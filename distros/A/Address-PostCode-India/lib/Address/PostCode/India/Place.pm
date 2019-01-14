@@ -1,6 +1,6 @@
 package Address::PostCode::India::Place;
 
-$Address::PostCode::India::Place::VERSION   = '0.09';
+$Address::PostCode::India::Place::VERSION   = '0.12';
 $Address::PostCode::India::Place::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Address::PostCode::India::Place - Placeholder for 'place' for Address::PostCode:
 
 =head1 VERSION
 
-Version 0.09
+Version 0.12
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'pincode'  => (is => 'ro');
 has 'city'     => (is => 'ro');

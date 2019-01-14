@@ -25,6 +25,8 @@ struct imp_sth_st {
   mysqlx_result_t *result;
 };
 
+#define DBD_MYSQLX_FETCH_BUF_LEN 1024
+
 #define dbd_init mysqlx_dr_init
 #define dbd_db_login6 mysqlx_db_login6
 #define dbd_db_do mysqlx_db_do

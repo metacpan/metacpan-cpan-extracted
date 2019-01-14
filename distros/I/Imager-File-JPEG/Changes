@@ -1,3 +1,19 @@
+Imager-File-JPEG 0.93
+=====================
+
+ - remove an unneeded check when terminating the stream for JPEG
+   writing.  CID 185347.
+
+Imager-File-JPEG 0.92
+=====================
+
+ - move common EXIF parsing into core Imager.
+
+Imager-File-JPEG 0.91
+=====================
+
+ - Makefile.PL improvements
+
 Imager-File-JPEG 0.90
 =====================
 

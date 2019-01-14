@@ -1,3 +1,10 @@
+0.007   2019-01-13 (PERLANCAR)
+
+	- [bugfix] Forgot to init in some functions.
+
+	- Tweak wording of log statements for clarity.
+
+
 0.006   2018-11-21 (PERLANCAR)
 
 	- [bugfix] update-all: --download option was not provided and

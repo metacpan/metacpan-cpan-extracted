@@ -14,12 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-CPANModulesUtils",
   "EXE_FILES" => [
+    "script/draw-feature-matrix-from-acme-cpanmodules-module",
     "script/gen-acme-cpanmodules-module-from-acme-cpanlists-list"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CPANModulesUtils",
   "PREREQ_PM" => {
+    "Acme::CPANModulesUtil::FeatureMatrix" => 0,
     "Data::Dump" => 0,
     "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
     "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" => 0,
@@ -30,8 +32,9 @@ my %WriteMakefileArgs = (
     "File::Slurper" => 0,
     "Log::ger" => "0.023",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.811",
+    "Perinci::CmdLine::Base" => "1.816",
     "Perinci::CmdLine::Classic" => "1.770",
+    "Perinci::Sub::XCompletion::perl_modname" => 0,
     "Sah::Schema::filename" => 0,
     "Sah::Schema::nonnegint" => 0,
     "Sah::Schema::perl::modname" => 0,
@@ -45,7 +48,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +56,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Acme::CPANModulesUtil::FeatureMatrix" => 0,
   "Data::Dump" => 0,
   "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
   "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" => 0,
@@ -66,8 +70,9 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Log::ger" => "0.023",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.811",
+  "Perinci::CmdLine::Base" => "1.816",
   "Perinci::CmdLine::Classic" => "1.770",
+  "Perinci::Sub::XCompletion::perl_modname" => 0,
   "Sah::Schema::filename" => 0,
   "Sah::Schema::nonnegint" => 0,
   "Sah::Schema::perl::modname" => 0,

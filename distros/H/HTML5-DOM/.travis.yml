@@ -1,3 +1,16 @@
+jobs:
+  include:
+    - stage: Windows
+      os: windows
+      language: shell
+      before_install:
+        - cinst -y strawberryperl
+        - export "PATH=/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin:/c/Strawberry/c/bin:$PATH"
+      install:
+        - cpanm --notest --installdeps .
+      script:
+        - perl Makefile.PL && gmake.exe test TEST_VERBOSE=1
+
 language: perl
 perl:
     - "5.22"
@@ -9,4 +22,4 @@ perl:
 os:
     - linux
 
-script: perl Makefile.PL && make test
+script: perl Makefile.PL && make test TEST_VERBOSE=1

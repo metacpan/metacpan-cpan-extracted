@@ -8,8 +8,8 @@ use 5.008003;
 use Term::Choose qw( choose );
 
 use App::DBBrowser::Auxil;
-use App::DBBrowser::Subqueries;
-use App::DBBrowser::Table::Functions;
+#use App::DBBrowser::Subqueries;        # required
+#use App::DBBrowser::Table::Functions;  # required
 
 
 sub new {
@@ -42,14 +42,16 @@ sub extended_col {
     }
     my $ext_col;
     if ( $type eq $subquery ) {
+        require App::DBBrowser::Subqueries;
         my $new_sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
         my $subq = $new_sq->choose_subquery( $sql, $stmt_type, $clause );
         if ( ! defined $subq ) {
             return;
         }
-        $ext_col = '(' . $subq . ')';
+        $ext_col = $subq;
     }
     elsif ( $type eq $function ) {
+        require App::DBBrowser::Table::Functions;
         my $new_func = App::DBBrowser::Table::Functions->new( $sf->{i}, $sf->{o}, $sf->{d} );
         my $func = $new_func->col_function( $sql, $stmt_type, $clause );
         if ( ! defined $func ) {
@@ -58,7 +60,7 @@ sub extended_col {
         $ext_col = $func;
     }
     $ax->print_sql( $sql, [ $stmt_type ] );
-    my $alias = $ax->alias( 'subqueries', $ext_col . ' AS: ', undef, ' ' );
+    my $alias = $ax->alias( 'subqueries', $ext_col );
     if ( defined $alias && length $alias ) {
         $sql->{alias}{$ext_col} = $ax->quote_col_qualified( [ $alias ] );
     }

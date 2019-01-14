@@ -1,5 +1,5 @@
 package Sim::OPT::Report;
-# Copyright (C) 2008-2018 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2015 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Retrieve of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -38,7 +38,7 @@ use warnings::unused;
 
 our @EXPORT = qw( retrieve report newretrieve newreport get_files );
 
-$VERSION = '0.067'; # our $VERSION = '';
+$VERSION = '0.069'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -155,10 +155,10 @@ sub newretrieve
   my $countvar = $d{countvar}; #say $tee "IN RETRIEVE(\$countvar): " . dump($countvar );
   my $countstep = $d{countstep}; #say $tee "IN RETRIEVE(\$countstep): " . dump($countstep);
 
-  my %to = %{ $d{to} }; #say $tee  "IN RETRIEVE( \%to) " . dump( %to );
-  my $thisto = $to{to}; #say $tee  "IN RETRIEVE( \$thisto) " . dump( $thisto );
+  my %to = %{ $d{to} }; say $tee  "IN RETRIEVE( \%to) " . dump( %to );
+  my $thisto = $to{to}; say $tee  "IN RETRIEVE( \$thisto) " . dump( $thisto );
   my %inst = %{ $d{inst} };
-  my $cleanto = $inst{$thisto}; #say $tee  "IN RETRIEVE( \$cleanto) " . dump( $cleanto );
+  my $cleanto = $inst{$thisto}; say $tee  "IN RETRIEVE( \$cleanto) " . dump( $cleanto );
 
 
   my $from = $d{from}; #say $tee " IN MORPH \$from $from ";
@@ -172,7 +172,7 @@ sub newretrieve
 
   my ( @repdata, @retrdata );
 
-  my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } ); #say $tee "dump(\$numberof_simtools ): " . dump($numberof_simtools );
+  my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } ); say $tee "dump(\$numberof_simtools ): " . dump($numberof_simtools );
 
   my $counttool = 1;
   while ( $counttool <= $numberof_simtools )
@@ -607,10 +607,10 @@ $printthis
           foreach my $retrievedatum ( @{ $retrievedata{$counttool} } )
           {
             #say $tee " IN NEWRETRIEVE: \$retrievedatum: " . dump( $retrievedatum ) ;
-            my $reportdata_ref_ref = $reportdata{$counttool}->[$counttheme]; #say $tee "\$reportdata_ref_ref : " . dump( $reportdata_ref_ref ) ;
-            my @retrievedatarefs = @{$retrievedatum}; #say $tee "\@retrievedatarefs : ". dump( @retrievedatarefs );
-            my $simtitle = $simtitles{$counttool}->[ $counttheme ][0]; #say $tee "\$simtitle : $simtitle .";
-            my @sims = @{ $simtitles{$counttool}->[ $counttheme ] }[1..4]; #say $tee "\@sims : ". dump( @sims );
+            my $reportdata_ref_ref = $reportdata{$counttool}->[$counttheme]; say $tee "\$reportdata_ref_ref : " . dump( $reportdata_ref_ref ) ;
+            my @retrievedatarefs = @{$retrievedatum}; say $tee "\@retrievedatarefs : ". dump( @retrievedatarefs );
+            my $simtitle = $simtitles{$counttool}->[ $counttheme ][0]; say $tee "\$simtitle : $simtitle .";
+            my @sims = @{ $simtitles{$counttool}->[ $counttheme ] }[1..4]; say $tee "\@sims : ". dump( @sims );
 
             #my $resfile = $resfiles[ $counttheme ]; ################ TURNING THIS OFF IS PROVISIONAL!!!
             #say $tee "IN NEWRETRIEVE \$resfile : $resfile .";
@@ -747,10 +747,10 @@ $printthis
                     }
                     elsif ( ( ( $themereport eq "loads" ) or ( $themereport eq "tempsstats"  ) ) )
                     {
-                      #say $tee "IN NEWRETRIEVE \$result $result, \$resfile $resfile, \@retrdata @retrdata, \$reporttitle $reporttitle,
-                      #\$themereport $themereport, \$counttheme $counttheme,
-                            #\$countreport $countreport, \$retfile $retfile, \$semaphorego1 $semaphorego1, \$semaphorego2 $semaphorego2,
-                            #\$semaphorestop1 $semaphorestop1, \$semaphorestop2 $semaphorestop2, \$textpattern $textpattern, \$afterlines $afterlines";
+                      say $tee "IN NEWRETRIEVE \$result $result, \$resfile $resfile, \@retrdata @retrdata, \$reporttitle $reporttitle,
+                      \$themereport $themereport, \$counttheme $counttheme,
+                            \$countreport $countreport, \$retfile $retfile, \$semaphorego1 $semaphorego1, \$semaphorego2 $semaphorego2,
+                            \$semaphorestop1 $semaphorestop1, \$semaphorestop2 $semaphorestop2, \$textpattern $textpattern, \$afterlines $afterlines";
                       retrieve_stats_results( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme,
                             $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines );
                     }
@@ -803,7 +803,7 @@ $printthis
                 open( RETBLOCK, ">>$retblock"); # or die;
 
                 my $reportdata_ref = $reportdata_ref_ref->[$countreport];
-                @repdata = @$reportdata_ref;  #say $tee "IN NEWREPORT \@repdata : ". dump( @repdata );
+                @repdata = @$reportdata_ref;  say $tee "IN NEWREPORT \@repdata : ". dump( @repdata );
                 @retcases = uniq( @retcases );
                 my $retfile = $resfile;
                 if ( not ($retfile ~~ @retcases ) )
@@ -888,6 +888,10 @@ $printthis
   if ( $dowhat{neweraseres} eq "y" )
   {
     `rm -f $resfile` ;
+    if ( -e $flfile )
+    {
+      `rm -f $flfile` ;
+    }
   }
   return ( \@retcases, \@retstruct, \@notecases );
 }  # END SUB NEWRETRIEVE
@@ -950,7 +954,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   my @descendcases = @{ $dirfiles{descendcases} };
   my @descendstruct = @{ $dirfiles{descendstruct} };
   my @notecases = @{ $dirfiles{notecases} };
-  my $repfile = $dirfiles{repfile}; #say $tee "IN REPORT REPFILE: $repfile";
+  my $repfile = $dirfiles{repfile}; say $tee "IN REPORT REPFILE: $repfile";
 
   my $morphlist = $dirfiles{morphlist};
   my $morphblock = $dirfiles{morphblock};
@@ -984,10 +988,10 @@ sub newreport # This function retrieves the results of interest from the texts f
   my $countvar = $d{countvar}; #say $tee "IN REPORT \$countvar " . dump( $countvar );
   my $countstep = $d{countstep}; #say $tee "IN REPORT \$countstep " . dump( $countstep );
 
-  my %to = %{ $d{to} }; #say $tee  "IN REPORT( \%to) " . dump( %to );
-  my $thisto = $to{to}; #say $tee  "IN REPORT( \$thisto) " . dump( $thisto );
+  my %to = %{ $d{to} }; say $tee  "IN REPORT( \%to) " . dump( %to );
+  my $thisto = $to{to}; say $tee  "IN REPORT( \$thisto) " . dump( $thisto );
   my %inst = %{ $d{inst} };
-  my $cleanto = $inst{$thisto}; #say $tee  "IN REPORT( \$cleanto) " . dump( $cleanto );
+  my $cleanto = $inst{$thisto}; say $tee  "IN REPORT( \$cleanto) " . dump( $cleanto );
 
   my $from = $d{from}; #say $tee " IN MORPH \$from $from ";
   my $toitem = $d{toitem}; #say $tee " IN MORPH \$toitem $toitem ";
@@ -1021,7 +1025,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   open( REPLIST, ">>$replist" ) or die( "$!" );
   open( REPBLOCK, ">>$repblock" ) or die( "$!" );
 
-  open( REPFILE, ">>$repfile") or die "Can't open $repfile $!"; #say $tee "IN NEWREPORT \$repfile $repfile";
+  open( REPFILE, ">>$repfile") or die "Can't open $repfile $!"; say $tee "IN NEWREPORT \$repfile $repfile";
   @repcases = uniq( @repcases );
 
   say REPBLOCK "$repfile";
@@ -1076,7 +1080,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 
 
           if ( -e $retfile ) #if ( not ( eval ( $skipreport ) ) )
-          {  #say $tee "#Inspecting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1) . ", file $retfile, to report $themereport." ;
+          {  say $tee "#Inspecting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1) . ", file $retfile, to report $themereport." ;
             open( RETFILE, "$retfile" ) or die( "$!" );
             my @lines = <RETFILE>;
             close RETFILE;

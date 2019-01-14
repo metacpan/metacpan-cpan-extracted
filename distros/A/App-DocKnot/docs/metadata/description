@@ -24,7 +24,7 @@ general tool.  But you're certainly welcome to use it if you find it
 useful, send pull requests to make it more general, or take ideas from it
 for your own purposes.
 
-Currently included in this package are just the App::DocKnot module (which
-contains most of the logic), a small docknot driver program, and the
-templates I use for my own software.  Over time, it may include more of my
-web publishing framework, time permitting.
+Currently included in this package are just the App::DocKnot module and
+its submodules, a small docknot driver program, and the templates I use
+for my own software.  Over time, it may include more of my web publishing
+framework, time permitting.

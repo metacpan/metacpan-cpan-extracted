@@ -51,11 +51,12 @@ sub defaults {
             qualified_table_name => 0,
             quote_identifiers    => 1,
             extend_select        => 0,
+            extend_group_by      => 0,
+            extend_having        => 0,
+            extend_join          => 0,
             extend_set           => 0,
             extend_table         => 0,
             extend_where         => 0,
-            extend_group_by      => 0,
-            extend_having        => 0,
             thsd_sep             => ',', ###
             update_ok            => 0,
         },
@@ -125,11 +126,11 @@ sub __menu_insert {
     my $menu_insert = {
         main_insert => [
 #            { name => 'files_dir',         text => "- File Dir",         section => 'insert' },
-            { name => '_parse_with_split', text => "- 'split'   config", section => 'split'  },
-            { name => '_module_Text_CSV',  text => "- Text::CSV config", section => 'csv'    },
-            { name => '_parse_mode',       text => "- Parse Tool",       section => 'insert' },
-            { name => 'file_encoding',     text => "- File Encoding",    section => 'insert' },
-            { name => 'max_files',         text => "- File History",     section => 'insert' },
+            { name => '_parse_with_split', text => "- Config \"split\"   ",  section => 'split'  },
+            { name => '_module_Text_CSV',  text => "- Config \"Text::CSV\"", section => 'csv'    },
+            { name => '_parse_mode',       text => "- Parse Mode",           section => 'insert' },
+            { name => 'file_encoding',     text => "- File Encoding",        section => 'insert' },
+            { name => 'max_files',         text => "- File History",         section => 'insert' },
         ],
         _module_Text_CSV => [
             { name => '_csv_char',    text => "- *_char attributes", section => 'csv' },
@@ -513,6 +514,7 @@ sub set_options {
                     [ 'extend_having',   "- Extend HAVING",   $ext_val         ],
                     [ 'extend_set',      "- Extend SET",      $ext_val         ],
                     [ 'extend_table',    "- Extend Table",    [ 'None', 'SQ' ] ],
+                    [ 'extend_join',     "- Extend Join",     [ 'None', 'SQ' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu );
             }

@@ -1,21 +1,23 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ListNewCPANDists/list_monthly_new_cpan_dists_html
-# and generated automatically using Perinci::CmdLine::Gen version 0.486
+# and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2018-09-02'; # DATE
+our $DATE = '2019-01-13'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ListNewCPANDists/list_monthly_new_cpan_dists_html",
     program_name => "list-monthly-new-cpan-dists-html",
+    log => 1,
     read_config => 0,
     read_env => 0,
 );
@@ -37,7 +39,7 @@ list-monthly-new-cpan-dists-html - List new CPAN distributions in a given month 
 
 =head1 VERSION
 
-This document describes version 0.008 of list-monthly-new-cpan-dists-html (from Perl distribution App-ListNewCPANDists), released on 2018-09-02.
+This document describes version 0.010 of list-monthly-new-cpan-dists-html (from Perl distribution App-ListNewCPANDists), released on 2019-01-13.
 
 =head1 SYNOPSIS
 
@@ -87,6 +89,32 @@ Can be specified multiple times.
 =item B<--exclude-dists-json>=I<s>
 
 See C<--exclude-dist>.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 
@@ -199,7 +227,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

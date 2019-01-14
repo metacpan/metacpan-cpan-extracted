@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "SQL::Schema::Versioned",
   "PREREQ_PM" => {
-    "DBIx::Diff::Schema" => "0.091",
+    "DBIx::Diff::Schema" => "0.093",
     "Exporter" => "5.57",
     "Log::ger" => "0.023",
     "Scalar::Util::Numeric" => 0,
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.236",
+  "VERSION" => "0.237",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "DBD::SQLite" => 0,
   "DBI" => 0,
-  "DBIx::Diff::Schema" => "0.091",
+  "DBIx::Diff::Schema" => "0.093",
   "Data::Clone" => 0,
   "Exporter" => "5.57",
   "File::Path" => 0,

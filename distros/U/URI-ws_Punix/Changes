@@ -1,0 +1,5 @@
+-- 0.002
+  Fix for unit tests on older versions of Test::More
+
+-- 0.001
+  Inital Release

@@ -28,3 +28,23 @@ map {
     print 42;
     print 42;
 } (1...100)
+
+## name Large map block - higher limit
+## failures 0
+## parms { block_statement_count_limit => 20 }
+## cut
+
+map {
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+} (1...100)

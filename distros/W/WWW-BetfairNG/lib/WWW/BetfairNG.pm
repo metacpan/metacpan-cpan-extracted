@@ -8,7 +8,7 @@ use Carp qw /croak/;
 
 # Define Betfair Endpoints
 use constant BF_BETTING_ENDPOINT => 'https://api.betfair.com/exchange/betting/rest/v1/';
-use constant BF_C_LOGIN_ENDPOINT => 'https://identitysso.betfair.com/api/certlogin/';
+use constant BF_C_LOGIN_ENDPOINT => 'https://identitysso-cert.betfair.com/api/certlogin/';
 use constant BF_LOGIN_ENDPOINT   => 'https://identitysso.betfair.com/api/login/';
 use constant BF_LOGOUT_ENDPOINT  => 'https://identitysso.betfair.com/api/logout/';
 use constant BF_KPALIVE_ENDPOINT => 'https://identitysso.betfair.com/api/keepAlive/';
@@ -22,11 +22,11 @@ WWW::BetfairNG - Object-oriented Perl interface to the Betfair JSON API
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,12 @@
 Revision history for App-DBBrowser
 
 
+2.042    2019-01-11
+        - Join: possibility to use a subquery instead of a table.
+        - Join: option to choose the comparison operator.
+        - Remove duplicates in history.
+        - Bugfix: avoid double quoting in saved subqueries.
+
 2.041    2019-01-09
         - Bugfix in join: backup aliases.
         - Update join menus.

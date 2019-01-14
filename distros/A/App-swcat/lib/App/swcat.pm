@@ -1,7 +1,7 @@
 package App::swcat;
 
-our $DATE = '2018-11-21'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2019-01-14'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -83,6 +83,13 @@ our %arg0_software = (
                 path_sep => '-',
             );
         },
+    },
+);
+
+our %argopt1_version = (
+    version => {
+        schema => ['str*'],
+        pos => 1,
     },
 );
 
@@ -382,6 +389,29 @@ sub latest_version {
     $res;
 }
 
+$SPEC{available_versions} = {
+    v => 1.1,
+    summary => 'Get list of available versions of a software',
+    description => <<'_',
+
+
+_
+    args => {
+        %args_common,
+        %arg0_software,
+    },
+};
+sub available_versions {
+    my %args = @_;
+    my $state = _init(\%args, 'rw');
+
+    my $sw = $args{software};
+
+    my $mod = _load_swcat_mod($sw);
+    return [501, "Not implemented"] unless $mod->can("get_available_versions");
+    $mod->get_available_versions(arch => $args{arch});
+}
+
 $SPEC{download_url} = {
     v => 1.1,
     summary => 'Get download URL(s) of a software',
@@ -427,6 +457,30 @@ sub download_url {
     $res;
 }
 
+$SPEC{release_note} = {
+    v => 1.1,
+    summary => 'Get release note of (a version of) a software',
+    description => <<'_',
+
+
+_
+    args => {
+        %args_common,
+        %arg0_software,
+        %argopt_arch,
+        %argopt1_version,
+    },
+};
+sub release_note {
+    my %args = @_;
+    my $state = _init(\%args, 'ro');
+
+    my $sw = delete $args{software};
+    my $mod = _load_swcat_mod($sw);
+    return [501, "Not implemented"] unless $mod->can("get_available_versions");
+    $mod->get_release_note(%args);
+}
+
 $SPEC{archive_info} = {
     v => 1.1,
     summary => 'Get info of a software archive',
@@ -465,7 +519,7 @@ App::swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.008 of App::swcat (from Perl distribution App-swcat), released on 2018-11-21.
+This document describes version 0.009 of App::swcat (from Perl distribution App-swcat), released on 2019-01-14.
 
 =head1 SYNOPSIS
 
@@ -485,6 +539,44 @@ Usage:
  archive_info(%args) -> [status, msg, payload, meta]
 
 Get info of a software archive.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<arch> => I<software::arch>
+
+=item * B<cache_period> => I<int>
+
+=item * B<db_path> => I<filename>
+
+Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+
+=item * B<software>* => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 available_versions
+
+Usage:
+
+ available_versions(%args) -> [status, msg, payload, meta]
+
+Get list of available versions of a software.
 
 This function is not exported.
 
@@ -637,6 +729,46 @@ that contains extra information.
 
 Return value:  (any)
 
+
+=head2 release_note
+
+Usage:
+
+ release_note(%args) -> [status, msg, payload, meta]
+
+Get release note of (a version of) a software.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<arch> => I<software::arch>
+
+=item * B<cache_period> => I<int>
+
+=item * B<db_path> => I<filename>
+
+Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+
+=item * B<software>* => I<str>
+
+=item * B<version> => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-swcat>.
@@ -663,7 +795,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

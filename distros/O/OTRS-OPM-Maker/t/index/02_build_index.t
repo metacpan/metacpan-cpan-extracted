@@ -19,18 +19,6 @@ my $opm_dir = File::Spec->catdir( $dir, '..', 'repo' );
 my $index = q~<?xml version="1.0" encoding="utf-8" ?>
 <otrs_package_list version="1.0">
 <Package>
-  <Name>TestSMTP</Name>
-  <Version>0.0.1</Version>
-  <Vendor>Renee Baecker, Perl-Services.de</Vendor>
-  <URL>http://perl-services.de/</URL>
-  <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
-  <Description Lang="en">A module that restricts email addresses.</Description>
-  <Description Lang="de">Ein Modul, das den Emailversand auf Testsystemen einschränkt.</Description>
-  <Framework>3.0.x</Framework>
-  <Filelist/>
-  <File>/TestSMTP-0.0.1.opm</File>
-</Package>
-<Package>
   <Name>SecondSMTP</Name>
   <Version>0.0.1</Version>
   <Vendor>Renee Baecker, Perl-Services.de</Vendor>
@@ -43,6 +31,18 @@ my $index = q~<?xml version="1.0" encoding="utf-8" ?>
     <FileDoc Permission="644" Location="doc/en/Test.pdf"/>
   </Filelist>
   <File>/SecondSMTP-0.0.1.opm</File>
+</Package>
+<Package>
+  <Name>TestSMTP</Name>
+  <Version>0.0.1</Version>
+  <Vendor>Renee Baecker, Perl-Services.de</Vendor>
+  <URL>http://perl-services.de/</URL>
+  <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+  <Description Lang="en">A module that restricts email addresses.</Description>
+  <Description Lang="de">Ein Modul, das den Emailversand auf Testsystemen einschränkt.</Description>
+  <Framework>3.0.x</Framework>
+  <Filelist/>
+  <File>/TestSMTP-0.0.1.opm</File>
 </Package>
 
 </otrs_package_list>

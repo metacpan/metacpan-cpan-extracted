@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.041';
+our $VERSION = '2.042';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -378,7 +378,7 @@ sub run {
                     next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
                     last DB_PLUGIN;
                 }
-                my ( $user_tables, $sys_tables );
+                my ( $user_tables, $sys_tables ) = ( [], [] );
                 for my $table ( keys %$tables_info ) {
                     if ( $tables_info->{$table}[3] =~ /SYSTEM/ ) {
                         push @$sys_tables, $table;
@@ -492,7 +492,7 @@ sub run {
                         next TABLE if ! defined $qt_table;
                     }
                     elsif ( $table eq $from_subquery ) {
-                        $sf->{i}{special_table} = 'subquery'; ##
+                        $sf->{i}{special_table} = 'subquery';
                         if ( ! eval { ( $qt_table, $qt_columns ) = $sf->__derived_table(); 1 } ) {
                             $ax->print_error_message( $@, 'Derived table' );
                             next TABLE;
@@ -531,6 +531,7 @@ sub __browse_the_table {
     $ax->reset_sql( $sql );
     $sql->{table} = $qt_table;
     $sql->{cols} = $qt_columns;
+    $ax->print_sql( $sql, [ 'Select' ] );
 
     PRINT_TABLE: while ( 1 ) {
         my $all_arrayref;
@@ -658,14 +659,13 @@ sub __derived_table {
     my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tmp = { table => '(SQ)' };
     $ax->reset_sql( $tmp );
-    my $subquery = $sq->choose_subquery( $tmp, 'Select', 'from' );
-    if ( ! defined $subquery ) {
+    my $qt_table = $sq->choose_subquery( $tmp, 'Select', 'from' );
+    if ( ! defined $qt_table ) {
         return;
     }
-    my $qt_table = "(" . $subquery . ")"; ###
     $tmp->{table} = $qt_table;
     $ax->print_sql( $tmp, [ 'Select' ] );
-    my $alias = $ax->alias( 'subqueries', 'AS: ', 'From_SQ' ); ##
+    my $alias = $ax->alias( 'subqueries', undef, 'From_SQ' );
     if ( defined $alias && length $alias ) {
         $qt_table .= " AS " . $alias;
     }
@@ -674,6 +674,8 @@ sub __derived_table {
     my $qt_columns = $ax->quote_simple_many( $sth->{NAME} );
     return $qt_table, $qt_columns;
 }
+
+
 
 
 
@@ -694,7 +696,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.041
+Version 2.042
 
 =head1 DESCRIPTION
 

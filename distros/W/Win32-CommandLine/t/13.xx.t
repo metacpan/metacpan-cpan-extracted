@@ -82,14 +82,13 @@ add_test( [ q{perl -MPerl::MinimumVersion -e "$pmv = Perl::MinimumVersion->new('
 add_test( [ q{perl -e "$_ = 'abc'; s/a/bb/; print"} ], ( q{perl -e "$_ = 'abc'; s/a/bb/; print"} ) );
 add_test( [ q{xx -e perl -e "$x = split( /x/, q{}); print $x;"} ], ( q{xx -e perl -e "$x = split( /x/, q{}); print $x;"} ) );       ## prior BUG
 
-# design decision = should non-quoted/non-glob expanded tokens be dosified or not
-add_test( [ q{/THIS_IS_NOT_A_FILE_sa9435kj4j5j545jn2230096jkjlk5609345k3l5j3lk} ], ( q{\THIS_IS_NOT_A_FILE_sa9435kj4j5j545jn2230096jkjlk5609345k3l5j3lk} ) );   # non-files (can screw up switches) ## assume not FRAGILE (name should be unique)
-
+# design decision = non-quoted/non-glob expanded tokens be NOT be dosified (or really, changed at all)
+add_test( [ q{/THIS_IS_NOT_A_FILE_sa9435kj4j5j545jn2230096jkjlk5609345k3l5j3lk} ], ( q{/THIS_IS_NOT_A_FILE_sa9435kj4j5j545jn2230096jkjlk5609345k3l5j3lk} ) );   # non-files (can screw up switches) ## assume not FRAGILE (name should be unique)
 
 if (-e 'c:/windows') {
     # case preservation of non-globbed args
-    add_test( [ q{c:/windows} ], ( q{c:\windows} ) );       # non-expanded files have no case changes   ## ? FRAGILE (b/c case differences between WINDOWS)
-    add_test( [ q{c:/WiNDowS} ], ( q{c:\WiNDowS} ) );       # non-expanded files have no case changes   ## ? FRAGILE (b/c case differences between WINDOWS)
+    add_test( [ q{c:/windows} ], ( q{c:/windows} ) );       # non-expanded files have no case changes   ## ? FRAGILE (b/c case differences between WINDOWS)
+    add_test( [ q{c:/WiNDowS} ], ( q{c:/WiNDowS} ) );       # non-expanded files have no case changes   ## ? FRAGILE (b/c case differences between WINDOWS)
     }
 
 if (-e "$ENV{SystemRoot}/system" ) {
@@ -97,6 +96,12 @@ if (-e "$ENV{SystemRoot}/system" ) {
     my $ENV_SystemRoot = untaint( $ENV{SystemRoot} );
     add_test( [ qq{$ENV_SystemRoot*/system*} ], ( join(q{ }, dosify( glob( quotemeta_glob($ENV{SystemRoot}).'*/system*' ))) ) );   # expanded portions of pathnames have case corresponding to the matched file ## ? FRAGILE (b/c case differences between WINDOWS)
     add_test( [ qq{$ENV_SystemRoot/system*} ], ( join(q{ }, dosify( glob( quotemeta_glob($ENV{SystemRoot}).'/system*' ))) ) );     # expanded portions of pathnames have case corresponding to the matched file ## ? FRAGILE (b/c case differences between WINDOWS)
+    $ENV_SystemRoot = lc $ENV_SystemRoot;
+    add_test( [ qq{$ENV_SystemRoot*/system*} ], ( join(q{ }, dosify( glob( quotemeta_glob($ENV_SystemRoot).'*/system*' ))) ) );   # expanded portions of pathnames have case corresponding to the matched file ## ? FRAGILE (b/c case differences between WINDOWS)
+    add_test( [ qq{$ENV_SystemRoot/system*} ], ( join(q{ }, dosify( glob( quotemeta_glob($ENV_SystemRoot).'/system*' ))) ) );     # expanded portions of pathnames have case corresponding to the matched file ## ? FRAGILE (b/c case differences between WINDOWS)
+    $ENV_SystemRoot = uc $ENV_SystemRoot;
+    add_test( [ qq{$ENV_SystemRoot*/system*} ], ( join(q{ }, dosify( glob( quotemeta_glob($ENV_SystemRoot).'*/system*' ))) ) );   # expanded portions of pathnames have case corresponding to the matched file ## ? FRAGILE (b/c case differences between WINDOWS)
+    add_test( [ qq{$ENV_SystemRoot/system*} ], ( join(q{ }, dosify( glob( quotemeta_glob($ENV_SystemRoot).'/system*' ))) ) );     # expanded portions of pathnames have case corresponding to the matched file ## ? FRAGILE (b/c case differences between WINDOWS)
     }
 
 if ($ENV{TEST_FRAGILE}) {
@@ -252,4 +257,3 @@ sub untaint {
 
     return wantarray ? @{$arg_ref} : "@{$arg_ref}";
     }
-

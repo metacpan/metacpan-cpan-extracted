@@ -1,5 +1,5 @@
 package Enterprise::Licence;
-our $VERSION = '0.01'; use utf8; use strict; use warnings;
+use utf8; use strict; use warnings; our $VERSION = '0.02';
 use DateTime; use Math::BigInt; use Compress::Huffman;
 use Shannon::Entropy qw/entropy/; use Bijection qw/all/;
 
@@ -10,7 +10,8 @@ sub new {
 		die 'no secure secret passed to new';
 	}
 	$self->{secret} = $args->{secret};
-	my $ch = huffman([split '', $args->{secret}]);
+	$self->{increment} = $args->{increment} || 0.1;
+	my $ch = $self->huffman([split '', $args->{secret}]);
 	$self->{ch} = $ch;
 	bijection_set(
 		($args->{offset} ? $args->{offset} : ()),
@@ -31,16 +32,16 @@ sub dec2bin {
 
 sub customer_offset {
 	my $encode = [split '', $_[1]];
-	my $ch = huffman($encode);
+	my $ch = $_[0]->huffman($encode);
 	return $ch->encode($encode);
 }
 
 sub huffman {
-	my $encode = shift;
+	my ($self, $encode) = @_;
 	my $ch = Compress::Huffman->new();
-	my $i = 0.1;
+	my $i = $self->{increment};
 	my %symbols = map {
-		$_ => ( $i += 0.1 )
+		$_ => ( $i += $self->{increment} )
 	} @{$encode};
 	$ch->symbols(\%symbols, notprob => 1);
 	return $ch;
@@ -55,20 +56,20 @@ __END__
 
 =head1 NAME
 
-Enterprise::Licence - The great new Enterprise::Licence!
+Enterprise::Licence - Licence or License
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
 =head1 SYNOPSIS
 
-    use Enterprise::Licence::Generate;
+	use Enterprise::Licence::Generate;
 	use Enterprise::Licence::Validate;
 
-	my $sec = 'IAmLimited';
+	my $sec = 'ab3yq34s1£f';
 	my $generator = Enterprise::Licence::Generate->new({ secret => $sec });
 
 	my $client = 'unique';
@@ -79,6 +80,117 @@ Version 0.01
 	# (1) == valid
 	# (0, 1) == expired
 	# (0, 0) == invalid
+
+=cut
+
+=head1 Description
+
+My software is white labeled and distributed into environments that I do not control. I needed a way to programmatically licence code for a set period of time 1 month trial, 5 years etc.
+
+=head2 The Licence
+
+The following is an example of a licence that this module generates:
+
+	jQT42jKM_-gfPn32-qs49pg-lpsYxqok
+
+It can be broken down into 4 parts:
+
+=over
+
+=item secret + client/environment
+
+	jQT42jKM_
+
+Decimal Huffman compressed secret + Decimal Huffman compressed client/environment bijected.
+
+=item start time
+
+	gfPn32
+
+The Bijected epoch your licence is valid from.
+
+=item expire time
+
+	qs49pg
+
+The Bijected epoch your licence is valid to.
+
+=item duration
+
+	lpsYxqok
+
+The Bijected duration of the licence (expire time - start time) this is to validate that the licence has not been manipulated.
+
+=back
+
+=head1 Generate/Validate
+
+=head2 new
+
+Both Generate and Validate accept the same parameters to new 
+
+=over 
+
+=item secret
+
+A string that should have an entropy greater than 3. This value is meant to be set at application level, hidden in compiled abstracted code.
+
+=item increment
+
+A float that will be used to build the huffman symbols table.
+
+=item biject
+
+An array reference that is passed to bijection_set.
+
+=item offset
+
+An offset that is passed to bijection_set.
+
+=back
+
+=head2 generate
+
+To generate a licence it as simple as the following:
+
+	my $generator = Enterprise::Licence::Generate->new({ secret => $secret });
+	my $licence = $generator->generate('world-wide', { months => 1 });
+
+=over
+
+=item client/environment
+
+The first param to generate should be your environment/client identifier.
+
+=item duration
+
+The second param should be a valid reference that can be passed to DateTime->add().
+
+=back
+
+=cut
+
+=head2 validate
+
+To validate a licence:
+
+	my $validator = Enterprise::Licence::Validate->new({ secret => $secret });
+	my @valid = $validator->valid($licence, 'world-wide');
+	# (1) == The licence is valid
+	# (0, 1) == The licence is valid but it has expired
+	# (0, 0) == The licence is invalid.
+
+=over
+
+=item client/environment
+
+The first param to validate should be the licence string.
+
+=item duration
+
+The second param to validate should be your environment/client identifier.
+
+=back
 
 =cut
 

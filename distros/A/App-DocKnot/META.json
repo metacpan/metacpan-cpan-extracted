@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-DocKnot",
    "prereqs" : {
@@ -38,7 +38,11 @@
    "provides" : {
       "App::DocKnot" : {
          "file" : "lib/App/DocKnot.pm",
-         "version" : "1.06"
+         "version" : "2.00"
+      },
+      "App::DocKnot::Generate" : {
+         "file" : "lib/App/DocKnot/Generate.pm",
+         "version" : "2.00"
       }
    },
    "release_status" : "stable",
@@ -57,6 +61,6 @@
          "web" : "https://github.com/rra/docknot"
       }
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "2.00",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

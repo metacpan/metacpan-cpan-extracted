@@ -84,11 +84,21 @@ BUILDING AND INSTALLATION
 
       perl Makefile.PL
       make
-      make test
       make install
 
-  You'll probably need to do the last as root unless you're installing
+  You will have to run the last command as root unless you're installing
   into a local Perl module tree in your home directory.
+
+TESTING
+
+  Term::ANSIColor comes with a test suite, which you can run after
+  building with:
+
+      make test
+
+  If a test fails, you can run a single test with verbose output via:
+
+      prove -vb <path-to-test>
 
   To enable tests that don't detect functionality problems but are used to
   sanity-check the release, set the environment variable RELEASE_TESTING

@@ -1,9 +1,9 @@
 #
 #	Gnu.pm --- The GNU Readline/History Library wrapper module
 #
-#	$Id: Gnu.pm 556 2016-11-03 14:24:45Z hayashi $
+#	$Id: Gnu.pm 566 2019-01-14 05:30:33Z hayashi $
 #
-#	Copyright (c) 1996-2016 Hiroo Hayashi.  All rights reserved.
+#	Copyright (c) 1996-2019 Hiroo Hayashi.  All rights reserved.
 #
 #	This program is free software; you can redistribute it and/or
 #	modify it under the same terms as Perl itself.
@@ -80,12 +80,20 @@ the Term::ReadLine documentation for more information.
 END
     }
 }
+# use Term::ReadLine::Stub on a dumb terminal.
+# https://rt.cpan.org/Ticket/Display.html?id=123398
+# Debian Bug Report #99843
+BEGIN {
+    if (!defined($ENV{TERM}) || $ENV{TERM} =~ /^(dumb|emacs|unknown)$/) {
+	croak "dumb terminal.";
+    }
+}
 
 {
     use Exporter ();
     use DynaLoader;
 
-    our $VERSION = '1.35';		# update Gnu::XS::VERSION also.
+    our $VERSION = '1.36';		# update Gnu::XS::VERSION also.
 
     # Term::ReadLine::Gnu::AU makes a function in
     # `Term::ReadLine::Gnu::XS' as a method.
@@ -245,6 +253,8 @@ sub new {
     my $this = shift;		# Package
     my $class = ref($this) || $this;
 
+    # Debian Bug Report #204362
+    croak "Wrong number of arguments" unless @_ == 1 or @_ == 3;
     my $name = shift;
 
     my $self = \%Attribs;
@@ -667,7 +677,8 @@ our %_rl_vars;
        rl_key_sequence_length			=> ['I', 42], # GRL 6.3
        rl_change_environment			=> ['I', 43], # GRL 6.3
        rl_persistent_signal_handlers		=> ['I', 44], # GRL 7.0
-       utf8_mode				=> ['I', 45], # internal
+       history_quoting_state			=> ['I', 45], # GRL 8.0
+       utf8_mode				=> ['I', 46], # internal
 
        rl_startup_hook				=> ['F', 0],
        rl_event_hook				=> ['F', 1],
@@ -956,6 +967,10 @@ C<FunctionPtr>.
 
 	void	rl_free_keymap(Keymap|str map)
 
+=item C<empty_keymap(MAP)>
+
+	int	rl_empty_keymap(Keymap|str map)			# GRL 8.0
+
 =item C<get_keymap>
 
 	Keymap	rl_get_keymap()
@@ -971,6 +986,10 @@ C<FunctionPtr>.
 =item C<get_keymap_name(MAP)>
 
 	str	rl_get_keymap_name(Keymap map)
+
+=item C<set_keymap_name(NAME, MAP)>
+
+	int	rl_set_keymap_name(str name, Keymap|str map)	# GRL 8.0
 
 =back
 
@@ -1392,6 +1411,10 @@ When C<MAX> is omitted, the max length of an item in C<@matches> is used.
 
 	void	rl_reset_after_signal()				# GRL 4.0
 
+=item C<check_signals>
+
+	void	rl_check_signals()				# GRL 8.0
+
 =item C<echo_signal_char>
 
 	void	rl_echo_signal_char(int sig)			# GRL 6.0
@@ -1784,6 +1807,7 @@ Examples:
 	str history_search_delimiter_chars
 	str history_no_expand_chars
 	int history_quotes_inhibit_expansion
+	int history_quoting_state
 	pfunc history_inhibit_expansion_function
 
 =head3 Function References

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::SummaryCounters;
 # ABSTRACT: Statement statistics
-$Neo4j::Driver::SummaryCounters::VERSION = '0.09';
+$Neo4j::Driver::SummaryCounters::VERSION = '0.11';
 
 sub new {
 	my ($class, $stats) = @_;
@@ -51,7 +51,7 @@ Neo4j::Driver::SummaryCounters - Statement statistics
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ another, certain error conditions produce misleading statistics: It
 was observed that deleting a node that has relationships fails in a
 Cypher shell with an obscure error message, while it succeeds when
 executed over HTTP with this driver. However, the HTTP response then
-reports that the node was deleted, but the relationship wasn't, which
+reports that the node was deleted, but that the relationship wasn't, which
 is obviously inconsistent. Not quite sure what is going on there. To
 verify that modifying the database was successful, it would therefore
 probably make more sense to run a MATCH query, tedious or not.
@@ -114,7 +114,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2018 by Arne Johannessen.
+This software is Copyright (c) 2016-2019 by Arne Johannessen.
 
 This is free software, licensed under:
 

@@ -2,7 +2,7 @@ NAME
     Win32::CommandLine - Retrieve and reparse the Win32 command line
 
 VERSION
-     $Win32::CommandLine::VERSION = '0.954';  # ( Win32-CommandLine-0.954 )
+     $Win32::CommandLine::VERSION = '0.958';  # Win32-CommandLine-0.958
 
 SYNOPSIS
      @ARGV = Win32::CommandLine::argv() if eval { require Win32::CommandLine; };
@@ -16,62 +16,72 @@ SYNOPSIS
 DESCRIPTION
     This module provides a simple way for any perl script to reread and
     reparse the windows command line, adding improved parsing and more
-    robust quote mechanics, augmented with powerful bash-like shell
-    enhancements (including brace and tilde expansion, extended file glob
-    expansion, and subshell command substitution).
+    robust quote mechanics, augmented with powerful "bash"-like shell
+    enhancements (including brace and tilde expansion, quote and subshell
+    command substitution, and file name glob expansion).
 
     Use of the companion script, "xx.bat" (along with "doskey"), can,
     transparently, grant those same features to the command line interface
     of *any* windows executable.
 
-    Note that bash-compatible globbing and argument expansion are supplied,
-    including command substitution. Glob patterns may also contain
-    meta-notations, such as '"a[bc]*"' or '"foo.{bat,pl,exe,o}"'.
+  Command line expansion
+    1. Brace expansion
+        Brace expansion is performed before any other expansions, and any
+        characters special to other expansions are preserved in the result.
+        It is strictly textual.
 
-  Quote mechanics/expansion and subshell command substitution
-     '...'    literal (no escapes and no globbing within quotes)
-     "..."    literal (no escapes and no globbing within quotes) (see *NOTE-1)
-     $'...'   string including all ANSI C string escapes (see *NOTE-2); no globbing within quotes
-     $"..."   literal (no escapes and no globbing within quotes) [same as "..."]
-     $( ... ) command substitution (see *NOTE-3)
-     $("...") command substitution (quotes removed; see *NOTE-4)
+    2. Tilde expansion
+         ~           Current user home directory
+         ~USERNAME   Home directory of USERNAME
+         ~TEXT       Environment variable named ~TEXT (aka $ENV{~TEXT}; overrides ~USERNAME expansion)
 
-    NOTE-1: DOS character escape sequences (such as "\"") are parsed prior
-    to being put into the command line and, so, are valid and still
-    (unavoidably) interpreted within double-quotes.
+    3. Quote and subshell command substitution
+         '...'    literal content (no escapes and no globbing within quotes)
+         "..."    literal content (no escapes and no globbing within quotes) (see *NOTE-1)
+         $"..."   literal content (no escapes and no globbing within quotes) [same as "..."; same as C<bash>]
 
-    NOTE-2: ANSI C string escapes are "\a", "\b", "\e", "\f", "\n", "\r",
-    "\t", "\v", "\\", "\'", "\"", "\[0-9]{1,3}", "\x[0-9a-fA-F]{1,2}",
-    "\c[@A-Z[\\\]^_`?" ; all other escaped characters are left in place
-    without transformation ("\<x>" => "\<x>").
+         $'...'   interpreted content, including ANSI C string escapes (see *NOTE-2); no globbing within quotes
 
-    NOTE-3: Command substitution replaces the "$(...)" argument with the
-    standard output of that argument's execution. Command substitution
-    strings are not, themselves, automatically expanded; use '"$(xx
-    *COMMAND*)"' to trigger expansion of the subshell command line.
+         $( ... ) command substitution (see *NOTE-3)
+         $("...") command substitution (quotes removed; see *NOTE-4)
 
-    NOTE-4: "$("...")" is present to enable delayed DOS/Windows
-    interpretation of redirection & continuation characters. This allows
-    redirection & continuation characters to be used within the subshell
-    command string.
+        NOTE-1: DOS character escape sequences (such as "\"") are parsed
+        prior to being put into the command line and, so, are valid and
+        still (unavoidably) interpreted within double-quotes.
 
-    ref: bash ANSI-C Quoting
-    <http://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.ht
-    ml>"@" <http://www.webcitation.org/66M8skmP8>
+        NOTE-2: ANSI C string escapes are "\a", "\b", "\e", "\f", "\n",
+        "\r", "\t", "\v", "\\", "\'", "\"", octal ("\[0-9]{1,3}"),
+        hexadecimal ("\x[0-9a-fA-F]{1,2}"), and control characters
+        ("\c[@A-Z[\\\]^_`?"); all other escaped characters are left in place
+        without transformation ("\<x>" => "\<x>").
 
-  Expansion and "glob" meta-characters
-     \           Quote the next metacharacter
-     []          Character class
-     {}          Multiple pattern
-     *           Match any string of characters
-     ?           Match any single character
-     ~           Current user home directory
-     ~USERNAME   Home directory of USERNAME
-     ~TEXT       Environment variable named ~TEXT (aka $ENV{~TEXT}) [overrides ~USERNAME expansion]
+        NOTE-3: Command substitution replaces the "$(...)" argument with the
+        standard output of that argument's execution. Command substitution
+        strings are not, themselves, automatically expanded; use "$(xx
+        *COMMAND*)" to trigger further expansion of the subshell command
+        line.
+
+        NOTE-4: "$("...")" is present to enable delayed DOS/Windows
+        interpretation of redirection & continuation characters. This allows
+        redirection & continuation characters to be used within the subshell
+        command string.
+
+    4. Glob expansion and meta-characters
+         ?           Match any single character
+         *           Match any string of characters
+         []          Character class (including POSIX and negated classes)
+         \           Quote the next metacharacter
 
     The multiple pattern meta-notation '"a{b,c,d}e"' is a shorthand for
     '"abe ace ade"'. Left to right order is preserved, with results of
     matches being sorted separately at a low level to preserve this order.
+
+   Examples
+    ...
+
+    ref: bash ANSI-C Quoting
+    <http://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.ht
+    ml>"@" <http://www.webcitation.org/66M8skmP8>
 
   "xx.bat" Usage
      doskey type=call xx type $*
@@ -88,10 +98,10 @@ DESCRIPTION
 
      @:: * assumes `ls` is installed
      @:: print all directories in current directory
-     xx echo $(" ls -ALp --quoting-style=c --color=no . | grep --color=no "[\\/]$" ")
+     xx -e $(" ls -ALp --quoting-style=c --color=no . | grep --color=no [\\/]$ ")
 
      @:: print all files (non-directories) in current directory
-     xx echo $(" ls -ALp --quoting-style=shell --color=no . | grep --color=no -v "[\\/]$" ")
+     xx -e $(" ls -ALp --quoting-style=shell --color=no . | grep --color=no -v [\\/]$ ")
 
 INSTALLATION
     To install this module, run the following commands:
@@ -135,15 +145,6 @@ INSTALLATION
     documentation current.
 
 INTERFACE
-  "command_line( ) => $"
-    *   "$" : [return] the original command line for the process (as a
-        string)
-
-    Use the Win32 API to recapture the original command line for the current
-    process.
-
-        my $commandline = command_line();
-
   "argv( [\%options] ) => @ARGS"
     *   "\%options" : (optional) reference to hash containing function
         options
@@ -151,9 +152,19 @@ INTERFACE
     *   @ARGS : [return] revised argument array (may replace @ARGV)
 
     Reparse & glob-expand the original command line, returning a new,
-    revised argument array (which is a drop-in replacement for @ARGV).
+    revised argument array (which may be used as a drop-in replacement for
+    @ARGV).
 
-         @ARGV = argv();
+     @ARGV = argv();
+
+  "command_line( ) => $S"
+    *   $S : [return] the original command line for the process (as a
+        string)
+
+    Use the Win32 API to recapture the original command line for the current
+    process.
+
+     my $commandline = command_line();
 
   "parse( $s [,\%options ] ) => @ARGS"
     *   $s : string argument to parse/expand
@@ -163,24 +174,88 @@ INTERFACE
 
     *   @ARGS : [return] parsed/expanded arguments
 
-     my @argv_new = parse( command_line() );
-
     Parse & glob-expand a string argument; returns the results of
     parsed/expanded argument as an array.
 
+     my @argv_new = parse( command_line() );
+
   Function options ( "\%options" )
         my %options = (
-            remove_exe_prefix => 1,     # = 0/<true> [default = true]       # if true, remove all initial args up to and including the exe name from the @args array
-            dosquote => 0,              # = 0/<true>/'all' [default = 0]    # if true, convert all non-globbed ARGS to DOS/Win32 CLI compatible tokens (escaping internal quotes and quoting whitespace and special characters)
-            dosify => 0,                # = 0/<true>/'all' [default = 0]    # if true, convert all _globbed_ ARGS to DOS/Win32 CLI compatible tokens (escaping internal quotes and quoting whitespace and special characters); 'all' => do so for for _all_ ARGS which are determined to be files
-            unixify => 0,               # = 0/<true>/'all' [default = 0]    # if true, convert all _globbed_ ARGS to UNIX path style; 'all' => do so for for _all_ ARGS which are determined to be files
-            nullglob => defined($ENV{nullglob}) ? $ENV{nullglob} : 0,       # = 0/<true> [default = 0]  # if true, patterns which match no files are expanded to a null string (no token), rather than the pattern itself  ## $ENV{nullglob} (if it exists) overrides the default
-            glob => 1,                  # = 0/<true> [default = true]       # when true, globbing is performed
-            ## ToDO: rework this ... need carp/croak on unbalanced quotes/subshells (? carp_ub_quotes, carp_ub_shells, carp = 0/1/warn/carp/die/croak)
-            croak_unbalanced => 1,      # = 0/true/'quotes'/'subshells' [default = true] # if true, croak for unbalanced command line quotes or subshell blocks (takes precedence over carp_unbalanced)
-            carp_unbalanced => 1,       # = 0/true/'quotes'/'subshells' [default = true] # if true, carp for unbalanced command line quotes or subshell blocks
+            remove_exe_prefix => 1,     # = 0/<true> [default = <true>]
+            dosquote => 0,              # = 0/<true>/'all' [default = 0]
+            dosify => 0,                # = 0/<true>/'all' [default = 0]
+            unixify => 0,               # = 0/<true>/'all' [default = 0]
+            nullglob => defined($ENV{nullglob}) ? $ENV{nullglob} : 0,   # = 0/<true> [default = 0]
+            glob => 1,                  # = 0/<true> [default = <true>]
+            croak_unbalanced => 1,      # = 0/true/'quotes'/'subshells' [default = <true>]
+            carp_unbalanced => 1,       # = 0/true/'quotes'/'subshells' [default = <true>]
             ## ToDO: add globstar option
             );
+
+    *   "remove_exe_prefix"
+
+        Allowable values: 0, "<true>"
+
+        Default value: "<true>"
+
+        If "<true>", remove all initial args up to and including the exe
+        name from the returned @ARGS array.
+
+    *   "dosquote"
+
+        Allowable values: 0, "<true>", 'all'
+
+        Default value: 0
+
+        If "<true>", convert all non-globbed ARGS to DOS/Win32 CLI
+        compatible tokens (escaping internal quotes and quoting whitespace
+        and special characters)
+
+    *   "dosify"
+
+         dosify => 0,                # = 0/<true>/'all' [default = 0]
+
+        - if true, convert all _globbed_ ARGS to DOS/Win32 CLI compatible
+        tokens (escaping internal quotes and quoting whitespace and special
+        characters); 'all' => do so for for _all_ ARGS which are determined
+        to be files
+
+    *   "unixify"
+
+         unixify => 0,               # = 0/<true>/'all' [default = 0]
+
+        - if true, convert all _globbed_ ARGS to UNIX path style; 'all' =>
+        do so for for _all_ ARGS which are determined to be files
+
+    *   "nullglob"
+
+         nullglob => defined($ENV{nullglob}) ? $ENV{nullglob} : 0,       # = 0/<true> [default = 0]
+
+        - if true, patterns which match no files are expanded to a null
+        string (no token), rather than the pattern itself ## $ENV{nullglob}
+        (if it exists) overrides the default
+
+    *   "glob"
+
+         glob => 1,                  # = 0/<true> [default = true]
+
+        - when true, globbing is performed
+
+    *   "croak_unbalanced"
+
+         croak_unbalanced => 1,      # = 0/true/'quotes'/'subshells' [default = true]
+
+        - if true, croak for unbalanced command line quotes or subshell
+        blocks (takes precedence over carp_unbalanced)
+
+    *   "carp_unbalanced"
+
+         carp_unbalanced => 1,       # = 0/true/'quotes'/'subshells' [default = true]
+
+        - if true, carp for unbalanced command line quotes or subshell
+        blocks
+
+        -for ToDO: add globstar option
 
 RATIONALE
     This began as a simple need to work-around the less-than-stellar
@@ -262,15 +337,15 @@ CONFIGURATION and ENVIRONMENT
    "NULLGLOB"
     Override the default glob expansion behavior for empty matches
 
-         $ENV{NULLGLOB} = 1; # undef/0 | <true>
+         $ENV{NULLGLOB} = 1; # undef/''/0 | <true>
 
     Default glob expansion, as in bash, expands glob patterns which match
     nothing into the glob pattern itself. Use $ENV{NULLGLOB} to override
     this default behavior.
 
     Analogous to the bash command '"shopt -s nullglob"', when $ENV{NULLGLOB}
-    is set to a true (non-NULL, non-zero) value, a glob expansion which
-    matches nothing will expand to the null string (aka, "q{}").
+    is set to a true (defined, non-NULL, non-zero) value, a glob expansion
+    which matches nothing will expand to the null string (aka, "q{}").
 
     Note: the default glob expansion behavior can also be modified
     programmatically via the function option, "nullglob", when passed to the
@@ -364,9 +439,9 @@ SUPPORT
 
         <https://www.cpantesters.org/distro/W/Win32-CommandLine.html>
 
-        <http://matrix.cpantesters.org/?dist=Win32-CommandLine+0.954>
+        <http://matrix.cpantesters.org/?dist=Win32-CommandLine+0.958>
 
-        <http://fast-matrix.cpantesters.org/?dist=Win32-CommandLine+0.954>
+        <http://fast-matrix.cpantesters.org/?dist=Win32-CommandLine+0.958>
 
     *   CPANTS: CPAN Testing Service module summary
 

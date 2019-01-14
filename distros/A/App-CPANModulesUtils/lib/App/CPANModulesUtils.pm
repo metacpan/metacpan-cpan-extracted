@@ -1,7 +1,7 @@
 package App::CPANModulesUtils;
 
-our $DATE = '2018-09-22'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-01-11'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -147,7 +147,7 @@ App::CPANModulesUtils - Command-line utilities related to Acme::CPANModules
 
 =head1 VERSION
 
-This document describes version 0.001 of App::CPANModulesUtils (from Perl distribution App-CPANModulesUtils), released on 2018-09-22.
+This document describes version 0.002 of App::CPANModulesUtils (from Perl distribution App-CPANModulesUtils), released on 2019-01-11.
 
 =head1 SYNOPSIS
 
@@ -157,6 +157,8 @@ This distribution includes the following command-line utilities related to
 L<Acme::CPANModules>:
 
 =over
+
+=item * L<draw-feature-matrix-from-acme-cpanmodules-module>
 
 =item * L<gen-acme-cpanmodules-module-from-acme-cpanlists-list>
 
@@ -169,7 +171,7 @@ L<Acme::CPANModules>:
 
 Usage:
 
- gen_acme_cpanmodules_module_from_acme_cpanlists_list(%args) -> [status, msg, result, meta]
+ gen_acme_cpanmodules_module_from_acme_cpanlists_list(%args) -> [status, msg, payload, meta]
 
 Generate an Acme::CPANModules module file from an Acme::CPANLists module list.
 
@@ -207,7 +209,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -239,7 +241,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

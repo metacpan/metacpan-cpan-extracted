@@ -27,5 +27,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager
   homepage: http://imager.perl.org/
   repository: git://git.imager.perl.org/imager.git
-version: '0.92'
+version: '0.93'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

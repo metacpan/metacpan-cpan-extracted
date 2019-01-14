@@ -1,9 +1,9 @@
 #
 #	Makefile.PL for Term::ReadLine::Gnu
 #
-#	$Id: Makefile.PL 505 2016-02-29 14:00:39Z hayashi $
+#	$Id: Makefile.PL 563 2017-11-25 13:50:26Z hayashi $
 #
-#	Copyright (c) 1996 Hiroo Hayashi.  All rights reserved.
+#	Copyright (c) 1996-2017 Hiroo Hayashi.  All rights reserved.
 #		<hiroo.hayashi@computer.org>
 #
 #	This program is free software; you can redistribute it and/or
@@ -33,9 +33,9 @@ if ($ENV{AUTOMATED_TESTING} && !open(SESAMI, '/dev/tty')) {
     exit 0;
 }
 # I could not reach a tester, "Chris Williams (BINGOS)".
-if ($ENV{AUTOMATED_TESTING} && ($Config{osname} eq 'openbsd')) {
-    die "OS unsupported\nPlease contact the author.\n";
-}
+#if ($ENV{AUTOMATED_TESTING} && ($Config{osname} eq 'openbsd')) {
+#    die "OS unsupported\nPlease contact the author.\n";
+#}
 
 $defs = ($Config{strings} =~ m|/string.h$|) ? '-DHAVE_STRING_H' : '';
 
@@ -74,19 +74,21 @@ if ($Config{osname} eq 'os2') {
         }
     }
 
-    # Search libtermcap, libncurses, or libcurses in this order.
+    # Search libtermcap, libtinfo, libncurses, or libcurses in this order.
     # I emulate the behavior of the configure script for bash, and don't
     # know why AIX prefers curses.
     # libtermcap.a on HPUX cannot be used for dynamically linked binary.
     # Old Cygwin may require setting false (0).
+    # tinfo is for Debian. [Debian Bug Report #644423]
     my $PREFER_CURSES = $Config{osname} eq 'aix' || $Config{osname} eq 'hpux'
 			|| $Config{osname} eq 'cygwin';
     my $TERMCAP_LIB = (! $PREFER_CURSES && &search_lib('-ltermcap'))
+	|| &search_lib('-ltinfo')
 	|| &search_lib('-lncurses')
-	    || &search_lib('-lcurses');
+	|| &search_lib('-lcurses');
 
     unless ($TERMCAP_LIB) {
-	warn "Could not find neither libtermcap.a, libncurses.a, or libcurses.\n";
+	warn "Could not find neither libtermcap, libtinfo, libncurses, or libcurses.\n";
 	exit $err;
     } 
  

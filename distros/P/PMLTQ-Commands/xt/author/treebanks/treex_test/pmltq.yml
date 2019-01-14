@@ -1,0 +1,38 @@
+---
+data_dir: "data"
+resources: "resources" # main directory with PML schemas
+
+db:
+  name: treex_test
+  host: localhost
+  port: 15432
+  user: postgres
+  password:
+
+sys_db: postgres
+
+layers: # description of all data layers
+  - name: treex_document
+    data: *.treex.gz
+    references:
+      a_coreference/target-node.rf: '-'
+      t-coref_text-link/target_node.rf: 't-node'
+      n-node/a.rf: 'a-node'
+
+      t-node/src_tnode.rf: 't-node'
+      t-node/original_parent.rf: 't-node'
+      t-node/coref_text.rf: 't-node'
+      t-node/compl.rf: 't-node'
+      t-node/coref_gram.rf: 't-node'
+      t-node/val_frame.rf: '-'
+
+      t-a/lex.rf: 'a-node'
+      t-a/aux.rf: 'a-node'
+      t-root/atree.rf: 'a-root'
+      t-root/src_tnode.rf: 't-node'
+      a-root/ptree.rf: 'p-nonterminal'
+      a-root/s.rf: '-'
+      a-root/giza_scores/counterpart.rf: '-'
+      a-node/p_terminal.rf: 'p-terminal'
+      align-links/counterpart.rf: '-'
+

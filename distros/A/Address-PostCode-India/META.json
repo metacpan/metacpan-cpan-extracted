@@ -35,9 +35,19 @@
             "Address::PostCode::UserAgent" : "0.08",
             "JSON" : "0",
             "Moo" : "0",
-            "namespace::clean" : "0",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
+      }
+   },
+   "provides" : {
+      "Address::PostCode::India" : {
+         "file" : "lib/Address/PostCode/India.pm",
+         "version" : "0.12"
+      },
+      "Address::PostCode::India::Place" : {
+         "file" : "lib/Address/PostCode/India/Place.pm",
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -48,6 +58,6 @@
          "web" : "https://github.com/Manwar/Address-PostCode-India"
       }
    },
-   "version" : "0.09",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -3,6 +3,7 @@ do { my $x = {
                     'requires' => {
                                     'Alien::Build' => '1.00',
                                     'Alien::Build::MM' => '0.32',
+                                    'Alien::Build::Plugin::Build::Make' => '0',
                                     'Config' => '0',
                                     'ExtUtils::MakeMaker' => '6.52',
                                     'IPC::Cmd' => '0'

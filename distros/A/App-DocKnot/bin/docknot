@@ -13,33 +13,16 @@ use autodie;
 use warnings;
 
 use App::DocKnot;
-use Getopt::Long qw(GetOptions :config bundling);
-use Pod::Usage qw(pod2usage);
 
-# Parse options.
-my @options = qw(help|h metadata|m=s output|o=s template|t=s);
-my %options;
-GetOptions(\%options, @options) or exit 1;
-if ($options{help}) {
-    pod2usage(0);
-}
-for my $required (qw(metadata output template)) {
-    if (!exists $options{$required}) {
-        die "$0: missing required option --$required\n";
-    }
-}
-
-# Initialize and run DocKnot.
-my $docknot = App::DocKnot->new({ metadata => $options{metadata} });
-open(my $outfh, '>', $options{output});
-print {$outfh} $docknot->generate($options{template})
-  or die "$0: cannot write to $options{output}: $!\n";
-close($outfh);
+# Dispatch everything to the module.
+my $docknot = App::DocKnot->new();
+$docknot->run();
 
 __END__
 
 =for stopwords
-Allbery DocKnot docknot MERCHANTABILITY NONINFRINGEMENT sublicense
+Allbery DocKnot docknot MERCHANTABILITY NONINFRINGEMENT sublicense subcommand
+subcommands
 
 =head1 NAME
 
@@ -47,16 +30,38 @@ docknot - Generate human-readable documentation from package metadata
 
 =head1 SYNOPSIS
 
-B<docknot> [B<-h>] B<-m> I<metadata> B<-o> I<output> B<-t> I<template>
+B<docknot> B<-h>
+
+B<docknot> generate [B<-m> I<metadata>] [B<-w> I<width>] I<template> [I<output>]
+
+B<docknot> generate-all [B<-m> I<metadata>] [B<-w> I<width>]
 
 =head1 DESCRIPTION
 
-B<docknot> uses metadata files and templates to generate human-readable
-documentation files for a package.  It is a small driver script around
-App::DocKnot.  See L<App::DocKnot> for documentation on the metadata format,
-configuration files, and paths.
+B<docknot> can perform various actions related to documenting or releasing
+software packages, organized into subcommands.  The supported subcommands are:
+
+=over 4
+
+=item generate
+
+Use metadata files and templates to generate human-readable documentation
+files for a package.  See L<App::DocKnot::Generate> for documentation on the
+metadata format, configuration files, and paths.
+
+=item generate-all
+
+Like C<generate>, but generates all of the package documentation for which
+default output files are configured.  This is a quick short-cut to generating
+all documentation that's shipped with the package.
+
+=back
 
 =head1 OPTIONS
+
+Each B<docknot> subcommand takes its own options.
+
+=head2 Global Options
 
 =over 4
 
@@ -64,27 +69,61 @@ configuration files, and paths.
 
 Print out usage information and exit.
 
+=back
+
+=head2 generate
+
+=over 4
+
 =item B<-m> I<metadata>, B<--metadata>=I<metadata>
 
 The path to the metadata files for the package whose documentation is being
 generated.  This should be a directory containing all the package metadata
-files required by App::DocKnot.  This option is required.
+files required by App::DocKnot.  Default: F<docs/metadata> relative to the
+current directory (which is the recommended metadata path for a project).
 
-=item B<-o> I<output>, B<--output>=I<output>
+=item B<-w> I<width>, B<--width>=I<width>
 
-The path to the output file to generate.  This option is required.
+Column width at which the generated output is wrapped.  Default: 74.
 
-=item B<-t> I<template>, B<--template>=I<template>
+=item I<template>
 
-The template to use when generating the output file.  This option is required.
+The template to use when generating the output file.
+
+=item I<output>
+
+The path to the output file to generate.  If this argument isn't given, the
+output file will be chosen based on the template as follows:
+
+    readme     ->  README
+    readme-md  ->  README.md
+
+If the template isn't listed above, this argument is required.
+
+=back
+
+=head2 generate-all
+
+=over 4
+
+=item B<-m> I<metadata>, B<--metadata>=I<metadata>
+
+The path to the metadata files for the package whose documentation is being
+generated.  This should be a directory containing all the package metadata
+files required by App::DocKnot.  Default: F<docs/metadata> relative to the
+current directory (which is the recommended metadata path for a project).
+
+=item B<-w> I<width>, B<--width>=I<width>
+
+Column width at which the generated output is wrapped.  Default: 74.
 
 =back
 
 =head1 DIAGNOSTICS
 
-If B<docknot> fails with errors, see L<App::DocKnot> for information about
-what those errors might mean.  Internally, it can also produce the following
-diagnostics:
+If B<docknot> fails with errors, see the underlying module for that subcommand
+for information about what those errors might mean.  Internally, it can also
+produce the following diagnostics:
 
 =over 4
 
@@ -95,6 +134,14 @@ diagnostics:
 =item missing required option %s
 
 (F) One of the required command-line options was not given.
+
+=item no subcommand given
+
+(F) No subcommand was given after B<docknot> on the command line.
+
+=item unknown command %s
+
+(F) The given subcommand was not recognized.
 
 =back
 
@@ -129,7 +176,7 @@ SOFTWARE.
 
 =head1 SEE ALSO
 
-L<App::DocKnot>
+L<App::DocKnot::Generate>
 
 This program is part of the DocKnot distribution.  DocKnot is available from
 CPAN as App::DocKnot, or directly from its web site at

@@ -1,3 +1,21 @@
+3.007 2019-01-12
+
+  New feature:
+    * add $app_to_test variable to specify which application
+      to test instead of specifying directly the model to test
+    * check parameter can specify more that one test per value
+
+  Bug fix:
+    * don't always warn about deprecated dump_warnings
+    * improve bad option error message
+
+  Doc changes:
+    * remove mentions of sourceforge mailing list
+    * improve code style in examples
+    * fix error in Setup pod doc
+    * Tester pod: fix links to Config::Model methods
+    * Tester doc: fix examples to run tests
+
 3.006 2018-04-14
 
     * Tester: can call run_tests without arguments. Calling

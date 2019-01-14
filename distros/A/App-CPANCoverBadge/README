@@ -1,0 +1,41 @@
+NAME
+
+    App::CPANCoverBadge - Get badge for cpancover
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+        use App::CPANCoverBadge;
+    
+        my $badger = App::CPANCoverBadge->new;
+        my $badge  = $badger->badge( 'App-CPANCoverBadge-0.01' );
+        
+        say $badge;
+
+ATTRIBUTES
+
+      * db_file
+
+      * sql
+
+      * ua
+
+METHODS
+
+ badge
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

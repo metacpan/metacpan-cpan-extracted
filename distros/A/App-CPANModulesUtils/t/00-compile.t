@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CPANModulesUtils.pm'
 );
 
 my @scripts = (
+    'script/draw-feature-matrix-from-acme-cpanmodules-module',
     'script/gen-acme-cpanmodules-module-from-acme-cpanlists-list'
 );
 

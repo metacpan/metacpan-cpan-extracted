@@ -1,9 +1,9 @@
 # -*- perl -*-
 #	utf8_text.t --- Term::ReadLine::Gnu UTF-8 text string test script
 #
-#	$Id: utf8_text.t 551 2016-06-12 14:30:54Z hayashi $
+#	$Id: utf8_text.t 565 2019-01-14 04:48:22Z hayashi $
 #
-#	Copyright (c) 2016 Hiroo Hayashi.  All rights reserved.
+#	Copyright (c) 2016-2019 Hiroo Hayashi.  All rights reserved.
 #
 #	This program is free software; you can redistribute it and/or
 #	modify it under the same terms as Perl itself.
@@ -24,7 +24,7 @@ use open ':std', ':encoding(UTF-8)';
 
 # This must follow UTF-8 setting.
 # See 'CAVEATS and NOTES' in http://perldoc.perl.org/Test/More.html for details.
-use constant NTEST => 13;
+use constant NTEST => 14;
 use Test::More tests => NTEST;
 use Data::Dumper;
 
@@ -49,11 +49,19 @@ note "I'm testing Term::ReadLine::Gnu version $Term::ReadLine::Gnu::VERSION";
 
 my $verbose = scalar @ARGV && ($ARGV[0] eq 'verbose');
 
+# skip on Perl 5.8
+if ($] < '5.010') {
+    diag "Perl version $] may not support UTF-8 properly. Skipped...";
+    ok(1, 'skip') for 1..(NTEST-1);
+    exit 0;
+}
+ok(1, 'Perl version > 5.8');
+
 # check locale setting because the following tests depend on locale feature.
 use Config;
 if (!$Config{d_setlocale}) {
     diag "d_setlocale is not defined. Skipped...";
-    ok(1, 'skip') for 1..(NTEST-1);
+    ok(1, 'skip') for 1..(NTEST-2);
     exit 0;
 }
 ok(1, '$Config{d_setlocale}');
@@ -64,7 +72,7 @@ use locale;
 my $old_locale = setlocale(LC_ALL, 'en_US.UTF-8');
 if (!defined $old_locale) {
     diag "The locale 'en_US.UTF-8' is not supported. Skipped...";
-    ok(1, 'skip') for 1..(NTEST-2);
+    ok(1, 'skip') for 1..(NTEST-3);
     exit 0;
 }
 ok(1, 'setlocale');

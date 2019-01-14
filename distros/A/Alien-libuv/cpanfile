@@ -8,9 +8,18 @@ on 'runtime' => sub {
 
 on 'build' => sub {
     requires 'Alien::Build' => '1.00';
+    requires 'Alien::Build::Plugin::Build::Make';
     requires 'Config';
     requires 'ExtUtils::MakeMaker';
     requires 'IPC::Cmd';
+#    if ($^O eq 'MSWin32') {
+#        requires 'Alien::Build::Plugin::Build::CMake';
+#        requires 'Alien::cmake3';
+#        requires 'Path::Tiny';
+#    }
+#    else {
+#        requires 'Alien::Autotools';
+#    };
 };
 
 on 'test' => sub {

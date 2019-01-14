@@ -144,7 +144,7 @@ BEGIN {
   if ($ex_version < 5.57) {
     @ISA = qw(Exporter);
   }
-  $VERSION = '1.008';
+  $VERSION = '1.009';
   require XSLoader;
   XSLoader::load(Imager => $VERSION);
 }
@@ -1042,7 +1042,12 @@ sub make_palette {
     ++$index;
   }
 
-  return i_img_make_palette($quant, map $_->{IMG}, @images);
+  my @cols = i_img_make_palette($quant, map $_->{IMG}, @images);
+  unless (@cols) {
+      Imager->_set_error(Imager->_error_as_msg);
+      return;
+  }
+  return @cols;
 }
 
 # convert a paletted (or any image) to an 8-bit/channel RGB image

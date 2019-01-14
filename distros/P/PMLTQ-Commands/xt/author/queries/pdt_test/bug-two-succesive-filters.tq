@@ -1,0 +1,5 @@
+a-node $a := []
+>> give $a.m/form, $a.m/id sort $2
+>> filter $1 ~ 'a'
+>> filter $1 ~ 'b'
+>> give $2

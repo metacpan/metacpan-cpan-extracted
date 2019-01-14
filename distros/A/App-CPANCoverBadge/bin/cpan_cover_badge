@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+
+# PODNAME: cpan_cover_badge
+
+use v5.20;
+
+use strict;
+use warnings;
+
+use App::CPANCoverBadge;
+use Mojolicious::Lite;
+use Types::Dist qw(DistFQ);
+
+my $badger = App::CPANCoverBadge->new;
+my $check  = DistFQ();
+
+get '/*dist' => sub {
+    my ($c) = @_;
+
+    my $dist = $c->param('dist');
+
+    if ( ! eval { $check->( $dist ) } ) {
+        return $c->reply->not_found;
+    }
+
+    my $badge = $badger->badge( $dist );
+    $c->render( data => $badge, format => 'svg' );
+};
+
+app->start;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpan_cover_badge
+
+=head1 VERSION
+
+version 0.02
+
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

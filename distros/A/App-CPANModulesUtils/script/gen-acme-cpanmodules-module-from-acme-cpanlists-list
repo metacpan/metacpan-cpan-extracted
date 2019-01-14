@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CPANModulesUtils/gen_acme_cpanmodules_module_from_acme_cpanlists_list
-# and generated automatically using Perinci::CmdLine::Gen version 0.486
+# and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2018-09-22'; # DATE
+our $DATE = '2019-01-11'; # DATE
 our $DIST = 'App-CPANModulesUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ gen-acme-cpanmodules-module-from-acme-cpanlists-list - Generate an Acme::CPANMod
 
 =head1 VERSION
 
-This document describes version 0.001 of gen-acme-cpanmodules-module-from-acme-cpanlists-list (from Perl distribution App-CPANModulesUtils), released on 2018-09-22.
+This document describes version 0.002 of gen-acme-cpanmodules-module-from-acme-cpanlists-list (from Perl distribution App-CPANModulesUtils), released on 2019-01-11.
 
 =head1 SYNOPSIS
 
@@ -217,7 +217,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

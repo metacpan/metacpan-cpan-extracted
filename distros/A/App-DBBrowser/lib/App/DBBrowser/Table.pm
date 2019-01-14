@@ -138,12 +138,12 @@ sub on_table {
             print 'Computing:' . "\r" if $sf->{o}{table}{progress_bar};
             my $statement = $ax->get_stmt( $sql, $stmt_type, 'prepare' );
             my @arguments = ( @{$sql->{where_args}}, @{$sql->{having_args}} );
-            if ( $sf->{i}{special_table} ne 'subquery' ) { ##
+            #if ( $sf->{i}{special_table} ne 'subquery' ) { ##
                 unshift @{$sf->{i}{history}{ $sf->{d}{db} }{print}}, [ $statement, \@arguments ];
                 if ( $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} > 50 ) {
                     $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} = 50;
                 }
-            }
+            #}
             if ( $sf->{o}{G}{max_rows} && ! $sql->{limit_stmt} ) {
                 $statement .= " LIMIT " . $sf->{o}{G}{max_rows};
                 $sf->{o}{table}{max_rows} = $sf->{o}{G}{max_rows};

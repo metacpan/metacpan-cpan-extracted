@@ -3,8 +3,8 @@ NAME
     application's DB schema
 
 VERSION
-    This document describes version 0.236 of SQL::Schema::Versioned (from
-    Perl distribution SQL-Schema-Versioned), released on 2018-06-06.
+    This document describes version 0.237 of SQL::Schema::Versioned (from
+    Perl distribution SQL-Schema-Versioned), released on 2019-01-13.
 
 DESCRIPTION
     To use this module, you typically run the "create_or_update_db_schema"()
@@ -31,7 +31,7 @@ FUNCTIONS
   create_or_update_db_schema
     Usage:
 
-     create_or_update_db_schema(%args) -> [status, msg, result, meta]
+     create_or_update_db_schema(%args) -> [status, msg, payload, meta]
 
     Routine and convention to create/update your application's DB schema.
 
@@ -67,7 +67,9 @@ FUNCTIONS
     This routine will check the existence of the "meta" table and the
     current schema version. If "meta" table does not exist yet, the SQL
     statements in "install" will be executed. The "meta" table will also be
-    created and a row "('schema_version', 1)" is added.
+    created and a row "('schema_version', 1)" is added. The
+    ("schema_summary", <SUMMARY>) row will also be added if your spec
+    specifies a "summary".
 
     If "meta" table already exists, schema version will be read from it and
     one or more series of SQL statements from "upgrade_to_v$VERSION" will be
@@ -112,6 +114,7 @@ FUNCTIONS
      # spec for the price application component
      {
          component_name => 'price',
+         summary => "Price application component",
          latest_v => 1,
          provides => ['daily_price', 'spot_price'],
          install => [...],
@@ -121,6 +124,7 @@ FUNCTIONS
      # spec for the portfolio application component
      {
          component_name => 'portfolio',
+         summary => "Portfolio application component",
          latest_v => 1,
          provides => ['account', 'balance', 'tx'],
          deps => {
@@ -134,6 +138,7 @@ FUNCTIONS
      # spec for the trade application component
      {
          component_name => 'trade',
+         summary => "Trade application component",
          latest_v => 1,
          provides => ['order'],
          deps => {
@@ -153,12 +158,12 @@ FUNCTIONS
     in the "meta" table, your component will use the
     "schema_version.<COMPONENT_NAME>" key. When "component_name" is not set,
     it is assumed to be "main" and the "schema_version" key is used in the
-    "meta" table.
+    "meta" table. The component "summary", if specified, will also be
+    written to "schema_summary.<COMPONENT_NAME>" key.
 
     "provides" is an array of tables to help this routine know which
     table(s) your component create and maintain. If unset, this routine will
-    try to guess from looking at "CREATE TABLE" SQL statements. It is
-    recommended that you supply "provides" to makes things easier.
+    try to guess from looking at "CREATE TABLE" SQL statements.
 
     This routine will create "table.<TABLE_NAME>" keys in the "meta" table
     to record which components currently maintain which tables. The value of
@@ -241,7 +246,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -299,7 +304,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2015, 2014, 2013 by
+    This software is copyright (c) 2019, 2018, 2017, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

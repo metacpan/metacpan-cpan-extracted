@@ -19,7 +19,7 @@ build_requires:
   FindBin: '0'
   IO::File: '0'
   IPC::Run3: '0'
-  Module::Build: '0'
+  Module::Build: '0.421'
   Probe::Perl: '0'
   TAP::Formatter::Color: '0'
   TAP::Formatter::Console: '0'
@@ -45,7 +45,7 @@ configure_requires:
   File::Which: '0'
   FindBin: '0'
   IO::File: '0'
-  Module::Build: '0'
+  Module::Build: '0.421'
   TAP::Formatter::Color: '0'
   TAP::Formatter::Console: '0'
   TAP::Harness: '0'
@@ -73,7 +73,7 @@ no_index:
 provides:
   Win32::CommandLine:
     file: lib/Win32/CommandLine.pm
-    version: '0.954'
+    version: '0.958'
 recommends:
   Win32: '0'
   Win32::Security::SID: '0'
@@ -88,7 +88,7 @@ resources:
   bugtracker: https://github.com/rivy/perl.Win32-CommandLine/issues
   homepage: https://github.com/rivy/perl.Win32-CommandLine
   license: http://www.perlfoundation.org/artistic_license_2_0
-  repository: git://github.com/rivy/perl.Win32-CommandLine.git
-version: '0.954'
+  repository: https://github.com/rivy/perl.Win32-CommandLine.git
+version: '0.958'
 x_authority: cpan:RIVY
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

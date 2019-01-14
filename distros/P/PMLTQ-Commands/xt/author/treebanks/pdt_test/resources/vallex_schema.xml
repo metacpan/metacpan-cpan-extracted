@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pml_schema xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/" version="1.1">
+ <root name="valency_lexicon" type="v-valency_lexicon.type" />
+ <type name="v-valency_lexicon.type">
+  <structure>
+   <member as_attribute="1" name="owner" required="1">
+    <cdata format="PMLREF" />
+   </member>
+<!--   <member name="head" type="v-head.type" /> -->
+   <member name="body" type="v-body.type" role="#TREES"/>
+<!--   <member name="tail" type="v-tail.type" /> -->
+  </structure>
+ </type>
+<!--
+ <type name="v-head.type">
+  <structure>
+   <member name="global_history" type="v-global_history.type" />
+   <member name="list_of_users" type="v-list_of_users.type" />
+  </structure>
+ </type>
+ <type name="v-tail.type">
+  <sequence content_pattern="(forbid+)">
+   <element name="forbid" type="v-forbid.type" />
+  </sequence>
+ </type>
+ <type name="v-forbid.type">
+  <container>
+   <attribute name="id" role="#ID" required="1">
+    <cdata format="ID" />
+   </attribute>
+  </container>
+ </type>
+-->
+ <type name="v-body.type">
+  <sequence content_pattern="(word+)">
+   <element name="word" type="v-word.type" />
+  </sequence>
+ </type>
+<!--
+ <type name="v-global_history.type">
+  <sequence content_pattern="(global_event*)">
+   <element name="global_event" type="v-global_event.type" />
+  </sequence>
+ </type>
+ <type name="v-global_event.type">
+  <container>
+   <attribute name="time_stamp" required="1">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="author" required="1">
+    <cdata format="any" />
+   </attribute>
+   <cdata format="any" />
+  </container>
+ </type>
+ <type name="v-list_of_users.type">
+  <sequence content_pattern="(user+)">
+   <element name="user" type="v-user.type" />
+  </sequence>
+ </type>
+ <type name="v-user.type">
+  <container>
+   <attribute name="reviewer">
+    <choice>
+     <value>YES</value>
+     <value>NO</value>
+    </choice>
+   </attribute>
+   <attribute name="name" required="1">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="id" role="#ID" required="1">
+    <cdata format="ID" />
+   </attribute>
+   <attribute name="annotator">
+    <choice>
+     <value>YES</value>
+     <value>NO</value>
+    </choice>
+   </attribute>
+  </container>
+ </type>
+-->
+ <type name="v-word.type">
+  <structure role="#NODE">
+   <member as_attribute="1" name="id" role="#ID" required="1">
+    <cdata format="ID" />
+   </member>
+   <member as_attribute="1" name="lemma" required="1">
+    <cdata format="any" />
+   </member>
+   <member as_attribute="1" name="POS">
+    <choice>
+     <value>V</value>
+     <value>A</value>
+     <value>N</value>
+     <value>D</value>
+    </choice>
+   </member>
+   <member name="valency_frames" type="v-valency_frames.type" role="#CHILDNODES"/>
+   <member name="note" type="v-note.type" />
+<!--   <member name="problems" type="v-problems.type" /> -->
+  </structure>
+ </type>
+<!--
+ <type name="v-problems.type">
+  <sequence content_pattern="(problem+)">
+   <element name="problem" type="v-problem.type" />
+  </sequence>
+ </type>
+ <type name="v-problem.type">
+  <container>
+   <attribute name="solved">
+    <choice>
+     <value>YES</value>
+     <value>NO</value>
+    </choice>
+   </attribute>
+   <attribute name="author">
+    <cdata format="PMLREF" />
+   </attribute>
+   <cdata format="any" />
+  </container>
+ </type>
+-->
+ <type name="v-valency_frames.type">
+  <sequence content_pattern="(frame*)">
+   <element name="frame" type="v-frame.type" />
+  </sequence>
+ </type>
+ <type name="v-frame.type">
+  <structure role="#NODE">
+   <member as_attribute="1" name="status">
+    <choice>
+     <value>active</value>
+     <value>reviewed</value>
+     <value>substituted</value>
+     <value>obsolete</value>
+     <value>deleted</value>
+    </choice>
+   </member>
+   <member as_attribute="1" name="used">
+    <cdata format="any" />
+   </member>
+   <member as_attribute="1" name="id" role="#ID" required="1">
+    <cdata format="ID" />
+   </member>
+<!--
+   <member as_attribute="1" name="hereditary_used">
+    <cdata format="any" />
+   </member>
+-->
+   <member as_attribute="1" name="substituted_with">
+    <cdata format="IDREFS" />
+   </member>
+   <member name="example" type="v-example.type" />
+   <member name="frame_elements" type="v-frame_elements.type" role="#CHILDNODES"/>
+<!--   <member name="local_history" type="v-local_history.type" /> -->
+<!--   <member name="problems" type="v-problems.type" /> -->
+   <member name="note" type="v-note.type" />
+  </structure>
+ </type>
+ <type name="v-example.type">
+  <cdata format="any" />
+ </type>
+ <type name="v-note.type">
+  <cdata format="any" />
+ </type>
+ <type name="v-frame_elements.type">
+  <sequence content_pattern="(element|element_alternation)*">
+   <element name="element_alternation" type="v-element_alternation.type" />
+   <element name="element" type="v-element.type" />
+  </sequence>
+ </type>
+ <type name="v-element_alternation.type">
+   <container role="#NODE">
+     <attribute name="id" role="#ID"><cdata format="ID" /></attribute>
+     <sequence content_pattern="(element+)" role="#CHILDNODES">
+       <element name="element" type="v-element.type" />
+     </sequence>
+   </container>
+ </type>
+ <type name="v-element.type">
+  <container role="#NODE">
+   <attribute name="id" role="#ID"><cdata format="ID" /></attribute>
+   <attribute name="functor" required="1">
+    <choice>
+     <value>---</value>
+     <value>ACT</value>
+     <value>PAT</value>
+     <value>ADDR</value>
+     <value>EFF</value>
+     <value>ORIG</value>
+     <value>ACMP</value>
+     <value>AIM</value>
+     <value>APP</value>
+     <value>ATT</value>
+     <value>AUTH</value>
+     <value>BEN</value>
+     <value>CAUS</value>
+     <value>CNCS</value>
+     <value>COMPL</value>
+     <value>CONTRD</value>
+     <value>COND</value>
+     <value>CPHR</value>
+     <value>CPR</value>
+     <value>CRIT</value>
+     <value>DIFF</value>
+     <value>DIR1</value>
+     <value>DIR2</value>
+     <value>DIR3</value>
+     <value>DPHR</value>
+     <value>ETHD</value>
+     <value>EXT</value>
+     <value>HER</value>
+     <value>ID</value>
+     <value>INTF</value>
+     <value>INTT</value>
+     <value>LOC</value>
+     <value>MANN</value>
+     <value>MAT</value>
+     <value>MEANS</value>
+     <value>MOD</value>
+     <value>PARTL</value>
+     <value>REG</value>
+     <value>RESL</value>
+     <value>RESTR</value>
+     <value>RSTR</value>
+     <value>SUBS</value>
+     <value>TFHL</value>
+     <value>TFRWH</value>
+     <value>THL</value>
+     <value>THO</value>
+     <value>TOWH</value>
+     <value>TPAR</value>
+     <value>TSIN</value>
+     <value>TTILL</value>
+     <value>TWHEN</value>
+     <value>TOWH</value>
+     <value>VOCAT</value>
+    </choice>
+   </attribute>
+<!--   <attribute name="orig_type">
+    <cdata format="any" />
+   </attribute>
+-->
+   <attribute name="type">
+    <choice>
+     <value>oblig</value>
+     <value>non-oblig</value>
+    </choice>
+   </attribute>
+   <attribute name="forms">
+    <cdata format="any" />
+   </attribute>
+   <sequence content_pattern="(form*)" role="#CHILDNODES">
+    <element name="form" type="v-form.type" />
+   </sequence>
+  </container>
+ </type>
+ <type name="v-form.type">
+  <container role="#NODE">
+   <attribute name="id" role="#ID"><cdata format="ID" /></attribute>
+   <attribute name="abbrev">
+    <cdata format="any" />
+   </attribute>
+   <sequence content_pattern="(typical | elided | recip | state | (parent?, node*, (parentpos, node*)?))" role="#CHILDNODES">
+    <element name="parentpos" type="v-parentpos.type" />
+    <element name="elided" type="v-elided.type" />
+    <element name="parent" type="v-parent.type" />
+    <element name="recip" type="v-recip.type" />
+    <element name="typical" type="v-typical.type" />
+    <element name="node" type="v-node.type" />
+    <element name="state" type="v-state.type" />
+   </sequence>
+  </container>
+ </type>
+ <type name="v-typical.type">
+  <container role="#NODE"><attribute name="id" role="#ID"><cdata format="ID" /></attribute></container>
+ </type>
+ <type name="v-elided.type">
+  <container role="#NODE"><attribute name="id" role="#ID"><cdata format="ID" /></attribute></container>
+ </type>
+ <type name="v-recip.type">
+  <container role="#NODE"><attribute name="id" role="#ID"><cdata format="ID" /></attribute></container>
+ </type>
+ <type name="v-state.type">
+  <container role="#NODE"><attribute name="id" role="#ID"><cdata format="ID" /></attribute></container>
+ </type>
+ <type name="v-parent.type">
+  <structure role="#NODE">
+   <member as_attribute="1" name="id" role="#ID"><cdata format="ID" /></member>
+   <member name="node" type="v-node.type" />
+  </structure>
+ </type>
+ <type name="v-parentpos.type">
+  <container role="#NODE"><attribute name="id" role="#ID"><cdata format="ID" /></attribute></container>
+ </type>
+ <type name="v-node.type">
+  <container role="#NODE">
+   <attribute name="id" role="#ID"><cdata format="ID" /></attribute>
+   <attribute name="num">
+    <choice>
+     <value>S</value>
+     <value>P</value>
+    </choice>
+   </attribute>
+   <attribute name="tagpos14">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="tagpos3">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="form">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="case">
+    <choice>
+     <value>1</value>
+     <value>2</value>
+     <value>3</value>
+     <value>4</value>
+     <value>5</value>
+     <value>6</value>
+     <value>7</value>
+    </choice>
+   </attribute>
+   <attribute name="tagpos2">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="tagpos5">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="agreement">
+    <choice>
+     <value>0</value>
+     <value>1</value>
+    </choice>
+   </attribute>
+   <attribute name="pos">
+    <choice>
+     <value>a</value>
+     <value>d</value>
+     <value>i</value>
+     <value>n</value>
+     <value>j</value>
+     <value>v</value>
+     <value>u</value>
+     <value>f</value>
+     <value>s</value>
+     <value>c</value>
+    </choice>
+   </attribute>
+   <attribute name="tagpos13">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="afun">
+    <choice>
+     <value>Pred</value>
+     <value>Pnom</value>
+     <value>AuxV</value>
+     <value>Sb</value>
+     <value>Obj</value>
+     <value>Atr</value>
+     <value>Adv</value>
+     <value>AtrAdv</value>
+     <value>AdvAtr</value>
+     <value>Coord</value>
+     <value>AtrObj</value>
+     <value>ObjAtr</value>
+     <value>AtrAtr</value>
+     <value>AuxT</value>
+     <value>AuxR</value>
+     <value>AuxP</value>
+     <value>Apos</value>
+     <value>ExD</value>
+     <value>AuxC</value>
+     <value>Atv</value>
+     <value>AtvV</value>
+     <value>AuxO</value>
+     <value>AuxZ</value>
+     <value>AuxY</value>
+     <value>AuxG</value>
+     <value>AuxK</value>
+     <value>AuxX</value>
+     <value>AuxS</value>
+     <value>unspecified</value>
+    </choice>
+   </attribute>
+   <attribute name="neg">
+    <choice>
+     <value>negative</value>
+     <value>unspecified</value>
+    </choice>
+   </attribute>
+   <attribute name="gen">
+    <choice>
+     <value>F</value>
+     <value>M</value>
+     <value>I</value>
+     <value>N</value>
+    </choice>
+   </attribute>
+   <attribute name="tagpos10">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="tagpos6">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="tagpos9">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="tagpos11">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="tagpos8">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="lemma">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="tagpos12">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="tagpos7">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="tagpos4">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="tagpos15">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="inherits">
+    <choice>
+     <value>0</value>
+     <value>1</value>
+    </choice>
+   </attribute>
+   <attribute name="deg">
+    <choice>
+     <value>1</value>
+     <value>2</value>
+     <value>3</value>
+    </choice>
+   </attribute>
+   <attribute name="tagpos1">
+    <cdata format="any" />
+   </attribute>
+   <sequence content_pattern="(node*)" role="#CHILDNODES">
+    <element name="node" type="v-node.type" />
+   </sequence>
+  </container>
+ </type>
+<!--
+ <type name="v-local_history.type">
+  <sequence content_pattern="(local_event*)">
+   <element name="local_event" type="v-local_event.type" />
+  </sequence>
+ </type>
+ <type name="v-local_event.type">
+  <container>
+   <attribute name="type_of_event" required="1">
+    <choice>
+     <value>create</value>
+     <value>modify</value>
+     <value>delete</value>
+     <value>import</value>
+     <value>review</value>
+     <value>obsolete</value>
+     <value>unreview</value>
+    </choice>
+   </attribute>
+   <attribute name="time_stamp" required="1">
+    <cdata format="any" />
+   </attribute>
+   <attribute name="author">
+    <cdata format="PMLREF" />
+   </attribute>
+   <attribute name="imported_from">
+    <cdata format="any" />
+   </attribute>
+  </container>
+ </type>
+-->
+</pml_schema>

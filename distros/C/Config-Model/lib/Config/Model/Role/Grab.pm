@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::Grab;
-$Config::Model::Role::Grab::VERSION = '2.132';
+$Config::Model::Role::Grab::VERSION = '2.133';
 # ABSTRACT: Role to grab data from elsewhere in the tree
 
 use Mouse::Role;
@@ -369,7 +369,7 @@ Config::Model::Role::Grab - Role to grab data from elsewhere in the tree
 
 =head1 VERSION
 
-version 2.132
+version 2.133
 
 =head1 SYNOPSIS
 

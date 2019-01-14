@@ -2,8 +2,8 @@ NAME
     Software::Catalog - Software catalog
 
 VERSION
-    This document describes version 1.0.4 of Software::Catalog (from Perl
-    distribution Software-Catalog), released on 2018-10-18.
+    This document describes version 1.0.5 of Software::Catalog (from Perl
+    distribution Software-Catalog), released on 2019-01-14.
 
 SYNOPSIS
 DESCRIPTION
@@ -40,7 +40,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2015, 2014, 2012 by
+    This software is copyright (c) 2019, 2018, 2015, 2014, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

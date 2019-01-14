@@ -1,6 +1,6 @@
 package Test::Mocha::CalledOk::Times;
 # ABSTRACT: Concrete subclass of CalledOk for verifying methods called an exact number of 'times'
-$Test::Mocha::CalledOk::Times::VERSION = '0.64';
+$Test::Mocha::CalledOk::Times::VERSION = '0.65';
 use parent 'Test::Mocha::CalledOk';
 use strict;
 use warnings;

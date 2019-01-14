@@ -1,5 +1,25 @@
 Revision history for PMLTQ-Command-printtrees
 
+1.0.1
+ - Released: 2019-01-11 15:09:14 UTC
+
+ [DOCUMENTATION]
+ - fix documentation
+
+1.0.0
+ - Released: 2019-01-11 12:57:03 UTC
+
+ [API CHANGES]
+ - added parameters: - printtrees-parallel-job_size - size of parallel job
+   (default 50) - printtrees-parallel-forks - maximum of parallel jobs
+   (default 8)
+
+ [BUG FIXES]
+ - increase minimal PMLTQ version
+
+ [ENHANCEMENTS]
+ - add parallel tree generation - multiple BTrEd instances are run
+
 0.1.1
  - Released: 2018-06-12 09:18:09 UTC
 

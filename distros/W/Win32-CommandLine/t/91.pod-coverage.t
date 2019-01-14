@@ -10,7 +10,7 @@ my $fh = select STDIN; $|++; select STDOUT; $|++; select STDERR; $|++; select $f
 
 use Test::More;
 
-plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless $ENV{TEST_AUTHOR} or $ENV{TEST_ALL};
+plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless ($ENV{TEST_AUTHOR} or $ENV{AUTHOR_TESTING}) or ($ENV{TEST_RELEASE} or $ENV{RELEASE_TESTING}) or $ENV{TEST_ALL} or $ENV{CI};
 
 #my $haveTestPodCoverage = eval { require 'Test::Pod::Coverage 1.04'; 1; };		## TODO: add version support
 use version qw();

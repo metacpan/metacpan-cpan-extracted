@@ -15,7 +15,7 @@ Header:
                     0x10 : ithreads
   U8      zero
   U8      FORMATVER_MAJOR 0
-  U8      FORMATVER_MINOR 3
+  U8      FORMATVER_MINOR 4
   U32     PERLVER   rev<<24 | ver<<16 | sub
 
   U8      NTYPES
@@ -23,6 +23,11 @@ Header:
    U8     NPTRS
    U8     NSTRS}*$NTYPES
             -- type=0 is common, then actual SV types
+
+  U8      NEXTNS
+  {U8     HEADERLEN
+   U8     NPTRS
+   U8     NSTRS}*$NEXTNS
 
   U8      NCONTEXTS
   {U8     HEADERLEN
@@ -242,12 +247,54 @@ An SV:
   type: UNDEF
 
 SV extensions:
+  PTR   SV
+
   type: MAGIC (0x80)
-    PTR   SV
-    U8    TYPE
-    U8    FLAGS  0x01 : MGf_REFCOUNTED
-    PTR   MG_OBJ
-    PTR   MG_PTR
+    Header(2):
+      U8    TYPE
+      U8    FLAGS  0x01 : MGf_REFCOUNTED
+    PTRs(2):
+            MG_OBJ
+            MG_PTR
+
+  type: SAVED_SV (0x81)
+    Header(0)
+    PTRs(1):
+            SV
+
+  type: SAVED_AV (0x82)
+    Header(0)
+    PTRs(1):
+            AV
+
+  type: SAVED_HV (0x83)
+    Header(0)
+    PTRs(1):
+            HV
+
+  type: SAVED_AELEM (0x84)
+    Header(I):
+      UINT  INDEX
+    PTRs(1):
+            SV
+
+  type: SAVED_HELEM (0x85)
+    Header(0)
+    PTRs(2):
+            KEY
+            SV
+
+  type: SAVED_CV (0x86)
+    Header(0)
+    PTRs(1):
+            CV
+
+  type: SVSV note (0x87)
+    Header(0)
+    PTRs(1):
+            SV
+    STRs(1):
+            NAME
 
 Context:
   type==0-terminated list of CTXs

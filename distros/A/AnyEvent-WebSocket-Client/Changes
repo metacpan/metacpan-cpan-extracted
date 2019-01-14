@@ -1,5 +1,8 @@
 Revision history for AnyEvent-WebSocket-Client
 
+0.50      2019-01-14 10:49:47 -0500
+  - Fixed a testing bug that was reportd on Debian Buster.
+
 0.49      2018-07-09 21:06:24 -0400
   - Fixed a bug whre adding next_message callback within a next_message
     callback was called immediately with the same message (gh#39 xavery++)

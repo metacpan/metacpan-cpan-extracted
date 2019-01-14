@@ -1,5 +1,8 @@
 Changelog for WebService-Lobid-Organisation
 
+0.0042 2019-01-11
+ - new attributes api_status and use_ssl, fallback on non-https URL
+
 0.0041 2019-01-09
  - new attribute "provides"
 

@@ -13,7 +13,7 @@ use JSON           qw( decode_json );
 
 use Term::Choose            qw( choose );
 use Term::Choose::Constants qw( :screen );
-use Term::Choose::LineFold  qw( line_fold );
+use Term::Choose::LineFold  qw( line_fold print_columns );
 use Term::Choose::Util      qw( term_width insert_sep );
 use Term::Form              qw();
 
@@ -84,7 +84,7 @@ sub get_stmt {
         }
     }
     elsif ( $stmt_type eq 'Join' ) {
-        @tmp = map { $in . $_ } split /(?=\s(?:INNER|LEFT\sOUTER|RIGHT\sOUTER|FULL\sOUTER|CROSS)\sJOIN)/, $sql->{stmt};
+        @tmp = map { $in . $_ } split /(?=\s(?:INNER|LEFT|RIGHT|FULL|CROSS)\sJOIN)/, $sql->{stmt};
         $tmp[0] =~ s/^\s//;
     }
     elsif ( $stmt_type eq 'Union' ) {
@@ -177,10 +177,14 @@ sub stmt_placeholder_to_value {
     }
     my $rx_placeholder = qr/(?<=(?:,|\s|\())\?(?=(?:,|\s|\)|$))/;
     for my $arg ( @$args ) {
+        my $arg_copy;
         if( $quote && $arg && ! looks_like_number $arg ) {
-            $arg = $sf->{d}{dbh}->quote( $arg );
+            $arg_copy = $sf->{d}{dbh}->quote( $arg );
         }
-        $stmt =~ s/$rx_placeholder/$arg/;
+        else {
+            $arg_copy = $arg;
+        }
+        $stmt =~ s/$rx_placeholder/$arg_copy/;
     }
     if ( $stmt !~ $rx_placeholder ) {
         return $stmt;
@@ -189,7 +193,20 @@ sub stmt_placeholder_to_value {
 
 
 sub alias {
-    my ( $sf, $type, $prompt, $default, $info ) = @_;
+    my ( $sf, $type, $prompt, $default ) = @_;
+    my $term_w = term_width() - 1;
+    if ( ! defined $prompt ) {
+        $prompt = '';
+    }
+    my $info;
+    if ( print_columns( $prompt . ' AS: ' ) > $term_w / 3 ) {
+        $info = "\n" . $prompt;
+        $prompt = 'AS: ';
+    }
+    else {
+        $info = ' ';
+        $prompt .= ' AS: ';
+    }
     my $alias;
     if ( $sf->{o}{alias}{$type} ) {
         my $tf = Term::Form->new();

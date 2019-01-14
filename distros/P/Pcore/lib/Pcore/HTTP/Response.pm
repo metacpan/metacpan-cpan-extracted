@@ -32,16 +32,32 @@ sub _build_tree ($self) {
 
     return if !is_plain_scalarref $self->{data};
 
-    require HTML::TreeBuilder::LibXML;
+    require HTML5::DOM;
 
-    my $tree = HTML::TreeBuilder::LibXML->new;
+    state $parser = HTML5::DOM->new( {
+        threads => 0,
+        async   => 0,
+    } );
 
-    $tree->parse( $self->decoded_data->$* );
-
-    $tree->eof;
-
-    return $tree;
+    return $parser->parse( $self->decoded_data->$* );
 }
+
+# TODO remove
+# sub _build_tree_xpath ($self) {
+#     return if !$self->{data};
+
+#     return if !is_plain_scalarref $self->{data};
+
+#     require HTML::TreeBuilder::LibXML;
+
+#     my $tree = HTML::TreeBuilder::LibXML->new;
+
+#     $tree->parse( $self->decoded_data->$* );
+
+#     $tree->eof;
+
+#     return $tree;
+# }
 
 1;
 __END__

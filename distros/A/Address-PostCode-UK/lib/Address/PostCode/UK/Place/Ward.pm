@@ -1,6 +1,6 @@
 package Address::PostCode::UK::Place::Ward;
 
-$Address::PostCode::UK::Place::Ward::VERSION   = '0.16';
+$Address::PostCode::UK::Place::Ward::VERSION   = '0.17';
 $Address::PostCode::UK::Place::Ward::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Address::PostCode::UK::Place::Ward - Placeholder for 'ward' of the Address::Post
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'title' => (is => 'ro');
 has 'uri'   => (is => 'ro');

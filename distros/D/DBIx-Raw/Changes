@@ -1,5 +1,23 @@
 Revision history for DBIx-Raw
 
+0.21  2019-01-13 22:54:57 CST
+        - Require strictures 2
+
+0.20  2019-01-13 15:43:41 CST
+        - update now returns the number of rows updated
+
+0.19  2019-01-13 14:36:52 CST
+        - Add dependencies to cpanfile
+
+0.18  2019-01-13 14:20:39 CST
+        - Update to using Moo
+        - Update to using Dist::Milla to release
+
+0.17    January 13, 11:59 AM Houston, TX
+        - Fix LICENSE meta name
+        - Update POD with number of rows returned by raw update
+        - in update() check if encrypt is defined and is '*' before using as an arrayref
+
 0.16    July 30, 12:09 San Jose, CA
         Use old_crypt_key for old_crypt.
 

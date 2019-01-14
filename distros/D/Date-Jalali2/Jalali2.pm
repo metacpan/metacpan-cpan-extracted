@@ -17,7 +17,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 
 my @g_days_in_month = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 my @j_days_in_month = (31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29);
@@ -185,11 +185,11 @@ http://www.cpan.org/
 
 Ahmad Anvari <http://www.anvari.org/bio/>
 
-Redistributed by : Ehsan Golpayegani <http://www.golpayegani.com>
+Redistributed by : Ehsan Golpayegani <http://www.ehsan.pw>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2012 by Ehsan Golpayegani
+Copyright 2019 by Ehsan Golpayegani
 
 The original algorithm was written with regards to Gregorian<->Jalali
 convertor developed by Roozbeh Pournader and Mohammad Toossi

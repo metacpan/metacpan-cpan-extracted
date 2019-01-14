@@ -8,9 +8,9 @@ my %opts = (
         'dist'         => { 'SUFFIX'   => '.gz',
                             'COMPRESS' => 'gzip -9f' },
         'realclean'    => { FILES => '*.xsi' },
-        'PREREQ_PM'    => { 'DBI' => 1.609 },
+        'PREREQ_PM'    => { 'DBI' => 1.642 },
         'OBJECT'       => '$(O_FILES)',
-        'INC'          => "-I$dbi_arch_dir -I/usr/include/mysql-cppconn-8 -std=c99",
+        'INC'          => "-I$dbi_arch_dir -I/usr/include/mysql-cppconn-8 -std=gnu99",
         'LIBS'         => '-lmysqlcppconn8',
 );
 

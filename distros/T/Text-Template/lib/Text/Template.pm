@@ -10,7 +10,7 @@
 #
 
 package Text::Template;
-$Text::Template::VERSION = '1.53';
+$Text::Template::VERSION = '1.54';
 # ABSTRACT: Expand template text with embedded Perl
 
 use strict;
@@ -603,13 +603,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Text::Template - Expand template text with embedded Perl
 
 =head1 VERSION
 
-version 1.53
+version 1.54
 
 =head1 SYNOPSIS
 
@@ -761,8 +763,6 @@ code in your template, with C<{> at the beginning and C<}> at the end.
 If you want a variable interpolated, you write it the way you would in
 Perl.  If you need to make a loop, you can use any of the Perl loop
 constructions.  All the Perl built-in functions are available.
-
-=encoding UTF-8
 
 =head1 Details
 
@@ -2337,7 +2337,7 @@ There are not quite enough tests in the test suite.
 
 =head1 SOURCE
 
-The development version is on github at L<http://https://github.com/mschout/perl-text-template>
+The development version is on github at L<https://https://github.com/mschout/perl-text-template>
 and may be cloned from L<git://https://github.com/mschout/perl-text-template.git>
 
 =head1 BUGS

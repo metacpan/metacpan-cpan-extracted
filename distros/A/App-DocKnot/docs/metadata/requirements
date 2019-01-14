@@ -6,18 +6,3 @@ The following additional Perl modules are required to use it:
 * JSON
 * Perl6::Slurp
 * Template (part of Template Toolkit)
-
-IPC::System::Simple is required to run the test suite.  The following
-additional Perl modules will be used by the test suite if present:
-
-* Devel::Cover
-* Test::MinimumVersion
-* Test::Perl::Critic
-* Test::Pod
-* Test::Pod::Coverage
-* Test::Spelling
-* Test::Strict
-* Test::Synopsis
-
-All are available on CPAN.  Those tests will be skipped if the modules are
-not available.

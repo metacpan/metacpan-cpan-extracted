@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use Time::HiRes;
 use POSIX qw(:errno_h);
-use Socket qw(PF_INET SOCK_STREAM pack_sockaddr_in inet_ntoa $CRLF SOL_SOCKET SO_ERROR);
+use Socket qw(PF_INET SOCK_STREAM pack_sockaddr_in $CRLF SOL_SOCKET SO_ERROR);
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 
-our $VERSION = "0.27";
+our $VERSION = "0.28";
 
 sub Hijk::Error::CONNECT_TIMEOUT         () { 1 << 0 } # 1
 sub Hijk::Error::READ_TIMEOUT            () { 1 << 1 } # 2
@@ -717,21 +717,17 @@ e.g. C<fcntl()> failing on a valid socket.
 
 =head1 AUTHORS
 
-=over 4
+Kang-min Liu <gugod@gugod.org>
 
-=item Kang-min Liu <gugod@gugod.org>
+Ævar Arnfjörð Bjarmason <avar@cpan.org>
 
-=item Ævar Arnfjörð Bjarmason <avar@cpan.org>
+Borislav Nikolov <jack@sofialondonmoskva.com>
 
-=item Borislav Nikolov <jack@sofialondonmoskva.com>
-
-=item Damian Gryski <damian@gryski.com>
-
-=back
+Damian Gryski <damian@gryski.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013 Kang-min Liu C<< <gugod@gugod.org> >>.
+Copyright (c) 2013- Kang-min Liu C<< <gugod@gugod.org> >>.
 
 =head1 LICENCE
 

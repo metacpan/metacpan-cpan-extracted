@@ -1,3 +1,8 @@
+0.006   2019-01-14 (PERLANCAR)
+
+	- Implement get_release_note() and get_available_versions().
+
+
 0.005   2018-10-18 (PERLANCAR)
 
 	- [Bugfix] Fix download URL.

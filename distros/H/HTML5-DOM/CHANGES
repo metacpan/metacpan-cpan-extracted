@@ -1,9 +1,19 @@
-2018-05-22	1.00	- initial release
-2018-05-22	1.01	- fix can package (remove trash files)
-2018-05-22	1.02	- fix Kwalitee and packaging issues
-2018-05-23	1.03	- fix fragments insertion, add Selector::Entry::pseudoElement and allow delete $node->{attr} to remove attribute.
-2018-05-23	1.04	- add missing myhtml_tree_node_remove, extend Collection API
-2018-05-27	1.05	- fix specificity calculation
-2018-05-27	1.06	- fix tests passing on 32-bit machines
-2018-05-27	1.07	- fix crash on OpenBSD (use semaphore instead of mutex)
-2018-06-16	1.08	- fix char-ref parsing (myhtml bug), fix doctype serialization (myhtml bug), new api for DOCTYPE nodes, attrArray method. 
+2018-05-22  1.00    - initial release
+2018-05-22  1.01    - fix can package (remove trash files)
+2018-05-22  1.02    - fix Kwalitee and packaging issues
+2018-05-23  1.03    - fix fragments insertion, add Selector::Entry::pseudoElement and allow delete $node->{attr} to remove attribute.
+2018-05-23  1.04    - add missing myhtml_tree_node_remove, extend Collection API
+2018-05-27  1.05    - fix specificity calculation
+2018-05-27  1.06    - fix tests passing on 32-bit machines
+2018-05-27  1.07    - fix crash on OpenBSD (use semaphore instead of mutex)
+2018-06-16  1.08    - fix char-ref parsing (myhtml bug), fix doctype serialization (myhtml bug), new api for DOCTYPE nodes, attrArray method.
+2019-01-13  1.09    - API CHANGE: removed old broken async api (wait and parsed methods on Tree and Node)
+                    - API CHANGE: now by default parsing in a single mode (it used to be 2 threads)
+                    - new async parsing api (see docs)
+                    - event loop integration (using EV or any custom implementations top on pipes or sockets)
+                    - update modest/myhtml
+                    - update and fix docs
+                    - supports exists($node->{attr}) for attributes
+2019-01-13  1.10    - fix docs
+2019-01-14  1.11    - fix work on windows (tested with Strawberry)
+                    - fix infinitie loop with threads >= 2

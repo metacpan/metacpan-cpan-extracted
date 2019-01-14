@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use App::CISetup::Travis::ConfigFile;
 use App::CISetup::Types qw( Bool CodeRef Dir Str );
@@ -75,8 +75,10 @@ sub _update_files {
         $file = path($file);
 
         $count++;
-        my $updated = try {
-            $self->_config_file_class->new( $self->_cf_params($file) )
+        my $updated;
+        try {
+            $updated
+                = $self->_config_file_class->new( $self->_cf_params($file) )
                 ->update_file;
         }
         catch {

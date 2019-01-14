@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the Hooktheory API
 
-our $VERSION = '0.0300';
+our $VERSION = '0.0400';
 
 use Moo;
 use strictures 2;
@@ -13,6 +13,7 @@ use Carp;
 use Mojo::UserAgent;
 use Mojo::JSON::MaybeXS;
 use Mojo::JSON qw( decode_json );
+use Mojo::URL;
 
 
 has username => (
@@ -31,8 +32,14 @@ has activkey => (
 
 
 has base => (
-    is      => 'ro',
-    default => sub { 'https://api.hooktheory.com/v1/' },
+    is      => 'rw',
+    default => sub { Mojo::URL->new('https://api.hooktheory.com/v1') },
+);
+
+
+has ua => (
+    is      => 'rw',
+    default => sub { Mojo::UserAgent->new() },
 );
 
 
@@ -40,9 +47,7 @@ sub BUILD {
     my ( $self, $args ) = @_;
 
     if ( !$args->{activkey} && $args->{username} && $args->{password} ) {
-        my $ua = Mojo::UserAgent->new;
-
-        my $tx = $ua->post(
+        my $tx = $self->ua->post(
             $self->base . 'users/auth',
             { 'Content-Type' => 'application/json' },
             json => { username => $args->{username}, password => $args->{password} },
@@ -68,9 +73,7 @@ sub fetch {
     $url .= '?' . $query
         if $query;
 
-    my $ua = Mojo::UserAgent->new;
-
-    my $tx = $ua->get( $url, { Authorization => 'Bearer ' . $self->activkey } );
+    my $tx = $self->ua->get( $url, { Authorization => 'Bearer ' . $self->activkey } );
 
     my $data = _handle_response($tx);
 
@@ -114,7 +117,7 @@ WebService::Hooktheory - Access to the Hooktheory API
 
 =head1 VERSION
 
-version 0.0300
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -122,7 +125,7 @@ version 0.0300
   my $w = WebService::Hooktheory->new( username => 'foo', password => 'bar' );
   # Or:
   $w = WebService::Hooktheory->new( activkey => '1234567890abcdefghij' );
-  my $r = $w->fetch( endpoint => 'trends/nodes', query => { cp => '4,1' } );
+  my $r = $w->fetch( endpoint => '/trends/nodes', query => { cp => '4,1' } );
   print Dumper $r;
 
 =head1 DESCRIPTION
@@ -142,6 +145,10 @@ Your authorized access key.
 =head2 base
 
 The base URL.  Default: https://api.hooktheory.com/v1/
+
+=head2 ua
+
+The user agent.
 
 =head1 METHODS
 

@@ -16,6 +16,7 @@
             config_dir  => '/etc/',
             file        => 'test.ini',
             auto_create => 1,
+            auto_delete => 1,
         },
 
         name => 'IniTest',

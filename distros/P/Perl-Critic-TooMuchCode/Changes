@@ -1,3 +1,7 @@
+0.12
+	- Released at 2019-01-11T16:57:36+0900
+	- ProhibitLargeBlock: add config parameter `block_statement_count_limit`
+
 0.11
         - Released at 2018-12-18T09:53:25+0900
         - ProhibitUnusedConstant: Workaround a PPI bug that misparses ternary op.

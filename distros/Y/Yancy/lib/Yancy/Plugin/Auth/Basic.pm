@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '1.021';
+our $VERSION = '1.022';
 # ABSTRACT: A simple auth module for a site
 
 #pod =encoding utf8
@@ -119,6 +119,20 @@ our $VERSION = '1.021';
 #pod protecting only the Yancy editor application.
 #pod
 #pod =back
+#pod
+#pod =head2 Sessions
+#pod
+#pod This module uses L<Mojolicious
+#pod sessions|https://mojolicious.org/perldoc/Mojolicious/Controller#session>
+#pod to store the login information in a secure, signed cookie.
+#pod
+#pod To configure the default expiration of a session, use
+#pod L<Mojolicious::Sessions
+#pod default_expiration|https://mojolicious.org/perldoc/Mojolicious/Sessions#default_expiration>.
+#pod
+#pod     use Mojolicious::Lite;
+#pod     # Expire a session after 1 day of inactivity
+#pod     app->sessions->default_expiration( 24 * 60 * 60 );
 #pod
 #pod =head1 TEMPLATES
 #pod
@@ -381,7 +395,7 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 1.021
+version 1.022
 
 =head1 SYNOPSIS
 
@@ -500,6 +514,20 @@ The root route that this auth module should protect. Defaults to
 protecting only the Yancy editor application.
 
 =back
+
+=head2 Sessions
+
+This module uses L<Mojolicious
+sessions|https://mojolicious.org/perldoc/Mojolicious/Controller#session>
+to store the login information in a secure, signed cookie.
+
+To configure the default expiration of a session, use
+L<Mojolicious::Sessions
+default_expiration|https://mojolicious.org/perldoc/Mojolicious/Sessions#default_expiration>.
+
+    use Mojolicious::Lite;
+    # Expire a session after 1 day of inactivity
+    app->sessions->default_expiration( 24 * 60 * 60 );
 
 =head1 TEMPLATES
 

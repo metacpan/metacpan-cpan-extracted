@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.09';
+$Neo4j::Driver::Record::VERSION = '0.11';
 
 use Carp qw(carp croak);
 use JSON::PP;
@@ -86,7 +86,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ version 0.09
  
  $query .= ' ORDER BY m.year LIMIT 1';
  my $record = $session->run($query)->single;
- say 'Age of oldest movie: ', $record->get(1);
+ say 'Year of oldest movie: ', $record->get(1);
 
 =head1 DESCRIPTION
 
@@ -187,7 +187,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2018 by Arne Johannessen.
+This software is Copyright (c) 2016-2019 by Arne Johannessen.
 
 This is free software, licensed under:
 

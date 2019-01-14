@@ -1,0 +1,51 @@
+NAME
+
+    Types::RENEEB - Several predefined Type::Tiny types
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+        package TypesTest;
+    
+        use strict;
+        use warnings;
+    
+        use Moo;
+        use Types::RENEEB qw(
+            DistName DistVersion
+            OTRSVersion OTRSVersionWildcard
+        );
+    
+        has distname     => ( is => 'ro', isa => DistName );
+        has distversion  => ( is => 'ro', isa => DistVersion );
+        has otrs_version => ( is => 'ro', isa => OTRSVersion );
+    
+        sub check_otrs_version {
+            OTRSVersion->('2.0.0');
+        }
+    
+        sub check_otrs_version {
+            OTRSVersion->('2.0.x');
+        }
+    
+        1;
+
+DESCRIPTION
+
+    Types::RENEEB is a collection of types I need very often
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

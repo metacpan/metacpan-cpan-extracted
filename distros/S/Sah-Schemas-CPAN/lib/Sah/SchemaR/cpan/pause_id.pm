@@ -1,9 +1,9 @@
 package Sah::SchemaR::cpan::pause_id;
 
-our $DATE = '2018-09-02'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-01-13'; # DATE
+our $VERSION = '0.004'; # VERSION
 
-our $rschema = ["str",[{match=>qr([A-Z][A-Z0-9]{1,8}),summary=>"PAUSE author ID","x.perl.coerce_rules"=>["str_toupper"]}],["str"]];
+our $rschema = ["str",[{match=>qr([A-Z][A-Z0-9]{1,8}),summary=>"PAUSE author ID","x.completion"=>["lcpan_authorid"],"x.perl.coerce_rules"=>["str_toupper"]}],["str"]];
 
 1;
 # ABSTRACT: PAUSE author ID
@@ -20,7 +20,7 @@ Sah::SchemaR::cpan::pause_id - PAUSE author ID
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2018-09-02.
+This document describes version 0.004 of Sah::SchemaR::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2019-01-13.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

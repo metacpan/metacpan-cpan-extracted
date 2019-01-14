@@ -18,12 +18,15 @@ use Test::Differences;
 
 #
 
-plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless $ENV{TEST_AUTHOR} or $ENV{TEST_ALL};
+plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless ($ENV{TEST_AUTHOR} or $ENV{AUTHOR_TESTING}) or ($ENV{TEST_RELEASE} or $ENV{RELEASE_TESTING}) or $ENV{TEST_ALL} or $ENV{CI};
 plan skip_all => 'TAINT mode not supported (Module::Build is eval tainted)' if in_taint_mode();
 
 use Module::Build;
 
-my $mb = Module::Build->current();
+my $mb;
+
+my $have_MB_current = eval { $mb = Module::Build->current(); 1; };
+plan skip_all => 'Module::Build->current() is not available' if not $have_MB_current;
 
 plan skip_all => 'No symbol table exports specified' if not defined $mb->notes('config/exports_aref');
 

@@ -5,16 +5,20 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Perl implementation of the Neo4j Driver API
-$Neo4j::Driver::VERSION = '0.09';
+$Neo4j::Driver::VERSION = '0.11';
 
 use Carp qw(croak);
+use Module::Load;
 
 use URI 1.25;
-use REST::Client 134;
+use Neo4j::Driver::Transport::HTTP;
 use Neo4j::Driver::Session;
 
 
-our $CONTENT_TYPE = 'application/json; charset=UTF-8';
+my %NEO4J_DEFAULT_PORT = (
+	bolt => 7687,
+	http => 7474,
+);
 
 
 sub new {
@@ -23,13 +27,21 @@ sub new {
 	if ($uri) {
 		$uri =~ s|^|http://| if $uri !~ m{:|/};
 		$uri = URI->new($uri);
-		croak "Only the 'http' URI scheme is supported [$uri]" if $uri->scheme ne 'http';
+		
+		if ($uri->scheme eq 'bolt') {
+			eval { load 'Neo4j::Bolt' };
+			croak "Only the 'http' URI scheme is supported [$uri] (you may need to install the Neo4j::Bolt module)" if $@;
+		}
+		else {
+			croak "Only the 'http' URI scheme is supported [$uri]" if $uri->scheme ne 'http';
+		}
+		
 		croak "Hostname is required [$uri]" if ! $uri->host;
-		$uri->port(7474) if ! $uri->port;
 	}
 	else {
-		$uri = URI->new("http://localhost:7474");
+		$uri = URI->new("http://localhost");
 	}
+	$uri->port( $NEO4J_DEFAULT_PORT{ $uri->scheme } ) if ! $uri->_port;
 	
 	my @defaults = (
 		die_on_error => 1,
@@ -48,44 +60,24 @@ sub basic_auth {
 		principal => $username,
 		credentials => $password,
 	};
-	$self->{client} = undef;  # ensure the next call to _client picks up the new credentials
 	
 	return $self;
-}
-
-
-# at the moment, every session uses the same REST::Client instance
-# this is a bug: two different sessions should use two different TCP connections
-sub _client {
-	my ($self) = @_;
-	
-	# lazy initialisation
-	if ( ! $self->{client} ) {
-		my $uri = $self->{uri};
-		if ($self->{auth}) {
-			croak "Only HTTP Basic Authentication is supported" if $self->{auth}->{scheme} ne 'basic';
-			$uri = $uri->clone;
-			$uri->userinfo( $self->{auth}->{principal} . ':' . $self->{auth}->{credentials} );
-		}
-		
-		$self->{client} = REST::Client->new({
-			host => "$uri",
-			timeout => $self->{http_timeout},
-			follow => 1,
-		});
-		$self->{client}->addHeader('Accept', $CONTENT_TYPE);
-		$self->{client}->addHeader('Content-Type', $CONTENT_TYPE);
-		$self->{client}->addHeader('X-Stream', 'true');
-	}
-	
-	return $self->{client};
 }
 
 
 sub session {
 	my ($self) = @_;
 	
-	return Neo4j::Driver::Session->new($self);
+	my $transport;
+	if ($self->{uri}->scheme eq 'bolt') {
+		load 'Neo4j::Driver::Transport::Bolt';
+		$transport = Neo4j::Driver::Transport::Bolt->new($self);
+	}
+	else {
+		$transport = Neo4j::Driver::Transport::HTTP->new($self);
+	}
+	
+	return Neo4j::Driver::Session->new($transport);
 }
 
 
@@ -107,7 +99,7 @@ Neo4j::Driver - Perl implementation of the Neo4j Driver API
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -173,7 +165,7 @@ Only the C<http> URI scheme is currently supported.
 If a part of the URI or even the entire URI is missing, suitable
 default values will be substituted. In particular, the host name
 C<localhost> will be used as default, along with the default port
-of the specified protocol. The default protocol might change to
+of the selected protocol. The default protocol might change to
 C<https> in future.
 
  # all of these are semantically equal
@@ -195,9 +187,31 @@ These are subject to unannounced modification or removal in future
 versions. Expect your code to break if you depend upon these
 features.
 
+=head2 Bolt support
+
+ my $driver = Neo4j::Driver->new('bolt://localhost');
+
+Thanks to L<Neo4j::Bolt>, there is now skeletal support for the
+L<Bolt Protocol|https://boltprotocol.org/>, which can be used as
+an alternative to HTTP to connect to the Neo4j server.
+
+The design goal is for this driver to eventually offer equal support
+for Bolt and HTTP. At this time, using Bolt with this driver is not
+recommended, although it sorta-kinda works. The biggest issues
+include: Explicit transactions are not yet implemented, there is
+no proper error handling, and summary information is completely
+unavailable. Additionally, there are certain problems with Unicode,
+incompatibilities with other "experimental" features of this driver,
+and parts of the documentation still assume that HTTP is the only
+option.
+
 =head2 Close method
 
-C<close> is currently a no-op in this class.
+ $driver->close;  # no-op
+
+This driver does not support persistent connections at present. All
+connections are closed automatically. There is no need for explicit
+calls to `close` at this time.
 
 =head2 HTTP Timeout
 
@@ -267,28 +281,12 @@ using Perl 5.16 or newer if you can.
 
 =head1 DIAGNOSTICS
 
-Module use may give the following errors.
-
-=over
-
-# =item Weak references are not implemented in the version of perl
-# 
-# The version of perl that you are using does not implement weak references, to
-# use L</isweak> or L</weaken> you will need to use a newer release of perl.
-# 
-# =item Vstrings are not implemented in the version of perl
-# 
-# The version of perl that you are using does not implement Vstrings, to use
-# L</isvstring> you will need to use a newer release of perl.
-
-=back
+Neo4j::Driver currently dies as soon as an error condition is
+discovered. Use C<eval>, L<Try::Tiny> or similar to catch this.
 
 =head1 BUGS
 
-This software has pre-release quality. There is no schedule for
-further development. The interface is not yet stable.
-
-See the F<TODO> document and Github for known issues and planned
+See the L<TODO.pod> document and Github for known issues and planned
 improvements. Please report new issues and other feedback on Github.
 
 Just like the official Neo4j drivers, this driver has been designed to strike
@@ -296,11 +294,6 @@ a balance between an idiomatic API for Perl and a uniform surface across all
 languages. Differences between this driver and the official Neo4j drivers in
 either the API or the behaviour are generally to be regarded as bugs unless
 there is a compelling reason for a different approach in Perl.
-
-This driver does not support the Bolt protocol of Neo4j version 3 and
-there are currently no plans of supporting Bolt in the future. The
-Transactional HTTP API is used for communicating with the server
-instead. This also means that Casual Clusters are not supported.
 
 Due to lack of resources, only the Neo4j community edition is targeted by this
 driver at present.
@@ -318,7 +311,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2018 by Arne Johannessen.
+This software is Copyright (c) 2016-2019 by Arne Johannessen.
 
 This is free software, licensed under:
 

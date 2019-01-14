@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 #define FORMAT_VERSION_MAJOR 0
-#define FORMAT_VERSION_MINOR 3
+#define FORMAT_VERSION_MINOR 4
 
 #ifndef SvOOK_offset
 #  define SvOOK_offset(sv, len) STMT_START { len = SvIVX(sv); } STMT_END
@@ -41,6 +41,30 @@ static int max_string;
 #  define PMAT_NVSIZE 10
 #endif
 
+#if (PERL_REVISION == 5) && (PERL_VERSION >= 26)
+#  define SAVEt_ARG0_MAX  SAVEt_REGCONTEXT
+#  define SAVEt_ARG1_MAX  SAVEt_FREEPADNAME
+#  define SAVEt_ARG2_MAX  SAVEt_APTR
+#  define SAVEt_MAX       SAVEt_DELETE
+   /* older perls already defined SAVEt_ARG<n>_MAX */
+#elif (PERL_REVISION == 5) && (PERL_VERSION >= 22)
+#  define SAVEt_MAX       SAVEt_DELETE
+#elif (PERL_REVISION == 5) && (PERL_VERSION >= 20)
+#  define SAVEt_MAX       SAVEt_AELEM
+#elif (PERL_REVISION == 5) && (PERL_VERSION >= 18)
+#  define SAVEt_MAX       SAVEt_GVSLOT
+#endif
+
+static SV *tmpsv;  /* A temporary SV for internal purposes. Will not get dumped */
+
+static SV *make_tmp_iv(IV iv)
+{
+  if(!tmpsv)
+    tmpsv = newSV(0);
+  sv_setiv(tmpsv, iv);
+  return tmpsv;
+}
+
 static uint8_t sv_sizes[] = {
   /* Header                   PTRs,  STRs */
   4 + PTRSIZE + UVSIZE,       1,     0,     /* common SV */
@@ -57,6 +81,18 @@ static uint8_t sv_sizes[] = {
   0,                          0,     0,     /* FORMAT */
   0,                          0,     0,     /* INVLIST */
   0,                          0,     0,     /* UNDEF */
+};
+
+static uint8_t svx_sizes[] = {
+  /* Header   PTRs   STRs */
+  2,          2,     0,     /* magic */
+  0,          1,     0,     /* saved SV */
+  0,          1,     0,     /* saved AV */
+  0,          1,     0,     /* saved HV */
+  UVSIZE,     1,     0,     /* saved AELEM */
+  0,          2,     0,     /* saved HELEM */
+  0,          1,     0,     /* saved CV */
+  0,          1,     1,     /* SV->SV annotation */
 };
 
 static uint8_t ctx_sizes[] = {
@@ -83,7 +119,15 @@ enum PMAT_SVt {
   PMAT_SVtINVLIST,
   PMAT_SVtUNDEF,
 
-  PMAT_SVtMAGIC = 0x80,
+  /* TODO: emit these in DMD_helper.h */
+  PMAT_SVxMAGIC = 0x80,
+  PMAT_SVxSAVED_SV,
+  PMAT_SVxSAVED_AV,
+  PMAT_SVxSAVED_HV,
+  PMAT_SVxSAVED_AELEM,
+  PMAT_SVxSAVED_HELEM,
+  PMAT_SVxSAVED_CV,
+  PMAT_SVxSVSVnote,
 };
 
 enum PMAT_CODEx {
@@ -102,6 +146,9 @@ enum PMAT_CTXt {
   PMAT_CTXtTRY,
   PMAT_CTXtEVAL,
 };
+
+static HV *helper_per_magic;
+typedef int DMD_MagicHelper(pTHX_ SV const *sv, MAGIC *mg);
 
 static void write_u8(FILE *fh, uint8_t v)
 {
@@ -614,6 +661,28 @@ static void write_private_lv(FILE *fh, const SV *sv)
   write_svptr(fh, LvTARG(sv));
 }
 
+static void write_annotations_from_stack(FILE *fh, int n)
+{
+  dSP;
+  SV **p = SP - n + 1;
+
+  while(p <= SP) {
+    unsigned char type = SvIV(p[0]);
+    switch(type) {
+      case PMAT_SVxSVSVnote:
+        write_u8(fh, type);
+        write_svptr(fh, p[1]); /* target */
+        write_svptr(fh, p[2]); /* value */
+        write_strn(fh, SvPV_nolen(p[3]), SvCUR(p[3])); /* annotation */
+        p += 4;
+        break;
+      default:
+        fprintf(stderr, "ARG: Unsure how to handle PMAT_SVn annotation type %02x\n", type);
+        p = SP + 1;
+    }
+  }
+}
+
 static void write_sv(FILE *fh, const SV *sv)
 {
   unsigned char type = -1;
@@ -676,7 +745,7 @@ static void write_sv(FILE *fh, const SV *sv)
   if(SvMAGICAL(sv)) {
     MAGIC *mg;
     for(mg = SvMAGIC(sv); mg; mg = mg->mg_moremagic) {
-      write_u8(fh, PMAT_SVtMAGIC);
+      write_u8(fh, PMAT_SVxMAGIC);
       write_svptr(fh, sv);
       write_u8(fh, mg->mg_type);
       write_u8(fh, (mg->mg_flags & MGf_REFCOUNTED ? 0x01 : 0));
@@ -685,6 +754,26 @@ static void write_sv(FILE *fh, const SV *sv)
         write_svptr(fh, (SV*)mg->mg_ptr);
       else
         write_svptr(fh, NULL);
+
+      if(mg->mg_type == PERL_MAGIC_ext &&
+         mg->mg_ptr && mg->mg_len != HEf_SVKEY) {
+        HE *he;
+
+        he = hv_fetch_ent(helper_per_magic, make_tmp_iv((IV)mg->mg_virtual), 0, 0);
+        if(he) {
+          DMD_MagicHelper *helperfunc = (DMD_MagicHelper *)SvUV(HeVAL(he));
+
+          ENTER;
+          SAVETMPS;
+
+          int ret = (*helperfunc)(aTHX_ sv, mg);
+          if(ret > 0)
+            write_annotations_from_stack(fh, ret);
+
+          FREETMPS;
+          LEAVE;
+        }
+      }
     }
   }
 }
@@ -797,6 +886,9 @@ static void dumpfh(FILE *fh)
 
   write_u8(fh, sizeof(sv_sizes)/3);
   fwrite(sv_sizes, sizeof(sv_sizes), 1, fh);
+
+  write_u8(fh, sizeof(svx_sizes)/3);
+  fwrite(svx_sizes, sizeof(svx_sizes), 1, fh);
 
   write_u8(fh, sizeof(ctx_sizes)/3);
   fwrite(ctx_sizes, sizeof(ctx_sizes), 1, fh);
@@ -925,6 +1017,9 @@ static void dumpfh(FILE *fh)
 
     SV *sv;
     for(sv = arena + 1; sv < arenaend; sv++) {
+      if(sv == tmpsv)
+        continue;
+
       switch(SvTYPE(sv)) {
         case 0xff:
           continue;
@@ -940,6 +1035,152 @@ static void dumpfh(FILE *fh)
   // and a few other things that don't actually appear in the arena
   if(!seen_defstash)
     write_sv(fh, (const SV *)PL_defstash);
+
+  // Savestack
+#if (PERL_REVISION == 5) && (PERL_VERSION >= 18)
+  /* The savestack only had a vaguely nicely predicable layout from perl 5.18 onwards
+   * On earlier perls we'll just not bother. Sorry
+   * No `local` detection for you
+   */
+
+  int saveix = PL_savestack_ix;
+  while(saveix) {
+    UV uv = PL_savestack[saveix-1].any_uv;
+    U8 type = (U8)uv & SAVE_MASK;
+
+    /* TODO: this seems fragile - does core perl not export a nice way to
+     * do it?
+     */
+    char count;
+    if(type <= SAVEt_ARG0_MAX)
+      count = 0;
+    else if(type <= SAVEt_ARG1_MAX)
+      count = 1;
+    else if(type <= SAVEt_ARG2_MAX)
+      count = 2;
+    else if(type <= SAVEt_MAX)
+      count = 3;
+    else
+      /* Unrecognised type; just abort here */
+      break;
+
+    saveix -= (count + 1);
+    ANY *a0 = count > 0 ? &PL_savestack[saveix  ] : NULL,
+        *a1 = count > 1 ? &PL_savestack[saveix+1] : NULL,
+        *a2 = count > 2 ? &PL_savestack[saveix+2] : NULL;
+
+    switch(type) {
+      /* Most savestack entries aren't very interesting to Devel::MAT, but
+       * there's a few we find useful. A lot of them don't add any linkages
+       * between SVs, so we can ignore the majority of them
+       */
+      case SAVEt_CLEARSV:
+      case SAVEt_CLEARPADRANGE:
+
+#if (PERL_REVISION == 5) && (PERL_VERSION >= 24)
+      case SAVEt_TMPSFLOOR:
+#endif
+      case SAVEt_BOOL:
+      case SAVEt_COMPPAD:
+      case SAVEt_FREEOP:
+      case SAVEt_FREESV:
+      case SAVEt_I16:
+      case SAVEt_I32_SMALL:
+      case SAVEt_I8:
+      case SAVEt_INT_SMALL:
+      case SAVEt_MORTALIZESV:
+      case SAVEt_OP:
+      case SAVEt_PARSER:
+      case SAVEt_SHARED_PVREF:
+      case SAVEt_SPTR:
+
+      case SAVEt_GP:
+      case SAVEt_I32:
+      case SAVEt_INT:
+#if (PERL_REVISION == 5) && (PERL_VERSION >= 20)
+      case SAVEt_STRLEN:
+#endif
+      case SAVEt_VPTR:
+      case SAVEt_ADELETE:
+
+      case SAVEt_DELETE:
+        /* ignore */
+        break;
+
+      case SAVEt_AV:
+        /* a local'ised @var */
+        write_u8(fh, PMAT_SVxSAVED_AV);
+        write_svptr(fh, a0->any_ptr); // GV
+        write_svptr(fh, a1->any_ptr); // AV
+        break;
+
+      case SAVEt_HV:
+        /* a local'ised %var */
+        write_u8(fh, PMAT_SVxSAVED_HV);
+        write_svptr(fh, a0->any_ptr); // GV
+        write_svptr(fh, a1->any_ptr); // HV
+        break;
+
+      case SAVEt_SV:
+        /* a local'ised $var */
+        write_u8(fh, PMAT_SVxSAVED_SV);
+        write_svptr(fh, a0->any_ptr); // GV
+        write_svptr(fh, a1->any_ptr); // SV
+        break;
+
+      case SAVEt_HELEM:
+        /* a local'ised $hash{key} */
+        write_u8(fh, PMAT_SVxSAVED_HELEM);
+        write_svptr(fh, a0->any_ptr); // HV
+        write_svptr(fh, a1->any_ptr); // key SV
+        write_svptr(fh, a2->any_ptr); // value SV
+        break;
+
+      case SAVEt_AELEM:
+        /* a local'ised $array[idx] */
+        write_u8(fh, PMAT_SVxSAVED_AELEM);
+        write_svptr(fh, a0->any_ptr); // AV
+        write_uint(fh, a1->any_iv);   // index
+        write_svptr(fh, a2->any_ptr); // value SV
+        break;
+
+      case SAVEt_GVSLOT:
+        /* a local'ised glob slot
+         * a0 points at the GV itself, a1 points at one of the slots within
+         * the GP part
+         * In practice this would only ever be the CODE slot, because other
+         * slots have other localisation mechanisms
+         */
+        if(a1->any_ptr != (SV **) &(GvGP((GV *)a0->any_ptr)->gp_cv)) {
+          fprintf(stderr, "TODO: SAVEt_GVSLOT of slot other than ->gp_cv\n");
+          break;
+        }
+
+        write_u8(fh, PMAT_SVxSAVED_CV);
+        write_svptr(fh, a0->any_ptr);
+        write_svptr(fh, a2->any_ptr);
+        break;
+
+      case SAVEt_GENERIC_SVREF:
+        /* Core perl uses this in a number of places, a few of which we can
+         * identify
+         */
+        if(a0->any_ptr == &GvSV(PL_defgv)) {
+          /* local $_ = ... */
+          write_u8(fh, PMAT_SVxSAVED_SV);
+          write_svptr(fh, (SV *)PL_defgv);
+          write_svptr(fh, a1->any_ptr);
+        }
+        else
+          fprintf(stderr, "TODO: SAVEt_GENERIC_SVREF *a0=%p a1=%p\n",
+            *((void **)a0->any_ptr), a1->any_ptr);
+        break;
+
+      default:
+        fprintf(stderr, "TODO: savestack type=%d\n", type);
+        break;
+    }
+  }
 
   write_u8(fh, 0);
 
@@ -996,6 +1237,7 @@ static void dumpfh(FILE *fh)
       }
     }
   }
+#endif
 
   write_u8(fh, 0);
 }
@@ -1016,3 +1258,6 @@ CODE:
 
 void
 dumpfh(FILE *fh)
+
+BOOT:
+  helper_per_magic = get_hv("Devel::MAT::Dumper::HELPER_PER_MAGIC", GV_ADD);

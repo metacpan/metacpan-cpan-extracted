@@ -13,7 +13,7 @@ use Try::Tiny;
 use Bible::OBML;
 use Bible::Reference 1.02;
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 with 'Throwable';
 
@@ -147,7 +147,7 @@ private_method _parse => sub {
     } );
 
     $passage->descendant_nodes->grep( sub {
-        $_->tag and $_->tag eq 'div' and $_->attr('class') and $_->attr('class') =~ 'poetry '
+        $_->tag and $_->tag eq 'div' and $_->attr('class') and $_->attr('class') =~ 'poetry'
     } )->each( sub {
         $_->descendant_nodes->grep( sub { $_->tag and $_->tag eq 'br' } )->each( sub { $_->replace("\n_") } );
 
@@ -172,6 +172,7 @@ private_method _parse => sub {
     $obml =~ s/\[\*/*/g;
     $obml =~ s/\*\]/*/g;
     $obml =~ s/=[^=\n]+=\n+(=[^=\n]+=)/$1/msg;
+    $obml =~ s/<span.*?>(.*?)<\/span>/$1/msg;
 
     utf8::decode($obml);
     $obml = $self->_obml_lib->desmartify($obml);
@@ -219,7 +220,7 @@ Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Lan
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bible-OBML-Gateway.svg)](https://travis-ci.org/gryphonshafer/Bible-OBML-Gateway)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bible-OBML-Gateway/badge.png)](https://coveralls.io/r/gryphonshafer/Bible-OBML-Gateway)

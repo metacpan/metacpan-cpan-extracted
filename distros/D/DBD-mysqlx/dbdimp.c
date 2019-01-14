@@ -161,6 +161,7 @@ int dbd_db_disconnect(SV *dbh, imp_dbh_t *imp_dbh) {
   return 1;
 }
 
+// There are currently not sth attributes we support or need
 int dbd_st_STORE_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv, SV *valuesv) {
   return 0;
 }
@@ -201,13 +202,15 @@ AV *dbd_st_fetch _((SV * sth, imp_sth_t *imp_sth)) {
   int numFields = DBIc_NUM_FIELDS(imp_sth);
   long int intres;
   long unsigned int uintres;
-  size_t buf_len = 1024;
-  char buf[1024];
-  char buf2[1024];
-  size_t buf2_len = 1024;
+  float floatres;
+  double doubleres;
+  size_t buf_len = DBD_MYSQLX_FETCH_BUF_LEN;
+  char buf[DBD_MYSQLX_FETCH_BUF_LEN];
+  char buf2[DBD_MYSQLX_FETCH_BUF_LEN];
+  size_t buf2_len = DBD_MYSQLX_FETCH_BUF_LEN;
   int precision;
-  unsigned char dbuf[1024];
-  size_t dbuf_len = 1024;
+  unsigned char dbuf[DBD_MYSQLX_FETCH_BUF_LEN];
+  size_t dbuf_len = DBD_MYSQLX_FETCH_BUF_LEN;
   bool is_negative;
   int64_t datetime[7] = {0};
   int offset;
@@ -254,15 +257,17 @@ AV *dbd_st_fetch _((SV * sth, imp_sth_t *imp_sth)) {
       sv_setuv(AvARRAY(av)[i], uintres);
       break;
     case MYSQLX_TYPE_DOUBLE:
-      // mysqlx_get_double()
-      // sv_setnv()
-    case MYSQLX_TYPE_FLOAT:
-      // mysqlx_get_float()
-      croak("Unsupported column type");
+      mysqlx_get_double(row, i, &doubleres);
+      sv_setnv(AvARRAY(av)[i], doubleres);
+      break;
+    case MYSQLX_TYPE_FLOAT: // FIXME: returns 0.333333343267441 instead of
+                            // 0.333333
+      mysqlx_get_float(row, i, &floatres);
+      sv_setnv(AvARRAY(av)[i], floatres);
       break;
     case MYSQLX_TYPE_GEOMETRY:
     case MYSQLX_TYPE_BYTES:
-      buf_len = 1024;
+      buf_len = DBD_MYSQLX_FETCH_BUF_LEN;
       switch (mysqlx_get_bytes(row, i, 0, buf, &buf_len)) {
       case RESULT_NULL:
         SvOK_off(AvARRAY(av)[i]);
@@ -276,7 +281,7 @@ AV *dbd_st_fetch _((SV * sth, imp_sth_t *imp_sth)) {
       }
       break;
     case MYSQLX_TYPE_TIME:
-      dbuf_len = 1024;
+      dbuf_len = DBD_MYSQLX_FETCH_BUF_LEN;
       switch (mysqlx_get_bytes(row, i, 0, dbuf, &dbuf_len)) {
       case RESULT_NULL:
         SvOK_off(AvARRAY(av)[i]);
@@ -311,8 +316,9 @@ AV *dbd_st_fetch _((SV * sth, imp_sth_t *imp_sth)) {
         sv_setpvn(AvARRAY(av)[i], buf, buf_len - 1);
       }
       break;
+    case MYSQLX_TYPE_TIMESTAMP:
     case MYSQLX_TYPE_DATETIME:
-      dbuf_len = 1024;
+      dbuf_len = DBD_MYSQLX_FETCH_BUF_LEN;
       switch (mysqlx_get_bytes(row, i, 0, dbuf, &dbuf_len)) {
       case RESULT_NULL:
         SvOK_off(AvARRAY(av)[i]);
@@ -343,13 +349,36 @@ AV *dbd_st_fetch _((SV * sth, imp_sth_t *imp_sth)) {
       }
       break;
     case MYSQLX_TYPE_SET:
-    case MYSQLX_TYPE_ENUM:
+      buf2_len = DBD_MYSQLX_FETCH_BUF_LEN;
+      switch (mysqlx_get_bytes(row, i, 0, buf2, &buf2_len)) {
+      case RESULT_NULL:
+        SvOK_off(AvARRAY(av)[i]);
+        break;
+      case RESULT_ERROR:
+        croak("Error fetching bytes");
+        break;
+      case RESULT_MORE_DATA: // TODO: Handle properly
+      default:;
+        int done = 0;
+        buf_len = 0;
+        buf[0] = 0;
+        while (done < buf2_len) {
+          if ((done > 0) && buf_len++)
+            strncat(buf, ",", 1);
+          int len = buf2[done++];
+          strncat(buf, buf2 + done, len);
+          done = done + len;
+          buf_len = buf_len + len;
+        }
+        sv_setpvn(AvARRAY(av)[i], buf, buf_len);
+      }
+      break;
     case MYSQLX_TYPE_BIT:
-      croak("Unsupported column type");
+      croak("Unsupported BIT column type");
       break;
     case MYSQLX_TYPE_DECIMAL: // Format: scale[1], Packed BCD, sign
       precision = mysqlx_column_get_precision(imp_sth->result, i);
-      dbuf_len = 1024;
+      dbuf_len = DBD_MYSQLX_FETCH_BUF_LEN;
       switch (mysqlx_get_bytes(row, i, 1, dbuf, &dbuf_len)) {
       case RESULT_NULL:
         SvOK_off(AvARRAY(av)[i]);
@@ -398,7 +427,7 @@ AV *dbd_st_fetch _((SV * sth, imp_sth_t *imp_sth)) {
       }
       break;
     case MYSQLX_TYPE_BOOL:
-      buf_len = 1024;
+      buf_len = DBD_MYSQLX_FETCH_BUF_LEN;
       switch (mysqlx_get_bytes(row, i, 0, buf, &buf_len)) {
       case RESULT_NULL:
         SvOK_off(AvARRAY(av)[i]);
@@ -414,28 +443,48 @@ AV *dbd_st_fetch _((SV * sth, imp_sth_t *imp_sth)) {
           sv_setuv(AvARRAY(av)[i], 0);
       }
       break;
+    case MYSQLX_TYPE_ENUM:
     case MYSQLX_TYPE_JSON:
-    case MYSQLX_TYPE_STRING:
-      buf_len = 1024;
-      switch (mysqlx_get_bytes(row, i, 0, buf, &buf_len)) {
-      case RESULT_NULL:
-        SvOK_off(AvARRAY(av)[i]);
-        break;
-      case RESULT_ERROR:
-        croak("Error fetching string");
-        break;
-      case RESULT_MORE_DATA: // TODO: Handle properly
-      default:
-        sv_setpvn(AvARRAY(av)[i], buf, buf_len - 1);
-        if (dbd_mysqlx_is_utf8_collation(
-                mysqlx_column_get_collation(imp_sth->result, i)))
-          SvUTF8_on(AvARRAY(av)[i]);
+    case MYSQLX_TYPE_STRING:;
+      uint64_t offset = 0;
+      bool hasmore = true;
+      while (hasmore) {
+        buf_len = DBD_MYSQLX_FETCH_BUF_LEN;
+        switch (mysqlx_get_bytes(row, i, offset, buf, &buf_len)) {
+        case RESULT_NULL:
+          SvOK_off(AvARRAY(av)[i]);
+          hasmore = false;
+          break;
+        case RESULT_ERROR:
+          croak("Error fetching string");
+          hasmore = false;
+          break;
+        case RESULT_OK:
+          hasmore = false;
+        case RESULT_MORE_DATA:
+          if (offset == 0) {
+            sv_setpvn(AvARRAY(av)[i], buf, hasmore ? buf_len : buf_len - 1);
+            if (dbd_mysqlx_is_utf8_collation(
+                    mysqlx_column_get_collation(imp_sth->result, i)))
+              SvUTF8_on(AvARRAY(av)[i]);
+          } else {
+            sv_catpvn(AvARRAY(av)[i], buf, hasmore ? buf_len : buf_len - 1);
+          }
+          if (hasmore)
+            offset += DBD_MYSQLX_FETCH_BUF_LEN;
+          break;
+        default:
+          croak("Got unexpeced result from mysqlx_get_bytes()");
+          hasmore = false;
+          break;
+        }
       }
       break;
-    case MYSQLX_TYPE_TIMESTAMP:
     case MYSQLX_TYPE_NULL:
+      croak("Unsupported NULL column type");
+      break;
     case MYSQLX_TYPE_EXPR:
-      croak("Unsupported column type");
+      croak("Unsupported EXPR column type");
       break;
     default:
       croak("Unknown column type");
@@ -511,6 +560,7 @@ SV *dbd_st_last_insert_id(SV *sth, imp_sth_t *imp_sth, SV *catalog, SV *schema,
   return sv_2mortal(newSVuv(mysqlx_get_auto_increment_value(imp_sth->result)));
 }
 
+// TODO: implement this
 int dbd_st_blob_read(SV *sth, imp_sth_t *imp_sth, int field, long offset,
                      long len, SV *destrv, long destoffset) {
   return 0;

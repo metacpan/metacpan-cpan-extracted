@@ -1,12 +1,12 @@
 {
     "name": "DocKnot",
-    "version": "1.06",
+    "version": "2.00",
     "synopsis": "package documentation generator",
     "maintainer": "Russ Allbery <rra@cpan.org>",
     "copyrights": [
         {
             "holder": "Russ Allbery <rra@cpan.org>",
-            "years": "2013-2018",
+            "years": "2013-2019",
         },
     ],
     "license": "Expat",

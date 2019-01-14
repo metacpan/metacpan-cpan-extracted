@@ -26,6 +26,7 @@ typedef struct {
 typedef struct {
     SV *self_rv;
     CURL *easy;
+    curl_mime *mimepost;
 
     AV *held_references;
     int slists_count;
@@ -457,6 +458,57 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
             break;
         }
 
+        /* MIME posts are specified as an arrayref of hashes with a 'name' and a 'value' */
+        case CURLOPT_MIMEPOST:
+        {
+            if (!SvROK(parameter) || SvTYPE(SvRV(parameter)) != SVt_PVAV) {
+                croak("Cannot convert %s to ARRAY reference", SvPV_nolen(parameter));
+            }
+            AV *param_av = (AV*)SvRV(parameter);
+
+            curl_mimepart *part;
+            if (request->mimepost) {
+                curl_mime_free(request->mimepost);
+            }
+            request->mimepost = curl_mime_init(request->easy);
+
+            int i;
+            for (i = 0; i <= av_len(param_av); i++) {
+                SV *entry = *av_fetch(param_av, i, TRUE);
+                if (!SvROK(entry) || SvTYPE(SvRV(entry)) != SVt_PVHV) {
+                    croak("Cannot convert %s to HASH reference", SvPV_nolen(entry));
+                }
+
+                HV *entry_hv = (HV*)SvRV(entry);
+                part = curl_mime_addpart(request->mimepost);
+
+                {
+                    SV **name_sv = hv_fetchs(entry_hv, "name", FALSE);
+                    if (!name_sv)
+                        croak("MIMEPOST must be specified as an array of hashrefs "
+                              "containing 'name' and 'value' entries");
+
+                    curl_mime_name(part, SvPV_nolen(*name_sv));
+                }
+
+                {
+                    SV **value_sv = hv_fetchs(entry_hv, "value", FALSE);
+                    if (!value_sv)
+                        croak("MIMEPOST must be specified as an array of hashrefs "
+                              "containing 'name' and 'value' entries");
+
+                    STRLEN valuelen;
+                    char *value = SvPV(*value_sv, valuelen);
+                    curl_mime_data(part, value, valuelen);
+                }
+            }
+
+            /* If this fails, we'll still free the mimepost properly later */
+            result = curl_easy_setopt(request->easy, CURLOPT_MIMEPOST, request->mimepost);
+
+            break;
+        }
+
         /* Don't know... */
         default:
         {
@@ -774,6 +826,9 @@ DESTROY(self)
 
         if (response->easy) {
             curl_easy_cleanup(response->easy);
+        }
+        if (response->mimepost) {
+            curl_mime_free(response->mimepost);
         }
         if (response->held_references) {
             SvREFCNT_dec(response->held_references);

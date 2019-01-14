@@ -14,6 +14,7 @@ lib/App/cdif/colors.pm
 lib/App/cdif/debug.pm
 lib/App/cdif/default.pm
 lib/App/sdif.pm
+lib/App/sdif/Divert.pm
 lib/App/sdif/LabelStack.pm
 lib/App/sdif/autocolor.pm
 lib/App/sdif/autocolor/Apple_Terminal.pm

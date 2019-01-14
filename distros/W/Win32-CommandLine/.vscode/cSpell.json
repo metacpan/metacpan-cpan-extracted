@@ -1,0 +1,71 @@
+{
+    "version": "0.1",
+    "language": "en",
+    "words": [
+        "aref",
+        "blib",
+        "cpan",
+        "cpansign",
+        "cperl",
+        "devel",
+        "ecredentials",
+        "egmsx",
+        "evaltext",
+        "getcwd",
+        "gmsx",
+        "hasargs",
+        "htm",
+        "htmlify",
+        "imsx",
+        "infile",
+        "jedit",
+        "laction",
+        "lifying",
+        "macify",
+        "mard",
+        "metacpan",
+        "mfile",
+        "mkmanifest",
+        "mskip",
+        "mymeta",
+        "no",
+        "nocase",
+        "numify",
+        "numstat",
+        "paus",
+        "pause",
+        "progname",
+        "qprintf",
+        "rcfile",
+        "re",
+        "repo",
+        "rivy",
+        "rscan",
+        "tar'ed",
+        "testdb",
+        "tria",
+        "tval",
+        "unixify",
+        "uploader",
+        "use",
+        "varchname",
+        "vfile",
+        "vfiles"
+    ],
+    "flagWords": [],
+    "dictionaryDefinitions": [
+        {
+            "name": "perl",
+            "description": "perl keywords",
+            "path": "./perl-keywords.txt"
+        }
+    ],
+    "languageSettings": [
+        {
+            "languageId": "perl",
+            "dictionaries": [
+                "perl"
+            ]
+        }
+    ]
+}

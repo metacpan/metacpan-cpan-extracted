@@ -18,10 +18,10 @@ name: WebService-Lobid-Organisation
 provides:
   WebService::Lobid:
     file: lib/WebService/Lobid.pm
-    version: '0.0041'
+    version: '0.0042'
   WebService::Lobid::Organisation:
     file: lib/WebService/Lobid/Organisation.pm
-    version: '0.0041'
+    version: '0.0042'
 requires:
   HTTP::Tiny: '0.070'
   JSON: '2.90'
@@ -36,6 +36,6 @@ resources:
   bugtracker: https://github.com/hatorikibble/webservice-lobid-organisations/issues
   homepage: https://github.com/hatorikibble/webservice-lobid-organisations
   repository: https://github.com/hatorikibble/webservice-lobid-organisations.git
-version: '0.0041'
+version: '0.0042'
 x_generated_by_perl: v5.20.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

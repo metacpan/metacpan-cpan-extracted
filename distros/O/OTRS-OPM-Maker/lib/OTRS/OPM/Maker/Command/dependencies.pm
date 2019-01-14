@@ -9,7 +9,7 @@ use XML::LibXML;
 
 use OTRS::OPM::Maker -command;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 sub abstract {
     return "list dependencies for OTRS packages";
@@ -72,7 +72,7 @@ OTRS::OPM::Maker::Command::dependencies - List dependencies of OTRS packages
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 AUTHOR
 

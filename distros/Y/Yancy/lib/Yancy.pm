@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.021';
+our $VERSION = '1.022';
 # ABSTRACT: A simple framework and editor for content-driven Mojolicious websites
 
 #pod =head1 SYNOPSIS
@@ -155,6 +155,13 @@ our $VERSION = '1.021';
 #pod =cut
 
 use Mojo::Base 'Mojolicious';
+use Mojo::File qw( path );
+
+# Default home should be the current working directory so that config,
+# templates, and static files can be found.
+has home => sub {
+    return !$ENV{MOJO_HOME} ? path : $_[0]->SUPER::home;
+};
 
 sub startup {
     my ( $app ) = @_;
@@ -188,7 +195,7 @@ Yancy - A simple framework and editor for content-driven Mojolicious websites
 
 =head1 VERSION
 
-version 1.021
+version 1.022
 
 =head1 SYNOPSIS
 

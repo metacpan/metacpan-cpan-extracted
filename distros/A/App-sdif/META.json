@@ -80,7 +80,10 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v4.8.0"
+         "version" : "v4.9.0"
+      },
+      "App::sdif::Divert" : {
+         "file" : "lib/App/sdif/Divert.pm"
       },
       "App::sdif::LabelStack" : {
          "file" : "lib/App/sdif/LabelStack.pm"
@@ -115,7 +118,7 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "4.8.0",
+   "version" : "4.9.0",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <kaz@utashiro.com>",

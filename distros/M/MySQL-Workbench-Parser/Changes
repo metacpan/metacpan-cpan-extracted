@@ -1,6 +1,10 @@
 Change history for MySQL::Workbench::Parser
 ===========================================
 
+1.06 2019-01-11 14:15:00
+
+  * fix bug in linter: do not warn when two names with the same name are unique in the model
+
 1.05 2018-12-10 15:37:00
 
   * add 'as_string' method to column class

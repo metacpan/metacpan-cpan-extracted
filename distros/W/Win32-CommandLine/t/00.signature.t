@@ -10,9 +10,11 @@ my $fh = select STDIN; $|++; select STDOUT; $|++; select STDERR; $|++; select $f
 
 use Test::More;     # included with perl v5.6.2+
 
-# plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless $ENV{TEST_AUTHOR} or $ENV{TEST_ALL};
+# plan skip_all => 'Release tests [to run: set TEST_RELEASE]' unless ($ENV{TEST_RELEASE} or $ENV{RELEASE_TESTING}) or $ENV{TEST_ALL};  ## no skip for basic signature testing
 
 ## no critic ( RequireCarping )
+
+my $keyserver = 'ha.pool.sks-keyservers.net';
 
 my $haveSIGNATURE = (-f 'SIGNATURE');
 my $haveNonEmptySIGNATURE = (-s 'SIGNATURE');
@@ -21,63 +23,66 @@ my $haveSHA = 0;
     unless ($haveSHA) { $haveSHA = eval { require Digest::SHA; 1 }; }
     unless ($haveSHA) { $haveSHA = eval { require Digest::SHA1; 1 }; }
     unless ($haveSHA) { $haveSHA = eval { require Digest::SHA::PurePerl; 1 }; }
-my $haveKeyserverConnectable = eval { require Socket; Socket::inet_aton('pgp.mit.edu') };
+my $haveKeyserverConnectable = eval { require Socket; Socket::inet_aton($keyserver) };
 
 my $message = q{};
 
 unless ($message || $haveSIGNATURE) { $message = 'Missing SIGNATURE file'; }
 unless ($message || $haveNonEmptySIGNATURE) { $message = 'Empty SIGNATURE file'; }
 
-unless ($message || ($ENV{TEST_SIGNATURE} or $ENV{TEST_ALL})) { $message = 'Signature test [to run: set TEST_SIGNATURE]'; }
+unless ($message || ($ENV{TEST_SIGNATURE} or ($ENV{TEST_RELEASE} or $ENV{RELEASE_TESTING}) or $ENV{TEST_ALL})) { $message = 'Signature test [to run: set TEST_SIGNATURE]'; }
+
+plan skip_all => $message if ($message and $ENV{CI});
 
 unless ($message || $haveModuleSignature) { $message = 'Module::Signature required to check distribution SIGNATURE'; }
 unless ($message || $haveSHA) { $message = 'One of Digest::SHA, Digest::SHA1, or Digest::SHA::PurePerl is required'; }
-unless ($message || $haveKeyserverConnectable) { $message = 'Unable to connect to keyserver (pgp.mit.edu)'; }
+unless ($message || $haveKeyserverConnectable) { $message = "Unable to connect to keyserver ($keyserver)"; }
 
-plan skip_all => $message if $message;
+plan skip_all => $message if $message;  ## no skip for author/release-type signature testing
 
 plan skip_all => 'TAINT mode not supported (Module::Build is eval tainted)' if in_taint_mode();
 
-plan tests => 1;
+plan tests => 2;
 
-local $ENV{TEST_SIGNATURE} = (defined $ENV{TEST_SIGNATURE} && $ENV{TEST_SIGNATURE}) || 1;   # Module::Signature only considers MANIFEST.SKIP when $ENV{TEST_SIGNATURE} is set (bug?)
+is($message, q{}, $message);
 
-# pull module information and subroutines via Module::Build->current()
-use Module::Build;
-my $mb = Module::Build->current();
-$mb->my_maniskip_init();
-{## no critic ( ProhibitNoWarnings )
-{no warnings qw( once redefine );
-my $codeRef = $mb->can('my_maniskip');      # ref: http://www.perlmonks.org/?node_id=62737 @@ https://archive.is/pJtfr
-*ExtUtils::Manifest::maniskip = $codeRef;
-}}
+SKIP: {
+    skip "Missing requirements", 1 if $message;
 
-# BUGFIX: ExtUtils::Manifest::manifind is File::Find::find() tainted; REPLACE with fixed version
-# URLref: [Find::File and taint mode] http://www.varioustopics.com/perl/219724-find-file-and-taint-mode.html
-{## no critic ( ProhibitNoWarnings )
-{no warnings qw( once redefine );
-my $codeRef = \&my_manifind;
-*ExtUtils::Manifest::manifind = $codeRef;
-}}
+    local $ENV{TEST_SIGNATURE} = (defined $ENV{TEST_SIGNATURE} && $ENV{TEST_SIGNATURE}) || 1;   # Module::Signature only considers MANIFEST.SKIP when $ENV{TEST_SIGNATURE} is set (bug?)
 
-my $DOWARN = 1;
-my $notCertified = 0;
-my $fingerprint = q{};
-# # setup warning silence to avoid loud "WARNING: This key is not certified with a trusted signature! Primary key fingerprint: [...]"
-# # :: change it to a less scary diag()
-my $verify;
-{
-local $SIG{'__WARN__'} = sub { if ($_[0] =~ /^WARNING:(.*)not certified/msx) { $notCertified = 1 }; if ($notCertified && ($_[0] =~ /^.*fingerprint:\s*(.*?)\s*$/msx)) { $fingerprint = $1 };  warn $_[0] if $DOWARN || ! $notCertified; };
-$DOWARN = 0;    # silence warnings
-$verify = Module::Signature::verify();
-$DOWARN = 1;    # re-enable warnings
+    # pull module information and subroutines via Module::Build->current()
+    use Module::Build;
+    my $mb = Module::Build->current();
+    $mb->my_maniskip_init();
+    {## no critic ( ProhibitNoWarnings )
+    {no warnings qw( once redefine );
+    my $codeRef = $mb->can('my_maniskip');      # ref: http://www.perlmonks.org/?node_id=62737 @@ https://archive.is/pJtfr
+    *ExtUtils::Manifest::maniskip = $codeRef;
+    }}
+
+    # BUGFIX: ExtUtils::Manifest::manifind is File::Find::find() tainted; REPLACE with fixed version
+    # URLref: [Find::File and taint mode] http://www.varioustopics.com/perl/219724-find-file-and-taint-mode.html
+    {## no critic ( ProhibitNoWarnings )
+    {no warnings qw( once redefine );
+    my $codeRef = \&my_manifind;
+    *ExtUtils::Manifest::manifind = $codeRef;
+    }}
+
+    my $notCertified = 0;
+    my $fingerprint = q{};
+    # # setup warning silence to avoid loud "WARNING: This key is not certified with a trusted signature! Primary key fingerprint: [...]"
+    # # :: change it to a less scary diag()
+    my $verify;
+    {
+    local $SIG{'__WARN__'} = sub { if ($_[0] =~ /^WARNING:(.*)key(.*)not\s+certified/msx) { $notCertified = 1 }; if ($notCertified && ($_[0] =~ /^.*fingerprint:\s*(.*?)\s*$/msx)) { $fingerprint = $1 };  warn $_[0] if ! $notCertified; };
+    $verify = Module::Signature::verify();
+    }
+
+    if (($verify == Module::Signature::SIGNATURE_OK()) && $fingerprint) { diag('SIGNATURE verified, but it is NOT certified/trusted'); diag("SIGNATURE fingerprint: [$fingerprint]"); }
+
+    is($verify, Module::Signature::SIGNATURE_OK(), 'Verify SIGNATURE over distribution');
 }
-
-if (($verify == Module::Signature::SIGNATURE_OK()) && $fingerprint) { diag('SIGNATURE verified, but NOT certified/trusted'); diag("signature fingerprint: [$fingerprint]"); }
-
-# is($message, q{}, $message);
-is($verify, Module::Signature::SIGNATURE_OK(), 'Verify SIGNATURE over distribution');
-
 
 #### SUBs ---------------------------------------------------------------------------------------##
 

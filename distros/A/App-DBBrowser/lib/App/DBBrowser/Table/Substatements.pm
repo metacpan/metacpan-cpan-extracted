@@ -12,7 +12,7 @@ use Term::Choose::Util qw( choose_a_number );
 use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
-#use App::DBBrowser::Table::Extensions; # required
+use App::DBBrowser::Table::Extensions;
 
 
 sub new {
@@ -90,7 +90,7 @@ sub __add_aggregate_substmt {
             $sql->{aggr_cols}[$i] .= ' ' . $f_col . ")";
         }
     }
-    my $alias = $ax->alias( 'aggregate', $sql->{aggr_cols}[$i] . ' AS: ', undef, ' ' );
+    my $alias = $ax->alias( 'aggregate', $sql->{aggr_cols}[$i] );
     if ( defined $alias && length $alias ) {
         $sql->{alias}{$sql->{aggr_cols}[$i]} = $ax->quote_col_qualified( [ $alias ] );
     }
@@ -136,11 +136,10 @@ sub select {
             return 1;
         }
         elsif ( $choices->[ $idx[0] ] eq $extended_sign ) {
-            require App::DBBrowser::Table::Extensions;
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $stmt_type, $clause );
             if ( ! defined $ext_col ) {
-                ( $sql->{chosen_cols}, $sql->{alias} ) = @{pop @$bu}; ###
+                ( $sql->{chosen_cols}, $sql->{alias} ) = @{pop @$bu};
             }
             else {
                 push @{$sql->{chosen_cols}}, $ext_col;
@@ -286,7 +285,6 @@ sub where {
             return 1;
         }
         if ( $quote_col eq $extended_sign ) {
-            require App::DBBrowser::Table::Extensions;
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $stmt_type, $clause );
             if ( ! defined $ext_col ) {
@@ -372,7 +370,6 @@ sub group_by {
             return 1;
         }
         elsif ( $choices->[ $idx[0] ] eq $extended_sign ) {
-            require App::DBBrowser::Table::Extensions;
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $stmt_type, $clause );
             if ( defined $ext_col ) {
@@ -618,17 +615,18 @@ sub __set_operator_sql {
     my $trs = Term::Form->new();
     my $stmt = $clause . '_stmt';
     my $args = $clause . '_args';
+    my $extended_sign = '=' . $sf->{extended_sign}[ $sf->{o}{G}{"extend_$clause"} ];
     my @operators;
     my @operators_ext;
     if ( $clause eq 'set' ) {
         @operators     = ( ' = ' );
         @operators_ext = ( " = " );
+        $extended_sign =~ s/^=// if @operators_ext == 1;
     }
     else {
         @operators     = @{$sf->{o}{G}{operators}};
         @operators_ext = ( "IN", "NOT IN", " = ", " != ", " < ", " > ", " >= ", " <= " );
     }
-    my $extended_sign = '=' . $sf->{extended_sign}[ $sf->{o}{G}{"extend_$clause"} ];
     if ( $extended_sign ) {
         unshift @operators, $extended_sign;
     }
@@ -666,7 +664,6 @@ sub __set_operator_sql {
                 $sql->{$stmt} = $bu_stmt . ' ' . $operator;
                 $ax->print_sql( $sql, [ $stmt_type ] );
             }
-            require App::DBBrowser::Table::Extensions;
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $ext_col = $ext->extended_col( $sql, $stmt_type, $clause );
             if ( ! defined $ext_col ) {

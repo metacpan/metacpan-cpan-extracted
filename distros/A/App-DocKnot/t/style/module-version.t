@@ -17,9 +17,10 @@ use warnings;
 
 use lib 't/lib';
 
-use Getopt::Long qw(GetOptions);
 use Test::RRA qw(skip_unless_automated use_prereq);
 use Test::RRA::ModuleVersion qw(test_module_versions update_module_versions);
+
+use Getopt::Long qw(GetOptions);
 
 # If we have options, we're being run from the command line and always load
 # our prerequisite modules.  Otherwise, check if we have necessary

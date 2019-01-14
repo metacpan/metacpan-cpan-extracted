@@ -6,7 +6,7 @@ my %WriteMakefileArgs = (
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/Mojolicious/Plugin/Webpack.pm',
   VERSION_FROM   => 'lib/Mojolicious/Plugin/Webpack.pm',
-  EXE_FILES      => [qw(script/crushinator)],
+  EXE_FILES      => [qw()],
   BUILD_REQUIRES => {}
 ,
   TEST_REQUIRES  => {

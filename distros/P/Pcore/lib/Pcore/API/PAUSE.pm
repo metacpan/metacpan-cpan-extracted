@@ -61,12 +61,12 @@ sub clean ( $self, @args ) {
 
     my $releases;
 
-    for my $node ( $res->tree->findnodes(q[//tbody[@class="list"]/tr]) ) {
-        my ( $name, $ver ) = $node->findvalue(q[./td[@class="file"]]) =~ /\A(.+)-v([[:alnum:].]+)[.]tar[.]gz\z/sm;
+    for my $node ( $res->tree->find('tbody.list > tr')->@* ) {
+        my ( $name, $ver ) = $node->at('td.file')->text =~ /\A(.+)-v([[:alnum:].]+)[.]tar[.]gz\z/sm;
 
         next if !$name;
 
-        next if $node->findvalue(q[./td[@class="modified"]]) =~ /Scheduled for deletion/sm;
+        next if $node->at('td.modified')->text =~ /Scheduled for deletion/smi;
 
         $releases->{$name}->{$ver} = undef;
     }
@@ -133,8 +133,6 @@ sub _pack_multipart ( $self, $body, $boundary, $name, $content, $filename = unde
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 112                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 64, 65, 69           | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

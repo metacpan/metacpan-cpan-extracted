@@ -28,6 +28,7 @@
          "requires" : {
             "Alien::Build" : "1.00",
             "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Build::Make" : "0",
             "Config" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "IPC::Cmd" : "0"
@@ -86,7 +87,7 @@
    "provides" : {
       "Alien::libuv" : {
          "file" : "lib/Alien/libuv.pm",
-         "version" : "1.006"
+         "version" : "1.007"
       }
    },
    "release_status" : "stable",
@@ -101,7 +102,7 @@
          "web" : "https://github.com/genio/Alien-libuv"
       }
    },
-   "version" : "1.006",
+   "version" : "1.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -133,53 +134,6 @@
             "version" : "2.045"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PruneCruft",
-            "name" : "@Starter/PruneCruft",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ManifestSkip",
-            "name" : "@Starter/ManifestSkip",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::MetaConfig",
-            "name" : "@Starter/MetaConfig",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
-            "config" : {
-               "Dist::Zilla::Plugin::MetaProvides::Package" : {
-                  "finder_objects" : [
-                     {
-                        "class" : "Dist::Zilla::Plugin::FinderCode",
-                        "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.012"
-                     }
-                  ],
-                  "include_underscores" : 0
-               },
-               "Dist::Zilla::Role::MetaProvider::Provider" : {
-                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
-                  "inherit_missing" : 1,
-                  "inherit_version" : 0,
-                  "meta_noindex" : 1
-               },
-               "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
-                  "version" : "0.006"
-               }
-            },
-            "name" : "@Starter/MetaProvides::Package",
-            "version" : "2.004003"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
-            "name" : "@Starter/MetaNoIndex",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Starter/MetaYAML",
             "version" : "6.012"
@@ -198,16 +152,6 @@
             "class" : "Dist::Zilla::Plugin::Pod2Readme",
             "name" : "@Starter/Pod2Readme",
             "version" : "0.004"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ExecDir",
-            "name" : "@Starter/ExecDir",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ShareDir",
-            "name" : "@Starter/ShareDir",
-            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -263,8 +207,13 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::TestRelease",
-            "name" : "@Starter/TestRelease",
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Starter/PruneCruft",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Starter/ManifestSkip",
             "version" : "6.012"
          },
          {
@@ -278,6 +227,47 @@
             "version" : "0.029"
          },
          {
+            "class" : "Dist::Zilla::Plugin::RewriteVersion",
+            "config" : {
+               "Dist::Zilla::Plugin::RewriteVersion" : {
+                  "add_tarball_name" : 0,
+                  "finders" : [
+                     ":ExecFiles",
+                     ":InstallModules"
+                  ],
+                  "global" : 1,
+                  "skip_version_provider" : 0
+               }
+            },
+            "name" : "@Starter/RewriteVersion",
+            "version" : "0.018"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@Starter/NextRelease",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
+            "config" : {
+               "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
+                  "finders" : [
+                     ":ExecFiles",
+                     ":InstallModules"
+                  ],
+                  "global" : 0,
+                  "munge_makefile_pl" : 1
+               }
+            },
+            "name" : "@Starter/BumpVersionAfterRelease",
+            "version" : "0.018"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Starter/TestRelease",
+            "version" : "6.012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Starter/ConfirmRelease",
             "version" : "6.012"
@@ -288,14 +278,56 @@
             "version" : "6.012"
          },
          {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@Starter/MetaConfig",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "@Starter/MetaNoIndex",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.012"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Starter/MetaProvides::Package",
+            "version" : "2.004003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Starter/ShareDir",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Starter/ExecDir",
+            "version" : "6.012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::AlienBuild",
             "name" : "AlienBuild",
             "version" : "0.24"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::PkgVersion",
-            "name" : "PkgVersion",
-            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -333,38 +365,6 @@
             "version" : "0.011"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
-            "config" : {
-               "Dist::Zilla::Plugin::MetaProvides::Package" : {
-                  "finder_objects" : [
-                     {
-                        "class" : "Dist::Zilla::Plugin::FinderCode",
-                        "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.012"
-                     }
-                  ],
-                  "include_underscores" : 0
-               },
-               "Dist::Zilla::Role::MetaProvider::Provider" : {
-                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
-                  "inherit_missing" : 1,
-                  "inherit_version" : 1,
-                  "meta_noindex" : 1
-               },
-               "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
-                  "version" : "0.006"
-               }
-            },
-            "name" : "MetaProvides::Package",
-            "version" : "2.004003"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::NextRelease",
-            "name" : "NextRelease",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
@@ -376,7 +376,7 @@
                }
             },
             "name" : "Git::Contributors",
-            "version" : "0.034"
+            "version" : "0.035"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -438,7 +438,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.006",
+                  "tag" : "v1.007",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
@@ -519,6 +519,7 @@
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
                      "CPAN",
+                     "Ollis",
                      "github",
                      "stopwords",
                      "wordlist"
@@ -588,11 +589,6 @@
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
             "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::FinderCode",
-            "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.012"
          }
       ],
       "zilla" : {
@@ -627,6 +623,6 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

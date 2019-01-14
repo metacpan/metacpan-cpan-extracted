@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw{ HTML::Parser };
 
-our $VERSION = '0.300';
+our $VERSION = '0.301';
 
 our $CLASSIC = 0;
 our $DEBUG = 0;
@@ -198,7 +198,7 @@ HTML::TableContentParser - Do interesting things with the contents of tables.
   use HTML::TableContentParser;
   my $p = HTML::TableContentParser->new();
   my $html = read_html_from_somewhere();
-  my $tables = $p->parse_file( $html );
+  my $tables = $p->parse( $html );
   for my $t (@$tables) {
     for my $r (@{$t->{rows}}) {
       print 'Row:';
@@ -411,7 +411,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 Copyright (C) 2002 Simon Drabble
 
-Copyright (C) 2017-2018 Thomas R. Wyant, III
+Copyright (C) 2017-2019 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

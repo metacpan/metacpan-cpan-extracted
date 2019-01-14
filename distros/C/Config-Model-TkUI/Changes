@@ -1,3 +1,16 @@
+1.369 2019-01-13
+
+  Bug fix:
+    * user can go back to edit mode after a save error
+    * don't show close ([-]) button after pasting data
+
+  UI improvements:
+    * improve balloon message for filter entry
+    * show feedback when pasting on wrong value type
+
+  Doc udates:
+    * remove mention of sourceforge mailing lists
+
 1.368 2018-10-25
 
   Bug fixes:

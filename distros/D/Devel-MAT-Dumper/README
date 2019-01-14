@@ -55,6 +55,11 @@ IMPORT OPTIONS
 
        $ perl -MDevel::MAT::Dumper=-dump_at_SIGQUIT ...
 
+    Take care if you are using the <Ctrl-\> key combination on a terminal
+    to send this signal to a foreground process, because if it has fork()ed
+    any background workers or similar, the signal will also be delivered to
+    those as well.
+
  -dump_at_SIGNAME
 
     Installs a handler for the named signal (e.g. SIGABRT, SIGINT) to write

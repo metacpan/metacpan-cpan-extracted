@@ -1,6 +1,6 @@
 
 package Text::Template::Preprocess;
-$Text::Template::Preprocess::VERSION = '1.53';
+$Text::Template::Preprocess::VERSION = '1.54';
 # ABSTRACT: Expand template text with embedded Perl
 
 use strict;
@@ -45,13 +45,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Text::Template::Preprocess - Expand template text with embedded Perl
 
 =head1 VERSION
 
-version 1.53
+version 1.54
 
 =head1 SYNOPSIS
 
@@ -120,7 +122,7 @@ L<Text::Template>
 
 =head1 SOURCE
 
-The development version is on github at L<http://https://github.com/mschout/perl-text-template>
+The development version is on github at L<https://https://github.com/mschout/perl-text-template>
 and may be cloned from L<git://https://github.com/mschout/perl-text-template.git>
 
 =head1 BUGS

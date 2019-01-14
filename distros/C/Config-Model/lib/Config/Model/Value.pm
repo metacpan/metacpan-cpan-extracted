@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value;
-$Config::Model::Value::VERSION = '2.132';
+$Config::Model::Value::VERSION = '2.133';
 use 5.10.1;
 
 use strict;
@@ -1915,7 +1915,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.132
+version 2.133
 
 =head1 SYNOPSIS
 

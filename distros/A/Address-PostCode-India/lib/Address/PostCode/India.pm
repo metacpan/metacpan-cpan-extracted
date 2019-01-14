@@ -1,6 +1,6 @@
 package Address::PostCode::India;
 
-$Address::PostCode::India::VERSION   = '0.09';
+$Address::PostCode::India::VERSION   = '0.12';
 $Address::PostCode::India::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Address::PostCode::India - Interface to the India PinCode.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.12
 
 =cut
 
@@ -20,7 +20,7 @@ use Address::PostCode::UserAgent;
 use Address::PostCode::India::Place;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 extends 'Address::PostCode::UserAgent';
 
 our $BASE_URL = 'http://getpincodes.info/api.php';

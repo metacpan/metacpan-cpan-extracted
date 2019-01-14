@@ -1,0 +1,11 @@
+Revision history for Types::RENEEB
+==================================
+
+0.02  2019-01-13 09:26:00
+
+   * Use Type::Utils tools in Types::RENEEB (fix #2, thanks to tobyink)
+   * Add DistFQ type
+
+0.01  2019-01-12 09:07:00
+
+   * initial release

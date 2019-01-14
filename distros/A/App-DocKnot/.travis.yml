@@ -1,22 +1,27 @@
 language: perl
 perl:
+  - "5.28"
   - "5.26"
   - "5.24"
 
+# Only run the exhaustive tests with heavy dependencies on the latest Perl
+# version.  (These conditionals are written weirdly backwards so that the
+# command line evaluates to true.)
+
 env: AUTHOR_TESTING=1
 before_install:
-  - cpanm Devel::Cover
   - cpanm File::BaseDir
   - cpanm File::ShareDir
   - cpanm JSON
   - cpanm Perl6::Slurp
   - cpanm Template
-  - cpanm Test::MinimumVersion
-  - cpanm Test::Perl::Critic
-  - cpanm Test::Pod
-  - cpanm Test::Pod::Coverage
-  - cpanm Test::Strict
-  - cpanm Test::Synopsis
+  - test "$TRAVIS_PERL_VERSION" != "5.28" || cpanm Devel::Cover
+  - test "$TRAVIS_PERL_VERSION" != "5.28" || cpanm Test::MinimumVersion
+  - test "$TRAVIS_PERL_VERSION" != "5.28" || cpanm Test::Perl::Critic
+  - test "$TRAVIS_PERL_VERSION" != "5.28" || cpanm Test::Pod
+  - test "$TRAVIS_PERL_VERSION" != "5.28" || cpanm Test::Pod::Coverage
+  - test "$TRAVIS_PERL_VERSION" != "5.28" || cpanm Test::Strict
+  - test "$TRAVIS_PERL_VERSION" != "5.28" || cpanm Test::Synopsis
 
 branches:
   except:

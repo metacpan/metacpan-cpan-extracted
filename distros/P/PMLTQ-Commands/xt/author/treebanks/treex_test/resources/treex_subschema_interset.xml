@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pml_schema xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/" version="1.1">
+  <revision>1.0.0</revision>
+  <description>DZ Interset features and values</description>
+
+  <!-- Each Interset feature has a list of permitted values (see the iset-*.type definitions below)
+       However, we declare the features as plain strings because value combinations (such as
+       <gender>masc|neut</gender>) are also allowed. Type checking must be done elsewhere. -->
+
+  <type name="iset.type">
+    <structure>
+      <member name="pos"><cdata format="any"/></member>
+      <member name="nountype"><cdata format="any"/></member>
+      <member name="nametype"><cdata format="any"/></member>
+      <member name="adjtype"><cdata format="any"/></member>
+      <member name="prontype"><cdata format="any"/></member>
+      <member name="numtype"><cdata format="any"/></member>
+      <member name="numform"><cdata format="any"/></member>
+      <member name="numvalue"><cdata format="any"/></member>
+      <member name="verbtype"><cdata format="any"/></member>
+      <member name="advtype"><cdata format="any"/></member>
+      <member name="adpostype"><cdata format="any"/></member>
+      <member name="conjtype"><cdata format="any"/></member>
+      <member name="parttype"><cdata format="any"/></member>
+      <member name="punctype"><cdata format="any"/></member>
+      <member name="puncside"><cdata format="any"/></member>
+      <member name="synpos"><cdata format="any"/></member> <!-- deprecated -->
+      <member name="poss"><cdata format="any"/></member>
+      <member name="reflex"><cdata format="any"/></member>
+      <member name="foreign"><cdata format="any"/></member>
+      <member name="abbr"><cdata format="any"/></member>
+      <member name="hyph"><cdata format="any"/></member>
+      <member name="typo"><cdata format="any"/></member>
+      <member name="echo"><cdata format="any"/></member>
+      <member name="negativeness"><cdata format="any"/></member>
+      <member name="definiteness"><cdata format="any"/></member>
+      <member name="gender"><cdata format="any"/></member>
+      <member name="animateness"><cdata format="any"/></member>
+      <member name="number"><cdata format="any"/></member>
+      <member name="case"><cdata format="any"/></member>
+      <member name="prepcase"><cdata format="any"/></member>
+      <member name="degree"><cdata format="any"/></member>
+      <member name="person"><cdata format="any"/></member>
+      <member name="politeness"><cdata format="any"/></member>
+      <member name="possgender"><cdata format="any"/></member>
+      <member name="possnumber"><cdata format="any"/></member>
+      <member name="possperson"><cdata format="any"/></member>
+      <member name="possednumber"><cdata format="any"/></member>
+      <member name="absperson"><cdata format="any"/></member>
+      <member name="ergperson"><cdata format="any"/></member>
+      <member name="datperson"><cdata format="any"/></member>
+      <member name="absnumber"><cdata format="any"/></member>
+      <member name="ergnumber"><cdata format="any"/></member>
+      <member name="datnumber"><cdata format="any"/></member>
+      <member name="abspoliteness"><cdata format="any"/></member>
+      <member name="ergpoliteness"><cdata format="any"/></member>
+      <member name="datpoliteness"><cdata format="any"/></member>
+      <member name="erggender"><cdata format="any"/></member>
+      <member name="datgender"><cdata format="any"/></member>
+      <member name="position"><cdata format="any"/></member>
+      <member name="subcat"><cdata format="any"/></member>
+      <member name="verbform"><cdata format="any"/></member>
+      <member name="mood"><cdata format="any"/></member>
+      <member name="tense"><cdata format="any"/></member>
+      <member name="voice"><cdata format="any"/></member>
+      <member name="aspect"><cdata format="any"/></member>
+      <member name="variant"><cdata format="any"/></member>
+      <member name="style"><cdata format="any"/></member>
+    </structure>
+  </type>
+
+</pml_schema>

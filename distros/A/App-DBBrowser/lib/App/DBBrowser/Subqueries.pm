@@ -7,7 +7,7 @@ use 5.008003;
 
 use File::Spec::Functions qw( catfile );
 
-use List::MoreUtils qw( any );
+use List::MoreUtils qw( any uniq );
 
 use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( print_columns line_fold );
@@ -33,41 +33,30 @@ sub __stmt_history {
     my ( $sf, $clause ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $db = $sf->{d}{db};
-    my $sq_history = [];
-    for my $stmt ( @{$sf->{i}{history}{$db}{$clause}} ) {
-        if ( any { $_ eq $stmt } @$sq_history ) {
-            next;
-        }
-        push @$sq_history, $stmt;
-        if ( @$sq_history == 6 ) {
-            last;
-        }
-    }
-    my $space = 10 - @$sq_history;
-
-    my $print_history_raw = [];
+    my $print_history_keep   = [];
     my $print_history_filled = [];
-    for my $stmt ( @{$sf->{i}{history}{$db}{print}} ) {
-        my $filled_stmt = $ax->stmt_placeholder_to_value( @$stmt, 1 );
+    for my $ref ( @{$sf->{i}{history}{$db}{print}} ) {
+        my $filled_stmt = $ax->stmt_placeholder_to_value( @$ref, 1 );
         if ( $filled_stmt =~ /^[^\(]+FROM\s*\(\s*(\S.+\S)\s*\)[^\)]*\z/ ) { # Union, Join
             $filled_stmt = $1;
         }
         if ( any { $_ eq $filled_stmt } @$print_history_filled ) {
             next;
         }
-        if ( @$print_history_raw == 7 ) {
-            $sf->{i}{history}{$db}{print} = $print_history_raw;
+        if ( @$print_history_keep == 8 ) {
+            $sf->{i}{history}{$db}{print} = $print_history_keep;
             last;
         }
-        push @$print_history_raw,    $stmt;
+        push @$print_history_keep, $ref;
         push @$print_history_filled, $filled_stmt;
     }
-
-    if ( @$print_history_filled > $space ) {
-        $#{$print_history_filled} = $space - 1;
+    my $sq_history = [ uniq @{$sf->{i}{history}{$db}{$clause}} ];
+    $#{$sq_history} = 5 if @$sq_history > 6;
+    my $history = [ uniq @$sq_history, @$print_history_filled ];
+    if ( @$history > 12 ) {
+        $#{$history} = 11;
     }
-    push @$sq_history, @$print_history_filled;
-    return $sq_history;
+    return $history;
 }
 
 
@@ -85,7 +74,7 @@ sub choose_subquery {
     my $prefix = '- ';
 
     SUBQUERY: while ( 1 ) {
-        $ax->print_sql( $sql, [ $stmt_type ] );
+        $ax->print_sql( $sql, [ $stmt_type ] ); ##
         my $choices = [
             @pre,
             map( $prefix . $_->[-1], @$subqueries ),
@@ -130,7 +119,7 @@ sub choose_subquery {
         }
         else {
             $info = "\nPress 'Enter'";
-            $prompt = '|';
+            $prompt = '';
              $idx -= @pre;
             if ( $idx <= $#$subqueries ) {
                 $default = $subqueries->[$idx][0];
@@ -140,12 +129,15 @@ sub choose_subquery {
                 $default = $history->[$idx];
             }
         }
-        $ax->print_sql( $sql, [ $stmt_type ] );
+        $ax->print_sql( $sql, [ $stmt_type ] ); ##
         my $tf = Term::Form->new();
         my $stmt = $tf->readline( $prompt, { default => $default, info => $info } );
         if ( defined $stmt && length $stmt ) {
+            if ( $stmt =~ /^\s*\((.+)\)\s*\z/ ) {
+                $stmt = $1;
+            }
             unshift @{$sf->{i}{history}{$db}{$clause}}, $stmt;
-            return $stmt;
+            return "(" . $stmt . ")";
         }
     }
 }
@@ -240,6 +232,9 @@ sub __add_subqueries {
             my $tf = Term::Form->new();
             my $stmt = $tf->readline( 'Stmt: ', { info => $info, clear_screen => 1  } );
             if ( defined $stmt && length $stmt ) {
+                if ( $stmt =~ /^\s*\((.+)\)\s*\z/ ) {
+                    $stmt = $1;
+                }
                 push @$bu, [ [ @$tmp_new ], [ @$history ], [ @$used ] ];
                 my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, term_width(), '', ' ' x length( 'Stmt: ' ) );
                 my $name = $tf->readline( 'Name: ', { info => $info . $folded_stmt } );

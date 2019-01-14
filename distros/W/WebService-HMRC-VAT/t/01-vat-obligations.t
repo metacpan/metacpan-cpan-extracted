@@ -102,7 +102,7 @@ dies_ok {
 # Make real call to HMRC test api with valid access_token
 SKIP: {
 
-    my $skip_count = 5;
+    my $skip_count = 12;
     my $count;
 
     $ENV{HMRC_ACCESS_TOKEN} or skip (

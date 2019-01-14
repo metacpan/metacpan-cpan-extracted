@@ -4,10 +4,19 @@
 All modifications are made by Mark Overmeer, unless explicitly stated
 differently.
 
+version 1.05: Fri 11 Jan 17:53:40 CET 2019
+
+	Fixes:
+	- include examples in the manual-pages.
+
+	Improvements:
+	- Convert to GitHUB
+
 version 1.04: Mon 23 May 09:24:40 CEST 2016
 
 	Fixes:
 	- regression test fails on hash randomization [cpantesters]
+	  rt.cpan.org#114542 [Slaven Rezic]
 
 version 1.03: Sat 21 May 09:32:33 CEST 2016
 

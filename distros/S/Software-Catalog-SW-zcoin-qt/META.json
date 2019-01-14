@@ -29,11 +29,13 @@
       },
       "runtime" : {
          "requires" : {
+            "HTML::FormatText::Any" : "0",
             "Log::ger" : "0.023",
+            "Mojo::DOM" : "0",
             "PerlX::Maybe" : "0",
             "Role::Tiny::With" : "0",
             "Software::Catalog::Role::Software" : "v1.0.3",
-            "Software::Catalog::Util" : "v1.0.0",
+            "Software::Catalog::Util" : "v1.0.5",
             "Versioning::Scheme::Dotted" : "0.003",
             "perl" : "5.010001",
             "strict" : "0",
@@ -61,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-Software-Catalog-SW-zcoin-qt"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -156,7 +158,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.593"
+            "version" : "0.594"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -450,7 +452,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
             "name" : "@Author::PERLANCAR/Test::Rinci",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::StaticInstall",

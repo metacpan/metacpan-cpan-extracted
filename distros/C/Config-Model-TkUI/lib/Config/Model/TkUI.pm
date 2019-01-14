@@ -10,7 +10,7 @@
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI;
-$Config::Model::TkUI::VERSION = '1.368';
+$Config::Model::TkUI::VERSION = '1.369';
 use 5.10.1;
 use strict;
 use warnings;
@@ -283,7 +283,7 @@ sub Populate {
     $cw->Balloon(-state => 'balloon')->attach(
         $element_filter_w,
         -msg => 'define a filter applied to element name. At least 3 character long.'
-            .' Can be a Perl regexp. Click on gear button to apply');
+            .' This can be a Perl regexp.');
     $element_filter_w->pack(qw/-side right -fill x -expand 1/);
     $element_filter_w->bind('<KeyRelease>', $reload_on_key);
 
@@ -555,11 +555,14 @@ sub save {
         }
 
         if ($@) {
-            $cw->Dialog(
+            my $answer = $cw->Dialog(
                 -title => 'Save error',
-                -text  => ref($@) ? $@->as_string : $@,
+                -text  => "Cannot save: " . (ref($@) ? $@->as_string : $@),
+                -buttons        => [ qw/quit cancel/ ],
+                -default_button => 'cancel',
             )->Show;
-            $cb->($@); # indicate failure
+            my $err = $@ ;
+            $cb->($err) if $answer eq 'quit'; # indicate failure
         }
         else {
             $cw->show_message("Save done ...");
@@ -806,35 +809,43 @@ sub on_select {
 }
 
 sub on_cut_buffer_dump {
-    my ( $cw, $tree_path ) = @_;
+    my ( $cw, $tree_path, $selection_for_test ) = @_;
     $cw->update_loc_bar($tree_path);
 
     # get cut buffer content, See Perl/Tk book p297
-    my $sel = eval { $cw->SelectionGet; };
+    my $sel = $selection_for_test // eval { $cw->SelectionGet; };
 
     return if $@;    # no selection
 
     my $obj = $cw->{tktree}->infoData($tree_path)->[1];
+    my $type = $obj->get_type;
 
-    if ( $obj->isa('Config::Model::Value') ) {
+    if ( $type eq "leaf" ) {
 
         # if leaf store content
         $obj->store( value => $sel, callback => sub { $cw->reload; } );
     }
-    elsif ( $obj->isa('Config::Model::HashId') ) {
+    elsif ( $type eq 'hash' ) {
 
         # if hash create keys
         my @keys = ( $sel =~ /\n/m ) ? split( /\n/, $sel ) : ($sel);
         map { $obj->fetch_with_id($_) } @keys;
     }
-    elsif ( $obj->isa('Config::Model::ListId') and $obj->get_cargo_type !~ /node/ ) {
-
-        # if array, push values
-        my @v =
-              ( $sel =~ /\n/m ) ? split( /\n/, $sel )
-            : ( $sel =~ /,/ )   ? split( /,/,  $sel )
-            :                     ($sel);
-        $obj->push(@v);
+    elsif ( $type eq 'list') {
+        if ( $obj->get_cargo_type =~ /node/ ) {
+            $cw->show_message("cannot paste on list of node");
+        }
+        else {
+            # if array, push values. Don't mix \n and , separators
+            my @v =
+                ( $sel =~ /\n/m ) ? split( /\n/, $sel )
+                : ( $sel =~ /,/ ) ? split( /,/,  $sel )
+                :                     ($sel);
+            $obj->push(@v);
+        }
+    }
+    else {
+        $cw->show_message("cannot paste on $type parameter");
     }
 
     # else ignore
@@ -843,7 +854,7 @@ sub on_cut_buffer_dump {
     $cw->reload;
     $cw->create_element_widget($cw->{current_mode}, $tree_path);
     $cw->open_item($tree_path);
-    $cw->{tktree}->setmode( $tree_path => 'close' );
+    $cw->{tktree}->setmode( $tree_path => 'close' ) if $type eq 'list' or $type eq 'hash';
 }
 
 # replace dot in str by _|_
@@ -1648,21 +1659,12 @@ See L<Config::Model home page|https://github.com/dod38fr/config-model/wiki>
 
 Or L<Author's blog|http://ddumont.wordpress.com> where you can find many post about L<Config::Model>.
 
-=item *
-
-Send a mail to Config::Model user mailing list: config-model-users at lists.sourceforge.net
-
 =back
 
 =head1 FEEDBACK and HELP wanted
 
 This project needs feedback from its users. Please send your
-feedbacks, comments and ideas to :
-
-  config-mode-users at lists.sourceforge.net
-
-
-This projects also needs help to improve its user interfaces:
+feedbacks, comments and ideas to the author.
 
 =over
 
@@ -1685,10 +1687,6 @@ Desktop
 
 =back
 
-If you want to help, please send a mail to:
-
-  config-mode-devel at lists.sourceforge.net
-
 =head1 SEE ALSO
 
 =over
@@ -1700,10 +1698,6 @@ L<Config::Model>, L<cme>
 =item *
 
 https://github.com/dod38fr/config-model-tkui/wiki
-
-=item *
-
-Config::Model mailing lists on http://sourceforge.net/mail/?group_id=155650
 
 =back
 

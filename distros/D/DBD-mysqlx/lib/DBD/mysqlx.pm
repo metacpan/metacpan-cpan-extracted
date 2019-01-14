@@ -1,6 +1,6 @@
 package DBD::mysqlx;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 our @ISA     = 'DynaLoader';
 
 __PACKAGE__->bootstrap($VERSION);
@@ -34,7 +34,7 @@ sub connect {
   my ($drh, $dbname, $user, $auth, $attr) = @_;
 
   my $dbh = DBI::_new_dbh($drh, {
-    'Name' => $dbname,
+    'Name' => split(/\//,$dbname),
   }) or return undef;
 
   DBD::mysqlx::db::_login($dbh, $dbname, $user, $auth, $attr)
@@ -115,3 +115,19 @@ This driver allows you to connect to a MySQL 5.7.12 or newer database
 over the MySQL X Protocol. On 5.7 you need to configure it to load the
 C<mysqlx> plugin. See L<https://dev.mysql.com/doc/refman/5.7/en/document-store-setting-up.html>
 for details.
+
+=head2 Differences with DBD::mysql
+
+DBD::mysql uses libmysqlclient, supports a wide range of MySQL and MariaDB
+versions and is stable. It uses the Classic MySQL Protocol.
+
+DBD::mysqlx uses libmysqlcppconn8, only supports MySQL 5.7 and 8.0 and
+is experimental. It uses the new MySQL X Protocol, which is protobuf based.
+
+The DSN format is different.
+
+Attributes on the dbh and sth are different, except for DBI standard attributes.
+
+DBD::mysqlx only supports last_insert_id() on the $sth, not on the $dbh.
+
+

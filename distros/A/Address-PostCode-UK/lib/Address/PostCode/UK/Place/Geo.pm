@@ -1,6 +1,6 @@
 package Address::PostCode::UK::Place::Geo;
 
-$Address::PostCode::UK::Place::Geo::VERSION   = '0.16';
+$Address::PostCode::UK::Place::Geo::VERSION   = '0.17';
 $Address::PostCode::UK::Place::Geo::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Address::PostCode::UK::Place::Geo - Placeholder for 'geo' of the Address::PostCo
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'lat'      => (is => 'ro');
 has 'lng'      => (is => 'ro');

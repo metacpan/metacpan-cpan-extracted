@@ -1,0 +1,64 @@
+NAME
+    Acme::CPANModulesUtil::FeatureMatrix - Draw features matrix of modules
+    in an Acme::CPANModules::* list
+
+VERSION
+    This document describes version 0.002 of
+    Acme::CPANModulesUtil::FeatureMatrix (from Perl distribution
+    Acme-CPANModulesUtil-FeatureMatrix), released on 2019-01-12.
+
+FUNCTIONS
+  draw_feature_matrix
+    Usage:
+
+     draw_feature_matrix(%args) -> [status, msg, payload, meta]
+
+    Draw features matrix of modules in an Acme::CPANModules::* list.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cpanmodule* => *perl::modname*
+
+        Name of Acme::CPANModules::* module, without the prefix.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModulesUtil-FeatureMatrix>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModulesUtil-FeatureMatrix>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModulesUtil-
+    FeatureMatrix>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    "Acme::CPANModules"
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -2,8 +2,8 @@ package Test::SQL::Schema::Versioned;
 
 ## no critic (Modules::ProhibitAutomaticExportation)
 
-our $DATE = '2018-06-06'; # DATE
-our $VERSION = '0.236'; # VERSION
+our $DATE = '2019-01-13'; # DATE
+our $VERSION = '0.237'; # VERSION
 
 use 5.010001;
 use strict;
@@ -77,7 +77,7 @@ Test::SQL::Schema::Versioned - Test SQL::Schema::Versioned spec
 
 =head1 VERSION
 
-This document describes version 0.236 of Test::SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2018-06-06.
+This document describes version 0.237 of Test::SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2019-01-13.
 
 =head1 FUNCTIONS
 
@@ -108,7 +108,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

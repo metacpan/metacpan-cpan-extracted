@@ -1,0 +1,45 @@
+Revision history for Short::URL
+
+0.014  2019-01-13 15:04:32 CST
+    - Switched to using Dist::Milla for releases
+    - Switched to Moo
+
+0.013     2016-11-14 23:23:37-08:00 America/Los_Angeles
+    Renamed Url.pm to URL.pm
+
+0.012     2016-02-07 18:56:38-08:00 America/Los_Angeles
+    Added the package version.
+
+0.011     2014-08-18 11:55:49-05:00 America/Chicago
+    Removed print and fixed "databse" typo
+
+0.010     2014-08-03 11:48:15-07:00 America/Los_Angeles
+    Added offset to documentation
+
+0.009     2014-08-03 00:53:04-07:00 America/Los_Angeles
+    Fixed some typos in Synopsis thanks to azawawi
+
+0.008     2014-08-02 19:44:53-07:00 America/Los_Angeles
+    Store alphabet_in_use instead of calling many times in loop
+
+0.007     2014-07-27 12:07:31-07:00 America/Los_Angeles
+    Removed pointles use List::Util line
+
+0.006     2014-07-26 23:29:44-07:00 America/Los_Angeles
+    Fixed issue where reverse was used instead of return in encode.
+
+0.005     2014-07-26 22:59:48-07:00 America/Los_Angeles
+    Changed no_naughties to no_vowels. Fixed issue where Template::Toolkit didn't handled returned reverse value properly.
+    Also, added croak_on_error.
+
+0.004     2014-07-26 18:24:52-07:00 America/Los_Angeles
+    Added no_naughties to synopsis
+
+0.003     2014-07-26 18:17:56-07:00 America/Los_Angeles
+    Added no_naughties
+
+0.002     2014-07-26 17:10:58-07:00 America/Los_Angeles
+    Removed test.pl from distribution
+
+0.001     2014-07-26 16:59:58-07:00 America/Los_Angeles
+	Released to the world!

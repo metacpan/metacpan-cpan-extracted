@@ -11,7 +11,9 @@ sub applies_to           { return 'PPI::Structure::Block' }
 
 sub violates {
     my ( $self, $elem, $doc ) = @_;
-    my $limit = $self->{block_statement_count_limit} || 10;
+    my $limit = $self->{_config}->{block_statement_count_limit} ||
+        $self->{block_statement_count_limit} ||
+        10;
 
     my $word_before = $elem->sprevious_sibling;
     return unless $word_before && $word_before->isa('PPI::Token::Word');
@@ -42,5 +44,14 @@ This policy scan for large code blocks of the following type.
     map { ... };
     grep { ... };
     do { ... };
+
+By default a large block is one with more than 10 statements. If
+you need an other limit, you can set the parameter
+C<block_statement_count_limit>.
+
+For example in the I<.perlcriticrc> file
+
+  [TooMuchCode::ProhibitLargeBlock]
+  block_statement_count_limit = 20
 
 =cut

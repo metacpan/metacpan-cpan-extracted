@@ -11,14 +11,19 @@ IP::World - Fast IP-address to country-code translation using multiple databases
 =head1 DESCRIPTION
 
 IP::World returns the ISO-3166 country code associated with an IP4
-address.  This version is based on two free databases from
-L<http://www.wipmania.com> and L<http://www.maxmind.com>.  An
+address.  This version is based on the free database from
+L<http://www.wipmania.com>.  An
 included application checks the currency of the included database
 on installation, and can be scheduled to do so periodically.
 
 The author uses this package for customizing served web pages to
 the location of the visitor, particularly to quote prices of items
 for sale in the visitor's currency.  Also for server log analysis.
+
+It used to also use the free GeoLite database from MaxMind but that
+has been discontinued (see L<https://blog.maxmind.com/2018/01/02/discontinuation-of-the-geolite-legacy-databases/>).
+If you were relying on the GeoLite database you should upgrade to
+using GeoLite2 (see L<https://dev.maxmind.com/geoip/geoip2/geolite2/>).
 
 =head2 EXPORTS
 
@@ -205,8 +210,7 @@ CPAN modules:
 See L<http://search.cpan.org/perldoc%3FIP::Country>
 
 This module appears to have the disadvantage that its database can
-only be updated by re-installing the module.  With IP-World, MaxMind
-updates its GeoIP data monthly, and WIPmania updates its WorldIP data
+only be updated by re-installing the module. WIPmania updates its WorldIP data
 every 2 months.  Such updates are automatically downloaded if you
 schedule I<maint_ip_world_db>.
 

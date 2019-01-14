@@ -15,10 +15,42 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Neo4j-Driver
+provides:
+  Neo4j::Driver:
+    file: lib/Neo4j/Driver.pm
+    version: '0.11'
+  Neo4j::Driver::Record:
+    file: lib/Neo4j/Driver/Record.pm
+    version: '0.11'
+  Neo4j::Driver::ResultColumns:
+    file: lib/Neo4j/Driver/ResultColumns.pm
+    version: '0.11'
+  Neo4j::Driver::ResultSummary:
+    file: lib/Neo4j/Driver/ResultSummary.pm
+    version: '0.11'
+  Neo4j::Driver::Session:
+    file: lib/Neo4j/Driver/Session.pm
+    version: '0.11'
+  Neo4j::Driver::StatementResult:
+    file: lib/Neo4j/Driver/StatementResult.pm
+    version: '0.11'
+  Neo4j::Driver::SummaryCounters:
+    file: lib/Neo4j/Driver/SummaryCounters.pm
+    version: '0.11'
+  Neo4j::Driver::Transaction:
+    file: lib/Neo4j/Driver/Transaction.pm
+    version: '0.11'
+  Neo4j::Driver::Transport::Bolt:
+    file: lib/Neo4j/Driver/Transport/Bolt.pm
+    version: '0.11'
+  Neo4j::Driver::Transport::HTTP:
+    file: lib/Neo4j/Driver/Transport/HTTP.pm
+    version: '0.11'
 requires:
   Cpanel::JSON::XS: '3.0201'
   JSON::PP: '0'
   LWP::UserAgent: '0'
+  Module::Load: '0'
   REST::Client: '134'
   Try::Tiny: '0'
   URI: '1.25'
@@ -27,6 +59,6 @@ resources:
   bugtracker: https://github.com/johannessen/neo4j-driver-perl/issues
   homepage: https://github.com/johannessen/neo4j-driver-perl
   repository: https://github.com/johannessen/neo4j-driver-perl.git
-version: '0.09'
+version: '0.11'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

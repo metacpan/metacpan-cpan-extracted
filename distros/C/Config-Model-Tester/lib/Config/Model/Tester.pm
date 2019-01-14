@@ -9,7 +9,7 @@
 #
 package Config::Model::Tester;
 # ABSTRACT: Test framework for Config::Model
-$Config::Model::Tester::VERSION = '3.006';
+$Config::Model::Tester::VERSION = '3.007';
 use warnings;
 use strict;
 use locale;
@@ -43,7 +43,7 @@ eval {
     require Config::Model::BackendMgr;
 } ;
 
-use vars qw/$model $conf_file_name $conf_dir $model_to_test $home_for_test @tests $skip @ISA @EXPORT/;
+use vars qw/$model $conf_file_name $conf_dir $model_to_test $app_to_test $home_for_test @tests $skip @ISA @EXPORT/;
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -52,7 +52,7 @@ require Exporter;
 $File::Copy::Recursive::DirPerms = 0755;
 
 sub setup_test {
-    my ( $app_to_test, $t_name, $wr_root, $trace, $t_data ) = @_;
+    my ( $test_group, $t_name, $wr_root, $trace, $t_data ) = @_;
 
     # cleanup before tests
     $wr_root->remove_tree();
@@ -69,7 +69,7 @@ sub setup_test {
     $conf_file = $wr_dir->child($conf_dir,$conf_file_name)
         if $conf_dir and $conf_file_name;
 
-    my $ex_dir = path('t')->child('model_tests.d', "$app_to_test-examples");
+    my $ex_dir = path('t')->child('model_tests.d', "$test_group-examples");
     my $ex_data = $ex_dir->child($t_data->{data_from} // $t_name);
 
     my @file_list;
@@ -81,7 +81,7 @@ sub setup_test {
                 = ref ($map) eq 'HASH' ? $map->{$^O} // $map->{default}
                 :                        $map;
             if (not defined $destination_str) {
-                die "$app_to_test $t_name setup error: cannot find destination for test file $file" ;
+                die "$test_group $t_name setup error: cannot find destination for test file $file" ;
             }
             $destination_str =~ s!~/!$home_for_test/! if $home_for_test;
             my $destination = $wr_dir->child($destination_str) ;
@@ -117,7 +117,7 @@ sub setup_test {
     else {
         note ('starting test without original config data, i.e. from scratch');
     }
-    ok( 1, "Copied $app_to_test example $t_name" );
+    ok( 1, "Copied $test_group example $t_name" );
 
     return ( $wr_dir, $wr_dir2, $conf_file, $ex_data, @file_list );
 }
@@ -139,7 +139,9 @@ sub list_test_files {
 		#push @file_list, '/'.join('/',@l) ; # build a unix-like path even on windows
 	};
 
-    return sort @file_list;
+    # don't use return sort -> undefined behavior in scalar context.
+    my @res = sort @file_list;
+    return @res;
 }
 
 sub write_config_file {
@@ -220,7 +222,7 @@ sub apply_fix {
 }
 
 sub dump_tree {
-    my ($app_to_test, $root, $mode, $no_warnings, $t, $trace) = @_;
+    my ($test_group, $root, $mode, $no_warnings, $t, $trace) = @_;
 
     print "dumping tree ...\n" if $trace;
     my $dump  = '';
@@ -233,7 +235,7 @@ sub dump_tree {
         my @tf = @{ $t->{dump_errors} };
         while (@tf) {
             my $qr = shift @tf;
-            throws_ok { &$risky } $qr, "Failed dump $nb of $app_to_test config tree";
+            throws_ok { &$risky } $qr, "Failed dump $nb of $test_group config tree";
             my $fix = shift @tf;
             $root->load($fix);
             ok( 1, "Fixed error nb " . $nb++ );
@@ -247,15 +249,15 @@ sub dump_tree {
     }
     elsif ( ($no_warnings or (exists $t->{dump_warnings}) and not defined $t->{dump_warnings}) ) {
         local $Config::Model::Value::nowarning = 1;
-        note("dump_warnings parameter is DEPRECATED");
+        note("dump_warnings parameter is DEPRECATED") if exists $t->{dump_warnings};
         &$risky;
         ok( 1, "Ran dump_tree (no warning check)" );
     }
     else {
-        note("dump_warnings parameter is DEPRECATED");
+        note("dump_warnings parameter is DEPRECATED") if $t->{dump_warnings};
         warnings_like { &$risky; } $t->{dump_warnings}, "Ran dump_tree";
     }
-    ok( $dump, "Dumped $app_to_test config tree in $mode mode" );
+    ok( $dump, "Dumped $test_group config tree in $mode mode" );
 
     print $dump if $trace;
     return $dump;
@@ -271,16 +273,30 @@ sub check_data {
     while (@checks) {
         my $path       = shift @checks;
         my $v          = shift @checks;
-        my $check_v    = ref $v eq 'HASH' ? delete $v->{value} : $v;
-        my @check_args = ref $v eq 'HASH' ? %$v : ();
+        check_one_item($label, $root,$path, $v);
+    }
+}
+
+sub check_one_item {
+    my ($label, $root,$path, $check_data_l) = @_;
+
+    my @checks = ref $check_data_l eq 'ARRAY' ? @$check_data_l : ($check_data_l);
+
+    foreach my $check_data (@checks) {
+        my $check_v_l  = ref $check_data eq 'HASH' ? delete $check_data->{value} : $check_data;
+        my @check_args = ref $check_data eq 'HASH' ? %$check_data : ();
         my $check_str  = @check_args ? " (@check_args)" : '';
         my $obj = $root->grab( step => $path, type => ['leaf','check_list'], @check_args );
         my $got = $obj->fetch(@check_args);
-        if (ref $check_v eq 'Regexp') {
-            like( $got, $check_v, "$label check '$path' value with regexp$check_str" );
-        }
-        else {
-            is( $got, $check_v, "$label check '$path' value$check_str" );
+
+        my @check_v = ref($check_v_l) eq 'ARRAY' ? @$check_v_l : ($check_v_l);
+        foreach my $check_v (@check_v) {
+            if (ref $check_v eq 'Regexp') {
+                like( $got, $check_v, "$label check '$path' value with regexp$check_str" );
+            }
+            else {
+                is( $got, $check_v, "$label check '$path' value$check_str" );
+            }
         }
     }
 }
@@ -342,10 +358,10 @@ sub _test_key {
 }
 
 sub write_data_back {
-    my ($app_to_test, $inst, $t) = @_;
+    my ($test_group, $inst, $t) = @_;
     local $Config::Model::Value::nowarning = $t->{no_warnings} || 0;
     $inst->write_back( force => 1 );
-    ok( 1, "$app_to_test write back done" );
+    ok( 1, "$test_group write back done" );
 }
 
 sub check_file_mode {
@@ -362,7 +378,7 @@ sub check_file_mode {
             my $stat = $wr_dir->child($f)->stat;
             ok($stat ,"stat found file $f");
             if ($stat) {
-                my $mode = $stat->mode & 07777 ;
+                my $mode = $stat->mode & oct(7777) ;
                 is($mode, $expected_mode, sprintf("check $f mode (got %o vs %o)",$mode,$expected_mode));
             }
         }
@@ -420,7 +436,7 @@ sub check_added_or_removed_files {
 }
 
 sub create_second_instance {
-    my ($app_to_test, $t_name, $wr_dir, $wr_dir2,$t, $config_dir_override) = @_;
+    my ($test_group, $t_name, $wr_dir, $wr_dir2,$t, $config_dir_override) = @_;
 
     # create another instance to read the conf file that was just written
     dircopy( $wr_dir->stringify, $wr_dir2->stringify )
@@ -433,14 +449,14 @@ sub create_second_instance {
         root_class_name => $model_to_test,
         root_dir        => $wr_dir2->stringify,
         config_file     => $t->{config_file} ,
-        instance_name   => "$app_to_test-$t_name-w",
+        instance_name   => "$test_group-$t_name-w",
         application     => $app_to_test,
         check           => $t->{load_check2} || 'yes',
         config_dir      => $config_dir_override,
         @options
     );
 
-    ok( $i2_test, "Created instance $app_to_test-test-$t_name-w" );
+    ok( $i2_test, "Created instance $test_group-test-$t_name-w" );
 
     local $Config::Model::Value::nowarning = $t->{no_warnings} || 0;
     my $i2_root = $i2_test->config_root;
@@ -450,24 +466,28 @@ sub create_second_instance {
 }
 
 sub run_model_test {
-    my ($app_to_test, $app_to_test_conf, $do, $model, $trace, $wr_root) = @_ ;
+    my ($test_group, $test_group_conf, $do, $model, $trace, $wr_root) = @_ ;
 
     $skip = 0;
     undef $conf_file_name ;
     undef $conf_dir ;
     undef $home_for_test ;
-    undef $model_to_test ;
+    undef $model_to_test ; # deprecated
+    undef $app_to_test;
 
-    note("Beginning $app_to_test test ($app_to_test_conf)");
+    note("Beginning $test_group test ($test_group_conf)");
+    note('$model_to_test variable is deprecated. Please use $app_to_test instead') if $model_to_test;
 
-    unless ( my $return = do "./$app_to_test_conf" ) {
-        warn "couldn't parse $app_to_test_conf: $@" if $@;
-        warn "couldn't do $app_to_test_conf: $!" unless defined $return;
-        warn "couldn't run $app_to_test_conf" unless $return;
+    unless ( my $return = do "./$test_group_conf" ) {
+        warn "couldn't parse $test_group_conf: $@" if $@;
+        warn "couldn't do $test_group_conf: $!" unless defined $return;
+        warn "couldn't run $test_group_conf" unless $return;
     }
 
+    $app_to_test ||= $test_group;
+
     if ($skip) {
-        note("Skipped $app_to_test test ($app_to_test_conf)");
+        note("Skipped $test_group test ($test_group_conf)");
         return;
     }
 
@@ -481,14 +501,15 @@ sub run_model_test {
         if (not defined $model_to_test) {
             my @k = sort values %$applications;
             my @files = map { $_->{_file} // 'unknown' } values %$appli_info ;
-            die "Cannot find model name for $app_to_test in files >@files<. Know dev models are >@k<. ".
-                "Check your test name (the file ending with -test-conf.pl) or set the \$model_to_test global variable\n";
+            die "Cannot find application or model for $test_group in files >@files<. Known applications are",
+                sort keys %$applications, ". Known models are >@k<. ".
+                "Check your test name (the file ending with -test-conf.pl) or set the \$app_to_test global variable\n";
         }
     }
 
-    my $config_dir_override = $appli_info->{$app_to_test}{config_dir}; # may be undef
+    my $config_dir_override = $appli_info->{$test_group}{config_dir}; # may be undef
 
-    my $note ="$app_to_test uses $model_to_test model";
+    my $note ="$test_group uses $model_to_test model";
     $note .= " on file $conf_file_name" if defined $conf_file_name;
     note($note);
 
@@ -500,16 +521,16 @@ sub run_model_test {
             $idx++;
             next;
         }
-        note("Beginning subtest $app_to_test $t_name");
+        note("Beginning subtest $test_group $t_name");
 
         my ($wr_dir, $wr_dir2, $conf_file, $ex_data, @file_list)
-            = setup_test ($app_to_test, $t_name, $wr_root,$trace, $t);
+            = setup_test ($test_group, $t_name, $wr_root,$trace, $t);
 
         write_config_file($conf_dir,$wr_dir,$t);
 
-        my $inst_name = "$app_to_test-" . $t_name;
+        my $inst_name = "$test_group-" . $t_name;
 
-        die "Duplicated test name $t_name for app $app_to_test\n"
+        die "Duplicated test name $t_name for app $test_group\n"
             if $model->has_instance ($inst_name);
 
         my @options;
@@ -538,14 +559,14 @@ sub run_model_test {
 
         load_instructions ($root,$t->{load},$trace) if $t->{load} ;
 
-        dump_tree ('before fix '.$app_to_test , $root, 'full', $t->{no_warnings}, $t->{check_before_fix}, $trace)
+        dump_tree ('before fix '.$test_group , $root, 'full', $t->{no_warnings}, $t->{check_before_fix}, $trace)
             if $t->{check_before_fix};
 
         apply_fix($inst) if  $t->{apply_fix};
 
-        dump_tree ($app_to_test, $root, 'full', $t->{no_warnings}, $t->{full_dump}, $trace) ;
+        dump_tree ($test_group, $root, 'full', $t->{no_warnings}, $t->{full_dump}, $trace) ;
 
-        my $dump = dump_tree ($app_to_test, $root, 'custom', $t->{no_warnings}, {}, $trace) ;
+        my $dump = dump_tree ($test_group, $root, 'custom', $t->{no_warnings}, {}, $trace) ;
 
         check_data("first", $root, $t->{check}, $t->{no_warnings}) if $t->{check};
 
@@ -554,7 +575,7 @@ sub run_model_test {
 
         check_annotation($root,$t) if $t->{verify_annotation};
 
-        write_data_back ($app_to_test, $inst, $t) ;
+        write_data_back ($test_group, $inst, $t) ;
 
         check_file_content($wr_dir,$t) ;
 
@@ -562,30 +583,30 @@ sub run_model_test {
 
         check_added_or_removed_files ($conf_dir, $wr_dir, $t, @file_list) if $ex_data->is_dir;
 
-        my $i2_root = create_second_instance ($app_to_test, $t_name, $wr_dir, $wr_dir2,$t, $config_dir_override);
+        my $i2_root = create_second_instance ($test_group, $t_name, $wr_dir, $wr_dir2,$t, $config_dir_override);
 
         load_instructions ($i2_root,$t->{load2},$trace) if $t->{load2} ;
 
-        my $p2_dump = dump_tree("second $app_to_test", $i2_root, 'custom', $t->{no_warnings},{}, $trace) ;
+        my $p2_dump = dump_tree("second $test_group", $i2_root, 'custom', $t->{no_warnings},{}, $trace) ;
 
         unified_diff;
         eq_or_diff(
             [ split /\n/,$p2_dump ],
             [ split /\n/,$dump ],
-            "compare original $app_to_test custom data with 2nd instance custom data",
+            "compare original $test_group custom data with 2nd instance custom data",
         );
 
         ok( -s "$wr_dir2/$conf_dir/$conf_file_name" ,
-            "check that original $app_to_test file was not clobbered" )
+            "check that original $test_group file was not clobbered" )
                 if defined $conf_file_name ;
 
         check_data("second", $i2_root, $t->{wr_check}, $t->{no_warnings}) if $t->{wr_check} ;
 
-        note("End of subtest $app_to_test $t_name");
+        note("End of subtest $test_group $t_name");
 
         $idx++;
     }
-    note("End of $app_to_test test");
+    note("End of $test_group test");
 
 }
 
@@ -642,12 +663,12 @@ sub run_tests {
 
     my @group_of_tests = grep { /-test-conf.pl$/ } glob("t/model_tests.d/*");
 
-    foreach my $app_to_test_conf (@group_of_tests) {
-        my ($app_to_test) = ( $app_to_test_conf =~ m!\.d/([\w\-]+)-test-conf! );
-        next if ( $test_only_app and $test_only_app ne $app_to_test ) ;
+    foreach my $test_group_conf (@group_of_tests) {
+        my ($test_group) = ( $test_group_conf =~ m!\.d/([\w\-]+)-test-conf! );
+        next if ( $test_only_app and $test_only_app ne $test_group ) ;
         $model = create_model_object();
         return unless $model;
-        run_model_test($app_to_test, $app_to_test_conf, $do, $model, $trace, $wr_root) ;
+        run_model_test($test_group, $test_group_conf, $do, $model, $trace, $wr_root) ;
     }
 
     memory_cycle_ok($model,"test memory cycle") ;
@@ -669,7 +690,7 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 3.006
+version 3.007
 
 =head1 SYNOPSIS
 
@@ -1073,7 +1094,7 @@ Optionally, call L<apply_fixes|Config::Model::Instance/apply_fixes>:
 
 =item *
 
-Call L<dump_tree|Config::Model::Node/dump_tree ( ... )> to check the validity of the
+Call L<dump_tree|Config::Model::Node/dump_tree> to check the validity of the
 data after optional C<apply_fix>. This step is not optional.
 
 As with C<check_before_fix>, both C<dump_errors> or C<dump_warnings> can be used.
@@ -1084,30 +1105,45 @@ Run specific content check to verify that configuration data was retrieved
 correctly:
 
     check => {
-        'fs:/proc fs_spec',           "proc" ,
-        'fs:/proc fs_file',           "/proc" ,
-        'fs:/home fs_file',          "/home",
+        'fs:/proc fs_spec' => "proc",
+        'fs:/proc fs_file' => "/proc",
+        'fs:/home fs_file' => "/home",
     },
 
 The keys of the hash points to the value to be checked using the
-syntax described in L<Config::Model::AnyThing:/"grab(...)">.
+syntax described in L<Config::Model::Role::Grab/grab>.
 
-You can run check using different check modes (See L<Config::Model::Value/"fetch( ... )">)
+Multiple check on the same item can be applied with a array ref:
+
+    check => [
+        Synopsis => 'fix undefined path_max for st_size zero',
+        Description => [ qr/^The downstream/,  qr/yada yada/ ]
+    ]
+
+You can run check using different check modes (See L<Config::Model::Value/fetch>)
 by passing a hash ref instead of a scalar :
 
     check  => {
-        'sections:debian packages:0' , { mode => 'layered', value => 'dpkg-dev' },
-        'sections:base packages:0',    { mode => 'layered', value => "gcc-4.2-base' },
+        'sections:debian packages:0' => { mode => 'layered', value => 'dpkg-dev' },
+        'sections:base packages:0'   => { mode => 'layered', value => "gcc-4.2-base' },
     },
 
-The whole hash content (except "value") is passed to  L<grab|Config::Model::AnyThing/"grab(...)">
-and L<fetch|Config::Model::Value/"fetch( ... )">
+The whole hash content (except "value") is passed to  L<grab|Config::Model::Role::Grab/grab>
+and L<fetch|Config::Model::Value/fetch>
 
 A regexp can also be used to check value:
 
    check => {
       "License text" => qr/gnu/i,
-      "License text" => { mode => 'custom', value => qr/gnu/i },
+   }
+
+And specification can nest hash or array style:
+
+   check => {
+      "License:0 text" => qr/gnu/i,
+      "License:1 text" => [ qr/gnu/i, qr/Stallman/ ],
+      "License:2 text" => { mode => 'custom', value => [ qr/gnu/i , qr/Stallman/ ] },
+      "License:3 text" => [ qr/General/], { mode => 'custom', value => [ qr/gnu/i , qr/Stallman/ ] },
    }
 
 =item *
@@ -1245,8 +1281,8 @@ different check modes.
 
 Run all tests with one of these commands:
 
- prove -l t/model_test.t :: [ t|l|e [ <model_name> [ <regexp> ]]]
- perl -Ilib t/model_test.t  [ t|l|e [ <model_name> [ <regexp> ]]]
+ prove -l t/model_test.t :: [ --trace ] [ --log ] [ --error ] [ <model_name> [ <regexp> ]]
+ perl -Ilib t/model_test.t  [ --trace ] [ --log ] [ --error ] [ <model_name> [ <regexp> ]]
 
 By default, all tests are run on all models.
 
@@ -1256,28 +1292,28 @@ You can pass arguments to C<t/model_test.t>:
 
 =item *
 
-a bunch of letters. 't' to get test traces. 'e' to get stack trace in case of
-errors, 'l' to have logs. All other letters are ignored. E.g.
+Optional parameters: C<--trace> to get test traces. C<--error> to get stack trace in case of
+errors, C<--log> to have logs. E.g.
 
   # run with log and error traces
-  prove -lv t/model_test.t :: el
+  prove -lv t/model_test.t :: --error --logl
 
 =item *
 
 The model name to tests. E.g.:
 
   # run only fstab tests
-  prove -lv t/model_test.t :: x fstab
+  prove -lv t/model_test.t :: fstab
 
 =item *
 
 A regexp to filter subtest E.g.:
 
   # run only fstab tests foobar subtest
-  prove -lv t/model_test.t :: x fstab foobar
+  prove -lv t/model_test.t :: fstab foobar
 
   # run only fstab tests foo subtest
-  prove -lv t/model_test.t :: x fstab '^foo$'
+  prove -lv t/model_test.t :: fstab '^foo$'
 
 =back
 

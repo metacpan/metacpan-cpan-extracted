@@ -37,5 +37,3 @@ This policy dictates that the use of `scalar` for in statement like this needs t
 
 If the left-hand side of assigiment is a single scalar variable, then the assignment is in scalar
 contetx. There is no need to add C<scalar> keyword.
-
-1;

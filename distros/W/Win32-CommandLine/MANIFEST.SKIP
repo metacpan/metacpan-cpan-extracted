@@ -101,8 +101,8 @@
 # Avoid Devel::Cover files.
 (?:^|/)cover_db/
 
-# Avoid local configuration files
-(?:^|/)\.perltidyrc$
+## Avoid local configuration files
+#(?:^|/)\.perltidyrc$
 
 # Avoid folders specified as non-manifest or tagged as no-distribute
 (?:^|/)@non-manifest/

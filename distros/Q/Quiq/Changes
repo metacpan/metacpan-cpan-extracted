@@ -1,0 +1,295 @@
+1.129 2019-01-12
+================
+Bibliothek umbenannt von Prty in Quiq.
+
+1.128 2019-01-06
+================
+[Quiq::MediaWiki::Markup]
+POD-Fehler behoben.
+
+[Quiq::Test::Class]
+Durch skipTest() verursachte Meldungen à la "does not map to ascii" behoben.
+
+[Quiq::TempDir]
+Test bei Setzung von TMPDIR korrigiert.
+
+[Quiq::TempFile]
+Test bei Setzung von TMPDIR korrigiert.
+
+1.126 2019-01-06
+================
+[Quiq::Confluence::Client]
+Doku bearbeitet.
+
+[Quiq::Confluence::Markup]
+Doku bearbeitet.
+
+[Quiq::Confluence::Page]
+Von Data::Printer auf Quiq::Debug umgestellt.
+
+[Quiq::Database::Resultset]
+Methode asString() um Option -info erweitert.
+
+[Quiq::LaTeX::LongTable]
+Alignment-Erkennung auf erstes Zeichen beschränkt.
+
+[Quiq::MediaWiki::Api]
+Klasse Quiq::MediaWiki::Client Quiq::MediaWiki::Api umbenannt.
+
+[Quiq::MediaWiki::Loader]
+Klasse hinzugefügt.
+
+[Quiq::MediaWiki::Markup]
+Tabellen und Listen hinzugefügt.
+
+[Quiq::MediaWiki::Page]
+Klasse entfernt.
+
+[Quiq::Test::Class]
+Doku bearbeitet.
+
+[Quiq::AnsiColor]
+Default für Konstruktorargument.
+
+[Quiq::AsciiTable]
+Von FileHandle auf split() umgestellt.
+
+[Quiq::Cascm]
+Klasse hinzugefügt.
+
+[Quiq::ColumnFormat]
+Formatstring für numerische Werte umgestellt, da Problem bei großen Werten.
+
+[Quiq::Debug]
+Methode dump() zur Ausgabe von Datenstrukturen hinzugefügt.
+
+[Quiq::FileHandle]
+Option -createDir auf Dateischreiben eingeschränkt.
+
+[Quiq::Parameters]
+Methoden extractPropertiesToVariables(), extractToVariables() hinzugefügt.
+
+[Quiq::Path]
+Methoden copyToDir(), encoding(), findProgram(), exists() hinzugefügt.
+Begonnen, Tilde-Expansion hinzuzufügen.
+
+[Quiq::Process]
+Methoden-Alias cd() für cwd() hinzugefügt.
+
+[Quiq::Program]
+Methode parameters() hinzugefügt.
+
+[Quiq::Record]
+Behandlung von Encoding hinzugefügt.
+
+[Quiq::Shell]
+Attribut cmdAnsiColor hinzugefügt.
+
+[Quiq::Storable]
+Methode memoize() hinzugefügt.
+
+[Quiq::TempDir]
+Klasse hinzugefügt.
+
+[Quiq::TempFile]
+Klasse hinzugefügt.
+
+[Quiq::Time]
+Zeitformat YYYYMMDD hinzugefügt.
+
+[Quiq::TreeFormatter]
+Stop-Erkennung und -Formatierung hinzugefügt.
+
+[Quiq::Udl]
+UDL-Zerlegung reimplementiert, damit Quoting von Metazeichen möglich ist.
+
+1.125 2018-10-21
+================
+[Quiq::Test::Class]
+Umlaute in Ausgabe von skipTest(), skipAllTests() konvertiert
+
+1.124 2018-03-02
+================
+Zahlreiche Erweiterungen.
+
+1.123 2018-01-30
+================
+[Quiq::AsciiTable]
+Klasse hinzugefügt.
+
+[Quiq::LaTeX::Generator]
+Methoden hinzugefügt.
+
+[Quiq::LaTeX::LongTable]
+Klasse hinzugefügt.
+
+[Quiq::Unindent]
+Methode trimNL() hinzugefügt.
+
+1.122 2018-01-23
+================
+Kosmetik. Kleinere Erweiterungen.
+
+[Quiq::LaTeX::Generator]
+Klasse hinzugefügt
+
+[Quiq::LineProcessor]
+Ehedem Quiq::TextFile. Erweitert.
+
+[Quiq::LineProcessor::Line]
+Ehedem Quiq::TextFile::Line. Erweitert.
+
+1.121 2017-12-03
+================
+[Quiq::AnsiColor]
+Klasse hinzugefügt.
+
+[Quiq::CommandLine]
+Klasse hinzugefügt.
+
+[Quiq::Config]
+Konstruktor um Tilde-Expansion erweitert.
+
+[Quiq::ContentProcessor]
+Methode commit() um Option -incomplete erweitert.
+Methode load() überarbeitet.
+
+[Quiq::ContentProcessor::*]
+Dokumentation bearbeitet.
+
+[Quiq::Database::ResultSet::Object]
+Methode index() um Option -unique erweitert.
+
+[Quiq::Fibu::*]
+Klassen hinzugefügt.
+
+[Quiq::FFmpeg]
+Methode extract169To43() um Default für fehlenden xOffset erweitert.
+
+[Quiq::Hash]
+Methode push() um das Pushen mehrerer Elemente erweitert.
+Methode unshift() hinzugefügt.
+Methode addNumber() hinzugefügt.
+
+[Quiq::Math]
+Diverse Methoden hinzugefügt.
+
+[Quiq::Path]
+Bei Methode delete() undefinierten Pfad berücksichtigt.
+Bei Methode expandTilde() Exception, wenn $HOME nicht definiert ist.
+
+[Quiq::Shell]
+In Methode exec() Ermittlung des Exitcode korrigiert.
+
+[Quiq::Sql]
+In Methode opIN() zurückgenommen, das Wert als Ausdruck interpretiert wird.
+
+[Quiq::Template]
+Methode replace() liefert nun Referenz auf das Template-Objekt und
+Keys werden in Regex geschützt.
+
+[Quiq::Test::Class]
+Methode floatIs() um Angabe von Nachkommastellen erweitert.
+
+[Quiq::TreeFormatter]
+Klasse hinzugefügt.
+
+1.120 2017-08-13
+================
+[Quiq::Array]
+Methoden compare(), eq(), pick() hinzugefügt.
+
+[Quiq::Confluence::Client]
+Methode createAttachment() hinzugefügt.
+
+[Quiq::DestinationTree]
+Option -dryRun hinzugefügt.
+
+[Quiq::Hash]
+Doku bearbeitet.
+
+[Quiq::Http::Client::Message]
+Doku bearbeitet.
+
+[Quiq::JavaScript]
+Methode line() hinzugefügt.
+
+[Quiq::Math]
+Methode radToDegree() hinzugefügt.
+
+[Quiq::Path]
+In Methode copy() Behandlung der Option -createDir hinter das Öffnen
+der Quelldatei verschoben.
+
+[Quiq::Section::Object]
+Methode add() hinzugefügt.
+
+[Quiq::Test::Class]
+Methode isClass() hinzugefügt.
+
+1.119 2017-07-15
+================
+[Quiq::Pod::Generator]
+Eingerückter Code wird nun getrimmt.
+
+[Quiq::Test::Class]
+ClassLoader entfernt. Die von Tests benötigten Klassen müssen nun
+explizit geladen werden.
+
+[Quiq::Hash]
+Methode isLocked() versions-portabel gemacht.
+
+1.118 2017-07-13
+================
+Perl - erforderliche Version auf 5.10.0 gesenkt.
+
+File::Rsync - erforderliche Version auf 0.49 gehoben (in
+Version 0.43 wird Option -delete nicht verstanden)
+
+[Quiq::Hash]
+Klasse umgeschrieben, so dass Hash::Util::hash_unlocked() nicht
+mehr genutzt wird, da die Funktion in Perl < 5.18.0 nicht
+funktioniert.
+
+Debug-Modus entfernt.
+
+[Quiq::Object]
+Methode bless() umgeschrieben, so dass Hash::Util::hash_unlocked()
+nicht mehr genutzt wird.
+
+[Quiq::Path]
+Methode copy() um Optionen -move und -overwrite ergänzt.
+
+[Quiq::Sql]
+IN-Klausel-Werte werden jetzt generell als Stringliterale
+eingesetzt.
+
+1.117 2017-07-09
+================
+Datei LICENSE hinzugefügt.
+
+[Quiq::Ipc]
+Testfall für Exitcode != 0 angepasst, so dass auch bei schneller
+Ausführung von false(1) kein SIGPIPE ausgelöst wird.
+
+[Quiq::Option]
+Argumente, die undef sind, lösen keine Warning mehr aus.
+
+1.116 2017-07-09
+================
+[Quiq::Hash]
+Unsinnigen Test auf gleiche Bucket-Größe nach clear() entfernt, da
+unportabel. Die zulässigen Keys in einem Restricted Hash
+bleiben in neueren Perl-Versionen nicht erhalten.
+
+Setzen von Bucket-Größe via buckets() entfernt, da unportabel.
+In neueren Perl-Versionen nicht mehr möglich.
+
+[Quiq::Test::Class]
+Methode floatIs() hinzugefügt.
+
+[Quiq::Math]
+Rundung bei Vergleich von Float-Werten zum Testcode hinzugefügt.
+
+[Quiq::Timeseries::Synchronizer]
+Rundung bei Vergleich von Float-Werten zum Testcode hinzugefügt.

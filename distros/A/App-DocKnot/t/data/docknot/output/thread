@@ -89,10 +89,10 @@ general tool.  But you're certainly welcome to use it if you find it
 useful, send pull requests to make it more general, or take ideas from it
 for your own purposes.
 
-Currently included in this package are just the App::DocKnot module (which
-contains most of the logic), a small docknot driver program, and the
-templates I use for my own software.  Over time, it may include more of my
-web publishing framework, time permitting.
+Currently included in this package are just the App::DocKnot module and
+its submodules, a small docknot driver program, and the templates I use
+for my own software.  Over time, it may include more of my web publishing
+framework, time permitting.
 
 \h2[Requirements]
 
@@ -104,21 +104,6 @@ The following additional Perl modules are required to use it:
 \bullet(packed)[JSON]
 \bullet(packed)[Perl6::Slurp]
 \bullet(packed)[Template (part of Template Toolkit)]
-
-IPC::System::Simple is required to run the test suite.  The following
-additional Perl modules will be used by the test suite if present:
-
-\bullet(packed)[Devel::Cover]
-\bullet(packed)[Test::MinimumVersion]
-\bullet(packed)[Test::Perl::Critic]
-\bullet(packed)[Test::Pod]
-\bullet(packed)[Test::Pod::Coverage]
-\bullet(packed)[Test::Spelling]
-\bullet(packed)[Test::Strict]
-\bullet(packed)[Test::Synopsis]
-
-All are available on CPAN.  Those tests will be skipped if the modules are
-not available.
 
 \h2[Download]
 
@@ -174,7 +159,7 @@ license:
 
 \block[
 
-    Copyright 2013-2018
+    Copyright 2013-2019
         Russ Allbery <rra@cpan.org>
 
     Permission is hereby granted, free of charge, to any person obtaining

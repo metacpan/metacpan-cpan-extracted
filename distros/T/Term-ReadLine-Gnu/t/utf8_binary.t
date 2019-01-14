@@ -1,9 +1,9 @@
 # -*- perl -*-
 #	utf8_binary.t --- Term::ReadLine::Gnu UTF-8 binary string test script
 #
-#	$Id: utf8_binary.t 545 2016-06-09 02:18:11Z hayashi $
+#	$Id: utf8_binary.t 565 2019-01-14 04:48:22Z hayashi $
 #
-#	Copyright (c) 2016 Hiroo Hayashi.  All rights reserved.
+#	Copyright (c) 2016-2019 Hiroo Hayashi.  All rights reserved.
 #
 #	This program is free software; you can redistribute it and/or
 #	modify it under the same terms as Perl itself.
@@ -20,7 +20,7 @@
 use strict;
 use warnings;
 
-use constant NTEST => 12;
+use constant NTEST => 13;
 use Test::More tests => NTEST;
 use Data::Dumper;
 
@@ -44,11 +44,19 @@ note "I'm testing Term::ReadLine::Gnu version $Term::ReadLine::Gnu::VERSION";
 
 my $verbose = scalar @ARGV && ($ARGV[0] eq 'verbose');
 
+# skip on Perl 5.8
+if ($] < '5.010') {
+    diag "Perl version $] may not support UTF-8 properly. Skipped...";
+    ok(1, 'skip') for 1..(NTEST-1);
+    exit 0;
+}
+ok(1, 'Perl version > 5.8');
+
 # skip when PERL_UNICODE is set
 # https://rt.cpan.org/Public/Bug/Display.html?id=114185
 if (${^UNICODE} != 0) {
     diag "PERL_UNICODE is defined or -C option is specified. Skipped...";
-    ok(1, 'skip') for 1..(NTEST-1);
+    ok(1, 'skip') for 1..(NTEST-2);
     exit 0;
 }
 ok(1, 'PERL_UNICODE is not defined');

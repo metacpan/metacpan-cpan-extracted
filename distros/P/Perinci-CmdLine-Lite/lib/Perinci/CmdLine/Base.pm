@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2018-11-22'; # DATE
-our $VERSION = '1.816'; # VERSION
+our $DATE = '2019-01-14'; # DATE
+our $VERSION = '1.817'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1688,7 +1688,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.816 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2018-11-22.
+This document describes version 1.817 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2019-01-14.
 
 =head1 DESCRIPTION
 
@@ -2690,7 +2690,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

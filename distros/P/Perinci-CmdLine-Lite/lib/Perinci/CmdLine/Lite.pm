@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2018-11-22'; # DATE
-our $VERSION = '1.816'; # VERSION
+our $DATE = '2019-01-14'; # DATE
+our $VERSION = '1.817'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -387,6 +387,16 @@ sub hook_after_get_meta {
     require Perinci::Object;
     my $metao = Perinci::Object::risub($r->{meta});
 
+    # delete --format, --json, --naked-res if function does not want its output
+    # to be formatted
+    {
+        last if $self->skip_format; # already doesn't have those copts
+        last unless $r->{meta}{'cmdline.skip_format'};
+        delete $copts->{format};
+        delete $copts->{json};
+        delete $copts->{naked_res};
+    }
+
     # add --dry-run (and -n shortcut, if no conflict)
     {
         last unless $metao->can_dry_run;
@@ -561,7 +571,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.816 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2018-11-22.
+This document describes version 1.817 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2019-01-14.
 
 =head1 SYNOPSIS
 
@@ -782,7 +792,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

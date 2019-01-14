@@ -5,15 +5,7 @@
 #define NEED_newRV_noinc
 #define NEED_sv_2pv_flags
 #include "ppport.h"
-
-#include <modest/finder/finder.h>
-#include <myhtml/myhtml.h>
-#include <myhtml/serialization.h>
-#include <mycss/mycss.h>
-#include <mycss/selectors/init.h>
-#include <mycss/selectors/serialization.h>
-
-#define MyENCODING_AUTO 1
+#include "utils.h"
 
 //#define DOM_GC_TRACE(msg, ...) fprintf(stderr, "[GC] " msg "\n", ##__VA_ARGS__);
 #define DOM_GC_TRACE(...)
@@ -26,10 +18,6 @@
 	#define sv_derived_from_pvn(sv, name, len) sv_derived_from(sv, name)
 #endif
 
-#define node_is_element(node) (node->tag_id != MyHTML_TAG__UNDEF && node->tag_id != MyHTML_TAG__TEXT && node->tag_id != MyHTML_TAG__COMMENT && node->tag_id != MyHTML_TAG__DOCTYPE)
-#define node_is_document(node) (!node->parent && node == node->tree->document)
-#define node_is_root(node) (node->tree->node_html && node->tree->node_html == node)
-
 #define sub_croak(cv, msg, ...) do { \
 	const GV *const __gv = CvGV(cv); \
 	if (__gv) { \
@@ -39,106 +27,6 @@
 		croak("%s%s%s(): " msg, __hvname ? __hvname : __gvname, __hvname ? "::" : "", __hvname ? __gvname : "", ##__VA_ARGS__); \
 	} \
 } while (0);
-
-// https://developer.mozilla.org/pl/docs/Web/API/Element/nodeType
-enum {
-	ELEMENT_NODE					= 1, 
-	ATTRIBUTE_NODE					= 2, 
-	TEXT_NODE						= 3, 
-	CDATA_SECTION_NODE				= 4, 
-	ENTITY_REFERENCE_NODE			= 5, 
-	ENTITY_NODE						= 6, 
-	PROCESSING_INSTRUCTION_NODE		= 7, 
-	COMMENT_NODE					= 8, 
-	DOCUMENT_NODE					= 9, 
-	DOCUMENT_TYPE_NODE				= 10, 
-	DOCUMENT_FRAGMENT_NODE			= 11, 
-	NOTATION_NODE					= 12
-};
-
-enum {
-	TAG_UA_STYLE_NONE					= 0, 
-	TAG_UA_STYLE_INLINE					= 1, 
-	TAG_UA_STYLE_BLOCK					= 2, 
-	TAG_UA_STYLE_INLINE_BLOCK			= 3, 
-	TAG_UA_STYLE_LIST_ITEM				= 4, 
-	TAG_UA_STYLE_TABLE					= 5, 
-	TAG_UA_STYLE_TABLE_CAPTION			= 6, 
-	TAG_UA_STYLE_TABLE_CELL				= 7, 
-	TAG_UA_STYLE_TABLE_COLUMN			= 8, 
-	TAG_UA_STYLE_TABLE_COLUMN_GROUP		= 9, 
-	TAG_UA_STYLE_TABLE_FOOTER_GROUP		= 10, 
-	TAG_UA_STYLE_TABLE_HEADER_GROUP		= 11, 
-	TAG_UA_STYLE_TABLE_ROW				= 12, 
-	TAG_UA_STYLE_TABLE_ROW_GROUP		= 13, 
-	TAG_UA_STYLE_RUBY					= 14, 
-	TAG_UA_STYLE_RUBY_BASE				= 15, 
-	TAG_UA_STYLE_RUBY_TEXT				= 16, 
-	TAG_UA_STYLE_RUBY_TEXT_CONTAINER	= 17, 
-};
-
-typedef struct {
-	long threads;
-	bool async;
-	bool ignore_whitespace;
-	bool ignore_doctype;
-	bool scripts;
-	myencoding_t encoding;
-	myencoding_t default_encoding;
-	bool encoding_use_meta;
-	bool encoding_use_bom;
-	long encoding_prescan_limit;
-} html5_dom_options_t;
-
-typedef struct {
-	myhtml_t *myhtml;
-	myhtml_tree_t *tree;
-	mycss_t *mycss;
-	mycss_entry_t *mycss_entry;
-	modest_finder_t *finder;
-	html5_dom_options_t opts; // base options
-	html5_dom_options_t chunk_opts; // for parseChunk
-	size_t chunks;
-} html5_dom_parser_t;
-
-typedef struct {
-	SV *parent;
-	SV *sv;
-	myhtml_tree_t *tree;
-	html5_dom_parser_t *parser;
-	myhtml_tag_id_t fragment_tag_id;
-} html5_dom_tree_t;
-
-typedef struct {
-	mycss_t *mycss;
-	mycss_entry_t *entry;
-	myencoding_t encoding;
-} html5_css_parser_t;
-
-typedef struct {
-	html5_css_parser_t *parser;
-	mycss_selectors_list_t *list;
-	SV *parent;
-} html5_css_selector_t;
-
-typedef struct {
-	html5_css_selector_t *selector;
-	mycss_selectors_entries_list_t *list;
-	SV *parent;
-} html5_css_selector_entry_t;
-
-typedef struct {
-	myhtml_tree_node_t *node_html;
-	myhtml_tree_node_t *node_body;
-	myhtml_tree_node_t *node_head;
-	myhtml_tree_node_t *document;
-} html5_fragment_parts_t;
-
-typedef struct {
-	bool new_line;
-	bool last_br;
-	mycore_string_t value;
-} html5_dom_inner_text_state_t;
 
 typedef html5_dom_parser_t *			HTML5__DOM;
 typedef myhtml_collection_t *			HTML5__DOM__Collection;
@@ -153,94 +41,7 @@ typedef html5_dom_tree_t *				HTML5__DOM__Tree;
 typedef html5_css_parser_t *			HTML5__DOM__CSS;
 typedef html5_css_selector_t *			HTML5__DOM__CSS__Selector;
 typedef html5_css_selector_entry_t *	HTML5__DOM__CSS__Selector__Entry;
-
-static inline bool html5_dom_is_fragment(myhtml_tree_node_t *node) {
-	html5_dom_tree_t *context = (html5_dom_tree_t *) node->tree->context;
-	return context->fragment_tag_id && node->tag_id == context->fragment_tag_id;
-}
-
-static const char *modest_strerror(mystatus_t status) {
-	switch (status) {
-		#include "gen/modest_errors.c"	
-	}
-	return status ? "UNKNOWN" : "";
-}
-
-static void html5_dom_wait_for_tree_done(myhtml_tree_t *tree) {
-	#ifndef MyCORE_BUILD_WITHOUT_THREADS
-		myhtml_t *myhtml = myhtml_tree_get_myhtml(tree);
-		if (myhtml->thread_stream) {
-			mythread_queue_list_t* queue_list = myhtml->thread_stream->context;
-			if (queue_list)
-				mythread_queue_list_wait_for_done(myhtml->thread_stream, queue_list);
-		}
-	#endif
-}
-
-static void html5_dom_wait_for_done(myhtml_tree_node_t *node, bool deep) {
-	#ifndef MyCORE_BUILD_WITHOUT_THREADS
-		if (node->token)
-			myhtml_token_node_wait_for_done(node->tree->token, node->token);
-		if (deep) {
-			myhtml_tree_node_t *child = myhtml_node_child(node);
-			while (child) {
-				html5_dom_wait_for_done(child, deep);
-				child = myhtml_node_next(child);
-			}
-		}
-	#endif
-}
-
-static bool html5_dom_tree_is_done(myhtml_tree_t *tree) {
-	#ifndef MyCORE_BUILD_WITHOUT_THREADS
-		myhtml_t *myhtml = myhtml_tree_get_myhtml(tree);
-		if (myhtml->thread_stream) {
-			mythread_queue_list_t* queue_list = myhtml->thread_stream->context;
-			return mythread_queue_list_see_for_done(myhtml->thread_stream, queue_list);
-		}
-	#endif
-	return true;
-}
-
-static bool html5_dom_is_done(myhtml_tree_node_t *node, bool deep) {
-	#ifndef MyCORE_BUILD_WITHOUT_THREADS
-		if (node->token) {
-			if ((node->token->type & MyHTML_TOKEN_TYPE_DONE) == 0)
-				return false;
-		}
-		if (deep) {
-			myhtml_tree_node_t *child = myhtml_node_child(node);
-			while (child) {
-				if (!html5_dom_is_done(child, deep))
-					return false;
-				child = myhtml_node_next(child);
-			}
-		}
-	#endif
-	return true;
-}
-
-static void html5_dom_parser_free(html5_dom_parser_t *self) {
-	if (self->myhtml) {
-		myhtml_destroy(self->myhtml);
-		self->myhtml = NULL;
-	}
-	
-	if (self->mycss_entry) {
-		mycss_entry_destroy(self->mycss_entry, 1);
-		self->mycss_entry = NULL;
-	}
-	
-	if (self->mycss) {
-		mycss_destroy(self->mycss, 1);
-		self->mycss = NULL;
-	}
-	
-	if (self->finder) {
-		modest_finder_destroy(self->finder, 1);
-		self->finder = NULL;
-	}
-}
+typedef html5_dom_async_result *		HTML5__DOM__AsyncResult;
 
 static mystatus_t sv_serialization_callback(const char *data, size_t len, void *ctx) {
 	sv_catpvn((SV *) ctx, data, len);
@@ -251,13 +52,6 @@ static inline SV *pack_pointer(const char *clazz, void *ptr) {
 	SV *sv = newSV(0);
 	sv_setref_pv(sv, clazz, ptr);
 	return sv;
-}
-
-static int html5_dom_get_ua_display_prop(myhtml_tree_node_t *node) {
-	switch (node->tag_id) {
-		#include "gen/tags_ua_style.c"	
-	}
-	return TAG_UA_STYLE_INLINE;
 }
 
 static void html5_dom_recursive_node_text(myhtml_tree_node_t *node, SV *sv) {
@@ -272,160 +66,6 @@ static void html5_dom_recursive_node_text(myhtml_tree_node_t *node, SV *sv) {
 			html5_dom_recursive_node_text(node, sv);
 		}
 		node = myhtml_node_next(node);
-	}
-}
-
-static void html5_dom_rtrim_mystring(mycore_string_t *str, char c) {
-	size_t i = str->length;
-	while (i > 0) {
-		--i;
-		
-		if (str->data[i] != c)
-			break;
-		
-		str->data[i] = '\0';
-		--str->length;
-	}
-}
-
-// Try to implements https://html.spec.whatwg.org/multipage/dom.html#the-innertext-idl-attribute
-// Using default user-agent box model types for tags instead of real css.
-static void html5_dom_recursive_node_inner_text(myhtml_tree_node_t *node, html5_dom_inner_text_state_t *state) {
-	if (node->tag_id == MyHTML_TAG__TEXT) {
-		size_t text_len = 0;
-		const char *text = myhtml_node_text(node, &text_len);
-		
-		bool is_empty = true;
-		for (size_t i = 0; i < text_len; ++i) {
-			// skip CR
-			if (text[i] == '\r')
-				continue;
-			
-			// collapse spaces
-			if (isspace(text[i])) {
-				bool skip_spaces = (state->value.length > 0 && state->value.data[state->value.length - 1] == ' ') || state->new_line;
-				if (skip_spaces)
-					continue;
-				mycore_string_append_one(&state->value, ' ');
-			}
-			// save other chars
-			else {
-				mycore_string_append_one(&state->value, text[i]);
-				is_empty = false;
-				state->new_line = false;
-			}
-		}
-		
-		if (!is_empty)
-			state->last_br = false;
-	} else if (node_is_element(node)) {
-		// get default box model type for tag
-		int display = html5_dom_get_ua_display_prop(node);
-		
-		// skip hidden nodes
-		if (display == TAG_UA_STYLE_NONE)
-			return;
-		
-		// skip some special nodes
-		switch (node->tag_id) {
-			case MyHTML_TAG_TEXTAREA:
-			case MyHTML_TAG_INPUT:
-			case MyHTML_TAG_AUDIO:
-			case MyHTML_TAG_VIDEO:
-				return;
-		}
-		
-		// <br> always inserts \n
-		if (node->tag_id == MyHTML_TAG_BR) {
-			mycore_string_append_one(&state->value, '\n');
-			state->new_line = true;
-			state->last_br = true;
-		} else {
-			switch (display) {
-				case TAG_UA_STYLE_BLOCK:
-				case TAG_UA_STYLE_TABLE:
-				case TAG_UA_STYLE_TABLE_CAPTION:
-					// if last token - line break, then collapse
-					// if last token - text, then insert new line break
-					if (!state->last_br) {
-						html5_dom_rtrim_mystring(&state->value, ' ');
-						mycore_string_append_one(&state->value, '\n');
-						state->new_line = true;
-						state->last_br = true;
-					}
-				break;
-			}
-			
-			myhtml_tree_node_t *child = myhtml_node_child(node);
-			while (child) {
-				html5_dom_recursive_node_inner_text(child, state);
-				child = myhtml_node_next(child);
-			}
-			
-			switch (display) {
-				case TAG_UA_STYLE_BLOCK:
-				case TAG_UA_STYLE_TABLE:
-				case TAG_UA_STYLE_TABLE_CAPTION:
-					// if last token - line break, then collapse
-					// if last token - text, then insert new line break
-					if (!state->last_br) {
-						html5_dom_rtrim_mystring(&state->value, ' ');
-						if (node->tag_id == MyHTML_TAG_P) {
-							// chrome inserts two \n after <p>
-							mycore_string_append_one(&state->value, '\n');
-							mycore_string_append_one(&state->value, '\n');
-						} else {
-							mycore_string_append_one(&state->value, '\n');
-						}
-						state->new_line = true;
-						state->last_br = true;
-					}
-				break;
-				
-				case TAG_UA_STYLE_TABLE_CELL:
-				{
-					bool is_last_cell = false;
-					myhtml_tree_node_t *cell = myhtml_node_last_child(myhtml_node_parent(node));
-					while (cell) {
-						if (html5_dom_get_ua_display_prop(cell) == TAG_UA_STYLE_TABLE_CELL) {
-							is_last_cell = cell == node;
-							break;
-						}
-						cell = myhtml_node_prev(cell);
-					}
-					
-					if (!is_last_cell) {
-						html5_dom_rtrim_mystring(&state->value, ' ');
-						mycore_string_append_one(&state->value, '\t');
-					}
-					
-					state->new_line = true;
-				}
-				break;
-				
-				case TAG_UA_STYLE_TABLE_ROW:
-				{
-					bool is_last_row = false;
-					myhtml_tree_node_t *row = myhtml_node_last_child(myhtml_node_parent(node));
-					while (row) {
-						if (html5_dom_get_ua_display_prop(row) == TAG_UA_STYLE_TABLE_ROW) {
-							is_last_row = (row == node);
-							break;
-						}
-						row = myhtml_node_prev(row);
-					}
-					
-					if (!is_last_row) {
-						html5_dom_rtrim_mystring(&state->value, ' ');
-						mycore_string_append_one(&state->value, '\n');
-						state->last_br = true;
-					}
-					
-					state->new_line = true;
-				}
-				break;
-			}
-		}
 	}
 }
 
@@ -469,76 +109,6 @@ static inline const char *get_node_class(myhtml_tree_node_t *node) {
 		return "HTML5::DOM::Document";
 	
 	return "HTML5::DOM::Node";
-}
-
-static myhtml_tag_id_t html5_dom_tag_id_by_name(myhtml_tree_t *tree, const char *tag_str, size_t tag_len, bool allow_create) {
-	const myhtml_tag_context_t *tag_ctx = myhtml_tag_get_by_name(tree->tags, tag_str, tag_len);
-	if (tag_ctx) {
-		return tag_ctx->id;
-	} else if (allow_create) {
-		// add custom tag
-		return myhtml_tag_add(tree->tags, tag_str, tag_len, MyHTML_TOKENIZER_STATE_DATA, true);
-	}
-	return MyHTML_TAG__UNDEF;
-}
-
-// Safe copy node from native or foreign tree
-static myhtml_tree_node_t *html5_dom_copy_foreign_node(myhtml_tree_t *tree, myhtml_tree_node_t *node) {
-	// Create new node
-	myhtml_tree_node_t *new_node = myhtml_tree_node_create(tree);
-	new_node->tag_id		= node->tag_id;
-	new_node->ns			= node->ns;
-	
-	// Copy custom tag
-	if (tree != node->tree && node->tag_id >= MyHTML_TAG_LAST_ENTRY) {
-		new_node->tag_id = MyHTML_TAG__UNDEF;
-		
-		// Get tag name in foreign tree
-		const myhtml_tag_context_t *tag_ctx = myhtml_tag_get_by_id(node->tree->tags, node->tag_id);
-		if (tag_ctx) {
-			// Get same tag in native tree
-			new_node->tag_id = html5_dom_tag_id_by_name(tree, tag_ctx->name, tag_ctx->name_length, true);
-		}
-	}
-	
-	if (node->token) {
-		// Wait, if node not yet done
-		myhtml_token_node_wait_for_done(node->tree->token, node->token);
-		
-		// Copy node token
-		new_node->token = myhtml_token_node_create(tree->token, tree->mcasync_rules_token_id);
-		if (!new_node->token) {
-			myhtml_tree_node_delete(new_node);
-			return NULL;
-		}
-		
-		new_node->token->tag_id			= node->token->tag_id;
-		new_node->token->type			= node->token->type;
-		new_node->token->attr_first		= NULL;
-		new_node->token->attr_last		= NULL;
-		new_node->token->raw_begin		= tree != node->tree ? 0 : node->token->raw_begin;
-		new_node->token->raw_length		= tree != node->tree ? 0 : node->token->raw_length;
-		new_node->token->element_begin	= tree != node->tree ? 0 : node->token->element_begin;
-		new_node->token->element_length	= tree != node->tree ? 0 : node->token->element_length;
-		new_node->token->type			= new_node->token->type | MyHTML_TOKEN_TYPE_DONE;
-		
-		// Copy text data
-		if (node->token->str.length) {
-			mycore_string_init(tree->mchar, tree->mchar_node_id, &new_node->token->str, node->token->str.length + 1);
-			mycore_string_append(&new_node->token->str, node->token->str.data, node->token->str.length);
-		} else {
-			mycore_string_clean_all(&new_node->token->str);
-		}
-		
-		// Copy node attributes
-		myhtml_token_attr_t *attr = node->token->attr_first;
-		while (attr) {
-			myhtml_token_attr_copy(tree->token, attr, new_node->token, tree->mcasync_rules_attr_id);
-			attr = attr->next;
-		}
-	}
-	
-	return new_node;
 }
 
 static SV *tree_to_sv(myhtml_tree_t *tree) {
@@ -608,127 +178,6 @@ static SV *sv_stringify(SV *sv) {
 		}
 	}
 	return sv;
-}
-
-static mystatus_t html5_dom_init_css(html5_dom_parser_t *parser) {
-	mystatus_t status = MyCSS_STATUS_OK;
-	
-	if (!parser->mycss) {
-		parser->mycss = mycss_create();
-		status = mycss_init(parser->mycss);
-		if (status) {
-			mycss_destroy(parser->mycss, 1);
-			parser->mycss = NULL;
-			return status;
-		}
-	}
-	
-	if (!parser->mycss_entry) {
-		parser->mycss_entry = mycss_entry_create();
-		status = mycss_entry_init(parser->mycss, parser->mycss_entry);
-		if (status) {
-			mycss_entry_destroy(parser->mycss_entry, 1);
-			mycss_destroy(parser->mycss, 1);
-			parser->mycss = NULL;
-			parser->mycss_entry = NULL;
-			return status;
-		}
-	}
-	
-	return status;
-}
-
-static mycss_selectors_list_t *html5_parse_selector(mycss_entry_t *entry, const char *query, size_t query_len, mystatus_t *status_out) {
-	mystatus_t status;
-	
-	*status_out = MyCSS_STATUS_OK;
-	
-	mycss_selectors_list_t *list = mycss_selectors_parse(mycss_entry_selectors(entry), MyENCODING_UTF_8, query, query_len, &status);
-	if (status || list == NULL || (list->flags & MyCSS_SELECTORS_FLAGS_SELECTOR_BAD)) {
-		if (list)
-			mycss_selectors_list_destroy(mycss_entry_selectors(entry), list, true);
-		*status_out = status;
-		return NULL;
-	}
-	
-	return list;
-}
-
-static void _modest_finder_callback_found_with_one_node(modest_finder_t *finder, myhtml_tree_node_t *node, 
-	mycss_selectors_list_t *selector_list, mycss_selectors_entry_t *selector, mycss_selectors_specificity_t *spec, void *ctx)
-{
-	myhtml_tree_node_t **result_node = (myhtml_tree_node_t **) ctx;
-	if (!*result_node)
-		*result_node = node;
-}
-
-static void *html5_node_finder(html5_dom_parser_t *parser, modest_finder_selector_combinator_f func, 
-		myhtml_tree_node_t *scope, mycss_selectors_entries_list_t *list, size_t list_size, mystatus_t *status_out, bool one)
-{
-	*status_out = MODEST_STATUS_OK;
-	
-	if (!scope)
-		return NULL;
-	
-	// Init finder
-	mystatus_t status;
-	if (parser->finder) {
-		parser->finder = modest_finder_create();
-		status = modest_finder_init(parser->finder);
-		if (status) {
-			*status_out = status;
-			modest_finder_destroy(parser->finder, 1);
-			return NULL;
-		}
-	}
-	
-	if (one) {
-		// Process selector entries
-		myhtml_tree_node_t *node = NULL;
-		for (size_t i = 0; i < list_size; ++i) {
-			func(parser->finder, scope, NULL, list[i].entry, &list[i].specificity, 
-				_modest_finder_callback_found_with_one_node, &node);
-			
-			if (node)
-				break;
-		}
-		
-		return (void *) node;
-	} else {
-		// Init collection for results
-		myhtml_collection_t *collection = myhtml_collection_create(4096, &status);
-		if (status) {
-			*status_out = MODEST_STATUS_ERROR_MEMORY_ALLOCATION;
-			return NULL;
-		}
-		
-		// Process selector entries
-		for (size_t i = 0; i < list_size; ++i) {
-			func(parser->finder, scope, NULL, list[i].entry, &list[i].specificity, 
-				modest_finder_callback_found_with_collection, collection);
-		}
-		
-		return (void *) collection;
-	}
-}
-
-static modest_finder_selector_combinator_f html5_find_selector_func(const char *c, int combo_len) {
-	if (combo_len == 2) {
-		if (c[0] == '|' && c[1] == '|')
-			return modest_finder_node_combinator_column;
-		if ((c[0] == '>' && c[1] == '>'))
-			return modest_finder_node_combinator_descendant;
-	} else if (combo_len == 1) {
-		if (c[0] == '>')
-			return modest_finder_node_combinator_child;
-		if (c[0] == '+')
-			return modest_finder_node_combinator_next_sibling;
-		if (c[0] == '~')
-			return modest_finder_node_combinator_following_sibling;
-		if (c[0] == '^')
-			return modest_finder_node_combinator_begin;
-	}
-	return modest_finder_node_combinator_descendant;
 }
 
 static SV *html5_node_find(CV *cv, html5_dom_parser_t *parser, myhtml_tree_node_t *scope, SV *query, SV *combinator, bool one) {
@@ -874,144 +323,7 @@ static SV *html5_node_simple_find(CV *cv, myhtml_tree_node_t *self, SV *key, SV 
 	return result;
 }
 
-static myhtml_tree_node_t *html5_dom_recursive_clone_node(myhtml_tree_t *tree, myhtml_tree_node_t *node, html5_fragment_parts_t *parts) {
-	myhtml_tree_node_t *new_node = html5_dom_copy_foreign_node(tree, node);
-	myhtml_tree_node_t *child = myhtml_node_child(node);
-	
-	if (parts) {
-		if (node == node->tree->node_html)
-			parts->node_html = new_node;
-		else if (node == node->tree->node_head)
-			parts->node_head = new_node;
-		else if (node == node->tree->node_body)
-			parts->node_body = new_node;
-		else if (node == node->tree->document)
-			parts->document = new_node;
-	}
-	
-	while (child) {
-		myhtml_tree_node_add_child(new_node, html5_dom_recursive_clone_node(tree, child, parts));
-		child = myhtml_node_next(child);
-	}
-	
-	return new_node;
-}
-
-// Safe delete nodes only if it has not perl object representation
-static void html5_tree_node_delete_recursive(myhtml_tree_node_t *node) {
-	if (!myhtml_node_get_data(node)) {
-		myhtml_tree_node_t *child = myhtml_node_child(node);
-		if (child) {
-			while (child) {
-				myhtml_tree_node_t *next = myhtml_node_next(child);
-				myhtml_tree_node_remove(child);
-				html5_tree_node_delete_recursive(child);
-				child = next;
-			}
-		}
-		myhtml_tree_node_delete(node);
-	}
-}
-
-void html5_dom_replace_attr_value(myhtml_tree_node_t *node, const char *key, size_t key_len, const char *val, size_t val_len, myencoding_t encoding) {
-	myhtml_tree_attr_t *attr = myhtml_attribute_by_key(node, key, key_len);
-	if (attr) { // edit
-		// destroy original value
-		mycore_string_destroy(&attr->value, 0);
-		
-		// set new value
-		mycore_string_init(node->tree->mchar, node->tree->mchar_node_id, &attr->value, (val_len + 1));
-		
-		// apply encoding
-		if (encoding == MyENCODING_UTF_8) {
-			mycore_string_append(&attr->value, val, val_len);
-		} else {
-			myencoding_string_append(&attr->value, val, val_len, encoding);
-		}
-	} else { // add new
-		myhtml_attribute_add(node, key, key_len, val, val_len, encoding);
-	}
-}
-
-myencoding_t html5_dom_auto_encoding(html5_dom_options_t *opts, const char **html_str, size_t *html_length) {
-	// Try to determine encoding
-	myencoding_t encoding;
-	if (opts->encoding == MyENCODING_AUTO) {
-		encoding = MyENCODING_NOT_DETERMINED;
-		if (*html_length) {
-			// Search encoding in meta-tags
-			if (opts->encoding_use_meta) {
-				size_t size = opts->encoding_prescan_limit < *html_length ? opts->encoding_prescan_limit : *html_length;
-				encoding = myencoding_prescan_stream_to_determine_encoding(*html_str, size);
-			}
-			
-			if (encoding == MyENCODING_NOT_DETERMINED) {
-				// Check BOM
-				if (!opts->encoding_use_bom || !myencoding_detect_and_cut_bom(*html_str, *html_length, &encoding, html_str, html_length)) {
-					// Check heuristic
-					if (!myencoding_detect(*html_str, *html_length, &encoding)) {
-						// Can't determine encoding, use default
-						encoding = opts->default_encoding;
-					}
-				}
-			}
-		} else {
-			encoding = opts->default_encoding;
-		}
-	} else {
-		encoding = opts->encoding;
-	}
-	return encoding;
-}
-
-void html5_dom_apply_tree_options(myhtml_tree_t *tree, html5_dom_options_t *opts);
-
-static myhtml_tree_node_t *html5_dom_parse_fragment(html5_dom_options_t *opts, myhtml_tree_t *tree, myhtml_tag_id_t tag_id, myhtml_namespace_t ns, 
-	const char *text, size_t length, html5_fragment_parts_t *parts, mystatus_t *status_out)
-{
-	mystatus_t status;
-	
-	myhtml_t *parser = myhtml_tree_get_myhtml(tree);
-	
-	// cteate temorary tree
-	myhtml_tree_t *fragment_tree = myhtml_tree_create();
-	status = myhtml_tree_init(fragment_tree, parser);
-	if (status) {
-		*status_out = status;
-		myhtml_tree_destroy(tree);
-		return NULL;
-	}
-	
-	html5_dom_apply_tree_options(fragment_tree, opts);
-	
-	myencoding_t encoding = html5_dom_auto_encoding(opts, &text, &length);
-	
-	// parse fragment from text
-	status = myhtml_parse_fragment(fragment_tree, encoding, text, length, tag_id, ns);
-	if (status) {
-		*status_out = status;
-		myhtml_tree_destroy(tree);
-		return NULL;
-	}
-	
-	// clone fragment from temporary tree to persistent tree
-	myhtml_tree_node_t *node = html5_dom_recursive_clone_node(tree, myhtml_tree_get_node_html(fragment_tree), parts);
-	
-	if (node) {
-		html5_dom_tree_t *context = (html5_dom_tree_t *) node->tree->context;
-		if (!context->fragment_tag_id)
-			context->fragment_tag_id = html5_dom_tag_id_by_name(tree, "-fragment", 9, true);
-		node->tag_id = context->fragment_tag_id;
-	}
-	
-	myhtml_tree_destroy(fragment_tree);
-	
-	*status_out = status;
-	
-	return node;
-}
-
-long hv_get_int_value(HV *hv, const char *key, int length, long def) {
+static long hv_get_int_value(HV *hv, const char *key, int length, long def) {
 	if (hv) {
 		SV **sv = hv_fetch(hv, key, length, 0);
 		if (sv && *sv)
@@ -1020,7 +332,7 @@ long hv_get_int_value(HV *hv, const char *key, int length, long def) {
 	return def;
 }
 
-myencoding_t hv_get_encoding_value(HV *hv, const char *key, int length, myencoding_t def) {
+static myencoding_t hv_get_encoding_value(HV *hv, const char *key, int length, myencoding_t def) {
 	if (hv) {
 		SV **sv = hv_fetch(hv, key, length, 0);
 		if (sv && *sv) {
@@ -1053,9 +365,8 @@ myencoding_t hv_get_encoding_value(HV *hv, const char *key, int length, myencodi
 	return def;
 }
 
-void html5_dom_parse_options(html5_dom_options_t *opts, html5_dom_options_t *extend, HV *options) {
-	opts->threads					= hv_get_int_value(options, "threads", 7, extend ? extend->threads : 2);
-	opts->async						= hv_get_int_value(options, "async", 5, extend ? extend->async : 0) > 0;
+static void html5_dom_parse_options(html5_dom_options_t *opts, html5_dom_options_t *extend, HV *options) {
+	opts->threads					= hv_get_int_value(options, "threads", 7, extend ? extend->threads : 0);
 	opts->ignore_whitespace			= hv_get_int_value(options, "ignore_whitespace", 17, extend ? extend->ignore_whitespace : 0) > 0;
 	opts->ignore_doctype			= hv_get_int_value(options, "ignore_doctype", 14, extend ? extend->ignore_doctype : 0) > 0;
 	opts->scripts					= hv_get_int_value(options, "scripts", 7, extend ? extend->scripts : 0) > 0;
@@ -1070,7 +381,7 @@ void html5_dom_parse_options(html5_dom_options_t *opts, html5_dom_options_t *ext
 	#endif
 }
 
-void html5_dom_check_options(CV *cv, html5_dom_options_t *opts) {
+static void html5_dom_check_options(CV *cv, html5_dom_options_t *opts) {
 	if (opts->encoding == MyENCODING_NOT_DETERMINED)
 		sub_croak(cv, "invalid encoding value");
 	if (opts->default_encoding == MyENCODING_NOT_DETERMINED || opts->default_encoding == MyENCODING_AUTO)
@@ -1081,24 +392,10 @@ void html5_dom_check_options(CV *cv, html5_dom_options_t *opts) {
 		sub_croak(cv, "invalid encoding_prescan_limit value");
 }
 
-void html5_dom_apply_tree_options(myhtml_tree_t *tree, html5_dom_options_t *opts) {
-	if (opts->scripts) {
-		tree->flags |= MyHTML_TREE_FLAGS_SCRIPT;
-	} else {
-		tree->flags &= ~MyHTML_TREE_FLAGS_SCRIPT;
-	}
-	
-	if (opts->ignore_doctype)
-		tree->parse_flags |= MyHTML_TREE_PARSE_FLAGS_WITHOUT_DOCTYPE_IN_TREE;
-	
-	if (opts->ignore_whitespace)
-		tree->parse_flags |= MyHTML_TREE_PARSE_FLAGS_SKIP_WHITESPACE_TOKEN;
-}
-
 // selectors to AST serialization
-void html5_dom_css_serialize_entry(mycss_selectors_list_t *selector, mycss_selectors_entry_t *entry, AV *result);
+static void html5_dom_css_serialize_entry(mycss_selectors_list_t *selector, mycss_selectors_entry_t *entry, AV *result);
 
-void html5_dom_css_serialize_selector(mycss_selectors_list_t *selector, AV *result) {
+static void html5_dom_css_serialize_selector(mycss_selectors_list_t *selector, AV *result) {
 	while (selector) {
 		for (size_t i = 0; i < selector->entries_list_length; ++i) {
 			mycss_selectors_entries_list_t *entries = &selector->entries_list[i];
@@ -1110,7 +407,7 @@ void html5_dom_css_serialize_selector(mycss_selectors_list_t *selector, AV *resu
 	}
 }
 
-void html5_dom_css_serialize_entry(mycss_selectors_list_t *selector, mycss_selectors_entry_t *entry, AV *result) {
+static void html5_dom_css_serialize_entry(mycss_selectors_list_t *selector, mycss_selectors_entry_t *entry, AV *result) {
 	// combinators names
 	static const struct {
 		const char name[16];
@@ -1323,6 +620,100 @@ void html5_dom_css_serialize_entry(mycss_selectors_list_t *selector, mycss_selec
 	}
 }
 
+static html5_dom_async_result *html5_dom_async_parse_init(CV *cv, html5_dom_parser_t *self, SV *html, HV *options, int ev_fd) {
+	html5_dom_async_result *result = (html5_dom_async_result *) safemalloc(sizeof(html5_dom_async_result));
+	memset(result, 0, sizeof(html5_dom_async_result));
+	
+	result->fd = ev_fd;
+	
+	// extends options
+	html5_dom_parse_options(&result->opts, &self->opts, options);
+	html5_dom_check_options(cv, &result->opts);
+	
+	mystatus_t status;
+	
+	STRLEN html_len;
+	const char *html_str = SvPV_const(html, html_len);
+	
+	// copy html source
+	result->html = safemalloc(html_len);
+	result->length = html_len;
+	memcpy(result->html, html_str, html_len);
+	
+	#ifndef MyCORE_BUILD_WITHOUT_THREADS
+		// create parsing thread
+		result->thread = mythread_create();
+		status = mythread_init(result->thread, MyTHREAD_TYPE_STREAM, 1, 0);
+		
+		if (status) {
+			mythread_destroy(result->thread, NULL, NULL, true);
+			safefree(result->html);
+			safefree(result);
+			sub_croak(cv, "mythread_init failed: %d (%s)", status, modest_strerror(status));
+			return NULL;
+		}
+		
+		result->thread->context = result;
+		
+		status = myhread_entry_create(result->thread, html5_dom_mythread_function, html5_dom_async_parse_worker, MyTHREAD_OPT_STOP);
+		mythread_option_set(result->thread, MyTHREAD_OPT_QUIT);
+		
+		if (status) {
+			mythread_destroy(result->thread, NULL, NULL, true);
+			safefree(result->html);
+			safefree(result);
+			sub_croak(cv, "myhread_entry_create failed: %d (%s)", status, modest_strerror(status));
+			return NULL;
+		}
+		
+		// start parsing thread
+		status = mythread_resume(result->thread, MyTHREAD_OPT_UNDEF);
+		
+		if (status) {
+			mythread_destroy(result->thread, NULL, NULL, true);
+			safefree(result->html);
+			safefree(result);
+			sub_croak(cv, "mythread_resume failed: %d (%s)", status, modest_strerror(status));
+			return NULL;
+		}
+	#else
+		// sync fallback
+		html5_dom_async_parse(result);
+	#endif
+	
+	return result;
+}
+
+static SV *html5_dom_async_parse_done(CV *cv, html5_dom_async_result *result, bool wait) {
+	if (!wait && !result->done)
+		return NULL;
+	
+	#ifndef MyCORE_BUILD_WITHOUT_THREADS
+		if (result->thread)
+			result->thread = mythread_destroy(result->thread, NULL, NULL, true);
+	#endif
+	
+	if (result->html) {
+		result->html = NULL;
+		safefree(result->html);
+	}
+	
+	if (result->status) {
+		sub_croak(cv, "parse failed: %d (%s)", result->status, modest_strerror(result->status));
+		return NULL;
+	}
+	
+	if (result->tree) {
+		DOM_GC_TRACE("DOM::new");
+		SV *myhtml_sv = pack_pointer("HTML5::DOM", result->parser);
+		result->tree_sv = (void *) create_tree_object(result->tree, SvRV(myhtml_sv), result->parser);
+		result->tree = NULL;
+		SvREFCNT_dec(myhtml_sv);
+	}
+	
+	return result->tree_sv ? SvREFCNT_inc((SV *) result->tree_sv) : &PL_sv_undef;
+}
+
 MODULE = HTML5::DOM  PACKAGE = HTML5::DOM
 
 #################################################################
@@ -1338,22 +729,18 @@ CODE:
 	html5_dom_parse_options(&opts, NULL, options);
 	html5_dom_check_options(cv, &opts);
 	
-	html5_dom_parser_t *self = (html5_dom_parser_t *) safemalloc(sizeof(html5_dom_parser_t));
-	memset(self, 0, sizeof(html5_dom_parser_t));
-	memcpy(&self->opts, &opts, sizeof(opts));
+	html5_dom_parser_t *self = html5_dom_parser_new(&opts);
 	
 	self->myhtml = myhtml_create();
 	
-	if (self->opts.threads <= 0) {
+	if (self->opts.threads <= 1) {
 		status = myhtml_init(self->myhtml, MyHTML_OPTIONS_PARSE_MODE_SINGLE, 1, 0);
-	} else if (self->opts.threads == 1) {
-		status = myhtml_init(self->myhtml, MyHTML_OPTIONS_PARSE_MODE_ALL_IN_ONE, 1, 0);
 	} else {
-		status = myhtml_init(self->myhtml, MyHTML_OPTIONS_PARSE_MODE_SEPARATELY, self->opts.threads, 0);
+		status = myhtml_init(self->myhtml, MyHTML_OPTIONS_DEFAULT, self->opts.threads, 0);
 	}
 	
 	if (status) {
-		html5_dom_parser_free(self);
+		self = html5_dom_parser_free(self);
 		sub_croak(cv, "myhtml_init failed: %d (%s)", status, modest_strerror(status));
 	}
 	
@@ -1394,6 +781,8 @@ SV *
 parseChunk(HTML5::DOM self, SV *html, HV *options = NULL)
 CODE:
 	mystatus_t status;
+	
+	html = sv_stringify(html);
 	
 	if (!self->tree) {
 		self->tree = myhtml_tree_create();
@@ -1443,9 +832,6 @@ CODE:
 		sub_croak(cv, "myhtml_parse_chunk failed:%d (%s)", status, modest_strerror(status));
 	}
 	
-	if (!self->chunk_opts.async)
-		html5_dom_wait_for_tree_done(self->tree);
-	
 	RETVAL = create_tree_object(self->tree, SvRV(ST(0)), self);
 	self->tree = NULL;
 OUTPUT:
@@ -1460,6 +846,8 @@ CODE:
 	
 	html5_dom_parse_options(&opts, &self->opts, options);
 	html5_dom_check_options(cv, &opts);
+	
+	html = sv_stringify(html);
 	
 	myhtml_tree_t *tree = myhtml_tree_create();
 	status = myhtml_tree_init(tree, self->myhtml);
@@ -1480,10 +868,17 @@ CODE:
 		sub_croak(cv, "myhtml_parse failed: %d (%s)", status, modest_strerror(status));
 	}
 	
-	if (!opts.async)
-		html5_dom_wait_for_tree_done(tree);
-	
 	RETVAL = create_tree_object(tree, SvRV(ST(0)), self);
+OUTPUT:
+	RETVAL
+
+# Parse full html (in background)
+HTML5::DOM::AsyncResult
+_parseAsync(HTML5::DOM self, SV *html, HV *options = NULL, int ev_fd = -1)
+CODE:
+	DOM_GC_TRACE("DOM::AsyncResult::new");
+	html = sv_stringify(html);
+	RETVAL = html5_dom_async_parse_init(cv, self, html, options, ev_fd);
 OUTPUT:
 	RETVAL
 
@@ -1492,9 +887,59 @@ DESTROY(HTML5::DOM self)
 CODE:
 	DOM_GC_TRACE("DOM::DESTROY (refs=%d)", SvREFCNT(SvRV(ST(0))));
 	html5_dom_parser_free(self);
+
+
+
+#################################################################
+# HTML5::DOM::AsyncResult
+#################################################################
+MODULE = HTML5::DOM  PACKAGE = HTML5::DOM::AsyncResult
+
+# Wait for parsing done and return HTML5::DOM::Tree
+SV *
+wait(HTML5::DOM::AsyncResult self)
+CODE:
+	RETVAL = html5_dom_async_parse_done(cv, self, true);
+OUTPUT:
+	RETVAL
+
+# True if parsing done
+int
+parsed(HTML5::DOM::AsyncResult self)
+CODE:
+	RETVAL = self->done ? 1 : 0;
+OUTPUT:
+	RETVAL
+
+# Return HTML5::DOM::Tree if parsing done
+SV *
+tree(HTML5::DOM::AsyncResult self)
+CODE:
+	RETVAL = html5_dom_async_parse_done(cv, self, false);
+OUTPUT:
+	RETVAL
+
+void
+DESTROY(HTML5::DOM::AsyncResult self)
+CODE:
+	DOM_GC_TRACE("DOM::AsyncResult::DESTROY (refs=%d)", SvREFCNT(SvRV(ST(0))));
+	if (self->thread)
+		self->thread = mythread_destroy(self->thread, NULL, NULL, true);
+	
+	if (self->tree) {
+		self->tree = myhtml_tree_destroy(self->tree);
+		
+		if (self->parser)
+			self->parser = html5_dom_parser_free(self->parser);
+	}
+	
+	if (self->tree_sv)
+		SvREFCNT_dec((SV *) self->tree_sv);
+	
+	if (self->html)
+		safefree(self->html);
+	
 	safefree(self);
-
-
 
 #################################################################
 # HTML5::DOM::Tree
@@ -1646,20 +1091,19 @@ CODE:
 OUTPUT:
 	RETVAL
 
-# Wait for parsing done (when async mode)
+# Wait for parsing done (when async mode) - removed
 SV *
 wait(HTML5::DOM::Tree self)
 CODE:
-	html5_dom_wait_for_tree_done(self->tree);
 	RETVAL = SvREFCNT_inc(ST(0));
 OUTPUT:
 	RETVAL
 
-# True if parsing done (when async mode)
+# True if parsing done (when async mode) - removed
 int
 parsed(HTML5::DOM::Tree self)
 CODE:
-	RETVAL = html5_dom_tree_is_done(self->tree);
+	RETVAL = 1;
 OUTPUT:
 	RETVAL
 
@@ -1992,7 +1436,6 @@ CODE:
 			// force set encoding to UTF-8
 			opts.encoding			= MyENCODING_DEFAULT;
 			opts.default_encoding	= MyENCODING_DEFAULT;
-			opts.async				= false;
 			
 			myhtml_tree_node_t *fragment = html5_dom_parse_fragment(&opts, self->tree, context_tag_id, myhtml_node_namespace(context_node), text_str, text_len, &parts, &status);
 			if (status)
@@ -2219,20 +1662,19 @@ CODE:
 OUTPUT:
 	RETVAL
 
-# Wait for node parsing done (when async mode)
+# Wait for node parsing done (when async mode) - removed
 SV *
 wait(HTML5::DOM::Node self, bool deep = false)
 CODE:
-	html5_dom_wait_for_done(self, deep);
 	RETVAL = SvREFCNT_inc(ST(0));
 OUTPUT:
 	RETVAL
 
-# True if node parsing done (when async mode)
+# True if node parsing done (when async mode) - removed
 int
 parsed(HTML5::DOM::Node self, bool deep = false)
 CODE:
-	RETVAL = html5_dom_is_done(self, deep);
+	RETVAL = 1;
 OUTPUT:
 	RETVAL
 

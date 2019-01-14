@@ -12,7 +12,7 @@ my $fh = select STDIN; $|++; select STDOUT; $|++; select STDERR; $|++; select $f
 
 use Test::More;
 
-plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless $ENV{TEST_AUTHOR} or $ENV{TEST_ALL};
+plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless ($ENV{TEST_AUTHOR} or $ENV{AUTHOR_TESTING}) or ($ENV{TEST_RELEASE} or $ENV{RELEASE_TESTING}) or $ENV{TEST_ALL} or $ENV{COVERAGE};
 
 #my $haveTestStrict = eval { require Test::Strict; import Test::Strict; 1; };
 #my $haveDevelCover = eval { require Devel::Cover; import Devel::Cover; 1; };
@@ -29,4 +29,4 @@ plan skip_all => '[ '.join(', ',@modules).' ] required for testing' if !$haveReq
 
 #Test::Strict::all_perl_files_ok( @mydirs );
 #Test::Strict::all_perl_files_ok( 'lib' );
-Devel::Cover::all_cover_ok( 80 );
+Test::Strict::all_cover_ok( 50, 'lib' );

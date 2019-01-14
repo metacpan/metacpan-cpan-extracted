@@ -15,7 +15,7 @@ Sah::Schemas::CPAN - Sah schemas related to CPAN
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schemas::CPAN (from Perl distribution Sah-Schemas-CPAN), released on 2018-09-02.
+This document describes version 0.004 of Sah::Schemas::CPAN (from Perl distribution Sah-Schemas-CPAN), released on 2019-01-13.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -45,13 +45,17 @@ i_map(i_img *im, unsigned char (*maps)[256], unsigned int mask) {
 
   if (!mask) return; /* nothing to do here */
 
-  for(i=0; i<im->channels; i++)
+  for(i=0; i<im->channels; i++) {
     if (mask & (1<<i)) {
       if (minset == -1) minset = i;
       maxset = i;
     }
+  }
 
   mm_log((1, "minset=%d maxset=%d\n", minset, maxset));
+
+  if (minset == -1)
+    return;
 
   vals = mymalloc(sizeof(i_color) * im->xsize);
 
@@ -59,7 +63,8 @@ i_map(i_img *im, unsigned char (*maps)[256], unsigned int mask) {
     i_glin(im, 0, im->xsize, y, vals);
     for (x = 0; x < im->xsize; ++x) {
       for(ch = minset; ch<=maxset; ch++) {
-	if (!maps[ch]) continue;
+	if (!(mask & (1 << ch)))
+	  continue;
 	vals[x].channel[ch] = maps[ch][vals[x].channel[ch]];
       }
     }

@@ -1,4 +1,4 @@
-Date/Jalali version 0.04
+Date/Jalali version 0.07
 ========================
 
 Date::Jalali
@@ -13,17 +13,39 @@ To install this module type the following:
    make
    make test
    make install
+   
+   
+   
+   
+To install using CPAN you can use CPAN cli as follows:
+
+
+#> yum install perl-CPAN
+#> perl -MCPAN -e shell
+cpan[1]> install Date::Jalali2
+
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
  None!
+ 
+AUTHOR
 
-COPYRIGHT AND LICENCE
+Ahmad Anvari <http://www.anvari.org/bio/>
 
-Copyright (C) 2012 Ehsan Golpayegani
+Redistributed by : Ehsan Golpayegani <http://www.ehsan.pw>
+
+COPYRIGHT AND LICENSE
+
+Copyright 2019 by Ehsan Golpayegani
+
+The original algorithm was written with regards to Gregorian<->Jalali
+convertor developed by Roozbeh Pournader and Mohammad Toossi
+available at:
+
+http://www.farsiweb.info/jalali/jalali.c
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
-

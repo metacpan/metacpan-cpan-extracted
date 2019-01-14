@@ -31,7 +31,7 @@ $parser = HTML5::DOM->new({
 isa_ok($parser, 'HTML5::DOM', 'create parser with options');
 
 # test api
-can_ok($parser, qw(parse parseChunkStart parseChunk parseChunkEnd));
+can_ok($parser, qw(parse parseChunkStart parseChunk parseChunkEnd parseAsync));
 
 # test html parsing with threads
 my $tree = $parser->parse('<div id="test">bla bla<!-- o_O --></div>');
@@ -60,6 +60,8 @@ isa_ok($parser->parseChunkEnd, 'HTML5::DOM::Tree');
 #####################################
 # HTML5::DOM::Tree
 #####################################
+
+$tree = $parser->parse('<div id="test">bla bla<!-- o_O --></div>', {threads => 0});
 
 # wait
 isa_ok($tree->wait, "HTML5::DOM::Tree");
@@ -244,6 +246,35 @@ ok($parser->parse('<div></div>')->compatMode eq 'BackCompat', 'compatMode: BackC
 ok($parser->parse('<!DOCTYPE html><div></div>')->compatMode eq 'CSS1Compat', 'compatMode: CSS1Compat');
 
 #####################################
+# HTML5::DOM::AsyncResult
+#####################################
+
+my $async;
+
+for my $threads ((0, 2)) {
+	$async = $parser->parseAsync('<div class="test">PASSED</div>', {threads => $threads});
+	
+	# check api + isa
+	can_ok($async, qw(parsed wait tree));
+	isa_ok($async, 'HTML5::DOM::AsyncResult', "AsyncResult [threads=$threads]");
+	
+	# check parsed()
+	while (!$async->parsed) { };
+	ok($async->parsed == 1, "parsed [threads=$threads]");
+	
+	# check wait()
+	isa_ok($async->wait, 'HTML5::DOM::Tree', "wait [threads=$threads]");
+	
+	# check tree()
+	isa_ok($async->tree, 'HTML5::DOM::Tree', "tree [threads=$threads]");
+	
+	# test leak
+	(sub { $parser->parseAsync('<div class="test">PASSED</div>', {threads => $threads}); })->();
+	(sub { my $new_parser = $parser->parseAsync('<div class="test">PASSED</div>', {threads => $threads})->wait->parser; })->();
+	(sub { $parser->parseAsync('<div class="test">PASSED</div>', {threads => $threads})->wait->parser->parse(""); })->();
+}
+
+#####################################
 # HTML5::DOM::Node
 #####################################
 
@@ -330,7 +361,7 @@ $el_node = $tree->createElement("div");
 ok($el_node->tagId == HTML5::DOM->TAG_DIV, "node->tagId");
 isa_ok($el_node->tagId(HTML5::DOM->TAG_SPAN), 'HTML5::DOM::Node');
 ok($el_node->tagId == HTML5::DOM->TAG_SPAN, "node->tagId");
-eval { $el_node->tagId(9999999999999); };
+eval { $el_node->tagId(999999999); };
 ok($@ =~ /unknown tag id/, "tagId: change tag to unknown id");
 
 # namespace
@@ -346,7 +377,7 @@ $el_node = $tree->createElement("div");
 ok($el_node->namespaceId == HTML5::DOM->NS_HTML, "node->namespaceId");
 isa_ok($el_node->namespaceId(HTML5::DOM->NS_SVG), 'HTML5::DOM::Node');
 ok($el_node->namespaceId == HTML5::DOM->NS_SVG, "node->namespaceId");
-eval { $el_node->namespaceId(9999999999999); };
+eval { $el_node->namespaceId(999999999); };
 ok($@ =~ /unknown namespace/, "node->namespaceId: set unknown namespace");
 
 # tree
@@ -1303,12 +1334,17 @@ $tree = $parser->parse('
 		
 	</div>
 ');
-for my $method (qw|attr getAttribute attrArray|) {
+for my $method (qw|{} attr getAttribute attrArray|) {
 	my $test = $tree->at('#test');
 	
 	my $method2 = $method eq 'attrArray' ? 'attr' : $method;
 	
-	ok(!defined $test->$method2("iwefwefwefewfwe"), "$method2 (undef)");
+	if ($method2 eq '{}') {
+		ok(!defined $test->{"iwefwefwefewfwe"}, "$method2 (undef)");
+		ok(!exists $test->{"iwefwefwefewfwe"}, "$method2 (exists)");
+	} else {
+		ok(!defined $test->$method2("iwefwefwefewfwe"), "$method2 (undef)");
+	}
 	
 	my $attrs_test = [
 		['id', 'test'], 
@@ -1319,7 +1355,11 @@ for my $method (qw|attr getAttribute attrArray|) {
 	];
 	
 	for my $attr (@$attrs_test) {
-		ok($test->$method2($attr->[0]) eq $attr->[1], "$method2(".$attr->[0].")");
+		if ($method2 eq '{}') {
+			ok($test->{$attr->[0]} eq $attr->[1], "->{".$attr->[0]."}");
+		} else {
+			ok($test->$method2($attr->[0]) eq $attr->[1], "$method2(".$attr->[0].")");
+		}
 	}
 	
 	# bulk test attr

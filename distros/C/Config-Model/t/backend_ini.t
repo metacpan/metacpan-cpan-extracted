@@ -2,7 +2,7 @@
 
 # NOTE: backend can also be tested in model_test.d
 
-use ExtUtils::testlib;
+#use ExtUtils::testlib;
 use Test::More;
 use Test::Memory::Cycle;
 use Config::Model;
@@ -26,7 +26,7 @@ map { s/#/;/; } @with_semicolon_comment;
 map { s/# foo2/; foo2/; } @with_one_semicolon_comment;
 
 sub init_backend_test {
-    my ($test_class, $test_data, $config_dir) = @_;
+    my ($test_class, $test_data, $instance_name, $config_dir) = @_;
 
     my @orig      = @$test_data ;
 
@@ -37,11 +37,12 @@ sub init_backend_test {
     my $etc_dir   = $wr_dir->child('etc');
     $etc_dir->mkpath;
     my $conf_file = $etc_dir->child("test.ini");
+    $conf_file->remove;
 
-    $conf_file->spew_utf8(@orig);
+    $conf_file->spew_utf8(@orig) if @orig;
 
     my $i_test = $model->instance(
-        instance_name   => "test_inst_for_$test_class",
+        instance_name   => $instance_name,
         root_class_name => $test_class,
         root_dir        => $wr_dir,
         model_file      => 'test_ini_backend_model.pl',
@@ -55,11 +56,11 @@ sub init_backend_test {
     $i_root->init;
     ok( 1, "$test_class root init done" );
 
-    return ($model, $i_test, $wr_dir);
+    return ($model, $i_test, $wr_dir, $conf_file);
 }
 
 sub finish {
-    my ($test_class, $wr_dir, $model, $i_test) = @_;
+    my ($test_class, $instance_name, $wr_dir, $model, $i_test) = @_;
 
     my $orig = $i_test->config_root->dump_tree;
     print $orig if $trace;
@@ -76,7 +77,7 @@ sub finish {
     $ini_file->copy( $wr_dir2 . '/etc/test.ini' );
 
     my $i2_test = $model->instance(
-        instance_name   => "test_inst2_for_$test_class",
+        instance_name   =>  $instance_name,
         root_class_name => $test_class,
         root_dir        => $wr_dir2,
         config_dir      => $i_test->config_dir, # propagate from first test instance
@@ -102,7 +103,7 @@ my %test_setup = (
 );
 
 foreach my $test_class ( sort keys %test_setup ) {
-    my ($model, $i_test, $wr_dir) = init_backend_test($test_class, $test_setup{$test_class}[0]);
+    my ($model, $i_test, $wr_dir) = init_backend_test($test_class, $test_setup{$test_class}[0], "test_inst_for_$test_class");
 
     my $test_path = $test_setup{$test_class}[1];
 
@@ -126,14 +127,14 @@ foreach my $test_class ( sort keys %test_setup ) {
         is( $elt->annotation, "lista$i comment", "check lista[$i] comment" );
     }
 
-    finish ($test_class, $wr_dir, $model,$i_test);
+    finish ($test_class, "test_inst2_for_$test_class", $wr_dir, $model,$i_test);
 }
 
 # test ini file using a check list
 
 {
     #    IniCheck
-    my ($model, $i_test, $wr_dir) = init_backend_test(IniCheck => \@with_hash_comment, '/etc/');
+    my ($model, $i_test, $wr_dir) = init_backend_test(IniCheck => \@with_hash_comment, "test_inst_for_check_list", '/etc/');
 
     my $i_root = $i_test->config_root;
 
@@ -147,9 +148,63 @@ foreach my $test_class ( sort keys %test_setup ) {
 
     $i_root->grab('class1 lista')->check('nolist');
 
-    finish ('IniCheck', $wr_dir, $model,$i_test);
+    finish ('IniCheck', "test_inst2_for_check_list", $wr_dir, $model,$i_test);
 
 }
+
+# test start with no ini file and should not write any after
+subtest "Test with empty ini file and no ini data" => sub {
+    $wr_root->remove_tree;
+
+    my ($model, $i_test, $wr_dir, $conf_file) = init_backend_test(IniTest => [], "test_inst_for_no_data", '/etc/');
+
+    my $i_root = $i_test->config_root;
+    # load some data so change notif is triggered
+    $i_root->load("baz=blork");
+
+    my $orig = $i_test->config_root->dump_tree;
+    print $orig if $trace;
+
+    # delete data and go back to default values, hence the
+    # configuration no longer contains valid data
+    $i_root->load("baz~");
+
+    print $i_test->config_root->dump_tree if $trace;
+
+    $i_test->write_back;
+    ok( 1, "Empty IniFile write back done" );
+    isnt($conf_file->exists, 1, "no file was written");
+
+};
+
+# test start with small ini file, delete all data so no file should be
+# left
+subtest "Test with small ini file and delete data" => sub {
+    $wr_root->remove_tree;
+
+    my ($model, $i_test, $wr_dir, $conf_file) = init_backend_test(
+        IniTest => ["\n","baz = blork\n"],
+        "test_inst_for_one_data", '/etc/'
+    );
+    is($conf_file->exists, 1, "ini file was written");
+
+    my $i_root = $i_test->config_root;
+    is($i_root->grab_value("baz"), 'blork', "check load of small data");
+
+    my $orig = $i_test->config_root->dump_tree;
+    print $orig if $trace;
+
+    # delete data and go back to default values, hence the
+    # configuration no longer contains valid data
+    $i_root->load("baz~");
+
+    print $i_test->config_root->dump_tree if $trace;
+
+    $i_test->write_back;
+    ok( 1, "Empty IniFile write back done" );
+    isnt($conf_file->exists, 1, "file is gone");
+
+};
 
 memory_cycle_ok( $model, "memory cycle test" );
 

@@ -37,16 +37,19 @@ use warnings;
 
 use lib 't/lib';
 
+use Test::RRA qw(skip_unless_automated);
+
 use File::Find qw(find);
 use Test::More;
-use Test::RRA qw(skip_unless_automated);
 
 # Bad patterns to search for.
 my @BAD_REGEXES = (qr{ http:// \S+ [.]eyrie[.]org }xms);
 my @BAD_STRINGS = qw(rra@stanford.edu RRA_MAINTAINER_TESTS);
 
 # File or directory names to always skip.
-my %SKIP = map { $_ => 1 } qw(.git _build blib cover_db obsolete-strings.t);
+my %SKIP = map { $_ => 1 } qw(
+  .git Changes _build blib cover_db obsolete-strings.t
+);
 
 # Only run this test during automated testing, since failure doesn't indicate
 # any user-noticable flaw in the package itself.

@@ -30,4 +30,5 @@ t/TooMuchCode/ProhibitUnusedConstant.run
 t/TooMuchCode/ProhibitUnusedImport.run
 t/TooMuchCode/ProhibitUnusedInclude.run
 t/all.t
+t/large_block.t
 t/require.t

@@ -2,8 +2,8 @@ NAME
     Text::Table::Any - Generate text table using one of several backends
 
 VERSION
-    This document describes version 0.093 of Text::Table::Any (from Perl
-    distribution Text-Table-Any), released on 2018-09-23.
+    This document describes version 0.094 of Text::Table::Any (from Perl
+    distribution Text-Table-Any), released on 2019-01-11.
 
 SYNOPSIS
      use Text::Table::Any;
@@ -102,11 +102,17 @@ DESCRIPTION
      | carol | brig gen | 8745     |
      +-------+----------+----------+
 
+VARIABLES
+  @BACKENDS
+    List of supported backends.
+
 FUNCTIONS
-  table(%params) => str
-  OPTIONS
-    The "table" function understands these arguments, which are passed as a
-    hash.
+  table
+    Usage:
+
+     table(%params) => str
+
+    Known arguments:
 
     *   rows (aoaos)
 
@@ -117,15 +123,15 @@ FUNCTIONS
 
         Optional. Pick a backend module. Supported backends:
 
-        *   Text::ANSITable
+        *   Text::Table::Tiny
 
-        *   Text::ASCIITable
+        *   Text::Table::TinyColor
 
-        *   Text::FormatTable
+        *   Text::Table::TinyColorWide
 
-        *   Text::MarkdownTable
+        *   Text::Table::TinyWide
 
-        *   Text::Table
+        *   Text::Table::Org
 
         *   Text::Table::CSV
 
@@ -139,21 +145,21 @@ FUNCTIONS
 
         *   Text::Table::HTML::DataTables
 
-        *   Text::Table::Org
-
         *   Text::Table::Paragraph
 
-        *   Text::Table::Tiny
+        *   Text::ANSITable
 
-        *   Text::Table::TinyColor
+        *   Text::ASCIITable
 
-        *   Text::Table::TinyColorWide
+        *   Text::FormatTable
 
-        *   Text::Table::TinyWide
+        *   Text::MarkdownTable
 
-        *   Text::Table::XLSX
+        *   Text::Table
 
         *   Text::TabularDisplay
+
+        *   Text::Table::XLSX
 
     *   header_row (bool, default 0)
 
@@ -161,6 +167,10 @@ FUNCTIONS
         interpreted as a header row, and separated visually from the rest of
         the table (e.g. with a ruled line). But some backends won't display
         differently.
+
+  backends
+    Return list of supported backends. You can also get the list from the
+    "@BACKENDS" package variable.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -184,7 +194,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

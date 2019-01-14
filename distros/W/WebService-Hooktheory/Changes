@@ -1,5 +1,9 @@
 Revision history for WebService-Hooktheory
 
+0.0400 2019-01-13 08:06:49
+    - Support and test mocking.
+    - Add a simple eg/example script.
+
 0.0300 2019-01-06 16:08:46
     - Use the new tx->result way of things.
 

@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use WebService::Hooktheory;
+
+my $key = shift || die "Usage: perl $0 1234567890abcdefghij\n";
+
+my $ws = WebService::Hooktheory->new( activkey => $key );
+
+my $r = $ws->fetch( endpoint => '/trends/nodes', query => { cp => '4,1' } );
+use Data::Dumper; warn Dumper $r;

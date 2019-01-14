@@ -7,9 +7,9 @@ eval { my $CWD = Mojolicious::Plugin::Webpack::CWD->new('nope') };
 like $@, qr{chdir nope:}, 'cannot chdir to nope';
 
 {
-  my $script_dir = $cwd->child('script');
-  my $CWD        = Mojolicious::Plugin::Webpack::CWD->new($script_dir);
-  is +Mojo::File->new->to_string, $script_dir, 'chdir script';
+  my $lib_dir = $cwd->child('lib');
+  my $CWD     = Mojolicious::Plugin::Webpack::CWD->new($lib_dir);
+  is +Mojo::File->new->to_string, $lib_dir, 'chdir lib';
 }
 
 is +Mojo::File->new->to_string, $cwd->to_string, 'chdir back';

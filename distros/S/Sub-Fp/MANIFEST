@@ -7,16 +7,12 @@ README
 Sub-Fp-0.05.tar.gz
 Sub-Fp-0.06.tar.gz
 Sub-Fp-0.07.tar.gz
-Sub-Fp-0.26.tar.gz
-Sub-Fp-0.27.tar.gz
-Sub-Fp-0.29.tar.gz
+Sub-Fp-0.10.tar.gz
 t/00-load.t
-t/Fn.pm.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/Sub::Fp.pm.t
-t/test.pl
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

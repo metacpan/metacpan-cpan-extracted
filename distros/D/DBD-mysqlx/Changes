@@ -1,3 +1,16 @@
+2019-01-12 Daniël van Eeden (0.003)
+* Updated documentation
+* Improved get_info support
+* Set minimun DBI version to 1.642
+* Replace hardcoded 1024 with a constant
+* Add tests for column type and insert id
+* Support fetching strings with > 1024 bytes.
+* Improved error messages for unsupported column types
+* Initial support for TIMESTAMP column type
+* Initial support for SET column type
+* Support for ENUM column type (via STRING)
+* Initial support for FLOAT and DOUBLE column types
+
 2018-12-21 Daniël van Eeden (0.002)
 * Rework dbd_st_FETCH_attrib (fixed $dbh->{Database}{Name} etc)
 * Instruct the compiler to use C99

@@ -16,6 +16,8 @@ lib/Neo4j/Driver/Session.pm
 lib/Neo4j/Driver/StatementResult.pm
 lib/Neo4j/Driver/SummaryCounters.pm
 lib/Neo4j/Driver/Transaction.pm
+lib/Neo4j/Driver/Transport/Bolt.pm
+lib/Neo4j/Driver/Transport/HTTP.pm
 t/experimental.t
 t/json-utf8.t
 t/lib/Neo4j/Test.pm

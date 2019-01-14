@@ -63,7 +63,7 @@
    "provides" : {
       "Slack::RTM::Bot" : {
          "file" : "lib/Slack/RTM/Bot.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Slack::RTM::Bot::Client" : {
          "file" : "lib/Slack/RTM/Bot/Client.pm"
@@ -86,8 +86,9 @@
          "web" : "https://github.com/duck8823/Slack-RTM-Bot"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_contributors" : [
+      "Matt Hallacy <mhallacy+github@haproxy.com>",
       "Paulo Bu <pbu_98@yahoo.com>",
       "Shunsuke Maeda <duck8823@gmail.com>",
       "dada <dada@perl.it>",

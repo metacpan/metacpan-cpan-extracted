@@ -1,6 +1,8 @@
 package WebService::Lobid::Organisation;
-$WebService::Lobid::Organisation::VERSION = '0.0041';
+$WebService::Lobid::Organisation::VERSION = '0.0042';
 # ABSTRACT: interface to the lobid-Organisations API
+
+=for html <a href="https://travis-ci.org/hatorikibble/webservice-lobid-organisations"><img src="https://travis-ci.org/hatorikibble/webservice-lobid-organisations.svg?branch=master"></a>
 
 =head1 NAME
 
@@ -39,6 +41,18 @@ tries to fetch data for the organisation identified by the ISIL C<$isil>. If an 
 currently the following attributes are supported
 
 =over 4
+
+=item * B<api_url> 
+
+inherited from L<WebService::Lobid>, default is I<https://lobid.org/>
+
+=item * B<api_status>
+
+inherited from L<WebService::Lobid>, I<ok> if C<api_url> reachable, otherwise C<error>
+
+=item * B<use_ssl>
+
+inherited from L<WebService::Lobid>, I<true> if L<HTTP::Tiny> can use SSL, otherwise C<false>
 
 =item * B<found> (true|false)
 

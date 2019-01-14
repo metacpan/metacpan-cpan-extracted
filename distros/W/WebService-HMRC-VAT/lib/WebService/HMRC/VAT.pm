@@ -15,11 +15,11 @@ WebService::HMRC::VAT - Interact with the UK HMRC VAT API
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -205,7 +205,7 @@ VAT return obligations:
           periodKey => "#004"
           start     => "2018-01-06",
           end       => "2018-04-05",
-          due"      => "2018-05-12",
+          due       => "2018-05-12",
           status    => "O",
         },
       ]
@@ -857,7 +857,7 @@ L<LedgerSMB|https://ledgersmb.org/> open source accounting software.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Nick Prater.
+Copyright 2018-2019 Nick Prater, NP Broadcast Limited.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

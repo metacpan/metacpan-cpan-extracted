@@ -12,6 +12,7 @@ Apache::Solr - Apache Solr (Lucene) extension
 
 =head1 SYNOPSIS
 
+  # use Log::Report mode => "DEBUG";
   my $solr    = Apache::Solr->new(server => $url);
 
   my $doc     = Apache::Solr::Document->new(...);
@@ -603,14 +604,14 @@ differences is that C<Apache::Solr> has much more abstraction.
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.04,
-built on May 23, 2016. Website: F<http://perl.overmeer.net>
+This module is part of Apache-Solr distribution version 1.05,
+built on January 11, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2012-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2012-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

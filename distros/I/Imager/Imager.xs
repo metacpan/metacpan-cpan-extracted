@@ -141,7 +141,7 @@ calloc_temp(pTHX_ size_t size) {
 #define i_img_dimPtr(size) ((i_img_dim *)calloc_temp(aTHX_ sizeof(i_img_dim) * (size)))
 #define SvI_img_dim(sv, pname) (SvIV(sv))
 
-#define i_colorPtr(size) ((i_color *)calloc_temp(aTHX_ sizeof(i_color *) * (size)))
+#define i_colorPtr(size) ((i_color *)calloc_temp(aTHX_ sizeof(i_color) * (size)))
 
 #define SvI_color(sv, pname) S_sv_to_i_color(aTHX_ sv, pname)
 
@@ -537,18 +537,29 @@ do_io_new_cb(pTHX_ SV *writecb, SV *readcb, SV *seekcb, SV *closecb) {
 }
 
 struct value_name {
-  char *name;
+  const char *name;
   int value;
 };
-static int lookup_name(const struct value_name *names, int count, char *name, int def_value)
+static int
+lookup_name(const struct value_name *names, int count, char *name, int def_value, int push_errors, const char *id, int *failed)
 {
   int i;
+
+  if (push_errors)
+    *failed = 0;
+
   for (i = 0; i < count; ++i)
     if (strEQ(names[i].name, name))
       return names[i].value;
 
+  if (push_errors) {
+    i_push_errorf(0, "unknown value '%s' for %s", name, id);
+    *failed = 1;
+  }
+
   return def_value;
 }
+
 static struct value_name transp_names[] =
 {
   { "none", tr_none },
@@ -602,14 +613,14 @@ static struct value_name orddith_names[] =
 };
 
 /* look through the hash for quantization options */
-static void
-ip_handle_quant_opts(pTHX_ i_quantize *quant, HV *hv)
+static int
+ip_handle_quant_opts_low(pTHX_ i_quantize *quant, HV *hv, int push_errors)
 {
-  /*** POSSIBLY BROKEN: do I need to unref the SV from hv_fetch ***/
   SV **sv;
   int i;
   STRLEN len;
   char *str;
+  int failed = 0;
 
   quant->mc_colors = mymalloc(quant->mc_size * sizeof(i_color));
 
@@ -617,7 +628,9 @@ ip_handle_quant_opts(pTHX_ i_quantize *quant, HV *hv)
   if (sv && *sv && (str = SvPV(*sv, len))) {
     quant->transp = 
       lookup_name(transp_names, sizeof(transp_names)/sizeof(*transp_names), 
-		  str, tr_none);
+		  str, tr_none, push_errors, "transp", &failed);
+    if (failed)
+       return 0;
     if (quant->transp != tr_none) {
       quant->tr_threshold = 127;
       sv = hv_fetch(hv, "tr_threshold", 12, 0);
@@ -627,13 +640,18 @@ ip_handle_quant_opts(pTHX_ i_quantize *quant, HV *hv)
     if (quant->transp == tr_errdiff) {
       sv = hv_fetch(hv, "tr_errdiff", 10, 0);
       if (sv && *sv && (str = SvPV(*sv, len)))
-	quant->tr_errdiff = lookup_name(errdiff_names, sizeof(errdiff_names)/sizeof(*errdiff_names), str, ed_floyd);
+	quant->tr_errdiff = lookup_name(errdiff_names, sizeof(errdiff_names)/sizeof(*errdiff_names), str, ed_floyd, push_errors, "tr_errdiff", &failed);
+	if (failed)
+	  return 0;
     }
     if (quant->transp == tr_ordered) {
       quant->tr_orddith = od_tiny;
       sv = hv_fetch(hv, "tr_orddith", 10, 0);
-      if (sv && *sv && (str = SvPV(*sv, len)))
-	quant->tr_orddith = lookup_name(orddith_names, sizeof(orddith_names)/sizeof(*orddith_names), str, od_random);
+      if (sv && *sv && (str = SvPV(*sv, len))) {
+	quant->tr_orddith = lookup_name(orddith_names, sizeof(orddith_names)/sizeof(*orddith_names), str, od_random, push_errors, "tr_orddith", &failed);
+	if (failed)
+	   return 0;
+      }
 
       if (quant->tr_orddith == od_custom) {
 	sv = hv_fetch(hv, "tr_map", 6, 0);
@@ -658,7 +676,9 @@ ip_handle_quant_opts(pTHX_ i_quantize *quant, HV *hv)
   sv = hv_fetch(hv, "make_colors", 11, 0);
   if (sv && *sv && (str = SvPV(*sv, len))) {
     quant->make_colors = 
-      lookup_name(make_color_names, sizeof(make_color_names)/sizeof(*make_color_names), str, mc_median_cut);
+      lookup_name(make_color_names, sizeof(make_color_names)/sizeof(*make_color_names), str, mc_median_cut, push_errors, "make_colors", &failed);
+    if (failed)
+      return 0;
   }
   sv = hv_fetch(hv, "colors", 6, 0);
   if (sv && *sv && SvROK(*sv) && SvTYPE(SvRV(*sv)) == SVt_PVAV) {
@@ -675,6 +695,10 @@ ip_handle_quant_opts(pTHX_ i_quantize *quant, HV *hv)
 	i_color *col = INT2PTR(i_color *, SvIV((SV*)SvRV(*sv1)));
 	quant->mc_colors[i] = *col;
       }
+      else if (push_errors) {
+        i_push_errorf(0, "colors[%d] isn't an Imager::Color object", i);
+	return 0;
+      }
     }
   }
   sv = hv_fetch(hv, "max_colors", 10, 0);
@@ -687,11 +711,15 @@ ip_handle_quant_opts(pTHX_ i_quantize *quant, HV *hv)
   quant->translate = pt_closest;
   sv = hv_fetch(hv, "translate", 9, 0);
   if (sv && *sv && (str = SvPV(*sv, len))) {
-    quant->translate = lookup_name(translate_names, sizeof(translate_names)/sizeof(*translate_names), str, pt_closest);
+    quant->translate = lookup_name(translate_names, sizeof(translate_names)/sizeof(*translate_names), str, pt_closest, push_errors, "translate", &failed);
+    if (failed)
+      return 0;
   }
   sv = hv_fetch(hv, "errdiff", 7, 0);
   if (sv && *sv && (str = SvPV(*sv, len))) {
-    quant->errdiff = lookup_name(errdiff_names, sizeof(errdiff_names)/sizeof(*errdiff_names), str, ed_floyd);
+    quant->errdiff = lookup_name(errdiff_names, sizeof(errdiff_names)/sizeof(*errdiff_names), str, ed_floyd, push_errors, "errdiff", &failed);
+    if (failed)
+      return 0;
   }
   if (quant->translate == pt_errdiff && quant->errdiff == ed_custom) {
     /* get the error diffusion map */
@@ -716,7 +744,12 @@ ip_handle_quant_opts(pTHX_ i_quantize *quant, HV *hv)
 	for (i = 0; i < len; ++i) {
 	  SV **sv2 = av_fetch(av, i, 0);
 	  if (sv2 && *sv2) {
-	    quant->ed_map[i] = SvIV(*sv2);
+	    IV iv = SvIV(*sv2);
+	    if (push_errors && iv < 0) {
+	      i_push_errorf(0, "errdiff_map values must be non-negative, errdiff[%d] is negative", i);
+	      return 0;
+	    }
+	    quant->ed_map[i] = iv;
 	    sum += quant->ed_map[i];
 	  }
 	}
@@ -726,12 +759,18 @@ ip_handle_quant_opts(pTHX_ i_quantize *quant, HV *hv)
 	myfree(quant->ed_map);
 	quant->ed_map = 0;
 	quant->errdiff = ed_floyd;
+	if (push_errors) {
+	  i_push_error(0, "error diffusion map must contain some non-zero values");
+	  return 0;
+	}
       }
     }
   }
   sv = hv_fetch(hv, "perturb", 7, 0);
   if (sv && *sv)
     quant->perturb = SvIV(*sv);
+
+  return 1;
 }
 
 static void
@@ -739,6 +778,20 @@ ip_cleanup_quant_opts(pTHX_ i_quantize *quant) {
   myfree(quant->mc_colors);
   if (quant->ed_map)
     myfree(quant->ed_map);
+}
+
+static int
+ip_handle_quant_opts2(pTHX_ i_quantize *quant, HV *hv) {
+  int result = ip_handle_quant_opts_low(aTHX_ quant, hv, 1);
+  if (!result) {
+     ip_cleanup_quant_opts(aTHX_ quant);
+  }
+  return result;
+}
+
+static void
+ip_handle_quant_opts(pTHX_ i_quantize *quant, HV *hv) {
+  (void)ip_handle_quant_opts_low(aTHX_ quant, hv, 0);
 }
 
 /* copies the color map from the hv into the colors member of the HV */
@@ -786,7 +839,7 @@ S_get_poly_fill_mode(pTHX_ SV *sv) {
   else {
     return (i_poly_fill_mode_t)lookup_name
     (poly_fill_mode_names, ARRAY_COUNT(poly_fill_mode_names),
-     SvPV_nolen(sv), i_pfm_evenodd);
+     SvPV_nolen(sv), i_pfm_evenodd, 0, NULL, NULL);
   }
 }
 
@@ -1056,7 +1109,8 @@ static im_pl_ext_funcs im_perl_funcs =
   IMAGER_PL_API_LEVEL,
   ip_handle_quant_opts,
   ip_cleanup_quant_opts,
-  ip_copy_colors_back
+  ip_copy_colors_back,
+  ip_handle_quant_opts2
 };
 
 #define PERL_PL_SET_GLOBAL_CALLBACKS \
@@ -1105,7 +1159,10 @@ ICL_set_internal(cl,r,g,b,a)
                unsigned char     b
                unsigned char     a
 	   PPCODE:
-	       ICL_set_internal(cl, r, g, b, a);
+	       cl->rgba.r = r;
+	       cl->rgba.g = g;
+	       cl->rgba.b = b;
+	       cl->rgba.a = a;
 	       EXTEND(SP, 1);
 	       PUSHs(ST(0));
 
@@ -1150,10 +1207,10 @@ MODULE = Imager        PACKAGE = Imager::Color::Float  PREFIX=ICLF_
 
 Imager::Color::Float
 ICLF_new_internal(r, g, b, a)
-        double r
-        double g
-        double b
-        double a
+        im_double r
+        im_double g
+        im_double b
+        im_double a
 
 void
 ICLF_DESTROY(cl)
@@ -1174,10 +1231,10 @@ ICLF_rgba(cl)
 void
 ICLF_set_internal(cl,r,g,b,a)
         Imager::Color::Float    cl
-        double     r
-        double     g
-        double     b
-        double     a
+        im_double     r
+        im_double     g
+        im_double     b
+        im_double     a
       PPCODE:
         cl->rgba.r = r;
         cl->rgba.g = g;
@@ -1209,9 +1266,9 @@ i_rgb_to_hsv(c)
 MODULE = Imager		PACKAGE = Imager::ImgRaw	PREFIX = IIM_
 
 Imager::ImgRaw
-IIM_new(x,y,ch)
-               i_img_dim     x
-	       i_img_dim     y
+IIM_new(xsize,ysize,ch)
+               i_img_dim     xsize
+	       i_img_dim     ysize
 	       int     ch
 
 void
@@ -1455,6 +1512,10 @@ i_io_CLONE_SKIP(...)
 
 int
 i_io_getc(ig)
+	Imager::IO ig
+
+void
+i_io_nextc(ig)
 	Imager::IO ig
 
 int
@@ -1812,19 +1873,19 @@ i_arc(im,x,y,rad,d1,d2,val)
     Imager::ImgRaw     im
 	       i_img_dim     x
 	       i_img_dim     y
-             double     rad
-             double     d1
-             double     d2
+             im_double     rad
+             im_double     d1
+             im_double     d2
 	   Imager::Color    val
 
 void
 i_arc_aa(im,x,y,rad,d1,d2,val)
     Imager::ImgRaw     im
-	    double     x
-	    double     y
-            double     rad
-            double     d1
-            double     d2
+	    im_double     x
+	    im_double     y
+            im_double     rad
+            im_double     d1
+            im_double     d2
 	   Imager::Color    val
 
 void
@@ -1832,36 +1893,36 @@ i_arc_cfill(im,x,y,rad,d1,d2,fill)
     Imager::ImgRaw     im
 	       i_img_dim     x
 	       i_img_dim     y
-             double     rad
-             double     d1
-             double     d2
+             im_double     rad
+             im_double     d1
+             im_double     d2
 	   Imager::FillHandle    fill
 
 void
 i_arc_aa_cfill(im,x,y,rad,d1,d2,fill)
     Imager::ImgRaw     im
-	    double     x
-	    double     y
-            double     rad
-            double     d1
-            double     d2
+	    im_double     x
+	    im_double     y
+            im_double     rad
+            im_double     d1
+            im_double     d2
 	   Imager::FillHandle	fill
 
 
 void
 i_circle_aa(im,x,y,rad,val)
     Imager::ImgRaw     im
-	     double     x
-	     double     y
-             double     rad
+	     im_double     x
+	     im_double     y
+             im_double     rad
 	   Imager::Color    val
 
 void
 i_circle_aa_fill(im,x,y,rad,fill)
     Imager::ImgRaw     im
-	     double     x
-	     double     y
-             double     rad
+	     im_double     x
+	     im_double     y
+             im_double     rad
 	   Imager::FillHandle    fill
 
 int
@@ -1886,8 +1947,8 @@ i_arc_out(im,x,y,rad,d1,d2,val)
 	     i_img_dim     x
 	     i_img_dim     y
              i_img_dim     rad
-	     double d1
-	     double d2
+	     im_double d1
+	     im_double d2
 	   Imager::Color    val
 
 int
@@ -1896,8 +1957,8 @@ i_arc_out_aa(im,x,y,rad,d1,d2,val)
 	     i_img_dim     x
 	     i_img_dim     y
              i_img_dim     rad
-	     double d1
-	     double d2
+	     im_double d1
+	     im_double d2
 	   Imager::Color    val
 
 
@@ -2053,7 +2114,7 @@ i_compose(out, src, out_left, out_top, src_left, src_top, width, height, combine
 	i_img_dim width
 	i_img_dim height
 	int combine
-	double opacity
+	im_double opacity
 
 undef_int
 i_compose_mask(out, src, mask, out_left, out_top, src_left, src_top, mask_left, mask_top, width, height, combine = ic_normal, opacity = 0.0)
@@ -2069,7 +2130,7 @@ i_compose_mask(out, src, mask, out_left, out_top, src_left, src_top, mask_left, 
 	i_img_dim width
 	i_img_dim height
 	int combine
-	double opacity
+	im_double opacity
 
 Imager::ImgRaw
 i_combine(src_av, channels_av = NULL)
@@ -2125,7 +2186,7 @@ i_rotate90(im, degrees)
 Imager::ImgRaw
 i_rotate_exact(im, amount, ...)
     Imager::ImgRaw      im
-            double      amount
+            im_double      amount
       PREINIT:
 	i_color *backp = NULL;
 	i_fcolor *fbackp = NULL;
@@ -2192,13 +2253,13 @@ i_matrix_transform(im, xsize, ysize, matrix_av, ...)
 undef_int
 i_gaussian(im,stdev)
     Imager::ImgRaw     im
-	    double     stdev
+	    im_double     stdev
 
 void
 i_unsharp_mask(im,stdev,scale)
     Imager::ImgRaw     im
-	     double    stdev
-             double    scale
+	     im_double    stdev
+             im_double    scale
 
 int
 i_conv(im,coef)
@@ -2323,7 +2384,7 @@ int
 i_img_samef(im1, im2, epsilon = i_img_epsilonf(), what=NULL)
     Imager::ImgRaw    im1
     Imager::ImgRaw    im2
-    double epsilon
+    im_double epsilon
     const char *what
 
 double
@@ -2375,7 +2436,7 @@ i_tt_text(handle,im,xb,yb,cl,points,str_sv,smooth,utf8,align=1)
 	       i_img_dim     xb
 	       i_img_dim     yb
      Imager::Color     cl
-             double     points
+             im_double     points
 	      SV *     str_sv
 	       int     smooth
                int     utf8
@@ -2402,7 +2463,7 @@ i_tt_cp(handle,im,xb,yb,channel,points,str_sv,smooth,utf8,align=1)
 	       i_img_dim     xb
 	       i_img_dim     yb
 	       int     channel
-             double     points
+             im_double     points
 	      SV *     str_sv
 	       int     smooth
                int     utf8
@@ -2425,7 +2486,7 @@ i_tt_cp(handle,im,xb,yb,channel,points,str_sv,smooth,utf8,align=1)
 void
 i_tt_bbox(handle,point,str_sv,utf8)
   Imager::Font::TT     handle
-	     double     point
+	     im_double     point
 	       SV*    str_sv
                int     utf8
 	     PREINIT:
@@ -2468,10 +2529,12 @@ i_tt_has_chars(handle, text_sv, utf8)
         work = mymalloc(len);
         count = i_tt_has_chars(handle, text, len, utf8, work);
         if (GIMME_V == G_ARRAY) {
-          EXTEND(SP, count);
-          for (i = 0; i < count; ++i) {
-            PUSHs(boolSV(work[i]));
-          }
+	  if (count) {
+            EXTEND(SP, count);
+            for (i = 0; i < count; ++i) {
+              PUSHs(boolSV(work[i]));
+            }
+	  }
         }
         else {
           EXTEND(SP, 1);
@@ -2507,7 +2570,6 @@ i_tt_glyph_name(handle, text_sv, utf8 = 0)
         size_t len;
         size_t outsize;
         char name[255];
-	SSize_t count = 0;
       PPCODE:
         i_clear_error();
         text = SvPV(text_sv, work_len);
@@ -2529,16 +2591,14 @@ i_tt_glyph_name(handle, text_sv, utf8 = 0)
             ch = *text++;
             --len;
           }
-          EXTEND(SP, count+1);
+          EXTEND(SP, 1);
           if ((outsize = i_tt_glyph_name(handle, ch, name, sizeof(name))) != 0) {
-	    ST(count) = sv_2mortal(newSVpv(name, 0));
+	    PUSHs(sv_2mortal(newSVpv(name, 0)));
           }
           else {
-	    ST(count) = &PL_sv_undef;
+	    PUSHs(&PL_sv_undef);
           }
-          ++count;
         }
-	XSRETURN(count);
 
 #endif 
 
@@ -2634,14 +2694,14 @@ i_readtga_wiol(ig, length)
 Imager::ImgRaw
 i_scaleaxis(im,Value,Axis)
     Imager::ImgRaw     im
-             double     Value
+             im_double     Value
 	       int     Axis
 
 Imager::ImgRaw
 i_scale_nn(im,scx,scy)
     Imager::ImgRaw     im
-             double    scx
-             double    scy
+             im_double    scx
+             im_double    scy
 
 Imager::ImgRaw
 i_scale_mixing(im, width, height)
@@ -2668,17 +2728,14 @@ i_get_anonymous_color_histo(im, maxc = 0x40000000)
         int col_cnt;
     PPCODE:
 	col_cnt = i_get_anonymous_color_histo(im, &col_usage, maxc);
-        if (col_cnt > 0) {
-            EXTEND(SP, col_cnt);
-            for (i = 0; i < col_cnt; i++)  {
-                PUSHs(sv_2mortal(newSViv( col_usage[i])));
-            }
-            myfree(col_usage);
-            XSRETURN(col_cnt);
+        if (col_cnt <= 0) {
+	    XSRETURN_EMPTY;
+	}
+        EXTEND(SP, col_cnt);
+        for (i = 0; i < col_cnt; i++)  {
+            PUSHs(sv_2mortal(newSViv( col_usage[i])));
         }
-        else {
-            XSRETURN_EMPTY;
-        }
+        myfree(col_usage);
 
 
 void
@@ -2797,7 +2854,7 @@ i_transform2(sv_width,sv_height,channels,sv_ops,av_n_regs,av_c_regs,av_in_imgs)
 void
 i_contrast(im,intensity)
     Imager::ImgRaw     im
-             float     intensity
+             im_float     intensity
 
 void
 i_hardinvert(im)
@@ -2810,7 +2867,7 @@ i_hardinvertall(im)
 void
 i_noise(im,amount,type)
     Imager::ImgRaw     im
-             float     amount
+             im_float     amount
      unsigned char     type
 
 void
@@ -2830,12 +2887,12 @@ i_bumpmap_complex(im,bump,channel,tx,ty,Lx,Ly,Lz,cd,cs,n,Ia,Il,Is)
                int     channel
                i_img_dim     tx
                i_img_dim     ty
-             double     Lx
-             double     Ly
-             double     Lz
-             float     cd
-             float     cs
-             float     n
+             im_double     Lx
+             im_double     Ly
+             im_double     Lz
+             im_float     cd
+             im_float     cs
+             im_float     n
      Imager::Color     Ia
      Imager::Color     Il
      Imager::Color     Is
@@ -2864,30 +2921,30 @@ i_watermark(im,wmark,tx,ty,pixdiff)
 void
 i_autolevels(im,lsat,usat,skew)
     Imager::ImgRaw     im
-             float     lsat
-             float     usat
-             float     skew
+             im_float     lsat
+             im_float     usat
+             im_float     skew
 
 void
 i_autolevels_mono(im,lsat,usat)
     Imager::ImgRaw     im
-             float     lsat
-             float     usat
+             im_float     lsat
+             im_float     usat
 
 void
 i_radnoise(im,xo,yo,rscale,ascale)
     Imager::ImgRaw     im
-             float     xo
-             float     yo
-             float     rscale
-             float     ascale
+             im_float     xo
+             im_float     yo
+             im_float     rscale
+             im_float     ascale
 
 void
 i_turbnoise(im, xo, yo, scale)
     Imager::ImgRaw     im
-             float     xo
-             float     yo
-             float     scale
+             im_float     xo
+             im_float     yo
+             im_float     scale
 
 
 void
@@ -2912,20 +2969,20 @@ Imager::ImgRaw
 i_diff_image(im, im2, mindist=0)
     Imager::ImgRaw     im
     Imager::ImgRaw     im2
-            double     mindist
+            im_double     mindist
 
 undef_int
 i_fountain(im, xa, ya, xb, yb, type, repeat, combine, super_sample, ssample_param, segs)
     Imager::ImgRaw     im
-            double     xa
-            double     ya
-            double     xb
-            double     yb
+            im_double     xa
+            im_double     ya
+            im_double     xb
+            im_double     yb
                int     type
                int     repeat
                int     combine
                int     super_sample
-            double     ssample_param
+            im_double     ssample_param
       PREINIT:
         AV *asegs;
         int count;
@@ -2944,15 +3001,15 @@ i_fountain(im, xa, ya, xb, yb, type, repeat, combine, super_sample, ssample_para
 
 Imager::FillHandle
 i_new_fill_fount(xa, ya, xb, yb, type, repeat, combine, super_sample, ssample_param, segs)
-            double     xa
-            double     ya
-            double     xb
-            double     yb
+            im_double     xa
+            im_double     ya
+            im_double     xb
+            im_double     yb
                int     type
                int     repeat
                int     combine
                int     super_sample
-            double     ssample_param
+            im_double     ssample_param
       PREINIT:
         AV *asegs;
         int count;
@@ -2972,7 +3029,7 @@ i_new_fill_fount(xa, ya, xb, yb, type, repeat, combine, super_sample, ssample_pa
 Imager::FillHandle
 i_new_fill_opacity(other_fill, alpha_mult)
     Imager::FillHandle other_fill
-    double alpha_mult
+    im_double alpha_mult
 
 void
 i_errors()
@@ -3139,22 +3196,23 @@ i_img_pal_new(x, y, channels, maxpal)
 	int	maxpal
 
 Imager::ImgRaw
-i_img_to_pal(src, quant)
+i_img_to_pal(src, quant_hv)
         Imager::ImgRaw src
+	HV *quant_hv
       PREINIT:
         HV *hv;
         i_quantize quant;
       CODE:
-        if (!SvROK(ST(1)) || ! SvTYPE(SvRV(ST(1))))
-          croak("i_img_to_pal: second argument must be a hash ref");
-        hv = (HV *)SvRV(ST(1));
         memset(&quant, 0, sizeof(quant));
 	quant.version = 1;
         quant.mc_size = 256;
-	ip_handle_quant_opts(aTHX_ &quant, hv);
+	i_clear_error();
+	if (!ip_handle_quant_opts2(aTHX_ &quant, quant_hv)) {
+	   XSRETURN_EMPTY;
+	}
         RETVAL = i_img_to_pal(src, &quant);
         if (RETVAL) {
-          ip_copy_colors_back(aTHX_ hv, &quant);
+          ip_copy_colors_back(aTHX_ quant_hv, &quant);
         }
 	ip_cleanup_quant_opts(aTHX_ &quant);
       OUTPUT:
@@ -3188,7 +3246,9 @@ i_img_make_palette(HV *quant_hv, ...)
         memset(&quant, 0, sizeof(quant));
 	quant.version = 1;
 	quant.mc_size = 256;
-        ip_handle_quant_opts(aTHX_ &quant, quant_hv);
+        if (!ip_handle_quant_opts2(aTHX_ &quant, quant_hv)) {
+	  XSRETURN_EMPTY;
+	}
 	i_quant_makemap(&quant, imgs, count);
 	EXTEND(SP, quant.mc_count);
 	for (i = 0; i < quant.mc_count; ++i) {
@@ -3784,26 +3844,26 @@ i_glinf(im, l, r, y)
         }
 
 Imager::ImgRaw
-i_img_8_new(x, y, ch)
-        i_img_dim x
-        i_img_dim y
-        int ch
+i_img_8_new(xsize, ysize, channels)
+        i_img_dim xsize
+        i_img_dim ysize
+        int channels
 
 Imager::ImgRaw
-i_img_16_new(x, y, ch)
-        i_img_dim x
-        i_img_dim y
-        int ch
+i_img_16_new(xsize, ysize, channels)
+        i_img_dim xsize
+        i_img_dim ysize
+        int channels
 
 Imager::ImgRaw
 i_img_to_rgb16(im)
        Imager::ImgRaw im
 
 Imager::ImgRaw
-i_img_double_new(x, y, ch)
-        i_img_dim x
-        i_img_dim y
-        int ch
+i_img_double_new(xsize, ysize, channels)
+        i_img_dim xsize
+        i_img_dim ysize
+        int channels
 
 Imager::ImgRaw
 i_img_to_drgb(im)
@@ -4137,6 +4197,9 @@ im_context_CLONE(...)
       /* the following sv_setref_pv() will free this inc */
       im_context_refinc(MY_CXT.ctx, "CLONE");
       MY_CXT.ctx = im_context_clone(MY_CXT.ctx, "CLONE");
+      if (MY_CXT.ctx == NULL) {
+        croak("Failed to clone Imager context");
+      }
       sv_setref_pv(get_sv("Imager::_context", GV_ADD), "Imager::Context", MY_CXT.ctx);
 
 #endif

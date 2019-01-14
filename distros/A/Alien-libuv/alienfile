@@ -1,27 +1,6 @@
 use alienfile;
 use Config;
 
-sub WINVER() {
-    # we're already bailing in the Makefile.PL on any version < 6
-    my $ver;
-    my $err = do {
-        local $@;
-        eval { require Win32; $ver = Win32::GetOSName(); 1; };
-        $@;
-    };
-    # if we're unable to determine a version, just go with 0x0603
-    return '0x0603' if $err || !$ver;
-
-    return '0x0600' if $ver =~ /^Win(?:Vista|2008)/;
-    return '0x0601' if $ver =~ /^Win7/;
-    return '0x0603' if $ver =~ /^Win8\.1/;
-    return '0x0602' if $ver =~ /^Win8/;
-    return '0x0603';
-    # no point in telling it about Win10 as it's all a lie at this point anyway
-    # return '0x0A00' if $ver =~ /^Win10/;
-    # return '0x0A00' if $ver =~ /^Win(?:2012|2014|2016)/; # not sure here
-}
-
 configure { requires 'Alien::Build::Plugin::Build::Make' => '0.01' };
 
 plugin 'PkgConfig' => (
@@ -34,7 +13,7 @@ share {
     meta->prop->{env}->{LIBTOOLIZE} = 'libtoolize' if $^O eq 'darwin';
 
     plugin Download => (
-        url     => 'https://dist.libuv.org/dist/v1.23.0',
+        url     => 'https://dist.libuv.org/dist/v1.24.1',
         version => qr/^libuv-v([0-9\.]+)\.tar\.gz$/,
     );
 
@@ -64,9 +43,7 @@ share {
             my $build= shift;
             my $flags = '-DWIN32 -D_WIN32';
             $flags .= ' -DWIN64 -D_WIN64' if $bits == 64;
-            if (my $ver = WINVER()) {
-                $flags .= " -D_WINVER=$ver -D_WIN32_WINNT=$ver"
-            }
+
             $build->runtime_prop->{$_} .= " $flags" for qw( cflags cflags_static );
             # on windows, we need the following libraries to be included. MinGW can't pull these
             # from source on windows, so we add the equivalent to these pragma comments
@@ -79,7 +56,7 @@ share {
             #pragma comment(lib, "User32.lib")
             #pragma comment(lib, "Userenv.lib")
             #pragma comment(lib, "Ws2_32.lib")
-            $build->runtime_prop->{$_} .= ' -ladvapi32 -lIphlpapi -lkernel32 -lpsapi -lshell32 -luser32 -luserenv -lws2_32' for qw( libs libs_static );
+            $build->runtime_prop->{$_} .= ' -msse2 -ladvapi32 -lIphlpapi -lkernel32 -lpsapi -lshell32 -luser32 -luserenv -lws2_32' for qw( libs libs_static );
         });
 
         build [

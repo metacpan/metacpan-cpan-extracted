@@ -12,8 +12,8 @@ configure_requires:
   Module::Build: '0.3607'
   Probe::Perl: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
-license: unknown
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -21,7 +21,7 @@ name: IP-World
 provides:
   IP::World:
     file: lib/IP/World.pm
-    version: '0.39'
+    version: '0.40'
 requires:
   Carp: '0'
   File::ShareDir: '0'
@@ -34,4 +34,5 @@ resources:
   bugtracker: https://github.com/DrHyde/perl-modules-IP-World/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/DrHyde/perl-modules-IP-World
-version: '0.39'
+version: '0.40'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

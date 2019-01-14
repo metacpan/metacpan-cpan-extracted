@@ -1,6 +1,10 @@
 Changes file for OTRS::OPM::Maker
 =================================
 
+0.17 2019-01-14 10:07:00
+
+     + fix test failures, thanks to CPANTesters
+
 0.16 2019-01-09 08:00:00
 
      + add more tests for the commands

@@ -1,7 +1,7 @@
 package File::Slurper::Temp;
 
-our $DATE = '2017-01-16'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-01-14'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -11,7 +11,10 @@ use File::Slurper ();
 use File::Temp ();
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(write_text write_binary);
+our @EXPORT_OK = qw(
+                       write_text write_binary
+                       write_text_to_tempfile write_binary_to_tempfile
+               );
 
 sub write_text {
     my $filename = shift;
@@ -25,6 +28,16 @@ sub write_text {
 
 sub write_binary {
     return write_text(@_[0,1], 'latin-1');
+}
+
+sub write_text_to_tempfile {
+    my ($tempfh, $tempname) = File::Temp::tempfile();
+    File::Slurper::write_text($tempname, @_);
+    return $tempname;
+}
+
+sub write_binary_to_tempfile {
+    return write_text_to_tempfile($_[0], 'latin-1');
 }
 
 1;
@@ -42,7 +55,7 @@ File::Slurper::Temp - File::Slurper + File::Temp
 
 =head1 VERSION
 
-This document describes version 0.003 of File::Slurper::Temp (from Perl distribution File-Slurper-Temp), released on 2017-01-16.
+This document describes version 0.004 of File::Slurper::Temp (from Perl distribution File-Slurper-Temp), released on 2019-01-14.
 
 =head1 SYNOPSIS
 
@@ -51,6 +64,12 @@ Use like you would use L<File::Slurper>'s C<write_text> or C<write_binary>:
  use File::Slurper::Temp qw(write_text write_binary);
  write_text("/tmp/foo.txt", "some text");
  write_binary("/tmp/bar", $somedata);
+
+Use C<write_text_to_tempfile> and C<write_binary_to_tempfile>:
+
+ use File::Slurper::Temp qw(write_text_to_tempfile write_binary_to_tempfile);
+ my $filename1 = write_text_to_tempfile("some text");
+ my $filename2 = write_binary_to_tempfile($somedata);
 
 =head1 DESCRIPTION
 
@@ -61,11 +80,19 @@ by L<File::Temp>'s C<tempfile>, then rename the temporary file to the originally
 specified name. If the filename is originally a symlink, it will be replaced
 with a regular file. This can avoid symlink attack.
 
+In addition to that, this module also provides C<write_text_to_tempfile> and
+C<write_binary_to_tempfile>. You don't have to specify filename but just content
+to write and the functions will return the temporay filename created.
+
 =head1 FUNCTIONS
 
 =head2 write_text
 
 =head2 write_binary
+
+=head2 write_text_to_tempfile
+
+=head2 write_binary_to_tempfile
 
 =head1 HOMEPAGE
 
@@ -95,7 +122,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

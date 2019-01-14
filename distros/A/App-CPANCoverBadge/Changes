@@ -1,0 +1,10 @@
+Revision history for App::CPANCoverBadge
+========================================
+
+0.02 2019-01-14 09:58:00
+
+  * Fix test failures
+
+0.01 2019-01-13 16:55:00
+
+  * initial release

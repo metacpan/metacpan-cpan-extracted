@@ -10,7 +10,7 @@ sub generate {
 		DateTime->now()->epoch(),
 		DateTime->now()->add(%{ $_[2] })->epoch(),
 	);
-	return sprintf("%s-%s-%s-%s", 
+	return sprintf("%s-%s-%s-%s",
 		$_[0]->bi($dec) . $n,
 		$_[0]->bi($time),
 		$_[0]->bi($end),

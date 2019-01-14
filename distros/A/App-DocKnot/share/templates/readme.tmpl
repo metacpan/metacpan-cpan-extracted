@@ -36,19 +36,11 @@ BUILDING AND INSTALLATION
 
       perl Build.PL
       ./Build
-      ./Build test
       ./Build install
 
   You will have to run the last command as root unless you're installing
   into a local Perl module tree in your home directory.
-[% IF build.lancaster %]
-  To enable tests that don't detect functionality problems but are used to
-  sanity-check the release, set the environment variable RELEASE_TESTING
-  to a true value.  To enable tests that may be sensitive to the local
-  environment or that produce a lot of false positives without uncovering
-  many problems, set the environment variable AUTHOR_TESTING to a true
-  value.
-[% END %][% ELSIF build.type == 'ExtUtils::MakeMaker' %]
+[% ELSIF build.type == 'ExtUtils::MakeMaker' %]
 BUILDING AND INSTALLATION
 
   [% name %] uses ExtUtils::MakeMaker and can be installed using the same
@@ -56,19 +48,11 @@ BUILDING AND INSTALLATION
 
       perl Makefile.PL
       make
-      make test
       make install
 
-  You'll probably need to do the last as root unless you're installing
+  You will have to run the last command as root unless you're installing
   into a local Perl module tree in your home directory.
-[% IF build.lancaster %]
-  To enable tests that don't detect functionality problems but are used to
-  sanity-check the release, set the environment variable RELEASE_TESTING
-  to a true value.  To enable tests that may be sensitive to the local
-  environment or that produce a lot of false positives without uncovering
-  many problems, set the environment variable AUTHOR_TESTING to a true
-  value.
-[% END %][% ELSIF build.type == 'Autoconf' %][% IF build.install %]
+[% ELSIF build.type == 'Autoconf' %][% IF build.install %]
 BUILDING AND INSTALLATION
 
   You can build and install [% name %] with the standard commands:
@@ -148,14 +132,26 @@ BUILDING
   If none of the above made any sense to you, don't bother with this flag.
 [% END %][% IF build.suffix %]
 [% indent(to_text(build.suffix), 2) %]
-[% END %][% IF !readme.testing %]
+[% END %][% END %][% IF !readme.testing && (build.type == 'Module::Build' || build.type == 'ExtUtils::MakeMaker' || build.type == 'Autoconf') %]
 TESTING
 [% IF test.prefix %]
 [% indent(to_text(test.prefix), 2) %]
 [% ELSE %]
   [% name %] comes with a test suite, which you can run after building
   with:
-[% END %]
+[% END %][% IF build.type == 'Module::Build' %]
+      ./Build test
+
+  If a test fails, you can run a single test with verbose output via:
+
+      ./Build test --test_files <path-to-test>
+[% ELSIF build.type == 'ExtUtils::MakeMaker' %]
+      make test
+
+  If a test fails, you can run a single test with verbose output via:
+
+      prove -vb <path-to-test>
+[% ELSIF build.type == 'Autoconf' %]
       make check
 
   If a test fails, you can run a single test with verbose output via:
@@ -164,7 +160,7 @@ TESTING
 
   Do this instead of running the test program directly since it will
   ensure that necessary environment variables are set up.
-[% IF test.suffix %]
+[% END %][% IF test.suffix %]
 [% indent(to_text(test.suffix), 2) %]
 [% END %][% IF build.lancaster %]
   To enable tests that don't detect functionality problems but are used to
@@ -173,12 +169,20 @@ TESTING
   environment or that produce a lot of false positives without uncovering
   many problems, set the environment variable AUTHOR_TESTING to a true
   value.
-[% END %][% END %][% END %]
+[% END %][% END %]
 [% FOREACH section IN readme.sections %][% section.title FILTER upper %]
 
 [% indent(to_text(section.body), 2) %]
 
-[% END %]SUPPORT
+[% IF section.title == 'Testing' && build.lancaster %]
+  To enable tests that don't detect functionality problems but are used to
+  sanity-check the release, set the environment variable RELEASE_TESTING
+  to a true value.  To enable tests that may be sensitive to the local
+  environment or that produce a lot of false positives without uncovering
+  many problems, set the environment variable AUTHOR_TESTING to a true
+  value.
+
+[% END %][% END %]SUPPORT
 
   The [% name %] web page at:
 

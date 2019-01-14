@@ -672,8 +672,10 @@ i_new_hatch_low(const i_color *fg, const i_color *bg,
     memcpy(fill->hatch, cust_hatch, 8);
   }
   else {
-    if (hatch > sizeof(builtin_hatches)/sizeof(*builtin_hatches)) 
+    if (hatch >= sizeof(builtin_hatches)/sizeof(*builtin_hatches)
+	|| hatch < 0) {
       hatch = 0;
+    }
     memcpy(fill->hatch, builtin_hatches[hatch], 8);
   }
   fill->dx = dx & 7;
@@ -758,14 +760,16 @@ static i_color interp_i_color(i_color before, i_color after, double pos,
   pos -= floor(pos);
   for (ch = 0; ch < channels; ++ch)
     out.channel[ch] = (1-pos) * before.channel[ch] + pos * after.channel[ch];
-  if (channels > 3 && out.channel[3])
-    for (ch = 0; ch < channels; ++ch)
+  if (channels > 3 && out.channel[3]) {
+    for (ch = 0; ch < channels; ++ch) {
       if (ch != 3) {
         int temp = out.channel[ch] * 255 / out.channel[3];
         if (temp > 255)
           temp = 255;
         out.channel[ch] = temp;
       }
+    }
+  }
 
   return out;
 }
@@ -780,14 +784,16 @@ static i_fcolor interp_i_fcolor(i_fcolor before, i_fcolor after, double pos,
   pos -= floor(pos);
   for (ch = 0; ch < channels; ++ch)
     out.channel[ch] = (1-pos) * before.channel[ch] + pos * after.channel[ch];
-  if (out.channel[3])
-    for (ch = 0; ch < channels; ++ch)
+  if (out.channel[3]) {
+    for (ch = 0; ch < channels; ++ch) {
       if (ch != 3) {
         int temp = out.channel[ch] / out.channel[3];
         if (temp > 1.0)
           temp = 1.0;
         out.channel[ch] = temp;
       }
+    }
+  }
 
   return out;
 }

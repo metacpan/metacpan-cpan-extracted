@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the AcousticBrainz API
 
-our $VERSION = '0.0200';
+our $VERSION = '0.0300';
 
 use Moo;
 use strictures 2;
@@ -13,11 +13,18 @@ use Carp;
 use Mojo::UserAgent;
 use Mojo::JSON::MaybeXS;
 use Mojo::JSON qw( decode_json );
+use Mojo::URL;
 
 
 has base => (
-    is      => 'ro',
-    default => sub { 'https://acousticbrainz.org/api/v1' },
+    is      => 'rw',
+    default => sub { Mojo::URL->new('https://acousticbrainz.org/api/v1') },
+);
+
+
+has ua => (
+    is      => 'rw',
+    default => sub { Mojo::UserAgent->new() },
 );
 
 
@@ -33,9 +40,7 @@ sub fetch {
     $url .= '?' . $query
         if $query;
 
-    my $ua = Mojo::UserAgent->new;
-
-    my $tx = $ua->get($url);
+    my $tx = $self->ua->get($url);
 
     my $data = _handle_response($tx);
 
@@ -79,7 +84,7 @@ WebService::AcousticBrainz - Access to the AcousticBrainz API
 
 =head1 VERSION
 
-version 0.0200
+version 0.0300
 
 =head1 SYNOPSIS
 
@@ -100,6 +105,10 @@ C<WebService::AcousticBrainz> provides access to the L<https://acousticbrainz.or
 =head2 base
 
 The base URL.  Default: https://acousticbrainz.org/api/v1
+
+=head2 ua
+
+The user agent.
 
 =head1 METHODS
 

@@ -1,0 +1,76 @@
+NAME
+    HTML::FormatText::Any - Render HTML as text using one of multiple
+    backends
+
+VERSION
+    This document describes version 0.001 of HTML::FormatText::Any (from
+    Perl distribution HTML-FormatText-Any), released on 2019-01-14.
+
+FUNCTIONS
+  html2text
+    Usage:
+
+     html2text(%args) -> [status, msg, payload, meta]
+
+    Render HTML as text using one of multiple backends.
+
+    Backends are tried in the following order (order is chosen based on
+    rendering quality):
+
+    *   HTML::FormatText::Elinks (using external program 'elinks')
+
+    *   HTML::FormatText::Links (using external program 'links')
+
+    *   HTML::FormatText::W3m (using external program 'w3m')
+
+    *   HTML::FormatText::Lynx (using external program 'lynx')
+
+    *   HTML::FormatText::WithLinks::AndTables
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   html* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTML-FormatText-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTML-FormatText-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-FormatText-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    html2text. CLI for this module.
+
+    html2txt. a simpler HTML rendering utility which basically just strips
+    HTML tags from HTML source code.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

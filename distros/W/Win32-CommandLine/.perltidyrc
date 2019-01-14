@@ -1,0 +1,29 @@
+#--character-encoding="utf8"     # treat files as UTF-8 (decode and encode)
+--output-line-ending="unix"     # use *nix LF EOLs
+#--preserve-line-endings
+--standard-error-output
+--backup-and-modify-in-place			# backup file to .bak and modify in place
+--backup-file-extension=/               # '/' => delete backup file iff no errors
+-l=0		# no max line length
+-i=4		# indent = 4
+#-ci=4		# continuation-indentation=n == Continuation indentation is extra indentation spaces applied when a long line is broken.
+-nbl         # [no] opening-brace-on-new-line == Use the flag -bl to place the opening brace on a new line
+#-bl			# opening-brace-on-new-line == Use the flag -bl to place the opening brace on a new line
+#-bli		# -bl with continuation indentation
+#-et=4		# entab initial whitespace (with <tab> = 4)
+#-nibc
+-isbc		# indent-spaced-block-comments == If there is no leading space on the line, then the comment will not be indented, and otherwise it may be
+#-csc
+#-nhsc
+-sbc		# static-block-comments == When -sbc is used, a block comment with a special leading pattern, ## by default, will be treated specially.
+#-msc=0
+-nbbc		# [no] blanks-before-comments == A blank line will NOT be introduced before a full-line comment
+-nbbb		# [no] blanks-before-blocks == A blank line will NOT be introduced before blocks of coding delimited by for, foreach, while, until, and if, unless...
+#-fpsc=0
+-sbc		# static-block-comments == When -sbc is used, a block comment with a special leading pattern, ## by default, will be treated specially.
+-ssc		# static-side-comments == When -ssc is used, a side comment with a static leading pattern, which is ## by default, will be be spaced only a single space from previous character, and it will not be vertically aligned with other side comments.
+-sbl		# opening-sub-brace-on-new-line == The flag -sbl can be used to override the value of -bl for opening sub braces.
+-cti=2
+#
+-mbl=2
+-kbl=1

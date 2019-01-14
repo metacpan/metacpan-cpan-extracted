@@ -189,6 +189,18 @@ SKIP: {
 	 sub { $root->load('warn_unless=foo2') ; $cmu->reload ;; ok(1,"test fix warn_unless ".$idx++)},
      sub { $cmu ->show_changes ; ok(1,"test show_changes ".$idx++)} ,
 
+     (
+         # test behavior when pasting data in tktree
+         # the 3 first items show an error message in TkUI message widget (bottom of widget)
+         map {
+             my $elt = $_;
+             sub {
+                 $cmu->on_cut_buffer_dump("test1.$elt", "test cut buffer dump string");
+                 ok(1,"test cut_buffer_dump on element $elt ".$idx++)
+             };
+         } qw/a_uniline olist ordered_checklist a_uniline lista/
+     ),
+
 	 sub { $mw->destroy; },
         unless $args->{show};
 

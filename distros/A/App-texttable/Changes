@@ -1,4 +1,7 @@
-Revision history for App-texttable
+0.030   2019-01-11 (PERLANCAR)
+
+	- Add options --backend (or -b) and -l.
+
 
 0.02    2016-01-18 (PERLANCAR)
 

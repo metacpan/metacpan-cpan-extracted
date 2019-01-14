@@ -1,3 +1,11 @@
+0.11, 2019-01-12
+
+ - repair broken list of dependencies
+
+0.10, 2019-01-12
+
+ - experimental support for Bolt
+
 0.09, 2018-12-03
 
  - implement Record->data() and StatementResult->keys()

@@ -64,6 +64,7 @@ my $opt_new = 1;
 my $opt_unknown = 1;
 my $opt_command = 1;
 my $opt_mark = 1;
+my $opt_graph = 1;
 
 my $opt_c;
 my $opt_u;
@@ -116,6 +117,7 @@ my @optargs = (
     "command!" => \$opt_command,
     "unknown!" => \$opt_unknown,
     "mark!" => \$opt_mark,
+    "graph!" => \$opt_graph,
 
     "i|ignore-case" => \$opt_i,
     "b|ignore-space-change" => \$opt_b,
@@ -180,9 +182,9 @@ my %colormap = do {
 };
 
 use Getopt::EX::Colormap;
-my $color_handler = new Getopt::EX::Colormap
-    HASH => \%colormap;
-$color_handler->load_params(@opt_colormap);
+my $color_handler = Getopt::EX::Colormap
+    ->new(HASH => \%colormap)
+    ->load_params(@opt_colormap);
 
 map  { $colormap{$_} = "" }
 map  { splice @$_, 1 }
@@ -205,6 +207,14 @@ if ($opt_colordump) {
 sub color {
     $color_handler->color(@_);
 }
+
+my $graph_prefix_re = do {
+    if ($opt_graph) {
+	qr/(?:\| )*(?:  )?/;
+    } else {
+	"";
+    }
+};
 
 my $DIFF;
 my $OLD;
@@ -362,9 +372,26 @@ while (<DIFF>) {
     #
     # diff -u
     #
-    elsif (/^\@\@ -\d+(?:,(\d+))? \+\d+(?:,(\d+))? \@\@/)  {
-	print_command($_);
-	my @buf = read_diffu(*DIFF, $1 // 1, $2 // 1);
+    elsif (m{^
+	   (?<prefix> $graph_prefix_re )
+	   (?<command>
+	     \@\@[ ]-\d+(?:,(?<o>\d+))?[ ]\+\d+(?:,(?<n>\d+))?[ ]\@\@
+	     (?s:.*)
+	   )
+	   }x) {
+	my($prefix, $command, $o, $n) = @+{qw(prefix command o n)};
+
+	use App::sdif::Divert;
+	my($divert, %opt);
+	if ($prefix) {
+	    $opt{prefix} = $prefix;
+	    $divert = new App::sdif::Divert FINAL => sub {
+		s/^/$prefix/mg;
+	    };
+	};
+
+	print_command($command);
+	my @buf = read_diffu(\%opt, *DIFF, $o // 1, $n // 1);
 	my $tab = $opt_T ? "\t" : "";
 	my $mark_re = qr/[\-\+]$tab/;
 	while (my($same, $old, $new) = splice(@buf, 0, 3)) {
@@ -730,19 +757,24 @@ sub read_diffc {
 
 my %slot;
 BEGIN {
-    %slot = (" " => 0, "\t" => 0, "-" => 1, "+" => 2);
+    %slot = ("\n" => 0, " " => 0, "\t" => 0, "-" => 1, "+" => 2);
 }
 sub read_diffu {
+    my $opt = ref $_[0] eq 'HASH' ? shift : {};
     my $FH = shift;
     my @l = (0, @_);
+    my $prefix = $opt->{prefix} // '';
 
     my $i = 0;
     my @buf;
     my $slot;
     while (2 * $l[0] + $l[1] + $l[2] > 0 and $_ = <$FH>) {
+	if ($prefix) {
+	    s/^\Q$prefix// or warn "Unexpected: $_";
+	}
 	# `git diff' produces message like this:
 	# "\ No newline at end of file"
-	/^[ \t\-\+]/ or next;
+	/^[^ \t\-\+\n]/ and next;
 	$i++ while ($i % 3) != ($slot = $slot{substr($_, 0, 1)});
 	$l[$slot]--;
 	$buf[$i] .= $_;
@@ -870,6 +902,9 @@ Options:
 	--[no]new	    print new text          (default true)
 	--[no]command	    print diff command line (default true)
 	--[no]unknown	    print unknown line      (default true)
+	--[no]mark	    print mark or not       (default true)
+	--[no]graph	    read git --graph output (default true)
+	--[no]mecab	    use mecab tokenizer     (default false)
 
 
 =head1 DESCRIPTION
@@ -1089,9 +1124,18 @@ this option is effective only for unified diff.
 Next example produces the output exactly same as I<new> except visual
 effects.
 
-    cdif -U100 --nomark --noold --nocommand --nounknown old new
+    cdif -U100 --no-mark --no-old --no-command --no-unknown old new
 
 These options are prepared for watchdiff(1) command.
+
+=item B<-->[B<no>]B<graph>
+
+Process B<git> B<--graph> option.
+
+=item B<-->[B<no>]B<mecab>
+
+Use B<mecab> command as a tokenizer.  External command B<mecab> is
+required.
 
 =item B<--stat>
 
@@ -1100,11 +1144,6 @@ of total appended/deleted/changed words in the context of cdif.  It's
 common to have many insertions and deletions of newlines because of
 text filling process.  So normal information is followed by modified
 number which ignores insert/delete newlines.
-
-=item B<--mecab>
-
-Experimental option for using B<mecab> as a tokenizer.  To use this
-option, external command B<mecab> has to be installed.
 
 =back
 

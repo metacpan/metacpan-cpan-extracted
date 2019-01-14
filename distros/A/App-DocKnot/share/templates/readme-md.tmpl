@@ -38,20 +38,12 @@ as any other Module::Build module:
 ```
     perl Build.PL
     ./Build
-    ./Build test
     ./Build install
 ```
 
 You will have to run the last command as root unless you're installing
 into a local Perl module tree in your home directory.
-[% IF build.lancaster %]
-To enable tests that don't detect functionality problems but are used to
-sanity-check the release, set the environment variable `RELEASE_TESTING`
-to a true value.  To enable tests that may be sensitive to the local
-environment or that produce a lot of false positives without uncovering
-many problems, set the environment variable `AUTHOR_TESTING` to a true
-value.
-[% END %][% ELSIF build.type == 'ExtUtils::MakeMaker' %]
+[% ELSIF build.type == 'ExtUtils::MakeMaker' %]
 ## Building and Installation
 
 [% name %] uses ExtUtils::MakeMaker and can be installed using the same
@@ -60,20 +52,12 @@ process as any other ExtUtils::MakeMaker module:
 ```
     perl Makefile.PL
     make
-    make test
     make install
 ```
 
 You'll probably need to do the last as root unless you're installing
 into a local Perl module tree in your home directory.
-[% IF build.lancaster %]
-To enable tests that don't detect functionality problems but are used to
-sanity-check the release, set the environment variable `RELEASE_TESTING`
-to a true value.  To enable tests that may be sensitive to the local
-environment or that produce a lot of false positives without uncovering
-many problems, set the environment variable `AUTHOR_TESTING` to a true
-value.
-[% END %][% ELSIF build.type == 'Autoconf' %][% IF build.install %]
+[% ELSIF build.type == 'Autoconf' %][% IF build.install %]
 ## Building and Installation
 
 You can build and install [% name %] with the standard commands:
@@ -163,13 +147,33 @@ that make shared library migrations more difficult.  If none of the above
 made any sense to you, don't bother with this flag.
 [% END %][% IF build.suffix %]
 [% build.suffix %]
-[% END %][% IF !readme.testing %]
+[% END %][% END %][% IF !readme.testing && (build.type == 'Module::Build' || build.type == 'ExtUtils::MakeMaker' || build.type == 'Autoconf') %]
 ## Testing
 [% IF test.prefix %]
 [% test.prefix %]
 [% ELSE %]
 [% name %] comes with a test suite, which you can run after building with:
-[% END %]
+[% END %][% IF build.type == 'Module::Build' %]
+```
+    ./Build test
+```
+
+If a test fails, you can run a single test with verbose output via:
+
+```
+    ./Build test --test_files <path-to-test>
+```
+[% ELSIF build.type == 'ExtUtils::MakeMaker' %]
+```
+    make test
+```
+
+If a test vails, you can run a single test with verbose output via:
+
+```
+    prove -vb <path-to-test>
+```
+[% ELSIF build.type == 'Autoconf' %]
 ```
     make check
 ```
@@ -182,7 +186,7 @@ If a test fails, you can run a single test with verbose output via:
 
 Do this instead of running the test program directly since it will ensure
 that necessary environment variables are set up.
-[% IF test.suffix %]
+[% END %][% IF test.suffix %]
 [% test.suffix %]
 [% END %][% IF build.lancaster %]
 To enable tests that don't detect functionality problems but are used to
@@ -191,12 +195,20 @@ to a true value.  To enable tests that may be sensitive to the local
 environment or that produce a lot of false positives without uncovering
 many problems, set the environment variable `AUTHOR_TESTING` to a true
 value.
-[% END %][% END %][% END %]
+[% END %][% END %]
 [% FOREACH section IN readme.sections %]## [% section.title %]
 
 [% section.body %]
 
-[% END %]## Support
+[% IF section.title == 'Testing' && build.lancaster %]
+To enable tests that don't detect functionality problems but are used to
+sanity-check the release, set the environment variable `RELEASE_TESTING`
+to a true value.  To enable tests that may be sensitive to the local
+environment or that produce a lot of false positives without uncovering
+many problems, set the environment variable `AUTHOR_TESTING` to a true
+value.
+
+[% END %][% END %]## Support
 
 The [[% name %] web page]([% support.web %]) will always have the current
 version of this package, the current documentation, and pointers to any

@@ -1,7 +1,7 @@
 package App::instopt;
 
-our $DATE = '2018-11-21'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-01-13'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -245,6 +245,7 @@ $SPEC{list_installed_versions} = {
 };
 sub list_installed_versions {
     my %args = @_;
+    my $state = _init(\%args);
 
     my $res = list_installed(%args, _software=>$args{software}, detail=>1);
     return $res unless $res->[0] == 200;
@@ -301,10 +302,10 @@ sub list_downloaded {
                 push @vers, $e;
             }
             unless (@vers) {
-                log_trace "Skipping software '$sw': no versions found";
+                log_trace "Skipping software '$sw': no downloaded versions found";
             }
             @vers = sort { $mod->cmp_version($a, $b) } @vers;
-            log_trace "Found versions %s for software '%s'", \@vers, $sw;
+            log_trace "Found downloaded versions %s for software '%s'", \@vers, $sw;
             push @rows, {
                 software => $sw,
                 latest_version => $vers[-1],
@@ -334,6 +335,7 @@ $SPEC{list_downloaded_versions} = {
 };
 sub list_downloaded_versions {
     my %args = @_;
+    my $state = _init(\%args);
 
     my $res = list_downloaded(%args, _software=>$args{software}, detail=>1);
     return $res unless $res->[0] == 200;
@@ -352,6 +354,7 @@ $SPEC{compare_versions} = {
 };
 sub compare_versions {
     my %args = @_;
+    my $state = _init(\%args);
 
     my $res;
 
@@ -531,6 +534,7 @@ sub cleanup_install_dir {
     require File::Path;
 
     my %args = @_;
+    my $state = _init(\%args);
 
     local $CWD = $args{install_dir};
     my $res = list_installed(%args, detail=>1);
@@ -570,6 +574,7 @@ sub cleanup_download_dir {
     require File::Path;
 
     my %args = @_;
+    my $state = _init(\%args);
 
     local $CWD = $args{download_dir};
     my $res = list_downloaded(%args, detail=>1);
@@ -806,7 +811,7 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.006 of App::instopt (from Perl distribution App-instopt), released on 2018-11-21.
+This document describes version 0.007 of App::instopt (from Perl distribution App-instopt), released on 2019-01-13.
 
 =head1 SYNOPSIS
 
@@ -1260,7 +1265,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

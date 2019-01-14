@@ -7,7 +7,7 @@ my $parser = HTML5::DOM->new;
 
 # parse some html
 my $tree = $parser->parse('
-	<label>Some list of OS:</lbnel>
+	<label>Some list of OS:</label>
 	<ul class="list" data-what="os" title="OS list">
 	   <li>UNIX</li>
 	   <li>Linux</li>

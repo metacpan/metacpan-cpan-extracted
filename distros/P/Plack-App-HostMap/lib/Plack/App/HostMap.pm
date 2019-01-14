@@ -1,8 +1,10 @@
 package Plack::App::HostMap;
-use strict;
-use warnings;
+
+use 5.008_005;
+our $VERSION = '0.007';
+
+use strictures 2;
 use parent qw/Plack::Component/;
-# ABSTRACT: Map multiple Plack apps by host 
 
 use Carp ();
 use Domain::PublicSuffix;
@@ -105,20 +107,12 @@ sub no_cache {
 
 __END__
 
-=pod
-
-=encoding UTF-8
-
 =head1 NAME
 
-Plack::App::HostMap - Map multiple Plack apps by host 
-
-=head1 VERSION
-
-version 0.006
-
+Plack::App::HostMap - Map multiple Plack apps by host
+ 
 =head1 SYNOPSIS
-
+ 
     use Plack::App::HostMap;
  
     my $foo_app = sub { ... };
@@ -143,9 +137,9 @@ version 0.006
     $host_map->map("*.foo.bar.com" => $foo_bar_app); #will match test.foo.bar.com, beta.foo.bar.com, beta.test.foo.bar.com, etc...
  
     my $app = $host_map->to_app;
-
+ 
 =head1 DESCRIPTION
-
+ 
 Plack::App::HostMap is a PSGI application that can dispatch multiple
 applications based on host name (a.k.a "virtual hosting"). L<Plack::App::URLMap> can
 also dispatch applications based on host name. However, it also more versatile and can dispatch
@@ -158,12 +152,12 @@ to dispatch by host name or 10,000, there shouldn't be a difference in terms of 
 time lookup.
 
 =head1 METHODS
-
+ 
 =head2 map
-
+ 
     $host_map->map("www.foo.com" => $foo_app);
     $host_map->map("bar.com" => $bar_app);
-
+ 
 Maps a host name to a PSGI application. You can also map multiple host names to
 one application at once by providing an array reference:
 
@@ -188,20 +182,20 @@ match the first rule it finds. For instance, if you have these two rules:
 
 And you request C<beta.foo.com>, it will match the C<$beta_foo_app>, not the C<$foo_app> because L<Plack::App::HostMap> will find
 C<beta.foo.com> before C<foo.com> when looking for a match. 
-
+ 
 =head2 mount
-
+ 
 Alias for C<map>.
-
+ 
 =head2 to_app
-
+ 
   my $handler = $host_map->to_app;
-
+ 
 Returns the PSGI application code reference. Note that the
 Plack::App::HostMap object is callable (by overloading the code
 dereference), so returning the object itself as a PSGI application
 should also work.
-
+ 
 =head2 no_cache
 
     $host_map->no_cache(1);
@@ -243,7 +237,7 @@ that is used for caching is never even used. Also, in order to avoid letting the
 actually map to a rule that you set. This way even if caching is on, someone can not make tons of requests with different hosts to your server and crash it.
 
 =head1 PERFORMANCE
-
+ 
 Note: This only applies if L</no_cache> is set to 1. 
 As mentioned in the L<DESCRIPTION|/"DESCRIPTION">, Plack::App::HostMap should perform
 much more efficiently than L<Plack::App::URLMap> when being used for host names. One
@@ -271,13 +265,13 @@ and it might be more worth it to use the convenient syntax.
 
 =head1 AUTHOR
 
-Adam Hopkins <srchulo@cpan.org>
+Adam Hopkins E<lt>srchulo@cpan.orgE<gt>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT
 
-This software is copyright (c) 2014 by Adam Hopkins.
+Copyright 2019- Adam Hopkins
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+=head1 LICENSE
 
-=cut
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -17,13 +17,20 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Address::PostCode::India:
+    file: lib/Address/PostCode/India.pm
+    version: '0.12'
+  Address::PostCode::India::Place:
+    file: lib/Address/PostCode/India/Place.pm
+    version: '0.12'
 requires:
   Address::PostCode::UserAgent: '0.08'
   JSON: '0'
   Moo: '0'
-  namespace::clean: '0'
+  namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/Manwar/Address-PostCode-India.git
-version: '0.09'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

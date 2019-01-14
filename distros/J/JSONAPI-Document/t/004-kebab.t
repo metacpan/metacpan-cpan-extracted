@@ -45,8 +45,8 @@ is_deeply(
         relationships => {
             'email-templates' => {
                 links => {
-                    related => 'http://example.com/api/authors/1/relationships/email-templates',
-                    self    => 'http://example.com/api/authors/1/email-templates',
+                    self    => 'http://example.com/api/authors/1/relationships/email-templates',
+                    related => 'http://example.com/api/authors/1/email-templates',
                 },
                 data => [{
                         id   => 1,

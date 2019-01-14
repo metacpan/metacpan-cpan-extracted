@@ -8,7 +8,7 @@ package Devel::MAT::Dumper;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use File::Basename qw( basename );
 use File::Spec;
@@ -72,6 +72,11 @@ received. The signal handler will remain in place and can be used several
 times.
 
    $ perl -MDevel::MAT::Dumper=-dump_at_SIGQUIT ...
+
+Take care if you are using the C<< <Ctrl-\> >> key combination on a terminal
+to send this signal to a foreground process, because if it has C<fork()>ed any
+background workers or similar, the signal will also be delivered to those as
+well.
 
 =head2 -dump_at_SIGI<NAME>
 

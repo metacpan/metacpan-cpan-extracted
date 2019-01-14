@@ -1,30 +1,68 @@
-SYNOPSIS
+NAME
+    File::Slurper::Temp - File::Slurper + File::Temp
 
-    Use like you would use File::Slurper's write_text or write_binary:
+VERSION
+    This document describes version 0.004 of File::Slurper::Temp (from Perl
+    distribution File-Slurper-Temp), released on 2019-01-14.
+
+SYNOPSIS
+    Use like you would use File::Slurper's "write_text" or "write_binary":
 
      use File::Slurper::Temp qw(write_text write_binary);
      write_text("/tmp/foo.txt", "some text");
      write_binary("/tmp/bar", $somedata);
 
-DESCRIPTION
+    Use "write_text_to_tempfile" and "write_binary_to_tempfile":
 
+     use File::Slurper::Temp qw(write_text_to_tempfile write_binary_to_tempfile);
+     my $filename1 = write_text_to_tempfile("some text");
+     my $filename2 = write_binary_to_tempfile($somedata);
+
+DESCRIPTION
     This module is a simple combination of File::Slurper and File::Temp. It
-    provides write_text and write_binary. The functions are the same as
-    their original in File::Slurper but they will first write to a
-    temporary file created by File::Temp's tempfile, then rename the
-    temporary file to the originally specified name. If the filename is
-    originally a symlink, it will be replaced with a regular file. This can
-    avoid symlink attack.
+    provides "write_text" and "write_binary". The functions are the same as
+    their original in File::Slurper but they will first write to a temporary
+    file created by File::Temp's "tempfile", then rename the temporary file
+    to the originally specified name. If the filename is originally a
+    symlink, it will be replaced with a regular file. This can avoid symlink
+    attack.
+
+    In addition to that, this module also provides "write_text_to_tempfile"
+    and "write_binary_to_tempfile". You don't have to specify filename but
+    just content to write and the functions will return the temporay
+    filename created.
 
 FUNCTIONS
+  write_text
+  write_binary
+  write_text_to_tempfile
+  write_binary_to_tempfile
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Slurper-Temp>.
 
- write_text
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Slurper-Temp>.
 
- write_binary
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Slurper-Temp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     File::Slurper
 
     File::Temp
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

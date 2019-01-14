@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -ex
+
+cip exec cpanm -n Net::SSLeay IO::Socket::SSL Capture::Tiny Test::Memory::Cycle HTTP::Proxy
+cip exec cpanm -n EV || true
+cip exec cpanm -n Mojolicious || true
+cip exec-background perl maint/proxy.pl

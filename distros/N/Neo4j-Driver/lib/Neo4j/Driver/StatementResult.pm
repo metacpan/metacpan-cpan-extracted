@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::StatementResult;
 # ABSTRACT: Result of running a Cypher statement (a list of records)
-$Neo4j::Driver::StatementResult::VERSION = '0.09';
+$Neo4j::Driver::StatementResult::VERSION = '0.11';
 
 use Carp qw(carp croak);
 
@@ -109,7 +109,7 @@ Neo4j::Driver::StatementResult - Result of running a Cypher statement (a list of
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -210,7 +210,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2018 by Arne Johannessen.
+This software is Copyright (c) 2016-2019 by Arne Johannessen.
 
 This is free software, licensed under:
 

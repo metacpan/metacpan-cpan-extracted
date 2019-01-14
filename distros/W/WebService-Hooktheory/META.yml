@@ -6,7 +6,10 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Mojo::Base: '0'
+  Mojolicious: '0'
   Test::More: '0'
+  Try::Tiny: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
@@ -24,6 +27,7 @@ requires:
   Carp: '0'
   Mojo::JSON: '0'
   Mojo::JSON::MaybeXS: '0'
+  Mojo::URL: '0'
   Mojo::UserAgent: '0'
   Moo: '0'
   namespace::clean: '0'
@@ -32,7 +36,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Hooktheory
   repository: https://github.com/ology/WebService-Hooktheory
-version: '0.0300'
+version: '0.0400'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -204,6 +208,7 @@ x_Dist_Zilla:
           stopwords:
             - DBOOK
             - activkey
+            - ua
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'
@@ -211,8 +216,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename:
-            - LICENSE
+          exclude_filename: []
           exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
@@ -232,10 +236,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::License
-      name: License
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Readme

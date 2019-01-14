@@ -1,5 +1,10 @@
 Revision history for Perl module Business::Hours
 
+0.13
+  * Use explicit 4 digit years when using localtime. This fixes
+    some test failures that started after 2018-12-31 because of
+    date math.
+
 0.12
   * merge of 0.11 and 0.10_01:
   ** support shifts over midnight

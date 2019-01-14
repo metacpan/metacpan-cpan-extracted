@@ -1,5 +1,8 @@
 Revision history for BioX-Seq
 
+0.007003 2019-01-11
+         Fix missing build dependency for Test::Exception
+
 0.007002 2019-01-10
          Write FASTA index files in raw mode for consistency on all platforms
          Expanded test coverage

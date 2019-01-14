@@ -11,7 +11,7 @@ BEGIN {
 }
 use Pod::Coverage::TrustPod;
 
-my %skip = map { $_ => 1 } qw(  );
+my %skip = map { $_ => 1 } qw( Alien::libuv::Install::Files );
 
 my @modules;
 for my $module ( all_modules() ) {

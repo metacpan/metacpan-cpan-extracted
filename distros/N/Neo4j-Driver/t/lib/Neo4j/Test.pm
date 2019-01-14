@@ -2,6 +2,7 @@ package Neo4j::Test;
 use strict;
 use warnings;
 
+use URI;
 use Neo4j::Driver;
 
 my $ok;
@@ -46,8 +47,11 @@ sub driver {
 sub driver_ok { $ok }
 
 
-# used for the ResultSummary test
-sub server_address { $ENV{TEST_NEO4J_SERVER} || 'localhost:7474' }
+# used for the ResultSummary/ServerInfo test
+sub server_address {
+	return 'localhost:7474' unless $ENV{TEST_NEO4J_SERVER};
+	return '' . URI->new( $ENV{TEST_NEO4J_SERVER} )->host_port;
+}
 
 
 1;

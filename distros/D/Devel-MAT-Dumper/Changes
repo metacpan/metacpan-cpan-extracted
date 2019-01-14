@@ -1,5 +1,13 @@
 Revision history for Devel-MAT-Dumper
 
+0.38    2019-01-14 17:44:15
+        [CHANGES]
+         * Capture saved values of 'local' variables and aggregate slots on
+           perl 5.18+ (RT125918)
+         * Add an entire new (experimental) mechanism for thirdparty XS
+           modules to provide additional annotations for SV to SV references
+         * Define PMAT format 0.4, which adds a table of SV extension sizes
+
 0.37    2018-07-24 17:55:09
         [CHANGES]
          * Define PMAT format 0.3, which represents undef SCALARs more

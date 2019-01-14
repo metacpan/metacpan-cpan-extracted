@@ -1,7 +1,7 @@
 package SQL::Schema::Versioned;
 
-our $DATE = '2018-06-06'; # DATE
-our $VERSION = '0.236'; # VERSION
+our $DATE = '2019-01-13'; # DATE
+our $VERSION = '0.237'; # VERSION
 
 use 5.010001;
 use strict;
@@ -96,7 +96,8 @@ a.k.a. v0 to v1), which is basically the same thing.
 This routine will check the existence of the `meta` table and the current schema
 version. If `meta` table does not exist yet, the SQL statements in `install`
 will be executed. The `meta` table will also be created and a row
-`('schema_version', 1)` is added.
+`('schema_version', 1)` is added. The (`schema_summary`, <SUMMARY>) row will
+also be added if your spec specifies a `summary`.
 
 If `meta` table already exists, schema version will be read from it and one or
 more series of SQL statements from `upgrade_to_v$VERSION` will be executed to
@@ -139,6 +140,7 @@ from the `daily_price` e.g. to calculate 52-week momentum, and writes to the
     # spec for the price application component
     {
         component_name => 'price',
+        summary => "Price application component",
         latest_v => 1,
         provides => ['daily_price', 'spot_price'],
         install => [...],
@@ -148,6 +150,7 @@ from the `daily_price` e.g. to calculate 52-week momentum, and writes to the
     # spec for the portfolio application component
     {
         component_name => 'portfolio',
+        summary => "Portfolio application component",
         latest_v => 1,
         provides => ['account', 'balance', 'tx'],
         deps => {
@@ -161,6 +164,7 @@ from the `daily_price` e.g. to calculate 52-week momentum, and writes to the
     # spec for the trade application component
     {
         component_name => 'trade',
+        summary => "Trade application component",
         latest_v => 1,
         provides => ['order'],
         deps => {
@@ -179,12 +183,12 @@ and `deps`.
 When `component_name` is set, then instead of the `schema_version` key in the
 `meta` table, your component will use the `schema_version.<COMPONENT_NAME>` key.
 When `component_name` is not set, it is assumed to be `main` and the
-`schema_version` key is used in the `meta` table.
+`schema_version` key is used in the `meta` table. The component `summary`, if
+specified, will also be written to `schema_summary.<COMPONENT_NAME>` key.
 
 `provides` is an array of tables to help this routine know which table(s) your
 component create and maintain. If unset, this routine will try to guess from
-looking at "CREATE TABLE" SQL statements. It is recommended that you supply
-`provides` to makes things easier.
+looking at "CREATE TABLE" SQL statements.
 
 This routine will create `table.<TABLE_NAME>` keys in the `meta` table to record
 which components currently maintain which tables. The value of the key is
@@ -407,6 +411,22 @@ sub create_or_update_db_schema {
         "";
     };
 
+    my $code_update_summary = sub {
+        my $key = "schema_summary".($comp eq 'main' ? '' : ".$comp");
+        my ($cur_summary) = $dbh->selectrow_array(
+            "SELECT value FROM meta WHERE name=?", {}, $key);
+        $cur_summary //= "";
+        my $new_summary = $spec->{summary} // "";
+        return "" if $cur_summary eq $new_summary;
+        $dbh->do("REPLACE INTO meta (name, value) VALUES (?, ?)",
+                 {},
+                 $key,
+                 $new_summary,
+             ) or return $dbh->errstr;
+        # success
+        "";
+    };
+
     my $begun;
     my $res;
 
@@ -518,6 +538,7 @@ sub create_or_update_db_schema {
 
         if ($current_v == $latest_v) {
             if (my $up_res = $code_update_provides->()) { $res = [500, "Couldn't update provides information: $up_res"]; last SETUP }
+            if (my $us_res = $code_update_summary->())  { $res = [500, "Couldn't update summary: $us_res"]; last SETUP }
         }
 
         $dbh->commit or do { $res = [500, "Couldn't commit: ".$dbh->errstr]; last SETUP };
@@ -552,7 +573,7 @@ SQL::Schema::Versioned - Routine and convention to create/update your applicatio
 
 =head1 VERSION
 
-This document describes version 0.236 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2018-06-06.
+This document describes version 0.237 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2019-01-13.
 
 =head1 DESCRIPTION
 
@@ -583,7 +604,7 @@ C<install_v1> so you can test migration from v1->v2, v2->v3, and so on.
 
 Usage:
 
- create_or_update_db_schema(%args) -> [status, msg, result, meta]
+ create_or_update_db_schema(%args) -> [status, msg, payload, meta]
 
 Routine and convention to create/update your application's DB schema.
 
@@ -618,7 +639,8 @@ a.k.a. v0 to v1), which is basically the same thing.
 This routine will check the existence of the C<meta> table and the current schema
 version. If C<meta> table does not exist yet, the SQL statements in C<install>
 will be executed. The C<meta> table will also be created and a row
-C<('schema_version', 1)> is added.
+C<('schema_version', 1)> is added. The (C<schema_summary>, <SUMMARY>) row will
+also be added if your spec specifies a C<summary>.
 
 If C<meta> table already exists, schema version will be read from it and one or
 more series of SQL statements from C<upgrade_to_v$VERSION> will be executed to
@@ -661,6 +683,7 @@ C<balance> tables. Here are the C<spec>s for each component:
  # spec for the price application component
  {
      component_name => 'price',
+     summary => "Price application component",
      latest_v => 1,
      provides => ['daily_price', 'spot_price'],
      install => [...],
@@ -670,6 +693,7 @@ C<balance> tables. Here are the C<spec>s for each component:
  # spec for the portfolio application component
  {
      component_name => 'portfolio',
+     summary => "Portfolio application component",
      latest_v => 1,
      provides => ['account', 'balance', 'tx'],
      deps => {
@@ -683,6 +707,7 @@ C<balance> tables. Here are the C<spec>s for each component:
  # spec for the trade application component
  {
      component_name => 'trade',
+     summary => "Trade application component",
      latest_v => 1,
      provides => ['order'],
      deps => {
@@ -701,12 +726,12 @@ and C<deps>.
 When C<component_name> is set, then instead of the C<schema_version> key in the
 C<meta> table, your component will use the C<< schema_version.E<lt>COMPONENT_NAMEE<gt> >> key.
 When C<component_name> is not set, it is assumed to be C<main> and the
-C<schema_version> key is used in the C<meta> table.
+C<schema_version> key is used in the C<meta> table. The component C<summary>, if
+specified, will also be written to C<< schema_summary.E<lt>COMPONENT_NAMEE<gt> >> key.
 
 C<provides> is an array of tables to help this routine know which table(s) your
 component create and maintain. If unset, this routine will try to guess from
-looking at "CREATE TABLE" SQL statements. It is recommended that you supply
-C<provides> to makes things easier.
+looking at "CREATE TABLE" SQL statements.
 
 This routine will create C<< table.E<lt>TABLE_NAMEE<gt> >> keys in the C<meta> table to record
 which components currently maintain which tables. The value of the key is
@@ -791,7 +816,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -858,7 +883,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,9 @@
+1.817   2019-01-14 (PERLANCAR)
+
+	- Remove --format, --json, --naked-res when function metadata
+	  specifies cmdline.skip_format => 1.
+
+
 1.816   2018-11-22 (PERLANCAR)
 
 	- [ux] Dump %main::SPEC to x.main.spec.

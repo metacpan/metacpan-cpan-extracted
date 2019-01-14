@@ -18,7 +18,7 @@ my %module_build_args = (
     "Maty\x{e1}\x{161} Kopp <matyas.kopp\@gmail.com>"
   ],
   "dist_name" => "PMLTQ-Command-printtrees",
-  "dist_version" => "0.1.1",
+  "dist_version" => "1.0.1",
   "license" => "perl",
   "module_name" => "PMLTQ::Command::printtrees",
   "recursive_test_files" => 1,
@@ -28,7 +28,9 @@ my %module_build_args = (
     "File::ShareDir" => "1.102",
     "File::Which" => "1.22",
     "Hash::Merge" => 0,
-    "PMLTQ" => "v1.4.0"
+    "PMLTQ" => "v2.0.0",
+    "PMLTQ::Commands" => "v2.0.0",
+    "Parallel::ForkManager" => "1.19"
   },
   "share_dir" => {
     "dist" => "share"

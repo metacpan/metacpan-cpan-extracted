@@ -1,5 +1,9 @@
 Revision history for Plack::App::HostMap
 
+0.007  2019-01-13 15:14:01 CST
+    - Updated to using Dist::Milla for releases
+    - use strictures
+
 0.006     2014-08-04 19:18:28-05:00 America/Chicago
     Fixed Hostmap to HostMap
 

@@ -1,5 +1,155 @@
 Imager release history.  Older releases can be found in Changes.old
 
+Imager 1.009 - 11 Jan 2009
+============
+
+Critical issue:
+
+ - drawing a filled, anti-aliased circle to the left or right of the
+   image (not within the image at all) would cause a buffer overflow.
+   https://rt.cpan.org/Ticket/Display.html?id=128208
+
+General changes:
+
+ - to_paletted() and make_palette() now fail (with an error in
+   errstr()) if invalid quantization parameters are supplied.
+
+ - map() would corrupt a channel if there was a gap in the arrayref of
+   channels.  Detected by Coverity.  CID 185300.
+
+ - most numeric parameters to the XS implementation now throw an
+   exception if supplied an unoverloaded reference.
+   https://rt.cpan.org/Ticket/Display.html?id=128208
+
+Coverity finally finished a build[1], fixed several of the problems
+found.  Coverity went down before I could finish working through them.
+
+High severity:
+
+ - reading a color-mapped TGA file with an id string would cause a
+   double-free if the palette was truncated. CID 185317.
+
+ - mixing scaling to sizes where the accumulator row, the working
+   output row or the working input row didn't fit into the address
+   space could result in memory leaks.  This can probably only be
+   reproduced on very wide floating-point sample images. CID 185318.
+
+ - convert an array style function parameter pointer to pointer style
+   to prevent confusing Coverity in the T1 bounding box implementation.
+   CID 185343.
+
+ - Similarly in the FT1 bounding box implementation. CID 185338.
+
+ - Similarly for the i_tt_rasterize() function in the FT1
+   implementation.  CID 185303.
+
+ - initialize a pointer to prevent Coverity complaining in polygon
+   drawing (it should always end up being set.) CID 185341.
+
+ - addi style makemap could potentially read one past the end of an
+   array. CID 185337.
+
+ - supplying a numeric hatch of 32 to Imager::Fill->new(hatch => ...)
+   would result in read beyond the end of the built-in hatch array.
+   Negative values (which Coverity didn't complain about) could also
+   cause problems.  CID 185331.
+
+ - the Imager::Color set_internal() interal method no longer
+   calls the over-complicated ICL_set_internal() (which is retained
+   only for the old API.)  Coverity complained that this leaked, but
+   this could only occur with an invalid (NULL pointer) color object.
+   CID 185323.
+
+ - the underlying implementation of the map() method could read before
+   the beginning on an allocated array if supplied with inconsistent
+   parameters, which Coverity complained about.  No Imager code calls
+   that function with inconsistent parameters, but a
+   belt-and-suspenders check was added. CID 185315.
+
+ - Coverity complained a call to i_getcolors(), used by the
+   implementation of the is_bilevel() method could leave the fetched
+   colors uninitialized.  Added a return value check. CID 185308.
+
+ - a numeric combining mode of 13 (eg. as a parameter to
+   Imager::Fill->new())could cause an invalid array read in
+   i_get_combine() due to a fencepost error in validating the combine
+   number.  CID 185299.
+
+Lower severity (according to Coverity):
+
+ - avoid an unneeded EXTEND() call when the FT1 has_chars()
+   implementation returns 0. CID 185350.
+
+ - avoid accessing a possibly NULL map from MakeMapObject() in a
+   logging call. (GIF) CID 185296.
+
+ - gradgen() allocated the wrong amount of space (always too much) for
+   the color array.  CID 185291.
+
+ - avoid dead code in i_tt_glyph_names(). CID 185321.
+
+ - avoid dead code in i_get_anonymous_color_histo(), which is the
+   implementation of getcolorusage().  CID 185327.
+
+ - avoid dead code in i_ft2_glyph_name(), which is the implementation
+   of glyph_names() for FT2.  CID 185342.
+
+ - avoid dead code in i_t1_glyph_names(), which is the implementation
+   of glyph_names() for T1.  CID 185322.
+
+ - avoid an unneeded EXTEND() call when the FT2 has_chars()
+   implementation returns 0. CID 185292.
+
+ - the unpack code for ICO/CUR file handling could extend 32-bit
+   unsigned values to 64-bit signed.  I believe this is harmless. CID
+   185319.
+
+ - remove an unneeded check when terminating the stream for JPEG
+   writing.  CID 185347.
+
+ - skip an unneeded check when freeing the combine temp buffer in the
+   fountain filter.  CID 185286.
+
+ - check the combine function pointer consistently rather than the
+   combine code in one place in the fountain filter.
+
+ - error diffusion now validates a custom error diffusion map and reports
+   an error if it's bad.  CID 185288.
+
+ - avoid discarding the value of i_io_getc() when scanning numbers in
+   pnm.c.  CID 185293.
+
+ - handle failure to clone the log filehandle when cloning the Imager
+   context object on thread creation.  CID 185294.
+
+ - fix an unsigned comparison when converting character code to a
+   glyph index with a NULL character map when calculating the glyph
+   for display for FT1.  This should be rare.  CID 185297.
+
+ - fix a similar bug when calculating whether a glyph is present for
+   has_chars() for FT1.  CID 185302.
+
+ - i_img_info() (C API) no longer tries to handle a NULL image object
+   pointer.  CID 185298.
+
+ - re-work testing for size_t overflow for circle/random
+   super-sampling for fountain fills.  CID 185304.
+
+ - don't check if the unsigned size passed to Imager's malloc wrapper
+   (mymalloc) is negative.  Left from when that parameter was signed.
+   CID 185305.
+
+ - make some types larger and add a cast to prevent integer overflows
+   when calculating a palette with median cut for extraordinarily
+   large images.  CID 185306.
+
+ - don't check if the unsigned size supplied to
+   im_set_image_file_limits() is negative.  CID 185307.
+
+[1] The first two build submissions ended up at the end of a ~400 item
+build queue, and seemed to have been cancelled by Coverity.  A build
+submitted on NYE went through in minutes.
+
 Imager 1.008 - 31 Dec 2018
 ============
 

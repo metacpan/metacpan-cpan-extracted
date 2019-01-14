@@ -4,7 +4,7 @@
       "Jesse Vincent (jesse@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -38,5 +38,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.12"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

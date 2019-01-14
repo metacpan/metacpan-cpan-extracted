@@ -1,0 +1,54 @@
+NAME
+    Regexp::Pattern::Net - Regexp patterns related to network
+
+VERSION
+    This document describes version 0.002 of Regexp::Pattern::Net (from Perl
+    distribution Regexp-Pattern-Net), released on 2019-01-14.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Net::ipv4");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+PATTERNS
+    *   ipv4
+
+        Match an IPv4 address.
+
+        Examples:
+
+         "1.2.3.4" =~ re("Net::ipv4");  # matches
+
+         "1.256.3.4" =~ re("Net::ipv4");  # doesn't match
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Net>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Net>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Net>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern
+
+    Regexp::Common, particularly Regexp::Common::net
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

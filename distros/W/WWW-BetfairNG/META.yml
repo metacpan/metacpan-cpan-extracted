@@ -26,4 +26,4 @@ requires:
   Net::Ping: '0'
   Net::SSLeay: '1.49'
   perl: '5.010001'
-version: '0.14'
+version: '0.15'

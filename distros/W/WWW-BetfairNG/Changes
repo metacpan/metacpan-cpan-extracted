@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW::BetfairNG.
 
+0.15  Fri Jan 11 21:00:00 2019
+        - Changed Certificate Login Endpoint to reflect change made by Betfair
+	  and effective from Tue 22 Jan 2019. From that date, the endpoint is
+	  'https://identitysso-cert.betfair.com/api/certlogin/'
+
 0.14  Thu Apr 06 19:00:00 2017
         - Added support for the 'listRunnerBook' method introduced by Betfair
           on 2017-03-28.

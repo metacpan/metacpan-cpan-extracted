@@ -18,6 +18,7 @@ use File::Spec;
 use lib 'blib/lib';
 
 use App::DocKnot;
+use App::DocKnot::Generate;
 
 # For each subdirectory of t/data, regenerate each file in the output
 # subdirectory using the metadata subdirectory and the template matching the
@@ -38,12 +39,9 @@ for my $package (@packages) {
     my $output = File::Spec->catdir($data, $package, 'output');
     opendir(my $outputdir, $output);
     for my $template (File::Spec->no_upwards(readdir($outputdir))) {
-        my $docknot = App::DocKnot->new({ metadata => $metadata });
+        my $docknot = App::DocKnot::Generate->new({ metadata => $metadata });
         my $outpath = File::Spec->catdir($output, $template);
-        open(my $outfh, '>', $outpath);
-        print {$outfh} $docknot->generate($template)
-          or die "$0: cannot write to $outpath: $!\n";
-        close($outfh);
+        $docknot->generate_output($template, $outpath);
     }
     closedir($outputdir);
 }

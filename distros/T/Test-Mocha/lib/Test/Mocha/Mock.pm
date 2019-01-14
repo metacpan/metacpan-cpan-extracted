@@ -1,6 +1,6 @@
 package Test::Mocha::Mock;
 # ABSTRACT: Mock objects
-$Test::Mocha::Mock::VERSION = '0.64';
+$Test::Mocha::Mock::VERSION = '0.65';
 use parent 'Test::Mocha::SpyBase';
 use strict;
 use warnings;

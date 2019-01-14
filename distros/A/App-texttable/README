@@ -1,7 +1,84 @@
+NAME
+    App::texttable - Generate text table using Text::Table::Any
+
+VERSION
+    This document describes version 0.030 of App::texttable (from Perl
+    distribution App-texttable), released on 2019-01-11.
+
 DESCRIPTION
+FUNCTIONS
+  texttable
+    Usage:
+
+     texttable(%args) -> any
+
+    Render a text table using Text::Table::Any.
+
+    Examples:
+
+    *   Example #1:
+
+         texttable(
+         rows => [
+             ["Name", "Gender", "Age"],
+             ["ujang", "M", 28],
+             ["iteung", "F", 25],
+           ]
+         );
+
+        Result:
+
+         [
+           200,
+           "OK",
+           "+--------+--------+-----+\n| Name   | Gender | Age |\n| ujang  | M      | 28  |\n| iteung | F      | 25  |\n+--------+--------+-----+\n",
+         ]
+
+    *   List available backends:
+
+         texttable( action => "list_backends");
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "gen_table")
+
+    *   backend => *str*
+
+    *   header_row => *bool* (default: 0)
+
+    *   rows => *array[array[str]]*
+
+        Table rows.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-texttable>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-texttable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-texttable>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     App::TableDataUtils distribution which also contains some utilities to
     generate text table.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

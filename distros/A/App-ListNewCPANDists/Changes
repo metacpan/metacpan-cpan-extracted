@@ -1,3 +1,19 @@
+0.010   2019-01-13 (PERLANCAR)
+
+	- [bugfix] to_time might not be defined [reported by Chris Hills].
+
+	- Add example for list-new-cpan-dists [GH#1].
+
+	- Enable logging for the CLIs.
+
+
+0.009   2019-01-13 (PERLANCAR)
+
+	- Specify database schema summary.
+
+	- [Bugfix] Fix printing status/reason.
+
+
 0.008   2018-09-02 (PERLANCAR)
 
 	- Add filter arguments: exclude_{dists,dist_re,authors,author_re}.

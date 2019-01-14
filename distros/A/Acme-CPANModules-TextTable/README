@@ -1,0 +1,100 @@
+NAME
+    Acme::CPANModules::TextTable - Modules that generate text tables
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::TextTable
+    (from Perl distribution Acme-CPANModules-TextTable), released on
+    2019-01-11.
+
+DESCRIPTION
+    Modules that generate text tables.
+
+INCLUDED MODULES
+    *   Text::ANSITable
+
+    *   Text::ASCIITable
+
+    *   Text::FormatTable
+
+    *   Text::MarkdownTable
+
+    *   Text::Table
+
+    *   Text::Table::Tiny
+
+    *   Text::Table::TinyColor
+
+    *   Text::Table::TinyColorWide
+
+    *   Text::Table::TinyWide
+
+    *   Text::Table::Org
+
+    *   Text::Table::CSV
+
+    *   Text::Table::HTML
+
+    *   Text::Table::HTML::DataTables
+
+    *   Text::TabularDisplay
+
+FEATURE COMPARISON MATRIX
+     +-------------------------------+--------------+-----------+---------------+
+     | module                        | box_char *1) | color *2) | wide_char *3) |
+     +-------------------------------+--------------+-----------+---------------+
+     | Text::ANSITable               | yes          | yes       | yes           |
+     | Text::ASCIITable              | no           | no        | no            |
+     | Text::FormatTable             | no           | no        | no            |
+     | Text::MarkdownTable           | no           | no        | no            |
+     | Text::Table                   | N/A *4)      | no        | no            |
+     | Text::Table::Tiny             | no           | no        | no            |
+     | Text::Table::TinyColor        | no           | yes       | no            |
+     | Text::Table::TinyColorWide    | no           | yes       | yes           |
+     | Text::Table::TinyWide         | no           | no        | yes           |
+     | Text::Table::Org              | no           | no        | no            |
+     | Text::Table::CSV              | N/A *5)      | no        | yes           |
+     | Text::Table::HTML             | N/A          | N/A       | N/A           |
+     | Text::Table::HTML::DataTables | N/A          | N/A       | N/A           |
+     | Text::TabularDisplay          | N/A *6)      | no        | yes           |
+     +-------------------------------+--------------+-----------+---------------+
+
+    Notes:
+
+    1. box_char: Whether the module can utilize box-drawing characters
+    2. color: Whether the module supports ANSI colors
+    3. wide_char: Whether the use of wide characters (e.g. Kanji) in cells
+    does not cause the table to be misaligned
+    4. Does not draw borders
+    5. Irrelevant
+    6. Irrelevant
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-TextTable>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-TextTable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Text
+    Table>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

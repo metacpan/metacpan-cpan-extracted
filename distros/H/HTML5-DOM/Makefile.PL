@@ -9,7 +9,13 @@ my $source_dir = $FindBin::Bin ."/third_party/modest/include";
 my $port = "posix";
 my $modest_source = "third_party/modest/source";
 
-$port = 'windows_nt' if ($^O =~ /MSWin/i);
+my $libs = [];
+
+if ($^O =~ /MSWin/i) {
+	$port = 'windows_nt';
+} else {
+	$libs = ["-lpthread", "-lm"];
+}
 
 my $defines = "";
 if ($^O =~ /openbsd/i) {
@@ -22,6 +28,7 @@ if ($^O =~ /openbsd/i) {
 
 my $sources = [
 	"DOM.o", 
+	"utils.o", 
 	"modest_modest.o", 
 	"modest_mycore.o", 
 	"modest_mycss.o", 
@@ -44,10 +51,21 @@ WriteMakefile(
 	NAME			=> 'HTML5::DOM',
 	LICENSE			=> 'MIT',
 	LINKTYPE		=> 'dynamic',
-	LIBS			=> ["-lpthread", "-lm"],
+	LIBS			=> $libs,
 	DEFINE			=> $defines, 
-	CCFLAGS			=> " -std=c99 ". $Config{ccflags},
+	CCFLAGS			=> " -std=c99 ".$Config{ccflags},
 	INC				=> "-I$source_dir",
 	OBJECT			=> join(" ", @$sources), 
-	test			=> {TESTS => 't/*.t t/*/*.t'}
+	test			=> {TESTS => 't/*.t t/*/*.t'}, 
+	
+	(eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
+				type	=> 'git',
+				url		=> 'https://github.com/Azq2/perl-html5-dom.git',
+				web		=> 'https://github.com/Azq2/perl-html5-dom',
+			},
+		}}) : ()
+	),
 );

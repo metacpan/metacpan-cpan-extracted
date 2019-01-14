@@ -1,0 +1,12 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+README.md
+dist.ini
+lib/PMLTQ/CGI.pm
+t/00-compile.t

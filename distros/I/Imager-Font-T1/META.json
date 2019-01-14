@@ -4,9 +4,9 @@
       "Tony Cook <tonyc@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -38,17 +38,26 @@
             "Imager" : "0.95",
             "XSLoader" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
+         "mailto" : "bug-Imager@rt.cpan.org",
          "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager"
       },
       "homepage" : "http://imager.perl.org/",
       "repository" : {
-         "url" : "git://git.imager.perl.org/imager.git"
+         "type" : "git",
+         "url" : "git://git.imager.perl.org/imager.git",
+         "web" : "http://git.imager.perl.org/imager.git"
       }
    },
-   "version" : "1.024"
+   "version" : "1.026",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

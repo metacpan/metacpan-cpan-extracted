@@ -11,6 +11,8 @@ MANIFEST
 mysqlx.h
 mysqlx.xs
 README.md
+t/column_types.t
 t/do1.t
+t/last_insertid.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

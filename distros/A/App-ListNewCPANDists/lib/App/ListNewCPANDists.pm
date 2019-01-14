@@ -1,7 +1,7 @@
 package App::ListNewCPANDists;
 
-our $DATE = '2018-09-02'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2019-01-13'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,6 +14,7 @@ my $sch_date = ['date*', 'x.perl.coerce_to' => 'DateTime'];
 my $URL_PREFIX = 'https://fastapi.metacpan.org/v1';
 
 our $db_schema_spec = {
+    summary => __PACKAGE__,
     latest_v => 1,
     install => [
         'CREATE TABLE release (
@@ -172,7 +173,7 @@ sub _get_dist_first_release {
     });
 
     die "Can't retrieve first release information of distribution '$dist': ".
-        "$res->[0] - $res->[1]\n" unless $res->{success};
+        "$res->{status} - $res->{reason}\n" unless $res->{success};
     my $api_res = _json_decode($res->{content});
     my $hit = $api_res->{hits}{hits}[0];
     die "No release information for distribution '$dist'" unless $hit;
@@ -217,6 +218,14 @@ _
             pos => 1,
         },
     },
+    examples => [
+        {
+            summary => 'Show new distributions from Jan 1, 2019 to the present',
+            argv => ['2019-01-01'],
+            'x.doc.show_result' => 0,
+            test => 0,
+        },
+    ],
 };
 sub list_new_cpan_dists {
     my %args = @_;
@@ -272,8 +281,8 @@ sub list_new_cpan_dists {
         log_trace("[#%d/%d] Got distribution %s", $i, $num_hits, $dist);
         # find the first release of this distribution
         my $relinfo = _get_dist_first_release($state, $dist);
-        unless ($relinfo->{time} >= $args{from_time}->epoch &&
-                    $relinfo->{time} <= $args{to_time}->epoch) {
+        unless ($relinfo->{time} >= $from_time->epoch &&
+                    $relinfo->{time} <= $to_time->epoch) {
             log_trace("First release of distribution %s is not in this time period, skipped", $dist);
             next;
         }
@@ -443,7 +452,7 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.008 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2018-09-02.
+This document describes version 0.010 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2019-01-13.
 
 =head1 FUNCTIONS
 
@@ -452,7 +461,7 @@ This document describes version 0.008 of App::ListNewCPANDists (from Perl distri
 
 Usage:
 
- list_monthly_new_cpan_dists(%args) -> [status, msg, result, meta]
+ list_monthly_new_cpan_dists(%args) -> [status, msg, payload, meta]
 
 List new CPAN distributions in a given month.
 
@@ -484,7 +493,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -495,7 +504,7 @@ Return value:  (any)
 
 Usage:
 
- list_monthly_new_cpan_dists_html(%args) -> [status, msg, result, meta]
+ list_monthly_new_cpan_dists_html(%args) -> [status, msg, payload, meta]
 
 List new CPAN distributions in a given month (HTML format).
 
@@ -527,7 +536,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -538,9 +547,19 @@ Return value:  (any)
 
 Usage:
 
- list_new_cpan_dists(%args) -> [status, msg, result, meta]
+ list_new_cpan_dists(%args) -> [status, msg, payload, meta]
 
 List new CPAN distributions in a given time period.
+
+Examples:
+
+=over
+
+=item * Show new distributions from Jan 1, 2019 to the present:
+
+ list_new_cpan_dists( from_time => "2019-01-01");
+
+=back
 
 This utility queries MetaCPAN to find out what CPAN distributions are new in a
 given time period (i.e. has their first release made during that time period).
@@ -587,7 +606,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -615,7 +634,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

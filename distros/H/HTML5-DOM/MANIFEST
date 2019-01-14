@@ -8,6 +8,7 @@ gen/tags_ua_style.c
 leaks.pl
 lib/HTML5/DOM.pm
 lib/HTML5/DOM.pod
+lib/HTML5/DOM/AsyncResult.pm
 lib/HTML5/DOM/Collection.pm
 lib/HTML5/DOM/Comment.pm
 lib/HTML5/DOM/CSS.pm
@@ -547,5 +548,7 @@ third_party/modest/source/myurl/url.h
 third_party/modest/source/myurl/utils.c
 third_party/modest/source/myurl/utils.h
 typemap
+utils.c
+utils.h
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

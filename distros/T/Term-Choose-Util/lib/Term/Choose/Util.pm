@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -37,10 +37,10 @@ sub choose_dirs {
     if ( ! defined $o->{prompt} ) {
         $o->{prompt} = ' ';
     }
-    my $new         = [];
-    my $dir         = realpath $start_dir;
-    my $previous    = $dir;
-    my @pre         = ( undef, $o->{confirm}, $o->{add_dir}, $o->{up} );
+    my $new = [];
+    my $dir = realpath $start_dir;
+    my $prev_encoded = $dir;
+    my @pre = ( undef, $o->{confirm}, $o->{add_dir}, $o->{up} );
     my $default_idx = $o->{enchanted}  ? $#pre : 0;
 
     while ( 1 ) {
@@ -61,22 +61,20 @@ sub choose_dirs {
         }
         closedir $dh;
         my @tmp;
-        if ( length $o->{info} ) {
-            push @tmp, $o->{info};
-        }
         if ( ! defined $o->{name} ) {
             $o->{name} = 'New: ';
         }
         push @tmp, $o->{name} . join( ', ', map { s/ /\ /g; $_ } @$new );
-        push @tmp, ' ++' . decode( 'locale_fs', "[$previous]" );
+        push @tmp, ' ++' . decode( 'locale_fs', "[$prev_encoded]" );
         if ( length $o->{prompt} ) {
             push @tmp, $o->{prompt};
         }
         my $lines = join( "\n", @tmp );
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
-            { prompt => $lines, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse}, lf => [ 0, length $o->{name} ],
-              justify => $o->{justify}, layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen}, hide_cursor => $o->{hide_cursor} }
+            { prompt => $lines, info => $o->{info}, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
+              lf => [ 0, length $o->{name} ], justify => $o->{justify}, layout => $o->{layout}, order => $o->{order},
+              clear_screen => $o->{clear_screen}, hide_cursor => $o->{hide_cursor} }
         );
         if ( ! defined $choice ) {
             if ( @$new ) {
@@ -92,19 +90,19 @@ sub choose_dirs {
         }
         elsif ( $choice eq $o->{add_dir} ) {
             if ( $o->{decoded} ) {
-                push @$new, decode( 'locale_fs', $previous );
+                push @$new, decode( 'locale_fs', $prev_encoded );
             }
             else {
-                push @$new, $previous;
+                push @$new, $prev_encoded;
             }
             $dir = dirname $dir;
-            $default_idx = 0 if $previous eq $dir;
-            $previous = $dir;
+            $default_idx = 0 if $prev_encoded eq $dir;
+            $prev_encoded = $dir;
             next;
         }
         $dir = $choice eq $o->{up} ? dirname( $dir ) : catdir( $dir, encode 'locale_fs', $choice );
-        $default_idx = 0 if $previous eq $dir;
-        $previous = $dir;
+        $default_idx = 0 if $prev_encoded eq $dir;
+        $prev_encoded = $dir;
     }
 }
 
@@ -168,7 +166,7 @@ sub _choose_a_path {
     my ( $o, $dir ) = _prepare_opt_choose_path( $opt );
     my @pre = ( undef, ( $a_file ? $o->{choose_file} : $o->{confirm} ), $o->{up} );
     my $default_idx = $o->{enchanted}  ? 2 : 0;
-    my $previous = $dir;
+    my $prev_encoded = $dir;
     my $wildcard = ' ? ';
 
     while ( 1 ) {
@@ -189,9 +187,6 @@ sub _choose_a_path {
         }
         closedir $dh;
         my @tmp;
-        if ( length $o->{info} ) {
-            push @tmp, $o->{info};
-        }
         if ( ! defined $o->{name} ) {
             $o->{name} = 'New: '; # a_file
         }
@@ -207,15 +202,16 @@ sub _choose_a_path {
         my $lines = join( "\n", @tmp );
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
-            { prompt => $lines, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse}, hide_cursor => $o->{hide_cursor},
-              justify => $o->{justify}, layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
+            { prompt => $lines, info => $o->{info}, undef => $o->{back}, default => $default_idx,
+              mouse => $o->{mouse}, hide_cursor => $o->{hide_cursor}, justify => $o->{justify},
+              layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
         );
         if ( ! defined $choice ) {
             return;
         }
         elsif ( $choice eq $o->{confirm} ) {
-            return decode 'locale_fs', $previous if $o->{decoded};
-            return $previous;
+            return decode 'locale_fs', $prev_encoded if $o->{decoded};
+            return $prev_encoded;
         }
         elsif ( $choice eq $o->{choose_file} ) {
             my $file = _a_file( $o, $dir, $wildcard );
@@ -230,13 +226,13 @@ sub _choose_a_path {
         else {
             $dir = catdir $dir, $choice;
         }
-        if ( $previous eq $dir ) {
+        if ( $prev_encoded eq $dir ) {
             $default_idx = 0;
         }
         else {
             $default_idx = $o->{enchanted}  ? 2 : 0;
         }
-        $previous = $dir;
+        $prev_encoded = $dir;
     }
 }
 
@@ -244,7 +240,7 @@ sub _choose_a_path {
 
 sub _a_file {
     my ( $o, $dir, $wildcard ) = @_;
-    my $previous = '';
+    my $prev_encoded = '';
 
     while ( 1 ) {
         my ( $dh, @files );
@@ -268,13 +264,10 @@ sub _a_file {
             return;
         }
         my @tmp;
-        if ( length $o->{info} ) {
-            push @tmp, $o->{info};
-        }
         if ( ! defined $o->{name} ) {
             $o->{name} = 'New: '; # file
         }
-        push @tmp, $o->{name} . _prepare_string( catfile $dir, length $previous ? $previous : $wildcard );
+        push @tmp, $o->{name} . _prepare_string( catfile $dir, length $prev_encoded ? $prev_encoded : $wildcard );
         if ( defined $o->{prompt} && length $o->{prompt} ) {
             push @tmp, $o->{prompt};
         }
@@ -282,18 +275,18 @@ sub _a_file {
         my @pre = ( undef, $o->{confirm} );
         my $choice = choose(
             [ @pre, sort( @files ) ],
-            { prompt => $lines, undef => $o->{back}, mouse => $o->{mouse}, justify => $o->{justify}, layout => $o->{layout},
-              order => $o->{order}, clear_screen => $o->{clear_screen}, hide_cursor => $o->{hide_cursor} }
+            { prompt => $lines, info => $o->{info}, undef => $o->{back}, mouse => $o->{mouse}, justify => $o->{justify},
+              layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen}, hide_cursor => $o->{hide_cursor} }
         );
         if ( ! length $choice ) {
             return;
         }
         elsif ( $choice eq $o->{confirm} ) {
-            return if ! length $previous;
-            return catfile $dir, encode 'locale_fs', $previous;
+            return if ! length $prev_encoded;
+            return catfile $dir, $prev_encoded;
         }
         else {
-            $previous = $choice;
+            $prev_encoded = encode( 'locale_fs', $choice );
         }
     }
 }
@@ -350,16 +343,13 @@ sub choose_a_number {
     }
 
     NUMBER: while ( 1 ) {
-        my @tmp;
-        if ( length $info ) {
-            push @tmp, $info;
-        }
+
         my $new_result = length $result ? $result : '';
         my $row = sprintf(  "${name}%*s", $longest, $new_result );
         if ( print_columns( $row ) > term_width() ) {
             $row = $new_result;
         }
-        push @tmp, $row;
+        my @tmp = ( $row );
         if ( length $prompt ) {
             push @tmp, $prompt;
         }
@@ -368,7 +358,7 @@ sub choose_a_number {
         # Choose
         my $range = choose(
             $small ? [ @pre, reverse @choices_range ] : [ @pre, @choices_range ],
-            { prompt => $lines, layout => 3, justify => 1, mouse => $mouse,
+            { prompt => $lines, info => $info, layout => 3, justify => 1, mouse => $mouse,
               clear_screen => $clear, undef => $back_tmp, hide_cursor => $hide_cursor }
         );
         if ( ! defined $range ) {
@@ -420,22 +410,23 @@ sub choose_a_number {
 sub choose_a_subset {
     my ( $available, $opt ) = @_;
     $opt = {} if ! defined $opt;
-    my $info          = defined $opt->{info}          ? $opt->{info}          : '';
+    my $info          = defined $opt->{info}           ? $opt->{info}           : '';
     my $name          =         $opt->{name};
-    my $prompt        = defined $opt->{prompt}        ? $opt->{prompt}        : '';
-    my $fmt_chosen    = defined $opt->{fmt_chosen}    ? $opt->{fmt_chosen}    : 0;
-    my $remove_chosen = defined $opt->{remove_chosen} ? $opt->{remove_chosen} : 1;
+    my $prompt        = defined $opt->{prompt}         ? $opt->{prompt}         : '';
+    my $fmt_chosen    = defined $opt->{fmt_chosen}     ? $opt->{fmt_chosen}     : 0;
+    my $remove_chosen = defined $opt->{remove_chosen}  ? $opt->{remove_chosen}  : 1;
     my $mark          =         $opt->{mark};
-    my $index         = defined $opt->{index}         ? $opt->{index}         : 0;
-    my $clear         = defined $opt->{clear_screen}  ? $opt->{clear_screen}  : 0;
-    my $mouse         = defined $opt->{mouse}         ? $opt->{mouse}         : 0;
-    my $layout        = defined $opt->{layout}        ? $opt->{layout}        : 3;
-    my $order         = defined $opt->{order}         ? $opt->{order}         : 1;
-    my $prefix        = defined $opt->{prefix}        ? $opt->{prefix}        : ( $layout == 3 ? '  ' : '' );
-    my $justify       = defined $opt->{justify}       ? $opt->{justify}       : 0;
-    my $confirm       = defined $opt->{confirm}       ? $opt->{confirm}       : ( ' ' x length $prefix ) . '-OK-';
-    my $back          = defined $opt->{back}          ? $opt->{back}          : ( ' ' x length $prefix ) . ' << ';
-    my $hide_cursor   = defined $opt->{hide_cursor}   ? $opt->{hide_cursor}   : 1;
+    my $index         = defined $opt->{index}          ? $opt->{index}          : 0;
+    my $clear         = defined $opt->{clear_screen}   ? $opt->{clear_screen}   : 0;
+    my $mouse         = defined $opt->{mouse}          ? $opt->{mouse}          : 0;
+    my $layout        = defined $opt->{layout}         ? $opt->{layout}         : 3;
+    my $order         = defined $opt->{order}          ? $opt->{order}          : 1;
+    my $prefix        = defined $opt->{prefix}         ? $opt->{prefix}         : ( $layout == 3 ? '  ' : '' );
+    my $justify       = defined $opt->{justify}        ? $opt->{justify}        : 0;
+    my $confirm       = defined $opt->{confirm}        ? $opt->{confirm}        : ( ' ' x length $prefix ) . '-OK-';
+    my $back          = defined $opt->{back}           ? $opt->{back}           : ( ' ' x length $prefix ) . ' << ';
+    my $hide_cursor   = defined $opt->{hide_cursor}    ? $opt->{hide_cursor}    : 1;
+    my $list_sep      = defined $opt->{list_separator} ? $opt->{list_separator} : ', '; # documentation
     #--------------------------------------#
     #my $subseq_tab = 4;
     #my $subseq_tab = print_columns( $name || '  ' );
@@ -445,12 +436,9 @@ sub choose_a_subset {
 
     while ( 1 ) {
         my @tmp;
-        if ( length $info ) {
-            push @tmp, $info;
-        }
         if ( $fmt_chosen == 0 ) {
             $name = '> ' if ! defined $name;
-            push @tmp,  $name . join( ', ', map { defined $_ ? $_ : '' } @{$available}[@$new_idx] );
+            push @tmp,  $name . join( $list_sep, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] );
         }
         else {
             push @tmp, $name if defined $name;
@@ -467,9 +455,9 @@ sub choose_a_subset {
         # Choose
         my @idx = choose(
             [ @pre, map { $prefix . ( defined $_ ? $_ : '' ) } @$curr_avail ],
-            { prompt => $lines, layout => $layout, mouse => $mouse, clear_screen => $clear, justify => $justify,
-              index => 1, lf => [ 0, 2 ], order => $order, meta_items => [ 0 .. $#pre ], undef => $back,
-              hide_cursor => $hide_cursor, mark => $mark, include_highlighted => 2 }
+            { prompt => $lines, info => $info, layout => $layout, mouse => $mouse, clear_screen => $clear,
+              justify => $justify, index => 1, lf => [ 0, 2 ], order => $order, meta_items => [ 0 .. $#pre ],
+              undef => $back, hide_cursor => $hide_cursor, mark => $mark, include_highlighted => 2 }
         );
         $mark = undef;
         if ( ! defined $idx[0] || $idx[0] == 0 ) {
@@ -523,17 +511,6 @@ sub settings_menu {
         $curr->{$key} = 0       if ! defined $curr->{$key};
         $new->{$key}  = $curr->{$key};
     }
-    my @tmp;
-    if ( length $info ) {
-        push @tmp, $info;
-    }
-    if ( length $prompt ) {
-        push @tmp, $prompt;
-    }
-    my $lines;
-    if ( @tmp ) {
-        $lines = join( "\n", @tmp );
-    }
 
     while ( 1 ) {
         my @print_keys;
@@ -547,7 +524,7 @@ sub settings_menu {
         # Choose
         my $idx = choose(
             $choices,
-            { prompt => $lines, index => 1, layout => 3, justify => 0, mouse => $mouse,
+            { prompt => $prompt, info => $info, index => 1, layout => 3, justify => 0, mouse => $mouse,
               clear_screen => $clear, undef => $back, hide_cursor => $hide_cursor }
         );
         return if ! defined $idx;
@@ -713,7 +690,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.068
+Version 0.069
 
 =cut
 
@@ -815,6 +792,8 @@ As an argument it can be passed a reference to a hash. With this hash the user c
 decoded
 
 If enabled, the directory name is returned decoded with C<locale_fs> form L<Encode::Locale>.
+
+Values: 0,[1].
 
 =item
 
@@ -962,7 +941,7 @@ fmt_chosen
 
 If I<fmt_chosen> is set to C<1>, each chosen item gets its own line in the output on the screen.
 
-Values: [0], 1;
+Values: [0],1;
 
 =item
 
@@ -1024,7 +1003,7 @@ remove_chosen
 
 If enabled, the chosen items are remove from the available choices.
 
-Values: [0], 1;
+Values: 0,[1];
 
 =back
 
@@ -1118,7 +1097,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2018 Matthäus Kiem.
+Copyright 2014-2019 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

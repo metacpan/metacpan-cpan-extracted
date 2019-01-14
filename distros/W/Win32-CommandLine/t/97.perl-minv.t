@@ -11,14 +11,14 @@ my $fh = select STDIN; $|++; select STDOUT; $|++; select STDERR; $|++; select $f
 
 use Test::More;
 
-plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless $ENV{AUTOMATED_TESTING} or $ENV{TEST_AUTHOR} or $ENV{TEST_RELEASE} or $ENV{TEST_ALL};
+plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless ($ENV{TEST_AUTHOR} or $ENV{AUTHOR_TESTING}) or ($ENV{TEST_RELEASE} or $ENV{RELEASE_TESTING}) or $ENV{TEST_ALL};
+plan skip_all => 'TAINT mode not supported (Test::MinimumVersion::all_minimum_version_from_metayml_ok() is File::Find tainted)' if in_taint_mode();
 
 use version qw();
 my @modules = ( 'Test::MinimumVersion 0.008' ); # @modules = ( '<MODULE> [[<MIN_VERSION>] <MAX_VERSION>]', ... )
 my $haveRequired = 1;
 foreach (@modules) {my ($module, $min_v, $max_v) = split(' '); my $v = eval "require $module; $module->VERSION();"; if ( !$v || ($min_v && ($v < version->new($min_v))) || ($max_v && ($v > version->new($max_v))) ) { $haveRequired = 0; my $out = $module . ($min_v?' [v'.$min_v.($max_v?" - $max_v":'+').']':''); diag("$out is not available"); }}  ## no critic (ProhibitStringyEval)
 
-plan skip_all => 'TAINT mode not supported (Test::MinimumVersion::all_minimum_version_from_metayml_ok() is File::Find tainted)' if in_taint_mode();
 plan skip_all => '[ '.join(', ',@modules).' ] required for testing' if !$haveRequired;
 
 Test::MinimumVersion::all_minimum_version_from_metayml_ok();

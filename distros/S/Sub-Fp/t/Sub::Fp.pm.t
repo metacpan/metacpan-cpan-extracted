@@ -14,8 +14,39 @@ len         is_array  is_hash     to_keys  to_vals
 noop        identity  is_empty    flow     eql
 is_sub      to_pairs  for_each    apply
 get         second    range       pops     pushes
-shifts      unshifts
+shifts      unshifts  once
 );
+
+sub once__returns_code_ref_when_args_undef :Tests {
+    ok(ref once() eq 'CODE');
+}
+
+sub once__returns_func_that_can_only_be_called_once :Tests {
+    my $times_called = 0;
+    my $sub          = once(sub {
+        $times_called++;
+    });
+
+    $sub->();
+    $sub->();
+    $sub->();
+
+    is($times_called, 1);
+}
+
+sub once__returns_result_from_first_call_without_reinvoking :Tests {
+    my $times_called = 0;
+    my $sub          = once(sub {
+        $times_called++;
+        return "I was only called $times_called times"
+    });
+
+    $sub->();
+    $sub->();
+    my $result = $sub->();
+
+    is($result, "I was only called 1 times");
+}
 
 sub range__returns_empty_array_when_args_undef :Tests {
     is_deeply(range(), []);
@@ -210,6 +241,7 @@ sub flow__returns_empty_sub_when_args_empty :Tests {
     is($func->(), undef);
 }
 
+
 sub flow__returns_func_ref_composed_of_passed_in_args :Tests {
     my $func = flow(\&incr, \&incr);
 
@@ -220,6 +252,40 @@ sub flow__returns_func_that_evaluates_to_composition_of_funcs :Tests {
     my $func = flow(\&incr, \&incr);
 
     is($func->(1), 3);
+}
+
+sub flow__returns_decorated_function_returning_3 :Tests {
+    my $addOne = sub {
+        my $sub = shift;
+
+        return sub {
+            my $num = shift;
+            return $sub->($num + 1);
+        }
+    };
+
+    my $sub = flow(
+        $addOne,
+        $addOne,
+        $addOne,
+    )->(sub {
+        my $num = shift;
+        return $num;
+    });
+
+    is($sub->(0), 3)
+}
+
+sub flow__accepts_multiple_arguments_when_composing :Tests {
+    my $add_many = sub {
+        my ($num1, $num2, $num3) = @_;
+
+        return $num1 + $num2 + $num3;
+    };
+
+    my $sub = flow($add_many);
+
+    is($sub->(100, 100, 100), 300);
 }
 
 sub is_empty__returns_1_when_args_undef :Tests {

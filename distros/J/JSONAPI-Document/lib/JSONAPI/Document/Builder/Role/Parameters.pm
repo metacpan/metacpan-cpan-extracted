@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Role::Parameters;
-$JSONAPI::Document::Builder::Role::Parameters::VERSION = '2.3';
+$JSONAPI::Document::Builder::Role::Parameters::VERSION = '2.4';
 =head1 NAME
 
 JSONAPI::Document::Builder::Role::Parameters - All available parameters for builders
 
 =head1 VERSION
 
-version 2.3
+version 2.4
 
 =head1 DESCRIPTION
 

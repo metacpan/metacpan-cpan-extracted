@@ -1,9 +1,9 @@
 This archive contains the distribution Mojolicious-Plugin-JSONAPI,
-version 2.3:
+version 2.4:
 
   Mojolicious Plugin for building JSON API compliant applications.
 
-This software is copyright (c) 2018 by Ali Zia.
+This software is copyright (c) 2019 by Ali Zia.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

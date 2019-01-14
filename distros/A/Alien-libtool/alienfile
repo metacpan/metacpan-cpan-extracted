@@ -2,7 +2,6 @@ use alienfile;
 use File::Which qw( which );
 use Capture::Tiny qw( capture );
 use List::Util qw( all );
-use Sort::Versions qw( versioncmp );
 
 configure {
   requires 'File::Which';
@@ -29,7 +28,7 @@ probe sub {
       {
         my $version = $1;
         require Sort::Versions;
-        if(versioncmp($version, '2.4.2') >= 0)
+        if(Sort::Versions::versioncmp($version, '2.4.2') >= 0)
         {
           $tools{$tool} = $version;
         }

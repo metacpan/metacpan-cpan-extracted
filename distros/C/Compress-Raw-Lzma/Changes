@@ -1,6 +1,14 @@
 CHANGES
 -------
 
+  2.085 12 January 2019
+
+      * t/050interop-xz.t
+      Test harness can use a lot of memory. 
+      On systems with small memory t/050interop-xz.t can fail.
+      Free memory before invoking xz.
+      [rt.cpan.org #128194]  may fail (memory leak?)
+
   2.084 5 January 2019
 
       * No Changes

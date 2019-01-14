@@ -9,7 +9,7 @@
 #
 package Config::Model::Tester::Setup;
 # ABSTRACT: Common test setup functions for Config::Model
-$Config::Model::Tester::Setup::VERSION = '3.006';
+$Config::Model::Tester::Setup::VERSION = '3.007';
 use warnings;
 use strict;
 use locale;
@@ -38,7 +38,7 @@ sub init_test {
     push @option_specs, @_;
 
     GetOptions( \my %opts,  @option_specs)
-        || die "Unknown option. Expected options are @option_specs";
+        || die "Unknown option. Expected options are '--".join("', '--",@option_specs)."'\n";
 
     if ($opts{error}) {
         Config::Model::Exception::Any->Trace(1);
@@ -88,7 +88,7 @@ Config::Model::Tester::Setup - Common test setup functions for Config::Model
 
 =head1 VERSION
 
-version 3.006
+version 3.007
 
 =head1 SYNOPSIS
 
@@ -132,7 +132,7 @@ strack trace when dying.
 
 C<--log>: When set, L<Log::Log4perl> uses the config from file
 C<~/.log4config-model> or the default config provided by
-L<Config::Model>. Without 'l', only Error level and above are shown.
+L<Config::Model>. By default, only Error level and above are shown.
 Experimental.
 
 =back

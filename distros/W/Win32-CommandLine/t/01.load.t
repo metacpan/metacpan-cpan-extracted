@@ -32,14 +32,20 @@ foreach (@required_modules) { my ($module, $min_v, $max_v) = /\S+/gmsx;
 plan skip_all => '[ '.join(', ',@required_modules).' ] required for testing' if not $have_required;
 
 my $metafile = q//;
-    $metafile = 'META.json' if (($metafile eq q//) && (-f 'META.json'));
-    $metafile = 'META.yml' if (($metafile eq q//) && (-f 'META.yml'));
+    $metafile = 'META.json'   if (($metafile eq q//) && (-f 'META.json'));
+    $metafile = 'META.yaml'   if (($metafile eq q//) && (-f 'META.yaml'));
+    $metafile = 'META.yml'    if (($metafile eq q//) && (-f 'META.yml'));
+    # $metafile = 'MYMETA.json' if (($metafile eq q//) && (-f 'MYMETA.json'));
+    # $metafile = 'MYMETA.yaml' if (($metafile eq q//) && (-f 'MYMETA.yaml'));
+    # $metafile = 'MYMETA.yml'  if (($metafile eq q//) && (-f 'MYMETA.yml'));
 my $have_metafile = ($metafile ne q//);
 my $have_metafile_content = $have_metafile && (-s $metafile);
 my $meta_href = $have_metafile_content ? CPAN::Meta->load_file( $metafile ) : undef;
 my $packages_href = (defined $meta_href) ? $meta_href->{provides} : undef;
 
-plan skip_all => "'no packages found in '$metafile'" if not defined $packages_href or ( scalar( keys %{$packages_href} ) < 1 );
+if ( !$have_metafile ) { plan tests => 1; fail("No metafile found"); exit 0; }
+
+plan skip_all => "No packages found in '$metafile'" if not defined $packages_href or ( scalar( keys %{$packages_href} ) < 1 );
 
 plan tests => scalar( keys %{$packages_href} ) * 2;
 

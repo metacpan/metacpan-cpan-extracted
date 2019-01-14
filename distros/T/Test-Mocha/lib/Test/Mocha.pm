@@ -1,6 +1,6 @@
 package Test::Mocha;
 # ABSTRACT: Test double framework with method stubs and behaviour verification
-$Test::Mocha::VERSION = '0.64';
+$Test::Mocha::VERSION = '0.65';
 
 use strict;
 use warnings;
@@ -264,7 +264,7 @@ Test::Mocha - Test double framework with method stubs and behaviour verification
 
 =head1 VERSION
 
-version 0.64
+version 0.65
 
 =head1 SYNOPSIS
 
@@ -705,6 +705,8 @@ Scott Davis for adding the C<class_mock()> function.
 
 Chad Granum <exodist@cpan.org>
 
+Bob Showalter <showaltb@gmail.com>
+
 =back
 
 =head1 SEE ALSO
@@ -713,7 +715,7 @@ L<Test::MockObject>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Steven Lee.
+This software is copyright (c) 2019 by Steven Lee.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

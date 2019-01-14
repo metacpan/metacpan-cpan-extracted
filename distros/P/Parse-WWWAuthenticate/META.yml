@@ -6,12 +6,16 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Parse-WWWAuthenticate
+provides:
+  Parse::WWWAuthenticate:
+    file: lib/Parse/WWWAuthenticate.pm
+    version: '0.04'
 requires:
   Carp: '0'
   HTTP::Headers::Util: '0'
@@ -21,4 +25,8 @@ resources:
   bugtracker: http://github.com/reneeb/Parse-WWWAuthenticate/issues
   homepage: http://github.com/reneeb/Parse-WWWAuthenticate
   repository: http://github.com/reneeb/Parse-WWWAuthenticate.git
-version: '0.03'
+version: '0.04'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

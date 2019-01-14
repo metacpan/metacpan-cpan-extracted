@@ -4,27 +4,42 @@ sudo: false     # use the container-based Travis infrastructure
 language: perl
 
 perl:
-    - "blead"
-    - "dev"
-    - "5.26"
-    # - "5.24"
-    # - "5.22"
-    - "5.20"
-    # - "5.18"
-    - "5.16"
-    # - "5.14"
-    - "5.12"
-    # - "5.10"
-    - "5.8.8"
-    # - "5.8"
+  - "blead"   ## build perl from git
+  - "dev"     ## latest point release
+  - "stable"  ## latest stable release
+  - "5.28"
+  #  - "5.26"
+  - "5.24"
+  # - "5.22"
+  - "5.20"
+  # - "5.18"
+  - "5.16"
+  # - "5.14"
+  - "5.12"
+  - "5.10"
+  - "5.8"
+  - "5.6"
+  - "5.8.9"
+  - "5.8.8"
 
+env:
+  global:
+    - AUTOMATED_TESTING=1
 matrix:
-    include:
-        - perl: 5.26
-          env: COVERAGE="Coveralls Codecov"
-    allow_failures:
-        - perl: "blead"
-        - perl: "dev"
+  include:
+    - perl: "stable"
+      env: COVERAGE="Coveralls Codecov" DEVEL_COVER_OPTIONS="-ignore,^t/"
+    - perl: "stable"
+      env: AUTHOR_TESTING=1 RELEASE_TESTING=1 TEST_SIGNATURE=1
+  allow_failures:
+    - perl: "blead"
+    - perl: "dev"
+    - perl: "5.8"       ## allow perl v5.8 failures; (v5.8.x can be problematic for many projects)
+    - perl: "5.6"       ## allow perl v5.6 failures; (v5.6.x can be problematic for many projects)
+    - perl: "5.8.9"     ## allow specific perl v5.8.9 failures; (v5.8.9 can be problematic for many projects)
+    - perl: "5.8.8"     ## allow specific perl v5.8.8 failures; (v5.8.8 can be problematic for many projects)
+    - perl: "stable"
+      env: AUTHOR_TESTING=1 RELEASE_TESTING=1 TEST_SIGNATURE=1
 
 # addons:
 #   apt:
@@ -33,85 +48,67 @@ matrix:
 #     - aspell-en
 
 before_install:
-    - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
-    - source ~/travis-perl-helpers/init
-    - build-perl
-    - perl -V
-    - |
-      function truthy { X=$(echo "$1" | tr '[:upper:]' '[:lower:]'); if test -n "$X" -a "$X" != "0" -a "$X" != "false" -a "$X" != "off"; then return 0; else return 1; fi; }
-      function falsey { if truthy "$1"; then return 1; else return 0; fi; }
-      function unsupported { truthy "$OS_unsupported"; }
-      function unsupported_msg { printf "\e[35mWARN: $OS_unsupported\e[m\n"; }
-      function warn_if_unsupported { if unsupported; then unsupported_msg >&2 ; fi; }
-      function warn_and_fail_if_unsupported { if unsupported; then unsupported_msg >&2 ; return 1; fi; }
+  # * global defaults (allows project network-side overloads [enables build flexibility and use by non-AUTHOR's])
+  - export AUTHOR_TESTING=${AUTHOR_TESTING:=}
+  - export RELEASE_TESTING=${RELEASE_TESTING:=}
+  #
+  - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
+  - source ~/travis-perl-helpers/init
+  - build-perl
+  - perl -V
+  - |
+    function falsey { X=$(echo "$1" | tr '[:upper:]' '[:lower:]'); if test -n "$X" -o "$X" == "0" -o "$X" == "f" -o "$X" == "false" -o "$X" == "n" -o "$X" == "no" -o "$X" == "off"; then return 1; else return 0; fi; }
+    function truthy { if falsey "$1"; then return 1; else return 0; fi; }
+    function unsupported { truthy "$OS_unsupported"; }
+    function unsupported_msg { printf "\e[35mWARNING ~ OS unsupported\e[m\n"; }
+    function warn_if_unsupported { if unsupported; then unsupported_msg >&2 ; fi; }
+    function warn_and_fail_if_unsupported { if unsupported; then unsupported_msg >&2 ; return 1; fi; }
+  - export CI_BUILD_FILE=$(test -e Build.PL && echo "Build.PL" || (test -e Makefile.PL && echo "Makefile.PL" || echo ""))
 
 install:
-    # - cpanm --notest JSON::PP  # most recent JSON::PP is required to avoid JSON parsing errors during coverage testing
-    # # * `dzil` build (note: does not provide coverage info)
-    # - cd $TRAVIS_BUILD_DIR
-    # - cpanm --notest Dist::Zilla
-    # - cpanm --skip-satisfied --force --notest Dist::Zilla::App::Command::stale
-    # - "dzil authordeps | cpanm --force --notest"
-    # - "dzil listdeps --author | cpanm --force --notest"
-    # * idiomatic build
-    # ensure CWD is project main directory
-    - cd "$TRAVIS_BUILD_DIR"
-    # install baseline dependencies + check OS_unsupported
-    - export OS_unsupported=""
-    # * attempt install of prereqs, ignoring errors; for "OS unsupported" check
-    # - cpan-install --deps || true
-    # - cpanm --notest --skip-installed Module::Build || true
-    - cpanm --no-interactive --no-man-pages --notest --skip-satisfied --installdeps . || true
-    - OS_unsupported=$(test $(perl Build.PL 2>&1 | grep -c "^OS unsupported\b") -ge 1 && echo "OS unsupported" || echo "$OS_unsupported")
-    # - echo "OS_unsupported=$OS_unsupported"
-    # install dependencies
-    - unsupported || cpan-install --deps                # installs prereqs, including recommends
-    - unsupported || cpan-install --coverage            # installs coverage prereqs, if enabled
-    # - unsupported || build-dist
+  # ensure CWD is project main directory
+  - cd "$TRAVIS_BUILD_DIR"
+  # install baseline dependencies + check OS_unsupported
+  - export OS_unsupported=""
+  # * attempt install of prereqs, ignoring errors; for "OS unsupported" check
+  - if test -n "$CI_BUILD_FILE"; then cpanm --no-interactive --no-man-pages --notest --skip-satisfied --installdeps . || true; fi;
+  - if test -n "$CI_BUILD_FILE"; then OS_unsupported=$(test $(perl $CI_BUILD_FILE 2>&1 | grep -c "^OS unsupported\b") -ge 1 && echo "OS unsupported" || echo "$OS_unsupported"); fi;
+  # install dependencies
+  - unsupported || cpan-install --deps                # installs prereqs, including recommends
+  - unsupported || cpan-install --coverage            # installs coverage prereqs, if enabled
+  # setup coverage
+  - unsupported || coverage-setup
+  # build
+  - unsupported || build-dist
+  - unsupported || cd "$BUILD_DIR"
 
 before_script:
-    # setup coverage
-    - unsupported || coverage-setup
-    # setup environment options
-    - export AUTOMATED_TESTING=1
-    - export DEVEL_COVER_OPTIONS=-ignore,^_build/
-    - export HARNESS_OPTIONS=j:c                        # enable parallel processing and color
-    - falsey "$COVERAGE" || export HARNESS_OPTIONS=c    # for COVERAGE builds, disable parallel processing to show correctly interleaved output
-    - export HARNESS_TIMER=1
-    # * preload JSON:PP to avoid JSON::PP::Boolean redefine warning (see <https://github.com/rurban/Cpanel-JSON-XS/issues/65#issuecomment-219352754>)
-    - falsey "$COVERAGE" || export PERL5OPT=-MJSON::PP $PERL5OPT
-    # ensure CWD is project main directory
-    - cd "$TRAVIS_BUILD_DIR"
-    # display environment
-    - echo "COVERAGE=$COVERAGE"
-    - echo "HARNESS_OPTIONS=$HARNESS_OPTIONS"
-    - echo "OS_unsupported=$OS_unsupported"
-    - echo "PERL5OPT=$PERL5OPT"
+  # setup environment options
+  - export HARNESS_OPTIONS="c"                                          # enable color
+  - truthy "$COVERAGE" || export HARNESS_OPTIONS="j:$HARNESS_OPTIONS"   # for non-COVERAGE builds, enable parallel test processing
+  - export HARNESS_TIMER="1"
+  # * preload JSON:PP to avoid JSON::PP::Boolean redefine warning (see <https://github.com/rurban/Cpanel-JSON-XS/issues/65#issuecomment-219352754>)
+  - falsey "$COVERAGE" || export HARNESS_PERL_SWITCHES="-MJSON::PP -MDevel::Cover"
+  - echo "# environment" && for v in BUILD_DIR CI_BUILD_FILE COVERAGE DEVEL_COVER_OPTIONS HARNESS_OPTIONS HARNESS_PERL_SWITCHES OS_unsupported PERL5OPT PWD; do echo "$v=$(printenv $v)"; done
 
 script:
-    # # * `dzil` build (note: does not provide coverage info)
-    # - dzil test ## _or_ "dzil test --author --smoke"
-    # * idiomatic build (portable variant)
-    - unsupported || ( perl Build.PL && perl Build )
-    - unsupported || perl Build test
-    # - unsupported || prove -l -j$(test-jobs)              # tests
-    # - unsupported || prove -l -j$(test-jobs) xt/author/*  # "author" tests
-    - warn_if_unsupported                           # show warning if OS is unsupported ## HACK: additional display here until "after_script" version stops being folded
+  - unsupported || prove -l $(test-files)
+  - warn_if_unsupported                           # show warning if OS is unsupported ## HACK: additional display here until "after_script" version stops being folded
 
 after_success:
-    - unsupported || coverage-report                # coveralls.io + codecov.io for `COVERAGE="Coveralls Codecov"`
+  - unsupported || coverage-report                # coveralls.io + codecov.io for `COVERAGE="Coveralls Codecov"`
 
 after_script:
-    - warn_and_fail_if_unsupported                  # show warning if OS is unsupported; failing here forces unfolding and display of the warning ## NOT WORKING
+  - warn_and_fail_if_unsupported                  # show warning if OS is unsupported; failing here forces unfolding and display of the warning ## NOT WORKING
 
 notifications:
-    on_success: change
-    on_failure: always
-    # irc:
-    #     channels:
-    #         - "irc.perl.org#perlcritic"
-    #     template:
-    #         - "%{branch}: %{message} %{build_url}"
-    # email: false
-    # slack:
-    #     secure: jm6FQqg+Pkly1+Jl7glx9evbyDq7WJ9ecmvYU2o+HXLlxq8A0l2BUejfJdf/3akrdQa2I+lMI92rujLAUWVu2okfD0rI3634hkpXZfKrj689OlWOMnI4da0sHYJhzmWGMLgiiqAH/QZiCBpXgNKomRHrit39wSa1v4b17l+2fVaOOGoUzpHYK5r/6CCYXjFvm0ayZ0hcw5vWMMuPOIdVcDBUHbzKri/JRA3tWUZ0uPi36g6D9r4Gn0v+hA9Qgyk8XhT7edmFPkLpANxnCyuMTPU2T+3grHsGZZj9C5euzlNmm47dXjKKSD17jH7cSa4+vRgat0ffYUHA/WRvjEVyYgDMDanp/2cRmLgU3RNNoiB8/qiFhOuoCUS6PdGnDJF+enKs7JdRiTrYfOqJulknZFH1FKrj36S8P6zbRggoyjyzZBQOO+FO2U3HvVZ99W+7nMGj58IzuFz1HljMlul1esYIgVxqVLDyu0iwM7RZsxf+1XND/J9qmbDT5GdeXc0NJm5BiLmZ2bOmmyss3nMX9pk3WyUU0dK731rmT60SzoTxT+BZoa3OkCr1bKxGGVGrltdigkCQZhwfyofvLm83GkEF3vu27fXeiyqj7O5rUku4yrae8jsVz4V4chOFIrWBunjsUFM/q4+NGBaxtl3l+kVLlggazLJgLSzmr6P7VFk=
+  on_success: change
+  on_failure: always
+  # irc:
+  #     channels:
+  #         - "irc.perl.org#modulesignature"
+  #     template:
+  #         - "%{branch}: %{message} %{build_url}"
+  # email: false
+  # slack:
+  #     secure: jm6FQqg+Pkly1+Jl7glx9evbyDq7WJ9ecmvYU2o+HXLlxq8A0l2BUejfJdf/3akrdQa2I+lMI92rujLAUWVu2okfD0rI3634hkpXZfKrj689OlWOMnI4da0sHYJhzmWGMLgiiqAH/QZiCBpXgNKomRHrit39wSa1v4b17l+2fVaOOGoUzpHYK5r/6CCYXjFvm0ayZ0hcw5vWMMuPOIdVcDBUHbzKri/JRA3tWUZ0uPi36g6D9r4Gn0v+hA9Qgyk8XhT7edmFPkLpANxnCyuMTPU2T+3grHsGZZj9C5euzlNmm47dXjKKSD17jH7cSa4+vRgat0ffYUHA/WRvjEVyYgDMDanp/2cRmLgU3RNNoiB8/qiFhOuoCUS6PdGnDJF+enKs7JdRiTrYfOqJulknZFH1FKrj36S8P6zbRggoyjyzZBQOO+FO2U3HvVZ99W+7nMGj58IzuFz1HljMlul1esYIgVxqVLDyu0iwM7RZsxf+1XND/J9qmbDT5GdeXc0NJm5BiLmZ2bOmmyss3nMX9pk3WyUU0dK731rmT60SzoTxT+BZoa3OkCr1bKxGGVGrltdigkCQZhwfyofvLm83GkEF3vu27fXeiyqj7O5rUku4yrae8jsVz4V4chOFIrWBunjsUFM/q4+NGBaxtl3l+kVLlggazLJgLSzmr6P7VFk=

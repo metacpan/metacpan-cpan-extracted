@@ -1,5 +1,8 @@
 releases by David Cantrell:
 
+0.40  2019-01-11  MaxMind's GeoLite database has been discontinued,
+                    so now only use WIPmania's data
+
 0.39  2016-11-15  test jiggery-pokery to make sure stuff works once
                     . is removed from default @INC (see
                     http://www.nntp.perl.org/group/perl.cpan.workers/2016/11/msg1513.html)

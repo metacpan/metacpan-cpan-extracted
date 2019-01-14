@@ -1,3 +1,9 @@
+0.094   2019-01-11 (PERLANCAR)
+
+	- Add @BACKENDS and backends() to let users get the list of
+	  supported backends.
+
+
 0.093   2018-09-23 (PERLANCAR)
 
 	- Add backend: Text::Table::XLSX.

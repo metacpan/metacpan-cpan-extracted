@@ -657,6 +657,58 @@ sub gotScalarUtilXS
     return $@ ? 0 : 1 ;
 }
 
+sub currmem {
+
+    # From https://github.com/eserte/srezic-repository/blob/master/perl/currmem#L14
+
+    my $pid = shift || $$;
+
+    no warnings 'portable'; # because of possible large hex values on 64bit systems
+
+    if ($^O eq 'freebsd' && open(MAP, "dd if=/proc/$pid/map bs=64k 2>/dev/null |")) { # FreeBSD
+        my $mem = 0;
+        my $realmem = 0;
+        while(<MAP>) {
+            my(@l) = split /\s+/;
+            my $delta = (hex($l[1])-hex($l[0]));
+            $mem += $delta;
+            if ($l[11] ne 'vnode') {
+                $realmem += $delta;
+            }
+
+        }
+
+        close MAP;
+        ($mem, $realmem);
+
+    } elsif ($^O eq 'linux' && open(MAP, "/proc/$pid/maps")) { # Linux
+
+        my $mem = 0;
+        my $realmem = 0;
+        while(<MAP>) {
+            my(@l) = split /\s+/;
+            my($start,$end) = split /-/, $l[0];
+            my $delta = (hex($end)-hex($start));
+            $mem += $delta;
+            if (!defined $l[5] || $l[5] eq '' || $l[5] eq '[heap]') {
+                $realmem += $delta;
+            }
+        }
+        close MAP;
+        ($mem, $realmem);
+    } else {
+	    undef;
+    }
+}
+
+sub displayMemoryUsage
+{
+    my $message = shift;
+
+    my ($mem, $realmem) = currmem();
+    print "$message:\t$mem\t$realmem\n";
+}
+
 package CompTestUtils;
 
 1;

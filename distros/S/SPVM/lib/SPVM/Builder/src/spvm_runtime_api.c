@@ -716,7 +716,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
     
     switch (opcode_id) {
       case SPVM_OPCODE_C_ID_BOOL_INT:
-        condition_flag = !!int_vars[opcode->operand0];
+        condition_flag = int_vars[opcode->operand0];
         break;
       case SPVM_OPCODE_C_ID_BOOL_LONG:
         condition_flag = !!long_vars[opcode->operand0];
@@ -858,43 +858,51 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
       {
         void* object1 = *(void**)&object_vars[opcode->operand0];
         void* object2 = *(void**)&object_vars[opcode->operand1];
-
-        int32_t length1 = *(SPVM_VALUE_int*)((intptr_t)object1 + (intptr_t)env->object_array_length_offset);
-        int32_t length2 = *(SPVM_VALUE_int*)((intptr_t)object2 + (intptr_t)env->object_array_length_offset);
         
-        SPVM_VALUE_byte* bytes1 = env->belems(env, object1);
-        SPVM_VALUE_byte* bytes2 = env->belems(env, object2);
-        
-        int32_t short_string_length = length1 < length2 ? length1 : length2;
-        int32_t retval = memcmp(bytes1, bytes2, short_string_length);
-        int32_t cmp;
-        if (retval) {
-          cmp = retval < 0 ? -1 : 1;
-        } else if (length1 == length2) {
-          cmp = 0;
-        } else {
-          cmp = length1 < length2 ? -1 : 1;
+        if (__builtin_expect(object1 == NULL || object2 == NULL, 0)) {
+          condition_flag = 0;
+          void* exception = env->new_str_raw(env, "Use of uninitialized value in string comparison operator", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
         }
-        
-        switch (opcode_id) {
-          case SPVM_OPCODE_C_ID_STRING_EQ:
-            condition_flag = (cmp == 0);
-            break;
-          case SPVM_OPCODE_C_ID_STRING_NE:
-            condition_flag = (cmp != 0);
-            break;
-          case SPVM_OPCODE_C_ID_STRING_GT:
-            condition_flag = (cmp == 1);
-            break;
-          case SPVM_OPCODE_C_ID_STRING_GE:
-            condition_flag = (cmp >= 0);
-            break;
-          case SPVM_OPCODE_C_ID_STRING_LT:
-            condition_flag = (cmp == -1);
-            break;
-          case SPVM_OPCODE_C_ID_STRING_LE:
-            condition_flag = (cmp <= 0);
-            break;
+        else {
+          int32_t length1 = *(SPVM_VALUE_int*)((intptr_t)object1 + (intptr_t)env->object_array_length_offset);
+          int32_t length2 = *(SPVM_VALUE_int*)((intptr_t)object2 + (intptr_t)env->object_array_length_offset);
+          
+          SPVM_VALUE_byte* bytes1 = env->belems(env, object1);
+          SPVM_VALUE_byte* bytes2 = env->belems(env, object2);
+          
+          int32_t short_string_length = length1 < length2 ? length1 : length2;
+          int32_t retval = memcmp(bytes1, bytes2, short_string_length);
+          int32_t cmp;
+          if (retval) {
+            cmp = retval < 0 ? -1 : 1;
+          } else if (length1 == length2) {
+            cmp = 0;
+          } else {
+            cmp = length1 < length2 ? -1 : 1;
+          }
+          
+          switch (opcode_id) {
+            case SPVM_OPCODE_C_ID_STRING_EQ:
+              condition_flag = (cmp == 0);
+              break;
+            case SPVM_OPCODE_C_ID_STRING_NE:
+              condition_flag = (cmp != 0);
+              break;
+            case SPVM_OPCODE_C_ID_STRING_GT:
+              condition_flag = (cmp == 1);
+              break;
+            case SPVM_OPCODE_C_ID_STRING_GE:
+              condition_flag = (cmp >= 0);
+              break;
+            case SPVM_OPCODE_C_ID_STRING_LT:
+              condition_flag = (cmp == -1);
+              break;
+            case SPVM_OPCODE_C_ID_STRING_LE:
+              condition_flag = (cmp <= 0);
+              break;
+          }
         }
 
         break;
@@ -2557,28 +2565,6 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
           int_vars[opcode->operand0] = *(SPVM_VALUE_int*)((intptr_t)*(void**)&object_vars[opcode->operand1] + (intptr_t)env->object_array_length_offset);
         }
         break;
-      case SPVM_OPCODE_C_ID_WEAKEN_ARRAY_ELEMENT: {
-        void* array = *(void**)&object_vars[opcode->operand0];
-        int32_t index = int_vars[opcode->operand1];
-        if (__builtin_expect(!array, 0)) {
-          void* exception = env->new_str_raw(env, "Array must not be undef", 0);
-          env->set_exception(env, exception);
-          exception_flag = 1;
-        }
-        else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_VALUE_int*)((intptr_t)array + (intptr_t)env->object_array_length_offset), 0)) {
-            void* exception = env->new_str_raw(env, "Index is out of range", 0);
-            env->set_exception(env, exception);
-            exception_flag = 1;
-          }
-          else {
-            void** elements = (void**)((intptr_t)array + env->object_header_byte_size);
-            void** object_element_address = (void**)&elements[index];
-            env->weaken(env, object_element_address);
-          }
-        }
-        break;
-      }
       case SPVM_OPCODE_C_ID_CONCAT: {
         
         void* string1 = *(void**)&object_vars[opcode->operand1];
@@ -3689,6 +3675,106 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         else {
           void** ofield_address = (SPVM_VALUE_object*)((intptr_t)object + object_header_byte_size + field_offset);
           env->weaken(env, ofield_address);
+        }
+        break;
+      }
+      case SPVM_OPCODE_C_ID_WEAKEN_ARRAY_ELEMENT: {
+        void* array = *(void**)&object_vars[opcode->operand0];
+        int32_t index = int_vars[opcode->operand1];
+        if (__builtin_expect(!array, 0)) {
+          void* exception = env->new_str_raw(env, "Array must not be undef", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
+        else {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_VALUE_int*)((intptr_t)array + (intptr_t)env->object_array_length_offset), 0)) {
+            void* exception = env->new_str_raw(env, "Index is out of range", 0);
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            void** elements = (void**)((intptr_t)array + env->object_header_byte_size);
+            void** object_element_address = (void**)&elements[index];
+            env->weaken(env, object_element_address);
+          }
+        }
+        break;
+      }
+      case SPVM_OPCODE_C_ID_UNWEAKEN_FIELD: {
+        int32_t constant_pool_id = opcode->operand1;
+        int32_t field_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
+        SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
+        int32_t field_offset = field->offset;
+        void* object = *(void**)&object_vars[opcode->operand0];
+        if (object == NULL) {
+          SPVM_OBJECT* exception = env->new_str_raw(env, "Object to unweaken an object field must not be undefined.", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
+        else {
+          void** ofield_address = (SPVM_VALUE_object*)((intptr_t)object + object_header_byte_size + field_offset);
+          env->unweaken(env, ofield_address);
+        }
+        break;
+      }
+      case SPVM_OPCODE_C_ID_UNWEAKEN_ARRAY_ELEMENT: {
+        void* array = *(void**)&object_vars[opcode->operand0];
+        int32_t index = int_vars[opcode->operand1];
+        if (__builtin_expect(!array, 0)) {
+          void* exception = env->new_str_raw(env, "Array must not be undef", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
+        else {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_VALUE_int*)((intptr_t)array + (intptr_t)env->object_array_length_offset), 0)) {
+            void* exception = env->new_str_raw(env, "Index is out of range", 0);
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            void** elements = (void**)((intptr_t)array + env->object_header_byte_size);
+            void** object_element_address = (void**)&elements[index];
+            env->unweaken(env, object_element_address);
+          }
+        }
+        break;
+      }
+      case SPVM_OPCODE_C_ID_ISWEAK_FIELD: {
+        int32_t constant_pool_id = opcode->operand1;
+        int32_t field_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
+        SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
+        int32_t field_offset = field->offset;
+        void* object = *(void**)&object_vars[opcode->operand0];
+        if (object == NULL) {
+          SPVM_OBJECT* exception = env->new_str_raw(env, "Object to isweak an object field must not be undefined.", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
+        else {
+          void** ofield_address = (SPVM_VALUE_object*)((intptr_t)object + object_header_byte_size + field_offset);
+          env->isweak(env, ofield_address);
+        }
+        break;
+      }
+      case SPVM_OPCODE_C_ID_ISWEAK_ARRAY_ELEMENT: {
+        void* array = *(void**)&object_vars[opcode->operand0];
+        int32_t index = int_vars[opcode->operand1];
+        if (__builtin_expect(!array, 0)) {
+          void* exception = env->new_str_raw(env, "Array must not be undef", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
+        else {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_VALUE_int*)((intptr_t)array + (intptr_t)env->object_array_length_offset), 0)) {
+            void* exception = env->new_str_raw(env, "Index is out of range", 0);
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            void** elements = (void**)((intptr_t)array + env->object_header_byte_size);
+            void** object_element_address = (void**)&elements[index];
+            env->isweak(env, object_element_address);
+          }
         }
         break;
       }

@@ -15,7 +15,7 @@ use YAML::Tiny;
 
 use MySQL::Workbench::Parser::Table;
 
-our $VERSION = 1.05;
+our $VERSION = '1.06';
 
 has file   => (
     is       => 'ro',
@@ -146,6 +146,7 @@ sub _lint {
             my $index_name = $index->name;
 
             next INDEX if $index_name eq 'PRIMARY';
+            next INDEX if $index->type eq 'UNIQUE';
 
             $indexes{$index_name}++;
         }
@@ -200,7 +201,7 @@ MySQL::Workbench::Parser - parse .mwb files created with MySQL Workbench
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 

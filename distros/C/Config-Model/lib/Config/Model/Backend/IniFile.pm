@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::IniFile;
-$Config::Model::Backend::IniFile::VERSION = '2.132';
+$Config::Model::Backend::IniFile::VERSION = '2.133';
 use Carp;
 use Mouse;
 use 5.10.0;
@@ -186,7 +186,7 @@ sub write {
     my $cc = substr($delimiter,0,1);
     $args{comment_delimiter} = $cc;
 
-    my $res = $self->write_global_comment( $cc );
+    my $res = '';
 
     # some INI file have a 'General' section mapped in root node
     my $top_class_name = $self->{reverse_section_map}{''};
@@ -196,7 +196,12 @@ sub write {
     }
 
     $res .= $self->_write(%args);
-    $args{file_path}->spew_utf8($res);
+    if ($res) {
+        $args{file_path}->spew_utf8($self->write_global_comment( $cc ) . $res);
+    }
+    elsif ($self->auto_delete) {
+        $args{file_path}->remove;
+    }
 }
 
 sub _write_list{
@@ -410,7 +415,7 @@ Config::Model::Backend::IniFile - Read and write config as a INI file
 
 =head1 VERSION
 
-version 2.132
+version 2.133
 
 =head1 SYNOPSIS
 

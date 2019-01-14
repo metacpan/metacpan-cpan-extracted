@@ -104,12 +104,12 @@ subtest 'die_on_error = 0' => sub {
 	# The latter are not yet covered by these tests.
 	plan tests => 4;
 	my $t = $s->begin_transaction;
-	$t->{die_on_error} = 0;
+	$t->{transport}->{die_on_error} = 0;
 	lives_and { is $t->run('RETURN 42')->single->get, 42 } 'no error';
 	lives_and { warnings { is $t->run('iced manifolds.')->size, 0 } } 'cypher syntax error';
 	$t = $s->begin_transaction;
 	$t->{die_on_error} = 0;
-	$t->{transaction} = '/qwertyasdfghzxcvbn';
+	$t->{transaction_endpoint} = '/qwertyasdfghzxcvbn';
 	lives_and { warnings { is $t->run('RETURN 42')->size, 0 } } 'HTTP 404';
 	lives_ok { warnings {
 		my $d = Neo4j::Driver->new('http://none.invalid');

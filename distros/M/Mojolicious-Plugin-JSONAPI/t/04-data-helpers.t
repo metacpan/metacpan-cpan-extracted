@@ -32,7 +32,8 @@ get '/' => sub {
     is($doc->{type}, 'posts');
     is_deeply($doc->{attributes}, { title => 'test post' });
     is_deeply($doc->{relationships}->{author}->{data}, { id => 123, type => 'authors' });
-    like($doc->{relationships}->{author}->{links}->{related}, qr|http://127.0.0.1:\d+/posts/123/relationships/author|);
+    like($doc->{relationships}->{author}->{links}->{self},    qr|http://127.0.0.1:\d+/posts/123/relationships/author|);
+    like($doc->{relationships}->{author}->{links}->{related}, qr|http://127.0.0.1:\d+/posts/123/author|);
     $c->render(status => 200, json => {});
 };
 

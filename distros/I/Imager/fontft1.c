@@ -613,7 +613,7 @@ i_tt_get_glyph( TT_Fonthandle *handle, int inst, unsigned long j) {
   if ( LTT_hinted ) load_flags |= TTLOAD_HINT_GLYPH;
   
   if ( !TT_VALID(handle->char_map) ) {
-    code = (j - ' ' + 1) < 0 ? 0 : (j - ' ' + 1);
+    code = (j < ' ' - 1)  ? 0 : (j - (' ' - 1));
     if ( code >= handle->properties.num_Glyphs ) code = 0;
   } else code = TT_Char_Index( handle->char_map, j );
   
@@ -687,7 +687,7 @@ i_tt_has_chars(TT_Fonthandle *handle, char const *text, size_t len, int utf8,
       index = TT_Char_Index(handle->char_map, c);
     }
     else {
-      index = (c - ' ' + 1) < 0 ? 0 : (c - ' ' + 1);
+      index = (c < ' ' - 1) ? 0 : (c - (' ' - 1));
       if (index >= handle->properties.num_Glyphs)
         index = 0;
     }
@@ -972,7 +972,7 @@ interface for generating single channel raster of text (internal)
 
 static
 int
-i_tt_rasterize( TT_Fonthandle *handle, TT_Raster_Map *bit, i_img_dim cords[6], double points, char const* txt, size_t len, int smooth, int utf8 ) {
+i_tt_rasterize( TT_Fonthandle *handle, TT_Raster_Map *bit, i_img_dim *cords, double points, char const* txt, size_t len, int smooth, int utf8 ) {
   int inst;
   i_img_dim width, height;
   TT_Raster_Map small_bit;
@@ -1108,7 +1108,7 @@ Function to get texts bounding boxes given the instance of the font (internal)
 
 static
 undef_int
-i_tt_bbox_inst( TT_Fonthandle *handle, int inst ,const char *txt, size_t len, i_img_dim cords[BOUNDING_BOX_COUNT], int utf8 ) {
+i_tt_bbox_inst( TT_Fonthandle *handle, int inst ,const char *txt, size_t len, i_img_dim *cords, int utf8 ) {
   int upm, casc, cdesc, first;
   
   int start    = 0;
@@ -1207,7 +1207,7 @@ Interface to get a strings bounding box
 */
 
 undef_int
-i_tt_bbox( TT_Fonthandle *handle, double points,const char *txt,size_t len,i_img_dim cords[6], int utf8) {
+i_tt_bbox( TT_Fonthandle *handle, double points,const char *txt,size_t len,i_img_dim *cords, int utf8) {
   int inst;
 
   i_clear_error();

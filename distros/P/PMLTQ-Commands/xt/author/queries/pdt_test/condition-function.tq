@@ -1,0 +1,2 @@
+t-node $n :=
+[ !length(gram/politeness) > 0 ];

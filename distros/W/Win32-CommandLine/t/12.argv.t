@@ -181,6 +181,26 @@ add_test( [ qq{$0 t 0""} ], ( q{t}, q{0} ) );
 
 add_test( [ qq{$0 't\\glob-file.tests\\'*x} ], ( q{t\\glob-file.tests\\*x} ) );
 
+add_test( [ qq{$0 missing_file} ], ( q{missing_file} ) );
+add_test( [ qq{$0 missing_file{,0}} ], ( qw/ missing_file missing_file0 / ) );
+add_test( [ qq{$0 missing_file'{,0}'} ], ( q/missing_file{,0}/ ) );
+add_test( [ qq{$0 missing_file"{,0}"} ], ( q/missing_file{,0}/ ) );
+
+add_test( [ qq[$0 -] ], ( qw[-] ) );
+add_test( [ qq[$0 -''] ], ( qw[-] ) );
+add_test( [ qq[$0 -""] ], ( qw[-] ) );
+
+add_test( [ qq[$0 -{}] ], ( qw[./-] ) );
+add_test( [ qq[$0 -"{}"] ], ( qw[-{}] ) );
+add_test( [ qq[$0 -'{}'] ], ( qw[-{}] ) );
+
+add_test( [ qq[$0 -{,0}] ], ( qw[./- ./-0] ) );
+add_test( [ qq[$0 -"{,0}"] ], ( q/-{,0}/ ) );
+add_test( [ qq[$0 -'{,0}'] ], ( q/-{,0}/ ) );
+
+add_test( [ qq{$0 --option={,0}} ], ( qw[./--option= ./--option=0] ) );
+add_test( [ qq{$0 --option="{,0}"} ], ( q/--option={,0}/ ) );
+
 ### TEST_FRAGILE == tests which require a specific environment setup to work
 if ($ENV{TEST_FRAGILE}) {
     sub add_path_tests {
@@ -341,7 +361,7 @@ sub add_test { push @tests, [ (caller(0))[2], @_ ]; return; }       ## NOTE: cal
 sub add_test_for_caller { push @tests, [ (caller(1))[2], @_ ]; return; }        ## NOTE: caller(EXPR) => ($package, $filename, $line, $subroutine, $hasargs, $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller($i);
 sub test_num { return scalar(@tests); }
 ## no critic (Subroutines::ProtectPrivateSubs)
-sub do_tests { foreach my $t (@tests) { my $line = shift @{$t}; my @args = @{shift @{$t}}; my @exp = @{$t}; my @got; eval { @got = Win32::CommandLine::_argv(@args); 1; } or ( @got = ( $@ =~ /^(.*)\s+at.*$/ ) ); eq_or_diff \@got, \@exp, "[line:$line] testing: `@args`"; } return; }
+sub do_tests { foreach my $t (@tests) { my $line = shift @{$t}; my @args = @{shift @{$t}}; my @exp = @{$t}; my @got; eval { @got = Win32::CommandLine::parse(@args); 1; } or ( @got = ( $@ =~ /^(.*)\s+at.*$/ ) ); eq_or_diff \@got, \@exp, "[line:$line] testing: `@args`"; } return; }
 
 #### SUBs
 
@@ -401,4 +421,3 @@ sub quotemeta_glob{
     $s =~ s/([$gc])/\\$1/g;                 # backslash quote all glob metacharacters (backslashes as well)
     return $s;
 }
-

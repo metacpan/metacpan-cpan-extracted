@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.041';
+our $VERSION = '2.042';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -168,7 +168,7 @@ sub get_schemas {
 }
 
 
-sub tables_data { # documentation
+sub tables_data { # not public
     my ( $sf, $dbh, $schema ) = @_;
     my $table_data = {};
     my ( $table_schem, $table_name );
@@ -194,6 +194,9 @@ sub tables_data { # documentation
         #if ( $href->{TABLE_TYPE} =~ /SYSTEM/ || $href->{TABLE_TYPE} =~ /^(?:TABLE|VIEW|LOCAL TEMPORARY)\z/ ) {
         my $table = $href->{$table_name};
         if ( ! defined $schema && $duplicates{$table}++ ) {
+            # the $schema is undefined if: SQLite + attached databases
+            # if the $schema is undefined, then in SQL code is always used the fully
+            # qualified table name and never the table name in the hash key
             if ( $duplicates{$table} == 2 ) {
                 my $tmp = delete $table_data->{$table};
                 my $first = '[' . join ']', grep { defined && length } @{$tmp}[0..2];
@@ -419,7 +422,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.041
+Version 2.042
 
 =head1 DESCRIPTION
 

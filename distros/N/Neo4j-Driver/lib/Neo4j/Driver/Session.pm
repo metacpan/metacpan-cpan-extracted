@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.09';
+$Neo4j::Driver::Session::VERSION = '0.11';
 
 use Cpanel::JSON::XS 3.0201 qw(decode_json);
 use URI 1.25;
@@ -13,18 +13,13 @@ use URI 1.25;
 use Neo4j::Driver::Transaction;
 
 
-# https://neo4j.com/docs/rest-docs/current/#rest-api-service-root
-our $SERVICE_ROOT_ENDPOINT = '/db/data/';
-
-
 sub new {
-	my ($class, $driver) = @_;
+	my ($class, $transport) = @_;
 	
 	my $session = {
 #		driver => $driver,
 #		uri => $driver->{uri}->clone,
-		client => $driver->_client,
-		die_on_error => $driver->{die_on_error},
+		transport => $transport,
 	};
 	
 	return bless $session, $class;
@@ -34,15 +29,16 @@ sub new {
 sub begin_transaction {
 	my ($self) = @_;
 	
-	return Neo4j::Driver::Transaction->new($self);
+	my $t = Neo4j::Driver::Transaction->new($self);
+	return $t->_explicit;
 }
 
 
 sub run {
 	my ($self, $query, @parameters) = @_;
 	
-	my $t = $self->begin_transaction();
-	return $t->_commit($query, @parameters);
+	my $t = Neo4j::Driver::Transaction->new($self);
+	return $t->_autocommit->run($query, @parameters);
 }
 
 
@@ -53,27 +49,7 @@ sub close {
 sub server {
 	my ($self) = @_;
 	
-	# That the ServerInfo is provided by the same object as Session
-	# is an implementation detail that might change in future.
-	return $self;
-}
-
-
-# server->
-sub address {
-	my ($self) = @_;
-	
-	return URI->new( $self->{client}->getHost() )->host_port;
-}
-
-
-# server->
-sub version {
-	my ($self) = @_;
-	
-	my $json = $self->{client}->GET( $SERVICE_ROOT_ENDPOINT )->responseContent();
-	my $neo4j_version = decode_json($json)->{neo4j_version};
-	return "Neo4j/$neo4j_version";
+	return $self->{transport}->server_info;
 }
 
 
@@ -91,7 +67,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -119,6 +95,10 @@ of transaction is known as an I<autocommit transaction>.
 I<Explicit transactions> allow multiple statements to be committed
 as part of a single atomic operation and can be rolled back if
 necessary.
+
+Only one open transaction per session at a time is supported. To
+work with multiple concurrent transactions, simply use more than one
+session.
 
 =head1 METHODS
 
@@ -162,13 +142,17 @@ context.
 
 =head2 Close method
 
-C<close> is currently a no-op in this class.
+ $session->close;  # no-op
+
+This driver does not support persistent connections at present. All
+connections are closed automatically. There is no need for explicit
+calls to `close` at this time.
 
 =head2 ServerInfo
 
  my $host_port = $session->server->address;
  my $version_string = $session->server->version;
- say "Result from $version_string at $host_port.";
+ say "Contacting $version_string at $host_port.";
 
 For security reasons, L<ResultSummary|Neo4j::Driver::ResultSummary>
 cannot provide C<ServerInfo>. Therefore, C<ServerInfo> is available
@@ -179,6 +163,19 @@ version number might be a way to get around this restriction and
 offer the C<ServerInfo> strings through
 L<ResultSummary|Neo4j::Driver::ResultSummary> after all. However,
 I'm really not sure if the ensuing performance penalty is worth it.
+
+=head2 Multiple transactions per session
+
+ my $session = Neo4j::Driver->new('http://...')->basic_auth(...)->session;
+ my $tx1 = $session->begin_transaction;
+ my $tx2 = $session->begin_transaction;
+ my $tx3 = $session->run(...);
+
+Since HTTP is a stateless protocol, the Neo4j HTTP API effectively
+allows multiple concurrently open transactions without special
+client-side considerations. This driver exposes this feature to the
+client and will continue to do so, but the interface is not yet
+finalised.
 
 =head1 BUGS
 
@@ -215,7 +212,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2018 by Arne Johannessen.
+This software is Copyright (c) 2016-2019 by Arne Johannessen.
 
 This is free software, licensed under:
 

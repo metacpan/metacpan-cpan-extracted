@@ -28,3 +28,11 @@ OPTIONS
 
       Directory where sould be images stored. Default value is 'svg'.
 
+    printtrees-parallel-job_size
+
+      Size of one job, default is 50.
+
+    printtrees-parallel-forks
+
+      Maximum number of parallel jobs, default is 8.
+

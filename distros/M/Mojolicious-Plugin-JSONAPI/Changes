@@ -1,4 +1,8 @@
+2.4       2019-01-12 20:33:52+00:00 Europe/London
+
 2.3       2018-11-16 16:14:07+00:00 Europe/London
+- Adds the ability to create routes for specific HTTP verbs for the
+main resource.
 
 2.2       2018-10-25 14:25:34+01:00 Europe/London
 - render_error SIGNATURE CHANGE: Removed argument for providing a primary

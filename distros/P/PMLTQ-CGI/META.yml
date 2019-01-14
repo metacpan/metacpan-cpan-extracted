@@ -1,0 +1,48 @@
+---
+abstract: '[DEPRECATED] This is html fronted for SQLEvaluator and is currently being replaced by PMLTQ::Server'
+author:
+  - 'Petr Pajas <pajas@ufal.mff.cuni.cz>'
+  - 'Jan Štěpánek <stepanek@ufal.mff.cuni.cz>'
+  - 'Michal Sedlák <sedlak@ufal.mff.cuni.cz>'
+  - 'Matyáš Kopp <matyas.kopp@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PMLTQ-CGI
+no_index: {}
+provides:
+  PMLTQ::CGI:
+    file: lib/PMLTQ/CGI.pm
+    version: v2.0.1
+requires:
+  Digest::MD5: '2.51'
+  Encode: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request::AsCGI: '1.2'
+  HTTP::Server::Simple::CGI: '0.44'
+  JSON: '2.90'
+  LWP::UserAgent: '0'
+  MIME::Types: '2.04'
+  PMLTQ: v2.0.1
+  URI::Encode: '0'
+  URI::WithBase: '0'
+resources:
+  bugtracker: https://github.com/ufal/pmltq-cgi/issues
+  homepage: http://ufal.mff.cuni.cz/pmltq/
+  repository: https://github.com/ufal/pmltq-cgi.git
+version: 2.0.1
+x_authority: cpan:MATY
+x_authority_from_module: PMLTQ::CGI
+x_permissions_from_module: PMLTQ::CGI
+x_serialization_backend: 'YAML::Tiny version 1.70'

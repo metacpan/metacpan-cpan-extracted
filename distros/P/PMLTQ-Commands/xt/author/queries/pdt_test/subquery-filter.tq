@@ -1,0 +1,5 @@
+t-node $n0 :=
+[ 2x ancestor t-node $n1 :=
+     [ 3+x t-node $n2 :=
+          [ ] ] ];
+  >> give $n0.id

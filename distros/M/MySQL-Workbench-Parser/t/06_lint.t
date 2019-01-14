@@ -30,4 +30,6 @@ for my $re (
     like $stderr, $re, "$re";
 }
 
+unlike $stderr, qr/Username_UNIQUE/;
+
 done_testing();

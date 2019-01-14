@@ -20,6 +20,7 @@ $modules{$_} = $_ for qw(
   ExtUtils::MakeMaker
   File::Which
   File::chdir
+  List::Util
   Sort::Versions
   Test2::V0
   Test::Alien

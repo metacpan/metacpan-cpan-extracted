@@ -18,6 +18,7 @@ example/slowlast
 lib/AnyEvent/WebSocket/Client.pm
 lib/AnyEvent/WebSocket/Connection.pm
 lib/AnyEvent/WebSocket/Message.pm
+maint/cip-before-install
 maint/proxy.pl
 t/00_diag.t
 t/01_use.t

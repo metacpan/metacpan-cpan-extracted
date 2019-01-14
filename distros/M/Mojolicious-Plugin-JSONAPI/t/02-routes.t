@@ -82,10 +82,18 @@ foreach my $test (@tests) {
     $t->delete_ok("$resource_path/20")->status_is(200);
 
     foreach my $relationship (@{ $test->{relationships} // [] }) {
+
+        # self
         $t->get_ok("$resource_path/20/relationships/$relationship")->status_is(200);
         $t->post_ok("$resource_path/20/relationships/$relationship")->status_is(200);
         $t->patch_ok("$resource_path/20/relationships/$relationship")->status_is(200);
         $t->delete_ok("$resource_path/20/relationships/$relationship")->status_is(200);
+
+        # related
+        $t->get_ok("$resource_path/20/$relationship")->status_is(200);
+        $t->post_ok("$resource_path/20/$relationship")->status_is(200);
+        $t->patch_ok("$resource_path/20/$relationship")->status_is(200);
+        $t->delete_ok("$resource_path/20/$relationship")->status_is(200);
     }
 }
 

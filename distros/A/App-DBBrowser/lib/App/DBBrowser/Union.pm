@@ -95,7 +95,7 @@ sub union_tables {
     my $qt_columns = $ax->quote_simple_many( $union->{used_cols}{$first_table} );
     my $qt_table = $ax->get_stmt( $union, 'Union', 'prepare' );
     # alias: required if mysql, Pg, ...
-    my $alias = $ax->alias( 'union', 'AS: ', "TABLES_UNION" );
+    my $alias = $ax->alias( 'union', undef, "TABLES_UNION" );
     $qt_table .= " AS " . $ax->quote_col_qualified( [ $alias ] );
     return $qt_table, $qt_columns;
 }

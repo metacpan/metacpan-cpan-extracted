@@ -1,5 +1,49 @@
                        User-Visible DocKnot Changes
 
+DocKnot 2.00 (2019-01-12)
+
+    Move previous docknot command functionality to a new docknot generate
+    subcommand.  All docknot actions in the future will be added as
+    subcommands.
+
+    docknot generate now takes the name of the template as its first
+    positional argument instead of as the -t option.
+
+    generate() and therefore the generate subcommand now defaults to
+    looking for metadata in docs/metadata, and the -m option is now
+    optional.
+
+    The -o option to docknot generate and the output argument to
+    generate_output() is now optional if there is a default output file
+    defined for the template.  The two defaults are README for the readme
+    template and README.md for the readme-md template, both in the current
+    directory.
+
+    Rename App::DocKnot to App:DocKnot::Generate and add a new
+    generate_output() method that writes the generated output to a
+    specified file instead of returning it as a string.  App::DocKnot must
+    be loaded as well to use the module API.
+
+    Add new generate-all command and generate_all() method that generates
+    all package documentation files with a default output file.
+
+    Separate the TESTING section from BUILD AND INSTALLATION for Perl
+    modules in both README and README.md, and move the Lancaster
+    instructions to that section.  Add instructions for how to run a
+    single test with Perl build systems.  Test dependencies for Perl
+    modules should now move into docs/metadata/test/suffix, the same as
+    for packages with an Autoconf build system.
+
+    If build.lancaster is set to true, add the standard section on
+    Lancaster consensus variables to the end of a TESTING section in
+    README and README.md even when a custom testing section is provided in
+    the metadata.
+
+    Update to rra-c-util 8.0:
+
+    * Fix t/style/strict.t to skip blib and .git directories.
+    * Update style for the latest perltidy.
+
 DocKnot 1.06 (2018-08-31)
 
     When generating text output, put the footnotes containing URLs for

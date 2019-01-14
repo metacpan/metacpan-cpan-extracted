@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.041';
+our $VERSION = '2.042';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.041
+Version 2.042
 
 =cut
 
@@ -234,7 +234,7 @@ The SQL Menu has the following menu entries:
 
 =head3 Prompt Line
 
-Selecting this prompt line (Customize:) opens a menu with these entries:
+Selecting this prompt line (I<Customize:>) opens a menu with these entries:
 
 (C<DELETE>, C<UPDATE> or C<INSERT INTO> are not available with C<JOIN> and C<UNION> statements (except C<INSERT> with
 C<mysql> and C<JOIN>))
@@ -468,6 +468,10 @@ Values: I<None>, I<Func>, I<SQ> and I<Func+SQ>
 
 Values: I<None> and I<SQ>
 
+=item Extended Join
+
+Values: I<None> and I<SQ>
+
 =back
 
 If set to I<None> no menu extension.
@@ -525,6 +529,9 @@ derived tables which get then a default alias.
 =item Functions
 
 =item Join
+
+In the I<foreign-key> menu one can choose a different comparison operator by selecting the prompt line (I<Choose FOREIGN
+KEY column:>).
 
 =item Subqueries
 

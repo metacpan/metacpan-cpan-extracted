@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile
   ( NAME        => 'Apache::Solr'
-  , VERSION     => '1.04'
+  , VERSION     => '1.05'
   , PREREQ_PM   =>
      { Data::Dumper	=> 0
      , Encode           => 0
@@ -19,8 +19,20 @@ WriteMakefile
      }
   , AUTHOR      => 'Mark Overmeer'
   , ABSTRACT    => 'Client for (Lucene) Solr'
-  , LICENSE     => 'perl'
-  , EXE_FILES   => [  ]
+  , LICENSE     => 'perl_5'
+
+  , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-Apache-Solr.git'
+              , web  => 'https://github.com/markov2/perl5-Apache-Solr'
+              }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
+          }
+      }
   );
 
 #### the next lines are added for OODoc, which generates the
@@ -30,11 +42,11 @@ sub MY::postamble { <<'__POSTAMBLE' }
 # for DIST
 RAWDIR          = ../public_html/apache-solr/raw
 DISTDIR         = ../public_html/apache-solr/source
-LICENSE         = artistic
+LICENSE         = perl
 
 # for POD
 FIRST_YEAR      = 2012
-EMAIL           = perl@overmeer.net
-WEBSITE         = http://perl.overmeer.net
+EMAIL           = markov@cpan.org
+WEBSITE         = http://perl.overmeer.net/CPAN/
 __POSTAMBLE
 

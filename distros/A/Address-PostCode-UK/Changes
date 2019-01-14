@@ -1,5 +1,8 @@
 Revision history for Address::PostCode::UK
 
+0.17  2019-01-13T14:05:00+01:00
+      - Updated packages to import namespace::autoclean.
+
 0.16  2019-01-09T12:45:00+01:00
       - Used namespace::autoclean instead.
 

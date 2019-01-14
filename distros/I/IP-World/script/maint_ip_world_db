@@ -13,10 +13,12 @@ use constant FN => 'ipworld';
 
 # online archives
 my @URLS = ("http://static.wipmania.com/static/worldip.en.text.zip",
-            "http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip");
+            # "http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip"
+           );
 # file names within the archives
 my @FNS = ("worldip.en.txt",
-           "GeoIPCountryWhois.csv");
+           # "GeoIPCountryWhois.csv"
+          );
 
 my @moname = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
               'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');

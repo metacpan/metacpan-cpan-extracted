@@ -48,11 +48,11 @@
    "provides" : {
       "WebService::Lobid" : {
          "file" : "lib/WebService/Lobid.pm",
-         "version" : "0.0041"
+         "version" : "0.0042"
       },
       "WebService::Lobid::Organisation" : {
          "file" : "lib/WebService/Lobid/Organisation.pm",
-         "version" : "0.0041"
+         "version" : "0.0042"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/hatorikibble/webservice-lobid-organisations"
       }
    },
-   "version" : "0.0041",
+   "version" : "0.0042",
    "x_generated_by_perl" : "v5.20.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

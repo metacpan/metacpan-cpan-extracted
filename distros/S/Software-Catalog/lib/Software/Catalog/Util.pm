@@ -1,7 +1,7 @@
 package Software::Catalog::Util;
 
-our $DATE = '2018-10-18'; # DATE
-our $VERSION = '1.0.4'; # VERSION
+our $DATE = '2019-01-14'; # DATE
+our $VERSION = '1.0.5'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,6 +29,9 @@ $SPEC{extract_from_url} = {
         code => {
             schema => 'code*',
         },
+        all => {
+            schema => 'bool*',
+        },
     },
     args_rels => {
         req_one => [qw/re code/],
@@ -50,11 +53,20 @@ sub extract_from_url {
     my $res;
     if ($args{re}) {
         log_trace "Finding version from $args{url} using regex $args{re} ...";
-        if ($lwp_res->content =~ $args{re}) {
-            $res = [200, "OK", $1];
+        if ($args{all}) {
+            my $content = $lwp_res->content;
+            my %m;
+            while ($content =~ /$args{re}/g) {
+                $m{$1}++;
+            }
+            $res = [200, "OK (all)", [sort keys %m]];
         } else {
-            $res = [543, "Couldn't match pattern $args{re} against ".
-                        "content of URL '$args{url}'"];
+            if ($lwp_res->content =~ $args{re}) {
+                $res = [200, "OK", $1];
+            } else {
+                $res = [543, "Couldn't match pattern $args{re} against ".
+                            "content of URL '$args{url}'"];
+            }
         }
     } else {
         log_trace "Finding version from $args{url} using code ...";
@@ -80,7 +92,7 @@ Software::Catalog::Util - Utility routines
 
 =head1 VERSION
 
-This document describes version 1.0.4 of Software::Catalog::Util (from Perl distribution Software-Catalog), released on 2018-10-18.
+This document describes version 1.0.5 of Software::Catalog::Util (from Perl distribution Software-Catalog), released on 2019-01-14.
 
 =head1 FUNCTIONS
 
@@ -96,6 +108,8 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<all> => I<bool>
 
 =item * B<code> => I<code>
 
@@ -138,7 +152,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,79 @@
+{
+   "abstract" : "[DEPRECATED] This is html fronted for SQLEvaluator and is currently being replaced by PMLTQ::Server",
+   "author" : [
+      "Petr Pajas <pajas@ufal.mff.cuni.cz>",
+      "Jan \u0160t\u011bp\u00e1nek <stepanek@ufal.mff.cuni.cz>",
+      "Michal Sedl\u00e1k <sedlak@ufal.mff.cuni.cz>",
+      "Maty\u00e1\u0161 Kopp <matyas.kopp@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PMLTQ-CGI",
+   "no_index" : {},
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "2.51",
+            "Encode" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::AsCGI" : "1.2",
+            "HTTP::Server::Simple::CGI" : "0.44",
+            "JSON" : "2.90",
+            "LWP::UserAgent" : "0",
+            "MIME::Types" : "2.04",
+            "PMLTQ" : "v2.0.1",
+            "URI::Encode" : "0",
+            "URI::WithBase" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PMLTQ::CGI" : {
+         "file" : "lib/PMLTQ/CGI.pm",
+         "version" : "v2.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ufal/pmltq-cgi/issues"
+      },
+      "homepage" : "http://ufal.mff.cuni.cz/pmltq/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ufal/pmltq-cgi.git",
+         "web" : "https://github.com/ufal/pmltq-cgi"
+      }
+   },
+   "version" : "2.0.1",
+   "x_authority" : "cpan:MATY",
+   "x_authority_from_module" : "PMLTQ::CGI",
+   "x_permissions_from_module" : "PMLTQ::CGI",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

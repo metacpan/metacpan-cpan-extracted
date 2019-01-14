@@ -1,7 +1,7 @@
 package Pod::From::Acme::CPANModules;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-01-11'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -81,6 +81,14 @@ sub gen_pod_from_acme_cpanmodules {
             $pod .= "=back\n\n";
             $res->{pod}{'INCLUDED MODULES'} .= $pod;
         }
+
+        {
+            require Acme::CPANModulesUtil::FeatureMatrix;
+            my $fres = Acme::CPANModulesUtil::FeatureMatrix::draw_feature_matrix(_list => $list);
+            last if $fres->[0] != 200;
+            $res->{pod}{'FEATURE COMPARISON MATRIX'} = $fres->[2];
+        }
+
     }
 
     $res;
@@ -101,7 +109,7 @@ Pod::From::Acme::CPANModules - Create "INCLUDED MODULES" POD sections from $LIST
 
 =head1 VERSION
 
-This document describes version 0.001 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2018-01-09.
+This document describes version 0.002 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2019-01-11.
 
 =head1 SYNOPSIS
 
@@ -158,7 +166,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

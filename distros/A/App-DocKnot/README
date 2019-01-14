@@ -1,8 +1,8 @@
-                               DocKnot 1.06
+                               DocKnot 2.00
                     (package documentation generator)
                 Maintained by Russ Allbery <rra@cpan.org>
 
-  Copyright 2013-2018 Russ Allbery <rra@cpan.org>.  This software is
+  Copyright 2013-2019 Russ Allbery <rra@cpan.org>.  This software is
   distributed under a BSD-style license.  Please see the section LICENSE
   below for more information.
 
@@ -43,10 +43,10 @@ DESCRIPTION
   it useful, send pull requests to make it more general, or take ideas
   from it for your own purposes.
 
-  Currently included in this package are just the App::DocKnot module
-  (which contains most of the logic), a small docknot driver program, and
-  the templates I use for my own software.  Over time, it may include more
-  of my web publishing framework, time permitting.
+  Currently included in this package are just the App::DocKnot module and
+  its submodules, a small docknot driver program, and the templates I use
+  for my own software.  Over time, it may include more of my web
+  publishing framework, time permitting.
 
 REQUIREMENTS
 
@@ -58,6 +58,28 @@ REQUIREMENTS
   * JSON
   * Perl6::Slurp
   * Template (part of Template Toolkit)
+
+BUILDING AND INSTALLATION
+
+  DocKnot uses Module::Build and can be installed using the same process
+  as any other Module::Build module:
+
+      perl Build.PL
+      ./Build
+      ./Build install
+
+  You will have to run the last command as root unless you're installing
+  into a local Perl module tree in your home directory.
+
+TESTING
+
+  DocKnot comes with a test suite, which you can run after building with:
+
+      ./Build test
+
+  If a test fails, you can run a single test with verbose output via:
+
+      ./Build test --test_files <path-to-test>
 
   IPC::System::Simple is required to run the test suite.  The following
   additional Perl modules will be used by the test suite if present:
@@ -73,19 +95,6 @@ REQUIREMENTS
 
   All are available on CPAN.  Those tests will be skipped if the modules
   are not available.
-
-BUILDING AND INSTALLATION
-
-  DocKnot uses Module::Build and can be installed using the same process
-  as any other Module::Build module:
-
-      perl Build.PL
-      ./Build
-      ./Build test
-      ./Build install
-
-  You will have to run the last command as root unless you're installing
-  into a local Perl module tree in your home directory.
 
   To enable tests that don't detect functionality problems but are used to
   sanity-check the release, set the environment variable RELEASE_TESTING
@@ -137,7 +146,7 @@ LICENSE
   The DocKnot package as a whole is covered by the following copyright
   statement and license:
 
-    Copyright 2013-2018 Russ Allbery <rra@cpan.org>
+    Copyright 2013-2019 Russ Allbery <rra@cpan.org>
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the

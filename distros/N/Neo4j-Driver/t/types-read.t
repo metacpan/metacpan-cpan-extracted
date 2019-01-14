@@ -122,7 +122,7 @@ END
 	is ref $r->get(1)->{second}, 'ARRAY', 'list in map =array';
 	is scalar @{$r->get(1)->{second}}, 2, 'map-list size';
 	is ref $r->get(1)->{second}->[0], 'HASH', 'node in map-list';
-	is scalar keys %{$r->get(1)->{second}->[0]}, 0, 'no-prop node in map-list';
+	is scalar (grep !/^_/, keys %{$r->get(1)->{second}->[0]}), 0, 'no-prop node in map-list';
 	is $r->get(1)->{second}->[1], undef, 'null in map-list';
 };
 

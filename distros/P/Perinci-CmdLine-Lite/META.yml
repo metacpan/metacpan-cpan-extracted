@@ -32,7 +32,7 @@ requires:
   Complete::Zsh: '0'
   Data::Clean::JSON: '0.390'
   Data::Dump: '0'
-  Data::Sah: '0.893'
+  Data::Sah: '0.895'
   Data::Sah::Util::Type: '0.45'
   Encode: '0'
   Fcntl: '0'
@@ -42,7 +42,7 @@ requires:
   JSON::MaybeXS: '0'
   List::Util: '1.45'
   Log::ger: '0.023'
-  Log::ger::App: '0.006'
+  Log::ger::App: '0.009'
   Log::ger::Output::Screen: '0.007'
   MIME::Base64: '0'
   Mo: '0'
@@ -63,7 +63,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite
   homepage: https://metacpan.org/release/Perinci-CmdLine-Lite
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Lite.git
-version: '1.816'
+version: '1.817'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -143,7 +143,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

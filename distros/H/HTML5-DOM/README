@@ -12,7 +12,7 @@ SYNOPSIS
 
      # parse some html
      my $tree = $parser->parse('
-      <label>Some list of OS:</lbnel>
+      <label>Some list of OS:</label>
       <ul class="list" data-what="os" title="OS list">
          <li>UNIX</li>
          <li>Linux</li>
@@ -73,9 +73,7 @@ DESCRIPTION
     and <https://github.com/lexborisov/myhtml> as HTML5 parser.
 
    Key features
-    *   Really fast HTML parsing, can use threads (by default).
-
-    *   Supports async parsing.
+    *   Really fast HTML parsing, can use threads.
 
     *   Supports parsing by chunks.
 
@@ -90,17 +88,24 @@ DESCRIPTION
     *   Fully integration in perl and memory management. You don't care
         about "free" or "destroy".
 
+    *   Supports async parsing, with optional event-loop intergration.
+
 HTML5::DOM
     HTML5 parser object.
 
   new
-     # with default options
-     my $parser = HTML5::DOM->new;
+     use warnings;
+     use strict;
+     use HTML5::DOM;
  
-     # override some options, if you need
-     my $parser = HTML5::DOM->new({
-        threads                 => 2,
-        async                   => 0, 
+     my $parser;
+ 
+     # with default options
+     $parser = HTML5::DOM->new;
+ 
+     # or override some options, if you need
+     $parser = HTML5::DOM->new({
+        threads                 => 0,
         ignore_whitespace       => 0, 
         ignore_doctype          => 0, 
         scripts                 => 0, 
@@ -115,19 +120,33 @@ HTML5::DOM
     details.
 
    parse
+     use warnings;
+     use strict;
+     use HTML5::DOM;
+ 
+     my $parser = HTML5::DOM->new;
+ 
      my $html = '<div>Hello world!</div>';
  
+     my $tree;
+ 
      # parsing with options defined in HTML5::DOM->new
-     my $tree = $parser->parse($html);
+     $tree = $parser->parse($html);
  
      # parsing with custom options (extends options defined in HTML5::DOM->new)
-     my $tree = $parser->parse($html, {
+     $tree = $parser->parse($html, {
          scripts     => 0, 
      });
 
     Parse html string and return HTML5::DOM::Tree object.
 
    parseChunkStart
+     use warnings;
+     use strict;
+     use HTML5::DOM;
+ 
+     my $parser = HTML5::DOM->new;
+ 
      # start chunked parsing with options defined in HTML5::DOM->new
      # call parseChunkStart without options is useless, 
      # because first call of parseChunk automatically call parseChunkStart. 
@@ -141,18 +160,182 @@ HTML5::DOM
     Init chunked parsing. See "PARSER OPTIONS" for details.
 
    parseChunk
+     use warnings;
+     use strict;
+     use HTML5::DOM;
+ 
+     my $parser = HTML5::DOM->new;
+ 
      $parser->parseChunkStart()->parseChunk('<')->parseChunk('di')->parseChunk('v>');
 
     Parse chunk of html stream.
 
    parseChunkEnd
+     use warnings;
+     use strict;
+     use HTML5::DOM;
+ 
+     my $parser = HTML5::DOM->new;
+ 
      # start some chunked parsing
      $parser->parseChunk('<')->parseChunk('di')->parseChunk('v>');
  
      # end parsing and get tree
      my $tree = $parser->parseChunkEnd();
+ 
+     print $tree->html; # <html><head></head><body><div></div></body></html>
 
     Completes chunked parsing and return HTML5::DOM::Tree object.
+
+   parseAsync
+    Parsing html in background thread. Can use with different ways:
+
+    1. Manual wait parsing completion when you need.
+
+     use warnings;
+     use strict;
+     use HTML5::DOM;
+ 
+     my $parser = HTML5::DOM->new;
+ 
+     my $html = '<div>Hello world!</div>';
+ 
+     my $async;
+ 
+     # start async parsing
+     $async = $parser->parseAsync($html);
+ 
+     # or with options
+     $async = $parser->parseAsync($html, { scripts => 0 });
+ 
+     # ...do some work...
+ 
+     # wait for parsing done
+     my $tree = $async->wait;
+ 
+     # work with tree
+     print $tree->html;
+
+    "$async->wait" returns HTML5::DOM::AsyncResult object.
+
+    2. Non-blocking check for parsing completion.
+
+     use warnings;
+     use strict;
+     use HTML5::DOM;
+ 
+     my $parser = HTML5::DOM->new;
+ 
+     my $html = '<div>Hello world!</div>';
+ 
+     my $tree;
+     my $async;
+ 
+     # start async parsing
+     $async = $parser->parseAsync($html);
+ 
+     # or with options
+     $async = $parser->parseAsync($html, { scripts => 0 });
+ 
+     while (!$async->parsed) {
+         # do some work
+     }
+     $tree = $async->tree; # HTML5::DOM::Tree
+     # work with $tree
+     print $tree->root->at('div')->text."\n"; # Hello world!
+ 
+     # or another way
+ 
+     # start async parsing
+     $async = $parser->parseAsync($html);
+ 
+     # or with options
+     $async = $parser->parseAsync($html, { scripts => 0 });
+ 
+     while (!($tree = $async->tree)) {
+         # do some work
+     }
+     # work with $tree
+     print $tree->root->at('div')->text."\n"; # Hello world!
+
+    "$async->parsed" returns 1 if parsing done. Else returns 0.
+
+    "$async->tree" returns HTML5::DOM::Tree object if parsing done. Else
+    returns "undef".
+
+    3. Intergation with EV <https://metacpan.org/pod/EV>
+
+    Required packages (only if you want use event loop):
+
+    *   EV <https://metacpan.org/pod/EV>
+
+    *   AnyEvent::Util <https://metacpan.org/pod/AnyEvent::Util>
+
+     use warnings;
+     use strict;
+     use EV;
+     use HTML5::DOM;
+ 
+     my $parser = HTML5::DOM->new;
+     my $html = '<div>Hello world!</div>';
+ 
+     my $custom_options = { scripts => 0 };
+ 
+     $parser->parseAsync($html, $custom_options, sub {
+         my $tree = shift;
+         # work with $tree
+         print $tree->root->at('div')->text."\n"; # Hello world!
+     });
+ 
+     # do some work
+ 
+     EV::loop;
+
+    Function returns HTML5::DOM::AsyncResult object.
+
+    $tree in callback is a HTML5::DOM::Tree object.
+
+    4. Intergation with custom event-loop (example with AnyEvent loop)
+
+     use warnings;
+     use strict;
+     use AnyEvent;
+     use AnyEvent::Util;
+     use HTML5::DOM;
+ 
+     my $parser = HTML5::DOM->new;
+     my $html = '<div>Hello world!</div>';
+ 
+     my $custom_options = { scripts => 0 };
+ 
+     # create pipe
+     my ($r, $w) = AnyEvent::Util::portable_pipe();
+     AnyEvent::fh_unblock $r;
+ 
+     # fd for parseAsync communications
+     my $write_fd = fileno($w);
+ 
+     # after parsing complete module writes to $write_fd:
+     # value "1" - if success
+     # value "0" - if error
+     my $async = $parser->parseAsync($html, $custom_options, $write_fd);
+ 
+     # watch for value
+     my $async_watcher;
+     $async_watcher = AE::io $r, 0, sub {
+         <$r>; # read "1" or "0"
+         $async_watcher = undef; # destroy watcher
+     
+         # work with $tree
+         my $tree = $async->wait;
+         print $tree->root->at('div')->text."\n"; # Hello world!
+     };
+ 
+     # ...do some work...
+ 
+     AE::cv->recv;
+
+    $tree in callback is a HTML5::DOM::Tree object.
 
 HTML5::DOM::Tree
     DOM tree object.
@@ -391,22 +574,6 @@ HTML5::DOM::Tree
 
     Convert namespace id to name. Return "undef", if namespace id not
     exists. See "NAMESPACES" for namespace constants list.
-
-   wait
-     my $parser = HTML5::DOM->new({async => 1});
-     my $tree = $parser->parse($some_big_html_file);
-     # ...some your work...
-     $tree->wait; # wait before parsing threads done
-
-    Blocking wait for tree parsing done. Only for async mode.
-
-   parsed
-     my $parser = HTML5::DOM->new({async => 1});
-     my $tree = $parser->parse($some_big_html_file);
-     # ...some your work...
-     while (!$tree->parsed); # wait before parsing threads done
-
-    Non-blocking way for check if tree parsing done. Only for async mode.
 
    parser
      my $parser = $tree->parser;
@@ -1107,22 +1274,6 @@ HTML5::DOM::Node
      print $li->[0]->isSameNode($li->[1]); # 0
      print $li->[0]->isSameNode($li->[2]); # 0
 
-   wait
-     my $parser = HTML5::DOM->new({async => 1});
-     my $tree = $parser->parse($some_big_html_file);
-     # ...some your work...
-     $tree->body->wait; # wait before parsing for <body> is done
-
-    Blocking wait for node parsing done. Only for async mode.
-
-   parsed
-     my $parser = HTML5::DOM->new({async => 1});
-     my $tree = $parser->parse($some_big_html_file);
-     # ...some your work...
-     while (!$tree->body->parsed); # wait before parsing for <body> is done
-
-    Non-blocking way for check if node parsing done. Only for async mode.
-
 HTML5::DOM::Element
     DOM node object for elements. Inherit all methods from HTML5::DOM::Node.
 
@@ -1688,6 +1839,60 @@ HTML5::DOM::TokenList
      });
 
     Forach all tokens in list.
+
+HTML5::DOM::AsyncResult
+    Get result and check status from async parsing.
+
+   parsed
+    Non-blocking check status.
+
+     use warnings;
+     use strict;
+     use HTML5::DOM;
+
+     my $parser = HTML5::DOM->new;
+     my $async = $parser->parseAsync('<div>Hello world!</div>' x 1000);
+ 
+     my $is_parsed;
+     while (!($is_parsed = $async->parsed)) {
+         print "is_parsed=$is_parsed\n";
+     }
+
+    Returns 1 if async parsing done. Otherwise returns 0.
+
+   tree
+    Non-blocking get result.
+
+     use warnings;
+     use strict;
+     use HTML5::DOM;
+
+     my $parser = HTML5::DOM->new;
+     my $async = $parser->parseAsync('<div>Hello world!</div>' x 1000);
+ 
+     my $tree;
+     while (!($tree = $async->tree)) {
+         print "is_parsed=".($tree ? 1 : 0)."\n";
+     }
+ 
+     print $tree->at('div')->text."\n"; # Hello world!
+
+    Returns HTML5::DOM::Tree object if async parsing done. Otherwise returns
+    "undef".
+
+   wait
+     use warnings;
+     use strict;
+     use HTML5::DOM;
+
+     my $parser = HTML5::DOM->new;
+     my $async = $parser->parseAsync('<div>Hello world!</div>' x 1000);
+ 
+     my $tree = $async->wait;
+ 
+     print $tree->at('div')->text."\n"; # Hello world!
+
+    Blocking waits for parsing done and returns HTML5::DOM::Tree object.
 
 HTML5::DOM::CSS
     CSS Parser object
@@ -2302,22 +2507,15 @@ PARSER OPTIONS
     *   HTML5::DOM::Tree::parseFragment
 
    threads
-    Threads count, if 0 - parsing in single mode without threads (default 2)
+    Threads count, if < 2 - parsing in single mode without threads (default
+    0)
 
     This option affects only for HTML5::DOM::new.
 
-   async
-    If async 0 (default), then some parsing functions (such as
-    HTML5::DOM::parse, HTML5::DOM::parseChunkEnd,
-    HTML5::DOM::Tree::parseFragment) waiting for parsing done.
+    In some OS or HTML documents may be slower than single mode (threads=0).
 
-    If async 1, you must manualy call "$tree->wait" and "$node->wait" for
-    waiting parsing done.
-
-    Or use non-blocking "$tree->parsed" and "$node->parsed" to determine
-    parsing state.
-
-    This options works only if "threads" > 0
+    Not recommended use if don't known what you do or without testing in
+    real cases
 
    ignore_whitespace
     Ignore whitespace tokens (default 0)
@@ -2359,6 +2557,71 @@ PARSER OPTIONS
     Allow use detecding BOM to determine input HTML encoding. (default 1)
 
     See detectBomAndCut.
+
+HTML5 support
+    Tested with html5lib-tests <https://github.com/html5lib/html5lib-tests>
+
+     test                        total    ok      fail    skip
+     -------------------------------------------------------------
+     menuitem-element.dat        19       16      3       0
+     tests11.dat                 12       11      1       0
+     math.dat                    7        7       0       0
+     plain-text-unsafe.dat       32       32      0       0
+     webkit01.dat                48       48      0       0
+     tests9.dat                  26       26      0       0
+     tests_innerHTML_1.dat       84       84      0       0
+     scriptdata01.dat            26       26      0       0
+     tests4.dat                  6        6       0       0
+     noscript01.dat              17       17      0       0
+     entities01.dat              74       74      0       0
+     tests14.dat                 6        6       0       0
+     domjs-unsafe.dat            48       48      0       0
+     tests10.dat                 53       53      0       0
+     ruby.dat                    20       20      0       0
+     tests12.dat                 1        1       0       0
+     comments01.dat              13       13      0       0
+     main-element.dat            2        2       0       0
+     entities02.dat              25       25      0       0
+     template.dat                107      107     0       0
+     tables01.dat                16       16      0       0
+     tests15.dat                 13       13      0       0
+     tests16.dat                 196      196     0       0
+     tests25.dat                 25       25      0       0
+     pending-spec-changes.dat    2        2       0       0
+     tests23.dat                 4        4       0       0
+     tricky01.dat                8        8       0       0
+     tests1.dat                  112      112     0       0
+     html5test-com.dat           23       23      0       0
+     tests22.dat                 4        4       0       0
+     tests26.dat                 15       15      0       0
+     tests6.dat                  51       51      0       0
+     tests5.dat                  16       16      0       0
+     isindex.dat                 3        3       0       0
+     tests20.dat                 43       43      0       0
+     doctype01.dat               36       36      0       0
+     tests21.dat                 24       24      0       0
+     foreign-fragment.dat        57       57      0       0
+     tests18.dat                 35       35      0       0
+     tests8.dat                  9        9       0       0
+     inbody01.dat                3        3       0       0
+     tests7.dat                  30       30      0       0
+     tests24.dat                 7        7       0       0
+     tests2.dat                  61       61      0       0
+     tests17.dat                 12       12      0       0
+     webkit02.dat                20       20      0       0
+     tests19.dat                 104      104     0       0
+     adoption01.dat              17       17      0       0
+     tests3.dat                  23       23      0       0
+     blocks.dat                  47       47      0       0
+     adoption02.dat              1        1       0       0
+     summary                     1643     1639    4       0
+
+    Tested with "examples/html5lib_tests.pl"
+
+     perl examples/html5lib_tests.pl --dir=../html5lib-tests/tree-construction --colordiff
+
+    Send patches to lexborisov's MyHTML
+    <https://github.com/lexborisov/myhtml> if you want improve this result.
 
 BUGS
     <https://github.com/Azq2/perl-html5-dom/issues>

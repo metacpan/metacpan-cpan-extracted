@@ -97,7 +97,7 @@ sub create_new_table {
     my %cu = ( create_table_plain      => '- plain',
                create_table_form_copy  => '- Copy & Paste',
                create_table_form_file  => '- From File',
-               settings                => '  SETTINGS'
+               settings                => '  Settings'
     );
     my $old_idx = 0;
 
@@ -291,7 +291,7 @@ sub __set_columns {
     }
     $sql->{insert_into_cols} = [ @{$sql->{create_table_cols}} ];
     if ( $sf->{col_auto} ) {
-        my ( $skip, $add ) = ( '- Skip', '- Add ai-column' );
+        my ( $skip, $add ) = ( '- Skip', '- Add AI column' );
         $ax->print_sql( $sql, $stmt_typeS );
         # Choose
         my $choice = choose(

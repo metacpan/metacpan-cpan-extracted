@@ -17,6 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-CPANModulesUtils
 requires:
+  Acme::CPANModulesUtil::FeatureMatrix: '0'
   Data::Dump: '0'
   Data::Sah::Coerce::perl::str::str_normalize_perl_modname: '0'
   Data::Sah::Coerce::perl::str::str_strip_trailing_slash: '0'
@@ -27,8 +28,9 @@ requires:
   File::Slurper: '0'
   Log::ger: '0.023'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.811'
+  Perinci::CmdLine::Base: '1.816'
   Perinci::CmdLine::Classic: '1.770'
+  Perinci::Sub::XCompletion::perl_modname: '0'
   Sah::Schema::filename: '0'
   Sah::Schema::nonnegint: '0'
   Sah::Schema::perl::modname: '0'
@@ -40,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPANModulesUtils
   homepage: https://metacpan.org/release/App-CPANModulesUtils
   repository: git://github.com/perlancar/perl-App-CPANModulesUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -48,6 +50,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript gen-acme-cpanmodules-module-from-acme-cpanlists-list'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript draw-feature-matrix-from-acme-cpanmodules-module'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
@@ -124,7 +130,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -136,7 +142,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.05'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -355,7 +361,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

@@ -37,27 +37,31 @@ use warnings;
 
 use lib 't/lib';
 
+use Test::RRA qw(skip_unless_automated);
+
 use File::Find qw(find);
 use Test::More;
-use Test::RRA qw(skip_unless_automated);
 
 # File name (the file without any directory component) and path patterns to
 # skip for this check.
 ## no critic (RegularExpressions::ProhibitFixedStringMatches)
 my @IGNORE = (
-    qr{ \A Build ( [.] .* )? \z }ixms,      # Generated file from Build.PL
+    qr{ \A Build ( [.] (?!PL) .* )? \z }ixms,    # Generated file from Build.PL
     qr{ \A LICENSE \z }xms,                 # Generated file, no license itself
-    qr{ \A (Changes|NEWS|TODO) \z }xms,     # Package license should be fine
+    qr{ \A (Changes|NEWS|THANKS) \z }xms,   # Package license should be fine
+    qr{ \A TODO \z }xms,                    # Package license should be fine
     qr{ \A MANIFEST ( [.] .* )? \z }xms,    # Package license should be fine
     qr{ \A Makefile \z }xms,                # Generated file, no license itself
     qr{ \A (MY)? META [.] .* }xms,          # Generated file, no license itself
     qr{ [.] output \z }xms,                 # Test data
+    qr{ pod2htm . [.] tmp \z }xms,          # Windows pod2html output
 );
 my @IGNORE_PATHS = (
     qr{ \A [.] / [.] git/ }xms,               # Version control files
     qr{ \A [.] /_build/ }xms,                 # Module::Build metadata
     qr{ \A [.] /blib/ }xms,                   # Perl build system artifacts
     qr{ \A [.] /cover_db/ }xms,               # Artifacts from coverage testing
+    qr{ \A [.] /debian/ }xms,                 # Found in debian/* branches
     qr{ \A [.] /docs/metadata/ }xms,          # Package license should be fine
     qr{ \A [.] /README ( [.] .* )? \z }xms,   # Package license should be fine
     qr{ \A [.] /share/ }xms,                  # Package license should be fine
@@ -79,9 +83,7 @@ sub check_file {
     my $filename = $_;
     my $path     = $File::Find::name;
 
-    # Ignore files in the whitelist, binary files, and files under 1KB.  The
-    # latter can be rolled up into the overall project license and the license
-    # notice may be a substantial portion of the file size.
+    # Ignore files in the whitelist and binary files.
     for my $pattern (@IGNORE) {
         return if $filename =~ $pattern;
     }
@@ -93,12 +95,14 @@ sub check_file {
     }
     return if -d $filename;
     return if !-T $filename;
-    return if -s $filename < 1024;
 
     # Scan the file.
-    my ($saw_spdx, $skip_spdx);
+    my ($saw_legacy_notice, $saw_spdx, $skip_spdx);
     open(my $file, '<', $filename) or BAIL_OUT("Cannot open $path");
     while (defined(my $line = <$file>)) {
+        if ($line =~ m{ \b See \s+ LICENSE \s+ for \s+ licensing }xms) {
+            $saw_legacy_notice = 1;
+        }
         if ($line =~ m{ \b SPDX-License-Identifier: \s+ \S+ }xms) {
             $saw_spdx = 1;
             last;
@@ -109,7 +113,16 @@ sub check_file {
         }
     }
     close($file) or BAIL_OUT("Cannot close $path");
-    ok($saw_spdx || $skip_spdx, $path);
+
+    # If there is a legacy license notice, report a failure regardless of file
+    # size.  Otherwise, skip files under 1KB.  They can be rolled up into the
+    # overall project license and the license notice may be a substantial
+    # portion of the file size.
+    if ($saw_legacy_notice) {
+        ok(!$saw_legacy_notice, "$path has legacy license notice");
+    } else {
+        ok($saw_spdx || $skip_spdx || -s $filename < 1024, $path);
+    }
     return;
 }
 

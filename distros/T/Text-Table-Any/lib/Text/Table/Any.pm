@@ -1,7 +1,7 @@
 package Text::Table::Any;
 
-our $DATE = '2018-09-23'; # DATE
-our $VERSION = '0.093'; # VERSION
+our $DATE = '2019-01-11'; # DATE
+our $VERSION = '0.094'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -9,10 +9,36 @@ our $VERSION = '0.093'; # VERSION
 # # use warnings;
 #END IFUNBUILT
 
+our @BACKENDS = qw(
+                      Text::Table::Tiny
+                      Text::Table::TinyColor
+                      Text::Table::TinyColorWide
+                      Text::Table::TinyWide
+                      Text::Table::Org
+                      Text::Table::CSV
+                      Text::Table::TSV
+                      Text::Table::LTSV
+                      Text::Table::ASV
+                      Text::Table::HTML
+                      Text::Table::HTML::DataTables
+                      Text::Table::Paragraph
+                      Text::ANSITable
+                      Text::ASCIITable
+                      Text::FormatTable
+                      Text::MarkdownTable
+                      Text::Table
+                      Text::TabularDisplay
+                      Text::Table::XLSX
+              );
+
 sub _encode {
     my $val = shift;
     $val =~ s/([\\"])/\\$1/g;
     "\"$val\"";
+}
+
+sub backends {
+    @BACKENDS;
 }
 
 sub table {
@@ -152,7 +178,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.093 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2018-09-23.
+This document describes version 0.094 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2019-01-11.
 
 =head1 SYNOPSIS
 
@@ -253,13 +279,21 @@ When using C<Text::TabularDisplay> backend:
  | carol | brig gen | 8745     |
  +-------+----------+----------+
 
+=head1 VARIABLES
+
+=head2 @BACKENDS
+
+List of supported backends.
+
 =head1 FUNCTIONS
 
-=head2 table(%params) => str
+=head2 table
 
-=head2 OPTIONS
+Usage:
 
-The C<table> function understands these arguments, which are passed as a hash.
+ table(%params) => str
+
+Known arguments:
 
 =over
 
@@ -274,15 +308,15 @@ Optional. Pick a backend module. Supported backends:
 
 =over
 
-=item * Text::ANSITable
+=item * Text::Table::Tiny
 
-=item * Text::ASCIITable
+=item * Text::Table::TinyColor
 
-=item * Text::FormatTable
+=item * Text::Table::TinyColorWide
 
-=item * Text::MarkdownTable
+=item * Text::Table::TinyWide
 
-=item * Text::Table
+=item * Text::Table::Org
 
 =item * Text::Table::CSV
 
@@ -296,21 +330,21 @@ Optional. Pick a backend module. Supported backends:
 
 =item * Text::Table::HTML::DataTables
 
-=item * Text::Table::Org
-
 =item * Text::Table::Paragraph
 
-=item * Text::Table::Tiny
+=item * Text::ANSITable
 
-=item * Text::Table::TinyColor
+=item * Text::ASCIITable
 
-=item * Text::Table::TinyColorWide
+=item * Text::FormatTable
 
-=item * Text::Table::TinyWide
+=item * Text::MarkdownTable
 
-=item * Text::Table::XLSX
+=item * Text::Table
 
 =item * Text::TabularDisplay
+
+=item * Text::Table::XLSX
 
 =back
 
@@ -321,6 +355,11 @@ as a header row, and separated visually from the rest of the table (e.g. with a
 ruled line). But some backends won't display differently.
 
 =back
+
+=head2 backends
+
+Return list of supported backends. You can also get the list from the
+L</@BACKENDS> package variable.
 
 =head1 HOMEPAGE
 
@@ -348,7 +387,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

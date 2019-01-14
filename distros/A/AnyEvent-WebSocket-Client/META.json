@@ -31,7 +31,7 @@
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -89,7 +89,7 @@
          "web" : "https://github.com/plicease/AnyEvent-WebSocket-Client"
       }
    },
-   "version" : "0.49",
+   "version" : "0.50",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Toshio Ito (debug-ito, TOSHIOITO)",
@@ -99,8 +99,8 @@
       "Fayland Lam (FAYLAND)",
       "Daniel Kamil Kozar (xavery)"
    ],
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
+   "x_generated_by_perl" : "v5.29.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
    "x_use_unsafe_inc" : 0
 }
 

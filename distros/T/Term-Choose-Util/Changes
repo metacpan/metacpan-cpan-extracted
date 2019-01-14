@@ -1,6 +1,11 @@
 Revision history for Term::Choose::Util
 
 
+0.069   2019-01-12
+        - Fixed the default for the option 'remove_chosen' in documentation.
+        - Option 'decoded': added the default to the documentation.
+        - Bufix file name encoding.
+
 0.068   2018-11-17
         - Update 'unicode_sprintf' and 'unicode_trim'.
 

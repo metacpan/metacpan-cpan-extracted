@@ -1,0 +1,5 @@
+# Velikost t-stromů
+t-root $r := 
+[ descendant t-node [  ] ];
+  >> for $r give count()
+  >> give min(),max(),round(avg(),4),sum()

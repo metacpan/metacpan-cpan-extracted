@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 TODO
 lib/Apache/Solr.pm
 lib/Apache/Solr.pod

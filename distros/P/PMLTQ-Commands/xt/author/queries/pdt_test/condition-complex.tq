@@ -1,0 +1,3 @@
+a-node $n0 :=
+[ afun != "AuxP", m/tag ~ '^V',  a-node $n1 :=
+     [ m/tag ~ '^[CN]...4', afun != 'Obj' ] ];

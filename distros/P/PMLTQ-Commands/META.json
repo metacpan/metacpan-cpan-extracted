@@ -1,0 +1,140 @@
+{
+   "abstract" : "PMLTQ command line interface",
+   "author" : [
+      "Maty\u00e1\u0161 Kopp <matyas.kopp@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PMLTQ-Commands",
+   "no_index" : {},
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "IO::Socket::IP" : "0",
+            "Module::Spy" : "0",
+            "Test::MockModule" : "0",
+            "Test::MockObject" : "0",
+            "Test::PostgreSQL" : "0",
+            "Treex::Core" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hash::Merge" : "0",
+            "JSON" : "0",
+            "PMLTQ" : "v2.0.1",
+            "URI::Encode" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PMLTQ::Base" : {
+         "file" : "lib/PMLTQ/Base.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command" : {
+         "file" : "lib/PMLTQ/Command.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::configuration" : {
+         "file" : "lib/PMLTQ/Command/configuration.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::convert" : {
+         "file" : "lib/PMLTQ/Command/convert.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::delete" : {
+         "file" : "lib/PMLTQ/Command/delete.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::init" : {
+         "file" : "lib/PMLTQ/Command/init.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::initdb" : {
+         "file" : "lib/PMLTQ/Command/initdb.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::load" : {
+         "file" : "lib/PMLTQ/Command/load.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::query" : {
+         "file" : "lib/PMLTQ/Command/query.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::verify" : {
+         "file" : "lib/PMLTQ/Command/verify.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::version" : {
+         "file" : "lib/PMLTQ/Command/version.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::webdelete" : {
+         "file" : "lib/PMLTQ/Command/webdelete.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::webload" : {
+         "file" : "lib/PMLTQ/Command/webload.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::webtreebank" : {
+         "file" : "lib/PMLTQ/Command/webtreebank.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Command::webverify" : {
+         "file" : "lib/PMLTQ/Command/webverify.pm",
+         "version" : "v2.0.1"
+      },
+      "PMLTQ::Commands" : {
+         "file" : "lib/PMLTQ/Commands.pm",
+         "version" : "v2.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ufal/pmltq-commands/issues"
+      },
+      "homepage" : "http://ufal.mff.cuni.cz/pmltq/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ufal/pmltq-commands.git",
+         "web" : "https://github.com/ufal/pmltq-commands"
+      }
+   },
+   "version" : "2.0.1",
+   "x_authority" : "cpan:MATY",
+   "x_authority_from_module" : "PMLTQ::Commands",
+   "x_permissions_from_module" : "PMLTQ::Commands",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

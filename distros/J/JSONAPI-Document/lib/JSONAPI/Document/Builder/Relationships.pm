@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Relationships;
-$JSONAPI::Document::Builder::Relationships::VERSION = '2.3';
+$JSONAPI::Document::Builder::Relationships::VERSION = '2.4';
 =head1 NAME
 
 JSONAPI::Document::Builder::Relationships - Related Resource Document builder
 
 =head1 VERSION
 
-version 2.3
+version 2.4
 
 =head1 DESCRIPTION
 
@@ -89,6 +89,28 @@ sub build {
 Builds a HashRef containing strings that represent URLs for fetching
 the given relationship, as well as the relationship ID(s).
 
+For referential purposes, B<self> and B<related> mean the following:
+
+=over
+
+=item self
+
+A link pointing to the relationship itself regardless of whether it is
+a one-to-one or has-many type of relationship. It contains the word
+"relationship" in the URL.
+
+The specification defines this link as the B<link to the relationship itself>
+in the context of the primary resource. This means that the resource(s)
+returned from this URL should be directly related to the primary resource,
+i.e. C<$dbic_row-E<gt>$relationship>.
+
+=item related
+
+Behaves the same as "self" except that its URL structure is
+different. I fail to see the difference.
+
+=back
+
 =cut
 
 sub build_links_document {
@@ -121,12 +143,12 @@ sub build_links_document {
 
     return {
         links => {
-            related => $self->api_url . '/'
+            self => $self->api_url . '/'
                 . $row_type . '/'
                 . $row->id
                 . '/relationships/'
                 . $self->format_type($relationship),
-            self => $self->api_url . '/' . $row_type . '/' . $row->id . '/' . $self->format_type($relationship),
+            related => $self->api_url . '/' . $row_type . '/' . $row->id . '/' . $self->format_type($relationship),
         },
         data => $data,
     };

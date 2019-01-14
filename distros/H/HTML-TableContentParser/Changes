@@ -1,3 +1,7 @@
+0.301		2019-01-11	T. R. Wyant
+    RT 128088 Synopsis should call parse(), not parse_file(). Thanks to
+    jabowery for catching this.
+
 0.300		2018-02-01	T. R. Wyant
     Handle <th> like <td>. That is, create a {headers} key in the <tr>
     hash. This contains the <th> hashes for the row, or undef if the

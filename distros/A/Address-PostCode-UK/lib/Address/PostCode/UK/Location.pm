@@ -1,6 +1,6 @@
 package Address::PostCode::UK::Location;
 
-$Address::PostCode::UK::Location::VERSION   = '0.16';
+$Address::PostCode::UK::Location::VERSION   = '0.17';
 $Address::PostCode::UK::Location::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Address::PostCode::UK::Location - Represent 'location' for Address::PostCode::UK
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'lat'      => (is => 'ro');
 has 'lng'      => (is => 'ro');

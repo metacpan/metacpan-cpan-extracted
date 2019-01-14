@@ -103,8 +103,8 @@
             "EV" : "v4.22.0",
             "File::Copy::Recursive" : "0",
             "Guard" : "v1.23.0",
+            "HTML5::DOM" : "v1.80.0",
             "HTML::Entities" : "0",
-            "HTML::TreeBuilder::LibXML" : "v0.26.0",
             "HTTP::Date" : "v6.2.0",
             "HTTP::Message" : "v6.13.0",
             "HTTP::Parser::XS" : "v0.17.0",
@@ -165,6 +165,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.78.5",
+   "version" : "v0.78.6",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -3,7 +3,16 @@
 
 =head1 TODO
 
-=head2 Driver
+This software has pre-release quality. The interface is not yet stable.
+
+=over
+
+=item * Replace old C<{}> parameter style with new C<$> style; see
+L<https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/>.
+
+=back
+
+=head2 L<Neo4j::Driver>
 
 =over
 
@@ -11,26 +20,26 @@
 
 =item * HTTPS support.
 
-=item * The current C<close> method is a no-op. It should either be removed
-completely or behave like the session C<close> method; see below.
+=item * The current C<close> method is a no-op. Perhaps it should behave like
+the session C<close> method; see below.
 
 =item * Consider if the 6 second timeout is too long. It should in fact be as
 short as reasonably possible.
 
+=item * Should we plan to support Casual Clusters?
+
 =back
 
-=head2 Session
+=head2 L<Neo4j::Driver::Session>
 
 =over
 
 =item * Support for persistent connections would be nice.
 
-=item * Two different sessions should use two different TCP connections (at the
-moment, every session uses the same L<REST::Client> instance).
-
 =item * Sessions should offer a C<close> method that automatically rolls back
 and terminates all currently open transactions. The current C<close> method is
 a no-op, which needs to be fixed.
+Bolt support B<needs> something like this!
 
 =item * Sessions of some of the official drivers can have at most one
 transaction running at a time. This restriction is not necessary for this Perl
@@ -41,14 +50,13 @@ of work".
 
 =back
 
-=head2 Transaction
+=head2 L<Neo4j::Driver::Transaction>
 
 =over
 
 =item * The option to send multiple statements at once should no longer be
 exposed to the client. It should only be used internally for running statements
-lazily. The method structure should be refactored such that this becomes
-obvious.
+lazily.
 
 =item * Using the C<meta> data (which is automatically returned since version
 3.0 (or possibly 3.1/3.2/3.3) and cannot be explicitly requested in
@@ -107,15 +115,15 @@ priority.
 
 =back
 
-=head2 StatementResult
+=head2 L<Neo4j::Driver::StatementResult>
 
 =over
 
-=item * Consider whether to implement iterator semantics for StatementResult.
+=item * Implement a stream iterator (for Bolt as well as HTTP).
 
 =back
 
-=head2 Record
+=head2 L<Neo4j::Driver::Record>
 
 =over
 
@@ -131,12 +139,12 @@ this record (C<keys>, C<has>, C<size>) and/or a mapping function for all fields
 the StatementResult object, these seem slightly superfluous though.
 
 =item * Implement C<graph>; see
-<https://github.com/neo4j/neo4j/blob/3.5/community/server/src/main/java/org/neo4j/server/rest/transactional/GraphExtractionWriter.java>,
+L<https://github.com/neo4j/neo4j/blob/3.5/community/server/src/main/java/org/neo4j/server/rest/transactional/GraphExtractionWriter.java>,
 L<https://github.com/neo4j/neo4j-python-driver/wiki/1.6-changelog#160a1>.
 
 =back
 
-=head2 ResultColumns
+=head2 L<Neo4j::Driver::ResultColumns>
 
 =over
 
@@ -154,7 +162,7 @@ regards to index/key collisions.
 
 =back
 
-=head2 ResultSummary
+=head2 L<Neo4j::Driver::ResultSummary>
 
 =over
 
@@ -171,7 +179,7 @@ running the statement.
 
 =back
 
-=head2 SummaryCounters
+=head2 L<Neo4j::Driver::SummaryCounters>
 
 =over
 

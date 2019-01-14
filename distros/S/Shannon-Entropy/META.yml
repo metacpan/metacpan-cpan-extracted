@@ -21,11 +21,11 @@ no_index:
 provides:
   Shannon::Entropy:
     file: lib/Shannon/Entropy.pm
-    version: '1.101011'
+    version: '1.101111'
 requires:
   Import::Export: '0.08'
   perl: '5.006'
-version: '1.101011'
+version: '1.101111'
 x_contributors:
   - 'John Imrie (JGNI) <jgni@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,7 +7,7 @@ require 5.006;
 use Set::IntSpan;
 use Time::Local qw/timelocal_nocheck/;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 NAME
 
@@ -272,6 +272,7 @@ sub for_timespan {
     # jump back to the first day (Sunday) of the last week before the period
     # began.
     my @start        = localtime( $args{'Start'} );
+    $start[5] += 1900;  # Set 4 digit year, see perldoc localtime
     my $month        = $start[4];
     my $year         = $start[5];
     my $first_sunday = $start[3] - $start[6];
@@ -320,6 +321,7 @@ sub for_timespan {
 
         my @today = (localtime($week_start))[3, 4, 5];
         $today[0]--; # compensate next increment
+        $today[2] += 1900;  # Set 4 digit year
 
         # foreach day in the week, find that day's business hours in
         # seconds since the epoch.
@@ -352,6 +354,7 @@ sub for_timespan {
     if ( my @holidays = $self->holidays ) {
         my $start_year = $year;
         my $end_year = (localtime $args{'End'})[5];
+        $end_year += 1900;  # Set 4 digit year
         foreach my $holiday (@holidays) {
             my ($year, $month, $date) = ($holiday =~ /^(?:(\d\d\d\d)\D)?(\d\d)\D(\d\d)$/);
             $month--;

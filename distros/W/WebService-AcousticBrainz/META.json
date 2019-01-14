@@ -37,6 +37,7 @@
             "Carp" : "0",
             "Mojo::JSON" : "0",
             "Mojo::JSON::MaybeXS" : "0",
+            "Mojo::URL" : "0",
             "Mojo::UserAgent" : "0",
             "Moo" : "2",
             "namespace::clean" : "0",
@@ -49,7 +50,10 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Mojo::Base" : "0",
+            "Mojolicious" : "0",
             "Test::More" : "0",
+            "Try::Tiny" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -67,7 +71,7 @@
          "web" : "https://github.com/ology/WebService-AcousticBrainz"
       }
    },
-   "version" : "0.0200",
+   "version" : "0.0300",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -298,7 +302,8 @@
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
                      "MusicBrainz",
-                     "mbid"
+                     "mbid",
+                     "ua"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }
@@ -321,9 +326,7 @@
             "class" : "Dist::Zilla::Plugin::GatherDir",
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [
-                     "LICENSE"
-                  ],
+                  "exclude_filename" : [],
                   "exclude_match" : [],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
@@ -348,11 +351,6 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "MetaYAML",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::License",
-            "name" : "License",
             "version" : "6.012"
          },
          {

@@ -1,6 +1,11 @@
 package DBIx::Raw;
-use strict;
-use Mouse;
+
+use 5.008_005;
+our $VERSION = '0.21';
+
+use strictures 2;
+use Moo;
+use Types::Standard qw/Bool HashRef InstanceOf Str/;
 use DBI;
 use Config::Any;
 use DBIx::Raw::Crypt;
@@ -9,17 +14,21 @@ use List::Util qw/first/;
 use Crypt::Mode::CBC::Easy;
 
 #have an errors file to write to
-has 'dsn'    => ( is => 'rw', isa => 'Any', default => undef);
-has 'user'    => ( is => 'rw', isa => 'Any', default => undef);
-has 'password'    => ( is => 'rw', isa => 'Any', default => undef);
-has 'conf'    => ( is => 'rw', isa => 'Any', default => undef);
-has 'prev_conf'    => ( is => 'rw', isa => 'Str', default => '');
+has 'dsn' => is => 'rw';
+has 'user' => is => 'rw';
+has 'password' => is => 'rw';
+has 'conf' => is => 'rw';
+has 'prev_conf' => (
+    is => 'rw', 
+    isa => Str, 
+    default => '',
+);
 
-has 'crypt'    => ( 
+has 'crypt' => ( 
 	is => 'ro', 
-	isa => 'Crypt::Mode::CBC::Easy',
+	isa => InstanceOf['Crypt::Mode::CBC::Easy'],
 	lazy => 1,
-	default => sub { 
+	builder => sub { 
 		my ($self) = @_;
 		return Crypt::Mode::CBC::Easy->new(key => $self->crypt_key);
 	},
@@ -27,9 +36,9 @@ has 'crypt'    => (
 
 has 'crypt_key' => (
     is => 'rw', 
-    isa => 'Str', 
+    isa => Str, 
     lazy => 1,
-    default => sub {
+    builder => sub {
         my $crypt_key_hex = 'aea77496999d37bf47aedff9c0d44fdf2d2bbfa848ee6652abe9891b43e0f331';
         return pack "H*", $crypt_key_hex;
     }, 
@@ -37,40 +46,40 @@ has 'crypt_key' => (
 
 has use_old_crypt => (
     is => 'rw',
-    isa => 'Bool',
+    isa => Bool,
     default => undef,
 );
 
 has 'old_crypt_key' => (
     is => 'rw', 
-    isa => 'Str', 
+    isa => Str, 
     lazy => 1,
     default => '6883868834006296591264051568595813693328016796531185824375212916576042669669556288781800326542091901603033335703884439231366552922364658270813734165084102xfasdfa8823423sfasdfalkj!@#$$CCCFFF!09xxxxlai3847lol13234408!!@#$_+-083dxje380-=0'
 );
 
-has 'old_crypt'    => ( 
+has 'old_crypt' => ( 
 	is => 'ro', 
-	isa => 'DBIx::Raw::Crypt', 
+	isa => InstanceOf['DBIx::Raw::Crypt'], 
 	lazy => 1,
-	default => sub { 
+	builder => sub { 
 		my ($self) = @_;
 		return DBIx::Raw::Crypt->new( { secret => $self->old_crypt_key });
 	},
 );
 
-has 'sth'    => ( is => 'rw', isa => 'Any', default => undef); #LAST STH USED
+# LAST STH USED
+has 'sth' => is => 'rw';
 
 #find out what DBH is specifically
-has 'dbh'    => ( 
+has 'dbh' => ( 
 	is => 'rw', 
-	isa => 'Any', 
 	lazy => 1, 
 	default => sub { shift->connect }
 );
 
 has 'keys' => (
 	is => 'ro', 
-	isa=>'HashRef[Str]',
+	isa => HashRef[Str],
 	default => sub { {
 		query => 1,
 		vals => 1,
@@ -95,14 +104,6 @@ sub BUILD {
 =head1 NAME
 
 DBIx::Raw - Maintain control of SQL queries while still having a layer of abstraction above DBI
-
-=head1 VERSION
-
-Version 0.16
-
-=cut
-
-our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -140,10 +141,10 @@ DBIx::Raw allows you to have complete control over your SQL, while still providi
     $db->raw("INSERT INTO people (name, age) VALUES (?, ?)", 'Sally', 26);
 
     #update records
-    $db->raw("UPDATE people SET name='Joe',age=34 WHERE id=1");
+    my $num_rows_updated = $db->raw("UPDATE people SET name='Joe',age=34 WHERE id=1");
 
     #use bind values to help prevent SQL injection
-    $db->raw("UPDATE people SET name=?,age=? WHERE id=?", 'Joe', 34, 1);
+    my $num_rows_updated = $db->raw("UPDATE people SET name=?,age=? WHERE id=?", 'Joe', 34, 1);
 
     #also use bind values when selecting
     my $name = $db->raw("SELECT name FROM people WHERE id=?", 1);
@@ -165,7 +166,7 @@ DBIx::Raw allows you to have complete control over your SQL, while still providi
     $db->update(href=>\%update, table => 'people', id=>1);
 
     #use alternate syntax to encrypt and decrypt data
-    $db->raw(query => "UPDATE people SET name=? WHERE id=1", vals => ['Joe'], encrypt => [0]);
+    my $num_rows_updated = $db->raw(query => "UPDATE people SET name=? WHERE id=1", vals => ['Joe'], encrypt => [0]);
 
     my $decrypted_name = $db->raw(query => "SELECT name FROM people WHERE id=1", decrypt => [0]);
 
@@ -242,14 +243,14 @@ or
 
 Below are some examples:
 
-    $db->raw("UPDATE people SET name='Fred'");
+    my $num_rows_updated = $db->raw("UPDATE people SET name='Fred'");
 
     my $name = $db->raw("SELECT name FROM people WHERE id=1");
 	
 DBIx::Raw also supports L<DBI/"Placeholders and Bind Values"> for L<DBI>. These can be useful to help prevent SQL injection. Below are
 some examples of how to use placeholders and bind values with L</"SIMPLE SYNTAX">.
 
-    $db->raw("UPDATE people SET name=?", 'Fred');
+    my $num_rows_updated = $db->raw("UPDATE people SET name=?", 'Fred');
 
     my $name = $db->raw("SELECT name FROM people WHERE id=?", 1);
 
@@ -262,23 +263,23 @@ Note that L</"SIMPLE SYNTAX"> cannot be used for L</hoh>, L</hoaoh>, L</hash>, o
 Advanced syntax is used whenever a subroutine requires extra parameters besides just the query and bind values, or whenever you need to use L</encrypt>
 or L</decrypt>. A simple example of the advanced syntax is:
 
-    $db->raw(query => "UPDATE people SET name='Fred'");
+    my $num_rows_updated = $db->raw(query => "UPDATE people SET name='Fred'");
 
 This is equivalent to:
 
-    $db->raw("UPDATE people SET name='Fred'");
+    my $num_rows_updated = $db->raw("UPDATE people SET name='Fred'");
 
 A slightly more complex example adds in bind values:
 
-    $db->raw(query => "UPDATE people SET name=?", vals => ['Fred']);
+    my $num_rows_updated = $db->raw(query => "UPDATE people SET name=?", vals => ['Fred']);
 
 This is equivalent to the simple syntax:
 
-    $db->raw("UPDATE people SET name=?", 'Fred');
+    my $num_rows_updated = $db->raw("UPDATE people SET name=?", 'Fred');
 
 Also, advanced syntax is required whenevery you want to L</encrypt> or L</decrypt> values.
 
-    $db->raw(query => "UPDATE people SET name=?", vals => ['Fred'], encrypt => [0]);
+    my $num_rows_updated = $db->raw(query => "UPDATE people SET name=?", vals => ['Fred'], encrypt => [0]);
 
     my $decrypted_name = $db->raw(query => "SELECT name FROM people WHERE id=1", decrypt => [0]);
 
@@ -298,11 +299,11 @@ One thing to note is that both L</encrypt> and L</decrypt> require L</"ADVANCED 
 In order to encrypt values, the values that you want to encrypt must be in the bind values array reference that you pass into C<vals>. Note that for the values that you want to
 encrypt, you should put their index into the encrypt array that you pass in. For example:
 
-    $db->raw(query => "UPDATE people SET name=?,age=?,height=? WHERE id=1", vals => ['Zoe', 24, "5'11"], encrypt => [0, 2]);
+    my $num_rows_updated = $db->raw(query => "UPDATE people SET name=?,age=?,height=? WHERE id=1", vals => ['Zoe', 24, "5'11"], encrypt => [0, 2]);
 
 In the above example, only C<name> and C<height> will be encrypted. You can easily encrypt all values by using '*', like so:
 
-    $db->raw(query => "UPDATE people SET name=?,height=? WHERE id=1", vals => ['Zoe', "5'11"], encrypt => '*');
+    my $num_rows_updated = $db->raw(query => "UPDATE people SET name=?,height=? WHERE id=1", vals => ['Zoe', "5'11"], encrypt => '*');
 
 And this will encrypt both C<name> and C<height>.
 
@@ -364,7 +365,7 @@ This sets the crypt key to use if L</use_old_crypt> is set to true. Default is t
 =head2 raw
 
 L</raw> is a very versitile subroutine, and it can be called in three contexts. L</raw> should only be used to make a query that
-returns values for one record, or a query that returns no results (such as an UPDATE or INSERT query). If you need to have multiple
+returns values for one record, or a query that returns no results (such as an INSERT query). If you need to have multiple
 results returned, see one of the subroutines below.
 
 =head3 SCALAR CONTEXT
@@ -374,7 +375,10 @@ L</raw> can be called in a scalar context to only return one value, or in a unde
     #select
     my $name = $db->raw("SELECT name FROM people WHERE id=1");
 
-    #update
+    #update with number of rows updated returned
+    my $num_rows_updated = $db->raw("UPDATE people SET name=? WHERE id=1", 'Frank');
+ 
+    #update in undef context, nothing returned.
     $db->raw("UPDATE people SET name=? WHERE id=1", 'Frank');
 
     #insert
@@ -448,7 +452,7 @@ sub raw {
   		my $return_value = $self->sth->rows();
 		push @return_values, $return_value;
 	}
-	elsif(($params->{query} =~ /SELECT /sig) || ($params->{query} =~ /SHOW /sig)) {
+    elsif(($params->{query} =~ /SELECT /sig) || ($params->{query} =~ /SHOW /sig)) {
   		unless($params->{query} =~ /INSERT INTO (.*?)SELECT /sig) {
   			if($return_type eq 'hash') {
 				return unless $params->{href} = $self->sth->fetchrow_hashref; #handles undef case
@@ -468,7 +472,7 @@ sub raw {
 				}
 			}
 		} 
-	} 
+	}
 
 	$self->sth->finish or $self->_perish($params);
 
@@ -1023,7 +1027,7 @@ B<where (optional)> - A where clause to help decide what row to update. Any bind
 
 =back
 
-L</update> can be used to update a single row with a hash. This can be useful if you already have the values you need
+L</update> can be used to update a single row with a hash, and returns the number of rows updated. This can be useful if you already have the values you need
 to update the row with in a hash, where the keys are the column names and the values are the new values. This function
 might be useful for submitting forms easily.
 
@@ -1033,20 +1037,23 @@ might be useful for submitting forms easily.
         favorite_color => 'blue',
     );
 
-    $db->update(href => \%updated_person, table => 'people', id => 1);
+    my $num_rows_updated = $db->update(href => \%updated_person, table => 'people', id => 1);
+
+    # or in list context
+    my ($num_rows_updated) = $db->update(href => \%updated_person, table => 'people', id => 1);
 
 Note that above for "id", the column must actually be named id for it to work. If you have a primary key or unique
 identifying column that is named something different than id, then you can use the C<pk> parameter:
 
-    $db->update(href => \%updated_person, table => 'people', pk => {name => 'person_id', val => 1});
+    my $num_rows_updated = $db->update(href => \%updated_person, table => 'people', pk => {name => 'person_id', val => 1});
 
 If you need to specify more constraints for the row that you are updating instead of just the id, you can pass in a where clause:
 
-    $db->update(href => \%updated_person, table => 'people', where => 'name=? AND favorite_color=? AND age=?', vals => ['Joe', 'green', 61]);
+    my $num_rows_updated = $db->update(href => \%updated_person, table => 'people', where => 'name=? AND favorite_color=? AND age=?', vals => ['Joe', 'green', 61]);
     
 Note that any bind values used in a where clause can just be passed into the C<vals> as usual. It is possible to use a where clause and an id or pk together:
 
-    $db->update(href => \%updated_person, table => 'people', where => 'name=? AND favorite_color=? AND age=?', vals => ['Joe', 'green', 61], id => 1);
+    my $num_rows_updated = $db->update(href => \%updated_person, table => 'people', where => 'name=? AND favorite_color=? AND age=?', vals => ['Joe', 'green', 61], id => 1);
 
 Alternatively, you could just put the C<id> or C<pk> in your where clause.
 
@@ -1061,11 +1068,11 @@ If we had this:
         update_time => 'NOW()',
     );
 
-    $db->update(href => \%updated_person, table => 'people', id => 1);
+    my $num_rows_updated = $db->update(href => \%updated_person, table => 'people', id => 1);
 
 This would effectively evaluate to:
 
-    $db->raw(query => "UPDATE people SET name=?, update_time=? WHERE id=?", vals => ['Billy', 'NOW()', 1]);
+    my $num_rows_updated = $db->raw(query => "UPDATE people SET name=?, update_time=? WHERE id=?", vals => ['Billy', 'NOW()', 1]);
 
 However, this will not work. Instead, we need to do:
 
@@ -1074,11 +1081,11 @@ However, this will not work. Instead, we need to do:
         update_time => \'NOW()',
     );
 
-    $db->update(href => \%updated_person, table => 'people', id => 1);
+    my $num_rows_updated = $db->update(href => \%updated_person, table => 'people', id => 1);
 
 Which evaluates to:
 
-    $db->raw(query => "UPDATE people SET name=?, update_time=NOW() WHERE id=?", vals => ['Billy', 1]);
+    my $num_rows_updated = $db->raw(query => "UPDATE people SET name=?, update_time=NOW() WHERE id=?", vals => ['Billy', 1]);
 
 And this is what we want.
 
@@ -1093,7 +1100,7 @@ instead of the indices for the order in which the columns are listed:
         favorite_color => 'blue',
     );
 
-    $db->update(href => \%updated_person, table => 'people', id => 1, encrypt => ['name', 'favorite_color']);
+    my $num_rows_updated = $db->update(href => \%updated_person, table => 'people', id => 1, encrypt => ['name', 'favorite_color']);
 
 Note we do not ecnrypt age because it is most likely stored as an integer in the database.
 
@@ -1115,7 +1122,8 @@ sub update {
 		}
 		else { 
             # TODO: write update encrypt tests
-            if ($params->{encrypt} and first { $_ eq $key } @{$params->{encrypt}}) {
+            if ((defined $params->{encrypt} and $params->{encrypt} eq '*') 
+                    or ($params->{encrypt} and first { $_ eq $key } @{$params->{encrypt}})) {
                 push @encrypt, scalar(@vals);
             }
 
@@ -1166,6 +1174,9 @@ sub update {
     }
 
 	$self->_query($params);
+
+    return unless defined wantarray;
+    return wantarray ? ($self->sth->rows()) : $self->sth->rows();
 } 
 
 =head2 insert_multiple
@@ -1499,9 +1510,6 @@ Please report any bugs or feature requests to C<bug-dbix-raw at rt.cpan.org>, or
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Raw>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -1536,47 +1544,11 @@ L<http://search.cpan.org/dist/DBIx-Raw/>
 
 Special thanks to Jay Davis who wrote a lot of the original code that this module is based on.
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENSE
 
-Copyright 2014 Adam Hopkins.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
-1; # End of DBIx::Raw
+1;

@@ -93,7 +93,7 @@ i_quant_makemap(i_quantize *quant, i_img **imgs, int count) {
 }
 
 static void translate_closest(i_quantize *, i_img *, i_palidx *);
-static void translate_errdiff(i_quantize *, i_img *, i_palidx *);
+static int translate_errdiff(i_quantize *, i_img *, i_palidx *);
 static void translate_addi(i_quantize *, i_img *, i_palidx *);
 
 /*
@@ -143,7 +143,10 @@ i_quant_translate(i_quantize *quant, i_img *img) {
     break;
     
   case pt_errdiff:
-    translate_errdiff(quant, img, result);
+    if (!translate_errdiff(quant, img, result)) {
+      myfree(result);
+      return NULL;
+    }
     break;
     
   case pt_perturb:
@@ -464,7 +467,7 @@ makemap_addi(i_quantize *quant, i_img **imgs, int count) {
 
 typedef struct {
   i_sample_t rgb[3];
-  int count;
+  i_img_dim count;
 } quant_color_entry;
 
 #define MEDIAN_CUT_COLORS 32768
@@ -647,8 +650,8 @@ makemap_mediancut(i_quantize *quant, i_img **imgs, int count) {
       int max_index = 0, max_ch = 0; /* index/channel with biggest spread */
       int max_size;
       medcut_partition *workpart;
-      int cum_total;
-      int half;
+      i_img_dim cum_total;
+      i_img_dim half;
       
       /* find the partition with the most biggest span with more than 
          one color */
@@ -702,7 +705,7 @@ makemap_mediancut(i_quantize *quant, i_img **imgs, int count) {
     /* fill in the color table - since we could still have partitions
        that have more than one color, we need to average the colors */
     for (part_num = 0; part_num < color_count; ++part_num) {
-      long sums[3];
+      double sums[3];
       medcut_partition *workpart;
       
       workpart = parts+part_num;
@@ -711,7 +714,7 @@ makemap_mediancut(i_quantize *quant, i_img **imgs, int count) {
       
       for (i = workpart->start; i < workpart->start + workpart->size; ++i) {
         for (ch = 0; ch < 3; ++ch) {
-          sums[ch] += colors[i].rgb[ch] * colors[i].count;
+          sums[ch] += (int)(colors[i].rgb[ch]) * colors[i].count;
         }
       }
       for (ch = 0; ch < 3; ++ch) {
@@ -1354,8 +1357,7 @@ typedef struct errdiff_tag {
 } errdiff_t;
 
 /* perform an error diffusion dither */
-static
-void
+static int
 translate_errdiff(i_quantize *quant, i_img *img, i_palidx *out) {
   int *map;
   int mapw, maph, mapo;
@@ -1383,14 +1385,25 @@ translate_errdiff(i_quantize *quant, i_img *img, i_palidx *out) {
     mapo = maps[index].orig;
   }
   
+  difftotal = 0;
+  for (i = 0; i < maph * mapw; ++i) {
+    if (map[i] < 0) {
+      i_push_errorf(0, "errdiff_map values must be non-negative, errdiff[%d] is negative", i);
+      return 0;
+    }
+    difftotal += map[i];
+  }
+
+  if (!difftotal) {
+    i_push_error(0, "error diffusion map must contain some non-zero values");
+    return 0;
+  }
+
   errw = img->xsize+mapw;
   err = mymalloc(sizeof(*err) * maph * errw);
   /*errp = err+mapo;*/
   memset(err, 0, sizeof(*err) * maph * errw);
   
-  difftotal = 0;
-  for (i = 0; i < maph * mapw; ++i)
-    difftotal += map[i];
   /*printf("map:\n");
  for (dy = 0; dy < maph; ++dy) {
    for (dx = 0; dx < mapw; ++dx) {
@@ -1444,6 +1457,8 @@ translate_errdiff(i_quantize *quant, i_img *img, i_palidx *out) {
   }
   CF_CLEANUP;
   myfree(err);
+
+  return 1;
 }
 /* Prescan finds the boxes in the image that have the highest number of colors 
    and that result is used as the initial value for the vectores */
@@ -1514,7 +1529,7 @@ static void reorder(pbox prescan[512]) {
   c.cand++;
   c.pdc=c.pixcnt/(c.cand*c.cand); 
   /*  c.pdc=c.pixcnt/c.cand; */
-  while(c.pdc < prescan[nidx+1].pdc && nidx < 511) {
+  while(nidx < 511 && c.pdc < prescan[nidx+1].pdc) {
     prescan[nidx]=prescan[nidx+1];
     nidx++;
   }

@@ -8,7 +8,9 @@ docs/metadata/description
 docs/metadata/metadata.json
 docs/metadata/README
 docs/metadata/requirements
+docs/metadata/test/suffix
 lib/App/DocKnot.pm
+lib/App/DocKnot/Generate.pm
 LICENSE
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -21,8 +23,8 @@ share/licenses/Perl
 share/templates/readme-md.tmpl
 share/templates/readme.tmpl
 share/templates/thread.tmpl
-t/api/basic.t
-t/api/self.t
+t/cli/errors.t
+t/cli/generate.t
 t/data/ansicolor/metadata/blurb
 t/data/ansicolor/metadata/description
 t/data/ansicolor/metadata/metadata.json
@@ -122,6 +124,9 @@ t/docs/pod-spelling.t
 t/docs/pod.t
 t/docs/spdx-license.t
 t/docs/synopsis.t
+t/generate/basic.t
+t/generate/output.t
+t/generate/self.t
 t/lib/Test/RRA.pm
 t/lib/Test/RRA/Config.pm
 t/lib/Test/RRA/ModuleVersion.pm

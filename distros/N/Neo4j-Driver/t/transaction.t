@@ -62,7 +62,7 @@ subtest 'error handling' => sub {
 	throws_ok { $s->run(\$q) } qr/\bunblessed reference\b/, 'bogus reference query';
 	throws_ok { $s->run( bless \$q, 'Neo4j::Test' ); } qr/syntax/i, 'bogus blessed query';
 	my $t = $s->begin_transaction;
-	$t->{transaction} = '/qwertyasdfghzxcvbn';
+	$t->{transaction_endpoint} = '/qwertyasdfghzxcvbn';
 	throws_ok { $t->run; } qr/\b404\b/, 'HTTP 404';
 	dies_ok {
 		Neo4j::Driver->new('http://none.invalid')->session->begin_transaction->run;

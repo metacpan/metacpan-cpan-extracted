@@ -1,4 +1,10 @@
+2.4       2019-01-12 19:16:45+00:00 Europe/London
+
 2.3       2018-07-25 23:32:04+01:00 Europe/London
+- Allow specifying an array reference in resource_documents, this is useful
+when you have situations where "all" is already called on your resultset and
+the resultset is no longer available to you.
+- Fixed some typos in the readme
 
 2.2       2018-07-18 23:04:28+01:00 Europe/London
 - Use a less taxing method of deriving a documents resource type with Mojo::Util::decamelize,

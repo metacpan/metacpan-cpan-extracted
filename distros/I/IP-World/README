@@ -3,14 +3,14 @@ IP::World is Copyright (C) 2010, Craig MacKenna <craig@animalhead.com>
 DESCRIPTION
 
   IP::World returns the ISO-3166 country code associated with an IP4 
-  address.  It uses two free databases from WIPmania.com and MaxMind.com.  
+  address.  It uses a free database from WIPmania.com. The free database
+  it used to use from MaxMind.com has been discontinued.
   
   The included application 'maint_ip_world_db' checks whether the 
   included IP::World database needs updating during installation, and 
-  can be run or scheduled to keep it current.  WIPmania.com and 
-  MaxMind.com release new source data bimonthly and monthly, 
-  respectively.  On a server, 'maint_ip_world_db' can be scheduled 
-  (cron'ed on Unix/Linux) to run at an unbusy time.
+  can be run or scheduled to keep it current.  WIPmania.com releases
+  new source data bimonthly. On a server, 'maint_ip_world_db' can be
+  scheduled (cron'ed on Unix/Linux) to run at an unbusy time.
   
 LICENSE INFORMATION
 

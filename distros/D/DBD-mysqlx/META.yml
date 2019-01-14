@@ -18,6 +18,6 @@ no_index:
     - t
     - inc
 requires:
-  DBI: '1.609'
-version: '0.002'
+  DBI: '1.642'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

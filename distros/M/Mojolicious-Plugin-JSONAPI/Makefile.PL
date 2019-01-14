@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::JSONAPI",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "JSONAPI::Document" => "2.3",
+    "JSONAPI::Document" => "2.4",
     "Lingua::EN::Inflexion" => 0,
     "Mojo::Base" => 0
   },
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "2.3",
+  "VERSION" => "2.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "JSONAPI::Document" => "2.3",
+  "JSONAPI::Document" => "2.4",
   "Lingua::EN::Inflexion" => 0,
   "Mojo::Base" => 0,
   "Mojolicious::Lite" => 0,

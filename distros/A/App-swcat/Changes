@@ -1,3 +1,8 @@
+0.009   2019-01-14 (PERLANCAR)
+
+	- Add subcommands: release-note, available-versions.
+
+
 0.008   2018-11-21 (PERLANCAR)
 
 	- Add subcommand: archive-info.

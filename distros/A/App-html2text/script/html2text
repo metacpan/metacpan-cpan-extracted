@@ -1,0 +1,188 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /HTML/FormatText/Any/html2text
+# and generated automatically using Perinci::CmdLine::Gen version 0.487
+
+our $DATE = '2019-01-14'; # DATE
+our $DIST = 'App-html2text'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/HTML/FormatText/Any/html2text",
+    program_name => "html2text",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Render HTML as text using one of multiple backends
+# PODNAME: html2text
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+html2text - Render HTML as text using one of multiple backends
+
+=head1 VERSION
+
+This document describes version 0.001 of html2text (from Perl distribution App-html2text), released on 2019-01-14.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % html2text [options] <html>
+
+=head1 DESCRIPTION
+
+Backends are tried in the following order (order is chosen based on rendering
+quality):
+
+=over
+
+=item * L<HTML::FormatText::Elinks> (using external program 'elinks')
+
+=item * L<HTML::FormatText::Links> (using external program 'links')
+
+=item * L<HTML::FormatText::W3m> (using external program 'w3m')
+
+=item * L<HTML::FormatText::Lynx> (using external program 'lynx')
+
+=item * L<HTML::FormatText::WithLinks::AndTables>
+
+=back
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Input options
+
+=over
+
+=item B<--html>=I<s>*
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C html2text html2text
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete html2text 'p/*/`html2text`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-html2text>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-html2text>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-html2text>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<html2text>. CLI for this module.
+
+L<html2txt>. a simpler HTML rendering utility which basically just strips HTML tags from HTML source code.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

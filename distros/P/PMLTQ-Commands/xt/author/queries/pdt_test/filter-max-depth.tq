@@ -1,0 +1,3 @@
+# Max tree depth
+t-node [  ];
+  >> give max(depth())

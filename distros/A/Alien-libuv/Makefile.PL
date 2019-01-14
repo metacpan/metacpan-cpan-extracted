@@ -9,11 +9,16 @@ use ExtUtils::MakeMaker;
 
 if ($^O eq 'MSWin32') {
     my $ver;
-    my $err = do {
+    my $err;
+    { # catch block
         local $@;
-        eval { require Win32; $ver = (Win32::GetOSVersion())[1]; 1; };
-        $@;
-    };
+        # try
+        $err = $@ || 'Error' unless eval {
+            require Win32;
+            $ver = (Win32::GetOSVersion())[1];
+            1;
+        };
+    }
     if ($err || $ver < 6) {
         die("OS unsupported\nWindows needs to be Win7 or higher.\n");
     }
@@ -25,6 +30,7 @@ my %WriteMakefileArgs = (
   "BUILD_REQUIRES" => {
     "Alien::Build" => "1.00",
     "Alien::Build::MM" => "0.32",
+    "Alien::Build::Plugin::Build::Make" => 0,
     "Config" => 0,
     "ExtUtils::MakeMaker" => "6.52",
     "IPC::Cmd" => 0
@@ -52,7 +58,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "1.006",
+  "VERSION" => "1.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +68,7 @@ my %FallbackPrereqs = (
   "Alien::Base" => "1.00",
   "Alien::Build" => "1.00",
   "Alien::Build::MM" => "0.32",
+  "Alien::Build::Plugin::Build::Make" => 0,
   "Config" => 0,
   "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,

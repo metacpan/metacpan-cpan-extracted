@@ -291,9 +291,9 @@ with the "shim" key set:
     $self->plugin(Webpack => {process => ["js"], shim => 1});
   }
 
-Save the file and start your application with C<crushinator>:
+Save the file and start your application with C<mojo webpack>:
 
-  $ crushinator ./script/my_app
+  $ mojo webpack ./script/my_app
 
 This will then generate C<lib/MyApp/Plugin/Webpack.pm> which will be enough to
 run in production, which again means that your application does not depend on

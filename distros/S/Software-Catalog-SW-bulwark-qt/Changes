@@ -1,3 +1,8 @@
+0.006   2019-01-14 (PERLANCAR)
+
+	- Implement get_available_versions() and get_release_note().
+
+
 0.005   2018-11-21 (PERLANCAR)
 
 	- [ux] get_archive_info(): Don't make version a required argument.

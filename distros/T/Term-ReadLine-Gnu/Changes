@@ -1,5 +1,25 @@
 	-*- Indented-text -*-
-	$Id: Changes 556 2016-11-03 14:24:45Z hayashi $
+	$Id: Changes 566 2019-01-14 05:30:33Z hayashi $
+
+1.36  2019-01-14
+	- readline-8.0 support
+	    new function
+		rl_empty_keymap
+		rl_set_keymap_name
+		rl_check_signals
+	    new variable
+		history_quoting_state
+	    rl_function_of_keyseq uses rl_function_of_keyseq_len to
+	    support an arbitrary key sequence that may include NULs.
+	- new() checks the number of arguments.
+	- make 'use Term::ReadLine::Gnu' fail if $TERM is not set or
+	  on a dumb terminal.  'use Term::ReadLine' uses
+	  Term::ReadLine::Stub instead. [rt.cpan.org #123398]
+	- Makefile.PL: checks the tinfo library for Debian.
+	- add t/01test_use.t and t/02test_use.t.
+	- comment out a hack for the CPAN Test on OpenBSD added on
+	  TRG 1.22.
+	- t/utf8_binary.t, t/utf8_text.t: skipped on Perl 5.8.
 
 1.35  2016-11-03
 	- readline-7.0 support
@@ -153,6 +173,7 @@
 	  - fix POD errors
 	  - make .pm versions consistent
 	  - use "use warnings"
+	- "make install" installs eg/perlsh
 	- Makefile.PL dies on the CPAN Test for OpenBSD temporarily
           (hopefully).
 

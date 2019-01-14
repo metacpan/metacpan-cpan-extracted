@@ -34,8 +34,8 @@ subtest 'error handling' => sub {
 	
 	# this really just tests Neo4j::Driver
 	throws_ok {
-		Neo4j::Test->driver_maybe->basic_auth('nobody', '')->session->begin_transaction->run;
-	} qr/\b401\b/, 'HTTP 401';
+		Neo4j::Test->driver_maybe->basic_auth('nobody', '')->session->begin_transaction->run('RETURN 42');
+	} qr/\bUnauthorized\b/, 'Unauthorized';
 };
 
 

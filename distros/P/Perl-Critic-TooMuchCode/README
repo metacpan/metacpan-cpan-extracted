@@ -5,10 +5,10 @@ NAME
 
 DESCRIPTION
 
-    This add-on of Perl::Critic is aiming for identifying trivial dead
+    This add-on for Perl::Critic is aiming for identifying trivial dead
     code. Either the ones that has no use, or the one that produce no
-    effect. Having dead code floating around causes maintance burden. Some
-    might prefer not to generate them in the first place.
+    effect. Having dead code floating around causes maintenance burden.
+    Some might prefer not to generate them in the first place.
 
 AUTHOR
 

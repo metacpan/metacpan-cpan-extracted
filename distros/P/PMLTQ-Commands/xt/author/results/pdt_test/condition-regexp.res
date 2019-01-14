@@ -1,0 +1,17 @@
+cmpr9410_001.a.gz#a-cmpr9410-001-p11s2w7
+cmpr9410_001.a.gz#a-cmpr9410-001-p14s1w20
+cmpr9410_001.a.gz#a-cmpr9410-001-p16s2w2
+cmpr9410_001.a.gz#a-cmpr9410-001-p16s2w26
+cmpr9410_001.a.gz#a-cmpr9410-001-p17s1w25
+cmpr9410_001.a.gz#a-cmpr9410-001-p17s1w9
+cmpr9410_001.a.gz#a-cmpr9410-001-p18s1w13
+cmpr9410_001.a.gz#a-cmpr9410-001-p18s3w8
+cmpr9410_001.a.gz#a-cmpr9410-001-p19s1w15
+cmpr9410_001.a.gz#a-cmpr9410-001-p20s1w11
+cmpr9410_001.a.gz#a-cmpr9410-001-p20s1w4
+cmpr9410_001.a.gz#a-cmpr9410-001-p21s1w26
+cmpr9410_001.a.gz#a-cmpr9410-001-p23s1w3
+ln94206_1.a.gz#a-ln94206-1-p2s1w23
+ln94206_1.a.gz#a-ln94206-1-p3s1w22
+ln94206_1.a.gz#a-ln94206-1-p4s3w6
+ln94206_1.a.gz#a-ln94206-1-p4s3w9

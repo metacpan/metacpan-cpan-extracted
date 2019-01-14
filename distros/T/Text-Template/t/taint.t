@@ -9,7 +9,7 @@ use File::Temp;
 
 use_ok 'Text::Template' or exit 1;
 
-my $tmpfile = File::Temp->new;
+my $tmpfile = File::Temp->new( $^O eq 'MSWin32' ? (DIR => '.') : () );
 my $file    = $tmpfile->filename;
 
 # makes its arguments tainted

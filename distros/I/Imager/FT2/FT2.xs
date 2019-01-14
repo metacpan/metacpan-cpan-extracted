@@ -243,10 +243,12 @@ i_ft2_has_chars(handle, text_sv, utf8)
         work = mymalloc(len);
         count = i_ft2_has_chars(handle, text, len, utf8, work);
         if (GIMME_V == G_ARRAY) {
-          EXTEND(SP, count);
-          for (i = 0; i < count; ++i) {
-            PUSHs(boolSV(work[i]));
-          }
+	  if (count) {
+            EXTEND(SP, count);
+            for (i = 0; i < count; ++i) {
+              PUSHs(boolSV(work[i]));
+            }
+	  }
         }
         else {
           EXTEND(SP, 1);
@@ -303,17 +305,15 @@ i_ft2_glyph_name(handle, text_sv, utf8 = 0, reliable_only = 1)
             ch = *text++;
             --len;
           }
-          EXTEND(SP, count+1);
+          EXTEND(SP, 1);
           if (i_ft2_glyph_name(handle, ch, name, sizeof(name), 
                                          reliable_only)) {
-            ST(count) = sv_2mortal(newSVpv(name, 0));
+            PUSHs(sv_2mortal(newSVpv(name, 0)));
           }
           else {
-            ST(count) = &PL_sv_undef;
+            PUSHs(&PL_sv_undef);
           }
-	  ++count;
         }
-	XSRETURN(count);
 
 int
 i_ft2_can_do_glyph_names()

@@ -1,4 +1,4 @@
-WWW-BetfairNG version 0.14
+WWW-BetfairNG version 0.15
 ==========================
 
 Betfair is an online betting exchange which allows registered users to
@@ -58,7 +58,7 @@ JSON encoding / decoding can be achieved by installing:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2017 by Myrddin Wyllt
+Copyright (C) 2019 by Myrddin Wyllt
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. (See the file LICENSE for

@@ -19,7 +19,10 @@ do {
             CURLOPT_WRITEFUNCTION => sub { },
             CURLOPT_HEADERFUNCTION => sub { warn "Got header: $_[0]"; },
             CURLOPT_SUPPRESS_CONNECT_HEADERS => 1,
-            CURLOPT_READFUNCTION => sub { "" }
+            CURLOPT_READFUNCTION => sub { "" },
+            CURLOPT_MIMEPOST => [
+                { name => "asd", value => "test" },
+            ],
         },
     );
     $client->request(

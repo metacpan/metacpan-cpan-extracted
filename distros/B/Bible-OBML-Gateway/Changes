@@ -1,5 +1,8 @@
 Revision history for Bible::OBML::Gateway
 
+1.03      2019-01-12 17:20:51-08:00 America/Los_Angeles
+        - Patch from dmachine to fix NIV 1 John 2 and Matt 3 parse failures
+
 1.02      2018-01-04 18:51:59-08:00 America/Los_Angeles
         - Minor doc patch (because I'm tired and didn't get it right the first time)
 

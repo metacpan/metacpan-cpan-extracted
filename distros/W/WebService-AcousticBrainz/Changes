@@ -1,5 +1,8 @@
 Revision history for WebService-AcousticBrainz
 
+0.0300 2019-01-13 08:46:11
+    - SUpport and test mocking.
+
 0.0200 2019-01-06 16:08:32
     - Use the new tx->result way of things.
 

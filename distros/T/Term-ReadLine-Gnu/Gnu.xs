@@ -1,9 +1,9 @@
 /*
  *	Gnu.xs --- GNU Readline wrapper module
  *
- *	$Id: Gnu.xs 555 2016-11-03 14:04:27Z hayashi $
+ *	$Id: Gnu.xs 566 2019-01-14 05:30:33Z hayashi $
  *
- *	Copyright (c) 1996-2016 Hiroo Hayashi.  All rights reserved.
+ *	Copyright (c) 1996-2019 Hiroo Hayashi.  All rights reserved.
  *
  *	This program is free software; you can redistribute it and/or
  *	modify it under the same terms as Perl itself.
@@ -369,6 +369,15 @@ static int rl_persistent_signal_handlers = 0;
 extern int rl_tty_set_echoing PARAMS((int));
 #endif /* (RL_READLINE_VERSION == 0x0700) */
 
+#if (RL_READLINE_VERSION < 0x0800)
+/* features introduced by GNU Readline 8.0 */
+static int rl_empty_keymap (Keymap keymap) { return 0; }
+static int rl_set_keymap_name (const char *name, Keymap keymap) { return 0; }
+static void rl_check_signals (void) {}
+/* rl_function_of_keyseq_len() is not added intentionally */
+static int history_quoting_state;
+#endif /* (RL_READLINE_VERSION < 0x0800) */
+
 /*
  * utility/dummy functions
  */                                                                                
@@ -571,7 +580,8 @@ static struct int_vars {
   { &rl_key_sequence_length,			0, 1, 0},	/* 42 */
   { &rl_change_environment,			0, 0, 0},	/* 43 */
   { &rl_persistent_signal_handlers,		0, 0, 0},	/* 44 */
-  { &utf8_mode,					0, 0, 0}	/* 45 */
+  { &history_quoting_state,			0, 0, 0},	/* 45 */
+  { &utf8_mode,					0, 0, 0}	/* 46 */
 };
 
 /*
@@ -1878,6 +1888,11 @@ rl_free_keymap(map)
 	Keymap map
     PROTOTYPE: $
 
+int
+rl_empty_keymap(map)
+	Keymap map
+    PROTOTYPE: $
+
 Keymap
 rl_get_keymap()
     PROTOTYPE:
@@ -1902,6 +1917,12 @@ char *
 rl_get_keymap_name(map)
 	Keymap map
     PROTOTYPE: $
+
+int
+rl_set_keymap_name(name, map)
+	CONST char *	name
+	Keymap map
+    PROTOTYPE: $$
 
  #
  #	2.4.3 Binding Keys
@@ -2076,13 +2097,19 @@ rl_get_function_name(function)
 
 void
 rl_function_of_keyseq(keyseq, map = rl_get_keymap())
-	CONST char *	keyseq
+	SV *	keyseq
 	Keymap map
     PROTOTYPE: $;$
     PPCODE:
 	{
 	  int type;
-	  rl_command_func_t *p = rl_function_of_keyseq(keyseq, map, &type);
+	  if (!SvOK(keyseq))
+	    return;
+#if (RL_READLINE_VERSION < 0x0800)
+	  rl_command_func_t *p = rl_function_of_keyseq(SvPV_nolen(keyseq), map, &type);
+#else
+	  rl_command_func_t *p = rl_function_of_keyseq_len(SvPV_nolen(keyseq), SvCUR(keyseq), map, &type);
+#endif
 	  SV *sv;
 
 	  if (p) {
@@ -2685,6 +2712,10 @@ rl_free_line_state()
 
 void
 rl_reset_after_signal()
+    PROTOTYPE:
+
+void
+rl_check_signals()
     PROTOTYPE:
 
 void

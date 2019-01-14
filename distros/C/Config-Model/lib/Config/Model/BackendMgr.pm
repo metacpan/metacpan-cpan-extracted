@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.132';
+$Config::Model::BackendMgr::VERSION = '2.133';
 use Mouse;
 use strict;
 use warnings;
@@ -59,8 +59,13 @@ sub _build_backend_obj {
     my $f = $self->rw_config->{function} || 'read';
     my $c = $self->load_backend_class( $backend, $f );
 
-    no strict 'refs';
-    return $c->new( node => $self->node, name => $backend );
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
+    return $c->new(
+        node => $self->node,
+        name => $backend,
+        auto_create => $self->rw_config->{auto_create},
+        auto_delete => $self->rw_config->{auto_delete},
+    );
 }
 
 has support_annotation => (
@@ -338,7 +343,7 @@ sub try_read_backend {
         die $error ;
     }
     elsif ( $error ) {
-        die "Backend error: $error";
+        die "Backend $backend failed to read $file_path: $error";
     }
 
     # only backend based on C::M::Backend::Any can support annotations
@@ -481,14 +486,16 @@ sub close_file_to_write {
 
     if ($error) {
         # restore backup and display error
-        $logger->debug("Error during write, restoring backup data in $file_path" );
+        $logger->warn("Error during write, restoring backup data in $file_path" );
         $file_path->spew_utf8( $self->file_backup );
         $error->rethrow if ref($error) and $error->can('rethrow');
         die $error;
     }
 
+    # TODO: move chmod in a backend role
     $file_path->chmod($file_mode) if $file_mode;
 
+    # TODO: move in a backend role
     # check file size and remove empty files
     $file_path->remove if -z $file_path and not -l $file_path;
 }
@@ -502,7 +509,7 @@ sub is_auto_write_for_type {
 __PACKAGE__->meta->make_immutable;
 
 package Config::Model::DeprecatedHandle;
-$Config::Model::DeprecatedHandle::VERSION = '2.132';
+$Config::Model::DeprecatedHandle::VERSION = '2.133';
 our $AUTOLOAD;
 
 sub new {
@@ -545,7 +552,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.132
+version 2.133
 
 =head1 SYNOPSIS
 

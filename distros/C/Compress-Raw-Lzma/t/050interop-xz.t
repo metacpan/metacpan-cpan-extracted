@@ -5,6 +5,7 @@ BEGIN {
     }
 }
 
+
 use lib qw(t t/compress);
 use strict;
 use warnings;
@@ -77,7 +78,7 @@ sub readWithXz
         return 1 ;
     }
 
-    diag "'$comp' failed: $?";
+    diag "'$comp' failed: \$?=$? \$!=$!";
     return 0 ;
 }
 
@@ -99,7 +100,7 @@ sub writeWithXz
         return 1 ;
     }
 
-    diag "'$comp' failed: $?";
+    diag "'$comp' failed: \$?=$? \$!=$!";
     return 0 ;
 }
 
@@ -167,8 +168,13 @@ sub compressWith
         my $lex = new LexFile my $file;
         writeFile($file, $X);
         
+        undef $x ;
+
+        # displayMemoryUsage("Before");
         my $got = '';
         ok readWithXz($file, $got, $xz_opts), "  readWithXz returns 0";
+        # displayMemoryUsage("After");
+
         is $got, $contents, "  got content";
     }
 }

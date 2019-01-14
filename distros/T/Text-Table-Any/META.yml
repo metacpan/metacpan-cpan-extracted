@@ -44,7 +44,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-Any
   homepage: https://metacpan.org/release/Text-Table-Any
   repository: git://github.com/perlancar/perl-Text-Table-Any.git
-version: '0.093'
+version: '0.094'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -53,6 +53,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::IfBuilt
       name: IfBuilt
       version: '0.03'
+    -
+      class: Dist::Zilla::Plugin::InsertCodeOutput
+      name: InsertCodeOutput
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -124,7 +128,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -355,7 +359,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

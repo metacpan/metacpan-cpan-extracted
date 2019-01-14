@@ -4,7 +4,7 @@ App::CISetup - Command line tools to generate and update Travis and AppVeyor con
 
 # VERSION
 
-version 0.16
+version 0.17
 
 # DESCRIPTION
 
@@ -22,13 +22,14 @@ Bugs may be submitted through [https://github.com/maxmind/App-CISetup/issues](ht
 - Mark Fowler <mark@twoshortplanks.com>
 - Dave Rolsky <autarch@urth.org>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-Zak B. Elep <zakame@zakame.net>
+- Olaf Alders <oalders@maxmind.com>
+- Zak B. Elep <zakame@zakame.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MaxMind, Inc.
+This software is Copyright (c) 2019 by MaxMind, Inc.
 
 This is free software, licensed under:
 

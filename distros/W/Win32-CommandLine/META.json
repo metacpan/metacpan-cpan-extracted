@@ -42,7 +42,7 @@
             "File::Which" : "0",
             "FindBin" : "0",
             "IO::File" : "0",
-            "Module::Build" : "0",
+            "Module::Build" : "0.421",
             "TAP::Formatter::Color" : "0",
             "TAP::Formatter::Console" : "0",
             "TAP::Harness" : "0",
@@ -66,7 +66,7 @@
             "File::Which" : "0",
             "FindBin" : "0",
             "IO::File" : "0",
-            "Module::Build" : "0",
+            "Module::Build" : "0.421",
             "TAP::Formatter::Color" : "0",
             "TAP::Formatter::Console" : "0",
             "TAP::Harness" : "0",
@@ -91,6 +91,12 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Test::MinimumVersion" : "0.008",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         },
          "requires" : {
             "CPAN::Meta" : "0",
             "Carp" : "0",
@@ -126,7 +132,7 @@
    "provides" : {
       "Win32::CommandLine" : {
          "file" : "lib/Win32/CommandLine.pm",
-         "version" : "0.954"
+         "version" : "0.958"
       }
    },
    "release_status" : "stable",
@@ -140,11 +146,11 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/rivy/perl.Win32-CommandLine.git",
+         "url" : "https://github.com/rivy/perl.Win32-CommandLine.git",
          "web" : "https://github.com/rivy/perl.Win32-CommandLine"
       }
    },
-   "version" : "0.954",
+   "version" : "0.958",
    "x_authority" : "cpan:RIVY",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }
