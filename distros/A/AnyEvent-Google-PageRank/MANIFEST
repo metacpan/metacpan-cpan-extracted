@@ -6,4 +6,5 @@ README
 t/1_load.t
 t/2_rank.t
 t/3_live.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

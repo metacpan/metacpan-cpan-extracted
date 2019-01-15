@@ -8,7 +8,7 @@ Perl bindings for the Baruwa REST API
 
 =for HTML <a href="https://travis-ci.org/akissa/Net-BaruwaAPI"><img src="https://travis-ci.org/akissa/Net-BaruwaAPI.svg?branch=master" /></a>
 
-=for HTML <a href="https://codecov.io/github/akissa/Net-BaruwaAPI?branch=master"><img src="https://codecov.io/github/akissa/Net-BaruwaAPI/coverage.svg?branch=master" alt="Coverage via Codecov" /></a>
+=for HTML <a href="https://codecov.io/gh/akissa/Net-BaruwaAPI"><img src="https://codecov.io/gh/akissa/Net-BaruwaAPI/branch/master/graph/badge.svg" alt="Coverage via Codecov" /></a>
 
 =for HTML <a href="https://www.mozilla.org/MPL/2.0/"><img src="https://img.shields.io/badge/license-MPLv2-blue.svg?style=flat-square" /></a>
 
@@ -67,7 +67,7 @@ You can also look for information at:
 
 =head2 License and Copyright
 
-Copyright (C) 2015-2016 Andrew Colin Kissa
+Copyright (C) 2015-2019 Andrew Colin Kissa
 
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this

@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "File::Map" : "0.65",
             "Imager" : "0.91",
             "Inline" : "0.53",
             "Inline::C" : "0.53",
@@ -41,12 +42,11 @@
             "Math::Bezier" : "0.01",
             "Math::Gradient" : "0.03",
             "Math::Trig" : "1.10",
-            "Sys::Mmap" : "0.16",
             "perl" : "5.008"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "6.13",
+   "version" : "6.14",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

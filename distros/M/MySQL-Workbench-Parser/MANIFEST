@@ -21,6 +21,7 @@ t/05_comments.t
 t/06_lint.t
 t/07_helper.t
 t/08_croaks.t
+t/09_datatypes.t
 t/actions.mwb
 t/actions.mwb.bak
 t/author-pod-coverage.t

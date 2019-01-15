@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Serge::Sync::Plugin::TranslationService::crowdin - L<Crowdin|https://crowdin.com> synchronization plugin for L<Serge|https://serge.io/>
+Serge::Sync::Plugin::TranslationService::crowdin - L<Crowdin|https://crowdin.com> synchronization plugin for L<Serge|https://serge.io/> based on L<Crowdin CLI|https://support.crowdin.com/cli-tool/>
 
 =head1 SYNOPSIS
 
@@ -19,8 +19,8 @@ Serge::Sync::Plugin::TranslationService::crowdin - L<Crowdin|https://crowdin.com
 
 =head1 DESCRIPTION
 
-Integration between Serge (Free, Open Source Solution for Continuous Localization) and Crowdin (Localization project management platform and translation tool for developers and website owners).
-Uses the command-line client for the Crowdin API (version 2). See L<Crowdin CLI|https://support.crowdin.com/cli-tool/>.
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and Crowdin (Localization project management platform and translation tool for developers and website owners),
+implemented using the command-line client for the Crowdin API (version 2).
 
 =head1 ATTRIBUTES
 

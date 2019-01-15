@@ -31,6 +31,7 @@ my @json_data_methods = (
        organisasjonsnummer
        orgnr
        navn
+       oppdateringsid
     /,
     
     # dates
@@ -38,16 +39,18 @@ my @json_data_methods = (
        registreringsdatoEnhetsregisteret
        stiftelsesdato
        sisteInnsendteAarsregnskap
+       slettedato
+       oppstartsdato
+       dato
+       datoEierskifte
     /,
 
-    # Org form, like AS etc.
     qw /
-       organisasjonsform
        overordnetEnhet
        maalform
     /,
 
-    # BOOL (J/N)
+    # BOOL
     qw /
        registrertIStiftelsesregisteret
        registrertIFrivillighetsregisteret
@@ -62,13 +65,15 @@ my @json_data_methods = (
     # hashes with their own extra keys
     qw /
        forretningsadresse
+       beliggenhetsadresse
        postadresse
        institusjonellSektorkode
        naeringskode1
        naeringskode2
        naeringskode3
-       links
+       _links
        orgform
+       organisasjonsform
     /,
 
     # web page, number of employed
@@ -88,39 +93,71 @@ sub map_json_entries {
     my ($self, $json) = @_;
 
     return unless ($json);    
-	
+        
     my @aj;
     my @ao;
 
     $self->status("");
     if ($json->{navn}) {
-	# single entry on the data array
-	push @aj, $json;
-	
+        # single entry on the data array
+        push @aj, $json;
+
+    } elsif ($json->{_embedded} && $json->{_embedded}->{enheter}) {
+        # multiple entries V2
+        push @aj, @{$json->{_embedded}->{enheter}};
+
+    } elsif ($json->{_embedded} && $json->{_embedded}->{underenheter}) {
+        # multiple entries V2
+        push @aj, @{$json->{_embedded}->{underenheter}};
+
+    } elsif ($json->{_embedded} && $json->{_embedded}->{oppdaterteEnheter}) {
+        # multiple updated entries V2
+        push @aj, @{$json->{_embedded}->{oppdaterteEnheter}};
+
+    } elsif ($json->{_embedded} && $json->{_embedded}->{oppdaterteUnderenheter}) {
+        # multiple updated entries V2
+        push @aj, @{$json->{_embedded}->{oppdaterteUnderenheter}};
+
     } elsif ($json->{data}) {
-	# multiple entries 
-	push @aj, @{$json->{data}};
+        # multiple entries V1
+        push @aj, @{$json->{data}};
     }
     
     # Check entry array for supported keys
     # set a warning if some are not expected
     foreach my $ej (@aj) {
-	foreach my $k (keys %$ej) {
-	    unless ($self->can($k)) {
-		$self->status($self->status . "JSON data key entry not expected: $k\n");
-		$self->warning(1);
-	    }
-	}
-	my $eo = NOLookup::Brreg::Entry->new($ej);
-	$eo->orgnr($eo->organisasjonsnummer);  
-	push @ao, $eo;
+        foreach my $k (keys %$ej) {
+            unless ($self->can($k)) {
+                $self->status($self->status . "JSON data key entry not expected: $k\n");
+                $self->warning(1);
+            }
+        }
+        my $eo = NOLookup::Brreg::Entry->new($ej);
+        $eo->orgnr($eo->organisasjonsnummer);  
+        push @ao, $eo;
     }
-    # Set next link page if more pages are present 
+    # Set next link page if more pages are present
+
     $self->next_page(undef);
-    foreach my $l (@{$json->{links}}) {
-	if ($l->{rel} eq 'next') {
-	    $self->next_page($l->{href});
-	}
+    
+    if ($json->{links}) {
+        # V1 entry
+        #print STDERR "V1 json entry: ", Dumper $json;
+        foreach my $l (@{$json->{links}}) {
+            if ($l->{rel} eq 'next') {
+                $self->next_page($l->{href});
+            }
+        }
+
+    } elsif ($json->{_links}) {
+
+        #print STDERR "V2 json entry: ", Dumper $json;
+        # V2 entry
+        if ($json->{_links}->{next}) {
+            $self->next_page($json->{_links}->{next}->{href});
+            #print STDERR "self entry: ", Dumper $self;
+            #exit;
+        }
     }
     
     # return a ref to the data array
@@ -189,14 +226,16 @@ Data elements are available through acessors in the NOLookup::Brreg::Entry objec
 This is the possible JSON data methods, which are the accessor
 methods that can be used to find the returned data elements.
 
-The accessor methods are:
+The accessor methods from @json_data_methods
 
   organisasjonsnummer 
   navn 
+  orgnr
+  oppdateringsid
   registreringsdatoEnhetsregisteret 
   stiftelsesdato 
   sisteInnsendteAarsregnskap 
-  organisasjonsform
+* organisasjonsform / orgform
   overordnetEnhet
   registrertIStiftelsesregisteret
   registrertIFrivillighetsregisteret
@@ -212,7 +251,7 @@ The accessor methods are:
 * naeringskode1 
 * naeringskode2
 * naeringskode3
-* links 
+* _links 
   hjemmeside 
   antallAnsatte
 
@@ -226,18 +265,35 @@ Hash data must be accessed via their respective keys.
 
 The hashes are described below.
 
+=head3 organisasjonsform()
+
+The hash looks like follows:
+
+  "organisasjonsform": {
+    "kode": "AS",
+    "beskrivelse": "Aksjeselskap",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/AS"
+      }
+    }
+  },
+
+
 =head3 forretningsadresse() / postadresse()
 
 The hash looks like follows:
 
-  'forretningsadresse' => {
-    'land' => 'Norge',
-    'kommune' => 'STAVANGER',
-    'postnummer' => '4035',
-    'poststed' => 'STAVANGER',
-    'kommunenummer' => '1103',
-    'landkode' => 'NO',
-    'adresse' => 'Forusbeen 50'
+ "forretningsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "7030",
+    "poststed": "TRONDHEIM",
+    "adresse": [
+      "Abels gate 5"
+    ],
+    "kommune": "TRONDHEIM",
+    "kommunenummer": "5001"
   },
 
 =head3 institusjonellSektorkode()
@@ -267,16 +323,15 @@ The hash looks like follows:
   ],
 
 
-=head3 links() 
+=head3 _links() 
 
 The hash looks like follows:
 
-  'links' => [
-     {
-       'rel' => 'self',
-       'href' => 'http://data.brreg.no/enhetsregisteret/enhet/923609016'
-     }
-   ]
+ "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/985821585"
+    }
+  }
 
 
 =head1 SUPPORT

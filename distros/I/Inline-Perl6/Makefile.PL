@@ -4,10 +4,16 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
-my $install_cmd = q{perl6-m -e 'say $*EXECUTABLE.dirname.Str.subst(rx{\/<-[\/]>+$}, "")'};
+my $perl6 = qx{perl6-m -e 'say \$*EXECUTABLE.absolute'};
+chomp $perl6;
+my $install_cmd = q{perl6-m -e 'print $*EXECUTABLE.dirname.Str.subst(rx{\/<-[\/]>+$}, "")'};
 my $install = qx{$install_cmd};
-chomp $install;
-say $install;
+
+my $moar_version_cmd = q{perl6-m -e 'print $*VM.version ge v2016.11.27.g.3171.dbba'};
+my $moar_version = qx{$moar_version_cmd};
+
+my $nqp_libdir_cmd = q{nqp-m -e 'print(nqp::getcomp("nqp").config<libdir>)'};
+my $nqp_libdir = qx{$nqp_libdir_cmd};
 
 my $inc = join(' ',
     map { "-I$install/include/$_" }
@@ -31,5 +37,10 @@ WriteMakefile(
 );
 
 open my $header, '>', 'Perl6.h';
-print { $header } qq{#define PERL6_INSTALL_PATH "$install"};
+print { $header } qq{#define PERL6_EXECUTABLE "$perl6"\n};
+print { $header } qq{#define PERL6_INSTALL_PATH "$install"\n};
+print { $header } qq{#define NQP_LIBDIR "$nqp_libdir"\n};
+print { $header } $moar_version eq 'True'
+    ? qq{#define mark_thread_blocked(tc) MVM_gc_mark_thread_blocked(tc)\n}
+    : qq{#define mark_thread_blocked(tc)\n};
 close $header;

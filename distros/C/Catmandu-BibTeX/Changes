@@ -1,5 +1,11 @@
 Revision history for Catmandu-BibTeX
 
+0.11  2019-01-15 13:29:22 CET
+  - provide VERSION for all *.pm files
+
+0.10  2019-01-15 13:26:40 CET
+  - make exporter idempotent
+
 0.08  2017-01-17 08:01:25 CET
   - support importing authors/editors as if,
     i.e. single authors will be SCALARs and multiple authors

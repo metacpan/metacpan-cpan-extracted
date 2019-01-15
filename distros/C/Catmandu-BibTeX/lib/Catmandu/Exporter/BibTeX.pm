@@ -1,7 +1,10 @@
 package Catmandu::Exporter::BibTeX;
 
+our $VERSION = '0.11';
+
 use namespace::clean;
 use Catmandu::Sane;
+use Clone qw(clone);
 use Moo;
 
 with 'Catmandu::Exporter';
@@ -49,7 +52,10 @@ my $JOIN = {
 };
 
 sub add {
-    my ($self, $data) = @_;
+    my ($self, $orig_data) = @_;
+    
+    my $data = clone($orig_data);
+    
     my $fh = $self->fh;
 
     my $type = $data->{type} || $data->{_type} || 'misc';

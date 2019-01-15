@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use Clone qw(clone);
 use Test::More;
 
 my $pkg;
@@ -31,6 +32,8 @@ my $data = {
 	title => 'A Computational Model of Empathy: Empirical Evaluation',
 };
 
+my $data2 = clone($data);
+
 my $bibtex_out;
 my $exporter = $pkg->new(file => \$bibtex_out);
 
@@ -43,5 +46,7 @@ can_ok($exporter, 'add_many');
 $exporter->add($data);
 
 is($bibtex, $bibtex_out, "compare output");
+
+is_deeply($data, $data2, "exporter is idempotent");
 
 done_testing;

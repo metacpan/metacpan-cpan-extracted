@@ -1,6 +1,11 @@
 Change history for MySQL::Workbench::Parser
 ===========================================
 
+1.07 2019-01-15 07:50:00
+
+  * fix behaviour of 'datatypes' for user defined datatypes
+  * add tests
+
 1.06 2019-01-11 14:15:00
 
   * fix bug in linter: do not warn when two names with the same name are unique in the model

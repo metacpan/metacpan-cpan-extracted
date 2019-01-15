@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../..";
 use xt::kwalitee::Test;
 
 xt::kwalitee::Test::run(
@@ -21,4 +23,7 @@ xt::kwalitee::Test::run(
 
   # invalid =encoding (utf-8;)
   ['INGY/IO-All-0.40.tar.gz', 0],
+
+  # script name with a dash instead of package name
+  ['SKIRMESS/App-ReportPrereqs-0.001.tar.gz', 1]
 );

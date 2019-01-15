@@ -22,7 +22,8 @@ my %WriteMakefileArgs = (
     "Mojo::JSON::MaybeXS" => 0,
     "Mojo::URL" => 0,
     "Mojo::UserAgent" => 0,
-    "Moo" => 0,
+    "Mojolicious" => 8,
+    "Moo" => 2,
     "namespace::clean" => 0,
     "strictures" => 2
   },
@@ -31,13 +32,13 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Mojo::Base" => 0,
-    "Mojolicious" => 0,
+    "Mojolicious" => 8,
     "Test::More" => 0,
     "Try::Tiny" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0400",
+  "VERSION" => "0.0401",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,8 +55,8 @@ my %FallbackPrereqs = (
   "Mojo::JSON::MaybeXS" => 0,
   "Mojo::URL" => 0,
   "Mojo::UserAgent" => 0,
-  "Mojolicious" => 0,
-  "Moo" => 0,
+  "Mojolicious" => 8,
+  "Moo" => 2,
   "Test::More" => 0,
   "Try::Tiny" => 0,
   "namespace::clean" => 0,

@@ -7,7 +7,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Mojo::Base: '0'
-  Mojolicious: '0'
+  Mojolicious: '8'
   Test::More: '0'
   Try::Tiny: '0'
   perl: '5.006'
@@ -29,6 +29,7 @@ requires:
   Mojo::JSON::MaybeXS: '0'
   Mojo::URL: '0'
   Mojo::UserAgent: '0'
+  Mojolicious: '8'
   Moo: '2'
   namespace::clean: '0'
   perl: '5.006'
@@ -36,7 +37,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-AcousticBrainz
   repository: https://github.com/ology/WebService-AcousticBrainz
-version: '0.0300'
+version: '0.0301'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

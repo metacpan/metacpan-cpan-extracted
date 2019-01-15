@@ -9,7 +9,6 @@ README
 README.md
 dist.ini
 eg/example
-junk.txt
 lib/WebService/GetSongBPM.pm
 t/00-compile.t
 t/01-methods.t

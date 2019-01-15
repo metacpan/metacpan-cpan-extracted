@@ -20,9 +20,17 @@ Given a 2D array-of-arrays containing strings (which may be plain or formatted
 ones returned by the various C<format_*> methods), prints them formatted in a
 table shape, aligning the columns.
 
+An element of C<$rows> may be an empty arrayref. This will cause a row of
+divisions to be drawn using hyphens (C<->) the full width of each column.
+
 The following named C<%ops> may be supplied:
 
 =over 4
+
+=item headings => ARRAY[STRING]
+
+A list of strings per column to place at the top of the table. These may be
+formatted differently to distinguish them.
 
 =item sep => ARRAY[STRING] or STRING
 
@@ -36,6 +44,11 @@ a C<sprintf> format string, so any C<%> marks it may contain should be doubled.
 A list of strings per column (or one single string to apply equally to them
 all) specifying the alignment of data in the column. Aligns to the right if
 the value is C<"right">.
+
+=item indent => INT
+
+A number of spaces to prefix before every row of output. Defaults to zero if
+not supplied.
 
 =back
 
@@ -119,6 +132,14 @@ will use base-1024 sizes in C<KiB>, C<MiB>, C<GiB> or C<TiB> if necessary.
 Similar to L</format_sv>, but more helpful on C<SCALAR> and C<REF> SVs. For
 C<SCALAR> SVs it will show the value directly by using L</format_value>, and
 for C<REF> SVs it will show the referrant SV.
+
+=head2 format_heading
+
+  $str = Devel::MAT::Cmd->format_heading( $text, $level )
+
+Returns a string applying some formatting to the given text to make it stand
+out as a section or table heading. C<$level> may be used to distinguish
+different styles; at least 3 should be provided.
 
 =head1 AUTHOR
 

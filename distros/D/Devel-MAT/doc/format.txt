@@ -289,6 +289,13 @@ SV extensions:
     PTRs(1):
             CV
 
+  type: SVSV note (0x87)
+    Header(0)
+    PTRs(1):
+            SV
+    STRs(1):
+            NAME
+
 Context:
   type==0-terminated list of CTXs
 

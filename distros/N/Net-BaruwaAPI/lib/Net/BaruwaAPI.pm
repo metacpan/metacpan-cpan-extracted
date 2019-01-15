@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim: ai ts=4 sts=4 et sw=4
 # Net::BaruwaAPI Perl bindings for the Baruwa REST API
-# Copyright (C) 2015-2016 Andrew Colin Kissa <andrew@topdog.za.net>
+# Copyright (C) 2015-2019 Andrew Colin Kissa <andrew@topdog.za.net>
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -18,7 +18,7 @@ use Type::Params qw/compile/;
 use Types::Standard qw(Str InstanceOf Object Int Bool Dict Num ArrayRef);
 use Moo;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our $AUTHORITY = 'cpan:DATOPDOG';
 
 my $api_path = '/api/v1';
@@ -122,6 +122,7 @@ sub create_user {
         spam_checks => Bool,
         low_score => Num,
         high_score => Num,
+        block_macros => Bool,
     ]);
     my ($self, $data) = $check->(@_);
     return $self->_call('POST', "$api_path/users", $data);
@@ -141,9 +142,9 @@ sub update_user {
         spam_checks => Bool,
         low_score => Num,
         high_score => Num,
+        block_macros => Bool,
     ]);
     my ($self, $data) = $check->(@_);
-    # my ($self, $data) = @_;
     return $self->_call('PUT', "$api_path/users", $data);
 }
 
@@ -161,6 +162,7 @@ sub delete_user {
         spam_checks => Bool,
         low_score => Num,
         high_score => Num,
+        block_macros => Bool,
     ]);
     my ($self, $data) = $check->(@_);
     # my ($self, $data) = @_;
@@ -237,10 +239,13 @@ sub create_domain {
         name => Str,
         site_url => Str,
         status => Bool,
+        accept_inbound => Bool,
+        discard_mail => Bool,
         smtp_callout => Bool,
         ldap_callout => Bool,
         virus_checks => Bool,
         virus_checks_at_smtp => Bool,
+        block_macros => Bool,
         spam_checks => Bool,
         spam_actions => Num,
         highspam_actions => Num,
@@ -264,10 +269,13 @@ sub update_domain {
         name => Str,
         site_url => Str,
         status => Bool,
+        accept_inbound => Bool,
+        discard_mail => Bool,
         smtp_callout => Bool,
         ldap_callout => Bool,
         virus_checks => Bool,
         virus_checks_at_smtp => Bool,
+        block_macros => Bool,
         spam_checks => Bool,
         spam_actions => Num,
         highspam_actions => Num,
@@ -308,6 +316,7 @@ sub create_domainalias {
     Dict[
         name => Str,
         status => Bool,
+        accept_inbound => Bool,
         domain => Int
     ]);
     my ($self, $domainid, $data) = $check->(@_);
@@ -319,6 +328,7 @@ sub update_domainalias {
     Dict[
         name => Str,
         status => Bool,
+        accept_inbound => Bool,
         domain => Int
     ]);
     my ($self, $domainid, $aliasid, $data) = $check->(@_);
@@ -330,6 +340,7 @@ sub delete_domainalias {
     Dict[
         name => Str,
         status => Bool,
+        accept_inbound => Bool,
         domain => Int
     ]);
     my ($self, $domainid, $aliasid, $data) = $check->(@_);
@@ -354,6 +365,8 @@ sub create_deliveryserver {
      address => Str,
      protocol => Int,
      port => Int,
+     require_tls => Bool,
+     verification_only => Bool,
      enabled => Bool
     ]);
     my ($self, $domainid, $data) = $check->(@_);
@@ -366,6 +379,8 @@ sub update_deliveryserver {
      address => Str,
      protocol => Int,
      port => Int,
+     require_tls => Bool,
+     verification_only => Bool,
      enabled => Bool
     ]);
     my ($self, $domainid, $serverid, $data) = $check->(@_);
@@ -378,10 +393,234 @@ sub delete_deliveryserver {
         address => Str,
         protocol => Int,
         port => Int,
+        require_tls => Bool,
+        verification_only => Bool,
         enabled => Bool
     ]);
     my ($self, $domainid, $serverid, $data) = $check->(@_);
     return $self->_call('DELETE', "$api_path/deliveryservers/$domainid/$serverid", $data);
+}
+
+sub get_user_deliveryservers {
+    state $check = compile(Object, Int);
+    my ($self, $domainid) = $check->(@_);
+    return $self->_call('GET', "$api_path/userdeliveryservers/$domainid");
+}
+
+sub get_user_deliveryserver {
+    state $check = compile(Object, Int, Int);
+    my ($self, $domainid, $serverid) = $check->(@_);
+    return $self->_call('GET', "$api_path/userdeliveryservers/$domainid/$serverid");
+}
+
+sub create_user_deliveryserver {
+    state $check = compile(Object, Int,
+    Dict[
+     address => Str,
+     protocol => Int,
+     port => Int,
+     require_tls => Bool,
+     verification_only => Bool,
+     enabled => Bool
+    ]);
+    my ($self, $domainid, $data) = $check->(@_);
+    return $self->_call('POST', "$api_path/userdeliveryservers/$domainid", $data);
+}
+
+sub update_user_deliveryserver {
+    state $check = compile(Object, Int, Int,
+    Dict[
+     address => Str,
+     protocol => Int,
+     port => Int,
+     require_tls => Bool,
+     verification_only => Bool,
+     enabled => Bool
+    ]);
+    my ($self, $domainid, $serverid, $data) = $check->(@_);
+    return $self->_call('PUT', "$api_path/userdeliveryservers/$domainid/$serverid", $data);
+}
+
+sub delete_user_deliveryserver {
+    state $check = compile(Object, Int, Int,
+    Dict[
+        address => Str,
+        protocol => Int,
+        port => Int,
+        require_tls => Bool,
+        verification_only => Bool,
+        enabled => Bool
+    ]);
+    my ($self, $domainid, $serverid, $data) = $check->(@_);
+    return $self->_call('DELETE', "$api_path/userdeliveryservers/$domainid/$serverid", $data);
+}
+
+sub get_domain_smarthosts {
+    state $check = compile(Object, Int);
+    my ($self, $domainid) = $check->(@_);
+    return $self->_call('GET', "$api_path/domains/smarthosts/$domainid");
+}
+
+sub get_domain_smarthost {
+    state $check = compile(Object, Int, Int);
+    my ($self, $domainid, $serverid) = $check->(@_);
+    return $self->_call('GET', "$api_path/domains/smarthosts/$domainid/$serverid");
+}
+
+sub create_domain_smarthost {
+    state $check = compile(Object, Int,
+    Dict[
+        address => Str,
+        username => Str,
+        password => Str,
+        port => Int,
+        require_tls => Bool,
+        enabled => Bool,
+        description => Str,
+    ]);
+    my ($self, $domainid, $data) = $check->(@_);
+    return $self->_call('POST', "$api_path/domains/smarthosts/$domainid", $data);
+}
+
+sub update_domain_smarthost {
+    state $check = compile(Object, Int, Int,
+    Dict[
+        address => Str,
+        username => Str,
+        password => Str,
+        port => Int,
+        require_tls => Bool,
+        enabled => Bool,
+        description => Str,
+    ]);
+    my ($self, $domainid, $serverid, $data) = $check->(@_);
+    return $self->_call('PUT', "$api_path/domains/smarthosts/$domainid/$serverid", $data);
+}
+
+sub delete_domain_smarthost {
+    state $check = compile(Object, Int, Int,
+    Dict[
+        address => Str,
+        username => Str,
+        password => Str,
+        port => Int,
+        require_tls => Bool,
+        enabled => Bool,
+        description => Str,
+    ]);
+    my ($self, $domainid, $serverid, $data) = $check->(@_);
+    return $self->_call('DELETE', "$api_path/domains/smarthosts/$domainid/$serverid", $data);
+}
+
+sub get_org_smarthosts {
+    state $check = compile(Object, Int);
+    my ($self, $orgid) = $check->(@_);
+    return $self->_call('GET', "$api_path/organizations/smarthosts/$orgid");
+}
+
+sub get_org_smarthost {
+    state $check = compile(Object, Int, Int);
+    my ($self, $orgid, $serverid) = $check->(@_);
+    return $self->_call('GET', "$api_path/organizations/smarthosts/$orgid/$serverid");
+}
+
+sub create_org_smarthost {
+    state $check = compile(Object, Int,
+    Dict[
+        address => Str,
+        username => Str,
+        password => Str,
+        port => Int,
+        require_tls => Bool,
+        enabled => Bool,
+        description => Str,
+    ]);
+    my ($self, $orgid, $data) = $check->(@_);
+    return $self->_call('POST', "$api_path/organizations/smarthosts/$orgid", $data);
+}
+
+sub update_org_smarthost {
+    state $check = compile(Object, Int, Int,
+    Dict[
+        address => Str,
+        username => Str,
+        password => Str,
+        port => Int,
+        require_tls => Bool,
+        enabled => Bool,
+        description => Str,
+    ]);
+    my ($self, $orgid, $serverid, $data) = $check->(@_);
+    return $self->_call('PUT', "$api_path/organizations/smarthosts/$orgid/$serverid", $data);
+}
+
+sub delete_org_smarthost {
+    state $check = compile(Object, Int, Int,
+    Dict[
+        address => Str,
+        username => Str,
+        password => Str,
+        port => Int,
+        require_tls => Bool,
+        enabled => Bool,
+        description => Str,
+    ]);
+    my ($self, $orgid, $serverid, $data) = $check->(@_);
+    return $self->_call('DELETE', "$api_path/organizations/smarthosts/$orgid/$serverid", $data);
+}
+
+sub get_fallbackservers {
+    state $check = compile(Object, Int);
+    my ($self, $orgid) = $check->(@_);
+    return $self->_call('GET', "$api_path/fallbackservers/$orgid");
+}
+
+sub get_fallbackserver {
+    state $check = compile(Object, Int);
+    my ($self, $serverid) = $check->(@_);
+    return $self->_call('GET', "$api_path/fallbackservers/$serverid");
+}
+
+sub create_fallbackserver {
+    state $check = compile(Object, Int,
+    Dict[
+     address => Str,
+     protocol => Int,
+     port => Int,
+     require_tls => Bool,
+     verification_only => Bool,
+     enabled => Bool
+    ]);
+    my ($self, $orgid, $data) = $check->(@_);
+    return $self->_call('POST', "$api_path/fallbackservers/$orgid", $data);
+}
+
+sub update_fallbackserver {
+    state $check = compile(Object, Int,
+    Dict[
+     address => Str,
+     protocol => Int,
+     port => Int,
+     require_tls => Bool,
+     verification_only => Bool,
+     enabled => Bool
+    ]);
+    my ($self, $serverid, $data) = $check->(@_);
+    return $self->_call('PUT', "$api_path/fallbackservers/$serverid", $data);
+}
+
+sub delete_fallbackserver {
+    state $check = compile(Object, Int,
+    Dict[
+        address => Str,
+        protocol => Int,
+        port => Int,
+        require_tls => Bool,
+        verification_only => Bool,
+        enabled => Bool
+    ]);
+    my ($self, $serverid, $data) = $check->(@_);
+    return $self->_call('DELETE', "$api_path/fallbackservers/$serverid", $data);
 }
 
 sub get_authservers {
@@ -453,7 +692,10 @@ sub create_ldapsettings {
         binddn => Str,
         bindpw => Str,
         usetls => Bool,
+        usesearch => Bool,
+        searchfilter => Str,
         search_scope => Str,
+        emailsearchfilter => Str,
         emailsearch_scope => Str
     ]);
     my ($self, $domainid, $serverid, $data) = $check->(@_);
@@ -469,7 +711,10 @@ sub update_ldapsettings {
         binddn => Str,
         bindpw => Str,
         usetls => Bool,
+        usesearch => Bool,
+        searchfilter => Str,
         search_scope => Str,
+        emailsearchfilter => Str,
         emailsearch_scope => Str
     ]);
     my ($self, $domainid, $serverid, $settingsid, $data) = $check->(@_);
@@ -485,7 +730,10 @@ sub delete_ldapsettings {
         binddn => Str,
         bindpw => Str,
         usetls => Bool,
+        usesearch => Bool,
+        searchfilter => Str,
         search_scope => Str,
+        emailsearchfilter => Str,
         emailsearch_scope => Str
     ]);
     my ($self, $domainid, $serverid, $settingsid, $data) = $check->(@_);
@@ -578,8 +826,9 @@ sub create_relay {
     state $check = compile(Object, Int,
     Dict[
         address => Str,
-        enabled => Bool,
         username => Str,
+        enabled => Bool,
+        require_tls => Bool,
         password1 => Str,
         password2 => Str,
         description => Str,
@@ -587,6 +836,8 @@ sub create_relay {
         high_score => Num,
         spam_actions => Int,
         highspam_actions => Int,
+        block_macros => Bool,
+        ratelimit => Int
     ]);
     my ($self, $orgid, $data) = $check->(@_);
     return $self->_call('POST', "$api_path/relays/$orgid", $data);
@@ -596,8 +847,9 @@ sub update_relay {
     state $check = compile(Object, Int,
     Dict[
         address => Str,
-        enabled => Bool,
         username => Str,
+        enabled => Bool,
+        require_tls => Bool,
         password1 => Str,
         password2 => Str,
         description => Str,
@@ -605,6 +857,8 @@ sub update_relay {
         high_score => Num,
         spam_actions => Int,
         highspam_actions => Int,
+        block_macros => Bool,
+        ratelimit => Int
     ]);
     my ($self, $relayid, $data) = $check->(@_);
     return $self->_call('PUT', "$api_path/relays/$relayid", $data);
@@ -614,8 +868,9 @@ sub delete_relay {
     state $check = compile(Object, Int,
     Dict[
         address => Str,
-        enabled => Bool,
         username => Str,
+        enabled => Bool,
+        require_tls => Bool,
         password1 => Str,
         password2 => Str,
         description => Str,
@@ -623,6 +878,8 @@ sub delete_relay {
         high_score => Num,
         spam_actions => Int,
         highspam_actions => Int,
+        block_macros => Bool,
+        ratelimit => Int
     ]);
     my ($self, $relayid, $data) = $check->(@_);
     return $self->_call('DELETE', "$api_path/relays/$relayid", $data);
@@ -1091,6 +1348,26 @@ More info: L<< https://www.baruwa.com/docs/api/#list-all-domains >>.
 
     my $data = $api->delete_deliveryserver($domainid, $serverid, $data);
 
+=head2 get_user_deliveryservers($domainid)
+
+    my $data = $api->get_user_deliveryservers($domainid);
+
+=head2 get_user_deliveryserver($domainid, $serverid)
+
+    my $data = $api->get_user_deliveryserver($domainid, $serverid);
+
+=head2 create_user_deliveryserver($domainid, $data)
+
+    my $data = $api->create_user_deliveryserver($domainid, $data);
+
+=head2 update_user_deliveryserver($domainid, $serverid, $data)
+
+    my $data = $api->update_user_deliveryserver($domainid, $serverid, $data);
+
+=head2 delete_user_deliveryserver($domainid, $serverid, $data)
+
+    my $data = $api->delete_user_deliveryserver($domainid, $serverid, $data);
+
 =head2 get_authservers($domainid)
 
     my $data = $api->get_authservers($domainid);
@@ -1143,6 +1420,26 @@ More info: L<< https://www.baruwa.com/docs/api/#list-all-domains >>.
 
     my $data = $api->delete_radiussettings($domainid, $serverid, $settingsid, $data);
 
+=head2 get_domain_smarthosts($domainid)
+
+    my $data = $api->get_domain_smarthosts($domainid);
+
+=head2 get_domain_smarthost($domainid, $serverid)
+
+    my $data = $api->get_domain_smarthost($domainid, $serverid);
+
+=head2 create_domain_smarthost($domainid, $data)
+
+    my $data = $api->create_domain_smarthost($domainid, $data);
+
+=head2 update_domain_smarthost($domainid, $serverid, $data)
+
+    my $data = $api->update_domain_smarthost($domainid, $serverid, $data);
+
+=head2 delete_domain_smarthost($domainid, $serverid, $data)
+
+    my $data = $api->delete_domain_smarthost($domainid, $serverid, $data);
+
 =head2 get_organizations
 
     my $data = $api->get_organizations();
@@ -1163,6 +1460,26 @@ More info: L<< https://www.baruwa.com/docs/api/#list-all-domains >>.
 
     my $data = $api->delete_organization($orgid);
 
+=head2 get_fallbackservers($orgid)
+
+    my $data = $api->get_fallbackservers($orgid);
+
+=head2 get_fallbackserver($serverid)
+
+    my $data = $api->get_fallbackserver($serverid);
+
+=head2 create_fallbackserver($orgid, $data)
+
+    my $data = $api->create_fallbackserver($orgid, $data);
+
+=head2 update_fallbackserver($serverid, $data)
+
+    my $data = $api->update_fallbackserver($serverid, $data);
+
+=head2 delete_fallbackserver($serverid, $data)
+
+    my $data = $api->delete_fallbackserver($serverid, $data);
+
 =head2 get_relay($relayid)
 
     my $data = $api->get_relay($relayid);
@@ -1178,6 +1495,26 @@ More info: L<< https://www.baruwa.com/docs/api/#list-all-domains >>.
 =head2 delete_relay($relayid, $data)
 
     my $data = $api->delete_relay($relayid, $data);
+
+=head2 get_org_smarthosts($orgid)
+
+    my $data = $api->get_org_smarthosts($orgid);
+
+=head2 get_org_smarthost($orgid, $serverid)
+
+    my $data = $api->get_org_smarthost($orgid, $serverid);
+
+=head2 create_org_smarthost($orgid, $data)
+
+    my $data = $api->create_org_smarthost($orgid, $data);
+
+=head2 update_org_smarthost($orgid, $serverid, $data)
+
+    my $data = $api->update_org_smarthost($orgid, $serverid, $data);
+
+=head2 delete_org_smarthost($orgid, $serverid, $data)
+
+    my $data = $api->delete_org_smarthost($orgid, $serverid, $data);
 
 =head2 get_status
 

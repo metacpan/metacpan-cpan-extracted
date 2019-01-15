@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
+use utf8;
 
-use Test::More tests => 9;
+use Test::More;
 
 package TestObject;
 use Sentinel;
@@ -13,12 +14,25 @@ sub new { return bless { foo => undef }, $_[0] }
 sub get_foo { return $_[0]->{foo} }
 sub set_foo { $_[0]->{foo} = $_[1] }
 
+# These names are non-ASCII
+sub get_ĝi { goto &get_foo }
+sub set_ĝi { goto &set_foo }
+
+package TestObject;
 sub foo :lvalue
 {
    my $self = shift;
    sentinel obj => $self, 
             get => \&get_foo,
             set => \&set_foo;
+}
+
+sub foo_utf8 :lvalue
+{
+   my $self = shift;
+   sentinel obj => $self,
+            get => "get_ĝi",
+            set => "set_ĝi";
 }
 
 sub foo_named :lvalue
@@ -55,3 +69,11 @@ is( $obj->foo_named, "Goodbye world!", '$obj->foo_named performs method name loo
 $obj->foo_named = "Another message";
 
 is( $obj->get_foo, "Another message", '$obj->get_foo after set via lvalue named' );
+
+is( $obj->foo_utf8, "Another message", '$obj->foo_utf8 performs method name lookup' );
+
+$obj->foo_utf8 = "Yet another message";
+
+is( $obj->get_foo, "Yet another message", '$obj->get_foo after set via lvalue utf8' );
+
+done_testing;

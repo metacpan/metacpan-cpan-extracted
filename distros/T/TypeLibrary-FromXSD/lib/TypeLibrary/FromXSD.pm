@@ -12,13 +12,14 @@ use XML::LibXML;
 
 use TypeLibrary::FromXSD::Element;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has types       => (is => 'rwp');
 has xsd         => (is => 'ro', required => 1);
 has output      => (is => 'ro');
 has namespace   => (is => 'ro');
 has version_add => (is => 'ro', default => sub{ '0.01' } );
+has version     => (is => 'ro', lazy => 1, default => \&_get_version);
 
 sub run {
     my ($self) = @_;
@@ -28,6 +29,8 @@ sub run {
 
     my $out_fh    = *STDOUT;
     my $namespace = $self->namespace || 'Library'; 
+
+    my $version   = $self->version;
 
     if ( $self->output ) {
         open $out_fh, '>', $self->output;
@@ -51,7 +54,7 @@ sub run {
     }
 
     my $declare = join ' ', map{ $_->name }@types;
-    print $out_fh $self->_module_header( $namespace, $declare );
+    print $out_fh $self->_module_header( $namespace, $version, $declare );
     
     if ( $types_used{date} || $types_used{dateTime} ) {
         print $out_fh "\nuse DateTime;\n\n";
@@ -72,15 +75,21 @@ sub run {
     print $out_fh "1;\n";
 }
 
-sub _module_header {
-    my ($self, $ns, $declare) = @_;
+sub _get_version {
+    my ($self) = @_;
 
-    my $version = $self->version_add;
+    my $version = 0;
     if ( $self->output and -f $self->output ) {
         my $content = do{ local (@ARGV,$/) = $self->output; <> };
         ($version)  = $content =~ m{\$VERSION\s*=\s*(.*?);};
-        $version   += $self->version_add;
     }
+
+    $version += $self->version_add;
+    return $version;
+}
+
+sub _module_header {
+    my ($self, $ns, $version, $declare) = @_;
 
     qq*package $ns;
 
@@ -159,7 +168,7 @@ TypeLibrary::FromXSD - create a Type::Tiny library of simpleTypes in .xsd files.
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

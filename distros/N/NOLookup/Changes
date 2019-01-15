@@ -1,5 +1,20 @@
 Revision history for Perl extension NOLookup
 
+1.13 2019-01-15
+
+     - A few doc fixes
+
+1.12 2019-01-15
+
+     - Changed to use the new API from brreg:
+       - https://data.brreg.no/enhetsregisteret/oppslag/enheter.
+       - Also support search on underenhet (-u).
+       - Also search search on changed orgs (-d/-i).
+
+       The version supported by v1.11 are removed because Brreg
+       will remove it eventually, e.g:
+       https://data.brreg.no/oppslag/enhetsregisteret/enheter.xhtml
+
 1.11 2018-08-09
 
      - Handle case that holder info is missing when using the Norid

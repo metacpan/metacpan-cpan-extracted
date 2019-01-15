@@ -50,19 +50,19 @@
    "provides" : {
       "MySQL::Workbench::Parser" : {
          "file" : "lib/MySQL/Workbench/Parser.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "MySQL::Workbench::Parser::Column" : {
          "file" : "lib/MySQL/Workbench/Parser/Column.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "MySQL::Workbench::Parser::Index" : {
          "file" : "lib/MySQL/Workbench/Parser/Index.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "MySQL::Workbench::Parser::Table" : {
          "file" : "lib/MySQL/Workbench/Parser/Table.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "http://github.com/reneeb/MySQL-Workbench-Parser"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
       "reneeb <github@renee-baecker.de>",

@@ -7,7 +7,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Mojo::Base: '0'
-  Mojolicious: '0'
+  Mojolicious: '8'
   Test::More: '0'
   Try::Tiny: '0'
   perl: '5.006'
@@ -29,14 +29,15 @@ requires:
   Mojo::JSON::MaybeXS: '0'
   Mojo::URL: '0'
   Mojo::UserAgent: '0'
-  Moo: '0'
+  Mojolicious: '8'
+  Moo: '2'
   namespace::clean: '0'
   perl: '5.006'
   strictures: '2'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Hooktheory
   repository: https://github.com/ology/WebService-Hooktheory
-version: '0.0400'
+version: '0.0401'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -212,6 +213,14 @@ x_Dist_Zilla:
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:

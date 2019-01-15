@@ -1,33 +1,28 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Perl bindings for Baruwa REST API",
    "author" : [
-      "unknown"
+      "Andrew Colin Kissa <andrew@topdog.za.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
-      "unknown"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-BaruwaAPI",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0"
          }
       },
       "runtime" : {
@@ -37,11 +32,22 @@
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "Moo" : "0",
-            "Test::More" : "0",
             "Types::Standard" : "0"
          }
       }
    },
+   "provides" : {
+      "Net::BaruwaAPI" : {
+         "file" : "lib/Net/BaruwaAPI.pm",
+         "version" : "0.05"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.04"
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/akissa/Net-BaruwaAPI"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

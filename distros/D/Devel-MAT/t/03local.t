@@ -6,8 +6,10 @@ use warnings;
 use Test::More;
 
 use Devel::MAT::Dumper;
-$Devel::MAT::Dumper::VERSION > 0.37 or
+$Devel::MAT::Dumper::VERSION >= 0.38 or
    plan skip_all => "Devel::MAT::Dumper too old to capture 'local' saves";
+$] >= 5.018 or
+   plan skip_all => "Devel::MAT::Dumper can't capture 'local' saves from this version of perl";
 
 use Devel::MAT;
 

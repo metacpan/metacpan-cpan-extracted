@@ -1,7 +1,7 @@
 package DBIx::Raw;
 
 use 5.008_005;
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use strictures 2;
 use Moo;
@@ -44,10 +44,9 @@ has 'crypt_key' => (
     }, 
 );
 
-has use_old_crypt => (
+has 'use_old_crypt' => (
     is => 'rw',
     isa => Bool,
-    default => undef,
 );
 
 has 'old_crypt_key' => (

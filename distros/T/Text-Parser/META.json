@@ -1,5 +1,5 @@
 {
-   "abstract" : "Bare text parser, bundles other common \"mundane\" tasks.",
+   "abstract" : "Bare text parser, bundles many common \"mundane\" tasks.",
    "author" : [
       "Balaji Ramasubramanian <balajiram@cpan.org>"
    ],
@@ -33,8 +33,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Method::Modifiers" : "0",
             "Exception::Class" : "0",
             "Exporter" : "0",
+            "Role::Tiny" : "0",
             "Scalar::Util" : "0",
             "Try::Tiny" : "0",
             "perl" : "5.012",
@@ -57,14 +59,17 @@
    "provides" : {
       "Text::Parser" : {
          "file" : "lib/Text/Parser.pm",
-         "version" : "0.753"
+         "version" : "0.801"
+      },
+      "Text::Parser::Multiline" : {
+         "file" : "lib/Text/Parser/Multiline.pm",
+         "version" : "0.801"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-text-parser at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Parser"
+         "web" : "http://github.com/me/Text-Parser/issues"
       },
       "homepage" : "https://github.com/balajirama/Text-Parser",
       "repository" : {
@@ -73,7 +78,7 @@
          "web" : "https://github.com/balajirama/Text-Parser"
       }
    },
-   "version" : "0.753",
+   "version" : "0.801",
    "x_contributors" : [
       "H.Merijn Brand - Tux <h.m.brand@xs4all.nl>"
    ],

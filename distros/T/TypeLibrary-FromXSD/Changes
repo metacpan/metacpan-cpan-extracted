@@ -1,6 +1,10 @@
 Change history for TypeLibrary::FromXSD
 =======================================
 
+0.05 2019-01-15 07:52:00
+
+     * fix bug: version_add add no effect before this change
+
 0.04 2019-01-10 12:30:00
 
      + updated dist.ini

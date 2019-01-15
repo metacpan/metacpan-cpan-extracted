@@ -2,8 +2,8 @@ package Module::CPANTS::Kwalitee::Distname;
 use warnings;
 use strict;
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
 sub order { 20 }
 
@@ -12,8 +12,8 @@ sub order { 20 }
 ##################################################################
 
 sub analyse {
-    my $class=shift;
-    my $me=shift;
+    my $class = shift;
+    my $me = shift;
 
     # NOTE: The analysis code has moved to ::Analyse to avoid
     # duplication.
@@ -71,7 +71,7 @@ Does nothing now.
 
 =head3 kwalitee_indicators
 
-Returns the Kwalitee Indicators datastructure.
+Returns the Kwalitee Indicators data structure.
 
 =over
 

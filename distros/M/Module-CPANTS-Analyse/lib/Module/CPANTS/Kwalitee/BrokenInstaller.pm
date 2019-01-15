@@ -3,8 +3,8 @@ use warnings;
 use strict;
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
 sub order { 100 }
 
@@ -12,10 +12,10 @@ sub analyse {
     my $class = shift;
     my $me = shift;
     my $distdir = $me->distdir;
-    
+
     # inc/Module/Install.pm file
     my $mi = catfile($distdir, 'inc', 'Module', 'Install.pm');
-    
+
     # Must be okay if not using Module::Install
     return if not -f $mi;
 
@@ -34,13 +34,13 @@ sub analyse {
         if ($non_devel < 0.89) {
             my $makefilepl = catfile($distdir, 'Makefile.PL');
             return if not -f $makefilepl;
-            
+
             open my $ih, '<', $makefilepl
               or die "Could not open file '$makefilepl' for checking the bad_installer metric: $!";
             local $/ = undef;
             my $mftext = <$ih>;
             close $ih;
-            
+
             return if not defined $mftext;
 
             if ($mftext =~ /auto_install/) {
@@ -48,7 +48,7 @@ sub analyse {
             } else {
                 return;
             }
-            
+
             if ($non_devel < 0.64) {
                 $me->d->{module_install}{broken} = 1;
             }
@@ -59,42 +59,39 @@ sub analyse {
         $me->d->{module_install}{broken} = 1;
     }
 
-    
     return;
 }
-
 
 sub kwalitee_indicators {
   return [
     {
-        name=>'no_broken_module_install',
-        error=>q{This distribution uses an obsolete version of Module::Install. Versions of Module::Install prior to 0.61 might not work on some systems at all. Additionally if your Makefile.PL uses the 'auto_install()' feature, you need at least version 0.64. Also, 1.04 is known to be broken.},
-        remedy=>q{Upgrade the bundled version of Module::Install to the most current release. Alternatively, you can switch to another build system / installer that does not suffer from this problem. (ExtUtils::MakeMaker, Module::Build both of which have their own set of problems.)},
-        code=>sub {
+        name => 'no_broken_module_install',
+        error => q{This distribution uses an obsolete version of Module::Install. Versions of Module::Install prior to 0.61 might not work on some systems at all. Additionally if your Makefile.PL uses the 'auto_install()' feature, you need at least version 0.64. Also, 1.04 is known to be broken.},
+        remedy => q{Upgrade the bundled version of Module::Install to the most current release. Alternatively, you can switch to another build system / installer that does not suffer from this problem. (ExtUtils::MakeMaker, Module::Build both of which have their own set of problems.)},
+        code => sub {
             my $d = shift;
             return 1 unless exists $d->{module_install};
             $d->{module_install}{broken} ? 0 : 1;
         },
-        details=> sub {
+        details => sub {
             q{This distribution uses obsolete Module::Install version }.(shift->{module_install}{version});
         },
     },
     {
-        name=>'no_broken_auto_install',
-        error=>q{This distribution uses an old version of Module::Install. Versions of Module::Install prior to 0.89 do not detect correcty that CPAN/CPANPLUS shell is used.},
-        remedy=>q{Upgrade the bundled version of Module::Install to at least 0.89, but preferably to the most current release. Alternatively, you can switch to another build system / installer that does not suffer from this problem. (ExtUtils::MakeMaker, Module::Build both of which have their own set of problems.)},
-        code=>sub {
+        name => 'no_broken_auto_install',
+        error => q{This distribution uses an old version of Module::Install. Versions of Module::Install prior to 0.89 do not detect correctly that CPAN/CPANPLUS shell is used.},
+        remedy => q{Upgrade the bundled version of Module::Install to at least 0.89, but preferably to the most current release. Alternatively, you can switch to another build system / installer that does not suffer from this problem. (ExtUtils::MakeMaker, Module::Build both of which have their own set of problems.)},
+        code => sub {
             my $d = shift;
             return 1 unless exists $d->{module_install};
             $d->{module_install}{broken_auto_install} ? 0 : 1;
         },
-        details=> sub {
+        details => sub {
             q{This distribution uses obsolete Module::Install version }.(shift->{module_install}{version});
         },
     },
 ];
 }
-
 
 1
 
@@ -131,7 +128,7 @@ If so, C<Module::Install> should be at least version 0.64.
 
 =head3 kwalitee_indicators
 
-Returns the Kwalitee Indicators datastructure.
+Returns the Kwalitee Indicators data structure.
 
 =over
 

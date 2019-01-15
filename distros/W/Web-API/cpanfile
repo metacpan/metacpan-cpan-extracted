@@ -1,0 +1,26 @@
+requires "Carp" => "0";
+requires "Data::Printer" => "0";
+requires "Data::Random" => "0";
+requires "HTTP::Cookies" => "6.04";
+requires "JSON" => "0";
+requires "LWP::UserAgent" => "0";
+requires "Mouse::Role" => "0";
+requires "Net::OAuth" => "0";
+requires "Time::HiRes" => "0";
+requires "URI" => "0";
+requires "URI::Escape::XS" => "0";
+requires "URI::QueryParam" => "0";
+requires "XML::Simple" => "0";
+requires "experimental" => "0";
+requires "perl" => "5.010001";
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Pod::Coverage::TrustPod" => "0";
+  requires "Test::Perl::Critic" => "0";
+  requires "Test::Pod" => "1.41";
+  requires "Test::Pod::Coverage" => "1.08";
+};

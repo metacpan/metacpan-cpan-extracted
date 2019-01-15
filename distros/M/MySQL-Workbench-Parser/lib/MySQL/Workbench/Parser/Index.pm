@@ -8,7 +8,7 @@ use warnings;
 use Moo;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 
 has node => (
@@ -96,7 +96,7 @@ MySQL::Workbench::Parser::Index - An index of the ER model
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 METHODS
 

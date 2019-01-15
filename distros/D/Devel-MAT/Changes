@@ -1,5 +1,14 @@
 Revision history for Devel-MAT
 
+0.41    2019-01-14 18:19:44
+        [CHANGES]
+         * Nicer table output in command tools
+         * Added `pmat-counts` for giving a quick summary of a series of
+           heapdump files
+         * Load the SV->SV annotations written by DMD_helper code in
+           thirdparty XS modules
+         * Added a `stack` command
+
 0.40    2018-09-07 14:57:06
         [CHANGES]
          * Read dumpfile format v0.4 - SV extension size table

@@ -3,11 +3,11 @@ use warnings;
 use strict;
 use File::Spec::Functions qw(catfile);
 use Module::ExtractUse 0.33;
-use Set::Scalar qw();
+use List::Util 1.33 qw/none/;
 use version;
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
 # These equivalents should be reasonably well-known and, preferably,
 # well-documented. Don't add obscure modules used by only one person
@@ -26,6 +26,7 @@ our @STRICT_WARNINGS_EQUIV = qw(
   Modern::Perl
   Moo Moo::Role
   Moose Moose::Role Moose::Exporter
+  Moose::Util::TypeConstraints Moose::Util::MetaRole
   MooseX::Declare MooseX::Role::Parameterized MooseX::Types
   Mouse Mouse::Role
   perl5 perl5i::1 perl5i::2 perl5i::latest
@@ -45,17 +46,17 @@ sub order { 100 }
 ##################################################################
 
 sub analyse {
-    my $class=shift;
-    my $me=shift;
+    my $class = shift;
+    my $me = shift;
     
-    my $distdir=$me->distdir;
-    my $modules=$me->d->{modules};
-    my $files=$me->d->{files_hash};
+    my $distdir = $me->distdir;
+    my $modules = $me->d->{modules};
+    my $files = $me->d->{files_hash};
 
     # NOTE: all files in xt/ should be ignored because they are
     # for authors only and their dependencies may not be (and
     # often are not) listed in meta files.
-    my @tests=grep {m|^t\b.*\.t|} sort keys %$files;
+    my @tests = grep {m|^t\b.*\.t|} sort keys %$files;
     $me->d->{test_files} = \@tests;
 
     my @test_modules = map {
@@ -67,7 +68,7 @@ sub analyse {
     } grep {m|^t\b.*\.pm$|} keys %$files;
     my %test_modules = map {$_ => 1} @test_modules;
 
-    my %skip=map {$_->{module}=>1 } @$modules;
+    my %skip = map {$_->{module} => 1} @$modules;
     my %uses;
 
     # used in modules
@@ -105,7 +106,7 @@ sub analyse {
         }
     }
 
-    $me->d->{uses}=\%uses;
+    $me->d->{uses} = \%uses;
     return;
 }
 
@@ -171,16 +172,13 @@ sub _extract_use {
 sub kwalitee_indicators {
     return [
         {
-            name=>'use_strict',
-            error=>q{This distribution does not 'use strict;' (or its equivalents) in all of its modules. Note that this is not about the actual strictness of the modules. It's bad if nobody can tell whether the modules are strictly written or not, without reading the source code of your favorite clever module that actually enforces strictness. In other words, it's bad if someone feels the need to add 'use strict' to your modules.},
-            remedy=>q{Add 'use strict' (or its equivalents) to all modules, or convince us that your favorite module is well-known enough and people can easily see the modules are strictly written.},
+            name => 'use_strict',
+            error => q{This distribution does not 'use strict;' (or its equivalents) in all of its modules. Note that this is not about the actual strictness of the modules. It's bad if nobody can tell whether the modules are strictly written or not, without reading the source code of your favorite clever module that actually enforces strictness. In other words, it's bad if someone feels the need to add 'use strict' to your modules.},
+            remedy => q{Add 'use strict' (or its equivalents) to all modules, or convince us that your favorite module is well-known enough and people can easily see the modules are strictly written.},
             ignorable => 1,
-            code=>sub {
+            code => sub {
                 my $d       = shift;
                 my $files = $d->{files_hash} || {};
-
-                # There are lots of acceptable strict alternatives
-                my $strict_equivalents = Set::Scalar->new->insert(@STRICT_EQUIV, @STRICT_WARNINGS_EQUIV);
 
                 my $perl_version_with_implicit_stricture = version->new('5.011')->numify;
                 my @no_strict;
@@ -195,34 +193,33 @@ sub kwalitee_indicators {
                         next unless exists $files->{$file}{$key};
                         $used{$_} = 1 for @{$files->{$file}{$key} || []};
                     }
-                    next if grep {/^v?5\./ && version->parse($_)->numify >= $perl_version_with_implicit_stricture} keys %used;
+                    next if grep {
+                      (/^v?5\./ && version->parse($_)->numify >= $perl_version_with_implicit_stricture) or /^v6\b/
+                    } keys %used;
 
-                    push @no_strict, $module if $strict_equivalents
-                        ->intersection(Set::Scalar->new(keys %used))
-                        ->is_empty;
+                    # There are lots of acceptable strict alternatives
+                    push @no_strict, $module if none {exists $used{$_}} (@STRICT_EQUIV, @STRICT_WARNINGS_EQUIV);
                 }
                 if (@no_strict) {
-                    $d->{error}{use_strict} = join ", ", @no_strict;
+                    $d->{error}{use_strict} = join ", ", sort @no_strict;
                     return 0;
                 }
                 return 1;
             },
-            details=>sub {
+            details => sub {
                 my $d = shift;
                 return "The following modules don't use strict (or equivalents): " . $d->{error}{use_strict};
             },
         },
         {
-            name=>'use_warnings',
-            error=>q{This distribution does not 'use warnings;' (or its equivalents) in all of its modules. Note that this is not about that your modules actually warn when something bad happens. It's bad if nobody can tell if a module warns or not, without reading the source code of your favorite module that actually enforces warnings. In other words, it's bad if someone feels the need to add 'use warnings' to your modules.},
-            is_extra=>1,
+            name => 'use_warnings',
+            error => q{This distribution does not 'use warnings;' (or its equivalents) in all of its modules. Note that this is not about that your modules actually warn when something bad happens. It's bad if nobody can tell if a module warns or not, without reading the source code of your favorite module that actually enforces warnings. In other words, it's bad if someone feels the need to add 'use warnings' to your modules.},
+            is_extra => 1,
             ignorable => 1,
-            remedy=>q{Add 'use warnings' (or its equivalents) to all modules (this will require perl > 5.6), or convince us that your favorite module is well-known enough and people can easily see the modules warn when something bad happens.},
-            code=>sub {
+            remedy => q{Add 'use warnings' (or its equivalents) to all modules (this will require perl > 5.6), or convince us that your favorite module is well-known enough and people can easily see the modules warn when something bad happens.},
+            code => sub {
                 my $d = shift;
                 my $files = $d->{files_hash} || {};
-
-                my $warnings_equivalents = Set::Scalar->new->insert(@WARNINGS_EQUIV, @STRICT_WARNINGS_EQUIV);
 
                 my @no_warnings;
                 for my $file (keys %$files) {
@@ -235,17 +232,16 @@ sub kwalitee_indicators {
                         next unless exists $files->{$file}{$key};
                         $used{$_} = 1 for @{$files->{$file}{$key} || []};
                     }
-                    push @no_warnings, $module if $warnings_equivalents
-                        ->intersection(Set::Scalar->new(keys %used))
-                        ->is_empty;
+                    next if grep {/^v6\b/} keys %used;
+                    push @no_warnings, $module if none {exists $used{$_}} (@WARNINGS_EQUIV, @STRICT_WARNINGS_EQUIV);
                 }
                 if (@no_warnings) {
-                    $d->{error}{use_warnings} = join ", ", @no_warnings;
+                    $d->{error}{use_warnings} = join ", ", sort @no_warnings;
                     return 0;
                 }
                 return 1;
             },
-            details=>sub {
+            details => sub {
                 my $d = shift;
                 return "The following modules don't use warnings (or equivalents): " . $d->{error}{use_warnings};
             },
@@ -285,7 +281,7 @@ C<MCK::Uses> uses C<Module::ExtractUse> to find all C<use> statements in code (a
 
 =head3 kwalitee_indicators
 
-Returns the Kwalitee Indicators datastructure.
+Returns the Kwalitee Indicators data structure.
 
 =over
 

@@ -12,7 +12,7 @@ use Config;
 use base qw( Module::Build );
 
 # ABSTRACT: Build Perl extensions in C with FFI
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 
 __PACKAGE__->add_property( ffi_libtest_dir =>
@@ -313,7 +313,7 @@ Module::Build::FFI - Build Perl extensions in C with FFI
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 

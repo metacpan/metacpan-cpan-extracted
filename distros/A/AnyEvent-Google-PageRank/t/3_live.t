@@ -5,6 +5,7 @@ use AnyEvent;
 use AnyEvent::Google::PageRank qw/rank_get/;
 use strict;
 
+=pod
 my $cv = AnyEvent->condvar;
 $cv->begin;
 
@@ -19,5 +20,8 @@ rank_get "http://www.google.com", sub {
 
 $cv->end;
 $cv->recv;
+=cut
+
+ok "Google closed pagerank service";
 
 done_testing();

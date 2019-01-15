@@ -1,0 +1,108 @@
+#!perl
+
+use strict;
+use warnings;
+
+unless (@ARGV >= 2) {
+    die "rename-swap: Please specify at least 2 files\n";
+}
+
+# make sure all files exist first
+for (@ARGV) {
+    die "rename-swap: File '$_' doesn't exist\n" unless -e $_;
+}
+
+# create a temporary name that does not exist
+my $tmp;
+while (1) {
+    $tmp = sprintf "rename-swap-tmp-%d", rand()*1_000_000;
+    last unless -e $tmp;
+}
+
+# start the swapping!
+for (my $i=0; $i < int(@ARGV/2); $i++) {
+    my $f1 = $ARGV[$i];
+    my $f2 = $ARGV[$#ARGV - $i];
+    if ($f1 eq $f2) {
+        print "Skipping swapping $f1 -> $f2 (same file)\n";
+        next;
+    }
+    rename $f1, $tmp or die "rename-swap: Can't rename $f1 -> $tmp: $!\n";
+    rename $f2, $f1  or die "rename-swap: Can't rename $f2 -> $f1: $!\n";
+    rename $tmp, $f2 or die "rename-swap: Can't rename $tmp -> $f2: $!\n";
+    print "Swapping $f1 <-> $f2\n";
+}
+
+# PODNAME: rename-swap
+# ABSTRACT: Swap filenames
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rename-swap - Swap filenames
+
+=head1 VERSION
+
+This document describes version 0.001 of rename-swap (from Perl distribution App-RenameUtils), released on 2019-01-15.
+
+=head1 SYNOPSIS
+
+Swapping two files:
+
+ % rename-swap f1 f2
+
+f1 will be renamed to f2 while f2 will be renamed to f1.
+
+Swapping three files:
+
+ % rename-swap f1 f2 f3
+
+f1 will be renamed to f3, f3 will be renamed to f1, while f2 will be unchanged.
+
+Swapping four files:
+
+ % rename-swap f1 f2 f3 f4
+
+f1 will be renamed to f4, f4 will be renamed to f1, f2 will be renamed to f3, f3
+will be renamed to f2.
+
+=head1 DESCRIPTION
+
+WARNING: Be careful when running this script. This script does not support
+dry-run (simulation) mode nor undo. It uses C<rename()> so it does not support
+moving files across filesystems; it's best to specify only files in the same
+directory.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-RenameUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-RenameUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-RenameUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

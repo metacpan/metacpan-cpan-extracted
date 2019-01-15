@@ -82,7 +82,7 @@ It based on  L<https://github.com/lexborisov/Modest> as selector engine and L<ht
 
 =item *
 
-Really fast HTML parsing, can use threads.
+Really fast HTML parsing.
 
 =item *
 
@@ -2858,9 +2858,11 @@ Threads count, if < 2 - parsing in single mode without threads (default 0)
 
 This option affects only for L<HTML5::DOM::new|/new>.
 
-In some OS or HTML documents may be slower than single mode (threads=0).
+Originaly, L<MyHTML|https://github.com/lexborisov/myhtml/blob/master/LICENSE> can use mulithread parsing.
 
-Not recommended use if don't known what you do or without testing in real cases
+But in real cases this mode slower than single mode (threads=0). Result speed very OS-specific and depends on input html.
+
+Not recommended use if don't known what you do. B<Single mode faster in 99.9% cases.>
 
 =head4 ignore_whitespace
 

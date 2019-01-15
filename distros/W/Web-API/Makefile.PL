@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Web::API - A Simple base module to implement almost every RESTful API with just a few lines of configuration",
+  "ABSTRACT" => "A Simple base module to implement almost every RESTful API with just a few lines of configuration",
   "AUTHOR" => "Tobias Kirschstein <lev\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "XML::Simple" => 0,
     "experimental" => 0
   },
-  "VERSION" => "2.3",
+  "VERSION" => "2.4.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

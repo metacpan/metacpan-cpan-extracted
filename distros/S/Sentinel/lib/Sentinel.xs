@@ -4,39 +4,50 @@
  *  (C) Paul Evans, 2011 -- leonerd@leonerd.org.uk
  */
 
+#define PERL_NO_GET_CONTEXT
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef G_METHOD_NAMED
+#define G_METHOD_NAMED G_METHOD
+#endif
+
 #include <string.h>
 #define streq(a,b) (strcmp((a),(b)) == 0)
 
-typedef struct {
-  SV *get_cb;
-  SV *set_cb;
-} sentinel_ctx;
+enum {
+  CTX_GET_CB,
+  CTX_SET_CB,
+  CTX_OBJ,
+};
+
+typedef SV *sentinel_ctx;
 
 static int magic_get(pTHX_ SV *sv, MAGIC *mg)
 {
   dSP;
-  sentinel_ctx *ctx = (void *)mg->mg_ptr;
+  sentinel_ctx *ctx = (sentinel_ctx*)AvARRAY(mg->mg_obj);
 
-  if(ctx->get_cb) {
+  if(ctx[CTX_GET_CB]) {
     int count;
 
     ENTER;
     SAVETMPS;
 
     PUSHMARK(SP);
-    if(mg->mg_obj)
-      PUSHs(mg->mg_obj);
+    if(ctx[CTX_OBJ]) {
+      EXTEND(SP, 1);
+      PUSHs(ctx[CTX_OBJ]);
+    }
     PUTBACK;
 
-    if(mg->mg_obj && SvPOK(ctx->get_cb))
+    if(ctx[CTX_OBJ] && SvPOK(ctx[CTX_GET_CB]))
       // Calling method by name
-      count = call_method(SvPV_nolen(ctx->get_cb), G_SCALAR);
+      count = call_sv(ctx[CTX_GET_CB], G_SCALAR | G_METHOD_NAMED);
     else
-      count = call_sv(ctx->get_cb, G_SCALAR);
+      count = call_sv(ctx[CTX_GET_CB], G_SCALAR);
     assert(count == 1);
 
     SPAGAIN;
@@ -53,25 +64,28 @@ static int magic_get(pTHX_ SV *sv, MAGIC *mg)
 static int magic_set(pTHX_ SV *sv, MAGIC *mg)
 {
   dSP;
-  sentinel_ctx *ctx = (void *)mg->mg_ptr;
+  sentinel_ctx *ctx = (sentinel_ctx*)AvARRAY(mg->mg_obj);
 
-  if(ctx->set_cb) {
+  if(ctx[CTX_SET_CB]) {
     ENTER;
     SAVETMPS;
 
     PUSHMARK(SP);
-    if(mg->mg_obj)
-      PUSHs(mg->mg_obj);
+    if(ctx[CTX_OBJ]) {
+      EXTEND(SP, 2);
+      PUSHs(ctx[CTX_OBJ]);
+    }
+    else {
+      EXTEND(SP, 1);
+    }
     PUSHs(sv);
     PUTBACK;
 
-    if(mg->mg_obj && SvPOK(ctx->set_cb))
+    if(ctx[CTX_OBJ] && SvPOK(ctx[CTX_SET_CB]))
       // Calling method by name
-      call_method(SvPV_nolen(ctx->set_cb), G_VOID);
+      call_sv(ctx[CTX_SET_CB], G_VOID | G_METHOD_NAMED);
     else
-      call_sv(ctx->set_cb, G_VOID);
-
-    SPAGAIN;
+      call_sv(ctx[CTX_SET_CB], G_VOID);
 
     FREETMPS;
     LEAVE;
@@ -80,26 +94,9 @@ static int magic_set(pTHX_ SV *sv, MAGIC *mg)
   return 1;
 }
 
-static int magic_free(pTHX_ SV *sv, MAGIC *mg)
-{
-  sentinel_ctx *ctx = (void *)mg->mg_ptr;
-
-  if(ctx->get_cb)
-    SvREFCNT_dec(ctx->get_cb);
-  if(ctx->set_cb)
-    SvREFCNT_dec(ctx->set_cb);
-
-  Safefree(ctx);
-
-  return 1;
-}
-
 static MGVTBL vtbl = {
   &magic_get,
   &magic_set,
-  NULL, /* len   */
-  NULL, /* clear */
-  &magic_free,
 };
 
 MODULE = Sentinel    PACKAGE = Sentinel
@@ -137,8 +134,7 @@ sentinel(...)
       }
     }
 
-    retval = newSV(0);
-    sv_2mortal(retval);
+    retval = sv_newmortal();
 /**
  * Perl 5.14 allows any TEMP scalar to be returned in LVALUE context provided
  * it is magical. Perl versions before this only accept magic for being a tied
@@ -155,17 +151,22 @@ sentinel(...)
 
     if(get_cb || set_cb) {
       sentinel_ctx *ctx;
-      Newx(ctx, 1, sentinel_ctx);
+      AV* payload = newAV();
+      av_extend(payload, 2);
+      AvFILLp(payload) = 2;
 
-      ctx->get_cb = newSVsv(get_cb);
-      ctx->set_cb = newSVsv(set_cb);
+      ctx = (sentinel_ctx*)AvARRAY(payload);
 
-      if(obj)
-        obj = sv_mortalcopy(obj);
+      ctx[CTX_GET_CB] = get_cb ? newSVsv(get_cb) : NULL;
+      ctx[CTX_SET_CB] = set_cb ? newSVsv(set_cb) : NULL;
+      ctx[CTX_OBJ] = obj ? newSVsv(obj) : NULL;
 
-      sv_magicext(retval, obj, PERL_MAGIC_ext, &vtbl, (char *)ctx, 0);
+      sv_magicext(retval, (SV*)payload, PERL_MAGIC_ext, &vtbl, NULL, 0);
+      SvREFCNT_dec(payload);
     }
 
+    if (!items)
+      EXTEND(SP, 1);
     PUSHs(retval);
     XSRETURN(1);
 

@@ -19,6 +19,7 @@ examples/images/Test_Pattern.jpg
 examples/images/dorksmile.png
 examples/primitives.pl
 examples/slideshow.pl
+examples/threaded_slideshow.pl
 examples/threadstest.pl
 examples/viewpic.pl
 examples/template.pl
@@ -31,9 +32,6 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
-t/01-primitives.t
-t/06-boilerplate.t
-t/07-manifest.t
-t/08-pod.t
-t/09-pod-coverage.t
+README.md
+t/01-splash.t
 TODO

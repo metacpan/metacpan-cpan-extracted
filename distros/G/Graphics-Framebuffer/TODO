@@ -2,6 +2,8 @@ TO DO
 
 The following are some ideas for the future:
 
+==============================================================================
+
 * Use DRM Framebuffer Compatibility Mode
 
 DRM drivers (those without a "/dev/fb0" file) have a framebuffer compatibility
@@ -10,10 +12,14 @@ capability I may exploit to allow all video cards to work with this module.
 However, this won't guarantee hardware acceleration, but it will be a step in
 that direction.
 
+==============================================================================
+
 * Polygons With Rounded Corners *
 
 Polygons with rounded corners would be difficult, but doable.  It has become
 quite difficult to get working so far.  I haven't given up.
+
+==============================================================================
 
 * Completely accelerate all primitive drawing
 
@@ -22,18 +28,29 @@ progresses.
 
 The slowest will be addressed first.
 
+==============================================================================
+
 * Incorporate all methods that need Imager to use their own C code, so Imager
-* is no longer needed.
+  is no longer needed.
 
 Imager's lack of support for RGB565 is the reason for this need.  The slight
 increase in speed won't hurt either.
+
+==============================================================================
 
 * Make double-buffering the default for 16 bit and make it seamless. *
 
 It's close right now
 
+==============================================================================
+
 * Add single bit monochrome drawing
 
-Having the appropriate hardware for this would make it a lot easier.
+Having the appropriate hardware for this would make it a lot easier, which I
+do not have.  So right now this would be lucky guesses.
+
+==============================================================================
 
 * Add 8 bit palletized drawing.
+
+Not sure about this, as not much of anything uses it now days.

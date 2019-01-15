@@ -1,3 +1,10 @@
+0.010   2019-01-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Tweak Synopsis.
+
+
 0.009   2019-01-14 (PERLANCAR)
 
 	- Add subcommands: release-note, available-versions.

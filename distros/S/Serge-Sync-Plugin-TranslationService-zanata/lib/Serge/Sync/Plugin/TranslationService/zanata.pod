@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Serge::Sync::Plugin::TranslationService::zanata - L<Zanata|http://zanata.org/> synchronization plugin for L<Serge|https://serge.io/>
+Serge::Sync::Plugin::TranslationService::zanata - L<Zanata|http://zanata.org/> synchronization plugin for L<Serge|https://serge.io/> based on L<Zanata CLI|http://docs.zanata.org/en/release/client/>
 
 =head1 SYNOPSIS
 
@@ -19,8 +19,8 @@ Serge::Sync::Plugin::TranslationService::zanata - L<Zanata|http://zanata.org/> s
 
 =head1 DESCRIPTION
 
-Integration between Serge (Free, Open Source Solution for Continuous Localization) and Zanata (Open source web-based system for translators to translate documentation and software online using a web-browser).
-Uses the command-line client for the Zanata API (version 2). See L<Zanata CLI|http://docs.zanata.org/en/release/client/>.
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and Zanata (Open source web-based system for translators to translate documentation and software online using a web-browser),
+implemented using the command-line client for the Zanata API (version 2).
 
 =head1 ATTRIBUTES
 
@@ -28,7 +28,19 @@ Uses the command-line client for the Zanata API (version 2). See L<Zanata CLI|ht
 
 =item I<project_config>
 
-Zanata CLI path to the project configuration file
+Zanata CLI path to the project configuration file.
+
+=item I<user_config>
+
+Zanata CLI user configuration, eg /home/user/.config/zanata.ini.
+
+=item I<push_type>
+
+Type of push to perform on the server. 'source' pushes source documents only, while 'both' (default) pushes both source and translation documents.
+
+=item I<file_types>
+
+File types to locate and transmit to the server when using project type 'file'.
 
 =back
 

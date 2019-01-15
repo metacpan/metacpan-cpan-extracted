@@ -15,5 +15,6 @@ t/06p5_to_p6.t
 t/07call_method.t
 t/lib/Perl6Test.pm
 t/use.t
+t/warn.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

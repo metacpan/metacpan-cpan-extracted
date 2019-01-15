@@ -4,7 +4,7 @@
       "Ed J <etj@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -40,15 +40,15 @@
       "runtime" : {
          "requires" : {
             "GraphQL" : "0.21",
-            "GraphQL::Plugin::Convert::DBIC" : "0.03",
+            "GraphQL::Plugin::Convert::DBIC" : "0.07",
             "SQL::Translator" : "0",
-            "SQL::Translator::Producer::DBIx::Class::File" : "0",
             "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Test::Snapshot" : "0.05"
          }
       }
    },
@@ -66,5 +66,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

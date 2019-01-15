@@ -8,7 +8,7 @@ package Devel::MAT::Dumpfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use Carp;
 use IO::Handle;   # ->read
@@ -501,6 +501,14 @@ sub _read_svx_86
    $sv->_more_saved( CODE => $ptrs->[0] );
 }
 
+sub _read_svx_87
+{
+   my $self = shift;
+   my ( $sv, $bytes, $ptrs, $strs ) = @_;
+
+   $sv->_more_annotations( $ptrs->[0], $strs->[0] );
+}
+
 sub _read_ctx
 {
    my $self = shift;
@@ -731,6 +739,21 @@ sub heap
 {
    my $self = shift;
    return values %{ $self->{heap} };
+}
+
+=head2 stack
+
+   @svs = $df->stack
+
+Returns all the SVs on the stack
+
+=cut
+
+sub stack
+{
+   my $self = shift;
+
+   return map { $self->sv_at( $_ ) } @{ $self->{stack_at} };
 }
 
 =head2 contexts

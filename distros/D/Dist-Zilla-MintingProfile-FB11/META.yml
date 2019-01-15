@@ -32,16 +32,17 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::FB11:
     file: lib/Dist/Zilla/MintingProfile/FB11.pm
-    version: '0.017'
+    version: '0.018'
 requires:
   Dist::Zilla: '5.045'
+  Dist::Zilla::App::Command::distversion: '0.03'
   Dist::Zilla::Plugin::Git::Init: '0'
   Dist::Zilla::Plugin::MungeFile::WithDataSection: '0'
   Dist::Zilla::Plugin::Run::AfterMint: '0'
 resources:
   bugtracker: https://github.com/OpusVL/Dist-Zilla-MintingProfile-FB11/issues
   repository: git://github.com/OpusVL/Dist-Zilla-MintingProfile-FB11.git
-version: '0.017'
+version: '0.018'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -315,7 +316,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.017
+          tag: v0.018
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

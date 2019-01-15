@@ -1,9 +1,9 @@
 use warnings;
 use strict;
 
-package Text::Parser 0.753;
+package Text::Parser 0.801;
 
-# ABSTRACT: Bare text parser, bundles other common "mundane" tasks.
+# ABSTRACT: Bare text parser, bundles many common "mundane" tasks.
 
 use Exporter 'import';
 our (@EXPORT_OK) = ();
@@ -52,11 +52,51 @@ use Exception::Class (
 
 use Try::Tiny;
 use Scalar::Util 'openhandle';
+use Role::Tiny;
 
 
 sub new {
     my $pkg = shift;
-    bless {}, $pkg;
+    return undef if not __check_options(@_);
+    my $hash = __set_options(@_);
+    my $obj  = bless { __options => $hash }, $pkg;
+    return $obj->__return_my_object();
+}
+
+my (%allowed_options)
+    = ( auto_chomp => '0|1', multiline_type => 'join_next|join_last' );
+my (%default_values) = ( auto_chomp => 0, multiline_type => undef );
+
+sub __check_options {
+    my (%opt) = @_;
+    foreach my $k ( keys %opt ) {
+        return 0 if not exists $allowed_options{$k};
+        my (@allowed) = split /\s*[|]\s*/, $allowed_options{$k};
+        return 0 if not grep { $_ eq $opt{$k} } @allowed;
+    }
+    return 1;
+}
+
+sub __set_options {
+    my (%opt) = @_;
+    foreach my $k ( keys %default_values ) {
+        $opt{$k} = $default_values{$k} if not exists $opt{$k};
+    }
+    return \%opt;
+}
+
+sub __return_my_object {
+    my $obj = shift;
+    return $obj if not defined $obj->setting('multiline_type');
+    Role::Tiny->apply_roles_to_object( $obj, 'Text::Parser::Multiline' );
+    return $obj;
+}
+
+
+sub setting {
+    my ( $self, $key ) = ( shift, shift );
+    return undef if not defined $key or not exists $self->{__options}{$key};
+    return $self->{__options}{$key};
 }
 
 
@@ -111,9 +151,10 @@ sub __read_file_handle {
 }
 
 sub __parse_line_and_next {
-    my $self = shift;
+    my ( $self, $line ) = ( shift, shift );
     $self->lines_parsed( $self->lines_parsed + 1 );
-    $self->__try_to_parse(shift);
+    chomp $line if $self->setting('auto_chomp');
+    $self->__try_to_parse($line);
     return not exists $self->{__abort_reading};
 }
 
@@ -230,6 +271,30 @@ sub pop_record {
 }
 
 
+sub is_line_continued {
+    my $self = shift;
+    return 0 if not defined $self->setting('multiline_type');
+    return 0
+        if $self->setting('multiline_type') eq 'join_last'
+        and $self->lines_parsed() == 1;
+    return 1;
+}
+
+
+sub join_last_line {
+    my $self = shift;
+    my ( $last, $line ) = ( shift, shift );
+    return $last . $line;
+}
+
+
+sub has_aborted {
+    my $self = shift;
+    return $self->{__abort_reading} if exists $self->{__abort_reading};
+    return 0;
+}
+
+
 1;
 
 __END__
@@ -240,11 +305,11 @@ __END__
 
 =head1 NAME
 
-Text::Parser - Bare text parser, bundles other common "mundane" tasks.
+Text::Parser - Bare text parser, bundles many common "mundane" tasks.
 
 =head1 VERSION
 
-version 0.753
+version 0.801
 
 =head1 SYNOPSIS
 
@@ -262,7 +327,25 @@ A simple text file parser should have to only specify the "grammar" it intends t
 
 Unfortunately, most programmers write code that calls C<open>, C<close>, etc., and keep track of things that should have been simple features of every text file parser. And if they have to read multiple files, usually, all these calls are repeated.
 
-This class does all "mundane" operations like C<open>, C<close>, line-count, and storage/deletion/retrieval of records, etc. You don't have to bother with a lot of book-keeping when you write your next parser. Instead, just inherit this class and override one method (C<L<save_record|/save_record>>). And voila! you have a parser. Look at L<these examples|/EXAMPLES> to see how easy this can be.
+Furthermore, there are times when a text format has what should have been one one line, spread out over several lines. Typically this is done to improve human readability, and uses some sort of continuation character. For example, the bash and other shells treat a trailing back-slash (C<\>) character as a line-continuation character. In such cases, the parser has to do additional tasks of book-keeping. It has to:
+
+=over 4
+
+=item *
+
+join the continuing lines intelligently to read what all was intended on one line
+
+=item *
+
+report any errors in this process of detecting line-continuations etc.
+
+=back
+
+Doing all this along with parsing for the actual data can get hairy and confusing. This class is meant to simplify all that.
+
+First, it does all "mundane" operations like C<open>, C<close>, line-count, and storage/deletion/retrieval of records, etc. You don't have to bother with a lot of book-keeping when you write your next parser. Instead, just inherit this class and override one method (C<L<save_record|/save_record>>). And voila! you have a parser. Look at L<these examples|/EXAMPLES> to see how easy this can be.
+
+Second, if data is expected to be on multiple lines, it is easy to setup a multi-line parser too. See L<these examples|/"Example 4 : Multi-line parsing"> for more on that. Also see L<Text::Parser::Multiline> for how it actually works.
 
 =head1 DESCRIPTION
 
@@ -274,11 +357,55 @@ Future versions are expected to include progress-bar support, parsing text from 
 
 =head2 new
 
-Takes no arguments. Constructor.
+Constructor. Takes options in the form of a hash. The options and their allowed values are:
 
-    my $parser = Text::Parser->new();
+    auto_chomp     => 0|1                     (Default: 0)
+    mutliline_type => 'join_next'|'join_last' (Default: undef)
+
+You can thus create an object of a parser like this.
+
+    my $parser = Text::Parser->new(auto_chomp => 1, multiline_type => 'join_last');
+    $parser = Text::Parser->new(); # Default auto_chomp => 0
 
 This C<$parser> variable will be used in examples below.
+
+=head3 Notes on the options
+
+The options have the following interpretation:
+
+     auto_chomp => 0 : Don't chomp lines automatically before calling save_record() - Default
+     auto_chomp => 1 : Automatically chomp lines before calling save_record()
+
+     multiline_type => 'join_next' : Multi-line parser, that continues current line in the next line
+     multiline_type => 'join_last' : Multi-line parser, that continues previous line in the current line
+                    => undef (Default)
+
+=head3 Which C<multiline_type> is right for me?
+
+If your text format allows users to break up their text into another line while indicating a continuation, you need to use the C<multiline_type> option. The option allows you to join those lines back into a single line, so that your C<save_record> method doesn't have to bother about joining the continued lines, stripping any continuation characters, line-feeds etc. If your text format does not allow users to break up information into multiple lines like that, then this is not what you want.
+
+If you need to write a multi-line parser, then you need to set C<multiline_type> option to one of the values shown above. How do you decide which one?
+
+=over 4
+
+=item *
+
+If your format allows something like a trailing back-slash or some other character to indicate that text on I<B<next>> line is to be joined with this one, then choose C<join_next>.
+
+=item *
+
+If your format allows some character to indicate that text on the current line is part of the I<B<last>> line, then choose C<join_last>.
+
+=back
+
+=head2 setting
+
+Takes a single string as argument, and returns the value of that setting. The string must be one of:
+
+    auto_chomp
+    multiline_type
+
+These settings are set during the parser construction.
 
 =head2 read
 
@@ -300,10 +427,12 @@ Returns once all records have been read or if an exception is thrown for any par
 
 If you provide a string file name as input, the function will handle all C<open> and C<close> operations on files even if any exception is thrown, or if the reading has been aborted. But if you pass a file handle C<GLOB> instead, then the file handle won't be closed and it will be the responsibility of the calling program to close the filehandle.
 
-    $parser->read('myfile.txt'); # Will handle open, parsing, and closing of file automatically.
+    $parser->read('myfile.txt');
+    # Will handle open, parsing, and closing of file automatically.
 
     open MYFH, "<myfile.txt" or die "Can't open file myfile.txt at ";
-    $parser->read(\*MYFH);       # Will not close MYFH and it is the respo
+    $parser->read(\*MYFH);
+    # Will not close MYFH and it is the respo
     close MYFH;
 
 When you do read a new file or input stream with this method, you will lose all the records stored from the previous read operation. So this means that if you want to read a different file with the same parser object, (unless you don't care about the records from the last file you read) you should use the C<L<get_records|/get_records>> method to retrieve all the read records before parsing a new file. So all those calls to C<read> in the example above were parsing three different files, and each successive call overwrote the records from the previous call.
@@ -329,7 +458,11 @@ Takes zero or one string argument containing the name of a file. Returns the nam
 The file name is "persistent" in the object. Meaning, even after you have called C<L<read|/read>> once, it still remembers the file name. So you can do this:
 
     $parser->read(shift @ARGV);
-    print $parser->filename(), ":\n", "=" x (length($parser->filename())+1), "\n", $parser->get_records(), "\n";
+    print $parser->filename(), ":\n",
+          "=" x (length($parser->filename())+1),
+          "\n",
+          $parser->get_records(),
+          "\n";
 
 But if you do a C<read> with a filehandle as argument, you'll see that the last filename is lost - which makes sense.
 
@@ -353,7 +486,8 @@ Like in the case of C<L<filename|/filename>> method, if after you C<read> with a
     ## Will return STDOUT
     
     $parser->read('another.txt');
-    print "No filehandle saved any more\n" if not defined $parser->filehandle();
+    print "No filehandle saved any more\n" if
+                        not defined $parser->filehandle();
 
 =head2 lines_parsed
 
@@ -401,6 +535,28 @@ Takes no arguments and pops the last saved record.
     my $last_rec = $parser->pop_record;
     $uc_last = uc $last_rec;
     $parser->save_record($uc_last);
+
+=head2 is_line_continued
+
+Takes a string argument. The default method provided will return C<0> if the parser is not a multi-line parser. If it is a multi-line parser, return value depends on the type of multiline parser. 
+
+If it is of type C<'join_last'>, then it returns C<1> for all lines except the first line. This means all lines continue from the previous line (except the first line, because there is no line before that).
+
+But if it is of type C<'join_next'>, then it returns C<1> for all lines unconditionally. This means the parser will expect further lines, even when the last line in the text input has been read. Thus you need to have a way to indicate that there is no further continuation. This is why if you are building a trivial line-joiner, you should use the C<'join_last'> type. See L<this example|/"Trivial line-joiner">.
+
+    $parser->is_line_continued();
+
+=head2 join_last_line
+
+This method is used in multi-line text parsing. The method takes two string arguments. The default implementation just concatenates two strings and returns the result. You should redefine this method to strip any continuation characters and join the strings with any required spaces etc.
+
+    $parser->join_last_line('last line', ' + this line');
+
+=head2 has_aborted
+
+Takes no arguments, returns a boolean to indicate if text reading was aborted in the middle. This method is used in multi-line parsers.
+
+    print "Aborted\n" if $parser->has_aborted();
 
 =head1 EXAMPLES
 
@@ -509,11 +665,121 @@ The output will be:
     Some text is here.
     More text here.
 
+=head2 Example 4 : Multi-line parsing
+
+Some text formats allow users to split a line into several lines with a line continuation character (usually at the end or the beginning of a line).
+
+=head3 Trivial line-joiner
+
+Below is a trivial example where all lines are joined into one:
+
+    use strict;
+    use warnings;
+    use Text::Parser;
+
+    my $join_all = Text::Parser->new(auto_chomp => 1, multiline_type => 'join_last');
+    $join_all->read('input.txt');
+    print $join_all->get_records(), "\n";
+
+Another trivial example is L<here|Text::Parser::Multiline/SYNOPSIS>.
+
+=head3 Continue with character
+
+(Pun intended! ;-))
+
+In the above example, all lines are joined (indiscriminately). But most often text formats have a continuation character that specifies that the line continues to the next line, or that the line is a continuation of the I<previous> line. Here's an example parser that treats the back-slash (C<\>) character as a line-continuation character:
+
+    package MyMultilineParser;
+    use parent 'Text::Parser';
+    use strict;
+    use warnings;
+
+    sub new {
+        my $pkg = shift;
+        $pkg->SUPER::new(multiline_type => 'join_next');
+    }
+
+    sub is_line_continued {
+        my $self = shift;
+        my $line = shift;
+        chomp $line;
+        return $line =~ /\\\s*$/;
+    }
+
+    sub join_last_line {
+        my $self = shift;
+        my ($last, $line) = (shift, shift);
+        chomp $last;
+        $last =~ s/\\\s*$/ /g;
+        return $last . $line;
+    }
+
+    1;
+
+In your C<main::>
+
+    use MyMultilineParser;
+    use strict;
+    use warnings;
+
+    my $parser = MyMultilineParser->new();
+    $parser->read('multiline.txt');
+    print "Read:\n"
+    print $parser->get_records(), "\n";
+
+Try with the following input F<multiline.txt>:
+
+    Garbage In.\
+    Garbage Out!
+
+When you run the above code with this file, you should get:
+
+    Read:
+    Garbage In. Garbage Out!
+
+=head3 Simple SPICE line joiner
+
+Some text formats allow a line to indicate that it is continuing from a previous line. For example L<SPICE|https://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/> has a continuation character (C<+>) on the next line, indicating that the text on that line should be joined with the I<previous> line. Let's show how to build a simple SPICE line-joiner. To build a full-fledged parser you will have to specify the rich and complex grammar for SPICE circuit description.
+
+    use TrivialSpiceJoin;
+    use parent 'Text::Parser';
+
+    use constant {
+        SPICE_LINE_CONTD => qr/^[+]\s*/,
+        SPICE_END_FILE   => qr/^\.end/i,
+    };
+
+    sub new {
+        my $pkg = shift;
+        $pkg->SUPER::new(auto_chomp => 1, multiline_type => 'join_last');
+    }
+
+    sub is_line_continued {
+        my ( $self, $line ) = @_;
+        return 0 if not defined $line;
+        return $line =~ SPICE_LINE_CONTD;
+    }
+    
+    sub join_last_line {
+        my ( $self, $last, $line ) = ( shift, shift, shift );
+        return $last if not defined $line;
+        $line =~ s/^[+]\s*/ /;
+        return $line if not defined $last;
+        return $last . $line;
+    }
+
+    sub save_record {
+        my ( $self, $line ) = @_;
+        return $self->abort_reading() if $line =~ SPICE_END_FILE;
+        $self->SUPER::save_record($line);
+    }
+
+Try this parser with a simple SPICE deck and see what you get. You may now write a more elaborate method for C<save_record> above and that could be used to parse a full SPICE file.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Parser> or by email
-to L<bug-text-parser at rt.cpan.org|mailto:bug-text-parser at rt.cpan.org>.
+L<http://github.com/me/Text-Parser/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

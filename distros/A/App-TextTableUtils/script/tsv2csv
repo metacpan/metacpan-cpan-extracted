@@ -1,0 +1,265 @@
+#!perl
+
+our $DATE = '2019-01-15'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+my ($ifmt, $ofmt) = $0 =~ /(\w+)2(\w+)\z/ or die "Please call me as <foo>2<bar> (not $0)";
+
+# parse options
+my %Opts;
+{
+    require Getopt::Long;
+    Getopt::Long::Configure("bundling", "no_ignore_case", "permute", "no_getopt_compat");
+    Getopt::Long::GetOptions(
+        "backend|b=s" => \$Opts{backend},
+    ) or die "$0: Error in getting options, bailing out\n";
+}
+
+# get input handle
+my $fh;
+{
+    if (@ARGV == 1) {
+        open $fh, "<:encoding(utf8)", $ARGV[0] or die "Can't open $ARGV[0]: $!";
+    } elsif (!@ARGV) {
+        binmode(STDIN, ":encoding(utf8)");
+        $fh = \*STDIN;
+    } else {
+        die "Usage: $0 <filename>\n";
+    }
+}
+
+my $rows;
+# parse input into rows
+{
+    if ($ifmt eq 'csv') {
+        require Text::CSV;
+        my $csv = Text::CSV->new({ binary => 1 })
+            or die "Cannot use CSV: ".Text::CSV->error_diag;
+        $rows = [];
+        while ( my $row = $csv->getline($fh) ) {
+            push @$rows, $row;
+        }
+        $csv->eof or $csv->error_diag();
+    } elsif ($ifmt eq 'tsv') {
+        $rows = [];
+        while (my $row = <$fh>) {
+            chomp $row;
+            push @$rows, [split /\t/, $row];
+        }
+    } elsif ($ifmt eq 'json') {
+        require Data::Check::Structure;
+        require JSON::MaybeXS;
+        local $/;
+        $rows = JSON::MaybeXS::decode_json(scalar <$fh>);
+        die "Input data is not an array-of-arrays-of scalars"
+            unless Data::Check::Structure::is_aoaos($rows);
+    } elsif ($ifmt eq 'dd') {
+        require Data::Check::Structure;
+        local $/;
+        $rows = eval scalar <$fh>;
+        die if $@;
+        die "Input data is not an array-of-arrays-of scalars"
+            unless Data::Check::Structure::is_aoaos($rows);
+    } else {
+        die "Unknown input format '$ifmt'";
+    }
+}
+
+# format as output
+{
+    if ($ofmt eq 'dd') {
+        no warnings 'once';
+        require Data::Dumper;
+        $Data::Dumper::Indent = 0;
+        $Data::Dumper::Terse  = 1;
+        # produce nicer, one-row-at-a-line output
+        print "[\n";
+        for (@$rows) {
+            print "    ", Data::Dumper::Dumper($_), ",\n";
+        }
+        print "]\n";
+    } elsif ($ofmt eq 'json') {
+        require JSON::MaybeXS;
+        # produce nicer, one-row-at-a-line output
+        print "[\n";
+        for (0..$#{$rows}) {
+            print "  ", JSON::MaybeXS::encode_json($rows->[$_]),
+            ($_ == $#{$rows} ? "" : ","), "\n";
+        }
+        print "]\n";
+    } elsif ($ofmt eq 'texttable') {
+        require Text::Table::Any;
+        print Text::Table::Any::table(
+            rows => $rows, backend => $Opts{backend});
+    } elsif ($ofmt eq 'csv') {
+        require Text::Table::Any;
+        require Text::Table::CSV;
+        print Text::Table::Any::table(
+            rows => $rows, backend => 'Text::Table::CSV');
+    } elsif ($ofmt eq 'tsv') {
+        require Text::Table::Any;
+        require Text::Table::TSV;
+        print Text::Table::Any::table(
+            rows => $rows, backend => 'Text::Table::TSV');
+    } elsif ($ofmt eq 'ansitable') {
+        require Text::Table::Any;
+        require Text::ANSITable;
+        print Text::Table::Any::table(
+            rows => $rows, backend => 'Text::ANSITable');
+    } elsif ($ofmt eq 'asciitable') {
+        require Text::Table::Any;
+        require Text::ASCIITable;
+        print Text::Table::Any::table(
+            rows => $rows, backend => 'Text::ASCIITable');
+    } elsif ($ofmt eq 'mdtable') {
+        require Text::Table::Any;
+        require Text::MarkdownTable;
+        print Text::Table::Any::table(
+            rows => $rows, backend => 'Text::MarkdownTable');
+    } elsif ($ofmt eq 'orgtable') {
+        require Text::Table::Any;
+        require Text::Table::Org;
+        print Text::Table::Any::table(
+            rows => $rows, backend => 'Text::Table::Org');
+    } else {
+        die "Unknown output format '$ofmt'";
+    }
+}
+
+# ABSTRACT: Convert/render {CSV,JSON/Perl array-of-arrays} into {CSV/JSON/Perl/text tables}
+# PODNAME: tsv2csv
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tsv2csv - Convert/render {CSV,JSON/Perl array-of-arrays} into {CSV/JSON/Perl/text tables}
+
+=head1 VERSION
+
+This document describes version 0.003 of tsv2csv (from Perl distribution App-TextTableUtils), released on 2019-01-15.
+
+=head1 SYNOPSIS
+
+The distribution App-TextTableUtils provides the following CLIs:
+
+=over
+
+=item * L<csv2ansitable>
+
+=item * L<csv2asciitable>
+
+=item * L<csv2dd>
+
+=item * L<csv2json>
+
+=item * L<csv2mdtable>
+
+=item * L<csv2orgtable>
+
+=item * L<csv2texttable>
+
+=item * L<csv2tsv>
+
+=item * L<dd2ansitable>
+
+=item * L<dd2asciitable>
+
+=item * L<dd2csv>
+
+=item * L<dd2mdtable>
+
+=item * L<dd2orgtable>
+
+=item * L<dd2texttable>
+
+=item * L<dd2tsv>
+
+=item * L<json2ansitable>
+
+=item * L<json2asciitable>
+
+=item * L<json2csv>
+
+=item * L<json2mdtable>
+
+=item * L<json2orgtable>
+
+=item * L<json2texttable>
+
+=item * L<json2tsv>
+
+=item * L<texttableutils-convert>
+
+=item * L<tsv2ansitable>
+
+=item * L<tsv2asciitable>
+
+=item * L<tsv2csv>
+
+=item * L<tsv2dd>
+
+=item * L<tsv2json>
+
+=item * L<tsv2mdtable>
+
+=item * L<tsv2orgtable>
+
+=item * L<tsv2texttable>
+
+=back
+
+Some examples for using the scripts:
+
+To render CSV as Org table:
+
+ % csv2orgtable TABLE.CSV
+
+To render CSV as JSON:
+
+ % csv2json < TABLE.CSV
+
+To render TSV as a text table (using L<Text::Table::Any>) with LTSV backend:
+
+ % echo "SELECT * FROM table1" | mysql DBNAME | tsv2texttable -b Text::Table::LTSV
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-TextTableUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-TextTableUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-TextTableUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<App::texttable>, L<texttable>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

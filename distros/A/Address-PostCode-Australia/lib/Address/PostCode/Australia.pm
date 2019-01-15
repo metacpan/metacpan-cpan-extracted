@@ -1,6 +1,6 @@
 package Address::PostCode::Australia;
 
-$Address::PostCode::Australia::VERSION   = '0.10';
+$Address::PostCode::Australia::VERSION   = '0.11';
 $Address::PostCode::Australia::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Address::PostCode::Australia - Interface to the Australia PostCode.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -21,7 +21,7 @@ use Address::PostCode::Australia::Place;
 use Address::PostCode::Australia::Params qw(validate);
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 extends 'Address::PostCode::UserAgent';
 
 our $BASE_URL = 'https://auspost.com.au/api/postcode/search.json';

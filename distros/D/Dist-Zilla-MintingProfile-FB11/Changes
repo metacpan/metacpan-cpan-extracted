@@ -1,3 +1,11 @@
+0.018     2019-01-15 13:00:15+00:00 Europe/London
+
+    - Updated all the skeleton files to have $VERSION, and set to 0
+    - Updated all the skeleton files to have an ABSTRACT comment instead of POD
+      (the default build profile will use PodWeaver)
+    - Updated the Makefile to produce an RC and a release version of the image
+    - Config file is now YAML
+
 0.017     2018-05-30 14:14:52+01:00 Europe/London
     - Prevented new apps from having a git origin. The existing one was always
       wrong, and any alternative was 99% wrong

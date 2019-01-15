@@ -2,143 +2,116 @@ package Module::CPANTS::Kwalitee;
 use 5.006;
 use strict;
 use warnings;
-use base qw(Class::Accessor);
+use base qw(Class::Accessor::Fast);
 use Carp;
+use Module::Find qw(useall);
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
-__PACKAGE__->mk_accessors(qw(generators _gencache _genhashcache _available _total));
+__PACKAGE__->mk_accessors(qw(_available _total));
+
+my @Plugins;
+my @Indicators;
+my %IndicatorHash;
+my $Total;
+my $Available;
 
 sub import {
     my $class = shift;
-    my %search_path = map {(/^Module::CPANTS::/ ? $_ : "Module::CPANTS::$_") => 1 } @_;
-    $search_path{'Module::CPANTS::Kwalitee'} = 1;
-    require Module::Pluggable;
-    Module::Pluggable->import(search_path => [keys %search_path]);
+    my @search_path = map {(/^Module::CPANTS::/ ? $_ : "Module::CPANTS::$_") => 1 } @_;
+    push @search_path, 'Module::CPANTS::Kwalitee';
+
+    my %seen;
+    push @Plugins, useall $_ for grep {!$seen{$_}++} @search_path;
+
+    %seen = ();
+    @Plugins = sort {$a->order <=> $b->order or $a cmp $b} grep {!$seen{$_}++} @Plugins;
+    $class->_cache_indicators;
 }
 
-sub new {
-    my $class=shift;
-    my $me=bless {},$class;
-    
-    my %generators;
-    foreach my $gen ($me->plugins) {
-        ## no critic (ProhibitStringyEval)
-        eval "require $gen";
-        croak qq{cannot load $gen: $@} if $@;
-        $generators{$gen}= [ $gen->order, $gen ];
+# I suppose nobody wants to change the generators dynamically though
+sub _cache_indicators {
+    my $class = shift;
+    @Indicators = ();
+    $Total = $Available = 0;
+    for my $plugin (@Plugins) {
+        for my $indicator (@{$plugin->kwalitee_indicators}) {
+            $indicator->{defined_in} = $plugin;
+            $indicator->{is_core} = 1 if !$indicator->{is_extra} and !$indicator->{is_experimental};
+            push @Indicators, $indicator;
+            $Total++ unless $indicator->{is_experimental};
+            $Available++ if $indicator->{is_core};
+        }
     }
-    # sort by 'order' first, then name
-    my @generators=sort {
-        $generators{$a}->[0] <=> $generators{$b}->[0]
-            ||
-        $generators{$a}->[1] cmp $generators{$b}->[1]
-    } keys %generators;
-    $me->generators(\@generators);
-    $me->_gencache({});
-    return $me;
+}
+
+sub plugins { @Plugins }
+
+sub new {
+    my $class = shift;
+    bless {}, $class;
+}
+
+sub generators {
+    my $self = shift;
+    return \@Plugins unless @_;
+    @Plugins = @{$_[0]};
+    $self->_cache_indicators;
+    \@Plugins;
 }
 
 sub get_indicators {
-    my $self=shift;
-    my $type = shift || 'all';
-    
-    $type='is_extra' if $type eq 'optional';
-    $type='is_experimental' if $type eq 'experimental';
-
-    my $indicators;
-    if ($self->_gencache->{$type}) {
-        $indicators=$self->_gencache->{$type};
-    } else {
-        my @aggregators;
-        foreach my $gen (@{$self->generators}) {
-            foreach my $ind (@{$gen->kwalitee_indicators}) {
-                if ($type eq 'all'
-                    || ($type eq 'core' && !$ind->{is_extra} && !$ind->{is_experimental}) 
-                    || $ind->{$type}) {
-                    $ind->{defined_in}=$gen;
-                    if ($ind->{aggregating}) {
-                        push @aggregators, $ind;
-                        next;
-                    }
-                    push(@$indicators,$ind); 
-                }
-            }
-        }
-        push @$indicators, @aggregators;
-        $self->_gencache->{$type}=$indicators;
+    my ($self, $type) = @_;
+    unless ($type) { # almost always true
+        return wantarray ? @Indicators : \@Indicators;
     }
-    return wantarray ? @$indicators : $indicators;
+
+    $type = 'is_core' if $type eq 'core';
+    $type = 'is_extra' if $type eq 'optional';
+    $type = 'is_experimental' if $type eq 'experimental';
+
+    my @indicators;
+    for my $indicator (@Indicators) {
+        next if !$indicator->{$type};
+        push @indicators, $indicator;
+    }
+
+    return wantarray ? @indicators : \@indicators;
 }
 
 sub get_indicators_hash {
-    my $self=shift;
+    my $self = shift;
+    return \%IndicatorHash if %IndicatorHash;
 
-    my $indicators;
-    if ($self->_genhashcache) {
-        $indicators=$self->_genhashcache;
-    } else {
-        foreach my $gen (@{$self->generators}) {
-            foreach my $ind (@{$gen->kwalitee_indicators}) {
-                $ind->{defined_in}=$gen;
-                $indicators->{$ind->{name}}=$ind;
-            }
-        }
-        $self->_genhashcache($indicators);
+    foreach my $ind (@Indicators) {
+        $IndicatorHash{$ind->{name}} = $ind;
     }
-    return $indicators;
+    return \%IndicatorHash;
 }
 
-sub available_kwalitee {
-    my $self=shift;
+sub available_kwalitee { $Available }
 
-    my $mem=$self->_available;
-    return $mem if $mem;
+sub total_kwalitee { $Total }
 
-    my $available;
-    foreach my $g ($self->get_indicators) {
-        $available++ unless $g->{is_extra} || $g->{is_experimental};
-    }
-    $self->_available($available);
+sub _indicator_names {
+    my ($self, $coderef) = @_;
+    my @names = map { $_->{name} } grep {$coderef->($_)} $self->get_indicators;
+    return wantarray ? @names : \@names;
 }
 
-sub total_kwalitee {
-    my $self=shift;
-
-    my $mem=$self->_total;
-    return $mem if $mem;
-    
-    my $available;
-    foreach my $g ($self->get_indicators) {
-        $available++ unless $g->{is_experimental};
-    }
-
-    $self->_total($available);
-}
-
-sub all_indicator_names {
-    my $self=shift;
-    my @all=map { $_->{name} } $self->get_indicators;
-    return wantarray ? @all : \@all;
-}
+sub all_indicator_names { shift->_indicator_names(sub {1}) }
 
 sub core_indicator_names {
-    my $self=shift;
-    my @all=map { $_->{name} } grep { !$_->{is_extra} && !$_->{is_experimental} } $self->get_indicators;
-    return wantarray ? @all : \@all;
+    shift->_indicator_names(sub {$_->{is_core}});
 }
 
 sub optional_indicator_names {
-    my $self=shift;
-    my @all=map { $_->{name} } grep { $_->{is_extra} } $self->get_indicators;
-    return wantarray ? @all : \@all;
+    shift->_indicator_names(sub {$_->{is_extra}});
 }
 
 sub experimental_indicator_names {
-    my $self=shift;
-    my @all=map { $_->{name} } grep { $_->{is_experimental} } $self->get_indicators;
-    return wantarray ? @all : \@all;
+    shift->_indicator_names(sub {$_->{is_experimental}});
 }
 
 q{Favourite record of the moment:
@@ -154,8 +127,8 @@ Module::CPANTS::Kwalitee - Interface to Kwalitee generators
 
 =head1 SYNOPSIS
 
-  my $mck=Module::CPANTS::Kwalitee->new;
-  my @generators=$mck->generators;
+  my $mck = Module::CPANTS::Kwalitee->new;
+  my @generators = $mck->generators;
 
 =head1 DESCRIPTION
 
@@ -197,7 +170,7 @@ Get the number of available kwalitee points
 
 =head3 total_kwalitee
 
-Get the total number of kwalitee points. This is bigger the available_kwalitee as some kwalitee metrics are marked as 'extra' (eg is_prereq).
+Get the total number of kwalitee points. This is bigger the available_kwalitee as some kwalitee metrics are marked as 'extra' (e.g. C<is_prereq>).
 
 =head1 SEE ALSO
 

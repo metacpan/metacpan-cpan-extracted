@@ -1,0 +1,23 @@
+0.000003    2019-01-15
+            * Add a self-contained test
+            * Expose some more functions
+            * Configuration is now stored as JSON
+            * Replace raw fprintf with a basic macro
+            * Add option to name configuration file
+            * Allow changing the signal used to trigger checking
+            * Allow enabling / disabling the probing code
+            * Allow installing / removing the probing code
+            * Move config parsing to Perl, cleanup code
+            * Add Ben Tyler as a bona fide author
+            * Fire a Perl callback on probe trigger
+            * Fix compilation in linux with older C compiler
+            * Fix coredump reported by btyler
+            * Add some pod
+            * Fix README and location of git repo
+            * Complete initial implementation
+
+0.000002    2019-01-15
+            * Not sure, never released.
+
+0.000001    2018-12-18
+            * Initial version.

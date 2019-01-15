@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use constant CMD => "find";
 use constant CMD_DESC => "List SVs matching given criteria";
@@ -172,8 +172,6 @@ package # hide
    Devel::MAT::Tool::Find::filter;
 
 sub CMD_DESC { return "find " . shift->FILTER_DESC }
-
-use constant CMD_SUBS => ();
 
 use constant FILTER_OPTS => ();
 sub CMD_OPTS { shift->FILTER_OPTS }

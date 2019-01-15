@@ -1,0 +1,7 @@
+name: {{ $dist->name =~ s/-/::/gr }}
+
+Model::FB11AuthDB:
+  connect_info:
+    - dbi:Pg:dbname=fb11;host=postgres
+    - username
+    - password

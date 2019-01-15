@@ -62,7 +62,7 @@ greple - extensible grep with lexical expression and region handling
 =head1 VERSION
 
 
-Version 8.3206
+Version 8.3301
 
 
 =head1 SYNOPSIS
@@ -118,6 +118,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
   BLOCK
     -p                   paragraph mode
     --all                print whole data
+    --border=pattern     specify the border pattern
     --block=pattern      specify the block of records
     --blockend=s         specify the block end mark (Default: "--\n")
   REGION
@@ -168,6 +169,7 @@ my @opt_of;
 my @opt_pf;
 my @opt_glob;
 my @opt_icode;
+my $opt_border;
 my @opt_block;
 my @opt_inside;
 my @opt_outside;
@@ -273,6 +275,7 @@ my @optargs = (
     'of=s'               => \@opt_of,
     'pf=s'               => \@opt_pf,
     'noif'               => \$opt_noif,
+    'border=s'           => \$opt_border,
     'block=s'            => \@opt_block,
     'blockend:s'         => \$opt_blockend,
     'inside=s'           => \@opt_inside,
@@ -561,23 +564,20 @@ my $count_allow = 0;
 ##
 ## --matchcount
 ##
-my $count_match_sub;
-if (my $pat = $opt_matchcount) {
-    my($min, $max);
-    $count_match_sub = do {
-	if ($pat =~ /\A(\d+)?,(\d+)\z/) {
-	    my($min, $max) = (int($1//0), int($2));
-	    sub { $min <= $_[0] and $_[0] <= $max }
-	}
-	elsif ($pat =~ /\A(\d+),?\z/) {
-	    my $min = int($1);
-	    sub { $min <= $_[0] }
-	}
-	else {
-	    die "$_ is not valid count.\n"
-	}
+my $count_match_sub = sub {
+    local $_ = shift or return undef;
+    if (/\A(\d+)?,(\d+)\z/) {
+	my($min, $max) = (int($1//0), int($2));
+	sub { $min <= $_[0] and $_[0] <= $max }
     }
-}
+    elsif (/\A(\d+),?\z/) {
+	my $min = int($1);
+	sub { $min <= $_[0] }
+    }
+    else {
+	die "$_ is not valid count.\n"
+    }
+}->($opt_matchcount);
 
 ##
 ## setup input/output filter
@@ -732,6 +732,18 @@ sub dump_uniqcolor {
     }
 }
 
+##
+## border regex
+##
+my $border_re = do {
+    if ($opt_border) {
+	qr/$opt_border/;	# custom
+    } elsif ($opt_p) {
+	qr/(?:\A|\n)\K\n+/;	# paragraph
+    } else {
+	qr/(?m)^/;		# line
+    }
+};		    
 
 my $blockend = "--\n";
 if (defined $opt_blockend) {
@@ -1019,9 +1031,9 @@ sub grep_data {
 	filename     => $current_file,
 	pattern      => $pat_holder,
 	regions      => $regions,
+	border       => $border_re,
 	after        => $opt_A,
 	before       => $opt_B,
-	paragraph    => $opt_p,
 	only         => $opt_o,
 	all          => $opt_all,
 	block        => \@opt_block,
@@ -1089,8 +1101,8 @@ sub display_result {
 	print $_file->($file), ":\n";
     }
 
-    my $need_blockend =
-	$opt_blockend || $opt_p || $opt_A || $opt_B || @opt_block;
+    my $need_blockend = $blockend ne '' &&
+	($opt_blockend || $opt_p || $opt_A || $opt_B || @opt_block);
 
     # --colorindex
     my $indexer = do {
@@ -1589,7 +1601,7 @@ B<--block> option, I<n> means number of paragraph or block.
 Actually, these options expand the area of logical operation.  It
 means
 
-    grep -C1 'foo bar baz'
+    greple -C1 'foo bar baz'
 
 matches following text.
 
@@ -1955,15 +1967,19 @@ background, though.
 
 Print the paragraph which contains the pattern.  Each paragraph is
 delimited by two or more successive newline characters by default.  Be
-aware that an empty line is not paragraph delimiter if which contains
-space characters.  Example:
+aware that an empty line is not a paragraph delimiter if which
+contains space characters.  Example:
 
     greple -np 'setuid script' /usr/man/catl/perl.l
 
     greple -pe '^struct sockaddr' /usr/include/sys/socket.h
 
 It changes the unit of context specified by B<-A>, B<-B>, B<-C>
-options.
+options.  Space grap between paragraphs are also treated as block
+unit.  Thus, option B<-pC2> will print with previous and after
+paragraph, and B<-pC1> will print with just sorrounding spaces.
+
+You can create original paragraph pattern by B<--border> option.
 
 =item B<--all>
 
@@ -1972,20 +1988,25 @@ identical to following command.
 
     greple --block='(?s).*'
 
+=item B<--border>=I<pattern>
+
+Specify record block border pattern.  Default block is a single line
+and use C<(?m)^> as a pattern.  Paragraph mode uses C<(?:\A|\n)\K\n+>,
+which means continuous newlines at the beginning of text or following
+another newline.
+
+Next command treat the data as a series of 10-line unit.
+
+    greple -n --border='(.*\n){1,10}'
+
+Contrary to the next B<--block> option, B<--border> never produce
+disjoint records.
+
 =item B<--block>=I<pattern>
 
 =item B<--block>=I<&sub>
 
 Specify the record block to display.  Default block is a single line.
-
-Next example behave almost same as B<--paragraph> option, but is less
-efficient.
-
-    greple --block='(.+\n)+'
-
-Next command treat the data as a series of 10-line blocks.
-
-    greple -n --block='(.*\n){1,10}'
 
 When blocks are not continuous and there are gaps between them, the
 match occurred outside blocks are ignored.
@@ -2656,7 +2677,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 1991-2018 Kazumasa Utashiro
+Copyright 1991-2019 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

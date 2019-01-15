@@ -1,13 +1,102 @@
+NAME
+    App::TextTableUtils - CLI utilities related to text tables
+
+VERSION
+    This document describes version 0.003 of App::TextTableUtils (from Perl
+    distribution App-TextTableUtils), released on 2019-01-15.
+
 DESCRIPTION
+    This distributions provides the following command-line utilities related
+    to text tables:
 
-    This distributions provides the following command-line utilities
-    related to text tables:
+    *   csv2ansitable
 
-    # INSERT_EXECS_LIST
+    *   csv2asciitable
+
+    *   csv2dd
+
+    *   csv2json
+
+    *   csv2mdtable
+
+    *   csv2orgtable
+
+    *   csv2texttable
+
+    *   csv2tsv
+
+    *   dd2ansitable
+
+    *   dd2asciitable
+
+    *   dd2csv
+
+    *   dd2mdtable
+
+    *   dd2orgtable
+
+    *   dd2texttable
+
+    *   dd2tsv
+
+    *   json2ansitable
+
+    *   json2asciitable
+
+    *   json2csv
+
+    *   json2mdtable
+
+    *   json2orgtable
+
+    *   json2texttable
+
+    *   json2tsv
+
+    *   texttableutils-convert
+
+    *   tsv2ansitable
+
+    *   tsv2asciitable
+
+    *   tsv2csv
+
+    *   tsv2dd
+
+    *   tsv2json
+
+    *   tsv2mdtable
+
+    *   tsv2orgtable
+
+    *   tsv2texttable
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-TextTableUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-TextTableUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-TextTableUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     App::texttable
 
     App::TableDataUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

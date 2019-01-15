@@ -1,4 +1,4 @@
-use Test2::Bundle::Extended;
+use Test2::V0 -no_srand => 1;
 use Module::Build::FFI;
 
 subtest 'ffi_dlext' => sub {

@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Dist::Zilla::MintingProfile::FB11",
   "PREREQ_PM" => {
     "Dist::Zilla" => "5.045",
+    "Dist::Zilla::App::Command::distversion" => "0.03",
     "Dist::Zilla::Plugin::Git::Init" => 0,
     "Dist::Zilla::Plugin::MungeFile::WithDataSection" => 0,
     "Dist::Zilla::Plugin::Run::AfterMint" => 0
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "autodie" => 0,
     "strictures" => 0
   },
-  "VERSION" => "0.017",
+  "VERSION" => "0.018",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Cwd" => 0,
   "Dist::Zilla" => "5.045",
+  "Dist::Zilla::App::Command::distversion" => "0.03",
   "Dist::Zilla::Plugin::Git::Init" => 0,
   "Dist::Zilla::Plugin::MungeFile::WithDataSection" => 0,
   "Dist::Zilla::Plugin::Run::AfterMint" => 0,

@@ -96,6 +96,15 @@ information about the autonymous system referenced by `$autnum`.
 
 If there was an error, this method will return a [Net::RDAP::Error](https://metacpan.org/pod/Net::RDAP::Error).
 
+## Entity Lookup
+
+        $entity = $rdap->entity($handle);
+
+This method returns a [Net::RDAP::Object::Entity](https://metacpan.org/pod/Net::RDAP::Object::Entity) object containing
+information about the entity referenced by `$handle`, which must be
+a string containing a "tagged" handle, such as `ABC123-EXAMPLE`, as
+per RFC 8521.
+
 ## Directly Fetching Known Resources
 
         $object = $rdap->fetch($url);
@@ -110,7 +119,7 @@ resource identified by `$url` or `$link` (which must be either a
 object (assuming that the server returns a valid RDAP response). This
 method is used internally by `query()` but is also available for when
 you need to directly fetch a resource without using the IANA
-registry, such as for nameserver or entity queries.
+registry, such as for nameserver or untagged entity queries.
 
 The third form allows the method to be called on an existing
 [Net::RDAP::Object](https://metacpan.org/pod/Net::RDAP::Object). Objects which are embedded inside other
@@ -173,10 +182,12 @@ RDAP-related modules that all work together. They are:
         - [Net::RDAP::Object::Entity](https://metacpan.org/pod/Net::RDAP::Object::Entity)
         - [Net::RDAP::Object::IPNetwork](https://metacpan.org/pod/Net::RDAP::Object::IPNetwork)
         - [Net::RDAP::Object::Nameserver](https://metacpan.org/pod/Net::RDAP::Object::Nameserver)
+        - [Net::RDAP::SearchResult](https://metacpan.org/pod/Net::RDAP::SearchResult)
     - [Net::RDAP::Remark](https://metacpan.org/pod/Net::RDAP::Remark), and its submodule:
         - [Net::RDAP::Notice](https://metacpan.org/pod/Net::RDAP::Notice)
 - [Net::RDAP::EPPStatusMap](https://metacpan.org/pod/Net::RDAP::EPPStatusMap)
 - [Net::RDAP::Registry](https://metacpan.org/pod/Net::RDAP::Registry)
+- [Net::RDAP::Service](https://metacpan.org/pod/Net::RDAP::Service)
 - [Net::RDAP::Link](https://metacpan.org/pod/Net::RDAP::Link)
 - [Net::RDAP::UA](https://metacpan.org/pod/Net::RDAP::UA)
 - [Net::RDAP::Values](https://metacpan.org/pod/Net::RDAP::Values)
@@ -184,6 +195,7 @@ RDAP-related modules that all work together. They are:
 # DEPENDENCIES
 
 - [DateTime::Format::ISO8601](https://metacpan.org/pod/DateTime::Format::ISO8601)
+- [Digest::SHA1](https://metacpan.org/pod/Digest::SHA1)
 - [File::Basename](https://metacpan.org/pod/File::Basename)
 - [File::Slurp](https://metacpan.org/pod/File::Slurp)
 - [File::Spec](https://metacpan.org/pod/File::Spec)
@@ -215,6 +227,8 @@ Registration Data (RDAP) Service
 - [https://tools.ietf.org/html/rfc8056](https://tools.ietf.org/html/rfc8056) - Extensible Provisioning
 Protocol (EPP) and Registration Data Access Protocol (RDAP) Status Mapping
 - [https://tools.ietf.org/html/rfc8288](https://tools.ietf.org/html/rfc8288) -  Web Linking
+- [https://tools.ietf.org/html/rfc8521](https://tools.ietf.org/html/rfc8521) -  Registration Data Access
+Protocol (RDAP) Object Tagging
 
 # COPYRIGHT
 

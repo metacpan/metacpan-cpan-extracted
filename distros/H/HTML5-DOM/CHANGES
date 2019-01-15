@@ -17,3 +17,5 @@
 2019-01-13  1.10    - fix docs
 2019-01-14  1.11    - fix work on windows (tested with Strawberry)
                     - fix infinitie loop with threads >= 2
+2019-01-15  1.12    - fixes for some strange windows/*bsd environments.
+                    - attention about threads mode.

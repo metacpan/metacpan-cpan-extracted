@@ -2,8 +2,8 @@ package Module::CPANTS::Kwalitee::Distros;
 use warnings;
 use strict;
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
 sub order { 800 }
 
@@ -13,8 +13,8 @@ sub order { 800 }
 my $debian;
 
 sub analyse {
-    my $class=shift;
-    my $me=shift;
+    my $class = shift;
+    my $me = shift;
 
     # NOTE: The data source of these debian metrics has not been
     # updated for more than a year, and mirroring stuff from
@@ -67,7 +67,7 @@ Does nothing now.
 
 =head3 kwalitee_indicators
 
-Returns the Kwalitee Indicators datastructure.
+Returns the Kwalitee Indicators data structure.
 
 =head1 SEE ALSO
 

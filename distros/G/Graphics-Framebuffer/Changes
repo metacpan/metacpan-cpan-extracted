@@ -1296,4 +1296,26 @@ Revision history for Graphics-Framebuffer
 
       Changes to the splash screen.
 
-      Changes to the C plotting routines to make way for 1 bit graphics.
+      Changes to the C plotting routines to make way for 1 bit graphics (not
+      yet implemented).
+
+6.14  Jan 15, 2019
+
+      Stopped using "Sys::Mmap" and switched to the more stable "File::Map"
+      which is very thread friendly.  No need to allocate a separate object for
+      each thread now.  One will do it for all just fine as the
+      "threaded_slideshow.pl" example script shows.
+
+      Which brings us to a new example script "threaded_slideshow.pl".  It is
+      similar in how you run it as the single threaded "slideshow.pl", but it
+      has the unique ability to divide the screen up by how many threads you
+      request and dedicate a thread to that region and have a slide show
+      managed by as many threads as requested.  Quite interesting to watch.
+      It doesn't have the "--full" switch as it doesn't apply for how it works.
+
+      "Makefile.PL" has undergone an overhaul.  It has a friendlier output and
+      no longer throws a weird licensing error.
+
+      The test scripts have been culled of all but the necessary, and the main
+      test script given double buffering for 16 bit displays.  This doesn't
+      affect 32 bit displays.

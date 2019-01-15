@@ -69,6 +69,10 @@ use strict;
 
 =cut
 
+=head1 CAUTION
+
+In 2016 Google officially closed public PageRank service. So, this module no longer works.
+
 =head1 DESCRIPTION
 
 AnyEvent::Google::PageRank helps to get google pagerank for specified url, like WWW::Google::PageRank
@@ -85,7 +89,7 @@ uses AnyEvent::HTTP as HTTP client.
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our @EXPORT_OK = qw(rank_get);
 
 use constant {

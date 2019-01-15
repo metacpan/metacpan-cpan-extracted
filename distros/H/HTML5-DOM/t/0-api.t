@@ -34,11 +34,13 @@ isa_ok($parser, 'HTML5::DOM', 'create parser with options');
 can_ok($parser, qw(parse parseChunkStart parseChunk parseChunkEnd parseAsync));
 
 # test html parsing with threads
+$parser = HTML5::DOM->new({threads	=> 2});
 my $tree = $parser->parse('<div id="test">bla bla<!-- o_O --></div>');
 isa_ok($tree, 'HTML5::DOM::Tree', 'parse with threads');
 
 # test html parsing without threads
-$tree = $parser->parse('<div id="test">bla bla<!-- o_O --></div>', {threads => 0});
+$parser = HTML5::DOM->new;
+$tree = $parser->parse('<div id="test">bla bla<!-- o_O --></div>');
 isa_ok($tree, 'HTML5::DOM::Tree', 'parse without threads');
 
 # test api
@@ -61,7 +63,7 @@ isa_ok($parser->parseChunkEnd, 'HTML5::DOM::Tree');
 # HTML5::DOM::Tree
 #####################################
 
-$tree = $parser->parse('<div id="test">bla bla<!-- o_O --></div>', {threads => 0});
+$tree = $parser->parse('<div id="test">bla bla<!-- o_O --></div>');
 
 # wait
 isa_ok($tree->wait, "HTML5::DOM::Tree");
@@ -252,7 +254,9 @@ ok($parser->parse('<!DOCTYPE html><div></div>')->compatMode eq 'CSS1Compat', 'co
 my $async;
 
 for my $threads ((0, 2)) {
-	$async = $parser->parseAsync('<div class="test">PASSED</div>', {threads => $threads});
+	$parser = HTML5::DOM->new({threads => $threads});
+	
+	$async = $parser->parseAsync('<div class="test">PASSED</div>');
 	
 	# check api + isa
 	can_ok($async, qw(parsed wait tree));
@@ -277,6 +281,7 @@ for my $threads ((0, 2)) {
 #####################################
 # HTML5::DOM::Node
 #####################################
+$parser = HTML5::DOM->new;
 
 my @node_methods = qw(
 	tag nodeName tagId namespace namespaceId tree nodeType next nextElementSibling

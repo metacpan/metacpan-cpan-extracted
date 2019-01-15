@@ -7,6 +7,7 @@ META.json
 META.yml
 Makefile.PL
 README
+cpanfile
 dist.ini
 lib/Web/API.pm
 t/author-critic.t

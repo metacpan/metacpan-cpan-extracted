@@ -20,6 +20,7 @@ no_index:
     - t
     - inc
 requires:
+  File::Map: '0.65'
   Imager: '0.91'
   Inline: '0.53'
   Inline::C: '0.53'
@@ -27,7 +28,6 @@ requires:
   Math::Bezier: '0.01'
   Math::Gradient: '0.03'
   Math::Trig: '1.10'
-  Sys::Mmap: '0.16'
   perl: '5.008'
-version: '6.13'
+version: '6.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More;
 
 use Sentinel;
 
@@ -19,3 +19,5 @@ sub test1
 }
 test1 inner;
 is( $var, "one", 'sentinel() as lvalue parameter to sub' );
+
+done_testing;

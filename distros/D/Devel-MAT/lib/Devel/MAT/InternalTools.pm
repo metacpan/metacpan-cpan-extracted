@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::InternalTools;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 package Devel::MAT::Tool::help;
 
@@ -81,17 +81,6 @@ sub help_cmd
       $tool->CMD_DESC,
    );
 
-   if( my @subs = $tool->CMD_SUBS ) {
-      Devel::MAT::Cmd->printf( "\nSUB-COMMANDS:\n" );
-      Devel::MAT::Cmd->printf( "  %s %s - %s\n",
-         Devel::MAT::Cmd->format_note( $cmdname ),
-         Devel::MAT::Cmd->format_note( $_ ),
-         $tool->find_subcommand( $_ )->CMD_DESC,
-      ) for @subs;
-
-      return;
-   }
-
    if( my $code = $tool->can( "help_cmd" ) ) {
       $tool->$code();
       return;
@@ -128,9 +117,10 @@ sub help_cmd
                $synopsis .= " INT" if $type eq "i";
             }
 
-            [ "  $synopsis", $opt->{help} ],
+            [ $synopsis, $opt->{help} ],
          } sort keys %optspec ],
-         sep => "    ",
+         sep    => "    ",
+         indent => 2,
       );
    }
 
@@ -141,10 +131,11 @@ sub help_cmd
          [ map {
             my $arg = $_;
 
-            [ "  \$\U$arg->{name}" . ( $arg->{slurpy} ? "..." :
-                                       $arg->{repeated} ? "*" : "" ), $arg->{help} ],
+            [ "\$\U$arg->{name}" . ( $arg->{slurpy} ? "..." :
+                                     $arg->{repeated} ? "*" : "" ), $arg->{help} ],
          } @argspec ],
-         sep => "    ",
+         sep    => "    ",
+         indent => 2,
       );
    }
 }

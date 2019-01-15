@@ -39,6 +39,6 @@
          "web" : "https://github.com/Azq2/perl-html5-dom"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

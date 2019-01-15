@@ -1,7 +1,7 @@
 package App::cpanmodules;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-01-15'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -172,6 +172,12 @@ $SPEC{list_entries} = {
     args => {
         %arg0_module,
         %arg_detail,
+        with_attrs => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'with_attr',
+            summary => 'Include additional attributes from each entry',
+            schema => ['array*', of=>'str*'],
+        },
     },
 };
 sub list_entries {
@@ -181,37 +187,25 @@ sub list_entries {
     return $res unless $res->[0] == 200;
     my $list = $res->[2];
 
+    my $attrs = $args{with_attrs} // [];
+
     my @rows;
     for my $e (@{ $list->{entries} }) {
-        my $n = $e->{module};
-        unless ($args{related} || $args{alternate}) {
-            push @rows, {
-                module => $n,
-                summary=>$e->{summary},
-                rating=>$e->{rating},
-            };
+        my $mod = $e->{module};
+        my $row = {
+            module => $mod,
+            summary => $e->{summary},
+            rating => $e->{rating},
+        };
+        for (@$attrs) {
+            $row->{$_} = $e->{$_};
         }
-        for my $n (@{ $e->{"related_modules"} // [] }) {
-            if ($args{related}) {
-                push @rows, {
-                    module => $n,
-                    summary=>$e->{summary},
-                    related=>1,
-                };
-            }
-        }
-        for my $n (@{ $e->{"alternate_modules"} // [] }) {
-            if ($args{alternate}) {
-                push @rows, {
-                    module => $n,
-                    summary=>$e->{summary},
-                    alternate=>1,
-                };
-            }
-        }
+        push @rows, $row;
     } # for each entry
 
-    unless ($args{detail}) {
+    my $detail = $args{detail} || @$attrs;
+
+    unless ($detail) {
         @rows = map {$_->{module}} @rows;
     }
 
@@ -234,7 +228,7 @@ App::cpanmodules - The Acme::CPANModules CLI
 
 =head1 VERSION
 
-This document describes version 0.001 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2018-01-09.
+This document describes version 0.002 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2019-01-15.
 
 =head1 SYNOPSIS
 
@@ -247,7 +241,7 @@ Use the included script L<cpanmodules>.
 
 Usage:
 
- get_acmemod(%args) -> [status, msg, result, meta]
+ get_acmemod(%args) -> [status, msg, payload, meta]
 
 Get contents of an Acme::CPANModules module.
 
@@ -266,7 +260,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -277,7 +271,7 @@ Return value:  (any)
 
 Usage:
 
- list_acmemods(%args) -> [status, msg, result, meta]
+ list_acmemods(%args) -> [status, msg, payload, meta]
 
 List all installed Acme::CPANModules modules.
 
@@ -300,7 +294,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -311,7 +305,7 @@ Return value:  (any)
 
 Usage:
 
- list_entries(%args) -> [status, msg, result, meta]
+ list_entries(%args) -> [status, msg, payload, meta]
 
 List entries from an Acme::CPANModules module.
 
@@ -325,6 +319,10 @@ Arguments ('*' denotes required arguments):
 
 =item * B<module>* => I<perl::modname>
 
+=item * B<with_attrs> => I<array[str]>
+
+Include additional attributes from each entry.
+
 =back
 
 Returns an enveloped result (an array).
@@ -332,7 +330,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -343,7 +341,7 @@ Return value:  (any)
 
 Usage:
 
- view_acmemod(%args) -> [status, msg, result, meta]
+ view_acmemod(%args) -> [status, msg, payload, meta]
 
 View an Acme::CPANModules module as rendered POD.
 
@@ -362,7 +360,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -390,7 +388,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

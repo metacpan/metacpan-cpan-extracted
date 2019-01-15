@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use List::Util qw( any pairs );
 
@@ -73,8 +73,7 @@ sub init_tool
       $sv->{tool_inrefs}[IDX_ROOTS_WEAK]++;
    }
 
-   foreach my $addr ( @{ $df->{stack_at} } ) { # TODO
-      my $sv = $df->sv_at( $addr ) or next;
+   foreach my $sv ( $df->stack ) {
       $sv->{tool_inrefs}[IDX_STACK]++;
    }
 
@@ -178,8 +177,8 @@ sub Devel::MAT::SV::_inrefs
          push @inrefs, ( 1 ) x $self->{tool_inrefs}[IDX_STACK];
       }
       else {
-         foreach my $addr ( @{ $df->{stack_at} } ) { # TODO
-            next unless $addr == $self->addr;
+         foreach my $stacksv ( $df->stack ) {
+            next unless $stacksv->addr == $self->addr;
 
             push @inrefs, Devel::MAT::SV::Reference( "a value on the stack", strong => undef );
          }

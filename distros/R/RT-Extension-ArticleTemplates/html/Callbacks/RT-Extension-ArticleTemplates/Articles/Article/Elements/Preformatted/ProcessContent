@@ -15,4 +15,4 @@
 %#  GNU General Public License for more details.
 %# 
 %# END LICENSE BLOCK
-<& /Elements/RT-Extension-ArticleTemplates/ProcessContent, %ARGS &>
+<& /Elements/RT-Extension-ArticleTemplates/ProcessContent, %ARGS &>\

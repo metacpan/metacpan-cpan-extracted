@@ -73,7 +73,7 @@ DESCRIPTION
     and <https://github.com/lexborisov/myhtml> as HTML5 parser.
 
    Key features
-    *   Really fast HTML parsing, can use threads.
+    *   Really fast HTML parsing.
 
     *   Supports parsing by chunks.
 
@@ -2512,10 +2512,15 @@ PARSER OPTIONS
 
     This option affects only for HTML5::DOM::new.
 
-    In some OS or HTML documents may be slower than single mode (threads=0).
+    Originaly, MyHTML
+    <https://github.com/lexborisov/myhtml/blob/master/LICENSE> can use
+    mulithread parsing.
 
-    Not recommended use if don't known what you do or without testing in
-    real cases
+    But in real cases this mode slower than single mode (threads=0). Result
+    speed very OS-specific and depends on input html.
+
+    Not recommended use if don't known what you do. Single mode faster in
+    99.9% cases.
 
    ignore_whitespace
     Ignore whitespace tokens (default 0)

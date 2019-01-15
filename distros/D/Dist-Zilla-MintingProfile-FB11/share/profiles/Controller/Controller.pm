@@ -2,13 +2,14 @@ package {{ $name }};
 {{ @bits = split(/::/, $name); $basename = $bits[-1] ; ''
 }}
 use v5.20;
-use strict;
-use warnings;
 use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; };
 with 'OpusVL::FB11::RolesFor::Controller::GUI';
+
+# ABSTRACT: Swell new controller for reasons
+our $VERSION = '0';
 
 __PACKAGE__->config
 (
@@ -39,12 +40,3 @@ fb11_method_group         => '{{ $basename }}',
 #}
 
 1;
-
-
-=head1 NAME
-
-{{ $name }} - 
-
-=head1 METHODS
-
-# =head2 index

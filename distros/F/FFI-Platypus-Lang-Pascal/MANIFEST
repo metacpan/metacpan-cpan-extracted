@@ -1,3 +1,4 @@
+.travis.yml
 Build.PL
 Changes
 CONTRIBUTING
@@ -9,10 +10,11 @@ inc/My/ModuleBuild.pm
 inc/run/readme.pl
 INSTALL
 lib/FFI/Platypus/Lang/Pascal.pm
-lib/Module/Build/FFI/Pascal.pm
 libtest/myunit.pas
 libtest/test.pas
 LICENSE
+maint/cip-before-install
+maint/releaseprep
 MANIFEST			This list of files
 META.json
 META.yml

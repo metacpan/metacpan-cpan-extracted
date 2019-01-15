@@ -1,5 +1,8 @@
 Revision history for RT-Extension-ArticleTemplates
 
+1.02 2018-01-14
+ - Remove unexpectedly introduced newlines since 0.05
+
 1.01 2016-10-21
  - Update documentation
 

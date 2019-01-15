@@ -10,7 +10,7 @@ use warnings;
 use 5.014; # s///r
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use constant CMD => "count";
 use constant CMD_DESC => "Count the various kinds of SV";
@@ -78,7 +78,14 @@ struct Counts => [qw( svs bytes blessed_svs blessed_bytes )];
 sub run
 {
    my $self = shift;
-   my %opts = %{ +shift };
+
+   $self->count_svs( %{ +shift } );
+}
+
+sub count_svs
+{
+   my $self = shift;
+   my %opts = @_;
 
    # TODO: consider options for
    #   sorting
@@ -87,6 +94,12 @@ sub run
    my $size_meth = $opts{owned}  ? "owned_size" :
                    $opts{struct} ? "structure_size" :
                    "size";
+
+   # Options for bin/pmat-counts
+   my $emit_count = $opts{emit_count} //
+      sub { ( !$_[1] || $_[2] ) ? $_[2] : "" };
+   my $emit_bytes = $opts{emit_bytes} //
+      sub { ( !$_[1] || $_[2] ) ? Devel::MAT::Cmd->format_bytes( $_[2] ) : "" };
 
    my %counts;
    my %counts_SCALAR;
@@ -127,51 +140,58 @@ sub run
       }
    }
 
-   my @table = (
-      [ "  Kind", "Count", "(blessed)", "Bytes", "(blessed)" ],
-   );
+   my @table;
 
    foreach ( sort keys %counts ) {
       my $kind = $_ =~ s/^Devel::MAT::SV:://r;
       my $c = $counts{$_};
 
-      push @table, [ "  $kind", $c->svs, $c->blessed_svs // "",
-            Devel::MAT::Cmd->format_bytes( $c->bytes ),
-            $c->blessed_bytes ? Devel::MAT::Cmd->format_bytes( $c->blessed_bytes ) : "" ];
+      push @table, [ $kind,
+            $emit_count->( $kind, 0, $c->svs ),
+            $emit_count->( $kind, 1, $c->blessed_svs ),
+            $emit_bytes->( $kind, 0, $c->bytes ),
+            $emit_bytes->( $kind, 1, $c->blessed_bytes ) ];
 
-      push @table, _gen_package_breakdown( $counts_per_package{$_} ) if $opts{blessed};
+      push @table, _gen_package_breakdown( $counts_per_package{$_}, $emit_count, $emit_bytes ) if $opts{blessed};
 
       if( $kind eq "SCALAR" and $opts{scalars} ) {
          foreach ( sort keys %counts_SCALAR ) {
             my $c = $counts_SCALAR{$_};
 
-            push @table, [ "    $_", $c->svs, $c->blessed_svs // "",
-                  Devel::MAT::Cmd->format_bytes( $c->bytes ),
-                  $c->blessed_bytes ? Devel::MAT::Cmd->format_bytes( $c->blessed_bytes ) : "" ];
+            push @table, [ "  $_",
+                  $emit_count->( $_, 0, $c->svs ),
+                  $emit_count->( $_, 1, $c->blessed_svs ),
+                  $emit_bytes->( $_, 0, $c->bytes ),
+                  $emit_bytes->( $_, 1, $c->blessed_bytes ) ];
          }
       }
    }
 
-   push @table, [ "  -----", ( "" ) x 4 ];
+   push @table, []; # HR
 
    my $total = Counts( ( 0 ) x 4 );
    foreach my $method (qw( svs bytes blessed_svs blessed_bytes )) {
       $total->$method = sum map { $_->$method } values %counts;
    }
 
-   push @table, [ "  (total)", $total->svs, $total->blessed_svs // "",
-            Devel::MAT::Cmd->format_bytes( $total->bytes ),
-            $total->blessed_bytes ? Devel::MAT::Cmd->format_bytes( $total->blessed_bytes ) : "" ];
+   push @table, [ "(total)",
+      $emit_count->( "(total)", 0, $total->svs ),
+      $emit_count->( "(total)", 1, $total->blessed_svs ),
+      $emit_bytes->( "(total)", 0, $total->bytes ),
+      $emit_bytes->( "(total)", 1, $total->blessed_bytes ) ];
 
    Devel::MAT::Cmd->print_table( \@table,
-      sep   => [ "    ", " ", "    ", " " ],
-      align => [ undef, "right", "right", "right", "right" ],
+      indent   => 2,
+      headings => [ "Kind", "Count", "(blessed)", "Bytes", "(blessed)" ],
+      sep      => [ "    ", " ", "    ", " " ],
+      align    => [ undef, "right", "right", "right", "right" ],
+      %{ $opts{table_args} || {} },
    );
 }
 
 sub _gen_package_breakdown
 {
-   my ( $counts ) = @_;
+   my ( $counts, $emit_count, $emit_bytes ) = @_;
 
    my @packages = rev_nsort_by { $counts->{$_}->blessed_svs } sort keys %$counts;
 
@@ -184,8 +204,10 @@ sub _gen_package_breakdown
       push @ret,
          [
             "    " . Devel::MAT::Cmd->format_symbol( $package ),
-            "", $counts->{$package}->blessed_svs,
-            "", Devel::MAT::Cmd->format_bytes( $counts->{$package}->blessed_bytes ),
+            $emit_count->( $package, 0, 0 ),
+            $emit_count->( $package, 1, $counts->{$package}->blessed_svs ),
+            $emit_bytes->( $package, 0, 0 ),
+            $emit_bytes->( $package, 1, $counts->{$package}->blessed_bytes ),
          ];
 
       $count++;
@@ -199,8 +221,11 @@ sub _gen_package_breakdown
 
    push @ret,
       [ "    " . Devel::MAT::Cmd->format_note( "(others)" ),
-         "", $remaining->blessed_svs,
-         "", Devel::MAT::Cmd->format_bytes( $remaining->blessed_bytes ) ] if @packages;
+         $emit_count->( "(others)", 0, 0 ),
+         $emit_count->( "(others)", 1, $remaining->blessed_svs ),
+         $emit_bytes->( "(others)", 0, 0 ),
+         $emit_bytes->( "(others)", 1, $remaining->blessed_bytes ),
+      ] if @packages;
 
    return @ret;
 }

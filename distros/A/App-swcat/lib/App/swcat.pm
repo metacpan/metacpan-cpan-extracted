@@ -1,7 +1,7 @@
 package App::swcat;
 
-our $DATE = '2019-01-14'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2019-01-15'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -519,7 +519,7 @@ App::swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.009 of App::swcat (from Perl distribution App-swcat), released on 2019-01-14.
+This document describes version 0.010 of App::swcat (from Perl distribution App-swcat), released on 2019-01-15.
 
 =head1 SYNOPSIS
 

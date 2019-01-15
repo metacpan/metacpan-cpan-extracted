@@ -4,9 +4,9 @@ use 5.010001;
 use Mouse::Role;
 use experimental 'smartmatch';
 
-# ABSTRACT: Web::API - A Simple base module to implement almost every RESTful API with just a few lines of configuration
+# ABSTRACT: A Simple base module to implement almost every RESTful API with just a few lines of configuration
 
-our $VERSION = '2.3'; # VERSION
+our $VERSION = '2.4.1'; # VERSION
 
 use LWP::UserAgent;
 use HTTP::Cookies 6.04;
@@ -397,7 +397,7 @@ sub encode {
 
 
 sub talk {
-    my ($self, $command, $uri, $options, $content_type) = @_;
+    my ($self, $command, $uri, $options, $query_keys, $content_type) = @_;
 
     my $method = uc($command->{method} || $self->default_method);
     my $oauth_req;
@@ -443,7 +443,7 @@ sub talk {
                 and (($self->oauth_post_body and $method eq 'POST')
                     or $method ne 'POST'))
             {
-                $opts{extra_params} = $options;
+                $opts{extra_params} = { %$options, %{ $query_keys || {} } };
             }
 
             $oauth_req = Net::OAuth->request("protected resource")->new(%opts);
@@ -473,6 +473,9 @@ sub talk {
             $self->log("send payload: $payload") if $self->debug;
         }
     }
+
+    # append query keys to URI
+    $uri->query_param_append($_ => $query_keys->{$_}) for keys %$query_keys;
 
     $uri = $oauth_req->to_url if ($self->auth_type eq 'oauth_params');
 
@@ -519,7 +522,7 @@ sub talk {
 
 
 sub map_options {
-    my ($self, $options, $command, $content_type) = @_;
+    my ($self, $options, $command) = @_;
 
     my %opts;
 
@@ -548,32 +551,28 @@ sub map_options {
         $options = { %opts, %$options };
     }
 
-    # then check existence of mandatory attributes
-    if ($command->{mandatory}) {
-        $self->log("mandatory keys:\n" . np(@{ $command->{mandatory} }))
-            if $self->debug;
+    return $options;
+}
 
-        my @missing_attrs;
-        foreach my $attr (@{ $command->{mandatory} }) {
-            push(@missing_attrs, $attr)
-                unless $self->key_exists($attr, $options);
-        }
 
-        die 'mandatory attributes for this command missing: '
-            . join(', ', @missing_attrs)
-            . $/
-            if @missing_attrs;
+sub check_mandatory {
+    my ($self, $options, $mandatory) = @_;
+
+    $self->log("mandatory keys:\n" . np(@$mandatory))
+        if $self->debug;
+
+    my @missing_attrs;
+    foreach my $attr (@$mandatory) {
+        push(@missing_attrs, $attr)
+            unless $self->key_exists($attr, $options);
     }
 
-    # wrap all options in wrapper key(s) if requested
-    my $method = uc($command->{method} || $self->default_method);
-    $options =
-        wrap($options, $command->{wrapper} || $self->wrapper, $content_type)
-        unless ($method =~ m/^(GET|HEAD|DELETE)$/);
+    die 'mandatory attributes for this command missing: '
+        . join(', ', @missing_attrs)
+        . $/
+        if @missing_attrs;
 
-    $self->log("options:\n" . np(%$options)) if $self->debug;
-
-    return $options;
+    return;
 }
 
 
@@ -602,10 +601,10 @@ sub wrap {
         # XML needs wrapping into extra array ref layer to make XML::Simple
         # behave correctly
         if ($content_type =~ m/xml/) {
-            $options = { $_ => [$options] } for (reverse @{$wrapper});
+            $options = { $_ => [$options] } for (reverse @$wrapper);
         }
         else {
-            $options = { $_ => $options } for (reverse @{$wrapper});
+            $options = { $_ => $options } for (reverse @$wrapper);
         }
     }
     elsif (defined $wrapper) {
@@ -731,7 +730,10 @@ sub format_response {
 
         # decode content if necessary
         unless ($self->_decoded_response) {
-            if (length($response->decoded_content) > 0) {
+            if (    defined $response->decoded_content
+                and length($response->decoded_content) > 0
+                and $response->decoded_content =~ m/\S/)
+            {
                 $self->_decoded_response(
                     eval {
                         $self->decode($response->decoded_content,
@@ -848,18 +850,43 @@ sub AUTOLOAD {
             $self->build_uri($command, $options,
             $self->commands->{$command}->{path});
 
-        # select the right content types for encoding/decoding
+        # first select the right content types for encoding/decoding
         $ct = $self->build_content_type($self->commands->{$command});
 
-        # manage options
+        # then map options if necessary
         $options =
             $self->map_options($options, $self->commands->{$command}, $ct->{in})
             if (((keys %$options) and ($ct->{out} =~ m/(xml|json|urlencoded)/))
             or (exists $self->commands->{$command}->{default_attributes})
             or (exists $self->commands->{$command}->{mandatory}));
 
+        # then check existence of mandatory attributes
+        $self->check_mandatory($options,
+            $self->commands->{$command}->{mandatory})
+            if exists $self->commands->{$command}->{mandatory};
+
+        # then extract query keys from options to prevent them being wrapped
+        # in the next step
+        my $query_keys;
+        foreach my $key (keys %$options) {
+            $query_keys->{$key} = delete $options->{$key}
+                if $key ~~ $self->commands->{$command}->{query_keys};
+        }
+
+        # finally wrap all options in wrapper key(s) if requested
+        my $method =
+            uc($self->commands->{$command}->{method} || $self->default_method);
+        $options =
+            wrap($options,
+            $self->commands->{$command}->{wrapper} || $self->wrapper,
+            $ct->{in})
+            unless ($method =~ m/^(GET|HEAD|DELETE)$/);
+
+        $self->log("options:\n" . np(%$options)) if $self->debug;
+
         # do the talking
-        return $self->talk($self->commands->{$command}, $uri, $options, $ct);
+        return $self->talk($self->commands->{$command},
+            $uri, $options, $query_keys, $ct);
     };
 
     return $self->format_response($self->_response, $ct->{in}, $@);
@@ -876,11 +903,11 @@ __END__
 
 =head1 NAME
 
-Web::API - Web::API - A Simple base module to implement almost every RESTful API with just a few lines of configuration
+Web::API - A Simple base module to implement almost every RESTful API with just a few lines of configuration
 
 =head1 VERSION
 
-version 2.3
+version 2.4.1
 
 =head1 SYNOPSIS
 
@@ -1012,6 +1039,7 @@ the following keys are valid/possible:
     incoming_content_type
     outgoing_content_type
     wrapper
+    query_keys
     require_id (deprecated, use path)
     pre_id_path (deprecated, use path)
     post_id_path (deprecated, use path)
@@ -1128,7 +1156,7 @@ if matched against an error found via one of the C<error_keys>
 
 =head2 retry_times (optional)
 
-get/set amount of times a request will be retried at most
+get/set number of times a request will be retried at most
 
 default: 3
 
@@ -1237,6 +1265,8 @@ generates new OAuth nonce for every request
 =head2 talk
 
 =head2 map_options
+
+=head2 check_mandatory
 
 =head2 key_exists
 

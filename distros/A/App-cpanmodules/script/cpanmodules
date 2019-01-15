@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-01-15'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,7 @@ cpanmodules - The Acme::CPANModules CLI
 
 =head1 VERSION
 
-This document describes version 0.001 of cpanmodules (from Perl distribution App-cpanmodules), released on 2018-01-09.
+This document describes version 0.002 of cpanmodules (from Perl distribution App-cpanmodules), released on 2019-01-15.
 
 =head1 SYNOPSIS
 
@@ -96,13 +96,11 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
@@ -143,7 +141,7 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -188,6 +186,18 @@ Display program's version and exit.
 =item B<--detail>, B<-l>
 
 =item B<--module>=I<s>*, B<-m>
+
+=item B<--with-attr>=I<s@>
+
+Include additional attributes from each entry.
+
+Can be specified multiple times.
+
+=item B<--with-attrs-json>=I<s>
+
+Include additional attributes from each entry (JSON-encoded).
+
+See C<--with-attr>.
 
 =back
 
@@ -272,6 +282,7 @@ List of available configuration parameters:
 
  detail (see --detail)
  module (see --module)
+ with_attrs (see --with-attr)
 
 =head2 Configuration for subcommand view
 
@@ -319,7 +330,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

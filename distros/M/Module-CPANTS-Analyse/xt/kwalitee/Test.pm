@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use FindBin;
 use Test::More;
-use JSON::MaybeXS;
+use JSON::PP;
 
 BEGIN {
   eval { require WorePAN };
@@ -21,14 +21,14 @@ sub run {
 
   my ($name) = $file =~ /(\w+)\.t$/;
 
+  local $Module::CPANTS::Kwalitee::Files::RespectManiskip = 0;
   for my $test (@tests) {
     my $worepan = WorePAN->new(
-      root => "$FindBin::Bin/tmp",
+      root => "$FindBin::Bin/../../tmp",
       files => [$test->[0]],
       no_indices => 1,
       use_backpan => 1,
       no_network => 0,
-      cleanup => 1,
     );
     my $tarball = $worepan->file($test->[0]);
     my $analyzer = Module::CPANTS::Analyse->new({dist => $tarball});

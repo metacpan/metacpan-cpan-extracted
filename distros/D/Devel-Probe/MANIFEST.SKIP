@@ -1,0 +1,6 @@
+gonzo/.*
+trash/.*
+\.git/.*
+.*\.tar\.gz
+.*\.zip
+.*\.swp

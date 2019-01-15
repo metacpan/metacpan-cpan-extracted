@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Devel::MAT;
+use Devel::MAT::Cmd::Terminal;
+use Commandable::Invocation 0.03;
+
+use Devel::MAT::Tool::Count;
+
+use constant TAG_INCR => fgindex => 2; # green
+use constant TAG_DECR => fgindex => 1; # red
+
+my $progress = ( -t STDERR ) ?
+   sub { print STDERR "\r\e[K";
+         print STDERR "$_[0]" if @_; } :
+   undef;
+
+my $cinv = Commandable::Invocation->new_from_tokens( @ARGV );
+my @args = Devel::MAT::Tool::Count->parse_cmd( $cinv );
+ref $args[0] eq "HASH" or die "ARGH! Expected HASH as first parsed result\n";
+my %opts = %{ +shift @args };
+
+my %lastcount;
+
+$opts{emit_count} = sub {
+   my ( $kind, $blessed, $count ) = @_;
+
+   my $lastcount = $lastcount{"$kind/$blessed"};
+   $lastcount{"$kind/$blessed"} = $count;
+
+   return "", "" unless $count || $lastcount;
+
+   my @ret = sprintf "%d", $count;
+
+   if( !defined $lastcount or $count == $lastcount ) {
+      push @ret, "";
+   }
+   elsif( $count > $lastcount ) {
+      push @ret,
+         String::Tagged->new_tagged( sprintf( "(+%d)", $count - $lastcount ), TAG_INCR );
+   }
+   else {
+      push @ret,
+         String::Tagged->new_tagged( sprintf( "(-%d)", $lastcount - $count ), TAG_DECR );
+   }
+
+   return @ret;
+};
+
+my %lastbytes;
+
+$opts{emit_bytes} = sub {
+   my ( $kind, $blessed, $bytes ) = @_;
+
+   my $lastbytes = $lastbytes{"$kind/$blessed"};
+   $lastbytes{"$kind/$blessed"} = $bytes;
+
+   return "", "" unless $bytes || $lastbytes;
+
+   my @ret = Devel::MAT::Cmd->format_bytes( $bytes );
+
+   if( !defined $lastbytes or $bytes == $lastbytes ) {
+      push @ret, "";
+   }
+   elsif( $bytes > $lastbytes ) {
+      push @ret,
+         String::Tagged->from_sprintf( "(+%s)", Devel::MAT::Cmd->format_bytes( $bytes - $lastbytes ) )
+            ->apply_tag( 0, -1, TAG_INCR );
+   }
+   else {
+      push @ret,
+         String::Tagged->from_sprintf( "(-%s)", Devel::MAT::Cmd->format_bytes( $lastbytes - $bytes ) )
+            ->apply_tag( 0, -1, TAG_DECR );
+   }
+
+   return @ret;
+};
+
+$opts{table_args} = {
+   headings => [ "Kind", "Count","", "(blessed)","", "Bytes","", "(blessed)","" ],
+   sep      => [ "    ", ""," ","", "    ", ""," ","" ],
+   align    => [ undef, "right","left", "right","left", "right","left", "right","left" ],
+};
+
+while( my $file = $cinv->pull_token ) {
+   Devel::MAT::Cmd->printf( "%s\n",
+      Devel::MAT::Cmd->format_heading( $file, 2 )
+   );
+
+   my $pmat = Devel::MAT->load( $file, progress => $progress );
+   $progress->() if $progress;
+
+   $pmat->load_tool( "Count", progress => $progress )
+      ->count_svs( %opts );
+}

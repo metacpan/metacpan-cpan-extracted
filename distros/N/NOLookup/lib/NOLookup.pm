@@ -4,7 +4,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "1.11";
+our $VERSION = "1.13";
 
 
 =pod 
@@ -27,7 +27,7 @@ See POD for each lookup module for further details.
 
 =head1 LICENSE
 
-Copyright (C) 2017 Trond Haugen.
+Copyright (C) 2017- Trond Haugen.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

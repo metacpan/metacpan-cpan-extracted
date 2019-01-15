@@ -8,7 +8,7 @@ package Sentinel;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Exporter 'import';
 our @EXPORT = qw( sentinel );
@@ -28,33 +28,33 @@ C<Sentinel> - create lightweight SCALARs with get/set callbacks
 
 =head1 SYNOPSIS
 
- package Some::Class;
+   package Some::Class;
 
- use Sentinel;
+   use Sentinel;
 
- sub foo :lvalue
- {
-    my $self = shift;
-    sentinel get => sub { return $self->get_foo },
-             set => sub { $self->set_foo( $_[0] ) };
- }
+   sub foo :lvalue
+   {
+      my $self = shift;
+      sentinel get => sub { return $self->get_foo },
+               set => sub { $self->set_foo( $_[0] ) };
+   }
 
- sub bar :lvalue
- {
-    my $self = shift;
-    sentinel value => $self->get_bar,
-             set   => sub { $self->set_bar( $_[0] ) };
- }
+   sub bar :lvalue
+   {
+      my $self = shift;
+      sentinel value => $self->get_bar,
+               set   => sub { $self->set_bar( $_[0] ) };
+   }
 
- sub splot :lvalue
- {
-    sentinel obj => shift, get => \&get_splot, set => \&set_splot;
- }
+   sub splot :lvalue
+   {
+      sentinel obj => shift, get => \&get_splot, set => \&set_splot;
+   }
 
- sub wibble :lvalue
- {
-    sentinel obj => shift, get => "get_wibble", set => "set_wibble";
- }
+   sub wibble :lvalue
+   {
+      sentinel obj => shift, get => "get_wibble", set => "set_wibble";
+   }
 
 =head1 DESCRIPTION
 
@@ -67,7 +67,9 @@ when a new value is set, rather than simply updating a scalar variable.
 
 =head1 FUNCTIONS
 
-=head2 $scalar = sentinel %args
+=head2 sentinel
+
+   $scalar = sentinel %args
 
 Returns (as an lvalue) a scalar with magic attached to it. This magic is used
 to get the value of the scalar, or to inform of a new value being set, by
@@ -108,26 +110,26 @@ overhead of creating lots of small one-use closures around the object.
 A useful behaviour of this module is generation of mutation accessor methods
 that automatically wrap C<get_>/C<set_> accessor/mutator pairs:
 
- foreach (qw( name address age height )) {
-    my $name = $_;
+   foreach (qw( name address age height )) {
+      my $name = $_;
 
-    no strict 'refs';
-    *$name = sub :lvalue {
-       sentinel obj => shift, get => "get_$name", set => "set_$name";
-    };
- }
+      no strict 'refs';
+      *$name = sub :lvalue {
+         sentinel obj => shift, get => "get_$name", set => "set_$name";
+      };
+   }
 
 This is especially useful for methods whose values are simple strings or
 numbers, because they allow Perl's rich set of mutation operators to be
 applied to the object's values.
 
- $obj->name =~ s/-/_/g;
+   $obj->name =~ s/-/_/g;
 
- substr( $obj->address, 100 ) = "";
+   substr( $obj->address, 100 ) = "";
 
- $obj->age++;
+   $obj->age++;
 
- $obj->height /= 100;
+   $obj->height /= 100;
 
 =head1 XS vs PUREPERL
 
@@ -136,8 +138,8 @@ XS. If not, it falls back on an implementation using a C<tie>d scalar. A
 pureperl installation can also be requested at build time by passing the
 C<--pp> argument to F<Build.PL>:
 
- $ perl Build.PL --pp
- $ ./Build
+   $ perl Build.PL --pp
+   $ ./Build
 
 =head1 ACKNOWLEDGEMENTS
 

@@ -54,4 +54,24 @@ sub lines_from(&)
        'Rows are aligned' );
 }
 
+# Headings
+{
+   no warnings 'once';
+   local *Devel::MAT::Cmd::format_heading = sub { return "*$_[1]*" };
+
+   is( lines_from {
+         Devel::MAT::Cmd->print_table( [ [ "1", "2" ] ], headings => [ "A", "B" ] ) },
+      "*A* *B*\n" .
+      "1   2\n",
+      'Row with headings' );
+}
+
+# Indent
+{
+   is( lines_from {
+         Devel::MAT::Cmd->print_table( [ [ "x", "y", "z" ] ], indent => 3 ) },
+      "   x y z\n",
+      'Row with indent' );
+}
+
 done_testing;

@@ -1,3 +1,10 @@
+0.002   2019-01-15 (PERLANCAR)
+
+	- [Incompatible change] No longer list each related/alternate
+	  module as separate entry, add --with-attr option to add other
+	  keys of entry to result.
+
+
 0.001   2018-01-09 (PERLANCAR)
 
         - First release.

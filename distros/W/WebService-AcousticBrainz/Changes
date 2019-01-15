@@ -1,5 +1,8 @@
 Revision history for WebService-AcousticBrainz
 
+0.0301 2019-01-14 19:00:49
+    - Require Mojolicious 8 to silence the cpantesters reports.
+
 0.0300 2019-01-13 08:46:11
     - SUpport and test mocking.
 

@@ -1,5 +1,12 @@
 Revision history for Sentinel
 
+0.06    2019-01-14 21:02:18
+        [BUGFIXES]
+         * Use an AV in mg_obj rather than a struct in mg_ptr, which has
+           advtanges when multithreading (RT118154)
+         * Remember to EXTEND() the stack appropriately (RT118188)
+         * Correct handling of non-ASCII method names (RT118222)
+
 0.05    CHANGES:
          * Also allow get/set callbacks to be object method names rather than
            CODE refs

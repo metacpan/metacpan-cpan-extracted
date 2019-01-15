@@ -17,6 +17,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Dist::Zilla' => '5.045',
+                                      'Dist::Zilla::App::Command::distversion' => '0.03',
                                       'Dist::Zilla::Plugin::Git::Init' => '0',
                                       'Dist::Zilla::Plugin::MungeFile::WithDataSection' => '0',
                                       'Dist::Zilla::Plugin::Run::AfterMint' => '0'

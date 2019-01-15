@@ -2,8 +2,8 @@ package Module::CPANTS::Kwalitee::NeedsCompiler;
 use warnings;
 use strict;
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
 sub order { 200 }
 
@@ -12,13 +12,13 @@ sub order { 200 }
 ##################################################################
 
 sub analyse {
-    my $class=shift;
-    my $me=shift;
+    my $class = shift;
+    my $me = shift;
     
-    my $files=$me->d->{files_array};
+    my $files = $me->d->{files_array};
     foreach my $f (@$files) {
         if ($f =~ /\.[hc]$/i or $f =~ /\.xs$/i) {
-            $me->d->{needs_compiler}=1;
+            $me->d->{needs_compiler} = 1;
             return;
         }
     }
@@ -27,7 +27,7 @@ sub analyse {
             if ($m->{requires} =~ /^Inline::/
                or $m->{requires} eq 'ExtUtils::CBuilder'
                or $m->{requires} eq 'ExtUtils::ParseXS') {
-                $me->d->{needs_compiler}=1;
+                $me->d->{needs_compiler} = 1;
                 return;
             }
         }
@@ -72,7 +72,7 @@ Returns C<200>.
 
 =head3 analyse
 
-Checks for file with .c, .h or .xs extensions.
+Checks for file with F<.c>, F<.h> or F<.xs> extensions.
 Check is the module depends on any of the Inline:: modules or
 on ExtUtils::CBuilder or ExtUtils::ParseXS.
 

@@ -2,8 +2,8 @@ package Module::CPANTS::Kwalitee::Repackageable;
 use warnings;
 use strict;
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
 sub order { 900 }
 
@@ -12,8 +12,8 @@ sub order { 900 }
 ##################################################################
 
 sub analyse {
-    my $class=shift;
-    my $me=shift;
+    my $class = shift;
+    my $me = shift;
 
     # NOTE: The analysis/metric in this module has moved to
     # Module::CPANTS::SiteKwalitee.
@@ -60,7 +60,7 @@ Defines the order in which Kwalitee tests should be run.
 
 =head3 kwalitee_indicators
 
-Returns the Kwalitee Indicators datastructure.
+Returns the Kwalitee Indicators data structure.
 
 =head1 SEE ALSO
 

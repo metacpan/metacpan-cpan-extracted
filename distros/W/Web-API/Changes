@@ -1,16 +1,108 @@
 ==================================================
-Changes from 2017-12-25 00:00:00 +0000 to present.
+Changes from 2018-01-15 00:00:00 +0000 to present.
 ==================================================
 
+------------------------------------------
+version 2.4.1 at 2019-01-15 04:01:08 +0000
+------------------------------------------
+
+  Change: f7531fae482f31b3e64fe60e3c10a1dd2ddfcdeb
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2019-01-15 17:00:51 +0000
+
+    updated pod from merges 
+
+  Change: 34174e3c23bebb8d5df30c38db88097ee9b24504
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2019-01-15 16:58:31 +0000
+
+    Merge branch 'master' of github.com:nupfel/Web-API 
+
+  Change: 039f7473ca7ea46c1045e5c60f7f8622ba7450cb
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2019-01-15 16:55:50 +0000
+
+    ignore cpanfile 
+
+  Change: 8a0810d23f89ce59301bc475ae3b8599bfd4f4f2
+  Author: Tobias Kirschstein <nupfel@users.noreply.github.com>
+  Date : 2019-01-09 15:37:12 +0000
+
+    Merge pull request #28 from pkg-perl-tools/pkg-perl-1517091610
+
+    Grammar correction 
+
+  Change: 47afb9f1458baa1e3f67c80a17e6573626bb1612
+  Author: Tobias Kirschstein <nupfel@users.noreply.github.com>
+  Date : 2019-01-09 15:36:30 +0000
+
+    Merge pull request #29 from manwar/tidy-up-abstract
+
+    Tidied up ABSTRACT in pod. 
+
+  Change: abcb468333ce206ec81d05daad2f54c821649641
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2019-01-08 01:33:00 +0000
+
+    generate and distribute cpanfile 
+
+  Change: bf15211921c1ac419de1870f9c091a136d990af9
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2019-01-08 01:25:28 +0000
+
+    upload release to github 
+
+  Change: a1d7942c1715ecde48bdced3800ef69ac71ad57c
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2019-01-08 01:25:13 +0000
+
+    separate out query_keys from options 
+
+  Change: 0bacbdf8888f2b1f2aa67e1fbdabc8da0ec75d72
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2018-12-25 11:18:22 +0000
+
+    Tidied up ABSTRACT in pod. 
+
+  Change: 98be5b3606ddc7d7b1741cc2be18fc6fb357ee12
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2018-12-25 23:56:47 +0000
+
+    minor version bump 
+
+  Change: b640a74053ba751c941bd97e1523deca73c24053
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2018-12-25 23:56:28 +0000
+
+    ignore decoding whitespace or empty responses 
+
+  Change: b58cfa36e991f5af15d50638f59f72f77c20802b
+  Author: Christopher Hoskin <mans0954@debian.org>
+  Date : 2018-01-27 22:21:27 +0000
+
+    Grammar correction 
+
 ----------------------------------------
-version 2.3 at 2018-12-25 10:23:22 +0000
+version 2.3 at 2018-12-25 10:23:48 +0000
 ----------------------------------------
+
+  Change: 5745eb37374e0faf4b732ea7625914d4e8c9ee9d
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2018-12-25 23:23:48 +0000
+
+    Merge branch 'master' of github.com:nupfel/Web-API 
 
   Change: 6975533993cbdf4030ae42ccb3eb19e13dc0ab69
   Author: Tobias Kirschstein <lev@ideegeo.com>
   Date : 2018-12-25 23:23:14 +0000
 
     api_version and auth method 'header' via Token, bump to 2.3 
+
+  Change: 6107849c9e68490be2b9b39826eea365692269ea
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2018-07-31 21:52:09 +0000
+
+    ignore .build 
 
   Change: a63841d5d55eb3d4d1c2e918ef6c74428c4aaff6
   Author: Tobias Kirschstein <lev@ideegeo.com>
@@ -131,5 +223,5 @@ version 2.3 at 2018-12-25 10:23:22 +0000
     use caller with parenthesis to silence warning. fixes #18 
 
 =================================================
-Plus 22 releases after 2017-12-25 00:00:00 +0000.
+Plus 22 releases after 2018-01-15 00:00:00 +0000.
 =================================================

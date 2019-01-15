@@ -17,10 +17,10 @@ name: TypeLibrary-FromXSD
 provides:
   TypeLibrary::FromXSD:
     file: lib/TypeLibrary/FromXSD.pm
-    version: '0.04'
+    version: '0.05'
   TypeLibrary::FromXSD::Element:
     file: lib/TypeLibrary/FromXSD/Element.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   DateTime: '0'
   File::Basename: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: http://github.com/reneeb/TypeLibrary-FromXSD/issues
   homepage: http://github.com/reneeb/TypeLibrary-FromXSD
   repository: http://github.com/reneeb/TypeLibrary-FromXSD.git
-version: '0.04'
+version: '0.05'
 x_contributors:
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'

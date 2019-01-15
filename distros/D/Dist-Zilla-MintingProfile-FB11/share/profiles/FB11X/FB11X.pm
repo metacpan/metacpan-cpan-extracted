@@ -6,15 +6,17 @@ use namespace::autoclean;
 
 with 'OpusVL::FB11::RolesFor::Plugin';
 
-our $VERSION = '0.010';
-{{ 
+# ABSTRACT: A brand new FB11 plugin!
+our $VERSION = '0';
+{{
     ($controller) = ($name =~ /::([^:]+)$/); ''
 }}
+
 after 'setup_components' => sub {
     my $class = shift;
-   
+
     $class->add_paths(__PACKAGE__);
-    
+
     # .. inject your components here ..
     CatalystX::InjectComponent->inject(
         into      => $class,
@@ -24,17 +26,3 @@ after 'setup_components' => sub {
 };
 
 1;
-
-=head1 NAME
-
-{{ $name }} - A brand new AppKitX component
-
-=head1 DESCRIPTION
-
-Frobnicates the whirligigs in a modular and reusable pattern
-
-=head1 COPYRIGHT and LICENSE
-
-Copyright (C) 2015 OpusVL
-
-This software is licensed according to the "IP Assignment Schedule" provided with the development project.

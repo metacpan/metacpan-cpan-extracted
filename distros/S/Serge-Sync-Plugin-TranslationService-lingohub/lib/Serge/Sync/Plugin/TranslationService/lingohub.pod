@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Serge::Sync::Plugin::TranslationService::lingohub - L<Lingohub|https://www.lingohub.com> synchronization plugin for L<Serge|https://serge.io/>
+Serge::Sync::Plugin::TranslationService::lingohub - L<LingoHub|https://www.lingohub.com> synchronization plugin for L<Serge|https://serge.io/> based on L<LingoHub CLI|https://github.com/lingohub/lingohub_ruby>
 
 =head1 SYNOPSIS
 
@@ -21,8 +21,8 @@ Serge::Sync::Plugin::TranslationService::lingohub - L<Lingohub|https://www.lingo
 
 =head1 DESCRIPTION
 
-Integration between Serge (Free, Open Source Solution for Continuous Localization) and Lingohub (One platform for developers and translators that makes localizing software, mobile or web applications and on-demand).
-Uses the command-line tool for the LingoHub API. See L<LingoHub CLI|https://github.com/lingohub/lingohub_ruby>.
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and LingoHub (One platform for developers and translators that makes localizing software, mobile or web applications and on-demand),
+implemented using the command-line tool for the LingoHub API.
 
 =head1 ATTRIBUTES
 

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -ex
+
+cip sudo bash -c 'dzil-dzil -I. authordeps --missing | dzil-cpanm -n'
+cip exec dzil-dzil build -I.
+cip exec bash -c "set -ex; echo Module-Build-FFI-*/ ; cd Module-Build-FFI-*/ ; cpanm -n --installdeps ."

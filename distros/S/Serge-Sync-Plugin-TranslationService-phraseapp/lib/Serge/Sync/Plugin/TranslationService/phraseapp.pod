@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Serge::Sync::Plugin::TranslationService::phraseapp - L<Phraseapp|https://phraseapp.com> synchronization plugin for L<Serge|https://serge.io/>
+Serge::Sync::Plugin::TranslationService::phraseapp - L<Phraseapp|https://phraseapp.com> synchronization plugin for L<Serge|https://serge.io/> based on L<PhraseApp CLI|https://phraseapp.com/cli>
 
 =head1 SYNOPSIS
 
@@ -18,8 +18,8 @@ Serge::Sync::Plugin::TranslationService::phraseapp - L<Phraseapp|https://phrasea
 
 =head1 DESCRIPTION
 
-Integration between Serge (Free, Open Source Solution for Continuous Localization) and Phraseapp (Translation and localization management system for web and mobile applications).
-Uses the command-line tool for the PhraseApp API. See L<PhraseApp CLI|https://phraseapp.com/cli>.
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and Phraseapp (Translation and localization management system for web and mobile applications),
+implemented using command-line tool for the PhraseApp API.
 
 =head1 ATTRIBUTES
 
@@ -27,7 +27,19 @@ Uses the command-line tool for the PhraseApp API. See L<PhraseApp CLI|https://ph
 
 =item I<config_file>
 
-PhraseApp CLI path to the configuration file
+PhraseApp CLI path to the configuration file.
+
+=item I<upload_translations>
+
+Upload translations on push. Default YES.
+
+=item I<wait_for_uploads>
+
+Wait for files to be processed while pushing. Default YES.
+
+=item I<verbose>
+
+Verbose output. Default NO.
 
 =back
 

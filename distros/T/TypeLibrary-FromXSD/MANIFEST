@@ -51,3 +51,4 @@ t/module_header.t
 t/test.xsd
 t/test2.xsd
 t/test3.xsd
+t/version_add.t

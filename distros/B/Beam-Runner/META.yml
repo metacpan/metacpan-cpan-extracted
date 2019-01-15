@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,37 +32,43 @@ no_index:
 provides:
   Beam::Runnable:
     file: lib/Beam/Runnable.pm
-    version: '0.014'
+    version: '0.015'
   Beam::Runnable::AllowUsers:
     file: lib/Beam/Runnable/AllowUsers.pm
-    version: '0.014'
+    version: '0.015'
   Beam::Runnable::DenyUsers:
     file: lib/Beam/Runnable/DenyUsers.pm
-    version: '0.014'
+    version: '0.015'
   Beam::Runnable::Single:
     file: lib/Beam/Runnable/Single.pm
-    version: '0.014'
+    version: '0.015'
   Beam::Runnable::Timeout::Alarm:
     file: lib/Beam/Runnable/Timeout/Alarm.pm
-    version: '0.014'
+    version: '0.015'
   Beam::Runner:
     file: lib/Beam/Runner.pm
-    version: '0.014'
+    version: '0.015'
   Beam::Runner::Command:
     file: lib/Beam/Runner/Command.pm
-    version: '0.014'
+    version: '0.015'
   Beam::Runner::Command::help:
     file: lib/Beam/Runner/Command/help.pm
-    version: '0.014'
+    version: '0.015'
   Beam::Runner::Command::list:
     file: lib/Beam/Runner/Command/list.pm
-    version: '0.014'
+    version: '0.015'
   Beam::Runner::Command::run:
     file: lib/Beam/Runner/Command/run.pm
-    version: '0.014'
+    version: '0.015'
+  Beam::Runner::ExecCommand:
+    file: lib/Beam/Runner/ExecCommand.pm
+    version: '0.015'
+  Beam::Runner::Steps:
+    file: lib/Beam/Runner/Steps.pm
+    version: '0.015'
   Beam::Runner::Util:
     file: lib/Beam/Runner/Util.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   Beam::Service: '0'
   Beam::Wire: '1.019'
@@ -80,6 +86,7 @@ resources:
   bugtracker: https://github.com/preaction/Beam-Runner/issues
   homepage: https://github.com/preaction/Beam-Runner
   repository: https://github.com/preaction/Beam-Runner.git
-version: '0.014'
+version: '0.015'
 x_authority: cpan:PREACTION
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

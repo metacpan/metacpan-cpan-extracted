@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More;
 use Test::Refcount;
 
 use Scalar::Util qw( refaddr );
@@ -38,3 +38,5 @@ undef @setargs;
 undef $vref;
 
 is_oneref( $obj, 'Object has refcount 1 after undef $vref' );
+
+done_testing;

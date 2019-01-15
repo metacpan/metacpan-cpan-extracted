@@ -11,9 +11,17 @@ use constant {
 
 sub save_record {
     my ( $self, $line ) = @_;
-    return $self->__spice_line_contd($line) if $line =~ SPICE_LINE_CONTD;
+    return $self->__spice_line_contd($line)
+        if $self->is_line_continued($line);
     return $self->abort_reading() if $line =~ SPICE_END_FILE;
     $self->SUPER::save_record($line);
+}
+
+sub is_line_continued {
+    my $self = shift;
+    return 1 if $self->SUPER::is_line_continued(@_);
+    my $line = shift;
+    return $line =~ SPICE_LINE_CONTD;
 }
 
 sub __spice_line_contd {
@@ -28,7 +36,7 @@ package main;
 use Test::More;
 use Test::Exception;
 
-my $sp = new SpiceParser;
+my $sp = SpiceParser->new();
 
 lives_ok { $sp->read('t/example.sp'); } 'Works fine';
 is( scalar( $sp->get_records() ), 1, '1 record saved' );

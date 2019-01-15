@@ -27,18 +27,16 @@ my $builder = My::ModuleBuild->new(
   dist_author   => [ 'Graham Ollis <plicease@cpan.org>' ],
   license       => 'perl',
   configure_requires => {
-    'Module::Build'      => 0.38,
-    'ExtUtils::CBuilder' => 0,
-    'Module::Build::FFI' => 0.19,
-    'File::Which' => 0,
-    'File::chdir' => 0,
+    'Module::Build'              => 0.38,
+    'Module::Build::FFI'         => 0.19,
+    'Module::Build::FFI::Pascal' => 0.49,
+    'File::Which'                => 0,
   },
   build_requires => {
     'Module::Build'      => 0.38,
-    'ExtUtils::CBuilder' => 0,
     'Module::Build::FFI' => 0.19,
+    'Module::Build::FFI::Pascal' => 0.49,
     'File::Which' => 0,
-    'File::chdir' => 0,
   },
   test_requires => {
     'FFI::CheckLib' => 0,
@@ -46,14 +44,13 @@ my $builder = My::ModuleBuild->new(
   requires => {
     'perl',               => '5.008001',
     'FFI::Platypus'       => '0.19',
-    'File::Which'         => 0,
-    'File::chdir'         => 0,
     'FFI::ExtractSymbols' => 0,
   },
   meta_merge => {
     resources  => {
-      repository => "http://github.com/plicease/FFI-Platypus-Lang-Pascal",
-      bugtracker => "http://github.com/plicease/FFI-Platypus-Lang-Pascal/issues",
+      repository => "http://github.com/Perl5-FFI/FFI-Platypus-Lang-Pascal",
+      bugtracker => "http://github.com/Perl5-FFI/FFI-Platypus-Lang-Pascal/issues",
+      x_IRC => "irc://irc.perl.org/#native",
     },
     no_index => {
       directory => [ 'examples' ],

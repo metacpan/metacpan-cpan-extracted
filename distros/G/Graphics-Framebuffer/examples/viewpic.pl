@@ -27,9 +27,10 @@ GetOptions(
 );
 
 my ($fr,$f) = Graphics::Framebuffer->new(
-    'SPLASH'      => 0,
-    'SHOW_ERRORS' => 0,
-    'RESET'       => 1 - $noclear,
+    'SPLASH'        => 0,
+    'SHOW_ERRORS'   => 0,
+    'RESET'         => 1 - $noclear,
+    'DOUBLE_BUFFER' => 1,
 );
 
 my $DB    = 0;

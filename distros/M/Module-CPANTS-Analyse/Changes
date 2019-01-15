@@ -1,5 +1,62 @@
 Revision history for Module-CPANTS-Analyse
 
+0.99 2019-01-15
+  - requires Module::Find
+
+0.98 2019-01-15
+  ** BACKWARD INCOMPATIBLE (INTERNAL) CHANGE **
+  - Module::CPANTS::Kwalitee now uses Module::Find to find
+    Kwalitee modules (instead of Module::Pluggable that unconditonally
+    spits a deprecation warning). You usually don't need to care
+    but if you have your custom Kwalitee plugin loader (such as
+    Module::CPANTS::SiteKwalitee), you need to change it.
+    Sorry for the inconvenience.
+
+  - Allow dash and dot in script name in the NAME section for
+    non-pm, non-pod files
+
+0.97_11 2018-04-22
+  - no changes; for testing
+
+0.97_10 2018-04-22
+  - no changes; for testing
+
+0.97_09 2018-04-22
+  - no changes; for testing
+
+0.97_08 2018-04-22
+  - no changes; for testing
+
+0.97_07 2018-04-22
+  - no changes; for testing
+
+0.97_06 2018-04-22
+  - no changes; for testing
+
+0.97_05 2018-04-22
+  - no changes; for testing
+
+0.97_04 2018-04-21
+  - Skip everything in MANIFEST.SKIP while testing symlinks (GH#33, Tux++)
+
+0.97_03 2016-09-01
+  - Not to check use_strict/use_warnings for Perl 6 modules in a
+    Perl 5 distribution (Stefan Seifert++)
+  - Worked around a File::Find::Object issue (reported by dolmen)
+  - Fixed dynamic_config handling (David Golden++)
+  - Improved LICENSE file detection (RT#114247)
+
+0.97_02 2016-04-27
+  - Requires List::Util 1.33
+
+0.97_01 2016-04-24
+  - Added has_meta_json metric (RT#107885)
+  - Accept a few more README extensions (mrcaron)
+  - Accept two more Moose modules as strict equivalents
+  - Various micro optimization for performance
+  - Dropped a few dependencies
+  - Doc patch from brac-mac and joenio
+
 0.96 2014-11-24
   - Added an import option to load extra Kwalitee plugins.
   - Fixed RT#100512 - has_readme now accepts README.pod as well

@@ -1,5 +1,9 @@
 Revision history for Perl extension AnyEvent::Google::PageRank.
 
+0.05  Wed Jan 16 00:35:06 +07 2019
+      - mention that PageRank service was closed by Google
+      - remove live tests
+
 0.04  Wed Jan 25 22:35:36 2012
       - warnings noise in perl >= 5.14 removed
 

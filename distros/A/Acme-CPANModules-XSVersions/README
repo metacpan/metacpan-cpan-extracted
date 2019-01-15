@@ -1,0 +1,213 @@
+NAME
+    Acme::CPANModules::XSVersions - XS versions of Perl modules
+
+VERSION
+    This document describes version 0.002 of Acme::CPANModules::XSVersions
+    (from Perl distribution Acme-CPANModules-XSVersions), released on
+    2019-01-15.
+
+SYNOPSIS
+    To install all XS versions of PP modules currently installed on your
+    system:
+
+     % perl -MAcme::CM::Get=XSVersions -MModule::Installed::Tiny=module_installed -E'for (@{$LIST->{entries}}) {
+           next unless module_installed($_->{module}) || $_->{pp_module} && module_installed($_->{pp_module});
+           say $_->{xs_module};
+       }' | cpanm -n
+
+    (Note: To run the above snippet, you need to install
+    Acme::CPANModules::XSVersions which you're reading right now, as well as
+    Acme::CM::Get, Module::Installed::Tiny, and cpanm.)
+
+DESCRIPTION
+    XS versions of Perl modules.
+
+    This list catalogs (pure-) Perl modules that have their XS counterparts
+    ("fast versions"), usually in separate distributions so the installation
+    of the XS version is optional. The two versions of the modules provide
+    the same interface. When the two modules are different in interface,
+    they are not listed here.
+
+    Usually authors use "::XS" or "_XS" suffix for the XS version (for
+    example, Type::Tiny is the PP/pure-perl version and Type::Tiny::XS is
+    the XS version). Or sometimes the other way around is done, a module is
+    an XS module and another with suffix "::PP" or "_PP" is the PP version.
+    And often a module like "JSON" is one that can automatically use the XS
+    version ("JSON::XS") when it's available or fallback to the PP version
+    ("JSON::PP").
+
+    Additions much welcome.
+
+INCLUDED MODULES
+    *   Algorithm::Diff
+
+    *   Algorithm::LUHN
+
+    *   Algorithm::PageRank
+
+    *   Algorithm::RectanglesContainingDot
+
+    *   Bytes::Random
+
+    *   Class::Accessor::Fast
+
+    *   Class::C3
+
+    *   Class::Load
+
+    *   Convert::Bencode
+
+    *   Crypt::Passwd
+
+    *   Crypt::TEA_PP
+
+    *   Crypt::XXTEA_PP
+
+    *   DDC::PP
+
+    *   Crypt::Skip32
+
+    *   Date::Calc
+
+    *   Directory::Iterator
+
+    *   Encode
+
+    *   Encoding::FixLatin
+
+    *   File::MMagic
+
+    *   Geo::Coordinates::UTM
+
+    *   Geo::Distance
+
+    *   Geo::Hash
+
+    *   HTTP::Headers::Fast
+
+    *   HTTP::Parser::XS::PP
+
+    *   Heap::Simple
+
+    *   Image::Info
+
+    *   JSON::PP
+
+    *   Language::Befunge::Vector
+
+    *   Language::Befunge::Storage::Generic::Vec
+
+    *   List::BinarySearch
+
+    *   List::Flatten
+
+    *   List::MoreUtils
+
+    *   List::SomeUtils
+
+    *   List::Util
+
+    *   List::UtilsBy
+
+    *   Math::Derivative
+
+    *   Math::Gauss
+
+    *   Math::Utils
+
+    *   MaxMind::DB::Reader
+
+    *   Mojo::Base
+
+    *   Net::IP
+
+    *   Net::SNMP
+
+    *   Number::Closest
+
+    *   Object::Tiny
+
+    *   Object::Tiny::RW
+
+    *   PPI
+
+    *   Package::Stash
+
+    *   Params::Validate
+
+    *   Path::Hilbert
+
+    *   PerlX::ArraySkip
+
+    *   PerlX::Maybe
+
+    *   Protocol::Redis
+
+    *   Readonly
+
+    *   Ref::Util
+
+    *   Set::IntSpan::Fast
+
+    *   Set::Product
+
+    *   SOAP::WSDL::Deserializer::XSD
+
+    *   Sort::Naturally
+
+    *   String::Numeric
+
+    *   Template::Alloy
+
+    *   Template::Stash
+
+    *   Text::CSV
+
+    *   Text::Levenshtein::Damerau
+
+    *   Time::Format
+
+    *   Type::Tiny
+
+    *   Tree::Object
+
+    *   URL::Encode
+
+    *   Unix::Uptime::BSD
+
+    *   XML::CompactTree
+
+    *   YAML::PP
+
+    *   match::simple
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-XSVersions>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-XSVersions>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-XSVe
+    rsions>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

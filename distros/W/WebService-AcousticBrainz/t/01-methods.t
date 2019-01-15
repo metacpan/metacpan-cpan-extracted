@@ -25,7 +25,13 @@ $ws->base(Mojo::URL->new(''));
 
 can_ok($ws, 'fetch');
 
-my $data = try { $ws->fetch( mbid => '1234567890', endpoint => 'low-level', query => { n => 2 } ) } catch { $_ };
+my $data = try {
+    $ws->fetch(
+        mbid     => '1234567890',
+        endpoint => 'low-level',
+        query    => { n => 2 },
+    )
+} catch { $_ };
 is_deeply $data, {ok => 1}, 'fetch';
 
 done_testing();

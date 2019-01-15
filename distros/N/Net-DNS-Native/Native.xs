@@ -421,7 +421,7 @@ _getaddrinfo(Net_DNS_Native *self, char *host, SV* sv_service, SV* sv_hints, int
             DNS_reinit_pool(self);
         }
 #endif
-        if (socketpair(AF_UNIX, SOCK_STREAM, PF_UNSPEC, fd) != 0)
+        if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, PF_UNSPEC, fd) != 0)
             croak("socketpair(): %s", strerror(errno));
         
         char *service = SvOK(sv_service) ? SvPV_nolen(sv_service) : "";
@@ -596,7 +596,10 @@ DESTROY(Net_DNS_Native *self)
         if (self->pool) {
             pthread_mutex_lock(&self->mutex);
             if (queue_size(self->in_queue) > 0) {
-                warn("destroying Net::DNS::Native object while queue for resolver has %d elements", queue_size(self->in_queue));
+                // warnings are useless in global destruction
+                if (!PL_dirty)
+                    warn("destroying Net::DNS::Native object while queue for resolver has %d elements", queue_size(self->in_queue));
+                
                 queue_iterator *it = queue_iterator_new(self->in_queue);
                 DNS_thread_arg *arg;
                 
@@ -637,7 +640,8 @@ DESTROY(Net_DNS_Native *self)
         pthread_mutex_unlock(&self->mutex);
         
         if (bstree_size(self->fd_map) > 0) {
-            warn("destroying Net::DNS::Native object with %d non-received results", bstree_size(self->fd_map));
+            if (!PL_dirty)
+                warn("destroying Net::DNS::Native object with %d non-received results", bstree_size(self->fd_map));
             
             int *fds = bstree_keys(self->fd_map);
             int i, l, j;

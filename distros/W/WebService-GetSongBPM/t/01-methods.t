@@ -2,6 +2,9 @@
 use Test::More;
 use Test::Exception;
 
+# Mocking example taken from:
+# http://blogs.perl.org/users/chase_whitener/2016/01/mock-testing-web-services-with-mojo.html
+
 use Mojo::Base -strict;
 use Mojolicious;
 

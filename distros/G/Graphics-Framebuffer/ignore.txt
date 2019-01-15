@@ -14,3 +14,5 @@ pod2htm*.tmp
 Graphics-Framebuffer-*
 fb_list*
 test*
+*.inl
+*.yml

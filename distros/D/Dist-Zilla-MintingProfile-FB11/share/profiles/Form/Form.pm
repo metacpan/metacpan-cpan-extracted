@@ -10,6 +10,9 @@ use v5.20;
 use warnings;
 use strict;
 
+# ABSTRACT: A Form for a thing.
+our $VERSION = '0';
+
 #has_field name => (
 #    type => 'Text',
 #    required => 1,

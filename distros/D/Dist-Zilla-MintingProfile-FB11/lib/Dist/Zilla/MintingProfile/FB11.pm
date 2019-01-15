@@ -1,7 +1,7 @@
 package Dist::Zilla::MintingProfile::FB11;
 
 # ABSTRACT: Mints a new FB11 site
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 use Moose;
 use 5.014;
 with 'Dist::Zilla::Role::MintingProfile::ShareDir';
@@ -23,7 +23,7 @@ Dist::Zilla::MintingProfile::FB11 - Mints a new FB11 site
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 NAME
 

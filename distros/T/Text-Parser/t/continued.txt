@@ -1,0 +1,3 @@
+Some text on this line is being continued on the next \
+line with the back-slash character. This is more readable \
+than having the whole text on one single line.

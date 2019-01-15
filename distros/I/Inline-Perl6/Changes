@@ -1,3 +1,10 @@
+0.09 2019-01-15 15:00 CET
+    - Use the same perl6-m executable from configure time also at runtime
+    - Support nqp with non-standard libdir
+    - Disable broken test for now - needs rethinking
+0.08 2016-12-02 16:45 CET
+    - Remove the need for manually calling initialize
+    - Optimize GC in multi threaded programs
 0.06 2016-08-05 17:00 CEST
     - Update for compatibility with current MoarVM
 0.05 2016-03-07 11:30 CET

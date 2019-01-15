@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the AcousticBrainz API
 
-our $VERSION = '0.0300';
+our $VERSION = '0.0301';
 
 use Moo;
 use strictures 2;
@@ -84,7 +84,7 @@ WebService::AcousticBrainz - Access to the AcousticBrainz API
 
 =head1 VERSION
 
-version 0.0300
+version 0.0301
 
 =head1 SYNOPSIS
 
@@ -143,7 +143,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

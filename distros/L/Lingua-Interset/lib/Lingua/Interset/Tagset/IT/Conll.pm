@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::IT::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.012';
+our $VERSION = '3.013';
 
 use utf8;
 use open ':utf8';
@@ -509,7 +509,7 @@ Lingua::Interset::Tagset::IT::Conll - Driver for the Italian tagset of the CoNLL
 
 =head1 VERSION
 
-version 3.012
+version 3.013
 
 =head1 SYNOPSIS
 
@@ -542,7 +542,7 @@ Dan Zeman <zeman@ufal.mff.cuni.cz>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Univerzita Karlova (Charles University).
+This software is copyright (c) 2019 by Univerzita Karlova (Charles University).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

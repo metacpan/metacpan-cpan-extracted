@@ -39,6 +39,7 @@
             "Mojo::JSON::MaybeXS" : "0",
             "Mojo::URL" : "0",
             "Mojo::UserAgent" : "0",
+            "Mojolicious" : "8",
             "Moo" : "2",
             "namespace::clean" : "0",
             "perl" : "5.006",
@@ -51,7 +52,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Mojo::Base" : "0",
-            "Mojolicious" : "0",
+            "Mojolicious" : "8",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Try::Tiny" : "0",
@@ -72,7 +73,7 @@
          "web" : "https://github.com/ology/WebService-GetSongBPM"
       }
    },
-   "version" : "0.0300",
+   "version" : "0.0301",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

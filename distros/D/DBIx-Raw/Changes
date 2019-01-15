@@ -1,5 +1,8 @@
 Revision history for DBIx-Raw
 
+0.22  2019-01-14 21:22:51 CST
+        - Try to fix failing test for Windows
+
 0.21  2019-01-13 22:54:57 CST
         - Require strictures 2
 

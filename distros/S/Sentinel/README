@@ -1,112 +1,127 @@
 NAME
-    `Sentinel' - create lightweight SCALARs with get/set callbacks
+
+    Sentinel - create lightweight SCALARs with get/set callbacks
 
 SYNOPSIS
-     package Some::Class;
 
-     use Sentinel;
-
-     sub foo :lvalue
-     {
-        my $self = shift;
-        sentinel get => sub { return $self->get_foo },
-                 set => sub { $self->set_foo( $_[0] ) };
-     }
-
-     sub bar :lvalue
-     {
-        my $self = shift;
-        sentinel value => $self->get_bar,
-                 set   => sub { $self->set_bar( $_[0] ) };
-     }
-
-     sub splot :lvalue
-     {
-        sentinel obj => shift, get => \&get_splot, set => \&set_splot;
-     }
-
-     sub wibble :lvalue
-     {
-        sentinel obj => shift, get => "get_wibble", set => "set_wibble";
-     }
+       package Some::Class;
+    
+       use Sentinel;
+    
+       sub foo :lvalue
+       {
+          my $self = shift;
+          sentinel get => sub { return $self->get_foo },
+                   set => sub { $self->set_foo( $_[0] ) };
+       }
+    
+       sub bar :lvalue
+       {
+          my $self = shift;
+          sentinel value => $self->get_bar,
+                   set   => sub { $self->set_bar( $_[0] ) };
+       }
+    
+       sub splot :lvalue
+       {
+          sentinel obj => shift, get => \&get_splot, set => \&set_splot;
+       }
+    
+       sub wibble :lvalue
+       {
+          sentinel obj => shift, get => "get_wibble", set => "set_wibble";
+       }
 
 DESCRIPTION
-    This module provides a single lvalue function, `sentinel', which yields
-    a scalar that invoke callbacks to get or set its value. Primarily this
-    is useful to create lvalue object accessors or other functions, to
-    invoke actual code when a new value is set, rather than simply updating
-    a scalar variable.
+
+    This module provides a single lvalue function, sentinel, which yields a
+    scalar that invoke callbacks to get or set its value. Primarily this is
+    useful to create lvalue object accessors or other functions, to invoke
+    actual code when a new value is set, rather than simply updating a
+    scalar variable.
 
 FUNCTIONS
-  $scalar = sentinel %args
-    Returns (as an lvalue) a scalar with magic attached to it. This magic is
-    used to get the value of the scalar, or to inform of a new value being
-    set, by invoking callback functions supplied to the sentinel. Takes the
-    following named arguments:
+
+ sentinel
+
+       $scalar = sentinel %args
+
+    Returns (as an lvalue) a scalar with magic attached to it. This magic
+    is used to get the value of the scalar, or to inform of a new value
+    being set, by invoking callback functions supplied to the sentinel.
+    Takes the following named arguments:
 
     get => CODE
-            A `CODE' reference or `obj' method name to invoke when the value
-            of the scalar is read, to obtain its value. The value returned
-            from this code will appear as the value of the scalar.
+
+      A CODE reference or obj method name to invoke when the value of the
+      scalar is read, to obtain its value. The value returned from this
+      code will appear as the value of the scalar.
 
     set => CODE
-            A `CODE' reference or `obj' method name to invoke when a new
-            value for the scalar is written. The code will be passed the new
-            value as its only argument.
+
+      A CODE reference or obj method name to invoke when a new value for
+      the scalar is written. The code will be passed the new value as its
+      only argument.
 
     value => SCALAR
-            If no `get' callback is provided, this value is given as the
-            initial value of the scalar. If the scalar manages to survive
-            longer than a single assignment, its value on read will retain
-            the last value set to it.
+
+      If no get callback is provided, this value is given as the initial
+      value of the scalar. If the scalar manages to survive longer than a
+      single assignment, its value on read will retain the last value set
+      to it.
 
     obj => SCALAR
-            Optional value to pass as the first argument into the `get' and
-            `set' callbacks. If this value is provided, then the `get' and
-            `set' callbacks may be given as direct sub references to object
-            methods, or simply method names, rather than closures that
-            capture the referent object. This avoids the runtime overhead of
-            creating lots of small one-use closures around the object.
+
+      Optional value to pass as the first argument into the get and set
+      callbacks. If this value is provided, then the get and set callbacks
+      may be given as direct sub references to object methods, or simply
+      method names, rather than closures that capture the referent object.
+      This avoids the runtime overhead of creating lots of small one-use
+      closures around the object.
 
 MUTATION ACCESSORS
+
     A useful behaviour of this module is generation of mutation accessor
-    methods that automatically wrap `get_'/`set_' accessor/mutator pairs:
+    methods that automatically wrap get_/set_ accessor/mutator pairs:
 
-     foreach (qw( name address age height )) {
-        my $name = $_;
+       foreach (qw( name address age height )) {
+          my $name = $_;
+    
+          no strict 'refs';
+          *$name = sub :lvalue {
+             sentinel obj => shift, get => "get_$name", set => "set_$name";
+          };
+       }
 
-        no strict 'refs';
-        *$name = sub :lvalue {
-           sentinel obj => shift, get => "get_$name", set => "set_$name";
-        };
-     }
+    This is especially useful for methods whose values are simple strings
+    or numbers, because they allow Perl's rich set of mutation operators to
+    be applied to the object's values.
 
-    This is especially useful for methods whose values are simple strings or
-    numbers, because they allow Perl's rich set of mutation operators to be
-    applied to the object's values.
-
-     $obj->name =~ s/-/_/g;
-
-     substr( $obj->address, 100 ) = "";
-
-     $obj->age++;
-
-     $obj->height /= 100;
+       $obj->name =~ s/-/_/g;
+    
+       substr( $obj->address, 100 ) = "";
+    
+       $obj->age++;
+    
+       $obj->height /= 100;
 
 XS vs PUREPERL
-    If an XS compiler is available at build time, this module is implemented
-    using XS. If not, it falls back on an implementation using a `tie'd
-    scalar. A pureperl installation can also be requested at build time by
-    passing the `--pp' argument to Build.PL:
 
-     $ perl Build.PL --pp
-     $ ./Build
+    If an XS compiler is available at build time, this module is
+    implemented using XS. If not, it falls back on an implementation using
+    a tied scalar. A pureperl installation can also be requested at build
+    time by passing the --pp argument to Build.PL:
+
+       $ perl Build.PL --pp
+       $ ./Build
 
 ACKNOWLEDGEMENTS
-    With thanks to `leont', `Zefram', and others from `irc.perl.org/#p5p'
-    for assisting with trickier bits of XS logic. Thanks to `mst' for
-    suggesting a pureperl implementation for XS-challenged systems.
+
+    With thanks to leont, Zefram, and others from irc.perl.org/#p5p for
+    assisting with trickier bits of XS logic. Thanks to mst for suggesting
+    a pureperl implementation for XS-challenged systems.
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

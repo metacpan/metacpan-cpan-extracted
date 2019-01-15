@@ -30,8 +30,8 @@ share/profiles/Form/profile.ini
 share/profiles/default/FB11.pm
 share/profiles/default/profile.ini
 share/profiles/default/skel/.gitignore
-share/profiles/default/skel/CATNAME.conf
 share/profiles/default/skel/CATNAME.psgi
+share/profiles/default/skel/CATNAME.yml
 share/profiles/default/skel/Dockerfile
 share/profiles/default/skel/Makefile
 share/profiles/default/skel/cpanfile

@@ -17,7 +17,7 @@ use TypeLibrary::FromXSD;
         output      => $file,
     );
 
-    my $code = $tl->_module_header( 'MyTestOutput', 'Hallo' );
+    my $code = $tl->_module_header( 'MyTestOutput', '0.02', 'Hallo' );
 
     like $code, qr/package MyTestOutput;/;
     like $code, qr/VERSION = 0.02/;

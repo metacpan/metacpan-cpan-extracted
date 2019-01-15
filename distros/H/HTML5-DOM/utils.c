@@ -448,7 +448,7 @@ void html5_dom_recursive_node_inner_text(myhtml_tree_node_t *node, html5_dom_inn
 				continue;
 			
 			// collapse spaces
-			if (isspace(text[i])) {
+			if (isspace(text[i]) && (text[i] != '\xA0' || !i || text[i - 1] != '\xC2') && text[i] != '\xC2') {
 				bool skip_spaces = (state->value.length > 0 && state->value.data[state->value.length - 1] == ' ') || state->new_line;
 				if (skip_spaces)
 					continue;

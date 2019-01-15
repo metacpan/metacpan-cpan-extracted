@@ -1,5 +1,10 @@
 Revision history for Perl extension Net::DNS::Native
 
+0.19  Wed Jan 16 00:07:08 +07 2019
+    - Prevent file descriptors leak on exec (#gh5)
+    - Mention that pthreads are linked by default since perl 5.22 (#gh6)
+    - Do not make noise during global destruction
+
 0.18  Sat Feb 10 21:41:32 DST 2018
     - Fix possible hanging during destruction
 

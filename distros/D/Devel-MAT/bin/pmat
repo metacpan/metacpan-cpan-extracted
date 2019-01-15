@@ -4,10 +4,9 @@ use strict;
 use warnings;
 
 use Devel::MAT;
+use Devel::MAT::Cmd::Terminal;
 use Getopt::Long qw( :config no_permute );
-use String::Tagged 0.15;  # sprintf
-use String::Tagged::Terminal 0.03;  # ->print_to_terminal
-use Commandable::Invocation;
+use Commandable::Invocation 0.03; # ->new_from_tokens
 
 use constant CAN_COLOUR => -t STDERR;
 
@@ -39,69 +38,12 @@ if( !$QUIET ) {
       ->run_cmd( Commandable::Invocation->new( "" ) );
 }
 
-sub Devel::MAT::Cmd::printf
-{
-   shift;
-   my ( $fmt, @args ) = @_;
-
-   my $str = String::Tagged::Terminal->from_sprintf( $fmt, @args );
-
-   CAN_COLOUR ? $str->print_to_terminal : print "$str";
-
-   return length $str;
-}
-
-my @FG = (
-   3, # yellow
-   6, # cyan
-   5, # magenta
-);
-
-sub Devel::MAT::Cmd::format_note
-{
-   shift;
-   my ( $str, $idx ) = @_;
-   $idx //= 0;
-
-   return String::Tagged->new_tagged( $str,
-      bold    => 1,
-      fgindex => $FG[$idx % 3],
-   );
-}
-
-sub Devel::MAT::Cmd::_format_sv
-{
-   shift;
-   my ( $ret, $sv ) = @_;
-
-   return String::Tagged->new_tagged( $ret, bold => 1, italic => 1 );
-}
-
-sub Devel::MAT::Cmd::_format_value
-{
-   shift;
-   return String::Tagged->new_tagged( $_[0], fgindex => 5+8 );
-}
-
-sub Devel::MAT::Cmd::format_symbol
-{
-   shift;
-   my ( $name ) = @_;
-
-   return String::Tagged->new_tagged( $name,
-      fgindex => 2,
-   );
-}
-
 if( @ARGV ) {
    my $cmd = shift @ARGV;
 
-   # We'll have to synthesize a suitable string
-   my $text = join " ", map { m/\s/ ? qq("$_") : $_ } @ARGV;
-
    $pmat->load_tool_for_command( $cmd,
       progress => $progress,
-   )->run_cmd( Commandable::Invocation->new( $text ) );
+   )->run_cmd( Commandable::Invocation->new_from_tokens( @ARGV ) );
 
    # Finish the pagination output
    Devel::MAT::Tool::more->run while Devel::MAT::Tool::more->can_more;

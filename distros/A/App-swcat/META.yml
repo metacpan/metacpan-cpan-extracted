@@ -45,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-swcat
   homepage: https://metacpan.org/release/App-swcat
   repository: git://github.com/perlancar/perl-App-swcat.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

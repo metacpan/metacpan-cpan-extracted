@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
 use Sentinel;
 
@@ -18,3 +18,5 @@ is( $getcount, 0, '$getcount 0 before get' );
 is( $$vref, "Another value", 'dereference vref yields value' );
 
 is( $getcount, 1, '$getcount 1 after get' );
+
+done_testing;

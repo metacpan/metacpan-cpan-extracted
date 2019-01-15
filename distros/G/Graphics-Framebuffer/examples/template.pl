@@ -4,7 +4,7 @@ use strict;
 # use warnings; # Use just for development, otherwise leave warnings off
 
 # We use Time::HiRes for the alarm, and we need fractions of a second.
-use Time::HiRes qw(alarm);
+use Time::HiRes qw(alarm time sleep);
 use Graphics::Framebuffer;
 
 ## Initialize any global variables here
@@ -23,13 +23,13 @@ our ($PFB,$DFB); # The framebuffer objects MUST be as global as possible
 unless ($double_buffer) {
     $DFB = Graphics::Framebuffer->new(
         'FB_DEVICE' => $device,
-        'SPLASH' => 0,
+        'SPLASH'    => 0,
     );
 } else { # This is best used in this way for 16 bit mode only
     ($PFB,$DFB) = Graphics::Framebuffer->new(
         'FB_DEVICE'     => $device,
         'DOUBLE_BUFFER' => TRUE,
-        'SPLASH' => 0,
+        'SPLASH'        => 0,
     );
 }
 

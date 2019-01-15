@@ -2,28 +2,19 @@ package Module::CPANTS::Analyse;
 use 5.006;
 use strict;
 use warnings;
-use base qw(Class::Accessor);
+use base qw(Class::Accessor::Fast);
 use File::Temp qw(tempdir);
 use File::Spec::Functions qw(catfile catdir splitpath);
 use File::Copy;
 use File::stat;
 use Archive::Any::Lite;
 use Carp;
-use IO::Capture::Stdout;
-use IO::Capture::Stderr;
 use CPAN::DistnameInfo;
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
-# setup logger
-if (! main->can('logger')) {
-    *main::logger = sub {
-        print "## $_[0]\n" if $main::logging;
-    };
-}
-
-__PACKAGE__->mk_accessors(qw(dist opts tarball distdir d mck capture_stdout capture_stderr));
+__PACKAGE__->mk_accessors(qw(dist opts tarball distdir d mck));
 __PACKAGE__->mk_accessors(qw(_testdir _dont_cleanup _tarball _x_opts));
 
 sub import {
@@ -33,29 +24,19 @@ sub import {
 }
 
 sub new {
-    my $class=shift;
-    my $opts=shift || {};
-    $opts->{d}={};
+    my $class = shift;
+    my $opts = shift || {};
+    $opts->{d} = {};
     $opts->{opts} ||= {};
-    my $me=bless $opts,$class;
-    $main::logging = 1 if $me->opts->{verbose};
+    my $me = bless $opts, $class;
     Carp::croak("need a dist") if not defined $opts->{dist};
-    main::logger("distro: $opts->{dist}");
 
     $me->mck(Module::CPANTS::Kwalitee->new);
 
     # For Test::Kwalitee and friends
     $me->d->{is_local_distribution} = 1 if -d $opts->{dist};
-    
-    unless ($me->opts->{no_capture} or $INC{'Test/More.pm'}) {
-        my $cserr=IO::Capture::Stderr->new;
-        my $csout=IO::Capture::Stdout->new;
-        $cserr->start;
-        $csout->start;
-        $me->capture_stderr($cserr);
-        $me->capture_stdout($csout);
-    }
-    return $me; 
+
+    return $me;
 }
 
 sub run {
@@ -67,104 +48,116 @@ sub run {
 }
 
 sub unpack {
-    my $me=shift;
+    my $me = shift;
     return 'cant find dist' unless $me->dist;
 
-    my $di=CPAN::DistnameInfo->new($me->dist);
-    my $ext=$di->extension || 'unknown';
-    
-    $me->d->{package}=$di->filename;
-    $me->d->{vname}=$di->distvname;
-    $me->d->{extension}=$ext;
-    $me->d->{version}=$di->version;
-    $me->d->{dist}=$di->dist;
-    $me->d->{author}=$di->cpanid;
+    my $di = CPAN::DistnameInfo->new($me->dist);
+    my $ext = $di->extension || 'unknown';
+
+    $me->d->{package} = $di->filename;
+    $me->d->{vname} = $di->distvname;
+    $me->d->{extension} = $ext;
+    $me->d->{version} = $di->version;
+    $me->d->{dist} = $di->dist;
+    $me->d->{author} = $di->cpanid;
     $me->d->{released} = stat($me->dist)->mtime;
-    $me->d->{size_packed}=-s $me->dist;
+    $me->d->{size_packed} = -s $me->dist;
 
     unless($me->d->{package}) {
-        $me->d->{package}=$me->tarball;
+        $me->d->{package} = $me->tarball;
     }
 
-    copy($me->dist,$me->testfile);
+    copy($me->dist, $me->testfile);
 
+    my @pax_headers;
     eval {
-        my $archive=Archive::Any::Lite->new($me->testfile);
-        $archive->extract($me->testdir);
+        my $archive = Archive::Any::Lite->new($me->testfile);
+        $archive->extract($me->testdir, {tar_filter_cb => sub {
+            my $entry = shift;
+            if ($entry->name eq Archive::Tar::Constant::PAX_HEADER() or $entry->type eq 'x' or $entry->type eq 'g') {
+                push @pax_headers, $entry->name;
+                return;
+            }
+            return 1;
+        }});
     };
+    if (@pax_headers) {
+        $me->d->{no_pax_headers} = 0;
+        $me->d->{error}{no_pax_headers} = join ',', @pax_headers;
+    } else {
+        $me->d->{no_pax_headers} = 1;
+    }
 
-    if (my $error=$@) {
-        if (not $INC{'Test/More.pm'}) {
-            $me->capture_stdout->stop;
-            $me->capture_stderr->stop;
-        }
-        $me->d->{extractable}=0;
-        $me->d->{error}{extractable}=$error;
-        $me->d->{kwalitee}{extractable}=0;
-        my ($vol,$dir,$name)=splitpath($me->dist);
-        $name=~s/\..*$//;
-        $name=~s/\-[\d\.]+$//;
-        $name=~s/\-TRIAL[0-9]*//;
-        $me->d->{dist}=$name;
+    if (my $error = $@) {
+        $me->d->{extractable} = 0;
+        $me->d->{error}{extractable} = $error;
+        $me->d->{kwalitee}{extractable} = 0;
+        my ($vol, $dir, $name) = splitpath($me->dist);
+        $name =~ s/\..*$//;
+        $name =~ s/\-[\d\.]+$//;
+        $name =~ s/\-TRIAL[0-9]*//;
+        $me->d->{dist} = $name;
         return $error;
     }
-    
-    $me->d->{extractable}=1;
+
+    $me->d->{extractable} = 1;
     unlink($me->testfile);
-   
-    opendir(my $fh_testdir,$me->testdir) || die "Cannot open ".$me->testdir.": $!";
-    my @stuff=grep {/\w/} readdir($fh_testdir);
+
+    opendir(my $fh_testdir, $me->testdir) or die "Cannot open ".$me->testdir.": $!";
+    my @stuff = grep {/\w/} readdir($fh_testdir);
 
     if (@stuff == 1) {
-        $me->distdir(catdir($me->testdir,$stuff[0]));
+        $me->distdir(catdir($me->testdir, $stuff[0]));
         if (-d $me->distdir) {
 
           my $vname = $di->distvname;
           $vname =~ s/\-TRIAL[0-9]*//;
 
-          $me->d->{extracts_nicely}=1 if $vname eq $stuff[0];
+          $me->d->{extracts_nicely} = 1;
+          if ($vname eq $stuff[0]) {
+            $me->d->{error}{extracts_nicely} = "expected $vname but got $stuff[0]";
+          }
         } else {
           $me->distdir($me->testdir);
-          $me->d->{extracts_nicely}=0;
+          $me->d->{extracts_nicely} = 0;
+          $me->d->{error}{extracts_nicely} = join ",", @stuff;
         }
     } else {
         $me->distdir($me->testdir);
-        $me->d->{extracts_nicely}=0;
+        $me->d->{extracts_nicely} = 0;
+        $me->d->{error}{extracts_nicely} = join ",", @stuff;
     }
     return;
 }
 
 sub analyse {
-    my $me=shift;
+    my $me = shift;
 
     foreach my $mod (@{$me->mck->generators}) {
-        main::logger("analyse $mod");
         $mod->analyse($me);
     }
 }
 
 sub calc_kwalitee {
-    my $me=shift;
+    my $me = shift;
 
-    my $kwalitee=0;
-    $me->d->{kwalitee}={};
+    my $kwalitee = 0;
+    $me->d->{kwalitee} = {};
     my %x_ignore = %{$me->x_opts->{ignore} || {}};
     foreach my $i ($me->mck->get_indicators) {
         next if $i->{needs_db};
-        main::logger($i->{name});
-        my $rv=$i->{code}($me->d, $i);
-        $me->d->{kwalitee}{$i->{name}}=$rv;
+        my $rv = $i->{code}($me->d, $i);
+        $me->d->{kwalitee}{$i->{name}} = $rv;
         if ($x_ignore{$i->{name}} && $i->{ignorable}) {
             $me->d->{kwalitee}{$i->{name}} = 1;
             if ($me->d->{error}{$i->{name}}) {
                 $me->d->{error}{$i->{name}} .= ' [ignored]';
             }
         }
-        $kwalitee+=$rv;
+        $kwalitee += $rv;
     }
 
-    $me->d->{'kwalitee'}{'kwalitee'}=$kwalitee;
-    main::logger("done");
+    $me->d->{'kwalitee'}{'kwalitee'} = $kwalitee;
 }
 
 #----------------------------------------------------------------
@@ -172,7 +165,7 @@ sub calc_kwalitee {
 #----------------------------------------------------------------
 
 sub testdir {
-    my $me=shift;
+    my $me = shift;
     return $me->_testdir if $me->_testdir;
     if ($me->_dont_cleanup) {
         return $me->_testdir(tempdir());
@@ -182,14 +175,14 @@ sub testdir {
 }
 
 sub testfile {
-    my $me=shift;
-    return catfile($me->testdir,$me->tarball); 
+    my $me = shift;
+    return catfile($me->testdir, $me->tarball);
 }
 
 sub tarball {
-    my $me=shift;
+    my $me = shift;
     return $me->_tarball if $me->_tarball;
-    my (undef,undef,$tb)=splitpath($me->dist);
+    my (undef, undef, $tb) = splitpath($me->dist);
     return $me->_tarball($tb);
 }
 
@@ -225,8 +218,8 @@ Module::CPANTS::Analyse - Generate Kwalitee ratings for a distribution
 
     use Module::CPANTS::Analyse;
 
-    my $analyser=Module::CPANTS::Analyse->new({
-        dist=>'path/to/Foo-Bar-1.42.tgz',
+    my $analyser = Module::CPANTS::Analyse->new({
+        dist => 'path/to/Foo-Bar-1.42.tgz',
     });
     $analyser->run;
     # results are in $analyser->d;
@@ -237,7 +230,7 @@ Module::CPANTS::Analyse - Generate Kwalitee ratings for a distribution
 
 =head3 new
 
-  my $analyser=Module::CPANTS::Analyse->new({dist=>'path/to/file'});
+  my $analyser = Module::CPANTS::Analyse->new({dist => 'path/to/file'});
 
 Plain old constructor.
 
@@ -253,7 +246,7 @@ Run all analysers (defined in C<Module::CPANTS::Kwalitee::*> on the dist.
 
 =head3 calc_kwalitee
 
-Check if the dist conforms to the Kwalitee indicators. 
+Check if the dist conforms to the Kwalitee indicators.
 
 =head3 run
 
@@ -284,7 +277,7 @@ L<http://cpants.cpanauthors.org/>
 =head1 BUGS
 
 Please report any bugs or feature requests, or send any patches, to
-bug-module-cpants-analyse at rt.cpan.org, or through the web interface at
+C<bug-module-cpants-analyse at rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-CPANTS-Analyse>.
 I will be notified, and then you'll automatically be notified of progress
 on your bug as I make changes.

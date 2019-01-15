@@ -15,13 +15,16 @@ my $BRREG_TIMEOUT = 60; # secs (default is 180 secs but we want shorter time).
 
 my $MAX_PAGES = 10; # max pages to fetch if no max is specified
 
-my $BRREG = "http://data.brreg.no/enhetsregisteret";
+my $BRREG     = "https://data.brreg.no/enhetsregisteret/api";
+my $BRREG_UPD = "https://data.brreg.no/enhetsregisteret/api/oppdateringer";
 
 my @module_methods = qw /
 
     lookup_orgno
     lookup_orgname
     lookup_reg_dates
+    lookup_update_dates
+
     orgno_ok
 
     status
@@ -46,25 +49,38 @@ __PACKAGE__->mk_accessors(
 ######## L o o k u p
 
 sub lookup_orgno {
-    my ($self, $orgno) = @_;
+    my ($self, $orgno, $sok_underenheter) = @_;
 
+    my $ENHETER="enheter";
+    
+    if ($sok_underenheter) {
+        $ENHETER = "under" . $ENHETER;
+    }
+    
     # validate the organizaton number
     unless (orgno_ok($self, $orgno)) {
-	return $self;
+        return $self;
     }
+    
     ##
     # Use the orgno as key to brreg.
     # Match is only found if number does exist.
     $self->size(0);
-    $self->_lookup_org_entries("$BRREG/enhet/$orgno.json");
+    $self->_lookup_org_entries("$BRREG/$ENHETER/$orgno");
 
 }
 
 sub lookup_orgname {
-    my ($self, $orgname, $max_no_pages) = @_;
+    my ($self, $orgname, $max_no_pages, $sok_underenheter) = @_;
     
     die "mandatory parameter 'orgname' not specified" unless ($orgname);
 
+    my $ENHETER="enheter";
+    
+    if ($sok_underenheter) {
+        $ENHETER = "under" . $ENHETER;
+    }
+    
     my $max_pg_to_fetch = $max_no_pages || $MAX_PAGES;
     
     # Use the orgname as filter in search to brreg
@@ -75,7 +91,7 @@ sub lookup_orgname {
 
     my $onm_e = uri_encode($orgname, {encode_reserved => 1});
 
-    my $BR = "$BRREG/enhet.json?size=100&\$filter=startswith(navn,'$onm_e')";
+    my $BR = "$BRREG/$ENHETER/?size=100&navn=$onm_e";
 
     # First page is 0
     my $pcnt = 0;
@@ -83,37 +99,37 @@ sub lookup_orgname {
     $self->next_page(1); # force the first lookup
 
     while ($self->next_page && $pcnt < $max_pg_to_fetch) {
-	#print STDERR "Page count is: $pcnt, fetching next page...\n";
-	$self->_lookup_org_entries("$BR&page=$pcnt");
-	++$pcnt;
+        #print STDERR "Page count is: $pcnt, fetching next page...\n";
+        $self->_lookup_org_entries("$BR&page=$pcnt");
+        ++$pcnt;
     }
 }
 
 sub lookup_reg_dates {
-    my ($self, $from_date, $to_date, $max_no_pages) = @_;
+    my ($self, $from_date, $to_date, $max_no_pages, $sok_underenheter) = @_;
 
     my $max_pg_to_fetch = $max_no_pages || $MAX_PAGES;
 
-    # Use the from / to dates as filter for lookup on 
-    # registration dates
-    my $rdateF = "registreringsdatoEnhetsregisteret";
-    my $ztime = "T00:00";
-    my $dateFilter;
-    if ($from_date && !$to_date) {
-	$from_date .= $ztime;
-	$dateFilter = "$rdateF ge datetime'$from_date'";
-    } elsif (!$from_date && $to_date) {
-	$to_date .= $ztime;
-	$dateFilter = "$rdateF le datetime'$to_date'";
-    } else {
-	$from_date .= $ztime;
-	$to_date .= $ztime;
-	
-	$dateFilter = "$rdateF ge datetime'$from_date' and $rdateF le datetime'$to_date'";
+    my $ENHETER="enheter";
+    
+    if ($sok_underenheter) {
+        $ENHETER = "under" . $ENHETER;
     }
     
-    my $df = uri_encode($dateFilter, {encode_reserved => 1});
-    my $BR = "$BRREG/enhet.json?size=100&\$filter=$df";
+    # Use the from / to dates as filter for lookup on 
+    # registration dates
+    my $rdateF = "fraRegistreringsdatoEnhetsregisteret";
+    my $rdateT = "tilRegistreringsdatoEnhetsregisteret";
+    my $dateFilter;
+    if ($from_date && !$to_date) {
+        $dateFilter = "$rdateF=$from_date";
+    } elsif (!$from_date && $to_date) {
+        $dateFilter = "$rdateT=$to_date";
+    } else {
+        $dateFilter = "$rdateF=$from_date&$rdateT=$to_date";
+    }
+    
+    my $BR = "$BRREG/$ENHETER/?size=100&$dateFilter";
       
     # First page is 0
     my $pcnt = 0;
@@ -122,9 +138,49 @@ sub lookup_reg_dates {
 
     # Fetch max 5 pages
     while ($self->next_page && $pcnt < $max_pg_to_fetch) {
-	#print STDERR "Page count is: $pcnt, fetching next page...\n";
-	$self->_lookup_org_entries("$BR&page=$pcnt");
-	++$pcnt;
+        #print STDERR "Page count is: $pcnt, fetching next page...\n";
+        $self->_lookup_org_entries("$BR&page=$pcnt");
+        ++$pcnt;
+    }
+}
+
+
+sub lookup_update_dates {
+    my ($self, $from_date, $update_id, $max_no_pages, $sok_underenheter) = @_;
+
+    my $max_pg_to_fetch = $max_no_pages || $MAX_PAGES;
+
+    my $ENHETER="enheter";
+    
+    if ($sok_underenheter) {
+        $ENHETER = "under" . $ENHETER;
+    }
+    
+    # Use the from / to dates as filter for lookup on 
+    # update date
+    my $updFilter;
+    $from_date .= "T00:00:00.000Z";
+          
+    if ($from_date && !$update_id) {
+        $updFilter = "dato=$from_date";
+    } elsif (!$from_date && $update_id) {
+        $updFilter = "oppdateringsid=$update_id";
+    } else {
+        $updFilter = "dato=$from_date&oppdateringsid=$update_id";
+    }
+    
+    my $BR = "$BRREG_UPD/$ENHETER/?size=100&$updFilter";
+      
+    # First page is 0
+    my $pcnt = 0;
+    $self->size(0);
+    $self->next_page(1); # force the first lookup
+
+    # Fetch max 5 pages
+    while ($self->next_page && $pcnt < $max_pg_to_fetch) {
+        #print STDERR "Page count is: $pcnt, fetching next page...\n";
+        $self->_lookup_org_entries("$BR&page=$pcnt");
+        ++$pcnt;
     }
 }
 
@@ -136,14 +192,14 @@ sub orgno_ok {
     $orgno =~ s/\s+//g;
 
     if ($orgno eq "000000000") {
-	$self->status("Invalid orgno: $orgno");
-	$self->error(1);
-	return 0;
+        $self->status("Invalid orgno: $orgno");
+        $self->error(1);
+        return 0;
     }
     unless ($orgno =~ m/\d{9}/) {
-	$self->status("Organization number $orgno must be 9 digits");
-	$self->error(1);
-	return 0;
+        $self->status("Organization number $orgno must be 9 digits");
+        $self->error(1);
+        return 0;
     }    
     return 1;
 }
@@ -159,52 +215,57 @@ sub _lookup_org_entries {
     my $mech = WWW::Mechanize->new(
         timeout => $BRREG_TIMEOUT,
         autocheck => 0
-	);
+        );
     
     my $resp = $mech->get($URL);
 
     unless ($mech->success) {
-	$self->status($resp->status_line);
-	$self->error(1);
-	$self->next_page(undef);
-	return $self;
+        $self->status($resp->status_line);
+        $self->error(1);
+        $self->next_page(undef);
+        return $self;
     }
 
     my $json = decode_json($mech->text);
 
     if ($json) {
-	$self->raw_json_decoded($json);
-	
-	# Map the json data structure to 
-	# internal entry objects
-	my $eo = NOLookup::Brreg::Entry->new;
-	my $entries = $eo->map_json_entries($json);
+        $self->raw_json_decoded($json);
+        
+        # Map the json data structure to 
+        # internal entry objects
+        my $eo = NOLookup::Brreg::Entry->new;
+        my $entries = $eo->map_json_entries($json);
 
-	# Collect any accumulated problems
-	$self->status($eo->status) if ($eo->status);
-	$self->warning($eo->warning) if ($eo->warning);
-	$self->error($eo->error) if ($eo->error);
+        #print STDERR "Entries: ", Dumper $entries;
+        
+        # Collect any accumulated problems
+        $self->status($eo->status) if ($eo->status);
+        $self->warning($eo->warning) if ($eo->warning);
+        $self->error($eo->error) if ($eo->error);
 
-	# Save the found data
-	if (@$entries) {
-	    push @{$self->{data}}, @$entries;
-	    $self->size($self->size + scalar @$entries);
+        # Save the found data
+        if (@$entries) {
+            push @{$self->{data}}, @$entries;
+            $self->size($self->size + scalar @$entries);
 
-	    if ($eo->next_page) {
-		# more pages are available.
-		$self->next_page($eo->next_page);
-	    } else {
-		# No more pages, all results are returned,
-		# and we know the total_size (=size)
-		# Only if total_size is set, the user can assume
-		# that all data has been fetched.
-		$self->total_size($self->size);
-		$self->next_page(undef);
-	    }
-	} else {
-	    $self->next_page(undef);
-	}
+            if ($eo->next_page) {
+                # more pages are available.
+                $self->next_page($eo->next_page);
+            } else {
+                # No more pages, all results are returned,
+                # and we know the total_size (=totalElementssize)
+                # Only if total_size is set, the user can assume
+                # that all data has been fetched.
+                $self->total_size($self->size);
+                $self->next_page(undef);
+            }
+        } else {
+            $self->next_page(undef);
+        }
     }
+
+    #print STDERR Dumper $self;
+    
     return $self;
 }
 
@@ -216,7 +277,8 @@ sub _lookup_org_entries {
 
 NOLookup::Brreg::DataLookup - Lookup Brreg basic organization data from
 the JSON formatted service offered by the Brreg data API via
-http://data.brreg.no/oppslag/enhetsregisteret/enheter.xhtml
+https://data.brreg.no/enhetsregisteret/oppslag/enheter
+https://data.brreg.no/enhetsregisteret/api/docs/index.html
 
 (Brreg is a short name for 'Brønnysundregistrene, the Norwegian
 Central Organization Registry).
@@ -266,6 +328,22 @@ Returns an array of NOLookup::Brreg::Entry objects in the data
 when matches are found.
 
 A maximum of $max_no_pages pages are fetched, each of 100 entries.
+
+
+=head3 lookup_update_dates()
+
+Lookup based on update date and update id.
+
+The lookup will find updated organizations performed after midnight
+starting on the from date. The minimum update id can also be set.
+
+Returns 0 entries if none found.
+
+Returns an array of NOLookup::Brreg::Entry objects in the data 
+when matches are found.
+
+A maximum of $max_no_pages pages are fetched, each of 100 entries.
+
 
 =head3 orgno_ok()
 
@@ -328,8 +406,8 @@ Please also see the README file in the distribution.
 
 =head1 SEE ALSO
 
-http://www.brreg.no
-http://data.brreg.no/oppslag/enhetsregisteret/enheter.xhtml
+https://www.brreg.no
+https://data.brreg.no/enhetsregisteret/oppslag/enheter
 
 =head1 AUTHOR
 
@@ -337,7 +415,7 @@ Trond Haugen, E<lt>(nospam)info(at)norid.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2017 Trond Haugen <(nospam)info(at)norid.no>.
+Copyright (c) 2017- Trond Haugen <(nospam)info(at)norid.no>.
 All rights reserved.
 
 This program is free software; you can redistribute it and/or modify

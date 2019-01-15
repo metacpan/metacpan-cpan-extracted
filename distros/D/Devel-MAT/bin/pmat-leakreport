@@ -49,6 +49,8 @@ while( my $file = shift @ARGV ) {
    $pmat = Devel::MAT->load( $file, progress => $progress );
    my $svs = list_svs;
 
+   $findex++;
+
    # Any current candidates that aren't now still allocated, are definitely not
    # leaks
    exists $svs->{$_} or delete $candidates{$_}
@@ -64,7 +66,6 @@ while( my $file = shift @ARGV ) {
    exists $previous_svs->{$_} or $candidates{$_} = $findex
       for keys %$svs;
 
-   $findex++;
    $previous_svs = $svs;
 }
 

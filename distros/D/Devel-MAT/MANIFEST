@@ -1,5 +1,6 @@
 bin/pmat
 bin/pmat-cat-svpv
+bin/pmat-counts
 bin/pmat-diff
 bin/pmat-leakreport
 bin/pmat-list-dangling-ptrs
@@ -10,6 +11,7 @@ doc/format.txt
 lib/Devel/MAT.pm
 lib/Devel/MAT.xs
 lib/Devel/MAT/Cmd.pod
+lib/Devel/MAT/Cmd/Terminal.pm
 lib/Devel/MAT/Context.pm
 lib/Devel/MAT/Dumpfile.pm
 lib/Devel/MAT/Graph.pm
@@ -27,6 +29,7 @@ lib/Devel/MAT/Tool/Reachability.pm
 lib/Devel/MAT/Tool/Roots.pm
 lib/Devel/MAT/Tool/Show.pm
 lib/Devel/MAT/Tool/Sizes.pm
+lib/Devel/MAT/Tool/Stack.pm
 lib/Devel/MAT/Tool/Summary.pm
 lib/Devel/MAT/Tool/Symbols.pm
 lib/Devel/MAT/UI.pod

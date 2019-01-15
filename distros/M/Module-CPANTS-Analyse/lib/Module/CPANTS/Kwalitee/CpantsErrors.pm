@@ -3,8 +3,8 @@ use warnings;
 use strict;
 use version;
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
 sub order { 1000 }
 
@@ -13,22 +13,14 @@ sub order { 1000 }
 ##################################################################
 
 sub analyse {
-    my $class=shift;
-    my $me=shift;
+    # NOTE: CPANTS error should be logged somewhere, but it
+    # should not annoy people. If anything wrong or interesting
+    # is found in the log, add some metrics (if it's worth),
+    # or just fix our problems.
 
-    return if $me->opts->{no_capture} or $INC{'Test/More.pm'};
-
-    my $sout=$me->capture_stdout;
-    my $serr=$me->capture_stderr;
-    $sout->stop;
-    $serr->stop;
-
-    my @eout=$sout->read;
-    my @eerr=$serr->read;
-    
-    if (@eerr || @eout) {
-        $me->d->{error}{cpants}=join("\n",'STDERR:',@eerr,'STDOUT:',@eout);
-    }
+    # Note also that this stub should not be removed so that
+    # this can replace the old ::CpantsErrors module, and the old
+    # metrics will not be loaded while loading plugins.
 }
 
 
@@ -37,11 +29,6 @@ sub analyse {
 ##################################################################
 
 sub kwalitee_indicators {
-    # NOTE: CPANTS error should be logged somewhere, but it
-    # should not annoy people. If anything wrong or interesting
-    # is found in the log, add some metrics (if it's worth),
-    # or just fix our problems.
-
     # Older Test::Kwalitee (prior to 1.08) has hardcoded metrics
     # names in it, and if those metrics are gone from
     # Module::CPANTS::Kwalitee, it fails because the number of tests
@@ -89,7 +76,7 @@ Uses C<IO::Capture::Stdout> to check for any strange things that might happen du
 
 =head3 kwalitee_indicators
 
-Returns the Kwalitee Indicators datastructure.
+Returns the Kwalitee Indicators data structure.
 
 =head1 SEE ALSO
 

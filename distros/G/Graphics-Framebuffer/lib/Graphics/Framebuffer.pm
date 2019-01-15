@@ -74,7 +74,7 @@ If you are using a Debian based system (Ubuntu, Weezy, Mint, etc.) then run the 
 
  sudo apt update
  sudo apt upgrade
- sudo apt install build-essential linux-headers-generic fbset libimager-perl libinline-c-perl libmath-bezier-perl libmath-gradient-perl libsys-mmap-perl libtest-most-perl
+ sudo apt install build-essential linux-headers-generic fbset libimager-perl libinline-c-perl libmath-bezier-perl libmath-gradient-perl libfile-map-perl libtest-most-perl
 
 =back
 
@@ -84,7 +84,7 @@ If you are using a RedHat based system (Fedora, CentOS, etc):
 
  sudo yum update
  sudo yum upgrade
- sudo yum upgrade kernel-headers build-essential perl-math-bezier perl-math-gradient perl-sys-mmap perl-imager perl-inline-c perl-test-most
+ sudo yum upgrade kernel-headers build-essential perl-math-bezier perl-math-gradient perl-file-map perl-imager perl-inline-c perl-test-most
 
 =back
 
@@ -384,7 +384,7 @@ use Math::Trig;                                                     # Usually on
 use Math::Bezier;                                                   # Bezier curve calculations done here.
 use Math::Gradient qw( gradient array_gradient multi_gradient );    # Awesome gradient calculation module
 use List::Util qw(min max);                                         # min and max are very handy!
-use Sys::Mmap;                                                      # Absolutely necessary to map the screen to a string.
+use File::Map 'map_handle';                                         # Absolutely necessary to map the screen to a string.
 use Imager;                                                         # This is used for TrueType font printing, image loading.
 use Imager::Matrix2d;
 use Imager::Fill;
@@ -401,7 +401,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.13';
+    our $VERSION   = '6.14';
     our @ISA       = qw(Exporter Graphics::Framebuffer::Splash);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -2849,8 +2849,14 @@ sub new {
 
         # Now that everything is set up, let's map the framebuffer to SCREEN
 
-        eval {
-            $self->{'SCREEN_ADDRESS'} = mmap($self->{'SCREEN'}, $self->{'fscreeninfo'}->{'smem_len'}, PROT_READ | PROT_WRITE, MAP_SHARED, $self->{'FB'});
+        eval { # We use the more stable File::Map now
+            $self->{'SCREEN_ADDRESS'} = map_handle(
+                $self->{'SCREEN'},
+                $self->{'FB'},
+                '+<',
+                0,
+                $self->{'fscreeninfo'}->{'smem_len'},
+            );
         };
         if ($@) {
             print STDERR qq{
@@ -3054,16 +3060,17 @@ sub _reset {
     exec('reset');
 }
 
-# Fixes the mmapping if Perl garbage collects (naughty Perl)
-sub _fix_mapping {
+# Fixes the mapping if Perl garbage collects (naughty Perl)
+sub _fix_mapping { # File::Map SHOULD make this obsolete
     my $self = shift;
-    munmap($self->{'SCREEN'});
+    unmap($self->{'SCREEN'});
     unless (defined($self->{'FB'})) {
         eval { close($self->{'FB'}); };
         open($self->{'FB'}, '+<', $self->{'FB_DEVICE'});
     }
     $self->{'MAP_ATTEMPTS'}++;
-    $self->{'SCREEN_ADDRESS'} = mmap($self->{'SCREEN'}, $self->{'fscreeninfo'}->{'smem_len'}, PROT_READ | PROT_WRITE, MAP_SHARED, $self->{'FB'});
+    # Wo don't eval, because it worked originally
+    $self->{'SCREEN_ADDRESS'} = map_handle($self->{'SCREEN'}, $self->{'FB'}, '+<', 0, $self->{'fscreeninfo'}->{'smem_len'});
 }
 
 # Determine the color order the video card uses
@@ -3096,11 +3103,11 @@ sub _color_order {
 sub _screen_close {
     my $self = shift;
     unless (defined($self->{'ERROR'})) {    # Only do it if not in emulation mode
-        munmap($self->{'SCREEN'}) if (defined($self->{'SCREEN'}));
+        unmap($self->{'SCREEN'}) if (defined($self->{'SCREEN'}));
         close($self->{'FB'}) if (defined($self->{'FB'}));
-        delete($self->{'FB'});              # We leave no remnants MUHWAHAHAHAHA!!!
+        delete($self->{'FB'});              # We leave no remnants
     }
-    delete($self->{'SCREEN'});              # MUHWAHAHAHA!!
+    delete($self->{'SCREEN'});
 }
 
 =head2 screen_dimensions
@@ -8814,7 +8821,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-Version 6.13 (Jan 10, 2019)
+Version 6.14 (Jan 15, 2019)
 
 =head1 THANKS
 

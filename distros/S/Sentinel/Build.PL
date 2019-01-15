@@ -17,10 +17,10 @@ printf STDERR "Building for %s implementation\n", $build_xs ? "XS" : "PP";
 my $build = Module::Build->new(
    module_name => 'Sentinel',
    configure_requires => {
-      'Module::Build' => 0,
+      'Module::Build' => '0.4004', # test_requires
    },
-   build_requires => {
-      'Test::More' => 0,
+   test_requires => {
+      'Test::More' => '0.88', # done_testing
       'Test::Refcount' => 0,
    },
    requires => {
@@ -28,7 +28,6 @@ my $build = Module::Build->new(
    },
    ( $build_xs ? () : ( xs_files => {} ) ),
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

@@ -2,39 +2,55 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
 
 use Test::More;
 
-plan tests => 18 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 32 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/TextTableUtils.pm'
 );
 
 my @scripts = (
-    'bin/csv2ansitable',
-    'bin/csv2asciitable',
-    'bin/csv2dd',
-    'bin/csv2json',
-    'bin/csv2mdtable',
-    'bin/csv2orgtable',
-    'bin/dd2ansitable',
-    'bin/dd2asciitable',
-    'bin/dd2csv',
-    'bin/dd2mdtable',
-    'bin/dd2orgtable',
-    'bin/json2ansitable',
-    'bin/json2asciitable',
-    'bin/json2csv',
-    'bin/json2mdtable',
-    'bin/json2orgtable',
-    'bin/texttableutils-convert'
+    'script/csv2ansitable',
+    'script/csv2asciitable',
+    'script/csv2dd',
+    'script/csv2json',
+    'script/csv2mdtable',
+    'script/csv2orgtable',
+    'script/csv2texttable',
+    'script/csv2tsv',
+    'script/dd2ansitable',
+    'script/dd2asciitable',
+    'script/dd2csv',
+    'script/dd2mdtable',
+    'script/dd2orgtable',
+    'script/dd2texttable',
+    'script/dd2tsv',
+    'script/json2ansitable',
+    'script/json2asciitable',
+    'script/json2csv',
+    'script/json2mdtable',
+    'script/json2orgtable',
+    'script/json2texttable',
+    'script/json2tsv',
+    'script/texttableutils-convert',
+    'script/tsv2ansitable',
+    'script/tsv2asciitable',
+    'script/tsv2csv',
+    'script/tsv2dd',
+    'script/tsv2json',
+    'script/tsv2mdtable',
+    'script/tsv2orgtable',
+    'script/tsv2texttable'
 );
 
 # no fake home requested
 
-my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
+my @switches = (
+    -d 'blib' ? '-Mblib' : '-Ilib',
+);
 
 use File::Spec;
 use IPC::Open3;
@@ -48,7 +64,11 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-e', "require q[$lib]"))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
@@ -70,11 +90,15 @@ foreach my $file (@scripts)
     my $line = <$fh>;
 
     close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
-    my @flags = $1 ? split(' ', $1) : ();
+    @switches = (@switches, split(' ', $1)) if $1;
 
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, @flags, '-c', $file);
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-c', $file))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-c', $file);
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);

@@ -8,7 +8,7 @@ package Devel::MAT::Tool;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use List::Util qw( any );
 use Commandable::Invocation;
@@ -87,7 +87,6 @@ sub get_sv_from_inv
 use constant CMD_OPTS => ();
 use constant CMD_ARGS_SV => 0;
 use constant CMD_ARGS => ();
-use constant CMD_SUBS => ();
 
 sub find_subcommand
 {
@@ -101,16 +100,10 @@ sub find_subcommand
    );
 }
 
-sub run_cmd
+sub parse_cmd
 {
    my $self = shift;
    my ( $inv ) = @_;
-
-   # TODO: consider what happens if parent commands have CMD_OPTS
-   if( my @subs = $self->CMD_SUBS ) {
-      my $subcmd = $inv->pull_token // $subs[0];
-      return $self->find_subcommand( $subcmd )->run_cmd( $inv );
-   }
 
    my @args;
 
@@ -126,7 +119,15 @@ sub run_cmd
       push @args, $self->get_args_from_inv( $inv, @argspec );
    }
 
-   $self->run( @args );
+   return @args;
+}
+
+sub run_cmd
+{
+   my $self = shift;
+   my ( $inv ) = @_;
+
+   $self->run( $self->parse_cmd( $inv ) );
 }
 
 sub get_opts_from_inv

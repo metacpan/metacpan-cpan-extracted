@@ -2,8 +2,8 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
@@ -18,7 +18,7 @@ binmode(STDOUT, ':utf8');
 binmode(STDERR, ':utf8');
 # We must declare in advance how many tests we are going to perform.
 # There are currently three tests per tagset driver.
-use Test::More tests => 59*3;
+use Test::More tests => 60*3;
 use Lingua::Interset qw(get_driver_object);
 use Lingua::Interset::Tagset;
 
@@ -49,6 +49,7 @@ my @tagsets =
     'it::conll',
     'ja::conll', 'ja::ipadic',
     'la::conll', 'la::it', 'la::itconll',
+    'lt::multext',
     'mt::mlss',
     'mul::google', 'mul::upos',
     'nl::cgn', 'nl::conll',

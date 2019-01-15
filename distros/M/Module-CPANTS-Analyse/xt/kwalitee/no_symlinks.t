@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../..";
 use xt::kwalitee::Test;
 
 Test::More::plan skip_all => "This test doesn't work well under Windows" if $^O eq 'MSWin32';

@@ -55,6 +55,7 @@ initialize()
         lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/nqp/lib";
         lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/perl6/lib";
         lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/perl6/runtime";
+        lib_path[lib_path_i++] = NQP_LIBDIR;
         lib_path[lib_path_i++] = NULL;
 
         for( argi = 0; argi < lib_path_i; argi++)
@@ -62,7 +63,7 @@ initialize()
 
         /* stash the rest of the raw command line args in the instance */
         instance->prog_name  = PERL6_INSTALL_PATH "/share/perl6/runtime/perl6.moarvm";
-        instance->exec_name  = "perl6";
+        instance->exec_name  = PERL6_EXECUTABLE;
         instance->raw_clargs = NULL;
 
         /* Map the compilation unit into memory and dissect it. */
@@ -86,8 +87,6 @@ initialize()
         instance->raw_clargs = (char **)raw_clargs;
         instance->clargs = NULL; /* clear cache */
 
-        MVMStaticFrame *start_frame;
-
         MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.main_frame);
 
         /* Points to the current opcode. */
@@ -108,6 +107,8 @@ initialize()
         tc->interp_reg_base       = &reg_base;
         tc->interp_cu             = &cu;
         toplevel_initial_invoke(tc, cu->body.main_frame);
+
+        mark_thread_blocked(tc);
 
         perl6 = create_p6;
 

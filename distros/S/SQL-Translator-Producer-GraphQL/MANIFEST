@@ -5,11 +5,12 @@ MANIFEST			This list of files
 README.md
 t/00-compile.t
 t/00-report-prereqs.t
-t/01-schema.t
 t/02-dbicschema.t
+t/03-sqlread.t
 t/lib-dbicschema/Schema.pm
 t/lib-dbicschema/Schema/Result/Blog.pm
 t/lib-dbicschema/Schema/Result/BlogTag.pm
+t/lib-dbicschema/Schema/Result/Pg.pm
 t/lib-dbicschema/Schema/Result/Photo.pm
 t/lib-dbicschema/Schema/Result/Photoset.pm
 t/lib-dbicschema/Schema/ResultSet/Blog.pm
@@ -17,6 +18,8 @@ t/lib-dbicschema/Schema/ResultSet/Photo.pm
 t/lib-dbicschema/Schema/ResultSet/Photoset.pm
 t/schema/mysql.sql
 t/schema/sqlite.sql
+t/snapshots/02-dbicschema_t/schema
+t/snapshots/03-sqlread_t/schema
 xt/manifest.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

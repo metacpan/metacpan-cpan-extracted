@@ -7,7 +7,7 @@ use 5.012;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Bare text parser, bundles other common \"mundane\" tasks.",
+  "ABSTRACT" => "Bare text parser, bundles many common \"mundane\" tasks.",
   "AUTHOR" => "Balaji Ramasubramanian <balajiram\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,8 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Text::Parser",
   "PREREQ_PM" => {
+    "Class::Method::Modifiers" => 0,
     "Exception::Class" => 0,
     "Exporter" => 0,
+    "Role::Tiny" => 0,
     "Scalar::Util" => 0,
     "Try::Tiny" => 0,
     "strict" => 0,
@@ -32,7 +34,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.753",
+  "VERSION" => "0.801",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,8 +42,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Class::Method::Modifiers" => 0,
   "Exception::Class" => 0,
   "Exporter" => 0,
+  "Role::Tiny" => 0,
   "Scalar::Util" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,

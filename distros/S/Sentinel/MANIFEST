@@ -1,9 +1,9 @@
 Build.PL
 Changes
+examples/lvalue_as_final.pl
 lib/Sentinel.pm
 lib/Sentinel.xs
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
@@ -16,4 +16,5 @@ t/04obj.t
 t/10lvalue.t
 t/11accessor.t
 t/12funcargs.t
+t/80dynamically+Sentinel.t
 t/99pod.t

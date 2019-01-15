@@ -1,5 +1,13 @@
 Changelog for Perl-Critic-Policy-RegularExpressions-RequireDefault
 
+1.01 2019-01-15T07:48:31Z Maintenance release, update not required
+
+- Corrected the homepage metadata link
+
+1.00 2018-11-30T06:41:05Z Maintenance release, update not required
+
+- This release is for marking the first stable version of the policy
+
 0.02 2018-11-26T07:43:46Z Maintenance release, update not required
 
 - Mention of requirement for Perl 5.14 as described in issue #3

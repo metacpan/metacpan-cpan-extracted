@@ -63,6 +63,8 @@ address range;
 
 =item * a L<Net::DNS::Domain> object representing a domain name.
 
+=item * a string containing a tagged entity handle
+
 =back
 
 This method requires objects to be passed to ensure that the resource
@@ -83,6 +85,9 @@ sub get_url {
 
 	} elsif ('Net::DNS::Domain' eq ref($object)) {
 		return $package->domain($object);
+
+	} elsif ($object =~ /-/) {
+		return $package->entity($object);
 
 	} else {
 		croak("Unable to deal with '$object'");
@@ -268,6 +273,25 @@ sub reverse_domain {
 	return undef if (!$url);
 
 	return URI->new_abs(sprintf('../../domain/%s', $domain->name), $url);
+}
+
+sub entity {
+	my ($package, $handle) = @_;
+
+	my @parts = split(/-/, $handle);
+	my $tag = pop(@parts);
+
+	my $registry = $package->load_registry('https://data.iana.org/rdap/object-tags.json');
+	return undef if (!$registry);
+
+	foreach my $service (@{$registry->{'services'}}) {
+		foreach my $value (@{$service->[1]}) {
+			# unlike the other registries we are only looking for an exact match as there is no hierarchy to tag
+			return $package->assemble_url($package->get_best_url(@{$service->[2]}), 'entity', $handle) if (lc($value) eq lc($tag));
+		}
+	}
+
+	return undef;
 }
 
 #

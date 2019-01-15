@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use {{ $name }}::Builder;
 
-our $VERSION = '0.001';
+# ABSTRACT: Brand new FB11 app
+our $VERSION = '0';
 
 my $builder = {{ $name }}::Builder->new(
     appname => __PACKAGE__,
@@ -14,22 +15,3 @@ my $builder = {{ $name }}::Builder->new(
 $builder->bootstrap;
 
 1;
-
-=head1 NAME
-
-{{ $name }} - Brand new FB11 site
-
-=head1 DESCRIPTION
-
-=head1 METHODS
-
-=head1 ATTRIBUTES
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2015 OpusVL.
-
-This software is licensed according to the "IP Assignment Schedule" provided with the development project.
-
-=cut

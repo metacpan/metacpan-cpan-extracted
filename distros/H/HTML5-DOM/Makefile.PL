@@ -18,11 +18,12 @@ if ($^O =~ /MSWin/i) {
 }
 
 my $defines = "";
-if ($^O =~ /openbsd/i) {
+
+if ($^O =~ /openbsd|netbsd|freebsd/i) {
 	# Simulates mutex using semaphore
 	# Because MyHTML call phtread_mutex_unlock without before call phtread_mutex_lock
 	# And it crashes on OpenBSD
-	warn("Detected OpenBSD - switch from mutex to semaphore\n");
+	warn("Detected *BSD - switch from mutex to semaphore\n");
 	$defines = " -DMyCORE_USE_SEMAPHORE_INSTEAD_OF_MUTEX ";
 }
 

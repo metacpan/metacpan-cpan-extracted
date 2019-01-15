@@ -31,6 +31,7 @@ my $data = {
     firstname => 'Rowdy',
     lastname => 'Rough',
     email => 'rowdyrough@example.com',
+    block_macros => 1,
 };
 
 my $update_data = {
@@ -45,6 +46,7 @@ my $update_data = {
     firstname => 'Rowdy',
     lastname => 'Rough',
     email => 'rowdyrough@example.com',
+    block_macros => 0,
 };
 
 my $update_passwd_data = {

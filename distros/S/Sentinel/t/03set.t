@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More;
 
 use Sentinel;
 
@@ -29,3 +29,9 @@ is( $$vref, 1, 'New vref 1 before incr' );
 $$vref++;
 is( $othervar, 2, '$othervar 2 after incr' );
 is( $$vref,    2, 'dereference vref 2 after incr' );
+
+undef $$vref;
+is( $othervar, undef, '$othervar undef after undef' );
+is( $$vref,    undef, 'dereference vref undef after undef' );
+
+done_testing;

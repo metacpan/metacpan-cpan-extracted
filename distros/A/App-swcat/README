@@ -2,8 +2,8 @@ NAME
     App::swcat - Software catalog
 
 VERSION
-    This document describes version 0.009 of App::swcat (from Perl
-    distribution App-swcat), released on 2019-01-14.
+    This document describes version 0.010 of App::swcat (from Perl
+    distribution App-swcat), released on 2019-01-15.
 
 SYNOPSIS
     See swcat script.

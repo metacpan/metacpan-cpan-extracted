@@ -2,8 +2,8 @@ package Module::CPANTS::Kwalitee::Version;
 use warnings;
 use strict;
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
 sub order { 100 }
 
@@ -65,7 +65,7 @@ Does nothing now.
 
 =head3 kwalitee_indicators
 
-Returns the Kwalitee Indicators datastructure.
+Returns the Kwalitee Indicators data structure.
 
 =head1 SEE ALSO
 

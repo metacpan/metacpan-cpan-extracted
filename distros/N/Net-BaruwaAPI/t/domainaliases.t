@@ -17,7 +17,8 @@ my $res;
 my $data = {
     name => "example.net",
     status => 1,
-    domain => 2
+    domain => 2,
+    accept_inbound => 1,
 };
 
 my $aliasid = 10;

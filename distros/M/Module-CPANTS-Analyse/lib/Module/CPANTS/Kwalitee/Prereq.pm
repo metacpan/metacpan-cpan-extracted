@@ -4,8 +4,8 @@ use strict;
 use File::Spec::Functions qw(catfile);
 use Text::Balanced qw/extract_bracketed/;
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
 sub order { 100 }
 
@@ -14,8 +14,8 @@ sub order { 100 }
 ##################################################################
 
 sub analyse {
-    my $class=shift;
-    my $me=shift;
+    my $class = shift;
+    my $me = shift;
 
     $class->_from_meta($me) or
     $class->_from_cpanfile($me) or
@@ -63,7 +63,7 @@ sub _from_meta {
     }
 
     return unless %res;
-    $me->d->{prereq} = [map {@$_} values %res];
+    $me->d->{prereq} = [sort {$a->{requires} cmp $b->{requires}} map {@$_} values %res];
     $me->d->{got_prereq_from} = 'META.yml';
 }
 
@@ -78,7 +78,7 @@ sub _from_cpanfile {
     my %res = $class->_handle_prereqs_v2($prereqs);
     return unless %res;
 
-    $me->d->{prereq} = [map {@$_} values %res];
+    $me->d->{prereq} = [sort {$a->{requires} cmp $b->{requires}} map {@$_} values %res];
     $me->d->{got_prereq_from} = 'cpanfile';
 }
 
@@ -120,7 +120,7 @@ sub _from_build_pl {
 
         $build_pl = $left;
     }
-    $me->d->{prereq} = [map {@$_} values %res];
+    $me->d->{prereq} = [sort {$a->{requires} cmp $b->{requires}} map {@$_} values %res];
     $me->d->{got_prereq_from} = 'Build.PL';
 }
 
@@ -186,7 +186,7 @@ sub _from_makefile_pl {
             }
         }
     }
-    $me->d->{prereq} = [map {@$_} values %res];
+    $me->d->{prereq} = [sort {$a->{requires} cmp $b->{requires}} map {@$_} values %res];
     $me->d->{got_prereq_from} = 'Makefile.PL';
 }
 
@@ -283,7 +283,7 @@ sub _from_dist_ini {
             };
         }
     }
-    $me->d->{prereq} = [map {@$_} values %res];
+    $me->d->{prereq} = [sort {$a->{requires} cmp $b->{requires}} map {@$_} values %res];
     $me->d->{got_prereq_from} = 'dist.ini';
 }
 
@@ -330,7 +330,7 @@ Find information on prerequisite distributions from meta files etc.
 
 =head3 kwalitee_indicators
 
-Returns the Kwalitee Indicators datastructure.
+Returns the Kwalitee Indicators data structure.
 
 =head1 SEE ALSO
 

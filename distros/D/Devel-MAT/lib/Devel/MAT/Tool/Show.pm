@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use List::Util qw( max );
 
@@ -375,12 +375,12 @@ sub run
    foreach my $idx ( $startidx .. $stopidx-1 ) {
       my $sv = $av->elem( $idx );
       push @rows, [
-         "  " . Devel::MAT::Cmd->format_value( $idx, index => 1 ),
+         Devel::MAT::Cmd->format_value( $idx, index => 1 ),
          $sv ? Devel::MAT::Cmd->format_sv_with_value( $sv ) : "NULL",
       ];
    }
 
-   Devel::MAT::Cmd->print_table( \@rows );
+   Devel::MAT::Cmd->print_table( \@rows, indent => 2 );
 
    my $morecount = $av->n_elems - $stopidx;
    Devel::MAT::Cmd->printf( "  ... (%d more)\n", $morecount ) if $morecount;
@@ -461,13 +461,13 @@ sub run
       foreach my $key ( splice @keys, 0, $count ) {
          my $sv = $hv->value( $key );
          push @rows, [
-            "  " . Devel::MAT::Cmd->format_value( $key, key => 1,
-                  stash => ( $type eq "STASH" ) ),
+            Devel::MAT::Cmd->format_value( $key, key => 1,
+               stash => ( $type eq "STASH" ) ),
             $sv ? Devel::MAT::Cmd->format_sv_with_value( $sv ) : "NULL",
          ];
       }
 
-      Devel::MAT::Cmd->print_table( \@rows );
+      Devel::MAT::Cmd->print_table( \@rows, indent => 2 );
 
       my $morecount = @keys;
       Devel::MAT::Cmd->printf( "  ... (%d more)\n", $morecount ) if $morecount;

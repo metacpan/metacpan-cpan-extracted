@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More;
 use Test::Refcount;
 
 use Sentinel;
@@ -23,3 +23,5 @@ is_refcount( $arr, 2, '$arr has refcount 2 after \sentinel' );
 
 undef $vref;
 is_oneref( $arr, '$arr has refcount 1 after undef $vref' );
+
+done_testing;

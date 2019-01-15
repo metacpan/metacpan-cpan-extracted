@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Serge::Sync::Plugin::TranslationService::transifex - L<Transifex|https://www.transifex.com> synchronization plugin for L<Serge|https://serge.io/>
+Serge::Sync::Plugin::TranslationService::transifex - L<Transifex|https://www.transifex.com> synchronization plugin for L<Serge|https://serge.io/> based on L<Transifex CLI|https://docs.transifex.com/client/introduction>
 
 =head1 SYNOPSIS
 
@@ -18,8 +18,8 @@ Serge::Sync::Plugin::TranslationService::transifex - L<Transifex|https://www.tra
 
 =head1 DESCRIPTION
 
-Integration between Serge (Free, Open Source Solution for Continuous Localization) and Transifex (Localization Automation Platform that powers the process of launching digital products into multiple languages).
-Uses the command-line tool for the Transifex API. See L<Transifex CLI|https://docs.transifex.com/client/introduction>.
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and Transifex (Localization Automation Platform that powers the process of launching digital products into multiple languages),
+implemented using the command-line tool for the Transifex API.
 
 =head1 ATTRIBUTES
 
@@ -27,7 +27,11 @@ Uses the command-line tool for the Transifex API. See L<Transifex CLI|https://do
 
 =item I<root_directory>
 
-Transifex CLI root directory
+Transifex CLI root directory.
+
+=item I<push_translations>
+
+Push the translation files to the server. Default YES.
 
 =back
 

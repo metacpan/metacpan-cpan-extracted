@@ -1,5 +1,9 @@
 Revision history for Serge-Sync-Plugin-TranslationService-Smartcat
 
+0.0.3  2019-01-15 00:24:34 UTC
+
+		- Allow to set project_translation_files_path for plugin in Serge config file
+
 0.0.2  2018-10-05 20:55:41 UTC 
         
         - Fix Serge vesion

@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple:
     file: lib/App/Greple.pm
-    version: '8.3206'
+    version: '8.3301'
   App::Greple::Common:
     file: lib/App/Greple/Common.pm
   App::Greple::Filter:
@@ -66,14 +66,15 @@ provides:
   UniqIndex:
     file: lib/App/Greple/Util.pm
 requires:
-  Getopt::EX: v1.13.1
+  Getopt::EX: v1.14.0
+  List::BinarySearch: '0'
   List::Util: '1.45'
-  perl: '5.014'
+  perl: '>= v5.14.0, != v5.18.0, != v5.18.1'
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple/issues
   homepage: https://github.com/kaz-utashiro/greple
   repository: git://github.com/kaz-utashiro/greple.git
-version: '8.3206'
+version: '8.3301'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

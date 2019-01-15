@@ -1,3 +1,4 @@
+.travis.yml
 AUTHORS
 Changes
 cpanfile
@@ -22,12 +23,13 @@ lib/Module/CPANTS/Kwalitee/Version.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-README
+README.md
 t/00_load.t
 t/05_testdir.t
 t/05_testfile.t
 t/analyse/manifest.t
 t/analyse/pod.t
+t/analyse/uses.t
 t/lib/Module/CPANTS/TestAnalyse.pm
 t/older_test_kwalitee.t
 t/x_cpants.t

@@ -8,7 +8,7 @@ package Devel::MAT;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use Carp;
 use List::Util qw( first pairs );
@@ -444,6 +444,11 @@ sub print_table
    my $self = shift;
    my ( $rows, %opts ) = @_;
 
+   if( $opts{headings} ) {
+      my @headings = map { $self->format_heading( $_ ) } @{ $opts{headings} };
+      $rows = [ \@headings, @$rows ];
+   }
+
    return unless @$rows;
 
    my $cols = max map { scalar @$_ } @$rows;
@@ -451,7 +456,7 @@ sub print_table
    my @colwidths = map {
       my $colidx = $_;
       # TODO: consider a unicode/terminal-aware version of length here
-      max map { length $_->[$colidx] } @$rows;
+      max map { length($_->[$colidx]) // 0 } @$rows;
    } 0 .. $cols-1;
 
    my $align = $opts{align} // "";
@@ -463,6 +468,7 @@ sub print_table
    my @leftalign = map { ($align->[$_]//"") ne "right" } 0 .. $cols-1;
 
    my $format = join( "",
+      ( " " x ( $opts{indent} // 0 ) ),
       ( map {
          my $col = $_;
          my $width = $colwidths[$col];
@@ -475,7 +481,10 @@ sub print_table
    ) . "\n";
 
    foreach my $row ( @$rows ) {
-      $self->printf( $format, @$row );
+      my @row = @$row;
+      @row or @row = map { "-"x$colwidths[$_] } ( 0 .. $cols-1 );
+      push @row, "" while @row < $cols; # pad with spaces
+      $self->printf( $format, @row );
    }
 }
 
@@ -613,6 +622,13 @@ sub format_sv_with_value
    }
 
    return $repr;
+}
+
+sub format_heading
+{
+   my ( $text, $level ) = @_;
+
+   return "$text";
 }
 
 =head1 AUTHOR

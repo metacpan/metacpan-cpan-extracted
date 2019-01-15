@@ -3,9 +3,10 @@ use warnings;
 use strict;
 use File::Spec::Functions qw/catfile/;
 use Encode;
+use Data::Binary qw/is_binary/;
 
-our $VERSION = '0.96';
-$VERSION = eval $VERSION; ## no critic
+our $VERSION = '0.99';
+$VERSION =~ s/_//; ## no critic
 
 our @ABSTRACT_STUBS = (
   q{Perl extension for blah blah blah}, # h2xs
@@ -26,18 +27,20 @@ sub analyse {
     my %abstract;
     my @errors;
     for my $module (@{$me->d->{modules} || []}) {
-        my ($package, $abstract, $error) = $class->_parse_abstract(catfile($distdir, $module->{file}));
+        my ($package, $abstract, $error, $has_binary_data) = $class->_parse_abstract(catfile($distdir, $module->{file}));
         push @errors, "$error ($package)" if $error;
         $me->d->{abstracts_in_pod}{$package} = $abstract if $package;
+        $me->d->{files_hash}{$module->{file}}{has_binary_data} = 1 if $has_binary_data;
     }
 
     # sometimes pod for .pm file is put into .pod
     for my $file (@{$me->d->{files_array} || []}) {
         next unless $file =~ /\.pod$/ && ($file =~ m!^lib/! or $file =~ m!^[^/]+$!);
         local $@;
-        my ($package, $abstract, $error) = $class->_parse_abstract(catfile($distdir, $file));
+        my ($package, $abstract, $error, $has_binary_data) = $class->_parse_abstract(catfile($distdir, $file));
         push @errors, "$error ($package)" if $error;
         $me->d->{abstracts_in_pod}{$package} = $abstract if $package;
+        $me->d->{files_hash}{$file}{has_binary_data} = 1 if $has_binary_data;
     }
     $me->d->{error}{has_abstract_in_pod} = join ';', @errors if @errors;
 }
@@ -50,19 +53,30 @@ sub _parse_abstract {
     open my $fh, '<', $file or return;
     my $directive;
     my $encoding;
+    my $package_name_pattern = '(?:[A-Za-z0-9_]+::)*[A-Za-z0-9_]+ | [BCIF] < (?:[A-Za-z0-9_]+::)*[A-Za-z0-9_]+ >';
+    if ( $file !~ /\.p(?:m|od)$/ ) {
+        $package_name_pattern .= ' | [A-Za-z0-9_.-]+ | [BCIF] < [A-Za-z0-9_.-]+ >';
+    }
     while(<$fh>) {
-        if (/^=encoding\s+(.+)/) {
-            $encoding = $1;
+        if (/^\s*__DATA__\s*$/) {
+            my $copy = $_ = <$fh>;
+            last unless defined $copy;
+            return (undef, undef, undef, 1) if is_binary($copy);
         }
-        if (/^=(?!cut)(.+)/) {
-            $directive = $1;
-            $inpod = 1;
-        } elsif (/^=cut/) {
-            $inpod = 0;
+        if (substr($_, 0, 1) eq '=') {
+            if (/^=encoding\s+(.+)/) {
+                $encoding = $1;
+            }
+            if (/^=cut/) {
+                $inpod = 0;
+            } elsif (/^=(?!cut)(.+)/) {
+                $directive = $1;
+                $inpod = 1;
+            }
         }
         next if !$inpod;
         next unless $directive =~ /^head/;
-        if ( /^\s*((?:[A-Za-z0-9_]+::)*[A-Za-z0-9_]+ | [BCIF] < (?:[A-Za-z0-9_]+::)*[A-Za-z0-9_]+ >) \s+ -+ (?:\s+ (.*)\s*$|$)/x ) {
+        if ( /^\s*(${package_name_pattern}) \s+ -+ (?:\s+ (.*)\s*$|$)/x ) {
             ($package, $abstract) = ($1, $2);
             $package =~ s![BCIF]<([^>]+)>!$1!;
             next;
@@ -170,7 +184,7 @@ Parses pod to see if it has a proper abstract.
 
 =head3 kwalitee_indicators
 
-Returns the Kwalitee Indicators datastructure.
+Returns the Kwalitee Indicators data structure.
 
 =over 4
 

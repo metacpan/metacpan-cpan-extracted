@@ -10,6 +10,7 @@
 #define node_is_element(node) (node->tag_id != MyHTML_TAG__UNDEF && node->tag_id != MyHTML_TAG__TEXT && node->tag_id != MyHTML_TAG__COMMENT && node->tag_id != MyHTML_TAG__DOCTYPE)
 #define node_is_document(node) (!node->parent && node == node->tree->document)
 #define node_is_root(node) (node->tree->node_html && node->tree->node_html == node)
+#define html5_dom_is_fragment(node) (((html5_dom_tree_t *) node->tree->context)->fragment_tag_id && node->tag_id == ((html5_dom_tree_t *) node->tree->context)->fragment_tag_id)
 
 #if (defined(_WIN32) || defined(_WIN64))
 	#define MyCORE_OS_WINDOWS_NT
@@ -177,13 +178,6 @@ void *html5_node_finder(html5_dom_parser_t *parser, modest_finder_selector_combi
 		myhtml_tree_node_t *scope, mycss_selectors_entries_list_t *list, size_t list_size, mystatus_t *status_out, bool one);
 modest_finder_selector_combinator_f html5_find_selector_func(const char *c, int combo_len);
 mycss_selectors_list_t *html5_parse_selector(mycss_entry_t *entry, const char *query, size_t query_len, mystatus_t *status_out);
-
-// nodes
-inline bool html5_dom_is_fragment(myhtml_tree_node_t *node) {
-	html5_dom_tree_t *context = (html5_dom_tree_t *) node->tree->context;
-	return context->fragment_tag_id && node->tag_id == context->fragment_tag_id;
-}
-
 myhtml_tag_id_t html5_dom_tag_id_by_name(myhtml_tree_t *tree, const char *tag_str, size_t tag_len, bool allow_create);
 myhtml_tree_node_t *html5_dom_copy_foreign_node(myhtml_tree_t *tree, myhtml_tree_node_t *node);
 myhtml_tree_node_t *html5_dom_recursive_clone_node(myhtml_tree_t *tree, myhtml_tree_node_t *node, html5_fragment_parts_t *parts);

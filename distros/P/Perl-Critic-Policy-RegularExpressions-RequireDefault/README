@@ -1,9 +1,9 @@
 This archive contains the distribution Perl-Critic-Policy-RegularExpressions-RequireDefault,
-version 1.00:
+version 1.01:
 
   Always use the C</a> or C</aa> modifier with regular expressions.
 
-This software is Copyright (c) 2018 by Jonas B. Nielsen.
+This software is Copyright (c) 2019 by Jonas B. Nielsen.
 
 This is free software, licensed under:
 

@@ -1,7 +1,7 @@
 package App::TextTableUtils;
 
-our $DATE = '2016-09-03'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-01-15'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to text tables
@@ -18,7 +18,7 @@ App::TextTableUtils - CLI utilities related to text tables
 
 =head1 VERSION
 
-This document describes version 0.002 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2016-09-03.
+This document describes version 0.003 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2019-01-15.
 
 =head1 DESCRIPTION
 
@@ -39,6 +39,10 @@ text tables:
 
 =item * L<csv2orgtable>
 
+=item * L<csv2texttable>
+
+=item * L<csv2tsv>
+
 =item * L<dd2ansitable>
 
 =item * L<dd2asciitable>
@@ -48,6 +52,10 @@ text tables:
 =item * L<dd2mdtable>
 
 =item * L<dd2orgtable>
+
+=item * L<dd2texttable>
+
+=item * L<dd2tsv>
 
 =item * L<json2ansitable>
 
@@ -59,7 +67,27 @@ text tables:
 
 =item * L<json2orgtable>
 
+=item * L<json2texttable>
+
+=item * L<json2tsv>
+
 =item * L<texttableutils-convert>
+
+=item * L<tsv2ansitable>
+
+=item * L<tsv2asciitable>
+
+=item * L<tsv2csv>
+
+=item * L<tsv2dd>
+
+=item * L<tsv2json>
+
+=item * L<tsv2mdtable>
+
+=item * L<tsv2orgtable>
+
+=item * L<tsv2texttable>
 
 =back
 
@@ -91,7 +119,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
