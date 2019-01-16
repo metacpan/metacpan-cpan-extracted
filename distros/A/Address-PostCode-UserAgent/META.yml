@@ -20,10 +20,10 @@ no_index:
 provides:
   Address::PostCode::UserAgent:
     file: lib/Address/PostCode/UserAgent.pm
-    version: '0.08'
+    version: '0.09'
   Address::PostCode::UserAgent::Exception:
     file: lib/Address/PostCode/UserAgent/Exception.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   HTTP::Tiny: '0'
   Moo: '0'
@@ -32,5 +32,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/Manwar/Address-PostCode-UserAgent.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

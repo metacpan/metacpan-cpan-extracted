@@ -7,7 +7,7 @@ use 5.012;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Bare text parser, bundles many common \"mundane\" tasks.",
+  "ABSTRACT" => "Bare text parser, simplifies text parsing.",
   "AUTHOR" => "Balaji Ramasubramanian <balajiram\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "Class::Method::Modifiers" => 0,
     "Exception::Class" => 0,
     "Exporter" => 0,
+    "IO::Select" => 0,
     "Role::Tiny" => 0,
     "Scalar::Util" => 0,
     "Try::Tiny" => 0,
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.801",
+  "VERSION" => "0.802",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "Class::Method::Modifiers" => 0,
   "Exception::Class" => 0,
   "Exporter" => 0,
+  "IO::Select" => 0,
   "Role::Tiny" => 0,
   "Scalar::Util" => 0,
   "Test::Exception" => 0,

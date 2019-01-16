@@ -1,5 +1,10 @@
 Revision history for Devel-MAT-Dumper
 
+0.39    2019-01-16 14:20:35
+        [BUGFIXES]
+         * Handle the incorrect value of AvFILL(PL_curstack)
+         * Avoid some (harmless) compiler warnings
+
 0.38    2019-01-14 17:44:15
         [CHANGES]
          * Capture saved values of 'local' variables and aggregate slots on

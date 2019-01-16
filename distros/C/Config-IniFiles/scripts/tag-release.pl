@@ -24,4 +24,3 @@ my @cmd = (
 
 print join(" ", map { /\s/ ? qq{"$_"} : $_ } @cmd), "\n";
 exec(@cmd);
-

@@ -3,15 +3,12 @@ use warnings;
 
 use Test::More;
 
-use Devel::Probe (skip_install => 0);
+use Devel::Probe;
 
 exit main();
 
 sub main {
-    ok(Devel::Probe::is_installed(), 'initially installed (skip_install => 0)');
-
-    Devel::Probe::install();
-    ok(Devel::Probe::is_installed(), 'still installed (noop)');
+    ok(Devel::Probe::is_installed(), 'initially installed');
 
     Devel::Probe::install();
     ok(Devel::Probe::is_installed(), 'still installed (noop)');

@@ -23,5 +23,6 @@ t/50-complexity.t
 t/60-pod-coverage.t
 t/60-pod-syntax.t
 t/80-minperl.t
+Changes
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

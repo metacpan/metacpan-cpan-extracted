@@ -17,31 +17,7 @@ sub _debug(@) {
   print "\n" unless $_[-1]=~/\n/;
 }
 
-our $VERSION = '0.19';
-
-# The currently-supported color palettes.
-our %palettes = (
-                  Pastel => {Scalar=>'lightyellow',
-                             Array =>'palevioletred',
-                             Hash  =>'paleturquoise',
-                             Glob  =>'lavender',
-                             Font  =>'black'},
-                  Bright => {Scalar=>'yellow',
-                             Array =>'tomato',
-                             Hash  =>'cyan',
-                             Glob =>'purple',
-                             Font =>'white'},
-                  Deep   => {Scalar=>'gold',
-                             Array =>'firebrick2',
-                             Hash  =>'turquoise',
-                             Glob  =>'mediumpurple1',
-                             Font  =>'white'},
-                  Plain  => {Scalar=>'white',
-                             Array =>'white',
-                             Hash  =>'white',
-                             Glob  =>'white',
-                             Font  =>'black'}
-                );
+our $VERSION = '0.20';
 
 =head1 NAME
 
@@ -57,7 +33,7 @@ GraphViz::Data::Structure - Visualise data structures
 =head1 DESCRIPTION
 
 This module makes it easy to visualise data structures, even recursive
-or circular ones. 
+or circular ones.
 
 It is provided as an alternative to GraphViz::Data::Grapher. Differences:
 
@@ -77,7 +53,7 @@ It is provided as an alternative to GraphViz::Data::Grapher. Differences:
 
 =head1 REPRESENTING DATA STRUCTURES AS GRAPHS
 
-C<Graphviz::Data::Structure> tries to draw data structure diagrams with a 
+C<Graphviz::Data::Structure> tries to draw data structure diagrams with a
 minimum of complexity and a maximum of elegance. To this end, the following
 design choices were made:
 
@@ -101,18 +77,18 @@ design choices were made:
 
 =head1 ALGORITHM
 
-The algorithm is a standard recursive depth-first treewalk; we determine how 
-the current node should be added to the current graph, add it, and then call 
+The algorithm is a standard recursive depth-first treewalk; we determine how
+the current node should be added to the current graph, add it, and then call
 ourselves recursively to determine how all nodes below this one
 should be visualized.Edges are added after the subnodes are added to the graph.
 
 Items "within" the current subnode (array and hash elements which are
-I<not> references) are rendered inside a cell in the aggregate corresponding to 
-their position. References are represented by an edge linking the appropriate 
+I<not> references) are rendered inside a cell in the aggregate corresponding to
+their position. References are represented by an edge linking the appropriate
 postion in the aggregate to the appropriate subnode.
 
-This code does its data-structure unwrapping in a manner very similar to 
-that used by C<dumpvar.pl>, the code used by the debugger to display data 
+This code does its data-structure unwrapping in a manner very similar to
+that used by C<dumpvar.pl>, the code used by the debugger to display data
 structures as text. The initial structure treewalk was written in isolation;
 the C<dumpvar.pl> code was integrated only after it was recognized that there
 was more to life than hashes, arrays, and scalars.The C<dumpvar.pl> code to
@@ -124,7 +100,7 @@ still appear to be scalars to the current algorithm.
 
 =head1 GLOBAL SETTINGS
 
-=head2 C<GraphViz::Data::Structure::Debug> 
+=head2 C<GraphViz::Data::Structure::Debug>
 
 Set this to a true value to turn on some debugging messages output to STDERR.
 Defaults to false, and should probably be left that way unless you're reworking
@@ -139,13 +115,13 @@ init().
 
 This is the constructor. It takes one mandatory argument, which is the
 data structure to be visualised. A C<GraphViz:Data::Structure> object, the name
-of the top node, and a list defining the 'to' port for this top node (if there 
+of the top node, and a list defining the 'to' port for this top node (if there
 is a 'to' port; if none, an empty list) are all returned.
 
   # Graph a data structure, creating a GraphViz object.
-  # The new GraphViz:Data::Structure object, the name of 
+  # The new GraphViz:Data::Structure object, the name of
   # the top node in the structure, and the "in" port are returned.
-  my ($gvds, $top_name, @port) = 
+  my ($gvds, $top_name, @port) =
    GraphViz::Data::Structure->new($structure);
   print $gvds->graph()->as_png("my.png");
 
@@ -169,21 +145,21 @@ avoid using nodes with similar names, you should not have any nodename
 collisions.
 
   # Create a graph of a data structure, using your own GraphViz object
-  my ($gvds, $top_name, @port) = 
+  my ($gvds, $top_name, @port) =
     GraphViz::Data::Structure->new($structure,
-                                   GraphViz=>GraphViz->new());
+                                   GraphViz => GraphViz->new());
   $gvds->graph()->as_png("my.png");
 
 =item C<Depth>
 
 If the C<Depth> parameter is supplied, C<GraphViz::Data::Structure> stops at
-the designated level. If any references are found at this level, plaintext 
+the designated level. If any references are found at this level, plaintext
 C<...> nodes are constructed for them. The default limit is B<no> limit.
 
   # Stop after reaching level 7.
-  my ($gvds, $top_name, @port) = 
+  my ($gvds, $top_name, @port) =
     GraphViz::Data::Structure->new($structure,
-                                   Level=>7);
+                                   Level => 7);
   $gvds->graph()->as_png("my.png");
 
 This can be useful if you have a very large data structure, but showing just
@@ -198,9 +174,9 @@ length of any text to be inserted into blocks; the default value is
 B<40> characters.
 
   # Trim any text to 20 characters or less.
-  my ($gvds, $top_name, @port) = 
+  my ($gvds, $top_name, @port) =
     GraphViz::Data::Structure->new($structure,
-                                   Fuzz=>20);
+                                   Fuzz => 20);
   $gvds->graph()->as_png("my.png");
 
 Be aware: large values for C<Fuzz> will result in long character strings being
@@ -214,89 +190,27 @@ either laid out horizontally, with class labels at the top, or vertically, with
 class labels on the left. Default is C<horizontal>.
 
   # Stack items vertically.
-  my ($gvds, $top_name, @port) = 
+  my ($gvds, $top_name, @port) =
     GraphViz::Data::Structure->new($structure,
-                                   Orientation=>'vertical');
+                                   Orientation => 'vertical');
   $gvds->graph()->as_png("my.png");
 
 You cannot mix horizontal and vertical layouts in the same graph.
 
-=item C<Colors>
-
-You can choose how you want the different kinds of nodes colored by passing a
-reference to a hash of type-to-color mappings as the value of the C<Colors>
-parameter, or by choosing the name of any of the predefined palettes.
-
-If you're making up your own set of colors, you can use any of the colors 
-listed in the C<dot> manual. The names of the types are C<Scalar>, C<Array>,
-C<Hash>, C<Glob>, and C<Font>. At present, C<GraphViz::Data::Structure> 
-doesn't allow you to color the plain-text items (strings, scalar values, 
-coderefs).
-
-The predefined palettes are:
-
-=over 4
-
-=item Colors=>'Pastel' - this is a pale, rather subtle set of colors.
-
-   Colors=>{Scalar=>'lightyellow',    Array=>'palevioletred', 
-            Hash  =>'paleturquoise',  Glob =>'lavender',
-            Font  =>'black');
-
-=item Colors=>'Bright' - this is a brightly-colored set.
-
-   Colors=>{Scalar=>'yellow',   Array=>'tomato', 
-            Hash  =>'cyan',     Glob =>'purple',
-            Font  =>'white);
-
-=item Colors=>'Deep' - this is a darker set.
-
-   Colors=>{Scalar=>'gold',      Array=>'firebrick4', 
-            Hash  =>'turquoise4', Glob =>'MediumPurple4',
-            Font  =>'white');
-
-=item Colors=>'Plain' - this is the same as no coloring at all, and is the default behaviour.
-
-   Colors=>{Scalar=>'white',     Array=>'white',
-            Hash  =>'white',     Glob =>'white',
-            Font  =>'black');
-
-=back
-
-
-  # Graph a structure, with the "bright" palette:
-  my $gvds = GraphViz::Data::Structure->new($structure,Colors=>Bright);
-
-  # Graph a structure, creating your own palette:
-  my $gvds = Graphviz::Data::Structure->new($structure,
-                                            Colors=>{Scalar=>'VioletRed1',
-                                                     Array =>'SeaGreen1',
-                                                     Hash  =>'tan1',
-                                                     Glob  =>'goldenrod1',
-                                                     Font  =>'white'
-                                                    }
-                                            );
-
-It should be noted that the optional palettes are simply a demonstration set
-of colors; someone with a better eye for graphic design will, I hope, submit
-better ones. The "rainbow" effect caused using the alternate palettes on a
-data structure with a lot ofdifferent node types in it is rather jarring - 
-sort of like an explosion in a Jello factory.
-
 =item Other parameters
 
-C<GraphViz> supports a number of other parameters at the graph level; any 
-parameters that C<GraphViz::Data::Structure> doesn't understand itself will 
+C<GraphViz> supports a number of other parameters at the graph level; any
+parameters that C<GraphViz::Data::Structure> doesn't understand itself will
 be passed on to C<GraphViz>.
 
   # Add a title and change the default font:
-  my ($gvds, $top_name, @port) = 
+  my ($gvds, $top_name, @port) =
     GraphViz::Data::Structure->new($structure,
-                                   graph=>{label=>'My graph',
-                                           fontname=>'Helvetica'}
+                                   graph => {label    => 'My graph',
+                                             fontname => 'Helvetica'}
                                   );
 
-=back 
+=back
 
 =cut
 
@@ -318,39 +232,12 @@ sub new {
   $self->{Label}       = $params{Label}       || 'left';
   $self->{Orientation} = $params{Orientation} || "horizontal";
 
-  # Handle Colors. This will be either a color set name, or a reference
-  # to a hash which defines the colors.
-  # Begin by defaulting the palette.
-  $self->{Colors} = $palettes{Plain};
-  if (defined $params{Colors}) {
-    # Color parameter set was specified. Override the defaults with whatever
-    # was specified. Note that specifying everything is the same as defining
-    # a completely new palette.
-    if (ref $params{Colors}) {
-      foreach my $item (sort keys %{$params{Colors}}) {
-        $self->{Colors}->{$item} = $params{Colors}->{$item};
-      }
-    }
-    else {
-      # Color set name was provided. Choose from the supported
-      # palettes; if not there, generate a monochrome palette with black text.
-      $self->{Colors} = defined $palettes{$params{Colors}}
-                          ? $palettes{$params{Colors}}
-                          : {Scalar=>$params{Colors},
-                             Hash  =>$params{Colors},
-                             Array =>$params{Colors},
-                             Glob  =>$params{Colors},
-                             Font  =>'black'
-                            };
-     }
-  }
-
   # Carry over the remaining parameters to GraphViz, if possible.
   # If we've got an old GraphViz object, it's too late.
   local $_;
-  map {delete $params{$_}} qw(Fuzz Depth Label Orientation Colors);
+  map {delete $params{$_}} qw(Fuzz Depth Label Orientation);
   my @gvparams = %params;
-  push @gvparams, ($self->{Orientation} eq 'vertical' ? ('rankdir'=>1) : ());
+  push @gvparams, ($self->{Orientation} eq 'vertical' ? (rankdir => 1) : ());
   $self->{Graph}       = $params{GraphViz}    || (GraphViz->new(@gvparams));
 
   # Initialize the node and address caches.
@@ -379,21 +266,21 @@ C<add()>, called as a class method, simply calls C<new()>, supporting all of
 the C<new()> parameters as usual.
 
   # Create a graph (replicates the new() call). Parameters default.
-  my ($gvds, $top_name, @ports) = 
+  my ($gvds, $top_name, @ports) =
     GraphViz::Data::Structure->add($structure);
 
 =head1 INSTANCE METHODS
 
 =head2 C<graph()>
 
-C<graph()> returns a C<GraphViz> object, loaded with the nodes and edges 
+C<graph()> returns a C<GraphViz> object, loaded with the nodes and edges
 corresponding to any data structure passed in via C<new()> and/or C<add()>.
 You can make any of the standard C<GraphViz> calls to this object.
 
 Methods include C<as_ps>, C<as_hpgl>, C<as_pcl>, C<as_mif>, C<as_pic>,
-C<as_gd>, C<as_gd2>, C<as_gif>, C<as_jpeg>, C<as_png>, C<as_wbmp>, 
-C<as_ismap>, C<as_imap>, C<as_vrml>, C<as_vtx>, C<as_mp>, C<as_fig>, 
-C<as_svg>. See the C<GraphViz> documentation for more information. The 
+C<as_gd>, C<as_gd2>, C<as_gif>, C<as_jpeg>, C<as_png>, C<as_wbmp>,
+C<as_ismap>, C<as_imap>, C<as_vrml>, C<as_vtx>, C<as_mp>, C<as_fig>,
+C<as_svg>. See the C<GraphViz> documentation for more information. The
 most common methods are:
 
   # Print out a PNG-format file
@@ -414,8 +301,8 @@ sub graph {
 =head2 C<was_null>
 
 C<was_null()> checks to ensure that your data structure didn't generate
-a graph that was too complex for C<dot> to handle. Directly self-referential 
-structures (e.g., C<@a = (1,\@a,3)>) seem to be the only offenders in this 
+a graph that was too complex for C<dot> to handle. Directly self-referential
+structures (e.g., C<@a = (1,\@a,3)>) seem to be the only offenders in this
 area; if your structure isn't directly self-referential -- by far the most
 likely situation -- you won't need to use C<was_null()> at all.
 
@@ -436,14 +323,14 @@ C<add()>, called as an instance method, simply adds new nodes and edges
 C<GraphViz::Data::Structure> object.
 
 You can specify the C<Fuzz>, C<Label>, and
-C<Depth>  arguments, just as you would for C<new()>. You cannot specify 
-C<GraphViz>, C<Orientation>, or any of the C<GraphViz> parameters that 
+C<Depth>  arguments, just as you would for C<new()>. You cannot specify
+C<GraphViz>, C<Orientation>, or any of the C<GraphViz> parameters that
 are used to create a C<GraphViz> object;
 C<add()> uses the pre-existing C<GraphViz> object
 in the C<GraphViz::Data::Structure> object to add new nodes.
 
   # Create a graph (replicates the new() call).
-  my ($gvds, $top_name, @ports) = 
+  my ($gvds, $top_name, @ports) =
     GraphViz::Data::Structure->add($structure);
 
   # Add a second structure; nodes will be merged as necessary.
@@ -456,11 +343,11 @@ sub add {
   # If the first item in the parameter list is a reference to a
   # GraphViz::Data::Structure object, we are being called as an
   # instance method.
-  if (ref $self_or_class and 
+  if (ref $self_or_class and
       ref $self_or_class eq "GraphViz::Data::Structure") {
     my $self = $self_or_class;
     my ($data_structure,%params) = @_;
-  
+
     $self->{Fuzz}        = $params{Fuzz}        || 40;
     $self->{Depth}       = $params{Depth}       || undef;
     $self->{Label}       = $params{Label}       || 'left';
@@ -478,42 +365,29 @@ sub add {
   }
 }
 
-=head2 Alternate palettes
-
-You can define your own palettes (or redefine the standard ones) by assigning
-them to the C<%GraphViz::Data::Structure::palettes> hash.
-
-  # Create and use a new AllPink palette:
-  $GraphViz::Data::Structure::palettes{AllPink} = 
-   {Scalar=>'pink', Hash=>'pink', Array=>'pink', Glob=>'pink', Font=>'black'};
-  my $gvds = GraphViz::Data::Structure->new($pink_struct,Colors=>AllPink);
-
-  # Do it the easy way:
-  my $gvds = GraphViz::Data::Structure->new($pink_struct,Colors=>'pink');
-
 =begin internals
 
 =head1 INTERNAL METHODS
 
 =over 4
 
-The following methods are I<internal> methods and should not be counted 
+The following methods are I<internal> methods and should not be counted
 upon; if the internal algorithm changes, these routines will undoubtedly also
 change. Do not base any code on the peculiarities of these methods!
 They are documented here only for ease in further extension of the program.
 
-=back 
+=back
 
 =head2 C<init($root,$rank)>
 
-C<init()> (currently) does a depth-first search of the data 
-structure. As it reaches each node, it creates an appropriate C<GraphViz> 
+C<init()> (currently) does a depth-first search of the data
+structure. As it reaches each node, it creates an appropriate C<GraphViz>
 node for it, caches the item (so it will not be processed again, and so other
 links to this node will point to it), and then calls itself
 recursively to process all the nodes below it.
 
 The call returns a node name and a "to" port specification suitable for
-passing on to a C<GraphViz-\>add_edge()> call. 
+passing on to a C<GraphViz-\>add_edge()> call.
 
 Initial rank should be zero; recursive calls increment the rank. When the
 rank exceeds the C<Depth> parameter, the recursion halts and dummy "..."
@@ -521,26 +395,26 @@ nodes are returned.
 
 =end internals
 
-=cut 
+=cut
 
 sub init {
   my($self, $root, $rank, $linkthru) = @_;
   local $_;
 
-  my @rank = (rank=>$rank);
+  my @rank = (rank => $rank);
 
   # If we've exceeded the depth limit, just return a plaintext "..." node.
   if (defined $self->{Depth} and $rank > $self->{Depth}) {
     _debug("Dummy node\n");
     my $node_type = sprintf("DUMMY(%08X)",0+$self->{Dummies}++);
-    my $node_label = $node_type; 
+    my $node_label = $node_type;
     my $name = "gvds_dummy" . $self->{Dummies}++;
 
     $self->{Graph}->add_node($name,
-                             label=>"...",
+                             label => "...",
                              @rank,
                              shape=>"plaintext");
-    $self->{NodeCache}->{$node_label} = [$name];  
+    $self->{NodeCache}->{$node_label} = [$name];
       return ($name,());   # no to-port for plaintext
   }
 
@@ -560,7 +434,7 @@ sub init {
   foreach my $node_type (reftype($root)) {
     my $node_label = ref $root;
     my @to_port = ();
-    
+
     _debug("Label: $node_label\n");
 
     # Just a scalar, not a scalar ref. Generate a plaintext node.
@@ -573,26 +447,26 @@ sub init {
 
       my $name = "gvds_atom" . $self->{Atoms}++;
       $self->{Graph}->add_node($name,
-                               label=>$self->_dot_escape($root),
+                               label => $self->_dot_escape($root),
                                @rank,
-                               shape=>"plaintext");
+                               shape => "plaintext");
       $self->{NodeCache}->{$name} = [$name, ()];
       $self->{Addresses}->{$root} = [$name, ()] if defined $root;
       return ($name,());   # no to-port for plaintext
     };
 
-    # Regexp. Generate a node for this containing the regexp text and return. 
+    # Regexp. Generate a node for this containing the regexp text and return.
     # Regexps are always leaf nodes. Again, this should be node_label.
     $node_label =~ /^Regexp$/ and do {
       $node_type = "$root";
-      my($flagson, undef, $flagsoff, $regexp) = 
+      my($flagson, undef, $flagsoff, $regexp) =
         ($node_type =~ /^\(\?(.*?)(-(.*?))*?:(.*)\)$/);
       print "Regex $node_type parsed as: $regexp (+$flagson, -$flagsoff)\n" if $Debug;
       my $name = "gvds_atom" . $self->{Atoms}++;
       $self->{Graph}-> add_node($name,
-                                label=>$self->_dot_escape("qr/$regexp/$flagson"),
+                                label => $self->_dot_escape("qr/$regexp/$flagson"),
                                 @rank,
-                                shape=>"plaintext");
+                                shape => "plaintext");
       $self->{NodeCache}->{name}            = [$name, ()];
       $self->{Addresses}->{refaddr(\$root)} = [$name, ()];
       return ($name,());   # no to-port for plaintext
@@ -605,24 +479,21 @@ sub init {
       # If linkthrough is on, just skip this node and go down a level directly.
       # Do not increment the rank since we've skipped a level. This is needed
       # because hashes seem to generate an extra scalar node internally when
-      # references are stored in aggregate elementis; linkthru elimnates this 
-      # from the graph. The result is not 100% accurate, but it is more 
+      # references are stored in aggregate elementis; linkthru elimnates this
+      # from the graph. The result is not 100% accurate, but it is more
       # readable.
       return $self->init($$root, $rank) if defined $linkthru;
 
       # Add the node for the scalar itself.
       $self->{Graph}->add_node($name,
-                               label=>$self->_scalar_port($root),
-                               'shape' => 'record',
-                               'color' => $self->{Colors}->{Scalar},
-                               'style' => 'filled',
-                               'fontcolor' => $self->{Colors}->{Font},
+                               label => $self->_scalar_port($root),
+                               shape => 'record',
                                @rank);
-      @to_port = blessed($root) ? ('to_port' => 0) : ();
-      my @from_port = blessed($root) ? ('from_port' => 1) : ();
+      @to_port = blessed($root) ? (to_port => 0) : ();
+      my @from_port = blessed($root) ? (from_port => 1) : (from_port => 0);
       $self->{NodeCache}->{$node_type}     = [$name, @to_port];
       $self->{Addresses}->{refaddr($root)} = [$name, @to_port];
- 
+
       # Visualize nodes under this one. If the item pointed to is an element of
       # an aggregate (hash or array), visualize the whole aggregate and then
       # add the edge appropriately. If it's not, just visualize what's
@@ -632,9 +503,9 @@ sub init {
       # scalar. Maybe later.
       my $subnode = $$root;
       my $subnode_name;
-      my @next_to_port = blessed($subnode) ? ('to_port' => 0) : ();
+      my @next_to_port = blessed($subnode) ? (to_port => 0) : ();
       ($subnode_name,@next_to_port) = $self->init($subnode, $rank+1);
-      $self->{Graph}-> add_edge($name=>$subnode_name,
+      $self->{Graph}-> add_edge($name => $subnode_name,
                                 @from_port,
                                 @next_to_port);
       return ($name, @to_port);
@@ -649,23 +520,20 @@ sub init {
       # Add node for the array itself.
       if (@$root == 0 && !blessed($root)) {
         # Empty unblessed array.
-        $self->{Graph}->add_node($name, 
-                                 label=>$self->_array_ports($root),
+        $self->{Graph}->add_node($name,
+                                 label => $self->_array_ports($root),
                                  @rank,
-                                 shape=> 'plaintext');
+                                 shape => 'plaintext');
       }
       else {
         # Blessed and/or non-empty.
-        $self->{Graph}->add_node($name, 
-                                 label=>$self->_array_ports($root),
+        $self->{Graph}->add_node($name,
+                                 label => $self->_array_ports($root),
                                  @rank,
-                                 shape=> 'record',
-                                 'color' => $self->{Colors}->{Array},
-                                 'style' => 'filled',
-                                 'fontcolor' => $self->{Colors}->{Font},
+                                 shape => 'record',
                                  );
       }
-      my @to_port = blessed($root) ? ('to_port' => 0) : ();
+      my @to_port = blessed($root) ? (to_port => 0) : ();
       $self->{NodeCache}->{$node_type}     = [$name, @to_port];
       $self->{Addresses}->{refaddr($root)} = [$name, @to_port];
 
@@ -675,18 +543,18 @@ sub init {
       # In addition, record the address of each element in the array
       # for catching references to individual elements.
       #
-      # Recording works, but the lookup to spot references to elements 
+      # Recording works, but the lookup to spot references to elements
       # currently does not.
       my $port = 1;
       my @next_to;
       foreach my $subnode (0..$#{$root}) {
-         $self->{Addresses}->{refaddr(\($root->[$subnode]))} = 
-           [$name, ('to_port' => $port)];
+         $self->{Addresses}->{refaddr(\($root->[$subnode]))} =
+           [$name, (to_port => $port)];
          if (ref $root->[$subnode]) {
-           my ($subnode_name,@next_to) = 
+           my ($subnode_name,@next_to) =
              $self->init($root->[$subnode], $rank+1, "link through");
-           $self->{Graph}-> add_edge($name=> $subnode_name,
-                                     'from_port'=>"$port", 
+           $self->{Graph}-> add_edge($name     => $subnode_name,
+                                     from_port => "$port",
                                      @next_to);
          }
          $port++;    # always go to next port, even if no edge added
@@ -703,24 +571,21 @@ sub init {
       my $name = "gvds_hash" . $self->{Hashes}++;
       if (scalar keys %$root == 0 && !blessed($root)) {
         # Empty hash.
-        $self->{Graph}->add_node($name, 
-                                 label=>$self->_hash_ports($node_type, $root), 
+        $self->{Graph}->add_node($name,
+                                 label => $self->_hash_ports($node_type, $root),
                                  @rank,
-                                 shape=>'plaintext'
+                                 shape => 'plaintext'
                                  );
       }
       else {
         # Non-empty and/or blessed hash.
-        $self->{Graph}->add_node($name, 
-                                 label=>$self->_hash_ports($node_type, $root), 
+        $self->{Graph}->add_node($name,
+                                 label => $self->_hash_ports($node_type, $root),
                                  @rank,
-                                 shape=>'record',
-                                 'color' => $self->{Colors}->{Hash},
-                                 'style' => 'filled',
-                                 'fontcolor' => $self->{Colors}->{Font},
+                                 shape => 'record',
                                  );
       }
-      my @to_port = blessed($root) ? ('to_port' => 0) : ();
+      my @to_port = blessed($root) ? (to_port => 0) : ();
       $self->{NodeCache}->{$node_type}     = [$name, @to_port];
       $self->{Addresses}->{refaddr($root)} = [$name, @to_port];
 
@@ -733,12 +598,12 @@ sub init {
         # We go by twos because the keys have the odd ports and the values
         # the even ones; we want links to come from the values.
         if (ref $root->{$subnode}) {
-          $self->{Addresses}->{refaddr(\($root->{$subnode}))} = 
-            [$name, ('to_port' => $port)];
+          $self->{Addresses}->{refaddr(\($root->{$subnode}))} =
+            [$name, (to_port => $port)];
           my ($subnode_name,@to_port) = $self->init($root->{$subnode},
                                               $rank+1,"link through");
-          $self->{Graph}->add_edge($name=>$subnode_name,
-                                   'from_port' => "$port", @to_port);
+          $self->{Graph}->add_edge($name     => $subnode_name,
+                                   from_port => "$port", @to_port);
         }
         $port += 2;  # always go to next port, even if no edge added
       }
@@ -752,10 +617,10 @@ sub init {
       my $name = "gvds_sub" . $self->{Subs}++;
       my $label = _dumpsub(0,$root);
       $self->{Graph}->add_node($name,
-                               label=>$self->_code_label($root, $label),
+                               label => $self->_code_label($root, $label),
                                @rank,
-                               shape=>"plaintext");
-      $self->{NodeCache}->{$name}          = [$name, ()];  
+                               shape => "plaintext");
+      $self->{NodeCache}->{$name}          = [$name, ()];
       $self->{Addresses}->{refaddr($root)} = [$name, ()];
       return ($name,());   # no to-port for plaintext
     };
@@ -768,33 +633,30 @@ sub init {
       if (ref $fake_glob) {
         bless $fake_glob, $label;
         $self->{Graph}-> add_node($name,
-				  label=> $self->_glob_ports($label,$fake_glob),
+				  label => $self->_glob_ports($label,$fake_glob),
 				  @rank,
-                                  'color' => $self->{Colors}->{Glob},
-                                  'style' => 'filled',
-                                  'fontcolor' => $self->{Colors}->{Font},
-				  shape=> "record"
-                                  );
-	my @to_port = ('to_port' => 0);  # the fake hash is always blessed
-	$self->{NodeCache}->{$name}               = [$name, @to_port];	
+				  shape => "record"
+        );
+        my @to_port = ('to_port' => 0);  # the fake hash is always blessed
+        $self->{NodeCache}->{$name}               = [$name, @to_port];
         $self->{Addresses}->{refaddr($fake_glob)} = [$name, @to_port];
 
-	# Now take the "glob" apart.
-	my $port = 2;
-	foreach my $subnode (sort keys %$fake_glob) {
-	  # Same logic as above: if the value is scalar, we don't want to
-	  # crawl down, because _hash_ports will have caught it. Otherwise,
-	  # crawl down, generate the nodes below, and link them back in.
-	  # We go by twos because the keys have the odd ports and the values
-	  # the even ones; we want links to come from the values.
-	  if (ref $fake_glob->{$subnode}) {
-            $self->{Addresses}->{refaddr(\($fake_glob->{$subnode}))} = 
-              [$name, ('to_port' => $port)];
-	    my ($subnode_name,@to_port) = $self->init($fake_glob->{$subnode},
+        # Now take the "glob" apart.
+        my $port = 2;
+        foreach my $subnode (sort keys %$fake_glob) {
+          # Same logic as above: if the value is scalar, we don't want to
+          # crawl down, because _hash_ports will have caught it. Otherwise,
+          # crawl down, generate the nodes below, and link them back in.
+          # We go by twos because the keys have the odd ports and the values
+          # the even ones; we want links to come from the values.
+          if (ref $fake_glob->{$subnode}) {
+            $self->{Addresses}->{refaddr(\($fake_glob->{$subnode}))} =
+              [$name, (to_port => $port)];
+            my ($subnode_name,@to_port) = $self->init($fake_glob->{$subnode},
                                                       $rank+1, "link through");
-	    $self->{Graph}->add_edge($name=>$subnode_name,
-                                     'from_port' => "$port", @to_port);
-	  }
+            $self->{Graph}->add_edge($name => $subnode_name,
+                                     from_port => "$port", @to_port);
+          }
           $port += 2;  # always go to next port, even if no edge added
         }
         # Done. Return the fake glob to the next level up.
@@ -803,9 +665,9 @@ sub init {
       # Otherwise, it was an empty glob. Just print the string for it.
       else {
         $self->{Graph}->add_node($name,
-                                 label=>$self->_code_label($root, $label),
+                                 label => $self->_code_label($root, $label),
                                  @rank,
-                                 shape=>"plaintext");
+                                 shape => "plaintext");
         $self->{NodeCache}->{$name}          = [$name, ()];
         $self->{Addresses}->{refaddr($root)} = [$name, ()];
         return ($name, ());   # no to-port for plaintext
@@ -816,9 +678,9 @@ sub init {
 
 =head1 DOT INPUT - LAYOUT DETAILS
 
-Port strings and C<shape=record> nodes are the key to visualizing the data 
-structures in a readable way. The examples in the C<dot> documentation are 
-some help, but a certain amount of experimentation was needed to determine 
+Port strings and C<shape=record> nodes are the key to visualizing the data
+structures in a readable way. The examples in the C<dot> documentation are
+some help, but a certain amount of experimentation was needed to determine
 exactly how the port strings needed to be set up so that the desired layout
 was achieved.
 
@@ -844,15 +706,15 @@ boxes to all line up smartly) takes a bit of extra work.
 =head2 SCALARS
 
 Scalars are represented either by plaintext nodes (for non-reference values)
-or record nodes (for references); they don't need ports, because we'll be 
-linking at most one edge out, and there's only one "thingy" to link to in a 
+or record nodes (for references); they don't need ports, because we'll be
+linking at most one edge out, and there's only one "thingy" to link to in a
 scalar. However, we do have to deal with blessed scalars as well, which need
 to have both their class name and value in the node, but need to look
 different than arrays.
 
 If a scalar's value is a reference, we add a record-style node and link it to
 the value. If the scalar is blessed, we put the class name and the scalar's
-value both in the same node  by constructing a multi-line string with the 
+value both in the same node  by constructing a multi-line string with the
 class name on top, tagged appropriately, and the value on the bottom.
 
 =cut
@@ -867,7 +729,7 @@ sub _scalar_port {
   }
   else {
     # Not blessed.
-    $out = "";
+    $out = "<port0>";
   }
   _debug("$out\n");
   $out;
@@ -903,8 +765,8 @@ want to include the class name as well in the record. We want to make
 sure that the class name itself isn't confused with any of the data
 items, so it needs to be off in a box by itself, parallel to the boxes
 defining the array. This means laying out a box the length of the whole
-array above the boxes defining the array in a horizontal layout, and a box 
-the height of the whole array to the left of the boxes defining the array in 
+array above the boxes defining the array in a horizontal layout, and a box
+the height of the whole array to the left of the boxes defining the array in
 a vertical layout.
 
 Fortunately (again), the same basic port string works in both orientations.
@@ -971,11 +833,11 @@ sub _array_ports {
   # Case 2: unblessed array.
   $case = 2 if !$label_needed;
 
-  # Case 4: blessed array. 
+  # Case 4: blessed array.
   $case = 4 if $label_needed;
 
   foreach (@$arrayref) {
-    ref $_ ? (push @ports, "{<port$port>.}") 
+    ref $_ ? (push @ports, "{<port$port>.}")
            :  push @ports, "{<port$port>" . $self->_dot_escape($_) . "}";
     $port++;
   }
@@ -986,10 +848,10 @@ sub _array_ports {
     # Case 2: unblessed array, laid out horizontally.
     #   $hports = "<port1>1|<port2>|<port3>s";
     /2/ and do {
-      $array_ports = join "|", @ports; 
+      $array_ports = join "|", @ports;
     };
 
-    # Case 4: blessed array, laid out horizontally. 
+    # Case 4: blessed array, laid out horizontally.
     #   $hports = "{<port0>Foo|{{<port1>1}|{<port2>}|{<port2>s}}}";
     /4/ and do {
       $array_ports = "{<port0>$label_needed\\n[Array object]|{" . (join "|", @ports) . "}}";
@@ -1017,8 +879,8 @@ In addition, we have the same four cases we did for arrays:
 
 =back
 
-Unblessed hashes should (ideally) simply be I<pairs> of rows of boxes - one 
-for key, one for value - with  either values or edges in each "key" box.  
+Unblessed hashes should (ideally) simply be I<pairs> of rows of boxes - one
+for key, one for value - with  either values or edges in each "key" box.
 Setting up port strings for this is a bit more difficult.
 
    # Hash assumed to contain (A=>1,B=>\$x,C=>"s").
@@ -1037,14 +899,14 @@ carefully lines up all the edges of boxes internal to a record; other times
 it doesn't. Rather than continue to try to kludge around this, it seemed
 the better part of valor to simply accept what it would do prettily and
 ignore the rest. In laying out blessed hashes (and following our self-imposed
-standard), we can either have 
+standard), we can either have
 
 =over 4
 
-=item a single box on the left containing the class name for 
-hashes laid out vertically 
+=item a single box on the left containing the class name for
+hashes laid out vertically
 
-=item a single box the top containing the class name for hashes 
+=item a single box the top containing the class name for hashes
 laid out horizontally
 
 =back
@@ -1057,32 +919,32 @@ So we stick with these two basic layouts and keep it pretty and simple.
    # Object is an hash blessed into class "Foo".
    # Hash assumed to contain (A=>1,B=>\$x,C=>"s").
    # Horizontal, name on top:
-   $hports = 
+   $hports =
    "{<port0>Foo|{{<port1>A|<port2>1}|{<port3>B|<port4>}|{<port5>C|<port6>s}}}";
 
    # Vertical, name on left:
-   $vports = 
+   $vports =
    "<port0>Foo|{<port1>A|<port3>B|<port5>C}|{<port2>1|<port4>|<port6>s}";
 
 Note that we also have to change how we add the braces to the keys and values
-when switching where the name is, in addition to separating or associating the 
+when switching where the name is, in addition to separating or associating the
 keys and values as needed.
 
-The good thing is that once this is all worked out, no one else has to care 
+The good thing is that once this is all worked out, no one else has to care
 anymore.  It just works and looks nice.
 
 =head2 GLOBS
 
 Globs, from the layout point of view, look pretty much like blessed hashes.
-The only exception for globs is if there's nothing in the glob, we want to 
+The only exception for globs is if there's nothing in the glob, we want to
 display it just as a plaintext node.
 
 =cut
 
 =for internals
 
-In the interest of coding as little as possible, we just reuse the hash code. 
-We construct a tiny pair of wrapper methods which add the necessary information 
+In the interest of coding as little as possible, we just reuse the hash code.
+We construct a tiny pair of wrapper methods which add the necessary information
 to the parameter list and then call the common module.
 
 =cut
@@ -1110,7 +972,7 @@ sub _hash_or_glob_ports {
   # We'll just pull out the string that differentiates them and
   # set it appropriately right here. Leter on, the code can be
   # identical, with the decision already out of the way.
-  my $description = {Hash=>"\\n[Hash object]", Glob=>""}->{$type};
+  my $description = {Hash => "\\n[Hash object]", Glob => ""}->{$type};
 
   # Exception: empty hashes. If the hash is completely empty and is not
   # blessed, we just want to show a plaintext "{}". If it's blessed, we
@@ -1154,7 +1016,7 @@ sub _hash_or_glob_ports {
   # {{<port1>A|<port3>B|<port5>C}|{<port2>1|<port4>|<port6>s}}
   $case = 1 if !$label_needed and $self->{Orientation} eq 'vertical';
 
-  # Case 2: unblessed hash, laid out horizontally. 
+  # Case 2: unblessed hash, laid out horizontally.
   # {<port1>A|<port2>1}|{<port3>B|<port4>}|{<port5>C|<port6>s}
   $case = 2 if !$label_needed and $self->{Orientation} ne 'vertical';
 
@@ -1162,11 +1024,11 @@ sub _hash_or_glob_ports {
   # {{<port0>Foo}|{<port1>A|<port3>B|<port5>C}|{<port2>1|<port4>|<port6>s}}
   $case = 3 if $label_needed  and $self->{Orientation} eq 'vertical';
 
-  # Case 4: blessed hash (glob), laid out horizontally, label on top. 
+  # Case 4: blessed hash (glob), laid out horizontally, label on top.
   # {<port0>Foo|{{<port1>A|<port2>1}|{<port3>B|<port4>}|{<port5>C|<port6>s}}}
   $case = 4 if $label_needed  and $self->{Orientation} ne 'vertical';
 
-  # Determine if we need associated or separated pairs. 
+  # Determine if we need associated or separated pairs.
   my $associate = 1 if grep /$case/,(2,4);
   my $separate  = 1 if grep /$case/,(1,3);
 
@@ -1218,7 +1080,7 @@ sub _hash_or_glob_ports {
   }
 
   if ($case == 2) {
-    # Case 2: unblessed hash, laid out horizontally. 
+    # Case 2: unblessed hash, laid out horizontally.
     # {<port1>A|<port2>1}|{<port3>B|<port4>}|{<port5>C|<port6>s}
     $port_string = join "|", (map {"{$_}"} @sets);
   }
@@ -1230,7 +1092,7 @@ sub _hash_or_glob_ports {
   }
 
   if ($case == 4) {
-    # Case 6: blessed hash (glob), laid out horizontally, label on top. 
+    # Case 6: blessed hash (glob), laid out horizontally, label on top.
     # {<port0>Foo|{{<port1>A|<port2>1}|{<port3>B|<port4>}|{<port5>C|<port6>s}}}
     $port_string = "{<port0>$label_needed$description|{" . (join "|", (map {"{$_}"} @sets))
                                             . "}}";
@@ -1268,7 +1130,7 @@ sub _code_label {
 C<dot> is a C program and therefore can get extremely upset (as in segfault
 upset) about text that is too long. In addition, it will become very testy
 if the text contains characters which it considers significant in constructing
-labels and the like. 
+labels and the like.
 
 It is necessary to clean up and shorten any text that C<dot> will be expected
 to put into a node. The C<_dot_escape> method is used to do this.
@@ -1319,7 +1181,7 @@ the active symbol tables and pads to find the glob that
 contains this item. After that, we can address the glob as if it were a hash,
 extracting the package and name from it.
 
-=end internals 
+=end internals
 
 =cut
 
@@ -1385,7 +1247,7 @@ sub _dumpglob {
   # strict has to be off for this code to even *begin* to parse.
   no strict;
   local *entry  = $val;
-  # Is there a scalar? 
+  # Is there a scalar?
   if (defined $entry) {
     $returns->{Scalar} = \$entry;
   }
@@ -1401,13 +1263,13 @@ sub _dumpglob {
   if (defined (my $fileno = fileno(*entry))) {
     $returns->{Filehandle} = \"FileHandle $$glob\n(fileno($fileno))";
   }
-  # A sub ? 
+  # A sub ?
   if (defined &entry) {
     $returns->{Sub} = \&entry;
   }
   (($returns ? $returns : "GLOB"),                        # The contents
    ('*' . *$val{PACKAGE} . '::' . *$val{NAME} or 'GLOB')  # The name
-  ); 
+  );
 }
 
 =head1 BUGS
@@ -1417,17 +1279,24 @@ containing items, even though it tries.
 
 =head1 BUGS EXPOSED IN DOT
 
-Data structures which point directly to themselves will cause C<dot> to 
+Data structures which point directly to themselves will cause C<dot> to
 discard all input in some cases. There's currently no fix for this; you can
 call the C<was_null()> method for now, which will tell you the graph was
 null and let you decide what to do.
 
-It isn't possible (in current releases of C<dot>) to code a record label which 
-contains no text (e.g.: C<{E<lt>port1E<gt>}>); this generates a zero-width box. 
-This has been worked around by placing a single period in places where nothing 
+It isn't possible (in current releases of C<dot>) to code a record label which
+contains no text (e.g.: C<{E<lt>port1E<gt>}>); this generates a zero-width box.
+This has been worked around by placing a single period in places where nothing
 at all would have been preferable. The C<graphviz> developers have developed a
-patch for C<dot> that corrects the problem, but it is not yet in a released 
+patch for C<dot> that corrects the problem, but it is not yet in a released
 version, though it is in CVS.
+
+=head1 OTHER DOT CONSIDERATIONS
+
+The C<record> type is officially deprecated, and it probably would be an idea
+to convert the labels to HTML format. The current implementation has been
+updated to work with C<dot 2.40.1>; there's no guarantee that future versions
+won't break the C<record> type again.
 
 =head1 AUTHOR
 

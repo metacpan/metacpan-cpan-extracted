@@ -1,0 +1,56 @@
+{
+   "abstract" : "allows AppleScript to be written in Perl",
+   "author" : [
+      "Steve Dondley <s@dondley.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mac-AppleScript-Glue",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "IO::File" : "0",
+            "Mac::AppleScript" : "0.03",
+            "Text::ParseWords" : "0",
+            "base" : "0",
+            "perl" : "v5.6.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Find" : "0",
+            "Test" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sdondley/Mac-AppleScript-Glue.git",
+         "web" : "https://github.com/sdondley/Mac-AppleScript-Glue"
+      }
+   },
+   "version" : "0.06",
+   "x_generated_by_perl" : "v5.24.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

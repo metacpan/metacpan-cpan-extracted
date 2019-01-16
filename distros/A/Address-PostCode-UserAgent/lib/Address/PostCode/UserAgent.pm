@@ -1,6 +1,6 @@
 package Address::PostCode::UserAgent;
 
-$Address::PostCode::UserAgent::VERSION = '0.08';
+$Address::PostCode::UserAgent::VERSION = '0.09';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Address::PostCode::UserAgent - User agent for Address::PostCode::* family.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -19,7 +19,7 @@ use HTTP::Tiny;
 use Address::PostCode::UserAgent::Exception;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'ua'=> (is => 'rw', default => sub { HTTP::Tiny->new(agent => "Address-PostCode-UserAgent/v1"); } );
 

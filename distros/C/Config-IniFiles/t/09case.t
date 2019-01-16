@@ -109,7 +109,7 @@ ok( first { index( $_, "parameter" ) >= 0 } @members, "parameter exists" );
     $group_case_check_pass = 0 unless ( $group_case_count == 2 );
 
     # We don't want to get the "interface" entries when we use the wrong case
-    @members = $ini->GroupMembers("Interface");
+    @members               = $ini->GroupMembers("Interface");
     $group_case_check_pass = 0 unless ( scalar(@members) == 0 );
 
     # We *do* want to get the "interface" entries when we use the right case

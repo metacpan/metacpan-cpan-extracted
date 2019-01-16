@@ -13,6 +13,7 @@ use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
 #use App::DBBrowser::GetContent; # required
 use App::DBBrowser::Opt;
+use App::DBBrowser::Table::Substatements;
 
 
 sub new {
@@ -43,6 +44,7 @@ sub table_write_access {
     if ( ! @stmt_types ) {
         return;
     }
+
     STMT_TYPE: while ( 1 ) {
         # Choose
         my $stmt_type = choose(
@@ -53,11 +55,12 @@ sub table_write_access {
             return;
         }
         $stmt_type =~ s/^-\ //;
+        $sf->{i}{stmt_types} = [ $stmt_type ];
         $ax->reset_sql( $sql );
         if ( $stmt_type eq 'Insert' ) {
-            my $ok = $sf->__build_insert_stmt( $sql, [ $stmt_type ] );
+            my $ok = $sf->__build_insert_stmt( $sql );
             if ( $ok ) {
-                $ok = $sf->commit_sql( $sql, [ $stmt_type ] );
+                $ok = $sf->commit_sql( $sql );
             }
             next STMT_TYPE;
         }
@@ -97,19 +100,19 @@ sub table_write_access {
             delete $ENV{TC_RESET_AUTO_UP};
             my $backup_sql = $ax->backup_href( $sql );
             if ( $custom eq $cu{'set'} ) {
-                my $ok = $sb->set( $stmt_h, $sql, $stmt_type );
+                my $ok = $sb->set( $stmt_h, $sql );
                 if ( ! $ok ) {
                     $sql = $backup_sql;
                 }
             }
             elsif ( $custom eq $cu{'where'} ) {
-                my $ok = $sb->where( $stmt_h, $sql, $stmt_type );
+                my $ok = $sb->where( $stmt_h, $sql );
                 if ( ! $ok ) {
                     $sql = $backup_sql;
                 }
             }
             elsif ( $custom eq $cu{'commit'} ) {
-                my $ok = $sf->commit_sql( $sql, [ $stmt_type ] );
+                my $ok = $sf->commit_sql( $sql );
                 next STMT_TYPE;
             }
             else {
@@ -121,13 +124,13 @@ sub table_write_access {
 
 
 sub commit_sql {
-    my ( $sf, $sql, $stmt_typeS ) = @_;
+    my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
     my $dbh = $sf->{d}{dbh};
     my $waiting = 'DB work ... ';
-    $ax->print_sql( $sql, $stmt_typeS, $waiting );
-    my $stmt_type = $stmt_typeS->[-1];
+    $ax->print_sql( $sql, $waiting );
+    my $stmt_type = $sf->{i}{stmt_types}[-1];
     my $rows_to_execute = [];
     my $row_count;
     if ( $stmt_type eq 'Insert' ) {
@@ -149,34 +152,17 @@ sub commit_sql {
         ) {
             $ax->print_error_message( "$@Fetching info: affected records ...\n", $stmt_type );
         }
-        my $prompt = @$all_arrayref == 2 ? 'This record will be ' : 'These records will be ';
-        if ( $stmt_type eq 'Update' ) {
-            my $filled = $sql->{set_stmt};
-            for my $val ( @{$sql->{set_args}} ) {
-                $filled =~ s/(?<=\ \=\ )\?/$val/;
-            }
-            $filled =~ s/^\s*SET\s*//;
-            my @items = split( /\s*,\s*/, $filled );
-            $prompt .= "updated with:\n";
-            if ( @items > 4 ) {
-                $prompt .= join ', ', @items;
-            }
-            else {
-                $prompt .= '  ' . join "\n  ", @items;
-            }
-            $prompt .= "\n";
-        }
-        else {
-            $prompt .= "deleted:\n";
-        }
+        my $prompt = $ax->print_sql( $sql );
+        $prompt .= "Affected records:";
         if ( @$all_arrayref > 1 ) {
             print_table(
                 $all_arrayref,
-                { %{$sf->{o}{table}}, grid => 2, prompt => $prompt, max_rows => 0, keep_header => 1 }
+                { %{$sf->{o}{table}}, grid => 2, prompt => $prompt, max_rows => 0,
+                keep_header => 1, table_expand => $sf->{o}{G}{info_expand} }
             );
         }
     }
-    $ax->print_sql( $sql, $stmt_typeS, $waiting );
+    $ax->print_sql( $sql, $waiting );
     my $transaction;
     eval {
         $dbh->{AutoCommit} = 1;
@@ -195,12 +181,12 @@ sub commit_sql {
                 $sth->execute( @$values );
             }
             my $commit_ok = sprintf qq(  %s %s "%s"), 'COMMIT', insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $stmt_type;
-            $ax->print_sql( $sql, $stmt_typeS );
+            $ax->print_sql( $sql );
             # Choose
             my $choice = $stmt_v->choose(
                 [ undef,  $commit_ok ]
             );
-            $ax->print_sql( $sql, $stmt_typeS, $waiting );
+            $ax->print_sql( $sql, $waiting );
             if ( ! defined $choice || $choice ne $commit_ok ) {
                 $dbh->rollback;
                 $rolled_back = 1;
@@ -221,13 +207,13 @@ sub commit_sql {
     }
     else {
         my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $stmt_type;
-        $ax->print_sql( $sql, $stmt_typeS ); #
+        $ax->print_sql( $sql ); #
         # Choose
         my $choice = $stmt_v->choose(
             [ undef,  $commit_ok ],
             { prompt => '' }
         );
-        $ax->print_sql( $sql, $stmt_typeS, $waiting );
+        $ax->print_sql( $sql, $waiting );
         if ( ! defined $choice || $choice ne $commit_ok ) {
             return;
         }
@@ -249,7 +235,7 @@ sub commit_sql {
 
 
 sub __insert_into_stmt_columns {
-    my ( $sf, $sql, $stmt_typeS ) = @_;
+    my ( $sf, $sql ) = @_;
     my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     $sql->{insert_into_cols} = [];
@@ -260,7 +246,7 @@ sub __insert_into_stmt_columns {
     my $bu_cols = [ @cols ];
 
     COL_NAMES: while ( 1 ) {
-        $ax->print_sql( $sql, $stmt_typeS );
+        $ax->print_sql( $sql );
         my @pre = ( undef, $sf->{i}{ok} );
         my $choices = [ @pre, @cols ];
         # Choose
@@ -298,13 +284,13 @@ sub __insert_into_stmt_columns {
 
 
 sub __build_insert_stmt {
-    my ( $sf, $sql, $stmt_typeS ) = @_;
+    my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     $ax->reset_sql( $sql );
     my @cu_keys = ( qw/insert_col insert_copy insert_file settings/ );
     my %cu = (
-        insert_col  => '- plain',
+        insert_col  => '- Plain',
         insert_file => '- From File',
         insert_copy => '- Copy & Paste',
         settings    => '  Settings'
@@ -338,7 +324,7 @@ sub __build_insert_stmt {
             $opt->config_insert;
             next MENU;
         }
-        my $cols_ok = $sf->__insert_into_stmt_columns( $sql, $stmt_typeS );
+        my $cols_ok = $sf->__insert_into_stmt_columns( $sql );
         if ( ! $cols_ok ) {
             next MENU;
         }
@@ -346,13 +332,13 @@ sub __build_insert_stmt {
         require App::DBBrowser::GetContent;
         my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o}, $sf->{d} );
         if ( $custom eq $cu{insert_col} ) {
-            $insert_ok = $gc->from_col_by_col( $sql, $stmt_typeS );
+            $insert_ok = $gc->from_col_by_col( $sql );
         }
         elsif ( $custom eq $cu{insert_copy} ) {
-            $insert_ok = $gc->from_copy_and_paste( $sql, $stmt_typeS );
+            $insert_ok = $gc->from_copy_and_paste( $sql );
         }
         elsif ( $custom eq $cu{insert_file} ) {
-            $insert_ok = $gc->from_file( $sql, $stmt_typeS );
+            $insert_ok = $gc->from_file( $sql );
         }
         if ( ! $insert_ok ) {
             next MENU;

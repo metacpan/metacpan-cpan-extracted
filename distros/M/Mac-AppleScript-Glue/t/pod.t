@@ -13,8 +13,8 @@ BEGIN {
     use Pod::Find qw(pod_find);
 
     %pods = pod_find(
-        { 
-            -verbose => 1, 
+        {
+            -verbose => 1,
         },
         'blib'
     );
@@ -23,5 +23,5 @@ BEGIN {
 use Test::Pod tests => scalar keys %pods;
 
 for my $pod (keys %pods) {
-    pod_ok($pod);
+    pod_file_ok($pod);
 }

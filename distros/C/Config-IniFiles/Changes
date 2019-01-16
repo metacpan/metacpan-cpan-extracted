@@ -1,3 +1,8 @@
+3.000001    2019-01-16
+    * Fix typos
+        - https://rt.cpan.org/Public/Bug/Display.html?id=128267
+        - Thanks to ROAM .
+
 3.000000    2018-09-13
     * Fix typos
         - https://github.com/shlomif/perl-Config-IniFiles/pull/5

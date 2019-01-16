@@ -8,7 +8,7 @@ sync
         {
             root_directory          ./not-found
             resource_directory      resources
-            destination_languages     de es fr-ca
+            target_languages     de es fr-ca
         }
     }
 }

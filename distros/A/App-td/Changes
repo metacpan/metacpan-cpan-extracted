@@ -1,4 +1,27 @@
-Revision history for App-td
+0.092   2019-01-16 (PERLANCAR)
+
+	- Tweak CLI: skip reading config & env.
+
+
+0.091   2019-01-16 (PERLANCAR)
+
+	- Fix Rinci metadata.
+
+
+0.090   2019-01-16 (PERLANCAR)
+
+	- select: support '*' and --exclude-column (-e).
+
+	- tail: support -n +NUM like the Unix command.
+
+        - head: support -n -NUM like the Unix command.
+
+	- Add action 'colnames'.
+
+	- Add action 'actions'.
+
+	- [Bugfix] wc and wc-row action aliases were not recognized.
+
 
 0.08    2017-01-01 (PERLANCAR)
 

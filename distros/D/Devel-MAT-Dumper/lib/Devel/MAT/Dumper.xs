@@ -366,7 +366,7 @@ static void write_private_sv(FILE *fh, const SV *sv)
     STRLEN len = SvCUR(sv);
     if(max_string > -1 && len > max_string)
       len = max_string;
-    write_strn(fh, SvPVX(sv), len);
+    write_strn(fh, SvPVX((SV *)sv), len);
   }
   else
     write_str(fh, NULL);
@@ -380,7 +380,7 @@ static void write_private_rv(FILE *fh, const SV *rv)
   write_u8(fh, (SvWEAKREF(rv) ? 0x01 : 0));
 
   // PTRs
-  write_svptr(fh, SvRV(rv));
+  write_svptr(fh, SvRV((SV *)rv));
 #if (PERL_REVISION == 5) && (PERL_VERSION <= 20)
   write_svptr(fh, (SV *)SvOURSTASH(rv));
 #else
@@ -390,10 +390,15 @@ static void write_private_rv(FILE *fh, const SV *rv)
 
 static void write_private_av(FILE *fh, const AV *av)
 {
-  int len = AvFILLp(av) + 1;
+  /* Perl doesn't bother to keep AvFILL(PL_curstack) updated for efficiency
+   * reasons, so if we're looking at PL_curstack we'll use a different method
+   * to calculate this
+   */
+  int len = (av == PL_curstack) ? (PL_stack_sp - PL_stack_base + 1) :
+    AvFILLp(av) + 1;
 
   write_common_sv(fh, (const SV *)av,
-    sizeof(XPVAV) + sizeof(SV *) * len);
+    sizeof(XPVAV) + sizeof(SV *) * (AvMAX(av) + 1));
 
   // Header
   write_uint(fh, len);

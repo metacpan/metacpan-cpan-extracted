@@ -20,7 +20,7 @@ use File::Spec;
 
 use File::Temp qw(tempdir);
 
-my $dirname = tempdir( CLEANUP => 1 );
+my $dirname  = tempdir( CLEANUP => 1 );
 my $filename = File::Spec->catfile( $dirname, 'toto.ini' );
 
 {

@@ -20,6 +20,7 @@ lib/App/DBBrowser/Table.pm
 lib/App/DBBrowser/Table/Extensions.pm
 lib/App/DBBrowser/Table/Functions.pm
 lib/App/DBBrowser/Table/Substatements.pm
+lib/App/DBBrowser/Table/Substatements/Operators.pm
 lib/App/DBBrowser/Table/WriteAccess.pm
 lib/App/DBBrowser/Union.pm
 LICENSE
@@ -30,7 +31,6 @@ META.yml
 README
 t/compile.t
 xt/cntrl_db_browser.t
-xt/Debug.pm
 xt/manifest.t
 xt/perl_minimum_version.t
 xt/pod-coverage.t

@@ -1,5 +1,5 @@
 package App::EvalServerAdvanced::Sandbox::Internal;
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 use strict;
 use warnings;
@@ -9,13 +9,14 @@ use Module::Runtime qw/require_module check_module_name/;
 use Moo;
 
 sub load_plugins {
+
   my $load_module = sub {
     my ($name) = @_;
     check_module_name($name);
 
     if ($name !~ /^App::EvalServerAdvanced::Sandbox::Plugin::/) {
       do {
-        local @INC = config->sandbox->plugin_base;
+        local @INC = (config->sandbox->plugin_base, @INC);
         return $name if (eval {require_module($name)});
       };
       # we couldnt' load it from the plugin base, try from @INC with a fully qualified name

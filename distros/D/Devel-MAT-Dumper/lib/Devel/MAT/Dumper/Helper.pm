@@ -8,7 +8,7 @@ package Devel::MAT::Dumper::Helper;
 use strict;
 use warnings;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 =head1 NAME
 
@@ -173,8 +173,8 @@ static int S_DMD_AnnotateSv(pTHX_ const SV *targ, const SV *val, const char *nam
     return 0;
 
   mXPUSHi(0x87); /* TODO PMAT_SVxSVSVnote */
-  XPUSHs(targ);
-  XPUSHs(val);
+  XPUSHs((SV *)targ);
+  XPUSHs((SV *)val);
   mXPUSHp(name, strlen(name));
   PUTBACK;
   return 4;
@@ -188,7 +188,7 @@ static void S_DMD_SetMagicHelper(pTHX_ MGVTBL *vtbl, DMD_MagicHelper *helper)
   HV *helper_per_magic = get_hv("Devel::MAT::Dumper::HELPER_PER_MAGIC", GV_ADD);
   SV *keysv = newSViv((IV)vtbl);
 
-  hv_store_ent(helper_per_magic, keysv, newSVuv((char *)helper), 0);
+  hv_store_ent(helper_per_magic, keysv, newSVuv(PTR2UV(helper)), 0);
 
   SvREFCNT_dec(keysv);
 }

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.042';
+our $VERSION = '2.043';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.042
+Version 2.043
 
 =cut
 
@@ -65,7 +65,7 @@ Version 2.042
     db-browser database-name, ...
 
 When the C<db-browser> is called with the argument C<-h|--help>, it shows a menu. The menu entry I<HELP> shows this
-documentation - see L<OPTIONS>.
+documentation - see L</OPTIONS>.
 
 If C<db-browser> is called without arguments, the user can choose from the databases offered by the database plugin. The
 database is chosen automatically if only one database is available. With the C<SQLite> driver in use, the option
@@ -112,7 +112,7 @@ With the option I<mouse> enabled it can be used the mouse with the left mouse ke
 To confirm a chosen menu item use the C<Return> key.
 
 In some sub-menus it is possible to select more then one item before C<Return> is pressed (for example I<Choose Rows>
-and I<Choose Columns> from the input filter - see L<Insert Into>); in such sub-menus the list of items marked with the
+and I<Choose Columns> from the input filter - see L</Insert Into>); in such sub-menus the list of items marked with the
 C<SpaceBar> are added to the chosen items when C<Return> is pressed. If a mouse mode is enabled, it can be used the
 right mouse key instead of the C<SpaceBar>. A C<Ctrl-SpaceBar> inverts the made choices - so for example with no items
 chosen C<Ctrl-SpaceBar> chooses everything.
@@ -133,7 +133,7 @@ Vertical spaces (C<\v>) are squashed to two spaces
 
 Control characters, code points of the surrogate ranges and non-characters are removed.
 
-See also the option group L<Output>.
+See also the option group L</Output>.
 
 =head1 MENUS
 
@@ -224,7 +224,7 @@ Combine the result from multiple SELECT statements.
 
 =head3 Settings
 
-See L<DB Settings>.
+See L</DB Settings>.
 
 =head2 SQL Menu
 
@@ -259,14 +259,46 @@ Read the input from am file. Supported file formats: text files and file formats
 
 =back
 
-Setting the insert mode to I<From File> or to I<Copy and Paste> enables different filters: one can select columns,
-select rows, select a range of rows or transpose rows to columns.
-
-If the input has rows with different numbers of columns, the filter I<choose_rows> sorts the rows in groups with the
-same number of columns. The user can then select the group which should be used.
-
 If the first column of a table is an auto-increment column, the C<INSERT INTO> statement is build without this first
 column. This feature is available if it is supported by the database plugin.
+
+Available input filters:
+
+=over
+
+=item Choose Columns
+
+Use only selected columns of the imported data.
+
+If the imported data has empty columns, the non-empty columns are preselected. Columns are regarded as empty if the
+values of all fields in the column - including the column header - have no length.
+
+=item Choose Rows
+
+Use only selected rows of the imported data.
+
+If the input has rows with different numbers of columns, this filter sorts the rows in groups with the same number of
+columns. The user can then select the group of rows which should be used.
+
+=item A Range of Rows
+
+Use only a range of rows.
+
+=item Cols_to_Rows
+
+Transpose columns to rows.
+
+=item Empty_to_NULL
+
+Convert fields containing an empty string to NULL (undefined).
+
+With I<Plain> and I<Copy & Paste> this filter is enabled by default.
+
+=item Reset
+
+Reset the filters to the default values.
+
+=back
 
 =head4 Update
 
@@ -359,7 +391,7 @@ Choose the required database plugins.
 
 These driver specific I<DB Settings> are used as the default database settings.
 
-There is also in each L<Table Menu> the entry I<Settings> to make database specific settings. If no database specific
+There is also in each L</Table Menu> the entry I<Settings> to make database specific settings. If no database specific
 settings are set, these global (to the database plugin) I<DB Settings> are used.
 
 User defined database plugins: it depends on the plugin which items are offered to set in each option and whether the
@@ -401,7 +433,29 @@ If enabled: saves the menu position while entering in a sub menu.
 
 =head3 Table
 
-Expand Rows:
+Expand table rows:
+
+=over
+
+=item C<YES>
+
+if C<Return> is pressed, the selected table row is printed with each column in its own line.
+
+=item C<NO>
+
+don't expand table rows.
+
+=item C<YES fast back>
+
+do not expand the first row if the cursor auto-jumped to the first row.
+
+=back
+
+=head3 Info
+
+Before records are deleted/updated or before a table is dropped the affected records are shown in an info-table.
+
+Expand info tables rows:
 
 =over
 
@@ -446,45 +500,50 @@ To disable the automatic limit set I<Auto Limit> to C<0>.
 
 =head3 Extensions
 
+Select which menu extensions should be available:
+
 =over
 
-=item Extended SELECT
+=item Extensions SELECT
 
-Values: I<None>, I<Func>, I<SQ> and I<Func+SQ>
+Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
 
-=item Extended WHERE
+=item Extensions WHERE
 
-Values: I<None>, I<Func>, I<SQ> and I<Func+SQ>
+Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
 
-=item Extended HAVING
+=item Extensions HAVING
 
-Values: I<None>, I<Func>, I<SQ> and I<Func+SQ>
+Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
 
-=item Extended SET
+=item Extensions SET
 
-Values: I<None>, I<Func>, I<SQ> and I<Func+SQ>
+Values: I<None>, I<Func>, I<SQ> I<=N> and I<Func/SQ/=N>
 
-=item Extended Table
+=item Extensions Table
 
 Values: I<None> and I<SQ>
 
-=item Extended Join
+=item Extensions Join
 
 Values: I<None> and I<SQ>
 
 =back
 
-If set to I<None> no menu extension.
+If set to I<None>, no menu extensions are available.
 
-If set to I<Func>, C<f()> is shown as additionally menu entry.
+If set to I<Func>, C<f()> is shown as additionally menu entry. Selecting C<f()> opens the L</Functions> menu.
 
-If set to I<SQ>, C<SQ> is shown as additionally menu entry.
+If set to I<SQ>, C<SQ> is shown as additionally menu entry. Selecting C<SQ> opens the L</Subqueries> menu.
 
-If set to I<Func+SQ>, C<%%> is shown as additionally menu entry. Selecting C<%%> lets one choose between C<f()> and
-C<SQ>.
+If set to I<=N>, C<=N> is shown as additionally menu entry (available only after the C<SET> in an C<UPDATE> statement).
+Selecting C<=N> sets the column to C<NULL>.
 
-If these additionally menu entries are prefixed with C<=>, it is required to select an operator before entering a subquery
-or before selecting a function.
+If set to I<Func/SQ> (or I<Func/SQ/=N>), C<%%> is shown as additionally menu entry. Selecting C<%%> lets one choose
+between all available extensions.
+
+If these menu entries are prefixed with C<=>, it is required to select the wanted operator I<after> the extended menu
+entry has been chosen.
 
 =head4 Functions
 

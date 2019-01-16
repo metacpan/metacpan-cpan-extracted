@@ -1,9 +1,9 @@
 This archive contains the distribution Text-Parser,
-version 0.801:
+version 0.802:
 
-  Bare text parser, bundles many common "mundane" tasks.
+  Bare text parser, simplifies text parsing.
 
-This software is copyright (c) 2018 by Balaji Ramasubramanian.
+This software is copyright (c) 2018-2019 by Balaji Ramasubramanian.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

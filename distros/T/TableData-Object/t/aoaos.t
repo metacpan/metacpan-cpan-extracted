@@ -58,15 +58,19 @@ subtest select => sub {
     $td2 = $td->select_as_aoaos();
     is_deeply($td2->rows_as_aoaos, [[1,2],[5,6],[3,4]]);
 
+    $td2 = $td->select_as_aoaos(["*"]);
+    is_deeply($td2->rows_as_aoaos, [[1,2],[5,6],[3,4]]);
+
     $td2 = $td->select_as_aoaos(["column1","column0","column1"]);
     is_deeply($td2->rows_as_aoaos, [[2,1,2],[6,5,6],[4,3,4]]);
 
     $td2 = $td->select_as_aohos(["column1","column0","column1"]);
     is_deeply($td2->rows_as_aohos, [{column1=>2, column0=>1, column1_2=>2},{column1=>6, column0=>5, column1_2=>6},{column1=>4, column0=>3, column1_2=>4}]);
 
-    # filter & sort
+    # filter, exclude & sort
     dies_ok { $td->select_as_aoaos([], undef, ["foo"]) } "unknown sort column -> dies";
-    $td2 = $td->select_as_aoaos(["column1"],
+    $td2 = $td->select_as_aoaos(["column1","column0"],
+                                ["column0"],
                                 sub { my ($td, $row) = @_; $row->{column0} > 1 },
                                 ["-column1"]);
     is_deeply($td2->rows_as_aoaos, [[6],[4]]);

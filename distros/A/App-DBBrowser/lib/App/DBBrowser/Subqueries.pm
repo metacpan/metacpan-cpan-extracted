@@ -43,7 +43,7 @@ sub __stmt_history {
         if ( any { $_ eq $filled_stmt } @$print_history_filled ) {
             next;
         }
-        if ( @$print_history_keep == 8 ) {
+        if ( @$print_history_keep == 7 ) {
             $sf->{i}{history}{$db}{print} = $print_history_keep;
             last;
         }
@@ -61,7 +61,7 @@ sub __stmt_history {
 
 
 sub choose_subquery {
-    my ( $sf, $sql, $stmt_type, $clause ) = @_;
+    my ( $sf, $sql, $clause ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $db = $sf->{d}{db};
     my $h_ref = $ax->read_json( $sf->{subquery_file} );
@@ -74,7 +74,6 @@ sub choose_subquery {
     my $prefix = '- ';
 
     SUBQUERY: while ( 1 ) {
-        $ax->print_sql( $sql, [ $stmt_type ] ); ##
         my $choices = [
             @pre,
             map( $prefix . $_->[-1], @$subqueries ),
@@ -110,6 +109,7 @@ sub choose_subquery {
                     map( $prefix . $_, @$history )
                 ];
             }
+            $ax->print_sql( $sql );
             next SUBQUERY;
         }
 
@@ -122,6 +122,9 @@ sub choose_subquery {
             $prompt = '';
              $idx -= @pre;
             if ( $idx <= $#$subqueries ) {
+                if ( defined $subqueries->[$idx][1] && length $subqueries->[$idx][1] ) {    #
+                    return "(" . $subqueries->[$idx][0] . ")";                              #
+                }                                                                           #
                 $default = $subqueries->[$idx][0];
             }
             else {
@@ -129,15 +132,14 @@ sub choose_subquery {
                 $default = $history->[$idx];
             }
         }
-        $ax->print_sql( $sql, [ $stmt_type ] ); ##
         my $tf = Term::Form->new();
         my $stmt = $tf->readline( $prompt, { default => $default, info => $info } );
         if ( defined $stmt && length $stmt ) {
-            if ( $stmt =~ /^\s*\((.+)\)\s*\z/ ) {
-                $stmt = $1;
-            }
             unshift @{$sf->{i}{history}{$db}{$clause}}, $stmt;
-            return "(" . $stmt . ")";
+            if ( $stmt !~ /^\s*\([^)(]+\)\s*\z/ ) {
+                $stmt = "(" . $stmt . ")";
+            }
+            return $stmt;
         }
     }
 }
@@ -153,7 +155,7 @@ sub edit_sq_file {
     my $any_change = 0;
 
     while ( 1 ) {
-        my $top_lines = [ $db, sprintf( 'Stored Subqueries "%s"', ucfirst $clause ) ];
+        my $top_lines = [ $db, sprintf( 'Stored Subqueries "%s":', ucfirst $clause ) ];
         my $h_ref = $ax->read_json( $sf->{subquery_file} );
         my $subqueries = $h_ref->{$driver}{$db}{$clause} || [];
         my @tmp_info = (
@@ -165,7 +167,7 @@ sub edit_sq_file {
         # Choose
         my $choice = choose(
             [ @pre, $add, $edit, $remove ],
-            { %{$sf->{i}{lyt_v_clear}}, undef => '  <=', info => $info }
+            { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose:', undef => '  <=', info => $info }
         );
         my $changed = 0;
         if ( ! defined $choice ) {
@@ -196,7 +198,6 @@ sub edit_sq_file {
 
 sub __add_subqueries {
     my ( $sf, $subqueries, $top_lines, $clause ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $history = $sf->__stmt_history( $clause );
     my $used = [];
     my $readline = '  Read-Line';
@@ -232,7 +233,7 @@ sub __add_subqueries {
             my $tf = Term::Form->new();
             my $stmt = $tf->readline( 'Stmt: ', { info => $info, clear_screen => 1  } );
             if ( defined $stmt && length $stmt ) {
-                if ( $stmt =~ /^\s*\((.+)\)\s*\z/ ) {
+                if ( $stmt =~ /^\s*\(([^)(]+)\)\s*\z/ ) {
                     $stmt = $1;
                 }
                 push @$bu, [ [ @$tmp_new ], [ @$history ], [ @$used ] ];

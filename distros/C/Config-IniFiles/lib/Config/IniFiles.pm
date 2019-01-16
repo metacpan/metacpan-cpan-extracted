@@ -4,7 +4,7 @@ require 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '3.000000';
+our $VERSION = '3.000001';
 use Carp;
 use Symbol 'gensym', 'qualify_to_ref';    # For the 'any data type' hack
 use Fcntl qw( SEEK_SET SEEK_CUR );
@@ -2381,7 +2381,7 @@ Config::IniFiles - A module for reading .ini-style configuration files.
 
 =head1 VERSION
 
-version 3.000000
+version 3.000001
 
 =head1 SYNOPSIS
 
@@ -2398,7 +2398,7 @@ sections can be grouped, and settings can be accessed from a tied hash.
 
 =head1 VERSION
 
-version 3.000000
+version 3.000001
 
 =head1 FILE FORMAT
 
@@ -2960,7 +2960,7 @@ prepended with one. See L</SetSectionComment($section, @comment)> above
 Gets the comment attached to a parameter. In list context returns all
 comments - in scalar context returns them joined by newlines.
 
-=head2 DeleteParameterComment ($section, $parmeter)
+=head2 DeleteParameterComment ($section, $parameter)
 
 Deletes the comment attached to a parameter.
 
@@ -2974,7 +2974,7 @@ Accessor method for the EOT text for the specified parameter. Sets the HERE styl
 
 To un-set the EOT text, use DeleteParameterEOT ($section, $parameter).
 
-=head2 DeleteParameterEOT ($section, $parmeter)
+=head2 DeleteParameterEOT ($section, $parameter)
 
 Removes the EOT marker for the given section and parameter.
 When writing a configuration file, if no EOT marker is defined

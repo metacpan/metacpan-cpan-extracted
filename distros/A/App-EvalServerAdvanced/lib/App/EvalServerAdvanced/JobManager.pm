@@ -6,7 +6,7 @@ use warnings;
 use feature qw(postderef);
 no warnings qw(experimental::postderef);
 
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 use Data::Dumper;
 use Moo;
@@ -14,6 +14,7 @@ use App::EvalServerAdvanced::Config;
 use App::EvalServerAdvanced::Log;
 use Function::Parameters;
 use POSIX qw/dup2 _exit/;
+use IO::Handle;
 
 has loop => (is => 'ro');
 has workers => (is => 'ro', builder => sub {+{}});
@@ -46,7 +47,8 @@ method run_job($eval_job) {
         code => sub {
             close(STDERR);
             dup2(1,2) or _exit(212); # Setup the C side of things
-            *STDERR = \*STDOUT; # Setup the perl side of things
+#            *STDERR = \*STDOUT; # Setup the perl side of things
+            *STDERR = IO::Handle->new_from_fd(2, "w"); # setup a new STDERR
             binmode STDOUT, ":encoding(utf8)"; # these really only affect perl subs, but they should also support other encodings
             binmode STDERR, ":encoding(utf8)";
             binmode STDIN, ":encoding(utf8)";

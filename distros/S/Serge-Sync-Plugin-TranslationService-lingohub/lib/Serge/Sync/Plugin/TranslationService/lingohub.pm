@@ -11,7 +11,7 @@ use Serge::Util qw(subst_macros);
 
 use version;
 
-our $VERSION = qv('0.902.0');
+our $VERSION = qv('0.903.0');
 
 sub name {
     return 'Lingohub translation software (https://www.lingohub.com) synchronization plugin';
@@ -28,8 +28,8 @@ sub init {
         project                => 'STRING',
         root_directory         => 'STRING',
         resource_directory     => 'STRING',
-        source_language          => 'STRING',
-        destination_languages    => 'ARRAY'
+        source_language        => 'STRING',
+        target_languages       => 'ARRAY'
     });
 }
 
@@ -42,19 +42,19 @@ sub validate_data {
     $self->{data}->{root_directory} = subst_macros($self->{data}->{root_directory});
     $self->{data}->{resource_directory} = subst_macros($self->{data}->{resource_directory});
     $self->{data}->{source_language} = subst_macros($self->{data}->{source_language});
-    $self->{data}->{destination_languages} = subst_macros($self->{data}->{destination_languages});
+    $self->{data}->{target_languages} = subst_macros($self->{data}->{target_languages});
 
     die "'project' not defined" unless defined $self->{data}->{project};
     die "'resource_directory' not defined" unless defined $self->{data}->{resource_directory};
     die "'root_directory', which is set to '$self->{data}->{root_directory}', does not point to a valid folder." unless -d $self->{data}->{root_directory};
 
-    my $destination_languages_count = 0;
+    my $target_languages_count = 0;
 
-    if (defined $self->{data}->{destination_languages}) {
-        $destination_languages_count = scalar(@{$self->{data}->{destination_languages}});
+    if (defined $self->{data}->{target_languages}) {
+        $target_languages_count = scalar(@{$self->{data}->{target_languages}});
     }
 
-    die "the list of destination languages is empty" unless $destination_languages_count != 0;
+    die "the list of target languages is empty" unless $target_languages_count != 0;
 
     $self->{data}->{source_language} = 'en' unless defined $self->{data}->{source_language};
 }
@@ -120,7 +120,7 @@ sub get_all_langs {
     my ($self, $langs) = @_;
 
     if (!$langs) {
-        $langs = $self->{data}->{destination_languages};
+        $langs = $self->{data}->{target_languages};
     }
 
     my @all_langs = ($self->{data}->{source_language});

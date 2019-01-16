@@ -44,12 +44,12 @@ sub on_table {
         limit           => '- LIMIT',
         reset           => '  Reset',
     );
-    my $stmt_type = 'Select';
+    $sf->{i}{stmt_types} = [ 'Select' ];
     my $old_idx = 1;
 
     CUSTOMIZE: while ( 1 ) {
         my $choices = [ $cu{hidden}, undef, @cu{@$sub_stmts} ];
-        $ax->print_sql( $sql, [ $stmt_type ] );
+        $ax->print_sql( $sql );
         # Choose
         $ENV{TC_RESET_AUTO_UP} = 0;
         my $idx = choose(
@@ -76,49 +76,49 @@ sub on_table {
             $old_idx = 1;
         }
         elsif ( $custom eq $cu{'select'} ) {
-            my $ok = $sb->select( $stmt_h, $sql, $stmt_type );
+            my $ok = $sb->select( $stmt_h, $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'distinct'} ) {
-            my $ok = $sb->distinct( $stmt_h, $sql, $stmt_type );
+            my $ok = $sb->distinct( $stmt_h, $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'aggregate'} ) {
-            my $ok = $sb->aggregate( $stmt_h, $sql, $stmt_type );
+            my $ok = $sb->aggregate( $stmt_h, $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'where'} ) {
-            my $ok = $sb->where( $stmt_h, $sql, $stmt_type );
+            my $ok = $sb->where( $stmt_h, $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'group_by'} ) {
-            my $ok = $sb->group_by( $stmt_h, $sql, $stmt_type );
+            my $ok = $sb->group_by( $stmt_h, $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'having'} ) {
-            my $ok = $sb->having( $stmt_h, $sql, $stmt_type );
+            my $ok = $sb->having( $stmt_h, $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'order_by'} ) {
-            my $ok = $sb->order_by( $stmt_h, $sql, $stmt_type );
+            my $ok = $sb->order_by( $stmt_h, $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
         }
         elsif ( $custom eq $cu{'limit'} ) {
-            my $ok = $sb->limit_offset( $stmt_h, $sql, $stmt_type );
+            my $ok = $sb->limit_offset( $stmt_h, $sql );
             if ( ! $ok ) {
                 $sql = $backup_sql;
             }
@@ -127,7 +127,7 @@ sub on_table {
             require App::DBBrowser::Table::WriteAccess;
             my $write = App::DBBrowser::Table::WriteAccess->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $write->table_write_access( $sql );
-            $stmt_type = 'Select';
+            $sf->{i}{stmt_types} = [ 'Select' ];
             $old_idx = 1;
             $sql = $backup_sql;
         }
@@ -136,14 +136,12 @@ sub on_table {
             print CLEAR_SCREEN;
             print HIDE_CURSOR;
             print 'Computing:' . "\r" if $sf->{o}{table}{progress_bar};
-            my $statement = $ax->get_stmt( $sql, $stmt_type, 'prepare' );
+            my $statement = $ax->get_stmt( $sql, 'Select', 'prepare' );
             my @arguments = ( @{$sql->{where_args}}, @{$sql->{having_args}} );
-            #if ( $sf->{i}{special_table} ne 'subquery' ) { ##
-                unshift @{$sf->{i}{history}{ $sf->{d}{db} }{print}}, [ $statement, \@arguments ];
-                if ( $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} > 50 ) {
-                    $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} = 50;
-                }
-            #}
+            unshift @{$sf->{i}{history}{ $sf->{d}{db} }{print}}, [ $statement, \@arguments ];
+            if ( $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} > 50 ) {
+                $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} = 50;
+            }
             if ( $sf->{o}{G}{max_rows} && ! $sql->{limit_stmt} ) {
                 $statement .= " LIMIT " . $sf->{o}{G}{max_rows};
                 $sf->{o}{table}{max_rows} = $sf->{o}{G}{max_rows};

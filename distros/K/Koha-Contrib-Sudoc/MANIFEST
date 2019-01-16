@@ -18,6 +18,7 @@ dist.ini
 doc/asciidoctor.css
 doc/coderay-asciidoctor.css
 doc/sudoc.html
+doc/sudoc.pdf
 lib/Koha/Contrib/Sudoc.pm
 lib/Koha/Contrib/Sudoc/BiblioReader.pm
 lib/Koha/Contrib/Sudoc/Converter.pm

@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::BiblioReader;
 #ABSTRACT: Lecture des notices biblio/autorité
-$Koha::Contrib::Sudoc::BiblioReader::VERSION = '2.26';
+$Koha::Contrib::Sudoc::BiblioReader::VERSION = '2.27';
 use Moose;
 use Moose::Util::TypeConstraints;
 use MARC::Moose::Record;
@@ -80,7 +80,7 @@ Koha::Contrib::Sudoc::BiblioReader - Lecture des notices biblio/autoritÃ©
 
 =head1 VERSION
 
-version 2.26
+version 2.27
 
 =head1 AUTHOR
 
@@ -88,7 +88,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Fréderic Demians.
+This software is Copyright (c) 2019 by Fréderic Demians.
 
 This is free software, licensed under:
 

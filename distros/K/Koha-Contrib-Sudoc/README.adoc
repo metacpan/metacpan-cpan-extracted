@@ -1,6 +1,6 @@
 = Chargeur Sudoc Koha par Tamil =
 Tamil s.a.r.l. <contact@tamil.fr>
-v2.23, novembre 2018
+v2.26, novembre 2018
 :linkcss:
 :icons: font
 :toc: right

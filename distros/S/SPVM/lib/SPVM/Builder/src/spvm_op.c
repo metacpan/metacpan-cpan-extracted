@@ -1145,6 +1145,10 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
         type->basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, "byte", strlen("byte"));
         type->dimension = 0;
       }
+      else if (basic_type->id == SPVM_BASIC_TYPE_C_ID_OARRAY && first_type->dimension == 0) {
+        type->basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, "object", strlen("object"));
+        type->dimension = 0;
+      }
       else {
         type->basic_type = basic_type;
         assert(first_type->dimension > 0);
@@ -1472,8 +1476,8 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   // Package
   SPVM_PACKAGE* package = SPVM_PACKAGE_new(compiler);
   
-  package->load_path = compiler->cur_file;
-  package->load_rel_path = compiler->cur_rel_file;
+  package->module_file = compiler->cur_file;
+  package->module_rel_file = compiler->cur_rel_file;
   
   int32_t is_anon;
   if (op_type) {

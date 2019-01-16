@@ -23,11 +23,17 @@ sub new {
 
 
 sub extended_col {
-    my ( $sf, $sql, $stmt_type, $clause ) = @_;
+    my ( $sf, $sql, $clause ) = @_;
     my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my ( $function, $subquery ) = ( 'f()', 'SQ' );
-    my @values = ( undef, [ $function ], [ $subquery ], [ $function, $subquery ] );
+    my ( $none, $function, $subquery, $all ) = @{$sf->{i}{extended_signs}};
+    my $set_to_null = '=NULL';
+    my @values;
+    if ( $clause eq 'set' ) {
+        @values = ( undef, [ $function ], [ $subquery ], [ $set_to_null ], [ $function, $subquery, $set_to_null ] );
+    }
+    else {
+        @values = ( undef, [ $function ], [ $subquery ], [ $function, $subquery ] );
+    }
     my @types = @{$values[$sf->{o}{G}{"extend_$clause"}]};
     my $type;
     if ( @types == 1 ) {
@@ -44,7 +50,7 @@ sub extended_col {
     if ( $type eq $subquery ) {
         require App::DBBrowser::Subqueries;
         my $new_sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $subq = $new_sq->choose_subquery( $sql, $stmt_type, $clause );
+        my $subq = $new_sq->choose_subquery( $sql, $clause );
         if ( ! defined $subq ) {
             return;
         }
@@ -53,18 +59,20 @@ sub extended_col {
     elsif ( $type eq $function ) {
         require App::DBBrowser::Table::Functions;
         my $new_func = App::DBBrowser::Table::Functions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $func = $new_func->col_function( $sql, $stmt_type, $clause );
+        my $func = $new_func->col_function( $sql, $clause );
         if ( ! defined $func ) {
             return;
         }
         $ext_col = $func;
     }
-    $ax->print_sql( $sql, [ $stmt_type ] );
+    elsif ( $type eq $set_to_null ) {
+        return "NULL";
+    }
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $alias = $ax->alias( 'subqueries', $ext_col );
     if ( defined $alias && length $alias ) {
         $sql->{alias}{$ext_col} = $ax->quote_col_qualified( [ $alias ] );
     }
-    $ax->print_sql( $sql, [ $stmt_type ] );
     return $ext_col;
 }
 

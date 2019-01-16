@@ -7,7 +7,7 @@ use Module::CPANfile;
 use Perl::PrereqScanner::NotQuiteLite::App;
 use Test::More;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 our @EXPORT = qw/cpanfile_has_all_used_modules/;
 
 my %Phases = (
@@ -76,7 +76,7 @@ sub cpanfile_has_all_used_modules {
               $res ? $res->{uri} : undef;
             };
           }
-          ok($uri && $uri_map{$uri}, "$module ($phase $type) is declared (as $uri_map{$uri})");
+          ok($uri && $uri_map{$uri}, "$module ($phase $type) is declared" . ($uri_map{$uri} ? " (as $uri_map{$uri})" : ""));
         }
       }
     }

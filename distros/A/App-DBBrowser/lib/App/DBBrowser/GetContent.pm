@@ -16,9 +16,10 @@ use Encode::Locale    qw();
 #use Spreadsheet::Read qw( ReadData rows ); # required
 #use Text::CSV         qw();                # required
 
-use Term::Choose       qw( choose );
-use Term::Choose::Util qw( choose_a_file choose_a_subset );
-use Term::Form         qw();
+use Term::Choose            qw( choose );
+use Term::Choose::Constants qw( :screen );
+use Term::Choose::Util      qw( choose_a_file choose_a_subset choose_a_number insert_sep );
+use Term::Form              qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::GetContent::Filter;
@@ -40,26 +41,71 @@ sub new {
 }
 
 
+sub __print_args {
+    my ( $sf, $sql ) = @_;
+    if ( @{$sf->{i}{stmt_types}} == 1 ) {
+        my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        $ax->print_sql( $sql );
+    }
+    else {
+        my $max = 9;
+        my @tmp = ( 'Table Data:' );
+        my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        my $arg_rows = $ax->insert_into_args_info_format( $sql, 10, '' );
+        push @tmp, @$arg_rows;
+        my $str = join( "\n", @tmp ) . "\n\n";
+        print CLEAR_SCREEN;
+        print $str;
+    }
+}
+
+
 sub from_col_by_col {
-    my ( $sf, $sql, $stmt_typeS ) = @_;
-    my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my ( $sf, $sql ) = @_;
     $sql->{insert_into_args} = [];
     my $trs = Term::Form->new();
+    my $col_names = $sql->{insert_into_cols};
+    if ( ! @$col_names ) {
+        $sf->__print_args( $sql );
+        # Choose a number
+        my $col_count = choose_a_number( 3,
+            { small_on_top => 1, confirm => 'Confirm', mouse => $sf->{o}{table}{mouse},
+            back => 'Back', name => 'Number of columns: ', clear_screen => 0 }
+        );
+        if ( ! $col_count ) {
+            return;
+        }
+        $col_names = [ map { 'c' . $_ } 1 .. $col_count ];
+        my $col_number = 0;
+        my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$col_names ];
+        # Fill_form
+        my $form = $trs->fill_form(
+            $fields,
+            { prompt => 'Col names:', auto_up => 2, confirm => '  CONFIRM', back => '  BACK   ' }
+        );
+        if ( ! $form ) {
+            return;
+        }
+        $col_names = [ map { $_->[1] } @$form ]; # not quoted
+        unshift @{$sql->{insert_into_args}}, $col_names;
+    }
 
     ROWS: while ( 1 ) {
         my $row_idxs = @{$sql->{insert_into_args}};
 
-        COLS: for my $col_name ( @{$sql->{insert_into_cols}} ) {
-            $ax->print_sql( $sql, $stmt_typeS );
+        COLS: for my $col_name ( @$col_names ) {
+            $sf->__print_args( $sql );
             # Readline
             my $col = $trs->readline( $col_name . ': ' );
-            # push $col to show $col immediately in "print_sql"
             push @{$sql->{insert_into_args}->[$row_idxs]}, $col;
         }
-        my $default = ( all { ! length } @{$sql->{insert_into_args}[-1]} ) ? 3 : 2;
+        my $default = 0;
+        if ( @{$sql->{insert_into_args}} ) {
+            $default = ( all { ! length } @{$sql->{insert_into_args}[-1]} ) ? 3 : 2;
+        }
 
         ASK: while ( 1 ) {
-            $ax->print_sql( $sql, $stmt_typeS );
+            $sf->__print_args( $sql );
             my ( $add, $del ) = ( 'Add', 'Del' );
             my @pre = ( undef, $sf->{i}{ok} );
             my $choices = [ @pre, $add, $del ];
@@ -73,15 +119,28 @@ sub from_col_by_col {
                     $sql->{insert_into_args} = [];
                     next ASK;
                 }
-                $sql->{insert_into_cols} = [];
                 $sql->{insert_into_args} = [];
                 return;
             }
             elsif ( $add_row eq $sf->{i}{ok} ) {
                 if ( ! @{$sql->{insert_into_args}} ) {
-                    $sql->{insert_into_cols} = [];
                     return;
                 }
+                my $bu = [ @{$sql->{insert_into_args}} ];
+                my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                my $ok = $cf->input_filter( $sql, 1 );
+                if ( ! $ok ) {
+                    # Choose
+                    my $idx = choose(
+                        [ 'NO', 'YES'  ],
+                        { %{$sf->{i}{lyt_m}}, index => 1, prompt => 'Discard all entered data?' }
+                    );
+                    if ( $idx ) {
+                        $sql->{insert_into_args} = [];
+                        return;
+                    }
+                    $sql->{insert_into_args} = $bu;
+                };
                 return 1;
             }
             elsif ( $add_row eq $del ) {
@@ -95,59 +154,58 @@ sub from_col_by_col {
             last ASK;
         }
     }
-    return 1;
 }
 
 
 sub from_copy_and_paste {
-    my ( $sf, $sql, $stmt_typeS ) = @_;
+    my ( $sf, $sql ) = @_;
     my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $ax->print_sql( $sql, $stmt_typeS );
+    $ax->print_sql( $sql );
     my $prompt = sprintf "Multi row  %s:\n", $sf->__parse_setting( 'copy_and_paste' );
     print $prompt;
-    my $file = $sf->{tmp_copy_paste};
-    local $SIG{INT} = sub { unlink $file; exit };
+    my $file_ec = $sf->{tmp_copy_paste};
+    local $SIG{INT} = sub { unlink $file_ec; exit };
     if ( ! eval {
-        open my $fh_in, '>', $file or die $!;
+        open my $fh_in, '>', $file_ec or die $!;
         # STDIN
         while ( my $row = <STDIN> ) {
             print $fh_in $row;
         }
         close $fh_in;
-        die "No input!" if ! -s $file;
-        open my $fh, '<', $file or die $!;
+        die "No input!" if ! -s $file_ec;
+        open my $fh, '<', $file_ec or die $!;
         $sql->{insert_into_args} = [];
-        my $ok = $sf->__parse_file( $sql, $stmt_typeS, $file, $fh, $sf->{o}{insert}{copy_parse_mode} );
+        my $ok = $sf->__parse_file( $sql, $file_ec, $fh, $sf->{o}{insert}{copy_parse_mode} );
         close $fh;
-        unlink $file or die $!;
+        unlink $file_ec or die $!;
         die "Error __parse_file!" if ! $ok;
         1 }
     ) {
-        $ax->print_error_message( $@, join ', ', @$stmt_typeS, 'copy & paste' );
-        unlink $file or warn $!;
+        $ax->print_error_message( $@, join ', ', @{$sf->{i}{stmt_types}}, 'copy & paste' );
+        unlink $file_ec or warn $!;
         return;
     }
     return if ! @{$sql->{insert_into_args}};
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $ok = $cf->input_filter( $sql, $stmt_typeS );
+    my $ok = $cf->input_filter( $sql, 1 );
     return if ! $ok;
     return 1;
 }
 
 
 sub from_file {
-    my ( $sf, $sql, $stmt_typeS ) = @_;
+    my ( $sf, $sql ) = @_;
 
     FILE: while ( 1 ) {
-        my $file = $sf->__file_name( $sql );
+        my $file_ec = $sf->__file_name( $sql );
         my $fh;
-        if ( ! defined $file ) {
+        if ( ! defined $file_ec ) {
             return;
         }
-        if ( $sf->{o}{insert}{file_parse_mode} < 2 && -T $file ) {
-            open $fh, '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')', $file or die $!;
+        if ( $sf->{o}{insert}{file_parse_mode} < 2 && -T $file_ec ) {
+            open $fh, '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')', $file_ec or die $!;
             my $parse_mode = $sf->{o}{insert}{file_parse_mode};
-            my $ok = $sf->__parse_file( $sql, $stmt_typeS, $file, $fh, $parse_mode );
+            my $ok = $sf->__parse_file( $sql, $file_ec, $fh, $parse_mode );
             if ( ! $ok ) {
                 next FILE;
             }
@@ -157,18 +215,19 @@ sub from_file {
                 next FILE;
             }
             my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            $ok = $cf->input_filter( $sql, $stmt_typeS );
+            $ok = $cf->input_filter( $sql, 0 );
             if ( ! $ok ) {
                 next FILE;
             }
-            return $file;
+            $sf->{d}{file_name} = decode( 'locale_fs', $file_ec );
+            return 1;
         }
         else {
             my $parse_mode = 2;
             my ( $sheet_count, $sheet_idx );
             SHEET: while ( 1 ) {
                 $sql->{insert_into_args} = [];
-                $sheet_count = $sf->__parse_file( $sql, $stmt_typeS, $file, $fh, $parse_mode );
+                $sheet_count = $sf->__parse_file( $sql, $file_ec, $fh, $parse_mode );
                 if ( ! $sheet_count ) {
                     next FILE;
                 }
@@ -177,12 +236,13 @@ sub from_file {
                     next FILE;
                 }
                 my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                my $ok = $cf->input_filter( $sql, $stmt_typeS );
+                my $ok = $cf->input_filter( $sql, 0 );
                 if ( ! $ok ) {
                     next SHEET if $sheet_count >= 2;
                     next FILE;
                 }
-                return $file;
+                $sf->{d}{file_name} = decode( 'locale_fs', $file_ec );
+                return 1;
             }
         }
     }
@@ -208,7 +268,7 @@ sub __file_name {
         my $prompt = sprintf "Choose a file  %s:", $sf->__parse_setting( 'file' );
         # Choose
         my $file = choose(
-            [ undef, $add_file, map( '  ' . decode( 'locale_fs', $_ ), @files ), $del_file ],
+            [ undef, $add_file, map( '  ' . $_, @files ), $del_file ],
             { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, undef => '  <=' }
         );
         if ( ! defined $file ) {
@@ -218,7 +278,7 @@ sub __file_name {
             my $prompt = sprintf "%s", $sf->__parse_setting( 'file' );
             my $dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
             # Choose_a_file
-            $file = choose_a_file( { dir => $dir, mouse => $sf->{o}{table}{mouse} } );
+            my $file = choose_a_file( { dir => $dir, mouse => $sf->{o}{table}{mouse} } );
             if ( ! defined $file || ! length $file ) {
                 next FILE;
             }
@@ -235,13 +295,14 @@ sub __file_name {
                 }
                 close $fh_out;
             }
-            $sf->{i}{tmp_files_dir} = dirname $file;
-            return $file;
+            my $file_ec = encode( 'locale_fs', $file );
+            $sf->{i}{tmp_files_dir} = dirname $file_ec;
+            return $file_ec;
         }
         elsif ( $file eq $del_file ) {
             $file = undef;
             my $idx = choose_a_subset(
-                [ map { decode 'locale_fs', $_ } @files ],
+                [ @files ],
                 { mouse => $sf->{o}{table}{mouse}, prefix => '  ', info => 'Files to remove:',
                  index => 1, fmt_chosen => 1, remove_chosen => 1, clear_screen => 1 }
             );
@@ -259,7 +320,8 @@ sub __file_name {
             next FILE;
         }
         $file =~ s/\s\s//;
-        return realpath encode 'locale_fs', $file;
+        my $file_ec = realpath encode 'locale_fs', $file;
+        return $file_ec;
     }
 }
 
@@ -283,11 +345,11 @@ sub __parse_setting {
 
 
 sub __parse_file {
-    my ( $sf, $sql, $stmt_typeS, $file, $fh, $parse_mode ) = @_;
+    my ( $sf, $sql, $file_ec, $fh, $parse_mode ) = @_;
     local $SIG{INT} = sub { unlink $sf->{tmp_copy_paste}; exit };
     my $waiting = 'Parsing file ... ';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $ax->print_sql( $sql, $stmt_typeS, $waiting );
+    $ax->print_sql( $sql, $waiting );
     if ( $parse_mode == 0 ) {
         seek $fh, 0, 0;
         my $rows_of_cols = [];
@@ -310,7 +372,7 @@ sub __parse_file {
             push @$rows_of_cols, $cols;
         }
         $sql->{insert_into_args} = $rows_of_cols;
-        $ax->print_sql( $sql, $stmt_typeS, $waiting );
+        $ax->print_sql( $sql, $waiting );
         return 1;
     }
     elsif ( $parse_mode == 1 ) {
@@ -323,27 +385,25 @@ sub __parse_file {
             push @$rows_of_cols, [ map {
                 s/^$lead//   if length $lead;
                 s/$trail\z// if length $trail;
-                $_ = undef   if ! length; # + trimmed spaces: to avoid conflicts with non-string data types # documentation
                 $_
             } split /$sf->{o}{split}{i_f_s}/, $row, -1 ]; # negative LIMIT (-1) to preserve trailing empty fields
         }
         $sql->{insert_into_args} = $rows_of_cols;
-        $ax->print_sql( $sql, $stmt_typeS, $waiting );
+        $ax->print_sql( $sql, $waiting );
         return 1;
     }
     else {
         require Spreadsheet::Read;
-        $ax->print_sql( $sql, $stmt_typeS, $waiting );
+        $ax->print_sql( $sql, $waiting );
         my $cm = Term::Choose->new( $sf->{i}{lyt_m} );
-        my $book = Spreadsheet::Read::ReadData( $file, cells => 0, attr => 0, rc => 1, strip => 0 );
-        my $file_dc = decode( 'locale_fs', $file );
+        my $book = Spreadsheet::Read::ReadData( $file_ec, cells => 0, attr => 0, rc => 1, strip => 0 );
         if ( ! defined $book ) {
-            $cm->choose( [ 'Press ENTER' ], { prompt => 'No Book in ' . $file_dc .'!' } );
+            $cm->choose( [ 'Press ENTER' ], { prompt => 'No Book in ' . decode( 'locale_fs', $file_ec ) .'!' } );
             return;
         }
         my $sheet_count = @$book - 1; # first sheet in $book contains meta info
         if ( $sheet_count == 0 ) {
-            $cm->choose( [ 'Press ENTER' ], { prompt => 'No Sheets in ' . $file_dc . '!' } );
+            $cm->choose( [ 'Press ENTER' ], { prompt => 'No Sheets in ' . decode( 'locale_fs', $file_ec ) . '!' } );
             return;
         }
         my $sheet_idx;

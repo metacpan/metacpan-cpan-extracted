@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 11;
 use Module::ScanDeps qw/scan_line/;
 
 {
@@ -65,3 +65,28 @@ is($@,'');
   is_deeply (\@expected, [sort @got], 'autouse pragma used in one-liner');
 }
 
+
+
+{
+  my $chunk= "{ package foo; use if 1, 'warnings' }";
+  my @array=sort(scan_line($chunk));
+  is_deeply(\@array,[sort qw{if.pm warnings.pm}]);
+}
+
+{
+  my $chunk= "{ use if 1, 'warnings' }";
+  my @array=sort(scan_line($chunk));
+  is_deeply(\@array,[sort qw{if.pm warnings.pm}]);
+}
+
+{
+  my $chunk= " do { use if 1, 'warnings' }";
+  my @array=sort(scan_line($chunk));
+  is_deeply(\@array,[sort qw{if.pm warnings.pm}]);
+}
+
+{
+  my $chunk= " do { use foo }";
+  my @array=sort(scan_line($chunk));
+  is_deeply(\@array,[sort qw{foo.pm}]);
+}

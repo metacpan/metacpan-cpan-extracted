@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Sudoc
 
+2.27 2019-01-16
+
+  - Ajout méthodes pour convertisseurs locaux
+
 2.25 2018-11-25
 
   - Compatibilité ElasticSearch

@@ -9,13 +9,8 @@ WriteMakefile(
     MIN_PERL_VERSION => 5.018000,
     PREREQ_PM      => {
         'XSLoader'     => 0,
-        'Path::Tiny'   => 0,
-        'JSON::XS'     => 0,
     },
     TEST_REQUIRES  => {
-        'Data::Dumper' => 0,
-        'Path::Tiny'   => 0,
-        'JSON::XS'     => 0,
         'Test::More'   => 0,
         'Test::Output' => 0,
     },

@@ -52,18 +52,22 @@ subtest select => sub {
     $td2 = $td->select_as_aoaos();
     is_deeply($td2->rows_as_aoaos, [["a",1],["b",2],["c",3]]);
 
+    $td2 = $td->select_as_aoaos(['*']);
+    is_deeply($td2->rows_as_aoaos, [["a",1],["b",2],["c",3]]);
+
     $td2 = $td->select_as_aoaos(["value", "value"]);
     is_deeply($td2->rows_as_aoaos, [[1,1],[2,2],[3,3]]);
 
     $td2 = $td->select_as_aohos(["value", "value"]);
     is_deeply($td2->rows_as_aohos, [{value=>1,value_2=>1},{value=>2,value_2=>2},{value=>3,value_2=>3}]);
 
-    # filter & sort
+    # filter, exclude & sort
     dies_ok { $td->select_as_aoaos([], undef, ["foo"]) } "unknown sort column -> dies";
     $td2 = $td->select_as_aoaos(["value", "key"],
+                                ["key"],
                                 sub { my ($td, $row) = @_; $row->{value} % 2 },
                                 ["-key"]);
-    is_deeply($td2->rows_as_aoaos, [[3,"c"],[1,"a"]]);
+    is_deeply($td2->rows_as_aoaos, [[3],[1]]);
 };
 
 subtest uniq_col_names => sub {

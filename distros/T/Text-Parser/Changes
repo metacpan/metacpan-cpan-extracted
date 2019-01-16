@@ -1,5 +1,8 @@
 Revision history for Text-Parser
 
+0.802     2019-01-15 23:58:56-08:00 America/Los_Angeles
+  - Fixed copyright year. Corrected Bug tracker link. Made POD brief and readable.
+
 0.801     2019-01-14 19:40:50-08:00 America/Los_Angeles
   - Improved documentation
 

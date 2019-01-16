@@ -1,6 +1,13 @@
 Change log
+0.20  Tue Jan 15 14:03:22 PST 2019
+    - Removed color support to make record nodes render properly
+      again. Color support wasn't really all that great anyway,
+      so removing it is not that big a sacrifice. Especially since
+      the nodes actually *render* again!
+
 0.19  Fri Jan 25 19:24:15 PST 2013
     - Updated META.yml
+
 0.18  Wed Mar  9 21:35:23 PST 2011
 	- Updated graphviz package version check
 

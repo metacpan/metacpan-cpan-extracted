@@ -1,6 +1,6 @@
 package Address::PostCode::UserAgent::Exception;
 
-$Address::PostCode::UserAgent::Exception::VERSION = '0.08';
+$Address::PostCode::UserAgent::Exception::VERSION = '0.09';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Address::PostCode::UserAgent::Exception - Interface to exception used by Address
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -16,7 +16,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 with 'Throwable';
 
 use overload q{""} => 'as_string', fallback => 1;

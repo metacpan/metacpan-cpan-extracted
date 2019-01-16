@@ -24,8 +24,7 @@ sub new {
 
 
 sub col_function {
-    my ( $sf, $sql, $stmt_type, $clause ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my ( $sf, $sql, $clause ) = @_;
     my $changed = 0;
     my $cols;
     if ( $clause eq 'select' && ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) ) {
@@ -48,7 +47,6 @@ sub col_function {
     my @functions_sorted = qw( Concat Truncate Bit_Length Char_Length Epoch_to_Date Epoch_to_DateTime );
 
     SCALAR_FUNC: while ( 1 ) {
-        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
         my $function = choose(
             [ undef, map( "  $_", @functions_sorted ) ],
@@ -59,12 +57,10 @@ sub col_function {
         }
         $function =~ s/^\s\s//;
         my $arg_count = $functions_args->{$function};
-        $ax->print_sql( $sql, [ $stmt_type ] );
-        my $col = $sf->__choose_columns( $sql, $stmt_type, $function, $arg_count, $cols ); # cols - col
+        my $col = $sf->__choose_columns( $sql, $function, $arg_count, $cols ); # cols - col
         if ( ! defined $col ) {
             next SCALAR_FUNC;
         }
-        $ax->print_sql( $sql, [ $stmt_type ] );
         my $col_with_func = $sf->__prepare_col_func( $function, $col );
         if ( ! defined $col_with_func ) {
             next SCALAR_FUNC;
@@ -74,9 +70,7 @@ sub col_function {
 }
 
 sub __choose_columns {
-    my ( $sf, $sql, $stmt_type, $function, $arg_count, $cols ) = @_;
-    my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $ax->print_sql( $sql, [ $stmt_type ] );
+    my ( $sf, $sql, $function, $arg_count, $cols ) = @_;
     if ( ! $arg_count ) {
         return;
     }
@@ -86,9 +80,10 @@ sub __choose_columns {
     }
     else {
         # Choose
-        return choose_a_subset( # option: list separator
+        return choose_a_subset(
             $cols,
-            { layout => 1, name => $function . ': ', mouse => $sf->{o}{table}{mouse}, remove_chosen => 0 }
+            { layout => 1, name => $function . ': ', list_separator => ',',
+              mouse => $sf->{o}{table}{mouse}, remove_chosen => 0 }
         );
     }
 }
@@ -137,7 +132,7 @@ sub __prepare_col_func {
         $quote_f = $plui->char_length( $qt_col );
     }
     elsif ( $func eq 'Concat' ) {
-        my $info = "\n" . 'Concat( ' . join( ', ', @$qt_col ) . ' )';
+        my $info = "\n" . 'Concat( ' . join( ',', @$qt_col ) . ' )';
         my $trs = Term::Form->new();
         my $sep = $trs->readline( 'Separator: ', { info => $info } );
         return if ! defined $sep;

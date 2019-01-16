@@ -1,5 +1,5 @@
 {
-   "abstract" : "Bare text parser, bundles many common \"mundane\" tasks.",
+   "abstract" : "Bare text parser, simplifies text parsing.",
    "author" : [
       "Balaji Ramasubramanian <balajiram@cpan.org>"
    ],
@@ -36,6 +36,7 @@
             "Class::Method::Modifiers" : "0",
             "Exception::Class" : "0",
             "Exporter" : "0",
+            "IO::Select" : "0",
             "Role::Tiny" : "0",
             "Scalar::Util" : "0",
             "Try::Tiny" : "0",
@@ -59,17 +60,17 @@
    "provides" : {
       "Text::Parser" : {
          "file" : "lib/Text/Parser.pm",
-         "version" : "0.801"
+         "version" : "0.802"
       },
       "Text::Parser::Multiline" : {
          "file" : "lib/Text/Parser/Multiline.pm",
-         "version" : "0.801"
+         "version" : "0.802"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/me/Text-Parser/issues"
+         "web" : "http://github.com/balajirama/Text-Parser/issues"
       },
       "homepage" : "https://github.com/balajirama/Text-Parser",
       "repository" : {
@@ -78,7 +79,7 @@
          "web" : "https://github.com/balajirama/Text-Parser"
       }
    },
-   "version" : "0.801",
+   "version" : "0.802",
    "x_contributors" : [
       "H.Merijn Brand - Tux <h.m.brand@xs4all.nl>"
    ],

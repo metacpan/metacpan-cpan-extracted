@@ -9,7 +9,7 @@ sync
             project                 SergeTest
             root_directory          ./files
             resource_directory      resources
-            destination_languages     de es fr-ca
+            target_languages     de es fr-ca
             source_language           en
         }
     }

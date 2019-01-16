@@ -54,7 +54,7 @@ cat Changes | head -n 1 | awk '{print $1}' >>$errors
 
 echo "== Checking missing modules required by library ==" >>$errors
 mkfifo /tmp/release_$$_a
-git grep -E '^[ \t]*use' | egrep '\.(pm|pl):' | egrep -v '^(bin)/' | sed 's/::/@@/g' | awk -F: '{print $2}' | sed 's/qw.*//g' | sed 's/#.*//g' | tr -d ';' | sed 's/ *$//g' | sed 's/@@/::/g' | egrep -v "use (strict|warnings|utf8|parent|$class_name)" | sed 's/^use //g' | sort -u >/tmp/release_$$_a &
+git grep -E '^use' | egrep '\.(pm|pl):' | egrep -v '^(bin)/' | sed 's/::/@@/g' | awk -F: '{print $2}' | sed -e 's/qw.*//g' -e 's/#.*//g' | tr -d ';' | sed -e 's/ *$//g' -e 's/@@/::/g' | egrep -v "use (strict|warnings|utf8|parent|constant|$class_name)" | sed -e 's/^use //g' -e 's/[ \t][ \t]*([ \t]*)[ \t]*$//g' | egrep -v '^[ \t]*$' | sort -u >/tmp/release_$$_a &
 mkfifo /tmp/release_$$_b
 cat Makefile.PL | awk '{if ($0 ~ /},/) {p=0; next;} if (p) { print; } if ($0 ~ /PREREQ_PM/) {p=1; next;}}' | awk -F\' '{print $2}' | egrep -v 'ExtUtils::XSpp' | sort -u >/tmp/release_$$_b &
 diff /tmp/release_$$_a /tmp/release_$$_b >>$errors
@@ -62,7 +62,7 @@ rm -f /tmp/release_$$_a /tmp/release_$$_b
 
 echo "== Checking missing modules required by tests ==" >>$errors
 mkfifo /tmp/release_$$_a
-git grep use t | sed 's/::/@@/g' | awk -F: '{print $2}' | sed 's/qw.*//g' | sed 's/#.*//g' | tr -d ';' | sed 's/ *$//g' | sed 's/@@/::/g' | egrep -v "use (strict|warnings|utf8|parent|$class_name)|^[ \t]*use_ok" | sed 's/^use //g' | sort -u >/tmp/release_$$_a &
+git grep use t | sed 's/::/@@/g' | awk -F: '{print $2}' | sed  -e 's/qw.*//g' -e 's/#.*//g' | tr -d ';' | sed -e 's/ *$//g' -e 's/@@/::/g' | egrep -v "use (strict|warnings|utf8|parent|constant|$class_name)|^[ \t]*use_ok" | sed -e 's/^use //g' -e 's/[ \t][ \t]*([ \t]*)[ \t]*$//g' | egrep -v '^[ \t]*$' | sort -u >/tmp/release_$$_a &
 mkfifo /tmp/release_$$_b
 cat Makefile.PL | awk '{if ($0 ~ /},/) {p=0; next;} if (p) { print; } if ($0 ~ /TEST_REQUIRES/) {p=1; next;}}' | awk -F\' '{print $2}' | sort -u >/tmp/release_$$_b &
 diff /tmp/release_$$_a /tmp/release_$$_b >>$errors

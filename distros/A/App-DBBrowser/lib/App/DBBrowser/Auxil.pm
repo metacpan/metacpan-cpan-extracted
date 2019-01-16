@@ -64,22 +64,9 @@ sub get_stmt {
             push @tmp, sprintf " VALUES(%s)", join( ', ', ( '?' ) x @{$sql->{insert_into_cols}} );
         }
         else {
-            my $row_in = ' '  x 4;
-            my $max = 9;
             push @tmp, "  VALUES(";
-            if ( @{$sql->{insert_into_args}} > $max ) {
-                for my $row ( @{$sql->{insert_into_args}}[ 0 .. $max - 3 ] ) {
-                    push @tmp, $row_in . join ', ', map { defined $_ ? $_ : '' } @$row;
-                }
-                push @tmp, $row_in . '...';
-                my $row_count = scalar( @{$sql->{insert_into_args}} );
-                push @tmp, $row_in . '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]';
-            }
-            else {
-                for my $row ( @{$sql->{insert_into_args}} ) {
-                    push @tmp, $row_in . join ', ', map { defined $_ ? $_ : '' } @$row;
-                }
-            }
+            my $arg_rows = $sf->insert_into_args_info_format( $sql, 10, ' ' x 4 );
+            push @tmp, @$arg_rows;
             push @tmp, "  )";
         }
     }
@@ -117,6 +104,41 @@ sub get_stmt {
 }
 
 
+sub insert_into_args_info_format {
+    my ( $sf, $sql, $max, $indent ) = @_;
+    my $begin = 4;
+    my $end = 0;
+    if ( $max < $begin ) {
+        $begin = $max;
+    }
+    else {
+        $end = $max - $begin;
+    }
+    $begin--;
+    $end--;
+    my $last_i = $#{$sql->{insert_into_args}};
+    my $tmp = [];
+    if ( @{$sql->{insert_into_args}} > $max + 2 ) { # 3
+        for my $row ( @{$sql->{insert_into_args}}[ 0 .. $begin ] ) {
+            push @$tmp, $indent . join ', ', map { defined $_ ? $_ : '' } @$row;
+        }
+        push @$tmp, $indent . '...';
+        #push @$tmp, $indent . '...';
+        for my $row ( @{$sql->{insert_into_args}}[ $last_i - $end .. $last_i ] ) {
+            push @$tmp, $indent . join ', ', map { defined $_ ? $_ : '' } @$row;
+        }
+        my $row_count = scalar( @{$sql->{insert_into_args}} );
+        push @$tmp, $indent . '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]';
+    }
+    else {
+        for my $row ( @{$sql->{insert_into_args}} ) {
+            push @$tmp, $indent . join ', ', map { defined $_ ? $_ : '' } @$row;
+        }
+    }
+    return $tmp;
+}
+
+
 sub __select_cols {
     my ( $sf, $sql ) = @_;
     my @combined_cols;
@@ -149,19 +171,26 @@ sub __select_cols {
 
 
 sub print_sql {
-    my ( $sf, $sql, $stmt_typeS, $waiting ) = @_;
-    return if ! defined $stmt_typeS;
+    my ( $sf, $sql, $waiting ) = @_;
     my $str = '';
-    for my $stmt_type ( @$stmt_typeS ) {
+    for my $stmt_type ( @{$sf->{i}{stmt_types}} ) {
          $str .= $sf->get_stmt( $sql, $stmt_type, 'print' );
     }
-    if ( ! $sf->{i}{special_table} ) {
-        my $filled = $sf->stmt_placeholder_to_value( $str, [ @{$sql->{set_args}}, @{$sql->{where_args}}, @{$sql->{having_args}} ] );
-        $str = $filled if defined $filled;
+    my $filled = $sf->stmt_placeholder_to_value(
+        $str,
+        [ @{$sql->{set_args}||[]}, @{$sql->{where_args}||[]}, @{$sql->{having_args}||[]} ] # join and union: ||[]
+    );
+    if ( defined $filled ) {
+        $str = $filled
     }
     $str .= "\n";
+    $str = line_fold( $str, term_width() - 2, '', ' ' x 4 );
+    if ( defined wantarray ) {
+        return $str;
+    }
     print CLEAR_SCREEN;
-    print line_fold( $str, term_width() - 2, '', ' ' x 4 );
+    print $str;
+    #print line_fold( $str, term_width() - 2, '', ' ' x 4 );
     if ( defined $waiting ) {
         local $| = 1;
         print HIDE_CURSOR;
@@ -186,31 +215,33 @@ sub stmt_placeholder_to_value {
         }
         $stmt =~ s/$rx_placeholder/$arg_copy/;
     }
-    if ( $stmt !~ $rx_placeholder ) {
-        return $stmt;
+    if ( $stmt =~ $rx_placeholder ) {
+        return;
     }
+    return $stmt;
 }
 
 
 sub alias {
-    my ( $sf, $type, $prompt, $default ) = @_;
+    my ( $sf, $type, $identifier, $default ) = @_;
     my $term_w = term_width() - 1;
-    if ( ! defined $prompt ) {
-        $prompt = '';
-    }
     my $info;
-    if ( print_columns( $prompt . ' AS: ' ) > $term_w / 3 ) {
-        $info = "\n" . $prompt;
-        $prompt = 'AS: ';
+    if ( $identifier eq '' ) { # Union
+        $info = ' ';
+        $identifier .= 'AS: ';
+    }
+    elsif ( print_columns( $identifier . ' AS: ' ) > $term_w / 3 ) {
+        $info = "\n" . $identifier;
+        $identifier = 'AS: ';
     }
     else {
         $info = ' ';
-        $prompt .= ' AS: ';
+        $identifier .= ' AS: ';
     }
     my $alias;
     if ( $sf->{o}{alias}{$type} ) {
         my $tf = Term::Form->new();
-        $alias = $tf->readline( $prompt, { info => $info } );
+        $alias = $tf->readline( $identifier, { info => $info } );
     }
     if ( ! defined $alias || ! length $alias ) {
         $alias = $default;

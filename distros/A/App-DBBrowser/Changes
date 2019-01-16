@@ -1,6 +1,15 @@
 Revision history for App-DBBrowser
 
 
+2.043    2019-01-16
+        - Bugfix: file name encoding.
+        - Bugfix: parentheses in 'Subqueries'.
+        - New input filter: convert empty fields to NULL.
+        - New itemt in option 'Extensions SET': '=N' to set a field to NULL.
+        - Make it possible to enter a "\t" as the 'Text-CSV-sep_char' value.
+        - New option 'Info'.
+        - Update write access.
+
 2.042    2019-01-11
         - Join: possibility to use a subquery instead of a table.
         - Join: option to choose the comparison operator.

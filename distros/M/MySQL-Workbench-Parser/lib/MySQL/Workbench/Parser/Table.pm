@@ -13,7 +13,7 @@ use YAML::Tiny;
 use MySQL::Workbench::Parser::Column;
 use MySQL::Workbench::Parser::Index;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 has node => (
     is       => 'ro',
@@ -233,7 +233,7 @@ MySQL::Workbench::Parser::Table - A table of the ER model
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for Pod::Coverage BUILD
 

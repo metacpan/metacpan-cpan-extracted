@@ -9,7 +9,7 @@ use Moo;
 use Scalar::Util qw(blessed);
 
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 has node => (
     is       => 'ro',
@@ -42,6 +42,8 @@ has not_null      => ( is => 'rwp' );
 has autoincrement => ( is => 'rwp' );
 has default_value => ( is => 'rwp' );
 has comment       => ( is => 'rwp' );
+has type_info     => ( is => 'rwp' );
+has flags         => ( is => 'rwp' );
 
 
 sub as_hash {
@@ -88,8 +90,15 @@ sub _parse {
     my $datatype_internal = $node->findvalue( './link[@struct-name="db.SimpleDatatype" or @struct-name="db.UserDatatype"]' );
     my $datatype          = $self->table->get_datatype( $datatype_internal );
     $self->_set_datatype( $datatype->{name} );
+    $self->_set_type_info( $datatype );
     $self->_set_length( $datatype->{length} )       if $datatype->{length};
     $self->_set_precision( $datatype->{precision} ) if $datatype->{precision};
+
+    my %flags = map{
+        my $flag = lc $_->textContent;
+        $flag => 1;
+    }@{ $node->findnodes('./value[@key="flags"]/value') || [] };
+    $self->_set_flags( \%flags );
 
     my $not_null = $node->findvalue( './value[@key="isNotNull"]' );
     $self->_set_not_null( $not_null );
@@ -115,7 +124,7 @@ MySQL::Workbench::Parser::Column - A column of the ER model
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 METHODS
 
@@ -169,6 +178,10 @@ returns
 
 =item * default_value
 
+=item * flags
+
+Any extra flags like I<binary>, I<unsigned> and/or I<zerofill>.
+
 =item * id
 
 =item * length
@@ -182,6 +195,34 @@ returns
 =item * precision
 
 =item * table
+
+=item * type_info
+
+More information about the datatype:
+
+=over 4
+
+=item * args
+
+The I<length>, I<precision> or a list of possible values (for enums).
+
+=item * gui_name
+
+The column type as shown in Workbench. For user defined types
+it is the label shown in the dropdowns.
+
+=item * length
+
+E.g. for C<VARCHAR> columns, the max length  of the value
+
+=item * name
+
+The SQL definition name. For user defined types, this is the
+underlying data type.
+
+=item * precision
+
+=back
 
 =back
 

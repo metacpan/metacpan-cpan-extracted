@@ -3,72 +3,30 @@ use strict;
 use warnings;
 
 use XSLoader;
-use Path::Tiny ();
-use JSON::XS   ();
 
-use constant {
-    PROBE_CONFIG_NAME  => '/tmp/devel-probe-config.json',
-    PROBE_SIGNAL_NAME  => 'HUP',
-};
-
-our $VERSION = '0.000003';
+our $VERSION = '0.000004';
 XSLoader::load( 'Devel::Probe', $VERSION );
 
-my %known_options = map +( $_ => 1 ), qw/
-    signal_name
-    skip_install
-    config_file
-    check_config_file
-/;
-
-my $config_file;
-my $signal_name;
-
 sub import {
-    my ($class, @opts) = @_;
-
-    my %options = @opts;
-    foreach my $option (keys %options) {
-        die "Unrecognized option $option" unless exists $known_options{$option};
-    }
-
-    set_config_name($options{config_file});
-    set_signal_name($options{signal_name});
-
-    return if $options{skip_install};
+    my ($class) = @_;
     Devel::Probe::install();
-
-    return unless $options{check_config_file};
-    check_config_file("import");
 }
 
-sub set_config_name {
-    my ($name) = @_;
+my @probe_type_names = (
+    'none',
+    'once',
+    'permanent',
+);
+my %probe_type_name_to_type = map { $probe_type_names[$_] => $_ }
+                              (0..scalar(@probe_type_names)-1);
 
-    $config_file = $name // PROBE_CONFIG_NAME;
-}
+sub config {
+    my ($config) = @_;
 
-sub set_signal_name {
-    my ($name) = @_;
-
-    $signal_name = $name // PROBE_SIGNAL_NAME;
-    $SIG{$signal_name} = \&Devel::Probe::check_config_file;
-}
-
-sub check_config_file {
-    my ($reason) = @_;
-
-    $reason //= 'manual';
     Devel::Probe::disable();
+    return unless $config;
 
-    my $path = Path::Tiny::path($config_file);
-    return unless $path && $path->is_file();
-    my $contents = $path->slurp_utf8();
-    return unless $contents;
-    my $data = JSON::XS->new->utf8->decode($contents);
-    return unless $data;
-
-    foreach my $action (@{ $data->{actions} }) {
+    foreach my $action (@{ $config->{actions} }) {
         if ($action->{action} eq 'enable') {
             Devel::Probe::enable();
             next;
@@ -88,14 +46,16 @@ sub check_config_file {
         if ($action->{action} eq 'define') {
             my $file = $action->{file};
             next unless $file;
+
+            my $type_name = $action->{type} // 'once';
+            my $type = $probe_type_name_to_type{$type_name} // 1;
             foreach my $line (@{ $action->{lines} // [] }) {
-                Devel::Probe::add_probe($file, $line);
+                Devel::Probe::add_probe($file, $line, $type);
             }
             next;
         }
     }
 }
-
 
 1;
 __END__
@@ -110,98 +70,143 @@ Devel::Probe - Quick & dirty code probes for Perl
 
 =head1 VERSION
 
-Version 0.000003
+Version 0.000004
 
 =head1 SYNOPSIS
 
     use Devel::Probe;
-    # or
-    use Devel::Probe (check_config_file => 0);
-    # or
-    use Devel::Probe (check_config_file => 1);
-    # or
-    use Devel::Probe (skip_install => 0);
-    # or
-    use Devel::Probe (skip_install => 1);
     ...
-
     Devel::Probe::trigger(sub {
         my ($file, $line) = @_;
         # probe logic
     });
+    Devel::Probe::config(%config);
+    ...
+    Devel::Probe::enable();
+    ...
+    Devel::Probe::disable();
 
 =head1 DESCRIPTION
 
 Use this module to allow the possibility of creating probes for some lines in
 your code.
 
-By default the probing code is installed when you import the module, but if you
-import it with C<skip_install =E<gt> 1> the code is not installed at all
-(useful for benchmarking the impact of loading the module with no active
-probes).
+The probing code is installed when you import the module, and it is disabled.
+In these conditions, the probe code is light enough that it should cause no
+impact at all in your CPU usage.
 
-By default the probing is disabled, but if you import the module with
-C<check_config_file =E<gt> 1>, it will immediately check for a configuration
-file, as when reacting to a signal (see below).
+You can call C<trigger(\&coderef)> to specify a piece of Perl code that will be
+called for every probe that triggers.
 
-When your process receives a  specific signal (C<SIGHUP> by default), this
-module will check for the existence of a configuration file
-(C</tmp/devel-probe-config.cfg> by default).  If that file exists, it must
-contain a list of directives for the probing.  If the configuration file
-enables probing, after sending a signal to the process it will start checking
-for probes.
+You can call C<config(\%config)> to specify a configuration for the module,
+including what lines in your code will cause probes to be triggered.  This call
+will always disable the module as a first action, so you always need to
+explicitly enable it again, either from the configuration itself or in a
+further call to C<enable()>.
 
-The directives allowed in the configuration file are:
+You can call C<add_probe(file, line, type)> to manually add a probe; this is
+what gets called from C<config()>.
+
+You can call C<enable()> / C<disable()> to dynamically activate and deactivate
+probing.  You can check this status by calling C<is_enabled()>.
+
+You can call C<install()> / C<remove()> to install or remove the probe handling
+code.  You can check this status by calling C<is_installed()>.  When you import
+the module, C<install()> is called automatically for you.
+
+You can call C<clear()> to remove all probes.
+
+You can call C<dump()> to print all probes to stderr.
+
+=head1 CONFIGURATION
+
+An example configuration hash looks like this:
+
+    my %config = (
+        actions => [
+            { action => 'disable' },
+            { action => 'clear' },
+            { action => 'define' ... },
+            { action => 'dump' },
+            { action => 'enable' },
+        ],
+    );
+
+Possible actions are:
 
 =over 4
 
-=item * enable
+=item * C<disable>: disable probing.
 
-Enable probing.
+=item * C<clear>: clear current list of probes.
 
-=item * disable
+=item * C<dump>: dump current list of probes to stderr.
 
-Disable probing.
+=item * C<enable>: enable probing.
 
-=item * clear
+=item * C<define>: define a new probe.  A full define action looks like:
 
-Clear current list of probes.
+    my %define = (
+        action => 'define',
+        type => PROBE_TYPE,
+        file => 'file_name',
+        lines => [ 10, 245, 333 ],
+    );
 
-=item * dump
+The type field is optional and its default value is C<once>.  Possible values
+are:
 
-Dump current list of probes to stderr.
+=over 4
 
-=item * probe file line line...
+=item * C<once>: the probe will trigger once and then will be destroyed right
+after that.
 
-Add a probe for the given file in each of the given lines.
+=item * C<permanent>: the probe will trigger every time that line of code is
+executed.
+
+=back
 
 =back
 
 =head1 EXAMPLE
 
-This will invoke the C<trigger> callback whenever line 14 executes, and use
-C<PadWalker> to dump the local variables.
+This will invoke the C<trigger> callback the first time line 21 executes, and
+take advantage of C<PadWalker> to dump the local variables.
 
-    # in my_cool_script.pl
     use Data::Dumper qw(Dumper);
     use PadWalker qw(peek_my);
-    use Devel::Probe (check_config_file => 1);
+    use Devel::Probe;
 
     Devel::Probe::trigger(sub {
         my ($file, $line) = @_;
         say Dumper(peek_my(1)); # 1 to jump up one level in the stack;
     });
 
+    my %config = (
+        actions => [
+            { action => 'define', # type is 'once' by default
+              file => 'probe my_cool_script.pl', lines => [ 13 ] },
+        ],
+    );
+    Devel::Probe::config(\%config);
+    Devel::Probe::enable();
     my $count;
     while (1) {
         $count++;
-        my $something_inside_the_loop = $count * 2;
+        my $something_inside_the_loop = $count * 2; # line 21
         sleep 5;
     }
+    Devel::Probe::disable();
 
-    # /tmp/devel-probe-config.cfg
-    enable
-    probe my_cool_script.pl 13
+=head1 SUGGESTIONS
+
+One typical use case would be to have a signal handler associated with a
+specific signal, which when triggered would disable the module, read the
+configuration from a given place, reconfigure the module accordingly and then
+enable it.
+
+Another use case could be a similar kind of control using remote endpoints to
+deal with reconfiguring, disabling and enabling the module.
 
 =head1 TODO
 
@@ -210,11 +215,10 @@ C<PadWalker> to dump the local variables.
 =item
 
 Probes are stored in a hash of file names; per file name, there is a hash
-of line numbers (with 1 or 0 as a value).  It is likely this can be made more
-performant with a better data structure, but that needs profiling.
+of line numbers (with the probe type as a value).  It is likely this can be
+made more performant with a better data structure, but that needs profiling.
 
 =back
-
 
 =head1 AUTHORS
 

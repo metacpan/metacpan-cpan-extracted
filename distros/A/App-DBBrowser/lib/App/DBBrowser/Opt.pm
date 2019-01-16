@@ -41,6 +41,7 @@ sub defaults {
             delete_ok            => 0,
             drop_table_ok        => 0,
             file_find_warnings   => 0,
+            info_expand          => 0,
             insert_ok            => 0,
             max_rows             => 200_000,
             menu_memory          => 0,
@@ -231,6 +232,9 @@ sub config_insert {
                 ];
                 my $prompt = '"Text::CSV"';
                 $sf->__group_readline( $section, $items, $prompt );
+                if ( $sf->{o}{$section}{sep_char} =~ /\\t/ ) {
+                    $sf->{o}{$section}{sep_char}=~ s/\\t/\t/g;
+                }
             }
             elsif ( $opt eq '_options_csv' ) {
                 my $prompt = '"Text::CSV"';
@@ -281,6 +285,7 @@ sub __menus {
         config_menu => [
             { name => '_menu_memory',  text => "- Menu Memory", section => 'G'     },
             { name => '_table_expand', text => "- Table",       section => 'table' },
+            { name => '_info_expand',  text => "- Info",        section => 'G'     },
             { name => 'mouse',         text => "- Mouse Mode",  section => 'table' },
         ],
         config_sql => [
@@ -288,7 +293,7 @@ sub __menus {
             { name => 'meta',               text => "- Metadata",     section => 'G' },
             { name => 'operators',          text => "- Operators",    section => 'G' },
             { name => '_alias',             text => "- Alias",        section => 'alias' },
-            { name => '_extended_cols',     text => "- Extentions",     section => 'G' },
+            { name => '_extended_cols',     text => "- Extentions",   section => 'G' },
             { name => '_sql_identifiers',   text => "- Identifiers",  section => 'G' },
             { name => '_write_access',      text => "- Write access", section => 'G' },
             { name => 'parentheses',        text => "- Parentheses",  section => 'G' },
@@ -506,15 +511,14 @@ sub set_options {
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_extended_cols' ) {
-                my $ext_val = [ 'None', 'Func', 'SQ', 'Func+SQ' ];
                 my $sub_menu = [
-                    [ 'extend_select',   "- Extend SELECT",   $ext_val         ],
-                    [ 'extend_where',    "- Extend WHERE",    $ext_val         ],
-                    [ 'extend_group_by', "- Extend GROUB BY", $ext_val         ],
-                    [ 'extend_having',   "- Extend HAVING",   $ext_val         ],
-                    [ 'extend_set',      "- Extend SET",      $ext_val         ],
-                    [ 'extend_table',    "- Extend Table",    [ 'None', 'SQ' ] ],
-                    [ 'extend_join',     "- Extend Join",     [ 'None', 'SQ' ] ],
+                    [ 'extend_select',   "- Extend SELECT",   [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
+                    [ 'extend_where',    "- Extend WHERE",    [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
+                    [ 'extend_group_by', "- Extend GROUB BY", [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
+                    [ 'extend_having',   "- Extend HAVING",   [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
+                    [ 'extend_set',      "- Extend SET",      [ 'None', 'Func', 'SQ', '=N', 'Func/SQ/=N' ] ],
+                    [ 'extend_table',    "- Extend Table",    [ 'None',         'SQ'                     ] ],
+                    [ 'extend_join',     "- Extend Join",     [ 'None',         'SQ'                     ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu );
             }
@@ -567,7 +571,14 @@ sub set_options {
             elsif ( $opt eq '_table_expand' ) {
                 my $prompt = 'Choose: ';
                 my $sub_menu = [
-                    [ 'table_expand', "- Expand Rows",   [ 'NO', 'YES - fast back', 'YES' ] ],
+                    [ 'table_expand', "- Expand table rows",   [ 'NO', 'YES - fast back', 'YES' ] ],
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq '_info_expand' ) {
+                my $prompt = 'Choose: ';
+                my $sub_menu = [
+                    [ 'info_expand', "- Expand info-table rows",   [ 'NO', 'YES - fast back', 'YES' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

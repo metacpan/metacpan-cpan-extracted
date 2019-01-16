@@ -1,7 +1,7 @@
 package TableData::Object::Base;
 
-our $DATE = '2017-01-01'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2019-01-16'; # DATE
+our $VERSION = '0.110'; # VERSION
 
 use 5.010;
 use strict;
@@ -66,34 +66,47 @@ sub col_count {
 }
 
 sub _select {
-    my ($self, $_as, $cols0, $func_filter_row, $sorts) = @_;
+    my ($self, $_as, $cols0, $excl_cols, $func_filter_row, $sorts) = @_;
 
     # determine result's columns & spec
     my $spec;
     my %newcols_to_origcols;
+    my @cols0; # original column names but with '*' expanded
     my @newcols;
     if ($cols0) {
         $spec = {fields=>{}};
         my $i = 0;
         for my $col0 (@$cols0) {
-            die "Column '$col0' does not exist" unless $self->col_exists($col0);
-
-            my $col = $col0;
-            my $j = 1;
-            while (defined $newcols_to_origcols{$col}) {
-                $j++;
-                $col = "${col0}_$j";
+            my @add;
+            if ($col0 eq '*') {
+                @add = @{ $self->{cols_by_idx} };
+            } else {
+                die "Column '$col0' does not exist" unless $self->col_exists($col0);
+                @add = ($col0);
             }
-            $newcols_to_origcols{$col} = $col0;
-            push @newcols, $col;
 
-            $spec->{fields}{$col} = {
-                %{$self->{spec}{fields}{$col0} // {}},
-                pos=>$i,
-            };
-            $i++;
+            for my $add (@add) {
+                next if $excl_cols && (grep {$add eq $_} @$excl_cols);
+                push @cols0, $add;
+                my $j = 1;
+                my $col = $add;
+                while (defined $newcols_to_origcols{$col}) {
+                    $j++;
+                    $col = "${add}_$j";
+                }
+                $newcols_to_origcols{$col} = $add;
+                push @newcols, $col;
+
+                $spec->{fields}{$col} = {
+                    %{$self->{spec}{fields}{$add} // {}},
+                    pos=>$i,
+                };
+                $i++;
+            }
         }
+        $cols0 = \@cols0;
     } else {
+        # XXX excl_cols is not being observed
         $spec = $self->{spec};
         $cols0 = $self->{cols_by_idx};
         @newcols = @{ $self->{cols_by_idx} };
@@ -176,13 +189,13 @@ sub _select {
 }
 
 sub select_as_aoaos {
-    my ($self, $cols, $func_filter_row, $sorts) = @_;
-    $self->_select('aoaos', $cols, $func_filter_row, $sorts);
+    my ($self, $cols, $excl_cols, $func_filter_row, $sorts) = @_;
+    $self->_select('aoaos', $cols, $excl_cols, $func_filter_row, $sorts);
 }
 
 sub select_as_aohos {
-    my ($self, $cols, $func_filter_row, $sorts) = @_;
-    $self->_select('aohos', $cols, $func_filter_row, $sorts);
+    my ($self, $cols, $excl_cols, $func_filter_row, $sorts) = @_;
+    $self->_select('aohos', $cols, $excl_cols, $func_filter_row, $sorts);
 }
 
 sub uniq_col_names { die "Must be implemented by subclass" }
@@ -210,7 +223,7 @@ TableData::Object::Base - Base class for TableData::Object::*
 
 =head1 VERSION
 
-This document describes version 0.10 of TableData::Object::Base (from Perl distribution TableData-Object), released on 2016-01-01.
+This document describes version 0.110 of TableData::Object::Base (from Perl distribution TableData-Object), released on 2019-01-16.
 
 =head1 METHODS
 
@@ -403,7 +416,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

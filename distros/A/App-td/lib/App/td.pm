@@ -1,7 +1,7 @@
 package App::td;
 
-our $DATE = '2017-01-01'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2019-01-16'; # DATE
+our $VERSION = '0.092'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -12,6 +12,28 @@ use 5.010001;
 use PerlX::Maybe;
 
 our %SPEC;
+
+our %actions = (
+    'actions' => {summary=>'List available actions', req_input=>0},
+    'avg-row' => {summary=>'Append an average row'},
+    'avg' => {summary=>'Return average of all numeric columns'},
+    'colcount-row' => {summary=>'Append a row containing number of columns'},
+    'colcount' => {summary=>'Count number of columns'},
+    'colnames' => {summary=>'Return only the row containing column names'},
+    'colnames-row' => {summary=>'Append a row containing column names'},
+    'head' => {summary=>'Only return the first N rows'},
+    'info' => {summary=>'Check if input is table data and show information about the table'},
+    'rowcount-row' => {summary=>'Count number of rows (equivalent to "wc -l" in Unix)'},
+    'rowcount' => {summary=>'Append a row containing rowcount'},
+    'rownum-col' => {summary=>'Add a column containing row number'},
+    'select' => {summary=>'Select one or more columns'},
+    'sort' => {summary=>'Sort rows'},
+    'sum-row' => {summary=>'Append a row containing sums'},
+    'sum' => {summary=>'Return a row containing sum of all numeric columns'},
+    'tail' => {summary=>'Only return the last N rows'},
+    'wc-row' => {summary=>'Alias for wc-row'},
+    'wc' => {summary=>'Alias for rowcount'},
+);
 
 sub _get_table_spec_from_envres {
     my $envres = shift;
@@ -81,6 +103,9 @@ Next, you can use these actions:
     # append a row containing rowcount
     % osnames -l --json | td rowcount-row
 
+    # return the column names only
+    % lcpan related-mods Perinci::CmdLine | td colnames
+
     # append a row containing column names
     % lcpan related-mods Perinci::CmdLine | td colnames-row
 
@@ -89,12 +114,18 @@ Next, you can use these actions:
 
     # select some columns
     % osnames -l --json | td select value description
+    # select all columns but some
+    % osnames -l --json | td select '*' -e value -e description
 
     # only show first 5 rows
     % osnames -l --json | td head -n5
+    # show all but the last 5 rows
+    % osnames -l --json | td head -n -5
 
     # only show last 5 rows
     % osnames -l --json | td tail -n5
+    # show rows from the row 5 onwards
+    % osnames -l --json | td tail -n +5
 
     # sort by column(s) (add "-" prefix to for descending order)
     % osnames -l --json | td sort value tags
@@ -115,29 +146,16 @@ Next, you can use these actions:
     # add a row number column (1, 2, 3, ...)
     % list-files -l --json | td rownum-col
 
+Use this to list all the available actions:
+
+    % td actions
+    % td actions -l ;# show details
+
 _
     args => {
         action => {
             summary => 'Action to perform on input table',
-            schema => ['str*', in => [qw/
-                                            avg
-                                            avg-row
-                                            colcount
-                                            colcount-row
-                                            colnames-row
-                                            head
-                                            info
-                                            rowcount
-                                            rowcount-row
-                                            rownum-col
-                                            select
-                                            sort
-                                            sum
-                                            sum-row
-                                            tail
-                                            wc
-                                            wc-row
-                                        /]],
+            schema => ['str*', in => [sort keys %actions]],
             req => 1,
             pos => 0,
             description => <<'_',
@@ -152,10 +170,24 @@ _
             greedy => 1,
         },
 
-        # XXX only for head, tail
         lines => {
-            schema => ['int*', min=>0],
+            schema => ['str*', match=>qr/\A[+-]?[0-9]+\z/],
             cmdline_aliases => {n=>{}},
+            tags => ['category:head-action', 'category:tail-action'],
+        },
+
+        detail => {
+            schema => 'bool*',
+            cmdline_aliases => {l=>{}},
+            tags => ['category:actions-action'],
+        },
+
+        exclude_columns => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'exclude_column',
+            schema => ['array*', of=>'str*'],
+            cmdline_aliases => {e=>{}},
+            tags => ['category:select-action'],
         },
     },
 };
@@ -167,6 +199,7 @@ sub td {
     my ($input, $input_form, $input_obj);
   GET_INPUT:
     {
+        last unless $actions{$action}{req_input} // 1;
         require Data::Check::Structure;
         eval {
             local $/;
@@ -210,6 +243,15 @@ sub td {
     my $output;
   PROCESS:
     {
+        if ($action eq 'actions') {
+            if ($args{detail}) {
+                $output = [200, "OK", [map {+{name=>$_, summary=>$actions{$_}{summary}}} sort keys %actions]];
+            } else {
+                $output = [200, "OK", [sort keys %actions]];
+            }
+            last;
+        }
+
         if ($action eq 'info') {
             my $form = ref($input_obj); $form =~ s/^TableData::Object:://;
             my $info = {
@@ -222,12 +264,12 @@ sub td {
             last;
         }
 
-        if ($action eq 'rowcount') {
+        if ($action eq 'rowcount' || $action eq 'wc') {
             $output = [200, "OK", $input_obj->row_count];
             last;
         }
 
-        if ($action eq 'rowcount-row') {
+        if ($action eq 'rowcount-row' || $action eq 'wc-row') {
             my $cols = $input_obj->cols_by_idx;
             my $rows = $input_obj->rows_as_aoaos;
             my $rowcount_row = [map {''} @$cols];
@@ -240,11 +282,26 @@ sub td {
         if ($action eq 'head' || $action eq 'tail') {
             my $cols = $input_obj->cols_by_idx;
             my $rows = $input_obj->rows_as_aoaos;
+            my $n = $args{lines} // 5;
             if ($action eq 'head') {
-                splice @$rows, $args{lines} if $args{lines} < @$rows;
+                if ($n =~ s/\A\+//) {
+                    if ($n >= @$rows) {
+                        $rows = [];
+                    } else {
+                        splice @$rows, @$rows - $n;
+                    }
+                } else {
+                    splice @$rows, $n if $n < @$rows;
+                }
             } else {
-                splice @$rows, 0, @$rows - $args{lines}
-                    if $args{lines} < @$rows;
+                if ($n < 0) {
+                    $output = [400, "Cannot tail negative number of rows"];
+                    last;
+                } elsif ($n =~ s/\A\+//) {
+                    splice @$rows, 0, $n-1 if $n >= 1;
+                } else {
+                    splice @$rows, 0, @$rows - $n if $n < @$rows;
+                }
             }
             $output = [200, "OK", $rows, {'table.fields' => $cols}];
             last;
@@ -252,6 +309,13 @@ sub td {
 
         if ($action eq 'colcount') {
             $output = [200, "OK", $input_obj->col_count];
+            last;
+        }
+
+        if ($action eq 'colnames') {
+            my $cols = $input_obj->cols_by_idx;
+            my $colnames_row = [map {$cols->[$_]} 0..$#{$cols}];
+            $output = [200, "OK", $colnames_row];
             last;
         }
 
@@ -314,15 +378,16 @@ sub td {
             my $res;
             if ($action eq 'sort') {
                 if ($input_form eq 'aohos') {
-                    $res = $input_obj->select_as_aohos(undef, undef, $argv);
+                    $res = $input_obj->select_as_aohos(undef, undef, undef, $argv);
                 } else {
-                    $res = $input_obj->select_as_aoaos(undef, undef, $argv);
+                    $res = $input_obj->select_as_aoaos(undef, undef, undef, $argv);
                 }
             } elsif ($action eq 'select') {
+                my $excl_cols = $args{exclude_columns} // [];
                 if ($input_form eq 'aohos') {
-                    $res = $input_obj->select_as_aohos($argv);
+                    $res = $input_obj->select_as_aohos($argv, $excl_cols);
                 } else {
-                    $res = $input_obj->select_as_aoaos($argv);
+                    $res = $input_obj->select_as_aoaos($argv, $excl_cols);
                 }
             }
 
@@ -381,12 +446,16 @@ App::td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.08 of App::td (from Perl distribution App-td), released on 2016-01-01.
+This document describes version 0.092 of App::td (from Perl distribution App-td), released on 2019-01-16.
 
 =head1 FUNCTIONS
 
 
-=head2 td(%args) -> [status, msg, result, meta]
+=head2 td
+
+Usage:
+
+ td(%args) -> [status, msg, payload, meta]
 
 Manipulate table data.
 
@@ -425,6 +494,9 @@ Next, you can use these actions:
  # append a row containing rowcount
  % osnames -l --json | td rowcount-row
  
+ # return the column names only
+ % lcpan related-mods Perinci::CmdLine | td colnames
+ 
  # append a row containing column names
  % lcpan related-mods Perinci::CmdLine | td colnames-row
  
@@ -433,12 +505,18 @@ Next, you can use these actions:
  
  # select some columns
  % osnames -l --json | td select value description
+ # select all columns but some
+ % osnames -l --json | td select '*' -e value -e description
  
  # only show first 5 rows
  % osnames -l --json | td head -n5
+ # show all but the last 5 rows
+ % osnames -l --json | td head -n -5
  
  # only show last 5 rows
  % osnames -l --json | td tail -n5
+ # show rows from the row 5 onwards
+ % osnames -l --json | td tail -n +5
  
  # sort by column(s) (add "-" prefix to for descending order)
  % osnames -l --json | td sort value tags
@@ -459,6 +537,11 @@ Next, you can use these actions:
  # add a row number column (1, 2, 3, ...)
  % list-files -l --json | td rownum-col
 
+Use this to list all the available actions:
+
+ % td actions
+ % td actions -l ;# show details
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -473,7 +556,11 @@ Action to perform on input table.
 
 Arguments.
 
-=item * B<lines> => I<int>
+=item * B<detail> => I<bool>
+
+=item * B<exclude_columns> => I<array[str]>
+
+=item * B<lines> => I<str>
 
 =back
 
@@ -482,7 +569,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -522,7 +609,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

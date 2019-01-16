@@ -1,8 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::Builder::Tester tests => 2;
+use Test::More;
+use Test::Builder::Tester;
 
 use Test::MemoryGrowth;
 
@@ -18,13 +20,15 @@ my @arr;
 test_out( "not ok 1 - push does not grow" );
 test_fail( +3 );
 test_err( qr/^# Lost \d+ bytes of memory over \d+ calls, average of \d+\.\d\d per call\n/ );
-test_err( qr/^# Writing heap dump to \S+\n/ ) if Test::MemoryGrowth::HAVE_DEVEL_MAT_DUMPER;
+test_err( qr/^# Writing heap dump to \S+\n/ ), test_err( qr/^# Writing heap dump after one more iteration to \S+\n/ ) if Test::MemoryGrowth::HAVE_DEVEL_MAT_DUMPER;
 no_growth { push @arr, "hello"; } "push does not grow";
 test_test( "no_growth push fails" );
 
+done_testing;
+
 END {
    # Clean up Devel::MAT dumpfile
-   my $pmat = $0;
-   $pmat =~ s/\.t$/-1.pmat/;
-   unlink $pmat if -f $pmat;
+   ( my $basename = $0 ) =~ s/\.t$//;
+
+   -f and unlink for "$basename-1.pmat", "$basename-1-after.pmat";
 }

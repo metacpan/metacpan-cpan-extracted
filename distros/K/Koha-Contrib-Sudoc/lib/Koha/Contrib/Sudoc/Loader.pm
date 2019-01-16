@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader;
 # ABSTRACT: Classe de base pour le chargement de notices biblio/autorité
-$Koha::Contrib::Sudoc::Loader::VERSION = '2.26';
+$Koha::Contrib::Sudoc::Loader::VERSION = '2.27';
 use Moose;
 use Modern::Perl;
 use utf8;
@@ -114,6 +114,7 @@ sub run {
         $self->count( $self->count + 1 );
         $self->handle_record($record);
     }
+    $self->converter->end();
     
     $self->sudoc->spool->move_done($self->file)  if $self->doit;
     my $format = '%#' . length($self->count) . "d\n";
@@ -143,7 +144,7 @@ Koha::Contrib::Sudoc::Loader - Classe de base pour le chargement de notices bibl
 
 =head1 VERSION
 
-version 2.26
+version 2.27
 
 =head1 AUTHOR
 
@@ -151,7 +152,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Fréderic Demians.
+This software is Copyright (c) 2019 by Fréderic Demians.
 
 This is free software, licensed under:
 

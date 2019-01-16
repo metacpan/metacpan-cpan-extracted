@@ -2,10 +2,9 @@
 
 use strict;
 use warnings;
-
 use Test::More;
 
-if ( $ENV{RELEASE_TESTING} ) 
+if ( $ENV{RELEASE_TESTING} )
 {
   plan tests => 7;
 }
@@ -14,7 +13,7 @@ else
   plan( skip_all => "Basic usage tests not required for installation" );
 }
 
-use_ok( 'Geo::IPinfo' ); 
+use_ok( 'Geo::IPinfo' );
 
 my $ip;
 
@@ -29,5 +28,5 @@ is($ip->field("8.8.8.8"), undef, "field() return undef if 'field' is missing");
 
 is($ip->field("8.8.8.8", "city"), "Mountain View",
                           "field() return a valid string when querying a valid IP");
-is($ip->field("192.168.0.1", "city"), "undefined",
-              "field() return the string 'undefined' when getting fields of private IPs");
+is($ip->field("192.168.0.1", "city"), undef,
+              "field() return 'undef' when getting fields of private IPs");

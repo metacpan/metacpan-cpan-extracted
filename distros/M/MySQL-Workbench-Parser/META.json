@@ -36,7 +36,8 @@
             "Moo" : "1.003001",
             "Scalar::Util" : "1.32",
             "XML::LibXML" : "2.0019",
-            "YAML::Tiny" : "1.64"
+            "YAML::Tiny" : "1.64",
+            "perl" : "5.008006"
          }
       },
       "test" : {
@@ -50,19 +51,19 @@
    "provides" : {
       "MySQL::Workbench::Parser" : {
          "file" : "lib/MySQL/Workbench/Parser.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       },
       "MySQL::Workbench::Parser::Column" : {
          "file" : "lib/MySQL/Workbench/Parser/Column.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       },
       "MySQL::Workbench::Parser::Index" : {
          "file" : "lib/MySQL/Workbench/Parser/Index.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       },
       "MySQL::Workbench::Parser::Table" : {
          "file" : "lib/MySQL/Workbench/Parser/Table.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       }
    },
    "release_status" : "stable",
@@ -77,9 +78,10 @@
          "web" : "http://github.com/reneeb/MySQL-Workbench-Parser"
       }
    },
-   "version" : "1.07",
+   "version" : "1.08",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>",
       "Renee <reb@perl-services.de>"

@@ -86,7 +86,7 @@ else
 use File::Temp qw(tempdir);
 use File::Spec ();
 
-my $dir_name = tempdir( CLEANUP => 1 );
+my $dir_name  = tempdir( CLEANUP => 1 );
 my $test01_fn = File::Spec->catfile( $dir_name, 'test01.ini' );
 
 # TEST

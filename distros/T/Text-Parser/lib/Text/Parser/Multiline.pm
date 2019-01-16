@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Text::Parser::Multiline 0.801;
+package Text::Parser::Multiline 0.802;
 
 # ABSTRACT: Adds multi-line support to the Text::Parser object.
 
@@ -141,7 +141,7 @@ Text::Parser::Multiline - Adds multi-line support to the Text::Parser object.
 
 =head1 VERSION
 
-version 0.801
+version 0.802
 
 =head1 SYNOPSIS
 
@@ -258,7 +258,7 @@ Takes two string arguments. The first is the line previously read which is expec
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<http://github.com/me/Text-Parser/issues>
+L<http://github.com/balajirama/Text-Parser/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -270,7 +270,7 @@ Balaji Ramasubramanian <balajiram@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Balaji Ramasubramanian.
+This software is copyright (c) 2018-2019 by Balaji Ramasubramanian.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

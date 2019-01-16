@@ -191,11 +191,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 SPVM_OP* op_term_element = op_list_elements->first;
                 int32_t index = 0;
                 while ((op_term_element = SPVM_OP_sibling(compiler, op_term_element))) {
-                  if (op_term_element->id == SPVM_OP_C_ID_ARRAY_LENGTH) {
-                    SPVM_COMPILER_error(compiler, "Can't use @ in array initialization at %s line %d\n", file, line);
-                    return;
-                  }
-                  
                   if (index == 0) {
                     
                     if (op_term_element->id == SPVM_OP_C_ID_UNDEF) {
@@ -1171,7 +1166,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               // First value must be array
               if (!SPVM_TYPE_is_array_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "right of @ must be array at %s line %d\n", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "Right operand of @ operator must be array type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -2351,11 +2346,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 SPVM_OP* op_term = op_list_args->first;
                 while ((op_term = SPVM_OP_sibling(compiler, op_term))) {
                   call_sub_args_count++;
-                  if (op_term->id == SPVM_OP_C_ID_ARRAY_LENGTH) {
-                    SPVM_COMPILER_error(compiler, "Can't use @ in subroutine arguments at %s line %d\n", op_cur->file, op_cur->line);
-                    return;
-                  }
-
                   if (call_sub_args_count > sub_args_count) {
                     SPVM_COMPILER_error(compiler, "Too many arguments \"%s\" at %s line %d\n", sub_name, op_cur->file, op_cur->line);
                     return;
@@ -3070,8 +3060,17 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               // Dist type is object type
               else if (SPVM_TYPE_is_object_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
+                // Dist type is oarray type
+                if (SPVM_TYPE_is_oarray_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
+                  if (SPVM_TYPE_is_object_array_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+                    is_valid = 1;
+                  }
+                  else {
+                    is_valid = 0;
+                  }
+                }
                 // Dist type is string type
-                if (SPVM_TYPE_is_string_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
+                else if (SPVM_TYPE_is_string_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
                   if (SPVM_TYPE_is_numeric_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
                     is_valid = 1;
                   }
@@ -3155,7 +3154,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               if (!is_valid) {
                 const char* src_type_name = SPVM_TYPE_new_type_name(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag);
                 const char* dist_type_name = SPVM_TYPE_new_type_name(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag);
-                SPVM_COMPILER_error(compiler, "Can't convert %s to %s at %s line %d\n", src_type_name, dist_type_name, op_src->file, op_src->line);
+                SPVM_COMPILER_error(compiler, "Can't convert %s to %s by cast at %s line %d\n", src_type_name, dist_type_name, op_src->file, op_src->line);
                 return;
               }
               
@@ -4198,8 +4197,20 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
   }
   // Dist type is object type
   else if (SPVM_TYPE_is_object_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
+    // Dist type is oarray type
+    if (SPVM_TYPE_is_oarray_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
+      if (SPVM_TYPE_is_object_array_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+        can_assign = 1;
+      }
+      else if (SPVM_TYPE_is_undef_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+        can_assign = 1;
+      }
+      else {
+        can_assign = 0;
+      }
+    }
     // Dist type is string type
-    if (SPVM_TYPE_is_string_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
+    else if (SPVM_TYPE_is_string_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
       // Source type is number
       if (SPVM_TYPE_is_numeric_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
         can_assign = 1;
@@ -4377,9 +4388,9 @@ void SPVM_OP_CHECKER_resolve_types(SPVM_COMPILER* compiler) {
     
     // Basic type name
     const char* basic_type_name = type->basic_type->name;
-
+    
     // Check if type name is package
-    if (type->basic_type->id > SPVM_BASIC_TYPE_C_ID_ANY_OBJECT) {
+    if (type->basic_type->id >= SPVM_BASIC_TYPE_C_ID_BYTE_OBJECT) {
       
       // Unknonw package
       SPVM_HASH* package_symtable = compiler->package_symtable;
@@ -4398,12 +4409,10 @@ void SPVM_OP_CHECKER_resolve_types(SPVM_COMPILER* compiler) {
       }
     }
     
-    // Interface array is invalid
-    if (type->basic_type->package && type->basic_type->package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE) {
-      if (type->dimension > 1) {
-        SPVM_COMPILER_error(compiler, "Array of interface is invalid at %s line %d\n", op_type->file, op_type->line);
-        return;
-      }
+    // array of oarray is invalid
+    if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_OARRAY && type->dimension > 0) {
+      SPVM_COMPILER_error(compiler, "Array of oarray type is invalid type at %s line %d\n", op_type->file, op_type->line);
+      return;
     }
   }
 }
@@ -4697,10 +4706,10 @@ void SPVM_OP_CHECKER_resolve_packages(SPVM_COMPILER* compiler) {
     const char* package_name = package->op_name->uv.name;
     
     // Add package load relative path to string pool
-    int32_t found_load_rel_path_string_pool_id = (intptr_t)SPVM_HASH_fetch(compiler->string_symtable, package->load_rel_path, strlen(package->load_rel_path) + 1);
-    if (found_load_rel_path_string_pool_id == 0) {
-      int32_t string_pool_id = SPVM_STRING_BUFFER_add_len(compiler->string_pool, (char*)package->load_rel_path, strlen(package->load_rel_path) + 1);
-      SPVM_HASH_insert(compiler->string_symtable, package->load_rel_path, strlen(package->load_rel_path) + 1, (void*)(intptr_t)string_pool_id);
+    int32_t found_module_rel_file_string_pool_id = (intptr_t)SPVM_HASH_fetch(compiler->string_symtable, package->module_rel_file, strlen(package->module_rel_file) + 1);
+    if (found_module_rel_file_string_pool_id == 0) {
+      int32_t string_pool_id = SPVM_STRING_BUFFER_add_len(compiler->string_pool, (char*)package->module_rel_file, strlen(package->module_rel_file) + 1);
+      SPVM_HASH_insert(compiler->string_symtable, package->module_rel_file, strlen(package->module_rel_file) + 1, (void*)(intptr_t)string_pool_id);
     }
     
     // value_t package limitation

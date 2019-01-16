@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.042';
+our $VERSION = '2.043';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -531,7 +531,8 @@ sub __browse_the_table {
     $ax->reset_sql( $sql );
     $sql->{table} = $qt_table;
     $sql->{cols} = $qt_columns;
-    $ax->print_sql( $sql, [ 'Select' ] );
+    $sf->{i}{stmt_types} = [ 'Select' ];
+    $ax->print_sql( $sql );
 
     PRINT_TABLE: while ( 1 ) {
         my $all_arrayref;
@@ -657,18 +658,18 @@ sub __derived_table {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     require App::DBBrowser::Subqueries;
     my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    $sf->{i}{stmt_types} = [ 'Select' ];
     my $tmp = { table => '(SQ)' };
     $ax->reset_sql( $tmp );
-    my $qt_table = $sq->choose_subquery( $tmp, 'Select', 'from' );
+    $ax->print_sql( $tmp );
+    my $qt_table = $sq->choose_subquery( $tmp, 'from' );
     if ( ! defined $qt_table ) {
         return;
     }
+    my $alias = $ax->alias( 'subqueries', $qt_table, 'From_SQ' );
+    $qt_table .= " AS " . $ax->quote_col_qualified( [ $alias ] );
     $tmp->{table} = $qt_table;
-    $ax->print_sql( $tmp, [ 'Select' ] );
-    my $alias = $ax->alias( 'subqueries', undef, 'From_SQ' );
-    if ( defined $alias && length $alias ) {
-        $qt_table .= " AS " . $alias;
-    }
+    $ax->print_sql( $tmp );
     my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
     $sth->execute() if $sf->{d}{driver} ne 'SQLite';
     my $qt_columns = $ax->quote_simple_many( $sth->{NAME} );
@@ -696,7 +697,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.042
+Version 2.043
 
 =head1 DESCRIPTION
 

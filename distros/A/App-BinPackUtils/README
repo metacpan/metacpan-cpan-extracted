@@ -1,0 +1,170 @@
+NAME
+    App::BinPackUtils - Collection of CLI utilities related to packing items
+    into bins
+
+VERSION
+    This document describes version 0.002 of App::BinPackUtils (from Perl
+    distribution App-BinPackUtils), released on 2019-01-16.
+
+DESCRIPTION
+    This distribution provides the following command-line utilities:
+
+    *   bin-files
+
+    *   bin-files-into-dvds
+
+    *   pack-bins
+
+    Keywords: binpack, bin pack, packbin, pack bins, packing, binning.
+
+FUNCTIONS
+  bin_files
+    Usage:
+
+     bin_files(%args) -> [status, msg, payload, meta]
+
+    Put files into bins.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   bin_prefix => *filename* (default: "bin")
+
+    *   bin_size* => *filesize*
+
+    *   files* => *array[filename]*
+
+    *   move => *bool*
+
+        Actually move the files to the bins.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  bin_files_into_dvds
+    Usage:
+
+     bin_files_into_dvds(%args) -> [status, msg, payload, meta]
+
+    Put files into DVD bins.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   bin_size => *filesize* (default: 4712300544)
+
+    *   files* => *array[filename]*
+
+    *   move => *bool*
+
+        Actually move the files to the bins.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pack_bins
+    Usage:
+
+     pack_bins(%args) -> [status, msg, payload, meta]
+
+    Pack items into bin.
+
+    Examples:
+
+    *   Example #1:
+
+         pack_bins(
+           items => ["A,10", "B,50", "C,30", "D,70", "E,40", "F,40", "G,25"],
+           bin_size => 100
+         );
+
+        Result:
+
+         [
+           {
+             items => [{ label => "D", size => 70 }, { label => "C", size => 30 }],
+             size  => 100,
+           },
+           {
+             items => [
+                        { label => "B", size => 50 },
+                        { label => "E", size => 40 },
+                        { label => "A", size => 10 },
+                      ],
+             size  => 100,
+           },
+           {
+             items => [{ label => "F", size => 40 }, { label => "G", size => 25 }],
+             size  => 65,
+           },
+         ]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   bin_size* => *filesize*
+
+    *   items* => *array[str]*
+
+        The items to be binned.
+
+        Each item should be in this format: "label,size" (or an array with
+        two elements, the first one is the label and the second its size).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-BinPackUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-BinPackUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-BinPackUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Algorithm::BinPack
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

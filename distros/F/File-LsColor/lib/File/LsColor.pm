@@ -5,7 +5,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.180';
+  $VERSION = '0.194';
   @ISA = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -14,12 +14,15 @@ BEGIN {
     ls_color_default
     ls_color_internal
     get_ls_colors
+    lookup_ls_color
+    ls_color_lookup
   );
 
   %EXPORT_TAGS = (
     all => [
       qw(
-      ls_color ls_color_custom ls_color_default ls_color_internal get_ls_colors
+      ls_color ls_color_custom ls_color_default ls_color_internal
+      get_ls_colors lookup_ls_color
       )
     ],
   );
@@ -27,6 +30,10 @@ BEGIN {
 
 use Carp qw(croak);
 use Term::ExtendedColor qw(fg);
+
+
+# alias for the author who keep typing the words in the wrong order. :)
+*ls_color_lookup = *File::LsColor::lookup_ls_color;
 
 my $LS_COLORS = $ENV{LS_COLORS}; # Default
 
@@ -216,10 +223,14 @@ sub ls_color {
     my($ext) = $file =~ m/^.*\.(.+)$/m;
     for my $ft(keys(%{$ls_colors})) {
       # First we check against the extensions
-      if($ft eq $ext) {
+      # NOTE:
+      # because of https://github.com/coreutils/coreutils/pull/14
+      # file extension mappings is no longer case sensitive. Therefore we lc the
+      # extension first.
+      if($ft eq lc($ext)) {
       # 38;5;100;1m
         if($ls_colors->{$ft} =~ m/;(\d+;?[1-9]?)$/m) {
-          my $n = $1;
+          my $n = $1; # color index 0 - 255
           # Account for bold, italic, underline etc
           if($n =~ m/(\d+);([1-7])/) {
             my $attr = $2;
@@ -254,18 +265,6 @@ sub ls_color {
             elsif( ($ft eq 'pi') and (!-p $file) ) {
               next;
             }
-
-            if($ls_colors->{$ft} =~ m/;(\d+;?[1-9]?)$/m) {
-              my $n = $1;
-              if($n =~ m/(\d+);([1-7])/) {
-                my $attr = $2;
-                $n = $1;
-                Term::ExtendedColor::autoreset(0);
-                $file = fg($attributes{$2}, $file);
-              }
-              Term::ExtendedColor::autoreset(1);
-              $file = fg($n, $file);
-            }
           }
         }
       }
@@ -297,6 +296,14 @@ sub _parse_ls_colors {
   }
   return $ft;
 }
+
+sub lookup_ls_color {
+  my $ft = shift;
+  my $table = get_ls_colors();
+
+  return (exists($table->{$ft}) ? $table->{$ft} : undef);
+}
+
 
 
 
@@ -338,6 +345,20 @@ File::LsColor - Colorize input filenames just like ls does
     # or use the defaults (only ANSI colors)
 
     @files = ls_color_default(@files);
+
+    ...
+
+    # returns a hashref with all defined filetypes and their attributes
+    my $ls_colors = get_ls_colors();
+
+    # what's the defined attributes for directories?
+
+    my $dir_color = lookup_ls_color('di');
+
+
+
+get_ls_colors()
+
 
 =head1 DESCRIPTION
 
@@ -392,6 +413,11 @@ definition, like so:
 Returns a hash reference where a key is the extension and its value is the
 attributes attached to it.
 
+=head2 lookup_ls_color()
+
+Given a valid name, returns the defined attributes associated with it.
+Else, returns undef.
+
 =head1 AUTHOR
 
   Magnus Woldrich
@@ -401,7 +427,7 @@ attributes attached to it.
 
 =head1 REPORTING BUGS
 
-Report bugs on rt.cpan.org or to m@japh.se
+Report bugs on L<https://github.com/trapd00r/File-LsColor> or to m@japh.se
 
 =head1 CONTRIBUTORS
 

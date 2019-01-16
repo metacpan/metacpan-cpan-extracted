@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008006;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "MySQL-Workbench-Parser",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.008006",
   "NAME" => "MySQL::Workbench::Parser",
   "PREREQ_PM" => {
     "Archive::Zip" => "1.30",
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::LongString" => "0.16"
   },
-  "VERSION" => "1.07",
+  "VERSION" => "1.08",
   "test" => {
     "TESTS" => "t/*.t"
   }

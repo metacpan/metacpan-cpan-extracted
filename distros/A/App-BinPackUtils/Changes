@@ -1,0 +1,9 @@
+0.002   2019-01-16 (PERLANCAR)
+
+	- bin-files-into-dvds: allow overriding --bin-size (-s) which
+	  defaults to 4493M.
+
+
+0.001   2019-01-16 (PERLANCAR)
+
+        - First release.

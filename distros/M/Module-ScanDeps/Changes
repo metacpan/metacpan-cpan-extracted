@@ -1,3 +1,20 @@
+1.27  2019-01-15
+
+- fixes by Shawn Laffan <shawnlaffan@gmail.com>
+  - Process lines like "{ package foo; use if 1, "warnings"; } (#8)
+  - Also handle 'do {use module; ...}'
+
+- some clean ups
+  - scandeps.pl: sort output by module name
+  - add_deps(): use _gettype() instead of inline code
+  - _compile_or_execute(): require DynaLoader _before_ accessing
+    its variables
+  - t/7-check-dynaloader.t: improve diagnostics
+
+- drop Cwd from the list of potential XS modules
+    
+- suppress warnings in some ancient Perls
+
 1.26  2018-12-12
 
 - Glue DLLs of XS modules should have type "shared" rather than "data"

@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 
 use Term::Choose       qw( choose );
-use Term::Choose::Util qw( choose_a_subset insert_sep );
+use Term::Choose::Util qw( choose_a_subset settings_menu insert_sep );
 
 use App::DBBrowser::Auxil;
 
@@ -23,10 +23,11 @@ sub new {
 
 
 sub input_filter {
-    my ( $sf, $sql, $stmt_typeS ) = @_;
+    my ( $sf, $sql, $default_e2n ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
     my $backup = [ map { [ @$_ ] } @{$sql->{insert_into_args}} ];
+    $sf->{empty_to_null} = $default_e2n;
 
     FILTER: while ( 1 ) {
         my @pre = ( undef, $sf->{i}{ok} );
@@ -34,40 +35,69 @@ sub input_filter {
         my $input_rows       = 'Choose Rows';
         my $input_rows_range = 'A Range of Rows';
         my $cols_to_rows     = 'Cols_to_Rows';
+        my $empty_to_null    = 'Empty_to_NULL';
         my $reset            = 'Reset';
-        my $choices = [ @pre, $input_cols, $input_rows, $input_rows_range, $cols_to_rows, $reset ];
+        my $choices = [ @pre, $input_cols, $input_rows, $input_rows_range, $cols_to_rows, $empty_to_null, $reset ];
         my $waiting = 'Working ... ';
-        $ax->print_sql( $sql, $stmt_typeS );
+        $ax->print_sql( $sql );
         # Choose
         my $filter = $stmt_h->choose(
             $choices,
             { prompt => 'Filter:' }
         );
-        $ax->print_sql( $sql, $stmt_typeS, $waiting );
+        $ax->print_sql( $sql, $waiting );
         if ( ! defined $filter ) {
             $sql->{insert_into_args} = [];
             return;
+            #$sql->{insert_into_args} = [ map { [ @$_ ] } @$backup ];
+            #$sf->{empty_to_null} = $default_e2n;
+            #if ( $sf->{empty_to_null} ) {
+            #    $ax->print_sql( $sql, $waiting );
+            #    no warnings 'uninitialized';
+            #    $sql->{insert_into_args} = [ map { [ map { length ? $_ : undef } @$_ ] } @{$sql->{insert_into_args}} ];
+            #}
+            #return 1;
         }
         elsif ( $filter eq $reset ) {
             $sql->{insert_into_args} = [ map { [ @$_ ] } @$backup ];
+            $sf->{empty_to_null} = $default_e2n;
             next FILTER
         }
         elsif ( $filter eq $sf->{i}{ok} ) {
+            if ( $sf->{empty_to_null} ) {
+                $ax->print_sql( $sql, $waiting );
+                no warnings 'uninitialized';
+                $sql->{insert_into_args} = [ map { [ map { length ? $_ : undef } @$_ ] } @{$sql->{insert_into_args}} ];
+            }
             return 1;
         }
         elsif ( $filter eq $input_cols  ) {
             $sf->__choose_columns( $sql );
         }
         elsif ( $filter eq $input_rows ) {
-            $sf->__choose_rows( $sql, $stmt_typeS, $waiting );
+            $sf->__choose_rows( $sql, $waiting );
         }
         elsif ( $filter eq $input_rows_range ) {
-            $sf->__range_of_rows( $sql, $stmt_typeS, $waiting );
+            $sf->__range_of_rows( $sql, $waiting );
         }
         elsif ( $filter eq $cols_to_rows ) {
             $sf->__transpose_rows_to_cols( $sql );
         }
+        elsif ( $filter eq $empty_to_null ) {
+            $sf->__empty_to_null();
+        }
     }
+}
+
+sub __empty_to_null {
+    my ( $sf ) = @_;
+    my $tmp = { empty_to_null => $sf->{empty_to_null} };
+    settings_menu(
+        [ [ 'empty_to_null', "  Empty fields to NULL", [ 'NO', 'YES' ] ] ],
+        $tmp,
+        { mouse => $sf->{o}{table}{mouse} }
+    );
+    $sf->{empty_to_null} = $tmp->{empty_to_null};
 }
 
 
@@ -102,7 +132,7 @@ sub __choose_columns {
 
 
 sub __choose_rows {
-    my ( $sf, $sql, $stmt_typeS, $waiting ) = @_;
+    my ( $sf, $sql, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aoa = $sql->{insert_into_args};
     my %group; # group rows by the number of cols
@@ -116,7 +146,7 @@ sub __choose_rows {
     $sql->{insert_into_args} = []; # refers to a new empty array - this doesn't delete $aoa
 
     GROUP: while ( 1 ) {
-        $ax->print_sql( $sql, $stmt_typeS, $waiting );
+        $ax->print_sql( $sql, $waiting );
         my $row_idxs = [];
         my @choices_rows;
         if ( @keys_sorted == 1 ) {
@@ -147,7 +177,7 @@ sub __choose_rows {
                 $sql->{insert_into_args} = $aoa;
                 return;
             }
-            $ax->print_sql( $sql, $stmt_typeS, $waiting );
+            $ax->print_sql( $sql, $waiting );
             $row_idxs = $group{ $keys_sorted[$idx-@pre] };
             {
                 no warnings 'uninitialized';
@@ -163,7 +193,7 @@ sub __choose_rows {
                 { prompt => 'Choose rows:', index => 1, meta_items => [ 0 .. $#pre ],
                   undef => '<<', include_highlighted => 2 }
             );
-            $ax->print_sql( $sql, $stmt_typeS );
+            $ax->print_sql( $sql );
             if ( ! $idx[0] ) {
                 if ( @keys_sorted == 1 ) {
                     $sql->{insert_into_args} = $aoa;
@@ -178,7 +208,7 @@ sub __choose_rows {
                     my $idx = $row_idxs->[$i-@pre];
                     push @{$sql->{insert_into_args}}, $aoa->[$idx];
                 }
-                $ax->print_sql( $sql, $stmt_typeS );
+                $ax->print_sql( $sql );
                 if ( ! @{$sql->{insert_into_args}} ) {
                     $sql->{insert_into_args} = [ @{$aoa}[@$row_idxs] ];
                 }
@@ -188,14 +218,14 @@ sub __choose_rows {
                 my $idx = $row_idxs->[$i-@pre];
                 push @{$sql->{insert_into_args}}, $aoa->[$idx];
             }
-            $ax->print_sql( $sql, $stmt_typeS );
+            $ax->print_sql( $sql );
         }
     }
 }
 
 
 sub __range_of_rows {
-    my ( $sf, $sql, $stmt_typeS, $waiting ) = @_;
+    my ( $sf, $sql, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aoa = $sql->{insert_into_args};
     my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
@@ -215,7 +245,7 @@ sub __range_of_rows {
     }
     my $first_row = $first_idx - @pre;
     $choices->[$first_row + @pre] = '* ' . $choices->[$first_row + @pre];
-    $ax->print_sql( $sql, $stmt_typeS );
+    $ax->print_sql( $sql );
     # Choose
     my $last_idx = $stmt_v->choose(
         $choices,
@@ -226,7 +256,7 @@ sub __range_of_rows {
     }
     my $last_row = $last_idx - @pre;
     if ( $last_row < $first_row ) {
-        $ax->print_sql( $sql, $stmt_typeS );
+        $ax->print_sql( $sql );
         # Choose
         choose(
             [ "Last row ($last_row) is less than First row ($first_row)!" ],

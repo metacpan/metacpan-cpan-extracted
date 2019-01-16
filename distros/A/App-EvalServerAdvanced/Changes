@@ -1,3 +1,6 @@
+0.024 - Jan 15 2019
+  * Fix handling of STDERR and Sandbox plugins
+
 0.023 - June 20th 2018
   * Fix potential YAML security issue
 

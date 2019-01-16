@@ -105,13 +105,9 @@ foreach my $key (sort keys %$map) {
 
 $len += 2;
 
-print "# Legend: [C]ore [X]ternal [S]ubmodule [?]NotOnCPAN\n" if $verbose;
+print "#\n# Legend: [C]ore [X]ternal [S]ubmodule [?]NotOnCPAN\n" if $verbose;
 
-foreach my $mod (sort {
-    "@{$a->{used_by}}" cmp "@{$b->{used_by}}" or
-    $a->{key} cmp $b->{key}
-} @todo) {
-
+foreach my $mod (sort { $a->{name} cmp $b->{name} } @todo ) {
     my $version = MM->parse_version($mod->{file});
 
     if (!$verbose) {

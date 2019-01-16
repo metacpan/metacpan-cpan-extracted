@@ -1,5 +1,10 @@
 Revision history for Test-MemoryGrowth
 
+0.03    2018-01-16 01:22:54
+        [CHANGES]
+         * Emit two .pmat files on failed tests with one iteration advanced,
+           for differential analysis
+
 0.02    2014/02/20 16:05:05
         [CHANGES]
          * Optionally invoke Devel::MAT::Dumper if a growth test fails

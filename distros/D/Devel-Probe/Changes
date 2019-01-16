@@ -1,3 +1,11 @@
+0.000004    2019-01-16
+            * Simplify API
+            * Cleanup trigger test
+            * Support "once" probes and set them as default
+            * Add support for more actions when looking up a probe
+            * Use preprocessor macros for time-sensitive operations
+            * Add a release script
+
 0.000003    2019-01-15
             * Add a self-contained test
             * Expose some more functions

@@ -1,4 +1,22 @@
-Revision history for Perl extension Mac::AppleScript::Glue.
+Revision history for Mac-AppleScript-Glue
+
+0.06      2019-01-16 01:02:21-05:00 America/New_York
+
+	- remove erroneously listed dependencies from dist.ini
+
+	- minor updates to documenation
+
+	- modify dist.ini to try to limit smoke testing to Mac OS
+
+0.05      2019-01-16 00:00:24-05:00 America/New_York
+
+0.04      2019-01-15 23:59:46-05:00 America/New_York
+
+	- module transferred to STEVIED for future maintenance
+
+	- fix broken tests
+
+	- modified/removed files to enable Dist::Zilla use
 
 0.03 Sat Sep 14 22:32:48 PDT 2002
 

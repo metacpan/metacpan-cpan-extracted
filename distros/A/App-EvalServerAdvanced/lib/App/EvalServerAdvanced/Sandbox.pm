@@ -1,5 +1,5 @@
 package App::EvalServerAdvanced::Sandbox;
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 use strict;
 use warnings;
@@ -47,6 +47,8 @@ sub run_eval {
   my $language = shift;
   my $files = shift;
   my $work_path = Path::Tiny->tempdir("eval-XXXXXXXX");
+
+  $|++;
 
   chmod(0555, $work_path); # have to fix permissions on the new / or nobody can do anything!
 

@@ -22,14 +22,14 @@ ok(defined $finder)
 
 ######################################################################
 
-my $quicktime = new Mac::AppleScript::Glue::Application('QuickTime Player');
+my $preview = new Mac::AppleScript::Glue::Application('Preview');
 
-ok(defined $quicktime)
-    or die "can't initialize application object (Quicktime)\n";
+ok(defined $preview)
+    or die "can't initialize application object (Preview)\n";
 
 ######################################################################
 
-my $file = $quicktime->objref(
+my $file = $preview->objref(
     posix_file => "/System/Library/CoreServices/Dock.app/Contents/Resources/finder.png",
 );
 
@@ -41,7 +41,7 @@ ok(defined $file)
 my $doc = $file->open;
 
 ok(defined $doc)
-    or die "can't open file in QuickTime\n";
+    or die "can't open file in Preview\n";
 
 ######################################################################
 

@@ -3,10 +3,7 @@ abstract: 'Quick & dirty code probes for Perl'
 author:
   - 'Gonzalo Diethelm (gonzus@cpan.org)'
 build_requires:
-  Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
-  JSON::XS: '0'
-  Path::Tiny: '0'
   Test::More: '0'
   Test::Output: '0'
 configure_requires:
@@ -23,11 +20,9 @@ no_index:
     - t
     - inc
 requires:
-  JSON::XS: '0'
-  Path::Tiny: '0'
   XSLoader: '0'
   perl: '5.018'
 resources:
   repository: https://github.com/gonzus/Devel-Probe.git
-version: '0.000003'
+version: '0.000004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

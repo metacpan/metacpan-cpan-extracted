@@ -1,5 +1,146 @@
-SEE ALSO
+NAME
+    App::td - Manipulate table data
 
+VERSION
+    This document describes version 0.092 of App::td (from Perl distribution
+    App-td), released on 2019-01-16.
+
+FUNCTIONS
+  td
+    Usage:
+
+     td(%args) -> [status, msg, payload, meta]
+
+    Manipulate table data.
+
+    *td* receives table data from standard input and performs an action on
+    it. It has functionality similar to some Unix commands like *head*,
+    *tail*, *wc*, *cut*, *sort* except that it operates on table
+    rows/columns instead of lines/characters. This is convenient to use with
+    CLI scripts that output table data.
+
+    A *table data* is JSON-encoded data in the form of either: "hos" (hash
+    of scalars, which is viewed as a two-column table where the columns are
+    "key" and "value"), "aos" (array of scalars, which is viewed as a
+    1-column array where the column is "elem"), "aoaos" (array of arrays of
+    scalars), or "aohos" (array of hashes of scalars).
+
+    The input can also be an *enveloped* table data, where the envelope is
+    an array: "[status, message, content, meta]" and "content" is the actual
+    table data. This kind of data is produced by "Perinci::CmdLine"-based
+    scripts and can contain more detailed table specification in the "meta"
+    hash, which "td" can parse.
+
+    First you might want to use the "info" action to see if the input is a
+    table data:
+
+     % osnames -l --json | td info
+
+    If input is not valid JSON, a JSON parse error will be displayed. If
+    input is valid JSON but not a table data, another error will be
+    displayed. Otherwise, information about the table will be displayed
+    (form, number of columns, column names, number of rows, and so on).
+
+    Next, you can use these actions:
+
+     # count number of rows (equivalent to "wc -l" Unix command)
+     % osnames -l --json | td rowcount
+ 
+     # append a row containing rowcount
+     % osnames -l --json | td rowcount-row
+ 
+     # return the column names only
+     % lcpan related-mods Perinci::CmdLine | td colnames
+ 
+     # append a row containing column names
+     % lcpan related-mods Perinci::CmdLine | td colnames-row
+ 
+     # count number of columns
+     % osnames -l --json | td colcount
+ 
+     # select some columns
+     % osnames -l --json | td select value description
+     # select all columns but some
+     % osnames -l --json | td select '*' -e value -e description
+ 
+     # only show first 5 rows
+     % osnames -l --json | td head -n5
+     # show all but the last 5 rows
+     % osnames -l --json | td head -n -5
+ 
+     # only show last 5 rows
+     % osnames -l --json | td tail -n5
+     # show rows from the row 5 onwards
+     % osnames -l --json | td tail -n +5
+ 
+     # sort by column(s) (add "-" prefix to for descending order)
+     % osnames -l --json | td sort value tags
+     % osnames -l --json | td sort -- -value
+ 
+     # return sum of all numeric columns
+     % list-files -l --json | td sum
+ 
+     # append a sum row
+     % list-files -l --json | td sum-row
+ 
+     # return average of all numeric columns
+     % list-files -l --json | td avg
+ 
+     # append an average row
+     % list-files -l --json | td avg-row
+ 
+     # add a row number column (1, 2, 3, ...)
+     % list-files -l --json | td rownum-col
+
+    Use this to list all the available actions:
+
+     % td actions
+     % td actions -l ;# show details
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action* => *str*
+
+        Action to perform on input table.
+
+    *   argv => *array[str]* (default: [])
+
+        Arguments.
+
+    *   detail => *bool*
+
+    *   exclude_columns => *array[str]*
+
+    *   lines => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-td>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-td>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-td>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Rinci::function for a more detailed explanation on enveloped result.
 
     TableDef for more detailed explanation of table data definition, which
@@ -9,4 +150,14 @@ SEE ALSO
     TableData::Object
 
     Perinci::CmdLine
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

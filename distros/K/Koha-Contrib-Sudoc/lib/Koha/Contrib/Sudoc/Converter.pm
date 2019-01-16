@@ -1,7 +1,8 @@
 package Koha::Contrib::Sudoc::Converter;
 # ABSTRACT: Classe de base pour convertir les notices
-$Koha::Contrib::Sudoc::Converter::VERSION = '2.26';
+$Koha::Contrib::Sudoc::Converter::VERSION = '2.27';
 use Moose;
+use utf8;
 use Modern::Perl;
 
 # Moulinette SUDOC
@@ -182,6 +183,28 @@ sub framework {
     $self->sudoc->c->{biblio}->{framework} || '';
 }
 
+
+sub biblio_modify {
+    my ($self, $record, $biblionumber, $framework) = @_;
+    $self->log->debug(
+        "  Notice après traitement :\n" . $record->as('Text') );
+    $self->log->notice("  * Remplace $biblionumber\n" );
+}
+
+
+sub biblio_add {
+    my ($self, $record, $biblionumber, $framework) = @_;
+
+    $self->log->debug(
+        "  Notice après traitement :\n" . $record->as('Text') );
+    my $plus = '';
+    $plus = " $biblionumber $framework" if $biblionumber;
+    $self->log->notice( "  * Ajout$plus\n" );
+}
+
+
+sub end { }
+
 1;
 
 __END__
@@ -196,7 +219,7 @@ Koha::Contrib::Sudoc::Converter - Classe de base pour convertir les notices
 
 =head1 VERSION
 
-version 2.26
+version 2.27
 
 =head1 DESCRIPTION
 
@@ -215,6 +238,11 @@ notice ou d'une notice qui existe déjà dans Koha:
  merge           N      O
  clean           O      O
  framework       O      N
+ biblio_add      O      N
+ biblio_modif    N      O
+
+Il y a en plus la méthode end() qui est appelée à la fin du traitement de
+toutes les notices du fichier.
 
 =head1 ATTRIBUTES
 
@@ -291,13 +319,22 @@ Le framework auquel affecter la notice biblio. Valeur par défaut prise dans
 C<sudoc.conf>.  Peut-être surchargée pour attribuer un framework différent en
 fonction du type de doc ou de tout autre critère.
 
+=head2 biblio_modify
+
+=head2 biblio_add
+
+=head2 end
+
+Appelé en fin de traitement du fichier Sudoc. Un converter peut générer ici des
+états de synthèse.
+
 =head1 AUTHOR
 
 Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Fréderic Demians.
+This software is Copyright (c) 2019 by Fréderic Demians.
 
 This is free software, licensed under:
 

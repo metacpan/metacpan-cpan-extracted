@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010,2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2019 -- leonerd@leonerd.org.uk
 
 package Test::MemoryGrowth;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Test::Builder::Module );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @EXPORT = qw(
    no_growth
@@ -23,26 +23,28 @@ C<Test::MemoryGrowth> - assert that code does not cause growth in memory usage
 
 =head1 SYNOPSIS
 
- use Test::More tests => 3;
- use Test::MemoryGrowth;
+   use Test::More;
+   use Test::MemoryGrowth;
 
- use Some::Class;
+   use Some::Class;
 
- no_growth {
-    my $obj = Some::Class->new;
- } 'Constructing Some::Class does not grow memory';
+   no_growth {
+      my $obj = Some::Class->new;
+   } 'Constructing Some::Class does not grow memory';
 
- my $obj = Some::Class->new;
- no_growth {
-    $obj->do_thing;
- } 'Some::Class->do_thing does not grow memory';
+   my $obj = Some::Class->new;
+   no_growth {
+      $obj->do_thing;
+   } 'Some::Class->do_thing does not grow memory';
 
 
- #### This test will fail ####
- my @list;
- no_growth {
-    push @list, "Hello world";
- } 'pushing to an array does not grow memory';
+   #### This test will fail ####
+   my @list;
+   no_growth {
+      push @list, "Hello world";
+   } 'pushing to an array does not grow memory';
+
+   done_testing;
 
 =head1 DESCRIPTION
 
@@ -118,7 +120,9 @@ If L<Devel::MAT> is installed, this test module will use it to dump the state
 of the memory after a failure. It will create a F<.pmat> file named the same
 as the unit test, but with the trailing F<.t> suffix replaced with
 F<-TEST.pmat> where C<TEST> is the number of the test that failed (in case
-there was more than one).
+there was more than one). It will then run the code under test one more time,
+before writing another file whose name is suffixed with F<-TEST-after.pmat>.
+This pair of files may be useful for differential analysis.
 
 =cut
 
@@ -136,7 +140,9 @@ sub get_memusage
    die "Unable to determine VmSize\n";
 }
 
-=head2 no_growth { CODE } %opts, $name
+=head2 no_growth
+
+   no_growth { CODE } %opts, $name
 
 Assert that the code block does not consume extra memory.
 
@@ -196,10 +202,17 @@ sub no_growth(&@)
 
          # Trim the .t off first then append -$num.pmat, in case $0 wasn't a .t file
          $file =~ s/\.(?:t|pm|pl)$//;
-         $file .= "-$num\.pmat";
 
-         $tb->diag( "Writing heap dump to $file" );
-         Devel::MAT::Dumper::dump( $file );
+         my $beforefile = "$file-$num.pmat";
+         my $afterfile  = "$file-$num-after.pmat";
+
+         $tb->diag( "Writing heap dump to $beforefile" );
+         Devel::MAT::Dumper::dump( $beforefile );
+
+         $code->();
+
+         $tb->diag( "Writing heap dump after one more iteration to $afterfile" );
+         Devel::MAT::Dumper::dump( $afterfile );
       }
    }
 

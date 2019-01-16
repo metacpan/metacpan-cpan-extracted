@@ -18,6 +18,17 @@ my $mwb = File::Spec->catfile(
 my $parser = MySQL::Workbench::Parser->new( file => $mwb, lint => 0 );
 $parser->_parse;
 
+my ($table2) = grep{ $_->name eq 'table2' }@{ $parser->tables };
+my ($column) = grep{ $_->name eq 'UserDefinedTest' }@{ $table2->columns };
+
+is_deeply $column->type_info, {
+        'precision' => undef,
+        'args' => "'Admin', 'Test'",,
+        'name' => 'ENUM',
+        'gui_name' => 'user_category',
+        'length' => undef
+    };
+
 my $check = {
     'com.mysql.rdbms.mysql.datatype.geometry' => {
         'length' => undef,

@@ -1,4 +1,8 @@
-Revision history for TableData-Object
+0.110   2019-01-16 (PERLANCAR)
+
+	- select(): Allow '*' as column to mean all columns, allow
+	  excluding columns.
+
 
 0.10    2017-01-01 (PERLANCAR)
 

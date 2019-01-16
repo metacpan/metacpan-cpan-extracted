@@ -43,11 +43,11 @@
    "provides" : {
       "Address::PostCode::UserAgent" : {
          "file" : "lib/Address/PostCode/UserAgent.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Address::PostCode::UserAgent::Exception" : {
          "file" : "lib/Address/PostCode/UserAgent/Exception.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/Manwar/Address-PostCode-UserAgent"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }
