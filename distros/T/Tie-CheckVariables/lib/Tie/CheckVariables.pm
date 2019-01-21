@@ -1,79 +1,115 @@
 package Tie::CheckVariables;
 
+# ABSTRACT: check/validate variables for their data type
+
 use strict;
 use warnings;
-use Carp;
 
-our $VERSION = 0.03;
+use Carp;
+use Scalar::Util qw(blessed);
+
+our $VERSION = 0.06;
   
-my %hash = (integer => qr{^[-+]?\d+$},
-            float   => qr{^[+-]?(\d+\.\d+|\d+\.|\.\d+|\d+)([eE][+-]?\d+)?$},
-	    string  => qr{.+},);
-	    
-my $error_code = sub {};
+my %hash = (
+    integer => qr{^[-+]?\d+$},
+    float   => qr{^[+-]?(\d+\.\d+|\d+\.|\.\d+|\d+)([eE][+-]?\d+)?$},
+    string  => qr{.+},
+);
+
+my $error_code = sub { die "Invalid value $_[0]" };
 
 sub TIESCALAR{
-  my ($class, $type) = @_;
+    my ($class, $type) = @_;
   
-  my $self = {};
-  bless $self, $class;
+    my $self = {};
+    bless $self, $class;
 
-  $self->_type($type);
+    $self->_type(
+        blessed $type && $type->isa('Type::Tiny') ?
+            $type->compiled_check :
+            $type
+    );
 	
-  return $self;
+    return $self;
 }
 
 sub FETCH {
-  my $self = shift;
-  return $self->{VALUE};
+    my $self = shift;
+    return $self->{VALUE};
 }
 
 sub STORE {
-  my ($self,$value) = @_;
+    my ($self,$value) = @_;
     
-  my $re = $self->_regex();
-  if(!(ref $value) && $value =~ /$re/){
-    $self->{VALUE} = $value;
-  }
-  else{
-    $self->{VALUE} = undef;
-    $error_code->();
-    #croak "no valid input";
-  }
+    my $check = $self->_check();
+
+    my $success;
+    my $is_code = 'CODE' eq ref $check;
+
+    if ( !defined $check ) {
+        $self->{VALUE} = $value;
+        $success = 1;
+    }
+    elsif ( $is_code ) {
+        eval {
+            $success = $check->($value);
+        };
+    }
+    elsif ( !ref $value && $value =~ $check ) {
+        $success = 1;
+    }
+
+    if ( $success ) {
+        $self->{VALUE} = $value;
+    }
+    else {
+        $self->{VALUE} = undef;
+        $error_code->( $value );
+        #croak "no valid input";
+    }
 }
 
 sub UNTIE {}
 
-sub DESTROY {}
+sub _check {
+    my ($self) = @_;
 
-sub _regex{
-  my ($self) = @_;
-  $self->{REGEXP} = _get_regex($self->_type()) unless($self->{REGEXP});
-  return $self->{REGEXP};
-}# regex
+    return $self->{CHECK} if $self->{CHECK};
 
-sub _type{
-  my ($self,$type) = @_;
-  $self->{TYPE} = $type if(defined $type);
-  return $self->{TYPE};
-}# type
+    my $type    = $self->_type;
+    my $is_code = grep{ $_ eq ref $type }qw(CODE Type::Tiny);
+    $self->{CHECK} = !$is_code ? _get_regex( $type ) : $type;
 
-sub _get_regex{
-  my ($type) = @_;
-	      
-  return $hash{$type} if(exists $hash{$type});
-}# get_regex
+    return $self->{CHECK};
+}
 
-sub register{
-  my ($class,$type,$regex) = @_;
-  return unless($class eq 'Tie::CheckVariables');
-  $hash{$type} = qr{$regex};
-}# register
+sub _type {
+    my ($self,$type) = @_;
 
-sub on_error{
-  my ($class,$coderef) = @_;
-  $error_code = $coderef if(ref($coderef) eq 'CODE');
-}# on_error
+    $self->{TYPE} = $type if defined $type;
+    return $self->{TYPE};
+}
+
+sub _get_regex {
+    my ($type) = @_;
+
+    return if !$type;
+    return qr/.*/ if !exists $hash{$type};
+    return $hash{$type};
+}
+
+sub register {
+    my ($class,$type,$regex) = @_;
+
+    return if $class ne 'Tie::CheckVariables';
+
+    $hash{$type} = qr{$regex};
+}
+
+sub on_error {
+    my ($class,$coderef) = @_;
+    $error_code = $coderef if 'CODE' eq ref $coderef;
+}
 
 
 1;
@@ -82,13 +118,19 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Tie::CheckVariables - check/validate variables for their datatype
+Tie::CheckVariables - check/validate variables for their data type
+
+=head1 VERSION
+
+version 0.06
 
 =head1 SYNOPSIS
 
-  use Tie::CheckVariables
+  use Tie::CheckVariables;
   
   tie my $scalar,'Tie::CheckVariables','integer';
   $scalar = 88; # is ok
@@ -96,9 +138,9 @@ Tie::CheckVariables - check/validate variables for their datatype
   
   untie $scalar;
 
-=head1 DATATYPES
+=head1 DATA TYPES
 
-You can use these datatypes:
+You can use these data types by default:
 
 =over 5
 
@@ -128,7 +170,7 @@ You can specify a subroutine that is invoked on error:
 
 =head2 register
 
-If the built-in datatypes aren't enough, you can extend this module with your own datatypes:
+If the built-in data types aren't enough, you can extend this module with your own data types:
 
   use Tie::CheckVariables;
   
@@ -137,14 +179,31 @@ If the built-in datatypes aren't enough, you can extend this module with your ow
   $test_url = 'http://www.perl.org';
   untie $test_url;
 
-=head1 BUGS
+=head1 USING Type::Tiny
 
-No known bugs, but "every" piece of code has bugs. If you find bugs, please
-use http://rt.cpan.org
+Since the very first version of this module, a lot has happened. L<Moose>, L<Moo> and other
+very nice modules were developed. And sometimes later L<Type::Tiny> was written.
+
+So I added support for L<Types::Standard> now ;-)
+
+  use Tie::CheckVariables;
+  use Types::Standard qw(Int);
+  
+  tie my $test_int,'Tie::CheckVariables', Int;
+  $test_int = 112;
+  $test_int = 'Test'; # throws error
+  untie $test_url;
 
 =head1 AUTHOR
 
-copyright 2006
-Renee Baecker E<lt>module@renee-baecker.deE<gt>
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2006 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

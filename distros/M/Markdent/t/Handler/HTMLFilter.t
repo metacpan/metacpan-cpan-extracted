@@ -56,7 +56,7 @@ EOF
         ],
     ];
 
-    my $mt = Markdent::Handler::MinimalTree->new();
+    my $mt     = Markdent::Handler::MinimalTree->new();
     my $filter = Markdent::Handler::HTMLFilter->new( handler => $mt );
 
     my $parser = Markdent::Parser->new( handler => $filter );

@@ -2,13 +2,13 @@ package LCFG::Build::Utils::RPM;    # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: RPM.pm.in 29224 2015-11-12 10:11:34Z squinney@INF.ED.AC.UK $
+# $Id: RPM.pm.in 35173 2018-12-07 16:25:33Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Utils/RPM.pm.in,v $
-# $Revision: 29224 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_6_6/lib/LCFG/Build/Utils/RPM.pm.in $
-# $Date: 2015-11-12 10:11:34 +0000 (Thu, 12 Nov 2015) $
+# $Revision: 35173 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_18/lib/LCFG/Build/Utils/RPM.pm.in $
+# $Date: 2018-12-07 16:25:33 +0000 (Fri, 07 Dec 2018) $
 
-our $VERSION = '0.6.6';
+our $VERSION = '0.9.18';
 
 use DateTime   ();
 use English qw(-no_match_vars);
@@ -60,8 +60,7 @@ sub generate_metadata {
         }
     }
 
-    my $packname = join q{-}, $pkgspec->fullname, $pkgspec->version;
-    my $specname = $packname . '.spec';
+    my $specname = $pkgspec->rpmspec_name;
     my $output   = File::Spec->catfile( $outdir, $specname );
 
     LCFG::Build::Utils::translate_file( $pkgspec, $specfile,
@@ -275,7 +274,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Utils::RPM version 0.6.6
+    This documentation refers to LCFG::Build::Utils::RPM version 0.9.18
 
 =head1 SYNOPSIS
 

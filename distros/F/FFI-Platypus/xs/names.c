@@ -5,7 +5,7 @@ ffi_type *
 ffi_pl_type_to_libffi_type(ffi_pl_type *type)
 {
   int type_code = type->type_code;
-  type_code = type_code & ~(FFI_PL_SHAPE_CUSTOM_PERL | FFI_PL_SHAPE_CUSTOM_NATIVE);
+  type_code = type_code & ~(FFI_PL_SHAPE_CUSTOM_PERL);
   switch(type_code)
   {
     case FFI_PL_TYPE_VOID:
@@ -95,6 +95,8 @@ ffi_pl_name_to_code(const char *name)
   else if(!strcmp(name, "complex_double"))
   { return FFI_PL_TYPE_COMPLEX_DOUBLE; }
 #endif
+  else if(!strcmp(name, "string"))
+  { return FFI_PL_TYPE_STRING; }
   else
   { return -1; }
 }

@@ -5,6 +5,7 @@ use strict;
 use Test::More;
 use Test::Prereq;
 prereq_ok( undef, [
+    'Win32::Console::ANSI',
     'Term::Choose::Constants',
     'Term::Choose::LineFold',
     'Term::Choose::Linux',

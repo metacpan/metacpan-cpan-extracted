@@ -9,7 +9,7 @@ use strict;
 use Serge::Util qw(subst_macros);
 use version;
 
-our $VERSION = qv('0.905.9');
+our $VERSION = qv('0.906.0');
 
 sub name {
     return 'Zanata translation server (http://zanata.org/) synchronization plugin';

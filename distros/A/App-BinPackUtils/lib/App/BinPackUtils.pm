@@ -1,7 +1,7 @@
 package App::BinPackUtils;
 
-our $DATE = '2019-01-16'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-01-17'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,15 +18,31 @@ my %arg_bin_size = (
     },
 );
 
-my %argopt_bin_size_for_dvd = (
-    bin_size => {
+my %argopt_num_bins = (
+    num_bins => {
+        summary => 'Just return the number of bins required',
+        schema => 'true*',
+        cmdline_aliases => {n=>{}},
+    },
+);
+
+my %argopt_num_dvds = (
+    num_dvds => {
+        summary => 'Just return the number of DVDs required',
+        schema => 'true*',
+        cmdline_aliases => {n=>{}},
+    },
+);
+
+my %argopt_dvd_size = (
+    dvd_size => {
         schema => ['filesize*'],
         default => 4494*1024*1024,
         cmdline_aliases => {s=>{}},
     },
 );
 
-my %arg_files = (
+my %arg0_files = (
     files => {
         schema => ['array*', of=>'filename*', min_len=>1],
         req => 1,
@@ -35,7 +51,7 @@ my %arg_files = (
     },
 );
 
-my %arg_move = (
+my %argopt_move = (
     move => {
         summary => 'Actually move the files to the bins',
         schema => 'bool*',
@@ -61,6 +77,7 @@ _
             greedy => 1,
             cmdline_src => 'stdin_or_args',
         },
+        %argopt_num_bins,
     },
     examples => [
         {
@@ -82,7 +99,8 @@ sub pack_bins {
             $bp->add_item(label => $item[0], size => $item[1]);
         }
     }
-    [200, "OK", [$bp->pack_bins]];
+    my @bins = $bp->pack_bins;
+    [200, "OK", $args{num_bins} ? scalar(@bins) : \@bins];
 }
 
 $SPEC{bin_files} = {
@@ -94,8 +112,9 @@ $SPEC{bin_files} = {
             schema => 'filename*',
             default => 'bin',
         },
-        %arg_files,
-        %arg_move,
+        %arg0_files,
+        %argopt_move,
+        %argopt_num_bins,
     },
     deps => {
         prog => 'du',
@@ -159,19 +178,17 @@ sub bin_files {
         }
     }
 
-    [200, "OK", \@rows];
+    [200, "OK", $args{num_bins} ? scalar(keys %bin_names) : \@rows];
 }
 
 $SPEC{bin_files_into_dvds} = {
     v => 1.1,
     summary => 'Put files into DVD bins',
     args => {
-        %arg_files,
-        %arg_move,
-        %argopt_bin_size_for_dvd,
-    },
-    deps => {
-        prog => 'du', # XXX indirectly
+        %arg0_files,
+        %argopt_move,
+        %argopt_dvd_size,
+        %argopt_num_dvds,
     },
 };
 sub bin_files_into_dvds {
@@ -181,7 +198,37 @@ sub bin_files_into_dvds {
         files      => $args{files},
         move       => $args{move},
         bin_prefix => "dvd",
-        bin_size   => $args{bin_size} // 4493*1024*1024,
+        bin_size   => $args{dvd_size} // 4493*1024*1024,
+        num_bins   => $args{num_dvds},
+    );
+}
+
+$SPEC{count_number_of_dvds_required} = {
+    v => 1.1,
+    summary => 'Count the number of DVDs required to contain the files',
+    description => <<'_',
+
+This:
+
+    % count-number-of-dvds-requires *
+
+is a shortcut for:
+
+    % bin-files-into-dvds -n *
+
+_
+    args => {
+        %arg0_files,
+        %argopt_move,
+        %argopt_dvd_size,
+    },
+};
+sub count_number_of_dvds_required {
+    my %args = @_;
+
+    bin_files_into_dvds(
+        %args,
+        num_dvds => 1,
     );
 }
 
@@ -200,7 +247,7 @@ App::BinPackUtils - Collection of CLI utilities related to packing items into bi
 
 =head1 VERSION
 
-This document describes version 0.002 of App::BinPackUtils (from Perl distribution App-BinPackUtils), released on 2019-01-16.
+This document describes version 0.003 of App::BinPackUtils (from Perl distribution App-BinPackUtils), released on 2019-01-17.
 
 =head1 DESCRIPTION
 
@@ -212,11 +259,14 @@ This distribution provides the following command-line utilities:
 
 =item * L<bin-files-into-dvds>
 
+=item * L<count-number-of-dvds-required>
+
 =item * L<pack-bins>
 
 =back
 
-Keywords: binpack, bin pack, packbin, pack bins, packing, binning.
+Keywords: binpack, bin pack, packbin, pack bins, packing, binning, dvd planning,
+files packing.
 
 =head1 FUNCTIONS
 
@@ -244,6 +294,10 @@ Arguments ('*' denotes required arguments):
 =item * B<move> => I<bool>
 
 Actually move the files to the bins.
+
+=item * B<num_bins> => I<true>
+
+Just return the number of bins required.
 
 =back
 
@@ -273,7 +327,55 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<bin_size> => I<filesize> (default: 4712300544)
+=item * B<dvd_size> => I<filesize> (default: 4712300544)
+
+=item * B<files>* => I<array[filename]>
+
+=item * B<move> => I<bool>
+
+Actually move the files to the bins.
+
+=item * B<num_dvds> => I<true>
+
+Just return the number of DVDs required.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 count_number_of_dvds_required
+
+Usage:
+
+ count_number_of_dvds_required(%args) -> [status, msg, payload, meta]
+
+Count the number of DVDs required to contain the files.
+
+This:
+
+ % count-number-of-dvds-requires *
+
+is a shortcut for:
+
+ % bin-files-into-dvds -n *
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dvd_size> => I<filesize> (default: 4712300544)
 
 =item * B<files>* => I<array[filename]>
 
@@ -351,6 +453,10 @@ The items to be binned.
 
 Each item should be in this format: "label,size" (or an array with two elements,
 the first one is the label and the second its size).
+
+=item * B<num_bins> => I<true>
+
+Just return the number of bins required.
 
 =back
 

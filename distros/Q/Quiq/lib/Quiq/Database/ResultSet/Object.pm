@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Quiq::Option;
 use Quiq::Hash;
@@ -837,7 +837,7 @@ sub selectParentRows {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

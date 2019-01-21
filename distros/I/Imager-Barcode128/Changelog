@@ -1,5 +1,12 @@
-version 0.0101 - March 21, 2015
+0.0103 2019-01-21
+ * Auto generate META.json as suggested by CPANTS. (Mohammad S Anwar)
+
+0.0102 2019-01-21
+ * Changed changelog format.
+ * Fixed documentation on how to save the bar code.
+
+0.0101 2015-03-21
  * Fixed the height parameter. It would change the height of the bar code but not the default image that is created if no image is passed in.
 
-version 0.0100 - March 6, 2015
+0.0100 2015-03-06
  * Initial public release.

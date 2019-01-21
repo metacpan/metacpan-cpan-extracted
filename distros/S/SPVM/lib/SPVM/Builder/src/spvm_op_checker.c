@@ -1632,13 +1632,10 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_OP* op_term = op_cur->first;
               
               // Void type
-              int32_t is_invalid = 0;
               if (SPVM_TYPE_is_void_type(compiler, sub->return_type->basic_type->id, sub->return_type->dimension, sub->return_type->flag)) {
                 if (op_term) {
-                  is_invalid = 1;
-                }
-                else {
-                  is_invalid = 0;
+                  SPVM_COMPILER_error(compiler, "void subroutine can't return value at %s line %d\n", op_cur->file, op_cur->line);
+                  return;
                 }
               }
               else {
@@ -3154,7 +3151,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               if (!is_valid) {
                 const char* src_type_name = SPVM_TYPE_new_type_name(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag);
                 const char* dist_type_name = SPVM_TYPE_new_type_name(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag);
-                SPVM_COMPILER_error(compiler, "Can't convert %s to %s by cast at %s line %d\n", src_type_name, dist_type_name, op_src->file, op_src->line);
+                SPVM_COMPILER_error(compiler, "Can't convert %s to %s by type cast at %s line %d\n", src_type_name, dist_type_name, op_src->file, op_src->line);
                 return;
               }
               
@@ -4353,7 +4350,7 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
     else {
       const char* src_type_name = SPVM_TYPE_new_type_name(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag);
       const char* dist_type_name = SPVM_TYPE_new_type_name(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag);
-      SPVM_COMPILER_error(compiler, "Can't convert %s to %s implicitly at %s line %d\n", src_type_name, dist_type_name, op_src->file, op_src->line);
+      SPVM_COMPILER_error(compiler, "Can't convert %s to %s by implicite type convertion at %s line %d\n", src_type_name, dist_type_name, op_src->file, op_src->line);
       return NULL;
     }
   }

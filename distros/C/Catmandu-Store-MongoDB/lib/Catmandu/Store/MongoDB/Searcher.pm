@@ -2,7 +2,7 @@ package Catmandu::Store::MongoDB::Searcher;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.07';
+our $VERSION = '0.0701';
 
 use Moo;
 use namespace::clean;
@@ -50,7 +50,7 @@ sub slice { # TODO constrain total?
 
 sub count { # TODO constrain on start, total?
     my ($self) = @_;
-    $self->bag->collection->count($self->query);
+    $self->bag->collection->count_documents($self->query);
 }
 
 1;

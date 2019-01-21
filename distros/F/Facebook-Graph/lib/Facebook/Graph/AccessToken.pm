@@ -1,5 +1,5 @@
 package Facebook::Graph::AccessToken;
-$Facebook::Graph::AccessToken::VERSION = '1.1204';
+$Facebook::Graph::AccessToken::VERSION = '1.1205';
 use Moo;
 use Facebook::Graph::AccessToken::Response;
 use Facebook::Graph::Request;
@@ -32,7 +32,7 @@ has access_token => (
 	predicate => 'has_access_token',
 );
 
-sub BUILD { 
+sub BUILD {
 	my $self = shift;
 	die "Either code or access_token is required" if not $self->has_code and not $self->has_access_token;
 }
@@ -50,7 +50,7 @@ sub uri_as_string {
 			code            => $self->code,
 		);
 	}
-	else { 
+	else {
 		$uri->query_form(
 			grant_type 			=> 'fb_exchange_token',
 			client_id       	=> $self->app_id,
@@ -79,7 +79,7 @@ Facebook::Graph::AccessToken - Acquire an access token from Facebook.
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 SYNOPSIS
 
@@ -144,6 +144,6 @@ Checks for either access_token or code and dies if has neither.
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

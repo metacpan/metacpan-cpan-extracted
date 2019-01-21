@@ -4,6 +4,7 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Joel Berger <joel.a.berger@gmail.com>'
 build_requires:
+  ExtUtils::MakeMaker: '6.64'
   Test2::Mock: '0.000060'
   Test2::Require: '0.000060'
   Test2::Require::Module: '0.000060'
@@ -11,7 +12,7 @@ build_requires:
   perl: '5.008001'
 configure_requires:
   ExtUtils::CBuilder: '0'
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
   ExtUtils::ParseXS: '3.30'
   File::Which: '0'
   perl: '5.008001'
@@ -30,6 +31,7 @@ no_index:
 requires:
   Capture::Tiny: '0.17'
   ExtUtils::CBuilder: '0'
+  ExtUtils::MakeMaker: '6.64'
   ExtUtils::ParseXS: '3.30'
   FFI::CheckLib: '0.11'
   File::Which: '1.10'
@@ -45,7 +47,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/Perl5-Alien/Alien-Build.git
-version: '1.49'
+version: '1.51'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'

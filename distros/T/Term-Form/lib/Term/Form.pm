@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.505';
+our $VERSION = '0.506';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -18,6 +18,7 @@ my $Plugin;
 BEGIN {
     if ( $^O eq 'MSWin32' ) {
         require Term::Choose::Win32;
+        require Win32::Console::ANSI;
         $Plugin = 'Term::Choose::Win32';
     }
     else {
@@ -78,6 +79,7 @@ sub __set_defaults {
     #$self->{no_echo}         = undef;
     $self->{default}          = '';
     $self->{clear_screen}     = 0;
+    $self->{codepage_mapping} = 0;
     #$self->{info}            = undef;
     #$self->{prompt}          = undef;
     #$self->{mark_curr}       = undef;             # experimental
@@ -171,12 +173,21 @@ sub readline {
         croak "readline: the (optional) second argument must be a string or a HASH reference";
     }
     my $valid = {
-        clear_screen => '[ 0 1 ]',
-        default      => '',
-        info         => '',
-        no_echo      => '[ 0 1 2 ]',
+        clear_screen     => '[ 0 1 ]',
+        codepage_mapping => 0,
+        default          => '',
+        info             => '',
+        no_echo          => '[ 0 1 2 ]',
     };
     $opt = $self->__validate_options( $opt, $valid );
+    if ( $^O eq "MSWin32" ) {
+        if ( $opt->{codepage_mapping} ) {
+            print "\e(K";
+        }
+        else {
+            print "\e(U";
+        }
+    }
     $self->{i}{pre_text}  = $opt->{info};
     $self->{i}{key_w}[0]  = print_columns( $prompt );
     $self->{i}{max_key_w} = $self->{i}{key_w}[0];
@@ -190,7 +201,7 @@ sub readline {
     my $list = [ [ $prompt, $opt->{default} ] ];
     $self->{i}{curr_row} = 0;
     my $m = $self->__string_and_pos( $list );
-    $self->{pg}->__clear_screen() if $opt->{clear_screen};
+    print CLEAR_SCREEN if $opt->{clear_screen};
     $self->{i}{pre_text_row_count} = 0;
 
     while ( 1 ) {
@@ -200,8 +211,8 @@ sub readline {
         }
         $self->__prepare_width();
         if ( defined $self->{i}{pre_text} ) { # empty info: add newline ?
-            $self->{pg}->__up( $self->{i}{pre_text_row_count} );
-            $self->{pg}->__clear_lines_to_end_of_screen();
+            print UP x $self->{i}{pre_text_row_count} if $self->{i}{pre_text_row_count};
+            print "\r". CLEAR_TO_END_OF_SCREEN;
             $self->__pre_text_row_count();
             print $self->{i}{pre_text}, "\n";
         }
@@ -239,8 +250,8 @@ sub readline {
             utf8::upgrade $key;
             if ( $key eq "\n" || $key eq "\r" ) { #
                 print "\n";
-                $self->{pg}->__up( $self->{i}{pre_text_row_count} + 1 );
-                $self->{pg}->__clear_lines_to_end_of_screen();
+                print UP x ( $self->{i}{pre_text_row_count} + 1 );
+                print "\r". CLEAR_TO_END_OF_SCREEN;
                 $self->__reset_term();
                 return join( '', map { $_->[0] } @{$m->{str}} );
             }
@@ -269,7 +280,7 @@ sub __string_and_pos {
         p_pos   => 0,
         diff    => 0,
     };
-    for ( $default =~ /\X/g ) { # \X == grapheme clusters
+    for ( $default =~ /\X/g ) {
         my $char_w = print_columns( $_ );
         push @{$m->{str}}, [ $_, $char_w ];
     }
@@ -523,14 +534,14 @@ sub _fill_from_begin {
 sub __print_readline {
     my ( $self, $opt, $list, $m ) = @_;
     my $key = $self->__padded_or_trimed_key( $list, $self->{i}{curr_row} );
-    $self->{pg}->__clear_line();
+    print "\r" . CLEAR_TO_END_OF_LINE;
     if ( $opt->{mark_curr} ) {
-        $self->{pg}->__bold_underline();
-        print "\r", $key;
-        $self->{pg}->__reset();
+        print BOLD_UNDERLINE;
+        print "\r" . $key;
+        print RESET;
     }
     else {
-        print "\r", $key;
+        print "\r" . $key;
     }
     my $sep = $self->{i}{sep};
     if ( defined $self->{i}{pre} && any { $_ == $self->{i}{curr_row} - @{$self->{i}{pre}} } @{$opt->{read_only}} ) { #
@@ -561,7 +572,7 @@ sub __print_readline {
     }
     my $right = $tmp_prompt_w + $pre_pos_w;
     if ( $right ) {
-        $self->{pg}->__right( $right );
+        print RIGHT x $right;
     }
 }
 
@@ -658,11 +669,11 @@ sub __prepare_size {
 
 sub __print_current_row {
     my ( $self, $opt, $list, $m ) = @_;
-    $self->{pg}->__clear_line();
+    print "\r" . CLEAR_TO_END_OF_LINE;
     if ( $self->{i}{curr_row} < @{$self->{i}{pre}} ) {
-        $self->{pg}->__reverse();
+        print REVERSE;
         print $list->[$self->{i}{curr_row}][0];
-        $self->{pg}->__reset();
+        print RESET;
     }
     else {
         $self->__print_readline( $opt, $list, $m );
@@ -704,12 +715,12 @@ sub __write_screen {
             $page_number = substr sprintf( '%d/%d', $self->{i}{page}, $self->{i}{pages} ), 0, $self->{i}{term_w};
         }
         print "\n", $page_number;
-        $self->{pg}->__up( $self->{i}{avail_h} - ( $self->{i}{curr_row} - $self->{i}{begin_row} ) );
+        print UP x ( $self->{i}{avail_h} - ( $self->{i}{curr_row} - $self->{i}{begin_row} ) ); #
     }
     else {
         $self->{i}{page} = 1;
         my $up_curr = $self->{i}{end_row} - $self->{i}{curr_row};
-        $self->{pg}->__up( $up_curr );
+        print UP x $up_curr;
     }
 }
 
@@ -732,7 +743,7 @@ sub __write_first_screen {
     if ( $self->{i}{end_row} > $#$list ) {
         $self->{i}{end_row} = $#$list;
     }
-    $self->{pg}->__clear_screen() if $opt->{clear_screen};
+    print CLEAR_SCREEN if $opt->{clear_screen};
     if ( defined $self->{i}{pre_text} ) {  # empty info add newline
         print $self->{i}{pre_text}, "\n";
     }
@@ -748,16 +759,25 @@ sub fill_form {
     croak "'fill_form': the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
     return [] if ! @$orig_list; ##
     my $valid = {
-        auto_up      => '[ 0 1 2 ]',
-        back         => '',
-        clear_screen => '[ 0 1 ]',
-        confirm      => '',
-        info         => '',
-        mark_curr    => '[ 0 1 ]',
-        prompt       => '',
-        read_only    => 'ARRAY',
+        auto_up          => '[ 0 1 2 ]',
+        back             => '',
+        clear_screen     => '[ 0 1 ]',
+        codepage_mapping => 0,
+        confirm          => '',
+        info             => '',
+        mark_curr        => '[ 0 1 ]',
+        prompt           => '',
+        read_only        => 'ARRAY',
     };
     $opt = $self->__validate_options( $opt, $valid );
+    if ( $^O eq "MSWin32" ) {
+        if ( $opt->{codepage_mapping} ) {
+            print "\e(K";
+        }
+        else {
+            print "\e(U";
+        }
+    }
     $self->{i}{pre_text}  = $opt->{info};
     if ( defined $opt->{prompt} ) {
         $self->{i}{pre_text} .= "\n" if defined $self->{i}{pre_text};
@@ -807,7 +827,7 @@ sub fill_form {
         if ( $tmp_term_w != $term_w || $tmp_term_h != $term_h && $tmp_term_h < ( @$list + 1 ) ) {
             ( $term_w, $term_h ) = ( $tmp_term_w, $tmp_term_h );
             $self->__prepare_size( $opt, $list, $term_w, $term_h );
-            $self->{pg}->__clear_screen();
+            print CLEAR_SCREEN;
             $self->__write_first_screen( $opt, $list, 1, $auto_up ); # 1
             $m = $self->__string_and_pos( $list );
         }
@@ -868,7 +888,7 @@ sub fill_form {
                 $m = $self->__string_and_pos( $list );
                 if ( $self->{i}{curr_row} >= $self->{i}{begin_row} ) {
                     $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} + 1 );
-                    $self->{pg}->__up( 1 );
+                    print UP x 1;
                 }
                 else {
                     $self->__print_previous_page( $opt, $list );
@@ -885,10 +905,10 @@ sub fill_form {
                 $m = $self->__string_and_pos( $list );
                 if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {
                     $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} - 1 );
-                    $self->{pg}->__down( 1 );
+                    print DOWN x 1;
                 }
                 else {
-                    $self->{pg}->__up( $self->{i}{end_row} - $self->{i}{begin_row} );
+                    print UP x ( $self->{i}{end_row} - $self->{i}{begin_row} );
                     $self->__print_next_page( $opt, $list );
                 }
             }
@@ -901,13 +921,13 @@ sub fill_form {
                 }
                 else {
                     $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} );
-                    $self->{pg}->__up( $self->{i}{curr_row} );
+                    print UP x $self->{i}{curr_row};
                     $self->{i}{curr_row} = 0;
                     $m = $self->__string_and_pos( $list );
                 }
             }
             else {
-                $self->{pg}->__up( $self->{i}{curr_row} - $self->{i}{begin_row} );
+                print UP x ( $self->{i}{curr_row} - $self->{i}{begin_row} );
                 $self->{i}{curr_row} = $self->{i}{begin_row} - $self->{i}{avail_h};
                 $m = $self->__string_and_pos( $list );
                 $self->__print_previous_page( $opt, $list );
@@ -922,13 +942,13 @@ sub fill_form {
                 else {
                     $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} );
                     my $rows = $self->{i}{end_row} - $self->{i}{curr_row};
-                    $self->{pg}->__down( $rows );
+                    print DOWN x $rows;
                     $self->{i}{curr_row} = $self->{i}{end_row};
                     $m = $self->__string_and_pos( $list );
                 }
             }
             else {
-                $self->{pg}->__up( $self->{i}{curr_row} - $self->{i}{begin_row} );
+                print UP x ( $self->{i}{curr_row} - $self->{i}{begin_row} );
                 $self->{i}{curr_row} = $self->{i}{end_row} + 1;
                 $m = $self->__string_and_pos( $list );
                 $self->__print_next_page( $opt, $list );
@@ -952,28 +972,28 @@ sub fill_form {
                 my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
                 $up += $self->{i}{pre_text_row_count} if $self->{i}{pre_text_row_count};
                 if ( $list->[$self->{i}{curr_row}][0] eq $opt->{back} ) {                                               # if ENTER on   {back/0}: leave and return nothing
-                    $self->{pg}->__up( $up );
-                    $self->{pg}->__clear_lines_to_end_of_screen();
+                    print UP x $up;
+                    print "\r" . CLEAR_TO_END_OF_SCREEN;
                     $self->__reset_term();
                     return;
                 }
                 elsif ( $list->[$self->{i}{curr_row}][0] eq $opt->{confirm} ) {                                         # if ENTER on {confirm/1}: leave and return result
-                    $self->{pg}->__up( $up );
-                    $self->{pg}->__clear_lines_to_end_of_screen();
+                    print UP x $up;
+                    print "\r" . CLEAR_TO_END_OF_SCREEN;
                     splice @$list, 0, @{$self->{i}{pre}};
                     $self->__reset_term();
                     return $list;
                 }
                 if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
-                    $self->{pg}->__up( $up );
-                    $self->{pg}->__clear_lines_to_end_of_screen();
+                    print UP x $up;
+                    print "\r" . CLEAR_TO_END_OF_SCREEN;
                     my $cursor = 0; # cursor on {back}
                     $self->__write_first_screen( $opt, $list, $cursor, $auto_up );
                     $m = $self->__string_and_pos( $list );
                 }
                 elsif ( $self->{i}{curr_row} == $#$list ) {                                                             # if ENTER && {last row}: jumps to the {first data row/2}
-                    $self->{pg}->__up( $up );
-                    $self->{pg}->__clear_lines_to_end_of_screen();
+                    print UP x $up;
+                    print "\r" . CLEAR_TO_END_OF_SCREEN;
                     my $cursor = scalar @{$self->{i}{pre}};                                                             # cursor on the first data row
                     $self->__write_first_screen( $opt, $list, $cursor, $auto_up );
                     $m = $self->__string_and_pos( $list );
@@ -989,10 +1009,10 @@ sub fill_form {
                     $m = $self->__string_and_pos( $list );                                                              # or go to the next row if not on the last row
                     if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {
                         $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} - 1 );
-                        $self->{pg}->__down( 1 );
+                        print DOWN x 1;
                     }
                     else {
-                        $self->{pg}->__up( $up );                                                                       # or else to the next page
+                        print UP x $up;                                                                                 # or else to the next page
                         $self->__print_next_page( $opt, $list );
                     }
                 }
@@ -1013,7 +1033,7 @@ sub fill_form {
 
 sub __reset_previous_row {
     my ( $self, $opt, $list, $idx ) = @_;
-    $self->{pg}->__clear_line();
+    print "\r" . CLEAR_TO_END_OF_LINE;
     print $self->__print_row( $opt, $list, $idx );
 }
 
@@ -1023,7 +1043,7 @@ sub __print_next_page {
     $self->{i}{begin_row} = $self->{i}{end_row} + 1;
     $self->{i}{end_row}   = $self->{i}{end_row} + $self->{i}{avail_h};
     $self->{i}{end_row}   = $#$list if $self->{i}{end_row} > $#$list;
-    $self->{pg}->__clear_lines_to_end_of_screen();
+    print "\r" . CLEAR_TO_END_OF_SCREEN;
     $self->__write_screen( $opt, $list );
 }
 
@@ -1033,7 +1053,7 @@ sub __print_previous_page {
     $self->{i}{end_row}   = $self->{i}{begin_row} - 1;
     $self->{i}{begin_row} = $self->{i}{begin_row} - $self->{i}{avail_h};
     $self->{i}{begin_row} = 0 if $self->{i}{begin_row} < 0;
-    $self->{pg}->__clear_lines_to_end_of_screen();
+    print "\r" . CLEAR_TO_END_OF_SCREEN;
     $self->__write_screen( $opt, $list );
 }
 
@@ -1055,7 +1075,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.505
+Version 0.506
 
 =cut
 
@@ -1168,6 +1188,24 @@ no_echo
 
 default: C<0>
 
+=item
+
+codepage_mapping
+
+This option has only meaning if the operating system is MSWin32.
+
+If the OS is MSWin32, L<Win32::Console::ANSI> is used. By default C<Win32::Console::ANSI> converts the characters from
+Windows code page to DOS code page (the so-called ANSI to OEM conversion). This conversation is disabled by default in
+C<Term::Choose> but one can enable it by setting this option.
+
+Setting this option to C<1> enables the codepage mapping offered by L<Win32::Console::ANSI>.
+
+0 - disable automatic codepage mapping (default)
+
+1 - keep automatic codepage mapping
+
+default: C<0>
+
 =back
 
 =head2 fill_form
@@ -1259,6 +1297,24 @@ Set the name of the "back" menu entry.
 The "back" menu entry can be disabled by setting I<back> to an empty string.
 
 default: C<Back>
+
+=item
+
+codepage_mapping
+
+This option has only meaning if the operating system is MSWin32.
+
+If the OS is MSWin32, L<Win32::Console::ANSI> is used. By default C<Win32::Console::ANSI> converts the characters from
+Windows code page to DOS code page (the so-called ANSI to OEM conversion). This conversation is disabled by default in
+C<Term::Choose> but one can enable it by setting this option.
+
+Setting this option to C<1> enables the codepage mapping offered by L<Win32::Console::ANSI>.
+
+0 - disable automatic codepage mapping (default)
+
+1 - keep automatic codepage mapping
+
+default: C<0>
 
 =back
 

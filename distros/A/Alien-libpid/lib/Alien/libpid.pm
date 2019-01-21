@@ -3,7 +3,7 @@ use warnings;
 package Alien::libpid;
 
 # ABSTRACT: Perl distribution for libpid
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.033'; # VERSION
 
 use parent 'Alien::Base';
 
@@ -17,7 +17,7 @@ Alien::libpid - Perl distribution for libpid
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 INSTALL
 

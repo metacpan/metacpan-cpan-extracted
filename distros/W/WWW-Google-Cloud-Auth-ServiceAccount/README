@@ -1,0 +1,46 @@
+WWW-Google-Cloud-Auth-ServiceAccount
+
+This is a library for service account based OAuth authentication with
+Google Cloud API endpoints for server to server applications. See:
+https://developers.google.com/identity/protocols/OAuth2ServiceAccount
+
+SYNOPSIS
+        my $auth = WWW::Google::Cloud::Auth::ServiceAccount>new(
+            credentials_path => '/home/myapp/priv/google_some_service.json',
+        );
+
+        my $response = $ua->post(
+			$some_google_cloud_api_endpoint,
+			'Content-Type' => 'application/json; charset=utf-8',
+			'Authorization' => 'Bearer ' . $auth->get_token,
+			Content => $arguments,
+       );
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::Google::Cloud::Auth::ServiceAccount
+
+Github
+
+The source code for this module is hosted on Github:
+
+https://github.com/larion/www-google-cloud-auth-serviceaccount
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2019 Larion Garaczi <larion@cpan.org>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

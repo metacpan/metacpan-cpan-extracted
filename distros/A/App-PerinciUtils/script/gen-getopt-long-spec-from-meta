@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-12-11'; # DATE
-our $VERSION = '0.111'; # VERSION
+our $DATE = '2019-01-20'; # DATE
+our $VERSION = '0.112'; # VERSION
 
 use strict;
 use warnings;
@@ -81,7 +81,7 @@ gen-getopt-long-spec-from-meta - Generate Getopt::Long spec from Riap function m
 
 =head1 VERSION
 
-This document describes version 0.111 of gen-getopt-long-spec-from-meta (from Perl distribution App-PerinciUtils), released on 2017-12-11.
+This document describes version 0.112 of gen-getopt-long-spec-from-meta (from Perl distribution App-PerinciUtils), released on 2019-01-20.
 
 =head1 SYNOPSIS
 
@@ -110,17 +110,15 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -281,7 +279,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.023
+    version 0.024
 
 SYNOPSIS
 
@@ -95,7 +95,7 @@ METHODS/SUBS AND ARGUMENTS
 
     draw3D($coderef)
 
-      Begins 3D drawing, calls $coderef-()> and ends drawing. See examples.
+      Begins 3D drawing, calls $coderef->() and ends drawing. See examples.
 
 EXAMPLES
 

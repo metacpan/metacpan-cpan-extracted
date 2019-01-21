@@ -1,3 +1,29 @@
+0.972
+
+	Fix missing Eb in prefs dialog.
+	Add scandinavian notes.
+	
+0.97
+
+	Better handling of errors and exceptions.
+	Add support for multiple configs, notation systems and transcoding.
+	Add setting of editor font and size.
+
+0.96
+
+0.84	Sep 22 2017
+
+	Add checkbox to suppress user and legacy config files.
+	Fix problem with (custom) config (needed prefs dialog to be picked up).
+
+0.84	Jul 31 2017
+
+	Bump.
+
+0.83	Jul 24 2017
+
+	Rework preferences to allow selection of preset configs.
+
 0.79	Jul 12 2017
 
 	Fix crash when inserting example text.

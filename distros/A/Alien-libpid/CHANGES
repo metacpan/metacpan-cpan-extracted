@@ -1,9 +1,24 @@
 ==================================================
-Changes from 2017-05-06 00:00:00 +0000 to present.
+Changes from 2018-01-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.032 at 2018-05-06 13:42:25 +0000
+version 0.033 at 2019-01-19 17:45:22 +0000
+------------------------------------------
+
+  Change: f4e2d282d2d33cbea16036fc7abbdcd05a8f5bb2
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-01-19 18:45:16 +0000
+
+    Harcode CMAKE_INSTALL_DIR as lib
+
+    This fixes #1 by ensuring pkg-config and library files are installed
+    into lib/, not lib64 or some other OS-specific subdir, so
+    Alien::Build can find the library and *.pc file on e.g. Fedora 28
+    x64, which has them in lib64/. 
+
+------------------------------------------
+version 0.032 at 2018-05-06 13:41:28 +0000
 ------------------------------------------
 
   Change: 9f1cefbfd9ae1d7e5a489d87eaf20ffcee27f5b3
@@ -30,16 +45,6 @@ version 0.031 at 2018-05-06 13:38:47 +0000
 
     Reported here: https://rt.cpan.org/Ticket/Display.html?id=123679 
 
------------------------------------------
-version 0.02 at 2017-08-20 13:33:01 +0000
------------------------------------------
-
-  Change: 1fbd65d42b8add69326e1cd2013b9574cf259397
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-08-20 15:33:01 +0000
-
-    Add Travis integration 
-
-===============================================
-Plus 1 release after 2017-05-06 00:00:00 +0000.
-===============================================
+================================================
+Plus 2 releases after 2018-01-19 00:00:00 +0000.
+================================================

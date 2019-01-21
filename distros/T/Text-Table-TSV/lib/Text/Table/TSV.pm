@@ -1,7 +1,7 @@
 package Text::Table::TSV;
 
-our $DATE = '2018-06-30'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-01-17'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -19,7 +19,6 @@ sub table {
     my %params = @_;
     my $rows = $params{rows} or die "Must provide rows!";
 
-    my $header_row = defined $params{header_row} ? $params{header_row} : 1;
     my $max_index = _max_array_index($rows);
 
     # here we go...
@@ -29,7 +28,6 @@ sub table {
     my $i = 0;
     foreach my $row ( @{ $rows }[0..$#$rows] ) {
         $i++;
-        next if $i==1 && !$header_row;
         push @table, join(
 	    "\t",
 	    map { _encode(defined($row->[$_]) ? $row->[$_] : '') } (0..$max_index)
@@ -71,7 +69,7 @@ Text::Table::TSV - Generate TSV
 
 =head1 VERSION
 
-This document describes version 0.001 of Text::Table::TSV (from Perl distribution Text-Table-TSV), released on 2018-06-30.
+This document describes version 0.002 of Text::Table::TSV (from Perl distribution Text-Table-TSV), released on 2019-01-17.
 
 =head1 SYNOPSIS
 
@@ -85,7 +83,7 @@ This document describes version 0.001 of Text::Table::TSV (from Perl distributio
      ['bob',   'cpl', '98765321'],
      ['carol', 'brig gen', '8745'],
  ];
- print Text::Table::TSV::table(rows => $rows, header_row => 1);
+ print Text::Table::TSV::table(rows => $rows);
 
 =head1 DESCRIPTION
 
@@ -149,7 +147,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

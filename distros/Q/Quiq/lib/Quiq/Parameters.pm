@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Quiq::Converter;
 use Quiq::Hash;
@@ -358,6 +358,78 @@ sub extractPropertiesToVariables {
 
 # -----------------------------------------------------------------------------
 
+=head3 extractPropertiesToObject() - Extrahiere Properties und weise sie an Hash-Objekt zu
+
+=head4 Synopsis
+
+    $opt = $class->extractPropertiesToObject(\@params,@propVal);
+
+=head4 Arguments
+
+=over 4
+
+=item @params
+
+Parameterliste, z.B. @_.
+
+=item @propVal
+
+Liste der Properties (und Optionen) und ihrer Defaultwerte.
+
+=back
+
+=head4 Returns
+
+Hash-Objekt mit Eigenschaften (und Optionen)
+
+=head4 Description
+
+Extrahiere Properties (und Optionen) aus der Parameterliste @params.
+Enthält die Parameterliste unbekannte Properties (oder Optionen),
+wird eine Exception geworfen. Die Methode wird typischerweise
+zur Verarbeitung von Methodenparametern genutzt.
+
+=head4 Example
+
+Methode, die eine WikiMedia-Tabelle generiert. Die Tabelleneigenschaften
+werden als Property/Wert-Paare übergeben:
+
+    sub table {
+        my $self = shift;
+        # @_: @keyVal
+    
+        my $opt = Quiq::Parameters->extractPropertiesToObject(\@_,
+            alignments => [],
+            bodyBackground => '#ffffff',
+            caption => undef,
+            rows => [],
+            titleBackground => '#e8e8e8',
+            titles => [],
+            valueCallback => undef,
+        );
+        ...
+    }
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub extractPropertiesToObject {
+    my ($class,$paramA) = splice @_,0,2;
+
+    my (undef,$opt) = $class->extract(0,1,undef,$paramA,0,@_);
+    if (@$paramA) {
+        $class->throw(
+            q~PARAM-00099: Unexpected parameter(s)~,
+            Parameters => "@$paramA",
+        );
+    }
+
+    return $opt;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 extractToVariables() - Extrahiere Parameter und weise Optionen Variablen zu
 
 =head4 Synopsis
@@ -448,7 +520,7 @@ sub extractToVariables {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

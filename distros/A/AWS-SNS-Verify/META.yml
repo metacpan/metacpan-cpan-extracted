@@ -13,8 +13,7 @@ meta-spec:
   version: '1.4'
 name: AWS-SNS-Verify
 requires:
-  Crypt::OpenSSL::RSA: '0'
-  Crypt::OpenSSL::X509: '0'
+  CryptX: '0'
   HTTP::Tiny: '0'
   JSON: '0'
   MIME::Base64: '0'
@@ -26,6 +25,6 @@ requires:
 resources:
   bugtracker: http://github.com/rizen/AWS-SNS-Verify/issues
   repository: git://github.com/rizen/.gitWS-SNS-Verify
-version: '0.0103'
+version: '0.0104'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

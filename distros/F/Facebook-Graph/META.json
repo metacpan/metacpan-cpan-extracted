@@ -4,13 +4,13 @@
       "JT Smith <jt@plainblack.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Facebook-Graph",
    "no_index" : {
@@ -20,6 +20,12 @@
       ]
    },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Response" : "0",
+            "Test::Pod" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -41,8 +47,95 @@
             "Moo" : "0",
             "Ouch" : "0.0400",
             "Test::More" : "0",
-            "URI" : "1.54"
+            "URI" : "1.54",
+            "perl" : "5.006"
          }
+      }
+   },
+   "provides" : {
+      "Facebook::Graph" : {
+         "file" : "lib/Facebook/Graph.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::AccessToken" : {
+         "file" : "lib/Facebook/Graph/AccessToken.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::AccessToken::Response" : {
+         "file" : "lib/Facebook/Graph/AccessToken/Response.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Authorize" : {
+         "file" : "lib/Facebook/Graph/Authorize.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::BatchRequests" : {
+         "file" : "lib/Facebook/Graph/BatchRequests.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Page::Feed" : {
+         "file" : "lib/Facebook/Graph/Page/Feed.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Picture" : {
+         "file" : "lib/Facebook/Graph/Picture.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Publish" : {
+         "file" : "lib/Facebook/Graph/Publish.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Publish::Checkin" : {
+         "file" : "lib/Facebook/Graph/Publish/Checkin.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Publish::Comment" : {
+         "file" : "lib/Facebook/Graph/Publish/Comment.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Publish::PageTab" : {
+         "file" : "lib/Facebook/Graph/Publish/PageTab.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Publish::Photo" : {
+         "file" : "lib/Facebook/Graph/Publish/Photo.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Publish::Post" : {
+         "file" : "lib/Facebook/Graph/Publish/Post.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Publish::RSVPAttending" : {
+         "file" : "lib/Facebook/Graph/Publish/RSVPAttending.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Publish::RSVPDeclined" : {
+         "file" : "lib/Facebook/Graph/Publish/RSVPDeclined.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Publish::RSVPMaybe" : {
+         "file" : "lib/Facebook/Graph/Publish/RSVPMaybe.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Query" : {
+         "file" : "lib/Facebook/Graph/Query.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Request" : {
+         "file" : "lib/Facebook/Graph/Request.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Response" : {
+         "file" : "lib/Facebook/Graph/Response.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Role::Uri" : {
+         "file" : "lib/Facebook/Graph/Role/Uri.pm",
+         "version" : "1.1205"
+      },
+      "Facebook::Graph::Session" : {
+         "file" : "lib/Facebook/Graph/Session.pm",
+         "version" : "1.1205"
       }
    },
    "release_status" : "stable",
@@ -56,7 +149,7 @@
          "web" : "http://github.com/rizen/Facebook-Graph"
       }
    },
-   "version" : "1.1204",
+   "version" : "1.1205",
    "x_contributors" : [
       "Adam Hopkins <SirChickenHair@srchulo-aire.local>",
       "Andrew Grangaard <granny-github@ofb.net>",
@@ -75,12 +168,15 @@
       "Nathan Handy <nhandy@Nathans-MacBook-Pro.local>",
       "Oklahomer <hagiwara.go@gmail.com>",
       "Olaf Alders <olaf@wundersolutions.com>",
+      "Paul Cochrane <paul@liekut.de>",
       "Sebastien Wernerus <s.wernerus@gmail.com>",
       "Syohei YOSHIDA <syohex@gmail.com>",
       "Tim Heaney <oylenshpeegul@gmail.com>",
       "hurricup <hurricup@gmail.com>",
       "mathieu viel <mathieu.viel@linkfluence.net>",
       "root <root@li125-92.members.linode.com>"
-   ]
+   ],
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

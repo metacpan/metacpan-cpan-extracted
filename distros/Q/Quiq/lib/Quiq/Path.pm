@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -94,6 +94,37 @@ Wert zurück.
 
 sub append {
     shift->write($_[0],$_[1],-append=>1);
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 checkFileSecurity() - Prüfe, ob Datei nur für Owner lesbar ist
+
+=head4 Synopsis
+
+    $this->checkFileSecurity($file);
+
+=head4 Description
+
+Prüfe, ob die Datei $file nur für ihren Owner lesbar ist.
+Wenn nicht, wirf eine Exception.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub checkFileSecurity {
+    my ($this,$file) = @_;
+
+    my $mode = $this->mode($file);
+    if ($mode & 00044) {
+        $this->throw(
+            q~PATH-00099: File is readable for others~,
+            File => $file,
+        );
+    }
+
     return;
 }
 
@@ -2236,7 +2267,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

@@ -49,7 +49,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Digest::SHA1" : "0",
+            "Digest::SHA" : "0",
             "Encode" : "0",
             "Exporter" : "0",
             "File::Slurper" : "0",
@@ -107,335 +107,335 @@
    "provides" : {
       "Markdent" : {
          "file" : "lib/Markdent.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::CLI" : {
          "file" : "lib/Markdent/CLI.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::CapturedEvents" : {
          "file" : "lib/Markdent/CapturedEvents.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::CheckedOutput" : {
          "file" : "lib/Markdent/CheckedOutput.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Dialect::GitHub::BlockParser" : {
          "file" : "lib/Markdent/Dialect/GitHub/BlockParser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Dialect::GitHub::SpanParser" : {
          "file" : "lib/Markdent/Dialect/GitHub/SpanParser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Dialect::Theory::BlockParser" : {
          "file" : "lib/Markdent/Dialect/Theory/BlockParser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Dialect::Theory::SpanParser" : {
          "file" : "lib/Markdent/Dialect/Theory/SpanParser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::AutoLink" : {
          "file" : "lib/Markdent/Event/AutoLink.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::CodeBlock" : {
          "file" : "lib/Markdent/Event/CodeBlock.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndBlockquote" : {
          "file" : "lib/Markdent/Event/EndBlockquote.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndCode" : {
          "file" : "lib/Markdent/Event/EndCode.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndDocument" : {
          "file" : "lib/Markdent/Event/EndDocument.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndEmphasis" : {
          "file" : "lib/Markdent/Event/EndEmphasis.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndHTMLTag" : {
          "file" : "lib/Markdent/Event/EndHTMLTag.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndHeader" : {
          "file" : "lib/Markdent/Event/EndHeader.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndLink" : {
          "file" : "lib/Markdent/Event/EndLink.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndListItem" : {
          "file" : "lib/Markdent/Event/EndListItem.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndOrderedList" : {
          "file" : "lib/Markdent/Event/EndOrderedList.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndParagraph" : {
          "file" : "lib/Markdent/Event/EndParagraph.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndStrong" : {
          "file" : "lib/Markdent/Event/EndStrong.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndTable" : {
          "file" : "lib/Markdent/Event/EndTable.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndTableBody" : {
          "file" : "lib/Markdent/Event/EndTableBody.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndTableCell" : {
          "file" : "lib/Markdent/Event/EndTableCell.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndTableHeader" : {
          "file" : "lib/Markdent/Event/EndTableHeader.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndTableRow" : {
          "file" : "lib/Markdent/Event/EndTableRow.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::EndUnorderedList" : {
          "file" : "lib/Markdent/Event/EndUnorderedList.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::HTMLBlock" : {
          "file" : "lib/Markdent/Event/HTMLBlock.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::HTMLComment" : {
          "file" : "lib/Markdent/Event/HTMLComment.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::HTMLCommentBlock" : {
          "file" : "lib/Markdent/Event/HTMLCommentBlock.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::HTMLEntity" : {
          "file" : "lib/Markdent/Event/HTMLEntity.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::HTMLTag" : {
          "file" : "lib/Markdent/Event/HTMLTag.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::HorizontalRule" : {
          "file" : "lib/Markdent/Event/HorizontalRule.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::Image" : {
          "file" : "lib/Markdent/Event/Image.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::LineBreak" : {
          "file" : "lib/Markdent/Event/LineBreak.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::Preformatted" : {
          "file" : "lib/Markdent/Event/Preformatted.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartBlockquote" : {
          "file" : "lib/Markdent/Event/StartBlockquote.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartCode" : {
          "file" : "lib/Markdent/Event/StartCode.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartDocument" : {
          "file" : "lib/Markdent/Event/StartDocument.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartEmphasis" : {
          "file" : "lib/Markdent/Event/StartEmphasis.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartHTMLTag" : {
          "file" : "lib/Markdent/Event/StartHTMLTag.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartHeader" : {
          "file" : "lib/Markdent/Event/StartHeader.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartLink" : {
          "file" : "lib/Markdent/Event/StartLink.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartListItem" : {
          "file" : "lib/Markdent/Event/StartListItem.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartOrderedList" : {
          "file" : "lib/Markdent/Event/StartOrderedList.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartParagraph" : {
          "file" : "lib/Markdent/Event/StartParagraph.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartStrong" : {
          "file" : "lib/Markdent/Event/StartStrong.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartTable" : {
          "file" : "lib/Markdent/Event/StartTable.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartTableBody" : {
          "file" : "lib/Markdent/Event/StartTableBody.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartTableCell" : {
          "file" : "lib/Markdent/Event/StartTableCell.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartTableHeader" : {
          "file" : "lib/Markdent/Event/StartTableHeader.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartTableRow" : {
          "file" : "lib/Markdent/Event/StartTableRow.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::StartUnorderedList" : {
          "file" : "lib/Markdent/Event/StartUnorderedList.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Event::Text" : {
          "file" : "lib/Markdent/Event/Text.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Handler::CaptureEvents" : {
          "file" : "lib/Markdent/Handler/CaptureEvents.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Handler::HTMLFilter" : {
          "file" : "lib/Markdent/Handler/HTMLFilter.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Handler::HTMLStream::Document" : {
          "file" : "lib/Markdent/Handler/HTMLStream/Document.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Handler::HTMLStream::Fragment" : {
          "file" : "lib/Markdent/Handler/HTMLStream/Fragment.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Handler::MinimalTree" : {
          "file" : "lib/Markdent/Handler/MinimalTree.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Handler::Multiplexer" : {
          "file" : "lib/Markdent/Handler/Multiplexer.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Handler::Null" : {
          "file" : "lib/Markdent/Handler/Null.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Parser" : {
          "file" : "lib/Markdent/Parser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Parser::BlockParser" : {
          "file" : "lib/Markdent/Parser/BlockParser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Parser::SpanParser" : {
          "file" : "lib/Markdent/Parser/SpanParser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Regexes" : {
          "file" : "lib/Markdent/Regexes.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::AnyParser" : {
          "file" : "lib/Markdent/Role/AnyParser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::BalancedEvent" : {
          "file" : "lib/Markdent/Role/BalancedEvent.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::BlockParser" : {
          "file" : "lib/Markdent/Role/BlockParser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::DebugPrinter" : {
          "file" : "lib/Markdent/Role/DebugPrinter.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::Dialect::BlockParser" : {
          "file" : "lib/Markdent/Role/Dialect/BlockParser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::Dialect::SpanParser" : {
          "file" : "lib/Markdent/Role/Dialect/SpanParser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::Event" : {
          "file" : "lib/Markdent/Role/Event.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::EventAsText" : {
          "file" : "lib/Markdent/Role/EventAsText.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::EventsAsMethods" : {
          "file" : "lib/Markdent/Role/EventsAsMethods.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::FilterHandler" : {
          "file" : "lib/Markdent/Role/FilterHandler.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::HTMLStream" : {
          "file" : "lib/Markdent/Role/HTMLStream.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::Handler" : {
          "file" : "lib/Markdent/Role/Handler.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::Simple" : {
          "file" : "lib/Markdent/Role/Simple.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Role::SpanParser" : {
          "file" : "lib/Markdent/Role/SpanParser.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Simple::Document" : {
          "file" : "lib/Markdent/Simple/Document.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Simple::Fragment" : {
          "file" : "lib/Markdent/Simple/Fragment.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Types" : {
          "file" : "lib/Markdent/Types.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Markdent::Types::Internal" : {
          "file" : "lib/Markdent/Types/Internal.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       }
    },
    "release_status" : "stable",
@@ -450,7 +450,7 @@
          "web" : "https://github.com/houseabsolute/Markdent"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026002"
@@ -852,7 +852,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -1068,7 +1068,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "name" : "@DROLSKY/InstallGuide",
-            "version" : "1.200011"
+            "version" : "1.200012"
          },
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
@@ -1110,7 +1110,7 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -1148,7 +1148,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -1177,7 +1177,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1194,12 +1194,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.32",
+                  "tag" : "v0.33",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1219,7 +1219,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -1259,7 +1259,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1279,7 +1279,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },

@@ -1,5 +1,5 @@
 package Box::Calc::Box;
-$Box::Calc::Box::VERSION = '1.0200';
+$Box::Calc::Box::VERSION = '1.0201';
 use strict;
 use warnings;
 use Moose;
@@ -18,7 +18,7 @@ Box::Calc::Box - The container in which we pack items.
 
 =head1 VERSION
 
-version 1.0200
+version 1.0201
 
 =head1 SYNOPSIS
 
@@ -304,10 +304,22 @@ sub packing_instructions {
   };
 }
 
+=head2 used_volume
+
+Returns the real used volume for this box.
+
+=cut
+
 sub used_volume {
     my $self = shift;
     return sum map { $_->used_volume } @{ $self->layers };
 }
+
+=head2 volume 
+
+Returns the exact volume needed for this box.    
+
+=cut
 
 sub volume {
     return $_[0]->fill_x * $_[0]->fill_y * $_[0]->fill_z;
@@ -315,3 +327,5 @@ sub volume {
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
+
+=for Pod::Coverage BUILD

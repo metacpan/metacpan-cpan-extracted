@@ -2,13 +2,13 @@ package LCFG::Build::Tool::DevOSXPkg;    # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: DevOSXPkg.pm.in 29224 2015-11-12 10:11:34Z squinney@INF.ED.AC.UK $
+# $Id: DevOSXPkg.pm.in 35277 2019-01-09 10:38:18Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool/DevOSXPkg.pm.in,v $
-# $Revision: 29224 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_6_6/lib/LCFG/Build/Tool/DevOSXPkg.pm.in $
-# $Date: 2015-11-12 10:11:34 +0000 (Thu, 12 Nov 2015) $
+# $Revision: 35277 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_18/lib/LCFG/Build/Tool/DevOSXPkg.pm.in $
+# $Date: 2019-01-09 10:38:18 +0000 (Wed, 09 Jan 2019) $
 
-our $VERSION = '0.6.6';
+our $VERSION = '0.9.18';
 
 use LCFG::Build::Utils::OSXPkg;
 
@@ -36,8 +36,8 @@ override 'execute' => sub {
     my $spec = $self->spec;
     my $module = $spec->fullname;
 
-    my $dirname = join q{-}, $module, $spec->version;
-    my $outdir = File::Spec->catdir( $self->resultsdir, $dirname );
+    my $outdir = $self->output_dir;
+    my $dirname = File::Spec->abs2rel( $outdir, $self->resultsdir );
 
     my $tarname = $spec->tarname;
     my $tarfile = File::Spec->catfile( $outdir, $tarname );
@@ -77,7 +77,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Tool::DevOSXPkg version 0.6.6
+    This documentation refers to LCFG::Build::Tool::DevOSXPkg version 0.9.18
 
 =head1 SYNOPSIS
 

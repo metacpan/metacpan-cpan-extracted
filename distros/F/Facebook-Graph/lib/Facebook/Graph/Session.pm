@@ -1,5 +1,5 @@
 package Facebook::Graph::Session;
-$Facebook::Graph::Session::VERSION = '1.1204';
+$Facebook::Graph::Session::VERSION = '1.1205';
 use Moo;
 use Facebook::Graph::Request;
 with 'Facebook::Graph::Role::Uri';
@@ -46,7 +46,7 @@ Facebook::Graph::Session - Convert old API sessions into Graph API access_tokens
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 SYNOPSIS
 
@@ -75,6 +75,6 @@ Makes a request to Facebook to fetch an access token. Returns a L<Facebook::Grap
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

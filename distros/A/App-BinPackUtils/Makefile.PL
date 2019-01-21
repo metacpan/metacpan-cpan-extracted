@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "script/bin-files",
     "script/bin-files-into-dvds",
+    "script/count-number-of-dvds-required",
     "script/pack-bins"
   ],
   "LICENSE" => "perl",
@@ -36,6 +37,7 @@ my %WriteMakefileArgs = (
     "Perinci::Sub::DepChecker" => 0,
     "Sah::Schema::filename" => 0,
     "Sah::Schema::filesize" => 0,
+    "Sah::Schema::true" => 0,
     "String::ShellQuote" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -46,7 +48,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,6 +73,7 @@ my %FallbackPrereqs = (
   "Perinci::Sub::DepChecker" => 0,
   "Sah::Schema::filename" => 0,
   "Sah::Schema::filesize" => 0,
+  "Sah::Schema::true" => 0,
   "String::ShellQuote" => 0,
   "Test::More" => 0,
   "strict" => 0,

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.642';
+our $VERSION = '1.643';
 
 use Term::Choose::Constants qw( :screen :linux );
 
@@ -230,7 +230,7 @@ sub __set_mode {
         system( "stty -echo $mode_stty" ) == 0 or die $?;
     }
     if ( $self->{hide_cursor} = $config->{hide_cursor} ) {
-        $self->__hide_cursor;
+        print HIDE_CURSOR;
     }
     return $self->{mouse};
 };
@@ -239,7 +239,7 @@ sub __set_mode {
 sub __reset_mode {
     my ( $self ) = @_;
     if ( $self->{hide_cursor} ) {
-        $self->__show_cursor();
+        print SHOW_CURSOR;
     }
     if ( $self->{mouse} ) {
         binmode STDIN, ':encoding(UTF-8)' or warn "binmode STDIN, :encoding(UTF-8): $!\n";
@@ -247,7 +247,7 @@ sub __reset_mode {
         print UNSET_SGR_EXT_MODE_MOUSE_1006 if $self->{mouse} == 4;
         print UNSET_ANY_EVENT_MOUSE_1003;
     }
-    $self->__reset();
+    print RESET;
     if ( $Term_ReadKey ) {
         Term::ReadKey::ReadMode( 'restore' );
     }
@@ -284,80 +284,6 @@ sub __get_cursor_position {
     #$self->{abs_cursor_x} = 0; # unused
     $self->{abs_cursor_y} = 0;
     print GET_CURSOR_POSITION;
-}
-
-
-sub __hide_cursor {
-    #my ( $self ) = @_;
-    print HIDE_CURSOR;
-}
-
-
-sub __show_cursor {
-    #my ( $self ) = @_;
-    print SHOW_CURSOR;
-}
-
-
-sub __clear_screen {
-    #my ( $self ) = @_;
-    print CLEAR_SCREEN;
-}
-
-
-sub __clear_lines_to_end_of_screen {
-    #my ( $self ) = @_;
-    print "\r", CLEAR_TO_END_OF_SCREEN;
-}
-
-
-sub __clear_line {
-    #my ( $self ) = @_;
-    print "\r", CLEAR_TO_END_OF_LINE;
-}
-
-
-sub __bold_underline {
-    #my ( $self ) = @_;
-    print BOLD_UNDERLINE;
-}
-
-
-sub __reverse {
-    #my ( $self ) = @_;
-    print REVERSE;
-}
-
-
-sub __reset {
-    #my ( $self ) = @_;
-    print RESET;
-}
-
-
-# up, down, left, right: $_[1] has to be 1 or greater
-
-sub __up {
-    #my ( $self ) = @_;
-    print "\e[${_[1]}A";
-}
-
-
-sub __down  {
-    #my ( $self ) = @_;
-    print "\e[${_[1]}B";
-}
-
-
-sub __left {
-    #my ( $self ) = @_;
-    print "\e[${_[1]}D";
-}
-
-
-sub __right {
-    #my ( $self ) = @_;
-    print "\e[${_[1]}C";
 }
 
 

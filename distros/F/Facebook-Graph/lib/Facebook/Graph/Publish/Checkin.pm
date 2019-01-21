@@ -1,5 +1,5 @@
 package Facebook::Graph::Publish::Checkin;
-$Facebook::Graph::Publish::Checkin::VERSION = '1.1204';
+$Facebook::Graph::Publish::Checkin::VERSION = '1.1205';
 use Moo;
 use Ouch;
 extends 'Facebook::Graph::Publish';
@@ -94,7 +94,7 @@ Facebook::Graph::Publish::Checkin - Publish a location checkin.
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 SYNOPSIS
 
@@ -180,6 +180,6 @@ Posts the data and returns a L<Facebook::Graph::Response> object. The response o
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

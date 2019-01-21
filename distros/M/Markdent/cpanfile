@@ -1,4 +1,4 @@
-requires "Digest::SHA1" => "0";
+requires "Digest::SHA" => "0";
 requires "Encode" => "0";
 requires "Exporter" => "0";
 requires "File::Slurper" => "0";

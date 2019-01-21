@@ -18,7 +18,7 @@ use UUID::Tiny ':std';
 use File::ShareDir;
 use Path::Tiny;
 
-our $VERSION = '0.022';    # VERSION
+our $VERSION = '0.023';    # VERSION
 
 # ABSTRACT: Generate html/javascript charts from perl data using javascript library plotly.js
 
@@ -135,7 +135,7 @@ sub show_plot {
 }
 
 sub plotlyjs_version {
-    return '1.43.1';
+    return '1.43.2';
 }
 
 1;
@@ -152,7 +152,7 @@ Chart::Plotly - Generate html/javascript charts from perl data using javascript 
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

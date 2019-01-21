@@ -22,10 +22,15 @@
       ]
    },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::CBuilder" : "0",
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "ExtUtils::ParseXS" : "3.30",
             "File::Which" : "0",
             "perl" : "5.008001"
@@ -38,7 +43,7 @@
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -51,6 +56,7 @@
          "requires" : {
             "Capture::Tiny" : "0.17",
             "ExtUtils::CBuilder" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "ExtUtils::ParseXS" : "3.30",
             "FFI::CheckLib" : "0.11",
             "File::Which" : "1.10",
@@ -93,7 +99,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.49",
+   "version" : "1.51",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",

@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Markdent",
   "PREREQ_PM" => {
-    "Digest::SHA1" => 0,
+    "Digest::SHA" => 0,
     "Encode" => 0,
     "Exporter" => 0,
     "File::Slurper" => 0,
@@ -70,7 +70,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.32",
+  "VERSION" => "0.33",
   "test" => {
     "TESTS" => "t/*.t t/Handler/*.t t/Handler/HTMLStream/*.t t/Simple/*.t t/markup/github/*.t t/markup/multi-dialect/*.t t/markup/standard/*.t t/markup/theory/*.t"
   }
@@ -78,7 +78,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Dumper" => 0,
-  "Digest::SHA1" => 0,
+  "Digest::SHA" => 0,
   "Encode" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use POSIX ();
 use Time::Local ();
@@ -143,6 +143,42 @@ sub textToHtml {
     $str =~ s/>/&gt;/g;
 
     return $str;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 doubleDecode() - Wandele doppelt enkodiertes UTF-8 zurück
+
+=head4 Synopsis
+
+    $class->doubleDecode(\$str);
+    $newStr = $class->doubleDecode($str);
+
+=head4 Description
+
+Wandele doppelt enkodiertes UTF-8 zurück in einfach enkodiertes UTF-8.
+Behandelt werden aktuell nur deutsche Umlaute und Sz.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub doubleDecode {
+    my ($class,$arg) = @_;
+
+    my $ref = ref $arg? $arg: \$arg;
+
+    if (defined $$ref) {
+        $$ref =~ s/\N{U+00C3}\N{U+00A4}/ä/g;
+        $$ref =~ s/\N{U+00C3}\N{U+00B6}/ö/g;
+        $$ref =~ s/\N{U+00C3}\N{U+00BC}/ü/g;
+        $$ref =~ s/\N{U+00C3}\N{U+0084}/Ä/g;
+        $$ref =~ s/\N{U+00C3}\N{U+0096}/Ö/g;
+        $$ref =~ s/\N{U+00C3}\N{U+009C}/Ü/g;
+        $$ref =~ s/\N{U+00C3}\N{U+009F}/ß/g;
+    }
+
+    return ref $arg? (): $$ref;
 }
 
 # -----------------------------------------------------------------------------
@@ -580,7 +616,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

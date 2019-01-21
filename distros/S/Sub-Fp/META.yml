@@ -3,9 +3,9 @@ abstract: 'A Clojure / Python Toolz / Lodash inspired Functional Utility Library
 author:
   - 'Kristopher C. Paulsen <kristopherpaulsen+cpan@gmail.com>'
 build_requires:
-  Exporter: '0'
-  strict: '0'
-  warnings: '0'
+  Exporter: '1'
+  strict: '1'
+  warnings: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -20,10 +20,10 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '0'
-  List::Util: '0'
-  POSIX: '0'
-  Test::Class: '0'
-  Test::More: '0'
+  Carp: '1'
+  List::Util: '1'
+  POSIX: '1'
+  Test::Class: '1'
+  Test::More: '1'
   perl: '5.006'
-version: '0.32'
+version: '0.34'

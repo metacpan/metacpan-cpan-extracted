@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use RT::Extension::ConditionalCustomFields::Test tests => 20;
+use RT::Extension::ConditionalCustomFields::Test tests => 21;
 
 use WWW::Mechanize::PhantomJS;
 
@@ -79,3 +79,12 @@ $mjs->field($ticket_cf_condition, $cf_values->[2]->Name);
 $mjs->eval_in_page("jQuery('#Object-RT\\\\:\\\\:Ticket-" . $ticket->id . "-CustomField\\\\:Groupone-" . $cf_condition->id . "-Values').trigger('change');");
 ok($ticket_cf_conditioned_by->is_displayed, "Show ConditionalCF when Condition is changed to be met by second val");
 ok($ticket_cf_conditioned_by_child->is_displayed, "Show Child when Condition is changed to be met by second val");
+
+my $cf_conditioned_by_img = RT::CustomField->new(RT->SystemUser);
+$cf_conditioned_by_img->Create(Name => 'ConditionedByImg', Type => 'Image', MaxValues => 1, Queue => 'General');
+$cf_conditioned_by_img->SetConditionedBy($cf_condition->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
+$ticket->AddCustomFieldValue(Field => $cf_condition->id , Value => $cf_values->[1]->Name);
+
+$mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
+my $ticket_cf_conditioned_by_img = $mjs->xpath('//input[@name="Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_conditioned_by_img->id . '-Upload"]', single => 1);
+ok($ticket_cf_conditioned_by_img->is_hidden, "Hide ConditionedByImg when Condition is not met");

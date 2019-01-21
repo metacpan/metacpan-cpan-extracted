@@ -1,5 +1,5 @@
 package Facebook::Graph::Publish;
-$Facebook::Graph::Publish::VERSION = '1.1204';
+$Facebook::Graph::Publish::VERSION = '1.1205';
 use Moo;
 use Facebook::Graph::Request;
 with 'Facebook::Graph::Role::Uri';
@@ -52,14 +52,14 @@ Facebook::Graph::Publish - A base class for publishing various things to faceboo
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 DESCRIPTION
 
-This module shouldn't be used by you directly for any purpose. 
+This module shouldn't be used by you directly for any purpose.
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

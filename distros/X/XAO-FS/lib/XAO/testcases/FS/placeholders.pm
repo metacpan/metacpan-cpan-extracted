@@ -245,6 +245,8 @@ sub test_same_field_name {
     $customer->drop_placeholder('first_name');
 }
 
+###############################################################################
+
 sub test_data_placeholder {
     my $self=shift;
 
@@ -266,6 +268,8 @@ sub test_data_placeholder {
 
     $customer->drop_placeholder('first_name');
 }
+
+###############################################################################
 
 sub test_list_placeholder {
     my $self=shift;
@@ -311,7 +315,6 @@ sub test_list_placeholder {
     $self->assert($got eq 'new',
                   "Got wrong value in the order ($got!='new')");
 
-    ##
     # Checking how automatic naming works
     #
     my $c2orders=$odb->fetch('/Customers/c2/Orders');
@@ -324,7 +327,6 @@ sub test_list_placeholder {
     $self->assert($got eq 'under c2',
                   "Got wrong value in the order ($got!='under c2')");
 
-    ##
     # Adding third level placeholder on Order.
     #
     $order->add_placeholder(name   => 'Products',
@@ -385,10 +387,9 @@ sub test_list_placeholder {
 
 ###############################################################################
 
-##
 # Checking that it is impossible to create more then one list for the
 # same class.
-#
+
 sub test_multiple_same_class {
     my $self=shift;
 
@@ -430,6 +431,8 @@ sub test_multiple_same_class {
                   "Succeeded in creating second list of the same class (After error! Weird..)");
 }
 
+###############################################################################
+
 sub test_build_structure {
     my $self=shift;
     my $odb=$self->get_odb;
@@ -449,6 +452,10 @@ sub test_build_structure {
             type => 'text',
             maxlength => 200,
             index => 1,
+        },
+        blob => {
+            type => 'blob',
+            maxlength => 10000,
         },
         integer => {
             type => 'integer',
@@ -488,6 +495,9 @@ sub test_build_structure {
                       "Field ($name) doesn't exist after build_structure()");
     }
 
+    $self->assert($cust->describe('blob')->{'maxlength'} == 10000,
+        "Maxlength is not 10000 on 'blob'");
+
     # Reconnecting to the database, getting a new database object with a
     # new structure loaded from disk.
     #
@@ -507,6 +517,7 @@ sub test_build_structure {
     $self->assert($cust->describe('name')->{'charset'} eq 'latin1',
         "Failed to change charset to 'latin1' on 'name'");
 
+    $structure{'blob'}->{'maxlength'}=20000;
     $structure{'name'}->{'maxlength'}=50;
     $structure{'name'}->{'charset'}='utf8';
     $structure{'text'}->{'charset'}='utf8';
@@ -515,6 +526,9 @@ sub test_build_structure {
 
     $odb=$self->reconnect();
     $cust=$odb->fetch('/Customers/c1');
+
+    $self->assert($cust->describe('blob')->{'maxlength'} == 20000,
+        "Failed to change maxlength to 20000 on 'blob'");
 
     $self->assert($cust->describe('name')->{'maxlength'} == 50,
         "Failed to change maxlength to 50 on 'name'");

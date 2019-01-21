@@ -61,6 +61,9 @@ t/Plugin-GenericTransformer.t
 t/Plugin-GenericValidator.t
 t/Plugin-SortLines.t
 t/Zglob.t
+t/helper-bin/exit.pl
+t/helper-bin/generic-transformer.pl
+t/helper-bin/generic-validator.pl
 t/inc1/Foo.pm
 t/inc2/Bar.pm
 t/lib/TestFor/Code/TidyAll/Basic.pm

@@ -1,5 +1,5 @@
 package Imager::Barcode128;
-$Imager::Barcode128::VERSION = '0.0101';
+$Imager::Barcode128::VERSION = '0.0103';
 use strict;
 use Moo;
 use Imager;
@@ -57,7 +57,7 @@ Imager::Barcode128 - Create GS1-128 compliant bar codes using Imager
 
 =head1 VERSION
 
-version 0.0101
+version 0.0103
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ version 0.0101
 
  my $barcode = Imager::Barcode128->new( text => 'My cool barcode' );
  $barcode->draw;
- $barcode->image->save(file => 'barcode.png');
+ $barcode->image->write(file => 'barcode.png');
 
 =head1 DESCRIPTION
 

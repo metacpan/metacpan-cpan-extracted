@@ -56,8 +56,17 @@ isa_ok($parser->parseChunkStart(), 'HTML5::DOM');
 isa_ok($parser->parseChunk('<div'), 'HTML5::DOM');
 isa_ok($parser->parseChunk('>ololo'), 'HTML5::DOM');
 isa_ok($parser->parseChunk('</div>'), 'HTML5::DOM');
+isa_ok($parser->parseChunkTree, 'HTML5::DOM::Tree');
 isa_ok($parser->parseChunk('ololo'), 'HTML5::DOM');
 isa_ok($parser->parseChunkEnd, 'HTML5::DOM::Tree');
+
+$parser->parseChunkStart->parseChunk('<div');
+my $tree0 = $parser->parseChunkTree;
+my $tree1 = $parser->parseChunkTree;
+my $tree2 = $parser->parseChunkEnd;
+
+ok($tree0 == $tree1, 'tree from chunks is eq [0]');
+ok($tree2 == $tree1, 'tree from chunks is eq [1]');
 
 #####################################
 # HTML5::DOM::Tree

@@ -1,3 +1,26 @@
+0.032   2019-01-21 (PERLANCAR)
+
+        - Maintain a static list of default coercion modules instead of finding
+          + loading all Data::Sah::Coerce::* modules on the system. The
+          motivation for this change is performance, simplicity, as well as
+          reduction of test warnings from CPAN Testers. Typically, a CPAN Tester
+          would have tested an old version of a coercion rule distribution, say
+          Data-Sah-Coerce-perl-date-str_alami and then later tests another
+          module. Data::Sah::Coerce would then warn when it cannot load the old
+          coercion rule module because the metadata version has been bumped.
+          With this change, the list of default coercion rules is maintained in
+          %Default_Rules in Data::Sah::Coerce instead of loading all coercion
+          rule modules and trying to read its 'enable_by_default' meta property.
+
+        - [Removed] Remove the ability to specify regexes in coerce_rules
+          because it is never used in practice, so far. The use of regexes also
+          requires us to find list of modules anyway.
+
+        - [Incompatible change] Bump metadata version to 4, just to remove
+          'enable_by_default' property. Data::Sah::Coerce still accepts old
+          metadata version (3) but ignores the property.
+
+
 0.031   2018-12-16 (PERLANCAR)
 
 	- timeofday: Tweak str_hms regex: allow hh:mm in addition to hh:mm:ss

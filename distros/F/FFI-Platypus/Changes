@@ -1,5 +1,60 @@
 Revision history for FFI-Platypus
 
+0.74      2019-01-19 04:42:22 -0500
+  - Production release identical to 0.73_01
+
+0.73_01   2019-01-13 18:31:33 -0500
+  - Remove dependency on Win32::ErrorMode on Windows
+
+0.72_01   2019-01-11 22:17:11 -0500
+  - Remove dependency on Config::AutoConf
+
+0.71_01   2019-01-10 23:29:06 -0500
+  - Merge FFI-Build into this distribution
+  - Add FFI::Probe
+
+0.70_01   2019-01-10 15:34:57 -0500
+  - prereq fix: IPC::Cmd as a configure requires
+    since it doesn't come with Perl 5.8.x
+
+0.69_01   2019-01-09 15:59:43 -0500
+  - require Alien::FFI in fallback mode
+
+0.68_01   2019-01-05 21:12:47 -0500
+  - Improve platform probing of complex type
+  - Allow override of platform probing using FFI_PLATYPUS_PROBE_OVERRIDE
+
+0.67_01   2019-01-05 09:16:22 -0500
+  - Better support for complex types: pointers to complex types and complex
+    type and pointers to complex as return value
+
+0.66_01   2019-01-04 20:16:59 -0500
+  - EXPERIMENTAL ExtUtils::MakeMaker fixes for dynamic prereqs on windows
+  - restore FFI_PLATYPUS_DEBUG_FAKE32
+  - restore FFI_PLATYPUS_NO_ALLOCA
+
+0.65_01   2019-01-04 13:38:58 -0500
+  - EXPERIMENTAL ExtUtils::MakeMaker fixes for parallel and freebsd build
+
+0.64_01   2019-01-03 03:16:57 -0500
+  - EXPERIMENTAL ExtUtils::MakeMaker fixes for MSWin32 / cygwin
+
+0.63_01   2019-01-02 11:23:48 -0500
+  - EXPERIMENTAL ExtUtils::MakeMaker release
+
+0.62_01   2019-01-01 04:23:23 -0500
+  - New type: array of string "string [x]" and "string []" are supported
+  - NULL terminated arrays are supported as return types for string and opaque arrays
+    "opaque []" and "string []"
+
+0.61_01   2018-12-31 19:56:20 -0500
+  - New type: pointers to string "string *" are supported.
+  - FFI::Platypus::Type::StringPointer is now deprecated.
+
+0.60_01   2018-12-30 14:55:15 -0500
+  - sticky/unstick functions can safely be called multiple times
+  - Removed some extra lookups from closure calls, should be faster now.
+
 0.59      2018-12-16 16:33:37 -0700
   - Workaround for possibly buggy pack/unpack on Perl 5.8.8 gh#91
     Fixes FFI::Platypus::Type::StringArray

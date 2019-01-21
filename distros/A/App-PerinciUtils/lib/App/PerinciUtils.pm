@@ -1,7 +1,7 @@
 package App::PerinciUtils;
 
-our $DATE = '2017-12-11'; # DATE
-our $VERSION = '0.111'; # VERSION
+our $DATE = '2019-01-20'; # DATE
+our $VERSION = '0.112'; # VERSION
 
 use 5.010001;
 
@@ -20,7 +20,7 @@ App::PerinciUtils - Some utilities related to Perinci
 
 =head1 VERSION
 
-This document describes version 0.111 of App::PerinciUtils (from Perl distribution App-PerinciUtils), released on 2017-12-11.
+This document describes version 0.112 of App::PerinciUtils (from Perl distribution App-PerinciUtils), released on 2019-01-20.
 
 =head1 DESCRIPTION
 
@@ -40,6 +40,8 @@ family.
 =item * L<peri-htserve>
 
 =item * L<peri-run>
+
+=item * L<testxcomp>
 
 =item * L<wrap-with-perinci-sub-wrapper>
 
@@ -73,7 +75,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

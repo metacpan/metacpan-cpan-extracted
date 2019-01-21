@@ -1,5 +1,9 @@
 Revision history for Perl extension Data::Tools
 
+1.20 2019-01-18
+
+    - added julian_date_* functions to Data::Tools::Time
+
 1.19 2018-08-31
 
     - changed escaping style of hash2str() and str2hash()

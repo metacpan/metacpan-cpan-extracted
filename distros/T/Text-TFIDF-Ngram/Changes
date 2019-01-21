@@ -1,5 +1,9 @@
 Revision history for Text-TFIDF-Ngram
 
+0.0300 2019-01-20 01:00:18
+    - Add a user defined punctuation regex attribute.
+    - Add a lowercase attribute.
+
 0.0207 2018-04-08 21:04:31
     - Set distribution dependency prerequisites.
     - Fix case sensitivity in test output from Lingua::EN::Ngram.

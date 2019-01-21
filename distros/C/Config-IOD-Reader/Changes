@@ -1,3 +1,8 @@
+0.341   2019-01-17 (PERLANCAR)
+
+	- Introduce attribute: enable_directive.
+
+
 0.340   2018-04-04 (PERLANCAR)
 
 	- [Bugfix] Pass callback to read_string too.

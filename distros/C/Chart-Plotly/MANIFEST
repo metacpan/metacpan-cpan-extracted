@@ -11,6 +11,7 @@ dist.ini
 examples/anscombe.pl
 examples/anscombe.png
 examples/basic.pl
+examples/bitcoin.pl
 examples/data_frame.pl
 examples/distribution_js.pl
 examples/embed_js.pl

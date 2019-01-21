@@ -1,0 +1,118 @@
+{
+   "abstract" : "Publish documents in new format",
+   "author" : [
+      "Renee Baecker <module@renee-baecker.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EPublisher",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Find::Rule" : "0",
+            "File::Glob" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::String" : "0",
+            "List::Util" : "0",
+            "Module::Info" : "0.32",
+            "PPI" : "1.213",
+            "Pod::Text" : "3.08",
+            "YAML::Tiny" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "EPublisher" : {
+         "file" : "lib/EPublisher.pm",
+         "version" : "1.22"
+      },
+      "EPublisher::Config" : {
+         "file" : "lib/EPublisher/Config.pm",
+         "version" : "1.22"
+      },
+      "EPublisher::Source" : {
+         "file" : "lib/EPublisher/Source.pm",
+         "version" : "1.22"
+      },
+      "EPublisher::Source::Base" : {
+         "file" : "lib/EPublisher/Source/Base.pm",
+         "version" : "1.22"
+      },
+      "EPublisher::Source::Plugin::Dir" : {
+         "file" : "lib/EPublisher/Source/Plugin/Dir.pm",
+         "version" : "1.22"
+      },
+      "EPublisher::Source::Plugin::File" : {
+         "file" : "lib/EPublisher/Source/Plugin/File.pm",
+         "version" : "1.22"
+      },
+      "EPublisher::Source::Plugin::Module" : {
+         "file" : "lib/EPublisher/Source/Plugin/Module.pm",
+         "version" : "1.22"
+      },
+      "EPublisher::Target" : {
+         "file" : "lib/EPublisher/Target.pm",
+         "version" : "1.22"
+      },
+      "EPublisher::Target::Base" : {
+         "file" : "lib/EPublisher/Target/Base.pm",
+         "version" : "1.22"
+      },
+      "EPublisher::Target::Plugin::Text" : {
+         "file" : "lib/EPublisher/Target/Plugin/Text.pm",
+         "version" : "1.22"
+      },
+      "EPublisher::Utils::PPI" : {
+         "file" : "lib/EPublisher/Utils/PPI.pm",
+         "version" : "1.22"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/EPublisher/issues"
+      },
+      "homepage" : "http://github.com/reneeb/EPublisher",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/EPublisher.git",
+         "web" : "http://github.com/reneeb/EPublisher"
+      }
+   },
+   "version" : "1.22",
+   "x_contributors" : [
+      "Boris D\u00e4ppen <boris_daeppen@bluewin.ch>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

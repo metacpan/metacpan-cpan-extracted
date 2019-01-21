@@ -44,6 +44,7 @@ typedef struct {
 	bool encoding_use_meta;
 	bool encoding_use_bom;
 	long encoding_prescan_limit;
+	int utf8; // 0 - off, 1 - on, 2 - auto (detect by input)
 } html5_dom_options_t;
 
 typedef struct {
@@ -63,18 +64,23 @@ typedef struct {
 	myhtml_tree_t *tree;
 	html5_dom_parser_t *parser;
 	myhtml_tag_id_t fragment_tag_id;
+	bool utf8;
+	bool used;
 } html5_dom_tree_t;
 
 typedef struct {
 	mycss_t *mycss;
 	mycss_entry_t *entry;
 	myencoding_t encoding;
+	int utf8; // 0 - off, 1 - on, 2 - auto (detect by input)
+	html5_dom_options_t opts;
 } html5_css_parser_t;
 
 typedef struct {
 	html5_css_parser_t *parser;
 	mycss_selectors_list_t *list;
 	void *parent;
+	bool utf8;
 } html5_css_selector_t;
 
 typedef struct {

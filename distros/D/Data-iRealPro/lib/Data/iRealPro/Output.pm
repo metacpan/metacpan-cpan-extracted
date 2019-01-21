@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 16:09:10 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Nov 13 10:10:20 2018
-# Update Count    : 80
+# Last Modified On: Mon Jan  7 09:30:08 2019
+# Update Count    : 81
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -45,6 +45,10 @@ sub new {
     elsif ( $opts->{output} =~ /\.jso?n$/i ) {
 	require Data::iRealPro::Output::JSON;
 	$self->{_backend} = Data::iRealPro::Output::JSON::;
+    }
+    elsif ( $opts->{output} =~ /\.mma$/i ) {
+	require Data::iRealPro::Output::MMA;
+	$self->{_backend} = Data::iRealPro::Output::MMA::;
     }
     elsif ( $options->{split}
 	    || $opts->{output} =~ /\.html$/i ) {

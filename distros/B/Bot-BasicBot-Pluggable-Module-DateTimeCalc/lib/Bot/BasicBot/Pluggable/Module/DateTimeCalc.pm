@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Calculate date-time operations
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0304';
 
 use strict;
 use warnings;
@@ -95,6 +95,7 @@ sub said {
     }
 }
 
+
 sub _capture {
     my ($string) = @_;
     $string =~ s/['"]//g;
@@ -124,12 +125,19 @@ Bot::BasicBot::Pluggable::Module::DateTimeCalc - Calculate date-time operations
 
 =head1 VERSION
 
-version 0.0302
+version 0.0304
 
 =head1 SYNOPSIS
 
   use Bot::BasicBot::Pluggable::Module::DateTimeCalc;
-  my $bot = Bot::BasicBot::Pluggable::Module::DateTimeCalc->new( nick => 'TimeBot', '...' );
+  my $bot = Bot::BasicBot::Pluggable::Module::DateTimeCalc->new(
+    server      => 'irc.somewhere.org',
+    port        => '6667',
+    channels    => ['#bots'],
+    nick        => 'TimeBot',
+    name        => 'Your Name Bot',
+    ignore_list => [qw/other_bot some_fool/],
+  );
   $bot->run();
 
 =head1 DESCRIPTION
@@ -155,6 +163,10 @@ Show the keyword help message.
 =head2 said()
 
 Process the date-time calculations.
+
+=head2 run()
+
+Start the process and connect to the IRC.
 
 =head1 IRC COMMANDS
 
@@ -223,7 +235,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

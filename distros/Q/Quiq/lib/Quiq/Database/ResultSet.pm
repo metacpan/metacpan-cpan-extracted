@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -966,9 +966,9 @@ sub asTable {
         # Statistik
 
         my $duration = $self->execTime + $self->fetchTime;
-        $str .= sprintf "\n%s, %s rows",
-            Quiq::Duration->new($duration)->asShortString(-precision=>3),
-            $self->count;
+        $str .= sprintf "\n%s rows, %s",
+            $self->count,
+            Quiq::Duration->new($duration)->asShortString(-precision=>3);
     }
     if ($msg) {
         $str .= $msg;
@@ -1055,7 +1055,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

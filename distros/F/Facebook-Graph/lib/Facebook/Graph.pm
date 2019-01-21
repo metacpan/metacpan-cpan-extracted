@@ -1,6 +1,7 @@
 package Facebook::Graph;
-$Facebook::Graph::VERSION = '1.1204';
+$Facebook::Graph::VERSION = '1.1205';
 use Moo;
+use 5.006;
 use MIME::Base64::URLSafe;
 use JSON;
 use Facebook::Graph::AccessToken;
@@ -271,7 +272,11 @@ Facebook::Graph - A fast and easy way to integrate your apps with Facebook.
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
+
+=head1 NOTICE OF DEPRECATION
+
+Facebook::Graph brought the world of Facebook to Perl, but as Facebook is massively changing their APIs it is impossible to keep up with a heavy weight module like Facebook::Graph. Instead, we recommend switching to the lighter weight L<Facebook::OpenGraph> module. We won't be removing Facebook::Graph from CPAN, but we won't be adding new features to keep up with all of Facebook's constant changes either.
 
 =head1 SYNOPSIS
 
@@ -331,7 +336,7 @@ Handle the Facebook authorization code postback:
 Or if you already had the access token:
 
  $fb->access_token($token);
- $fb->request_extended_access_token; 
+ $fb->request_extended_access_token;
 
 Or simply:
 
@@ -564,7 +569,7 @@ This module throws exceptions when it encounters a problem. It uses L<Ouch> to t
 
 The Facebook Graph API is a constantly moving target. As such some stuff that used to work, may stop working. Keep up to date with their changes here: L<https://developers.facebook.com/docs/apps/upgrading>
 
-If you were using any version of Facebook::Graph before 1.1000, then you may be used to doing things like creating events through this API, or using a person's username instead of their ID, or making queries without an access token. You can't do any of those things anymore, because as of the Facebook Graph v2.0 API, none of them is supported any longer. 
+If you were using any version of Facebook::Graph before 1.1000, then you may be used to doing things like creating events through this API, or using a person's username instead of their ID, or making queries without an access token. You can't do any of those things anymore, because as of the Facebook Graph v2.0 API, none of them is supported any longer.
 
 
 =head1 PREREQS
@@ -609,6 +614,6 @@ JT Smith <jt_at_plainblack_dot_com>
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

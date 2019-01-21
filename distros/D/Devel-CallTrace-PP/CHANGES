@@ -1,0 +1,41 @@
+==================================================
+Changes from 2018-01-18 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.01 at 2019-01-18 14:45:30 +0000
+-----------------------------------------
+
+  Change: 3f6be5c3c73b79cd50c552c9c09ed003cb0e6134
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2019-01-18 17:45:17 +0000
+
+    Fixed meta info 
+
+  Change: c6302bbbd6bc7191c1a48307ef748859f161e282
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2019-01-18 17:42:25 +0000
+
+    Added gitignore 
+
+  Change: 02ae4c521326fb866d56eae6748acd1b71a6bf27
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2019-01-17 19:12:47 +0000
+
+    Folding added 
+
+  Change: 63bcc9994034311b7435d899c79860cf9b7e5776
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2019-01-16 23:32:10 +0000
+
+    Prettify output and fixed pod error 
+
+  Change: df45a92beab10190911177da55ee4cdc49fbb492
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2019-01-16 22:10:03 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

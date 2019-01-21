@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -162,7 +162,7 @@ sub html {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

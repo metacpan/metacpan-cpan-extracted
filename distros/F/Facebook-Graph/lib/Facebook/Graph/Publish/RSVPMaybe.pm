@@ -1,5 +1,5 @@
 package Facebook::Graph::Publish::RSVPMaybe;
-$Facebook::Graph::Publish::RSVPMaybe::VERSION = '1.1204';
+$Facebook::Graph::Publish::RSVPMaybe::VERSION = '1.1205';
 use Moo;
 extends 'Facebook::Graph::Publish';
 
@@ -13,7 +13,7 @@ Facebook::Graph::Publish::RSVPMaybe - RSVP maybe to an event.
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 SYNOPSIS
 
@@ -37,6 +37,6 @@ Posts the data and returns a L<Facebook::Graph::Response> object. The response o
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

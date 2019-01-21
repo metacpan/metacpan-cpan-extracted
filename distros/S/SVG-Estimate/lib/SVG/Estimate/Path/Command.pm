@@ -1,5 +1,5 @@
 package SVG::Estimate::Path::Command;
-$SVG::Estimate::Path::Command::VERSION = '1.0110';
+$SVG::Estimate::Path::Command::VERSION = '1.0111';
 use Moo;
 with 'SVG::Estimate::Role::Round';
 
@@ -10,7 +10,7 @@ SVG::Estimate::Path::Command - Base class for all path calculations.
 
 =head1 VERSION
 
-version 1.0110
+version 1.0111
 
 =head1 DESCRIPTION
 

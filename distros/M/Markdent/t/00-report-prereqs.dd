@@ -34,7 +34,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Digest::SHA1' => '0',
+                                      'Digest::SHA' => '0',
                                       'Encode' => '0',
                                       'Exporter' => '0',
                                       'File::Slurper' => '0',

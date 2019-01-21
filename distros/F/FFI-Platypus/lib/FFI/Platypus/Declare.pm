@@ -2,10 +2,11 @@ package FFI::Platypus::Declare;
 
 use strict;
 use warnings;
+use Carp ();
 use FFI::Platypus;
 
 # ABSTRACT: Declarative interface to FFI::Platypus
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 
 our $ffi    = {};
@@ -78,7 +79,18 @@ sub attach ($$$;$$)
 sub closure (&)
 {
   my($coderef) = @_;
+  require FFI::Platypus::Closure;
   FFI::Platypus::Closure->new($coderef);
+}
+
+
+sub sticky ($)
+{
+  my($closure) = @_;
+  Carp::croak("usage: sticky \$closure")
+    unless defined $closure && ref($closure) eq 'FFI::Platypus::Closure';
+  $closure->sticky;
+  $closure;
 }
 
 
@@ -174,7 +186,7 @@ FFI::Platypus::Declare - Declarative interface to FFI::Platypus
 
 =head1 VERSION
 
-version 0.59
+version 0.74
 
 =head1 SYNOPSIS
 
@@ -452,7 +464,7 @@ Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015,2016,2017,2018 by Graham Ollis.
+This software is copyright (c) 2015,2016,2017,2018,2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

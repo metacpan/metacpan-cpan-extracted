@@ -2,7 +2,7 @@ package LCFG::Build::Tool::Submit; # -*-perl-*-
 use strict;
 use warnings;
 
-our $VERSION = '0.6.6';
+our $VERSION = '0.9.18';
 
 use File::Find::Rule ();
 use File::Spec ();
@@ -52,11 +52,9 @@ sub execute {
     my $spec = $self->spec;
 
     my $version = $spec->version;
+    my $module  = $spec->fullname;
 
-    my $module = $spec->fullname;
-
-    my $dirname = join q{-}, $module, $version;
-    my $outdir = File::Spec->catdir( $self->resultsdir, $dirname );
+    my $outdir = $self->output_dir;
 
     if ( !-d $outdir ) {
         $self->fail("Failed to find anything for $module-$version, do you need to build the packages?");
@@ -107,7 +105,7 @@ LCFG::Build::Tool::Submit - Tool for submitting RPMs
 
 =head1 VERSION
 
-This documentation refers to LCFG::Build::Tool::Submit version 0.6.6
+This documentation refers to LCFG::Build::Tool::Submit version 0.9.18
 
 =head1 USAGE
 

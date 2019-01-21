@@ -1,6 +1,154 @@
-2017-01-19  SVN: new release
+2019-01-18  SVN: new release
 
-	* Release: 0.2.3
+	* Release: 0.3.8
+
+2019-01-18 10:22  squinney@INF.ED.AC.UK
+
+	* Makefile.PL: Updated build script
+
+2019-01-18 10:21  squinney@INF.ED.AC.UK
+
+	* META.json.in, META.yml.in, lcfg.yml: Updated cpan metadata
+
+2019-01-18 10:10  squinney@INF.ED.AC.UK
+
+	* debian/control: fixed Build-Depends-Indep
+
+2019-01-18 10:10  squinney@INF.ED.AC.UK
+
+	* Build.PL.in: minor tweaks to how dep versions are specified
+
+2019-01-18 10:09  squinney@INF.ED.AC.UK
+
+	* README: updated instructions
+
+2019-01-18 10:07  squinney@INF.ED.AC.UK
+
+	* LCFG-Build-VCS.spec: updated minimum perl version
+
+2019-01-18 10:07  squinney@INF.ED.AC.UK
+
+	* debian/control: Added perl modules to build-deps so tests can be
+	  run
+
+2019-01-18 10:01  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/VCS/CVS.pm.in, lib/LCFG/Build/VCS/None.pm.in,
+	  lib/LCFG/Build/VCS/SVN.pm.in: Set minimum perl version to 5.10
+
+2019-01-17 12:02  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-VCS release:
+	  0.3.7
+
+2019-01-17 12:01  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml, lib/LCFG/Build/VCS.pm.in: Fixed calls to
+	  update_debian_changelog and update_lcfg_changelog from
+	  update_changelog
+
+2019-01-17 11:59  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-VCS.spec, debian/control, lcfg.yml: Added
+	  new dependency on Template Toolkit
+
+2019-01-17 11:57  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/VCS.pm.in: Extracted the functionality for
+	  updating debian changelog files so that it can be used elsewhere
+
+2019-01-16 20:13  squinney@INF.ED.AC.UK
+
+	* debian/control: Changed binary package name to
+	  liblcfg-build-vcs-perl to be standard style for perl packages
+
+2019-01-15 16:37  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-VCS release:
+	  0.3.5
+
+2019-01-15 16:36  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/VCS/None.pm.in: specify minimum dep on some
+	  modules
+
+2019-01-15 16:36  squinney@INF.ED.AC.UK
+
+	* debian/control: recommend subversion, suggest cvs
+
+2019-01-15 16:36  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/VCS.pm.in: Fixed POD errors
+
+2019-01-15 16:29  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-VCS release:
+	  0.3.4
+
+2019-01-15 16:29  squinney@INF.ED.AC.UK
+
+	* debian, debian/compat, debian/control, debian/copyright,
+	  debian/docs, debian/rules, debian/source, debian/source/format,
+	  lcfg.yml, t/01_load.t: Added debian packaging metadata
+
+2019-01-08 14:31  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-VCS release: 0.3.3
+
+2019-01-04 16:53  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-VCS release: 0.3.2
+
+2019-01-04 16:49  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/VCS.pm.in: Fixed package name handling for
+	  debian/changelog
+
+2018-12-12 15:04  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-VCS release: 0.3.1
+
+2018-12-12 15:03  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/VCS.pm.in: Need to add debian/changelog
+	  file to the repository if it is new
+
+2018-12-12 14:57  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-VCS release: 0.3.0
+
+2018-12-12 14:57  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-VCS.spec, META.yml.in, lcfg.yml: Use a
+	  safer macro for the package version
+
+2018-12-12 14:57  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/VCS.pm.in: Added support to update_changelog for
+	  updating a debian/changelog file
+
+2017-11-20 14:52  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-VCS release: 0.2.5
+
+2017-11-20 14:52  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/VCS.pm.in: store_version now reports
+	  what it is doing
+
+2017-11-20 14:25  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-VCS release: 0.2.4
+
+2017-11-20 14:25  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/VCS.pm.in: Added new store_version method which
+	  can be used to store version string into a file when project is
+	  tagged
+
+2017-01-19 13:33  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-VCS release: 0.2.3
 
 2017-01-19 13:31  squinney@INF.ED.AC.UK
 

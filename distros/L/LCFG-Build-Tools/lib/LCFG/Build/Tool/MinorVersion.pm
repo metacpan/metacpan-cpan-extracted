@@ -2,13 +2,13 @@ package LCFG::Build::Tool::MinorVersion;    # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: MinorVersion.pm.in 29224 2015-11-12 10:11:34Z squinney@INF.ED.AC.UK $
+# $Id: MinorVersion.pm.in 33768 2017-11-20 15:51:27Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool/MinorVersion.pm.in,v $
-# $Revision: 29224 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_6_6/lib/LCFG/Build/Tool/MinorVersion.pm.in $
-# $Date: 2015-11-12 10:11:34 +0000 (Thu, 12 Nov 2015) $
+# $Revision: 33768 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_18/lib/LCFG/Build/Tool/MinorVersion.pm.in $
+# $Date: 2017-11-20 15:51:27 +0000 (Mon, 20 Nov 2017) $
 
-our $VERSION = '0.6.6';
+our $VERSION = '0.9.18';
 
 use Moose;
 
@@ -36,7 +36,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Tool::MinorVersion version 0.6.6
+    This documentation refers to LCFG::Build::Tool::MinorVersion version 0.9.18
 
 =head1 SYNOPSIS
 
@@ -114,6 +114,13 @@ This is a boolean value which signifies whether the changelog file for
 the software project should be generated from the commit logs of the
 version-control system. By default the value specified in the LCFG
 metadata file will be used.
+
+=item store_version
+
+This is a boolean value which controls whether the version string
+(e.g. C<1.2.3>) should be stored into a F<lcfg-build-id.txt> file when
+a new project version is tagged. By default the value specified in the
+LCFG metadata file will be used.
 
 =back
 

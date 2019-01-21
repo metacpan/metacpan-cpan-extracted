@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the TF-IDF measure for ngram phrases
 
-our $VERSION = '0.0207';
+our $VERSION = '0.0300';
 
 use Moo;
 use strictures 2;
@@ -32,6 +32,18 @@ has stopwords => (
     is      => 'ro',
     isa     => sub { croak 'Invalid Boolean' unless defined $_[0] },
     default => sub { 1 },
+);
+
+
+has punctuation => (
+    is      => 'ro',
+    default => sub { qr/[-!"#$%&()*+,.\/\\:;<=>?@\[\]^_`{|}~]/ },
+);
+
+
+has lowercase => (
+    is      => 'ro',
+    default => sub { 0 },
 );
 
 
@@ -65,6 +77,10 @@ sub _process_ngrams {
     my $ngram  = Lingua::EN::Ngram->new( file => $file );
     my $phrase = $ngram->ngram($size);
 
+    if ( $self->lowercase ) {
+        $phrase = { map { lc $_ => $phrase->{$_} } keys %$phrase };
+    }
+
     my $stop = getStopWords('en');
 
     my $counts;
@@ -73,14 +89,16 @@ sub _process_ngrams {
         next if $self->stopwords
             && grep { $stop->{$_} } split /\s/, $p;  # Exclude stopwords
 
-        $p =~ s/[\-?;:!,."\(\)]//g; # Remove unwanted punctuation
+        my $pat = $self->punctuation;
+        $p =~ s/$pat//g if $pat; # Remove unwanted punctuation
 
-        # XXX Why are there blanks in the returned phrases??
         my @p = grep { $_ } split /\s/, $p;
         next unless @p == $size;
 
-        # Skip a lone single quote (allowed above)
+        # Skip a lone single quote (allowed by the default punctuation)
         next if grep { $_ eq "'" } @p;
+
+        $p = lc $p if $self->lowercase;
 
         $counts->{$p} = $phrase->{$p};
     }
@@ -154,7 +172,7 @@ Text::TFIDF::Ngram - Compute the TF-IDF measure for ngram phrases
 
 =head1 VERSION
 
-version 0.0207
+version 0.0300
 
 =head1 SYNOPSIS
 
@@ -192,6 +210,16 @@ Integer ngram phrase size.  Default is 1.
 
 Boolean indicating that phrases with stopwords will be ignored.  Default is 1.
 
+=head2 punctuation
+
+Regular expression to be used to parse-out unwanted punctuation.
+
+Default: qr/[-!"#$%&()*+,.\/\\:;<=>?@\[\]^_`{|}~]/
+
+=head2 lowercase
+
+Boolean to render the ngrams in lowercase.  Default is 0.
+
 =head2 counts
 
 HashRef of the ngram counts of each processed file.  This is a computed
@@ -207,9 +235,11 @@ attribute - providing it in the constructor will be ignored.
 =head2 new
 
   $obj = Text::TFIDF::Ngram->new(
-    files     => \@files,
-    size      => $size,
-    stopwords => $stopwords,
+    files       => \@files,
+    size        => $size,
+    stopwords   => $stopwords,
+    punctuation => $punctuation,
+    lowercase   => $boolean,
   );
 
 Create a new C<Text::TFIDF::Ngram> object.  If the B<files> argument is passed
@@ -264,7 +294,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

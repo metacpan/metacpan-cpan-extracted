@@ -1,0 +1,20 @@
+[%- USE wrap -%]
+Source: [% spec.deb_name %]
+Section: admin
+Priority: optional
+Maintainer: [% spec.author.list.first %]
+Build-Depends: debhelper (>= 11), cmake, perl (>= 5.16.0)
+Standards-Version: 4.1.3
+Homepage: https://www.lcfg.org/
+[% SET vcs_url = vcs.get_info('URL') -%]
+Vcs-Svn: [% vcs_url %]
+Vcs-Browser: [% vcs_url.replace( 'svn\.lcfg\.org/svn/', 'svn.lcfg.org/viewvc/' ) %]
+
+Package: [% spec.deb_name %]
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}[% IF is_component %],
+    lcfg-om,
+    lcfg-ngeneric[% END %]
+Description: [% spec.abstract %]
+[% wrap(spec.abstract, 72, ' ', ' ') %]
+

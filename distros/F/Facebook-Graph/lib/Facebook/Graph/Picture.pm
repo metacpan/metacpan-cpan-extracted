@@ -1,5 +1,5 @@
 package Facebook::Graph::Picture;
-$Facebook::Graph::Picture::VERSION = '1.1204';
+$Facebook::Graph::Picture::VERSION = '1.1205';
 use Moo;
 with 'Facebook::Graph::Role::Uri';
 
@@ -52,12 +52,12 @@ Facebook::Graph::Picture - Get the URI for the picture of any object.
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 SYNOPSIS
 
  my $fb = Facebook::Graph->new;
- 
+
  my $default_picture =  $fb->picture('16665510298')->uri_as_string;
  my $large_picture = $fb->picture('16665510298')->get_large->uri_as_string;
  my $small_picture = $fb->picture('16665510298')->get_small->uri_as_string;
@@ -133,6 +133,6 @@ Returns a URI string based upon all the methods you've called so far on the quer
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

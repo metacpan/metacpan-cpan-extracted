@@ -4,7 +4,7 @@ Facebook::Graph::Cookbook - A cookbook for Facebook::Graph
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 DESCRIPTION
 
@@ -31,6 +31,6 @@ Shows you how to post as all the different pages under your control.
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

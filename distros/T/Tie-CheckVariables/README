@@ -1,31 +1,84 @@
-Tie-CheckVariables
-==================
+NAME
 
-Tie::CheckVariables aims to simplify the checks of values. In many programs you
-want a variable to get only integer values or email addresses. With Tie::CheckVariables
-you don't have to check the value for each assignment.
+    Tie::CheckVariables - check/validate variables for their data type
 
-INSTALLATION
+VERSION
 
-To install this module type the following:
+    version 0.06
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+SYNOPSIS
 
-DEPENDENCIES
+      use Tie::CheckVariables;
+      
+      tie my $scalar,'Tie::CheckVariables','integer';
+      $scalar = 88; # is ok
+      $scalar = 'test'; # is not ok, throws error
+      
+      untie $scalar;
 
-This module requires these other modules and libraries:
+DATA TYPES
 
-  Carp
+    You can use these data types by default:
 
-COPYRIGHT AND LICENCE
+      * integer
 
-Copyright (C) 2006 by Renee Baecker
+      * float
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.6 or,
-at your option, any later version of Perl 5 you may have available.
+      * string
 
+WHAT TO DO WHEN CHECK FAILS
+
+ on_error
+
+    You can specify a subroutine that is invoked on error:
+
+      use Tie::CheckVariables;
+      
+      Tie::CheckVariables->on_error(sub{print "ERROR!"});
+      
+      tie my $scalar,'Tie::CheckVariables','integer';
+      $scalar = 'a'; # ERROR! is printed
+      untie $scalar;
+
+USE YOUR OWN DATATYPE
+
+ register
+
+    If the built-in data types aren't enough, you can extend this module
+    with your own data types:
+
+      use Tie::CheckVariables;
+      
+      Tie::CheckVariables->register('url','^http://');
+      tie my $test_url,'Tie::CheckVariables','url';
+      $test_url = 'http://www.perl.org';
+      untie $test_url;
+
+USING Type::Tiny
+
+    Since the very first version of this module, a lot has happened. Moose,
+    Moo and other very nice modules were developed. And sometimes later
+    Type::Tiny was written.
+
+    So I added support for Types::Standard now ;-)
+
+      use Tie::CheckVariables;
+      use Types::Standard qw(Int);
+      
+      tie my $test_int,'Tie::CheckVariables', Int;
+      $test_int = 112;
+      $test_int = 'Test'; # throws error
+      untie $test_url;
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2006 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

@@ -1,0 +1,208 @@
+#!perl
+
+our $DATE = '2019-01-17'; # DATE
+our $VERSION = '0.032'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use App::INIUtils;
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+$SPEC{parse_ini} = {
+    v => 1.1,
+    summary => 'Parse INI using Config::IOD::INI module and show the raw result',
+    description => <<'_',
+
+Mostly only useful for developer for debugging purposes.
+
+_
+    args => {
+        %App::INIUtils::args_common,
+    },
+    result_naked => 1,
+    'cmdline.default_format' => 'json-pretty',
+};
+sub parse_ini {
+    my %args = @_;
+
+    my $parser = App::INIUtils::_get_cii_parser(\%args);
+
+    $parser->read_string($args{ini})->{_parsed};
+}
+
+my $cli = Perinci::CmdLine::Any->new(
+    url => '/main/parse_ini',
+    pass_cmdline_object => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+# so help message can be more helpful
+$cli->common_opts->{format}{default} = 'json-pretty';
+$cli->common_opts->{naked_res}{default} = 1;
+
+$cli->run;
+
+# ABSTRACT: Parse INI using Config::IOD::INI module and show the raw result
+# PODNAME: parse-ini
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+parse-ini - Parse INI using Config::IOD::INI module and show the raw result
+
+=head1 VERSION
+
+This document describes version 0.032 of parse-ini (from Perl distribution App-INIUtils), released on 2019-01-17.
+
+=head1 SYNOPSIS
+
+Basic usage:
+
+ % parse-ini /path/to/file.ini
+
+=head1 DESCRIPTION
+
+Mostly only useful for developer for debugging purposes.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ "json-pretty"
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--no-naked-res>
+
+When outputing as JSON, add result envelope.
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Parser options
+
+=over
+
+=item B<--default-section>=I<s>
+
+Default value:
+
+ "GLOBAL"
+
+=item B<--disallow-duplicate-key>
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--ini>=I<s>*
+
+INI file.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C parse-ini parse-ini
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete parse-ini 'p/*/`parse-ini`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-INIUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-INIUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-INIUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

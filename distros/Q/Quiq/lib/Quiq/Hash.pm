@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -615,7 +615,7 @@ sub AUTOLOAD {
 
     if (!exists $this->{$key}) {
         $this->throw(
-            q~HASH-00001: Hash-Schlüssel existiert nicht~,
+            q~HASH-00001: Hash-Schlüssel oder Methode existiert nicht~,
             Attribute=>$key,
             Class=>ref($this)? ref($this): $this,
         );
@@ -1435,7 +1435,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

@@ -7,15 +7,17 @@
 # To escape an open parenthesis in a regular expression use: \x28, for close use: \x29
 # perl Build.PL && perl Build test && sudo perl Build install
 # document and test foot option for format table
+# E for exportable methods
 # write binary data with out complaints about wide characters
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = 20181218;                                                        # Version
+our $VERSION = 20190121;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
 use Cwd;
+use Digest::MD5 qw(md5_hex);
 use File::Path qw(make_path);
 use File::Glob qw(:bsd_glob);
 use File::Temp qw(tempfile tempdir);
@@ -206,10 +208,18 @@ sub fileSize($)                                                                 
   undef                                                                         # File does not exist
  }
 
-sub fileMd5Sum($)                                                               # Get the Md5 sum for a file
- {my ($file) = @_;                                                              # File
-  my $s = qx(md5sum "$file");
-  (split /\s+/, $s)[0];
+sub fileMd5Sum($)                                                               # Get the Md5 sum for a file or string
+ {my ($file) = @_;                                                              # File or string
+  if ($file !~ m(\n)s and -e $file)                                             # From file
+   {my $s = readBinaryFile($file);
+    return md5_hex($s);
+   }
+  else                                                                          # From string - convoluted but necessary to avoid utf8 problems
+   {my $f = writeFile(undef, $file);
+    my $m = &fileMd5Sum($f);
+    unlink $f;
+    return $m;
+   }
  }
 
 sub guidFromMd5($)                                                              # Create a guid from an md5 hash.
@@ -217,6 +227,18 @@ sub guidFromMd5($)                                                              
   length($m) == 32 or confess "Not an md5 hash: ". ($m//"undef");
   join '-', q(GUID), substr($m, 0, 8),  substr($m, 8, 4), substr($m, 12, 4),
                      substr($m, 16, 4), substr($m, 20);
+ }
+
+sub md5FromGuid($)                                                              # Recover an md5 sum from a guid.
+ {my ($g) = @_;                                                                 # Guid
+  length($g) == 41 or confess "Incorrect length for guid: $g";
+  return $g =~ s(guid|-) ()igsr if $g =~ m(\AGUID-[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}\Z)is;
+  confess "Incorrect format for guid: $g";
+ }
+
+sub guidFromString($)                                                           # Create a guid from a file or string via an md5 hash.
+ {my ($string) = @_;                                                            # File name or string
+  guidFromMd5 fileMd5Sum $string
  }
 
 sub fileModTime($)                                                              # Get the modified time of a file in seconds since the epoch.
@@ -252,6 +274,11 @@ sub firstFileThatExists(@)                                                      
    }
   undef                                                                         # No such file
  } # firstFileThatExists
+
+sub fileInWindowsFormat($)                                                      # Convert a unix file name to windows format
+ {my ($file) = @_;                                                              # File
+  $file =~ s(\/) (\\)gsr
+ }
 
 #D2 Components                                                                  # File names and components.
 
@@ -352,16 +379,17 @@ sub removeFilePrefix($@)                                                        
   @f
  }
 
-sub swapFilePrefix($$$)                                                         # Swaps the start of a file name from a known name to a new one,
+sub swapFilePrefix($$$)                                                         # Swaps the start of a file name from a known name to a new one if the file does in fact start with the known name otherwise returns the original file name.
  {my ($file, $known, $new) = @_;                                                # File name, existing prefix, new prefix
-
+  my $L = length($file);
   my $l = length($known);
-  if (length($file) >= $l)
+  if ($L >= $l)
    {if (substr($file, 0, $l) eq $known)
      {return $new.substr($file, $l);
      }
+    return $file;
    }
-  confess "Known longer than file name";
+  confess "Known $l longer than file name $L:\n$known\n$file";
  } # swapFilePrefix
 
 sub trackFiles($@)                                                              #P Track the existence of files.
@@ -531,7 +559,9 @@ sub findAllFilesAndFolders($)                                                   
  {my ($dir) = @_;                                                               # Folder to start the search with
   my @files;                                                                    # Files
   return split /\n/, qx(dir $dir /b /s) if $^O =~ m(MSWin32)i;                  # Execute dir command on windows
-  my $res = qx(find $dir -print0);                                              # Execute find command
+  my $c   = qq(find $dir -print0);                                              # Use find command to find files
+  my $res = qx($c);                                                             # Execute find command
+  defined($res) or confess "No result from find commend below\n$c\n";           # Find failed for some reason
   utf8::decode($res);                                                           # Decode unicode file names
   split /\0/, $res                                                              # Split out file names on \0
  } # findFiles
@@ -565,7 +595,7 @@ sub fileList($)                                                                 
 
 sub searchDirectoryTreesForMatchingFiles(@)                                     #I Search the specified directory trees for the files (not folders) that match the specified extensions. The argument list should include at least one path name to be useful. If no file extension is supplied then all the files below the specified paths are returned.
  {my (@foldersandExtensions) = @_;                                              # Mixture of folder names and extensions
-  my @extensions = grep {!-d $_} @_;                                            # Extensions
+  my @extensions = grep {!-d $_ and !m([\/])} @_;                               # Extensions are not directories
   for(@extensions)                                                              # Prefix period to extension of not all ready there - however this can lead to errors if there happens to be a folder with the same name as an undotted extension.
    {$_ = qq(\.$_) unless m(\A\.)s
    }
@@ -573,6 +603,7 @@ sub searchDirectoryTreesForMatchingFiles(@)                                     
   my @file;                                                                     # Files
   for my $dir(@_)                                                               # Directories
    {next unless -d $dir;                                                        # Do not include folder names
+
     for my $d(findAllFilesAndFolders($dir))                                     # All files and folders beneath each folder
      {next if -d $d;                                                            # Do not include folder names
       push @file, $d if !$ext or $d =~ m(($ext)\Z)is;                           # Filter by extension if requested.
@@ -664,7 +695,7 @@ sub readFile($)                                                                 
  {my ($file) = @_;                                                              # Name of file to read
   defined($file) or
     confess "Cannot read undefined file\n";
-  $file =~ m(\n) and
+  $file =~ m(\n|\r) and
     confess "File name contains a new line:\n=$file=\n";
   -e $file or
     confess "Cannot read file because it does not exist, file:\n$file\n";
@@ -704,7 +735,7 @@ sub readUtf16File($)                                                            
  {my ($file) = @_;                                                              # Name of file to read
   defined($file) or
     confess "Cannot read undefined file\n";
-  $file =~ m(\n) and
+  $file =~ m(\n|\r) and
     confess "File name contains a new line:\n=$file=\n";
   -e $file or
     confess "Cannot read file because it does not exist, file:\n$file\n";
@@ -731,7 +762,7 @@ sub readGZipFile($)                                                             
  {my ($file) = @_;                                                              # File to read.
   defined($file) or
     confess "Cannot read undefined file\n";
-  $file =~ m(\n) and
+  $file =~ m(\n|\r) and
     confess "File name contains a new line:\n=$file=\n";
   -e $file or
     confess "Cannot read file because it does not exist, file:\n$file\n";
@@ -758,6 +789,7 @@ sub makePath($)                                                                 
 sub overWriteFile($$)                                                           # Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess. If the file already exists it is overwritten.
  {my ($file, $string) = @_;                                                     # File to write to or B<undef> for a temporary file, unicode string to write
   $file //= temporaryFile;
+  $file =~ m(\n|\r)s and confess "File name contains a new line:\n=$file=\n";
   $string or carp "No string for file:\n$file\n";
   makePath($file);
   open my $F, ">$file" or
@@ -782,6 +814,7 @@ sub writeFile($$)                                                               
 sub overWriteBinaryFile($$)                                                     # Write a binary string to a file after creating a path to the file if necessary and return the name of the file on success else confess. If the file already exists it is overwritten.
  {my ($file, $string) = @_;                                                     # File to write to or B<undef> for a temporary file, unicode string to write
   $file //= temporaryFile;
+  $file =~ m(\n|\r)s and confess "File name contains a new line:\n=$file=\n";
   $string or carp "No string for binary write to file:\n$file\n";
   makePath($file);
   open my $F, ">$file" or
@@ -789,7 +822,7 @@ sub overWriteBinaryFile($$)                                                     
   binmode($F);
   print  {$F} $string;
   close  ($F);
-  -e $file or confess "Failed to write in binary to file:\n$file\n";
+  -e $file or confess "Failed to write in binary to file:\n=$file=\n$!\n";
   $file
  }
 
@@ -1149,6 +1182,27 @@ sub convertUnicodeToXml($)                                                      
   $t                                                                            # Return resulting string
  }
 
+sub asciiToHexString($)                                                         # Encode an ascii string as a string of hexadecimal digits.
+ {my ($ascii) = @_;                                                             # Ascii string
+  my $c = '';                                                                   # Result
+  for my $a(split //, $ascii)                                                   # Each ascii character
+   {$c .= sprintf("%x", ord $a)                                                 # Format as hex
+   }
+  $c                                                                            # Return string of hexadecimal digits
+ }
+
+sub hexToAsciiString($)                                                         # Decode a string of hexadecimal digits as an ascii string.
+ {my ($hex) = @_;                                                               # Hexadecimal string
+  my @c = grep {m/[0-9a-f]/i} split //, $hex;                                   # Each hexadecimal digit
+  my $c = '';                                                                   # Result
+  for my $i(keys @c)                                                            # Index of each hexadecimal digit
+   {if ($i % 2 == 1)                                                            # End of latest pair
+     {$c .= chr hex $c[$i-1].$c[$i];                                            # Convert to character
+     }
+   }
+  $c                                                                            # Return result
+ }
+
 #D1 Numbers                                                                     # Numeric operations,
 
 sub powerOfTwo($)                                                               # Test whether a number is a power of two, return the power if it is else B<undef>.
@@ -1179,23 +1233,145 @@ sub mergeHashesBySummingValues(@)                                               
   \%h
  }
 
-sub setIntersectionOfSetsOfWords(@)                                             # Intersection of arrays of words.
- {my (@s) = @_;                                                                 # A reference to an array of arrays of words
+sub setCombination(@)                                                           #P Count the elements in sets represented as arrays of strings and/or the keys of hashes
+ {my (@s) = @_;                                                                 # Array of arrays of strings and/or hashes
   my %e;
   for my $s(@s)                                                                 # Intersect each set
-   {reftype($s) =~ m(array)is or confess "Array reference required";
-    for my $e(@$s)                                                              # Count instances of each word
-     {$e{$e}++
+   {my $t = reftype($s);
+    if (!defined $t)                                                            # Scalar as a set of one
+     {$e{$s}++
+     }
+    elsif ($t =~ m(array)is)                                                    # Intersect array of strings
+     {for my $e(@$s)                                                            # Count instances of each string
+       {$e{$e}++
+       }
+     }
+    elsif ($t =~ m(hash)is)                                                     # Intersect keys of hash
+     {for my $e(keys %$s)                                                       # Count instances of each key
+       {$e{$e}++
+       }
+     }
+    else                                                                        # Unknown set type
+     {confess "Unknown set type: $t";
      }
    }
-  my $S = @s;                                                                   # Set count
-  grep {$e{$_} == $S} sort keys %e;                                             # Return words that appear in all the sets
+  \%e                                                                           # Count of each set member
  }
 
-sub setUnionOfWords(@)                                                          # Union of arrays of words.
- {my (@a) = @_;                                                                 # Array of words or arrays of words
-  my %a = map {$_=>1} map {ref($_) ? @$_ : $_} @_;                              # Form union
-  sort keys %a                                                                  # Return words in union
+sub setUnion(@)                                                                 # Union of sets represented as arrays of strings and/or the keys of hashes
+ {my (@s) = @_;                                                                 # Array of arrays of strings and/or hashes
+  my $e = setCombination(@_);
+  sort keys %$e                                                                 # Return words in union
+ }
+
+sub setIntersection(@)                                                          # Intersection of sets represented as arrays of strings and/or the keys of hashes
+ {my (@s) = @_;                                                                 # Array of arrays of strings and/or hashes
+  my $e = setCombination(@_);
+  my $S = @s;                                                                   # Set count
+  grep {$e->{$_} == $S} sort keys %$e                                           # Return words that appear in all the sets
+ }
+
+sub setIntersectionOverUnion(@)                                                 # Returns the size of the intersection over the size of the union of one or more sets represented as arrays and/or hashes
+ {my (@s) = @_;                                                                 # Array of arrays of strings and/or hashes
+  my $e = setCombination(@_);                                                   # Set element count
+  my $u = keys %$e;                                                             # Union size
+  $u == 0 and confess "Empty union";                                            # 0/0 can be anything
+  my $S = @s;                                                                   # Set count
+  my $i = grep {$e->{$_} == $S} keys %$e;                                       # Intersection size
+  $i/$u                                                                         # Return ratio
+ }
+
+sub setPartitionOnIntersectionOverUnion($@)                                     # Partition a set of sets so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets in the partition is never less than the specified B<$confidence**2>
+ {my ($confidence, @sets) = @_;                                                 # Minimum setIntersectionOverUnion, array of arrays of strings and/or hashes representing sets
+  my @s = sort {scalar(@$b) <=> scalar(@$a)} map {[setUnion($_)]} @sets;        # Input sets as arrays in descending order of length
+
+  my @partition;
+  while(@s)                                                                     # The proposed partition
+   {my $base = shift @s;                                                        # Each set starting with the largest
+    next unless defined $base;                                                  # No longer present
+    my @base = ($base);                                                         # Create set of elements congruent with the base set
+    for my $i(keys @s)                                                          # Each remaining set
+     {my $s = $s[$i];                                                           # Current set to compare with base set
+      next unless defined $s;                                                   # Current set has already been classified
+      last if scalar(@$s) < scalar(@$base) * $confidence;                       # Too small in comparison to the base and the sets are in descending order of size so all the remainder will have the same problem
+      my $o = setIntersectionOverUnion($base, $s);                              # Overlap
+      if ($o > $confidence)                                                     # Overlap is better than confidence
+       {push @base, $s;                                                         # Include in partition
+        $s[$i] = undef;                                                         # Remove from further consideration
+       }
+     }
+    push @partition, \@base;                                                    # Save partition
+   }
+  @partition;                                                                   # Return partitions
+ }
+
+sub setPartitionOnIntersectionOverUnionOfSetsOfWords($@)                         # Partition a set of sets of words so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets of words in the partition is never less than the specified B<$confidence**2>
+ {my ($confidence, @sets) = @_;                                                 # Minimum setIntersectionOverUnion, array of arrays of strings and/or hashes representing sets
+
+  my %u;                                                                        # Normalized set to input sets with this normalization
+  for my $s(@sets)                                                              # Each set
+   {push @{$u{join ' ', setUnion($s)}}, $s;                                     # Normalized set back to each input set of words
+   }
+  my @partition = setPartitionOnIntersectionOverUnion($confidence,              # Partition normalized sets
+   map {[split / /, $_]} sort keys %u);                                         # We can split
+
+  my @P;
+  for my $partition(@partition)                                                 # Each partition
+   {my @p;
+    for my $set(@$partition)                                                    # Each set in the current partition
+     {push @p, @{$u{join ' ',  @$set}};
+     }
+
+    push @P, \@p;
+   }
+  @P
+ }
+
+sub setPartitionOnIntersectionOverUnionOfStringSets($@)                         # Partition a set of sets, each set represented by a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2>
+ {my ($confidence, @strings) = @_;                                              # Minimum setIntersectionOverUnion, sets represented by strings
+
+  my %u;                                                                        # Normalized set to input sets with this normalization
+  for my $s(@strings)                                                           # Each set
+   {my $n = $s =~ s([^a-z ]) ()girs =~ s(\s+) ( )gsr;
+    push @{$u{$n}}, $s;                                                         # Normalized set back to each input set of words
+   }
+
+  my @partition = setPartitionOnIntersectionOverUnionOfSetsOfWords($confidence, # Partition normalized strings
+    map {[split /\s+/, $_]} keys %u);
+  my @P;                                                                        # Partition of strings
+  for my $partition(@partition)                                                 # Each partition
+   {my @p;
+    for my $set(@$partition)                                                    # Each set in the current partition
+     {push @p, @{$u{join ' ',  @$set}};
+     }
+
+    push @P, \@p;
+   }
+  @P
+ }
+
+sub setPartitionOnIntersectionOverUnionOfHashStringSets($$)                     # Partition a set of sets represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
+ {my ($confidence, $hashSet) = @_;                                              # Minimum setIntersectionOverUnion, sets represented by the hash value strings
+  reftype($hashSet) =~ m(hash)is or confess "Second parameter must be a hash";
+
+  my %u;                                                                        # Invert the hash so we can present the partitions by hash key
+  for my $s(sort keys %$hashSet)                                                # Each set
+   {push @{$u{$$hashSet{$s}}}, $s;                                              # Invert
+   }
+
+  my @partition = setPartitionOnIntersectionOverUnionOfStringSets($confidence,  # Partition strings
+    sort values %$hashSet);
+
+  my @P;                                                                        # Partition of strings
+  for my $partition(@partition)                                                 # Each partition
+   {my @p;
+    for my $set(@$partition)                                                    # Each set in the current partition
+     {push @p, @{$u{$set}};
+     }
+
+    push @P, \@p;
+   }
+  @P
  }
 
 sub contains($@)                                                                # Returns the indices at which an item matches elements of the specified array. If the item is a regular expression then it is matched as one, else it is a number it is matched as a number, else as a string.
@@ -1219,6 +1395,19 @@ sub contains($@)                                                                
   @r
  }
 
+sub countOccurencesInString($$)                                                 # Returns the number of times the first string occurs in the second string
+ {my ($inString, $searchFor) = @_;                                              # String to search in, string to search for.
+
+  my $n = 0;
+  my $w = length($searchFor);
+  my $W = length($inString);
+  $W >= $w or confess "String to search must be longer than string to look for";
+  for my $p(0..$W-$w)
+   {++$n if substr($inString, $p, $w) eq $searchFor;
+   }
+  $n
+ }
+
 #D1 Minima and Maxima                                                           # Find the smallest and largest elements of arrays.
 
 sub min(@)                                                                      # Find the minimum number in a list confessing to any ill defined values.
@@ -1233,6 +1422,19 @@ sub min(@)                                                                      
   $M
  }
 
+sub indexOfMin(@)                                                               # Find the index of the minimum number in a list confessing to any ill defined values.
+ {my (@m) = @_;                                                                 # Numbers
+  my @n = grep {defined($_) and looks_like_number($_)} @_;
+  @_ == @n or confess q(Undefined or non numeric parameters present);
+  return undef unless @n;
+  my $M = 0;
+  for my $i(keys @n)
+   {my $n = $n[$i];
+    $M = $i if $n < $n[$M];
+   }
+  $M
+ }
+
 sub max(@)                                                                      # Find the maximum number in a list confessing to any ill defined values.
  {my (@m) = @_;                                                                 # Numbers
   my @n = grep {defined($_) and looks_like_number($_)} @_;
@@ -1243,6 +1445,40 @@ sub max(@)                                                                      
    {$M = $_ if $_ > $M;
    }
   $M
+ }
+
+sub indexOfMax(@)                                                               # Find the index of the maximum number in a list confessing to any ill defined values.
+ {my (@m) = @_;                                                                 # Numbers
+  my @n = grep {defined($_) and looks_like_number($_)} @_;
+  @_ == @n or confess q(Undefined or non numeric parameters present);
+  return undef unless @n;
+  my $M = 0;
+  for my $i(keys @n)
+   {my $n = $n[$i];
+    $M = $i if $n > $n[$M];
+   }
+  $M
+ }
+
+sub arraySum(@)                                                                 # Find the sum of any strings that look like numbers in an array
+ {my (@a) = @_;                                                                 # Array to sum
+  my @n = grep {defined($_) and looks_like_number($_)} @_;
+  @_ == @n or confess q(Undefined or non numeric parameters present);
+  my $sum = 0; $sum += $_ for @n;
+  $sum
+ }
+
+sub arrayProduct(@)                                                             # Find the product of any strings that look like numbers in an array
+ {my (@a) = @_;                                                                 # Array to multiply
+  my @n = grep {defined($_) and looks_like_number($_)} @_;
+  @_ == @n or confess q(Undefined or non numeric parameters present);
+  my $product = 1; $product *= $_ for @n;
+  $product
+ }
+
+sub arrayTimes($@)                                                              # Multiply the second and subsequent parameters by the first parameter and return as an array
+ {my ($multiplier, @a) = @_;                                                    # Multiplier, array to multiply and return
+  map {$multiplier * $_} @a
  }
 
 #D1 Format                                                                      # Format data structures as tables.
@@ -1414,6 +1650,8 @@ sub formatTableH($;$)                                                           
   formatTableBasic($d);
  }
 
+our @formatTables;                                                              # tttt Report of all the reports that have been created
+
 sub formatTable($;$%)                                                           #I Format various data structures as a table with titles as specified by B<$columnTitles>: either a reference to an array of column titles or a string each line of which contains the column title as the first word with the rest of the line describing that column.\mOptionally create a report from the table using the following optional report B<%options>:\mB<file=E<gt>$file> the name of a file to write the report to.\mB<head=E<gt>$head> a header line in which DDDD will be replaced with the data and time and NNNN will be replaced with the number of rows in the table.\mB<foot=E<gt>$foot> footer text that will be placed immediately after the table.\mB<summarize=E<gt>$summarize> if true and B<$data> is an array of arrays, then each column of the will be summarized by printing its distinct values and a count of how often each value occurs in a series of smaller tables following the main table.\mB<wide=E<gt>$wide>write a note explaining the need to scroll to the right if true.\mB<msg=E<gt>$msg> if true a summary of the situation will be written to STDERR including the first line of the header and the file being written to.\mB<zero=E<gt>$zero> if true the report will be written to the specified file even if the report is empty.\mParameters:
  {my ($data, $columnTitles, %options) = @_;                                     # Data to be formatted, optional reference to an array of titles or string of column descriptions, options
 
@@ -1458,10 +1696,14 @@ sub formatTable($;$%)                                                           
   return $formattedTable unless keys %options;                                  # Return table as is unless report requested
 
   checkKeys(\%options,                                                          # Check report options
-    {head=><<'END',
+    {title=><<'END',
+Title for the table
+END
+     head=><<'END',
 Header text which will preceed the formatted table.
-DDDD in this line will be replaced with the current date and time.
-NNNN in this line will be replaced with the number of rows in the table.
+DDDD will be replaced with the current date and time.
+NNNN will be replaced with the number of rows in the table.
+TTTT will be replaced with the title from the title keyword
 END
      foot=><<'END',
 Footer text which will follow the table
@@ -1475,24 +1717,34 @@ END
      zero=>q(Write the report even if the table is empty.),
      wide=>q(Write a note explaining the need to scroll to the right if true),
      msg =>q(Write a message to STDERR summarizing the situation if true),
+     csv =>q(Add a line showing the summarized columnn contents in csv format if true),
     });
 
-  my ($head, $foot, $file, $zero, $summarize, $wide, $msg) = map{$options{$_}}  # Options requested
-    qw(head   foot   file   zero   summarize   wide   msg);
+  my ($Title, $head, $foot, $file, $zero, $summarize, $wide, $msg, $csv) = map{$options{$_}} # Options requested
+    qw(title   head   foot   file   zero   summarize   wide   msg   csv);
 
   my @report;
   my $date = dateTimeStamp;
   my $N    = keyCount(1, $data);
   my $H    = ($head//'') =~ s(DDDD) ($date)gr =~ s(NNNN) ($N)gr;
+     $H    =~ s(TTTT_) ($title)gs         if $Title;
+  push @report, $Title                    if $Title;
   push @report, $H                        if $head;
-  push @report, qq(This file: $file), q() if $file;
+  push @report, qq(This file: $file)      if $file;
   push @report, $titleString              if $titleString;
   push @report, <<END                     if $wide;
 Please note that this is a wide report: you might have to scroll
 a long way to the right to see all the columns of data available!
 END
+  push @report, <<END                     if $summarize;
+Summary_of_column                - Count of unique values found in each column                     Use the Geany flick capability by placing your cursor on the first word
+Comma_Separated_Values_of_column - Comma separated list of the unique values found in each column  of these lines and pressing control + down arrow to see each sub report.
+END
+
   push @report, $formattedTable;
   push @report, $foot                     if $foot;
+
+  push @formatTables, [$N, $Title//nws($H, 80), $file];                         # Report of all the reports created
 
   if ($msg and $file and $head)
    {say STDERR $H =~ s(\n.*\Z) ()gsr;
@@ -1505,20 +1757,35 @@ END
      {if ($a and !$h and !$o)
        {for my $col(1..@$title)
          {my $n = $title->[$col-1];
-          my $c = qq(Summary of column: $n);
-          my $t = &formatTable([summarizeColumn($data, $col-1)],
-                              [q(Count), $n]);
+          my $c = qq(Summary_of_column: $n);
+          my @s = summarizeColumn($data, $col-1);
+          my $t = &formatTable(\@s, [q(Count), $n]);
           $s .= qq($c\n$t\n);
+          if (1 or $csv)
+           {my $v = join ",", map {dump($$_[1])} @s;
+            $s .= "Comma_Separated_Values_of_column $n: $v\n\n";
+           }
          }
        }
      }
     push @report, $s;
    }
 
-  my $report = join "\n", @report;
+  my $report = join "\n\n", @report;
   overWriteFile($file, $report) if $file and $a+$h+$o || $zero;                 # Only write the report if there is some data in it or the zero option has been specified to write it regardless.
 
   $report
+ }
+
+sub formattedTablesReport(@)                                                    # Report of all the reports created. The optional parameters are the same as for L<formatTable|/formatTable>
+ {my (@options) = @_;                                                           # Options
+
+  formatTable([sort {($a->[1]//'') cmp ($b->[1]//'')} @formatTables], <<END,
+Rows   Number of entries in table
+Title  Title of the report
+File   File containing the report
+END
+    @options);
  }
 
 sub summarizeColumn($$)                                                         # Count the number of unique instances of each value a column in a table assumes.
@@ -1794,7 +2061,7 @@ sub isSubInPackage($$)                                                          
 sub overrideMethods($$@)                                                        #S For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
  {my ($from, $to, @methods) = @_;                                               # Name of package from which to import methods, package into which to import the methods, list of methods to try importing.
   my @s;
-  for my $method(setUnionOfWords @methods)                                      # Replaceable methods
+  for my $method(setUnion @methods)                                             # Replaceable methods
    {push @s, <<"END";
 if (isSubInPackage(q($from), q($method)))
  {undef &${to}::$method;
@@ -3170,58 +3437,73 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT       = qw(formatTable);
 @EXPORT_OK    = qw(
 absFromAbsPlusRel addCertificate addLValueScalarMethods adopt appendFile
-arrayToHash assertRef assertPackageRefs
+arrayProduct arraySum arrayTimes arrayToHash assertPackageRefs assertRef
+asciiToHexString
 binModeAllUtf8 boldString boldStringUndo
-call checkFile checkFilePath checkFilePathExt checkFilePathDir
-checkKeys clearFolder contains containingPowerOfTwo
-convertDocxToFodt convertImageToJpx convertUnicodeToXml
-copyBinaryFile copyFile copyFolder countFileExtensions countFileTypes
-createEmptyFile currentDirectory currentDirectoryAbove cutOutImagesInFodtFile
-dateStamp dateTimeStamp dateTimeStampName decodeJson decodeBase64
-deSquareArray dumpFile dumpGZipFile
-enclosedString enclosedStringUndo enclosedReversedString enclosedReversedStringUndo
-encodeJson encodeBase64 evalFile evalGZipFile
-fileList fileMd5Sum fileModTime fileOutOfDate
-filePath filePathDir filePathExt fileSize findDirs findFiles
-findFileWithExtension
-firstFileThatExists firstNChars
-formatTableBasic fpd fpe fpf fp fe fn fpn fne fullFileName
-genClass genHash
-genLValueArrayMethods genLValueHashMethods
-genLValueScalarMethods genLValueScalarMethodsWithDefaultValues
-guidFromMd5
+call checkFile checkFilePath checkFilePathDir checkFilePathExt checkKeys
+clearFolder containingPowerOfTwo contains convertDocxToFodt convertImageToJpx
+convertUnicodeToXml copyBinaryFile copyFile copyFolder countFileExtensions
+countFileTypes createEmptyFile currentDirectory currentDirectoryAbove
+cutOutImagesInFodtFile
+dateStamp dateTimeStamp dateTimeStampName decodeBase64 decodeJson deSquareArray
+dumpFile dumpGZipFile
+enclosedReversedString enclosedReversedStringUndo enclosedString
+enclosedStringUndo encodeBase64 encodeJson evalFile evalGZipFile
+fe fileInWindowsFormat fileList fileMd5Sum fileModTime fileOutOfDate filePath filePathDir
+filePathExt fileSize findDirs findFiles findFileWithExtension
+firstFileThatExists firstNChars fn fne formatTableBasic formattedTablesReport fp fpd fpe fpf fpn
+fullFileName
+genClass genHash genLValueArrayMethods genLValueHashMethods
+genLValueScalarMethods genLValueScalarMethodsWithDefaultValues guidFromMd5 guidFromString
+hexToAsciiString
 hostName htmlToc
-imageSize isSubInPackage indentString ipAddressViaArp isBlank isFileUtf8
+imageSize indentString indexOfMax indexOfMin
+ipAddressViaArp isBlank isFileUtf8 isSubInPackage
 javaPackage javaPackageAsFileName
 keyCount
-loadArrayArrayFromLines loadArrayFromLines loadArrayHashFromLines
-loadHash loadHashArrayFromLines loadHashFromLines loadHashHashFromLines
-makeDieConfess
-makePath matchPath max microSecondsSinceEpoch min
-newServiceIncarnation newProcessStarter
-newUdsrServer newUdsrClient
-numberOfLinesInFile numberOfLinesInString
-nws
+loadArrayArrayFromLines loadArrayFromLines loadArrayHashFromLines loadHash
+loadHashArrayFromLines loadHashFromLines loadHashHashFromLines
+makeDieConfess makePath matchPath max md5FromGuid microSecondsSinceEpoch min
+newProcessStarter newServiceIncarnation newUdsrClient newUdsrServer
+numberOfLinesInFile numberOfLinesInString nws
 overWriteBinaryFile overWriteFile owf
-pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName printQw
+pad parseCommandLineArguments parseFileName powerOfTwo printFullFileName
+printQw
 quoteFile
-readBinaryFile readFile readGZipFile readUtf16File relFromAbsAgainstAbs reloadHashes removeBOM removeFilePrefix
-retrieveFile
+readBinaryFile readFile readGZipFile readUtf16File relFromAbsAgainstAbs
+reloadHashes removeBOM removeFilePrefix retrieveFile
 saveCodeToS3 saveSourceToS3 searchDirectoryTreesForMatchingFiles
-setIntersectionOfSetsOfWords setPackageSearchOrder
-setUnionOfWords squareArray startProcess
-storeFile stringsAreNotEqual
-summarizeColumn
-superScriptString superScriptStringUndo subScriptString subScriptStringUndo
-swapFilePrefix
+setIntersectionOfArraysOfStrings setPackageSearchOrder setUnionOfArraysOfStrings squareArray
+startProcess storeFile stringsAreNotEqual subScriptString subScriptStringUndo
+summarizeColumn superScriptString superScriptStringUndo swapFilePrefix
 temporaryDirectory temporaryFile temporaryFolder timeStamp trackFiles trim
 updateDocumentation updatePerlModuleDocumentation userId
 versionCode versionCodeDashed
-waitForAllStartedProcessesToFinish wwwDecode wwwEncode writeBinaryFile writeFile writeFiles writeGZipFile
-xxx XXX
+waitForAllStartedProcessesToFinish writeBinaryFile writeFile writeFiles
+writeGZipFile wwwDecode wwwEncode
+xxx
+XXX
 zzz
 ˢ
 );
+
+if (0)                                                                          # Format exports
+ {my $width = 80;
+  binModeAllUtf8;
+  my @e = sort {lc($a) cmp lc($b)} @EXPORT_OK;
+  my @r = '';
+  for my $i(keys @e)
+   {my $e =  $e[$i];
+    my $E = $i ? $e[$i-1] : q( );
+    if (length($r[-1]) + 1 + length($e) > $width or
+        substr($e, 0, 1) ne substr($E, 0, 1))
+     {push @r, '';
+     }
+    $r[-1] .= qq( $e);
+   }
+  say STDERR "qw(", join("\n", @r);
+ }
+
 %EXPORT_TAGS = (all=>[@EXPORT, @EXPORT_OK]);
 
 #D
@@ -3392,7 +3674,7 @@ Data::Table::Text - Write data in tabular text format.
 Write data in tabular text format.
 
 
-Version 20181218.
+Version 20190121.
 
 
 The following sections describe the methods in each functional area of this
@@ -3683,15 +3965,35 @@ B<Example:>
 
 =head3 fileMd5Sum($)
 
-Get the Md5 sum for a file
+Get the Md5 sum for a file or string
 
      Parameter  Description
-  1  $file      File
+  1  $file      File or string
 
 B<Example:>
 
 
     𝗳𝗶𝗹𝗲𝗠𝗱𝟱𝗦𝘂𝗺(q(/etc/hosts));                                                    
+  
+  if (1) {                                                                           
+    ok 𝗳𝗶𝗹𝗲𝗠𝗱𝟱𝗦𝘂𝗺(join '', 1..100)     eq
+       q(ef69caaaeea9c17120821a9eb6c7f1de);
+  
+    ok guidFromString(join '', 1..100) eq
+       q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de);
+  
+    ok guidFromMd5(𝗳𝗶𝗹𝗲𝗠𝗱𝟱𝗦𝘂𝗺(join('', 1..100))) eq
+       q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de);
+  
+    ok md5FromGuid(q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de)) eq
+                        q(ef69caaaeea9c17120821a9eb6c7f1de);
+  }
+  
+  if (1)
+   {ok arraySum   (1..10) ==  55;                                                 
+    ok arrayProduct(1..5) == 120;                                                 
+    is_deeply[arrayTimes(2, 1..5)], [qw(2 4 6 8 10)];                             
+   }
   
 
 =head3 guidFromMd5($)
@@ -3704,14 +4006,87 @@ Create a guid from an md5 hash.
 B<Example:>
 
 
-  if (1) {                                                                        
-    ok 𝗴𝘂𝗶𝗱𝗙𝗿𝗼𝗺𝗠𝗱𝟱(substr(join('', 0..9) x 4, 0, 32)) eq
-       q(GUID-01234567-8901-2345-6789-012345678901);
+  if (1) {                                                                           
+    ok fileMd5Sum(join '', 1..100)     eq
+       q(ef69caaaeea9c17120821a9eb6c7f1de);
+  
+    ok guidFromString(join '', 1..100) eq
+       q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de);
+  
+    ok 𝗴𝘂𝗶𝗱𝗙𝗿𝗼𝗺𝗠𝗱𝟱(fileMd5Sum(join('', 1..100))) eq
+       q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de);
+  
+    ok md5FromGuid(q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de)) eq
+                        q(ef69caaaeea9c17120821a9eb6c7f1de);
   }
   
-  #tttt
+  if (1)
+   {ok arraySum   (1..10) ==  55;                                                 
+    ok arrayProduct(1..5) == 120;                                                 
+    is_deeply[arrayTimes(2, 1..5)], [qw(2 4 6 8 10)];                             
+   }
   
-  1
+
+=head3 md5FromGuid($)
+
+Recover an md5 sum from a guid.
+
+     Parameter  Description
+  1  $g         Guid
+
+B<Example:>
+
+
+  if (1) {                                                                           
+    ok fileMd5Sum(join '', 1..100)     eq
+       q(ef69caaaeea9c17120821a9eb6c7f1de);
+  
+    ok guidFromString(join '', 1..100) eq
+       q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de);
+  
+    ok guidFromMd5(fileMd5Sum(join('', 1..100))) eq
+       q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de);
+  
+    ok 𝗺𝗱𝟱𝗙𝗿𝗼𝗺𝗚𝘂𝗶𝗱(q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de)) eq
+                        q(ef69caaaeea9c17120821a9eb6c7f1de);
+  }
+  
+  if (1)
+   {ok arraySum   (1..10) ==  55;                                                 
+    ok arrayProduct(1..5) == 120;                                                 
+    is_deeply[arrayTimes(2, 1..5)], [qw(2 4 6 8 10)];                             
+   }
+  
+
+=head3 guidFromString($)
+
+Create a guid from a file or string via an md5 hash.
+
+     Parameter  Description
+  1  $string    File name or string
+
+B<Example:>
+
+
+  if (1) {                                                                           
+    ok fileMd5Sum(join '', 1..100)     eq
+       q(ef69caaaeea9c17120821a9eb6c7f1de);
+  
+    ok 𝗴𝘂𝗶𝗱𝗙𝗿𝗼𝗺𝗦𝘁𝗿𝗶𝗻𝗴(join '', 1..100) eq
+       q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de);
+  
+    ok guidFromMd5(fileMd5Sum(join('', 1..100))) eq
+       q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de);
+  
+    ok md5FromGuid(q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de)) eq
+                        q(ef69caaaeea9c17120821a9eb6c7f1de);
+  }
+  
+  if (1)
+   {ok arraySum   (1..10) ==  55;                                                 
+    ok arrayProduct(1..5) == 120;                                                 
+    is_deeply[arrayTimes(2, 1..5)], [qw(2 4 6 8 10)];                             
+   }
   
 
 =head3 fileModTime($)
@@ -3787,6 +4162,21 @@ B<Example:>
     my $d = temporaryFolder;                                                      
   
     ok $d eq 𝗳𝗶𝗿𝘀𝘁𝗙𝗶𝗹𝗲𝗧𝗵𝗮𝘁𝗘𝘅𝗶𝘀𝘁𝘀("$d/$d", $d);                                    
+  
+
+=head3 fileInWindowsFormat($)
+
+Convert a unix file name to windows format
+
+     Parameter  Description
+  1  $file      File
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {ok 𝗳𝗶𝗹𝗲𝗜𝗻𝗪𝗶𝗻𝗱𝗼𝘄𝘀𝗙𝗼𝗿𝗺𝗮𝘁(fpd(qw(/a b c d))) eq q(\a\b\c\d\\);
+   }
   
 
 =head2 Components
@@ -4001,7 +4391,7 @@ B<Example:>
 
 =head4 swapFilePrefix($$$)
 
-Swaps the start of a file name from a known name to a new one,
+Swaps the start of a file name from a known name to a new one if the file does in fact start with the known name otherwise returns the original file name.
 
      Parameter  Description
   1  $file      File name
@@ -5101,6 +5491,38 @@ B<Example:>
   ok 𝗰𝗼𝗻𝘃𝗲𝗿𝘁𝗨𝗻𝗶𝗰𝗼𝗱𝗲𝗧𝗼𝗫𝗺𝗹('setenta e três') eq q(setenta e tr&#234;s);             
   
 
+=head2 asciiToHexString($)
+
+Encode an ascii string as a string of hexadecimal digits.
+
+     Parameter  Description
+  1  $ascii     Ascii string
+
+B<Example:>
+
+
+  if (1) {                                                                         
+    ok 𝗮𝘀𝗰𝗶𝗶𝗧𝗼𝗛𝗲𝘅𝗦𝘁𝗿𝗶𝗻𝗴("Hello World!") eq                  "48656c6c6f20576f726c6421";
+    ok                  "Hello World!"  eq hexToAsciiString("48656c6c6f20576f726c6421");
+   }
+  
+
+=head2 hexToAsciiString($)
+
+Decode a string of hexadecimal digits as an ascii string.
+
+     Parameter  Description
+  1  $hex       Hexadecimal string
+
+B<Example:>
+
+
+  if (1) {                                                                         
+    ok asciiToHexString("Hello World!") eq                  "48656c6c6f20576f726c6421";
+    ok                  "Hello World!"  eq 𝗵𝗲𝘅𝗧𝗼𝗔𝘀𝗰𝗶𝗶𝗦𝘁𝗿𝗶𝗻𝗴("48656c6c6f20576f726c6421");
+   }
+  
+
 =head1 Numbers
 
 Numeric operations,
@@ -5164,33 +5586,164 @@ B<Example:>
    }
   
 
-=head2 setIntersectionOfSetsOfWords(@)
+=head2 setUnion(@)
 
-Intersection of arrays of words.
+Union of sets represented as arrays of strings and/or the keys of hashes
 
      Parameter  Description
-  1  @s         A reference to an array of arrays of words
+  1  @s         Array of arrays of strings and/or hashes
 
 B<Example:>
 
 
   if (1) {                                                                        
-    is_deeply [qw(a b c)],
-     [𝘀𝗲𝘁𝗜𝗻𝘁𝗲𝗿𝘀𝗲𝗰𝘁𝗶𝗼𝗻𝗢𝗳𝗦𝗲𝘁𝘀𝗢𝗳𝗪𝗼𝗿𝗱𝘀([qw(e f g a b c )], [qw(a A b B c C)])];
+    is_deeply [qw(a b c)],     [𝘀𝗲𝘁𝗨𝗻𝗶𝗼𝗻(qw(a b c a a b b b))];
+    is_deeply [qw(a b c d e)], [𝘀𝗲𝘁𝗨𝗻𝗶𝗼𝗻 {a=>1, b=>2, e=>3}, [qw(c d e)], qw(e)];
    }
   
 
-=head2 setUnionOfWords(@)
+=head2 setIntersection(@)
 
-Union of arrays of words.
+Intersection of sets represented as arrays of strings and/or the keys of hashes
 
      Parameter  Description
-  1  @a         Array of words or arrays of words
+  1  @s         Array of arrays of strings and/or hashes
 
 B<Example:>
 
 
-  is_deeply [qw(a b c)], [𝘀𝗲𝘁𝗨𝗻𝗶𝗼𝗻𝗢𝗳𝗪𝗼𝗿𝗱𝘀(qw(a b c a a b b b))];                  
+  if (1) {                                                                        
+    is_deeply [qw(a b c)], [𝘀𝗲𝘁𝗜𝗻𝘁𝗲𝗿𝘀𝗲𝗰𝘁𝗶𝗼𝗻[qw(e f g a b c )],[qw(a A b B c C)]];
+    is_deeply [qw(e)],   [𝘀𝗲𝘁𝗜𝗻𝘁𝗲𝗿𝘀𝗲𝗰𝘁𝗶𝗼𝗻 {a=>1, b=>2, e=>3}, [qw(c d e)], qw(e)];
+   }
+  
+
+=head2 setIntersectionOverUnion(@)
+
+Returns the size of the intersection over the size of the union of one or more sets represented as arrays and/or hashes
+
+     Parameter  Description
+  1  @s         Array of arrays of strings and/or hashes
+
+B<Example:>
+
+
+  if (1) {                                                                        
+    my $f = 𝘀𝗲𝘁𝗜𝗻𝘁𝗲𝗿𝘀𝗲𝗰𝘁𝗶𝗼𝗻𝗢𝘃𝗲𝗿𝗨𝗻𝗶𝗼𝗻 {a=>1, b=>2, e=>3}, [qw(c d e)], qw(e);
+    ok $f > 0.199999 && $f < 2.00001;
+   }
+  
+
+=head2 setPartitionOnIntersectionOverUnion($@)
+
+Partition a set of sets so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets in the partition is never less than the specified B<$confidence**2>
+
+     Parameter    Description
+  1  $confidence  Minimum setIntersectionOverUnion
+  2  @sets        Array of arrays of strings and/or hashes representing sets
+
+B<Example:>
+
+
+  if (1) {                                                                        
+    is_deeply [𝘀𝗲𝘁𝗣𝗮𝗿𝘁𝗶𝘁𝗶𝗼𝗻𝗢𝗻𝗜𝗻𝘁𝗲𝗿𝘀𝗲𝗰𝘁𝗶𝗼𝗻𝗢𝘃𝗲𝗿𝗨𝗻𝗶𝗼𝗻
+     (0.80,
+       [qw(a A   b c d e)],
+       [qw(a A B b c d e)],
+       [qw(a A B C b c d)],
+     )],
+    [[["A", "B", "a".."e"],
+      ["A",      "a".."e"]],
+     [["A".."C", "a".."d"]],
+    ];
+  }
+  
+  
+  
+  
+  if (1) {                                                                        
+  is_deeply [setPartitionOnIntersectionOverUnionOfSetsOfWords
+     (0.80,
+       [qw(a A   b c d e)],
+       [qw(a A B b c d e)],
+       [qw(a A B C b c d)],
+     )],
+   [[["a", "A", "B", "C", "b", "c", "d"]],
+    [["a", "A", "B", "b" .. "e"], ["a", "A", "b" .. "e"]],
+   ];
+   }
+  
+
+=head2 setPartitionOnIntersectionOverUnionOfSetsOfWords($@)
+
+Partition a set of sets of words so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets of words in the partition is never less than the specified B<$confidence**2>
+
+     Parameter    Description
+  1  $confidence  Minimum setIntersectionOverUnion
+  2  @sets        Array of arrays of strings and/or hashes representing sets
+
+B<Example:>
+
+
+  if (1) {                                                                        
+  is_deeply [𝘀𝗲𝘁𝗣𝗮𝗿𝘁𝗶𝘁𝗶𝗼𝗻𝗢𝗻𝗜𝗻𝘁𝗲𝗿𝘀𝗲𝗰𝘁𝗶𝗼𝗻𝗢𝘃𝗲𝗿𝗨𝗻𝗶𝗼𝗻𝗢𝗳𝗦𝗲𝘁𝘀𝗢𝗳𝗪𝗼𝗿𝗱𝘀
+     (0.80,
+       [qw(a A   b c d e)],
+       [qw(a A B b c d e)],
+       [qw(a A B C b c d)],
+     )],
+   [[["a", "A", "B", "C", "b", "c", "d"]],
+    [["a", "A", "B", "b" .. "e"], ["a", "A", "b" .. "e"]],
+   ];
+   }
+  
+
+=head2 setPartitionOnIntersectionOverUnionOfStringSets($@)
+
+Partition a set of sets, each set represented by a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2>
+
+     Parameter    Description
+  1  $confidence  Minimum setIntersectionOverUnion
+  2  @strings     Sets represented by strings
+
+B<Example:>
+
+
+  if (1) {                                                                        
+  is_deeply [𝘀𝗲𝘁𝗣𝗮𝗿𝘁𝗶𝘁𝗶𝗼𝗻𝗢𝗻𝗜𝗻𝘁𝗲𝗿𝘀𝗲𝗰𝘁𝗶𝗼𝗻𝗢𝘃𝗲𝗿𝗨𝗻𝗶𝗼𝗻𝗢𝗳𝗦𝘁𝗿𝗶𝗻𝗴𝗦𝗲𝘁𝘀
+     (0.80,
+       q(The Emu            are seen here sometimes.),
+       q(The Emu, Gnu       are seen here sometimes.),
+       q(The Emu, Gnu, Colt are seen here.),
+     )],
+   [["The Emu, Gnu, Colt are seen here."],
+    ["The Emu, Gnu       are seen here sometimes.",
+     "The Emu            are seen here sometimes.",
+    ]];
+   }
+  
+
+=head2 setPartitionOnIntersectionOverUnionOfHashStringSets($$)
+
+Partition a set of sets represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
+
+     Parameter    Description
+  1  $confidence  Minimum setIntersectionOverUnion
+  2  $hashSet     Sets represented by the hash value strings
+
+B<Example:>
+
+
+  if (1) {                                                                        
+  is_deeply [𝘀𝗲𝘁𝗣𝗮𝗿𝘁𝗶𝘁𝗶𝗼𝗻𝗢𝗻𝗜𝗻𝘁𝗲𝗿𝘀𝗲𝗰𝘁𝗶𝗼𝗻𝗢𝘃𝗲𝗿𝗨𝗻𝗶𝗼𝗻𝗢𝗳𝗛𝗮𝘀𝗵𝗦𝘁𝗿𝗶𝗻𝗴𝗦𝗲𝘁𝘀
+     (0.80,
+       {e  =>q(The Emu            are seen here sometimes.),
+        eg =>q(The Emu, Gnu       are seen here sometimes.),
+        egc=>q(The Emu, Gnu, Colt are seen here.),
+       }
+     )],
+   [["egc"], ["eg", "e"]];
+   }
   
 
 =head2 contains($@)
@@ -5213,6 +5766,22 @@ B<Example:>
   is_deeply [0, 1, 5], [𝗰𝗼𝗻𝘁𝗮𝗶𝗻𝘀(qr(a+), qw(a baa c d e aa b c d e))];            
   
 
+=head2 countOccurencesInString($$)
+
+Returns the number of times the first string occurs in the second string
+
+     Parameter   Description
+  1  $inString   String to search in
+  2  $searchFor  String to search for.
+
+B<Example:>
+
+
+  if (1)                                                                          
+   {ok 𝗰𝗼𝘂𝗻𝘁𝗢𝗰𝗰𝘂𝗿𝗲𝗻𝗰𝗲𝘀𝗜𝗻𝗦𝘁𝗿𝗶𝗻𝗴(q(a<b>c<b><b>d), q(<b>)) == 3;
+   }
+  
+
 =head1 Minima and Maxima
 
 Find the smallest and largest elements of arrays.
@@ -5232,6 +5801,19 @@ B<Example:>
   ok 𝗺𝗶𝗻(5,4,2,3) == 2;                                                           
   
 
+=head2 indexOfMin(@)
+
+Find the index of the minimum number in a list confessing to any ill defined values.
+
+     Parameter  Description
+  1  @m         Numbers
+
+B<Example:>
+
+
+    ok 𝗶𝗻𝗱𝗲𝘅𝗢𝗳𝗠𝗶𝗻(qw(2 3 1 2)) == 2;                                              
+  
+
 =head2 max(@)
 
 Find the maximum number in a list confessing to any ill defined values.
@@ -5247,6 +5829,59 @@ B<Example:>
   ok 𝗺𝗮𝘅(1) == 1;                                                                 
   
   ok 𝗺𝗮𝘅(1,4,2,3) == 4;                                                           
+  
+
+=head2 indexOfMax(@)
+
+Find the index of the maximum number in a list confessing to any ill defined values.
+
+     Parameter  Description
+  1  @m         Numbers
+
+B<Example:>
+
+
+   {ok 𝗶𝗻𝗱𝗲𝘅𝗢𝗳𝗠𝗮𝘅(qw(2 3 1 2)) == 1;                                              
+  
+
+=head2 arraySum(@)
+
+Find the sum of any strings that look like numbers in an array
+
+     Parameter  Description
+  1  @a         Array to sum
+
+B<Example:>
+
+
+   {ok 𝗮𝗿𝗿𝗮𝘆𝗦𝘂𝗺   (1..10) ==  55;                                                 
+  
+
+=head2 arrayProduct(@)
+
+Find the product of any strings that look like numbers in an array
+
+     Parameter  Description
+  1  @a         Array to multiply
+
+B<Example:>
+
+
+    ok 𝗮𝗿𝗿𝗮𝘆𝗣𝗿𝗼𝗱𝘂𝗰𝘁(1..5) == 120;                                                 
+  
+
+=head2 arrayTimes($@)
+
+Multiply the second and subsequent parameters by the first parameter and return as an array
+
+     Parameter    Description
+  1  $multiplier  Multiplier
+  2  @a           Array to multiply and return
+
+B<Example:>
+
+
+    is_deeply[𝗮𝗿𝗿𝗮𝘆𝗧𝗶𝗺𝗲𝘀(2, 1..5)], [qw(2 4 6 8 10)];                             
   
 
 =head1 Format
@@ -5428,7 +6063,7 @@ B<Example:>
     ok -e $file;
     ok readFile($file) eq $t;
     unlink $file;
-    ok $t eq <<END;
+    ok nws($t) eq nws(<<END);
   Sample report.
   
   Table has 2 rows.
@@ -5439,6 +6074,37 @@ B<Example:>
   1  a
   2     b
         c
+  END
+   }
+  
+
+=head2 formattedTablesReport(@)
+
+Report of all the reports created. The optional parameters are the same as for L<formatTable|/formatTable>
+
+     Parameter  Description
+  1  @options   Options
+
+B<Example:>
+
+
+  if (1) {                                                                        
+    @formatTables = ();
+  
+    for my $m(2..8)
+     {formatTable([map {[$_, $_*$m]} 1..$m], [q(Single), qq(* $m)],
+        title=>qq(Multiply by $m));
+     }
+  
+    ok nws(𝗳𝗼𝗿𝗺𝗮𝘁𝘁𝗲𝗱𝗧𝗮𝗯𝗹𝗲𝘀𝗥𝗲𝗽𝗼𝗿𝘁) eq nws(<<END);
+     Rows  Title          File
+  1     2  Multiply by 2
+  2     3  Multiply by 3
+  3     4  Multiply by 4
+  4     5  Multiply by 5
+  5     6  Multiply by 6
+  6     7  Multiply by 7
+  7     8  Multiply by 8
   END
    }
   
@@ -5464,6 +6130,9 @@ B<Example:>
       [qw(Col-1 Col-2)],
        summarize=>1)) eq nws(<<'END');
   
+  Summary_of_column                - Count of unique values found in each column                     Use the Geany flick capability by placing your cursor on the first word
+  Comma_Separated_Values_of_column - Comma separated list of the unique values found in each column  of these lines and pressing control + down arrow to see each sub report.
+  
       Col-1  Col-2
    1  A      A
    2  C      B
@@ -5481,19 +6150,24 @@ B<Example:>
   14  B      B
   15  B      D
   
-  Summary of column: Col-1
+  Summary_of_column: Col-1
      Count  Col-1
   1      5  C
   2      4  B
   3      3  A
   4      3  D
   
-  Summary of column: Col-2
+  Comma_Separated_Values_of_column Col-1: "C","B","A","D"
+  
+  Summary_of_column: Col-2
      Count  Col-2
   1      6  D
   2      4  C
   3      3  B
   4      2  A
+  
+  Comma_Separated_Values_of_column Col-2: "D","C","B","A"
+  
   END
    }
   
@@ -7378,6 +8052,13 @@ Convert an image to jpx format using versions of L<Imagemagick|https://www.image
   3  $Size      Optional size of each tile - defaults to 256
   4  $Tiles     Optional limit on the number of tiles in either dimension
 
+=head2 setCombination(@)
+
+Count the elements in sets represented as arrays of strings and/or the keys of hashes
+
+     Parameter  Description
+  1  @s         Array of arrays of strings and/or hashes
+
 =head2 formatTableMultiLine($$)
 
 Tabularize text that has new lines in it.
@@ -7558,379 +8239,415 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 4 L<appendFile|/appendFile> - Append a unicode utf8 string to a file, possibly creating the file and the path to the file if necessary and return the name of the file on success else confess.
 
-5 L<arrayToHash|/arrayToHash> - Create a hash from an array
+5 L<arrayProduct|/arrayProduct> - Find the product of any strings that look like numbers in an array
 
-6 L<assertPackageRefs|/assertPackageRefs> - Confirm that the specified references are to the specified package
+6 L<arraySum|/arraySum> - Find the sum of any strings that look like numbers in an array
 
-7 L<assertRef|/assertRef> - Confirm that the specified references are to the package into which this routine has been exported.
+7 L<arrayTimes|/arrayTimes> - Multiply the second and subsequent parameters by the first parameter and return as an array
 
-8 L<binModeAllUtf8|/binModeAllUtf8> - Set STDOUT and STDERR to accept utf8 without complaint.
+8 L<arrayToHash|/arrayToHash> - Create a hash from an array
 
-9 L<boldString|/boldString> - Convert alphanumerics in a string to bold.
+9 L<asciiToHexString|/asciiToHexString> - Encode an ascii string as a string of hexadecimal digits.
 
-10 L<boldStringUndo|/boldStringUndo> - Undo alphanumerics in a string to bold.
+10 L<assertPackageRefs|/assertPackageRefs> - Confirm that the specified references are to the specified package
 
-11 L<call|/call> - Call the specified sub in a separate process, wait for it to complete, copy back the named L<our|https://perldoc.perl.org/functions/our.html> variables, free the memory used.
+11 L<assertRef|/assertRef> - Confirm that the specified references are to the package into which this routine has been exported.
 
-12 L<checkFile|/checkFile> - Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
+12 L<binModeAllUtf8|/binModeAllUtf8> - Set STDOUT and STDERR to accept utf8 without complaint.
 
-13 L<checkKeys|/checkKeys> - Check the keys in a hash.
+13 L<boldString|/boldString> - Convert alphanumerics in a string to bold.
 
-14 L<clearFolder|/clearFolder> - Remove all the files and folders under and including the specified folder as long as the number of files to be removed is less than the specified limit.
+14 L<boldStringUndo|/boldStringUndo> - Undo alphanumerics in a string to bold.
 
-15 L<containingPowerOfTwo|/containingPowerOfTwo> - Find log two of the lowest power of two greater than or equal to a number.
+15 L<call|/call> - Call the specified sub in a separate process, wait for it to complete, copy back the named L<our|https://perldoc.perl.org/functions/our.html> variables, free the memory used.
 
-16 L<contains|/contains> - Returns the indices at which an item matches elements of the specified array.
+16 L<checkFile|/checkFile> - Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
 
-17 L<convertDocxToFodt|/convertDocxToFodt> - Convert a B<docx> file to B<fodt> using B<unoconv> which must not be running elsewhere at the time.
+17 L<checkKeys|/checkKeys> - Check the keys in a hash.
 
-18 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|https://www.imagemagick.org/script/index.php> applying an optional scaling if required.
+18 L<clearFolder|/clearFolder> - Remove all the files and folders under and including the specified folder as long as the number of files to be removed is less than the specified limit.
 
-19 L<convertImageToJpx690|/convertImageToJpx690> - Convert an image to jpx format using versions of L<Imagemagick|https://www.imagemagick.org/script/index.php> version 6.
+19 L<containingPowerOfTwo|/containingPowerOfTwo> - Find log two of the lowest power of two greater than or equal to a number.
 
-20 L<convertUnicodeToXml|/convertUnicodeToXml> - Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents.
+20 L<contains|/contains> - Returns the indices at which an item matches elements of the specified array.
 
-21 L<copyBinaryFile|/copyBinaryFile> - Copy a binary file
+21 L<convertDocxToFodt|/convertDocxToFodt> - Convert a B<docx> file to B<fodt> using B<unoconv> which must not be running elsewhere at the time.
 
-22 L<copyFile|/copyFile> - Copy a file encoded in utf8
+22 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|https://www.imagemagick.org/script/index.php> applying an optional scaling if required.
 
-23 L<copyFolder|/copyFolder> - Copy a folder
+23 L<convertImageToJpx690|/convertImageToJpx690> - Convert an image to jpx format using versions of L<Imagemagick|https://www.imagemagick.org/script/index.php> version 6.
 
-24 L<countFileExtensions|/countFileExtensions> - Return a hash which counts the file extensions under the specified directories
+24 L<convertUnicodeToXml|/convertUnicodeToXml> - Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents.
 
-25 L<countFileTypes|/countFileTypes> - Return a hash which counts, in parallel, the results of applying the B<file> command to each file under the specified directories.
+25 L<copyBinaryFile|/copyBinaryFile> - Copy a binary file
 
-26 L<countSquareArray|/countSquareArray> - Count the number of elements in a square array
+26 L<copyFile|/copyFile> - Copy a file encoded in utf8
 
-27 L<createEmptyFile|/createEmptyFile> - Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
+27 L<copyFolder|/copyFolder> - Copy a folder
 
-28 L<currentDirectory|/currentDirectory> - Get the current working directory.
+28 L<countFileExtensions|/countFileExtensions> - Return a hash which counts the file extensions under the specified directories
 
-29 L<currentDirectoryAbove|/currentDirectoryAbove> - The path to the folder above the current working folder.
+29 L<countFileTypes|/countFileTypes> - Return a hash which counts, in parallel, the results of applying the B<file> command to each file under the specified directories.
 
-30 L<cutOutImagesInFodtFile|/cutOutImagesInFodtFile> - Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
+30 L<countOccurencesInString|/countOccurencesInString> - Returns the number of times the first string occurs in the second string
+
+31 L<countSquareArray|/countSquareArray> - Count the number of elements in a square array
+
+32 L<createEmptyFile|/createEmptyFile> - Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
+
+33 L<currentDirectory|/currentDirectory> - Get the current working directory.
+
+34 L<currentDirectoryAbove|/currentDirectoryAbove> - The path to the folder above the current working folder.
+
+35 L<cutOutImagesInFodtFile|/cutOutImagesInFodtFile> - Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
 
   <image href="$imageFile" outputclass="imageType">.
 
-31 L<Data::Exchange::Service::check|/Data::Exchange::Service::check> - Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>.
+36 L<Data::Exchange::Service::check|/Data::Exchange::Service::check> - Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>.
 
-32 L<Data::Table::Text::Starter::averageProcessTime|/Data::Table::Text::Starter::averageProcessTime> - Average elapsed time spent by each process
+37 L<Data::Table::Text::Starter::averageProcessTime|/Data::Table::Text::Starter::averageProcessTime> - Average elapsed time spent by each process
 
-33 L<Data::Table::Text::Starter::finish|/Data::Table::Text::Starter::finish> - Wait for all started processes to finish and return their results as an array.
+38 L<Data::Table::Text::Starter::finish|/Data::Table::Text::Starter::finish> - Wait for all started processes to finish and return their results as an array.
 
-34 L<Data::Table::Text::Starter::logEntry|/Data::Table::Text::Starter::logEntry> - Create a log entry showing progress and eta.
+39 L<Data::Table::Text::Starter::logEntry|/Data::Table::Text::Starter::logEntry> - Create a log entry showing progress and eta.
 
-35 L<Data::Table::Text::Starter::say|/Data::Table::Text::Starter::say> - Write to the log file if it is available.
+40 L<Data::Table::Text::Starter::say|/Data::Table::Text::Starter::say> - Write to the log file if it is available.
 
-36 L<Data::Table::Text::Starter::start|/Data::Table::Text::Starter::start> - Start a new process to run the specified B<$sub>.
+41 L<Data::Table::Text::Starter::start|/Data::Table::Text::Starter::start> - Start a new process to run the specified B<$sub>.
 
-37 L<Data::Table::Text::Starter::waitOne|/Data::Table::Text::Starter::waitOne> - Wait for at least one process to finish and consolidate its results.
+42 L<Data::Table::Text::Starter::waitOne|/Data::Table::Text::Starter::waitOne> - Wait for at least one process to finish and consolidate its results.
 
-38 L<dateStamp|/dateStamp> - Year-monthName-day
+43 L<dateStamp|/dateStamp> - Year-monthName-day
 
-39 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
+44 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
 
-40 L<dateTimeStampName|/dateTimeStampName> - Date time stamp without white space.
+45 L<dateTimeStampName|/dateTimeStampName> - Date time stamp without white space.
 
-41 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
+46 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
 
-42 L<decodeJson|/decodeJson> - Decode Perl from Json.
+47 L<decodeJson|/decodeJson> - Decode Perl from Json.
 
-43 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
+48 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
 
-44 L<deSquareArray|/deSquareArray> - Create a one dimensional array from a two dimensional array of arrays
+49 L<deSquareArray|/deSquareArray> - Create a one dimensional array from a two dimensional array of arrays
 
-45 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
+50 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
 
-46 L<dumpFile|/dumpFile> - Dump a data structure to a file
+51 L<dumpFile|/dumpFile> - Dump a data structure to a file
 
-47 L<dumpGZipFile|/dumpGZipFile> - Write a data structure through B<gzip> to a file.
+52 L<dumpGZipFile|/dumpGZipFile> - Write a data structure through B<gzip> to a file.
 
-48 L<enclosedReversedString|/enclosedReversedString> - Convert alphanumerics in a string to enclosed reversed alphanumerics.
+53 L<enclosedReversedString|/enclosedReversedString> - Convert alphanumerics in a string to enclosed reversed alphanumerics.
 
-49 L<enclosedReversedStringUndo|/enclosedReversedStringUndo> - Undo alphanumerics in a string to enclosed reversed alphanumerics.
+54 L<enclosedReversedStringUndo|/enclosedReversedStringUndo> - Undo alphanumerics in a string to enclosed reversed alphanumerics.
 
-50 L<enclosedString|/enclosedString> - Convert alphanumerics in a string to enclosed alphanumerics.
+55 L<enclosedString|/enclosedString> - Convert alphanumerics in a string to enclosed alphanumerics.
 
-51 L<enclosedStringUndo|/enclosedStringUndo> - Undo alphanumerics in a string to enclosed alphanumerics.
+56 L<enclosedStringUndo|/enclosedStringUndo> - Undo alphanumerics in a string to enclosed alphanumerics.
 
-52 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
+57 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
 
-53 L<encodeJson|/encodeJson> - Encode Perl to Json.
+58 L<encodeJson|/encodeJson> - Encode Perl to Json.
 
-54 L<evalFile|/evalFile> - Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
+59 L<evalFile|/evalFile> - Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
 
-55 L<evalGZipFile|/evalGZipFile> - Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
+60 L<evalGZipFile|/evalGZipFile> - Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
 
-56 L<extractTest|/extractTest> - Remove example markers from test code.
+61 L<extractTest|/extractTest> - Remove example markers from test code.
 
-57 L<fe|/fe> - Get extension of file name.
+62 L<fe|/fe> - Get extension of file name.
 
-58 L<fileList|/fileList> - Files that match a given search pattern handed to bsd_glob.
+63 L<fileInWindowsFormat|/fileInWindowsFormat> - Convert a unix file name to windows format
 
-59 L<fileMd5Sum|/fileMd5Sum> - Get the Md5 sum for a file
+64 L<fileList|/fileList> - Files that match a given search pattern handed to bsd_glob.
 
-60 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
+65 L<fileMd5Sum|/fileMd5Sum> - Get the Md5 sum for a file or string
 
-61 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
+66 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
 
-62 L<filePath|/filePath> - Create a file name from an array of file name components.
+67 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
 
-63 L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
+68 L<filePath|/filePath> - Create a file name from an array of file name components.
 
-64 L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
+69 L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
 
-65 L<fileSize|/fileSize> - Get the size of a file.
+70 L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
 
-66 L<findAllFilesAndFolders|/findAllFilesAndFolders> - Find all the files and folders under a folder.
+71 L<fileSize|/fileSize> - Get the size of a file.
 
-67 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
+72 L<findAllFilesAndFolders|/findAllFilesAndFolders> - Find all the files and folders under a folder.
 
-68 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
+73 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
 
-69 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
+74 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
 
-70 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or B<undef> if none of the named files exist.
+75 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
 
-71 L<firstNChars|/firstNChars> - First N characters of a string.
+76 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or B<undef> if none of the named files exist.
 
-72 L<fn|/fn> - Remove path and extension from file name.
+77 L<firstNChars|/firstNChars> - First N characters of a string.
 
-73 L<fne|/fne> - Remove path from file name.
+78 L<fn|/fn> - Remove path and extension from file name.
 
-74 L<formatTable|/formatTable> - Format various data structures as a table with titles as specified by B<$columnTitles>: either a reference to an array of column titles or a string each line of which contains the column title as the first word with the rest of the line describing that column.
+79 L<fne|/fne> - Remove path from file name.
 
-75 L<formatTableA|/formatTableA> - Tabularize an array.
+80 L<formatTable|/formatTable> - Format various data structures as a table with titles as specified by B<$columnTitles>: either a reference to an array of column titles or a string each line of which contains the column title as the first word with the rest of the line describing that column.
 
-76 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
+81 L<formatTableA|/formatTableA> - Tabularize an array.
 
-77 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
+82 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
 
-78 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
+83 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
 
-79 L<formatTableH|/formatTableH> - Tabularize a hash.
+84 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
 
-80 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
+85 L<formatTableH|/formatTableH> - Tabularize a hash.
 
-81 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
+86 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
 
-82 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
+87 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
 
-83 L<fp|/fp> - Get path from file name.
+88 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
 
-84 L<fpn|/fpn> - Remove extension from file name.
+89 L<formattedTablesReport|/formattedTablesReport> - Report of all the reports created.
 
-85 L<fullFileName|/fullFileName> - Full name of a file.
+90 L<fp|/fp> - Get path from file name.
 
-86 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes> accessible via L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method calls.
+91 L<fpn|/fpn> - Remove extension from file name.
 
-87 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
+92 L<fullFileName|/fullFileName> - Full name of a file.
 
-88 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
+93 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes> accessible via L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method calls.
 
-89 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
+94 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
 
-90 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
+95 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
 
-91 L<guidFromMd5|/guidFromMd5> - Create a guid from an md5 hash.
+96 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
 
-92 L<hostName|/hostName> - The name of the host we are running on.
+97 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
 
-93 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
+98 L<guidFromMd5|/guidFromMd5> - Create a guid from an md5 hash.
 
-94 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|https://www.imagemagick.org/script/index.php>.
+99 L<guidFromString|/guidFromString> - Create a guid from a file or string via an md5 hash.
 
-95 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
+100 L<hexToAsciiString|/hexToAsciiString> - Decode a string of hexadecimal digits as an ascii string.
 
-96 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
+101 L<hostName|/hostName> - The name of the host we are running on.
 
-97 L<isBlank|/isBlank> - Test whether a string is blank.
+102 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
 
-98 L<isFileUtf8|/isFileUtf8> - Return the file name quoted if its contents are in utf8 else return undef
+103 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|https://www.imagemagick.org/script/index.php>.
 
-99 L<isSubInPackage|/isSubInPackage> - Test whether a subroutine is present in a package.
+104 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
 
-100 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
+105 L<indexOfMax|/indexOfMax> - Find the index of the maximum number in a list confessing to any ill defined values.
 
-101 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
+106 L<indexOfMin|/indexOfMin> - Find the index of the minimum number in a list confessing to any ill defined values.
 
-102 L<keyCount|/keyCount> - Count keys down to the specified level.
+107 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
 
-103 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
+108 L<isBlank|/isBlank> - Test whether a string is blank.
 
-104 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
+109 L<isFileUtf8|/isFileUtf8> - Return the file name quoted if its contents are in utf8 else return undef
 
-105 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is a hash of words.
+110 L<isSubInPackage|/isSubInPackage> - Test whether a subroutine is present in a package.
 
-106 L<loadHash|/loadHash> - Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
+111 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
 
-107 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
+112 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
 
-108 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
+113 L<keyCount|/keyCount> - Count keys down to the specified level.
 
-109 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
+114 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
 
-110 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred.
+115 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
 
-111 L<makePath|/makePath> - Make the path for the specified file name or folder.
+116 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is a hash of words.
 
-112 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
+117 L<loadHash|/loadHash> - Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
 
-113 L<max|/max> - Find the maximum number in a list confessing to any ill defined values.
+118 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
 
-114 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
+119 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
 
-115 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge the specified hashes by summing their values
+120 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
 
-116 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
+121 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred.
 
-117 L<min|/min> - Find the minimum number in a list confessing to any ill defined values.
+122 L<makePath|/makePath> - Make the path for the specified file name or folder.
 
-118 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
+123 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
 
-119 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
+124 L<max|/max> - Find the maximum number in a list confessing to any ill defined values.
 
-120 L<newUdsr|/newUdsr> - Create a communicator - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+125 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
 
-121 L<newUdsrClient|/newUdsrClient> - Create a new communications client - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+126 L<md5FromGuid|/md5FromGuid> - Recover an md5 sum from a guid.
 
-122 L<newUdsrServer|/newUdsrServer> - Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+127 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge the specified hashes by summing their values
 
-123 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
+128 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
 
-124 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
+129 L<min|/min> - Find the minimum number in a list confessing to any ill defined values.
 
-125 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
+130 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
 
-126 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
+131 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
 
-127 L<overWriteBinaryFile|/overWriteBinaryFile> - Write a binary string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+132 L<newUdsr|/newUdsr> - Create a communicator - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-128 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+133 L<newUdsrClient|/newUdsrClient> - Create a new communications client - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-129 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
+134 L<newUdsrServer|/newUdsrServer> - Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-130 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
+135 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
 
-131 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
+136 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
 
-132 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
+137 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
 
-133 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
+138 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
 
-134 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
+139 L<overWriteBinaryFile|/overWriteBinaryFile> - Write a binary string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-135 L<printQw|/printQw> - Print an array of words in qw() format.
+140 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-136 L<quoteFile|/quoteFile> - Quote a file name.
+141 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
 
-137 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
+142 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
 
-138 L<readFile|/readFile> - Read a file containing unicode in utf8.
+143 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
 
-139 L<readFiles|/readFiles> - Read all the files in a folder into a hash
+144 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
 
-140 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
+145 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
 
-141 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
+146 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
 
-142 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
+147 L<printQw|/printQw> - Print an array of words in qw() format.
 
-143 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+148 L<quoteFile|/quoteFile> - Quote a file name.
 
-144 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+149 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
 
-145 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
+150 L<readFile|/readFile> - Read a file containing unicode in utf8.
 
-146 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
+151 L<readFiles|/readFiles> - Read all the files in a folder into a hash
 
-147 L<retrieveFile|/retrieveFile> - Retrieve a file created via L<Storable>.
+152 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
 
-148 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
+153 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
 
-149 L<saveSourceToS3|/saveSourceToS3> - Save source code.
+154 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
 
-150 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
+155 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-151 L<setIntersectionOfSetsOfWords|/setIntersectionOfSetsOfWords> - Intersection of arrays of words.
+156 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-152 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
+157 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
 
-153 L<setUnionOfWords|/setUnionOfWords> - Union of arrays of words.
+158 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
 
-154 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
+159 L<retrieveFile|/retrieveFile> - Retrieve a file created via L<Storable>.
 
-155 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
+160 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
 
-156 L<squareArray|/squareArray> - Create a two dimensional square array from a one dimensional linear array.
+161 L<saveSourceToS3|/saveSourceToS3> - Save source code.
 
-157 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
+162 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
 
-158 L<storeFile|/storeFile> - Store a data structure to a file via L<Storable>.
+163 L<setCombination|/setCombination> - Count the elements in sets represented as arrays of strings and/or the keys of hashes
 
-159 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
+164 L<setIntersection|/setIntersection> - Intersection of sets represented as arrays of strings and/or the keys of hashes
 
-160 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
+165 L<setIntersectionOverUnion|/setIntersectionOverUnion> - Returns the size of the intersection over the size of the union of one or more sets represented as arrays and/or hashes
 
-161 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
+166 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
 
-162 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative file names
+167 L<setPartitionOnIntersectionOverUnion|/setPartitionOnIntersectionOverUnion> - Partition a set of sets so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets in the partition is never less than the specified B<$confidence**2>
 
-163 L<summarizeColumn|/summarizeColumn> - Count the number of unique instances of each value a column in a table assumes.
+168 L<setPartitionOnIntersectionOverUnionOfHashStringSets|/setPartitionOnIntersectionOverUnionOfHashStringSets> - Partition a set of sets represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
 
-164 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
+169 L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> - Partition a set of sets of words so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets of words in the partition is never less than the specified B<$confidence**2>
 
-165 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
+170 L<setPartitionOnIntersectionOverUnionOfStringSets|/setPartitionOnIntersectionOverUnionOfStringSets> - Partition a set of sets, each set represented by a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2>
 
-166 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a file name from a known name to a new one,
+171 L<setUnion|/setUnion> - Union of sets represented as arrays of strings and/or the keys of hashes
 
-167 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
+172 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-168 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
+173 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-169 L<timeStamp|/timeStamp> - hours:minute:seconds
+174 L<squareArray|/squareArray> - Create a two dimensional square array from a one dimensional linear array.
 
-170 L<trackFiles|/trackFiles> - Track the existence of files.
+175 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
 
-171 L<trim|/trim> - Remove any white space from the front and end of a string.
+176 L<storeFile|/storeFile> - Store a data structure to a file via L<Storable>.
 
-172 L<Udsr::kill|/Udsr::kill> - Kill a communications server.
+177 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
 
-173 L<Udsr::read|/Udsr::read> - Read a message from the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+178 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
 
-174 L<Udsr::write|/Udsr::write> - Write a communications message to the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+179 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
 
-175 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
+180 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative file names
 
-176 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
+181 L<summarizeColumn|/summarizeColumn> - Count the number of unique instances of each value a column in a table assumes.
 
-177 L<userId|/userId> - The userid we are currently running under.
+182 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
 
-178 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+183 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
 
-179 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+184 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a file name from a known name to a new one if the file does in fact start with the known name otherwise returns the original file name.
 
-180 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+185 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
 
-181 L<writeBinaryFile|/writeBinaryFile> - Write a binary string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+186 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
 
-182 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file already exists.
+187 L<timeStamp|/timeStamp> - hours:minute:seconds
 
-183 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+188 L<trackFiles|/trackFiles> - Track the existence of files.
 
-184 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+189 L<trim|/trim> - Remove any white space from the front and end of a string.
 
-185 L<wwwDecode|/wwwDecode> - Percent decode a url per: https://en.
+190 L<Udsr::kill|/Udsr::kill> - Kill a communications server.
 
-186 L<wwwEncode|/wwwEncode> - Percent encode a url per: https://en.
+191 L<Udsr::read|/Udsr::read> - Read a message from the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
 
-187 L<xxx|/xxx> - Execute a shell command optionally checking its response.
+192 L<Udsr::write|/Udsr::write> - Write a communications message to the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
 
-188 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+193 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
 
-189 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+194 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
 
-190 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
+195 L<userId|/userId> - The userid we are currently running under.
+
+196 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+
+197 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+
+198 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+
+199 L<writeBinaryFile|/writeBinaryFile> - Write a binary string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+
+200 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file already exists.
+
+201 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+
+202 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+
+203 L<wwwDecode|/wwwDecode> - Percent decode a url per: https://en.
+
+204 L<wwwEncode|/wwwEncode> - Percent encode a url per: https://en.
+
+205 L<xxx|/xxx> - Execute a shell command optionally checking its response.
+
+206 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+
+207 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+
+208 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
 
 =head1 Installation
 
@@ -7993,7 +8710,7 @@ __DATA__
 Test::More->builder->output("/dev/null")                                        # Reduce number of confirmation messages during testing
   if ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";
 
-use Test::More tests => 458;
+use Test::More tests => 480;
 my $haiku     = $^O =~ m(haiku)i;
 my $windows   = $^O =~ m(MSWin32)i;
 my $mac       = $^O =~ m(darwin)i;
@@ -8533,12 +9250,73 @@ if (1)
  }
 
 
-if (1) {                                                                        #TsetIntersectionOfSetsOfWords
-  is_deeply [qw(a b c)],
-   [setIntersectionOfSetsOfWords([qw(e f g a b c )], [qw(a A b B c C)])];
+if (1) {                                                                        #TsetIntersection
+  is_deeply [qw(a b c)], [setIntersection[qw(e f g a b c )],[qw(a A b B c C)]];
+  is_deeply [qw(e)],   [setIntersection {a=>1, b=>2, e=>3}, [qw(c d e)], qw(e)];
  }
 
-is_deeply [qw(a b c)], [setUnionOfWords(qw(a b c a a b b b))];                  #TsetUnionOfWords
+
+if (1) {                                                                        #TsetUnion
+  is_deeply [qw(a b c)],     [setUnion(qw(a b c a a b b b))];
+  is_deeply [qw(a b c d e)], [setUnion {a=>1, b=>2, e=>3}, [qw(c d e)], qw(e)];
+ }
+
+if (1) {                                                                        #TsetIntersectionOverUnion
+  my $f = setIntersectionOverUnion {a=>1, b=>2, e=>3}, [qw(c d e)], qw(e);
+  ok $f > 0.199999 && $f < 2.00001;
+ }
+
+if (1) {                                                                        #TsetPartitionOnIntersectionOverUnion
+  is_deeply [setPartitionOnIntersectionOverUnion
+   (0.80,
+     [qw(a A   b c d e)],
+     [qw(a A B b c d e)],
+     [qw(a A B C b c d)],
+   )],
+  [[["A", "B", "a".."e"],
+    ["A",      "a".."e"]],
+   [["A".."C", "a".."d"]],
+  ];
+}
+
+
+
+
+if (1) {                                                                        #TsetPartitionOnIntersectionOverUnionOfSetsOfWords
+is_deeply [setPartitionOnIntersectionOverUnionOfSetsOfWords
+   (0.80,
+     [qw(a A   b c d e)],
+     [qw(a A B b c d e)],
+     [qw(a A B C b c d)],
+   )],
+ [[["a", "A", "B", "C", "b", "c", "d"]],
+  [["a", "A", "B", "b" .. "e"], ["a", "A", "b" .. "e"]],
+ ];
+ }
+
+if (1) {                                                                        #TsetPartitionOnIntersectionOverUnionOfStringSets
+is_deeply [setPartitionOnIntersectionOverUnionOfStringSets
+   (0.80,
+     q(The Emu            are seen here sometimes.),
+     q(The Emu, Gnu       are seen here sometimes.),
+     q(The Emu, Gnu, Colt are seen here.),
+   )],
+ [["The Emu, Gnu, Colt are seen here."],
+  ["The Emu, Gnu       are seen here sometimes.",
+   "The Emu            are seen here sometimes.",
+  ]];
+ }
+
+if (1) {                                                                        #TsetPartitionOnIntersectionOverUnionOfHashStringSets
+is_deeply [setPartitionOnIntersectionOverUnionOfHashStringSets
+   (0.80,
+     {e  =>q(The Emu            are seen here sometimes.),
+      eg =>q(The Emu, Gnu       are seen here sometimes.),
+      egc=>q(The Emu, Gnu, Colt are seen here.),
+     }
+   )],
+ [["egc"], ["eg", "e"]];
+ }
 
 ok printQw(qw(a  b  c)) eq "qw(a b c)";
 
@@ -8716,7 +9494,7 @@ if (1) {                                                                        
 ok quoteFile(fpe(qw(a "b" c))) eq q("a/\"b\".c");                               #TquoteFile
 ok printQw(qw(a b c)) eq q(qw(a b c));                                          #TprintQw
 
-if (!$windows) {
+if (!$windows and !$mac) {
   my $D = temporaryFolder;                                                      #TtemporaryFolder #TcreateEmptyFile #TclearFolder #TfileList #TfindFiles #TsearchDirectoryTreesForMatchingFiles #TfindDirs
   my $d = fpd($D, q(ddd));                                                                        #TcreateEmptyFile #TclearFolder #TfileList #TfindFiles #TsearchDirectoryTreesForMatchingFiles #TfindDirs
   my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);                                  #TcreateEmptyFile #TclearFolder #TfileList #TfindFiles #TsearchDirectoryTreesForMatchingFiles #TfindDirs
@@ -8980,7 +9758,7 @@ END
   ok -e $file;
   ok readFile($file) eq $t;
   unlink $file;
-  ok $t eq <<END;
+  ok nws($t) eq nws(<<END);
 Sample report.
 
 Table has 2 rows.
@@ -9054,7 +9832,7 @@ Table of Tables.
 Table has 2 rows each of which contains a table.
 END
 
-ok $T eq <<END;
+ok nws($T) eq nws(<<END);
 Table of Tables.
 
 Table has 2 rows each of which contains a table.
@@ -9457,6 +10235,9 @@ if (1) {                                                                        
     [qw(Col-1 Col-2)],
      summarize=>1)) eq nws(<<'END');
 
+Summary_of_column                - Count of unique values found in each column                     Use the Geany flick capability by placing your cursor on the first word
+Comma_Separated_Values_of_column - Comma separated list of the unique values found in each column  of these lines and pressing control + down arrow to see each sub report.
+
     Col-1  Col-2
  1  A      A
  2  C      B
@@ -9474,19 +10255,24 @@ if (1) {                                                                        
 14  B      B
 15  B      D
 
-Summary of column: Col-1
+Summary_of_column: Col-1
    Count  Col-1
 1      5  C
 2      4  B
 3      3  A
 4      3  D
 
-Summary of column: Col-2
+Comma_Separated_Values_of_column Col-1: "C","B","A","D"
+
+Summary_of_column: Col-2
    Count  Col-2
 1      6  D
 2      4  C
 3      3  B
 4      2  A
+
+Comma_Separated_Values_of_column Col-2: "D","C","B","A"
+
 END
  }
 
@@ -9534,10 +10320,98 @@ else
  {ok 1 for 1..1;
  }
 
-if (1) {                                                                        #TguidFromMd5
-  ok guidFromMd5(substr(join('', 0..9) x 4, 0, 32)) eq
-     q(GUID-01234567-8901-2345-6789-012345678901);
+if (1) {                                                                        #TguidFromMd5 #TguidFromString #TfileMd5Sum #Tmd5FromGuid
+  ok fileMd5Sum(join '', 1..100)     eq
+     q(ef69caaaeea9c17120821a9eb6c7f1de);
+
+  ok guidFromString(join '', 1..100) eq
+     q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de);
+
+  ok guidFromMd5(fileMd5Sum(join('', 1..100))) eq
+     q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de);
+
+  ok md5FromGuid(q(GUID-ef69caaa-eea9-c171-2082-1a9eb6c7f1de)) eq
+                      q(ef69caaaeea9c17120821a9eb6c7f1de);
 }
+
+if (1)
+ {ok arraySum   (1..10) ==  55;                                                 #TarraySum
+  ok arrayProduct(1..5) == 120;                                                 #TarrayProduct
+  is_deeply[arrayTimes(2, 1..5)], [qw(2 4 6 8 10)];                             #TarrayTimes
+ }
+
+if (1)
+ {ok indexOfMax(qw(2 3 1 2)) == 1;                                              #TindexOfMax
+  ok indexOfMin(qw(2 3 1 2)) == 2;                                              #TindexOfMin
+ }
+
+if (1)
+ {is_deeply [arrayTimes(2, 1..3)], [2,4,6];
+ }
+
+if (1)                                                                          #TcountOccurencesInString
+ {ok countOccurencesInString(q(a<b>c<b><b>d), q(<b>)) == 3;
+ }
+
+if (1)                                                                          #TfileInWindowsFormat
+ {ok fileInWindowsFormat(fpd(qw(/a b c d))) eq q(\a\b\c\d\\);
+ }
+
+if (1) {                                                                        #TformattedTablesReport
+  @formatTables = ();
+
+  for my $m(2..8)
+   {formatTable([map {[$_, $_*$m]} 1..$m], [q(Single), qq(* $m)],
+      title=>qq(Multiply by $m));
+   }
+
+  ok nws(formattedTablesReport) eq nws(<<END);
+   Rows  Title          File
+1     2  Multiply by 2
+2     3  Multiply by 3
+3     4  Multiply by 4
+4     5  Multiply by 5
+5     6  Multiply by 6
+6     7  Multiply by 7
+7     8  Multiply by 8
+END
+ }
+
+if (1) {
+  my $t = [[qw(a b c)], [1..3], [4..6]];
+
+  ok nws(formatTable($t, [qw(A B C)], summarize=>1, csv=>q(/dev/null))) eq nws(<<END)
+Summary_of_column                - Count of unique values found in each column                     Use the Geany flick capability by placing your cursor on the first word
+Comma_Separated_Values_of_column - Comma separated list of the unique values found in each column  of these lines and pressing control + down arrow to see each sub report.
+   A  B  C
+1  a  b  c
+2  1  2  3
+3  4  5  6
+Summary_of_column: A
+   Count  A
+1      1  1
+2      1  4
+3      1  a
+Comma_Separated_Values_of_column A: 1,4,"a"
+Summary_of_column: B
+   Count  B
+1      1  2
+2      1  5
+3      1  b
+Comma_Separated_Values_of_column B: 2,5,"b"
+Summary_of_column: C
+   Count  C
+1      1  3
+2      1  6
+3      1  c
+Comma_Separated_Values_of_column C: 3,6,"c"
+END
+ }
+
+if (1) {                                                                        #TasciiToHexString #ThexToAsciiString
+  ok asciiToHexString("Hello World!") eq                  "48656c6c6f20576f726c6421";
+  ok                  "Hello World!"  eq hexToAsciiString("48656c6c6f20576f726c6421");
+ }
 
 #tttt
 

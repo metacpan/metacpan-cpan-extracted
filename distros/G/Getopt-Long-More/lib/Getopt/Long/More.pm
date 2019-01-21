@@ -1,7 +1,9 @@
+## no critic: Modules::ProhibitAutomaticExportation
+
 package Getopt::Long::More;
 
-our $DATE = '2016-12-03'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-01-20'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 
@@ -61,10 +63,13 @@ sub GetOptionsFromArray {
 
     my $ary = shift;
 
-    if (ref($_[0]) eq 'HASH') {
-        # we bail out, user only specifies a list of option specs, e.g. (\%h,
-        # 'foo=s', 'bar!')
-        return Getopt::Long::GetOptionsFromArray($ary, @_);
+    my @go_opts_spec;
+
+    if ( ref($_[0]) ) {
+      require Scalar::Util;
+      if ( Scalar::Util::reftype ($_[0]) eq 'HASH') {
+        push @go_opts_spec, shift;  # 'hash-storage' is now directly supported
+      }
     }
 
     my @opts_spec = @_;
@@ -92,31 +97,20 @@ sub GetOptionsFromArray {
     $_cur_opts_spec = [@opts_spec];
 
     # strip the optspec objects
-    my $i = -1;
-    my @go_opts_spec;
-    my $osname;
+    my $prev;
     my $has_arg_handler;
     my $arg_handler_accessed;
-    for my $e (@opts_spec) {
-        $i++;
-        if ($i % 2 == 0) {
-            $osname = $e;
-            push @go_opts_spec, $e;
-        } else {
-            if (ref($e) eq 'Getopt::Long::More::OptSpec') {
-                if ($osname eq '<>') {
-                    $has_arg_handler++;
-                    push @go_opts_spec, sub {
-                        $arg_handler_accessed++;
-                        $e->{handler}->(@_);
-                    };
-                } else {
-                    push @go_opts_spec, $e->{handler};
-                }
-            } else {
-                push @go_opts_spec, $e;
-            }
-        }
+      for my $e (@opts_spec) {
+        ref($e) ne 'Getopt::Long::More::OptSpec'  and do { push @go_opts_spec, $e; next            };
+        $prev   ne '<>'                           and do { push @go_opts_spec, $e->{handler}; next };
+      OTHERWISE:
+        $has_arg_handler++;
+        push @go_opts_spec, sub {
+          $arg_handler_accessed++;
+          $e->{handler}->(@_);
+        };
+    } continue {
+      $prev = $e;
     }
 
     # if in completion mode, do completion instead of parsing options
@@ -212,10 +206,10 @@ sub GetOptionsFromArray {
 
     my $res = Getopt::Long::GetOptionsFromArray($ary, @go_opts_spec);
 
-    $i = -1;
+    my $i = -1;
     for (@opts_spec) {
         $i++;
-        if ($i % 2 && ref($_) eq 'Getopt::Long::More::OptSpec') {
+        if ($i > 0 && ref($_) eq 'Getopt::Long::More::OptSpec') {
             my $osname = $opts_spec[$i-1];
 
             # check required
@@ -361,10 +355,8 @@ package # hide from PAUSE indexer
 sub new {
     my $class = shift;
     my $obj = bless {@_}, $class;
-    unless (exists $obj->{handler}) {
-        die "You must specify handler in optspec";
-    }
     for (keys %$obj) {
+        next if /\A(x|x\..+|_.*)\z/;
         unless (/\A(handler|required|default|summary|description|completion)\z/) {
             die "Unknown optspec property '$_'";
         }
@@ -387,7 +379,7 @@ Getopt::Long::More - Like Getopt::Long, but with more stuffs
 
 =head1 VERSION
 
-This document describes version 0.004 of Getopt::Long::More (from Perl distribution Getopt-Long-More), released on 2016-12-03.
+This document describes version 0.005 of Getopt::Long::More (from Perl distribution Getopt-Long-More), released on 2019-01-20.
 
 =head1 SYNOPSIS
 
@@ -403,7 +395,7 @@ This document describes version 0.004 of Getopt::Long::More (from Perl distribut
 
      # but if you want to specify extra stuffs...
      'baz'   => optspec(
-         # at least specify this, for Getopt::Long
+         # will be passed to Getopt::Long
          handler => \$opts{baz},
 
          # specify that this option is required
@@ -419,7 +411,6 @@ This document describes version 0.004 of Getopt::Long::More (from Perl distribut
          description => <<'_',
 Blah blah ...
 blah
-
 Blah blah ...
 blah blah
 _
@@ -436,6 +427,10 @@ _
                  array => [ ... ],
              );
          },
+
+         # other properties: x or x.* or _* are allowed
+         'x.debug' => 'blah',
+         _app_code => {foo=>1},
      ),
  );
 
@@ -453,9 +448,9 @@ object as one or more option handlers.
 =head1 OPTSPEC OBJECT
 
 In addition to using scalarref, arrayref, hashref, or coderef as the option
-handler as Getopt::Long allows, Getopt::Long::More also allows using optspec
-object as option handler. This allows you to specify more stuffs. Optspec object
-is created using the C<optspec> function which accepts a list of property
+handler ("linkage") as Getopt::Long allows, Getopt::Long::More also allows using
+optspec object as the linkage. This allows you to specify more stuffs. Optspec
+object is created using the C<optspec> function which accepts a list of property
 name-property value pairs:
 
  '--fruit=s' => optspec(
@@ -466,7 +461,7 @@ name-property value pairs:
      ...
  )
 
-At least the C<handler> property must be specified, as this will be passed to
+All properties are optional. Tthe C<handler> property will be passed to
 Getopt::Long when parsing options. In addition to that, these other properties
 are also recognized:
 
@@ -496,6 +491,12 @@ Completion routine will be passed a hash argument, with at least the following
 keys: C<word> (str, the word to be completed). It is expected to return a
 completion answer structure (see L<Complete> for mor edetails) which is usually
 just an array of strings.
+
+=head2 x, x.*, _* => any
+
+You are allowed to have properties named C<x> or anything that begins with C<x.>
+or C<_>. These are ignored by Getopt::Long::More. You can use store comments or
+whatever additional information here.
 
 =head1 FUNCTIONS
 
@@ -623,7 +624,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

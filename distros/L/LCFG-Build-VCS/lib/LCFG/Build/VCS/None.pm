@@ -2,16 +2,18 @@ package LCFG::Build::VCS::None;  # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: None.pm.in 29257 2015-11-12 15:42:14Z squinney@INF.ED.AC.UK $
+# $Id: None.pm.in 35424 2019-01-18 10:01:16Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-VCS/lib/LCFG/Build/VCS/None.pm.in,v $
-# $Revision: 29257 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-VCS/LCFG_Build_VCS_0_2_3/lib/LCFG/Build/VCS/None.pm.in $
-# $Date: 2015-11-12 15:42:14 +0000 (Thu, 12 Nov 2015) $
+# $Revision: 35424 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-VCS/LCFG_Build_VCS_0_3_8/lib/LCFG/Build/VCS/None.pm.in $
+# $Date: 2019-01-18 10:01:16 +0000 (Fri, 18 Jan 2019) $
 
-our $VERSION = '0.2.3';
+our $VERSION = '0.3.8';
 
-use File::Copy::Recursive ();
-use File::HomeDir ();
+use v5.10;
+
+use File::Copy::Recursive v0.36 ();
+use File::HomeDir v0.58 ();
 use File::Path ();
 use File::Spec ();
 use IO::Dir ();
@@ -180,7 +182,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::VCS::None version 0.2.3
+    This documentation refers to LCFG::Build::VCS::None version 0.3.8
 
 =head1 SYNOPSIS
 

@@ -3,20 +3,15 @@ abstract: 'Write Perl bindings to non-Perl libraries with FFI. No XS required.'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Alien::FFI: '0.012'
   Capture::Tiny: '0'
-  IPC::Cmd: '0'
-  Module::Build: '0.3601'
-  Test::More: '0.94'
+  ExtUtils::CBuilder: '0'
+  Test::More: '0.98'
   perl: '5.008001'
 configure_requires:
-  Alien::FFI: '0.20'
-  Config::AutoConf: '0.309'
-  ExtUtils::CBuilder: '0'
-  FFI::CheckLib: '0.05'
-  Module::Build: '0.3601'
+  ExtUtils::MakeMaker: '7.12'
+  IPC::Cmd: '0'
   perl: '5.008001'
-dynamic_config: '1'
+dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -27,8 +22,12 @@ no_index:
   directory:
     - examples
 requires:
-  FFI::CheckLib: '0'
-  File::ShareDir: '0'
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '7.12'
+  FFI::CheckLib: '0.05'
+  IPC::Cmd: '0'
+  JSON::PP: '0'
+  List::Util: '1.45'
   constant: '1.32'
   perl: '5.008001'
 resources:
@@ -36,7 +35,7 @@ resources:
   bugtracker: https://github.com/Perl5-FFI/FFI-Platypus/issues
   homepage: https://metacpan.org/pod/FFI::Platypus
   repository: git://github.com/Perl5-FFI/FFI-Platypus.git
-version: '0.59'
+version: '0.74'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'

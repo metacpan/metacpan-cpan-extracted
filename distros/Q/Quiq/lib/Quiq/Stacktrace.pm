@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 # -----------------------------------------------------------------------------
 
@@ -36,23 +36,23 @@ Erzeugung von Exceptions.
 
 Folgendes Beispielprogramm (test.pl)
 
-     1: #!/usr/bin/env perl
-     2: 
-     3: use Quiq::Stacktrace;
-     4: 
-     5: sub a {
-     6:     b();
-     7: }
-     8: 
-     9: sub b {
-    10:     c();
-    11: }
-    12: 
-    13: sub c {
-    14:     print Quiq::Stacktrace->asString,"\n";
-    15: }
-    16: 
-    17: a();
+    #!/usr/bin/env perl
+    
+    use Quiq::Stacktrace;
+    
+    sub a {
+        b();
+    }
+    
+    sub b {
+        c();
+    }
+    
+    sub c {
+        print Quiq::Stacktrace->asString,"\n";
+    }
+    
+    a();
 
 erzeugt die Ausgabe
 
@@ -190,7 +190,7 @@ sub asString {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

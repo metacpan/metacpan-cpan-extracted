@@ -3,7 +3,6 @@
 
 #include <ffi.h>
 #include "ffi_platypus_config.h"
-#include "ffi_platypus_probe.h"
 
 #ifdef HAVE_DLFCN_H
 #ifndef PERL_OS_WINDOWS
@@ -113,7 +112,6 @@ typedef enum _ffi_pl_type_code {
   FFI_PL_SHAPE_POINTER       = 0x1000,
   FFI_PL_SHAPE_ARRAY         = 0x2000,
   FFI_PL_SHAPE_CUSTOM_PERL   = 0x4000,
-  FFI_PL_SHAPE_CUSTOM_NATIVE = 0x8000,
   FFI_PL_SHAPE_MASK          = 0xf000,
 
   /*
@@ -336,8 +334,7 @@ typedef struct _ffi_pl_heap {
 
 #if defined(_MSC_VER)
 #define Newx_or_alloca(ptr, count, type) ptr = _alloca(sizeof(type)*count)
-#define HAVE_ALLOCA 1
-#elif defined(HAVE_ALLOCA)
+#elif defined(FFI_PL_PROBE_ALLOCA)
 #define Newx_or_alloca(ptr, count, type) ptr = alloca(sizeof(type)*count)
 #else
 #define Newx_or_alloca(ptr, count, type) ffi_pl_heap_add(ptr, count, type)

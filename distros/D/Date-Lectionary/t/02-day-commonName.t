@@ -2,7 +2,7 @@
 use v5.22;
 use strict;
 use warnings;
-use Test::More tests => 175;
+use Test::More tests => 178;
 use Test::Exception;
 
 use Time::Piece;
@@ -1147,4 +1147,28 @@ is(
     $sunday->day->commonName,
     "The First Sunday of Christmas",
     'Validating that 2017-12-31 returns the correct day.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date' => Time::Piece->strptime( "2019-01-20", "%Y-%m-%d" ) );
+is(
+    $sunday->day->commonName,
+    "The Second Sunday of Epiphany",
+    'Validating that 2019-01-20 returns the correct day.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date' => Time::Piece->strptime( "2019-01-13", "%Y-%m-%d" ) );
+is(
+    $sunday->day->commonName,
+    "The First Sunday of Epiphany",
+    'Validating that 2019-01-13 returns the correct day.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date' => Time::Piece->strptime( "2019-01-06", "%Y-%m-%d" ) );
+is(
+    $sunday->day->commonName,
+    "The Epiphany",
+    'Validating that 2019-01-06 returns the correct day.'
 );

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.32      2019-01-21 00:10:20 -0500
+  - Require plicease plugsin 2.32
+
 2.31      2019-01-02 09:05:59 -0500
   - Add option copy_mm
 

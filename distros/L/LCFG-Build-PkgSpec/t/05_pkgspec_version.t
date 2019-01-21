@@ -1,4 +1,5 @@
-use strict; # -*-cperl-*-*
+#!/usr/bin/perl
+use strict;
 use warnings;
 
 use Test::More tests => 63;
@@ -71,12 +72,12 @@ is( $spec->get_micro, '0', 'version, micro-part accessor' );
 
 # dev versions
 
-$spec->version('1.0.0_dev');
-is( $spec->version, '1.0.0_dev', 'set dev version' );
+$spec->version('1.0.0.dev1');
+is( $spec->version, '1.0.0.dev1', 'set dev version' );
 
 # development versions, micro update
 
-$spec->version('1.0.0_dev');
+$spec->version('1.0.0.dev1');
 $spec->release('2');
 $spec->update_micro();
 is( $spec->version(), '1.0.1', 'dev version, smallest version update' );
@@ -90,7 +91,7 @@ is( $spec->get_micro, '1', 'version, micro-part accessor' );
 
 # development versions, minor update
 
-$spec->version('1.0.0_dev');
+$spec->version('1.0.0.dev1');
 $spec->release('2');
 $spec->update_minor();
 is( $spec->version(), '1.1.0', 'dev version, minor version update' );
@@ -104,7 +105,7 @@ is( $spec->get_micro, '0', 'version, micro-part accessor' );
 
 # development versions, major update
 
-$spec->version('1.0.0_dev');
+$spec->version('1.0.0.dev1');
 $spec->release('2');
 $spec->update_major();
 is( $spec->version(), '2.0.0', 'dev version, major version update' );
@@ -199,12 +200,10 @@ $spec->release(1);
 
 $spec->dev_version;
 
-is( $spec->version, '1.2.3_dev', 'create a devel version');
+is( $spec->version, '1.2.3.dev2', 'create a devel version');
 is( $spec->release, 2, 'release incremented for devel version');
-
-$spec->version('1.2.3_dev');
 
 $spec->dev_version;
 
-is( $spec->version, '1.2.3_dev', 'update a devel version');
+is( $spec->version, '1.2.3.dev3', 'update a devel version');
 is( $spec->release, 3, 'release incremented for devel version');

@@ -1,32 +1,36 @@
 ---
-name: LCFG-Build-PkgSpec
-version: v0.1.0
+abstract: 'Object-oriented interface to LCFG build metadata'
 author:
   - 'Stephen Quinney <squinney@inf.ed.ac.uk>'
-abstract: Object-oriented interface to LCFG build metadata
-license: gpl
-resources:
-  license: http://opensource.org/licenses/gpl-license.php
 build_requires:
-  Test::Differences: 0
-  Test::Exception: 0
-  Test::More: 0
-requires:
-  Data::Structure::Util: 0.12
-  DateTime: 0
-  Email::Address: 0
-  Email::Valid: 0
-  Moose: 0.98
-  Pod::Usage: 0
-  YAML::Syck: 0.98
-  perl: v5.6.1
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.35
+  Module::Build: '0.40'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LCFG-Build-PkgSpec
 provides:
   LCFG::Build::PkgSpec:
     file: lib/LCFG/Build/PkgSpec.pm
-    version: v0.1.0
-generated_by: Module::Build version 0.35
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+    version: v0.2.6
+requires:
+  Data::Structure::Util: '0.12'
+  DateTime: '0'
+  Email::Address: '0'
+  Email::Valid: '0'
+  Moose: '0.98'
+  Pod::Usage: '0'
+  YAML::Syck: '0.98'
+  perl: 'v5.10.0'
+resources:
+  bugtracker:
+    web: https://bugs.lcfg.org/
+  homepage: http://www.lcfg.org/doc/buildtools/
+  license: https://opensource.org/licenses/GPL-2.0
+version: v0.2.6

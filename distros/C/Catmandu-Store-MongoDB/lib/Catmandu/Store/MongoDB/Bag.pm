@@ -2,7 +2,7 @@ package Catmandu::Store::MongoDB::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.07';
+our $VERSION = '0.0701';
 
 use Catmandu::Util qw(:is);
 use Catmandu::Store::MongoDB::Searcher;
@@ -60,7 +60,7 @@ sub each {
 }
 
 sub count {
-    $_[0]->collection->count({});
+    $_[0]->collection->count_documents({});
 }
 
 # efficiently handle:
@@ -187,7 +187,7 @@ sub search {
     Catmandu::Hits->new({
         start => $start,
         limit => $limit,
-        total => $self->collection->count($query),
+        total => $self->collection->count_documents($query),
         hits  => \@hits,
     });
 }

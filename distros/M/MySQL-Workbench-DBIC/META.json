@@ -30,18 +30,19 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dumper" : "0",
+            "File::Path" : "2.0",
             "File::Spec" : "3.40",
             "JSON" : "0",
             "List::Util" : "0",
             "Moo" : "1.003001",
-            "MySQL::Workbench::Parser" : "1.01",
+            "MySQL::Workbench::Parser" : "1.08",
             "perl" : "5.010001"
          }
       },
       "test" : {
          "requires" : {
             "File::Copy" : "0",
-            "File::Path" : "0",
+            "File::Path" : "2.0",
             "FindBin" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::LongString" : "0.16"
@@ -51,11 +52,11 @@
    "provides" : {
       "MySQL::Workbench::DBIC" : {
          "file" : "lib/MySQL/Workbench/DBIC.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       },
       "MySQL::Workbench::DBIC::FakeDBIC" : {
          "file" : "lib/MySQL/Workbench/DBIC/FakeDBIC.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       }
    },
    "release_status" : "stable",
@@ -70,7 +71,7 @@
          "web" : "http://github.com/reneeb/MySQL-Workbench-DBIC"
       }
    },
-   "version" : "1.15",
+   "version" : "1.16",
    "x_contributors" : [
       "Mario Minati <mario.minati@minati.de>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

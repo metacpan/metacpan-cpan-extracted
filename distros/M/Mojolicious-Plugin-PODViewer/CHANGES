@@ -1,5 +1,15 @@
 Changelog for Mojolicious-Plugin-PODViewer
 
+0.003     2019-01-21 12:38:10-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed routing when the plugin was not directly at the root. Thanks
+      @iamb!
+    - Fixed link rewriting to only rewrite modules in the allowed
+      modules list. This prevents the need for a 302 Redirect for
+      modules we aren't serving. Thanks @iamb!
+
 0.002     2018-11-08 22:07:11-06:00 America/Chicago
 
     - Added option to change route to load POD under. Previously, it

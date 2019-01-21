@@ -1,7 +1,7 @@
 package Dancer2::Plugin::WebSocket;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: add a websocket interface to your Dancers app
-$Dancer2::Plugin::WebSocket::VERSION = '0.1.1';
+$Dancer2::Plugin::WebSocket::VERSION = '0.1.2';
 
 use Plack::App::WebSocket;
 
@@ -123,7 +123,7 @@ Dancer2::Plugin::WebSocket - add a websocket interface to your Dancers app
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.2
 
 =head1 SYNOPSIS
 
@@ -349,7 +349,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2019, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

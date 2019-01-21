@@ -26,7 +26,7 @@ sub extended_col {
     my ( $sf, $sql, $clause ) = @_;
     my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
     my ( $none, $function, $subquery, $all ) = @{$sf->{i}{extended_signs}};
-    my $set_to_null = '=NULL';
+    my $set_to_null = '=N';
     my @values;
     if ( $clause eq 'set' ) {
         @values = ( undef, [ $function ], [ $subquery ], [ $set_to_null ], [ $function, $subquery, $set_to_null ] );
@@ -34,7 +34,7 @@ sub extended_col {
     else {
         @values = ( undef, [ $function ], [ $subquery ], [ $function, $subquery ] );
     }
-    my @types = @{$values[$sf->{o}{G}{"extend_$clause"}]};
+    my @types = @{$values[ $sf->{o}{extend}{$clause} ]};
     my $type;
     if ( @types == 1 ) {
         $type = $types[0];

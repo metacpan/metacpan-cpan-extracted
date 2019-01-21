@@ -1,5 +1,8 @@
 Revision history for Catmandu-Store-MongoDB
 
+0.0701  2019-01-18 15:04:24 CET
+  - use count_documents instead of deprecated count method
+
 0.07  2017-03-23 14:38:15 CET
   - use the new Catmandu::CQLSearchable role
 

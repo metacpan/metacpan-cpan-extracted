@@ -1,5 +1,5 @@
 package Facebook::Graph::AccessToken::Response;
-$Facebook::Graph::AccessToken::Response::VERSION = '1.1204';
+$Facebook::Graph::AccessToken::Response::VERSION = '1.1205';
 use Moo;
 use URI;
 use URI::QueryParam;
@@ -72,7 +72,7 @@ Facebook::Graph::AccessToken::Response - The Facebook access token request respo
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 Description
 
@@ -94,6 +94,6 @@ Direct access to the L<HTTP::Response> object.
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

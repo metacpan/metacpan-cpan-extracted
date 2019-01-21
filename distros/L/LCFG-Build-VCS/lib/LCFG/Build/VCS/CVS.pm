@@ -2,13 +2,15 @@ package LCFG::Build::VCS::CVS;  # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: CVS.pm.in 31796 2017-01-19 13:31:51Z squinney@INF.ED.AC.UK $
+# $Id: CVS.pm.in 35424 2019-01-18 10:01:16Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-VCS/lib/LCFG/Build/VCS/CVS.pm.in,v $
-# $Revision: 31796 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-VCS/LCFG_Build_VCS_0_2_3/lib/LCFG/Build/VCS/CVS.pm.in $
-# $Date: 2017-01-19 13:31:51 +0000 (Thu, 19 Jan 2017) $
+# $Revision: 35424 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-VCS/LCFG_Build_VCS_0_3_8/lib/LCFG/Build/VCS/CVS.pm.in $
+# $Date: 2019-01-18 10:01:16 +0000 (Fri, 18 Jan 2019) $
 
-our $VERSION = '0.2.3';
+our $VERSION = '0.3.8';
+
+use v5.10;
 
 use Cwd            ();
 use File::Find     ();
@@ -377,7 +379,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::VCS::CVS version 0.2.3
+    This documentation refers to LCFG::Build::VCS::CVS version 0.3.8
 
 =head1 SYNOPSIS
 

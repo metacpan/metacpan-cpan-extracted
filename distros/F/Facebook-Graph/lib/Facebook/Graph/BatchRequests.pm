@@ -1,5 +1,5 @@
 package Facebook::Graph::BatchRequests;
-$Facebook::Graph::BatchRequests::VERSION = '1.1204';
+$Facebook::Graph::BatchRequests::VERSION = '1.1205';
 use Moo;
 use Ouch;
 use Facebook::Graph::Request;
@@ -64,7 +64,7 @@ Facebook::Graph::BatchRequests - Batch Requests
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 SYNOPSIS
 
@@ -119,6 +119,6 @@ Fire the request and return decoded @batches data
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

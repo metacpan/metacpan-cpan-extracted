@@ -73,8 +73,6 @@ C<CPUWeight> applies to normal runtime of the system, and if the former is not s
 the startup phase. Using C<StartupCPUWeight> allows prioritizing specific services at
 boot-up differently than during normal runtime.
 
-Implies C<CPUAccounting=true>.
-
 These settings replace C<CPUShares> and C<StartupCPUShares>. I< Optional. Type integer.  > 
 
 =over 4
@@ -100,8 +98,6 @@ C<CPUWeight> applies to normal runtime of the system, and if the former is not s
 the startup phase. Using C<StartupCPUWeight> allows prioritizing specific services at
 boot-up differently than during normal runtime.
 
-Implies C<CPUAccounting=true>.
-
 These settings replace C<CPUShares> and C<StartupCPUShares>. I< Optional. Type integer.  > 
 
 =over 4
@@ -120,12 +116,10 @@ Assign the specified CPU time quota to the processes executed. Takes a percentag
 "%". The percentage specifies how much CPU time the unit shall get at maximum, relative to the total CPU time
 available on one CPU. Use values > 100% for allotting CPU time on more than one CPU. This controls the
 C<cpu.max> attribute on the unified control group hierarchy and
-C<cpu.cfs_quota_us> on legacy. For details about these control group attributes, see cgroup-v2.txt and sched-design-CFS.txt.
+C<cpu.cfs_quota_us> on legacy. For details about these control group attributes, see cgroup-v2.txt and sched-bwc.txt.
 
 Example: C<CPUQuota=20%> ensures that the executed processes will never get more than
-20% CPU time on one CPU.
-
-Implies C<CPUAccounting=true>. I< Optional. Type uniline.  > 
+20% CPU time on one CPU. I< Optional. Type uniline.  > 
 
 =head2 MemoryAccounting
 
@@ -138,6 +132,20 @@ for this setting may be controlled with
 C<DefaultMemoryAccounting> in
 L<systemd-system.conf(5)>. I< Optional. Type boolean.  > 
 
+=head2 MemoryMin
+
+Specify the memory usage protection of the executed processes in this unit. If the memory usages of
+this unit and all its ancestors are below their minimum boundaries, this unit's memory won't be reclaimed.
+
+Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
+percentage value may be specified, which is taken relative to the installed physical memory on the
+system. This controls the C<memory.min> control group attribute. For details about this
+control group attribute, see cgroup-v2.txt.
+
+This setting is supported only if the unified control group hierarchy is used and disables
+C<MemoryLimit>. I< Optional. Type uniline.  > 
+
 =head2 MemoryLow
 
 Specify the best-effort memory usage protection of the executed processes in this unit. If the memory
@@ -149,8 +157,6 @@ parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), re
 percentage value may be specified, which is taken relative to the installed physical memory on the
 system. This controls the C<memory.low> control group attribute. For details about this
 control group attribute, see cgroup-v2.txt.
-
-Implies C<MemoryAccounting=true>.
 
 This setting is supported only if the unified control group hierarchy is used and disables
 C<MemoryLimit>. I< Optional. Type uniline.  > 
@@ -169,8 +175,6 @@ special value C<infinity>, no memory limit is applied. This controls the
 C<memory.high> control group attribute. For details about this control group attribute, see
 cgroup-v2.txt.
 
-Implies C<MemoryAccounting=true>.
-
 This setting is supported only if the unified control group hierarchy is used and disables
 C<MemoryLimit>. I< Optional. Type uniline.  > 
 
@@ -188,8 +192,6 @@ assigned the special value C<infinity>, no memory limit is applied. This control
 C<memory.max> control group attribute. For details about this control group attribute, see
 cgroup-v2.txt.
 
-Implies C<MemoryAccounting=true>.
-
 This setting replaces C<MemoryLimit>. I< Optional. Type uniline.  > 
 
 =head2 MemorySwapMax
@@ -201,8 +203,6 @@ parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), re
 special value C<infinity>, no swap limit is applied. This controls the
 C<memory.swap.max> control group attribute. For details about this control group attribute,
 see cgroup-v2.txt.
-
-Implies C<MemoryAccounting=true>.
 
 This setting is supported only if the unified control group hierarchy is used and disables
 C<MemoryLimit>. I< Optional. Type uniline.  > 
@@ -231,7 +231,7 @@ system.  If assigned the special value C<infinity>, no tasks limit is applied. T
 the C<pids.max> control group attribute. For details about this control group attribute, see
 pids.txt.
 
-Implies C<TasksAccounting=true>. The
+The
 system default for this setting may be controlled with
 C<DefaultTasksMax> in
 L<systemd-system.conf(5)>. I< Optional. Type uniline.  > 
@@ -263,8 +263,6 @@ the system, and if the former is not set also to the startup
 phase. This allows prioritizing specific services at boot-up
 differently than during runtime.
 
-Implies C<IOAccounting=true>.
-
 These settings replace C<BlockIOWeight> and C<StartupBlockIOWeight>
 and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>. I< Optional. Type uniline.  > 
 
@@ -283,8 +281,6 @@ the system, and if the former is not set also to the startup
 phase. This allows prioritizing specific services at boot-up
 differently than during runtime.
 
-Implies C<IOAccounting=true>.
-
 These settings replace C<BlockIOWeight> and C<StartupBlockIOWeight>
 and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>. I< Optional. Type uniline.  > 
 
@@ -292,13 +288,11 @@ and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>. I< Optional.
 
 Set the per-device overall block I/O weight for the executed processes, if the unified control group
 hierarchy is used on the system. Takes a space-separated pair of a file path and a weight value to specify
-the device specific weight value, between 1 and 10000. (Example: "/dev/sda 1000"). The file path may be
-specified as path to a block device node or as any other file, in which case the backing block device of the
-file system of the file is determined. This controls the C<io.weight> control group
-attribute, which defaults to 100. Use this option multiple times to set weights for multiple devices. For
-details about this control group attribute, see cgroup-v2.txt.
-
-Implies C<IOAccounting=true>.
+the device specific weight value, between 1 and 10000. (Example: C</dev/sda 1000>). The file
+path may be specified as path to a block device node or as any other file, in which case the backing block
+device of the file system of the file is determined. This controls the C<io.weight> control
+group attribute, which defaults to 100. Use this option multiple times to set weights for multiple devices.
+For details about this control group attribute, see cgroup-v2.txt.
 
 This setting replaces C<BlockIODeviceWeight> and disables settings prefixed with
 C<BlockIO> or C<StartupBlockIO>. I< Optional. Type uniline.  > 
@@ -315,8 +309,6 @@ parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes, respectively, to the ba
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5M"). This controls the C<io.max> control
 group attributes. Use this option multiple times to set bandwidth limits for multiple devices. For details
 about this control group attribute, see cgroup-v2.txt.
-
-Implies C<IOAccounting=true>.
 
 These settings replace C<BlockIOReadBandwidth> and
 C<BlockIOWriteBandwidth> and disable settings prefixed with C<BlockIO> or
@@ -335,8 +327,6 @@ parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes, respectively, to the ba
 group attributes. Use this option multiple times to set bandwidth limits for multiple devices. For details
 about this control group attribute, see cgroup-v2.txt.
 
-Implies C<IOAccounting=true>.
-
 These settings replace C<BlockIOReadBandwidth> and
 C<BlockIOWriteBandwidth> and disable settings prefixed with C<BlockIO> or
 C<StartupBlockIO>. I< Optional. Type uniline.  > 
@@ -354,8 +344,6 @@ GigaIOPS, or TeraIOPS, respectively, to the base of 1000. (Example:
 group attributes. Use this option multiple times to set IOPS limits for multiple devices. For details about
 this control group attribute, see cgroup-v2.txt.
 
-Implies C<IOAccounting=true>.
-
 These settings are supported only if the unified control group hierarchy is used and disable settings
 prefixed with C<BlockIO> or C<StartupBlockIO>. I< Optional. Type uniline.  > 
 
@@ -372,10 +360,22 @@ GigaIOPS, or TeraIOPS, respectively, to the base of 1000. (Example:
 group attributes. Use this option multiple times to set IOPS limits for multiple devices. For details about
 this control group attribute, see cgroup-v2.txt.
 
-Implies C<IOAccounting=true>.
-
 These settings are supported only if the unified control group hierarchy is used and disable settings
 prefixed with C<BlockIO> or C<StartupBlockIO>. I< Optional. Type uniline.  > 
+
+=head2 IODeviceLatencyTargetSec
+
+Set the per-device average target I/O latency for the executed processes, if the unified control group
+hierarchy is used on the system. Takes a file path and a timespan separated by a space to specify
+the device specific latency target. (Example: "/dev/sda 25ms"). The file path may be specified
+as path to a block device node or as any other file, in which case the backing block device of the file
+system of the file is determined. This controls the C<io.latency> control group
+attribute. Use this option multiple times to set latency target for multiple devices. For details about this
+control group attribute, see cgroup-v2.txt.
+
+Implies C<IOAccounting=yes>.
+
+These settings are supported only if the unified control group hierarchy is used. I< Optional. Type uniline.  > 
 
 =head2 IPAccounting
 
@@ -559,7 +559,27 @@ C<io>, C<blkio>, C<memory>, C<devices>,
 C<pids>. Not all of these controllers are available on all kernels however, and some are
 specific to the unified hierarchy while others are specific to the legacy hierarchy. Also note that the
 kernel might support further controllers, which aren't covered here yet as delegation is either not supported
-at all for them or not defined cleanly. I< Optional. Type uniline.  > 
+at all for them or not defined cleanly.
+
+For further details on the delegation model consult Control Group APIs and Delegation. I< Optional. Type uniline.  > 
+
+=head2 DisableControllers
+
+Disables controllers from being enabled for a unit's children. If a controller listed is already in use
+in its subtree, the controller will be removed from the subtree. This can be used to avoid child units being
+able to implicitly or explicitly enable a controller. Defaults to not disabling any controllers.
+
+It may not be possible to successfully disable a controller if the unit or any child of the unit in
+question delegates controllers to its children, as any delegated subtree of the cgroup hierarchy is unmanaged
+by systemd.
+
+Multiple controllers may be specified, separated by spaces. You may also pass
+C<DisableControllers> multiple times, in which case each new instance adds another controller
+to disable. Passing C<DisableControllers> by itself with no controller name present resets
+the disabled controller list.
+
+Valid controllers are C<cpu>, C<cpuacct>, C<io>,
+C<blkio>, C<memory>, C<devices>, and C<pids>. I< Optional. Type uniline.  > 
 
 =head2 CPUShares
 
@@ -574,7 +594,7 @@ C<CPUShares> applies to normal runtime of the system, and if the former is not s
 the startup phase. Using C<StartupCPUShares> allows prioritizing specific services at
 boot-up differently than during normal runtime.
 
-Implies C<CPUAccounting=true>.
+Implies C<CPUAccounting=yes>.
 
 These settings are deprecated. Use C<CPUWeight> and
 C<StartupCPUWeight> instead. I< Optional. Type integer.  > 
@@ -602,7 +622,7 @@ C<CPUShares> applies to normal runtime of the system, and if the former is not s
 the startup phase. Using C<StartupCPUShares> allows prioritizing specific services at
 boot-up differently than during normal runtime.
 
-Implies C<CPUAccounting=true>.
+Implies C<CPUAccounting=yes>.
 
 These settings are deprecated. Use C<CPUWeight> and
 C<StartupCPUWeight> instead. I< Optional. Type integer.  > 
@@ -628,7 +648,7 @@ C<infinity>, no memory limit is applied. This controls the
 C<memory.limit_in_bytes> control group attribute. For details about this control group
 attribute, see memory.txt.
 
-Implies C<MemoryAccounting=true>.
+Implies C<MemoryAccounting=yes>.
 
 This setting is deprecated. Use C<MemoryMax> instead. I< Optional. Type uniline.  > 
 
@@ -660,7 +680,7 @@ startup phase. This allows prioritizing specific services at
 boot-up differently than during runtime.
 
 Implies
-C<BlockIOAccounting=true>.
+C<BlockIOAccounting=yes>.
 
 These settings are deprecated. Use C<IOWeight> and C<StartupIOWeight>
 instead. I< Optional. Type uniline.  > 
@@ -682,7 +702,7 @@ startup phase. This allows prioritizing specific services at
 boot-up differently than during runtime.
 
 Implies
-C<BlockIOAccounting=true>.
+C<BlockIOAccounting=yes>.
 
 These settings are deprecated. Use C<IOWeight> and C<StartupIOWeight>
 instead. I< Optional. Type uniline.  > 
@@ -698,7 +718,7 @@ attribute, which defaults to 1000. Use this option multiple times to set weights
 details about this control group attribute, see blkio-controller.txt.
 
 Implies
-C<BlockIOAccounting=true>.
+C<BlockIOAccounting=yes>.
 
 This setting is deprecated. Use C<IODeviceWeight> instead. I< Optional. Type uniline.  > 
 
@@ -716,7 +736,7 @@ control group attributes. Use this option multiple times to set bandwidth limits
 details about these control group attributes, see blkio-controller.txt.
 
 Implies
-C<BlockIOAccounting=true>.
+C<BlockIOAccounting=yes>.
 
 These settings are deprecated. Use C<IOReadBandwidthMax> and
 C<IOWriteBandwidthMax> instead. I< Optional. Type uniline.  > 
@@ -735,7 +755,7 @@ control group attributes. Use this option multiple times to set bandwidth limits
 details about these control group attributes, see blkio-controller.txt.
 
 Implies
-C<BlockIOAccounting=true>.
+C<BlockIOAccounting=yes>.
 
 These settings are deprecated. Use C<IOReadBandwidthMax> and
 C<IOWriteBandwidthMax> instead. I< Optional. Type uniline.  > 
@@ -771,7 +791,16 @@ C<RootDirectory> however mounts a file system hierarchy from a block device node
 file instead of a directory. The device node or file system image file needs to contain a file system without a
 partition table, or a file system within an MBR/MS-DOS or GPT partition table with only a single
 Linux-compatible partition, or a set of file systems within a GPT partition table that follows the Discoverable Partitions
-Specification. I< Optional. Type uniline.  > 
+Specification.
+
+When C<DevicePolicy> is set to C<closed> or C<strict>,
+or set to C<auto> and C<DeviceAllow> is set, then this setting adds
+/dev/loop-control with C<rw> mode, C<block-loop> and
+C<block-blkext> with C<rwm> mode to C<DeviceAllow>. See
+L<systemd.resource-control(5)>
+for the details about C<DevicePolicy> or C<DeviceAllow>. Also, see
+C<PrivateDevices> below, as it may change the setting of C<DevicePolicy>.
+I< Optional. Type uniline.  > 
 
 =head2 MountAPIVFS
 
@@ -1826,9 +1855,9 @@ operating system (and optionally its configuration, and local mounts) is prohibi
 recommended to enable this setting for all long-running services, unless they are involved with system updates
 or need to modify the operating system in other ways. If this option is used,
 C<ReadWritePaths> may be used to exclude specific directories from being made read-only. This
-setting is implied if C<DynamicUser> is set. For this setting the same restrictions regarding
-mount propagation and privileges apply as for C<ReadOnlyPaths> and related calls, see
-below. Defaults to off. I< Optional. Type enum. choice: 'no', 'yes', 'full', 'strict'.  > 
+setting is implied if C<DynamicUser> is set. This setting cannot ensure protection in all
+cases. In general it has the same limitations as C<ReadOnlyPaths>, see below. Defaults to
+off. I< Optional. Type enum. choice: 'no', 'yes', 'full', 'strict'.  > 
 
 =head2 ProtectHome
 
@@ -1845,18 +1874,20 @@ C<InaccessiblePaths>. Similarly, C<read-only> is mostly equivalent to
 C<ReadOnlyPaths>, and C<tmpfs> is mostly equivalent to
 C<TemporaryFileSystem>.
 
- It is recommended to enable this setting for all long-running services (in particular network-facing ones),
-to ensure they cannot get access to private user data, unless the services actually require access to the user's
-private data. This setting is implied if C<DynamicUser> is set. For this setting the same
-restrictions regarding mount propagation and privileges apply as for C<ReadOnlyPaths> and related
-calls, see below. I< Optional. Type enum. choice: 'no', 'yes', 'read-only', 'tmpfs'.  > 
+ It is recommended to enable this setting for all long-running services (in particular network-facing
+ones), to ensure they cannot get access to private user data, unless the services actually require access to
+the user's private data. This setting is implied if C<DynamicUser> is set. This setting cannot
+ensure protection in all cases. In general it has the same limitations as C<ReadOnlyPaths>,
+see below. I< Optional. Type enum. choice: 'no', 'yes', 'read-only', 'tmpfs'.  > 
 
 =head2 RuntimeDirectory
 
 These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
-defined in the following table, when the unit is started.
+defined in the following table, when the unit is started. Also, the corresponding environment variable
+is defined with the full path of directories. If multiple directories are set, then int the environment variable
+the paths are concatenated with colon (C<:>).
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -1904,14 +1935,24 @@ the service manager creates /run/foo (if it does not exist),
 /run/foo/bar, and /run/baz. The directories
 /run/foo/bar and /run/baz except /run/foo are
 owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped. I< Optional. Type uniline.  > 
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>. I< Optional. Type uniline.  > 
 
 =head2 StateDirectory
 
 These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
-defined in the following table, when the unit is started.
+defined in the following table, when the unit is started. Also, the corresponding environment variable
+is defined with the full path of directories. If multiple directories are set, then int the environment variable
+the paths are concatenated with colon (C<:>).
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -1959,14 +2000,24 @@ the service manager creates /run/foo (if it does not exist),
 /run/foo/bar, and /run/baz. The directories
 /run/foo/bar and /run/baz except /run/foo are
 owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped. I< Optional. Type uniline.  > 
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>. I< Optional. Type uniline.  > 
 
 =head2 CacheDirectory
 
 These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
-defined in the following table, when the unit is started.
+defined in the following table, when the unit is started. Also, the corresponding environment variable
+is defined with the full path of directories. If multiple directories are set, then int the environment variable
+the paths are concatenated with colon (C<:>).
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -2014,14 +2065,24 @@ the service manager creates /run/foo (if it does not exist),
 /run/foo/bar, and /run/baz. The directories
 /run/foo/bar and /run/baz except /run/foo are
 owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped. I< Optional. Type uniline.  > 
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>. I< Optional. Type uniline.  > 
 
 =head2 LogsDirectory
 
 These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
-defined in the following table, when the unit is started.
+defined in the following table, when the unit is started. Also, the corresponding environment variable
+is defined with the full path of directories. If multiple directories are set, then int the environment variable
+the paths are concatenated with colon (C<:>).
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -2069,14 +2130,24 @@ the service manager creates /run/foo (if it does not exist),
 /run/foo/bar, and /run/baz. The directories
 /run/foo/bar and /run/baz except /run/foo are
 owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped. I< Optional. Type uniline.  > 
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>. I< Optional. Type uniline.  > 
 
 =head2 ConfigurationDirectory
 
 These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
-defined in the following table, when the unit is started.
+defined in the following table, when the unit is started. Also, the corresponding environment variable
+is defined with the full path of directories. If multiple directories are set, then int the environment variable
+the paths are concatenated with colon (C<:>).
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -2124,7 +2195,15 @@ the service manager creates /run/foo (if it does not exist),
 /run/foo/bar, and /run/baz. The directories
 /run/foo/bar and /run/baz except /run/foo are
 owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped. I< Optional. Type uniline.  > 
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>. I< Optional. Type uniline.  > 
 
 =head2 RuntimeDirectoryMode
 
@@ -2199,8 +2278,7 @@ desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
 C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
 see C<TemporaryFileSystem>.
 
-Note that restricting access with these options does not extend to submounts of a directory that are
-created later on.  Non-directory paths may be specified as well. These options may be specified more than once,
+Non-directory paths may be specified as well. These options may be specified more than once,
 in which case all paths listed will have limited access from within the namespace. If the empty string is
 assigned to this option, the specific list is reset, and all prior assignments have no effect.
 
@@ -2212,11 +2290,19 @@ instead of relative to the root directory of the host (see above). When combinin
 C<+> on the same path make sure to specify C<-> first, and C<+>
 second.
 
-Note that using this setting will disconnect propagation of mounts from the service to the host
-(propagation in the opposite direction continues to work). This means that this setting may not be used for
-services which shall be able to install mount points in the main mount namespace. Note that the effect of these
-settings may be undone by privileged processes. In order to set up an effective sandboxed environment for a
-unit it is thus recommended to combine these settings with either
+Note that these settings will disconnect propagation of mounts from the unit's processes to the
+host. This means that this setting may not be used for services which shall be able to install mount points in
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
+unit processes' namespace, and mounts removed on the host also disappear there too. In particular, note that
+mount propagation from host to unit will result in unmodified mounts to be created in the unit's namespace,
+i.e. writable mounts appearing on the host will be writable in the unit's namespace too, even when propagated
+below a path marked with C<ReadOnlyPaths>! Restricting access with these options hence does
+not extend to submounts of a directory that are created later on. This means the lock-down offered by that
+setting is not complete, and does not offer full protection. 
+
+Note that the effect of these settings may be undone by privileged processes. In order to set up an
+effective sandboxed environment for a unit it is thus recommended to combine these settings with either
 C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
 C<SystemCallFilter=~@mount>. I< Optional. Type list of uniline.  > 
 
@@ -2241,8 +2327,7 @@ desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
 C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
 see C<TemporaryFileSystem>.
 
-Note that restricting access with these options does not extend to submounts of a directory that are
-created later on.  Non-directory paths may be specified as well. These options may be specified more than once,
+Non-directory paths may be specified as well. These options may be specified more than once,
 in which case all paths listed will have limited access from within the namespace. If the empty string is
 assigned to this option, the specific list is reset, and all prior assignments have no effect.
 
@@ -2254,11 +2339,19 @@ instead of relative to the root directory of the host (see above). When combinin
 C<+> on the same path make sure to specify C<-> first, and C<+>
 second.
 
-Note that using this setting will disconnect propagation of mounts from the service to the host
-(propagation in the opposite direction continues to work). This means that this setting may not be used for
-services which shall be able to install mount points in the main mount namespace. Note that the effect of these
-settings may be undone by privileged processes. In order to set up an effective sandboxed environment for a
-unit it is thus recommended to combine these settings with either
+Note that these settings will disconnect propagation of mounts from the unit's processes to the
+host. This means that this setting may not be used for services which shall be able to install mount points in
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
+unit processes' namespace, and mounts removed on the host also disappear there too. In particular, note that
+mount propagation from host to unit will result in unmodified mounts to be created in the unit's namespace,
+i.e. writable mounts appearing on the host will be writable in the unit's namespace too, even when propagated
+below a path marked with C<ReadOnlyPaths>! Restricting access with these options hence does
+not extend to submounts of a directory that are created later on. This means the lock-down offered by that
+setting is not complete, and does not offer full protection. 
+
+Note that the effect of these settings may be undone by privileged processes. In order to set up an
+effective sandboxed environment for a unit it is thus recommended to combine these settings with either
 C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
 C<SystemCallFilter=~@mount>. I< Optional. Type list of uniline.  > 
 
@@ -2283,8 +2376,7 @@ desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
 C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
 see C<TemporaryFileSystem>.
 
-Note that restricting access with these options does not extend to submounts of a directory that are
-created later on.  Non-directory paths may be specified as well. These options may be specified more than once,
+Non-directory paths may be specified as well. These options may be specified more than once,
 in which case all paths listed will have limited access from within the namespace. If the empty string is
 assigned to this option, the specific list is reset, and all prior assignments have no effect.
 
@@ -2296,11 +2388,19 @@ instead of relative to the root directory of the host (see above). When combinin
 C<+> on the same path make sure to specify C<-> first, and C<+>
 second.
 
-Note that using this setting will disconnect propagation of mounts from the service to the host
-(propagation in the opposite direction continues to work). This means that this setting may not be used for
-services which shall be able to install mount points in the main mount namespace. Note that the effect of these
-settings may be undone by privileged processes. In order to set up an effective sandboxed environment for a
-unit it is thus recommended to combine these settings with either
+Note that these settings will disconnect propagation of mounts from the unit's processes to the
+host. This means that this setting may not be used for services which shall be able to install mount points in
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
+unit processes' namespace, and mounts removed on the host also disappear there too. In particular, note that
+mount propagation from host to unit will result in unmodified mounts to be created in the unit's namespace,
+i.e. writable mounts appearing on the host will be writable in the unit's namespace too, even when propagated
+below a path marked with C<ReadOnlyPaths>! Restricting access with these options hence does
+not extend to submounts of a directory that are created later on. This means the lock-down offered by that
+setting is not complete, and does not offer full protection. 
+
+Note that the effect of these settings may be undone by privileged processes. In order to set up an
+effective sandboxed environment for a unit it is thus recommended to combine these settings with either
 C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
 C<SystemCallFilter=~@mount>. I< Optional. Type list of uniline.  > 
 
@@ -2386,9 +2486,13 @@ be available to the executed process. This is useful to turn off network access 
 Defaults to false. It is possible to run two or more units within the same private network namespace by using
 the C<JoinsNamespaceOf> directive, see
 L<systemd.unit(5)> for
-details. Note that this option will disconnect all socket families from the host, this includes AF_NETLINK and
-AF_UNIX.  The latter has the effect that AF_UNIX sockets in the abstract socket namespace will become
-unavailable to the processes (however, those located in the file system will continue to be accessible).
+details. Note that this option will disconnect all socket families from the host, including
+C<AF_NETLINK> and C<AF_UNIX>. Effectively, for
+C<AF_NETLINK> this means that device configuration events received from
+L<systemd-udevd.service(8)> are
+not delivered to the unit's processes. And for C<AF_UNIX> this has the effect that
+C<AF_UNIX> sockets in the abstract socket namespace of the host will become unavailable to
+the unit's processes (however, those located in the file system will continue to be accessible).
 
 Note that the implementation of this setting might be impossible (for example if network namespaces are
 not available), and the unit should be written in a way that does not solely rely on this setting for
@@ -2628,10 +2732,7 @@ points of the file system namespace created for each process of this unit. Other
 settings (see the discussion in C<PrivateMounts> above) will implicitly disable mount and
 unmount propagation from the unit's processes towards the host by changing the propagation setting of all mount
 points in the unit's file system namepace to C<slave> first. Setting this option to
-C<shared> does not reestablish propagation in that case. Conversely, if this option is set, but
-no other file system namespace setting is used, then new file system namespaces will be created for the unit's
-processes and this propagation flag will be applied right away to all mounts within it, without the
-intermediary application of C<slave>.
+C<shared> does not reestablish propagation in that case.
 
 If not set – but file system namespaces are enabled through another file system namespace unit setting –
 C<shared> mount propagation is used, but — as mentioned — as C<slave> is applied
@@ -2764,7 +2865,13 @@ with the values C<word1 word2>,
 C<word3>, C<$word 5 6>.
 
 See L<environ(7)> for details
-about environment variables. I< Optional. Type list of uniline.  > 
+about environment variables.
+
+Note that environment variables are not suitable for passing secrets (such as passwords, key material, …)
+to service processes. Environment variables set for a unit are exposed to unprivileged clients via D-Bus IPC,
+and generally not understood as being data that requires protection. Moreover, environment variables are
+propagated down the process tree, including across security boundaries (such as setuid/setgid executables), and
+hence might leak to processes that should not have access to the secret data. I< Optional. Type list of uniline.  > 
 
 =head2 EnvironmentFile
 
@@ -2887,7 +2994,13 @@ matches are found, the first one will be used.  See C<FileDescriptorName> in
 L<systemd.socket(5)> for more
 details about named file descriptors and their ordering.
 
-This setting defaults to C<null>. I< Optional. Type enum. choice: 'null', 'tty', 'tty-force', 'tty-fail', 'data', 'socket'.  > 
+This setting defaults to C<null>.
+
+Note that services which specify C<DefaultDependencies=no> and use
+C<StandardInput> or C<StandardOutput> with
+C<tty>/C<tty-force>/C<tty-fail>, should specify
+C<After=systemd-vconsole-setup.service>, to make sure that the tty intialization is
+finished before they start. I< Optional. Type enum. choice: 'null', 'tty', 'tty-force', 'tty-fail', 'data', 'socket'.  > 
 
 =head2 StandardOutput
 
@@ -2895,8 +3008,8 @@ Controls where file descriptor 1 (STDOUT) of the executed processes is connected
 of C<inherit>, C<null>, C<tty>, C<journal>,
 C<syslog>, C<kmsg>, C<journal+console>,
 C<syslog+console>, C<kmsg+console>,
-C<file:path>, C<socket> or
-C<fd:name>.
+C<file:path>, C<append:path>,
+C<socket> orC<fd:name>.
 
 C<inherit> duplicates the file descriptor of standard input for standard output.
 
@@ -2926,10 +3039,16 @@ in a similar way as the three options above but copy the output to the system co
 
 The C<file:path> option may be used to connect a specific file
 system object to standard output. The semantics are similar to the same option of
-C<StandardInput>, see above. If standard input and output are directed to the same file path,
-it is opened only once, for reading as well as writing and duplicated. This is particular useful when the
-specified path refers to an C<AF_UNIX> socket in the file system, as in that case only a
+C<StandardInput>, see above. If path refers to a regular file
+on the filesystem, it is opened (created if it doesn't exist yet) for writing at the beginning of the file,
+but without truncating it.
+If standard input and output are directed to the same file path, it is opened only once, for reading as well
+as writing and duplicated. This is particularly useful when the specified path refers to an
+C<AF_UNIX> socket in the file system, as in that case only a
 single stream connection is created for both input and output.
+
+C<append:path> is similar to C<file:path
+> above, but it opens the file in append mode.
 
 C<socket> connects standard output to a socket acquired via socket activation. The
 semantics are similar to the same option of C<StandardInput>, see above.
@@ -3054,6 +3173,32 @@ enclose the assignment in double quotes ("). The usual specifiers are expanded i
 below). Note that this setting is not only useful for attaching additional metadata to log records of a unit,
 but given that all fields and values are indexed may also be used to implement cross-unit log record
 matching. Assign an empty string to reset the list. I< Optional. Type uniline.  > 
+
+=head2 LogRateLimitIntervalSec
+
+Configures the rate limiting that is applied to messages generated by this unit. If, in the
+time interval defined by C<LogRateLimitIntervalSec>, more messages than specified in
+C<LogRateLimitBurst> are logged by a service, all further messages within the interval are
+dropped until the interval is over. A message about the number of dropped messages is generated. The time
+specification for C<LogRateLimitIntervalSec> may be specified in the following units: "s",
+"min", "h", "ms", "us" (see
+L<systemd.time(7)> for details).
+The default settings are set by C<RateLimitIntervalSec> and C<RateLimitBurst>
+configured in L<journald.conf(5)>.
+I< Optional. Type uniline.  > 
+
+=head2 LogRateLimitBurst
+
+Configures the rate limiting that is applied to messages generated by this unit. If, in the
+time interval defined by C<LogRateLimitIntervalSec>, more messages than specified in
+C<LogRateLimitBurst> are logged by a service, all further messages within the interval are
+dropped until the interval is over. A message about the number of dropped messages is generated. The time
+specification for C<LogRateLimitIntervalSec> may be specified in the following units: "s",
+"min", "h", "ms", "us" (see
+L<systemd.time(7)> for details).
+The default settings are set by C<RateLimitIntervalSec> and C<RateLimitBurst>
+configured in L<journald.conf(5)>.
+I< Optional. Type uniline.  > 
 
 =head2 SyslogIdentifier
 
@@ -3183,7 +3328,8 @@ is immediately followed by a C<SIGHUP> (if
 enabled with C<SendSIGHUP>). If then, after a
 delay (configured via the C<TimeoutStopSec>
 option), processes still remain, the termination request is
-repeated with the C<SIGKILL> signal (unless
+repeated with the C<SIGKILL> signal or the
+signal specified via C<FinalKillSignal> (unless
 this is disabled via the C<SendSIGKILL>
 option). See
 L<kill(2)>
@@ -3220,84 +3366,60 @@ I< Optional. Type boolean.  >
 =head2 SendSIGKILL
 
 Specifies whether to send
-C<SIGKILL> to remaining processes after a
-timeout, if the normal shutdown procedure left processes of
-the service around. Takes a boolean value. Defaults to "yes".
+C<SIGKILL> (or the signal specified by
+C<FinalKillSignal>) to remaining processes
+after a timeout, if the normal shutdown procedure left
+processes of the service around. Takes a boolean value.
+Defaults to "yes".
 I< Optional. Type boolean.  > 
+
+=head2 FinalKillSignal
+
+Specifies which signal to send to remaining
+processes after a timeout if C<SendSIGKILL>
+is enabled. The signal configured here should be one that is
+not typically caught and processed by services (C<SIGTERM>
+is not suitable). Developers can find it useful to use this to
+generate a coredump to troubleshoot why a service did not
+terminate upon receiving the initial C<SIGTERM>
+signal. This can be achieved by configuring C<LimitCORE>
+and setting C<FinalKillSignal> to either
+C<SIGQUIT> or C<SIGABRT>
+Defaults to C<SIGKILL>.
+I< Optional. Type uniline.  > 
+
+=head2 WatchdogSignal
+
+Specifies which signal to use to terminate the
+service when the watchdog timeout expires (enabled through
+C<WatchdogSec>). Defaults to C<SIGABRT>.
+I< Optional. Type uniline.  > 
 
 =head2 Type
 
-Configures the process start-up type for this
-service unit. One of
-C<simple>,
-C<forking>,
-C<oneshot>,
-C<dbus>,
-C<notify> or
-C<idle>.
+Configures the process start-up type for this service unit. One of C<simple>,
+C<exec>, C<forking>, C<oneshot>, C<dbus>,
+C<notify> or C<idle>:
 
-If set to C<simple> (the default if
-neither C<Type> nor
-C<BusName>, but C<ExecStart>
-are specified), it is expected that the process configured
-with C<ExecStart> is the main process of the
-service. In this mode, if the process offers functionality to
-other processes on the system, its communication channels
-should be installed before the daemon is started up (e.g.
-sockets set up by systemd, via socket activation), as systemd
-will immediately proceed starting follow-up units.
-
-If set to C<forking>, it is expected that
-the process configured with C<ExecStart> will
-call fork() as part of its start-up. The
-parent process is expected to exit when start-up is complete
-and all communication channels are set up. The child continues
-to run as the main daemon process. This is the behavior of
-traditional UNIX daemons. If this setting is used, it is
-recommended to also use the C<PIDFile>
-option, so that systemd can identify the main process of the
-daemon. systemd will proceed with starting follow-up units as
-soon as the parent process exits.
-
-Behavior of C<oneshot> is similar to
-C<simple>; however, it is expected that the
-process has to exit before systemd starts follow-up units.
-C<RemainAfterExit> is particularly useful for
-this type of service. This is the implied default if neither
-C<Type> nor C<ExecStart> are
-specified.
-
-Behavior of C<dbus> is similar to
-C<simple>; however, it is expected that the
-daemon acquires a name on the D-Bus bus, as configured by
-C<BusName>. systemd will proceed with
-starting follow-up units after the D-Bus bus name has been
-acquired. Service units with this option configured implicitly
-gain dependencies on the dbus.socket
-unit. This type is the default if C<BusName>
-is specified.
-
-Behavior of C<notify> is similar to
-C<simple>; however, it is expected that the
-daemon sends a notification message via
-L<sd_notify(3)>
-or an equivalent call when it has finished starting up.
-systemd will proceed with starting follow-up units after this
-notification message has been sent. If this option is used,
-C<NotifyAccess> (see below) should be set to
-open access to the notification socket provided by systemd. If
-C<NotifyAccess> is missing or set to
-C<none>, it will be forcibly set to
-C<main>. Note that currently
-C<Type>C<notify> will not work
-if used in combination with
-C<PrivateNetwork>C<yes>.
-
-Behavior of C<idle> is very similar to C<simple>; however, actual execution
-of the service program is delayed until all active jobs are dispatched. This may be used to avoid interleaving
-of output of shell services with the status output on the console. Note that this type is useful only to
-improve console output, it is not useful as a general unit ordering tool, and the effect of this service type
-is subject to a 5s time-out, after which the service program is invoked anyway. I< Optional. Type uniline.  > 
+It is generally recommended to use C<Type>C<simple> for long-running
+services whenever possible, as it is the simplest and fastest option. However, as this service type won't
+propagate service start-up failures and doesn't allow ordering of other units against completion of
+initialization of the service (which for example is useful if clients need to connect to the service through
+some form of IPC, and the IPC channel is only established by the service itself — in contrast to doing this
+ahead of time through socket or bus activation or similar), it might not be sufficient for many cases. If so,
+C<notify> or C<dbus> (the latter only in case the service provides a D-Bus
+interface) are the preferred options as they allow service program code to precisely schedule when to
+consider the service started up successfully and when to proceed with follow-up units. The
+C<notify> service type requires explicit support in the service codebase (as
+sd_notify() or an equivalent API needs to be invoked by the service at the appropriate
+time) — if it's not supported, then C<forking> is an alternative: it supports the traditional
+UNIX service start-up protocol. Finally, C<exec> might be an option for cases where it is
+enough to ensure the service binary is invoked, and where the service binary itself executes no or little
+initialization on its own (and its initialization is unlikely to fail). Note that using any type other than
+C<simple> possibly delays the boot process, as the service manager needs to wait for service
+initialization to complete. It is hence recommended not to needlessly use any types other than
+C<simple>. (Also note it is generally not recommended to use C<idle> or
+C<oneshot> for long-running services.) I< Optional. Type uniline.  > 
 
 =head2 RemainAfterExit
 
@@ -3321,14 +3443,15 @@ Defaults to C<yes>. I< Optional. Type boolean.  >
 
 =head2 PIDFile
 
-Takes an absolute path referring to the PID file of the service. Usage of this option is
-recommended for services where C<Type> is set to C<forking>. The service manager
-will read the PID of the main process of the service from this file after start-up of the service. The service
-manager will not write to the file configured here, although it will remove the file after the service has shut
-down if it still exists. The PID file does not need to be owned by a privileged user, but if it is owned by an
-unprivileged user additional safety restrictions are enforced: the file may not be a symlink to a file owned by
-a different user (neither directly nor indirectly), and the PID file must refer to a process already belonging
-to the service. I< Optional. Type uniline.  > 
+Takes a path referring to the PID file of the service. Usage of this option is recommended for
+services where C<Type> is set to C<forking>. The path specified typically points
+to a file below /run/. If a relative path is specified it is hence prefixed with
+/run/. The service manager will read the PID of the main process of the service from this
+file after start-up of the service. The service manager will not write to the file configured here, although it
+will remove the file after the service has shut down if it still exists. The PID file does not need to be owned
+by a privileged user, but if it is owned by an unprivileged user additional safety restrictions are enforced:
+the file may not be a symlink to a file owned by a different user (neither directly nor indirectly), and the
+PID file must refer to a process already belonging to the service. I< Optional. Type uniline.  > 
 
 =head2 BusName
 
@@ -3615,7 +3738,8 @@ regularly with C<WATCHDOG=1> (i.e. the
 "keep-alive ping"). If the time between two such calls is
 larger than the configured time, then the service is placed in
 a failed state and it will be terminated with
-C<SIGABRT>. By setting
+C<SIGABRT> (or the signal specified by
+C<WatchdogSignal>). By setting
 C<Restart> to C<on-failure>,
 C<on-watchdog>, C<on-abnormal> or
 C<always>, the service will be automatically
@@ -3765,23 +3889,6 @@ service restarts, regardless of the restart setting configured
 with C<Restart>. The argument format is
 similar to
 C<RestartPreventExitStatus>. I< Optional. Type uniline.  > 
-
-=head2 PermissionsStartOnly
-
-Takes a boolean argument. If true, the
-permission-related execution options, as configured with
-C<User> and similar options (see
-L<systemd.exec(5)>
-for more information), are only applied to the process started
-with
-C<ExecStart>, and not to the various other
-C<ExecStartPre>,
-C<ExecStartPost>,
-C<ExecReload>,
-C<ExecStop>, and
-C<ExecStopPost>
-commands. If false, the setting is applied to all configured
-commands the same way. Defaults to false. I< Optional. Type boolean.  > 
 
 =head2 RootDirectoryStartOnly
 

@@ -54,6 +54,6 @@
          "url" : "https://github.com/thrig/Game-DijkstraMap"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

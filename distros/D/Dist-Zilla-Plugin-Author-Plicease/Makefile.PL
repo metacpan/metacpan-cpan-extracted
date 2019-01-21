@@ -1,5 +1,31 @@
-use strict; use warnings;
 BEGIN {
+  use strict; use warnings;
+  my %missing = map {
+    eval qq{ require $_ };
+    $@ ? ($_=>1) : ()
+  } qw( Carp Encode File::Path File::Spec FindBin JSON::PP List::Util Module::CoreList autodie strict version warnings );
+  if(%missing)
+  {
+    print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
+    print "Ideally if you are using the system Perl you can install the appropriate\n";
+    print "package which includes the core Perl modules.  On at least some versions\n";
+    print "of Fedora, CentOS and RHEL, this is the `perl-core` package.\n";
+    print "\n";
+    print " % dnf install perl-core\n";
+    print "   ~ or ~\n";
+    print " % yum install perl-core\n";
+    print "\n";
+    print "If you really want to install dual-life modules from CPAN, then you can\n";
+    print "use cpanm:\n";
+    print "\n";
+    print " % cpanm @{[ sort keys %missing ]}\n";
+    print "\n";
+    print "Note that some core modules are not available from CPAN.\n";
+    exit;
+  }
+}
+BEGIN {
+  use strict; use warnings;
   unless(eval q{ use 5.014; 1}) {
     print "Perl 5.014 or better required\n";
     exit;
@@ -30,6 +56,7 @@ my %WriteMakefileArgs = (
   "PM"               => {
     "lib/Dist/Zilla/MintingProfile/Author/Plicease.pm"         => "\$(INST_LIB)/Dist/Zilla/MintingProfile/Author/Plicease.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease.pm"                 => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/Core.pm"            => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Core.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/DevShare.pm"        => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/DevShare.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/Init2.pm"           => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Init2.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm"       => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm",
@@ -44,7 +71,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Section"             => 0,
     "Dist::Zilla"               => "6.00",
-    "File::Path"                => 0,
     "File::ShareDir::Dist"      => 0,
     "File::chdir"               => 0,
     "IPC::System::Simple"       => "1.25",
@@ -52,22 +78,20 @@ my %WriteMakefileArgs = (
     "Path::Tiny"                => 0,
     "Perl::Tidy"                => 0,
     "Sub::Exporter::ForMethods" => 0,
-    "autodie"                   => 0,
     "namespace::autoclean"      => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "2.31",
+  "VERSION" => "2.32",
   "test"    => {
     "TESTS" => "t/*.t"
-  }
+    }
 );
 
 my %FallbackPrereqs = (
   "Data::Section"             => 0,
   "Dist::Zilla"               => "6.00",
-  "File::Path"                => 0,
   "File::ShareDir::Dist"      => 0,
   "File::chdir"               => 0,
   "IPC::System::Simple"       => "1.25",
@@ -76,7 +100,6 @@ my %FallbackPrereqs = (
   "Perl::Tidy"                => 0,
   "Sub::Exporter::ForMethods" => 0,
   "Test2::V0"                 => "0.000060",
-  "autodie"                   => 0,
   "namespace::autoclean"      => 0
 );
 

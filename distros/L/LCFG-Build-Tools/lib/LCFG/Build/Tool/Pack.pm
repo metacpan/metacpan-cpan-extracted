@@ -2,19 +2,19 @@ package LCFG::Build::Tool::Pack;    # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: Pack.pm.in 29224 2015-11-12 10:11:34Z squinney@INF.ED.AC.UK $
+# $Id: Pack.pm.in 35307 2019-01-10 15:31:12Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool/Pack.pm.in,v $
-# $Revision: 29224 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_6_6/lib/LCFG/Build/Tool/Pack.pm.in $
-# $Date: 2015-11-12 10:11:34 +0000 (Thu, 12 Nov 2015) $
+# $Revision: 35307 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_18/lib/LCFG/Build/Tool/Pack.pm.in $
+# $Date: 2019-01-10 15:31:12 +0000 (Thu, 10 Jan 2019) $
 
-our $VERSION = '0.6.6';
+our $VERSION = '0.9.18';
 
 use File::Path ();
 use File::Spec ();
 use File::Temp ();
-use LCFG::Build::PkgSpec;
 use LCFG::Build::Utils;
+use LCFG::Build::Utils::Debian;
 use UNIVERSAL::require;
 
 use Moose;
@@ -58,10 +58,7 @@ sub execute {
 
     my $version = $spec->version;
 
-    my $module = $spec->fullname;
-
-    my $dirname = join q{-}, $module, $version;
-    my $outdir = File::Spec->catdir( $self->resultsdir, $dirname );
+    my $outdir = $self->output_dir;
 
     if ( -d $outdir ) {
         File::Path::rmtree $outdir;
@@ -101,21 +98,9 @@ sub execute {
             $self->log('Successfully generated cmake files.');
         }
 
-        for my $util ( LCFG::Build::Utils->plugins() ) {
-            $util->require or $self->fail($@);
-            my $type = ( split /::/, $util )[-1];
-
-            if ( $util->can('generate_metadata') ) {
-                eval {
-                    $util->generate_metadata( $new_spec, $srcdir, $outdir )
-                };
-                if ($@) {
-                    $self->fail("Failed to generate package metadata files for $type: $@");
-                }
-
-                $self->log("Successfully generated metadata files for $type");
-            }
-        }
+        LCFG::Build::Utils->run_plugins_method( 'generate_metadata',
+                                                $new_spec, $srcdir,
+                                                $outdir );
 
         # We MUST pack *AFTER* generating the metadata in case the
         # metadata files need to be inserted into the generated tar
@@ -126,6 +111,13 @@ sub execute {
           LCFG::Build::Utils::generate_srctar( $tarname, $srcdir, $outdir );
         $self->log('Successfully generated source tar file.');
         $self->log("Tar file is: $tarfile");
+
+        # Some plugins need to generate metadata AFTER the source has
+        # been packed, for example, Debian.
+
+        LCFG::Build::Utils->run_plugins_method( 'generate_metadata_post',
+                                                $new_spec, $srcdir,
+                                                $outdir );
     }
 
     return;
@@ -141,7 +133,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Tool::Pack version 0.6.6
+    This documentation refers to LCFG::Build::Tool::Pack version 0.9.18
 
 =head1 SYNOPSIS
 

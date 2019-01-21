@@ -1,5 +1,5 @@
 requires 'Hash::Merge';
-requires 'Moose';
+requires 'Moo';
 requires 'Types::Standard';
 requires 'List::MoreUtils';
 

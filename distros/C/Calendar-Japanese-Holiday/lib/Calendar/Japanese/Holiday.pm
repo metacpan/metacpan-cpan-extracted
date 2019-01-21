@@ -13,14 +13,55 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = qw(getHolidays isHoliday);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 our $FurikaeStr = '振替';
 
 my @StaticHoliday = (
+# 山の日を8/11に戻す
+		     {'start' => 2021, 'end' => 2999,
+		      'days' => {1  => { 1 => '元日'},
+				 2  => {11 => '建国記念の日',
+					23 => '天皇誕生日'},
+				 4  => {29 => '昭和の日'},
+				 5  => { 3 => '憲法記念日',
+					 4 => 'みどりの日',
+					 5 => 'こどもの日'},
+				 8  => {11 => '山の日'},
+				 11 => { 3 => '文化の日',
+					23 => '勤労感謝の日'},
+				},
+		     },
+# 2020年は山の日が8/10に移動
+		     {'start' => 2020, 'end' => 2020,
+		      'days' => {1  => { 1 => '元日'},
+				 2  => {11 => '建国記念の日',
+					23 => '天皇誕生日'},
+				 4  => {29 => '昭和の日'},
+				 5  => { 3 => '憲法記念日',
+					 4 => 'みどりの日',
+					 5 => 'こどもの日'},
+				 8  => {10 => '山の日'},
+				 11 => { 3 => '文化の日',
+					23 => '勤労感謝の日'},
+				},
+		     },
+# 天皇誕生日削除(2019年のみ)
+		     {'start' => 2019, 'end' => 2019,
+		      'days' => {1  => { 1 => '元日'},
+				 2  => {11 => '建国記念の日'},
+				 4  => {29 => '昭和の日'},
+				 5  => { 3 => '憲法記念日',
+					 4 => 'みどりの日',
+					 5 => 'こどもの日'},
+				 8  => {11 => '山の日'},
+				 11 => { 3 => '文化の日',
+					23 => '勤労感謝の日'},
+				},
+		     },
 # 山の日を追加
-		     {'start' => 2016, 'end' => 2999,
+		     {'start' => 2016, 'end' => 2018,
 		      'days' => {1  => { 1 => '元日'},
 				 2  => {11 => '建国記念の日'},
 				 4  => {29 => '昭和の日'},
@@ -156,6 +197,8 @@ my %ExceptionalHoliday = (
 			  198902 => {24 => '昭和天皇の大喪の礼'},
 			  199011 => {12 => '即位礼正殿の儀'},
 			  199306 => { 9 => '皇太子徳仁親王の結婚の儀'},
+			  201905 => { 1 => '天皇の即位の日'},
+			  201910 => {22 => '即位礼正殿の儀の行われる日'},
 			 );
 
 my @daysInMonth = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
@@ -289,8 +332,9 @@ sub furikae_days {
     return \%days;
 }
 
-sub getHolidays {
-    my ($year, $mon, $furikae) = @_;
+# 指定年月の休日一覧を取得(国民の休日、振替休日を処理する前)
+sub get_holidays {
+    my ($year, $mon) = @_;
 
     my $holiday_tbl;
 
@@ -304,15 +348,29 @@ sub getHolidays {
     # Happy Monday (成人の日、海の日、敬老の日、体育の日)
     my @mondays = weekdays($year, $mon, 1);	# 月曜日の一覧
 
-    if ($year >= 2000) {
-	if ($mon == 1) {$holidays{$mondays[1]} = '成人の日';}
-	if ($mon == 10){$holidays{$mondays[1]} = '体育の日';}
+    if ($year >= 2000 && $mon == 1) {$holidays{$mondays[1]} = '成人の日';}
+
+    # 体育の日/スポーツの日(2020年以降)
+    if ($year >= 2000 && $year <= 2019 && $mon == 10) {
+	$holidays{$mondays[1]} = '体育の日';
+    } elsif ($year == 2020 && $mon == 7) {
+	# 2020年はオリンピックにあわせて変更となりHappy Mondayではない
+	$holidays{24} = 'スポーツの日';
+    } elsif ($year >= 2021 && $mon == 10) {
+	# 2021年以降は第二月曜に戻る
+	$holidays{$mondays[1]} = 'スポーツの日';
     }
 
-    if ($year >= 2003) {
-	if ($mon == 7) {$holidays{$mondays[2]} = '海の日';}
-	if ($mon == 9) {$holidays{$mondays[2]} = '敬老の日';}
+    # 海の日追加
+    if ($year >= 2003 && $mon == 7) {
+	if ($year != 2020) {
+	    $holidays{$mondays[2]} = '海の日';
+	} else {
+	    $holidays{23} = '海の日';	# 2020年は7/23に変更される
+	}
     }
+
+    if ($year >= 2003 && $mon == 9) {$holidays{$mondays[2]} = '敬老の日';}
 
     # 不定なもの
     if ($mon == 3) {$holidays{shunbun_day($year)} = '春分の日';}
@@ -326,12 +384,63 @@ sub getHolidays {
 	}
     }
 
+    return \%holidays;
+}
+
+sub next_year_mon {
+    my ($year, $mon) = @_;
+
+    $mon++;
+    if ($mon > 12) {
+	$year++;
+	$mon = 1;
+    }
+    return ($year, $mon);
+}
+
+sub prev_year_mon {
+    my ($year, $mon) = @_;
+
+    $mon--;
+    if ($mon < 1) {
+	$year--;
+	$mon = 12;
+    }
+    return ($year, $mon);
+}
+
+sub getHolidays {
+    my ($year, $mon, $furikae) = @_;
+
+    my $holidays = get_holidays($year, $mon);
+
+    return if not defined $holidays;
+
     # 国民の休日
     if ($year >= 1986) {
 	# 祝日に挟まれた平日を探す (祝日A - 平日B - 祝日C)
-	while (my ($day, $name) = each %holidays) {
-	    if ( exists $holidays{$day + 2} &&
-		 !exists $holidays{$day + 1}) {
+
+	# 休日検索用テーブル
+	# 祝日Aと祝日Cが月をまたぐケースもあるので、前後の月の情報も結合する
+	my %holidays_search_table = %$holidays;
+	my $next_holidays = get_holidays(next_year_mon($year, $mon));
+	if ($next_holidays) {
+	    my $offset = days_in_month($year, $mon);
+	    while (my ($d, $name) = each %$next_holidays) {
+		$holidays_search_table{$d + $offset} = $name;
+	    }
+	}
+	my $prev_holidays = get_holidays(prev_year_mon($year, $mon));
+	if ($prev_holidays) {
+	    my $offset = -days_in_month(prev_year_mon($year, $mon));
+	    while (my ($d, $name) = each %$prev_holidays) {
+		$holidays_search_table{$d + $offset} = $name;
+	    }
+	}
+
+	foreach my $day (keys %$holidays) {
+	    if ( exists $holidays_search_table{$day + 2} &&
+		 !exists $holidays_search_table{$day + 1}) {
 		my $wday = (localtime(timelocal(0, 0, 0,
 						$day, $mon - 1, $year)))[6];
 		# 祝日Aの時は平日Bはただの振り替え休日
@@ -340,21 +449,21 @@ sub getHolidays {
 		# 平日Bが日曜の場合も国民の休日とはならない
 		next if $wday == 6;
 
-		$holidays{$day + 1} = '国民の休日';
+		$holidays->{$day + 1} = '国民の休日';
 	    }
 	}
     }
 
     # 振り替え休日も含める
     if ($furikae) {
-	my $furikae_days = furikae_days($year, $mon, \%holidays);
+	my $furikae_days = furikae_days($year, $mon, $holidays);
 
 	while (my ($val, $name) = each %$furikae_days) {
-	    $holidays{$val} = $FurikaeStr;
+	    $holidays->{$val} = $FurikaeStr;
 	}
     }
 
-    return \%holidays;
+    return $holidays;
 }
 
 my $Cache_holidays_Year  = 0;

@@ -18,6 +18,13 @@
 	#define sv_derived_from_pvn(sv, name, len) sv_derived_from(sv, name)
 #endif
 
+// HACK: support older perl <5.6 (why not :D)
+#if PERL_BCDVERSION < 0x5006000
+	#define SvUTF8(x) (0)
+	#define SvUTF8_on(x)
+	#define SvUTF8_off(x)
+#endif
+
 #define sub_croak(cv, msg, ...) do { \
 	const GV *const __gv = CvGV(cv); \
 	if (__gv) { \
@@ -69,14 +76,21 @@ static void html5_dom_recursive_node_text(myhtml_tree_node_t *node, SV *sv) {
 	}
 }
 
-static SV *create_tree_object(myhtml_tree_t *tree, SV *parent, html5_dom_parser_t *parser) {
-	tree->context = safemalloc(sizeof(html5_dom_tree_t));
-	
+static SV *create_tree_object(myhtml_tree_t *tree, SV *parent, html5_dom_parser_t *parser, bool used, bool utf8) {
 	html5_dom_tree_t *tree_obj = (html5_dom_tree_t *) tree->context;
+	
+	if (tree_obj)
+		return newRV(tree_obj->sv);
+	
+	tree->context = safemalloc(sizeof(html5_dom_tree_t));
+	tree_obj = (html5_dom_tree_t *) tree->context;
+	
 	tree_obj->tree = tree;
 	tree_obj->parent = parent;
 	tree_obj->parser = parser;
 	tree_obj->fragment_tag_id = MyHTML_TAG__UNDEF;
+	tree_obj->used = used;
+	tree_obj->utf8 = utf8;
 	
 	SvREFCNT_inc(parent);
 	
@@ -109,6 +123,27 @@ static inline const char *get_node_class(myhtml_tree_node_t *node) {
 		return "HTML5::DOM::Document";
 	
 	return "HTML5::DOM::Node";
+}
+
+static inline SV *newSVpv_utf8_auto(myhtml_tree_t *tree, const char *value, STRLEN length) {
+	html5_dom_tree_t *context = (html5_dom_tree_t *) tree->context;
+	if (!context || !context->utf8) {
+		return newSVpv(value, length);
+	} else {
+		SV *sv = newSVpv(value, length);
+		SvUTF8_on(sv);
+		return sv;
+	}
+}
+
+static inline SV *newSVpv_utf8_auto_css(html5_css_selector_t *selector, const char *value, STRLEN length) {
+	if (!selector || !selector->utf8) {
+		return newSVpv(value, length);
+	} else {
+		SV *sv = newSVpv(value, length);
+		SvUTF8_on(sv);
+		return sv;
+	}
 }
 
 static SV *tree_to_sv(myhtml_tree_t *tree) {
@@ -350,15 +385,37 @@ static myencoding_t hv_get_encoding_value(HV *hv, const char *key, int length, m
 					if (!myencoding_name_by_id(enc_id, NULL))
 						return MyENCODING_NOT_DETERMINED;
 				} else { // May be encoding name
-					if (!myencoding_by_name(key, length, &enc_id)) {
-						if (length == 4 && strcasecmp(key, "auto") == 0)
+					if (!myencoding_by_name(enc_str, enc_length, &enc_id)) {
+						if (enc_length == 4 && strcasecmp(enc_str, "auto") == 0)
 							return MyENCODING_AUTO;
-						if (length == 7 && strcasecmp(key, "default") == 0)
+						if (enc_length == 7 && strcasecmp(enc_str, "default") == 0)
 							return MyENCODING_DEFAULT;
 						return MyENCODING_NOT_DETERMINED;
 					}
 				}
 				return enc_id;
+			}
+		}
+	}
+	return def;
+}
+
+static int hv_get_utf8_value(HV *hv, const char *key, int length, int def) {
+	if (hv) {
+		SV **sv = hv_fetch(hv, key, length, 0);
+		if (sv && *sv) {
+			SV *encoding = sv_stringify(*sv);
+			
+			STRLEN enc_length;
+			const char *enc_str = SvPV_const(encoding, enc_length);
+			
+			if (enc_length > 0) {
+				if (isdigit(enc_str[0])) {
+					return SvIV(encoding) != 0;
+				} else if (length == 4 && strcasecmp(enc_str, "auto") == 0) {
+					return 2;
+				}
+				return enc_length > 0;
 			}
 		}
 	}
@@ -375,6 +432,7 @@ static void html5_dom_parse_options(html5_dom_options_t *opts, html5_dom_options
 	opts->encoding_use_meta			= hv_get_int_value(options, "encoding_use_meta", 17, extend ? extend->encoding_use_meta : 1) > 0;
 	opts->encoding_use_bom			= hv_get_int_value(options, "encoding_use_bom", 16, extend ? extend->encoding_use_bom : 1) > 0;
 	opts->encoding_prescan_limit	= hv_get_int_value(options, "encoding_prescan_limit", 22, extend ? extend->encoding_prescan_limit : 1024);
+	opts->utf8						= hv_get_utf8_value(options, "utf8", 4, extend ? extend->utf8 : 2);
 	
 	#ifdef MyCORE_BUILD_WITHOUT_THREADS
 		opts->threads = 0;
@@ -393,21 +451,21 @@ static void html5_dom_check_options(CV *cv, html5_dom_options_t *opts) {
 }
 
 // selectors to AST serialization
-static void html5_dom_css_serialize_entry(mycss_selectors_list_t *selector, mycss_selectors_entry_t *entry, AV *result);
+static void html5_dom_css_serialize_entry(html5_css_selector_t *self, mycss_selectors_list_t *selector, mycss_selectors_entry_t *entry, AV *result);
 
-static void html5_dom_css_serialize_selector(mycss_selectors_list_t *selector, AV *result) {
+static void html5_dom_css_serialize_selector(html5_css_selector_t *self, mycss_selectors_list_t *selector, AV *result) {
 	while (selector) {
 		for (size_t i = 0; i < selector->entries_list_length; ++i) {
 			mycss_selectors_entries_list_t *entries = &selector->entries_list[i];
 			AV *chain = newAV();
-			html5_dom_css_serialize_entry(selector, entries->entry, chain);
+			html5_dom_css_serialize_entry(self, selector, entries->entry, chain);
 			av_push(result, newRV_noinc((SV *) chain));
 		}
 		selector = selector->next;
 	}
 }
 
-static void html5_dom_css_serialize_entry(mycss_selectors_list_t *selector, mycss_selectors_entry_t *entry, AV *result) {
+static void html5_dom_css_serialize_entry(html5_css_selector_t *self, mycss_selectors_list_t *selector, mycss_selectors_entry_t *entry, AV *result) {
 	// combinators names
 	static const struct {
 		const char name[16];
@@ -437,15 +495,15 @@ static void html5_dom_css_serialize_entry(mycss_selectors_list_t *selector, mycs
 	while (entry) {
 		if (entry->combinator != MyCSS_SELECTORS_COMBINATOR_UNDEF) {
 			HV *data = newHV();
-			hv_store_ent(data, sv_2mortal(newSVpv("type", 4)), newSVpv("combinator", 10), 0);
-			hv_store_ent(data, sv_2mortal(newSVpv("value", 5)), newSVpv(combinators[entry->combinator].name, combinators[entry->combinator].len), 0);
+			hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "type", 4)), newSVpv_utf8_auto_css(self, "combinator", 10), 0);
+			hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, combinators[entry->combinator].name, combinators[entry->combinator].len), 0);
 			av_push(result, newRV_noinc((SV *) data));
 		}
 		
 		HV *data = newHV();
 		
 		if ((selector->flags) & MyCSS_SELECTORS_FLAGS_SELECTOR_BAD)
-			hv_store_ent(data, sv_2mortal(newSVpv("invalid", 7)), newSViv(1), 0);
+			hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "invalid", 7)), newSViv(1), 0);
 		
 		switch (entry->type) {
 			case MyCSS_SELECTORS_TYPE_ID:
@@ -456,57 +514,57 @@ static void html5_dom_css_serialize_entry(mycss_selectors_list_t *selector, mycs
 			{
 				switch (entry->type) {
 					case MyCSS_SELECTORS_TYPE_ELEMENT:
-						hv_store_ent(data, sv_2mortal(newSVpv("type", 4)), newSVpv("tag", 3), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "type", 4)), newSVpv_utf8_auto_css(self, "tag", 3), 0);
 					break;
 					case MyCSS_SELECTORS_TYPE_ID:
-						hv_store_ent(data, sv_2mortal(newSVpv("type", 4)), newSVpv("id", 2), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "type", 4)), newSVpv_utf8_auto_css(self, "id", 2), 0);
 					break;
 					case MyCSS_SELECTORS_TYPE_CLASS:
-						hv_store_ent(data, sv_2mortal(newSVpv("type", 4)), newSVpv("class", 5), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "type", 4)), newSVpv_utf8_auto_css(self, "class", 5), 0);
 					break;
 					case MyCSS_SELECTORS_TYPE_PSEUDO_CLASS:
-						hv_store_ent(data, sv_2mortal(newSVpv("type", 4)), newSVpv("pseudo-class", 12), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "type", 4)), newSVpv_utf8_auto_css(self, "pseudo-class", 12), 0);
 					break;
 					case MyCSS_SELECTORS_TYPE_PSEUDO_ELEMENT:
-						hv_store_ent(data, sv_2mortal(newSVpv("type", 4)), newSVpv("pseudo-element", 14), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "type", 4)), newSVpv_utf8_auto_css(self, "pseudo-element", 14), 0);
 					break;
 				}
 				
 				if (entry->key)
-					hv_store_ent(data, sv_2mortal(newSVpv("value", 5)), newSVpv(entry->key->data ? entry->key->data : "", entry->key->length), 0);
+					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, entry->key->data ? entry->key->data : "", entry->key->length), 0);
 			}
 			break;
 			case MyCSS_SELECTORS_TYPE_ATTRIBUTE:
 			{
-				hv_store_ent(data, sv_2mortal(newSVpv("type", 4)), newSVpv("attribute", 9), 0);
+				hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "type", 4)), newSVpv_utf8_auto_css(self, "attribute", 9), 0);
 				
 				/* key */
 				if (entry->key)
-					hv_store_ent(data, sv_2mortal(newSVpv("name", 4)), newSVpv(entry->key->data ? entry->key->data : "", entry->key->length), 0);
+					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, entry->key->data ? entry->key->data : "", entry->key->length), 0);
 				
 				/* value */
 				if (mycss_selector_value_attribute(entry->value)->value) {
 					mycore_string_t *str_value = mycss_selector_value_attribute(entry->value)->value;
-					hv_store_ent(data, sv_2mortal(newSVpv("value", 5)), newSVpv(str_value->data ? str_value->data : "", str_value->length), 0);
+					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, str_value->data ? str_value->data : "", str_value->length), 0);
 				} else {
-					hv_store_ent(data, sv_2mortal(newSVpv("value", 5)), newSVpv("", 0), 0);
+					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, "", 0), 0);
 				}
 				
 				/* match */
 				int match = mycss_selector_value_attribute(entry->value)->match;
-				hv_store_ent(data, sv_2mortal(newSVpv("match", 5)), newSVpv(attr_match_names[match].name, attr_match_names[match].len), 0);
+				hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "match", 5)), newSVpv_utf8_auto_css(self, attr_match_names[match].name, attr_match_names[match].len), 0);
 				
 				/* modificator */
 				if (mycss_selector_value_attribute(entry->value)->mod & MyCSS_SELECTORS_MOD_I) {
-					hv_store_ent(data, sv_2mortal(newSVpv("ignoreCase", 10)), newSViv(1), 0);
+					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "ignoreCase", 10)), newSViv(1), 0);
 				} else {
-					hv_store_ent(data, sv_2mortal(newSVpv("ignoreCase", 10)), newSViv(0), 0);
+					hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "ignoreCase", 10)), newSViv(0), 0);
 				}
 			}
 			break;
 			case MyCSS_SELECTORS_TYPE_PSEUDO_CLASS_FUNCTION:
 			{
-				hv_store_ent(data, sv_2mortal(newSVpv("type", 4)), newSVpv("function", 8), 0);
+				hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "type", 4)), newSVpv_utf8_auto_css(self, "function", 8), 0);
 				
 				switch (entry->sub_type) {
 					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_CONTAINS:
@@ -517,25 +575,25 @@ static void html5_dom_css_serialize_entry(mycss_selectors_list_t *selector, mycs
 					{
 						switch (entry->sub_type) {
 							case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_CONTAINS:
-								hv_store_ent(data, sv_2mortal(newSVpv("name", 4)), newSVpv("contains", 8), 0);
+								hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, "contains", 8), 0);
 							break;
 							case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_HAS:
-								hv_store_ent(data, sv_2mortal(newSVpv("name", 4)), newSVpv("has", 3), 0);
+								hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, "has", 3), 0);
 							break;
 							case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_NOT:
-								hv_store_ent(data, sv_2mortal(newSVpv("name", 4)), newSVpv("not", 3), 0);
+								hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, "not", 3), 0);
 							break;
 							case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_MATCHES:
-								hv_store_ent(data, sv_2mortal(newSVpv("name", 4)), newSVpv("matches", 7), 0);
+								hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, "matches", 7), 0);
 							break;
 							case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_CURRENT:
-								hv_store_ent(data, sv_2mortal(newSVpv("name", 4)), newSVpv("current", 7), 0);
+								hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, "current", 7), 0);
 							break;
 						}
 						
 						AV *value = newAV();
-						html5_dom_css_serialize_selector(entry->value, value);
-						hv_store_ent(data, sv_2mortal(newSVpv("value", 5)), newRV_noinc((SV *) value), 0);
+						html5_dom_css_serialize_selector(self, entry->value, value);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newRV_noinc((SV *) value), 0);
 					}
 					break;
 					
@@ -547,70 +605,70 @@ static void html5_dom_css_serialize_entry(mycss_selectors_list_t *selector, mycs
 					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_NTH_LAST_OF_TYPE:
 					{
 						mycss_an_plus_b_entry_t *a_plus_b = mycss_selector_value_an_plus_b(entry->value);
-						hv_store_ent(data, sv_2mortal(newSVpv("name", 4)), newSVpv("nth-child", 9), 0);
-						hv_store_ent(data, sv_2mortal(newSVpv("a", 1)), newSViv(a_plus_b->a), 0);
-						hv_store_ent(data, sv_2mortal(newSVpv("b", 1)), newSViv(a_plus_b->b), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, "nth-child", 9), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "a", 1)), newSViv(a_plus_b->a), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "b", 1)), newSViv(a_plus_b->b), 0);
 						
 						if (a_plus_b->of) {
 							AV *of = newAV();
-							html5_dom_css_serialize_selector(a_plus_b->of, of);
-							hv_store_ent(data, sv_2mortal(newSVpv("of", 2)), newRV_noinc((SV *) of), 0);
+							html5_dom_css_serialize_selector(self, a_plus_b->of, of);
+							hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "of", 2)), newRV_noinc((SV *) of), 0);
 						}
 					}
 					break;
 					
 					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_DIR:
 					{
-						hv_store_ent(data, sv_2mortal(newSVpv("name", 4)), newSVpv("dir", 3), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, "dir", 3), 0);
 						if (entry->value) {
 							mycore_string_t *str_fname = mycss_selector_value_string(entry->value);
-							hv_store_ent(data, sv_2mortal(newSVpv("value", 5)), newSVpv(str_fname->data ? str_fname->data : "", str_fname->length), 0);
+							hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, str_fname->data ? str_fname->data : "", str_fname->length), 0);
 						} else {
-							hv_store_ent(data, sv_2mortal(newSVpv("value", 5)), newSVpv("", 0), 0);
+							hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newSVpv_utf8_auto_css(self, "", 0), 0);
 						}
 					}
 					break;
 					
 					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_DROP:
 					{
-						hv_store_ent(data, sv_2mortal(newSVpv("name", 4)), newSVpv("drop", 4), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, "drop", 4), 0);
 						mycss_selectors_function_drop_type_t drop_val = mycss_selector_value_drop(entry->value);
 						
 						AV *langs = newAV();
 						if (drop_val & MyCSS_SELECTORS_FUNCTION_DROP_TYPE_ACTIVE)
-							av_push(langs, newSVpv("active", 6));
+							av_push(langs, newSVpv_utf8_auto_css(self, "active", 6));
 						if (drop_val & MyCSS_SELECTORS_FUNCTION_DROP_TYPE_VALID)
-							av_push(langs, newSVpv("valid", 5));
+							av_push(langs, newSVpv_utf8_auto_css(self, "valid", 5));
 						if (drop_val & MyCSS_SELECTORS_FUNCTION_DROP_TYPE_INVALID)
-							av_push(langs, newSVpv("invalid", 7));
-						hv_store_ent(data, sv_2mortal(newSVpv("value", 5)), newRV_noinc((SV *) langs), 0);
+							av_push(langs, newSVpv_utf8_auto_css(self, "invalid", 7));
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newRV_noinc((SV *) langs), 0);
 					}
 					break;
 					
 					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_LANG:
 					{
-						hv_store_ent(data, sv_2mortal(newSVpv("name", 4)), newSVpv("lang", 4), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, "lang", 4), 0);
 						AV *langs = newAV();
 						if (entry->value) {
 							mycss_selectors_value_lang_t *lang = mycss_selector_value_lang(entry->value);
 							while (lang) {
-								av_push(langs, newSVpv(lang->str.data ? lang->str.data : "", lang->str.length));
+								av_push(langs, newSVpv_utf8_auto_css(self, lang->str.data ? lang->str.data : "", lang->str.length));
 								lang = lang->next;
 							}
 						}
-						hv_store_ent(data, sv_2mortal(newSVpv("value", 5)), newRV_noinc((SV *) langs), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "value", 5)), newRV_noinc((SV *) langs), 0);
 					}
 					break;
 					
 					default:
-						hv_store_ent(data, sv_2mortal(newSVpv("name", 4)), newSVpv("unknown", 7), 0);
+						hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "name", 4)), newSVpv_utf8_auto_css(self, "unknown", 7), 0);
 					break;
 				}
 			}
 			break;
 			
 			default:
-				hv_store_ent(data, sv_2mortal(newSVpv("type", 4)), newSVpv("unknown", 7), 0);
+				hv_store_ent(data, sv_2mortal(newSVpv_utf8_auto_css(self, "type", 4)), newSVpv_utf8_auto_css(self, "unknown", 7), 0);
 			break;
 		}
 		
@@ -629,6 +687,10 @@ static html5_dom_async_result *html5_dom_async_parse_init(CV *cv, html5_dom_pars
 	// extends options
 	html5_dom_parse_options(&result->opts, &self->opts, options);
 	html5_dom_check_options(cv, &result->opts);
+	
+	// Auto detect UTF8 flag
+	if (result->opts.utf8 == 2)
+		result->opts.utf8 = SvUTF8(html) ? 1 : 0;
 	
 	mystatus_t status;
 	
@@ -706,7 +768,7 @@ static SV *html5_dom_async_parse_done(CV *cv, html5_dom_async_result *result, bo
 	if (result->tree) {
 		DOM_GC_TRACE("DOM::new");
 		SV *myhtml_sv = pack_pointer("HTML5::DOM", result->parser);
-		result->tree_sv = (void *) create_tree_object(result->tree, SvRV(myhtml_sv), result->parser);
+		result->tree_sv = (void *) create_tree_object(result->tree, SvRV(myhtml_sv), result->parser, false, result->opts.utf8);
 		result->tree = NULL;
 		SvREFCNT_dec(myhtml_sv);
 	}
@@ -758,7 +820,13 @@ CODE:
 	html5_dom_check_options(cv, &self->chunk_opts);
 	
 	if (self->tree) {
-		myhtml_tree_destroy(self->tree);
+		if (self->tree->context) {
+			html5_dom_tree_t *tree_context = (html5_dom_tree_t *) self->tree;
+			tree_context->used = false;
+		} else {
+			myhtml_tree_destroy(self->tree);
+		}
+		
 		self->tree = NULL;
 	}
 	
@@ -802,6 +870,11 @@ CODE:
 	// Try detect encoding only in first chunk
 	if (!self->chunks) {
 		myhtml_encoding_set(self->tree, html5_dom_auto_encoding(&self->chunk_opts, &html_str, &html_length));
+		
+		// Auto detect UTF8 flag
+		if (self->chunk_opts.utf8 == 2)
+			self->chunk_opts.utf8 = SvUTF8(html) ? 1 : 0;
+		
 		html5_dom_apply_tree_options(self->tree, &self->chunk_opts);
 	}
 	
@@ -809,11 +882,25 @@ CODE:
 	
 	status = myhtml_parse_chunk(self->tree, html_str, html_length);
 	if (status) {
-		myhtml_tree_destroy(self->tree);
+		if (!self->tree->context)
+			myhtml_tree_destroy(self->tree);
 		sub_croak(cv, "myhtml_parse_chunk failed: %d (%s)", status, modest_strerror(status));
 	}
 	
 	RETVAL = SvREFCNT_inc(ST(0));
+OUTPUT:
+	RETVAL
+
+# Get current Tree from current chunked parsing session
+SV *
+parseChunkTree(HTML5::DOM self)
+CODE:
+	mystatus_t status;
+	
+	if (!self->tree)
+		sub_croak(cv, "call parseChunkStart or parseChunk first");
+	
+	RETVAL = create_tree_object(self->tree, SvRV(ST(0)), self, true, self->chunk_opts.utf8);
 OUTPUT:
 	RETVAL
 
@@ -824,15 +911,21 @@ CODE:
 	mystatus_t status;
 	
 	if (!self->tree)
-		sub_croak(cv, "call parseChunk first");
+		sub_croak(cv, "call parseChunkStart or parseChunk first");
 	
 	status = myhtml_parse_chunk_end(self->tree);
 	if (status) {
-		myhtml_tree_destroy(self->tree);
+		if (!self->tree->context)
+			myhtml_tree_destroy(self->tree);
 		sub_croak(cv, "myhtml_parse_chunk failed:%d (%s)", status, modest_strerror(status));
 	}
 	
-	RETVAL = create_tree_object(self->tree, SvRV(ST(0)), self);
+	if (self->tree) {
+		html5_dom_tree_t *tree_context = (html5_dom_tree_t *) self->tree;
+		tree_context->used = false;
+	}
+	
+	RETVAL = create_tree_object(self->tree, SvRV(ST(0)), self, false, self->chunk_opts.utf8);
 	self->tree = NULL;
 OUTPUT:
 	RETVAL
@@ -860,6 +953,11 @@ CODE:
 	const char *html_str = SvPV_const(html, html_length);
 	
 	myencoding_t encoding = html5_dom_auto_encoding(&opts, &html_str, &html_length);
+	
+	// Auto detect UTF8 flag
+	if (opts.utf8 == 2)
+		opts.utf8 = SvUTF8(html) ? 1 : 0;
+	
 	html5_dom_apply_tree_options(tree, &opts);
 	
 	status = myhtml_parse(tree, encoding, html_str, html_length);
@@ -868,7 +966,7 @@ CODE:
 		sub_croak(cv, "myhtml_parse failed: %d (%s)", status, modest_strerror(status));
 	}
 	
-	RETVAL = create_tree_object(tree, SvRV(ST(0)), self);
+	RETVAL = create_tree_object(tree, SvRV(ST(0)), self, false, opts.utf8);
 OUTPUT:
 	RETVAL
 
@@ -1107,6 +1205,34 @@ CODE:
 OUTPUT:
 	RETVAL
 
+# utf8(flag)				- enable or disable utf8 mode
+# utf8()					- get status of utf8 mode (0 - disabled, 1 - enabled)
+SV *
+utf8(HTML5::DOM::Tree self, SV *value = NULL)
+CODE:
+	if (!value) {
+		RETVAL = newSViv(self->utf8 ? 1 : 0);
+	} else {
+		value = sv_stringify(value);
+		
+		STRLEN enc_length;
+		const char *enc_str = SvPV_const(value, enc_length);
+		
+		if (enc_length > 0) {
+			if (isdigit(enc_str[0])) {
+				self->utf8 = SvIV(value) != 0;
+			} else {
+				self->utf8 = 1;
+			}
+		}
+		
+		self->utf8 = 0;
+		
+		RETVAL = SvREFCNT_inc(ST(0));
+	}
+OUTPUT:
+	RETVAL
+
 # findTag(val), getElementsByTagName(val)									- get nodes by tag name
 # findClass(val), getElementsByClassName(val)								- get nodes by class name
 # findId(val), getElementById(val)											- get node by id
@@ -1133,10 +1259,10 @@ compatMode(HTML5::DOM::Tree self)
 CODE:
 	if (self->tree->compat_mode == MyHTML_TREE_COMPAT_MODE_QUIRKS) {
 		// if the document is in quirks mode.
-		RETVAL = newSVpv("BackCompat", 10);
+		RETVAL = newSVpv_utf8_auto(self->tree, "BackCompat", 10);
 	} else {
 		// if the document is in no-quirks (also known as "standards") mode or limited-quirks (also known as "almost standards") mode.
-		RETVAL = newSVpv("CSS1Compat", 10);
+		RETVAL = newSVpv_utf8_auto(self->tree, "CSS1Compat", 10);
 	}
 OUTPUT:
 	RETVAL
@@ -1147,7 +1273,7 @@ encoding(HTML5::DOM::Tree self)
 CODE:
 	size_t length = 0;
 	const char *name = myencoding_name_by_id(self->tree->encoding, &length);
-	RETVAL = newSVpv(name ? name : "", length);
+	RETVAL = newSVpv_utf8_auto(self->tree, name ? name : "", length);
 OUTPUT:
 	RETVAL
 
@@ -1177,7 +1303,7 @@ CODE:
 	RETVAL = &PL_sv_undef;
 	const myhtml_tag_context_t *tag_ctx = myhtml_tag_get_by_id(self->tree->tags, tag_id);
 	if (tag_ctx)
-		RETVAL = newSVpv(tag_ctx->name ? tag_ctx->name : "", tag_ctx->name_length);
+		RETVAL = newSVpv_utf8_auto(self->tree, tag_ctx->name ? tag_ctx->name : "", tag_ctx->name_length);
 OUTPUT:
 	RETVAL
 
@@ -1203,7 +1329,7 @@ id2namespace(HTML5::DOM::Tree self, int ns_id)
 CODE:
 	size_t ns_len = 0;
 	const char *ns_name = myhtml_namespace_name_by_id(ns_id, &ns_len);
-	RETVAL = ns_name ? newSVpv(ns_name, ns_len) : &PL_sv_undef;
+	RETVAL = ns_name ? newSVpv_utf8_auto(self->tree, ns_name, ns_len) : &PL_sv_undef;
 OUTPUT:
 	RETVAL
 
@@ -1241,10 +1367,13 @@ DESTROY(HTML5::DOM::Tree self)
 CODE:
 	DOM_GC_TRACE("DOM::Tree::DESTROY (refs=%d)", SvREFCNT(SvRV(ST(0))));
 	void *context = self->tree->context;
-	myhtml_tree_destroy(self->tree);
+	if (self->used) {
+		self->tree->context = NULL;
+	} else {
+		myhtml_tree_destroy(self->tree);
+	}
 	SvREFCNT_dec(self->parent);
 	safefree(context);
-
 
 
 #################################################################
@@ -1317,7 +1446,7 @@ CODE:
 		if (tree && tree->tags) {
 			const myhtml_tag_context_t *tag_ctx = myhtml_tag_get_by_id(tree->tags, self->tag_id);
 			if (tag_ctx) {
-				RETVAL = newSVpv(tag_ctx->name, tag_ctx->name_length);
+				RETVAL = newSVpv_utf8_auto(self->tree, tag_ctx->name, tag_ctx->name_length);
 				if (ix == 1 || ix == 2) {
 					STRLEN value_len;
 					char *value = SvPV(RETVAL, value_len);
@@ -1353,7 +1482,7 @@ CODE:
 	else {
 		size_t ns_name_len;
 		const char *ns_name = myhtml_namespace_name_by_id(myhtml_node_namespace(self), &ns_name_len);
-		RETVAL = newSVpv(ns_name ? ns_name : "", ns_name_len);
+		RETVAL = newSVpv_utf8_auto(self->tree, ns_name ? ns_name : "", ns_name_len);
 	}
 OUTPUT:
 	RETVAL
@@ -1370,7 +1499,7 @@ OUTPUT:
 SV *
 nodeHtml(HTML5::DOM::Node self)
 CODE:
-	RETVAL = newSVpv("", 0);
+	RETVAL = newSVpv_utf8_auto(self->tree, "", 0);
 	myhtml_serialization_node_callback(self, sv_serialization_callback, RETVAL);
 OUTPUT:
 	RETVAL
@@ -1491,7 +1620,7 @@ CODE:
 		}
 		RETVAL = SvREFCNT_inc(ST(0));
 	} else {
-		RETVAL = newSVpv("", 0);
+		RETVAL = newSVpv_utf8_auto(self->tree, "", 0);
 		if (self->tag_id == MyHTML_TAG__UNDEF || ix == 1 || html5_dom_is_fragment(self)) { // innerHTML
 			myhtml_tree_node_t *node = myhtml_node_child(self);
 			while (node) {
@@ -1539,7 +1668,7 @@ CODE:
 		} else { // get node value
 			size_t text_len = 0;
 			const char *text = myhtml_node_text(self, &text_len);
-			RETVAL = newSVpv(text ? text : "", text_len);
+			RETVAL = newSVpv_utf8_auto(self->tree, text ? text : "", text_len);
 		}
 	} else {
 		if (ix == 1 || ix == 4) {
@@ -1649,12 +1778,12 @@ CODE:
 				}
 				html5_dom_rtrim_mystring(&state.value, ' ');
 				
-				RETVAL = newSVpv(state.value.data ? state.value.data : "", state.value.length);
+				RETVAL = newSVpv_utf8_auto(self->tree, state.value.data ? state.value.data : "", state.value.length);
 				mycore_string_destroy(&state.value, 0);
 			}
 			// text, textContent
 			else {
-				RETVAL = newSVpv("", 0);
+				RETVAL = newSVpv_utf8_auto(self->tree, "", 0);
 				html5_dom_recursive_node_text(self, RETVAL);
 			}
 		}
@@ -2037,10 +2166,10 @@ SV *
 position(HTML5::DOM::Node self)
 CODE:
 	HV *hash = newHV();
-	hv_store_ent(hash, sv_2mortal(newSVpv("raw_begin", 9)), newSViv(self->token ? self->token->raw_begin : 0), 0);
-	hv_store_ent(hash, sv_2mortal(newSVpv("raw_length", 10)), newSViv(self->token ? self->token->raw_length : 0), 0);
-	hv_store_ent(hash, sv_2mortal(newSVpv("element_begin", 13)), newSViv(self->token ? self->token->element_begin : 0), 0);
-	hv_store_ent(hash, sv_2mortal(newSVpv("element_length", 14)), newSViv(self->token ? self->token->element_length : 0), 0);
+	hv_store_ent(hash, sv_2mortal(newSVpv_utf8_auto(self->tree, "raw_begin", 9)), newSViv(self->token ? self->token->raw_begin : 0), 0);
+	hv_store_ent(hash, sv_2mortal(newSVpv_utf8_auto(self->tree, "raw_length", 10)), newSViv(self->token ? self->token->raw_length : 0), 0);
+	hv_store_ent(hash, sv_2mortal(newSVpv_utf8_auto(self->tree, "element_begin", 13)), newSViv(self->token ? self->token->element_begin : 0), 0);
+	hv_store_ent(hash, sv_2mortal(newSVpv_utf8_auto(self->tree, "element_length", 14)), newSViv(self->token ? self->token->element_length : 0), 0);
 	RETVAL = newRV_noinc((SV *) hash);
 OUTPUT:
 	RETVAL
@@ -2199,9 +2328,9 @@ CODE:
 		size_t ns_len = 0;
 		const char *ns_name = myhtml_namespace_name_by_id(myhtml_attribute_namespace(attr), &ns_len);
 		
-		hv_store_ent(hash, sv_2mortal(newSVpv("name", 4)), newSVpv(attr_key ? attr_key : "", attr_key_len), 0);
-		hv_store_ent(hash, sv_2mortal(newSVpv("value", 5)), newSVpv(attr_val ? attr_val : "", attr_val_len), 0);
-		hv_store_ent(hash, sv_2mortal(newSVpv("namespace", 9)), newSVpv(ns_name ? ns_name : "", ns_len), 0);
+		hv_store_ent(hash, sv_2mortal(newSVpv_utf8_auto(self->tree, "name", 4)), newSVpv_utf8_auto(self->tree, attr_key ? attr_key : "", attr_key_len), 0);
+		hv_store_ent(hash, sv_2mortal(newSVpv_utf8_auto(self->tree, "value", 5)), newSVpv_utf8_auto(self->tree, attr_val ? attr_val : "", attr_val_len), 0);
+		hv_store_ent(hash, sv_2mortal(newSVpv_utf8_auto(self->tree, "namespace", 9)), newSVpv_utf8_auto(self->tree, ns_name ? ns_name : "", ns_len), 0);
 		
 		av_push(array, newRV_noinc((SV *) hash));
 		
@@ -2296,7 +2425,7 @@ CODE:
 				if (attr) {
 					size_t attr_val_len = 0;
 					const char *attr_val = myhtml_attribute_value(attr, &attr_val_len);
-					RETVAL = newSVpv(attr_val ? attr_val : "", attr_val_len);
+					RETVAL = newSVpv_utf8_auto(self->tree, attr_val ? attr_val : "", attr_val_len);
 				}
 			}
 		}
@@ -2311,7 +2440,7 @@ CODE:
 			size_t attr_val_len = 0;
 			const char *attr_val = myhtml_attribute_value(attr, &attr_val_len);
 			
-			hv_store_ent(hash, sv_2mortal(newSVpv(attr_key ? attr_key : "", attr_key_len)), newSVpv(attr_val ? attr_val : "", attr_val_len), 0);
+			hv_store_ent(hash, sv_2mortal(newSVpv_utf8_auto(self->tree, attr_key ? attr_key : "", attr_key_len)), newSVpv_utf8_auto(self->tree, attr_val ? attr_val : "", attr_val_len), 0);
 			
 			attr = myhtml_attribute_next(attr);
 		}
@@ -2436,7 +2565,7 @@ CODE:
 		break;
 	}
 	
-	RETVAL = ret ? newSVpv(ret, strlen(ret)) : &PL_sv_undef;
+	RETVAL = ret ? newSVpv_utf8_auto(self->tree, ret, strlen(ret)) : &PL_sv_undef;
 OUTPUT:
 	RETVAL
 
@@ -2526,15 +2655,15 @@ CODE:
 		
 		switch (ix) {
 			case 0: /* name */
-				RETVAL = newSVpv(root_name && root_name->key.data ? root_name->key.data : "", root_name ? root_name->key.length : 0);
+				RETVAL = newSVpv_utf8_auto(self->tree, root_name && root_name->key.data ? root_name->key.data : "", root_name ? root_name->key.length : 0);
 			break;
 			
 			case 1: /* publicId */
-				RETVAL = newSVpv(public_id && public_id->value.data ? public_id->value.data : "", public_id ? public_id->value.length : 0);
+				RETVAL = newSVpv_utf8_auto(self->tree, public_id && public_id->value.data ? public_id->value.data : "", public_id ? public_id->value.length : 0);
 			break;
 			
 			case 2: /* systemId */
-				RETVAL = newSVpv(system_id && system_id->value.data ? system_id->value.data : "", system_id ? system_id->value.length : 0);
+				RETVAL = newSVpv_utf8_auto(self->tree, system_id && system_id->value.data ? system_id->value.data : "", system_id ? system_id->value.length : 0);
 			break;
 		}
 	}
@@ -2546,7 +2675,7 @@ OUTPUT:
 #################################################################
 MODULE = HTML5::DOM  PACKAGE = HTML5::DOM::CSS
 HTML5::DOM::CSS
-new(SV *CLASS)
+new(SV *CLASS, HV *options = NULL)
 CODE:
 	DOM_GC_TRACE("DOM::CSS::new");
 	mystatus_t status;
@@ -2570,15 +2699,21 @@ CODE:
 	self->mycss = mycss;
 	self->entry = entry;
 	self->encoding = MyENCODING_UTF_8;
+	
+	html5_dom_parse_options(&self->opts, NULL, options);
+	
 	RETVAL = self;
 OUTPUT:
 	RETVAL
 
 # Parse css selector
 SV *
-parseSelector(HTML5::DOM::CSS self, SV *query)
+parseSelector(HTML5::DOM::CSS self, SV *query, HV *options = NULL)
 CODE:
 	mystatus_t status;
+	
+	html5_dom_options_t opts;
+	html5_dom_parse_options(&opts, &self->opts, options);
 	
 	query = sv_stringify(query);
 	
@@ -2592,6 +2727,13 @@ CODE:
 	selector->parent = SvRV(ST(0));
 	selector->list = list;
 	selector->parser = self;
+	
+	if (opts.utf8 == 2) {
+		selector->utf8 = SvUTF8(query) ? 1 : 0;
+	} else {
+		selector->utf8 = opts.utf8 != 0;
+	}
+	
 	SvREFCNT_inc(selector->parent);
 	RETVAL = pack_pointer("HTML5::DOM::CSS::Selector", selector);
 OUTPUT:
@@ -2615,7 +2757,7 @@ MODULE = HTML5::DOM  PACKAGE = HTML5::DOM::CSS::Selector
 SV *
 text(HTML5::DOM::CSS::Selector self)
 CODE:
-	RETVAL = newSVpv("", 0);
+	RETVAL = newSVpv_utf8_auto_css(self, "", 0);
 	if (self->list)
 		mycss_selectors_serialization_list(mycss_entry_selectors(self->parser->entry), self->list, sv_serialization_callback, RETVAL);
 OUTPUT:
@@ -2635,7 +2777,7 @@ ast(HTML5::DOM::CSS::Selector self)
 CODE:
 	AV *result = newAV();
 	if (self->list)
-		html5_dom_css_serialize_selector(self->list, result);
+		html5_dom_css_serialize_selector(self, self->list, result);
 	RETVAL = newRV_noinc((SV *) result);
 OUTPUT:
 	RETVAL
@@ -2666,6 +2808,34 @@ CODE:
 OUTPUT:
 	RETVAL
 
+# utf8(flag)				- enable or disable utf8 mode
+# utf8()					- get status of utf8 mode (0 - disabled, 1 - enabled)
+SV *
+utf8(HTML5::DOM::CSS::Selector self, SV *value = NULL)
+CODE:
+	if (!value) {
+		RETVAL = newSViv(self->utf8 ? 1 : 0);
+	} else {
+		value = sv_stringify(value);
+		
+		STRLEN enc_length;
+		const char *enc_str = SvPV_const(value, enc_length);
+		
+		if (enc_length > 0) {
+			if (isdigit(enc_str[0])) {
+				self->utf8 = SvIV(value) != 0;
+			} else {
+				self->utf8 = 1;
+			}
+		}
+		
+		self->utf8 = 0;
+		
+		RETVAL = SvREFCNT_inc(ST(0));
+	}
+OUTPUT:
+	RETVAL
+
 void
 DESTROY(HTML5::DOM::CSS::Selector self)
 CODE:
@@ -2685,7 +2855,7 @@ MODULE = HTML5::DOM  PACKAGE = HTML5::DOM::CSS::Selector::Entry
 SV *
 text(HTML5::DOM::CSS::Selector::Entry self)
 CODE:
-	RETVAL = newSVpv("", 0);
+	RETVAL = newSVpv_utf8_auto_css(self->selector, "", 0);
 	mycss_selectors_serialization_chain(mycss_entry_selectors(self->selector->parser->entry), self->list->entry, sv_serialization_callback, RETVAL);
 OUTPUT:
 	RETVAL
@@ -2695,7 +2865,7 @@ SV *
 ast(HTML5::DOM::CSS::Selector::Entry self)
 CODE:
 	AV *result = newAV();
-	html5_dom_css_serialize_entry(self->selector->list, self->list->entry, result);
+	html5_dom_css_serialize_entry(self->selector, self->selector->list, self->list->entry, result);
 	RETVAL = newRV_noinc((SV *) result);
 OUTPUT:
 	RETVAL
@@ -2708,7 +2878,7 @@ CODE:
 	RETVAL = &PL_sv_undef;
 	while (entry) {
 		if (entry->type == MyCSS_SELECTORS_TYPE_PSEUDO_ELEMENT) {
-			RETVAL = newSVpv(entry->key->data ? entry->key->data : "", entry->key->length);
+			RETVAL = newSVpv_utf8_auto_css(self->selector, entry->key->data ? entry->key->data : "", entry->key->length);
 			break;
 		}
 		entry = entry->next;
@@ -2729,9 +2899,9 @@ SV *
 specificity(HTML5::DOM::CSS::Selector::Entry self)
 CODE:
 	HV *hash = newHV();
-	hv_store_ent(hash, sv_2mortal(newSVpv("a", 1)), newSViv(self->list->specificity.a), 0);
-	hv_store_ent(hash, sv_2mortal(newSVpv("b", 1)), newSViv(self->list->specificity.b), 0);
-	hv_store_ent(hash, sv_2mortal(newSVpv("c", 1)), newSViv(self->list->specificity.c), 0);
+	hv_store_ent(hash, sv_2mortal(newSVpv_utf8_auto_css(self->selector, "a", 1)), newSViv(self->list->specificity.a), 0);
+	hv_store_ent(hash, sv_2mortal(newSVpv_utf8_auto_css(self->selector, "b", 1)), newSViv(self->list->specificity.b), 0);
+	hv_store_ent(hash, sv_2mortal(newSVpv_utf8_auto_css(self->selector, "c", 1)), newSViv(self->list->specificity.c), 0);
 	RETVAL = newRV_noinc((SV *) hash);
 OUTPUT:
 	RETVAL
@@ -2851,6 +3021,9 @@ CODE:
 	ST(0) = newSViv(encoding);
 	ST(1) = newSVpv(text_str, text_len);
 	
+	if (SvUTF8(text))
+		SvUTF8_on(ST(0));
+	
 	sv_2mortal(ST(0));
 	sv_2mortal(ST(1));
 	
@@ -2878,6 +3051,9 @@ CODE:
 	
 	ST(0) = newSViv(encoding);
 	ST(1) = newSVpv(text_str, text_len);
+	
+	if (SvUTF8(text))
+		SvUTF8_on(ST(0));
 	
 	sv_2mortal(ST(0));
 	sv_2mortal(ST(1));

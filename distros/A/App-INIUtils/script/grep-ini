@@ -1,0 +1,197 @@
+#!perl
+
+our $DATE = '2019-01-17'; # DATE
+our $VERSION = '0.032'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use App::INIUtils;
+use App::INIUtils::Common;
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+$SPEC{grep_ini} = {
+    v => 1.1,
+    summary => 'Filter INI using pattern against section/key/value',
+    args => {
+        %App::INIUtils::args_common,
+        %App::INIUtils::Common::args_grep,
+    },
+    result_naked => 1,
+    'cmdline.skip_format' => 1,
+};
+sub grep_ini {
+    my %args = @_;
+
+    my $reader = App::INIUtils::_get_ciir_reader(\%args);
+
+    my $hoh = $reader->read_string($args{ini});
+    $hoh = App::INIUtils::Common::grep_hoh(hoh => $hoh, %args);
+    App::INIUtils::Common::hoh_as_ini($hoh);
+}
+
+my $cli = Perinci::CmdLine::Any->new(
+    url => '/main/grep_ini',
+    read_config => 0,
+    read_env => 0,
+);
+
+$cli->common_opts->{version}{getopt} = 'V';
+
+$cli->run;
+
+# ABSTRACT: Filter INI using pattern against section/key/value
+# PODNAME: grep-ini
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+grep-ini - Filter INI using pattern against section/key/value
+
+=head1 VERSION
+
+This document describes version 0.032 of grep-ini (from Perl distribution App-INIUtils), released on 2019-01-17.
+
+=head1 SYNOPSIS
+
+Examples:
+
+ # only show sections with 'foo' in their name
+ % grep-ini --section foo /path/to/file.ini
+
+ # do not (-v) show sections with 'foo' in their name, do case-insensitive matching (-i)
+ % grep-ini --section foo -iv /path/to/file.ini
+
+ # only show keys with 'foo' in their name
+ % grep-ini --key foo /path/to/file.ini
+
+ # only show values with 'foo' in their name
+ % grep-ini --value foo /path/to/file.ini
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--ignore-case>, B<-i>
+
+=item B<--invert-match>, B<-v>
+
+=item B<--invert-match-key>
+
+=item B<--invert-match-section>
+
+=item B<--invert-match-value>
+
+=item B<--key>=I<s>
+
+=item B<--section>=I<s>
+
+=item B<--value>=I<s>
+
+=back
+
+=head2 Parser options
+
+=over
+
+=item B<--default-section>=I<s>
+
+Default value:
+
+ "GLOBAL"
+
+=item B<--disallow-duplicate-key>
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--ini>=I<s>*
+
+INI file.
+
+=item B<-V>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C grep-ini grep-ini
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete grep-ini 'p/*/`grep-ini`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-INIUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-INIUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-INIUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

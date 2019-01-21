@@ -1,6 +1,6 @@
 package WWW::Google::UserAgent;
 
-$WWW::Google::UserAgent::VERSION   = '0.21';
+$WWW::Google::UserAgent::VERSION   = '0.22';
 $WWW::Google::UserAgent::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::UserAgent - Low-level HTTP request handler for Google API.
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
@@ -20,7 +20,7 @@ use HTTP::Tiny;
 use WWW::Google::UserAgent::Exception;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'api_key' => ( is => 'ro', required => 1 );
 has 'ua'      => ( is => 'rw', default => sub { HTTP::Tiny->new(agent => "WWW-Google/0.01"); } );
@@ -47,7 +47,7 @@ sub get {
     @caller = caller(2) if $caller[3] eq '(eval)';
 
     unless ($response->{success}) {
-	WWW::Google::UserAgent::Exception->throw({
+        WWW::Google::UserAgent::Exception->throw({
             method      => $caller[3],
             code        => $response->{status},
             message     => $response->{reason},
@@ -98,17 +98,17 @@ L<https://github.com/manwar/WWW-Google-UserAgent>
 
 =over 4
 
-=item * L<WWW::Google::CustomSearch>
-
-=item * L<WWW::Google::Places>
-
 =item * L<WWW::Google::APIDiscovery>
+
+=item * L<WWW::Google::CustomSearch>
 
 =item * L<WWW::Google::DistanceMatrix>
 
-=item * L<WWW::Google::URLShortener>
+=item * L<WWW::Google::KnowledgeGraphSearch>
 
 =item * L<WWW::Google::PageSpeedOnline>
+
+=item * L<WWW::Google::Places>
 
 =back
 

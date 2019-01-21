@@ -1,0 +1,39 @@
+---
+abstract: 'add methods with temporaly use of suppress_row_objects'
+author:
+  - 'egawata <egawa.takashi@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Teng-Plugin-TmpSuppressRowObjects
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Teng::Plugin::TmpSuppressRowObjects:
+    file: lib/Teng/Plugin/TmpSuppressRowObjects.pm
+    version: '0.03'
+requires:
+  Teng: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/egawata/Teng-Plugin-TmpSuppressRowObjects/issues
+  homepage: https://github.com/egawata/Teng-Plugin-TmpSuppressRowObjects
+  repository: git://github.com/egawata/Teng-Plugin-TmpSuppressRowObjects.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

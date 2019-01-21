@@ -15,6 +15,20 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_unitTest: Ignore(2) {
+    my $self = shift;
+
+    my $mwl = Quiq::MediaWiki::Api->new('ruv',-debug=>1);
+    $self->is(ref($mwl),'Quiq::MediaWiki::Api');
+
+    my $url = $mwl->url;
+    $self->is($url,'http://lxv0103.ruv.de:8080/api.php');
+
+    $mwl->loadPage('dss-ims-manual','~/dss-ims-manual.mw');
+}
+
+# -----------------------------------------------------------------------------
+
 package main;
 Quiq::MediaWiki::Api::Test->runTests;
 

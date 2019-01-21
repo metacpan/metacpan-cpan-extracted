@@ -2,23 +2,25 @@ package LCFG::Build::Utils;    # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: Utils.pm.in 29224 2015-11-12 10:11:34Z squinney@INF.ED.AC.UK $
+# $Id: Utils.pm.in 35408 2019-01-17 16:05:10Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Utils.pm.in,v $
-# $Revision: 29224 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_6_6/lib/LCFG/Build/Utils.pm.in $
-# $Date: 2015-11-12 10:11:34 +0000 (Thu, 12 Nov 2015) $
+# $Revision: 35408 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_18/lib/LCFG/Build/Utils.pm.in $
+# $Date: 2019-01-17 16:05:10 +0000 (Thu, 17 Jan 2019) $
 
-our $VERSION = '0.6.6';
+our $VERSION = '0.9.18';
 
 use v5.10;
 
 use Cwd ();
 use File::Basename ();
 use File::Find     ();
+use File::pushd    ();
 use File::Spec     ();
 use File::Temp     ();
 use IO::File       ();
-use Module::Pluggable search_path => [ 'LCFG::Build::Utils' ];
+use Module::Pluggable v3.10 search_path => [ 'LCFG::Build::Utils' ];
+use Try::Tiny;
 
 use constant NOT_FOUND => -1;
 
@@ -146,7 +148,7 @@ sub translate_file {
     my $outdir = ( File::Basename::fileparse($out) )[1];
 
     my $tmp = File::Temp->new(
-        TEMPLATE => 'tempXXXX',
+        TEMPLATE => 'lcfgXXXXXX',
         DIR      => $outdir,
         UNLINK   => 0,
     );
@@ -333,9 +335,10 @@ sub generate_srctar {
     pop @parent_dirs;
     my $parent_dir = File::Spec->catdir(@parent_dirs);
 
-    my $prev_dir = Cwd::getcwd(); # will need to go back to this later
+    # Need to ensure we are in the correct directory before adding
+    # files to the tar archive.
 
-    chdir $parent_dir or die "Could not cd to $parent_dir: $!\n";
+    my $dh = File::pushd::pushd($parent_dir);
 
     require Archive::Tar;
     require IO::Zlib;
@@ -346,6 +349,11 @@ sub generate_srctar {
 
     File::Find::find(
         {   wanted => sub {
+                # debian packaging stuff does not belong in the source tar file
+                if ( $File::Find::name eq "$srcdir/debian" ) {
+                    $File::Find::prune = 1;
+                    return;
+                }
                 my $name
                     = File::Spec->abs2rel( $File::Find::name, $parent_dir );
                 $tar->add_files($name);
@@ -359,9 +367,36 @@ sub generate_srctar {
 
     $tar->write( $tarfile, 1 );
 
-    chdir $prev_dir;
-
     return $tarfile;
+}
+
+sub run_plugins_method {
+    my ( $class, $method, @method_args ) = @_;
+
+    $method //= 'generate_metadata';
+
+    my $success = 1;
+    for my $util ( sort $class->plugins() ) {
+        my $loaded = $util->require;
+        if ( !$loaded ) {
+            warn "Failed to load plugin module '$util': $@\n";
+            next;
+        }
+
+        my $type = ( split /::/, $util )[-1];
+
+        if ( $util->can($method) ) {
+            try {
+                $util->$method(@method_args);
+                say STDERR "Successfully generated metadata files for $type";
+            } catch {
+                warn "Failed to generate package metadata files for $type: $_\n";
+                $success = 0;
+            };
+        }
+    }
+
+    return $success;
 }
 
 1;
@@ -373,7 +408,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Utils version 0.6.6
+    This documentation refers to LCFG::Build::Utils version 0.9.18
 
 =head1 SYNOPSIS
 

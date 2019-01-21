@@ -2,8 +2,10 @@ use Test::More;
 
 # assumes suitable class setup before call
 sub run_struct_tests {
-  my $o = Inline::Struct::Foo->new->inum(10)->dnum(3.1415)->str('Wazzup?');
-  $o->inum(10);
+  my $class = 'Inline::Struct::Foo';
+  my $o = $class->new;
+  isa_ok $o, $class;
+  isa_ok $o->inum(10), $class;
   $o->dnum(3.1415);
   $o->str('Wazzup?');
   my %vals = (inum => 10, dnum => 3.1415, str => 'Wazzup?');

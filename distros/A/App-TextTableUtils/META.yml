@@ -17,6 +17,8 @@ meta-spec:
   version: '1.4'
 name: App-TextTableUtils
 requires:
+  Config::IOD::INI::Reader: '0'
+  Config::IOD::Reader: '0.341'
   Data::Check::Structure: '0'
   Data::Dumper: '0'
   Getopt::Long: '0'
@@ -36,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-TextTableUtils
   homepage: https://metacpan.org/release/App-TextTableUtils
   repository: git://github.com/perlancar/perl-App-TextTableUtils.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

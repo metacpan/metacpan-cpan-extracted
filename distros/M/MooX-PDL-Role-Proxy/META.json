@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -32,7 +32,6 @@
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::AutoMetaResources" : "0",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
             "Dist::Zilla::Plugin::CPANFile" : "0",
@@ -46,6 +45,7 @@
             "Dist::Zilla::Plugin::MetaJSON" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
             "Dist::Zilla::Plugin::ModuleBuildTiny" : "0",
             "Dist::Zilla::Plugin::NextRelease" : "0",
             "Dist::Zilla::Plugin::PodCoverageTests" : "0",
@@ -102,7 +102,7 @@
             "Hash::Wrap" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
-            "MooX::TaggedAttributes" : "0.05",
+            "MooX::TaggedAttributes" : "0.07",
             "PDL" : "0",
             "PDL::Primitive" : "0",
             "Scalar::Util" : "0",
@@ -134,13 +134,12 @@
    "provides" : {
       "MooX::PDL::Role::Proxy" : {
          "file" : "lib/MooX/PDL/Role/Proxy.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-MooX-PDL-Role-Proxy@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-PDL-Role-Proxy"
       },
       "repository" : {
@@ -149,7 +148,8 @@
          "web" : "https://gitlab.com/djerius/moox-pdl-role-proxy"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "0.03",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

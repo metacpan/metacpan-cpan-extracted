@@ -1,0 +1,128 @@
+#!perl
+
+our $DATE = '2019-01-20'; # DATE
+our $VERSION = '0.112'; # VERSION
+
+BEGIN { $ENV{TRACE} // 1 }
+
+use 5.010001;
+use strict 'subs', 'vars';
+use warnings;
+use Log::ger;
+
+use File::Which qw(which);
+use Getopt::Long;
+use Log::ger::Level::FromEnv;
+use Log::ger::Output qw(Screen);
+use String::ShellQuote;
+
+my %Opts = (
+);
+
+# arguments to pass to x.completion routine
+my %args;
+
+my @inc = @INC;
+Getopt::Long::Configure(
+    'no_ignore_case', 'bundling', 'permute', 'pass_through',
+    'auto_help', 'auto_version');
+GetOptions(
+    'include|I=s' => sub {
+        unshift @inc, $_[1];
+    },
+    'arg=s%'  => \%args,
+    'raw' => \$Opts{raw},
+);
+
+@ARGV or die "testxcomp: Please specify name of x.completion routine\n";
+my $name = shift @ARGV;
+my $mod = "Perinci::Sub::XCompletion::$name";
+(my $mod_pm = "$mod.pm") =~ s!::!/!g;
+{ local @INC = @inc; require $mod_pm };
+
+my $routine = &{"$mod\::gen_completion"}();
+my $res = $routine->(word => $ARGV[0], %args);
+if ($Opts{raw}) {
+    require Data::Dump;
+    Data::Dump::dd($res);
+} else {
+    require Complete::Bash;
+    print Complete::Bash::format_completion($res, {as=>'str'});
+}
+
+# ABSTRACT: Invoke Perinci::Sub::XCompletion::* completion routine
+# PODNAME: testxcomp
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+testxcomp - Invoke Perinci::Sub::XCompletion::* completion routine
+
+=head1 VERSION
+
+This document describes version 0.112 of testxcomp (from Perl distribution App-PerinciUtils), released on 2019-01-20.
+
+=head1 SYNOPSIS
+
+ % testxcomp filename foo
+
+will load L<Perinci::Sub::XCompletion::filename>, invoke its C<gen_completion()>
+to get a completion routine, then run the completion routine with arguments: C<<
+(word=>"foo") >>, then return the results one item per line.
+
+ % testxcomp filename foo --arg filter=fx --arg starting_path=subdir
+
+will do the same and run the completion routine with arguments: C<<
+(word=>"foo", filter=>"fx", starting_path"=>"subdir") >>.
+
+It's a quick way to test completion routine defined in a
+Perinci::Sub::XCompletion::* module.
+
+=head1 OPTIONS
+
+=head2 --arg=s%
+
+Specify arguments to pass to completion routine.
+
+=head2 --raw
+
+Instead of formatting the completion answer using L<Complete::Bash>'s
+C<format_completion>, display the answer structure as Perl.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PerinciUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PerinciUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerinciUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Perinci::Sub::XCompletion>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

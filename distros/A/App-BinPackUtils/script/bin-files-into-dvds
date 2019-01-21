@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/BinPackUtils/bin_files_into_dvds
 # and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2019-01-16'; # DATE
+our $DATE = '2019-01-17'; # DATE
 our $DIST = 'App-BinPackUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ bin-files-into-dvds - Put files into DVD bins
 
 =head1 VERSION
 
-This document describes version 0.002 of bin-files-into-dvds (from Perl distribution App-BinPackUtils), released on 2019-01-16.
+This document describes version 0.003 of bin-files-into-dvds (from Perl distribution App-BinPackUtils), released on 2019-01-17.
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--bin-size>=I<s>, B<-s>
+=item B<--dvd-size>=I<s>, B<-s>
 
 Default value:
 
@@ -73,6 +73,10 @@ Can be specified multiple times.
 =item B<--move>
 
 Actually move the files to the bins.
+
+=item B<--num-dvds>, B<-n>
+
+Just return the number of DVDs required.
 
 =back
 

@@ -1,3 +1,8 @@
+0.73     2019-01-20
+
+- Fix test failures on Windows. Based on GH #91 from Shlomi Fish.
+
+
 0.72     2018-12-20
 
 - Added documentation for the -j/--jobs flag to the tidyall script's help

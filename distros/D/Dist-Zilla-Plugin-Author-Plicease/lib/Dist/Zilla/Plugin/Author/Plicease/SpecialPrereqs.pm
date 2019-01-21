@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.31 {
+package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.32 {
 
   use 5.014;
   use Moose;
@@ -187,7 +187,6 @@ package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.31 {
   sub before_release
   {
     my $self = shift;
-    $self->log_fatal('release requires Perl 5.10 or better') if $] < 5.010000;
     $self->log_fatal('don\'t release via MSWin32')           if $^O eq 'MSWin32';
     $self->log_fatal('don\'t release without Git plugins')   if $ENV{PLICEASE_DZIL_NO_GIT};
   }
@@ -206,8 +205,8 @@ package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.31 {
     {
       my $content = $file->content;
       $content = join "\n", 
-        "use strict; use warnings;",
         "BEGIN {",
+        "  use strict; use warnings;",
         (map { s/^\| /  /; $_ } @{ $self->preamble }),
         "  unless(eval q{ use $perl_version; 1}) {",
         "    print \"Perl $perl_version or better required\\n\";",
@@ -236,7 +235,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.31
+version 2.32
 
 =head1 SYNOPSIS
 

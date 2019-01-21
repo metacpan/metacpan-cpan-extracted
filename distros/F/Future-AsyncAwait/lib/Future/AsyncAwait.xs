@@ -8,6 +8,10 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifdef HAVE_DMD_HELPER
+#  include "DMD_helper.h"
+#endif
+
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
@@ -136,6 +140,9 @@ typedef struct {
   U32 padlen;
   SV **padslots;
 
+  U32 mortallen;
+  SV **mortals;
+
 #ifdef DEBUG
   COP *curcop;
 #endif
@@ -181,8 +188,17 @@ static void debug_sv_summary(const SV *sv)
 
   if(SvROK(sv))
     fprintf(stderr, ",ROK");
-  else if(SvIOK(sv))
-    fprintf(stderr, ",IV=%" IVdf, SvIVX(sv));
+  else {
+    if(SvIOK(sv))
+      fprintf(stderr, ",IV=%" IVdf, SvIVX(sv));
+    if(SvUOK(sv))
+      fprintf(stderr, ",UV=%" UVuf, SvUVX(sv));
+    if(SvPOK(sv)) {
+      fprintf(stderr, ",PVX=\"%.10s\"", SvPVX((SV *)sv));
+      if(SvCUR(sv) > 10)
+        fprintf(stderr, "...");
+    }
+  }
 
   fprintf(stderr, "}");
 }
@@ -232,13 +248,28 @@ static void panic(char *fmt, ...)
  * them
  */
 
+static int magic_free(pTHX_ SV *sv, MAGIC *mg);
+
 static MGVTBL vtbl = {
   NULL, /* get   */
   NULL, /* set   */
   NULL, /* len   */
   NULL, /* clear */
-  NULL, /* free  - TODO?? */
+  magic_free,
 };
+
+#ifdef HAVE_DMD_HELPER
+static int dumpmagic(pTHX_ const SV *sv, MAGIC *mg)
+{
+  SuspendedState *state = (SuspendedState *)mg->mg_ptr;
+  int ret = 0;
+
+  ret += DMD_ANNOTATE_SV(sv, state->awaiting_future, "the awaiting Future");
+  ret += DMD_ANNOTATE_SV(sv, state->returning_future, "the returning Future");
+
+  return ret;
+}
+#endif
 
 #define suspendedstate_get(cv)  MY_suspendedstate_get(aTHX_ cv)
 static SuspendedState *MY_suspendedstate_get(pTHX_ CV *cv)
@@ -265,6 +296,27 @@ static SuspendedState *MY_suspendedstate_new(pTHX_ CV *cv)
   sv_magicext((SV *)cv, NULL, PERL_MAGIC_ext, &vtbl, (char *)ret, 0);
 
   return ret;
+}
+
+static int magic_free(pTHX_ SV *sv, MAGIC *mg)
+{
+  SuspendedState *state = (SuspendedState *)mg->mg_ptr;
+
+  if(state->awaiting_future) {
+    fprintf(stderr, "TODO: free ->awaiting_future\n");
+  }
+
+  if(state->returning_future) {
+    fprintf(stderr, "TODO: free ->returning_future\n");
+  }
+
+  if(state->frames) {
+    fprintf(stderr, "TODO: free ->frames\n");
+  }
+
+  Safefree(state);
+
+  return 1;
 }
 
 #define suspend_block(frame, cx)  MY_suspend_block(aTHX_ frame, cx)
@@ -378,17 +430,13 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         /* In general we don't want to support this; but specifically on perls
          * older than 5.20, this might be PL_tmps_floor
          */
-        if(var != (int *)&PL_tmps_floor)
-          panic("TODO: Unsure how to handle a savestack entry of SAVEt_INT_SMALL with var != &PL_tmps_floor\n");
+        if(var == (int *)&PL_tmps_floor)
+          /* Don't bother to save the old tmpsfloor. We'll actually just
+           * squash all the mortals into one big block anyway
+           */
+          goto nosave;
 
-        saved->type    = SAVEt_INT;
-        saved->u.iptr  = var;
-        saved->cur.i   = *var;
-        saved->saved.i = val;
-
-        /* restore it for now */
-        *var = val;
-
+        panic("TODO: Unsure how to handle a savestack entry of SAVEt_INT_SMALL with var != &PL_tmps_floor\n");
         break;
       }
 
@@ -417,17 +465,13 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         /* In general we don't want to support this; but specifically on perls
          * older than 5.24, this might be PL_tmps_floor
          */
-        if(var != (STRLEN *)&PL_tmps_floor)
-          panic("TODO: Unsure how to handle a savestack entry of SAVEt_STRLEN with var != &PL_tmps_floor\n");
+        if(var == (STRLEN *)&PL_tmps_floor)
+          /* Don't bother to save the old tmpsfloor. We'll actually just
+           * squash all the mortals into one big block anyway
+           */
+          goto nosave;
 
-        saved->type      = SAVEt_STRLEN;
-        saved->u.lenptr  = var;
-        saved->cur.len   = *var;
-        saved->saved.len = val;
-
-        /* restore it for now */
-        *var = val;
-
+        panic("TODO: Unsure how to handle a savestack entry of SAVEt_STRLEN with var != &PL_tmps_floor\n");
         break;
       }
 #endif
@@ -498,6 +542,9 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
     }
 
     frame->savedlen++;
+
+nosave:
+    ;
   }
 
   if(OLDSAVEIX(cx) != PL_savestack_ix)
@@ -660,6 +707,7 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
   PADLIST *plist;
   PADNAME **padnames;
   PAD *pad;
+  SV **tmpsbase = PL_tmps_stack + PL_tmps_floor + 1;
 
   state->frames = NULL;
 
@@ -834,6 +882,18 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
       }
   }
 
+  state->mortallen = (I32)(PL_tmps_ix - PL_tmps_floor);
+  if(state->mortallen) {
+    /* Save the mortals! */
+    I32 i;
+    Newx(state->mortals, state->mortallen, SV *);
+    for(i = 0; i < state->mortallen; i++) {
+      state->mortals[i] = tmpsbase[i];
+      tmpsbase[i] = NULL;
+    }
+    PL_tmps_ix = PL_tmps_floor;
+  }
+
   dounwind(cxix);
 }
 
@@ -945,6 +1005,8 @@ static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
 #define suspendedstate_resume(state, cv)  MY_suspendedstate_resume(aTHX_ state, cv)
 static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
 {
+  I32 i;
+
   if(state->padlen) {
     PAD *pad = PadlistARRAY(CvPADLIST(cv))[CvDEPTH(cv)];
     PADOFFSET i;
@@ -957,6 +1019,15 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
       SvREFCNT_dec(PadARRAY(pad)[i]);
       PadARRAY(pad)[i] = state->padslots[i-1];
     }
+  }
+
+  if(state->mortallen) {
+    for(i = 0; i < state->mortallen; i++) {
+      sv_2mortal(state->mortals[i]);
+    }
+
+    Safefree(state->mortals);
+    state->mortals = NULL;
   }
 
   SuspendedFrame *frame, *next;
@@ -1041,6 +1112,7 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
 
     Safefree(frame);
   }
+  state->frames = NULL;
 }
 
 /*
@@ -1067,7 +1139,7 @@ static SV *MY_future_done_from_stack(pTHX_ SV *f, SV **mark)
     *(svp+1) = *svp;
   }
   if(f)
-    *bottom = SvREFCNT_inc(f);
+    *bottom = f;
   else
     *bottom = sv_2mortal(newSVpvn("Future", 6));
   SP++;
@@ -1095,7 +1167,7 @@ static SV *MY_future_fail(pTHX_ SV *f, SV *failure)
 
   PUSHMARK(SP);
   if(f)
-    PUSHs(SvREFCNT_inc(f));
+    PUSHs(f);
   else
     mPUSHp("Future", 6);
   mPUSHs(newSVsv(failure));
@@ -1216,8 +1288,10 @@ static OP *pp_leaveasync(pTHX)
   SV **oldsp = PL_stack_base + cx->blk_oldsp;
 
   SuspendedState *state = suspendedstate_get(find_runcv(0));
-  if(state && state->returning_future)
+  if(state && state->returning_future) {
     f = state->returning_future;
+    state->returning_future = NULL;
+  }
 
   if(SvTRUE(ERRSV)) {
     ret = future_fail(f, ERRSV);
@@ -1230,8 +1304,11 @@ static OP *pp_leaveasync(pTHX)
   while(SP > oldsp)
     POPs;
 
-  PUSHs(ret);
+  mPUSHs(ret);
   PUTBACK;
+
+  if(f)
+    SvREFCNT_dec(f);
 
   return PL_op->op_next;
 }
@@ -1259,6 +1336,7 @@ static OP *pp_await(pTHX)
   CV *curcv = find_runcv(0);
   CV *origcv = curcv;
   COP *curcop = PL_curcop; /* just for debug printing purposes */
+  bool defer_mortal_curcv = FALSE;
 
   SuspendedState *state = suspendedstate_get(curcv);
 
@@ -1282,6 +1360,7 @@ static OP *pp_await(pTHX)
     TRACEPRINT("  RESUME\n");
 
     f = state->awaiting_future;
+    sv_2mortal(state->awaiting_future);
     state->awaiting_future = NULL;
 
     /* Before we restore the stack we first need to POP the caller's
@@ -1337,6 +1416,7 @@ static OP *pp_await(pTHX)
     state = suspendedstate_new(curcv);
 
     TRACEPRINT("  SUSPEND cloned CV->%p\n", curcv);
+    defer_mortal_curcv = TRUE;
   }
   else {
     TRACEPRINT("  SUSPEND reuse CV\n");
@@ -1351,10 +1431,13 @@ static OP *pp_await(pTHX)
   CvSTART(curcv) = PL_op; /* resume from here */
   future_on_ready(f, curcv);
 
-  state->awaiting_future = SvREFCNT_inc(f);
+  state->awaiting_future = newSVsv(f);
 
   if(!state->returning_future)
     state->returning_future = future_new_from_proto(f);
+
+  if(defer_mortal_curcv)
+    SvREFCNT_dec((SV *)curcv);
 
   PUSHMARK(SP);
   PUSHs(state->returning_future);
@@ -1582,3 +1665,6 @@ BOOT:
 
   next_keyword_plugin = PL_keyword_plugin;
   PL_keyword_plugin = &my_keyword_plugin;
+#ifdef HAVE_DMD_HELPER
+  DMD_SET_MAGIC_HELPER(&vtbl, dumpmagic);
+#endif

@@ -1,0 +1,48 @@
+{
+   "abstract" : "Main module of dctpp",
+   "author" : [
+      "Pavel Serikov <pavelsr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-CallTrace-PP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "File::Slurp" : "0",
+            "List::Util" : "0",
+            "Math::Round" : "0",
+            "MetaCPAN::Client" : "0",
+            "Module::CoreList" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pavelsr/Devel-CallTrace-PP/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pavelsr/Devel-CallTrace-PP.git",
+         "web" : "https://github.com/pavelsr/Devel-CallTrace-PP"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
+}
+

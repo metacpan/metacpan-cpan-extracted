@@ -3,7 +3,7 @@ abstract: 'Perlish wrapper for Raylib videogame library'
 author:
   - 'Ahmad Fatoum <athreef@cpan.org>'
 build_requires:
-  Alien::raylib: '0.022'
+  Alien::raylib: '0.023'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
@@ -34,75 +34,75 @@ no_index:
 provides:
   Graphics::Raylib:
     file: lib/Graphics/Raylib.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Color:
     file: lib/Graphics/Raylib/Color.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Key:
     file: lib/Graphics/Raylib/Key.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Keyboard:
     file: lib/Graphics/Raylib/Keyboard.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Mouse:
     file: lib/Graphics/Raylib/Mouse.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Shape:
     file: lib/Graphics/Raylib/Shape.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Shape::Circle:
     file: lib/Graphics/Raylib/Shape.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Shape::Line:
     file: lib/Graphics/Raylib/Shape.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Shape::Pixel:
     file: lib/Graphics/Raylib/Shape.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Shape::Polygon:
     file: lib/Graphics/Raylib/Shape.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Shape::Rectangle:
     file: lib/Graphics/Raylib/Shape.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Shape::Triangle:
     file: lib/Graphics/Raylib/Shape.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Text:
     file: lib/Graphics/Raylib/Text.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Texture:
     file: lib/Graphics/Raylib/Texture.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::Util:
     file: lib/Graphics/Raylib/Util.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::XS::Camera3D:
     file: lib/Graphics/Raylib/Util.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::XS::Color:
     file: lib/Graphics/Raylib/Color.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::XS::Image:
     file: lib/Graphics/Raylib/Util.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::XS::Rectangle:
     file: lib/Graphics/Raylib/Util.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::XS::Texture2D:
     file: lib/Graphics/Raylib/Util.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::XS::Vector2:
     file: lib/Graphics/Raylib/Util.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::XS::Vector3:
     file: lib/Graphics/Raylib/Util.pm
-    version: '0.023'
+    version: '0.024'
   Graphics::Raylib::XS::Vector4:
     file: lib/Graphics/Raylib/Util.pm
-    version: '0.023'
+    version: '0.024'
 requires:
-  Alien::raylib: '0.022'
+  Alien::raylib: '0.023'
   Convert::Color: '0'
   Import::Into: '0'
   perl: '5.010'
@@ -110,10 +110,10 @@ resources:
   bugtracker: https://github.com/athreef/Graphics-Raylib/issues
   homepage: https://github.com/athreef/Graphics-Raylib
   repository: https://github.com/athreef/Graphics-Raylib.git
-version: '0.023'
+version: '0.024'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.028001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -323,7 +323,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.20.1
           repo_root: .
       name: '@Git/Check'
       version: '2.045'
@@ -340,7 +340,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -353,11 +353,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.023
+          tag: v0.024
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -371,7 +371,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.20.1
           repo_root: .
       name: '@Git/Push'
       version: '2.045'
@@ -387,7 +387,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.20.1
           repo_root: .
       name: Git::NextVersion
       version: '2.045'
@@ -516,5 +516,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

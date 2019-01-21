@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.79.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,25 +15,29 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 e0a2730549998d792ce08401c51b3bf21ec3517a AUTHOR_PLEDGE
-SHA1 84190c29a4d87d86739fb4148a9f92519225a603 Build.PL
-SHA1 e45d5b6c4495f4214a251b5e342c9254a5a73159 Changes
-SHA1 a124f7a76d045d61b16c7d6e7be6a92aa20bc8ea INSTALL
-SHA1 cf5dc9c929415cfa7133eed863def866ade9774d LICENSE
-SHA1 03e75ce39d4f1dca04e1f4926f433d9660c352d0 MANIFEST
-SHA1 008bd8e69c576efb4a6fa88bb7f80869a4ec1fbd META.json
-SHA1 88456ffeab43b8fe1aff8d068e8b33c624fe6c0e META.yml
-SHA1 bbf91d658b10c38d3483b7d9a4323e438dcf29d9 README
-SHA1 8bbc01d2c94438200196088d6edf8cd4afbe4ece README.mkdn
+SHA1 dc51cae02a67955fe2ced58ef55493e147c48e84 CODE_OF_CONDUCT.md
+SHA1 267364eaf8e1c6f0126208f35153c2323727d774 CONTRIBUTORS
+SHA1 22a13e27148a041c08166e26f5d71d6b209df3ee Changes
+SHA1 a79e6a53f87915cd02d44f809853b78846b9f895 INSTALL
+SHA1 dd27bb2a7851272962c81f9a83e19b50ee8ce2d4 LICENSE
+SHA1 ac3abe5246dde27377f70baaa147bb12ae683cc5 MANIFEST
+SHA1 11e7dd5cd5e725ed20c669beb3c974aaea135304 META.json
+SHA1 b92362154d4e2209a0f1b21092118a73bbca5e01 META.yml
+SHA1 08880a76f597211a51d198bc209352329db572db Makefile.PL
+SHA1 e405fdbdbca5f0309403f56eaba096cbea91294f README
+SHA1 47c1ead0b44b072c596c7b49c83dee3fd5602428 README.mkdn
+SHA1 941679b7a5b7df5ee9fe2005b4b23f354c85aa49 cpanfile
+SHA1 37c6c1adb4d4f2152d5707b2834e9b027dd0a107 doap.xml
 SHA1 3889cae02ad5a7391937d425d3fb9de085ab1e2e inc/MyBuild.pm
-SHA1 828f8881d1448e8367e1581b0d484f19e481e543 lib/Task/BeLike/YANICK.pm
-SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
+SHA1 2b5a97989bf3ceed1d583866eba553db4369d7f6 lib/Task/BeLike/YANICK.pm
+SHA1 5eb372cac874b272e4a2f7b29e65d47d026620dc t/00-compile.t
 SHA1 3e245c11c2b26a4fc730768d0527042a6f5e7b23 t/00-load.t
-SHA1 ab46e9d0b74f41492e9381ac19036aeeb4adb1c7 t/000-report-versions-tiny.t
-SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+SHA1 b1de472b725bd5b6f4a15725b703e8fc24872914 t/00-report-prereqs.dd
+SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
 
-iEYEARECAAYFAlDjfXMACgkQ34Hwf+GwC4y7igCgzBM+K6yCPPS60bJMzyaPVZ88
-keEAoI4Vua9wVO0u0SSF6nPfpU26xu9v
-=aPy2
+iEYEARECAAYFAlxGIb4ACgkQ34Hwf+GwC4wagQCgrFgbCxeEn8WwCgzeBD3yvxlA
+FUsAoJ/IIOx3H30r0S4MWukefRadG9AK
+=1QmE
 -----END PGP SIGNATURE-----

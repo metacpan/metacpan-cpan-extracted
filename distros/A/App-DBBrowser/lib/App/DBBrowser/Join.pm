@@ -54,7 +54,7 @@ sub join_tables {
         my $info   = '  INFO';
         my $from_subquery = '  From SQ';
         my @choices = map { "- $_" } @$tables;
-        push @choices, $from_subquery if $sf->{o}{G}{extend_join};
+        push @choices, $from_subquery if $sf->{o}{extend}{join};
         push @choices, $info;
         my @pre = ( undef );
         # Choose
@@ -85,7 +85,7 @@ sub join_tables {
             $qt_master = $ax->quote_table( $sf->{d}{tables_info}{$master} );
         }
         push @{$join->{used_tables}}, $master;
-        $join->{default_alias} = $sf->{d}{driver} eq 'Pg' ? 'a' : 'A';
+        $join->{default_alias} = 'A';
         $ax->print_sql( $join );
         # Readline
         my $master_alias = $ax->alias( 'join', $qt_master, $join->{default_alias} );
@@ -162,18 +162,17 @@ sub __add_slave_and_condition {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
     my $used = ' (used)';
-    my @tmp_tables;
+    my $from_subquery = '  From SQ';
+    my @choices;
     for my $table ( @$tables ) {
         if ( any { $_ eq $table } @{$join->{used_tables}} ) {
-            push @tmp_tables, $table . $used;
+            push @choices, '- ' . $table . $used;
         }
         else {
-            push @tmp_tables, $table;
+            push @choices, '- ' . $table;
         }
     }
-    my $from_subquery = '  From SQ';
-    my @choices = map { "- $_" } @tmp_tables;
-    push @choices, $from_subquery if $sf->{o}{G}{extend_join};
+    push @choices, $from_subquery if $sf->{o}{extend}{join};
     push @choices, $info;
     my @pre = ( undef );
     my @bu;

@@ -229,7 +229,7 @@ This automatically detects all of the framebuffer devices in your system, and sh
 
 =head1 SYNOPSIS
 
- perl slideshow [options] "/path/to/scan"
+ perl slideshow.pl [options] "/path/to/scan"
 
 More than one path can be used.  Just separate each path by a space.
 

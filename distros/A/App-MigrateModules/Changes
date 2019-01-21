@@ -1,2 +1,9 @@
+0.002     2019-01-16 14:50:47 EST
+  - Add -f/--from option for overriding source libs
+  - Add -I/--lib option for specifying additional source libs
+  - Add examples to documentation
+  - Ignore environment variables that affect the module search paths for the source Perl
+  - Allow passing only one path for source and destination
+
 0.001     2018-12-28 18:24:54 EST
   - First release

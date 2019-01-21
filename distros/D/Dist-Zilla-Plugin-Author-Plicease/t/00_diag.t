@@ -13,7 +13,6 @@ $modules{$_} = $_ for qw(
   Data::Section
   Dist::Zilla
   ExtUtils::MakeMaker
-  File::Path
   File::ShareDir::Dist
   File::ShareDir::Install
   File::chdir
@@ -23,7 +22,6 @@ $modules{$_} = $_ for qw(
   Perl::Tidy
   Sub::Exporter::ForMethods
   Test2::V0
-  autodie
   namespace::autoclean
 );
 

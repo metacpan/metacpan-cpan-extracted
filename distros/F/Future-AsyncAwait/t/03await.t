@@ -117,15 +117,6 @@ async sub makelist
    is( scalar $fret->get, "later", '$fret->get for ANON closure' );
 }
 
-# async sub called in list context
-{
-   my @ret = (async sub { return 1, 2, 3 })->( 4, 5, 6 );
-
-   is( scalar @ret, 1, 'async sub returns 1 value in list context' ) or
-      diag( "async sub returned <@ret>" );
-   isa_ok( shift @ret, "Future", 'Single result was a Future' );
-}
-
 # await in non-async sub is forbidden
 {
    my $ok = !eval 'sub { await $_[0] }';

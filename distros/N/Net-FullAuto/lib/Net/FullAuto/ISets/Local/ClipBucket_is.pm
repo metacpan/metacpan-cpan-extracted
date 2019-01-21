@@ -3,7 +3,7 @@ package Net::FullAuto::ISets::Local::ClipBucket_is;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2017  Brian M. Kelly
+#    Copyright © 2000-2019  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -874,7 +874,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'mkdir -vp phpshield','__display__');
    ($stdout,$stderr)=$handle->cwd('phpshield');
-   # https://linuxflow.blogspot.com/2017/05/clipbucket-installation.html
+   # https://linuxflow.blogspot.com/2019/05/clipbucket-installation.html
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget --random-wait --progress=dot '.
       'https://www.sourceguardian.com/loaders/download/'.
@@ -2328,7 +2328,7 @@ END
           |_| \_|\___|\__|     |_|   \__,_|_|_/_/   \_\__,_|\__\___/ ©
 
 
-   Copyright © 2000-2017  Brian M. Kelly  Brian.Kelly@FullAuto.com
+   Copyright © 2000-2019  Brian M. Kelly  Brian.Kelly@FullAuto.com
 
 END
    if (defined $Net::FullAuto::FA_Core::dashboard) {

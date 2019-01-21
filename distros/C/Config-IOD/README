@@ -2,14 +2,15 @@ NAME
     Config::IOD - Read and write IOD/INI configuration files
 
 VERSION
-    This document describes version 0.34 of Config::IOD (from Perl
-    distribution Config-IOD), released on 2017-08-05.
+    This document describes version 0.350 of Config::IOD (from Perl
+    distribution Config-IOD), released on 2019-01-17.
 
 SYNOPSIS
      use Config::IOD;
      my $iod = Config::IOD->new(
          # list of known attributes, with their default values
          # default_section     => 'GLOBAL',
+         # enable_directive    => 1,
          # enable_encoding     => 1,
          # enable_quoting      => 1,
          # enable_backet       => 1,
@@ -50,6 +51,19 @@ ATTRIBUTES
     If a key line is specified before any section line, this is the section
     that the key will be put in.
 
+  enable_directive => bool (default: 1)
+    If set to false, then directives will not be parsed. Lines such as below
+    will be considered a regular comment:
+
+     ;!include foo.ini
+
+    and lines such as below will be considered a syntax error (regardless of
+    the "allow_bang_only" setting):
+
+     !include foo.ini
+
+    NOTE: Turning this setting off violates IOD specification.
+
   enable_encoding => bool (default: 1)
     If set to false, then encoding notation will be ignored and key value
     will be parsed as verbatim. Example:
@@ -59,7 +73,7 @@ ATTRIBUTES
     With "enable_encoding" turned off, value will not be undef but will be
     string with the value of (as Perl literal) "!json null".
 
-    Turning off this setting will violate IOD.
+    NOTE: Turning this setting off violates IOD specification.
 
   enable_quoting => bool (default: 1)
     If set to false, then quotes on key value will be ignored and key value
@@ -71,7 +85,7 @@ ATTRIBUTES
     but will be a one line string with the value of (as Perl literal) "line
     1\\nline2".
 
-    *Turning off this setting will violate IOD.*
+    NOTE: Turning this setting off violates IOD specification.
 
   enable_bracket => bool (default: 1)
     If set to false, then JSON literal array will be parsed as verbatim.
@@ -83,7 +97,7 @@ ATTRIBUTES
     array, but will be a string with the value of (as Perl literal)
     "[1,2,3]".
 
-    *Turning off this setting will violate IOD.*
+    NOTE: Turning this setting off violates IOD specification.
 
   enable_brace => bool (default: 1)
     If set to false, then JSON literal object (hash) will be parsed as
@@ -95,7 +109,7 @@ ATTRIBUTES
     but will be a string with the value of (as Perl literal)
     '{"a":1,"b":2}'.
 
-    *Turning off this setting will violate IOD.*
+    NOTE: Turning this setting off violates IOD specification.
 
   enable_tilde => bool (default: 1)
     If set to true (the default), then value that starts with "~" (tilde)
@@ -108,7 +122,7 @@ ATTRIBUTES
 
     With "enable_tilde" turned off, value will still be literally "~/logs".
 
-    *Turning off this setting will violate IOD.*
+    NOTE: Turning this setting off violates IOD specification.
 
   allow_encodings => array
     If defined, set list of allowed encodings. Note that if
@@ -174,13 +188,13 @@ ATTRIBUTES
      [section]
      a=[1,2]
 
-    *Turning off this setting will violate IOD.*
+    NOTE: Turning this setting off violates IOD specification.
 
   ignore_unknown_directive => bool (default: 0)
     If set to true, will not die if an unknown directive is encountered. It
     will simply be ignored as a regular comment.
 
-    *Turning on this setting will violate IOD.*
+    NOTE: Turning this setting on violates IOD specification.
 
 METHODS
   new(%attrs) => obj
@@ -197,7 +211,7 @@ HOMEPAGE
     <https://metacpan.org/release/Config-IOD>.
 
 SOURCE
-    Source repository is at <https://github.com/sharyanto/perl-Config-IOD>.
+    Source repository is at <https://github.com/perlancar/perl-Config-IOD>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -219,7 +233,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2011 by
+    This software is copyright (c) 2019, 2017, 2016, 2015, 2011 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

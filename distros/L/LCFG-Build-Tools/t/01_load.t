@@ -1,9 +1,12 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 20;
 
 use_ok('LCFG::Build::Utils');
+
+use_ok('LCFG::Build::Utils::Debian');
 
 use_ok('LCFG::Build::Utils::RPM');
 
@@ -13,11 +16,17 @@ use_ok('LCFG::Build::Tool');
 
 use_ok('LCFG::Build::Tool::CheckMacros');
 
+use_ok('LCFG::Build::Tool::DevDebianPkg');
+
+use_ok('LCFG::Build::Tool::DebianPkg');
+
 use_ok('LCFG::Build::Tool::DevOSXPkg');
 
 use_ok('LCFG::Build::Tool::DevPack');
 
 use_ok('LCFG::Build::Tool::DevRPM');
+
+use_ok('LCFG::Build::Tool::GenDeb');
 
 use_ok('LCFG::Build::Tool::MicroVersion');
 

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-01-15'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-01-17'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,6 +16,7 @@ my %Opts;
     Getopt::Long::Configure("bundling", "no_ignore_case", "permute", "no_getopt_compat");
     Getopt::Long::GetOptions(
         "backend|b=s" => \$Opts{backend},
+        "transpose|t" => \$Opts{transpose},
     ) or die "$0: Error in getting options, bailing out\n";
 }
 
@@ -50,6 +51,25 @@ my $rows;
             chomp $row;
             push @$rows, [split /\t/, $row];
         }
+    } elsif ($ifmt eq 'ini' || $ifmt eq 'iod') {
+        my $reader;
+        if ($ifmt eq 'ini') {
+            require Config::IOD::INI::Reader;
+            $reader = Config::IOD::INI::Reader->new;
+        } else {
+            require Config::IOD::Reader;
+            $reader = Config::IOD::Reader->new;
+        }
+        my $content = do { local $/; scalar <$fh> };
+        my $hoh = $reader->read_string($content);
+        $rows = [];
+        for my $section (sort keys %$hoh) {
+            my $hash = $hoh->{$section};
+            for my $key (sort keys %$hash) {
+                push @$rows, [$key, $hash->{$key}];
+            }
+        }
+
     } elsif ($ifmt eq 'json') {
         require Data::Check::Structure;
         require JSON::MaybeXS;
@@ -67,6 +87,18 @@ my $rows;
     } else {
         die "Unknown input format '$ifmt'";
     }
+}
+
+# optionally transpose
+if ($Opts{transpose}) {
+    my $new_rows = [];
+    for my $i (0..$#{$rows}) {
+        my $row = $rows->[$i];
+        for my $j (0..$#{$row}) {
+            $new_rows->[$j][$i] = $row->[$j];
+        }
+    }
+    $rows = $new_rows;
 }
 
 # format as output
@@ -94,43 +126,43 @@ my $rows;
     } elsif ($ofmt eq 'texttable') {
         require Text::Table::Any;
         print Text::Table::Any::table(
-            rows => $rows, backend => $Opts{backend});
+            rows => $rows, header_row=>0, backend => $Opts{backend});
     } elsif ($ofmt eq 'csv') {
         require Text::Table::Any;
         require Text::Table::CSV;
         print Text::Table::Any::table(
-            rows => $rows, backend => 'Text::Table::CSV');
+            rows => $rows, header_row=>0, backend => 'Text::Table::CSV');
     } elsif ($ofmt eq 'tsv') {
         require Text::Table::Any;
         require Text::Table::TSV;
         print Text::Table::Any::table(
-            rows => $rows, backend => 'Text::Table::TSV');
+            rows => $rows, header_row=>0, backend => 'Text::Table::TSV');
     } elsif ($ofmt eq 'ansitable') {
         require Text::Table::Any;
         require Text::ANSITable;
         print Text::Table::Any::table(
-            rows => $rows, backend => 'Text::ANSITable');
+            rows => $rows, header_row=>0, backend => 'Text::ANSITable');
     } elsif ($ofmt eq 'asciitable') {
         require Text::Table::Any;
         require Text::ASCIITable;
         print Text::Table::Any::table(
-            rows => $rows, backend => 'Text::ASCIITable');
+            rows => $rows, header_row=>0, backend => 'Text::ASCIITable');
     } elsif ($ofmt eq 'mdtable') {
         require Text::Table::Any;
         require Text::MarkdownTable;
         print Text::Table::Any::table(
-            rows => $rows, backend => 'Text::MarkdownTable');
+            rows => $rows, header_row=>0, backend => 'Text::MarkdownTable');
     } elsif ($ofmt eq 'orgtable') {
         require Text::Table::Any;
         require Text::Table::Org;
         print Text::Table::Any::table(
-            rows => $rows, backend => 'Text::Table::Org');
+            rows => $rows, header_row=>0, backend => 'Text::Table::Org');
     } else {
         die "Unknown output format '$ofmt'";
     }
 }
 
-# ABSTRACT: Convert/render {CSV,JSON/Perl array-of-arrays} into {CSV/JSON/Perl/text tables}
+# ABSTRACT: Convert/render {CSV,TSV,INI,IOD,JSON/Perl array-of-arrays} into {CSV/TSV/JSON/Perl/text tables}
 # PODNAME: json2mdtable
 
 __END__
@@ -141,11 +173,11 @@ __END__
 
 =head1 NAME
 
-json2mdtable - Convert/render {CSV,JSON/Perl array-of-arrays} into {CSV/JSON/Perl/text tables}
+json2mdtable - Convert/render {CSV,TSV,INI,IOD,JSON/Perl array-of-arrays} into {CSV/TSV/JSON/Perl/text tables}
 
 =head1 VERSION
 
-This document describes version 0.003 of json2mdtable (from Perl distribution App-TextTableUtils), released on 2019-01-15.
+This document describes version 0.004 of json2mdtable (from Perl distribution App-TextTableUtils), released on 2019-01-17.
 
 =head1 SYNOPSIS
 
@@ -182,6 +214,34 @@ The distribution App-TextTableUtils provides the following CLIs:
 =item * L<dd2texttable>
 
 =item * L<dd2tsv>
+
+=item * L<ini2ansitable>
+
+=item * L<ini2asciitable>
+
+=item * L<ini2csv>
+
+=item * L<ini2mdtable>
+
+=item * L<ini2orgtable>
+
+=item * L<ini2texttable>
+
+=item * L<ini2tsv>
+
+=item * L<iod2ansitable>
+
+=item * L<iod2asciitable>
+
+=item * L<iod2csv>
+
+=item * L<iod2mdtable>
+
+=item * L<iod2orgtable>
+
+=item * L<iod2texttable>
+
+=item * L<iod2tsv>
 
 =item * L<json2ansitable>
 
@@ -230,6 +290,18 @@ To render CSV as JSON:
 To render TSV as a text table (using L<Text::Table::Any>) with LTSV backend:
 
  % echo "SELECT * FROM table1" | mysql DBNAME | tsv2texttable -b Text::Table::LTSV
+
+=head1 OPTIONS
+
+=head2 --backend (-b)
+
+Only for texttable output (C<*2texttable> scripts).
+
+Select L<Text::Table::Any> backend to use.
+
+=head2 --transpose (-t)
+
+Transpose table prior to output.
 
 =head1 HOMEPAGE
 

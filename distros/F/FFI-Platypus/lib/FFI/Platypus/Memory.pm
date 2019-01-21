@@ -6,14 +6,13 @@ use FFI::Platypus;
 use base qw( Exporter );
 
 # ABSTRACT: Memory functions for FFI
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 
 our @EXPORT = qw( malloc free calloc realloc memcpy memset strdup );
 
 my $ffi = FFI::Platypus->new;
 $ffi->lib(undef);
-$ffi->type($_) foreach qw( opaque size_t void int );
 
 $ffi->attach(malloc  => ['size_t']                     => 'opaque' => '$');
 $ffi->attach(free    => ['opaque']                     => 'void'   => '$');
@@ -22,9 +21,6 @@ $ffi->attach(realloc => ['opaque', 'size_t']           => 'opaque' => '$$');
 $ffi->attach(memcpy  => ['opaque', 'opaque', 'size_t'] => 'opaque' => '$$$');
 $ffi->attach(memset  => ['opaque', 'int', 'size_t']    => 'opaque' => '$$$');
 
-# This global may be removed at any time, do not use it
-# externally.  It is used by t/ffi_platypus_memory__strdup.t
-# for a diagnostic.
 our $_strdup_impl = 'not-loaded';
 
 eval {
@@ -59,7 +55,7 @@ FFI::Platypus::Memory - Memory functions for FFI
 
 =head1 VERSION
 
-version 0.59
+version 0.74
 
 =head1 SYNOPSIS
 
@@ -205,7 +201,7 @@ Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015,2016,2017,2018 by Graham Ollis.
+This software is copyright (c) 2015,2016,2017,2018,2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

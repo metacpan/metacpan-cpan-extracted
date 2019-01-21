@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::DevShare 2.31 {
+package Dist::Zilla::Plugin::Author::Plicease::DevShare 2.32 {
 
   use 5.014;
   use Moose;
@@ -58,7 +58,7 @@ Dist::Zilla::Plugin::Author::Plicease::DevShare - Plugin to deal with dev/projec
 
 =head1 VERSION
 
-version 2.31
+version 2.32
 
 =head1 AUTHOR
 

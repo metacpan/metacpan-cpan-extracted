@@ -5,7 +5,9 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
+
+use Quiq::Unindent;
 
 # -----------------------------------------------------------------------------
 
@@ -79,6 +81,47 @@ sub new {
 
 =head2 Objektmethoden
 
+=head3 code() - Code-Abschnitt
+
+=head4 Synopsis
+
+    $str = $gen->code($text);
+
+=head4 Description
+
+Erzeuge einen Code-Abschnitt mit Text $text und liefere den
+resultierenden Sdoc-Code zurück.
+
+=head4 Example
+
+    $gen->code("Dies ist\nein Test\n");
+
+erzeugt
+
+    |  Dies ist\n
+    |  ein Test.\n
+    |\n
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub code {
+    my ($self,$text) = @_;
+
+    $text = Quiq::Unindent->trim($text);
+    if ($text eq '') {
+        return $text;
+    }
+
+    my $ind = ' ' x $self->indentation;
+    $text =~ s/^/$ind/mg;
+
+    return "$text\n\n";
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 comment() - Kommentar
 
 =head4 Synopsis
@@ -145,6 +188,82 @@ sub document {
 
 # -----------------------------------------------------------------------------
 
+=head3 paragraph() - Paragraph
+
+=head4 Synopsis
+
+    $str = $gen->paragraph($text);
+
+=head4 Description
+
+Erzeuge einen Paragraph mit Text $text und liefere den
+resultierenden Sdoc-Code zurück.
+
+=head4 Example
+
+    $gen->paragraph("Dies ist\nein Test\n");
+
+erzeugt
+
+    |Dies ist\n
+    |ein Test.\n
+    |\n
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub paragraph {
+    my ($self,$text) = @_;
+
+    $text = Quiq::Unindent->trim($text);
+    if ($text eq '') {
+        return $text;
+    }
+
+    return "$text\n\n";
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 table() - Tabelle
+
+=head4 Synopsis
+
+    $str = $gen->table($text,@keyVal);
+
+=head4 Description
+
+Erzeuge eine Tabelle mit der ASCII-Darstellung $text mit den Eigenschaften
+@keyVal und liefere den resultierenden Sdoc-Code zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub table {
+    my $self = shift;
+    my $text = Quiq::Unindent->trim(shift);
+    # @_: @keyVal
+
+    if (!defined($text) || $text eq '') {
+        return $text;
+    }
+
+    my $ind = ' ' x $self->indentation;
+    
+    my $str = "%Table:\n";
+    while (@_) {
+        $str .= sprintf qq|%s%s="%s"\n|,$ind,shift,shift;
+    }
+    $text =~ s/^/$ind/mg;
+    $str .= "$text\n.\n\n";
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 tableOfContents() - Inhaltsverzeichnis-Definition
 
 =head4 Synopsis
@@ -181,6 +300,7 @@ sub tableOfContents {
 
 =head4 Synopsis
 
+    $str = $gen->section($level,$title);
     $str = $gen->section($level,$title,$body);
 
 =head4 Description
@@ -206,9 +326,18 @@ erzeugt
 # -----------------------------------------------------------------------------
 
 sub section {
-    my ($self,$level,$title,$body) = @_;
-    $body =~ s/\s+$//;
-    return sprintf "%s %s\n\n%s\n\n",('=' x $level),$title,$body;
+    my ($self,$level,$title) = splice @_,0,3;
+
+    my $str = sprintf "%s %s\n\n",('=' x $level),$title;
+    if (@_) {
+        my $body = shift;
+        $body =~ s/\s+$//;
+        if ($body ne '') {
+            $str .= "$body\n\n";
+        }
+    }
+
+    return $str;
 }
 
 # -----------------------------------------------------------------------------
@@ -323,7 +452,7 @@ sub eof {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

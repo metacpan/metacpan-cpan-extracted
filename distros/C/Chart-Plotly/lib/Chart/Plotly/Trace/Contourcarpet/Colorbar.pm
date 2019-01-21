@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Contourcarpet::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Contourcarpet::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Contourcarpet::Colorbar::Title;
 
-our $VERSION = '0.022';    # VERSION
+our $VERSION = '0.023';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace contourcarpet.
 
@@ -273,7 +273,7 @@ Chart::Plotly::Trace::Contourcarpet::Colorbar - This attribute is one of the pos
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

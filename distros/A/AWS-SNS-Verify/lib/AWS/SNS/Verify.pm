@@ -1,14 +1,13 @@
 use strict;
 use warnings;
 package AWS::SNS::Verify;
-$AWS::SNS::Verify::VERSION = '0.0103';
+$AWS::SNS::Verify::VERSION = '0.0104';
 use JSON;
 use HTTP::Tiny;
 use MIME::Base64;
 use Moo;
 use Ouch;
-use Crypt::OpenSSL::RSA;
-use Crypt::OpenSSL::X509;
+use Crypt::PK::RSA;
 use URI::URL;
 
 has body => (
@@ -39,7 +38,7 @@ has certificate => (
     lazy        => 1,
     default     => sub {
         my $self = shift;
-        return Crypt::OpenSSL::X509->new_from_string($self->certificate_string);
+        return Crypt::PK::RSA->new(\$self->certificate_string);
     }
 );
 
@@ -88,8 +87,8 @@ sub decode_signature {
 
 sub verify {
     my $self = shift;
-    my $rsa = Crypt::OpenSSL::RSA->new_public_key($self->certificate->pubkey);
-    unless ($rsa->verify($self->generate_signature_string, $self->decode_signature)) {
+    my $pk = $self->certificate;
+    unless ($pk->verify_message($self->decode_signature, $self->generate_signature_string, 'SHA1', 'v1.5')) {
         ouch 'Bad SNS Signature', 'Could not verify the SES message from its signature.', $self;
     }
     return 1;
@@ -130,7 +129,7 @@ AWS::SNS::Verify - Verifies authenticity of SNS messages.
 
 =head1 VERSION
 
-version 0.0103
+version 0.0104
 
 =head1 SYNOPSIS
 

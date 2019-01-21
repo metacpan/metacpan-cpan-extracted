@@ -1,7 +1,7 @@
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2018  Brian M. Kelly
+#    Copyright © 2000-2019  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -20,21 +20,30 @@
 #######################################################################
 
 
-2018-01-02  Brian M. Kelly <Brian.Kelly@fullauto.com>
+2019-01-02  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000464 released
+
+        * Added passphrase filter to FA_Core.pm.
+
+	* Updated year for copyright.
+
+
+2019-01-02  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000463 released
 
         * Added echo y to amazon-linux-extras.
 
 
-2018-01-02  Brian M. Kelly <Brian.Kelly@fullauto.com>
+2019-01-02  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000462 released
 
         * Added amazon-linux-extras to Makefile.PL
 
 
-2018-01-01  Brian M. Kelly <Brian.Kelly@fullauto.com>
+2019-01-01  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000461 released
 

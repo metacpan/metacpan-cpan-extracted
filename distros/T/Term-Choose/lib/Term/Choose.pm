@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.642';
+our $VERSION = '1.643';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -18,6 +18,7 @@ my $Plugin;
 
 BEGIN {
     if ( $^O eq 'MSWin32' ) {
+        require Win32::Console::ANSI;
         require Term::Choose::Win32;
         $Plugin = 'Term::Choose::Win32';
     }
@@ -171,8 +172,8 @@ sub __reset_term {
     my ( $self, $from_choose ) = @_;
     if ( $from_choose ) {
         my $up = $self->{i_row} + $self->{nr_prompt_lines};
-        $self->{plugin}->__up( $up ) if $up;
-        $self->{plugin}->__clear_lines_to_end_of_screen();
+        print UP x $up if $up;
+        print "\r" . CLEAR_TO_END_OF_SCREEN;
     }
     if ( defined $self->{plugin} ) {
         $self->{plugin}->__reset_mode();
@@ -227,8 +228,7 @@ sub __choose {
     local $| = 1;
     $self->{wantarray} = wantarray;
     $self->__undef_to_defaults();
-    if ( $^O eq "MSWin32" && $self->{color} ) {
-        require Win32::Console::ANSI;
+    if ( $^O eq "MSWin32" ) {
         if ( $self->{codepage_mapping} ) {
             print "\e(K";
         }
@@ -274,8 +274,8 @@ sub __choose {
                 $self->{mark} = $self->__marked_rc2idx();
             }
             my $up = $self->{i_row} + $self->{nr_prompt_lines};
-            $self->{plugin}->__up( $up ) if $up;
-            $self->{plugin}->__clear_lines_to_end_of_screen();
+            print UP x $up if $up;
+            print "\r" . CLEAR_TO_END_OF_SCREEN;
             $self->__write_first_screen();
             next GET_KEY;
         }
@@ -765,10 +765,10 @@ sub __write_first_screen {
         $self->__set_default_cell();
     }
     if ( $self->{clear_screen} ) {
-        $self->{plugin}->__clear_screen();
+        print CLEAR_SCREEN;
     }
     else {
-        $self->{plugin}->__clear_lines_to_end_of_screen
+        print "\r" . CLEAR_TO_END_OF_SCREEN;
     }
     if ( $self->{prompt_copy} ne '' ) {
         print $self->{prompt_copy};
@@ -920,21 +920,25 @@ sub __set_default_cell {
 
 sub __goto {
     my ( $self, $newrow, $newcol ) = @_;
+    # up, down, left, right: 1 or greater
     if ( $newrow > $self->{i_row} ) {
-        print CR, LF x ( $newrow - $self->{i_row} );
+        print "\r\n" x ( $newrow - $self->{i_row} );
         $self->{i_row} += ( $newrow - $self->{i_row} );
         $self->{i_col} = 0;
     }
     elsif ( $newrow < $self->{i_row} ) {
-        $self->{plugin}->__up( $self->{i_row} - $newrow );
+        print "\e[" . ( $self->{i_row} - $newrow ) . "A";
+        #print UP x ( $self->{i_row} - $newrow );
         $self->{i_row} -= ( $self->{i_row} - $newrow );
     }
     if ( $newcol > $self->{i_col} ) {
-        $self->{plugin}->__right( $newcol - $self->{i_col} );
+        print "\e[" . ( $newcol - $self->{i_col} ) . "C";
+        #print RIGHT x ( $newcol - $self->{i_col} );
         $self->{i_col} += ( $newcol - $self->{i_col} );
     }
     elsif ( $newcol < $self->{i_col} ) {
-        $self->{plugin}->__left( $self->{i_col} - $newcol );
+        print "\e[" . ( $self->{i_col} - $newcol ) . "D";
+        #print LEFT x ( $self->{i_col} - $newcol );
         $self->{i_col} -= ( $self->{i_col} - $newcol );
     }
 }
@@ -966,7 +970,7 @@ sub __prepare_page_number {
 sub __wr_screen {
     my ( $self ) = @_;
     $self->__goto( 0, 0 );
-    $self->{plugin}->__clear_lines_to_end_of_screen();
+    print "\r" . CLEAR_TO_END_OF_SCREEN;
     if ( $self->{pp_row} ) {
         $self->__goto( $self->{avail_height_idx} + $self->{pp_row}, 0 );
         my $pp_line = sprintf $self->{footer_fmt}, int( $self->{p_begin} / $self->{avail_height} ) + 1;
@@ -1020,10 +1024,10 @@ sub __wr_cell {
             print $str . RESET; # if \e[
         }
         else {
-            $self->{plugin}->__bold_underline() if $is_marked;
-            $self->{plugin}->__reverse()        if $is_current_pos;
+            print BOLD_UNDERLINE if $is_marked;
+            print REVERSE        if $is_current_pos;
             print $self->{list}[$idx];
-            $self->{plugin}->__reset() if $is_marked || $is_current_pos;
+            print RESET if $is_marked || $is_current_pos;
         }
     }
     else {
@@ -1080,10 +1084,10 @@ sub __wr_cell {
             print $str;
         }
         else {
-            $self->{plugin}->__bold_underline() if $is_marked;
-            $self->{plugin}->__reverse()        if $is_current_pos;
+            print BOLD_UNDERLINE if $is_marked;
+            print REVERSE        if $is_current_pos;
             print $pre . $str . $post;
-            $self->{plugin}->__reset() if $is_marked || $is_current_pos;
+            print RESET if $is_marked || $is_current_pos;
         }
     }
 }
@@ -1115,7 +1119,7 @@ sub __mouse_info_to_key {
         if ( $#{$self->{rc2idx}} == 0 ) {
             my $idx = $self->{rc2idx}[$row][$col];
             $end_this_col = $end_last_col
-                          + ( defined $self->{length}[$idx] ? defined $self->{length}[$idx] : $self->{length_longest} )
+                          + ( defined $self->{length}[$idx] ? $self->{length}[$idx] : $self->{length_longest} )
                           + $self->{pad};
         }
         else { #
@@ -1172,7 +1176,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.642
+Version 1.643
 
 =cut
 
@@ -1402,9 +1406,13 @@ Options which expect a number as their value expect integers.
 
 =head3 codepage_mapping
 
-This option has only meaning if the operating system is MSWin32 and the option I<color> is enabled.
+This option has only meaning if the operating system is MSWin32.
 
-By setting this option to C<1> one can enable the codepage mapping offered by L<Win32::Console::ANSI>.
+If the OS is MSWin32, L<Win32::Console::ANSI> is used. By default C<Win32::Console::ANSI> converts the characters from
+Windows code page to DOS code page (the so-called ANSI to OEM conversion). This conversation is disabled by default in
+C<Term::Choose> but one can enable it by setting this option.
+
+Setting this option to C<1> enables the codepage mapping offered by L<Win32::Console::ANSI>.
 
 0 - disable automatic codepage mapping (default)
 
@@ -1417,9 +1425,6 @@ Setting this option to C<1> enables the support for color and text formatting es
 0 - off (default)
 
 1 - on
-
-If the OS is MSWin32 and this option is enabled, L<Win32::Console::ANSI> is loaded. C<Win32::Console::ANSI> emulates
-an ANSI console. See also the option L</codepage_mapping>.
 
 =head3 default
 
@@ -1777,11 +1782,7 @@ are used to enable/disable the different I<mouse> modes.
 
 =head2 MSWin32
 
-If the OS is MSWin32 L<Win32::Console> is used.
-
-If the option I<color> is enabled also L<Win32::Console::ANSI> is used. By default C<Win32::Console::ANSI> converts the
-characters from Windows code page to DOS code page (the so-called ANSI to OEM conversion). This conversation is disabled
-by default in C<Term::Choose> but one can enable it by setting the option L</codepage_mapping>.
+If the OS is MSWin32 L<Win32::Console> and L<Win32::Console::ANSI> are used. See option L</codepage_mapping>.
 
 =head1 SUPPORT
 
@@ -1802,7 +1803,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012-2018 Matthäus Kiem.
+Copyright (C) 2012-2019 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

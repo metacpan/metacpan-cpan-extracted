@@ -3,13 +3,13 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 =encoding utf8
 
 =head1 NAME
 
-Quiq - Class library
+Quiq - Class library for rapid development
 
 =head1 DESCRIPTION
 
@@ -448,10 +448,6 @@ L<Quiq::MediaWiki::Api> - Clientseitiger Zugriff auf MediaWiki API
 
 =item *
 
-L<Quiq::MediaWiki::Loader> - MediaWiki Seiten-Lader
-
-=item *
-
 L<Quiq::MediaWiki::Markup> - MediaWiki Code Generator
 
 =item *
@@ -750,7 +746,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

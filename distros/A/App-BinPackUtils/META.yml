@@ -31,6 +31,7 @@ requires:
   Perinci::Sub::DepChecker: '0'
   Sah::Schema::filename: '0'
   Sah::Schema::filesize: '0'
+  Sah::Schema::true: '0'
   String::ShellQuote: '0'
   perl: '5.010001'
   strict: '0'
@@ -39,15 +40,11 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BinPackUtils
   homepage: https://metacpan.org/release/App-BinPackUtils
   repository: git://github.com/perlancar/perl-App-BinPackUtils.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
   plugins:
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript pack-bins'
-      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript bin-files'
@@ -55,6 +52,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript bin-files-into-dvds'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript count-number-of-dvds-required'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript pack-bins'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::InsertExecsList

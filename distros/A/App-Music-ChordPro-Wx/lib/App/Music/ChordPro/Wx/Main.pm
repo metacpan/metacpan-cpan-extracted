@@ -17,7 +17,9 @@ use Wx::Locale gettext => '_T';
 
 use App::Music::ChordPro::Wx;
 use App::Music::ChordPro;
+use App::Packager;
 use File::Temp qw( tempfile );
+use Encode qw(decode_utf8);
 
 our $VERSION = $App::Music::ChordPro::Wx::VERSION;
 
@@ -27,16 +29,42 @@ sub new {
     $self;
 }
 
+use constant FONTSIZE => 12;
+
+my @fonts =
+  ( { name => "Monospace",
+      font => Wx::Font->new( FONTSIZE, wxFONTFAMILY_TELETYPE,
+			     wxFONTSTYLE_NORMAL,
+			     wxFONTWEIGHT_NORMAL ),
+    },
+    { name => "Serif",
+      font => Wx::Font->new( FONTSIZE, wxFONTFAMILY_ROMAN,
+			     wxFONTSTYLE_NORMAL,
+			     wxFONTWEIGHT_NORMAL ),
+    },
+    { name => "Sans serif",
+      font => Wx::Font->new( FONTSIZE, wxFONTFAMILY_SWISS,
+			     wxFONTSTYLE_NORMAL,
+			     wxFONTWEIGHT_NORMAL ),
+    },
+  );
+
 my $prefctl;
 
 # Explicit (re)initialisation of this class.
 sub init {
-    my ( $self ) = @_;
+    my ( $self, $options ) = @_;
 
     $prefctl ||=
       {
+       cfgpreset => lc(_T("Default")),
+       xcode => "",
+       notation => "",
+       skipstdcfg => 1,
        configfile => "",
        pdfviewer => "",
+       editfont => 0,
+       editsize => FONTSIZE,
       };
 
     if ( $^O =~ /^mswin/i ) {
@@ -57,16 +85,20 @@ sub init {
 	Wx::ConfigBase::Set
 	    (Wx::FileConfig->new
 	     ( "WxChordPro",
-	       "Squirrel Consultancy",
+	       "ChordPro_ORG",
 	       $cb,
 	       '',
 	       wxCONFIG_USE_LOCAL_FILE,
 	     ));
     }
 
+    $self->{_verbose} = $options->{verbose};
+    $self->{_trace}   = $options->{trace};
+    $self->{_debug}   = $options->{debug};
+
     $self->GetPreferences;
-    my $font = Wx::Font->new( 12, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL,
-			      wxFONTWEIGHT_NORMAL );
+    my $font = $fonts[$self->{prefs_editfont}]->{font};
+    $font->SetPointSize($self->{prefs_editsize});
     $self->{t_source}->SetFont($font);
     Wx::Log::SetTimestamp(' ');
     if ( @ARGV && -s $ARGV[0] ) {
@@ -80,6 +112,49 @@ sub init {
 }
 
 ################ Internal methods ################
+
+# List of available config presets (styles).
+my $stylelist;
+sub stylelist {
+    return $stylelist if $stylelist && @$stylelist;
+    my $cfglib = getresource("config");
+    $stylelist = [];
+    if ( -d $cfglib ) {
+	opendir( my $dh, $cfglib );
+	foreach ( sort readdir($dh) ) {
+	    $_ = decode_utf8($_);
+	    next unless /^(.*)\.json$/;
+	    my $base = $1;
+	    unshift( @$stylelist, $base ), next
+	      if $base eq "chordpro"; # default
+	    push( @$stylelist, $base );
+	}
+    }
+    push( @$stylelist, "custom" );
+    return $stylelist;
+}
+
+# List of available notation systems.
+my $notationlist;
+sub notationlist {
+    return $notationlist if $notationlist && @$notationlist;
+    my $cfglib = getresource("notes");
+    $notationlist = [ undef ];
+    if ( -d $cfglib ) {
+	opendir( my $dh, $cfglib );
+	foreach ( sort readdir($dh) ) {
+	    $_ = decode_utf8($_);
+	    next unless /^(.*)\.json$/;
+	    my $base = $1;
+	    $notationlist->[0] = "common", next
+	      if $base eq "common";
+	    push( @$notationlist, $base )
+	}
+    }
+    return $notationlist;
+}
+
+sub fonts { \@fonts }
 
 sub opendialog {
     my ($self) = @_;
@@ -99,10 +174,11 @@ sub opendialog {
 sub openfile {
     my ( $self, $file ) = @_;
     unless ( $self->{t_source}->LoadFile($file) ) {
-	my $md = Wx::MessageDialog( $self,
-				    "Error opening $file: $!",
-				    "File open error",
-				    wxOK | wxICON_ERROR );
+	my $md = Wx::MessageDialog->new
+	  ( $self,
+	    "Error opening $file: $!",
+	    "File open error",
+	    wxOK | wxICON_ERROR );
 	$md->ShowModal;
 	$md->Destroy;
 	return;
@@ -118,6 +194,7 @@ sub openfile {
     }
 
     $self->{prefs_xpose} = 0;
+    $self->{prefs_xposesharp} = 0;
 }
 
 sub newfile {
@@ -129,9 +206,23 @@ sub newfile {
 EOD
     Wx::LogStatus("New file");
     $self->{prefs_xpose} = 0;
+    $self->{prefs_xposesharp} = 0;
 }
 
 my ( $preview_cho, $preview_pdf );
+my ( $msgs, $fatal, $died );
+
+sub _warn {
+    Wx::LogWarning(@_);
+    $msgs++;
+}
+
+sub _die {
+    Wx::LogError(@_);
+    $msgs++;
+    $fatal++;
+    $died++;
+}
 
 sub preview {
     my ( $self ) = @_;
@@ -153,48 +244,64 @@ sub preview {
 
     @ARGV = ();			# just to make sure
     $::__EMBEDDED__ = 1;
-    my $options = App::Music::ChordPro::app_setup( "ChordPro", $VERSION );
 
-    use App::Music::ChordPro::Output::PDF;
-    $options->{output} = $preview_pdf;
-    $options->{generate} = "PDF";
-    $options->{backend} = "App::Music::ChordPro::Output::PDF";
-    $options->{transpose} = $self->{prefs_xpose} if $self->{prefs_xpose};
+    $msgs = $fatal = $died = 0;
+    $SIG{__WARN__} = \&_warn;
+#    $SIG{__DIE__}  = \&_die;
 
-    # Setup configuration.
-    use App::Music::ChordPro::Config;
-    $options->{nouserconfig} = 1;
-    if ( $self->{prefs_configfile} ) {
-	$options->{noconfig} = 0;
-	$options->{config} = $self->{prefs_configfile};
+    my $haveconfig;
+    push( @ARGV, '--nosysconfig', '--nouserconfig', '--nolegacyconfig' )
+      if $self->{prefs_skipstdcfg};
+    if ( $self->{prefs_cfgpreset} ) {
+	$haveconfig++;
+	foreach ( @{ $self->{prefs_cfgpreset} } ) {
+	    if ( $_ eq "custom" ) {
+		push( @ARGV, '--config', $self->{prefs_configfile} );
+	    }
+	    else {
+		push( @ARGV, '--config', $_ );
+	    }
+	}
     }
-    else {
-	$options->{noconfig} = 1;
+    if ( $self->{prefs_xcode} ) {
+	$haveconfig++;
+	push( @ARGV, '--transcode', $self->{prefs_xcode} );
     }
-    $::config = App::Music::ChordPro::Config::configurator($options);
+    if ( $self->{prefs_notation} ) {
+	$haveconfig++;
+	push( @ARGV, '--config', 'notes:' . $self->{prefs_notation} );
+    }
+    push( @ARGV, '--noconfig' ) unless $haveconfig;
 
-    # Parse the input.
-    use App::Music::ChordPro::Songbook;
-    my $s = App::Music::ChordPro::Songbook->new;
+    push( @ARGV, '--output', $preview_pdf );
+    push( @ARGV, '--generate', "PDF" );
 
-    my @msgs;
-    local $SIG{__WARN__} = sub {
-	push( @msgs, join("", @_) );
-	Wx::LogWarning($msgs[-1]);
+    push( @ARGV, '--transpose', $self->{prefs_xpose} )
+      if $self->{prefs_xpose};
+
+    push( @ARGV, $preview_cho );
+
+    if ( $self->{_trace} || $self->{_debug}
+	 || $self->{_verbose} && $self->{_verbose} > 1 ) {
+	warn( "Command line: @ARGV\n" );
+	warn( "$_\n" ) for split( /\n+/, _aboutmsg() );
+    }
+    my $options;
+    eval {
+	$options = App::Music::ChordPro::app_setup( "ChordPro", $VERSION );
     };
+    _die($@), goto ERROR if $@ && !$died;
 
+    $options->{verbose} = $self->{_verbose} || 0;
+    $options->{trace} = $self->{_trace} || 0;
+    $options->{debug} = $self->{_debug} || 0;
     $options->{diagformat} = 'Line %n, %m';
-    $s->parsefile( $preview_cho, $options );
+    $options->{silent} = 1;
 
-    if ( @msgs ) {
-	Wx::LogStatus( @msgs . " message" .
-		       ( @msgs == 1 ? "" : "s" ) . "." );
-	Wx::LogError("Problems found!");
-	return;
-    }
-
-    # Generate the songbook.
-    my $res = App::Music::ChordPro::Output::PDF->generate_songbook( $s, $options );
+    eval {
+	App::Music::ChordPro::main($options)
+    };
+    _die($@), goto ERROR if $@ && !$died;
 
     if ( -e $preview_pdf ) {
 	Wx::LogStatus("Output generated, starting previewer");
@@ -218,6 +325,156 @@ sub preview {
 	    else {
 		Wx::LaunchDefaultBrowser($preview_pdf);
 	    }
+	}
+    }
+
+  ERROR:
+    if ( $msgs ) {
+	Wx::LogStatus( $msgs . " message" .
+		       ( $msgs == 1 ? "" : "s" ) . "." );
+	if ( $fatal ) {
+	    Wx::LogError( "Fatal problems found!" );
+	    return;
+	}
+	else {
+	    Wx::LogWarning( "Problems found!" );
+	}
+    }
+    unlink( $preview_cho );
+}
+
+sub xxpreview {
+    my ( $self ) = @_;
+
+    # We can not unlink temps because we do not know when the viewer
+    # is ready. So the best we can do is reuse the files.
+    unless ( $preview_cho ) {
+	( undef, $preview_cho ) = tempfile( OPEN => 0 );
+	$preview_pdf = $preview_cho . ".pdf";
+	$preview_cho .= ".cho";
+	unlink( $preview_cho, $preview_pdf );
+    }
+
+    my $mod = $self->{t_source}->IsModified;
+    $self->{t_source}->SaveFile($preview_cho);
+    $self->{t_source}->SetModified($mod);
+
+    #### ChordPro
+
+    @ARGV = ();			# just to make sure
+    $::__EMBEDDED__ = 1;
+
+    $msgs = $fatal = $died = 0;
+    $SIG{__WARN__} = \&_warn;
+#    $SIG{__DIE__}  = \&_die;
+
+    my $options = App::Music::ChordPro::app_setup( "ChordPro", $VERSION );
+
+    use App::Music::ChordPro::Output::PDF;
+    $options->{output} = $preview_pdf;
+    $options->{generate} = "PDF";
+    $options->{backend} = "App::Music::ChordPro::Output::PDF";
+    $options->{transpose} = $self->{prefs_xpose} if $self->{prefs_xpose};
+    $options->{transcode} = $self->{prefs_xcode} if $self->{prefs_xcode};
+
+    if ( my $xc = $options->{transcode} ) {
+	# Load the appropriate notes config, but retain the current parser.
+	unless ( App::Music::ChordPro::Chords::Parser->get_parser($xc, 1) ) {
+	    my $file = getresource("notes/$xc.json");
+	    if ( $file and open( my $fd, "<:raw", $file ) ) {
+		my $pp = JSON::PP->new->relaxed;
+		warn("Config: $file\n") if $options->{verbose};
+		my $new = $pp->decode( ::loadfile ($fd, { %$options, donotsplit => 1 } ) );
+		App::Music::ChordPro::Chords::set_notes( $new->{notes},
+							 { %$options,
+							   'keep-parser' => 1 } );
+	    }
+	}
+	unless ( App::Music::ChordPro::Chords::Parser->get_parser($xc, 1) ) {
+	    die("No transcoder for ", $xc, "\n");
+	}
+    }
+
+    # Setup configuration.
+    use App::Music::ChordPro::Config;
+    $options->{nouserconfig} =
+      $options->{nolegacyconfig} = $self->{prefs_skipstdcfg};
+
+    $options->{config} = [];
+    $options->{noconfig} = 1;
+    if ( $self->{prefs_cfgpreset} ) {
+	$options->{noconfig} = 0;
+	$options->{config} = [ map { $_->[1] } @{ $self->{prefs_cfgpreset} } ];
+    }
+    if ( $self->{prefs_xcode} ) {
+	$options->{noconfig} = 0;
+	push( @{ $options->{config} }, $notationlist->{$self->{prefs_xcode}} );
+	$options->{transcode} = $self->{prefs_xcode};
+    }
+    if ( $self->{prefs_notation} ) {
+	$options->{noconfig} = 0;
+	push( @{ $options->{config} }, $notationlist->{$self->{prefs_notation}} );
+    }
+
+    eval {
+	$options->{verbose} = 2;
+	$options->{debug} = 1;
+	$::config = App::Music::ChordPro::Config::configurator($options);
+    };
+    _die($@), goto ERROR if $@ && !$died;
+
+    # Parse the input.
+    use App::Music::ChordPro::Songbook;
+    my $s = App::Music::ChordPro::Songbook->new;
+
+    $options->{diagformat} = 'Line %n, %m';
+    $options->{silent} = 1;
+    eval {
+	$s->parsefile( $preview_cho, $options );
+    };
+    _die($@), goto ERROR if $@ && !$died;
+
+    # Generate the songbook.
+    eval {
+	App::Music::ChordPro::Output::PDF->generate_songbook( $s, $options )
+    };
+    _die($@), goto ERROR if $@ && !$died;
+
+    if ( -e $preview_pdf ) {
+	Wx::LogStatus("Output generated, starting previewer");
+
+	if ( my $cmd = $self->{prefs_pdfviewer} ) {
+	    if ( $cmd =~ s/\%f/$preview_pdf/g ) {
+		$cmd .= " \"$preview_pdf\"";
+	    }
+	    elsif ( $cmd =~ /\%u/ ) {
+		my $u = _makeurl($preview_pdf);
+		$cmd =~ s/\%u/$u/g;
+	    }
+	    Wx::ExecuteCommand($cmd);
+	}
+	else {
+	    my $wxTheMimeTypesManager = Wx::MimeTypesManager->new;
+	    my $ft = $wxTheMimeTypesManager->GetFileTypeFromExtension("pdf");
+	    if ( $ft && ( my $cmd = $ft->GetOpenCommand($preview_pdf) ) ) {
+		Wx::ExecuteCommand($cmd);
+	    }
+	    else {
+		Wx::LaunchDefaultBrowser($preview_pdf);
+	    }
+	}
+    }
+
+  ERROR:
+    if ( $msgs ) {
+	Wx::LogStatus( $msgs . " message" .
+		       ( $msgs == 1 ? "" : "s" ) . "." );
+	if ( $fatal ) {
+	    Wx::LogError( "Fatal problems found!" );
+	    return;
+	}
+	else {
+	    Wx::LogWarning( "Problems found!" );
 	}
     }
     unlink( $preview_cho );
@@ -276,12 +533,45 @@ sub GetPreferences {
     for ( keys( %$prefctl ) ) {
 	$self->{"prefs_$_"} = $conf->Read( "preferences/$_", $prefctl->{$_} );
     }
+
+    # Find config setting.
+    my $p = lc( $self->{prefs_cfgpreset} ) || $prefctl->{cfgpreset};
+    if ( ",$p" =~ quotemeta( "," . _T("Custom") ) ) {
+	$self->{_cfgpresetfile} = $self->{prefs_configfile};
+    }
+    my @presets;
+    foreach ( @{stylelist()} ) {
+	if ( ",$p" =~ quotemeta( "," . $_ ) ) {
+	    push( @presets, $_ );
+	}
+    }
+    $self->{prefs_cfgpreset} = \@presets;
+
+    # Find transcode setting.
+    $p = lc $self->{prefs_xcode} || $prefctl->{xcode};
+    if ( $p ) {
+	if ( $p eq lc(_T("-----")) ) {
+	    $p = $prefctl->{xcode};
+
+	}
+	else {
+	    my $n = "";
+	    for ( @{ $self->notationlist } ) {
+		next unless $_ eq $p;
+		$n = $p;
+		last;
+	    }
+	    $p = $n;
+	}
+    }
+    $self->{prefs_xcode} = $p;
 }
 
 sub SavePreferences {
     my ( $self ) = @_;
     return unless $self;
     my $conf = Wx::ConfigBase::Get;
+    local $self->{prefs_cfgpreset} = join( ",", @{$self->{prefs_cfgpreset}} );
     for ( keys( %$prefctl ) ) {
 	$conf->Write( "preferences/$_", $self->{"prefs_$_"} );
     }
@@ -319,6 +609,7 @@ sub OnSaveAs {
        wxDefaultPosition);
     my $ret = $fd->ShowModal;
     if ( $ret == wxID_OK ) {
+	$self->{_currentfile} = $fd->GetPath;
 	$self->{t_source}->SaveFile($fd->GetPath);
 	Wx::LogStatus( "Saved." );
     }
@@ -328,6 +619,7 @@ sub OnSaveAs {
 
 sub OnSave {
     my ($self, $event) = @_;
+    goto &OnSaveAs unless $self->{_currentfile};
     $self->saveas( $self->{_currentfile} );
 }
 
@@ -338,8 +630,8 @@ sub OnPreview {
 
 sub OnQuit {
     my ( $self, $event ) = @_;
-    return unless $self->checksaved;
     $self->SavePreferences;
+    return unless $self->checksaved;
     $self->Close;
 }
 
@@ -395,7 +687,7 @@ sub OnHelp_Config {
 sub OnHelp_Example {
     my ($self, $event) = @_;
     return unless $self->checksaved;
-    $self->openfile( ::findlib( "examples/swinglow.cho" ) );
+    $self->openfile( getresource( "examples/swinglow.cho" ) );
     undef $self->{_currentfile};
     $self->{t_source}->SetModified(1);
 }
@@ -406,10 +698,11 @@ sub OnPreferences {
     use App::Music::ChordPro::Wx::PreferencesDialog;
     $self->{d_prefs} ||= App::Music::ChordPro::Wx::PreferencesDialog->new($self, -1, "Preferences");
     my $ret = $self->{d_prefs}->ShowModal;
+    $self->SavePreferences if $ret == wxID_OK;
 }
 
-sub OnAbout {
-    my ($self, $event) = @_;
+sub _aboutmsg {
+    my ( $self ) = @_;
 
     my $firstyear = 2016;
     my $year = 1900 + (localtime(time))[5];
@@ -420,41 +713,33 @@ sub OnAbout {
     # Sometimes version numbers are localized...
     my $dd = sub { my $v = $_[0]; $v =~ s/,/./g; $v };
 
-    if ( rand > 0.5 ) {
-	my $ai = Wx::AboutDialogInfo->new;
-	$ai->SetName("ChordPro Preview Editor");
-	$ai->SetVersion( $dd->($VERSION) );
-	$ai->SetCopyright("Copyright $year Johan Vromans <jvromans\@squirrel.nl>");
-	$ai->AddDeveloper("Johan Vromans <jvromans\@squirrel.nl>");
-	$ai->AddDeveloper("ChordPro version " . $dd->($App::Music::ChordPro::VERSION));
-	$ai->AddDeveloper("Perl version " . $dd->(sprintf("%vd",$^V)));
-	$ai->AddDeveloper("wxWidgets version " . $dd->(Wx::wxVERSION));
-	$ai->AddDeveloper(App::Packager::Packager() . " version " . App::Packager::Version())
-	  if $App::Packager::PACKAGED;
-	$ai->AddDeveloper("GUI design with wxGlade");
-	$ai->AddDeveloper("Some icons by www.flaticon.com");
-	$ai->SetWebSite("http://www.chordpro.org");
-	Wx::AboutBox($ai);
-    }
-    else {
-	my $md = Wx::MessageDialog->new
-	  ($self, "ChordPro Preview Editor version " . $dd->($VERSION) . "\n".
-	   "Copyright $year Johan Vromans <jvromans\@squirrel.nl>\n".
-	   "\n".
-	   "GUI design with wxGlade, http://wxglade.sourceforge.net\n\n".
-	   "ChordPro version " . $dd->($App::Music::ChordPro::VERSION) . "\n".
-	   "Perl version " . $dd->(sprintf("%vd",$^V))."\n".
-	   "wxPerl version " . $dd->($Wx::VERSION)."\n".
-	   "wxWidgets version " . $dd->(Wx::wxVERSION)."\n".
-	   ( $App::Packager::PACKAGED
-	     ? App::Packager::Packager() . " version " . App::Packager::Version()."\n"
-	     : "" ),
-	   "About ChordPro",
-	   wxOK|wxICON_INFORMATION,
-	   wxDefaultPosition);
-	$md->ShowModal;
-	$md->Destroy;
-    }
+    join( "",
+	  "ChordPro Preview Editor version ",
+	  $dd->($App::Music::ChordPro::VERSION),
+	  "\n",
+	  "https://www.chordpro.org\n",
+	  "Copyright $year Johan Vromans <jvromans\@squirrel.nl>\n",
+	  "\n",
+	  "GUI wrapper ", $dd->($VERSION), " designed with wxGlade\n\n",
+	  "Perl version ", $dd->(sprintf("%vd",$^V)), "\n",
+	  "wxPerl version ", $dd->($Wx::VERSION), "\n",
+	  "wxWidgets version ", $dd->(Wx::wxVERSION), "\n",
+	  $App::Packager::PACKAGED
+	  ? App::Packager::Packager()." version ".App::Packager::Version()."\n"
+	  : "",
+	);
+}
+
+sub OnAbout {
+    my ($self, $event) = @_;
+
+    my $md = Wx::MessageDialog->new
+      ( $self, _aboutmsg(),
+	"About ChordPro",
+	wxOK|wxICON_INFORMATION,
+	wxDefaultPosition);
+    $md->ShowModal;
+    $md->Destroy;
 }
 
 ################ End of Event handlers ################

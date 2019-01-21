@@ -18,7 +18,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Moo'                    => '2.000000',
-        'namespace::clean'       => '0.24',
+        'namespace::autoclean'   => '0.28',
         'JSON'                   => '2.53',
         'WWW::Google::UserAgent' => '0.20'
     },
@@ -27,9 +27,9 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'WWW::Google::APIDiscovery'                => { file => 'lib/WWW/Google/APIDiscovery.pm'             , version => '0.24' },
-            'WWW::Google::APIDiscovery::API'           => { file => 'lib/WWW/Google/APIDiscovery/API.pm'         , version => '0.24' },
-            'WWW::Google::APIDiscovery::API::MetaData' => { file => 'lib/WWW/Google/APIDiscovery/API/MetaData.pm', version => '0.24' },
+            'WWW::Google::APIDiscovery'                => { file => 'lib/WWW/Google/APIDiscovery.pm'             , version => '0.25' },
+            'WWW::Google::APIDiscovery::API'           => { file => 'lib/WWW/Google/APIDiscovery/API.pm'         , version => '0.25' },
+            'WWW::Google::APIDiscovery::API::MetaData' => { file => 'lib/WWW/Google/APIDiscovery/API/MetaData.pm', version => '0.25' },
         },
         resources => {
             repository => {

@@ -5,6 +5,7 @@ use strict;
 
 use Carp;
 use Data::Dumper;
+use File::Path qw(make_path);
 use File::Spec;
 use JSON;
 use List::Util qw(first);
@@ -13,18 +14,18 @@ use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 has output_path              => ( is => 'ro', required => 1, default => sub { '.' } );
 has file                     => ( is => 'ro', required => 1 );
 has uppercase                => ( is => 'ro' );
 has inherit_from_core        => ( is => 'ro' );
-has namespace                => ( is => 'ro', isa => \&_check_namespace, required => 1, default => sub { '' } );
+has namespace                => ( is => 'ro', isa => sub{ _check_namespace( @_, 1) }, required => 1, default => sub { '' } );
 has result_namespace         => ( is => 'ro', isa => \&_check_namespace, required => 1, default => sub { '' } );
 has resultset_namespace      => ( is => 'ro', isa => \&_check_namespace, required => 1, default => sub { '' } );
 has load_result_namespace    => ( is => 'ro', isa => \&_check_namespace_array, default => sub { '' } );
 has load_resultset_namespace => ( is => 'ro', isa => \&_check_namespace_array, default => sub { '' } );
-has schema_name              => ( is => 'rwp', isa => sub { $_[0] =~ m{ \A [A-Za-z0-9_]+ \z }xms } );
+has schema_name              => ( is => 'rwp', isa => sub { defined $_[0] && $_[0] =~ m{ \A [A-Za-z0-9_]+ \z }xms } );
 has parser                   => ( is => 'rwp' );
 has version_add              => ( is => 'ro', required => 1, default => sub { 0.01 } );
 has column_details           => ( is => 'ro', required => 1, default => sub { 0 } );
@@ -40,7 +41,12 @@ has version => ( is => 'rwp' );
 has classes => ( is => 'rwp', isa => sub { ref $_[0] && ref $_[0] eq 'ARRAY' }, default => sub { [] } );
 
 sub _check_namespace {
-    my ($namespace) = @_;
+    my ($namespace, $allow_empty_string) = @_;
+
+    return if !defined $namespace;
+    return if ref $namespace;
+
+    return 1 if $namespace eq '' && $allow_empty_string;
 
     return $namespace =~ m{ \A [A-Z]\w*(::\w+)* \z }xms;
 }
@@ -52,7 +58,9 @@ sub _check_namespace_array {
         return _check_namespace( $namespaces );
     }
 
-    for my $namespace ( @{ $namespaces || [] } ) {
+    return if 'ARRAY' ne ref $namespaces;
+
+    for my $namespace ( @{ $namespaces } ) {
         return if !_check_namespace( $namespace );
     }
 
@@ -160,8 +168,8 @@ sub _write_files{
         my $file = pop @path;
         my $dir  = File::Spec->catdir( @path );
 
-        unless( -e $dir ){
-            $self->_mkpath( $dir );
+        if( !-e $dir ){
+            make_path( $dir ) or croak "Cannot create directory $dir";
         }
 
         if( open my $fh, '>', $dir . '/' . $file . '.pm' ){
@@ -174,19 +182,6 @@ sub _write_files{
         }
         else{
             croak "Couldn't create $file.pm: $!";
-        }
-    }
-}
-
-sub _mkpath{
-    my ($self, $path) = @_;
-
-    my @parts = split /[\\\/]/, $path;
-
-    for my $i ( 0..$#parts ){
-        my $dir = File::Spec->catdir( @parts[ 0..$i ] );
-        unless ( -e $dir ) {
-            mkdir $dir or die "$dir: $!";
         }
     }
 }
@@ -342,89 +337,7 @@ sub _class_template{
         my @columns = @{ $table->columns };
 
         for my $column ( @columns ) {
-            my $default_value = $column->default_value || '';
-            $default_value =~ s/'/\\'/g;
-
-            my $size = $column->length;
-
-            if ( $column->datatype =~ /char/i && $column->length <= 0 ) {
-                $size = 255;
-            }
-
-            my @options;
-
-            my $name        = $column->name;
-            my $col_comment = $column->comment;
-
-            push @options, "data_type          => '" . $column->datatype . "',";
-            push @options, "is_auto_increment  => 1,"                            if $column->autoincrement;
-            push @options, "is_nullable        => 1,"                            if !$column->not_null;
-            push @options, "size               => " . $size . ","                if $size > 0;
-            push @options, "default_value      => '" . $default_value . "',"     if $default_value;
-
-            if ( first { $column->datatype eq $_ }qw/SMALLINT INT INTEGER BIGINT MEDIUMINT NUMERIC DECIMAL/ ) {
-                push @options, "is_numeric         => 1,";
-            }
-
-            push @options, "retrieve_on_insert => 1," if first{ $name eq $_ }@{ $table->primary_key };
-            push @options, "is_foreign_key     => 1," if $foreign_keys{$name};
-
-            my $column_comment_perl_raw = '';
-
-            if ( ( $data && $data->{column_info}->{$name} ) || $col_comment ) {
-                local $Data::Dumper::Sortkeys = 1;
-                local $Data::Dumper::Indent   = 1;
-                local $Data::Dumper::Pad      = '      ';
-
-                utf8::upgrade( $col_comment );
-
-                my $comment_data;
-                eval {
-                    $comment_data = JSON->new->decode( $col_comment );
-                    1;
-                } or do {
-                    if ( $col_comment =~ /\{/ ) {
-                    print STDERR $col_comment, ": ", $@;
-                    }
-                };
-
-                if ( !$comment_data || 'HASH' ne ref $comment_data ) {
-                    $column_comment_perl_raw = $col_comment;
-                    $comment_data            = {};
-                }
-                else {
-                    $column_comment_perl_raw = delete $comment_data->{comment} // '';
-                }
-
-                my %hash = (
-                    %{ $data->{column_info}->{$name} || {} },
-                    %{ $comment_data || {} },
-                );
-
-                if ( %hash ) {
-                    my $dump = Dumper( \%hash );
-                    $dump    =~ s{\$VAR1 \s+ = \s* \{ \s*? $}{}xms;
-                    $dump    =~ s{\A\s+\n\s{8}}{}xms;
-                    $dump    =~ s{\n[ ]+\};\s*\z}{}xms;
-
-                    push @options, $dump;
-                }
-            }
-
-            my $option_string = join "\n        ", @options;
-
-            my @column_comment_lines = split /\r?\n/, $column_comment_perl_raw;
-            my $column_comment_perl  = '';
-            if ( @column_comment_lines ) {
-                my $sep = sprintf "\n%s%s%s# ", ' ' x 4, ' ' x length $name, ' ' x 6;
-                $column_comment_perl = ' # ' . join ( $sep, @column_comment_lines );
-            }
-
-            $column_string .= <<"            COLUMN";
-    $name => {$column_comment_perl
-        $option_string
-    },
-            COLUMN
+            $column_string .= $self->_column_details( $table, $column, \%foreign_keys, $data );
         }
     }
 
@@ -469,6 +382,102 @@ $custom_code
     return $package, $template;
 }
 
+sub _column_details {
+    my ($self, $table, $column, $foreign_keys, $data) = @_;
+
+    my $default_value = $column->default_value // '';
+    $default_value =~ s/'/\\'/g;
+
+    my $size = $column->length;
+
+    if ( $column->datatype =~ /char/i && $column->length <= 0 ) {
+        $size = 255;
+    }
+
+    my @options;
+
+    my $name        = $column->name;
+    my $col_comment = $column->comment;
+
+    push @options, "data_type          => '" . $column->datatype . "',";
+    push @options, "is_auto_increment  => 1,"                            if $column->autoincrement;
+    push @options, "is_nullable        => 1,"                            if !$column->not_null;
+    push @options, "size               => " . $size . ","                if $size > 0;
+    push @options, "default_value      => '" . $default_value . "',"     if length $default_value;
+
+    if ( first { $column->datatype eq $_ }qw/SMALLINT INT INTEGER BIGINT MEDIUMINT NUMERIC DECIMAL/ ) {
+        push @options, "is_numeric         => 1,";
+    }
+
+    push @options, "retrieve_on_insert => 1," if first{ $name eq $_ }@{ $table->primary_key };
+    push @options, "is_foreign_key     => 1," if $foreign_keys->{$name};
+
+    my %flags = %{ $column->flags };
+    if ( %flags ) {
+        my $extras = join ', ', map { "$_ => 1" }sort keys %flags;
+        push @options, sprintf "extra => {%s},", $extras;
+    }
+
+    my $column_comment_perl_raw = '';
+
+    if ( ( $data && $data->{column_info}->{$name} ) || $col_comment ) {
+        local $Data::Dumper::Sortkeys = 1;
+        local $Data::Dumper::Indent   = 1;
+        local $Data::Dumper::Pad      = '      ';
+
+        utf8::upgrade( $col_comment );
+
+        my $comment_data;
+        eval {
+            $comment_data = JSON->new->decode( $col_comment );
+            1;
+        } or do {
+            if ( $col_comment =~ /\{/ ) {
+            print STDERR $col_comment, ": ", $@;
+            }
+        };
+
+        if ( !$comment_data || 'HASH' ne ref $comment_data ) {
+            $column_comment_perl_raw = $col_comment;
+            $comment_data            = {};
+        }
+        else {
+            $column_comment_perl_raw = delete $comment_data->{comment} // '';
+        }
+
+        my %hash = (
+            %{ $data->{column_info}->{$name} || {} },
+            %{ $comment_data },
+        );
+
+        if ( %hash ) {
+            my $dump = Dumper( \%hash );
+            $dump    =~ s{\$VAR1 \s+ = \s* \{ \s*? $}{}xms;
+            $dump    =~ s{\A\s+\n\s{8}}{}xms;
+            $dump    =~ s{\n[ ]+\};\s*\z}{}xms;
+
+            push @options, $dump;
+        }
+    }
+
+    my $option_string = join "\n        ", @options;
+
+    my @column_comment_lines = split /\r?\n/, $column_comment_perl_raw;
+    my $column_comment_perl  = '';
+
+    if ( @column_comment_lines ) {
+        my $sep = sprintf "\n%s%s%s# ", ' ' x 4, ' ' x length $name, ' ' x 6;
+        $column_comment_perl = ' # ' . join ( $sep, @column_comment_lines );
+    }
+
+    my $details = sprintf "    %s => {%s\n        %s\n    },\n",
+        $name,
+        $column_comment_perl,
+        $option_string;
+
+    return $details;
+}
+
 sub _indexes_template {
     my ($self, @indexes) = @_;
 
@@ -478,11 +487,22 @@ sub _indexes_template {
     my $hooks     = '';
     my $indexlist = '';
 
+    my $unique_indexes = '';
+
     INDEX:
     for my $index ( @indexes ) {
-        my $type = lc $index->type || 'normal';
+        my $type = $index->type;
+        $type    = 'normal' if !$type;
+        $type    = lc $type;
 
         next INDEX if $type eq 'primary';
+
+        if ( $type eq 'unique' ) {
+            $unique_indexes .= sprintf q~__PACKAGE__->add_unique_constraint(
+    %s => [qw/%s/],
+);~, $index->name, ( join ' ', @{ $index->columns } );
+            next INDEX;
+        }
 
         $type = 'normal' if $type eq 'index';
 
@@ -497,9 +517,12 @@ sub _indexes_template {
         $indexlist.= sprintf "=item * %s\n\n", $index->name;
     }
 
-    return '' if !$hooks;
+    my $sub_string = '';
+    $sub_string .= $unique_indexes if $unique_indexes;
 
-    my $sub_string = qq~
+    return $sub_string if !$hooks;
+
+    $sub_string .= qq~
 =head1 DEPLOYMENT
 
 =head2 sqlt_deploy_hook
@@ -528,16 +551,17 @@ $hooks
 sub _main_template{
     my ($self) = @_;
 
-    my @class_names  = @{ $self->classes };
-    my $classes      = join "\n", map{ "    " . $_ }@class_names;
+    my @class_names = @{ $self->classes };
+    my $classes     = join "\n", map{ "    " . $_ }@class_names;
 
-    my $schema_name  = $self->schema_name;
+    my $schema_name = $self->schema_name;
+    $schema_name    = '' if !defined $schema_name;
 
-    unless ($schema_name) {
+    if (!$schema_name) {
         my @schema_names = qw(DBIC_Schema Database DBIC MySchema MyDatabase DBIxClass_Schema);
 
         for my $schema ( @schema_names ){
-            unless( grep{ $_ eq $schema }@class_names ){
+            if( !grep{ $_ eq $schema }@class_names ){
                 $schema_name = $schema;
                 last;
             }
@@ -553,15 +577,14 @@ sub _main_template{
        $namespace  =~ s/^:://;
 
     my $version;
-    eval {
+    do {
         my $lib_path = $self->output_path;
         my @paths    = @INC;
         unshift @INC, $lib_path;
 
         eval "require $namespace";
         $version = $namespace->VERSION();
-        1;
-    } or warn $@;
+    };
 
     my $custom_code;
     if ( $version ) {
@@ -597,11 +620,14 @@ sub _main_template{
         unshift @{ $all_namespaces_to_load{result_namespace} }, $namespace if !$found;
     }
 
+    my $version_add = $self->version_add;
+    $version_add    = 0.01 if !$version_add;
+
     if ( $version ) {
-        $version += $self->version_add || 0.01;
+        $version += $version_add;
     }
 
-    $version ||= ($self->version_add || 0.01);
+    $version = $version_add if !$version;
 
     $self->_set_version( $version );
 
@@ -658,7 +684,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 

@@ -5,6 +5,7 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+examples/sample.serge
 lib/Serge/Sync/Plugin/TranslationService/lingohub.pm
 lib/Serge/Sync/Plugin/TranslationService/lingohub.pod
 t/00-compile.t

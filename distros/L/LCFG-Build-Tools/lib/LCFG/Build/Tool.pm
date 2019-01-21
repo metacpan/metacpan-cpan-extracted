@@ -2,17 +2,17 @@ package LCFG::Build::Tool;    # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: Tool.pm.in 29224 2015-11-12 10:11:34Z squinney@INF.ED.AC.UK $
+# $Id: Tool.pm.in 35448 2019-01-18 15:01:53Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool.pm.in,v $
-# $Revision: 29224 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_6_6/lib/LCFG/Build/Tool.pm.in $
-# $Date: 2015-11-12 10:11:34 +0000 (Thu, 12 Nov 2015) $
+# $Revision: 35448 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_18/lib/LCFG/Build/Tool.pm.in $
+# $Date: 2019-01-18 15:01:53 +0000 (Fri, 18 Jan 2019) $
 
-our $VERSION = '0.6.6';
+our $VERSION = '0.9.18';
 
-use File::HomeDir;
+use File::HomeDir v0.58;
 use File::Spec;
-use LCFG::Build::PkgSpec;
+use LCFG::Build::PkgSpec v0.2.6;
 use UNIVERSAL::require;
 
 my $VCS_STUB = 'LCFG::Build::VCS::';
@@ -140,6 +140,26 @@ sub _load_pkgspec {
     return $spec;
 }
 
+sub output_dir {
+    my ($self) = @_;
+
+    my $spec = $self->spec;
+
+    my $module  = $spec->fullname;
+    my $version = $spec->version;
+
+    # This retains compatibility with the previous version scheme.  By
+    # doing this we reuse the _dev build directory for each build
+    # rather than creating (potentially) lots of new ones.
+
+    my $dirname = join q{-}, $module, $version;
+    $dirname =~ s/\.dev[0-9]+$/_dev/;
+
+    my $outdir = File::Spec->catdir( $self->resultsdir, $dirname );
+
+    return $outdir;
+}
+
 sub fail {
     my ( $self, $message ) = @_;
 
@@ -166,7 +186,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Tool version 0.6.6
+    This documentation refers to LCFG::Build::Tool version 0.9.18
 
 =head1 SYNOPSIS
 

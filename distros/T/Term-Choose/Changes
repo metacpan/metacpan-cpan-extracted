@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.643   2019-01-20
+    - MSWin32: use always Win32::Console::ANSI.
+    - Bugfix mouse mode.
+
 1.642   2018-12-25
     - Bugfix "line_fold".
 

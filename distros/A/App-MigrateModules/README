@@ -5,13 +5,16 @@ NAME
 
 SYNOPSIS
 
-      perl-migrate-modules [OPTIONS] <src-path> <dest-path>
+      perl-migrate-modules [OPTIONS] [<src-path>] <dest-path>
     
         perl-migrate-modules /path/to/perl-5.28.0 /path/to/perl-5.28.1
-        perl-migrate-modules -nq /usr/bin/perl ~/bin/perl
+        perl-migrate-modules -nq -Ilib /usr/bin/perl ~/bin/perl
+        perl-migrate-modules --from ~/perl5/lib/perl5 ~/perls/5.20.0
     
       Options:
         -h, --help                   Show this message
+        -f <path>, --from=<path>     Search only these path(s) for source modules
+        -I <path>, --lib=<path>      Additional search path(s) for source modules
         -n, --notest                 Skip testing and test dependencies
         -q, --quiet                  Show only installation successes and failures
         -v, --version                Show the version of this script
@@ -22,7 +25,33 @@ DESCRIPTION
     Perl, similar to the clone-modules command for perlbrew or the
     migrate-modules command for plenv <https://github.com/tokuhirom/plenv>.
     The Perls may be passed as paths to the base installation directory or
-    paths to the perl executable itself.
+    paths to the perl executable itself. If only one path is passed, it
+    will be used as both the source and destination.
+
+    The -I/--lib option allows specifying additional search paths for
+    modules from the source Perl, such as local::lib directories. The
+    install behavior for the destination Perl can be influenced using
+    standard Perl and cpanm environment variables, such as "PERL_MM_OPT" in
+    ExtUtils::MakeMaker, "PERL_MB_OPT" in Module::Build, and
+    "PERL_CPANM_OPT" in cpanm.
+
+EXAMPLES
+
+      * Basic migration of modules to a newly installed Perl:
+
+        $ perl-migrate-modules /opt/perl-5.20.3 /opt/perl-5.22.0
+
+      * Migrate modules from an old (inactive) local::lib directory:
+
+        $ perl-migrate-modules --from ~/perl5-old/lib/perl5 /usr/bin/perl
+
+      * Migrate modules to a custom local::lib location:
+
+        $ env PERL_CPANM_OPT='-l /opt/project/local' perl-migrate-modules /opt/perl-5.28.0 /opt/perl-5.28.1
+
+      * Update all modules installed in the current Perl:
+
+        $ perl-migrate-modules $(which perl)
 
 CAVEATS
 
@@ -32,6 +61,11 @@ CAVEATS
 
     Migrated modules will be installed at their latest indexed version, not
     the version that exists in the source Perl.
+
+    Any environment settings that affect Perl's library search and module
+    install locations, such as PERL5LIB or an active local::lib, will be
+    ignored for the source Perl but will have its normal effect on
+    installation into the destination Perl.
 
 BUGS
 

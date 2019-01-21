@@ -1,5 +1,5 @@
 package Box::Calc::Row;
-$Box::Calc::Row::VERSION = '1.0200';
+$Box::Calc::Row::VERSION = '1.0201';
 use strict;
 use Moose;
 use Box::Calc::Item;
@@ -12,7 +12,7 @@ Box::Calc::Row - The smallest organizational unit in a box.
 
 =head1 VERSION
 
-version 1.0200
+version 1.0201
 
 =head1 SYNOPSIS
 
@@ -191,6 +191,17 @@ sub packing_instructions {
         calculated_weight   => $self->calculate_weight,
     };
 }
+
+
+=head2 used_volume
+
+Returns the real used volume for this row.
+
+=head2 volume 
+
+Returns the exact volume needed for this row.    
+
+=cut
 
 sub used_volume {
     my $self = shift;

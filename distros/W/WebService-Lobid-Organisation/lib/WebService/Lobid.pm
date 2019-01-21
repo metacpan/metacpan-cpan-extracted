@@ -1,5 +1,5 @@
 package WebService::Lobid;
-$WebService::Lobid::VERSION = '0.0042';
+$WebService::Lobid::VERSION = '0.00421';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ sub BUILD {
     else {
         $api_url =~ s/https/http/;
         $self->api_url($api_url);
-        $self->use_ssl("true");
+        $self->use_ssl("false");
     }
 
     $response = HTTP::Tiny->new->get( $self->api_url );

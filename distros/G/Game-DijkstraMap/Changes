@@ -1,5 +1,8 @@
 See also the git repository.
 
+1.02    2019-01-19
+        Logic fix on cost calculation.
+
 1.01    January  6 2019
         Major interface changes to allow for both 4-way and 8-way map
         normalization and path finding (probably did not break the

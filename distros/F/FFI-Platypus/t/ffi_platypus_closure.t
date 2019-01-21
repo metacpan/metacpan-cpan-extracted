@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use FFI::Platypus;
+use FFI::Platypus::Closure;
 use FFI::CheckLib;
 
 my $libtest = find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi';
@@ -17,13 +17,12 @@ subtest 'basic' => sub {
   $closure = $ffi->closure($c);
   isa_ok $closure, 'FFI::Platypus::Closure';
   is $closure->(1), 3, 'closure.(1) = 3';
+  is $closure->call(1), 3, 'closure.call(1) = 3';
 
   $closure = $ffi->closure($c);
   isa_ok $closure, 'FFI::Platypus::Closure';
   is $closure->(1), 3, 'closure.(1) = 3';
-
-  eval { $closure->sticky };
-  is $@, '', 'able to call sticky';
+  is $closure->call(1), 3, 'closure.call(1) = 3';
 };
 
 subtest 'sticky' => sub {
@@ -32,6 +31,11 @@ subtest 'sticky' => sub {
 
   my $refcnt = $closure->_svrefcnt;
   note "_svrefcnt = $refcnt";
+
+  eval { $closure->sticky };
+  is $@, '', 'called $closure->sticky';
+
+  is($closure->_svrefcnt, $refcnt+2);
 
   eval { $closure->sticky };
   is $@, '', 'called $closure->sticky';
@@ -105,6 +109,17 @@ subtest 'reuse' => sub {
 
   is $call_closure1->(), 21;
   is $call_closure2->(42), 294;
+};
+
+subtest 'immediate' => sub {
+  my $ffi = FFI::Platypus->new;
+  $ffi->lib($libtest);
+
+  my $ret = $ffi->function( closure_call_closure_immediate => ['()->int'] => 'int')->call(
+    $ffi->closure(sub { return 42; })
+  );
+
+  is $ret, 42;
 };
 
 done_testing;

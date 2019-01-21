@@ -73,3 +73,4 @@ xt/user_modify_dropdown.t
 xt/user_modify_list.t
 xt/user_modify_selectbox.t
 xt/user_summary.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

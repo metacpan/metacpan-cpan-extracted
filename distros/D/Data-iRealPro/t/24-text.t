@@ -34,8 +34,8 @@ Playlist: Playlist
 {*i T44D _ |D/F# _ |G _ |A _ }
 {*A D _ |D/F# _ |G _ |A _ }
 |D _ |D/F# _ |G _ |A _ |SD _ |G _ |A _ |A _ |D _ |G _ |A _ |A _ ]
-{*B D _ |G _ |E- _ |A _ |D _ |G _ |A _ |N1G _ }
-______ |N2A _<D.S. al Coda>_ ]
+{*B D _ |G _ |E- _ |A _ |D _ |G _ |A _ |N1 G _ }
+______ |N2 A _<D.S. al Coda>_ ]
 [QD _ |D/F# _ |G _ |fA _ Z _
 
 EOD

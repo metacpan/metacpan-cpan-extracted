@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/BinPackUtils.pm'
@@ -15,6 +15,7 @@ my @module_files = (
 my @scripts = (
     'script/bin-files',
     'script/bin-files-into-dvds',
+    'script/count-number-of-dvds-required',
     'script/pack-bins'
 );
 

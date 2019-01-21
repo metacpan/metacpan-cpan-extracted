@@ -8,7 +8,7 @@ use Alien::Build::Plugin;
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: CMake plugin for Alien::Build
-our $VERSION = '1.49'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 
 sub cmake_generator
@@ -77,6 +77,7 @@ sub init
     -G => '%{cmake_generator}', 
     '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true',
     '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+    '-DCMAKE_INSTALL_LIBDIR:PATH=lib',
     '-DCMAKE_MAKE_PROGRAM:PATH=%{make}',
   );
 
@@ -127,7 +128,7 @@ Alien::Build::Plugin::Build::CMake - CMake plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.49
+version 1.51
 
 =head1 SYNOPSIS
 
@@ -159,6 +160,7 @@ but for the moment includes:
  -G %{cmake_generator}                          \
  -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true    \
  -DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix} \
+ -DCMAKE_INSTALL_LIBDIR:PATH=lib                \
  -DCMAKE_MAKE_PROGRAM:PATH=%{make}
 
 This plugin supports out-of-source builds via the meta property C<out_of_source>.

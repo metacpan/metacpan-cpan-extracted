@@ -1,5 +1,5 @@
 package Box::Calc;
-$Box::Calc::VERSION = '1.0200';
+$Box::Calc::VERSION = '1.0201';
 use strict;
 use Moose;
 use Box::Calc::BoxType;
@@ -16,7 +16,7 @@ Box::Calc - Packing Algorithm
 
 =head1 VERSION
 
-version 1.0200
+version 1.0201
 
 =head1 SYNOPSIS
 
@@ -593,6 +593,13 @@ sub reset_items {
     $self->items([]);
     $self->clear_max_dimensions_of_items;
 }
+
+=head2 make_box($box_type)
+
+Handy method to create  new box using a specified
+box type.
+
+=cut
 
 sub make_box {
     my ($self, $box_type) = @_;

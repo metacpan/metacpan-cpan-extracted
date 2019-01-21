@@ -53,6 +53,24 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	FLAG_WINDOW_RESIZABLE
 	FLAG_WINDOW_TRANSPARENT
 	FLAG_WINDOW_UNDECORATED
+	FONT_BITMAP
+	FONT_DEFAULT
+	FONT_SDF
+	GAMEPAD_ANDROID_BUTTON_A
+	GAMEPAD_ANDROID_BUTTON_B
+	GAMEPAD_ANDROID_BUTTON_C
+	GAMEPAD_ANDROID_BUTTON_L1
+	GAMEPAD_ANDROID_BUTTON_L2
+	GAMEPAD_ANDROID_BUTTON_R1
+	GAMEPAD_ANDROID_BUTTON_R2
+	GAMEPAD_ANDROID_BUTTON_X
+	GAMEPAD_ANDROID_BUTTON_Y
+	GAMEPAD_ANDROID_BUTTON_Z
+	GAMEPAD_ANDROID_DPAD_CENTER
+	GAMEPAD_ANDROID_DPAD_DOWN
+	GAMEPAD_ANDROID_DPAD_LEFT
+	GAMEPAD_ANDROID_DPAD_RIGHT
+	GAMEPAD_ANDROID_DPAD_UP
 	GAMEPAD_PLAYER1
 	GAMEPAD_PLAYER2
 	GAMEPAD_PLAYER3
@@ -115,12 +133,14 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	HMD_SONY_PSVR
 	HMD_VALVE_HTC_VIVE
 	KEY_A
+	KEY_APOSTROPHE
 	KEY_B
 	KEY_BACK
 	KEY_BACKSLASH
 	KEY_BACKSPACE
 	KEY_C
 	KEY_CAPS_LOCK
+	KEY_COMMA
 	KEY_D
 	KEY_DELETE
 	KEY_DOWN
@@ -128,6 +148,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	KEY_EIGHT
 	KEY_END
 	KEY_ENTER
+	KEY_EQUAL
 	KEY_ESCAPE
 	KEY_F
 	KEY_F1
@@ -152,13 +173,34 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	KEY_INSERT
 	KEY_J
 	KEY_K
+	KEY_KB_MENU
+	KEY_KP_0
+	KEY_KP_1
+	KEY_KP_2
+	KEY_KP_3
+	KEY_KP_4
+	KEY_KP_5
+	KEY_KP_6
+	KEY_KP_7
+	KEY_KP_8
+	KEY_KP_9
+	KEY_KP_ADD
+	KEY_KP_DECIMAL
+	KEY_KP_DIVIDE
+	KEY_KP_ENTER
+	KEY_KP_EQUAL
+	KEY_KP_MULTIPLY
+	KEY_KP_SUBTRACT
 	KEY_L
 	KEY_LEFT
 	KEY_LEFT_ALT
+	KEY_LEFT_BRACKET
 	KEY_LEFT_CONTROL
 	KEY_LEFT_SHIFT
+	KEY_LEFT_SUPER
 	KEY_M
 	KEY_MENU
+	KEY_MINUS
 	KEY_N
 	KEY_NINE
 	KEY_NUM_LOCK
@@ -168,15 +210,19 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	KEY_PAGE_DOWN
 	KEY_PAGE_UP
 	KEY_PAUSE
+	KEY_PERIOD
 	KEY_PRINT_SCREEN
 	KEY_Q
 	KEY_R
 	KEY_RIGHT
 	KEY_RIGHT_ALT
+	KEY_RIGHT_BRACKET
 	KEY_RIGHT_CONTROL
 	KEY_RIGHT_SHIFT
+	KEY_RIGHT_SUPER
 	KEY_S
 	KEY_SCROLL_LOCK
+	KEY_SEMICOLON
 	KEY_SEVEN
 	KEY_SIX
 	KEY_SLASH
@@ -246,6 +292,9 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	MOUSE_LEFT_BUTTON
 	MOUSE_MIDDLE_BUTTON
 	MOUSE_RIGHT_BUTTON
+	NPT_3PATCH_HORIZONTAL
+	NPT_3PATCH_VERTICAL
+	NPT_9PATCH
 	RAD2DEG
 	UNCOMPRESSED_GRAYSCALE
 	UNCOMPRESSED_GRAY_ALPHA
@@ -341,6 +390,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	DrawTextEx
 	DrawTexture
 	DrawTextureEx
+	DrawTextureNPatch
 	DrawTexturePro
 	DrawTextureRec
 	DrawTextureV
@@ -356,6 +406,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	EndVrDrawing
 	ExportImage
 	ExportMesh
+	ExportWave
 	Fade
 	FormatText
 	GenImageCellular
@@ -387,11 +438,11 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	GetCollisionRayTriangle
 	GetCollisionRec
 	GetColor
-	GetFontDefault
 	GetDirectoryPath
 	GetExtension
 	GetFPS
 	GetFileName
+	GetFontDefault
 	GetFrameTime
 	GetGamepadAxisCount
 	GetGamepadAxisMovement
@@ -408,6 +459,12 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	GetImageDataNormalized
 	GetKeyPressed
 	GetMatrixModelview
+	GetMonitorCount
+	GetMonitorHeight
+	GetMonitorName
+	GetMonitorPhysicalHeight
+	GetMonitorPhysicalWidth
+	GetMonitorWidth
 	GetMousePosition
 	GetMouseRay
 	GetMouseWheelMove
@@ -560,6 +617,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	SetTextureFilter
 	SetTextureWrap
 	SetTraceLog
+	SetTraceLogCallback
 	SetVrDistortionShader
 	SetWindowIcon
 	SetWindowMinSize
@@ -641,6 +699,24 @@ our @EXPORT = qw(
 	FLAG_WINDOW_RESIZABLE
 	FLAG_WINDOW_TRANSPARENT
 	FLAG_WINDOW_UNDECORATED
+	FONT_BITMAP
+	FONT_DEFAULT
+	FONT_SDF
+	GAMEPAD_ANDROID_BUTTON_A
+	GAMEPAD_ANDROID_BUTTON_B
+	GAMEPAD_ANDROID_BUTTON_C
+	GAMEPAD_ANDROID_BUTTON_L1
+	GAMEPAD_ANDROID_BUTTON_L2
+	GAMEPAD_ANDROID_BUTTON_R1
+	GAMEPAD_ANDROID_BUTTON_R2
+	GAMEPAD_ANDROID_BUTTON_X
+	GAMEPAD_ANDROID_BUTTON_Y
+	GAMEPAD_ANDROID_BUTTON_Z
+	GAMEPAD_ANDROID_DPAD_CENTER
+	GAMEPAD_ANDROID_DPAD_DOWN
+	GAMEPAD_ANDROID_DPAD_LEFT
+	GAMEPAD_ANDROID_DPAD_RIGHT
+	GAMEPAD_ANDROID_DPAD_UP
 	GAMEPAD_PLAYER1
 	GAMEPAD_PLAYER2
 	GAMEPAD_PLAYER3
@@ -703,12 +779,14 @@ our @EXPORT = qw(
 	HMD_SONY_PSVR
 	HMD_VALVE_HTC_VIVE
 	KEY_A
+	KEY_APOSTROPHE
 	KEY_B
 	KEY_BACK
 	KEY_BACKSLASH
 	KEY_BACKSPACE
 	KEY_C
 	KEY_CAPS_LOCK
+	KEY_COMMA
 	KEY_D
 	KEY_DELETE
 	KEY_DOWN
@@ -716,6 +794,7 @@ our @EXPORT = qw(
 	KEY_EIGHT
 	KEY_END
 	KEY_ENTER
+	KEY_EQUAL
 	KEY_ESCAPE
 	KEY_F
 	KEY_F1
@@ -740,13 +819,34 @@ our @EXPORT = qw(
 	KEY_INSERT
 	KEY_J
 	KEY_K
+	KEY_KB_MENU
+	KEY_KP_0
+	KEY_KP_1
+	KEY_KP_2
+	KEY_KP_3
+	KEY_KP_4
+	KEY_KP_5
+	KEY_KP_6
+	KEY_KP_7
+	KEY_KP_8
+	KEY_KP_9
+	KEY_KP_ADD
+	KEY_KP_DECIMAL
+	KEY_KP_DIVIDE
+	KEY_KP_ENTER
+	KEY_KP_EQUAL
+	KEY_KP_MULTIPLY
+	KEY_KP_SUBTRACT
 	KEY_L
 	KEY_LEFT
 	KEY_LEFT_ALT
+	KEY_LEFT_BRACKET
 	KEY_LEFT_CONTROL
 	KEY_LEFT_SHIFT
+	KEY_LEFT_SUPER
 	KEY_M
 	KEY_MENU
+	KEY_MINUS
 	KEY_N
 	KEY_NINE
 	KEY_NUM_LOCK
@@ -756,15 +856,19 @@ our @EXPORT = qw(
 	KEY_PAGE_DOWN
 	KEY_PAGE_UP
 	KEY_PAUSE
+	KEY_PERIOD
 	KEY_PRINT_SCREEN
 	KEY_Q
 	KEY_R
 	KEY_RIGHT
 	KEY_RIGHT_ALT
+	KEY_RIGHT_BRACKET
 	KEY_RIGHT_CONTROL
 	KEY_RIGHT_SHIFT
+	KEY_RIGHT_SUPER
 	KEY_S
 	KEY_SCROLL_LOCK
+	KEY_SEMICOLON
 	KEY_SEVEN
 	KEY_SIX
 	KEY_SLASH
@@ -834,6 +938,9 @@ our @EXPORT = qw(
 	MOUSE_LEFT_BUTTON
 	MOUSE_MIDDLE_BUTTON
 	MOUSE_RIGHT_BUTTON
+	NPT_3PATCH_HORIZONTAL
+	NPT_3PATCH_VERTICAL
+	NPT_9PATCH
 	RAD2DEG
 	UNCOMPRESSED_GRAYSCALE
 	UNCOMPRESSED_GRAY_ALPHA
@@ -941,6 +1048,24 @@ None by default.
   FLAG_WINDOW_RESIZABLE
   FLAG_WINDOW_TRANSPARENT
   FLAG_WINDOW_UNDECORATED
+  FONT_BITMAP
+  FONT_DEFAULT
+  FONT_SDF
+  GAMEPAD_ANDROID_BUTTON_A
+  GAMEPAD_ANDROID_BUTTON_B
+  GAMEPAD_ANDROID_BUTTON_C
+  GAMEPAD_ANDROID_BUTTON_L1
+  GAMEPAD_ANDROID_BUTTON_L2
+  GAMEPAD_ANDROID_BUTTON_R1
+  GAMEPAD_ANDROID_BUTTON_R2
+  GAMEPAD_ANDROID_BUTTON_X
+  GAMEPAD_ANDROID_BUTTON_Y
+  GAMEPAD_ANDROID_BUTTON_Z
+  GAMEPAD_ANDROID_DPAD_CENTER
+  GAMEPAD_ANDROID_DPAD_DOWN
+  GAMEPAD_ANDROID_DPAD_LEFT
+  GAMEPAD_ANDROID_DPAD_RIGHT
+  GAMEPAD_ANDROID_DPAD_UP
   GAMEPAD_PLAYER1
   GAMEPAD_PLAYER2
   GAMEPAD_PLAYER3
@@ -1003,12 +1128,14 @@ None by default.
   HMD_SONY_PSVR
   HMD_VALVE_HTC_VIVE
   KEY_A
+  KEY_APOSTROPHE
   KEY_B
   KEY_BACK
   KEY_BACKSLASH
   KEY_BACKSPACE
   KEY_C
   KEY_CAPS_LOCK
+  KEY_COMMA
   KEY_D
   KEY_DELETE
   KEY_DOWN
@@ -1016,6 +1143,7 @@ None by default.
   KEY_EIGHT
   KEY_END
   KEY_ENTER
+  KEY_EQUAL
   KEY_ESCAPE
   KEY_F
   KEY_F1
@@ -1040,13 +1168,34 @@ None by default.
   KEY_INSERT
   KEY_J
   KEY_K
+  KEY_KB_MENU
+  KEY_KP_0
+  KEY_KP_1
+  KEY_KP_2
+  KEY_KP_3
+  KEY_KP_4
+  KEY_KP_5
+  KEY_KP_6
+  KEY_KP_7
+  KEY_KP_8
+  KEY_KP_9
+  KEY_KP_ADD
+  KEY_KP_DECIMAL
+  KEY_KP_DIVIDE
+  KEY_KP_ENTER
+  KEY_KP_EQUAL
+  KEY_KP_MULTIPLY
+  KEY_KP_SUBTRACT
   KEY_L
   KEY_LEFT
   KEY_LEFT_ALT
+  KEY_LEFT_BRACKET
   KEY_LEFT_CONTROL
   KEY_LEFT_SHIFT
+  KEY_LEFT_SUPER
   KEY_M
   KEY_MENU
+  KEY_MINUS
   KEY_N
   KEY_NINE
   KEY_NUM_LOCK
@@ -1056,15 +1205,19 @@ None by default.
   KEY_PAGE_DOWN
   KEY_PAGE_UP
   KEY_PAUSE
+  KEY_PERIOD
   KEY_PRINT_SCREEN
   KEY_Q
   KEY_R
   KEY_RIGHT
   KEY_RIGHT_ALT
+  KEY_RIGHT_BRACKET
   KEY_RIGHT_CONTROL
   KEY_RIGHT_SHIFT
+  KEY_RIGHT_SUPER
   KEY_S
   KEY_SCROLL_LOCK
+  KEY_SEMICOLON
   KEY_SEVEN
   KEY_SIX
   KEY_SLASH
@@ -1134,6 +1287,9 @@ None by default.
   MOUSE_LEFT_BUTTON
   MOUSE_MIDDLE_BUTTON
   MOUSE_RIGHT_BUTTON
+  NPT_3PATCH_HORIZONTAL
+  NPT_3PATCH_VERTICAL
+  NPT_9PATCH
   RAD2DEG
   UNCOMPRESSED_GRAYSCALE
   UNCOMPRESSED_GRAY_ALPHA
@@ -1160,7 +1316,7 @@ None by default.
   void BeginShaderMode(Shader shader)
   void BeginTextureMode(RenderTexture2D target)
   void BeginVrDrawing(void)
-  bool ChangeDirectory(char *dir)
+  bool ChangeDirectory(const char *dir)
   bool CheckCollisionBoxSphere(BoundingBox box, Vector3 centerSphere, float radiusSphere)
   bool CheckCollisionBoxes(BoundingBox box1, BoundingBox box2)
   bool CheckCollisionCircleRec(Vector2 center, float radius, Rectangle rec)
@@ -1228,10 +1384,11 @@ None by default.
   void DrawSphere(Vector3 centerPos, float radius, Color color)
   void DrawSphereEx(Vector3 centerPos, float radius, int rings, int slices, Color color)
   void DrawSphereWires(Vector3 centerPos, float radius, int rings, int slices, Color color)
-  void DrawText(char *text, int posX, int posY, int fontSize, Color color)
-  void DrawTextEx(Font font, char* text, Vector2 position, float fontSize, float spacing, Color tint)
+  void DrawText(const char *text, int posX, int posY, int fontSize, Color color)
+  void DrawTextEx(Font font, const char* text, Vector2 position, float fontSize, float spacing, Color tint)
   void DrawTexture(Texture2D texture, int posX, int posY, Color tint)
   void DrawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint)
+  void DrawTextureNPatch(Texture2D texture, NPatchInfo nPatchInfo, Rectangle destRec, Vector2 origin, float rotation, Color tint)
   void DrawTexturePro(Texture2D texture, Rectangle sourceRec, Rectangle destRec, Vector2 origin, float rotation, Color tint)
   void DrawTextureRec(Texture2D texture, Rectangle sourceRec, Vector2 position, Color tint)
   void DrawTextureV(Texture2D texture, Vector2 position, Color tint)
@@ -1245,10 +1402,11 @@ None by default.
   void EndShaderMode(void)
   void EndTextureMode(void)
   void EndVrDrawing(void)
-  void ExportImage(Image image, char *fileName)
-  void ExportMesh(Mesh mesh, char *fileName)
+  void ExportImage(Image image, const char *fileName)
+  void ExportMesh(Mesh mesh, const char *fileName)
+  void ExportWave(Wave wave, const char *fileName)
   Color Fade(Color color, float alpha)
-  char *FormatText(char *text, ...)
+  const char *FormatText(const char *text, ...)
   Image GenImageCellular(int width, int height, int tileSize)
   Image GenImageChecked(int width, int height, int checksX, int checksY, Color col1, Color col2)
   Image GenImageColor(int width, int height, Color color)
@@ -1278,16 +1436,16 @@ None by default.
   RayHitInfo GetCollisionRayTriangle(Ray ray, Vector3 p1, Vector3 p2, Vector3 p3)
   Rectangle GetCollisionRec(Rectangle rec1, Rectangle rec2)
   Color GetColor(int hexValue)
-  Font GetFontDefault(void)
-  char *GetDirectoryPath(char *fileName)
-  char *GetExtension(char *fileName)
+  const char *GetDirectoryPath(const char *fileName)
+  const char *GetExtension(const char *fileName)
   int GetFPS(void)
-  char *GetFileName(char *filePath)
+  const char *GetFileName(const char *filePath)
+  Font GetFontDefault(void)
   float GetFrameTime(void)
   int GetGamepadAxisCount(int gamepad)
   float GetGamepadAxisMovement(int gamepad, int axis)
   int GetGamepadButtonPressed(void)
-  char *GetGamepadName(int gamepad)
+  const char *GetGamepadName(int gamepad)
   int GetGestureDetected(void)
   float GetGestureDragAngle(void)
   Vector2 GetGestureDragVector(void)
@@ -1299,6 +1457,12 @@ None by default.
   Vector4 *GetImageDataNormalized(Image image)
   int GetKeyPressed(void)
   Matrix GetMatrixModelview()
+  int GetMonitorCount(void)
+  int GetMonitorHeight(int monitor)
+  const char *GetMonitorName(int monitor)
+  int GetMonitorPhysicalHeight(int monitor)
+  int GetMonitorPhysicalWidth(int monitor)
+  int GetMonitorWidth(int monitor)
   Vector2 GetMousePosition(void)
   Ray GetMouseRay(Vector2 mousePosition, Camera3D camera)
   int GetMouseWheelMove(void)
@@ -1311,7 +1475,7 @@ None by default.
   int GetScreenHeight(void)
   int GetScreenWidth(void)
   Shader GetShaderDefault(void)
-  int GetShaderLocation(Shader shader, char *uniformName)
+  int GetShaderLocation(Shader shader, const char *uniformName)
   Image GetTextureData(Texture2D texture)
   Texture2D GetTextureDefault(void)
   double GetTime(void)
@@ -1321,7 +1485,7 @@ None by default.
   int GetTouchY(void)
   VrDeviceInfo GetVrDeviceInfo(int vrDeviceType)
   float *GetWaveData(Wave wave)
-  char *GetWorkingDirectory(void)
+  const char *GetWorkingDirectory(void)
   Vector2 GetWorldToScreen(Vector3 position, Camera3D camera)
   void HideCursor(void)
   void ImageAlphaClear(Image *image, Color color, float threshold)
@@ -1339,8 +1503,8 @@ None by default.
   void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp)
   void ImageDraw(Image *dst, Image src, Rectangle srcRec, Rectangle dstRec)
   void ImageDrawRectangle(Image *dst, Vector2 position, Rectangle rec, Color color)
-  void ImageDrawText(Image *dst, Vector2 position, char *text, int fontSize, Color color)
-  void ImageDrawTextEx(Image *dst, Vector2 position, Font font, char *text, float fontSize, float spacing, Color color)
+  void ImageDrawText(Image *dst, Vector2 position, const char *text, int fontSize, Color color)
+  void ImageDrawTextEx(Image *dst, Vector2 position, Font font, const char *text, float fontSize, float spacing, Color color)
   void ImageFlipHorizontal(Image *image)
   void ImageFlipVertical(Image *image)
   void ImageFormat(Image *image, int newFormat)
@@ -1350,25 +1514,25 @@ None by default.
   void ImageResizeNN(Image *image, int newWidth,int newHeight)
   void ImageRotateCCW(Image *image)
   void ImageRotateCW(Image *image)
-  Image ImageText(char *text, int fontSize, Color color)
-  Image ImageTextEx(Font font, char *text, float fontSize, float spacing, Color tint)
+  Image ImageText(const char *text, int fontSize, Color color)
+  Image ImageTextEx(Font font, const char *text, float fontSize, float spacing, Color tint)
   void ImageToPOT(Image *image, Color fillColor)
   void InitAudioDevice(void)
   AudioStream InitAudioStream(unsigned int sampleRate, unsigned int sampleSize, unsigned int channels)
   void InitVrSimulator(VrDeviceInfo info)
-  void InitWindow(int width, int height, char *title)
+  void InitWindow(int width, int height, const char *title)
   bool IsAudioBufferProcessed(AudioStream stream)
   bool IsAudioDeviceReady(void)
   bool IsAudioStreamPlaying(AudioStream stream)
   bool IsCursorHidden(void)
   bool IsFileDropped(void)
-  bool IsFileExtension(char *fileName, char *ext)
+  bool IsFileExtension(const char *fileName, const char *ext)
   bool IsGamepadAvailable(int gamepad)
   bool IsGamepadButtonDown(int gamepad, int button)
   bool IsGamepadButtonPressed(int gamepad, int button)
   bool IsGamepadButtonReleased(int gamepad, int button)
   bool IsGamepadButtonUp(int gamepad, int button)
-  bool IsGamepadName(int gamepad, char *name)
+  bool IsGamepadName(int gamepad, const char *name)
   bool IsGestureDetected(int gesture)
   bool IsKeyDown(int key)
   bool IsKeyPressed(int key)
@@ -1383,35 +1547,36 @@ None by default.
   bool IsVrSimulatorReady(void)
   bool IsWindowMinimized(void)
   bool IsWindowReady(void)
-  Font LoadFont(char *fileName)
-  CharInfo *LoadFontData(char *fileName, int fontSize, int *fontChars, int charsCount, bool sdf)
-  Font LoadFontEx(char *fileName, int fontSize, int charsCount, int *fontChars)
-  Image LoadImage(char *fileName)
+  Font LoadFont(const char *fileName)
+  CharInfo *LoadFontData(const char *fileName, int fontSize, int *fontChars, int charsCount, int type)
+  Font LoadFontEx(const char *fileName, int fontSize, int charsCount, int *fontChars)
+  Image LoadImage(const char *fileName)
   Image LoadImageEx(Color *pixels, int width, int height)
   Image LoadImagePro(void *data, int width, int height, int format)
+  Image LoadImageRaw(const char *fileName, int width, int height, int format, int headerSize)
   Image LoadImageRaw(char *fileName, int width, int height, int format, int headerSize)
   Image LoadImageFromAV(SV *array_ref, SV *color_cb)
   Image LoadImageFromAV_uninitialized_mem(SV *array_ref, SV *color_cb)
   Image LoadImageFromAV_transposed(SV *array_ref, SV *color_cb)
   Image LoadImageFromAV_transposed_uninitialized_mem(SV *array_ref, SV *color_cb)
-  Material LoadMaterial(char *fileName)
+  Material LoadMaterial(const char *fileName)
   Material LoadMaterialDefault(void)
-  Mesh LoadMesh(char *fileName)
-  Model LoadModel(char *fileName)
+  Mesh LoadMesh(const char *fileName)
+  Model LoadModel(const char *fileName)
   Model LoadModelFromMesh(Mesh mesh)
-  Music LoadMusicStream(char *fileName)
+  Music LoadMusicStream(const char *fileName)
   RenderTexture2D LoadRenderTexture(int width, int height)
-  Shader LoadShader(char *vsFileName, char *fsFileName)
+  Shader LoadShader(const char *vsFileName, const char *fsFileName)
   Shader LoadShaderCode(char *vsCode, char *fsCode)
-  Sound LoadSound(char *fileName)
+  Sound LoadSound(const char *fileName)
   Sound LoadSoundFromWave(Wave wave)
-  char *LoadText(char *fileName)
-  Texture2D LoadTexture(char *fileName)
+  char *LoadText(const char *fileName)
+  Texture2D LoadTexture(const char *fileName)
   Texture2D LoadTextureFromImage(Image image)
-  Wave LoadWave(char *fileName)
+  Wave LoadWave(const char *fileName)
   Wave LoadWaveEx(void *data, int sampleCount, int sampleRate, int sampleSize, int channels)
-  int MeasureText(char *text, int fontSize)
-  Vector2 MeasureTextEx(Font font, char *text, float fontSize, float spacing)
+  int MeasureText(const char *text, int fontSize)
+  Vector2 MeasureTextEx(Font font, const char *text, float fontSize, float spacing)
   void MeshBinormals(Mesh *mesh)
   BoundingBox MeshBoundingBox(Mesh mesh)
   void MeshTangents(Mesh *mesh)
@@ -1451,13 +1616,14 @@ None by default.
   void SetTextureFilter(Texture2D texture, int filterMode)
   void SetTextureWrap(Texture2D texture, int wrapMode)
   void SetTraceLog(unsigned char types)
+  void SetTraceLogCallback(TraceLogCallback callback)
   void SetVrDistortionShader(Shader shader)
   void SetWindowIcon(Image image)
   void SetWindowMinSize(int width, int height)
   void SetWindowMonitor(int monitor)
   void SetWindowPosition(int x, int y)
   void SetWindowSize(int width, int height)
-  void SetWindowTitle(char *title)
+  void SetWindowTitle(const char *title)
   void ShowCursor(void)
   void ShowLogo(void)
   void StopAudioStream(AudioStream stream)
@@ -1465,11 +1631,11 @@ None by default.
   void StopSound(Sound sound)
   int StorageLoadValue(int position)
   void StorageSaveValue(int position, int value)
-  char *SubText(char *text, int position, int length)
-  void TakeScreenshot(char *fileName)
+  const char *SubText(const char *text, int position, int length)
+  void TakeScreenshot(const char *fileName)
   void ToggleFullscreen(void)
   void ToggleVrMode(void)
-  void TraceLog(int logType, char *text, ...)
+  void TraceLog(int logType, const char *text, ...)
   void UnloadFont(Font font)
   void UnloadImage(Image image)
   void UnloadMaterial(Material material)
@@ -1497,19 +1663,26 @@ None by default.
 
 =head1 SEE ALSO
 
-L<http://www.raylib.com>
+Mention other useful documentation such as the documentation of
+related modules or operating system documentation (such as man pages
+in UNIX), or any relevant external documentation such as RFCs or
+standards.
 
-L<Alien::raylib>
+If you have a mailing list set up for your module, mention it here.
+
+If you have a web site set up for your module, mention it here.
 
 =head1 AUTHOR
 
-Ahmad Fatoum, E<lt>ahmad@a3f.atE<gt>
+Ahmad Fatoum, E<lt>a3f@localE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Ahmad Fatoum
+Copyright (C) 2019 by Ahmad Fatoum
 
-L<Graphics::Raylib::XS> is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, or, at your option, the zlib/libpng license.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.28.1 or,
+at your option, any later version of Perl 5 you may have available.
+
 
 =cut

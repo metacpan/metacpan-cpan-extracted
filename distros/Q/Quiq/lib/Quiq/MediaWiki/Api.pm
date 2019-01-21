@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Quiq::Parameters;
 use Quiq::AnsiColor;
@@ -13,6 +13,8 @@ use Quiq::Hash;
 use LWP::UserAgent ();
 use Quiq::Option;
 use Quiq::Debug;
+use Quiq::Path;
+use Quiq::Record;
 use Quiq::Url;
 use JSON ();
 
@@ -38,7 +40,7 @@ Die Doku der API wird angezeigt, wenn api.php ohne Parameter
 oder mit "action=help&recursivesubmodules=1" (alles auf einer Seite)
 aufgerufen wird.
 
-Die MediaWiki-API empfängt und liefert die Daten in UTF-8.
+Die MediaWiki-API empfängt und liefert alle Daten in UTF-8.
 
 =head1 METHODS
 
@@ -75,7 +77,8 @@ Passwort (für automatisches Login statt explizites Login).
 
 =item -color => $bool (Default: 1)
 
-Gib die Laufzeitinformation (wenn -debug => 1) in Farbe aus.
+Gib die Laufzeitinformation (wird mit -debug=>1 eingeschaltet)
+in Farbe aus.
 
 =item -debug => $bool (Default: 0)
 
@@ -121,13 +124,15 @@ sub new {
 
     my $color = 1;
     my $debug = 0;
+    my $warnings = 0;
 
     my $argA = Quiq::Parameters->extractToVariables(\@_,1,3,
         -color => \$color,
         -debug => \$debug,
+        -warnings => \$warnings,
     );
     my ($url,$user,$password) = @$argA;
-    
+
     # UserAgent instantiieren
 
     my $ua = LWP::UserAgent->new(
@@ -142,6 +147,7 @@ sub new {
         autoLogin => $user && $password? 1: 0,
         color => $color,
         debug => $debug,
+        warnings => $warnings,
         tokenH => Quiq::Hash->new->unlockKeys,
         ua => $ua,
         url => $url,
@@ -369,7 +375,7 @@ sub getPage {
 
 # -----------------------------------------------------------------------------
 
-=head3 editPage() - Erzeuge/bearbeite Seite
+=head3 editPage() - Erzeuge/ändere Seite
 
 =head4 Synopsis
 
@@ -550,6 +556,250 @@ sub movePage {
 
 # -----------------------------------------------------------------------------
 
+=head3 loadPage() - Lade Seite ins Wiki
+
+=head4 Synopsis
+
+    $mwa->loadPage($mirrorDir,$pageName,$input,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $mirrorDir
+
+Pfad zum Spiegel-Verzeichnis. Der Inhalt des Spiegel-Verzeichnisses wird
+von der Methode verwaltet. Es enthält Kopien der MediaWiki-Seiten (*.mw).
+
+=item $pageName
+
+Name für die Seite im Spiegel-Verzeichnis. Dieser Name identifiziert die
+Seite im Spiegel-Verzeichnis (und ist nicht zu verwechseln mit dem Titel
+der Seite). Der Name $pageName muss eindeutig sein.
+
+=item $input
+
+Pfad der MediaWiki Seitendatei oder eine Stringreferenz auf den
+Inhalt der Seitendatei.
+
+=back
+
+=head4 Description
+
+Lade die Seite $input mit dem eindeutigen Namen $pageName (im
+Spiegel-Verzeichnis) ins MediaWiki. Der $pageName ist nicht zu verwechseln
+mit dem Titel der Seite. Der Titel der Seite ist zusammen mit
+dem Inhalt der Seite Teil der externen Seitenrepräsentation $input.
+Die Methode erkennt, ob die externe Seite $input
+
+=over 2
+
+=item *
+
+bereits im Wiki existiert oder neu angelegt werden muss
+
+=item *
+
+sich der Titel geändert hat -> movePage()
+
+=item *
+
+sich der Inhalt gegenüber dem letzten Stand geändert hat -> editPage()
+
+=item *
+
+eine Änderung im Wiki erfahren hat und diese Änderung in die externe
+Seite eingepflegt werden muss -> Fehlermeldung
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub loadPage {
+    my $self = shift;
+    # @_: $mirrorDir,$pageName,$input,@opt
+
+    # Optionen und Argumente
+
+    my $force = 1;
+
+    my $argA = Quiq::Parameters->extractToVariables(\@_,3,3,
+        -force => \$force,
+    );
+    my ($mirrorDir,$pageName,$input) = @$argA;
+
+    # Pfad-Objekt für diverse Pfad-Operationen instantiieren
+    my $p = Quiq::Path->new;
+
+    # Externe Seite: Information (Titel, Inhalt) ermitteln
+
+    my $pageCode = ref $input? $$input: $p->read($input,-decode=>'utf-8');
+    my $recNew = Quiq::Hash->new(Quiq::Record->fromString($pageCode));
+    my ($titleNew,$contentNew) = $recNew->get('Title','Content');
+
+    # Mirror-Seite: Information (Id, Titel, Inhalt) ermitteln.
+    # Existiert keine Mirror-Seite, versuchen wir, die Seite über
+    # den Titel im Wiki zu finden. Falls sie im Wiki existiert, erzeugen
+    # wir aus ihr die Mirror-Seite. Falls nicht, legen wir eine leere
+    # Mirror-Seite an (die notwendig von der externen Seite differiert).
+
+    my $varFile = sprintf '%s/%s.mw',$mirrorDir,$pageName;
+    if (!$p->exists($varFile)) {
+        my $pageId = '';
+        my $title = '';
+        my $content = '';
+
+        if (my $pag = $self->getPage($titleNew,-sloppy=>1)) {
+            $pageId = $pag->{'pageid'};
+            $title = $pag->{'title'};
+            $content = $pag->{'*'};
+        }
+
+        my $data = Quiq::Record->toString(
+            Id => $pageId,
+            Title => $title,
+            Content => $content,
+        );
+        $p->write($varFile,$data,
+            -recursive => 1,
+            -encode => 'UTF-8',
+        );
+    }
+
+    my $recOld = Quiq::Hash->new(Quiq::Record->fromFile(
+        $varFile,-encoding=>'UTF-8'));
+    my ($pageId,$titleOld,$contentOld) = $recOld->get('Id','Title','Content');
+
+    if ($pageId) {
+        # Wiki-Seite existiert bereits
+
+        if ($titleNew eq $titleOld && $contentNew eq $contentOld) {
+            # Keine Differenz, es gibt nichts zu tun.
+            return;
+        }
+        if ($contentNew ne $contentOld) {
+            # Der Inhalt zwischen der externen Seite und der Mirror-Seite
+            # hat sich geändert. Wir prüfen ob die Wiki-Seite geändert
+            # wurde, also zwischen dem Inhalt der Mirror-Seite und
+            # der Wiki-Seite ein Unterschied besteht.
+
+            if (my $pag = $self->getPage($pageId)) {
+                if ($pag->{'*'} ne $contentOld) {
+                    if (!$force) {
+                        printf "ERROR: Page has changed in Wiki: pageId=%s".
+                            " '%s'. Update skipped! Use --force to update the".
+                            " page.\n",$pageId,$pag->{'title'};
+                        return;
+                    }
+                    else {
+                        printf "WARNING: Page has changed in Wiki: pageId=%s".
+                        " '%s'\n",$pageId,$pag->{'title'};
+                    }
+                }
+            }
+        }
+        if ($titleNew ne $titleOld) {
+            # Der Titel zwischen der externen Seite und der Mirror-Seite
+            # hat sich geändert. Wir benennen die Wiki-Seite um.
+
+            $self->movePage($pageId,$titleNew);
+            print "Page moved: pageId=$pageId '$titleOld' => '$titleNew'\n";
+        }
+    }
+
+    # Die Seite ist neu oder hat sich geändert. Wir bringen den
+    # neusten Stand aufs Wiki und speichern ihn im Cache.
+
+    my $op = $pageId? 'update': 'create'; # 
+
+    my $res = $self->editPage($pageId || $titleNew,$contentNew);
+    $pageId = $res->{'edit'}->{'pageid'};
+    my $data = Quiq::Record->toString(
+        Id => $pageId,
+        Title => $titleNew,
+        Content => $contentNew,
+    );
+    $p->write($varFile,$data,
+        -encode => 'UTF-8',
+    );
+
+    printf "Page %sd: pageId=%s '%s'\n",$op,$pageId,$titleNew;
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 siteInfo() - Allgemeine Information über das MediaWiki
+
+=head4 Synopsis
+
+    $res = $mwa->siteInfo;
+    $res = $mwa->siteInfo(@properties);
+
+=head4 Arguments
+
+=over 4
+
+=item @properties
+
+Liste der Sysinfo-Properties, die abgefragt werden sollen. Sind keine
+Properties angegeben, werden alle (zur Zeit der Implementierung
+bekannten) Properties abgefragt.
+
+=back
+
+=head4 Returns
+
+Response
+
+=head4 Example
+
+    $ quiq-mediawiki ruv statistics --debug
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub siteInfo {
+    my ($self,@properties) = @_;
+
+    my %property = (
+         general => 1,
+         namespaces => 1,
+         namespacealiases => 1,
+         specialpagealiases => 1,
+         magicwords => 1,
+         statistics => 1,
+         interwikimap => 1,
+         dbrepllag => 1,
+         usergroups => 1,
+         extensions => 1,
+         fileextensions => 1,
+         rightsinfo => 1,
+         languages => 1,
+         skins => 1,
+         extensiontags => 1,
+         functionhooks => 1,
+         showhooks => 1,
+         variables => 1,
+         protocols => 1,
+    );
+    if (!@properties) {
+        @properties = keys %property;
+    }
+
+    return $self->send(
+        GET => 'query',
+        meta => 'siteinfo',
+        siprop => join('|',@properties),
+    );
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Kommunikation
 
 =head3 send() - Sende HTTP-Anfrage, empfange HTTP-Antwort
@@ -672,7 +922,7 @@ sub send {
 
     # Warnungen schreiben wir nach STDERR
 
-    if (my $h = $json->{'warnings'}) {
+    if ($self->warnings && (my $h = $json->{'warnings'})) {
         for my $key (keys %$h) {
             warn "WARNING: $key - $h->{$key}->{'*'}\n";
             # formatversion=2
@@ -806,7 +1056,7 @@ sub log {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 SEE ALSO
 

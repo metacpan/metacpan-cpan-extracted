@@ -1,13 +1,13 @@
-#!/usr/bin/perl
+package Crypt::Random::Source::Weak::openssl; # git description: v0.02-6-g14c3ddf
+# ABSTRACT: Get random bytes from the OpenSSL command line utility
 
-package Crypt::Random::Source::Weak::openssl;
-use Moose;
+use Moo;
 
 use File::Which qw(which);
 
-use namespace::clean -except => [qw(meta)];
+use namespace::clean;
 
-our $VERSION = "0.02";
+our $VERSION = '0.03';
 
 sub available {
 	which("openssl");
@@ -31,9 +31,8 @@ has default_chunk_size => (
 );
 
 has 'command' => (
-	isa => "ArrayRef",
-	is  => "ro",
-	lazy_build => 1,
+	isa => sub { die "$_[0] must be an arrayref" unless ref $_[0] eq 'ARRAY' },
+	is => 'lazy',
 	clearer => "clear_command",
 );
 
@@ -71,10 +70,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Crypt::Random::Source::Weak::openssl - Get random bytes from the OpenSSL
-command line utility
+Crypt::Random::Source::Weak::openssl - Get random bytes from the OpenSSL command line utility
+
+=head1 VERSION
+
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -121,20 +125,26 @@ L<Crypt::Random::Source>
 
 L<openssl(1)>, L<rand(1)>
 
-=head1 VERSION CONTROL
+=head1 SUPPORT
 
-This module is maintained using Darcs. You can get the latest version from
-L<http://nothingmuch.woobling.org/code>, and use C<darcs send> to commit
-changes.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-Random-Source-Weak-openssl>
+(or L<bug-Crypt-Random-Source-Weak-openssl@rt.cpan.org|mailto:bug-Crypt-Random-Source-Weak-openssl@rt.cpan.org>).
 
 =head1 AUTHOR
 
-Yuval Kogman E<lt>nothingmuch@woobling.orgE<gt>
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
 
-=head1 COPYRIGHT
+=head1 CONTRIBUTOR
 
-	Copyright (c) 2008 Yuval Kogman. All rights reserved
-	This program is free software; you can redistribute
-	it and/or modify it under the same terms as Perl itself.
+=for stopwords Karen Etheridge
+
+Karen Etheridge <ether@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2008 by Yuval Kogman.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

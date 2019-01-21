@@ -1,36 +1,42 @@
 ---
-name: LCFG-Build-VCS
-version: 0.2.3
+abstract: LCFG version control infrastructure
 author:
   - 'Stephen Quinney <squinney@inf.ed.ac.uk>'
-abstract: LCFG version control infrastructure
-license: gpl
-resources:
-  license: http://www.opensource.org/licenses/gpl-license.php
-requires:
-  DateTime: 0
-  File::Copy::Recursive: 0.36
-  File::HomeDir: 0.58
-  IPC::Run: 0
-  Moose: 0.57
-  perl: 5.6.1
-  URI: 0
 build_requires:
-  Test::More: 0
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.40'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LCFG-Build-VCS
 provides:
   LCFG::Build::VCS:
     file: lib/LCFG/Build/VCS.pm
-    version: 0.2.3
+    version: v0.3.8
   LCFG::Build::VCS::CVS:
     file: lib/LCFG/Build/VCS/CVS.pm
-    version: 0.2.3
+    version: v0.3.8
   LCFG::Build::VCS::None:
     file: lib/LCFG/Build/VCS/None.pm
-    version: 0.2.3
+    version: v0.3.8
   LCFG::Build::VCS::SVN:
     file: lib/LCFG/Build/VCS/SVN.pm
-    version: 0.2.3
-generated_by: Module::Build version 0.2807
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: v0.3.8
+requires:
+  DateTime: '0'
+  File::Copy::Recursive: '0.36'
+  File::HomeDir: '0.58'
+  IPC::Run: '0'
+  Moose: '0.57'
+  Template: '2.14'
+  URI: '0'
+  perl: v5.10.0
+resources:
+  bugtracker:
+    web: https://bugs.lcfg.org/
+  homepage: http://www.lcfg.org/doc/buildtools/
+  license: https://opensource.org/licenses/GPL-2.0
+version: v0.3.8

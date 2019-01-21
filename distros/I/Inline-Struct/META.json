@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Inline-Struct",
    "no_index" : {
@@ -56,5 +56,6 @@
          "web" : "https://github.com/mohawk2/Inline-Struct"
       }
    },
-   "version" : "0.23"
+   "version" : "0.25",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

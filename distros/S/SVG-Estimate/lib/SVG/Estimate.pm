@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package SVG::Estimate;
-$SVG::Estimate::VERSION = '1.0110';
+$SVG::Estimate::VERSION = '1.0111';
 use XML::Hash::LX;
 use XML::LibXML;
 use File::Slurp;
@@ -24,7 +24,7 @@ SVG::Estimate - Estimates the length of all the vectors in an SVG file.
 
 =head1 VERSION
 
-version 1.0110
+version 1.0111
 
 =head1 SYNOPSIS
 

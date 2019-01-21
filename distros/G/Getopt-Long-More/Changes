@@ -1,4 +1,14 @@
-Revision history for Getopt-Long-More
+0.005   2019-01-20 (PERLANCAR)
+
+        - [Bugfix] Handle "hash storage mode" of Getopt::Long (where GetOptions
+          is called with a hashref as its first argument). Also fix
+          compatibility of Getopt::Long which does not require explicit
+          "linkage" (option handler), e.g. GetOptions('foo', 'bar', 'baz') is
+          allowed by Getopt::Long. (Thanks Tabulon!)
+
+        - Allow extra optspec properties x, x.*, _* to store comments or
+          whatever.
+
 
 0.004   2016-12-03 (PERLANCAR)
 

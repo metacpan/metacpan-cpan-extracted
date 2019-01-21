@@ -11,21 +11,27 @@ jQuery(function() {
     cf_id = cf_id.replace(/:/g,'\\:');
     var conditionedby_vals = ["<% join('", "', @conditioned_by_vals) |n%>"];
     var condition_met = false;
-    var condition_vals = jQuery('#'+conditionedby_id+' td.value li');
-    if (condition_vals.length) {
-        jQuery.each(condition_vals, function(i, condition_val) {
-            if (jQuery.inArray(jQuery.trim(condition_val.text()), conditionedby_vals) != -1) {
-                condition_met = true;
-                return false;
-            }
-        });
-    } else {
-        var condition_val = jQuery('#'+conditionedby_id+' td.value');
-        if (condition_val.length) {
-            if (jQuery.inArray(jQuery.trim(condition_val.text()), conditionedby_vals) != -1) {
-                condition_met = true;
-            }
+    if (jQuery('#'+conditionedby_id).is(':visible')) {
+        var condition_vals = jQuery('#'+conditionedby_id+' td.value li');
+        if (condition_vals.length) {
+            jQuery.each(condition_vals, function(i, condition_val) {
+                if (jQuery.inArray(jQuery.trim(condition_val.text()), conditionedby_vals) != -1) {
+                    condition_met = true;
+                    return false;
+                }
+            });
         } else {
+            var condition_val = jQuery('#'+conditionedby_id+' td.value');
+            if (condition_val.length) {
+                if (jQuery.inArray(jQuery.trim(condition_val.text()), conditionedby_vals) != -1) {
+                    condition_met = true;
+                }
+            } else {
+                condition_met = true;
+            }
+        }
+    } else {
+        if (!jQuery('#'+conditionedby_id).length) {
             condition_met = true;
         }
     }
@@ -45,16 +51,22 @@ jQuery(function() {
     cf_class = cf_class.replace(/:/g,'\\:');
     var conditionedby_vals = ["<% join('", "', @conditioned_by_vals) |n%>"];
     var condition_met = false;
-    var condition_vals = jQuery(conditionedby_class+' .value li');
-    if (condition_vals.length) {
-        jQuery.each(condition_vals, function(i, condition_val) {
-            if (jQuery.inArray(jQuery.trim(condition_val.text()), conditionedby_vals) != -1) {
+    if (jQuery(conditionedby_class).is(':visible')) {
+        var condition_vals = jQuery(conditionedby_class+' .value li');
+        if (condition_vals.length) {
+            jQuery.each(condition_vals, function(i, condition_val) {
+                if (jQuery.inArray(jQuery.trim(condition_val.text()), conditionedby_vals) != -1) {
+                    condition_met = true;
+                    return false;
+                }
+            });
+        } else {
+            if (jQuery.inArray(jQuery.trim(jQuery(conditionedby_class+' .value').text()), conditionedby_vals) != -1) {
                 condition_met = true;
-                return false;
             }
-        });
+        }
     } else {
-        if (jQuery.inArray(jQuery.trim(jQuery(conditionedby_class+' .value').text()), conditionedby_vals) != -1) {
+        if (!jQuery(conditionedby_class).length) {
             condition_met = true;
         }
     }

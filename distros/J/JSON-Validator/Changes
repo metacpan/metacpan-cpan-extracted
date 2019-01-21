@@ -1,5 +1,26 @@
 Revision history for perl distribution JSON-Validator
 
+3.04 2019-01-21T09:39:50+0900
+ - Fix "uri" check, so that it only accept ASCII characters. Note that this
+   fix might be an undesired change for your application. If so, then update
+   the "uri" format in your schema to "iri".
+ - Fix "hostname" format check, so it does not require a valid TLD
+ - Fix validating draft-07 schema against itself #144
+ - Add support for more formats in JSON Schema draft-6 and 7: date, idn-email,
+   idn-hostname, iri, iri-reference, json-pointer, relative-json-pointer, time,
+   uri-reference and uri-template.
+ - Add support for more keywords in draft-07
+   * 6.4.6. Arrays - contains
+   * 6.5.8. Objects - propertyNames
+   * 6.6.1. Objects - if
+   * 6.6.2. Objects - then
+   * 6.6.3. Objects - else
+
+3.03 2019-01-19T12:11:34+0900
+ - Add JSON::Validator::Formats with format checks
+   Note that these functions work by returning a string on error, instead of
+   true on sucches, which was a breaking change introduced in the 3.00 release.
+
 3.02 2019-01-07T09:52:31+0900
  - Trying to fix more failing test reports from the smokers
 
@@ -10,9 +31,11 @@ Revision history for perl distribution JSON-Validator
  - Add enum() to Joi
  - Add support for a list of types passed on to Joi #136
  - Add support for file:// scheme in $ref #138
- - Fix $ref resolving after fixes applied to Mojo::JSON::Pointer in Mojolicious 8.11 #139
+ - Fix $ref resolving after fixes applied to Mojo::JSON::Pointer in
+   Mojolicious 8.11 #139
  - Fix cases where input was not coerced
- - Changed how format validation is done
+ - Breaking change: format callbacks need to return undef on success and a
+   description on error.
  - Changed Joi to always coerce values
  - Removed JSON::Validator::OpenAPI
 
@@ -60,7 +83,7 @@ Revision history for perl distribution JSON-Validator
 2.08  2018-06-03
  - Fix validating oneOf correctly #103
  - Fix validating "id" property #111
- - Add support for $id keyword in draft7 #114
+ - Add support for $id keyword in draft-07 #114
  - Bundle JSON Schema draft-06 and draft-07
 
 2.07  2018-04-18

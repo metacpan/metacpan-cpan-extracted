@@ -1,7 +1,7 @@
 package Dancer2::Plugin::WebSocket::Connection;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Role tying Plack::App::WebSocket::Connection with the Dancer serializer
-$Dancer2::Plugin::WebSocket::Connection::VERSION = '0.1.1';
+$Dancer2::Plugin::WebSocket::Connection::VERSION = '0.1.2';
 
 
 use Scalar::Util qw/ refaddr /;
@@ -89,7 +89,7 @@ Dancer2::Plugin::WebSocket::Connection - Role tying Plack::App::WebSocket::Conne
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.2
 
 =head1 DESCRIPTION
 
@@ -144,7 +144,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2019, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

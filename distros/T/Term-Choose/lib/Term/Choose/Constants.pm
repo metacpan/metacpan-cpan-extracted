@@ -4,13 +4,12 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.642';
+our $VERSION = '1.643';
 
 use Exporter qw( import );
 
 our @EXPORT_OK = qw(
         ROW COL
-        LF CR
         HIDE_CURSOR SHOW_CURSOR WIDTH_CURSOR
         MAX_ROW_MOUSE_1003 MAX_COL_MOUSE_1003
         GET_CURSOR_POSITION
@@ -18,6 +17,7 @@ our @EXPORT_OK = qw(
         UNSET_ANY_EVENT_MOUSE_1003 UNSET_EXT_MODE_MOUSE_1005 UNSET_SGR_EXT_MODE_MOUSE_1006
         CLEAR_SCREEN CLEAR_TO_END_OF_SCREEN CLEAR_TO_END_OF_LINE
         RESET REVERSE UNDERLINE BOLD_UNDERLINE BEEP
+        UP DOWN RIGHT LEFT
         NEXT_get_key
         CONTROL_SPACE CONTROL_A CONTROL_B CONTROL_C CONTROL_D CONTROL_E CONTROL_F CONTROL_H KEY_BTAB CONTROL_I KEY_TAB
         CONTROL_K KEY_ENTER CONTROL_U KEY_ESC KEY_SPACE KEY_h KEY_j KEY_k KEY_l KEY_q KEY_Tilde KEY_BSPACE
@@ -31,7 +31,6 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = (
     choose => [ qw(
         ROW COL
-        LF CR
         WIDTH_CURSOR
         MAX_ROW_MOUSE_1003 MAX_COL_MOUSE_1003
         NEXT_get_key
@@ -46,7 +45,7 @@ our %EXPORT_TAGS = (
         VK_PAGE_UP VK_PAGE_DOWN VK_END VK_HOME VK_LEFT VK_UP VK_RIGHT VK_DOWN VK_INSERT VK_DELETE
     ) ],
     screen => [ qw(
-        CLEAR_SCREEN CLEAR_TO_END_OF_SCREEN CLEAR_TO_END_OF_LINE
+        CLEAR_SCREEN CLEAR_TO_END_OF_SCREEN CLEAR_TO_END_OF_LINE UP DOWN RIGHT LEFT
         RESET REVERSE UNDERLINE BOLD_UNDERLINE HIDE_CURSOR SHOW_CURSOR BEEP
     ) ],
     linux  => [ qw(
@@ -75,17 +74,20 @@ use constant {
 };
 
 use constant {
-    LF => "\n",
-    CR => "\r",
 
-    BEEP                    => "\a",
-    CLEAR_SCREEN            => "\e[H\e[J",
-    CLEAR_TO_END_OF_SCREEN  => "\e[0J",
-    CLEAR_TO_END_OF_LINE    => "\e[K",
-    RESET                   => "\e[0m",
-    UNDERLINE               => "\e[4m",
-    BOLD_UNDERLINE          => "\e[1m\e[4m",
-    REVERSE                 => "\e[7m",
+    UP    => "\e[A",
+    DOWN  => "\e[B",
+    RIGHT => "\e[C",
+    LEFT  => "\e[D",
+
+    BEEP                   => "\a",
+    CLEAR_SCREEN           => "\e[H\e[J",
+    CLEAR_TO_END_OF_SCREEN => "\e[0J",
+    CLEAR_TO_END_OF_LINE   => "\e[K",
+    RESET                  => "\e[0m",
+    UNDERLINE              => "\e[4m",
+    BOLD_UNDERLINE         => "\e[1m\e[4m",
+    REVERSE                => "\e[7m",
 
     HIDE_CURSOR  => "\e[?25l",
     SHOW_CURSOR  => "\e[?25h",

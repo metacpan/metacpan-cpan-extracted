@@ -46,12 +46,13 @@ $conf_dir = '/etc/systemd/system/';
             'default-sshd' => '/lib/systemd/system/sshd.service',
             'mpd.service' => $conf_dir.'mpd.service.d/override.conf',
             'mpd.socket' => $conf_dir.'mpd.socket.d/override.conf',
+            'default-alsa-state' => '/lib/systemd/system/alsa-state.service'
         },
         load => "service:sshd Unit Description~",
         # file is removed because the load instruction above removes the only setting in there
         file_check_sub => sub {
             my $list_ref = shift ;
-            @$list_ref = grep { $_ ne '/etc/systemd/system/sshd.service'} @$list_ref;
+            @$list_ref = grep { not m!/etc/.*/sshd.service!} @$list_ref;
         }
     },
     {

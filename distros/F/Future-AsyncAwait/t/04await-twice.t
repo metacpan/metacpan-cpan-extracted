@@ -42,8 +42,7 @@ my $orig_cxstack_ix = Future::AsyncAwait::__cxstack_ix;
    async sub wait_for_both
    {
       my ( $f1, $f2 ) = @_;
-      await $f1;
-      await $f2;
+      return await( $f1 ) + await( $f2 );
    }
 
    my $f1 = Future->new;
@@ -51,11 +50,11 @@ my $orig_cxstack_ix = Future::AsyncAwait::__cxstack_ix;
 
    my $fret = wait_for_both( $f1, $f2 );
 
-   $f1->done;
+   $f1->done( 12 );
 
-   $f2->done( "result" );
+   $f2->done( 34 );
 
-   is( scalar $fret->get, "result", '$fret->get from double await by pad' );
+   is( scalar $fret->get, 46, '$fret->get from double await by pad' );
 }
 
 is( Future::AsyncAwait::__cxstack_ix, $orig_cxstack_ix,

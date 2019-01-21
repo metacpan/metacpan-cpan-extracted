@@ -11,7 +11,7 @@ use Serge::Util qw(subst_macros);
 
 use version;
 
-our $VERSION = qv('0.903.0');
+our $VERSION = qv('0.903.1');
 
 sub name {
     return 'Lingohub translation software (https://www.lingohub.com) synchronization plugin';

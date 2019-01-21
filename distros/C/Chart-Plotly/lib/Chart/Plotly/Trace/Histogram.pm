@@ -18,7 +18,7 @@ use Chart::Plotly::Trace::Histogram::Unselected;
 use Chart::Plotly::Trace::Histogram::Xbins;
 use Chart::Plotly::Trace::Histogram::Ybins;
 
-our $VERSION = '0.022';    # VERSION
+our $VERSION = '0.023';    # VERSION
 
 # ABSTRACT: The sample data from which statistics are computed is set in `x` for vertically spanning histograms and in `y` for horizontally spanning histograms. Binning options are set `xbins` and `ybins` respectively if no aggregation data is provided.
 
@@ -303,7 +303,7 @@ Chart::Plotly::Trace::Histogram - The sample data from which statistics are comp
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

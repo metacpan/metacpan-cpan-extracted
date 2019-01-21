@@ -16,8 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "AWS::SNS::Verify",
   "PREREQ_PM" => {
-    "Crypt::OpenSSL::RSA" => 0,
-    "Crypt::OpenSSL::X509" => 0,
+    "CryptX" => 0,
     "HTTP::Tiny" => 0,
     "JSON" => 0,
     "MIME::Base64" => 0,
@@ -27,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "URI::URL" => 0
   },
-  "VERSION" => "0.0103",
+  "VERSION" => "0.0104",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,8 +34,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Crypt::OpenSSL::RSA" => 0,
-  "Crypt::OpenSSL::X509" => 0,
+  "CryptX" => 0,
   "HTTP::Tiny" => 0,
   "JSON" => 0,
   "MIME::Base64" => 0,

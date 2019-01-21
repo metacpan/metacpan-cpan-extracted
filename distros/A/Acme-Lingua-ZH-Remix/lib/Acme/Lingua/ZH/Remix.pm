@@ -1,6 +1,6 @@
 package Acme::Lingua::ZH::Remix;
 use v5.10;
-our $VERSION = "0.97";
+our $VERSION = "0.98";
 
 =pod
 
@@ -24,16 +24,15 @@ Acme::Lingua::ZH::Remix - The Chinese sentence generator.
 Because lipsum is not funny enough, that is the reason to write this
 module.
 
-This module is a L<Moose> based OO module. You create an instance of
-it with C<new> method, and then invoke methods on the returned object.
+This module is a L<Moo>-based, with C<new> method being the constructor.
 
 The C<random_sentence> method returns a string of one sentence
 of Chinese like:
 
     真是完全失敗，孩子！怎麼不動了呢？
 
-It uses the corpus data from Project Gutenberg by default. All
-generate sentences are remixes of the corpus.
+By default, it uses small corpus data from Project Gutenberg. The generated
+sentences are remixes of the corpus.
 
 You can feed you own corpus data to the `feed` method:
 
@@ -48,13 +47,12 @@ The corpus should use full-width punctuation characters.
 =cut
 
 use utf8;
-use Moose;
+use Moo;
 use Types::Standard qw(HashRef Int);
 use List::MoreUtils qw(uniq);
 use Hash::Merge qw(merge);
 
-has phrases      => (is => "rw", isa => HashRef, lazy_build => 1);
-has phrase_count => (is => "rw", isa => Int, lazy_build => 1);
+has phrases => (is => "rw", isa => HashRef, lazy => 1, builder => "_build_phrases");
 
 sub _build_phrases {
     my $self   = shift;
@@ -69,7 +67,7 @@ sub _build_phrases {
     return \%phrase;
 }
 
-sub _build_phrase_count {
+sub phrase_count {
     my $self = shift;
     my %p = %{$self->phrases};
     my $count = 0;
@@ -148,8 +146,6 @@ sub feed {
     }
 
     $self->phrases(merge($self->phrases, \%phrase));
-    $self->phrase_count( $self->_build_phrase_count );
-
     return $self;
 }
 

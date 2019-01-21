@@ -218,7 +218,7 @@ sub splash {
                 'hatch'  => 'dots16'
             }
         );
-        $self->alpha_mode();
+        $self->alpha_mode() if ($self->{'GPU'} !~ /nouveaufb/);
         $self->set_color({ 'red' => 0, 'green' => 0, 'blue' => 128, 'alpha' => 255 });
         $self->polygon(
             {
@@ -258,7 +258,7 @@ sub splash {
 
         ### Draws the Circle with GFB in it ###
         # The dark shadow circle
-        $self->set_color({ 'red' => 32, 'green' => 0, 'blue' => 0, 'alpha' => 200 });
+        $self->set_color({ 'red' => 32, 'green' => 0, 'blue' => 0, 'alpha' => ($self->{'GPU'} !~ /nouveaufb/) ? 200 : 255 });
         $self->circle(
             {
                 'x'      => (207 * $hf) + $X,
@@ -284,6 +284,7 @@ sub splash {
                         'red'   => [255, 255, 255],
                         'green' => [192, 96, 228],
                         'blue'  => [0, 0, 0],
+                        'alpha' => [255,255,255],
                     },
                 }
             }
@@ -481,7 +482,7 @@ sub splash {
                     'y'            => (621 * $vf) + $Y,
                     'height'       => 200 * $vf,
                     'wscale'       => 1,
-                    'color'        => '221100A0',
+                    'color'        => ($self->{'GPU'} !~ /nouveaufb/) ? '221100A0' : '221100FF',
                     'text'         => 'Graphics-Framebuffer',
                     'bounding_box' => TRUE,
                     'center'       => $self->{'CENTER_X'},
@@ -536,7 +537,7 @@ sub splash {
         $rk->{'x'} = (1710 * $hf) - $rk->{'pwidth'};
         $self->ttf_print($rk);
 
-        $self->alpha_mode();
+        $self->alpha_mode() if ($self->{'GPU'} !~ /nouveaufb/);
 
         $self->rbox(
             {

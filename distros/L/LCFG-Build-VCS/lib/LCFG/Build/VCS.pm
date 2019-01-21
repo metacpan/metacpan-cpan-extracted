@@ -2,13 +2,15 @@ package LCFG::Build::VCS;   # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: VCS.pm.in 31796 2017-01-19 13:31:51Z squinney@INF.ED.AC.UK $
-# $Source: /var/cvs/dice/LCFG-Build-VCS/lib/LCFG/Build/VCS.pm.in,v $
-# $Revision: 31796 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-VCS/LCFG_Build_VCS_0_2_3/lib/LCFG/Build/VCS.pm.in $
-# $Date: 2017-01-19 13:31:51 +0000 (Thu, 19 Jan 2017) $
+use v5.10;
 
-our $VERSION = '0.2.3';
+# $Id: VCS.pm.in 35396 2019-01-17 12:01:51Z squinney@INF.ED.AC.UK $
+# $Source: /var/cvs/dice/LCFG-Build-VCS/lib/LCFG/Build/VCS.pm.in,v $
+# $Revision: 35396 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-VCS/LCFG_Build_VCS_0_3_8/lib/LCFG/Build/VCS.pm.in $
+# $Date: 2019-01-17 12:01:51 +0000 (Thu, 17 Jan 2019) $
+
+our $VERSION = '0.3.8';
 
 use DateTime ();
 use File::Copy ();
@@ -17,6 +19,7 @@ use File::Spec ();
 use File::Temp ();
 use IO::File ();
 use IPC::Run qw(run);
+use Template v2.14 ();
 
 use Moose::Role;
 use Moose::Util::TypeConstraints;
@@ -153,35 +156,72 @@ sub gen_tag {
 }
 
 sub update_changelog {
-    my ( $self, $version ) = @_;
+    my ( $self, $version, $options ) = @_;
+    $options //= {};
 
-    my $dir     = $self->workdir;
-    my $logfile = $self->logfile;
+    $options->{dryrun}  = $self->dryrun;
+    $options->{id}      = $self->id;
+    $options->{version} = $version;
+    $options->{style} ||= 'default';
 
-    # If this is a dry-run we will need to clean up the temporary file
-    # at the end. Otherwise it gets renamed to the logfile.
+    my $dir = $self->workdir;
 
-    my $unlink = 0;
-    if ( $self->dryrun ) {
-        $unlink = 1;
+    my ( $logfile, $needs_add );
+    if ( $options->{style} eq 'debian' ) {
+        $logfile = File::Spec->catfile( $dir, 'debian', 'changelog' );
+        $needs_add = !-e $logfile;
+
+        if ( !$options->{pkgname} ) {
+
+            # Cook up something sensible which looks like a Debian package
+            # name
+
+            $options->{pkgname} = lc $self->module;
+
+            # underscores are not permitted, helpfully replace with dashes
+            $options->{pkgname} =~ s/_/-/g;
+
+            # For safety remove any other invalid characters
+            $options->{pkgname} =~ s/[^a-z0-9-]//;
+        }
+
+        update_debian_changelog( $logfile, $options );
+    } else {
+        $logfile = $self->logfile;
+        $needs_add = !-e $logfile;
+
+        update_lcfg_changelog( $logfile, $options );
     }
 
+    if ( !$self->dryrun ) {
+        if ($needs_add) {
+            $self->run_cmd( 'add', $logfile );
+        }
+    }
+
+    return;
+}
+
+sub update_lcfg_changelog {
+    my ( $logfile, $options ) = @_;
+    $options //= {};
+
+    $options->{date} ||= DateTime->now->ymd;
+
+    my $dir = (File::Spec->splitpath($logfile))[1];
+
     my $tmplog = File::Temp->new(
-        UNLINK => $unlink,
-        DIR    => $dir,
-        SUFFIX => '.tmp',
+        TEMPLATE => 'lcfgXXXXXX',
+        UNLINK   => 1,
+        DIR      => $dir,
     );
 
     my $tmpname = $tmplog->filename;
 
-    my $date = DateTime->now->ymd;
+    $tmplog->print(<<"EOT");
+$options->{date}  $options->{id}: new release
 
-    my $id = $self->id;
-
-    print {$tmplog} <<"EOT";
-$date  $id: new release
-
-\t* Release: $version
+\t* Release: $options->{version}
 
 EOT
 
@@ -190,7 +230,7 @@ EOT
             or die "Could not open $logfile: $!\n";
 
         while ( defined( my $line = <$log> ) ) {
-            print {$tmplog} $line;
+            $tmplog->print($line);
         }
 
         $log->close;
@@ -199,12 +239,104 @@ EOT
     $tmplog->close
         or die "Could not close temporary file, $tmpname: $!\n";
 
-    if ( !$self->dryrun ) {
+    if ( !$options->{dryrun} ) {
         rename $tmpname, $logfile
-            or die "Could not rename $tmpname as $logfile: $!\n";
+          or die "Could not rename $tmpname as $logfile: $!\n";
     }
 
     return;
+}
+
+# These update_*_changelog subroutines are also used externally from
+# places which do not have access to the VCS object so they are not
+# class methods.
+
+sub update_debian_changelog {
+    my ( $logfile, $options ) = @_;
+    $options //= {};
+
+    $options->{urgency}      ||= 'low';
+    $options->{distribution} ||= 'unstable';
+    $options->{release}      //= 1;
+    $options->{message}      ||= 'New upstream release';
+
+    # RFC822 date
+    $options->{date} = DateTime->now->strftime('%a, %d %b %Y %H:%M:%S %z');
+
+    if ( !$options->{email} ) {
+        my $user_name = (getpwuid($<))[0];
+
+        my $email_addr = $ENV{DEBEMAIL} || $ENV{EMAIL};
+
+        if ( !$email_addr ) {
+            require Net::Domain;
+
+            my $domain = Net::Domain::hostdomain();
+            
+            $email_addr = join '@', $user_name, $domain;
+        }
+
+        # trim any leading or trailing whitespace
+        $email_addr =~ s/^\s+//; $email_addr =~ s/\s+$//;
+
+        if ( $email_addr !~ m/<.+>/ ) {
+            my $email_name = $ENV{DEBFULLNAME} || $ENV{NAME}  || $user_name;
+            $email_name =~ s/^\s+//; $email_name =~ s/\s+$//;
+
+            $email_addr = "$email_name <$email_addr>";
+        }
+
+        $options->{email} = $email_addr;
+    }
+
+    my ( $dir, $basename ) = (File::Spec->splitpath($logfile))[1,2];
+
+    my $tmplog = File::Temp->new(
+        TEMPLATE => 'lcfgXXXXXX',
+        UNLINK   => 1,
+        DIR      => $dir,
+    );
+    my $tmpname = $tmplog->filename;
+
+    my $tt = Template->new(
+        {
+            INCLUDE_PATH => $dir,
+        }
+    ) or die $Template::ERROR . "\n";
+
+    my $template = q{
+[%- FOREACH entry IN entries -%]
+[% entry.item('pkgname') %] ([% entry.item('version') %]-[% entry.item('release') %]) [% entry.item('distribution') %]; urgency=[% entry.item('urgency') %]
+
+  * [% entry.item('message') %]
+
+ -- [% entry.item('email') %]  [% entry.item('date') %]
+
+[% END -%]
+[% IF current_logfile %][% INSERT $current_logfile %][% END -%]
+};
+
+    my %args = (
+        entries => [$options],
+    );
+
+    if ( -e $logfile ) {
+        $args{current_logfile} = $basename;
+    }
+
+    $tt->process( \$template, \%args, $tmplog )
+        or die $tt->error() . "\n";
+
+    $tmplog->close
+        or die "Could not close temporary file, $tmpname: $!\n";
+
+    if ( !$options->{dryrun} ) {
+        rename $tmpname, $logfile
+          or die "Could not rename $tmpname as $logfile: $!\n";
+    }
+
+    return;
+
 }
 
 sub mirror_file {
@@ -252,6 +384,35 @@ sub mirror_file {
     return;
 }
 
+sub store_version {
+    my ( $self, $version ) = @_;
+
+    warn "Updating build ID file\n";
+
+    my $dir          = $self->workdir;
+    my $version_file = 'lcfg-build-id.txt';
+
+    my $tmpfh = File::Temp->new(
+        UNLINK => 1,
+        DIR    => $dir,
+        SUFFIX => '.tmp',
+    );
+
+    my $tmpname = $tmpfh->filename;
+
+    $tmpfh->say($version);
+
+    $tmpfh->close
+        or die "Could not close temporary file, $tmpname: $!\n";
+
+    if ( !$self->dryrun ) {
+        rename $tmpname, $version_file
+            or die "Could not rename $tmpname as $version_file: $!\n";
+    }
+
+    return;
+}
+
 1;
 __END__
 
@@ -261,7 +422,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::VCS version 0.2.3
+This documentation refers to LCFG::Build::VCS version 0.3.8
 
 =head1 SYNOPSIS
 
@@ -294,7 +455,7 @@ http://www.lcfg.org/doc/buildtools/
 
 =head1 ATTRIBUTES
 
-=over 4
+=over
 
 =item module
 
@@ -341,7 +502,7 @@ file name is 'ChangeLog'.
 This module provides a few fully-implemented methods which are likely
 to be useful for all sub-classes which implement the interface.
 
-=over 4
+=over
 
 =item gen_tag($version)
 
@@ -376,7 +537,7 @@ logfile based on the workdir and logname attributes.
 As well as the methods above, any class which implements this
 interface MUST provide methods for:
 
-=over 4
+=over
 
 =item checkcommitted()
 
@@ -387,11 +548,18 @@ returns 1 if all files are committed and 0 (zero) otherwise. In list
 context the subroutine will return this code along with a list of any
 files which require committing.
 
-=item genchangelog()
+=item genchangelog($version)
 
 This method will generate a changelog (the name of which is controlled
 by the logname attribute) from the log kept within the version-control
 system.
+
+=item store_version($version)
+
+This method can be used to store the version string (e.g. C<1.2.3>)
+into a file named F<lcfg-build-id.txt> in the top-level directory for
+the project. This is useful if you need to have eacy access to the
+version string in build scripts.
 
 =item tagversion($version)
 
@@ -431,6 +599,8 @@ at the specified version. Unlike the export() method this checked-out
 copy will include the files necessary for the version-control system
 (e.g. CVS or .svn directories).
 
+=back
+
 =head1 DEPENDENCIES
 
 This module is L<Moose> powered. It also requires L<DateTime> and L<IPC::Run>.
@@ -459,7 +629,7 @@ welcome.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2008 University of Edinburgh. All rights reserved.
+Copyright (C) 2008-2019 University of Edinburgh. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GPL, version 2 or later.

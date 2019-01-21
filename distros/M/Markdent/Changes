@@ -1,3 +1,9 @@
+0.33   2019-01-18
+
+- Replace use of Digest::SHA1 with Digest::SHA. The latter is core since 5.9.3
+  so it's one less dependency. Requested by Jonas Smedegaard. GH #17.
+
+
 0.32   2018-10-20
 
 - Added more documentation to Markdent.pm containing pointers to various

@@ -15,9 +15,9 @@ build_requires:
   Types::Standard: '0'
   perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,17 +34,18 @@ no_index:
 provides:
   Type::TinyX::Facets:
     file: lib/Type/TinyX/Facets.pm
-    version: '0.01'
+    version: '0.03'
 requires:
   B: '0'
   Carp: '0'
-  Data::OptList: '0'
-  Exporter: '0'
+  Exporter::Tiny: '0'
   Safe::Isa: '0'
+  base: '0'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Type-TinyX-Facets
-  repository: git://github.com/djerius/type-tinyx-facets.git
-version: '0.01'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  repository: https://gitlab.com/djerius/type-tinyx-facets.git
+version: '0.03'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

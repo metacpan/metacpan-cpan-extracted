@@ -11,12 +11,13 @@ Data::iRealPro - Convert iRealBook/iRealPro data
 
 =cut
 
-our $VERSION = "1.14";
+our $VERSION = "1.15";
 
 =head1 SYNOPSIS
 
   irealcvt iRealPro_exported.html --output formatted.pdf
   irealcvt iRealPro_exported.html --output formatted.png
+  irealcvt iRealPro_exported.html --output song.mma
   irealcvt iRealPro_exported.html --output raw.json
   irealcvt iRealPro_exported.html --output editable.txt
   irealcvt iRealPro_exported.html --output importable.html
@@ -91,7 +92,7 @@ The iRealPro community, for contributing many, many songs.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2013,2018 Johan Vromans, all rights reserved.
+Copyright 2013,2019 Johan Vromans, all rights reserved.
 
 Clone me at L<GitHub|https://github.com/sciurius/perl-Data-iRealPro>
 

@@ -1,0 +1,11 @@
+Revision history for Crypt-Random-Source-Weak-openssl
+
+0.03      2019-01-19 02:50:15Z
+          - converted packaging to Dist::Zilla
+          - switch from Moose to Moo.
+
+0.02      2009-11-25
+          - switch from Squirrel to Moose.
+
+0.01      2008-06-17
+          - Initial release.

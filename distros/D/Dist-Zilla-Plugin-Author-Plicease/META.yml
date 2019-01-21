@@ -26,7 +26,6 @@ no_index:
 requires:
   Data::Section: '0'
   Dist::Zilla: '6.00'
-  File::Path: '0'
   File::ShareDir::Dist: '0'
   File::chdir: '0'
   IPC::System::Simple: '1.25'
@@ -34,14 +33,13 @@ requires:
   Path::Tiny: '0'
   Perl::Tidy: '0'
   Sub::Exporter::ForMethods: '0'
-  autodie: '0'
   namespace::autoclean: '0'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-Author-Plicease/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::Author::Plicease
   repository: git://github.com/plicease/Dist-Zilla-Plugin-Author-Plicease.git
-version: '2.31'
-x_generated_by_perl: v5.29.6
+version: '2.32'
+x_generated_by_perl: v5.29.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

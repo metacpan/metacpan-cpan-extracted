@@ -428,7 +428,7 @@ Adds a field to the list of things to alter on maxlength_change_execute()
 sub maxlength_change_field ($$$$$$) {
     my ($self,$csh,$name,$maxlength,$fdesc)=@_;
 
-    my $def=$self->text_field_definition($fdesc->{'charset'},$maxlength);
+    my $def=$self->text_field_definition($fdesc->{'charset'} || 'binary',$maxlength);
 
     $csh->{'sql'}.=', ' if $csh->{'sql'};
     $csh->{'sql'}.="CHANGE ".
@@ -1125,7 +1125,6 @@ sub load_structure ($) {
                     }
                     ### dprint "fname=$fname, charset=$charset, ml=$maxlength, def=$default";
 
-                    ##
                     # Multiple spaces in defaults are probably there because
                     # the table is in the old format. Stripping them to the
                     # empty string.
@@ -1135,7 +1134,6 @@ sub load_structure ($) {
                         $fdata->{'default'}='';
                     }
 
-                    ##
                     # Converting all strings, not just BINARY columns to update the DEFAULT value
                     #
                     my $tdef=$self->text_field_definition($charset,$maxlength);

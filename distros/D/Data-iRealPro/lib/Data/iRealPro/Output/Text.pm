@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 14:58:26 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Nov  6 08:27:04 2018
-# Update Count    : 105
+# Last Modified On: Tue Jan 15 10:38:42 2019
+# Update Count    : 106
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -143,6 +143,7 @@ sub neatify1 {
     $t =~ s/([\]\}])/$1\n/g;
     $t =~ s/([\[\{])/\n$1/g;
     $t =~ s/([\[\{])(\*[ABCDVi]),?/$1$2 /gi;
+    $t =~ s/\|N(\d)/|N$1 /g;
     $t =~ s/\n\n+/\n/g;
     $t =~ s/^\n+//;
     $t =~ s/^ +_/_/mg;

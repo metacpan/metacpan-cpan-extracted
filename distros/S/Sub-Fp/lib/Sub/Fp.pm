@@ -7,21 +7,21 @@ use List::Util;
 use Data::Dumper qw(Dumper);
 use Exporter qw(import);
 our @EXPORT_OK = qw(
-    incr        reduces  flatten
-    drop_right  drop     take_right  take
-    assoc       maps     decr        chain
-    first       end      subarray    partial
-    __          find     filter      some
-    none        uniq     bool        spread
-    len         to_keys  to_vals     is_array
-    is_hash     every    noop        identity
-    is_empty    is_sub   flow        eql
-    to_pairs    for_each apply       get
-    second      range    pops        pushes
-    shifts      unshifts once
+    incr        reduces   flatten
+    drop_right  drop      take_right  take
+    assoc       maps      decr        chain
+    first       end       subarray    partial
+    __          find      filter      some
+    none        uniq      bool        spread
+    len         to_keys   to_vals     is_array
+    is_hash     every     noop        identity
+    is_empty    is_sub    flow        eql
+    to_pairs    for_each  apply       get
+    second      range     pops        pushes
+    shifts      unshifts  once
 );
 
-our $VERSION = '0.32';
+our $VERSION = '0.34';
 
 use constant ARG_PLACE_HOLDER => {};
 

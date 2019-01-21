@@ -1,5 +1,5 @@
 package Box::Calc::BoxType;
-$Box::Calc::BoxType::VERSION = '1.0200';
+$Box::Calc::BoxType::VERSION = '1.0201';
 use strict;
 use warnings;
 use Moose;
@@ -13,7 +13,7 @@ Box::Calc::BoxType - The container class for the types (sizes) of boxes that can
 
 =head1 VERSION
 
-version 1.0200
+version 1.0201
 
 =head1 SYNOPSIS
 
@@ -78,6 +78,12 @@ has category => (
     isa         => 'Str',
     default     => '',
 );
+
+=head2 describe
+
+Returns a hash ref with the properties of this box type.
+
+=cut
 
 sub describe {
     my $self = shift;

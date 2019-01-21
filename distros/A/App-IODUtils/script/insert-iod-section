@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-08-05'; # DATE
-our $VERSION = '0.15'; # VERSION
+our $DATE = '2019-01-17'; # DATE
+our $VERSION = '0.162'; # VERSION
 
 use 5.010;
 use strict;
@@ -76,6 +76,8 @@ sub insert_iod_section {
 
 Perinci::CmdLine::Any->new(
     url => '/main/insert_iod_section',
+    read_config => 0,
+    read_env => 0,
 )->run;
 
 # ABSTRACT: Insert an new empty section to IOD configuration file
@@ -93,7 +95,7 @@ insert-iod-section - Insert an new empty section to IOD configuration file
 
 =head1 VERSION
 
-This document describes version 0.15 of insert-iod-section (from Perl distribution App-IODUtils), released on 2017-08-05.
+This document describes version 0.162 of insert-iod-section (from Perl distribution App-IODUtils), released on 2019-01-17.
 
 =head1 SYNOPSIS
 
@@ -129,7 +131,7 @@ Note that this can only be done if you specify an actual file and not STDIN.
 Otherwise, an error will be thrown.
 
 
-=item B<--linum>=I<i>
+=item B<--linum>=I<s>
 
 Put section line at a specific line number (line number starts from 1).
 
@@ -138,36 +140,6 @@ Put section line at a specific line number (line number starts from 1).
 =item B<--top>
 
 Add to the beginning of file instead of end.
-
-=back
-
-=head2 Configuration options
-
-=over
-
-=item B<--config-path>=I<filename>
-
-Set path to configuration file.
-
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
-
-Set configuration profile to use.
-
-=item B<--no-config>
-
-Do not use any configuration file.
-
-=back
-
-=head2 Environment options
-
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
 
 =back
 
@@ -239,6 +211,8 @@ Default value:
 =item B<--disable-brace>
 
 =item B<--disable-bracket>
+
+=item B<--disable-directive>
 
 =item B<--disable-encoding>
 
@@ -330,63 +304,6 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/insert-iod-section.conf>, F<~/insert-iod-section.conf>, or F</etc/insert-iod-section.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-List of available configuration parameters:
-
- add (see --add)
- allow_bang_only (see --disallow-bang-only)
- allow_directives (see --allow-directive)
- allow_duplicate_key (see --disallow-duplicate-key)
- allow_encodings (see --allow-encoding)
- comment (see --comment)
- default_section (see --default-section)
- disallow_directives (see --disallow-directive)
- disallow_encodings (see --disallow-encoding)
- enable_brace (see --disable-brace)
- enable_bracket (see --disable-bracket)
- enable_encoding (see --disable-encoding)
- enable_expr (see --enable-expr)
- enable_quoting (see --disable-quoting)
- expr_vars (see --expr-var)
- format (see --format)
- ignore (see --ignore)
- ignore_unknown_directive (see --ignore-unknown-directive)
- inplace (see --inplace)
- iod (see --iod)
- linum (see --linum)
- naked_res (see --naked-res)
- section (see --section)
- top (see --top)
-
-=head1 ENVIRONMENT
-
-=head2 INSERT_IOD_SECTION_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/insert-iod-section.conf>
-
-F<~/insert-iod-section.conf>
-
-F</etc/insert-iod-section.conf>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-IODUtils>.
@@ -409,7 +326,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -31,8 +31,8 @@ use Sim::OPT::Parcoord3d;
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
-$VERSION = '0.033';
-$ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of gradients weighted proportionally to multidimensional distances.';
+$VERSION = '0.034';
+$ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
 # Interlinear
@@ -1663,10 +1663,10 @@ Sim::OPT::Interlinear
 
 
   interlinear( "/path/to/a-pre-prepared-configfile.pl", "/path/to/a-pre-prepared-sourcefile.csv", "/path/to/the-metamodel-file-to-be-obtained" );
-  # Or from the command line:
+  # or from the command line:
   interlinear .
   # (note the dot at the end), to use the file as a script and include the location of the source file directly in the configuration file.
-  # Or again from the command line, for beginning with a dialogue question:
+  # or, again, from the command line, for beginning with a dialogue question:
   interlinear interstart
 
 
@@ -1676,14 +1676,14 @@ Sim::OPT::Interlinear
 Interlinear is a program for computing the missing values in multivariate datasieries pre-prepared in csv format.
 The program can adopt the following algorithmic strategies and intermix their result:
 
-a) a propagating distance-weighted gradient-based strategy (by far the best one so far, keeping into account that the behaviour of factors is often not linear and there are curvatures all aroung the design space);
+a) a propagating distance-weighted gradient-based strategy (by far the best one so far, keeping into account that the behaviour of factors is often not linear and there are curvatures all aroung the design space). The strategy weights the known gradients in a manner inversely proportional to the distance of their pivot points from the pivot points of the missing nearest-neighbouring gradients.
 
 b) pure linear interpolation (one may want to use this in some occasions: for example, on factorials);
 
-c) nearest neighbour (a strategy of last resort. One may want to use it to unlock a computation which is based on data which are too sparse to proceed, or when nothing else works).
+c) pure nearest neighbour (a strategy of last resort. One may want to use it to unlock a computation which is based on data which are too sparse to proceed, or when nothing else works).
 
 Strategy a) works for cases which are adjacent in the design space. For example, it cannot work with the gradient between a certain iteration 1 and the corresponding iteration 3. It can only work with the gradient between iterations 1 and 2, or 2 and 3.
-For that reason, it does not work well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from coordinate descent sampling strategies.
+For that reason, it does not work well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from star (coordinate descent) sampling strategies.
 To work well with a latin hypercube sampling, it is necessary to include a pass of strategy b) before calling strategy a). Then strategy a) will charge itself of reducing the gradient errors created by the initial pass of strategy b).
 
 A configuration file should be prepared following the example in the "examples" folder in this distribution.
@@ -1691,21 +1691,29 @@ If the configuration file is incomplete or missing, the program adopts its own d
 
 The only variable that must mandatorily be specified in a configuration file is $sourcefile : the Unix path to the source file containining the dataseries.
 
-The source file has to be prepared by listing in each column the values (levels) of the parameters (factors, variables), putting in the last column the objective function value, when present.
+The source file has to be prepared by listing in each column the values (levels) of the parameters (factors, variables), putting in the last column the objective function values, in the rows in which they are present.
 
 The parameter number is given by the position of the column (i.e. column 4 host parameter 4).
 
-Here below is shown an example of multivatiate dataseries of 3 parameters assuming 3 levels each. having with missing objecive function entries. The numbers preceding the objective function (which is in the last colum) are the indices of the multidimensional matrix (tensor).
+Here below an example is shown of multivatiate dataseries of 3 parameters assuming 3 levels each. The numbers preceding the objective function (which is in the last colum) are the indices of the multidimensional matrix (tensor).
 
 
 1,1,1,1.234
+
 1,2,3,2,1.500
+
 1,3,3,3
+
 2,1,3,1,1.534
+
 2,2,3,2,0.000
+
 2,3,3,0.550
+
 3,1,3,1
+
 3,2,3,2,0.670
+
 3,3,3,3
 
 
@@ -1714,13 +1722,21 @@ The program converts this format into the one liked by Sim::OPTS, which is the f
 
 
 1-1_2-1_3-1,9.234
+
 1-1_2-2_3-2,4.500
+
 1-1_2-3_3-3
+
 1-2_2-1_3-1,7.534
+
 1-2_2-2_3-2,0.000
+
 1-2_2-3_3-3,0.550
+
 1-3_2-1_3-1
+
 1-3_2-2_3-2,0.670
+
 1-3_2-3_3-3
 
 

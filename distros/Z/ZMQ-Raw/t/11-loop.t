@@ -267,5 +267,28 @@ $loop->add ($expirer);
 $loop->run;
 is $expired, 1;
 
+my $cancelled = 0;
+my $cancel = ZMQ::Raw::Loop::Timer->new (
+	timer => ZMQ::Raw::Timer->new ($ctx, after => 10000),
+	on_timeout => sub {},
+	on_cancel => sub
+	{
+		$cancelled = 1;
+	}
+);
+
+my $canceller = ZMQ::Raw::Loop::Timer->new (
+	timer => ZMQ::Raw::Timer->new ($ctx, after => 10),
+	on_timeout => sub
+	{
+		$cancel->cancel();
+	}
+);
+
+$loop->add ($cancel);
+$loop->add ($canceller);
+$loop->run;
+is $cancelled, 1;
+
 done_testing;
 

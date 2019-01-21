@@ -1,5 +1,11 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+0.13 2019-01-20
+ - Fix Binary/Image CF conditionned by
+ - Add tests for Binary/Image CF conditionned by
+ - Fix edit of cascaded conditioned CFs by adding hide/show events
+ - Fix display of cascaded conditioned CFs
+
 0.12 2018-07-02
  - Fix editing with two conditions having the same value
  - Prevent Error Message

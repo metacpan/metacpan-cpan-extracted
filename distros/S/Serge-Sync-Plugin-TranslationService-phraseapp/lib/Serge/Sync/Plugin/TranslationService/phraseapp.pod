@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Serge::Sync::Plugin::TranslationService::phraseapp - L<Phraseapp|https://phraseapp.com> synchronization plugin for L<Serge|https://serge.io/> based on L<PhraseApp CLI|https://phraseapp.com/cli>
+Serge::Sync::Plugin::TranslationService::phraseapp - L<PhraseApp|https://phraseapp.com> synchronization plugin for L<Serge|https://serge.io/> based on L<PhraseApp CLI|https://phraseapp.com/cli>
 
 =head1 SYNOPSIS
 
@@ -18,7 +18,7 @@ Serge::Sync::Plugin::TranslationService::phraseapp - L<Phraseapp|https://phrasea
 
 =head1 DESCRIPTION
 
-Integration between Serge (Free, Open Source Solution for Continuous Localization) and Phraseapp (Translation and localization management system for web and mobile applications),
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and PhraseApp (Translation and localization management system for web and mobile applications),
 implemented using command-line tool for the PhraseApp API.
 
 =head1 ATTRIBUTES

@@ -517,6 +517,17 @@ my %tests = (
             users => 'hoge,fugo',
         },
     },
+    bots => {
+        info => {
+            bot => 'hoge',
+        },
+    },
+    migration => {
+        exchange => {
+            users => 'hoge',
+            to_old => '1',
+        },
+    },
 );
 
 set_any_mock_response;

@@ -68,7 +68,7 @@
       },
       "App::perlbrew" : {
          "file" : "lib/App/perlbrew.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/gugod/App-perlbrew"
       }
    },
-   "version" : "0.85",
+   "version" : "0.86",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : "1"
 }

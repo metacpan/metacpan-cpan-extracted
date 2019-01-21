@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.642';
+our $VERSION = '1.643';
 
 
 use Encode qw( decode );
@@ -175,84 +175,9 @@ sub __show_cursor {
 }
 
 
-sub __clear_screen {
-    my ( $self ) = @_;
-    if ( ! exists $self->{output}{handle} || ! defined $self->{output}{handle} ) {
-        $self->{output} = Win32::Console->new( STD_OUTPUT_HANDLE );
-    }
-    if ( ! defined $self->{curr_attr} ) {
-        $self->{curr_attr} = $self->{output}->Attr();
-    }
-    $self->{output}->Cls( $self->{curr_attr} );
-}
-
-
-sub __clear_lines_to_end_of_screen {
-    my ( $self ) = @_;
-    my ( $width, $height ) = $self->{output}->Size();
-    $self->__get_cursor_position();
-    $self->__set_cursor_position( 0, $self->{abs_cursor_y}  );
-    $self->{output}->FillAttr(
-            $self->{fill_attr},
-            $width * $height,
-            0, $self->{abs_cursor_y} );
-}
-
-
-sub __clear_line {
-    my ( $self ) = @_;
-    my ( $width, $height ) = $self->{output}->Size(); #
-    $self->__get_cursor_position();
-    $self->__set_cursor_position( 0, $self->{abs_cursor_y} );
-    $self->{output}->FillAttr(
-            $self->{fill_attr},
-            $width,
-            0, $self->{abs_cursor_y} );
-}
-
-
-sub __bold_underline {
-    my ( $self ) = @_;
-    $self->{output}->Attr( $self->{curr_attr} | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY  );
-}
-
-
-sub __reverse {
-    my ( $self ) = @_;
-    $self->{output}->Attr( $self->{inverse} );
-}
-
-
 sub __reset {
     my ( $self ) = @_;
     $self->{output}->Attr( $self->{curr_attr} );
-}
-
-
-sub __up {
-    my ( $self, $rows_up ) = @_;
-    $self->__get_cursor_position;
-    $self->__set_cursor_position( $self->{abs_cursor_x}, $self->{abs_cursor_y} - $rows_up );
-}
-
-
-sub __down {
-    my ( $self, $rows_down ) = @_;
-    $self->__get_cursor_position;
-    $self->__set_cursor_position( $self->{abs_cursor_x}, $self->{abs_cursor_y} + $rows_down );
-}
-
-
-sub __left {
-    my ( $self, $cols_left ) = @_;
-    $self->__get_cursor_position;
-    $self->__set_cursor_position( $self->{abs_cursor_x} - $cols_left, $self->{abs_cursor_y} );
-}
-
-sub __right {
-    my ( $self, $cols_right ) = @_;
-    $self->__get_cursor_position;
-    $self->__set_cursor_position( $self->{abs_cursor_x} + $cols_right, $self->{abs_cursor_y} );
 }
 
 

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Quiq::Unindent;
 use Quiq::Parameters;
@@ -347,6 +347,160 @@ erzeugt
 sub horizontalRule {
     my $self = shift;
     return "----\n\n";
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 image() - Erzeuge Bild
+
+=head4 Synopsis
+
+    $code = $gen->image(@keyVal);
+
+=head4 Options
+
+=over 4
+
+=item align => $align
+
+Mögliche Werte: left, right, center, none.
+
+=item alt => $str
+
+Alternativer Text.
+
+=item border => $bool
+
+Umrandung.
+
+=item caption => $str
+
+Bildbeschriftung.
+
+=item file => $file
+
+(Pflichtangabe) Name der Datei. Hier wird nur der Dateiname, bestehend
+aus NAME.EXT benötigt. Ein etwaiger Pfad, sofern vorhanden, wird entfernt.
+Die Datei muss zuvor ins MediaWiki hochgeladen worden sein.
+
+=item format => $format
+
+Mögliche Werte: frameless, frame, thumb.
+
+=item height => $height
+
+Höhe des Bildes.
+
+=item link => $url
+
+Link, mit das Bild hinterlegt wird.
+
+=item page => $n
+
+Seitennumer im Falle eines PDF.
+
+=item valign => $valign
+
+Mögliche Werte: baseline, sub, super, top, text-top, middle, bottom,
+text-bottom.
+
+=item width => $width
+
+Breite des Bildes.
+
+=back
+
+=head4 Returns
+
+Markup-Code (String)
+
+=head4 Description
+
+Erzeuge den MediaWiki Markup-Code für ein Bild und liefere diesen zurück.
+
+=head4 See Also
+
+=over 2
+
+=item *
+
+Syntax: L<https://www.mediawiki.org/wiki/Help:Images>
+
+=back
+
+=head4 Example
+
+    $gen->image(
+        file => 'Ein_testbild.png',
+        width => 1200,
+        height => 900,
+    );
+
+erzeugt
+
+    [[File:Ein_testbild.png|1200x900px]]
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub image {
+    my $self = shift;
+
+    my $opt = Quiq::Parameters->extractPropertiesToObject(\@_,
+        align => undef,
+        alt => undef,
+        border => undef,
+        caption => undef,
+        file => undef,
+        format => undef,
+        height => undef,
+        link => undef,
+        page => undef,
+        valign => undef,
+        width => undef,
+    );
+
+    push my @arr,sprintf 'File:%s',$opt->file;
+
+    my $width = $opt->width;
+    my $height = $opt->height;
+
+    if ($width && $height) {
+        push @arr,"${width}x${height}px";
+    }
+    elsif ($width) {
+        push @arr,"${width}px";
+    }
+    elsif ($height) {
+        push @arr,"x${height}px";
+    }
+
+    # Attribute, deren Schlüssel und Wert eingetragen wird
+
+    for my $key (qw/alt link page/) {
+        if (my $val = $opt->$key) {
+            push @arr,sprintf '%s=%s',$key,$val;
+        }
+    }
+
+    # Boolsche Attribute, deren Name eingetragen wird
+
+    for my $key (qw/border/) {
+        if (my $val = $opt->$key) {
+            push @arr,$key;
+        }
+    }
+
+    # Attribute, deren Wert eingetragen wird (caption muss am Ende stehen)
+
+    for my $key (qw/align format valign caption/) {
+        if (my $val = $opt->$key) {
+            push @arr,$val;
+        }
+    }
+
+    return sprintf "[[%s]]\n\n",join('|',@arr);
 }
 
 # -----------------------------------------------------------------------------
@@ -1669,7 +1823,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

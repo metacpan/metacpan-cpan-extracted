@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
          }
       },
       "runtime" : {
@@ -42,5 +43,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.1"
+   "version" : "v1.1.1"
 }

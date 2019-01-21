@@ -1,5 +1,9 @@
 Revision history for Data-iRealPro
 
+1.15	2019-01-20
+
+	First support for MMA output.
+
 1.14	2018-11-14
 
 	Add Forum backend, to generate cut/paste data to post songs to

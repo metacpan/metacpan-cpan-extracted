@@ -1,5 +1,8 @@
 Revision history for Address-PostCode-India
 
+0.13  2019-01-19T21:05:00+01:00
+      - Upgraded to use Address::PostCode::UserAgent 0.09.
+
 0.12  2019-01-14T16:50:00+01:00
       - Added unit test scripts (t/meta-json.t and t/meta-yml.t).
 

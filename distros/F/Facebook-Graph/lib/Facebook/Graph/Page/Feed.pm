@@ -1,5 +1,5 @@
 package Facebook::Graph::Page::Feed;
-$Facebook::Graph::Page::Feed::VERSION = '1.1204';
+$Facebook::Graph::Page::Feed::VERSION = '1.1205';
 use strict;
 use Moo;
 extends 'Facebook::Graph::Publish';
@@ -20,8 +20,8 @@ sub set_page_id {
 use subs qw(object_path);
 sub object_path{
 	my $s = shift;
-	
-	return $s->has_page_id ? 
+
+	return $s->has_page_id ?
 		sprintf( '%s/feed', $s->page_id )
 		: die "You must set_page_id first";
 }
@@ -82,12 +82,12 @@ has published => (
 sub published
 {
 	my($self, $published) = @_;
-	
+
 	if( scalar @_ > 1 )
 	{
 		$self->_set_published($published);
 	}
-	
+
 	return $self->_get_published && $self->_get_published ne 'false';
 }
 
@@ -132,7 +132,7 @@ Facebook::Graph::Page::Feed - Add a post to a Facebook page.
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 SYNOPSIS
 
@@ -156,17 +156,17 @@ Implements publishing protocol available here:
 L<https://developers.facebook.com/docs/graph-api/reference/v2.0/page/feed/>
 
 B<ATTENTION:> You must have the page access token to use this module.
-It's available in C<$fb->fetch('me/accounts')>, but, you must have a user 
+It's available in C<$fb->fetch('me/accounts')>, but, you must have a user
 token with C<manage_page> permission.
 
-More information about tokens could be found here: 
+More information about tokens could be found here:
 L<https://developers.facebook.com/docs/facebook-login/access-tokens>
 
 =head1 METHODS
 
 =head2 set_page_id ( page_id )
 
-Specify a page id to post to. This is required field and must be set before 
+Specify a page id to post to. This is required field and must be set before
 publishing.
 
 =head2 set_message ( message )
@@ -188,12 +188,12 @@ A URI.
 
 =head2 set_backdated_time ( time )
 
-Set a date of your post, different from now. Just a backdate. Time should be a 
+Set a date of your post, different from now. Just a backdate. Time should be a
 timestamp, no fancy formats.
 
 =head2 set_scheduled_publish_time( time )
 
-Set a publishing time for scheduled posts. Time should be a desired timestamp of 
+Set a publishing time for scheduled posts. Time should be a desired timestamp of
 post in future. Doesn't work with minutes from now, but works fine with hour+
 
 =head2 publish ( )
@@ -202,10 +202,10 @@ Posts the data and returns a L<Facebook::Graph::Response> object. The response o
 
  {"id":"1647395831_130068550371568"}
 
- 
+
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 Facebook::Graph::Page::Feed is Copyright 2014 Alexandr Evstigneev (L<http://evstigneev.com>) and is licensed under the same terms as Perl itself.
 

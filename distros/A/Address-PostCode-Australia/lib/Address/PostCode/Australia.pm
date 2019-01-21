@@ -1,6 +1,6 @@
 package Address::PostCode::Australia;
 
-$Address::PostCode::Australia::VERSION   = '0.11';
+$Address::PostCode::Australia::VERSION   = '0.12';
 $Address::PostCode::Australia::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Address::PostCode::Australia - Interface to the Australia PostCode.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

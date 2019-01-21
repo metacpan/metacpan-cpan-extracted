@@ -6,12 +6,46 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: EPublisher
+provides:
+  EPublisher:
+    file: lib/EPublisher.pm
+    version: '1.22'
+  EPublisher::Config:
+    file: lib/EPublisher/Config.pm
+    version: '1.22'
+  EPublisher::Source:
+    file: lib/EPublisher/Source.pm
+    version: '1.22'
+  EPublisher::Source::Base:
+    file: lib/EPublisher/Source/Base.pm
+    version: '1.22'
+  EPublisher::Source::Plugin::Dir:
+    file: lib/EPublisher/Source/Plugin/Dir.pm
+    version: '1.22'
+  EPublisher::Source::Plugin::File:
+    file: lib/EPublisher/Source/Plugin/File.pm
+    version: '1.22'
+  EPublisher::Source::Plugin::Module:
+    file: lib/EPublisher/Source/Plugin/Module.pm
+    version: '1.22'
+  EPublisher::Target:
+    file: lib/EPublisher/Target.pm
+    version: '1.22'
+  EPublisher::Target::Base:
+    file: lib/EPublisher/Target/Base.pm
+    version: '1.22'
+  EPublisher::Target::Plugin::Text:
+    file: lib/EPublisher/Target/Plugin/Text.pm
+    version: '1.22'
+  EPublisher::Utils::PPI:
+    file: lib/EPublisher/Utils/PPI.pm
+    version: '1.22'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -26,8 +60,15 @@ requires:
   PPI: '1.213'
   Pod::Text: '3.08'
   YAML::Tiny: '0'
+  perl: '5.008'
 resources:
   bugtracker: http://github.com/reneeb/EPublisher/issues
   homepage: http://github.com/reneeb/EPublisher
   repository: http://github.com/reneeb/EPublisher.git
-version: '1.21'
+version: '1.22'
+x_contributors:
+  - 'Boris Däppen <boris_daeppen@bluewin.ch>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

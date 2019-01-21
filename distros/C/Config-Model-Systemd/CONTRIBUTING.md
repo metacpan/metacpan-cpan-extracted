@@ -5,8 +5,8 @@
 Yes, asking a question is a form of contribution that helps the author
 to improve documentation.
 
-Feel free to ask questions by sending a mail to
-[config-model-user mailing list](mailto:config-model-users@lists.sourceforge.net)
+Feel free to ask questions by sending a mail to the
+[author](mailto:ddumont@cpan.org)
 
 ## Log a bug ##
 
@@ -50,7 +50,7 @@ For instance:
 * commit all files: `git add -A ; git commit -m"committed all"`
 * edit files
 * run `prove -l t` to run non-regression tests
-* run `git diff` and send the output on [config-model-user mailing list](mailto:config-model-users@lists.sourceforge.net)
+* run `git diff` and send the output to the [author](mailto:ddumont@cpan.org)
 
 
 ## Edit source code from Debian source package or CPAN tarball ##
@@ -64,7 +64,7 @@ Non Debian users can also prepare a patch using CPAN tarball:
 * commit all files: `git add -A ; git commit -m"committed all"`
 * edit files
 * run `prove -l t` to run non-regression tests
-* run `git diff` and send the output on [config-model-user mailing list](mailto:config-model-users@lists.sourceforge.net)
+* run `git diff` and send the output to the [author](mailto:ddumont@cpan.org)
 
 ## Provide feedback ##
 

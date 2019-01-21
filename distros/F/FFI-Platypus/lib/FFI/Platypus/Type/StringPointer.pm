@@ -7,7 +7,7 @@ use Scalar::Util qw( readonly );
 use Config ();
 
 # ABSTRACT: Convert a pointer to a string and back
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 
 use constant _incantation =>
@@ -76,7 +76,7 @@ FFI::Platypus::Type::StringPointer - Convert a pointer to a string and back
 
 =head1 VERSION
 
-version 0.59
+version 0.74
 
 =head1 SYNOPSIS
 
@@ -112,6 +112,10 @@ In your Platypus::FFI code:
  print $$ref;  # print the string pointed to by $ref
 
 =head1 DESCRIPTION
+
+B<NOTE>: As of version 0.61, this custom type is now deprecated since
+pointers to strings are supported in the L<FFI::Platypus> directly
+without custom types.
 
 This module provides a L<FFI::Platypus> custom type for pointers to
 strings.
@@ -158,7 +162,7 @@ Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015,2016,2017,2018 by Graham Ollis.
+This software is copyright (c) 2015,2016,2017,2018,2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

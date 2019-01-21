@@ -66,4 +66,13 @@ use Future::AsyncAwait;
    is( scalar $f->failure, "Failure\n", '$f->failure' );
 }
 
+# immediate done list in list context
+{
+   my @ret = (async sub { return 1, 2, 3 })->( 4, 5, 6 );
+
+   is( scalar @ret, 1, 'async sub returns 1 value in list context' ) or
+      diag( "async sub returned <@ret>" );
+   isa_ok( shift @ret, "Future", 'Single result was a Future' );
+}
+
 done_testing;

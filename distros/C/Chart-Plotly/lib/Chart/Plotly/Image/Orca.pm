@@ -1,11 +1,15 @@
 package Chart::Plotly::Image::Orca;
 
-use Moose;
+# ABSTRACT: Export static images of Plotly charts using orca
+
+use strict;
+use warnings;
+
 use File::Which;
 use Path::Tiny;
 use utf8;
 
-our $VERSION = '0.022';    # VERSION
+our $VERSION = '0.023';    # VERSION
 
 my $ORCA_COMMAND = 'orca';
 
@@ -13,8 +17,12 @@ sub orca {
     my %params = @_;
 
     if ( orca_available() ) {
-        my $plot = $params{plot};
-        my $file = path( $params{file} );
+        my $plot   = $params{plot};
+        my $file   = path( $params{file} );
+        my $format = $params{format};
+        unless ( defined $format ) {
+            ($format) = $file =~ /\.([^\.]+)$/;
+        }
 
         my $tmp_json = Path::Tiny->tempfile( SUFFIX => '.json' );
         $tmp_json->spew_raw( $plot->TO_JSON );
@@ -22,11 +30,25 @@ sub orca {
         # For now have to explicitly specify -d as otherwise orca would
         #  not be able to store output to a different path other than cwd.
         # See https://github.com/plotly/orca/issues/101
-        my @orca_line = ( $ORCA_COMMAND, 'graph', $tmp_json, '-d', $file->parent, '-o', $file->basename );
-        my $orca_line = join( " ", @orca_line );
+        my @orca_line = ( $ORCA_COMMAND, 'graph', $tmp_json, '-d', $file->parent, '-o', $file->basename,
+                          ( $format ? ( '--format', $format ) : () )
+        );
+        for my $arg (qw(mathjax scale width height)) {
+            if ( my $val = $params{$arg} ) {
+                push @orca_line, ( "--${arg}", $val );
+            }
+        }
+        for my $arg (qw(safe verbose debug)) {
+            if ( $params{$arg} ) {
+                push @orca_line, "--${arg}";
+            }
+        }
 
-        system($orca_line);
+        #my $orca_line = join(" ", @orca_line);
+        my $rc = system(@orca_line);
+        return 1 unless ( $rc >> 8 );
     }
+    return;
 }
 
 sub correct_orca {
@@ -36,15 +58,19 @@ sub correct_orca {
 
 sub orca_available {
     if ( not which($ORCA_COMMAND) or not correct_orca() ) {
-        die "Orca tool must be installed and in PATH in order to export images";
+        die "Orca tool must be installed and in PATH in order to export images. "
+          . "See also https://github.com/plotly/orca#installation";
     }
     return 1;
 }
 
 sub orca_version {
-    my $version = `$ORCA_COMMAND --version`;
-    chomp($version);
-    return $version;
+    if ( orca_available() ) {
+        my $version = `$ORCA_COMMAND --version`;
+        chomp($version);
+        return $version;
+    }
+    return;
 }
 
 1;
@@ -57,11 +83,11 @@ __END__
 
 =head1 NAME
 
-Chart::Plotly::Image::Orca
+Chart::Plotly::Image::Orca - Export static images of Plotly charts using orca
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -87,13 +113,19 @@ L<Orca|https://github.com/plotly/orca>
 Orca is an L<Electron|https://electronjs.org/> app that must be installed before
 using this module. See L<https://github.com/plotly/orca#installation>
 
-# ABSTRACT: Export static images of Plotly charts using orca
-
 =head1 FUNCTIONS
 
 =head2 orca
 
-Export L<Chart::Plotly::Plot> as a static image file
+    orca(plot => $plot, file => $file, %rest)
+
+Export L<Chart::Plotly::Plot> as a static image file.
+
+This function is a wrapper over the plotly orca command.
+Most of its named parameters are mapped to orca's command line options.
+See also the output of C<orca graph --help>.
+
+Returns a true value if the orca command is successful.
 
 =over 4
 
@@ -105,11 +137,47 @@ Object to export
 
 Filename (with or without path) to export
 
+=item format
+
+Sets the output format (png, jpeg, webp, svg, pdf, eps).
+By default it's inferred from the specified file name extension.
+
+=item scale
+
+Sets the image scale.
+
+=item width
+
+Sets the image width.
+
+=item height
+
+Sets the image height.
+
+=item mathjax
+
+Sets path to MathJax files. Required to export LaTeX characters.
+
+=item safe
+
+Turns on safe mode: where figures likely to make browser window hang
+during image generating are skipped.
+
+=item verbose
+
+Turn on verbose logging on stdout.
+
+=item debug
+
+Starts app in debug mode and turn on verbose logs on stdout.
+
 =back
 
 =head2 correct_orca
 
-Checks that orca command available is the plotly image exporter
+Checks that orca command available is the plotly image exporter,
+as there may be some other different command also named "orca", like
+L<https://help.gnome.org/users/orca/stable/>
 
 =head2 orca_available
 
@@ -118,10 +186,6 @@ Checks that orca command is available and the plotly image exporter
 =head2 orca_version
 
 Returns the orca version
-
-=head1 AUTHOR
-
-Pablo Rodríguez González
 
 =head1 BUGS
 
@@ -133,18 +197,6 @@ This is an unofficial Plotly Perl module. Currently I'm not affiliated in any wa
 But I think plotly.js is a great library and I want to use it with perl.
 
 If you like plotly.js please consider supporting them purchasing a pro subscription: L<https://plot.ly/products/cloud/>
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2018 Pablo Rodríguez González.
-
-The MIT License (MIT)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 =head1 AUTHOR
 

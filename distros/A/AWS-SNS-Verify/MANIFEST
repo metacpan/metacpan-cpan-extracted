@@ -8,6 +8,7 @@ README
 author.t/01_verify.t
 dist.ini
 lib/AWS/SNS/Verify.pm
+t/01_verify.t
 t/02_valid_cert_url.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

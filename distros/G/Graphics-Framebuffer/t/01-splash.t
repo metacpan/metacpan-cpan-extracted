@@ -12,23 +12,36 @@ unless (defined($ENV{'DISPLAY'})) {
     eval {
         use Graphics::Framebuffer;
 
-        my ($PF,$F) = Graphics::Framebuffer->new('DOUBLE_BUFFER' => 1, 'RESET' => 0);
-
-        isa_ok($F,'Graphics::Framebuffer');
-        if (defined($F)) {
-            my $scr = $F->screen_dimensions();
+        my ($PF,$F) = Graphics::Framebuffer->new('DOUBLE_BUFFER' => 16, 'RESET' => 0);
+        my $DB = 1;
+        isa_ok($PF,'Graphics::Framebuffer');
+        if (defined($PF)) {
+            my $scr = $PF->screen_dimensions();
+            if ($scr->{'bits_per_pixel'} != 16) {
+                $DB = 0;
+                $F  = $PF;
+            }
             my $xm  = $scr->{'height'} / 1080;
             $F->cls();
             $F->ttf_print($F->ttf_print({
-                'height'       => 180 * $xm,
-                'wscale'       => 1,          # Scales the width.  1 is normal
+                'height'       => 134 * $xm,
+                'wscale'       => 1.05,         # Scales the width.  1 is normal
+                'color'        => '222244FF', # Hex value of color 00-FF (RRGGBBAA)
+                'text'         => 'Hey, This Works!',
+                'bounding_box' => 1,
+                'center'       => CENTER_XY,
+                'antialias'    => 1
+            }));
+            $F->ttf_print($F->ttf_print({
+                'height'       => 130 * $xm,
+                'wscale'       => 1,         # Scales the width.  1 is normal
                 'color'        => 'FFFFFFFF', # Hex value of color 00-FF (RRGGBBAA)
                 'text'         => 'Hey, This Works!',
                 'bounding_box' => 1,
                 'center'       => CENTER_XY,
                 'antialias'    => 1
             }));
-            $PF->blit_flip($F);
+            $PF->blit_flip($F) if ($DB);
             sleep 2;
             $F->cls();
         } else {

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 # -----------------------------------------------------------------------------
 
@@ -58,6 +58,9 @@ Die Methode ist logisch äquivalent zu
 
     $str = !$bool? '': join '',$expr // '', ...;
 
+Sie vermeidet jedoch, dass $expr // '', ... berechnet werden muss,
+wenn $bool falsch ist.
+
 =head4 Example
 
 B<Konkatenation bei zutreffender Bedingung>
@@ -85,7 +88,7 @@ sub catIf {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

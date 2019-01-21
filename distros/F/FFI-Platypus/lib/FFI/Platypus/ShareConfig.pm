@@ -2,10 +2,31 @@ package FFI::Platypus::ShareConfig;
 
 use strict;
 use warnings;
-use File::ShareDir qw( dist_dir );
 use File::Spec;
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.74'; # VERSION
+
+sub dist_dir ($)
+{
+  my($dist_name) = @_;
+  
+  my @pm = split /-/, $dist_name;
+  $pm[-1] .= ".pm";
+  
+  foreach my $inc (@INC)
+  {
+    if(-f File::Spec->catfile($inc, @pm))
+    {
+      my $share = File::Spec->catdir($inc, qw( auto share dist ), $dist_name );
+      if(-d $share)
+      {
+        return File::Spec->rel2abs($share);
+      }
+      last;
+    }
+  }
+  Carp::croak("unable to find dist share directory for $dist_name");
+}
 
 sub get
 {
@@ -42,7 +63,7 @@ FFI::Platypus::ShareConfig
 
 =head1 VERSION
 
-version 0.59
+version 0.74
 
 =head1 AUTHOR
 
@@ -72,7 +93,7 @@ Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015,2016,2017,2018 by Graham Ollis.
+This software is copyright (c) 2015,2016,2017,2018,2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

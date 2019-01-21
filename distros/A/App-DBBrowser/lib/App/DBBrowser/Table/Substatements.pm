@@ -32,7 +32,8 @@ sub new {
     if ( $data->{driver} eq 'Pg' ) {
         $sf->{aggregate}[3] = "STRING_AGG(X)";
     }
-    $sf->{i}{extended_signs} = [ '',  'f()', 'SQ', '%%' ];
+    $sf->{i}{extended_signs}     = [ '',  'f()', 'SQ', '%%' ];
+    $sf->{i}{extended_signs_set} = [ '',  'f()', 'SQ', '=N', '%%' ];
     bless $sf, $class;
 }
 
@@ -42,7 +43,7 @@ sub select {
     my $clause = 'select';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $choices = [];
-    my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{G}{"extend_$clause"} ];
+    my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
     my @pre = ( undef, $sf->{i}{ok}, $ext_sign ? $ext_sign : () );
     my $type;
     if ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
@@ -254,7 +255,7 @@ sub where {
     my $unclosed = 0;
     my $count = 0;
     my $bu = [];
-    my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{G}{"extend_$clause"} ];
+    my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
     my @pre = ( undef, $sf->{i}{ok}, $ext_sign ? $ext_sign : () );
 
     WHERE: while ( 1 ) {
@@ -338,7 +339,7 @@ sub group_by {
     $sql->{group_by_stmt} = " GROUP BY";
     $sql->{group_by_cols} = [];
     $sql->{chosen_cols} = [];
-    my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{G}{"extend_$clause"} ];
+    my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
     my @pre = ( undef, $sf->{i}{ok}, $ext_sign ? $ext_sign : () );
     my $choices = [ @pre, @{$sql->{cols}} ];
 

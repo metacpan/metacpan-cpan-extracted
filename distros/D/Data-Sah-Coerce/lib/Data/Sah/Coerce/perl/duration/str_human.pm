@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::duration::str_human;
 
-our $DATE = '2018-12-16'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $DATE = '2019-01-21'; # DATE
+our $VERSION = '0.032'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,8 +9,7 @@ use warnings;
 
 sub meta {
     +{
-        v => 3,
-        enable_by_default => 1,
+        v => 4,
         might_fail => 1, # we feed most string to Time::Duration::Parse::AsHash which might croak when fed invalid string
         prio => 60,
     };
@@ -60,7 +59,7 @@ Data::Sah::Coerce::perl::duration::str_human - Coerce duration from human notati
 
 =head1 VERSION
 
-This document describes version 0.031 of Data::Sah::Coerce::perl::duration::str_human (from Perl distribution Data-Sah-Coerce), released on 2018-12-16.
+This document describes version 0.032 of Data::Sah::Coerce::perl::duration::str_human (from Perl distribution Data-Sah-Coerce), released on 2019-01-21.
 
 =head1 DESCRIPTION
 
@@ -90,7 +89,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

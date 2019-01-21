@@ -33,7 +33,7 @@ provides:
     file: lib/App/Perlbrew/Path/Root.pm
   App::perlbrew:
     file: lib/App/perlbrew.pm
-    version: '0.85'
+    version: '0.86'
 requires:
   CPAN::Perl::Releases: '3.66'
   Capture::Tiny: '0.36'
@@ -46,6 +46,6 @@ requires:
   local::lib: '2.000014'
 resources:
   repository: https://github.com/gugod/App-perlbrew.git
-version: '0.85'
+version: '0.86'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: '1'

@@ -13,6 +13,7 @@ for my $sub ( @subs ) {
 }
 
 
+ok !DBIx::Class::Schema->load_namespaces;
 
 
 done_testing();

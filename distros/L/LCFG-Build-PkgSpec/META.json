@@ -1,0 +1,59 @@
+{
+   "abstract" : "Object-oriented interface to LCFG build metadata",
+   "author" : [
+      "Stephen Quinney <squinney@inf.ed.ac.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "gpl"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LCFG-Build-PkgSpec",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Structure::Util" : "0.12",
+            "DateTime" : "0",
+            "Email::Address" : "0",
+            "Email::Valid" : "0",
+            "Moose" : "0.98",
+            "Pod::Usage" : "0",
+            "YAML::Syck" : "0.98",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "LCFG::Build::PkgSpec" : {
+         "file" : "lib/LCFG/Build/PkgSpec.pm",
+         "version" : "v0.2.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+          "web" : "https://bugs.lcfg.org/"
+      },
+      "homepage" : "http://www.lcfg.org/doc/buildtools/",
+      "license" : [
+         "https://opensource.org/licenses/GPL-2.0"
+      ]
+   },
+   "version" : "v0.2.6"
+}

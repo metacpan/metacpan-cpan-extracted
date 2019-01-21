@@ -1,12 +1,7 @@
 package Task::BeLike::YANICK;
-BEGIN {
-  $Task::BeLike::YANICK::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $Task::BeLike::YANICK::VERSION = '0.8.0';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: like Yanick? Be like Yanick!
-
+$Task::BeLike::YANICK::VERSION = '0.9.0';
 use warnings;
 use strict;
 
@@ -18,13 +13,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Task::BeLike::YANICK - like Yanick? Be like Yanick!
 
 =head1 VERSION
 
-version 0.8.0
+version 0.9.0
 
 =head1 SYNOPSIS
 
@@ -35,8 +32,8 @@ version 0.8.0
 This L<Task> module installs the modules that I use on
 a regular basis.
 
-Wait, there is more! 
-It can also B<update> the modules that I use on a regular basis! 
+Wait, there is more!
+It can also B<update> the modules that I use on a regular basis!
 To do that, do
 
     TASK_UPGRADE=1 cpan -f Task::BeLike::YANICK
@@ -46,10 +43,6 @@ To do that, do
 =head2 General
 
 =over
-
-=item L<Task::Kensho>
-
-Might not use'em all, but I want them all near me, just in case.
 
 =item L<Set::CrossProduct>
 
@@ -76,6 +69,10 @@ Permutations are fun!
 
 =item L<MooseX::Declare>
 
+=item L<MooseX::MungeHas>
+
+=item L<MooseX::SetOnce>
+
 =back
 
 =head2 XML Processing
@@ -97,11 +94,35 @@ Useful for quick'n'dirty XML creation or slurping.
 
 Can't leave out my baby, now, can I?
 
+=item L<Web::Query>
+
+jQuery-like manipulation of DOMs.
+
+=back
+
+=head2 File Processing
+
+=over
+
+=item L<Path::Tiny>
+
+=item L<File::Serialize>
+
 =back
 
 =head2 Applications
 
 =over
+
+=item L<PAUSE::Permissions>
+
+To know who is the author of a module:
+
+    pause-permissions Foo
+
+=item L<App::PAUSE::cleanup>
+
+So very useful to keep your Schwartz factor low.
 
 =item L<App::GitGot>
 
@@ -128,6 +149,14 @@ Want to know where the module is?
 
 Muuuch better than via the PAUSE web interface.
 
+=item L<App::PAUSE::Comaint>
+
+Power, just like love, is for sharing.
+
+=item L<App::pretty>
+
+Prints JSON/YAML structures in easier-on-the-eye tables.
+
 =back
 
 =head2 Web Development
@@ -135,6 +164,8 @@ Muuuch better than via the PAUSE web interface.
 =over
 
 =item L<Dancer>
+
+=item L<Dancer2>
 
 So you think you can dance?
 
@@ -148,14 +179,9 @@ So you think you can dance?
 
 My templating system of choice.
 
-=item L<Template>
-
-I prefer L<HTML::Mason>, but C<TT> is used in an awful lot 
-of applications.
-
 =item L<WWW::Mechanize>
 
-A must for testing and small web hacks.  Plus, this module name always 
+A must for testing and small web hacks.  Plus, this module name always
 reminds me of I<Battletech>.
 
 =back
@@ -195,7 +221,9 @@ have a database handy? No problem.
 
 =over
 
-=item L<Method::Signatures>
+=item L<Deve::Hide>
+
+When we have it, but need to pretend we don't.
 
 =item L<Carp::Always::Color>
 
@@ -232,9 +260,25 @@ five minutes.
 
 =back
 
+=head2 Databases
+
+=over
+
+=item L<DBIx::Class::Schema::Loader>
+
+Use the database to create the schema.
+
+=back
+
 =head2 CPAN
 
 =over
+
+=item L<lazy>
+
+Install all the missing dependencies!
+
+    perl -Mlazy foo.pl
 
 =item L<App::cpanminus>
 
@@ -247,6 +291,10 @@ CPAN asks for it, so there it is.
 =item L<App::cpanoutdated>
 
     cpan-outdated | cpanm
+
+=item L<File::ShareDir>
+
+Interface to dist/module shared files.
 
 =back
 
@@ -328,7 +376,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yanick Champoux.
+This software is copyright (c) 2019, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

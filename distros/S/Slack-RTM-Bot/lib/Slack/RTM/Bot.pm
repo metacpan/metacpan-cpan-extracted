@@ -9,7 +9,7 @@ use POSIX qw/sys_wait_h/;
 use JSON;
 use Slack::RTM::Bot::Client;
 
-our $VERSION = "1.07";
+our $VERSION = "1.08";
 
 pipe(READH, WRITEH);
 select(WRITEH);$|=1;
@@ -182,7 +182,7 @@ sub say {
 		subtype => 'bot_message',
 		bot_id  => $self->{client}->{info}->{self}->{id},
 		%$args,
-		channel => $self->{client}->find_channel_or_group_id($args->{channel})
+		channel => $self->{client}->find_conversation_id($args->{channel})
 	})."\n";
 	print WRITEH $request;
 }

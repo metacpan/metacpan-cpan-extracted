@@ -7,7 +7,7 @@ require Inline;
 require Inline::Struct::grammar;
 use Data::Dumper;
 
-our $VERSION = '0.23';
+our $VERSION = '0.25';
 
 #=============================================================================
 # Inline::Struct is NOT an ILSM: no register() function
@@ -209,6 +209,7 @@ END
 			   $type,
 			   "input_expr",
 			   1,
+			   '_KEYS',
 			  );
 	    my $s =
 	      typeconv($o, "_IS_src->$field",
@@ -216,13 +217,15 @@ END
 			   $type,
 			   "output_expr",
 			   1,
+			   '_KEYS',
 			  );
 	    $INITL .=
 	      (typeconv($o, "_IS_targ->$field",
 			    "ST($i)",
 			    $type,
 			    "input_expr",
-			    1
+			    1,
+			    '_KEYS',
 			   ) .
 	       "; \\\n");
 	    $HASH .= (qq{{\\\n\tSV*tmp=newSViv(0);\\\n$s \\
@@ -239,7 +242,8 @@ END
 		      ($i == $maxi ? "" : "\\") .
 		      "\n"
 		     );
-	    $o->{STRUCT}{'.xs'} .= sprintf <<EOF;
+	    my $is_sv = $type =~ /^SV\s*\*$/;
+	    $o->{STRUCT}{'.xs'} .= <<EOF;
 void
 $field(object, ...)
 	$cname *object
@@ -250,27 +254,27 @@ $field(object, ...)
 	ENTER;
 	SAVETMPS;
 	if (items == 1) {
-	    @{[typeconv($o, "object->$field", "retval", $type, "output_expr")]}
+	    @{[typeconv($o, "object->$field", "retval", $type, "output_expr", undef, $field)]}
 	    @{[
 	    # mortalise if not an SV *
-	    $type =~ /^SV\s*\*$/ ? '' : 'mortalise_retval = 1;'
+	    $is_sv ? '' : 'mortalise_retval = 1;'
 	    ]}
 	}
 	else {
 	    @{[
-	    $type =~ /^SV\s*\*$/ ?
+	    $is_sv ?
 		qq{if (object->$field && SvOK(object->$field)) {
 		    SvREFCNT_dec(object->$field);
 		}} : ""
 	    ]}
-	    @{[typeconv($o, "object->$field", "ST(1)", $type, "input_expr")]};
+	    @{[typeconv($o, "object->$field", "ST(1)", $type, "input_expr", undef, $field)]};
 	    @{[
-	    $type =~ /^SV\s*\*$/ ?
+	    $is_sv ?
 		qq{if (object->$field && SvOK(object->$field)) {
 		    SvREFCNT_inc(object->$field);
 		}} : ""
 	    ]}
-	    @{[typeconv($o, "object", "retval", "$cname *", "output_expr")]};
+	    @{[typeconv($o, "object", "retval", "$cname *", "output_expr", undef, $field)]};
 	    mortalise_retval = 1;
 	}
 	FREETMPS;
@@ -307,7 +311,7 @@ sub write_typemap {
 	my $type = "O_OBJECT_$struct";
 	my @ctypes = grep { $data->{typeconv}{type_kind}{$_} eq $type }
 	   keys %{$data->{typeconv}{type_kind}};
-	$TYPEMAP .= join "\n", map { "$_\t\t$type" } @ctypes;
+	$TYPEMAP .= join "", map { "$_\t\t$type\n" } @ctypes;
 	$INPUT .= $type."\n".$data->{typeconv}{input_expr}{$type};
 	$OUTPUT .= $type."\n".$data->{typeconv}{output_expr}{$type};
     }
@@ -321,7 +325,6 @@ sub write_typemap {
     print $fh <<END;
 TYPEMAP
 $TYPEMAP
-
 INPUT
 $INPUT
 
@@ -340,9 +343,11 @@ sub typeconv {
     my $type = shift;
     my $dir = shift;
     my $preproc = shift;
+    my $pname = shift;
     my $tkind = $o->{ILSM}{typeconv}{type_kind}{$type};
-    my $ret =
-      eval qq{qq{$o->{ILSM}{typeconv}{$dir}{$tkind}}};
+    my $compile = qq{qq{$o->{ILSM}{typeconv}{$dir}{$tkind}}};
+    my $ret = eval $compile;
+    die "Error while compiling: >>>$compile<<<\n$@" if $@;
     chomp $ret;
     $ret =~ s/\n/\\\n/g if $preproc;
     return $ret;

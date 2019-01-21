@@ -1,3 +1,16 @@
+0.27   2019-01-19
+
+- If test_all_dependents() cannot find anything that depends on the given
+  module it runs `plan( skip_all => ... )` rather than `plan(0)`. The latter
+  causes the test to fail. While this should never really happen in normal use
+  it can be an issue when MetaCPAN is having problems (such as
+  https://github.com/metacpan/metacpan-web/issues/2139).
+
+- Explicitly add JSON::PP to our prereqs. This seems to fix an issue with
+  testing on Perl 5.10.1. This module is needed by something in our dependency
+  chain but it doesn't get installed.
+
+
 0.26   2015-11-07
 
 - The previous release only had a partial fix for failures to resolve distro

@@ -4,29 +4,25 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Task-BeLike-YANICK",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.3601"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "version" : "0.9901"
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -36,36 +32,49 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
-            "Test::More" : "0.88"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "Task::BeLike::YANICK" : {
          "file" : "lib/Task/BeLike/YANICK.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.9.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-task-belike-yanick at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Task-BeLike-YANICK"
+         "web" : "https://github.com/yanick/Task-BeLike-YANICK/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Task-BeLike-YANICK/",
+      "homepage" : "https://github.com/yanick/Task-BeLike-YANICK",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/yanick/Task-BeLike-YANICK.git",
          "web" : "https://github.com/yanick/Task-BeLike-YANICK"
       }
    },
-   "version" : "0.8.0",
+   "version" : "0.9.0",
    "x_author_pledge" : {
       "version" : 1
    },
-   "x_authority" : "cpan:YANICK"
+   "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
+   "x_contributors" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

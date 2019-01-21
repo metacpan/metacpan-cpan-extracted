@@ -12,47 +12,44 @@ code: part(s) {1}
 part: comment
     | struct
       {
-	 my ($perlname, $cname, $fields, @aliases) = @{$item[1]};
-         my @fields;
-	 push @fields, @$_ for (@$fields);
+	 my ($perlname, $cname, $fields) = @{$item[1]};
+         my @fields = map @$_, @$fields;
          push @{$thisparser->{data}{structs}}, $perlname;
 	 $thisparser->{data}{struct}{$perlname}{cname} = $cname;
          $thisparser->{data}{struct}{$perlname}{field} = {reverse @fields};
          $thisparser->{data}{struct}{$perlname}{fields} =
-            [ grep { defined $thisparser->{data}{struct}{$perlname}{field}{$_} }
+            [ grep defined $thisparser->{data}{struct}{$perlname}{field}{$_},
               @fields ];
          Inline::Struct::grammar::typemap($thisparser, $perlname, $cname);
-	 Inline::Struct::grammar::alias($thisparser, $cname, $_)
-	   for @aliases[0..$#aliases];
       }
     | typedef
-	{
-	    my ($type,$alias) = @{$item[1]}[0,1];
-	    Inline::Struct::grammar::alias($thisparser, $type, $alias);
-	}
     | ALL
 
-struct: 'struct' IDENTIFIER { $thisparser->{data}{current}="@item[1,2]" }
-        '{' field(s) '}' ';'
+struct: struct_identifier_fields
+	| 'typedef' 'struct' fields IDENTIFIER ';'
+	   {
+	    # [perlname, cname, fields]
+	      [@item[4,4,3]]
+	   }
+	| 'typedef' struct_identifier_fields IDENTIFIER ';'
+	   {
+	      Inline::Struct::grammar::alias($thisparser, $item[2][1], $item[3]);
+	      $item[2]
+	   }
+
+struct_identifier_fields:
+        'struct' IDENTIFIER { $thisparser->{data}{current}="@item[1,2]" } fields ';'
            {
 	    # [perlname, cname, fields]
-	      [$item[2], "@item[1,2]", $item[5]]
-	   }
-	| 'typedef' 'struct' '{' field(s) '}' IDENTIFIER ';'
-	   {
-	    # [perlname, cname, fields]
-	      [@item[6,6,4]]
-	   }
-	| 'typedef' 'struct' IDENTIFIER '{' field(s) '}' IDENTIFIER ';'
-	   {
-	      # [perlname, cname, fields, alias]
-	      [$item[3], "@item[2,3]", $item[5], $item[7]]
+	      [$item[2], "@item[1,2]", $item[4]]
 	   }
 
 typedef: 'typedef' 'struct' IDENTIFIER IDENTIFIER ';'
 	{
-	   ["@item[2,3]", $item[4]]
+	   Inline::Struct::grammar::alias($thisparser, "@item[2,3]", $item[4]);
 	}
+
+fields: '{' field(s) '}' { [ grep ref, @{$item[2]} ] }
 
 field: comment
      | type IDENTIFIER ';'
@@ -61,33 +58,22 @@ field: comment
        }
 
 IDENTIFIER: /[~_a-z]\w*/i
-	    {
-	      $item[1]
-	    }
 
 comment:  m{\s* // [^\n]* \n }x
 	| m{\s* /\* (?:[^*]+|\*(?!/))* \*/  ([ \t]*)? }x
 
-type:   TYPE star(s?)
-        {
-         $return = $item[1];
-         $return .= join '',' ',@{$item[2]} if @{$item[2]};
-         return undef
-           unless (defined $thisparser->{data}{typeconv}{valid_types}{$return});
-        }
-      | modifier(s) TYPE star(s?)
+type: modifier(s?) TYPE star(s?)
 	{
          $return = $item[2];
          $return = join ' ',@{$item[1]},$return if @{$item[1]};
          $return .= join '',' ',@{$item[3]} if @{$item[3]};
          return undef
            unless (defined $thisparser->{data}{typeconv}{valid_types}{$return} or
-#                   $return eq $thisparser->{data}{current} or 
-		   $return eq $thisparser->{data}{current} . "*"
+		   $return eq $thisparser->{data}{current} . " *"
 		);
 	}
 
-modifier: 'extern' | 'unsigned' | 'long' | 'short' | 'const'
+modifier: 'extern' | 'unsigned' | 'long' | 'short' | 'const' | 'struct' | 'volatile'
 
 star: '*' | '&'
 
@@ -110,19 +96,20 @@ sub typemap {
     my $perlname = shift;
     my $cname = shift;
 
-    my ($TYPEMAP, $INPUT, $OUTPUT);
     my $type = "O_OBJECT_$perlname";
-    $TYPEMAP .= "$cname *\t\t$type\n";
-    $INPUT .= <<END;
-    if (sv_isobject(\$arg) && (SvTYPE(SvRV(\$arg)) == SVt_PVMG)) {
-	\$var = (\$type)SvIV((SV*)SvRV( \$arg ));
+    my $TYPEMAP = "$cname *\t\t$type\n";
+    my $INPUT = <<'END';
+    if (!sv_isobject($arg)) {
+	warn ( \"$pname() -- $var is not a blessed reference\" );
+	XSRETURN_UNDEF;
     }
-    else {
-	warn ( \\"\${Package}::\$func_name() -- \$var is not a blessed reference\\" );
+    $var = ($type)SvIV((SV*)SvRV( $arg ));
+    if (!$var) {
+	warn ( \"$pname() -- $var is null pointer\" );
 	XSRETURN_UNDEF;
     }
 END
-    $OUTPUT .= <<END;
+    my $OUTPUT = <<END;
         {
             HV *map = get_hv("Inline::Struct::${perlname}::_map_", 1);
             SV *lookup = newSViv((IV)\$var);
@@ -160,7 +147,7 @@ sub alias {
     $parser->{data}{typeconv}{valid_types}{$alias}++;
     $parser->{data}{typeconv}{valid_rtypes}{$alias}++;
     $parser->{data}{typeconv}{type_kind}{$alias} =
-      $parser->{data}{typeconv}{type_kind}{$type};
+      $parser->{data}{typeconv}{type_kind}{$type} ||= {};
 }
 
 1;

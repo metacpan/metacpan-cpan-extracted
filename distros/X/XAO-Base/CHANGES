@@ -1,6 +1,16 @@
 https://github.com/amaltsev/XAO-Base
 ------------------------------------
 
+commit 073bcc869e05ff5d9e7f5c266ad7bb1d8ac02eb0
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Thu Jan 17 18:48:51 2019 -0800
+
+    1.24 Changed to Devel::Size in Cache::Memory
+    
+    The old code was slow and underestimated the size 10 times or
+    more. Using Devel::Size is optional, defaulting to a slightly updated
+    old code if it's not found.
+
 commit 45a91ea05f5975402eb321b28d35c4ad91c43765
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Wed Oct 24 20:09:34 2018 -0700
@@ -70,10 +80,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Jul 6 18:51:30 2018 -0700
 
     Removed unnecessary man page building
-
-commit d468cbd7a4e677df63c036e91359f09b5102bdd1
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 6 18:47:20 2018 -0700
-
-    Version bump
 

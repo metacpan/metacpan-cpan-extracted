@@ -2,13 +2,13 @@
 use strict;
 use warnings;
 
-# $Id: lcfg-reltool.in 29146 2015-11-06 15:07:48Z squinney@INF.ED.AC.UK $
+# $Id: lcfg-reltool.in 35358 2019-01-15 16:54:36Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/bin/lcfg-reltool.in,v $
-# $Revision: 29146 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_6_6/bin/lcfg-reltool.in $
-# $Date: 2015-11-06 15:07:48 +0000 (Fri, 06 Nov 2015) $
+# $Revision: 35358 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_18/bin/lcfg-reltool.in $
+# $Date: 2019-01-15 16:54:36 +0000 (Tue, 15 Jan 2019) $
 
-our $VERSION = '0.6.6';
+our $VERSION = '0.9.18';
 
 use LCFG::Build::Tools;
 
@@ -22,7 +22,7 @@ lcfg-reltool - LCFG source release control tool
 
 =head1 VERSION
 
-This documentation refers to lcfg-reltool version 0.6.6
+This documentation refers to lcfg-reltool version 0.9.18
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ This documentation refers to lcfg-reltool version 0.6.6
 
 There are two built-in commands:
 
-=over 4
+=over
 
 =item help [command name]
 
@@ -57,7 +57,7 @@ The following commands are each implemented with a separate Perl
 module. For full documentation you need to read the perldoc for the
 specific module. They are all in the C<LCFG::Build::Tool> namespace.
 
-=over 4
+=over
 
 =item checkmacros - L<LCFG::Build::Tool::CheckMacros>
 
@@ -130,6 +130,8 @@ development source tree for the project. This will include all local
 files which have been added to the specified working directory for the
 project.
 
+=back
+
 =head1 CONFIGURATION AND ENVIRONMENT
 
 This version-control tool is driven by the LCFG build system meta-file
@@ -193,7 +195,7 @@ Stephen Quinney <squinney@inf.ed.ac.uk>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (C) 2008 University of Edinburgh. All rights reserved.
+Copyright (C) 2008-2019 University of Edinburgh. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GPL, version 2 or later.

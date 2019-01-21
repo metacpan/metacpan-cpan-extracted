@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Quiq::Path;
 use Quiq::Ipc;
@@ -266,7 +266,8 @@ sub dump {
         return Quiq::Html::Listing->html($h,
             colNumbers=>$self->{'cn'},
             cssPrefix=>"$cssPrefix-code",
-            escape=>$self->{'cotedo'}, # oder doch 0? 1 wird für CoTeDo-SOURCE benötigt
+            escape=>$self->{'cotedo'}, # oder doch 0? 1 wird für
+                                       # CoTeDo-SOURCE benötigt
             lineNumbers=>$self->{'ln'} || 0,
             minLineNumberWidth=>$root->{'minLnWidth'},
             language=>$self->{'language'},
@@ -352,7 +353,7 @@ sub dump {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

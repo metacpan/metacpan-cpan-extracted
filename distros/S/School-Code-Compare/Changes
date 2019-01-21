@@ -1,5 +1,9 @@
 Revision history for School-Code-Compare
  
+0.007     2019-01-17 13:54:55+01:00 Europe/Zurich
+ - throw "skipped" comparisons away
+ - mention html in help as option for output format
+
 0.006     2017-12-11 16:35:04+01:00 Europe/Zurich
  - support multiline comments, probably buggy ( /* )
  - add 'java' as option, added some code_examples

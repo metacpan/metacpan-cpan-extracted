@@ -1,4 +1,23 @@
-Revision history for App-INIUtils
+0.032   2019-01-17 (PERLANCAR)
+
+	- Add utilities: grep-ini, map-ini.
+
+
+0.031   2019-01-17 (PERLANCAR)
+
+	- [ux] Tweak CLIs: disable config/env reading.
+
+
+0.030   2019-01-17 (PERLANCAR)
+
+	- Add utilities: delete-ini-{key,section}, get-ini-{key,section},
+	  insert-ini-{key,section}, list-ini-sections.
+
+	- [Incompatible change] Rename parse-ini to dump-ini, add script
+	  parse-ini (modified from parse-iod).
+
+	- parse-ini: Add Config::IOD::INI::Reader as an alternative parser.
+
 
 0.02    2015-12-10 (PERLANCAR)
 

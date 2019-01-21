@@ -1,0 +1,64 @@
+NAME
+
+  Term::ExtendedColor::Xresources::Colorscheme - terminal colorschemes
+
+SYNOPSIS
+
+  use Term::ExtendedColor::Xresources qw(get_xterm_color set_xterm_color);
+  use Term::ExtendedColor::Xresources::Colorscheme qw(get_colorscheme);
+
+  my $colors = get_colorscheme('xterm');
+  set_xterm_color($colors);
+
+DESCRIPTION
+
+  Term::ExtendedColor::Xresources::Colorscheme provides a lot of
+  pre-defined colorschemes for the terminal.
+
+EXPORTS
+
+  None by default.
+
+FUNCTIONS
+
+  get_colorscheme()
+    Arguments: $colorscheme
+    Return value: \%colorscheme
+
+    Given a valid colorscheme name, return a hash reference where its keys
+    are the color indexes. Every index is mapped to a corresponding escape
+    sequence that'll change index color n when printed.
+
+  get_colorschemes()
+    Arguments: None
+    Return value: @colorschemes
+
+    Returns a list with all available colorschemes.
+
+SEE ALSO
+
+    Term::ExtendedColor::Xresources, Term::ExtendedColor,
+    Term::ExtendedColor::TTY
+
+AUTHOR
+
+      Magnus Woldrich
+      CPAN ID: WOLDRICH
+      m@japh.se
+      http://japh.se
+
+CONTRIBUTORS
+
+    None required yet.
+
+COPYRIGHT
+
+    Copyright 2010, 2011, 2019- the
+    Term::ExtendedColor::Xresources::Colorscheme "AUTHOR" and "CONTRIBUTORS"
+    as listed above.
+
+LICENSE
+
+    This library is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+

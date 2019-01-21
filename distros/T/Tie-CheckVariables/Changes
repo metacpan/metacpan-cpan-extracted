@@ -1,11 +1,20 @@
-Revision history for Perl extension Tie::CheckVariables.
+Revision history for Tie::CheckVariables.
+=========================================
 
-0.01  Mon Jun 19 15:22:06 2006
-	- original version; created by h2xs 1.23 with options
-		-b 5.6.1 -XA -n Tie::CheckVariables
+0.06  2019-01-21 09:08:00
+    - fix typos thanks to @manwar
+    - fix code in synopsis
+    - add test for code in synopsis
 
-0.02  Mon Oct 02 11:19:52 2006
-    - added tests: Pod, Pod_Coverage, Manifest
+0.05  2019-01-19 13:19:00
+    - improve handling of Type::Tiny
+      - do not check for 'Type::Tiny' in ref check, but use Scalar::Utils blessed
+      - thanks to Toby Inkster
+
+0.04  2019-01-18 13:19:00
+    - add support for Type::Tiny
+    - dzilized dist
+    - added tests to reach 100% coverage
 
 0.03  Fri Dec 08 10:29:55 2006
     - added: 98_boilerplate.t
@@ -13,3 +22,10 @@ Revision history for Perl extension Tie::CheckVariables.
     - bugfix:99_pod.t
     - bugfix:99_pod_coverage.t
     - added: LICENSE field in Makefile.PL
+
+0.02  Mon Oct 02 11:19:52 2006
+    - added tests: Pod, Pod_Coverage, Manifest
+
+0.01  Mon Jun 19 15:22:06 2006
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.1 -XA -n Tie::CheckVariables

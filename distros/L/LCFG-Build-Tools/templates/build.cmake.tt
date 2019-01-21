@@ -93,11 +93,16 @@ ENDMACRO(lcfg_pod2man)
 
 MACRO(lcfg_add_pod podfile manfile section)
 
-  IF(EXISTS ${podfile})
-    INSTALL(FILES ${podfile} DESTINATION ${LCFGPOD})
+  UNSET( podpath CACHE )
+  FIND_FILE( podpath ${podfile}
+             ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}
+             NO_DEFAULT_PATH )
 
-    lcfg_pod2man(${podfile} ${manfile} ${section})
-  ENDIF(EXISTS ${podfile})
+  IF(podpath)
+    INSTALL(FILES ${podpath} DESTINATION ${LCFGPOD})
+
+    lcfg_pod2man(${podpath} ${manfile} ${section})
+  ENDIF(podpath)
 
 ENDMACRO(lcfg_add_pod)
 
@@ -176,9 +181,14 @@ ENDMACRO(lcfg_add_sbin)
 
 MACRO(lcfg_add_logrotate)
 
-  IF(EXISTS "logrotate")
-    INSTALL(FILES "logrotate" DESTINATION "${LCFGDATA}/${LCFG_NAME}")
-  ENDIF(EXISTS "logrotate")
+  UNSET( logrotpath CACHE )
+  FIND_FILE( logrotpath "logrotate"
+             ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}
+             NO_DEFAULT_PATH )
+
+  if(logrotpath)
+    INSTALL(FILES ${logrotpath} DESTINATION "${LCFGDATA}/${LCFG_NAME}")
+  endif()
 
 ENDMACRO(lcfg_add_logrotate)
 
@@ -190,11 +200,13 @@ MACRO(lcfg_add_templates)
 
   # Allow non-standard templates directory
 
-  IF(${ARGC} GREATER 0)
-    SET(dir "${CMAKE_CURRENT_SOURCE_DIR}/${ARGV0}")
-  ELSE(${ARGC} GREATER 0)
-    SET(dir "${CMAKE_CURRENT_SOURCE_DIR}/templates")
-  ENDIF(${ARGC} GREATER 0)
+  if(${ARGC} GREATER 0)
+    SET(srcdir "${CMAKE_CURRENT_SOURCE_DIR}/${ARGV0}")
+    SET(bindir "${CMAKE_CURRENT_BINARY_DIR}/${ARGV0}")
+  else()
+    SET(srcdir "${CMAKE_CURRENT_SOURCE_DIR}/templates")
+    SET(bindir "${CMAKE_CURRENT_BINARY_DIR}/templates")
+  endif()
 
   # Allow non-standard destination directory
 
@@ -206,22 +218,23 @@ MACRO(lcfg_add_templates)
 
   # New-style templates directory, can contain sub-directories
 
-  FILE(GLOB_RECURSE templates RELATIVE ${dir} "${dir}/*")
+  FILE(GLOB_RECURSE templates "${srcdir}/*")
 
   FOREACH(template ${templates})
-    IF(${template} MATCHES "\\.cin$")
-      # nothing here...
-    ELSE(${template} MATCHES "\\.cin$")
-      GET_FILENAME_COMPONENT(dirname ${template} PATH)
-      INSTALL(FILES "${dir}/${template}"
-              DESTINATION "${destination}/${dirname}")
-    ENDIF(${template} MATCHES "\\.cin$")
+    get_filename_component(basename ${template} NAME)
+    if(${basename} MATCHES "(.+)\\.c?in$")
+      # Handled separately
+    else()
+      configure_file(${template} "${bindir}/${basename}" COPYONLY)
+    endif()
   ENDFOREACH(template)
+
+  install(DIRECTORY ${bindir}/ DESTINATION ${destination} OPTIONAL)
 
   # Old-style single template file named 'template' in the top-level
   #  of the project directory.
 
-  install(FILES "template" DESTINATION ${destination} OPTIONAL)
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/template" "${CMAKE_CURRENT_BINARY_DIR}/template" DESTINATION ${destination} OPTIONAL)
 
 ENDMACRO(lcfg_add_templates)
 
@@ -234,7 +247,7 @@ ENDMACRO(lcfg_add_nagios_module)
 
 MACRO(lcfg_add_nagios_support)
 
-  file(GLOB nagios_mods "nagios/*.pm")
+  file(GLOB nagios_mods "${CMAKE_CURRENT_SOURCE_DIR}/nagios/*.pm" "${CMAKE_CURRENT_BINARY_DIR}/nagios/*.pm")
 
   foreach(nagios_mod ${nagios_mods})
     lcfg_add_nagios_module(${nagios_mod})

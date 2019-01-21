@@ -2,7 +2,7 @@ package Test2::Tools::Spec;
 use strict;
 use warnings;
 
-our $VERSION = '0.000117';
+our $VERSION = '0.000118';
 
 use Carp qw/croak/;
 use Test2::Workflow qw/parse_args build current_build root_build init_root build_stack/;
@@ -296,7 +296,7 @@ Test2::Tools::Spec - RSPEC implementation on top of Test2::Workflow
 
 =head1 DESCRIPTION
 
-This uses L<Test::Workflow> to implement an RSPEC variant. This variant
+This uses L<Test2::Workflow> to implement an RSPEC variant. This variant
 supports isolation and/or concurrency via forking or threads.
 
 =head1 SYNOPSIS

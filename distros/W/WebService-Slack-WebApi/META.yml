@@ -28,13 +28,15 @@ no_index:
 provides:
   WebService::Slack::WebApi:
     file: lib/WebService/Slack/WebApi.pm
-    version: '0.14'
+    version: '0.15'
   WebService::Slack::WebApi::Api:
     file: lib/WebService/Slack/WebApi/Api.pm
   WebService::Slack::WebApi::Auth:
     file: lib/WebService/Slack/WebApi/Auth.pm
   WebService::Slack::WebApi::Base:
     file: lib/WebService/Slack/WebApi/Base.pm
+  WebService::Slack::WebApi::Bots:
+    file: lib/WebService/Slack/WebApi/Bots.pm
   WebService::Slack::WebApi::Channels:
     file: lib/WebService/Slack/WebApi/Channels.pm
   WebService::Slack::WebApi::Chat:
@@ -61,6 +63,8 @@ provides:
     file: lib/WebService/Slack/WebApi/Groups.pm
   WebService::Slack::WebApi::Im:
     file: lib/WebService/Slack/WebApi/Im.pm
+  WebService::Slack::WebApi::Migration:
+    file: lib/WebService/Slack/WebApi/Migration.pm
   WebService::Slack::WebApi::Oauth:
     file: lib/WebService/Slack/WebApi/Oauth.pm
   WebService::Slack::WebApi::Pins:
@@ -94,7 +98,7 @@ resources:
   bugtracker: https://github.com/mihyaeru21/p5-WebService-Slack-WebApi/issues
   homepage: https://github.com/mihyaeru21/p5-WebService-Slack-WebApi
   repository: git://github.com/mihyaeru21/p5-WebService-Slack-WebApi.git
-version: '0.14'
+version: '0.15'
 x_contributors:
   - 'Askar Timirgazin <anotheroneackap@gmail.com>'
   - 'Ivan Wills <Ivan.Wills2@optus.com.au>'

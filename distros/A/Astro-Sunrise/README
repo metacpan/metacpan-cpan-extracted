@@ -1,6 +1,6 @@
 -*- encoding: utf-8; indent-tabs-mode: nil -*-
 
-Astro::Sunrise version 0.97
+Astro::Sunrise version 0.98
 ===========================
 
 This module commpute the sunrise and sunset for a given day.
@@ -29,7 +29,7 @@ The following module is recommended:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2000, 2001, 2002, 2003, 2013, 2015, 2017 Ron Hill and Jean Forget
+Copyright (C) 2000, 2001, 2002, 2003, 2013, 2015, 2017, 2018, 2019 Ron Hill and Jean Forget
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5.16.3. For more details, see the full
@@ -40,6 +40,7 @@ is provided “as is” and without any express or implied warranties. For
 details, see the full text of the licenses in the file LICENSE.
 
 Based on a public domain C program sunriset.c (c) Paul Schlyter, 1989, 1992
+
 NAME
 
     Astro::Sunrise - Perl extension for computing the sunrise/sunset on a given day

@@ -59,6 +59,7 @@ lib/Test2/EventFacet/Control.pm
 lib/Test2/EventFacet/Error.pm
 lib/Test2/EventFacet/Hub.pm
 lib/Test2/EventFacet/Info.pm
+lib/Test2/EventFacet/Info/Table.pm
 lib/Test2/EventFacet/Meta.pm
 lib/Test2/EventFacet/Parent.pm
 lib/Test2/EventFacet/Plan.pm

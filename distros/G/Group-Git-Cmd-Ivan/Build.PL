@@ -10,7 +10,7 @@ my $builder = Module::Build->new(
     requires          => {
         'perl'                          => 5.008,
         'DateTime::Format::Strptime'    => 0,
-        'Group::Git'                    => 0,
+        'Group::Git'                    => '0.6.10',
         'Group::Git::Cmd::SinceRelease' => 0,
         'Group::Git::Cmd::Stats'        => 0,
         'Group::Git::Cmd::Todo'         => 0,
@@ -28,7 +28,7 @@ my $builder = Module::Build->new(
     },
     build_requires => {
         'Test::More'     => '0.88',
-        'Test::Warnings' => 0,
+        'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'Group-Git-Cmd-Ivan-*' ],
     create_license     => 1,

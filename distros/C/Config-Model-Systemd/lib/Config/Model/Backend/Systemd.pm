@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd ;
-$Config::Model::Backend::Systemd::VERSION = '0.239.1';
+$Config::Model::Backend::Systemd::VERSION = '0.240.1';
 use strict;
 use warnings;
 use 5.010;
@@ -170,6 +170,7 @@ sub read_systemd_units {
 
     if (not $found) {
         # no service exists, let's create them.
+        $user_logger->warn( "No unit '$select_unit' found, creating one...");
         my ($service_name, $unit_type) =  split /\./, $select_unit;
         my @to_create = $unit_type ? ($unit_type) : @service_types;
         $service_name //= $select_unit;
@@ -237,7 +238,7 @@ Config::Model::Backend::Systemd - R/W backend for systemd configurations files
 
 =head1 VERSION
 
-version 0.239.1
+version 0.240.1
 
 =head1 SYNOPSIS
 

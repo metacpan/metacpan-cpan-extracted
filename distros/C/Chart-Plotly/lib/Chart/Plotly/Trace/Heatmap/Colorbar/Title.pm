@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Heatmap::Colorbar::Title::Font;
 
-our $VERSION = '0.022';    # VERSION
+our $VERSION = '0.023';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace heatmap.
 
@@ -67,7 +67,7 @@ Chart::Plotly::Trace::Heatmap::Colorbar::Title - This attribute is one of the po
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

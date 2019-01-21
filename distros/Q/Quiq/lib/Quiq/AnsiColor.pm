@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Term::ANSIColor ();
 
@@ -120,6 +120,30 @@ sub new {
 
 =head2 Objektmethoden
 
+=head3 active() - Farbdarstellung eingeschaltet
+
+=head4 Synopsis
+
+    $bool = $a->active;
+
+=head4 Returns
+
+Bool
+
+=head4 Description
+
+Liefere wahr, wenn ANSI Colorcodes aktiviert sind, anderfalls falsch.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub active {
+    return ${$_[0]};
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 str() - Formatiere String mit Colorcodes
 
 =head4 Synopsis
@@ -172,7 +196,7 @@ sub str {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

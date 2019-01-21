@@ -6,6 +6,8 @@ use Test::More;
 use Test::Prereq;
 
 prereq_ok( undef, [ qw(
+        Win32::Console::ANSI
+
         Term::Choose::Constants
         Term::Choose::LineFold
         Term::Choose::Linux

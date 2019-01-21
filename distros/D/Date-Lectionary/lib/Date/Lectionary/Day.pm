@@ -25,11 +25,11 @@ Date::Lectionary::Day - Determines the Day in the Christian Liturgical Year
 
 =head1 VERSION
 
-Version 1.20180423
+Version 1.20190120
 
 =cut
 
-use version; our $VERSION = version->declare("v1.20180423");
+use version; our $VERSION = version->declare("v1.20190120");
 
 =head1 SYNOPSIS
 
@@ -41,6 +41,7 @@ enum 'DayType',        [qw(fixedFeast moveableFeast Sunday noLect)];
 enum 'LectionaryType', [qw(acna rcl)];
 enum 'MultiLect',      [qw(yes no)];
 enum 'IncludeFeasts',  [qw(yes no)];
+enum 'XianSeason',     [qw(Advent Christmas Epiphany Ordinary Lent Easter Pentecost NaN)];
 no Moose::Util::TypeConstraints;
 
 =head1 SUBROUTINES/METHODS/ATTRIBUTES
@@ -80,6 +81,14 @@ An ArrayRef of the names of the multiple services that occur on a multiLect day.
 If this is set to 'yes' --- the default value --- the module will include fixed and moveable feasts in its determination of which liturgical Sunday it is.
 
 If set to 'no', it will exclude fixed and moveable feasts.  Excluding feasts is useful when using Date::Lectionary::Day in combination with a daily lectionary such as Date::Lectioary::Daily where a fixed feast such as The Transfiguration can conflict with determining the Sunday to use for the daily lectionary.
+
+=head3 season
+
+The liturgical season the day falls within.
+
+Valid values are 'Advent', 'Christmas', 'Epiphany', 'Ordinary', 'Lent', 'Easter', or 'Pentecost'.
+
+If a date is given that is not a Sunday nor a pricipal holy day 'NaN' will be given for the season.
 
 =cut
 
@@ -145,6 +154,13 @@ has 'includeFeasts' => (
     default => 'yes',
 );
 
+has 'season' => (
+    is       => 'ro',
+    isa      => 'XianSeason',
+    writer   => '_setSeason',
+    init_arg => undef,
+);
+
 =head2 BUILD
 
 Constructor for the Date::Lectionary object.  Takes a Time::Piect object, C<date>, to create the object.
@@ -163,6 +179,7 @@ sub BUILD {
     $self->_setAltName( _determineAltName( $self->lectionary, $commonNameInfo{commonName} ) );
 
     $self->_setType( $commonNameInfo{type} );
+    $self->_setSeason( $commonNameInfo{season} );
 
     my %multiLectInfo = _determineMultiLect( $self->lectionary, $commonNameInfo{commonName} );
     $self->_setMultiLect( $multiLectInfo{multiLect} );
@@ -376,20 +393,32 @@ sub _determineFeasts {
     }
 
     if ($yesterdayName) {
-        return ( commonName => $yesterdayName, type => 'moveableFeast' );
+        return (
+            commonName => $yesterdayName,
+            type       => 'moveableFeast',
+            season     => 'NaN'
+        );
     }
 
     my $fixedDayName = _buildFixedDays( $date, $lectionary );
     if ($fixedDayName) {
-        return ( commonName => $fixedDayName, type => 'fixedFeast' );
+        return (
+            commonName => $fixedDayName->{commonName},
+            type       => 'fixedFeast',
+            season     => $fixedDayName->{season}
+        );
     }
 
     my $moveableDayName = _buildMoveableDays( $date, $lectionary );
     if ( $moveableDayName && $date->wday != 1 ) {
-        return ( commonName => $moveableDayName, type => 'moveableFeast' );
+        return (
+            commonName => $moveableDayName,
+            type       => 'moveableFeast',
+            season     => 'NaN'
+        );
     }
 
-    return ( commonName => undef, type => undef );
+    return ( commonName => undef, type => undef, season => 'NaN' );
 }
 
 =head2 _buildMoveableDays
@@ -545,10 +574,16 @@ sub _buildFixedDays {
     #Fixed holidays in January
     if ( $date->mon == 1 ) {
         if ( $date->mday == 1 ) {
-            return "Holy Name";
+            return {
+                commonName => "Holy Name",
+                season     => 'Christmas'
+            };
         }
         if ( $date->mday == 6 ) {
-            return "The Epiphany";
+            return {
+                commonName => "The Epiphany",
+                season     => 'Epiphany'
+            };
         }
     }
 
@@ -579,7 +614,10 @@ sub _buildFixedDays {
     #Fixed holidays in August
     elsif ( $date->mon == 8 ) {
         if ( $date->mday == 6 && $lectionary eq 'acna' ) {
-            return "The Transfiguration";
+            return {
+                commonName => "The Transfiguration",
+                season     => 'Ordinary'
+            };
         }
     }
 
@@ -594,14 +632,20 @@ sub _buildFixedDays {
     #Fixed holidays in November
     elsif ( $date->mon == 11 ) {
         if ( $date->mday == 1 ) {
-            return "All Saints' Day";
+            return {
+                commonName => "All Saints' Day",
+                season     => 'Ordinary'
+            };
         }
     }
 
     #Fixed holidays in December
     elsif ( $date->mon == 12 ) {
         if ( $date->mday == 25 ) {
-            return "Christmas Day";
+            return {
+                commonName => "Christmas Day",
+                season     => 'Christmas'
+            };
         }
     }
     else {
@@ -833,6 +877,9 @@ sub _determineChristmasEpiphany {
         }
 
         if ( $date == $dateMarker && $christmas2 == 1 ) {
+            return $epiphanySundays[$sunCount];
+        }
+        elsif ( $date == $dateMarker && $epiphany->wday == 1 ) {
             return $epiphanySundays[$sunCount];
         }
         elsif ( $date == $dateMarker && $christmas2 == 0 ) {
@@ -1095,64 +1142,102 @@ sub _determineDay {
 
     #Is the date in Advent?
     if ( $date == $advent->firstSunday ) {
-        return ( commonName => "The First Sunday in Advent", type => 'Sunday' );
+        return (
+            commonName => "The First Sunday in Advent",
+            type       => 'Sunday',
+            season     => 'Advent'
+        );
     }
     elsif ( $date == $advent->secondSunday ) {
         return (
             commonName => "The Second Sunday in Advent",
-            type       => 'Sunday'
+            type       => 'Sunday',
+            season     => 'Advent'
         );
     }
     elsif ( $date == $advent->thirdSunday ) {
-        return ( commonName => "The Third Sunday in Advent", type => 'Sunday' );
+        return (
+            commonName => "The Third Sunday in Advent",
+            type       => 'Sunday',
+            season     => 'Advent'
+        );
     }
     elsif ( $date == $advent->fourthSunday ) {
         return (
             commonName => "The Fourth Sunday in Advent",
-            type       => 'Sunday'
+            type       => 'Sunday',
+            season     => 'Advent'
         );
     }
 
     #Is the date Easter Sunday?
     if ( $date == $easter ) {
-        return ( commonName => "Easter Day", type => 'fixedFeast' );
+        return (
+            commonName => "Easter Day",
+            type       => 'fixedFeast',
+            season     => 'Easter'
+        );
     }
 
     #Determine when Ash Wednesday is
     my $ashWednesday = _determineAshWednesday($easter);
     if ( $date == $ashWednesday ) {
-        return ( commonName => "Ash Wednesday", type => 'fixedFeast' );
+        return (
+            commonName => "Ash Wednesday",
+            type       => 'fixedFeast',
+            season     => 'Lent'
+        );
     }
 
     #Holy Week
     my $holyWeekDay = _determineHolyWeek( $date, $easter );
     if ($holyWeekDay) {
-        return ( commonName => $holyWeekDay, type => 'fixedFeast' );
+        return (
+            commonName => $holyWeekDay,
+            type       => 'fixedFeast',
+            season     => 'Lent'
+        );
     }
 
     #Easter Week
     my $easterWeekDay = _determineEasterWeek( $date, $easter );
     if ($easterWeekDay) {
-        return ( commonName => $easterWeekDay, type => 'fixedFeast' );
+        return (
+            commonName => $easterWeekDay,
+            type       => 'fixedFeast',
+            season     => 'Easter'
+        );
     }
 
     #Ascension is 40 days after Easter
     my $ascension = _determineAscension($easter);
     if ( $date == $ascension ) {
-        return ( commonName => "Ascension Day", type => 'fixedFeast' );
+        return (
+            commonName => "Ascension Day",
+            type       => 'fixedFeast',
+            season     => 'Easter'
+        );
     }
 
     #Pentecost is 50 days after Easter
     my $pentecost = _determinePentecost($easter);
     if ( $date == $pentecost ) {
-        return ( commonName => "Pentecost", type => 'fixedFeast' );
+        return (
+            commonName => "Pentecost",
+            type       => 'fixedFeast',
+            season     => 'Pentecost'
+        );
     }
 
     #Feast Day Celebrations
     if ( $includeFeasts eq 'yes' ) {
         my %feastDay = _determineFeasts( $date, $lectionary );
         if ( $feastDay{commonName} ) {
-            return ( commonName => $feastDay{commonName}, type => $feastDay{type} );
+            return (
+                commonName => $feastDay{commonName},
+                type       => $feastDay{type},
+                season     => $feastDay{season}
+            );
         }
     }
 
@@ -1161,36 +1246,49 @@ sub _determineDay {
     if ( $date->wday != 1 ) {
         return (
             commonName => $date->fullday . ', ' . $date->fullmonth . ' ' . $date->mday . ', ' . $date->year,
-            type       => 'noLect'
+            type       => 'noLect',
+            season     => 'NaN'
         );
     }
 
     #Sundays of the Liturgical Year
     if ( $date < $ashWednesday ) {
-        return (
+        my %xmasEpiphany = (
             commonName => _determineChristmasEpiphany( $date, $advent, $ashWednesday, $lectionary ),
             type       => 'Sunday'
         );
+
+        if ( $xmasEpiphany{commonName} =~ m/Christmas/ig ) {
+            $xmasEpiphany{season} = 'Christmas';
+            return %xmasEpiphany;
+        }
+        else {
+            $xmasEpiphany{season} = 'Epiphany';
+            return %xmasEpiphany;
+        }
     }
 
     if ( $date < $easter ) {
         return (
             commonName => _determineLent( $date, $ashWednesday ),
-            type       => 'Sunday'
+            type       => 'Sunday',
+            season     => 'Lent'
         );
     }
 
     if ( $date > $easter && $date < $pentecost ) {
         return (
             commonName => _determineEasterSeason( $date, $easter ),
-            type       => 'Sunday'
+            type       => 'Sunday',
+            season     => 'Easter'
         );
     }
 
     if ( $date > $pentecost ) {
         return (
             commonName => _determineOrdinary( $date, $pentecost ),
-            type       => 'Sunday'
+            type       => 'Sunday',
+            season     => 'Ordinary'
         );
     }
 }

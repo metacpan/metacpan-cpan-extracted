@@ -1,6 +1,6 @@
 package School::Code::Simplify::Comments;
 # ABSTRACT: roughly trim whitespace, depending on commenting style
-$School::Code::Simplify::Comments::VERSION = '0.006';
+$School::Code::Simplify::Comments::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -140,7 +140,7 @@ School::Code::Simplify::Comments - roughly trim whitespace, depending on comment
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 
@@ -148,7 +148,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Boris Däppen.
+This software is copyright (c) 2019 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

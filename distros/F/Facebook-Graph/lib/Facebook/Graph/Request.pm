@@ -1,5 +1,5 @@
 package Facebook::Graph::Request;
-$Facebook::Graph::Request::VERSION = '1.1204';
+$Facebook::Graph::Request::VERSION = '1.1205';
 use Moo;
 use JSON;
 use Ouch;
@@ -36,7 +36,7 @@ Facebook::Graph::Request - Handling posts to Facebook Graph.
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 DESCRIPTION
 
@@ -95,6 +95,6 @@ A URI to fetch.
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

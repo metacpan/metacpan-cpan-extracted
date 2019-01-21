@@ -1,0 +1,278 @@
+#!perl
+
+our $DATE = '2019-01-17'; # DATE
+our $VERSION = '0.032'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+no warnings 'once';
+
+use App::INIUtils;
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+$SPEC{insert_ini_section} = {
+    v => 1.1,
+    summary => 'Insert an new empty section to INI configuration file',
+    args_rels => {
+        'choose_one&' => [
+            [qw/add ignore/],
+            [qw/top linum/],
+        ],
+    },
+    args => {
+        %App::INIUtils::args_common,
+        %App::INIUtils::arg_inplace,
+        section => {
+            schema  => 'str*',
+            req     => 1,
+            pos     => 1,
+        },
+        add => {
+            summary => 'When section already exists, add another',
+            schema => [bool => is=>1],
+        },
+        ignore => {
+            summary => 'When section already exists, do nothing',
+            schema => [bool => is=>1],
+        },
+        top => {
+            summary => 'Add to the beginning of file instead of end',
+            schema => [bool => is=>1],
+        },
+        comment => {
+            summary => 'Add comment',
+            schema => ['str*'],
+        },
+        linum => {
+            summary => 'Put section line at a specific line number '.
+                '(line number starts from 1)',
+            schema => ['int*' => min=>1],
+        },
+    },
+};
+sub insert_ini_section {
+    my %args = @_;
+    App::INIUtils::_check_inplace(\%args);
+
+    my $parser = App::INIUtils::_get_cii_parser(\%args);
+
+    my $doc = $parser->read_string($args{ini});
+
+    $doc->insert_section(
+        {
+            add     => $args{add},
+            ignore  => $args{ignore},
+            top     => $args{top},
+            comment => $args{comment},
+            linum   => $args{linum},
+        },
+        $args{section},
+    );
+
+    App::INIUtils::_return_mod_result(\%args, $doc);
+}
+
+Perinci::CmdLine::Any->new(
+    url => '/main/insert_ini_section',
+    read_config => 0,
+    read_env => 0,
+)->run;
+
+# ABSTRACT: Insert an new empty section to INI configuration file
+# PODNAME: insert-ini-section
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+insert-ini-section - Insert an new empty section to INI configuration file
+
+=head1 VERSION
+
+This document describes version 0.032 of insert-ini-section (from Perl distribution App-INIUtils), released on 2019-01-17.
+
+=head1 SYNOPSIS
+
+Basic usage:
+
+ % insert-ini-section /path/to/file.ini section
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--add>
+
+When section already exists, add another.
+
+=item B<--comment>=I<s>
+
+Add comment.
+
+=item B<--ignore>
+
+When section already exists, do nothing.
+
+=item B<--inplace>
+
+Modify file in-place.
+
+Note that this can only be done if you specify an actual file and not STDIN.
+Otherwise, an error will be thrown.
+
+
+=item B<--linum>=I<s>
+
+Put section line at a specific line number (line number starts from 1).
+
+=item B<--section>=I<s>*
+
+=item B<--top>
+
+Add to the beginning of file instead of end.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Parser options
+
+=over
+
+=item B<--default-section>=I<s>
+
+Default value:
+
+ "GLOBAL"
+
+=item B<--disallow-duplicate-key>
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--ini>=I<s>*
+
+INI file.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C insert-ini-section insert-ini-section
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete insert-ini-section 'p/*/`insert-ini-section`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-INIUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-INIUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-INIUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -14,7 +14,7 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use constant SQRT2 => sqrt(2);
 
@@ -268,7 +268,7 @@ sub norm_4way {
                     $best = $nv if $nv < $best and $nv >= $mincost;
                     last if $best == $mincost;
                 }
-                if ( $value > $best + 2 ) {
+                if ( $value >= $best + 2 ) {
                     $dimap->[$r][$c] = $best + 1;
                     $stable = 0;
                 }
@@ -311,8 +311,6 @@ sub norm_8way_euclid {
                     $best = $nr if $nr->[0] < $best->[0] and $nr->[0] >= $mincost;
                     last if $best->[0] == $mincost;
                 }
-                # TODO should this be + 2 like the others or is + SQRT2
-                # a better check?
                 if ( $value > $best->[0] + SQRT2 ) {
                     $dimap->[$r][$c] = $best->[0] + $best->[1];
                     $stable = 0;

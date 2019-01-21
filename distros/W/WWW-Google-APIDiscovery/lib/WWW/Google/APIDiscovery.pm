@@ -1,6 +1,6 @@
 package WWW::Google::APIDiscovery;
 
-$WWW::Google::APIDiscovery::VERSION   = '0.24';
+$WWW::Google::APIDiscovery::VERSION   = '0.25';
 $WWW::Google::APIDiscovery::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::APIDiscovery - Interface to Google API Discovery Service.
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
@@ -22,7 +22,7 @@ use WWW::Google::APIDiscovery::API;
 use WWW::Google::APIDiscovery::API::MetaData;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 extends 'WWW::Google::UserAgent';
 
 our $BASE_URL = 'https://www.googleapis.com/discovery/v1/apis';

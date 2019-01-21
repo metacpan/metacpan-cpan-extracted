@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Scattergeo::Textfont;
 use Chart::Plotly::Trace::Scattergeo::Transform;
 use Chart::Plotly::Trace::Scattergeo::Unselected;
 
-our $VERSION = '0.022';    # VERSION
+our $VERSION = '0.023';    # VERSION
 
 # ABSTRACT: The data visualized as scatter point or lines on a geographic map is provided either by longitude/latitude pairs in `lon` and `lat` respectively or by geographic location IDs or names in `locations`.
 
@@ -290,7 +290,7 @@ Chart::Plotly::Trace::Scattergeo - The data visualized as scatter point or lines
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

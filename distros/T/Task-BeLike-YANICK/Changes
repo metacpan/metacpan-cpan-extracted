@@ -1,41 +1,32 @@
 # Revision history for Task-BeLike-YANICK
 
-0.8.0 2013-01-01
- [ENHANCEMENTS]
- - add App::PAUSE::cleanup, App::cpanoutdated, App::HTTPThis, Module::Info,
-   DBD::Mock and Const::Fast.
+0.9.0 2019-01-21
+  [ ENHANCEMENTS ]
+    - A few new modules.
 
- [STATISTICS]
- - code churn: 3 files changed, 16 insertions(+), 5 deletions(-)
+  [ STATISTICS ]
+    - code churn: 5 files changed, 136 insertions(+), 33 deletions(-)
+
+0.8.0 2013-01-01
+  [ ENHANCEMENTS ]
+    - add App::PAUSE::cleanup, App::cpanoutdated, App::HTTPThis,
+      Module::Info, DBD::Mock and Const::Fast.
 
 0.7.0 2012-06-03
- [ENHANCEMENTS]
- - add Method::Signature, App::GitGot, Carp::Always::Color,
-   Set::CrossProduct, Algorithm:;Combinatorics
+  [ ENHANCEMENTS ]
+    - add Method::Signature, App::GitGot, Carp::Always::Color,
+      Set::CrossProduct, Algorithm:;Combinatorics
 
 0.6.0 2011-06-05
- [ENHANCEMENTS]
- - add App::cpanoutdated, App::HTTPThis, Module::Info and Const::Fast.
+  [ ENHANCEMENTS ]
+    - add App::cpanoutdated, App::HTTPThis, Module::Info and Const::Fast.
 
 0.5.0 2011-01-06
- - add a few more modules
 
 0.4.0 2010-07-03
- - add Pod::POM::Web
- - add Carp::Always
 
 0.3.0 2010-07-03
- - add ability to upgrade dependencies with TASK_UPGRADE
- - abort build for automated testing
- - add Dist::Zilla modules
- - add Module::Which
- - dist::zilify
 
 0.2.0 2009-09-07
- - Added Development section
- - Added Testing section
- - Added WWW::Mechanize to Web Development section
 
 0.1.0 2009-08-22
- - Initial release
-

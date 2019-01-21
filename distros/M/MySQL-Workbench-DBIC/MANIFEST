@@ -36,7 +36,18 @@ t/24_umlaut_comments.t
 t/25_multi_result_namespaces.t
 t/26_single_load_namespace.t
 t/27_detect_double_namespaces.t
+t/28_flags_and_constraints.t
+t/29_check_namespaces.t
+t/30_check_namespace.t
+t/31_has_many_template.t
+t/32_belongs_to_template.t
+t/33_class_template.t
+t/34_column_details.t
+t/35_index_template.t
+t/36_main_template.t
+t/37_write_files.t
 t/DBIC_Schema.pm
+t/MySQL/Workbench/DBIC/Table.pm
 t/Role.pm
 t/Test/MyApp/DB/DBIC_Schema.pm
 t/Test/MyApp/DB/DBIC_Schema/Core/Result/Gefa_User.pm
@@ -48,6 +59,7 @@ t/comment.mwb
 t/comment_umlaut.mwb
 t/comment_umlaut.mwb.bak
 t/fake_dbic.t
+t/flags.mwb
 t/m_to_n.mwb
 t/misc.mwb
 t/more_comments.mwb

@@ -1,39 +1,46 @@
-SYNOPSIS
+NAME
+    Getopt::Long::More - Like Getopt::Long, but with more stuffs
 
+VERSION
+    This document describes version 0.005 of Getopt::Long::More (from Perl
+    distribution Getopt-Long-More), released on 2019-01-20.
+
+SYNOPSIS
      use Getopt::Long::More; # imports GetOptions as well as optspec; you can also
                              # explicitly import Configure, GetOptionsFromArray,
                              # GetOptionsFromString
-    
+
      my %opts;
      GetOptions(
          # just like in Getopt::Long
          'foo=s' => \$opts{foo},
          'bar'   => sub { ... },
-    
+
          # but if you want to specify extra stuffs...
          'baz'   => optspec(
-             # at least specify this, for Getopt::Long
+             # will be passed to Getopt::Long
              handler => \$opts{baz},
-    
+
              # specify that this option is required
              required => 1,
-    
+
              # specify this for default value
              default => 10,
-    
+
              # specify this if you want nicer usage message
              summary => 'Blah blah blah',
-    
+
              # specify longer (multiparagraphs) of text for POD, in POD format
              description => <<'_',
     Blah blah ...
     blah
-
-    Blah blah ... blah blah _
+    Blah blah ...
+    blah blah
+    _
 
              # provide completion from a list of strings
              # completion => [qw/apple apricot banana/],
-    
+
              # provide more advanced completion routine
              completion => sub {
                  require Complete::Util;
@@ -43,11 +50,14 @@ SYNOPSIS
                      array => [ ... ],
                  );
              },
+
+             # other properties: x or x.* or _* are allowed
+             'x.debug' => 'blah',
+             _app_code => {foo=>1},
          ),
      );
 
 DESCRIPTION
-
     This module is a wrapper and drop-in replacement for Getopt::Long. It
     provides the same interface as Getopt::Long and, unlike other wrappers
     like Getopt::Long::Complete or Getopt::Long::Modern it does not change
@@ -56,12 +66,11 @@ DESCRIPTION
     start to use optspec object as one or more option handlers.
 
 OPTSPEC OBJECT
-
     In addition to using scalarref, arrayref, hashref, or coderef as the
-    option handler as Getopt::Long allows, Getopt::Long::More also allows
-    using optspec object as option handler. This allows you to specify more
-    stuffs. Optspec object is created using the optspec function which
-    accepts a list of property name-property value pairs:
+    option handler ("linkage") as Getopt::Long allows, Getopt::Long::More
+    also allows using optspec object as the linkage. This allows you to
+    specify more stuffs. Optspec object is created using the "optspec"
+    function which accepts a list of property name-property value pairs:
 
      '--fruit=s' => optspec(
          handler => \$opts{fruit},
@@ -71,122 +80,110 @@ OPTSPEC OBJECT
          ...
      )
 
-    At least the handler property must be specified, as this will be passed
-    to Getopt::Long when parsing options. In addition to that, these other
+    All properties are optional. Tthe "handler" property will be passed to
+    Getopt::Long when parsing options. In addition to that, these other
     properties are also recognized:
 
- required => bool
-
+  required => bool
     Set this to 1 to specify that the option is required.
 
- default => any
-
+  default => any
     Provide default for the option.
 
- summary => str
-
+  summary => str
     Provide a short summary message for the option. This is used when
     generating usage/help message.
 
- description => str
-
+  description => str
     Provide a longer (multiparagraph) text, in POD format. Will be used to
     generate POD.
 
- completion => array|code
-
+  completion => array|code
     Provide completion routine. Can also be a simple array of strings.
 
     Completion routine will be passed a hash argument, with at least the
-    following keys: word (str, the word to be completed). It is expected to
-    return a completion answer structure (see Complete for mor edetails)
+    following keys: "word" (str, the word to be completed). It is expected
+    to return a completion answer structure (see Complete for mor edetails)
     which is usually just an array of strings.
 
+  x, x.*, _* => any
+    You are allowed to have properties named "x" or anything that begins
+    with "x." or "_". These are ignored by Getopt::Long::More. You can use
+    store comments or whatever additional information here.
+
 FUNCTIONS
-
- Configure
-
+  Configure
     See Getopt::Long documentation.
 
- GetOptionsFromArray
-
+  GetOptionsFromArray
     See Getopt::Long documentation.
 
- GetOptionsFromString
-
+  GetOptionsFromString
     See Getopt::Long documentation.
 
- GetOptions
-
+  GetOptions
     See Getopt::Long documentation.
 
- HelpMessage(@opts_spec) => str
-
+  HelpMessage(@opts_spec) => str
     Will print a usage/help message and exit. Sample result:
 
      myapp [options]
-    
+
      Options:
        --fruit=s     Supply name of fruit to order (default: apple)
        --debug       Enable debug mode
        --help|?      Print help message and exit
        --version     Print usage message and exit
 
- VersionMessage
-
+  VersionMessage
     See Getopt::Long documentation.
 
- OptionsPod(@opts_spec) => str
-
+  OptionsPod(@opts_spec) => str
     Will generate a POD containing list of options. The text will be taken
-    from the summary and description properties of optspec objects. Example
-    result:
+    from the "summary" and "description" properties of optspec objects.
+    Example result:
 
      =head1 OPTIONS
-    
+
      =head2 --fruit|f=s
-    
+
      Supply name of fruit to order.
-    
+
      Blah blah blah
      blah blah ...
-    
+
      =head2 --debug
-    
+
      =head2 --version
-    
+
      Display program version and exit.
-    
+
      =head2 --help
-    
+
      Display help message and exit.
 
- optspec(%props) => obj
-
+  optspec(%props) => obj
     Create optspec object. See "OPTSPEC OBJECT".
 
 COMPLETION
-
     Getopt::Long::Mode supports shell tab completion. To activate tab
-    completion, put your script (e.g. myapp.pl) in PATH and in bash shell
-    type:
+    completion, put your script (e.g. "myapp.pl") in "PATH" and in bash
+    shell type:
 
      % complete -C myapp.pl myapp.pl
 
     You can then complete option names (or option values or command-line
-    arguments too, if you provide completion properties). You can also use
+    arguments too, if you provide "completion" properties). You can also use
     shcompgen to activate shell completion; shcompgen supports several
     shells and various modules.
 
-    Tab completion functionality is provided by Complete::Getopt::Long.
-    Note that this module assumes no_ignore_case and does not support
-    things like getopt_compat (starting option with + instead of --).
+    Tab completion functionality is provided by Complete::Getopt::Long. Note
+    that this module assumes "no_ignore_case" and does not support things
+    like "getopt_compat" (starting option with "+" instead of "--").
 
 FAQ
-
- How do I provide completion for command-line arguments:
-
-    Use the option spec <>:
+  How do I provide completion for command-line arguments:
+    Use the option spec "<>":
 
      GetOptions(
          ...
@@ -198,13 +195,36 @@ FAQ
          ),
      );
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Getopt-Long-More>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Getopt-Long-More>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-More>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Getopt::Long
 
     Other Getopt::Long wrappers that provide extra features:
     Getopt::Long::Complete, Getopt::Long::Descriptive.
 
-    If you want less features instead of more: Getopt::Long::Less,
+    If you want *less* features instead of more: Getopt::Long::Less,
     Getopt::Long::EvenLess.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

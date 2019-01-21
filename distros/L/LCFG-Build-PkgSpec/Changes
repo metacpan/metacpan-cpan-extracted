@@ -1,6 +1,142 @@
-2015-06-24  SVN: new release
+2019-01-18  SVN: new release
 
-	* Release: 0.1.0
+	* Release: 0.2.6
+
+2019-01-18 10:45  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, t/02_pkgspec_basic.t: updated tests for change to
+	  tarname accessor behaviour
+
+2019-01-18 10:43  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/PkgSpec.pm.in: Need to keep the original tar file
+	  name for compatibility. Will instead symlink the Debian name to
+	  the real file
+
+2019-01-18 09:51  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-PkgSpec release:
+	  0.2.5
+
+2019-01-18 09:50  squinney@INF.ED.AC.UK
+
+	* Makefile.PL: Updated minimum perl version to 5.10
+
+2019-01-18 09:49  squinney@INF.ED.AC.UK
+
+	* META.yml.in: quote version strings to be safer
+
+2019-01-18 09:45  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, META.json.in, META.yml.in, README: Updated minimum
+	  perl version to 5.10. Other minor metadata updates
+
+2019-01-18 09:39  squinney@INF.ED.AC.UK
+
+	* Makefile.PL: minor tweak for latest Module::Build
+
+2019-01-18 09:39  squinney@INF.ED.AC.UK
+
+	* debian/control: Added perl modules to build deps so tests can be
+	  run
+
+2019-01-16 16:31  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-PkgSpec release:
+	  0.2.4
+
+2019-01-16 16:31  squinney@INF.ED.AC.UK
+
+	* debian/control: changed debian binary package name to be
+	  'liblcfg-build-pkgspec-perl' so that it is more standard
+
+2019-01-15 16:23  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-PkgSpec release:
+	  0.2.3
+
+2019-01-15 16:22  squinney@INF.ED.AC.UK
+
+	* debian/changelog: Fixed email address in changelog
+
+2019-01-15 16:21  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/PkgSpec.pm.in: Fixed POD errors
+
+2019-01-15 16:19  squinney@INF.ED.AC.UK
+
+	* bin/lcfg-pkgcfg.in: Fixed POD errors
+
+2019-01-15 16:11  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-PkgSpec release:
+	  0.2.2
+
+2019-01-15 16:11  squinney@INF.ED.AC.UK
+
+	* debian, debian/compat, debian/control, debian/copyright,
+	  debian/docs, debian/rules, debian/source, debian/source/format,
+	  lcfg.yml, t/01_load.t, t/03_pkgspec_from_file.t,
+	  t/04_pkgspec_badattr.t, t/05_pkgspec_version.t,
+	  t/06_pkgspec_cfg.t, t/07_pkgspec_savemeta.t, t/08_pkgspec_cfg2.t,
+	  t/09_clone.t: Added debian packaging metadata
+
+2019-01-09 12:54  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-PkgSpec release: 0.2.1
+
+2019-01-09 12:54  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/PkgSpec.pm.in: Added deb_dscname method to make it
+	  easy to get the name of the .dsc file for a project build
+
+2018-12-07 15:59  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-PkgSpec release: 0.2.0
+
+2018-12-07 15:59  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/PkgSpec.pm.in, t/05_pkgspec_version.t:
+	  Added various methods related to debian package names and
+	  versions. Altered the behaviour of dev_version so that it appends
+	  .dev and the release number
+
+2018-12-07 13:07  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-PkgSpec release: 0.1.3
+
+2018-12-07 12:11  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/PkgSpec.pm.in: Added a 'debname' method
+	  which can be used to get a name for the project which can be
+	  safely used for a debian package
+
+2018-12-07 11:54  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-PkgSpec release: 0.1.2
+
+2018-12-07 11:53  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, t/02_pkgspec_basic.t: Updated tests to check new
+	  support for alternate compression in tarname method
+
+2018-12-07 11:49  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/PkgSpec.pm.in: Made it possible to alter the
+	  compression type for the tar file name
+
+2018-12-07 10:14  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-PkgSpec release: 0.1.1
+
+2018-12-07 10:14  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/PkgSpec.pm.in, t/02_pkgspec_basic.t:
+	  Minor tweak to the way the source tar.gz file name is built
+
+2015-06-24 10:11  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-PkgSpec release: 0.1.0
 
 2015-06-24 10:11  squinney@INF.ED.AC.UK
 

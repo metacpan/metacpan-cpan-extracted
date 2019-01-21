@@ -19,8 +19,7 @@ http://www.lcfg.org/doc/buildtools/
 
 ==== DEPENDENCIES ====
 
-This module needs perl 5.8.1 or newer (that's for Moose nothing in
-this code needs it).
+This module needs perl 5.10 or newer.
 
 To build this module you will need the following:
 
@@ -109,7 +108,7 @@ Stephen Quinney <squinney@inf.ed.ac.uk>
 
 ==== COPYRIGHT AND LICENCE ====
 
-Copyright (C) 2008-2011 University of Edinburgh
+Copyright (C) 2008-2019 University of Edinburgh
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GPL, version 2 or later.

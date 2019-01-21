@@ -10,6 +10,7 @@ dist.ini
 lib/App/BinPackUtils.pm
 script/bin-files
 script/bin-files-into-dvds
+script/count-number-of-dvds-required
 script/pack-bins
 t/00-compile.t
 t/author-critic.t

@@ -8,7 +8,7 @@ use strict;
 use Serge::Util qw(subst_macros);
 use version;
 
-our $VERSION = qv('0.900.8');
+our $VERSION = qv('0.901.0');
 
 sub name {
     return 'Transifex translation software (https://www.transifex.com) synchronization plugin';

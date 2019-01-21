@@ -1,5 +1,14 @@
 Revision history for Group-Git-Cmd-Ivan
 
+0.0.4   2019-01-19
+        Updating for release of version 0.0.4
+        Added perl 5.26 to .travis build (Ivan Wills)
+        Updated date (Ivan Wills)
+        Setting minimum version of Group:Git (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Fixed name (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+
 0.0.3   2016-05-22
         Updating for release of version 0.0.3
         tagging that this is a CPAN release (Ivan Wills)

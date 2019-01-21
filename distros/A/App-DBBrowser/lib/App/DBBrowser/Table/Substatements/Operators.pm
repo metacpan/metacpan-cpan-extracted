@@ -64,19 +64,17 @@ sub add_operator_with_value {
     my $trs = Term::Form->new();
     my $stmt = $clause . '_stmt';
     my $args = $clause . '_args';
-    my @extended_signs = @{$sf->{i}{extended_signs}};
     my $ext_sign;
     my @operators;
     my @operators_ext;
     if ( $clause eq 'set' ) {
-        splice( @extended_signs, -2, 0, '=N' );
-        $ext_sign = $extended_signs[$sf->{o}{G}{"extend_$clause"}];
-        @operators     = ( " = " );
+        $ext_sign = $sf->{i}{extended_signs_set}[ $sf->{o}{extend}{$clause} ];
+        @operators = ( " = " );
         @operators_ext = ( " = " );
     }
     else {
-        $ext_sign = '=' . $extended_signs[$sf->{o}{G}{"extend_$clause"}];
-        @operators     = @{$sf->{o}{G}{operators}};
+        $ext_sign = '=' . $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
+        @operators = @{$sf->{o}{G}{operators}};
         @operators_ext = ( "IN", "NOT IN", " = ", " != ", " < ", " > ", " >= ", " <= " );
     }
     if ( $ext_sign ) {
@@ -126,43 +124,29 @@ sub add_operator_with_value {
             }
         }
         $op =~ s/^\s+|\s+\z//g;
+        my $ok;
         if ( $op =~ /^IS\s(?:NOT\s)?NULL\z/ ) {
             $sql->{$stmt} .= ' ' . $op;
+            $ok = 1;
         }
         elsif ( $op =~ /\s%?col%?\z/ ) {
-            my $ok = $sf->__col_op( $sql, $op, $stmt, $stmt_h );
-            if ( ! $ok ) {
-                $sql->{$stmt} = $bu_stmt;
-                next OPERATOR;
-            }
+            $ok = $sf->__col_op( $sql, $op, $stmt, $stmt_h );
         }
         elsif ( $op =~ /REGEXP(_i)?\z/ ) {
-            my $ok = $sf->__regex_op( $sql, $op, $stmt, $args, $quote_col );
-            if ( ! $ok ) {
-                $sql->{$stmt} = $bu_stmt;
-                next OPERATOR;
-            }
+            $ok = $sf->__regex_op( $sql, $op, $stmt, $args, $quote_col );
         }
         elsif ( $op =~ /^(?:NOT\s)?IN\z/ ) {
-            my $ok = $sf->__in_op( $sql, $op, $stmt, $args, $ext_col );
-            if ( ! $ok ) {
-                $sql->{$stmt} = $bu_stmt;
-                next OPERATOR;
-            }
+            $ok = $sf->__in_op( $sql, $op, $stmt, $args, $ext_col );
         }
         elsif ( $op =~ /^(?:NOT\s)?BETWEEN\z/ ) {
-            my $ok = $sf->__between_op( $sql, $op, $stmt, $args );
-            if ( ! $ok ) {
-                $sql->{$stmt} = $bu_stmt;
-                next OPERATOR;
-            }
+            $ok = $sf->__between_op( $sql, $op, $stmt, $args );
         }
         else {
-            my $ok = $sf->__default_op( $sql, $op, $stmt, $args, $ext_col );
-            if ( ! $ok ) {
-                $sql->{$stmt} = $bu_stmt;
-                next OPERATOR;
-            }
+            $ok = $sf->__default_op( $sql, $op, $stmt, $args, $ext_col );
+        }
+        if ( ! $ok ) {
+            $sql->{$stmt} = $bu_stmt;
+            next OPERATOR;
         }
         last OPERATOR;
     }

@@ -16,6 +16,7 @@ lib/Data/iRealPro/Output/Forum.pm
 lib/Data/iRealPro/Output/HTML.pm
 lib/Data/iRealPro/Output/Imager.pm
 lib/Data/iRealPro/Output/JSON.pm
+lib/Data/iRealPro/Output/MMA.pm
 lib/Data/iRealPro/Output/Text.pm
 lib/Data/iRealPro/Playlist.pm
 lib/Data/iRealPro/Song.pm
@@ -47,6 +48,8 @@ t/23-text.t
 t/24-text.t
 t/25-text.t
 t/26-forum.t
+t/27-mma.t
+t/28-mma.t
 t/30-chords.t
 t/31-chords.t
 t/32-chords.t

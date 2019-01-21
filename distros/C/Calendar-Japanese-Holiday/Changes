@@ -1,5 +1,8 @@
 Revision history for Perl extension Calendar::Japanese::Holiday.
 
+0.05  Sat Jan 19 2019
+	Supported 2019-2021 years
+
 0.04  Tue Jan 6 2015
 	Added Yama-no-hi.
 

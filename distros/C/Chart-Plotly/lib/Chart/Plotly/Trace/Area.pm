@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Area::Marker;
 use Chart::Plotly::Trace::Area::Stream;
 use Chart::Plotly::Trace::Area::Transform;
 
-our $VERSION = '0.022';    # VERSION
+our $VERSION = '0.023';    # VERSION
 
 # ABSTRACT:
 
@@ -176,7 +176,7 @@ Chart::Plotly::Trace::Area -
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

@@ -3,8 +3,8 @@ NAME
     into bins
 
 VERSION
-    This document describes version 0.002 of App::BinPackUtils (from Perl
-    distribution App-BinPackUtils), released on 2019-01-16.
+    This document describes version 0.003 of App::BinPackUtils (from Perl
+    distribution App-BinPackUtils), released on 2019-01-17.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:
@@ -13,9 +13,12 @@ DESCRIPTION
 
     *   bin-files-into-dvds
 
+    *   count-number-of-dvds-required
+
     *   pack-bins
 
-    Keywords: binpack, bin pack, packbin, pack bins, packing, binning.
+    Keywords: binpack, bin pack, packbin, pack bins, packing, binning, dvd
+    planning, files packing.
 
 FUNCTIONS
   bin_files
@@ -39,6 +42,10 @@ FUNCTIONS
 
         Actually move the files to the bins.
 
+    *   num_bins => *true*
+
+        Just return the number of bins required.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -61,7 +68,49 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   bin_size => *filesize* (default: 4712300544)
+    *   dvd_size => *filesize* (default: 4712300544)
+
+    *   files* => *array[filename]*
+
+    *   move => *bool*
+
+        Actually move the files to the bins.
+
+    *   num_dvds => *true*
+
+        Just return the number of DVDs required.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  count_number_of_dvds_required
+    Usage:
+
+     count_number_of_dvds_required(%args) -> [status, msg, payload, meta]
+
+    Count the number of DVDs required to contain the files.
+
+    This:
+
+     % count-number-of-dvds-requires *
+
+    is a shortcut for:
+
+     % bin-files-into-dvds -n *
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dvd_size => *filesize* (default: 4712300544)
 
     *   files* => *array[filename]*
 
@@ -129,6 +178,10 @@ FUNCTIONS
 
         Each item should be in this format: "label,size" (or an array with
         two elements, the first one is the label and the second its size).
+
+    *   num_bins => *true*
+
+        Just return the number of bins required.
 
     Returns an enveloped result (an array).
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.106';
+our $VERSION = '0.107';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -22,6 +22,7 @@ use Term::TablePrint::ProgressBar qw();
 my $Plugin;
 BEGIN {
     if ( $^O eq 'MSWin32' ) {
+        require Win32::Console::ANSI;
         require Term::Choose::Win32;
         $Plugin = 'Term::Choose::Win32';
     }
@@ -50,7 +51,7 @@ sub new {
 
 sub DESTROY {
     my ( $self ) = @_;
-    $self->{plugin}->__show_cursor();
+    print SHOW_CURSOR;
 }
 
 
@@ -153,7 +154,7 @@ sub print_table {
         $self->{row_idxs} = [ 0 .. $#$table_ref ];
     }
     local $| = 1;
-    $self->{plugin}->__hide_cursor();
+    print HIDE_CURSOR;
     if ( $self->{choose_columns}  ) {
         $self->{chosen_cols} = $self->__choose_columns( $table_ref->[0] );
         if ( ! defined $self->{chosen_cols} ) {
@@ -187,7 +188,7 @@ sub print_table {
             }
         }
     }
-    $self->{plugin}->__show_cursor();
+    print SHOW_CURSOR;
 }
 
 
@@ -235,8 +236,8 @@ sub __recursive_code {
             $self->__recursive_code();
             return;
         }
-        if ( ( $self->{keep_header} && ! @$list ) || ( ! $self->{keep_header} && @$list == 1 ) ) {
-            push @$list, '';
+        if ( $self->{keep_header} && ! @$list ) {
+            push @$list, ''; # so that going back requires always the same amount of keystrokes
         }
         $ENV{TC_RESET_AUTO_UP} = 0;
         my $row = choose(
@@ -570,8 +571,9 @@ sub __choose_columns {
         my $choices = [ @pre, @cols ];
         my @idx = choose(
             $choices,
-            { prompt => $prompt, lf => [ 0, $s_tab ], clear_screen => 1, undef => '<<', meta_items => [ 0 .. $#pre ],
-              index => 1, mouse => $self->{mouse}, include_highlighted => 2, hide_cursor => 0 }
+            { prompt => $prompt, lf => [ 0, $s_tab ], clear_screen => 1, undef => '<<',
+              meta_items => [ 0 .. $#pre ], index => 1, mouse => $self->{mouse}, include_highlighted => 2,
+              hide_cursor => 0, codepage_mapping => $self->{codepage_mapping} }
         );
         if ( ! @idx || $idx[0] == 0 ) {
             if ( @$col_idxs ) {
@@ -696,7 +698,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.106
+Version 0.107
 
 =cut
 
@@ -874,9 +876,13 @@ Default: . (dot)
 
 =head3 codepage_mapping
 
-This option has only meaning if the operating system is MSWin32 and the option I<color> is enabled.
+This option has only meaning if the operating system is MSWin32.
 
-By setting this option to C<1> one can enable the codepage mapping offered by L<Win32::Console::ANSI>.
+If the OS is MSWin32, L<Win32::Console::ANSI> is used. By default C<Win32::Console::ANSI> converts the characters from
+Windows code page to DOS code page (the so-called ANSI to OEM conversion). This conversation is disabled by default in
+C<Term::Choose> but one can enable it by setting this option.
+
+Setting this option to C<1> enables the codepage mapping offered by L<Win32::Console::ANSI>.
 
 0 - disable automatic codepage mapping
 
@@ -889,9 +895,6 @@ Default: 0
 Setting this option to C<1> enables the support for color and text formatting escape sequences.
 
 At the end of each row it is added automatically a reset (C<\e[0m>) if I<color> is enabled.
-
-If the OS is MSWin32 and this option is enabled, C<Term::Choose> loads L<Win32::Console::ANSI>. C<Win32::Console::ANSI>
-emulates an ANSI console. See also the option L</codepage_mapping>.
 
 Default: 0
 
@@ -1033,7 +1036,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2018 Matthäus Kiem.
+Copyright 2013-2019 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

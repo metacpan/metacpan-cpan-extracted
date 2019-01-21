@@ -1,5 +1,5 @@
 {
-   "abstract" : "Class library",
+   "abstract" : "Class library for rapid development",
    "author" : [
       "Frank Seitz <fs@fseitz.de>"
    ],
@@ -59,6 +59,6 @@
          "web" : "https://github.com/s31tz/Quiq"
       }
    },
-   "version" : 1.129,
+   "version" : 1.131,
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Estimates the length of all the vectors in an SVG file.",
+   "author" : [
+      "JT Smith <jt@plainblack.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SVG-Estimate",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0",
+            "File::Slurp" : "0",
+            "Image::SVG::Path" : "0.23",
+            "Image::SVG::Transform" : "0.04",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Math::Trig" : "0",
+            "Moo" : "0",
+            "Ouch" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "XML::Hash::LX" : "0",
+            "XML::LibXML" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/rizen/SVG-Estimate/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rizen/SVG-Estimate.git",
+         "web" : "http://github.com/rizen/SVG-Estimate"
+      }
+   },
+   "version" : "1.0111",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

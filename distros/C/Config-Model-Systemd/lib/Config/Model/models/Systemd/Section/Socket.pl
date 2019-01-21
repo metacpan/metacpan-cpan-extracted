@@ -56,8 +56,8 @@ suffix replaced, unless overridden with C<Service>;
 or it must be a template unit named the same way. Example: a
 socket file foo.socket needs a matching
 service foo.service if
-C<Accept=false> is set. If
-C<Accept=true> is set, a service template file
+C<Accept=no> is set. If
+C<Accept=yes> is set, a service template file
 foo@.service must exist from which services
 are instantiated for each incoming connection.
 
@@ -82,6 +82,17 @@ L<inetd(8)>-style
 socket passing (i.e. sockets passed in via standard input and
 output, using C<StandardInput=socket> in the
 service file).
+
+All network sockets allocated through .socket units are allocated in the host\'s network
+namespace (see L<network_namespaces(7)>). This
+does not mean however that the service activated by a configured socket unit has to be part of the host\'s network
+namespace as well.  It is supported and even good practice to run services in their own network namespace (for
+example through C<PrivateNetwork>, see
+L<systemd.exec(5)>), receiving only
+the sockets configured through socket-activation from the host\'s namespace. In such a set-up communication within
+the host\'s network namespace is only permitted through the activation sockets passed in while all sockets allocated
+from the service code itself will be associated with the service\'s own namespace, and thus possibly subject to a a
+much more restrictive configuration.
 This configuration class was generated from systemd documentation.
 by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>
 ',
@@ -406,16 +417,25 @@ C<USBFunctionStrings> options set.
       },
       'SocketProtocol',
       {
-        'description' => 'Takes a one of C<udplite>
+        'choice' => [
+          'udplite',
+          'sctp'
+        ],
+        'description' => 'Takes one of C<udplite>
 or C<sctp>. Specifies a socket protocol
 (C<IPPROTO_UDPLITE>) UDP-Lite
 (C<IPPROTO_SCTP>) SCTP socket respectively. ',
         'type' => 'leaf',
-        'value_type' => 'uniline'
+        'value_type' => 'enum'
       },
       'BindIPv6Only',
       {
-        'description' => 'Takes a one of C<default>,
+        'choice' => [
+          'default',
+          'both',
+          'ipv6-only'
+        ],
+        'description' => 'Takes one of C<default>,
 C<both> or C<ipv6-only>. Controls
 the IPV6_V6ONLY socket option (see
 L<ipv6(7)>
@@ -429,7 +449,7 @@ controlled by
 turn defaults to the equivalent of
 C<both>.',
         'type' => 'leaf',
-        'value_type' => 'uniline'
+        'value_type' => 'enum'
       },
       'Backlog',
       {
@@ -512,17 +532,17 @@ where a single service unit unconditionally handles all
 incoming traffic. Defaults to C<false>. For
 performance reasons, it is recommended to write new daemons
 only in a way that is suitable for
-C<Accept=false>. A daemon listening on an
+C<Accept=no>. A daemon listening on an
 C<AF_UNIX> socket may, but does not need to,
 call
 L<close(2)>
 on the received socket before exiting. However, it must not
 unlink the socket from a file system. It should not invoke
 L<shutdown(2)>
-on sockets it got with C<Accept=false>, but it
+on sockets it got with C<Accept=no>, but it
 may do so for sockets it got with
-C<Accept=true> set. Setting
-C<Accept=true> is mostly useful to allow
+C<Accept=yes> set. Setting
+C<Accept=yes> is mostly useful to allow
 daemons designed for usage with
 L<inetd(8)>
 to work unmodified with systemd socket
@@ -556,11 +576,11 @@ false, in read-only mode. Defaults to false.',
       {
         'description' => 'The maximum number of connections to
 simultaneously run services instances for, when
-C<Accept=true> is set. If more concurrent
+C<Accept=yes> is set. If more concurrent
 connections are coming in, they will be refused until at least
 one existing connection is terminated. This setting has no
 effect on sockets configured with
-C<Accept=false> or datagram sockets. Defaults to
+C<Accept=no> or datagram sockets. Defaults to
 64.',
         'type' => 'leaf',
         'value_type' => 'uniline'

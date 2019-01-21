@@ -26,7 +26,7 @@ no_index:
 provides:
   App::MigrateModules:
     file: lib/App/MigrateModules.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   File::Spec: '0'
   File::Temp: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/Grinnz/App-MigrateModules/issues
   homepage: https://github.com/Grinnz/App-MigrateModules
   repository: https://github.com/Grinnz/App-MigrateModules.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -185,7 +185,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

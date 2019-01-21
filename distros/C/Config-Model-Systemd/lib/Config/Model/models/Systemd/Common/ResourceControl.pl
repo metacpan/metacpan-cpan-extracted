@@ -84,8 +84,6 @@ C<CPUWeight> applies to normal runtime of the system, and if the former is not s
 the startup phase. Using C<StartupCPUWeight> allows prioritizing specific services at
 boot-up differently than during normal runtime.
 
-Implies C<CPUAccounting=true>.
-
 These settings replace C<CPUShares> and C<StartupCPUShares>.',
         'max' => '10000',
         'min' => '1',
@@ -106,8 +104,6 @@ C<CPUWeight> applies to normal runtime of the system, and if the former is not s
 the startup phase. Using C<StartupCPUWeight> allows prioritizing specific services at
 boot-up differently than during normal runtime.
 
-Implies C<CPUAccounting=true>.
-
 These settings replace C<CPUShares> and C<StartupCPUShares>.',
         'max' => '10000',
         'min' => '1',
@@ -121,12 +117,10 @@ These settings replace C<CPUShares> and C<StartupCPUShares>.',
 "%". The percentage specifies how much CPU time the unit shall get at maximum, relative to the total CPU time
 available on one CPU. Use values > 100% for allotting CPU time on more than one CPU. This controls the
 C<cpu.max> attribute on the unified control group hierarchy and
-C<cpu.cfs_quota_us> on legacy. For details about these control group attributes, see cgroup-v2.txt and sched-design-CFS.txt.
+C<cpu.cfs_quota_us> on legacy. For details about these control group attributes, see cgroup-v2.txt and sched-bwc.txt.
 
 Example: C<CPUQuota=20%> ensures that the executed processes will never get more than
-20% CPU time on one CPU.
-
-Implies C<CPUAccounting=true>.',
+20% CPU time on one CPU.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -147,6 +141,22 @@ L<systemd-system.conf(5)>.',
           'yes'
         ]
       },
+      'MemoryMin',
+      {
+        'description' => 'Specify the memory usage protection of the executed processes in this unit. If the memory usages of
+this unit and all its ancestors are below their minimum boundaries, this unit\'s memory won\'t be reclaimed.
+
+Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
+percentage value may be specified, which is taken relative to the installed physical memory on the
+system. This controls the C<memory.min> control group attribute. For details about this
+control group attribute, see cgroup-v2.txt.
+
+This setting is supported only if the unified control group hierarchy is used and disables
+C<MemoryLimit>.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'MemoryLow',
       {
         'description' => 'Specify the best-effort memory usage protection of the executed processes in this unit. If the memory
@@ -158,8 +168,6 @@ parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), re
 percentage value may be specified, which is taken relative to the installed physical memory on the
 system. This controls the C<memory.low> control group attribute. For details about this
 control group attribute, see cgroup-v2.txt.
-
-Implies C<MemoryAccounting=true>.
 
 This setting is supported only if the unified control group hierarchy is used and disables
 C<MemoryLimit>.',
@@ -180,8 +188,6 @@ special value C<infinity>, no memory limit is applied. This controls the
 C<memory.high> control group attribute. For details about this control group attribute, see
 cgroup-v2.txt.
 
-Implies C<MemoryAccounting=true>.
-
 This setting is supported only if the unified control group hierarchy is used and disables
 C<MemoryLimit>.',
         'type' => 'leaf',
@@ -201,8 +207,6 @@ assigned the special value C<infinity>, no memory limit is applied. This control
 C<memory.max> control group attribute. For details about this control group attribute, see
 cgroup-v2.txt.
 
-Implies C<MemoryAccounting=true>.
-
 This setting replaces C<MemoryLimit>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -216,8 +220,6 @@ parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), re
 special value C<infinity>, no swap limit is applied. This controls the
 C<memory.swap.max> control group attribute. For details about this control group attribute,
 see cgroup-v2.txt.
-
-Implies C<MemoryAccounting=true>.
 
 This setting is supported only if the unified control group hierarchy is used and disables
 C<MemoryLimit>.',
@@ -254,7 +256,7 @@ system.  If assigned the special value C<infinity>, no tasks limit is applied. T
 the C<pids.max> control group attribute. For details about this control group attribute, see
 pids.txt.
 
-Implies C<TasksAccounting=true>. The
+The
 system default for this setting may be controlled with
 C<DefaultTasksMax> in
 L<systemd-system.conf(5)>.',
@@ -294,8 +296,6 @@ the system, and if the former is not set also to the startup
 phase. This allows prioritizing specific services at boot-up
 differently than during runtime.
 
-Implies C<IOAccounting=true>.
-
 These settings replace C<BlockIOWeight> and C<StartupBlockIOWeight>
 and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>.',
         'type' => 'leaf',
@@ -316,8 +316,6 @@ the system, and if the former is not set also to the startup
 phase. This allows prioritizing specific services at boot-up
 differently than during runtime.
 
-Implies C<IOAccounting=true>.
-
 These settings replace C<BlockIOWeight> and C<StartupBlockIOWeight>
 and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>.',
         'type' => 'leaf',
@@ -327,13 +325,11 @@ and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>.',
       {
         'description' => 'Set the per-device overall block I/O weight for the executed processes, if the unified control group
 hierarchy is used on the system. Takes a space-separated pair of a file path and a weight value to specify
-the device specific weight value, between 1 and 10000. (Example: "/dev/sda 1000"). The file path may be
-specified as path to a block device node or as any other file, in which case the backing block device of the
-file system of the file is determined. This controls the C<io.weight> control group
-attribute, which defaults to 100. Use this option multiple times to set weights for multiple devices. For
-details about this control group attribute, see cgroup-v2.txt.
-
-Implies C<IOAccounting=true>.
+the device specific weight value, between 1 and 10000. (Example: C</dev/sda 1000>). The file
+path may be specified as path to a block device node or as any other file, in which case the backing block
+device of the file system of the file is determined. This controls the C<io.weight> control
+group attribute, which defaults to 100. Use this option multiple times to set weights for multiple devices.
+For details about this control group attribute, see cgroup-v2.txt.
 
 This setting replaces C<BlockIODeviceWeight> and disables settings prefixed with
 C<BlockIO> or C<StartupBlockIO>.',
@@ -352,8 +348,6 @@ parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes, respectively, to the ba
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5M"). This controls the C<io.max> control
 group attributes. Use this option multiple times to set bandwidth limits for multiple devices. For details
 about this control group attribute, see cgroup-v2.txt.
-
-Implies C<IOAccounting=true>.
 
 These settings replace C<BlockIOReadBandwidth> and
 C<BlockIOWriteBandwidth> and disable settings prefixed with C<BlockIO> or
@@ -374,8 +368,6 @@ parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes, respectively, to the ba
 group attributes. Use this option multiple times to set bandwidth limits for multiple devices. For details
 about this control group attribute, see cgroup-v2.txt.
 
-Implies C<IOAccounting=true>.
-
 These settings replace C<BlockIOReadBandwidth> and
 C<BlockIOWriteBandwidth> and disable settings prefixed with C<BlockIO> or
 C<StartupBlockIO>.',
@@ -395,8 +387,6 @@ GigaIOPS, or TeraIOPS, respectively, to the base of 1000. (Example:
 group attributes. Use this option multiple times to set IOPS limits for multiple devices. For details about
 this control group attribute, see cgroup-v2.txt.
 
-Implies C<IOAccounting=true>.
-
 These settings are supported only if the unified control group hierarchy is used and disable settings
 prefixed with C<BlockIO> or C<StartupBlockIO>.',
         'type' => 'leaf',
@@ -415,10 +405,24 @@ GigaIOPS, or TeraIOPS, respectively, to the base of 1000. (Example:
 group attributes. Use this option multiple times to set IOPS limits for multiple devices. For details about
 this control group attribute, see cgroup-v2.txt.
 
-Implies C<IOAccounting=true>.
-
 These settings are supported only if the unified control group hierarchy is used and disable settings
 prefixed with C<BlockIO> or C<StartupBlockIO>.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'IODeviceLatencyTargetSec',
+      {
+        'description' => 'Set the per-device average target I/O latency for the executed processes, if the unified control group
+hierarchy is used on the system. Takes a file path and a timespan separated by a space to specify
+the device specific latency target. (Example: "/dev/sda 25ms"). The file path may be specified
+as path to a block device node or as any other file, in which case the backing block device of the file
+system of the file is determined. This controls the C<io.latency> control group
+attribute. Use this option multiple times to set latency target for multiple devices. For details about this
+control group attribute, see cgroup-v2.txt.
+
+Implies C<IOAccounting=yes>.
+
+These settings are supported only if the unified control group hierarchy is used.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -628,7 +632,29 @@ C<io>, C<blkio>, C<memory>, C<devices>,
 C<pids>. Not all of these controllers are available on all kernels however, and some are
 specific to the unified hierarchy while others are specific to the legacy hierarchy. Also note that the
 kernel might support further controllers, which aren\'t covered here yet as delegation is either not supported
-at all for them or not defined cleanly.',
+at all for them or not defined cleanly.
+
+For further details on the delegation model consult Control Group APIs and Delegation.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'DisableControllers',
+      {
+        'description' => 'Disables controllers from being enabled for a unit\'s children. If a controller listed is already in use
+in its subtree, the controller will be removed from the subtree. This can be used to avoid child units being
+able to implicitly or explicitly enable a controller. Defaults to not disabling any controllers.
+
+It may not be possible to successfully disable a controller if the unit or any child of the unit in
+question delegates controllers to its children, as any delegated subtree of the cgroup hierarchy is unmanaged
+by systemd.
+
+Multiple controllers may be specified, separated by spaces. You may also pass
+C<DisableControllers> multiple times, in which case each new instance adds another controller
+to disable. Passing C<DisableControllers> by itself with no controller name present resets
+the disabled controller list.
+
+Valid controllers are C<cpu>, C<cpuacct>, C<io>,
+C<blkio>, C<memory>, C<devices>, and C<pids>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -645,7 +671,7 @@ C<CPUShares> applies to normal runtime of the system, and if the former is not s
 the startup phase. Using C<StartupCPUShares> allows prioritizing specific services at
 boot-up differently than during normal runtime.
 
-Implies C<CPUAccounting=true>.
+Implies C<CPUAccounting=yes>.
 
 These settings are deprecated. Use C<CPUWeight> and
 C<StartupCPUWeight> instead.',
@@ -668,7 +694,7 @@ C<CPUShares> applies to normal runtime of the system, and if the former is not s
 the startup phase. Using C<StartupCPUShares> allows prioritizing specific services at
 boot-up differently than during normal runtime.
 
-Implies C<CPUAccounting=true>.
+Implies C<CPUAccounting=yes>.
 
 These settings are deprecated. Use C<CPUWeight> and
 C<StartupCPUWeight> instead.',
@@ -689,7 +715,7 @@ C<infinity>, no memory limit is applied. This controls the
 C<memory.limit_in_bytes> control group attribute. For details about this control group
 attribute, see memory.txt.
 
-Implies C<MemoryAccounting=true>.
+Implies C<MemoryAccounting=yes>.
 
 This setting is deprecated. Use C<MemoryMax> instead.',
         'type' => 'leaf',
@@ -729,7 +755,7 @@ startup phase. This allows prioritizing specific services at
 boot-up differently than during runtime.
 
 Implies
-C<BlockIOAccounting=true>.
+C<BlockIOAccounting=yes>.
 
 These settings are deprecated. Use C<IOWeight> and C<StartupIOWeight>
 instead.',
@@ -753,7 +779,7 @@ startup phase. This allows prioritizing specific services at
 boot-up differently than during runtime.
 
 Implies
-C<BlockIOAccounting=true>.
+C<BlockIOAccounting=yes>.
 
 These settings are deprecated. Use C<IOWeight> and C<StartupIOWeight>
 instead.',
@@ -771,7 +797,7 @@ attribute, which defaults to 1000. Use this option multiple times to set weights
 details about this control group attribute, see blkio-controller.txt.
 
 Implies
-C<BlockIOAccounting=true>.
+C<BlockIOAccounting=yes>.
 
 This setting is deprecated. Use C<IODeviceWeight> instead.',
         'type' => 'leaf',
@@ -791,7 +817,7 @@ control group attributes. Use this option multiple times to set bandwidth limits
 details about these control group attributes, see blkio-controller.txt.
 
 Implies
-C<BlockIOAccounting=true>.
+C<BlockIOAccounting=yes>.
 
 These settings are deprecated. Use C<IOReadBandwidthMax> and
 C<IOWriteBandwidthMax> instead.',
@@ -812,7 +838,7 @@ control group attributes. Use this option multiple times to set bandwidth limits
 details about these control group attributes, see blkio-controller.txt.
 
 Implies
-C<BlockIOAccounting=true>.
+C<BlockIOAccounting=yes>.
 
 These settings are deprecated. Use C<IOReadBandwidthMax> and
 C<IOWriteBandwidthMax> instead.',

@@ -4,13 +4,13 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dancer2-Plugin-WebSocket",
    "prereqs" : {
@@ -41,7 +41,11 @@
       },
       "test" : {
          "recommends" : {
-            "CPAN::Meta" : "2.120900"
+            "CPAN::Meta" : "2.120900",
+            "EV" : "0",
+            "Mojolicious" : "0",
+            "Plack::Util" : "0",
+            "Twiggy::Server" : "0"
          },
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
@@ -49,6 +53,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
+            "Test::Requires" : "0",
             "perl" : "5.006"
          }
       }
@@ -56,15 +61,15 @@
    "provides" : {
       "Dancer2::Plugin::WebSocket" : {
          "file" : "lib/Dancer2/Plugin/WebSocket.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       },
       "Dancer2::Plugin::WebSocket::Connection" : {
          "file" : "lib/Dancer2/Plugin/WebSocket/Connection.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       },
       "Dancer2::Plugin::WebSocket::Group" : {
          "file" : "lib/Dancer2/Plugin/WebSocket/Group.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       }
    },
    "release_status" : "stable",
@@ -79,14 +84,18 @@
          "web" : "https://github.com/yanick/Dancer2-Plugin-WebSocket"
       }
    },
-   "version" : "0.1.1",
+   "version" : "0.1.2",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
    "x_contributors" : [
       "Frank Schreiner <schreiner@suse.de>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

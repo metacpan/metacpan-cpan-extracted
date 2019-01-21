@@ -1,6 +1,619 @@
-2016-07-12  SVN: new release
+2019-01-18  SVN: new release
 
-	* Release: 0.6.6
+	* Release: 0.9.18
+
+2019-01-18 15:19  squinney@INF.ED.AC.UK
+
+	* debian/changelog: fixed broken email address
+
+2019-01-18 15:19  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.17
+
+2019-01-18 15:19  squinney@INF.ED.AC.UK
+
+	* debian/control: fixed missing comma in Build-Depends-Indep
+
+2019-01-18 15:09  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.16
+
+2019-01-18 15:09  squinney@INF.ED.AC.UK
+
+	* LCFG-Build-Tools.spec: Need to build-depend on perl(File::pushd)
+	  for tests
+
+2019-01-18 15:04  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.15
+
+2019-01-18 15:04  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, META.json.in, META.yml.in, Makefile.PL, README,
+	  lcfg.yml: various updates to deps lists and other project
+	  metadata
+
+2019-01-18 15:04  squinney@INF.ED.AC.UK
+
+	* debian/control: Bumped dep on liblcfg-build-vcs-perl to 0.3.7,
+	  added dep on libfile-pushd-perl
+
+2019-01-18 15:01  squinney@INF.ED.AC.UK
+
+	* LCFG-Build-Tools.spec, lib/LCFG/Build/Tool.pm.in: bumped dep on
+	  LCFG::Build::PkgSpec to 0.2.6
+
+2019-01-18 11:56  squinney@INF.ED.AC.UK
+
+	* Build.PL.in: updated deps
+
+2019-01-18 11:56  squinney@INF.ED.AC.UK
+
+	* README: updated instructions
+
+2019-01-18 11:51  squinney@INF.ED.AC.UK
+
+	* debian/control: Added all perl modules to build-deps so tests
+	  will run
+
+2019-01-18 11:42  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/Debian.pm.in: Generate a symlink to the
+	  source tar file which has the correct name for Debian packages
+
+2019-01-17 16:26  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.14
+
+2019-01-17 16:22  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/Debian.pm.in: Fixed copying of build
+	  products back to the results directory
+
+2019-01-17 16:14  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.13
+
+2019-01-17 16:05  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/Debian.pm.in: Fixed working directory for
+	  generate_debtar. Fixed parsing of output from dpkg-source
+
+2019-01-17 16:05  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils.pm.in: Improved switching between working
+	  directories in generate_srctar
+
+2019-01-17 15:07  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.12
+
+2019-01-17 15:06  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-Tools.spec, META.json.in, META.yml.in,
+	  Makefile.PL, lcfg.yml: Require 0.3.7 or newer for
+	  LCFG::Build::VCS
+
+2019-01-17 15:06  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Utils/Debian.pm.in: update debian/changelog for
+	  devel releases
+
+2019-01-16 16:35  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.11
+
+2019-01-16 16:35  squinney@INF.ED.AC.UK
+
+	* debian/control: Fixed names of lcfg build tools packages. Also
+	  recommend build-essential package
+
+2019-01-16 16:25  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.10
+
+2019-01-16 16:25  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/DebianPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevDebianPkg.pm.in: updated the docs
+
+2019-01-16 16:21  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/DevRPM.pm.in, lib/LCFG/Build/Tool/RPM.pm.in:
+	  Set minimum perl version to 5.10
+
+2019-01-16 16:07  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Tool/DebianPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevDebianPkg.pm.in, t/01_load.t: Added 'dev'
+	  version of debian package builder
+
+2019-01-16 11:52  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Utils/Debian.pm.in: fixed incorrect
+	  variable name
+
+2019-01-16 11:47  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/Debian.pm.in: Added support for sourceonly,
+	  nodeps and sign options
+
+2019-01-16 11:38  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/Debian.pm.in: Added support for running
+	  debuild
+
+2019-01-16 10:46  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Tool/Debian.pm.in,
+	  lib/LCFG/Build/Tool/DebianPkg.pm.in, t/01_load.t: renamed module
+	  for clarity
+
+2019-01-16 10:44  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/Debian.pm.in: Made a start on support for
+	  building debian packages
+
+2019-01-16 10:42  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/Debian.pm.in: Made a start on support for
+	  building debian packages
+
+2019-01-16 09:55  squinney@INF.ED.AC.UK
+
+	* debian/control: Altered debian binary package name to match with
+	  standard perl module naming convention
+
+2019-01-15 16:57  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.9
+
+2019-01-15 16:55  squinney@INF.ED.AC.UK
+
+	* debian/changelog: Fixed errors in early entries
+
+2019-01-15 16:54  squinney@INF.ED.AC.UK
+
+	* bin/lcfg-reltool.in: Fixed POD errors
+
+2019-01-15 16:47  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.8
+
+2019-01-15 16:47  squinney@INF.ED.AC.UK
+
+	* debian/control: Updated homepage
+
+2019-01-15 16:46  squinney@INF.ED.AC.UK
+
+	* debian/control: Updated dependencies
+
+2019-01-15 16:00  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.7
+
+2019-01-10 16:21  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Utils/Debian.pm.in: Tweaked log messages
+
+2019-01-10 15:31  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/Pack.pm.in, lib/LCFG/Build/Utils.pm.in,
+	  lib/LCFG/Build/Utils/Debian.pm.in: Introduced a new way of
+	  calling methods on util plugins and added support for
+	  generate_metadata_post which is called after the source tar file
+	  is created
+
+2019-01-10 14:48  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Utils/Debian.pm.in: Call generate_debtar from
+	  generate_dsc so that only a single subroutine needs to be called
+	  from a Tool module
+
+2019-01-10 14:45  squinney@INF.ED.AC.UK
+
+	* templates/dsc.tt: No need to append release number to debian
+	  version, that now comes directly from the changelog
+
+2019-01-10 14:38  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Utils/Debian.pm.in: forgot to declare
+	  $version
+
+2019-01-10 14:36  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Utils/Debian.pm.in: Alternate approach to getting
+	  the debian package version which more closely matches the 'debian
+	  way'
+
+2019-01-10 12:38  squinney@INF.ED.AC.UK
+
+	* templates/dsc.tt: Set the debian release to 1
+
+2019-01-10 12:36  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Utils/Debian.pm.in, templates/dsc.tt: Pass in the
+	  package version when generating the debian dsc file
+
+2019-01-10 12:22  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Utils/Debian.pm.in, templates/dsc.tt:
+	  Really make the field names look nicer
+
+2019-01-10 12:05  squinney@INF.ED.AC.UK
+
+	* templates/dsc.tt: Tidy up case of field names
+
+2019-01-10 12:02  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Utils/Debian.pm.in, templates/dsc.tt:
+	  Added support for the Package-List and Architecture dsc fields
+
+2019-01-10 11:24  squinney@INF.ED.AC.UK
+
+	* debian/control: Added better description
+
+2019-01-10 10:47  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool.pm.in, lib/LCFG/Build/Tool/GenDeb.pm.in,
+	  lib/LCFG/Build/Utils.pm.in, lib/LCFG/Build/Utils/Debian.pm.in:
+	  Specified minimum required versions for some modules
+
+2019-01-10 10:47  squinney@INF.ED.AC.UK
+
+	* t/01_load.t, t/02_macros.t: Added shebang so the test files look
+	  more like perl scripts
+
+2019-01-10 10:46  squinney@INF.ED.AC.UK
+
+	* debian/control: Improved the list of dependencies and added
+	  versions for some modules. Also added build-dependencty on
+	  libtest-differences-perl
+
+2019-01-09 18:38  squinney@INF.ED.AC.UK
+
+	* debian/control: Added list of dependencies
+
+2019-01-09 16:28  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-Tools.spec, Makefile.PL, README,
+	  lcfg.yml, lib/LCFG/Build/Tool.pm.in: Increased minimum dep on
+	  LCFG::Build::Pkgspec to 0.2.1 to get deb_dscname method
+
+2019-01-09 16:28  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/Debian.pm.in, templates/dsc.tt: More work on
+	  generating the Debian dsc file
+
+2019-01-09 13:03  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/Debian.pm.in: made the generation of DSC
+	  files completely optional
+
+2019-01-09 13:03  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/Pack.pm.in: Pass in required dsc filename
+
+2019-01-09 12:29  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/Pack.pm.in: Use new Utils::Debian module for
+	  generating tar and dsc files
+
+2019-01-09 12:28  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils.pm.in: Moved generate_debtar to new
+	  Utils::Debian module
+
+2019-01-09 12:28  squinney@INF.ED.AC.UK
+
+	* templates/dsc.tt: Start of new template for Debian package .dsc
+	  file
+
+2019-01-09 12:28  squinney@INF.ED.AC.UK
+
+	* t/01_load.t: Test new Utils::Debian module
+
+2019-01-09 12:27  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/Debian.pm.in: New module for handling debian
+	  packaging work
+
+2019-01-09 12:27  squinney@INF.ED.AC.UK
+
+	* LCFG-Build-Tools.spec: Include all Utils modules
+
+2019-01-09 10:39  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.6
+
+2019-01-09 10:38  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Tool.pm.in,
+	  lib/LCFG/Build/Tool/DevOSXPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/OSXPkg.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/Submit.pm.in:
+	  Introduced a new output_dir method which can be shared by all
+	  build tool modules.
+
+2019-01-09 10:09  squinney@INF.ED.AC.UK
+
+	* debian/rules: Enabled svn:executable property
+
+2019-01-09 10:09  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in: Ensure the debian/rules file is
+	  executable
+
+2019-01-08 16:23  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: Only attempt to install the templates
+	  directory if it exists
+
+2019-01-08 15:58  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.5
+
+2019-01-08 15:32  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in: Updated docs
+
+2019-01-08 15:10  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in: Added final note asking
+	  developer to review the new debian directory
+
+2019-01-08 15:09  squinney@INF.ED.AC.UK
+
+	* templates/debian/rules: Added override for dh_installsystemd to
+	  ensure that the component isn't enabled/started/stopped
+	  automatically by systemd when the package is changed. We will
+	  handle that directly ourselves
+
+2019-01-08 15:01  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in: Add the 'debian' directory to
+	  the repository if it is new
+
+2019-01-08 15:00  squinney@INF.ED.AC.UK
+
+	* templates/debian/control: further improvements to handling of
+	  dependency list
+
+2019-01-08 14:54  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.4
+
+2019-01-08 14:53  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in: Fixed handling of the logfile
+	  name so that it matches how the (micro,minor,major)version
+	  modules do things
+
+2019-01-08 14:52  squinney@INF.ED.AC.UK
+
+	* templates/debian/control: Fixed handling of whitespace for end of
+	  dependency list
+
+2019-01-08 14:51  squinney@INF.ED.AC.UK
+
+	* debian/docs: Added docs
+
+2019-01-08 14:51  squinney@INF.ED.AC.UK
+
+	* debian/control: Fixed deps
+
+2019-01-08 14:39  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.3
+
+2019-01-08 14:39  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-Tools.spec, META.json.in, META.yml.in,
+	  Makefile.PL, README: Set minimum dep on LCFG::Build::VCS to 0.3.3
+
+2019-01-08 12:01  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in, templates/debian/service: Added
+	  support for generating a basic systemd service file for
+	  components
+
+2019-01-08 11:54  squinney@INF.ED.AC.UK
+
+	* debian/rules: for clarity remove the CMake specific stuff
+
+2019-01-04 17:25  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in: Fix permissions of debian
+	  scripts which should be executable
+
+2019-01-04 16:41  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.2
+
+2019-01-04 16:41  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: Adjusted the location of some
+	  directories in /var for FHS support
+
+2019-01-04 15:39  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.1
+
+2019-01-04 15:38  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/GenDeb.pm.in: Identify docs files which
+	  should be included in the debian package
+
+2019-01-04 15:13  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.0
+
+2019-01-04 15:13  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, lcfg.yml, lib/LCFG/Build/Tool/GenDeb.pm.in,
+	  t/01_load.t: Added tool to generate Debian metadata
+
+2019-01-04 15:12  squinney@INF.ED.AC.UK
+
+	* templates/debian/control: Only add lcfg-om and lcfg-ngeneric for
+	  components
+
+2019-01-04 15:12  squinney@INF.ED.AC.UK
+
+	* debian, debian/compat, debian/control, debian/copyright,
+	  debian/docs, debian/rules, debian/source, debian/source/format:
+	  First attempt at debian packaging
+
+2019-01-04 14:27  squinney@INF.ED.AC.UK
+
+	* templates/debian/control: Fixed path to viewvc
+
+2019-01-04 13:52  squinney@INF.ED.AC.UK
+
+	* LCFG-Build-Tools.spec: include all files in lcfgbuild directory
+
+2019-01-04 13:47  squinney@INF.ED.AC.UK
+
+	* templates/debian, templates/debian/compat,
+	  templates/debian/control, templates/debian/copyright,
+	  templates/debian/docs, templates/debian/postinst,
+	  templates/debian/postrm, templates/debian/prerm,
+	  templates/debian/rules, templates/debian/source,
+	  templates/debian/source/format: Debian package metadata file
+	  templates
+
+2019-01-04 13:46  squinney@INF.ED.AC.UK
+
+	* Build.PL.in: Reworked how the template files are gathered so all
+	  sub-dirs are included
+
+2019-01-03 14:14  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: Improved logrotate and nagios macros to
+	  handle out-of-tree builds
+
+2019-01-03 13:59  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: Improved lcfg_add_templates to handle
+	  out-of-tree builds
+
+2019-01-03 10:35  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, templates/build.cmake.tt: Improved lcfg_add_pod so that
+	  it can handle out-of-tree builds
+
+2019-01-03 10:09  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tools.pm.in: Fixed POD
+
+2018-12-18 21:21  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: Complete overhaul of how we handle the
+	  locations of LCFG files and directories to provide support for
+	  Debian
+
+2018-12-12 15:11  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.8.0
+
+2018-12-12 15:11  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-Tools.spec, META.json.in, META.yml.in,
+	  Makefile.PL, README, lcfg.yml: Updated minimum required version
+	  for LCFG::Build::VCS to 0.3.1
+
+2018-12-12 15:10  squinney@INF.ED.AC.UK
+
+	* bin/lcfg-reltool.in: use safe version macro
+
+2018-12-12 15:10  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/MicroVersion.pm.in: Added support for
+	  updating the debian/changelog when required
+
+2018-12-07 16:25  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.7.0
+
+2018-12-07 16:25  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-Tools.spec, META.json.in, META.yml.in,
+	  Makefile.PL, README, lcfg.yml, lib/LCFG/Build/Tool.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Utils.pm.in,
+	  lib/LCFG/Build/Utils/RPM.pm.in: Added basic support for building
+	  a debian source tar file
+
+2018-12-07 11:38  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.6.9
+
+2018-12-07 11:38  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Utils.pm.in: Do not include any
+	  top-level debian directory in the source tar file
+
+2017-11-20 16:01  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.6.8
+
+2017-11-20 16:01  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-Tools.spec, META.json.in, META.yml.in,
+	  Makefile.PL, README, lcfg.yml: Updated minimum dep on
+	  LCFG::Build::VCS to 0.2.5
+
+2017-11-20 15:51  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.6.7
+
+2017-11-20 15:51  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Tool/MajorVersion.pm.in,
+	  lib/LCFG/Build/Tool/MicroVersion.pm.in,
+	  lib/LCFG/Build/Tool/MinorVersion.pm.in: Added support for storing
+	  the project version string in a text file when a micro, minor or
+	  major version is tagged
+
+2017-11-20 14:36  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/MicroVersion.pm.in: Added support for storing
+	  build id string into text file in project directory
+
+2016-07-12 12:59  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.6.6
 
 2016-07-12 12:58  squinney@INF.ED.AC.UK
 

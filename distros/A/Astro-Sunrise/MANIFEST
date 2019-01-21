@@ -3,9 +3,12 @@ LICENSE
 MANIFEST
 Makefile.PL
 README
-TODO
 doc/astronomical-notes.pod
 doc/notes-astronomiques.pod
+doc/equ-time.png
+doc/ps-an-pol.gif
+doc/pseudo-analemma.gif
+doc/sunset-slope.png
 lib/Astro/Sunrise.pm
 t/00load.t
 t/01basic.t
@@ -20,5 +23,7 @@ t/09springforward.t
 t/10fallback.t
 t/11fatal.t
 t/12loop.t
+t/13testpod.t
+t/14precise.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

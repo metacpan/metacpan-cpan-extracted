@@ -2,13 +2,13 @@ package LCFG::Build::Tools;    # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: Tools.pm.in 29224 2015-11-12 10:11:34Z squinney@INF.ED.AC.UK $
+# $Id: Tools.pm.in 35212 2019-01-03 10:09:17Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tools.pm.in,v $
-# $Revision: 29224 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_6_6/lib/LCFG/Build/Tools.pm.in $
-# $Date: 2015-11-12 10:11:34 +0000 (Thu, 12 Nov 2015) $
+# $Revision: 35212 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_18/lib/LCFG/Build/Tools.pm.in $
+# $Date: 2019-01-03 10:09:17 +0000 (Thu, 03 Jan 2019) $
 
-our $VERSION = '0.6.6';
+our $VERSION = '0.9.18';
 
 use Moose;
 
@@ -29,7 +29,7 @@ __END__
 
 =head1 VERSION
 
-This documentation refers to LCFG::Build::Tools version 0.6.6
+This documentation refers to LCFG::Build::Tools version 0.9.18
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,7 @@ This is a list of the LCFG build tool modules in this suite. You
 should see the separate perl documentation for information on how to
 use the modules.
 
-=over 4
+=over
 
 =item L<LCFG::Build::Utils>
 
@@ -122,6 +122,8 @@ packages for MacOSX
 Tool for packaging tagged development code into a tar file and
 generating packages for MacOSX
 
+=back
+
 =head1 CONFIGURATION AND ENVIRONMENT
 
 Some of the tools use template files, by default it is assumed that
@@ -177,7 +179,7 @@ welcome.
 
 =head1 LICENSE AND COPYRIGHT
 
-    Copyright (C) 2008 University of Edinburgh. All rights reserved.
+    Copyright (C) 2008-2019 University of Edinburgh. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GPL, version 2 or later.

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -414,7 +414,7 @@ sub this {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

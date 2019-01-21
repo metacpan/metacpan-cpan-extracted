@@ -77,18 +77,11 @@ sub get_stmt {
     elsif ( $stmt_type eq 'Union' ) {
         @tmp = $used_for eq 'print' ? "SELECT * FROM (" :"(";
         my $count = 0;
-        for my $table ( @{$sql->{used_tables}} ) {
+        for my $ref ( @{$sql->{used_cols}} ) {
             ++$count;
-            my $str = $in x 2 . "SELECT ";
-            if ( defined $sql->{used_cols}{$table} && @{$sql->{used_cols}{$table}} ) { #
-                my $qt_cols = $sf->quote_simple_many( $sql->{used_cols}{$table} );
-                $str .= join( ', ', @$qt_cols );
-            }
-            else {
-                $str .= '*';
-            }
-            $str .= " FROM " . $sf->quote_table( $sf->{d}{tables_info}{$table} );
-            if ( $count < @{$sql->{used_tables}} ) {
+            my $str = $in x 2 . "SELECT " . join( ', ', @{$ref->[1]} );
+            $str .= " FROM " . $ref->[0];
+            if ( $count < @{$sql->{used_cols}} ) {
                 $str .= " UNION ALL ";
             }
             push @tmp, $str;
@@ -245,6 +238,9 @@ sub alias {
     }
     if ( ! defined $alias || ! length $alias ) {
         $alias = $default;
+    }
+    if ( $sf->{d}{driver} eq 'Pg' && ! $sf->{o}{G}{quote_identifiers} ) {
+        return lc $alias;
     }
     return $alias;
 }

@@ -1,0 +1,11 @@
+lib/WWW/Google/Cloud/Auth/ServiceAccount.pm
+Makefile.PL
+MANIFEST.SKIP
+MANIFEST			This list of files
+README
+t/100-serviceaccount.t
+t/pod_coverage.t
+t/pod.t
+t/data/test_creds.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

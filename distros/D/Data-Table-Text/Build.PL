@@ -11,6 +11,7 @@ my $b = Module::Build->new(
      Carp             => 0,
      Cwd              => 0,
     'Data::Dump'      => 0,
+    'Digest::MD5'     => 0,
     'Exporter'        => 0,
     'File::Glob'      => 1.17,
     'File::Path'      => 0,

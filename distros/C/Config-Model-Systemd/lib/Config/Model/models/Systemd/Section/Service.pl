@@ -59,77 +59,29 @@ by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-
     'element' => [
       'Type',
       {
-        'description' => 'Configures the process start-up type for this
-service unit. One of
-C<simple>,
-C<forking>,
-C<oneshot>,
-C<dbus>,
-C<notify> or
-C<idle>.
+        'description' => "Configures the process start-up type for this service unit. One of C<simple>,
+C<exec>, C<forking>, C<oneshot>, C<dbus>,
+C<notify> or C<idle>:
 
-If set to C<simple> (the default if
-neither C<Type> nor
-C<BusName>, but C<ExecStart>
-are specified), it is expected that the process configured
-with C<ExecStart> is the main process of the
-service. In this mode, if the process offers functionality to
-other processes on the system, its communication channels
-should be installed before the daemon is started up (e.g.
-sockets set up by systemd, via socket activation), as systemd
-will immediately proceed starting follow-up units.
-
-If set to C<forking>, it is expected that
-the process configured with C<ExecStart> will
-call fork() as part of its start-up. The
-parent process is expected to exit when start-up is complete
-and all communication channels are set up. The child continues
-to run as the main daemon process. This is the behavior of
-traditional UNIX daemons. If this setting is used, it is
-recommended to also use the C<PIDFile>
-option, so that systemd can identify the main process of the
-daemon. systemd will proceed with starting follow-up units as
-soon as the parent process exits.
-
-Behavior of C<oneshot> is similar to
-C<simple>; however, it is expected that the
-process has to exit before systemd starts follow-up units.
-C<RemainAfterExit> is particularly useful for
-this type of service. This is the implied default if neither
-C<Type> nor C<ExecStart> are
-specified.
-
-Behavior of C<dbus> is similar to
-C<simple>; however, it is expected that the
-daemon acquires a name on the D-Bus bus, as configured by
-C<BusName>. systemd will proceed with
-starting follow-up units after the D-Bus bus name has been
-acquired. Service units with this option configured implicitly
-gain dependencies on the dbus.socket
-unit. This type is the default if C<BusName>
-is specified.
-
-Behavior of C<notify> is similar to
-C<simple>; however, it is expected that the
-daemon sends a notification message via
-L<sd_notify(3)>
-or an equivalent call when it has finished starting up.
-systemd will proceed with starting follow-up units after this
-notification message has been sent. If this option is used,
-C<NotifyAccess> (see below) should be set to
-open access to the notification socket provided by systemd. If
-C<NotifyAccess> is missing or set to
-C<none>, it will be forcibly set to
-C<main>. Note that currently
-C<Type>C<notify> will not work
-if used in combination with
-C<PrivateNetwork>C<yes>.
-
-Behavior of C<idle> is very similar to C<simple>; however, actual execution
-of the service program is delayed until all active jobs are dispatched. This may be used to avoid interleaving
-of output of shell services with the status output on the console. Note that this type is useful only to
-improve console output, it is not useful as a general unit ordering tool, and the effect of this service type
-is subject to a 5s time-out, after which the service program is invoked anyway.',
+It is generally recommended to use C<Type>C<simple> for long-running
+services whenever possible, as it is the simplest and fastest option. However, as this service type won't
+propagate service start-up failures and doesn't allow ordering of other units against completion of
+initialization of the service (which for example is useful if clients need to connect to the service through
+some form of IPC, and the IPC channel is only established by the service itself \x{2014} in contrast to doing this
+ahead of time through socket or bus activation or similar), it might not be sufficient for many cases. If so,
+C<notify> or C<dbus> (the latter only in case the service provides a D-Bus
+interface) are the preferred options as they allow service program code to precisely schedule when to
+consider the service started up successfully and when to proceed with follow-up units. The
+C<notify> service type requires explicit support in the service codebase (as
+sd_notify() or an equivalent API needs to be invoked by the service at the appropriate
+time) \x{2014} if it's not supported, then C<forking> is an alternative: it supports the traditional
+UNIX service start-up protocol. Finally, C<exec> might be an option for cases where it is
+enough to ensure the service binary is invoked, and where the service binary itself executes no or little
+initialization on its own (and its initialization is unlikely to fail). Note that using any type other than
+C<simple> possibly delays the boot process, as the service manager needs to wait for service
+initialization to complete. It is hence recommended not to needlessly use any types other than
+C<simple>. (Also note it is generally not recommended to use C<idle> or
+C<oneshot> for long-running services.)",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -167,14 +119,15 @@ Defaults to C<yes>.',
       },
       'PIDFile',
       {
-        'description' => 'Takes an absolute path referring to the PID file of the service. Usage of this option is
-recommended for services where C<Type> is set to C<forking>. The service manager
-will read the PID of the main process of the service from this file after start-up of the service. The service
-manager will not write to the file configured here, although it will remove the file after the service has shut
-down if it still exists. The PID file does not need to be owned by a privileged user, but if it is owned by an
-unprivileged user additional safety restrictions are enforced: the file may not be a symlink to a file owned by
-a different user (neither directly nor indirectly), and the PID file must refer to a process already belonging
-to the service.',
+        'description' => 'Takes a path referring to the PID file of the service. Usage of this option is recommended for
+services where C<Type> is set to C<forking>. The path specified typically points
+to a file below /run/. If a relative path is specified it is hence prefixed with
+/run/. The service manager will read the PID of the main process of the service from this
+file after start-up of the service. The service manager will not write to the file configured here, although it
+will remove the file after the service has shut down if it still exists. The PID file does not need to be owned
+by a privileged user, but if it is owned by an unprivileged user additional safety restrictions are enforced:
+the file may not be a symlink to a file owned by a different user (neither directly nor indirectly), and the
+PID file must refer to a process already belonging to the service.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -505,7 +458,8 @@ regularly with C<WATCHDOG=1> (i.e. the
 "keep-alive ping"). If the time between two such calls is
 larger than the configured time, then the service is placed in
 a failed state and it will be terminated with
-C<SIGABRT>. By setting
+C<SIGABRT> (or the signal specified by
+C<WatchdogSignal>). By setting
 C<Restart> to C<on-failure>,
 C<on-watchdog>, C<on-abnormal> or
 C<always>, the service will be automatically
@@ -674,29 +628,6 @@ similar to
 C<RestartPreventExitStatus>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
-      },
-      'PermissionsStartOnly',
-      {
-        'description' => 'Takes a boolean argument. If true, the
-permission-related execution options, as configured with
-C<User> and similar options (see
-L<systemd.exec(5)>
-for more information), are only applied to the process started
-with
-C<ExecStart>, and not to the various other
-C<ExecStartPre>,
-C<ExecStartPost>,
-C<ExecReload>,
-C<ExecStop>, and
-C<ExecStopPost>
-commands. If false, the setting is applied to all configured
-commands the same way. Defaults to false.',
-        'type' => 'leaf',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
       },
       'RootDirectoryStartOnly',
       {

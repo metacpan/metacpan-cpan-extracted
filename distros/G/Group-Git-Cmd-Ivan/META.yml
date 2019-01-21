@@ -4,11 +4,11 @@ author:
   - 'Ivan Wills <ivan.wills@gmail.com>'
 build_requires:
   Test::More: '0.88'
-  Test::Warnings: '0'
+  Test::Warnings: '0.026'
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,18 +17,18 @@ name: Group-Git-Cmd-Ivan
 provides:
   Group::Git::Cmd::Build:
     file: lib/Group/Git/Cmd/Build.pm
-    version: v0.0.3
+    version: v0.0.4
   Group::Git::Cmd::Ivan:
     file: lib/Group/Git/Cmd/Ivan.pm
-    version: v0.0.3
+    version: v0.0.4
   Group::Git::Cmd::Tag:
     file: lib/Group/Git/Cmd/Tag.pm
-    version: v0.0.3
+    version: v0.0.4
 requires:
   DateTime::Format::Strptime: '0'
   File::chdir: '0'
   Getopt::Alt: v0.1.1
-  Group::Git: '0'
+  Group::Git: v0.6.10
   Group::Git::Cmd::SinceRelease: '0'
   Group::Git::Cmd::Stats: '0'
   Group::Git::Cmd::Todo: '0'
@@ -43,5 +43,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Group::Git::Cmd::Ivan
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/Group-Git-Cmd-Ivan.git
-version: v0.0.3
+version: v0.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

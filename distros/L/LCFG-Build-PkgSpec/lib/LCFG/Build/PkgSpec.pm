@@ -2,13 +2,15 @@ package LCFG::Build::PkgSpec; # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: PkgSpec.pm.in 27862 2015-06-24 10:11:40Z squinney@INF.ED.AC.UK $
+# $Id: PkgSpec.pm.in 35434 2019-01-18 10:43:38Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-PkgSpec/lib/LCFG/Build/PkgSpec.pm.in,v $
-# $Revision: 27862 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_1_0/lib/LCFG/Build/PkgSpec.pm.in $
-# $Date: 2015-06-24 11:11:40 +0100 (Wed, 24 Jun 2015) $
+# $Revision: 35434 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_2_6/lib/LCFG/Build/PkgSpec.pm.in $
+# $Date: 2019-01-18 10:43:38 +0000 (Fri, 18 Jan 2019) $
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.6';
+
+use v5.10;
 
 use Data::Structure::Util ();
 use DateTime ();
@@ -44,7 +46,7 @@ coerce 'EmailAddressList'
 
 subtype 'VersionString'
       => as 'Str'
-      => where { $_ =~ m/^\d+\.\d+\.\d+(_dev)?$/ }
+      => where { $_ =~ m/^\d+\.\d+\.\d+(\.dev\d*)?$/ }
       => message { $_ = 'undef' if !defined $_; "Version string ($_) does not match the expected LCFG format." };
 
 subtype 'ReleaseString'
@@ -155,24 +157,33 @@ sub perl_version {
     my ($self) = @_;
 
     my $perl_version = $self->version;
-    if ( $perl_version =~ s/_dev$// ) {
+    if ( $perl_version =~ s/\.dev\d*$// ) {
 
         # Cannot use a non-numeric in a Perl version string. A "devel"
         # version is signified with a suffix which is an underscore
         # and a release number. See "perldoc version" for details.
 
-        my $release = $self->release;
-        $perl_version .= q{_} . $release;
+        $perl_version = join q{.}, $self->get_major, $self->get_minor, $self->get_micro;
+        $perl_version .= q{_} . $self->release;
     }
 
     return $perl_version;
+}
+
+sub deb_version {
+    my ($self) = @_;
+
+    my $deb_version = $self->version;
+
+    $deb_version =~ s/[^a-zA-Z0-9~.+-]//;
+
+    return $deb_version;
 }
 
 sub get_major {
     my ($self) = @_;
 
     my $version = $self->version;
-    $version =~ s/_dev$//;
 
     my $major = (split /\./, $version)[0];
 
@@ -183,7 +194,6 @@ sub get_minor {
     my ($self) = @_;
 
     my $version = $self->version;
-    $version =~ s/_dev$//;
 
     my $minor = (split /\./, $version)[1];
 
@@ -194,7 +204,6 @@ sub get_micro {
     my ($self) = @_;
 
     my $version = $self->version;
-    $version =~ s/_dev$//;
 
     my $micro = (split /\./, $version)[2];
 
@@ -225,13 +234,64 @@ sub fullname {
     return $fullname;
 }
 
-sub tarname {
+sub deb_name {
     my ($self) = @_;
 
+    # By convention debian package names are lower-case
+    my $name = lc $self->fullname;
+
+    # underscores are not permitted, helpfully replace with dashes
+    $name =~ s/_/-/g;
+
+    # For safety remove any other invalid characters
+    $name =~ s/[^a-z0-9-]//;
+
+    return $name;
+}
+
+sub tarname {
+    my ( $self, $comp ) = @_;
+    $comp ||= 'gz';
+
     my $packname = join q{-}, $self->fullname, $self->version;
-    my $tarname  = $packname . '.tar.gz';
+    my $tarname  = $packname . ".tar.$comp";
 
     return $tarname;
+}
+
+sub deb_srctarname {
+    my ( $self, $comp ) = @_;
+    $comp ||= 'gz';
+
+    my $packname = join q{_}, $self->deb_name, $self->deb_version;
+    my $tarname  = $packname . ".orig.tar.$comp";
+
+    return $tarname;
+}
+
+sub deb_tarname {
+    my ( $self, $comp ) = @_;
+    $comp ||= 'gz';
+
+    my $packname = join q{_}, $self->deb_name, $self->deb_version;
+    my $tarname  = $packname . "-1.debian.tar.$comp";
+
+    return $tarname;
+}
+
+sub deb_dscname {
+    my ($self) = @_;
+
+    my $packname = join q{_}, $self->deb_name, $self->deb_version;
+    my $dscname  = $packname . "-1.dsc";
+
+    return $dscname;
+}
+
+sub rpmspec_name {
+    my ( $self, $base ) = @_;
+
+    return $self->fullname . '.spec';
 }
 
 sub clone {
@@ -383,13 +443,14 @@ sub save_metafile {
 sub dev_version {
     my ($self) = @_;
 
-    my $version = $self->version;
-    if ( $version !~ m/_dev$/ ) {
-        $version .= '_dev';
-        $self->version($version);
-    }
-
     $self->update_release;
+
+    my $dev_version = 'dev' . $self->release;
+
+    $dev_version = join q{.}, $self->get_major, $self->get_minor,
+                              $self->get_micro, $dev_version;
+
+    $self->version($dev_version);
 
     return $self->version;
 }
@@ -439,10 +500,9 @@ sub update_micro {
 sub _update_version {
     my ( $self, $uptype ) = @_;
 
-    my $version = $self->version;
-    $version =~ s/_dev$//;
-
-    my ( $major, $minor, $micro ) = split /\./, $version;
+    my $major = $self->get_major;
+    my $minor = $self->get_minor;
+    my $micro = $self->get_micro;
 
     if ( $uptype eq 'major' ) {
         $major++;
@@ -495,7 +555,7 @@ LCFG::Build::PkgSpec - Object-oriented interface to LCFG build metadata
 
 =head1 VERSION
 
-This documentation refers to LCFG::Build::PkgSpec version 0.1.0
+This documentation refers to LCFG::Build::PkgSpec version 0.2.6
 
 =head1 SYNOPSIS
 
@@ -531,7 +591,7 @@ http://www.lcfg.org/doc/buildtools/
 
 =head1 ATTRIBUTES
 
-=over 4
+=over
 
 =item name
 
@@ -630,7 +690,7 @@ accessing and managing the information contained with the hash.
 
 =head1 SUBROUTINES/METHODS
 
-=over 4
+=over
 
 =item fullname
 
@@ -639,6 +699,37 @@ specified then this will be a combination of base and package name
 separated with a hyphen, e.g. 'lcfg-foo'. If no base is specified then
 this is just the package name, e.g. 'foo'.
 
+=item deb_name
+
+Returns a name for the package which is safe for use as a Debian
+package name. Debian package names must not contain the C<_>
+(underscore) character so those are replace with hyphens, also by
+convention the name is lower-cased. Any invalid characters (not in the
+set C<[a-zA-Z0-9-]>) are simply removed.
+
+=item deb_version
+
+Returns a version for the package which is safe for use with Debian
+packages. Typically this will be identical to the standard C<version>
+string. Debian package versions must only contain characters in the
+set C<[a-zA-Z0-9~.+-]>, any invalid characters are simply removed
+
+=item deb_tarname
+
+Returns the name of the debian source package tarfile which would be
+generated for this version of the package. This combines the full name
+and the version, for example, C<lcfg-foo_1.0.1-1.debian.tar.gz>. Note
+that the LCFG build tools will only actually generate this file when a
+project contains a C<debian> sub-directory.
+
+=item deb_dscname
+
+Returns the name of the debian source control (dsc) file which would
+be generated for this version of the package. This combines the full
+name and the version, for example, C<lcfg-foo_1.0.1-1.dsc>. Note that
+the LCFG build tools will only actually generate this file when a
+project contains a C<debian> sub-directory.
+
 =item pkgident
 
 This returns a string formed by the concatenation of the C<orgident>
@@ -646,11 +737,17 @@ and C<fullname> values, joined with a period character,
 C<com.example.lcfg-client> for example. This is used as the identifier
 name for MacOSX packages.
 
+=item rpmspec_name
+
+This returns the name of the RPM specfile for the project. This is
+just based on the full name with a C<.spec> suffix
+(e.g. C<lcfg-foo.spec>).
+
 =item tarname
 
 Returns the standard LCFG name of the tarfile which would be generated
 for this version of the package. This combines the full name and the
-version, for example, lcfg-foo-1.0.1.tar.gz
+version, for example, C<lcfg-foo_1.0.1.orig.tar.gz>
 
 =item new_from_metafile($file)
 
@@ -720,8 +817,10 @@ was not previously defined then it will be set to one.
 =item dev_version
 
 This method converts the version to the development format. If it is
-not already present an '_dev' string is appended to the version
-string. The release field is also incremented.
+not already present an C<.dev> string is appended to the version
+string along with the value of the release field. The release field is
+also incremented. For example, the first dev version for C<1.2.3>
+would be C<1.2.3.dev1> and the second would be C<1.2.3.dev2>.
 
 =item add_author
 
@@ -807,7 +906,7 @@ Stephen Quinney <squinney@inf.ed.ac.uk>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2008-2015 University of Edinburgh. All rights reserved.
+Copyright (C) 2008-2019 University of Edinburgh. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GPL, version 2 or later.

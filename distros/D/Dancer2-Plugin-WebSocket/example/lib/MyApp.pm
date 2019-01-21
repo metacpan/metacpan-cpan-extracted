@@ -6,13 +6,13 @@ use Dancer2::Plugin::WebSocket;
 
 websocket_on_open sub {
     my( $conn, $env ) = @_;
-    warn "opening $conn";
+    warn "# opening $conn\n";
 };
 
 
 websocket_on_close sub {
     my( $conn ) = @_;
-    warn "closing $conn";
+    warn "# closing $conn\n";
 };
 
 websocket_on_error sub {

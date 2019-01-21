@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.107   2019-01-20
+        - MSWin32: always use "Win32::Console::ANSI".
+
 0.106   2018-12-14
         - Bugfix in "single-row-print".
 

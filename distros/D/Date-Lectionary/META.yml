@@ -15,7 +15,7 @@ build_requires:
   Test::Pod::Coverage: '1.10'
   Test::Version: '2.07'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.34'
   File::ShareDir::Install: '0.11'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
@@ -38,16 +38,16 @@ no_index:
 provides:
   Date::Lectionary:
     file: lib/Date/Lectionary.pm
-    version: '1.20180423'
+    version: '1.20190120'
   Date::Lectionary::Day:
     file: lib/Date/Lectionary/Day.pm
-    version: '1.20180423'
+    version: '1.20190120'
   Date::Lectionary::Year:
     file: lib/Date/Lectionary/Year.pm
-    version: '1.20180423'
+    version: '1.20190120'
 requires:
   Carp: '1.38'
-  Date::Advent: '1.20180422'
+  Date::Advent: '1.20180423'
   Date::Easter: '1.22'
   Date::Lectionary::Time: v1.20180422.1
   File::Share: '0.25'
@@ -63,6 +63,6 @@ requires:
   perl: '5.022'
 resources:
   repository: git://github.com/marmanold/Date-Lectionary.git
-version: v1.20180423
+version: v1.20190120
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_twitter: https://www.twitter.com/marmanold/

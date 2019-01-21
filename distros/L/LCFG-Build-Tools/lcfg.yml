@@ -7,7 +7,7 @@ build:
   gencmake: 0
   remove_input_after_translate: 1
   translate_before_pack: 1
-date: 12/07/16 12:59:57
+date: 18/01/19 15:20:06
 license: gpl
 name: LCFG-Build-Tools
 orgident: org.lcfg
@@ -24,4 +24,4 @@ translate:
 vcs: 
   genchangelog: 1
   logname: Changes
-version: 0.6.6
+version: 0.9.18

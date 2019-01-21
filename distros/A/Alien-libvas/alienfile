@@ -13,9 +13,10 @@ share {
     plugin 'Build::CMake';
 
     build [
-        [ '%{cmake}', -G => '%{cmake_generator}',
+        [ '%{cmake}', @{ meta->prop->{plugin_build_cmake}->{args} },
+           '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DWITH_PIC=ON',
           '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DWITH_PIC=ON',
-          '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', '-DBUILD_MANUAL_TESTS=OFF',
+          '-DCMAKE_INSTALL_LIBDIR:PATH=lib', '-DBUILD_MANUAL_TESTS=OFF',
           '-DTEST_XPROC=' . qw(OFF ON)[$^O ne 'darwin'],
           '.'],
 

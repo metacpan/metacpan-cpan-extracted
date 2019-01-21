@@ -1,5 +1,8 @@
 Revision history for Address::PostCode::Australia
 
+0.12  Fri Jan 18 10:55:00 2019
+      - Upgraded to use Address::PostCode::UserAgent 0.09.
+
 0.11  Tue Jan 15 16:30:00 2019
       - Used namespace::autoclean instead.
 

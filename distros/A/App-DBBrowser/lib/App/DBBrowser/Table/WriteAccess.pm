@@ -69,9 +69,9 @@ sub table_write_access {
             Update => [ qw( commit set where ) ],
         };
         my %cu = (
-            commit    => '  CONFIRM Stmt',
-            set       => '- SET',
-            where     => '- WHERE',
+            commit => '  CONFIRM Stmt',
+            set    => '- SET',
+            where  => '- WHERE',
         );
         my $old_idx = 0;
 
@@ -126,17 +126,16 @@ sub table_write_access {
 sub commit_sql {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
     my $dbh = $sf->{d}{dbh};
     my $waiting = 'DB work ... ';
     $ax->print_sql( $sql, $waiting );
     my $stmt_type = $sf->{i}{stmt_types}[-1];
     my $rows_to_execute = [];
-    my $row_count;
+    my $count_affected;
     if ( $stmt_type eq 'Insert' ) {
         return 1 if ! @{$sql->{insert_into_args}};
         $rows_to_execute = $sql->{insert_into_args};
-        $row_count = @$rows_to_execute;
+        $count_affected = @$rows_to_execute;
     }
     else {
         $rows_to_execute = [ [ @{$sql->{set_args}}, @{$sql->{where_args}} ] ];
@@ -146,7 +145,7 @@ sub commit_sql {
             $sth->execute( @{$sql->{where_args}} );
             my $col_names = $sth->{NAME};
             $all_arrayref = $sth->fetchall_arrayref;
-            $row_count = @$all_arrayref;
+            $count_affected = @$all_arrayref;
             unshift @$all_arrayref, $col_names;
             1 }
         ) {
@@ -172,114 +171,82 @@ sub commit_sql {
         $transaction = 0;
     };
     if ( $transaction ) {
-        my $rolled_back;
-        if ( ! eval {
-            my $sth = $dbh->prepare(
-                $ax->get_stmt( $sql, $stmt_type, 'prepare' )
-            );
-            for my $values ( @$rows_to_execute ) {
-                $sth->execute( @$values );
-            }
-            my $commit_ok = sprintf qq(  %s %s "%s"), 'COMMIT', insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $stmt_type;
-            $ax->print_sql( $sql );
-            # Choose
-            my $choice = $stmt_v->choose(
-                [ undef,  $commit_ok ]
-            );
-            $ax->print_sql( $sql, $waiting );
-            if ( ! defined $choice || $choice ne $commit_ok ) {
-                $dbh->rollback;
-                $rolled_back = 1;
-            }
-            else {;
-                $dbh->commit;
-            }
-            1 }
-        ) {
-            $ax->print_error_message( "$@Rolling back ...\n", 'Commit' );
-            $dbh->rollback;
-            $rolled_back = 1;
-        }
-        if ( $rolled_back ) {
-            return;
-        }
-        return 1;
+        return $sf->__transaction( $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting );
     }
     else {
-        my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $stmt_type;
-        $ax->print_sql( $sql ); #
-        # Choose
-        my $choice = $stmt_v->choose(
-            [ undef,  $commit_ok ],
-            { prompt => '' }
-        );
-        $ax->print_sql( $sql, $waiting );
-        if ( ! defined $choice || $choice ne $commit_ok ) {
-            return;
-        }
-        if ( ! eval {
-            my $sth = $dbh->prepare(
-                $ax->get_stmt( $sql, $stmt_type, 'prepare' )
-            );
-            for my $values ( @$rows_to_execute ) {
-                $sth->execute( @$values );
-            }
-            1 }
-        ) {
-            $ax->print_error_message( $@, 'Commit' );
-            return;
-        }
-        return 1;
+        return $sf->__auto_commit( $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting );
     }
 }
 
 
-sub __insert_into_stmt_columns {
-    my ( $sf, $sql ) = @_;
-    my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-    $sql->{insert_into_cols} = [];
-    my @cols = ( @{$sql->{cols}} );
-    if ( $plui->first_column_is_autoincrement( $sf->{d}{dbh}, $sf->{d}{schema}, $sf->{d}{table} ) ) {
-        shift @cols;
-    }
-    my $bu_cols = [ @cols ];
-
-    COL_NAMES: while ( 1 ) {
-        $ax->print_sql( $sql );
-        my @pre = ( undef, $sf->{i}{ok} );
-        my $choices = [ @pre, @cols ];
-        # Choose
-        my @idx = choose(
-            $choices,
-            { %{$sf->{i}{lyt_stmt_h}}, prompt => 'Columns:', index => 1,
-              meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
+sub __transaction {
+    my ( $sf, $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $dbh = $sf->{d}{dbh};
+    my $rolled_back;
+    if ( ! eval {
+        my $sth = $dbh->prepare(
+            $ax->get_stmt( $sql, $stmt_type, 'prepare' )
         );
-        if ( ! $idx[0] ) {
-            if ( ! @{$sql->{insert_into_cols}} ) {
-                return;
-            }
-            $sql->{insert_into_cols} = [];
-            @cols = @$bu_cols;
-            next COL_NAMES;
+        for my $values ( @$rows_to_execute ) {
+            $sth->execute( @$values );
         }
-        if ( $idx[0] == 1 ) {
-            shift @idx;
-            push @{$sql->{insert_into_cols}}, @{$choices}[@idx];
-            if ( ! @{$sql->{insert_into_cols}} ) {
-                $sql->{insert_into_cols} = $bu_cols;
-            }
-            return 1;
+        my $commit_ok = sprintf qq(  %s %s "%s"), 'COMMIT', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
+        $ax->print_sql( $sql );
+        # Choose
+        my $choice = choose(
+            [ undef,  $commit_ok ],
+            { %{$sf->{i}{lyt_stmt_v}} }
+        );
+        $ax->print_sql( $sql, $waiting );
+        if ( ! defined $choice || $choice ne $commit_ok ) {
+            $dbh->rollback;
+            $rolled_back = 1;
         }
-        push @{$sql->{insert_into_cols}}, @{$choices}[@idx];
-        my $c = 0;
-        for my $i ( @idx ) {
-            last if ! @cols;
-            my $ni = $i - ( @pre + $c );
-            splice( @cols, $ni, 1 );
-            ++$c;
+        else {;
+            $dbh->commit;
         }
+        1 }
+    ) {
+        $ax->print_error_message( "$@Rolling back ...\n", 'Commit' );
+        $dbh->rollback;
+        $rolled_back = 1;
     }
+    if ( $rolled_back ) {
+        return;
+    }
+    return 1;
+}
+
+
+sub __auto_commit {
+    my ( $sf, $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $dbh = $sf->{d}{dbh};
+    my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
+    $ax->print_sql( $sql ); #
+    # Choose
+    my $choice = choose(
+        [ undef,  $commit_ok ],
+        { %{$sf->{i}{lyt_stmt_v}}, prompt => '' }
+    );
+    $ax->print_sql( $sql, $waiting );
+    if ( ! defined $choice || $choice ne $commit_ok ) {
+        return;
+    }
+    if ( ! eval {
+        my $sth = $dbh->prepare(
+            $ax->get_stmt( $sql, $stmt_type, 'prepare' )
+        );
+        for my $values ( @$rows_to_execute ) {
+            $sth->execute( @$values );
+        }
+        1 }
+    ) {
+        $ax->print_error_message( $@, 'Auto Commit' );
+        return;
+    }
+    return 1;
 }
 
 
@@ -344,6 +311,55 @@ sub __build_insert_stmt {
             next MENU;
         }
         return 1
+    }
+}
+
+
+sub __insert_into_stmt_columns {
+    my ( $sf, $sql ) = @_;
+    my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    $sql->{insert_into_cols} = [];
+    my @cols = ( @{$sql->{cols}} );
+    if ( $plui->first_column_is_autoincrement( $sf->{d}{dbh}, $sf->{d}{schema}, $sf->{d}{table} ) ) {
+        shift @cols;
+    }
+    my $bu_cols = [ @cols ];
+
+    COL_NAMES: while ( 1 ) {
+        $ax->print_sql( $sql );
+        my @pre = ( undef, $sf->{i}{ok} );
+        my $choices = [ @pre, @cols ];
+        # Choose
+        my @idx = choose(
+            $choices,
+            { %{$sf->{i}{lyt_stmt_h}}, prompt => 'Columns:', index => 1,
+              meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
+        );
+        if ( ! $idx[0] ) {
+            if ( ! @{$sql->{insert_into_cols}} ) {
+                return;
+            }
+            $sql->{insert_into_cols} = [];
+            @cols = @$bu_cols;
+            next COL_NAMES;
+        }
+        if ( $idx[0] == 1 ) {
+            shift @idx;
+            push @{$sql->{insert_into_cols}}, @{$choices}[@idx];
+            if ( ! @{$sql->{insert_into_cols}} ) {
+                $sql->{insert_into_cols} = $bu_cols;
+            }
+            return 1;
+        }
+        push @{$sql->{insert_into_cols}}, @{$choices}[@idx];
+        my $c = 0;
+        for my $i ( @idx ) {
+            last if ! @cols;
+            my $ni = $i - ( @pre + $c );
+            splice( @cols, $ni, 1 );
+            ++$c;
+        }
     }
 }
 

@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.32      2019-01-21 00:06:45 -0500
+  - Add [Author::Plicease::Core]
+  - EUMM tweaks
+
 2.31      2019-01-02 09:02:53 -0500
   - Add support for inc/mymm-clean.pl
   - Add support for inc/mymm-config.pl

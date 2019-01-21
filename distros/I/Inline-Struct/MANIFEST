@@ -1,22 +1,27 @@
-Changes
-MANIFEST
-Makefile.PL
-README
-TODO
 benchmark
+Changes
 lib/Inline/Struct.pm
 lib/Inline/Struct.pod
 lib/Inline/Struct/grammar.pm
+Makefile.PL
+MANIFEST
+README
 t/all.t
 t/anon.t
 t/argorder.t
 t/common.pl
 t/copyref.t
+t/multi.t
 t/oneline.t
 t/readme.t
 t/refcnt.t
+t/selfref.t
 t/srcmember.t
 t/svmember.t
 t/synopsis.t
+t/types.t
+TODO
+xt/manifest.t
+xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

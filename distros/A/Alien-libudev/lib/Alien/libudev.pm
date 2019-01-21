@@ -3,7 +3,7 @@ use warnings;
 package Alien::libudev;
 
 # ABSTRACT: Perl distribution for libudev
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 use parent 'Alien::Base';
 

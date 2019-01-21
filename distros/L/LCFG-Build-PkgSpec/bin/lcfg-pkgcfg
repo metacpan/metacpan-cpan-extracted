@@ -2,18 +2,20 @@
 use strict;
 use warnings;
 
-# $Id: lcfg-pkgcfg.in 22420 2013-01-22 14:19:52Z squinney@INF.ED.AC.UK $
+# $Id: lcfg-pkgcfg.in 35341 2019-01-15 16:19:12Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-PkgSpec/bin/lcfg-pkgcfg.in,v $
-# $Revision: 22420 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_1_0/bin/lcfg-pkgcfg.in $
-# $Date: 2013-01-22 14:19:52 +0000 (Tue, 22 Jan 2013) $
+# $Revision: 35341 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_2_6/bin/lcfg-pkgcfg.in $
+# $Date: 2019-01-15 16:19:12 +0000 (Tue, 15 Jan 2019) $
 
 use LCFG::Build::PkgSpec;
 use File::Spec ();
 use Getopt::Long ();
 use Pod::Usage ();
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.6';
+
+use v5.10;
 
 my ( $get, %set, $in, $out, $skeleton, $help );
 Getopt::Long::GetOptions('get=s'    => \$get,
@@ -118,7 +120,7 @@ lcfg-pkgcfg - A tool for querying LCFG build metadata files
 
 =head1 VERSION
 
-This documentation refers to lcfg-reltool version 0.1.0
+This documentation refers to lcfg-reltool version 0.2.6
 
 =head1 USAGE
 
@@ -148,9 +150,9 @@ Perl CPAN modules.
 
 =head1 OPTIONS
 
-=over 4
+=over
 
-=item --in
+=item I<--in>
 
 The input LCFG build package specification metadata file name. If no
 path is passed into the script then it uses the lcfg.yml file in the
@@ -158,7 +160,7 @@ current-directory. Otherwise you can specify a particular metadata
 file (in which case any name is acceptable) or a particular directory,
 in which case lcfg.yml will be used automatically.
 
-=item --out
+=item I<--out>
 
 The output LCFG build package specification metadata file name. If no
 path is passed into the script then it uses the input file
@@ -174,7 +176,7 @@ the data from the input will be copied to the output, anything
 irrelevant will be ignored. It is thus possible to create an LCFG
 metadata file from a CPAN metadata file (META.yml).
 
-=item --get
+=item I<--get>
 
 Specify the name of the attribute to query. See
 L<LCFG::Build::PkgSpec> for the full list of attributes. Attributes
@@ -186,7 +188,7 @@ C<vcs.genchangelog> or C<build.gencmake>, you can access any hash
 element as deep as you like. If the value of an element is an array it
 will be stringified as described above.
 
-=item --set
+=item I<--set>
 
 Set the value for a attribute in the LCFG build package specification,
 see L<LCFG::Build::PkgSpec> for the full list of attributes. It is
@@ -194,7 +196,7 @@ possible to set any number of key-value pairs at the same time. Each
 pair should be separated by just an '=' sign and preceded by the
 I<--set> option.
 
-=item --skeleton
+=item I<--skeleton>
 
 Create a skeleton package specification. As a default it sets the
 package name to 'skeleton', which is not what you want, and leaves
@@ -204,9 +206,11 @@ should be aware that if you use this option with a project that
 already has a lcfg.yml specification that file will be overwritten
 with the new settings.
 
-=item --help
+=item I<--help>
 
 Show the documentation.
+
+=back
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
@@ -256,7 +260,7 @@ Stephen Quinney <squinney@inf.ed.ac.uk>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2008-2013 University of Edinburgh. All rights reserved.
+Copyright (C) 2008-2019 University of Edinburgh. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GPL, version 2 or later.

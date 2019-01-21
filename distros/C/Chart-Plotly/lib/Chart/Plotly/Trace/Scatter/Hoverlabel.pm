@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Scatter::Hoverlabel::Font;
 
-our $VERSION = '0.022';    # VERSION
+our $VERSION = '0.023';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scatter.
 
@@ -85,7 +85,7 @@ Chart::Plotly::Trace::Scatter::Hoverlabel - This attribute is one of the possibl
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

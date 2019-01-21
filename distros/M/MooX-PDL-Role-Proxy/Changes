@@ -1,5 +1,18 @@
 Revision history for MooX-PDL-Role-Proxy
 
+0.03      2019-01-18 11:46:22-05:00 America/New_York
+
+  [STABLE RELEASE]
+
+    * no code changes from 0.02
+
+
+0.02      2018-12-09 00:43:39-05:00 America/New_York (TRIAL RELEASE)
+
+  [ BUILD FIX ]
+
+    * specify required version of MooX::TaggedAttributes
+
 0.01      2018-12-09 00:43:39-05:00 America/New_York
 
 * First release upon an unsuspecting world.

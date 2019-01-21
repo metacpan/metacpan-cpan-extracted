@@ -1,13 +1,37 @@
---- #YAML:1.0
-name:                Tie-CheckVariables
-version:             0.03
-abstract:            check/validate variables for their datatype
-license:             perl
-generated_by:        ExtUtils::MakeMaker version 6.31
-distribution_type:   module
-requires:     
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+---
+abstract: 'check/validate variables for their data type'
 author:
-    - Renee Baecker <module@renee-baecker.de>
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires:
+  FindBin: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::CheckManifest: '1.38'
+  Test::More: '0'
+  Test::Pod::Coverage: '0'
+  Types::Standard: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-CheckVariables
+provides:
+  Tie::CheckVariables:
+    file: lib/Tie/CheckVariables.pm
+    version: '0.06'
+requires:
+  Carp: '0'
+  Scalar::Util: '0'
+  perl: '5.008'
+resources:
+  bugtracker: http://github.com/reneeb/Tie-CheckVariables/issues
+  homepage: http://github.com/reneeb/Tie-CheckVariables
+  repository: git://github.com/reneeb/Tie-CheckVariables.git
+version: '0.06'
+x_contributors:
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

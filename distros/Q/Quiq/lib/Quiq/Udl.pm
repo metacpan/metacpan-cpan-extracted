@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -729,7 +729,7 @@ sub udl {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

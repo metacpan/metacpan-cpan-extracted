@@ -1,6 +1,12 @@
 https://github.com/amaltsev/XAO-FS
 ----------------------------------
 
+commit 7f09060e8207d002b9e019ef2aa6fd029fec7382
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Jan 16 12:02:09 2019 -0800
+
+    1.24 Fixed a bug with resizing blobs
+
 commit 1559e4b2e6af6caab171278d5a57cd5f3fb670dc
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Jan 4 17:49:55 2019 -0800
@@ -68,10 +74,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Tue Jun 12 20:31:09 2018 -0700
 
     1.18 Ready for cpanm, skipping tests if no DB
-
-commit 486be88b495cce1289a7aefa6d693c9267f476b5
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Tue Dec 12 16:09:29 2017 -0800
-
-    Version bump on XAO::FS to 1.17
 

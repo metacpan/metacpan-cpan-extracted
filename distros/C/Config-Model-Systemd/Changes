@@ -1,3 +1,18 @@
+0.240.1 2019-01-17
+
+  Model update:
+    * update parameters from systemd 240 source
+    * use auto-delete to cleanup empty config files
+      (which requires Config::Model 2.133)
+
+  Model generator (parse-man.pl) changes:
+    * parse-man: set auto-delete for systemd backend
+    * parse-man: infer choice from other enum
+
+  Other changes:
+    * add a message when creating a unit file
+    * remove mentions of sourceforge mailing list in doc
+
 0.239.1 2018-07-10
 
   Systemd model update:

@@ -3,13 +3,25 @@ use Config; # before strict...
 use strict;
 use warnings;
 
+use v5.10;
+
 use Module::Build;
+use File::Find;
 
 my %yml_files = map { $_ => "lcfgbuild/$_" }
     qw(lcfg_config.yml mapping_config.yml);
 
-my %tmpl_files = map { $_ => "lcfgbuild/$_" }
-    ( glob('templates/*.tt'), glob('templates/*.tmpl') );
+
+my %tmpl_files;
+File::Find::find( 
+    {
+        wanted => sub {
+            $tmpl_files{$File::Find::name} = "lcfgbuild/$File::Find::name"
+                if -f $File::Find::name;
+        },
+        no_chdir => 1,
+    },
+    'templates' );
 
 my $lcfgbuild_dir;
 if ( $Config{osname} eq 'darwin' ) {
@@ -26,17 +38,19 @@ my $build = Module::Build->new(
     module_name   => 'LCFG::Build::Tools',
     dist_abstract => 'LCFG build system tools',
     dist_author   => 'Stephen Quinney <squinney@inf.ed.ac.uk>',
-    dist_version  => '0.6.6',
+    dist_version  => '0.9.18',
     license => 'gpl',
     requires => {
-        'perl'                 => '5.6.1',
+        'perl'                 => '5.10.0',
         'Archive::Tar'         => '0',
         'DateTime'             => '0',
+        'File::Copy::Recursive' => '0',
         'File::HomeDir'        => '0.58',
         'File::Find::Rule'     => '0',
+        'File::pushd'          => '0',
         'IO::Zlib'             => '0',
-        'LCFG::Build::PkgSpec' => '0.1.0',
-        'LCFG::Build::VCS'     => '0.0.19',
+        'LCFG::Build::PkgSpec' => '0.2.6',
+        'LCFG::Build::VCS'     => '0.3.7',
         'Module::Pluggable'    => '3.10',
         'Moose'                => '0.57',
         'MooseX::App::Cmd'     => '0.06',
@@ -46,11 +60,12 @@ my $build = Module::Build->new(
         'YAML::Syck'           => '0.98',
     },
     build_requires => {
-        'Test::More'        => 0,
-        'Test::Differences' => 0,
-        'Test::Exception'   => 0,
+        'File::Find'        => '0',
+        'Test::More'        => '0',
+        'Test::Differences' => '0',
+        'Test::Exception'   => '0',
     },
-    configure_requires => { 'Module::Build' => 0.38 },
+    configure_requires => { 'Module::Build' => '0.40' },
     add_to_cleanup => [ 'LCFG-Build-Tools-*', 'MANIFEST.bak', 'Changes.bak' ],
     create_makefile_pl => 'traditional',
     yml_files    => \%yml_files,

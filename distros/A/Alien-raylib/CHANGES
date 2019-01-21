@@ -1,9 +1,30 @@
 ==================================================
-Changes from 2017-10-07 00:00:00 +0000 to present.
+Changes from 2018-01-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.022 at 2018-10-07 08:51:25 +0000
+version 0.023 at 2019-01-19 17:56:01 +0000
+------------------------------------------
+
+  Change: d5b7a954df68d2ec0e1b83c101458219b8534245
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-01-19 18:55:45 +0000
+
+    Harcode CMAKE_INSTALL_DIR as lib
+
+    This fixes #3 by ensuring pkg-config and library files are installed
+    into lib/, not lib64 or some other OS-specific subdir, so
+    Alien::Build can find the library and *.pc file on e.g. Fedora 28
+    x64, which has them in lib64/. 
+
+  Change: 2fabc986896bec0af0316bca21670f21c5e23405
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-01-16 14:16:44 +0000
+
+    Track newer raylib 
+
+------------------------------------------
+version 0.022 at 2018-10-07 08:50:36 +0000
 ------------------------------------------
 
   Change: 04a00561fecdf2b3d7aae093a0cf1d459ec6635e
@@ -203,39 +224,6 @@ version 0.007 at 2018-01-25 21:00:52 +0000
 
     Point at newest raylib develop snapshot 
 
-------------------------------------------
-version 0.006 at 2017-11-27 02:07:00 +0000
-------------------------------------------
-
-  Change: 0e254b60579bdc98ed100fdac54817cc2208e1b2
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-11-27 03:07:00 +0000
-
-    Don't fetch newest upstream tarball
-
-    Settle for a specific commit and update as needed. Current commit
-    also fixes an issue with older GCCs defaulting to -std=gnu89. 
-
-------------------------------------------
-version 0.005 at 2017-11-25 23:13:47 +0000
-------------------------------------------
-
-  Change: c664b70fb33c685fbf48aa1c97271436652e0696
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-11-26 00:13:47 +0000
-
-    Upgrade to raylib 1.8.0 
-
-------------------------------------------
-version 0.004 at 2017-10-07 18:38:07 +0000
-------------------------------------------
-
-  Change: f245e9631103b1a9aba57355431947bd6c935983
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-10-07 20:38:07 +0000
-
-    s/http/https/ in download url 
-
 ================================================
-Plus 3 releases after 2017-10-07 00:00:00 +0000.
+Plus 6 releases after 2018-01-19 00:00:00 +0000.
 ================================================

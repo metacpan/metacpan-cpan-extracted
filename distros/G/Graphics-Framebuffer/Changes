@@ -1319,3 +1319,12 @@ Revision history for Graphics-Framebuffer
       The test scripts have been culled of all but the necessary, and the main
       test script given double buffering for 16 bit displays.  This doesn't
       affect 32 bit displays.
+
+6.14 Jan 20, 2019
+
+      Minor changes to the Splash module.  Turned off alpha output for
+      Nouveau framebuffer devices, and alpha appears to be slow for anything
+      but one way writing.  This allows the logo to show much more quickly on
+      Nouveau devices.
+
+      Minor changes to the double buffer setup of the test scripts.

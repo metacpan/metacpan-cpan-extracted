@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Quiq::FileHandle;
 
@@ -354,7 +354,10 @@ sub html {
             $str .= '.' x ($i-length($str)-1);
             $str .= $i;
         }
-        $str .= '.' x ($max-length($str));
+        my $l = $max-length($str);
+        if ($l > 0) {
+            $str .= '.' x $l;
+        }
 
         $html = $h->tag('tr','-',
             $h->tag('td',
@@ -397,7 +400,7 @@ sub html {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

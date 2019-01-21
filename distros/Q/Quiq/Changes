@@ -1,3 +1,56 @@
+1.131 2019-01-21
+================
+[Quiq::MediaWiki::Api]
+Request siteInfo() hinzugefügt.
+
+[Quiq::MediaWiki::Markup]
+Codeerzeugung image() hinzugefügt.
+
+[Quiq::Concat]
+Doku bearbeitet.
+
+[Quiq::Parameters]
+Methode extractPropertiesToObject() hinzugefügt.
+
+1.130 2019-01-19
+================
+[Quiq::Database::ResultSet]
+In asTable() Datensatzzähler und Ausführungszeit vertauscht.
+
+[Quiq::Html::Listing]
+Warning im Zusammenhang mit x-Operator behoben.
+
+[Quiq::MediaWiki::Api]
+Konstruktor-Option -warnings hinzugefügt.
+
+Methode loadPage() hinzugefügt.
+
+[Quiq::Sdoc::Code]
+Kosmetik.
+
+[Quiq::AnsiColor]
+Methode active() hinzugefügt.
+
+[Quiq::Config]
+Konstruktor-Option -secure hinzugefügt.
+
+[Quiq::Converter]
+Methode doubleDecode() hinzugefügt.
+
+[Quiq::Hash]
+Fehlermeldung bei nicht-existentem Schlüssel verbessert.
+
+[Quiq::Path]
+Methode checkFileSecurity() hinzugefügt.
+
+[Quiq::Sdoc]
+Methoden code(), paragraph() hinzugefügt.
+
+Methode section() verallgemeinert.
+
+[Quiq::Stacktrace]
+Kosmetik.
+
 1.129 2019-01-12
 ================
 Bibliothek umbenannt von Prty in Quiq.

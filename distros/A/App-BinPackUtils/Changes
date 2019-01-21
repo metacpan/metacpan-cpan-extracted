@@ -1,3 +1,15 @@
+0.003   2019-01-17 (PERLANCAR)
+
+	- Add utility: count-number-of-dvs-required.
+
+	- Add option --num-bins (-n) to return just the number of bins/dvds
+	  required.
+
+	- [ux] Rename --bin-size to --dvd-size for bin-files-into-dvds.
+
+	- [doc] Add more keywords.
+
+
 0.002   2019-01-16 (PERLANCAR)
 
 	- bin-files-into-dvds: allow overriding --bin-size (-s) which

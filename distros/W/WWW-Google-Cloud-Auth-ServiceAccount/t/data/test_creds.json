@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "foobar",
+  "private_key_id": "11111111111111111",
+  "private_key": "-----BEGIN RSA PRIVATE KEY-----\nMIICXgIBAAKBgQDIgnSESkWlGsciNgH45DkXqbpVmvsrwfyHNTZwXQYVJNXjmqdp\nw2AsWDvvHwdtAqh8SWPgBtE8NmjsxqS7DxBBI5ku5Jpt8CwplOA4qt5GLt3/Fc7W\nDTf8KvZUwuLErp9F0+5O8kOr5SqMARR9Ko60PmJxNUm2cBx6TYIZ6qoXZQIDAQAB\nAoGBAJMxITPUChhP9gspNn1tnHPAhyc8pFHVD/p5l8MYptRyvAlfiLJdWIZ1J1o8\nnwjpQKIshgL5PjRDhPb8RAWF41mA9MvAdttat7npGZsnfsZkmIPuJnueXk6HdwRC\njvG8AbK4dsGEtsv+1oq6VP8F6WZZucSQoq1uWJ8MYWy6MQgpAkEA8MwRySid+V9h\nyl+xNzbshXi2/z3r3IyquqhQc0eKt+gyxmzFnMHXRpmBj1MmDb/YQBpIMLeuH5R1\nMbEFW3qBawJBANUrOvECtTug4LCG3tyQz3xXj5cPCaTnkeZydRxYw4rDTGyml8y4\nY8VHwqhUju/lN6Y0rDP8XqkbUqzFzeLQbm8CQFbn//9O9nz7LMsicE5SN1kQsVM7\noPWvmyrU9nw0tN8dIb41obiqySyE2JrG0rQhqkWwdp+Gm4RwSz/M+PcEJtMCQQCH\nZQ/o6Mln+ET+mouPGMNQvOTNE5YSkasP7f8IZDC/QFCYai/crflg4rV26U5ofPSd\nsrL1ygPt8RbP+ktNFwotAkEAqqa4K082b0qG9px6D0pYhI6tZId+tcXGEky9xo8l\n3mu6Ufmn+lSZNOPYR/+PMJfkILcj7OWDvu1OppQhtuZtIQ==\n-----END RSA PRIVATE KEY-----",
+  "client_email": "johndoe@foobar.iam.gserviceaccount.com",
+  "client_id": "123456",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/foobar.iam.gserviceaccount.com"
+}

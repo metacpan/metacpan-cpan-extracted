@@ -113,7 +113,7 @@
             float *ptr;
             Newx_or_alloca(ptr, 2, float complex);
             argument_pointers[i] = ptr;
-            ffi_pl_perl_complex_float(arg, ptr);
+            ffi_pl_perl_to_complex_float(arg, ptr);
           }
           break;
         case FFI_PL_TYPE_COMPLEX_DOUBLE:
@@ -121,7 +121,7 @@
             double *ptr;
             Newx_or_alloca(ptr, 2, double);
             argument_pointers[i] = ptr;
-            ffi_pl_perl_complex_double(arg, ptr);
+            ffi_pl_perl_to_complex_double(arg, ptr);
           }
           break;
 #endif
@@ -157,6 +157,7 @@
               ffi_status ffi_status;
 
               SvREFCNT_inc(arg);
+              SvREFCNT_inc(SvRV(arg));
 
               closure = ffi_pl_closure_get_data(arg, self->argument_types[i]);
               if(closure != NULL)
@@ -193,9 +194,22 @@
                   }
                   else
                   {
-                    closure->coderef = arg;
-                    ffi_pl_closure_add_data(arg, closure);
-                    ffi_pl_arguments_set_pointer(arguments, i, closure->function_pointer);
+                    SV **svp;
+                    svp = hv_fetch((HV *)SvRV(arg), "code", 4, 0);
+                    if(svp != NULL)
+                    {
+                      closure->coderef = *svp;
+                      SvREFCNT_inc(closure->coderef);
+                      ffi_pl_closure_add_data(arg, closure);
+                      ffi_pl_arguments_set_pointer(arguments, i, closure->function_pointer);
+                    }
+                    else
+                    {
+                      ffi_closure_free(closure->ffi_closure);
+                      Safefree(closure);
+                      ffi_pl_arguments_set_pointer(arguments, i, NULL);
+                      warn("closure has no coderef");
+                    }
                   }
                 }
               }
@@ -283,8 +297,37 @@
                         ffi_pl_perl_to_long_double(arg2, (long double*)ptr);
                         break;
 #endif
+#ifdef FFI_PL_PROBE_COMPLEX
+                      case FFI_PL_TYPE_COMPLEX_FLOAT | FFI_PL_SHAPE_POINTER:
+                        Newx_or_alloca(ptr, 1, float complex);
+                        ffi_pl_perl_to_complex_float(arg2, (float *)ptr);
+                        break;
+                      case FFI_PL_TYPE_COMPLEX_DOUBLE | FFI_PL_SHAPE_POINTER:
+                        Newx_or_alloca(ptr, 1, double complex);
+                        ffi_pl_perl_to_complex_double(arg2, (double *)ptr);
+                        break;
+#endif
+                      case FFI_PL_TYPE_STRING | FFI_PL_SHAPE_POINTER:
+                        Newx_or_alloca(ptr, 1, char *);
+                        if(SvOK(arg2))
+                        {
+                          char *pv;
+                          STRLEN len;
+                          char *str;
+                          pv = SvPV(arg2, len);
+                          /* TODO: this should probably be a malloc since it could be arbitrarily large */
+                          Newx_or_alloca(str, len+1, char);
+                          memcpy(str, pv, len+1);
+                          *((char**)ptr) = str;
+                        }
+                        else
+                        {
+                          *((char**)ptr) = NULL;
+                        }
+                        break;
                       default:
                         warn("argument type not supported (%d)", i);
+                        Newx_or_alloca(ptr, 1, void*);
                         *((void**)ptr) = NULL;
                         break;
                     }
@@ -414,6 +457,28 @@
                       }
                       break;
 #endif
+                    case FFI_PL_TYPE_STRING | FFI_PL_SHAPE_ARRAY:
+                      Newx(ptr, count, char *);
+                      for(n=0; n<count; n++)
+                      {
+                        SV *sv = *av_fetch(av, n, 1);
+                        if(SvOK(sv))
+                        {
+                          char *str;
+                          char *pv;
+                          STRLEN len;
+                          pv = SvPV(sv, len);
+                          /* TODO: this should probably be a malloc since it could be arbitrarily large */
+                          Newx_or_alloca(str, len+1, char);
+                          memcpy(str, pv, len+1);
+                          ((char**)ptr)[n] = str;
+                        }
+                        else
+                        {
+                          ((char**)ptr)[n] = NULL;
+                        }
+                      }
+                      break;
                     default:
                       Newxz(ptr, count*(1 << ((type_code & FFI_PL_SIZE_MASK)-1)), char);
                       warn("argument type not supported (%d)", i);
@@ -588,6 +653,7 @@
             if(SvROK(arg))
             {
               SvREFCNT_dec(arg);
+              SvREFCNT_dec(SvRV(arg));
             }
           }
           break;
@@ -656,12 +722,30 @@
                         break;
 #ifdef FFI_PL_PROBE_LONGDOUBLE
                       case FFI_PL_TYPE_LONG_DOUBLE | FFI_PL_SHAPE_POINTER:
-                        {
-                          SV *arg2 = SvRV(arg);
-                          ffi_pl_long_double_to_perl(arg2,(long double*)ptr);
-                        }
+                        ffi_pl_long_double_to_perl(SvRV(arg),(long double*)ptr);
                         break;
 #endif
+#ifdef FFI_PL_PROBE_COMPLEX
+                      case FFI_PL_TYPE_COMPLEX_FLOAT | FFI_PL_SHAPE_POINTER:
+                        ffi_pl_complex_float_to_perl(SvRV(arg), (float *)ptr);
+                        break;
+                      case FFI_PL_TYPE_COMPLEX_DOUBLE | FFI_PL_SHAPE_POINTER:
+                        ffi_pl_complex_double_to_perl(SvRV(arg), (double *)ptr);
+                        break;
+#endif
+                      case FFI_PL_TYPE_STRING | FFI_PL_SHAPE_POINTER:
+                        {
+                          char **pv = ptr;
+                          if(*pv == NULL)
+                          {
+                            sv_setsv(SvRV(arg), &PL_sv_undef);
+                          }
+                          else
+                          {
+                            sv_setpv(SvRV(arg), *pv);
+                          }
+                        }
+                        break;
                     }
                   }
                 }
@@ -747,6 +831,7 @@
                       }
                       break;
                     case FFI_PL_TYPE_OPAQUE | FFI_PL_SHAPE_ARRAY:
+                    case FFI_PL_TYPE_STRING | FFI_PL_SHAPE_ARRAY:
                       for(n=0; n<count; n++)
                       {
                         if( ((void**)ptr)[n] == NULL)
@@ -755,7 +840,14 @@
                         }
                         else
                         {
-                          sv_setnv(*av_fetch(av,n,1), PTR2IV( ((void**)ptr)[n]) );
+                          switch(type_code) {
+                            case FFI_PL_TYPE_OPAQUE | FFI_PL_SHAPE_ARRAY:
+                              sv_setnv(*av_fetch(av,n,1), PTR2IV( ((void**)ptr)[n]) );
+                              break;
+                            case FFI_PL_TYPE_STRING | FFI_PL_SHAPE_ARRAY:
+                              sv_setpv(*av_fetch(av,n,1), ((char**)ptr)[n] );
+                              break;
+                          }
                         }
                       }
                       break;
@@ -946,6 +1038,24 @@
           }
         }
 #endif
+#ifdef FFI_PL_PROBE_COMPLEX
+        case FFI_PL_TYPE_COMPLEX_FLOAT:
+          {
+            SV *sv = sv_newmortal();
+            ffi_pl_complex_float_to_perl(sv, (float*)&result.complex_float);
+            ST(0) = sv;
+            XSRETURN(1);
+          }
+          break;
+        case FFI_PL_TYPE_COMPLEX_DOUBLE:
+          {
+            SV *sv = sv_newmortal();
+            ffi_pl_complex_double_to_perl(sv, (double*)&result.complex_double);
+            ST(0) = sv;
+            XSRETURN(1);
+          }
+          break;
+#endif
         case FFI_PL_TYPE_RECORD:
           if(result.pointer == NULL)
           {
@@ -1047,6 +1157,23 @@
                     ffi_pl_long_double_to_perl(value, (long double*)result.pointer);
                     break;
 #endif
+#ifdef FFI_PL_PROBE_COMPLEX
+                  case FFI_PL_TYPE_COMPLEX_FLOAT | FFI_PL_SHAPE_POINTER:
+                    value = sv_newmortal();
+                    ffi_pl_complex_float_to_perl(value, (float*)result.pointer);
+                    break;
+                  case FFI_PL_TYPE_COMPLEX_DOUBLE | FFI_PL_SHAPE_POINTER:
+                    value = sv_newmortal();
+                    ffi_pl_complex_double_to_perl(value, (double*)result.pointer);
+                    break;
+#endif
+                  case FFI_PL_TYPE_STRING | FFI_PL_SHAPE_POINTER:
+                    value = sv_newmortal();
+                    if( *((void**)result.pointer) == NULL )
+                      value = &PL_sv_undef;
+                    else
+                      sv_setpv(value, (char*) result.pointer);
+                    break;
                   default:
                     warn("return type not supported");
                     XSRETURN_EMPTY;
@@ -1068,6 +1195,11 @@
               else
               {
                 int count = self->return_type->extra[0].array.element_count;
+                if(count == 0 && type_code & FFI_PL_TYPE_OPAQUE)
+                {
+                  while(((void**)result.pointer)[count] != NULL)
+                    count++;
+                }
                 AV *av;
                 SV **sv;
                 Newx(sv, count, SV*);
@@ -1141,6 +1273,7 @@
                       sv[i] = newSVnv( ((double*)result.pointer)[i] );
                     }
                     break;
+                  case FFI_PL_TYPE_STRING | FFI_PL_SHAPE_ARRAY:
                   case FFI_PL_TYPE_OPAQUE | FFI_PL_SHAPE_ARRAY:
                     for(i=0; i<count; i++)
                     {
@@ -1150,7 +1283,14 @@
                       }
                       else
                       {
-                        sv[i] = newSViv( PTR2IV( ((void**)result.pointer)[i] ));
+                        switch(type_code) {
+                          case FFI_PL_TYPE_STRING | FFI_PL_SHAPE_ARRAY:
+                            sv[i] = newSVpv( ((char**)result.pointer)[i], 0 );
+                            break;
+                          case FFI_PL_TYPE_OPAQUE | FFI_PL_SHAPE_ARRAY:
+                            sv[i] = newSViv( PTR2IV( ((void**)result.pointer)[i] ));
+                            break;
+                        }
                       }
                     }
                     break;

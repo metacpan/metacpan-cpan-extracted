@@ -2,7 +2,7 @@
 
 use utf8;
 
-use Test::More tests => 60;
+use Test::More tests => 74;
 BEGIN { use_ok('Calendar::Japanese::Holiday') };
 
 #########################
@@ -186,6 +186,21 @@ ok(cmpHash(getHolidays(2009, 9, 1),
 	    23 => '秋分の日'}),
    "getHolidays - Kokumin-no-hi in september (2009)");
 
+# 2019年4,5月分の処理(4/30は判定が月をまたぐケース)
+ok(cmpHash(getHolidays(2019, 4, 1),
+	   {29 => '昭和の日',
+	    30 => '国民の休日'}),
+   "getHolidays - Kokumin-no-hi in 2019.4");
+ok(cmpHash(getHolidays(2019, 5, 1),
+	   {1 => '天皇の即位の日',
+	    2 => '国民の休日',
+	    3 => '憲法記念日',
+	    4 => 'みどりの日',
+	    5 => 'こどもの日',
+	    6 => '振替'}),
+   "getHolidays - Kokumin-no-hi in 2019.5");
+
+
 #
 # Test for isHoliday()
 #
@@ -214,7 +229,9 @@ ok(checkHoliday(2007,  $ED, 5,  4, 'みどりの日'),   'Midori(2007-)');
 ok(checkHoliday(2007,  $ED, 4, 29, '昭和の日'),     'Shouwai(2007-)');
 
 ok(checkHoliday(1949, 1988, 4, 29, '天皇誕生日'),   'TennouTanjoubi(-1988)');
-ok(checkHoliday(1989,  $ED,12, 23, '天皇誕生日'),   'TennouTanjoubi(1989-)');
+ok(checkHoliday(1989, 2018,12, 23, '天皇誕生日'),   'TennouTanjoubi(1989-2018)');
+ok(checkHoliday(2019, 2019,12, 23, ''),             'TennouTanjoubi(2019)');
+ok(checkHoliday(2020,  $ED, 2, 23, '天皇誕生日'),   'TennouTanjoubi(2020-)');
 
 ok(checkHoliday(1949,  $ED, 5,  3, '憲法記念日'),   'Kenpou');
 
@@ -224,6 +241,9 @@ ok(checkHoliday( $ST, 1995, 7, 20, ''),             'Umi(-1995)');
 ok(checkHoliday(1996, 2002, 7, 20, '海の日'),       'Umi(1996-2002)');
 ok(checkHoliday(2003, 2003, 7, 20, ''),             'Umi(2003 !Happy Monday)');
 ok(checkHoliday(2007, 2007, 7, 16, '海の日'),       'Umi(2007 Happy Monday)');
+ok(checkHoliday(2019, 2019, 7, 15, '海の日'),       'Umi(2019 Happy Monday)');
+ok(checkHoliday(2020, 2020, 7, 23, '海の日'),       'Umi(2020 olympic)');
+ok(checkHoliday(2021, 2021, 7, 19, '海の日'),       'Umi(2021 Happy Monday)');
 
 ok(checkHoliday( $ST, 1965, 9, 15, ''),             'Keirou(-1965)');
 ok(checkHoliday(1966, 2002, 9, 15, '敬老の日'),     'Keirou(1966-2002)');
@@ -234,7 +254,10 @@ ok(checkHoliday(2007, 2007, 9, 17, '敬老の日'),     'Keirou(2007 Happy Monda
 ok(checkHoliday( $ST, 1965,10, 10, ''),             'Taiiku(-1965)');
 ok(checkHoliday(1966, 1999,10, 10, '体育の日'),     'Taiiku(1966-1999)');
 ok(checkHoliday(2000, 2000,10, 10, ''),             'Taiiku(2000 !Happy Monday)');
-ok(checkHoliday(2007, 2007,10, 8, '体育の日'),      'Taiiku(2007 Happy Monday)');
+ok(checkHoliday(2007, 2007,10,  8, '体育の日'),     'Taiiku(2007 Happy Monday)');
+ok(checkHoliday(2019, 2019,10, 14, '体育の日'),     'Taiiku(2019 Happy Monday)');
+ok(checkHoliday(2020, 2020, 7, 24, 'スポーツの日'), 'Taiiku(2020 olympic)');
+ok(checkHoliday(2021, 2021,10, 11, 'スポーツの日'), 'Taiiku(2021 olympic)');
 
 ok(checkHoliday( $ST,  $ED,11,  3, '文化の日'),     'Bunka');
 
@@ -244,9 +267,13 @@ ok(checkHoliday(1959, 1959, 4, 10, '皇太子明仁親王の結婚の儀'), 'Exc
 ok(checkHoliday(1989, 1989, 2, 24, '昭和天皇の大喪の礼'),       'Exceptional');
 ok(checkHoliday(1990, 1990,11, 12, '即位礼正殿の儀'),           'Exceptional');
 ok(checkHoliday(1993, 1993, 6,  9, '皇太子徳仁親王の結婚の儀'), 'Exceptional');
+ok(checkHoliday(2019, 2019, 5,  1, '天皇の即位の日'), 'Exceptional');
+ok(checkHoliday(2019, 2019,10, 22, '即位礼正殿の儀の行われる日'), 'Exceptional');
 
 ok(checkHoliday( $ST, 2015, 8, 11, ''),             'Yama(-2015)');
-ok(checkHoliday(2016,  $ED, 8, 11, '山の日'),       'Yama(2016-2020)');
+ok(checkHoliday(2016, 2019, 8, 11, '山の日'),       'Yama(2016-2019)');
+ok(checkHoliday(2020, 2020, 8, 10, '山の日'),       'Yama(2020)');
+ok(checkHoliday(2021,  $ED, 8, 11, '山の日'),       'Yama(2016-2021)');
 
 ok(checkShunbunShuubun(), 'Shunbun/Shuubun');
 

@@ -5,7 +5,7 @@ use warnings;
 use FFI::Platypus;
 
 # ABSTRACT: Platypus custom type for arrays of strings
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 
 use constant _incantation =>
@@ -124,7 +124,7 @@ FFI::Platypus::Type::StringArray - Platypus custom type for arrays of strings
 
 =head1 VERSION
 
-version 0.59
+version 0.74
 
 =head1 SYNOPSIS
 
@@ -159,6 +159,13 @@ In your L<Platypus::FFI> code:
  takes_fixed_string_array([qw( s1 s2 s3 s4 s5 )]);
 
 =head1 DESCRIPTION
+
+B<NOTE>: The primary motivation for this custom type was originally to
+fill the void left by the fact that L<FFI::Platypus> did not support arrays
+of strings by itself.  Since 0.62 this support has been added, and that is
+probably what you want to use, but the semantics and feature set are
+slightly different, so there are cases where you might want to use this
+custom type.
 
 This module provides a L<FFI::Platypus> custom type for arrays of
 strings. The array is always NULL terminated.  Return types are supported!
@@ -236,7 +243,7 @@ Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015,2016,2017,2018 by Graham Ollis.
+This software is copyright (c) 2015,2016,2017,2018,2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

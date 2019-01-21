@@ -1,27 +1,34 @@
-version 1.0200 - September 17, 2015
+1.0201 2019-01-21
+ * Changed changelog format.
+ * Fixed use of uninitialized value (Alberto Simões)
+ * Fix hanging =item (Alberto Simões)
+ * Complete PODs (Alberto Simões)
+ * Add meta.json creation to dist.ini (Lance Wicks)
+
+1.0200 2015-09-17
  * Added max_weight attribute to box types so that boxes span based upon weight. Defaults to 1000.
 
-version 1.0100 - September 11, 2015
+1.0100 2015-09-11
  * Added new sort algorithm: sort_items_by_z_desc_A
  * Integration with Travis (cakirke)
  * Fixed hash key sorting (cakirke)
  * Fixes for Kwalitee errors (openstrike)
 
-version 1.0001 - September 28, 2014
+1.0001 2014-09-28
  * Declaired Data::GUID dependency.
 
-version 1.0000 - June 23, 2014
+1.0000 2014-06-23
  * No longer a wrapper of a web service. Exposed code behind the web service as it's own public module.
 
-version 0.0501 - Novemver 6, 2012
+0.0501 2012-11-06
  * Fix some cosmetic problems.
  * Added some parameter validation for the shipping_options method.
 
-version 0.0500 - November 6, 2012
+0.0500 2012-11-06
  * NOT backwards compatible.
  * Now works asynchronously.
  * Add SSL to web service.
  * Add shipping_options method which returns USPS postage rate calculations.
 
-version 0.0400 - October 25, 2012
+0.0400 2012-10-25
  * First public release to web service.

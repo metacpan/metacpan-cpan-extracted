@@ -1,7 +1,7 @@
 ##############################################################################
 #
 #  Data::Tools perl module
-#  2013-2018 (c) Vladi Belperchinov-Shabanski "Cade"
+#  2013-2019 (c) Vladi Belperchinov-Shabanski "Cade"
 #  http://cade.datamax.bg
 #  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 #
@@ -13,8 +13,10 @@ use strict;
 use Exporter;
 use Carp;
 use Data::Tools;
+use Date::Calc;
+use Time::JulianDay;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -24,6 +26,15 @@ our @EXPORT = qw(
     
                 julian_date_diff_in_words
                 julian_date_diff_in_words_relative
+
+                julian_date_add_ymd
+                julian_date_to_ymd
+                julian_date_from_ymd
+                julian_date_goto_first_dom
+                julian_date_goto_last_dom
+                julian_date_get_dow
+                julian_date_month_days_ym
+                julian_date_month_days
 
                 );
 
@@ -159,6 +170,89 @@ sub julian_date_diff_in_words_relative
 
 ##############################################################################
 
+# return julian date, moved with positive or negative deltas ( y, m, d ) 
+sub julian_date_add_ymd
+{
+  my $wd = shift; # original/work date
+  my $dy = shift; # add delta year
+  my $dm = shift; # add delta month
+  my $dd = shift; # add delta day
+
+  my ( $y, $m, $d ) = inverse_julian_day( $wd );
+
+  ( $y, $m, $d ) = Date::Calc::Add_Delta_YMD( $y, $m, $d, $dy, $dm, $dd );
+
+  $wd = julian_day( $y, $m, $d );
+
+  return $wd;
+
+}
+
+# return ( year, month, day ) from julian date
+sub julian_date_to_ymd
+{
+  my $wd = shift; # original/work date
+
+  my ( $y, $m, $d ) = inverse_julian_day( $wd );
+  return ( $y, $m, $d );
+}
+
+# return julian date from ( year, month, day )
+sub julian_date_from_ymd
+{
+  my $y = shift; # set year
+  my $m = shift; # set month
+  my $d = shift; # set day
+
+  my $wd = julian_day( $y, $m, $d );
+  return $wd;
+}
+
+# return julian date, moved to the first day of its month
+sub julian_date_goto_first_dom
+{
+  my $wd = shift; # original/work date
+
+  my ( $y, $m, $d ) = julian_date_to_ymd( $wd );
+  return julian_date_from_ymd( $y, $m, 1 );
+}
+
+# return julian date, moved to the last day of its month
+sub julian_date_goto_last_dom
+{
+  my $wd = shift; # original/work date
+
+  my ( $y, $m, $d ) = julian_date_to_ymd( $wd );
+  return julian_date_from_ymd( $y, $m, Date::Calc::Days_in_Month( $y, $m ) );
+}
+
+# return day of the week, for julian date -- 0 Sun .. 6 Sat
+sub julian_date_get_dow
+{
+  my $d = shift; # original date
+
+  return day_of_week( $d );
+}
+
+# return month days count for given ( year, month ) (not strictly julian_ namespace)
+sub julian_date_month_days_ym
+{
+  my $y = shift; # set year
+  my $m = shift; # set month
+
+  return Date::Calc::Days_in_Month( $y, $m );
+}
+
+# return month days count for given julian date
+sub julian_date_month_days
+{
+  my $d = shift;
+
+  return Date::Calc::Days_in_Month( ( julian_date_to_ymd( $d ) )[0,1] );
+}
+
+##############################################################################
+
 =pod
 
 
@@ -183,6 +277,34 @@ sub julian_date_diff_in_words_relative
   my $date_diff_str_rel = julian_date_diff_in_words_relative( $date1 - $date2 );
 
   # --------------------------------------------------------------------------
+  
+  # gets current julian date, needs Time::JulianDay
+  my $jd = local_julian_day( time() );
+
+  # move current julian date to year ago, one month ahead and 2 days ahead
+  $jd = julian_date_add_ymd( $jd, -1, 1, 2 );
+
+  # get year, month and day from julian date
+  my ( $y, $m, $d ) = julian_date_to_ymd( $jd );
+
+  # get julian date from year, month and day
+  $jd = julian_date_from_ymd( $y, $m, $d );
+
+  # move julian date ($jd) to the first day of its current month
+  $jd = julian_date_goto_first_dom( $jd );
+
+  # move julian date ($jd) to the last day of its current month
+  $jd = julian_date_goto_last_dom( $jd );
+
+  # get day of week for given julian date ( 0 => Mon .. 6 => Sun )
+  my $dow = julian_date_get_dow( $jd );
+  print( ( qw( Mon Tue Wed Thu Fri Sat Sun ) )[ $dow ] . "\n" );
+
+  # get month days count for the given julian date's month
+  my $mdays = julian_date_month_days( $jd );
+
+  # get month days count for the given year and month
+  my $mdays = julian_date_month_days_ym( $y, $m );
 
 =head1 FUNCTIONS
 
@@ -215,9 +337,11 @@ Same as julian_date_diff_in_words() but returns relative text
 
 =head1 REQUIRED MODULES
 
-Data::Tools::Time uses only:
+Data::Tools::Time uses:
 
   * Data::Tools (from the same package)
+  * Date::Calc
+  * Time::JulianDay
 
 =head1 TEXT TRANSLATION NOTES
 

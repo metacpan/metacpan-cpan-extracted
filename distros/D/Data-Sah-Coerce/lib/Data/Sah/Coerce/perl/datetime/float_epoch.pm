@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::datetime::float_epoch;
 
-our $DATE = '2018-12-16'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $DATE = '2019-01-21'; # DATE
+our $VERSION = '0.032'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,7 +10,7 @@ use warnings;
 use subroutines 'Data::Sah::Coerce::perl::date::float_epoch';
 
 1;
-# ABSTRACT: Coerce datenotime from number (assumed to be epoch)
+# ABSTRACT: Coerce datetime from number (assumed to be epoch)
 
 __END__
 
@@ -20,11 +20,11 @@ __END__
 
 =head1 NAME
 
-Data::Sah::Coerce::perl::datetime::float_epoch - Coerce datenotime from number (assumed to be epoch)
+Data::Sah::Coerce::perl::datetime::float_epoch - Coerce datetime from number (assumed to be epoch)
 
 =head1 VERSION
 
-This document describes version 0.031 of Data::Sah::Coerce::perl::datetime::float_epoch (from Perl distribution Data-Sah-Coerce), released on 2018-12-16.
+This document describes version 0.032 of Data::Sah::Coerce::perl::datetime::float_epoch (from Perl distribution Data-Sah-Coerce), released on 2019-01-21.
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

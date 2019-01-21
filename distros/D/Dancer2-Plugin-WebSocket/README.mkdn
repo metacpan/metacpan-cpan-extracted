@@ -4,7 +4,7 @@ Dancer2::Plugin::WebSocket - add a websocket interface to your Dancers app
 
 # VERSION
 
-version 0.1.1
+version 0.1.2
 
 # SYNOPSIS
 
@@ -252,7 +252,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2019, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

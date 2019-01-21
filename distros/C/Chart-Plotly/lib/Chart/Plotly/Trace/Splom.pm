@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Splom::Stream;
 use Chart::Plotly::Trace::Splom::Transform;
 use Chart::Plotly::Trace::Splom::Unselected;
 
-our $VERSION = '0.022';    # VERSION
+our $VERSION = '0.023';    # VERSION
 
 # ABSTRACT: Splom traces generate scatter plot matrix visualizations. Each splom `dimensions` items correspond to a generated axis. Values for each of those dimensions are set in `dimensions[i].values`. Splom traces support all `scattergl` marker style attributes. Specify `layout.grid` attributes and/or layout x-axis and y-axis attributes for more control over the axis positioning and style.
 
@@ -206,7 +206,7 @@ Chart::Plotly::Trace::Splom - Splom traces generate scatter plot matrix visualiz
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

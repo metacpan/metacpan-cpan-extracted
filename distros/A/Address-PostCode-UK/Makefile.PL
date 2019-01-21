@@ -22,20 +22,20 @@ WriteMakefile(
         'JSON' => 0,
         'Moo'  => 0,
         'namespace::autoclean'         => '0.28',
-        'Address::PostCode::UserAgent' => '0.08',
+        'Address::PostCode::UserAgent' => '0.09',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Address-PostCode-UK-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Address::PostCode::UK'                      => { file => 'lib/Address/PostCode/UK.pm'                   , version => '0.17' },
-            'Address::PostCode::UK::Location'            => { file => 'lib/Address/PostCode/UK/Location.pm'          , version => '0.17' },
-            'Address::PostCode::UK::Place'               => { file => 'lib/Address/PostCode/UK/Place.pm'             , version => '0.17' },
-            'Address::PostCode::UK::Place::Constituency' => { file => 'lib/Address/PostCode/UK/Place/Constituency.pm', version => '0.17' },
-            'Address::PostCode::UK::Place::Council'      => { file => 'lib/Address/PostCode/UK/Place/Council.pm'     , version => '0.17' },
-            'Address::PostCode::UK::Place::Geo'          => { file => 'lib/Address/PostCode/UK/Place/Geo.pm'         , version => '0.17' },
-            'Address::PostCode::UK::Place::Ward'         => { file => 'lib/Address/PostCode/UK/Place/Ward.pm'        , version => '0.17' },
+            'Address::PostCode::UK'                      => { file => 'lib/Address/PostCode/UK.pm'                   , version => '0.18' },
+            'Address::PostCode::UK::Location'            => { file => 'lib/Address/PostCode/UK/Location.pm'          , version => '0.18' },
+            'Address::PostCode::UK::Place'               => { file => 'lib/Address/PostCode/UK/Place.pm'             , version => '0.18' },
+            'Address::PostCode::UK::Place::Constituency' => { file => 'lib/Address/PostCode/UK/Place/Constituency.pm', version => '0.18' },
+            'Address::PostCode::UK::Place::Council'      => { file => 'lib/Address/PostCode/UK/Place/Council.pm'     , version => '0.18' },
+            'Address::PostCode::UK::Place::Geo'          => { file => 'lib/Address/PostCode/UK/Place/Geo.pm'         , version => '0.18' },
+            'Address::PostCode::UK::Place::Ward'         => { file => 'lib/Address/PostCode/UK/Place/Ward.pm'        , version => '0.18' },
         },
         resources => {
             repository => {

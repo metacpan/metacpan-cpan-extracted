@@ -17,6 +17,7 @@ WriteMakefile1(
     ABSTRACT          => q{Get, set and modify X resources},
     VERSION_FROM      => q{./lib/Term/ExtendedColor/Xresources.pm},
     LICENSE           => q{perl},
+    MIN_PERL_VERSION  => 5.0060,
     EXE_FILES         => [
     glob('bin/*'),
     ],
@@ -26,7 +27,6 @@ WriteMakefile1(
     },
     MAN1PODS            => {
       q{./bin/set_single_color} => q{blib/man1/set_single_color.1},
-      q{./bin/xcolor}           => q{blib/man1/xcolor.1},
     },
 
     MAN3PODS            => { },

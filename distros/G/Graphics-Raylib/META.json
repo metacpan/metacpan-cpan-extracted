@@ -26,7 +26,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::raylib" : "0.022"
+            "Alien::raylib" : "0.023"
          }
       },
       "configure" : {
@@ -52,7 +52,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::raylib" : "0.022",
+            "Alien::raylib" : "0.023",
             "Convert::Color" : "0",
             "Import::Into" : "0",
             "perl" : "5.010"
@@ -78,95 +78,95 @@
    "provides" : {
       "Graphics::Raylib" : {
          "file" : "lib/Graphics/Raylib.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Color" : {
          "file" : "lib/Graphics/Raylib/Color.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Key" : {
          "file" : "lib/Graphics/Raylib/Key.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Keyboard" : {
          "file" : "lib/Graphics/Raylib/Keyboard.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Mouse" : {
          "file" : "lib/Graphics/Raylib/Mouse.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Shape" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Shape::Circle" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Shape::Line" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Shape::Pixel" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Shape::Polygon" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Shape::Rectangle" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Shape::Triangle" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Text" : {
          "file" : "lib/Graphics/Raylib/Text.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Texture" : {
          "file" : "lib/Graphics/Raylib/Texture.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::Util" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::XS::Camera3D" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::XS::Color" : {
          "file" : "lib/Graphics/Raylib/Color.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::XS::Image" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::XS::Rectangle" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::XS::Texture2D" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::XS::Vector2" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::XS::Vector3" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "Graphics::Raylib::XS::Vector4" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       }
    },
    "release_status" : "stable",
@@ -181,10 +181,10 @@
          "web" : "https://github.com/athreef/Graphics-Raylib"
       }
    },
-   "version" : "0.023",
+   "version" : "0.024",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028000"
+         "version" : "5.028001"
       },
       "plugins" : [
          {
@@ -460,7 +460,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -483,7 +483,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -500,12 +500,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.023",
+                  "tag" : "v0.024",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -525,7 +525,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -546,7 +546,7 @@
                   "version_regexp" : "(?^:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -716,7 +716,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.0",
+   "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

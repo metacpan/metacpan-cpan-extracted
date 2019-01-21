@@ -16,6 +16,7 @@ lib/JSON/Validator/cache/a0f5b4b4e75ea17fc09e88ec0343d148
 lib/JSON/Validator/cache/ea34d47d4e060a1c3b12d2287aff89a7
 lib/JSON/Validator/cache/eaa832720f36cff0abc20c05236a9cd9
 lib/JSON/Validator/Error.pm
+lib/JSON/Validator/Formats.pm
 lib/JSON/Validator/Joi.pm
 lib/JSON/Validator/Ref.pm
 Makefile.PL
@@ -110,6 +111,7 @@ t/spec/with-relative-ref.json
 t/stack/Some.pm
 t/stack/Some/Module.pm
 t/to-json.t
+t/validate-draft07.t
 t/validate-id.t
 t/validate-json.t
 t/validate-recursive.t

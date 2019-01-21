@@ -72,6 +72,37 @@ sub test_horizontalRule : Test(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_image : Test(2) {
+    my $self = shift;
+
+    my $gen = Quiq::MediaWiki::Markup->new;
+    
+    my $code = $gen->image(
+        file => 'Ein_testbild.png',
+        width => 1200,
+    );
+    $self->is($code,"[[File:Ein_testbild.png|1200px]]\n\n");
+
+    $code = $gen->image(
+        file => 'Ein_testbild.png',
+        width => 1200,
+        height => 900,
+        align => 'center',
+        alt => 'Ein Testbild',
+        border => 1,
+        caption => 'Ein Testbild',
+        format => 'frame',
+        link => 'http://fseitz.de/',
+        page => 2,
+        valign => 'baseline',
+    );
+    $self->is($code,'[[File:Ein_testbild.png|1200x900px|alt=Ein Testbild'.
+        '|link=http://fseitz.de/|page=2|border|center|frame|baseline'.
+        "|Ein Testbild]]\n\n");
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_item : Test(5) {
     my $self = shift;
 

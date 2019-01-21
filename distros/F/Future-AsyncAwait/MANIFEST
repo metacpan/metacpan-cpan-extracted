@@ -32,6 +32,7 @@ t/20context-block.t
 t/21context-while.t
 t/22context-foreach.t
 t/30stringeval.t
+t/31destroy.t
 t/40croak.t
 t/41end.t
 t/80await+try.t

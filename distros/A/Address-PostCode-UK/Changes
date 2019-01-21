@@ -1,5 +1,8 @@
 Revision history for Address::PostCode::UK
 
+0.18  2019-01-17T22:30:00+01:00
+      - Upgraded to use Address::PostCode::UserAgent 0.09.
+
 0.17  2019-01-13T14:05:00+01:00
       - Updated packages to import namespace::autoclean.
 

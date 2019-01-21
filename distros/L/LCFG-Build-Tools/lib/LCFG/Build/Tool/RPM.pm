@@ -2,13 +2,15 @@ package LCFG::Build::Tool::RPM;    # -*-perl-*-
 use strict;
 use warnings;
 
-# $Id: RPM.pm.in 29224 2015-11-12 10:11:34Z squinney@INF.ED.AC.UK $
+# $Id: RPM.pm.in 35383 2019-01-16 16:21:24Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool/RPM.pm.in,v $
-# $Revision: 29224 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_6_6/lib/LCFG/Build/Tool/RPM.pm.in $
-# $Date: 2015-11-12 10:11:34 +0000 (Thu, 12 Nov 2015) $
+# $Revision: 35383 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_18/lib/LCFG/Build/Tool/RPM.pm.in $
+# $Date: 2019-01-16 16:21:24 +0000 (Wed, 16 Jan 2019) $
 
-our $VERSION = '0.6.6';
+our $VERSION = '0.9.18';
+
+use v5.10;
 
 use LCFG::Build::Utils::RPM;
 use File::Basename ();
@@ -63,16 +65,13 @@ override 'execute' => sub {
     my $spec = $self->spec;
 
     my $module  = $spec->fullname;
-    my $version = $spec->version;
 
-    my $dirname = join q{-}, $module, $version;
-    my $outdir = File::Spec->catdir( $self->resultsdir, $dirname );
+    my $outdir = $self->output_dir;
 
     my $tarname = $spec->tarname;
     my $tarfile = File::Spec->catfile( $outdir, $tarname );
 
-    my $packname = join q{-}, $spec->fullname, $spec->version;
-    my $specname = $packname . '.spec';
+    my $specname = $spec->rpmspec_name;
     my $specfile = File::Spec->catfile( $outdir, $specname );
 
     my $result = LCFG::Build::Utils::RPM->build( $outdir, $specfile, \%opts );
@@ -106,7 +105,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Tool::RPM version 0.6.6
+    This documentation refers to LCFG::Build::Tool::RPM version 0.9.18
 
 =head1 SYNOPSIS
 

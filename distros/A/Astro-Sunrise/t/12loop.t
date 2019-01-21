@@ -2,13 +2,13 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Test script for Astro::Sunrise
-#     Copyright (C) 2015, 2017 Ron Hill and Jean Forget
+#     Copyright (C) 2015, 2017, 2019 Ron Hill and Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
 #
 #     You can find the text of the licenses in the F<LICENSE> file or at
-#     L<http://www.perlfoundation.org/artistic_license_1_0>
+#     L<https://dev.perl.org/licenses/artistic.html>
 #     and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 #
 #     Here is the summary of GPL:
@@ -44,8 +44,8 @@ my ($rise, $set) = sunrise({ year    => 2015,
                              isdst   =>    0,
                              alt     =>    6,
                              precise =>    1 });
-is($rise, "17:21", "Sunrise on 28 November");
-is($set,  "06:39", "Sunset on 28 November");
+is($rise, "17:24", "Sunrise on 28 November");  # 17:23:26 on Stellarium, actually the day before on 27 nov
+is($set,  "06:36", "Sunset on 28 November");   # 06:36:15 on Stellarium
 
 ($rise, $set) = sunrise({ year    => 2015,
                           month   =>   11,
@@ -56,5 +56,5 @@ is($set,  "06:39", "Sunset on 28 November");
                           isdst   =>    0,
                           alt     =>    6,
                           precise =>    1 });
-is($rise, "17:21", "Sunrise on 29 November");
-is($set,  "06:39", "Sunset on 29 November");
+is($rise, "17:24", "Sunrise on 29 November");  # 17:23:11 on Stellarium, actually the day before on 28 nov
+is($set,  "06:37", "Sunset on 29 November");   # 06:37:10 on Stellarium

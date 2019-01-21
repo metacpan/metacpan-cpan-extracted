@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.043';
+our $VERSION = '2.045';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.043
+Version 2.045
 
 =cut
 
@@ -217,6 +217,9 @@ This entry is available only if enabled in L</Subqueries>.
 =head3 Join
 
 Join tables.
+
+In the I<foreign-key> menu one can choose a different comparison operator by selecting the prompt line (I<Choose FOREIGN
+KEY column:>).
 
 =head3 Union
 
@@ -518,13 +521,17 @@ Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
 
 =item Extensions SET
 
-Values: I<None>, I<Func>, I<SQ> I<=N> and I<Func/SQ/=N>
+Values: I<None>, I<Func>, I<SQ>, I<=N> and I<Func/SQ/=N>
 
 =item Extensions Table
 
 Values: I<None> and I<SQ>
 
 =item Extensions Join
+
+Values: I<None> and I<SQ>
+
+=item Extensions Union
 
 Values: I<None> and I<SQ>
 
@@ -588,9 +595,6 @@ derived tables which get then a default alias.
 =item Functions
 
 =item Join
-
-In the I<foreign-key> menu one can choose a different comparison operator by selecting the prompt line (I<Choose FOREIGN
-KEY column:>).
 
 =item Subqueries
 
@@ -794,19 +798,31 @@ Set the input record separator (regexp).
 
 =item
 
+Trim record left
+
+Expects a regex pattern. If set, removes leading characters matching regexp from each record.
+
+=item
+
+Trim record right
+
+Expects a regex pattern. If set, removes trailing characters matching regexp from each record.
+
+=item
+
 Field separator
 
 Set the input field separator (regexp).
 
 =item
 
-Trim leading
+Trim field left
 
 Expects a regex pattern. If set, removes leading characters matching regexp from each field.
 
 =item
 
-Trim trailing
+Trim field right
 
 Expects a regex pattern. If set, removes trailing characters matching regexp from each field.
 

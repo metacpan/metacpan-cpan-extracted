@@ -1,6 +1,6 @@
 package School::Code::Compare::Judge;
 # ABSTRACT: guess if two strings are so similary, that it's maybe cheating
-$School::Code::Compare::Judge::VERSION = '0.006';
+$School::Code::Compare::Judge::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -64,7 +64,7 @@ School::Code::Compare::Judge - guess if two strings are so similary, that it's m
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 
@@ -72,7 +72,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Boris Däppen.
+This software is copyright (c) 2019 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

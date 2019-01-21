@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+use strict;
+no warnings 'experimental::smartmatch';
+use Term::ExtendedColor::Xresources qw(set_xterm_color);
+use Term::ExtendedColor::Xresources::Colorscheme qw(
+                                                    get_colorschemes
+                                                    get_colorscheme
+                                                  );
+
+
+my $choice = shift;
+my @valid = get_colorschemes();
+
+if(!($choice ~~ @valid)) {
+  print "$_\n" for(sort(@valid));
+  exit;
+}
+else {
+  print values %{ get_colorscheme($choice) };
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+xcolor - colorschemes for X terminal emulators
+
+=head1 SYNOPSIS
+
+  xcolor [COLORSCHEME]
+
+=head1 OPTIONS
+
+None.
+
+=head1 AUTHOR
+
+  Magnus Woldrich
+  CPAN ID: WOLDRICH
+  m@japh.se
+  http://japh.se
+
+=head1 CONTRIBUTORS
+
+None required yet.
+
+=head1 COPYRIGHT
+
+Copyright 2011, 2019- the B<xcolor> L</AUTHOR> and L</CONTRIBUTORS> as
+listed above.
+
+=head1 LICENSE
+
+This program is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

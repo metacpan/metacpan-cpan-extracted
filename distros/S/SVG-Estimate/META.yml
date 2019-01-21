@@ -30,6 +30,6 @@ requires:
 resources:
   bugtracker: http://github.com/rizen/SVG-Estimate/issues
   repository: git://github.com/rizen/SVG-Estimate.git
-version: '1.0110'
+version: '1.0111'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

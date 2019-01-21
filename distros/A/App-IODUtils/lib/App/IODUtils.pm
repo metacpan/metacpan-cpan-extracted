@@ -1,7 +1,7 @@
 package App::IODUtils;
 
-our $VERSION = '0.15'; # VERSION
-our $DATE = '2017-08-05'; # DATE
+our $VERSION = '0.162'; # VERSION
+our $DATE = '2019-01-17'; # DATE
 
 use 5.010001;
 
@@ -18,6 +18,11 @@ our %common_args = (
     default_section => {
         schema  => 'str*',
         default => 'GLOBAL',
+        tags    => ['common', 'category:parser'],
+    },
+    enable_directive => {
+        schema  => 'bool',
+        default => 1,
         tags    => ['common', 'category:parser'],
     },
     enable_encoding => {
@@ -133,6 +138,7 @@ sub _get_parser_options {
     my $args = shift;
     return (
         default_section          => $args->{default_section},
+        enable_directive         => $args->{enable_directive},
         enable_encoding          => $args->{enable_encoding},
         enable_quoting           => $args->{enable_quoting},
         enable_bracket           => $args->{enable_bracket},
@@ -181,7 +187,7 @@ App::IODUtils - IOD utilities
 
 =head1 VERSION
 
-This document describes version 0.15 of App::IODUtils (from Perl distribution App-IODUtils), released on 2017-08-05.
+This document describes version 0.162 of App::IODUtils (from Perl distribution App-IODUtils), released on 2019-01-17.
 
 =head1 SYNOPSIS
 
@@ -199,11 +205,15 @@ This distribution provides the following command-line utilities:
 
 =item * L<get-iod-section>
 
+=item * L<grep-iod>
+
 =item * L<insert-iod-key>
 
 =item * L<insert-iod-section>
 
 =item * L<list-iod-sections>
+
+=item * L<map-iod>
 
 =item * L<parse-iod>
 
@@ -228,6 +238,8 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<App::INIUtils>
 
 Below is the list of distributions that provide CLI utilities for various
 purposes, with the focus on providing shell tab completion feature.
@@ -256,7 +268,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

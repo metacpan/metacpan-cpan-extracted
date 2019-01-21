@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ no_index:
 provides:
   Astro::Sunrise:
     file: lib/Astro/Sunrise.pm
-    version: '0.97'
+    version: '0.98'
 recommends:
   DateTime: '0.16'
 requires:
@@ -34,4 +34,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/jforget/Astro-Sunrise.git
-version: '0.97'
+version: '0.98'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,75 @@
+package dctpp;
+$dctpp::VERSION = '0.01';
+# ABSTRACT: Postprocessor of Devel::CallTrace output
+
+
+use strict;
+use warnings;
+
+use Devel::CallTrace::PP;
+use Getopt::Long::Descriptive;
+
+my ( $opts, $usage ) = describe_options(
+    $0 . ' %o <filename_of_text_file_with_trace>',
+    [ 'hide_cpan=i', "hide modules published on CPAN", { default => 0 } ],
+    [ 'hide_core=i', "hide CORE modules",              { default => 1 } ],
+    [
+        'hide_constants=i',
+        "hide constants (capital case only methods)",
+        { default => 1 }
+    ],
+    [ 'hide_lineno=i',       "hide file and line number", { default => 0 } ],
+    [ 'just_uniq_modules=i', "print only unique modules", { default => 0 } ],
+    [ 'just_uniq_calls=i',   "print only unique calls",   { default => 0 } ],
+    [ 'rle|r=i',             "fold same calls",           { default => 1 } ],
+    [
+        'project_path|p=s',
+        "absolute path to project, for filtering external libs output"
+    ],
+
+    [ 'verbose|v', "print extra stuff" ],
+    [ 'help', "print usage message and exit", { shortcircuit => 1 } ],
+);
+
+
+print( $usage->text ), exit if $opts->help;
+
+Devel::CallTrace::PP->handler( $ARGV[0], $opts );
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dctpp - Postprocessor of Devel::CallTrace output
+
+=head1 VERSION
+
+version 0.01
+
+=head1 USAGE
+
+	perl -d:CallTrace x.pl > /dev/null 2>trace.txt
+	
+	perl -d:CallTrace x.pl > /dev/null | tee trace.txt
+	dctpp --just_uniq_modules 1 -v 1 --project-path /media/sf_Hub trace.txt > trace_processed.txt
+
+	perl -d:CallTrace x.pl > /dev/null | tee trace.txt | dctpp trace.txt | tee trace_processed.txt
+
+=head1 AUTHOR
+
+Pavel Serikov <pavelsr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Pavel Serikov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

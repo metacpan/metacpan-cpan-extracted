@@ -1,7 +1,9 @@
 use alienfile;
 use File::Copy qw(copy);
 use Env qw( @PATH );
-$^O eq 'linux' or die "OS unsupported. This is a Linux-only module\n";
+if ($^O ne 'linux' and $ENV{FORCE_INSTALL} ne '1') {
+    die "OS unsupported. This is a Linux-only module\n";
+}
 
 plugin 'PkgConfig' => 'libudev';
 
@@ -30,9 +32,9 @@ share {
     build [
         'autoreconf -i',
         './configure --prefix=%{.install.prefix} --disable-shared --with-pic',
-        'cd src/shared  && %{make}',
-        'cd src/libudev && %{make}',
-        'cd src/libudev && %{make} install',
+        '%{make} -C src/shared',
+        '%{make} -C src/libudev',
+        '%{make} -C src/libudev install'
     ];
 
     plugin 'Gather::IsolateDynamic' => ();

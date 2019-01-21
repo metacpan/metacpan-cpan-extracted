@@ -1,0 +1,70 @@
+{
+   "abstract" : "LCFG version control infrastructure",
+   "author" : [
+      "Stephen Quinney <squinney@inf.ed.ac.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "LCFG-Build-VCS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "File::Copy::Recursive" : "0.36",
+            "File::HomeDir" : "0.58",
+            "IPC::Run" : "0",
+            "Moose" : "0.57",
+            "Template" : "2.14",
+            "URI" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "LCFG::Build::VCS" : {
+         "file" : "lib/LCFG/Build/VCS.pm",
+         "version" : "v0.3.8"
+      },
+      "LCFG::Build::VCS::CVS" : {
+         "file" : "lib/LCFG/Build/VCS/CVS.pm",
+         "version" : "v0.3.8"
+      },
+      "LCFG::Build::VCS::None" : {
+         "file" : "lib/LCFG/Build/VCS/None.pm",
+         "version" : "v0.3.8"
+      },
+      "LCFG::Build::VCS::SVN" : {
+         "file" : "lib/LCFG/Build/VCS/SVN.pm",
+         "version" : "v0.3.8"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+          "web" : "https://bugs.lcfg.org/"
+      },
+      "homepage" : "http://www.lcfg.org/doc/buildtools/",
+      "license" : [
+         "https://opensource.org/licenses/GPL-2.0"
+      ]
+   },
+   "version" : "v0.3.8",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

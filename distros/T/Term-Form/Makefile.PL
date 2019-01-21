@@ -3,6 +3,13 @@ use warnings;
 use strict;
 use ExtUtils::MakeMaker;
 
+my %prereqs_os_specific;
+
+if ( $^O eq 'MSWin32' ) {
+    %prereqs_os_specific = (
+        'Win32::Console::ANSI' => 0,
+    );
+}
 
 WriteMakefile(
     PL_FILES         => {},
@@ -36,7 +43,8 @@ WriteMakefile(
         'Carp'                    => 0,
         'Exporter'                => 0,
         'List::Util'              => '1.33',
-        'Term::Choose'            => '1.642',
+        'Term::Choose'            => '1.643',
+        %prereqs_os_specific,
     },
     dist  => {
         COMPRESS => 'gzip',

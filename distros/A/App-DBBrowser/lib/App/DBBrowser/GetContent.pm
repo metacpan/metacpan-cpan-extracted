@@ -335,7 +335,7 @@ sub __parse_setting {
         $sep = $sf->{o}{csv}{sep_char};
     }
     elsif ( $i == 1 ) {
-        $sep = $sf->{o}{split}{i_f_s};
+        $sep = $sf->{o}{split}{field_sep};
     }
     my $str = "($parse_mode";
     $str .= " - sep[$sep]" if defined $sep;
@@ -379,14 +379,19 @@ sub __parse_file {
         my $rows_of_cols = [];
         local $/;
         seek $fh, 0, 0;
-        my $lead  = $sf->{o}{split}{trim_leading};
-        my $trail = $sf->{o}{split}{trim_trailing};
-        for my $row ( split /$sf->{o}{split}{i_r_s}/, <$fh> ) {
-            push @$rows_of_cols, [ map {
-                s/^$lead//   if length $lead;
-                s/$trail\z// if length $trail;
-                $_
-            } split /$sf->{o}{split}{i_f_s}/, $row, -1 ]; # negative LIMIT (-1) to preserve trailing empty fields
+        my $record_lead  = $sf->{o}{split}{record_l_trim};
+        my $record_trail = $sf->{o}{split}{record_r_trim};
+        my $field_lead  = $sf->{o}{split}{field_l_trim};
+        my $field_trail = $sf->{o}{split}{field_r_trim};
+        for my $row ( split /$sf->{o}{split}{record_sep}/, <$fh> ) {
+            $row =~ s/^$record_lead//   if length $record_lead;
+            $row =~ s/$record_trail\z// if length $record_trail;
+            push @$rows_of_cols, [
+                map {
+                    s/^$field_lead//   if length $field_lead;
+                    s/$field_trail\z// if length $field_trail;
+                    $_
+                } split /$sf->{o}{split}{field_sep}/, $row, -1 ]; # negative LIMIT (-1) to preserve trailing empty fields
         }
         $sql->{insert_into_args} = $rows_of_cols;
         $ax->print_sql( $sql, $waiting );

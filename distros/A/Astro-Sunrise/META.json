@@ -5,13 +5,13 @@
       "Jean Forget <JFORGET@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Astro-Sunrise",
    "no_index" : {
@@ -49,7 +49,7 @@
    "provides" : {
       "Astro::Sunrise" : {
          "file" : "lib/Astro/Sunrise.pm",
-         "version" : "0.97"
+         "version" : "0.98"
       }
    },
    "release_status" : "stable",
@@ -60,5 +60,6 @@
          "web" : "https://github.com/jforget/Astro-Sunrise"
       }
    },
-   "version" : "0.97"
+   "version" : "0.98",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

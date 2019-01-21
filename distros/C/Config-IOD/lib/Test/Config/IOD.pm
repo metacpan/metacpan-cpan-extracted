@@ -1,7 +1,7 @@
 package Test::Config::IOD;
 
-our $DATE = '2017-08-05'; # DATE
-our $VERSION = '0.34'; # VERSION
+our $DATE = '2019-01-17'; # DATE
+our $VERSION = '0.350'; # VERSION
 
 ## no critic (Modules::ProhibitAutomaticExportation)
 
@@ -56,7 +56,7 @@ Test::Config::IOD - Testing routines for Config::IOD
 
 =head1 VERSION
 
-This document describes version 0.34 of Test::Config::IOD (from Perl distribution Config-IOD), released on 2017-08-05.
+This document describes version 0.350 of Test::Config::IOD (from Perl distribution Config-IOD), released on 2019-01-17.
 
 =head1 FUNCTIONS
 
@@ -72,7 +72,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Config-IOD
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Config-IOD>.
+Source repository is at L<https://github.com/perlancar/perl-Config-IOD>.
 
 =head1 BUGS
 
@@ -88,7 +88,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

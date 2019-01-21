@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Streamtube::Lightposition;
 use Chart::Plotly::Trace::Streamtube::Starts;
 use Chart::Plotly::Trace::Streamtube::Stream;
 
-our $VERSION = '0.022';    # VERSION
+our $VERSION = '0.023';    # VERSION
 
 # ABSTRACT: Use a streamtube trace to visualize flow in a vector field.  Specify a vector field using 6 1D arrays of equal length, 3 position arrays `x`, `y` and `z` and 3 vector component arrays `u`, `v`, and `w`.  By default, the tubes' starting positions will be cut from the vector field's x-z plane at its minimum y value. To specify your own starting position, use attributes `starts.x`, `starts.y` and `starts.z`.
 
@@ -291,7 +291,7 @@ Chart::Plotly::Trace::Streamtube - Use a streamtube trace to visualize flow in a
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ plugin 'PkgConfig' => 'raylib';
 share {
     plugin Download => (
         url => 'https://github.com/raysan5/raylib/archive/'
-             . '93f68fa61205c2d06ce9006eec0569133cd515ba'
+             . '0d2cfce18edf8016b7ff865aafab25ee7a352507'
              . '.tar.gz'
     );
 
@@ -22,11 +22,11 @@ share {
         and push @CMAKE_ARGS, '-DMACOS_FATLIB=ON';
 
     build [
-        [ '%{cmake}', -G => '%{cmake_generator}',
+      [ '%{cmake}', @{ meta->prop->{plugin_build_cmake}->{args} },
           '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON',
-          '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
-          '-DCMAKE_MAKE_PROGRAM:PATH=%{make}',
+          '-DCMAKE_INSTALL_LIBDIR:PATH=lib',
           @CMAKE_ARGS, '.'],
+
 
         '%{cmake} --build .',
         '%{cmake} --build . --target install'

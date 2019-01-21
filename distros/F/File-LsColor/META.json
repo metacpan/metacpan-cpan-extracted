@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Term::ExtendedColor" : "0.182"
+            "Term::ExtendedColor" : "0.182",
+            "perl" : "5.004"
          }
       }
    },
@@ -45,6 +46,6 @@
          "url" : "https://github.com/trapd00r/File-LsColor"
       }
    },
-   "version" : "0.194",
+   "version" : "0.199",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

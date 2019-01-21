@@ -23,15 +23,15 @@ WriteMakefile(
         'JSON' => 0,
         'Moo'  => 0,
         'namespace::autoclean'         => '0.28',
-        'Address::PostCode::UserAgent' => '0.08',
+        'Address::PostCode::UserAgent' => '0.09',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Address-PostCode-India-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Address::PostCode::India'        => { file => 'lib/Address/PostCode/India.pm'      , version => '0.12' },
-            'Address::PostCode::India::Place' => { file => 'lib/Address/PostCode/India/Place.pm', version => '0.12' },
+            'Address::PostCode::India'        => { file => 'lib/Address/PostCode/India.pm'      , version => '0.13' },
+            'Address::PostCode::India::Place' => { file => 'lib/Address/PostCode/India/Place.pm', version => '0.13' },
         },
         resources => {
             repository => {

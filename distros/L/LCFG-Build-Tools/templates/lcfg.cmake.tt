@@ -13,80 +13,93 @@ SET([% key +%] "[%+ value.list.join(', ') | replace('"','\"') %]")
 # On Linux these variables allow packagers to make decisions based on
 # the platform
 
-IF(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-FIND_PROGRAM(LSB lsb_release)
+set( LCFG_HIERARCHY_DEFAULT "fhs" )
 
-IF(LSB)
+if( "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" )
 
-  EXECUTE_PROCESS(COMMAND ${LSB} -s -v
-                  OUTPUT_VARIABLE LSB_VERSION
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  EXECUTE_PROCESS(COMMAND ${LSB} -s -i
-                  OUTPUT_VARIABLE DISTRIB_ID
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  EXECUTE_PROCESS(COMMAND ${LSB} -s -d
-                  OUTPUT_VARIABLE DISTRIB_DESCRIPTION
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  EXECUTE_PROCESS(COMMAND ${LSB} -s -r
-                  OUTPUT_VARIABLE DISTRIB_RELEASE
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  EXECUTE_PROCESS(COMMAND ${LSB} -s -c
-                  OUTPUT_VARIABLE DISTRIB_CODENAME
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
+  SET( OS_NAME "linux" )
 
-IF(${DISTRIB_ID} STREQUAL "FedoraCore")
-  SET(OS_RELEASE ${DISTRIB_RELEASE})
-  SET(OS_VERSION "fc${OS_RELEASE}")
-ENDIF()
+  if( EXISTS "/etc/redhat-release" )
+    set( DISTRIB_BASE_REDHAT true )
 
-IF(${DISTRIB_ID} STREQUAL "Fedora")
-  SET(OS_RELEASE ${DISTRIB_RELEASE})
-  SET(OS_VERSION "f${OS_RELEASE}")
-ENDIF()
+    if( EXISTS "/etc/sl-release" )
+      set( DISTRIB_ID "scientific" )
+    elseif( EXISTS "/etc/centos-release" )
+      set( DISTRIB_ID "centos" )
+    elseif( EXISTS "/etc/fedora-release" )
+      set( DISTRIB_ID "fedora" )
+    else()
+      set( DISTRIB_ID "rhel" )
+    endif()
 
-IF(${DISTRIB_ID} MATCHES "^Scientific(SL)?$")
-  SET(OS_RELEASE ${DISTRIB_RELEASE})
-  string(REGEX REPLACE "^([0-9]+).*" "\\1" OS_RELEASE ${OS_RELEASE})
-  SET(OS_VERSION "sl${OS_RELEASE}")
-ENDIF()
+  elseif( EXISTS "/etc/debian_version" )
+    set( DISTRIB_BASE_DEBIAN true )
 
-IF(${DISTRIB_ID} STREQUAL "CentOS")
-  SET(OS_RELEASE ${DISTRIB_RELEASE})
-  string(REGEX REPLACE "^([0-9]+).*" "\\1" OS_RELEASE ${OS_RELEASE})
-  SET(OS_VERSION "el${OS_RELEASE}")
-ENDIF()
+    if( EXISTS "/etc/ubuntu_version" )
+      set( DISTRIB_ID "ubuntu" )
+    else()
+      set( DISTRIB_ID "debian" )
+    endif()
 
-IF(${DISTRIB_ID} STREQUAL "RedHatEnterpriseServer")
-  SET(OS_RELEASE ${DISTRIB_RELEASE})
-  string(REGEX REPLACE "^([0-9]+).*" "\\1" OS_RELEASE ${OS_RELEASE})
-  SET(OS_VERSION "el${OS_RELEASE}")
-ENDIF()
+  endif()
 
-SET(OS_NAME "linux")
-SET(OS_ID "${OS_VERSION}")
+  if( EXISTS "/etc/os-release" )
 
-ENDIF(LSB)
+    file( READ /etc/os-release LCFG_OS_INFO )
 
-# Architecture-specific installation locations, this is for
-# Redhat-style systems and would need to be overridden for Debian
-# systems.
+    if( "${LCFG_OS_INFO}" MATCHES "VERSION_ID=\"([^\"]+)\"")
+      set( DISTRIB_RELEASE "${CMAKE_MATCH_1}")
 
-IF(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
-  SET(OS_ID "${OS_ID}_64")
+      string(REPLACE "." ";" DISTRIB_RELEASE_LIST "${DISTRIB_RELEASE}")
+      list(GET DISTRIB_RELEASE_LIST 0 DISTRIB_RELEASE_MAJOR)
+      list(GET DISTRIB_RELEASE_LIST 1 DISTRIB_RELEASE_MINOR)
 
-  SET(LIBDIR "/usr/lib64" CACHE PATH "Library installation location")
-  SET(LIBSECURITYDIR "/lib64/security" CACHE PATH "PAM module installation location")
-ELSE(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
-  SET(LIBDIR "/usr/lib" CACHE PATH "Library installation location")
-  SET(LIBSECURITYDIR "/lib/security" CACHE PATH "PAM module installation location")
-ENDIF(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
+      # Compatibility variables for OS info
 
-SET(HAS_PROC "yes")
-SET(BOOTCOMP "boot")
+      set( OS_RELEASE "${DISTRIB_RELEASE_MAJOR}" )
+      if ( "${DISTRIB_ID}" STREQUAL "fedora" )
+        set( OS_VERSION "f${OS_RELEASE}")
+      elseif( "${DISTRIB_ID}" STREQUAL "scientific" )
+        set( OS_VERSION "sl${OS_RELEASE}")
+      elseif( DISTRIB_BASE_REDHAT )
+        set( OS_VERSION "el${OS_RELEASE}")
+      else()
+        set( OS_VERSION "${OS_RELEASE}")
+      endif()
 
-ENDIF(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+      if( DISTRIB_BASE_REDHAT AND 
+          "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" AND
+          "${DISTRIB_RELEASE}" LESS 7 )
+        set( OS_ID "${OS_VERSION}_64")
+      else()
+        set( OS_ID "${OS_VERSION}" )
+      endif()
 
-IF(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+    endif()
+
+    if( "${LCFG_OS_INFO}" MATCHES "PRETTY_NAME=\"([^\"]+)\"" )
+      set( DISTRIB_DESCRIPTION "${CMAKE_MATCH_1}")
+    endif()
+
+  endif( EXISTS "/etc/os-release" )
+
+  set( HAS_PROC "yes" )
+  set( BOOTCOMP "systemd" )
+
+  if( DISTRIB_BASE_REDHAT )
+    if ( "${DISTRIB_RELEASE}" LESS 7 )
+      set( BOOTCOMP "boot")
+      set( LCFG_HIERARCHY_DEFAULT "legacy1" )
+    else()
+      set( LCFG_HIERARCHY_DEFAULT "legacy2" )
+    endif()
+  endif()
+
+endif( "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" )
+
+IF( "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
+
+set( LCFG_HIERARCHY_DEFAULT "macosx" )
 
 SET(HAS_PROC "no")
 SET(BOOTCOMP "macboot")
@@ -153,7 +166,7 @@ INCLUDE(CPack)
 
 SET(CMAKE_INSTALL_NAME_DIR "/usr/local/lib")
 
-ENDIF(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+ENDIF( "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
 
 # Find the location of the perl executable
 
@@ -199,19 +212,127 @@ STRING( REGEX REPLACE "^i[1-6]86$" "i386" LCFGARCH ${LCFGARCH} )
 
 # Variables describing the standard LCFG layout
 
-[%+ FOREACH key IN lcfgcfg.keys %]
-[% SET type = lcfgcfg.item(key).item("type") %]
-SET([% key +%] [%+ lcfgcfg.item(key).item("value") %] CACHE [% IF type == "directory" %]PATH[% ELSIF type == "file" %]FILEPATH[% ELSE %][% type | upper %][% END %] "[% lcfgcfg.item(key).item("description") %]")
+set(LCFG_HIERARCHY "${LCFG_HIERARCHY_DEFAULT}" CACHE STRING "LCFG filesystem layout")
 
-[%+ END %]
+set_property(CACHE LCFG_HIERARCHY PROPERTY STRINGS fhs legacy3 legacy2 legacy1 local macosx) 
 
-SET(CONFIGDIR "${LCFGCONF}/${LCFG_NAME}")
+if( "${LCFG_HIERARCHY}" STREQUAL "local" OR "${LCFG_HIERARCHY}" STREQUAL "macosx" )
+  set( LCFG_BASE "/usr/local" )
+else() # fhs
+  set( LCFG_BASE "/usr" )
+endif()
 
-SET(ICONDIR "${LCFGDATA}/${LCFG_NAME}/icons")
+set( LCFGLIB    "${LCFG_BASE}/share/lcfg" )
 
-SET(SCRIPTDIR "${LCFGDATA}/${LCFG_NAME}/scripts")
+# Assuming we can always write data into /var
 
-SET(LCFG_TMPLDIR "${LCFGDATA}/${LCFG_NAME}")
+set( LCFGVAR    "/var/lib/lcfg" )
+set( LCFGLOG    "/var/log/lcfg" )
+set( LCFGTMP    "/var/tmp/lcfg" )
+
+set( LCFGLOCK   "/run/lock/lcfg" )
+set( LCFGRUN    "/run/lcfg" )
+set( LCFGSTATUS "/run/lcfg/status" )
+
+if ( "${LCFG_HIERARCHY}" MATCHES "^legacy([0-9]+)$" ) 
+  set( LEGACY_LEVEL "${CMAKE_MATCH_0}")
+
+  set( LCFGLIB  "${LCFG_BASE}/lib/lcfg" )
+  set( LCFGVAR  "/var/lcfg" )
+  set( LCFGLOG  "${LCFGVAR}/log" )
+  set( LCFGTMP  "${LCFGVAR}/tmp" )
+
+  if( "${LEGACY_LEVEL}" LESS 2 ) # Legacy 1 (EL6)
+    set( INITDIR    "/etc/init.d" )
+
+    set( LCFGLOCK   "${LCFGVAR}/lock" )
+    set( LCFGRUN    "${LCFGVAR}/tmp" )
+    set( LCFGSTATUS "${LCFGVAR}/status" )
+  endif()
+
+else()
+
+  if( "${LCFG_HIERARCHY}" STREQUAL "macosx" )
+    set( LCFGLIB    "${LCFG_BASE}/lib/lcfg" )
+    set( LCFGVAR    "/var/lcfg" )
+    set( LCFGLOG    "${LCFGVAR}/log" )
+    set( LCFGTMP    "${LCFGVAR}/tmp" )
+    set( LCFGLOCK   "${LCFGVAR}/lock" )
+    set( LCFGRUN    "${LCFGVAR}/tmp" )
+    set( LCFGSTATUS "${LCFGVAR}/status" )
+  endif()
+
+endif()
+
+# ALL
+
+set( LCFGCOMP      "${LCFGLIB}/components" )
+set( LCFGDATA      "${LCFGLIB}/conf" )
+set( LCFGCONF      "${LCFGVAR}/conf" )
+
+# Binaries
+
+set( LCFGBIN       "${LCFG_BASE}/bin" )
+set( LCFGSBIN      "${LCFG_BASE}/sbin" )
+set( LCFGOM        "${LCFGBIN}/om" )
+
+# Documentation
+
+set( LCFGDOC       "${LCFGLIB}/doc" )
+set( LCFGHTML      "${LCFGDOC}/html" )
+set( LCFGPOD       "${LCFGDOC}/pod" )
+set( LCFGBIB       "${LCFGDOC}/bib" )
+set( LCFGPDF       "${LCFGDOC}/pdf" )
+
+# Manual pages
+
+set( LCFGMAN       "${LCFG_BASE}/share/man" )
+set( LIBMANSECT    3 CACHE STRING "The manual page section for libraries" )
+set( MANSECT       8 CACHE STRING "The manual page section for admin commands" )
+set( LIBMANDIR     "${LCFGMAN}/man${LIBMANSECT}" )
+set( MANDIR        "${LCFGMAN}/man${MANSECT}" )
+
+# Config files
+
+set( BOOTSTAMP     /var/run/bootstamp CACHE FILEPATH "last boot time-stamp marker file" )
+set( RELEASEFILE   /etc/LCFG-RELEASE  CACHE FILEPATH "The LCFG platform release file" )
+set( LCFGROTATED   /etc/logrotate.d   CACHE PATH "Directory for log rotate config files" )
+
+# Schema files
+
+set( LCFGCLIENTDEF "${LCFGLIB}/defaults/client" )
+set( LCFGSERVERDEF "${LCFGLIB}/defaults/server" )
+
+# Component directories
+
+set( CONFIGDIR     "${LCFGCONF}/${LCFG_NAME}" )
+set( ICONDIR       "${LCFGDATA}/${LCFG_NAME}/icons" )
+set( SCRIPTDIR     "${LCFGDATA}/${LCFG_NAME}/scripts" )
+set( LCFG_TMPLDIR  "${LCFGDATA}/${LCFG_NAME}" )
+
+# Main library and PAM module directories
+
+if( "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+
+  if( DISTRIB_BASE_REDHAT )
+
+    if( "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
+
+      set( LIBDIR "/usr/lib64" CACHE PATH "Library installation location")
+      set( LIBSECURITYDIR "/lib64/security" CACHE PATH "PAM module installation location")
+    elseif()
+      set( LIBDIR "/usr/lib" CACHE PATH "Library installation location" )
+      set( LIBSECURITYDIR "/lib/security" CACHE PATH "PAM module installation location" )
+    endif()
+
+  elseif( DISTRIB_BASE_DEBIAN )
+
+      set( LIBDIR "/usr/lib" CACHE PATH "Library installation location" )
+      set( LIBSECURITYDIR "/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/security" CACHE PATH "PAM module installation location" )
+
+  endif()
+
+endif( "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 
 SET(MSG " ** Generated file : do not edit **")
 

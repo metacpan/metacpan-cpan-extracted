@@ -1,0 +1,238 @@
+#!perl
+
+our $DATE = '2019-01-17'; # DATE
+our $VERSION = '0.162'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use App::IODUtils;
+use App::INIUtils::Common;
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+$SPEC{map_iod} = {
+    v => 1.1,
+    summary => 'Modify IOD section/key/value with Perl code',
+    args => {
+        %App::IODUtils::common_args,
+        %App::INIUtils::Common::args_map,
+    },
+    result_naked => 1,
+    'cmdline.skip_format' => 1,
+};
+sub map_iod {
+    my %args = @_;
+
+    my $reader = App::IODUtils::_get_reader(\%args);
+
+    my $hoh = $reader->read_string($args{iod});
+    $hoh = App::INIUtils::Common::map_hoh(hoh => $hoh, %args);
+    App::INIUtils::Common::hoh_as_ini($hoh);
+}
+
+my $cli = Perinci::CmdLine::Any->new(
+    url => '/main/map_iod',
+    read_config => 0,
+    read_env => 0,
+);
+
+$cli->run;
+
+# ABSTRACT: Modify IOD section/key/value with Perl code
+# PODNAME: map-iod
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+map-iod - Modify IOD section/key/value with Perl code
+
+=head1 VERSION
+
+This document describes version 0.162 of map-iod (from Perl distribution App-IODUtils), released on 2019-01-17.
+
+=head1 SYNOPSIS
+
+Examples:
+
+ # make section names uppercase
+ % map-iod --section '$_ = uc' /path/to/file.iod
+
+ # prepend key name with section name
+ % map-iod --key '$_ = "$SECTION.$_"' /path/to/file.iod
+
+ # prepend value with section and key name
+ % map-iod --value '$_ = "$SECTION.$KEY.$_"' /path/to/file.iod
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--key>=I<s>
+
+=item B<--section>=I<s>
+
+=item B<--value>=I<s>
+
+=back
+
+=head2 Parser options
+
+=over
+
+=item B<--allow-directive>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--allow-directives-json>=I<s>
+
+See C<--allow-directive>.
+
+=item B<--allow-encoding>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--allow-encodings-json>=I<s>
+
+See C<--allow-encoding>.
+
+=item B<--default-section>=I<s>
+
+Default value:
+
+ "GLOBAL"
+
+=item B<--disable-brace>
+
+=item B<--disable-bracket>
+
+=item B<--disable-directive>
+
+=item B<--disable-encoding>
+
+=item B<--disable-quoting>
+
+=item B<--disallow-bang-only>
+
+=item B<--disallow-directive>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--disallow-directives-json>=I<s>
+
+See C<--disallow-directive>.
+
+=item B<--disallow-duplicate-key>
+
+=item B<--disallow-encoding>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--disallow-encodings-json>=I<s>
+
+See C<--disallow-encoding>.
+
+=item B<--enable-expr>, B<-e>
+
+=item B<--expr-var>=I<s>%
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--expr-vars-json>=I<s>
+
+See C<--expr-var>.
+
+=item B<--ignore-unknown-directive>
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--iod>=I<s>*
+
+IOD file.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C map-iod map-iod
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete map-iod 'p/*/`map-iod`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-IODUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-IODUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IODUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

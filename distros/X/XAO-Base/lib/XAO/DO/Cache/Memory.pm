@@ -24,11 +24,11 @@ use strict;
 use XAO::Utils;
 use XAO::Objects;
 use Clone qw(clone);
+use feature qw(state);
 
 use base XAO::Objects->load(objname => 'Atom');
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: Memory.pm,v 2.1 2005/01/13 22:34:34 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION=2.1;
 
 ###############################################################################
 
@@ -41,34 +41,53 @@ Calculates size in bytes of the given reference.
 sub calculate_size ($$) {
     my $self=shift;
     my $d=shift;
-    my $r=ref($d);
-    my $sz=0;
-    while($r eq 'REF') {
-        $d=$$d;
-        $r=ref($d);
-        $sz+=4;
-    }
-    if($r eq 'ARRAY') {
-        foreach my $dd (@$d) {
-            $sz+=$self->calculate_size($dd);
+
+    state $have_devel_size;
+    if(!defined $have_devel_size) {
+        eval 'require Devel::Size';
+        if($@) {
+            $have_devel_size=0;
+            eprint "Consider installing Devel::Size for size limited caches, it is faster and more accurate";
+        }
+        else {
+            $have_devel_size=1;
+            $Devel::Size::warn=0;
         }
     }
-    elsif($r eq 'HASH') {
-        foreach my $dk (keys %$d) {
-            # very rough estimate
-            $sz+=length($dk) + $self->calculate_size($d->{$dk});
-        }
-    }
-    elsif($r eq 'SCALAR') {
-        $sz=length($$d) + 4;
-    }
-    elsif($r eq '') {
-        $sz=length($d) + 4;
+
+    if($have_devel_size) {
+        return Devel::Size::total_size($d);
     }
     else {
-        $sz+=200;
+        my $r=ref($d);
+        my $sz=0;
+        while($r eq 'REF') {
+            $d=$$d;
+            $r=ref($d);
+            $sz+=4;
+        }
+        if($r eq 'ARRAY') {
+            foreach my $dd (@$d) {
+                $sz+=$self->calculate_size($dd);
+            }
+        }
+        elsif($r eq 'HASH') {
+            foreach my $dk (keys %$d) {
+                # very rough estimate
+                $sz+=length($dk) * 4 + $self->calculate_size($d->{$dk});
+            }
+        }
+        elsif($r eq 'SCALAR') {
+            $sz=length($$d) * 4 + 4;
+        }
+        elsif($r eq '') {
+            $sz=length($d) * 4 + 4;
+        }
+        else {
+            $sz+=200;
+        }
+        return $sz;
     }
-    return $sz;
 }
 
 ###############################################################################

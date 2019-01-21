@@ -4,7 +4,7 @@ Facebook::Graph::Cookbook::Recipe3 - Impersonation
 
 =head1 VERSION
 
-version 1.1204
+version 1.1205
 
 =head1 DESCRIPTION
 
@@ -31,10 +31,10 @@ We're assuming you've already learned the basics of Facebook::Graph through the 
  # identify the specific page i want to post to
  foreach my $page (@{$pages}) {
      $token = $page->{access_token} if $page->{id} eq $fb_config->{page_id};
- }   
+ }
  unless (defined $token) {
      ouch 504, "Couldn't post to Facebook.";
- }   
+ }
 
  # post
  $fb->access_token($token);
@@ -55,6 +55,6 @@ For more recipes, check out the L<Facebook::Graph::Cookbook>.
 
 =head1 LEGAL
 
-Facebook::Graph is Copyright 2010 - 2012 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
+Facebook::Graph is Copyright 2010 - 2017 Plain Black Corporation (L<http://www.plainblack.com>) and is licensed under the same terms as Perl itself.
 
 =cut

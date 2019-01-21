@@ -2,7 +2,7 @@ package Catmandu::Store::MongoDB;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.07';
+our $VERSION = '0.0701';
 
 use Moo;
 use Catmandu::Store::MongoDB::Bag;

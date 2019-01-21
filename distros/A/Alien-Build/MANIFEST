@@ -195,6 +195,7 @@ lib/Test/Alien/Synthetic.pm
 lib/alienfile.pm
 maint/Alien-Base-PkgConfig/Makefile.PL
 maint/ci-test-plugins.pl
+maint/cip-before-install
 maint/gen.pl
 maint/travis-daemon
 maint/travis-dzil
@@ -278,12 +279,6 @@ t/test_alien_cancompile.t
 t/test_alien_canplatypus.t
 t/test_alien_run.t
 t/test_alien_synthetic.t
-testalienIXehT/foo.pl
-testalienIXehT/test.xs
-testalienMC_9y/Test/Alien/XS/Mod0.pm
-testalienMC_9y/auto/Test/Alien/XS/Mod0/Mod0.so
-testalienMC_9y/foo.pl
-testalienMC_9y/test.xs
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

@@ -9,15 +9,18 @@ use HTTP::Tinyish;
 use IPC::Open3;
 use Pod::Usage;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 GetOptions(
+  'from|f=s' => \my @from,
+  'lib|I=s' => \my @libs,
   'notest|n' => \my $notest,
   'quiet|q'  => \my $quiet,
 ) or die "Invalid options passed\n";
 
 my ($src, $dest) = @ARGV;
-pod2usage() unless defined $src and defined $dest;
+pod2usage() unless defined $src;
+$dest = $src unless defined $dest;
 
 foreach my $perl ($src, $dest) {
   $perl = File::Spec->rel2abs($perl) unless File::Spec->file_name_is_absolute($perl);
@@ -26,6 +29,8 @@ foreach my $perl ($src, $dest) {
 }
 
 print "Migrating CPAN modules from $src to $dest\n";
+print "Migrating from @from\n" if @from;
+print "Including @libs\n" if @libs;
 
 my $ua = HTTP::Tinyish->new;
 my $tempdir = File::Temp->newdir;
@@ -37,8 +42,22 @@ unless ($response->{success}) {
   die "Failed to download $url: $response->{status} $response->{reason}\n";
 }
 
-my $list_pid = open3 undef, my $list_out, '>&STDERR', $src, '-MExtUtils::Installed', '-e',
-  'for (ExtUtils::Installed->new(skip_cwd => 1)->modules) {next if /\APerl\z/; print $_, "\n";}';
+my $from_count = @from;
+my $print_modules = "my %args; \$args{inc_override} = [splice \@ARGV, 0, $from_count] if $from_count; " . <<'EOC';
+$args{extra_libs} = [@ARGV] if @ARGV;
+for (ExtUtils::Installed->new(skip_cwd => 1, %args)->modules) {
+  next if /\APerl\z/;
+  print $_, "\n";
+}
+EOC
+
+my ($list_pid, $list_out);
+{
+  local $ENV{PERLLIB};
+  local $ENV{PERL5LIB};
+  local $ENV{PERL5OPT};
+  $list_pid = open3 undef, $list_out, '>&STDERR', $src, '-MExtUtils::Installed', '-e', $print_modules, @from, @libs;
+}
 
 my @opts;
 push @opts, '-n' if $notest;
@@ -66,13 +85,16 @@ perl-migrate-modules - Migrate installed CPAN modules from one Perl to another
 
 =head1 SYNOPSIS
 
-  perl-migrate-modules [OPTIONS] <src-path> <dest-path>
+  perl-migrate-modules [OPTIONS] [<src-path>] <dest-path>
 
     perl-migrate-modules /path/to/perl-5.28.0 /path/to/perl-5.28.1
-    perl-migrate-modules -nq /usr/bin/perl ~/bin/perl
+    perl-migrate-modules -nq -Ilib /usr/bin/perl ~/bin/perl
+    perl-migrate-modules --from ~/perl5/lib/perl5 ~/perls/5.20.0
 
   Options:
     -h, --help                   Show this message
+    -f <path>, --from=<path>     Search only these path(s) for source modules
+    -I <path>, --lib=<path>      Additional search path(s) for source modules
     -n, --notest                 Skip testing and test dependencies
     -q, --quiet                  Show only installation successes and failures
     -v, --version                Show the version of this script
@@ -83,7 +105,44 @@ Reinstalls all modules found in the source Perl into the destination Perl,
 similar to the C<clone-modules> command for L<perlbrew> or the
 C<migrate-modules> command for L<plenv|https://github.com/tokuhirom/plenv>. The
 Perls may be passed as paths to the base installation directory or paths to the
-F<perl> executable itself.
+F<perl> executable itself. If only one path is passed, it will be used as both
+the source and destination.
+
+The C<-I>/C<--lib> option allows specifying additional search paths for modules
+from the source Perl, such as L<local::lib> directories. The install behavior
+for the destination Perl can be influenced using standard Perl and L<cpanm>
+environment variables, such as L<ExtUtils::MakeMaker/PERL_MM_OPT>,
+L<Module::Build/PERL_MB_OPT>, and L<cpanm/PERL_CPANM_OPT>.
+
+=head1 EXAMPLES
+
+=over
+
+=item *
+
+Basic migration of modules to a newly installed Perl:
+
+  $ perl-migrate-modules /opt/perl-5.20.3 /opt/perl-5.22.0
+
+=item *
+
+Migrate modules from an old (inactive) local::lib directory:
+
+  $ perl-migrate-modules --from ~/perl5-old/lib/perl5 /usr/bin/perl
+
+=item *
+
+Migrate modules to a custom local::lib location:
+
+  $ env PERL_CPANM_OPT='-l /opt/project/local' perl-migrate-modules /opt/perl-5.28.0 /opt/perl-5.28.1
+
+=item *
+
+Update all modules installed in the current Perl:
+
+  $ perl-migrate-modules $(which perl)
+
+=back
 
 =head1 CAVEATS
 
@@ -93,6 +152,11 @@ packages or core modules.
 
 Migrated modules will be installed at their latest indexed version, not the
 version that exists in the source Perl.
+
+Any environment settings that affect Perl's library search and module install
+locations, such as C<PERL5LIB> or an active L<local::lib>, will be ignored for
+the source Perl but will have its normal effect on installation into the
+destination Perl.
 
 =head1 BUGS
 

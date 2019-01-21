@@ -1,0 +1,34 @@
+---
+abstract: 'Service account based OAuth authentication for Google Cloud APIs'
+author:
+  - 'Larion Garaczi <larion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Google-Cloud-Auth-ServiceAccount
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Crypt::JWT: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  MooseX::HasDefaults::RO: '0'
+  MooseX::StrictConstructor: '0'
+  Test::More: '0'
+  namespace::autoclean: '0'
+  perl: '5.010000'
+resources:
+  repository: https://github.com/larion/www-google-cloud-auth-serviceaccount.git
+version: v1.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

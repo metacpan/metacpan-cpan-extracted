@@ -42,7 +42,7 @@ use School::Code::Compare::Out;
 
 my $s = '                   ';
 my $opt_desc_lang =
-    "$s" . 'Supportet options are:'
+    "$s" . 'Supportet arguments:'
 . "\n$s" . '  - hashy:  python, perl, bash'
 . "\n$s" . '  - slashy: php, js, c++, c#'
 . "\n$s" . '  - html'
@@ -50,6 +50,7 @@ my $opt_desc_lang =
 
 my $opt_desc_out =
     "$s" . 'You can define an output format:'
+. "\n$s" . '  - html'
 . "\n$s" . '  - tab'
 . "\n$s" . '  - csv';
 
@@ -255,6 +256,9 @@ for my $algo ( @algos ) {
             my $comparison = $comparer->measure( $files[$i]->{"code_$algo"},
                                                  $files[$j]->{"code_$algo"}
                                                );
+
+            # throw the "skipped" comparisons away, to thin out the result
+            next if ( $comparison->{comment} =~ /^skipped/);
     
             $comparison->{file1} = $files[$i]->{path};
             $comparison->{file2} = $files[$j]->{path};
@@ -310,7 +314,7 @@ compare-code - find similar pieces of code (file based)
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -339,7 +343,7 @@ If you are unfamiliar with GNU/Linux you might want to read L<doc::Windows> in t
  
    Arguments:
      LANG         language to parse
-                    Supportet options are:
+                    Supportet arguments:
                       - hashy:  python, perl, bash
                       - slashy: php, js, c++, c#
                       - html
@@ -350,6 +354,7 @@ If you are unfamiliar with GNU/Linux you might want to read L<doc::Windows> in t
                     otherwise read from STDIN
      --out,  -o   output format
                     You can define an output format:
+                      - html
                       - tab
                       - csv
      --file, -f   file prefix
@@ -372,7 +377,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Boris Däppen.
+This software is copyright (c) 2019 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

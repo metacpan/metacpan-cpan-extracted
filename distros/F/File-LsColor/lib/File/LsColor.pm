@@ -1,11 +1,12 @@
 package File::LsColor;
 use strict;
+use warnings;
 
 BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.194';
+  $VERSION = '0.199';
   @ISA = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -31,9 +32,11 @@ BEGIN {
 use Carp qw(croak);
 use Term::ExtendedColor qw(fg);
 
-
-# alias for the author who keep typing the words in the wrong order. :)
-*ls_color_lookup = *File::LsColor::lookup_ls_color;
+{
+  no warnings;
+  # alias for the author who keep typing the words in the wrong order. :)
+  *ls_color_lookup = *File::LsColor::lookup_ls_color;
+}
 
 my $LS_COLORS = $ENV{LS_COLORS}; # Default
 
@@ -227,21 +230,24 @@ sub ls_color {
       # because of https://github.com/coreutils/coreutils/pull/14
       # file extension mappings is no longer case sensitive. Therefore we lc the
       # extension first.
-      if($ft eq lc($ext)) {
-      # 38;5;100;1m
-        if($ls_colors->{$ft} =~ m/;(\d+;?[1-9]?)$/m) {
-          my $n = $1; # color index 0 - 255
-          # Account for bold, italic, underline etc
-          if($n =~ m/(\d+);([1-7])/) {
-            my $attr = $2;
-            $n = $1;
-            Term::ExtendedColor::autoreset(0);
-            $file = fg($attributes{$2}, $file);
+      if(defined($ext)) {
+        if($ft eq lc($ext)) {
+        # 38;5;100;1m
+          if($ls_colors->{$ft} =~ m/;(\d+;?[1-9]?)$/m) {
+            my $n = $1; # color index 0 - 255
+            # Account for bold, italic, underline etc
+            if($n =~ m/(\d+);([1-7])/) {
+              my $attr = $2;
+              $n = $1;
+              Term::ExtendedColor::autoreset(0);
+              $file = fg($attributes{$2}, $file);
+            }
+            Term::ExtendedColor::autoreset(1);
+            $file = fg($n, $file);
           }
-          Term::ExtendedColor::autoreset(1);
-          $file = fg($n, $file);
         }
       }
+
       # Next are the file attributes
       else {
         for my $o(qw(di fi pi so ln)) {
@@ -346,7 +352,6 @@ File::LsColor - Colorize input filenames just like ls does
 
     @files = ls_color_default(@files);
 
-    ...
 
     # returns a hashref with all defined filetypes and their attributes
     my $ls_colors = get_ls_colors();
@@ -413,7 +418,7 @@ definition, like so:
 Returns a hash reference where a key is the extension and its value is the
 attributes attached to it.
 
-=head2 lookup_ls_color()
+=head2 lookup_ls_color(), ls_color_lookup()
 
 Given a valid name, returns the defined attributes associated with it.
 Else, returns undef.
@@ -435,7 +440,7 @@ None required yet.
 
 =head1 COPYRIGHT
 
-Copyright 2011, 2018 the B<File::LsColor> L</AUTHOR> and
+Copyright 2011, 2018, 2019- the B<File::LsColor> L</AUTHOR> and
 L</CONTRIBUTORS> as listed above.
 
 =head1 LICENSE

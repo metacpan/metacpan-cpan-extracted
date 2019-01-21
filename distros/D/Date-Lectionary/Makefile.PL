@@ -16,7 +16,7 @@ WriteMakefile(
     PL_FILES           => {},
     MIN_PERL_VERSION   => 5.022000,
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker'     => 0,
+        'ExtUtils::MakeMaker'     => '7.34',
         'File::ShareDir::Install' => '0.11'
     },
     BUILD_REQUIRES => {
@@ -41,7 +41,7 @@ WriteMakefile(
         'Moose::Util::TypeConstraints' => '2.2010',
         'MooseX::Aliases'              => '0.11',
         'Date::Lectionary::Time'       => '1.20180422.1',
-        'Date::Advent'                 => '1.20180422',
+        'Date::Advent'                 => '1.20180423',
         'Date::Easter'                 => '1.22',
         'namespace::autoclean'         => '0.28',
         'File::Share'                  => '0.25',
@@ -60,15 +60,15 @@ WriteMakefile(
         provides => {
             'Date::Lectionary' => {
                 file    => 'lib/Date/Lectionary.pm', 
-                version => '1.20180423'
+                version => '1.20190120'
             },
             'Date::Lectionary::Day' => {
                 file    => 'lib/Date/Lectionary/Day.pm', 
-                version => '1.20180423'
+                version => '1.20190120'
             },
             'Date::Lectionary::Year' => {
                 file    => 'lib/Date/Lectionary/Year.pm', 
-                version => '1.20180423'
+                version => '1.20190120'
             },
         },
         keywords  => [qw/ lectionary rcl acna readings christian liturgical /],

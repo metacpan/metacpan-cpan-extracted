@@ -1,0 +1,35 @@
+---
+abstract: 'Web client to download events from Daily Connect'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000060'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-DailyConnect
+recommends:
+  Cpanel::JSON::XS: '0'
+requires:
+  HTTP::AnyUA: '0'
+  JSON::MaybeXS: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  Path::Tiny: '0'
+  URI: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/plicease/WebService-DailyConnect/issues
+  homepage: https://metacpan.org/pod/WebService::DailyConnect
+  repository: git://github.com/plicease/WebService-DailyConnect.git
+version: '0.02'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

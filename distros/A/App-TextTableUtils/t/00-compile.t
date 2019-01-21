@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 32 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 46 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/TextTableUtils.pm'
@@ -28,6 +28,20 @@ my @scripts = (
     'script/dd2orgtable',
     'script/dd2texttable',
     'script/dd2tsv',
+    'script/ini2ansitable',
+    'script/ini2asciitable',
+    'script/ini2csv',
+    'script/ini2mdtable',
+    'script/ini2orgtable',
+    'script/ini2texttable',
+    'script/ini2tsv',
+    'script/iod2ansitable',
+    'script/iod2asciitable',
+    'script/iod2csv',
+    'script/iod2mdtable',
+    'script/iod2orgtable',
+    'script/iod2texttable',
+    'script/iod2tsv',
     'script/json2ansitable',
     'script/json2asciitable',
     'script/json2csv',

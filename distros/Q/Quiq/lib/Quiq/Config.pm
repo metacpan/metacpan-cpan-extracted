@@ -5,11 +5,11 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.129;
+our $VERSION = 1.131;
 
 use Quiq::Option;
-use Quiq::Reference;
 use Quiq::Path;
+use Quiq::Reference;
 use Quiq::Unindent;
 use Quiq::Perl;
 use Quiq::Process;
@@ -100,6 +100,11 @@ Verzeichnis über einen Dienst wie FTP:
 Falls die Konfigurationsdatei nicht existert, erzeuge sie mit
 dem Inhalt $text.
 
+=item -secure => $bool (Default: 0)
+
+Prüfe die Sicherheit der Datei. Wenn gesetzt, wird geprüft,
+ob die Datei nur für den Benutzer lesbar/schreibbar ist.
+
 =back
 
 =head4 Description
@@ -131,9 +136,11 @@ sub new {
     # Optionen
 
     my $create = undef;
+    my $secure = 0;
 
     Quiq::Option->extract(\@_,
         -create => \$create,
+        -secure => \$secure,
     );
 
     # Operation ausführen
@@ -148,19 +155,21 @@ sub new {
     else {
         # $file -or- \@dirs,$file
 
+        my $p = Quiq::Path->new;
+
         # Datei suchen
 
         my $dirA;
         if (Quiq::Reference->isArrayRef($_[0])) { # \@dirs
             $dirA = shift;
         }
-        my $cfgFile = Quiq::Path->expandTilde(shift);
+        my $cfgFile = $p->expandTilde(shift);
 
         # Configdatei suchen, wenn \@dirs
 
         if ($dirA) {
             for (@$dirA) {
-                my $dir = Quiq::Path->expandTilde($_);
+                my $dir = $p->expandTilde($_);
                 my $file = $dir? "$dir/$cfgFile": $cfgFile;
                 if (-e $file) {
                     $cfgFile = $file;
@@ -168,7 +177,11 @@ sub new {
                 }
             }
         }
- 
+
+        if ($secure) {
+            $p->checkFileSecurity($cfgFile);
+        }
+
         if (substr($cfgFile,0,1) ne '/') {
             # Wenn der Dateiname kein absoluter Pfad ist,
             # müssen wir ./ voranstellen, weil perlDoFile()
@@ -287,7 +300,7 @@ sub try {
 
 =head1 VERSION
 
-1.129
+1.131
 
 =head1 AUTHOR
 

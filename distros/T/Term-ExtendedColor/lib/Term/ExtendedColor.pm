@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.234';
+  $VERSION = '0.238';
   @ISA     = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -533,7 +533,8 @@ sub uncolor {
   return if !@data;
 
   if(ref($data[0]) eq 'ARRAY') {
-    push(@data, @{$_[0]});
+    my $ref = shift @data;
+    push(@data, @{$ref});
   }
 
   for(@data) {
@@ -696,6 +697,7 @@ Like C<fg()>, but sets background colors.
 
   my $stripped = uncolor($colored_data);
   my @no_color = uncolor(\@colored);
+  my @no_color = uncolor(@colored);
 
 Remove all attribute and color escape sequences from the input.
 
@@ -720,22 +722,22 @@ Turn autoreset on/off. Enabled by default.
 
   Term::ExtendedColor::autoreset( 0 ); # Turn off autoreset
 
-=head2 bold(@data)
+=head2 bold(\@data)
 
-Convenience function that might be used in place of C<fg('bold', @data)>;
+Convenience function that might be used in place of C<fg('bold', \@data)>;
 
-=head2 italic(@data)
+=head2 italic(\@data)
 
-Convenience function that might be used in place of C<fg('italic', @data)>;
+Convenience function that might be used in place of C<fg('italic', \@data)>;
 
-=head2 underline(@data)
+=head2 underline(\@data)
 
-Convenience function that might be used in place of C<fg('underline', @data)>;
+Convenience function that might be used in place of C<fg('underline', \@data)>;
 
-=head2 inverse(@data)
+=head2 inverse(\@data)
 
 Reverse video / inverse.
-Convenience function that might be used in place of C<fg('inverse', @data)>;
+Convenience function that might be used in place of C<fg('inverse', \@data)>;
 
 =head1 NOTES
 
@@ -1003,12 +1005,14 @@ L<Term::ExtendedColor::Xresources>, L<Term::ExtendedColor::TTY>, L<Term::ANSICol
 
 =head1 CONTRIBUTORS
 
+L<Varadinsky|https://github.com/Varadinsky>
+
 None required yet.
 
 =head1 COPYRIGHT
 
-Copyright 2010, 2011, 2018 the B<Term::ExtendedColor> L</AUTHOR> and L</CONTRIBUTORS>
-as listed above.
+Copyright 2010, 2011, 2018, 2019- the B<Term::ExtendedColor> L</AUTHOR>
+and L</CONTRIBUTORS> as listed above.
 
 =head1 LICENSE
 

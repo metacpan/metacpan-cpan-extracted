@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use Test::Exception;
 use Test::More 0.98;
 
 use Getopt::Long::More qw(optspec);
@@ -56,6 +57,22 @@ use Getopt::Long::More qw(optspec);
         expected_argv => [qw//],
     );
 }
+
+subtest "optspec: no property is required" => sub {
+    lives_ok { optspec() };
+};
+
+subtest "optspec: unknown property -> dies" => sub {
+    dies_ok { optspec(foo=>1) };
+};
+
+subtest "optspec: extra properties allowed" => sub {
+    lives_ok { optspec(handler=>sub{}, _foo=>1, 'x.bar'=>2, _=>{baz=>3}, x=>{qux=>4}) };
+};
+
+subtest "optspec: invalid extra properties -> dies" => sub {
+    dies_ok { optspec(handler=>sub{}, 'x.'=>1) };
+};
 
 {
     my $opts = {};
@@ -128,6 +145,84 @@ use Getopt::Long::More qw(optspec);
         argv => [qw/a b/],
         opts => $opts,
         expected_opts => {},
+        expected_argv => [qw//],
+    );
+}
+
+{
+    my $opts = {};
+    test_getoptions(
+        name => 'basic: with hash-storage',
+        opts_spec => [$opts, 'foo=s' => \$opts->{foo}],
+        argv => [qw/--foo bar/],
+        opts => $opts,
+        expected_opts => {foo => "bar"},
+        expected_argv => [qw//],
+    );
+}
+
+{
+    my $opts = {};
+    test_getoptions(
+        name => 'basic: mixed implict/explicit linkage',
+        opts_spec =>  [
+          'foo=s', \$opts->{foo},
+          'bar=s',
+          'baz=s', \$opts->{baz},
+          'gaz=s', \$opts->{gaz},
+        ],
+        argv => [qw/--foo boo --baz boz --gaz gez/],
+        opts => $opts,
+        expected_opts => {foo => "boo", baz => "boz", gaz => "gez"},
+        expected_argv => [qw//],
+    );
+}
+
+{
+    my $opts = {};
+    test_getoptions(
+        name => 'optspec: mixed implict/explicit linkage',
+        opts_spec =>  [
+          'foo=s', optspec(handler => \$opts->{foo} ),
+          'bar=s',
+          'baz=s', optspec(handler => \$opts->{baz} ),
+          'gaz=s', \$opts->{gaz},
+        ],
+        argv => [qw/--foo boo --baz boz --gaz gez/],
+        opts => $opts,
+        expected_opts => {foo => "boo", baz => "boz", gaz => "gez"},
+        expected_argv => [qw//],
+    );
+}
+{
+    my $opts = {};
+    test_getoptions(
+        name => 'optspec: with "hash-storage"',
+        opts_spec => [
+          $opts,
+          'foo=s', optspec(handler => \$opts->{foo} ),
+          'bar=s',
+        ],
+        argv => [qw/--foo boo --bar bur/],
+        opts => $opts,
+        expected_opts => {foo => "boo", bar => "bur"},
+        expected_argv => [qw//],
+    );
+}
+{
+    my $opts = {};
+    test_getoptions(
+        name => 'optspec: mixed implict/explicit linkage (with "hash-storage")',
+        opts_spec => [
+          $opts,
+          'foo=s', optspec(handler => \$opts->{foo} ),
+          'bar=s',
+          'baz=s', optspec(handler => \$opts->{baz} ),
+          'gaz=s', \$opts->{gaz},
+        ],
+        argv => [qw/--foo boo --bar bur --baz boz --gaz gez/],
+        opts => $opts,
+        expected_opts => {foo => "boo", bar => "bur", baz => "boz", gaz => "gez" },
         expected_argv => [qw//],
     );
 }

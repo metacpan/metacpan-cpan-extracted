@@ -1,19 +1,14 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl Tie-CheckVariables.t'
+#!/usr/bin/env perl
 
-#########################
+use strict;
+use warnings;
 
-# change 'tests => 1' to 'tests => last_test_to_print';
+use Test::More;
 
-use Test::More tests => 6;
-
-my @subroutines = qw(TIESCALAR STORE FETCH DESTROY UNTIE on_error register _type _regex _get_regex);
+my @subroutines = qw(TIESCALAR STORE FETCH UNTIE on_error register _type _check _get_regex);
 
 require_ok('Tie::CheckVariables');
 can_ok('Tie::CheckVariables',@subroutines);
-
-
-Tie::CheckVariables->on_error(sub{ die;});
 
 tie my $scalar,'Tie::CheckVariables','integer';
 $scalar = 99;
@@ -34,3 +29,5 @@ tie my $string,'Tie::CheckVariables','string';
 $string = 'test';
 ok($string eq 'test');
 untie $string;
+
+done_testing();

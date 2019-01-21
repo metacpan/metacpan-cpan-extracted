@@ -1,3 +1,23 @@
+1.302160  2019-01-18 11:44:33-08:00 America/Los_Angeles
+
+    - No Changes since last trial release
+
+1.302159  2019-01-09 13:21:37-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add table support to ctx->fail and ctx->fail_and_return
+    - Fix Instance.t on haiku-os
+
+1.302158  2019-01-08 15:36:24-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix TAP test on windows
+    - Fix math errors in table indentation
+    - Devel requires Term::Table
+
+1.302157  2019-01-08 14:10:29-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix minor typos and missing doc sections
+    - Add table support in info facet and TAP formatter
+
 1.302156  2019-01-07 11:13:07-08:00 America/Los_Angeles
 
     - No changes from last trial

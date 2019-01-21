@@ -11,7 +11,7 @@ use File::Temp qw( tempdir );
 use File::chdir;
 
 # ABSTRACT: Plugin for fetching files using curl
-our $VERSION = '1.49'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 
 has curl_command => sub { defined $ENV{CURL} ? which($ENV{CURL}) : which('curl') };
@@ -186,7 +186,7 @@ Alien::Build::Plugin::Fetch::CurlCommand - Plugin for fetching files using curl
 
 =head1 VERSION
 
-version 1.49
+version 1.51
 
 =head1 SYNOPSIS
 

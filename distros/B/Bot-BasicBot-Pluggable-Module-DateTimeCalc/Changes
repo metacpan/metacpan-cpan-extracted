@@ -1,5 +1,13 @@
 Revision history for Bot-BasicBot-Pluggable-Module-DateTimeCalc
 
+0.0304 2019-01-20 20:40:42
+    - Add to documentation.
+    - Fix the dist.ini file.
+
+0.0303 2019-01-20 17:07:06
+    - Improve documentation synopsis.
+    - Add can_ok() tests.
+
 0.0302 2018-06-24 22:53:16
     - Improve documentation yet again...
 

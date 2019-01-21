@@ -43,4 +43,8 @@ my $build = Module::Build->new(
    extra_compiler_flags => \@extra_compiler_flags,
 );
 
+if( eval { require Devel::MAT::Dumper::Helper } ) {
+   Devel::MAT::Dumper::Helper->extend_module_build( $build );
+}
+
 $build->create_build_script;

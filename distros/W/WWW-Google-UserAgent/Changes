@@ -1,4 +1,7 @@
-Revision history for WWW-Google-UserAgent
+Revision history for WWW::Google::UserAgent
+
+0.22  Sun Jan 20 04:25:00 2019
+      - Used namespace::autoclean instead.
 
 0.21  Sun Jun 11 09:50:00 2017
       - Added more types.

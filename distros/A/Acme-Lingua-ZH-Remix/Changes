@@ -1,40 +1,43 @@
+0.98
+	- Made to be Moo-based.
+
 0.97
-        - re-packaging with mbtiny. no feature changes.
+	- re-packaging with mbtiny. no feature changes.
 
-0.96:
-- Try to be faster by adding fuzzy exit conditions.
+0.96
+	- Try to be faster by adding fuzzy exit conditions.
 
-0.95:
-- improve: range_sentence does not stop generating when the sentance length just passes the lower-bound.
+0.95
+	- improve: range_sentence does not stop generating when the sentance length just passes the lower-bound.
 
-0.94:
-- fix: range constranit and infinite loop
+0.94
+	- fix: range constranit and infinite loop
 
-0.93:
-- fix: dup phrases in a particular edge case.
+0.93
+	- fix dup phrases in a particular edge case.
 
-0.92:
-- random_sentence now accpets length constrain
+0.92
+	- random_sentence now accpets length constrain
 
-0.91:
-- prevent a div-by-zero exception
-- use Any::Moose instead
+0.91
+	- prevent a div-by-zero exception
+	- use AnyMoose instead
 
-0.90:
-- Make it a Moose-based module. Deprecate all old usages.
+0.90
+	- Make it a Moose-based module. Deprecate all old usages.
 
-0.14:
-- Add c9s as corpus author
-- small rewrite of the generating algorithm.
+0.14
+	- Add c9s as corpus author
+	- small rewrite of the generating algorithm.
 
-0.13:
-- The default corpus is changed to the texts from a Taiwan writer.
+0.13
+	- The default corpus is changed to the texts from a Taiwan writer.
 
-0.12:
-- Improve init_phrase to extract text from be project gutenberg better
+0.12
+	- Improve init_phrase to extract text from be project gutenberg better
 
-0.11:
-- Use a public domain corpus by default
+0.11
+	- Use a public domain corpus by default
 
-0.10:
-- First release
+0.10
+	- First release

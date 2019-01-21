@@ -1,5 +1,5 @@
 package WebService::Lobid::Organisation;
-$WebService::Lobid::Organisation::VERSION = '0.0042';
+$WebService::Lobid::Organisation::VERSION = '0.00421';
 # ABSTRACT: interface to the lobid-Organisations API
 
 =for html <a href="https://travis-ci.org/hatorikibble/webservice-lobid-organisations"><img src="https://travis-ci.org/hatorikibble/webservice-lobid-organisations.svg?branch=master"></a>

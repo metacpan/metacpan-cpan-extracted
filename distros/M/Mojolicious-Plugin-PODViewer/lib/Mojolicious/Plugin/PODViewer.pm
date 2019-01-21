@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::PODViewer;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 # ABSTRACT: POD renderer plugin
 
 #pod =encoding utf8
@@ -46,7 +46,9 @@ our $VERSION = '0.002';
 #pod
 #pod =head2 route
 #pod
-#pod The route to add documentation to. Defaults to C</perldoc>.
+#pod The L<route|Mojolicious::Routes::Route> to add documentation to. Defaults to
+#pod C<< $app->routes->any('/perldoc') >>. The new route will have a name of
+#pod C<plugin.podviewer>.
 #pod
 #pod =head2 default_module
 #pod
@@ -181,7 +183,7 @@ sub register {
   my $route = $conf->{route} ||= $app->routes->any( '/perldoc' );
   return $route->any( '/:module' =>
       $defaults => [module => qr/[^.]+/] => \&_perldoc,
-  );
+  )->name('plugin.podviewer');
 }
 
 sub _indentation {
@@ -192,11 +194,17 @@ sub _html {
   my ($c, $src) = @_;
 
   # Rewrite links
-  my $dom     = Mojo::DOM->new(_pod_to_html($src));
-  my $perldoc = $c->url_for('/perldoc/');
-  $_->{href} =~ s!^https://metacpan\.org/pod/!$perldoc!
-    and $_->{href} =~ s!::!/!gi
-    for $dom->find('a[href]')->map('attr')->each;
+  my $dom  = Mojo::DOM->new(_pod_to_html($src));
+  my $base = 'https://metacpan.org/pod/';
+  $dom->find('a[href]')->map('attr')->each(sub {
+    if ($_->{href} =~ m!^\Q$base\E([:\w]+)!) {
+      my $module = $1;
+      return undef
+        unless grep { $module =~ /$_/ } @{ $c->stash('allow_modules') || [] };
+      $_->{href} =~ s{^\Q$base$module\E}{$c->url_for(module => $module)}e;
+      $_->{href} =~ s!::!/!gi
+    }
+  });
 
   # Rewrite code blocks for syntax highlighting and correct indentation
   for my $e ($dom->find('pre > code')->each) {
@@ -269,7 +277,7 @@ Mojolicious::Plugin::PODViewer - POD renderer plugin
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -315,7 +323,9 @@ Handler name, defaults to C<pod>.
 
 =head2 route
 
-The route to add documentation to. Defaults to C</perldoc>.
+The L<route|Mojolicious::Routes::Route> to add documentation to. Defaults to
+C<< $app->routes->any('/perldoc') >>. The new route will have a name of
+C<plugin.podviewer>.
 
 =head2 default_module
 
@@ -425,9 +435,13 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Oleg Zoffix Znet
+=for stopwords brad Oleg Zoffix Znet
 
 =over 4
+
+=item *
+
+brad <brad@clickmagick.com>
 
 =item *
 
@@ -467,11 +481,12 @@ __DATA__
     % for my $part (split '/', $module) {
         %= '::' if $path
         % $path .= "/$part";
-        %= link_to $part => url_for("/perldoc$path")
+        %= link_to $part => 'plugin.podviewer', { module => $module }
     % }
     <span class="more">
-        (<%= link_to 'source' => url_for("/perldoc$path.txt") %>,
-        <%= link_to 'CPAN' => $cpan %>)
+        (<%= link_to 'source' => 'plugin.podviewer',
+          { module => $module, format => 'txt' } %>,
+        <%= link_to 'CPAN' => 'plugin.podviewer', { module => $module } %>)
     </span>
 </div>
 

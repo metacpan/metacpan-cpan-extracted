@@ -87,7 +87,16 @@ C<RootDirectory> however mounts a file system hierarchy from a block device node
 file instead of a directory. The device node or file system image file needs to contain a file system without a
 partition table, or a file system within an MBR/MS-DOS or GPT partition table with only a single
 Linux-compatible partition, or a set of file systems within a GPT partition table that follows the Discoverable Partitions
-Specification.',
+Specification.
+
+When C<DevicePolicy> is set to C<closed> or C<strict>,
+or set to C<auto> and C<DeviceAllow> is set, then this setting adds
+/dev/loop-control with C<rw> mode, C<block-loop> and
+C<block-blkext> with C<rwm> mode to C<DeviceAllow>. See
+L<systemd.resource-control(5)>
+for the details about C<DevicePolicy> or C<DeviceAllow>. Also, see
+C<PrivateDevices> below, as it may change the setting of C<DevicePolicy>.
+',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1308,9 +1317,9 @@ operating system (and optionally its configuration, and local mounts) is prohibi
 recommended to enable this setting for all long-running services, unless they are involved with system updates
 or need to modify the operating system in other ways. If this option is used,
 C<ReadWritePaths> may be used to exclude specific directories from being made read-only. This
-setting is implied if C<DynamicUser> is set. For this setting the same restrictions regarding
-mount propagation and privileges apply as for C<ReadOnlyPaths> and related calls, see
-below. Defaults to off.',
+setting is implied if C<DynamicUser> is set. This setting cannot ensure protection in all
+cases. In general it has the same limitations as C<ReadOnlyPaths>, see below. Defaults to
+off.',
         'replace' => {
           '0' => 'no',
           '1' => 'yes',
@@ -1341,11 +1350,11 @@ C<InaccessiblePaths>. Similarly, C<read-only> is mostly equivalent to
 C<ReadOnlyPaths>, and C<tmpfs> is mostly equivalent to
 C<TemporaryFileSystem>.
 
- It is recommended to enable this setting for all long-running services (in particular network-facing ones),
-to ensure they cannot get access to private user data, unless the services actually require access to the user\'s
-private data. This setting is implied if C<DynamicUser> is set. For this setting the same
-restrictions regarding mount propagation and privileges apply as for C<ReadOnlyPaths> and related
-calls, see below.',
+ It is recommended to enable this setting for all long-running services (in particular network-facing
+ones), to ensure they cannot get access to private user data, unless the services actually require access to
+the user\'s private data. This setting is implied if C<DynamicUser> is set. This setting cannot
+ensure protection in all cases. In general it has the same limitations as C<ReadOnlyPaths>,
+see below.',
         'replace' => {
           '0' => 'no',
           '1' => 'yes',
@@ -1360,7 +1369,9 @@ calls, see below.',
         'description' => 'These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
-defined in the following table, when the unit is started.
+defined in the following table, when the unit is started. Also, the corresponding environment variable
+is defined with the full path of directories. If multiple directories are set, then int the environment variable
+the paths are concatenated with colon (C<:>).
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -1408,7 +1419,15 @@ the service manager creates /run/foo (if it does not exist),
 /run/foo/bar, and /run/baz. The directories
 /run/foo/bar and /run/baz except /run/foo are
 owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.',
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1417,7 +1436,9 @@ when the service is stopped.',
         'description' => 'These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
-defined in the following table, when the unit is started.
+defined in the following table, when the unit is started. Also, the corresponding environment variable
+is defined with the full path of directories. If multiple directories are set, then int the environment variable
+the paths are concatenated with colon (C<:>).
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -1465,7 +1486,15 @@ the service manager creates /run/foo (if it does not exist),
 /run/foo/bar, and /run/baz. The directories
 /run/foo/bar and /run/baz except /run/foo are
 owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.',
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1474,7 +1503,9 @@ when the service is stopped.',
         'description' => 'These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
-defined in the following table, when the unit is started.
+defined in the following table, when the unit is started. Also, the corresponding environment variable
+is defined with the full path of directories. If multiple directories are set, then int the environment variable
+the paths are concatenated with colon (C<:>).
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -1522,7 +1553,15 @@ the service manager creates /run/foo (if it does not exist),
 /run/foo/bar, and /run/baz. The directories
 /run/foo/bar and /run/baz except /run/foo are
 owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.',
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1531,7 +1570,9 @@ when the service is stopped.',
         'description' => 'These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
-defined in the following table, when the unit is started.
+defined in the following table, when the unit is started. Also, the corresponding environment variable
+is defined with the full path of directories. If multiple directories are set, then int the environment variable
+the paths are concatenated with colon (C<:>).
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -1579,7 +1620,15 @@ the service manager creates /run/foo (if it does not exist),
 /run/foo/bar, and /run/baz. The directories
 /run/foo/bar and /run/baz except /run/foo are
 owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.',
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1588,7 +1637,9 @@ when the service is stopped.',
         'description' => 'These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
-defined in the following table, when the unit is started.
+defined in the following table, when the unit is started. Also, the corresponding environment variable
+is defined with the full path of directories. If multiple directories are set, then int the environment variable
+the paths are concatenated with colon (C<:>).
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -1636,7 +1687,15 @@ the service manager creates /run/foo (if it does not exist),
 /run/foo/bar, and /run/baz. The directories
 /run/foo/bar and /run/baz except /run/foo are
 owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.',
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1740,8 +1799,7 @@ desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
 C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
 see C<TemporaryFileSystem>.
 
-Note that restricting access with these options does not extend to submounts of a directory that are
-created later on.  Non-directory paths may be specified as well. These options may be specified more than once,
+Non-directory paths may be specified as well. These options may be specified more than once,
 in which case all paths listed will have limited access from within the namespace. If the empty string is
 assigned to this option, the specific list is reset, and all prior assignments have no effect.
 
@@ -1753,11 +1811,19 @@ instead of relative to the root directory of the host (see above). When combinin
 C<+> on the same path make sure to specify C<-> first, and C<+>
 second.
 
-Note that using this setting will disconnect propagation of mounts from the service to the host
-(propagation in the opposite direction continues to work). This means that this setting may not be used for
-services which shall be able to install mount points in the main mount namespace. Note that the effect of these
-settings may be undone by privileged processes. In order to set up an effective sandboxed environment for a
-unit it is thus recommended to combine these settings with either
+Note that these settings will disconnect propagation of mounts from the unit\'s processes to the
+host. This means that this setting may not be used for services which shall be able to install mount points in
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
+unit processes\' namespace, and mounts removed on the host also disappear there too. In particular, note that
+mount propagation from host to unit will result in unmodified mounts to be created in the unit\'s namespace,
+i.e. writable mounts appearing on the host will be writable in the unit\'s namespace too, even when propagated
+below a path marked with C<ReadOnlyPaths>! Restricting access with these options hence does
+not extend to submounts of a directory that are created later on. This means the lock-down offered by that
+setting is not complete, and does not offer full protection. 
+
+Note that the effect of these settings may be undone by privileged processes. In order to set up an
+effective sandboxed environment for a unit it is thus recommended to combine these settings with either
 C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
 C<SystemCallFilter=~@mount>.',
         'type' => 'list'
@@ -1787,8 +1853,7 @@ desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
 C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
 see C<TemporaryFileSystem>.
 
-Note that restricting access with these options does not extend to submounts of a directory that are
-created later on.  Non-directory paths may be specified as well. These options may be specified more than once,
+Non-directory paths may be specified as well. These options may be specified more than once,
 in which case all paths listed will have limited access from within the namespace. If the empty string is
 assigned to this option, the specific list is reset, and all prior assignments have no effect.
 
@@ -1800,11 +1865,19 @@ instead of relative to the root directory of the host (see above). When combinin
 C<+> on the same path make sure to specify C<-> first, and C<+>
 second.
 
-Note that using this setting will disconnect propagation of mounts from the service to the host
-(propagation in the opposite direction continues to work). This means that this setting may not be used for
-services which shall be able to install mount points in the main mount namespace. Note that the effect of these
-settings may be undone by privileged processes. In order to set up an effective sandboxed environment for a
-unit it is thus recommended to combine these settings with either
+Note that these settings will disconnect propagation of mounts from the unit\'s processes to the
+host. This means that this setting may not be used for services which shall be able to install mount points in
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
+unit processes\' namespace, and mounts removed on the host also disappear there too. In particular, note that
+mount propagation from host to unit will result in unmodified mounts to be created in the unit\'s namespace,
+i.e. writable mounts appearing on the host will be writable in the unit\'s namespace too, even when propagated
+below a path marked with C<ReadOnlyPaths>! Restricting access with these options hence does
+not extend to submounts of a directory that are created later on. This means the lock-down offered by that
+setting is not complete, and does not offer full protection. 
+
+Note that the effect of these settings may be undone by privileged processes. In order to set up an
+effective sandboxed environment for a unit it is thus recommended to combine these settings with either
 C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
 C<SystemCallFilter=~@mount>.',
         'type' => 'list'
@@ -1834,8 +1907,7 @@ desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
 C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
 see C<TemporaryFileSystem>.
 
-Note that restricting access with these options does not extend to submounts of a directory that are
-created later on.  Non-directory paths may be specified as well. These options may be specified more than once,
+Non-directory paths may be specified as well. These options may be specified more than once,
 in which case all paths listed will have limited access from within the namespace. If the empty string is
 assigned to this option, the specific list is reset, and all prior assignments have no effect.
 
@@ -1847,11 +1919,19 @@ instead of relative to the root directory of the host (see above). When combinin
 C<+> on the same path make sure to specify C<-> first, and C<+>
 second.
 
-Note that using this setting will disconnect propagation of mounts from the service to the host
-(propagation in the opposite direction continues to work). This means that this setting may not be used for
-services which shall be able to install mount points in the main mount namespace. Note that the effect of these
-settings may be undone by privileged processes. In order to set up an effective sandboxed environment for a
-unit it is thus recommended to combine these settings with either
+Note that these settings will disconnect propagation of mounts from the unit\'s processes to the
+host. This means that this setting may not be used for services which shall be able to install mount points in
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
+unit processes\' namespace, and mounts removed on the host also disappear there too. In particular, note that
+mount propagation from host to unit will result in unmodified mounts to be created in the unit\'s namespace,
+i.e. writable mounts appearing on the host will be writable in the unit\'s namespace too, even when propagated
+below a path marked with C<ReadOnlyPaths>! Restricting access with these options hence does
+not extend to submounts of a directory that are created later on. This means the lock-down offered by that
+setting is not complete, and does not offer full protection. 
+
+Note that the effect of these settings may be undone by privileged processes. In order to set up an
+effective sandboxed environment for a unit it is thus recommended to combine these settings with either
 C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
 C<SystemCallFilter=~@mount>.',
         'type' => 'list'
@@ -1955,9 +2035,13 @@ be available to the executed process. This is useful to turn off network access 
 Defaults to false. It is possible to run two or more units within the same private network namespace by using
 the C<JoinsNamespaceOf> directive, see
 L<systemd.unit(5)> for
-details. Note that this option will disconnect all socket families from the host, this includes AF_NETLINK and
-AF_UNIX.  The latter has the effect that AF_UNIX sockets in the abstract socket namespace will become
-unavailable to the processes (however, those located in the file system will continue to be accessible).
+details. Note that this option will disconnect all socket families from the host, including
+C<AF_NETLINK> and C<AF_UNIX>. Effectively, for
+C<AF_NETLINK> this means that device configuration events received from
+L<systemd-udevd.service(8)> are
+not delivered to the unit\'s processes. And for C<AF_UNIX> this has the effect that
+C<AF_UNIX> sockets in the abstract socket namespace of the host will become unavailable to
+the unit\'s processes (however, those located in the file system will continue to be accessible).
 
 Note that the implementation of this setting might be impossible (for example if network namespaces are
 not available), and the unit should be written in a way that does not solely rely on this setting for
@@ -2261,10 +2345,7 @@ points of the file system namespace created for each process of this unit. Other
 settings (see the discussion in C<PrivateMounts> above) will implicitly disable mount and
 unmount propagation from the unit's processes towards the host by changing the propagation setting of all mount
 points in the unit's file system namepace to C<slave> first. Setting this option to
-C<shared> does not reestablish propagation in that case. Conversely, if this option is set, but
-no other file system namespace setting is used, then new file system namespaces will be created for the unit's
-processes and this propagation flag will be applied right away to all mounts within it, without the
-intermediary application of C<slave>.
+C<shared> does not reestablish propagation in that case.
 
 If not set \x{2013} but file system namespaces are enabled through another file system namespace unit setting \x{2013}
 C<shared> mount propagation is used, but \x{2014} as mentioned \x{2014} as C<slave> is applied
@@ -2394,25 +2475,31 @@ details.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Sets environment variables for executed processes. Takes a space-separated list of variable
+        'description' => "Sets environment variables for executed processes. Takes a space-separated list of variable
 assignments. This option may be specified more than once, in which case all listed variables will be set. If
 the same variable is set twice, the later setting will override the earlier setting. If the empty string is
 assigned to this option, the list of environment variables is reset, all prior assignments have no
-effect. Variable expansion is not performed inside the strings, however, specifier expansion is possible. The $
+effect. Variable expansion is not performed inside the strings, however, specifier expansion is possible. The \$
 character has no special meaning. If you need to assign a value containing spaces or the equals sign to a
-variable, use double quotes (") for the assignment.
+variable, use double quotes (\") for the assignment.
 
 Example:
 
-    Environment="VAR1=word1 word2" VAR2=word3 "VAR3=$word 5 6"
+    Environment=\"VAR1=word1 word2\" VAR2=word3 \"VAR3=\$word 5 6\"
 
 gives three variables C<VAR1>,
 C<VAR2>, C<VAR3>
 with the values C<word1 word2>,
-C<word3>, C<$word 5 6>.
+C<word3>, C<\$word 5 6>.
 
 See L<environ(7)> for details
-about environment variables.',
+about environment variables.
+
+Note that environment variables are not suitable for passing secrets (such as passwords, key material, \x{2026})
+to service processes. Environment variables set for a unit are exposed to unprivileged clients via D-Bus IPC,
+and generally not understood as being data that requires protection. Moreover, environment variables are
+propagated down the process tree, including across security boundaries (such as setuid/setgid executables), and
+hence might leak to processes that should not have access to the secret data.",
         'type' => 'list'
       },
       'EnvironmentFile',
@@ -2559,7 +2646,13 @@ matches are found, the first one will be used.  See C<FileDescriptorName> in
 L<systemd.socket(5)> for more
 details about named file descriptors and their ordering.
 
-This setting defaults to C<null>.",
+This setting defaults to C<null>.
+
+Note that services which specify C<DefaultDependencies=no> and use
+C<StandardInput> or C<StandardOutput> with
+C<tty>/C<tty-force>/C<tty-fail>, should specify
+C<After=systemd-vconsole-setup.service>, to make sure that the tty intialization is
+finished before they start.",
         'type' => 'leaf',
         'value_type' => 'enum'
       },
@@ -2581,8 +2674,8 @@ This setting defaults to C<null>.",
 of C<inherit>, C<null>, C<tty>, C<journal>,
 C<syslog>, C<kmsg>, C<journal+console>,
 C<syslog+console>, C<kmsg+console>,
-C<file:path>, C<socket> or
-C<fd:name>.
+C<file:path>, C<append:path>,
+C<socket> orC<fd:name>.
 
 C<inherit> duplicates the file descriptor of standard input for standard output.
 
@@ -2612,10 +2705,16 @@ in a similar way as the three options above but copy the output to the system co
 
 The C<file:path> option may be used to connect a specific file
 system object to standard output. The semantics are similar to the same option of
-C<StandardInput>, see above. If standard input and output are directed to the same file path,
-it is opened only once, for reading as well as writing and duplicated. This is particular useful when the
-specified path refers to an C<AF_UNIX> socket in the file system, as in that case only a
+C<StandardInput>, see above. If path refers to a regular file
+on the filesystem, it is opened (created if it doesn\'t exist yet) for writing at the beginning of the file,
+but without truncating it.
+If standard input and output are directed to the same file path, it is opened only once, for reading as well
+as writing and duplicated. This is particularly useful when the specified path refers to an
+C<AF_UNIX> socket in the file system, as in that case only a
 single stream connection is created for both input and output.
+
+C<append:path> is similar to C<file:path
+> above, but it opens the file in append mode.
 
 C<socket> connects standard output to a socket acquired via socket activation. The
 semantics are similar to the same option of C<StandardInput>, see above.
@@ -2750,6 +2849,36 @@ enclose the assignment in double quotes ("). The usual specifiers are expanded i
 below). Note that this setting is not only useful for attaching additional metadata to log records of a unit,
 but given that all fields and values are indexed may also be used to implement cross-unit log record
 matching. Assign an empty string to reset the list.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'LogRateLimitIntervalSec',
+      {
+        'description' => 'Configures the rate limiting that is applied to messages generated by this unit. If, in the
+time interval defined by C<LogRateLimitIntervalSec>, more messages than specified in
+C<LogRateLimitBurst> are logged by a service, all further messages within the interval are
+dropped until the interval is over. A message about the number of dropped messages is generated. The time
+specification for C<LogRateLimitIntervalSec> may be specified in the following units: "s",
+"min", "h", "ms", "us" (see
+L<systemd.time(7)> for details).
+The default settings are set by C<RateLimitIntervalSec> and C<RateLimitBurst>
+configured in L<journald.conf(5)>.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'LogRateLimitBurst',
+      {
+        'description' => 'Configures the rate limiting that is applied to messages generated by this unit. If, in the
+time interval defined by C<LogRateLimitIntervalSec>, more messages than specified in
+C<LogRateLimitBurst> are logged by a service, all further messages within the interval are
+dropped until the interval is over. A message about the number of dropped messages is generated. The time
+specification for C<LogRateLimitIntervalSec> may be specified in the following units: "s",
+"min", "h", "ms", "us" (see
+L<systemd.time(7)> for details).
+The default settings are set by C<RateLimitIntervalSec> and C<RateLimitBurst>
+configured in L<journald.conf(5)>.
+',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

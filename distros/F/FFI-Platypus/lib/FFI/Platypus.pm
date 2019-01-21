@@ -6,7 +6,7 @@ use 5.008001;
 use Carp qw( croak );
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -23,17 +23,7 @@ our @CARP_NOT = qw( FFI::Platypus::Declare FFI::Platypus::Record );
 
 require XSLoader;
 XSLoader::load(
-  'FFI::Platypus', $FFI::Platypus::VERSION ||= do {
-    # this is for testing without dzil
-    # it expects MYMETA.yml for FFI::Platypus
-    # to be in the current working directory.
-    my $fh;
-    open($fh, '<', 'MYMETA.yml') || die "unable to read MYMETA.yml";
-    my($str) = grep /^version:/, <$fh>;
-    close $fh;
-    my($version) = $str =~ /^version: '?([0-9._]+)/;
-    $version;
-  }
+  'FFI::Platypus', $FFI::Platypus::VERSION || 0
 );
 
 
@@ -340,6 +330,7 @@ sub closure
 {
   my($self, $coderef) = @_;
   croak "not a coderef" unless ref $coderef eq 'CODE';
+  require FFI::Platypus::Closure;
   FFI::Platypus::Closure->new($coderef);
 }
 
@@ -554,7 +545,7 @@ sub _have_pm
 
 package FFI::Platypus::Function;
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 use overload '&{}' => sub {
   my $ffi = shift;
@@ -566,51 +557,11 @@ use overload 'bool' => sub {
   return $ffi;
 };
 
-package FFI::Platypus::Closure;
-
-use Scalar::Util qw( refaddr);
-use Carp qw( croak );
-use overload '&{}' => sub {
-  my $self = shift;
-  sub { $self->{code}->(@_) };
-};
-
-our $VERSION = '0.59'; # VERSION
-
-sub new
-{
-  my($class, $coderef) = @_;
-  croak "not a coderef" unless ref($coderef) eq 'CODE';
-  my $self = bless { code => $coderef, cbdata => {} }, $class;
-  $self;
-}
-
-sub add_data
-{
-  my($self, $payload, $type) = @_;
-  $self->{cbdata}{$type} = bless \$payload, 'FFI::Platypus::ClosureData';
-}
-
-sub get_data
-{
-  my($self, $type) = @_;
-
-  if (exists $self->{cbdata}{$type}) {
-      return ${$self->{cbdata}{$type}};
-  }
-
-  return 0;
-}
-
-package FFI::Platypus::ClosureData;
-
-our $VERSION = '0.59'; # VERSION
-
 package FFI::Platypus::Type;
 
 use Carp qw( croak );
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 sub new
 {
@@ -712,7 +663,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 0.59
+version 0.74
 
 =head1 SYNOPSIS
 
@@ -1087,7 +1038,7 @@ Examples:
 
 Prepares a code reference so that it can be used as a FFI closure (a 
 Perl subroutine that can be called from C code).  For details on 
-closures, see L<FFI::Platypus::Type#Closures>.
+closures, see L<FFI::Platypus::Type#Closures> and L<FFI::Platypus::Closure>.
 
 =head2 cast
 
@@ -2006,7 +1957,7 @@ pull request on this project's GitHub repository:
 L<https://github.com/Perl5-FFI/FFI-Platypus/pulls>
 
 This project is developed using L<Dist::Zilla>.  The project's git 
-repository also comes with the C<Build.PL> file necessary 
+repository also comes with the C<Makefile.PL> file necessary 
 for building, testing (and even installing if necessary) without 
 L<Dist::Zilla>.  Please keep in mind though that these files are 
 generated so if changes need to be made to those files they should be 
@@ -2039,9 +1990,9 @@ that is normally automatically built by C<./Build test>.  If you prefer
 to use C<prove> or run tests directly, you can use the C<./Build 
 libtest> command to build it.  Example:
 
- % perl Build.PL
- % ./Build
- % ./Build libtest
+ % perl Makefile.PL
+ % make
+ % make mymm_test
  % prove -bv t
  # or an individual test
  % perl -Mblib t/ffi_platypus_memory.t
@@ -2050,26 +2001,6 @@ The build process also respects these environment variables:
 
 =over 4
 
-=item FFI_PLATYPUS_DEBUG
-
-Build the XS code portion of Platypus with -g3 instead of what ever 
-optimizing flags that your Perl normally uses.  This is useful if you 
-need to debug the C or XS code that comes with Platypus, but do not have 
-a debugging Perl.
-
- % env FFI_PLATYPUS_DEBUG=1 perl Build.PL
- 
- 
- DEBUG:
-   - $Config{lddlflags} = -shared -O2 -L/usr/local/lib -fstack-protector
-   + $Config{lddlflags} = -shared -g3 -L/usr/local/lib -fstack-protector
-   - $Config{optimize} = -O2
-   + $Config{optimize} = -g3
- 
- 
- Created MYMETA.yml and MYMETA.json
- Creating new 'Build' script for 'FFI-Platypus' version '0.10'
-
 =item FFI_PLATYPUS_DEBUG_FAKE32
 
 When building Platypus on 32 bit Perls, it will use the L<Math::Int64> C 
@@ -2077,15 +2008,14 @@ API and make L<Math::Int64> a prerequisite.  Setting this environment
 variable will force Platypus to build with both of those options on a 64 
 bit Perl as well.
 
- % env FFI_PLATYPUS_DEBUG_FAKE32=1 perl Build.PL
- 
- 
+ % env FFI_PLATYPUS_DEBUG_FAKE32=1 perl Makefile.PL
  DEBUG_FAKE32:
-   + making Math::Int64 a prerequisite (not normally done on 64 bit Perls)
-   + using Math::Int64's C API to manipulate 64 bit values (not normally done on 64 bit Perls)
- 
- Created MYMETA.yml and MYMETA.json
- Creating new 'Build' script for 'FFI-Platypus' version '0.10'
+   + making Math::Int64 a prereq
+   + Using Math::Int64's C API to manipulate 64 bit values
+ Generating a Unix-style Makefile
+ Writing Makefile for FFI::Platypus
+ Writing MYMETA.yml and MYMETA.json
+ %
 
 =item FFI_PLATYPUS_NO_ALLOCA
 
@@ -2095,17 +2025,14 @@ Platypus uses it responsibly to allocate small amounts of memory for
 argument type parameters, and does not use it to allocate large 
 structures like arrays or buffers.  If you prefer not to use C<alloca> 
 despite these precautions, then you can turn its use off by setting this 
-environment variable when you run C<Build.PL>:
+environment variable when you run C<Makefile.PL>:
 
- % env FFI_PLATYPUS_NO_ALLOCA=1 perl Build.PL
- 
- 
+ helix% env FFI_PLATYPUS_NO_ALLOCA=1 perl Makefile.PL 
  NO_ALLOCA:
    + alloca() will not be used, even if your platform supports it.
- 
- 
-  Created MYMETA.yml and MYMETA.json
-  Creating new 'Build' script for 'FFI-Platypus' version '0.10'
+ Generating a Unix-style Makefile
+ Writing Makefile for FFI::Platypus
+ Writing MYMETA.yml and MYMETA.json
 
 =back
 
@@ -2148,16 +2075,12 @@ making significant changes to the Platypus Core.  For that I use
 
 =head2 System integrators
 
-If you are including Platypus in a larger system (for example a Linux 
-distribution), and you already have libffi as part of your system, you 
-may be interested in L<Alt::Alien::FFI::System>.  This is an alternative 
-to L<Alien::FFI> that does not require L<Alien::Base>.  In fact it has 
-zero non-Core dependencies, and doesn't even need to be installed.  
-Simply include L<Alt::Alien::FFI::System>'s C<lib> directory in your 
-C<PERL5LIB> path when you build Platypus.  For example:
-
- % export PERL5LIB=/path/to/Alt-Alien-FFI-System/lib
- % cpanm FFI::Platypus
+This distribution uses L<Alien::FFI> in fallback mode, meaning if
+the system doesn't provide C<pkg-config> and C<libffi> it will attempt
+to download C<libffi> and build it from source.  If you are including
+Platypus in a larger system (for example a Linux distribution) you
+only need to make sure to declare C<pkg-config> or C<pkgconf> and
+the development package for C<libffi> as prereqs for this module.
 
 =head1 SEE ALSO
 
@@ -2266,10 +2189,6 @@ Embed a tiny C compiler into your Perl scripts.
 
 Provides libffi for Platypus during its configuration and build stages.
 
-=item L<Alt::Alien::FFI::System>
-
-An alternative for L<Alien::FFI> intended mainly for system integrators.
-
 =item L<P5NCI>
 
 Yet another FFI like interface that does not appear to be supported or 
@@ -2317,7 +2236,7 @@ Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015,2016,2017,2018 by Graham Ollis.
+This software is copyright (c) 2015,2016,2017,2018,2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

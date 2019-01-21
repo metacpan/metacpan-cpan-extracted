@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib;
 
 # ABSTRACT: Perlish wrapper for Raylib videogame library
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 use Carp;
 use Graphics::Raylib::XS qw(:all);
@@ -22,7 +22,7 @@ Graphics::Raylib - Perlish wrapper for Raylib videogame library
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -179,7 +179,7 @@ sub draws(@) {
 
 =item draw3D($coderef)
 
-Begins 3D drawing, calls C<$coderef->()> and ends drawing. See examples.
+Begins 3D drawing, calls C<< $coderef->() >> and ends drawing. See examples.
 
 =cut
 

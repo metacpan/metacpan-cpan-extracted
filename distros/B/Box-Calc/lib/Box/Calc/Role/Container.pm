@@ -1,5 +1,5 @@
 package Box::Calc::Role::Container;
-$Box::Calc::Role::Container::VERSION = '1.0200';
+$Box::Calc::Role::Container::VERSION = '1.0201';
 use strict;
 use warnings;
 use Moose::Role;
@@ -12,7 +12,7 @@ Box::Calc::Role::Container - Extends the L<Box::Calc::Role::Dimensional> role to
 
 =head1 VERSION
 
-version 1.0200
+version 1.0201
 
 =head1 METHODS
 
@@ -90,7 +90,7 @@ has outer_extent => (
     required    => 1,
 );
 
-=item max_weight
+=head2 max_weight
 
 The max weight of the items including the container. Defaults to 1000.
 

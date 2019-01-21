@@ -1,0 +1,11 @@
+requires "Data::Dumper" => "0";
+requires "Exporter" => "0";
+requires "File::Slurp" => "0";
+requires "List::Util" => "0";
+requires "Math::Round" => "0";
+requires "MetaCPAN::Client" => "0";
+requires "Module::CoreList" => "0";
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};

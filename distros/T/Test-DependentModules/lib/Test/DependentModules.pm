@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 # CPAN::Reporter spits out random output we don't want, and we don't want to
 # report these tests anyway.
@@ -46,6 +46,11 @@ sub test_all_dependents {
     _make_logs();
 
     my @deps = _get_deps( $module, $params );
+    unless (@deps) {
+        $Test->plan(
+            skip_all => "Could not find any distros that depend on $module" );
+        return 0;
+    }
 
     $Test->plan( tests => scalar @deps );
 
@@ -341,7 +346,7 @@ sub _get_distro {
 }
 
 sub _install_prereqs {
-    my $dist = shift;
+    my $dist      = shift;
     my $root_dist = shift || $dist->base_id;
 
     my $install_dir = _temp_lib_dir();
@@ -517,10 +522,10 @@ sub _run_tests {
         $CPAN::Config->{test_report} = 0;
         $CPAN::Config->{mbuildpl_arg} .= ' --quiet';
         $CPAN::Config->{prerequisites_policy} = 'follow';
-        $CPAN::Config->{make_install_make_command} =~ s/^sudo //;
+        $CPAN::Config->{make_install_make_command}    =~ s/^sudo //;
         $CPAN::Config->{mbuild_install_build_command} =~ s/^sudo //;
-        $CPAN::Config->{make_install_arg} =~ s/UNINST=1//;
-        $CPAN::Config->{mbuild_install_arg} =~ s/--uninst\s+1//;
+        $CPAN::Config->{make_install_arg}             =~ s/UNINST=1//;
+        $CPAN::Config->{mbuild_install_arg}           =~ s/--uninst\s+1//;
 
         if ( $ENV{PERL_TEST_DM_CPAN_VERBOSE} ) {
             $fh = io_from_write_cb( sub { $Test->diag( $_[0] ) } );
@@ -540,13 +545,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Test::DependentModules - Test all modules which depend on your module
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -556,17 +563,15 @@ version 0.26
 
     # or ...
 
-    use Test::DependentModules qw( test_module );
+    use Test::DependentModules qw( test_modules );
     use Test::More tests => 3;
 
-    test_module('Exception::Class');
-    test_module('DateTime');
-    test_module('Log::Dispatch');
+    test_modules( 'Exception::Class', 'DateTime', 'Log::Dispatch' );
 
 =head1 DESCRIPTION
 
-B<WARNING>: The tests this module does should B<never> be included as part of
-a normal CPAN install!
+B<WARNING>: The tests this module does should B<never> be run as part of a
+normal CPAN install!
 
 This module is intended as a tool for module authors who would like to easily
 test that a module release will not break dependencies. This is particularly
@@ -602,8 +607,8 @@ This module optionally exports three functions:
 
 =head2 test_all_dependents( $module, { filter => sub { ... } } )
 
-Given a module name, this function uses L<MetaCPAN::Client> to find all its
-dependencies and test them. It will set a test plan for you.
+Given a module or distro name, this function uses L<MetaCPAN::Client> to find
+all its dependencies and test them. It will set a test plan for you.
 
 If you provide a C<filter> sub, it will be called with a single argument, the
 I<distribution name>, which will be something like "Test-DependentModules"
@@ -625,8 +630,8 @@ In this case, you will have to handle your own test planning.
 
 =head2 test_module($name)
 
-B<DEPRECATED>. Use the C<test_modules()> sub instead, so you can run
-optionally run tests in parallel.
+B<DEPRECATED>. Use the C<test_modules()> sub instead, so you can optionally
+run tests in parallel.
 
 Given a module name, this function will test it. You can use this if you'd
 prefer to hard code a list of modules to test.
@@ -661,15 +666,18 @@ where C<$type> is one of "status", "error", or "prereq".
 The directory should be provided in C<$ENV{PERL_TEST_DM_LOG_DIR}>. The
 directory must already exist.
 
-You also can enable CPAN's output by setting the
+You also can enable verbose output from the L<CPAN> package by setting the
 C<$ENV{PERL_TEST_DM_CPAN_VERBOSE}> variable to a true value.
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests to C<bug-test-mydeps@rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org>.  I will be notified,
-and then you'll automatically be notified of progress on your bug as I make
-changes.
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Test-DependentModules> or via email to L<bug-test-dependentmodules@rt.cpan.org|mailto:bug-test-dependentmodules@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Test-DependentModules can be found at L<https://github.com/houseabsolute/Test-DependentModules>.
 
 =head1 DONATIONS
 
@@ -683,10 +691,10 @@ inasmuch as I have in the past, for as long as it interests me.
 
 Similarly, a donation made in this way will probably not make me work on this
 software much more, unless I get so many donations that I can consider working
-on free software full time, which seems unlikely at best.
+on free software full time (let's all have a chuckle at that together).
 
-To donate, log into PayPal and send money to autarch@urth.org or use the
-button on this page: L<http://www.urth.org/~autarch/fs-donation.html>
+To donate, log into PayPal and send money to autarch@urth.org, or use the
+button at L<http://www.urth.org/~autarch/fs-donation.html>.
 
 =head1 AUTHOR
 
@@ -694,7 +702,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Graham Knop Jesse Luehrs mickey Sawyer X
+=for stopwords Graham Knop Jesse Luehrs mickey Olaf Alders Sawyer X
 
 =over 4
 
@@ -712,16 +720,23 @@ mickey <mickey75@gmail.com>
 
 =item *
 
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
 Sawyer X <xsawyerx@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

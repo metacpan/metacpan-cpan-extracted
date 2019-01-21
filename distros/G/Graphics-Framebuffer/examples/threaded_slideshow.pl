@@ -19,6 +19,7 @@ my $showall    = 0;
 my $help       = 0;
 my $delay      = 3;
 my $nosplash   = 0;
+my $DB         = 1;
 my $threads    = Sys::CPU::cpu_count();
 my $RUNNING : shared = 1;
 
@@ -63,16 +64,16 @@ my ($F,$FB) = Graphics::Framebuffer->new(
     'SHOW_ERRORS'   => $errors,
     'RESET'         => 1,
     'SPLASH'        => $splash,
-    'DOUBLE_BUFFER' => 1,
+    'DOUBLE_BUFFER' => 16,
 );
 
 my $info  = $F->screen_dimensions();
-my $DB    = 0;
 my $DIRTY : shared = 1;
 
 if ($info->{'bits_per_pixel'} == 16 && $F->{'ACCELERATED'}) {
     $DB = 1;
 } else {
+    $DB = 0;
     $FB = $F;
 }
 
@@ -103,7 +104,7 @@ $SIG{'KILL'} = \&finish;
 for (my $t=0;$t<$threads;$t++) {
     $thrd[$t] = threads->create(\&show,$FB, $p, $threads, $t);
 }
-while ($RUNNING) {
+while ($RUNNING && scalar(threads::list(threads::running))) {
     sleep 1;
 }
 
@@ -115,7 +116,7 @@ sub finish {
     $RUNNING = 0;
     alarm 0;
     $SIG{'ALRM'} = sub {
-        exit(1);
+        exec('reset');
     };
     alarm 20;
     while(my @thr = threads->list(threads::running)) {
@@ -178,19 +179,20 @@ sub calculate_window {
         } else {
             $x = $w;
         }
-    } elsif ($max == 4) {
+    } elsif ($max <= 4) {
         $h = int($height/2);
         $w = int($width/2);
         if ($current == 0) {
         } elsif ($current == 1) {
             $x = $w;
         } elsif ($current == 2) {
+            $w = $width if ($max == 3);
             $y = $h;
         } else {
             $x = $w;
             $y = $h;
         }
-    } elsif ($max == 6) {
+    } elsif ($max <= 6) {
         $h = int($height/2);
         $w = int($width/3);
         if ($current == 0) {
@@ -199,15 +201,17 @@ sub calculate_window {
         } elsif ($current == 2) {
             $x = int($w * 2);
         } elsif ($current == 3) {
+            $w = int($width/2) if ($max == 5);
             $y = $h;
         } elsif ($current == 4) {
+            $w = int($width/2) if ($max == 5);
             $y = $h;
             $x = $w;
         } else {
             $y = $h;
             $x = int($w * 2);
         }
-    } elsif ($max == 8) { 
+    } elsif ($max <= 8) { 
         $w = int($width/4);
         $h = int($height/2);
         if ($current == 0) {
@@ -219,17 +223,20 @@ sub calculate_window {
             $x = int($w * 3);
         } elsif ($current == 4) {
             $y = $h;
+            $w = int($width/3) if ($max == 7);
         } elsif ($current == 5) {
             $y = $h;
+            $w = int($width/3) if ($max == 7);
             $x = $w;
         } elsif ($current == 6) {
             $y = $h;
+            $w = int($width/3) if ($max == 7);
             $x = int($w * 2);
         } else {
             $y = $h;
             $x = int($w * 3);
         }
-    } elsif ($max >= 12) {
+    } elsif ($max <= 12) {
         $w = int($width/4);
         $h = int($height/3);
         if ($current == 0) {
@@ -362,7 +369,7 @@ This automatically detects all of the framebuffer devices in your system, and sh
 
 =head1 SYNOPSIS
 
- perl slideshow [options] "/path/to/scan"
+ perl threaded_slideshow.pl [options] "/path/to/scan"
 
 More than one path can be used.  Just separate each path by a space.
 
@@ -376,11 +383,7 @@ Turns on auto color level mode.  Sometimes this yields great results... and some
 
 =item B<--errors>
 
-Allows the module to print errors to STDERR
-
-=item B<--full>
-
-Scales all images (and animations) to full screen (proportionally).  Images are always scaled down, if they are too big for the screen, regardless of this option.
+Allows the module to print errors to STDERR, as well as some minimal initial debugging data.
 
 =item B<--delay>=seconds
 
@@ -391,6 +394,10 @@ Default is 3 seconds.
 =item B<--showall>
 
 Ignores any ".nomedia" files in subdirectories, and shows the images in them anyway.
+
+=item B<--threads>=1-16
+
+The program automatically determines the number of threads, and assigns one to each core.  However, you can override this number with this switch, up to 16.
 
 =back
 

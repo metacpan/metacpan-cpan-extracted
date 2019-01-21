@@ -1,7 +1,7 @@
 package App::TextTableUtils;
 
-our $DATE = '2019-01-15'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-01-17'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to text tables
@@ -18,7 +18,7 @@ App::TextTableUtils - CLI utilities related to text tables
 
 =head1 VERSION
 
-This document describes version 0.003 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2019-01-15.
+This document describes version 0.004 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2019-01-17.
 
 =head1 DESCRIPTION
 
@@ -56,6 +56,34 @@ text tables:
 =item * L<dd2texttable>
 
 =item * L<dd2tsv>
+
+=item * L<ini2ansitable>
+
+=item * L<ini2asciitable>
+
+=item * L<ini2csv>
+
+=item * L<ini2mdtable>
+
+=item * L<ini2orgtable>
+
+=item * L<ini2texttable>
+
+=item * L<ini2tsv>
+
+=item * L<iod2ansitable>
+
+=item * L<iod2asciitable>
+
+=item * L<iod2csv>
+
+=item * L<iod2mdtable>
+
+=item * L<iod2orgtable>
+
+=item * L<iod2texttable>
+
+=item * L<iod2tsv>
 
 =item * L<json2ansitable>
 

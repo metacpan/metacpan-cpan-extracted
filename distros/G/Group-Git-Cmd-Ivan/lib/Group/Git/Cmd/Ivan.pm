@@ -13,7 +13,7 @@ use Carp;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 
-our $VERSION = version->new('0.0.3');
+our $VERSION = version->new('0.0.4');
 
 1;
 
@@ -25,7 +25,7 @@ Group::Git::Cmd::Ivan - Group-Git extra tools
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::Ivan version 0.0.3
+This documentation refers to Group::Git::Cmd::Ivan version 0.0.4
 
 
 =head1 SYNOPSIS

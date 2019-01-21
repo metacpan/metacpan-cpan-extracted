@@ -49,6 +49,7 @@ t/README.md
 t/cme-function.t
 t/model_tests.d/systemd-examples/condition-list/main-test
 t/model_tests.d/systemd-examples/disable-service/main-sshd
+t/model_tests.d/systemd-examples/remove-service/default-alsa-state
 t/model_tests.d/systemd-examples/remove-service/default-sshd
 t/model_tests.d/systemd-examples/remove-service/main-sshd
 t/model_tests.d/systemd-examples/remove-service/mpd.service

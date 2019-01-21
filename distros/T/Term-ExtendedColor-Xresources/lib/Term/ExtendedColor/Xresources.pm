@@ -1,12 +1,13 @@
 #!/usr/bin/perl
 package Term::ExtendedColor::Xresources;
 use strict;
+use warnings;
 
 BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.075';
+  $VERSION = '0.080';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     set_xterm_color
@@ -21,7 +22,10 @@ BEGIN {
 use Carp qw(croak);
 use Term::ReadKey;
 
-*get_xterm_color = *get_xterm_colors;
+{
+  no warnings;
+  *get_xterm_color = *get_xterm_colors;
+}
 
 sub get_xterm_colors {
   my $arg = shift;
@@ -227,7 +231,7 @@ values hexadecimal representations of the color values.
 Changes the colors if called in void context. Else, returns a hash with the
 indexes as keys and the appropriate escape sequences as values.
 
-=head2 get_xterm_color()
+=head2 get_xterm_color(), get_xterm_colors()
 
   my $defined_colors = get_xterm_color({ index => [0 .. 255], type => 'dec' });
 
@@ -313,8 +317,8 @@ None required yet.
 
 =head1 COPYRIGHT
 
-Copyright 2010, 2011 the B<Term::ExtendedColor::Xresources> L</AUTHOR> and
-L</CONTRIBUTORS> as listed above.
+Copyright 2010, 2011, 2019- the B<Term::ExtendedColor::Xresources>
+L</AUTHOR> and L</CONTRIBUTORS> as listed above.
 
 =head1 LICENSE
 

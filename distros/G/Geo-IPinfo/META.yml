@@ -6,6 +6,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
 license: apache
@@ -24,4 +25,4 @@ requires:
   JSON: '0'
   LWP::UserAgent: '0'
   perl: '5.006'
-version: '1.1'
+version: v1.1.1

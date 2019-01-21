@@ -3,7 +3,8 @@ package My::Types;
 use Carp;
 use Type::Utils;
 use Type::Library -base,
-  -declare => 'MinMax', 'Bounds', 'Positive';
+  -declare => 'MinMax',
+  'Bounds', 'Positive';
 
 use Types::Standard -types, 'is_Num';
 

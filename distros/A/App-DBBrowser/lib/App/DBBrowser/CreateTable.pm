@@ -150,21 +150,27 @@ sub create_new_table {
         if ( ! $ok_input ) {
             next MENU;
         }
-        my $ok_table_name = $sf->__set_table_name( $sql );
-        if ( ! $ok_table_name ) {
-            next MENU;
-        }
-        my $ok_columns = $sf->__set_columns( $sql );
-        if ( ! $ok_columns ) {
-            next MENU;
+        TABLE: while ( 1 ) {
+            my $ok_table_name = $sf->__set_table_name( $sql );
+            if ( ! $ok_table_name ) {
+                next MENU;
+            }
+            my $ok_columns = $sf->__set_columns( $sql );
+            if ( ! $ok_columns ) {
+                $sql->{table} = '';
+                next TABLE;
+            }
+            last TABLE;
         }
         my $ok_create_table = $sf->__create_table( $sql );
         if ( ! $ok_create_table ) {
             next MENU;
         }
         if ( @{$sql->{insert_into_args}} ) {
-            my $ok_create_table = $sf->__insert_data( $sql );
-            # ?
+            my $ok_insert = $sf->__insert_data( $sql );
+            if ( ! $ok_insert ) {
+                return;
+            }
         }
         return 1;
     }
@@ -184,7 +190,10 @@ sub __create_table {
         return;
     }
     my $stmt = $ax->get_stmt( $sql, 'Create_table', 'prepare' );
-    $sf->{d}{dbh}->do( $stmt ) or die "$stmt failed!";
+    if ( ! eval { $sf->{d}{dbh}->do( $stmt ); 1 } ) {
+        $ax->print_error_message( $@, 'Create table' );
+        return;
+    };
     delete $sql->{create_table_cols};
     return 1;
 }
@@ -214,7 +223,7 @@ sub __set_table_name {
     my $table;
     my $c = 0;
 
-    TABLENAME: while ( 1 ) {
+    while ( 1 ) {
         $ax->print_sql( $sql );
         my $trs = Term::Form->new( 'tn' );
         my $info;
@@ -229,8 +238,7 @@ sub __set_table_name {
         if ( ! length $table ) {
             return;
         }
-        my $tmp_td = [ undef, $sf->{d}{schema}, $table ];
-        $sql->{table} = $ax->quote_table( $tmp_td );
+        $sql->{table} = $ax->quote_table( [ undef, $sf->{d}{schema}, $table ] );
         if ( none { $sql->{table} eq $ax->quote_table( $sf->{d}{tables_info}{$_} ) } keys %{$sf->{d}{tables_info}} ) {
             return 1;
         }

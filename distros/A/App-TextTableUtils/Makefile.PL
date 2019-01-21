@@ -29,6 +29,20 @@ my %WriteMakefileArgs = (
     "script/dd2orgtable",
     "script/dd2texttable",
     "script/dd2tsv",
+    "script/ini2ansitable",
+    "script/ini2asciitable",
+    "script/ini2csv",
+    "script/ini2mdtable",
+    "script/ini2orgtable",
+    "script/ini2texttable",
+    "script/ini2tsv",
+    "script/iod2ansitable",
+    "script/iod2asciitable",
+    "script/iod2csv",
+    "script/iod2mdtable",
+    "script/iod2orgtable",
+    "script/iod2texttable",
+    "script/iod2tsv",
     "script/json2ansitable",
     "script/json2asciitable",
     "script/json2csv",
@@ -50,6 +64,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::TextTableUtils",
   "PREREQ_PM" => {
+    "Config::IOD::INI::Reader" => 0,
+    "Config::IOD::Reader" => "0.341",
     "Data::Check::Structure" => 0,
     "Data::Dumper" => 0,
     "Getopt::Long" => 0,
@@ -71,7 +87,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,6 +95,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Config::IOD::INI::Reader" => 0,
+  "Config::IOD::Reader" => "0.341",
   "Data::Check::Structure" => 0,
   "Data::Dumper" => 0,
   "File::Spec" => 0,

@@ -1,5 +1,5 @@
 package Box::Calc::Item;
-$Box::Calc::Item::VERSION = '1.0200';
+$Box::Calc::Item::VERSION = '1.0201';
 use strict;
 use warnings;
 use Moose;
@@ -13,7 +13,7 @@ Box::Calc::Item - The container class for the items you wish to pack.
 
 =head1 VERSION
 
-version 1.0200
+version 1.0201
 
 =head1 SYNOPSIS
 

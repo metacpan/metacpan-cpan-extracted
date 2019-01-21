@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp;
 
@@ -52,8 +52,8 @@ The new syntax takes the form of two new keywords, C<async> and C<await>.
 The C<async> keyword should appear just before the C<sub> keyword that
 declares a new function. When present, this marks that the function performs
 its work in a I<potentially> asynchronous fashion. This has two effects: it
-permits the body of the function to use the C<await> expression, and it forces
-the return value of the function to always be a L<Future> instance.
+permits the body of the function to use the C<await> expression, and it wraps
+the return value of the function in a L<Future> instance.
 
    async sub myfunc
    {
@@ -69,6 +69,19 @@ function returns, either by the C<return> keyword or by falling off the end;
 the result of the future will be the return value from the function's code.
 Alternatively, if the function body throws an exception, this will cause the
 returned future to fail.
+
+If the final expression in the body of the function returns a C<Future>, don't
+forget to C<await> it rather than simply returning it as it is, or else this
+return value will become double-wrapped - almost certainly not what you
+wanted.
+
+   async sub otherfunc { ... }
+
+   async sub myfunc
+   {
+      ...
+      return await otherfunc();
+   }
 
 =head2 C<await>
 
@@ -323,6 +336,8 @@ L<https://rt.cpan.org/Ticket/Display.html?id=122793>
 =item *
 
 Clean up the implementation; check for and fix memory leaks.
+
+L<https://rt.cpan.org/Ticket/Display.html?id=128222>
 
 =item *
 

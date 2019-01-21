@@ -1,4 +1,4 @@
-Changes
+CHANGES
 INSTALL
 lib/Date/Lectionary.pm
 lib/Date/Lectionary/Day.pm
@@ -21,6 +21,7 @@ t/05-readings.t
 t/06-day-altName.t
 t/07-day-feasts.t
 t/08-day-includeFeasts.t
+t/09-day-seasons.t
 xt/01-pod.t
 xt/02-pod-coverage.t
 xt/03-minimum_perl_version.t

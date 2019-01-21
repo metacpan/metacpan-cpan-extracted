@@ -25,7 +25,7 @@ Unicode in span - <span class="foo">\x{1f600} smiley face</span> - works
 EOF
 
 my $simple = Markdent::Simple::Fragment->new;
-my $got = $simple->markdown_to_html( markdown => $text );
+my $got    = $simple->markdown_to_html( markdown => $text );
 
 my $expect = <<"EOF";
 <h1>\x{1f600} smiley face</h1>

@@ -5,6 +5,8 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+examples/config/application.properties
+examples/sample.serge
 lib/Serge/Sync/Plugin/TranslationService/mojito.pm
 lib/Serge/Sync/Plugin/TranslationService/mojito.pod
 t/00-compile.t

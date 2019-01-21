@@ -16,6 +16,7 @@ Mesh *						T_PTROBJ
 Model						T_OPAQUE_STRUCT
 Model *						T_PTROBJ
 Music						T_PTROBJ
+NPatchInfo					T_OPAQUE_STRUCT
 Ray						T_OPAQUE_STRUCT
 RayHitInfo					T_OPAQUE_STRUCT
 Rectangle					T_OPAQUE_STRUCT
@@ -24,6 +25,7 @@ Shader						T_OPAQUE_STRUCT
 Sound						T_OPAQUE_STRUCT
 Texture2D					T_OPAQUE_STRUCT
 Texture2D *					T_PTROBJ
+TraceLogCallback				T_PTROBJ
 Vector2						T_OPAQUE_STRUCT
 Vector2 *					T_PTROBJ
 Vector3						T_OPAQUE_STRUCT

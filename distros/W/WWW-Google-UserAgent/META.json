@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -38,7 +38,7 @@
             "Net::SSLeay" : "1.49",
             "Throwable" : "0.200011",
             "Type::Tiny" : "1.000005",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -46,15 +46,15 @@
    "provides" : {
       "WWW::Google::UserAgent" : {
          "file" : "lib/WWW/Google/UserAgent.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "WWW::Google::UserAgent::DataTypes" : {
          "file" : "lib/WWW/Google/UserAgent/DataTypes.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "WWW::Google::UserAgent::Exception" : {
          "file" : "lib/WWW/Google/UserAgent/Exception.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -65,6 +65,6 @@
          "web" : "https://github.com/manwar/WWW-Google-UserAgent"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

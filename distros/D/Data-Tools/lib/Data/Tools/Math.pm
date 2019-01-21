@@ -1,7 +1,7 @@
 ##############################################################################
 #
 #  Data::Tools perl module
-#  2013-2018 (c) Vladi Belperchinov-Shabanski "Cade"
+#  2013-2019 (c) Vladi Belperchinov-Shabanski "Cade"
 #  http://cade.datamax.bg
 #  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 #
@@ -15,7 +15,7 @@ use Carp;
 use Data::Tools;
 use Math::BigFloat;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(

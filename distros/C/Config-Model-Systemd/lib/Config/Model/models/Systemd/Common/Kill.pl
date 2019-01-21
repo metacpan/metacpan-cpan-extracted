@@ -78,7 +78,8 @@ is immediately followed by a C<SIGHUP> (if
 enabled with C<SendSIGHUP>). If then, after a
 delay (configured via the C<TimeoutStopSec>
 option), processes still remain, the termination request is
-repeated with the C<SIGKILL> signal (unless
+repeated with the C<SIGKILL> signal or the
+signal specified via C<FinalKillSignal> (unless
 this is disabled via the C<SendSIGKILL>
 option). See
 L<kill(2)>
@@ -125,9 +126,11 @@ severed. Takes a boolean value. Defaults to "no".
       'SendSIGKILL',
       {
         'description' => 'Specifies whether to send
-C<SIGKILL> to remaining processes after a
-timeout, if the normal shutdown procedure left processes of
-the service around. Takes a boolean value. Defaults to "yes".
+C<SIGKILL> (or the signal specified by
+C<FinalKillSignal>) to remaining processes
+after a timeout, if the normal shutdown procedure left
+processes of the service around. Takes a boolean value.
+Defaults to "yes".
 ',
         'type' => 'leaf',
         'value_type' => 'boolean',
@@ -135,6 +138,32 @@ the service around. Takes a boolean value. Defaults to "yes".
           'no',
           'yes'
         ]
+      },
+      'FinalKillSignal',
+      {
+        'description' => 'Specifies which signal to send to remaining
+processes after a timeout if C<SendSIGKILL>
+is enabled. The signal configured here should be one that is
+not typically caught and processed by services (C<SIGTERM>
+is not suitable). Developers can find it useful to use this to
+generate a coredump to troubleshoot why a service did not
+terminate upon receiving the initial C<SIGTERM>
+signal. This can be achieved by configuring C<LimitCORE>
+and setting C<FinalKillSignal> to either
+C<SIGQUIT> or C<SIGABRT>
+Defaults to C<SIGKILL>.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'WatchdogSignal',
+      {
+        'description' => 'Specifies which signal to use to terminate the
+service when the watchdog timeout expires (enabled through
+C<WatchdogSec>). Defaults to C<SIGABRT>.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       }
     ],
     'generated_by' => 'parse-man.pl from systemd doc',

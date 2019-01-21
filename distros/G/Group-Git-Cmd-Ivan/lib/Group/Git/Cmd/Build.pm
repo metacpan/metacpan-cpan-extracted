@@ -14,7 +14,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use File::chdir;
 
-our $VERSION = version->new('0.0.3');
+our $VERSION = version->new('0.0.4');
 
 sub build { shift->_builder( 'builder', 'Build.PL', @_ ) }
 sub mvn   { shift->_builder( 'mvn'    , 'pom.xml' , @_ ) }
@@ -41,7 +41,7 @@ Group::Git::Cmd::Build - Builds repositories
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::Build version 0.0.3
+This documentation refers to Group::Git::Cmd::Build version 0.0.4
 
 
 =head1 SYNOPSIS

@@ -571,47 +571,133 @@ static int
 constant_8 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     KEY_BACK KEY_DOWN KEY_FIVE KEY_FOUR KEY_HOME KEY_LEFT KEY_MENU KEY_NINE
-     KEY_ZERO LOG_INFO MAP_BRDF */
-  /* Offset 6 gives the best switch position.  */
-  switch (name[6]) {
-  case 'C':
-    if (memEQ(name, "KEY_BACK", 8)) {
-    /*                     ^       */
-#ifdef KEY_BACK
-      *iv_return = KEY_BACK;
+     FONT_SDF KEY_BACK KEY_DOWN KEY_FIVE KEY_FOUR KEY_HOME KEY_KP_0 KEY_KP_1
+     KEY_KP_2 KEY_KP_3 KEY_KP_4 KEY_KP_5 KEY_KP_6 KEY_KP_7 KEY_KP_8 KEY_KP_9
+     KEY_LEFT KEY_MENU KEY_NINE KEY_ZERO LOG_INFO MAP_BRDF */
+  /* Offset 7 gives the best switch position.  */
+  switch (name[7]) {
+  case '0':
+    if (memEQ(name, "KEY_KP_", 7)) {
+    /*                      0     */
+#ifdef KEY_KP_0
+      *iv_return = KEY_KP_0;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
     }
     break;
-  case 'D':
-    if (memEQ(name, "MAP_BRDF", 8)) {
-    /*                     ^       */
-      *iv_return = MAP_BRDF;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'F':
-    if (memEQ(name, "KEY_LEFT", 8)) {
-    /*                     ^       */
-#ifdef KEY_LEFT
-      *iv_return = KEY_LEFT;
+  case '1':
+    if (memEQ(name, "KEY_KP_", 7)) {
+    /*                      1     */
+#ifdef KEY_KP_1
+      *iv_return = KEY_KP_1;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
     }
-    if (memEQ(name, "LOG_INFO", 8)) {
-    /*                     ^       */
-      *iv_return = LOG_INFO;
+    break;
+  case '2':
+    if (memEQ(name, "KEY_KP_", 7)) {
+    /*                      2     */
+#ifdef KEY_KP_2
+      *iv_return = KEY_KP_2;
       return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
-  case 'M':
-    if (memEQ(name, "KEY_HOME", 8)) {
-    /*                     ^       */
+  case '3':
+    if (memEQ(name, "KEY_KP_", 7)) {
+    /*                      3     */
+#ifdef KEY_KP_3
+      *iv_return = KEY_KP_3;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case '4':
+    if (memEQ(name, "KEY_KP_", 7)) {
+    /*                      4     */
+#ifdef KEY_KP_4
+      *iv_return = KEY_KP_4;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case '5':
+    if (memEQ(name, "KEY_KP_", 7)) {
+    /*                      5     */
+#ifdef KEY_KP_5
+      *iv_return = KEY_KP_5;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case '6':
+    if (memEQ(name, "KEY_KP_", 7)) {
+    /*                      6     */
+#ifdef KEY_KP_6
+      *iv_return = KEY_KP_6;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case '7':
+    if (memEQ(name, "KEY_KP_", 7)) {
+    /*                      7     */
+#ifdef KEY_KP_7
+      *iv_return = KEY_KP_7;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case '8':
+    if (memEQ(name, "KEY_KP_", 7)) {
+    /*                      8     */
+#ifdef KEY_KP_8
+      *iv_return = KEY_KP_8;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case '9':
+    if (memEQ(name, "KEY_KP_", 7)) {
+    /*                      9     */
+#ifdef KEY_KP_9
+      *iv_return = KEY_KP_9;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'E':
+    if (memEQ(name, "KEY_FIV", 7)) {
+    /*                      E     */
+#ifdef KEY_FIVE
+      *iv_return = KEY_FIVE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "KEY_HOM", 7)) {
+    /*                      E     */
 #ifdef KEY_HOME
       *iv_return = KEY_HOME;
       return PERL_constant_ISIV;
@@ -619,19 +705,8 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_NOTDEF;
 #endif
     }
-    break;
-  case 'N':
-    if (memEQ(name, "KEY_MENU", 8)) {
-    /*                     ^       */
-#ifdef KEY_MENU
-      *iv_return = KEY_MENU;
-      return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
-    }
-    if (memEQ(name, "KEY_NINE", 8)) {
-    /*                     ^       */
+    if (memEQ(name, "KEY_NIN", 7)) {
+    /*                      E     */
 #ifdef KEY_NINE
       *iv_return = KEY_NINE;
       return PERL_constant_ISIV;
@@ -640,9 +715,43 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'R':
-    if (memEQ(name, "KEY_ZERO", 8)) {
-    /*                     ^       */
+  case 'F':
+    if (memEQ(name, "FONT_SD", 7)) {
+    /*                      F     */
+      *iv_return = FONT_SDF;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "MAP_BRD", 7)) {
+    /*                      F     */
+      *iv_return = MAP_BRDF;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'K':
+    if (memEQ(name, "KEY_BAC", 7)) {
+    /*                      K     */
+#ifdef KEY_BACK
+      *iv_return = KEY_BACK;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'N':
+    if (memEQ(name, "KEY_DOW", 7)) {
+    /*                      N     */
+#ifdef KEY_DOWN
+      *iv_return = KEY_DOWN;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'O':
+    if (memEQ(name, "KEY_ZER", 7)) {
+    /*                      O     */
 #ifdef KEY_ZERO
       *iv_return = KEY_ZERO;
       return PERL_constant_ISIV;
@@ -650,10 +759,15 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_NOTDEF;
 #endif
     }
+    if (memEQ(name, "LOG_INF", 7)) {
+    /*                      O     */
+      *iv_return = LOG_INFO;
+      return PERL_constant_ISIV;
+    }
     break;
-  case 'U':
-    if (memEQ(name, "KEY_FOUR", 8)) {
-    /*                     ^       */
+  case 'R':
+    if (memEQ(name, "KEY_FOU", 7)) {
+    /*                      R     */
 #ifdef KEY_FOUR
       *iv_return = KEY_FOUR;
       return PERL_constant_ISIV;
@@ -662,22 +776,22 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'V':
-    if (memEQ(name, "KEY_FIVE", 8)) {
-    /*                     ^       */
-#ifdef KEY_FIVE
-      *iv_return = KEY_FIVE;
+  case 'T':
+    if (memEQ(name, "KEY_LEF", 7)) {
+    /*                      T     */
+#ifdef KEY_LEFT
+      *iv_return = KEY_LEFT;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
     }
     break;
-  case 'W':
-    if (memEQ(name, "KEY_DOWN", 8)) {
-    /*                     ^       */
-#ifdef KEY_DOWN
-      *iv_return = KEY_DOWN;
+  case 'U':
+    if (memEQ(name, "KEY_MEN", 7)) {
+    /*                      U     */
+#ifdef KEY_MENU
+      *iv_return = KEY_MENU;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -692,8 +806,9 @@ static int
 constant_9 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     KEY_EIGHT KEY_ENTER KEY_GRAVE KEY_PAUSE KEY_RIGHT KEY_SEVEN KEY_SLASH
-     KEY_SPACE KEY_THREE LOG_DEBUG LOG_ERROR LOG_OTHER */
+     KEY_COMMA KEY_EIGHT KEY_ENTER KEY_EQUAL KEY_GRAVE KEY_MINUS KEY_PAUSE
+     KEY_RIGHT KEY_SEVEN KEY_SLASH KEY_SPACE KEY_THREE LOG_DEBUG LOG_ERROR
+     LOG_OTHER */
   /* Offset 5 gives the best switch position.  */
   switch (name[5]) {
   case 'A':
@@ -744,6 +859,15 @@ constant_9 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_NOTDEF;
 #endif
     }
+    if (memEQ(name, "KEY_MINUS", 9)) {
+    /*                    ^         */
+#ifdef KEY_MINUS
+      *iv_return = KEY_MINUS;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     if (memEQ(name, "KEY_RIGHT", 9)) {
     /*                    ^         */
 #ifdef KEY_RIGHT
@@ -776,11 +900,33 @@ constant_9 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'O':
+    if (memEQ(name, "KEY_COMMA", 9)) {
+    /*                    ^         */
+#ifdef KEY_COMMA
+      *iv_return = KEY_COMMA;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'P':
     if (memEQ(name, "KEY_SPACE", 9)) {
     /*                    ^         */
 #ifdef KEY_SPACE
       *iv_return = KEY_SPACE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'Q':
+    if (memEQ(name, "KEY_EQUAL", 9)) {
+    /*                    ^         */
+#ifdef KEY_EQUAL
+      *iv_return = KEY_EQUAL;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -818,41 +964,38 @@ static int
 constant_10 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     KEY_DELETE KEY_ESCAPE KEY_INSERT MAP_ALBEDO MAP_HEIGHT MAP_NORMAL
-     WRAP_CLAMP */
-  /* Offset 8 gives the best switch position.  */
-  switch (name[8]) {
-  case 'A':
-    if (memEQ(name, "MAP_NORMAL", 10)) {
-    /*                       ^        */
-      *iv_return = MAP_NORMAL;
+     KEY_DELETE KEY_ESCAPE KEY_INSERT KEY_KP_ADD KEY_PERIOD MAP_ALBEDO
+     MAP_HEIGHT MAP_NORMAL NPT_9PATCH WRAP_CLAMP */
+  /* Offset 4 gives the best switch position.  */
+  switch (name[4]) {
+  case '9':
+    if (memEQ(name, "NPT_9PATCH", 10)) {
+    /*                   ^            */
+      *iv_return = NPT_9PATCH;
       return PERL_constant_ISIV;
     }
     break;
-  case 'D':
+  case 'A':
     if (memEQ(name, "MAP_ALBEDO", 10)) {
-    /*                       ^        */
+    /*                   ^            */
       *iv_return = MAP_ALBEDO;
       return PERL_constant_ISIV;
     }
     break;
-  case 'H':
-    if (memEQ(name, "MAP_HEIGHT", 10)) {
-    /*                       ^        */
-      *iv_return = MAP_HEIGHT;
+  case 'D':
+    if (memEQ(name, "KEY_DELETE", 10)) {
+    /*                   ^            */
+#ifdef KEY_DELETE
+      *iv_return = KEY_DELETE;
       return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
-  case 'M':
-    if (memEQ(name, "WRAP_CLAMP", 10)) {
-    /*                       ^        */
-      *iv_return = WRAP_CLAMP;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'P':
+  case 'E':
     if (memEQ(name, "KEY_ESCAPE", 10)) {
-    /*                       ^        */
+    /*                   ^            */
 #ifdef KEY_ESCAPE
       *iv_return = KEY_ESCAPE;
       return PERL_constant_ISIV;
@@ -861,9 +1004,16 @@ constant_10 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'R':
+  case 'H':
+    if (memEQ(name, "MAP_HEIGHT", 10)) {
+    /*                   ^            */
+      *iv_return = MAP_HEIGHT;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'I':
     if (memEQ(name, "KEY_INSERT", 10)) {
-    /*                       ^        */
+    /*                   ^            */
 #ifdef KEY_INSERT
       *iv_return = KEY_INSERT;
       return PERL_constant_ISIV;
@@ -872,15 +1022,40 @@ constant_10 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'T':
-    if (memEQ(name, "KEY_DELETE", 10)) {
-    /*                       ^        */
-#ifdef KEY_DELETE
-      *iv_return = KEY_DELETE;
+  case 'K':
+    if (memEQ(name, "KEY_KP_ADD", 10)) {
+    /*                   ^            */
+#ifdef KEY_KP_ADD
+      *iv_return = KEY_KP_ADD;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
+    }
+    break;
+  case 'N':
+    if (memEQ(name, "MAP_NORMAL", 10)) {
+    /*                   ^            */
+      *iv_return = MAP_NORMAL;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'P':
+    if (memEQ(name, "KEY_PERIOD", 10)) {
+    /*                   ^            */
+#ifdef KEY_PERIOD
+      *iv_return = KEY_PERIOD;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case '_':
+    if (memEQ(name, "WRAP_CLAMP", 10)) {
+    /*                   ^            */
+      *iv_return = WRAP_CLAMP;
+      return PERL_constant_ISIV;
     }
     break;
   }
@@ -891,60 +1066,34 @@ static int
 constant_11 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BLEND_ALPHA CAMERA_FREE GESTURE_TAP KEY_PAGE_UP LOG_WARNING MAP_CUBEMAP
-     MAP_DIFFUSE WRAP_MIRROR WRAP_REPEAT */
-  /* Offset 8 gives the best switch position.  */
-  switch (name[8]) {
+     BLEND_ALPHA CAMERA_FREE FONT_BITMAP GESTURE_TAP KEY_KB_MENU KEY_PAGE_UP
+     LOG_WARNING MAP_CUBEMAP MAP_DIFFUSE WRAP_MIRROR WRAP_REPEAT */
+  /* Offset 7 gives the best switch position.  */
+  switch (name[7]) {
   case 'E':
-    if (memEQ(name, "WRAP_REPEAT", 11)) {
-    /*                       ^         */
-      *iv_return = WRAP_REPEAT;
+    if (memEQ(name, "KEY_PAGE_UP", 11)) {
+    /*                      ^          */
+#ifdef KEY_PAGE_UP
+      *iv_return = KEY_PAGE_UP;
       return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
-    break;
-  case 'I':
-    if (memEQ(name, "LOG_WARNING", 11)) {
-    /*                       ^         */
-      *iv_return = LOG_WARNING;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'M':
     if (memEQ(name, "MAP_CUBEMAP", 11)) {
-    /*                       ^         */
+    /*                      ^          */
       *iv_return = MAP_CUBEMAP;
       return PERL_constant_ISIV;
     }
     break;
-  case 'P':
-    if (memEQ(name, "BLEND_ALPHA", 11)) {
-    /*                       ^         */
-      *iv_return = BLEND_ALPHA;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'R':
+  case 'F':
     if (memEQ(name, "CAMERA_FREE", 11)) {
-    /*                       ^         */
+    /*                      ^          */
       *iv_return = CAMERA_FREE;
       return PERL_constant_ISIV;
     }
-    if (memEQ(name, "WRAP_MIRROR", 11)) {
-    /*                       ^         */
-      *iv_return = WRAP_MIRROR;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'T':
-    if (memEQ(name, "GESTURE_TAP", 11)) {
-    /*                       ^         */
-      *iv_return = GESTURE_TAP;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'U':
     if (memEQ(name, "MAP_DIFFUSE", 11)) {
-    /*                       ^         */
+    /*                      ^          */
 #ifdef MAP_DIFFUSE
       *iv_return = MAP_DIFFUSE;
       return PERL_constant_ISIV;
@@ -953,15 +1102,57 @@ constant_11 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case '_':
-    if (memEQ(name, "KEY_PAGE_UP", 11)) {
-    /*                       ^         */
-#ifdef KEY_PAGE_UP
-      *iv_return = KEY_PAGE_UP;
+  case 'L':
+    if (memEQ(name, "BLEND_ALPHA", 11)) {
+    /*                      ^          */
+      *iv_return = BLEND_ALPHA;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'M':
+    if (memEQ(name, "KEY_KB_MENU", 11)) {
+    /*                      ^          */
+#ifdef KEY_KB_MENU
+      *iv_return = KEY_KB_MENU;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
+    }
+    break;
+  case 'N':
+    if (memEQ(name, "LOG_WARNING", 11)) {
+    /*                      ^          */
+      *iv_return = LOG_WARNING;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'P':
+    if (memEQ(name, "WRAP_REPEAT", 11)) {
+    /*                      ^          */
+      *iv_return = WRAP_REPEAT;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'R':
+    if (memEQ(name, "WRAP_MIRROR", 11)) {
+    /*                      ^          */
+      *iv_return = WRAP_MIRROR;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'T':
+    if (memEQ(name, "FONT_BITMAP", 11)) {
+    /*                      ^          */
+      *iv_return = FONT_BITMAP;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '_':
+    if (memEQ(name, "GESTURE_TAP", 11)) {
+    /*                      ^          */
+      *iv_return = GESTURE_TAP;
+      return PERL_constant_ISIV;
     }
     break;
   }
@@ -972,10 +1163,18 @@ static int
 constant_12 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     FILTER_POINT GESTURE_DRAG GESTURE_HOLD GESTURE_NONE KEY_LEFT_ALT
-     KEY_NUM_LOCK LOC_MAP_BRDF MAP_EMISSION MAP_SPECULAR */
+     FILTER_POINT FONT_DEFAULT GESTURE_DRAG GESTURE_HOLD GESTURE_NONE
+     KEY_KP_ENTER KEY_KP_EQUAL KEY_LEFT_ALT KEY_NUM_LOCK LOC_MAP_BRDF
+     MAP_EMISSION MAP_SPECULAR */
   /* Offset 8 gives the best switch position.  */
   switch (name[8]) {
+  case 'A':
+    if (memEQ(name, "FONT_DEFAULT", 12)) {
+    /*                       ^          */
+      *iv_return = FONT_DEFAULT;
+      return PERL_constant_ISIV;
+    }
+    break;
   case 'B':
     if (memEQ(name, "LOC_MAP_BRDF", 12)) {
     /*                       ^          */
@@ -1014,12 +1213,32 @@ constant_12 (pTHX_ const char *name, IV *iv_return) {
       *iv_return = GESTURE_NONE;
       return PERL_constant_ISIV;
     }
+    if (memEQ(name, "KEY_KP_ENTER", 12)) {
+    /*                       ^          */
+#ifdef KEY_KP_ENTER
+      *iv_return = KEY_KP_ENTER;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     break;
   case 'O':
     if (memEQ(name, "FILTER_POINT", 12)) {
     /*                       ^          */
       *iv_return = FILTER_POINT;
       return PERL_constant_ISIV;
+    }
+    break;
+  case 'Q':
+    if (memEQ(name, "KEY_KP_EQUAL", 12)) {
+    /*                       ^          */
+#ifdef KEY_KP_EQUAL
+      *iv_return = KEY_KP_EQUAL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
   case 'S':
@@ -1060,8 +1279,8 @@ constant_13 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      CAMERA_CUSTOM HMD_OCULUS_GO HMD_SONY_PSVR KEY_BACKSLASH KEY_BACKSPACE
-     KEY_CAPS_LOCK KEY_PAGE_DOWN KEY_RIGHT_ALT KEY_VOLUME_UP MAP_METALNESS
-     MAP_OCCLUSION MAP_PREFILTER MAP_ROUGHNESS */
+     KEY_CAPS_LOCK KEY_KP_DIVIDE KEY_PAGE_DOWN KEY_RIGHT_ALT KEY_SEMICOLON
+     KEY_VOLUME_UP MAP_METALNESS MAP_OCCLUSION MAP_PREFILTER MAP_ROUGHNESS */
   /* Offset 7 gives the best switch position.  */
   switch (name[7]) {
   case 'A':
@@ -1076,6 +1295,17 @@ constant_13 (pTHX_ const char *name, IV *iv_return) {
     /*                      ^            */
       *iv_return = CAMERA_CUSTOM;
       return PERL_constant_ISIV;
+    }
+    break;
+  case 'D':
+    if (memEQ(name, "KEY_KP_DIVIDE", 13)) {
+    /*                      ^            */
+#ifdef KEY_KP_DIVIDE
+      *iv_return = KEY_KP_DIVIDE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
   case 'E':
@@ -1108,6 +1338,17 @@ constant_13 (pTHX_ const char *name, IV *iv_return) {
     /*                      ^            */
 #ifdef KEY_RIGHT_ALT
       *iv_return = KEY_RIGHT_ALT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'I':
+    if (memEQ(name, "KEY_SEMICOLON", 13)) {
+    /*                      ^            */
+#ifdef KEY_SEMICOLON
+      *iv_return = KEY_SEMICOLON;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -1183,8 +1424,9 @@ static int
 constant_14 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BLEND_ADDITIVE CAMERA_ORBITAL FLAG_SHOW_LOGO KEY_LEFT_SHIFT LOC_MAP_ALBEDO
-     LOC_MAP_HEIGHT LOC_MAP_NORMAL LOC_MATRIX_MVP MAP_IRRADIANCE */
+     BLEND_ADDITIVE CAMERA_ORBITAL FLAG_SHOW_LOGO KEY_APOSTROPHE KEY_KP_DECIMAL
+     KEY_LEFT_SHIFT KEY_LEFT_SUPER LOC_MAP_ALBEDO LOC_MAP_HEIGHT LOC_MAP_NORMAL
+     LOC_MATRIX_MVP MAP_IRRADIANCE */
   /* Offset 9 gives the best switch position.  */
   switch (name[9]) {
   case 'B':
@@ -1192,6 +1434,17 @@ constant_14 (pTHX_ const char *name, IV *iv_return) {
     /*                        ^           */
       *iv_return = CAMERA_ORBITAL;
       return PERL_constant_ISIV;
+    }
+    break;
+  case 'C':
+    if (memEQ(name, "KEY_KP_DECIMAL", 14)) {
+    /*                        ^           */
+#ifdef KEY_KP_DECIMAL
+      *iv_return = KEY_KP_DECIMAL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
   case 'E':
@@ -1227,11 +1480,31 @@ constant_14 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_ISIV;
     }
     break;
+  case 'R':
+    if (memEQ(name, "KEY_APOSTROPHE", 14)) {
+    /*                        ^           */
+#ifdef KEY_APOSTROPHE
+      *iv_return = KEY_APOSTROPHE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'S':
     if (memEQ(name, "KEY_LEFT_SHIFT", 14)) {
     /*                        ^           */
 #ifdef KEY_LEFT_SHIFT
       *iv_return = KEY_LEFT_SHIFT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "KEY_LEFT_SUPER", 14)) {
+    /*                        ^           */
+#ifdef KEY_LEFT_SUPER
+      *iv_return = KEY_LEFT_SUPER;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -1265,9 +1538,9 @@ constant_15 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      FILTER_BILINEAR FLAG_VSYNC_HINT GAMEPAD_PLAYER1 GAMEPAD_PLAYER2
-     GAMEPAD_PLAYER3 GAMEPAD_PLAYER4 KEY_RIGHT_SHIFT KEY_SCROLL_LOCK
-     KEY_VOLUME_DOWN LOC_MAP_CUBEMAP LOC_MAP_DIFFUSE LOC_MATRIX_VIEW
-     LOC_VECTOR_VIEW */
+     GAMEPAD_PLAYER3 GAMEPAD_PLAYER4 KEY_KP_MULTIPLY KEY_KP_SUBTRACT
+     KEY_RIGHT_SHIFT KEY_RIGHT_SUPER KEY_SCROLL_LOCK KEY_VOLUME_DOWN
+     LOC_MAP_CUBEMAP LOC_MAP_DIFFUSE LOC_MATRIX_VIEW LOC_VECTOR_VIEW */
   /* Offset 14 gives the best switch position.  */
   switch (name[14]) {
   case '1':
@@ -1360,12 +1633,30 @@ constant_15 (pTHX_ const char *name, IV *iv_return) {
       *iv_return = FILTER_BILINEAR;
       return PERL_constant_ISIV;
     }
+    if (memEQ(name, "KEY_RIGHT_SUPE", 14)) {
+    /*                             R      */
+#ifdef KEY_RIGHT_SUPER
+      *iv_return = KEY_RIGHT_SUPER;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     break;
   case 'T':
     if (memEQ(name, "FLAG_VSYNC_HIN", 14)) {
     /*                             T      */
 #ifdef FLAG_VSYNC_HINT
       *iv_return = FLAG_VSYNC_HINT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "KEY_KP_SUBTRAC", 14)) {
+    /*                             T      */
+#ifdef KEY_KP_SUBTRACT
+      *iv_return = KEY_KP_SUBTRACT;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -1393,6 +1684,17 @@ constant_15 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_ISIV;
     }
     break;
+  case 'Y':
+    if (memEQ(name, "KEY_KP_MULTIPL", 14)) {
+    /*                             Y      */
+#ifdef KEY_KP_MULTIPLY
+      *iv_return = KEY_KP_MULTIPLY;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   }
   return PERL_constant_NOTFOUND;
 }
@@ -1402,10 +1704,22 @@ constant_16 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      BLEND_MULTIPLIED FILTER_TRILINEAR GESTURE_PINCH_IN GESTURE_SWIPE_UP
-     KEY_LEFT_CONTROL KEY_PRINT_SCREEN LOC_MAP_EMISSION LOC_MAP_SPECULAR
-     LOC_MATRIX_MODEL LOC_VERTEX_COLOR MAX_TOUCH_POINTS UNCOMPRESSED_R32 */
+     KEY_LEFT_BRACKET KEY_LEFT_CONTROL KEY_PRINT_SCREEN LOC_MAP_EMISSION
+     LOC_MAP_SPECULAR LOC_MATRIX_MODEL LOC_VERTEX_COLOR MAX_TOUCH_POINTS
+     UNCOMPRESSED_R32 */
   /* Offset 12 gives the best switch position.  */
   switch (name[12]) {
+  case 'C':
+    if (memEQ(name, "KEY_LEFT_BRACKET", 16)) {
+    /*                           ^          */
+#ifdef KEY_LEFT_BRACKET
+      *iv_return = KEY_LEFT_BRACKET;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'E':
     if (memEQ(name, "GESTURE_SWIPE_UP", 16)) {
     /*                           ^          */
@@ -1512,10 +1826,10 @@ static int
 constant_17 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     FLAG_MSAA_4X_HINT GESTURE_DOUBLETAP GESTURE_PINCH_OUT KEY_RIGHT_CONTROL
-     LOC_COLOR_AMBIENT LOC_COLOR_DIFFUSE LOC_MAP_METALNESS LOC_MAP_OCCLUSION
-     LOC_MAP_PREFILTER LOC_MAP_ROUGHNESS LOC_VERTEX_NORMAL MAX_MATERIAL_MAPS
-     MOUSE_LEFT_BUTTON */
+     FLAG_MSAA_4X_HINT GESTURE_DOUBLETAP GESTURE_PINCH_OUT KEY_RIGHT_BRACKET
+     KEY_RIGHT_CONTROL LOC_COLOR_AMBIENT LOC_COLOR_DIFFUSE LOC_MAP_METALNESS
+     LOC_MAP_OCCLUSION LOC_MAP_PREFILTER LOC_MAP_ROUGHNESS LOC_VERTEX_NORMAL
+     MAX_MATERIAL_MAPS MOUSE_LEFT_BUTTON */
   /* Offset 11 gives the best switch position.  */
   switch (name[11]) {
   case 'A':
@@ -1604,6 +1918,17 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
     /*                          ^            */
 #ifdef KEY_RIGHT_CONTROL
       *iv_return = KEY_RIGHT_CONTROL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'R':
+    if (memEQ(name, "KEY_RIGHT_BRACKET", 17)) {
+    /*                          ^            */
+#ifdef KEY_RIGHT_BRACKET
+      *iv_return = KEY_RIGHT_BRACKET;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -1709,8 +2034,8 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
      COMPRESSED_DXT1_RGB COMPRESSED_ETC1_RGB COMPRESSED_ETC2_RGB
      COMPRESSED_PVRT_RGB GAMEPAD_PS3_AXIS_L2 GAMEPAD_PS3_AXIS_R2
      GESTURE_SWIPE_RIGHT HMD_OCULUS_RIFT_CV1 HMD_OCULUS_RIFT_DK2
-     LOC_VERTEX_POSITION MOUSE_MIDDLE_BUTTON UNCOMPRESSED_R5G6B5
-     UNCOMPRESSED_R8G8B8 */
+     LOC_VERTEX_POSITION MOUSE_MIDDLE_BUTTON NPT_3PATCH_VERTICAL
+     UNCOMPRESSED_R5G6B5 UNCOMPRESSED_R8G8B8 */
   /* Offset 16 gives the best switch position.  */
   switch (name[16]) {
   case '6':
@@ -1731,6 +2056,11 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "HMD_OCULUS_RIFT_CV1", 19)) {
     /*                               ^         */
       *iv_return = HMD_OCULUS_RIFT_CV1;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "NPT_3PATCH_VERTICAL", 19)) {
+    /*                               ^         */
+      *iv_return = NPT_3PATCH_VERTICAL;
       return PERL_constant_ISIV;
     }
     break;
@@ -1923,8 +2253,8 @@ constant_21 (pTHX_ const char *name, IV *iv_return) {
      GAMEPAD_PS3_BUTTON_R1 GAMEPAD_PS3_BUTTON_R2 GAMEPAD_PS3_BUTTON_UP
      GAMEPAD_XBOX_BUTTON_A GAMEPAD_XBOX_BUTTON_B GAMEPAD_XBOX_BUTTON_X
      GAMEPAD_XBOX_BUTTON_Y LOC_MATRIX_PROJECTION LOC_VERTEX_TEXCOORD01
-     LOC_VERTEX_TEXCOORD02 UNCOMPRESSED_R4G4B4A4 UNCOMPRESSED_R5G5B5A1
-     UNCOMPRESSED_R8G8B8A8 */
+     LOC_VERTEX_TEXCOORD02 NPT_3PATCH_HORIZONTAL UNCOMPRESSED_R4G4B4A4
+     UNCOMPRESSED_R5G5B5A1 UNCOMPRESSED_R8G8B8A8 */
   /* Offset 20 gives the best switch position.  */
   switch (name[20]) {
   case '1':
@@ -2027,6 +2357,13 @@ constant_21 (pTHX_ const char *name, IV *iv_return) {
 #else
       return PERL_constant_NOTDEF;
 #endif
+    }
+    break;
+  case 'L':
+    if (memEQ(name, "NPT_3PATCH_HORIZONTA", 20)) {
+    /*                                   L      */
+      *iv_return = NPT_3PATCH_HORIZONTAL;
+      return PERL_constant_ISIV;
     }
     break;
   case 'N':
@@ -2162,9 +2499,9 @@ static int
 constant_23 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     FLAG_WINDOW_TRANSPARENT FLAG_WINDOW_UNDECORATED GAMEPAD_PS3_AXIS_LEFT_X
-     GAMEPAD_PS3_AXIS_LEFT_Y GAMEPAD_PS3_BUTTON_DOWN GAMEPAD_PS3_BUTTON_LEFT
-     UNCOMPRESSED_GRAY_ALPHA */
+     FLAG_WINDOW_TRANSPARENT FLAG_WINDOW_UNDECORATED GAMEPAD_ANDROID_DPAD_UP
+     GAMEPAD_PS3_AXIS_LEFT_X GAMEPAD_PS3_AXIS_LEFT_Y GAMEPAD_PS3_BUTTON_DOWN
+     GAMEPAD_PS3_BUTTON_LEFT UNCOMPRESSED_GRAY_ALPHA */
   /* Offset 22 gives the best switch position.  */
   switch (name[22]) {
   case 'A':
@@ -2190,6 +2527,17 @@ constant_23 (pTHX_ const char *name, IV *iv_return) {
     /*                                     N      */
 #ifdef GAMEPAD_PS3_BUTTON_DOWN
       *iv_return = GAMEPAD_PS3_BUTTON_DOWN;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'P':
+    if (memEQ(name, "GAMEPAD_ANDROID_DPAD_U", 22)) {
+    /*                                     P      */
+#ifdef GAMEPAD_ANDROID_DPAD_UP
+      *iv_return = GAMEPAD_ANDROID_DPAD_UP;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -2247,54 +2595,65 @@ constant_24 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      COMPRESSED_ASTC_4x4_RGBA COMPRESSED_ASTC_8x8_RGBA COMPRESSED_ETC2_EAC_RGBA
+     GAMEPAD_ANDROID_BUTTON_A GAMEPAD_ANDROID_BUTTON_B GAMEPAD_ANDROID_BUTTON_C
+     GAMEPAD_ANDROID_BUTTON_X GAMEPAD_ANDROID_BUTTON_Y GAMEPAD_ANDROID_BUTTON_Z
      GAMEPAD_PS3_AXIS_RIGHT_X GAMEPAD_PS3_AXIS_RIGHT_Y GAMEPAD_PS3_BUTTON_CROSS
      GAMEPAD_PS3_BUTTON_RIGHT GAMEPAD_PS3_BUTTON_START GAMEPAD_XBOX_AXIS_LEFT_X
      GAMEPAD_XBOX_AXIS_LEFT_Y GAMEPAD_XBOX_BUTTON_DOWN GAMEPAD_XBOX_BUTTON_HOME
      GAMEPAD_XBOX_BUTTON_LEFT */
-  /* Offset 22 gives the best switch position.  */
-  switch (name[22]) {
-  case 'B':
-    if (memEQ(name, "COMPRESSED_ASTC_4x4_RGBA", 24)) {
-    /*                                     ^        */
+  /* Offset 23 gives the best switch position.  */
+  switch (name[23]) {
+  case 'A':
+    if (memEQ(name, "COMPRESSED_ASTC_4x4_RGB", 23)) {
+    /*                                      A      */
       *iv_return = COMPRESSED_ASTC_4x4_RGBA;
       return PERL_constant_ISIV;
     }
-    if (memEQ(name, "COMPRESSED_ASTC_8x8_RGBA", 24)) {
-    /*                                     ^        */
+    if (memEQ(name, "COMPRESSED_ASTC_8x8_RGB", 23)) {
+    /*                                      A      */
       *iv_return = COMPRESSED_ASTC_8x8_RGBA;
       return PERL_constant_ISIV;
     }
-    if (memEQ(name, "COMPRESSED_ETC2_EAC_RGBA", 24)) {
-    /*                                     ^        */
+    if (memEQ(name, "COMPRESSED_ETC2_EAC_RGB", 23)) {
+    /*                                      A      */
       *iv_return = COMPRESSED_ETC2_EAC_RGBA;
       return PERL_constant_ISIV;
     }
-    break;
-  case 'F':
-    if (memEQ(name, "GAMEPAD_XBOX_BUTTON_LEFT", 24)) {
-    /*                                     ^        */
-#ifdef GAMEPAD_XBOX_BUTTON_LEFT
-      *iv_return = GAMEPAD_XBOX_BUTTON_LEFT;
+    if (memEQ(name, "GAMEPAD_ANDROID_BUTTON_", 23)) {
+    /*                                      A      */
+#ifdef GAMEPAD_ANDROID_BUTTON_A
+      *iv_return = GAMEPAD_ANDROID_BUTTON_A;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
     }
     break;
-  case 'H':
-    if (memEQ(name, "GAMEPAD_PS3_BUTTON_RIGHT", 24)) {
-    /*                                     ^        */
-#ifdef GAMEPAD_PS3_BUTTON_RIGHT
-      *iv_return = GAMEPAD_PS3_BUTTON_RIGHT;
+  case 'B':
+    if (memEQ(name, "GAMEPAD_ANDROID_BUTTON_", 23)) {
+    /*                                      B      */
+#ifdef GAMEPAD_ANDROID_BUTTON_B
+      *iv_return = GAMEPAD_ANDROID_BUTTON_B;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
     }
     break;
-  case 'M':
-    if (memEQ(name, "GAMEPAD_XBOX_BUTTON_HOME", 24)) {
-    /*                                     ^        */
+  case 'C':
+    if (memEQ(name, "GAMEPAD_ANDROID_BUTTON_", 23)) {
+    /*                                      C      */
+#ifdef GAMEPAD_ANDROID_BUTTON_C
+      *iv_return = GAMEPAD_ANDROID_BUTTON_C;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'E':
+    if (memEQ(name, "GAMEPAD_XBOX_BUTTON_HOM", 23)) {
+    /*                                      E      */
 #ifdef GAMEPAD_XBOX_BUTTON_HOME
       *iv_return = GAMEPAD_XBOX_BUTTON_HOME;
       return PERL_constant_ISIV;
@@ -2303,31 +2662,9 @@ constant_24 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'R':
-    if (memEQ(name, "GAMEPAD_PS3_BUTTON_START", 24)) {
-    /*                                     ^        */
-#ifdef GAMEPAD_PS3_BUTTON_START
-      *iv_return = GAMEPAD_PS3_BUTTON_START;
-      return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
-    }
-    break;
-  case 'S':
-    if (memEQ(name, "GAMEPAD_PS3_BUTTON_CROSS", 24)) {
-    /*                                     ^        */
-#ifdef GAMEPAD_PS3_BUTTON_CROSS
-      *iv_return = GAMEPAD_PS3_BUTTON_CROSS;
-      return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
-    }
-    break;
-  case 'W':
-    if (memEQ(name, "GAMEPAD_XBOX_BUTTON_DOWN", 24)) {
-    /*                                     ^        */
+  case 'N':
+    if (memEQ(name, "GAMEPAD_XBOX_BUTTON_DOW", 23)) {
+    /*                                      N      */
 #ifdef GAMEPAD_XBOX_BUTTON_DOWN
       *iv_return = GAMEPAD_XBOX_BUTTON_DOWN;
       return PERL_constant_ISIV;
@@ -2336,9 +2673,58 @@ constant_24 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case '_':
-    if (memEQ(name, "GAMEPAD_PS3_AXIS_RIGHT_X", 24)) {
-    /*                                     ^        */
+  case 'S':
+    if (memEQ(name, "GAMEPAD_PS3_BUTTON_CROS", 23)) {
+    /*                                      S      */
+#ifdef GAMEPAD_PS3_BUTTON_CROSS
+      *iv_return = GAMEPAD_PS3_BUTTON_CROSS;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'T':
+    if (memEQ(name, "GAMEPAD_PS3_BUTTON_RIGH", 23)) {
+    /*                                      T      */
+#ifdef GAMEPAD_PS3_BUTTON_RIGHT
+      *iv_return = GAMEPAD_PS3_BUTTON_RIGHT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "GAMEPAD_PS3_BUTTON_STAR", 23)) {
+    /*                                      T      */
+#ifdef GAMEPAD_PS3_BUTTON_START
+      *iv_return = GAMEPAD_PS3_BUTTON_START;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "GAMEPAD_XBOX_BUTTON_LEF", 23)) {
+    /*                                      T      */
+#ifdef GAMEPAD_XBOX_BUTTON_LEFT
+      *iv_return = GAMEPAD_XBOX_BUTTON_LEFT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'X':
+    if (memEQ(name, "GAMEPAD_ANDROID_BUTTON_", 23)) {
+    /*                                      X      */
+#ifdef GAMEPAD_ANDROID_BUTTON_X
+      *iv_return = GAMEPAD_ANDROID_BUTTON_X;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "GAMEPAD_PS3_AXIS_RIGHT_", 23)) {
+    /*                                      X      */
 #ifdef GAMEPAD_PS3_AXIS_RIGHT_X
       *iv_return = GAMEPAD_PS3_AXIS_RIGHT_X;
       return PERL_constant_ISIV;
@@ -2346,17 +2732,8 @@ constant_24 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_NOTDEF;
 #endif
     }
-    if (memEQ(name, "GAMEPAD_PS3_AXIS_RIGHT_Y", 24)) {
-    /*                                     ^        */
-#ifdef GAMEPAD_PS3_AXIS_RIGHT_Y
-      *iv_return = GAMEPAD_PS3_AXIS_RIGHT_Y;
-      return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
-    }
-    if (memEQ(name, "GAMEPAD_XBOX_AXIS_LEFT_X", 24)) {
-    /*                                     ^        */
+    if (memEQ(name, "GAMEPAD_XBOX_AXIS_LEFT_", 23)) {
+    /*                                      X      */
 #ifdef GAMEPAD_XBOX_AXIS_LEFT_X
       *iv_return = GAMEPAD_XBOX_AXIS_LEFT_X;
       return PERL_constant_ISIV;
@@ -2364,10 +2741,41 @@ constant_24 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_NOTDEF;
 #endif
     }
-    if (memEQ(name, "GAMEPAD_XBOX_AXIS_LEFT_Y", 24)) {
-    /*                                     ^        */
+    break;
+  case 'Y':
+    if (memEQ(name, "GAMEPAD_ANDROID_BUTTON_", 23)) {
+    /*                                      Y      */
+#ifdef GAMEPAD_ANDROID_BUTTON_Y
+      *iv_return = GAMEPAD_ANDROID_BUTTON_Y;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "GAMEPAD_PS3_AXIS_RIGHT_", 23)) {
+    /*                                      Y      */
+#ifdef GAMEPAD_PS3_AXIS_RIGHT_Y
+      *iv_return = GAMEPAD_PS3_AXIS_RIGHT_Y;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "GAMEPAD_XBOX_AXIS_LEFT_", 23)) {
+    /*                                      Y      */
 #ifdef GAMEPAD_XBOX_AXIS_LEFT_Y
       *iv_return = GAMEPAD_XBOX_AXIS_LEFT_Y;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'Z':
+    if (memEQ(name, "GAMEPAD_ANDROID_BUTTON_", 23)) {
+    /*                                      Z      */
+#ifdef GAMEPAD_ANDROID_BUTTON_Z
+      *iv_return = GAMEPAD_ANDROID_BUTTON_Z;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -2382,33 +2790,36 @@ static int
 constant_25 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
+     GAMEPAD_ANDROID_BUTTON_L1 GAMEPAD_ANDROID_BUTTON_L2
+     GAMEPAD_ANDROID_BUTTON_R1 GAMEPAD_ANDROID_BUTTON_R2
+     GAMEPAD_ANDROID_DPAD_DOWN GAMEPAD_ANDROID_DPAD_LEFT
      GAMEPAD_PS3_BUTTON_CIRCLE GAMEPAD_PS3_BUTTON_SELECT
      GAMEPAD_PS3_BUTTON_SQUARE GAMEPAD_XBOX_AXIS_RIGHT_X
      GAMEPAD_XBOX_AXIS_RIGHT_Y GAMEPAD_XBOX_BUTTON_RIGHT
      GAMEPAD_XBOX_BUTTON_START UNCOMPRESSED_R32G32B32A32 */
-  /* Offset 20 gives the best switch position.  */
-  switch (name[20]) {
-  case '3':
+  /* Offset 21 gives the best switch position.  */
+  switch (name[21]) {
+  case '2':
     if (memEQ(name, "UNCOMPRESSED_R32G32B32A32", 25)) {
-    /*                                   ^           */
+    /*                                    ^          */
       *iv_return = UNCOMPRESSED_R32G32B32A32;
       return PERL_constant_ISIV;
     }
     break;
-  case 'E':
-    if (memEQ(name, "GAMEPAD_PS3_BUTTON_SELECT", 25)) {
-    /*                                   ^           */
-#ifdef GAMEPAD_PS3_BUTTON_SELECT
-      *iv_return = GAMEPAD_PS3_BUTTON_SELECT;
+  case 'D':
+    if (memEQ(name, "GAMEPAD_ANDROID_DPAD_DOWN", 25)) {
+    /*                                    ^          */
+#ifdef GAMEPAD_ANDROID_DPAD_DOWN
+      *iv_return = GAMEPAD_ANDROID_DPAD_DOWN;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
     }
     break;
-  case 'G':
+  case 'H':
     if (memEQ(name, "GAMEPAD_XBOX_AXIS_RIGHT_X", 25)) {
-    /*                                   ^           */
+    /*                                    ^          */
 #ifdef GAMEPAD_XBOX_AXIS_RIGHT_X
       *iv_return = GAMEPAD_XBOX_AXIS_RIGHT_X;
       return PERL_constant_ISIV;
@@ -2417,7 +2828,7 @@ constant_25 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     if (memEQ(name, "GAMEPAD_XBOX_AXIS_RIGHT_Y", 25)) {
-    /*                                   ^           */
+    /*                                    ^          */
 #ifdef GAMEPAD_XBOX_AXIS_RIGHT_Y
       *iv_return = GAMEPAD_XBOX_AXIS_RIGHT_Y;
       return PERL_constant_ISIV;
@@ -2427,30 +2838,8 @@ constant_25 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'I':
-    if (memEQ(name, "GAMEPAD_PS3_BUTTON_CIRCLE", 25)) {
-    /*                                   ^           */
-#ifdef GAMEPAD_PS3_BUTTON_CIRCLE
-      *iv_return = GAMEPAD_PS3_BUTTON_CIRCLE;
-      return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
-    }
-    break;
-  case 'Q':
-    if (memEQ(name, "GAMEPAD_PS3_BUTTON_SQUARE", 25)) {
-    /*                                   ^           */
-#ifdef GAMEPAD_PS3_BUTTON_SQUARE
-      *iv_return = GAMEPAD_PS3_BUTTON_SQUARE;
-      return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
-    }
-    break;
-  case 'R':
     if (memEQ(name, "GAMEPAD_XBOX_BUTTON_RIGHT", 25)) {
-    /*                                   ^           */
+    /*                                    ^          */
 #ifdef GAMEPAD_XBOX_BUTTON_RIGHT
       *iv_return = GAMEPAD_XBOX_BUTTON_RIGHT;
       return PERL_constant_ISIV;
@@ -2459,11 +2848,91 @@ constant_25 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'S':
+  case 'L':
+    if (memEQ(name, "GAMEPAD_ANDROID_DPAD_LEFT", 25)) {
+    /*                                    ^          */
+#ifdef GAMEPAD_ANDROID_DPAD_LEFT
+      *iv_return = GAMEPAD_ANDROID_DPAD_LEFT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "GAMEPAD_PS3_BUTTON_SELECT", 25)) {
+    /*                                    ^          */
+#ifdef GAMEPAD_PS3_BUTTON_SELECT
+      *iv_return = GAMEPAD_PS3_BUTTON_SELECT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'N':
+    if (memEQ(name, "GAMEPAD_ANDROID_BUTTON_L1", 25)) {
+    /*                                    ^          */
+#ifdef GAMEPAD_ANDROID_BUTTON_L1
+      *iv_return = GAMEPAD_ANDROID_BUTTON_L1;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "GAMEPAD_ANDROID_BUTTON_L2", 25)) {
+    /*                                    ^          */
+#ifdef GAMEPAD_ANDROID_BUTTON_L2
+      *iv_return = GAMEPAD_ANDROID_BUTTON_L2;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "GAMEPAD_ANDROID_BUTTON_R1", 25)) {
+    /*                                    ^          */
+#ifdef GAMEPAD_ANDROID_BUTTON_R1
+      *iv_return = GAMEPAD_ANDROID_BUTTON_R1;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "GAMEPAD_ANDROID_BUTTON_R2", 25)) {
+    /*                                    ^          */
+#ifdef GAMEPAD_ANDROID_BUTTON_R2
+      *iv_return = GAMEPAD_ANDROID_BUTTON_R2;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'R':
+    if (memEQ(name, "GAMEPAD_PS3_BUTTON_CIRCLE", 25)) {
+    /*                                    ^          */
+#ifdef GAMEPAD_PS3_BUTTON_CIRCLE
+      *iv_return = GAMEPAD_PS3_BUTTON_CIRCLE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'T':
     if (memEQ(name, "GAMEPAD_XBOX_BUTTON_START", 25)) {
-    /*                                   ^           */
+    /*                                    ^          */
 #ifdef GAMEPAD_XBOX_BUTTON_START
       *iv_return = GAMEPAD_XBOX_BUTTON_START;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'U':
+    if (memEQ(name, "GAMEPAD_PS3_BUTTON_SQUARE", 25)) {
+    /*                                    ^          */
+#ifdef GAMEPAD_PS3_BUTTON_SQUARE
+      *iv_return = GAMEPAD_PS3_BUTTON_SQUARE;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -2487,49 +2956,62 @@ constant (pTHX_ const char *name, STRLEN len, IV *iv_return) {
      Regenerate these constant functions by feeding this entire source file to
      perl -x
 
-#!/usr/local/Cellar/perl/5.26.1/bin/perl -w
+#!/usr/local/Cellar/perl/5.28.1/bin/perl -w
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 my $types = {map {($_, 1)} qw(IV)};
 my @names = (qw(DEG2RAD FLAG_FULLSCREEN_MODE FLAG_MSAA_4X_HINT FLAG_SHOW_LOGO
 	       FLAG_VSYNC_HINT FLAG_WINDOW_RESIZABLE FLAG_WINDOW_TRANSPARENT
-	       FLAG_WINDOW_UNDECORATED GAMEPAD_PLAYER1 GAMEPAD_PLAYER2
-	       GAMEPAD_PLAYER3 GAMEPAD_PLAYER4 GAMEPAD_PS3_AXIS_L2
-	       GAMEPAD_PS3_AXIS_LEFT_X GAMEPAD_PS3_AXIS_LEFT_Y
-	       GAMEPAD_PS3_AXIS_R2 GAMEPAD_PS3_AXIS_RIGHT_X
-	       GAMEPAD_PS3_AXIS_RIGHT_Y GAMEPAD_PS3_BUTTON_CIRCLE
-	       GAMEPAD_PS3_BUTTON_CROSS GAMEPAD_PS3_BUTTON_DOWN
-	       GAMEPAD_PS3_BUTTON_L1 GAMEPAD_PS3_BUTTON_L2
-	       GAMEPAD_PS3_BUTTON_LEFT GAMEPAD_PS3_BUTTON_PS
-	       GAMEPAD_PS3_BUTTON_R1 GAMEPAD_PS3_BUTTON_R2
-	       GAMEPAD_PS3_BUTTON_RIGHT GAMEPAD_PS3_BUTTON_SELECT
-	       GAMEPAD_PS3_BUTTON_SQUARE GAMEPAD_PS3_BUTTON_START
-	       GAMEPAD_PS3_BUTTON_TRIANGLE GAMEPAD_PS3_BUTTON_UP
-	       GAMEPAD_XBOX_AXIS_LEFT_X GAMEPAD_XBOX_AXIS_LEFT_Y
-	       GAMEPAD_XBOX_AXIS_LT GAMEPAD_XBOX_AXIS_RIGHT_X
-	       GAMEPAD_XBOX_AXIS_RIGHT_Y GAMEPAD_XBOX_AXIS_RT
-	       GAMEPAD_XBOX_BUTTON_A GAMEPAD_XBOX_BUTTON_B
+	       FLAG_WINDOW_UNDECORATED GAMEPAD_ANDROID_BUTTON_A
+	       GAMEPAD_ANDROID_BUTTON_B GAMEPAD_ANDROID_BUTTON_C
+	       GAMEPAD_ANDROID_BUTTON_L1 GAMEPAD_ANDROID_BUTTON_L2
+	       GAMEPAD_ANDROID_BUTTON_R1 GAMEPAD_ANDROID_BUTTON_R2
+	       GAMEPAD_ANDROID_BUTTON_X GAMEPAD_ANDROID_BUTTON_Y
+	       GAMEPAD_ANDROID_BUTTON_Z GAMEPAD_ANDROID_DPAD_CENTER
+	       GAMEPAD_ANDROID_DPAD_DOWN GAMEPAD_ANDROID_DPAD_LEFT
+	       GAMEPAD_ANDROID_DPAD_RIGHT GAMEPAD_ANDROID_DPAD_UP
+	       GAMEPAD_PLAYER1 GAMEPAD_PLAYER2 GAMEPAD_PLAYER3 GAMEPAD_PLAYER4
+	       GAMEPAD_PS3_AXIS_L2 GAMEPAD_PS3_AXIS_LEFT_X
+	       GAMEPAD_PS3_AXIS_LEFT_Y GAMEPAD_PS3_AXIS_R2
+	       GAMEPAD_PS3_AXIS_RIGHT_X GAMEPAD_PS3_AXIS_RIGHT_Y
+	       GAMEPAD_PS3_BUTTON_CIRCLE GAMEPAD_PS3_BUTTON_CROSS
+	       GAMEPAD_PS3_BUTTON_DOWN GAMEPAD_PS3_BUTTON_L1
+	       GAMEPAD_PS3_BUTTON_L2 GAMEPAD_PS3_BUTTON_LEFT
+	       GAMEPAD_PS3_BUTTON_PS GAMEPAD_PS3_BUTTON_R1
+	       GAMEPAD_PS3_BUTTON_R2 GAMEPAD_PS3_BUTTON_RIGHT
+	       GAMEPAD_PS3_BUTTON_SELECT GAMEPAD_PS3_BUTTON_SQUARE
+	       GAMEPAD_PS3_BUTTON_START GAMEPAD_PS3_BUTTON_TRIANGLE
+	       GAMEPAD_PS3_BUTTON_UP GAMEPAD_XBOX_AXIS_LEFT_X
+	       GAMEPAD_XBOX_AXIS_LEFT_Y GAMEPAD_XBOX_AXIS_LT
+	       GAMEPAD_XBOX_AXIS_RIGHT_X GAMEPAD_XBOX_AXIS_RIGHT_Y
+	       GAMEPAD_XBOX_AXIS_RT GAMEPAD_XBOX_BUTTON_A GAMEPAD_XBOX_BUTTON_B
 	       GAMEPAD_XBOX_BUTTON_DOWN GAMEPAD_XBOX_BUTTON_HOME
 	       GAMEPAD_XBOX_BUTTON_LB GAMEPAD_XBOX_BUTTON_LEFT
 	       GAMEPAD_XBOX_BUTTON_RB GAMEPAD_XBOX_BUTTON_RIGHT
 	       GAMEPAD_XBOX_BUTTON_SELECT GAMEPAD_XBOX_BUTTON_START
 	       GAMEPAD_XBOX_BUTTON_UP GAMEPAD_XBOX_BUTTON_X
-	       GAMEPAD_XBOX_BUTTON_Y KEY_A KEY_B KEY_BACK KEY_BACKSLASH
-	       KEY_BACKSPACE KEY_C KEY_CAPS_LOCK KEY_D KEY_DELETE KEY_DOWN
-	       KEY_E KEY_EIGHT KEY_END KEY_ENTER KEY_ESCAPE KEY_F KEY_F1
-	       KEY_F10 KEY_F11 KEY_F12 KEY_F2 KEY_F3 KEY_F4 KEY_F5 KEY_F6
-	       KEY_F7 KEY_F8 KEY_F9 KEY_FIVE KEY_FOUR KEY_G KEY_GRAVE KEY_H
-	       KEY_HOME KEY_I KEY_INSERT KEY_J KEY_K KEY_L KEY_LEFT
-	       KEY_LEFT_ALT KEY_LEFT_CONTROL KEY_LEFT_SHIFT KEY_M KEY_MENU
-	       KEY_N KEY_NINE KEY_NUM_LOCK KEY_O KEY_ONE KEY_P KEY_PAGE_DOWN
-	       KEY_PAGE_UP KEY_PAUSE KEY_PRINT_SCREEN KEY_Q KEY_R KEY_RIGHT
-	       KEY_RIGHT_ALT KEY_RIGHT_CONTROL KEY_RIGHT_SHIFT KEY_S
-	       KEY_SCROLL_LOCK KEY_SEVEN KEY_SIX KEY_SLASH KEY_SPACE KEY_T
-	       KEY_TAB KEY_THREE KEY_TWO KEY_U KEY_UP KEY_V KEY_VOLUME_DOWN
-	       KEY_VOLUME_UP KEY_W KEY_X KEY_Y KEY_Z KEY_ZERO LOC_MAP_DIFFUSE
-	       LOC_MAP_SPECULAR MAP_DIFFUSE MAP_SPECULAR MAX_MATERIAL_MAPS
-	       MAX_SHADER_LOCATIONS MAX_TOUCH_POINTS MOUSE_LEFT_BUTTON
-	       MOUSE_MIDDLE_BUTTON MOUSE_RIGHT_BUTTON RAD2DEG),
+	       GAMEPAD_XBOX_BUTTON_Y KEY_A KEY_APOSTROPHE KEY_B KEY_BACK
+	       KEY_BACKSLASH KEY_BACKSPACE KEY_C KEY_CAPS_LOCK KEY_COMMA KEY_D
+	       KEY_DELETE KEY_DOWN KEY_E KEY_EIGHT KEY_END KEY_ENTER KEY_EQUAL
+	       KEY_ESCAPE KEY_F KEY_F1 KEY_F10 KEY_F11 KEY_F12 KEY_F2 KEY_F3
+	       KEY_F4 KEY_F5 KEY_F6 KEY_F7 KEY_F8 KEY_F9 KEY_FIVE KEY_FOUR
+	       KEY_G KEY_GRAVE KEY_H KEY_HOME KEY_I KEY_INSERT KEY_J KEY_K
+	       KEY_KB_MENU KEY_KP_0 KEY_KP_1 KEY_KP_2 KEY_KP_3 KEY_KP_4
+	       KEY_KP_5 KEY_KP_6 KEY_KP_7 KEY_KP_8 KEY_KP_9 KEY_KP_ADD
+	       KEY_KP_DECIMAL KEY_KP_DIVIDE KEY_KP_ENTER KEY_KP_EQUAL
+	       KEY_KP_MULTIPLY KEY_KP_SUBTRACT KEY_L KEY_LEFT KEY_LEFT_ALT
+	       KEY_LEFT_BRACKET KEY_LEFT_CONTROL KEY_LEFT_SHIFT KEY_LEFT_SUPER
+	       KEY_M KEY_MENU KEY_MINUS KEY_N KEY_NINE KEY_NUM_LOCK KEY_O
+	       KEY_ONE KEY_P KEY_PAGE_DOWN KEY_PAGE_UP KEY_PAUSE KEY_PERIOD
+	       KEY_PRINT_SCREEN KEY_Q KEY_R KEY_RIGHT KEY_RIGHT_ALT
+	       KEY_RIGHT_BRACKET KEY_RIGHT_CONTROL KEY_RIGHT_SHIFT
+	       KEY_RIGHT_SUPER KEY_S KEY_SCROLL_LOCK KEY_SEMICOLON KEY_SEVEN
+	       KEY_SIX KEY_SLASH KEY_SPACE KEY_T KEY_TAB KEY_THREE KEY_TWO
+	       KEY_U KEY_UP KEY_V KEY_VOLUME_DOWN KEY_VOLUME_UP KEY_W KEY_X
+	       KEY_Y KEY_Z KEY_ZERO LOC_MAP_DIFFUSE LOC_MAP_SPECULAR
+	       MAP_DIFFUSE MAP_SPECULAR MAX_MATERIAL_MAPS MAX_SHADER_LOCATIONS
+	       MAX_TOUCH_POINTS MOUSE_LEFT_BUTTON MOUSE_MIDDLE_BUTTON
+	       MOUSE_RIGHT_BUTTON RAD2DEG),
             {name=>"BLEND_ADDITIVE", type=>"IV", macro=>"1"},
             {name=>"BLEND_ALPHA", type=>"IV", macro=>"1"},
             {name=>"BLEND_MULTIPLIED", type=>"IV", macro=>"1"},
@@ -2557,6 +3039,9 @@ my @names = (qw(DEG2RAD FLAG_FULLSCREEN_MODE FLAG_MSAA_4X_HINT FLAG_SHOW_LOGO
             {name=>"FILTER_BILINEAR", type=>"IV", macro=>"1"},
             {name=>"FILTER_POINT", type=>"IV", macro=>"1"},
             {name=>"FILTER_TRILINEAR", type=>"IV", macro=>"1"},
+            {name=>"FONT_BITMAP", type=>"IV", macro=>"1"},
+            {name=>"FONT_DEFAULT", type=>"IV", macro=>"1"},
+            {name=>"FONT_SDF", type=>"IV", macro=>"1"},
             {name=>"GESTURE_DOUBLETAP", type=>"IV", macro=>"1"},
             {name=>"GESTURE_DRAG", type=>"IV", macro=>"1"},
             {name=>"GESTURE_HOLD", type=>"IV", macro=>"1"},
@@ -2615,6 +3100,9 @@ my @names = (qw(DEG2RAD FLAG_FULLSCREEN_MODE FLAG_MSAA_4X_HINT FLAG_SHOW_LOGO
             {name=>"MAP_OCCLUSION", type=>"IV", macro=>"1"},
             {name=>"MAP_PREFILTER", type=>"IV", macro=>"1"},
             {name=>"MAP_ROUGHNESS", type=>"IV", macro=>"1"},
+            {name=>"NPT_3PATCH_HORIZONTAL", type=>"IV", macro=>"1"},
+            {name=>"NPT_3PATCH_VERTICAL", type=>"IV", macro=>"1"},
+            {name=>"NPT_9PATCH", type=>"IV", macro=>"1"},
             {name=>"UNCOMPRESSED_GRAYSCALE", type=>"IV", macro=>"1"},
             {name=>"UNCOMPRESSED_GRAY_ALPHA", type=>"IV", macro=>"1"},
             {name=>"UNCOMPRESSED_R32", type=>"IV", macro=>"1"},
@@ -2711,23 +3199,61 @@ __END__
     return constant_25 (aTHX_ name, iv_return);
     break;
   case 26:
-    if (memEQ(name, "GAMEPAD_XBOX_BUTTON_SELECT", 26)) {
+    /* Names all of length 26.  */
+    /* GAMEPAD_ANDROID_DPAD_RIGHT GAMEPAD_XBOX_BUTTON_SELECT */
+    /* Offset 17 gives the best switch position.  */
+    switch (name[17]) {
+    case 'O':
+      if (memEQ(name, "GAMEPAD_XBOX_BUTTON_SELECT", 26)) {
+      /*                                ^               */
 #ifdef GAMEPAD_XBOX_BUTTON_SELECT
-      *iv_return = GAMEPAD_XBOX_BUTTON_SELECT;
-      return PERL_constant_ISIV;
+        *iv_return = GAMEPAD_XBOX_BUTTON_SELECT;
+        return PERL_constant_ISIV;
 #else
-      return PERL_constant_NOTDEF;
+        return PERL_constant_NOTDEF;
 #endif
+      }
+      break;
+    case 'P':
+      if (memEQ(name, "GAMEPAD_ANDROID_DPAD_RIGHT", 26)) {
+      /*                                ^               */
+#ifdef GAMEPAD_ANDROID_DPAD_RIGHT
+        *iv_return = GAMEPAD_ANDROID_DPAD_RIGHT;
+        return PERL_constant_ISIV;
+#else
+        return PERL_constant_NOTDEF;
+#endif
+      }
+      break;
     }
     break;
   case 27:
-    if (memEQ(name, "GAMEPAD_PS3_BUTTON_TRIANGLE", 27)) {
+    /* Names all of length 27.  */
+    /* GAMEPAD_ANDROID_DPAD_CENTER GAMEPAD_PS3_BUTTON_TRIANGLE */
+    /* Offset 17 gives the best switch position.  */
+    switch (name[17]) {
+    case 'N':
+      if (memEQ(name, "GAMEPAD_PS3_BUTTON_TRIANGLE", 27)) {
+      /*                                ^                */
 #ifdef GAMEPAD_PS3_BUTTON_TRIANGLE
-      *iv_return = GAMEPAD_PS3_BUTTON_TRIANGLE;
-      return PERL_constant_ISIV;
+        *iv_return = GAMEPAD_PS3_BUTTON_TRIANGLE;
+        return PERL_constant_ISIV;
 #else
-      return PERL_constant_NOTDEF;
+        return PERL_constant_NOTDEF;
 #endif
+      }
+      break;
+    case 'P':
+      if (memEQ(name, "GAMEPAD_ANDROID_DPAD_CENTER", 27)) {
+      /*                                ^                */
+#ifdef GAMEPAD_ANDROID_DPAD_CENTER
+        *iv_return = GAMEPAD_ANDROID_DPAD_CENTER;
+        return PERL_constant_ISIV;
+#else
+        return PERL_constant_NOTDEF;
+#endif
+      }
+      break;
     }
     break;
   }

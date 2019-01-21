@@ -1,3 +1,12 @@
+0.25 2019-01-19
+    - fix handling "unsigned" etc - #4 - thanks @djacobow for report!
+    - fix handling comments
+    - test self-ref in struct eg for linked list
+    - support "volatile" as part of field spec
+
+0.24 2019-01-18
+    - add test for and fix #3 - thanks @djacobow for report!
+
 0.23 2016-05-05
 
     - include updated Changes

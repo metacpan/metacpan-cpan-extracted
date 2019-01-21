@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::bool::str;
 
-our $DATE = '2018-12-16'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $DATE = '2019-01-21'; # DATE
+our $VERSION = '0.032'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,8 +9,7 @@ use warnings;
 
 sub meta {
     +{
-        v => 3,
-        enable_by_default => 0,
+        v => 4,
         prio => 50,
     };
 }
@@ -47,17 +46,17 @@ Data::Sah::Coerce::perl::bool::str - Convert "yes","true",etc to "1", and "no","
 
 =head1 VERSION
 
-This document describes version 0.031 of Data::Sah::Coerce::perl::bool::str (from Perl distribution Data-Sah-Coerce), released on 2018-12-16.
+This document describes version 0.032 of Data::Sah::Coerce::perl::bool::str (from Perl distribution Data-Sah-Coerce), released on 2019-01-21.
 
 =head1 DESCRIPTION
 
-This is an optional rule (not enabled by default) that converts "true", "yes",
-"on" (matched case-insensitively) to "1" and "false", "no", "off", "0" (matched
-case-insensitively) to "". All other strings are left untouched.
+This coercion rule converts "true", "yes", "on" (matched case-insensitively) to
+"1"; and "false", "no", "off", "0" (matched case-insensitively) to "". All other
+strings are left untouched.
 
-This rule is not enabled because it is incompatible with Perl's notion of
-true/false. Perl regards all non-empty string that isn't "0" (including "no",
-"false", "off") as true.
+B<Note that this rule is incompatible with Perl's notion of true/false.> Perl
+regards all non-empty string that isn't "0" (including "no", "false", "off") as
+true.
 
 =for Pod::Coverage ^(meta|coerce)$
 
@@ -83,7 +82,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
