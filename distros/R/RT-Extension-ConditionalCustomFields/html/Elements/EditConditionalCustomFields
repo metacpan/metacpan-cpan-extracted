@@ -1,37 +1,39 @@
-%   my $conditioned_by = $CustomField->ConditionedBy;
-%   if ($conditioned_by) {
-%       my $conditioned_by_cf = RT::CustomField->new($session{CurrentUser});
-%       $conditioned_by_cf->Load($conditioned_by->{CF});
-%       if ($conditioned_by_cf->id) {
-%           my $conditioned_by_val = $conditioned_by->{vals} || '';
-%           my @conditioned_by_vals = ref($conditioned_by_val) eq 'ARRAY' ? @$conditioned_by_val : ($conditioned_by_val);
-%           if ($conditioned_by_cf->RenderType eq 'List') {
-%               $Grouping =~ s/\W//g if $Grouping;
-%               my $cf_id = GetCustomFieldInputName(Object => $Object, CustomField => $CustomField, Grouping => $Grouping );
-%               my $conditioned_by_grouping = $conditioned_by_cf->_findGrouping($Object);
-%               $conditioned_by_grouping =~ s/\W//g if $conditioned_by_grouping;
-%               my $conditionedby_name = GetCustomFieldInputName(Object => $Object, CustomField => $conditioned_by_cf, Grouping => $conditioned_by_grouping );
+%   my $condition = $CustomField->ConditionedBy;
+%   if ($condition) {
+%       my $condition_cf = RT::CustomField->new($session{CurrentUser});
+%       $condition_cf->Load($condition->{CF});
+%       if ($condition_cf->id) {
+%           my $condition_val = $condition->{vals} || '';
+%           my @condition_vals = ref($condition_val) eq 'ARRAY' ? @$condition_val : ($condition_val);
+%           $Grouping =~ s/\W//g if $Grouping;
+%           my $cf_id = GetCustomFieldInputName(Object => $Object, CustomField => $CustomField, Grouping => $Grouping );
+%           my $condition_grouping = $condition_cf->_findGrouping($Object);
+%           $condition_grouping =~ s/\W//g if $condition_grouping;
+%           my $condition_name = GetCustomFieldInputName(Object => $Object, CustomField => $condition_cf, Grouping => $condition_grouping );
+%           if ($condition_cf->RenderType eq 'List') {
 <script type="text/javascript">
 jQuery(function() {
-    var conditionedby_name = <% "$conditionedby_name" |h,n,j%>;
-    conditionedby_name = conditionedby_name.replace(/:/g,'\\:');
-    jQuery('input[name="'+conditionedby_name+'"]').change(function() {
+    var condition_obj = <% "$condition_name" |h,n,j%>;
+    condition_obj = condition_obj.replace(/:/g,'\\:');
+    jQuery('input[name="'+condition_obj+'"]').change(function() {
         var cf_id = <% "$cf_id" |h,n,j%>;
         cf_id = cf_id.replace(/:/g,'\\:');
-        var conditionedby_vals = ["<% join('", "', @conditioned_by_vals) |n%>"];
-        var condition_met = 0;
-        jQuery.each(conditionedby_vals, function(i, conditioned_by_val) {
-            if (jQuery('input[name="'+conditionedby_name+'"][value="'+conditioned_by_val+'"]').is(':checked')) {
-                condition_met = 1;
-            }
-        });
+        var condition_vals = ["<% join('", "', @condition_vals) |n%>"];
+        var condition_met = false;
+        if (jQuery('input[name="'+condition_obj+'"]').is(":visible")) {
+            jQuery.each(condition_vals, function(i, condition_val) {
+                if (jQuery('input[name="'+condition_obj+'"][value="'+condition_val+'"]').is(':checked')) {
+                    condition_met = true;
+                }
+            });
+        }
         if (condition_met) {
             if (jQuery('#'+cf_id).length) {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').show();
                 jQuery('#'+cf_id).trigger('show');
             } else {
                 jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
-                jQuery('input[name="'+cf_id+'"]').trigger('show');
+                jQuery('input[name="'+cf_id+'"]').first().trigger('show');
             }
         }
         else {
@@ -40,11 +42,11 @@ jQuery(function() {
                 jQuery('#'+cf_id).trigger('hide');
             } else {
                 jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
-                jQuery('input[name="'+cf_id+'"]').trigger('hide');
+                jQuery('input[name="'+cf_id+'"]').first().trigger('hide');
             }
         }
     });
-    jQuery('#'+conditionedby_name).on('hide', function() {
+    jQuery('input[name="'+condition_obj+'"]').on('hide', function() {
         var cf_id = <% "$cf_id" |h,n,j%>;
         cf_id = cf_id.replace(/:/g,'\\:');
         if (jQuery('#'+cf_id).length) {
@@ -52,56 +54,55 @@ jQuery(function() {
             jQuery('#'+cf_id).trigger('hide');
         } else {
             jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
-            jQuery('input[name="'+cf_id+'"]').trigger('hide');
+            jQuery('input[name="'+cf_id+'"]').first().trigger('hide');
         }
     });
-    jQuery('#'+conditionedby_name).on('show', function() {
+    jQuery('input[name="'+condition_obj+'"]').on('show', function() {
         var cf_id = <% "$cf_id" |h,n,j%>;
         cf_id = cf_id.replace(/:/g,'\\:');
-        var conditionedby_vals = ["<% join('", "', @conditioned_by_vals) |n%>"];
-        var condition_met = 0;
-        jQuery.each(conditionedby_vals, function(i, conditioned_by_val) {
-            if (jQuery('input[name="'+conditionedby_name+'"][value="'+conditioned_by_val+'"]').is(':checked')) {
-                condition_met = 1;
+        var condition_vals = ["<% join('", "', @condition_vals) |n%>"];
+        var condition_met = false;
+        jQuery.each(condition_vals, function(i, condition_val) {
+            if (jQuery('input[name="'+condition_obj+'"][value="'+condition_val+'"]').is(':checked')) {
+                condition_met = true;
             }
         });
         if (condition_met) {
             if (jQuery('#'+cf_id).length) {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').show();
+                jQuery('#'+cf_id).trigger('show');
             } else {
                 jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
+                jQuery('input[name="'+cf_id+'"]').first().trigger('show');
             }
          }
     });
-    jQuery('input[name="'+conditionedby_name+'"]').first().trigger('change');
+    jQuery('input[name="'+condition_obj+'"]').first().trigger('change');
 });
 </script>
 %           }
 %           else {
-%               $Grouping =~ s/\W//g if $Grouping;
-%               my $cf_id = GetCustomFieldInputName(Object => $Object, CustomField => $CustomField, Grouping => $Grouping );
-%               my $conditioned_by_grouping = $conditioned_by_cf->_findGrouping($Object);
-%               $conditioned_by_grouping =~ s/\W//g if $conditioned_by_grouping;
-%               my $conditionedby_id = GetCustomFieldInputName(Object => $Object, CustomField => $conditioned_by_cf, Grouping => $conditioned_by_grouping );
 <script type="text/javascript">
 jQuery(function() {
-    var conditionedby_id = <% "$conditionedby_id" |h,n,j%>;
-    conditionedby_id = conditionedby_id.replace(/:/g,'\\:');
-    jQuery('#'+conditionedby_id).change(function() {
+    var condition_obj = <% "$condition_name" |h,n,j%>;
+    condition_obj = condition_obj.replace(/:/g,'\\:');
+    jQuery('#'+condition_obj).change(function() {
         var cf_id = <% "$cf_id" |h,n,j%>;
         cf_id = cf_id.replace(/:/g,'\\:');
-        var conditionedby_vals = ["<% join('", "', @conditioned_by_vals) |n%>"];
+        var condition_vals = ["<% join('", "', @condition_vals) |n%>"];
         var condition_met = false;
-        var condition_vals = jQuery(this).val();
-        if (jQuery.isArray(condition_vals)) {
-            jQuery.each(condition_vals, function(i, condition_val) {
-                if (jQuery.inArray(condition_val, conditionedby_vals) != -1) {
-                    condition_met = true;
-                    return false;
-                }
-            });
-        } else {
-            condition_met = (jQuery.inArray(condition_vals, conditionedby_vals) != -1);
+        var condition_obj_vals = jQuery(this).val();
+        if (jQuery('#'+condition_obj).is(":visible")) {
+            if (jQuery.isArray(condition_obj_vals)) {
+                jQuery.each(condition_obj_vals, function(i, condition_obj_val) {
+                    if (jQuery.inArray(condition_obj_val, condition_vals) != -1) {
+                        condition_met = true;
+                        return false;
+                    }
+                });
+            } else {
+                condition_met = (jQuery.inArray(condition_obj_vals, condition_vals) != -1);
+            }
         }
         if (condition_met) {
             if (jQuery('#'+cf_id).length) {
@@ -109,19 +110,20 @@ jQuery(function() {
                 jQuery('#'+cf_id).trigger('show');
             } else {
                 jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
-                jQuery('input[name="'+cf_id+'"]').trigger('show');
+                jQuery('input[name="'+cf_id+'"]').first().trigger('show');
             }
         }
         else {
             if (jQuery('#'+cf_id).length) {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').hide();
+                jQuery('#'+cf_id).trigger('hide');
             } else {
                 jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
-                jQuery('input[name="'+cf_id+'"]').trigger('hidde');
+                jQuery('input[name="'+cf_id+'"]').first().trigger('hide');
             }
         }
     });
-    jQuery('#'+conditionedby_id).on('hide', function() {
+    jQuery('#'+condition_obj).on('hide', function() {
         var cf_id = <% "$cf_id" |h,n,j%>;
         cf_id = cf_id.replace(/:/g,'\\:');
         if (jQuery('#'+cf_id).length) {
@@ -129,34 +131,36 @@ jQuery(function() {
             jQuery('#'+cf_id).trigger('hide');
         } else {
             jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
-            jQuery('input[name="'+cf_id+'"]').trigger('hidde');
+            jQuery('input[name="'+cf_id+'"]').first().trigger('hide');
         }
     });
-    jQuery('#'+conditionedby_id).on('show', function() {
+    jQuery('#'+condition_obj).on('show', function() {
         var cf_id = <% "$cf_id" |h,n,j%>;
         cf_id = cf_id.replace(/:/g,'\\:');
-        var conditionedby_vals = ["<% join('", "', @conditioned_by_vals) |n%>"];
+        var condition_vals = ["<% join('", "', @condition_vals) |n%>"];
         var condition_met = false;
-        var condition_vals = jQuery(this).val();
-        if (jQuery.isArray(condition_vals)) {
-            jQuery.each(condition_vals, function(i, condition_val) {
-                if (jQuery.inArray(condition_val, conditionedby_vals) != -1) {
+        var condition_obj_vals = jQuery(this).val();
+        if (jQuery.isArray(condition_obj_vals)) {
+            jQuery.each(condition_obj_vals, function(i, condition_obj_val) {
+                if (jQuery.inArray(condition_obj_val, condition_vals) != -1) {
                     condition_met = true;
                     return false;
                 }
             });
         } else {
-            condition_met = (jQuery.inArray(condition_vals, conditionedby_vals) != -1);
+            condition_met = (jQuery.inArray(condition_obj_vals, condition_vals) != -1);
         }
         if (condition_met) {
             if (jQuery('#'+cf_id).length) {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').show();
+                jQuery('#'+cf_id).trigger('show');
             } else {
                 jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
+                jQuery('input[name="'+cf_id+'"]').first().trigger('show');
             }
          }
      });
-    jQuery('#'+conditionedby_id).trigger('change');
+    jQuery('#'+condition_obj).trigger('change');
 });
 </script>
 %           }

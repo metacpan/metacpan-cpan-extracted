@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-package Text::Parser 0.802;
+package Text::Parser 0.803;
 
 # ABSTRACT: Bare text parser, simplifies text parsing.
 
@@ -58,7 +58,7 @@ use IO::Select;
 
 sub new {
     my $pkg = shift;
-    return undef if not __check_options(@_);
+    return if not __check_options(@_);
     my $hash = __set_options(@_);
     my $obj  = bless { __options => $hash }, $pkg;
     return $obj->__return_my_object();
@@ -96,7 +96,7 @@ sub __return_my_object {
 
 sub setting {
     my ( $self, $key ) = ( shift, shift );
-    return undef if not defined $key or not exists $self->{__options}{$key};
+    return if not defined $key or not exists $self->{__options}{$key};
     return $self->{__options}{$key};
 }
 
@@ -195,7 +195,7 @@ sub __is_readable_file {
 
 sub __open_file {
     my ( $self, $fname ) = @_;
-    open my $fh, "<$fname"
+    open my $fh, '<', $fname
         or throw_cant_open( error => "Error while opening file $fname" );
     $self->__close_file if exists $self->{__filehandle};
     $self->{__filename}   = $fname;
@@ -269,7 +269,7 @@ sub get_records {
 
 sub last_record {
     my $self = shift;
-    return undef if not exists $self->{__records};
+    return if not exists $self->{__records};
     my (@record) = @{ $self->{__records} };
     return $record[$#record];
 }
@@ -277,7 +277,7 @@ sub last_record {
 
 sub pop_record {
     my $self = shift;
-    return undef if not exists $self->{__records};
+    return if not exists $self->{__records};
     pop @{ $self->{__records} };
 }
 
@@ -320,7 +320,7 @@ Text::Parser - Bare text parser, simplifies text parsing.
 
 =head1 VERSION
 
-version 0.802
+version 0.803
 
 =head1 SYNOPSIS
 

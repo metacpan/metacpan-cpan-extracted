@@ -4,13 +4,13 @@ NAME
 
 SYNOPSIS
 
-     use Device::Chip::HTU21D;
+       use Device::Chip::HTU21D;
     
-     my $chip = Device::Chip::HTU21D->new;
-     $chip->mount( Device::Chip::Adapter::...->new )->get;
+       my $chip = Device::Chip::HTU21D->new;
+       $chip->mount( Device::Chip::Adapter::...->new )->get;
     
-     printf "Current temperature is is %.2f C\n",
-        $chip->read_temperature->get;
+       printf "Current temperature is is %.2f C\n",
+          $chip->read_temperature->get;
 
 DESCRIPTION
 

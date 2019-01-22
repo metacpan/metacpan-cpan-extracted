@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Text::Parser",
   "PREREQ_PM" => {
     "Class::Method::Modifiers" => 0,
+    "Dist::Zilla::Plugin::Test::TidyAll" => 0,
     "Exception::Class" => 0,
     "Exporter" => 0,
     "IO::Select" => 0,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.802",
+  "VERSION" => "0.803",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Class::Method::Modifiers" => 0,
+  "Dist::Zilla::Plugin::Test::TidyAll" => 0,
   "Exception::Class" => 0,
   "Exporter" => 0,
   "IO::Select" => 0,

@@ -1,7 +1,10 @@
 Revision history for Dir-Manifest
 
-0.0.2       2018-01-14
+0.0.3       2019-01-22
+    - Added a SYNOPSIS.
+
+0.0.2       2019-01-14
     - Added the ->texts_dictionary() method.
 
-0.0.1       2018-01-14
+0.0.1       2019-01-14
     - First version, released on an unsuspecting world

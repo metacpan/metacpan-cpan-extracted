@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Pod::Text" => "3.08",
     "YAML::Tiny" => 0
   },
-  "VERSION" => "1.22",
+  "VERSION" => "1.23",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -3,9 +3,10 @@ use strict;
 use warnings;
 
 package Opsview::RestAPI;
-$Opsview::RestAPI::VERSION = '1.181000';
+$Opsview::RestAPI::VERSION = '1.190220';
 # ABSTRACT: Interact with the Opsview Rest API interface
 
+use version;
 use Data::Dump qw(pp);
 use Carp qw(croak);
 use REST::Client;
@@ -81,6 +82,7 @@ sub _parse_response_to_json {
             http_code => $code,
             eval_error => $error,
             response  => $response,
+            message  => "Failed to read JSON in response from server ($response)",
         );
 
         croak( Opsview::RestAPI::Exception->new(%exception) );
@@ -168,7 +170,7 @@ sub login {
             api    => "login",
             params => {
                 username => $self->{username},
-                password => uri_encode( $self->{password} ),
+                password => $self->{password},
             },
         );
     } or do {
@@ -210,6 +212,14 @@ sub opsview_info {
     }
     return $self->{opsview_info};
 }
+
+
+sub opsview_version {
+    my ($self) = @_;
+
+    return qv( $self->opsview_info->{opsview_version} );
+}
+
 
 
 sub opsview_build {
@@ -447,7 +457,7 @@ Opsview::RestAPI - Interact with the Opsview Rest API interface
 
 =head1 VERSION
 
-version 1.181000
+version 1.190220
 
 =head1 SYNOPSIS
 
@@ -463,13 +473,39 @@ version 1.181000
 
   my %api_version=$rest->api_version;
   $rest->login;
-  my %opsview_version=$rest->opsview_version;
+  my %opsview_info=$rest->opsview_info;
   $rest->logout;
 
 =head1 DESCRIPTION
 
 Allow for easier access to the Opsview Monitor Rest API, version 4.x and newer.
 See L<https://knowledge.opsview.com/reference> for more details.
+
+=head1 BUILDING AND INSTALLING
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+You can amend where the module will be installed using
+
+  perl Makefile.PL LIB=/path/to/perl/lib INSTALLSITEMAN3DIR=/path/to/perl/man/man3
+
+=head1 EXAMPLES
+
+Please see the files within the C<examples> and C<t/> test directory.
 
 =head1 METHODS
 
@@ -525,6 +561,11 @@ Example hashref:
     server_timezone_offset => 0,
     uuid                   => "ABCDEF12-ABCD-ABCD-ABCD-ABCDEFABCDEF",
   }
+
+=item $version = $rest->opsview_version
+
+Return a Version Object for the version of Opsview.  Implicitly calls
+C<opsview_info> if required.  See L<version> for more details
 
 =item $build = $rest->opsview_build
 

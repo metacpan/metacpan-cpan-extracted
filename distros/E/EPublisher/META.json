@@ -51,47 +51,47 @@
    "provides" : {
       "EPublisher" : {
          "file" : "lib/EPublisher.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "EPublisher::Config" : {
          "file" : "lib/EPublisher/Config.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "EPublisher::Source" : {
          "file" : "lib/EPublisher/Source.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "EPublisher::Source::Base" : {
          "file" : "lib/EPublisher/Source/Base.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "EPublisher::Source::Plugin::Dir" : {
          "file" : "lib/EPublisher/Source/Plugin/Dir.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "EPublisher::Source::Plugin::File" : {
          "file" : "lib/EPublisher/Source/Plugin/File.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "EPublisher::Source::Plugin::Module" : {
          "file" : "lib/EPublisher/Source/Plugin/Module.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "EPublisher::Target" : {
          "file" : "lib/EPublisher/Target.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "EPublisher::Target::Base" : {
          "file" : "lib/EPublisher/Target/Base.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "EPublisher::Target::Plugin::Text" : {
          "file" : "lib/EPublisher/Target/Plugin/Text.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "EPublisher::Utils::PPI" : {
          "file" : "lib/EPublisher/Utils/PPI.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       }
    },
    "release_status" : "stable",
@@ -106,7 +106,7 @@
          "web" : "http://github.com/reneeb/EPublisher"
       }
    },
-   "version" : "1.22",
+   "version" : "1.23",
    "x_contributors" : [
       "Boris D\u00e4ppen <boris_daeppen@bluewin.ch>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

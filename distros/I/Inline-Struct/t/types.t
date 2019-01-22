@@ -29,7 +29,7 @@ struct aaa_t {
 typedef struct aaa_t aaa_t;
 
 struct bbb_t {
-   unsigned int a;
+   unsigned short a;
    int b;
 };
 

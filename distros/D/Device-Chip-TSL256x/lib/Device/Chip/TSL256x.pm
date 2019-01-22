@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::TSL256x;
 
@@ -9,10 +9,11 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Data::Bitfield qw( bitfield enumfield );
 use Future;
+use Future::AsyncAwait;
 
 use constant PROTOCOL => "I2C";
 
@@ -24,17 +25,17 @@ C<Device::Chip::TSL256x> - chip driver for F<TSL256x>
 
 =head1 SYNOPSIS
 
- use Device::Chip::TSL256x;
+   use Device::Chip::TSL256x;
 
- my $chip = Device::Chip::TSL256x->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::TSL256x->new;
+   $chip->mount( Device::Chip::Adapter::...->new )->get;
 
- $chip->power(1)->get;
+   $chip->power(1)->get;
 
- sleep 1; # Wait for one integration cycle
+   sleep 1; # Wait for one integration cycle
 
- printf "Current ambient light level is %.2f lux\n",
-    scalar $chip->read_lux->get;
+   printf "Current ambient light level is %.2f lux\n",
+      scalar $chip->read_lux->get;
 
 =head1 DESCRIPTION
 
@@ -138,29 +139,28 @@ sub _cached_read_TIMING
             ->on_done( sub { $self->{TIMINGbytes} = $_[0] } );
 }
 
-sub read_config
+async sub read_config
 {
    my $self = shift;
 
-   $self->_cached_read_TIMING->then( sub {
-      return Future->done( { unpack_TIMING( unpack "C", $_[0] ) } );
-   });
+   return {
+      unpack_TIMING( unpack "C", await $self->_cached_read_TIMING )
+   };
 }
 
-sub change_config
+async sub change_config
 {
    my $self = shift;
    my %changes = @_;
 
-   $self->read_config->then( sub {
-      my ( $config ) = @_;
-      $config->{$_} = $changes{$_} for keys %changes;
+   my $config = await $self->read_config;
 
-      my $TIMING = $self->{TIMINGbytes} =
-         pack "C", pack_TIMING( %$config );
+   $config->{$_} = $changes{$_} for keys %changes;
 
-      $self->_write( REG_TIMING, $TIMING );
-   });
+   my $TIMING = $self->{TIMINGbytes} =
+      pack "C", pack_TIMING( %$config );
+
+   await $self->_write( REG_TIMING, $TIMING );
 }
 
 =head2 read_id
@@ -171,13 +171,11 @@ Returns the chip's ID register value.
 
 =cut
 
-sub read_id
+async sub read_id
 {
    my $self = shift;
 
-   $self->_read( REG_ID, 1 )->then( sub {
-      Future->done( unpack "C", $_[0] );
-   });
+   return unpack "C", await $self->_read( REG_ID, 1 );
 }
 
 =head2 read_data0
@@ -192,22 +190,18 @@ Reads the current values of the ADC channels.
 
 =cut
 
-sub read_data0
+async sub read_data0
 {
    my $self = shift;
 
-   $self->_read( REG_DATA0, 2 )->then( sub {
-      Future->done( unpack "S<", $_[0] );
-   });
+   return unpack "S<", await $self->_read( REG_DATA0, 2 );
 }
 
-sub read_data1
+async sub read_data1
 {
    my $self = shift;
 
-   $self->_read( REG_DATA1, 2 )->then( sub {
-      Future->done( unpack "S<", $_[0] );
-   });
+   return unpack "S<", await $self->_read( REG_DATA1, 2 );
 }
 
 =head2 read_data
@@ -218,13 +212,11 @@ Read the current values of both ADC channels in a single I²C transaction.
 
 =cut
 
-sub read_data
+async sub read_data
 {
    my $self = shift;
 
-   $self->_read( REG_DATA0, 4 )->then( sub {
-      Future->done( unpack "S< S<", $_[0] );
-   });
+   return unpack "S< S<", await $self->_read( REG_DATA0, 4 );
 }
 
 =head1 METHODS
@@ -271,44 +263,44 @@ my %INTEG_to_msec = (
    '402ms' => 402,
 );
 
-sub read_lux
+async sub read_lux
 {
    my $self = shift;
-   Future->needs_all(
+
+   my ( $data0, $data1, $config ) = await Future->needs_all(
       $self->read_data,
       $self->read_config,
-   )->then( sub {
-      my ( $data0, $data1, $config ) = @_;
+   );
 
-      my $gain = $config->{GAIN};
-      my $msec = $INTEG_to_msec{ $config->{INTEG} };
+   my $gain = $config->{GAIN};
+   my $msec = $INTEG_to_msec{ $config->{INTEG} };
 
-      my $ch0 = $data0 * ( 16 / $gain ) * ( 402 / $msec );
-      my $ch1 = $data1 * ( 16 / $gain ) * ( 402 / $msec );
+   my $ch0 = $data0 * ( 16 / $gain ) * ( 402 / $msec );
+   my $ch1 = $data1 * ( 16 / $gain ) * ( 402 / $msec );
 
-      my $ratio = $ch1 / $ch0;
+   my $ratio = $ch1 / $ch0;
 
-      # TODO: take account of differing package types.
+   # TODO: take account of differing package types.
 
-      my $lux;
-      if( $ratio <= 0.52 ) {
-         $lux = 0.0304 * $ch0 - 0.062 * $ch0 * ( $ratio ** 1.4 );
-      }
-      elsif( $ratio <= 0.65 ) {
-         $lux = 0.0224 * $ch0 - 0.031 * $ch1;
-      }
-      elsif( $ratio <= 0.80 ) {
-         $lux = 0.0128 * $ch0 - 0.0153 * $ch1;
-      }
-      elsif( $ratio <= 1.30 ) {
-         $lux = 0.00146 * $ch0 - 0.00112 * $ch1;
-      }
-      else {
-         $lux = 0;
-      }
+   my $lux;
+   if( $ratio <= 0.52 ) {
+      $lux = 0.0304 * $ch0 - 0.062 * $ch0 * ( $ratio ** 1.4 );
+   }
+   elsif( $ratio <= 0.65 ) {
+      $lux = 0.0224 * $ch0 - 0.031 * $ch1;
+   }
+   elsif( $ratio <= 0.80 ) {
+      $lux = 0.0128 * $ch0 - 0.0153 * $ch1;
+   }
+   elsif( $ratio <= 1.30 ) {
+      $lux = 0.00146 * $ch0 - 0.00112 * $ch1;
+   }
+   else {
+      $lux = 0;
+   }
 
-      return Future->done( $lux, $data0, $data1 );
-   });
+   return $lux if !wantarray;
+   return $lux, $data0, $data1;
 }
 
 =head1 AUTHOR

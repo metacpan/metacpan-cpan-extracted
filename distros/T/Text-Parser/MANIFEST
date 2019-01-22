@@ -40,4 +40,5 @@ t/release-cpan-changes.t
 t/release-distmeta.t
 t/release-kwalitee.t
 t/text-simple.txt
+tidyall.ini
 weaver.ini

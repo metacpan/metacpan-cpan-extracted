@@ -26,8 +26,9 @@ is( $parser->filename(), undef, 'The last file read is lost' );
 close MYFH;
 isnt( $parser->filehandle(), undef, 'Retains the last filehandle read' );
 throws_ok {
-    $parser->read(\*MYFH);
-} 'Text::Parser::Exception', 'Trying to read a closed filehandle';
+    $parser->read( \*MYFH );
+}
+'Text::Parser::Exception', 'Trying to read a closed filehandle';
 isnt( $parser->filehandle(), undef, 'Retains the last filehandle read' );
 
 done_testing();

@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Device-Chip-HTU21D",
    "prereqs" : {
@@ -22,7 +22,8 @@
       "runtime" : {
          "requires" : {
             "Data::Bitfield" : "0.02",
-            "Device::Chip" : "0.03"
+            "Device::Chip" : "0.03",
+            "Future::AsyncAwait" : "0"
          }
       },
       "test" : {
@@ -35,7 +36,7 @@
    "provides" : {
       "Device::Chip::HTU21D" : {
          "file" : "lib/Device/Chip/HTU21D.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -44,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

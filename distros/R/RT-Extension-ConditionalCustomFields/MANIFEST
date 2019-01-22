@@ -47,6 +47,8 @@ xt/asset_display.t
 xt/asset_modify_dropdown.t
 xt/asset_modify_list.t
 xt/asset_modify_selectbox.t
+xt/cascaded_ticket_display.t
+xt/cascaded_ticket_modify.t
 xt/data/firstcf
 xt/data/initialdata
 xt/external_customfield_values.t.in

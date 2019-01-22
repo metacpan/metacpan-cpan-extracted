@@ -1592,6 +1592,10 @@ The memory page size in bytes
 
 The total number of iterations over guest memory
 
+=item Sys::Virt::Domain::JOB_MEMORY_POSTCOPY_REQS
+
+The number of page requests received from the destination host during post-copy migration.
+
 =item Sys::Virt::Domain::JOB_DISK_TOTAL
 
 The total amount of file expected to be processed by the job, in bytes.

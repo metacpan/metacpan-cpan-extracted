@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Indexer;
 # ABSTRACT: Class doing Zebra Koha indexing
-$Koha::Contrib::Tamil::Indexer::VERSION = '0.061';
+$Koha::Contrib::Tamil::Indexer::VERSION = '0.062';
 use Moose;
 
 use 5.010;
@@ -98,9 +98,10 @@ sub run {
     }
 
     # DOM indexing? otherwise GRS-1
+    # Par défaut DOM depuis 18.11 avec dispartion des param zebra_bib_index_mode
     my $is_dom = $self->source eq 'biblio' ? 'zebra_bib_index_mode' : 'zebra_auth_index_mode';
     $is_dom = $self->koha->conf->{config}->{$is_dom} || '';
-    $is_dom = $is_dom =~ /dom/i ? 1 : 0;
+    $is_dom = $is_dom =~ /grs/i ? 0 : 1;
 
     # STEP 1.1: Records to update
     print __"Exporting records to update", "\n" if $self->verbose;
@@ -186,7 +187,7 @@ Koha::Contrib::Tamil::Indexer - Class doing Zebra Koha indexing
 
 =head1 VERSION
 
-version 0.061
+version 0.062
 
 =head1 METHODS
 
@@ -220,7 +221,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Fréderic Démians.
+This software is Copyright (c) 2019 by Fréderic Démians.
 
 This is free software, licensed under:
 

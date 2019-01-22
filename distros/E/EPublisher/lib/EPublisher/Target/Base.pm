@@ -46,7 +46,7 @@ EPublisher::Target::Base - Base class for Target plugins
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 SYNOPSIS
 
@@ -64,17 +64,6 @@ version 1.22
 =head2 publisher
 
 =head2 _config
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2010 Renee Baecker, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms of Artistic License 2.0.
-
-=head1 AUTHOR
-
-Renee Baecker (E<lt>module@renee-baecker.deE<gt>)
 
 =head1 AUTHOR
 

@@ -119,6 +119,14 @@ SKIP: {
         "opsview_info 'uuid' returned okay"
     );
 
+    # also check version capability
+    my $version = trap { $rest->opsview_version; };
+    $trap->did_return(" ... returned");
+    $trap->quiet(" ... quietly");
+    isa_ok( $version, 'version', "direct call to 'opsview_version' returned a version object");
+    like ($version, qr/^\d\.\d+\.\d$/, "direct call to 'opsview_version' returned okay" );
+    note("Opsview version: $version");
+
     # Now log out and make sure we can no longer get the info
     trap {
         $rest->logout

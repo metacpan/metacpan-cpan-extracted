@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0511';
+our $VERSION = '0.0512';
 
 use Moo;
 use Catmandu::Hits;
@@ -15,8 +15,9 @@ with 'Catmandu::Bag';
 with 'Catmandu::Droppable';
 with 'Catmandu::CQLSearchable';
 
+has type        => (is => 'ro', lazy => 1);
 has buffer_size => (is => 'ro', lazy => 1, builder => 'default_buffer_size');
-has _bulk       => (is => 'ro', lazy => 1, builder => '_build_bulk');
+has _bulk       => (is => 'ro', lazy => 1);
 has cql_mapping => (is => 'ro');
 has on_error => (is => 'ro', default => sub {'log'});
 
@@ -48,12 +49,16 @@ sub _coerce_on_error {
         "on_error should be code ref, 'throw', 'log', or 'ignore'");
 }
 
-sub _build_bulk {
+sub _build_type {
+    $_[0]->name;
+}
+
+sub _build__bulk {
     my ($self)   = @_;
     my $on_error = $self->_coerce_on_error($self->on_error);
     my %args     = (
         index     => $self->store->index_name,
-        type      => $self->name,
+        type      => $self->type,
         max_count => $self->buffer_size,
         on_error  => $on_error,
     );
@@ -73,7 +78,7 @@ sub generator {
         state $scroll = do {
             my %args = (
                 index => $self->store->index_name,
-                type  => $self->name,
+                type  => $self->type,
                 size => $self->buffer_size,  # TODO divide by number of shards
                 body => {query => {match_all => {}},},
             );
@@ -96,7 +101,7 @@ sub count {
     my ($self) = @_;
     $self->store->es->count(
         index => $self->store->index_name,
-        type  => $self->name,
+        type  => $self->type,
     )->{count};
 }
 
@@ -105,7 +110,7 @@ sub get {
     try {
         my $data = $self->store->es->get_source(
             index => $self->store->index_name,
-            type  => $self->name,
+            type  => $self->type,
             id    => $id,
         );
         $data->{$self->id_key} = $id;
@@ -132,7 +137,7 @@ sub delete_all {
     if ($es->can('delete_by_query')) {
         $es->delete_by_query(
             index => $self->store->index_name,
-            type  => $self->name,
+            type  => $self->type,
             body  => {query => {match_all => {}},},
         );
     }
@@ -141,7 +146,7 @@ sub delete_all {
             method => 'DELETE',
             path   => '/'
                 . $self->store->index_name . '/'
-                . $self->name
+                . $self->type
                 . '/_query',
             body => {query => {match_all => {}},}
         );
@@ -154,7 +159,7 @@ sub delete_by_query {
     if ($es->can('delete_by_query')) {
         $es->delete_by_query(
             index => $self->store->index_name,
-            type  => $self->name,
+            type  => $self->type,
             body  => {query => $args{query},},
         );
     }
@@ -163,7 +168,7 @@ sub delete_by_query {
             method => 'DELETE',
             path   => '/'
                 . $self->store->index_name . '/'
-                . $self->name
+                . $self->type
                 . '/_query',
             body => {query => $args{query},}
         );
@@ -194,7 +199,7 @@ sub search {
 
     my $res = $self->store->es->search(
         index => $self->store->index_name,
-        type  => $self->name,
+        type  => $self->type,
         body  => {%args, from => $start, size => $limit,},
     );
 

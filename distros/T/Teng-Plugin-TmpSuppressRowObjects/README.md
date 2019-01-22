@@ -1,6 +1,6 @@
 # NAME
 
-Teng::Plugin::TmpSuppressRowObjects - add methods with temporaly use of suppress\_row\_objects
+Teng::Plugin::TmpSuppressRowObjects - add methods with temporary use of suppress\_row\_objects
 
 # SYNOPSIS
 

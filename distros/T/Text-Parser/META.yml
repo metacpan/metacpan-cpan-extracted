@@ -23,12 +23,13 @@ name: Text-Parser
 provides:
   Text::Parser:
     file: lib/Text/Parser.pm
-    version: '0.802'
+    version: '0.803'
   Text::Parser::Multiline:
     file: lib/Text/Parser/Multiline.pm
-    version: '0.802'
+    version: '0.803'
 requires:
   Class::Method::Modifiers: '0'
+  Dist::Zilla::Plugin::Test::TidyAll: '0'
   Exception::Class: '0'
   Exporter: '0'
   IO::Select: '0'
@@ -42,7 +43,7 @@ resources:
   bugtracker: http://github.com/balajirama/Text-Parser/issues
   homepage: https://github.com/balajirama/Text-Parser
   repository: https://github.com/balajirama/Text-Parser.git
-version: '0.802'
+version: '0.803'
 x_contributors:
   - 'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>'
 x_generated_by_perl: v5.28.1

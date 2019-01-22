@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 our @EXPORT;
 
@@ -36,7 +36,7 @@ our @EXPORT;
 sub search_by_sql_hashref {
     my ($self, $sql, $bind, $table_name) = @_;
 
-    wantarray and return $self->dbh->selectall_array($sql, +{ Slice => +{} }, @$bind);
+    wantarray and return @{ $self->dbh->selectall_arrayref($sql, +{ Slice => +{} }, @$bind) };
     local $self->{suppress_row_objects} = 1;
     $self->search_by_sql($sql, $bind, $table_name);
 }
@@ -49,7 +49,7 @@ __END__
 
 =head1 NAME
 
-Teng::Plugin::TmpSuppressRowObjects - add methods with temporaly use of suppress_row_objects
+Teng::Plugin::TmpSuppressRowObjects - add methods with temporary use of suppress_row_objects
 
 =head1 SYNOPSIS
 

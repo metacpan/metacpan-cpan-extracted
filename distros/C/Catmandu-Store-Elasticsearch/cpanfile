@@ -7,8 +7,7 @@ on 'test', sub {
 
 requires 'Catmandu', '>=1.04';
 requires 'Cpanel::JSON::XS', '>=3.0213';
-requires 'CQL::Parser', '1.12';
-requires 'Moo', '1.0';
-requires 'namespace::clean', '0.24';
-requires 'Search::Elasticsearch', '1.14';
-
+requires 'CQL::Parser', '>=1.12';
+requires 'Moo', '>=1.004006';
+requires 'namespace::clean', '>=0.24';
+requires 'Search::Elasticsearch', '>=6.00';

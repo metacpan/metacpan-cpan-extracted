@@ -38,10 +38,10 @@ struct: struct_identifier_fields
 	   }
 
 struct_identifier_fields:
-        'struct' IDENTIFIER { $thisparser->{data}{current}="@item[1,2]" } fields ';'
+        'struct' IDENTIFIER fields ';'
            {
 	    # [perlname, cname, fields]
-	      [$item[2], "@item[1,2]", $item[4]]
+	      [$item[2], "@item[1,2]", $item[3]]
 	   }
 
 typedef: 'typedef' 'struct' IDENTIFIER IDENTIFIER ';'
@@ -52,28 +52,22 @@ typedef: 'typedef' 'struct' IDENTIFIER IDENTIFIER ';'
 fields: '{' field(s) '}' { [ grep ref, @{$item[2]} ] }
 
 field: comment
-     | type IDENTIFIER ';'
-       {
-         [@item[1,2]]
-       }
+     | type_identifier
 
 IDENTIFIER: /[~_a-z]\w*/i
 
 comment:  m{\s* // [^\n]* \n }x
 	| m{\s* /\* (?:[^*]+|\*(?!/))* \*/  ([ \t]*)? }x
 
-type: modifier(s?) TYPE star(s?)
+type_identifier: TYPE(s) star(s?) IDENTIFIER(?) ';'
 	{
-         $return = $item[2];
-         $return = join ' ',@{$item[1]},$return if @{$item[1]};
-         $return .= join '',' ',@{$item[3]} if @{$item[3]};
-         return undef
-           unless (defined $thisparser->{data}{typeconv}{valid_types}{$return} or
-		   $return eq $thisparser->{data}{current} . " *"
-		);
+         my ($identifier) = @{ $item[3] };
+         $identifier = pop @{$item[1]}
+           if !defined $identifier; # no stars = overgreedy
+         my $type = join ' ', @{$item[1]};
+         $type .= join '',' ',@{$item[2]} if @{$item[2]};
+         [ $type, $identifier ];
 	}
-
-modifier: 'extern' | 'unsigned' | 'long' | 'short' | 'const' | 'struct' | 'volatile'
 
 star: '*' | '&'
 

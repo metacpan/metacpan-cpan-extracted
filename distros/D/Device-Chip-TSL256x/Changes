@@ -1,5 +1,9 @@
 Revision history for Device-Chip-TSL256x
 
+0.02    2019-01-21 19:48:00
+        [CHANGES]
+         * Use Future::AsyncAwait
+
 0.01    2016/09/18 17:17:56
         First version, released on an unsuspecting world.
 

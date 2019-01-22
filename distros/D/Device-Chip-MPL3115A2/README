@@ -4,13 +4,13 @@ NAME
 
 SYNOPSIS
 
-     use Device::Chip::MPL3115A2;
+       use Device::Chip::MPL3115A2;
     
-     my $chip = Device::Chip::MPL3115A2->new;
-     $chip->mount( Device::Chip::Adapter::...->new )->get;
+       my $chip = Device::Chip::MPL3115A2->new;
+       $chip->mount( Device::Chip::Adapter::...->new )->get;
     
-     printf "Current pressure is %.2f kPa\n",
-        $chip->read_pressure->get;
+       printf "Current pressure is %.2f kPa\n",
+          $chip->read_pressure->get;
 
 DESCRIPTION
 
@@ -34,6 +34,22 @@ ACCESSORS
 
     Returns a HASH reference of the contents of control registers CTRL_REG1
     to CTRL_REG3, using fields named from the data sheet.
+
+       SBYB => "STANDBY" | "ACTIVE"
+       OST  => 0 | 1
+       RST  => 0 | 1
+       OS   => 1 | 2 | 4 | ... | 64 | 128
+       RAW  => 0 | 1
+       ALT  => 0 | 1
+    
+       ST          => 1 | 2 | 4 | ... | 16384 | 32768
+       ALARM_SEL   => 0 | 1
+       LOAD_OUTPUT => 0 | 1
+    
+       IPOL1  => 0 | 1
+       PP_OD1 => 0 | 1
+       IPOL2  => 0 | 1
+       PP_OD2 => 0 | 1
 
  change_config
 

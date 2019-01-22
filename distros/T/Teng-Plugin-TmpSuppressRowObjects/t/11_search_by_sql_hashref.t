@@ -50,4 +50,21 @@ subtest 'does not affect original method' => sub {
     ];
 };
 
+subtest 'die never affects other methods' => sub {
+    eval {
+        #  die
+        my @rows = $db->search_by_sql_hashref(q{INVALID});
+    };
+    {
+        my @rows = $db->search_by_sql(q{
+        SELECT * FROM test_table WHERE id IN (?, ?) ORDER BY id
+        }, [2, 3], 'test_table');
+        is ref $rows[0], 'TestDB::Model::Row::TestTable';
+        is_deeply [ map { $_->get_columns } @rows ], [
+            { id => 2, name => 'Banana' },
+            { id => 3, name => 'Coconut' },
+        ];
+    }
+};
+
 done_testing;

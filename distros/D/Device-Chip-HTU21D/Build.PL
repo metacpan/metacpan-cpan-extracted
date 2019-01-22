@@ -8,6 +8,7 @@ my $build = Module::Build->new(
    requires => {
       'Data::Bitfield' => '0.02',
       'Device::Chip' => '0.03',
+      'Future::AsyncAwait' => 0,
    },
    test_requires => {
       'Test::Device::Chip::Adapter' => '0.09',

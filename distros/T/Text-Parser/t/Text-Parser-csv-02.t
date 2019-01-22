@@ -6,11 +6,11 @@ use parent 'Text::Parser';
 use Text::CSV;
 
 # Note that this approach is still unsafe for embedded newlines
-my $csv = Text::CSV->new({ binary => 1, auto_diag => 1 });
+my $csv = Text::CSV->new( { binary => 1, auto_diag => 1 } );
 
 sub save_record {
     my ( $self, $line ) = @_;
-    my @fields = $csv->parse($line) ? $csv-> fields : ();
+    my @fields = $csv->parse($line) ? $csv->fields : ();
     $self->SUPER::save_record( \@fields );
 }
 

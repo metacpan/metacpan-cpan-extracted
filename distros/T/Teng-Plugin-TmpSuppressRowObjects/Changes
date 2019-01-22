@@ -1,5 +1,8 @@
 Revision history for Perl extension Teng-Plugin-TmpSuppressRowObjects
 
+0.04 2019-01-21T23:03:42Z
+    - use selectrow_arrayref instead of selectrow_array in search_by_sql_hashref, because older versions of DBI doesn't implement selectrow_array.
+
 0.03 2019-01-20T03:24:57Z
     - improve performance of search_by_sql_hashref
 

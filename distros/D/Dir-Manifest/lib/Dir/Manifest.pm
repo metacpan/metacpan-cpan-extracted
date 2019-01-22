@@ -1,11 +1,11 @@
 package Dir::Manifest;
-$Dir::Manifest::VERSION = '0.0.2';
+$Dir::Manifest::VERSION = '0.0.3';
 use strict;
 use warnings;
 
 use 5.014;
 
-use Path::Tiny qw/ path tempdir tempfile cwd /;
+use Path::Tiny qw/ path /;
 use Dir::Manifest::Key   ();
 use Dir::Manifest::Slurp ();
 
@@ -104,7 +104,23 @@ Dir::Manifest
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
+
+=head1 SYNOPSIS
+
+    my $obj = Dir::Manifest->new(
+        {
+            manifest_fn => "./t/data/texts/list.txt",
+            dir         => "./t/data/texts/texts",
+        }
+    );
+
+    # TEST
+    is (
+        scalar(`my-process ...`),
+        $obj->text("my-process-output1", {lf => 1,}),
+        "Good output of my-process.",
+    );
 
 =head1 DESCRIPTION
 
@@ -122,7 +138,7 @@ Dir::Manifest - treat a directory and a manifest file as a hash/dictionary of ke
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 METHODS
 

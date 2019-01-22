@@ -20,7 +20,7 @@ use Pod::Tree::HTML::LinkMap;
 use constant BGCOLOR => '#ffffff';
 use constant TEXT    => '#000000';
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 sub new {
 	my ( $class, $source, $dest, %options ) = @_;

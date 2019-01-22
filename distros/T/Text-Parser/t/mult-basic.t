@@ -6,7 +6,7 @@ use parent 'Text::Parser';
 
 sub new {
     my $pkg = shift;
-    $pkg->SUPER::new(multiline_type => 'join_last');
+    $pkg->SUPER::new( multiline_type => 'join_last' );
 }
 
 package main;

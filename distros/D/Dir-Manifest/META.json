@@ -61,15 +61,15 @@
    "provides" : {
       "Dir::Manifest" : {
          "file" : "lib/Dir/Manifest.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       },
       "Dir::Manifest::Key" : {
          "file" : "lib/Dir/Manifest/Key.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       },
       "Dir::Manifest::Slurp" : {
          "file" : "lib/Dir/Manifest/Slurp.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/shlomif/Dir-Manifest"
       }
    },
-   "version" : "0.0.2",
+   "version" : "0.0.3",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028001"

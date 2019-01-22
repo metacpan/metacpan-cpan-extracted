@@ -1,6 +1,12 @@
 Revision history for Perl EPublisher.
 =====================================
 
+1.23 2019-01-22 10:17:00
+
+  + fix POD in ::Text target, thanks to @manwar
+  + accept list of POD string as parameter to deploy() in ::Text target
+  + add tests
+
 1.22 2019-01-20 03:29:00
 
   + add tests

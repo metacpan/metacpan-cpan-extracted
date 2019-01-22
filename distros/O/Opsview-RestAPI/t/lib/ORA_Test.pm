@@ -75,7 +75,7 @@ sub new {
             $message =~ s/\n/ /g;
 
             my $exit_msg
-                = "The configured URL '".$self->{opsview}->{url}."' does NOT appear to be an opsview server: "
+                = "The configured URL '".$self->{url}."' does NOT appear to be an opsview server: "
                 . $message;
             diag $exit_msg;
             skip $exit_msg;

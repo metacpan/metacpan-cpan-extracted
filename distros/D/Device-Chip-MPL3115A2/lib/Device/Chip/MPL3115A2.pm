@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::MPL3115A2;
 
@@ -11,13 +11,13 @@ use base qw( Device::Chip::Base::RegisteredI2C );
 
 use utf8;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
 
-use Future::Utils qw( repeat );
+use Future::AsyncAwait;
 
-use Data::Bitfield qw( bitfield boolfield enumfield );
+use Data::Bitfield 0.02 qw( bitfield boolfield enumfield );
 
 =encoding UTF-8
 
@@ -27,13 +27,13 @@ C<Device::Chip::MPL3115A2> - chip driver for a F<MPL3115A2>
 
 =head1 SYNOPSIS
 
- use Device::Chip::MPL3115A2;
+   use Device::Chip::MPL3115A2;
 
- my $chip = Device::Chip::MPL3115A2->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::MPL3115A2->new;
+   $chip->mount( Device::Chip::Adapter::...->new )->get;
 
- printf "Current pressure is %.2f kPa\n",
-    $chip->read_pressure->get;
+   printf "Current pressure is %.2f kPa\n",
+      $chip->read_pressure->get;
 
 =head1 DESCRIPTION
 
@@ -108,7 +108,7 @@ use constant {
 };
 
 # Represent CTRL_REG1 to CTRL_REG3 as one three-byte field
-bitfield CTRL_REG =>
+bitfield { format => "bytes-LE" }, CTRL_REG =>
    # CTRL_REG1
    SBYB => enumfield( 0, qw( STANDBY ACTIVE )),
    OST  => boolfield( 1 ),
@@ -129,20 +129,25 @@ bitfield CTRL_REG =>
    PP_OD2 => boolfield( 21 );
 
 # Converted pressure
-sub _mplread_p { $_[0]->read_reg( $_[1], 3 )
-                  ->then( sub { Future->done( unpack( "L>", "\0" . $_[0] ) / 64 ) } ) }
+async sub _mplread_p
+{
+   my $v = unpack "L>", "\0" . await $_[0]->read_reg( $_[1], 3 );
+   return $v / 64
+}
 
 # Converted altitude
-sub _mplread_a { $_[0]->read_reg( $_[1], 3 )
-                  ->then( sub {
-                        my ( $msb, $lsb ) = unpack "s>C", $_[0];
-                        Future->done( $msb + ( $lsb / 256 ) ); }) }
+async sub _mplread_a
+{
+   my ( $msb, $lsb ) = unpack "s>C", await $_[0]->read_reg( $_[1], 3 );
+   return $msb + ( $lsb / 256 );
+}
 
 # Converted temperature
-sub _mplread_t { $_[0]->read_reg( $_[1], 2 )
-                  ->then( sub {
-                        my ( $msb, $lsb ) = unpack "cC", $_[0];
-                        Future->done( $msb + ( $lsb / 256 ) ) }) }
+async sub _mplread_t
+{
+   my ( $msb, $lsb ) = unpack "cC", await $_[0]->read_reg( $_[1], 2 );
+   return $msb + ( $lsb / 256 );
+}
 
 =head1 ACCESSORS
 
@@ -158,6 +163,22 @@ L<Future> instances.
 Returns a C<HASH> reference of the contents of control registers C<CTRL_REG1>
 to C<CTRL_REG3>, using fields named from the data sheet.
 
+   SBYB => "STANDBY" | "ACTIVE"
+   OST  => 0 | 1
+   RST  => 0 | 1
+   OS   => 1 | 2 | 4 | ... | 64 | 128
+   RAW  => 0 | 1
+   ALT  => 0 | 1
+
+   ST          => 1 | 2 | 4 | ... | 16384 | 32768
+   ALARM_SEL   => 0 | 1
+   LOAD_OUTPUT => 0 | 1
+
+   IPOL1  => 0 | 1
+   PP_OD1 => 0 | 1
+   IPOL2  => 0 | 1
+   PP_OD2 => 0 | 1
+
 =head2 change_config
 
    $chip->change_config( %changes )->get
@@ -172,39 +193,32 @@ subsequent modifications more efficient. This cache will not respect the
 
 =cut
 
-sub _cached_read_ctrlreg
+async sub _cached_read_ctrlreg
 {
    my $self = shift;
 
-   defined $self->{configbytes}
-      ? return Future->done( $self->{configbytes} )
-      : return $self->read_reg( REG_CTRL_REG1, 3 )
+   return $self->{configbytes} //= await $self->read_reg( REG_CTRL_REG1, 3 );
 }
 
-sub read_config
+async sub read_config
 {
    my $self = shift;
 
-   $self->_cached_read_ctrlreg->then( sub {
-      my ( $bytes ) = @_;
-      return Future->done( { unpack_CTRL_REG( unpack "L<", $bytes . "\0" ) } );
-   });
+   return { unpack_CTRL_REG( await $self->_cached_read_ctrlreg ) };
 }
 
-sub change_config
+async sub change_config
 {
    my $self = shift;
    my %changes = @_;
 
-   $self->read_config->then( sub {
-      my ( $config ) = @_;
-      $config->{$_} = $changes{$_} for keys %changes;
+   my $config = await $self->read_config;
 
-      my $bytes = $self->{configbytes} =
-         substr pack( "L<", pack_CTRL_REG( %$config ) ), 0, 3;
+   $config->{$_} = $changes{$_} for keys %changes;
 
-      $self->write_reg( REG_CTRL_REG1, $bytes );
-   });
+   my $bytes = $self->{configbytes} = pack_CTRL_REG( %$config );
+
+   await $self->write_reg( REG_CTRL_REG1, $bytes );
 }
 
 =head2 get_sealevel_pressure
@@ -221,9 +235,8 @@ The default value is 101,326 Pa.
 
 =cut
 
-sub get_sealevel_pressure {
-   $_[0]->read_reg( REG_BAR_IN_MSB, 2 )
-      ->transform( done => sub { unpack( "S<", $_[0] ) * 2 } );
+async sub get_sealevel_pressure {
+   unpack( "S<", await $_[0]->read_reg( REG_BAR_IN_MSB, 2 ) ) * 2;
 }
 
 sub set_sealevel_pressure {
@@ -370,19 +383,18 @@ future fails if the expected result is not received.
 
 =cut
 
-sub check_id
+async sub check_id
 {
    my $self = shift;
 
-   $self->read_reg( REG_WHO_AM_I, 1 )->then( sub {
-      my ( $val ) = @_;
-      my $id = unpack "C", $val;
-      $id == WHO_AM_I_ID or
-         die sprintf "Incorrect response from WHO_AM_I register (got %02X, expected %02X)\n",
-            $id, WHO_AM_I_ID;
+   my $val = await $self->read_reg( REG_WHO_AM_I, 1 );
 
-      Future->done( $self );
-   });
+   my $id = unpack "C", $val;
+   $id == WHO_AM_I_ID or
+      die sprintf "Incorrect response from WHO_AM_I register (got %02X, expected %02X)\n",
+         $id, WHO_AM_I_ID;
+
+   return $self;
 }
 
 =head2 start_oneshot
@@ -396,15 +408,14 @@ the interrupts.
 
 =cut
 
-sub start_oneshot
+async sub start_oneshot
 {
    my $self = shift;
 
-   $self->_cached_read_ctrlreg->then( sub {
-      my ( $bytes ) = @_;
-      my $ctrl_reg1 = substr( $bytes, 0, 1 ) | "\x02"; # Set OST bit
-      $self->write_reg( REG_CTRL_REG1, $ctrl_reg1 );
-   });
+   my $bytes = await $self->_cached_read_ctrlreg;
+
+   my $ctrl_reg1 = substr( $bytes, 0, 1 ) | "\x02"; # Set OST bit
+   await $self->write_reg( REG_CTRL_REG1, $ctrl_reg1 );
 }
 
 =head2 busywait_oneshot
@@ -415,15 +426,14 @@ Repeatedly reads the C<OST> bit of C<CTRL_REG1> until it becomes clear.
 
 =cut
 
-sub busywait_oneshot
+async sub busywait_oneshot
 {
    my $self = shift;
 
-   repeat {
-      $self->read_reg( REG_CTRL_REG1, 1 )->then( sub {
-         Future->done( ord( $_[0] ) & 0x02 )
-      });
-   } until => sub { !$_[0]->failure and !$_[0]->get };
+   while(1) {
+      my $ctrl_reg1 = await $self->read_reg( REG_CTRL_REG1, 1 );
+      last if not( ord( $ctrl_reg1 ) & 0x02 );
+   }
 }
 
 =head2 oneshot
@@ -434,13 +444,12 @@ A convenient wrapper around C<start_oneshot> and C<busywait_oneshot>.
 
 =cut
 
-sub oneshot
+async sub oneshot
 {
    my $self = shift;
 
-   $self->start_oneshot->then( sub {
-      $self->busywait_oneshot
-   });
+   await $self->start_oneshot;
+   await $self->busywait_oneshot;
 }
 
 =head1 AUTHOR

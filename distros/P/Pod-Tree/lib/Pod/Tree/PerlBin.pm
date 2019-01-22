@@ -8,7 +8,7 @@ use Pod::Tree;
 use Pod::Tree::HTML;
 use Pod::Tree::PerlUtil;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 use base qw(Pod::Tree::PerlUtil);
 
@@ -206,7 +206,7 @@ Pod::Tree::PerlBin - translate program PODs to HTML
 C<Pod::Tree::PerlBin> translates program PODs to HTML.
 
 It searches for programs in a list of directories
-(typically a PATH), and searches for PODs withing the programs.
+(typically a PATH), and searches for PODs within the programs.
 Only text (-T) files are considered.
 
 C<Pod::Tree::PerlBin> generates a top-level index of all the program PODs, 

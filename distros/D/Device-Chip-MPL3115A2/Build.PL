@@ -6,15 +6,17 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::MPL3115A2',
    requires => {
-      'Data::Bitfield' => 0,
+      'Data::Bitfield' => '0.02',
       'Device::Chip::Base::RegisteredI2C' => '0.03',
+      'Future::AsyncAwait' => 0,
    },
-   build_requires => {
+   test_requires => {
       'Test::More' => '0.88', # done_testing
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
+   },
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

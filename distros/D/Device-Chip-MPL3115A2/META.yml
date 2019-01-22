@@ -4,8 +4,10 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,11 +16,12 @@ name: Device-Chip-MPL3115A2
 provides:
   Device::Chip::MPL3115A2:
     file: lib/Device/Chip/MPL3115A2.pm
-    version: '0.05'
+    version: '0.06'
 requires:
-  Data::Bitfield: '0'
+  Data::Bitfield: '0.02'
   Device::Chip::Base::RegisteredI2C: '0.03'
+  Future::AsyncAwait: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

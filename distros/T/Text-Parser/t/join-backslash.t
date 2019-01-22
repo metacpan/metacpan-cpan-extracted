@@ -22,7 +22,7 @@ sub is_line_continued {
 
 sub new {
     my $pkg = shift;
-    $pkg->SUPER::new(multiline_type => 'join_next');
+    $pkg->SUPER::new( multiline_type => 'join_next' );
 }
 
 package main;
@@ -45,6 +45,7 @@ is_deeply(
 
 throws_ok {
     $mpars->read('t/bad-continued.txt');
-} 'Text::Parser::Multiline::Error', '';
+}
+'Text::Parser::Multiline::Error', '';
 
 done_testing;

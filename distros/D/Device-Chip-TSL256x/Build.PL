@@ -8,6 +8,7 @@ my $build = Module::Build->new(
    requires => {
       'Data::Bitfield' => 0,
       'Device::Chip' => '0.03',
+      'Future::AsyncAwait' => 0,
    },
    build_requires => {
       'Test::Device::Chip::Adapter' => 0,
@@ -15,7 +16,6 @@ my $build = Module::Build->new(
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
    extra_manify_args => {

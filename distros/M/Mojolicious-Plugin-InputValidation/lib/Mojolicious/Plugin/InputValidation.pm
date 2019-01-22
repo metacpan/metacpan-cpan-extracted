@@ -192,7 +192,7 @@ sub new { my $class = shift; bless {@_}, $class }
 sub pattern {
     my $self         = shift;
     $self->{pattern} = shift if @_;
-    $self->{pattern} || qr/^20\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(Z|[+-]\d\d\d\d)$/
+    $self->{pattern} || qr/^20\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d\d\d)?(Z|[+-]\d\d\d\d)$/
 }
 sub accepts {
     my ($self, $value, $path) = @_;
@@ -208,7 +208,7 @@ package Mojolicious::Plugin::InputValidation;
 use Mojo::Base 'Mojolicious::Plugin';
 no strict 'subs';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Mojo::Util 'monkey_patch';
 
@@ -391,6 +391,7 @@ This type matches datetime strings in the following format:
   YYYY-mm-DDTHH:mm:ss-0100
   YYYY-mm-DDTHH:mm:ss+0000
   YYYY-mm-DDTHH:mm:ss+0100
+  YYYY-mm-DDTHH:mm:ss.uuu+0100
 
 It also supports a regex pattern, but that kinda defeats the purpose of this type.
 

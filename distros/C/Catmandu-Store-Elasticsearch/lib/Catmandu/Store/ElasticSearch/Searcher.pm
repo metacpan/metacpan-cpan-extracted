@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Searcher;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0511';
+our $VERSION = '0.0512';
 
 use Moo;
 use namespace::clean;
@@ -31,7 +31,7 @@ sub generator {
             $body->{sort} = $self->sort if $self->sort;
             my %args = (
                 index => $store->index_name,
-                type  => $self->bag->name,
+                type  => $self->bag->type,
                 from  => $self->start,
                 size =>
                     $self->bag->buffer_size, # TODO divide by number of shards
@@ -74,7 +74,7 @@ sub count {
     my $store = $self->bag->store;
     $store->es->count(
         index => $store->index_name,
-        type  => $self->bag->name,
+        type  => $self->bag->type,
         body  => {query => $self->query,},
     )->{count};
 }

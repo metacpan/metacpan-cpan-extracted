@@ -1,5 +1,9 @@
 Revision history for Device-Chip-HTU21D
 
+0.03    2019-01-21 19:39:01
+        [CHANGES]
+         * Use Future::AsyncAwait
+
 0.02    2017-11-11 02:02:19
         [CHANGES]
          * Declare dependency on Data::Bitfield

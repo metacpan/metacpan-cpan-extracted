@@ -8,15 +8,15 @@ BEGIN { use_ok 'Text::Parser'; }
 
 my $fname = 'text-simple.txt';
 
-my $pars = Text::Parser->new(balaji => 1);
-is($pars, undef);
-$pars = Text::Parser->new(multiline_type => 'balaji');
-is($pars, undef);
+my $pars = Text::Parser->new( balaji => 1 );
+is( $pars, undef );
+$pars = Text::Parser->new( multiline_type => 'balaji' );
+is( $pars, undef );
 $pars = Text::Parser->new();
-isa_ok($pars, 'Text::Parser');
-is ($pars->setting(), undef, 'When no setting is called');
-is ($pars->setting('balaji'), undef, 'balaji is not a setting at all');
-is( $pars->filename(), undef, 'No filename specified so far' );
+isa_ok( $pars, 'Text::Parser' );
+is( $pars->setting(),         undef, 'When no setting is called' );
+is( $pars->setting('balaji'), undef, 'balaji is not a setting at all' );
+is( $pars->filename(),        undef, 'No filename specified so far' );
 lives_ok { is( $pars->filehandle(), undef, 'No filehandles' ); }
 'This should not die, just return undef';
 throws_ok { $pars->filehandle('bad argument'); } 'Text::Parser::Exception',

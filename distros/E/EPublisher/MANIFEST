@@ -62,5 +62,6 @@ t/config/test3.yml
 t/config/test_config.yml
 t/lib/Text.pm
 t/second_lib/AnotherText.pm
+t/target_text.t
 t/third_lib/AnotherText.pm
 t/third_lib/subdir/Text.pm

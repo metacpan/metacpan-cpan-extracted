@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::HTU21D;
 
@@ -11,11 +11,12 @@ use base qw( Device::Chip );
 
 use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Data::Bitfield 0.02 qw( bitfield boolfield );
-use Future::Utils qw( repeat );
 use List::Util qw( first );
+
+use Future::AsyncAwait;
 
 use constant PROTOCOL => "I2C";
 
@@ -27,13 +28,13 @@ C<Device::Chip::HTU21D> - chip driver for F<HTU21D>
 
 =head1 SYNOPSIS
 
- use Device::Chip::HTU21D;
+   use Device::Chip::HTU21D;
 
- my $chip = Device::Chip::HTU21D->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::HTU21D->new;
+   $chip->mount( Device::Chip::Adapter::...->new )->get;
 
- printf "Current temperature is is %.2f C\n",
-    $chip->read_temperature->get;
+   printf "Current temperature is is %.2f C\n",
+      $chip->read_temperature->get;
 
 =head1 DESCRIPTION
 
@@ -102,64 +103,64 @@ Writes updates to the user register.
 
 my @RES_VALUES = ( "12/14", "8/12", "10/13", "11/11" );
 
-sub read_config
+async sub read_config
 {
    my $self = shift;
 
-   $self->protocol->write_then_read( pack( "C", CMD_READ_REG ), 1 )->then( sub {
-      my %config = unpack_REG_USER( $_[0] );
-      my $res = ( delete $config{RES0} ) | ( delete $config{RES1} ) << 1;
-      $config{RES} = $RES_VALUES[$res];
+   my %config = unpack_REG_USER(
+      await $self->protocol->write_then_read( pack( "C", CMD_READ_REG ), 1 )
+   );
 
-      Future->done( \%config );
-   });
+   my $res = ( delete $config{RES0} ) | ( delete $config{RES1} ) << 1;
+   $config{RES} = $RES_VALUES[$res];
+
+   return \%config;
 }
 
-sub change_config
+async sub change_config
 {
    my $self = shift;
    my %changes = @_;
 
-   $self->read_config->then( sub {
-      my ( $config ) = @_;
-      $config->{$_} = $changes{$_} for keys %changes;
+   my $config = await $self->read_config;
 
-      my $res = delete $config->{RES};
+   $config->{$_} = $changes{$_} for keys %changes;
 
-      $res = first { $RES_VALUES[$_] eq $res } 0 .. 3;
-      defined $res or
-         croak "Unrecognised new value for RES - '$changes{RES}'";
+   my $res = delete $config->{RES};
 
-      my $val = pack_REG_USER(
-         RES0 => $res & ( 1<<0 ),
-         RES1 => $res & ( 1<<1 ),
-         %$config,
-      );
+   $res = first { $RES_VALUES[$_] eq $res } 0 .. 3;
+   defined $res or
+      croak "Unrecognised new value for RES - '$changes{RES}'";
 
-      $self->protocol->write( pack "C a", CMD_WRITE_REG, $val );
-   });
+   my $val = pack_REG_USER(
+      RES0 => $res & ( 1<<0 ),
+      RES1 => $res & ( 1<<1 ),
+      %$config,
+   );
+
+   await $self->protocol->write( pack "C a", CMD_WRITE_REG, $val );
 }
 
-sub _trigger_nohold
+async sub _trigger_nohold
 {
    my $self = shift;
    my ( $cmd ) = @_;
 
    my $protocol = $self->protocol;
 
-   $self->protocol->write( pack "C", $cmd )->then( sub {
-      my $attempts = 10;
-      repeat {
-         $protocol->read( 2 )
-            ->else( sub {
-               --$attempts ? ( $protocol->sleep( 0.01 )->then_done() )
-                           : Future->fail( $_[0] );
-            });
-      } while => sub { !$_[0]->failure and !defined $_[0]->get }
-   })->then( sub {
-      my ( $bytes ) = @_;
-      return Future->done( unpack "S>", $bytes );
-   });
+   await $self->protocol->write( pack "C", $cmd );
+
+   my $attempts = 10;
+   while( $attempts ) {
+      my $f = $protocol->read( 2 );
+      $attempts-- and $f = $f->else_done( undef );
+
+      my $bytes = await $f;
+      defined $bytes and
+         return unpack "S>", $bytes;
+
+      await $protocol->sleep( 0.01 );
+   }
 }
 
 =head1 METHODS
@@ -174,14 +175,13 @@ Triggers a reading of the temperature sensor, returning a number in degrees C.
 
 =cut
 
-sub read_temperature
+async sub read_temperature
 {
    my $self = shift;
 
-   $self->_trigger_nohold( CMD_TRIGGER_TEMP_NOHOLD )->then( sub {
-      my ( $val ) = @_;
-      Future->done( -46.85 + 175.72 * ( $val / 2**16 ) );
-   });
+   my $val = await $self->_trigger_nohold( CMD_TRIGGER_TEMP_NOHOLD );
+
+   return -46.85 + 175.72 * ( $val / 2**16 );
 }
 
 =head2 read_humidity
@@ -192,14 +192,13 @@ Triggers a reading of the humidity sensor, returning a number in % RH.
 
 =cut
 
-sub read_humidity
+async sub read_humidity
 {
    my $self = shift;
 
-   $self->_trigger_nohold( CMD_TRIGGER_HUMID_NOHOLD )->then( sub {
-      my ( $val ) = @_;
-      Future->done( -6 + 125 * ( $val / 2**16 ) );
-   });
+   my $val = await $self->_trigger_nohold( CMD_TRIGGER_HUMID_NOHOLD );
+
+   return -6 + 125 * ( $val / 2**16 );
 }
 
 =head1 AUTHOR
