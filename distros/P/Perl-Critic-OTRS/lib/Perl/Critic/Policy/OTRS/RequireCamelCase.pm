@@ -10,7 +10,7 @@ use base 'Perl::Critic::Policy';
 
 use Readonly;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 Readonly::Scalar my $DESC => q{Variable, subroutine, and package names have to be in CamelCase};
 Readonly::Scalar my $EXPL => q{};
@@ -26,7 +26,7 @@ my %dispatcher = (
 );
 
 sub applies_to {
-    keys %dispatcher,
+    sort keys %dispatcher,
 }
 
 sub violates {
@@ -104,11 +104,17 @@ Perl::Critic::Policy::OTRS::RequireCamelCase - Variable, subroutine, and package
 
 =head1 VERSION
 
-version 0.08
+version 0.09
+
+=head1 METHODS
+
+=head2 supported_parameters
+
+There are no supported parameters.
 
 =head1 AUTHOR
 
-Renee Baecker <module@renee-baecker.de>
+Renee Baecker <info@perl-services.de>
 
 =head1 COPYRIGHT AND LICENSE
 

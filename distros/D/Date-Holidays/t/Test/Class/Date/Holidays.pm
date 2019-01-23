@@ -111,7 +111,7 @@ sub test_at : Test(5) {
         ok( my $dh = Date::Holidays->new( countrycode => 'at' ),
             'Testing Date::Holidays::AT' );
 
-        ok( $dh->holidays( YEAR => 2017 ),
+        ok( $dh->holidays( year => 2017 ),
             'Testing holidays with argument for Date::Holidays::AT' );
 
         my $holidays_hashref = Date::Holidays->is_holiday(
@@ -121,7 +121,7 @@ sub test_at : Test(5) {
             countries => [ 'at' ],
         );
 
-        ok( !$holidays_hashref->{'at'},
+        ok( $holidays_hashref->{'at'},
             'Checking for Austrian first day of year' );
 
         ok(! Date::Holidays::AT->can('is_holiday'));

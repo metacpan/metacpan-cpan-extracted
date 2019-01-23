@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dpkg",
    "prereqs" : {
@@ -281,13 +281,17 @@
          "file" : "lib/Dpkg/Source/BinaryFiles.pm",
          "version" : "0.01"
       },
+      "Dpkg::Source::Format" : {
+         "file" : "lib/Dpkg/Source/Format.pm",
+         "version" : "1.00"
+      },
       "Dpkg::Source::Functions" : {
          "file" : "lib/Dpkg/Source/Functions.pm",
          "version" : "0.01"
       },
       "Dpkg::Source::Package" : {
          "file" : "lib/Dpkg/Source/Package.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Dpkg::Source::Package::V1" : {
          "file" : "lib/Dpkg/Source/Package/V1.pm",
@@ -372,6 +376,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.19.2",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v1.19.3",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

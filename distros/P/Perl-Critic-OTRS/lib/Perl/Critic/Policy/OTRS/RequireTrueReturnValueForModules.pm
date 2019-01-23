@@ -10,7 +10,7 @@ use base 'Perl::Critic::Policy';
 
 use Readonly;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 Readonly::Scalar my $DESC => q{Modules have to return a true value ("1;")};
 Readonly::Scalar my $EXPL => q{Use "1;" as the last statement of the module};
@@ -62,11 +62,17 @@ Perl::Critic::Policy::OTRS::RequireTrueReturnValueForModules - Check if modules 
 
 =head1 VERSION
 
-version 0.08
+version 0.09
+
+=head1 METHODS
+
+=head2 supported_parameters
+
+There are no supported parameters.
 
 =head1 AUTHOR
 
-Renee Baecker <module@renee-baecker.de>
+Renee Baecker <info@perl-services.de>
 
 =head1 COPYRIGHT AND LICENSE
 

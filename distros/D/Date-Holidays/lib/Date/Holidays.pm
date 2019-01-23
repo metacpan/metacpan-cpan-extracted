@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.16';
+$VERSION = '1.18';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -313,7 +313,7 @@ Date::Holidays - Date::Holidays::* adapter and aggregator for all your holiday n
 
 =head1 VERSION
 
-The documentation describes version 1.16 of Date::Holidays
+The documentation describes version 1.18 of Date::Holidays
 
 =head1 FEATURES
 
@@ -527,7 +527,7 @@ Takes 6 optional named arguments:
 
 =item * year, four digit parameter representing year
 
-=item * month, 1.16, representing month
+=item * month, 1.18, representing month
 
 =item * day, 1-31, representing day
 
@@ -898,6 +898,8 @@ all the wrapped (adapted and aggregated) distributions.
 
 =over
 
+=item * Mario Minati, for telling me about the states in Date::Holidays::DE resulting in 1.17
+
 =item * Vladimir Varlamov, PR introducing Date::Holidays::KZ resulting in 1.07
 
 =item * CHORNY (Alexandr Ciornii), Github issue #10, letting me know I included local/ by accident,
@@ -940,7 +942,7 @@ Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 Date-Holidays and related modules are (C) by Jonas B. Nielsen, (jonasbn)
-2004-2018
+2004-2019
 
 Date-Holidays and related modules are released under the Artistic License 2.0
 

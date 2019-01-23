@@ -10,7 +10,7 @@ use base 'Perl::Critic::Policy';
 
 use Readonly;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 Readonly::Scalar my $DESC => q{Method FetchrowHashref() is deprecated.};
 Readonly::Scalar my $EXPL => q{Use other methods of DBObject instead. FetchrowHashref() does not work on all database systems};
@@ -45,11 +45,17 @@ Perl::Critic::Policy::OTRS::ProhibitFetchrowHashref - Do no use FetchrowHashref
 
 =head1 VERSION
 
-version 0.08
+version 0.09
+
+=head1 METHODS
+
+=head2 supported_parameters
+
+There are no supported parameters.
 
 =head1 AUTHOR
 
-Renee Baecker <module@renee-baecker.de>
+Renee Baecker <info@perl-services.de>
 
 =head1 COPYRIGHT AND LICENSE
 

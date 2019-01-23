@@ -16,13 +16,14 @@ dies_ok( sub { Game::DijkstraMap->new( map => [ [] ], str2map => 'x' ) },
 my $dm = Game::DijkstraMap->new;
 
 dies_ok( sub { $dm->dimap_with } );
+dies_ok( sub { $dm->each_cell } );
 dies_ok( sub { $dm->map("treasure") }, 'R.L.S. called' );
 dies_ok( sub { $dm->next( 0, 0 ) } );
 dies_ok( sub { $dm->next_best( 0, 0 ) } );
 dies_ok( sub { $dm->next_sq( 0, 0 ) } );
+dies_ok( sub { $dm->normalize } );
 dies_ok( sub { $dm->path_best( 0, 0 ) } );
 dies_ok( sub { $dm->recalc } );
-dies_ok( sub { $dm->to_tsv } );
 dies_ok( sub { $dm->unconnected } );
 dies_ok( sub { $dm->update( [ 0, 0, 42 ] ) } );
 dies_ok( sub { $dm->values } );
@@ -107,6 +108,25 @@ $deeply->(
     ],
     [qw(1 1)],
     'adjacent_values_sq to [2,2]'
+);
+
+$dm->each_cell(
+    sub {
+        my ( $dimap, $row, $col, $self ) = @_;
+        return
+          if $dimap->[$row][$col] == $self->min_cost
+          or $dimap->[$row][$col] == $self->bad_cost;
+        $dimap->[$row][$col] *= -2.2;
+    }
+);
+$deeply->(
+    rounded( $dm->dimap ),
+    rounded( [ [qw(-8.8 -6.6 -4.4)], [qw(-6.6 -4.4 -2.2)], [qw(-4.4 -2.2 0)] ] )
+);
+$dm->normalize;
+$deeply->(
+    rounded( $dm->dimap ),
+    rounded( [ [qw(-4 -3 -2)], [qw(-3 -2 -1)], [qw(-2 -1 0)] ] )
 );
 
 my $level = $dm->str2map(<<'EOM');
@@ -242,7 +262,7 @@ $deeply->(
         [   [ SQRT2 + SQRT2, 1 + SQRT2, 2, 1 + SQRT2 ],
             [ 1 + SQRT2,     SQRT2,     1, SQRT2 ],
             [ 2,             1,         0, 1 ],
-            [ 1 + SQRT2,     SQRT2,     1, 1 ]
+            [ 1 + SQRT2,     SQRT2,     1, SQRT2 ]
         ]
     ),
     "norm_8way_euclid rounded because floating point math"
@@ -279,17 +299,16 @@ EOM
     );
 }
 
-is( $dm->to_tsv, "2\t1\t0$/3\t2\t1$/4\t3\t2$/" );
-is( Game::DijkstraMap->to_tsv( [ [qw(a b)], [qw(c d)] ] ), "a\tb$/c\td$/" );
-
 sub rounded {
     my ($aref) = @_;
+    my $new;
     my $maxcol = $aref->[0]->$#*;
     for my $r ( 0 .. $aref->$#* ) {
         for my $c ( 0 .. $maxcol ) {
-            $aref->[$r][$c] = sprintf "%.3f", $aref->[$r][$c];
+            $new->[$r][$c] = sprintf "%.3f", $aref->[$r][$c];
         }
     }
+    return $new;
 }
 
-plan tests => 57
+plan tests => 58

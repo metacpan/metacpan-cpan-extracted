@@ -1,10 +1,12 @@
 package Catalyst::Helper::Model::MongoDB;
 our $AUTHORITY = 'cpan:GETTY';
-$Catalyst::Helper::Model::MongoDB::VERSION = '0.13';
+
 # ABSTRACT: Helper for MongoDB models
 use strict;
 use warnings;
 
+
+our $VERSION = '0.14';
 
 sub mk_compclass {
     my ( $self, $helper, $host, $port, $dbname, $collectionname, $gridfs ) = @_;
@@ -37,7 +39,7 @@ Catalyst::Helper::Model::MongoDB - Helper for MongoDB models
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

@@ -188,12 +188,15 @@ provides:
   Dpkg::Source::BinaryFiles:
     file: lib/Dpkg/Source/BinaryFiles.pm
     version: '0.01'
+  Dpkg::Source::Format:
+    file: lib/Dpkg/Source/Format.pm
+    version: '1.00'
   Dpkg::Source::Functions:
     file: lib/Dpkg/Source/Functions.pm
     version: '0.01'
   Dpkg::Source::Package:
     file: lib/Dpkg/Source/Package.pm
-    version: '1.02'
+    version: '1.03'
   Dpkg::Source::Package::V1:
     file: lib/Dpkg/Source/Package/V1.pm
     version: '0.01'
@@ -255,5 +258,5 @@ resources:
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://git.dpkg.org/git/dpkg/dpkg.git
-version: v1.19.2
+version: v1.19.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

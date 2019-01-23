@@ -1,0 +1,45 @@
+---
+abstract: 'Get the day cutoff and payday for in Japanese timezone'
+author:
+  - 'worthmine <worthmine@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Cutoff-JP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Date::Cutoff::JP:
+    file: lib/Date/Cutoff/JP.pm
+    version: '0.03'
+  Date::Weekend::JP:
+    file: lib/Date/Cutoff/JP.pm
+    version: '0.03'
+requires:
+  Date::Japanese::Holiday: '0'
+  Moose: '0'
+  Time::Piece: '0'
+  Time::Seconds: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/worthmine/Date-Cutoff-JP/issues
+  homepage: https://github.com/worthmine/Date-Cutoff-JP
+  repository: git://github.com/worthmine/Date-Cutoff-JP.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

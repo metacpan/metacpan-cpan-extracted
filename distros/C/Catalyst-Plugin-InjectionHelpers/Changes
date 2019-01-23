@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::Plugin::InjectionHelpers
 
+0.013   22 January 2019
+        - Document how to use this with Configloader so that injection
+        overlays work as expected.
+
 0.012   13 November 2018
         - Merged in experimental depenency injection support.
         - Breaking API change, see docs for backcompat wedge.

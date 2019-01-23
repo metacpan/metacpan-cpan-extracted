@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,10 +19,10 @@ requires:
 resources:
   homepage: https://github.com/singingfish/p5-catalyst-model-mongodb
   repository: https://github.com/singingfish/p5-catalyst-model-mongodb.git
-version: '0.13'
+version: '0.14'
 x_Dist_Zilla:
   perl:
-    version: '5.022000'
+    version: '5.018002'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -36,62 +36,62 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@GETTY/@Basic/GatherDir'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@GETTY/@Basic/PruneCruft'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@GETTY/@Basic/ManifestSkip'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@GETTY/@Basic/MetaYAML'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::License
       name: '@GETTY/@Basic/License'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@GETTY/@Basic/Readme'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@GETTY/@Basic/ExtraTests'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@GETTY/@Basic/ExecDir'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@GETTY/@Basic/ShareDir'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@GETTY/@Basic/MakeMaker'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@GETTY/@Basic/Manifest'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@GETTY/@Basic/TestRelease'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@GETTY/@Basic/ConfirmRelease'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@GETTY/@Basic/UploadToCPAN'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -100,33 +100,38 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.19.1
           repo_root: .
       name: '@GETTY/Git::NextVersion'
-      version: '2.036'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@GETTY/PkgVersion'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@GETTY/MetaConfig'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@GETTY/MetaJSON'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@GETTY/NextRelease'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@GETTY/PodSyntaxTests'
-      version: '5.040'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: '@GETTY/Repository'
+      version: '0.24'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@GETTY/GithubMeta'
-      version: '0.54'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: '@GETTY/InstallRelease'
@@ -142,7 +147,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@GETTY/TestMoreWithSubtests'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -156,77 +161,77 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Name
               name: '@GETTY/Name'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Version
               name: '@GETTY/Version'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@GETTY/Prelude'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Synopsis'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Description'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Overview'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: '@GETTY/Stability'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: Attributes
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: Methods
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: Functions
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@GETTY/Leftovers'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@GETTY/postlude'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Bugs
               name: '@GETTY/Bugs'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Authors
               name: '@GETTY/Authors'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Legal
               name: '@GETTY/Legal'
-              version: '4.012'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/List'
-              version: '4.012'
+              version: '4.015'
       name: '@GETTY/PodWeaver'
-      version: '4.006'
+      version: '4.008'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -239,9 +244,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.19.1
           repo_root: .
       name: '@GETTY/@Git/Check'
-      version: '2.036'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -255,11 +261,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@GETTY/@Git/Commit'
-      version: '2.036'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -267,15 +274,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.13'
+          tag: '0.14'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@GETTY/@Git/Tag'
-      version: '2.036'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -284,9 +292,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.19.1
           repo_root: .
       name: '@GETTY/@Git/Push'
-      version: '2.036'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -294,7 +303,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -302,50 +311,52 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '5.040'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '5.040'
+      version: '6.012'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '5.040'
+    version: '6.012'
 x_authority: cpan:GETTY
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

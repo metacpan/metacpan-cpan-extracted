@@ -19,7 +19,7 @@ use Config::Any;
 use Term::ANSIColor qw/colored/;
 use File::chdir;
 
-our $VERSION = version->new('0.6.10');
+our $VERSION = version->new('0.7.0');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -56,8 +56,8 @@ sub main {
             'match|m=s',
             'max|M=i',
             'runtime|max-runtime|R=i',
-            'local|l!',
-            'limit|L=i',
+            'remote|R!',
+            'limit|l=i',
             'recurse|r!',
             'page|p!',
             'tag|t=s',
@@ -69,7 +69,7 @@ sub main {
         ]
     );
 
-    my $module = $conf->{type} && !$opt->local ? 'Group::Git::' . ucfirst $conf->{type} : 'Group::Git';
+    my $module = $conf->{type} && $opt->remote ? 'Group::Git::' . ucfirst $conf->{type} : 'Group::Git';
     my $file   = "$module.pm";
     $file =~ s{::}{/}g;
     require $file;
@@ -321,7 +321,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.6.10.
+This documentation refers to group-git version 0.7.0.
 
 =head1 SYNOPSIS
 
@@ -333,7 +333,7 @@ This documentation refers to group-git version 0.6.10.
                 Skip any project matching this regexp
   -m --match[=]regexp
                 Only process any project matching this regexp
-  -l --local    Ignore any management type and just look at what is checked out
+  -R --remote   Use any management type defined to for remote git servers.
                 Only useful if you have a group-git.yml file defining Github,
                 Bitbucked or Gitosis types.
   -t --tag[=]str

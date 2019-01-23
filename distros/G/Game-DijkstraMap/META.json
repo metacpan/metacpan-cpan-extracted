@@ -34,6 +34,7 @@
             "Carp" : "0",
             "List::Util" : "1.26",
             "Moo" : "0",
+            "MooX::Rebuild" : "0",
             "Scalar::Util" : "0",
             "constant" : "0",
             "namespace::clean" : "0",
@@ -54,6 +55,6 @@
          "url" : "https://github.com/thrig/Game-DijkstraMap"
       }
    },
-   "version" : "1.02",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -1,5 +1,11 @@
 Revision history for Group-Git
 
+0.7.0   2019-01-23
+        Updating for release of version 0.7.0
+        Updated date (Ivan Wills)
+        Changing default behaviour to not go remote (Ivan Wills)
+        Adding auto tags to repositories (Ivan Wills)
+
 0.6.10   2018-06-10
         Updating for release of version 0.6.10
         Fixed --limit logic (Ivan Wills)

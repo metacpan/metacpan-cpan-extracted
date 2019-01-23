@@ -62,3 +62,15 @@ t/Module/TrueReturnString.pm
 t/Module/WithDumper.pm
 t/Module/WithDumperLong.pm
 t/data/test.pl
+t/prohibit_core_functions.t
+t/prohibit_dumper.t
+t/prohibit_fetchrow_hashref.t
+t/prohibit_localtime.t
+t/prohibit_low_precedence_ops.t
+t/prohibit_open.t
+t/prohibit_push_isa.t
+t/prohibit_require.t
+t/prohibit_rmtree.t
+t/require_camel_case.t
+t/require_parens.t
+t/require_true_value.t

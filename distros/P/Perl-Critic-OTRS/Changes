@@ -1,6 +1,12 @@
 Release history for Perl::Critic::OTRS
 ======================================
 
+0.09  2019-01-23 09:22:00
+
+  * Fix listing of packages in META.json (thanks @andk, fix for #10)
+  * add more tests
+  * add documentation
+
 0.08  2018-07-03
 
   [IMPROVEMENTS]

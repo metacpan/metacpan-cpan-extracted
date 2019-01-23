@@ -88,7 +88,7 @@ use Dpkg::Gettext;
 
 use parent qw(Dpkg::Interface::Storable);
 
-=item $dep = Dpkg::Deps::Simple->new(%opts);
+=item $dep = Dpkg::Deps::Simple->new([$dep[, %opts]]);
 
 Creates a new object. Some options can be set through %opts:
 
@@ -147,20 +147,6 @@ sub reset {
     $self->{arches} = undef;
     $self->{archqual} = undef;
     $self->{restrictions} = undef;
-}
-
-=item $dep->parse($fh, $desc)
-
-Parses a line from a filehandle.
-
-=cut
-
-sub parse {
-    my ($self, $fh, $desc) = @_;
-
-    my $line = <$fh>;
-    chomp $line;
-    return $self->parse_string($line);
 }
 
 =item $dep->parse_string($dep_string)
@@ -224,6 +210,24 @@ sub parse_string {
     }
 }
 
+=item $dep->parse($fh, $desc)
+
+Parse a dependency line from a filehandle.
+
+=cut
+
+sub parse {
+    my ($self, $fh, $desc) = @_;
+
+    my $line = <$fh>;
+    chomp $line;
+    return $self->parse_string($line);
+}
+
+=item $dep->load($filename)
+
+Parse a dependency line from $filename.
+
 =item $dep->output([$fh])
 
 =item "$dep"
@@ -256,6 +260,12 @@ sub output {
     }
     return $res;
 }
+
+=item $dep->save($filename)
+
+Save the dependency into the given $filename.
+
+=cut
 
 # _arch_is_superset(\@p, \@q)
 #

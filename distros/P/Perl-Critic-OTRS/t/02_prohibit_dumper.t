@@ -20,8 +20,6 @@ my %modules = (
     'Module::WithDumperLong'    => 1,
 );
 
-plan tests => scalar keys %modules;
-
 my $dir = dirname __FILE__;
 
 my $pc = Perl::Critic->new( -'single-policy' => 'OTRS::ProhibitDumper' );
@@ -39,3 +37,5 @@ for my $module ( keys %modules ) {
 
     is scalar @violations, $modules{$module}, "Check $module";
 }
+
+done_testing();

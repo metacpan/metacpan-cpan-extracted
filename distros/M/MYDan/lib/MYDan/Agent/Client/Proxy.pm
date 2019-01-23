@@ -80,7 +80,7 @@ sub run
         $efsize = ( stat $ef )[7];
 
         my $filecache = MYDan::Agent::FileCache->new();
-        $filecache->save( $ef ) unless $filecache->check( $md5 );
+        $filecache->fastsave( $ef, $md5 ) unless $filecache->check( $md5 );
     }
 
     my $percent =  MYDan::Util::Percent->new( scalar @node, 'run ..' );

@@ -36,6 +36,7 @@ my %params = (
         'Carp'             => 0,
         'List::Util'       => 1.26,
         'Moo'              => 0,
+        'MooX::Rebuild'    => 0,
         'Scalar::Util'     => 0,
         'constant'         => 0,
         'namespace::clean' => 0,

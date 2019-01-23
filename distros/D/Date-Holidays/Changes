@@ -1,5 +1,21 @@
 Changes file for Date-Holidays
 
+1.18 2019-01-23 Feature release, update recommended
+
+- Added adapter for:
+    Date::Holidays::AT (Austria) we now support the state parameter for this distribution
+
+    Ref: https://github.com/jonasbn/Date-Holidays/issues/33
+
+
+1.17 2019-01-22 Feature release, update recommended
+
+- Improved adapter for:
+    Date::Holidays::DE we now support the state parameter for this distribution
+
+    Ref: https://github.com/jonasbn/Date-Holidays/issues/31
+
+
 1.16 2018-06-17 Feature release, update recommended
 
 - Added adapter for:

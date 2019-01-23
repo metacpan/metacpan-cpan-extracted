@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Date/Cutoff/JP.pm
+minil.toml
+t/00_compile.t
+t/01_basic.t
+t/02_late2.t
+t/03_cut_off10.t
+t/04_cut_off10AndPayEnd.t
+t/05_cut_off10AndPayEndWithOver.t
+t/06_pay10.t
+META.yml
+MANIFEST

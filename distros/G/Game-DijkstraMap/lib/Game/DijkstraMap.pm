@@ -14,9 +14,11 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 use constant SQRT2 => sqrt(2);
+
+with 'MooX::Rebuild';
 
 has bad_cost => ( is => 'rw', default => sub { -2147483648 } );
 has min_cost => ( is => 'rw', default => sub { 0 } );
@@ -87,10 +89,27 @@ sub adjacent_values_sq {
     return @values;
 }
 
+sub clone {
+    my ($self) = @_;
+    my $newdm  = $self->rebuild;
+    my $dimap  = $self->dimap;
+    if ( defined $dimap ) {
+        my $map;
+        my $cols = $dimap->[0]->$#*;
+        for my $r ( 0 .. $dimap->$#* ) {
+            for my $c ( 0 .. $cols ) {
+                $map->[$r][$c] = $dimap->[$r][$c];
+            }
+        }
+        $newdm->dimap($map);
+    }
+    return $newdm;
+}
+
 sub dimap_with {
     my ( $self, $param ) = @_;
     my $dimap = $self->dimap;
-    croak "cannot make new dimap from unset map" if !defined $dimap;
+    croak "dimap not set" if !defined $dimap;
     my $new_dimap;
     my $badcost = $self->bad_cost;
     my $cols    = $dimap->[0]->$#*;
@@ -116,6 +135,20 @@ sub dimap_with {
     return $new_dimap;
 }
 
+sub each_cell {
+    my ( $self, $fn ) = @_;
+    croak "need a code ref" if !defined $fn or ref $fn ne 'CODE';
+    my $dimap = $self->dimap;
+    croak "dimap not set" if !defined $dimap;
+    my $cols = $dimap->[0]->$#*;
+    for my $r ( 0 .. $dimap->$#* ) {
+        for my $c ( 0 .. $cols ) {
+            $fn->( $dimap, $r, $c, $self );
+        }
+    }
+    return $self;
+}
+
 sub map {
     my ( $self, $map ) = @_;
     my $dimap = [];
@@ -132,7 +165,7 @@ sub map {
         }
     }
     $self->_set_iters(
-        $self->normfn->( $dimap, $self->min_cost, $self->max_cost ) );
+        $self->normfn->( $dimap, $self->min_cost, $self->max_cost, $self->bad_cost ) );
     $self->dimap($dimap);
     return $self;
 }
@@ -140,7 +173,7 @@ sub map {
 sub next {
     my ( $self, $r, $c, $value ) = @_;
     my $dimap = $self->dimap;
-    croak "cannot pathfind on unset map" if !defined $dimap;
+    croak "dimap not set" if !defined $dimap;
     my $maxrow = $dimap->$#*;
     my $maxcol = $dimap->[0]->$#*;
     croak "row $r out of bounds" if $r > $maxrow or $r < 0;
@@ -181,7 +214,7 @@ sub next_best {
 sub next_sq {
     my ( $self, $r, $c, $value ) = @_;
     my $dimap = $self->dimap;
-    croak "cannot pathfind on unset map" if !defined $dimap;
+    croak "dimap not set" if !defined $dimap;
     my $maxrow = $dimap->$#*;
     my $maxcol = $dimap->[0]->$#*;
     croak "row $r out of bounds" if $r > $maxrow or $r < 0;
@@ -210,7 +243,7 @@ sub next_sq {
 sub next_with {
     my ( $self, $r, $c, $param ) = @_;
     my $dimap = $self->dimap;
-    croak "cannot pathfind on unset map" if !defined $dimap;
+    croak "dimap not set" if !defined $dimap;
 
     my $badcost = $self->bad_cost;
 
@@ -250,8 +283,8 @@ sub next_with {
 # normalize_costs and used to be a method). one could possibly also
 # normalize only in the diagonal directions...
 sub norm_4way {
-    my ( $dimap, $mincost, $maxcost, $avfn ) = @_;
-    $avfn //= \&adjacent_values_sq;
+    my ( $dimap, $mincost, $maxcost, $badcost, $adjvals ) = @_;
+    $adjvals //= \&adjacent_values_sq;
     my $iters  = 0;
     my $maxrow = $dimap->$#*;
     my $maxcol = $dimap->[0]->$#*;
@@ -262,14 +295,23 @@ sub norm_4way {
         for my $r ( 0 .. $maxrow ) {
             for my $c ( 0 .. $maxcol ) {
                 my $value = $dimap->[$r][$c];
-                next if $value <= $mincost;
+                next if $value == $badcost or $value == $mincost;
+                my $isneg;
+                if ( $value < 0 ) {
+                    $isneg = 1;
+                    $value = abs $value;
+                }
                 my $best = $maxcost;
-                for my $nv ( $avfn->( $dimap, $r, $c, $maxrow, $maxcol ) ) {
-                    $best = $nv if $nv < $best and $nv >= $mincost;
+                for my $nv ( $adjvals->( $dimap, $r, $c, $maxrow, $maxcol ) ) {
+                    next if $nv == $badcost;
+                    $nv   = abs $nv;
+                    $best = $nv if $nv < $best;
                     last if $best == $mincost;
                 }
                 if ( $value >= $best + 2 ) {
-                    $dimap->[$r][$c] = $best + 1;
+                    my $newval = $best + 1;
+                    $newval *= -1 if $isneg;
+                    $dimap->[$r][$c] = $newval;
                     $stable = 0;
                 }
             }
@@ -291,7 +333,7 @@ sub norm_8way {
 # approximate diagonals costing sqrt(2) but this is more complicated,
 # which is perhaps why many roguelikes use 4-way or non-Euclidean 8-way
 sub norm_8way_euclid {
-    my ( $dimap, $mincost, $maxcost ) = @_;
+    my ( $dimap, $mincost, $maxcost, $badcost ) = @_;
     my $iters  = 0;
     my $maxrow = $dimap->$#*;
     my $maxcol = $dimap->[0]->$#*;
@@ -302,17 +344,26 @@ sub norm_8way_euclid {
         for my $r ( 0 .. $maxrow ) {
             for my $c ( 0 .. $maxcol ) {
                 my $value = $dimap->[$r][$c];
-                next if $value <= $mincost;
+                next if $value == $badcost or $value == $mincost;
+                my $isneg;
+                if ( $value < 0 ) {
+                    $isneg = 1;
+                    $value = abs $value;
+                }
                 my $best = [ $maxcost, 0 ];
                 for my $nr (
                     map( [ $_, 1 ], adjacent_values_sq( $dimap, $r, $c, $maxrow, $maxcol ) ),
                     map( [ $_, SQRT2 ], adjacent_values_diag( $dimap, $r, $c, $maxrow, $maxcol ) )
                 ) {
-                    $best = $nr if $nr->[0] < $best->[0] and $nr->[0] >= $mincost;
+                    next if $nr->[0] == $badcost;
+                    $nr->[0] = abs $nr->[0];
+                    $best = $nr if $nr->[0] < $best->[0];
                     last if $best->[0] == $mincost;
                 }
                 if ( $value > $best->[0] + SQRT2 ) {
-                    $dimap->[$r][$c] = $best->[0] + $best->[1];
+                    my $newval = $best->[0] + $best->[1];
+                    $newval *= -1 if $isneg;
+                    $dimap->[$r][$c] = $newval;
                     $stable = 0;
                 }
             }
@@ -320,6 +371,15 @@ sub norm_8way_euclid {
         last if $stable;
     }
     return $iters;
+}
+
+sub normalize {
+    my ($self) = @_;
+    my $dimap = $self->dimap;
+    croak "dimap not set" if !defined $dimap;
+    $self->_set_iters(
+        $self->normfn->( $dimap, $self->min_cost, $self->max_cost, $self->bad_cost ) );
+    return $self;
 }
 
 sub path_best {
@@ -335,16 +395,20 @@ sub path_best {
 sub recalc {
     my ($self) = @_;
     my $dimap = $self->dimap;
-    croak "cannot recalc unset map" if !defined $dimap;
+    croak "dimap not set" if !defined $dimap;
     my $maxcost = $self->max_cost;
     my $mincost = $self->min_cost;
+    my $badcost = $self->bad_cost;
     my $maxcol  = $dimap->[0]->$#*;
     for my $r ( 0 .. $dimap->$#* ) {
+
         for my $c ( 0 .. $maxcol ) {
-            $dimap->[$r][$c] = $maxcost if $dimap->[$r][$c] > $mincost;
+            $dimap->[$r][$c] = $maxcost
+              if $dimap->[$r][$c] != $mincost and $dimap->[$r][$c] != $badcost;
         }
     }
-    $self->_set_iters( $self->normfn->( $dimap, $mincost, $maxcost ) );
+    $self->_set_iters(
+        $self->normfn->( $dimap, $mincost, $maxcost, $self->bad_cost ) );
     $self->dimap($dimap);
     return $self;
 }
@@ -382,7 +446,7 @@ sub to_tsv {
 sub unconnected {
     my ($self) = @_;
     my $dimap = $self->dimap;
-    croak "nothing unconnected on unset map" if !defined $dimap;
+    croak "dimap not set" if !defined $dimap;
     my @points;
     my $maxcost = $self->max_cost;
     my $maxcol  = $dimap->[0]->$#*;
@@ -397,7 +461,7 @@ sub unconnected {
 sub update {
     my $self  = shift;
     my $dimap = $self->dimap;
-    croak "cannot update unset map" if !defined $dimap;
+    croak "dimap not set" if !defined $dimap;
     my $maxrow = $dimap->$#*;
     my $maxcol = $dimap->[0]->$#*;
     for my $ref (@_) {
@@ -414,7 +478,7 @@ sub update {
 sub values {
     my $self  = shift;
     my $dimap = $self->dimap;
-    croak "cannot get values from unset map" if !defined $dimap;
+    croak "dimap not set" if !defined $dimap;
     my @values;
     my $maxrow = $dimap->$#*;
     my $maxcol = $dimap->[0]->$#*;
@@ -492,7 +556,7 @@ Game::DijkstraMap - a numeric grid of weights plus some related functions
 
 This module implements code described by "The Incredible Power of
 Dijkstra Maps" article. Such maps have various uses in roguelikes or
-other games. This implementation may not be fast but should allow quick
+other games. This implementation is not fast but should allow for
 prototyping of map-building and path-finding exercises.
 
 L<http://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps>
@@ -518,8 +582,7 @@ reduce object construction verbosity:
 
 Cost for cells through which motion is illegal (walls, typically, though
 a map for cats may also treat water as impassable). C<INT_MIN> by
-default (previously C<-1>) and ignored when updating the map. This value
-for optimization purposes is assumed to be lower than B<min_cost>.
+default (previously C<-1>) and hopefully ignored when updating the map.
 
 =item B<costfn>
 
@@ -544,15 +607,15 @@ first e.g. with B<map> or B<str2map>.
 
 =item B<iters>
 
-This is set during the B<map> and B<recalc> method calls and indicates
-how many iterations it took the B<normfn> to stabilize the map.
+This is set during the B<normalize>, B<map>, and B<recalc> method
+calls and indicates how many iterations it took the B<normfn> to
+stabilize the map.
 
 =item B<max_cost>
 
 Cost for non-goal (B<min_cost>) non-wall (B<bad_cost>) cells. C<INT_MAX>
 by default. These are reduced to appropriate weights (steps from the
-nearest goal point) by the B<normfn> that is called by B<map> or
-B<recalc>.
+nearest goal point) by the B<normfn>.
 
 =item B<min_cost>
 
@@ -567,11 +630,12 @@ diagonal motions) but could instead be C<next_sq>.
 
 =item B<normfn>
 
-A code reference that is called during B<map> and B<recalc> to weight
-the Dijkstra Map as appropriate. The default B<norm_4way> calculates
-weights using square or 4-way motion as seen in Brogue; other roguelikes
-will need an 8-way cost function if diagonal moves are in general
-permitted; this is possible with the B<norm_8way> function:
+A code reference that is called by the B<normalize>, B<map>, and
+B<recalc> methods to weight the Dijkstra Map as appropriate. The
+default B<norm_4way> calculates weights using square or 4-way motion as
+seen in Brogue; other roguelikes will need an 8-way cost function if
+diagonal moves are in general permitted; this is possible with the
+B<norm_8way> function:
 
     Game::DijkstraMap->new(
         normfn  => \&Game::DijkstraMap::norm_8way,
@@ -588,6 +652,11 @@ when given known bad input, or when B<dimap> has not been set).
 
 =over 4
 
+=item B<clone>
+
+Clones the object by way of L<MooX::Rebuild> but also if the B<dimap> is
+set that is duplicated into the new object.
+
 =item B<dimap_with> I<param>
 
 Constructs and returns a new B<dimap> data structure ideally in
@@ -595,6 +664,21 @@ combination with one or more other Dijkstra Map objects. Cells will be
 marked as B<bad_cost> if any object lists that for the cell; otherwise
 the new values will be a weighted combination of the values for each
 cell for each object. The I<param> are the same as used by B<next_with>.
+
+=item B<each_cell> I<coderef>
+
+Calls the provided I<coderef> for each cell of the B<dimap>; the
+arguments to the I<coderef> are as shown:
+
+  $dm->each_cell(
+      sub {
+          my ( $dimap, $row, $col, $self ) = @_;
+          return if $dimap->[$row][$col] <= $self->min_cost;
+          ...
+      }
+  );
+
+The return value of the I<coderef> call is not used.
 
 =item B<map> I<map>
 
@@ -655,18 +739,27 @@ See also B<dimap_with>.
 A custom version of this method may need to be written--this
 implementation will for example not leave a local minimum point.
 
+=item B<normalize>
+
+Calls B<normfn> on the current B<dimap>. See also B<recalc>.
+
 =item B<path_best> I<row> I<col> [ I<next-method> ]
 
 Finds a best path to a goal via repeated calls to B<next> or optionally
 some other method such as C<next_sq>. Returns the path as an array
 reference of array references (a reference to a list of points).
 
+=item B<rebuild>
+
+Provided by L<MooX::Rebuild>, builds a new version of the object from
+the original arguments. See also B<clone>; B<clone> additionally
+duplicates the B<dimap> if available.
+
 =item B<recalc>
 
-Resets the weights of all non-wall non-goal cells and then calls the
-B<normfn>. See below for a discussion of B<update> and B<recalc>.
-
-Returns the object so can be chained with other calls.
+Resets the weights of all cells that are neither goals nor considered
+bad to the maximum cost and then calls the B<normfn>. See also
+B<normalize>.
 
 =item B<str2map> I<string> [ I<split-with> ]
 
@@ -731,14 +824,20 @@ and I<col>.
 Returns the values for valid cells square (4-way) to the given I<row>
 and I<col>.
 
-=item B<norm_4way> I<dimap> I<mincost> I<maxcost>
+=item B<norm_4way> I<dimap> I<mincost> I<maxcost> I<badcost>
 
-This is called by B<map> or B<recalc> via the B<normfn> attribute and
-reduces cell cost values relative to the B<min_cost> cells. Returns a
-value that is set to the B<iters> attribute. This method onlu considers
-square (4-way) moves in the compass directions and will not connect
-areas joined only by a diagonal; C<@> would not be able to reach the
-goal C<x> in the following map:
+This is called by B<normalize>, B<map>, or B<recalc> via the B<normfn>
+attribute and weights cell cost values relative to the B<min_cost>
+cells. Returns a value that is set to the B<iters> attribute.
+
+As of module version 1.04 negative values can be normalized, though
+mixing positive and negative numbers adjacent in the same map may have
+issues as only the magnitude of the number is considered when searching
+for the best cost.
+
+This method onlu considers square (4-way) moves in the compass
+directions and will not connect areas joined only by a diagonal; C<@>
+would not be able to reach the goal C<x> in the following map:
 
   ######
   #@.#x#
@@ -749,12 +848,12 @@ goal C<x> in the following map:
 The B<next> method is able to walk diagonal paths but only where a
 adjacent square cell was available during B<norm_4way>.
 
-=item B<norm_8way> I<dimap> I<mincost> I<maxcost>
+=item B<norm_8way> I<dimap> I<mincost> I<maxcost> I<badcost>
 
 Like B<norm_4way> though assigns the same cost to all surrounding cells.
 Should allow for diagonal path finding.
 
-=item B<norm_8way_euclid> I<dimap> I<mincost> I<maxcost>
+=item B<norm_8way_euclid> I<dimap> I<mincost> I<maxcost> I<badcost>
 
 A more complicated version of B<norm_8way> that tries to assign a cost
 of C<sqrt(2)> to diagonals instead of the more typical non-Euclidean

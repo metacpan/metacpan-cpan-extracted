@@ -10,7 +10,7 @@ requires 'setup_injected_component',
   'setup_injected_components',
   'config_for';
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 my $adaptor_namespace = sub {
   my $app = shift;
@@ -195,7 +195,7 @@ Use the plugin in your application class:
           adaptor=>'Application', 
           method=>sub {
             my ($adaptor_instance, $from_class, $app, %args) = @_;
-            return $class->new(aaa=>$args{arg});
+            return $from_class->new(aaa=>$args{arg});
         },
         arg => 300,
       },
@@ -549,19 +549,19 @@ context object as it leads to unnecessary tight coupling.
 
 =item $req
 
-The result of C<$c->req>
+The result of C<< $c->req >>
 
 =item $res
 
-The result of C<$c->res>
+The result of C<< $c->res >>
 
 =item $log
 
-The result of C<$c->log>
+The result of C<< $c->log >>
 
 =item $user
 
-The result of C<$c->user> (if it exists, you should either define it or
+The result of C<< $c->user >> (if it exists, you should either define it or
 use the Authentication plugin).
 
 =back
@@ -603,6 +603,57 @@ Allows you to add to the default dependency injection handers:
 
 Default is 2.  Set to 1 if you are need compatibility version 0.011 or older
 style of arguments for 'method' and 'from_code'.
+
+=head1 Catalyst::Plugin::ConfigLoader
+
+When using this plugin with L<Catalyst::Plugin::ConfigLoader> you should add it to the
+plugin list afterward, for example:
+
+    package MyApp;
+
+    use Catalyst 'ConfigLoader', 
+      'InjectionHelpers';
+
+Please keep in mind that due to the way Configloader merges the configuration files
+you might have to set some things to C<undef> in order to get the correct behavior.  For
+example you might define a model by default using from_code:
+
+    package MyApp;
+
+    use Catalyst 'ConfigLoader', 
+      'InjectionHelpers';
+
+    MyApp->config(
+      'Model::Foo' => {
+        -inject => {
+          from_code => sub {
+            my ($app, %args) = @_;
+            return bless +{ %args, app=>$app }, 'Dummy1';
+          },
+        },
+        bar => 'baz',
+      },
+    );
+
+    MyApp->setup;
+
+But then in youe configuration file overlay, you want to specify a class.  In that case you
+will need to undefine the default keys:
+
+    # File:myapp_local.pl
+    return +{
+      'Model::Foo' => {
+        -inject => {
+          from_class => 'MyApp::Dummy2',
+          from_code => undef, # Need to blow away the existing...
+        },
+      },
+    };
+
+Its probably not ideal that the configuration overlay doesn't permit you to tag refs as 'replace'
+rather than 'merge' but this is not a problem with this plugin.  If it bothers you that a
+configuration overlay would require to have understanding of how 'lower' configurations are setup
+you should be able to avoid it by using all the same keys.
 
 =head1 PRIOR ART
 

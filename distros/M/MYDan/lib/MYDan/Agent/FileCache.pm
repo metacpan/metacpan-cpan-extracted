@@ -54,6 +54,35 @@ sub save
     return $md5;
 }
 
+sub fastsave
+{
+    my ( $this, $file, $md5 ) = @_;
+
+    my $path = $this->{path};
+    return 0 unless -e $path && defined $file &&  -f $file;
+
+    $this->_clean();
+
+    my $tempmd5 = Digest::MD5->new()->add( $file.time,$$ )->hexdigest();
+    
+    my @dev = map{ (stat $_)[0] }( $file, $path );
+    my $cp = $dev[0] eq $dev[1] ? 'ln' : 'cp';
+    die "save fail: $!" if system "$cp '$file' '$path/$tempmd5.tmp'";
+
+    unless( $md5 )
+    {
+        open my $fh, "<$path/$tempmd5.tmp" or die "open fail: $!";
+        $md5 = Digest::MD5->new()->addfile( $fh )->hexdigest();
+        close $fh;
+    }
+
+    die "save fail: $!" if system "mv '$path/$tempmd5.tmp' '$path/$md5'";
+    
+    return $md5;
+}
+
+
+
 sub check
 {
     my ( $this, $md5 ) = @_;
@@ -96,6 +125,12 @@ sub _clean
     }
 
     return;
+}
+
+sub usable
+{
+    my $this = shift;
+    return -e $this->{path} ? 1 : 0;
 }
 
 1;

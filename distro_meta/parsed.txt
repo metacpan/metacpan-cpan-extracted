@@ -52658,3 +52658,15 @@ D/DA/DANBERR/Sys-Virt-v5.0.0.tar.gz
 E/EG/EGAWATA/Teng-Plugin-TmpSuppressRowObjects-0.04.tar.gz
 B/BA/BALAJIRAM/Text-Parser-0.803.tar.gz
 L/LA/LARION/WWW-Google-Cloud-Auth-ServiceAccount-1.000002.tar.gz
+J/JJ/JJNAPIORK/Catalyst-Plugin-InjectionHelpers-0.013.tar.gz
+G/GO/GONCALES/Catalyst-Model-MongoDB-0.14.tar.gz
+P/PR/PRBRENAN/Data-Edit-Xml-20190124.tar.gz
+W/WO/WORTHMINE/Date-Cutoff-JP-0.03.tar.gz
+J/JO/JONASBN/Date-Holidays-1.18.tar.gz
+G/GU/GUILLEM/Dpkg-1.19.3.tar.gz
+J/JM/JMATES/Game-DijkstraMap-1.04.tar.gz
+I/IV/IVANWILLS/Group-Git-v0.7.0.tar.gz
+M/MA/MARIOROY/MCE-1.838.tar.gz
+L/LI/LIJINFENG/MYDan-0.1.56.tar.gz
+Z/ZD/ZDM/Pcore-CDN-Static-v0.2.14.tar.gz
+R/RE/RENEEB/Perl-Critic-OTRS-0.09.tar.gz

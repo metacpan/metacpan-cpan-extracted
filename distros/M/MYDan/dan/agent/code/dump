@@ -22,7 +22,8 @@ my $unlink = sub { unlink shift; print shift; exit 1 };
 &$idie( "MYDanExtractFile undef" ) unless my $MYDanExtractFile = $ENV{MYDanExtractFile};
 
 my $do = 1;
-if( -f $path )
+my $filecache = MYDan::Agent::FileCache->new();
+if( $filecache->usable() && -f $path )
 {
     open my $fh, "<$path" or &$idie( "Open file fail: $!" );
     my $md5 = Digest::MD5->new()->addfile( $fh )->hexdigest;
@@ -54,7 +55,7 @@ if( $do )
     &$idie( 'param error' ) unless defined $conf->{md5} && $path;
     &$idie( "get $conf->{chown} uid fail" ) if $conf->{chown} && ! ( my @pw = getpwnam $conf->{chown} );
 
-    &$unlink( $temp, "copy fail: $!" ) if system "cp '$MYDanExtractFile' '$temp'";
+    &$unlink( $temp, "save fail: $!" ) if system "mv '$MYDanExtractFile' '$temp'";
     open my $fh, "<$temp" or &$idie( "Open MYDanExtractFile fail: $!" );
     my $md5 = Digest::MD5->new()->addfile( $fh )->hexdigest;
     close $fh;
@@ -74,10 +75,7 @@ if( $do )
     &$unlink( $temp, 'dst path error' )  if -e $path && ! -f $path;
     &$unlink( $temp, 'rename fail' ) if system "mv '$temp' '$path'";
 
-    eval{ 
-        my $filecache = MYDan::Agent::FileCache->new();
-        $filecache->save( $path ) unless $filecache->check( $md5 ); 
-    };
+    eval{ $filecache->save( $path ) unless $filecache->check( $md5 ); };
     print "filecache save fail:$@" if $@;
 }
 

@@ -15,6 +15,7 @@ cpanfile.snapshot
 dist.ini
 lib/Date/Holidays.pm
 lib/Date/Holidays/Adapter.pm
+lib/Date/Holidays/Adapter/AT.pm
 lib/Date/Holidays/Adapter/AU.pm
 lib/Date/Holidays/Adapter/BR.pm
 lib/Date/Holidays/Adapter/BY.pm

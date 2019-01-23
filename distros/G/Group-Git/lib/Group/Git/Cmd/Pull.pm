@@ -16,7 +16,7 @@ use File::chdir;
 use Path::Tiny;
 use Getopt::Alt;
 
-our $VERSION = version->new('0.6.10');
+our $VERSION = version->new('0.7.0');
 
 requires 'repos';
 requires 'verbose';
@@ -126,7 +126,7 @@ Group::Git::Cmd::Pull - Pull latest versions of all repositories or clone any th
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::Pull version 0.6.10.
+This documentation refers to Group::Git::Cmd::Pull version 0.7.0.
 
 =head1 SYNOPSIS
 

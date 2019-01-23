@@ -1,23 +1,27 @@
 Revision history for Catalyst-Model-MongoDB
 
-0.13      2015-10-27
-	- Fix test count
-        - Make compatible with MongoDB >= v 1.0 (ZARQUON)
+0.14	2019-01-23
+		- Fix connection with MongoDB::MongoClient > v 1.0 (GONCALES)
+		- Add VERSION inside the module
 
-0.12      2013-09-20 22:36:40 Asia/Tokyo
-        - Support find_master, so you can actually use replica sets properly. (Matthew Keller)
+0.13	2015-10-27
+		- Fix test count
+		- Make compatible with MongoDB >= v 1.0 (ZARQUON)
 
-0.11      2013-09-20 17:10:37 Asia/Tokyo
-        - Changed to use MongoDB::MongoClient as MongoDB::Connection is deprecated (roman3legs)
+0.12	2013-09-20 22:36:40 Asia/Tokyo
+		- Support find_master, so you can actually use replica sets properly. (Matthew Keller)
 
-0.10      2011-04-30 16:41:54 America/Chicago
-	- Turns out I can't spell; fixed that.
+0.11	2013-09-20 17:10:37 Asia/Tokyo
+		- Changed to use MongoDB::MongoClient as MongoDB::Connection is deprecated (roman3legs)
 
-0.09      2011-04-30 13:09:21 America/Chicago
+0.10	2011-04-30 16:41:54 America/Chicago
+		- Turns out I can't spell; fixed that.
 
-0.08      2013-09-20 16:46:27 Asia/Tokyo
-	- Added functionality for authenticating (setting username and password) and setting the db_name value which didnt exist (magnachef)
+0.09	2011-04-30 13:09:21 America/Chicago
 
-0.07      2010-12-08 02:19:02 Europe/Berlin
-	- Switched to Dist::Zilla
-	- Actually started a Changes file
+0.08	2013-09-20 16:46:27 Asia/Tokyo
+		- Added functionality for authenticating (setting username and password) and setting the db_name value which didnt exist (magnachef)
+
+0.07	2010-12-08 02:19:02 Europe/Berlin
+		- Switched to Dist::Zilla
+		- Actually started a Changes file

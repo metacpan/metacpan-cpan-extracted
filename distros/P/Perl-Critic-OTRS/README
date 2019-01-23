@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.08
+    version 0.09
 
 SYNOPSIS
 
@@ -71,7 +71,7 @@ ACKNOWLEDGMENTS
 
 AUTHOR
 
-    Renee Baecker <module@renee-baecker.de>
+    Renee Baecker <info@perl-services.de>
 
 COPYRIGHT AND LICENSE
 

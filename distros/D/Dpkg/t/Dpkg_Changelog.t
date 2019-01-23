@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 96;
+use Test::More tests => 102;
 use Test::Dpkg qw(:paths);
 
 use File::Basename;
@@ -36,14 +36,12 @@ my $vendor = get_current_vendor();
 #########################
 
 foreach my $file ("$datadir/countme", "$datadir/shadow", "$datadir/fields",
-    "$datadir/regressions", "$datadir/date-format") {
+    "$datadir/regressions", "$datadir/date-format", "$datadir/stop-modeline") {
 
     my $changes = Dpkg::Changelog::Debian->new(verbose => 0);
     $changes->load($file);
 
-    open(my $clog_fh, '<', "$file") or die "can't open $file\n";
-    my $content = file_slurp($clog_fh);
-    close($clog_fh);
+    my $content = file_slurp($file);
     cmp_ok($content, 'eq', "$changes", "string output of Dpkg::Changelog on $file");
 
     my $errors = $changes->get_parse_errors();
@@ -345,6 +343,10 @@ Xb-Userfield2: foobar
            'get date w/ DoW, and positive timezone offset');
         is($data[2]->get_timestamp(), 'Mon, 01 Jan 2000 00:00:00 +0000',
            'get date w/ DoW, and zero timezone offset');
+    }
+    if ($file eq "$datadir/stop-modeline") {
+        is($changes->get_unparsed_tail(), "vim: et\n",
+           'get unparsed modeline at EOF');
     }
     if ($file eq "$datadir/regressions") {
 	my $f = ($changes->format_range('dpkg'))[0];

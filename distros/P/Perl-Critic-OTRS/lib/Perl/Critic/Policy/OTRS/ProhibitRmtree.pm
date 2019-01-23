@@ -10,7 +10,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :severities :classification :ppi };
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 Readonly::Scalar my $DESC => q{ ERROR: Don't use File::Path::rmtree(). };
 Readonly::Scalar my $EXPL => q{ It is obsolete and not thread safe in some versions of perl. Use File::Path::remove_tree() instead.' };
@@ -44,11 +44,17 @@ Perl::Critic::Policy::OTRS::ProhibitRmtree - Do not use File::Path's rmtree
 
 =head1 VERSION
 
-version 0.08
+version 0.09
+
+=head1 METHODS
+
+=head2 supported_parameters
+
+There are no supported parameters.
 
 =head1 AUTHOR
 
-Renee Baecker <module@renee-baecker.de>
+Renee Baecker <info@perl-services.de>
 
 =head1 COPYRIGHT AND LICENSE
 

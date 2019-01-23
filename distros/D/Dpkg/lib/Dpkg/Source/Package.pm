@@ -34,7 +34,7 @@ is the one that supports the extraction of the source package.
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 our @EXPORT_OK = qw(
     get_default_diff_ignore_regex
     set_default_diff_ignore_regex
@@ -166,12 +166,15 @@ sub get_default_tar_ignore_pattern {
 
 =over 4
 
-=item $p = Dpkg::Source::Package->new(filename => $dscfile, options => {})
+=item $p = Dpkg::Source::Package->new(%opts, options => {})
 
-Creates a new object corresponding to the source package described
-by the file $dscfile.
+Creates a new object corresponding to a source package. When the key
+B<filename> is set to a F<.dsc> file, it will be used to initialize the
+source package with its description. Otherwise if the B<format> key is
+set to a valid value, the object will be initialized for that format
+(since dpkg 1.19.3).
 
-The options hash supports the following options:
+The B<options> key is a hash ref which supports the following options:
 
 =over 8
 
@@ -210,6 +213,7 @@ sub new {
     my $class = ref($this) || $this;
     my $self = {
         fields => Dpkg::Control->new(type => CTRL_PKG_SRC),
+        format => Dpkg::Source::Format->new(),
         options => {},
         checksums => Dpkg::Checksums->new(),
     };
@@ -219,6 +223,10 @@ sub new {
     }
     if (exists $args{filename}) {
         $self->initialize($args{filename});
+        $self->init_options();
+    } elsif ($args{format}) {
+        $self->{fields}{Format} = $args{format};
+        $self->upgrade_object_type(0);
         $self->init_options();
     }
     return $self;
@@ -262,9 +270,8 @@ sub initialize {
     $self->{filename} = $fn;
 
     # Read the fields
-    my $fields = Dpkg::Control->new(type => CTRL_PKG_SRC);
+    my $fields = $self->{fields};
     $fields->load($filename);
-    $self->{fields} = $fields;
     $self->{is_signed} = $fields->get_option('is_pgp_signed');
 
     foreach my $f (qw(Source Version Files)) {
@@ -281,41 +288,28 @@ sub initialize {
 sub upgrade_object_type {
     my ($self, $update_format) = @_;
     $update_format //= 1;
-    $self->{fields}{'Format'} //= '1.0';
-    my $format = $self->{fields}{'Format'};
 
-    if ($format =~ /^([\d\.]+)(?:\s+\((.*)\))?$/) {
-        my ($version, $variant) = ($1, $2);
+    my $format = $self->{fields}{'Format'} // '1.0';
+    my ($major, $minor, $variant) = $self->{format}->set($format);
 
-        if (defined $variant and $variant ne lc $variant) {
-            error(g_("source package format '%s' is not supported: %s"),
-                  $format, g_('format variant must be in lowercase'));
-        }
-
-        my $major = $version =~ s/\.[\d\.]+$//r;
-        my $minor;
-
-        my $module = "Dpkg::Source::Package::V$major";
-        $module .= '::' . ucfirst $variant if defined $variant;
-        eval qq{
-            pop \@INC if \$INC[-1] eq '.';
-            require $module;
-            \$minor = \$${module}::CURRENT_MINOR_VERSION;
-        };
-        $minor //= 0;
-        if ($update_format) {
-            $self->{fields}{'Format'} = "$major.$minor";
-            $self->{fields}{'Format'} .= " ($variant)" if defined $variant;
-        }
-        if ($@) {
-            error(g_("source package format '%s' is not supported: %s"),
-                  $format, $@);
-        }
-        $module->prerequisites() if $module->can('prerequisites');
-        bless $self, $module;
-    } else {
-        error(g_("invalid Format field '%s'"), $format);
+    my $module = "Dpkg::Source::Package::V$major";
+    $module .= '::' . ucfirst $variant if defined $variant;
+    eval qq{
+        pop \@INC if \$INC[-1] eq '.';
+        require $module;
+        \$minor = \$${module}::CURRENT_MINOR_VERSION;
+    };
+    if ($@) {
+        error(g_("source package format '%s' is not supported: %s"),
+              $format, $@);
     }
+    if ($update_format) {
+        $self->{format}->set_from_parts($major, $minor, $variant);
+        $self->{fields}{'Format'} = $self->{format}->get();
+    }
+
+    $module->prerequisites() if $module->can('prerequisites');
+    bless $self, $module;
 }
 
 =item $p->get_filename()
@@ -549,10 +543,7 @@ sub extract {
         my $format_file = File::Spec->catfile($srcdir, 'format');
 	unless (-e $format_file) {
 	    mkdir($srcdir) unless -e $srcdir;
-	    open(my $format_fh, '>', $format_file)
-	        or syserr(g_('cannot write %s'), $format_file);
-	    print { $format_fh } $self->{fields}{'Format'} . "\n";
-	    close($format_fh);
+            $self->{format}->save($format_file);
 	}
     }
 
@@ -670,6 +661,10 @@ sub write_dsc {
 =back
 
 =head1 CHANGES
+
+=head2 Version 1.03 (dpkg 1.19.3)
+
+New option: format in new().
 
 =head2 Version 1.02 (dpkg 1.18.7)
 

@@ -62,6 +62,7 @@ lib/Dpkg/Shlibs/Symbol.pm
 lib/Dpkg/Shlibs/SymbolFile.pm
 lib/Dpkg/Source/Archive.pm
 lib/Dpkg/Source/BinaryFiles.pm
+lib/Dpkg/Source/Format.pm
 lib/Dpkg/Source/Functions.pm
 lib/Dpkg/Source/Package.pm
 lib/Dpkg/Source/Package/V1.pm
@@ -94,6 +95,7 @@ t/Dpkg_Build_Env.t
 t/Dpkg_Build_Info.t
 t/Dpkg_Build_Types.t
 t/Dpkg_BuildFlags.t
+t/Dpkg_BuildFlags_Ubuntu.t
 t/Dpkg_BuildOptions.t
 t/Dpkg_BuildProfiles.t
 t/Dpkg_Changelog.t
@@ -103,6 +105,7 @@ t/Dpkg_Changelog/fields
 t/Dpkg_Changelog/misplaced-tz
 t/Dpkg_Changelog/regressions
 t/Dpkg_Changelog/shadow
+t/Dpkg_Changelog/stop-modeline
 t/Dpkg_Changelog/unreleased
 t/Dpkg_Changelog_Ubuntu.t
 t/Dpkg_Checksums.t
@@ -185,6 +188,7 @@ t/Dpkg_Shlibs/symbols.include-2
 t/Dpkg_Shlibs/symbols.include-3
 t/Dpkg_Shlibs_Cppfilt.t
 t/Dpkg_Source_Archive.t
+t/Dpkg_Source_Format.t
 t/Dpkg_Source_Functions.t
 t/Dpkg_Source_Package.t
 t/Dpkg_Source_Patch.t
@@ -213,6 +217,7 @@ t/po.t
 t/pod-coverage.t
 t/pod-spell.t
 t/pod.t
+t/shellcheck.t
 t/strict.t
 t/synopsis.t
 t/syntax.t

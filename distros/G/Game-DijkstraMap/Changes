@@ -1,5 +1,11 @@
 See also the git repository.
 
+1.04    lunes, 21 de enero de 2019
+        Add clone(), each_cell(), rebuild() methods. norm_*way* can now
+        normalize negative values, for better or worse. Add a
+        normalize() method (a less scorched-earth form of recalc()).
+        More tests, docs, and fewer buggy tests.
+
 1.02    2019-01-19
         Logic fix on cost calculation.
 

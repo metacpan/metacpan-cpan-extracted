@@ -10,7 +10,7 @@ use base 'Perl::Critic::Policy';
 
 use Readonly;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 Readonly::Scalar my $DESC => q{Use of "push @ISA, ..." is not allowed};
 Readonly::Scalar my $EXPL => q{Use RequireBaseClass method of MainObject instead.};
@@ -55,11 +55,17 @@ Perl::Critic::Policy::OTRS::ProhibitPushISA - Do not use "push @ISA, ..."
 
 =head1 VERSION
 
-version 0.08
+version 0.09
+
+=head1 METHODS
+
+=head2 supported_parameters
+
+There are no supported parameters.
 
 =head1 AUTHOR
 
-Renee Baecker <module@renee-baecker.de>
+Renee Baecker <info@perl-services.de>
 
 =head1 COPYRIGHT AND LICENSE
 

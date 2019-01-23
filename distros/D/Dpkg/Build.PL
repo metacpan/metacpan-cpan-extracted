@@ -17,12 +17,6 @@ if (-e 'Build.PL.in') {
 my $class = Module::Build->subclass(
     class => 'Module::Build::Dpkg',
     code => q{
-        BEGIN {
-            $ENV{DPKG_TEST_MODE} = 'cpan';
-            $ENV{DPKG_DATADIR} = 'data';
-            $ENV{DPKG_ORIGINS_DIR} = 't/origins';
-        }
-
         sub subst {
             my ($self, $file) = @_;
             my $path = $self->install_path();
@@ -52,13 +46,23 @@ my $class = Module::Build->subclass(
             $self->SUPER::ACTION_build;
             $self->subst('lib/Dpkg.pm');
         }
+        sub ACTION_test {
+            my $self = shift;
+
+            local $ENV{LANG} = 'C';
+            local $ENV{LC_ALL} = 'C';
+            local $ENV{DPKG_TEST_MODE} = 'cpan';
+            local $ENV{DPKG_DATADIR} = 'data';
+            local $ENV{DPKG_ORIGINS_DIR} = 't/origins';
+            $self->SUPER::ACTION_test;
+        }
     },
 );
 
 my $build = $class->new(
     dist_name       => 'Dpkg',
     dist_abstract   => 'Debian Package Manager Perl modules',
-    dist_version    => '1.19.2',
+    dist_version    => '1.19.3',
     dist_author     => 'Dpkg Developers <debian-dpkg@lists.debian.org>',
     license         => 'GPL_2',
 

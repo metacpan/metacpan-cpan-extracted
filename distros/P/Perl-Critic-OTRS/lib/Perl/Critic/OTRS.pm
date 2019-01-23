@@ -5,7 +5,7 @@ use strict;
 
 # ABSTRACT: A collection of handy Perl::Critic policies
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 
 1; # End of Perl::Critic::OTRS
@@ -22,7 +22,7 @@ Perl::Critic::OTRS - A collection of handy Perl::Critic policies
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,7 @@ Thanks to
 
 =head1 AUTHOR
 
-Renee Baecker <module@renee-baecker.de>
+Renee Baecker <info@perl-services.de>
 
 =head1 COPYRIGHT AND LICENSE
 

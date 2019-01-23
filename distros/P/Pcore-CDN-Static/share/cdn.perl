@@ -109,7 +109,7 @@
 
     # amCharts4 geodata
     amcharts4_geodata => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.0.27 );
+        my $ver = version->parse( $args->{ver} // v4.0.29 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4/geodata';
 
@@ -142,9 +142,6 @@
             # push @res, $cdn->get_script_tag( $cdn->("/static/extjs/$ver/packages/ux/$framework/ux$debug.js") );
 
             # theme
-            # TODO default theme
-            $args->{theme} = $args->{default_theme} if 0;
-
             push @res, $cdn->get_css_tag( $cdn->("/static/extjs/$ver/$args->{type}/theme-$args->{theme}/resources/theme-$args->{theme}-all$debug.css") );
             push @res, $cdn->get_script_tag( $cdn->("/static/extjs/$ver/$args->{type}/theme-$args->{theme}/theme-$args->{theme}$debug.js") );
 
@@ -164,7 +161,7 @@
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (34)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (33)                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
