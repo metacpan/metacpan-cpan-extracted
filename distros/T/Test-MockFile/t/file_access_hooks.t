@@ -48,5 +48,11 @@ package main;
 
 is( open( my $fh, '<&STDIN' ), 1, "open STDIN isn't an error" );
 
-#diag "$!";
+my ( $fh_temp, $file_on_disk ) = tempfile();
+print {$fh_temp} "a" x 4096 . "\n";
+$fh_temp->flush;
+my @stat = stat($fh_temp);
+is( $stat[7], 4097, "Stat on a file handle which didn't get filtered through MockFile works without a die" )
+  or diag explain \@stat;
+
 done_testing();

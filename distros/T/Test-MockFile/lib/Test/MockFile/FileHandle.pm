@@ -24,7 +24,7 @@ Test::MockFile::FileHandle - Provides a class for L<Test::MockFile> to tie to on
 
 =head1 VERSION
 
-Version 0.017
+Version 0.018
 
 =cut
 
@@ -173,7 +173,7 @@ tell is updated after the line is read. undef is returned if tell is already at 
 
 =cut
 
-sub READLINE {
+sub _READLINE_ONE_LINE {
     my ($self) = @_;
 
     my $tell     = $self->{'tell'};
@@ -187,7 +187,26 @@ sub READLINE {
 
     my $str = substr( $self->{'data'}->{'contents'}, $tell, $new_tell - $tell );
     $self->{'tell'} = $new_tell;
+
     return $str;
+}
+
+sub READLINE {
+    my ($self) = @_;
+
+    return if $self->EOF;
+
+    if (wantarray) {
+        my @all;
+        my $line = _READLINE_ONE_LINE($self);
+        while ( defined $line ) {
+            push @all, $line;
+            $line = _READLINE_ONE_LINE($self);
+        }
+        return @all;
+    }
+
+    return _READLINE_ONE_LINE($self);
 }
 
 =head2 GETC

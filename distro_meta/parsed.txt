@@ -52686,3 +52686,6 @@ M/MA/MATY/PMLTQ-Commands-2.0.2.tar.gz
 G/GI/GIBUS/RT-Extension-ConditionalCustomFields-0.15.tar.gz
 H/HI/HIROSE/Sys-PageCache-0.06.tar.gz
 M/MA/MANWAR/WWW-Google-Places-0.34.tar.gz
+G/GR/GRYPHON/Bot-IRC-1.23.tar.gz
+S/ST/STRO/CPAN-SQLite-0.216.tar.gz
+T/TO/TODDR/Test-MockFile-0.018.tar.gz

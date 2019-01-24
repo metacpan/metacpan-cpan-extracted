@@ -43,11 +43,11 @@ Test::MockFile - Allows tests to validate code that can interact with files with
 
 =head1 VERSION
 
-Version 0.017
+Version 0.018
 
 =cut
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 our %files_being_mocked;
 
@@ -470,7 +470,7 @@ sub _mock_stat {
 
     my $file_data = _get_file_object($file);
     if ( !$file_data ) {
-        _real_file_access_hook( $type, [$file_or_fh] );
+        _real_file_access_hook( $type, [$file_or_fh] ) unless ref $file_or_fh;
         return FALLBACK_TO_REAL_OP();
     }
 
@@ -604,6 +604,19 @@ sub contents {
     }
 
     return $self->{'contents'};
+}
+
+=head2 filename
+
+The name of the file this mock object is controlling.
+
+=cut
+
+sub filename {
+    my ($self) = @_;
+    $self or die("filename is a method");
+
+    return $self->{'file_name'};
 }
 
 =head2 unlink
@@ -1073,7 +1086,7 @@ BEGIN {
         # This is how we tell if the file is open by something.
 
         $mock_file->{'fh'} = $_[0];
-        Scalar::Util::weaken( $_[0] );    # Will this make it go out of scope?
+        Scalar::Util::weaken( $mock_file->{'fh'} ) if ref $_[0];    # Will this make it go out of scope?
 
         # Fix tell based on open options.
         if ( $mode eq '>>' or $mode eq '+>>' ) {
@@ -1159,7 +1172,7 @@ BEGIN {
 
         # This is how we tell if the file is open by something.
         $files_being_mocked{$abs_path}->{'fh'} = $_[0];
-        Scalar::Util::weaken( $_[0] );    # Will this make it go out of scope?
+        Scalar::Util::weaken( $files_being_mocked{$abs_path}->{'fh'} ) if ref $_[0];    # Will this make it go out of scope?
 
         # O_TRUNC
         if ( $sysopen_mode & O_TRUNC ) {

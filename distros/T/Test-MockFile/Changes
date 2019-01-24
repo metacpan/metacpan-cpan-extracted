@@ -1,5 +1,11 @@
 Revision history for Test-MockFile
 
+0.018
+ - Properly handle open and sysopen file handles going out of scope.
+ - Provide a helper method to mock objects to determine the file name. GH #31
+ - Do not throw a file access hook when statting a file handle that is not under MockFile control. GH #30
+ - Read multiple lines via readline when wantarray is true. GH #29
+
 0.017
  - Require a newer Test2::Bundle::Extended (0.000084) to support named isa_ok
 

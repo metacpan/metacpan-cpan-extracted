@@ -14,7 +14,7 @@ use Date::Format 'time2str';
 use Encode 'encode';
 use Try::Tiny;
 
-our $VERSION = '1.22'; # VERSION
+our $VERSION = '1.23'; # VERSION
 
 sub new {
     my $class = shift;
@@ -477,10 +477,10 @@ sub hooks {
 }
 
 sub helps {
-    my $self = shift;
+    my ( $self, @input ) = @_;
 
     try {
-        $self->{helps} = { %{ $self->{helps} }, @_ };
+        $self->{helps} = { %{ $self->{helps} }, @input };
     }
     catch {
         $self->note('Plugin helps called but not properly implemented');
@@ -656,7 +656,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC)

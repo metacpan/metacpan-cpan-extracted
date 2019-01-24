@@ -1,5 +1,8 @@
 Revision history for Perl extension CPAN::SQLite.
 
+0.216 Jan 24, 2019
+  - Fixed test problems in Perl 5.8
+
 0.215 Jan 23, 2019
   - Weaken some references to avoid memory leaks
 

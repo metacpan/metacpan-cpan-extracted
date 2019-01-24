@@ -1,5 +1,9 @@
 Revision history for Bot::IRC
 
+1.23      2019-01-24 12:42:33-08:00 America/Los_Angeles
+        - Fix for bot help topics listing display
+        - Uprade TravisCD Perl test version head
+
 1.22      2018-10-01 16:30:33-07:00 America/Los_Angeles
         - POD error correction; spotted by Ralf (Thanks!)
 

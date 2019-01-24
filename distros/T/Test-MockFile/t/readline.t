@@ -3,7 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::Bundle::Extended;
+use Test2::Tools::Explain;
+use Test2::Plugin::NoWarnings;
+
 use Errno qw/ENOENT EBADF/;
 
 use File::Temp qw/tempfile/;
@@ -36,7 +39,7 @@ my $bar = Test::MockFile->file( $filename, "abc\ndef\nghi\n" );
 
 is( open( my $fh, '<', $filename ), 1, "Mocked temp file opens and returns true" );
 
-isa_ok( $fh, "IO::File", '$fh is a IO::File' );
+isa_ok( $fh, ["IO::File"], '$fh is a IO::File' );
 like( "$fh", qr/^IO::File=GLOB\(0x[0-9a-f]+\)$/, '$fh stringifies to a IO::File GLOB' );
 is( <$fh>, "abc\n", '1st read on $fh is "abc\n"' );
 
@@ -113,5 +116,13 @@ sub slurp {
     is( slurp(), $mock_multiline, "MOCK multiline do slurp works" );
 }
 
-done_testing();
+{
+    note "readline array.";
+    my $baz = Test::MockFile->file( $filename, $multiline );
+    open( my $fh, '<', $filename );
+    my @read = <$fh>;
+    is( \@read, [ "abc\n", "def\n", "ghi\r\n", "dhdbhjdb\r" ], "readline reads in an array of stuff." );
+}
 
+done_testing();
+exit;

@@ -11,10 +11,12 @@ README
 t/00-load.t
 t/file_access_hooks.t
 t/file_from_disk.t
+t/filename.t
 t/goto_is_available.t
 t/manifest.t
 t/mkdir.t
 t/mock_stat.t
+t/open-noclose.t
 t/open.t
 t/opendir.t
 t/pod-coverage.t

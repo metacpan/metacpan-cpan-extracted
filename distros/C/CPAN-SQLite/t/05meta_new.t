@@ -1,4 +1,4 @@
-# $Id: 05meta_new.t 71 2019-01-15 01:46:34Z stro $
+# $Id: 05meta_new.t 76 2019-01-24 19:50:04Z stro $
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ $ENV{'CPAN_SQLITE_DOWNLOAD'} = $ENV{'CPAN_SQLITE_DOWNLOAD_URL'} = undef;
 my $cwd = cwd;
 my $path_sep = $Config{path_sep} || ':';
 $ENV{PERL5LIB} = join $path_sep,
-  (File::Spec->catdir($cwd, qw(t dot-cpan)), map { File::Spec->catdir($cwd, 'blib', $_) } qw(arch lib)), $ENV{PERL5LIB} // '';
+  (File::Spec->catdir($cwd, qw(t dot-cpan)), map { File::Spec->catdir($cwd, 'blib', $_) } qw(arch lib)), $ENV{PERL5LIB} || '';
 
 # so that a real $HOME/.cpan isn't used
 $ENV{HOME} = File::Spec->catdir($cwd, qw(t dot-cpan));

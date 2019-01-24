@@ -1,10 +1,10 @@
-# $Id: Info.pm 73 2019-01-23 22:29:38Z stro $
+# $Id: Info.pm 76 2019-01-24 19:50:04Z stro $
 
 package CPAN::SQLite::Info;
 use strict;
 use warnings;
 
-our $VERSION = '0.215';
+our $VERSION = '0.216';
 
 use English qw/-no_match_vars/;
 
@@ -196,7 +196,7 @@ CPAN::SQLite::Info - extract information from CPAN indices
 
 =head1 VERSION
 
-version 0.215
+version 0.216
 
 =head1 DESCRIPTION
 
