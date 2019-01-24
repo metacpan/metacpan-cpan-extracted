@@ -21,4 +21,4 @@ no_index:
     - inc
 requires:
   Pod::Usage: '1.36'
-version: '0.05'
+version: '0.06'

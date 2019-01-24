@@ -1,5 +1,5 @@
 {
-   "abstract" : "Main module of dctpp",
+   "abstract" : "Main module for dctpp CLI tool",
    "author" : [
       "Pavel Serikov <pavelsr@cpan.org>"
    ],
@@ -24,10 +24,13 @@
             "Data::Dumper" : "0",
             "Exporter" : "0",
             "File::Slurp" : "0",
+            "Getopt::Long::Descriptive" : "0",
             "List::Util" : "0",
             "Math::Round" : "0",
             "MetaCPAN::Client" : "0",
-            "Module::CoreList" : "0"
+            "Module::CoreList" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
@@ -42,7 +45,7 @@
          "web" : "https://github.com/pavelsr/Devel-CallTrace-PP"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
 }
 

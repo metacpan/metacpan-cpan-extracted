@@ -1,4 +1,4 @@
-# $Id: TestShellDiag.pm 69 2019-01-04 00:24:35Z stro $
+# $Id: TestShellDiag.pm 71 2019-01-15 01:46:34Z stro $
 
 package TestShellDiag;
 use strict;
@@ -14,9 +14,9 @@ use CPAN;
 $CPAN::FrontEnd = 'TestShellDiag';
 
 sub myprint {
-    return Test::More::diag(splice(@_, 1));
+  return Test::More::diag(splice(@_, 1));
 }
 
 sub mywarn {
-    return Test::More::diag(splice(@_, 1));
+  return Test::More::diag(splice(@_, 1));
 }

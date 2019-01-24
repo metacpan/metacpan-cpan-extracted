@@ -83,7 +83,7 @@ sub api_call ( $self, $method, @args ) {
     }
 
     # parse callback
-    my $cb = is_plain_coderef $_[-1] || is_callback $_[-1] ? pop : undef;
+    my $cb = is_callback $_[-1] ? pop : undef;
 
     if ( defined wantarray ) {
         my $cv = P->cv;

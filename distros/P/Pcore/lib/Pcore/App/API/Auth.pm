@@ -99,7 +99,7 @@ sub api_call ( $self, $method_id, @ ) {
     my ( $cb, $args );
 
     # parse $args and $cb
-    if ( is_plain_coderef $_[-1] || is_callback $_[-1] ) {
+    if ( is_callback $_[-1] ) {
         $cb = $_[-1];
 
         $args = [ @_[ 2 .. $#_ - 1 ] ] if @_ > 3;

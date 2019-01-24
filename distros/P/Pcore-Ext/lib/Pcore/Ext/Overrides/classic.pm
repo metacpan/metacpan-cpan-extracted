@@ -1,9 +1,9 @@
-package Pcore::Ext::Lib::Overrides::Classic;
+package Pcore::Ext::Overrides::classic;
 
 use Pcore -l10n;
 
 # set buffered store defaults: pageSize, leadingBufferZone
-sub EXT_override_data_BufferedStore : Override('Ext.data.BufferedStore') : Ext('classic') {
+sub EXT_override_data_BufferedStore : Override('Ext.data.BufferedStore') {
     return {
         config => {
 
@@ -17,7 +17,7 @@ sub EXT_override_data_BufferedStore : Override('Ext.data.BufferedStore') : Ext('
 # https: //www.sencha.com/forum/showthread.php?304363-Buffered-Store-Fatal-HasRange-Call
 # this bug is present in classic v6.2.0
 # TODO test under v6.5.3
-sub EXT_override_data_PageMap : Override('Ext.data.PageMap') : Ext('classic') {
+sub EXT_override_data_PageMap : Override('Ext.data.PageMap') {
     return {
         hasRange => func [ 'start', 'end' ],
         <<'JS',
@@ -43,7 +43,7 @@ __END__
 
 =head1 NAME
 
-Pcore::Ext::Lib::Overrides::Classic
+Pcore::Ext::Overrides::classic
 
 =head1 SYNOPSIS
 

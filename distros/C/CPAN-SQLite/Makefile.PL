@@ -1,4 +1,4 @@
-# $Id: Makefile.PL 52 2015-07-12 00:49:18Z stro $
+# $Id: Makefile.PL 74 2019-01-23 22:42:55Z stro $
 
 use strict;
 use warnings;
@@ -15,6 +15,9 @@ my $goners = join ' ', qw(
     t/dot-cpan/sources/authors/01mailrc.txt.gz
     t/dot-cpan/sources/modules/02packages.details.txt.gz
     t/dot-cpan/sources/modules/03modlist.data.gz
+    t/cpan-t-06/*
+    t/cpan-t-07/*
+    t/cpan-t-08/*
 );
 
 my %opts = (
@@ -54,9 +57,24 @@ my $prereqs = {
     'parent'                => 0,
 };
 
+my $test_prereqs = {
+    'Test::Memory::Cycle'   => 0,
+};
+
 if ($ENV{'HARNESS_OPTIONS'}) {
   # Parallel testing requires Test::Harness 3.31
   $prereqs->{'Test::Harness'} = 3.31;
 }
 
-WriteMakefile( %opts, 'PREREQ_PM' => $prereqs);
+if ($eu_version >= '6.64') {
+    %opts = (%opts,
+        'PREREQ_PM' => $prereqs,
+        'TEST_REQUIRES' => $test_prereqs,
+    );
+} else {
+    %opts = (%opts,
+        'PREREQ_PM' => { %{$prereqs}, %{$test_prereqs} },
+    );
+}
+
+WriteMakefile( %opts );

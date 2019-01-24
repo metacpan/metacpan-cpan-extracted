@@ -1,5 +1,8 @@
 Changelog for Catmandu-Importer-getJSON
 
+0.51  2019-01-23 20:12:35 CET
+ - Disable default warning enabled (issue #15) 
+
 0.50  2015-05-19 12:48:46 CEST
  - more powerful get_json fix function
  - new public methods request and construct_url 

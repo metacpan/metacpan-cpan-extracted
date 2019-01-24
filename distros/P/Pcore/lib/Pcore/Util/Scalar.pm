@@ -35,7 +35,7 @@ sub is_path : prototype($) { return is_blessed_hashref $_[0] && $_[0]->isa('Pcor
 
 sub is_uri : prototype($) { return is_blessed_hashref $_[0] && $_[0]->can('IS_PCORE_URI') }
 
-sub is_callback : prototype($) { return is_blessed_hashref $_[0] && $_[0]->can('IS_PCORE_CALLBACK') }
+sub is_callback : prototype($) { return is_plain_coderef $_[0] || ( is_blessed_hashref $_[0] && $_[0]->can('IS_PCORE_CALLBACK') ) }
 
 sub is_res : prototype($) { return is_blessed_hashref $_[0] && $_[0]->can('IS_PCORE_RESULT') }
 

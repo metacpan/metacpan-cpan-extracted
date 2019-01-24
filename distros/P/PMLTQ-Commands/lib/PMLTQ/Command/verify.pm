@@ -1,6 +1,6 @@
 package PMLTQ::Command::verify;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::verify::VERSION = '2.0.1';
+$PMLTQ::Command::verify::VERSION = '2.0.2';
 # ABSTRACT: Check if database exists and that it contains some data
 
 use PMLTQ::Base 'PMLTQ::Command';

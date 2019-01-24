@@ -1,4 +1,4 @@
-# $Id: 05meta_update.t 70 2019-01-04 19:39:59Z stro $
+# $Id: 05meta_update.t 71 2019-01-15 01:46:34Z stro $
 
 use strict;
 use warnings;
@@ -19,21 +19,24 @@ $ENV{'CPAN_SQLITE_DOWNLOAD'} = $ENV{'CPAN_SQLITE_DOWNLOAD_URL'} = undef;
 my $cwd = cwd;
 my $path_sep = $Config{path_sep} || ':';
 $ENV{PERL5LIB} = join $path_sep,
-  (File::Spec->catdir($cwd, qw(t dot-cpan)),
-   map {File::Spec->catdir($cwd, 'blib', $_)} qw(arch lib) ), $ENV{PERL5LIB};
+  (File::Spec->catdir($cwd, qw(t dot-cpan)), map { File::Spec->catdir($cwd, 'blib', $_) } qw(arch lib)), $ENV{PERL5LIB} // '';
+
 # so that a real $HOME/.cpan isn't used
 $ENV{HOME} = File::Spec->catdir($cwd, qw(t dot-cpan));
+
 # hack to get tests to pass on Darwin, as File::HomeDir
 # doesn't use HOME or PERL5LIB to specify where CPAN::MyConfig lives
 $ENV{CPAN_SQLITE_TESTING} = 1;
 
 unshift @INC, File::Spec->catdir($cwd, qw(t dot-cpan));
-eval { require CPAN::MyConfig;
-       require CPAN;
-       require CPAN::HandleConfig;
-       require CPAN::Version; };
+eval {
+  require CPAN::MyConfig;
+  require CPAN;
+  require CPAN::HandleConfig;
+  require CPAN::Version;
+};
 
-my $min_cpan_v = '1.88_64';
+my $min_cpan_v    = '1.88_64';
 my $actual_cpan_v = $CPAN::VERSION;
 
 # older CPAN::Version's seem to have problems with underscores
@@ -42,30 +45,27 @@ $actual_cpan_v =~ s/_//g if $actual_cpan_v;
 
 if ($@ or CPAN::Version->vcmp($actual_cpan_v, $min_cpan_v) < 0) {
   plan skip_all => qq{Need CPAN.pm version $min_cpan_v or higher};
-}
-else {
+} else {
   plan tests => 2768;
 }
 
 # verify that we loaded the right CPAN::Config
 is($CPAN::Config->{QAZWSX}, 'PLMOKN');
 
-my $home = $CPAN::Config->{cpan_home};
-my $db = File::Spec->catfile($home, 'cpandb.sql');
+my $home    = $CPAN::Config->{cpan_home};
+my $db      = File::Spec->catfile($home, 'cpandb.sql');
 my $sources = $CPAN::Config->{keep_source_where};
 
-is(-e $db, 1, "$db exists");
+is(-e $db,     1, "$db exists");
 is(-s $db > 0, 1, "$db has non-zero size");
 
 for my $mod_search (qw(net ^uri::.*da)) {
   for my $mod (CPAN::Shell->expand("Module", "/$mod_search/")) {
     my $mod_name = $mod->id;
     is(defined $mods->{$mod_name}, 1, $mod_name);
-    like($mod->cpan_file, qr/$mods->{$mod_name}->{dist_name}/,
-         $mods->{$mod_name}->{dist_name});
+    like($mod->cpan_file, qr/$mods->{$mod_name}->{dist_name}/, $mods->{$mod_name}->{dist_name});
     next unless $mods->{$mod_name}->{mod_vers};
-    is(vcmp($mod->cpan_version, $mods->{$mod_name}->{mod_vers}), 0,
-       "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
+    is(vcmp($mod->cpan_version, $mods->{$mod_name}->{mod_vers}), 0, "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
   }
 }
 
@@ -73,28 +73,27 @@ for my $mod_search (qw(CPAN MP)) {
   for my $bundle (CPAN::Shell->expand("Bundle", "/$mod_search/")) {
     my $mod_name = $bundle->id;
     is(defined $mods->{$mod_name}, 1, $mod_name);
-    like($bundle->cpan_file, qr/$mods->{$mod_name}->{dist_name}/,
-         $mods->{$mod_name}->{dist_name});
+    like($bundle->cpan_file, qr/$mods->{$mod_name}->{dist_name}/, $mods->{$mod_name}->{dist_name});
     next unless $mods->{$mod_name}->{mod_vers};
-    is(vcmp($bundle->cpan_version, $mods->{$mod_name}->{mod_vers}), 0,
-       "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
+    is(vcmp($bundle->cpan_version, $mods->{$mod_name}->{mod_vers}),
+      0, "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
   }
 }
 
-for my $dist_search(qw(apache test.*perl)) {
+for my $dist_search (qw(apache test.*perl)) {
   for my $dist (CPAN::Shell->expand("Distribution", "/$dist_search/")) {
-    my $id = $dist->id;
-    my $pathname = "authors/id/$id";
-    my $d = CPAN::DistnameInfo->new($pathname);
+    my $id        = $dist->id;
+    my $pathname  = "authors/id/$id";
+    my $d         = CPAN::DistnameInfo->new($pathname);
     my $dist_name = $d->dist;
     is(defined $dists->{$dist_name}, 1, $dist_name);
     my $cpanid = $dist->author->id;
     my $download = download($cpanid, $dists->{$dist_name}->{dist_file});
     is($id, $download, $download);
-    is($cpanid, $dists->{$dist_name}->{cpanid},
-       $dists->{$dist_name}->{cpanid});
-    my %mods = map {$_ => 1 } $dist->containsmods;
-    foreach my $mod(keys %{$dists->{$dist_name}->{modules}}) {
+    is($cpanid, $dists->{$dist_name}->{cpanid}, $dists->{$dist_name}->{cpanid});
+    my %mods = map { $_ => 1 } $dist->containsmods;
+
+    foreach my $mod (keys %{ $dists->{$dist_name}->{modules} }) {
       is($mods{$mod}, 1, $mod);
     }
   }
@@ -115,24 +114,23 @@ for my $auth_search (qw(G G\w+A)) {
   my $mod_name = q{Date::Language};
   my $mod = CPAN::Shell->expand("Module", $mod_name);
   is($mod->id, $mod_name);
-  like($mod->cpan_file, qr/$mods->{$mod_name}->{dist_name}/,
-       $mods->{$mod_name}->{dist_name});
+  like($mod->cpan_file, qr/$mods->{$mod_name}->{dist_name}/, $mods->{$mod_name}->{dist_name});
   next unless $mods->{$mod_name}->{mod_vers};
-  is(vcmp($mod->cpan_version, $mods->{$mod_name}->{mod_vers}), 0,
-     "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
+  is(vcmp($mod->cpan_version, $mods->{$mod_name}->{mod_vers}), 0, "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
 }
 
 {
   my $dist_file = q{TimeDate-1.16.tar.gz};
   my $dist_name = q{TimeDate};
-  my $cpanid = q{GBARR};
-  my $query = "$cpanid/$dist_file";
-  my $dist = CPAN::Shell->expand("Distribution", $query);
-  my $dist_id = download($cpanid, $dists->{$dist_name}->{dist_file});
-  is($dist->id, $dist_id);
+  my $cpanid    = q{GBARR};
+  my $query     = "$cpanid/$dist_file";
+  my $dist      = CPAN::Shell->expand("Distribution", $query);
+  my $dist_id   = download($cpanid, $dists->{$dist_name}->{dist_file});
+  is($dist->id,         $dist_id);
   is($dist->author->id, $cpanid);
-  my %mods = map {$_ => 1 } $dist->containsmods;
-  foreach my $mod(keys %{$dists->{$dist_name}->{modules}}) {
+  my %mods = map { $_ => 1 } $dist->containsmods;
+
+  foreach my $mod (keys %{ $dists->{$dist_name}->{modules} }) {
     is($mods{$mod}, 1, $mod);
   }
 }
@@ -141,44 +139,43 @@ for my $mod_search (qw(Apache::)) {
   for my $mod (CPAN::Shell->expand("Module", "/$mod_search/")) {
     my $mod_name = $mod->id;
     is(defined $mods->{$mod_name}, 1, $mod_name);
-    like($mod->cpan_file, qr/$mods->{$mod_name}->{dist_name}/,
-         $mods->{$mod_name}->{dist_name});
+    like($mod->cpan_file, qr/$mods->{$mod_name}->{dist_name}/, $mods->{$mod_name}->{dist_name});
     next unless $mods->{$mod_name}->{mod_vers};
-    is(vcmp($mod->cpan_version, $mods->{$mod_name}->{mod_vers}), 0,
-       "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
+    is(vcmp($mod->cpan_version, $mods->{$mod_name}->{mod_vers}), 0, "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
   }
 }
 
 {
   my $dist_file = q{Apache-GzipChain-1.14.tar.gz};
   my $dist_name = q{Apache-GzipChain};
-  my $cpanid = q{ANDK};
-  my $query = "$cpanid/$dist_file";
-  my $dist = CPAN::Shell->expand("Distribution", $query);
-  my $dist_id = download($cpanid, $dists->{$dist_name}->{dist_file});
-  is($dist->id, $dist_id);
+  my $cpanid    = q{ANDK};
+  my $query     = "$cpanid/$dist_file";
+  my $dist      = CPAN::Shell->expand("Distribution", $query);
+  my $dist_id   = download($cpanid, $dists->{$dist_name}->{dist_file});
+  is($dist->id,         $dist_id);
   is($dist->author->id, $cpanid);
-  my %mods = map {$_ => 1 } $dist->containsmods;
-  foreach my $mod(keys %{$dists->{$dist_name}->{modules}}) {
+  my %mods = map { $_ => 1 } $dist->containsmods;
+
+  foreach my $mod (keys %{ $dists->{$dist_name}->{modules} }) {
     is($mods{$mod}, 1, $mod);
   }
 }
 
-for my $dist_search(qw(CPAN-Test)) {
+for my $dist_search (qw(CPAN-Test)) {
   for my $dist (CPAN::Shell->expand("Distribution", "/$dist_search/")) {
-    my $id = $dist->id;
-    my $pathname = "authors/id/$id";
-    my $d = CPAN::DistnameInfo->new($pathname);
+    my $id        = $dist->id;
+    my $pathname  = "authors/id/$id";
+    my $d         = CPAN::DistnameInfo->new($pathname);
     my $dist_name = $d->dist;
     is(defined $dists->{$dist_name}, 1, $dist_name);
     my $cpanid = $dist->author->id;
     my $download = download($cpanid, $dists->{$dist_name}->{dist_file});
     is($id, $download, $download);
-    is($cpanid, $dists->{$dist_name}->{cpanid},
-       $dists->{$dist_name}->{cpanid});
-    my %mods = map {$_ => 1 } $dist->containsmods;
+    is($cpanid, $dists->{$dist_name}->{cpanid}, $dists->{$dist_name}->{cpanid});
+    my %mods = map { $_ => 1 } $dist->containsmods;
     my $mods = $dist->containsmods;
-    foreach my $mod(keys %{$dists->{$dist_name}->{modules}}) {
+
+    foreach my $mod (keys %{ $dists->{$dist_name}->{modules} }) {
       is($mods{$mod}, 1, $mod);
     }
   }
@@ -187,14 +184,15 @@ for my $dist_search(qw(CPAN-Test)) {
 {
   my $dist_file = q{CPAN-Test-Dummy-Perl5-Make-1.05.tar.gz};
   my $dist_name = q{CPAN-Test-Dummy-Perl5-Make};
-  my $cpanid = q{ANDK};
-  my $query = "$cpanid/$dist_file";
-  my $dist = CPAN::Shell->expand("Distribution", $query);
-  my $dist_id = download($cpanid, $dists->{$dist_name}->{dist_file});
-  is($dist->id, $dist_id);
+  my $cpanid    = q{ANDK};
+  my $query     = "$cpanid/$dist_file";
+  my $dist      = CPAN::Shell->expand("Distribution", $query);
+  my $dist_id   = download($cpanid, $dists->{$dist_name}->{dist_file});
+  is($dist->id,         $dist_id);
   is($dist->author->id, $cpanid);
-  my %mods = map {$_ => 1 } $dist->containsmods;
-  foreach my $mod(keys %{$dists->{$dist_name}->{modules}}) {
+  my %mods = map { $_ => 1 } $dist->containsmods;
+
+  foreach my $mod (keys %{ $dists->{$dist_name}->{modules} }) {
     is($mods{$mod}, 1, $mod);
   }
 }
@@ -212,41 +210,37 @@ foreach my $mod_name (keys %$mods) {
   next if $mod_name =~ /^Bundle/;
   my $mod = CPAN::Shell->expand("Module", $mod_name);
   is($mod->id, $mod_name);
-  like($mod->cpan_file, qr/$mods->{$mod_name}->{dist_name}/,
-       $mods->{$mod_name}->{dist_name});
+  like($mod->cpan_file, qr/$mods->{$mod_name}->{dist_name}/, $mods->{$mod_name}->{dist_name});
   next unless $mods->{$mod_name}->{mod_vers};
-  is(vcmp($mod->cpan_version, $mods->{$mod_name}->{mod_vers}), 0,
-     "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
+  is(vcmp($mod->cpan_version, $mods->{$mod_name}->{mod_vers}), 0, "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
 }
 
 foreach my $mod_name (keys %$mods) {
   next unless ($mod_name =~ /^Bundle::/);
   my $bundle = CPAN::Shell->expand("Bundle", $mod_name);
   is($bundle->id, $mod_name);
-  like($bundle->cpan_file, qr/$mods->{$mod_name}->{dist_name}/,
-       $mods->{$mod_name}->{dist_name});
+  like($bundle->cpan_file, qr/$mods->{$mod_name}->{dist_name}/, $mods->{$mod_name}->{dist_name});
   next unless $mods->{$mod_name}->{mod_vers};
-  is(vcmp($bundle->cpan_version, $mods->{$mod_name}->{mod_vers}), 0,
-     "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
+  is(vcmp($bundle->cpan_version, $mods->{$mod_name}->{mod_vers}), 0, "version $mods->{$mod_name}->{mod_vers} for '$mod_name'");
 }
 
-for my $dist_name(keys %$dists) {
+for my $dist_name (keys %$dists) {
   my $dist_file = $dists->{$dist_name}->{dist_file};
-  my $cpanid = $dists->{$dist_name}->{cpanid};
-  my $query = "$cpanid/$dist_file";
-  my $dist = CPAN::Shell->expand("Distribution", $query);
-  my $dist_id = download($cpanid, $dists->{$dist_name}->{dist_file});
-  is($dist->id, $dist_id);
+  my $cpanid    = $dists->{$dist_name}->{cpanid};
+  my $query     = "$cpanid/$dist_file";
+  my $dist      = CPAN::Shell->expand("Distribution", $query);
+  my $dist_id   = download($cpanid, $dists->{$dist_name}->{dist_file});
+  is($dist->id,         $dist_id);
   is($dist->author->id, $cpanid);
-  my %mods = map {$_ => 1 } $dist->containsmods;
-  foreach my $mod(keys %{$dists->{$dist_name}->{modules}}) {
+  my %mods = map { $_ => 1 } $dist->containsmods;
+
+  foreach my $mod (keys %{ $dists->{$dist_name}->{modules} }) {
     is($mods{$mod}, 1, $mod);
   }
 }
 
-
 my $no_such = 'ZZZ';
-foreach my $type(qw(Author Distribution Module)) {
+foreach my $type (qw(Author Distribution Module)) {
   my $query = ($type eq 'Distribution') ? "/$no_such/" : $no_such;
   my $item = CPAN::Shell->expand($type, $query);
   is($item, undef, "no such $type");

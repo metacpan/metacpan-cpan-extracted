@@ -157,6 +157,7 @@ lib/Pcore/Util/File/UmaskGuard.pm
 lib/Pcore/Util/File1.pm
 lib/Pcore/Util/File1/TempDir.pm
 lib/Pcore/Util/File1/TempFile.pm
+lib/Pcore/Util/HTML.pm
 lib/Pcore/Util/Hash.pm
 lib/Pcore/Util/Hash/LRU.pm
 lib/Pcore/Util/Hash/Multivalue.pm

@@ -1,5 +1,8 @@
 Revision history for Perl extension CPAN::SQLite.
 
+0.215 Jan 23, 2019
+  - Weaken some references to avoid memory leaks
+
 0.214 Jan 4, 2019
   - Removed 03modlist-related code as that file is not updated anymore
   - Made sure tests pass when CPAN_SQLITE_DOWNLOAD variable is set

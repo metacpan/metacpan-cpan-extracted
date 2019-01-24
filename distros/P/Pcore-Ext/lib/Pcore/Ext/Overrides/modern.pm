@@ -1,16 +1,16 @@
-package Pcore::Ext::Lib::Overrides::Modern;
+package Pcore::Ext::Overrides::modern;
 
 use Pcore -l10n;
 
-sub EXT_override_grid_menu_SortAsc : Override('Ext.grid.menu.SortAsc') : Ext('modern') {
+sub EXT_override_grid_menu_SortAsc : Override('Ext.grid.menu.SortAsc') {
     return { config => { text => l10n('Sort Ascending'), }, };
 }
 
-sub EXT_override_grid_menu_SortDesc : Override('Ext.grid.menu.SortDesc') : Ext('modern') {
+sub EXT_override_grid_menu_SortDesc : Override('Ext.grid.menu.SortDesc') {
     return { config => { text => l10n('Sort Descending'), }, };
 }
 
-sub EXT_override_panel_Collapser : Override('Ext.panel.Collapser') : Ext('modern') {
+sub EXT_override_panel_Collapser : Override('Ext.panel.Collapser') {
     return {
         config => {
             collapseToolText => { html => l10n('Collapse panel') },
@@ -27,7 +27,7 @@ __END__
 
 =head1 NAME
 
-Pcore::Ext::Lib::Overrides::Modern
+Pcore::Ext::Overrides::modern
 
 =head1 SYNOPSIS
 

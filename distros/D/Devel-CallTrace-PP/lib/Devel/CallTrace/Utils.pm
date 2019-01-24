@@ -1,5 +1,5 @@
 package Devel::CallTrace::Utils;
-$Devel::CallTrace::Utils::VERSION = '0.01';
+$Devel::CallTrace::Utils::VERSION = '0.02';
 use MetaCPAN::Client;
 use Module::CoreList;
 
@@ -168,7 +168,7 @@ Devel::CallTrace::Utils
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

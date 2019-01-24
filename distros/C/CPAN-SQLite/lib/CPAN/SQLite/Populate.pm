@@ -1,11 +1,11 @@
-# $Id: Populate.pm 70 2019-01-04 19:39:59Z stro $
+# $Id: Populate.pm 73 2019-01-23 22:29:38Z stro $
 
 package CPAN::SQLite::Populate;
 use strict;
 use warnings;
 no warnings qw(redefine);
 
-our $VERSION = '0.214';
+our $VERSION = '0.215';
 
 use English qw/-no_match_vars/;
 
@@ -16,20 +16,21 @@ use File::Find;
 use File::Basename;
 use File::Spec::Functions;
 use File::Path;
+use Scalar::Util 'weaken';
 
 our $dbh = $CPAN::SQLite::DBI::dbh;
 my ($setup);
 
 my %tbl2obj;
-$tbl2obj{$_} = __PACKAGE__ . '::' . $_  foreach (qw(dists mods auths info));
-my %obj2tbl  = reverse %tbl2obj;
+$tbl2obj{$_} = __PACKAGE__ . '::' . $_ foreach (qw(dists mods auths info));
+my %obj2tbl = reverse %tbl2obj;
 
 sub new {
   my ($class, %args) = @_;
 
   $setup = $args{setup};
 
-  my $index = $args{index};
+  my $index  = $args{index};
   my @tables = qw(dists mods auths info);
   foreach my $table (@tables) {
     my $obj = $index->{$table};
@@ -43,12 +44,13 @@ sub new {
   }
   my $cdbi = CPAN::SQLite::DBI::Index->new(%args);
 
-  my $self = {index => $index,
-              state => $state,
-              obj => {},
-              cdbi => $cdbi,
-              db_name => $args{db_name},
-             };
+  my $self = {
+    index   => $index,
+    state   => $state,
+    obj     => {},
+    cdbi    => $cdbi,
+    db_name => $args{db_name},
+  };
   return bless $self, $class;
 }
 
@@ -73,42 +75,44 @@ sub populate {
 }
 
 sub create_objs {
-  my $self = shift;
+  my $self   = shift;
   my @tables = qw(dists auths mods info);
 
   foreach my $table (@tables) {
     my $obj;
-    my $pack = $tbl2obj{$table};
+    my $pack  = $tbl2obj{$table};
     my $index = $self->{index}->{$table};
     if ($index and ref($index) eq "CPAN::SQLite::Index::$table") {
       my $info = $index->{info};
       if ($table ne 'info') {
         return unless has_hash_data($info);
       }
-      $obj = $pack->new(info => $info,
-                        cdbi => $self->{cdbi}->{objs}->{$table});
-    }
-    else {
+      $obj = $pack->new(
+        info => $info,
+        cdbi => $self->{cdbi}->{objs}->{$table});
+    } else {
       $obj = $pack->new(cdbi => $self->{cdbi}->{objs}->{$table});
     }
     $self->{obj}->{$table} = $obj;
   }
+
   foreach my $table (@tables) {
     my $obj = $self->{obj}->{$table};
     foreach (@tables) {
       next if ref($obj) eq $tbl2obj{$_};
       $obj->{obj}->{$_} = $self->{obj}->{$_};
+      weaken $obj->{obj}->{$_};
     }
   }
 
   unless ($setup) {
-    my $state = $self->{state};
+    my $state  = $self->{state};
     my @tables = qw(auths dists mods);
-    my @data = qw(ids insert update delete);
+    my @data   = qw(ids insert update delete);
 
     foreach my $table (@tables) {
       my $state_obj = $state->{obj}->{$table};
-      my $pop_obj = $self->{obj}->{$table};
+      my $pop_obj   = $self->{obj}->{$table};
       $pop_obj->{$_} = $state_obj->{$_} for (@data);
     }
   }
@@ -134,8 +138,7 @@ sub populate_tables {
         if (my $error = $obj->{error_msg}) {
           print_debug("Fatal error from ", ref($obj), ": ", $error, $/);
           return;
-        }
-        else {
+        } else {
           my $info = $obj->{info_msg};
           print_debug("Info from ", ref($obj), ": ", $info, $/);
         }
@@ -164,16 +167,16 @@ sub new {
   die "No dbi object available"
     unless ($cdbi and ref($cdbi) eq 'CPAN::SQLite::DBI::Index::auths');
   my $self = {
-              info => $info,
-              insert => {},
-              update => {},
-              delete => {},
-              ids => {},
-              obj => {},
-              cdbi => $cdbi,
-              error_msg => '',
-              info_msg => '',
-             };
+    info      => $info,
+    insert    => {},
+    update    => {},
+    delete    => {},
+    ids       => {},
+    obj       => {},
+    cdbi      => $cdbi,
+    error_msg => '',
+    info_msg  => '',
+  };
   return bless $self, $class;
 }
 
@@ -191,8 +194,8 @@ sub insert {
     return;
   }
   my $auth_ids = $self->{ids};
-  my @fields = qw(cpanid email fullname);
-  my $sth = $cdbi->sth_insert(\@fields) or do {
+  my @fields   = qw(cpanid email fullname);
+  my $sth      = $cdbi->sth_insert(\@fields) or do {
     $self->{error_msg} = $cdbi->{error_msg};
     return;
   };
@@ -202,16 +205,15 @@ sub insert {
     print_debug("Inserting author $cpanid\n");
     $sth->execute($cpanid, $values->{email}, $values->{fullname})
       or do {
-        $cdbi->db_error($sth);
-        $self->{error_msg} = $cdbi->{error_msg};
-        return;
+      $cdbi->db_error($sth);
+      $self->{error_msg} = $cdbi->{error_msg};
+      return;
       };
-    $auth_ids->{$cpanid} =
-      $dbh->func('last_insert_rowid') or do {
-        $cdbi->db_error($sth);
-        $self->{error_msg} = $cdbi->{error_msg};
-        return;
-      };
+    $auth_ids->{$cpanid} = $dbh->func('last_insert_rowid') or do {
+      $cdbi->db_error($sth);
+      $self->{error_msg} = $cdbi->{error_msg};
+      return;
+    };
   }
   $sth->finish();
   undef $sth;
@@ -236,7 +238,7 @@ sub update {
     return;
   }
 
-  my $info = $self->{info};
+  my $info   = $self->{info};
   my @fields = qw(cpanid email fullname);
   foreach my $cpanid (keys %$data) {
     print_debug("Updating author $cpanid\n");
@@ -246,9 +248,9 @@ sub update {
     next unless ($cpanid and $values);
     $sth->execute($cpanid, $values->{email}, $values->{fullname})
       or do {
-        $cdbi->db_error($sth);
-        $self->{error_msg} = $cdbi->{error_msg};
-        return;
+      $cdbi->db_error($sth);
+      $self->{error_msg} = $cdbi->{error_msg};
+      return;
       };
     $sth->finish();
     undef $sth;
@@ -279,15 +281,15 @@ sub new {
   die "No dbi object available"
     unless ($cdbi and ref($cdbi) eq 'CPAN::SQLite::DBI::Index::dists');
   my $self = {
-              info => $info,
-              insert => {},
-              update => {},
-              delete => {},
-              ids => {},
-              obj => {},
-              cdbi => $cdbi,
-              error_msg => '',
-              info_msg => '',
+    info      => $info,
+    insert    => {},
+    update    => {},
+    delete    => {},
+    ids       => {},
+    obj       => {},
+    cdbi      => $cdbi,
+    error_msg => '',
+    info_msg  => '',
   };
   return bless $self, $class;
 }
@@ -299,10 +301,10 @@ sub insert {
     return;
   }
   return unless my $auth_obj = $self->{obj}->{auths};
-  my $cdbi = $self->{cdbi};
+  my $cdbi     = $self->{cdbi};
   my $auth_ids = $auth_obj->{ids};
-  my $dists = $self->{info};
-  my $data = $setup ? $dists : $self->{insert};
+  my $dists    = $self->{info};
+  my $data     = $setup ? $dists : $self->{insert};
   unless (has_hash_data($data)) {
     $self->{info_msg} = q{No dist data to insert};
     return;
@@ -313,8 +315,8 @@ sub insert {
   }
 
   my $dist_ids = $self->{ids};
-  my @fields = qw(auth_id dist_name dist_file dist_vers dist_abs);
-  my $sth = $cdbi->sth_insert(\@fields) or do {
+  my @fields   = qw(auth_id dist_name dist_file dist_vers dist_abs);
+  my $sth      = $cdbi->sth_insert(\@fields) or do {
     $self->{error_msg} = $cdbi->{error_msg};
     return;
   };
@@ -323,13 +325,12 @@ sub insert {
     my $cpanid = $values->{cpanid};
     next unless ($values and $cpanid and $auth_ids->{$cpanid});
     print_debug("Inserting $distname of $cpanid\n");
-    $sth->execute($auth_ids->{$values->{cpanid}}, $distname,
-                    $values->{dist_file}, $values->{dist_vers},
-                    $values->{dist_abs}) or do {
-                      $cdbi->db_error($sth);
-                      $self->{error_msg} = $cdbi->{error_msg};
-                      return;
-                    };
+    $sth->execute($auth_ids->{ $values->{cpanid} }, $distname, $values->{dist_file}, $values->{dist_vers}, $values->{dist_abs})
+      or do {
+      $cdbi->db_error($sth);
+      $self->{error_msg} = $cdbi->{error_msg};
+      return;
+      };
     $dist_ids->{$distname} = $dbh->func('last_insert_rowid') or do {
       $cdbi->db_error($sth);
       $self->{error_msg} = $cdbi->{error_msg};
@@ -360,7 +361,7 @@ sub update {
   }
   return unless my $auth_obj = $self->{obj}->{auths};
   my $auth_ids = $auth_obj->{ids};
-  my $dists = $self->{info};
+  my $dists    = $self->{info};
   unless ($dists and $auth_ids) {
     $self->{error_msg} = q{No dist index data available};
     return;
@@ -369,18 +370,17 @@ sub update {
   my @fields = qw(auth_id dist_name dist_file dist_vers dist_abs);
   foreach my $distname (keys %$data) {
     next unless $data->{$distname};
-    my $sth = $cdbi->sth_update(\@fields, $data->{$distname});
+    my $sth    = $cdbi->sth_update(\@fields, $data->{$distname});
     my $values = $dists->{$distname};
     my $cpanid = $values->{cpanid};
     next unless ($values and $cpanid and $auth_ids->{$cpanid});
     print_debug("Updating $distname of $cpanid\n");
-    $sth->execute($auth_ids->{$values->{cpanid}}, $distname,
-                  $values->{dist_file}, $values->{dist_vers},
-                  $values->{dist_abs}) or do {
-                    $cdbi->db_error($sth);
-                    $self->{error_msg} = $cdbi->{error_msg};
-                    return;
-                  };
+    $sth->execute($auth_ids->{ $values->{cpanid} }, $distname, $values->{dist_file}, $values->{dist_vers}, $values->{dist_abs})
+      or do {
+      $cdbi->db_error($sth);
+      $self->{error_msg} = $cdbi->{error_msg};
+      return;
+      };
     $sth->finish();
     undef $sth;
   }
@@ -406,7 +406,7 @@ sub delete {
   }
 
   my $sth = $cdbi->sth_delete('dist_id');
-  foreach my $distname(keys %$data) {
+  foreach my $distname (keys %$data) {
     print_debug("Deleting $distname\n");
     $sth->execute($data->{$distname}) or do {
       $cdbi->db_error($sth);
@@ -436,16 +436,16 @@ sub new {
   die "No dbi object available"
     unless ($cdbi and ref($cdbi) eq 'CPAN::SQLite::DBI::Index::mods');
   my $self = {
-              info => $info,
-              insert => {},
-              update => {},
-              delete => {},
-              ids => {},
-              obj => {},
-              cdbi => $cdbi,
-              error_msg => '',
-              info_msg => '',
-             };
+    info      => $info,
+    insert    => {},
+    update    => {},
+    delete    => {},
+    ids       => {},
+    obj       => {},
+    cdbi      => $cdbi,
+    error_msg => '',
+    info_msg  => '',
+  };
   return bless $self, $class;
 }
 
@@ -456,10 +456,10 @@ sub insert {
     return;
   }
   return unless my $dist_obj = $self->{obj}->{dists};
-  my $cdbi = $self->{cdbi};
+  my $cdbi     = $self->{cdbi};
   my $dist_ids = $dist_obj->{ids};
-  my $mods = $self->{info};
-  my $data = $setup ? $mods : $self->{insert};
+  my $mods     = $self->{info};
+  my $data     = $setup ? $mods : $self->{insert};
   unless (has_hash_data($data)) {
     $self->{info_msg} = q{No module data to insert};
     return;
@@ -470,23 +470,22 @@ sub insert {
   }
 
   my $mod_ids = $self->{ids};
-  my @fields = qw(dist_id mod_name mod_abs
-                  mod_vers);
+  my @fields  = qw(dist_id mod_name mod_abs
+    mod_vers);
 
   my $sth = $cdbi->sth_insert(\@fields) or do {
     $self->{error_msg} = $cdbi->{error_msg};
     return;
   };
-  foreach my $modname(keys %$data) {
+  foreach my $modname (keys %$data) {
     my $values = $mods->{$modname};
-    next unless ($values and $dist_ids->{$values->{dist_name}});
-    $sth->execute($dist_ids->{$values->{dist_name}}, $modname,
-                  $values->{mod_abs}, $values->{mod_vers})
+    next unless ($values and $dist_ids->{ $values->{dist_name} });
+    $sth->execute($dist_ids->{ $values->{dist_name} }, $modname, $values->{mod_abs}, $values->{mod_vers})
       or do {
-          $cdbi->db_error($sth);
-          $self->{error_msg} = $cdbi->{error_msg};
-          return;
-        };
+      $cdbi->db_error($sth);
+      $self->{error_msg} = $cdbi->{error_msg};
+      return;
+      };
     $mod_ids->{$modname} = $dbh->func('last_insert_rowid') or do {
       $cdbi->db_error($sth);
       $self->{error_msg} = $cdbi->{error_msg};
@@ -517,27 +516,26 @@ sub update {
   }
   return unless my $dist_obj = $self->{obj}->{dists};
   my $dist_ids = $dist_obj->{ids};
-  my $mods = $self->{info};
+  my $mods     = $self->{info};
   unless ($dist_ids and $mods) {
     $self->{error_msg} = q{No module index data available};
     return;
   }
 
   my @fields = qw(dist_id mod_name mod_abs
-                  mod_vers);
+    mod_vers);
 
   foreach my $modname (keys %$data) {
     next unless $data->{$modname};
     print_debug("Updating $modname\n");
     my $sth = $cdbi->sth_update(\@fields, $data->{$modname});
     my $values = $mods->{$modname};
-    next unless ($values and $dist_ids->{$values->{dist_name}});
-    $sth->execute($dist_ids->{$values->{dist_name}}, $modname,
-                  $values->{mod_abs}, $values->{mod_vers})
+    next unless ($values and $dist_ids->{ $values->{dist_name} });
+    $sth->execute($dist_ids->{ $values->{dist_name} }, $modname, $values->{mod_abs}, $values->{mod_vers})
       or do {
-        $cdbi->db_error($sth);
-        $self->{error_msg} = $cdbi->{error_msg};
-        return;
+      $cdbi->db_error($sth);
+      $self->{error_msg} = $cdbi->{error_msg};
+      return;
       };
     $sth->finish();
     undef $sth;
@@ -554,14 +552,14 @@ sub delete {
   my $self = shift;
   unless ($dbh) {
     $self->{error_msg} = q{No db handle available};
-        return;
+    return;
   }
   return unless my $dist_obj = $self->{obj}->{dists};
   my $cdbi = $self->{cdbi};
   my $data = $dist_obj->{delete};
   if (has_hash_data($data)) {
     my $sth = $cdbi->sth_delete('dist_id');
-    foreach my $distname(keys %$data) {
+    foreach my $distname (keys %$data) {
       $sth->execute($data->{$distname}) or do {
         $cdbi->db_error($sth);
         $self->{error_msg} = $cdbi->{error_msg};
@@ -575,7 +573,7 @@ sub delete {
   $data = $self->{delete};
   if (has_hash_data($data)) {
     my $sth = $cdbi->sth_delete('mod_id');
-    foreach my $modname(keys %$data) {
+    foreach my $modname (keys %$data) {
       $sth->execute($data->{$modname}) or do {
         $cdbi->db_error($sth);
         $self->{error_msg} = $cdbi->{error_msg};
@@ -604,11 +602,11 @@ sub new {
   die "No dbi object available"
     unless ($cdbi and ref($cdbi) eq 'CPAN::SQLite::DBI::Index::info');
   my $self = {
-              obj => {},
-              cdbi => $cdbi,
-              error_msg => '',
-              info_msg => '',
-             };
+    obj       => {},
+    cdbi      => $cdbi,
+    error_msg => '',
+    info_msg  => '',
+  };
   return bless $self, $class;
 }
 
@@ -625,11 +623,11 @@ sub insert {
     return;
   };
   $sth->execute(1)
-          or do {
-            $cdbi->db_error($sth);
-            $self->{error_msg} = $cdbi->{error_msg};
-            return;
-          };
+    or do {
+    $cdbi->db_error($sth);
+    $self->{error_msg} = $cdbi->{error_msg};
+    return;
+    };
   $sth->finish();
   undef $sth;
   $dbh->commit() or do {
@@ -650,16 +648,16 @@ sub delete {
   my $self = shift;
   unless ($dbh) {
     $self->{error_msg} = q{No db handle available};
-        return;
+    return;
   }
   my $cdbi = $self->{cdbi};
 
   my $sth = $cdbi->sth_delete('status');
   $sth->execute(1) or do {
-      $cdbi->db_error($sth);
-      $self->{error_msg} = $cdbi->{error_msg};
-      return;
-    };
+    $cdbi->db_error($sth);
+    $self->{error_msg} = $cdbi->{error_msg};
+    return;
+  };
   $sth->finish();
   undef $sth;
   $dbh->commit() or do {
@@ -690,7 +688,7 @@ CPAN::SQLite::Populate - create and populate database tables
 
 =head1 VERSION
 
-version 0.214
+version 0.215
 
 =head1 DESCRIPTION
 

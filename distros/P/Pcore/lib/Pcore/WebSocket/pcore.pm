@@ -61,7 +61,7 @@ sub auth ( $self, $token, $bindings = undef ) {
 sub rpc_call ( $self, $method, @args ) {
 
     # parse callback
-    my $cb = is_plain_coderef $_[-1] || is_callback $_[-1] ? pop @args : undef;
+    my $cb = is_callback $_[-1] ? pop @args : undef;
 
     if ( !$self->{is_ready} ) {
         my $res = res [ 500, 'Connection is not ready' ];

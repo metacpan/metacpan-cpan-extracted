@@ -1,3 +1,6 @@
+v0.19.2 2019-01-23T17:58:37Z
+ - refactored
+
 v0.19.1 2019-01-03T19:00:07Z
  - to_json return plain scalar
  - read_bin returns plain scalar

@@ -1,6 +1,6 @@
 package WWW::Google::Places;
 
-$WWW::Google::Places::VERSION   = '0.33';
+$WWW::Google::Places::VERSION   = '0.34';
 $WWW::Google::Places::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::Places - Interface to Google Places API.
 
 =head1 VERSION
 
-Version 0.33
+Version 0.34
 
 =cut
 

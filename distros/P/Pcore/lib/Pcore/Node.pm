@@ -784,8 +784,6 @@ sub run_node ( $self, @nodes ) {
 
     weaken $self;
 
-    my $cpus_num = P->sys->cpus_num;
-
     my $server = do {
         if ( ref $self->{server} eq 'Pcore::Node::Server' ) {
             $self->{server}->{listen};
@@ -798,14 +796,7 @@ sub run_node ( $self, @nodes ) {
     for my $node (@nodes) {
 
         # resolve number of the workers
-        if ( !$node->{workers} ) {
-            $node->{workers} = $cpus_num;
-        }
-        elsif ( $node->{workers} < 0 ) {
-            $node->{workers} = P->sys->cpus_num - $node->{workers};
-
-            $node->{workers} = 1 if $node->{workers} <= 0;
-        }
+        $node->{workers} = P->sys->cpus_num( $node->{workers} );
 
         # run workers
         for ( 1 .. $node->{workers} ) {
@@ -856,7 +847,7 @@ sub rpc_call ( $self, $type, $method, @args ) {
     if ( !defined $h ) {
         my $res = res [ 404, qq[Node type "$type" is not available] ];
 
-        my $cb = is_plain_coderef $args[-1] || is_callback $args[-1] ? pop @args : undef;
+        my $cb = is_callback $args[-1] ? pop @args : undef;
 
         return $cb ? $cb->($res) : $res;
     }

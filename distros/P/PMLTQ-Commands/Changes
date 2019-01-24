@@ -1,5 +1,11 @@
 Revision history for PMLTQ-Commands
 
+2.0.2
+ - Released: 2019-01-24 09:29:38 UTC
+
+ [BUG FIXES]
+ - fix missing path to pmltq command
+
 2.0.1
  - Released: 2019-01-11 06:48:12 UTC
 

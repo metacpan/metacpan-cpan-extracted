@@ -8,6 +8,7 @@ MANIFEST			This list of files
 PageCache.xs
 ppport.h
 README
+README.md
 t/00_compile.t
 t/09_page_size.t
 t/10_fincore.t

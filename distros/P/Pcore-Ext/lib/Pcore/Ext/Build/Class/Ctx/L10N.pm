@@ -1,32 +1,34 @@
-package Pcore::Ext::Context::L10N;
+package Pcore::Ext::Build::Class::Ctx::L10N;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[refaddr is_ref];
+use Pcore::Util::Scalar qw[refaddr is_ref weaken];
 use Pcore::Util::Data qw[to_json];
 
-has ctx => ();
-has buf => ();
+has class => ( required => 1 );
+has buf   => ( required => 1 );
+
+sub BUILD ( $self, $args ) {
+    weaken $self->{class};
+
+    return;
+}
 
 use overload    #
-  q[""] => sub ( $self, @ ) {
-    return $self->to_js_func->$*;
+  '""' => sub ( $self, @ )   { return $self->to_js_func },
+  '.'  => sub ( $self, $str, $pos ) {
+    return __PACKAGE__->new(
+        class => $self->{class},
+        buf   => $pos ? [ is_ref $str ? $str->{buf}->@* : $str, $self->{buf}->@* ] : [ $self->{buf}->@*, is_ref $str ? $str->{buf}->@* : $str ],
+    );
   },
-  q[.] => sub ( $self, $str, $pos ) {
-    return bless {
-        ctx => $self->{ctx},
-        buf => $pos ? [ is_ref $str ? $str->{buf}->@* : $str, $self->{buf}->@* ] : [ $self->{buf}->@*, is_ref $str ? $str->{buf}->@* : $str ],
-      },
-      __PACKAGE__;
-  },
-  q[&{}] => sub ( $self, @ ) {
+  '&{}' => sub ( $self, @ ) {
     die 'Invalid plural form usage' if $self->{buf}->@* > 1;
 
     return sub ($num) {
-        my $clone = bless {
-            ctx => $self->{ctx},
-            buf => [ [ $self->{buf}->[0]->@* ] ],
-          },
-          __PACKAGE__;
+        my $clone = __PACKAGE__->new(
+            class => $self->{class},
+            buf   => [ [ $self->{buf}->[0]->@* ] ],
+        );
 
         $clone->{buf}->[0]->[3] = $num;
 
@@ -36,11 +38,11 @@ use overload    #
   fallback => 1;
 
 sub TO_JSON ( $self ) {
-    my $id = refaddr $self;
+    my $id = '__JS_' . refaddr($self) . '__';
 
-    $self->{ctx}->{_js_gen_cache}->{$id} = $self->to_js_object;
+    $self->{class}->{build_cache}->{$id} = $self;
 
-    return "__JS${id}__";
+    return $id;
 }
 
 sub to_js_func ($self) {
@@ -70,11 +72,11 @@ sub to_js_func ($self) {
         }
     }
 
-    return \$buf;
+    return $buf;
 }
 
-sub to_js_object ( $self ) {
-    return \qq[new Ext.L10N.string(@{[ to_json $self->{buf} ]})];
+sub generate ( $self, $quote ) {
+    return qq[new Ext.L10N.string(@{[ to_json $self->{buf} ]})];
 }
 
 1;
@@ -84,7 +86,7 @@ sub to_js_object ( $self ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 59                   | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
+## |    2 | 61                   | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -95,7 +97,7 @@ __END__
 
 =head1 NAME
 
-Pcore::Ext::Context::L10N - ExtJS function call generator
+Pcore::Ext::Build::Class::Ctx::L10N - ExtJS function call generator
 
 =head1 SYNOPSIS
 
@@ -105,12 +107,12 @@ Pcore::Ext::Context::L10N - ExtJS function call generator
         text => 'prefix' . l10n('singular form') . 'suffix',
         text => 'prefix' . l10n('singular form', 'plural form', 5) . 'suffix',
 
-        method => func [], <<"JS",
+        method => func <<"JS",
             console.log('prefix' + $l10n->{'singular form'} + 'suffix');
 
             console.log('prefix' + $str + 'suffix');
 
-            // redefine num for predefined l10n string
+            // redefine num for the predefined l10n string
             var num = 10;
             console.log('prefix' + @{[ $str->('num') ]} + 'suffix');
     JS

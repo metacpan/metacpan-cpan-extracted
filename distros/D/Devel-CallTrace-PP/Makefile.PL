@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Main module of dctpp",
+  "ABSTRACT" => "Main module for dctpp CLI tool",
   "AUTHOR" => "Pavel Serikov <pavelsr\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -22,12 +22,15 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Exporter" => 0,
     "File::Slurp" => 0,
+    "Getopt::Long::Descriptive" => 0,
     "List::Util" => 0,
     "Math::Round" => 0,
     "MetaCPAN::Client" => 0,
-    "Module::CoreList" => 0
+    "Module::CoreList" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => ""
   }
@@ -38,10 +41,13 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "Exporter" => 0,
   "File::Slurp" => 0,
+  "Getopt::Long::Descriptive" => 0,
   "List::Util" => 0,
   "Math::Round" => 0,
   "MetaCPAN::Client" => 0,
-  "Module::CoreList" => 0
+  "Module::CoreList" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

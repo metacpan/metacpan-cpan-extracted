@@ -1,5 +1,9 @@
 Revision history for Perl extension Data::Table.
 
+1.77 Wed Jan 23 14:02:24 PST 2019
+  No code change, add more examples under match_pattern_hash
+  Suggested by James Volkman
+
 1.76 Tue Nov 21 08:08:30 PST 2017
   Minor syntax bug in fromFile.
 

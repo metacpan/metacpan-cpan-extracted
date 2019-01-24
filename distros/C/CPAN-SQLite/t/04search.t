@@ -1,4 +1,4 @@
-# $Id: 04search.t 70 2019-01-04 19:39:59Z stro $
+# $Id: 04search.t 71 2019-01-15 01:46:34Z stro $
 
 use strict;
 use warnings;
@@ -17,13 +17,17 @@ my $CPAN = catfile $cwd, 't', 'cpan';
 
 plan tests => 2668;
 my $db_name = 'cpandb.sql';
-my $db_dir = $cwd;
+my $db_dir  = $cwd;
 
-my $cdbi = CPAN::SQLite::DBI::Search->new(db_name => $db_name,
-                                          db_dir => $db_dir);
+my $cdbi = CPAN::SQLite::DBI::Search->new(
+  db_name => $db_name,
+  db_dir  => $db_dir
+);
 
-my $query = CPAN::SQLite::Search->new(db_name => $db_name,
-                                      db_dir => $db_dir);
+my $query = CPAN::SQLite::Search->new(
+  db_name => $db_name,
+  db_dir  => $db_dir
+);
 ok(defined $query);
 isa_ok($query, 'CPAN::SQLite::Search');
 
@@ -39,7 +43,7 @@ for my $cpanid (keys %$auths) {
   }
 }
 
-for my $dist_name(keys %$dists) {
+for my $dist_name (keys %$dists) {
   $query->query(mode => 'dist', name => $dist_name);
   $results = $query->{results};
   ok(defined $results);
@@ -65,13 +69,13 @@ foreach my $mod_name (keys %$mods) {
   is(vcmp($results->{mod_vers}, $mods->{$mod_name}->{mod_vers}), 0);
 }
 
-my %keys = map {$_ => 1} qw(email fullname);
+my %keys = map { $_ => 1 } qw(email fullname);
 for my $auth_search (qw(G G\w+A)) {
   my $auth_searches = [];
   for my $cpanid (keys %$auths) {
     next unless ($cpanid =~ /$auth_search/i
       or $auths->{$cpanid}->{fullname} =~ /$auth_search/i);
-    push @$auth_searches, {cpanid => $cpanid, %{$auths->{$cpanid}}};
+    push @$auth_searches, { cpanid => $cpanid, %{ $auths->{$cpanid} } };
   }
   $query->query(mode => 'author', query => $auth_search);
   $results = $query->{results};
@@ -81,12 +85,12 @@ for my $auth_search (qw(G G\w+A)) {
   compare_arrays($results, $auth_searches, \%keys);
 }
 
-%keys = map {$_ => 1} qw(dist_vers cpanid dist_file);
-for my $dist_search(qw(apache test.*perl)) {
+%keys = map { $_ => 1 } qw(dist_vers cpanid dist_file);
+for my $dist_search (qw(apache test.*perl)) {
   my $dist_searches = [];
   for my $dist_name (keys %$dists) {
     next unless $dist_name =~ /$dist_search/i;
-    push @$dist_searches, {dist_name => $dist_name, %{$dists->{$dist_name}}};
+    push @$dist_searches, { dist_name => $dist_name, %{ $dists->{$dist_name} } };
   }
   $query->query(mode => 'dist', query => $dist_search);
   $results = $query->{results};
@@ -96,12 +100,12 @@ for my $dist_search(qw(apache test.*perl)) {
   compare_arrays($results, $dist_searches, \%keys);
 }
 
-%keys = map {$_ => 1}  qw(dist_name mod_vers);
+%keys = map { $_ => 1 } qw(dist_name mod_vers);
 for my $mod_search (qw(net ^uri::.*da)) {
   my $mod_searches = [];
   for my $mod_name (keys %$mods) {
     next unless $mod_name =~ /$mod_search/i;
-    push @$mod_searches, {mod_name => $mod_name, %{$mods->{$mod_name}}};
+    push @$mod_searches, { mod_name => $mod_name, %{ $mods->{$mod_name} } };
   }
   $query->query(mode => 'module', query => $mod_search);
   $results = $query->{results};
@@ -127,17 +131,18 @@ for my $mode (qw(author dist module)) {
 sub compare_arrays {
   my ($x, $y, $keys) = @_;
   my $N = scalar @$x;
-  for (my $i=0; $i<$N; $i++) {
+  for (my $i = 0 ; $i < $N ; $i++) {
     my $href = $x->[$i];
-    for my $key( keys %$href) {
+    for my $key (keys %$href) {
       next unless defined $keys->{$key};
       next unless $x->[$i]->{$key};
       my $flag = 0;
-      for (my $j=0; $j<$N; $j++) {
+      for (my $j = 0 ; $j < $N ; $j++) {
         if ($y->[$j]->{$key}) {
-          my $test = ($key =~ /vers$/) ?
-            (vcmp($x->[$i]->{$key}, $y->[$j]->{$key}) == 0) :
-              $x->[$i]->{$key} eq $y->[$j]->{$key};
+          my $test =
+              ($key =~ /vers$/)
+            ? (vcmp($x->[$i]->{$key}, $y->[$j]->{$key}) == 0)
+            : $x->[$i]->{$key} eq $y->[$j]->{$key};
           if ($test) {
             pass("Found matching $key");
             $flag++;

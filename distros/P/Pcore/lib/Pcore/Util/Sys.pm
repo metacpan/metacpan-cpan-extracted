@@ -5,14 +5,24 @@ use POSIX qw[];
 
 our $EXPORT = [qw[is_superuser run_proc]];
 
-sub cpus_num {
+sub cpus_num ($num = undef) {
     state $cpus_num = do {
         require Sys::CpuAffinity;
 
         Sys::CpuAffinity::getNumCpus();
     };
 
-    return $cpus_num;
+    if ( !$num ) {
+        return $cpus_num;
+    }
+    elsif ( $num > 0 ) {
+        return $num;
+    }
+    else {
+        $num = $cpus_num + $num;
+
+        return $num > 0 ? $num : 1;
+    }
 }
 
 sub change_priv {

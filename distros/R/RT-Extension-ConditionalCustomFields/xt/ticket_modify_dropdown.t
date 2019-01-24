@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use RT::Extension::ConditionalCustomFields::Test tests => 21;
+use RT::Extension::ConditionalCustomFields::Test tests => 22;
 
 use WWW::Mechanize::PhantomJS;
 
@@ -88,3 +88,12 @@ $ticket->AddCustomFieldValue(Field => $cf_condition->id , Value => $cf_values->[
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
 my $ticket_cf_conditioned_by_img = $mjs->xpath('//input[@name="Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_conditioned_by_img->id . '-Upload"]', single => 1);
 ok($ticket_cf_conditioned_by_img->is_hidden, "Hide ConditionedByImg when Condition is not met");
+
+my $cf_conditioned_by_wiki = RT::CustomField->new(RT->SystemUser);
+$cf_conditioned_by_wiki->Create(Name => 'ConditionedByImg', Type => 'Wikitext', MaxValues => 1, Queue => 'General');
+$cf_conditioned_by_wiki->SetConditionedBy($cf_condition->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
+$ticket->AddCustomFieldValue(Field => $cf_condition->id , Value => $cf_values->[1]->Name);
+
+$mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
+my $ticket_cf_conditioned_by_wiki = $mjs->xpath('//textarea[@name="Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_conditioned_by_wiki->id . '-Values"]', single => 1);
+ok($ticket_cf_conditioned_by_wiki->is_hidden, "Hide ConditionedByWiki when Condition is not met");

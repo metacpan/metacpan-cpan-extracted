@@ -1,6 +1,6 @@
 package PMLTQ::Command::configuration;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::configuration::VERSION = '2.0.1';
+$PMLTQ::Command::configuration::VERSION = '2.0.2';
 # ABSTRACT: GET current configuration
 
 use PMLTQ::Base 'PMLTQ::Command';

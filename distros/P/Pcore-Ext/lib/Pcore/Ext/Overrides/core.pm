@@ -1,8 +1,8 @@
-package Pcore::Ext::Lib::Overrides::Core;
+package Pcore::Ext::Overrides::core;
 
 use Pcore -l10n;
 
-sub EXT_L10N : Define('Ext.L10N') : Ext('core') {
+sub EXT_L10N : Name('Ext.L10N') {
     return {
         singleton => \1,
 
@@ -162,11 +162,10 @@ JS
 }
 
 # ExtDirect websocket integration
-sub EXT_direct_websocket_provider : Extend('Ext.direct.RemotingProvider') : Ext('core') {
+sub EXT_direct_websocket_provider : Extend('Ext.direct.RemotingProvider') : Type('direct') : Alias('websocketprovider') {
     return {
-        alias => 'direct.websocketprovider',
-
-        invokeFunction => func [ 'action', 'method', 'args' ], <<'JS',
+        invokeFunction => func [ 'action', 'method', 'args' ],
+        <<'JS',
             var a = '/' + action.replace(/\./g, '/') + '/' + method.name;
 
             // this is ExtDirect call
@@ -213,7 +212,7 @@ JS
 }
 
 # override filter serializer
-sub EXT_override_data_proxy_Server : Override('Ext.data.proxy.Server') : Ext('core') {
+sub EXT_override_data_proxy_Server : Override('Ext.data.proxy.Server') {
     return {
         encodeFilters => func ['filters'],
         <<'JS',
@@ -237,7 +236,7 @@ JS
 }
 
 # override sorter serializer
-sub EXT_override_util_Sorter : Override('Ext.util.Sorter') : Ext('core') {
+sub EXT_override_util_Sorter : Override('Ext.util.Sorter') {
     return {
         serialize => func [],
         <<'JS',
@@ -247,7 +246,7 @@ JS
 }
 
 # override default values
-sub EXT_override_data_proxy_Direct : Override('Ext.data.proxy.Direct') : Ext('core') {
+sub EXT_override_data_proxy_Direct : Override('Ext.data.proxy.Direct') {
     return {
         batchActions => \1,
         pageParam    => $EMPTY,
@@ -262,7 +261,7 @@ sub EXT_override_data_proxy_Direct : Override('Ext.data.proxy.Direct') : Ext('co
 }
 
 # add methods for work with pcore response object
-sub EXT_override_data_operation_Operation : Override('Ext.data.operation.Operation') : Ext('core') {
+sub EXT_override_data_operation_Operation : Override('Ext.data.operation.Operation') {
     return {
         toRes => func [],
         <<'JS',
@@ -316,7 +315,7 @@ JS
 }
 
 # add methods for work with pcore response object
-sub EXT_override_direct_Event : Override('Ext.direct.Event') : Ext('core') {
+sub EXT_override_direct_Event : Override('Ext.direct.Event') {
     return {
         getStatus => func [],
         <<'JS',
@@ -367,7 +366,7 @@ JS
 
 # allow to redirect to '', when current hash is ''
 # https://www.sencha.com/forum/showthread.php?343467-6-5-0-redirectTo-force-is-ignored
-sub EXT_override_app_BaseController : Override('Ext.app.BaseController') : Ext('core') {
+sub EXT_override_app_BaseController : Override('Ext.app.BaseController') {
     return {
         redirectTo => func ['hash, opt'],
         <<'JS',
@@ -487,7 +486,7 @@ __END__
 
 =head1 NAME
 
-Pcore::Ext::Lib::Overrides::Core
+Pcore::Ext::Overrides::core
 
 =head1 SYNOPSIS
 

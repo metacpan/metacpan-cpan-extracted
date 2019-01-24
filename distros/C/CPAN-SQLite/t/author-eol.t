@@ -52,6 +52,7 @@ my @files = (
     't/05meta_update.t',
     't/06retrieve.t',
     't/07download.t',
+    't/08circular_references.t',
     't/author-critic.t',
     't/author-eol.t',
     't/author-minimum-version.t',

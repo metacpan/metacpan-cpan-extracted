@@ -6,7 +6,7 @@ use vars qw($VERSION %DEFAULTS);
 use Carp;
 #use Data::Dumper;
 
-$VERSION = '1.76';
+$VERSION = '1.77';
 %DEFAULTS = (
   "CSV_DELIMITER"=>',', # controls how to read/write CSV file
   "CSV_QUALIFIER"=>'"',
@@ -2535,9 +2535,9 @@ We use Data::Table instead of Table, because Table.pm has already been used insi
 
 =head1 INTRODUCTION
 
-=over 4
-
 A table object has three data members:
+
+=over 4
 
 =item 1. $data:
 
@@ -3166,12 +3166,30 @@ In the $pattern string, a column element should be referred as ${column_name}.
 match_pattern_hash() is added in 1.62. The difference between this method and match_pattern is each row is fed to the pattern as a hash %_.
 In the case of match_pattern, each row is fed as an array ref $_.  The pattern for match_pattern_hash() becomes much cleaner.
 
-If a table has two columns: Col_A as the 1st column and Col_B as the 2nd column, a filter "Col_A>2 AND Col_B<2" is written before as
+If a table has two columns: Col_A as the 1st column and Col_B as the 2nd column, a filter "Col_A > 2 AND Col_B < 2" is written before as
 	$t->match_pattern('$_->[0] > 2 && $_->[1] <2');
 where we need to figure out $t->colIndex('Col_A') is 0 and $t->colIndex('Col_B') is 1, in order to build the pattern.
 Now you can use column name directly in the pattern:
 	$t->match_pattern_hash('$_{Col_A} >2 && $_{Col_B} <2');
 This method creates $t->{OK}, as well as @Data::Table::OK, same as match_pattern().
+
+Simple boolean operators such as and/or can be directly put into the pattern string. More complex logic can also be supported in the example below:
+
+    my $t= Data::Table->new([[2,5,'Jan'], [1,6,'Feb'], [-3,2,'Apr'], [6,-4,'Dec']], ['X','Y','Month'], 0);
+    # we need to use our instead of my, so that %Q1 is accessible within match_pattern_hash
+    our %Q1 = ('Jan'=>1, 'Feb'=>1, 'Mar'=>1);
+    # find records belongin to Q1 months, we need to use %::Q1 to access the Q1 defined outside Data::Table
+    $t2=$t->match_pattern_hash('exists $::Q1{$_{Month}}');
+
+similarly, subroutines can be accessed inside match_pattern_hash using "::":
+
+    sub in_Q1 {
+        my $x = shift;
+        return ($x eq 'Jan' or $x eq 'Feb' or $x eq 'Mar');
+    }
+    $t2=$t->match_pattern_hash('::in_Q1($_{Month})');
+
+However, such usage is discouraged, as match_pattern_hash() does not throw errors when the pattern is invalid.  For complex filtering logic, we strongly recommend you stick to row-based looping.
 
 =item table table::match_string ($s, $caseIgnore, $countOnly)
 

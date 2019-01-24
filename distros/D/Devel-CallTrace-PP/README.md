@@ -1,10 +1,10 @@
 # NAME
 
-Devel::CallTrace::PP - Main module of dctpp
+Devel::CallTrace::PP - Main module for dctpp CLI tool
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # AUTHOR
 

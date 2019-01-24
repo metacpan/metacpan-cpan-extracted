@@ -1,0 +1,74 @@
+NAME
+
+    Dist::Zilla::Plugin::ReadmeAddDevInfo -
+    Dist::Zilla::Plugin::ReadmeAddDevInfo - add info how to contribute to
+    the project
+
+VERSION
+
+    version 0.03
+
+SYNOPSIS
+
+        # in dist.ini
+        [ReadmeAddDevInfo]
+        phase = release
+
+CONFIG
+
+ phase
+
+        [ReadmeAddDevInfo]
+        phase = release
+
+    Which Dist::Zilla phase to add the info: build, release or filemunge.
+    For the build and release phases, the README that is on disk will be
+    modified, whereas for the filemunge it's the internal zilla version of
+    the README that will be modified.
+
+    The default is build.
+
+ before
+
+        [ReadmeAddDevInfo]
+        before = # AUTHOR
+
+    Where to put the info in. In this example the info is added before the
+    "AUTHOR" section.
+
+ add_contribution_file
+
+        [ReadmeAddDevInfo]
+        add_contribution_file = 1
+
+    Also add the info as CONTRIBUTING.md. The information from this file is
+    shown in MetaCPAN <https://metacpan.org> under the "How to contribute"
+    link. E.g. for this dist: How to contribute
+    <https://metacpan.org/contributing-to/Dist-Zilla-Plugin-ReadmeAddDevInfo>.
+
+METHODS
+
+ add_info
+
+ after_build
+
+ after_release
+
+ munge_files
+
+SEE ALSO
+
+    Minilla, Dist::Zilla::Plugin::TravisCI::StatusBadge
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

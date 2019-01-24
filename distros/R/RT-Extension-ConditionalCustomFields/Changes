@@ -1,5 +1,9 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+0.15 2019-01-24
+ - Fix textarea CF conditionned byFix textarea CF conditionned by
+ - Add tests for textarea CF conditionned by
+
 0.14 2019-01-22
  - Add tests for display of cascaded conditioned CFs
  - Add tests for edit of cascaded conditioned CFs

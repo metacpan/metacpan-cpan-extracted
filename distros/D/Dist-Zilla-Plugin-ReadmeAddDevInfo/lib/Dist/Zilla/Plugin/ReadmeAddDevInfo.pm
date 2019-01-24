@@ -14,7 +14,7 @@ use Dist::Zilla::File::OnDisk;
 use Dist::Zilla::File::InMemory;
 use Path::Tiny;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # same as Dist::Zilla::Plugin::ReadmeAnyFromPod
 with qw(
@@ -133,9 +133,12 @@ sub add_info {
     my $distname = $self->zilla->name;
     my $distmeta = $self->zilla->distmeta;
     my $repository = $distmeta->{resources}->{repository}->{url};
-    return unless $repository;
+
+    return if !$repository;
+
     my ($base_url, $user_name, $repository_name) = ($repository =~ m{^\w+://(.*)/([^\/]+)/(.*?)(\.git|\/|$)});
-    return unless $repository_name;
+
+    return if !$repository_name;
 
     if ( '.git' ne substr $repository, -4 ) {
         $repository .= '.git';
@@ -154,7 +157,7 @@ repository
 and change into the newly-created directory.
 
 ```
-\$ cd $distname
+\$ cd $repository_name
 ```
 
 The project uses [`Dist::Zilla`](https://metacpan.org/pod/Dist::Zilla) to
@@ -228,7 +231,7 @@ Dist::Zilla::Plugin::ReadmeAddDevInfo - Dist::Zilla::Plugin::ReadmeAddDevInfo - 
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -266,6 +269,16 @@ Where to put the info in. In this example the info is added before the
 Also add the info as I<CONTRIBUTING.md>. The information from this file
 is shown in L<MetaCPAN|https://metacpan.org> under the "How to contribute" link.
 E.g. for this dist: L<How to contribute|https://metacpan.org/contributing-to/Dist-Zilla-Plugin-ReadmeAddDevInfo>.
+
+=head1 METHODS
+
+=head2 add_info
+
+=head2 after_build
+
+=head2 after_release
+
+=head2 munge_files
 
 =head1 SEE ALSO
 

@@ -24,6 +24,7 @@ t/05meta_new.t
 t/05meta_update.t
 t/06retrieve.t
 t/07download.t
+t/08circular_references.t
 t/cpan/authors/01mailrc.txt.gz
 t/cpan/modules/02packages.details.txt.gz
 t/dot-cpan/CPAN/TestConfig.pm

@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Delhi
 
+0.81  Thu Jan 24 15:20:00 2019
+      - Added dependency on Dist::Zilla::PluginBundle::MANWAR v0.08.
+
 0.80  Mon Dec 24 09:50:00 2018
       - Updated dependency on Map::Tube v3.58.
 

@@ -24,7 +24,7 @@ sub _build_decoded_data ($self) {
 
     require HTTP::Message;
 
-    return HTTP::Message->new( [ 'Content-Type' => $self->{headers}->{'content-type'} ], $self->{data}->$* )->decoded_content( raise_error => 1, ref => 1 );
+    return HTTP::Message->new( [ 'Content-Type' => $self->{headers}->{'content-type'} ], $self->{data}->$* )->decoded_content( raise_error => 1 );
 }
 
 sub _build_tree ($self) {
@@ -32,32 +32,10 @@ sub _build_tree ($self) {
 
     return if !is_plain_scalarref $self->{data};
 
-    require HTML5::DOM;
+    # return P->html->tree( $self->{data}->$* );
 
-    state $parser = HTML5::DOM->new( {
-        threads => 0,
-        async   => 0,
-    } );
-
-    return $parser->parse( $self->decoded_data->$* );
+    return P->html->tree( $self->decoded_data, encoding => HTML5::DOM::Encoding->UTF_8 );
 }
-
-# TODO remove
-# sub _build_tree_xpath ($self) {
-#     return if !$self->{data};
-
-#     return if !is_plain_scalarref $self->{data};
-
-#     require HTML::TreeBuilder::LibXML;
-
-#     my $tree = HTML::TreeBuilder::LibXML->new;
-
-#     $tree->parse( $self->decoded_data->$* );
-
-#     $tree->eof;
-
-#     return $tree;
-# }
 
 1;
 __END__

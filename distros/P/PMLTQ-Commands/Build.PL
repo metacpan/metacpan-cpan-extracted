@@ -18,7 +18,7 @@ my %module_build_args = (
     "Maty\x{e1}\x{161} Kopp <matyas.kopp\@gmail.com>"
   ],
   "dist_name" => "PMLTQ-Commands",
-  "dist_version" => "2.0.1",
+  "dist_version" => "2.0.2",
   "license" => "perl",
   "module_name" => "PMLTQ::Commands",
   "recursive_test_files" => 1,
@@ -28,6 +28,9 @@ my %module_build_args = (
     "PMLTQ" => "v2.0.1",
     "URI::Encode" => 0
   },
+  "script_files" => [
+    "script/pmltq"
+  ],
   "share_dir" => {
     "dist" => "share"
   },

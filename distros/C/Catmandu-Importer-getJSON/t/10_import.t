@@ -12,10 +12,10 @@ sub test_importer(@) { ##no critic
         client => MockFurl::new( content => $content ),
     );
     $importer->url($url) if defined $url;
-    
+
     $expect = [ map { $expect } @$requests ] if ref $expect ne 'ARRAY';
     is_deeply $importer->to_array, $expect, $msg;
-    is_deeply $importer->client->urls, [ map { $_->[1] } @$requests ]; 
+    is_deeply $importer->client->urls, [ map { $_->[1] } @$requests ];
 }
 
 my @requests = (
@@ -24,13 +24,13 @@ my @requests = (
     [ '/path?q=%20 ' => 'http://example.org/path?q=%20' ],
 );
 
-test_importer 'http://example.org/', \@requests, 
+test_importer 'http://example.org/', \@requests,
     '{"x":"\u2603"}' => {x=>"\x{2603}"},
     'URI';
 
 test_importer
     'http://example.{tdl}/{?foo}{?bar}',
-    [ 
+    [
         [ 'http://example.org' => 'http://example.org' ],
         [ '{"tdl":"com"}' => 'http://example.com/' ],
         [ '{"tdl":"com","bar":"doz"}' => 'http://example.com/?bar=doz' ],
@@ -43,12 +43,12 @@ is_deeply(Catmandu::Importer::getJSON->new(
     from   =>  'http://example.org',
 )->to_array, [{hello=>"World"}], '--from');
 
-is_deeply(Catmandu::Importer::getJSON->new( 
+is_deeply(Catmandu::Importer::getJSON->new(
     dry => 1, url => 'http://example.{tdl}/',
     file => \'{"tdl":"org"}'
 )->to_array, [{url=>"http://example.org/"}],'--dry');
 
-test_importer undef, 
+test_importer undef,
     [ ["http://example.info" => "http://example.info" ] ],
     '[{"n":1},{"n":2}]' => [{"n"=>1},{"n"=>2}],
     'JSON array response';
@@ -65,6 +65,7 @@ is_deeply $importer->rest->first, { n => 2}, 'array response 2/2';
     is_deeply(Catmandu::Importer::getJSON->new(
         file => \"x\n\nhttp://example.org/",
         dry => 1,
+        warn => 1,
     )->to_array, [{ url => "http://example.org/" }]);
     is $warning, "failed to construct URL: x\n", "warning";
 }

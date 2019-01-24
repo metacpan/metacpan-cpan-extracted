@@ -1,6 +1,6 @@
 package Catmandu::Fix::get_json;
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 use Catmandu::Sane;
 use Catmandu::Util;
@@ -10,22 +10,22 @@ use Catmandu::Importer::getJSON;
 
 with "Catmandu::Fix::Base";
 
-has url     => (fix_arg => 1, default => sub {"url"});
+has url => ( fix_arg => 1, default => sub { "url" } );
 
-has dry     => (fix_opt => 1);
-has cache   => (fix_opt => 1);
-has timeout => (fix_opt => 1, default => sub { 10 } );
-has agent   => (fix_opt => 1);
-has proxy   => (fix_opt => 1);
-has wait    => (fix_opt => 1);
+has dry     => ( fix_opt => 1 );
+has cache   => ( fix_opt => 1 );
+has timeout => ( fix_opt => 1, default => sub { 10 } );
+has agent   => ( fix_opt => 1 );
+has proxy   => ( fix_opt => 1 );
+has wait    => ( fix_opt => 1 );
 
-has vars    => (fix_opt => 1);
-has path    => (fix_opt => 1);
+has vars => ( fix_opt => 1 );
+has path => ( fix_opt => 1 );
 
-has importer => (is => 'ro', lazy => 1, builder => 1);
+has importer => ( is => 'ro', lazy => 1, builder => 1 );
 
 sub _build_importer {
-	my ($self) = @_;
+    my ($self) = @_;
 
     my %options = (
         dry     => $self->dry,
@@ -35,80 +35,108 @@ sub _build_importer {
         proxy   => $self->proxy,
         wait    => $self->wait,
     );
-    
+
     # URL template or plain URL
     if ( $self->url =~ qr{^https?://} ) {
         $options{ $self->vars ? 'url' : 'from' } = $self->url;
     }
-	Catmandu::Importer::getJSON->new(%options);
+    Catmandu::Importer::getJSON->new(%options);
 }
 
 sub BUILD {
     my ($self) = @_;
-    unless (defined $self->path) {
+    unless ( defined $self->path ) {
         $self->{path} = $self->url =~ qr{^https?://} ? '' : $self->url;
     }
 }
 
 sub emit {
-    my ($self, $fixer) = @_;
-    my $path = $fixer->split_path($self->path);
-    my $importer = $fixer->capture($self->importer);
+    my ( $self, $fixer ) = @_;
+    my $path     = $fixer->split_path( $self->path );
+    my $importer = $fixer->capture( $self->importer );
 
     # plain URL
-    if ($self->importer->from) {
-        return $fixer->emit_create_path($fixer->var, $path, sub {
-            sprintf '%s = %s->request(%s->from) // { };',
-                shift, $importer, $importer;
-        });       
+    if ( $self->importer->from ) {
+        return $fixer->emit_create_path(
+            $fixer->var,
+            $path,
+            sub {
+                sprintf '%s = %s->request(%s->from) // { };',
+                  shift, $importer, $importer;
+            }
+        );
     }
 
     # URL template or base URL
-    if ($self->importer->url) {
-        my $tpl = $fixer->split_path($self->vars);
+    if ( $self->importer->url ) {
+        my $tpl = $fixer->split_path( $self->vars );
         my $url = $fixer->generate_var;
 
-        return $fixer->emit_create_path($fixer->var, $tpl, sub {
-            my $tpl = shift;
-            "my $url;".
-            "if (is_hash_ref($tpl) or is_string($tpl) and $tpl !~ qr{^https?://}) {".
-            "  $url = ${importer}->construct_url($tpl) ".
-            "}".
-            $fixer->emit_create_path($fixer->var, $path, sub {            
-                sprintf '%s = %s ? %s->request(%s) // {} : {};',
-                    shift, $url, $importer, $url;
-            })
-        });
+        return $fixer->emit_create_path(
+            $fixer->var,
+            $tpl,
+            sub {
+                my $tpl = shift;
+                "my $url;"
+                  . "if (is_hash_ref($tpl) or is_string($tpl) and $tpl !~ qr{^https?://}) {"
+                  . "  $url = ${importer}->construct_url($tpl) " . "}"
+                  . $fixer->emit_create_path(
+                    $fixer->var,
+                    $path,
+                    sub {
+                        sprintf '%s = %s ? %s->request(%s) // {} : {};',
+                          shift, $url, $importer, $url;
+                    }
+                  );
+            }
+        );
     }
 
     # URL from field
-    my $url = $fixer->split_path($self->url);
+    my $url = $fixer->split_path( $self->url );
 
-    return $fixer->emit_create_path($fixer->var, $url, sub {
-        if ($self->vars) {
-            my $base = shift;
-            my $tpl = $fixer->split_path($self->vars);
-            my $url = $fixer->generate_var;
+    return $fixer->emit_create_path(
+        $fixer->var,
+        $url,
+        sub {
+            if ( $self->vars ) {
+                my $base = shift;
+                my $tpl  = $fixer->split_path( $self->vars );
+                my $url  = $fixer->generate_var;
 
-            return $fixer->emit_create_path($fixer->var, $tpl, sub {
-                my $tpl = shift;
-                "my $url;".
-                "if (is_hash_ref($tpl) or is_string($tpl) and $tpl !~ qr{^https?://}) {".
-                "  $url = ${importer}->construct_url($base, $tpl); ".
-                "}".
-                $fixer->emit_create_path($fixer->var, $path, sub {            
-                    sprintf '%s = %s ? %s->request(%s) // {} : {};',
-                        shift, $url, $importer, $url;
-                })
-            });
-        } else {
-            my $url = shift;
-            return $fixer->emit_create_path($fixer->var, $path, sub {
-                sprintf '%s = %s->request(%s) // { };',
-                    shift, $importer, $url;
-            });       
+                return $fixer->emit_create_path(
+                    $fixer->var,
+                    $tpl,
+                    sub {
+                        my $tpl = shift;
+                        "my $url;"
+                          . "if (is_hash_ref($tpl) or is_string($tpl) and $tpl !~ qr{^https?://}) {"
+                          . "  $url = ${importer}->construct_url($base, $tpl); "
+                          . "}"
+                          . $fixer->emit_create_path(
+                            $fixer->var,
+                            $path,
+                            sub {
+                                sprintf '%s = %s ? %s->request(%s) // {} : {};',
+                                  shift, $url, $importer, $url;
+                            }
+                          );
+                    }
+                );
+            }
+            else {
+                my $url = shift;
+                return $fixer->emit_create_path(
+                    $fixer->var,
+                    $path,
+                    sub {
+                        sprintf '%s = %s->request(%s) // { };',
+                          shift, $importer, $url;
+                    }
+                );
+            }
         }
-    });
+    );
 
 }
 

@@ -1,5 +1,9 @@
 Revision history for Sys::PageCache
 
+0.06  2019-01-24
+    [IMPROVEMENTS]
+        - Use needed parts of POSIX [RT #128339]
+
 0.05  2017-07-25
     [IMPROVEMENTS]
         - Pass tests on linux >= 4.8 [RT #122591]

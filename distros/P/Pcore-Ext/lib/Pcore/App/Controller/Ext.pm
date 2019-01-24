@@ -7,30 +7,35 @@ use Pcore::Util::Scalar qw[is_plain_arrayref];
 
 has ext_app   => ( required => 1 );     # name of the linked application, required
 has ext_title => 'ExtJS Application';
-has ext_theme => ();
 
-has _cache => ();
+has _bootstrap => ();
 
-const our $DEFAULT_THEME_CLASSIC => 'aria';
-const our $DEFAULT_THEME_MODERN  => 'material';
-
+# TODO api_url
 sub BUILD ( $self, $args ) {
-    Pcore::Ext->scan( $self->{app}, ref( $self->{app} ) . '::Ext' );
+    my $ns = ref( $self->{app} ) . '::Ext::' . $self->{ext_app};
 
-    die qq[Ext app "$self->{ext_app}" not found] if !$Pcore::Ext::APP->{ $self->{ext_app} };
+    my $app = $self->{app}->{ext}->{ $self->{ext_app} } = Pcore::Ext->new(
+        namespace => $ns,
+        app       => $self->{app},      # maybe Pcore::App instance
+        cdn       => undef,             # maybe Pcore::CDN instance
+        prefixes  => {
+            pcore => undef,
+            dist  => undef,
+            cdn   => undef,
+        },
+
+        # TODO
+        # api_url => $self->{app}->{router}->get_host_api_path( $req->{host} ),
+    );
+
+    $app->build;
+
+    die qq[Ext app "$self->{ext_app}" not found] if !defined $self->{app}->{ext}->{ $self->{ext_app} };
 
     return;
 }
 
-sub build_resources ( $self, $req, $type ) {
-    return;
-}
-
-sub build_theme ( $self, $req, $type ) {
-    ( my $theme ) = $req->{env}->{QUERY_STRING} =~ m/theme=([[:alpha:]-]+)/sm;
-
-    return $theme;
-}
+sub _get_app ($self) { return $self->{app}->{ext}->{ $self->{ext_app} } }
 
 around run => sub ( $orig, $self, $req ) {
     if ( defined $req->{path} ) {
@@ -48,43 +53,28 @@ around run => sub ( $orig, $self, $req ) {
         }
     }
     else {
-        $self->_return_html($req);
+        $self->_return_bootstrap($req);
     }
 
     return;
 };
 
-sub _return_html ( $self, $req ) {
-    my $app = $Pcore::Ext::APP->{ $self->{ext_app} };
+sub _return_bootstrap ( $self, $req ) {
+    my $app = $self->_get_app;
 
-    my $theme = $self->build_theme( $req, $app->{ext_type} ) || $self->{ext_theme} || ( $app->{ext_type} eq 'classic' ? $DEFAULT_THEME_CLASSIC : $DEFAULT_THEME_MODERN );
-
-    if ( !$self->{_cache}->{html}->{$theme} ) {
-        my $resources = [ ( $self->build_resources( $req, $app->{ext_type} ) // [] )->@* ];
+    if ( !$self->{_bootstrap} ) {
+        push my $resources->@*, $app->get_resources( $self->{app}->{devel} )->@*;
 
         my $cdn = $self->{app}->{cdn};
-
-        # CDN resources
-        push $resources->@*, $cdn->get_resources(
-            'pcore_api',
-            [   'extjs6',
-                ver           => $app->{ext_ver},
-                type          => $app->{ext_type},
-                theme         => $theme,
-                default_theme => $app->{ext_type} eq 'classic' ? $DEFAULT_THEME_CLASSIC : $DEFAULT_THEME_MODERN,
-                devel         => $self->{app}->{devel}
-            ],
-            'fa5',    # NOTE FontAwesme must be after ExtJS in resources or icons will not be displayed
-        )->@*;
 
         # overrides
         push $resources->@*, $cdn->get_script_tag( $self->get_abs_path('overrides.js') );
 
-        # TODO calc checksum 'sha384-' . P->digest->sha384_b64( $res->{body}->$* );
+        # app
         push $resources->@*, $cdn->get_script_tag( $self->get_abs_path('app.js') );
 
         # generate HTML tmpl
-        $self->{_cache}->{html}->{$theme} = \P->text->encode_utf8(
+        $self->{_bootstrap} = \P->text->encode_utf8(
             P->tmpl->render(
                 'ext/index.html',
                 {   INDEX => {    #
@@ -96,174 +86,63 @@ sub _return_html ( $self, $req ) {
         );
     }
 
-    $req->( 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{_cache}->{html}->{$theme} )->finish;
+    $req->( 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{_bootstrap} )->finish;
 
     return;
 }
 
 sub _return_overrides ( $self, $req ) {
-    if ( !$self->{_cache}->{overrides} ) {
-        my $app = $Pcore::Ext::APP->{ $self->{ext_app} };
+    my $app = $self->_get_app;
 
-        my $js = $Pcore::Ext::EXT->{ $app->{ext_type} };
+    my $etag = 'W/' . $app->get_overrides_md5( $self->{app}->{devel} );
 
-        $self->{_cache}->{overrides}->{js} = $self->_prepare_js($js);
-
-        $self->{_cache}->{overrides}->{etag} = 'W/' . P->digest->md5_hex( $self->{_cache}->{overrides}->{js}->$* );
-    }
-
-    if ( $req->{env}->{HTTP_IF_NONE_MATCH} && $req->{env}->{HTTP_IF_NONE_MATCH} eq $self->{_cache}->{overrides}->{etag} ) {
+    if ( $req->{env}->{HTTP_IF_NONE_MATCH} && $req->{env}->{HTTP_IF_NONE_MATCH} eq $etag ) {
         $req->(304)->finish;    # not modified
     }
     else {
-        $req->( 200, [ 'Content-Type' => 'application/javascript', 'Cache-Control' => 'must-revalidate', Etag => $self->{_cache}->{overrides}->{etag} ], $self->{_cache}->{overrides}->{js} )->finish;
+        $req->( 200, [ 'Content-Type' => 'application/javascript', 'Cache-Control' => 'must-revalidate', Etag => $etag ], $app->get_overrides( $self->{app}->{devel} ) )->finish;
     }
 
     return;
 }
 
 sub _return_locale ( $self, $req ) {
-    state $locale_settings = {};
+    my $app = $self->_get_app;
 
     # get locale from query param
     ( my $locale ) = $req->{env}->{QUERY_STRING} =~ m/locale=([[:alpha:]-]+)/sm;
 
-    if ( !$locale || !$self->{app}->get_locales->{$locale} ) {
-        $req->(404)->finish;
+    return $req->(404)->finish if !$locale;
 
-        return;
-    }
+    my $etag = $app->get_locale_md5( $locale, $self->{app}->{devel} );
 
-    if ( !$self->{_cache}->{locale}->{$locale} ) {
-        my $app = $Pcore::Ext::APP->{ $self->{ext_app} };
+    return $req->(404)->finish if !$etag;
 
-        $locale_settings->{$locale} //= $ENV->{share}->read_cfg("data/ext/locale/$locale.perl");
+    $etag = 'W/' . $etag;
 
-        # load locale
-        Pcore::Core::L10N::load_locale($locale) if !exists $Pcore::Core::L10N::MESSAGES->{$locale};
-
-        # get messages, used by app classes
-        my $locale_messages = $Pcore::Core::L10N::MESSAGES->{$locale};
-
-        # grep app messages, that have translation
-        my $messages = { $locale_messages->%{ grep { $locale_messages->{$_} } keys $app->{l10n}->%* } };
-
-        my $plural_form_exp = $Pcore::Core::L10N::LOCALE_PLURAL_FORM->{$locale}->{exp} // 0;
-
-        my $js = <<"JS";
-            Ext.L10N.addLocale(
-                '$locale',
-                {   messages: @{[ to_json $messages, canonical => 1 ]},
-                    pluralFormExp: function (n) { return $plural_form_exp; },
-                    settings: @{[ to_json $locale_settings->{$locale}, canonical => 1 ]}
-                }
-            );
-JS
-
-        $self->{_cache}->{locale}->{$locale}->{js} = $self->_prepare_js($js);
-
-        $self->{_cache}->{locale}->{$locale}->{etag} = 'W/' . P->digest->md5_hex( $self->{_cache}->{locale}->{$locale}->{js}->$* );
-    }
-
-    if ( $req->{env}->{HTTP_IF_NONE_MATCH} && $req->{env}->{HTTP_IF_NONE_MATCH} eq $self->{_cache}->{locale}->{$locale}->{etag} ) {
+    if ( $req->{env}->{HTTP_IF_NONE_MATCH} && $req->{env}->{HTTP_IF_NONE_MATCH} eq $etag ) {
         $req->(304)->finish;    # not modified
     }
     else {
-        $req->( 200, [ 'Content-Type' => 'application/javascript', 'Cache-Control' => 'must-revalidate', Etag => $self->{_cache}->{locale}->{$locale}->{etag} ], $self->{_cache}->{locale}->{$locale}->{js} )->finish;
+        $req->( 200, [ 'Content-Type' => 'application/javascript', 'Cache-Control' => 'must-revalidate', Etag => $etag ], $app->get_locale( $locale, $self->{app}->{devel} ) )->finish;
     }
 
     return;
 }
 
 sub _return_app ( $self, $req ) {
-    my $app = $Pcore::Ext::APP->{ $self->{ext_app} };
+    my $app = $self->_get_app;
 
-    if ( !$self->{_cache}->{app} ) {
-        my $ext_app = $Pcore::Ext::APP->{ $self->{ext_app} };
+    my $etag = 'W/' . $app->get_app_md5( $self->{app}->{devel} );
 
-        my $data = {
-            api_path => $self->{app}->{router}->get_host_api_path( $req->{host} ),
-            api_map  => to_json(
-                {   type    => 'websocket',                                                 # remoting
-                    url     => $self->{app}->{router}->get_host_api_path( $req->{host} ),
-                    actions => $ext_app->{api},
-
-                    # not mandatory options
-                    # id              => 'api',
-                    namespace       => 'EXTDIRECT.' . ref( $self->{app} ) =~ s[::][]smgr,
-                    timeout         => 0,                                                   # milliseconds, 0 - no timeout
-                    version         => undef,
-                    maxRetries      => 0,                                                   # number of times to re-attempt delivery on failure of a call
-                    headers         => {},
-                    enableBuffer    => 10,                                                  # \1, \0, milliseconds
-                    enableUrlEncode => undef,
-                },
-                canonical => 1
-            ),
-        };
-
-        my $js = <<"JS";
-            Ext.Loader.setConfig({
-                enabled: false,
-                disableCaching: false
-            });
-
-            // app classes
-            $ext_app->{content}
-
-            Ext.ariaWarn = Ext.emptyFn;
-
-            // ExtDirect api
-            Ext.direct.Manager.addProvider($data->{api_map});
-
-            Ext.application({
-                name: 'APP',
-                api: new PCORE({
-                    url: '$data->{api_path}',
-                    version: '$ext_app->{api_ver}',
-                    listenEvents: null,
-                    onConnect: function(api) {},
-                    onDisconnect: function(api, status, reason) {},
-                    onEvent: function(api, ev) { Ext.fireEvent('remoteEvent', ev); },
-                    onListen: function(api, events) {},
-                    onRpc: null
-                }),
-                mainView: '$ext_app->{viewport}'
-            });
-JS
-
-        $self->{_cache}->{app}->{js} = $self->_prepare_js($js);
-
-        $self->{_cache}->{app}->{etag} = 'W/' . P->digest->md5_hex( $self->{_cache}->{app}->{js}->$* );
-    }
-
-    if ( $req->{env}->{HTTP_IF_NONE_MATCH} && $req->{env}->{HTTP_IF_NONE_MATCH} eq $self->{_cache}->{app}->{etag} ) {
+    if ( $req->{env}->{HTTP_IF_NONE_MATCH} && $req->{env}->{HTTP_IF_NONE_MATCH} eq $etag ) {
         $req->(304)->finish;    # not modified
     }
     else {
-        $req->( 200, [ 'Content-Type' => 'application/javascript', 'Cache-Control' => 'must-revalidate', Etag => $self->{_cache}->{app}->{etag} ], $self->{_cache}->{app}->{js} )->finish;
+        $req->( 200, [ 'Content-Type' => 'application/javascript', 'Cache-Control' => 'must-revalidate', Etag => $etag ], $app->get_app( $self->{app}->{devel} ) )->finish;
     }
 
     return;
-}
-
-sub _prepare_js ( $self, $js ) {
-    P->text->encode_utf8($js);
-
-    if ( $self->{app}->{devel} ) {
-        $js = P->src->decompress(
-            path => '1.js',
-            data => $js,
-        )->{data};
-    }
-    else {
-        $js = P->src->obfuscate(
-            path => '1.js',
-            data => $js,
-        )->{data};
-    }
-
-    return \$js;
 }
 
 1;

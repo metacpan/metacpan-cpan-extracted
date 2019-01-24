@@ -19,8 +19,8 @@ RUN /bin/bash -c ' \
     && yum -y install nginx-mainline \
     \
     # deploy non-CPAN deps
-    # && mkdir "$PCORE_LIB/pcore-share-www/" \
-    # && wget -q -O - https://bitbucket.org/softvisio/pcore-share-www/get/latest.tar.gz | tar -C "$PCORE_LIB/pcore-share-www/" --strip-components=1 -xzf - \
+    # && mkdir "$PCORE_LIB/pcore-cdn-static-data" \
+    # && wget -q -O - https://bitbucket.org/softvisio/pcore-cdn-static-data/get/tip.tar.gz | tar -C "$PCORE_LIB/pcore-cdn-static-data" --strip-components=1 -xzf - \
     \
     # deploy deps
     # yum -y install ...

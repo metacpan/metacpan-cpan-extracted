@@ -18,15 +18,17 @@ const our $IDN2_USE_STD3_ASCII_RULES => 32;
 
 use Inline(
     C => <<'C',
+# include "idn2.h"
+
 SV* domain_to_utf8 ( char* domain, ... ) {
     char *output;
 
-    // Function: int idn2_to_ascii_8z (const char *input, char **output, int flags)
-    //    input: zero terminated input UTF-8 string.
-    //    output: pointer to newly allocated output string.
-    //    flags: optional idn2_flags to modify behaviour.
-
     Inline_Stack_Vars;
+
+    // Function: int idn2_to_unicode_8z8z (const char *input, char **output, int flags)
+    //    input: Input zero-terminated UTF-8 string.
+    //    output: Newly allocated UTF-8 output string.
+    //    flags: optional idn2_flags to modify behaviour.
 
     int rc = idn2_to_unicode_8z8z( domain, &output, Inline_Stack_Items == 2 ? SvIV(Inline_Stack_Item(1)) : 0 );
 
@@ -45,12 +47,12 @@ SV* domain_to_utf8 ( char* domain, ... ) {
 SV* domain_to_ascii ( char* domain, ... ) {
     char *output;
 
-    // Function: int idn2_to_unicode_8z8z (const char *input, char **output, int flags)
-    //    input: Input zero-terminated UTF-8 string.
-    //    output: Newly allocated UTF-8 output string.
-    //    flags: optional idn2_flags to modify behaviour.
-
     Inline_Stack_Vars;
+
+    // Function: int idn2_to_ascii_8z (const char *input, char **output, int flags)
+    //    input: zero terminated input UTF-8 string.
+    //    output: pointer to newly allocated output string.
+    //    flags: optional idn2_flags to modify behaviour.
 
     int rc = idn2_to_ascii_8z( domain, &output, Inline_Stack_Items == 2 ? SvIV(Inline_Stack_Item(1)) : IDN2_NONTRANSITIONAL );
 
@@ -66,9 +68,11 @@ SV* domain_to_ascii ( char* domain, ... ) {
     }
 }
 C
-    auto_include => q[# include "idn2.h"],
-    libs         => $MSWIN ? '-lidn2' : '-l:libidn2.a',
-    ccflagsex    => '-Wall -Wextra -Ofast -std=c11',
+    libs      => $MSWIN ? '-lidn2' : '-l:libidn2.a',
+    ccflagsex => '-Wall -Wextra -Ofast -std=c11',
+
+    # build_noisy => 1,
+    # force_build => 1,
 );
 
 1;

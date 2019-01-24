@@ -1,7 +1,7 @@
 package Devel::CallTrace::PP;
-$Devel::CallTrace::PP::VERSION = '0.01';
+$Devel::CallTrace::PP::VERSION = '0.02';
 
-# ABSTRACT: Main module of dctpp
+# ABSTRACT: Main module for dctpp CLI tool
 
 use File::Slurp;
 use Data::Dumper;
@@ -117,11 +117,11 @@ __END__
 
 =head1 NAME
 
-Devel::CallTrace::PP - Main module of dctpp
+Devel::CallTrace::PP - Main module for dctpp CLI tool
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

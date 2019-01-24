@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ no_index:
     - eg
     - examples
 requires:
-  Catmandu: '0.9'
+  Catmandu: '1.0'
   Furl: '3.0'
   JSON: '2.90'
   Moo: '1.0'
@@ -32,8 +32,9 @@ resources:
   bugtracker: https://github.com/nichtich/Catmandu-Importer-getJSON/issues
   homepage: https://github.com/nichtich/Catmandu-Importer-getJSON
   repository: https://github.com/nichtich/Catmandu-Importer-getJSON.git
-version: '0.50'
+version: '0.51'
 x_contributors:
-  - 'Jakob Voß <jakob.voss@gbv.de>'
-  - 'Vitali Peil <vpeil@cpan.org>'
   - 'bayashi <bayashi@cpan.org>'
+  - 'Jakob Voß <jakob.voss@gbv.de>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+  - 'Vitali Peil <vpeil@cpan.org>'

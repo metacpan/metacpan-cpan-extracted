@@ -1,5 +1,8 @@
 Revision history for WWW::Google::Places
 
+0.34   Wed Jan 23 16:00:00 2019
+       - Used namespace::autoclean instead.
+
 0.33   Sun Jan 14 12:35:00 2018
        - Improved method exporting.
 

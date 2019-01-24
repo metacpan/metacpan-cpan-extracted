@@ -1,4 +1,4 @@
-# $Id: 03info.t 70 2019-01-04 19:39:59Z stro $
+# $Id: 03info.t 71 2019-01-15 01:46:34Z stro $
 
 use strict;
 use warnings;
@@ -14,22 +14,22 @@ use CPAN::SQLite::Info;
 
 plan tests => 2929;
 
-my $cwd = getcwd;
-my $CPAN = catdir $cwd, 't', 'cpan';
+my $cwd   = getcwd;
+my $CPAN  = catdir $cwd, 't', 'cpan';
 my $t_dir = catdir $cwd, 't';
 
 my $db_name = 'cpandb.sql';
-my $db_dir = $cwd;
+my $db_dir  = $cwd;
 unlink($db_name) if (-e $db_name);
 
-ok (-d $CPAN);
+ok(-d $CPAN);
 use CPAN::SQLite::Info;
 my $info = CPAN::SQLite::Info->new(CPAN => $CPAN, db_dir => $db_dir);
 isa_ok($info, 'CPAN::SQLite::Info');
 
 $info->fetch_info();
 my $info_dists = $info->{dists};
-my $info_mods = $info->{mods};
+my $info_mods  = $info->{mods};
 my $info_auths = $info->{auths};
 
 ok(has_hash_data($info_dists));
@@ -52,7 +52,7 @@ foreach my $dist_name (keys %$dists) {
   }
   my $modules = $dists->{$dist_name}->{modules};
   if (has_hash_data($modules)) {
-    foreach my $key(keys %$modules) {
+    foreach my $key (keys %$modules) {
       ok(exists $info_dists->{$dist_name}->{modules}->{$key});
       next unless $modules->{$key};
       is($info_dists->{$dist_name}->{modules}->{$key}, $modules->{$key});
@@ -75,24 +75,28 @@ ok(not defined $info->{dists}->{ZZZ});
 my @tables = qw(dists mods auths info);
 my $index;
 my $package = 'CPAN::SQLite::Index';
-foreach my $table(@tables) {
+foreach my $table (@tables) {
   my $class = $package . '::' . $table;
-  my $this = {info => $info->{$table}};
+  my $this = { info => $info->{$table} };
   $index->{$table} = bless $this, $class;
 }
 
 use CPAN::SQLite::DBI qw($tables);
-my $cdbi = CPAN::SQLite::DBI::Index->new(CPAN => $CPAN,
-                                         db_name => $db_name,
-                                         db_dir => $db_dir);
+my $cdbi = CPAN::SQLite::DBI::Index->new(
+  CPAN    => $CPAN,
+  db_name => $db_name,
+  db_dir  => $db_dir
+);
 isa_ok($cdbi, 'CPAN::SQLite::DBI::Index');
 
 use CPAN::SQLite::Populate;
-my $pop = CPAN::SQLite::Populate->new(db_name => $db_name,
-                                      db_dir => $db_dir,
-                                      setup => 1,
-                                      CPAN => $CPAN,
-                                      index => $index);
+my $pop = CPAN::SQLite::Populate->new(
+  db_name => $db_name,
+  db_dir  => $db_dir,
+  setup   => 1,
+  CPAN    => $CPAN,
+  index   => $index
+);
 isa_ok($pop, 'CPAN::SQLite::Populate');
 $pop->populate();
 ok(1);

@@ -37,9 +37,15 @@ subtest 'after release' => sub {
 
   $test->{zilla}->release;
 
-  like $test->{readme}->slurp_raw,
+  my $readme = $test->{readme}->slurp_raw;
+
+  like $readme,
     qr/$info/,
     'info added after release';
+
+  like $readme,
+    qr/cd Test-DevInfo/,
+    'used git repository name to `cd` in';
 };
 
 done_testing;

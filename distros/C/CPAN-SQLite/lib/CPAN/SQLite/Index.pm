@@ -1,10 +1,10 @@
-# $Id: Index.pm 70 2019-01-04 19:39:59Z stro $
+# $Id: Index.pm 73 2019-01-23 22:29:38Z stro $
 
 package CPAN::SQLite::Index;
 use strict;
 use warnings;
 
-our $VERSION = '0.214';
+our $VERSION = '0.215';
 
 use English qw/-no_match_vars/;
 
@@ -26,7 +26,6 @@ unless ($ENV{CPAN_SQLITE_NO_LOG_FILES}) {
 our ($oldout);
 my $log_file = 'cpan_sqlite_log.' . time;
 
-
 # This is usually already defined in real life, but tests need it to be set
 $CPAN::FrontEnd ||= "CPAN::Shell";
 
@@ -36,7 +35,8 @@ sub new {
     die "Reindexing must be done on an exisiting database";
   }
 
-  my $self = {index => undef, state => undef, %args};
+  my $self = { index => undef, state => undef, %args };
+
   return bless $self, $class;
 }
 
@@ -51,7 +51,9 @@ sub download_index {
 
   $CPAN::FrontEnd->myprint("Downloading the compiled index db ... ");
 
-  if (my $response = HTTP::Tiny->new->mirror($ENV{'CPAN_SQLITE_DOWNLOAD_URL'} => catfile($self->{'db_dir'}, $self->{'db_name'}))) {
+  if (my $response =
+    HTTP::Tiny->new->mirror($ENV{'CPAN_SQLITE_DOWNLOAD_URL'} => catfile($self->{'db_dir'}, $self->{'db_name'})))
+  {
     if ($response->{'success'} and $response->{'status'} and $response->{'status'} eq '200') {
       if (my $type = $response->{'headers'}->{'content-type'}) {
         if ($type eq 'application/x-sqlite3') {
@@ -66,93 +68,93 @@ sub download_index {
 }
 
 sub index {
-    my $self = shift;
-    my $setup = $self->{'setup'};
+  my $self  = shift;
+  my $setup = $self->{'setup'};
 
-    if ($setup) {
-        my $db_name = catfile($self->{'db_dir'}, $self->{db_name});
-        if (-f $db_name) {
-            $CPAN::FrontEnd->myprint("Removing existing $db_name ... ");
-            if (unlink $db_name) {
-                $CPAN::FrontEnd->myprint("Done.\n");
-            } else {
-                $CPAN::FrontEnd->mywarn("Failed: $!\n");
-            }
-        }
-    }
-
-    my $log = catfile($self->{'log_dir'}, $log_file);
-
-    unless ($ENV{'CPAN_SQLITE_NO_LOG_FILES'}) {
-        $oldout = error_fh($log);
-    }
-
-    my $log_cleanup = $ENV{'CPAN_SQLITE_LOG_FILES_CLEANUP'};
-    $log_cleanup = 30 unless defined $log_cleanup;
-    if ($log_cleanup and $log_cleanup =~ /^\d+$/) {
-      if (opendir(my $DIR, $self->{'log_dir'})) {
-        my @files = grep { /cpan_sqlite_log\./ } readdir $DIR;
-        closedir $DIR;
-
-        @files = grep { -C $_ > $log_cleanup } map { catfile($self->{'log_dir'}, $_) } @files;
-
-        if (@files) {
-          $CPAN::FrontEnd->myprint('Cleaning old log files ... ');
-          unlink @files;
-          $CPAN::FrontEnd->myprint("Done.\n");
-        }
+  if ($setup) {
+    my $db_name = catfile($self->{'db_dir'}, $self->{db_name});
+    if (-f $db_name) {
+      $CPAN::FrontEnd->myprint("Removing existing $db_name ... ");
+      if (unlink $db_name) {
+        $CPAN::FrontEnd->myprint("Done.\n");
+      } else {
+        $CPAN::FrontEnd->mywarn("Failed: $!\n");
       }
     }
+  }
 
-    if ($self->download_index()) {
-        return 1;
-    }
+  my $log = catfile($self->{'log_dir'}, $log_file);
 
-    if ($self->{'update_indices'}) {
-        $CPAN::FrontEnd->myprint('Fetching index files ... ');
-        if ($self->fetch_cpan_indices()) {
-            $CPAN::FrontEnd->myprint("Done.\n");
-        } else {
-            $CPAN::FrontEnd->mywarn("Failed\n");
-            return;
-        }
-    }
+  unless ($ENV{'CPAN_SQLITE_NO_LOG_FILES'}) {
+    $oldout = error_fh($log);
+  }
 
-    $CPAN::FrontEnd->myprint('Gathering information from index files ... ');
-    if ($self->fetch_info()) {
+  my $log_cleanup = $ENV{'CPAN_SQLITE_LOG_FILES_CLEANUP'};
+  $log_cleanup = 30 unless defined $log_cleanup;
+  if ($log_cleanup and $log_cleanup =~ /^\d+$/) {
+    if (opendir(my $DIR, $self->{'log_dir'})) {
+      my @files = grep { /cpan_sqlite_log\./ } readdir $DIR;
+      closedir $DIR;
+
+      @files = grep { -C $_ > $log_cleanup } map { catfile($self->{'log_dir'}, $_) } @files;
+
+      if (@files) {
+        $CPAN::FrontEnd->myprint('Cleaning old log files ... ');
+        unlink @files;
         $CPAN::FrontEnd->myprint("Done.\n");
-    } else {
-        $CPAN::FrontEnd->mywarn("Failed\n");
-        return;
+      }
     }
+  }
 
-    unless ($setup) {
-        $CPAN::FrontEnd->myprint('Obtaining current state of database ... ');
-        if ($self->state()) {
-            $CPAN::FrontEnd->myprint("Done.\n");
-        } else {
-            $CPAN::FrontEnd->mywarn("Failed\n");
-            return;
-        }
-    }
-
-    $CPAN::FrontEnd->myprint('Populating database tables ... ');
-    if ($self->populate()) {
-        $CPAN::FrontEnd->myprint("Done.\n");
-    } else {
-        $CPAN::FrontEnd->mywarn("Failed\n");
-        return;
-    }
-
+  if ($self->download_index()) {
     return 1;
+  }
+
+  if ($self->{'update_indices'}) {
+    $CPAN::FrontEnd->myprint('Fetching index files ... ');
+    if ($self->fetch_cpan_indices()) {
+      $CPAN::FrontEnd->myprint("Done.\n");
+    } else {
+      $CPAN::FrontEnd->mywarn("Failed\n");
+      return;
+    }
+  }
+
+  $CPAN::FrontEnd->myprint('Gathering information from index files ... ');
+  if ($self->fetch_info()) {
+    $CPAN::FrontEnd->myprint("Done.\n");
+  } else {
+    $CPAN::FrontEnd->mywarn("Failed\n");
+    return;
+  }
+
+  unless ($setup) {
+    $CPAN::FrontEnd->myprint('Obtaining current state of database ... ');
+    if ($self->state()) {
+      $CPAN::FrontEnd->myprint("Done.\n");
+    } else {
+      $CPAN::FrontEnd->mywarn("Failed\n");
+      return;
+    }
+  }
+
+  $CPAN::FrontEnd->myprint('Populating database tables ... ');
+  if ($self->populate()) {
+    $CPAN::FrontEnd->myprint("Done.\n");
+  } else {
+    $CPAN::FrontEnd->mywarn("Failed\n");
+    return;
+  }
+
+  return 1;
 }
 
 sub fetch_cpan_indices {
   my $self = shift;
 
-  my $CPAN = $self->{CPAN};
+  my $CPAN    = $self->{CPAN};
   my $indices = {
-    '01mailrc.txt.gz' => 'authors',
+    '01mailrc.txt.gz'           => 'authors',
     '02packages.details.txt.gz' => 'modules',
   };
 
@@ -163,8 +165,8 @@ sub fetch_cpan_indices {
     unless (-d $dir) {
       mkpath($dir, 0, oct(755)) or die "Cannot mkpath $dir: $!";
     }
-    my @urllist = @{$self->{urllist}};
-    foreach my $cpan(@urllist) {
+    my @urllist = @{ $self->{urllist} };
+    foreach my $cpan (@urllist) {
       my $from = join '/', ($cpan, $indices->{$index}, $index);
       if (my $response = HTTP::Tiny->new->get($from)) {
         if ($response->{'success'}) {
@@ -187,15 +189,15 @@ sub fetch_cpan_indices {
 }
 
 sub fetch_info {
-  my $self = shift;
-  my %wanted = map {$_ => $self->{$_}} qw(CPAN ignore keep_source_where);
-  my $info = CPAN::SQLite::Info->new(%wanted);
+  my $self   = shift;
+  my %wanted = map { $_ => $self->{$_} } qw(CPAN ignore keep_source_where);
+  my $info   = CPAN::SQLite::Info->new(%wanted);
   $info->fetch_info() or return;
   my @tables = qw(dists mods auths info);
   my $index;
-  foreach my $table(@tables) {
+  foreach my $table (@tables) {
     my $class = __PACKAGE__ . '::' . $table;
-    my $this = {info => $info->{$table}};
+    my $this = { info => $info->{$table} };
     $index->{$table} = bless $this, $class;
   }
   $self->{index} = $index;
@@ -205,7 +207,7 @@ sub fetch_info {
 sub state {
   my $self = shift;
 
-  my %wanted = map {$_ => $self->{$_}} qw(db_name index setup reindex db_dir);
+  my %wanted = map { $_ => $self->{$_} } qw(db_name index setup reindex db_dir);
   my $state = CPAN::SQLite::State->new(%wanted);
   $state->state() or return;
   $self->{state} = $state;
@@ -213,9 +215,9 @@ sub state {
 }
 
 sub populate {
-  my $self = shift;
-  my %wanted = map {$_ => $self->{$_}} qw(db_name index setup state db_dir);
-  my $db = CPAN::SQLite::Populate->new(%wanted);
+  my $self   = shift;
+  my %wanted = map { $_ => $self->{$_} } qw(db_name index setup state db_dir);
+  my $db     = CPAN::SQLite::Populate->new(%wanted);
   $db->populate() or return;
   return 1;
 }
@@ -224,10 +226,12 @@ sub error_fh {
   my $file = shift;
   open(my $tmp, '>', $file) or die "Cannot open $file: $!";
   close $tmp;
-# Should be open(my $oldout, '>&', \*STDOUT); but it fails on 5.6.2
+
+  # Should be open(my $oldout, '>&', \*STDOUT); but it fails on 5.6.2
   open(my $oldout, '>&STDOUT');
   open(STDOUT, '>', $file) or die "Cannot tie STDOUT to $file: $!";
-  select STDOUT; $| = 1;
+  select STDOUT;
+  $| = 1;
   return $oldout;
 }
 
@@ -247,7 +251,7 @@ CPAN::SQLite::Index - set up or update database tables.
 
 =head1 VERSION
 
-version 0.214
+version 0.215
 
 =head1 SYNOPSIS
 

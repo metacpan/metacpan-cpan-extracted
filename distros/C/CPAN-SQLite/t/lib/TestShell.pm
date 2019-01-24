@@ -1,4 +1,4 @@
-# $Id: TestShell.pm 42 2013-06-29 20:44:17Z stro $
+# $Id: TestShell.pm 71 2019-01-15 01:46:34Z stro $
 
 package TestShell;
 use strict;
@@ -13,9 +13,9 @@ use CPAN;
 $CPAN::FrontEnd = 'TestShell';
 
 sub myprint {
-    return;
+  return;
 }
 
 sub mywarn {
-    return;
+  return;
 }

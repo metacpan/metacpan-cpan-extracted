@@ -1,4 +1,4 @@
-package Pcore::Ext::Lib::Modern::Plugin;
+package Pcore::Ext::Lib::modern::Plugin;
 
 use Pcore -l10n;
 
@@ -68,13 +68,13 @@ __END__
 
 =head1 NAME
 
-Pcore::Ext::Lib::Modern::Plugin
+Pcore::Ext::Lib::modern::Plugin
 
 =head1 SYNOPSIS
 
     # swipe tab plugin
     plugins => {
-        $type->{'/Pcore/Ext/Lib/Modern/Plugin/swipe_tab'} => {
+        $type->{'/pcore/modern/Plugin/swipe_tab'} => {
             allowOverflow   => \0,
             allowDirections => [ 'left', 'right' ],
         },

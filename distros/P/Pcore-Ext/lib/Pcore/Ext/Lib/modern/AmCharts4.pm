@@ -1,4 +1,4 @@
-package Pcore::Ext::Lib::Modern::AmCharts4;
+package Pcore::Ext::Lib::modern::AmCharts4;
 
 use Pcore -l10n;
 
@@ -142,7 +142,7 @@ __END__
 
 =head1 NAME
 
-Pcore::Ext::Lib::Modern::AmCharts4
+Pcore::Ext::Lib::modern::AmCharts4
 
 =head1 SYNOPSIS
 

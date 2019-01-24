@@ -1,4 +1,4 @@
-# $Id: 02drop.t 70 2019-01-04 19:39:59Z stro $
+# $Id: 02drop.t 71 2019-01-15 01:46:34Z stro $
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ plan tests => 6;
 
 my $db_name = 't/dot-cpan/cpandb.sql';
 
-my $dbh = DBI->connect( "DBI:SQLite:$db_name", { RaiseError => 1, AutoCommit => 0 } )  or die "Cannot connect to $db_name";
+my $dbh = DBI->connect("DBI:SQLite:$db_name", { RaiseError => 1, AutoCommit => 0 }) or die "Cannot connect to $db_name";
 ok $dbh ;
 isa_ok($dbh, 'DBI::db');
 

@@ -1,10 +1,10 @@
-# $Id: Info.pm 70 2019-01-04 19:39:59Z stro $
+# $Id: Info.pm 73 2019-01-23 22:29:38Z stro $
 
 package CPAN::SQLite::Info;
 use strict;
 use warnings;
 
-our $VERSION = '0.214';
+our $VERSION = '0.215';
 
 use English qw/-no_match_vars/;
 
@@ -19,13 +19,13 @@ my $ext = qr/\.(tar\.gz|tar\.Z|tgz|zip)$/;
 
 sub new {
   my ($class, %args) = @_;
-  my $self = {dists => {}, auths => {}, mods => {}, info => {}, %args};
+  my $self = { dists => {}, auths => {}, mods => {}, info => {}, %args };
   return bless $self, $class;
 }
 
 sub fetch_info {
   my $self = shift;
-  $self->mailrc() or return;
+  $self->mailrc()         or return;
   $self->dists_and_mods() or return;
   return 1;
 }
@@ -50,13 +50,14 @@ sub dists_and_mods {
     next unless ($d->maturity eq 'released');
     my $dist_name = $d->dist;
     my $dist_vers = $d->version;
-    my $cpanid = $d->cpanid;
+    my $cpanid    = $d->cpanid;
     my $dist_file = $d->filename;
     unless ($dist_name and $dist_vers and $cpanid) {
       print_debug("No dist_name/version/cpanid for $cpan_file: skipping\n");
       delete $cpan_files->{$cpan_file};
       next;
     }
+
     # ignore specified dists
     if ($pat and ($dist_name =~ /^($pat)$/)) {
       delete $cpan_files->{$cpan_file};
@@ -66,16 +67,16 @@ sub dists_and_mods {
     if (not $dists->{$dist_name} or vcmp($dist_vers, $dists->{$dist_name}->{dist_vers}) > 0) {
       $dists->{$dist_name}->{dist_vers} = $dist_vers;
       $dists->{$dist_name}->{dist_file} = $dist_file;
-      $dists->{$dist_name}->{cpanid} = $cpanid;
+      $dists->{$dist_name}->{cpanid}    = $cpanid;
     }
   }
 
   my $wanted;
   foreach my $dist_name (keys %$dists) {
-    $wanted->{basename($dists->{$dist_name}->{dist_file})} = $dist_name;
+    $wanted->{ basename($dists->{$dist_name}->{dist_file}) } = $dist_name;
   }
   foreach my $mod_name (keys %$packages) {
-    my $file = basename($packages->{$mod_name}->{dist_file});
+    my $file      = basename($packages->{$mod_name}->{dist_file});
     my $dist_name = $wanted->{$file};
     unless ($dist_name and $dists->{$dist_name}) {
       delete $packages->{$mod_name};
@@ -96,12 +97,12 @@ sub modlist {
 }
 
 sub packages {
-  my $self = shift;
+  my $self  = shift;
   my $index = 'modules/02packages.details.txt.gz';
-  my $packages = $self->{keep_source_where} ?
-    CPAN::FTP->localize($index,
-                        catfile($self->{keep_source_where}, $index) ) :
-                          catfile($self->{CPAN}, $index);
+  my $packages =
+    $self->{keep_source_where}
+    ? CPAN::FTP->localize($index, catfile($self->{keep_source_where}, $index))
+    : catfile($self->{CPAN}, $index);
   return unless check_file('modules/02packages.details.txt.gz', $packages);
   print_debug("Reading information from $packages\n");
   my $lines = zcat($packages);
@@ -113,24 +114,25 @@ sub packages {
   foreach (@$lines) {
     my ($mod_name, $mod_vers, $dist_file) = split(" ", $_, 4);
     $mod_vers = undef if $mod_vers eq 'undef';
-    $mods->{$mod_name} = {mod_vers => $mod_vers, dist_file => $dist_file};
+    $mods->{$mod_name} = { mod_vers => $mod_vers, dist_file => $dist_file };
     $cpan_files->{$dist_file}++;
   }
   return ($mods, $cpan_files);
 }
 
 sub mailrc {
-  my $self = shift;
+  my $self  = shift;
   my $index = 'authors/01mailrc.txt.gz';
-  my $mailrc = $self->{keep_source_where} ?
-    CPAN::FTP->localize($index,
-                        catfile($self->{keep_source_where}, $index) ) :
-                          catfile($self->{CPAN}, $index);
+  my $mailrc =
+    $self->{keep_source_where}
+    ? CPAN::FTP->localize($index, catfile($self->{keep_source_where}, $index))
+    : catfile($self->{CPAN}, $index);
   return unless check_file('authors/01mailrc.txt.gz', $mailrc);
   print_debug("Reading information from $mailrc\n");
   my $lines = zcat($mailrc);
   my $auths;
   foreach (@$lines) {
+
     #my($cpanid,$fullname,$email) =
     #m/alias\s+(\S+)\s+\"([^\"\<]+)\s+\<([^\>]+)\>\"/;
     my ($cpanid, $authinfo) = m/alias\s+(\S+)\s+\"([^\"]+)\"/;
@@ -138,14 +140,14 @@ sub mailrc {
     my ($fullname, $email);
     if ($authinfo =~ m/([^<]+)\<(.*)\>/) {
       $fullname = $1;
-      $email = $2;
-    }
-    else {
+      $email    = $2;
+    } else {
       $fullname = '';
-      $email = lc($cpanid) . '@cpan.org';
+      $email    = lc($cpanid) . '@cpan.org';
     }
-    $auths->{$cpanid} = {fullname => trim($fullname),
-                         email => trim($email)};
+    $auths->{$cpanid} = {
+      fullname => trim($fullname),
+      email    => trim($email) };
   }
   return $self->{auths} = $auths;
 }
@@ -171,7 +173,7 @@ sub zcat {
   while ($gz->gzreadline($buffer) > 0) {
     push @$lines, $buffer;
   }
-  die "Error reading from $file: $gzerrno" . ($gzerrno+0)
+  die "Error reading from $file: $gzerrno" . ($gzerrno + 0)
     if $gzerrno != Z_STREAM_END;
   $gz->gzclose();
   return $lines;
@@ -194,7 +196,7 @@ CPAN::SQLite::Info - extract information from CPAN indices
 
 =head1 VERSION
 
-version 0.214
+version 0.215
 
 =head1 DESCRIPTION
 

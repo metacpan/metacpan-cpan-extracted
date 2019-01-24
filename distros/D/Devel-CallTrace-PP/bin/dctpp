@@ -1,5 +1,8 @@
+#!/usr/bin/env perl
+
 package dctpp;
-$dctpp::VERSION = '0.01';
+$dctpp::VERSION = '0.02';
+
 # ABSTRACT: Postprocessor of Devel::CallTrace output
 
 
@@ -31,7 +34,6 @@ my ( $opts, $usage ) = describe_options(
     [ 'help', "print usage message and exit", { shortcircuit => 1 } ],
 );
 
-
 print( $usage->text ), exit if $opts->help;
 
 Devel::CallTrace::PP->handler( $ARGV[0], $opts );
@@ -50,7 +52,7 @@ dctpp - Postprocessor of Devel::CallTrace output
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 USAGE
 
@@ -60,6 +62,41 @@ version 0.01
 	dctpp --just_uniq_modules 1 -v 1 --project-path /media/sf_Hub trace.txt > trace_processed.txt
 
 	perl -d:CallTrace x.pl > /dev/null | tee trace.txt | dctpp trace.txt | tee trace_processed.txt
+
+=head1 AVAILABLE OPTIONS
+
+Options that are enabled by default are marked as (1)
+
+See dctpp --help for more info
+
+=over 
+=item hide_cpan
+Hide from trace modules that are alredy published on CPAN, using L<Devel::CallTrace::Utils/is_cpan_published> (based on L<MetaCPAN::Client>)
+=item hide_core (1) 
+Hide from trace modules that are CORE for installed Perl version (using L<Module::CoreList>)
+=item hide_constants (1)
+Hide constants from trace assumed that constant is method that is fully named in capital case
+=item hide_lineno
+Hide in filtered trace path to module file and line number
+=item just_uniq_modules
+Prints only unique modules in order when trey called in trace. Each module printed once.
+=item just_uniq_calls
+Prints only unique calls. Each call printed once.
+=item rle (1)
+Fold module calls. E.g
+
+    Foo::bar::baz
+    Foor::bar::baz
+
+Will be printed as
+
+    Foo::bar::baz (x2)
+
+=item verbose
+
+Prints some additional debug info, e.g. @INC, how much lines left and how much was filtered
+
+=back
 
 =head1 AUTHOR
 

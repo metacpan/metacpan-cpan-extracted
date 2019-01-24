@@ -1,4 +1,4 @@
-# $Id: 04search_everything.t 44 2014-11-22 08:15:20Z stro $
+# $Id: 04search_everything.t 71 2019-01-15 01:46:34Z stro $
 
 use strict;
 use warnings;
@@ -17,13 +17,17 @@ my $CPAN = catfile $cwd, 't', 'cpan';
 
 plan tests => 14;
 my $db_name = 'cpandb.sql';
-my $db_dir = $cwd;
+my $db_dir  = $cwd;
 
-my $cdbi = CPAN::SQLite::DBI::Search->new(db_name => $db_name,
-                                          db_dir => $db_dir);
+my $cdbi = CPAN::SQLite::DBI::Search->new(
+  db_name => $db_name,
+  db_dir  => $db_dir
+);
 
-my $query = CPAN::SQLite::Search->new(db_name => $db_name,
-                                      db_dir => $db_dir);
+my $query = CPAN::SQLite::Search->new(
+  db_name => $db_name,
+  db_dir  => $db_dir
+);
 ok(defined $query);
 isa_ok($query, 'CPAN::SQLite::Search');
 

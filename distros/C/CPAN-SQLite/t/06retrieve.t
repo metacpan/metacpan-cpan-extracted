@@ -1,4 +1,4 @@
-# $Id: 06retrieve.t 70 2019-01-04 19:39:59Z stro $
+# $Id: 06retrieve.t 73 2019-01-23 22:29:38Z stro $
 
 use strict;
 use warnings;
@@ -21,11 +21,11 @@ my $CPAN = catdir $cwd, 't', 'cpan-t-06';
 
 mkdir $CPAN;
 
-ok (-d $CPAN);
+ok(-d $CPAN);
 
 my $info = CPAN::SQLite::Index->new(
-  'CPAN' => $CPAN,
-  'db_dir' => $cwd,
+  'CPAN'    => $CPAN,
+  'db_dir'  => $CPAN,
   'urllist' => ['http://search.cpan.org/CPAN/'],
 );
 
@@ -36,4 +36,4 @@ SKIP: {
 
   ok(-e catfile($CPAN, 'authors', '01mailrc.txt.gz'));
   ok(-e catfile($CPAN, 'modules', '02packages.details.txt.gz'));
-};
+}

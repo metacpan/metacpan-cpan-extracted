@@ -1,307 +1,591 @@
-package Pcore::Ext v0.19.1;
+package Pcore::Ext v0.19.2;
 
-use Pcore -dist, -const;
-use Pcore::Ext::Base;
-use Pcore::Ext::Context;
+use Pcore -dist, -class;
 use Pcore::Util::Scalar qw[is_ref];
 use Package::Stash::XS qw[];
+use Pcore::Ext::Build::Class;
 
-our ( $APP, $EXT );
-our $SCANNED;
+has namespace => ( required => 1 );
 
-sub load_class ( $self, $module_path, $full_path, $reload ) {
-    my $namespace = ( $module_path =~ s/[.]pm\z//smr ) =~ s[/][::]smgr;
+has app           => ();       # Pcore::App instance
+has cdn           => ();       # Pcore::CDN instance
+has api_namespace => ();
+has prefixes      => ();
+has api_url       => '/api';
 
-    # reload
-    if ( exists $INC{$module_path} ) {
-        return if !$reload;
+has classes   => ( init_arg => undef );    # HashRef
+has requires  => ( init_arg => undef );    # HashRef
+has api       => ( init_arg => undef );    # HashRef, used API methods
+has l10n      => ( init_arg => undef );    # HashRef, used l10n msgid's
+has build     => ( init_arg => undef );
+has overrides => ( init_arg => undef );
+has locales   => ( init_arg => undef );
 
-        my $code = P->file->read_bin($full_path);
+has api_ver   => 'v1';
+has viewport  => ( init_arg => undef );
+has ext_type  => 'modern';
+has ext_ver   => 'v6.6.0';
+has ext_theme => 'material';
 
-        $code =~ s/^use Pcore.+?$//smg;
+our $FRAMEWORK;
 
-        no warnings qw[redefine];
+sub BUILD ( $self, $args ) {
+    $self->{api_namespace} //= $self->{namespace} =~ s/:://smgr;
 
-        *{"$namespace\::const"} = sub : prototype(\[$@%]@) { };
+    if ( defined $self->{app} ) {
+        $self->{cdn} //= $self->{app}->{cdn};
 
-        eval $code;    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
+        $self->{prefixes}->{pcore} //= 'Pcore/Ext/Lib';
+        $self->{prefixes}->{dist}  //= ref( $self->{app} ) . '::Ext' =~ s[::][/]smgr;
+        $self->{prefixes}->{app}   //= $self->{namespace} =~ s[::][/]smgr;
     }
 
-    # load
-    else {
+    return;
+}
 
-        # configure namespace
-        push @{"$namespace\::ISA"}, 'Pcore::Ext::Base';
-        *{"$namespace\::raw"}  = sub : prototype($) {die};
-        *{"$namespace\::func"} = sub                {die};
-        *{"$namespace\::cdn"}  = \undef;
-        *{"$namespace\::api"}  = \undef;
-        *{"$namespace\::class"} = \undef;
-        *{"$namespace\::type"}  = \undef;
+# TODO reload
+sub _load_module ( $self, $module ) {
+    my $prefix = $module =~ s/[.]pm\z//smr;
 
-        do $full_path;
-    }
+    my $package = $prefix =~ s[/][::]smgr;
+
+    my $package_ref_attrs;
+
+    # add MODIFY_CODE_ATTRIBUTES method
+    *{"$package\::MODIFY_CODE_ATTRIBUTES"} = sub ( $pkg, $ref, @attrs ) {
+        my @bad;
+
+        for my $attr (@attrs) {
+            if ( $attr =~ /(Name|Extend|Override|Type|Alias) [(] (?:'(.+?)')? [)]/smxx ) {
+                my ( $attr, $val ) = ( $1, $2 );
+
+                $package_ref_attrs->{$ref}->{ lc $attr } = $val;
+            }
+            else {
+                push @bad, $attr;
+            }
+        }
+
+        return @bad;
+    };
+
+    # configure package
+    *{"$package\::raw"}  = sub {...};
+    *{"$package\::func"} = sub {...};
+    *{"$package\::cdn"}  = \undef;
+    *{"$package\::api"}  = \undef;
+    *{"$package\::class"} = \undef;
+    *{"$package\::type"}  = \undef;
+
+    eval { require $module };
+
+    my $stash = Package::Stash::XS->new($package);
+
+    # cleanup
+    $stash->remove_symbol('&MODIFY_CODE_ATTRIBUTES');
 
     die $@ if $@;
 
-    $INC{$module_path} = $full_path;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    my $classes;
 
-    return;
+    for my $method_name ( grep {/\AEXT_/sm} $stash->list_all_symbols('CODE') ) {
+        my $name = $method_name =~ s/\AEXT_//smr;
+
+        my $class = $self->{classes}->{"/$prefix/$name"} = Pcore::Ext::Build::Class->new(
+            app     => $self,
+            path    => "/$prefix/$name",
+            package => $package,
+            method  => $method_name,
+            ( $package_ref_attrs->{ *{"$package\::$method_name"}{CODE} } // {} )->%*,
+        );
+
+        $classes->{ $class->{path} } = 1;
+
+        # set ExtJS class name
+        $class->{name} //= "$prefix/$name" =~ s[/][.]smgr;
+    }
+
+    return [ keys $classes->%* ];
 }
 
-sub scan ( $self, $app, @namespaces ) {
-    return if $SCANNED;
-
-    $SCANNED = 1;
-
+sub _scan_app_tree ($self) {
     my $tree;
 
-    # scan namespaces
-    for my $root_namespace ( @namespaces, 'Pcore::Ext::Lib' ) {
-        my $root_namespace_path = $root_namespace =~ s[::][/]smgr;
+    my $namespace_path = $self->{namespace} =~ s[::][/]smgr;
 
-        for my $inc_path ( grep { !is_ref $_ } @INC ) {
-            my $modules = P->path("$inc_path/$root_namespace_path")->read_dir( abs => 0, is_dir => 0, max_depth => 0 );
+    for my $inc (@INC) {
+        next if is_ref $inc;
 
-            next if !$modules;
+        my $path = P->path($inc)->to_abs->{path};
 
-            for my $module ( $modules->@* ) {
-                next if $module !~ s/[.]pm\z//sm;
+        my $packages = P->path("$path/$namespace_path")->read_dir( abs => 0, is_dir => 0, max_depth => 0 );
 
-                my $namespace = "$root_namespace_path/$module" =~ s[/][::]smgr;
-
-                # load class
-                my $context_cfg = do {
-                    $self->load_class( "$root_namespace_path/$module.pm", "$inc_path/$root_namespace_path/$module.pm", 0 );
-
-                    {   ext_type    => ${"$namespace\::EXT_TYPE"},
-                        ext_ver     => ${"$namespace\::EXT_VER"},
-                        ext_api_ver => ${"$namespace\::EXT_API_VER"},
-                        ext_map     => ${"$namespace\::_EXT_MAP"},
-                    };
-                };
-
-                my $context_path = "$root_namespace_path/$module";
-
-                for my $name ( grep {/\AEXT_/sm} Package::Stash::XS->new($namespace)->list_all_symbols('CODE') ) {
-                    my $ref = *{"$namespace\::$name"}{CODE};
-
-                    $name =~ s/\AEXT_//sm;
-
-                    $tree->{"/$context_path/$name"} = {
-                        namespace       => $namespace,
-                        generator       => $name,
-                        class_path      => "/$context_path/$name",
-                        context_path    => "/$context_path/",
-                        extend          => $context_cfg->{ext_map}->{$ref}->{extend},
-                        override        => $context_cfg->{ext_map}->{$ref}->{override},
-                        api_ver         => $context_cfg->{ext_api_ver},
-                        ext_class_name  => $context_cfg->{ext_map}->{$ref}->{define} // "$context_path/$name" =~ s[/][.]smgr,
-                        alias_namespace => $context_cfg->{ext_map}->{$ref}->{type},
-                        ext_framework   => $context_cfg->{ext_map}->{$ref}->{ext},
-                    };
-                }
-
-                # detect application
-                if ( ( my $app_name ) = $context_path =~ m[\A$root_namespace_path/([^/]+)\z]sm ) {
-                    die qq[Ext app "/$context_path" requires \$EXT_TYPE to be defined] if !$context_cfg->{ext_type};
-                    die qq[Ext app "/$context_path" requires \$EXT_VER to be defined]  if !$context_cfg->{ext_ver};
-                    die qq[Viewport is not defined]                                    if !$tree->{"/$context_path/viewport"};
-
-                    $APP->{$app_name} = {
-                        name         => $app_name,
-                        context_path => "/$context_path/",
-                        ext_type     => $context_cfg->{ext_type},
-                        ext_ver      => $context_cfg->{ext_ver},
-                        api_ver      => $context_cfg->{ext_api_ver},
-                        viewport     => "$context_path/viewport" =~ s[/][.]smgr,
-                    };
-                }
-            }
+        for my $package ( $packages->@* ) {
+            $tree->{"$namespace_path/$package"} = 1;
         }
     }
 
-    # distribute classes between apps
-    for my $app_name ( keys $APP->%* ) {
-        my $app_context_path_re = qr[\A$APP->{$app_name}->{context_path}]sm;
+    return $tree;
+}
 
-        for my $class ( grep { $_->{class_path} =~ $app_context_path_re } values $tree->%* ) {
-            $class->{app_name} = $app_name;
-            $class->{app_path} = $APP->{$app_name}->{context_path};
-            $class->{api_ver} //= $APP->{$app_name}->{api_ver};
-        }
+# TODO
+sub _get_framework ($self) {
+    my $ext_type = 'modern';    # $APP->{ $class->{app_name} }->{ext_type};
+    my $ext_ver  = 'v6.6.0';    # $APP->{ $class->{app_name} }->{ext_ver};
+
+    # load extjs framework config, if not loaded
+    if ( !exists $FRAMEWORK->{$ext_type}->{$ext_ver} ) {
+        $FRAMEWORK->{$ext_type}->{$ext_ver} = $ENV->{share}->read_cfg("/Pcore-Ext/data/ext/$ext_ver/$ext_type.json");
     }
 
-    # resolve extend, set alias namespace, alias
-    $self->_resolve_extend( $app, $tree );
+    return $FRAMEWORK->{$ext_type}->{$ext_ver};
+}
 
-    $self->_build_classes( $app, $tree );
+# TODO cleanup
+sub build ($self) {
+    my $app_module = $self->{namespace} =~ s[::][/]smgr . '.pm';
 
-    $self->_build_apps($tree);
+    my @app_classes;
 
-    $self->_build_ext($tree);
+    # load main app module
+    push @app_classes, $self->_load_module($app_module)->@*;
+
+    # check, that app has EXT_viewport method
+    my $viewport = $self->{classes}->{ '/' . $self->{namespace} =~ s[::][/]smgr . '/viewport' };
+    die q[Viewport class is not defined] if !defined $viewport;
+    $self->{viewport} = $viewport->{name};
+
+    # get app modules
+    my $tree = $self->_scan_app_tree;
+
+    # load app modules
+    for my $module ( keys $tree->%* ) { push @app_classes, $self->_load_module($module)->@* }
+
+    for my $class (@app_classes) { $self->_build_class( $self->{classes}->{$class}, $self->{requires} //= {} ) }
+
+    $self->_generate;
+
+    $self->_build_overrides;
+
+    # cleanup build
+    delete $self->{classes};
+    delete $self->{requires};
+    undef $FRAMEWORK;    # TODO if not --devel
+
+    # delete $self->{api};
+    # delete $self->{l10n};
+    # delete $self->{overrides};
+    # delete $self->{build};
 
     return;
 }
 
-sub _resolve_extend ( $self, $app, $tree ) {
-    my ( $extjs, $processed_classes );
+sub _build_class ( $self, $class, $requires ) {
 
-    my $resolve_extend = sub ($class) {
-        return if $processed_classes->{ $class->{class_path} };
+    # class is already processed
+    return if defined $class->{build};
 
-        $processed_classes->{ $class->{class_path} } = 1;
+    $class->build;
 
-        # extend is defined
+    # add class to the app requires
+    $requires->{ $class->{path} } = 1;
+
+    die qq["extend" and "override" defined for class "$class->{path}"] if $class->{extend} && $class->{override};
+
+    # resolve class "extend"
+    if ( $class->{extend} ) {
+        $class->{extend} = $class->resolve_class_name( $class->{extend} );
+        $class->{requires}->{ $class->{extend} } = 1;
+    }
+
+    # resolve class "override"
+    if ( $class->{override} ) {
+        $class->{override} = $class->resolve_class_name( $class->{override} );
+        $class->{requires}->{ $class->{override} } = 1;
+    }
+
+    # check and load missed requirements
+    for my $require ( keys $class->{requires}->%* ) {
+
+        # require is NOT ExtJS class name
+        if ( index( $require, '.' ) == -1 ) {
+
+            # add class to the app requires
+            $requires->{$require} = 1;
+
+            # class is not loaded
+            if ( !exists $self->{classes}->{$require} ) {
+                my $module = $require =~ s[\A/][]smr;
+                $module =~ s[/[^/]+\z][]sm;
+                $module .= '.pm';
+
+                # load module
+                $self->_load_module($module);
+
+                # check, that class is present
+                die if !exists $self->{classes}->{$require};
+            }
+
+            # build class
+            $self->_build_class( $self->{classes}->{$require}, $requires );
+
+        }
+    }
+
+    # find and set class type
+    if ( !$class->{type} ) {
         if ( $class->{extend} ) {
 
-            # extend is ExtJS class name
-            if ( $class->{extend} =~ /[.]/sm ) {
+            # extend ExtJS class
+            if ( index( $class->{extend}, '.' ) != -1 ) {
+                my $framework = $self->_get_framework;
 
-                # alias namespace is not defined, try to inherit from the base class
-                # only for app classes, because lib classes doesn't contains framework information
-                if ( !$class->{alias_namespace} && $class->{app_name} ) {
-                    my $ext_ver  = $APP->{ $class->{app_name} }->{ext_ver};
-                    my $ext_type = $APP->{ $class->{app_name} }->{ext_type};
+                # base class is not exists
+                die qq[Invalid ExtJS class name "$class->{extend}"] if !exists $framework->{ $class->{extend} };
 
-                    # load extjs config, if not loaded
-                    $extjs->{$ext_ver}->{$ext_type} = $ENV->{share}->read_cfg("/Pcore-Ext/data/ext/$ext_ver/$ext_type.json") if !exists $extjs->{$ext_ver}->{$ext_type};
-
-                    # base class is not exists
-                    die qq[Invalid ExtJS class name "$class->{extend}"] if !exists $extjs->{$ext_ver}->{$ext_type}->{ $class->{extend} };
-
-                    # inherit alias namespace from the base class
-                    $class->{alias_namespace} = $extjs->{$ext_ver}->{$ext_type}->{ $class->{extend} };
-                }
+                # inherit alias namespace from the base class
+                $class->{type} = $framework->{ $class->{extend} };
             }
 
-            # extend is internal class path
+            # extend perl class
             else {
-                my $ctx = Pcore::Ext::Context->new(
-                    app  => $app,
-                    tree => $tree,
-                    ctx  => $class,
-                );
-
-                my $base_class = $ctx->_resolve_class_path( $class->{extend} );
-
-                # register requires
-                $class->{requires}->{ $base_class->{class_path} } = undef;
-                $class->{extend} = $base_class->{ext_class_name};
-
-                # alias namespace is not defined, try to inherit from the base class
-                if ( !$class->{alias_namespace} ) {
-                    __SUB__->($base_class);
-
-                    $class->{alias_namespace} = $base_class->{alias_namespace};
-                }
+                $class->{type} = $self->{classes}->{ $class->{extend} }->{type};
             }
         }
+    }
 
-        # generate alias, if alias namespace is defined
-        $class->{alias} = $class->{class_path} =~ s[/][_]smgr if $class->{alias_namespace};
+    # generate class alias
+    if ( $class->{alias} ) {
+        die qq[Class type is not defined for class "$class->{path}"] if !$class->{type};
+    }
+    elsif ( $class->{type} ) {
+        $class->{alias} = substr $class->{path} =~ s/\//-/smgr, 1;
+    }
+
+    # check build data
+    die qq[Do not use "extend" for class "$class->{path}"]   if exists $class->{build}->{extend};
+    die qq[Do not use "override" for class "$class->{path}"] if exists $class->{build}->{override};
+    die qq[Do not use "alias" for class "$class->{path}"]    if exists $class->{build}->{alias};
+    die qq[Do not use "requires" for class "$class->{path}"] if exists $class->{build}->{requires};
+
+    # set build data
+    $class->{build}->{extend}   = Pcore::Ext::Build::Class::Ctx::Class->new( class => $class, name => $class->{extend} )   if $class->{extend};
+    $class->{build}->{override} = Pcore::Ext::Build::Class::Ctx::Class->new( class => $class, name => $class->{override} ) if $class->{override};
+    $class->{build}->{alias} = "$class->{type}.$class->{alias}" if $class->{alias};
+
+    # generate
+    $class->generate;
+
+    return;
+}
+
+sub _generate ($self) {
+    my ( %processed_class, $js );
+
+    # topologically sort deps tree
+    my $add_deps = sub ($class_name) {
+
+        # node is "white"
+        if ( !exists $processed_class{$class_name} ) {
+
+            # mark node as "gray"
+            $processed_class{$class_name} = 1;
+        }
+
+        # node is "gray", this is cyclic deps
+        elsif ( $processed_class{$class_name} == 1 ) {
+            die q[Cyclic dependency found];
+        }
+
+        # node is "black"
+        else {
+            return;
+        }
+
+        my $class = $self->{classes}->{$class_name};
+
+        for my $require ( sort keys $class->{requires}->%* ) {
+
+            # skip external deps
+            next if !exists $self->{classes}->{$require};
+
+            __SUB__->($require);
+        }
+
+        # all deps processed, mark node as "black"
+        $processed_class{$class_name} = 2;
+
+        # add content
+        $js .= "$class->{build}\n\n";
+
+        # add app l10n msgid
+        $self->{l10n}->@{ keys $class->{l10n}->%* } = ();
+
+        # add api map
+        for my $method ( values $class->{api}->%* ) {
+            push $self->{api}->{ $method->{action} }->@*,
+              { name     => $method->{name},
+                len      => 1,
+                params   => [],
+                strict   => \0,
+                metadata => {
+                    len    => 1,
+                    params => [],
+                    strict => \0,
+                },
+                formHandler => \0,
+              };
+        }
 
         return;
     };
 
-    for my $class ( values $tree->%* ) {
-        $resolve_extend->($class);
+    # sort deps
+    for my $class_name ( sort keys $self->{requires}->%* ) {
+        $add_deps->($class_name);
     }
+
+    # my $res = P->src->decompress(
+    #     path => 'app.js',    # mark file as javascript
+    #     data => $js,
+    # );
+
+    # $self->{build} = $res->{data};
+
+    $self->{build}->{raw} = $js;
 
     return;
 }
 
-sub _build_classes ( $self, $app, $tree ) {
-    for my $class ( values $tree->%* ) {
-        Pcore::Ext::Context->new(
-            app  => $app,
-            tree => $tree,
-            ctx  => $class,
-        )->to_js;
+# BOOTSTRAP
+sub build_resources ($self) {
+    return;
+}
+
+sub get_resources ( $self, $devel = undef ) {
+    my $cdn = $self->{cdn};
+
+    my @resources = ( $self->build_resources // [] )->@*;
+
+    # CDN resources
+    push @resources, $cdn->get_resources(
+        'pcore_api',
+        [   'extjs6',
+            ver   => $self->{ext_ver},
+            type  => $self->{ext_type},
+            theme => $self->{ext_theme},
+            devel => $devel,
+        ],
+        'fa5',    # NOTE FontAwesme must be after ExtJS in resources or icons will not be displayed
+    )->@*;
+
+    return \@resources;
+}
+
+# APP
+sub get_app ( $self, $devel = undef ) {
+    if ($devel) {
+        if ( !$self->{build}->{devel} ) {
+            $self->{build}->{devel} = $self->_prepare_js( $self->_build_app, 1 );
+
+            delete $self->{build}->{devel_md5};
+        }
+
+        return $self->{build}->{devel};
     }
+    else {
+        if ( !$self->{build}->{min} ) {
+            $self->{build}->{min} = $self->_prepare_js( $self->_build_app, 0 );
+
+            delete $self->{build}->{min_md5};
+        }
+
+        return $self->{build}->{min};
+    }
+}
+
+sub _build_app ($self) {
+    my $api_url = $self->{api_url};
+
+    my $data = {
+        api_url => $api_url,
+        api_map => P->data->to_json(
+            {   type    => 'websocket',    # remoting
+                url     => $api_url,
+                actions => $self->{api},
+
+                # not mandatory options
+                # id              => 'api',
+                namespace       => "EXTDIRECT.$self->{api_namespace}",
+                timeout         => 0,                                    # milliseconds, 0 - no timeout
+                version         => undef,
+                maxRetries      => 0,                                    # number of times to re-attempt delivery on failure of a call
+                headers         => {},
+                enableBuffer    => 10,                                   # \1, \0, milliseconds
+                enableUrlEncode => undef,
+            },
+            canonical => 1
+        ),
+    };
+
+    my $js = <<"JS";
+        Ext.Loader.setConfig({
+            enabled: false,
+            disableCaching: false
+        });
+
+        // app classes
+        $self->{build}->{raw}
+
+        Ext.ariaWarn = Ext.emptyFn;
+
+        // ExtDirect api
+        Ext.direct.Manager.addProvider($data->{api_map});
+
+        Ext.application({
+            name: 'APP',
+            api: new PCORE({
+                url: '$data->{api_url}',
+                version: '$self->{api_ver}',
+                listenEvents: null,
+                onConnect: function(api) {},
+                onDisconnect: function(api, status, reason) {},
+                onEvent: function(api, ev) { Ext.fireEvent('remoteEvent', ev); },
+                onListen: function(api, events) {},
+                onRpc: null
+            }),
+            mainView: '$self->{viewport}'
+        });
+JS
+
+    return $js;
+}
+
+sub get_app_md5 ( $self, $devel = undef ) {
+    if ($devel) {
+        return $self->{build}->{devel_md5} //= P->digest->md5_hex( $self->get_app(1) );
+    }
+    else {
+        return $self->{build}->{min_md5} //= P->digest->md5_hex( $self->get_app(0) );
+    }
+}
+
+# OVERRIDES
+sub _build_overrides ($self) {
+    my @classes;
+
+    push @classes, $self->_load_module('Pcore/Ext/Overrides/core.pm')->@*;
+
+    push @classes, $self->_load_module("Pcore/Ext/Overrides/$self->{ext_type}.pm")->@*;
+
+    my $requires = {};
+
+    for my $class (@classes) {
+        $self->_build_class( $self->{classes}->{$class}, $requires );
+    }
+
+    my $build;
+
+    for my $class ( sort keys $requires->%* ) {
+        $build .= "$self->{classes}->{$class}->{build}\n\n";
+    }
+
+    $self->{overrides} = { raw => $build };
+
+    return $EMPTY;
+}
+
+sub get_overrides ( $self, $devel = undef ) {
+    if ($devel) {
+        if ( !$self->{overrides}->{devel} ) {
+            $self->{overrides}->{devel} = $self->_prepare_js( $self->{overrides}->{raw}, 1 );
+
+            delete $self->{overrides}->{devel_md5};
+        }
+
+        return $self->{overrides}->{devel};
+    }
+    else {
+        if ( !$self->{overrides}->{min} ) {
+            $self->{overrides}->{min} = $self->_prepare_js( $self->{overrides}->{raw}, 0 );
+
+            delete $self->{overrides}->{min_md5};
+        }
+
+        return $self->{overrides}->{min};
+    }
+}
+
+sub get_overrides_md5 ( $self, $devel = undef ) {
+    if ($devel) {
+        return $self->{overrides}->{devel_md5} //= P->digest->md5_hex( $self->get_overrides(1) );
+    }
+    else {
+        return $self->{overrides}->{min_md5} //= P->digest->md5_hex( $self->get_overrides(0) );
+    }
+}
+
+# LOCALE
+# TODO
+sub get_locale ( $self, $locale, $req, $devel = undef ) {
+    state $locale_settings = {};
+
+    $locale_settings->{$locale} //= $ENV->{share}->read_cfg("data/ext/locale/$locale.perl");
+
+    # load locale
+    Pcore::Core::L10N::load_locale($locale) if !exists $Pcore::Core::L10N::MESSAGES->{$locale};
+
+    # get messages, used by app classes
+    my $locale_messages = $Pcore::Core::L10N::MESSAGES->{$locale};
+
+    # grep app messages, that have translation
+    my $messages = { $locale_messages->%{ grep { $locale_messages->{$_} } keys $self->{l10n}->%* } };
+
+    my $plural_form_exp = $Pcore::Core::L10N::LOCALE_PLURAL_FORM->{$locale}->{exp} // 0;
+
+    my $js = <<"JS";
+            Ext.L10N.addLocale(
+                '$locale',
+                {   messages: @{[ to_json $messages, canonical => 1 ]},
+                    pluralFormExp: function (n) { return $plural_form_exp; },
+                    settings: @{[ to_json $locale_settings->{$locale}, canonical => 1 ]}
+                }
+            );
+JS
+
+    $self->{_cache}->{locale}->{$locale}->{js} = $self->_prepare_js($js);
+
+    $self->{_cache}->{locale}->{$locale}->{etag} = 'W/' . P->digest->md5_hex( $self->{_cache}->{locale}->{$locale}->{js}->$* );
 
     return;
 }
 
-sub _build_apps ( $self, $tree ) {
-    for my $app ( values $APP->%* ) {
-        my ( %processed_class, $added_methods );
-
-        # topologically sort deps tree
-        my $add_deps = sub ($class) {
-            if ( !exists $processed_class{ $class->{class_path} } ) {
-
-                # mark node as "gray"
-                $processed_class{ $class->{class_path} } = 1;
-            }
-            elsif ( $processed_class{ $class->{class_path} } == 1 ) {
-
-                # entered to the "gray" node, this is cyclic deps
-                die q[Cyclic dependency found];
-            }
-            else {
-
-                # entered to the "black" node
-                return;
-            }
-
-            for my $require ( sort keys $class->{requires}->%* ) {
-
-                # skip external deps
-                next if !exists $tree->{$require};
-
-                __SUB__->( $tree->{$require} );
-            }
-
-            # all deps processed, mark node as "black"
-            $processed_class{ $class->{class_path} } = 2;
-
-            # add content
-            $app->{content} .= "$class->{content}->$*;\n";
-
-            # add app l10n msgid
-            $app->{l10n}->@{ keys $class->{l10n}->%* } = ();
-
-            # add api map
-            for my $method_id ( sort keys $class->{api}->%* ) {
-                next if exists $added_methods->{$method_id};
-
-                $added_methods->{$method_id} = undef;
-
-                push $app->{api}->{ delete $class->{api}->{$method_id}->{action} }->@*, $class->{api}->{$method_id};
-            }
-
-            return;
-        };
-
-        # sort deps
-        for my $class ( sort { $a->{ext_class_name} cmp $b->{ext_class_name} } grep { defined $_->{app_name} && $_->{app_name} eq $app->{name} } values $tree->%* ) {
-            $add_deps->($class);
-        }
+sub get_locale_md5 ( $self, $locale, $devel = undef ) {
+    if ($devel) {
+        return $self->{locales}->{devel_md5} //= P->digest->md5_hex( $self->get_locale( $locale, 1 ) );
     }
-
-    return;
+    else {
+        return $self->{locales}->{min_md5} //= P->digest->md5_hex( $self->get_overrides( $locale, 0 ) );
+    }
 }
 
-sub _build_ext ( $self, $tree ) {
-    for my $class ( sort { $a->{ext_class_name} cmp $b->{ext_class_name} } grep { $_->{ext_framework} } values $tree->%* ) {
-        if ( $class->{ext_framework} eq 'core' ) {
-            $EXT->{modern} .= "$class->{content}->$*;\n";
+sub _prepare_js ( $self, $js, $devel = undef ) {
+    P->text->encode_utf8($js);
 
-            $EXT->{classic} .= "$class->{content}->$*;\n";
-        }
-        elsif ( $class->{ext_framework} eq 'modern' ) {
-            $EXT->{modern} .= "$class->{content}->$*;\n";
-        }
-        elsif ( $class->{ext_framework} eq 'classic' ) {
-            $EXT->{classic} .= "$class->{content}->$*;\n";
-        }
-        else {
-            die q[Invalid value for "Ext" attribute];
-        }
+    if ($devel) {
+        $js = P->src->decompress(
+            path => '1.js',
+            data => $js,
+        )->{data};
+    }
+    else {
+        $js = P->src->compress(
+            path => '1.js',
+            data => $js,
+        )->{data};
     }
 
-    return;
+    return $js;
 }
 
 1;
@@ -311,13 +595,11 @@ sub _build_ext ( $self, $tree ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 12                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 73, 74               | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 27                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 80                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 109                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 25                   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    3 | 183                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

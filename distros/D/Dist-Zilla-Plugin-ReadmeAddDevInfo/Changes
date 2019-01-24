@@ -1,6 +1,10 @@
 Revision history for Dist-Zilla-Plugin-ReadmeAddDevInfo
 =======================================================
 
+0.03  2019-01-24 07:55:00
+        - Added more tests
+        - Use reponame instead of distname as directory to `cd` into
+
 0.02  2018-10-18 11:29:00
         - Add config option to create CONTRIBUTING.md
         - Improved documentation

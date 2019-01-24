@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::ConditionalCustomFields;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =encoding utf8
 

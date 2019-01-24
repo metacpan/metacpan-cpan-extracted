@@ -1,6 +1,6 @@
 package PMLTQ::Command::init;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::init::VERSION = '2.0.1';
+$PMLTQ::Command::init::VERSION = '2.0.2';
 # ABSTRACT: Initialize empty database
 
 use PMLTQ::Base 'PMLTQ::Command';

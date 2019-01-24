@@ -15,14 +15,14 @@
 jQuery(function() {
     var condition_obj = <% "$condition_name" |h,n,j%>;
     condition_obj = condition_obj.replace(/:/g,'\\:');
-    jQuery('input[name="'+condition_obj+'"]').change(function() {
+    jQuery('input[name="'+condition_obj+'"], textarea[name="'+condition_obj+'"]').change(function() {
         var cf_id = <% "$cf_id" |h,n,j%>;
         cf_id = cf_id.replace(/:/g,'\\:');
         var condition_vals = ["<% join('", "', @condition_vals) |n%>"];
         var condition_met = false;
-        if (jQuery('input[name="'+condition_obj+'"]').is(":visible")) {
+        if (jQuery('input[name="'+condition_obj+'"], textarea[name="'+condition_obj+'"]').is(":visible")) {
             jQuery.each(condition_vals, function(i, condition_val) {
-                if (jQuery('input[name="'+condition_obj+'"][value="'+condition_val+'"]').is(':checked')) {
+                if (jQuery('input[name="'+condition_obj+'"][value="'+condition_val+'"], textarea[name="'+condition_obj+'"][value="'+condition_val+'"]').is(':checked')) {
                     condition_met = true;
                 }
             });
@@ -32,8 +32,9 @@ jQuery(function() {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').show();
                 jQuery('#'+cf_id).trigger('show');
             } else {
-                jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
+                jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
                 jQuery('input[name="'+cf_id+'"]').first().trigger('show');
+                jQuery('textarea[name="'+cf_id+'"]').trigger('show');
             }
         }
         else {
@@ -41,29 +42,31 @@ jQuery(function() {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').hide();
                 jQuery('#'+cf_id).trigger('hide');
             } else {
-                jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
+                jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
                 jQuery('input[name="'+cf_id+'"]').first().trigger('hide');
+                jQuery('textarea[name="'+cf_id+'"]').trigger('hide');
             }
         }
     });
-    jQuery('input[name="'+condition_obj+'"]').on('hide', function() {
+    jQuery('input[name="'+condition_obj+'"], textarea[name="'+condition_obj+'"]').on('hide', function() {
         var cf_id = <% "$cf_id" |h,n,j%>;
         cf_id = cf_id.replace(/:/g,'\\:');
         if (jQuery('#'+cf_id).length) {
             jQuery('#'+cf_id).closest('<% $ParentSelector %>').hide();
             jQuery('#'+cf_id).trigger('hide');
         } else {
-            jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
+            jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
             jQuery('input[name="'+cf_id+'"]').first().trigger('hide');
+            jQuery('textarea[name="'+cf_id+'"]').trigger('hide');
         }
     });
-    jQuery('input[name="'+condition_obj+'"]').on('show', function() {
+    jQuery('input[name="'+condition_obj+'"], textarea[name="'+condition_obj+'"]').on('show', function() {
         var cf_id = <% "$cf_id" |h,n,j%>;
         cf_id = cf_id.replace(/:/g,'\\:');
         var condition_vals = ["<% join('", "', @condition_vals) |n%>"];
         var condition_met = false;
         jQuery.each(condition_vals, function(i, condition_val) {
-            if (jQuery('input[name="'+condition_obj+'"][value="'+condition_val+'"]').is(':checked')) {
+            if (jQuery('input[name="'+condition_obj+'"][value="'+condition_val+'"], textarea[name="'+condition_obj+'"][value="'+condition_val+'"]').is(':checked')) {
                 condition_met = true;
             }
         });
@@ -72,12 +75,14 @@ jQuery(function() {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').show();
                 jQuery('#'+cf_id).trigger('show');
             } else {
-                jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
+                jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
                 jQuery('input[name="'+cf_id+'"]').first().trigger('show');
+                jQuery('textarea[name="'+cf_id+'"]').trigger('show');
             }
          }
     });
     jQuery('input[name="'+condition_obj+'"]').first().trigger('change');
+    jQuery('textarea[name="'+condition_obj+'"]').trigger('change');
 });
 </script>
 %           }
@@ -109,8 +114,9 @@ jQuery(function() {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').show();
                 jQuery('#'+cf_id).trigger('show');
             } else {
-                jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
+                jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
                 jQuery('input[name="'+cf_id+'"]').first().trigger('show');
+                jQuery('textarea[name="'+cf_id+'"]').trigger('show');
             }
         }
         else {
@@ -118,8 +124,9 @@ jQuery(function() {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').hide();
                 jQuery('#'+cf_id).trigger('hide');
             } else {
-                jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
+                jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
                 jQuery('input[name="'+cf_id+'"]').first().trigger('hide');
+                jQuery('textarea[name="'+cf_id+'"]').trigger('hide');
             }
         }
     });
@@ -130,8 +137,9 @@ jQuery(function() {
             jQuery('#'+cf_id).closest('<% $ParentSelector %>').hide();
             jQuery('#'+cf_id).trigger('hide');
         } else {
-            jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
+            jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').hide();
             jQuery('input[name="'+cf_id+'"]').first().trigger('hide');
+            jQuery('textarea[name="'+cf_id+'"]').trigger('hide');
         }
     });
     jQuery('#'+condition_obj).on('show', function() {
@@ -155,8 +163,9 @@ jQuery(function() {
                 jQuery('#'+cf_id).closest('<% $ParentSelector %>').show();
                 jQuery('#'+cf_id).trigger('show');
             } else {
-                jQuery('input[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
+                jQuery('input[name="'+cf_id+'"], textarea[name="'+cf_id+'"]').closest('<% $ParentSelector %>').show();
                 jQuery('input[name="'+cf_id+'"]').first().trigger('show');
+                jQuery('textarea[name="'+cf_id+'"]').trigger('show');
             }
          }
      });

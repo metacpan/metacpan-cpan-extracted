@@ -44,6 +44,7 @@ sub build_dist {
     [
       MetaResources => {
         'repository.url' => "http://github.com/$test->{user}/$test->{repo}",
+        %{ $test->{MetaResources} || {} },
       }
     ],
     @{ $test->{plugins} || [] },

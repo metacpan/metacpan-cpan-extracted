@@ -1,4 +1,4 @@
-package Pcore::Ext::Lib::Core::Viewport;
+package Pcore::Ext::Lib::core::Viewport;
 
 use Pcore -l10n;
 use Pcore::CDN::Static::FA qw[:ALL];
@@ -71,7 +71,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
             me.callParent(arguments);
 JS
 
-        initApp => func [], <<"JS",
+        initApp => func <<"JS",
             var me = this;
 
             me.mask();
@@ -158,11 +158,11 @@ JS
 JS
 
         # MASK
-        mask => func [], <<'JS',
+        mask => func <<'JS',
             this.getView().setMasked(this.defaultMask);
 JS
 
-        unmask => func [], <<'JS',
+        unmask => func <<'JS',
             this.getView().unmask();
 JS
 
@@ -190,11 +190,11 @@ JS
             }
 JS
 
-        getToken => func [], <<'JS',
+        getToken => func <<'JS',
             return sessionStorage.token || localStorage.token;
 JS
 
-        removeToken => func [], <<'JS',
+        removeToken => func <<'JS',
             localStorage.removeItem('token');
             sessionStorage.removeItem('token');
 JS
@@ -251,7 +251,7 @@ JS
             });
 JS
 
-        clearInterface => func [], <<'JS',
+        clearInterface => func <<'JS',
             var view = this.getView();
 
             view.getItems().each(function(item) {
@@ -306,7 +306,7 @@ JS
             });
 JS
 
-        onSignout => func [], <<"JS",
+        onSignout => func <<"JS",
             this.doSignout();
 
             // drop API token
@@ -366,7 +366,7 @@ JS
             }, cb);
 JS
 
-        doSignout => func [], <<"JS",
+        doSignout => func <<"JS",
             this.api.signout();
 JS
 
@@ -388,7 +388,7 @@ JS
         # ROUTES HANDLERS
         routeChangePassword => func ['values'], <<"JS",
             Ext.create({
-                xtype: "$type->{'/Pcore/Ext/Lib/Core/Viewport/change_password'}",
+                xtype: "$type->{change_password}",
                 token: values.token,
                 redirectOnClose: ''
             }).show();
@@ -401,8 +401,7 @@ JS
 # SIGNIN DIALOG
 sub EXT_signin_controller : Extend('Ext.app.ViewController') : Type('controller') {
     return {
-        submit => func [],
-        <<"JS",
+        submit => func <<"JS",
                 var me = this,
                     view = this.getView(),
                     form = view.down('fieldpanel');
@@ -417,7 +416,7 @@ sub EXT_signin_controller : Extend('Ext.app.ViewController') : Type('controller'
                 }
 JS
 
-        recoverPassword => func [], <<"JS",
+        recoverPassword => func <<"JS",
                 var me = this;
                 var view = this.getView(),
                     form = view.down('fieldpanel'),
@@ -496,8 +495,7 @@ sub EXT_signin : Extend('Ext.Dialog') : Type('widget') {
 # CHANGE PASSWORD DIALOG
 sub EXT_change_password_controller : Extend('Ext.app.ViewController') : Type('controller') {
     return {
-        submit => func [],
-        <<"JS",
+        submit => func <<"JS",
             var me = this;
             var view = this.getView();
             var form = view.down('fieldpanel');
@@ -526,13 +524,13 @@ sub EXT_change_password_controller : Extend('Ext.app.ViewController') : Type('co
             }
 JS
 
-        close => func [], <<"JS",
+        close => func <<"JS",
             var view = this.getView();
 
             view.destroy();
 JS
 
-        onDestroy => func [], <<"JS",
+        onDestroy => func <<"JS",
             var view = this.getView(),
                 redirectOnClose = view.getRedirectOnClose();
 
@@ -600,7 +598,7 @@ __END__
 
 =head1 NAME
 
-Pcore::Ext::Lib::Core::Viewport
+Pcore::Ext::Lib::core::Viewport
 
 =head1 SYNOPSIS
 

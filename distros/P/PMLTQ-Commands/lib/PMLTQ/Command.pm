@@ -1,6 +1,6 @@
 package PMLTQ::Command;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::VERSION = '2.0.1';
+$PMLTQ::Command::VERSION = '2.0.2';
 # ABSTRACT: Command base class
 
 use PMLTQ::Base -base;
