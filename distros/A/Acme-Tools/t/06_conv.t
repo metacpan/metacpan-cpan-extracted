@@ -1,7 +1,7 @@
 #perl Makefile.PL;make;perl -Iblib/lib t/06_conv.t
 #perl -I/ext t/06_conv.t
 use lib '.'; BEGIN{require 't/common.pl'}
-use Test::More tests => 37;
+use Test::More tests => 42;
 
 sub check {
   my($n, $from, $to, $answer) = @_;
@@ -32,6 +32,12 @@ check( 1, 'W', 'BTU/h', 3600/1055.05585262 );
 check( 1, 'BTU/h', 'W', 1055.05585262/3600 ); #0.29307107
 check( 1, 'BTU/h', 'mW',1055055.85262/3600 ); #293.07107
 check( 1, 'BTU/s', 'W', 1055.05585262      );
+
+check( 1,  'Wh', 'J', 3.6e3  );
+check( 1, 'kWh', 'J', 3.6e6  );
+check( 1, 'MWh', 'J', 3.6e9  );
+check( 1, 'GWh', 'J', 3.6e12 );
+check( 1, 'TWh', 'J', 3.6e15 );
 
 check( 4.2766288,'lp100km','mpg',      55 ); #hmm
 check( 58, 'mpg', 'lp100km', 4.05542386206896 );

@@ -1,3 +1,7 @@
+0.003     2019-01-24 17:07:44 EST
+  - Fix Encode::Unicode test to not rely on how invalid characters are encoded,
+    since this changed in Encode 2.99.
+
 0.002     2018-02-22 21:09:15 EST
   - Promote utf8 warnings used by Encode::Unicode to exceptions in encode/decode,
     and suppress them in encode_lax/decode_lax. This brings the inconsistent API

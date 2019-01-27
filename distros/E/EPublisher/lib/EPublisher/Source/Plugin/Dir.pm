@@ -14,40 +14,63 @@ use EPublisher::Utils::PPI qw(extract_pod extract_package);
 
 our @ISA = qw( EPublisher::Source::Base );
 
-our $VERSION = 1.0;
+our $VERSION = 1.1;
 
 sub load_source{
-    my ($self) = @_;
+    my ($self, $source_path) = @_;
     
     my $options = $self->_config;
     
-    my $path = $options->{path};
+    my $path = $source_path || $options->{path};
+
+    if ( !defined $path ) {
+        $self->publisher->debug( "400: No path given" );
+        return;
+    }
     
     my @paths = ref $path eq 'ARRAY' ? @{$path} : ($path);
     my @paths_to_use;
     
     for my $path_to_check ( @paths ) {
-        unless( $path_to_check && -d $path_to_check ) {
-            $self->publisher->debug( "400: $path_to_check -> " . ( -d $path_to_check or 0 ) );
+        if ( !defined $path_to_check ) {
+            $self->publisher->debug( "400: undefined path given" );
+            next;
+        }
+        if ( !-d $path_to_check ) {
+            $self->publisher->debug( "400: $path_to_check does not exist" );
             next;
         }
         
         push @paths_to_use, $path_to_check;
     }
     
-    return '' if !@paths_to_use;
+    return if !@paths_to_use;
     
-    my @files = sort File::Find::Rule->file->name( qr/\.p(?:m|od|l)\z/ )->in( @paths_to_use );
+    my @testrule;
+    if ( $options->{testfiles} ) {
+        @testrule = (qr/\.t\z/);
+    }
+
+    my $rule  = File::Find::Rule->file->name( qr/\.p(?:m|od|l)\z/, @testrule );
+
+    if ( defined $options->{subdirs} && $options->{subdirs} == 0 ) {
+        $rule->maxdepth( 1 );
+    }
+
+    my @files = sort $rule->in( @paths_to_use );
     my @pods;
     
+    my @excludes;
+    if ( $options->{exclude} ) {
+        @excludes = ref $options->{exclude} eq 'ARRAY' ? @{ $options->{exclude} } : ($options->{exclude});
+    }
+
+    $options->{title} = '' if !defined $options->{title};
+            
     FILE:
     for my $file ( @files ) {
         
-        if ( $options->{exclude} ) {
-            my @excludes = ref $options->{exclude} eq 'ARRAY' ? @{ $options->{exclude} } : ($options->{exclude});
-            
-            next FILE if first{ $file =~ m{\A \Q$_\E }xms }@excludes;
-        }
+        next FILE if first{ $file =~ m{\A \Q$_\E }xms }@excludes;
         
         my $pod = extract_pod( $file, $self->_config );
         
@@ -56,15 +79,15 @@ sub load_source{
         my $filename = basename $file;
         my $title    = $filename;
 
-        if ( $options->{title} and $options->{title} eq 'pod' ) {
+        if ( $options->{title} eq 'pod' ) {
             ($title) = $pod =~ m{ =head1 \s+ (.*) }x;
             $title = '' if !defined $title;
         }
-        elsif ( $options->{title} and $options->{title} eq 'package' ) {
+        elsif ( $options->{title} eq 'package' ) {
             my $package = extract_package( $file, $self->_config );
             $title = $package if $package;
         }
-        elsif ( $options->{title} and $options->{title} ne 'pod' ) {
+        elsif ( length $options->{title} ) {
             $title = $options->{title};
         }
         
@@ -88,7 +111,7 @@ EPublisher::Source::Plugin::Dir - Dir source plugin
 
 =head1 VERSION
 
-version 1.23
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -118,16 +141,19 @@ C<$file> is the name of the file (without path) and C<$title> is the title of
 the pod documentation. By default it is the filename, but you can say "title => 'pod'"
 in the configuration. The title is the first value for I<=head1> in the pod.
 
-=head1 COPYRIGHT & LICENSE
+=head1 CONFIGURATION
 
-Copyright 2010 - 2012 Renee Baecker, all rights reserved.
+These settings can be passed to the constructor
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of Artistic License 2.0.
+=over 4
 
-=head1 AUTHOR
+=item * exclude
 
-Renee Baecker (E<lt>module@renee-baecker.deE<gt>)
+=item * path
+
+=item * subdirs
+
+=back
 
 =head1 AUTHOR
 

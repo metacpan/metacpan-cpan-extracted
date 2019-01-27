@@ -1,0 +1,5 @@
+=head1 TEST
+
+This is a simple test POD.
+
+=cut

@@ -18,7 +18,11 @@ unless( $param{argv} && ref $param{argv} eq 'ARRAY' && @{$param{argv}} )
 my ( $pid, $filename );
 
 $SIG{INT} = $SIG{TERM} = sub {
-    kill 'TERM', $pid if $pid;
+    if( $pid )
+    {
+        system "pkill -15 -P $pid";
+        kill 'TERM', $pid;
+    }
     unlink $filename if -e $filename;
     exit 1;
 };
@@ -38,6 +42,8 @@ map
         print "md5 nomatch\n";
         exit 1;
     }
+
+    print "[warn]nofind pkill\n" if system "pkill --help 1>/dev/null";
 
     if( $pid = fork )
     {

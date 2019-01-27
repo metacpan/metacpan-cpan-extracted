@@ -3,7 +3,7 @@ package Acme::CPANAuthors::Japanese;
 use strict;
 use warnings;
 
-our $VERSION = '0.180422';
+our $VERSION = '0.190126';
 
 use Acme::CPANAuthors::Register (
     ABUI      => 'DAISUKE ABUI',
@@ -141,6 +141,7 @@ use Acme::CPANAuthors::Register (
     HMATSU    => 'Hajime Matsumoto',
     HOKKE     => 'Yoichi Hirota',
     HOLLY     => 'Akira Horimoto',
+    HOMESHIMA => 'Teppei Shimada',
     HORIUCHI  => 'Yasuhiro Horiuchi',
     HORIYUKI  => 'Yukio HORI',
     HOTO      => 'Yuki Ishikawa',
@@ -155,6 +156,7 @@ use Acme::CPANAuthors::Register (
     IIDAATCNT => 'MASAKATSU IIDA',
     IIZUKA    => 'Nao Iizuka',
     IKEBE     => 'IKEBE Tomohiro',
+    IKENOX    => 'Naoto Ikeno',
     IKHRNET   => 'Tatsuya Ikehara',
     IKUTA     => 'Masahito Ikuta',
     ILLO      => 'Ichito Nagata',
@@ -184,6 +186,7 @@ use Acme::CPANAuthors::Register (
     KARUPA    => 'Kenta Sato',
     KASHIWABA => 'Nobuyuki Kashiwabara',
     KATAGIRI  => 'Tomoharu Katagiri',
+    KATAOKA   => 'Hirofumi Kataoka',
     KAWABATA  => 'KAWABATA Kazumichi',
     KAWAMURAY => 'Yuto KAWAMURA',
     KAWASAKI  => 'Kawasaki Yusuke',
@@ -226,6 +229,7 @@ use Acme::CPANAuthors::Register (
     KOJUN     => 'Kojun Ueno',
     KOKOGIKO  => 'OHTSUKA Ko-hei',
     KOMORIYA  => 'Kazunari Komoriya',
+    KONA      => 'Kona Furugoori',
     KONBOI    => 'Ryosuke Yabuki',
     KONDO     => 'Yoshiyuki KONDO',
     KOPUG     => 'Masahiro Funakoshi',
@@ -270,6 +274,7 @@ use Acme::CPANAuthors::Register (
     MAGICDRIV => 'Hiroshi IKEGAMI',
     MAHIRO    => 'Mahiro Ando',
     MAHITO    => 'Hogelist',
+    MAHORI    => 'mahori',
     MAIDO     => 'Masahiro Funakoshi',
     MAKAMAKA  => 'Makamaka Hannyaharamitu',
     MAKOT     => 'Makoto Nozaki',
@@ -295,6 +300,7 @@ use Acme::CPANAuthors::Register (
     MATTN     => 'Yasuhiro Matsumoto',
     MATZ      => 'Taichi Matsumura',
     MERU      => 'meru_akimbo',
+    METEOR    => 'Shumpei URABE',
     MIHYAERU  => 'Atsushi Takano',
     MIKAGE    => 'SANO Taku',
     MIKI      => 'Takeshi Miki',
@@ -328,6 +334,7 @@ use Acme::CPANAuthors::Register (
     NABESHIMA => 'Masaaki NABESHIMA',
     NAGAMI    => 'Shuhei Nagami',
     NAGATA    => 'Ichito Nagata',
+    NAHCNUJ   => 'Junichi Hayashi',
     NAITO     => 'Naoyuki Ito',
     NAKAYAMA  => 'Yasuhiro Nakayama',
     NANTO     => 'nanto_vi (TOYAMA Nao)',
@@ -468,6 +475,7 @@ use Acme::CPANAuthors::Register (
     STAKASHIO => 'Shin Takashio',
     SUENAGA   => 'Hiroki Suenaga',
     SUGA      => 'suga masashi',
+    SUGASUGAX => 'sugawara taiki',
     SUGMAK    => 'Makoto Sugiyama',
     SUGYAN    => 'Yoshihiro Sugi',
     SUHARA    => 'Yoshihiko Suhara',
@@ -517,6 +525,8 @@ use Acme::CPANAuthors::Register (
     TATENO    => 'Yuichi Tateno',
     TATSUYAGI => 'Tatsuya Yagi',
     TAWAN     => 'Taro Funaki',
+    TAWANYAN  => 'Hiroki Nishino',
+    TAWASHI   => 'Hiroki Nishino',
     TEBORA    => 'Issei Horie',
     TENMIHI   => 'Kenichi Murao',
     THORIKAWA => 'Takahiro Horikawa',
@@ -543,6 +553,7 @@ use Acme::CPANAuthors::Register (
     TONODERA  => 'Takahiro Onodera',
     TOONA     => 'Naoto Ishikawa',
     TOPIA     => 'Tatuya Noda',
+    TORICOR   => 'Hiroshi Toriyabe',
     TORITSUYO => 'Tsuyoshi Torii',
     TORU      => 'Toru Hisai',
     TOSHIFJW  => 'Toshimitsu FUJIWARA',
@@ -579,6 +590,7 @@ use Acme::CPANAuthors::Register (
     WATANABE  => 'WATANABE Hirofumi',
     WHISKYSHU => 'Shunsuke Usuki',
     WHYWAITA  => 'Nakanishi Kento',
+    WKTK      => 'Kenichiro Wakitani',
     WOREMACX  => 'Wore Macx',
     WORTHMINE => 'Yuki Yoshida',
     XAICRON   => 'Yuji Shimada',

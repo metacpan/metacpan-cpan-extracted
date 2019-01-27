@@ -576,7 +576,37 @@ package TestCase::CoreFunc::Basic {
     
     return 1;
   }
+
+
+  sub test_equals_strarray : int () {
+    my $strings1 = ["abc", "def", "ghi"];
+    my $strings2 = ["abc", "def", "ghi"];
+    my $strings3 = ["abc", "def"];
+    my $strings4 = ["abc", "def", "xxx"];
+    
+    {
+      my $is_equals = equals_strarray($strings1, $strings2);
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_strarray($strings1, $strings3);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_strarray($strings1, $strings4);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
   
+
   sub test_type_name : int () {
     my $minimal = TestCase::Minimal->new;
     my $type_name = type_name($minimal);
@@ -588,9 +618,9 @@ package TestCase::CoreFunc::Basic {
     return 1;
   }
   
-  sub test_copy_string : int () {
+  sub test_copy_str : int () {
     my $string = "abc";
-    my $string_out = copy_string($string);
+    my $string_out = copy_str($string);
     
     unless ($string_out eq "abc") {
       return 0;
@@ -599,9 +629,9 @@ package TestCase::CoreFunc::Basic {
     return 1;
   }
 
-  sub test_copy_byte_array : int () {
+  sub test_copy_barray : int () {
     my $nums = [(byte)1, 2, INT8_MIN()];
-    my $nums_out = copy_byte_array($nums);
+    my $nums_out = copy_barray($nums);
     
     unless ($nums->[0] == 1) {
       return 0;
@@ -615,16 +645,16 @@ package TestCase::CoreFunc::Basic {
       return 0;
     }
     
-    unless (@$nums == 3) {
+    unless (@$nums_out == 3) {
       return 0;
     }
     
     return 1;
   }
 
-  sub test_copy_short_array : int () {
+  sub test_copy_sarray : int () {
     my $nums = [(short)1, 2, INT16_MIN()];
-    my $nums_out = copy_short_array($nums);
+    my $nums_out = copy_sarray($nums);
     
     unless ($nums->[0] == 1) {
       return 0;
@@ -638,16 +668,16 @@ package TestCase::CoreFunc::Basic {
       return 0;
     }
     
-    unless (@$nums == 3) {
+    unless (@$nums_out == 3) {
       return 0;
     }
     
     return 1;
   }
 
-  sub test_copy_int_array : int () {
+  sub test_copy_iarray : int () {
     my $nums = [(int)1, 2, INT32_MIN()];
-    my $nums_out = copy_int_array($nums);
+    my $nums_out = copy_iarray($nums);
     
     unless ($nums->[0] == 1) {
       return 0;
@@ -661,16 +691,16 @@ package TestCase::CoreFunc::Basic {
       return 0;
     }
     
-    unless (@$nums == 3) {
+    unless (@$nums_out == 3) {
       return 0;
     }
     
     return 1;
   }
 
-  sub test_copy_long_array : int () {
+  sub test_copy_larray : int () {
     my $nums = [(long)1, 2, INT64_MIN()];
-    my $nums_out = copy_long_array($nums);
+    my $nums_out = copy_larray($nums);
     
     unless ($nums->[0] == 1) {
       return 0;
@@ -684,16 +714,16 @@ package TestCase::CoreFunc::Basic {
       return 0;
     }
     
-    unless (@$nums == 3) {
+    unless (@$nums_out == 3) {
       return 0;
     }
     
     return 1;
   }
 
-  sub test_copy_float_array : int () {
+  sub test_copy_farray : int () {
     my $nums = [(float)0.5f, 0.25f, FLT_MIN()];
-    my $nums_out = copy_float_array($nums);
+    my $nums_out = copy_farray($nums);
     
     unless ($nums->[0] == 0.5) {
       return 0;
@@ -707,16 +737,16 @@ package TestCase::CoreFunc::Basic {
       return 0;
     }
     
-    unless (@$nums == 3) {
+    unless (@$nums_out == 3) {
       return 0;
     }
     
     return 1;
   }
 
-  sub test_copy_double_array : int () {
+  sub test_copy_darray : int () {
     my $nums = [(double)0.5, 0.25, DBL_MIN()];
-    my $nums_out = copy_double_array($nums);
+    my $nums_out = copy_darray($nums);
     
     unless ($nums->[0] == 0.5) {
       return 0;
@@ -730,16 +760,16 @@ package TestCase::CoreFunc::Basic {
       return 0;
     }
     
-    unless (@$nums == 3) {
+    unless (@$nums_out == 3) {
       return 0;
     }
     
     return 1;
   }
 
-  sub test_copy_object_array : int () {
+  sub test_copy_oarray : int () {
     my $objects = [(object)SPVM::Int->new(1), SPVM::Int->new(2), SPVM::Int->new(INT32_MIN())];
-    my $objects_out = copy_object_array($objects);
+    my $objects_out = copy_oarray($objects);
 
     unless ($objects->[0] == $objects_out->[0]) {
       return 0;
@@ -765,11 +795,34 @@ package TestCase::CoreFunc::Basic {
       return 0;
     }
     
-    unless (@$objects == 3) {
+    unless (@$objects_out == 3) {
       return 0;
     }
     
     unless ($objects != $objects_out) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  sub test_copy_strarray : int () {
+    my $strings = ["abc", "def", "hij"];
+    my $strings_out = copy_strarray($strings);
+    
+    unless ($strings->[0] eq $strings_out->[0]) {
+      return 0;
+    }
+    
+    unless ($strings->[1] == $strings_out->[1]) {
+      return 0;
+    }
+    
+    unless ($strings->[2] == $strings_out->[2]) {
+      return 0;
+    }
+    
+    unless (@$strings_out == 3) {
       return 0;
     }
     

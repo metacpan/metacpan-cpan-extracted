@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+Storage.pm
+Storage.xs
+store.c
+store.h
+t/storage.t
+typemap

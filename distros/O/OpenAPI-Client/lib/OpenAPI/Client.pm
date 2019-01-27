@@ -9,7 +9,7 @@ use Mojo::Promise;
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 my $BASE = __PACKAGE__;
 my $X_RE = qr{^x-};
@@ -334,7 +334,7 @@ See L<Mojo::UserAgent::Transactor> for more details.
 
 =head2 after_build_tx
 
-  $self->on(after_build_tx => sub { my ($self, $tx) = @_ })
+  $client->on(after_build_tx => sub { my ($client, $tx) = @_ })
 
 This event is emitted after a L<Mojo::UserAgent::Transactor> object has been
 built, just before it is passed on to the L</ua>. Note that all validation has
@@ -352,7 +352,7 @@ Note that this usage of C<env()> is currently EXPERIMENTAL:
 
 =head2 base_url
 
-  $base_url = $self->base_url;
+  $base_url = $client->base_url;
 
 Returns a L<Mojo::URL> object with the base URL to the API. The default value
 comes from C<schemes>, C<basePath> and C<host> in the Open API specification.
@@ -365,7 +365,7 @@ Use L</after_build_tx> and L<Mojo::UserAgent::Transactor/generators> instead.
 
 =head2 ua
 
-  $ua = $self->ua;
+  $ua = $client->ua;
 
 Returns a L<Mojo::UserAgent> object which is used to execute requests.
 
@@ -373,8 +373,8 @@ Returns a L<Mojo::UserAgent> object which is used to execute requests.
 
 =head2 call
 
-  $tx = $self->call($operationId => \%params, %content);
-  $self = $self->call($operationId => \%params, %content, sub { my ($self, $tx) = @_; });
+  $tx = $client->call($operationId => \%params, %content);
+  $client = $client->call($operationId => \%params, %content, sub { my ($client, $tx) = @_; });
 
 Used to either call an C<$operationId> that has an "invalid name", such as
 "list pets" instead of "listPets" or to call an C<$operationId> that you are
@@ -397,7 +397,7 @@ C<$tx> is a L<Mojo::Transaction> object.
 
 =head2 call_p
 
-  $promise = $self->call_p($operationId => $params, %content);
+  $promise = $client->call_p($operationId => $params, %content);
   $promise->then(sub { my $tx = shift });
 
 As L</call> above, but returns a L<Mojo::Promise> object.
@@ -431,7 +431,7 @@ See L<JSON::Validator/coerce>. Default to 1.
 
 =head2 validator
 
-  $validator = $self->validator;
+  $validator = $client->validator;
   $validator = $class->validator;
 
 Returns a L<JSON::Validator::OpenAPI::Mojolicious> object for a generated

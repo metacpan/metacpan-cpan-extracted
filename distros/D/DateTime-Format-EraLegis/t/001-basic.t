@@ -18,7 +18,7 @@ binmode(STDOUT, ':encoding(utf8)');
 binmode(STDERR, ':encoding(utf8)');
 
 my $ephem = DateTime::Format::EraLegis::Ephem::DBI->new(
-    ephem_db => './t/test.sqlite3' );
+    ephem_db => './test-data/test.sqlite3' );
 
 my $dtf;
 $dtf = DateTime::Format::EraLegis->new(
@@ -33,7 +33,7 @@ my $iso = DateTime::Format::ISO8601->new;
 my $dt = $iso->parse_datetime($tstamp);
 $dt->set_formatter( $dtf );
 my $out = ''.$dt;
-is $out, '☉ in 12° ♐ : ☽ in 10° ♌ : ☽ : ⅠⅤⅹⅹ',
+is $out, '☉︎ in 12° ♐︎ : ☽︎ in 10° ♌︎ : ☽︎ : ⅠⅤⅹⅹ',
     'Basic rendering';
 
 $dtf = DateTime::Format::EraLegis->new(
@@ -41,7 +41,7 @@ $dtf = DateTime::Format::EraLegis->new(
     style => DateTime::Format::EraLegis::Style->new(
         lang=>'latin', show_dow=>0, show_year=>1) );
 is $dtf->format_datetime($dt),
-    '☉ in 12° Sagittarii : ☽ in 10° Leonis : Anno ⅠⅤⅹⅹ æræ legis',
+    '☉︎ in 12° Sagittarii : ☽︎ in 10° Leonis : Anno ⅠⅤⅹⅹ æræ legis',
     'Basic rendering';
 
 $dtf = DateTime::Format::EraLegis->new(
@@ -49,7 +49,7 @@ $dtf = DateTime::Format::EraLegis->new(
     style => DateTime::Format::EraLegis::Style->new(
         lang=>'latin', show_terse=>1, show_dow=>1, show_year=>0) );
 is $dtf->format_datetime($dt),
-    '☉ 12° Sagittarii : ☽ 10° Leonis : dies Lunae',
+    '☉︎ 12° Sagittarii : ☽︎ 10° Leonis : dies Lunae',
     'Basic rendering';
 
 my @edges = (

@@ -20,6 +20,7 @@ lib/Pcore/Ext/Lib/classic/README.txt
 lib/Pcore/Ext/Lib/core/README.txt
 lib/Pcore/Ext/Lib/core/Viewport.pm
 lib/Pcore/Ext/Lib/modern/AmCharts4.pm
+lib/Pcore/Ext/Lib/modern/PDF.pm
 lib/Pcore/Ext/Lib/modern/Plugin.pm
 lib/Pcore/Ext/Overrides/classic.pm
 lib/Pcore/Ext/Overrides/core.pm

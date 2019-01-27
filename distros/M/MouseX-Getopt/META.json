@@ -4,7 +4,7 @@
       "=over 4"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.2",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -66,7 +66,7 @@
    "provides" : {
       "MouseX::Getopt" : {
          "file" : "lib/MouseX/Getopt.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "MouseX::Getopt::Basic" : {
          "file" : "lib/MouseX/Getopt/Basic.pm"
@@ -107,36 +107,38 @@
          "web" : "https://github.com/gfx/mousex-getopt"
       }
    },
-   "version" : "0.37",
+   "version" : "0.38",
    "x_authority" : "cpan:GFUJI",
    "x_contributors" : [
       "Brandon L Black <blblack@gmail.com>",
-      "Ryan D Johnson <ryan@innerfence.com>",
-      "Todd Hepler <thepler@employees.org>",
-      "John Goulah <jgoulah@cpan.org>",
       "Chris Prather <chris@prather.org>",
-      "Stevan Little <stevan.little@iinteractive.com>",
-      "Yuval Kogman <nothingmuch@woobling.org>",
       "Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>",
-      "Hans Dieter Pearcey <hdp@weftsoar.net>",
-      "Nelo Onyiah <nelo.onyiah@gmail.com>",
-      "Ricardo SIGNES <rjbs@cpan.org>",
       "Devin Austin <devin@devin-laptop.(none)>",
-      "Gordon Irving <goraxe@goraxe.me.uk>",
-      "Shlomi Fish <shlomif@iglu.org.il>",
-      "Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>",
-      "Tomas Doran (t0m) <t0m@state51.co.uk>",
-      "Ævar Arnfjörð Bjarmason <avarab@gmail.com>",
-      "Jesse Luehrs <doy@tozt.net>",
-      "Florian Ragwitz <rafl@debian.org>",
-      "Karen Etheridge <karen@etheridge.ca>",
-      "Justin Hunter <justin.d.hunter@gmail.com>",
-      "Tomas Doran <bobtfish@bobtfish.net>",
-      "Mark Gardner <gardnerm@gsicommerce.com>",
-      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
       "FUJI Goro (gfx) <gfuji@cpan.org>",
-      "Paul Howarth <paul@city-fan.org>",
       "FUJI Goro <gfx@users.noreply.github.com>",
-      "FUJI Goro <goro.fuji@ebookjapan.co.jp>"
-   ]
+      "FUJI Goro <goro.fuji@ebookjapan.co.jp>",
+      "Florian Ragwitz <rafl@debian.org>",
+      "Gordon Irving <goraxe@goraxe.me.uk>",
+      "Hans Dieter Pearcey <hdp@weftsoar.net>",
+      "Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>",
+      "Jesse Luehrs <doy@tozt.net>",
+      "John Goulah <jgoulah@cpan.org>",
+      "Justin Hunter <justin.d.hunter@gmail.com>",
+      "Karen Etheridge <karen@etheridge.ca>",
+      "Mark Gardner <gardnerm@gsicommerce.com>",
+      "Nelo Onyiah <nelo.onyiah@gmail.com>",
+      "Paul Howarth <paul@city-fan.org>",
+      "Ricardo SIGNES <rjbs@cpan.org>",
+      "Ryan D Johnson <ryan@innerfence.com>",
+      "Shlomi Fish <shlomif@iglu.org.il>",
+      "Stevan Little <stevan.little@iinteractive.com>",
+      "Todd Hepler <thepler@employees.org>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
+      "Tomas Doran (t0m) <t0m@state51.co.uk>",
+      "Tomas Doran <bobtfish@bobtfish.net>",
+      "Yuval Kogman <nothingmuch@woobling.org>",
+      "Ævar Arnfjörð Bjarmason <avarab@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

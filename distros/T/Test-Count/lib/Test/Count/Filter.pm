@@ -1,5 +1,5 @@
 package Test::Count::Filter;
-$Test::Count::Filter::VERSION = '0.0902';
+$Test::Count::Filter::VERSION = '0.1000';
 use warnings;
 use strict;
 
@@ -142,7 +142,7 @@ Test::Count::Filter - a filter that counts the tests and updates the test count.
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 SYNOPSIS
 
@@ -167,7 +167,7 @@ total number of tests.
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head2 my $filter = Test::Count::Filter->new({%args});
 

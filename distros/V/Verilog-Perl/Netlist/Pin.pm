@@ -17,7 +17,7 @@ use strict;
 @ISA = qw(Verilog::Netlist::Pin::Struct
 	Verilog::Netlist::Subclass);
 
-$VERSION = '3.456';
+$VERSION = '3.460';
 
 structs('_new_base',
 	'Verilog::Netlist::Pin::Struct'
@@ -57,7 +57,7 @@ sub new {
 	}
 	delete $params{pinselects};
     }
-    return $class->_new_base (%params);
+    return $class->_new_base(%params);
 }
 
 sub delete {
@@ -188,7 +188,7 @@ sub type_match {
 sub lint {
     my $self = shift;
     if (!$self->port && $self->submod) {
-        $self->error ($self,"Port not found in ",$self->submod->keyword," ",$self->submod->name,": ",$self->portname,"\n");
+        $self->error($self,"Port not found in ",$self->submod->keyword," ",$self->submod->name,": ",$self->portname,"\n");
     }
     if ($self->port && $self->nets) {
 	if (!$self->type_match) {
@@ -281,7 +281,7 @@ Verilog::Netlist::Pin - Pin on a Verilog Cell
   use Verilog::Netlist;
 
   ...
-  my $pin = $cell->find_pin ('pinname');
+  my $pin = $cell->find_pin('pinname');
   print $pin->name;
 
 =head1 DESCRIPTION
@@ -380,7 +380,7 @@ Verilog-Perl is part of the L<http://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
 L<http://www.veripool.org/verilog-perl>.
 
-Copyright 2000-2018 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2019 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

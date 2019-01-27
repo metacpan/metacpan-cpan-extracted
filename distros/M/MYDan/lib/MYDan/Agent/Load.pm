@@ -40,6 +40,7 @@ use Fcntl qw(:flock SEEK_END);
 use MYDan::Agent::Proxy;
 use MYDan::Util::Hosts;
 use MYDan::Agent::FileCache;
+use MYDan::Util::FastMD5;
 use File::Basename;
 
 sub new
@@ -179,20 +180,17 @@ sub run
 
 			       if( -f $dp )
 			       {
-				   if( open my $DP, '<', $dp )
-				   {
-				       my $x = Digest::MD5->new()->addfile( $DP )->hexdigest();
-				       if( $x && $filemd5 && $x eq $filemd5 )
-				       {
-				           die "chmod fail\n" if $run{chmod} && ! chmod oct($run{chmod}), $dp;
-					   if( $run{chown} )
-					   {
-                                               die "get $run{chown} uid fail\n" unless my @pw = getpwnam $run{chown};
-					       die "chown fail\n" unless chown @pw[2,3], $dp;
-					   }
-                                           undef $hdl; $cv->send; $ok = $size;
-				       }
-			           }
+                       my $x = eval{ MYDan::Util::FastMD5->hexdigest( $dp ) };
+                       if( $x && $filemd5 && $x eq $filemd5 )
+                       {
+                           die "chmod fail\n" if $run{chmod} && ! chmod oct($run{chmod}), $dp;
+                           if( $run{chown} )
+                           {
+                               die "get $run{chown} uid fail\n" unless my @pw = getpwnam $run{chown};
+                               die "chown fail\n" unless chown @pw[2,3], $dp;
+                           }
+                           undef $hdl; $cv->send; $ok = $size;
+                       }
 			       }
 
 			       $percent->renew( $size )->add( length $keepalive{cont}  );
@@ -240,9 +238,8 @@ sub run
         die "status error $err $end\n";
     }
     truncate $TEMP, $size;
-    seek $TEMP, 0, 0;
 
-    unless( $filemd5 eq Digest::MD5->new()->addfile( $TEMP )->hexdigest() )
+    unless( $filemd5 eq MYDan::Util::FastMD5->hexdigest( $temp ) )
     {
         unlink $temp;
         die "md5 nomatch\n";

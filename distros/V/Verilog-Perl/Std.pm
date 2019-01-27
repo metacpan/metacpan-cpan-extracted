@@ -9,38 +9,18 @@ use Verilog::Language;
 use Carp;
 use strict;
 
-use vars qw ($VERSION);
+use vars qw($VERSION);
 
 ######################################################################
 #### Configuration Section
 
-$VERSION = '3.456';
+$VERSION = '3.460';
 
 #######################################################################
-# ACCESSORS
+# It's a PITRA to have pure datafiles get installed properly, so we have
+# the std text here in this package.
 
-our %_Std_Data;
-
-sub std {
-    my $std = shift || Verilog::Language::language_standard();
-    if (!$_Std_Data{$std}) {
-	my @out;
-	foreach (<DATA>) {
-	    last if $_ =~ /^__END__/;
-	    last if $std !~ /^1800/;  # Non system verilog, ie 1364 has no std package
-	    push @out, $_;
-	}
-	$_Std_Data{$std} = join('',@out);
-    }
-    return $_Std_Data{$std};
-}
-
-#######################################################################
-# It's a PITRA to have pure datafiles get installed properly,
-# so we just paste our text into this package.
-1;
-__DATA__
-
+our $_Std_Text = <<EOF;
 `line 1 "Perl_Verilog::Std_module" 0
 // Verilog-Perl Verilog::Std
 // The basis for this package is described in IEEE 1800-2017 Annex G
@@ -84,7 +64,22 @@ endpackage : std
 
 import std::*;
 
-__END__
+EOF
+
+#######################################################################
+# ACCESSORS
+
+sub std {
+    my $std = shift || Verilog::Language::language_standard();
+    if ($std =~ /^1800/) {
+	return $_Std_Text;
+    } else {
+	return "";
+    }
+}
+
+#######################################################################
+1;
 
 =pod
 
@@ -108,7 +103,7 @@ SystemVerilog standard.
 
 =over 4
 
-=item std ({I<standard>})
+=item std({I<standard>})
 
 Return the definition of the std package.  Optionally pass the language
 standard, defaulting to what Verilog::Language::language_standard returns if
@@ -122,7 +117,7 @@ Verilog-Perl is part of the L<http://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
 L<http://www.veripool.org/verilog-perl>.
 
-Copyright 2009-2018 by Wilson Snyder.  This package is free software; you
+Copyright 2009-2019 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License
 Version 2.0.

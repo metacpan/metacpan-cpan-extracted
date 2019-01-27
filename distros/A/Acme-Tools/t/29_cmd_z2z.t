@@ -12,7 +12,7 @@ writefile($tf,join" ",1..500);
 my($last,$n)=("",0);
 for(qw(gz bz2 xz gz xz bz2 gz)){
   my $prog={qw/gz gzip bz2 bzip2 xz xz/}->{$_};
-  next if !qx(which $prog) and warn "Program $prog missing, test z2z -t $_" and ok(1);
+  next if !Acme::Tools::which($prog) and warn "Program $prog missing, test z2z -t $_" and ok(1);
   my $opt='-vt';
   $opt=~s,-,-h, if $n++>3;
   Acme::Tools::cmd_z2z($opt,$_,"$tf$last");

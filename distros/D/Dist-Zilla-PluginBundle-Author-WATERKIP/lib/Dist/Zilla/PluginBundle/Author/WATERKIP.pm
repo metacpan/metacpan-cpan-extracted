@@ -10,25 +10,8 @@ use Moose::Util::TypeConstraints qw(enum subtype where);
 use namespace::autoclean;
 
 # Use all the modules so we don't get weird dependency issues
-use Dist::Zilla::App::Command::xtest                  ();
-use Dist::Zilla::Plugin::CheckExtraTests              ();
-use Dist::Zilla::Plugin::ContributorsFile             ();
-use Dist::Zilla::Plugin::CopyFilesFromBuild::Filtered ();
-use Dist::Zilla::Plugin::Git::Contributors            ();
-use Dist::Zilla::Plugin::MetaProvides                 ();
-use Dist::Zilla::Plugin::MinimumPerl                  ();
-use Dist::Zilla::Plugin::PodWeaver                    ();
-use Dist::Zilla::Plugin::Prereqs::AuthorDeps          ();
-use Dist::Zilla::Plugin::PromptIfStale                ();
-use Dist::Zilla::Plugin::Repository                   ();
-use Dist::Zilla::PluginBundle::Filter                 ();
-use Dist::Zilla::PluginBundle::Git::VersionManager    ();
-use Dist::Zilla::PluginBundle::TestingMania           ();
-use Dist::Zilla::Role::PluginBundle                   ();
-use Dist::Zilla::Role::PluginBundle::Easy             ();
-use Dist::Zilla::Util                                 ();
 
-our $VERSION = '2.0';
+our $VERSION = '2.1';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -267,7 +250,7 @@ sub configure {
         ['Git::Contributors' => { order_by => 'commits' }],
         ['ContributorsFile'  => { filename => 'CONTRIBUTORS' }],
 
-        ['AutoPrereqs'         => { skip       => [qw(^perl$ utf8 warnings strict)] }],
+        ['AutoPrereqs'         => { skip       => [qw(^perl$ utf8 warnings strict overload)] }],
         ['Prereqs::AuthorDeps' => { ':version' => '0.006' }],
         [
             'MinimumPerl' => {
@@ -384,7 +367,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 2.0
+version 2.1
 
 =head1 SYNOPSIS
 

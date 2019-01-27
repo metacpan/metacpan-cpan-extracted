@@ -1,0 +1,6 @@
+Revision history for Perl extension AES128.
+
+0.01  Fri Jan 25 15:37:49 2019
+	- original version; created by h2xs 1.23 with options
+		-A -n AES128
+

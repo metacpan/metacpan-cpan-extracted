@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::SFTP::Foreign::Backend::Net_SSH2.
 
+0.10  Jan 26, 2019
+      - The module was blowing up when using an unathenticated
+        Net::SSH2 object (bug report and patch by Sergiy Zuban).
+
 0.09  Apr 28, 2012
       - support authentication keys protected by passphrase
 

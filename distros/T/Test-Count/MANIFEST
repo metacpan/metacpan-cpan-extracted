@@ -15,6 +15,7 @@ lib/Test/Count.pm
 lib/Test/Count/Base.pm
 lib/Test/Count/FileMutator.pm
 lib/Test/Count/FileMutator/ByFileType/App.pm
+lib/Test/Count/FileMutator/ByFileType/Lib.pm
 lib/Test/Count/Filter.pm
 lib/Test/Count/Filter/ByFileType/App.pm
 lib/Test/Count/Lib.pm
@@ -26,7 +27,6 @@ t/01-parser.t
 t/02-main.t
 t/03-filter.t
 t/04-modify-file-in-place.t
-t/boilerplate.t
 t/sample-data/test-scripts/01-parser.pl
 t/sample-data/test-scripts/arithmetics.pl
 t/sample-data/test-scripts/basic.arc

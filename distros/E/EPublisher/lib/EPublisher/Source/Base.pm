@@ -6,13 +6,14 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub new{
-    my ($class,$args) = @_;
+    my ($class,$args,%params) = @_;
     
     my $self = bless {}, $class;
     $self->_config( $args );
+    $self->publisher( $params{publisher} );
     
     return $self;
 }
@@ -46,7 +47,7 @@ EPublisher::Source::Base - Base class for Source plugins
 
 =head1 VERSION
 
-version 1.23
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -78,17 +79,6 @@ of hashreferences where each reference should look like
       filename => $filename_of_documentation,
       title    => $a_title_for_documentation,
   }
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2010 - 2012 Renee Baecker, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms of Artistic License 2.0.
-
-=head1 AUTHOR
-
-Renee Baecker (E<lt>module@renee-baecker.deE<gt>)
 
 =head1 AUTHOR
 

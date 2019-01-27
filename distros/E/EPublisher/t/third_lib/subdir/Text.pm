@@ -1,4 +1,5 @@
-package Test::Text;
+package # private package
+     Test::Text;
 
 1;
 

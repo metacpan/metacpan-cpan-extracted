@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use YAML::XS;
-use Digest::MD5;
+use MYDan::Util::FastMD5;
 
 eval
 {
@@ -18,7 +18,7 @@ eval
     my ( $uid, $mode, $size ) = (stat $file)[4,2,7];
     $mode  = sprintf( "%04o", $mode & 07777 );
     syswrite \*STDOUT, sprintf "%d:%s:%s:%s:", 
-        $size, Digest::MD5->new()->addfile( $fh )->hexdigest(),( getpwuid($uid) )[0], $mode;
+        $size,MYDan::Util::FastMD5->hexdigest( $file ),( getpwuid($uid) )[0], $mode;
 
     if( $position )
     {

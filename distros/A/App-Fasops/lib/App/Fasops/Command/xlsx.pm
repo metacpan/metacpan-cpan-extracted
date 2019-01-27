@@ -14,7 +14,7 @@ sub abstract {
 
 sub opt_spec {
     return (
-        [ "outfile|o=s", "Output filename. [stdout] for screen" ],
+        [ "outfile|o=s", "Output filename" ],
         [ "length|l=i", "the threshold of alignment length", { default => 1 } ],
         [ 'wrap=i',     'wrap length',                       { default => 50 }, ],
         [ 'spacing=i',  'wrapped line spacing',              { default => 1 }, ],
@@ -37,7 +37,7 @@ sub description {
     $desc .= ucfirst(abstract) . ".\n";
     $desc .= <<'MARKDOWN';
 
-* <infiles> are paths to axt files, .axt.gz is supported
+* <infiles> are paths to axt files, .fas.gz is supported
 * infile == stdin means reading from STDIN
 
 MARKDOWN
@@ -121,8 +121,8 @@ sub execute {
             $max_name_length = List::Util::max( $max_name_length, map {length} @full_names );
 
             # including indels and snps
-            my $vars = get_variations( $seq_refs, $opt );
-            $opt->{section} = paint_variations( $worksheet, $format_of, $opt, $vars, \@full_names );
+            my $vars = get_vars( $seq_refs, $opt );
+            $opt->{section} = paint_vars( $worksheet, $format_of, $opt, $vars, \@full_names );
 
         }
         else {
@@ -244,7 +244,7 @@ sub create_formats {
 }
 
 # store all variations
-sub get_variations {
+sub get_vars {
     my $seq_refs = shift;
     my $opt      = shift;
 
@@ -303,8 +303,8 @@ sub get_variations {
     return \%variations;
 }
 
-# write execel
-sub paint_variations {
+# write excel
+sub paint_vars {
 
     #@type Excel::Writer::XLSX::Worksheet
     my $sheet     = shift;

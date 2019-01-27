@@ -48,6 +48,11 @@ typedef: 'typedef' 'struct' IDENTIFIER IDENTIFIER ';'
 	{
 	   Inline::Struct::grammar::alias($thisparser, "@item[2,3]", $item[4]);
 	}
+	| 'typedef' (/[^\s\(]+/)(s) '(' '*' IDENTIFIER ')' '(' (/[^\s\)]+/)(s) ')' ';'
+	{
+	   # a function-pointer typedef
+	   Inline::Struct::grammar::ptr_register($thisparser, $item[5]);
+	}
 
 fields: '{' field(s) '}' { [ grep ref, @{$item[2]} ] }
 
@@ -142,6 +147,14 @@ sub alias {
     $parser->{data}{typeconv}{valid_rtypes}{$alias}++;
     $parser->{data}{typeconv}{type_kind}{$alias} =
       $parser->{data}{typeconv}{type_kind}{$type} ||= {};
+}
+
+sub ptr_register {
+    my $parser = shift;
+    my $cname = shift;
+    $parser->{data}{typeconv}{valid_types}{$cname}++;
+    $parser->{data}{typeconv}{valid_rtypes}{$cname}++;
+    $parser->{data}{typeconv}{type_kind}{$cname} = 'T_PTR';
 }
 
 1;

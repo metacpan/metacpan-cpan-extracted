@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //*************************************************************************
 //
-// Copyright 2009-2018 by Wilson Snyder.  This program is free software;
+// Copyright 2009-2019 by Wilson Snyder.  This program is free software;
 // you can redistribute it and/or modify it under the terms of either the
 // GNU Lesser General Public License Version 3 or the Perl Artistic License
 // Version 2.0.
@@ -148,7 +148,7 @@ VAstEnt* VAstEnt::replaceInsert(VAstType type, const string& name) {
     return avToSymEnt(sub_avp);
 }
 
-VAstEnt* VAstEnt::findSym (const string& name) {
+VAstEnt* VAstEnt::findSym(const string& name) {
     HV* hvp = subhash();  assert(hvp);
     // $svpp = $table{$name}
     SV** svpp = hv_fetch(hvp, name.c_str(), name.length(), 0/*no-change*/);
@@ -162,7 +162,7 @@ VAstEnt* VAstEnt::findSym (const string& name) {
     return entp;
 }
 
-VAstEnt* VAstEnt::findInsert (VAstType type, const string& name) {
+VAstEnt* VAstEnt::findInsert(VAstType type, const string& name) {
     if (debug()) cout<<"VAstEnt::findInsert under="<<this<<" "<<type.ascii()<<"-\""<<name<<"\"\n";
     VAstEnt* symp = findSym(name);
     if (!symp) {

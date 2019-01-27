@@ -1,7 +1,7 @@
 package Perinci::CmdLine::POD;
 
-our $DATE = '2017-08-25'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2019-01-25'; # DATE
+our $VERSION = '0.017'; # VERSION
 
 use 5.010001;
 use strict;
@@ -466,6 +466,7 @@ sub gen_pod_for_pericmd_script {
                         my $res;
                         if (exists $eg->{example_spec}{result}) {
                             $res = $eg->{example_spec}{result};
+                            $res = [200, "OK", $res] if $meta->{_orig_result_naked};
                         } else {
                             my %extra;
                             if ($eg->{example_spec}{argv}) {
@@ -981,7 +982,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.016 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2017-08-25.
+This document describes version 0.017 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2019-01-25.
 
 =head1 SYNOPSIS
 
@@ -996,7 +997,7 @@ Please see the included CLI script L<gen-pod-for-pericmd-script>.
 
 Usage:
 
- gen_pod_for_pericmd_script(%args) -> [status, msg, result, meta]
+ gen_pod_for_pericmd_script(%args) -> [status, msg, payload, meta]
 
 Generate POD for Perinci::CmdLine-based CLI script.
 
@@ -1102,7 +1103,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1134,7 +1135,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

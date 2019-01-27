@@ -12,13 +12,13 @@ hopp: and {u dont stoppp #
 dfsa
 
 dsa
-[section1]  #
-hei:        { fds1
+[ section1]  #
+hei :        { fds1
 312321
 123321}
 båt: 4231\#3
 bil: 213+123
-sykkel: { x  }
+sykkel : { x  }
 ski: {
        staver
 }

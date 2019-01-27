@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Test/Count.pm',
     'Test/Count/Base.pm',
     'Test/Count/FileMutator.pm',
     'Test/Count/FileMutator/ByFileType/App.pm',
+    'Test/Count/FileMutator/ByFileType/Lib.pm',
     'Test/Count/Filter.pm',
     'Test/Count/Filter/ByFileType/App.pm',
     'Test/Count/Lib.pm',

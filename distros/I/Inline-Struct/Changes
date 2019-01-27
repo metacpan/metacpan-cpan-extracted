@@ -1,3 +1,7 @@
+0.27 2019-01-27
+    - handle function-pointers
+    - added LICENSE - thanks @manwar
+
 0.26 2019-01-22
     - deal with "short" as bare type by loosening parsing
 

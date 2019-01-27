@@ -1,5 +1,14 @@
 Revision history for Mock::Populate
 
+0.1001 2019-01-27 09:11:45
+    - Improved documentation.
+    - Corrected the gender default in name_ranger().
+
+0.1000 2019-01-27 08:49:39
+    - Corrected the retrieved split chunk in time_ranger().
+    - Added tests for checking result content.
+    - Improved documentation.
+
 0.0902 2016-03-07 20:44:19
     - Corrected the time string selection index.
 

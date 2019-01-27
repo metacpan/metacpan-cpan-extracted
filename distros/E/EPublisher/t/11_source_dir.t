@@ -17,7 +17,8 @@ my $module = 'EPublisher::Source';
 use_ok( $module );
 
 {
-    package MockPublisher;
+    package # private package
+        MockPublisher;
     
     my $test = '';
     
@@ -195,7 +196,7 @@ Ein Absatz im POD.
    ];
    
    is_deeply( \@info, $check, 'debug on non-existant dir' );
-   is $mock_publisher->debug, "400: $path -> 0", 'non existant dir not found (debug message)';
+   is $mock_publisher->debug, "400: $path does not exist", 'non existant dir not found (debug message)';
 }
 
 

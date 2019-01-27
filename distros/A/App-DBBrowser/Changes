@@ -1,6 +1,14 @@
 Revision history for App-DBBrowser
 
 
+2.047    2019-01-26
+        - Use the whole terminal width (by upgrading Term::TablePrint).
+        - Bugfix in subqueries.
+
+2.046    2019-01-25
+        - DBD::mysql: 'mysql_enable_utf8mb4' enabled by default, 'mysql_enable_utf8' disabled by default.
+        - New input filter 'Add Column'.
+
 2.045    2019-01-20
         - Bugfix: make the mouse work also in the help menu.
         - Parse mode 'split': new option to trim records.

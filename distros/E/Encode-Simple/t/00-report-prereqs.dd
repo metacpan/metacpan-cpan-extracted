@@ -14,7 +14,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
-                                      'Encode' => '1.50',
+                                      'Encode' => '2.85',
                                       'Exporter' => '5.57',
                                       'perl' => '5.008001'
                                     }

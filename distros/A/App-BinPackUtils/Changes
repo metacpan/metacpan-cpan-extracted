@@ -1,3 +1,9 @@
+0.004   2019-01-27 (PERLANCAR)
+
+	- bin-files-into-dvds: [ux] Use a more conservative DVD size default
+          (4494MB -> 4470MB) so they fit more.
+
+
 0.003   2019-01-17 (PERLANCAR)
 
 	- Add utility: count-number-of-dvs-required.

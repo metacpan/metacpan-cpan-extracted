@@ -8,11 +8,17 @@
 
 #define yy_create_buffer VPreLex_create_buffer
 #define yy_delete_buffer VPreLex_delete_buffer
-#define yy_flex_debug VPreLex_flex_debug
+#define yy_scan_buffer VPreLex_scan_buffer
+#define yy_scan_string VPreLex_scan_string
+#define yy_scan_bytes VPreLex_scan_bytes
 #define yy_init_buffer VPreLex_init_buffer
 #define yy_flush_buffer VPreLex_flush_buffer
 #define yy_load_buffer_state VPreLex_load_buffer_state
 #define yy_switch_to_buffer VPreLex_switch_to_buffer
+#define yypush_buffer_state VPreLexpush_buffer_state
+#define yypop_buffer_state VPreLexpop_buffer_state
+#define yyensure_buffer_stack VPreLexensure_buffer_stack
+#define yy_flex_debug VPreLex_flex_debug
 #define yyin VPreLexin
 #define yyleng VPreLexleng
 #define yylex VPreLexlex
@@ -28,9 +34,243 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 6
-#define YY_FLEX_SUBMINOR_VERSION 0
+#define YY_FLEX_SUBMINOR_VERSION 4
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
+#endif
+
+#ifdef yy_create_buffer
+#define VPreLex_create_buffer_ALREADY_DEFINED
+#else
+#define yy_create_buffer VPreLex_create_buffer
+#endif
+
+#ifdef yy_delete_buffer
+#define VPreLex_delete_buffer_ALREADY_DEFINED
+#else
+#define yy_delete_buffer VPreLex_delete_buffer
+#endif
+
+#ifdef yy_scan_buffer
+#define VPreLex_scan_buffer_ALREADY_DEFINED
+#else
+#define yy_scan_buffer VPreLex_scan_buffer
+#endif
+
+#ifdef yy_scan_string
+#define VPreLex_scan_string_ALREADY_DEFINED
+#else
+#define yy_scan_string VPreLex_scan_string
+#endif
+
+#ifdef yy_scan_bytes
+#define VPreLex_scan_bytes_ALREADY_DEFINED
+#else
+#define yy_scan_bytes VPreLex_scan_bytes
+#endif
+
+#ifdef yy_init_buffer
+#define VPreLex_init_buffer_ALREADY_DEFINED
+#else
+#define yy_init_buffer VPreLex_init_buffer
+#endif
+
+#ifdef yy_flush_buffer
+#define VPreLex_flush_buffer_ALREADY_DEFINED
+#else
+#define yy_flush_buffer VPreLex_flush_buffer
+#endif
+
+#ifdef yy_load_buffer_state
+#define VPreLex_load_buffer_state_ALREADY_DEFINED
+#else
+#define yy_load_buffer_state VPreLex_load_buffer_state
+#endif
+
+#ifdef yy_switch_to_buffer
+#define VPreLex_switch_to_buffer_ALREADY_DEFINED
+#else
+#define yy_switch_to_buffer VPreLex_switch_to_buffer
+#endif
+
+#ifdef yypush_buffer_state
+#define VPreLexpush_buffer_state_ALREADY_DEFINED
+#else
+#define yypush_buffer_state VPreLexpush_buffer_state
+#endif
+
+#ifdef yypop_buffer_state
+#define VPreLexpop_buffer_state_ALREADY_DEFINED
+#else
+#define yypop_buffer_state VPreLexpop_buffer_state
+#endif
+
+#ifdef yyensure_buffer_stack
+#define VPreLexensure_buffer_stack_ALREADY_DEFINED
+#else
+#define yyensure_buffer_stack VPreLexensure_buffer_stack
+#endif
+
+#ifdef yylex
+#define VPreLexlex_ALREADY_DEFINED
+#else
+#define yylex VPreLexlex
+#endif
+
+#ifdef yyrestart
+#define VPreLexrestart_ALREADY_DEFINED
+#else
+#define yyrestart VPreLexrestart
+#endif
+
+#ifdef yylex_init
+#define VPreLexlex_init_ALREADY_DEFINED
+#else
+#define yylex_init VPreLexlex_init
+#endif
+
+#ifdef yylex_init_extra
+#define VPreLexlex_init_extra_ALREADY_DEFINED
+#else
+#define yylex_init_extra VPreLexlex_init_extra
+#endif
+
+#ifdef yylex_destroy
+#define VPreLexlex_destroy_ALREADY_DEFINED
+#else
+#define yylex_destroy VPreLexlex_destroy
+#endif
+
+#ifdef yyget_debug
+#define VPreLexget_debug_ALREADY_DEFINED
+#else
+#define yyget_debug VPreLexget_debug
+#endif
+
+#ifdef yyset_debug
+#define VPreLexset_debug_ALREADY_DEFINED
+#else
+#define yyset_debug VPreLexset_debug
+#endif
+
+#ifdef yyget_extra
+#define VPreLexget_extra_ALREADY_DEFINED
+#else
+#define yyget_extra VPreLexget_extra
+#endif
+
+#ifdef yyset_extra
+#define VPreLexset_extra_ALREADY_DEFINED
+#else
+#define yyset_extra VPreLexset_extra
+#endif
+
+#ifdef yyget_in
+#define VPreLexget_in_ALREADY_DEFINED
+#else
+#define yyget_in VPreLexget_in
+#endif
+
+#ifdef yyset_in
+#define VPreLexset_in_ALREADY_DEFINED
+#else
+#define yyset_in VPreLexset_in
+#endif
+
+#ifdef yyget_out
+#define VPreLexget_out_ALREADY_DEFINED
+#else
+#define yyget_out VPreLexget_out
+#endif
+
+#ifdef yyset_out
+#define VPreLexset_out_ALREADY_DEFINED
+#else
+#define yyset_out VPreLexset_out
+#endif
+
+#ifdef yyget_leng
+#define VPreLexget_leng_ALREADY_DEFINED
+#else
+#define yyget_leng VPreLexget_leng
+#endif
+
+#ifdef yyget_text
+#define VPreLexget_text_ALREADY_DEFINED
+#else
+#define yyget_text VPreLexget_text
+#endif
+
+#ifdef yyget_lineno
+#define VPreLexget_lineno_ALREADY_DEFINED
+#else
+#define yyget_lineno VPreLexget_lineno
+#endif
+
+#ifdef yyset_lineno
+#define VPreLexset_lineno_ALREADY_DEFINED
+#else
+#define yyset_lineno VPreLexset_lineno
+#endif
+
+#ifdef yywrap
+#define VPreLexwrap_ALREADY_DEFINED
+#else
+#define yywrap VPreLexwrap
+#endif
+
+#ifdef yyalloc
+#define VPreLexalloc_ALREADY_DEFINED
+#else
+#define yyalloc VPreLexalloc
+#endif
+
+#ifdef yyrealloc
+#define VPreLexrealloc_ALREADY_DEFINED
+#else
+#define yyrealloc VPreLexrealloc
+#endif
+
+#ifdef yyfree
+#define VPreLexfree_ALREADY_DEFINED
+#else
+#define yyfree VPreLexfree
+#endif
+
+#ifdef yytext
+#define VPreLextext_ALREADY_DEFINED
+#else
+#define yytext VPreLextext
+#endif
+
+#ifdef yyleng
+#define VPreLexleng_ALREADY_DEFINED
+#else
+#define yyleng VPreLexleng
+#endif
+
+#ifdef yyin
+#define VPreLexin_ALREADY_DEFINED
+#else
+#define yyin VPreLexin
+#endif
+
+#ifdef yyout
+#define VPreLexout_ALREADY_DEFINED
+#else
+#define yyout VPreLexout
+#endif
+
+#ifdef yy_flex_debug
+#define VPreLex_flex_debug_ALREADY_DEFINED
+#else
+#define yy_flex_debug VPreLex_flex_debug
+#endif
+
+#ifdef yylineno
+#define VPreLexlineno_ALREADY_DEFINED
+#else
+#define yylineno VPreLexlineno
 #endif
 
 /* First, we deal with  platform-specific or compiler-specific issues. */
@@ -103,60 +343,48 @@ typedef unsigned int flex_uint32_t;
 #define UINT32_MAX             (4294967295U)
 #endif
 
+#ifndef SIZE_MAX
+#define SIZE_MAX               (~(size_t)0)
+#endif
+
 #endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
-#ifdef __cplusplus
+/* begin standard C++ headers. */
 
-/* The "const" storage-class-modifier is valid. */
-#define YY_USE_CONST
-
-#else	/* ! __cplusplus */
-
-/* C99 requires __STDC__ to be defined as 1. */
-#if defined (__STDC__)
-
-#define YY_USE_CONST
-
-#endif	/* defined (__STDC__) */
-#endif	/* ! __cplusplus */
-
-#ifdef YY_USE_CONST
+/* TODO: this is always defined, so inline it */
 #define yyconst const
+
+#if defined(__GNUC__) && __GNUC__ >= 3
+#define yynoreturn __attribute__((__noreturn__))
 #else
-#define yyconst
+#define yynoreturn
 #endif
 
 /* Returned upon end-of-file. */
 #define YY_NULL 0
 
-/* Promotes a possibly negative, possibly signed char to an unsigned
- * integer for use as an array index.  If the signed char is negative,
- * we want to instead treat it as an 8-bit unsigned char, hence the
- * double cast.
+/* Promotes a possibly negative, possibly signed char to an
+ *   integer in range [0..255] for use as an array index.
  */
-#define YY_SC_TO_UI(c) ((unsigned int) (unsigned char) c)
+#define YY_SC_TO_UI(c) ((YY_CHAR) (c))
 
 /* Enter a start condition.  This macro really ought to take a parameter,
  * but we do it the disgusting crufty way forced on us by the ()-less
  * definition of BEGIN.
  */
 #define BEGIN (yy_start) = 1 + 2 *
-
 /* Translate the current start state into a value that can be later handed
  * to BEGIN to return to the state.  The YYSTATE alias is for lex
  * compatibility.
  */
 #define YY_START (((yy_start) - 1) / 2)
 #define YYSTATE YY_START
-
 /* Action number for EOF rule of a given start state. */
 #define YY_STATE_EOF(state) (YY_END_OF_BUFFER + state + 1)
-
 /* Special action meaning "start processing a new file". */
-#define YY_NEW_FILE VPreLexrestart(VPreLexin  )
-
+#define YY_NEW_FILE yyrestart( yyin  )
 #define YY_END_OF_BUFFER_CHAR 0
 
 /* Size of default input buffer. */
@@ -186,14 +414,14 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 typedef size_t yy_size_t;
 #endif
 
-extern yy_size_t VPreLexleng;
+extern int yyleng;
 
-extern FILE *VPreLexin, *VPreLexout;
+extern FILE *yyin, *yyout;
 
 #define EOB_ACT_CONTINUE_SCAN 0
 #define EOB_ACT_END_OF_FILE 1
 #define EOB_ACT_LAST_MATCH 2
-
+    
     #define YY_LESS_LINENO(n)
     #define YY_LINENO_REWIND_TO(ptr)
     
@@ -201,16 +429,15 @@ extern FILE *VPreLexin, *VPreLexout;
 #define yyless(n) \
 	do \
 		{ \
-		/* Undo effects of setting up VPreLextext. */ \
+		/* Undo effects of setting up yytext. */ \
         int yyless_macro_arg = (n); \
         YY_LESS_LINENO(yyless_macro_arg);\
 		*yy_cp = (yy_hold_char); \
 		YY_RESTORE_YY_MORE_OFFSET \
 		(yy_c_buf_p) = yy_cp = yy_bp + yyless_macro_arg - YY_MORE_ADJ; \
-		YY_DO_BEFORE_ACTION; /* set up VPreLextext again */ \
+		YY_DO_BEFORE_ACTION; /* set up yytext again */ \
 		} \
 	while ( 0 )
-
 #define unput(c) yyunput( c, (yytext_ptr)  )
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
@@ -225,7 +452,7 @@ struct yy_buffer_state
 	/* Size of input buffer in bytes, not including room for EOB
 	 * characters.
 	 */
-	yy_size_t yy_buf_size;
+	int yy_buf_size;
 
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
@@ -253,7 +480,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-    
+
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
 	 */
@@ -270,8 +497,8 @@ struct yy_buffer_state
 	 * possible backing-up.
 	 *
 	 * When we actually see the EOF, we change the status to "new"
-	 * (via VPreLexrestart()), so that the user can continue scanning by
-	 * just pointing VPreLexin at a new input file.
+	 * (via yyrestart()), so that the user can continue scanning by
+	 * just pointing yyin at a new input file.
 	 */
 #define YY_BUFFER_EOF_PENDING 2
 
@@ -281,7 +508,7 @@ struct yy_buffer_state
 /* Stack of input buffers. */
 static size_t yy_buffer_stack_top = 0; /**< index of top of stack. */
 static size_t yy_buffer_stack_max = 0; /**< capacity of stack. */
-static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
+static YY_BUFFER_STATE * yy_buffer_stack = NULL; /**< Stack as an array. */
 
 /* We provide macros for accessing buffer states in case in the
  * future we want to put the buffer states in a more general
@@ -292,113 +519,102 @@ static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
 #define YY_CURRENT_BUFFER ( (yy_buffer_stack) \
                           ? (yy_buffer_stack)[(yy_buffer_stack_top)] \
                           : NULL)
-
 /* Same as previous macro, but useful when we know that the buffer stack is not
  * NULL or when we need an lvalue. For internal use only.
  */
 #define YY_CURRENT_BUFFER_LVALUE (yy_buffer_stack)[(yy_buffer_stack_top)]
 
-/* yy_hold_char holds the character lost when VPreLextext is formed. */
+/* yy_hold_char holds the character lost when yytext is formed. */
 static char yy_hold_char;
 static int yy_n_chars;		/* number of characters read into yy_ch_buf */
-yy_size_t VPreLexleng;
+int yyleng;
 
 /* Points to current character in buffer. */
-static char *yy_c_buf_p = (char *) 0;
+static char *yy_c_buf_p = NULL;
 static int yy_init = 0;		/* whether we need to initialize */
 static int yy_start = 0;	/* start state number */
 
-/* Flag which is used to allow VPreLexwrap()'s to do buffer switches
- * instead of setting up a fresh VPreLexin.  A bit of a hack ...
+/* Flag which is used to allow yywrap()'s to do buffer switches
+ * instead of setting up a fresh yyin.  A bit of a hack ...
  */
 static int yy_did_buffer_switch_on_eof;
 
-void VPreLexrestart (FILE *input_file  );
-void VPreLex_switch_to_buffer (YY_BUFFER_STATE new_buffer  );
-YY_BUFFER_STATE VPreLex_create_buffer (FILE *file,int size  );
-void VPreLex_delete_buffer (YY_BUFFER_STATE b  );
-void VPreLex_flush_buffer (YY_BUFFER_STATE b  );
-void VPreLexpush_buffer_state (YY_BUFFER_STATE new_buffer  );
-void VPreLexpop_buffer_state (void );
+void yyrestart ( FILE *input_file  );
+void yy_switch_to_buffer ( YY_BUFFER_STATE new_buffer  );
+YY_BUFFER_STATE yy_create_buffer ( FILE *file, int size  );
+void yy_delete_buffer ( YY_BUFFER_STATE b  );
+void yy_flush_buffer ( YY_BUFFER_STATE b  );
+void yypush_buffer_state ( YY_BUFFER_STATE new_buffer  );
+void yypop_buffer_state ( void );
 
-static void VPreLexensure_buffer_stack (void );
-static void VPreLex_load_buffer_state (void );
-static void VPreLex_init_buffer (YY_BUFFER_STATE b,FILE *file  );
+static void yyensure_buffer_stack ( void );
+static void yy_load_buffer_state ( void );
+static void yy_init_buffer ( YY_BUFFER_STATE b, FILE *file  );
+#define YY_FLUSH_BUFFER yy_flush_buffer( YY_CURRENT_BUFFER )
 
-#define YY_FLUSH_BUFFER VPreLex_flush_buffer(YY_CURRENT_BUFFER )
+YY_BUFFER_STATE yy_scan_buffer ( char *base, yy_size_t size  );
+YY_BUFFER_STATE yy_scan_string ( const char *yy_str  );
+YY_BUFFER_STATE yy_scan_bytes ( const char *bytes, int len  );
 
-YY_BUFFER_STATE VPreLex_scan_buffer (char *base,yy_size_t size  );
-YY_BUFFER_STATE VPreLex_scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE VPreLex_scan_bytes (yyconst char *bytes,yy_size_t len  );
+void *yyalloc ( yy_size_t  );
+void *yyrealloc ( void *, yy_size_t  );
+void yyfree ( void *  );
 
-void *VPreLexalloc (yy_size_t  );
-void *VPreLexrealloc (void *,yy_size_t  );
-void VPreLexfree (void *  );
-
-#define yy_new_buffer VPreLex_create_buffer
-
+#define yy_new_buffer yy_create_buffer
 #define yy_set_interactive(is_interactive) \
 	{ \
 	if ( ! YY_CURRENT_BUFFER ){ \
-        VPreLexensure_buffer_stack (); \
+        yyensure_buffer_stack (); \
 		YY_CURRENT_BUFFER_LVALUE =    \
-            VPreLex_create_buffer(VPreLexin,YY_BUF_SIZE ); \
+            yy_create_buffer( yyin, YY_BUF_SIZE ); \
 	} \
 	YY_CURRENT_BUFFER_LVALUE->yy_is_interactive = is_interactive; \
 	}
-
 #define yy_set_bol(at_bol) \
 	{ \
 	if ( ! YY_CURRENT_BUFFER ){\
-        VPreLexensure_buffer_stack (); \
+        yyensure_buffer_stack (); \
 		YY_CURRENT_BUFFER_LVALUE =    \
-            VPreLex_create_buffer(VPreLexin,YY_BUF_SIZE ); \
+            yy_create_buffer( yyin, YY_BUF_SIZE ); \
 	} \
 	YY_CURRENT_BUFFER_LVALUE->yy_at_bol = at_bol; \
 	}
-
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
 /* Begin user sect3 */
 
 #define VPreLexwrap() (/*CONSTCOND*/1)
 #define YY_SKIP_YYWRAP
+typedef flex_uint8_t YY_CHAR;
 
-typedef unsigned char YY_CHAR;
-
-FILE *VPreLexin = (FILE *) 0, *VPreLexout = (FILE *) 0;
+FILE *yyin = NULL, *yyout = NULL;
 
 typedef int yy_state_type;
 
-extern int VPreLexlineno;
+extern int yylineno;
+int yylineno = 1;
 
-int VPreLexlineno = 1;
-
-extern char *VPreLextext;
+extern char *yytext;
 #ifdef yytext_ptr
 #undef yytext_ptr
 #endif
-#define yytext_ptr VPreLextext
+#define yytext_ptr yytext
 
-static yy_state_type yy_get_previous_state (void );
-static yy_state_type yy_try_NUL_trans (yy_state_type current_state  );
-static int yy_get_next_buffer (void );
-#if defined(__GNUC__) && __GNUC__ >= 3
-__attribute__((__noreturn__))
-#endif
-static void yy_fatal_error (yyconst char msg[]  );
+static yy_state_type yy_get_previous_state ( void );
+static yy_state_type yy_try_NUL_trans ( yy_state_type current_state  );
+static int yy_get_next_buffer ( void );
+static void yynoreturn yy_fatal_error ( const char* msg  );
 
 /* Done after the current pattern has been matched and before the
- * corresponding action - sets up VPreLextext.
+ * corresponding action - sets up yytext.
  */
 #define YY_DO_BEFORE_ACTION \
 	(yytext_ptr) = yy_bp; \
 	(yytext_ptr) -= (yy_more_len); \
-	VPreLexleng = (size_t) (yy_cp - (yytext_ptr)); \
+	yyleng = (int) (yy_cp - (yytext_ptr)); \
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-
 #define YY_NUM_RULES 121
 #define YY_END_OF_BUFFER 122
 /* This struct is not used in this scanner,
@@ -408,7 +624,7 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int32_t yy_accept[692] =
+static const flex_int32_t yy_accept[692] =
     {   0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -489,7 +705,7 @@ static yyconst flex_int32_t yy_accept[692] =
 
     } ;
 
-static yyconst YY_CHAR yy_ec[256] =
+static const YY_CHAR yy_ec[256] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    2,    4,    1,    1,    1,    1,    1,    1,    1,
@@ -521,7 +737,7 @@ static yyconst YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst YY_CHAR yy_meta[55] =
+static const YY_CHAR yy_meta[55] =
     {   0,
         1,    2,    3,    4,    1,    5,    6,    7,    7,    8,
         9,    8,   10,    1,   11,   11,   11,   11,   11,   11,
@@ -531,7 +747,7 @@ static yyconst YY_CHAR yy_meta[55] =
        11,   11,   11,    1
     } ;
 
-static yyconst flex_uint32_t yy_base[736] =
+static const flex_int32_t yy_base[736] =
     {   0,
         0,   54,  108,  162,  216,  270,   12,   14,  322,  356,
        36,   67,  392,  446,  500,  554,  606,  640,   71,   88,
@@ -616,7 +832,7 @@ static yyconst flex_uint32_t yy_base[736] =
      1651, 1663, 1675, 1687, 1699
     } ;
 
-static yyconst flex_int32_t yy_def[736] =
+static const flex_int32_t yy_def[736] =
     {   0,
       692,  692,  693,  693,  694,  694,  695,  695,  696,  696,
       697,  697,  698,  698,  699,  699,  700,  700,  701,  701,
@@ -701,7 +917,7 @@ static yyconst flex_int32_t yy_def[736] =
       691,  691,  691,  691,  691
     } ;
 
-static yyconst flex_uint32_t yy_nxt[1829] =
+static const flex_int32_t yy_nxt[1829] =
     {   0,
        26,   27,   28,   29,   30,   31,   26,   26,   26,   26,
        26,   32,   26,   26,   52,   53,   52,   53,  125,   54,
@@ -906,7 +1122,7 @@ static yyconst flex_uint32_t yy_nxt[1829] =
       691,  691,  691,  691,  691,  691,  691,  691
     } ;
 
-static yyconst flex_int32_t yy_chk[1829] =
+static const flex_int32_t yy_chk[1829] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    7,    7,    8,    8,   32,    7,
@@ -1114,8 +1330,8 @@ static yyconst flex_int32_t yy_chk[1829] =
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
 
-extern int VPreLex_flex_debug;
-int VPreLex_flex_debug = 0;
+extern int yy_flex_debug;
+int yy_flex_debug = 0;
 
 /* The intent behind this definition is that it'll catch
  * any uses of REJECT which flex missed.
@@ -1126,7 +1342,7 @@ static int yy_more_len = 0;
 #define yymore() ((yy_more_flag) = 1)
 #define YY_MORE_ADJ (yy_more_len)
 #define YY_RESTORE_YY_MORE_OFFSET
-char *VPreLextext;
+char *yytext;
 #line 1 "VPreLex.l"
 #line 6 "VPreLex.l"
 /******************************************************************************
@@ -1140,7 +1356,7 @@ char *VPreLextext;
  *
  ******************************************************************************
  *
- * Copyright 2000-2018 by Wilson Snyder.  This program is free software;
+ * Copyright 2000-2019 by Wilson Snyder.  This program is free software;
  * you can redistribute it and/or modify it under the terms of either the GNU
  * Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
  *
@@ -1162,7 +1378,7 @@ char *VPreLextext;
 #include <iostream>
 
 // Flex 2.5.35 has compile warning in ECHO, so we'll default our own rule
-#define ECHO yyerrorf("Missing VPreLex.l rule: ECHO rule invoked in state %d: %s", YY_START, VPreLextext);
+#define ECHO yyerrorf("Missing VPreLex.l rule: ECHO rule invoked in state %d: %s", YY_START, yytext);
 
 VPreLex* VPreLex::s_currentLexp = NULL;	// Current lexing point
 
@@ -1177,10 +1393,10 @@ void yyerror(char* msg) { LEXP->curFilelinep()->error(msg); }
 #define YY_INPUT(buf,result,max_size) \
     result = LEXP->inputToLex(buf,max_size);
 
-// Accessors, because flex keeps changing the type of VPreLexleng
-char* yyourtext() { return VPreLextext; }
-size_t yyourleng() { return (size_t)VPreLexleng; }
-void yyourtext(const char* textp, size_t size) { VPreLextext=(char*)textp; VPreLexleng=size; }
+// Accessors, because flex keeps changing the type of yyleng
+char* yyourtext() { return yytext; }
+size_t yyourleng() { return (size_t)yyleng; }
+void yyourtext(const char* textp, size_t size) { yytext=(char*)textp; yyleng=size; }
 
 void yyerrorf(const char* format, ...) {
     char msg[1024];
@@ -1194,23 +1410,15 @@ void yyerrorf(const char* format, ...) {
 }
 
 /**********************************************************************/
-
-
-
-
-
-
-
-
-
-
+#line 1414 "VPreLex_pretmp.cpp"
 
 /* drop: Drop Ctrl-Z - can't pass thru or may EOF the output too soon */
 /* Where we use symb/symbdef, we must also look for a `` join */
 /* Note in the preprocessor \ESCaped is *not* always special; mantis1537/bug441 */
 /* Case insensitive; unfortunately ?i: isn't in flex 2.5.4 which is popular */
-/**************************************************************/
-#line 1214 "VPreLex_pretmp.cpp"
+#line 112 "VPreLex.l"
+	/**************************************************************/
+#line 1422 "VPreLex_pretmp.cpp"
 
 #define INITIAL 0
 #define CMTMODE 1
@@ -1237,36 +1445,36 @@ void yyerrorf(const char* format, ...) {
 #define YY_EXTRA_TYPE void *
 #endif
 
-static int yy_init_globals (void );
+static int yy_init_globals ( void );
 
 /* Accessor methods to globals.
    These are made visible to non-reentrant scanners for convenience. */
 
-int VPreLexlex_destroy (void );
+int yylex_destroy ( void );
 
-int VPreLexget_debug (void );
+int yyget_debug ( void );
 
-void VPreLexset_debug (int debug_flag  );
+void yyset_debug ( int debug_flag  );
 
-YY_EXTRA_TYPE VPreLexget_extra (void );
+YY_EXTRA_TYPE yyget_extra ( void );
 
-void VPreLexset_extra (YY_EXTRA_TYPE user_defined  );
+void yyset_extra ( YY_EXTRA_TYPE user_defined  );
 
-FILE *VPreLexget_in (void );
+FILE *yyget_in ( void );
 
-void VPreLexset_in  (FILE * _in_str  );
+void yyset_in  ( FILE * _in_str  );
 
-FILE *VPreLexget_out (void );
+FILE *yyget_out ( void );
 
-void VPreLexset_out  (FILE * _out_str  );
+void yyset_out  ( FILE * _out_str  );
 
-yy_size_t VPreLexget_leng (void );
+			int yyget_leng ( void );
 
-char *VPreLexget_text (void );
+char *yyget_text ( void );
 
-int VPreLexget_lineno (void );
+int yyget_lineno ( void );
 
-void VPreLexset_lineno (int _line_number  );
+void yyset_lineno ( int _line_number  );
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -1274,32 +1482,31 @@ void VPreLexset_lineno (int _line_number  );
 
 #ifndef YY_SKIP_YYWRAP
 #ifdef __cplusplus
-extern "C" int VPreLexwrap (void );
+extern "C" int yywrap ( void );
 #else
-extern int VPreLexwrap (void );
+extern int yywrap ( void );
 #endif
 #endif
 
 #ifndef YY_NO_UNPUT
     
-    static void yyunput (int c,char *buf_ptr  );
+    static void yyunput ( int c, char *buf_ptr  );
     
 #endif
 
 #ifndef yytext_ptr
-static void yy_flex_strncpy (char *,yyconst char *,int );
+static void yy_flex_strncpy ( char *, const char *, int );
 #endif
 
 #ifdef YY_NEED_STRLEN
-static int yy_flex_strlen (yyconst char * );
+static int yy_flex_strlen ( const char * );
 #endif
 
 #ifndef YY_NO_INPUT
-
 #ifdef __cplusplus
-static int yyinput (void );
+static int yyinput ( void );
 #else
-static int input (void );
+static int input ( void );
 #endif
 
 #endif
@@ -1308,11 +1515,11 @@ static int input (void );
         static int yy_start_stack_depth = 0;
         static int *yy_start_stack = NULL;
     
-    static void yy_push_state (int _new_state );
+    static void yy_push_state ( int _new_state );
     
-    static void yy_pop_state (void );
+    static void yy_pop_state ( void );
     
-    static int yy_top_state (void );
+    static int yy_top_state ( void );
     
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
@@ -1329,7 +1536,7 @@ static int input (void );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO do { if (fwrite( VPreLextext, VPreLexleng, 1, VPreLexout )) {} } while (0)
+#define ECHO do { if (fwrite( yytext, (size_t) yyleng, 1, yyout )) {} } while (0)
 #endif
 
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
@@ -1340,20 +1547,20 @@ static int input (void );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		size_t n; \
+		int n; \
 		for ( n = 0; n < max_size && \
-			     (c = getc( VPreLexin )) != EOF && c != '\n'; ++n ) \
+			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
 		if ( c == '\n' ) \
 			buf[n++] = (char) c; \
-		if ( c == EOF && ferror( VPreLexin ) ) \
+		if ( c == EOF && ferror( yyin ) ) \
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
 		result = n; \
 		} \
 	else \
 		{ \
 		errno=0; \
-		while ( (result = fread(buf, 1, max_size, VPreLexin))==0 && ferror(VPreLexin)) \
+		while ( (result = (int) fread(buf, 1, (yy_size_t) max_size, yyin)) == 0 && ferror(yyin)) \
 			{ \
 			if( errno != EINTR) \
 				{ \
@@ -1361,7 +1568,7 @@ static int input (void );
 				break; \
 				} \
 			errno=0; \
-			clearerr(VPreLexin); \
+			clearerr(yyin); \
 			} \
 		}\
 \
@@ -1394,12 +1601,12 @@ static int input (void );
 #ifndef YY_DECL
 #define YY_DECL_IS_OURS 1
 
-extern int VPreLexlex (void);
+extern int yylex (void);
 
-#define YY_DECL int VPreLexlex (void)
+#define YY_DECL int yylex (void)
 #endif /* !YY_DECL */
 
-/* Code executed at the beginning of each rule, after VPreLextext and VPreLexleng
+/* Code executed at the beginning of each rule, after yytext and yyleng
  * have been set up.
  */
 #ifndef YY_USER_ACTION
@@ -1412,9 +1619,9 @@ extern int VPreLexlex (void);
 #endif
 
 #define YY_RULE_SETUP \
-	if ( VPreLexleng > 0 ) \
+	if ( yyleng > 0 ) \
 		YY_CURRENT_BUFFER_LVALUE->yy_at_bol = \
-				(VPreLextext[VPreLexleng - 1] == '\n'); \
+				(yytext[yyleng - 1] == '\n'); \
 	YY_USER_ACTION
 
 /** The main scanner function which does all the work.
@@ -1436,38 +1643,38 @@ YY_DECL
 		if ( ! (yy_start) )
 			(yy_start) = 1;	/* first start state */
 
-		if ( ! VPreLexin )
-			VPreLexin = stdin;
+		if ( ! yyin )
+			yyin = stdin;
 
-		if ( ! VPreLexout )
-			VPreLexout = stdout;
+		if ( ! yyout )
+			yyout = stdout;
 
 		if ( ! YY_CURRENT_BUFFER ) {
-			VPreLexensure_buffer_stack ();
+			yyensure_buffer_stack ();
 			YY_CURRENT_BUFFER_LVALUE =
-				VPreLex_create_buffer(VPreLexin,YY_BUF_SIZE );
+				yy_create_buffer( yyin, YY_BUF_SIZE );
 		}
 
-		VPreLex_load_buffer_state( );
+		yy_load_buffer_state(  );
 		}
 
 	{
-#line 112 "VPreLex.l"
+#line 113 "VPreLex.l"
 
 
-#line 1459 "VPreLex_pretmp.cpp"
+#line 1666 "VPreLex_pretmp.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
 		(yy_more_len) = 0;
 		if ( (yy_more_flag) )
 			{
-			(yy_more_len) = (yy_c_buf_p) - (yytext_ptr);
+			(yy_more_len) = (int) ((yy_c_buf_p) - (yytext_ptr));
 			(yy_more_flag) = 0;
 			}
 		yy_cp = (yy_c_buf_p);
 
-		/* Support of VPreLextext. */
+		/* Support of yytext. */
 		*yy_cp = (yy_hold_char);
 
 		/* yy_bp points to the position in yy_ch_buf of the start of
@@ -1490,9 +1697,9 @@ yy_match:
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
 				if ( yy_current_state >= 692 )
-					yy_c = yy_meta[(unsigned int) yy_c];
+					yy_c = yy_meta[yy_c];
 				}
-			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
 		while ( yy_base[yy_current_state] != 1774 );
@@ -1521,579 +1728,579 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 114 "VPreLex.l"
+#line 115 "VPreLex.l"
 { }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 115 "VPreLex.l"
-{ LEXP->lineDirective(VPreLextext);
+#line 116 "VPreLex.l"
+{ LEXP->lineDirective(yytext);
 						  return(VP_LINE); }
 	YY_BREAK
 /* Special directives we recognize */
 case 3:
 YY_RULE_SETUP
-#line 119 "VPreLex.l"
+#line 120 "VPreLex.l"
 { return(VP_DEFINE); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 120 "VPreLex.l"
+#line 121 "VPreLex.l"
 { return(VP_ELSE); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 121 "VPreLex.l"
+#line 122 "VPreLex.l"
 { return(VP_ELSIF); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 122 "VPreLex.l"
+#line 123 "VPreLex.l"
 { return(VP_ENDIF); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 123 "VPreLex.l"
+#line 124 "VPreLex.l"
 { return(VP_IFDEF); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 124 "VPreLex.l"
+#line 125 "VPreLex.l"
 { return(VP_IFNDEF); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 125 "VPreLex.l"
+#line 126 "VPreLex.l"
 { return(VP_INCLUDE); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 126 "VPreLex.l"
+#line 127 "VPreLex.l"
 { return(VP_UNDEF); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 127 "VPreLex.l"
+#line 128 "VPreLex.l"
 { return(VP_UNDEFINEALL); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 128 "VPreLex.l"
+#line 129 "VPreLex.l"
 { if (!pedantic()) return (VP_ERROR); else return(VP_DEFREF); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 129 "VPreLex.l"
+#line 130 "VPreLex.l"
 { static string rtnfile;
 			  rtnfile = '"'; rtnfile += LEXP->curFilelinep()->filename();
-			  rtnfile += '"'; VPreLextext=(char*)rtnfile.c_str(); VPreLexleng = rtnfile.length();
+			  rtnfile += '"'; yytext=(char*)rtnfile.c_str(); yyleng = rtnfile.length();
 			  return (VP_STRING); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 133 "VPreLex.l"
+#line 134 "VPreLex.l"
 { static char buf[10];
 			  sprintf(buf, "%d",LEXP->curFilelinep()->lineno());
-	                  VPreLextext = buf; VPreLexleng = strlen(VPreLextext);
+	                  yytext = buf; yyleng = strlen(yytext);
 			  return (VP_TEXT); }
 	YY_BREAK
 /* Pass-through strings */
 case 15:
 YY_RULE_SETUP
-#line 139 "VPreLex.l"
+#line 140 "VPreLex.l"
 { yy_push_state(STRMODE); yymore(); }
 	YY_BREAK
 case YY_STATE_EOF(STRMODE):
-#line 140 "VPreLex.l"
-{ linenoInc(); yyerrorf("EOF in unterminated string"); VPreLexleng=0; yyterminate(); }
+#line 141 "VPreLex.l"
+{ linenoInc(); yyerrorf("EOF in unterminated string"); yyleng=0; yyterminate(); }
 	YY_BREAK
 case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
-#line 141 "VPreLex.l"
+#line 142 "VPreLex.l"
 { linenoInc(); yyerrorf("Unterminated string"); BEGIN(INITIAL); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 142 "VPreLex.l"
+#line 143 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 18:
 /* rule 18 can match eol */
 YY_RULE_SETUP
-#line 143 "VPreLex.l"
+#line 144 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 19:
 /* rule 19 can match eol */
 YY_RULE_SETUP
-#line 144 "VPreLex.l"
+#line 145 "VPreLex.l"
 { linenoInc(); yymore(); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 145 "VPreLex.l"
+#line 146 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 146 "VPreLex.l"
+#line 147 "VPreLex.l"
 { yy_pop_state();
-			  if (LEXP->m_parenLevel || LEXP->m_defQuote) { LEXP->m_defQuote=false; appendDefValue(VPreLextext,VPreLexleng); VPreLexleng=0; }
+			  if (LEXP->m_parenLevel || LEXP->m_defQuote) { LEXP->m_defQuote=false; appendDefValue(yytext,yyleng); yyleng=0; }
 			  else return (VP_STRING); }
 	YY_BREAK
 /* Stringification */
 case 22:
 YY_RULE_SETUP
-#line 151 "VPreLex.l"
+#line 152 "VPreLex.l"
 { yy_push_state(STRIFY); return VP_STRIFY; }
 	YY_BREAK
 case YY_STATE_EOF(STRIFY):
-#line 152 "VPreLex.l"
-{ linenoInc(); yyerrorf("EOF in unterminated '\""); VPreLexleng=0; yyterminate(); }
+#line 153 "VPreLex.l"
+{ linenoInc(); yyerrorf("EOF in unterminated '\""); yyleng=0; yyterminate(); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 153 "VPreLex.l"
+#line 154 "VPreLex.l"
 { return VP_BACKQUOTE; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 154 "VPreLex.l"
+#line 155 "VPreLex.l"
 { yy_push_state(STRMODE); yymore(); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 155 "VPreLex.l"
+#line 156 "VPreLex.l"
 { yy_pop_state(); return VP_STRIFY; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 156 "VPreLex.l"
+#line 157 "VPreLex.l"
 { return (VP_SYMBOL); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 157 "VPreLex.l"
-{ VPreLexleng-=2; return (VP_SYMBOL_JOIN); }
+#line 158 "VPreLex.l"
+{ yyleng-=2; return (VP_SYMBOL_JOIN); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 158 "VPreLex.l"
+#line 159 "VPreLex.l"
 { return (VP_DEFREF); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 159 "VPreLex.l"
-{ VPreLexleng-=2; return (VP_DEFREF_JOIN); }
+#line 160 "VPreLex.l"
+{ yyleng-=2; return (VP_DEFREF_JOIN); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 160 "VPreLex.l"
-{ VPreLexleng-=2; return (VP_JOIN); }
+#line 161 "VPreLex.l"
+{ yyleng-=2; return (VP_JOIN); }
 	YY_BREAK
 case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
-#line 161 "VPreLex.l"
-{ linenoInc(); VPreLextext=(char*)"\n"; VPreLexleng=1; return(VP_WHITE); }
+#line 162 "VPreLex.l"
+{ linenoInc(); yytext=(char*)"\n"; yyleng=1; return(VP_WHITE); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 162 "VPreLex.l"
+#line 163 "VPreLex.l"
 { return (VP_WHITE); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 163 "VPreLex.l"
+#line 164 "VPreLex.l"
 { }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 164 "VPreLex.l"
+#line 165 "VPreLex.l"
 { }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 165 "VPreLex.l"
+#line 166 "VPreLex.l"
 { return (VP_TEXT); }
 	YY_BREAK
 /* Protected blocks */
 case 36:
 YY_RULE_SETUP
-#line 168 "VPreLex.l"
+#line 169 "VPreLex.l"
 { yy_push_state(PRTMODE); yymore(); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 169 "VPreLex.l"
+#line 170 "VPreLex.l"
 { yy_push_state(PRTMODE); yymore(); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 170 "VPreLex.l"
+#line 171 "VPreLex.l"
 { yy_push_state(PRTMODE); yymore(); }
 	YY_BREAK
 case YY_STATE_EOF(PRTMODE):
-#line 171 "VPreLex.l"
-{ linenoInc(); yyerrorf("EOF in `protected"); VPreLexleng=0; yyterminate(); }
+#line 172 "VPreLex.l"
+{ linenoInc(); yyerrorf("EOF in `protected"); yyleng=0; yyterminate(); }
 	YY_BREAK
 case 39:
 /* rule 39 can match eol */
 YY_RULE_SETUP
-#line 172 "VPreLex.l"
+#line 173 "VPreLex.l"
 { linenoInc(); return VP_TEXT; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 173 "VPreLex.l"
+#line 174 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 174 "VPreLex.l"
+#line 175 "VPreLex.l"
 { yy_pop_state(); return VP_TEXT; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 175 "VPreLex.l"
+#line 176 "VPreLex.l"
 { yy_pop_state(); return VP_TEXT; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 176 "VPreLex.l"
+#line 177 "VPreLex.l"
 { yy_pop_state(); return VP_TEXT; }
 	YY_BREAK
 /* Pass-through include <> filenames */
 case YY_STATE_EOF(INCMODE):
-#line 179 "VPreLex.l"
-{ linenoInc(); yyerrorf("EOF in unterminated include filename"); VPreLexleng=0; yyterminate(); }
+#line 180 "VPreLex.l"
+{ linenoInc(); yyerrorf("EOF in unterminated include filename"); yyleng=0; yyterminate(); }
 	YY_BREAK
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 180 "VPreLex.l"
+#line 181 "VPreLex.l"
 { linenoInc(); yyerrorf("Unterminated include filename"); BEGIN(INITIAL); }
 	YY_BREAK
 case 45:
 /* rule 45 can match eol */
 YY_RULE_SETUP
-#line 181 "VPreLex.l"
+#line 182 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 182 "VPreLex.l"
+#line 183 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 183 "VPreLex.l"
+#line 184 "VPreLex.l"
 { yy_pop_state(); return VP_STRING; }
 	YY_BREAK
 /* Reading definition formal parenthesis (or not) to begin formal arguments */
 /* Note '(' must IMMEDIATELY follow definition name */
 case 48:
 YY_RULE_SETUP
-#line 187 "VPreLex.l"
+#line 188 "VPreLex.l"
 { appendDefValue("(",1); LEXP->m_formalLevel=1; BEGIN(DEFFORM); }
 	YY_BREAK
 case 49:
 /* rule 49 can match eol */
 YY_RULE_SETUP
-#line 188 "VPreLex.l"
-{ yy_pop_state(); unput('\n'); VPreLexleng=0; return VP_DEFFORM; } /* DEFVAL will later grab the return */
+#line 189 "VPreLex.l"
+{ yy_pop_state(); unput('\n'); yyleng=0; return VP_DEFFORM; } /* DEFVAL will later grab the return */
 	YY_BREAK
 case YY_STATE_EOF(DEFFPAR):
-#line 189 "VPreLex.l"
+#line 190 "VPreLex.l"
 { yy_pop_state(); return VP_DEFFORM; }  /* empty formals */
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 190 "VPreLex.l"
-{ yy_pop_state(); unput(VPreLextext[VPreLexleng-1]); VPreLexleng=0; return VP_DEFFORM; }  /* empty formals */
+#line 191 "VPreLex.l"
+{ yy_pop_state(); unput(yytext[yyleng-1]); yyleng=0; return VP_DEFFORM; }  /* empty formals */
 	YY_BREAK
 /* Reading definition formals (declaration of a define) */
 case 51:
 YY_RULE_SETUP
-#line 193 "VPreLex.l"
-{ appendDefValue(VPreLextext,VPreLexleng); VPreLexleng=0; ++LEXP->m_formalLevel; }
+#line 194 "VPreLex.l"
+{ appendDefValue(yytext,yyleng); yyleng=0; ++LEXP->m_formalLevel; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 194 "VPreLex.l"
-{ appendDefValue(VPreLextext,VPreLexleng); VPreLexleng=0; if ((--LEXP->m_formalLevel)==0) { yy_pop_state(); return VP_DEFFORM; } }
+#line 195 "VPreLex.l"
+{ appendDefValue(yytext,yyleng); yyleng=0; if ((--LEXP->m_formalLevel)==0) { yy_pop_state(); return VP_DEFFORM; } }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 195 "VPreLex.l"
+#line 196 "VPreLex.l"
 { yy_push_state(CMTMODE); yymore(); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 196 "VPreLex.l"
+#line 197 "VPreLex.l"
 { return (VP_COMMENT);}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 197 "VPreLex.l"
+#line 198 "VPreLex.l"
 { }
 	YY_BREAK
 case YY_STATE_EOF(DEFFORM):
-#line 198 "VPreLex.l"
-{ linenoInc(); yy_pop_state(); yyerrorf("Unterminated ( in define formal arguments."); VPreLexleng=0; return VP_DEFFORM; }
+#line 199 "VPreLex.l"
+{ linenoInc(); yy_pop_state(); yyerrorf("Unterminated ( in define formal arguments."); yyleng=0; return VP_DEFFORM; }
 	YY_BREAK
 case 56:
 /* rule 56 can match eol */
 YY_RULE_SETUP
-#line 199 "VPreLex.l"
+#line 200 "VPreLex.l"
 { linenoInc(); appendDefValue((char*)"\n",1); } /* Include return so can maintain output line count */
 	YY_BREAK
 case 57:
 /* rule 57 can match eol */
 YY_RULE_SETUP
-#line 200 "VPreLex.l"
+#line 201 "VPreLex.l"
 { linenoInc(); appendDefValue((char*)"\\\n",2); } /* Include return so can maintain output line count */
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 201 "VPreLex.l"
+#line 202 "VPreLex.l"
 { LEXP->m_defQuote=true; yy_push_state(STRMODE); yymore(); }  /* Legal only in default values */
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 202 "VPreLex.l"
-{ appendDefValue(VPreLextext,VPreLexleng); }  /* Maybe illegal, otherwise in default value */
+#line 203 "VPreLex.l"
+{ appendDefValue(yytext,yyleng); }  /* Maybe illegal, otherwise in default value */
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 203 "VPreLex.l"
-{ appendDefValue(VPreLextext,VPreLexleng); }  /* Maybe illegal, otherwise in default value */
+#line 204 "VPreLex.l"
+{ appendDefValue(yytext,yyleng); }  /* Maybe illegal, otherwise in default value */
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 204 "VPreLex.l"
-{ LEXP->m_formalLevel++; appendDefValue(VPreLextext,VPreLexleng); }
+#line 205 "VPreLex.l"
+{ LEXP->m_formalLevel++; appendDefValue(yytext,yyleng); }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 205 "VPreLex.l"
-{ LEXP->m_formalLevel--; appendDefValue(VPreLextext,VPreLexleng); }
+#line 206 "VPreLex.l"
+{ LEXP->m_formalLevel--; appendDefValue(yytext,yyleng); }
 	YY_BREAK
 case 63:
-#line 207 "VPreLex.l"
-case 64:
 #line 208 "VPreLex.l"
+case 64:
+#line 209 "VPreLex.l"
 case 65:
 YY_RULE_SETUP
-#line 208 "VPreLex.l"
-{ appendDefValue(VPreLextext,VPreLexleng); }
+#line 209 "VPreLex.l"
+{ appendDefValue(yytext,yyleng); }
 	YY_BREAK
 /* Reading definition value (declaration of a define's text) */
 case 66:
 YY_RULE_SETUP
-#line 211 "VPreLex.l"
+#line 212 "VPreLex.l"
 { LEXP->m_defCmtSlash=false; yy_push_state(DEFCMT); yymore(); }  /* Special comment parser */
 	YY_BREAK
 case 67:
 /* rule 67 can match eol */
 YY_RULE_SETUP
-#line 212 "VPreLex.l"
+#line 213 "VPreLex.l"
 { linenoInc(); appendDefValue((char*)"\n",1); }  /* Spec says // not part of define value */
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 213 "VPreLex.l"
+#line 214 "VPreLex.l"
 { return (VP_COMMENT);}
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 214 "VPreLex.l"
+#line 215 "VPreLex.l"
 { }
 	YY_BREAK
 case YY_STATE_EOF(DEFVAL):
-#line 215 "VPreLex.l"
-{ linenoInc(); yy_pop_state(); VPreLextext=(char*)"\n"; VPreLexleng=1; return (VP_DEFVALUE); } /* Technically illegal, but people complained */
+#line 216 "VPreLex.l"
+{ linenoInc(); yy_pop_state(); yytext=(char*)"\n"; yyleng=1; return (VP_DEFVALUE); } /* Technically illegal, but people complained */
 	YY_BREAK
 case 70:
 /* rule 70 can match eol */
 YY_RULE_SETUP
-#line 216 "VPreLex.l"
-{ linenoInc(); yy_pop_state(); VPreLextext=(char*)"\n"; VPreLexleng=1; return (VP_DEFVALUE); }
+#line 217 "VPreLex.l"
+{ linenoInc(); yy_pop_state(); yytext=(char*)"\n"; yyleng=1; return (VP_DEFVALUE); }
 	YY_BREAK
 case 71:
 /* rule 71 can match eol */
 YY_RULE_SETUP
-#line 217 "VPreLex.l"
+#line 218 "VPreLex.l"
 { linenoInc(); appendDefValue((char*)"\\\n",2); } /* Return, AND \ is part of define value */
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 218 "VPreLex.l"
+#line 219 "VPreLex.l"
 { LEXP->m_defQuote=true; yy_push_state(STRMODE); yymore(); }
 	YY_BREAK
 case 73:
-#line 220 "VPreLex.l"
-case 74:
 #line 221 "VPreLex.l"
+case 74:
+#line 222 "VPreLex.l"
 case 75:
 YY_RULE_SETUP
-#line 221 "VPreLex.l"
-{ appendDefValue(VPreLextext,VPreLexleng); }
+#line 222 "VPreLex.l"
+{ appendDefValue(yytext,yyleng); }
 	YY_BREAK
 /* Comments inside define values - if embedded get added to define value per spec */
 /* - if no \{crnl} ending then the comment belongs to the next line, as a non-embedded comment */
 /* - if all but (say) 3rd line is missing \ then it's indeterminate */
 case 76:
 YY_RULE_SETUP
-#line 226 "VPreLex.l"
-{ yy_pop_state(); appendDefValue(VPreLextext,VPreLexleng); }
+#line 227 "VPreLex.l"
+{ yy_pop_state(); appendDefValue(yytext,yyleng); }
 	YY_BREAK
 case 77:
 /* rule 77 can match eol */
 YY_RULE_SETUP
-#line 227 "VPreLex.l"
+#line 228 "VPreLex.l"
 { linenoInc(); LEXP->m_defCmtSlash=true;
-	 		  appendDefValue(VPreLextext,VPreLexleng-2); appendDefValue((char*)"\n",1); }  /* Return but not \ */
+	 		  appendDefValue(yytext,yyleng-2); appendDefValue((char*)"\n",1); }  /* Return but not \ */
 	YY_BREAK
 case 78:
 /* rule 78 can match eol */
 YY_RULE_SETUP
-#line 229 "VPreLex.l"
+#line 230 "VPreLex.l"
 { linenoInc(); yymore(); if (LEXP->m_defCmtSlash) yyerrorf("One line of /* ... */ is missing \\ before newline");
 			  BEGIN(CMTMODE); }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 231 "VPreLex.l"
+#line 232 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 232 "VPreLex.l"
+#line 233 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case YY_STATE_EOF(DEFCMT):
-#line 233 "VPreLex.l"
-{ yyerrorf("EOF in '/* ... */' block comment\n"); VPreLexleng=0; yyterminate(); }
+#line 234 "VPreLex.l"
+{ yyerrorf("EOF in '/* ... */' block comment\n"); yyleng=0; yyterminate(); }
 	YY_BREAK
 /* Define arguments (use of a define) */
 case 81:
 YY_RULE_SETUP
-#line 236 "VPreLex.l"
+#line 237 "VPreLex.l"
 { yy_push_state(CMTMODE); yymore(); }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 237 "VPreLex.l"
+#line 238 "VPreLex.l"
 { return (VP_COMMENT);}
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 238 "VPreLex.l"
+#line 239 "VPreLex.l"
 { }
 	YY_BREAK
 case YY_STATE_EOF(ARGMODE):
-#line 239 "VPreLex.l"
-{ yyerrorf("EOF in define argument list\n"); VPreLexleng = 0; yyterminate(); }
+#line 240 "VPreLex.l"
+{ yyerrorf("EOF in define argument list\n"); yyleng = 0; yyterminate(); }
 	YY_BREAK
 case 84:
 /* rule 84 can match eol */
 YY_RULE_SETUP
-#line 240 "VPreLex.l"
-{ linenoInc(); VPreLextext=(char*)"\n"; VPreLexleng=1; return(VP_WHITE); }
+#line 241 "VPreLex.l"
+{ linenoInc(); yytext=(char*)"\n"; yyleng=1; return(VP_WHITE); }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 241 "VPreLex.l"
+#line 242 "VPreLex.l"
 { yy_push_state(STRMODE); yymore(); }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 242 "VPreLex.l"
-{ appendDefValue(VPreLextext,VPreLexleng); }  /* Literal text */
+#line 243 "VPreLex.l"
+{ appendDefValue(yytext,yyleng); }  /* Literal text */
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 243 "VPreLex.l"
+#line 244 "VPreLex.l"
 { yy_push_state(STRIFY); return(VP_STRIFY); }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 244 "VPreLex.l"
-{ LEXP->m_parenLevel++; appendDefValue(VPreLextext,VPreLexleng); }
+#line 245 "VPreLex.l"
+{ LEXP->m_parenLevel++; appendDefValue(yytext,yyleng); }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 245 "VPreLex.l"
-{ LEXP->m_parenLevel--; appendDefValue(VPreLextext,VPreLexleng); }
+#line 246 "VPreLex.l"
+{ LEXP->m_parenLevel--; appendDefValue(yytext,yyleng); }
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 246 "VPreLex.l"
+#line 247 "VPreLex.l"
 { LEXP->m_parenLevel++;
 			  // Note paren level 0 means before "(" of starting args
 			  // Level 1 means "," between arguments
 			  // Level 2+ means one argument's internal ()
 			  if (LEXP->m_parenLevel>1) {
-			      appendDefValue(VPreLextext,VPreLexleng);
+			      appendDefValue(yytext,yyleng);
 			  } else {
 			      return (VP_TEXT);
 			}}
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 255 "VPreLex.l"
+#line 256 "VPreLex.l"
 { LEXP->m_parenLevel--;
 			  if (LEXP->m_parenLevel>0) {
-			      appendDefValue(VPreLextext,VPreLexleng);
+			      appendDefValue(yytext,yyleng);
 			  } else {
 			      yy_pop_state(); return (VP_DEFARG);
 			}}
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 261 "VPreLex.l"
+#line 262 "VPreLex.l"
 { if (LEXP->m_parenLevel>1) {
-			      appendDefValue(VPreLextext,VPreLexleng);
+			      appendDefValue(yytext,yyleng);
 			  } else {
 			      yy_pop_state(); return (VP_DEFARG);
 			}}
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 266 "VPreLex.l"
-{ appendDefValue(VPreLextext,VPreLexleng); }  /* defref in defref - outer macro expands first */
+#line 267 "VPreLex.l"
+{ appendDefValue(yytext,yyleng); }  /* defref in defref - outer macro expands first */
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 267 "VPreLex.l"
-{ appendDefValue(VPreLextext,VPreLexleng); }  /* defref in defref - outer macro expands first */
+#line 268 "VPreLex.l"
+{ appendDefValue(yytext,yyleng); }  /* defref in defref - outer macro expands first */
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 268 "VPreLex.l"
-{ appendDefValue(VPreLextext,VPreLexleng); }  /* defref in defref - outer macro expands first */
+#line 269 "VPreLex.l"
+{ appendDefValue(yytext,yyleng); }  /* defref in defref - outer macro expands first */
 	YY_BREAK
 case 96:
-#line 270 "VPreLex.l"
+#line 271 "VPreLex.l"
 case 97:
 YY_RULE_SETUP
-#line 270 "VPreLex.l"
-{ appendDefValue(VPreLextext,VPreLexleng); }
+#line 271 "VPreLex.l"
+{ appendDefValue(yytext,yyleng); }
 	YY_BREAK
 /* Translate offs.  Note final newline not included */
 case 98:
 YY_RULE_SETUP
-#line 273 "VPreLex.l"
+#line 274 "VPreLex.l"
 {
 			  if (LEXP->m_synthesis) { yy_push_state(OFFMODE); }
 			  return(VP_COMMENT); }
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 276 "VPreLex.l"
+#line 277 "VPreLex.l"
 {
 			  if (LEXP->m_synthesis) { yy_pop_state(); }
 			  return(VP_COMMENT); }
@@ -2101,136 +2308,136 @@ YY_RULE_SETUP
 case 100:
 /* rule 100 can match eol */
 YY_RULE_SETUP
-#line 279 "VPreLex.l"
+#line 280 "VPreLex.l"
 { linenoInc(); yymore(); }  /* Need to end the / / */
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 280 "VPreLex.l"
+#line 281 "VPreLex.l"
 { }
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 281 "VPreLex.l"
+#line 282 "VPreLex.l"
 { }
 	YY_BREAK
 case YY_STATE_EOF(OFFMODE):
-#line 282 "VPreLex.l"
-{ yyerrorf("EOF in '/*synthesis translate_off*/' region\n"); VPreLexleng=0; yyterminate(); }
+#line 283 "VPreLex.l"
+{ yyerrorf("EOF in '/*synthesis translate_off*/' region\n"); yyleng=0; yyterminate(); }
 	YY_BREAK
 /* One line comments. Note final newline not included */
 case 103:
 YY_RULE_SETUP
-#line 285 "VPreLex.l"
+#line 286 "VPreLex.l"
 { return (VP_COMMENT); }
 	YY_BREAK
 /* C-style comments. */
 /**** See also DEFCMT */
 case 104:
 YY_RULE_SETUP
-#line 289 "VPreLex.l"
+#line 290 "VPreLex.l"
 { yy_push_state(CMTMODE); yymore(); }
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 290 "VPreLex.l"
+#line 291 "VPreLex.l"
 { yy_pop_state(); return(VP_COMMENT); }
 	YY_BREAK
 case 106:
 /* rule 106 can match eol */
 YY_RULE_SETUP
-#line 291 "VPreLex.l"
+#line 292 "VPreLex.l"
 { linenoInc(); yymore(); }
 	YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 292 "VPreLex.l"
+#line 293 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 293 "VPreLex.l"
+#line 294 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case YY_STATE_EOF(CMTMODE):
-#line 294 "VPreLex.l"
-{ yyerrorf("EOF in '/* ... */' block comment\n"); VPreLexleng=0; yyterminate(); }
+#line 295 "VPreLex.l"
+{ yyerrorf("EOF in '/* ... */' block comment\n"); yyleng=0; yyterminate(); }
 	YY_BREAK
 /* Define calls */
 /* symbdef prevents normal lex rules from making `\`"foo a symbol {`"foo} instead of a BACKQUOTE */
 case 109:
 YY_RULE_SETUP
-#line 298 "VPreLex.l"
+#line 299 "VPreLex.l"
 { return (VP_DEFREF); }
 	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 299 "VPreLex.l"
-{ VPreLexleng-=2; return (VP_DEFREF_JOIN); }
+#line 300 "VPreLex.l"
+{ yyleng-=2; return (VP_DEFREF_JOIN); }
 	YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 300 "VPreLex.l"
-{ VPreLexleng-=2; return (VP_JOIN); }
+#line 301 "VPreLex.l"
+{ yyleng-=2; return (VP_JOIN); }
 	YY_BREAK
 /* Generics */
 case YY_STATE_EOF(INITIAL):
-#line 303 "VPreLex.l"
+#line 304 "VPreLex.l"
 { yyterminate(); }  /* A "normal" EOF */
 	YY_BREAK
 case 112:
 /* rule 112 can match eol */
 YY_RULE_SETUP
-#line 304 "VPreLex.l"
-{ linenoInc(); VPreLextext=(char*)"\n"; VPreLexleng=1; return(VP_WHITE); }
+#line 305 "VPreLex.l"
+{ linenoInc(); yytext=(char*)"\n"; yyleng=1; return(VP_WHITE); }
 	YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 305 "VPreLex.l"
+#line 306 "VPreLex.l"
 { return (VP_SYMBOL); }
 	YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 306 "VPreLex.l"
-{ VPreLexleng-=2; return (VP_SYMBOL_JOIN); }
+#line 307 "VPreLex.l"
+{ yyleng-=2; return (VP_SYMBOL_JOIN); }
 	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 307 "VPreLex.l"
-{ VPreLexleng-=2; return (VP_JOIN); }
+#line 308 "VPreLex.l"
+{ yyleng-=2; return (VP_JOIN); }
 	YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 308 "VPreLex.l"
+#line 309 "VPreLex.l"
 { }
 	YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 309 "VPreLex.l"
-{ if (!keepWhitespace()) { VPreLextext=(char*)" "; VPreLexleng=1; } return VP_WHITE; }
+#line 310 "VPreLex.l"
+{ if (!keepWhitespace()) { yytext=(char*)" "; yyleng=1; } return VP_WHITE; }
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 310 "VPreLex.l"
+#line 311 "VPreLex.l"
 { }
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 311 "VPreLex.l"
+#line 312 "VPreLex.l"
 { return (VP_TEXT); }
 	YY_BREAK
 case 120:
 /* rule 120 can match eol */
 YY_RULE_SETUP
-#line 313 "VPreLex.l"
+#line 314 "VPreLex.l"
 { yymore(); }	/* Prevent hitting ECHO; */
 	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 314 "VPreLex.l"
+#line 315 "VPreLex.l"
 ECHO;
 	YY_BREAK
-#line 2234 "VPreLex_pretmp.cpp"
+#line 2441 "VPreLex_pretmp.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2245,15 +2452,15 @@ ECHO;
 			{
 			/* We're scanning a new file or input source.  It's
 			 * possible that this happened because the user
-			 * just pointed VPreLexin at a new source and called
-			 * VPreLexlex().  If so, then we have to assure
+			 * just pointed yyin at a new source and called
+			 * yylex().  If so, then we have to assure
 			 * consistency between YY_CURRENT_BUFFER and our
 			 * globals.  Here is the right place to do so, because
 			 * this is the first action (other than possibly a
 			 * back-up) that will match for the new input source.
 			 */
 			(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
-			YY_CURRENT_BUFFER_LVALUE->yy_input_file = VPreLexin;
+			YY_CURRENT_BUFFER_LVALUE->yy_input_file = yyin;
 			YY_CURRENT_BUFFER_LVALUE->yy_buffer_status = YY_BUFFER_NORMAL;
 			}
 
@@ -2306,11 +2513,11 @@ ECHO;
 				{
 				(yy_did_buffer_switch_on_eof) = 0;
 
-				if ( VPreLexwrap( ) )
+				if ( yywrap(  ) )
 					{
 					/* Note: because we've taken care in
 					 * yy_get_next_buffer() to have set up
-					 * VPreLextext, we can now set up
+					 * yytext, we can now set up
 					 * yy_c_buf_p so that if some total
 					 * hoser (like flex itself) wants to
 					 * call the scanner after we return the
@@ -2360,7 +2567,7 @@ ECHO;
 	} /* end of action switch */
 		} /* end of scanning one token */
 	} /* end of user's declarations */
-} /* end of VPreLexlex */
+} /* end of yylex */
 
 /* yy_get_next_buffer - try to read in a new buffer
  *
@@ -2373,7 +2580,7 @@ static int yy_get_next_buffer (void)
 {
     	char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
 	char *source = (yytext_ptr);
-	yy_size_t number_to_move, i;
+	int number_to_move, i;
 	int ret_val;
 
 	if ( (yy_c_buf_p) > &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[(yy_n_chars) + 1] )
@@ -2402,7 +2609,7 @@ static int yy_get_next_buffer (void)
 	/* Try to read more data. */
 
 	/* First move last chars to start of buffer. */
-	number_to_move = (yy_size_t) ((yy_c_buf_p) - (yytext_ptr)) - 1;
+	number_to_move = (int) ((yy_c_buf_p) - (yytext_ptr) - 1);
 
 	for ( i = 0; i < number_to_move; ++i )
 		*(dest++) = *(source++);
@@ -2415,7 +2622,7 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			yy_size_t num_to_read =
+			int num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
@@ -2429,7 +2636,7 @@ static int yy_get_next_buffer (void)
 
 			if ( b->yy_is_our_buffer )
 				{
-				yy_size_t new_size = b->yy_buf_size * 2;
+				int new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -2438,11 +2645,12 @@ static int yy_get_next_buffer (void)
 
 				b->yy_ch_buf = (char *)
 					/* Include room in for 2 EOB chars. */
-					VPreLexrealloc((void *) b->yy_ch_buf,b->yy_buf_size + 2  );
+					yyrealloc( (void *) b->yy_ch_buf,
+							 (yy_size_t) (b->yy_buf_size + 2)  );
 				}
 			else
 				/* Can't grow it, we don't own it. */
-				b->yy_ch_buf = 0;
+				b->yy_ch_buf = NULL;
 
 			if ( ! b->yy_ch_buf )
 				YY_FATAL_ERROR(
@@ -2470,7 +2678,7 @@ static int yy_get_next_buffer (void)
 		if ( number_to_move == YY_MORE_ADJ )
 			{
 			ret_val = EOB_ACT_END_OF_FILE;
-			VPreLexrestart(VPreLexin  );
+			yyrestart( yyin  );
 			}
 
 		else
@@ -2484,12 +2692,15 @@ static int yy_get_next_buffer (void)
 	else
 		ret_val = EOB_ACT_CONTINUE_SCAN;
 
-	if ((int) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
+	if (((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
 		/* Extend the array by 50%, plus the number we really need. */
 		int new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
-		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) VPreLexrealloc((void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf,new_size  );
+		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yyrealloc(
+			(void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf, (yy_size_t) new_size  );
 		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
 			YY_FATAL_ERROR( "out of dynamic memory in yy_get_next_buffer()" );
+		/* "- 2" to take care of EOB's */
+		YY_CURRENT_BUFFER_LVALUE->yy_buf_size = (int) (new_size - 2);
 	}
 
 	(yy_n_chars) += number_to_move;
@@ -2523,9 +2734,9 @@ static int yy_get_next_buffer (void)
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
 			if ( yy_current_state >= 692 )
-				yy_c = yy_meta[(unsigned int) yy_c];
+				yy_c = yy_meta[yy_c];
 			}
-		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 		}
 
 	return yy_current_state;
@@ -2551,9 +2762,9 @@ static int yy_get_next_buffer (void)
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
 		if ( yy_current_state >= 692 )
-			yy_c = yy_meta[(unsigned int) yy_c];
+			yy_c = yy_meta[yy_c];
 		}
-	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 	yy_is_jam = (yy_current_state == 691);
 
 		return yy_is_jam ? 0 : yy_current_state;
@@ -2567,13 +2778,13 @@ static int yy_get_next_buffer (void)
     
     yy_cp = (yy_c_buf_p);
 
-	/* undo effects of setting up VPreLextext */
+	/* undo effects of setting up yytext */
 	*yy_cp = (yy_hold_char);
 
 	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 		{ /* need to shift things up to make room */
 		/* +2 for EOB chars. */
-		yy_size_t number_to_move = (yy_n_chars) + 2;
+		int number_to_move = (yy_n_chars) + 2;
 		char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
 					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
 		char *source =
@@ -2585,7 +2796,7 @@ static int yy_get_next_buffer (void)
 		yy_cp += (int) (dest - source);
 		yy_bp += (int) (dest - source);
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars =
-			(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_buf_size;
+			(yy_n_chars) = (int) YY_CURRENT_BUFFER_LVALUE->yy_buf_size;
 
 		if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 			YY_FATAL_ERROR( "flex scanner push-back overflow" );
@@ -2624,7 +2835,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
+			int offset = (int) ((yy_c_buf_p) - (yytext_ptr));
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -2641,14 +2852,14 @@ static int yy_get_next_buffer (void)
 					 */
 
 					/* Reset buffer status. */
-					VPreLexrestart(VPreLexin );
+					yyrestart( yyin );
 
 					/*FALLTHROUGH*/
 
 				case EOB_ACT_END_OF_FILE:
 					{
-					if ( VPreLexwrap( ) )
-						return EOF;
+					if ( yywrap(  ) )
+						return 0;
 
 					if ( ! (yy_did_buffer_switch_on_eof) )
 						YY_NEW_FILE;
@@ -2667,7 +2878,7 @@ static int yy_get_next_buffer (void)
 		}
 
 	c = *(unsigned char *) (yy_c_buf_p);	/* cast for 8-bit char's */
-	*(yy_c_buf_p) = '\0';	/* preserve VPreLextext */
+	*(yy_c_buf_p) = '\0';	/* preserve yytext */
 	(yy_hold_char) = *++(yy_c_buf_p);
 
 	YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (c == '\n');
@@ -2681,32 +2892,32 @@ static int yy_get_next_buffer (void)
  * 
  * @note This function does not reset the start condition to @c INITIAL .
  */
-    void VPreLexrestart  (FILE * input_file )
+    void yyrestart  (FILE * input_file )
 {
     
 	if ( ! YY_CURRENT_BUFFER ){
-        VPreLexensure_buffer_stack ();
+        yyensure_buffer_stack ();
 		YY_CURRENT_BUFFER_LVALUE =
-            VPreLex_create_buffer(VPreLexin,YY_BUF_SIZE );
+            yy_create_buffer( yyin, YY_BUF_SIZE );
 	}
 
-	VPreLex_init_buffer(YY_CURRENT_BUFFER,input_file );
-	VPreLex_load_buffer_state( );
+	yy_init_buffer( YY_CURRENT_BUFFER, input_file );
+	yy_load_buffer_state(  );
 }
 
 /** Switch to a different input buffer.
  * @param new_buffer The new input buffer.
  * 
  */
-    void VPreLex_switch_to_buffer  (YY_BUFFER_STATE  new_buffer )
+    void yy_switch_to_buffer  (YY_BUFFER_STATE  new_buffer )
 {
     
 	/* TODO. We should be able to replace this entire function body
 	 * with
-	 *		VPreLexpop_buffer_state();
-	 *		VPreLexpush_buffer_state(new_buffer);
+	 *		yypop_buffer_state();
+	 *		yypush_buffer_state(new_buffer);
      */
-	VPreLexensure_buffer_stack ();
+	yyensure_buffer_stack ();
 	if ( YY_CURRENT_BUFFER == new_buffer )
 		return;
 
@@ -2719,21 +2930,21 @@ static int yy_get_next_buffer (void)
 		}
 
 	YY_CURRENT_BUFFER_LVALUE = new_buffer;
-	VPreLex_load_buffer_state( );
+	yy_load_buffer_state(  );
 
 	/* We don't actually know whether we did this switch during
-	 * EOF (VPreLexwrap()) processing, but the only time this flag
-	 * is looked at is after VPreLexwrap() is called, so it's safe
+	 * EOF (yywrap()) processing, but the only time this flag
+	 * is looked at is after yywrap() is called, so it's safe
 	 * to go ahead and always set it.
 	 */
 	(yy_did_buffer_switch_on_eof) = 1;
 }
 
-static void VPreLex_load_buffer_state  (void)
+static void yy_load_buffer_state  (void)
 {
     	(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
 	(yytext_ptr) = (yy_c_buf_p) = YY_CURRENT_BUFFER_LVALUE->yy_buf_pos;
-	VPreLexin = YY_CURRENT_BUFFER_LVALUE->yy_input_file;
+	yyin = YY_CURRENT_BUFFER_LVALUE->yy_input_file;
 	(yy_hold_char) = *(yy_c_buf_p);
 }
 
@@ -2743,35 +2954,35 @@ static void VPreLex_load_buffer_state  (void)
  * 
  * @return the allocated buffer state.
  */
-    YY_BUFFER_STATE VPreLex_create_buffer  (FILE * file, int  size )
+    YY_BUFFER_STATE yy_create_buffer  (FILE * file, int  size )
 {
 	YY_BUFFER_STATE b;
     
-	b = (YY_BUFFER_STATE) VPreLexalloc(sizeof( struct yy_buffer_state )  );
+	b = (YY_BUFFER_STATE) yyalloc( sizeof( struct yy_buffer_state )  );
 	if ( ! b )
-		YY_FATAL_ERROR( "out of dynamic memory in VPreLex_create_buffer()" );
+		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
-	b->yy_buf_size = (yy_size_t)size;
+	b->yy_buf_size = size;
 
 	/* yy_ch_buf has to be 2 characters longer than the size given because
 	 * we need to put in 2 end-of-buffer characters.
 	 */
-	b->yy_ch_buf = (char *) VPreLexalloc(b->yy_buf_size + 2  );
+	b->yy_ch_buf = (char *) yyalloc( (yy_size_t) (b->yy_buf_size + 2)  );
 	if ( ! b->yy_ch_buf )
-		YY_FATAL_ERROR( "out of dynamic memory in VPreLex_create_buffer()" );
+		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
 	b->yy_is_our_buffer = 1;
 
-	VPreLex_init_buffer(b,file );
+	yy_init_buffer( b, file );
 
 	return b;
 }
 
 /** Destroy the buffer.
- * @param b a buffer created with VPreLex_create_buffer()
+ * @param b a buffer created with yy_create_buffer()
  * 
  */
-    void VPreLex_delete_buffer (YY_BUFFER_STATE  b )
+    void yy_delete_buffer (YY_BUFFER_STATE  b )
 {
     
 	if ( ! b )
@@ -2781,27 +2992,27 @@ static void VPreLex_load_buffer_state  (void)
 		YY_CURRENT_BUFFER_LVALUE = (YY_BUFFER_STATE) 0;
 
 	if ( b->yy_is_our_buffer )
-		VPreLexfree((void *) b->yy_ch_buf  );
+		yyfree( (void *) b->yy_ch_buf  );
 
-	VPreLexfree((void *) b  );
+	yyfree( (void *) b  );
 }
 
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
- * such as during a VPreLexrestart() or at EOF.
+ * such as during a yyrestart() or at EOF.
  */
-    static void VPreLex_init_buffer  (YY_BUFFER_STATE  b, FILE * file )
+    static void yy_init_buffer  (YY_BUFFER_STATE  b, FILE * file )
 
 {
 	int oerrno = errno;
     
-	VPreLex_flush_buffer(b );
+	yy_flush_buffer( b );
 
 	b->yy_input_file = file;
 	b->yy_fill_buffer = 1;
 
-    /* If b is the current buffer, then VPreLex_init_buffer was _probably_
-     * called from VPreLexrestart() or through yy_get_next_buffer.
+    /* If b is the current buffer, then yy_init_buffer was _probably_
+     * called from yyrestart() or through yy_get_next_buffer.
      * In that case, we don't want to reset the lineno or column.
      */
     if (b != YY_CURRENT_BUFFER){
@@ -2818,7 +3029,7 @@ static void VPreLex_load_buffer_state  (void)
  * @param b the buffer state to be flushed, usually @c YY_CURRENT_BUFFER.
  * 
  */
-    void VPreLex_flush_buffer (YY_BUFFER_STATE  b )
+    void yy_flush_buffer (YY_BUFFER_STATE  b )
 {
     	if ( ! b )
 		return;
@@ -2838,7 +3049,7 @@ static void VPreLex_load_buffer_state  (void)
 	b->yy_buffer_status = YY_BUFFER_NEW;
 
 	if ( b == YY_CURRENT_BUFFER )
-		VPreLex_load_buffer_state( );
+		yy_load_buffer_state(  );
 }
 
 /** Pushes the new state onto the stack. The new state becomes
@@ -2847,14 +3058,14 @@ static void VPreLex_load_buffer_state  (void)
  *  @param new_buffer The new state.
  *  
  */
-void VPreLexpush_buffer_state (YY_BUFFER_STATE new_buffer )
+void yypush_buffer_state (YY_BUFFER_STATE new_buffer )
 {
     	if (new_buffer == NULL)
 		return;
 
-	VPreLexensure_buffer_stack();
+	yyensure_buffer_stack();
 
-	/* This block is copied from VPreLex_switch_to_buffer. */
+	/* This block is copied from yy_switch_to_buffer. */
 	if ( YY_CURRENT_BUFFER )
 		{
 		/* Flush out information for old buffer. */
@@ -2868,8 +3079,8 @@ void VPreLexpush_buffer_state (YY_BUFFER_STATE new_buffer )
 		(yy_buffer_stack_top)++;
 	YY_CURRENT_BUFFER_LVALUE = new_buffer;
 
-	/* copied from VPreLex_switch_to_buffer. */
-	VPreLex_load_buffer_state( );
+	/* copied from yy_switch_to_buffer. */
+	yy_load_buffer_state(  );
 	(yy_did_buffer_switch_on_eof) = 1;
 }
 
@@ -2877,18 +3088,18 @@ void VPreLexpush_buffer_state (YY_BUFFER_STATE new_buffer )
  *  The next element becomes the new top.
  *  
  */
-void VPreLexpop_buffer_state (void)
+void yypop_buffer_state (void)
 {
     	if (!YY_CURRENT_BUFFER)
 		return;
 
-	VPreLex_delete_buffer(YY_CURRENT_BUFFER );
+	yy_delete_buffer(YY_CURRENT_BUFFER );
 	YY_CURRENT_BUFFER_LVALUE = NULL;
 	if ((yy_buffer_stack_top) > 0)
 		--(yy_buffer_stack_top);
 
 	if (YY_CURRENT_BUFFER) {
-		VPreLex_load_buffer_state( );
+		yy_load_buffer_state(  );
 		(yy_did_buffer_switch_on_eof) = 1;
 	}
 }
@@ -2896,7 +3107,7 @@ void VPreLexpop_buffer_state (void)
 /* Allocates the stack if it does not exist.
  *  Guarantees space for at least one push.
  */
-static void VPreLexensure_buffer_stack (void)
+static void yyensure_buffer_stack (void)
 {
 	yy_size_t num_to_alloc;
     
@@ -2906,15 +3117,15 @@ static void VPreLexensure_buffer_stack (void)
 		 * scanner will even need a stack. We use 2 instead of 1 to avoid an
 		 * immediate realloc on the next call.
          */
-		num_to_alloc = 1; /* After all that talk, this was set to 1 anyways... */
-		(yy_buffer_stack) = (struct yy_buffer_state**)VPreLexalloc
+      num_to_alloc = 1; /* After all that talk, this was set to 1 anyways... */
+		(yy_buffer_stack) = (struct yy_buffer_state**)yyalloc
 								(num_to_alloc * sizeof(struct yy_buffer_state*)
 								);
 		if ( ! (yy_buffer_stack) )
-			YY_FATAL_ERROR( "out of dynamic memory in VPreLexensure_buffer_stack()" );
-								  
+			YY_FATAL_ERROR( "out of dynamic memory in yyensure_buffer_stack()" );
+
 		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
-				
+
 		(yy_buffer_stack_max) = num_to_alloc;
 		(yy_buffer_stack_top) = 0;
 		return;
@@ -2926,12 +3137,12 @@ static void VPreLexensure_buffer_stack (void)
 		yy_size_t grow_size = 8 /* arbitrary grow size */;
 
 		num_to_alloc = (yy_buffer_stack_max) + grow_size;
-		(yy_buffer_stack) = (struct yy_buffer_state**)VPreLexrealloc
+		(yy_buffer_stack) = (struct yy_buffer_state**)yyrealloc
 								((yy_buffer_stack),
 								num_to_alloc * sizeof(struct yy_buffer_state*)
 								);
 		if ( ! (yy_buffer_stack) )
-			YY_FATAL_ERROR( "out of dynamic memory in VPreLexensure_buffer_stack()" );
+			YY_FATAL_ERROR( "out of dynamic memory in yyensure_buffer_stack()" );
 
 		/* zero only the new slots.*/
 		memset((yy_buffer_stack) + (yy_buffer_stack_max), 0, grow_size * sizeof(struct yy_buffer_state*));
@@ -2943,9 +3154,9 @@ static void VPreLexensure_buffer_stack (void)
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
  * 
- * @return the newly allocated buffer state object. 
+ * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE VPreLex_scan_buffer  (char * base, yy_size_t  size )
+YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size )
 {
 	YY_BUFFER_STATE b;
     
@@ -2953,69 +3164,69 @@ YY_BUFFER_STATE VPreLex_scan_buffer  (char * base, yy_size_t  size )
 	     base[size-2] != YY_END_OF_BUFFER_CHAR ||
 	     base[size-1] != YY_END_OF_BUFFER_CHAR )
 		/* They forgot to leave room for the EOB's. */
-		return 0;
+		return NULL;
 
-	b = (YY_BUFFER_STATE) VPreLexalloc(sizeof( struct yy_buffer_state )  );
+	b = (YY_BUFFER_STATE) yyalloc( sizeof( struct yy_buffer_state )  );
 	if ( ! b )
-		YY_FATAL_ERROR( "out of dynamic memory in VPreLex_scan_buffer()" );
+		YY_FATAL_ERROR( "out of dynamic memory in yy_scan_buffer()" );
 
-	b->yy_buf_size = size - 2;	/* "- 2" to take care of EOB's */
+	b->yy_buf_size = (int) (size - 2);	/* "- 2" to take care of EOB's */
 	b->yy_buf_pos = b->yy_ch_buf = base;
 	b->yy_is_our_buffer = 0;
-	b->yy_input_file = 0;
+	b->yy_input_file = NULL;
 	b->yy_n_chars = b->yy_buf_size;
 	b->yy_is_interactive = 0;
 	b->yy_at_bol = 1;
 	b->yy_fill_buffer = 0;
 	b->yy_buffer_status = YY_BUFFER_NEW;
 
-	VPreLex_switch_to_buffer(b  );
+	yy_switch_to_buffer( b  );
 
 	return b;
 }
 
-/** Setup the input buffer state to scan a string. The next call to VPreLexlex() will
+/** Setup the input buffer state to scan a string. The next call to yylex() will
  * scan from a @e copy of @a str.
  * @param yystr a NUL-terminated string to scan
  * 
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
- *       VPreLex_scan_bytes() instead.
+ *       yy_scan_bytes() instead.
  */
-YY_BUFFER_STATE VPreLex_scan_string (yyconst char * yystr )
+YY_BUFFER_STATE yy_scan_string (const char * yystr )
 {
     
-	return VPreLex_scan_bytes(yystr,strlen(yystr) );
+	return yy_scan_bytes( yystr, (int) strlen(yystr) );
 }
 
-/** Setup the input buffer state to scan the given bytes. The next call to VPreLexlex() will
+/** Setup the input buffer state to scan the given bytes. The next call to yylex() will
  * scan from a @e copy of @a bytes.
  * @param yybytes the byte buffer to scan
  * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE VPreLex_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
+YY_BUFFER_STATE yy_scan_bytes  (const char * yybytes, int  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	yy_size_t i;
+	int i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
-	n = _yybytes_len + 2;
-	buf = (char *) VPreLexalloc(n  );
+	n = (yy_size_t) (_yybytes_len + 2);
+	buf = (char *) yyalloc( n  );
 	if ( ! buf )
-		YY_FATAL_ERROR( "out of dynamic memory in VPreLex_scan_bytes()" );
+		YY_FATAL_ERROR( "out of dynamic memory in yy_scan_bytes()" );
 
 	for ( i = 0; i < _yybytes_len; ++i )
 		buf[i] = yybytes[i];
 
 	buf[_yybytes_len] = buf[_yybytes_len+1] = YY_END_OF_BUFFER_CHAR;
 
-	b = VPreLex_scan_buffer(buf,n );
+	b = yy_scan_buffer( buf, n );
 	if ( ! b )
-		YY_FATAL_ERROR( "bad buffer in VPreLex_scan_bytes()" );
+		YY_FATAL_ERROR( "bad buffer in yy_scan_bytes()" );
 
 	/* It's okay to grow etc. this buffer, and we should throw it
 	 * away when we're done.
@@ -3032,13 +3243,14 @@ YY_BUFFER_STATE VPreLex_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes
 		yy_size_t new_size;
 
 		(yy_start_stack_depth) += YY_START_STACK_INCR;
-		new_size = (yy_start_stack_depth) * sizeof( int );
+		new_size = (yy_size_t) (yy_start_stack_depth) * sizeof( int );
 
 		if ( ! (yy_start_stack) )
-			(yy_start_stack) = (int *) VPreLexalloc(new_size  );
+			(yy_start_stack) = (int *) yyalloc( new_size  );
 
 		else
-			(yy_start_stack) = (int *) VPreLexrealloc((void *) (yy_start_stack),new_size  );
+			(yy_start_stack) = (int *) yyrealloc(
+					(void *) (yy_start_stack), new_size  );
 
 		if ( ! (yy_start_stack) )
 			YY_FATAL_ERROR( "out of memory expanding start-condition stack" );
@@ -3066,9 +3278,9 @@ YY_BUFFER_STATE VPreLex_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes
 #define YY_EXIT_FAILURE 2
 #endif
 
-static void yy_fatal_error (yyconst char* msg )
+static void yynoreturn yy_fatal_error (const char* msg )
 {
-			(void) fprintf( stderr, "%s\n", msg );
+			fprintf( stderr, "%s\n", msg );
 	exit( YY_EXIT_FAILURE );
 }
 
@@ -3078,14 +3290,14 @@ static void yy_fatal_error (yyconst char* msg )
 #define yyless(n) \
 	do \
 		{ \
-		/* Undo effects of setting up VPreLextext. */ \
+		/* Undo effects of setting up yytext. */ \
         int yyless_macro_arg = (n); \
         YY_LESS_LINENO(yyless_macro_arg);\
-		VPreLextext[VPreLexleng] = (yy_hold_char); \
-		(yy_c_buf_p) = VPreLextext + yyless_macro_arg; \
+		yytext[yyleng] = (yy_hold_char); \
+		(yy_c_buf_p) = yytext + yyless_macro_arg; \
 		(yy_hold_char) = *(yy_c_buf_p); \
 		*(yy_c_buf_p) = '\0'; \
-		VPreLexleng = yyless_macro_arg; \
+		yyleng = yyless_macro_arg; \
 		} \
 	while ( 0 )
 
@@ -3094,91 +3306,91 @@ static void yy_fatal_error (yyconst char* msg )
 /** Get the current line number.
  * 
  */
-int VPreLexget_lineno  (void)
+int yyget_lineno  (void)
 {
-        
-    return VPreLexlineno;
+    
+    return yylineno;
 }
 
 /** Get the input stream.
  * 
  */
-FILE *VPreLexget_in  (void)
+FILE *yyget_in  (void)
 {
-        return VPreLexin;
+        return yyin;
 }
 
 /** Get the output stream.
  * 
  */
-FILE *VPreLexget_out  (void)
+FILE *yyget_out  (void)
 {
-        return VPreLexout;
+        return yyout;
 }
 
 /** Get the length of the current token.
  * 
  */
-yy_size_t VPreLexget_leng  (void)
+int yyget_leng  (void)
 {
-        return VPreLexleng;
+        return yyleng;
 }
 
 /** Get the current token.
  * 
  */
 
-char *VPreLexget_text  (void)
+char *yyget_text  (void)
 {
-        return VPreLextext;
+        return yytext;
 }
 
 /** Set the current line number.
  * @param _line_number line number
  * 
  */
-void VPreLexset_lineno (int  _line_number )
+void yyset_lineno (int  _line_number )
 {
     
-    VPreLexlineno = _line_number;
+    yylineno = _line_number;
 }
 
 /** Set the input stream. This does not discard the current
  * input buffer.
  * @param _in_str A readable stream.
  * 
- * @see VPreLex_switch_to_buffer
+ * @see yy_switch_to_buffer
  */
-void VPreLexset_in (FILE *  _in_str )
+void yyset_in (FILE *  _in_str )
 {
-        VPreLexin = _in_str ;
+        yyin = _in_str ;
 }
 
-void VPreLexset_out (FILE *  _out_str )
+void yyset_out (FILE *  _out_str )
 {
-        VPreLexout = _out_str ;
+        yyout = _out_str ;
 }
 
-int VPreLexget_debug  (void)
+int yyget_debug  (void)
 {
-        return VPreLex_flex_debug;
+        return yy_flex_debug;
 }
 
-void VPreLexset_debug (int  _bdebug )
+void yyset_debug (int  _bdebug )
 {
-        VPreLex_flex_debug = _bdebug ;
+        yy_flex_debug = _bdebug ;
 }
 
 static int yy_init_globals (void)
 {
         /* Initialization is the same as for the non-reentrant scanner.
-     * This function is called from VPreLexlex_destroy(), so don't allocate here.
+     * This function is called from yylex_destroy(), so don't allocate here.
      */
 
-    (yy_buffer_stack) = 0;
+    (yy_buffer_stack) = NULL;
     (yy_buffer_stack_top) = 0;
     (yy_buffer_stack_max) = 0;
-    (yy_c_buf_p) = (char *) 0;
+    (yy_c_buf_p) = NULL;
     (yy_init) = 0;
     (yy_start) = 0;
 
@@ -3188,40 +3400,40 @@ static int yy_init_globals (void)
 
 /* Defined in main.c */
 #ifdef YY_STDINIT
-    VPreLexin = stdin;
-    VPreLexout = stdout;
+    yyin = stdin;
+    yyout = stdout;
 #else
-    VPreLexin = (FILE *) 0;
-    VPreLexout = (FILE *) 0;
+    yyin = NULL;
+    yyout = NULL;
 #endif
 
     /* For future reference: Set errno on error, since we are called by
-     * VPreLexlex_init()
+     * yylex_init()
      */
     return 0;
 }
 
-/* VPreLexlex_destroy is for both reentrant and non-reentrant scanners. */
-int VPreLexlex_destroy  (void)
+/* yylex_destroy is for both reentrant and non-reentrant scanners. */
+int yylex_destroy  (void)
 {
     
     /* Pop the buffer stack, destroying each element. */
 	while(YY_CURRENT_BUFFER){
-		VPreLex_delete_buffer(YY_CURRENT_BUFFER  );
+		yy_delete_buffer( YY_CURRENT_BUFFER  );
 		YY_CURRENT_BUFFER_LVALUE = NULL;
-		VPreLexpop_buffer_state();
+		yypop_buffer_state();
 	}
 
 	/* Destroy the stack itself. */
-	VPreLexfree((yy_buffer_stack) );
+	yyfree((yy_buffer_stack) );
 	(yy_buffer_stack) = NULL;
 
     /* Destroy the start condition stack. */
-        VPreLexfree((yy_start_stack)  );
+        yyfree( (yy_start_stack)  );
         (yy_start_stack) = NULL;
 
     /* Reset the globals. This is important in a non-reentrant scanner so the next time
-     * VPreLexlex() is called, initialization will occur. */
+     * yylex() is called, initialization will occur. */
     yy_init_globals( );
 
     return 0;
@@ -3232,7 +3444,7 @@ int VPreLexlex_destroy  (void)
  */
 
 #ifndef yytext_ptr
-static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
+static void yy_flex_strncpy (char* s1, const char * s2, int n )
 {
 		
 	int i;
@@ -3242,7 +3454,7 @@ static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
 #endif
 
 #ifdef YY_NEED_STRLEN
-static int yy_flex_strlen (yyconst char * s )
+static int yy_flex_strlen (const char * s )
 {
 	int n;
 	for ( n = 0; s[n]; ++n )
@@ -3252,12 +3464,12 @@ static int yy_flex_strlen (yyconst char * s )
 }
 #endif
 
-void *VPreLexalloc (yy_size_t  size )
+void *yyalloc (yy_size_t  size )
 {
-			return (void *) malloc( size );
+			return malloc(size);
 }
 
-void *VPreLexrealloc  (void * ptr, yy_size_t  size )
+void *yyrealloc  (void * ptr, yy_size_t  size )
 {
 		
 	/* The cast to (char *) in the following accommodates both
@@ -3267,18 +3479,17 @@ void *VPreLexrealloc  (void * ptr, yy_size_t  size )
 	 * any pointer type to void*, and deal with argument conversions
 	 * as though doing an assignment.
 	 */
-	return (void *) realloc( (char *) ptr, size );
+	return realloc(ptr, size);
 }
 
-void VPreLexfree (void * ptr )
+void yyfree (void * ptr )
 {
-			free( (char *) ptr );	/* see VPreLexrealloc() for (char *) cast */
+			free( (char *) ptr );	/* see yyrealloc() for (char *) cast */
 }
 
 #define YYTABLES_NAME "yytables"
 
-#line 314 "VPreLex.l"
-
+#line 315 "VPreLex.l"
 
 
 void VPreLex::pushStateDefArg(int level) {
@@ -3310,12 +3521,12 @@ void VPreLex::pushStateIncFilename() {
 
 void VPreLex::debug(int level) {
 #ifdef FLEX_DEBUG
-    VPreLex_flex_debug=level;
+    yy_flex_debug=level;
 #endif
 }
 int VPreLex::debug() {
 #ifdef FLEX_DEBUG
-    return VPreLex_flex_debug;
+    return yy_flex_debug;
 #else
     return 0;
 #endif
@@ -3324,7 +3535,7 @@ int VPreLex::debug() {
 int VPreLex::lex() {
     VPreLex::s_currentLexp = this;  // Tell parser where to get/put data
     m_tokFilelinep = curFilelinep();  // Remember token start location, may be updated by the lexer later
-    return VPreLexlex();
+    return yylex();
 }
 
 size_t VPreLex::inputToLex(char* buf, size_t max_size) {
@@ -3438,14 +3649,14 @@ string VPreLex::endOfStream(bool& againr) {
 
 void VPreLex::initFirstBuffer(VFileLine* filelinep) {
     // Called from constructor to make first buffer
-    // VPreLex_create_buffer also sets yy_fill_buffer=1 so reads from YY_INPUT
+    // yy_create_buffer also sets yy_fill_buffer=1 so reads from YY_INPUT
     VPreStream* streamp = new VPreStream(filelinep, this);
     streamp->m_eof = true;
     m_streampStack.push(streamp);
     //
-    m_bufferState = VPreLex_create_buffer(NULL,YY_BUF_SIZE);
-    VPreLex_switch_to_buffer(m_bufferState);
-    VPreLexrestart(NULL);
+    m_bufferState = yy_create_buffer(NULL, YY_BUF_SIZE);
+    yy_switch_to_buffer(m_bufferState);
+    yyrestart(NULL);
 }
 
 void VPreLex::scanNewFile(VFileLine* filelinep) {
@@ -3483,7 +3694,7 @@ void VPreLex::scanBytes(const string& str) {
 void VPreLex::scanSwitchStream(VPreStream* streamp) {
     curStreamp()->m_buffers.push_front(currentUnreadChars());
     m_streampStack.push(streamp);
-    VPreLexrestart(NULL);
+    yyrestart(NULL);
 }
 
 void VPreLex::scanBytesBack(const string& str) {

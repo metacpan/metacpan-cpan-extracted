@@ -1,5 +1,23 @@
 Revision history for Text-TFIDF-Ngram
 
+0.0501 2019-01-26 12:22:33
+    - Fix a documentation line!
+
+0.0500 2019-01-25 21:36:38
+    - Correct the split regex in ngram processing.
+    - Remove the digits attribute and processing. Lingua::EN::Ngram excludes them by default it seems.
+
+0.0402 2019-01-25 18:50:30
+    - Fix a little grammar.
+    - Improved the documentation of the eg/analyze program.
+
+0.0401 2019-01-25 18:23:30
+    - Improved the documentation ever so slightly.
+
+0.0400 2019-01-25 17:58:43
+    - Add a digits attribute.
+    - Update the eg/analyze program.
+
 0.0300 2019-01-20 01:00:18
     - Add a user defined punctuation regex attribute.
     - Add a lowercase attribute.

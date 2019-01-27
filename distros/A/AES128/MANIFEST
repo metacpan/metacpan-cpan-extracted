@@ -1,0 +1,8 @@
+AES128.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/AES128.t
+lib/AES128.pm

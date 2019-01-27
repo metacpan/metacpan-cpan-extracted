@@ -85,11 +85,26 @@ S_ft_return_true(pTHX_ SV *ret) {
 /************* Perl <= 5.14 ***************************************************/
 /******************************************************************************/
 
+#if PERL_VERSION >= 14
+PERL_STATIC_INLINE OP *
+#else
+OP *
+#endif
+S_ft_return_bool(pTHX_ SV *ret) {
+    dSP;
+    if (PL_op->op_flags & OPf_REF)
+        XPUSHs(ret);
+    else
+        SETs(ret);
+    PUTBACK;
+    return NORMAL;
+}
+
 #define FT_SETUP_dSP_IF_NEEDED    dSP
 
-#define FT_RETURNYES    RETURNX(PUSHs(&PL_sv_yes))
-#define FT_RETURNNO     RETURNX(PUSHs(&PL_sv_no))
-#define FT_RETURNUNDEF  RETURNX(PUSHs(&PL_sv_undef))
+#define FT_RETURNYES    RETURNX( S_ft_return_bool(aTHX_ &PL_sv_yes) )
+#define FT_RETURNNO     RETURNX( S_ft_return_bool(aTHX_ &PL_sv_no) )
+#define FT_RETURNUNDEF  RETURNX( S_ft_return_bool(aTHX_ &PL_sv_undef) )
 #define FT_RETURN_TARG  RETURNX(PUSHs(TARG))
 
 #endif

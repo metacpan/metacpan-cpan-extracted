@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use Moo;
 use POSIX qw( ceil );
 
-our $VERSION = '0.0200';
+our $VERSION = '0.0201';
 
 use constant K => 3.14159265358979323846 / 180;
 
@@ -197,7 +197,7 @@ Data::Turtle - Turtle Movement and State Operations
 
 =head1 VERSION
 
-version 0.0200
+version 0.0201
 
 =head1 SYNOPSIS
 
@@ -214,7 +214,7 @@ version 0.0200
   $turtle->set_state($x, $y, $heading, $status, $color, $size);
   for my $i (1 .. 4) {
       my @line = $turtle->forward(50);
-      # If there is a line and the pen is down, draw it!
+      # if (@line) { ... # Draw it!
       $turtle->right(90);
   }
 
@@ -226,15 +226,15 @@ any particular graphics package.
 The methods don't draw anything.  They just set or output coordinates and
 values for drawing by your favorite graphics package.
 
-Please see the F<eg/> distribution directory for example code, with L<GD> and
-L<Imager>.
+For examples with L<GD> and L<Imager>, please see the files in the F<eg/>
+distribution directory.
 
 =head1 METHODS
 
 =head2 new
 
-  Data::Turtle->new();
-  Data::Turtle->new(
+  $turtle = Data::Turtle->new();
+  $turtle = Data::Turtle->new(
     width      => $width,
     height     => $height,
     x          => $x0,
@@ -278,7 +278,7 @@ Coordinate parameters.  Defaults:
 
 Is the pen is up or down?  Default: 1 (down position)
 
-Pen properties.  Defaults: pen_color = the string 'black', pen_size = 1 (pixel)
+Pen properties.  Defaults: pen_color = the string 'black', pen_size = 1
 
 =back
 
@@ -316,7 +316,7 @@ Turn to the left.
 
   @pos = $turtle->position;
 
-Return the current pen position as a list of the x and y values.
+Return the current pen position as a list of x and y.
 
 =head2 get_state
 
@@ -336,25 +336,34 @@ Set the turtle state with the given parameters.
 
   @line = $turtle->forward($steps);
 
-Move forward the given number of steps.
+Move forward the given number of steps.  If the pen is down, a list defining a
+line is returned with these values:
+
+  x0, y0, x, y, pen_color, pen_size
 
 =head2 backward
 
   @line = $turtle->backward($steps);
 
-Move backward the given number of steps.
+Move backward the given number of steps.  If the pen is down, a list defining a
+line is returned with these values:
+
+  x0, y0, x, y, pen_color, pen_size
 
 =head2 mirror
 
   $turtle->mirror;
 
-Reflect the heading by multiplying by -1.
+Reflect the heading (by multiplying by -1).
 
 =head2 goto
 
   @line = $turtle->goto( $x, $y );
 
-Move the pen to the given coordinate.
+Move the pen to the given coordinate.  If the pen is down, a list defining a
+line is returned with these values:
+
+  x0, y0, x, y, pen_color, pen_size
 
 =head1 SEE ALSO
 
@@ -372,7 +381,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Test::Count;
-$Test::Count::VERSION = '0.0902';
+$Test::Count::VERSION = '0.1000';
 use warnings;
 use strict;
 
@@ -129,7 +129,7 @@ Test::Count - Module for keeping track of the number of tests in a test script.
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 SYNOPSIS
 
@@ -160,7 +160,7 @@ tests in the file is:
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 FUNCTIONS
 

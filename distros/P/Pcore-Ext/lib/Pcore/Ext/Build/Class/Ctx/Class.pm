@@ -16,7 +16,7 @@ sub generate ( $self, $quote ) {
         $class_name = $self->{class}->{app}->{classes}->{ $self->{name} }->{name};
     }
 
-    die qq[Class name "$class_name" can't be resolved] if !$class_name;
+    die qq[Class name "$class_name" can't be resolved in "$self->{class}"] if !$class_name;
 
     return $quote . $class_name . $quote;
 }

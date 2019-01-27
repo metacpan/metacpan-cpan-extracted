@@ -14,9 +14,9 @@ use Pod::Usage;
 use Verilog::Preproc;
 use Verilog::Getopt;
 use strict;
-use vars qw ($Debug $VERSION);
+use vars qw($Debug $VERSION);
 
-$VERSION = '3.456';
+$VERSION = '3.460';
 
 ######################################################################
 # main
@@ -32,12 +32,12 @@ autoflush STDOUT 1;
 autoflush STDERR 1;
 
 # Option parsing
-Getopt::Long::config ("no_auto_abbrev","pass_through");
-GetOptions ("debug" => \&debug);  # Snarf --debug ASAP, before parse -f files
+Getopt::Long::config("no_auto_abbrev","pass_through");
+GetOptions("debug" => \&debug);  # Snarf --debug ASAP, before parse -f files
 
 my $Opt = new Verilog::Getopt(filename_expansion=>1);
 @ARGV = $Opt->parameter(@ARGV);
-Getopt::Long::config ("no_auto_abbrev","no_pass_through");
+Getopt::Long::config("no_auto_abbrev","no_pass_through");
 if (! GetOptions (
 		  "help"	=> \&usage,
 		  "debug"	=> \&debug,
@@ -93,14 +93,14 @@ if ($opt_dump_defines) {
     }
 }
 
-exit (0);
+exit(0);
 
 ######################################################################
 
 sub usage {
     print "Version $VERSION\n";
     pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
-    exit (1);
+    exit(1);
 }
 
 sub debug {
@@ -276,7 +276,7 @@ Verilog-Perl is part of the L<http://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
 L<http://www.veripool.org/verilog-perl>.
 
-Copyright 2000-2018 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2019 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

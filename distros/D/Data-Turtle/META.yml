@@ -28,7 +28,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Turtle
   repository: https://github.com/ology/Data-Turtle
-version: '0.0200'
+version: '0.0201'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

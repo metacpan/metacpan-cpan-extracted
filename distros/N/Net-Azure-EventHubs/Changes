@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-Azure-EventHubs
 
+0.09 2019-01-25T08:28:37Z
+    - Just version increment
+
 0.08 2018-12-13T09:52:54Z
     - Stabilize testing script t/13_req.t
 

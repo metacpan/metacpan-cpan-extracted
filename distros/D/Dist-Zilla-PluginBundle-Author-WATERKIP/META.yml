@@ -26,23 +26,29 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::WATERKIP:
     file: lib/Dist/Zilla/MintingProfile/Author/WATERKIP.pm
-    version: '2.0'
+    version: '2.1'
   Dist::Zilla::PluginBundle::Author::WATERKIP:
     file: lib/Dist/Zilla/PluginBundle/Author/WATERKIP.pm
-    version: '2.0'
+    version: '2.1'
 requires:
   Data::Dumper: '0'
   Dist::Zilla::App::Command::xtest: '0'
   Dist::Zilla::Plugin::CheckExtraTests: '0'
+  Dist::Zilla::Plugin::CheckPrereqsIndexed: '0'
   Dist::Zilla::Plugin::ContributorsFile: '0'
   Dist::Zilla::Plugin::CopyFilesFromBuild::Filtered: '0'
+  Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts: '0'
   Dist::Zilla::Plugin::Git::Contributors: '0'
+  Dist::Zilla::Plugin::Git::Remote::Check: '0'
   Dist::Zilla::Plugin::MetaProvides: '0'
+  Dist::Zilla::Plugin::MetaProvides::Package: '0'
   Dist::Zilla::Plugin::MinimumPerl: '0'
   Dist::Zilla::Plugin::PodWeaver: '0'
   Dist::Zilla::Plugin::Prereqs::AuthorDeps: '0'
   Dist::Zilla::Plugin::PromptIfStale: '0'
-  Dist::Zilla::Plugin::Repository: '0'
+  Dist::Zilla::Plugin::ReadmeFromPod: '0'
+  Dist::Zilla::Plugin::Repository: '0.22'
+  Dist::Zilla::Plugin::lib: '0'
   Dist::Zilla::PluginBundle::Filter: '0'
   Dist::Zilla::PluginBundle::Git::VersionManager: '0'
   Dist::Zilla::PluginBundle::TestingMania: '0'
@@ -55,13 +61,18 @@ requires:
   List::Util: '0'
   Moose: '0'
   Moose::Util::TypeConstraints: '0'
+  Pod::Markdown: '0'
+  Test::EOL: '0'
+  Test::Kwalitee: '0'
+  Test::NoTabs: '0'
+  Test::Pod::Coverage: '0'
   namespace::autoclean: '0'
   namespace::clean: '0'
   perl: '5.010'
 resources:
   repository: git://gitlab.com/waterkip/dist-zilla-pluginbundle-author-waterkip.git
-version: '2.0'
+version: '2.1'
 x_contributors:
   - 'Wesley Schwengle <wesley@schwengle.net>'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

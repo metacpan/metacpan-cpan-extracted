@@ -105,7 +105,7 @@ EPublisher::Utils::PPI - PPI utility for EPublisher
 
 =head1 VERSION
 
-version 1.23
+version 1.26
 
 =head1 SYNOPSIS
 

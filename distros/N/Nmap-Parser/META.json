@@ -21,6 +21,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "1.36",
+   "version" : "1.37",
    "x_homepage" : "https://github.com/modernistik/Nmap-Parser"
 }

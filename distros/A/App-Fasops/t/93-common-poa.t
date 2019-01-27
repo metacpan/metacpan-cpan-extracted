@@ -5,7 +5,10 @@ use Test::More;
 use App::Fasops::Common;
 use Test::Number::Delta within => 1e-2;
 
-{
+SKIP: {
+    skip "poa not installed", 6
+        unless IPC::Cmd::can_run('poa');
+
     print "#poa_consensus\n";
 
     my @data = (

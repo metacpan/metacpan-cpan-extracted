@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.108   2019-01-26
+        - Use the whole terminal width
+
 0.107   2019-01-20
         - MSWin32: always use "Win32::Console::ANSI".
 

@@ -1,12 +1,15 @@
 # make test
 # perl Makefile.PL; make; perl -Iblib/lib t/36_cmd_due.t
+# perl Makefile.PL; make; ATDEBUG=1 perl -Iblib/lib t/36_cmd_due.t
 
 use lib '.'; BEGIN{require 't/common.pl'}
-use Test::More tests    => 2;
-warn <<"" and map ok(1),1..2 and exit if $^O!~/^(linux|cygwin)$/;
+use Test::More tests    => 6;
+warn <<"" and map ok(1),1..6 and exit if $^O!~/^(linux|cygwin)$/;
 Tests for cmd_due not available for $^O, only linux and cygwin
 
-my $tmp=tmp();
+my($tmp,$p,$ok,@d)=(tmp());
+sub okk{ ok($p eq $ok, shift); $p eq $ok or deb "$p\n!=\n$ok\n"};
+
 my %f=( a=>10, b=>20, c=>30 );
 my $i=1;
 $Acme::Tools::Magic_openstr=0;
@@ -14,10 +17,8 @@ for my $ext (qw( .gz .xz .txt .doc .doc.gz),""){
   writefile("$tmp/$_$ext","x" x ($f{$_}*$i++)) for sort(keys%f);
 }
 #print qx(find $tmp -ls),"\n" if $ENV{ATDEBUG}; #!deb()
-my $p=printed {
-  Acme::Tools::cmd_due('-Mihz',$tmp)
-};
-my $ok=repl(<<'','ymd',tms('YYYY/MM/DD'));
+$p=printed { Acme::Tools::cmd_due('-Mihz',$tmp) };
+my $answer=<<'';
 .gz               3          140 B    3.95%  ymd ymd ymd
 .xz               3          320 B    9.04%  ymd ymd ymd
 .txt              3          500 B   14.12%  ymd ymd ymd
@@ -26,11 +27,10 @@ my $ok=repl(<<'','ymd',tms('YYYY/MM/DD'));
                   3        1.02 kB   29.38%  ymd ymd ymd
 Sum              18        3.46 kB  100.00%  ymd ymd ymd
 
-ok($p eq $ok, 'due -Mihz');
-deb("$p\n!=\n$ok\n") if $p ne $ok;
+$ok=repl($answer,'ymd',tms('YYYY/MM/DD'));
+okk('due -Mihz');
 
-use MIME::Base64;
-@Acme::Tools::Due_fake_stdin=split"\n",$p=gunzip(MIME::Base64::decode_base64(<<""));
+@Acme::Tools::Due_fake_stdin=split"\n",gunzip(unbase64(<<''));
 H4sIAOY951kCA72ayXKjSBCG7/0U3Dsk1b5c+jhPMHOewAJk3CwKwNvbTyFkulJST5CpFg45wtiyP/7cs3CScG0NZyI5fagk
 694/us34Cpc66dp2OP1k/uL0NuZN8pI22yQxSSIYt8muPQ6797LJN/2QHsrmsOuf0y7ffUvOBHmTYO4n1GkzQ9RNiPwjkF3R
 bf/5+6+Nm2n6Jk38Wdp4wc9I8SXQJZvufdNtxle45L9DcsmT9NiV1XiXI9MsZ57e1OfdW95t+azZnP4wF4tugDPn1H03sP2l
@@ -50,9 +50,10 @@ V4MZRCFPX2gN+eUqsLnH9YnTAQLZy7CEGNy+6Knkq6qpcf94w4W6Y+ADAabFiuc+QLNXU8iaZZuqpeXU
 NwYvjqtfWt5xhgucLFfrjfDgh+Gql6QeWhcX24Rd8zQTnvxw5B7D6T6G+7mX53+4XJRPzCnjiE4G58Z8ve0JyDXItY12mvly
 Y29DPokxzJGrB5wF1lonissV2dnV6gdUbNYo1M83VkaHmwTIWZxfFC4lpidPi8BCibG0Y8Cnx7NlU3z7D43Aan/3LwAA
 
-$p=printed {
-  Acme::Tools::cmd_due('-ihz');
-};
+eval { Acme::Tools::cmd_due('-ihz',$tmp) };
+ok($@ eq "due: can not combine STDIN and args\n", 'ok die');
+
+$p=printed { Acme::Tools::cmd_due('-ihz') };
 $ok=<<"";
 .desktop          1        1.30 kB    0.02%
 .nls              1        6.26 kB    0.10%
@@ -62,5 +63,14 @@ $ok=<<"";
 .ttf              9        4.97 MB   85.46%
 Sum              89        5.82 MB  100.00%
 
-ok($p eq $ok, 'find -ld|due -ihz');
-deb("$p\n!=\n$ok\n") if $p ne $ok;
+okk('find -ls|due -ihz');
+
+my @f;File::Find::find(sub{-f$_&&push@f,"$tmp/$_"},$tmp);
+@Acme::Tools::Due_fake_stdin=@f;
+utime 0, .5<rand?8e8:9e8, $_ for @f;
+$ok=repl($answer,'ymd','1998/07/09');
+$p=printed { Acme::Tools::cmd_due('-Mihz') };
+$p=~s{\b(\d{4}/\d\d/\d\d)\b}{push@d,$1;'1998/07/09'}ge;
+ok(mins(@d) eq '1995/05/09','min');
+ok(maxs(@d) eq '1998/07/09','max');
+okk('find|due -Mihz  ...with -M');

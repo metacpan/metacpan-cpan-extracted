@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent 'Pod::Markdown';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub syntax {
     my ( $self, $paragraph ) = @_;
@@ -36,7 +36,7 @@ Pod::Markdown::Github - Convert POD to Github's specific markdown
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 

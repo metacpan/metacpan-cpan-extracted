@@ -1,6 +1,10 @@
 # perl Makefile.PL;make;perl -Iblib/lib t/10_md5sum.t
 use lib '.'; BEGIN{require 't/common.pl'}
-use Test::More tests => 2;
+use Test::More tests => 4;
+
+my $s=join"",1..1e4;
+is( md5sum(\"abc"), '900150983cd24fb0d6963f7d28e17f72', 'stringref');
+is( md5sum(\$s),    '6784cd80458707896e40532a50f69b82', 'stringref longer');
 my $tmp=tmp();
 if(-d$tmp and -w$tmp){
   writefile("$tmp/attest-md5sum","asdf\cJ");

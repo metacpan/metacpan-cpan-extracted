@@ -32,6 +32,7 @@ use MYDan::Util::Percent;
 use MYDan::Agent::Proxy;
 use AnyEvent::Loop;
 use MYDan::Agent::FileCache;
+use MYDan::Util::FastMD5;
 
 our %RUN = ( user => 'root', max => 128, timeout => 300 );
 
@@ -72,9 +73,7 @@ sub run
     my ( $md5, $aim, $efsize );
     if( my $ef = $ENV{MYDanExtractFile} )
     {
-        open my $TEMP, "<$ef" or die "open ef fail:$!";
-        $md5 = Digest::MD5->new()->addfile( $TEMP )->hexdigest();
-        close $TEMP;
+        $md5 = MYDan::Util::FastMD5->hexdigest( $ef );
         my $efa =  $ENV{MYDanExtractFileAim};
         $aim = $efa && $efa =~ /^[a-zA-Z0-9\/\._\-]+$/ ? $efa : '.';
         $efsize = ( stat $ef )[7];

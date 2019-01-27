@@ -9,6 +9,8 @@ use Pcore::Ext::Build::Class::Ctx::Class;
 use Pcore::Ext::Build::Class::Ctx::Type;
 use Pcore::Ext::Build::Class::Ctx::L10N;
 
+use overload '""' => sub ( $self, @ ) { return $self->{path} };
+
 has app     => ( required => 1 );    # InstanceOf['Pcore::Ext']
 has path    => ( required => 1 );    # Str, /Class/Path/name
 has package => ( required => 1 );    # Str, perl package, Class::Path
@@ -125,7 +127,7 @@ sub build ( $self ) {
     local *{"$self->{package}\::api"} = \$api;
 
     # "cdn" resolver
-    local ${"$self->{package}\::cdn"} = $self->{app}->{app}->{cdn};
+    local ${"$self->{package}\::cdn"} = $self->{app}->{cdn};
 
     # "l10n" resolver
     local *{"$self->{package}\::l10n"} = sub : prototype($;$$) ( $msgid, $msgid_plural = undef, $num = undef ) {
@@ -184,9 +186,9 @@ sub generate ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 83, 94, 105, 139     | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## |    2 | 85, 96, 107, 141     | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 131                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 133                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,5 +1,5 @@
 package Test::Count::Base;
-$Test::Count::Base::VERSION = '0.0902';
+$Test::Count::Base::VERSION = '0.1000';
 
 use strict;
 use warnings;
@@ -30,11 +30,11 @@ Test::Count::Base - Base Class for Test::Count.
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 FUNCTIONS
 

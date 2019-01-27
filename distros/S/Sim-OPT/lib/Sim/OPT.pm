@@ -67,7 +67,7 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ clean
 );
 
-$VERSION = '0.219';
+$VERSION = '0.227';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program encouraging problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
@@ -918,9 +918,9 @@ sub cleansweeps
 				$elt =~ s/^(\d+)>// ;
 				$elt =~ s/[A-za-z]+//g ;
 				$elt =~ s/<//g ;
-				$elt =~ s/\|//g ;
 				$elt =~ s/£//g ;
 				$elt =~ s/§//g ;
+				$elt =~ s/\|//g ;
 				push( @inbag, $elt );
 			}
 			push( @midbag, [ @inbag ] );
@@ -978,7 +978,7 @@ sub gencentres
   my $numelts = scalar( @vars );
   my $numcases = ( $numelts / 2 );
   my $c = 0;
-  while ( $c < ( $numelts -1 ) )
+  while ( $c < ( $numelts - 1 ) )
   {
     my %newhs;
     my @box;
@@ -995,9 +995,9 @@ sub gencentres
         my $answer = odd__( $signal ); #say "\$answer: " . dump ( $answer );
         if ( $answer eq "even" )
         {
-          $value = $array[ int(rand(@array)) ];
+          $value = $array[ int(rand( @array + 1 )) ];
           my @ar = ( $hsmax{$key}, $hsmin{$key} );
-          $newval = $ar[ int( rand( @ar ) ) ]; #say "newpair1: " . dump ( @newpair );
+          $newval = $ar[ int( rand( @ar + 1 ) ) ]; #say "newpair1: " . dump ( @newpair );
           if ( $hsmax{$key} == $newval )
           {
             $inv = "no";

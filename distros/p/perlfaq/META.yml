@@ -33,10 +33,10 @@ resources:
   bugtracker: https://github.com/perl-doc-cats/perlfaq/issues
   homepage: https://metacpan.org/release/perlfaq
   repository: https://github.com/perl-doc-cats/perlfaq.git
-version: '5.20180915'
+version: '5.20190126'
 x_Dist_Zilla:
   perl:
-    version: '5.029002'
+    version: '5.029006'
   plugins:
     -
       class: Dist::Zilla::Plugin::AutoVersion
@@ -192,13 +192,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.18.0
+          git_version: 2.19.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: Git::Contributors
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::Authority
       name: Authority
@@ -208,16 +208,8 @@ x_Dist_Zilla:
       name: MetaNoIndex
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::lib
-      config:
-        Dist::Zilla::Plugin::lib:
-          lib:
-            - inc
-      name: lib
-      version: '0.001002'
-    -
-      class: CreateQuestionList
-      name: =CreateQuestionList
+      class: inc::CreateQuestionList
+      name: =inc::CreateQuestionList
       version: ~
     -
       class: Dist::Zilla::Plugin::FileFinder::Filter
@@ -237,7 +229,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
       name: Git::Check
       version: '2.045'
@@ -245,7 +237,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
       name: Git::CheckFor::MergeConflicts
       version: '0.014'
@@ -253,7 +245,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
       name: Git::CheckFor::CorrectBranch
       version: '0.014'
@@ -317,7 +309,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -330,11 +322,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.20180915
+          tag: v5.20190126
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -371,7 +363,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -385,7 +377,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
       name: Git::Push
       version: '2.045'
@@ -442,6 +434,7 @@ x_authority: cpan:LLAP
 x_contributors:
   - 'Alex Beamish <talexb@gmail.com>'
   - 'Brian Fraser <brian.fraser@booking.com>'
+  - 'Celejar <celejar@gmail.com>'
   - 'Chris Nehren <apeiron@cpan.org>'
   - 'Christian Walde <walde.christian@googlemail.com>'
   - 'Christopher J. Madsen <perl@cjmweb.net>'
@@ -462,6 +455,7 @@ x_contributors:
   - 'James E Keenan <jkeenan@cpan.org>'
   - 'Jeffrey Kegler <jeffreykegler@jeffreykegler.com>'
   - 'joaquinferrero <explorer+git@joaquinferrero.com>'
+  - 'Joaquín Ferrero <explorer@joaquinferrero.com>'
   - 'Joel Maslak <jmaslak@antelope.net>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Laurent Dami <laurent.dami@free.fr>'
@@ -484,5 +478,5 @@ x_contributors:
   - 'Smylers <Smylers@stripey.com>'
   - 'tina <forum@s05.tinita.de>'
   - 'Tom Molesworth <tom@binary.com>'
-x_generated_by_perl: v5.29.2
+x_generated_by_perl: v5.29.6
 x_serialization_backend: 'YAML::Tiny version 1.73'

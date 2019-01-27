@@ -33,7 +33,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-TFIDF-Ngram
   repository: https://github.com/ology/Text-TFIDF-Ngram
-version: '0.0300'
+version: '0.0501'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

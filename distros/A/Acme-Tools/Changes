@@ -2,8 +2,14 @@ Revision history for Perl extension Acme::Tools.
 
 See also HISTORY in Acme::Tools doc.
 
+0.23  Jan 2019   subs: logn, egrep, which. More UTF-8 "oriented" (lower, upper, ...)
+                 Commands: zsize, finddup, due (improved), conv (improved, [MGT]?Wh
+                 and many more units), due -M for stdin of filenames.
+
+0.22  Feb 2018   subs: subarr, sim, sim_perm, aoh2sql. command: resubst
+
 0.21  Mar 2017   Improved nicenum() and its tests
- 
+
 0.20  Mar 2017   Subs: a2h cnttbl h2a log10 log2 nicenum rstddev sec_readable
                  throttle timems refa refaa refah refh refha refhh refs
                  eachr globr keysr popr pushr shiftr splicer unshiftr valuesr

@@ -11,11 +11,11 @@ DateTime::Format::Text - Find a Date in Text
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @month_names = (
 	'january',
@@ -82,6 +82,30 @@ sub new {
 	return bless { }, $class;
 }
 
+=head2 parse_datetime
+
+Synonym for parse().
+
+=cut
+
+sub parse_datetime {
+	my $self = shift;
+	my %params;
+
+	if(!ref($self)) {
+		if(scalar(@_)) {
+			return(__PACKAGE__->new()->parse(@_));
+		}
+		return(__PACKAGE__->new()->parse($self));
+	} elsif(ref($self) eq 'HASH') {
+		return(__PACKAGE__->new()->parse($self));
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: ', __PACKAGE__, '::parse_datetime(string => $string)');
+	}
+
+	return $self->parse(@_);
+}
+ 
 =head2 parse
 
 Creates a DateTime::Format::Text object.

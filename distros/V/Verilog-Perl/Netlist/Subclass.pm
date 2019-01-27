@@ -12,7 +12,7 @@ use base qw(Exporter);
 use vars qw($VERSION @EXPORT);
 use strict;
 
-$VERSION = '3.456';
+$VERSION = '3.460';
 @EXPORT = qw(structs);
 
 # Maybe in the future.  For now all users of this must do it themselves
@@ -229,7 +229,7 @@ sub structs {
 	    package $overclass;
 	    sub ${func} {
 		my \$class = shift;
-		my \$self = new $baseclass (\@_);
+		my \$self = new $baseclass(\@_);
 		bless \$self, \$class;
 	    }";
     }
@@ -269,7 +269,7 @@ and $self->error() will produce consistent results.
 
 =over 4
 
-=item $self->error (I<Text...>)
+=item $self->error(I<Text...>)
 
 Print an error in a standard format.
 
@@ -285,7 +285,7 @@ Exits the program if any errors were detected.
 
 The filename number the entity was created in.
 
-=item $self->info (I<Text...>)
+=item $self->info(I<Text...>)
 
 Print a informational in a standard format.
 
@@ -298,13 +298,13 @@ The line number the entity was created on.
 The class to report errors using, generally a Verilog::Netlist::Logger
 object.
 
-=item $self->userdata (I<key>)
-=item $self->userdata (I<key>, I<data>)
+=item $self->userdata(I<key>)
+=item $self->userdata(I<key>, I<data>)
 
 Sets (with two arguments) or retrieves the specified key from an opaque
 hash.  This may be used to store application data on the specified node.
 
-=item $self->warn (I<Text...>)
+=item $self->warn(I<Text...>)
 
 Print a warning in a standard format.
 
@@ -320,7 +320,7 @@ Verilog-Perl is part of the L<http://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
 L<http://www.veripool.org/verilog-perl>.
 
-Copyright 2000-2018 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2019 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

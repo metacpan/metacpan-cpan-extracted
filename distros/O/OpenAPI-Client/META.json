@@ -52,6 +52,6 @@
          "web" : "https://github.com/jhthorsen/openapi-client"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

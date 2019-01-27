@@ -10,7 +10,7 @@ use JSON;
 use File::Share ':all';
 use Geo::Details;
 
-our $VERSION = '1.1.1';
+our $VERSION = '1.2.0';
 my $DEFAULT_CACHE_MAX_SIZE = 4096;
 my $DEFAULT_CACHE_TTL = 86400;
 my $DEFAULT_COUNTRY_FILE = 'countries.json';

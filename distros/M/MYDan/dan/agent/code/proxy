@@ -8,6 +8,7 @@ use AnyEvent::Handle;
 use AnyEvent::Socket;
 use Fcntl qw(:flock SEEK_END);
 use MYDan::Agent::FileCache;
+use MYDan::Util::FastMD5;
 
 eval
 {
@@ -158,9 +159,8 @@ eval
 				die "status error $err $end\n";
 			}
 			truncate $TEMP, $size;
-			seek $TEMP, 0, 0;
 
-			unless( $filemd5 eq Digest::MD5->new()->addfile( $TEMP )->hexdigest() )
+			unless( $filemd5 eq MYDan::Util::FastMD5->hexdigest( $temp ) )
 			{
 				unlink $temp;
 				die "md5 nomatch\n";

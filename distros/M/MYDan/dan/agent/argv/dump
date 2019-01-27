@@ -3,8 +3,8 @@ use strict;
 use warnings;
 
 use Cwd;
-use Digest::MD5;
 use Getopt::Long;
+use MYDan::Util::FastMD5;
 
 return sub
 {
@@ -23,9 +23,7 @@ return sub
 	$o{chown} ||= ( getpwuid($uid) )[0];
     }
 
-    die "Can't open '$file': $!\n" unless open my  $fh, '+<', $file;
-    $o{md5} = Digest::MD5->new()->addfile( $fh )->hexdigest();
-    close $fh;
+    $o{md5} = MYDan::Util::FastMD5->hexdigest( $file );
 
     $ENV{MYDanExtractFile} = $file;
     $ENV{MYDanExtractFileAim} = $o{path};

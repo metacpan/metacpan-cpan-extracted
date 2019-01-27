@@ -4,7 +4,7 @@ use strict;
 use parent qw(Test::Class);
 use Test::More;
 use Sub::Fp qw(
-incr         reduces   flatten
+incr        reduces   flatten
 drop_right  drop      take_right  take
 assoc       maps      decr        chain
 first       end       subarray    partial
@@ -16,6 +16,8 @@ is_sub      to_pairs  for_each    apply
 get         second    range       pops     pushes
 shifts      unshifts  once
 );
+
+# ------------------------------------------------------------------------------
 
 sub once__returns_code_ref_when_args_undef :Tests {
     ok(ref once() eq 'CODE');
@@ -47,6 +49,8 @@ sub once__returns_result_from_first_call_without_reinvoking :Tests {
 
     is($result, "I was only called 1 times");
 }
+
+# ------------------------------------------------------------------------------
 
 sub range__returns_empty_array_when_args_undef :Tests {
     is_deeply(range(), []);
@@ -140,6 +144,8 @@ sub range__returns_list_of_same_num_when_step_zero :Tests {
     is_deeply(range(1, 4, 0), [1,1,1]);
 }
 
+# ------------------------------------------------------------------------------
+
 sub is_sub__returns_0_when_args_undef :Tests {
     is(is_sub(), 0);
 }
@@ -168,7 +174,7 @@ sub is_sub__returns_1_when_args_is_code_ref :Tests {
     is(is_sub(sub {}), 1);
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub eql__returns_0_when_args_incomplete :Tests {
     is(eql([]), 0);
@@ -235,6 +241,8 @@ sub eql__returns_1_when_args_are_equal_nums :Tests {
     is(eql(100, 100), 1);
 }
 
+# ------------------------------------------------------------------------------
+
 sub flow__returns_empty_sub_when_args_empty :Tests {
     my $func = flow();
 
@@ -288,6 +296,8 @@ sub flow__accepts_multiple_arguments_when_composing :Tests {
     is($sub->(100, 100, 100), 300);
 }
 
+# ------------------------------------------------------------------------------
+
 sub is_empty__returns_1_when_args_undef :Tests {
     is(is_empty(), 1);
 }
@@ -319,6 +329,8 @@ sub is_empty__returns_0_when_args_a_hash :Tests {
 sub is_empty__returns_0_when_args_a_string :Tests {
     is(is_empty("I am not empty!"), 0);
 }
+
+# ------------------------------------------------------------------------------
 
 sub partial__throws_no_func_error_if_no_args :Tests {
     local $SIG{__WARN__} = sub { die $_[0] };
@@ -449,6 +461,51 @@ sub partial__returns_partially_applied_func_with_placeholders_odd_placement :Tes
     );
 }
 
+sub partial__returns_func_callable_multiple_times :Tests {
+    my $add_two_nums = sub {
+        my ($num1, $num2) = @_;
+
+        return $num1 + $num2;
+    };
+
+    my $add_one_num = partial($add_two_nums, 100);
+
+    $add_one_num->(100);
+    $add_one_num->(100);
+    $add_one_num->(100);
+    $add_one_num->(100);
+    $add_one_num->(100);
+
+    is_deeply(
+        $add_one_num->(100),
+        200,
+    );
+}
+
+sub partial__returns_func_callable_multiple_times_keeps_sideffects :Tests {
+
+    my $num3;
+    my $cause_side_effects = sub {
+        my ($num1, $num2) = @_;
+
+        $num3 += $num1 + $num2;
+    };
+
+    my $curried_cause_side_effects = partial($cause_side_effects, 100);
+
+    $curried_cause_side_effects->(100);
+    $curried_cause_side_effects->(100);
+    $curried_cause_side_effects->(100);
+    $curried_cause_side_effects->(100),
+
+    is_deeply(
+        $num3,
+        800,
+    );
+}
+
+# ------------------------------------------------------------------------------
+
 sub to_vals__returns_empty_array_when_args_undef :Tests {
     is_deeply(to_vals(), []);
 }
@@ -502,6 +559,8 @@ sub to_vals__returns_array_of_values_from_string :Tests {
     );
 }
 
+# ------------------------------------------------------------------------------
+
 sub identity__returns_undef_when_args_undef :Tests {
     is(identity(), undef)
 }
@@ -516,6 +575,8 @@ sub identity__returns_only_first_arg :Tests {
         [1,2,3]
     )
 }
+
+# ------------------------------------------------------------------------------
 
 sub noop__returns_undef_when_args_undef :Tests {
     is(noop(), undef)
@@ -532,6 +593,8 @@ sub for_each__returns_undef_when_args_undef :Tests {
 
     is_deeply($result, $expected);
 }
+
+# ------------------------------------------------------------------------------
 
 sub for_each__itterates_through_each_val_in_collection :Tests {
 
@@ -569,7 +632,7 @@ sub for_each__itterates_and_can_use_collection_ref :Tests {
     is_deeply($result, [[1,2,3], [1,2,3], [1,2,3]]);
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub maps__returns_empty_array_when_args_undef :Tests {
     is_deeply(maps(), []);
@@ -608,6 +671,8 @@ sub maps__returns_collection_as_arg :Tests {
     is_deeply($expected, $result);
 }
 
+# ------------------------------------------------------------------------------
+
 sub len__returns_0_when_args_undef :Tests {
     is(len(), 0);
 }
@@ -644,6 +709,7 @@ sub len__returns_length_of_string_including_spaces :Tests  {
     is(len('abcd  '), 6);
 }
 
+# ------------------------------------------------------------------------------
 
 sub is_array__returns_0_when_args_undef :Tests {
     is(is_array(), 0);
@@ -675,6 +741,7 @@ sub is_array__returns_1_when_array_ref :Tests {
     is(is_array([]), 1)
 }
 
+# ------------------------------------------------------------------------------
 
 sub is_hash__returns_0_when_args_undef :Tests {
     is(
@@ -697,6 +764,7 @@ sub is_hash__returns_1_when_hash :Tests {
     )
 }
 
+# ------------------------------------------------------------------------------
 
 sub to_keys__returns_empty_array_when_args_undef :Tests {
     is_deeply(
@@ -766,6 +834,8 @@ sub to_keys__returns_array_of_indicies_from_string :Tests {
 
     is_deeply($result, $expected);
 }
+
+# ------------------------------------------------------------------------------
 
 sub reduces__returns_undef_when_no_args :Tests {
     is(reduces(), undef);
@@ -845,6 +915,8 @@ sub reduces__returns_collection_as_arg :Tests {
     is_deeply($result, $expected);
 }
 
+# ------------------------------------------------------------------------------
+
 sub every__returns_1_when_undef :Tests {
     is(every(), 1)
 }
@@ -867,7 +939,7 @@ sub every__returns_0_when_predicate_only_matches_some :Tests {
     )
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub bool__returns_0_when_undef :Tests {
     is(bool(), 0)
@@ -884,6 +956,8 @@ sub bool__returns_1_when_truthy :Tests {
 sub bool__returns_1_when_string_truthy :Tests {
     is(bool("string"), 1);
 }
+
+# ------------------------------------------------------------------------------
 
 sub uniq__returns_empty_array_when_array_empty :Tests {
     is_deeply(uniq([]), []);
@@ -908,6 +982,7 @@ sub uniq__returns_new_array :Tests {
     ok( uniq([1,1,2,2,3,3]) != [1,2,3] );
 }
 
+# ------------------------------------------------------------------------------
 
 sub some__returns_false_when_empty_args :Tests {
     is(some(sub {}, []), 0)
@@ -931,7 +1006,7 @@ sub some__returns_false_if_none_match_predicate :Tests {
     );
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub none__returns_true_when_empty_args :Tests {
     is(none(sub{}, []), 1);
@@ -962,7 +1037,7 @@ sub none__returns_false_when_multi_matches_predicate :Tests {
     )
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub to_pairs__returns_empty_array_when_args_undef :Tests {
     is_deeply(to_pairs(), []);
@@ -1021,7 +1096,7 @@ sub to_pairs__returns_array_of_idx_char_from_string :Tests {
     );
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub spread__returns_empty_list_when_args_undef :Tests {
     is_deeply(
@@ -1074,6 +1149,8 @@ sub spread__returns_destructured_key_vals :Tests {
     );
 }
 
+# ------------------------------------------------------------------------------
+
 sub find__returns_undef_when_empty_args :Tests {
     is_deeply(find([]), undef);
 }
@@ -1092,7 +1169,7 @@ sub find__returns_item_when_found_in_array :Tests {
     );
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub filter__returns_empty_when_empty_args :Tests {
     is_deeply(
@@ -1115,7 +1192,7 @@ sub filter__returns_multi_items_that_match_predicate :Tests {
     );
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub pops__returns_last_item_in_array :Tests {
     my $array = [1,2,3];
@@ -1133,7 +1210,7 @@ sub pops__mutates_array :Tests {
     is_deeply($array, [1,2]);
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub pushes__adds_item_to_array_with_mutation :Tests {
     my $array = [1,2,3];
@@ -1151,7 +1228,7 @@ sub pushes__returns_array_length :Tests {
     is($new_length, 4);
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub shifts__returns_first_item_in_array :Tests {
     my $array = [1,2,3];
@@ -1169,7 +1246,7 @@ sub shifts__mutates_array :Tests {
     is_deeply($array, [1,2]);
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub unshifts__adds_item_to_array_with_mutation :Tests {
     my $array = [1,2,3];
@@ -1187,7 +1264,7 @@ sub unshifts__returns_array_length :Tests {
     is($new_length, 4);
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub drop__returns_empty_array_when_empty_array :Tests {
     is_deeply(drop([]), []);
@@ -1230,6 +1307,7 @@ sub drop__returns_new_array :Tests {
     ok($array != drop($array));
 }
 
+# ------------------------------------------------------------------------------
 
 sub drop_right__returns_empty_array_when_empty_array :Tests {
     is_deeply(drop_right([]), []);
@@ -1265,6 +1343,7 @@ sub drop_right__returns_new_array :Tests {
     ok($array != drop_right($array));
 }
 
+# ------------------------------------------------------------------------------
 
 sub take__returns_empty_array_when_empty_array :Tests {
     is_deeply(take([]), []);
@@ -1302,7 +1381,7 @@ sub take__returns_new_array :Tests {
     ok($array != take($array))
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub take_right__returns_empty_array_when_empty_array :Tests {
     is_deeply(take_right([]), []);
@@ -1340,7 +1419,7 @@ sub take_right__returns_new_array :Tests {
     ok($array != take($array))
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub get__returns_undef_when_args_undef :Tests {
     is_deeply(get(), undef);
@@ -1352,7 +1431,7 @@ sub get__returns_value_at_single_level_hash_get :Tests {
     };
 
     is_deeply(
-        get($hash, 'key1'),
+        get('key1', $hash),
         'value1',
     );
 }
@@ -1361,7 +1440,7 @@ sub get__returns_value_at_single_level_array :Tests {
     my $array = [100, 200, 300];
 
     is_deeply(
-        get($array, 1),
+        get(1, $array),
         200,
     );
 }
@@ -1370,7 +1449,7 @@ sub get__returns_value_at_single_level_string :Tests {
     my $string = "String";
 
     is_deeply(
-        get($string, 1),
+        get(1, $string),
         "t",
     );
 }
@@ -1381,7 +1460,7 @@ sub get__returns_default_if_key_isnt_defined :Tests {
     };
 
     is_deeply(
-        get($hash, 'nonKey', 'DEFAULT VALUE'),
+        get('nonKey', $hash, 'DEFAULT VALUE'),
         "DEFAULT VALUE",
     );
 }
@@ -1392,12 +1471,12 @@ sub get__returns_value_not_default_when_value_falsy :Tests {
     };
 
     is_deeply(
-        get($hash, 'key1', 'DEFAULT VALUE'),
+        get('key1', $hash, 'DEFAULT VALUE'),
         0,
     );
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub assoc_returns_undef_when_args_undef :Tests {
     is_deeply(assoc(), undef);
@@ -1447,6 +1526,7 @@ sub assoc__returns_new_hash :Tests {
     ok(assoc($hash, 'key', 'newValue') != $hash);
 }
 
+# ------------------------------------------------------------------------------
 
 sub chain__accepts_expression_as_first_arg :Tests {
     my $addThree = sub { (shift) + 3 };
@@ -1479,6 +1559,8 @@ sub chain__accepts_anon_func :Tests {
     is($result, 103);
 }
 
+# ------------------------------------------------------------------------------
+
 sub flatten__returns_empty_array_when_empty_array :Tests {
     is_deeply(flatten([]), []);
 }
@@ -1499,6 +1581,7 @@ sub flatten__returns_single_level_flattened :Tests {
     is_deeply(flatten([[1], 2, [[3]]]), [1,2,[3]]);
 }
 
+# ------------------------------------------------------------------------------
 
 sub subarray__returns_empty_array_if_args_undef :Tests {
     is_deeply(subarray(), []);
@@ -1526,7 +1609,7 @@ sub subarray__returns_new_array {
     ok($array != subarray($array, 1))
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub second__returns_undef_if_no_args :Tests {
     is(second(), undef);
@@ -1540,7 +1623,7 @@ sub second__returns_second_item_in_list_of_many_items :Tests {
     is(second(["first", "second", "third", "fourth"]), "second");
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub first__returns_undefined_if_no_args :Tests {
     is(first(), undef);
@@ -1554,6 +1637,7 @@ sub first__returns_first_item_in_list_of_many_items :Tests {
     is(first([1,2,3,4]), 1);
 }
 
+# ------------------------------------------------------------------------------
 
 sub end__returns_undefined_if_no_args :Tests {
     is(end(), undef);
@@ -1566,6 +1650,8 @@ sub end__returns_last_item_in_list_of_one :Tests {
 sub end__returns_last_item_in_list_of_many_items :Tests {
     is(end(["item", "another", "lastItem"]), "lastItem");
 }
+
+# ------------------------------------------------------------------------------
 
 sub incr__throws_warning_if_non_num_as_arg :Tests {
 
@@ -1582,6 +1668,7 @@ sub incr__returns_num_plus_one :Tests {
     is(incr(100), 101);
 }
 
+# ------------------------------------------------------------------------------
 
 sub decr__throws_warning_if_non_num_as_arg :Tests {
 
@@ -1602,7 +1689,7 @@ sub decr__returns_num_minus_one_when_zero :Tests {
     is(decr(0), -1);
 }
 
-
+# ------------------------------------------------------------------------------
 
 sub apply__calls_func_with_array_and_applies_as_args :Tests {
     my $sum_all_nums = sub {
@@ -1638,5 +1725,7 @@ sub apply__calls_func_with_empty_array :Tests {
 
     is($result, $expected);
 }
+
+# ------------------------------------------------------------------------------
 
 __PACKAGE__->runtests;

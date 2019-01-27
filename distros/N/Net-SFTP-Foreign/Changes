@@ -1,5 +1,8 @@
 Revision history for Net::SFTP::Foreign
 
+1.90  Jan 26, 2018
+        - Module metadata updated.
+
 1.89  Feb 2, 2018
 	- Method "ls" has an internal shortcut intended to improve
           performance that was never taken (bug report and patch by

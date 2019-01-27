@@ -820,13 +820,15 @@ sub get_snps {
         my $mutant_to;
         my $snp_freq = 0;
         my $snp_occured;
-        my @class = uniq(@bases);
+        my @class = uniq( sort @bases );
         if ( scalar @class < 2 ) {
             Carp::confess "no snp\n";
         }
         elsif ( scalar @class > 2 ) {
             $snp_freq    = -1;
             $snp_occured = 'unknown';
+            $query_base  = "";
+            $mutant_to   = "";
         }
         else {
             for (@bases) {

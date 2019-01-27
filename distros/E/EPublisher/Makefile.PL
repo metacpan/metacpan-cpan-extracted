@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "EPublisher",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "EPublisher",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Pod::Text" => "3.08",
     "YAML::Tiny" => 0
   },
-  "VERSION" => "1.23",
+  "VERSION" => "1.26",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,6 +1,6 @@
 package MicroECC;
 
-use 5.010001;
+use 5.016001;
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('MicroECC', $VERSION);
@@ -70,6 +70,7 @@ MicroECC - Perl wrapper for the micro-ecc ECDH and ECDSA library
 	  print "Valid public key.\n";
   }
 
+  # make shared secret with other people's public key.
   my $shared_secret = MicroECC::shared_secret($your_pubkey, $privkey);
 
   my $compute_pubkey = MicroECC::compute_public_key($privkey, $curve);
@@ -88,7 +89,7 @@ MicroECC - Perl wrapper for the micro-ecc ECDH and ECDSA library
 	  print "Verify failed.\n";
   }
   else {
-	  printf "Verify success.\n";
+	  print "Verify success.\n";
   }
 
 =head1 DESCRIPTION
@@ -111,7 +112,7 @@ Jeff Zhang, <10395708@qq.com>
 Copyright (C) 2019 by Jeff Zhang
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
+it under the same terms as Perl itself, either Perl version 5.16.1 or,
 at your option, any later version of Perl 5 you may have available.
 
 

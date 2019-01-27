@@ -8,13 +8,16 @@ META.json
 META.yml
 Makefile.PL
 README
+cpanfile
 dist.ini
 lib/Types/Dist.pm
 lib/Types/OTRS.pm
 lib/Types/RENEEB.pm
+t/CpanfileTest.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/base.t
+t/cpanfile.t
 t/dist/fq.t
 t/dist/name.t
 t/dist/version.t

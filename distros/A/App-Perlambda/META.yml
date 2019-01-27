@@ -1,0 +1,52 @@
+---
+abstract: 'A CLI tool for managing Lambda functions with Lambda Perl layer.'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Perlambda
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Perlambda:
+    file: lib/App/Perlambda.pm
+    version: '0.01'
+  App::Perlambda::CLI:
+    file: lib/App/Perlambda/CLI.pm
+  App::Perlambda::CLI::Create:
+    file: lib/App/Perlambda/CLI/Create.pm
+  App::Perlambda::CLI::Dist:
+    file: lib/App/Perlambda/CLI/Dist.pm
+  App::Perlambda::CLI::Help:
+    file: lib/App/Perlambda/CLI/Help.pm
+  App::Perlambda::CLI::Update:
+    file: lib/App/Perlambda/CLI/Update.pm
+  App::Perlambda::Util:
+    file: lib/App/Perlambda/Util.pm
+requires:
+  AWS::CLIWrapper: '1.16'
+  perl: '5.020000'
+resources:
+  bugtracker: https://github.com/moznion/p5-App-Perlambda/issues
+  homepage: https://github.com/moznion/p5-App-Perlambda
+  repository: git://github.com/moznion/p5-App-Perlambda.git
+version: '0.01'
+x_authority: cpan:MOZNION
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

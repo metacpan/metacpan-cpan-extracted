@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.643';
+our $VERSION = '1.644';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -229,12 +229,7 @@ sub __choose {
     $self->{wantarray} = wantarray;
     $self->__undef_to_defaults();
     if ( $^O eq "MSWin32" ) {
-        if ( $self->{codepage_mapping} ) {
-            print "\e(K";
-        }
-        else {
-            print "\e(U";
-        }
+        print $opt->{codepage_mapping} ? "\e(K" : "\e(U";
     }
     $self->__copy_orig_list( $orig_list_ref );
     $self->__length_longest();
@@ -245,9 +240,6 @@ sub __choose {
     };
     $self->__init_term();
     ( $self->{term_width}, $self->{term_height} ) = $self->{plugin}->__get_term_size();
-    if ( $self->{ll} && $self->{ll} > $self->{term_width} ) {
-        return -2;                                                          ###
-    }
     $self->__write_first_screen();
     my $fast_page = 25;
     #if ( $self->{count_pp} > 30_000 ) {
@@ -728,6 +720,9 @@ sub __write_first_screen {
         #                 with only one print-column the output doesn't get messed up if an item
         #                 reaches the right edge of the terminal on a non-MSWin32-OS
     }
+    if ( $self->{ll} && $self->{ll} > $self->{avail_width} ) {
+        return -2;                                                          ###
+    }
     if ( $self->{max_width} && $self->{avail_width} > $self->{max_width} ) {
         $self->{avail_width} = $self->{max_width};
     }
@@ -1176,7 +1171,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.643
+Version 1.644
 
 =cut
 

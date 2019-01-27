@@ -30,7 +30,7 @@
         state $native_prefix = 'https://ajax.googleapis.com/ajax/libs/jquery';
 
         if (wantarray) {
-            $cdn->get_script_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/jquery.min.js" : $cdn->("/static/jquery/$ver/jquery.min.js") );
+            return $cdn->get_script_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/jquery.min.js" : $cdn->("/static/jquery/$ver/jquery.min.js") );
         }
         else {
             return $native ? "$native_prefix/" . substr $ver, 1 : $cdn->("/static/jquery/$ver");
@@ -89,7 +89,7 @@
 
     # amCharts4
     amcharts4 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.0.22 );
+        my $ver = version->parse( $args->{ver} // v4.0.24 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4';
 
@@ -118,6 +118,25 @@
         }
         else {
             return $native ? $native_prefix : $cdn->("/static/amcharts-geodata/$ver");
+        }
+    },
+
+    # pdfjs
+    pdfjs => sub ( $cdn, $native, $args ) {
+        my $ver = version->parse( $args->{ver} // v2.0.943 );
+
+        state $native_prefix = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js';
+
+        if (wantarray) {
+            my @res;
+
+            push @res, $cdn->get_script_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/pdf.min.js"        : $cdn->("/static/pdfjs/$ver/pdf.min.js") );
+            push @res, $cdn->get_script_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/pdf.worker.min.js" : $cdn->("/static/pdfjs/$ver/pdf.worker.min.js") );
+
+            return @res;
+        }
+        else {
+            return $native ? "$native_prefix/" . substr $ver, 1 : $cdn->("/static/pdfjs/$ver");
         }
     },
 
@@ -161,7 +180,7 @@
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (33)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (38)                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

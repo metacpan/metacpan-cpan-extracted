@@ -4,6 +4,18 @@ The contributors that suggested a given feature are shown in [].  [by ...]
 indicates the contributor was also the author of the fix; Thanks!
 
 
+* Verilog::Language 3.460 2019-01-26
+
+***	Fix Verilog::Std being empty on fork, bug1394. [Corey Teffetalor]
+
+
+* Verilog::Language 3.458 2019-01-24
+
+***     Add Verilog::Cell::range accessor, bug1393. [Ed Carstens]
+
+****    For write_verilog, print any cell parameters.
+
+
 * Verilog::Language 3.456 2018-10-28
 
 ****    Fix number parsing with newline after radix, bug1340. [George Cuan]
@@ -1404,7 +1416,7 @@ DESCRIPTION: Documentation on change history for this package
 
 This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
 
-Copyright 2001-2018 by Wilson Snyder.  This program is free software;
+Copyright 2001-2019 by Wilson Snyder.  This program is free software;
 you can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

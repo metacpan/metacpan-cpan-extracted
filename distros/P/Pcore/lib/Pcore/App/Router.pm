@@ -112,9 +112,9 @@ sub _get_host_map ( $self, $host, $ns ) {
     }
 
     # check, that index controller is present
-    if ( !exists $map->{'/'} ) {
-        die qq[HTTP router path "/" is required but not found for host "$host"];
-    }
+    die qq[HTTP router path "/" is required but not found for host "$host"] if !exists $map->{'/'};
+
+    die qq[Index controller "$map->{'/'}" must inherit "Pcore::App::Controller::Index" role] if !$self->{class_ctrl}->{ $map->{'/'} }->does('Pcore::App::Controller::Index');
 
     return $map;
 }

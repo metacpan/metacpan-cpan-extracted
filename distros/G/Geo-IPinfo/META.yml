@@ -25,4 +25,4 @@ requires:
   JSON: '0'
   LWP::UserAgent: '0'
   perl: '5.006'
-version: v1.1.1
+version: v1.2.0

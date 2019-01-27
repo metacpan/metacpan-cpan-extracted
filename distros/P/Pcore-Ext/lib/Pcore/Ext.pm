@@ -1,4 +1,4 @@
-package Pcore::Ext v0.19.2;
+package Pcore::Ext v0.19.5;
 
 use Pcore -dist, -class;
 use Pcore::Util::Scalar qw[is_ref];
@@ -28,6 +28,7 @@ has ext_ver   => 'v6.6.0';
 has ext_theme => 'material';
 
 our $FRAMEWORK;
+our $MODULES;
 
 sub BUILD ( $self, $args ) {
     $self->{api_namespace} //= $self->{namespace} =~ s/:://smgr;
@@ -45,64 +46,76 @@ sub BUILD ( $self, $args ) {
 
 # TODO reload
 sub _load_module ( $self, $module ) {
-    my $prefix = $module =~ s/[.]pm\z//smr;
-
-    my $package = $prefix =~ s[/][::]smgr;
-
-    my $package_ref_attrs;
-
-    # add MODIFY_CODE_ATTRIBUTES method
-    *{"$package\::MODIFY_CODE_ATTRIBUTES"} = sub ( $pkg, $ref, @attrs ) {
-        my @bad;
-
-        for my $attr (@attrs) {
-            if ( $attr =~ /(Name|Extend|Override|Type|Alias) [(] (?:'(.+?)')? [)]/smxx ) {
-                my ( $attr, $val ) = ( $1, $2 );
-
-                $package_ref_attrs->{$ref}->{ lc $attr } = $val;
-            }
-            else {
-                push @bad, $attr;
-            }
-        }
-
-        return @bad;
-    };
-
-    # configure package
-    *{"$package\::raw"}  = sub {...};
-    *{"$package\::func"} = sub {...};
-    *{"$package\::cdn"}  = \undef;
-    *{"$package\::api"}  = \undef;
-    *{"$package\::class"} = \undef;
-    *{"$package\::type"}  = \undef;
-
-    eval { require $module };
-
-    my $stash = Package::Stash::XS->new($package);
-
-    # cleanup
-    $stash->remove_symbol('&MODIFY_CODE_ATTRIBUTES');
-
-    die $@ if $@;
-
     my $classes;
 
-    for my $method_name ( grep {/\AEXT_/sm} $stash->list_all_symbols('CODE') ) {
-        my $name = $method_name =~ s/\AEXT_//smr;
+    if ( exists $MODULES->{$module} ) {
+        for my $class ( keys $MODULES->{$module}->%* ) {
+            $self->{classes}->{$class} = Pcore::Ext::Build::Class->new( $MODULES->{$module}->{$class}->%*, app => $self );
 
-        my $class = $self->{classes}->{"/$prefix/$name"} = Pcore::Ext::Build::Class->new(
-            app     => $self,
-            path    => "/$prefix/$name",
-            package => $package,
-            method  => $method_name,
-            ( $package_ref_attrs->{ *{"$package\::$method_name"}{CODE} } // {} )->%*,
-        );
+            $classes->{$class} = 1;
+        }
+    }
+    else {
+        my $prefix = $module =~ s/[.]pm\z//smr;
 
-        $classes->{ $class->{path} } = 1;
+        my $package = $prefix =~ s[/][::]smgr;
 
-        # set ExtJS class name
-        $class->{name} //= "$prefix/$name" =~ s[/][.]smgr;
+        my $package_ref_attrs;
+
+        # add MODIFY_CODE_ATTRIBUTES method
+        *{"$package\::MODIFY_CODE_ATTRIBUTES"} = sub ( $pkg, $ref, @attrs ) {
+            my @bad;
+
+            for my $attr (@attrs) {
+                if ( $attr =~ /(Name|Extend|Override|Type|Alias) [(] (?:'(.+?)')? [)]/smxx ) {
+                    my ( $attr, $val ) = ( $1, $2 );
+
+                    $package_ref_attrs->{$ref}->{ lc $attr } = $val;
+                }
+                else {
+                    push @bad, $attr;
+                }
+            }
+
+            return @bad;
+        };
+
+        # configure package
+        *{"$package\::raw"}  = sub {...};
+        *{"$package\::func"} = sub {...};
+        *{"$package\::cdn"}  = \undef;
+        *{"$package\::api"}  = \undef;
+        *{"$package\::class"} = \undef;
+        *{"$package\::type"}  = \undef;
+
+        eval { require $module };
+
+        my $stash = Package::Stash::XS->new($package);
+
+        # cleanup
+        $stash->remove_symbol('&MODIFY_CODE_ATTRIBUTES');
+
+        die $@ if $@;
+
+        for my $method_name ( grep {/\AEXT_/sm} $stash->list_all_symbols('CODE') ) {
+            my $name = $method_name =~ s/\AEXT_//smr;
+
+            my $path = "/$prefix/$name";
+
+            $MODULES->{$module}->{$path} = {
+                path    => $path,
+                package => $package,
+                method  => $method_name,
+                ( $package_ref_attrs->{ *{"$package\::$method_name"}{CODE} } // {} )->%*,
+            };
+
+            # set ExtJS class name
+            $MODULES->{$module}->{$path}->{name} //= "$prefix/$name" =~ s[/][.]smgr;
+
+            my $class = $self->{classes}->{$path} = Pcore::Ext::Build::Class->new( $MODULES->{$module}->{$path}->%*, app => $self );
+
+            $classes->{$path} = 1;
+        }
     }
 
     return [ keys $classes->%* ];
@@ -595,11 +608,11 @@ sub _prepare_js ( $self, $js, $devel = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 73, 74               | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 84, 85               | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 80                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 91                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 183                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
+## |    3 | 196                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

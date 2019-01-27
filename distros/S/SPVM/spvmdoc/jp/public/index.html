@@ -408,18 +408,18 @@ my $total = MyMath->sum($sp_nums);
         SPVMの言語仕様の詳細です。
       </p>
       <ul class="toc">
-        <li><a href="#language-c99">C99準拠</a>
-        <li><a href="#language-parser">構文解析</a>
-        <li><a href="#language-comment">コメント</a>
-        <li><a href="#language-pod">POD</a>
-        <li><a href="#language-package">パッケージ</a>
-        <li><a href="#language-module">モジュール</a>
-        <li><a href="#language-package-var">パッケージ変数</a>
-        <li><a href="#language-field">フィールド</a>
-        <li><a href="#language-sub">サブルーチン</a>
-        <li><a href="#language-enum">列挙</a>
-        <li><a href="#language-begin-block">BEGINブロック</a>
-        <li><a href="#language-lex-var">レキシカル変数</a>
+        <li><a href="#language-c99">C99準拠</a></li>
+        <li><a href="#language-parser">構文解析</a></li>
+        <li><a href="#language-comment">コメント</a></li>
+        <li><a href="#language-pod">POD</a></li>
+        <li><a href="#language-package">パッケージ</a></li>
+        <li><a href="#language-module">モジュール</a></li>
+        <li><a href="#language-package-var">パッケージ変数</a></li>
+        <li><a href="#language-field">フィールド</a></li>
+        <li><a href="#language-sub">サブルーチン</a></li>
+        <li><a href="#language-enum">列挙</a></li>
+        <li><a href="#language-begin-block">BEGINブロック</a></li>
+        <li><a href="#language-lex-var">レキシカル変数</a></li>
         <li><a href="#language-block">ブロック</a></li>
         <li><a href="#language-scope">スコープ</a></li>
         <li><a href="#language-term">項</a></li>
@@ -873,7 +873,7 @@ package Foo {
         <li>モジュールの概要</li>
         <li>モジュールの読み込み</li>
       </ul>
-      <h3 class="language-module-summary">モジュールの概要</h3>
+      <h4 class="language-module-summary">モジュールの概要</h4>
       <p>
         モジュールとは、SPVMのソースコードとして読み込むことができるひとつのファイルのことをいいます。
       </p>
@@ -896,7 +896,7 @@ package Foo::Bar::Baz {
 
 }
 </pre>
-      <h3 class="language-module-path">モジュールのファイル名</h3>
+      <h4 class="language-module-path">モジュールのファイル名</h4>
       <p>
         モジュールは、モジュールの読み込みパスに、以下のファイル名で配置される必要があります。
       </p>
@@ -908,7 +908,7 @@ Foo.spvm
 Foo/Bar.spvm
 Foo/Bar/Baz.spvm
 </pre>
-      <h3 class="language-module-load">モジュールの読み込み</h3>
+      <h4 class="language-module-load">モジュールの読み込み</h4>
       <p>
         モジュールを読み込むには、useキーワードを使用します。
       </p>
@@ -930,7 +930,7 @@ package Foo {
   use Foo;
 }
 </pre>
-      <h3 class="language-module-load-if-require">選択的なモジュールの読み込み</h3>
+      <h4 class="language-module-load-if-require">選択的なモジュールの読み込み</h4>
       <p>
         SPVMでは、モジュールが、検索パスに存在する場合だけ読み込み、そうでない場合は、ブロックの内部が存在しないことにできるif require文があります。これはC言語の「#ifdef」の一部の機能を実現するために設計されました。
       </p>
@@ -984,8 +984,7 @@ my $result = $interface->foo(3);
       <ul class="list">
         <li><a href="#language-package-var-definition">パッケージ変数の定義</a></li>
         <li><a href="#language-package-var-initial-value">パッケージ変数の初期値</a></li>
-        <li><a href="#language-package-var-get">パッケージ変数の値の取得</a></li>
-        <li><a href="#language-package-var-set">パッケージ変数の値の設定</a></li>
+        <li><a href="#language-package-var-access">パッケージ変数へのアクセス</a></li>
       </ul>
       <h4 id="language-package-var-definition">パッケージ変数の定義</h4>
       <p>
@@ -1106,7 +1105,7 @@ package Foo {
 </pre>
       <h4 id="language-package-var-initial-value">パッケージ変数の初期値</h4>
       <p>
-        パッケージ変数は、コンパイルが終了して、実行時に入る前に、<a href="language-type-initial-value">型の初期値</a>で初期化されます。
+        パッケージ変数は、コンパイルが終了して、実行時に入る前に、<a href="#language-type-initial-value">型の初期値</a>で初期化されます。
       </p>
       <p>
         この初期値は、<a href="#language-begin-block">BEGINブロック</a>を使うことで、変更することができます。
@@ -1120,80 +1119,21 @@ package Foo {
   }
 }
 </pre>
-      <h4 id="language-package-var-get">パッケージ変数の値の取得</h4>
+      <h4 id="language-package-var-access">パッケージ変数へのアクセス</h4>
       <p>
-        パッケージ変数の値を取得するには以下の構文を使用します。
-      </p>
-<pre>
-$クラス名::パッケージ変数名
-</pre>
-      <p>
-        自分自身のパッケージに属するパッケージ変数の場合は「クラス名::」を省略できます。
-      </p>
-<pre>
-$パッケージ変数名
-</pre>
-      <p>
-       パッケージ変数の値の取得は、<a href="#language-expression">式</a>を返します。
+        パッケージ変数へのアクセスとは、パッケージ変数にアクセスして、値を取得したり、設定したりする操作のことです。
       </p>
       <p>
-        定義されていないパッケージ変数の値を取得しようとした場合は、コンパイル時エラーが発生します。
+        パッケージ変数の値の取得については、<a href="#language-expression-get-package-var">パッケージ変数の値の取得</a>を見てください。
       </p>
       <p>
-        パッケージの外側からプライベートなパッケージ変数にアクセスしようとした場合は、コンパイル時エラーが発生します。
+        パッケージ変数の値の設定については、<a href="#language-expression-set-package-var">パッケージ変数の値の設定</a>を見てください。
       </p>
-      <p>
-        <b>パッケージ変数の値の取得のサンプル</b>
-      </p>
-<pre>
-package Foo {
-  our $VAR : int;
-  
-  sub bar : int () {
-    my $var1 = $Foo::VAR;
-    my $var2 = $VAR;
-  }
-}
-</pre>
-      <h4 id="language-package-var-set">パッケージ変数の値の取得</h4>
-      <p>
-        パッケージ変数の値を設定するには以下の構文を使用します。
-      </p>
-<pre>
-$クラス名::パッケージ変数名 = 右式
-</pre>
-        自分自身のパッケージに属するパッケージ変数の場合は「クラス名::」を省略できます。
-      </p>
-<pre>
-$パッケージ変数名 = 右式
-</pre>
-      <p>
-        パッケージ変数設定は、<a href="#language-expression">式</a>を返します。返される結果は、代入後のパッケージ変数の値です。
-      </p>
-      <p>
-        定義されていないパッケージ変数の値を設定しようとした場合は、コンパイル時エラーが設定します。
-      </p>
-      <p>
-        パッケージの外側からプライベートなパッケージ変数にアクセスしようとした場合は、コンパイル時エラーが発生します。
-      </p>
-      <p>
-        <b>パッケージ変数の値の取得のサンプル</b>
-      </p>
-<pre>
-package Foo {
-  our $VAR : int;
-  
-  sub bar : int () {
-    $Foo::VAR = 1;
-    $VAR = 3;
-  }
-}
-</pre>
       
       <h3 id="language-field">フィールド</h3>
       <ul class="list">
         <li><a href="#language-field-definition">フィールドの定義</a></li>
-        <li><a href="#language-field-access">フィールドアクセス</a></li>
+        <li><a href="#language-field-access">フィールドへのアクセス</a></li>
       </ul>
       <h4 id="language-field-definition">フィールドの定義</h4>
       <p>
@@ -1315,27 +1255,67 @@ package Foo {
   has num_rw : rw int;
 }
 </pre>
+      <h4 id="language-field-access">フィールドへのアクセス</h4>
       <p>
-        不正なフィールドの定義は、コンパイル時エラーが発生します。
+        フィールドへのアクセスとは、フィールドにアクセスして、値を取得したり、設定したりする操作のことです。
       </p>
-      <h4 id="language-field-access">フィールドアクセス</h4>
       <p>
-        フィールドの取得の構文は以下です。
-      </p>
-<pre>
-インボーカー式->{フィールド名}
-</pre>
-      <p>
-        フィールドの設定の構文は以下です。
+        フィールドアクセスは、一種類の構文で、三つの異なる意味を持ちます。
       </p>
 <pre>
-インボーカー式->{フィールド名} = 右式;
+インボカント->{フィールド名}
 </pre>
       <p>
-        インボーカー式は、<a href="#language-type-class">クラス型</a>あるいは<a href="#language-type-value">値型</a>あるいは<a href="#language-type-ref-value">値のリファレンス型</a>である必要があります。そうでない場合は、コンパイル時エラーが発生します。
+        <b>1. クラス型のフィールドへのアクセス</b>
       </p>
       <p>
-        フィールド名がインボーカー式のパッケージに存在しない場合は、
+        <a href="#language-type-class">クラス型</a>を元に<a href="#language-operator-new-object">オブジェクトの生成</a>が行われた場合は、オブジェクトからフィールドにアクセスすることができます。
+      </p>
+<pre>
+my $point = new Point;
+$point->{x} = 1;
+</pre>
+
+      <p>
+        クラス型のフィールドの取得については、<a href="#language-expression-get-field-class">クラス型のフィールドの値の取得</a>を見てください。
+      </p>
+      <p>
+        クラス型のフィールドの設定については、<a href="#language-expression-set-field-class">クラス型のフィールドの値の設定</a>を見てください。
+      </p>
+      <p>
+        <b>2. 値型のフィールドへのアクセス</b>
+      </p>
+      <p>
+        2. <a href="#language-type-value">値型</a>におけるフィールドは、値型の変数の宣言をすれば、その変数からフィールドにアクセスできます。これは、レキシカル変数領域におけるアクセスです。
+      </p>
+<pre>
+my $z : SPVM::Complex_2d;
+$z->{re} = 1;
+$z->{im} = 3;
+</pre>
+      <p>
+        値型のフィールドの取得については、<a href="#language-expression-get-field-value">値型のフィールドの値の取得</a>を見てください。
+      </p>
+      <p>
+        値型のフィールドの設定については、<a href="#language-expression-set-field-value">値型のフィールドの値の設定</a>を見てください。
+      </p>
+      <p>
+        <b>3. デリファレンスによる値型のフィールドのアクセス</b>
+      </p>
+      <p>
+        値型の変数に対するリファレンス型から、デリファレンスを行って直接に値型のフィールドにアクセスできます。
+      </p>
+<pre>
+my $z : SPVM::Complex_2d;
+my $z_ref = \$z;
+$z_ref->{re} = 1;
+$z_ref->{im} = 3;
+</pre>
+      <p>
+        デリファレンスによる値型のフィールドの取得については、<a href="#language-expression-get-field-value-deref">デリファレンスによる値型のフィールドの取得</a>を見てください。
+      </p>
+      <p>
+        デリファレンスによる値型のフィールドの設定については、<a href="#language-expression-set-field-value-deref">デリファレンスによる値型のフィールドの設定</a>を見てください。
       </p>
 
       <h3 id="language-sub">サブルーチン</h3>
@@ -1666,7 +1646,7 @@ BEGIN {
         BEGINブロックの実行順序は、保証されません。他のパッケージにBEGINブロックが定義されている場合は、そのBEGINブロックが先に実行されることを想定しないでください。
       </p>
       <p>
-        BEGINブロックの一般的な用途は、パッケージ変数を初期化することです。
+        BEGINブロックの一般的な用途は、<a href="#language-package-var">パッケージ変数</a>を初期化することです。
       </p>
 <pre>
 package Foo {
@@ -1683,17 +1663,11 @@ package Foo {
       <ul class="list">
         <li><a href="#language-lex-var-declaration">レキシカル変数の宣言</a></li>
         <li><a href="#language-lex-var-initial-value">レキシカル変数の初期値</a></li>
-        <li><a href="#language-lex-var-value-get">レキシカル変数の値の取得</a></li>
+        <li><a href="#language-lex-var-access">レキシカル変数へのアクセス</a></li>
       </ul>
       <h4 id="language-lex-var-declaration">レキシカル変数の宣言</h4>
       <p>
-        レキシカル変数は「my」キーワードによって宣言します。「:」の後ろに「<a href="#language-type">型</a>」を指定する必要があります。
-      </p>
-<pre>
-my $num : int;
-</pre>
-      <p>
-        レキシカル変数は<a href="#language-scope-block">スコープブロック</a>の中で宣言され、<a href="#language-scope">スコープ</a>を持つ変数のことです。
+        レキシカル変数とは、<a href="#language-scope-block">スコープブロック</a>の中で利用できる、<a href="#language-scope">スコープ</a>を持つ変数のことです。C言語のローカル変数に該当します。
       </p>
 <pre>
 {
@@ -1701,10 +1675,42 @@ my $num : int;
 }
 </pre>
       <p>
+        レキシカル変数は「my」キーワードによって宣言します。「:」の後ろに「<a href="#language-type">型</a>」を指定する必要があります。
+      </p>
+<pre>
+my $num : int;
+</pre>
+      <p>
         レキシカル変数は、<a href="#language-lex-var-initial-value">レキシカル変数の初期値</a>によって初期化されます。
       </p>
+<pre>
+# 0で初期化される
+my $num : int;
+
+# 0で初期化される
+my $num : double;
+
+# undefで初期化される
+my $point : Point;
+
+# reは0, imは0で初期化される
+my $z : SPVM::Complex_2d;
+</pre>
       <p>
-        <a href="#language-type-inference">型推論</a>によって、レキシカル変数を宣言するときに、型の指定を省略することができます。型推論は、常に代入演算子の右辺の型によって、行われます。
+        レキシカル変数の宣言と同時に初期化を行うことができます。
+      </p>
+<pre>
+# 1で初期化される
+my $num : int = 1;
+
+# 2.5で初期化される
+my $num : double = 2.5;
+
+# Pointオブジェクトで初期化される
+my $point : Point = new Point;
+</pre>
+      <p>
+        <a href="#language-type-inference">型推論</a>を使うと、宣言するときに、型の指定を省略することができます。
       </p>
 <pre>
 # int
@@ -1714,7 +1720,7 @@ my $num = 1;
 my $num = 1.0;
 </pre>
       <p>
-        レキシカル変数の宣言は、レキシカル変数自体を表現する式を返します。次のような記述が可能です。
+        レキシカル変数の宣言は、レキシカル変数の値を返します。これは、<a href="#language-expression">式</a>として利用できます。
       </p>
 <pre>
 my $ppp = my $bar = 4;
@@ -1727,36 +1733,20 @@ while (my $bar = 1) {
   
 }
 </pre>
+      <h4 id="language-lex-var-initial-value">レキシカル変数の初期値</h4>
+      <p>
+        レキシカル変数は、<a href="#language-type-initial-value">型の初期値</a>で初期化されます。
+      </p>
 
-      <h4 id="language-lex-var-initial-value-get">レキシカル変数の値の取得</h4>
+      <h4 id="language-lex-var-access">レキシカル変数へのアクセス</h4>
       <p>
-        レキシカル変数の値の取得をするには、それ自体を記述します。
-      </p>
-<pre>
-レキシカル変数
-</pre>
-      <p>
-        レキシカル変数の値の取得は、式を返します。
+        レキシカル変数へのアクセスとは、レキシカル変数にアクセスして、値を取得したり、設定したりする操作のことです。
       </p>
       <p>
-        <b>キシカル変数の値の取得のサンプル</b>
+        <b>レキシカル変数の値の取得</b>については、<a href="#language-expression-get-lex-var">レキシカル変数の値の取得</a>を見てください。
       </p>
-<pre>
-$var;
-my $foo = $bar;
-</pre>
-
-      <h4 id="language-lex-var-initial-value-get">レキシカル変数の値の設定</h4>
       <p>
-        レキシカル変数の値の設定については、代入演算子を見てください。
-      </p>
-<pre>
-$var = 式
-</pre>
-      
-      <h4 id="language-lex-var-declaration">レキシカル変数の宣言</h4>
-      <p>
-        
+        <b>レキシカル変数の値の設定</b>については、<a href="#language-expression-set-lex-var">レキシカル変数の値の設定</a>を見てください。
       </p>
       
       <h3 id="language-block">ブロック</h3>
@@ -1931,16 +1921,20 @@ switch (条件) {
         <b>式の一覧</b>
       </p>
       <ul class="list">
-        <li><a href="#language-lex-var-initial-value-get">レキシカル変数の値の取得</a></li>
-        <li><a href="#language-lex-var-declaration">レキシカル変数変数の宣言</a></li>
+        <li><a href="#language-expression-get-lex-var">レキシカル変数の値の取得</a></li>
+        <li><a href="#language-expression-set-lex-var">レキシカル変数の値の設定</a></li>
         <li>例外変数</li>
-        <li><a href="#language-package-var-set">パッケージ変数の値の設定</a></li>
-        <li><a href="#language-package-var-get">パッケージ変数の値の取得</a></li>
-        <li><a href="language-literal">リテラル</a></li>
-        <li><a href="language-undef">未定義値</a></li>
+        <li><a href="#language-expression-get-package-var">パッケージ変数の値の設定</a></li>
+        <li><a href="#language-expression-set-package-var">パッケージ変数の値の取得</a></li>
+        <li><a href="#language-literal">リテラル</a></li>
+        <li><a href="#language-undef">未定義値</a></li>
         <li>サブルーチン呼び出し</li>
-        <li>フィールドの設定</li>
-        <li>フィールドの取得</li>
+        <li><a href="#language-expression-get-field-class">クラス型のフィールドの値の取得</a></li>
+        <li><a href="#language-expression-set-field-class">クラス型のフィールドの値の設定</a></li>
+        <li><a href="#language-expression-get-field-value">値型のフィールドの値の取得</a></li>
+        <li><a href="#language-expression-set-field-value">値型のフィールドの値の設定</a></li>
+        <li><a href="#language-expression-get-field-value-deref">デリファレンスによる値型のフィールドの取得</a></li>
+        <li><a href="#language-expression-set-field-value-deref">デリファレンスによる値型のフィールドの設定</a></li>
         <li>配列の要素の設定</li>
         <li>配列の要素の取得</li>
         <li>型変換</li>
@@ -1960,6 +1954,122 @@ switch (条件) {
         <li><a href="#language-expression-current-line">現在の行番号の取得</a></li>
         <li>(式)</li>
       </ul>
+      <h4 id="language-expression-get-lex-var">レキシカル変数の値の取得</h4>
+      <p>
+        レキシカル変数の値の取得をするには、レキシカル変数自体を記述します。
+      </p>
+<pre>
+$var
+</pre>
+      <p>
+        レキシカル変数の値の取得は、<a href="#language-expression">式</a>です。
+      </p>
+
+      <h4 id="language-expression-set-lex-var">レキシカル変数の値の設定</h4>
+      <p>
+        レキシカル変数の値の設定を行うには、<a href="#language-operator-assign">代入演算子</a>を使用します。
+      </p>
+<pre>
+$var = 右式
+</pre>
+      <p>
+        代入が<a href="#language-type-compatible">型の互換性</a>を満たさない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        レキシカル変数の値の設定は、設定後の値を返します。
+      </p>
+      <p>
+        レキシカル変数の値の設定は、<a href="#language-expression">式</a>です。
+      </p>
+      <h4 id="language-expression-get-package-var">パッケージ変数の値の取得</h4>
+      <p>
+        パッケージ変数の値を取得するには以下の構文を使用します。
+      </p>
+<pre>
+$クラス名::パッケージ変数名
+</pre>
+      <p>
+        自分自身のパッケージに属するパッケージ変数の場合は「クラス名::」を省略できます。
+      </p>
+<pre>
+$パッケージ変数名
+</pre>
+      <p>
+       パッケージ変数の値の取得は、<a href="#language-expression">式</a>を返します。
+      </p>
+      <p>
+        定義されていないパッケージ変数の値を取得しようとした場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        パッケージの外側からプライベートなパッケージ変数にアクセスしようとした場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        <b>パッケージ変数の値の取得のサンプル</b>
+      </p>
+<pre>
+package Foo {
+  our $VAR : int;
+  
+  sub bar : int () {
+    my $var1 = $Foo::VAR;
+    my $var2 = $VAR;
+  }
+}
+</pre>
+      <h4 id="language-expression-set-package-var">パッケージ変数の値の設定</h4>
+      <p>
+        パッケージ変数の値を設定するには以下の構文を使用します。
+      </p>
+<pre>
+$クラス名::パッケージ変数名 = 右式
+</pre>
+        自分自身のパッケージに属するパッケージ変数の場合は「クラス名::」を省略できます。
+      </p>
+<pre>
+$パッケージ変数名 = 右式
+</pre>
+      <p>
+        パッケージ変数設定は、<a href="#language-expression">式</a>を返します。返される結果は、代入後のパッケージ変数の値です。
+      </p>
+      <p>
+        定義されていないパッケージ変数の値を設定しようとした場合は、コンパイル時エラーが設定します。
+      </p>
+      <p>
+        パッケージの外側からプライベートなパッケージ変数にアクセスしようとした場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        <b>パッケージ変数の値の設定のサンプル</b>
+      </p>
+<pre>
+package Foo {
+  our $VAR : int;
+  
+  sub bar : int () {
+    $Foo::VAR = 1;
+    $VAR = 3;
+  }
+}
+</pre>
+      <h4 id="language-field-access">クラス型のフィールドの取得</h4>
+      <p>
+        フィールドの取得の構文は以下です。
+      </p>
+<pre>
+インボーカー式->{フィールド名}
+</pre>
+      <p>
+        フィールドの設定の構文は以下です。
+      </p>
+<pre>
+インボーカー式->{フィールド名} = 右式;
+</pre>
+      <p>
+        インボーカー式は、<a href="#language-type-class">クラス型</a>あるいは<a href="#language-type-value">値型</a>あるいは<a href="#language-type-ref-value">値のリファレンス型</a>である必要があります。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールド名がインボーカー式のパッケージに存在しない場合は、コンパイル時エラーが発生します。
+      </p>
+
       <h4 id="language-expression-current-package">現在のパッケージ名の取得</h4>
       <p>
         現在のパッケージ名の取得を行う「__PACKAGE__」キーワードを使用します。
@@ -2704,6 +2814,9 @@ undef
         <li><a href="#language-operator-logical-not">論理NOT演算子</a></li>
         <li><a href="#language-operator-concat">文字列連結演算子</a></li>
         <li><a href="#language-operator-assign">代入演算子</a></li>
+        <li><a href="#language-operator-assign-special">特殊代入演算子</a></li>
+        <li><a href="#language-operator-ref">リファレンス生成演算子</a></li>
+        <li><a href="#language-operator-deref">デリファレンス演算子</a></li>
       </ul>
       
       <h4 id="language-operator-summary">演算子の概要</h4>
@@ -2809,7 +2922,7 @@ my $num = -10;
 </pre>
       <h4 id="language-operator-add">加算演算子</h4>
       <p>
-        加算演算子は「+」で表現される<a href="#language-operator-binary">二項演算子</a>です。
+        加算演算子は「+」で表現される、加算を行うための<a href="#language-operator-binary">二項演算子</a>です。
       </p>
 <pre>
 左式 + 右式
@@ -3085,7 +3198,7 @@ x << y;
 
       <h4 id="language-operator-arithmetic-right-shift">算術右シフト演算子</h4>
       <p>
-        算術右シフトは「<<」で表現される<a href="#language-operator-binary">二項演算子</a>です。
+        算術右シフトは「>>」で表現される<a href="#language-operator-binary">二項演算子</a>です。
       </p>
 <pre>
 左式 >> 右式
@@ -3460,13 +3573,234 @@ x <= y;
         実行時に、左式あるいは右式が<a href="#language-undef">未定義値</a>だった場合は、例外が発生します。
       </p>
       <p>
-        <b>文字列連結演算子のサンプル
+        <b>文字列連結演算子のサンプル</b>
       </p>
 <pre>
 my $str = "abc" . "def";
 my $str = "def" . 34;
 my $str = 123 . 456;
 </pre>
+      <h4 id="language-operator-assign">代入演算子</h4>
+      <p>
+        代入演算子は「=」で表現される、代入を行うための<a href="#language-operator-binary">二項演算子</a>です。
+      </p>
+      <p>
+        代入演算子は、右辺と左辺によって、複数の意味を持ちます。各項目を参考にしてください。
+      </p>
+      <ul>
+        <li><a href="#language-expression-set-lex-var">レキシカル変数の値の設定</a></li>
+      </ul>
+      
+      <h4 id="language-operator-assign-special">特殊代入演算子</h4>
+      <p>
+        特殊代入演算子とは、<a href="#language-operator-binary">二項演算子</a>と<a href="#language-operator-assign">代入演算子</a>の組み合わせで表現される特殊な代入を行う<a href="#language-operator-binary">二項演算子</a>のことです。
+      </p>
+<pre>
+左式 特殊代入演算子 右式
+</pre>
+      <p>
+        左式と右式が<a href="#language-type-compatible">型の互換性</a>を満たさない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        <b>特殊代入演算子の一覧</b>
+      </p>
+      <p>
+        特殊代入演算子の一覧です。
+      </p>
+      <table>
+        <tr>
+          <td>加算代入演算子</td>
+          <td>+=</td>
+        </tr>
+        <tr>
+          <td>減算代入演算子</td>
+          <td>-=</td>
+        </tr>
+        <tr>
+          <td>乗算代入演算子</td>
+          <td>*=</td>
+        </tr>
+        <tr>
+          <td>除算代入演算子</td>
+          <td>/=</td>
+        </tr>
+        <tr>
+          <td>剰余代入演算子</td>
+          <td>%=</td>
+        </tr>
+        <tr>
+          <td>ビットAND代入演算子</td>
+          <td>&=</td>
+        </tr>
+        <tr>
+          <td>ビットOR代入演算子</td>
+          <td>|=</td>
+        </tr>
+        <tr>
+          <td>左シフト代入演算子</td>
+          <td><<=</td>
+        </tr>
+        <tr>
+          <td>算術右シフト代入演算子</td>
+          <td>>>=</td>
+        </tr>
+        <tr>
+          <td>論理右シフト代入演算子</td>
+          <td>>>>=</td>
+        </tr>
+      </table>
+      <p>
+        特殊代入演算子は、次のように展開されます。
+      </p>
+<pre>
+# 展開前
+左式 特殊代入演算子 右式
+
+# 展開後
+左式 代入演算子 (左式の型によるキャスト)(左式 指定された演算子 右式)
+</pre>
+      <p>
+        たとえば、加算代入演算子の場合は、次のように展開されます。
+      </p>
+<pre>
+# 展開前 xはbyte型
+$x += 1;
+
+# 展開後
+$x = (byte)($x + 1)
+</pre>
+      <p>
+        <b>特殊代入演算子のサンプル</b>
+      </p>
+      <p>
+        特殊代入演算子のサンプルです。
+      </p>
+<pre>
+$x += 1;
+$x -= 1;
+$x *= 1;
+$x /= 1;
+$x &= 1;
+$x |= 1;
+$x ^= 1;
+$x %= 1;
+$x <<= 1;
+$x >>= 1;
+$x >>>= 1;
+</pre>
+      <h4 id="language-operator-ref">リファレンス生成演算子</h4>
+      <p>
+        リファレンス生成演算子は、<a href="#language-type-numeric">数値型</a>または<a href="#language-type-value">値型</a>の変数に対してリファレンスを生成する演算子です。C言語のアドレス演算子「&」を実現するために設計されました。
+      </p>
+<pre>
+\変数
+</pre>
+      <p>
+        変数が数値型または値型でなかった場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        リファレンス生成演算子は式を返します。
+      </p>
+      <p>
+        リファレンス生成演算子で返された結果は、対応する<a href="#language-type-ref">リファレンス型</a>に代入できます。
+      </p>
+      <pre>
+        <b>リファレンス生成演算子のサンプル</b>
+      </pre>
+<pre>
+my $num : int;
+my $num_ref : int& = \$num;
+
+my $z : SPVM::Complex_2d;
+my $z_ref : SPVM::Complex_2d& = \$z;
+</pre>
+      <h4 id="language-operator-deref-get">デリファレンスによる値の取得</h4>
+      <p>
+        デリファレンスによる値の取得とは、リファレンスから実際の値を取得するための操作のことです。C言語の関節演算子「*」を実現するために設計されました。
+      </p>
+<pre>
+$変数
+</pre>
+      <p>
+        変数の型は、リファレンス型である必要があります。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        デリファレンスによる値の取得は、<a href="#language-expression">式</a>を返します。
+      </p>
+      <pre>
+        <b>デリファレンスによる値の取得のサンプル</b>
+      </pre>
+<pre>
+my $num : int;
+my $num_ref : int& = \$num;
+my $num_deref : int = $$num_ref;
+
+my $z : SPVM::Complex_2d;
+my $z_ref : SPVM::Complex_2d& = \$z;
+my $z_deref : SPVM::Complex_2d = $$z_ref;
+</pre>
+      <h4 id="language-operator-deref-get">デリファレンスによる値の取得</h4>
+      <p>
+        デリファレンスによる値の取得とは、リファレンスから実際の値を取得するための操作のことです。C言語の関節演算子「*」を実現するために設計されました。
+      </p>
+<pre>
+$変数
+</pre>
+      <p>
+        変数の型は、リファレンス型である必要があります。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        デリファレンスによる値の取得は、<a href="#language-expression">式</a>を返します。
+      </p>
+      <pre>
+        <b>デリファレンスによる値の取得のサンプル</b>
+      </pre>
+<pre>
+my $num : int;
+my $num_ref : int& = \$num;
+my $num_deref : int = $$num_ref;
+
+my $z : SPVM::Complex_2d;
+my $z_ref : SPVM::Complex_2d& = \$z;
+my $z_deref : SPVM::Complex_2d = $$z_ref;
+</pre>
+      <h4 id="language-operator-deref-set">デリファレンスによる値の設定</h4>
+      <p>
+        デリファレンスによる値の設定とは、リファレンスから実際の値を設定するための操作のことです。C言語の関節演算子「*」を実現するために設計されました。
+      </p>
+<pre>
+$変数 = 式
+</pre>
+      <p>
+        変数の型は、リファレンス型である必要があります。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        式の型は、デリファレンスされた場合の変数の型に一致していなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        デリファレンスによる値の設定は、設定された値を返します。これは<a href="#language-expression">式</a>です。
+      </p>
+      <pre>
+        <b>デリファレンスによる値の設定のサンプル</b>
+      </pre>
+<pre>
+my $num : int;
+my $num_ref : int& = \$num;
+$$num_ref = 1;
+
+my $z : SPVM::Complex_2d;
+my $z_ref : SPVM::Complex_2d& = \$z;
+
+my $z2 : SPVM::Complex_2d;
+
+$$z_ref = $z2;
+</pre>
+      
+        <li><a href="#language-operator-assign">代入演算子</a></li>
+        <li><a href="#language-operator-assign-special">特殊代入演算子</a></li>
+        <li><a href="#language-operator-ref">リファレンス生成演算子</a></li>
+        <li><a href="#language-operator-deref">デリファレンス演算子</a></li>
+        
       <h3 id="language-operator-precedence">演算子の優先順位</h3>
       <p>
         演算子の優先順位は、以下の通りです。下にいくほど、優先順位が高くなります。
@@ -3492,8 +3826,8 @@ my $str = 123 . 456;
             ビットOR代入演算子「|=」<br>
             ビット排他OR代入演算子「^=」<br>
             左シフト代入演算子「<<=」<br>
-            符号付右シフト代入演算子「>>=」<br>
-            符号なし右シフト演算子「>>>=」<br>
+            算術右シフト代入演算子「>>=」<br>
+            論理右シフト演算子「>>>=」<br>
             文字列結合代入演算子「.=」
           </td>
         </tr>

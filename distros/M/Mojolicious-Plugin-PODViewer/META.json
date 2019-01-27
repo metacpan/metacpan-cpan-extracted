@@ -53,7 +53,7 @@
    "provides" : {
       "Mojolicious::Plugin::PODViewer" : {
          "file" : "lib/Mojolicious/Plugin/PODViewer.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/preaction/Mojolicious-Plugin-PODViewer"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "brad <brad@clickmagick.com>",

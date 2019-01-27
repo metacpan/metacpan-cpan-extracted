@@ -7,6 +7,7 @@ use YAML::XS;
 use Digest::MD5;
 use MYDan::Agent::FileCache;
 use File::Basename;
+use MYDan::Util::FastMD5;
 
 local $/ = undef;
 
@@ -25,9 +26,8 @@ my $do = 1;
 my $filecache = MYDan::Agent::FileCache->new();
 if( $filecache->usable() && -f $path )
 {
-    open my $fh, "<$path" or &$idie( "Open file fail: $!" );
-    my $md5 = Digest::MD5->new()->addfile( $fh )->hexdigest;
-    close $fh;
+    my $md5 = eval{ MYDan::Util::FastMD5->hexdigest( $path ) };
+    &$idie( "fastmd5 fail: $@" ) if $@;
 
     if( $md5 eq $conf->{md5} )
     {
@@ -56,9 +56,8 @@ if( $do )
     &$idie( "get $conf->{chown} uid fail" ) if $conf->{chown} && ! ( my @pw = getpwnam $conf->{chown} );
 
     &$unlink( $temp, "save fail: $!" ) if system "mv '$MYDanExtractFile' '$temp'";
-    open my $fh, "<$temp" or &$idie( "Open MYDanExtractFile fail: $!" );
-    my $md5 = Digest::MD5->new()->addfile( $fh )->hexdigest;
-    close $fh;
+    my $md5 = eval{ MYDan::Util::FastMD5->hexdigest( $temp ) };
+    &$idie( "fastmd5 fail MYDanExtractFile: $@" ) if $@;
 
     &$unlink( $temp, 'chomd fail' ) if $conf->{chmod}
          && ! chmod oct $conf->{chmod}, $temp;

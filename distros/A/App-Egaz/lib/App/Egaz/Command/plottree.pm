@@ -92,7 +92,13 @@ sub execute {
                 font = 3,
                 xpd = TRUE
             )
-            add.scale.bar(cex = 0.8, lwd = 2, length = barlen)
+            add.scale.bar(
+                x = 0,
+                y = 0.85,
+                cex = 0.8,
+                lwd = 2,
+                length = barlen
+            )
         }}    # Don't start a new line here
     );
     $R->run(q{ tree <- read.tree(datafile) });

@@ -1,5 +1,8 @@
 Revision history for Perl extension MouseX-Getopt
 
+0.38 2019-01-26T03:38:09Z
+  * Cope with GLD output changes in version 0.103 (#13, by pghmcfc)
+
 0.37 2016-07-13T03:23:39Z
   * Cope with GLD output changes in version 0.100 (#10, by pghmcfc)
 

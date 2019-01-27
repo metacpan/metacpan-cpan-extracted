@@ -49,8 +49,8 @@ sub read_arguments {
 sub set_attributes {
     my ( $self ) = @_;
     return [
-        { name => 'mysql_enable_utf8',        default => 1, values => [ 0, 1 ] },
-        { name => 'mysql_enable_utf8mb4',     default => 0, values => [ 0, 1 ] }, ##
+        { name => 'mysql_enable_utf8',        default => 0, values => [ 0, 1 ] },
+        { name => 'mysql_enable_utf8mb4',     default => 1, values => [ 0, 1 ] },
         { name => 'mysql_bind_type_guessing', default => 1, values => [ 0, 1 ] },
     ];
 }

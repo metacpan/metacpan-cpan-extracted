@@ -1,0 +1,43 @@
+---
+abstract: 'The police that opponents to @INC contamination'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-AtIncPolice
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::AtIncPolice:
+    file: lib/Acme/AtIncPolice.pm
+    version: '0.02'
+requires:
+  Tie::Trace: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ytnobody/p5-Acme-AtIncPolice/issues
+  homepage: https://github.com/ytnobody/p5-Acme-AtIncPolice
+  repository: git://github.com/ytnobody/p5-Acme-AtIncPolice.git
+version: '0.02'
+x_authority: cpan:YTURTLE
+x_contributors:
+  - 'sazuma <azuma.satoshi@colon.ne.jp>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

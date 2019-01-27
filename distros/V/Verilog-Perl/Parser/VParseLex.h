@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //*************************************************************************
 //
-// Copyright 2000-2018 by Wilson Snyder.  This program is free software;
+// Copyright 2000-2019 by Wilson Snyder.  This program is free software;
 // you can redistribute it and/or modify it under the terms of either the GNU
 // Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 //
@@ -61,10 +61,10 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 extern int yylex();
 extern void yyrestart(FILE*);
 
-YY_BUFFER_STATE yy_create_buffer ( FILE *file, int size );
+YY_BUFFER_STATE yy_create_buffer (FILE *file, int size);
 YY_BUFFER_STATE yy_scan_bytes(const char *bytes, int len);
-void yy_switch_to_buffer( YY_BUFFER_STATE new_buffer );
-void yy_delete_buffer( YY_BUFFER_STATE b );
+void yy_switch_to_buffer(YY_BUFFER_STATE new_buffer);
+void yy_delete_buffer(YY_BUFFER_STATE b);
 
 class VParse;
 

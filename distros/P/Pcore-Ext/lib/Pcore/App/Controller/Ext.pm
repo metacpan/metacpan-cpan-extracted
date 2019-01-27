@@ -21,7 +21,7 @@ sub BUILD ( $self, $args ) {
         prefixes  => {
             pcore => undef,
             dist  => undef,
-            cdn   => undef,
+            app   => undef,
         },
 
         # TODO

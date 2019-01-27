@@ -1,5 +1,8 @@
 Revision history for Test::Count
 
+0.1000   2019-01-26
+    - Add Test::Count::FileMutator::ByFileType::Lib .
+
 0.0902   2018-05-02
     - Convert to dist zilla.
 

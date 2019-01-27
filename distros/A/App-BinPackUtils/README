@@ -3,8 +3,8 @@ NAME
     into bins
 
 VERSION
-    This document describes version 0.003 of App::BinPackUtils (from Perl
-    distribution App-BinPackUtils), released on 2019-01-17.
+    This document describes version 0.004 of App::BinPackUtils (from Perl
+    distribution App-BinPackUtils), released on 2019-01-27.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:
@@ -68,7 +68,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   dvd_size => *filesize* (default: 4712300544)
+    *   dvd_size => *filesize* (default: 4687134720)
 
     *   files* => *array[filename]*
 
@@ -110,7 +110,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   dvd_size => *filesize* (default: 4712300544)
+    *   dvd_size => *filesize* (default: 4687134720)
 
     *   files* => *array[filename]*
 

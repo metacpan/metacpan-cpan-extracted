@@ -1,7 +1,7 @@
 package App::BinPackUtils;
 
-our $DATE = '2019-01-17'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-01-27'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ my %argopt_num_dvds = (
 my %argopt_dvd_size = (
     dvd_size => {
         schema => ['filesize*'],
-        default => 4494*1024*1024,
+        default => 4470*1024*1024,
         cmdline_aliases => {s=>{}},
     },
 );
@@ -247,7 +247,7 @@ App::BinPackUtils - Collection of CLI utilities related to packing items into bi
 
 =head1 VERSION
 
-This document describes version 0.003 of App::BinPackUtils (from Perl distribution App-BinPackUtils), released on 2019-01-17.
+This document describes version 0.004 of App::BinPackUtils (from Perl distribution App-BinPackUtils), released on 2019-01-27.
 
 =head1 DESCRIPTION
 
@@ -327,7 +327,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<dvd_size> => I<filesize> (default: 4712300544)
+=item * B<dvd_size> => I<filesize> (default: 4687134720)
 
 =item * B<files>* => I<array[filename]>
 
@@ -375,7 +375,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<dvd_size> => I<filesize> (default: 4712300544)
+=item * B<dvd_size> => I<filesize> (default: 4687134720)
 
 =item * B<files>* => I<array[filename]>
 

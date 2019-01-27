@@ -8,6 +8,7 @@ lib/Mojolicious/Command/openapi.pm
 lib/OpenAPI/Client.pm
 Makefile.PL
 MANIFEST			This list of files
+README.md
 t/00-basic.t
 t/body-validation.t
 t/client.t

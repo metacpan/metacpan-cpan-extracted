@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.644   2019-01-25
+    - Option 'll': allow the use of the full term width.
+
 1.643   2019-01-20
     - MSWin32: use always Win32::Console::ANSI.
     - Bugfix mouse mode.

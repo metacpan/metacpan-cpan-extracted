@@ -1,5 +1,20 @@
 Revision history for MIDI-Drummer
 
+0.0800 2019-01-27 02:36:16
+    - Remove the unused "patch" attribute.
+
+0.0700 2019-01-27 02:22:57
+    - Fix time_signature according to the MIDI spec.
+
+0.0601 2019-01-27 01:37:17
+    - Improve documentation.
+    - Fix the default bars in the count_in() method.
+
+0.0600 2019-01-27 01:14:54
+    - Use the BUILD() method and defaults instead of BUILDARGS().
+    - Add tests.
+    - Improve documentation.
+
 0.05  2014-10-14
     - Rollback naive "swing"
 

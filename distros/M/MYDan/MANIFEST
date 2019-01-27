@@ -133,6 +133,7 @@ dan/tools/config
 dan/tools/deploy
 dan/tools/diskSpaceControl
 dan/tools/expect
+dan/tools/fastmd5
 dan/tools/fileupdate
 dan/tools/gateway
 dan/tools/git
@@ -303,6 +304,7 @@ lib/MYDan/Util/Deploy.pm
 lib/MYDan/Util/DirConf.pm
 lib/MYDan/Util/DiskSpaceControl.pm
 lib/MYDan/Util/ExpSSH.pm
+lib/MYDan/Util/FastMD5.pm
 lib/MYDan/Util/File.pm
 lib/MYDan/Util/FileUpdate.pm
 lib/MYDan/Util/FLock.pm

@@ -9,14 +9,15 @@ ENDMACRO(lcfg_translate)
 
 MACRO(lcfg_add_comp_script compname)
 
-  UNSET( comppath CACHE )
-  FIND_FILE( comppath ${compname}
-             ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}
-             NO_DEFAULT_PATH )
+  if( IS_ABSOLUTE ${compname} )
+    SET(comppath ${compname})
+  elseif( EXISTS "${CMAKE_BINARY_DIR}/${compname}")
+    SET(comppath "${CMAKE_BINARY_DIR}/${compname}")
+  else()
+    SET(comppath "${CMAKE_SOURCE_DIR}/${compname}")
+  endif()
 
-  IF(comppath)
-    INSTALL(PROGRAMS ${comppath} DESTINATION ${LCFGCOMP})
-  ENDIF(comppath)
+  install(PROGRAMS ${comppath} DESTINATION ${LCFGCOMP})
 
 ENDMACRO(lcfg_add_comp_script)
 
@@ -24,12 +25,16 @@ MACRO(lcfg_add_schema schema_name schema_ver)
 
   SET(schemafile ${schema_name}.def)
 
-  UNSET( schemapath CACHE )
-  FIND_FILE( schemapath ${schemafile}
-             ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}
-             NO_DEFAULT_PATH )
+  if(EXISTS "${CMAKE_BINARY_DIR}/${schemafile}")
+    SET(schemapath "${CMAKE_BINARY_DIR}/${schemafile}")
+  else()
+    SET(schemapath "${CMAKE_SOURCE_DIR}/${schemafile}")
+  endif()
 
-  IF(schemapath)
+  # Schema file is now optional
+
+  if(EXISTS ${schemapath})
+
     STRING(LENGTH ${schema_ver} schema_length)
     IF(${schema_length} GREATER 0)
       SET(deffile ${schema_name}-${schema_ver}.def)
@@ -46,7 +51,7 @@ MACRO(lcfg_add_schema schema_name schema_ver)
             RENAME ${deffile}
             COMPONENT defaults)
 
-  ENDIF(schemapath)
+  endif()
 
 ENDMACRO(lcfg_add_schema)
 
@@ -61,8 +66,16 @@ MACRO(pod_strip in out)
 ENDMACRO(pod_strip)
 
 MACRO(lcfg_add_man manfile section)
- 
-  INSTALL(FILES ${manfile} DESTINATION ${LCFGMAN}/man${section})
+
+  if( IS_ABSOLUTE ${manfile} )
+    SET(manpath ${manfile})
+  elseif( EXISTS "${CMAKE_BINARY_DIR}/${manfile}")
+    SET(manpath "${CMAKE_BINARY_DIR}/${manfile}")
+  else()
+    SET(manpath "${CMAKE_SOURCE_DIR}/${manfile}")
+  endif()
+
+  INSTALL(FILES ${manpath} DESTINATION ${LCFGMAN}/man${section})
 
 ENDMACRO(lcfg_add_man)
 
@@ -73,36 +86,44 @@ MACRO(lcfg_pod2man podfile manfile section)
     message(FATAL ERROR "Need pod2man installed to generate manual files")
   ENDIF(NOT POD2MAN)
 
-  IF(NOT EXISTS ${podfile})
+  if( IS_ABSOLUTE ${podfile} )
+    SET(podpath ${podfile})
+  elseif( EXISTS "${CMAKE_BINARY_DIR}/${podfile}")
+    SET(podpath "${CMAKE_BINARY_DIR}/${podfile}")
+  else()
+    SET(podpath "${CMAKE_SOURCE_DIR}/${podfile}")
+  endif()
+
+  if(NOT EXISTS ${podpath})
     MESSAGE(FATAL ERROR "Could not find pod file ${podfile} to generate manual file")
-  ENDIF(NOT EXISTS ${podfile})
+  endif()
 
-  SET(outfile "${manfile}.${section}")
+  SET(outfile "${CMAKE_BINARY_DIR}/${manfile}.${section}")
 
-  IF(LCFG_GROUP)
-    EXECUTE_PROCESS(COMMAND ${POD2MAN} --section="${section}" --release="Release: ${LCFG_VERSION}" --center="${LCFG_GROUP}" --date="${LCFG_DATE}" ${podfile} ${outfile})
-  ELSE(LCFG_GROUP)
-    EXECUTE_PROCESS(COMMAND ${POD2MAN} --section="${section}" --release="Release: ${LCFG_VERSION}" --date="${LCFG_DATE}" ${podfile} ${outfile})
-  ENDIF(LCFG_GROUP)
+  if(LCFG_GROUP)
+    EXECUTE_PROCESS(COMMAND ${POD2MAN} --section="${section}" --release="Release: ${LCFG_VERSION}" --center="${LCFG_GROUP}" --date="${LCFG_DATE}" ${podpath} ${outfile})
+  else()
+    EXECUTE_PROCESS(COMMAND ${POD2MAN} --section="${section}" --release="Release: ${LCFG_VERSION}" --date="${LCFG_DATE}" ${podpath} ${outfile})
+  endif()
 
-  IF(EXISTS ${outfile})
-    lcfg_add_man("${CMAKE_BINARY_DIR}/${outfile}" ${section})
-  ENDIF(EXISTS ${outfile})
+  if(EXISTS ${outfile})
+    lcfg_add_man(${outfile} ${section})
+  endif()
 
 ENDMACRO(lcfg_pod2man)
 
 MACRO(lcfg_add_pod podfile manfile section)
 
-  UNSET( podpath CACHE )
-  FIND_FILE( podpath ${podfile}
-             ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}
-             NO_DEFAULT_PATH )
+  if( IS_ABSOLUTE ${podfile} )
+    SET(podpath ${podfile})
+  elseif( EXISTS "${CMAKE_BINARY_DIR}/${podfile}")
+    SET(podpath "${CMAKE_BINARY_DIR}/${podfile}")
+  else()
+    SET(podpath "${CMAKE_SOURCE_DIR}/${podfile}")
+  endif()
 
-  IF(podpath)
-    INSTALL(FILES ${podpath} DESTINATION ${LCFGPOD})
-
-    lcfg_pod2man(${podpath} ${manfile} ${section})
-  ENDIF(podpath)
+  install(FILES ${podpath} DESTINATION ${LCFGPOD})
+  lcfg_pod2man(${podpath} ${manfile} ${section})
 
 ENDMACRO(lcfg_add_pod)
 
@@ -122,10 +143,10 @@ MACRO(lcfg_add_perl_module file modpath)
   STRING( REGEX REPLACE "\\.pm" "" modname ${modpath})
   STRING( REGEX REPLACE "/" "::" modname ${modname} )
 
-  SET(podfile "${modname}.pod")
+  SET(podfile "${CMAKE_BINARY_DIR}/${modname}.pod")
 
   pod_strip(${file} ${podfile})
-  lcfg_add_pod("${CMAKE_BINARY_DIR}/${podfile}" ${modname} ${PERL_LIBSECT})
+  lcfg_add_pod(${podfile} ${modname} ${PERL_LIBSECT})
 
   GET_FILENAME_COMPONENT(dirname ${modpath} PATH)
 
@@ -158,16 +179,23 @@ ENDMACRO(lcfg_add_perl_tree)
 
 MACRO(lcfg_add_program location binfile mansect)
 
-  IF(${ARGC} GREATER 3)
-    IF (${ARGV3} STREQUAL "podstrip")
-      pod_strip(${binfile} "${binfile}.pod")
-      lcfg_add_pod("${binfile}.pod" ${binfile} ${mansect})
-    ENDIF (${ARGV3} STREQUAL "podstrip")
-  ENDIF(${ARGC} GREATER 3)
+  if(${ARGC} GREATER 3)
+    if (${ARGV3} STREQUAL "podstrip")
+      set(podfile "${CMAKE_BINARY_DIR}/${binfile}.pod")
+      pod_strip(${binfile} ${podfile})
+      lcfg_add_pod(${podfile} ${binfile} ${mansect})
+    endif()
+  endif()
 
-  IF(EXISTS ${binfile})
-    INSTALL(PROGRAMS ${binfile} DESTINATION ${location})
-  ENDIF(EXISTS ${binfile})
+  if( IS_ABSOLUTE ${binfile} )
+    SET(binpath ${binfile})
+  elseif( EXISTS "${CMAKE_BINARY_DIR}/${binfile}")
+    SET(binpath "${CMAKE_BINARY_DIR}/${binfile}")
+  else()
+    SET(binpath "${CMAKE_SOURCE_DIR}/${binfile}")
+  endif()
+
+  INSTALL(PROGRAMS ${binpath} DESTINATION ${location})
 
 ENDMACRO(lcfg_add_program)
 
@@ -181,14 +209,15 @@ ENDMACRO(lcfg_add_sbin)
 
 MACRO(lcfg_add_logrotate)
 
-  UNSET( logrotpath CACHE )
-  FIND_FILE( logrotpath "logrotate"
-             ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}
-             NO_DEFAULT_PATH )
-
-  if(logrotpath)
-    INSTALL(FILES ${logrotpath} DESTINATION "${LCFGDATA}/${LCFG_NAME}")
+  if( EXISTS "${CMAKE_BINARY_DIR}/logrotate")
+    SET(logrotpath "${CMAKE_BINARY_DIR}/logrotate")
+  else()
+    SET(logrotpath "${CMAKE_SOURCE_DIR}/logrotate")
   endif()
+
+  # logrotate template file is optional
+
+  install(FILES ${logrotpath} DESTINATION "${LCFGDATA}/${LCFG_NAME}" OPTIONAL)
 
 ENDMACRO(lcfg_add_logrotate)
 

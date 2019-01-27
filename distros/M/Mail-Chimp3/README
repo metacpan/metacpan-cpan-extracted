@@ -1,5 +1,5 @@
 This archive contains the distribution Mail-Chimp3,
-version 0.05:
+version 0.06:
 
   An interface to mailchimp.com's RESTful Web API v3 using WEB::API
 

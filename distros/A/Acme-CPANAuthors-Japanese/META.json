@@ -48,6 +48,6 @@
          "url" : "https://github.com/charsbar/acme-cpanauthors-japanese"
       }
    },
-   "version" : "0.180422",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.190126",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

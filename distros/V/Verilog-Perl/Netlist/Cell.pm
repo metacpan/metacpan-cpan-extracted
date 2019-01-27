@@ -11,7 +11,7 @@ use strict;
 @ISA = qw(Verilog::Netlist::Cell::Struct
 	Verilog::Netlist::Subclass);
 
-$VERSION = '3.456';
+$VERSION = '3.460';
 
 structs('new',
 	'Verilog::Netlist::Cell::Struct'
@@ -25,6 +25,7 @@ structs('new',
 	   submodname	=> '$', #'	# Which module it instantiates
 	   module	=> '$', #'	# Module reference
 	   params	=> '$', #'	# Textual description of parameters
+	   range	=> '$', #'	# Range of ranged instance
 	   _pins	=> '%',		# List of Verilog::Netlist::Pins
 	   byorder 	=> '$',		# True if Cell call uses order based pins
 	   # after link():
@@ -62,10 +63,10 @@ sub _link_guts {
     if (!$self->submod) {
 	if (my $name = $self->submodname) {
 	    my $netlist = $self->netlist;
-	    my $sm = $netlist->find_module_or_interface_for_cell ($name);
+	    my $sm = $netlist->find_module_or_interface_for_cell($name);
 	    if (!$sm) {
 		my $name2 = $netlist->remove_defines($name);
-		$sm = $netlist->find_module_or_interface_for_cell ($name2)
+		$sm = $netlist->find_module_or_interface_for_cell($name2)
 		    if $name ne $name2;
 	    }
 	    if ($sm) {
@@ -119,7 +120,7 @@ sub _link {
 sub lint {
     my $self = shift;
     if (!$self->submod() && !$self->gateprim && !$self->netlist->{link_read_nonfatal}) {
-        $self->error ($self,"Module/Program/Interface reference not found: ",$self->submodname(),,"\n");
+        $self->error($self,"Module/Program/Interface reference not found: ",$self->submodname(),,"\n");
     }
     if ($self->netlist->{use_vars}) {
 	foreach my $pinref ($self->pins) {
@@ -130,7 +131,15 @@ sub lint {
 
 sub verilog_text {
     my $self = shift;
-    my @out = $self->submodname." ".$self->name." (";
+    my @out = $self->submodname;
+    if ($self->params) {
+	push @out, " #(".$self->params.")";
+    }
+    push @out, " ".$self->name;
+    if ($self->range) {
+	push @out, " ".$self->range;
+    }
+    push @out, " (";
     my $comma="";
     foreach my $pinref ($self->pins_sorted) {
 	push @out, $comma if $comma; $comma=", ";
@@ -165,8 +174,8 @@ sub new_pin {
     # @_ params
     # Create a new pin under this cell
     push @_, (cell=>$self);
-    my $pinref = new Verilog::Netlist::Pin (@_);
-    $self->_pins ($pinref->name(), $pinref);
+    my $pinref = new Verilog::Netlist::Pin(@_);
+    $self->_pins($pinref->name(), $pinref);
     return $pinref;
 }
 
@@ -200,7 +209,7 @@ Verilog::Netlist::Cell - Instantiated cell within a Verilog Netlist
   use Verilog::Netlist;
 
   ...
-  my $cell = $module->find_cell ('cellname');
+  my $cell = $module->find_cell('cellname');
   print $cell->name;
 
 =head1 DESCRIPTION
@@ -248,6 +257,10 @@ List of Verilog::Netlist::Pin connections for the cell.
 
 List of name sorted Verilog::Netlist::Pin connections for the cell.
 
+=item $self->range
+
+The range for the cell (e.g. "[1:0]") or undef if not ranged.
+
 =item $self->submod
 
 Reference to the Verilog::Netlist::Module the cell instantiates.  Only
@@ -289,7 +302,7 @@ Verilog-Perl is part of the L<http://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
 L<http://www.veripool.org/verilog-perl>.
 
-Copyright 2000-2018 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2019 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

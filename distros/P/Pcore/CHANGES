@@ -1,3 +1,6 @@
+v0.78.9 2019-01-25T10:46:01Z
+ - index controller must inherit index role
+
 v0.78.8 2019-01-23T18:45:42Z
  - update tld enabled
 

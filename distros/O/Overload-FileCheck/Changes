@@ -1,8 +1,12 @@
 Revision history for Overload-FileCheck
 
+adjust -e and other check for Perl <= 5.14
+fix -e: now returns 'undef' when false and not ''
 fix unit tests failures on darwin
 fix compilation warning on darwin
 external link is clickable in POD - Mohammad S Anwar <mohammad.anwar@yahoo.com> 
+
+0.009     2019-01-24 14:01:45-07:00 America/Denver
 
 0.008     2018-12-26 14:11:45-07:00 America/Denver
 

@@ -1,4 +1,4 @@
-package Pcore::Service::Nginx v0.1.2;
+package Pcore::Service::Nginx v0.1.3;
 
 use Pcore -dist, -class;
 

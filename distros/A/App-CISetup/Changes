@@ -1,3 +1,9 @@
+0.18     2019-01-24
+
+- Make fewer assumptions about the existing config when updating, notably the
+  matrix.allow_failures section. Fixed by Olaf Alders. GH #8.
+
+
 0.17     2019-01-10
 
 - Both tools could incorrectly report that they updated the .travis.yml when

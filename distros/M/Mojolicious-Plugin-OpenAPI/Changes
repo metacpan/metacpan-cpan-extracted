@@ -1,6 +1,20 @@
 Revision history for perl distribution Mojolicious-Plugin-OpenAPI
 
-2.09 2019-01-21T09:47:37+0900
+2.11 2019-01-26T11:37:15+0900
+ - Fix allowing regular requests with "openapi_cors_allowed_origins" #103
+
+2.10 2019-01-25T12:49:55+0900
+ - Add "plugins" as a documented feature for register()
+ - Add Mojolicious::Plugin::OpenAPI::SpecRenderer
+ - Add the possibility to turn off automatic rendering of specification
+   using OPTIONS and from /:basePath route
+ - Add EXPERIMENTAL "openapi_routes_added" hook
+ - Add support for Preflight CORS requests #99
+ - Fix Simple CORS requests with "GET" and no Content-Type #99
+ - Fix writing a list of headers back after validated
+ - Marked $c->openapi->simple_cors as DEPRECATED
+
+2.09 2019-01-21T09:51:56+0900
  - Using formats from JSON::Validator 3.04
 
 2.08 2019-01-07T10:00:52+0900

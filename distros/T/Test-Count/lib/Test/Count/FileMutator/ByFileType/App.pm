@@ -1,54 +1,31 @@
 package Test::Count::FileMutator::ByFileType::App;
-$Test::Count::FileMutator::ByFileType::App::VERSION = '0.0902';
+$Test::Count::FileMutator::ByFileType::App::VERSION = '0.1000';
 use strict;
 use warnings;
 
-use Test::Count::FileMutator;
-use Getopt::Long;
+use Test::Count::FileMutator::ByFileType::Lib ();
+use Getopt::Long qw/ GetOptions /;
 
-use base 'Exporter';
+use parent 'Exporter';
 
 our @EXPORT = (qw(run));
 
 
 sub run
 {
-    my $filetype = "perl";
+    my $filetype;
     GetOptions( 'ft=s' => \$filetype );
 
     my $filename = shift(@ARGV);
 
-    my %params = (
-        'lisp' => {
-            assert_prefix_regex => qr{; TEST},
-            plan_prefix_regex   => qr{\(plan\s+},
-        },
-        'c' => {
-            assert_prefix_regex => qr{/[/\*]\s+TEST},
-            plan_prefix_regex   => qr{\s*plan_tests\s*\(\s*},
-        },
-        'python' => {
-            plan_prefix_regex => qr{plan\s*\(\s*},
-        },
-    );
-
-    my %aliases = (
-        'arc'    => "lisp",
-        'scheme' => "lisp",
-        'cpp'    => "c",
-    );
-
-    $filetype = exists( $aliases{$filetype} ) ? $aliases{$filetype} : $filetype;
-    my $ft_params = exists( $params{$filetype} ) ? $params{$filetype} : +{};
-
-    my $mutator = Test::Count::FileMutator->new(
+    my $mutator = Test::Count::FileMutator::ByFileType::Lib->new(
         {
             filename => $filename,
-            %{$ft_params},
+            ( defined($filetype) ? ( filetype => $filetype, ) : () ),
         }
     );
 
-    $mutator->modify();
+    $mutator->run;
 
     return 0;
 }
@@ -68,7 +45,7 @@ application that modifies a file in place based on its type.
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 SYNOPSIS
 
@@ -80,7 +57,7 @@ version 0.0902
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 FUNCTIONS
 

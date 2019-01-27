@@ -37,6 +37,7 @@ my @cmd =
     [ 'alias', "${name}内部使用的alias.", 'dan/tools/alias', 'box/tools/alias' ],
     [ 'unalias', "${name}内部使用的unalias.\n", 'dan/tools/unalias', 'box/tools/unalias' ],
 
+    [ 'fastmd5', "快速计算文件md5.", 'dan/tools/fastmd5', 'box/tools/fastmd5' ],
     [ 'sync', "同步${name}的配置", 'dan/tools/sync', 'box/tools/sync' ],
     [ 'xtar', '脚本和数据压缩工具.', 'dan/tools/xtar' ],
     [ 'git', 'git命令，添加了指定key功能.', 'dan/tools/git', 'box/tools/git' ],

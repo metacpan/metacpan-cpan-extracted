@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-cpanfile
 dist.ini
 lib/Mail/Chimp3.pm
 t/01_load.t

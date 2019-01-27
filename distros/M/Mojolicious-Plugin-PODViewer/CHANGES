@@ -1,5 +1,13 @@
 Changelog for Mojolicious-Plugin-PODViewer
 
+0.004     2019-01-24 15:20:44-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed default layout to allow app default to win over the skeleton
+      'podviewer' default. The default layout in the plugin must always
+      be a last resort!
+
 0.003     2019-01-21 12:38:10-06:00 America/Chicago
 
     [Fixed]

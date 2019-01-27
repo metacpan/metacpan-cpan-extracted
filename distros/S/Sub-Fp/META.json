@@ -22,9 +22,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Exporter" : "1",
-            "strict" : "1",
-            "warnings" : "1"
+            "Exporter" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "configure" : {
@@ -34,15 +34,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "1",
-            "List::Util" : "1",
-            "POSIX" : "1",
-            "Test::Class" : "1",
-            "Test::More" : "1",
+            "Carp" : "0",
+            "List::Util" : "0",
+            "POSIX" : "0",
+            "Test::Class" : "0",
+            "Test::More" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.34"
+   "version" : "0.39"
 }

@@ -1,19 +1,13 @@
-#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+
+#include "perlmulticore.h"
 
 #include "ppport.h"
 #include "uECC.h"
 #include "uECC.c"
 #include "get_curve.c"
-
-int
-verify(const uint8_t *public_key, const uint8_t *hash, const uint8_t *signature, int curve_id, unsigned hash_size)
-{
-	return uECC_verify(public_key, hash, strlen(hash), signature, get_curve(curve_id));
-}
-
 
 MODULE = MicroECC		PACKAGE = MicroECC		
 
@@ -115,10 +109,14 @@ compute_public_key(const uint8_t *private_key, int curve_id)
 
 
 SV *
-sign(const uint8_t *private_key, const uint8_t *hash, int curve_id)
+sign(SV *sv_private_key, SV *sv_hash, int curve_id)
 	CODE:
-		unsigned hash_size = strlen(hash);
+		STRLEN hash_size, key_size;
+		char *hash = (char *)SvPVbyte(sv_hash, hash_size);
+		char *private_key = (char *)SvPVbyte(sv_private_key, key_size);
 		int public_key_size = uECC_curve_public_key_size(get_curve(curve_id));
+		//printf("key size: %d, hash size: %d\n", key_size, hash_size);
+
 		uint8_t *signature = (uint8_t *)malloc(public_key_size);
 		int res = uECC_sign(private_key, hash, hash_size, signature, get_curve(curve_id));
 		SV* d;
@@ -134,4 +132,13 @@ sign(const uint8_t *private_key, const uint8_t *hash, int curve_id)
 		RETVAL
 
 int
-verify(const uint8_t *public_key, const uint8_t *hash, const uint8_t *signature, int curve_id, unsigned length(hash))
+verify(SV *sv_public_key, SV *sv_hash, SV *sv_signature, int curve_id)
+	CODE:
+		STRLEN hash_size, public_key_size, signature_size;
+		char *hash = (char *)SvPVbyte(sv_hash, hash_size);
+		char *public_key = (char *)SvPVbyte(sv_public_key, public_key_size);
+		char *signature = (char *)SvPVbyte(sv_signature, signature_size);
+
+		RETVAL = uECC_verify(public_key, hash, hash_size, signature, get_curve(curve_id));
+	OUTPUT:
+		RETVAL

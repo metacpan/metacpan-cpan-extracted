@@ -60,7 +60,7 @@ END {
 warning_like {
     throws_ok { Class->new_with_options }
            #usage: 107_no_auto_help.t [-?] [long options...]
-        qr/^usage: [\d\w]+\Q.t [-?] [long options...]\E.\s+\Q-? --usage --help\E\s+\QPrints this usage information.\E.\s+--configfile/ms,
+        qr/^usage: [\d\w]+\Q.t [-?] [long options...]\E.\s+\Q-? --\E(\[no-\])?usage --(\[no-\])?\Qhelp\E\s+\QPrints this usage information.\E.\s+--configfile/ms,
         'usage information looks good';
     }
     qr/^Specified configfile \'this_value_unimportant\' does not exist, is empty, or is not readable$/,

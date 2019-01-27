@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use App::CISetup::Types qw( Bool File Str );
 use File::pushd;
@@ -211,7 +211,8 @@ sub _update_perl_matrix {
     my @allow_failures = @{ $travis->{matrix}{allow_failures} // [] };
     for my $blead (@bleads) {
         push @allow_failures, { perl => $blead }
-            unless grep { $_->{perl} eq $blead } @allow_failures;
+            unless grep { exists $_->{perl} && $_->{perl} eq $blead }
+            @allow_failures;
     }
 
     $travis->{matrix} = {

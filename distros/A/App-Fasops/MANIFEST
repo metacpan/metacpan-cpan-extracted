@@ -22,6 +22,7 @@ lib/App/Fasops/Command/slice.pm
 lib/App/Fasops/Command/split.pm
 lib/App/Fasops/Command/stat.pm
 lib/App/Fasops/Command/subset.pm
+lib/App/Fasops/Command/vars.pm
 lib/App/Fasops/Command/xlsx.pm
 lib/App/Fasops/Common.pm
 minil.toml
@@ -48,6 +49,7 @@ t/17-concat.t
 t/18-stat.t
 t/19-mergecsv.t
 t/20-consensus.t
+t/21-vars.t
 t/90-common-variations.t
 t/90-common.t
 t/91-common-trim.t
@@ -57,10 +59,12 @@ t/93-common-poa.t
 t/Arabid_thaliana.pair.fas
 t/NC_000932.fa
 t/NC_000932.fa.fai
+t/NC_007942.maf.gz.fas.gz
 t/RM11_1a.chr.sizes
 t/S288cvsRM11_1a.slice.fas
 t/S288cvsSpar.slice.fas
 t/S288cvsYJM789.slice.fas
+t/anno.yml
 t/example.axt
 t/example.fa
 t/example.fas

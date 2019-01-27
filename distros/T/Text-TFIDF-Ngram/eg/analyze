@@ -45,7 +45,7 @@ my $t = Text::TFIDF::Ngram->new(
     files       => \@files,
     size        => $opts{size},
     stopwords   => $opts{stop},
-    punctuation => qr/$opts{punc}/,
+    punctuation => $opts{punc} ? qr/$opts{punc}/ : '',
     lowercase   => $opts{lc},
 );
 
@@ -113,6 +113,8 @@ Options:
   --stop      use stopwords
   --phrase    search phrase
   --type      file extension
+  --punc      pattern of characters to exclude
+  --lc        lower-case the strings
 
 Examples:
 
@@ -120,7 +122,7 @@ Examples:
   perl analyze --dir=/Users/you/Documents/lit/inaugural --phrase='public good'
   perl analyze --dir=/Users/you/Documents/lit/inaugural --dir=/Users/you/Documents/lit/SOTU --top=5
   perl analyze --dir=/Users/you/Documents/lit/Shakespeare --size=3 --top=5
-  perl analyze --dir=/Users/you/perl5/perlbrew/perls/perl-5.27.7/lib/site_perl/5.27.7/Music --size=1 --type=pm
+  perl analyze --dir=/Users/you/perl5/lib/site_perl/Music --size=1 --type=pm --punc=''
 
 =head1 OPTIONS
 
@@ -156,7 +158,20 @@ Search the corpus for the B<phrase> and its IF-IDF values.  Default = ''
 
 =item --type
 
-Read copus files of this file extension. Default = 'txt'
+Read corpus files of this file extension. Default = 'txt'
+
+=item --punc
+
+A string defining a regular expression of characters to exclude from results.
+Giving a C<''> or C<0> as the value for this will not exclude any characters.
+
+Default: [-!"#$%&()*+,.\/\\:;<=>?@\[\]^_`{|}~]
+
+Note that the single quote is not excluded by default.
+
+=item --lc
+
+Lower-case the results. Default = 0
 
 =back
 
@@ -165,4 +180,3 @@ Read copus files of this file extension. Default = 'txt'
 This program analyzes the given corpus with the TF-IDF measure for ngrams.
 
 =cut
-

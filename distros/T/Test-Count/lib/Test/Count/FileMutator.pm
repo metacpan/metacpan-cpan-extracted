@@ -1,5 +1,5 @@
 package Test::Count::FileMutator;
-$Test::Count::FileMutator::VERSION = '0.0902';
+$Test::Count::FileMutator::VERSION = '0.1000';
 use warnings;
 use strict;
 
@@ -145,7 +145,7 @@ Test::Count::FileMutator - modify a file in place
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 SYNOPSIS
 
@@ -170,7 +170,7 @@ total number of tests.
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head2 my $filter = Test::Count::Filter->new({%args});
 

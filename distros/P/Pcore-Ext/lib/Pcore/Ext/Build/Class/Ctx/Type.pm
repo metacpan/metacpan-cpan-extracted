@@ -9,7 +9,7 @@ has name => ( required => 1 );
 sub generate ( $self, $quote ) {
     my $alias = $self->{class}->{app}->{classes}->{ $self->{name} }->{alias};
 
-    die qq[Alias for class "$self->{name}" can't be resolved] if !$alias;
+    die qq[Alias for class "$self->{name}" can't be resolved in "$self->{class}"] if !$alias;
 
     return $quote . $alias . $quote;
 }

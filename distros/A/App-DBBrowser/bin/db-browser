@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.045';
+our $VERSION = '2.047';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.045
+Version 2.047
 
 =cut
 
@@ -265,7 +265,7 @@ Read the input from am file. Supported file formats: text files and file formats
 If the first column of a table is an auto-increment column, the C<INSERT INTO> statement is build without this first
 column. This feature is available if it is supported by the database plugin.
 
-Available input filters:
+Input filters:
 
 =over
 
@@ -286,6 +286,12 @@ columns. The user can then select the group of rows which should be used.
 =item A Range of Rows
 
 Use only a range of rows.
+
+=item Add Column
+
+Add an empty column: adds a column to the header row and adjusts the remaining rows to the length of the header row.
+
+If the input has rows with different numbers of columns, use first I<Choose Rows> to select the rows to use.
 
 =item Cols_to_Rows
 

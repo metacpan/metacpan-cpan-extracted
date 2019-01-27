@@ -153,17 +153,17 @@ appreciated.
 
 =head2 description
 
-  $str = $self->description;
+  $str = $command->description;
 
 =head2 usage
 
-  $str = $self->usage;
+  $str = $command->usage;
 
 =head1 METHODS
 
 =head2 run
 
-  $get->run(@ARGV);
+  $command->run(@ARGV);
 
 Run this command.
 

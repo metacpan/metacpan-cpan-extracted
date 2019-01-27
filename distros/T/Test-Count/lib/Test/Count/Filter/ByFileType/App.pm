@@ -1,5 +1,5 @@
 package Test::Count::Filter::ByFileType::App;
-$Test::Count::Filter::ByFileType::App::VERSION = '0.0902';
+$Test::Count::Filter::ByFileType::App::VERSION = '0.1000';
 use strict;
 use warnings;
 
@@ -61,7 +61,7 @@ that filters according to the filetype.
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ version 0.0902
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 FUNCTIONS
 

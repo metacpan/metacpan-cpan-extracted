@@ -1,6 +1,6 @@
 package Net::SFTP::Foreign::Backend::Net_SSH2;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use strict;
 use warnings;
@@ -61,6 +61,7 @@ sub _init_transport {
     my ($self, $sftp, $opts) = @_;
     my $ssh2 = delete $opts->{ssh2};
     if (defined $ssh2) {
+        $self->{_ssh2} = $ssh2;
         $debug and $debug & 131072 and $ssh2->debug(1);
 	unless ($ssh2->auth_ok) {
 	    $sftp->_conn_failed("Net::SSH2 object is not authenticated");
@@ -112,7 +113,6 @@ sub _init_transport {
 	return;
     }
     $channel->ext_data('ignore');
-    $self->{_ssh2} = $ssh2;
     $channel->subsystem('sftp');
 }
 
@@ -265,9 +265,13 @@ authenticated.
 
 =item password => $password
 
-=item publickey => $publickey
+=item publickey => $publickey_path
 
-=item privatekey => $privatekey
+=item key_path => $privatekey_path
+
+=item privatekey => $privatekey_path
+
+=item passphrase => $passphrase
 
 =item local_username => $local_username
 
@@ -275,7 +279,7 @@ authenticated.
 
 =item cb_keyboard => $cb_keyboard
 
-=item cv_password => $cb_password
+=item cb_password => $cb_password
 
 These options are passed to L<Net::SSH2> C<connect> and C<auth>
 methods in order to stablish an SSH authenticated connection with the
@@ -299,7 +303,7 @@ is rather limited and its performance very poor.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2009-2012 by Salvador FandiE<ntilde>o (sfandino@yahoo.com).
+Copyright (c) 2009-2012, 2019 by Salvador FandiE<ntilde>o (sfandino@yahoo.com).
 
 All rights reserved. This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

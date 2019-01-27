@@ -1,13 +1,13 @@
 package Map::Tube::Exception::InvalidColorHexCode;
 $Map::Tube::Exception::InvalidColorHexCode::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::InvalidColorHexCode::VERSION = '3.18';
+$Map::Tube::Exception::InvalidColorHexCode::VERSION = '3.19';
 =head1 NAME
 
 Map::Tube::Exception::InvalidColorHexCode - Represent 'invalid color hex code' exception.
 
 =head1 VERSION
 
-version 3.18
+version 3.19
 
 =cut
 

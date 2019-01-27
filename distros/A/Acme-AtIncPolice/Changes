@@ -1,0 +1,10 @@
+Revision history for Perl extension Acme-AtIncPolice
+
+0.02 2019-01-26T23:25:28Z
+
+    - Add Test::Exception as dependency (reported by Slaven Rezić)
+
+0.01 2019-01-25T10:53:21Z
+
+    - original version
+

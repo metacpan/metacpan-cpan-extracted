@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Egaz
 
+0.2.3 2019-01-26T19:01:57Z
+
+    - `egaz plottree`
+        - Some spaces above the scale bar
+
 0.2.2 2018-11-26T17:46:32Z
 
     - `egaz template`

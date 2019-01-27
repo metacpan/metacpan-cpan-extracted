@@ -1,0 +1,65 @@
+NAME
+    Number::Util::Range - Find sequences in number arrays & convert to range
+    (e.g. 100,2,3,4,5,101 -> 100,"2..5",101)
+
+VERSION
+    This document describes version 0.001 of Number::Util::Range (from Perl
+    distribution Number-Util-Range), released on 2019-01-25.
+
+FUNCTIONS
+  convert_number_sequence_to_range
+    Usage:
+
+     convert_number_sequence_to_range(%args) -> any
+
+    Find sequences in number arrays & convert to range (e.g. 100,2,3,4,5,101
+    -> 100,"2..5",101).
+
+    Examples:
+
+    *   Example #1:
+
+         convert_number_sequence_to_range(array => [100, 2 .. 5, 101, "foo"]); # -> [100, "2..5", 101, "foo"]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   array => *array[str]*
+
+    *   separator => *str* (default: "..")
+
+    *   threshold => *posint* (default: 4)
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Number-Util-Range>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Number-Util-Range>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Number-Util-Range>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Dump also does something similar when dumping arrays of numbers,
+    e.g. if you say "dd [1,2,3,4];" it will dump the array as "[1..4]".
+
+    String::Util::Range
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

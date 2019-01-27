@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::js::bool::str;
 
-our $DATE = '2019-01-21'; # DATE
-our $VERSION = '0.032'; # VERSION
+our $DATE = '2019-01-26'; # DATE
+our $VERSION = '0.033'; # VERSION
 
 use 5.010001;
 use strict;
@@ -52,7 +52,7 @@ Data::Sah::Coerce::js::bool::str - Coerce "true","yes",etc to true and "false","
 
 =head1 VERSION
 
-This document describes version 0.032 of Data::Sah::Coerce::js::bool::str (from Perl distribution Data-Sah-Coerce), released on 2019-01-21.
+This document describes version 0.033 of Data::Sah::Coerce::js::bool::str (from Perl distribution Data-Sah-Coerce), released on 2019-01-26.
 
 =head1 DESCRIPTION
 

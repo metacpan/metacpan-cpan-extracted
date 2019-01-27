@@ -1,6 +1,11 @@
 Revision history for Term::Form
 
 
+0.507   2019-01-25
+        - Bugfix in 'fill_form': reset available width.
+        - Handle terminal size change.
+        - Enable threshold in 'fill_form'
+
 0.506   2019-01-20
         - MSWin32: always use "Win32::Console::ANSI".
 

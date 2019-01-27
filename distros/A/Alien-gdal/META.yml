@@ -60,9 +60,9 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-gdal/issues/
   repository: https://github.com/shawnlaffan/perl-alien-gdal
-version: '1.14'
+version: '1.15'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 1.49'
+  generated_by: 'Alien::Build::MM version 1.51'
   requires:
     share:
       Alien::MSYS: '0.07'

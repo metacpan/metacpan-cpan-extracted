@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
-$VERSION = '0.034';
+$VERSION = '0.037';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -40,9 +40,9 @@ $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, m
 
 $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
 my $maxloops= 1000;
-my $sourcefile = "/home/luca/int/starcloud_micro.csv";
+my $sourcefile = "./sourcefile.csv";
 my $newfile = $sourcefile . "_meta.csv";
-my $report = $newfile . "_reprt.txt";
+my $report = $newfile . "_report.txt";
 my @mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
 #my @mode = ( "near" ); # "nea" means "nearest neighbour"
 #@mode = ( ""mix" ); # "mix" means sequentially mixed in each loop.
@@ -73,6 +73,7 @@ my $minreq_formerge = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIA
 my $minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
 my $minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
 my $condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
+my $nfilter = 10; # do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
 my $tee = new IO::Tee(\*STDOUT, ">>$report");
 
 #######################################################################
@@ -590,7 +591,7 @@ sub calcmaxdist
 sub wei
 {
   my ( $arr_ref, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count,
-    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist ) = @_;
+    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter ) = @_;
   my @arr = @{ $arr_ref };
   #say $tee "ARR VERY_BEFORE: " . dump(@arr);
   my %factlevels = %{ $factlevels_ref };  #say $tee "AND \%factlevels: " . dump( %factlevels );
@@ -599,7 +600,7 @@ sub wei
 
   sub fillbank
   { #say $tee "NOW IN FILLBANK.";
-    my ( $arr_r, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, $factlevels_r ) = @_;
+    my ( $arr_r, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, $factlevels_r, $nfilter ) = @_;
     my @arr = @{ $arr_r };
     my %factlevels = %{ $factlevels_r };
     my %bank;
@@ -640,84 +641,99 @@ sub wei
 
             unless ( !keys %{ $res_ref } and ( $ordist > 0 ) and ( $ordist ne "" ) ) ######## IMPROVE THIS SO AS TO ALLOW VERY DIFFERENT NUMBERS OF LEVELS FOR EACH FACTOR
             { #say $tee " SO I AM IN. ";
-              my $count = 0;
-              foreach my $d10 ( @da1 )
-              { #say $tee "WORKING \$d10: " . dump( $d10 );
 
-                my $d11 = $da1par[$count]; #say $tee "WORKING \$d11: " . dump( $d11 );
-                #my $nearness = abs( $d11 - $d21 );
-                #my $d20 = $da2[$count]; #say $tee "\$d21: " . dump( $d21 );
-                my $co = 0;
-                foreach my $d20 ( @da2 )
-                { #say $tee "WORKING \$d20: " . dump( $d20 );
+              my @sorteds;
+              my $benchmark;
+              if ( $nfilter )
+              {
+                @sorteds = sort { $b <=> $a } @{ $bank{$trio}{strengths} };
+                $benchmark = $sorteds[$nfilter-1];
+              }
 
-                  if ( $d10 == $d20 )
-                  { #say $tee "THIS: d10 AND d20: " . dump( $d20 );
-                    my $stepsize = $factlevels{stepsizes}{$d20}; #say $tee "$stepsize: " . dump( $stepsize );
-                    my $d21 = $da2par[$co]; #say $tee "WORKING \$d21: " . dump( $d21 );
-                    #if ( ( $d10 eq $d20 ) and ( abs( $d11 - $d21 ) == 1 ) and ( $d11 > 0 ) and ( $d21 > 0 ) and ( $d11 ne "" ) and ( $d21 ne "" )
-                    #  and ( $d11 ne $d21 ) ) #### if ( ( $d10 eq $d20 ) and ( $d11 ne $d21 ) ) ###  THE SECOND CONDITION COULD BE LOGICALLY REDUNDANT. CHECK. ####
-                    #{
-                      my $pair = join( "-", $d11, $d21 );
-                      my @sorted = sort( $d11, $d21 );
-                      my $orderedpair = join( "-", @sorted );
-                      my $trio = join( "-", $d10, $pair );
-                      my $orderedtrio = join( "-", $d10, $orderedpair ); #say $tee "\$orderedtrio: " . dump( $orderedtrio );
+              if ( ( $strength > $benchmark ) or ( not( $nfilter ) ) )
+              {
 
-                      unless ( $trio eq "" )
-                      {
-                        $bank{$trio}{par} = $d10;
-                        push ( @{ $bank{$trio}{trio} }, $trio );
-                        push ( @{ $bank{$trio}{orderedtrio} }, $orderedtrio );
+                my $count = 0;
+                foreach my $d10 ( @da1 )
+                { #say $tee "WORKING \$d10: " . dump( $d10 );
 
-                        push ( @{ $bank{$trio}{orvals} }, [ $el->[2], $elt->[2] ] );
-                        push ( @{ $bank{$trio}{origins} }, $el->[1], $elt->[1] );
+                  my $d11 = $da1par[$count]; #say $tee "WORKING \$d11: " . dump( $d11 );
+                  #my $nearness = abs( $d11 - $d21 );
+                  #my $d20 = $da2[$count]; #say $tee "\$d21: " . dump( $d21 );
+                  my $co = 0;
+                  foreach my $d20 ( @da2 )
+                  { #say $tee "WORKING \$d20: " . dump( $d20 );
 
-                        if ( ( $ordist > 0 ) and ( $ordist ne "" ) and ( $dist ne "" ) and ( $strength ne "" ) )
+                    if ( $d10 == $d20 )
+                    { #say $tee "THIS: d10 AND d20: " . dump( $d20 );
+                      my $stepsize = $factlevels{stepsizes}{$d20}; #say $tee "$stepsize: " . dump( $stepsize );
+                      my $d21 = $da2par[$co]; #say $tee "WORKING \$d21: " . dump( $d21 );
+                      #if ( ( $d10 eq $d20 ) and ( abs( $d11 - $d21 ) == 1 ) and ( $d11 > 0 ) and ( $d21 > 0 ) and ( $d11 ne "" ) and ( $d21 ne "" )
+                      #  and ( $d11 ne $d21 ) ) #### if ( ( $d10 eq $d20 ) and ( $d11 ne $d21 ) ) ###  THE SECOND CONDITION COULD BE LOGICALLY REDUNDANT. CHECK. ####
+                      #{
+                        my $pair = join( "-", $d11, $d21 );
+                        my @sorted = sort( $d11, $d21 );
+                        my $orderedpair = join( "-", @sorted );
+                        my $trio = join( "-", $d10, $pair );
+                        my $orderedtrio = join( "-", $d10, $orderedpair ); #say $tee "\$orderedtrio: " . dump( $orderedtrio );
+
+                        unless ( $trio eq "" )
                         {
-                          push ( @{ $bank{$trio}{ordists} }, $ordist );
-                          #push ( @{ $bank{$reversedtrio}{ordists} }, $ordist );
-                          push ( @{ $bank{$trio}{dists} }, $dist );
-                          #push ( @{ $bank{$reversedtrio}{dists} }, $dist );
-                          push ( @{ $bank{$trio}{strengths} }, $strength );
-                        }
+                          $bank{$trio}{par} = $d10;
+                          push ( @{ $bank{$trio}{trio} }, $trio );
+                          push ( @{ $bank{$trio}{orderedtrio} }, $orderedtrio );
 
-                        #my $cn = 0;
-                        #foreach my $vals ( @{ $bank{$trio}{orvals} } )
-                        #{
+                          push ( @{ $bank{$trio}{orvals} }, [ $el->[2], $elt->[2] ] );
+                          push ( @{ $bank{$trio}{origins} }, $el->[1], $elt->[1] );
 
-                        my $pos1 = $d11; #say $tee "WORKING \$pos1: " . dump( $pos1 );
-                        my $pos2 = $d21; #say $tee "WORKING \$pos2: " . dump( $pos2 );
-                        my $val1 = $el->[2]; #say $tee "WORKING \$val1: " . dump( $val1 );
-                        my $val2 = $elt->[2]; #say $tee "WORKING \$val2: " . dump( $val2 );
-
-                        my $diffpos = ( $pos1 - $pos2 ); #say $tee "WORKING \$diffpos: " . dump( $diffpos );
-                        my $diffval = ( $val1 - $val2 ); #say $tee "WORKING \$diffval: " . dump( $diffval );
-                        my $grad;
-                        if ( ( $diffpos ne "" ) and ( $diffpos != 0 ) )
-                        {
-                          $grad = ( $diffval / $diffpos ); #say $tee "DEFINING \$grad: " . dump( $grad );
-                        }
-
-                        if ( $grad ne "" )
-                        { #say $tee "PUSHING \$grad: " . dump( $grad ) . " IN \$trio" . dump( $trio ) ;
-
-                          if ( $orderedtrio eq $trio )
+                          if ( ( $ordist > 0 ) and ( $ordist ne "" ) and ( $dist ne "" ) and ( $strength ne "" ) )
                           {
-                            push ( @{ $bank{$trio}{grads} }, (- $grad ) );
+                            push ( @{ $bank{$trio}{ordists} }, $ordist );
+                            #push ( @{ $bank{$reversedtrio}{ordists} }, $ordist );
+                            push ( @{ $bank{$trio}{dists} }, $dist );
+                            #push ( @{ $bank{$reversedtrio}{dists} }, $dist );
+                            push ( @{ $bank{$trio}{strengths} }, $strength );
                           }
-                          else
+
+                          #my $cn = 0;
+                          #foreach my $vals ( @{ $bank{$trio}{orvals} } )
+                          #{
+
+                          my $pos1 = $d11; #say $tee "WORKING \$pos1: " . dump( $pos1 );
+                          my $pos2 = $d21; #say $tee "WORKING \$pos2: " . dump( $pos2 );
+                          my $val1 = $el->[2]; #say $tee "WORKING \$val1: " . dump( $val1 );
+                          my $val2 = $elt->[2]; #say $tee "WORKING \$val2: " . dump( $val2 );
+
+                          my $diffpos = ( $pos1 - $pos2 ); #say $tee "WORKING \$diffpos: " . dump( $diffpos );
+                          my $diffval = ( $val1 - $val2 ); #say $tee "WORKING \$diffval: " . dump( $diffval );
+                          my $grad;
+                          if ( ( $diffpos ne "" ) and ( $diffpos != 0 ) )
                           {
-                            push ( @{ $bank{$trio}{grads} }, $grad );
+                            $grad = ( $diffval / $diffpos ); #say $tee "DEFINING \$grad: " . dump( $grad );
+                          }
+
+                          if ( $grad ne "" )
+                          { #say $tee "PUSHING \$grad: " . dump( $grad ) . " IN \$trio" . dump( $trio ) ;
+
+                            if ( $orderedtrio eq $trio )
+                            {
+                              push ( @{ $bank{$trio}{grads} }, (- $grad ) );
+                            }
+                            else
+                            {
+                              push ( @{ $bank{$trio}{grads} }, $grad );1
+                            }
                           }
                         }
                       }
-                    }
 
-                  $co++;
+                    $co++;
+                  }
+                  $count++;
                 }
-                $count++;
+
               }
+
             }
           }
         }
@@ -726,8 +742,8 @@ sub wei
     return ( \%bank );
   }
 
-  my %bank = %{ fillbank( \@arr, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels ) };
-  #say $tee "IN WEI \%bank: " . dump( %bank );
+  my %bank = %{ fillbank( \@arr, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter ) };
+  say $tee "IN WEI \%bank: " . dump( %bank );
 
   sub clean
   {
@@ -877,6 +893,7 @@ sub wei
                         #say $tee "332 OBTAINED \$totdist: " . dump( $totdist );
                         #say $tee "332 OBTAINED \$totstrength: " . dump( $totstrength );
 
+                        #unless ( ( $soughtinc eq "" ) or ( $totdist eq "" ) or ( $elt->[0] ~~ @{ $wand{$key}{origin} } ) )###################
                         unless ( ( $soughtinc eq "" ) or ( $totdist eq "" ) )
                         {
                           my $soughtval = ( $elt->[2] + $soughtinc );
@@ -1494,7 +1511,7 @@ sub interlinear
 
     if ( ( $mode__ eq "wei" ) or ( $mode__ eq "mix" ) )
     {
-      @limbo_wei = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist );
+      @limbo_wei = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter );
       say $tee "THERE ARE " . scalar( @limbo_wei ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR WEIGHTED GRADIENT INTERPOLATION OF THE NEAREST NEIGHBOUR.";
     }
     #say $tee "OBTAINED LIMBO_WEI: " . dump( @limbo_wei );
@@ -1659,13 +1676,13 @@ __END__
 Sim::OPT::Interlinear
 
 
-=head1 SYNOPSISdata series
+=head1 SYNOPSIS
 
-
+  # as a function from Perl (for example, after having launched "re.pl" from the command line):
   interlinear( "/path/to/a-pre-prepared-configfile.pl", "/path/to/a-pre-prepared-sourcefile.csv", "/path/to/the-metamodel-file-to-be-obtained" );
-  # or from the command line:
+  # or as a script, from the command line, from a directory where the file "Interlinear.pm" has been copied:
   interlinear .
-  # (note the dot at the end), to use the file as a script and include the location of the source file directly in the configuration file.
+  # (note the dot at the end). In that case, Interlinear will look for the source file "sourcefile.csv" in the "$HOME" directory, and restitute back a file "sourcefile_meta.csv" in the same directory.
   # or, again, from the command line, for beginning with a dialogue question:
   interlinear interstart
 
@@ -1676,7 +1693,7 @@ Sim::OPT::Interlinear
 Interlinear is a program for computing the missing values in multivariate datasieries pre-prepared in csv format.
 The program can adopt the following algorithmic strategies and intermix their result:
 
-a) a propagating distance-weighted gradient-based strategy (by far the best one so far, keeping into account that the behaviour of factors is often not linear and there are curvatures all aroung the design space). The strategy weights the known gradients in a manner inversely proportional to the distance of their pivot points from the pivot points of the missing nearest-neighbouring gradients.
+a) a propagating distance-weighted gradient-based strategy (by far the best one so far, keeping into account that the behaviour of factors is often not linear and there are curvatures all around the design space). The strategy weights the known gradients in a manner inversely proportional to the distance of their pivot points from the pivot points of the missing nearest-neighbouring gradients.
 
 b) pure linear interpolation (one may want to use this in some occasions: for example, on factorials);
 

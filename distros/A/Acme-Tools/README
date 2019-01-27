@@ -1,13 +1,13 @@
-Acme::Tools version 0.21
+Acme::Tools version 0.23
 ========================
 
 INSTALLATION
 
 To install this module type the following:
 
-   wget http://search.cpan.org/CPAN/authors/id/K/KJ/KJETIL/Acme-Tools-0.16.tar.gz
-   tar zxf Acme-Tools-0.16.tar.gz
-   cd Acme-Tools-0.16
+   wget http://search.cpan.org/CPAN/authors/id/K/KJ/KJETIL/Acme-Tools-0.23.tar.gz
+   tar zxf Acme-Tools-0.23.tar.gz
+   cd Acme-Tools-0.23
 
    perl Makefile.PL
    make test
@@ -22,7 +22,19 @@ Or if you've installed 'App::cpanminus' and have the 'cpanm' tool available, run
    cpan App::cpanminus     #or:  apt-get -y install cpanminus  #on ubundu or debian
    cpanm Acme::Tools
 
+Or from github:
+
+   git clone https://github.com/kjetillll/Acme-Tools.git
+   cd Acme-Tools
+   perl Makefile.PL
+   make test
+   sudo make install
+
 To install system wide, run make install, cpanm or cpan as root.
+
+To self-update, grabs newest in master branch from github and replaces just the Tools.pm file:
+
+   sudo perl -MAcme::Tools -e Acme::Tools::self_update
 
 WHAT
 
@@ -50,7 +62,7 @@ COPYRIGHT AND LICENCE
 
 Put the correct copyright and licence information here.
 
-Copyright (C) 2008-2018 Kjetil Skotheim
+Copyright (C) 2008-2019 Kjetil Skotheim
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

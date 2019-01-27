@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Mock data creation
 
-our $VERSION = '0.0902';
+our $VERSION = '0.1001';
 
 use strict;
 use warnings;
@@ -113,7 +113,7 @@ sub time_ranger {
         if ($args{stamp}) {
             # In HH:MM::SS format.
             my $time = scalar localtime($start_time + $offset);
-            push @results, (split / /, $time)[4];
+            push @results, (split / /, $time)[3];
         }
         else {
             # As a number of seconds from the "epoc."
@@ -166,7 +166,7 @@ sub number_ranger {
 sub name_ranger {
     my %args = @_;
     # Set defaults.
-    $args{gender}  ||= 0;
+    $args{gender}  ||= 'b';
     $args{names}   ||= 2;
     $args{country} ||= 'us';
     $args{N}       ||= NDATA;
@@ -223,7 +223,7 @@ sub email_modifier {
         # Add an email address for the person.
         my $email = lc($name[0]);
         $email .= '.'. lc($name[-1]) if @name > 1;
-        $email .= '@example.' . $tld[rand @tld];
+        $email .= '@example.' . $tld[int rand @tld];
         push @results, $email;
     }
 
@@ -390,24 +390,26 @@ Mock::Populate - Mock data creation
 
 =head1 VERSION
 
-version 0.0902
+version 0.1001
 
 =head1 SYNOPSIS
 
   use Mock::Populate;
   # * Call each function below with Mock::Populate::foo(...
-  $ids    = number_ranger(start => 1, end => 1001, prec => 0, random => 0, N => $n);
-  $money  = number_ranger(start => 1000, end => 5000, prec => 2, random => 1, N => $n);
-  $create = date_ranger(start => '1900-01-01', end => '2020-12-31', N => $n);
-  $modify = date_modifier($offset, @$create);
-  $times  = time_ranger(stamp => 1, start => '01:02:03' end =>'23:59:59', N => $n);
-  $people = name_ranger(gender => 'b', names => 2, country => 'us', N => $n);
-  $email  = email_ranger(@$people);
-  $shuff  = shuffler($n, qw(foo bar baz goo ber buz));
-  $stats  = distributor(type => 'u', prec => 4, dof => 2, N => $n);
-  $string = string_ranger(length => 32, type => 'base64', N => $n);
-  $imgs   = image_ranger(size => 10, N => $n);  # *size is density, not pixel dimension
-  $coll   = collate($ids, $people, $email, $create, $times, $modify, $times);
+  my $n      = 5;
+  my $offset = 11;
+  my $ids    = number_ranger(start => 1, end => 1001, prec => 0, random => 0, N => $n);
+  my $money  = number_ranger(start => 1000, end => 5000, prec => 2, random => 1, N => $n);
+  my $create = date_ranger(start => '1900-01-01', end => '2020-12-31', N => $n);
+  my $modify = date_modifier($offset, @$create);
+  my $times  = time_ranger(stamp => 1, start => '01:02:03', end =>'23:59:59', N => $n);
+  my $people = name_ranger(gender => 'b', names => 2, country => 'us', N => $n);
+  my $email  = email_ranger(@$people);
+  my $shuff  = shuffler($n, qw(foo bar baz goo ber buz));
+  my $stats  = distributor(type => 'u', prec => 4, dof => 2, N => $n);
+  my $string = string_ranger(length => 32, type => 'base64', N => $n);
+  my $imgs   = image_ranger(size => 10, N => $n);  # *size is density, not pixel dimension
+  my $coll   = collate($ids, $people, $email, $create, $times, $modify, $times);
 
 =head1 DESCRIPTION
 
@@ -427,48 +429,54 @@ be directly inserted into your favorite database, with your favorite perl ORM.
 
   $results = date_ranger(start => $start, end => $end, N => $n);
 
-Return a list of N random dates within a range.  The start and end dates and
-desired number of data-points arguments are all optional.  The defaults are:
+Return a list of B<N> random dates within a range.  The start and end dates, and
+desired number of data-points are all optional.  The defaults are:
 
   start: 2000-01-01
   end: today (computed if not given)
   N: 10
 
-The dates must be given as B<YYYY-MM-DD> strings.
+The dates must be given as C<YYYY-MM-DD> strings.
 
 =head2 date_modifier()
 
   $modify = date_modifier($offset, @$dates);
 
-Returns a new list of random future dates, based on the offset, and respective
-to each given date.
+Return a new list of random future dates, based on the offset.
 
 =head2 time_ranger()
 
   $results = time_ranger(
-    stamp => $stamp, start => $start, end => $end,
-    N => $n);
+    stamp => $stamp,
+    start => $start,
+    end   => $end,
+    N     => $n,
+  );
 
-Return a list of N random times within a range.  The start and end times and
-desired number of data-points arguments are all optional.  The defaults are:
+Return a list of B<N> random times within a range.  The stamp, start and end
+times, and desired number of data-points are all optional.  The defaults are:
 
   stamp: 1 (boolean)
   start: 00-00-00
   end: now (computed if not given)
   N: 10
 
-The times must be given as B<HH-MM-SS> strings.
+The times must be given as C<HH-MM-SS> strings.  The B<stamp> argument
+determines if a time-stamp or the number of seconds should be returned.
 
 =head2 number_ranger()
 
   $results = number_ranger(
-    start => $start, end => $end,
-    prec => $prec, random => $random,
-    N => $n)
+    start  => $start,
+    end    => $end,
+    prec   => $prec,
+    random => $random,
+    N      => $n
+  );
 
-Return a list of N random numbers within a range.  The start, end, precision,
-whether we want random or sequential numbers and desired number of data-points
-arguments are all optional.  The defaults are:
+Return a list of B<N> random numbers within a range.  The start, end, precision,
+whether we want random or sequential numbers, and the desired number of
+data-points are all optional.  The defaults are:
 
   start: 0
   end: 9
@@ -479,35 +487,50 @@ arguments are all optional.  The defaults are:
 =head2 name_ranger()
 
   $results = name_ranger(
-    gender => $gender, names => $names, country => $country,
-    N => $n)
+    gender  => $gender,
+    names   => $names,
+    country => $country,
+    N       => $n,
+  );
 
-Return a list of N random person names.  The gender, number of names and
-desired number of data-points arguments are all optional.  The defaults are:
+Return a list of B<N> random person names.  The gender, number of names, and
+desired number of data-points are all optional.  The defaults are:
 
   gender: b (options: both, female, male)
   names: 2 (first, last)
   country: us
   N: 10
 
+This routine uses L<Mock::Person>.  Please see that module for the country
+identifiers to use.
+
 =head2 email_modifier()
 
   $results = email_modifier(@people)
   # first.last@example.{com,net,org,edu}
 
-Return a list of N email addresses based on a list of given names.
+Return a list of email addresses based on a list of given names.  Any names with
+unicode are run through L<Text::Unidecode>.
 
 =head2 distributor()
 
-  $results = distributor(type => $type, prec => $prec, dof => $dof, N => $n)
+  $results = distributor(
+    type => $type,
+    prec => $prec,
+    dof  => $dof,
+    N    => $n,
+  );
 
-Return a list of N distribution values.  The type, precision, degrees-of-freedom
-and desired number of data-points arguments are optional.  The defaults are:
+Return a list of B<N> distribution values.  The type, precision,
+degrees-of-freedom, and desired number of data-points are optional.
+The defaults are:
 
   type: u (normal)
   precision: 2
   degrees-of-freedom: 2
   N: 10
+
+This routine uses L<Statistics::Distributions>.
 
 =head3 Types
 
@@ -518,30 +541,26 @@ This function uses single letter identifiers:
   s: Student's T distribution
   f: F distribution
 
-=head3 Degrees of freedom
-
-Given the type, this function accepts the following:
-
-  c: A single integer
-  s: A single integer
-  f: A fraction string of the form 'N/D' (default 2/1)
-
 =head2 shuffler()
 
   $results = shuffler($n, @items)
 
 Return a shuffled list of B<$n> items.  The items and number of data-points
-arguments are optional.  The defaults are:
+are optional.  The defaults are:
 
   n: 10
   items: a b c d e f g h i j
 
 =head2 string_ranger()
 
-  $results = string_ranger(type => $type, length => $length, N => $n)
+  $results = string_ranger(
+    type   => $type,
+    length => $length,
+    N      => $n,
+  );
 
-Return a list of N strings.  The strings and number of data-points
-arguments are optional.  The defaults are:
+Return a list of B<N> strings.  The type, length, and number of data-points are
+optional.  The defaults are:
 
   type: default
   length: 8
@@ -563,20 +582,22 @@ C<rndpassword> program, but allows you to generate a finite number of results.
   alpha     femvifzscyvvlwvn  a..z
   pron      werbucedicaremoz  a..z but pronounceable!
   digit     7563919623282657  0..9
-  binary    1001011110000101
-  morse     -.--...-.--.-..-
+  binary    1001011110000101  01
+  morse     -.--...-.--.-..-  .-
 
 =head2 image_ranger()
 
   $results = image_ranger(size => $size, N => $n)
 
-Return a list of N 1x1 pixel images of varying byte sizes (not image dimension).
-The byte size and number of data-points are both optional.
+Return a list of B<N> 1x1 pixel images of varying byte sizes (not image
+dimension).  The byte size and number of data-points are both optional.
 
 The defaults are:
 
   N: 10
   size: 8
+
+This routine uses L<Image::Dot>.
 
 =head2 collate()
 
@@ -634,7 +655,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

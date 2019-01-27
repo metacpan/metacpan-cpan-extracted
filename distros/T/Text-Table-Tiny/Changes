@@ -1,5 +1,12 @@
 Revision history for Perl module Text::Table::Tiny
 
+0.05 2019-01-25 NEILB
+    - generate_table() was die'ing if no rows were passed, which resulted
+      in a suboptimal error message. Now croaks; added fatal test for this.
+    - Added top_and_tail param, to address GH#3.
+    - deleted unused internal function _get_cols_and_rows(). Devel::Cover++
+    - Enabled Travis-CI. PR from Petr Kletečka++.
+
 0.04 2015-11-05 NEILB
     - Added this Changes file. Addresses RT#97285
     - Now use Exporter, and provide an optional export generate_table(),

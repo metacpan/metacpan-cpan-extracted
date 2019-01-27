@@ -7,14 +7,14 @@ use Getopt::Long;
 use IO::File;
 use Pod::Usage;
 use strict;
-use vars qw ($Debug $VERSION);
+use vars qw($Debug $VERSION);
 
 # We need keywords, but haven't completely built yet, so can't use the blib
 # Thus we pull in Language.pm directly
 require "../Language.pm";
 package main;
 
-$VERSION = '3.456';
+$VERSION = '3.460';
 
 # xs_manual=>1,   -> The .xs file makes the handler itself
 
@@ -68,7 +68,7 @@ our $Opt_Debug;
 
 autoflush STDOUT 1;
 autoflush STDERR 1;
-Getopt::Long::config ("no_auto_abbrev");
+Getopt::Long::config("no_auto_abbrev");
 if (! GetOptions (
 	  # Local options
 	  "help"	=> \&usage,
@@ -85,7 +85,7 @@ process();
 sub usage {
     print "Version $VERSION\n";
     pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
-    exit (1);
+    exit(1);
 }
 
 #######################################################################
@@ -369,7 +369,7 @@ This is part of the L<http://www.veripool.org/> free Verilog EDA software
 tool suite.  The latest version is available from CPAN and from
 L<http://www.veripool.org/>.
 
-Copyright 2008-2018 by Wilson Snyder.  This package is free software; you
+Copyright 2008-2019 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

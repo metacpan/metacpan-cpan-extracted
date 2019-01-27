@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Text
   repository: git://github.com/nigelhorne/DateTime-Format-Text.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

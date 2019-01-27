@@ -9,12 +9,14 @@ use warnings;
 
 use Type::Library
    -base,
-   -declare => qw( DistName DistVersion DistFQ );
+   -declare => qw( DistName DistVersion DistFQ CPANfile );
 
 use Type::Utils -all;
 use Types::Standard -types;
 
-our $VERSION = '0.02';
+use Module::CPANfile;
+
+our $VERSION = '0.03';
 
 my $distname_re = qr{
     (?:[A-Za-z][A-Za-z0-9]*)
@@ -44,6 +46,12 @@ declare DistFQ =>
     as Str,
     where { $_ =~ m{\A$distfq_re\z} };
 
+class_type CPANfile, { class => 'Module::CPANfile' };
+
+coerce CPANfile,
+    from Str, via { Module::CPANfile->load( $_ ) }
+;
+
 1;
 
 __END__
@@ -58,7 +66,7 @@ Types::Dist - Types related to distributions (e.g. distributions on CPAN)
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 TYPES
 

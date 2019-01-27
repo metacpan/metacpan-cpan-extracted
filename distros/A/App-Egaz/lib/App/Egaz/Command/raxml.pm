@@ -109,7 +109,7 @@ sub execute {
     {    # run raxml
         my $exe;
         for (
-            qw{raxmlHPC-AVX raxmlHPC-PTHREADS-AVX raxmlHPC-SSE3 raxmlHPC-PTHREADS-SSE3 raxmlHPC-PTHREADS raxmlHPC}
+            qw{raxmlHPC-PTHREADS-AVX raxmlHPC-PTHREADS-SSE3 raxmlHPC-PTHREADS raxmlHPC-AVX raxmlHPC-SSE3 raxmlHPC}
             )
         {
             if ( IPC::Cmd::can_run($_) ) {

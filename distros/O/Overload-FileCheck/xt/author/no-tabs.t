@@ -40,6 +40,7 @@ my @files = (
     't/test-b.t',
     't/test-c.t',
     't/test-d.t',
+    't/test-e-simple.t',
     't/test-e.t',
     't/test-f.t',
     't/test-g.t',

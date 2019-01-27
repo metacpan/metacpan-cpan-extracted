@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.107';
+our $VERSION = '0.108';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -197,7 +197,8 @@ sub __recursive_code {
     $self->{table_copy} = [];
     $self->__copy_table();
     $self->__calc_col_width();
-    my $term_w = term_width();
+    my $extra_w = $^O eq 'MSWin32' || $^O eq 'cygwin' ? 0 : 1;
+    my $term_w = term_width() + $extra_w;
     my $w_cols = $self->__calc_avail_col_width( $term_w );
     if ( ! defined $w_cols ) {
         return;
@@ -231,8 +232,8 @@ sub __recursive_code {
     my $row_is_expanded = 0;
 
     while ( 1 ) {
-        if ( term_width() != $term_w ) {
-            $term_w = term_width();
+        if ( $term_w != term_width() + $extra_w ) {
+            $term_w = term_width() + $extra_w;
             $self->__recursive_code();
             return;
         }
@@ -698,7 +699,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.107
+Version 0.108
 
 =cut
 

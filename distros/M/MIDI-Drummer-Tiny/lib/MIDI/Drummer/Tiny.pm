@@ -1,69 +1,48 @@
 package MIDI::Drummer::Tiny;
-BEGIN {
-  $MIDI::Drummer::Tiny::AUTHORITY = 'cpan:GENE';
-}
+our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-use strict;
-use warnings;
-
-our $VERSION = '0.05';
+our $VERSION = '0.0800';
 
 use Moo;
 use MIDI::Simple;
 
 
-sub BUILDARGS
-{
-   my ( $class, %args ) = @_;
+sub BUILD {
+   my ( $self, $args ) = @_;
 
-    $args{channel}   ||= 9;
-    $args{volume}    ||= 100;
-    $args{bpm}       ||= 120;
-    $args{signature} ||= '4/4';
-    $args{score}     ||= MIDI::Simple->new_score;
-
-    ($args{beats}, $args{divisions}) = split /\//, $args{signature};
-
-    $args{score}->time_signature(
-        $args{beats},
-        sqrt( $args{divisions} ),
-        ( $args{divisions} == 8 ? 24 : 18 ),
+    my ($beats, $divisions) = split /\//, $self->signature;
+    $self->beats($beats);
+    $self->divisions($divisions);
+    $self->score->time_signature(
+        $self->beats,
+        ( $self->divisions == 8 ? 3 : 2),
+        ( $self->divisions == 8 ? 24 : 18 ),
         8
     );
 
-    $args{score}->noop( 'c' . $args{channel}, 'V' . $args{volume} );
-    $args{score}->set_tempo( int( 60_000_000 / $args{bpm} ) );
+    $self->score->noop( 'c' . $self->channel, 'V' . $self->volume );
+    $self->score->set_tempo( int( 60_000_000 / $self->bpm ) );
 
-    $args{patch} ||= 0;
-    $args{score}->patch_change( $args{channel}, $args{patch} );
-
-    $args{reverb} ||= 0;
-    $args{score}->control_change( $args{channel}, 91, $args{reverb} );
-    $args{chorus} ||= 0;
-    $args{score}->control_change( $args{channel}, 93, $args{chorus} );
-    $args{pan}    ||= 0;
-    $args{score}->control_change( $args{channel}, 10, $args{pan} );
-
-   return \%args;
+    $self->score->control_change( $self->channel, 91, $self->reverb ) if $self->reverb;
+    $self->score->control_change( $self->channel, 93, $self->chorus ) if $self->chorus;
+    $self->score->control_change( $self->channel, 10, $self->pan ) if $self->pan;
 }
 
 
-has channel => ( is => 'ro' );
-has patch => ( is => 'ro' );
-has volume => ( is => 'ro' );
-has bpm => ( is => 'ro' );
-has reverb => ( is => 'ro' );
-has chorus => ( is => 'ro' );
-has pan => ( is => 'ro' );
-has beats => ( is => 'ro' );
-has divisions => ( is => 'ro' );
-has signature => ( is => 'ro' );
-has score => ( is => 'ro' );
-
-has file => ( is => 'ro', default => sub { 'MIDI-Drummer.mid' } );
-has bars => ( is => 'ro', default => sub { 4 } );
+has channel   => ( is => 'ro', default => sub { 9 } );
+has volume    => ( is => 'ro', default => sub { 100 } );
+has bpm       => ( is => 'ro', default => sub { 120 } );
+has reverb    => ( is => 'ro', default => sub { 0 } );
+has chorus    => ( is => 'ro', default => sub { 0 } );
+has pan       => ( is => 'ro', default => sub { 0 } );
+has file      => ( is => 'ro', default => sub { 'MIDI-Drummer.mid' } );
+has bars      => ( is => 'ro', default => sub { 4 } );
+has score     => ( is => 'ro', default => sub { MIDI::Simple->new_score } );
+has signature => ( is => 'ro', default => sub { '4/4' });
+has beats     => ( is => 'rw' );
+has divisions => ( is => 'rw' );
 
 
 # kit
@@ -88,13 +67,13 @@ has low_floor_tom => ( is => 'ro', default => sub { 'n41' } );
 
 
 # duration
-has whole => ( is => 'ro', default => sub { 'wn' } );
-has half => ( is => 'ro', default => sub { 'hn' } );
-has quarter => ( is => 'ro', default => sub { 'qn' } );
-has triplet_quarter => ( is => 'ro', default => sub { 'tqn' } );
-has eighth => ( is => 'ro', default => sub { 'en' } );
-has triplet_eighth => ( is => 'ro', default => sub { 'ten' } );
-has sixteenth => ( is => 'ro', default => sub { 'sn' } );
+has whole             => ( is => 'ro', default => sub { 'wn' } );
+has half              => ( is => 'ro', default => sub { 'hn' } );
+has quarter           => ( is => 'ro', default => sub { 'qn' } );
+has triplet_quarter   => ( is => 'ro', default => sub { 'tqn' } );
+has eighth            => ( is => 'ro', default => sub { 'en' } );
+has triplet_eighth    => ( is => 'ro', default => sub { 'ten' } );
+has sixteenth         => ( is => 'ro', default => sub { 'sn' } );
 has triplet_sixteenth => ( is => 'ro', default => sub { 'tsn' } );
 
 
@@ -106,7 +85,7 @@ sub rest { return shift->score->r(@_) }
 
 sub count_in {
     my $self = shift;
-    my $bars = shift || 1;
+    my $bars = shift || $self->bars;
     for my $i ( 1 .. $self->beats * $bars) {
         $self->note( $self->quarter, $self->closed_hh );
     }
@@ -148,19 +127,18 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.05
+version 0.0800
 
 =head1 SYNOPSIS
 
  use MIDI::Drummer::Tiny;
  my $d = MIDI::Drummer::Tiny->new(
-    file => 'drums.mid',
-    bpm => 120,
+    file      => 'drums.mid',
+    bpm       => 100,
     signature => '3/4',
-    bars => 32,
-    patch => 26, # TR808
+    bars      => 32,
  );
- $d->count_in();
+ $d->count_in(1);
  $d->note( $d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare )
     for 1 .. $d->beats * $d->bars;  # Alternate beats
  $d->metronome();  # <- Similar but honoring time signature
@@ -168,103 +146,149 @@ version 0.05
 
 =head1 DESCRIPTION
 
-This module provides a MIDI drummer with the bare essentials to add notes to a
-MIDI score.
+This module provides a MIDI drummer with the essentials to add notes to produce
+a MIDI score.
 
 =head1 ATTRIBUTES
 
-=head2 file: MIDI-Drummer.mid
+=head2 file
 
-=head2 score MIDI::Simple->new_score
+Default: MIDI-Drummer.mid
 
-=head2 channel: 9
+=head2 score
 
-=head2 volume: 100
+Default: MIDI::Simple->new_score
 
-=head2 patch: 0
+=head2 channel
 
-=head2 bpm: 120
+Default: 9
 
-=head2 reverb: 0
+=head2 volume
 
-=head2 chorus: 0
+Default: 100
 
-=head2 pan: 0
+=head2 bpm
 
-=head2 bars: 4
+Default: 120
 
-=head2 beats: 4
+=head2 reverb
 
-=head2 divisions: 4
+Default: 0
 
-=head2 signature: 4/4
+=head2 chorus
 
-"beats/divisions"
+Default: 0
+
+=head2 pan
+
+Default: 0
+
+=head2 bars
+
+Default: 4
+
+=head2 beats
+
+Computed given the B<signature>.
+
+=head2 divisions
+
+Computed given the B<signature>.
+
+=head2 signature
+
+Default: 4/4
+
+B<beats>/B<divisions>
 
 =head1 KIT
 
-=head2 kick
+These patches may be overridden as with any other attribute.
 
-=head2 snare
+=over 4
 
-=head2 open_hh
+=item kick
 
-=head2 closed_hh
+=item snare
 
-=head2 pedal_hh
+=item open_hh
 
-=head2 crash1
+=item closed_hh
 
-=head2 crash2
+=item pedal_hh
 
-=head2 splash
+=item crash1
 
-=head2 china
+=item crash2
 
-=head2 ride1
+=item splash
 
-=head2 ride2
+=item china
 
-=head2 ride_bell
+=item ride1
 
-=head2 hi_tom
+=item ride2
 
-=head2 hi_mid_tom
+=item ride_bell
 
-=head2 low_mid_tom
+=item hi_tom
 
-=head2 low_tom
+=item hi_mid_tom
 
-=head2 hi_floor_tom
+=item low_mid_tom
 
-=head2 low_floor_tom
+=item low_tom
+
+=item hi_floor_tom
+
+=item low_floor_tom
+
+=back
 
 =head1 DURATIONS
 
-=head2 whole
+=over 4
 
-=head2 half
+=item whole
 
-=head2 quarter, triplet_quarter
+=item half
 
-=head2 eighth, triplet_eighth
+=item quarter, triplet_quarter
 
-=head2 sixteenth, triplet_sixteenth
+=item eighth, triplet_eighth
+
+=item sixteenth, triplet_sixteenth
+
+=back
 
 =head1 METHODS
+
+=head2 new()
+
+  $d = MIDI::Drummer::Tiny->new(%arguments);
+
+Return a new C<MIDI::Drummer::Tiny> object.
+
+=head2 BUILD()
+
+Initialize the score.
 
 =head2 note()
 
  $d->note( $d->quarter, $d->closed_hh, $d->kick );
  $d->note( 'qn', 'n42', 'n35' ); # Same thing
 
-Send a note to the score.
+Add a note to the score.
+
+This method takes the same arguments as with L<MIDI::Simple/"Parameters for n/r/noop">.
 
 =head2 rest()
 
  $d->rest( $d->quarter );
 
-Send a rest to the score.
+Add a rest to the score.
+
+This method takes the same arguments as with L<MIDI::Simple/"Parameters for n/r/noop">.
 
 =head2 count_in()
 
@@ -272,9 +296,12 @@ Send a rest to the score.
  $d->count_in($bars);
 
 Play the closed hihat for the number of beats times the given bars.
-If no bars are given, the default of 1 is used.
+If no bars are given, the default times the number of beats is used.
 
 =head2 metronome()
+
+  $d->metronome;
+  $d->metronome($bars);
 
 Add a steady beat to the score.
 
@@ -282,13 +309,19 @@ Add a steady beat to the score.
 
 Output the score to the F<*.mid> file given in the constuctor.
 
+=head1 SEE ALSO
+
+L<Moo>
+
+L<MIDI::Simple>
+
 =head1 AUTHOR
 
 Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

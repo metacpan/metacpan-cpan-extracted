@@ -2,6 +2,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
   NAME => 'Inline::Struct',
+  LICENSE => 'perl_5',
   MIN_PERL_VERSION => 5.010, # // operator
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => 6.48,

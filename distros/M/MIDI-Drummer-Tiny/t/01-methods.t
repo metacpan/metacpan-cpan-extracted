@@ -6,11 +6,13 @@ use Test::More;
 
 use_ok 'MIDI::Drummer::Tiny';
 
-my $md = MIDI::Drummer::Tiny->new(
-);
-isa_ok $md, 'MIDI::Drummer::Tiny';
+my $d = new_ok 'MIDI::Drummer::Tiny';
 
-is $md->beats, 4, 'beats';
-is $md->divisions, 4, 'divisions';
+isa_ok $d->score, 'MIDI::Simple';
+
+is $d->beats, 4, 'beats computed';
+is $d->divisions, 4, 'divisions computed';
+
+is(($d->score->Score)[1][0], 'time_signature', 'time signature added');
 
 done_testing();

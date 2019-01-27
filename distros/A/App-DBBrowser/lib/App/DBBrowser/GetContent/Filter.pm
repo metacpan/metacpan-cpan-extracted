@@ -34,10 +34,11 @@ sub input_filter {
         my $input_cols       = 'Choose Columns';
         my $input_rows       = 'Choose Rows';
         my $input_rows_range = 'A Range of Rows';
-        my $cols_to_rows     = 'Cols_to_Rows';
-        my $empty_to_null    = 'Empty_to_NULL';
+        my $add_col          = 'Add Column';
+        my $cols_to_rows     = 'Cols to Rows';
+        my $empty_to_null    = 'Empty to NULL';
         my $reset            = 'Reset';
-        my $choices = [ @pre, $input_cols, $input_rows, $input_rows_range, $cols_to_rows, $empty_to_null, $reset ];
+        my $choices = [ @pre, $input_cols, $input_rows, $input_rows_range, $add_col, $cols_to_rows, $empty_to_null, $reset ];
         my $waiting = 'Working ... ';
         $ax->print_sql( $sql );
         # Choose
@@ -85,6 +86,9 @@ sub input_filter {
         }
         elsif ( $filter eq $empty_to_null ) {
             $sf->__empty_to_null();
+        }
+        elsif ( $filter eq $add_col ) {
+            $sf->__add_column( $sql );
         }
     }
 }
@@ -265,6 +269,19 @@ sub __range_of_rows {
         return;
     }
     $sql->{insert_into_args} = [ @{$aoa}[$first_row .. $last_row] ];
+    return;
+}
+
+
+sub __add_column {
+    my ( $sf, $sql ) = @_;
+    my $aoa = $sql->{insert_into_args};
+    my $end = $#{$aoa->[0]};
+    for my $row ( @$aoa ) {
+        $#$row = $end + 1;
+    }
+    $aoa->[0][$end + 1] = 'col' . ( $end + 2 );
+    $sql->{insert_into_args} = $aoa;
     return;
 }
 

@@ -1,0 +1,111 @@
+#!perl
+
+our $DATE = '2019-01-25'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+
+use Getopt::Long::Modern;
+
+our $opt_times = 1;
+GetOptions('times|n=i');
+
+for my $item (@ARGV) {
+    $item++ for 1..$opt_times;
+    print "$item\n";
+}
+
+# ABSTRACT: Increment variable using Perl's auto-increment notion
+# PODNAME: inc-pl
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+inc-pl - Increment variable using Perl's auto-increment notion
+
+=head1 VERSION
+
+This document describes version 0.001 of inc-pl (from Perl distribution App-IncrementUtils), released on 2019-01-25.
+
+=head1 SYNOPSIS
+
+ % inc-pl 1 9 01 09 a ab az A AB AZ Az aa01 aa09 aa99
+ 2
+ 10
+ 02
+ 10
+ b
+ ac
+ ba
+ B
+ AC
+ BA
+ Ba
+ aa02
+ aa10
+ ab00
+
+=head1 DESCRIPTION
+
+This very simple script increments its arguments using Perl's C<++>
+(auto-increment) operator. The rules, taken from L<perlop> and copied here for
+convenience, are the following:
+
+ The auto-increment operator has a little extra builtin magic to it. If you
+ increment a variable that is numeric, or that has ever been used in a numeric
+ context, you get a normal increment. If, however, the variable has been used in
+ only string contexts since it was set, and has a value that is not the empty
+ string and matches the pattern "/^[a-zA-Z]*[0-9]*\z/", the increment is done as
+ a string, preserving each character within its range, with carry:
+
+     print ++($foo = "99");      # prints "100"
+     print ++($foo = "a0");      # prints "a1"
+     print ++($foo = "Az");      # prints "Ba"
+     print ++($foo = "zz");      # prints "aaa"
+
+ "undef" is always treated as numeric, and in particular is changed to 0 before
+ incrementing (so that a post-increment of an undef value will return 0 rather
+ than "undef").
+
+ The auto-decrement operator is not magical.
+
+=head1 OPTIONS
+
+=head2 --times=i (-n)
+
+Specify how many times to increment.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-IncrementUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-IncrementUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IncrementUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

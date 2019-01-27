@@ -1,5 +1,8 @@
 Revision history for WWW::Google::PageSpeedOnline
 
+0.27  Sun Jan 27 10:40:00 2019
+      - Updated dependency on WWW::Google::UserAgent v0.21.
+
 0.26  Sun Sep 02 06:55:00 2018
       - Used "namespace::autoclean" instead of "namespace::clean".
 

@@ -1,5 +1,5 @@
 package Test::Count::Lib;
-$Test::Count::Lib::VERSION = '0.0902';
+$Test::Count::Lib::VERSION = '0.1000';
 use strict;
 use warnings;
 
@@ -25,11 +25,11 @@ Test::Count::Lib - various commonly used routines.
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 FUNCTIONS
 

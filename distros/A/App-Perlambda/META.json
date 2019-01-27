@@ -1,0 +1,94 @@
+{
+   "abstract" : "A CLI tool for managing Lambda functions with Lambda Perl layer.",
+   "author" : [
+      "moznion <moznion@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Perlambda",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AWS::CLIWrapper" : "1.16",
+            "perl" : "5.020000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::Perlambda" : {
+         "file" : "lib/App/Perlambda.pm",
+         "version" : "0.01"
+      },
+      "App::Perlambda::CLI" : {
+         "file" : "lib/App/Perlambda/CLI.pm"
+      },
+      "App::Perlambda::CLI::Create" : {
+         "file" : "lib/App/Perlambda/CLI/Create.pm"
+      },
+      "App::Perlambda::CLI::Dist" : {
+         "file" : "lib/App/Perlambda/CLI/Dist.pm"
+      },
+      "App::Perlambda::CLI::Help" : {
+         "file" : "lib/App/Perlambda/CLI/Help.pm"
+      },
+      "App::Perlambda::CLI::Update" : {
+         "file" : "lib/App/Perlambda/CLI/Update.pm"
+      },
+      "App::Perlambda::Util" : {
+         "file" : "lib/App/Perlambda/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/moznion/p5-App-Perlambda/issues"
+      },
+      "homepage" : "https://github.com/moznion/p5-App-Perlambda",
+      "repository" : {
+         "url" : "git://github.com/moznion/p5-App-Perlambda.git",
+         "web" : "https://github.com/moznion/p5-App-Perlambda"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:MOZNION",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

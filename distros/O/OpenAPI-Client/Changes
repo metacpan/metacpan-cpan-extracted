@@ -1,5 +1,8 @@
 Revision history for perl distribution OpenAPI-Client
 
+0.22 2019-01-25T14:45:56+0900
+ - Updated documentation to use $client instead of $self
+
 0.21 2018-10-03T16:19:00+0900
  - Fix failing tests after Mojolicious::Plugin::OpenAPI 2.00 #15
 

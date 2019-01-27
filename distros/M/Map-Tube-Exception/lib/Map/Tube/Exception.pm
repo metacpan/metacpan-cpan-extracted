@@ -1,13 +1,13 @@
 package Map::Tube::Exception;
 $Map::Tube::Exception::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::VERSION = '3.18';
+$Map::Tube::Exception::VERSION = '3.19';
 =head1 NAME
 
 Map::Tube::Exception - Base exception package as Moo Role for Map::Tube::* family.
 
 =head1 VERSION
 
-version 3.18
+version 3.19
 
 =cut
 

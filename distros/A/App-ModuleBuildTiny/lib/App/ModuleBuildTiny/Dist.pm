@@ -3,7 +3,7 @@ package App::ModuleBuildTiny::Dist;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use CPAN::Meta;
 use Carp qw/croak/;
@@ -152,7 +152,7 @@ sub new {
 			dynamic_config => 0,
 			license        => [ $license->meta2_name ],
 			prereqs        => $prereqs,
-			release_status => $version =~ /_|-TRIAL$/ ? 'testing' : 'stable',
+			release_status => $opts{trial} || $version =~ /_/ ? 'testing' : 'stable',
 			generated_by   => "App::ModuleBuildTiny version $VERSION",
 			'meta-spec'    => {
 				version    => '2',
@@ -291,7 +291,7 @@ for my $method (qw/meta license/) {
 	*$method = sub { my $self = shift; return $self->{$method}; };
 }
 
-for my $method (qw/name version/) {
+for my $method (qw/name version release_status/) {
 	no strict 'refs';
 	*$method = sub { my $self = shift; return $self->{meta}->$method; }
 }

@@ -217,23 +217,25 @@ sub stmt_placeholder_to_value {
 
 sub alias {
     my ( $sf, $type, $identifier, $default ) = @_;
-    my $term_w = term_width() - 1;
+    my $term_w = term_width();
     my $info;
     if ( $identifier eq '' ) { # Union
-        $info = ' ';
+        #$info = ' ';
         $identifier .= 'AS: ';
     }
     elsif ( print_columns( $identifier . ' AS: ' ) > $term_w / 3 ) {
-        $info = "\n" . $identifier;
+        #$info = "\n" . $identifier;
+        $info = $identifier;
         $identifier = 'AS: ';
     }
     else {
-        $info = ' ';
+        #$info = ' ';
         $identifier .= ' AS: ';
     }
     my $alias;
     if ( $sf->{o}{alias}{$type} ) {
         my $tf = Term::Form->new();
+        # Readline
         $alias = $tf->readline( $identifier, { info => $info } );
     }
     if ( ! defined $alias || ! length $alias ) {

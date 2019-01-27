@@ -1,0 +1,77 @@
+NAME
+    String::Util::Range - Find sequences in arrays & convert to range (e.g.
+    "a","b","c","d","x",1,2,3,4,"x" -> "a..d","x","1..4","x")
+
+VERSION
+    This document describes version 0.001 of String::Util::Range (from Perl
+    distribution String-Util-Range), released on 2019-01-25.
+
+FUNCTIONS
+  convert_sequence_to_range
+    Usage:
+
+     convert_sequence_to_range(%args) -> any
+
+    Find sequences in arrays & convert to range (e.g.
+    "a","b","c","d","x",1,2,3,4,"x" -> "a..d","x","1..4","x").
+
+    Examples:
+
+    *   basic:
+
+         convert_sequence_to_range(array => [1 .. 4, "x", "a" .. "d"]); # -> ["1..4", "x", "a..d"]
+
+    *   option: separator:
+
+         convert_sequence_to_range(array => [1 .. 4, "x", "a" .. "d"], separator => "-"); # -> ["1-4", "x", "a-d"]
+
+    *   option: threshold:
+
+         convert_sequence_to_range(array => [1 .. 4, "x", "a" .. "e"], threshold => 5); # -> [1 .. 4, "x", "a..e"]
+
+    Sequence follows Perl's autoincrement notion, e.g. 1->2, "aa"->"ab",
+    "az"->"ba", "01"->"02", "ab1"->"ab2".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   array => *array[str]*
+
+    *   separator => *str* (default: "..")
+
+    *   threshold => *posint* (default: 4)
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-Util-Range>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-String-Util-Range>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Util-Range>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Dump also does something similar, e.g. if you say "dd
+    [1,2,3,4,"x","a","b","c","d"];" it will dump the array as ""[1 .. 4,
+    "x", "a" .. "d"]"".
+
+    Number::Util::Range which only deals with numbers.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -33,7 +33,7 @@ sub _mycopy
    #
    # http://www.cpantesters.org/cpan/report/4936c342-71bd-1014-a781-9481788a0512
 
-    my $temp_dir = tempdir( CLEANUP => 1 );
+    my $temp_dir     = tempdir( CLEANUP => 1 );
     my $temp_lib_dir = File::Spec->catdir( $temp_dir, "lib" );
 
     my $orig_dir = File::Spec->catdir( File::Spec->curdir(),

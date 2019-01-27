@@ -11,6 +11,7 @@ t/anon.t
 t/argorder.t
 t/common.pl
 t/copyref.t
+t/funcptr.t
 t/multi.t
 t/oneline.t
 t/readme.t

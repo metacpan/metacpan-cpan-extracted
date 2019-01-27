@@ -1,0 +1,9 @@
+requires 'perl', '5.014';
+requires 'Roman::Unicode';
+requires 'DateTime';
+requires 'DateTime::Format::ISO8601';
+requires 'DBI';
+requires 'DBD::SQLite';
+requires 'Any::Moose', '== 0.26';
+requires 'Method::Signatures';
+requires 'Carp';

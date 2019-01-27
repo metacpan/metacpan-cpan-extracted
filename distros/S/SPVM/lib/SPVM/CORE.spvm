@@ -5,8 +5,89 @@ package SPVM::CORE {
   use SPVM::Hash;
   use SPVM::Comparator;
   use SPVM::Stringer;
+  use SPVM::FileHandle;
+
+  our $O_RDONLY : ro int;
+  our $O_WRONLY : ro int;
+  our $O_RDWR : ro int;
+  our $O_APPEND : ro int;
+  our $O_CREAT : ro int;
+  our $O_TRUNC : ro int;
+  our $SEEK_SET : ro int;
+  our $SEEK_CUR : ro int;
+  our $SEEK_END : ro int;
   
+  BEGIN {
+    init_native_constants();
+  }
+  
+  native sub init_native_constants : void ();
+  
+  sub open : int ($file_name : string, $amode : int[]...) {
+    return 0;
+  }
+  sub read : int ($fd : int, $buf : byte[], $buf_offset : int) {
+    return 0;
+  }
+  sub write : int ($fd : int, $buf : string) {
+    return 0;
+  }
+  sub lseek : int ($fd : int, $offset : long, $origin : int) {
+    return 0;
+  }
+  sub close : int ($fd : int) {
+    return 0;
+  }
+  
+  sub fopen : SPVM::FileHandle ($file_name : string, $mode : string) {
+    return undef;
+  }
+  sub fputc : int ($self : self, $c : int) {
+    return 0;
+  }
+  sub fread : int ($self :self, $buf : byte[], $buf_offset : int, $n : int) {
+    return 0;
+  }
+  sub fwrite : int ($self : self, $buf : byte[], $buf_offset : int, $n : int) {
+    return 0;
+  }
+  sub fseek : int ($self : self, $offset : long, $whence : int) {
+    return 0;
+  }
+  sub fclose : int ($self : self) {
+    return 0;
+  }
+  sub fgets : string ($self : self) {
+    
+    return undef;
+  }
+
   native sub new_oarray_proto : oarray ($proto_array : oarray, $length : int);
+
+  precompile sub replaceb : void ($nums : byte[], $offset : int, $replaces : byte[]) {
+    
+    if ($nums == undef) {
+      croak "Array must be defined";
+    }
+    
+    my $array_length = @$nums;
+    
+    if ($offset < 0 || $offset > $array_length - 1) {
+      croak "Invalid offset";
+    }
+    
+    my $length = @$replaces;
+    
+    if ($offset + $length > $array_length) {
+      croak "Offset + length must not be over array length";
+    }
+    
+    my $pos = 0;
+    for (my $i = $offset; $i < $offset + $length; $i++) {
+      $nums->[$pos] = $replaces->[$pos];
+      $pos++;
+    }
+  }
 
   precompile sub sliceb : byte[] ($nums : byte[], $offset : int, $length : int) {
     
@@ -240,11 +321,10 @@ package SPVM::CORE {
   native sub sortf : void ($nums : float[]);
   native sub sortd : void ($nums : double[]);
 
-  precompile sub _merge : void($a : oarray, $left : int, $mid : int, $right : int, $n : int, $comparator : SPVM::Comparator) {
+  precompile sub _merge : void($a : oarray, $b : oarray, $left : int, $mid : int, $right : int, $n : int, $comparator : SPVM::Comparator) {
       my $i = $left;
       my $j = $mid + 1;
       my $k = 0;
-      my $b = new_oarray_proto($a, $n);
       while ($i <= $mid && $j <= $right) {
           $i = $left;
           $j = $mid + 1;
@@ -278,16 +358,16 @@ package SPVM::CORE {
       }
   }
 
-  precompile sub _merge_sort : void($a : oarray, $left : int, $right : int, $n : int, $comparator : SPVM::Comparator){
+  precompile sub _merge_sort : void($a : oarray, $b : oarray, $left : int, $right : int, $n : int, $comparator : SPVM::Comparator){
       if ($left == $right) {
         return;
       }
 
       my $mid = ($left + $right) / 2;
 
-      _merge_sort($a, $left, $mid, $n, $comparator);
-      _merge_sort($a, $mid + 1, $right, $n, $comparator);
-      _merge($a, $left, $mid, $right, $n, $comparator);
+      _merge_sort($a, $b, $left, $mid, $n, $comparator);
+      _merge_sort($a, $b, $mid + 1, $right, $n, $comparator);
+      _merge($a, $b, $left, $mid, $right, $n, $comparator);
   }
   
   precompile sub sorto : void ($objs : oarray, $comparator : SPVM::Comparator) {
@@ -295,7 +375,8 @@ package SPVM::CORE {
       croak "Array must be defined";
     }
     my $length = @$objs;
-    _merge_sort($objs, 0, $length - 1, $length, $comparator);
+    my $b = new_oarray_proto($objs, $length);
+    _merge_sort($objs, $b, 0, $length - 1, $length, $comparator);
   }
   
   precompile sub equals_barray : int ($nums1 : byte[], $nums2 : byte[]) {
@@ -412,6 +493,23 @@ package SPVM::CORE {
     
     return $is_equals;
   }
+
+  precompile sub equals_strarray : int ($strings1 : string[], $strings2 : string[]) {
+    my $is_equals = 1;
+    if (@$strings1 == @$strings2) {
+      for (my $i = 0; $i < @$strings1; $i++) {
+        if ($strings1->[$i] ne $strings2->[$i]) {
+          $is_equals = 0;
+          last;
+        }
+      }
+    }
+    else {
+      $is_equals = 0;
+    }
+    
+    return $is_equals;
+  }
   
   sub AUTO_LEN : int () { return -1; }
   sub EOF : int () { return -1; }
@@ -436,13 +534,13 @@ package SPVM::CORE {
     return SPVM::Hash->new_with_array($objects);
   }
   
-  sub copy_string : string ($string : string) {
+  sub copy_str : string ($string : string) {
     my $bytes = (byte[])$string;
     
     return (string)$bytes;
   }
   
-  sub copy_byte_array : byte[] ($nums : byte[]) {
+  sub copy_barray : byte[] ($nums : byte[]) {
     my $length = @$nums;
     
     my $new_nums = new byte[$length];
@@ -454,7 +552,7 @@ package SPVM::CORE {
     return $new_nums;
   }
 
-  sub copy_short_array : short[] ($nums : short[]) {
+  sub copy_sarray : short[] ($nums : short[]) {
     my $length = @$nums;
     
     my $new_nums = new short[$length];
@@ -466,7 +564,7 @@ package SPVM::CORE {
     return $new_nums;
   }
   
-  sub copy_int_array : int[] ($nums : int[]) {
+  sub copy_iarray : int[] ($nums : int[]) {
     my $length = @$nums;
     
     my $new_nums = new int[$length];
@@ -478,7 +576,7 @@ package SPVM::CORE {
     return $new_nums;
   }
 
-  sub copy_long_array : long[] ($nums : long[]) {
+  sub copy_larray : long[] ($nums : long[]) {
     my $length = @$nums;
     
     my $new_nums = new long[$length];
@@ -490,7 +588,7 @@ package SPVM::CORE {
     return $new_nums;
   }
 
-  sub copy_float_array : float[] ($nums : float[]) {
+  sub copy_farray : float[] ($nums : float[]) {
     my $length = @$nums;
     
     my $new_nums = new float[$length];
@@ -502,7 +600,7 @@ package SPVM::CORE {
     return $new_nums;
   }
 
-  sub copy_double_array : double[] ($nums : double[]) {
+  sub copy_darray : double[] ($nums : double[]) {
     my $length = @$nums;
     
     my $new_nums = new double[$length];
@@ -514,7 +612,7 @@ package SPVM::CORE {
     return $new_nums;
   }
 
-  sub copy_object_array : object[] ($objects : object[]) {
+  sub copy_oarray : object[] ($objects : object[]) {
     my $length = @$objects;
     
     my $new_objects = new object[$length];
@@ -524,6 +622,18 @@ package SPVM::CORE {
     }
     
     return $new_objects;
+  }
+
+  sub copy_strarray : string[] ($strings : string[]) {
+    my $length = @$strings;
+    
+    my $new_strings = new string[$length];
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $new_strings->[$i] = copy_str($strings->[$i]);
+    }
+    
+    return $new_strings;
   }
 
   sub new_fcomplex_array : SPVM::Complex_2f[] ($re_values : float[], $im_values : float[]) {

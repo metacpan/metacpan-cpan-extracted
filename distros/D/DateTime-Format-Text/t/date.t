@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 27;
+use Test::Most tests => 35;
 use Test::Deep;
 use Test::NoWarnings;
 
@@ -20,8 +20,16 @@ TEXT: {
 	cmp_deeply(DateTime::Format::Text->parse('Today is 10/1/19'), methods('day' => num(10), 'month' => num(1), 'year' => num(2019)), '->');
 	cmp_deeply(DateTime::Format::Text->parse(string => 'Today is 10/1/19'), methods('day' => num(10), 'month' => num(1), 'year' => num(2019)), '->');
 	cmp_deeply(DateTime::Format::Text->parse({ string => 'Today is 10/1/19' }), methods('day' => num(10), 'month' => num(1), 'year' => num(2019)), '->');
-
 	cmp_deeply($dft->parse({ string => '9/1/19 was yesterday' }), methods('day' => num(9), 'month' => num(1), 'year' => num(2019)));
+	cmp_deeply($dft->parse_datetime(string => '9/1/19 was yesterday'), methods('day' => num(9), 'month' => num(1), 'year' => num(2019)));
+
+	cmp_deeply($dft->parse_datetime('Today is 10/1/19'), methods('day' => num(10), 'month' => num(1), 'year' => num(2019)));
+	cmp_deeply(DateTime::Format::Text::parse_datetime('Today is 10/1/19'), methods('day' => num(10), 'month' => num(1), 'year' => num(2019)), '::');
+	cmp_deeply(DateTime::Format::Text::parse_datetime(string => 'Today is 10/1/19'), methods('day' => num(10), 'month' => num(1), 'year' => num(2019)), '::');
+	cmp_deeply(DateTime::Format::Text::parse_datetime({ string => 'Today is 10/1/19' }), methods('day' => num(10), 'month' => num(1), 'year' => num(2019)), '::');
+	cmp_deeply(DateTime::Format::Text->parse_datetime('Today is 10/1/19'), methods('day' => num(10), 'month' => num(1), 'year' => num(2019)), '->');
+	cmp_deeply(DateTime::Format::Text->parse_datetime(string => 'Today is 10/1/19'), methods('day' => num(10), 'month' => num(1), 'year' => num(2019)), '->');
+	cmp_deeply(DateTime::Format::Text->parse_datetime({ string => 'Today is 10/1/19' }), methods('day' => num(10), 'month' => num(1), 'year' => num(2019)), '->');
 
 	for my $test (
 		'Sunday, 1 March 2015',
@@ -35,6 +43,6 @@ TEXT: {
 	) {
 		cmp_deeply($dft->parse($test), methods('day' => num(1), 'month' => num(3), 'year' => num(2015)), $test);
 		my $s = "foo $test bar";
-		cmp_deeply($dft->parse($s), methods('day' => num(1), 'month' => num(3), 'year' => num(2015)), $s);
+		cmp_deeply($dft->parse_datetime($s), methods('day' => num(1), 'month' => num(3), 'year' => num(2015)), $s);
 	};
 }

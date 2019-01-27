@@ -60,8 +60,16 @@ t/config/test.yml
 t/config/test2.yml
 t/config/test3.yml
 t/config/test_config.yml
+t/fourth_lib/Text.pm
 t/lib/Text.pm
+t/pods/Test.pod
+t/pods/empty.pl
 t/second_lib/AnotherText.pm
+t/source_dir.t
+t/source_dir2.t
+t/source_dir3.t
+t/source_file.t
+t/source_module.t
 t/target_text.t
 t/third_lib/AnotherText.pm
 t/third_lib/subdir/Text.pm

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //*************************************************************************
 //
-// Copyright 2009-2018 by Wilson Snyder.  This program is free software;
+// Copyright 2009-2019 by Wilson Snyder.  This program is free software;
 // you can redistribute it and/or modify it under the terms of either the
 // GNU Lesser General Public License Version 3 or the Perl Artistic License
 // Version 2.0.
@@ -116,7 +116,7 @@ void VSymStack::selftest() {
     VFileLine* fl = flt.create(__FILE__,__LINE__);
 
     AV* topavp = newAV();
-    VSymStack stack (fl, topavp);
+    VSymStack stack(fl, topavp);
     //
     DBG_UINFO(9,"=============\n");
     assert(stack.objofUpward() == "netlist");

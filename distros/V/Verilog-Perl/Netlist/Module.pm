@@ -17,7 +17,7 @@ use strict;
 @ISA = qw(Verilog::Netlist::Module::Struct
 	Verilog::Netlist::Subclass);
 
-$VERSION = '3.456';
+$VERSION = '3.460';
 
 structs('new',
 	'Verilog::Netlist::Module::Struct'
@@ -172,18 +172,18 @@ sub new_net {
 	$data_type = "[".($params{msb});
 	$data_type .= ":".($params{lsb}) if defined $params{lsb};
 	$data_type .= "]";
-	$netref = new Verilog::Netlist::Net (decl_type=>'net',
-					     net_type => 'wire',
-					     data_type => $data_type,
-					     %params,
-					     module => $self);
+	$netref = new Verilog::Netlist::Net(decl_type=>'net',
+					    net_type => 'wire',
+					    data_type => $data_type,
+					    %params,
+					    module => $self);
     } else {
-	$netref = new Verilog::Netlist::Net (decl_type => 'net',
-					     net_type => 'wire',
-					     %params,
-					     module => $self);
+	$netref = new Verilog::Netlist::Net(decl_type => 'net',
+					    net_type => 'wire',
+					    %params,
+					    module => $self);
     }
-    $self->_nets ($netref->name(), $netref);
+    $self->_nets($netref->name(), $netref);
     return $netref;
 }
 
@@ -197,8 +197,8 @@ sub new_port {
     my $self = shift;
     # @_ params
     # Create a new port under this module
-    my $portref = new Verilog::Netlist::Port (@_, module=>$self,);
-    $self->_ports ($portref->name(), $portref);
+    my $portref = new Verilog::Netlist::Port(@_, module=>$self,);
+    $self->_ports($portref->name(), $portref);
     return $portref;
 }
 
@@ -533,7 +533,7 @@ Verilog-Perl is part of the L<http://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
 L<http://www.veripool.org/verilog-perl>.
 
-Copyright 2000-2018 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2019 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

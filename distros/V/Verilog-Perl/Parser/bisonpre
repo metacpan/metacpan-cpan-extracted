@@ -7,9 +7,9 @@ use Getopt::Long;
 use IO::File;
 use Pod::Usage;
 use strict;
-use vars qw ($Debug $VERSION);
+use vars qw($Debug $VERSION);
 
-$VERSION = '3.456';
+$VERSION = '3.460';
 
 our $Self;
 
@@ -28,7 +28,7 @@ our $Opt_Input;
 
 autoflush STDOUT 1;
 autoflush STDERR 1;
-Getopt::Long::config ("no_auto_abbrev");
+Getopt::Long::config("no_auto_abbrev");
 if (! GetOptions (
 	  # Local options
 	  "help"		=> \&usage,
@@ -57,7 +57,7 @@ process();
 sub usage {
     print "Version $VERSION\n";
     pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
-    exit (1);
+    exit(1);
 }
 
 sub parameter {
@@ -328,7 +328,7 @@ sub clean_input {
 		($line =~ s/BISONPRE_NOT\((\S+)\)\s*({[^}]+})\s*$//)
 		    or die "%Error: $filename:$l: Bad form of BISONPRE_NOT: $line\n";
 		my $endtok = $1;  my $action = $2;
-		my @endtoks = split (/,/, $endtok);
+		my @endtoks = split(/,/, $endtok);
 		map { $tokens{$_} or die "%Error: $filename:$l: Can't find definition for token: $_\n"
 		} @endtoks;
 		# Push it all onto one line to avoid error messages changing
@@ -572,7 +572,7 @@ This is part of the L<http://www.veripool.org/> free Verilog EDA software
 tool suite.  The latest version is available from CPAN and from
 L<http://www.veripool.org/>.
 
-Copyright 2008-2018 by Wilson Snyder.  This package is free software; you
+Copyright 2008-2019 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

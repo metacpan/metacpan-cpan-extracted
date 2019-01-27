@@ -1,8 +1,5 @@
 package DateTime::Format::EraLegis;
-{
-  $DateTime::Format::EraLegis::VERSION = '0.006';
-}
-
+$DateTime::Format::EraLegis::VERSION = '0.009';
 # ABSTRACT: DateTime formatter for Era Legis (http://oto-usa.org/calendar.html)
 
 use 5.010;
@@ -65,9 +62,7 @@ no Any::Moose;
 
 ######################################################
 package DateTime::Format::EraLegis::Ephem;
-{
-  $DateTime::Format::EraLegis::Ephem::VERSION = '0.006';
-}
+$DateTime::Format::EraLegis::Ephem::VERSION = '0.009';
 use Any::Moose qw(Role);
 
 requires 'lookup';
@@ -76,10 +71,7 @@ no Any::Moose;
 
 ######################################################
 package DateTime::Format::EraLegis::Ephem::DBI;
-{
-  $DateTime::Format::EraLegis::Ephem::DBI::VERSION = '0.006';
-}
-
+$DateTime::Format::EraLegis::Ephem::DBI::VERSION = '0.009';
 use 5.010;
 use Any::Moose;
 use Carp;
@@ -128,10 +120,7 @@ no Any::Moose;
 ######################################################
 
 package DateTime::Format::EraLegis::Style;
-{
-  $DateTime::Format::EraLegis::Style::VERSION = '0.006';
-}
-
+$DateTime::Format::EraLegis::Style::VERSION = '0.009';
 use 5.010;
 use Any::Moose;
 use utf8;
@@ -184,14 +173,14 @@ has 'template' => (
 method _build_dow {
     return
         ($self->lang eq 'symbol')
-        ? [qw( ☉ ☽ ♂ ☿ ♃ ♀ ♄ ☉ )]
+        ? [qw( ☉︎ ☽︎ ♂︎ ☿︎ ♃︎ ♀︎ ♄︎ ☉︎ )]
         : ($self->lang eq 'english')
         ? [qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday Sunday)]
         : [qw(Solis Lunae Martis Mercurii Iovis Veneris Saturni Solis)];
 }
 
 method _build_signs {
-    return [qw( ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ )]
+    return [qw( ♈︎ ♉︎ ♊︎ ♋︎ ♌︎ ♍︎ ♎︎ ♏︎ ♐︎ ♑︎ ♒︎ ♓︎ )]
         if $self->lang eq 'symbol';
 
     return [qw(Aries Taurus Gemini Cancer Leo Virgo Libra Scorpio Sagittarius Capricorn Aquarius Pisces)]
@@ -216,10 +205,10 @@ method _build_years {
 method _build_template {
     my $template = '';
     if ($self->show_deg) {
-        $template = '☉ in {sdeg}° {ssign} : ☽ in {ldeg}° {lsign}';
+        $template = '☉︎ in {sdeg}° {ssign} : ☽︎ in {ldeg}° {lsign}';
     }
     else {
-        $template = '☉ in {ssign} : ☽ in {lsign}';
+        $template = '☉︎ in {ssign} : ☽︎ in {lsign}';
     }
     if ($self->show_terse) {
         $template =~ s/ in / /g;
@@ -408,8 +397,8 @@ SQLite3 is the only one tested. The schema is:
 
 =head1 BUGS
 
-Please report bugs via GitHub issues:
-https://github.com/ctfliblime/DateTime-Format-EraLegis
+Please report bugs as issues at:
+https://gitlab.com/clayfouts/datetime-format-eralegis
 
 =head1 AUTHOR
 

@@ -17,15 +17,17 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Types::RENEEB",
   "PREREQ_PM" => {
+    "Module::CPANfile" => 0,
     "Type::Library" => "1.004004",
     "Type::Utils" => "1.004004",
     "Types::Standard" => "1.004004"
   },
   "TEST_REQUIRES" => {
+    "Moo" => 0,
     "Pod::Coverage::TrustPod" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t t/dist/*.t t/otrs/*.t"
   }
@@ -33,6 +35,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Module::CPANfile" => 0,
+  "Moo" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Test::More" => 0,
   "Type::Library" => "1.004004",

@@ -1,3 +1,8 @@
+0.017   2019-01-25 (PERLANCAR)
+
+	- [bugfix] Handle naked result in example specification.
+
+
 0.016   2017-08-25 (PERLANCAR)
 
 	- [Bugfix] Show subcommand name in example.

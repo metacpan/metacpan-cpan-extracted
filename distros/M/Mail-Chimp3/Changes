@@ -1,9 +1,41 @@
 ==================================================
-Changes from 2018-01-19 00:00:00 +0000 to present.
+Changes from 2018-01-25 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.05 at 2019-01-19 00:38:28 +0000
+version 0.06 at 2019-01-25 03:09:07 +0000
+-----------------------------------------
+
+  Change: d7c68ffe49cedd68b4ee6e663dc3837545e7c3a4
+  Author: Josh Lavin <jlavin@fastly.com>
+  Date : 2019-01-24 19:08:51 +0000
+
+    v0.06 
+
+  Change: 65d31a66684ec39844e2c3e14001082da93cd343
+  Author: Josh Lavin <jlavin@fastly.com>
+  Date : 2019-01-24 19:08:45 +0000
+
+    Localize attribute names
+
+    avoid clashing with role 
+
+  Change: db42a666adda56a53d71eb0180e9c8f74c482ce5
+  Author: Josh Lavin <jlavin@fastly.com>
+  Date : 2019-01-24 19:02:06 +0000
+
+    Revert "Add cpanfile, pin Web::API to working version"
+
+    This reverts commit 99f86fe3ff7a6a4fea7f21c23ae1de10e45a8ac5. 
+
+  Change: 2f693b95f5775803a0f7501a945b55f65b8eadc6
+  Author: Josh Lavin <jlavin@fastly.com>
+  Date : 2019-01-18 16:44:27 +0000
+
+    v0.05 
+
+-----------------------------------------
+version 0.05 at 2019-01-19 00:35:36 +0000
 -----------------------------------------
 
   Change: 99f86fe3ff7a6a4fea7f21c23ae1de10e45a8ac5
@@ -41,5 +73,5 @@ version 0.05 at 2019-01-19 00:38:28 +0000
     v0.04 
 
 ================================================
-Plus 4 releases after 2018-01-19 00:00:00 +0000.
+Plus 4 releases after 2018-01-25 00:00:00 +0000.
 ================================================

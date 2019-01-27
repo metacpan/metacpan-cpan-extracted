@@ -12,29 +12,36 @@ use EPublisher::Utils::PPI qw(extract_pod);
 
 our @ISA = qw( EPublisher::Source::Base );
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub load_source{
-    my ($self) = @_;
+    my ($self, $source_path) = @_;
     
     my $options = $self->_config;
     
-    my $file = $options->{path};
+    my $file = $source_path // $options->{path};
+
+    if ( !defined $file ) {
+        $self->publisher->debug( "400: No path given" );
+        return;
+    }
     
-    unless( $file && -f $file ) {
-        $self->publisher->debug( "400: $file -> " . ( -f $file or 0 ) );
-        return '';
+    if( !-f $file ) {
+        $self->publisher->debug( "400: $file is not a file" );
+        return;
     }
     
     my $pod      = extract_pod( $file, $self->_config );
     my $filename = basename $file;
     my $title    = $filename;
 
-    if ( $options->{title} and $options->{title} eq 'pod' ) {
+    $options->{title} = '' if !defined $options->{title};
+
+    if ( $options->{title} eq 'pod' ) {
         ($title) = $pod =~ m{ =head1 \s+ (.*) }x;
         $title = '' if !defined $title;
     }
-    elsif ( $options->{title} and $options->{title} ne 'pod' ) {
+    elsif ( length $options->{title} ) {
         $title = $options->{title};
     }
 
@@ -55,7 +62,7 @@ EPublisher::Source::Plugin::File - File source plugin
 
 =head1 VERSION
 
-version 1.23
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -86,17 +93,6 @@ C<$pod_document> is the complete pod documentation that was found in the file.
 C<$file> is the name of the file (without path) and C<$title> is the title of
 the pod documentation. By default it is the filename, but you can say "title => 'pod'"
 in the configuration. The title is the first value for I<=head1> in the pod.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2010 - 2012 Renee Baecker, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of Artistic License 2.0.
-
-=head1 AUTHOR
-
-Renee Baecker (E<lt>module@renee-baecker.deE<gt>)
 
 =head1 AUTHOR
 

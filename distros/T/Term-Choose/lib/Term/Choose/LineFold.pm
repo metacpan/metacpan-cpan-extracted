@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.643';
+our $VERSION = '1.644';
 
 use Exporter qw( import );
 
@@ -94,7 +94,7 @@ sub cut_to_printwidth {
 
 sub line_fold {
     my ( $string, $avail_width, $init_tab, $subseq_tab ) = @_; #copy
-    # return if ! length $string;
+    return $string if ! defined $string || ! length $string;
     for ( $init_tab, $subseq_tab ) {
         if ( defined $_ && length $_ ) {
             s/\t/ /g;

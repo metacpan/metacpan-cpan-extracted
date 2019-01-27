@@ -3,7 +3,7 @@ package App::ModuleBuildTiny;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -113,18 +113,20 @@ my @config_items = (
 my %actions = (
 	dist => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, 'verbose!' => \my $verbose);
-		my $dist = App::ModuleBuildTiny::Dist->new;
+		GetOptionsFromArray(\@arguments, \my %opts, qw/trial verbose!/);
+		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
+		die "Trial mismatch" if $opts{trial} && $dist->release_status ne 'testing';
 		my $name = $dist->meta->name . '-' . $dist->meta->version;
-		printf "tar czf $name.tar.tz %s\n", join ' ', $dist->files if ($verbose || 0) > 0;
+		printf "tar czf $name.tar.tz %s\n", join ' ', $dist->files if $opts{verbose};
 		$dist->write_tarball($name);
 		return 0;
 	},
 	distdir => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, 'verbose!' => \my $verbose);
-		my $dist = App::ModuleBuildTiny::Dist->new;
-		$dist->write_dir($dist->meta->name . '-' . $dist->meta->version, $verbose);
+		GetOptionsFromArray(\@arguments, \my %opts, qw/trial verbose!/);
+		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
+		die "Trial mismatch" if $opts{trial} && $dist->release_status ne 'testing';
+		$dist->write_dir($dist->meta->name . '-' . $dist->meta->version, $opts{verbose});
 		return 0;
 	},
 	test => sub {
@@ -136,17 +138,18 @@ my %actions = (
 	},
 	upload => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, 'config=s' => \my $config_file, 'silent' => \my $silent);
+		GetOptionsFromArray(\@arguments, \my %opts, qw/trial config=s silent/);
 
 		my $dist = App::ModuleBuildTiny::Dist->new;
 		$dist->run(command => [ $Config{perlpath}, 'Build', 'test' ], build => 1) or return 1;
-		my $name = $dist->meta->name . '-' . $dist->meta->version;
+		my $trial =  $dist->release_status eq 'testing' && $dist->version !~ /_/;
+		my $name = $dist->meta->name . '-' . $dist->meta->version . ($trial ? '-TRIAL' : '' );
 		my $file = $dist->write_tarball($name);
 		require CPAN::Upload::Tiny;
 		CPAN::Upload::Tiny->VERSION('0.009');
-		my $uploader = CPAN::Upload::Tiny->new_from_config_or_stdin($config_file);
+		my $uploader = CPAN::Upload::Tiny->new_from_config_or_stdin($opts{config});
 		$uploader->upload_file($file);
-		print "Successfully uploaded $file\n" if not $silent;
+		print "Successfully uploaded $file\n" if not $opts{silent};
 		return 0;
 	},
 	run => sub {
@@ -193,9 +196,10 @@ my %actions = (
 	},
 	regenerate => sub {
 		my @arguments = @_;
+		GetOptionsFromArray(\@arguments, \my %opts, qw/trial/);
 		my %files = map { $_ => 1 } @arguments ? @arguments : qw/Build.PL META.json META.yml MANIFEST LICENSE README/;
 
-		my $dist = App::ModuleBuildTiny::Dist->new(regenerate => \%files);
+		my $dist = App::ModuleBuildTiny::Dist->new(%opts, regenerate => \%files);
 		for my $filename ($dist->files) {
 			write_binary($filename, $dist->get_file($filename)) if $dist->is_generated($filename);
 		}
@@ -278,7 +282,7 @@ App::ModuleBuildTiny - A standalone authoring tool for Module::Build::Tiny
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 DESCRIPTION
 

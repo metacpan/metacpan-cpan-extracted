@@ -1,0 +1,11 @@
+#!perl
+
+use strict;
+use warnings;
+use utf8;
+use App::Perlambda::CLI;
+
+App::Perlambda::CLI->run($ARGV);
+
+__END__
+

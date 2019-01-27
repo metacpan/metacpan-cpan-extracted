@@ -4,7 +4,7 @@
       "Creighton Higgins <chiggins@chiggins.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -21,6 +21,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Exporter" : "0",
             "List::Util" : "0",
             "parent" : "0",
@@ -31,6 +32,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Fatal" : "0",
             "Test::More" : "0",
             "lib" : "0"
          }
@@ -45,6 +47,7 @@
          "web" : "https://github.com/neilbowers/Text-Table-Tiny"
       }
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

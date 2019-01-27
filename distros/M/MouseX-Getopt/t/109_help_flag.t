@@ -40,7 +40,7 @@ foreach my $args ( ['--help'], ['--usage'], ['--?'], ['-?'] )
     local @ARGV = @$args;
 
     throws_ok { MyClass->new_with_options() }
-        qr/^usage: (?:[\d\w]+)\Q.t [-?] [long options...]\E.^\t\Q-? --usage --help\E\s+\QPrints this usage information.\E$/ms,
+        qr/^usage: (?:[\d\w]+)\Q.t [-?] [long options...]\E.^\t\Q-? --\E(\[no-\])?usage --(\[no-\])?help\s+\QPrints this usage information.\E$/ms,
         'Help request detected; usage information properly printed';
 }
 

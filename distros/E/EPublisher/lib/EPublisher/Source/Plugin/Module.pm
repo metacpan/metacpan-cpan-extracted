@@ -7,8 +7,6 @@ use warnings;
 
 use Module::Info;
 
-use Data::Dumper;
-
 use File::Basename;
 
 use EPublisher::Source::Base;
@@ -16,31 +14,39 @@ use EPublisher::Utils::PPI qw(extract_pod);
 
 our @ISA = qw( EPublisher::Source::Base );
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub load_source{
-    my ($self) = @_;
+    my ($self, $name) = @_;
     
     my $options = $self->_config;
+    my $module  = $name // $options->{name};
     
-    return unless $options->{name};
+    if ( !defined $module ) {
+        $self->publisher->debug( '400: No module defined' );
+        return;
+    }
 
     my @my_inc = @{ $options->{lib} || [] };
     
-    my $mod = Module::Info->new_from_module( $options->{name}, @my_inc );
+    my $mod = Module::Info->new_from_module( $module, @my_inc );
 
-    return if !$mod;
-    return if !$mod->file;
+    if ( !$mod ) {
+        $self->publisher->debug( '400: Cannot find module' );
+        return;
+    }
 
     my $pod      = extract_pod( $mod->file, $self->_config );
     my $filename = File::Basename::basename( $mod->file );
-    my $title    = $options->{name};
+    my $title    = $module;
 
-    if ( $options->{title} and $options->{title} eq 'pod' ) {
+    $options->{title} = '' if !defined $options->{title};
+
+    if ( $options->{title} eq 'pod' ) {
         ($title) = $pod =~ m{ =head1 \s+ (.*) }x;
         $title   = '' if !defined $title;
     }
-    elsif ( $options->{title} and $options->{title} ne 'pod' ) {
+    elsif ( length $options->{title} ) {
         $title = $options->{title};
     }
 
@@ -61,7 +67,7 @@ EPublisher::Source::Plugin::Module - Module source plugin
 
 =head1 VERSION
 
-version 1.23
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -95,29 +101,6 @@ C<$pod_document> is the complete pod documentation that was found in the file.
 C<$file> is the name of the file (without path) and C<$title> is the title of
 the pod documentation. By default it is the module name, but you can say "title => 'pod'"
 in the configuration. The title is the first value for I<=head1> in the pod.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2010 Renee Baecker, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms of Artistic License 2.0.
-
-=head1 AUTHOR
-
-Renee Baecker (E<lt>module@renee-baecker.deE<gt>)
-
-=head1 AUTHOR
-
-Renee Baecker <module@renee-baecker.de>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2012 by Renee Baecker.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
 
 =head1 AUTHOR
 

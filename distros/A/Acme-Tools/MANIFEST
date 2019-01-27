@@ -45,6 +45,8 @@ t/38_base64.t
 t/39_sim.t
 t/40_aoh2.t
 t/41_changed.t
+t/42_finddup.t
+t/43_egrep.t
 t/common.pl
 t/test_binsearch_bench.pl
 t/test_fork_bloom.pl

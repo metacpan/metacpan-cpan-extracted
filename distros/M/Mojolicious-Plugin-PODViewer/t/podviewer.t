@@ -106,6 +106,7 @@ done_testing();
 __DATA__
 
 @@ layouts/gray.html.ep
+<title><%= title %></title>
 Gray <%= content %>
 
 @@ index.html.ep

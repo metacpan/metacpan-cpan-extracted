@@ -1,21 +1,9 @@
 #!/usr/local/bin/perl
-#
-# This file is part of Pod-Markdown
-#
-# This software is copyright (c) 2011 by Randy Stauner.
-# Minor change by Ben Kaufman for github, but so little as to not change
-# the copyright.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
+
 use 5.008;
 use strict;
 use warnings;
-# PODNAME: pod2github
-# ABSTRACT: Convert POD text to Markdown
 
-#use Pod::Markdown;
 use Pod::Markdown::Github;
 use Getopt::Long;
 use Pod::Usage;
@@ -82,7 +70,7 @@ pod2github - Convert POD text to Github flavored markdown
 
 =head1 VERSION
 
-version 3.005
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -149,7 +137,13 @@ Alias for C<< -e UTF-8 >>.
 This program is pretty much a straight copy of pod2markdown, which is in turn 
 strongly based on C<pod2mdwn> from L<Module::Build::IkiWiki>.
 
-=head1 AUTHORS
+=head1 AUTHOR
+
+Stefan G. <minimal@cpan.org>
+
+=head1 CREDITS
+
+This software is based on work by:
 
 =over 4
 
@@ -173,16 +167,9 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 Randy Stauner <rwstauner@cpan.org>
 
-=item *
-
-Stefan G. minimal @ cpan . org
-
-
 =back
 
 =head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Randy Stauner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

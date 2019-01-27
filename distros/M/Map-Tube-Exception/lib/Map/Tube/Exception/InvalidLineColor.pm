@@ -1,13 +1,13 @@
 package Map::Tube::Exception::InvalidLineColor;
 $Map::Tube::Exception::InvalidLineColor::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::InvalidLineColor::VERSION = '3.18';
+$Map::Tube::Exception::InvalidLineColor::VERSION = '3.19';
 =head1 NAME
 
 Map::Tube::Exception::InvalidLineColor - Represent 'invalid line color' exception.
 
 =head1 VERSION
 
-version 3.18
+version 3.19
 
 =cut
 

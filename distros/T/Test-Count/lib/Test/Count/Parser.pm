@@ -1,5 +1,5 @@
 package Test::Count::Parser;
-$Test::Count::Parser::VERSION = '0.0902';
+$Test::Count::Parser::VERSION = '0.1000';
 use warnings;
 use strict;
 
@@ -195,7 +195,7 @@ Test::Count::Parser - A Parser for Test::Count.
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 SYNOPSIS
 
@@ -211,7 +211,7 @@ version 0.0902
 
 =head1 VERSION
 
-version 0.0902
+version 0.1000
 
 =head1 DESCRIPTIONS
 

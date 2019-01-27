@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Exception
 
+3.19  Fri Jan 25 11:30:00 2019
+      - Added dependency on Dist::Zilla::PluginBundle::MANWAR v0.08.
+
 3.18  Tue Sep 25 15:45:00 2018
       - Added exception for invalid color name.
 

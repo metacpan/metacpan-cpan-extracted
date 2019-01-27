@@ -27,7 +27,7 @@ no_index:
 provides:
   CPAN::Audit:
     file: lib/CPAN/Audit.pm
-    version: '0.13'
+    version: '0.14'
   CPAN::Audit::DB:
     file: lib/CPAN/Audit/DB.pm
   CPAN::Audit::Discover:
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://github.com/vti/cpan-audit/issues
   homepage: https://github.com/vti/cpan-audit
   repository: git://github.com/vti/cpan-audit.git
-version: '0.13'
+version: '0.14'
 x_authority: cpan:VTI
 x_contributors:
   - 'James Raspass <jraspass@gmail.com>'

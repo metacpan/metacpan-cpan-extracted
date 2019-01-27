@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use YAML::XS;
 use File::Temp;
-use Digest::MD5;
+use MYDan::Util::FastMD5;
 
 local $/ = undef;
 
@@ -24,9 +24,9 @@ my $unlink = sub { unlink shift; print shift; exit 1 };
 &$idie( "get $conf->{chown} uid fail" ) if $conf->{chown} && ! ( my @pw = getpwnam $conf->{chown} );
 
 print $fh $param{data};
-seek $fh, 0, 0;
-my $md5 = Digest::MD5->new()->addfile( $fh )->hexdigest;
 close $fh;
+
+my $md5 = MYDan::Util::FastMD5->hexdigest( $temp );
 
 &$unlink( $temp, 'chomd fail' ) if $conf->{chmod}
      && ! chmod oct $conf->{chmod}, $temp;

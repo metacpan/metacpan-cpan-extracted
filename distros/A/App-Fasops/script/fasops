@@ -73,3 +73,12 @@ perl -I lib/ t/19-mergecsv.t
 perl -I lib/ script/fasops consensus t/example.fas -o stdout
 perl -I lib/ script/fasops consensus t/refine.fas -p 2 -o stdout
 perl -I lib/ t/20-consensus.t
+
+cat t/example.fas | perl -I lib script/fasops vars stdin -o stdout
+cat t/example.fas | perl -I lib script/fasops vars stdin  --outgroup -o stdout
+
+perl -I lib script/fasops vars \
+    t/NC_007942.maf.gz.fas.gz --anno t/anno.yml \
+    -l 30000 --nosingle --nocomplex -o stdout |
+    datamash check
+perl -I lib/ t/21-vars.t

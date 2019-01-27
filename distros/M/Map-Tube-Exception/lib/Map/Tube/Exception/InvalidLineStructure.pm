@@ -1,13 +1,13 @@
 package Map::Tube::Exception::InvalidLineStructure;
 $Map::Tube::Exception::InvalidLineStructure::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::InvalidLineStructure::VERSION = '3.18';
+$Map::Tube::Exception::InvalidLineStructure::VERSION = '3.19';
 =head1 NAME
 
 Map::Tube::Exception::InvalidLineStructure - Represent 'invalid line structure' exception.
 
 =head1 VERSION
 
-version 3.18
+version 3.19
 
 =cut
 

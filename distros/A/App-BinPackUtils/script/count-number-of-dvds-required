@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/BinPackUtils/count_number_of_dvds_required
 # and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2019-01-17'; # DATE
+our $DATE = '2019-01-27'; # DATE
 our $DIST = 'App-BinPackUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ count-number-of-dvds-required - Count the number of DVDs required to contain the
 
 =head1 VERSION
 
-This document describes version 0.003 of count-number-of-dvds-required (from Perl distribution App-BinPackUtils), released on 2019-01-17.
+This document describes version 0.004 of count-number-of-dvds-required (from Perl distribution App-BinPackUtils), released on 2019-01-27.
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ C<*> marks required options.
 
 Default value:
 
- 4712300544
+ 4687134720
 
 =item B<--files-json>=I<s>
 

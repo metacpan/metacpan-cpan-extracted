@@ -6,7 +6,7 @@ use POSIX;
 use List::Util;
 use Data::Dumper qw(Dumper);
 use Exporter qw(import);
-our @EXPORT_OK = qw(
+our @EXPORT_LIST = qw(
     incr        reduces   flatten
     drop_right  drop      take_right  take
     assoc       maps      decr        chain
@@ -20,14 +20,56 @@ our @EXPORT_OK = qw(
     second      range     pops        pushes
     shifts      unshifts  once
 );
-
-our $VERSION = '0.34';
-
+our @EXPORT_OK                 = @EXPORT_LIST;
+our $VERSION                   = '0.39';
 use constant ARG_PLACE_HOLDER => {};
+
+_wrap_to_use_partials(
+    grep { $_ !~ /flow|flow_right|partial|chain|range/ } @EXPORT_LIST
+);
 
 # -----------------------------------------------------------------------------#
 
 sub __ { ARG_PLACE_HOLDER };
+
+sub _contains_placeholders {
+    my $arguments = [@_];
+
+    foreach my $arg (@{ $arguments }) {
+        if (ref($arg) and ref(__) and $arg == __) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+sub _wrap {
+    no warnings 'redefine';
+    no strict 'refs';
+    my ($methodName, $decorator) = @_;
+    my $module                    = caller;
+    my $fullName                  = "$module"."::"."$methodName";
+    my $wrappedSub                = *{"$fullName"}{CODE};
+
+    *{"$fullName"} = List::Util::reduce {
+       my ($wrappedSub, $decor) = ($a, $b);
+       return $decor->($wrappedSub);
+    } ($wrappedSub, $decorator);
+}
+
+sub _can_use_placeholders {
+    my $func = shift;
+
+    return sub {
+        return _contains_placeholders(@_) ? partial($func, @_) : $func->(@_);
+    }
+}
+
+sub _wrap_to_use_partials {
+    foreach my $func_name (@_) {
+        _wrap($func_name, \&_can_use_placeholders);
+    }
+}
 
 sub noop { return undef }
 
@@ -107,9 +149,10 @@ sub _is_nonsense_range {
     }
 }
 
+
 sub get {
-    my $coll    = shift // [];
     my $key     = shift // 0;
+    my $coll    = shift // [];
     my $default = shift;
 
     if (is_array($coll)) {
@@ -456,6 +499,7 @@ sub maps {
     return [@vals];
 }
 
+
 sub reduces {
     my $func           = shift;
     my ($accum, $coll) = spread(_get_reduces_args([@_]));
@@ -495,8 +539,9 @@ sub partial {
 
     return sub {
         my $newArgs = [@_];
-        my $no_placeholder_args = _fill_holders($oldArgs, $newArgs);
-        return $func->(@$no_placeholder_args);
+        my $filled_args = _fill_holders([spread($oldArgs)], $newArgs);
+
+        return $func->(spread($filled_args));
     }
 }
 
@@ -511,7 +556,7 @@ sub _fill_holders {
     for (my $idx = 0; $idx < $old_args_len; $idx++) {
         my $arg = shift @{ $old_args };
 
-        if (eql($arg, __)) {
+        if(_contains_placeholders($arg)) {
             push @{ $filled_args }, (shift @{ $new_args });
         } else {
             push @{ $filled_args }, $arg;
@@ -588,6 +633,8 @@ sub spread {
 
     return split('', $coll);
 }
+
+# ------------------------------------------------------------------------------
 
 =head1 NAME
 
@@ -1133,21 +1180,21 @@ Only works one level deep;
         key1 => 'value1',
     };
 
-    get($hash, 'key1');
+    get('key1', $hash);
 
     # 'value1'
 
 
     my $array = [100, 200, 300]
 
-    get($array, 1);
+    get(1, $array);
 
     # 200
 
 
     my $string = "Hello";
 
-    get($string, 1);
+    get(1, $string);
 
     # e
 
@@ -1158,7 +1205,7 @@ Only works one level deep;
         key1 => 'value1',
     };
 
-    get($hash, 'key2', "DEFAULT HERE");
+    get('key2', $hash, "DEFAULT HERE");
 
     # 'DEFAULT HERE'
 

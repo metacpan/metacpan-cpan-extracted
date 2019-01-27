@@ -1,5 +1,10 @@
 Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 
+2.1       2019-01-25 09:15:27Z
+
+    * Add dependency to Dist::Zilla::Plugin::Repository v0.22
+    * Make sure docker/CI runs without issues after initial commit
+
 2.0       2018-06-12 08:08:14Z
 
     * Add meta provides

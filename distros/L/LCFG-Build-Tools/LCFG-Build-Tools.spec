@@ -1,10 +1,10 @@
 Name:           perl-LCFG-Build-Tools
-Version:        0.9.18
+Version:        0.9.19
 Release:        1
 Summary:        LCFG build system tools
 License:        gpl
 Group:          Development/Libraries
-Source0:        LCFG-Build-Tools-0.9.18.tar.gz
+Source0:        LCFG-Build-Tools-0.9.19.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl >= 5.16.0
@@ -85,8 +85,17 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/lcfg-reltool
 
 %changelog
-* Fri Jan 18 2019 SVN: new release
-- Release: 0.9.18
+* Thu Jan 24 2019 SVN: new release
+- Release: 0.9.19
+
+* Thu Jan 24 2019 10:39  squinney@INF.ED.AC.UK
+- lcfg.yml, templates/build.cmake.tt: Fixed the pod to man page convertor,
+  closes: https://bugs.lcfg.org/show_bug.cgi?id=1110 Also reworked a number
+  of other macros to take a better approach to searching for files in both
+  source and binary directories
+
+* Fri Jan 18 2019 15:20  squinney@INF.ED.AC.UK
+- Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release: 0.9.18
 
 * Fri Jan 18 2019 15:19  squinney@INF.ED.AC.UK
 - debian/changelog: fixed broken email address

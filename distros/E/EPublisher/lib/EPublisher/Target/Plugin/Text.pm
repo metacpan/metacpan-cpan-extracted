@@ -59,7 +59,7 @@ EPublisher::Target::Plugin::Text - Use Ascii text as a target for EPublisher
 
 =head1 VERSION
 
-version 1.23
+version 1.26
 
 =head1 SYNOPSIS
 

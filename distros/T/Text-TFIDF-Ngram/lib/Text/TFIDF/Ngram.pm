@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the TF-IDF measure for ngram phrases
 
-our $VERSION = '0.0300';
+our $VERSION = '0.0501';
 
 use Moo;
 use strictures 2;
@@ -92,7 +92,8 @@ sub _process_ngrams {
         my $pat = $self->punctuation;
         $p =~ s/$pat//g if $pat; # Remove unwanted punctuation
 
-        my @p = grep { $_ } split /\s/, $p;
+        # Skip if we don't have an ngram of the requested size anymore
+        my @p = grep { $_ } split /\s+/, $p;
         next unless @p == $size;
 
         # Skip a lone single quote (allowed by the default punctuation)
@@ -103,7 +104,7 @@ sub _process_ngrams {
         $counts->{$p} = $phrase->{$p};
     }
 
-	$self->{counts}{$file} = $counts;
+    $self->{counts}{$file} = $counts;
 }
 
 
@@ -172,7 +173,7 @@ Text::TFIDF::Ngram - Compute the TF-IDF measure for ngram phrases
 
 =head1 VERSION
 
-version 0.0300
+version 0.0501
 
 =head1 SYNOPSIS
 
@@ -193,14 +194,14 @@ version 0.0300
 This module computes the TF-IDF ("term frequency-inverse document frequency")
 measure for a corpus of text documents.
 
-For a working example program, please see the F<eg/analyze> file in the
+For a working example program, please see the F<eg/analyze> file in this
 distribution.
 
 =head1 ATTRIBUTES
 
 =head2 files
 
-ArrayRef of filenames.
+ArrayRef of filenames to use in the ngram processing.
 
 =head2 size
 
@@ -212,9 +213,13 @@ Boolean indicating that phrases with stopwords will be ignored.  Default is 1.
 
 =head2 punctuation
 
-Regular expression to be used to parse-out unwanted punctuation.
+Regular expression to be used to parse-out unwanted punctuation.  Giving the
+constructor a value of C<''> or C<0> will override this and not exclude any
+characters from the results.
 
 Default: qr/[-!"#$%&()*+,.\/\\:;<=>?@\[\]^_`{|}~]/
+
+Note that the default does not exclude the single quote.
 
 =head2 lowercase
 
@@ -239,11 +244,11 @@ attribute - providing it in the constructor will be ignored.
     size        => $size,
     stopwords   => $stopwords,
     punctuation => $punctuation,
-    lowercase   => $boolean,
+    lowercase   => $lowercase,
   );
 
 Create a new C<Text::TFIDF::Ngram> object.  If the B<files> argument is passed
-in, the ngrams of each file is stored.
+in, the ngrams of each file are stored in the B<counts>.
 
 =head2 BUILD
 
@@ -277,6 +282,8 @@ is not in the corpus, a warning is issued and undef is returned.
 Construct a HashRef of all files with all phrases and their B<tfidf> values.
 
 =head1 SEE ALSO
+
+The F<eg/analyze> file in this distribution
 
 L<https://en.wikipedia.org/wiki/Tf%E2%80%93idf>
 
