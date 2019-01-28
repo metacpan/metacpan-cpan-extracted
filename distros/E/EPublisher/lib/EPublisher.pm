@@ -10,7 +10,7 @@ use EPublisher::Config;
 use EPublisher::Source;
 use EPublisher::Target;
 
-our $VERSION = 1.26;
+our $VERSION = 1.27;
 
 sub new{
     my ($class,%args) = @_;
@@ -42,7 +42,6 @@ sub projects {
     
     my $config = $self->_config;
     
-    return if !$config;
     return if !ref $config;
     return if ref $config ne 'HASH';
     
@@ -53,29 +52,45 @@ sub run{
     my ($self,$projects) = @_;
 
     PROJECT:    
-    for my $project ( @$projects ){
+    for my $project ( @$projects ) {
         my $config   = $self->_config->{$project};
         
         next PROJECT if !$config;
         
         # load the source
+        next PROJECT if !exists $config->{source};
+
         my $sources = $config->{source};
-        $sources    = [ $sources ] if !ref $sources or ref $sources ne 'ARRAY';
+        next PROJECT if !ref $sources;
+
+        $sources = [ $sources ] if ref $sources ne 'ARRAY';
+
+        next PROJECT if !exists $config->{target};
+        next PROJECT if !$config->{target}->{type};
         
         my @pods;
+
+        SOURCE:
         for my $source ( @{$sources} ) {
-            die('No type in source.') unless (exists $source->{type});
+            die 'No type in source.' if !length $source->{type};
+
             $self->debug('100: ' . $source->{type} );
+
             my $source_obj = EPublisher::Source->new( $source );
             $source_obj->publisher( $self );
             
             my @pod_source = $source_obj->load_source;
-            @pod_source = ({ pod => '', title => '', filename => '' }) if !@pod_source || !$pod_source[0];
+
+            next SOURCE if !@pod_source;
+
+            @pod_source = grep { $_->{pod} }@pod_source;
             
             $self->debug('101: ' . substr join( "", map{ $_->{pod} }@pod_source ), 0, 50 );
             
             push @pods, @pod_source;
-        }        
+        }
+
+        next PROJECT if !@pods;
         
         $config->{target}->{source} = \@pods;
         
@@ -85,6 +100,8 @@ sub run{
         $target->publisher( $self );
         $target->deploy;
     }
+
+    return 1;
 }
 
 sub _debug{
@@ -135,7 +152,7 @@ EPublisher - Publish documents in new format
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

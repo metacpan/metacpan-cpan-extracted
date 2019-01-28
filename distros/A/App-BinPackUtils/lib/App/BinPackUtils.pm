@@ -1,12 +1,14 @@
 package App::BinPackUtils;
 
-our $DATE = '2019-01-27'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-01-28'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+use IPC::System::Options 'readpipe', -log=>1;
 
 our %SPEC;
 
@@ -48,6 +50,14 @@ my %arg0_files = (
         req => 1,
         pos => 0,
         greedy => 1,
+    },
+);
+
+my %argopt_dereference_files = (
+    dereference_files => {
+        summary => 'Just like -D option in du, to derefence the filenames only',
+        schema => 'bool*',
+        cmdline_aliases => {D=>{}},
     },
 );
 
@@ -113,6 +123,7 @@ $SPEC{bin_files} = {
             default => 'bin',
         },
         %arg0_files,
+        %argopt_dereference_files,
         %argopt_move,
         %argopt_num_bins,
     },
@@ -130,7 +141,8 @@ sub bin_files {
     for my $file (@{ $args{files} }) {
         return [404, "File '$file' does not exist"] unless -e $file;
 
-        my $cmd = "du -sb ".String::ShellQuote::shell_quote($file);
+        my $cmd = "du ".($args{dereference_files} ? "-D " : "")."-sb ".
+            String::ShellQuote::shell_quote($file);
         my $out = `$cmd`;
         my $size;
         if ($out =~ /\A(\d+)/) {
@@ -186,6 +198,7 @@ $SPEC{bin_files_into_dvds} = {
     summary => 'Put files into DVD bins',
     args => {
         %arg0_files,
+        %argopt_dereference_files,
         %argopt_move,
         %argopt_dvd_size,
         %argopt_num_dvds,
@@ -196,6 +209,7 @@ sub bin_files_into_dvds {
 
     bin_files(
         files      => $args{files},
+        dereference_files => $args{dereference_files},
         move       => $args{move},
         bin_prefix => "dvd",
         bin_size   => $args{dvd_size} // 4493*1024*1024,
@@ -219,6 +233,7 @@ is a shortcut for:
 _
     args => {
         %arg0_files,
+        %argopt_dereference_files,
         %argopt_move,
         %argopt_dvd_size,
     },
@@ -247,7 +262,7 @@ App::BinPackUtils - Collection of CLI utilities related to packing items into bi
 
 =head1 VERSION
 
-This document describes version 0.004 of App::BinPackUtils (from Perl distribution App-BinPackUtils), released on 2019-01-27.
+This document describes version 0.005 of App::BinPackUtils (from Perl distribution App-BinPackUtils), released on 2019-01-28.
 
 =head1 DESCRIPTION
 
@@ -289,6 +304,10 @@ Arguments ('*' denotes required arguments):
 
 =item * B<bin_size>* => I<filesize>
 
+=item * B<dereference_files> => I<bool>
+
+Just like -D option in du, to derefence the filenames only.
+
 =item * B<files>* => I<array[filename]>
 
 =item * B<move> => I<bool>
@@ -326,6 +345,10 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<dereference_files> => I<bool>
+
+Just like -D option in du, to derefence the filenames only.
 
 =item * B<dvd_size> => I<filesize> (default: 4687134720)
 
@@ -374,6 +397,10 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<dereference_files> => I<bool>
+
+Just like -D option in du, to derefence the filenames only.
 
 =item * B<dvd_size> => I<filesize> (default: 4687134720)
 

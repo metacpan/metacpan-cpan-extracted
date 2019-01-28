@@ -1,6 +1,6 @@
 package PMLTQ::Command::delete;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::delete::VERSION = '2.0.2';
+$PMLTQ::Command::delete::VERSION = '2.0.3';
 # ABSTRACT: Deletes the treebank from database
 
 use PMLTQ::Base 'PMLTQ::Command';

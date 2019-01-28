@@ -4,7 +4,7 @@
       "Nicolas Oudard <nicolas@oudard.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -43,6 +43,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.15"
 }

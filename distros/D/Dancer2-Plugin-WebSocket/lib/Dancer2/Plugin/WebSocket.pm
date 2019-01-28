@@ -1,7 +1,7 @@
 package Dancer2::Plugin::WebSocket;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: add a websocket interface to your Dancers app
-$Dancer2::Plugin::WebSocket::VERSION = '0.1.2';
+$Dancer2::Plugin::WebSocket::VERSION = '0.1.3';
 
 use Plack::App::WebSocket;
 
@@ -123,7 +123,7 @@ Dancer2::Plugin::WebSocket - add a websocket interface to your Dancers app
 
 =head1 VERSION
 
-version 0.1.2
+version 0.1.3
 
 =head1 SYNOPSIS
 
@@ -210,7 +210,7 @@ is the most popular server that fits the bill.
 
 If serializer is set to a C<true> value, messages will be assumed to be JSON
 objects and will be automatically encoded/decoded using a L<JSON::MaybeXS>
-serializer.  If the value of C<serialier> is a hash, it'll be passed as
+serializer.  If the value of C<serializer> is a hash, it'll be passed as
 arguments to the L<JSON::MaybeXS> constructor.
 
     plugins:

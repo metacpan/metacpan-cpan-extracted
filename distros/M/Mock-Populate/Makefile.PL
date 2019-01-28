@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,14 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mock-Populate",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Mock::Populate",
   "PREREQ_PM" => {
     "Data::SimplePassword" => 0,
     "Date::Range" => 0,
     "Date::Simple" => 0,
     "Image::Dot" => 0,
-    "List::Util" => 0,
     "Mock::Person" => 0,
     "Statistics::Distributions" => 0,
     "Text::Password::Pronounceable" => 0,
@@ -38,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.1001",
+  "VERSION" => "0.1700",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +53,6 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Image::Dot" => 0,
-  "List::Util" => 0,
   "Mock::Person" => 0,
   "Statistics::Distributions" => 0,
   "Test::More" => 0,

@@ -6,11 +6,13 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub new{
     my ($class,$args) = @_;
     my $self;
+
+    croak 'No source type given' if !$args->{type};
     
     my $plugin = 'EPublisher::Source::Plugin::' . $args->{type};
     eval{
@@ -40,7 +42,7 @@ EPublisher::Source - Container for Source plugins
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

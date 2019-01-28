@@ -1,5 +1,11 @@
 Revision history for Git-Database
 
+0.011 2019-01-28 BOOK
+    - Improved META generation to fix two kwalitee issues:
+      `build_prereq_matches_use` and `meta_yml_has_provides`
+    - Added missing contributors to META
+    - Removed obsolete web sites from the documentation
+
 0.010 2017-12-08 BOOK
     - Improved the Git::Database constructor to also accept the `backend`,
       `work_tree` and `git_dir` paramaters, and to autoselect the best

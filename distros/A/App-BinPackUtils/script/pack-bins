@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/BinPackUtils/pack_bins
 # and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2019-01-27'; # DATE
+our $DATE = '2019-01-28'; # DATE
 our $DIST = 'App-BinPackUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ pack-bins - Pack items into bin
 
 =head1 VERSION
 
-This document describes version 0.004 of pack-bins (from Perl distribution App-BinPackUtils), released on 2019-01-27.
+This document describes version 0.005 of pack-bins (from Perl distribution App-BinPackUtils), released on 2019-01-28.
 
 =head1 SYNOPSIS
 

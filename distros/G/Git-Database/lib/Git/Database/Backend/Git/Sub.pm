@@ -1,5 +1,5 @@
 package Git::Database::Backend::Git::Sub;
-$Git::Database::Backend::Git::Sub::VERSION = '0.010';
+$Git::Database::Backend::Git::Sub::VERSION = '0.011';
 use Git::Sub qw(
    cat_file
    hash_object
@@ -178,7 +178,7 @@ Git::Database::Backend::Git::Sub - A Git::Database backend based on Git::Sub
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

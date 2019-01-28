@@ -14,7 +14,7 @@ my $check = {
    Test => {
       source   => {
          type => 'File',
-         path => './t/01_base.t',
+         path => './t/03_base_source.t',
       },
       target => {
          type => 'Text',

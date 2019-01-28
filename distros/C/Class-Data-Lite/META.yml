@@ -1,0 +1,39 @@
+---
+abstract: 'a minimalistic class accessors'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Data-Lite
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Class::Data::Lite:
+    file: lib/Class/Data/Lite.pm
+    version: '0.0010'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/Class-Data-Lite/issues
+  homepage: https://github.com/Songmu/Class-Data-Lite
+  repository: git://github.com/Songmu/Class-Data-Lite.git
+version: '0.0010'
+x_authority: cpan:SONGMU
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

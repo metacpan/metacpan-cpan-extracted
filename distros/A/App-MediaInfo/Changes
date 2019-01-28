@@ -1,4 +1,8 @@
-Revision history for App-MediaInfo
+0.120   2019-01-28 (PERLANCAR)
+
+	- Add utilities: media-is-landscape, media-is-portrait,
+	  media-orientation.
+
 
 0.11    2016-04-06 (PERLANCAR)
 

@@ -53,4 +53,14 @@ methods:
       my_file: ":my_file"
     path: /anotherobject
     method: POST
-
+  search_anotherobject:
+    optional_params:
+      - parameters
+    path: /anotherobject
+    method: GET
+  get_anotherobject_list:
+    optional_params:
+      - created_at
+      - name_object
+    path: /anotherobject
+    method: GET

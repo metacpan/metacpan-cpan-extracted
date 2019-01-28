@@ -1,12 +1,13 @@
 package PMLTQ::Command::initdb;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::initdb::VERSION = '2.0.2';
+$PMLTQ::Command::initdb::VERSION = '2.0.3';
 # ABSTRACT: Initialize empty database
 
 use PMLTQ::Base 'PMLTQ::Command';
-use PMLTQ;
+use PMLTQ::Commands;
 
 has usage => sub { shift->extract_usage };
+
 
 sub run {
   my $self = shift;
@@ -18,7 +19,7 @@ sub run {
   $dbh->disconnect;
 
   $dbh = $self->db;
-  $self->run_sql_from_file( 'init.sql', File::Spec->catfile( PMLTQ->shared_dir, 'sql' ), $dbh );
+  $self->run_sql_from_file( 'init.sql', File::Spec->catfile( PMLTQ::Commands::shared_dir(), 'sql' ), $dbh );
   $dbh->disconnect;
 }
 

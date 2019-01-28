@@ -1,5 +1,5 @@
 package Git::Database::Object::Raw;
-$Git::Database::Object::Raw::VERSION = '0.010';
+$Git::Database::Object::Raw::VERSION = '0.011';
 use Moo;
 
 has kind => (
@@ -35,7 +35,7 @@ Git::Database::Object::Raw - Raw Git::Database objects
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

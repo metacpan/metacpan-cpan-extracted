@@ -42,7 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Date::Japanese::Holiday" : "0",
+            "Calendar::Japanese::Holiday" : "0",
+            "Date::DayOfWeek" : "0",
             "Moose" : "0",
             "Time::Piece" : "0",
             "Time::Seconds" : "0",
@@ -58,11 +59,7 @@
    "provides" : {
       "Date::Cutoff::JP" : {
          "file" : "lib/Date/Cutoff/JP.pm",
-         "version" : "0.03"
-      },
-      "Date::Weekend::JP" : {
-         "file" : "lib/Date/Cutoff/JP.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -76,7 +73,7 @@
          "web" : "https://github.com/worthmine/Date-Cutoff-JP"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.00",
    "x_static_install" : 1
 }

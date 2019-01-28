@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Mock data creation
 
-our $VERSION = '0.1001';
+our $VERSION = '0.1700';
 
 use strict;
 use warnings;
@@ -17,7 +17,6 @@ use Data::SimplePassword;
 use Date::Range;
 use Date::Simple qw(date today);
 use Image::Dot;
-use List::Util qw(shuffle);
 use Mock::Person;
 use Statistics::Distributions;
 use Text::Password::Pronounceable;
@@ -28,7 +27,7 @@ use Time::Local;
 sub date_ranger {
     my %args = @_;
     # Set defaults.
-    $args{start} ||= '2001-01-01';
+    $args{start} ||= '1970-01-01';
     $args{end}   ||= today();
     $args{N}     ||= NDATA;
 
@@ -57,7 +56,7 @@ sub date_ranger {
 
 
 sub date_modifier {
-    # Get the number of days in the future and the date list.
+    # Get the number of days and the date list.
     my ($offset, @dates) = @_;
 
     # Bucket for our result list.
@@ -67,7 +66,7 @@ sub date_modifier {
         # Cast the current date string as an object.
         my $current = date($date);
 
-        # Get a random number of days in the future.
+        # Get a random number of days.
         my $m = int(rand $offset) + 1;
 
         # Save the stringified date plus the offest.
@@ -82,7 +81,7 @@ sub date_modifier {
 sub time_ranger {
     my %args = @_;
     # Set defaults.
-    $args{stamp} ||= 1;
+    $args{stamp} //= 1;
     $args{start} ||= '00:00:00';
     $args{end}   ||= '';
     $args{N}     ||= NDATA;
@@ -132,10 +131,10 @@ sub _now { # Return hour, minute, second.
 sub number_ranger {
     my %args = @_;
     # Set defaults.
-    $args{start}  ||= 0;
-    $args{end}    ||= NDATA;
-    $args{prec}   ||= PREC;
-    $args{random} ||= 1;
+    $args{start}  //= 1;
+    $args{end}    //= NDATA;
+    $args{prec}   //= PREC;
+    $args{random} //= 1;
     $args{N}      ||= NDATA;
 
     # Bucket for our result list.
@@ -151,12 +150,16 @@ sub number_ranger {
             while ($x < $args{start}) {
                 $x = rand($args{end});
             }
+            $x = sprintf '%.*f', $args{prec}, $x;
             push @results, $x;
         }
     }
     else {
-        # Use a simple sequence of integers.
+        # Use a contiguous sequence.
         @results = ($args{start} .. $args{end});
+        for ( @results ) {
+            $_ = sprintf '%.*f', $args{prec}, $_;
+        }
     }
 
     return \@results;
@@ -217,8 +220,12 @@ sub email_modifier {
         # Break up the name.
         my @name = split / /, $p;
 
-        # Turn any unicode characters into something ascii.
-        $_ = unidecode($_) for @name;
+        for ( @name ) {
+            # Turn any unicode characters into something ascii.
+            $_ = unidecode($_);
+            # Remove non-alpha_nums
+            s/\W//g;
+        }
 
         # Add an email address for the person.
         my $email = lc($name[0]);
@@ -235,11 +242,11 @@ sub distributor {
     my %args = @_;
     # Set defaults.
     $args{type} ||= 'u';
-    $args{prec} ||= PREC;
-    $args{dof}  ||= DOF;
+    $args{prec} //= PREC;
+    $args{dof}  //= DOF;
     $args{N}    ||= NDATA;
 
-    # Separate numerator/denominator for F degs-of-freedm.
+    # Separate numerator/denominator for F degs-of-freedom.
     my $e = 1;
     ($args{dof}, $e) = split(/\//, $args{dof}) if $args{type} eq 'f';
 
@@ -248,35 +255,31 @@ sub distributor {
 
     # Roll!
     for(1 .. $args{N}) {
+        my $x;
+
         # Select distribution.
         if ($args{type} eq 'c') {
             # Chi-squared
-            push @results, Statistics::Distributions::chisqrdistr($args{dof}, rand);
+            $x = Statistics::Distributions::chisqrdistr($args{dof}, rand);
         }
         elsif ($args{type} eq 's') {
             # Student's T
-            push @results, Statistics::Distributions::tdistr($args{dof}, rand);
+            $x = Statistics::Distributions::tdistr($args{dof}, rand);
         }
         elsif ($args{type} eq 'f') {
             # F distribution
-            push @results, Statistics::Distributions::fdistr($args{dof}, $e, rand);
+            $x = Statistics::Distributions::fdistr($args{dof}, $e, rand);
         }
         else {
             # Normal
-            push @results, Statistics::Distributions::udistr(rand);
+            $x = Statistics::Distributions::udistr(rand);
         }
+
+        $x = sprintf '%.*f', $args{prec}, $x;
+        push @results, $x;
     }
 
     return \@results;
-}
-
-
-sub shuffler {
-    # Get the desired number of data-points.
-    my $n = defined $_[0] ? shift : 9;
-    # Get the items to shuffle.
-    my @items = @_ ? @_ : ('a' .. 'j');
-    return [ shuffle(@items) ];
 }
 
 
@@ -314,7 +317,8 @@ sub string_ranger {
     for(1 .. $args{N}) {
         if ($args{type} eq 'pron') {
             push @results, Text::Password::Pronounceable->generate(
-                $args{length}, $args{length});
+                $args{length}, $args{length}
+            );
         }
         else {
             push @results, $sp->make_password($args{length});
@@ -360,9 +364,6 @@ sub collate {
     # Accept any number of columns.
     my @columns = @_;
 
-    # Make a copy of the columns to peel off.
-    my @lists = @columns;
-
     # Declare the bucket for our arrayrefs.
     my @results = ();
 
@@ -390,7 +391,7 @@ Mock::Populate - Mock data creation
 
 =head1 VERSION
 
-version 0.1001
+version 0.1700
 
 =head1 SYNOPSIS
 
@@ -398,18 +399,17 @@ version 0.1001
   # * Call each function below with Mock::Populate::foo(...
   my $n      = 5;
   my $offset = 11;
-  my $ids    = number_ranger(start => 1, end => 1001, prec => 0, random => 0, N => $n);
-  my $money  = number_ranger(start => 1000, end => 5000, prec => 2, random => 1, N => $n);
+  my $ids    = number_ranger(start => 1, end => $n, prec => 0, random => 0);
+  my $money  = number_ranger(start => 1000, end => 5000, prec => 2, N => $n);
   my $create = date_ranger(start => '1900-01-01', end => '2020-12-31', N => $n);
   my $modify = date_modifier($offset, @$create);
-  my $times  = time_ranger(stamp => 1, start => '01:02:03', end =>'23:59:59', N => $n);
-  my $people = name_ranger(gender => 'b', names => 2, country => 'us', N => $n);
+  my $times  = time_ranger(start => '01:02:03', end =>'23:59:59', stamp => 1, N => $n);
+  my $people = name_ranger(gender => 'f', N => $n);
   my $email  = email_ranger(@$people);
-  my $shuff  = shuffler($n, qw(foo bar baz goo ber buz));
   my $stats  = distributor(type => 'u', prec => 4, dof => 2, N => $n);
   my $string = string_ranger(length => 32, type => 'base64', N => $n);
-  my $imgs   = image_ranger(size => 10, N => $n);  # *size is density, not pixel dimension
-  my $coll   = collate($ids, $people, $email, $create, $times, $modify, $times);
+  my $imgs   = image_ranger(N => $n);
+  my $coll   = collate($ids, $people, $email, $create, $times);
 
 =head1 DESCRIPTION
 
@@ -421,7 +421,7 @@ calling each.
 Each function produces a list of elements that can be used as database columns.
 The handy C<collate()> function takes these columns and returns a list of
 (arrayref) rows.  This can then be processed into CSV, JSON, etc.  It can also
-be directly inserted into your favorite database, with your favorite perl ORM.
+be directly inserted into your favorite database.
 
 =head1 FUNCTIONS
 
@@ -429,20 +429,20 @@ be directly inserted into your favorite database, with your favorite perl ORM.
 
   $results = date_ranger(start => $start, end => $end, N => $n);
 
-Return a list of B<N> random dates within a range.  The start and end dates, and
-desired number of data-points are all optional.  The defaults are:
+Return a list of B<N> random dates within a range.  The B<start> and B<end>
+dates, and desired number of data-points are all optional.  The defaults are:
 
-  start: 2000-01-01
-  end: today (computed if not given)
-  N: 10
+  start: 1970-01-01
+  end:   today (computed if not given)
+  N:     10
 
 The dates must be given as C<YYYY-MM-DD> strings.
 
 =head2 date_modifier()
 
-  $modify = date_modifier($offset, @$dates);
+  $results = date_modifier($offset, @$dates);
 
-Return a new list of random future dates, based on the offset.
+Return a new list of random B<dates>, based on the B<offset>.
 
 =head2 time_ranger()
 
@@ -453,15 +453,16 @@ Return a new list of random future dates, based on the offset.
     N     => $n,
   );
 
-Return a list of B<N> random times within a range.  The stamp, start and end
-times, and desired number of data-points are all optional.  The defaults are:
+Return a list of B<N> random times within a range.  The B<stamp>, B<start> and
+B<end> times, and desired number of data-points are all optional.  The defaults
+are:
 
   stamp: 1 (boolean)
-  start: 00-00-00
-  end: now (computed if not given)
-  N: 10
+  start: 00:00:00
+  end:   now (computed if not given)
+  N:     10
 
-The times must be given as C<HH-MM-SS> strings.  The B<stamp> argument
+The times must be given as C<HH:MM:SS> strings.  The B<stamp> argument
 determines if a time-stamp or the number of seconds should be returned.
 
 =head2 number_ranger()
@@ -471,18 +472,18 @@ determines if a time-stamp or the number of seconds should be returned.
     end    => $end,
     prec   => $prec,
     random => $random,
-    N      => $n
+    N      => $n,
   );
 
-Return a list of B<N> random numbers within a range.  The start, end, precision,
-whether we want random or sequential numbers, and the desired number of
-data-points are all optional.  The defaults are:
+Return a list of numbers within the range defined by B<start> and B<end>.  The
+B<start>, B<end>, B<prec>ision, B<N>, and whether we want B<random> or sequential
+numbers are all optional.  The defaults are:
 
-  start: 0
-  end: 9
+  start:     1
+  end:       10
   precision: 2
-  random: 1
-  N: 10
+  random:    1 (boolean)
+  N:         10
 
 =head2 name_ranger()
 
@@ -493,24 +494,24 @@ data-points are all optional.  The defaults are:
     N       => $n,
   );
 
-Return a list of B<N> random person names.  The gender, number of names, and
-desired number of data-points are all optional.  The defaults are:
+Return a list of B<N> random person names.  The B<gender>, B<names>, B<country>
+and desired number of data-points are all optional.  The defaults are:
 
-  gender: b (options: both, female, male)
-  names: 2 (first, last)
+  gender:  b (options: both, female, male)
+  names:   2 (first, last)
   country: us
-  N: 10
+  N:       10
 
-This routine uses L<Mock::Person>.  Please see that module for the country
-identifiers to use.
+This routine uses L<Mock::Person> which currently, only supports C<us> and C<ru>
+countries.
 
 =head2 email_modifier()
 
   $results = email_modifier(@people)
   # first.last@example.{com,net,org,edu}
 
-Return a list of email addresses based on a list of given names.  Any names with
-unicode are run through L<Text::Unidecode>.
+Return a list of email addresses based on a list of given people names.  Any
+names with unicode are run through L<Text::Unidecode>.
 
 =head2 distributor()
 
@@ -521,14 +522,14 @@ unicode are run through L<Text::Unidecode>.
     N    => $n,
   );
 
-Return a list of B<N> distribution values.  The type, precision,
-degrees-of-freedom, and desired number of data-points are optional.
+Return a list of B<N> distribution values.  The B<type>, B<prec>ision,
+degrees-of-freedom (B<dof>), and desired number of data-points are optional.
 The defaults are:
 
-  type: u (normal)
+  type:      u (normal)
   precision: 2
-  degrees-of-freedom: 2
-  N: 10
+  dof:       2
+  N:         10
 
 This routine uses L<Statistics::Distributions>.
 
@@ -541,16 +542,6 @@ This function uses single letter identifiers:
   s: Student's T distribution
   f: F distribution
 
-=head2 shuffler()
-
-  $results = shuffler($n, @items)
-
-Return a shuffled list of B<$n> items.  The items and number of data-points
-are optional.  The defaults are:
-
-  n: 10
-  items: a b c d e f g h i j
-
 =head2 string_ranger()
 
   $results = string_ranger(
@@ -559,15 +550,12 @@ are optional.  The defaults are:
     N      => $n,
   );
 
-Return a list of B<N> strings.  The type, length, and number of data-points are
-optional.  The defaults are:
+Return a list of B<N> strings.  The B<type>, B<length>, and number of
+data-points are optional.  The defaults are:
 
-  type: default
+  type:   default
   length: 8
-  N: 10
-
-* This function is nearly identical to the L<Data::SimplePassword>
-C<rndpassword> program, but allows you to generate a finite number of results.
+  N:      10
 
 =head3 Types
 
@@ -590,12 +578,12 @@ C<rndpassword> program, but allows you to generate a finite number of results.
   $results = image_ranger(size => $size, N => $n)
 
 Return a list of B<N> 1x1 pixel images of varying byte sizes (not image
-dimension).  The byte size and number of data-points are both optional.
+dimension).  The byte B<size> and number of data-points are both optional.
 
 The defaults are:
 
-  N: 10
   size: 8
+  N:    10
 
 This routine uses L<Image::Dot>.
 
@@ -616,8 +604,6 @@ L<Date::Simple>
 
 L<Image::Dot>
 
-L<List::Util>
-
 L<Mock::Person>
 
 L<Statistics::Distributions>
@@ -629,25 +615,6 @@ L<Text::Unidecode>
 L<Time::Local>
 
 L<Data::Random> does nearly the exact same thing. Whoops!
-
-=head1 TO DO
-
-Implement dirty-data randomizing.
-
-  unexpected formats: iso-8859-1, utf-16, windows codepage,
-  BOM (byte order marker),
-  broken unicode,
-  garbled binary,
-  \r and \n variations,
-  commas or $ in currencies ("format fuckups"),
-  bad JSON,
-  broken XML,
-  bad ' and " in CSV,
-  statistical outliers,
-  time-series drops and spikes,
-  duplicate data,
-  missing data,
-  truncated data,
 
 =head1 AUTHOR
 

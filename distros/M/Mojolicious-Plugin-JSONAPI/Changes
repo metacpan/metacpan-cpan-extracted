@@ -1,4 +1,11 @@
+2.6       2019-01-27 18:56:44+00:00 Europe/London
+
+2.5       2019-01-27 18:53:40+00:00 Europe/London
+- Update test to use regex for url matching, for cpantesters tests.
+
 2.4       2019-01-12 20:33:52+00:00 Europe/London
+- Add routes for related links (https://jsonapi.org/format/#document-resource-object-related-resource-links).
+These routes are treated identically to self links, therefore they're handled by the same controller action.
 
 2.3       2018-11-16 16:14:07+00:00 Europe/London
 - Adds the ability to create routes for specific HTTP verbs for the

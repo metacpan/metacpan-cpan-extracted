@@ -1,6 +1,6 @@
 package PMLTQ::Commands;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Commands::VERSION = '2.0.2';
+$PMLTQ::Commands::VERSION = '2.0.3';
 # ABSTRACT: PMLTQ command line interface
 
 use PMLTQ::Base -strict;
@@ -13,6 +13,18 @@ use Hash::Merge 'merge';
 use List::MoreUtils 'apply';
 use PMLTQ::Loader qw/find_modules load_class/;
 use YAML::Tiny;
+
+use File::Basename 'dirname';
+use File::Spec ();
+use File::ShareDir 'dist_dir';
+my $local_shared_dir = File::Spec->catdir(dirname(__FILE__), File::Spec->updir, File::Spec->updir, File::Spec->updir, 'share');
+my $shared_dir = eval { dist_dir(__PACKAGE__) };
+
+# Assume installation
+if (-d $local_shared_dir or !$shared_dir) {
+  $shared_dir = $local_shared_dir;
+}
+sub shared_dir { $shared_dir }
 
 sub DEFAULT_CONFIG {
   my $base_dir = shift || getcwd();

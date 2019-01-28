@@ -1,5 +1,5 @@
 package Git::Database::Backend::Git::PurePerl;
-$Git::Database::Backend::Git::PurePerl::VERSION = '0.010';
+$Git::Database::Backend::Git::PurePerl::VERSION = '0.011';
 use Sub::Quote;
 
 use Moo;
@@ -39,7 +39,7 @@ Git::Database::Backend::Git::PurePerl - A Git::Database backend based on Git::Pu
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

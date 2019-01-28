@@ -1,5 +1,5 @@
 package Git::Database::Backend::Cogit;
-$Git::Database::Backend::Cogit::VERSION = '0.010';
+$Git::Database::Backend::Cogit::VERSION = '0.011';
 use Sub::Quote;
 
 use Moo;
@@ -39,7 +39,7 @@ Git::Database::Backend::Cogit - A Git::Database backend based on Cogit
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

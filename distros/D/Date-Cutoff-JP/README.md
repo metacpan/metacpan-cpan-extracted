@@ -53,19 +53,10 @@ returns hash value with keys below:
 
 # BUGS
 
-Because of dependency: [Date::Japanese::Holiday](https://metacpan.org/pod/Date::Japanese::Holiday)
-
-- 山の日
-
-    11th of Aug is a holiday as '山の日' since 2016 but this module doesn't support it yet.
-
-- 天皇即位の日
-
-    1st of May is special holiday especially 2019 but this module doesn't support it yet.
-
 # SEE ALSO
 
-[Date::Simple](https://metacpan.org/pod/Date::Simple), [Date::Japanese::Holiday](https://metacpan.org/pod/Date::Japanese::Holiday),
+[Calendar::Japanese::Holiday](https://metacpan.org/pod/Calendar::Japanese::Holiday),[Date::DayOfWeek](https://metacpan.org/pod/Date::DayOfWeek)
+
 [日本の祝日YAML](https://github.com/holiday-jp/holiday_jp/blob/master/holidays.yml)
 
 # LICENSE

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/bench.pl
+eg/bench_ro.pl
+lib/Class/Data/Lite.pm
+minil.toml
+t/00_compile.t
+t/01_simple.t
+t/02_error.t
+t/03_array.t
+META.yml
+MANIFEST

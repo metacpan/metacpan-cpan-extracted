@@ -1,0 +1,43 @@
+---
+NoSource:
+  target:
+    type: CPAN
+    user: web_user
+SourceString:
+  source: Test
+  target:
+    type: CPAN
+    user: web_user
+NoSourceType:
+  source:
+    path: /test
+  target:
+    type: CPAN
+    user: web_user
+SourceArray:
+  source:
+    -
+      type: File
+      path: /test
+  target:
+    type: Text
+    user: web_user
+NoTargetType:
+  source:
+    -
+      type: File
+      path: /test
+  target:
+    user: web_user
+NoTarget:
+  source:
+    -
+      type: File
+      path: /test
+NoPod:
+  source:
+    -
+      type: File
+      path: /tmp/test
+  target:
+    type: Text

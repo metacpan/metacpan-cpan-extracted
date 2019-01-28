@@ -1,5 +1,8 @@
 Revision history for Dancer-Plugin-SporeDefinitionControl
 
+0.15    2019-01-28, Nicolas Oudard
+        add the capability to manage method OPTIONS (Frederic Lechauve)
+
 0.14    2016-02-24, Nicolas Oudard
         Fix typo in error message when a parameter is wrong (Simon Lenne)
         manage form-data in check_spore_definition (Frederic Lechauve)

@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/BinPackUtils/bin_files_into_dvds
 # and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2019-01-27'; # DATE
+our $DATE = '2019-01-28'; # DATE
 our $DIST = 'App-BinPackUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ bin-files-into-dvds - Put files into DVD bins
 
 =head1 VERSION
 
-This document describes version 0.004 of bin-files-into-dvds (from Perl distribution App-BinPackUtils), released on 2019-01-27.
+This document describes version 0.005 of bin-files-into-dvds (from Perl distribution App-BinPackUtils), released on 2019-01-28.
 
 =head1 SYNOPSIS
 
@@ -55,6 +55,10 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--dereference-files>, B<-D>
+
+Just like -D option in du, to derefence the filenames only.
 
 =item B<--dvd-size>=I<s>, B<-s>
 

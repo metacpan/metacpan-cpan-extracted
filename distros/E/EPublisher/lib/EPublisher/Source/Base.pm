@@ -47,7 +47,7 @@ EPublisher::Source::Base - Base class for Source plugins
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

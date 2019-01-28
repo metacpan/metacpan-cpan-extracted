@@ -17,11 +17,11 @@ Dancer Plugin to control validity of route from a Spore configuration file
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -94,12 +94,14 @@ Load yaml config file
 #Load definition spore file from plugin config
 
 our $path_validation;
-
+#_load_path_validation();
+$path_validation =_load_path_validation();
 sub _load_path_validation
 {
     my $rh_file = {};
 
     my $path_to_spore_def = plugin_setting->{'spore_spec_path'};
+    my $build_options_route = plugin_setting->{'build_options_route'};
     if ($path_to_spore_def)
     {
     $path_to_spore_def = File::Spec->catfile( setting('appdir') , $path_to_spore_def) unless (File::Spec->file_name_is_absolute($path_to_spore_def));
@@ -107,11 +109,10 @@ sub _load_path_validation
     }
 
     my $path_valid;
+
     #load validation hash
     foreach my $method_name (keys(%{$rh_file->{'methods'}}))
     {
-
-
         my $method = $rh_file->{'methods'}->{$method_name}->{'method'};
         my $complet_path = $rh_file->{'methods'}->{$method_name}->{'path'};
         my ($path, $query_params) = split(/\?/, $complet_path);
@@ -122,17 +123,36 @@ sub _load_path_validation
             push @{$rh_file->{'methods'}->{$method_name}->{'required_params'}}, @additional_params;
         }
 
-
-        push @{$path_valid->{$method}->{$path}->{params}},
+        push @{$path_valid->{path}->{$path}}, $method;
+        push @{$path_valid->{method}->{$method}->{$path}->{params}},
           {
             required_params => $rh_file->{'methods'}->{$method_name}->{'required_params'},
             optional_params => $rh_file->{'methods'}->{$method_name}->{'optional_params'},
             form_data_params => $rh_file->{'methods'}->{$method_name}->{'form-data'},
           };
-        $path_valid->{$method}->{$path}->{functions}->{$method_name} = 1;
+        $path_valid->{method}->{$method}->{$path}->{functions}->{$method_name} = 1;
+
     }
+    init_routes_options($path_valid->{path}) if (defined $build_options_route);
     return $path_valid;
 };
+
+=head2 init_routes_options
+
+force the routes on options method
+
+=cut
+
+
+
+sub init_routes_options(){
+    my $paths = shift;
+    foreach my $path (keys %{$paths}){
+            options $path => sub {
+            };
+
+        }
+}
 
 
 
@@ -151,25 +171,30 @@ register 'check_spore_definition' => sub {
         my %req_params = params;
         die "method request must be defined" unless (defined( $req->method() ) );
         _returned_error( "route pattern request must be defined", 404) unless (defined( $req->{_route_pattern} ) );
+
 #        my $all_route_pattern = $req->{_route_pattern};
 #my $detail_route_pattern =  split /?/, $route_pattern;
-        $path_validation = _load_path_validation() if !$path_validation;
-        unless (defined( $path_validation->{$req->method()} ) )
+        #$path_validation = _load_path_validation() if !$path_validation;
+        unless (defined( $path_validation->{method}->{$req->method()}) || uc($req->method()) eq "OPTIONS" )
         {
           my $req_method = $req->method();
           return _returned_error("no route define with method `$req_method'", 404);
         }
-#TODO : return an error because path does not exist in specification
-        unless (defined( $path_validation->{$req->method()}->{$req->{_route_pattern}} ) )
+
+        #TODO : return an error because path does not exist in specification
+        unless (defined( $path_validation->{method}->{$req->method()}->{$req->{_route_pattern}} ) 
+                        || (uc($req->method()) eq "OPTIONS" && defined($path_validation->{path}->{$req->{_route_pattern}}))
+                )
         {
           my $req_route_pattern = $req->{_route_pattern};
           return _returned_error("route pattern `$req_route_pattern' is not defined",404);
         }
 
-
         my $is_ok = 0;
+        #IF method is OPTIONS list of methods set the headers and return ok
+        _returned_options_methods($path_validation->{path}->{$req->{_route_pattern}}) if (uc($req->method()) eq "OPTIONS" );
         my $error;
-        foreach my $route_defined (@{$path_validation->{$req->method()}->{$req->{_route_pattern}}->{params}})
+        foreach my $route_defined (@{$path_validation->{method}->{$req->method()}->{$req->{_route_pattern}}->{params}})
         {
             my $ko;
             my $ra_required_params = $route_defined->{'required_params'};
@@ -228,7 +253,7 @@ register 'get_functions_from_request' => sub {
     $path_validation = _load_path_validation() if !$path_validation;
     my $method = $req->method();
     my $path = $req->{_route_pattern};
-    my $functions = $path_validation->{$method}->{$path}->{functions};
+    my $functions = $path_validation->{method}->{$method}->{$path}->{functions};
     return $functions;
 };
 
@@ -252,6 +277,30 @@ sub _returned_error
   else
   {die "Unknown code";}
 }
+
+sub _returned_options_methods
+{
+  my $methods = shift;
+  my %seen = ();
+  my @unique_methods = grep { !$seen{$_}++ } @{$methods};
+  my $build_options_route = plugin_setting->{'build_options_route'};
+  if (defined $methods){
+  set serializer => 'JSON';
+  status 200;
+  header 'access-control-allow-credentials' => $build_options_route->{'header_allow_credentials'} || '';
+  header 'access-control-allow-headers' => $build_options_route->{'header_allow_headers'} || '';
+  header 'access-control-allow-methods' => join(",",@unique_methods,'OPTIONS');
+  header 'access-control-allow-origin' => $build_options_route->{'header_allow_allow_origin'} || '';
+  header 'access-control-max-age' => $build_options_route->{'header_max_age'}  || '';
+  return halt('{"status":200,"message":"OK"}');
+  }
+  else{
+      set serializer => 'JSON';
+      status 404;
+      return halt('{"status":404,"message":"no route exists"}');
+  }
+}
+
 
 =head1 AUTHOR
 

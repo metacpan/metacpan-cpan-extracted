@@ -1,5 +1,5 @@
 package Git::Database::Role::ObjectReader;
-$Git::Database::Role::ObjectReader::VERSION = '0.010';
+$Git::Database::Role::ObjectReader::VERSION = '0.011';
 use Git::Database::Object::Blob;
 use Git::Database::Object::Tree;
 use Git::Database::Object::Commit;
@@ -47,7 +47,7 @@ Git::Database::Role::ObjectReader - Abstract role for a Git backends that read o
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

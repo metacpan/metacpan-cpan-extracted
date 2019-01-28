@@ -1,5 +1,5 @@
 package Git::Database::Backend::Git::Wrapper;
-$Git::Database::Backend::Git::Wrapper::VERSION = '0.010';
+$Git::Database::Backend::Git::Wrapper::VERSION = '0.011';
 use Cwd qw( cwd );
 use Git::Wrapper;
 use Git::Version::Compare qw( ge_git );
@@ -141,7 +141,7 @@ Git::Database::Backend::Git::Wrapper - A Git::Database backend based on Git::Wra
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

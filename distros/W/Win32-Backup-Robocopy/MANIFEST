@@ -1,0 +1,27 @@
+Changes
+lib/Win32/Backup/Robocopy.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/00-load.t
+t/01-new.t
+t/02-run.t
+t/03-job.t
+t/04-runjobs.t
+t/05-writeconf.t
+t/06-loadconf.t
+t/07-listjobs.t
+t/08-range.t
+t/09-runjobs-ranges.t
+t/10-restore.t
+t/11-restorehistory.t
+t/12-verbosity.t
+t/bkpscenario.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,7 @@
+name = "Class-Data-Lite"
+# badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

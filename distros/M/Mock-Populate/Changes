@@ -1,5 +1,52 @@
 Revision history for Mock::Populate
 
+0.1700 2019-01-27 17:44:10
+    - Drop the useless shuffler() function.
+    - Improved documentation.
+
+0.1601 2019-01-27 16:18:20
+    - Improved documentation once again.
+
+0.1600 2019-01-27 15:02:31
+    - Readded the N argument back to number_ranger().
+
+0.1500 2019-01-27 13:55:49
+    - Remove non-alpha_num chars from names in email_modifier().
+
+0.1402 2019-01-27 13:43:15
+    - Fixed the date_ranger() start default.
+    - Improved documentation slightly.
+
+0.1401 2019-01-27 12:14:05
+    - Fixed the wording for the number_ranger() doc.
+
+0.1400 2019-01-27 11:56:53
+    - Honored the precision argument to number_ranger() and distributor().
+    - Used //= defined-or instead of ||= for arguments that could be 0.
+
+0.1300 2019-01-27 11:12:53
+    - Allowed 0 to be set for the time-stamp.
+
+0.1201 2019-01-27 10:44:52
+    - Improved the documentation ever so slightly.
+    - Pruned a misleading statement from the docs.
+
+0.1200 2019-01-27 10:30:14
+    - Remove the unused N argument from shuffler().
+
+0.1100 2019-01-27 10:21:09
+    - Improved documentation.
+    - Correct the default N for shuffler().
+
+0.1004 2019-01-27 09:50:13
+    - Improved documentation yet again!
+
+0.1003 2019-01-27 09:38:33
+    - Improved documentation yet again!
+
+0.1002 2019-01-27 09:22:10
+    - Improved documentation a bit again.
+
 0.1001 2019-01-27 09:11:45
     - Improved documentation.
     - Corrected the gender default in name_ranger().

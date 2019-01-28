@@ -26,12 +26,12 @@ do { my $x = {
                     },
        'test' => {
                    'recommends' => {
-                                   'CPAN::Meta' => '2.120900',
-                                   'EV' => '0',
-                                   'Mojolicious' => '0',
-                                   'Plack::Util' => '0',
-                                   'Twiggy::Server' => '0'
-                                 },
+                                     'CPAN::Meta' => '2.120900',
+                                     'EV' => '0',
+                                     'Mojolicious' => '0',
+                                     'Plack::Util' => '0',
+                                     'Twiggy::Server' => '0'
+                                   },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',

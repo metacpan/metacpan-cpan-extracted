@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use EPublisher;
 use EPublisher::Config;
 
 my $error;
@@ -12,6 +13,11 @@ eval {
 } or $error = $@;
 
 like $error, qr'No \(existant\) config file given!';
+
+my $publisher = EPublisher->new;
+is $publisher->config([]), undef;
+
+is $publisher->_debug, undef;
 
 
 done_testing();

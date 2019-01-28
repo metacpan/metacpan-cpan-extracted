@@ -26,12 +26,10 @@ no_index:
 provides:
   Date::Cutoff::JP:
     file: lib/Date/Cutoff/JP.pm
-    version: '0.03'
-  Date::Weekend::JP:
-    file: lib/Date/Cutoff/JP.pm
-    version: '0.03'
+    version: '0.04'
 requires:
-  Date::Japanese::Holiday: '0'
+  Calendar::Japanese::Holiday: '0'
+  Date::DayOfWeek: '0'
   Moose: '0'
   Time::Piece: '0'
   Time::Seconds: '0'
@@ -40,6 +38,6 @@ resources:
   bugtracker: https://github.com/worthmine/Date-Cutoff-JP/issues
   homepage: https://github.com/worthmine/Date-Cutoff-JP
   repository: git://github.com/worthmine/Date-Cutoff-JP.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
 x_static_install: 1

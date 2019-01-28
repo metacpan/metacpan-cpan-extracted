@@ -1,5 +1,5 @@
 package Git::Database::DirectoryEntry;
-$Git::Database::DirectoryEntry::VERSION = '0.010';
+$Git::Database::DirectoryEntry::VERSION = '0.011';
 use Sub::Quote;
 
 use Moo;
@@ -64,7 +64,7 @@ Git::Database::DirectoryEntry - A directory entry in Git
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

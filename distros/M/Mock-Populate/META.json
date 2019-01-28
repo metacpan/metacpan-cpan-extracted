@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "develop" : {
@@ -37,14 +37,13 @@
             "Date::Range" : "0",
             "Date::Simple" : "0",
             "Image::Dot" : "0",
-            "List::Util" : "0",
             "Mock::Person" : "0",
             "Statistics::Distributions" : "0",
             "Text::Password::Pronounceable" : "0",
             "Text::Unidecode" : "0",
             "Time::Local" : "0",
             "constant" : "0",
-            "perl" : "5.006",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -56,7 +55,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       }
    },
@@ -71,7 +70,7 @@
          "web" : "https://github.com/ology/Mock-Populate"
       }
    },
-   "version" : "0.1001",
+   "version" : "0.1700",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -290,6 +289,7 @@
                      "HH",
                      "ORM",
                      "YYYY",
+                     "dof",
                      "unicode"
                   ],
                   "wordlist" : "Pod::Wordlist"

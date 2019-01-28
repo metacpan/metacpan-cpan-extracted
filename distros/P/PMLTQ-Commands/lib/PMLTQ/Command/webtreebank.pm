@@ -1,6 +1,6 @@
 package PMLTQ::Command::webtreebank;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::webtreebank::VERSION = '2.0.2';
+$PMLTQ::Command::webtreebank::VERSION = '2.0.3';
 # ABSTRACT: GET actions on treebanks on the web
 
 use PMLTQ::Base 'PMLTQ::Command';

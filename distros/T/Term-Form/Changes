@@ -1,6 +1,10 @@
 Revision history for Term::Form
 
 
+0.508   2019-01-28
+        - "readline": new option 'show_context'.
+        - "readline": arrow-up goes back 10 chars, arrow-down goes forward 10 chars.
+
 0.507   2019-01-25
         - Bugfix in 'fill_form': reset available width.
         - Handle terminal size change.

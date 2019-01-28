@@ -1,7 +1,7 @@
 package Dancer2::Plugin::WebSocket::Group;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTACT: Grouping of connections to send messages to
-$Dancer2::Plugin::WebSocket::Group::VERSION = '0.1.2';
+$Dancer2::Plugin::WebSocket::Group::VERSION = '0.1.3';
 
 use strict;
 use warnings;
@@ -60,7 +60,7 @@ Dancer2::Plugin::WebSocket::Group
 
 =head1 VERSION
 
-version 0.1.2
+version 0.1.3
 
 =head1 SYNOPSIS
 

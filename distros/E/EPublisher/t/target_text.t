@@ -6,9 +6,12 @@ use warnings;
 use Test::More;
 use EPublisher::Target::Plugin::Text;
 
+my $debug = '';
 my $target = EPublisher::Target::Plugin::Text->new({
-    width => 80,
-});
+    width      => 80,
+},
+    publisher => Mock::Publisher->new
+);
 
 {
     my $output = $target->deploy;
@@ -27,5 +30,17 @@ my $target = EPublisher::Target::Plugin::Text->new({
     is $text, "TEST\n    Hello World!\n\n";
 }
 
+my $publisher = $target->publisher;
+isa_ok $publisher, 'Mock::Publisher';
+
 
 done_testing();
+
+{
+    package
+        Mock::Publisher;
+
+    sub new { bless {}, shift }
+    sub debug { $debug = $_[1] };
+}
+

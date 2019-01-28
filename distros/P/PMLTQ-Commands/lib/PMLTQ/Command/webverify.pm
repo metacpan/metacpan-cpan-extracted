@@ -1,6 +1,6 @@
 package PMLTQ::Command::webverify;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::webverify::VERSION = '2.0.2';
+$PMLTQ::Command::webverify::VERSION = '2.0.3';
 # ABSTRACT: Check if treebank is setted in web interface
 
 use PMLTQ::Base 'PMLTQ::Command';

@@ -3,8 +3,8 @@ NAME
     into bins
 
 VERSION
-    This document describes version 0.004 of App::BinPackUtils (from Perl
-    distribution App-BinPackUtils), released on 2019-01-27.
+    This document describes version 0.005 of App::BinPackUtils (from Perl
+    distribution App-BinPackUtils), released on 2019-01-28.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:
@@ -35,6 +35,10 @@ FUNCTIONS
     *   bin_prefix => *filename* (default: "bin")
 
     *   bin_size* => *filesize*
+
+    *   dereference_files => *bool*
+
+        Just like -D option in du, to derefence the filenames only.
 
     *   files* => *array[filename]*
 
@@ -67,6 +71,10 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   dereference_files => *bool*
+
+        Just like -D option in du, to derefence the filenames only.
 
     *   dvd_size => *filesize* (default: 4687134720)
 
@@ -109,6 +117,10 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   dereference_files => *bool*
+
+        Just like -D option in du, to derefence the filenames only.
 
     *   dvd_size => *filesize* (default: 4687134720)
 

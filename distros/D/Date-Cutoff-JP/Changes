@@ -1,5 +1,12 @@
 Revision history for Perl extension Date-CutOff-JP
 
+0.04 2019-01-28T10:55:02Z
+    - the bugs was fixed
+    - start using Calendar::Japanese::Holiday instead of Date::Japanese::Holiday
+    - start using Date::DayOfWeek
+
+use Date::DayOfWeek;
+
 0.03 2019-01-23T14:18:16Z
     - add the link to about Japanese holidays
 

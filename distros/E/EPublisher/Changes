@@ -1,6 +1,12 @@
 Revision history for Perl EPublisher.
 =====================================
 
+1.27 2019-01-28 07:19:00
+
+  + add more validation of the config input
+  + do not try to load a plugin when no type is given
+  + add tests
+
 1.26 2019-01-27 08:35:00
 
   + accept a module name as parameter to load_source in ::Module plugin, make debugging easier

@@ -1,6 +1,6 @@
 package PMLTQ::Command;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::VERSION = '2.0.2';
+$PMLTQ::Command::VERSION = '2.0.3';
 # ABSTRACT: Command base class
 
 use PMLTQ::Base -base;
@@ -32,6 +32,7 @@ has term_encoding => sub {
   require Term::Encoding;
   Term::Encoding::get_encoding();
 };
+
 
 sub run {
   die 'Override by parent class';

@@ -1,6 +1,6 @@
 package PMLTQ::Command::query;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::query::VERSION = '2.0.2';
+$PMLTQ::Command::query::VERSION = '2.0.3';
 # ABSTRACT: WIP: Executes query on treebank
 
 use PMLTQ::Base 'PMLTQ::Command';

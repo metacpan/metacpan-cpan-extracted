@@ -21,23 +21,20 @@ our $VERSION = 0.5;
 sub extract_package {
     my ($file, $config) = @_;
     
-    return if !$file || ! -f $file;
+    return if !$file || !-r -f $file;
     
-    my $content;
+    open my $fh, '<', $file;
  
-    if ( open my $fh, '<', $file ) {
+    if ( $config->{encoding} ) {
+        binmode $fh, ':encoding(' . $config->{encoding} . ')';
+    }
  
-        if ( $config->{encoding} ) {
-            binmode $fh, ':encoding(' . $config->{encoding} . ')';
-        }
- 
-        local $/;
-        $content = <$fh>;
-    } 
+    local $/;
+    my $content = <$fh>;
     
     return if !$content;
     
-    my $parser    = PPI::Document->new( \$content );
+    my $parser = PPI::Document->new( \$content );
     
     return if !$parser;
     
@@ -53,19 +50,19 @@ sub extract_package {
 sub extract_pod {
     my ($file, $config) = @_;
     
-    return if !$file || ! -f $file;
+    return if !$file || !-r -f $file;
     
     my $content;
  
-    if ( open my $fh, '<', $file ) {
+    open my $fh, '<', $file;
  
-        if ( $config->{encoding} ) {
-            binmode $fh, ':encoding(' . $config->{encoding} . ')';
-        }
+    if ( $config->{encoding} ) {
+        binmode $fh, ':encoding(' . $config->{encoding} . ')';
+    }
  
-        local $/;
-        $content = <$fh>;
-    } 
+    local $/;
+    $content = <$fh>;
+    close $fh;
 
     return extract_pod_from_code( $content );
 }
@@ -75,7 +72,7 @@ sub extract_pod_from_code {
     
     return if !$code;
     
-    my $parser    = PPI::Document->new( \$code );
+    my $parser = PPI::Document->new( \$code );
     
     return if !$parser;
     
@@ -105,7 +102,7 @@ EPublisher::Utils::PPI - PPI utility for EPublisher
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -146,17 +143,6 @@ Get the documentation of a piece of code...
 =head2 extract_package
 
 Get the namespace name of a package
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2010 Renee Baecker, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms of Artistic License 2.0.
-
-=head1 AUTHOR
-
-Renee Baecker (E<lt>module@renee-baecker.deE<gt>)
 
 =head1 AUTHOR
 

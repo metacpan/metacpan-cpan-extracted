@@ -20,6 +20,12 @@
       <foaf:mbox rdf:resource="mailto:schreiner@suse.de" />
     </foaf:Person>
   </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Mohammad S Anwar</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mohammad.anwar@yahoo.com" />
+    </foaf:Person>
+  </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
   <homepage rdf:resource="https://github.com/yanick/Dancer2-Plugin-WebSocket" />
   <bug-database rdf:resource="https://github.com/yanick/Dancer2-Plugin-WebSocket/issues" />
@@ -45,6 +51,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1.1</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-11-20</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1.2</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-01-20</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

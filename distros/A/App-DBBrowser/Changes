@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.048    2019-01-28
+        - Update subquery menu.
+
 2.047    2019-01-26
         - Use the whole terminal width (by upgrading Term::TablePrint).
         - Bugfix in subqueries.

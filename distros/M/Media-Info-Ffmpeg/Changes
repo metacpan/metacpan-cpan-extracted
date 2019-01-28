@@ -1,3 +1,16 @@
+0.007   2019-01-28 (PERLANCAR)
+
+	- Tweak regex once again to get the correct width/height.
+
+
+0.006   2019-01-28 (PERLANCAR)
+
+	- Add 'rotate' information.
+
+	- Tweak regex to avoid capturing the wrong size (e.g. 'Stream
+	  #0:0(eng): Video: h264 (Baseline) (avc1 / 0x31637661) ...').
+
+
 0.005   2017-07-10 (PERLANCAR)
 
 	- No functional changes.

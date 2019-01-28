@@ -1,0 +1,48 @@
+{
+   "abstract" : "a simple backup solution using robocopy",
+   "author" : [
+      "LorenzoTa <lorenzo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-Backup-Robocopy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Cron" : "0",
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "DateTime::Tiny" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "JSON::PP" : "0",
+            "Test::More" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "7",
+   "x_serialization_backend" : "JSON version 2.90"
+}

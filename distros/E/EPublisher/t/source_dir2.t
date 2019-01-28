@@ -38,6 +38,7 @@ my $debug = '';
         { pod => "=pod\n\n05_sources.t - test for the source plugins\n\n=cut\n", title => '', filename => '09_source_file.t' },
         { pod => "=pod\n\n=head1 Testcase\n\n05_sources.t - test for the source plugins\n\n=cut\n", title => 'Testcase', filename => '10_source_file_title_pod.t' },
         { pod => "=pod\n\n=head1 Testcase\n\n05_sources.t - test for the source plugins\n\n=cut\n", title => 'Testcase', filename => '12_source_file_arbitrary_title.t' },
+        { pod => "=pod\n\nTest\n\n=cut\n", title => '', filename => 'extract_pod.t' },
         { pod => "=pod\n\nThis is a test\n\n=cut\n", title => '', filename => 'source_dir2.t' },
     ];
     is $debug, '';

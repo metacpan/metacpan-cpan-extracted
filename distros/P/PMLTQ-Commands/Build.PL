@@ -18,7 +18,7 @@ my %module_build_args = (
     "Maty\x{e1}\x{161} Kopp <matyas.kopp\@gmail.com>"
   ],
   "dist_name" => "PMLTQ-Commands",
-  "dist_version" => "2.0.2",
+  "dist_version" => "2.0.3",
   "license" => "perl",
   "module_name" => "PMLTQ::Commands",
   "recursive_test_files" => 1,
@@ -26,6 +26,8 @@ my %module_build_args = (
     "Hash::Merge" => 0,
     "JSON" => 0,
     "PMLTQ" => "v2.0.1",
+    "Term::Encoding" => 0,
+    "Term::UI" => 0,
     "URI::Encode" => 0
   },
   "script_files" => [

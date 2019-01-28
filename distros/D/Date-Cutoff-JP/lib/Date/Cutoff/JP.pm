@@ -1,27 +1,19 @@
-package Date::Weekend::JP;
-
-our $VERSION = "0.03";
-
-use base 'Date::Japanese::Holiday';
-
-sub is_weekend {
-    my $self = shift;
-    return $self->is_holiday || $self->day_of_week == 6;
-}
-
 package Date::Cutoff::JP;
 use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Carp;
 use Time::Seconds;
 use Time::Piece;
 my $tp = Time::Piece->new();
+use Calendar::Japanese::Holiday;
+use Date::DayOfWeek;
 
 use Moose;
+
 has cutoff => ( is => 'rw', isa => 'Int', default => 0 );
 has payday => ( is => 'rw', isa => 'Int', default => 0 );
 has late    => ( is => 'rw', isa => 'Int', default => 1 );
@@ -53,6 +45,13 @@ before 'late' => sub {
 
 __PACKAGE__->meta->make_immutable;
 
+sub isWeekend {
+    my $self = shift;
+    my ($y, $m, $d ) = split "-", shift;
+    my $dow = dayofweek( $d, $m, $y );
+    return isHoliday( $y, 0+$m, 0+$d, 1 ) || $dow == 6 || $dow == 0;
+}
+
 sub calc_date {
     my $self = shift;
     my $until = shift if @_;
@@ -68,7 +67,7 @@ sub calc_date {
     }
     
     $cutoff = $ref_day->ymd();
-    while( Date::Weekend::JP->new( split( "-", $cutoff ) )->is_weekend ){
+    while( $self->isWeekend($cutoff) ){
         my $ref_day = $t->strptime( $cutoff, '%Y-%m-%d');
         $ref_day += ONE_DAY();
         $cutoff = $ref_day->ymd();
@@ -82,7 +81,7 @@ sub calc_date {
     $str = $ref_day->strftime('%Y-%m-') . sprintf( "%02d", $payday );
     
     my $date = $t->strptime( $str, '%Y-%m-%d' )->ymd();
-    while( Date::Weekend::JP->new( split( "-", $date ) )->is_weekend ){
+    while( $self->isWeekend($date) ){
         my $ref_day = $t->strptime( $date, '%Y-%m-%d');
         $ref_day += ONE_DAY();
         $date = $ref_day->ymd();
@@ -155,23 +154,10 @@ Is or not that the cutoff is pending until next month.
  
 =head1 BUGS
 
-Because of dependency: L<Date::Japanese::Holiday>
- 
-=over
- 
-=item 山の日
-
-11th of Aug is a holiday as '山の日' since 2016 but this module doesn't support it yet.
-
-=item 天皇即位の日
-
-1st of May is special holiday especially 2019 but this module doesn't support it yet.
- 
-=back
-
 =head1 SEE ALSO
  
-L<Date::Simple>, L<Date::Japanese::Holiday>,
+L<Calendar::Japanese::Holiday>,L<Date::DayOfWeek>
+ 
 L<日本の祝日YAML|https://github.com/holiday-jp/holiday_jp/blob/master/holidays.yml>
  
 =head1 LICENSE

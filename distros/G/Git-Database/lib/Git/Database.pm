@@ -1,5 +1,5 @@
 package Git::Database;
-$Git::Database::VERSION = '0.010';
+$Git::Database::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -140,7 +140,7 @@ Git::Database - Provide access to the Git object database
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -322,14 +322,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Database>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Git-Database>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Git-Database>
-
 =item * MetaCPAN
 
 L<http://metacpan.org/release/Git-Database>
@@ -342,7 +334,7 @@ Philippe Bruhat (BooK) <book@cpan.org>.
 
 =head1 COPYRIGHT
 
-Copyright 2013-2017 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2013-2019 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

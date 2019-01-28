@@ -3,7 +3,7 @@
 use FindBin;
 BEGIN { $ENV{DANCER_APPDIR} = $FindBin::Bin }
 
-use Test::More tests => 3, import => ["!pass"];
+use Test::More tests => 4, import => ["!pass"];
 
 use Dancer;
 use Dancer::Test;
@@ -29,3 +29,4 @@ response_status_is ['PUT' => '/object/12', $params1], 200, "PUT method is OK";
 response_status_is ['GET' => '/object/12', $params1], 404, "GET method is missing in spore specification";
 response_content_is ['GET' => '/object/12', $params1], '{"error":"no route define with method `GET\'"}', "GET method is missing in spore specification";
 
+response_status_is ['OPTIONS' => '/object/12', $params1], 404, "OPTIONS routes are not active because spore_spec_with_options is not set";

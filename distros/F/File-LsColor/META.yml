@@ -23,5 +23,5 @@ requires:
 resources:
   bugtracker: https://github.com/trapd00r/File-LsColor/issues
   repository: https://github.com/trapd00r/File-LsColor
-version: '0.300'
+version: '0.302'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.507';
+our $VERSION = '0.508';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -115,15 +115,17 @@ sub __validate_options {
 }
 
 
-sub _sanitize_string {
-    if ( defined $_[0] ) {
-        $_[0] =~ s/\t/ /g;
-        $_[0] =~ s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
-        $_[0] =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
+sub _sanitized_string {
+    my ( $str ) = @_;
+    if ( defined $str ) {
+        $str =~ s/\t/ /g;
+        $str =~ s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
+        $str =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
     }
     else {
-        $_[0] = '';
+        $str = '';
     }
+    return $str;
 }
 
 
@@ -151,21 +153,12 @@ sub __calculate_threshold {
     }
 }
 
-sub _big_step {
-    my ( $m ) = @_;
-    my $big_step = int $m->{avail_w} / 6;
-    if ( $big_step < 10 ) {
-        $big_step = 10;
-    }
-    return $big_step;
-}
 
-
-sub __before_print {
+sub __before_readline {
     my ( $self, $opt, $m ) = @_;
-    my @info   = split /\n/, line_fold( $opt->{info},           $self->{i}{term_w} ), -1;
-    my @prompt = split /\n/, line_fold( $self->{i}{top_prompt}, $self->{i}{term_w} ), -1;
+    my @info = split /\n/, line_fold( $opt->{info}, $self->{i}{term_w} ), -1;
     my @before;
+    my $prompt_ok;
     if ( $opt->{show_context} && $m->{diff} ) {
         my $line_s = '';
         my $line_w = 0;
@@ -180,22 +173,33 @@ sub __before_print {
             $line_w = $m->{str}[$i][1] + $line_w;
 
         }
-        if ( $line_w ) {
-            my $prompt_last_row_w = 0;
-            if ( @prompt ) {
-                $prompt_last_row_w = print_columns( $prompt[-1] );
-            }
-            my $empty_w = ( $self->{i}{term_w} - $line_w );
-            if ( $prompt_last_row_w && $prompt_last_row_w < $empty_w ) {
-                $empty_w -= $prompt_last_row_w;
-                unshift @before, pop( @prompt ) . ( ' ' x $empty_w ) . $line_s;
-            }
-            else {
-                unshift @before, ' ' x $empty_w . $line_s;
-            }
+        my $comb_w = $self->{i}{max_key_w} + $line_w;
+        if ( $comb_w <= $self->{i}{term_w} ) {
+            my $empty_w = $self->{i}{term_w} - $comb_w;
+            unshift @before, $self->{i}{prompt} . ( ' ' x $empty_w ) . $line_s;
+            $prompt_ok = 1;
+        }
+        else {
+            my $empty_w = $self->{i}{term_w} - $line_w;
+            unshift @before, ' ' x $empty_w . $line_s;
         }
     }
-    $self->{i}{pre_text} = join "\n", @info, @prompt, @before;
+    if ( ! @before ) {
+        if ( ( $m->{str_w} + $self->{i}{max_key_w} ) <= $self->{i}{term_w} ) {
+            $self->{i}{keys}[0] = $self->{i}{prompt};
+            $prompt_ok = 1;
+        }
+        else {
+            $self->{i}{keys}[0] = '';
+        }
+    }
+    else {
+        $self->{i}{keys}[0] = '';
+    }
+    if ( ! $prompt_ok ) {
+        unshift @before, $self->{i}{prompt};
+    }
+    $self->{i}{pre_text} = join "\n", @info, @before;
     $self->{i}{pre_text_row_count} = $self->{i}{pre_text} =~ tr/\n//;
     if ( length $self->{i}{pre_text} ) {
         ++$self->{i}{pre_text_row_count};
@@ -203,7 +207,7 @@ sub __before_print {
 }
 
 
-sub __after_print {
+sub __after_readline {
     my ( $self, $opt, $m ) = @_;
     my $count_chars_after = @{$m->{str}} - ( @{$m->{p_str}} + $m->{diff} );
     if (  ! $opt->{show_context} || ! $count_chars_after ) {
@@ -235,6 +239,39 @@ sub __after_print {
 }
 
 
+sub __init_readline {
+    my ( $self, $opt, $term_w, $prompt ) = @_;
+    $self->{i}{term_w} = $term_w;
+    $self->{i}{seps}[0] = ''; # in __readline
+    $self->{i}{curr_row} = 0; # in __readlline and __string_and_pos
+    $prompt = _sanitized_string( $prompt );
+    $self->{i}{prompt} = $prompt;
+    $self->{i}{max_key_w} = print_columns( $prompt );
+    if ( $self->{i}{max_key_w} > $term_w / 3 ) {
+        $self->{i}{max_key_w} = int( $term_w / 3 );
+        $self->{i}{prompt} = $self->__unicode_trim( $prompt, $self->{i}{max_key_w} );
+    }
+    if ( $opt->{show_context} ) {
+        $self->{i}{arrow_left}  = '';
+        $self->{i}{arrow_right} = '';
+        $self->{i}{arrow_w} = 0;
+        $self->{i}{avail_w} = $term_w;
+    }
+    else {
+        $self->{i}{arrow_left}  = '<';
+        $self->{i}{arrow_right} = '>';
+        $self->{i}{arrow_w} = 1;
+        $self->{i}{avail_w} = $term_w - ( $self->{i}{max_key_w} + $self->{i}{arrow_w} );
+        # arrow_w: see comment in __prepare_width
+    }
+    $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
+    $self->{i}{th} = 40 if $self->{i}{th} > 40;
+    my $list = [ [ $prompt, $opt->{default} ] ];
+    my $m = $self->__string_and_pos( $list );
+    return $m;
+}
+
+
 sub readline {
     my ( $self, $prompt, $opt ) = @_;
     $prompt = ''                                         if ! defined $prompt;
@@ -252,31 +289,12 @@ sub readline {
         default          => '',
         info             => '',
         no_echo          => '[ 0 1 2 ]',
-        show_context     => '[ 0 1 ]',          # documentation # name
+        show_context     => '[ 0 1 ]',
     };
     $opt = $self->__validate_options( $opt, $valid );
     if ( $^O eq "MSWin32" ) {
         print $opt->{codepage_mapping} ? "\e(K" : "\e(U";
     }
-    if ( $opt->{show_context} ) {
-        $self->{i}{top_prompt} = $prompt;
-        $prompt = '';
-        $self->{i}{max_key_w} = $self->{i}{key_w}[0] = 0;
-        $self->{i}{arrow_left}  = '';
-        $self->{i}{arrow_right} = '';
-        $self->{i}{arrow_w} = 0;
-    }
-    else {
-        $self->{i}{top_prompt} = '';
-        $self->{i}{max_key_w} = $self->{i}{key_w}[0] = print_columns( $prompt );
-        $self->{i}{arrow_left}  = '<';
-        $self->{i}{arrow_right} = '>';
-        $self->{i}{arrow_w} = 1;
-    }
-    $self->{i}{max_key_w} = $self->{i}{key_w}[0] = print_columns( $prompt );
-    $self->{i}{seps}[0]   = $self->{i}{sep}      = '';
-    $self->{i}{curr_row} = 0;
-    my $list = [ [ map { _sanitize_string( $_ ); $_ } $prompt, $opt->{default} ] ];
     local $| = 1;
     $self->__init_term();
     print SHOW_CURSOR;
@@ -284,13 +302,8 @@ sub readline {
         print CLEAR_SCREEN;
     }
     my $term_w = ( $self->{pg}->__get_term_size() )[0];
-    $self->__prepare_width( $term_w );
-    $self->{i}{keys}[0] = $prompt;
-    if ( $self->{i}{key_w}[0] > $self->{i}{max_key_w} ) {
-        $self->{i}{keys}[0] = $self->__unicode_trim( $prompt, $self->{i}{max_key_w} );
-    }
-    my $m = $self->__string_and_pos( $list );
-    my $big_step = _big_step( $m );
+    my $m = $self->__init_readline( $opt, $term_w, $prompt );
+    my $big_step = 10;
     my $up_before = 0;
 
     CHAR: while ( 1 ) {
@@ -301,29 +314,23 @@ sub readline {
         my $tmp_term_w = ( $self->{pg}->__get_term_size() )[0];
         if ( $tmp_term_w != $term_w ) {
             $term_w = $tmp_term_w;
-            $self->__prepare_width( $term_w );
-            $self->{i}{keys}[0] = $prompt;
-            if ( $self->{i}{key_w}[0] > $self->{i}{max_key_w} ) {
-                $self->{i}{keys}[0] = $self->__unicode_trim( $prompt, $self->{i}{max_key_w} );
-            }
-            $m = $self->__string_and_pos( $list );
-            $big_step = _big_step( $m );
+            $m = $self->__init_readline( $opt, $term_w, $prompt );
         }
         if ( $up_before ) {
             print UP x $up_before;
         }
         print "\r". CLEAR_TO_END_OF_SCREEN;
-        $self->__before_print( $opt, $m );
+        $self->__before_readline( $opt, $m );
         $up_before = $self->{i}{pre_text_row_count};
         if ( length $self->{i}{pre_text} ) {
             print $self->{i}{pre_text}, "\n";
         }
-        $self->__after_print( $opt, $m );
+        $self->__after_readline( $opt, $m );
         if ( length $self->{i}{post_text} ) {
             print "\n" . $self->{i}{post_text};
             print UP x $self->{i}{post_text_row_count};
         }
-        $self->__print_readline( $opt, $list, $m );
+        $self->__print_readline( $opt, $m );
         my $char = $self->{pg}->__get_key_OS();
         if ( ! defined $char ) {
             $self->__reset_term();
@@ -387,6 +394,7 @@ sub __string_and_pos {
         th_l    => 0,
         th_r    => 0,
         str     => [],
+        str_w   => 0,
         pos     => 0,
         p_str   => [],
         p_str_w => 0,
@@ -396,6 +404,7 @@ sub __string_and_pos {
     for ( $default =~ /\X/g ) {
         my $char_w = print_columns( $_ );
         push @{$m->{str}}, [ $_, $char_w ];
+        $m->{str_w} += $char_w;
     }
     $m->{pos}  = @{$m->{str}};
     $m->{diff} = $m->{pos};
@@ -409,14 +418,12 @@ sub __left {
     if ( $m->{pos} ) {
         $m->{pos}--;
         # '<=' and not '==' because th_l could change and fall behind p_pos
-        if( $m->{p_pos} <= $m->{th_l} && $m->{diff} ) {
-            while ($m->{p_pos} <= $m->{th_l}) {
-                _unshift_element( $m, $m->{pos} - $m->{p_pos} );
-            }
-            if ( ! $m->{diff} ) { # no '<'
-                $m->{avail_w} = $self->{i}{avail_w} + $self->{i}{arrow_w};
-                _push_till_avail_w( $m, [ $#{$m->{p_str}} + 1 .. $#{$m->{str}} ] );
-            }
+        while ( $m->{p_pos} <= $m->{th_l} && $m->{diff} ) {
+            _unshift_element( $m, $m->{pos} - $m->{p_pos} );
+        }
+        if ( ! $m->{diff} ) { # no '<'
+            $m->{avail_w} = $self->{i}{avail_w} + $self->{i}{arrow_w};
+            _push_till_avail_w( $m, [ $#{$m->{p_str}} + 1 .. $#{$m->{str}} ] );
         }
         $m->{p_pos}--;
     }
@@ -431,12 +438,8 @@ sub __right {
     if ( $m->{pos} < $#{$m->{str}} ) {
         $m->{pos}++;
         # '>=' and not '==' because th_r could change and fall in front of p_pos
-        if(    $m->{p_pos} >= $#{$m->{p_str}} - $m->{th_r}
-            && $#{$m->{p_str}} + $m->{diff} != $#{$m->{str}}
-        ) {
-            while ( $m->{p_pos} >= $#{$m->{p_str}} - $m->{th_r} ) {
-                _push_element( $m );
-            }
+        while ( $m->{p_pos} >= $#{$m->{p_str}} - $m->{th_r} && $#{$m->{p_str}} + $m->{diff} != $#{$m->{str}} ) {
+            _push_element( $m );
         }
         $m->{p_pos}++;
     }
@@ -456,10 +459,8 @@ sub __bspace {
     if ( $m->{pos} ) {
         $m->{pos}--;
         # '<=' and not '==' because th_l could change and fall behind p_pos
-        if ( $m->{p_pos} <= $m->{th_l} && $m->{diff} ) {
-            while ($m->{p_pos} <= $m->{th_l}) {
-                _unshift_element( $m, $m->{pos} - $m->{p_pos} );
-            }
+        while ( $m->{p_pos} <= $m->{th_l} && $m->{diff} ) {
+            _unshift_element( $m, $m->{pos} - $m->{p_pos} );
         }
         $m->{p_pos}--;
         if ( ! $m->{diff} ) { # no '<'
@@ -491,7 +492,9 @@ sub __delete {
 sub __ctrl_u {
     my ( $self, $m ) = @_;
     if ( $m->{pos} ) {
-        splice ( @{$m->{str}}, 0, $m->{pos} );
+        for my $removed ( splice ( @{$m->{str}}, 0, $m->{pos} ) ) {
+            $m->{str_w} -= $removed->[1];
+        }
         # diff always 0     # never '<'
         $m->{avail_w} = $self->{i}{avail_w} + $self->{i}{arrow_w};
         _fill_from_begin( $m );
@@ -504,7 +507,9 @@ sub __ctrl_u {
 sub __ctrl_k {
     my ( $self, $m ) = @_;
     if ( $m->{pos} < @{$m->{str}} ) {
-        splice ( @{$m->{str}}, $m->{pos}, @{$m->{str}} - $m->{pos} );
+        for my $removed ( splice ( @{$m->{str}}, $m->{pos}, @{$m->{str}} - $m->{pos} ) ) {
+            $m->{str_w} -= $removed->[1];
+        }
         _fill_from_end( $m );
     }
     else {
@@ -542,6 +547,7 @@ sub __add_char {
     splice( @{$m->{p_str}}, $m->{p_pos}, 0, [ $char, $char_w ] );
     $m->{p_pos}++;
     $m->{p_str_w} += $char_w;
+    $m->{str_w}   += $char_w;
     while ( $m->{p_pos} < $#{$m->{p_str}} ) {
         if ( $m->{p_str_w} <= $m->{avail_w} ) {
             last;
@@ -615,6 +621,7 @@ sub _remove_pos {
     splice( @{$m->{str}}, $m->{pos}, 1 );
     my $tmp = splice( @{$m->{p_str}}, $m->{p_pos}, 1 );
     $m->{p_str_w} -= $tmp->[1];
+    $m->{str_w}   -= $tmp->[1];
     _push_till_avail_w( $m, [ ( $#{$m->{p_str}} + $m->{diff} + 1 ) .. $#{$m->{str}} ] );
 }
 
@@ -640,37 +647,36 @@ sub _fill_from_begin {
 
 
 sub __print_readline {
-    my ( $self, $opt, $list, $m ) = @_;
+    my ( $self, $opt, $m ) = @_;
     print "\r" . CLEAR_TO_END_OF_LINE;
     my $i = $self->{i}{curr_row};
     if ( $opt->{no_echo} && $opt->{no_echo} == 2 ) {
         print "\r" . $self->{i}{keys}[$i]; # no_echo only in readline -> in readline no separator
         return;
     }
-    my $abs_cursor_pos = $self->{i}{prompt_w};
     my $print_str = "\r" . $self->{i}{keys}[$i] . $self->{i}{seps}[$i];
     # left arrow:
     if ( $m->{diff} ) {
         $print_str .= $self->{i}{arrow_left};
-        $abs_cursor_pos += $self->{i}{arrow_w};
     }
     # input text:
     if ( $opt->{no_echo} ) {
         $print_str .= ( '*' x @{$m->{p_str}} );
     }
     else {
-        $print_str .= join( '', map { defined $_->[0] ? $_->[0] : '' } @{$m->{p_str}} );
+        $print_str .= join( '', map { $_->[0] } @{$m->{p_str}} );
     }
     # right arrow:
     if ( @{$m->{p_str}} + $m->{diff} != @{$m->{str}} ) {
         $print_str .= $self->{i}{arrow_right};
     }
-    for ( @{$m->{p_str}}[0..$m->{p_pos}-1] ) {
-        $abs_cursor_pos += $_->[1];
+    my $back_to_pos = 0;
+    for ( @{$m->{p_str}}[$m->{p_pos} .. $#{$m->{p_str}}] ) {
+        $back_to_pos += $_->[1];
     }
-    print $print_str . "\r";
-    if ( $abs_cursor_pos ) {
-        print RIGHT x $abs_cursor_pos;
+    print $print_str;
+    if ( $back_to_pos ) {
+        print LEFT x $back_to_pos;
     }
 }
 
@@ -704,8 +710,7 @@ sub __prepare_width {
     if ( $self->{i}{max_key_w} > $term_w / 3 ) {
         $self->{i}{max_key_w} = int( $term_w / 3 );
     }
-    $self->{i}{prompt_w} = $self->{i}{max_key_w} + length( $self->{i}{sep} );
-    $self->{i}{avail_w} = $term_w - ( $self->{i}{prompt_w} + $self->{i}{arrow_w} );
+    $self->{i}{avail_w} = $term_w - ( $self->{i}{max_key_w} + length( $self->{i}{sep} ) + $self->{i}{arrow_w} );
     # minus 'arrow_w' for the '<' before the string. In each case where no '<'-prefix is required (if diff==0)
     # 'arrow_w' is added to the 'avail_w' in the code: __left, __bspace, __home, __ctrl_u
     # - 1 for the cursor (or the '>') behind the string already subtracted by __get_term_size
@@ -756,7 +761,7 @@ sub __print_current_row {
         print RESET;
     }
     else {
-        $self->__print_readline( $opt, $list, $m );
+        $self->__print_readline( $opt, $m );
         $list->[$self->{i}{curr_row}][1] = join( '', map { defined $_->[0] ? $_->[0] : '' } @{$m->{str}} );
     }
 }
@@ -888,7 +893,7 @@ sub fill_form {
     if ( @{$opt->{read_only}} ) {
         $self->{i}{read_only} = [ map { $_ + @{$self->{i}{pre}} } @{$opt->{read_only}} ];
     }
-    my $list = [ @{$self->{i}{pre}}, map { [ map { _sanitize_string( $_ ); $_ } @$_ ] } @$orig_list ];
+    my $list = [ @{$self->{i}{pre}}, map { [ _sanitized_string( $_->[0] ), $_->[1] ] } @$orig_list ];
     my $auto_up = $opt->{auto_up};
     $self->__init_term();
     local $| = 1;
@@ -1084,7 +1089,7 @@ sub fill_form {
                     print "\r" . CLEAR_TO_END_OF_SCREEN;
                     splice @$list, 0, @{$self->{i}{pre}};
                     $self->__reset_term();
-                    return $list;
+                    return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
                 }
                 if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
                     print UP x $up;
@@ -1175,7 +1180,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.507
+Version 0.508
 
 =cut
 
@@ -1225,11 +1230,11 @@ C<Home> or C<Strg-A>: Move to the start of the line.
 
 C<End> or C<Strg-E>: Move to the end of the line.
 
+C<Up-Arrow>: in C<fill_form> move up one row, in C<readline> move back 10 characters.
+
+C<Down-Arrow>: in C<fill_form> move down one row, in C<readline> move forward 10 characters.
+
 Only in C<fill_form>:
-
-C<Up-Arrow>: Move up one row.
-
-C<Down-Arrow>: Move down one row.
 
 C<Page-Up> or C<Strg-B>: Move back one page.
 
@@ -1285,6 +1290,18 @@ no_echo
 - if set to C<1>, "C<*>" are displayed instead of the characters.
 
 - if set to C<2>, no output is shown apart from the prompt string.
+
+default: C<0>
+
+=item
+
+show_context
+
+Display the input that does not fit into the "readline" before or after the "readline".
+
+0 - disable I<show_context>
+
+1 - enable I<show_context>
 
 default: C<0>
 

@@ -1,4 +1,12 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Pod::Coverage::TrustPod' => '0',
+                                    'Test::CPAN::Meta' => '0',
+                                    'Test::Pod' => '0',
+                                    'Test::Pod::Coverage' => '0'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'

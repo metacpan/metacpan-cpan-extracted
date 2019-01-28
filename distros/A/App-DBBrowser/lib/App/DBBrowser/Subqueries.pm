@@ -184,7 +184,7 @@ sub edit_sq_file {
     my $any_change = 0;
 
     while ( 1 ) {
-        my $top_lines = [ $db, sprintf( 'Stored Subqueries "%s":', ucfirst $clause ) ];
+        my $top_lines = [ sprintf( 'Stored Subqueries "%s":', uc $clause ) ];
         my $h_ref = $ax->read_json( $sf->{subquery_file} );
         my $saved_history = $h_ref->{$driver}{$db}{$clause} || [];
         my @tmp_info = (
