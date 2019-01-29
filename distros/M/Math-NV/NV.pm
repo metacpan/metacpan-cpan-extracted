@@ -9,7 +9,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-$Math::NV::VERSION = '2.0';
+$Math::NV::VERSION = '2.01';
 
 DynaLoader::bootstrap Math::NV $Math::NV::VERSION;
 
@@ -26,9 +26,14 @@ DynaLoader::bootstrap Math::NV $Math::NV::VERSION;
     set_C set_mpfr
     )]);
 
-if($Math::MPFR::VERSION < 4.03) {
-   die " Math-MPFR version needs to be 4.03 or later\nThis only Math-MPFR-$Math::MPFR::VERSION\n";
+if($Math::MPFR::VERSION < 4.07) {
+   die " Math-MPFR version needs to be 4.07 or later\n This is only Math-MPFR-$Math::MPFR::VERSION\n";
 }
+
+## max NV finite values ##
+# double    : 1.7976931348623157e+308
+#long double: 1.18973149535723176502e4932
+# __float128: 1.18973149535723176508575932662800702e4932
 
 ## normal min values ##
 # double     : (2 ** - 1022) : 0.1E-1021  : 2.2250738585072014e-308

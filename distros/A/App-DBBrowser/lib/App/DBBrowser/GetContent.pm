@@ -304,7 +304,7 @@ sub __file_name {
             my $idx = choose_a_subset(
                 [ @files ],
                 { mouse => $sf->{o}{table}{mouse}, prefix => '  ', info => 'Files to remove:',
-                 index => 1, fmt_chosen => 1, remove_chosen => 1, clear_screen => 1 }
+                 index => 1, sofar_begin => "* ", sofar_separator => "\n* ", remove_chosen => 1, clear_screen => 1 }
             );
             if ( ! defined $idx || ! @$idx ) {
                 next FILE;
@@ -427,6 +427,7 @@ sub __parse_file {
             if ( ! defined $sheet_idx || ! defined $choices->[$sheet_idx] ) {
                 return;
             }
+            $sheet_idx = $sheet_idx - @pre + 1;
         }
         if ( $book->[$sheet_idx]{maxrow} == 0 ) {
             my $sheet = length $book->[$sheet_idx]{label} ? $book->[$sheet_idx]{label} : 'sheet_' . $_;
@@ -434,6 +435,9 @@ sub __parse_file {
             return $sheet_count;
         }
         $sql->{insert_into_args} = [ Spreadsheet::Read::rows( $book->[$sheet_idx] ) ];
+        if ( length $book->[$sheet_idx]{label} ){
+            $sf->{d}{sheet_name} = $book->[$sheet_idx]{label};
+        }
         return $sheet_count;
     }
 }

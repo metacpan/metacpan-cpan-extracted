@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Locale::Country::Multilingual;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub check {
     my ($class, $value, $conf) = @_;
@@ -49,13 +49,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Data::Validate::WithYAML::Plugin::Country - check whether a given value is a valid country code
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -87,6 +89,10 @@ And it supports different languages so you use the country codes in your preferr
 =head1 DESCRIPTION
 
 Check if the given value is a valid country code.
+
+=head1 METHODS
+
+=head2 check
 
 =head1 AUTHOR
 

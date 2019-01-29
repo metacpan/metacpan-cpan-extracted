@@ -1,6 +1,11 @@
 Change history for Data::Validate::WithYAML::Plugin::Country
 ============================================================
 
+0.03 2019-01-29 11:35:00
+
+    * update dist.ini
+    * add tests
+
 0.02 2013-10-24
 
      * use PodWeaver

@@ -40,7 +40,8 @@ if ($browse) {
 
 my @editor_args = editor_args_from_parsed_text($parsed);
 
-exec $ENV{EDITOR}, @editor_args;
+$ENV{EDITOR} ? exec $ENV{EDITOR}, @editor_args
+             : die('Please ensure your $EDITOR env var has been set');
 
 # ABSTRACT: parse text and (hopefully) open an editor with the correct arguments
 # PODNAME: ot
@@ -57,7 +58,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000014
+version 0.000015
 
 =head1 SYNOPSIS
 

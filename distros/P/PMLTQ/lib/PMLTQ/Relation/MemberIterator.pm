@@ -1,6 +1,6 @@
 package PMLTQ::Relation::MemberIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::MemberIterator::VERSION = '2.0.2';
+$PMLTQ::Relation::MemberIterator::VERSION = '3.0.1';
 # ABSTRACT: Iterates over member nodes of given list
 
 use 5.006;
@@ -47,7 +47,7 @@ PMLTQ::Relation::MemberIterator - Iterates over member nodes of given list
 
 =head1 VERSION
 
-version 2.0.2
+version 3.0.1
 
 =head1 AUTHORS
 

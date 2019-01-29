@@ -38,7 +38,7 @@ sub union_tables {
 
     UNION_TABLE: while ( 1 ) {
         my $enough_tables = '  Enough TABLES';
-        my $from_subquery = '  From SQ';
+        my $from_subquery = '  Derived';
         my $all_tables    = '  All Tables';
         my @pre  = ( undef, $enough_tables );
         my @post = ( $all_tables );

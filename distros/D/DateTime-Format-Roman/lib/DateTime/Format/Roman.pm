@@ -1,10 +1,15 @@
+#
+#     Perl extension to display date with the Roman style
+#     Copyright (C) 2003, 2004, 2018, 2019 Eugene van der Pijll, Dave Rolsky and Jean Forget
+#
+#     See the license in the embedded documentation below.
+#
 package DateTime::Format::Roman;
 
 use strict;
+use warnings;
 
-use vars qw($VERSION);
-
-$VERSION = 0.03;
+our $VERSION = 0.04;
 
 use DateTime 0.22;
 
@@ -21,20 +26,20 @@ sub new {
     $p{pattern} = [$p{pattern}] unless ref $p{pattern};
 
     my $self = bless \%p, $class;
-	return $self;
+    return $self;
 }
 
 my @fixed_days_names = (
-    { Kal => 'Kal', Non => 'Non', Id => 'Id' },
-    { Kal => 'K', Non => 'N', Id => 'Id' },
+    { Kal => 'Kal'    , Non => 'Non'  , Id => 'Id'   },
+    { Kal => 'K'      , Non => 'N'    , Id => 'Id'   },
     { Kal => 'Kalends', Non => 'Nones', Id => 'Ides' },
 );
 
 my %dt_elem;
 my %formats;
 %formats =
-    ( 'b' => sub { (shift->language->month_abbreviations)->[$dt_elem{month}-1] },
-      'B' => sub { (shift->language->month_names)->[$dt_elem{month}-1] },
+    ( 'b' => sub { (shift->locale->month_format_abbreviated)->[$dt_elem{month}-1] },
+      'B' => sub { (shift->locale->month_format_wide)       ->[$dt_elem{month}-1] },
       'd' => sub { $dt_elem{day} },
       'D' => sub { ($dt_elem{day} ne 1 && $dt_elem{day}.' ') . $formats{f}->(@_) },
       'f' => sub { $fixed_days_names[$_[1]||0]{$dt_elem{fixed_day}} },
@@ -83,7 +88,7 @@ sub date_elements {
 
     my ($d, $m, $y) = ($dt->day, $dt->month, $dt->year);
     my $nones = _nones($m);
-    my $ides = $nones + 8;
+    my $ides  = $nones + 8;
 
     my %retval;
 
@@ -124,7 +129,9 @@ sub _nones {
     return 5;
 }
 
-1;
+# Instead of using a boring "1" ending value:
+'Ils sont fous, ces romains !';
+
 __END__
 
 =head1 NAME
@@ -223,8 +230,8 @@ the length of the output:
 
 =head1 SUPPORT
 
-Support for this module is provided via the datetime@perl.org email
-list. See http://lists.perl.org/ for more details.
+Support for  this module is  provided via the  datetime@perl.org email
+list. See L<https://lists.perl.org/> for more details.
 
 Note that this is a beta release. The interface *will* change,
 especially the format specifiers, and the way the "fixed days" are
@@ -232,13 +239,41 @@ returned.
 
 =head1 AUTHOR
 
-Eugene van der Pijll <pijll@gmx.net>
+First author: Eugene van der Pijll <pijll@gmx.net>
+
+First co-maintainer: Dave Rolsky <autarch@urth.org>
+
+Second co-maintainer: Jean Forget <JFORGET@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003, 2004 Eugene van der Pijll.  All rights reserved.
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+Copyright (c) 2003, 2004, 2018, 2019 Eugene van der Pijll, Dave Rolsky
+and Jean Forget.  All rights reserved. This program  is free software;
+you can redistribute it and/or modify  it under the same terms as Perl
+itself.
+
+This program is  distributed under the same terms  as Perl 5.28.0: GNU
+Public License version 1 or later and Perl Artistic License
+
+You can find the text of the licenses in the F<LICENSE> file or at
+L<https://dev.perl.org/licenses/artistic.html> and
+L<https://www.gnu.org/licenses/gpl-1.0.html>.
+
+Here is the summary of GPL:
+
+This program is  free software; you can redistribute  it and/or modify
+it under the  terms of the GNU General Public  License as published by
+the Free  Software Foundation; either  version 1, or (at  your option)
+any later version.
+
+This program  is distributed in the  hope that it will  be useful, but
+WITHOUT   ANY  WARRANTY;   without  even   the  implied   warranty  of
+MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
+General Public License for more details.
+
+You should  have received  a copy  of the  GNU General  Public License
+along with  this program; if not,  see <https://www.gnu.org/licenses/>
+or write to the Free Software Foundation, Inc., L<https://fsf.org>.
 
 =head1 SEE ALSO
 

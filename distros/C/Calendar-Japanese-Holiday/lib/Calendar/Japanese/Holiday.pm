@@ -13,7 +13,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = qw(getHolidays isHoliday);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 our $FurikaeStr = '振替';
@@ -412,6 +412,12 @@ sub prev_year_mon {
 sub getHolidays {
     my ($year, $mon, $furikae) = @_;
 
+    $year = int($year);
+    $mon = int($mon);
+    if ($mon < 1 || $mon > 12) {
+	die('$mon argument is out of range.');
+    }
+
     my $holidays = get_holidays($year, $mon);
 
     return if not defined $holidays;
@@ -472,6 +478,14 @@ my $Cache_holidays;
 
 sub isHoliday {
     my ($year, $mon, $day, $furikae) = @_;
+
+    $year = int($year);
+    $mon = int($mon);
+    $day = int($day);
+
+    if ($mon < 1 || $mon > 12) {
+	die('$mon argument is out of range.');
+    }
 
     my $holidays;
 

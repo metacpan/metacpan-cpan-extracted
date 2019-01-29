@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 53 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 52;
 
 my @module_files = (
     'PMLTQ.pm',
@@ -15,7 +15,6 @@ my @module_files = (
     'PMLTQ/Grammar.pm',
     'PMLTQ/Loader.pm',
     'PMLTQ/NG2PMLTQ.pm',
-    'PMLTQ/PML2BASE.pm',
     'PMLTQ/ParserError.pm',
     'PMLTQ/Planner.pm',
     'PMLTQ/Relation.pm',
@@ -106,7 +105,6 @@ for my $lib (@module_files)
 
 
 
-is(scalar(@warnings), 0, 'no warnings found')
-    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) ) if $ENV{AUTHOR_TESTING};
+# no warning checks;
 
 

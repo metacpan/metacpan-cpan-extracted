@@ -3,3 +3,5 @@ Revision history for Perl extension Locked::Storage.
 1.00  25 Jan 2018
 	- original version; created by h2xs 1.19
 
+1.01  29 Jan 2019
+	- fixed test following CPAN tester reports.

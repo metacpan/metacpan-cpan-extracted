@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -34,7 +34,7 @@
          "requires" : {
             "JSON" : "2.53",
             "Moo" : "2.000000",
-            "WWW::Google::UserAgent" : "0.20",
+            "WWW::Google::UserAgent" : "0.22",
             "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
@@ -43,15 +43,15 @@
    "provides" : {
       "WWW::Google::DistanceMatrix" : {
          "file" : "lib/WWW/Google/DistanceMatrix.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "WWW::Google::DistanceMatrix::Params" : {
          "file" : "lib/WWW/Google/DistanceMatrix/Params.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "WWW::Google::DistanceMatrix::Result" : {
          "file" : "lib/WWW/Google/DistanceMatrix/Result.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/manwar/WWW-Google-DistanceMatrix"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

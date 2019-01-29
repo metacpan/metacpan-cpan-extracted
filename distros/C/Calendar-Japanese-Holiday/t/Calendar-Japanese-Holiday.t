@@ -2,7 +2,7 @@
 
 use utf8;
 
-use Test::More tests => 74;
+use Test::More tests => 88;
 BEGIN { use_ok('Calendar::Japanese::Holiday') };
 
 #########################
@@ -280,3 +280,12 @@ ok(checkShunbunShuubun(), 'Shunbun/Shuubun');
 ok(!isHoliday(2007, 9, 24),                         'Furikae (FALSE)');
 ok(isHoliday(2007, 9, 24, 1) eq '振替',             'Furikae (TRUE)');
 
+#
+# Test string arguments
+#
+foreach $m (1 .. 12) {
+    my $m_str = sprintf('%02d', $m);
+    ok(cmpHash(getHolidays('2019', $m_str), getHolidays(2019, $m)), "getHolidays - string argument ('2019', '$m_str')");
+}
+ok(isHoliday('2019', '01', '01'), 'isHoliday - string argument');
+ok(isHoliday('2019', '01', '14'), 'isHoliday - string argument');

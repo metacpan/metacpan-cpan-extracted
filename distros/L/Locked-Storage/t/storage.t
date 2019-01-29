@@ -21,6 +21,5 @@ sub OK  { print "ok ", $N++, "\n" }
 
 my $a = new Locked::Storage 1;
 $a->store("Hello world!", length("Hello world!")) or Not; OK;
-$a->get eq "Hello world!" or Not; OK;
-$a->lockall or OK; Not;
-
+$a->get() eq "Hello world!" or Not; OK;
+$a->lockall() and Not; OK;

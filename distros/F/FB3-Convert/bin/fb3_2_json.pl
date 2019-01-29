@@ -36,8 +36,9 @@ die "\nERROR: destination directory `$Out' not found\n" unless -d $Out;
 
 $Out = $Out.'/' unless $Out =~ /\/$/;
 
-$Version = '1.0' if ( not $Version or $Version =~ /[\D\.]/ );
-$Version = "1.$Version" unless $Version =~ /^\d+\.\d+$/;
+unless ($Version =~ /^\d+\.\d+$/) {
+	$Version = ($Version =~ /^\d+$/) ? "1.$Version" : "1.0"
+}
 
 my $PartLimit = 20000;
 my $IsTrial   = 0;
@@ -85,7 +86,7 @@ my %AttrHash = (
 my %LangDependentStr = (
 	'ru' => ['Конец ознакомительного фрагмента'],
 	'uk' => ['Кінець ознайомчого фрагмента'],
-	'en' => ['End of fragment'],
+	'en' => ['The end of the free preview'],
 	'de' => ['Ende des Fragments'],
 	'fr' => ['Fin du fragment'],
 	'az' => ['Fragmanın sonu'],
@@ -121,6 +122,8 @@ my %LangDependentStr = (
 	'ja' => ['断片の終わり'],
 	'nl' => ['Einde fragment'],
 	);
+
+$Lang = 'en' unless $LangDependentStr{$Lang}[0];
 
 my @AuthorsPriority = qw(author co_author dubious_author lecturer compiler screenwriter translator contributing_editor managing_editor editor editorial_board_member adapter conceptor rendering associated commentator consultant scientific_advisor recipient_of_letters corrector composer);
 

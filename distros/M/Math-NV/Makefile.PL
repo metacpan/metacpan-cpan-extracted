@@ -12,21 +12,13 @@ print "Defining $defines\n";
 my $nv = 1.0;
 my $x = $nv + (2 ** -1000);
 
-# Removed Data::Float dependency in 0.08
-# Data::Float is handy for testing, but won't work with powerpc 'long double' builds.
-# Don't add Data::Float::DoubleDouble as a prereq for 'doubledouble' builds as that module
-# already lists Math::NV as one of its prereqs.
-#my $prereq = $Config::Config{longdblkind} == 5 || $Config::Config{longdblkind} == 6 ||
-#             ($Config::Config{nvsize} > 8 && $x > $nv)
-#                    ? {}
-#                    : {'Data::Float' => '0.012'};
 
 my %options = %{
 {
   'NAME' => 'Math::NV',
   'VERSION_FROM' => 'NV.pm',
   'PREREQ_PM' => {
-                'Math::MPFR'          => '4.03',
+                'Math::MPFR'          => '4.07',
 
                },
   'LIBS' => [

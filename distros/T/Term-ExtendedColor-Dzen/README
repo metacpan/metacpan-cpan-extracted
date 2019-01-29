@@ -1,0 +1,60 @@
+NAME
+    Term::ExtendedColor::Dzen - Color input and add dzen(2) compatible
+    attributes
+
+SYNOPSIS
+        use Term::ExtendedColor::Dzen qw(fgd bgd);
+
+        print fgd('#ff0000', 'this is red foreground');
+        print bgd('#fff00',  'this is yellow background');
+
+        print fgd('#000', bgd('#ffffff', 'this is black on white background'));
+
+DESCRIPTION
+    Term::ExtendedColor::Dzen provides functionality for coloring input data
+    with dzen compatible attributes.
+
+EXPORTS
+    None by default.
+
+FUNCTIONS
+  fgd('#fff', $string)
+    Sets foreground color. When called without arguments, returns the fg
+    reset string.
+
+        my $white_fg = fgd('#fff', 'white foreground');
+
+  bgd('#000', $string)
+    Sets background color. When called without arguments, returns the bg
+    reset string.
+
+        my $black_bg = bg('#000', 'black background');
+
+    Like "fgd()", but sets background colors.
+
+    These two can be combined:
+
+        my $str = fgd('#000', bgd('#ffffff', 'this is black on white background'));
+
+    which yields the combined string:
+
+        ^fg(#000)^bg(#fff)this is black on white background^bg()^fg()
+
+SEE ALSO
+    dzen <https://github.com/robm/dzen>
+
+    dzen2 <https://github.com/minos-org/dzen2>
+
+AUTHOR
+      Magnus Woldrich
+      CPAN ID: WOLDRICH
+      m@japh.se
+      http://japh.se
+
+    Copyright 2019- the Term::ExtendedColor::Dzen "AUTHOR" and
+    "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+

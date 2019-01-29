@@ -2,10 +2,10 @@ package Sim::OPT::Interlinear;
 
 # INTERLINEAR
 # Author: Gian Luca Brunetti, Politecnico di Milano. (gianluca.brunetti@polimi.it)
-# Copyright reserved.  2018.
+# Copyright reserved.  2018-2019.
 # GPL License 3.0 or newer.
 # This is a program for filling a design space multivariate discrete dataseries
-# by creatinng recursive and progressive relations by various strategies.
+# through a strategy entailing distance-weighting the nearest-neihbouring gradients.
 use v5.14;
 use Math::Round;
 use List::Util qw[ min max reduce shuffle];
@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
-$VERSION = '0.037';
+$VERSION = '0.055';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -63,7 +63,7 @@ my $minreq_forgrad = [1, 1, 1 ]; #THIS VALUES SPECIFY THE NUMBER OF PARAMETER DI
 # THE FIRST VALUE IS RELATIVE TO THE FACTORS AND TELLS HOW RELAXED A SEARCH IS.
 # THE SECOND VALUE IS RELATIVE TO THE LEVELS. ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
 # ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
-# THE THIRD VALUE HOW DIFFERENT (FAR, IN TERMS OF PARAMETER DIFFERENCES) MAY AN INSTANCE BE TO BE CALDULATED THROUGH THE GRADIENT IN QUESTION.
+# THE THIRD VALUE HOW DIFFERENT (FAR, IN TERMS OF PARAMETER DIFFERENCES) MAY AN INSTANCE BE TO BE CALCULATED THROUGH THE GRADIENT IN QUESTION.
 # ONE MAY WANT TO SET TO THE NUMBER OF PARAMETERS.
 # A LARGE NUMBER, WEAK ENTRY BARRIER. NEVER LESS THAN 1.
 
@@ -73,7 +73,9 @@ my $minreq_formerge = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIA
 my $minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
 my $minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
 my $condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
-my $nfilter = 10; # do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
+my $nfilter = 20; # do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
+my $limit_checkdistgrades = 10000; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
+my $limit_checkdistpoints = 10000; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
 my $tee = new IO::Tee(\*STDOUT, ">>$report");
 
 #######################################################################
@@ -591,25 +593,51 @@ sub calcmaxdist
 sub wei
 {
   my ( $arr_ref, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count,
-    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter ) = @_;
+    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints ) = @_;
   my @arr = @{ $arr_ref };
   #say $tee "ARR VERY_BEFORE: " . dump(@arr);
   my %factlevels = %{ $factlevels_ref };  #say $tee "AND \%factlevels: " . dump( %factlevels );
   # my ( %magic, %wand, %spell, %bank );
+  $nfilter = ( $nfilter - 1 );
 
+  my @arra;
+  if ( $limit_checkdistgrades ne "" )
+  {
+    @arra = shuffle( @arr );
+    @arra = @arra[0..$limit_checkdistgrades];
+  }
+  else
+  {
+    @arra = @arr;
+  }
+
+  my @arrb;
+  if ( $limit_checkdistpoints ne "" )
+  {
+    @arrb = shuffle( @arr );
+    @arrb = @arrb[0..$limit_checkdistpoints];
+  }
+  else
+  {
+    @arrb = @arr;
+  }
 
   sub fillbank
   { #say $tee "NOW IN FILLBANK.";
-    my ( $arr_r, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, $factlevels_r, $nfilter ) = @_;
+    my ( $arr_r, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, $factlevels_r, $nfilter, $arra_r ) = @_;
     my @arr = @{ $arr_r };
+    my @arra = @{ $arra_r };
     my %factlevels = %{ $factlevels_r };
+
+
     my %bank;
     foreach my $el ( @arr )
     { #say $tee "SO IN FIRST ARR CHECK" ;  say $tee "\$el->[1]: " . dump( $el->[1] ); #say $tee "EL: " . dump( $el );
       my $key =  $el->[0] ; #say $tee "\$key: " . dump( $key );
       if ( ( $el->[2] ne "" ) and ( $el->[3] >= $minimumcertain ) )
       { #say $tee "SO IN SECOND ARR CHECK" ; say $tee "\nTRYING \$el->[1]: " . dump( $el->[1] );
-        foreach my $elt ( @arr )
+
+        foreach my $elt ( @arra )
         { #say $tee "SO, ELT: " . dump( $elt ); say $tee "IN WHICH, ELT0: " . dump( @{ $elt->[0] } );
           if ( ( $elt->[2] ne "" ) and ( $elt->[0] ne $el->[0] ) and ( $el->[3] >= $minimumcertain ) )
           { #say $tee "NOW CHECKING .";
@@ -642,17 +670,23 @@ sub wei
             unless ( !keys %{ $res_ref } and ( $ordist > 0 ) and ( $ordist ne "" ) ) ######## IMPROVE THIS SO AS TO ALLOW VERY DIFFERENT NUMBERS OF LEVELS FOR EACH FACTOR
             { #say $tee " SO I AM IN. ";
 
-              my @sorteds;
               my $benchmark;
-              if ( $nfilter )
+              if ( $nfilter ne "" )
               {
-                @sorteds = sort { $b <=> $a } @{ $bank{$trio}{strengths} };
-                $benchmark = $sorteds[$nfilter-1];
+                my @sorteds = sort { $b <=> $a } @{ $bank{$trio}{strengths} };
+                if ( scalar( @sorteds ) > $nfilter )
+                {
+                  @sorteds = @sorteds[0..$nfilter];
+                  $benchmark = $sorteds[-1];
+                }
+                else
+                {
+                  $benchmark = 0;
+                }
               }
 
-              if ( ( $strength > $benchmark ) or ( not( $nfilter ) ) )
+              if ( ( $strength > $benchmark ) or ( $nfilter eq "" ) )
               {
-
                 my $count = 0;
                 foreach my $d10 ( @da1 )
                 { #say $tee "WORKING \$d10: " . dump( $d10 );
@@ -742,7 +776,7 @@ sub wei
     return ( \%bank );
   }
 
-  my %bank = %{ fillbank( \@arr, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter ) };
+  my %bank = %{ fillbank( \@arr, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter, \@arra ) };
   say $tee "IN WEI \%bank: " . dump( %bank );
 
   sub clean
@@ -755,9 +789,13 @@ sub wei
         or ( $bank{$trio}{dists} eq "" ) or ( $bank{$trio}{strengths} eq "" ) )
       {
         push ( @grads, $bank{$trio}{grad} );
+        @grads = map { $_ =~ s/ // } @grads;
         push ( @ordists, $bank{$trio}{ordists} );
+        @ordists = map { $_ =~ s/ // } @ordists;
         push ( @dists, $bank{$trio}{dists} );
+        @dists = map { $_ =~ s/ // } @dists;
         push ( @strengths, $bank{$trio}{strengths} );
+        @strengths = map { $_ =~ s/ // } @strengths;
         $bank{$trio}{grad} = [ @grads ];
         $bank{$trio}{ordists} = [ @ordists ];
         $bank{$trio}{dists} = [ @dists ];
@@ -771,8 +809,9 @@ sub wei
 
   sub cyclearr
   {
-    my ( $arr_r, $minreq_forinclusion, $minreq_forgrad, $bank_r, $factlevels ) = @_;
+    my ( $arr_r, $minreq_forinclusion, $minreq_forgrad, $bank_r, $factlevels, $arrb_r ) = @_;
     my @arr = @{ $arr_r };
+    my @arrb = @{ $arrb_r };
     my %bank = %{ $bank_r };
     my %factlevels = %{ $factlevels };
     #say $tee "IN cyclearr ARR: " . dump( @arr );
@@ -784,7 +823,7 @@ sub wei
       my $key =  $el->[0] ; #say $tee "\$key: " . dump( $key );
       if ( $el->[2] eq "" )
       { #say $tee "TRYING \$el->[1]: " . dump( $el->[1] );
-        foreach my $elt ( @arr )
+        foreach my $elt ( @arrb )
         { #say $tee "SO, ELT: " . dump( $elt ); #say $tee "IN WHICH, ELT0: " . dump( @{ $elt->[0] } );
           if ( ( $elt->[2] ne "" ) and ( $el->[3] >= $minreq_forinclusion ) )
           {
@@ -934,7 +973,7 @@ sub wei
     return( \%wand );
   }
 
-  my %wand = %{ cyclearr( \@arr, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels ) }; say $tee "\%wand OUT: " . dump( %wand );
+  my %wand = %{ cyclearr( \@arr, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, \@arrb ) }; say $tee "\%wand OUT: " . dump( %wand );
 
 
   my @limb0;
@@ -1511,7 +1550,7 @@ sub interlinear
 
     if ( ( $mode__ eq "wei" ) or ( $mode__ eq "mix" ) )
     {
-      @limbo_wei = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter );
+      @limbo_wei = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints );
       say $tee "THERE ARE " . scalar( @limbo_wei ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR WEIGHTED GRADIENT INTERPOLATION OF THE NEAREST NEIGHBOUR.";
     }
     #say $tee "OBTAINED LIMBO_WEI: " . dump( @limbo_wei );
@@ -1690,8 +1729,8 @@ Sim::OPT::Interlinear
 =head1 DESCRIPTION
 
 
-Interlinear is a program for computing the missing values in multivariate datasieries pre-prepared in csv format.
-The program can adopt the following algorithmic strategies and intermix their result:
+Interlinear is a program for computing the missing values in multivariate datasieries through a strategy entailing distance-weighting the nearest-neihbouring gradients between points in an n-dimensional space.
+The program can adopt the following algorithmic strategies - including the told, main one - and intermix their result:
 
 a) a propagating distance-weighted gradient-based strategy (by far the best one so far, keeping into account that the behaviour of factors is often not linear and there are curvatures all around the design space). The strategy weights the known gradients in a manner inversely proportional to the distance of their pivot points from the pivot points of the missing nearest-neighbouring gradients.
 
@@ -1760,6 +1799,7 @@ The program converts this format into the one liked by Sim::OPTS, which is the f
 After some computations, Interlinear will output a new dataseries, with the missing values filled in.
 This dataseries can be used by OPT for the optimization of one or more blocks. This can be useful for saving computations in searches involving simulations, especially when the time required by each simulations is long, like it may happen with CFD simulations in building design.
 
+The number of computations required for the creation of a metamodel in OPT increases exponencially with the number of instances in the metamodel. To make the increase linear, a limit has to be set for the size of net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$limit_checkgrades" and "$limit_checkpoints". By default they are both set to 10000. If a null value ("") is specified for them, no limit is assumed.
 
 
 =head2 EXPORT
@@ -1783,7 +1823,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 =head1 COPYRIGHT AND LICENSE
 
 
-Copyright (C) 2018 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 or newer.
+Copyright (C) 2018-19 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 or newer.
 
 
 =cut

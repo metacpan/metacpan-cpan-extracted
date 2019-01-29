@@ -22,7 +22,7 @@ use Image::ExifTool qw/ImageInfo/;
 use English '-no_match_vars';
 use base qw/Exporter/;
 
-our $VERSION   = version->new('0.3.13');
+our $VERSION   = version->new('0.3.14');
 our @EXPORT_OK = qw//;
 
 Readonly my $MARGIN_RATIO             => 0.04;
@@ -561,7 +561,7 @@ SVG::Calendar - Creates calendars in SVG format which can be printed
 
 =head1 VERSION
 
-This documentation refers to SVG::Calendar version 0.3.13.
+This documentation refers to SVG::Calendar version 0.3.14.
 
 =head1 SYNOPSIS
 
@@ -633,7 +633,7 @@ Return: list - A list of the files created
 Description: Creates the SVG calendar files for each month of the year (or for
 each month from start and end)
 
- eg $svg->output_year( 2006, 'folowers' );
+ eg $svg->output_year( 2006, 'flowers' );
 
  Will result in the following files created
 

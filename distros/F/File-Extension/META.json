@@ -31,7 +31,9 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "perl" : "5.008"
+         }
       }
    },
    "release_status" : "stable",
@@ -43,6 +45,6 @@
          "url" : "https://github.com/trapd00r/File-Extension"
       }
    },
-   "version" : "0.030",
+   "version" : "0.034",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

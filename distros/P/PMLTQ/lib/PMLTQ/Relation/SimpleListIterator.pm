@@ -1,6 +1,6 @@
 package PMLTQ::Relation::SimpleListIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::SimpleListIterator::VERSION = '2.0.2';
+$PMLTQ::Relation::SimpleListIterator::VERSION = '3.0.1';
 # ABSTRACT: Base class for all iterators that iterates on a list of nodes
 
 use 5.006;
@@ -68,7 +68,7 @@ PMLTQ::Relation::SimpleListIterator - Base class for all iterators that iterates
 
 =head1 VERSION
 
-version 2.0.2
+version 3.0.1
 
 =head1 AUTHORS
 

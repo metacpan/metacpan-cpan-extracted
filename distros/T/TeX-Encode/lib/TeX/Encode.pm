@@ -13,7 +13,7 @@ use TeX::Encode::BibTeX;
 
 our @ISA = qw(Encode::Encoding);
 
-our $VERSION = '2.004'; # VERSION
+our $VERSION = '2.005'; # VERSION
 
 __PACKAGE__->Define(qw(LaTeX latex));
 
@@ -31,7 +31,7 @@ sub encode
 	# set up a "check" sub that will determine how we handle unsupported code
 	# points
 	$check = Encode::FB_DEFAULT if !defined $check;
-	if( $check eq Encode::FB_DEFAULT )
+	if( $check eq Encode::FB_DEFAULT or $check eq "")
 	{
 		$check = sub { '?' };
 	}

@@ -31,9 +31,9 @@ else {
 
 $prec = 2098 if $prec == 106;
 
-if($prec == $Math::MPFR::BITS) {print "ok 2\n"}
+if($prec == $Math::MPFR::NV_properties{bits}) {print "ok 2\n"}
 else {
-  warn "\n $prec != $Math::MPFR::BITS\n";
+  warn "\n $prec != $Math::MPFR::NV_properties{bits}\n";
   print "not ok 2\n";
 }
 

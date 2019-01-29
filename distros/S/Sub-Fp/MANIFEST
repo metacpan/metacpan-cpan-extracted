@@ -8,9 +8,11 @@ Sub-Fp-0.05.tar.gz
 Sub-Fp-0.06.tar.gz
 Sub-Fp-0.07.tar.gz
 Sub-Fp-0.10.tar.gz
-Sub-Fp-0.36.tar.gz
-Sub-Fp-0.37.tar.gz
-Sub-Fp-0.38.tar.gz
+Sub-Fp-0.26.tar.gz
+Sub-Fp-0.27.tar.gz
+Sub-Fp-0.29.tar.gz
+Sub-Fp-0.30.tar.gz
+Sub-Fp-0.31.tar.gz
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t

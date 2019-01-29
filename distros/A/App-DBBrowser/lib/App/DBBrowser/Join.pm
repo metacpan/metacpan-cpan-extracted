@@ -51,8 +51,8 @@ sub join_tables {
         $join->{used_tables}  = [];
         $join->{aliases}      = [];
         $ax->print_sql( $join );
-        my $info   = '  INFO';
-        my $from_subquery = '  From SQ';
+        my $info = '  INFO';
+        my $from_subquery = '  Derived';
         my @choices = map { "- $_" } @$tables;
         push @choices, $from_subquery if $sf->{o}{extend}{join};
         push @choices, $info;
@@ -162,7 +162,7 @@ sub __add_slave_and_condition {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
     my $used = ' (used)';
-    my $from_subquery = '  From SQ';
+    my $from_subquery = '  Derived';
     my @choices;
     for my $table ( @$tables ) {
         if ( any { $_ eq $table } @{$join->{used_tables}} ) {

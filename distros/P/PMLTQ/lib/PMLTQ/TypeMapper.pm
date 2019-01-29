@@ -1,6 +1,6 @@
 package PMLTQ::TypeMapper;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::TypeMapper::VERSION = '2.0.2';
+$PMLTQ::TypeMapper::VERSION = '3.0.1';
 # ABSTRACT: Helper methods for PML::Schema, relations and PML::Node types
 
 use 5.006;
@@ -276,7 +276,7 @@ PMLTQ::TypeMapper - Helper methods for PML::Schema, relations and PML::Node type
 
 =head1 VERSION
 
-version 2.0.2
+version 3.0.1
 
 =head1 AUTHORS
 

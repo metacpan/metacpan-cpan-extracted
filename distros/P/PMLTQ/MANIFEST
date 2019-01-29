@@ -169,7 +169,6 @@ lib/PMLTQ/Common.pm
 lib/PMLTQ/Grammar.pm
 lib/PMLTQ/Loader.pm
 lib/PMLTQ/NG2PMLTQ.pm
-lib/PMLTQ/PML2BASE.pm
 lib/PMLTQ/ParserError.pm
 lib/PMLTQ/Planner.pm
 lib/PMLTQ/Relation.pm

@@ -1,9 +1,17 @@
 Revision history for Perl module Math::NV
+ 2.01
+    - Require version 4.07 of Math::MPFR as Math-MPFR-4.07 altered the way
+      that atonv() is called. The atonv function is use only in
+      t/08subnormal_mpfr.t and t/09subnormal_mpfr_alt.t
+    - Fix bug in test 7 of t/08subnormal_mpfr.t and t/09subnormal_mpfr_alt.t
+      Bug exposed by:
+      http://www.cpantesters.org/cpan/report/2d66ef6c-19fc-11e9-9376-4c7cbe00b72a
+
  2.0
     - Move POD to separate file (NV.pod)
     - cater correctly for subnormal values in is_eq_mpfr() and nv_mpfr()
     - add set_C() and set_mpfr
-    - make Math::MPFR-4.02 a prerequisite
+    - make Math::MPFR-4.03 a prerequisite
 
  1.02
     - Update nv_mpfr() to accommodate IEEE 754 quad long double type.

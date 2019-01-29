@@ -17,12 +17,16 @@ meta-spec:
   version: '1.4'
 name: App-BlockWebFlooders
 requires:
-  Config::IOD::Reader: '0.340'
+  Array::Iter: '0'
+  Config::IOD::Reader: '0.341'
   DBD::SQLite: '0'
   DBI: '0'
-  Getopt::Long: '0'
-  IPC::System::Options: '0.330'
+  Getopt::Long::Modern: '0'
+  IPC::System::Options: '0.331'
+  Regexp::Pattern: v0.2.7
+  Regexp::Pattern::Net: '0'
   SQL::Schema::Versioned: '0.234'
+  Sys::RunAlone::Flexible: '0'
   Term::ANSIColor: '0'
   Tie::Array::Expire: '0'
   Tie::Handle::TailSwitch: '0'
@@ -35,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BlockWebFlooders
   homepage: https://metacpan.org/release/App-BlockWebFlooders
   repository: git://github.com/perlancar/perl-App-BlockWebFlooders.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -111,7 +115,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -342,7 +346,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

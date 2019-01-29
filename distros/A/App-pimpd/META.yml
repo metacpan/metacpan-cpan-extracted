@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/trapd00r/pimpd2/issues
   repository: https://github.com/trapd00r/pimpd2
-version: '0.338'
+version: '0.340'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

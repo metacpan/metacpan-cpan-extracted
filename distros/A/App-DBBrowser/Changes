@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.049    2019-01-29
+        - Set the default value for the options 'grid' and 'keep_header' to 1.
+        - Add the sheet name to the default table name if the content is from a spreadsheet.
+        - Rename the subquery-menu-entry in table/join/union menus.
+
 2.048    2019-01-28
         - Update subquery menu.
 

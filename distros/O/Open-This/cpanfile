@@ -26,6 +26,10 @@ on 'configure' => sub {
   requires "perl" => "5.006";
 };
 
+on 'configure' => sub {
+  suggests "JSON::PP" => "2.27300";
+};
+
 on 'develop' => sub {
   requires "Code::TidyAll" => "0.71";
   requires "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003";

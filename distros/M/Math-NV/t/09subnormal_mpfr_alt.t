@@ -13,12 +13,11 @@ use warnings;
 use Math::NV qw(:all);
 use Config;
 
-my ($have_atonv, $ws);
+my ($have_atonv);
 
 $have_atonv = Math::MPFR::MPFR_VERSION() <= 196869 ? 0 : 1;
 
 if($have_atonv) {
-  $ws = Math::MPFR::Rmpfr_init2($Math::MPFR::BITS);
   warn "\n Math::MPFR::atonv() tests enabled\n";
 }
 else {  warn "\n Math::MPFR::atonv() tests disabled\n"}
@@ -98,11 +97,11 @@ unless($Math::NV::_ld_subnormal_bug && $Config{nvtype} eq 'long double') {
     }
 
     if($have_atonv) {
-      if($set != Math::MPFR::atonv($ws, $str)) {
-        warn "\n$set != ", Math::MPFR::atonv($ws, $str), " for $str\n";
+      if($set != Math::MPFR::atonv($str)) {
+        warn "\n$set != ", Math::MPFR::atonv($str), " for $str\n";
         if($] >= '5.022') {
           warn "The former is: ", sprintf("%a\n", $set);
-          warn "The latter is: ", sprintf "%a\n", Math::MPFR::atonv($ws, $str);
+          warn "The latter is: ", sprintf "%a\n", Math::MPFR::atonv($str);
         }
         $ok = 0;
         last;
@@ -330,7 +329,7 @@ if(mant_dig() == 113) {
 
   if($have_atonv) {
     for(my $i = 0; $i < $len; $i++) {
-      if(Math::MPFR::atonv($ws, $str1[$i]) != Math::MPFR::atonv($ws, $str2[$i])) {
+      if(Math::MPFR::atonv($str1[$i]) != Math::MPFR::atonv($str2[$i])) {
         warn "\nIn Math::MPFR::atonv(): ", Math::NV::get_relevant_prec(Math::MPFR->new($str1[$i], 2)), ": $str1[$i] != $str2[$i]\n";
         $ok = 0;
       }
@@ -377,7 +376,7 @@ elsif(mant_dig() == 64) {
 
   if($have_atonv) {
     for(my $i = 0; $i < $len; $i++) {
-      if(Math::MPFR::atonv($ws, $str1[$i]) != Math::MPFR::atonv($ws, $str2[$i])) {
+      if(Math::MPFR::atonv($str1[$i]) != Math::MPFR::atonv($str2[$i])) {
         warn "\nIn Math::MPFR::atonv(): ", Math::NV::get_relevant_prec(Math::MPFR->new($str1[$i], 2)), ": $str1[$i] != $str2[$i]\n";
         $ok = 0;
       }
@@ -436,7 +435,7 @@ elsif(mant_dig() == 53) {
 
   if($have_atonv) {
     for(my $i = 0; $i < $len; $i++) {
-      if(Math::MPFR::atonv($ws, $str1[$i]) != Math::MPFR::atonv($ws, $str2[$i])) {
+      if(Math::MPFR::atonv($str1[$i]) != Math::MPFR::atonv($str2[$i])) {
         warn "\nIn Math::MPFR::atonv(): ", Math::NV::get_relevant_prec(Math::MPFR->new($str1[$i], 2)), ": $str1[$i] != $str2[$i]\n";
         $ok = 0;
       }
@@ -487,7 +486,7 @@ else { # double-double
 
   if($have_atonv) {
     for(my $i = 0; $i < $len; $i++) {
-      if(Math::MPFR::atonv($ws, $str1[$i]) != Math::MPFR::atonv($ws, $str2[$i])) {
+      if(Math::MPFR::atonv($str1[$i]) != Math::MPFR::atonv($str2[$i])) {
         warn "\nIn Math::MPFR::atonv(): ", Math::NV::get_relevant_prec(Math::MPFR->new($str1[$i], 2)), ": $str1[$i] != $str2[$i]\n";
         $ok = 0;
       }
@@ -553,6 +552,12 @@ if($have_ld_bytes) {
       $str .= "e-4932";
 
       my $out1 = nv_mpfr($str, Math::MPFR::LDBL_MANT_DIG);
+
+      ## Ignore irrelevant bytes ##
+      if(Math::MPFR::LDBL_MANT_DIG == 64) {
+        $out1 = substr($out1, -20, 20);
+      }
+
       my $out2 = join '', Math::MPFR::_ld_bytes($str, Math::MPFR::LDBL_MANT_DIG);
 
       if($out1 ne $out2 && $out1 ne ('0000'. $out2) && $out1 ne ('000000000000'. $out2)) {

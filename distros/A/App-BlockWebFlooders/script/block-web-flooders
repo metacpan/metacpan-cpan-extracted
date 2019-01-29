@@ -1,26 +1,30 @@
 #!perl
 
-our $DATE = '2018-11-12'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2019-01-29'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Getopt::Long qw(:config no_ignore_case bundling no_ignore_case gnu_compat no_getopt_compat);
+use Getopt::Long::Modern;
 use IPC::System::Options qw(system);
+use Regexp::Pattern 'Net::ipv4';
 use Term::ANSIColor;
+use Tie::Array::Expire;
 use Time::HiRes 'sleep';
 
 my $PROG = 'block-web-flooders';
 
-my $dbspec = {
+my $Dbspec = {
     latest_v => 1,
     install => [
         'CREATE TABLE blocked (ip TEXT NOT NULL PRIMARY KEY, ctime INT NOT NULL)',
     ],
 };
 
+my $action = "run";
+my $opt_detail;
 my %Opts = (
     limit => undef,
     has => [],
@@ -33,6 +37,14 @@ my %Opts = (
     # ports => [80, 443],
     spanel_site => undef,
 );
+my %Whitelisted; # key = ip address
+
+my $Dbh;
+my %Blocked; # key = ip address, value = unix time (time blocked)
+
+my %Ips; # key = ip address, value = expiring array
+
+tie my @Messages, "Tie::Array::Expire", 15;
 
 sub read_config {
     require Config::IOD::Reader;
@@ -43,9 +55,15 @@ sub read_config {
         next unless -f $path;
         my $hoh = $iod->read_file($path);
         for my $sect (keys %$hoh) {
-            next unless $sect eq 'GLOBAL';
+            unless ($sect eq 'GLOBAL') {
+                warn "$PROG: Unknown config section '$sect', ignored\n";
+                next;
+            }
             my $h = $hoh->{$sect};
             for my $k (keys %$h) {
+                unless (exists $Opts{$k}) {
+                    die "$PROG: Unknown config parameter '$k', please fix it first\n";
+                }
                 my $v = $h->{$k};
                 $Opts{$k} = $v;
             }
@@ -85,6 +103,18 @@ Options:
                 Instead of piping output of tail -f manually, you can use this
                 on an Spanel server to automatically locate the HTTP & HTTPS
                 log files and switch to the newest files.
+
+  --action=S    The default ("run") is to read from file/stdin continuously and
+                block IP's as we run. Other actions include: "block" and
+                "unblock" to block (unblock) one or more IP addresses specified
+                in command-line arguments or stdin, "list_blocked" to list the
+                IPs currently blocked, "unblock_all" to unblock all IP's.
+  --block       Shortcut for --action=block.
+  --unblock     Shortcut for --action=unblock.
+  --list-blocked  Shortcut for --action=list_blocked.
+  --unblock-all   Shortcut for --action=unblock_all.
+  --detail, -l  When action=list_blocked, show more data.
+
 For more details, see the documentation (man $PROG).
 EOT
             exit 0;
@@ -94,6 +124,14 @@ EOT
             print "$PROG version ", ($main::VERSION // "dev"), "\n";
             exit 0;
         },
+        'action=s' => \$action,
+        'block' => sub { $action = 'block' },
+        'unblock' => sub { $action = 'unblock' },
+        'list-blocked' => sub { $action = 'list_blocked' },
+        'unblock-all' => sub { $action = 'unblock_all' },
+
+        'detail|l' => \$opt_detail,
+
         'whitelist-ip=s' => $Opts{whitelist_ip},
         'has=s' => $Opts{has},
         'has-pattern=s' => $Opts{has_pattern},
@@ -107,36 +145,159 @@ EOT
     );
 
     warn "$PROG: No whitelist_ip specified\n" unless @{ $Opts{whitelist_ip} };
-    die "$PROG: Please specify --limit\n" unless defined($Opts{limit}) && $Opts{limit} > 0;
-    die "$PROG: Please specify positive --period\n" unless $Opts{period} > 0;
-    if (defined $Opts{spanel_site}) {
-        $Opts{spanel_site} =~ /\A[\w-]+(\.[\w-]+)*\z/ or die "$PROG: Invalid site `$Opts{spanel_site}`\n";
-        (-d "/s/$Opts{spanel_site}/syslog")
-            or die "$PROG: Site not found `$Opts{spanel_site}`: no /s/$Opts{spanel_site}/syslog\n";
+    if ($action eq 'run') {
+        die "$PROG: Please specify --limit\n" unless defined($Opts{limit}) && $Opts{limit} > 0;
+        die "$PROG: Please specify positive --period\n" unless $Opts{period} > 0;
+        if (defined $Opts{spanel_site}) {
+            $Opts{spanel_site} =~ /\A[\w-]+(\.[\w-]+)*\z/ or die "$PROG: Invalid site `$Opts{spanel_site}`\n";
+            (-d "/s/$Opts{spanel_site}/syslog")
+                or die "$PROG: Site not found `$Opts{spanel_site}`: no /s/$Opts{spanel_site}/syslog\n";
+        }
+        $Opts{has_pattern}   = [map { qr/$_/ } @{ $Opts{has_pattern} }  ];
+        $Opts{lacks_pattern} = [map { qr/$_/ } @{ $Opts{lacks_pattern} }];
     }
-    $Opts{has_pattern}   = [map { qr/$_/ } @{ $Opts{has_pattern} }  ];
-    $Opts{lacks_pattern} = [map { qr/$_/ } @{ $Opts{lacks_pattern} }];
 }
 
 sub connectdb {
     require DBI;
     require SQL::Schema::Versioned;
 
-    my $dbh = DBI->connect("dbi:SQLite:dbname=/var/run/block-web-flooders.db");
+    return if $Dbh;
+
+    $Dbh = DBI->connect("dbi:SQLite:dbname=/var/run/block-web-flooders.db");
 
     my $res = SQL::Schema::Versioned::create_or_update_db_schema(
-        dbh => $dbh, spec => $dbspec);
+        dbh => $Dbh, spec => $Dbspec);
     die "Cannot initialize DB: $res->[0] - $res->[1]" unless $res->[0] == 200;
-
-    $dbh;
 }
 
-sub run {
-    #require Term::Size;
-    require Tie::Array::Expire;
-    require Time::Duration;
+sub _set_need_reload {
+    $Dbh->do("INSERT OR IGNORE INTO meta (name,value) VALUES ('_need_reload',0)");
+    $Dbh->do("UPDATE meta SET value=$_[0] WHERE name='_need_reload'");
+}
 
-    my $dbh = connectdb();
+sub _reload_data_from_db {
+    my $force = shift;
+
+    my ($need_reload) = $Dbh->selectrow_array("SELECT value FROM meta WHERE name='_need_reload'");
+    return if !$force && defined $need_reload && !$need_reload;
+
+    %Blocked = ();
+    my $sth = $Dbh->prepare("SELECT * FROM blocked");
+    $sth->execute;
+    while (my $row = $sth->fetchrow_hashref) {
+        $Blocked{ $row->{ip} } = $row->{ctime};
+    }
+
+    unshift @Messages, "(re)loaded data from db";
+    _set_need_reload(0);
+}
+
+sub _init {
+    connectdb();
+
+    _reload_data_from_db(1); # force
+    %Whitelisted = map { $_=>1 } @{ $Opts{whitelist_ip} };
+}
+
+sub _block_or_unblock_ip {
+    my ($which, $ip, $update_messages) = @_;
+
+    $update_messages //= 1;
+    if ($which eq 'block') {
+        return if $Blocked{$ip};
+    } else {
+        return unless $Blocked{$ip};
+    }
+
+    system(
+        {
+            die => ($which eq 'block' ? 1:0),
+            dry_run => $Opts{dry_run},
+            (capture_stderr => \my $stderr) x ($which eq 'block' ? 0:1),
+        },
+        "iptables", ($which eq 'block' ? "-A" : "-D"), "INPUT", "-s", $ip,
+        "-p", "tcp", "-m", "multiport", "--dports", "80,443",
+        "-j", "DROP",
+    );
+    my $now = time();
+    if ($which eq 'block') {
+        unshift @Messages, "$ip BLOCKED".($Opts{dry_run} ? " (dry-run)" : "")
+            if $update_messages;
+        $Dbh->do("INSERT OR IGNORE INTO blocked (ip,ctime) VALUES (?,?)", {}, $ip, $now);
+        $Blocked{$ip} = time();
+    } else {
+        unshift @Messages, "$ip unblocked".($Opts{dry_run} ? " (dry-run)" : "")
+            if $update_messages;
+        $Dbh->do("DELETE FROM blocked WHERE ip=?", {}, $ip);
+        delete $Blocked{$ip};
+    }
+}
+
+sub block_ip { _block_or_unblock_ip("block", @_) }
+
+sub unblock_ip { _block_or_unblock_ip("unblock", @_) }
+
+sub _block_or_unblock_ips {
+    my $which = shift;
+
+    _init();
+
+    # get IP's from command-line arguments if specified, otherwise from stdin
+    my $iter;
+    if (@ARGV) {
+        require Array::Iter;
+        $iter = Array::Iter::array_iter(\@ARGV);
+    } else {
+        $iter = sub { scalar <STDIN> };
+    }
+
+    while (defined(my $ip = $iter->())) {
+        chomp($ip);
+        unless ($ip =~ /\A$RE{ipv4}\z/) {
+            warn "$PROG: Invalid IP address '$ip', skipped\n";
+            next;
+        }
+        _block_or_unblock_ip($which, $ip, 1); # don't update messages
+    }
+}
+
+sub action_block {
+    _block_or_unblock_ips("block");
+    _set_need_reload(1);
+}
+
+sub action_unblock {
+    _block_or_unblock_ips("unblock");
+    _set_need_reload(1);
+}
+
+sub action_list_blocked {
+    _init();
+
+    my $now = time();
+    for (sort { $Blocked{$a} <=> $Blocked{$b} } keys %Blocked) {
+        my $secs = $Opts{block_period} - ($now - $Blocked{$_});
+        $secs = 0 if $secs < 0;
+        if ($opt_detail) {
+            printf "%s\t%d\n", $_, $secs;
+        } else {
+            print $_, "\n";
+        }
+    }
+}
+
+sub action_unblock_all {
+    _init();
+
+    local @ARGV = keys %Blocked;
+    _block_or_unblock_ips("unblock");
+    _set_need_reload(1);
+}
+
+sub action_run {
+    #require Term::Size;
+    require Time::Duration;
 
     #my ($columns, $rows) = Term::Size::chars *STDOUT{IO};
 
@@ -145,42 +306,10 @@ sub run {
 
     my $last_update_output_time;
     my $last_unblock_time;
-    my %ips; # key = ip address, value = expiring array
-    my %whitelisted = map { $_=>1 } @{ $Opts{whitelist_ip} }; # key = ip address
-    my %blocked; # key = ip address, value = unix time (time blocked)
+    my $last_reload_data_time;
     my $num_lines = 0;
-    tie my @messages, "Tie::Array::Expire", 15;
 
-    # load blocked ips from db
-    my $sth = $dbh->prepare("SELECT * FROM blocked");
-    $sth->execute;
-    while (my $row = $sth->fetchrow_hashref) { $blocked{ $row->{ip} } = $row->{ctime} }
-
-    my $code_block_or_unblock = sub {
-        my ($which, $ip) = @_;
-        if ($which eq 'block') {
-            return if $blocked{$ip};
-        } else {
-            return unless $blocked{$ip};
-        }
-        system({die => 1, dry_run => $Opts{dry_run}},
-               "iptables", ($which eq 'block' ? "-A" : "-D"), "INPUT", "-s", $ip,
-               "-p", "tcp", "-m", "multiport", "--dports", "80,443",
-               "-j", "DROP",
-           );
-        my $now = time();
-        if ($which eq 'block') {
-            unshift @messages, "$ip BLOCKED".($Opts{dry_run} ? " (dry-run)" : "");
-            $dbh->do("INSERT OR IGNORE INTO blocked (ip,ctime) VALUES (?,?)", {}, $ip, $now);
-            $blocked{$ip} = time();
-        } else {
-            unshift @messages, "$ip unblocked".($Opts{dry_run} ? " (dry-run)" : "");
-            $dbh->do("DELETE FROM blocked WHERE ip=?", {}, $ip);
-            delete $blocked{$ip};
-        }
-    };
-    my $code_block   = sub { $code_block_or_unblock->('block'  , @_) };
-    my $code_unblock = sub { $code_block_or_unblock->('unblock', @_) };
+    _init();
 
     local *INPUT;
     if (defined $Opts{spanel_site}) {
@@ -204,12 +333,12 @@ sub run {
         my $now = time();
         $num_lines++;
         chomp $line;
-        $line =~ /\A(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s/ or do {
+        $line =~ /\A($RE{ipv4})\s/ or do {
             warn "$PROG: Line '$line': Can't parse IP address, skipped\n";
             next;
         };
         my $ip = $1;
-        next if $blocked{$ip};
+        next if $Blocked{$ip};
 
       OUTPUT:
         {
@@ -217,19 +346,19 @@ sub run {
                 $last_update_output_time <= $now-2;
             print "\e[2J\e[;H"; # clear screen + put cursor at top (0,0)
             printf "Blocked IPs: %s%4d%s | Log lines: %s%6d%s | Running for: %s%s%s\n",
-                color('bold'), (scalar keys %blocked), color('reset'),
+                color('bold'), (scalar keys %Blocked), color('reset'),
                 color('bold'), $num_lines, color('reset'),
                 color('bold'), Time::Duration::concise(Time::Duration::duration($now-$^T, 2)), color('reset');
             $last_update_output_time = $now;
             printf "Top IPs:\n";
             my $i = 0;
-            for my $ip (sort { scalar(@{ $ips{$b} }) <=> scalar(@{ $ips{$a} }) } keys %ips) {
+            for my $ip (sort { scalar(@{ $Ips{$b} }) <=> scalar(@{ $Ips{$a} }) } keys %Ips) {
                 last if $i++ >= 10;
-                printf "  %15s (%4d)\n", $ip, scalar(@{ $ips{$ip} });
+                printf "  %15s (%4d)\n", $ip, scalar(@{ $Ips{$ip} });
             }
             printf "Last messages:\n";
             $i = 0;
-            for my $msg (@messages) {
+            for my $msg (@Messages) {
                 last if $i++ >= 5;
                 print "  $msg\n";
             }
@@ -239,12 +368,20 @@ sub run {
         {
             last unless !$last_unblock_time ||
                 $last_unblock_time <= $now-60;
-            for (keys %blocked) {
-                next unless $blocked{$_} < $now - $Opts{block_period};
-                $code_unblock->($_);
+            for (keys %Blocked) {
+                next unless $Blocked{$_} < $now - $Opts{block_period};
+                unblock_ip($_);
             }
             $last_unblock_time = $now;
         } # UNBLOCK
+
+      RELOAD_DATA:
+        {
+            last unless !$last_reload_data_time ||
+                $last_reload_data_time <= $now-5;
+            _reload_data_from_db();
+            $last_reload_data_time = $now;
+        }
 
         for my $has (@{ $Opts{has} }) {
             next LINE unless index($line, $has) >= 0;
@@ -259,14 +396,14 @@ sub run {
             next LINE if $line =~ $pat;
         }
 
-        $ips{$ip} //= do {
+        $Ips{$ip} //= do {
             tie my @ary, "Tie::Array::Expire", $Opts{period};
             \@ary;
         };
-        push @{ $ips{$ip} }, 1;
-        if (@{ $ips{$ip} } > $Opts{limit} && !$whitelisted{$ip}) {
-            $code_block->($ip);
-            delete $ips{$ip};
+        push @{ $Ips{$ip} }, 1;
+        if (@{ $Ips{$ip} } > $Opts{limit} && !$Whitelisted{$ip}) {
+            block_ip($ip);
+            delete $Ips{$ip};
         }
     } # loop
 }
@@ -276,7 +413,21 @@ sub run {
 die "$PROG: Please run me as root\n" if $>;
 read_config();
 parse_options();
-run();
+if ($action eq 'block') {
+    action_block();
+} elsif ($action eq 'unblock') {
+    action_unblock();
+} elsif ($action eq 'list_blocked') {
+    action_list_blocked();
+} elsif ($action eq 'unblock_all') {
+    action_unblock_all();
+} elsif ($action eq 'run') {
+    require Sys::RunAlone::Flexible;
+    Sys::RunAlone::Flexible::lock();
+    action_run();
+} else {
+    die "$PROG: Unknown action '$action'\n";
+}
 
 # PODNAME: block-web-flooders
 # ABSTRACT: Block IP addresses of web flooders using iptables
@@ -293,7 +444,7 @@ block-web-flooders - Block IP addresses of web flooders using iptables
 
 =head1 VERSION
 
-This document describes version 0.009 of block-web-flooders (from Perl distribution App-BlockWebFlooders), released on 2018-11-12.
+This document describes version 0.010 of block-web-flooders (from Perl distribution App-BlockWebFlooders), released on 2019-01-29.
 
 =head1 SYNOPSIS
 
@@ -394,6 +545,10 @@ To immediately clear/unblock all the IPs:
 (this is assuming the default policy of input is ACCEPT; if you have a firewall
 package installed, please follow the procedure for that firewall.)
 
+To immediately unblock some IPs:
+
+ #
+
 =head1 DESCRIPTION
 
 This script helps a sysadmin when there is a flood from multiple IP addresses to
@@ -467,7 +622,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,56 @@
+---
+abstract: 'Convert from PML to SQL'
+author:
+  - 'Petr Pajas <pajas@ufal.mff.cuni.cz>'
+  - 'Jan Štěpánek <stepanek@ufal.mff.cuni.cz>'
+  - 'Michal Sedlák <sedlak@ufal.mff.cuni.cz>'
+  - 'Matyáš Kopp <matyas.kopp@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PMLTQ-PML2BASE
+provides:
+  PMLTQ::PML2BASE:
+    file: lib/PMLTQ/PML2BASE.pm
+    version: v3.0.1
+  PMLTQ::PML2BASE::Relation::PDT::AEParentIterator:
+    file: lib/PMLTQ/PML2BASE/Relation/PDT/AEParentIterator.pm
+    version: v3.0.1
+  PMLTQ::PML2BASE::Relation::PDT::ALexOrAuxRFIterator:
+    file: lib/PMLTQ/PML2BASE/Relation/PDT/ALexOrAuxRFIterator.pm
+    version: v3.0.1
+  PMLTQ::PML2BASE::Relation::PDT::TEParentIterator:
+    file: lib/PMLTQ/PML2BASE/Relation/PDT/TEParentIterator.pm
+    version: v3.0.1
+  PMLTQ::PML2BASE::Relation::Treex::AEParentCIterator:
+    file: lib/PMLTQ/PML2BASE/Relation/Treex/AEParentCIterator.pm
+    version: v3.0.1
+  PMLTQ::PML2BASE::Relation::Treex::AEParentIterator:
+    file: lib/PMLTQ/PML2BASE/Relation/Treex/AEParentIterator.pm
+    version: v3.0.1
+  PMLTQ::PML2BASE::Relation::Treex::TEParentIterator:
+    file: lib/PMLTQ/PML2BASE/Relation/Treex/TEParentIterator.pm
+    version: v3.0.1
+requires:
+  PMLTQ: v3.0.0
+resources:
+  bugtracker: https://github.com/ufal/pmltq-pml2base/issues
+  homepage: http://ufal.mff.cuni.cz/pmltq/
+  repository: https://github.com/ufal/pmltq-pml2base.git
+version: 3.0.1
+x_authority: cpan:MATY
+x_authority_from_module: PMLTQ::PML2BASE
+x_permissions_from_module: PMLTQ::PML2BASE
+x_serialization_backend: 'YAML::Tiny version 1.70'

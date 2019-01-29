@@ -1,7 +1,7 @@
 package Finance::Bank::ID::Mandiri;
 
-our $DATE = '2017-07-20'; # DATE
-our $VERSION = '0.37'; # VERSION
+our $DATE = '2019-01-29'; # DATE
+our $VERSION = '0.381'; # VERSION
 
 use 5.010001;
 
@@ -9,6 +9,8 @@ use Moo;
 
 use HTTP::Headers;
 use HTTP::Headers::Patch::DontUseStorable -load_target=>0;
+use Parse::Number::EN qw(parse_number_en);
+
 extends 'Finance::Bank::ID::Base';
 
 has _variant => (is => 'rw');
@@ -18,6 +20,7 @@ my $re_acc         = qr/(?:\d{13})/;
 my $re_currency    = qr/(?:\w{3})/;
 my $re_money       = qr/(?:\d+(?:\.\d\d?)?)/;
 my $re_moneymin    = qr/(?:-?\d+(?:\.\d\d?)?)/; # allow negative
+my $re_money2      = qr/(?:[\d,]*(?:\.\d\d?)?)/; # allow starts with ., e.g. .00. formatted thousand=, decimal=.
 my $re_date1       = qr!(?:\d{2}/\d{2}/\d{4})!; # 25/12/2010
 my $re_txcode      = qr!(?:\d{4})!;
 
@@ -28,6 +31,7 @@ our $re_mcm_v201009 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
                          (?<desc1>[^;]+);(?<desc2>.*?);
                          (?<amount>$re_money)(?<amount_dbmarker>DR)?;
                          (?<bal>$re_money)(?<bal_dbmarker>DR)?$!mx;
+
 # what's new: third line argument
 our $re_mcm_v201103 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
                          (?<date_d>\d\d)/(?<date_m>\d\d)/(?<date_y>\d\d\d\d)
@@ -35,6 +39,7 @@ our $re_mcm_v201103 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
                          (?<desc1>[^;]+);(?<desc2>[^;]*);(?:(?<desc3>.*?);)?
                          (?<amount>$re_money)(?<amount_dbmarker>DR)?;
                          (?<bal>$re_money)(?<bal_dbmarker>DR)?$!mx;
+
 # what's new: txcode moved to 3rd column, credit & debit amount split into 2
 # fields
 our $re_mcm_v201107 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
@@ -44,6 +49,21 @@ our $re_mcm_v201107 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
                          (?<amount_db>$re_money);
                          (?<amount_cr>$re_money);
                          (?<bal>$re_moneymin)!mx; # maybe? no more DR marker
+
+# this CSV is currently available when we use the indonesian language on the
+# website. what's different: a CSV (comma as field separator), a header field,
+# no more currency field, two dates.
+# header: Account No,Date,Val. Date,Transaction Code,Description,Description,Reference No.,Debit,Credit,
+our $re_mcm_v201901 = qr!^(?<acc>$re_acc),
+                         (?<date_d>\d\d)/(?<date_m>\d\d)/(?<date_y>\d\d),
+                         (?<vdate_d>\d\d)/(?<vdate_m>\d\d)/(?<vdate_y>\d\d),
+                         (?<txcode>$re_txcode),
+                         "(?<desc1>[^"]*)","(?<desc2>[^"]*)",
+                         (?<reference_no>[^,]*),
+                         "(?<amount_db>$re_money2)",
+                         "(?<amount_cr>$re_money2)",
+                         !mx;
+
 
 sub _make_readonly_inputs_rw {
     my ($self, @forms) = @_;
@@ -249,7 +269,11 @@ sub _ps_detect {
     #} elsif ($page =~ /$re_mcm_v201009/) {
     #    $self->_variant('mcm-v201009');
     #    $self->_re_tx($re_mcm_v201009);
-    #    return '';
+        #    return '';
+    } elsif ($page =~ /$re_mcm_v201901/) {
+        $self->_variant('mcm-v201901');
+        $self->_re_tx($re_mcm_v201901);
+        return '';
     } elsif ($page =~ /$re_mcm_v201103/) {
         $self->_variant('mcm-v201103');
         $self->_re_tx($re_mcm_v201103);
@@ -404,20 +428,20 @@ sub _ps_get_metadata_mcm {
     $page =~ m!$re_tx!
         or return "can't get account number & currency & date";
     $stmt->{account} = $+{acc};
-    $stmt->{currency} = $+{currency};
+    $stmt->{currency} = $+{currency} // "IDR"; # assume if not given
     $stmt->{start_date} = DateTime->new(
-        day=>$+{date_d}, month=>$+{date_m}, year=>$+{date_y});
+        day=>$+{date_d}, month=>$+{date_m}, year=>($+{date_y} < 100 ? 2000:0)+$+{date_y});
 
     # we'll just assume the first and last transaction date to be start and
     # end date of statement, because the semicolon format doesn't include
     # any other metadata.
     $page =~ m!.*$re_tx!s or return "can't get end date";
     $stmt->{end_date} = DateTime->new(
-        day=>$+{date_d}, month=>$+{date_m}, year=>$+{date_y});
+        day=>$+{date_d}, month=>$+{date_m}, year=>($+{date_y} < 100 ? 2000:0)+$+{date_y});
 
     # Mandiri sucks, doesn't provide total credit/debit in statement
     my $n = 0;
-    while ($page =~ m!^\d{13};!mg) { $n++ }
+    while ($page =~ m!^\d{13}[;,]!mg) { $n++ }
     $stmt->{_num_tx_in_stmt} = $n;
     "";
 }
@@ -571,32 +595,45 @@ sub _ps_get_transactions_mcm {
 
     my $re_tx = $self->_re_tx;
 
+    my $skip_header = $self->_variant =~ /^mcm-v201901/ ? 1:0;
+    my $num_formatted = $self->_variant =~ /^mcm-v201901/ ? 1:0;
+
     my @rows;
     my $i = 0;
     for (split /\r?\n/, $page) {
         $i++;
+        next if $skip_header && $i == 1;
         next unless /\S/;
         m!$re_tx! or die "Invalid data in line $i: '$_' doesn't match pattern".
             " (variant = ".$self->_variant.")";
         my $row = {
             account   => $+{acc},
-            currency  => $+{currency},
+            currency  => $+{currency} // "IDR", # assume if not given
             txcode    => $+{txcode},
             day       => $+{date_d},
             month     => $+{date_m},
-            year      => $+{date_y},
+            year      => ($+{date_y} < 100 ? 2000:0) + $+{date_y},
             desc1     => $+{desc1},
             desc2     => $+{desc2},
         };
         $row->{desc3}   = $+{desc3} if defined($+{desc3});
         if ($+{amount_cr}) {
-            my $cr = $+{amount_cr}+0;
-            my $dr = $+{amount_db}+0;
+            my $cr = $+{amount_cr};
+            my $dr = $+{amount_db};
+            if ($num_formatted) {
+                $cr = parse_number_en(text => $cr);
+                $dr = parse_number_en(text => $dr);
+            } else {
+                $cr += 0;
+                $dr += 0;
+            }
             $row->{amount} = $cr ? $cr : -$dr;
         } else {
             $row->{amount} = $+{amount} * ($+{amount_dbmarker} ? -1 : 1);
         }
-        $row->{balance} = $+{bal} * ($+{bal_dbmarker} ? -1 : 1);
+        if (defined $+{bal}) {
+            $row->{balance} = $+{bal} * ($+{bal_dbmarker} ? -1 : 1);
+        }
         push @rows, $row;
     }
 
@@ -651,7 +688,7 @@ Finance::Bank::ID::Mandiri - Check your Bank Mandiri accounts from Perl
 
 =head1 VERSION
 
-This document describes version 0.37 of Finance::Bank::ID::Mandiri (from Perl distribution Finance-Bank-ID-Mandiri), released on 2017-07-20.
+This document describes version 0.381 of Finance::Bank::ID::Mandiri (from Perl distribution Finance-Bank-ID-Mandiri), released on 2019-01-29.
 
 =head1 SYNOPSIS
 
@@ -943,7 +980,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

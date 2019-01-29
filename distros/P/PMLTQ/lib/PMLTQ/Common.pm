@@ -1,6 +1,6 @@
 package PMLTQ::Common;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Common::VERSION = '2.0.2';
+$PMLTQ::Common::VERSION = '3.0.1';
 # ABSTRACT: Helper functions mainly for PML manipulations
 
 use 5.006;
@@ -1195,7 +1195,7 @@ PMLTQ::Common - Helper functions mainly for PML manipulations
 
 =head1 VERSION
 
-version 2.0.2
+version 3.0.1
 
 =head1 AUTHORS
 

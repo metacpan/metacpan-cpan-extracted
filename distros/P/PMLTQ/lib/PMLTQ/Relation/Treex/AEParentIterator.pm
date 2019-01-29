@@ -1,12 +1,11 @@
 package PMLTQ::Relation::Treex::AEParentIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::Treex::AEParentIterator::VERSION = '2.0.2';
+$PMLTQ::Relation::Treex::AEParentIterator::VERSION = '3.0.1';
 # ABSTRACT: Effective parent relation iterator on a-nodes for Treex treebanks
 
 use strict;
 use warnings;
 use base qw(PMLTQ::Relation::SimpleListIterator);
-use PMLTQ::PML2BASE;
 use PMLTQ::Relation {
   name              => 'eparent',
   table_name        => 'adata__#eparents',
@@ -19,6 +18,18 @@ use PMLTQ::Relation {
 };
 use PMLTQ::Relation::Treex;
 
+BEGIN {
+  {
+    local $@; # protect existing $@
+    eval {
+      require PMLTQ::PML2BASE::Relation::Treex::AEParentIterator;
+      PMLTQ::PML2BASE::Relation::Treex::AEParentIterator->import();
+    };
+    print STDERR "PMLTQ::PML2BASE::Relation::Treex::TEParentIterator is not installed\n" if $@;
+    print STDERR "PMLTQ::PML2BASE::Relation::Treex::AEParentIterator is not installed\n" if $@;
+  }
+}
+
 sub get_node_list {
   my ( $self, $node ) = @_;
   my $fsfile = $self->start_file;
@@ -27,18 +38,7 @@ sub get_node_list {
 
 sub dump_relation {
   my ($tree, $hash, $fh ) = @_;
-
-  my $name = $tree->type->get_schema->get_root_name;
-  die 'Trying dump relation eparent for incompatible schema' unless $name =~ /^treex_document/;
-
-  my $struct_name = $tree->type->get_structure_name || '';
-  return unless $struct_name eq 'a-root';
-
-  for my $node ( $tree->descendants ) {
-    for my $p ( PMLTQ::Relation::Treex::AGetEParents($node) ) {
-      $fh->print( PMLTQ::PML2BASE::mkdump( $hash->{$node}{'#idx'}, $hash->{$p}{'#idx'} ) );
-    }
-  }
+  PMLTQ::PML2BASE::Relation::Treex::AEParentIterator::dump_relation($tree, $hash, $fh );
 }
 
 1;
@@ -55,7 +55,7 @@ PMLTQ::Relation::Treex::AEParentIterator - Effective parent relation iterator on
 
 =head1 VERSION
 
-version 2.0.2
+version 3.0.1
 
 =head1 AUTHORS
 

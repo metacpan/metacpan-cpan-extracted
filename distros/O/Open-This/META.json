@@ -25,6 +25,9 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "perl" : "5.006"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
@@ -89,7 +92,7 @@
          "web" : "https://github.com/oalders/open-this"
       }
    },
-   "version" : "0.000014",
+   "version" : "0.000015",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -463,7 +466,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -474,7 +477,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.20.0",
+                  "git_version" : "2.20.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -582,7 +585,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -599,12 +602,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000014",
+                  "tag" : "v0.000015",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -654,7 +657,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -674,7 +677,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -752,6 +755,7 @@
       }
    },
    "x_contributors" : [
+      "Boris D\u00e4ppen <bdaeppen.perl@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Olaf Alders <olaf@wundersolutions.com>"
    ],

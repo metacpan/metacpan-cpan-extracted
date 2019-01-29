@@ -2,21 +2,34 @@
 abstract: 'check whether a given value is a valid country code'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
-build_requires: {}
+build_requires:
+  Capture::Tiny: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Data-Validate-WithYAML-Plugin-Country
+provides:
+  Data::Validate::WithYAML::Plugin::Country:
+    file: lib/Data/Validate/WithYAML/Plugin/Country.pm
+    version: '0.03'
 requires:
-  Data::Validate::WithYAML: 0.11
-  Locale::Country::Multilingual: 0
+  Carp: '0'
+  Data::Validate::WithYAML: '0.11'
+  Locale::Country::Multilingual: '0'
+  perl: '5.008'
 resources:
   bugtracker: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-Country/issues
   homepage: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-Country
   repository: git://github.com/reneeb/Data-Validate-WithYAML-Plugin-Country.git
-version: 0.02
+version: '0.03'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

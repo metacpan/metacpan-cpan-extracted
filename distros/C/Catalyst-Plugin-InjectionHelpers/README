@@ -1,9 +1,9 @@
 This archive contains the distribution Catalyst-Plugin-InjectionHelpers,
-version 0.013:
+version 0.014:
 
   Enhance Catalyst component injection
 
-This software is copyright (c) 2016 by John Napiorkowski.
+This software is copyright (c) 2019 by John Napiorkowski.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

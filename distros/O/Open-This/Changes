@@ -1,5 +1,9 @@
 Revision history for Open-This
 
+0.000015  2019-01-28 21:43:33Z
+    - Don't exec if $EDITOR is empty, die with message (GH#9) (Boris Dppen)
+    - Render the command name in description as a link (GH#7) (Boris Dppen)
+
 0.000014  2018-12-18 21:57:14Z
     - Fix parsing of GitHub links (GH#6) (Olaf Alders)
 

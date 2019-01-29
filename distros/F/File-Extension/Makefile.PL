@@ -15,6 +15,7 @@ WriteMakefile1(
   ABSTRACT                     => q{Lookup file extensions},
   VERSION_FROM                 => q{lib/File/Extension.pm},
   LICENSE                      => q{perl},
+  MIN_PERL_VERSION             => 5.008,
   EXE_FILES                    => [
     glob("scripts/*"),
   ],

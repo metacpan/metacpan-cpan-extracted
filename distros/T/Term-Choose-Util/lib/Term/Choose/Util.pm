@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -354,7 +354,7 @@ sub choose_a_number {
             push @tmp, $prompt;
         }
         my $lines = join "\n", @tmp;
-        my @pre = ( undef, $confirm_tmp );
+        my @pre = ( undef, $confirm_tmp ); # confirm if $result ?
         # Choose
         my $range = choose(
             $small ? [ @pre, reverse @choices_range ] : [ @pre, @choices_range ],
@@ -413,7 +413,7 @@ sub choose_a_subset {
     my $info          = defined $opt->{info}           ? $opt->{info}           : '';
     my $name          =         $opt->{name};
     my $prompt        = defined $opt->{prompt}         ? $opt->{prompt}         : '';
-    my $fmt_chosen    = defined $opt->{fmt_chosen}     ? $opt->{fmt_chosen}     : 0;
+    my $fmt_chosen    = defined $opt->{fmt_chosen}     ? $opt->{fmt_chosen}     : 0;            #### deprecated
     my $remove_chosen = defined $opt->{remove_chosen}  ? $opt->{remove_chosen}  : 1;
     my $mark          =         $opt->{mark};
     my $index         = defined $opt->{index}          ? $opt->{index}          : 0;
@@ -426,7 +426,10 @@ sub choose_a_subset {
     my $confirm       = defined $opt->{confirm}        ? $opt->{confirm}        : ( ' ' x length $prefix ) . '-OK-';
     my $back          = defined $opt->{back}           ? $opt->{back}           : ( ' ' x length $prefix ) . ' << ';
     my $hide_cursor   = defined $opt->{hide_cursor}    ? $opt->{hide_cursor}    : 1;
-    my $list_sep      = defined $opt->{list_separator} ? $opt->{list_separator} : ', '; # documentation
+
+    my $list_begin    = defined $opt->{sofar_begin}     ? $opt->{sofar_begin}     : '';
+    my $list_sep      = defined $opt->{sofar_separator} ? $opt->{sofar_separator} : ', ';
+    my $list_end      = defined $opt->{sofar_end}       ? $opt->{sofar_end}       : '';
     #--------------------------------------#
     #my $subseq_tab = 4;
     #my $subseq_tab = print_columns( $name || '  ' );
@@ -436,14 +439,21 @@ sub choose_a_subset {
 
     while ( 1 ) {
         my @tmp;
-        if ( $fmt_chosen == 0 ) {
-            $name = '> ' if ! defined $name;
-            push @tmp,  $name . join( $list_sep, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] );
-        }
-        else {
-            push @tmp, $name if defined $name;
-            push @tmp, join( "\n", map { ( ' ' x length $prefix ) . ( defined $_ ? $_ : '' ) } @{$available}[@$new_idx] ) if @{$available}[@$new_idx]; # prefix
-        }
+        if ( defined $opt->{sofar_begin} || defined $opt->{sofar_separator} || defined $opt->{sofar_end} ) {                        ####
+            my $sofar = $name;
+            $sofar .= $list_begin . join( $list_sep, @{$available}[@$new_idx] ) . $list_end if @{$available}[@$new_idx];
+            @tmp = ( $sofar );
+        }                                                                                                                           ####    29.01.2109
+        else {                                                                                                                      ####
+            if ( $fmt_chosen == 0 ) {                                                                                               ####    remove lines marked with ####
+                $name = '> ' if ! defined $name;                                                                                    ####
+                push @tmp,  $name . join( $list_sep, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] );                       ####    remove fmt_chosen in the documentation
+            }                                                                                                                       ####
+            else {                                                                                                                  ####
+                push @tmp, $name if defined $name;                                                                                  ####
+                push @tmp, join( "\n", map { ( ' ' x length $prefix ) . ( defined $_ ? $_ : '' ) } @{$available}[@$new_idx] ) if @{$available}[@$new_idx]; ####
+            }                                                                                                                       ####
+        }                                                                                                                           ####
         if ( length $prompt ) {
             push @tmp, $prompt;
         }
@@ -690,7 +700,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.069
+Version 0.070
 
 =cut
 
@@ -751,8 +761,6 @@ Values: 0,[1].
 prompt
 
 A string placed on top of the available choices.
-
-=item
 
 back
 
@@ -937,7 +945,10 @@ The optional second argument is a hash reference. The following options are avai
 
 =item
 
-fmt_chosen
+fmt_chosen DEPRECATED
+
+The option I<fmt_chosen> is deprecated; use the options I<sofar_begin>, I<sofar_separator> and I<sofar_end> to format
+the info-output.
 
 If I<fmt_chosen> is set to C<1>, each chosen item gets its own line in the output on the screen.
 
@@ -976,7 +987,7 @@ C<choose_a_subset> is called.
 
 name
 
-The value of I<name> is a string. It is placed in front of the chosen-subset-info-output.
+The value of I<name> is a string. It is placed in front of the subset-info-output.
 
 =item
 
@@ -992,8 +1003,8 @@ Values: 0,[1].
 
 prefix
 
-I<prefix> expects as its value a string. This string is put in front of the elements of the available list before
-printing. The chosen elements are returned without this I<prefix>.
+I<prefix> expects as its value a string. This string is put in front of the elements of the available list in the menu.
+The chosen elements are returned without this I<prefix>.
 
 The default value is "  " if the I<layout> is 3 else the default is the empty string ("").
 
@@ -1004,6 +1015,37 @@ remove_chosen
 If enabled, the chosen items are remove from the available choices.
 
 Values: 0,[1];
+
+=item
+
+sofar_begin
+
+The value of I<sofar_begin> is a string.
+
+Subset-info-output: I<sofar_begin> is placed between the I<name> string and the chosen elements as soon as an element
+has been chosen.
+
+Default: empty
+
+=item
+
+sofar_separator
+
+The value of I<sofar_separator> is a string.
+
+Subset-info-output: I<sofar_separator> is placed between the chosen list elements.
+
+Default: C< ,>
+
+=item
+
+sofar_end
+
+The value of I<sofar_end> is a string.
+
+Subset-info-output: as soon as elements have been chosen I<sofar_end> if placed at the end of the chosen elements.
+
+Default: empty
 
 =back
 

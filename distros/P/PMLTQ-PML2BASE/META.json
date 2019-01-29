@@ -1,0 +1,98 @@
+{
+   "abstract" : "Convert from PML to SQL",
+   "author" : [
+      "Petr Pajas <pajas@ufal.mff.cuni.cz>",
+      "Jan \u0160t\u011bp\u00e1nek <stepanek@ufal.mff.cuni.cz>",
+      "Michal Sedl\u00e1k <sedlak@ufal.mff.cuni.cz>",
+      "Maty\u00e1\u0161 Kopp <matyas.kopp@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PMLTQ-PML2BASE",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Treex::Core" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PMLTQ" : "v3.0.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PMLTQ::PML2BASE" : {
+         "file" : "lib/PMLTQ/PML2BASE.pm",
+         "version" : "v3.0.1"
+      },
+      "PMLTQ::PML2BASE::Relation::PDT::AEParentIterator" : {
+         "file" : "lib/PMLTQ/PML2BASE/Relation/PDT/AEParentIterator.pm",
+         "version" : "v3.0.1"
+      },
+      "PMLTQ::PML2BASE::Relation::PDT::ALexOrAuxRFIterator" : {
+         "file" : "lib/PMLTQ/PML2BASE/Relation/PDT/ALexOrAuxRFIterator.pm",
+         "version" : "v3.0.1"
+      },
+      "PMLTQ::PML2BASE::Relation::PDT::TEParentIterator" : {
+         "file" : "lib/PMLTQ/PML2BASE/Relation/PDT/TEParentIterator.pm",
+         "version" : "v3.0.1"
+      },
+      "PMLTQ::PML2BASE::Relation::Treex::AEParentCIterator" : {
+         "file" : "lib/PMLTQ/PML2BASE/Relation/Treex/AEParentCIterator.pm",
+         "version" : "v3.0.1"
+      },
+      "PMLTQ::PML2BASE::Relation::Treex::AEParentIterator" : {
+         "file" : "lib/PMLTQ/PML2BASE/Relation/Treex/AEParentIterator.pm",
+         "version" : "v3.0.1"
+      },
+      "PMLTQ::PML2BASE::Relation::Treex::TEParentIterator" : {
+         "file" : "lib/PMLTQ/PML2BASE/Relation/Treex/TEParentIterator.pm",
+         "version" : "v3.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ufal/pmltq-pml2base/issues"
+      },
+      "homepage" : "http://ufal.mff.cuni.cz/pmltq/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ufal/pmltq-pml2base.git",
+         "web" : "https://github.com/ufal/pmltq-pml2base"
+      }
+   },
+   "version" : "3.0.1",
+   "x_authority" : "cpan:MATY",
+   "x_authority_from_module" : "PMLTQ::PML2BASE",
+   "x_permissions_from_module" : "PMLTQ::PML2BASE",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

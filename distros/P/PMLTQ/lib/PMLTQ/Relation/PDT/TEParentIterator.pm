@@ -1,12 +1,11 @@
 package PMLTQ::Relation::PDT::TEParentIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::PDT::TEParentIterator::VERSION = '2.0.2';
+$PMLTQ::Relation::PDT::TEParentIterator::VERSION = '3.0.1';
 # ABSTRACT: Effective parent relation iterator on t-nodes for PDT like treebanks
 
 use strict;
 use warnings;
 use base qw(PMLTQ::Relation::SimpleListIterator);
-use PMLTQ::PML2BASE;
 use PMLTQ::Relation {
   name              => 'eparent',
   table_name        => 'tdata__#eparents',
@@ -21,6 +20,17 @@ use PMLTQ::Relation {
 };
 use PMLTQ::Relation::PDT;
 
+BEGIN {
+  {
+    local $@; # protect existing $@
+    eval {
+      require PMLTQ::PML2BASE::Relation::PDT::TEParentIterator;
+      PMLTQ::PML2BASE::Relation::PDT::TEParentIterator->import();
+    };
+    print STDERR "PMLTQ::PML2BASE::Relation::PDT::TEParentIterator is not installed\n" if $@;
+  }
+}
+
 sub get_node_list {
   my ($self, $node) = @_;
   my $type   = $node->type->get_base_type_name;
@@ -31,14 +41,7 @@ sub get_node_list {
 sub dump_relation {
   my ($tree,$hash,$fh)=@_;
 
-  my $name = $tree->type->get_schema->get_root_name;
-  die 'Trying dump relation eparent for incompatible schema' unless $name =~ /^tdata/;
-
-  for my $node ($tree->descendants) {
-    for my $p (PMLTQ::Relation::PDT::TGetEParents($node)) {
-      $fh->print(PMLTQ::PML2BASE::mkdump($hash->{$node}{'#idx'},$hash->{$p}{'#idx'}));
-    }
-  }
+  PMLTQ::PML2BASE::Relation::PDT::TEParentIterator::dump_relation($tree,$hash,$fh);
 }
 
 1;
@@ -55,7 +58,7 @@ PMLTQ::Relation::PDT::TEParentIterator - Effective parent relation iterator on t
 
 =head1 VERSION
 
-version 2.0.2
+version 3.0.1
 
 =head1 AUTHORS
 

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.048';
+our $VERSION = '2.049';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.048
+Version 2.049
 
 =cut
 
@@ -90,6 +90,8 @@ C<DBD::MariaDB> and C<DBD::Pg>. See L<App::DBBrowser::DB> how to write a databas
 
 =head1 NAVIGATION
 
+=head2 Menus
+
 =over
 
 =item *
@@ -114,11 +116,38 @@ To confirm a chosen menu item use the C<Return> key.
 In some sub-menus it is possible to select more then one item before C<Return> is pressed (for example I<Choose Rows>
 and I<Choose Columns> from the input filter - see L</Insert Into>); in such sub-menus the list of items marked with the
 C<SpaceBar> are added to the chosen items when C<Return> is pressed. If a mouse mode is enabled, it can be used the
-right mouse key instead of the C<SpaceBar>. A C<Ctrl-SpaceBar> inverts the made choices - so for example with no items
-chosen C<Ctrl-SpaceBar> chooses everything.
+right mouse key instead of the C<SpaceBar>. A C<Ctrl-SpaceBar> inverts the made choices - so for example to select all
+but one select the one with the C<SpaceBar> and then press C<Ctrl-SpaceBar>.
 
-To leave a "readline" in a C<WHERE> or a C<HAVING> substatement without entering anything enter the C<eof> control
-character (C<Ctrl-D> for *nix). Pressing only the C<Enter> key means entering an empty string.
+=head2 Read-line
+
+=over
+
+=item *
+
+C<BackSpace> or C<Strg-H> to delete the character behind the cursor, C<Delete> to delete  the  character at point.
+
+=item *
+
+C<Strg-U> to delete the text backward from the cursor to the beginning of the line, C<Strg-K> to delete the text from
+the cursor to the end of the line.
+
+=item *
+
+C<Right-Arrow> to move forward a character, C<Left-Arrow> to move back a character.
+
+=item *
+
+C<Up-Arrow> to move back 10 characters, C<Down-Arrow> to move forward 10 characters.
+
+=item *
+
+C<Home> or C<Strg-A> to move to the start of the line, C<End> or C<Strg-E> to move to the end of the line.
+
+=back
+
+To leave a C<read-line> without returning anything press C<Ctrl-D>. When the input puffer is empty and an C<Enter> is
+pressed, C<read-line> returns an empty string.
 
 =head1 OUTPUT
 
@@ -208,9 +237,9 @@ This entry is available if a C<SQLite> database has attached databases.
 
 Choosing a table leads to the I<SQL Menu>.
 
-=head3 From(SQ)
+=head3 Derived
 
-Choosing this entry allows one to enter a subquery instead of table name.
+Choosing this entry allows one to enter a subquery and use it as a table.
 
 This entry is available only if enabled in L</Subqueries>.
 
@@ -341,23 +370,7 @@ selected aggregate functions and the selected group-by columns.
 
 =head4 AGGREGATE
 
-=over
-
-=item AVG
-
-=item COUNT
-
-=item COUNT(*)
-
-=item GROUP_CONCAT / STRING_AGG
-
-=item MAX
-
-=item MIN
-
-=item SUM
-
-=back
+C<AVG>, C<COUNT>, C<COUNT(*)>, C<GROUP_CONCAT>/C<STRING_AGG>, C<MAX>, C<MIN>, C<SUM>
 
 =head4 DISTINCT
 
@@ -547,7 +560,8 @@ If set to I<None>, no menu extensions are available.
 
 If set to I<Func>, C<f()> is shown as additionally menu entry. Selecting C<f()> opens the L</Functions> menu.
 
-If set to I<SQ>, C<SQ> is shown as additionally menu entry. Selecting C<SQ> opens the L</Subqueries> menu.
+If set to I<SQ>, C<SQ> is shown as additionally menu entry. Selecting C<SQ> opens the L</Subqueries> menu. (In the
+table-, join- and union-menus C<Derived> is used instead of C<SQ>.)
 
 If set to I<=N>, C<=N> is shown as additionally menu entry (available only after the C<SET> in an C<UPDATE> statement).
 Selecting C<=N> sets the column to C<NULL>.

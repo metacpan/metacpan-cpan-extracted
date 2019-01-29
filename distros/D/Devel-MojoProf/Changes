@@ -1,0 +1,13 @@
+Revision history for perl distribution Devel-MojoProf
+
+0.02 2019-01-29T16:28:55+0900
+ - Changed "reporter" into an object
+ - Devel::MojoProf::Reporter can write a CSV file
+
+0.01 2019-01-29T13:44:21+0900
+ - Started project
+ - Add profiling for Mojo::UserAgent
+ - Add profiling for Mojo::Pg
+ - Add profiling for Mojo::Redis
+ - Add profiling for Mojo::SQLite
+ - Add profiling for Mojo::mysql

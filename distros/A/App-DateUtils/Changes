@@ -1,3 +1,8 @@
+0.120   2019-01-29 (PERLANCAR)
+
+	- Add backend module: Date::Parse.
+
+
 0.11    2017-01-09 (PERLANCAR)
 
 	- [Bugfix] Forgot to set result when parsing with DTF:Alami.

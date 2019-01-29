@@ -1,14 +1,58 @@
+NAME
 
+    Data::Validate::WithYAML::Plugin::Country - check whether a given value
+    is a valid country code
 
-This archive contains the distribution Data-Validate-WithYAML-Plugin-Country,
-version 0.02:
+VERSION
 
-  check whether a given value is a valid country code
+    version 0.03
 
-This software is Copyright (c) 2012 by Renee Baecker.
+SYNOPSIS
 
-This is free software, licensed under:
+    Your test.pl:
 
-  The Artistic License 2.0 (GPL Compatible)
+      use Data::Validate::WithYAML;
+      
+      my $validator = Data::Validate::WithYAML->new( 'validate.yml' );
+      my %params    = (
+          country => 'DE',
+          # more user input
+      );
+      my %errors = $validator->validate( \%params );
 
+    Your validate.yml:
+
+      ---
+      country:
+        type: required
+        plugin: Country
+        format: alpha-2
+        lang: en
+
+    Currently this module supports to formats: alpha-2 that are two-letter
+    country codes like 'DE', 'FR', etc. and alpha-3 that is the
+    three-letter code (e.g. DEU, FRA).
+
+    And it supports different languages so you use the country codes in
+    your preferred language (see Locale::Country::Multilingual).
+
+DESCRIPTION
+
+    Check if the given value is a valid country code.
+
+METHODS
+
+ check
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

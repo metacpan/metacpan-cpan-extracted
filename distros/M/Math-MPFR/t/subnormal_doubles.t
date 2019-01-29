@@ -22,7 +22,6 @@ if(
 
     my ($ok, $dmin, $inf) = (1, 2 ** - 1022, 99 ** (99 ** 99));
     my($exp, $sig, $val, $d, $nv);
-    my $ws = Rmpfr_init2($Math::MPFR::BITS);
 
     for my $it(1 .. 1500) {
       $exp = 300 + int(rand(30));
@@ -31,14 +30,14 @@ if(
 
       $val = "${sig}e${exp}";
       $d = atodouble($val);
-      $nv = atonv($ws, $val);
+      $nv = atonv($val);
 
       if(($d == $inf || $nv == $inf) && $d != $nv) {
         warn "\n $d != $nv\n";
         $ok = 0;
       }
 
-      if($Math::MPFR::BITS != 2098) { # Check that $d == $nv for all values
+      if($Math::MPFR::NV_properties{bits} != 2098) { # Check that $d == $nv for all values
         if($d != $nv) {
           warn "\n $d != $nv\n";
           $ok = 0;
@@ -60,7 +59,7 @@ if(
          Math::MPFR::_required_ldbl_mant_dig() == 2098 &&
          $exp <= -300) {
         my $prefix = "1" . ("0" x ($exp * -1));
-        my $nv = atonv($ws, $prefix . $val);
+        my $nv = atonv($prefix . $val);
 
         my $hex_dd = scalar reverse unpack "h*", pack "D<", $nv;
         my $hex_d  = scalar reverse unpack "h*", pack "d<", $d;
@@ -89,7 +88,7 @@ if(
 }
 else { # Not a double or double-double build
   print "1..1\n";
-  warn "\n Skipping tests: NV type ($Config::Config{nvtype} is neither\n  'double' nor double-double'\n";
+  warn "\n Skipping tests: NV type ( $Config::Config{nvtype} ) is neither\n  'double' nor double-double'\n";
   print "ok 1\n";
 }
 

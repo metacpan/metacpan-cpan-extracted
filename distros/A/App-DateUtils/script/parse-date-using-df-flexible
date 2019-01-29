@@ -1,0 +1,215 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/DateUtils/parse_date_using_df_flexible
+# and generated automatically using Perinci::CmdLine::Gen version 0.487
+
+our $DATE = '2019-01-29'; # DATE
+our $DIST = 'App-DateUtils'; # DIST
+our $VERSION = '0.120'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/DateUtils/parse_date_using_df_flexible",
+    program_name => "parse-date-using-df-flexible",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Parse date string(s) using DateTime::Format::Flexible
+# PODNAME: parse-date-using-df-flexible
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+parse-date-using-df-flexible - Parse date string(s) using DateTime::Format::Flexible
+
+=head1 VERSION
+
+This document describes version 0.120 of parse-date-using-df-flexible (from Perl distribution App-DateUtils), released on 2019-01-29.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % parse-date-using-df-flexible [options] <dates> ...
+
+Examples:
+
+ % parse-date-using-df-flexible '23rd Jun'
+ +----------------------------+----------+--------------+------------+---------------------+
+ | module                     | original | is_parseable | as_epoch   | as_datetime_obj     |
+ +----------------------------+----------+--------------+------------+---------------------+
+ | DateTime::Format::Flexible | 23rd Jun | 1            | 1561248000 | 2019-06-23T00:00:00 |
+ +----------------------------+----------+--------------+------------+---------------------+
+
+ % parse-date-using-df-flexible '23 Dez' --lang de
+ +--------------------------------+----------+--------------+------------+---------------------+
+ | module                         | original | is_parseable | as_epoch   | as_datetime_obj     |
+ +--------------------------------+----------+--------------+------------+---------------------+
+ | DateTime::Format::Flexible(de) | 23 Dez   | 1            | 1577059200 | 2019-12-23T00:00:00 |
+ +--------------------------------+----------+--------------+------------+---------------------+
+
+ % parse-date-using-df-flexible foo
+ +----------------------------+----------+--------------+------------------------------------------------------------------------------------------------------------------------------+
+ | module                     | original | is_parseable | error_msg                                                                                                                    |
+ +----------------------------+----------+--------------+------------------------------------------------------------------------------------------------------------------------------+
+ | DateTime::Format::Flexible | foo      | 0            | Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Perinci/CmdLine/POD.pm line 480.  |
+ +----------------------------+----------+--------------+------------------------------------------------------------------------------------------------------------------------------+
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--date>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--dates-json>=I<s>
+
+See C<--date>.
+
+=item B<--lang>=I<s>
+
+Default value:
+
+ "en"
+
+Valid values:
+
+ ["de","en","es"]
+
+=item B<--time-zone>=I<s>, B<--timezone>
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C parse-date-using-df-flexible parse-date-using-df-flexible
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete parse-date-using-df-flexible 'p/*/`parse-date-using-df-flexible`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-DateUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-DateUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DateUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

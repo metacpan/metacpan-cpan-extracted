@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.238';
+  $VERSION = '0.239';
   @ISA     = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -1006,8 +1006,6 @@ L<Term::ExtendedColor::Xresources>, L<Term::ExtendedColor::TTY>, L<Term::ANSICol
 =head1 CONTRIBUTORS
 
 L<Varadinsky|https://github.com/Varadinsky>
-
-None required yet.
 
 =head1 COPYRIGHT
 

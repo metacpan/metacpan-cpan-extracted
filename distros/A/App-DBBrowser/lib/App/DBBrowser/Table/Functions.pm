@@ -82,7 +82,7 @@ sub __choose_columns {
         # Choose
         return choose_a_subset(
             $cols,
-            { layout => 1, name => $function . ': ', list_separator => ',',
+            { layout => 1, name => $function . ': ', sofar_separator => ',',
               mouse => $sf->{o}{table}{mouse}, remove_chosen => 0 }
         );
     }

@@ -2,7 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
 
 use Test::More;
 
@@ -13,23 +13,25 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/dateconv',
-    'bin/durconv',
-    'bin/parse-date',
-    'bin/parse-date-using-df-alami-en',
-    'bin/parse-date-using-df-alami-id',
-    'bin/parse-date-using-df-flexible',
-    'bin/parse-date-using-df-natural',
-    'bin/parse-duration',
-    'bin/parse-duration-using-df-alami-en',
-    'bin/parse-duration-using-df-alami-id',
-    'bin/parse-duration-using-df-natural',
-    'bin/parse-duration-using-td-parse'
+    'script/dateconv',
+    'script/durconv',
+    'script/parse-date',
+    'script/parse-date-using-df-alami-en',
+    'script/parse-date-using-df-alami-id',
+    'script/parse-date-using-df-flexible',
+    'script/parse-date-using-df-natural',
+    'script/parse-duration',
+    'script/parse-duration-using-df-alami-en',
+    'script/parse-duration-using-df-alami-id',
+    'script/parse-duration-using-df-natural',
+    'script/parse-duration-using-td-parse'
 );
 
 # no fake home requested
 
-my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
+my @switches = (
+    -d 'blib' ? '-Mblib' : '-Ilib',
+);
 
 use File::Spec;
 use IPC::Open3;
@@ -43,7 +45,11 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-e', "require q[$lib]"))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
@@ -65,11 +71,15 @@ foreach my $file (@scripts)
     my $line = <$fh>;
 
     close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
-    my @flags = $1 ? split(' ', $1) : ();
+    @switches = (@switches, split(' ', $1)) if $1;
 
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, @flags, '-c', $file);
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-c', $file))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-c', $file);
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);

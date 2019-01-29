@@ -77,8 +77,8 @@ sub defaults {
             codepage_mapping  => 0, # not an option, always 0
             color             => 0,
             decimal_separator => '.',
-            grid              => 0,
-            keep_header       => 0,
+            grid              => 1,
+            keep_header       => 1,
             min_col_width     => 30,
             mouse             => 0,
             progress_bar      => 40_000,

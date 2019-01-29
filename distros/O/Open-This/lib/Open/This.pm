@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -198,11 +198,11 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000014
+version 0.000015
 
 =head1 DESCRIPTION
 
-This module powers the C<ot> command line script, which tries to do the right
+This module powers the L<ot> command line script, which tries to do the right
 thing when opening a file.  Imagine your C<$ENV{EDITOR}> is set to C<vim>.
 (This should also work for C<emacs> and C<nano>.)  The following examples
 demonstrate how your input is translated when launching your editor.

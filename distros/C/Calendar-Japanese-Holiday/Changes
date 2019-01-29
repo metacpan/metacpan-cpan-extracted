@@ -1,5 +1,11 @@
 Revision history for Perl extension Calendar::Japanese::Holiday.
 
+0.06  Tue Jan 29 2019
+	Supported passing string as argument.
+
+	Ex.
+	isHoliday('2019', '01', '14')
+
 0.05  Sat Jan 19 2019
 	Supported 2019-2021 years
 

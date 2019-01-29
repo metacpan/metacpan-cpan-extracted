@@ -1,6 +1,6 @@
 package WWW::Google::Places::Geometry;
 
-$WWW::Google::Places::Geometry::VERSION   = '0.34';
+$WWW::Google::Places::Geometry::VERSION   = '0.35';
 $WWW::Google::Places::Geometry::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::Places::Geometry - Placeholder for 'geometry' of WWW::Google::Place
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 

@@ -21,11 +21,11 @@ our @EXPORT_LIST = qw(
     shifts      unshifts  once
 );
 our @EXPORT_OK                 = @EXPORT_LIST;
-our $VERSION                   = '0.39';
+our $VERSION                   = '0.40';
 use constant ARG_PLACE_HOLDER => {};
 
 _wrap_to_use_partials(
-    grep { $_ !~ /flow|flow_right|partial|chain|range/ } @EXPORT_LIST
+    grep { $_ !~ /flow|flow_right|partial|chain/ } @EXPORT_LIST
 );
 
 # -----------------------------------------------------------------------------#
@@ -295,6 +295,8 @@ sub for_each {
         $idx++;
         $fn->($val, $idx - 1, $coll);
     }
+
+    return undef;
 }
 
 sub is_empty {

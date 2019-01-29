@@ -4,11 +4,11 @@ Open::This - Try to Do the Right Thing when opening files
 
 # VERSION
 
-version 0.000014
+version 0.000015
 
 # DESCRIPTION
 
-This module powers the `ot` command line script, which tries to do the right
+This module powers the [ot](https://metacpan.org/pod/ot) command line script, which tries to do the right
 thing when opening a file.  Imagine your `$ENV{EDITOR}` is set to `vim`.
 (This should also work for `emacs` and `nano`.)  The following examples
 demonstrate how your input is translated when launching your editor.

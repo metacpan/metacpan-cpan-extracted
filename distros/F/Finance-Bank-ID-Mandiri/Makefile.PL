@@ -21,7 +21,8 @@ my %WriteMakefileArgs = (
     "Finance::Bank::ID::Base" => "0.28",
     "HTTP::Headers" => 0,
     "HTTP::Headers::Patch::DontUseStorable" => "0.03",
-    "Moo" => 0
+    "Moo" => 0,
+    "Parse::Number::EN" => 0
   },
   "TEST_REQUIRES" => {
     "File::Slurper" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.37",
+  "VERSION" => "0.381",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Moo" => 0,
+  "Parse::Number::EN" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

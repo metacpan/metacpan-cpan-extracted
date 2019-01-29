@@ -1,6 +1,6 @@
 package PMLTQ::Relation::PDT;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::PDT::VERSION = '2.0.2';
+$PMLTQ::Relation::PDT::VERSION = '3.0.1';
 # ABSTRACT: PDT user defined relations
 
 use warnings;
@@ -239,7 +239,7 @@ PMLTQ::Relation::PDT - PDT user defined relations
 
 =head1 VERSION
 
-version 2.0.2
+version 3.0.1
 
 =over 5
 

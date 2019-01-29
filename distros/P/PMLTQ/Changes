@@ -1,5 +1,20 @@
 Revision history for PMLTQ
 
+3.0.1
+ - Released: 2019-01-29 06:23:15 UTC
+
+ [BUG FIXES]
+ - move PML2BASE to independent cpan module PMLTQ::PML2BASE
+
+3.0.0
+ - Released: 2019-01-28 15:50:11 UTC
+
+ [API CHANGES]
+ - move PML2BASE to independent cpan module PMLTQ::PML2BASE
+
+ [STATISTICS]
+ - code churn: 3 files changed, 105 insertions(+), 1 deletion(-)
+
 2.0.2
  - Released: 2019-01-10 10:18:09 UTC
 

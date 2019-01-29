@@ -11,3 +11,5 @@ perl Makefile.PL
 make
 make test
 make install
+
+Or use your preferred CPAN tool: CPAN shell or cpanm.

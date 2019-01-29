@@ -7,9 +7,8 @@ use 5.008003;
 
 use List::Util qw( any );
 
-use Term::Choose       qw( choose );
-use Term::Choose::Util qw( choose_a_subset );
-use Term::Form         qw();
+use Term::Choose qw( choose );
+use Term::Form   qw();
 
 use App::DBBrowser::Auxil;
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.048';
+our $VERSION = '2.049';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -401,7 +401,7 @@ sub run {
 
                 TABLE: while ( 1 ) {
 
-                    my ( $join, $union, $from_subquery, $db_setting ) = ( '  Join', '  Union', '  From(SQ)', '  DB settings' );
+                    my ( $join, $union, $from_subquery, $db_setting ) = ( '  Join', '  Union', '  Derived', '  DB settings' );
                     my $hidden = $db_string;
                     my $table;
                     if ( $sf->{redo_table} ) {
@@ -697,7 +697,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.048
+Version 2.049
 
 =head1 DESCRIPTION
 

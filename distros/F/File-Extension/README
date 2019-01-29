@@ -1,0 +1,80 @@
+NAME
+    File::Extension - explain file extensions
+
+SYNOPSIS
+          use File::Extension qw(extplain filter_by_meta filter_by_meta_reverse);
+
+          my @filetypes = qw(nes pl pm gb p6);
+
+          for my $what(@filetypes) {
+            printf("%s is a %s\n", $what, extplain($what));
+          }
+
+          my $document_extensions = filter_by_meta('doc');
+
+DESCRIPTION
+    File::Extension exposes functionality for getting information on
+    filetypes based solely on their file extension.
+
+    This is useful in cases where libmagic doesn't work, i.e on empty or
+    corrupted files.
+
+    The extensions and descriptions are taken from <http://fileinfo.com>.
+
+EXPORTS
+    None by default.
+
+FUNCTIONS
+  extplain()
+    Parameters: $file_extension
+
+    Returns: $explanation
+
+      my $explanation = extplain('nes'); # Nintendo (NES) ROM File
+
+  filter_by_meta()
+    Parameters: $filter
+
+    Returns: \%filtered
+
+      my $results = filter_by_meta('doc');
+
+    Filters the hash by a raw string or regular expression, returning the
+    results.
+
+  filter_by_meta_reverse()
+    Parameters: $filter
+
+    Returns: \%filtered
+
+      my $results = filter_by_meta_reverse('doc');
+
+    Like filter_by_meta(), but returns the results that does not match the
+    given filter.
+
+HISTORY
+    This module was initially crafted while exploring ideas for generating
+    the world's largest LS_COLORS file:
+
+    github <https://github.com/trapd00r/LS_COLORS/issues/112>
+
+SEE ALSO
+    LS_COLORS <https://github.com/trapd00r/LS_COLORS>
+
+AUTHOR
+      Magnus Woldrich
+      CPAN ID: WOLDRICH
+      m@japh.se
+      http://japh.se
+
+CONTRIBUTORS
+    None required yet.
+
+COPYRIGHT
+    Copyright 2018 the File::Extensions "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+

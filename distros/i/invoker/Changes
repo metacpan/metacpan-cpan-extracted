@@ -1,5 +1,8 @@
 Revision history for Perl extension invoker
 
+0.35
+        - make it work with perl-5.26.
+
 0.34      Mon Feb 18 10:34:46 CST 2013
         - dist fixes
 

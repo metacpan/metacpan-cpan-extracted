@@ -1,3 +1,8 @@
+4.07
+ - Alter the way that atonv() is called.
+ - Fix bug in t/atonv.t. (Thanks Dana Jacobsen)
+ - Add nvtoa()
+
 4.06
  - Fix bug (https://bugs.debian.org/918673) in t/subnormal_doubles.t
 

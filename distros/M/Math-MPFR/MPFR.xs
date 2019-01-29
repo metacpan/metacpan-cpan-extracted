@@ -2646,6 +2646,9 @@ SV * Rmpfr_cot(pTHX_ mpfr_t * a, mpfr_t * b, SV * round) {
 
 SV * Rmpfr_root(pTHX_ mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
      CHECK_ROUNDING_VALUE
+#if MPFR_VERSION_MAJOR >= 4
+     warn("Rmpfr_root is deprecated - use Rmpfr_rootn_ui instead");
+#endif
      return newSViv(mpfr_root(*a, *b, (unsigned long)SvUV(c), (mpfr_rnd_t)SvUV(round)));
 }
 
@@ -6235,6 +6238,9 @@ SV * Rmpfr_z_sub(pTHX_ mpfr_t * rop, mpz_t * op1, mpfr_t * op2, SV * round) {
 }
 
 SV * Rmpfr_grandom(pTHX_ mpfr_t * rop1, mpfr_t * rop2, gmp_randstate_t * state, SV * round) {
+#if MPFR_VERSION_MAJOR >= 4
+     warn("Rmpfr_grandom is deprecated - use Rmpfr_nrandom instead");
+#endif
 #if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
      return newSViv(mpfr_grandom(*rop1, *rop2, *state, (mpfr_rnd_t)SvUV(round)));
 #else
@@ -7804,17 +7810,17 @@ double atodouble(char * str) {
 #endif
 }
 
-SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
+SV * atonv(pTHX_ SV * str) {
 
 
 #if defined(MPFR_VERSION) & MPFR_VERSION > 196869
-
+    mpfr_t workspace;
 #if defined(NV_IS_DOUBLE) || LDBL_MANT_DIG == 53        /* D */
     mpfr_prec_t emin, emax;
     int inex;
+    double ret;
 
-    if(mpfr_get_prec(*workspace) != 53)
-      croak ("Precision of first arg to atonv function must be 53");
+    mpfr_init2(workspace, 53);
 
     emin = mpfr_get_emin();
     emax = mpfr_get_emax();
@@ -7822,13 +7828,16 @@ SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
     mpfr_set_emin(-1073);
     mpfr_set_emax(1024);
 
-    inex = mpfr_strtofr(*workspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
-    mpfr_subnormalize(*workspace, inex, GMP_RNDN);
+    inex = mpfr_strtofr(workspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
+    mpfr_subnormalize(workspace, inex, GMP_RNDN);
 
     mpfr_set_emin(emin);
     mpfr_set_emax(emax);
 
-    return newSVnv(mpfr_get_d(*workspace, GMP_RNDN));
+    ret = mpfr_get_d(workspace, GMP_RNDN);
+    mpfr_clear(workspace);
+
+    return newSVnv(ret);
 
 #endif                                                  /* close D */
 
@@ -7837,9 +7846,9 @@ SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
 
     mpfr_prec_t emin, emax;
     int inex;
+    long double ret;
 
-    if(mpfr_get_prec(*workspace) != 64)
-      croak ("Precision of first arg to atonv function must be 64");
+    mpfr_init2(workspace, 64);
 
     emin = mpfr_get_emin();
     emax = mpfr_get_emax();
@@ -7847,13 +7856,16 @@ SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
     mpfr_set_emin(-16444);
     mpfr_set_emax(16384);
 
-    inex = mpfr_strtofr(*workspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
-    mpfr_subnormalize(*workspace, inex, GMP_RNDN);
+    inex = mpfr_strtofr(workspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
+    mpfr_subnormalize(workspace, inex, GMP_RNDN);
 
     mpfr_set_emin(emin);
     mpfr_set_emax(emax);
 
-    return newSVnv(mpfr_get_ld(*workspace, GMP_RNDN));
+    ret = mpfr_get_ld(workspace, GMP_RNDN);
+    mpfr_clear(workspace);
+
+    return newSVnv(ret);
 
 #endif
 
@@ -7861,9 +7873,9 @@ SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
 
     mpfr_prec_t emin, emax;
     int inex;
+    long double ret;
 
-    if(mpfr_get_prec(*workspace) != 113)
-      croak ("Precision of first arg to atonv function must be 113");
+    mpfr_init2(workspace, 113);
 
     emin = mpfr_get_emin();
     emax = mpfr_get_emax();
@@ -7871,13 +7883,16 @@ SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
     mpfr_set_emin(-16493);
     mpfr_set_emax(16384);
 
-    inex = mpfr_strtofr(*workspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
-    mpfr_subnormalize(*workspace, inex, GMP_RNDN);
+    inex = mpfr_strtofr(workspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
+    mpfr_subnormalize(workspace, inex, GMP_RNDN);
 
     mpfr_set_emin(emin);
     mpfr_set_emax(emax);
 
-    return newSVnv(mpfr_get_ld(*workspace, GMP_RNDN));
+    ret = mpfr_get_ld(workspace, GMP_RNDN);
+    mpfr_clear(workspace);
+
+    return newSVnv(ret);
 
 #endif
 
@@ -7889,9 +7904,7 @@ SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
     int inex;
     long double ret;
 
-    if(mpfr_get_prec(*workspace) != 2098)
-      croak ("Precision of first arg to atonv function must be 2098");
-
+    mpfr_init2(workspace, 2098);
     mpfr_init2(dspace, 53);
 
     emin = mpfr_get_emin();
@@ -7912,12 +7925,13 @@ SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
       return newSVnv(msd);
     }
 
-    mpfr_strtofr(*workspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
-    inex = mpfr_sub(dspace, *workspace, dspace, GMP_RNDN);
+    mpfr_strtofr(workspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
+    inex = mpfr_sub(dspace, workspace, dspace, GMP_RNDN);
     mpfr_subnormalize(dspace, inex, GMP_RNDN);
     lsd = mpfr_get_d(dspace, GMP_RNDN);
 
     mpfr_clear(dspace);
+    mpfr_clear(workspace);
 
     mpfr_set_emin(emin); /* restore to original value */
     mpfr_set_emax(emax); /* restore to original value */
@@ -7932,9 +7946,9 @@ SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
 
     mpfr_prec_t emin, emax;
     int inex;
+    __float128 ret;
 
-    if(mpfr_get_prec(*workspace) != 113)
-      croak ("Precision of first arg to atonv function must be 113");
+    mpfr_init2(workspace, 113);
 
     emin = mpfr_get_emin();
     emax = mpfr_get_emax();
@@ -7942,13 +7956,15 @@ SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
     mpfr_set_emin(-16493);
     mpfr_set_emax(16384);
 
-    inex = mpfr_strtofr(*workspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
-    mpfr_subnormalize(*workspace, inex, GMP_RNDN);
+    inex = mpfr_strtofr(workspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
+    mpfr_subnormalize(workspace, inex, GMP_RNDN);
 
     mpfr_set_emin(emin);
     mpfr_set_emax(emax);
 
-    return newSVnv(mpfr_get_float128(*workspace, GMP_RNDN));
+    ret = mpfr_get_float128(workspace, GMP_RNDN);
+    mpfr_clear(workspace);
+    return newSVnv(ret);
 
 #else
     croak("The atonv function is unavailable for this __float128 build of perl\n");
@@ -8010,6 +8026,307 @@ SV * Rmpfr_dot(pTHX_ mpfr_t * rop, SV * avref_A, SV * avref_B, SV * len, SV * ro
     croak("The Rmpfr_dot function requires mpfr-4.1.0 or later");
 #endif
 }
+
+/* _nvtoa function is adapted from p120 of  "How to Print Floating-Point Numbers Accurately" */
+/* by Guy L. Steele Jr and Jon L. White                                               */
+
+void _nvtoa(pTHX_ SV * pnv, NV nv_max, NV normal_min, int min_pow, int b, int max_dig) {
+
+#if MPFR_VERSION_MAJOR < 4
+  croak("nvtoa function requires version 4.0 or later of the mpfr library - this is only %s", MPFR_VERSION_STRING);
+#else
+  dXSARGS;
+  int subnormal_prec_adjustment, exp_init;
+  int k, k_start, len;
+  int bits = b, is_subnormal = 0, shift1, shift2, inex, further_adjustment, low, high, cmp;
+  unsigned long u;
+  mpfr_prec_t e;
+  NV nv;
+  mpfr_t ws;
+  mpz_t R, S, M_minus, M_plus, LHS, TMP;
+  mpq_t Q, QT;
+#if REQUIRED_LDBL_MANT_DIG == 2098
+  void *nvptr = &nv; /* The NV, not the SV */
+  unsigned long msd_exp, lsd_exp;
+#endif
+
+  char *f, *out;
+
+  nv = SvNV(pnv);
+
+  if(nv <= 0) {
+    if(nv < 0) croak("Passing of negative values to _nvtoa XSub is not allowed");
+    ST(0) = sv_2mortal(newSVpv("0.0", 0));
+    XSRETURN(1);
+  }
+
+  if(nv != nv) {
+    ST(0) = sv_2mortal(newSVpv("NaN", 0));
+    XSRETURN(1);
+  }
+
+  if(nv > nv_max) {
+    ST(0) = sv_2mortal(newSVpv("Inf", 0));
+    XSRETURN(1);
+  }
+
+  mpfr_init2(ws, bits);
+  mpz_init(R);
+  mpz_init(S);
+  mpz_init(M_plus);
+  mpz_init(M_minus);
+  mpz_init(LHS);
+  mpz_init(TMP);
+  mpq_init(Q);
+  mpq_init(QT);
+
+  Newxz(f, bits + 8, char);
+  if(f == NULL) croak("Failed to allocate memory near start of _nvtoa XSub");
+
+  if(nv < normal_min) {
+    is_subnormal = 1;
+#if REQUIRED_LDBL_MANT_DIG == 2098
+    bits = 53;
+#endif
+    mpfr_set_prec(ws, bits);
+    Rmpfr_set_NV(aTHX_ &ws, pnv, GMP_RNDN);
+
+    exp_init = mpfr_get_exp(ws);
+    subnormal_prec_adjustment = bits - (exp_init - min_pow);
+    bits -= subnormal_prec_adjustment;
+  }
+
+#if REQUIRED_LDBL_MANT_DIG == 2098
+#ifdef MPFR_HAVE_BENDIAN                   /* Big Endian architecture */
+
+    if(!is_subnormal) {
+      msd_exp = ((unsigned char *)nvptr)[0];
+      msd_exp <<= 4;
+      bits = ((unsigned char *)nvptr)[1];
+      bits >>= 4;
+      msd_exp += bits;
+      if(msd_exp > 2047) msd_exp -= 2048;
+      if(msd_exp == 0) msd_exp = -1022;
+      else msd_exp -= 1023;
+
+      lsd_exp = ((unsigned char *)nvptr)[8];
+      lsd_exp <<= 4;
+      bits = ((unsigned char *)nvptr)[9];
+      bits >>= 4;
+      lsd_exp += bits;
+      if(lsd_exp > 2047) lsd_exp -= 2048;
+      if(lsd_exp == 0) lsd_exp = -1022;
+      else lsd_exp -= 1023;
+
+      bits = 53 + msd_exp - lsd_exp;
+      if(lsd_exp < -1022) bits += (lsd_exp + 1022); /* reduce "bits" because lsd is subnormal */
+      if(bits < 53) croak ("Bad calculation of bitsize");
+    }
+
+#else                                     /* Little Endian architecture */
+
+    if(!is_subnormal) {
+      msd_exp = ((unsigned char *)nvptr)[15];
+      msd_exp <<= 4;
+      bits = ((unsigned char *)nvptr)[14];
+      bits >>= 4;
+      msd_exp += bits;
+      if(msd_exp > 2047) msd_exp -= 2048;
+      if(msd_exp == 0) msd_exp = -1022;
+      else msd_exp -= 1023;
+
+      lsd_exp = ((unsigned char *)nvptr)[7];
+      lsd_exp <<= 4;
+      bits = ((unsigned char *)nvptr)[6];
+      bits >>= 4;
+      lsd_exp += bits;
+      if(lsd_exp > 2047) lsd_exp -= 2048;
+      if(lsd_exp == 0) lsd_exp = -1022;
+      else lsd_exp -= 1023;
+
+      bits = 53 + msd_exp - lsd_exp;
+      if(lsd_exp < -1022) bits += (lsd_exp + 1022); /* reduce "bits" because lsd is subnormal */
+      if(bits < 53) croak ("Bad calculation of bitsize");
+    }
+
+#endif
+#endif
+
+  mpfr_set_prec(ws, bits);
+  Rmpfr_set_NV(aTHX_ &ws, pnv, GMP_RNDN);
+
+  mpfr_get_str(f, &e, 2, bits, ws, GMP_RNDN);
+  mpz_set_str(R, f, 2);
+  mpz_set(TMP, R);
+
+  if(mpz_cmp_ui(R, 0) < 1) croak("Negative value in _nvtoa XSub is not allowed");
+  mpz_set_ui(S, 1);
+
+  shift1 = e - bits > 0 ? e - bits : 0;
+  shift2 = shift1       ? 0 : -(e - bits);
+
+  mpz_mul_2exp(R, R, shift1);
+  mpz_mul_2exp(S, S, shift2);
+
+  mpq_set_z(Q, R);
+  mpq_div_2exp(Q, Q, shift2);
+
+  mpfr_set_q(ws, Q, GMP_RNDN);
+
+  mpz_set_ui(M_minus, 1);
+  mpz_mul_2exp(M_minus, M_minus, shift1);
+  mpz_set(M_plus, M_minus);
+
+  /*************** simple_fixup() **************/
+
+  if(!is_subnormal) {
+    mpz_set_ui(LHS, 1);
+    mpz_mul_2exp(LHS, LHS, bits - 1);
+    if(!mpz_cmp(LHS, TMP)) {
+      mpz_mul_2exp(M_plus, M_plus, 1);
+      mpz_mul_2exp(R,      R,      1);
+      mpz_mul_2exp(S,      S,      1);
+    }
+  }
+
+  k = 0;
+
+  while(1) {
+
+    mpq_set_z(Q, S);
+    mpq_set_ui(QT, 10, 1);
+    mpq_div(Q, Q, QT);
+
+    inex = mpfr_set_q(ws, Q, GMP_RNDN);
+
+    further_adjustment = 0;
+
+    if(inex < 0 && mpfr_integer_p(ws)) {
+      further_adjustment++;
+    }
+    else {
+      mpfr_ceil(ws, ws);
+    }
+
+    mpfr_add_ui(ws, ws, 1, GMP_RNDN);
+
+    if(mpfr_cmp_z(ws, R) <= 0) break;
+
+    k--;
+    mpz_mul_ui(R, R, 10);
+    mpz_mul_ui(M_minus, M_minus, 10);
+    mpz_mul_ui(M_plus, M_plus, 10);
+  }                                   /* close first while loop */
+
+  while(1) {
+    mpz_mul_2exp(LHS, R, 1);
+    mpz_add(LHS, LHS, M_plus);
+    mpz_mul_2exp(TMP, S, 1);
+
+    if(mpz_cmp(LHS, TMP) < 0) break;
+
+    mpz_mul_ui(S, S, 10);
+    k++;
+  }                                 /* close second while loop */
+
+  /*********************************************/
+
+  k_start = k;
+
+  Newxz(out, max_dig + 8, char);
+  if(out == NULL) croak("Failed to allocate memory for output string in _nvtoa XSub");
+
+  while(1) {
+
+    k--;
+    mpz_mul_ui(TMP, R, 10);
+    mpq_set_z(Q, TMP);
+    mpq_set_z(QT, S);
+    mpq_div(Q, Q, QT);
+
+    inex = mpfr_set_q(ws, Q, GMP_RNDN);
+
+    further_adjustment = 0;
+
+
+    if(inex > 0 && mpfr_integer_p(ws)) {
+      further_adjustment++;
+    }
+    else {
+      mpfr_floor(ws, ws);
+    }
+
+    u = mpfr_get_ui(ws, GMP_RNDN);
+    u -= further_adjustment;
+
+    mpz_mul_ui(TMP, R, 10);
+    mpz_mod(R, TMP, S);
+    mpz_mul_ui(M_minus, M_minus, 10);
+    mpz_mul_ui(M_plus, M_plus, 10);
+
+    mpz_mul_2exp(LHS, R, 1);
+
+    cmp = mpz_cmp(LHS, M_minus);
+
+    len = strlen(f);
+
+    if(!cmp && f[len - 1] == '0' && !is_subnormal) {
+      low = 1;
+    }
+    else {
+      low = cmp < 0 ? 1 : 0;
+    }
+
+    mpz_mul_2exp(TMP, S, 1);
+    mpz_sub(TMP, TMP, M_plus);
+
+    cmp = mpz_cmp(LHS, TMP);
+
+    if(!cmp && f[len - 1] == '0' && !is_subnormal) {
+      high = 1;
+    }
+    else {
+      high = cmp > 0 ? 1 : 0;
+    }
+
+    if(!(!low && !high)) break;
+
+    out[k_start - k - 1] = 48 + u;
+
+  }                                   /* close while loop */
+
+  Safefree(f);
+
+  if(low && !high) out[k_start - k - 1] = 48 + u;
+  if(!low && high) out[k_start - k - 1] = 49 + u;
+  if(low && high) {
+    mpz_mul_2exp(LHS, R, 1);
+    cmp = mpz_cmp(LHS, S);
+    if(cmp < 0)    out[k_start - k - 1] = 48 + u;
+    if(cmp > 0)    out[k_start - k - 1] = 49 + u;
+    if(cmp == 0) {
+      if(u & 1)    out[k_start - k - 1] = 49 + u;
+      else         out[k_start - k - 1] = 48 + u;
+    }
+  }
+
+  mpfr_clear(ws);
+  mpz_clear(R);
+  mpz_clear(S);
+  mpz_clear(M_plus);
+  mpz_clear(M_minus);
+  mpz_clear(LHS);
+  mpz_clear(TMP);
+  mpq_clear(Q);
+  mpq_clear(QT);
+
+  ST(0) = sv_2mortal(newSVpv(out, 0));
+  Safefree(out);
+  ST(1) = sv_2mortal(newSViv(k));
+  XSRETURN(2);
+#endif
+}
+
 
 
 
@@ -12392,11 +12709,10 @@ atodouble (str)
 	char *	str
 
 SV *
-atonv (workspace, str)
-	mpfr_t *	workspace
+atonv (str)
 	SV *	str
 CODE:
-  RETVAL = atonv (aTHX_ workspace, str);
+  RETVAL = atonv (aTHX_ str);
 OUTPUT:  RETVAL
 
 SV *
@@ -12417,4 +12733,25 @@ Rmpfr_dot (rop, avref_A, avref_B, len, round)
 CODE:
   RETVAL = Rmpfr_dot (aTHX_ rop, avref_A, avref_B, len, round);
 OUTPUT:  RETVAL
+
+void
+_nvtoa (pnv, nv_max, normal_min, min_pow, b, max_dig)
+	SV *	pnv
+	NV	nv_max
+	NV	normal_min
+	int	min_pow
+	int	b
+	int	max_dig
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        _nvtoa(aTHX_ pnv, nv_max, normal_min, min_pow, b, max_dig);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 

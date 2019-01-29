@@ -18,8 +18,8 @@ no_index:
     - t
     - inc
 requires:
-  Math::MPFR: '4.03'
+  Math::MPFR: '4.07'
 resources:
   repository: https://github.com/sisyphus/math-nv.git
-version: '2.0'
+version: '2.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

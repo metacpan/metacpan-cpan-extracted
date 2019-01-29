@@ -1690,21 +1690,28 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Sets the $nv to the value of the double that's represented by
     the string $str.
     If $Config{nvtype} is double, it therefore returns the same
-    value as atonv - though it is less efficient than atonv().
+    value as atonv.
 
-   $nv = atonv($ws, $str); # $ws is a Math::MPFR object.
-                           # Needs mpfr-3.1.6 or later
+   $nv = atonv($str); # Needs mpfr-3.1.6 or later
     Sets $nv to the NV value represented by the string $str.
-    $ws needs to be initialized (once only) with a precision of
-    $Math::MPFR::BITS - after which atonv() can be called repeatedly
-    without incurring the overhead of having to repeatedly create the
-    Math::MPFR object that it needs. Ie:
+    NOTE: ORIGINALLY TOOK 2 ARGUMENTS - NOW TAKES ONLY 1.
 
-     my $ws = Rmpfr_init2($Math::MPFR::BITS);
-     for(@strings) {
-        $nv = atonv($ws, $_);
-        ... # Do stuff
-     }
+   $str = nvtoa($nv);
+    Requires at least version 4.0 of the mpfr library.
+    Sets $str to the value of $nv.
+    $str will appear in standard decimal format, containing the
+    *minimum* number of digits such that the condition ($str == $nv)
+    is true.
+    NOTE 1: Perl versions prior to 5.29.4, or subsequent versions that
+            don't define $Config{d_strtod} (or, respectively,
+            $Config{d_strtold} for-Duselongdouble builds) are buggy in
+            their assignment of values to the NV. The nvtoa() function
+            looks only at the value that was passed to it - which,
+            with such buggy perls, may differ from the intended value.
+            When it matters, assign with atonv().
+    NOTE 2: Be wary of values assigned by perl to double-double NVs,
+            irrespective of the perl version.
+            When it matters, assign with atonv().
 
    $MPFR_version = Rmpfr_get_version();
     Returns the version of the MPFR library (eg 2.1.0) being used by

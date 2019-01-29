@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 
 
-our $VERSION = '0.030';
+our $VERSION = '0.034';
 
 # populated in BEGIN block
 my %ext;
@@ -8423,7 +8423,6 @@ Returns:    $explanation
 
   my $explanation = extplain('nes'); # Nintendo (NES) ROM File
 
-
 =head2 filter_by_meta()
 
 Parameters: $filter
@@ -8433,7 +8432,6 @@ Returns:    \%filtered
   my $results = filter_by_meta('doc');
 
 Filters the hash by a raw string or regular expression, returning the results.
-
 
 =head2 filter_by_meta_reverse()
 
@@ -8451,11 +8449,11 @@ given filter.
 This module was initially crafted while exploring ideas for generating
 the world's largest LS_COLORS file:
 
-L</https://github.com/trapd00r/LS_COLORS/issues/112>
+L<github|https://github.com/trapd00r/LS_COLORS/issues/112>
 
 =head1 SEE ALSO
 
-L<https://github.com/trapd00r/LS_COLORS>
+L<LS_COLORS|https://github.com/trapd00r/LS_COLORS>
 
 =head1 AUTHOR
 

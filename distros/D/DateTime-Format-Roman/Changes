@@ -1,5 +1,9 @@
 Revision history for Perl module DateTime::Format::Roman
 
+0.04  v kal feb anno mmxix
+    - remove the warning about the month_abbreviations method (RT 69845)
+    - fix kwalitee issues
+
 0.03  xv kal nov anno mmiv
     - added default pattern
     - format_datetime() can nnow be used as a class method

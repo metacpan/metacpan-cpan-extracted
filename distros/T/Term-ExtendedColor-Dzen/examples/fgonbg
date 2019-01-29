@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+# vim: ft=perl:fdm=marker:fmr=#<,#>:fen:et:sw=2:
+use strict;
+use vars     qw($VERSION);
+use autodie  qw(:all);
+
+use Term::ExtendedColor::Dzen qw(fgd bgd);
+
+use feature 'say';
+
+say fgd('#000', bgd('#fff', 'this is black on white background'));

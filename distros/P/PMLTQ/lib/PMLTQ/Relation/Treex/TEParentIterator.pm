@@ -1,6 +1,6 @@
 package PMLTQ::Relation::Treex::TEParentIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::Treex::TEParentIterator::VERSION = '2.0.2';
+$PMLTQ::Relation::Treex::TEParentIterator::VERSION = '3.0.1';
 # ABSTRACT: Effective parent relation iterator on t-nodes for Treex treebanks
 
 use strict;
@@ -18,6 +18,16 @@ use PMLTQ::Relation {
   test_code         => q( grep($_ == $end, PMLTQ::Relation::Treex::TGetEParents($start)) ? 1 : 0 ),
 };
 
+BEGIN {
+  {
+    local $@; # protect existing $@
+    eval {
+      require PMLTQ::PML2BASE::Relation::Treex::TEParentIterator;
+      PMLTQ::PML2BASE::Relation::Treex::TEParentIterator->import();
+    };
+    print STDERR "PMLTQ::PML2BASE::Relation::Treex::TEParentIterator is not installed\n" if $@;
+  }
+}
 
 sub get_node_list {
   my ( $self, $node ) = @_;
@@ -28,18 +38,7 @@ sub get_node_list {
 
 sub dump_relation {
   my ($tree, $hash, $fh ) = @_;
-
-  my $name = $tree->type->get_schema->get_root_name;
-  die 'Trying dump relation eparent for incompatible schema' unless $name =~ /^treex_document/;
-
-  my $struct_name = $tree->type->get_structure_name || '';
-  return unless $struct_name eq 't-root';
-
-  for my $node ( $tree->descendants ) {
-    for my $p ( PMLTQ::Relation::Treex::TGetEParents($node) ) {
-      $fh->print( PMLTQ::PML2BASE::mkdump( $hash->{$node}{'#idx'}, $hash->{$p}{'#idx'} ) );
-    }
-  }
+  PMLTQ::PML2BASE::Relation::Treex::TEParentIterator::dump_relation($tree, $hash, $fh );
 }
 
 1;
@@ -56,7 +55,7 @@ PMLTQ::Relation::Treex::TEParentIterator - Effective parent relation iterator on
 
 =head1 VERSION
 
-version 2.0.2
+version 3.0.1
 
 =head1 AUTHORS
 

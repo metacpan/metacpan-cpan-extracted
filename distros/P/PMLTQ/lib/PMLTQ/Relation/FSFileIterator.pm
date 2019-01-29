@@ -1,6 +1,6 @@
 package PMLTQ::Relation::FSFileIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::FSFileIterator::VERSION = '2.0.2';
+$PMLTQ::Relation::FSFileIterator::VERSION = '3.0.1';
 # ABSTRACT: Iterates nodes of given fsfile
 
 use 5.006;
@@ -112,7 +112,7 @@ PMLTQ::Relation::FSFileIterator - Iterates nodes of given fsfile
 
 =head1 VERSION
 
-version 2.0.2
+version 3.0.1
 
 =head1 AUTHORS
 

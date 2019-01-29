@@ -1,8 +1,16 @@
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
-use Catalyst::Test 'MyApp';
 use Test::Most;
+
+BEGIN {
+  eval "use Catalyst::Plugin::ConfigLoader; 1" || do {
+    plan skip_all => "Need a Catalyst::Plugin::ConfigLoader.pm => $@";
+  };
+  use Catalyst::Test 'MyApp';
+}
+
+
 
 {
   ok my $res = request '/test';

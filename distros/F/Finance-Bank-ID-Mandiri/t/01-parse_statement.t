@@ -134,4 +134,35 @@ for my $f (
     is($stmt->{transactions}[3]{seq}, 3, "$f->[1] (seq 2)");
 }
 
+for my $f (
+    ["stmt-mcm-v201901.csv", "mcm v201901, comma"],) {
+    my $resp = $ibank->parse_statement(read_text("$Bin/data/$f->[0]"));
+    die "status=$resp->[0], error=$resp->[1]\n" if $resp->[0] != 200;
+    my $stmt = $resp->[2];
+
+    # metadata
+    is($stmt->{account}, "1030001026344", "$f->[1] (account)");
+    ##is($stmt->{account_holder}, "MAJU MUNDUR", "$f->[1] (account_holder)");
+    is(DateTime->compare($stmt->{start_date},
+                         DateTime->new(year=>2019, month=>1, day=>5)),
+       0, "$f->[1] (start_date)");
+    is(DateTime->compare($stmt->{end_date},
+                         DateTime->new(year=>2019, month=>1, day=>5)),
+       0, "$f->[1] (end_date)");
+    is($stmt->{currency}, "IDR", "$f->[1] (currency)");
+
+    # transactions
+    is(scalar(@{ $stmt->{transactions} }), 5, "$f->[1] (num tx)");
+    is(DateTime->compare($stmt->{transactions}[0]{date},
+                         DateTime->new(year=>2019, month=>1, day=>5)),
+       0, "$f->[1] (tx0 date)");
+    is($stmt->{transactions}[0]{amount}, 917180,
+       "$f->[1] (tx0 amount, credit)");
+    is($stmt->{transactions}[0]{seq}, 1, "$f->[1] (tx0 seq)");
+
+    is($stmt->{transactions}[1]{amount}, -152900,
+       "$f->[1] (tx1 amount, debit)");
+    is($stmt->{transactions}[1]{seq}, 2, "$f->[1] (tx1 seq)");
+}
+
 done_testing();

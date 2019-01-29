@@ -1,13 +1,40 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         DateTime-Format-Roman
-version:      0.03
-version_from: lib/DateTime/Format/Roman.pm
-installdirs:  site
+---
+abstract: 'Roman day names (kalends, ides, nones) for DateTime objects'
+author:
+  - 'Eugene van der Pijll (pijll@gmx.net)'
+  - 'Dave Rolsky <autarch@urth.org>'
+  - 'Jean Forget <JFORGET@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.57_02
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Format-Roman
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  DateTime::Format::Roman:
+    file: lib/DateTime/Format/Roman.pm
+    version: '0.04'
 requires:
-    DateTime:                      0.12
-    Roman:                         0
-    Test::More:                    0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  DateTime: '0.22'
+  Params::Validate: '0'
+  Roman: '0'
+  Test::More: '0'
+  perl: v5.6.1
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/jforget/DateTime-Format-Roman.git
+version: 0.04
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,17 @@
+0.010   2019-01-29 (PERLANCAR)
+
+	- Add --action and actions: block, unblock, unblock_all,
+	  list_blocked.
+
+	- [bugfix] Don't die when unblocking an IP fails (e.g. iptables has
+	  been cleared).
+
+	- [ux] Prevent running multiple instances.
+
+	- [ux] Check for known config parameters and sections, die on
+	  unknown param.
+
+
 0.009   2018-11-12 (PERLANCAR)
 
 	- No functional changes.

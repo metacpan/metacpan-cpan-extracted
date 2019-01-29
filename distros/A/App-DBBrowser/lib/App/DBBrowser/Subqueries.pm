@@ -11,7 +11,7 @@ use List::MoreUtils qw( any uniq );
 
 use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( print_columns line_fold );
-use Term::Choose::Util     qw( choose_a_subset term_width );
+use Term::Choose::Util     qw( term_width );
 use Term::Form             qw();
 
 use App::DBBrowser::Auxil;

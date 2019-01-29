@@ -1,6 +1,6 @@
 package PMLTQ::Relation::ParentIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::ParentIterator::VERSION = '2.0.2';
+$PMLTQ::Relation::ParentIterator::VERSION = '3.0.1';
 # ABSTRACT: Evaluates condition on the parent of start node 
 
 use 5.006;
@@ -47,7 +47,7 @@ PMLTQ::Relation::ParentIterator - Evaluates condition on the parent of start nod
 
 =head1 VERSION
 
-version 2.0.2
+version 3.0.1
 
 =head1 AUTHORS
 
