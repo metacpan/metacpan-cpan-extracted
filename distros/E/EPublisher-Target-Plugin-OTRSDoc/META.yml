@@ -2,20 +2,39 @@
 abstract: 'Create HTML version of OTRS documentation'
 author:
   - 'Renee Bäcker <module@renee-baecker.de>'
-build_requires: {}
+build_requires:
+  Capture::Tiny: '0'
+  File::Spec: '0'
+  Test::LongString: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: EPublisher-Target-Plugin-OTRSDoc
+provides:
+  EPublisher::Target::Plugin::OTRSDoc:
+    file: lib/EPublisher/Target/Plugin/OTRSDoc.pm
+    version: '1.01'
 requires:
-  EPublisher: 0.7
-  File::Basename: 2
-  File::Path: 2.08
-  HTML::Template::Compiled: 0
-  Pod::Simple::XHTML: 3.14
-version: 0.4
+  EPublisher: '0.7'
+  File::Basename: '2'
+  File::Path: '2.08'
+  HTML::Template::Compiled: '0'
+  Pod::Simple::XHTML: '3.14'
+  parent: '0'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/reneeb/EPublisher-Target-Plugin-OTRSDoc/issues
+  homepage: http://github.com/reneeb/EPublisher-Target-Plugin-OTRSDoc
+  repository: http://github.com/reneeb/EPublisher-Target-Plugin-OTRSDoc.git
+version: '1.01'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

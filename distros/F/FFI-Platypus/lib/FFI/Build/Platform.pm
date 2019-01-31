@@ -3,7 +3,6 @@ package FFI::Build::Platform;
 use strict;
 use warnings;
 use 5.008001;
-use Config ();
 use Carp ();
 use Text::ParseWords ();
 use List::Util 1.45 ();
@@ -11,13 +10,16 @@ use File::Temp ();
 use Capture::Tiny ();
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 
 sub new
 {
   my($class, $config) = @_;
-  $config ||= \%Config::Config;
+  $config ||= do {
+    require Config;
+    \%Config::Config;
+  };
   my $self = bless {
     config => $config,
   }, $class;
@@ -31,25 +33,6 @@ sub default
   $default ||= FFI::Build::Platform->new;
 }
 
-sub _context
-{
-  if(defined wantarray)
-  {
-    if(wantarray)
-    {
-      return @_;
-    }
-    else
-    {
-      return $_[0];
-    }
-  }
-  else
-  {
-    Carp::croak("method does not work in void context");
-  }
-}
-
 sub _self
 {
   my($self) = @_;
@@ -59,13 +42,13 @@ sub _self
 
 sub osname
 {
-  _context _self(shift)->{config}->{osname};
+  _self(shift)->{config}->{osname};
 }
 
 
 sub object_suffix
 {
-  _context _self(shift)->{config}->{obj_ext};
+  _self(shift)->{config}->{obj_ext};
 }
 
 
@@ -73,18 +56,20 @@ sub library_suffix
 {
   my $self = _self(shift);
   my $osname = $self->osname;
+  my @suffix;
   if($osname eq 'darwin')
   {
-    return _context '.dylib', '.bundle';
+    push @suffix, '.dylib', '.bundle';
   }
   elsif($osname =~ /^(MSWin32|msys|cygwin)$/)
   {
-    return _context '.dll';
+    push @suffix, '.dll';
   }
   else
   {
-    return _context '.' . $self->{config}->{dlext};
+    push @suffix, '.' . $self->{config}->{dlext};
   }
+  wantarray ? @suffix : $suffix[0];
 }
 
 
@@ -114,58 +99,79 @@ sub library_prefix
 
 sub cc
 {
-  # TODO: cc could include flags "cc --some-flag" so we should really parse
-  # the first element of cc to be our cc, and push the rest into cflags.
-  my $cc = shift->{config}->{cc};
-  $cc =~ s/^\s+//;
-  $cc =~ s/\s+$//;
-  $cc;
+  my $self = _self(shift);
+  my $cc = $self->{config}->{cc};
+  [$self->shellwords($cc)];
+}
+
+
+sub cpp
+{
+  my $self = _self(shift);
+  my $cpp = $self->{config}->{cpprun};
+  [$self->shellwords($cpp)];
 }
 
 
 sub cxx
 {
   my $self = _self(shift);
+
+  my @cc = @{ $self->cc };
+  
   if($self->{config}->{ccname} eq 'gcc')
   {
-    if($self->cc =~ /gcc$/)
+    if($cc[0] =~ /gcc$/)
     {
-      my $maybe = $self->cc;
-      $maybe =~ s/gcc$/g++/;
-      return $maybe if $self->which($maybe);
+      my @maybe = @cc;
+      $maybe[0] =~ s/gcc$/g++/;
+      return \@maybe if $self->which($maybe[0]);
     }
-    if($self->cc =~ /clang/)
+    if($cc[0] =~ /clang/)
     {
-      return 'clang++';
+      my @maybe = @cc;
+      $maybe[0] =~ s/clang/clang++/;
+      return \@maybe if $self->which($maybe[0]);
     }
-    else
+
+    # TODO: there are probably situations, eg solaris
+    # where we don't want to try c++ in the case of
+    # a ccname = gcc ?
+    my @maybe = qw( c++ g++ clang++ );
+
+    foreach my $maybe (@maybe)
     {
-      return 'g++';
+      return [$maybe] if $self->which($maybe);
     }
   }
   elsif($self->osname eq 'MSWin32' && $self->{config}->{ccname} eq 'cl')
   {
-    return 'cl';
+    return \@cc;
   }
-  else
-  {
-    Carp::croak("unable to detect corresponding C++ compiler");
-  }
+
+  Carp::croak("unable to detect corresponding C++ compiler");
 }
 
 
 sub for
 {
   my $self = _self(shift);
+
+  my @cc = @{ $self->cc };
+  
   if($self->{config}->{ccname} eq 'gcc')
   {
-    if($self->cc =~ /gcc$/)
+    if($cc[0] =~ /gcc$/)
     {
-      my $maybe = $self->cc;
-      $maybe =~ s/gcc$/gfortran/;
-      return $maybe if $self->which($maybe);
+      my @maybe = @cc;
+      $maybe[0] =~ s/gcc$/gfortran/;
+      return \@maybe if $self->which($maybe[0]);
     }
-    return 'gfortran';
+
+    foreach my $maybe (qw( gfortran ))
+    {
+      return [$maybe] if $self->which($maybe);
+    }
   }
   else
   {
@@ -176,93 +182,71 @@ sub for
 
 sub ld
 {
-  my $ld = shift->{config}->{ld};
-  $ld =~ s/^\s+//;
-  $ld =~ s/\s+$//;
-  $ld;
-}
-
-sub _uniq
-{
-  List::Util::uniq(@_);
+  my($self) = @_;
+  my $ld = $self->{config}->{ld};
+  [$self->shellwords($ld)];
 }
 
 
 sub shellwords
 {
   my $self = _self(shift);
-  if($self->osname eq 'MSWin32')
-  {
-    # Borrowed from Alien/Base.pm, see the caveat there.
-    Text::ParseWords::shellwords(map { my $x = $_; $x =~ s,\\,\\\\,g; $x } @_);
-  }
-  else
-  {
-    Text::ParseWords::shellwords(@_);
-  }
+
+  my $win = !!$self->osname eq 'MSWin32';
+
+  grep { defined $_ } map {
+    ref $_
+      # if we have an array ref then it has already been shellworded
+      ? @$_
+      : do {
+        # remove leading whitespace, confuses some older versions of shellwords
+        my $str = /^\s*(.*)$/ && $1;
+        # escape things on windows
+        $str =~ s,\\,\\\\,g if $win;
+        Text::ParseWords::shellwords($str);
+      }
+  } @_;
+
 }
 
-sub _context_args
-{
-  wantarray ? @_ : join ' ', @_;
-}
 
-
-sub cflags
+sub ccflags
 {
   my $self = _self(shift);
-  my @cflags;
-  push @cflags, _uniq grep /^-fPIC$/i, $self->shellwords($self->{config}->{cccdlflags});
-  _context_args @cflags;
+  my @ccflags;
+  push @ccflags, $self->shellwords($self->{config}->{cccdlflags});
+  push @ccflags, $self->shellwords($self->{config}->{ccflags});
+  push @ccflags, $self->shellwords($self->{config}->{optimize});
+  \@ccflags;
 }
 
 
 sub ldflags
 {
   my $self = _self(shift);
-  my @ldflags;
+  my @ldflags = $self->shellwords($self->{config}->{lddlflags});
   if($self->osname eq 'cygwin')
   {
     no warnings 'qw';
-    push @ldflags, qw( --shared -Wl,--enable-auto-import -Wl,--export-all-symbols -Wl,--enable-auto-image-base );
+    # doesn't appear to be necessary, Perl has this in lddlflags already on cygwin
+    #push @ldflags, qw( -Wl,--enable-auto-import -Wl,--export-all-symbols -Wl,--enable-auto-image-base );
   }
   elsif($self->osname eq 'MSWin32' && $self->{config}->{ccname} eq 'cl')
   {
+    # TODO: test.
     push @ldflags, qw( -link -dll );
   }
   elsif($self->osname eq 'MSWin32')
   {
-    # TODO: VCC support *sigh*
     no warnings 'qw';
-    push @ldflags, qw( -mdll -Wl,--enable-auto-import -Wl,--export-all-symbols -Wl,--enable-auto-image-base );
+    push @ldflags, qw( -Wl,--enable-auto-import -Wl,--export-all-symbols -Wl,--enable-auto-image-base );
   }
   elsif($self->osname eq 'darwin')
   {
-    push @ldflags, '-shared';
+    # we want to build a .dylib instead of a .bundle
+    @ldflags = map { $_ eq '-bundle' ? '-shared' : $_ } @ldflags;
   }
-  else
-  {
-    push @ldflags, _uniq grep /^-shared$/i, $self->shellwords($self->{config}->{lddlflags});
-  }
-  _context_args @ldflags;
-}
-
-
-sub extra_system_inc
-{
-  my $self = _self(shift);
-  my @dir;
-  push @dir, _uniq grep /^-I(.*)$/, $self->shellwords(map { $self->{config}->{$_} } qw( ccflags ccflags_nolargefiles cppflags ));
-  _context_args @dir;  
-}
-
-
-sub extra_system_lib
-{
-  my $self = _self(shift);
-  my @dir;
-  push @dir, _uniq grep /^-L(.*)$/, $self->shellwords(map { $self->{config}->{$_} } qw( lddlflags ldflags ldflags_nolargefiles ));
-  _context_args @dir;  
+  \@ldflags;
 }
 
 
@@ -270,6 +254,7 @@ sub cc_mm_works
 {
   my $self = _self(shift);
   my $verbose = shift;
+  $verbose ||= 0;
   
   unless(defined $self->{cc_mm_works})
   {
@@ -284,21 +269,23 @@ sub cc_mm_works
 
     my @cmd = (
       $self->cc,
-      $self->cflags,
-      $self->extra_system_inc,
+      $self->ccflags,
       "-I$dir",
       '-MM',
       $c->path,
     );
     
     my($out, $exit) = Capture::Tiny::capture_merged(sub {
-      print "+ @cmd\n";
-      system @cmd;
+      $self->run(@cmd);
     });
-    
-    if($verbose)
+
+    if($verbose >= 2)
     {
       print $out;
+    }
+    elsif($verbose >= 1)
+    {
+      print "CC (checkfor -MM)\n";
     }
     
     
@@ -350,27 +337,40 @@ sub which
 {
   my(undef, $command) = @_;
   require IPC::Cmd;
-  IPC::Cmd::can_run($command);
+  my @command = ref $command ? @$command : ($command);
+  IPC::Cmd::can_run($command[0]);
 }
 
+
+sub run
+{
+  my $self = shift;
+  $DB::single = 1;
+  my @command  = map { ref $_ ? @$_ : $_ } grep { defined $_ } @_;
+  print "+@command\n";
+  system @command;
+  $?;
+}
+
+
+sub _c { join ',', @_ }
+sub _l { join ' ', map { ref $_ ? @$_ : $_ } @_ }
 
 sub diag
 {
   my $self = _self(shift);
   my @diag;
   
-  push @diag, "osname            : ". join(", ", $self->osname);
-  push @diag, "cc                : ". $self->cc;
-  push @diag, "cxx               : ". (eval { $self->cxx } || '???' );
-  push @diag, "for               : ". (eval { $self->for } || '???' );
-  push @diag, "ld                : ". $self->ld;
-  push @diag, "cflags            : ". $self->cflags;
-  push @diag, "ldflags           : ". $self->ldflags;
-  push @diag, "extra system inc  : ". $self->extra_system_inc;
-  push @diag, "extra system lib  : ". $self->extra_system_lib;
-  push @diag, "object suffix     : ". join(", ", $self->object_suffix);
-  push @diag, "library prefix    : ". join(", ", $self->library_prefix);
-  push @diag, "library suffix    : ". join(", ", $self->library_suffix);
+  push @diag, "osname            : ". _c($self->osname);
+  push @diag, "cc                : ". _l($self->cc);
+  push @diag, "cxx               : ". (eval { _l($self->cxx) } || '---' );
+  push @diag, "for               : ". (eval { _l($self->for) } || '---' );
+  push @diag, "ld                : ". _l($self->ld);
+  push @diag, "ccflags           : ". _l($self->ccflags);
+  push @diag, "ldflags           : ". _l($self->ldflags);
+  push @diag, "object suffix     : ". _c($self->object_suffix);
+  push @diag, "library prefix    : ". _c($self->library_prefix);
+  push @diag, "library suffix    : ". _c($self->library_suffix);
   push @diag, "cc mm works       : ". $self->cc_mm_works;
 
   join "\n", @diag;
@@ -390,7 +390,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 0.74
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -451,19 +451,25 @@ The library prefix for the platform.  On Unix this is usually C<lib>, as in C<li
 
 =head2 cc
 
- my $cc = $platform->cc;
+ my @cc = @{ $platform->cc };
 
 The C compiler
 
+=head2 cpp
+
+ my @cpp = @{ $platform->cpp };
+
+The C pre-processor
+
 =head2 cxx
 
- my $cxx = $platform->cxx;
+ my @cxx = @{ $platform->cxx };
 
 The C++ compiler that naturally goes with the C compiler.
 
 =head2 for
 
- my $for = $platform->for;
+ my @for = @{ $platform->for };
 
 The Fortran compiler that naturally goes with the C compiler.
 
@@ -480,32 +486,20 @@ The C linker
 This is a wrapper around L<Text::ParseWords>'s C<shellwords> with some platform  workarounds
 applied.
 
-=head2 cflags
+=head2 ccflags
 
- my $cflags = $platform->cflags;
+ my @ccflags = @{ $platform->cflags};
 
-The compiler flags needed to compile object files that can be linked into a dynamic library.
-On Linux, for example, this is usually -fPIC.
+The compiler flags, including those needed to compile object files that can be linked into a dynamic library.
+On Linux, for example, this is usually includes C<-fPIC>.
 
 =head2 ldflags
 
- my $ldflags = $platform->ldflags;
+ my @ldflags = @{ $platform->ldflags };
 
 The linker flags needed to link object files into a dynamic library.  This is NOT the C<libs> style library
 flags that specify the location and name of a library to link against, this is instead the flags that tell
 the linker to generate a dynamic library.  On Linux, for example, this is usually C<-shared>.
-
-=head2 extra_system_inc
-
- my @dir = $platform->extra_syste_inc;
-
-Extra include directory flags, such as C<-I/usr/local/include>, which were configured when Perl was built.
-
-=head2 extra_system_lib
-
- my @dir = $platform->extra_syste_lib;
-
-Extra library directory flags, such as C<-L/usr/local/lib>, which were configured when Perl was built.
 
 =head2 cc_mm_works
 
@@ -530,6 +524,10 @@ Returns the flags that the compiler recognizes as being used to write out to a s
  my $path = $platform->which($command);
 
 Returns the full path of the given command, if it is available, otherwise C<undef> is returned.
+
+=head2 run
+
+ $platform->run(@command);
 
 =head2 diag
 

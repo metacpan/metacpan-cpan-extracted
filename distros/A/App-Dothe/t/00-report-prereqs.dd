@@ -1,0 +1,49 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'File::Wildcard' => '0',
+                                      'Graph::Directed' => '0',
+                                      'List::AllUtils' => '0',
+                                      'Log::Any' => '0',
+                                      'Log::Any::Adapter' => '0',
+                                      'Moose' => '0',
+                                      'MooseX::App::Simple' => '0',
+                                      'Path::Tiny' => '0',
+                                      'PerlX::Maybe' => '0',
+                                      'Ref::Util' => '0',
+                                      'Text::Template' => '0',
+                                      'Type::Tiny' => '0',
+                                      'Types::Standard' => '0',
+                                      'YAML::XS' => '0',
+                                      'experimental' => '0',
+                                      'perl' => 'v5.20.0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'strict' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

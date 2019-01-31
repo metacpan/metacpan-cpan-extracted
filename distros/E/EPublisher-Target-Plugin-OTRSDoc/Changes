@@ -1,0 +1,24 @@
+Revision history for EPublisher::Target::Plugin::OTRSDoc
+========================================================
+
+1.01 2019-01-30 14:35:00
+
+    + accept a list of sources in deploy()
+    + add more config checks
+    + add more tests
+
+0.4 2013-07-14 08:39:00
+
+    + remove closing body- and html-tags as those tags should be in the template
+
+0.3 2013-07-14 08:35:00
+
+    + always use lower case file name
+
+0.2 2013-07-12 09:30:00
+
+    + have more information about the TOC
+
+0.1 2013-07-12 08:14:00
+
+    + initial release

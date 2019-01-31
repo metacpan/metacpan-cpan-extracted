@@ -1,5 +1,5 @@
 package Clipboard;
-our $VERSION = '0.13';
+$Clipboard::VERSION = '0.18';
 our $driver;
 
 sub copy { my $self = shift; $driver->copy(@_); }
@@ -15,8 +15,8 @@ sub find_driver {
         # example, cygwin doesn't count as Unix here, because it will
         # use the Win32 clipboard.)
         bind_os(Xclip => qw(linux bsd$ aix bsdos dec_osf dgux
-            dynixptx hpux irix dragonfly machten next os2 sco_sv solaris sunos
-            svr4 svr5 unicos unicosmk)),
+            dynixptx gnu hpux irix dragonfly machten next os2 sco_sv solaris
+            sunos svr4 svr5 unicos unicosmk)),
         bind_os(MacPasteboard => qw(darwin)),
         bind_os(Win32 => qw(mswin ^win cygwin)),
     );
@@ -32,9 +32,21 @@ sub import {
 }
 
 1;
-=head1 NAME 
+# vi:tw=72
 
-Clipboard - Copy and paste with any OS
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Clipboard
+
+=head1 VERSION
+
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -61,6 +73,14 @@ clipboards are magical.
 With Clipboard.pm, this magic is now trivial to access,
 in a cross-platform-consistent API, from your Perl code.
 
+=head1 NAME
+
+Clipboard - Copy and paste with any OS
+
+=head1 VERSION
+
+version 0.18
+
 =head1 STATUS
 
 Seems to be working well for Linux, OSX, *BSD, and Windows.  I use it
@@ -81,5 +101,125 @@ under the same terms as Perl itself.
 
 See http://www.perl.com/perl/misc/Artistic.html
 
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/Clipboard>
+
+=item *
+
+Search CPAN
+
+The default CPAN search engine, useful to view POD in HTML format.
+
+L<http://search.cpan.org/dist/Clipboard>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Clipboard>
+
+=item *
+
+AnnoCPAN
+
+The AnnoCPAN is a website that allows community annotations of Perl module documentation.
+
+L<http://annocpan.org/dist/Clipboard>
+
+=item *
+
+CPAN Ratings
+
+The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
+
+L<http://cpanratings.perl.org/d/Clipboard>
+
+=item *
+
+CPANTS
+
+The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+L<http://cpants.cpanauthors.org/dist/Clipboard>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/C/Clipboard>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=Clipboard>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=Clipboard>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-clipboard at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Clipboard>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/shlomif/clipboard>
+
+  git clone https://github.com/shlomif/Clipboard
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/clipboard/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Ryan King <rking@panoptic.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
-# vi:tw=72

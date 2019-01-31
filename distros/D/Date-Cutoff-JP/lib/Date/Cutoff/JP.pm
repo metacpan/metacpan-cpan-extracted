@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Carp;
 use Time::Seconds;
@@ -22,7 +22,9 @@ before 'cutoff' => sub {
     my $self = shift;
     my $value = shift;
     return super() unless defined $value;
-    croak "unvalid cutoff was set: $value" if $value < 0 or 31 < $value;
+    croak "unvalid cutoff was set: $value" if $value < 0 or 28 < $value;
+    my $day = $value? $value: 31;
+    croak "cuttoff must be before payday" if $day >= $self->payday and $self->late == 0;
     return super();
 };
 
@@ -30,8 +32,9 @@ before 'payday' => sub {
     my $self = shift;
     my $value = shift;
     return super() unless defined $value;
-    croak "unvalid payday was set: $value" if $value < 0 or 31 < $value;
-    croak "payday must be after cuttoff" if $value < $self->cutoff and $self->late == 0;
+    croak "unvalid payday was set: $value" if $value < 0 or 28 < $value;
+    my $day = $value? $value: 31;
+    croak "payday must be after cuttoff" if $day <= $self->cutoff and $self->late == 0;
     return super();
 };
 
@@ -40,12 +43,14 @@ before 'late' => sub {
     my $value = shift;
     return super() unless defined $value;
     croak "unvalid lateness was set: $value" if $value < 0 or 2 < $value;
+    my( $cutoff, $payday ) = ($self->cutoff, $self->payday);
+    croak "payday is before cuttoff in same month" if $value == 0 and $payday <= $cutoff;
     return super();
 };
 
 __PACKAGE__->meta->make_immutable;
 
-sub isWeekend {
+sub _isWeekend {
     my $self = shift;
     my ($y, $m, $d ) = split "-", shift;
     my $dow = dayofweek( $d, $m, $y );
@@ -67,7 +72,7 @@ sub calc_date {
     }
     
     $cutoff = $ref_day->ymd();
-    while( $self->isWeekend($cutoff) ){
+    while( $self->_isWeekend($cutoff) ){
         my $ref_day = $t->strptime( $cutoff, '%Y-%m-%d');
         $ref_day += ONE_DAY();
         $cutoff = $ref_day->ymd();
@@ -81,7 +86,7 @@ sub calc_date {
     $str = $ref_day->strftime('%Y-%m-') . sprintf( "%02d", $payday );
     
     my $date = $t->strptime( $str, '%Y-%m-%d' )->ymd();
-    while( $self->isWeekend($date) ){
+    while( $self->_isWeekend($date) ){
         my $ref_day = $t->strptime( $date, '%Y-%m-%d');
         $ref_day += ONE_DAY();
         $date = $ref_day->ymd();
@@ -106,23 +111,32 @@ Date::CutOff::JP - Get the day cutoff and payday for in Japanese timezone
  print $calculated{'cutoff'}; # '2019-01-31'
  print $calculated{'payday'}; # '2019-02-28'
 
-
 =head1 DESCRIPTION
 
-Date::CutOff::JP provides how to calculate the day cutoff and the payday from Japanese calender.
+Date::CutOff::JP provides how to calculate the day cutoff and the payday from Japanese calendar.
 
-you can calculate the weekday for cutoff and paying without holiday in Japan.
+You can calculate the weekday for cutoff and paying without holidays in Japan.
+ 
+=head1 Constructor
+
+=head3 new({ [cutoff => $day], [payday => $day], [late => 0||1||2] })
+ 
+You may omit parameters. defaults are { cutoff => 0, payday => 0, late => 1 }
  
 =head2 Accessor Methods
  
 =head3 cutoff()
  
 get/set the day cutoff in every months. 0 means the end of the month.
+ 
+B<caution> Int over 28 is denied
 
 =head3 payday()
  
 get/set the payday in every months. 0 means the end of the month.
  
+B<caution> Int over 28 is denied
+
 =head3 late()
  
 get/set the lateness. 0 means the cutoff and payday is at same month.
@@ -131,12 +145,13 @@ The all you can set is Int of [ 0 .. 2 ] 3 or more returns error.
  
 =head2 Method
 
-=head3 calc_date($date)
+=head3 calc_date([$date])
+
+You may omit the parameter. default is TODAY.
  
 returns hash value with keys below:
 
 =over
- 
  
 =item cutoff
 

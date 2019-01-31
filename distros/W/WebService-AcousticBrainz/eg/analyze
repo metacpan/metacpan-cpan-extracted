@@ -29,4 +29,4 @@ for my $stat ( keys %{ $r->{highlevel} } ) {
     $stats->{$stat} = $r->{highlevel}{$stat}{value};
 }
 
-use Data::Dumper;$Data::Dumper::Sortkeys = 1; warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper$stats);
+use Data::Dumper;$Data::Dumper::Sortkeys = 1; warn Dumper$stats;

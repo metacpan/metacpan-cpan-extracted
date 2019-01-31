@@ -5,9 +5,10 @@ use warnings;
 use Config;
 use Capture::Tiny qw( capture_merged );
 use Text::ParseWords ();
+use FFI::Build::Platform;
 
 # ABSTRACT: Probe runner builder for FFI
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 
 sub new
@@ -16,9 +17,21 @@ sub new
 
   $args{dir} ||= 'blib/lib/auto/share/dist/FFI-Platypus/probe';
 
+  my $platform = FFI::Build::Platform->new;
+
   my $self = bless {
-    dir => $args{dir},
+    dir      => $args{dir},
+    # we don't use the platform ccflags, etc because they are geared
+    # for building dynamic libs not exes
+    cc       => [$platform->shellwords($Config{cc})],
+    ld       => [$platform->shellwords($Config{ld})],
+    ccflags  => [$platform->shellwords($Config{ccflags})],
+    optimize => [$platform->shellwords($Config{optimize})],
+    ldflags  => [$platform->shellwords($Config{ldflags})],
+    libs     => [$platform->shellwords($Config{perllibs})],
+    platform => $platform,
   }, $class;
+
   $self;
 }
 
@@ -43,6 +56,14 @@ sub dir
 }
 
 
+sub cc       { shift->{cc}       }
+sub ccflags  { shift->{ccflags}  }
+sub optimize { shift->{optimize} }
+sub ld       { shift->{ld}       }
+sub ldflags  { shift->{ldflags}  }
+sub libs     { shift->{libs}     }
+
+
 sub file
 {
   my($self, @sub) = @_;
@@ -53,6 +74,13 @@ sub file
 }
 
 my $source;
+
+
+sub exe
+{
+  my($self) =  @_;
+  my $xfn = $self->file('bin', "dlrun$Config{exe_ext}");
+}
 
 
 sub source
@@ -67,13 +95,15 @@ sub source
 }
 
 
+our $VERBOSE = !!$ENV{V};
+
 sub extract
 {
   my($self) = @_;
 
   # the source src/dlrun.c
   {
-    print "x src/dlrun.c\n";
+    print "XX src/dlrun.c\n" unless $VERBOSE;
     my $fh;
     my $fn = $self->file('src', 'dlrun.c');
     my $source = $self->source;
@@ -84,23 +114,19 @@ sub extract
 
   # the bin directory bin
   {
-    print "x bin/\n";
+    print "XX bin/\n" unless $VERBOSE;
     $self->dir('bin');
   }
   
 }
 
-our $VERBOSE;
-
 
 sub run
 {
   my($self, $type, @cmd) = @_;
+  @cmd = map { ref $_ ? @$_ : $_ } @cmd;
   my($out, $ret) = capture_merged {
-    print "+ @cmd\n";
-    print "cmd=$_\n" for @cmd;
-    system @cmd;
-    $?;
+    $self->{platform}->run(@cmd);
   };
   if($ret)
   {
@@ -112,13 +138,6 @@ sub run
 }
 
 
-sub _shellwords
-{
-  my($string) = @_;
-  $string =~ s/^\s+//;
-  grep { defined $_ } Text::ParseWords::shellwords($string);
-}
-
 sub build
 {
   my($self) = @_;
@@ -126,18 +145,18 @@ sub build
 
   my $cfn = $self->file('src', 'dlrun.c');
   my $ofn = $self->file('src', "dlrun$Config{obj_ext}");
-  my $xfn = $self->file('bin', "dlrun$Config{exe_ext}");
+  my $xfn = $self->exe;
 
   # compile
-  print "c src/dlrun.c\n";
-  $self->run(compile => _shellwords($Config{cc}), _shellwords($Config{ccflags}), '-c', '-o' => $ofn, $cfn);
+  print "CC src/dlrun.c\n" unless $VERBOSE;
+  $self->run(compile => $self->cc, $self->ccflags, $self->optimize, '-c', '-o' => $ofn, $cfn);
 
   # link
-  print "l src/dlrun$Config{obj_ext}\n";
-  $self->run(link => _shellwords($Config{ld}), _shellwords($Config{ldflags}), '-o' => $xfn, $ofn, _shellwords($Config{perllibs}));
+  print "LD src/dlrun$Config{obj_ext}\n" unless $VERBOSE;
+  $self->run(link => $self->ld, $self->ldflags, '-o' => $xfn, $ofn, $self->libs);
 
   # verify
-  print "v bin/dlrun$Config{exe_ext}\n";
+  print "VV bin/dlrun$Config{exe_ext}\n" unless $VERBOSE;
   my $out = $self->run(verify => $xfn, 'verify', 'self');
   if($out !~ /dlrun verify self ok/)
   {
@@ -146,7 +165,7 @@ sub build
   }
 
   # remove object
-  print "u src/dlrun$Config{obj_ext}\n";
+  print "UN src/dlrun$Config{obj_ext}\n" unless $VERBOSE;
   unlink $ofn;
 
   $xfn;
@@ -164,7 +183,7 @@ FFI::Probe::Runner::Builder - Probe runner builder for FFI
 
 =head1 VERSION
 
-version 0.74
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -209,6 +228,40 @@ makes sense for when L<FFI::Platypus> is being built.
 Returns a subdirectory from the builder root.  Directory
 will be created if it doesn't already exist.
 
+=head2 cc
+
+ my @cc = @{ $builder->cc };
+
+The C compiler to use.  Returned as an array reference so that it may be modified.
+
+=head2 ccflags
+
+ my @ccflags = @{ $builder->ccflags };
+
+The C compiler flags to use.  Returned as an array reference so that it may be modified.
+
+=head2 optimize
+
+The C optimize flags to use.  Returned as an array reference so that it may be modified.
+
+=head2 ld
+
+ my @ld = @{ $builder->ld };
+
+The linker to use.  Returned as an array reference so that it may be modified.
+
+=head2 ldflags
+
+ my @ldflags = @{ $builder->ldflags };
+
+The linker flags to use.  Returned as an array reference so that it may be modified.
+
+=head2 libs
+
+ my @libs = @{ $builder->libs };
+
+The library flags to use.  Returned as an array reference so that it may be modified.
+
 =head2 file
 
  my $file = $builder->file(@subdirs, $filename);
@@ -216,6 +269,12 @@ will be created if it doesn't already exist.
 Returns a file in a subdirectory from the builder root.
 Directory will be created if it doesn't already exist.
 File will not be created.
+
+=head2 exe
+
+ my $exe = $builder->exe;
+
+The name of the executable, once it is built.
 
 =head2 source
 
@@ -349,6 +408,10 @@ main(int argc, char **argv)
     return 0;
   }
 
+#if defined WIN32
+  SetErrorMode(SetErrorMode(0) | SEM_NOGPFAULTERRORBOX);
+#endif
+
   dlargv = malloc(sizeof(char*)*(argc-2));
   dlargv[0] = argv[0];
   filename = argv[1];
@@ -368,7 +431,7 @@ main(int argc, char **argv)
 
   if(dlmain == NULL)
   {
-    printf(stderr, "no dlmain symbol");
+    fprintf(stderr, "no dlmain symbol");
     return 1;
   }
 

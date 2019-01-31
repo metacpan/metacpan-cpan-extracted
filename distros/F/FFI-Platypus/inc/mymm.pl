@@ -19,6 +19,8 @@ sub _pkg_config_exe
   return;
 }
 
+our $VERBOSE = !!$ENV{V};
+
 sub _pkg_config
 {
   my(@args) = @_;
@@ -26,7 +28,7 @@ sub _pkg_config
   if(defined $cmd)
   {
     my @cmd = ($cmd, @args);
-    print "+@cmd\n";
+    print "+@cmd\n" if $VERBOSE;
     system @cmd;
     return $? == 0;
   }
@@ -126,13 +128,30 @@ sub myWriteMakefile
   # uniq'ify it
   @dlext = do { my %seen; grep { !$seen{$_}++ } @dlext };
 
-  #print "dlext[]=$_\n" for @dlext;
-
   $share_config->set(diag => \%diag);
   $share_config->set(config_dlext => \@dlext);
 
   ExtUtils::MakeMaker::WriteMakefile(%args);
 }
+
+#package MM;
+#
+#sub init_tools
+#{
+#  my $self = shift;
+#  $self->SUPER::init_tools(@_);
+#
+#  return if !!$ENV{V};
+#
+#  my $noecho = $^O eq 'MSWin32' ? 'REM ' : '@';
+#
+#  foreach my $tool (qw( RM_F RM_RF CP MV ))
+#  {
+#    $self->{$tool} = $noecho . $self->{$tool};
+#  }
+#
+#  return;
+#}
 
 package MY;
 
@@ -145,7 +164,6 @@ sub dynamic_lib
   push @{ $h{"ffi_platypus.h"} }, map { "include/ffi_platypus_$_.h" } qw( config );
 
   my %targets = (
-    '_mm/config' => ['mymm_config'],
     'include/ffi_platypus_config.h' => ['_mm/config'],
     'lib/FFI/Platypus.c' => [File::Glob::bsd_glob('xs/*.xs'), 'lib/FFI/Platypus.xs', 'lib/FFI/typemap'],
   );
@@ -186,6 +204,65 @@ sub dynamic_lib
   }
 
   $dynamic_lib;
+}
+
+sub postamble {
+  my $postamble = '';
+
+  my $noecho = !!$ENV{V} ? '' : '$(NOECHO) ';
+
+  $postamble .=
+    "flags: _mm/flags\n" .
+    "_mm/flags:\n";
+
+  foreach my $key (qw( cc inc ccflags cccdlflags optimize ld ldflags lddlflags ))
+  {
+    $postamble .= 
+      sprintf "\t$noecho\$(FULLPERL) inc/mm-config-set.pl eumm.%-20s \$(%s)\n", $key, uc $key;
+  }
+
+  $postamble .=
+    "\t$noecho\$(MKPATH) _mm\n" .
+    "\t$noecho\$(TOUCH) _mm/flags\n\n";
+
+  $postamble .=
+    "probe-runner-builder prb: _mm/probe-builder\n" .
+    "_mm/probe-builder: _mm/flags\n" .
+    "\t$noecho\$(FULLPERL) inc/mm-config-pb.pl\n" .
+    "\t$noecho\$(MKPATH) _mm\n" .
+    "\t$noecho\$(TOUCH) _mm/probe-builder\n\n";
+
+  $postamble .=
+    "config :: _mm/config\n" .
+    "_mm/config: _mm/flags _mm/probe-builder\n" .
+    "\t$noecho\$(FULLPERL) inc/mm-config.pl\n" .
+    "\t$noecho\$(MKPATH) _mm\n" .
+    "\t$noecho\$(TOUCH) _mm/config\n\n";
+
+  $postamble .=
+    "pure_all :: ffi\n" .
+    "ffi: _mm/config\n" .
+    "\t$noecho\$(FULLPERL) inc/mm-build.pl\n\n";
+
+  $postamble .=
+    "subdirs-test_dynamic subdirs-test_static subdirs-test :: ffi-test\n" .
+    "ffi-test : _mm/config\n" .
+    "\t$noecho\$(FULLPERL) inc/mm-test.pl\n\n";
+
+  $postamble .=
+    "clean :: mm-clean\n" .
+    "mm-clean :\n" .
+    "\t$noecho\$(FULLPERL) inc/mm-clean.pl\n" .
+    "\t$noecho\$(RM_RF) _mm ffi-probe-*\n\n";
+
+  $postamble;
+}
+
+sub special_targets {
+  my($self, @therest) = @_;
+  my $st = $self->SUPER::special_targets(@therest);
+  $st .= "\n.PHONY: flags probe-runner-builder prb ffi ffi-test\n";
+  $st;
 }
 
 1;

@@ -72,7 +72,7 @@
          "web" : "https://github.com/ology/WebService-AcousticBrainz"
       }
    },
-   "version" : "0.0301",
+   "version" : "0.0400",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

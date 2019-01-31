@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Searcher;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0512';
+our $VERSION = '1.0';
 
 use Moo;
 use namespace::clean;
@@ -16,10 +16,59 @@ has limit => (is => 'ro', required => 1);
 has total => (is => 'ro');
 has sort  => (is => 'ro');
 
+sub _paging_generator {
+    my ($self) = @_;
+    my $es     = $self->bag->store->es;
+    my $id_key = $self->bag->id_key;
+    my $index  = $self->bag->index;
+    my $type   = $self->bag->type;
+    my $query  = $self->query;
+    my $sort   = $self->sort;
+
+    sub {
+        state $start = $self->start;
+        state $total = $self->total;
+        state $limit = $self->limit;
+        state $hits;
+        if (defined $total) {
+            return unless $total;
+        }
+        unless ($hits && @$hits) {
+            if ($total && $limit > $total) {
+                $limit = $total;
+            }
+            my $body = {query => $query, from => $start, size => $limit,};
+            $body->{sort} = $sort if defined $sort;
+            my $res = $es->search(
+                index => $index,
+                type  => $type,
+                body  => $body,
+            );
+
+            $hits = $res->{hits}{hits};
+            $start += $limit;
+        }
+        if ($total) {
+            $total--;
+        }
+        my $doc = shift(@$hits) || return;
+        my $data = $doc->{_source};
+        $data->{$id_key} = $doc->{_id};
+        $data;
+    };
+}
+
 sub generator {
     my ($self) = @_;
-    my $store = $self->bag->store;
-    my $id_key = $self->bag->id_key;
+
+    # scroll + from isn't supported in es > 1.2
+    if ($self->start) {
+        return $self->_paging_generator;
+    }
+
+    my $bag    = $self->bag;
+    my $store  = $bag->store;
+    my $id_key = $bag->id_key;
     sub {
         state $total = $self->total;
         if (defined $total) {
@@ -30,12 +79,11 @@ sub generator {
             my $body = {query => $self->query};
             $body->{sort} = $self->sort if $self->sort;
             my %args = (
-                index => $store->index_name,
-                type  => $self->bag->type,
+                index => $bag->index,
+                type  => $bag->type,
                 from  => $self->start,
-                size =>
-                    $self->bag->buffer_size, # TODO divide by number of shards
-                body => $body,
+                size  => $bag->buffer_size,  # TODO divide by number of shards
+                body  => $body,
             );
             if (!$self->sort && $store->is_es_1_or_2) {
                 $args{search_type} = 'scan';
@@ -71,10 +119,10 @@ sub slice {    # TODO constrain total?
 
 sub count {
     my ($self) = @_;
-    my $store = $self->bag->store;
-    $store->es->count(
-        index => $store->index_name,
-        type  => $self->bag->type,
+    my $bag = $self->bag;
+    $bag->store->es->count(
+        index => $bag->index,
+        type  => $bag->type,
         body  => {query => $self->query,},
     )->{count};
 }

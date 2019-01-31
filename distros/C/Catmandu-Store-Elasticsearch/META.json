@@ -1,7 +1,7 @@
 {
    "abstract" : "A searchable store backed by Elasticsearch",
    "author" : [
-      "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
+      "=over 4"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-Store-Elasticsearch"
       }
    },
-   "version" : "0.0512",
+   "version" : "1.0",
    "x_contributors" : [
       "Dave Sherohman <Dave.Sherohman@ub.lu.se>",
       "Mirko Tietgen <mirko@abunchofthings.net>",

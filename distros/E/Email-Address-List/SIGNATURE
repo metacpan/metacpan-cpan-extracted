@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.69.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,35 +14,38 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 3436e919e4b66f27f2ea395cb9d4e0351877aa58 Changes
-SHA1 17f8596db104ffaea586784e085f4824fb3741ff MANIFEST
-SHA1 83ef7f35c1129972703ce725157a1c9b7acc4ce2 META.yml
-SHA1 be4547d00d6c49fe4252da994378c2a7f161c3e5 Makefile.PL
-SHA1 2a014fe26766365a791f1020ca818ed06d2dc221 README
-SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
-SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
-SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
-SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
-SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
-SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
-SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
-SHA1 dd0647d12510f67cb4969da92c8bb41bd500793f lib/Email/Address/List.pm
-SHA1 2c008b60a3213c22fcd7db589456915db8d6825f t/basics.t
-SHA1 d47c146488047eefa8f5ecbee1510f503d26c7c9 t/data/RFC5233.single.obs.json
-SHA1 31183f86437e1a75001fe0b04dea12999881274c t/data/RFC5233.single.obs.txt
-SHA1 1092a16b40cf7e979d4f234d041b342269cacbb8 t/data/RFC5233.single.valid.json
-SHA1 ef4569d12c81789362ebe6d51591213ef160c1f7 t/data/RFC5233.single.valid.txt
-SHA1 d8dda26c6e798fc201747c621f41d10f714575f9 t/generate.pl
-SHA1 e261f8f0b71767ca094cce325eda1f1aba8dfd84 t/invalid.t
-SHA1 22c9725a9feac3242072e4c5cff6a6d8a7b53e82 t/pathological.t
-SHA1 8b01eef1e4a95ad6f4fd45153f60901d24fd1f5e t/random.combinations.t
-SHA1 b749d9f357f04d94da250c484b753aecc1eb5b1c t/single.suit.t
+SHA256 aaf5c1533cdd0df780e13a25bd83e1493f3e95b622d341067526b58cfcd2083b Changes
+SHA256 9883fb41b524d22ad40d4ab5dc603b2dd2fa042bb0a6f37dad32899f9a112f33 MANIFEST
+SHA256 cf35a42849719bb793fcbeae523de016bde7a66e30e1ef2b9b77f98ab00081ed META.yml
+SHA256 76eb9ce69722da0c6093cd55ff8388fc28f26bb72283ff34676e4e3d453e6865 Makefile.PL
+SHA256 0609f05b84cbe8baccc533e178f0de3e97f7455b0b251fdc0e1066dbc52318b6 README
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 f8cab72df4fd27df5d94407c29e31a7488ddd6da8ffaf2c69680ad74c6f7eafd lib/Email/Address/List.pm
+SHA256 c9328d06f426124dae95d0692c55d4b01663ff3489615b2953f1a882bf7e83bd t/basics.t
+SHA256 d46c79aa1f71a378d39c0a1c388480b3e2258dfbf96a2d2c37dbb21afafa62a5 t/data/RFC5233.single.obs.json
+SHA256 9268997b5d59b1ed955984a33a9168e94755099073f4e5a36906261ceb723368 t/data/RFC5233.single.obs.txt
+SHA256 9127918179049e3cc716a26e099cfd9858ac2b240ffd024cf603c1533d9bf6dd t/data/RFC5233.single.valid.json
+SHA256 678c3ab4f307c69174613e72cb7076a62d6fb43b49cda43ad13d7ad09ff872b3 t/data/RFC5233.single.valid.txt
+SHA256 08c9d5abb15ce0d3dfbe6d58f96986746a0ad330098871c443e9bb6e1a4c35ae t/generate.pl
+SHA256 beb98a4d58c3e9ab75980f1d5b24d2b12c73c933148711b8e6dbf39855dc77bc t/invalid.t
+SHA256 ad0c277b7e3305533c819240ad18d1da8d2dddb511b70f0f6e145922f6aefedc t/pathological.t
+SHA256 e350edfad40192a7fb550b41910cf4058f8c07038a23c0244e286e91d7d2d252 t/random.combinations.t
+SHA256 408434761070094eec1e888e0bb8c79ec3e7c4231d78e6f5b2ea9dc949a47561 t/single.suit.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
 
-iEYEARECAAYFAlMBDQkACgkQMflWJZZAbqAqSQCfUHrof8hyCQ8vZlQ+4e3Bu+tx
-pmsAoL6gz5r1uAMH/lju07RIdWNp0ZRl
-=bcjr
+iQEcBAEBAgAGBQJcUL7JAAoJEA3wooP+rICy40UH/jSPRa4knPj16Pvz+D8Cs2td
+2mECeUfMZfg82bnDRbjzm+1NdA/pHOwHroOix6+X1lv0I1ybwHdgSKQFIYnBmQzL
+VPkbqXJ751g1S8hT5BQLttMNaNDYdTTVdZIawibVHlhY99YiKzfy5uyZzQ8fqJsJ
+K0IJl7ED4UQDlo52dSZUfZ+oX/rwXTbNofkoBY75hvXojNcJzH/8I2yFYfSCsMtm
+KKF4NBKhwqxRJrFv7XZVY+ZIQBpc8ST/pTAvOEHKybUQrMJddmAa1DUKxJgVpSG+
+dl1QljjZW7CEZtj0Dsa80rhiOGzRPgMurv1M9v486hzZVu7h3aHggnJrzXdNn+Y=
+=M3kp
 -----END PGP SIGNATURE-----

@@ -31,9 +31,12 @@ if (defined($ENV{'DISPLAY'})) {
 # Why did I do this?  Simple, managing the version and the C code is a lot
 # easier this way, and eliminates the Inline::C quirks.
 
-my $t = '    ';
+my $t = '  ';
+my $name = '========================== Graphics::Framebuffer =============================';
+my $line = '------------------------------------------------------------------------------';
+print "\n",colored(['bright_yellow on_blue'],$name),"\n";
 
-print "\n", colored(['bright_yellow'],'Adding C to Module...');
+print colored(['bright_yellow'],'Adding C to Module...');
 my $ccode = slurp_file('src/Framebuffer.c');
 my $template = slurp_file('src/Framebuffer.template.pm');
 if ($template =~ /^(.*?)\n/s) {
@@ -49,7 +52,7 @@ open(my $FILE,'>','lib/Graphics/Framebuffer.pm');
 print $FILE $template;
 close($FILE);
 
-print colored(['bright_green'],' Added'),"\n\n";
+print colored(['bright_green'],' Added'),"\n";
 
 if (WriteMakefile(
     NAME               => 'Graphics::Framebuffer',
@@ -57,7 +60,7 @@ if (WriteMakefile(
     VERSION_FROM       => 'lib/Graphics/Framebuffer.pm',
     ABSTRACT_FROM      => 'lib/Graphics/Framebuffer.pm',
     PL_FILES           => {},
-    MIN_PERL_VERSION   => 5.008, # 5.6 is considered slow and unstable.  Upgrade
+    MIN_PERL_VERSION   => 5.008, # 5.6 (5.006) is considered slow and unstable.  Upgrade
     CONFIGURE_REQUIRES => {
         'Inline::MakeMaker'   => 0.45,
         'ExtUtils::MakeMaker' => 4.52,
@@ -72,7 +75,7 @@ if (WriteMakefile(
         'Math::Trig'     => '1.10',
         'Math::Gradient' => '0.03',
         'List::Util'     => '1.20',
-        'File::Map'      => '0.65',
+        'File::Map'      => '0.64',
         'Imager'         => '0.91',
         'Inline'         => '0.53',
         'Inline::C'      => '0.53',
@@ -80,20 +83,20 @@ if (WriteMakefile(
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
     clean => {FILES    => 'Graphics-Framebuffer* _Inline* examples/_Inline* *log'},
 )) {
-    print "\n",colored(['blue on_blue'],'=' x79),"\n";
-    print "The ",'"', colored(['bold cyan'],'examples'), qq{" directory (in this package) has some handy scripts to help get\nyou started, and show you how to use the module.  Just 'perldoc' on each to see\nhow to use them:\n\n};
+    print colored(['blue on_blue'],$line),"\n";
+    print "The ",'"', colored(['bold cyan'],'examples'), qq{" directory (in this package) has some handy scripts to help get\nyou started, and show you how to use the module.  Just 'perldoc' on each to\nsee how to use them:\n\n};
 
-    print $t,colored(['bold green'],'primitives.pl'),"         - This script will pretty much demonstrate all of the\n                            capabilities of this module.\n\n";
-    print $t,colored(['bold green'],'threaded_slideshow.pl')," - This script shows all of the images in a specific\n                            path.  It divides your screen by how many threads,\n                            and dedicates a thread to each portion to show an\n                            image.\n\n";
-    print $t,colored(['bold green'],'slideshow.pl'),"          - This script shows all of the images in a specific\n                            path (full screen, if asked).\n\n";
-    print $t,colored(['bold green'],'viewpic.pl'),"            - This script shows one specific image (or\n                            animation).\n\n";
-    print $t,colored(['bold green'],'dump.pl'),"               - This script does a diagnostic variable dump to the\n                            file 'dump.log', for the author to help you with\n                            troubleshooting.\n\n";
+    print $t,colored(['bold green'],'primitives.pl'),"         - This script will pretty much demonstrate all of\n                          the capabilities of this module.\n\n";
+    print $t,colored(['bold green'],'threaded_slideshow.pl')," - This script shows all of the images in a specific\n                          path.  It divides your screen by how many threads,\n                          and dedicates a thread to each portion to show an\n                          image.\n\n";
+    print $t,colored(['bold green'],'slideshow.pl'),"          - This script shows all of the images in a specific\n                          path (full screen, if asked).\n\n";
+    print $t,colored(['bold green'],'viewpic.pl'),"            - This script shows one specific image (or\n                          animation).\n\n";
+    print $t,colored(['bold green'],'dump.pl'),"               - This script does a diagnostic variable dump to the\n                          file 'dump.log', for the author to help you with\n                          troubleshooting.\n\n";
     print $t,colored(['bold green'],'fonts.pl'),"              - This script prints installed font names.\n";
-    print colored(['blue on_blue'],'=' x79),"\n";
+    print colored(['blue on_blue'],$line),"\n";
 
-    print colored(['bright_white on_blue'],' Building   -> '),colored(['bright_green'],'  make'),"\n";
-    print colored(['bright_white on_blue'],' Testing    -> '),colored(['bright_green'],'  make test'),"\n";
-    print colored(['bright_white on_blue'],' Installing -> '),colored(['red'],'  sudo '),colored(['bright_green'],'make install'),"\n";
+    print colored(['bright_white on_magenta'],' Building   -> '),colored(['bright_green'],'  make'),"\n";
+    print colored(['bright_white on_magenta'],' Testing    -> '),colored(['bright_green'],'  make test'),"\n";
+    print colored(['bright_white on_magenta'],' Installing -> '),colored(['red'],'  sudo '),colored(['bright_green'],'make install'),"\n";
 }
 
 sub slurp_file {

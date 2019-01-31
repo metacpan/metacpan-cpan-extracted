@@ -1,6 +1,6 @@
 package WWW::Google::APIDiscovery;
 
-$WWW::Google::APIDiscovery::VERSION   = '0.25';
+$WWW::Google::APIDiscovery::VERSION   = '0.26';
 $WWW::Google::APIDiscovery::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::APIDiscovery - Interface to Google API Discovery Service.
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 

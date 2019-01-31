@@ -1,0 +1,12 @@
+package TestCase::Lib::SPVM::Byte {
+  sub basic : int () {
+    my $oval = SPVM::Byte->new(INT8_MIN());
+    my $value1 = $oval->val;
+    
+    unless ($value1 == INT8_MIN()) {
+      return 0;
+    }
+    
+    return 1;
+  }
+}

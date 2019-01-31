@@ -1,4 +1,4 @@
-MODULE = FFI::Platypus PACKAGE = FFI::Platypus::Function
+MODULE = FFI::Platypus PACKAGE = FFI::Platypus::Function::Function
 
 ffi_pl_function *
 new(class, platypus, address, abi, return_type, ...)
@@ -107,7 +107,7 @@ call(self, ...)
     }
 
 void
-attach(self, perl_name, path_name, proto)
+_attach(self, perl_name, path_name, proto)
     SV *self
     const char *perl_name
     ffi_pl_string path_name

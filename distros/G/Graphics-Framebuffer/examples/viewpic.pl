@@ -26,31 +26,13 @@ GetOptions(
     'alpha=i' => \$alpha,
 );
 
-my ($fr,$f) = Graphics::Framebuffer->new(
+our $f = Graphics::Framebuffer->new(
     'SPLASH'        => 0,
     'SHOW_ERRORS'   => 0,
     'RESET'         => 1 - $noclear,
-    'DOUBLE_BUFFER' => 1,
 );
 
-my $DB    = 0;
-my $DIRTY = 1;
-
-my $info = $fr->screen_dimensions();
-
-if ($info->{'bits_per_pixel'} == 16 && $fr->{'ACCELERATED'}) {
-    $DB = 1;
-    $SIG{'ALRM'} = sub {
-        alarm(0);
-        if ($DIRTY) {
-            $DIRTY = 0;
-            $fr->blit_flip($f);
-        }
-        alarm(1/15);
-    };
-} else {
-    $f = $fr;
-}
+my $info = $f->screen_dimensions();
 
 system('clear');
 $f->cls('OFF');
@@ -82,7 +64,6 @@ if (ref($image) eq 'ARRAY') {
         $f->normal_mode();
     }
     $f->blit_write($image);
-    $DIRTY = 1;
     sleep $delay if ($delay);
 }
 

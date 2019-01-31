@@ -52,7 +52,6 @@ pod_spelling_system:
     - zmughal
     - Scala
     - JVM
-    - gcj
     - integrators
     - ABIs
     - abis
@@ -114,6 +113,7 @@ pod_spelling_system:
     - cxx
     - shellwords
     - fbx
+    - strndup
 
 
 pod_coverage:
@@ -142,3 +142,4 @@ pod_coverage:
     - FFI::Build::File::C#build_item
     - FFI::Build::File::Object#build_item
     - FFI::Build::MM
+    - FFI::Platypus::Function#new

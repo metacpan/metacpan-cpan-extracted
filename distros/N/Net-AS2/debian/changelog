@@ -1,0 +1,45 @@
+libnet-as2-perl (1.0-1) stable; urgency=low
+
+  * HTTP::Headers
+    - Accept an HTTP::Headers compatible object for the headers parameter in
+      decode_message() and decode_mdn(). A hash ref is also still accepted.
+
+  * Update POD documentation
+
+  * Packaging
+    - Use and configure Dist::Zilla
+    - Review POD style
+    - Fix POD content errors
+
+  * File options
+    - Enable private key and certificates to be read in from files
+
+  * HTTPS support
+    - Enable UserAgent class to be configured
+    - Provide support for sending requests over HTTPS
+
+  * Enable SHA-2 support
+    - Use Digest::SHA to provide support for sha1 and sha2 signing.
+      SHA-2 is not officially part of the AS2 RFC specification but
+      is commonly implemented in AS2 implementations.
+
+  * Bugfixes to ensure communication compatibility
+    - Tested communication with as2-server
+    - Tested communication with RSSBus
+
+  * Miscellaneous
+    - Remove trailing whitespace
+    - Remove use of experimental smartmatch feature
+    - minor corrections of POD
+    - Split up tests so that older Perl versions pass.
+      This avoids some memory leak with Crypt::SMIME.
+    - Add 2019 copyright
+    - Update Maintainer information
+
+ -- Andrew Maguire <ajm@cpan.org>  Wed, 30 Jan 2019 11:33:12 +1300
+
+libnet-as2-perl (0.03-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Andrew Maguire <ajm@cpan.org>  Mon, 7 Jan 2019 12:26:24 +1300

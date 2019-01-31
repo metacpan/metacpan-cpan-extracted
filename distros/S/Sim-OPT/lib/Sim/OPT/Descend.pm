@@ -38,7 +38,7 @@ no warnings;
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( descend prepareblank ); # our @EXPORT = qw( );
 
-$VERSION = '0.127'; # our $VERSION = '';
+$VERSION = '0.129'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -1110,7 +1110,7 @@ sub descend
     }
     elsif ( ( $direction eq "<" ) or ( ( $direction eq "star"  ) and ( $starorder eq "<"  ) ) )
     {
-      $winnerentry = $lines[-1]; #say $tee "DIRECTION < OR STAR IN SUB TAKEOPTIMA. \$winnerentry: " . dump($winnerentry);
+      $winnerentry = $lines[0]; #say $tee "DIRECTION < OR STAR IN SUB TAKEOPTIMA. \$winnerentry: " . dump($winnerentry);
     }
     elsif ( ( $direction eq "=" ) or ( ( $direction eq "star"  ) and ( $starorder eq "="  ) ) )
     {
@@ -1379,12 +1379,12 @@ sub descend
         my $winnerentry;
         if ( ( $direction eq ">" ) or ( ( $direction eq "star"  ) and ( $starorder eq ">"  ) ) )
         {
-          $winnerentry = $lines[0]; #say TOFILE "dump( IN SUB TAKEOPTIMA\$winnerentry): " . dump($winnerentry);
+          $winnerentry = $lines[0]; #say $tee "dump( TAKEN_ IN SUB TAKEOPTIMA\$winnerentry): " . dump($winnerentry);
         }
         elsif ( ( $direction eq "<" ) or ( ( $direction eq "star"  ) and ( $starorder eq "<"  ) ) )
         {
           #$winnerentry = $lines[-1];
-          $winnerentry = $lines[0];
+          $winnerentry = $lines[0]; #say $tee "dump( TAKEN_ IN SUB TAKEOPTIMA\$winnerentry): " . dump($winnerentry);
         }
         elsif ( ( $direction eq "=" ) or ( ( $direction eq "star"  ) and ( $starorder eq "="  ) ) )
         {

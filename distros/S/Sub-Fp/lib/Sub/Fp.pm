@@ -6,7 +6,8 @@ use POSIX;
 use List::Util;
 use Data::Dumper qw(Dumper);
 use Exporter qw(import);
-our @EXPORT_LIST = qw(
+our $VERSION = '0.41';
+our @EXPORT_OK = qw(
     incr        reduces   flatten
     drop_right  drop      take_right  take
     assoc       maps      decr        chain
@@ -20,12 +21,10 @@ our @EXPORT_LIST = qw(
     second      range     pops        pushes
     shifts      unshifts  once
 );
-our @EXPORT_OK                 = @EXPORT_LIST;
-our $VERSION                   = '0.40';
 use constant ARG_PLACE_HOLDER => {};
 
 _wrap_to_use_partials(
-    grep { $_ !~ /flow|flow_right|partial|chain/ } @EXPORT_LIST
+    grep { $_ !~ /flow|flow_right|partial|chain/ } @EXPORT_OK
 );
 
 # -----------------------------------------------------------------------------#
@@ -150,7 +149,7 @@ sub _is_nonsense_range {
 }
 
 
-sub get {
+sub _safe_get {
     my $key     = shift // 0;
     my $coll    = shift // [];
     my $default = shift;
@@ -166,6 +165,21 @@ sub get {
     my $string_coll = [spread($coll)];
 
     return defined $string_coll->[$key] ? $string_coll->[$key] : $default;
+}
+
+sub get {
+    my ($path, $coll, $default) = @_;
+
+    if (!len($path)) {
+        return $default;
+    }
+
+    my $accessors = [$path =~ /([\w\s-]+)/g];
+
+    return reduces(sub {
+        my ($value, $accessor) = @_;
+        return _safe_get($accessor, $value, $default);
+    }, $coll, $accessors)
 }
 
 sub apply {

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.0800';
+our $VERSION = '0.0801';
 
 use Moo;
 use MIDI::Simple;
@@ -92,7 +92,6 @@ sub count_in {
 }
 
 
-
 sub metronome {
     my $self = shift;
     my $bars = shift || $self->bars;
@@ -127,21 +126,26 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.0800
+version 0.0801
 
 =head1 SYNOPSIS
 
  use MIDI::Drummer::Tiny;
+
  my $d = MIDI::Drummer::Tiny->new(
     file      => 'drums.mid',
     bpm       => 100,
     signature => '3/4',
     bars      => 32,
  );
- $d->count_in(1);
+
+ $d->count_in(1);  # HH for 1 bar
+
  $d->note( $d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare )
-    for 1 .. $d->beats * $d->bars;  # Alternate beats
- $d->metronome();  # <- Similar but honoring time signature
+    for 1 .. $d->beats * $d->bars;  # Alternate kick and snare
+
+ $d->metronome();  # Similar but honoring time signature
+
  $d->write();
 
 =head1 DESCRIPTION

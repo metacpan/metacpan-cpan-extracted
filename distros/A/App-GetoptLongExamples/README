@@ -1,0 +1,43 @@
+NAME
+    App::GetoptLongExamples - Collection of CLI examples related to
+    Getopt::Long
+
+VERSION
+    This document describes version 0.001 of App::GetoptLongExamples (from
+    Perl distribution App-GetoptLongExamples), released on 2019-01-30.
+
+DESCRIPTION
+    This distribution provides the following command-line utilities:
+
+    *   getopt-long-sample-implicit-dest-classic
+
+    *   getopt-long-sample-implicit-dest-hash-storage
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-GetoptLongExamples>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-GetoptLongExamples>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-GetoptLongExample
+    s>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Getopt::Long
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

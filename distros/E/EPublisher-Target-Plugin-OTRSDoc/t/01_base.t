@@ -3,14 +3,7 @@
 use strict;
 use warnings;
 
-#######################
-# TESTING starts here #
-#######################
-use Test::More tests => 7;
-
-###########################
-# General module tests... #
-###########################
+use Test::More;
 
 my $module = 'EPublisher::Target::Plugin::OTRSDoc';
 use_ok( $module );
@@ -19,14 +12,8 @@ use_ok( 'EPublisher::Target::Base' );
 my $obj = $module->new();
 
 isa_ok($obj, 'EPublisher::Target::Base');
+can_ok($obj, qw'deploy new publisher _config');
 
-can_ok($obj, 'deploy');
-can_ok($obj, 'new');
-can_ok($obj, 'publisher');
-can_ok($obj, '_config');
 
-########
-# done #
-########
-1;
+done_testing();
 

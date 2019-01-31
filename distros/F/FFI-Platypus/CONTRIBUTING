@@ -40,7 +40,7 @@ CONTRIBUTING
 
      % perl Makefile.PL
      % make
-     % make mymm_test
+     % make ffi-test
      % prove -bv t
      # or an individual test
      % perl -Mblib t/ffi_platypus_memory.t
@@ -79,6 +79,15 @@ CONTRIBUTING
        Generating a Unix-style Makefile
        Writing Makefile for FFI::Platypus
        Writing MYMETA.yml and MYMETA.json
+
+    V
+
+      When building platypus may hide some of the excessive output when
+      probing and building, unless you set V to a true value.
+
+       % env V=1 perl Makefile.PL
+       % make V=1
+       ...
 
  Coding Guidelines
 

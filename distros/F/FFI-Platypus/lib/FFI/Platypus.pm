@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use 5.008001;
 use Carp qw( croak );
+use FFI::Platypus::Function;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -270,18 +271,39 @@ sub type_meta
 
 sub function
 {
+  my $wrapper;
+  $wrapper = pop if ref $_[-1] eq 'CODE';
+
   my($self, $name, $args, $ret) = @_;
-  croak "usage \$ffi->function( name, [ arguments ], return_type)" unless @_ == 4;
+  croak "usage \$ffi->function( name, [ arguments ], return_type)" unless (@_ == 4) || (@_ == 5);
   my @args = map { $self->_type_lookup($_) || croak "unknown type: $_" } @$args;
   $ret = $self->_type_lookup($ret) || croak "unknown type: $ret";
   my $address = $name =~ /^-?[0-9]+$/ ? $name : $self->find_symbol($name);
   croak "unable to find $name" unless defined $address || $self->ignore_not_found;
   return unless defined $address;
-  FFI::Platypus::Function->new($self, $address, $self->{abi}, $ret, @args);
+  my $function = FFI::Platypus::Function::Function->new($self, $address, $self->{abi}, $ret, @args);
+  $wrapper
+    ? FFI::Platypus::Function::Wrapper->new($function, $wrapper)
+    : $function;
+}
+
+sub _function_meta
+{
+  # NOTE: may be upgraded to a documented function one day,
+  # but shouldn't be used externally as we will rename it
+  # if that happens.
+  my($self, $name, $meta, $args, $ret) = @_;
+  $args = ['opaque','int',@$args];
+  $self->function(
+    $name, $args, $ret, sub {
+      my $xsub = shift;
+      $xsub->($meta, scalar(@_), @_);
+    },
+  );
 }
 
 
-my $inner_counter=0;
+#my $inner_counter=0;
 
 sub attach
 {
@@ -296,30 +318,11 @@ sub attach
   croak "you tried to provide a perl name that looks like an address"
     if $perl_name =~ /^-?[0-9]+$/;
   
-  my $function = $self->function($c_name, $args, $ret);
+  my $function = $self->function($c_name, $args, $ret, $wrapper);
   
   if(defined $function)
   {
-    my($caller, $filename, $line) = caller;
-    $perl_name = join '::', $caller, $perl_name
-      unless $perl_name =~ /::/;
-    
-    my $attach_name = $perl_name;
-    if($wrapper)
-    {
-      $attach_name = "FFI::Platypus::Inner::xsub$inner_counter";
-      $inner_counter++;
-    }
-    
-    $function->attach($attach_name, "$filename:$line", $proto);
-    
-    if($wrapper)
-    {
-      my $inner_coderef = \&{$attach_name};
-      no strict 'refs';
-      # TODO: Sub::Name ?
-      *{$perl_name} = sub { $wrapper->($inner_coderef, @_) };
-    }
+    $function->attach($perl_name);
   }
   
   $self;
@@ -543,25 +546,11 @@ sub _have_pm
   $ok;
 }
 
-package FFI::Platypus::Function;
-
-our $VERSION = '0.74'; # VERSION
-
-use overload '&{}' => sub {
-  my $ffi = shift;
-  sub { $ffi->call(@_) };
-};
-
-use overload 'bool' => sub {
-  my $ffi = shift;
-  return $ffi;
-};
-
 package FFI::Platypus::Type;
 
 use Carp qw( croak );
 
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 sub new
 {
@@ -663,7 +652,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 0.74
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -681,11 +670,11 @@ version 0.74
 
 =head1 DESCRIPTION
 
-Platypus is a library for creating interfaces to machine code libraries 
-written in languages like C, L<C++|FFI::Platypus::Lang::CPP>, 
-L<Fortran|FFI::Platypus::Lang::Fortran>, 
-L<Rust|FFI::Platypus::Lang::Rust>, 
-L<Pascal|FFI::Platypus::Lang::Pascal>. Essentially anything that gets 
+Platypus is a library for creating interfaces to machine code libraries
+written in languages like C, L<C++|FFI::Platypus::Lang::CPP>,
+L<Fortran|FFI::Platypus::Lang::Fortran>,
+L<Rust|FFI::Platypus::Lang::Rust>,
+L<Pascal|FFI::Platypus::Lang::Pascal>. Essentially anything that gets
 compiled into machine code.  This implementation uses C<libffi> to 
 accomplish this task.  C<libffi> is battle tested by a number of other 
 scripting and virtual machine languages, such as Python and Ruby to 
@@ -954,6 +943,8 @@ Examples:
 
  my $function = $ffi->function($name => \@argument_types => $return_type);
  my $function = $ffi->function($address => \@argument_types => $return_type);
+ my $function = $ffi->function($name => \@argument_types => $return_type, \&wrapper);
+ my $function = $ffi->function($address => \@argument_types => $return_type, \&wrapper);
 
 Returns an object that is similar to a code reference in that it can be 
 called like one.
@@ -980,6 +971,13 @@ Example: a C function could return the address of another C function
 that you might want to call, or modules such as L<FFI::TinyCC> produce 
 machine code at runtime that you can call from Platypus.
 
+[version 0.76]
+
+If the last argument is a code reference, then it will be used as a 
+wrapper around the function when called.  The first argument to the wrapper 
+will be the inner function, or if it is later attached an xsub.  This can be
+used if you need to verify/modify input/output data.
+
 Examples:
 
  my $function = $ffi->function('my_function_name', ['int', 'string'] => 'string');
@@ -990,9 +988,9 @@ Examples:
  $ffi->attach($name => \@argument_types => $return_type);
  $ffi->attach([$c_name => $perl_name] => \@argument_types => $return_type);
  $ffi->attach([$address => $perl_name] => \@argument_types => $return_type);
- $ffi->attach($name => \@argument_types => $return_type, sub { ... });
- $ffi->attach([$c_name => $perl_name] => \@argument_types => $return_type, sub { ... });
- $ffi->attach([$address => $perl_name] => \@argument_types => $return_type, sub { ... });
+ $ffi->attach($name => \@argument_types => $return_type, \&wrapper);
+ $ffi->attach([$c_name => $perl_name] => \@argument_types => $return_type, \&wrapper);
+ $ffi->attach([$address => $perl_name] => \@argument_types => $return_type, \&wrapper);
 
 Find and attach a C function as a real live Perl xsub.  The advantage of 
 attaching a function over using the L<function|/function> method is that 
@@ -1748,129 +1746,6 @@ will come in after that.  This allows you to modify / convert the
 arguments to conform to the C API.  What ever value you return from the 
 wrapper function will be returned back to the original caller.
 
-=head2 Java
-
-Java:
-
- // On Linux build .so with
- // % gcj -fPIC -shared -o libexample.so Example.java
- 
- public class Example
- {
-   public static void print_hello()
-   {
-     System.out.println("hello world");
-   }
- 
-   public static int add(int a, int b)
-   {
-     return a + b;
-   }
- }
-
-C++:
-
- #include <gcj/cni.h>
- #include <java/lang/System.h>
- #include <java/io/PrintStream.h>
- #include <java/lang/Throwable.h>
- 
- extern "C" void
- gcj_start()
- {
-   using namespace java::lang;
- 
-   JvCreateJavaVM(NULL);
-   JvInitClass(&System::class$);
- }
- 
- extern "C" void
- gcj_end()
- {
-   JvDetachCurrentThread();
- }
-
-Perl:
-
- use FFI::Platypus;
- 
- my $ffi = FFI::Platypus->new;
- $ffi->lib('./libexample.so');
- 
- # Java methods are mangled by gcj using the same format as g++
- 
- $ffi->attach(
-   [ _ZN7Example11print_helloEJvv => 'print_hello' ] => [] => 'void'
- );
- 
- $ffi->attach(
-   [ _ZN7Example3addEJiii => 'add' ] => ['int', 'int'] => 'int'
- );
- 
- # Initialize the Java runtime
- 
- $ffi->function( gcj_start => [] => 'void' )->call;
- 
- print_hello();
- print add(1,2), "\n";
- 
- # Wind the java runtime down
- 
- $ffi->function( gcj_end => [] => 'void' )->call;
-
-Makefile:
-
- GCJ=gcj
- CXX=g++
- CFLAGS=-fPIC
- LDFLAGS=-shared
- RM=rm -f
- 
- libexample.so: between.o Example.o
- 	$(GCJ) $(LDFLAGS) -o libexample.so between.o Example.o
- 
- between.o: between.cpp
- 	$(CXX) $(CFLAGS) -c -o between.o between.cpp
- 
- Example.o: Example.java
- 	$(GCJ) $(CFLAGS) -c -o Example.o Example.java
- 
- clean:
- 	$(RM) *.o *.so
-
-Output:
-
- % make
- g++ -fPIC -c -o between.o between.cpp
- gcj -fPIC -c -o Example.o Example.java
- gcj -shared -o libexample.so between.o Example.o
- % perl example.pl 
- hello world
- 3
-
-B<Discussion>: You can't call Java .class files directly from FFI / 
-Platypus, but you can compile Java source and .class files into a shared 
-library using the GNU Java Compiler C<gcj>.  Because we are calling Java 
-functions from a program (Perl!) that was not started from a Java 
-C<main()> we have to initialize the Java runtime ourselves
-(L<details|https://gcc.gnu.org/onlinedocs/gcj/Invocation.html>).
-This can most easily be accomplished from C++.
-
-The GNU Java Compiler uses the same format to mangle method names as GNU 
-C++.  The L<C++ plugin|FFI::Platypus::Lang::CPP> for handles this more 
-transparently by extracting the symbols from the shared library and 
-using either L<FFI::Platypus::Lang::CPP::Demangle::XS> or C<c++filt> to 
-determined the unmangled names.
-
-Although the Java source is compiled ahead of time with optimizations, 
-it will not necessarily perform better than a real JVM just because it 
-is compiled.  In fact the gcj developers warn than gcj will optimize 
-Java source better than Java .class files.  The GNU Java Compiler also 
-lags behind modern Java.
-
-Even so this enables you to call Java from Perl and potentially other 
-Java based languages such as Scala, Groovy or JRuby.
-
 =head1 FAQ
 
 =head2 I get seg faults on some platforms but not others with a library using pthreads.
@@ -1914,12 +1789,11 @@ Like OpenVMS
 
 =item Languages that do not support using dynamic libraries from other languages
 
-Like Google's Go.  Although I believe that XS won't help in this 
-regard.
+Like older versions of Google's Go. This is a problem for C / XS code as well.
 
 =item Languages that do not compile to machine code
 
-Like .NET based languages and Java that can't be understood by gcj.
+Like .NET based languages and Java.
 
 =back
 
@@ -1992,7 +1866,7 @@ libtest> command to build it.  Example:
 
  % perl Makefile.PL
  % make
- % make mymm_test
+ % make ffi-test
  % prove -bv t
  # or an individual test
  % perl -Mblib t/ffi_platypus_memory.t
@@ -2033,6 +1907,15 @@ environment variable when you run C<Makefile.PL>:
  Generating a Unix-style Makefile
  Writing Makefile for FFI::Platypus
  Writing MYMETA.yml and MYMETA.json
+
+=item V
+
+When building platypus may hide some of the excessive output when
+probing and building, unless you set C<V> to a true value.
+
+ % env V=1 perl Makefile.PL
+ % make V=1
+ ...
 
 =back
 

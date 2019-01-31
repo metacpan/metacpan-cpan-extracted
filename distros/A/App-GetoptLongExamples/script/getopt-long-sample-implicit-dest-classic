@@ -1,0 +1,118 @@
+#!perl
+
+our $DATE = '2019-01-30'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config gnu_getopt no_ignore_case);
+use Data::Dump;
+
+use vars qw($opt_foo $opt_no_bar $opt_baz);
+
+GetOptions(
+    'foo=s',
+    'bar=s' => \$opt_no_bar,
+    'baz=s',
+    'help|h' => sub {
+        print <<'_';
+Usage:
+  getopt-long-sample-implicit-dest [[--foo=s] [--bar=s] [--baz=s]] | [--help|-h]
+_
+        exit 0;
+    },
+);
+
+print "Options: "; dd {foo=>$opt_foo, bar=>$opt_no_bar, baz=>$opt_baz};
+
+1;
+
+# ABSTRACT: Example of Getopt::Long usage with some implicit destinations
+# PODNAME: getopt-long-sample-implicit-dest-classic
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+getopt-long-sample-implicit-dest-classic - Example of Getopt::Long usage with some implicit destinations
+
+=head1 VERSION
+
+This document describes version 0.001 of getopt-long-sample-implicit-dest-classic (from Perl distribution App-GetoptLongExamples), released on 2019-01-30.
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+When getting options with L<Getopt::Long>'s L<GetOptions>, one usually specifies
+a destination for each option specification:
+
+ GetOptions(
+     'foo=s' => \$foo,
+     'bar=s' => \@bar,
+     'help'  => sub { ... },
+ );
+
+But Getopt::Long allows not specifying these destinations. When the first
+argument is a reference to a hash ("hash storage mode") then the hash (with the
+option name as the key being looked up) will be consulted for the destination
+and if no such destination exist, the hash key will be set:
+
+ my %opts = (
+     bar => \@bar,
+ );
+
+ GetOptions(
+     \%opts,
+     'foo=s',                # will set $opts{foo}
+     'bar=s',                # will push to @bar
+     'help'  => sub { ... },
+ );
+
+When the first argument is not a hashref ("classic mode"), the corresponding
+C<$opt_OPTIONNAME> will be set, without regard of destination types.
+
+ GetOptions(
+     'foo=s',                # will set $opt_foo to option value, regardless of current content of $opt_foo
+     'bar=s',                # will set $opt_bar to option value, regardless of current content of $opt_bar
+     'help'  => sub { ... },
+ );
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-GetoptLongExamples>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-GetoptLongExamples>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GetoptLongExamples>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Getopt::Long>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

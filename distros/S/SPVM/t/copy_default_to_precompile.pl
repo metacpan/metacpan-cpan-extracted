@@ -48,10 +48,6 @@ find(
         unless ($content =~ /:\s+interface\s+{/) {
           $content =~ s/\bsub\b/precompile sub/g;
           $content =~ s/\bnative\s+precompile\b/native/g;
-          
-          # TODO
-          # anon sub precompile have some bugs, so I suppress it for a while
-          $content =~ s/precompile sub :/sub :/g;
         }
         
         mkpath $to_dir;
@@ -68,3 +64,6 @@ find(
   },
   $test_default_dir
 );
+
+# Add spvm_build directory
+mkdir 't/precompile/spvm_build';

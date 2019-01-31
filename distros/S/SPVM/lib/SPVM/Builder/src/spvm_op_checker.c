@@ -1286,8 +1286,8 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 || SPVM_TYPE_is_short_type(compiler, term_mutable_type->basic_type->id, term_mutable_type->dimension, term_mutable_type->flag))
               {
                 SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, op_cur->file, op_cur->line);
-                SPVM_OP* op_convert_type = SPVM_OP_new_op_type(compiler, term_mutable_type, op_cur->file, op_cur->line);
-                SPVM_OP_build_convert(compiler, op_convert, op_convert_type, op_subtract);
+                SPVM_OP* op_dist_type = SPVM_OP_new_op_type(compiler, term_mutable_type, op_cur->file, op_cur->line);
+                SPVM_OP_build_convert(compiler, op_convert, op_dist_type, op_subtract);
                 SPVM_OP_build_assign(compiler, op_assign, op_term_mutable_clone, op_convert);
               }
               else {
@@ -1359,8 +1359,8 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 || SPVM_TYPE_is_short_type(compiler, term_mutable_type->basic_type->id, term_mutable_type->dimension, term_mutable_type->flag))
               {
                 SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, op_cur->file, op_cur->line);
-                SPVM_OP* op_convert_type = SPVM_OP_new_op_type(compiler, term_mutable_type, op_cur->file, op_cur->line);
-                SPVM_OP_build_convert(compiler, op_convert, op_convert_type, op_add);
+                SPVM_OP* op_dist_type = SPVM_OP_new_op_type(compiler, term_mutable_type, op_cur->file, op_cur->line);
+                SPVM_OP_build_convert(compiler, op_convert, op_dist_type, op_add);
                 SPVM_OP_build_assign(compiler, op_assign_add, op_term_mutable_clone, op_convert);
               }
               else {
@@ -1439,8 +1439,8 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 || SPVM_TYPE_is_short_type(compiler, term_mutable_type->basic_type->id, term_mutable_type->dimension, term_mutable_type->flag))
               {
                 SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, op_cur->file, op_cur->line);
-                SPVM_OP* op_convert_type = SPVM_OP_new_op_type(compiler, term_mutable_type, op_cur->file, op_cur->line);
-                SPVM_OP_build_convert(compiler, op_convert, op_convert_type, op_subtract);
+                SPVM_OP* op_dist_type = SPVM_OP_new_op_type(compiler, term_mutable_type, op_cur->file, op_cur->line);
+                SPVM_OP_build_convert(compiler, op_convert, op_dist_type, op_subtract);
                 SPVM_OP_build_assign(compiler, op_assign_subtract, op_term_mutable_clone, op_convert);
               }
               else {
@@ -1574,8 +1574,8 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               if (need_conversion) {
                 SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, op_cur->file, op_cur->line);
-                SPVM_OP* op_convert_type = SPVM_OP_new_op_type(compiler, term_mutable_type, op_cur->file, op_cur->line);
-                SPVM_OP_build_convert(compiler, op_convert, op_convert_type, op_culc);
+                SPVM_OP* op_dist_type = SPVM_OP_new_op_type(compiler, term_mutable_type, op_cur->file, op_cur->line);
+                SPVM_OP_build_convert(compiler, op_convert, op_dist_type, op_culc);
                 SPVM_OP_build_assign(compiler, op_assign, op_term_mutable_clone, op_convert);
               }
               else {
@@ -1615,7 +1615,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               // Check if source can be assigned to dist
               // If needed, numeric convertion op is added
               dist_type = SPVM_OP_get_type(compiler, op_term_dist);
-              SPVM_OP_CHECKER_check_assign(compiler, dist_type, op_term_src);
+              SPVM_OP_CHECKER_check_assign(compiler, dist_type, op_term_src, "assign operator");
               if (compiler->error_count > 0) {
                 return;
               }
@@ -1623,6 +1623,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               // If dist is string access and const, it is invalid
               if (op_term_dist->id == SPVM_OP_C_ID_ARRAY_ACCESS && op_term_dist->flag & SPVM_OP_C_FLAG_ARRAY_ACCESS_CONST) {
                 SPVM_COMPILER_error(compiler, "Can't change each character of string at %s line %d\n", op_term_dist->file, op_term_dist->line);
+                return;
               }
               
               break;
@@ -1640,7 +1641,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               else {
                 // Automatical numeric convertion
-                SPVM_OP_CHECKER_check_assign(compiler, sub->return_type, op_term);
+                SPVM_OP_CHECKER_check_assign(compiler, sub->return_type, op_term, "return statement");
                 if (compiler->error_count > 0) {
                   return;
                 }
@@ -2353,7 +2354,10 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   
                   // Check if source can be assigned to dist
                   // If needed, numeric convertion op is added
-                  op_term = SPVM_OP_CHECKER_check_assign(compiler, sub_arg_my_type, op_term);
+                  char place[50];
+                  sprintf(place, "arguments %d", call_sub_args_count);
+                  
+                  op_term = SPVM_OP_CHECKER_check_assign(compiler, sub_arg_my_type, op_term, place);
                   if (compiler->error_count > 0) {
                     return;
                   }
@@ -2501,10 +2505,10 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   // Class->FOO
                   // [After]
                   // $Class::FOO
-
+                  
                   SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                   
-                  const char* package_name = call_sub->op_invocant->uv.type->basic_type->name;
+                  const char* package_name = call_sub->sub->package->name;
                   const char* package_var_base_name = call_sub->sub->accessor_original_name;
                   char* package_var_name = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, 1 + strlen(package_name) + 2 + strlen(package_var_base_name));
                   memcpy(package_var_name, "$", 1);
@@ -2520,6 +2524,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   SPVM_OP_CHECKER_check_tree(compiler, op_package_var_access, check_ast_info);
 
                   op_cur = op_package_var_access;
+
                 }
                 // Package var setter is replaced to package var access
                 else if (call_sub->sub->is_package_var_setter) {
@@ -2527,6 +2532,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   // Class->SET_FOO($value)
                   // [After]
                   // $Class::FOO = $value
+                  
 
                   SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                   
@@ -2537,7 +2543,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
 
                   op_term_value->no_need_check = 1;
                   
-                  const char* package_name = call_sub->op_invocant->uv.type->basic_type->name;
+                  const char* package_name = call_sub->sub->package->name;
                   const char* package_var_base_name = call_sub->sub->accessor_original_name;
                   char* package_var_name = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, 1 + strlen(package_name) + 2 + strlen(package_var_base_name));
                   memcpy(package_var_name, "$", 1);
@@ -3151,7 +3157,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               if (!is_valid) {
                 const char* src_type_name = SPVM_TYPE_new_type_name(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag);
                 const char* dist_type_name = SPVM_TYPE_new_type_name(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag);
-                SPVM_COMPILER_error(compiler, "Can't convert %s to %s by type cast at %s line %d\n", src_type_name, dist_type_name, op_src->file, op_src->line);
+                SPVM_COMPILER_error(compiler, "Can't convert %s to %s by type convert at %s line %d\n", src_type_name, dist_type_name, op_src->file, op_src->line);
                 return;
               }
               
@@ -4059,7 +4065,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
 #endif
 }
 
-SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_type, SPVM_OP* op_src) {
+SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_type, SPVM_OP* op_src, const char* place) {
   SPVM_TYPE* src_type = SPVM_OP_get_type(compiler, op_src);
   
   // Dist type is numeric type
@@ -4338,19 +4344,19 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
     }
   }
   else {
-    SPVM_COMPILER_error(compiler, "Can't assign to empty type at %s line %d\n", op_src->file, op_src->line);
+    SPVM_COMPILER_error(compiler, "Can't assign to empty type in %s, at %s line %d\n", place, op_src->file, op_src->line);
     return NULL;
   }
     
   if (!can_assign) {
     if (narrowing_convertion_error) {
-      SPVM_COMPILER_error(compiler, "Can't apply narrowing convertion at %s line %d\n", op_src->file, op_src->line);
+      SPVM_COMPILER_error(compiler, "Can't apply narrowing convertion in %s at %s line %d\n", place, op_src->file, op_src->line);
       return NULL;
     }
     else {
       const char* src_type_name = SPVM_TYPE_new_type_name(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag);
       const char* dist_type_name = SPVM_TYPE_new_type_name(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag);
-      SPVM_COMPILER_error(compiler, "Can't convert %s to %s by implicite type convertion at %s line %d\n", src_type_name, dist_type_name, op_src->file, op_src->line);
+      SPVM_COMPILER_error(compiler, "Can't convert %s to %s by implicite type convertion in %s at %s line %d\n", src_type_name, dist_type_name, place, op_src->file, op_src->line);
       return NULL;
     }
   }

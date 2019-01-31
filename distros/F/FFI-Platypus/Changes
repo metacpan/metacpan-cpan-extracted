@@ -1,5 +1,28 @@
 Revision history for FFI-Platypus
 
+0.78      2019-01-30 10:28:22 -0500
+  - Production release identical to 0.77_03
+
+0.77_03   2019-01-29 21:44:29 -0500
+  - Remove Java gcj examples.  The gcj compiler has been deprecated,
+    unmaintained, and removed from the gcc collection for quite a while
+    now.
+  - Fix problem diagnostic window on Windows during probe
+
+0.77_02   2019-01-29 11:30:56 -0500
+  - Fix regressions in 0.77_01
+
+0.77_01   2019-01-28 15:47:07 -0500
+  - Honor compiler and linker flag overrides provided on the command-line
+    for FFI::Probe::Runner::Builder, make ffi and make ffi-test (gh#104)
+
+0.76_01   2019-01-20 20:14:45 -0500
+  - function method can now take a wrapper code reference as its last
+    argument in the same way as attach.
+
+0.75_01   2019-01-19 04:45:19 -0500
+  - Add strndup to FFI::Platypus::Memory
+
 0.74      2019-01-19 04:42:22 -0500
   - Production release identical to 0.73_01
 

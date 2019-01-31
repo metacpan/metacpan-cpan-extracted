@@ -1,5 +1,8 @@
 Revision history for Perl module Ouch 
 
+0.0501 2019-01-29
+ - Auto generate META.json as suggested by CPANTS. (Mohammad S Anwar)
+
 0.0500 2017-06-21
  - Made :trytiny more Try::Tiny-sh thanks to Flavio Poletti
 

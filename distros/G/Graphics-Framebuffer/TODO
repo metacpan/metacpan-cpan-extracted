@@ -38,16 +38,11 @@ increase in speed won't hurt either.
 
 ==============================================================================
 
-* Make double-buffering the default for 16 bit and make it seamless. *
-
-It's close right now
-
-==============================================================================
-
 * Add single bit monochrome drawing
 
 Having the appropriate hardware for this would make it a lot easier, which I
-do not have.  So right now this would be lucky guesses.
+do not have.  So right now this would be lucky guesses.  Want to donate or
+loan one?
 
 ==============================================================================
 

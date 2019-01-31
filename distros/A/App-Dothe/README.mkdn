@@ -1,0 +1,172 @@
+# NAME
+
+App::Dothe - YAML-based task runner
+
+# VERSION
+
+version 0.0.1
+
+# DESCRIPTION
+
+Task runner heavily inspired by Task ([https://github.com/go-task/task](https://github.com/go-task/task)).
+Basically, I wanted `Task`, but with a `foreach` construct.
+
+See `perldoc App::DoThe` for the syntax of the `Dothe.yml` file.
+
+# DOTHE SYNTAX
+
+The configuration file is in YAML. It follows, by and large, the
+format used by Task.
+
+By default, \`dothe\` looks for the file \`Dothe.yml\`.
+
+Where entries can be templates, they are evaluated via [Text::Template](https://metacpan.org/pod/Text::Template).
+Basically, that means that in a template all that is surrounded by double curley braces
+is evaluated as Perl code. Those code snippets are evaluated within the
+`App::Dothe::Sandbox` namespace, and have all the `vars` variables
+accessible to them.
+
+## `code` section
+
+Takes an array. Each item will be eval'ed in the namespace
+used by the template code.
+
+For example, to have access to [Path::Tiny](https://metacpan.org/pod/Path::Tiny)'s
+`path`:
+
+```perl
+code:
+    - use Path::Tiny;
+
+tasks:
+    import-all:
+        sources:
+            - /home/yanick/work/blog_entries/**/entry
+        foreach: sources
+        cmds:
+            - task: import
+              vars: { dir: '{{ path($item)->parent }}' }
+```
+
+## `vars` section
+
+Takes a hash of variable names and values. Those are variables that will be accessible to all
+tasks.
+
+E.g.,
+
+```
+vars:
+    entries_file: ./content/_shared/entries.md
+    blog_entries_root: /home/yanick/work/blog_entries
+```
+
+## `tasks` section
+
+Takes a hash of task names and their definitions.
+
+E.g.,
+
+```
+tasks:
+
+    something:
+        sources: [ ./src/foo.source ]
+        generates: [ ./dest/foo.dest ]
+        foreach: sources
+        cmds:
+            - ./tools/process_entry.pl {{$item}}
+```
+
+### `task`
+
+Defines a specific task.
+
+#### `vars`
+
+Hash of variable names and values to be made accessible to the
+task and its subtasks.
+
+Variable values can be templates, which have visibility of
+previously declared variables.
+
+A locally defined variable will mask the definition of a global
+variable.
+
+#### `deps`
+
+Array of task dependencies. If present, Dothe will build the graph
+of dependencies (via [Graph::Directed](https://metacpan.org/pod/Graph::Directed)) and run them in their
+topological order.
+
+```
+deploy:
+    deps: [ clean, build, test ]
+    cmds:
+        - dzil release
+```
+
+#### `sources`
+
+Array of files. Can take glob patterns that will be expanded using
+[Path::Tiny::Glob](https://metacpan.org/pod/Path::Tiny::Glob). The result is accessible via the `sources` variable.
+
+```
+foo:
+    sources: [ './lib/**/*.pm' ]
+    foreach: sources
+    cmds:
+        - perl -c {{$item}}
+```
+
+#### `generates`
+
+Array of files. If `sources` and `generates` are both given, the task will
+only be run if any of the sources (or the `Dothe.yml` file itself) has been
+modified after the `generates` files.
+
+Can take glob patterns that will be expanded using
+[Path::Tiny::Glob](https://metacpan.org/pod/Path::Tiny::Glob). The result is accessible via the `generates` variable.
+
+#### `foreach`
+
+Takes the name of a variable that must hold an array. If presents,
+the `cmds` will be run for each value of that variable, which will
+be accessible via `$item`.
+
+#### `cmds`
+
+List of shell commands to run. The entries can be templates.
+As soon as one command fails, the task aborts.
+
+```
+deploy:
+    vars:
+        important_test: ./xt/test.t
+    cmds:
+        - dzil build
+        - perl {{ $important_test }}
+        - dzil release
+```
+
+A command can also be a subtask, with potentially some associated variables:
+
+```
+stuff:
+    cmds:
+        - task: other_stuff
+          vars:
+            foo: bar
+            baz: quux
+```
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.ca> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

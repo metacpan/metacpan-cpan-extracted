@@ -13,4 +13,4 @@ my @pkgs = qw(
 
 require_ok $_ for @pkgs;
 
-done_testing 4;
+done_testing;

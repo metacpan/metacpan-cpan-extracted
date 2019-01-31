@@ -1,0 +1,64 @@
+NAME
+    Complete::Spanel - Completion routines related to Spanel
+
+VERSION
+    This document describes version 0.001 of Complete::Spanel (from Perl
+    distribution Complete-Spanel), released on 2019-01-30.
+
+DESCRIPTION
+FUNCTIONS
+  complete_spanel_site
+    Usage:
+
+     complete_spanel_site(%args) -> array
+
+    Complete from a list of sites in /home/spanel/site (/s).
+
+    Root will be able to read the content of this directory. Thus, when run
+    as root, this routine will return complete from list of sites on the
+    system. Normal users cannot; thus, when run as normal user, this routine
+    will return empty answer.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   wildcard => *int* (default: 0)
+
+        How to treat wildcard subdomain.
+
+        0 means to skip it. 1 means to return it as-is (e.g.
+        "_.example.com") while 2 means to return it converting "_" to "*",
+        e.g. "*.example.com".
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Spanel>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Spanel>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Spanel>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -121,21 +121,27 @@ Odroid XU3/XU4  - Surprisingly fast.  All methods plenty fast enough for heavy
 
 Atom 1.60 GHz   - Decent, not nearly as fast as the Odroid XU3/4.  Works good
 with NVidia     - with threads too (when done properly).  Great for normal
-Nouveau driver  - graphical apps and static displayed output.
+Nouveau driver  - graphical apps and static displayed output.  Recent versions
+                - of the Nouveau framebuffer driver have become noticably
+                - slower now days though.
 
 2.6 GHz MacBook - Blazingly fast. Most primitives draw nearly instantly.
 with VirtualBox -
 
 Windows 10 PC   - Holy cow!  No, seriously, this sucker is fast!  I wonder how
-with VirtualBox - much faster if it were running Linux natively?  Especially
-4GHz 6 core CPU - since I noticed that VirtualBox is very inefficient with
-NVidia 970 Ti   - threads (What's up with that?).  UPDATE: VirtualBox appears
-                - to have fixed the threading issue.
-                -
-                - In addition, 3840x2160x32 (4K) is surprisingly fast.  Who'd
+with VirtualBox - much faster if it were running Linux natively?
+4GHz 6 core CPU -
+NVidia 970 Ti   - In addition, 3840x2160x32 (4K) is surprisingly fast.  Who'd
                 - have thought?  Full screen animations were choppy, but
                 - everything else was plenty fast enough.
 
+Windows 10 PC   - This is how I found out that the Nouveau driver is very poor
+Native with     - when handling a framebuffer.  It's actually disgraceful at
+4GHx 6 core i7  - how bad and how slow it really is.  It doesn't appear to be
+CPU and two     - using any DMA for the memory copy of the framebuffer, but
+Nvidia 1080Ti's - CPU itself for transfers.  Running Virtual Box on Windows
+                = is much faster than running Linux natively with the 
+                - Nouveau framebuffer drivers.  Sad, really sad.
 
 SUPPORT AND DOCUMENTATION
 

@@ -19,7 +19,8 @@ my $showall    = 0;
 my $help       = 0;
 my $delay      = 3;
 my $nosplash   = 0;
-my $DB         = 1;
+my $dev        = 0;
+my $noaccel    = 0;
 my $threads    = Sys::CPU::cpu_count();
 my $RUNNING : shared = 1;
 
@@ -30,7 +31,9 @@ GetOptions(
     'help'         => \$help,
     'delay|wait=i' => \$delay,
     'nosplash'     => \$nosplash,
+    'noaccel'      => \$noaccel,
     'threads=i'    => \$threads,
+    'dev=i'        => \$dev,
 );
 my @paths      = @ARGV;
 
@@ -44,75 +47,66 @@ if ($help) {
 
 my $splash = ($nosplash) ? 0 : 2;
 
-if ($errors) {
-    system('clear');
-
-    print qq{
-AUTO     = $auto
-ERRORS   = $errors
-SHOWALL  = $showall
-DELAY    = $delay
-NOSPLASH = $nosplash
-CPU      = }, Sys::CPU::cpu_type(), qq{
-THREADS  = $threads
-PATH(s)  = }, join('; ',@paths),"\n";
-
-    sleep 3;
-}
-# Double buffering now supported
-my ($F,$FB) = Graphics::Framebuffer->new(
+our $FB = Graphics::Framebuffer->new(
     'SHOW_ERRORS'   => $errors,
     'RESET'         => 1,
     'SPLASH'        => $splash,
-    'DOUBLE_BUFFER' => 16,
+    'ACCELERATED'   => ! $noaccel,
+    'FB_DEVICE'     => "/dev/fb$dev",
 );
 
-my $info  = $F->screen_dimensions();
-my $DIRTY : shared = 1;
-
-if ($info->{'bits_per_pixel'} == 16 && $F->{'ACCELERATED'}) {
-    $DB = 1;
-} else {
-    $DB = 0;
-    $FB = $F;
-}
-
-if ($DB) {
-    $SIG{'ALRM'} = sub {
-        alarm(0);
-        if ($DIRTY) {
-            $DIRTY = 0;
-            $F->blit_flip($FB);
-        }
-        alarm(1/15);
-    };
-}
-
-system('clear');
-$FB->cls('OFF');
-
+$SIG{'QUIT'} = \&finish;
+$SIG{'INT'}  = \&finish;
+$SIG{'KILL'} = \&finish;
 my $p = gather($FB,@paths);
+
+if ($errors) {
+    print STDERR qq{
+
+AUTO            = $auto
+ERRORS          = $errors
+SHOWALL         = $showall
+DELAY           = $delay
+NOSPLASH        = $nosplash
+CPU             = }, Sys::CPU::cpu_type(), qq{
+THREADS         = $threads
+DEVICE          = /dev/fb$dev
+PATH(s)         = }, join('; ',@paths),"\n";
+
+    sleep 5;
+}
 
 system('clear');
 $FB->cls();
 $FB->set_color({'red' => 0,'green' => 0, 'blue' => 0, 'alpha' => 255});
 my @thrd;
-$SIG{'QUIT'} = \&finish;
-$SIG{'INT'}  = \&finish;
-$SIG{'KILL'} = \&finish;
 
+# Run the slides in threads and have the main thread do housekeeping.
 for (my $t=0;$t<$threads;$t++) {
-    $thrd[$t] = threads->create(\&show,$FB, $p, $threads, $t);
+    $thrd[$t] = threads->create(\&show, $p, $threads, $t);
 }
-while ($RUNNING && scalar(threads::list(threads::running))) {
-    sleep 1;
+
+while ($RUNNING) { # Monitors the running threads and restores them if one dies
+    my $num = scalar(threads::list(threads::running));
+    if ($RUNNING && $num < $threads) {
+        for (my $t=0;$t<$threads;$t++) {
+            if ($RUNNING) {
+                unless($thrd[$t]->is_running()) {
+                    eval { $thrd[$t]->detach()->kill(); };
+                    $thrd[$t] = threads->create(\&show, $p, $threads, $t);
+                }
+            }
+        }
+    } else {
+        sleep 1;
+    }
 }
 
 $FB->cls('ON');
 exit(0);
 
 sub finish {
-    print_it($FB,'SHUTTING DOWN...',1);
+    print_it('SHUTTING DOWN...',1);
     $RUNNING = 0;
     alarm 0;
     $SIG{'ALRM'} = sub {
@@ -123,14 +117,14 @@ sub finish {
         while (my @j = threads->list(threads::joinable)) {
             foreach my $jo (@j) {
                 $jo->join();
-                print_it($FB,'SHUTTING DOWN...',1);
+                print_it('SHUTTING DOWN...',1);
             }
         }
     }
     while (my @j = threads->list(threads::joinable)) {
         foreach my $jo (@j) {
             $jo->join();
-            print_it($FB,'SHUTTING DOWN...',1);
+            print_it('SHUTTING DOWN...',1);
         }
     }
     foreach my $thr (threads->list()) {
@@ -274,7 +268,6 @@ sub calculate_window {
 }
 
 sub show {
-    my $FB   = shift;
     my $ps   = shift;
     my $jobs = shift;
     my $job  = shift;
@@ -306,31 +299,36 @@ sub show {
             $FB->rbox({'x'=>$X,'y'=>$Y,'width'=>$W,'height'=>$H,'filled'=>1});
             if (ref($image) eq 'ARRAY') {
                 my $s = time + ($delay * 2);
-                while ($RUNNING && time <= $s) {
-                    $FB->play_animation($image,1);
+                while ($RUNNING && time <= $s) { # We play it as many times as the delay allows, but at least once.
+                    # We don't use "play_animation" for threads.  This is so we can stop the playback quickly.
+                    for (my $frame = 0;$frame < scalar(@{$image});$frame++) {
+                        my $begin = time; # Mark the start time
+                        $FB->blit_write($image->[$frame]); # Write the frame to the display
+                        # Multiply the 'gif_delay' by 0.01 and then subtract from that the amount of time
+                        # it took to actually display the fram.  This givs the true delay, which should
+                        # show an accurate animation.
+                        my $d = (($image->[$frame]->{'tags'}->{'gif_delay'} * .01) - (time - $begin));
+                        sleep $d if ($d > 0);
+                        last unless($RUNNING);
+                    }
                 } ## end while (time <= $s)
             } else {
                 $FB->blit_write($image);
-                {
-                    lock($DIRTY);
-                    $DIRTY = 1;
-                }
                 sleep $delay * $RUNNING;
             }
         } ## end if (defined($image))
         $idx++;
-#        $idx = 0 if ($idx >= $p);
+        $idx = 0 if ($idx >= $p);
     } ## end while ($RUNNING)
     $FB->rbox({'x'=>$X,'y'=>$Y,'width'=>$W,'height'=>$H,'filled'=>1});
 } ## end sub show
 
 sub print_it {
-    my $fb      = shift;
     my $message = shift;
     my $big     = shift || 0;
 
-    unless ($fb->{'XRES'} < 256) {
-        my $b = $fb->ttf_print(
+    unless ($FB->{'XRES'} < 256) {
+        my $b = $FB->ttf_print(
             {
                 'x'            => 5,
                 'y'            => 32,
@@ -342,15 +340,11 @@ sub print_it {
                 'antialias'    => 1
             }
         );
-        $fb->ttf_print($b);
+        $FB->ttf_print($b);
     } else {
         print "$message\n";
     }
-    {
-        lock($DIRTY);
-        $DIRTY = 1;
-    }
-    $fb->normal_mode();
+    $FB->normal_mode();
 } ## end sub print_it
 
 __END__

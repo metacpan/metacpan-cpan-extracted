@@ -1,6 +1,6 @@
-package Net::AS2::Message;
+package Net::AS2::Message 1.0;
 use strict;
-use warnings qw(all);
+use warnings;
 
 =head1 NAME
 
@@ -16,22 +16,39 @@ Net::AS2::Message - AS2 incoming message
 
 =head1 PUBLIC INTERFACE
 
+=head2 Constructors
+
 =cut
 
 use Carp;
 
 my $crlf = "\x0d\x0a";
 
+=over 4
+
+=item Net::AS2::Message->new($message_id, $async_url, $should_mdn_sign, $mic, $content, $mic_alg)
+
+Create a new AS2 message.
+
+=cut
+
 sub new
 {
-    my ($class, $message_id, $async_url, $should_mdn_sign, $mic, $content) = @_;
+    my ($class, $message_id, $async_url, $should_mdn_sign, $mic, $content, $mic_alg) = @_;
 
     my $self = $class->_create_message($message_id, $async_url, $should_mdn_sign);
     $self->{success} = 1;
     $self->{content} = $content;
     $self->{mic} = $mic;
+    $self->{mic_alg} = $mic_alg;
     return $self;
 }
+
+=item Net::AS2::Message->create_error_message($message_id, $async_url, $should_mdn_sign, $mic, $content, $mic_alg)
+
+Create a new AS2 'error' message.
+
+=cut
 
 sub create_error_message
 {
@@ -39,6 +56,12 @@ sub create_error_message
     $self->{error} = 1;
     return $self;
 }
+
+=item Net::AS2::Message->create_failure_message($message_id, $async_url, $should_mdn_sign, $mic, $content, $mic_alg)
+
+Create a new AS2 'failure' message.
+
+=cut
 
 sub create_failure_message
 {
@@ -51,7 +74,7 @@ sub _create_message
 {
     my ($class, $message_id, $async_url, $should_mdn_sign, $status_text, $plain_text) = @_;
     $class = ref($class) || $class;
-    my $self = { 
+    my $self = {
         message_id => $message_id,
         async_url => $async_url,
         should_mdn_sign => $should_mdn_sign,
@@ -61,10 +84,6 @@ sub _create_message
     bless ($self, $class);
     return $self;
 }
-
-=head2 Constructor
-
-=over 4
 
 =item $msg = Net::AS2::Message->create_from_serialized_state($state)
 
@@ -78,20 +97,21 @@ sub create_from_serialized_state
 {
     my ($class, $state) = @_;
 
-    my ($version, $status, $message_id, $mic, $async_url, $should_mdn_sign, $status_text, $plain_text)
+    my ($version, $status, $message_id, $mic, $mic_alg, $async_url, $should_mdn_sign, $status_text, $plain_text)
         = split(/\n/, $state);
-    croak "Net::AS2::Message state version is not supported" 
+    croak "Net::AS2::Message state version is not supported"
         unless defined $version && $version eq 'v1' && defined $plain_text;
 
     $class = ref($class) || $class;
-    my $self = { 
+    my $self = {
         (
-            $status eq '1' ? ( success => 1 ) : 
+            $status eq '1' ? ( success => 1 ) :
             $status eq '-1' ? ( error => 1 ) :
             ( failure => 1 )
         ),
         message_id => $message_id,
         mic => $mic,
+        mic_alg => $mic_alg,
         status_text => $status_text,
         should_mdn_sign => $should_mdn_sign,
         plain_text => $plain_text,
@@ -117,7 +137,7 @@ sub is_success { return (shift)->{success}; }
 
 =item $msg->is_error
 
-Returns if the message was failed to parse. 
+Returns if the message was failed to parse.
 C<error_status_text> and C<error_plain_text> would be available.
 
 =cut
@@ -160,7 +180,7 @@ sub message_id { return (shift)->{message_id}; }
 
 =item $msg->content
 
-Returns the encoded content (binary) of the message. 
+Returns the encoded content (binary) of the message.
 This is only defined when C<is_success> is true.
 
 =cut
@@ -169,12 +189,21 @@ sub content { return (shift)->{content}; }
 
 =item $msg->mic
 
-Returns the SHA-1 MIC of the message.
+Returns the SHA Digest MIC of the message.
 This is only defined when C<is_success> is true.
 
 =cut
 
 sub mic { return (shift)->{mic}; }
+
+=item $msg->mic_alg
+
+Returns the SHA Algorithm used for the message.
+This is only defined when C<is_success> is true.
+
+=cut
+
+sub mic_alg { return (shift)->{mic_alg}; }
 
 =item $msg->error_status_text
 
@@ -202,9 +231,11 @@ sub async_url { return (shift)->{async_url}; }
 
 =item $msg->serialized_state
 
-Returns the serialized state of this message. 
+Returns the serialized state of this message.
 
 This is usually used for passing C<Net::AS2::Message> to another process for sending ASYNC MDN.
+
+=back
 
 =cut
 
@@ -215,14 +246,26 @@ sub serialized_state {
         $self->is_success ? 1 : $self->is_error ? -1 : -2,
         $self->{message_id},
         $self->{mic} // '',
+        $self->{mic_alg} // 'sha1',
         $self->{async_url} // '',
         $self->{should_mdn_sign} // '',
-        $self->{status_text} // '', 
+        $self->{status_text} // '',
         $self->{plain_text} // ''
     );
 }
 
-# Check if notification options are supported
+=head2 Functions
+
+=over 4
+
+=item notification_options_check ($option)
+
+Check if Disposition Notification Options are supported.
+
+Returns a string describing the unsupported option, if any.
+
+=cut
+
 sub notification_options_check
 {
     my ($options) = @_;
@@ -232,15 +275,17 @@ sub notification_options_check
         my ($requireness, @values) = lc($value) =~ /\s*(.+?)\s*(?:,|$)/g;
 
         if (lc($key) eq 'signed-receipt-protocol') {
-            return 'requested MDN protocol is not supported' 
-		unless 'pkcs7-signature' ~~ \@values;
+            return 'requested MDN protocol is not supported'
+              unless grep { $_ eq 'pkcs7-signature' } @values;
         }
         if (lc($key) eq 'signed-receipt-micalg') {
-            return 'requested MIC algorithm is not supported' 
-		unless 'sha1' ~~ \@values;
+            foreach my $value (@values) {
+                return 'requested MIC algorithm is not supported'
+                  unless $value =~ qr{^sha-?(?:1|224|256|384|512)$};
+            }
         }
     }
-    return undef;
+    return;
 }
 
 1;

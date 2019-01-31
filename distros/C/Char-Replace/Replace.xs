@@ -56,7 +56,7 @@ SV *_replace_str( SV *sv, SV *map ) {
   AV           *mapav;
   SV           *reply;
 
-  if ( !map || SvTYPE(map) != SVt_RV || SvTYPE(SvRV(map)) != SVt_PVAV 
+  if ( !map || SvTYPE(map) != SVt_RV || SvTYPE(SvRV(map)) != SVt_PVAV
     || AvFILL( SvRV(map) ) <= 0
     ) {
       return newSVpv( src, len ); /* no alteration */
@@ -73,7 +73,9 @@ SV *_replace_str( SV *sv, SV *map ) {
     // need to croak in DEBUG mode if char is invalid
 
     str[ix_newstr] = c; /* default always performed... */
-    if ( ix >= AvFILL(mapav) || !AvARRAY(mapav)[ix] ) {
+    if ( ix >= AvFILL(mapav)
+      || !AvARRAY(mapav)[ix]
+      ) {
       continue;
     } else {
       SV *entry = AvARRAY(mapav)[ix];
@@ -83,17 +85,17 @@ SV *_replace_str( SV *sv, SV *map ) {
           continue;
         } else {
           char *replace = SvPVX( entry );
-          int j = 0;
+          int j;
 
           /* Check if we need to expand. */
           if (str_size <= (ix_newstr + slen + 1) ) { /* +1 for \0 */
-            //printf( "neew to grow %d -> %d\n", str_size, ix_newstr + slen );
+            //printf( "#### need to grow %d -> %d\n", str_size, ix_newstr + slen );
             str_size *= 2;
 
             if ( str == buffer ) {
               /* our first malloc */
               Newx(str, str_size, char*);
-              strncpy( str, buffer, ix_newstr );
+              memcpy( str, buffer, _REPLACE_BUFFER_SIZE ); /* strncpy stops after the first \0 */
             } else {
               /* grow the string */
               tmp = Perl_realloc( str, str_size );
@@ -103,19 +105,21 @@ SV *_replace_str( SV *sv, SV *map ) {
           }
 
           /* replace all characters except the last one, which avoids us to do a --ix_newstr after */
-          for ( ; j < slen - 1; ++j ) {
+          for ( j = 0 ; j < slen - 1; ++j ) {
             str[ix_newstr++] = replace[j];
           }
+
           /* handle the last character */
           str[ix_newstr] = replace[j];
         }
       } /* end - SvPOK */
-    } /* end - AvFILL || AvARRAY */    
+    } /* end - AvFILL || AvARRAY */
   }
 
   str[ix_newstr] = '\0'; /* add the final trailing \0 character */
+
   reply = newSVpvn_flags( str, ix_newstr, SvUTF8(sv) );
- 
+
   /* free our tmp buffer if needed */
   if ( str != buffer ) free(str);
 

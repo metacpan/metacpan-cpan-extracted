@@ -13,6 +13,7 @@ isa_ok $d->score, 'MIDI::Simple';
 is $d->beats, 4, 'beats computed';
 is $d->divisions, 4, 'divisions computed';
 
-is(($d->score->Score)[1][0], 'time_signature', 'time signature added');
+my @score = $d->score->Score;
+is($score[1]->[0], 'time_signature', 'time signature added');
 
 done_testing();

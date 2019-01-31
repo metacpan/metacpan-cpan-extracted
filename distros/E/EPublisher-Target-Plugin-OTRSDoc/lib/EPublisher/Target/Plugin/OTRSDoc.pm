@@ -4,6 +4,7 @@ package EPublisher::Target::Plugin::OTRSDoc;
 
 use strict;
 use warnings;
+
 use File::Basename;
 use File::Path qw(make_path);
 use HTML::Template::Compiled;
@@ -11,28 +12,33 @@ use Pod::Simple::XHTML;
 
 use EPublisher;
 use EPublisher::Target::Base;
-our @ISA = qw(EPublisher::Target::Base);
+use parent qw(EPublisher::Target::Base);
 
-our $VERSION = 0.4;
+our $VERSION = 1.01;
 
 sub deploy {
-    my ($self) = @_;
+    my ($self, $sources) = @_;
     
-    my $pods = $self->_config->{source} || [];
+    my @pods = @{ $sources || [] };
+    if ( !@pods ) {
+        @pods = @{ $self->_config->{source} || [] };
+    }
+
+    return if !@pods;
     
-    my $encoding       = $self->_config->{encoding} || ':encoding(UTF-8)';
-    my $base_url       = $self->_config->{base_url} || '';
-    my $version        = 0;
+    my $encoding = $self->_config->{encoding} || 'utf-8';
+    my $base_url = $self->_config->{base_url} || '';
+    my $version  = 0;
     
     my @TOC = map{
         (my $name = $_->{title}) =~ s/::/_/g; 
         { target => join( '/', $base_url, lc( $name ) . '.html'), name => $_->{title} };
-    } @{$pods};
+    } @pods;
     
     my $output = $self->_config->{output};
     make_path $output if $output && !-d $output;
     
-    for my $pod ( @{$pods} ) {    
+    for my $pod ( @pods ) {    
         my $parser = Pod::Simple::XHTML->new;
         $parser->index(0);
         
@@ -40,9 +46,14 @@ sub deploy {
                 
         $parser->output_string( \my $xhtml );
         $parser->parse_string_document( $pod->{pod} );
+
+        my $template = $self->_config->{template};
+        my %opts = $template ?
+            ( filename  => $template ) :
+            ( scalarref => \do { local $/; <DATA> } );
         
         my $tmpl = HTML::Template::Compiled->new(
-            filename => $self->_config->{template},
+            %opts,
         );
         
         $xhtml =~ s{</body>}{};
@@ -53,8 +64,16 @@ sub deploy {
             Body => $xhtml,
         );
         
-        if ( open my $fh, '>', File::Spec->catfile( $output, lc $name . '.html' ) ) {
-            print $fh $tmpl->output;
+        my $fh = *STDOUT;
+
+        if ( $output ) {
+            open $fh, '>', File::Spec->catfile( $output, lc $name . '.html' );
+            binmode $fh, ":encoding($encoding)";
+        }
+
+        print $fh $tmpl->output;
+
+        if ( $output ) {
             close $fh;
         }
     }
@@ -67,7 +86,7 @@ sub deploy {
 {
     no warnings 'redefine';
     
-    sub Pod::Simple::XHTML::idify {
+    *Pod::Simple::XHTML::idify = sub {
         my ($self, $t, $not_unique) = @_;
         for ($t) {
             s/<[^>]+>//g;            # Strip HTML.
@@ -80,11 +99,11 @@ sub deploy {
         my $i = '';
         $i++ while $self->{ids}{"$t$i"}++;
         return "$t$i";
-    }
+    };
     
-    sub Pod::Simple::XHTML::start_Verbatim {}
+    *Pod::Simple::XHTML::start_Verbatim = sub {};
     
-    sub Pod::Simple::XHTML::end_Verbatim {
+    *Pod::Simple::XHTML::end_Verbatim = sub {
         my ($self) = @_;
         
         $self->{scratch} =~ s{  }{ &nbsp;}g;
@@ -93,7 +112,7 @@ sub deploy {
         $self->{scratch} =  '<p><code class="code">' . $self->{scratch} . '</code></p>';
         
         $self->emit;
-    }
+    };
 
     *Pod::Simple::XHTML::start_L  = sub {
 
@@ -136,14 +155,14 @@ sub deploy {
 
         #$self->{'scratch'} .= $xhtml_headers;
         $self->emit('nowrap');
-    }
+    };
 }
 
 1;
 
-
-
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -151,15 +170,13 @@ EPublisher::Target::Plugin::OTRSDoc - Create HTML version of OTRS documentation
 
 =head1 VERSION
 
-version 0.4
+version 1.01
 
 =head1 SYNOPSIS
 
   use EPublisher::Target;
   my $EPub = EPublisher::Target->new( { type => 'OTRSDoc' } );
   $EPub->deploy;
-
-=encoding utf8
 
 =head1 METHODS
 
@@ -195,6 +212,8 @@ This is free software, licensed under:
 
 =cut
 
-
-__END__
-
+__DATA__
+<%loop TOC %>
+  <a href="<%= target %>"><%= name %></a>
+<%/loop %>
+<%= Body %>

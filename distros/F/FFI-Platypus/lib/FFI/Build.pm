@@ -12,7 +12,7 @@ use Capture::Tiny ();
 use File::Path ();
 
 # ABSTRACT: Build shared libraries for use with FFI
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 
 sub _native_name
@@ -28,10 +28,12 @@ sub new
   Carp::croak "name is required" unless defined $name;
 
   my $self = bless {
-    source => [],
-    cflags => [],
-    libs   => [],
-    alien  => [],
+    source   => [],
+    cflags_I => [],
+    cflags   => [],
+    libs_L   => [],
+    libs     => [],
+    alien    => [],
   }, $class;
   
   my $platform  = $self->{platform}  = $args{platform} || FFI::Build::Platform->default;
@@ -41,12 +43,16 @@ sub new
 
   if(defined $args{cflags})
   {
-    push @{ $self->{cflags} }, ref $args{cflags} ? @{ $args{cflags} } : $self->platform->shellwords($args{cflags});
+    my @flags = ref $args{cflags} ? @{ $args{cflags} } : $self->platform->shellwords($args{cflags});
+    push @{ $self->{cflags}   }, grep !/^-I/, @flags;
+    push @{ $self->{cflags_I} }, grep  /^-I/, @flags;
   }
   
   if(defined $args{libs})
   {
-    push @{ $self->{libs} }, ref $args{libs} ? @{ $args{libs} } : $self->platform->shellwords($args{libs});
+    my @flags = ref $args{libs} ? @{ $args{libs} } : $self->platform->shellwords($args{libs});
+    push @{ $self->{libs} },   grep !/^-L/, @flags;
+    push @{ $self->{libs_L} }, grep  /^-L/, @flags;
   }
   
   if(defined $args{alien})
@@ -61,8 +67,10 @@ sub new
         require $pm;
       }
       push @{ $self->{alien} }, $alien;
-      push @{ $self->{cflags} }, $self->platform->shellwords($alien->cflags);
-      push @{ $self->{libs} }, $self->platform->shellwords($alien->libs);
+      push @{ $self->{cflags}   }, grep !/^-I/, $self->platform->shellwords($alien->cflags);
+      push @{ $self->{cflags_I} }, grep  /^-I/, $self->platform->shellwords($alien->cflags);
+      push @{ $self->{libs}     }, grep !/^-L/, $self->platform->shellwords($alien->libs);
+      push @{ $self->{libs_L}   }, grep  /^-L/, $self->platform->shellwords($alien->libs);
     }
   }
   
@@ -77,7 +85,9 @@ sub file      { shift->{file}      }
 sub platform  { shift->{platform}  }
 sub verbose   { shift->{verbose}   }
 sub cflags    { shift->{cflags}    }
+sub cflags_I  { shift->{cflags_I}  }
 sub libs      { shift->{libs}      }
+sub libs_L    { shift->{libs_L}    }
 sub alien     { shift->{alien}     }
 
 my @file_classes;
@@ -190,16 +200,15 @@ sub build
   
   my @cmd = (
     $ld,
+    $self->libs_L,
     $self->platform->ldflags,
     (map { "$_" } @objects),
-    @{ $self->libs },
-    $self->platform->extra_system_lib,
+    $self->libs,
     $self->platform->flag_library_output($self->file->path),
   );
   
   my($out, $exit) = Capture::Tiny::capture_merged(sub {
-    print "+ @cmd\n";
-    system @cmd;
+    $self->platform->run(@cmd);
   });
   
   if($exit || !-f $self->file->path)
@@ -207,9 +216,13 @@ sub build
     print $out;
     die "error building @{[ $self->file->path ]} from @objects";
   }
-  elsif($self->verbose)
+  elsif($self->verbose >= 2)
   {
     print $out;
+  }
+  elsif($self->verbose >= 1)
+  {
+    print "LD @{[ $self->file->path ]}\n";
   }
   
   $self->file;
@@ -246,7 +259,7 @@ FFI::Build - Build shared libraries for use with FFI
 
 =head1 VERSION
 
-version 0.74
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -343,8 +356,24 @@ List of source files.  You can use wildcards supported by C<bsd_glob> from L<Fil
 =item verbose
 
 By default this class does not print out the actual compiler and linker commands used in building
-the library unless there is a failure.  If this option is set to true, then these commands will
-always be printed.
+the library unless there is a failure.  You can alter this behavior with this option.  Set to
+one of these values:
+
+=over 4
+
+=item zero (0)
+
+Default, quiet unless there is a failure.
+
+=item one (1)
+
+Output the operation (compile, link, etc) and the file, but nothing else
+
+=item two (2)
+
+Output the complete commands run verbatim.
+
+=back
 
 =back
 
@@ -386,15 +415,27 @@ Returns the verbose flag.
 
 =head2 cflags
 
- my $cflags = $build->cflags;
+ my @cflags = @{ $build->cflags };
 
 Returns the compiler flags.
 
+=head3 cflags_I
+
+ my @cflags_I = @{ $build->cflags_I };
+
+Returns the C<-I> cflags.
+
 =head2 libs
 
- my $libs = $build->libs;
+ my @libs = @{ $build->libs };
 
 Returns the library flags.
+
+=head2 libs_L
+
+ my @libs = @{ $build->libs };
+
+Returns the C<-L> library flags.
 
 =head2 alien
 

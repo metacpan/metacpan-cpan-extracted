@@ -8,7 +8,7 @@ use List::Util qw(shuffle);
 use Getopt::Long;
 use Pod::Usage;
 
-# use Data::Dumper::Simple;
+# use Data::Dumper::Simple;$Data::Dumper::Sortkeys = 1;$Data::Dumper::Purity = 1;
 
 my $errors     = 0;
 my $auto       = 0;
@@ -17,6 +17,8 @@ my $showall    = 0;
 my $help       = 0;
 my $delay      = 3;
 my $nosplash   = 0;
+my $dev        = 0;
+my $noaccel    = 0;
 
 GetOptions(
     'auto'         => \$auto,
@@ -26,6 +28,8 @@ GetOptions(
     'help'         => \$help,
     'delay|wait=i' => \$delay,
     'nosplash'     => \$nosplash,
+    'dev=i'        => \$dev,
+    'noaccel'      => \$noaccel,
 );
 my @paths      = @ARGV;
 
@@ -39,64 +43,49 @@ if ($help) {
 
 my $splash = ($nosplash) ? 0 : 2;
 
-print qq{
-AUTO     = $auto
-ERRORS   = $errors
-FULL     = $fullscreen
-SHOWALL  = $showall
-DELAY    = $delay
-NOSPLASH = $nosplash
-PATH(s)  = }, join('; ',@paths),"\n";
-
-sleep 1;
-
-# Double buffering now supported
-my ($F,$FB) = Graphics::Framebuffer->new(
-    'SHOW_ERRORS' => $errors,
-    'RESET'       => 1,
-    'SPLASH'      => $splash,
+our $FB = Graphics::Framebuffer->new(
+    'SHOW_ERRORS'   => $errors,
+    'RESET'         => 1,
+    'SPLASH'        => $splash,
+    'ACCELERATED'   => ! $noaccel,
+    'FB_DEVICE'     => "/dev/fb$dev",
 );
 
-my $info  = $F->screen_dimensions();
-my $DB    = 0;
-my $DIRTY = 1;
+if ($errors) {
+    system('clear');
+    print STDERR qq{
+AUTO            = $auto
+ERRORS          = $errors
+FULL            = $fullscreen
+SHOWALL         = $showall
+DELAY           = $delay
+NOSPLASH        = $nosplash
+DEVICE          = /dev/fb$dev
+ACCELERATION    = $FB->{'ACCELERATED'}
+PATH(s)         = }, join('; ',@paths),"\n";
 
-if ($info->{'bits_per_pixel'} == 16 && $F->{'ACCELERATED'}) {
-    $DB = 1;
-} else {
-    $FB = $F;
+    sleep 1;
 }
 
-if ($DB) {
-    $SIG{'ALRM'} = sub {
-        alarm(0);
-        if ($DIRTY) {
-            $DIRTY = 0;
-            $F->blit_flip($FB);
-        }
-        alarm(1/15);
-    };
-}
 
 system('clear');
 $FB->cls('OFF');
 
-my $p = gather($FB,@paths);
+my $p = gather(@paths);
 
 $FB->cls();
 
-show($FB, $p);
+show($p);
 
 exit(0);
 
 sub gather {
-    my $FB    = shift;
     my @paths = @_;
     my @pics;
     foreach my $path (@paths) {
         chop($path) if ($path =~ /\/$/);
         $FB->rbox({'x' => 0, 'y' => 0, 'width' => $FB->{'XRES'}, 'height' => 32, 'filled' => 1, 'gradient' => {'direction' => 'vertical', 'colors' => {'red' => [0,0], 'green' => [0,0], 'blue' => [64,128]}}});
-        print_it($FB,"Scanning - $path");
+        print_it("Scanning - $path");
         opendir(my $DIR, "$path") || die "Problem reading $path directory";
         chomp(my @dir = readdir($DIR));
         closedir($DIR);
@@ -105,7 +94,7 @@ sub gather {
         foreach my $file (@dir) {
             next if ($file =~ /^\.+/);
             if (-d "$path/$file") {
-                my $r = gather($FB,"$path/$file");
+                my $r = gather("$path/$file");
                 if (defined($r)) {
                     @pics = (@pics,@{$r});
                 }
@@ -118,7 +107,6 @@ sub gather {
 }
 
 sub show {
-    my $FB  = shift;
     my $ps  = shift;
     my @pics = shuffle(@{$ps});
     my $p = scalar(@pics);
@@ -128,7 +116,7 @@ sub show {
 
     while ($idx < $p) {
         my $name = $pics[$idx];
-        print_it($FB, "Loading image $name");
+        print_it("Loading image $name");
         my $image;
         unless ($fullscreen) {
             $image = $FB->load_image(
@@ -177,7 +165,6 @@ sub show {
                 } else {
                     $FB->blit_write($image);
                 }
-                $DIRTY = 1;
                 sleep $delay;
             }
         } ## end if (defined($image))
@@ -187,13 +174,12 @@ sub show {
 } ## end sub show
 
 sub print_it {
-    my $fb      = shift;
     my $message = shift;
 
-    unless ($fb->{'XRES'} < 256) {
-        $fb->xor_mode();
+    unless ($FB->{'XRES'} < 256) {
+        $FB->xor_mode();
 
-        my $b = $fb->ttf_print(
+        my $b = $FB->ttf_print(
             {
                 'x'            => 5,
                 'y'            => 32,
@@ -205,12 +191,11 @@ sub print_it {
                 'antialias'    => 1
             }
         );
-        $fb->ttf_print($b);
+        $FB->ttf_print($b);
     } else {
-        print "$message\n";
+        print STDERR "$message\n";
     }
-    $DIRTY = 1;
-    $fb->normal_mode();
+    $FB->normal_mode();
 } ## end sub print_it
 
 __END__

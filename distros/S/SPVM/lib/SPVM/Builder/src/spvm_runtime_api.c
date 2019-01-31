@@ -152,6 +152,7 @@ SPVM_ENV* SPVM_RUNTIME_API_create_env(SPVM_RUNTIME* runtime) {
     SPVM_RUNTIME_API_set_dpkgvar,
     SPVM_RUNTIME_API_set_opkgvar,
     SPVM_RUNTIME_API_pointer,
+    SPVM_RUNTIME_API_set_pointer,
     SPVM_RUNTIME_API_weaken,
     SPVM_RUNTIME_API_isweak,
     SPVM_RUNTIME_API_unweaken,
@@ -389,6 +390,7 @@ int32_t SPVM_RUNTIME_API_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* sta
 
     // Call native subrotuine
     int32_t (*native_address)(SPVM_ENV*, SPVM_VALUE*) = runtime->sub_cfunc_addresses[sub->id];
+    assert(native_address != NULL);
     int32_t exception_flag = (*native_address)(env, stack);
     
     // Increment ref count of return value
@@ -507,8 +509,6 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
   // Allignment is 8. This is numeric type max byte size
   // Order 8, 4, 2, 1 numeric variable, and addrress variables
   char* call_stack = NULL;
-  char call_stack_small[256];
-  int8_t need_free_call_stack = 0;
   {
     // Numeric area byte size
     int32_t numeric_vars_byte_size = 0;
@@ -532,56 +532,47 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
     // Total area byte size
     int32_t total_vars_byte_size = numeric_vars_byte_size + address_vars_byte_size;
     
-    if (total_vars_byte_size > 0) {
-      if (total_vars_byte_size <= 256) {
-        call_stack = call_stack_small;
-        memset(call_stack, 0, total_vars_byte_size);
-      }
-      else {
-        call_stack = SPVM_RUNTIME_API_alloc_memory_block_zero(env, total_vars_byte_size);
-        need_free_call_stack = 1;
-      }
+    call_stack = SPVM_RUNTIME_API_alloc_memory_block_zero(env, total_vars_byte_size + 1);
 
-      int32_t call_stack_offset = 0;
-      
-      // Double variables
-      double_vars = (double*)&call_stack[call_stack_offset];
-      call_stack_offset += sub->double_vars_alloc_length * 8;
-      
-      // Long varialbes
-      long_vars = (SPVM_VALUE_long*)&call_stack[call_stack_offset];
-      call_stack_offset += sub->long_vars_alloc_length * 8;
-      
-      // Float variables
-      float_vars = (float*)&call_stack[call_stack_offset];
-      call_stack_offset += sub->float_vars_alloc_length * 4;
-      
-      // Int variables
-      int_vars = (SPVM_VALUE_int*)&call_stack[call_stack_offset];
-      call_stack_offset += sub->int_vars_alloc_length * 4;
+    int32_t call_stack_offset = 0;
+    
+    // Double variables
+    double_vars = (double*)&call_stack[call_stack_offset];
+    call_stack_offset += sub->double_vars_alloc_length * 8;
+    
+    // Long varialbes
+    long_vars = (SPVM_VALUE_long*)&call_stack[call_stack_offset];
+    call_stack_offset += sub->long_vars_alloc_length * 8;
+    
+    // Float variables
+    float_vars = (float*)&call_stack[call_stack_offset];
+    call_stack_offset += sub->float_vars_alloc_length * 4;
+    
+    // Int variables
+    int_vars = (SPVM_VALUE_int*)&call_stack[call_stack_offset];
+    call_stack_offset += sub->int_vars_alloc_length * 4;
 
-      // Short variables
-      short_vars = (SPVM_VALUE_short*)&call_stack[call_stack_offset];
-      call_stack_offset += sub->short_vars_alloc_length * 2;
+    // Short variables
+    short_vars = (SPVM_VALUE_short*)&call_stack[call_stack_offset];
+    call_stack_offset += sub->short_vars_alloc_length * 2;
 
-      // Mortal stack
-      mortal_stack = (uint16_t*)&call_stack[call_stack_offset];
-      call_stack_offset += sub->mortal_stack_length * 2;
-      
-      // Byte variables
-      byte_vars = (SPVM_VALUE_byte*)&call_stack[call_stack_offset];
-      call_stack_offset += sub->byte_vars_alloc_length * 1;
-      
-      call_stack_offset = numeric_vars_byte_size;
+    // Mortal stack
+    mortal_stack = (uint16_t*)&call_stack[call_stack_offset];
+    call_stack_offset += sub->mortal_stack_length * 2;
+    
+    // Byte variables
+    byte_vars = (SPVM_VALUE_byte*)&call_stack[call_stack_offset];
+    call_stack_offset += sub->byte_vars_alloc_length * 1;
+    
+    call_stack_offset = numeric_vars_byte_size;
 
-      // Object variables
-      object_vars = (void**)&call_stack[call_stack_offset];
-      call_stack_offset += sub->object_vars_alloc_length * sizeof(void*);
-      
-      // Refernce variables
-      ref_vars = (void**)&call_stack[call_stack_offset];
-      call_stack_offset += sub->ref_vars_alloc_length * sizeof(void*);
-    }
+    // Object variables
+    object_vars = (void**)&call_stack[call_stack_offset];
+    call_stack_offset += sub->object_vars_alloc_length * sizeof(void*);
+    
+    // Refernce variables
+    ref_vars = (void**)&call_stack[call_stack_offset];
+    call_stack_offset += sub->ref_vars_alloc_length * sizeof(void*);
   }
 
   // Buffer for string convertion
@@ -4249,9 +4240,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
     }
   }
   
-  if (need_free_call_stack) {
-    SPVM_RUNTIME_API_free_memory_block(env, call_stack);
-  }
+  SPVM_RUNTIME_API_free_memory_block(env, call_stack);
   
   return exception_flag;
 }
@@ -5243,6 +5232,12 @@ void* SPVM_RUNTIME_API_pointer(SPVM_ENV* env, SPVM_OBJECT* object) {
   (void)env;
   
   return *(void**)((intptr_t)object + (intptr_t)env->object_header_byte_size);
+}
+
+void SPVM_RUNTIME_API_set_pointer(SPVM_ENV* env, SPVM_OBJECT* object, void* ptr) {
+  (void)env;
+  
+  *(void**)((intptr_t)object + (intptr_t)env->object_header_byte_size) = ptr;
 }
 
 void SPVM_RUNTIME_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {

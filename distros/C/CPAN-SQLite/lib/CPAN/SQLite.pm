@@ -1,10 +1,10 @@
-# $Id: SQLite.pm 76 2019-01-24 19:50:04Z stro $
+# $Id: SQLite.pm 79 2019-01-30 02:35:31Z stro $
 
 package CPAN::SQLite;
 use strict;
 use warnings;
 
-our $VERSION = '0.216';
+our $VERSION = '0.217';
 
 use English qw/-no_match_vars/;
 
@@ -104,7 +104,7 @@ CPAN::SQLite - maintain and search a minimal CPAN database
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -211,7 +211,7 @@ the C<query_term> for the C<search> option.
 
 As well, an option of C<max_results =E<gt> some_number> will
 limit the number of results returned; if not specified,
-this defaults to 200.
+the limit doesn't apply.
 
 =head1 CPAN.pm support
 

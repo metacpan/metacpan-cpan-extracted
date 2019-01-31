@@ -1,8 +1,34 @@
 ---
-version: 0.13
-date: Wed Oct 13 00:42:03 EDT 2010
+version: 0.18
+date: Wed Jan 30 22:08:04 IST 2019
 changes:
-- Tom Wyant's excellent Mac fixups
+- Remove a stray .orig script. Teaching me to use git status...
+- Thanks to gregor herrmann .
+---
+version: 0.17
+date: Wed Jan 30 16:00:04 IST 2019
+changes:
+- Blacklist some Win32 and Mac-only prereqs in dist.ini.
+- Thanks to PERLANCAR .
+---
+version: 0.16
+date: Wed Jan 30 13:20:04 IST 2019
+changes:
+- Add support for Debian GNU/Hurd ( https://rt.cpan.org/Ticket/Display.html?id=116951 )
+- Fix https://rt.cpan.org/Ticket/Display.html?id=98435 ; CVE-2014-5509
+- clipedit Insecurely used temporary files.
+---
+version: 0.15
+date: Wed Jan 30 12:57:34 IST 2019
+changes:
+- https://rt.cpan.org/Ticket/Display.html?id=121056
+- Fix for tests with no "." in @INC
+---
+version: 0.14
+date: Wed Jan 30 12:43:34 IST 2019
+changes:
+- SHLOMIF resumed maintenance
+- Convert to dzil .
 ---
 version: 0.12
 date: Mon Oct 11 02:11:44 EDT 2010

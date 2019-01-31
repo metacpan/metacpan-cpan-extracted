@@ -110,7 +110,12 @@ void c_get_screen_info(char *fb_file) {
     Inline_Stack_Done;
 }
 
-/* The other routines call this.  It handles all draw modes */
+/* The other routines call this.  It handles all draw modes
+ * 
+ * Normally I would add code to properly place the RGB values according to
+ * color order, but in reality, that can be done solely when the color value
+ * itself is defined, so the colors are in the correct order before even
+ * arriving at this routine. */
 void c_plot(
     char *framebuffer,
     short x, short y,
@@ -120,9 +125,9 @@ void c_plot(
     unsigned char bytes_per_pixel,
     unsigned char bits_per_pixel,
     unsigned int bytes_per_line,
-    unsigned short x_clip, unsigned short y_clip,
-    unsigned short xx_clip, unsigned short yy_clip,
-    unsigned short xoffset, unsigned short yoffset,
+    short x_clip, short y_clip,
+    short xx_clip, short yy_clip,
+    short xoffset, short yoffset,
     unsigned char alpha)
 {
     if (x >= x_clip && x <= xx_clip && y >= y_clip && y <= yy_clip) {
@@ -425,9 +430,9 @@ void c_line(
     unsigned char bytes_per_pixel,
     unsigned char bits_per_pixel,
     unsigned int bytes_per_line,
-    unsigned short x_clip, unsigned short y_clip,
-    unsigned short xx_clip, unsigned short yy_clip,
-    unsigned short xoffset, unsigned short yoffset,
+    short x_clip, short y_clip,
+    short xx_clip, short yy_clip,
+    short xoffset, short yoffset,
     unsigned char alpha)
 {
     short shortLen = y2 - y1;
@@ -481,27 +486,27 @@ void c_line(
 /* Reads in rectangular screen data as a string to a previously allocated buffer */
 void c_blit_read(
     char *framebuffer,
-    unsigned short screen_width,
-    unsigned short screen_height,
+    short screen_width,
+    short screen_height,
     unsigned int bytes_per_line,
-    unsigned short xoffset,
-    unsigned short yoffset,
+    short xoffset,
+    short yoffset,
     char *blit_data,
     short x, short y,
-    unsigned short w, unsigned short h,
+    short w, short h,
     unsigned char bytes_per_pixel,
     unsigned char draw_mode,
     unsigned char alpha,
     unsigned int bcolor,
-    unsigned short x_clip, unsigned short y_clip,
-    unsigned short xx_clip, unsigned short yy_clip)
+    short x_clip, short y_clip,
+    short xx_clip, short yy_clip)
 {
     short fb_x = xoffset + x;
     short fb_y = yoffset + y;
     short xx   = x + w;
     short yy   = y + h;
-    unsigned short horizontal;
-    unsigned short vertical;
+    short horizontal;
+    short vertical;
     unsigned int bline = w * bytes_per_pixel;
 
     for (vertical = 0; vertical < h; vertical++) {
@@ -535,27 +540,27 @@ void c_blit_read(
 /* Blits a rectangle of graphics to the screen using the specified draw mode */
 void c_blit_write(
     char *framebuffer,
-    unsigned short screen_width,
-    unsigned short screen_height,
+    short screen_width,
+    short screen_height,
     unsigned int bytes_per_line,
     unsigned short xoffset,
     unsigned short yoffset,
     char *blit_data,
     short x, short y,
-    unsigned short w, unsigned short h,
+    short w, short h,
     unsigned char bytes_per_pixel,
     unsigned char draw_mode,
     unsigned char alpha,
     unsigned int bcolor,
-    unsigned short x_clip, unsigned short y_clip,
-    unsigned short xx_clip, unsigned short yy_clip)
+    short x_clip, short y_clip,
+    short xx_clip, short yy_clip)
 {
     short fb_x = xoffset + x;
     short fb_y = yoffset + y;
     short xx   = x + w;
     short yy   = y + h;
-    unsigned short horizontal;
-    unsigned short vertical;
+    short horizontal;
+    short vertical;
     unsigned int bline = w * bytes_per_pixel;
 
     if (draw_mode == NORMAL_MODE && x >= x_clip && xx <= xx_clip && y >= y_clip && yy <= yy_clip) {
@@ -1361,8 +1366,8 @@ void c_blit_write(
 void c_rotate(
     char *image,
     char *new_img,
-    unsigned short width,
-    unsigned short height,
+    short width,
+    short height,
     unsigned short wh,
     double degrees,
     unsigned char bytes_per_pixel)
@@ -1408,12 +1413,12 @@ void c_rotate(
     }
 }
 
-void c_flip_both(char* pixels, unsigned short width, unsigned short height, unsigned short bytes) {
+void c_flip_both(char* pixels, short width, short height, unsigned short bytes) {
     c_flip_vertical(pixels,width,height,bytes);
     c_flip_horizontal(pixels,width,height,bytes);
 }
 
-void c_flip_horizontal(char* pixels, unsigned short width, unsigned short height, unsigned char bytes_per_pixel) {
+void c_flip_horizontal(char* pixels, short width, short height, unsigned char bytes_per_pixel) {
     short y;
     short x;
     unsigned short offset;
@@ -1432,7 +1437,7 @@ void c_flip_horizontal(char* pixels, unsigned short width, unsigned short height
     }
 }
 
-void c_flip_vertical(char *pixels, unsigned short width, unsigned short height, unsigned char bytes_per_pixel) {
+void c_flip_vertical(char *pixels, short width, short height, unsigned char bytes_per_pixel) {
     unsigned int stride = width * bytes_per_pixel;        // Bytes per line
     unsigned char *row  = malloc(stride);                 // Allocate a temporary buffer
     unsigned char *low  = pixels;                         // Pointer to the beginning of the image
@@ -1579,7 +1584,7 @@ void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned cha
     }
 }
 
-void c_monochrome(char *pixels, unsigned int size, unsigned short color_order, unsigned char bytes_per_pixel) {
+void c_monochrome(char *pixels, unsigned int size, unsigned char color_order, unsigned char bytes_per_pixel) {
     unsigned int idx;
     unsigned char r;
     unsigned char g;

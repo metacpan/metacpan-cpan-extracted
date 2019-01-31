@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the AcousticBrainz API
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0400';
 
 use Moo;
 use strictures 2;
@@ -35,6 +35,9 @@ sub fetch {
     if ( $args{query} ) {
         $query = join '&', map { "$_=$args{query}->{$_}" } keys %{ $args{query} };
     }
+
+    croak 'No mbid provided' unless $args{mbid};
+    croak 'No endpoint provided' unless $args{endpoint};
 
     my $url = $self->base . '/'. $args{mbid} . '/'. $args{endpoint};
     $url .= '?' . $query
@@ -84,14 +87,16 @@ WebService::AcousticBrainz - Access to the AcousticBrainz API
 
 =head1 VERSION
 
-version 0.0301
+version 0.0400
 
 =head1 SYNOPSIS
 
   use WebService::AcousticBrainz;
+
   my $w = WebService::AcousticBrainz->new;
+
   my $r = $w->fetch(
-    mbid     => '96685213-a25c-4678-9a13-abd9ec81cf35',
+    mbid     => 'c51f788f-f2ac-4d4e-aa72-205f002b8752',
     endpoint => 'low-level',
     query    => { n => 2 },
   );
@@ -114,7 +119,7 @@ The user agent.
 
 =head2 new()
 
-  $x = WebService::AcousticBrainz->new;
+  $w = WebService::AcousticBrainz->new;
 
 Create a new C<WebService::AcousticBrainz> object.
 
@@ -122,8 +127,8 @@ Create a new C<WebService::AcousticBrainz> object.
 
   $r = $w->fetch(%arguments);
 
-Fetch the results given the B<mbid> (MusicBrainz ID), B<endpoint> and optional
-B<query> arguments.
+Fetch the results given a B<mbid> (MusicBrainz recording ID), B<endpoint> and
+optional B<query> arguments.
 
 =head1 SEE ALSO
 

@@ -15,10 +15,10 @@ my %module_build_args = (
   },
   "dist_abstract" => "A searchable store backed by Elasticsearch",
   "dist_author" => [
-    "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
+    "=over 4"
   ],
   "dist_name" => "Catmandu-Store-Elasticsearch",
-  "dist_version" => "0.0512",
+  "dist_version" => "1.0",
   "license" => "perl",
   "module_name" => "Catmandu::Store::Elasticsearch",
   "recursive_test_files" => 1,

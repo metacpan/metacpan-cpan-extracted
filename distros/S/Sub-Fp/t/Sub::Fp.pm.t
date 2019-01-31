@@ -1476,6 +1476,58 @@ sub get__returns_value_not_default_when_value_falsy :Tests {
     );
 }
 
+sub get__returns_value_with_deep_path_shorthand :Tests {
+    my $collection = [
+        {
+            favorite_foods => ["cheese", "cake"]
+        }
+    ];
+
+    is_deeply(
+        get('[0]{favorite_foods}[1]', $collection),
+        "cake"
+    );
+}
+
+sub get__returns_default_with_deep_shorthand :Tests {
+    my $collection = [
+        {
+            favorite_foods => ["cheese", "cake"]
+        }
+    ];
+
+    is_deeply(
+        get('[0]{favorite_foods}[100]', $collection, "Other value not present"),
+        "Other value not present"
+    );
+}
+
+sub get__returns_value_with_key_spaces :Tests {
+    my $collection = [
+        {
+            "favorite foods" => ["cheese", "cake"]
+        }
+    ];
+
+    is_deeply(
+        get('[0]{favorite foods}[1]', $collection),
+        "cake"
+    );
+}
+
+sub get__returns_value_with_key_spaces_and_numbers_and_dashes :Tests {
+    my $collection = [
+        {
+            "favorite foods-1337" => ["cheese", "cake"]
+        }
+    ];
+
+    is_deeply(
+        get('[0]{favorite foods-1337}[1]', $collection),
+        "cake"
+    );
+}
+
 # ------------------------------------------------------------------------------
 
 sub assoc_returns_undef_when_args_undef :Tests {

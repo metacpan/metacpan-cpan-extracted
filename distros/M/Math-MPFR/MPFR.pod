@@ -2455,7 +2455,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2018 Sisyphus
+    Copyright 2006-2019 Sisyphus
 
 =head1 AUTHOR
 

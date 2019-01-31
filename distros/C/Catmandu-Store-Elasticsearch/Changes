@@ -1,5 +1,15 @@
 Revision history for Catmandu-Store-ElasticSearch
 
+1.0  2019-01-30 13:42:43 CET
+  - update constructor pod
+
+0.9_02  2019-01-30 12:15:12 CET
+  - add an upgrading to 1.0 section to the pod
+
+0.9_01  2019-01-30 11:55:01 CET
+  - this is a major breaking release that is fully compatible
+    with Elasticsearch >= 5.0 and maps indexes to bags
+
 0.0512  2019-01-22 14:06:36 CET
   - the bag gets a new type parameter for setting the index type that defaults
     to the bag's name

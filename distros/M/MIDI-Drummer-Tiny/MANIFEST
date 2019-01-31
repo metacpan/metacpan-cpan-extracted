@@ -9,7 +9,6 @@ README
 README.md
 dist.ini
 eg/metronome
-eg/metronome.mid
 eg/swing
 lib/MIDI/Drummer/Tiny.pm
 t/00-compile.t

@@ -34,7 +34,7 @@
       },
       "runtime" : {
          "requires" : {
-            "File::Map" : "0.65",
+            "File::Map" : "0.64",
             "Imager" : "0.91",
             "Inline" : "0.53",
             "Inline::C" : "0.53",
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "6.15",
+   "version" : "6.18",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,0 +1,12 @@
+package TestCase::Lib::SPVM::Long {
+  sub basic : int () {
+    my $oval = SPVM::Long->new(INT64_MIN());
+    my $value1 = $oval->val;
+    
+    unless ($value1 == INT64_MIN()) {
+      return 0;
+    }
+    
+    return 1;
+  }
+}

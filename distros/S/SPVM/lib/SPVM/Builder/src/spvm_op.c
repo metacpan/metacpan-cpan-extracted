@@ -152,7 +152,7 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "BOOL",
   "LOOP_INCREMENT",
   "SELF",
-  "CHECK_CAST",
+  "CHECK_CONVERT",
   "STRING_EQ",
   "STRING_NE",
   "STRING_GT",
@@ -1178,7 +1178,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_PLUS:
     case SPVM_OP_C_ID_MINUS:
     case SPVM_OP_C_ID_NEW:
-    case SPVM_OP_C_ID_CHECK_CAST:
+    case SPVM_OP_C_ID_CHECK_CONVERT:
     case SPVM_OP_C_ID_ARRAY_INIT:
     {
       type = SPVM_OP_get_type(compiler, op->first);

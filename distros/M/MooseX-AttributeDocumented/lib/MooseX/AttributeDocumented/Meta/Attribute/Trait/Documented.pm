@@ -4,8 +4,9 @@ use warnings;
 
 package MooseX::AttributeDocumented::Meta::Attribute::Trait::Documented;
 
-our $VERSION = '0.1003'; # VERSION
 # ABSTRACT: Add documentation to attributes
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
+our $VERSION = '0.1004';
 
 use Moose::Role;
 #Moose::Util::meta_attribute_alias('Documented');
@@ -47,7 +48,7 @@ MooseX::AttributeDocumented::Meta::Attribute::Trait::Documented - Add documentat
 
 =head1 VERSION
 
-Version 0.1003, released 2015-01-18.
+Version 0.1004, released 2019-01-30.
 
 =head1 SYNOPSIS
 
@@ -108,7 +109,7 @@ Erik Carlsson <info@code301.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Erik Carlsson <info@code301.com>.
+This software is copyright (c) 2016 by Erik Carlsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

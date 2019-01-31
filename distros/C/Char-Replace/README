@@ -1,5 +1,5 @@
 This archive contains the distribution Char-Replace,
-version 0.003:
+version 0.004:
 
   Perl naive XS character replacement as an alternate to substitute or transliterate
 

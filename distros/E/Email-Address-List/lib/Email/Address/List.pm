@@ -4,7 +4,7 @@ use 5.010;
 
 package Email::Address::List;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use Email::Address;
 
 =head1 NAME
@@ -201,36 +201,36 @@ $RE{'text'}           = qr/[^\x0A\x0D]/;
 $RE{'quoted_pair'}    = qr/\\$RE{'text'}/;
 
 $RE{'atext'}          = qr/[^$RE{'CTL'}$RE{'special'}\s]/;
-$RE{'ctext'}          = qr/(?>[^()\\]+)/;
+$RE{'ctext'}          = qr/[^()\\]++/;
 $RE{'qtext'}          = qr/[^\\"]/;
 $RE{'dtext'}          = qr/[^\[\]\\]/;
 
 ($RE{'ccontent'}, $RE{'comment'}) = (q{})x2;
 for (1 .. $COMMENT_NEST_LEVEL) {
   $RE{'ccontent'} = qr/$RE{'ctext'}|$RE{'quoted_pair'}|$RE{'comment'}/;
-  $RE{'comment'}  = qr/\s*\((?:\s*$RE{'ccontent'})*\s*\)\s*/;
+  $RE{'comment'}  = qr/(?>\s*+\((?:\s*+$RE{'ccontent'})*+\s*+\)\s*+)/;
 }
-$RE{'cfws'}           = qr/$RE{'comment'}|\s+/;
+$RE{'cfws'}           = qr/$RE{'comment'}++|\s*+/;
 
 $RE{'qcontent'}       = qr/$RE{'qtext'}|$RE{'quoted_pair'}/;
-$RE{'quoted-string'}  = qr/$RE{'cfws'}*"$RE{'qcontent'}+"$RE{'cfws'}*/;
+$RE{'quoted-string'}  = qr/$RE{'cfws'}"$RE{'qcontent'}*+"$RE{'cfws'}/;
 
-$RE{'atom'}           = qr/$RE{'cfws'}*$RE{'atext'}++$RE{'cfws'}*/;
+$RE{'atom'}           = qr/$RE{'cfws'}$RE{'atext'}++$RE{'cfws'}/;
 
-$RE{'word'}           = qr/$RE{'cfws'}* (?: $RE{'atom'} | "$RE{'qcontent'}+" ) $RE{'cfws'}*/x;
+$RE{'word'}           = qr/$RE{'atom'} | $RE{'quoted-string'}/x;
 $RE{'phrase'}         = qr/$RE{'word'}+/x;
 $RE{'display-name'}   = $RE{'phrase'};
 
-$RE{'dot_atom_text'}  = qr/$RE{'atext'}+(?:\.$RE{'atext'}+)*/;
-$RE{'dot_atom'}       = qr/$RE{'cfws'}*$RE{'dot_atom_text'}$RE{'cfws'}*/;
+$RE{'dot_atom_text'}  = qr/$RE{'atext'}++(?:\.$RE{'atext'}++)*/;
+$RE{'dot_atom'}       = qr/$RE{'cfws'}$RE{'dot_atom_text'}$RE{'cfws'}/;
 $RE{'local-part'}     = qr/$RE{'dot_atom'}|$RE{'quoted-string'}/;
 
 $RE{'dcontent'}       = qr/$RE{'dtext'}|$RE{'quoted_pair'}/;
-$RE{'domain_literal'} = qr/$RE{'cfws'}*\[(?:\s*$RE{'dcontent'})*\s*\]$RE{'cfws'}*/;
+$RE{'domain_literal'} = qr/$RE{'cfws'}\[(?:\s*$RE{'dcontent'})*\s*\]$RE{'cfws'}/;
 $RE{'domain'}         = qr/$RE{'dot_atom'}|$RE{'domain_literal'}/;
 
 $RE{'addr-spec'}      = qr/$RE{'local-part'}\@$RE{'domain'}/;
-$RE{'angle-addr'}     = qr/$RE{'cfws'}* < $RE{'addr-spec'} > $RE{'cfws'}*/x;
+$RE{'angle-addr'}     = qr/$RE{'cfws'} < $RE{'addr-spec'} > $RE{'cfws'}/x;
 
 $RE{'name-addr'}      = qr/$RE{'display-name'}?$RE{'angle-addr'}/;
 $RE{'mailbox'}        = qr/(?:$RE{'name-addr'}|$RE{'addr-spec'})$RE{'comment'}*/;
@@ -238,13 +238,13 @@ $RE{'mailbox'}        = qr/(?:$RE{'name-addr'}|$RE{'addr-spec'})$RE{'comment'}*/
 $CRE{'addr-spec'}      = qr/($RE{'local-part'})\@($RE{'domain'})/;
 $CRE{'mailbox'} = qr/
     (?:
-        ($RE{'display-name'})?($RE{'cfws'}*)<$CRE{'addr-spec'}>($RE{'cfws'}*)
+        ($RE{'display-name'})?($RE{'cfws'})<$CRE{'addr-spec'}>($RE{'cfws'})
         |$CRE{'addr-spec'}
-    )($RE{'comment'}*)
+    )($RE{'comment'}*+)
 /x;
 
-$RE{'dword'}            = qr/$RE{'cfws'}* (?: $RE{'atom'} | \. | "$RE{'qcontent'}+" ) $RE{'cfws'}*/x;
-$RE{'obs-phrase'}       = qr/$RE{'word'} $RE{'dword'}*/x;
+$RE{'dword'}            = qr/$RE{'cfws'} (?: $RE{'atom'} | \. | "$RE{'qcontent'}++" ) $RE{'cfws'}/x;
+$RE{'obs-phrase'}       = qr/$RE{'word'} $RE{'dword'}*+/x;
 $RE{'obs-display-name'} = $RE{'obs-phrase'};
 $RE{'obs-route'}        = qr/
     (?:$RE{'cfws'}|,)*
@@ -259,9 +259,9 @@ $CRE{'obs-addr-spec'}   = qr/($RE{'obs-local-part'})\@($RE{'obs-domain'})/;
 $CRE{'obs-mailbox'} = qr/
     (?:
         ($RE{'obs-display-name'})?
-        ($RE{'cfws'}*)< $RE{'obs-route'}? $CRE{'obs-addr-spec'} >($RE{'cfws'}*)
+        ($RE{'cfws'})< $RE{'obs-route'}? $CRE{'obs-addr-spec'} >($RE{'cfws'})
         |$CRE{'obs-addr-spec'}
-    )($RE{'comment'}*)
+    )($RE{'comment'}*+)
 /x;
 
 sub parse {
@@ -331,12 +331,12 @@ sub parse {
         # if we got here then something unknown on our way
         # try to recorver
         if ($in_group) {
-            if ( $line =~ s/^([^;,"\)]*(?:(?:$RE{'quoted-string'}|$RE{'comment'})[^;,"\)]*)*)(?=;|,)//o ) {
+            if ( $line =~ s/^([^;,"\)]*+(?:(?:$RE{'quoted-string'}|$RE{'comment'})[^;,"\)]*+)*+)(?=;|,)//o ) {
                 push @res, { type => 'unknown', value => $1 } unless $args{'skip_unknown'};
                 next;
             }
         } else {
-            if ( $line =~ s/^([^,"\)]*(?:(?:$RE{'quoted-string'}|$RE{'comment'})[^,"\)]*)*)(?=,)//o ) {
+            if ( $line =~ s/^([^,"\)]*+(?:(?:$RE{'quoted-string'}|$RE{'comment'})[^,"\)]*+)*+)(?=,)//o ) {
                 push @res, { type => 'unknown', value => $1 } unless $args{'skip_unknown'};
                 next;
             }

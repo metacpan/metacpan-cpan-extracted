@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
-$VERSION = '0.055';
+$VERSION = '0.059';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -676,8 +676,8 @@ sub wei
                 my @sorteds = sort { $b <=> $a } @{ $bank{$trio}{strengths} };
                 if ( scalar( @sorteds ) > $nfilter )
                 {
-                  @sorteds = @sorteds[0..$nfilter];
-                  $benchmark = $sorteds[-1];
+                  @{ $bank{$trio}{strengths} } = @sorteds[0..$nfilter];
+                  $benchmark = ${ $bank{$trio}{strengths} }[-1];
                 }
                 else
                 {

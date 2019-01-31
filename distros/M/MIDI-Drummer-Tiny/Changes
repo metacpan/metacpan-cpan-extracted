@@ -1,5 +1,9 @@
 Revision history for MIDI-Drummer
 
+0.0801 2019-01-29 18:11:06
+    - Fix weird syntax in the test that was making cpantesters unhappy.
+    - Improve synopsis documentation.
+
 0.0800 2019-01-27 02:36:16
     - Remove the unused "patch" attribute.
 

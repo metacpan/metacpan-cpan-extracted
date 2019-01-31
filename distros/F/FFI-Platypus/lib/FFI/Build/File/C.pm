@@ -11,7 +11,7 @@ use File::Path ();
 use FFI::Build::File::Object;
 
 # ABSTRACT: Class to track C source file in FFI::Build
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 
 sub accept_suffix
@@ -40,15 +40,15 @@ sub build_item
   
   File::Path::mkpath($object->dirname, { verbose => 0, mode => 0700 });
 
+  $DB::single = 1;
   my @cmd = (
     $self->_base_args,
     -c => $self->path,
     $self->platform->flag_object_output($object->path),
   );
-  
+
   my($out, $exit) = Capture::Tiny::capture_merged(sub {
-    print "+ @cmd\n";
-    system @cmd;
+    $self->platform->run(@cmd);
   });
 
   if($exit || !-f $object->path)
@@ -56,9 +56,13 @@ sub build_item
     print $out;
     die "error building $object from $self";
   }
-  elsif($self->build && $self->build->verbose)
+  elsif($self->build && $self->build->verbose >= 2)
   {
     print $out;
+  }
+  elsif($self->build && $self->build->verbose >= 1)
+  {
+    print "CC @{[ $self->path ]}\n";
   }
   
   $object;
@@ -73,28 +77,20 @@ sub cc
 sub _base_args
 {
   my($self) = @_;
-  my @cmd = (
-    $self->cc,
-    $self->platform->cflags,
-  );
+  my @cmd = ($self->cc);
+  push @cmd, $self->build->cflags_I if $self->build;
+  push @cmd, $self->platform->ccflags;
   push @cmd, @{ $self->build->cflags } if $self->build;
-  push @cmd, $self->platform->extra_system_inc;
   @cmd;
 }
 
 sub _base_args_cpp
 {
   my($self) = @_;
-
-  # TODO: move into platform
-  require Config;
-  require Text::ParseWords;
-  my @cmd = (
-    Text::ParseWords::shellwords($Config::Config{cpprun}),
-    grep /^-[DI]/, $self->platform->cflags,
-  );
-  push @cmd, grep /^-[DI]/, @{ $self->build->cflags } if $self->build;
-  push @cmd, grep /^-[DI]/, $self->platform->extra_system_inc;
+  my @cmd = ($self->platform->cpp);
+  push @cmd, $self->build->cflags_I if $self->build;
+  push @cmd, grep /^-[DI]/, $self->platform->ccflags;
+  push @cmd, grep /^-D/, @{ $self->build->cflags } if $self->build;
   @cmd;
 }
 
@@ -123,12 +119,11 @@ sub build_item_cpp
   );
 
   my($out, $err, $exit) = Capture::Tiny::capture(sub {
-    system @cmd;
+    $self->platform->run(@cmd);
   });
 
   if($exit)
   {
-    print "+@cmd\n";
     print "[out]\n$out\n" if defined $out && $out ne '';
     print "[err]\n$err\n" if defined $err && $err ne '';
     die "error building $ifile from $self";
@@ -157,8 +152,7 @@ sub _deps
   );
   
   my($out,$err,$exit) = Capture::Tiny::capture(sub {
-    print "+ @cmd\n";
-    system @cmd;
+    $self->platform->run(@cmd);
   });
   
   if($exit)
@@ -191,7 +185,7 @@ FFI::Build::File::C - Class to track C source file in FFI::Build
 
 =head1 VERSION
 
-version 0.74
+version 0.78
 
 =head1 SYNOPSIS
 

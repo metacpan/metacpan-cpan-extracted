@@ -1,10 +1,10 @@
-# $Id: DBI.pm 76 2019-01-24 19:50:04Z stro $
+# $Id: DBI.pm 79 2019-01-30 02:35:31Z stro $
 
 package CPAN::SQLite::DBI;
 use strict;
 use warnings;
 
-our $VERSION = '0.216';
+our $VERSION = '0.217';
 
 use English qw/-no_match_vars/;
 
@@ -136,7 +136,7 @@ CPAN::SQLite::DBI - DBI information for the CPAN::SQLite database
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 DESCRIPTION
 

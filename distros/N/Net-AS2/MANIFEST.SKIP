@@ -1,13 +1,1 @@
-~$
-(^|/)\.
-\.tar\.gz$
-(^|/)\.svn(/|$)
-^\.git(/|$)
-^\.gitignore$
-^\.hg(/|$)
-^\.hgignore$
-^blib(/|$)
-^Makefile$
-^Makefile\.old$
-^MANIFEST\.bak$
-^pm_to_blib$
+libnet-as2-perl_*

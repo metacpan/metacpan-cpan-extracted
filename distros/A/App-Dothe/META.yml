@@ -1,0 +1,59 @@
+---
+abstract: 'YAML-based task runner'
+author:
+  - 'Yanick Champoux <yanick@babyl.ca>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Dothe
+provides:
+  App::Dothe:
+    file: lib/App/Dothe.pm
+    version: v0.0.1
+  App::Dothe::Task:
+    file: lib/App/Dothe/Task.pm
+    version: v0.0.1
+requires:
+  File::Wildcard: '0'
+  Graph::Directed: '0'
+  List::AllUtils: '0'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  Moose: '0'
+  MooseX::App::Simple: '0'
+  Path::Tiny: '0'
+  PerlX::Maybe: '0'
+  Ref::Util: '0'
+  Text::Template: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  YAML::XS: '0'
+  experimental: '0'
+  perl: v5.20.0
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/App-Dothe/issues
+  homepage: https://github.com/yanick/App-Dothe
+  repository: https://github.com/yanick/App-Dothe.git
+version: 0.0.1
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.01
+x_contributors:
+  - 'Yanick Champoux <yanick@cpan.org>'
+x_generated_by_perl: v5.20.2
+x_serialization_backend: 'YAML::Tiny version 1.67'

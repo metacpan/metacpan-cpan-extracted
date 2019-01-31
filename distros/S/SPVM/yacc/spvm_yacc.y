@@ -17,13 +17,13 @@
   #include "spvm_package.h"
 %}
 
-%token <opval> PACKAGE HAS SUB OUR ENUM MY SELF USE 
+%token <opval> PACKAGE HAS SUB OUR ENUM MY SELF USE REQUIRE
 %token <opval> DESCRIPTOR
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT EVAL
 %token <opval> NAME VAR_NAME CONSTANT PACKAGE_VAR_NAME EXCEPTION_VAR
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT
-%token <opval> DOT3 FATCAMMA RW RO WO BEGIN
-%token <opval> RETURN WEAKEN CROAK CURRENT_PACKAGE UNWEAKEN ISWEAK
+%token <opval> DOT3 FATCAMMA RW RO WO BEGIN NEW
+%token <opval> RETURN WEAKEN CROAK CURRENT_PACKAGE UNWEAKEN ISWEAK '[' '{' '('
 
 %type <opval> grammar
 %type <opval> opt_packages packages package package_block
@@ -36,7 +36,7 @@
 %type <opval> block eval_block begin_block if_require_statement
 %type <opval> unary_op binary_op comparison_op num_comparison_op str_comparison_op isa logical_op
 %type <opval> call_sub opt_vaarg
-%type <opval> array_access field_access weaken_field weaken_array_element unweaken_field unweaken_array_element isweak_field isweak_array_element convert_type convert array_length
+%type <opval> array_access field_access weaken_field weaken_array_element unweaken_field unweaken_array_element isweak_field isweak_array_element convert array_length
 %type <opval> deref ref assign inc dec
 %type <opval> new array_init
 %type <opval> my_var var package_var_access
@@ -51,15 +51,12 @@
 %left <opval> '&'
 %nonassoc <opval> NUMEQ NUMNE STREQ STRNE
 %nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA
-%nonassoc <opval> SCALAR LENGTH REQUIRE
 %left <opval> SHIFT
 %left <opval> '+' '-' '.'
 %left <opval> MULTIPLY DIVIDE REMAINDER
-%right <opval> LOGICAL_NOT BIT_NOT '@' REF DEREF PLUS MINUS CAST
+%right <opval> LOGICAL_NOT BIT_NOT '@' REF DEREF PLUS MINUS CONVERT SCALAR LENGTH
 %nonassoc <opval> INC DEC
-%right <opval> NEW
 %left <opval> ARROW
-%left <opval> '[' '{' '('
 
 %%
 
@@ -567,7 +564,7 @@ block
     }
 
 eval_block
-  : EVAL block
+  : EVAL block ';'
     {
       $$ = SPVM_OP_build_eval(compiler, $1, $2);
     }
@@ -609,7 +606,7 @@ expression
   | call_sub
   | field_access
   | array_access
-  | convert_type
+  | convert
   | new
   | array_init
   | array_length
@@ -622,9 +619,21 @@ expression
   | assign
   | inc
   | dec
-  | '(' expression ')'
+  | '(' expressions ')'
     {
-      $$ = $2;
+      if ($2->id == SPVM_OP_C_ID_LIST) {
+			  SPVM_OP* op_term = $2->first;
+	      SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, compiler->cur_file, compiler->cur_line);
+			  while ((op_term = SPVM_OP_sibling(compiler, op_term))) {
+			    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_term);
+  	      SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_term);
+  	      op_term = op_stab;
+			  }
+			  $$ = op_sequence;
+      }
+      else {
+        $$ = $2;
+      }
     }
   | CURRENT_PACKAGE
 
@@ -870,17 +879,11 @@ array_init
       $$ = SPVM_OP_build_array_init(compiler, op_array_init, $2);
     }
 
-convert_type
-  : convert expression %prec CAST
-    {
-      SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, $1->file, $1->line);
-      $$ = SPVM_OP_build_convert(compiler, op_convert, $1, $2);
-    }
-
 convert
-  : '(' type ')'
+  : '(' type ')' expression %prec CONVERT
     {
-      $$ = $2;
+      SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, $2->file, $2->line);
+      $$ = SPVM_OP_build_convert(compiler, op_convert, $2, $4);
     }
 
 array_access
@@ -1002,6 +1005,7 @@ string_length
     {
       $$ = SPVM_OP_build_string_length(compiler, $1, $2);
     }
+    
 deref
   : DEREF var
     {
@@ -1013,11 +1017,6 @@ ref
     {
       SPVM_OP* op_ref = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_REF, $1->file, $1->line);
       $$ = SPVM_OP_build_ref(compiler, op_ref, $2);
-    }
-  | REF '{' var '}'
-    {
-      SPVM_OP* op_ref = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_REF, $1->file, $1->line);
-      $$ = SPVM_OP_build_ref(compiler, op_ref, $3);
     }
 
 my_var

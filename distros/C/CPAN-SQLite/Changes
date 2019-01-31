@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::SQLite.
 
+0.217 Jan 29, 2019
+  - Updated HTTP::Tiny prerequisite to make it working with proxy auth
+  - Removed search limits (RT#128387)
+
 0.216 Jan 24, 2019
   - Fixed test problems in Perl 5.8
 

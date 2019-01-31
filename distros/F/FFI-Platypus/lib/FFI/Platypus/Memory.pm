@@ -6,13 +6,15 @@ use FFI::Platypus;
 use base qw( Exporter );
 
 # ABSTRACT: Memory functions for FFI
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 
-our @EXPORT = qw( malloc free calloc realloc memcpy memset strdup );
+our @EXPORT = qw( malloc free calloc realloc memcpy memset strdup strndup );
 
 my $ffi = FFI::Platypus->new;
 $ffi->lib(undef);
+$ffi->package;
+sub _ffi { $ffi }
 
 $ffi->attach(malloc  => ['size_t']                     => 'opaque' => '$');
 $ffi->attach(free    => ['opaque']                     => 'void'   => '$');
@@ -21,24 +23,32 @@ $ffi->attach(realloc => ['opaque', 'size_t']           => 'opaque' => '$$');
 $ffi->attach(memcpy  => ['opaque', 'opaque', 'size_t'] => 'opaque' => '$$$');
 $ffi->attach(memset  => ['opaque', 'int', 'size_t']    => 'opaque' => '$$$');
 
-our $_strdup_impl = 'not-loaded';
+my $_strdup_impl = 'not-loaded';
+sub _strdup_impl { $_strdup_impl }
 
 eval {
-  die "do not use c impl" if ($ENV{FFI_PLATYPUS_MEMORY_STRDUP_IMPL}||'c') eq 'perl';
+  die "do not use c impl" if ($ENV{FFI_PLATYPUS_MEMORY_STRDUP_IMPL}||'libc') eq 'ffi';
   $ffi->attach(strdup  => ['string'] => 'opaque' => '$');
+  $_strdup_impl = 'libc';  
 };
 if($@)
 {
-  $_strdup_impl = 'perl';
-  *strdup = sub ($) {
-    my($string) = @_;
-    my $ptr = malloc(length($string)+1);
-    memcpy($ptr, $ffi->cast('string' => 'opaque', $string), length($string)+1);
-  };
+  $_strdup_impl = 'ffi';
+  $ffi->attach([ ffi_platypus_memory__strdup => 'strdup' ] => ['string'] => 'opaque' => '$');
 }
-else
+
+my $_strndup_impl = 'not-loaded';
+sub _strndup_impl { $_strndup_impl }
+
+eval {
+  die "do not use c impl" if ($ENV{FFI_PLATYPUS_MEMORY_STRDUP_IMPL}||'libc') eq 'ffi';
+  $ffi->attach(strndup  => ['string','size_t'] => 'opaque' => '$$');
+  $_strndup_impl = 'libc';  
+};
+if($@)
 {
-  $_strdup_impl = 'c';
+  $_strndup_impl = 'ffi';
+  $ffi->attach([ ffi_platypus_memory__strndup => 'strndup' ] => ['string','size_t'] => 'opaque' => '$$');
 }
 
 1;
@@ -55,7 +65,7 @@ FFI::Platypus::Memory - Memory functions for FFI
 
 =head1 VERSION
 
-version 0.74
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -137,31 +147,12 @@ C<strdup> returns an opaque pointer type, not a string type.  This may
 seem a little strange, but returning a string type would not be very 
 useful in Perl.
 
-Platforms that do not support C<strdup> will be provided with an 
-equivalent using C<malloc> and C<memcpy> written in Perl.  This version 
-is slower.
+=head2 strndup
 
-=head1 ENVIRONMENT
+ my $pointer = strndup $string, $max;
 
-=head2 FFI_PLATYPUS_MEMORY_STRDUP_IMPL
-
-C<strdup> isn't always supported by all platforms.  On platforms that do not support
-it, it is emulated using calls to C<malloc> and C<memcpy> which are part of the
-standard C library.  Because this requires two function calls it is probably not
-as fast on most platforms.
-
-If you experience problems with the C<strdup> provided by your platform, you can
-force the emulated implementation using the FFI_PLATYPUS_MEMORY_STRDUP_IMPL
-environment variable.
-
- # bash:
- $ export FFI_PLATYPUS_MEMORY_STRDUP_IMPL=perl
-
- # tcsh:
- % setenv FFI_PLATYPUS_MEMORY_STRDUP_IMPL perl
-
- # Windows:
- > SET FFI_PLATYPUS_MEMORY_STRDUP_IMPL=perl
+The same as C<strdup> above, except at most C<$max> characters will be
+copied in the new string.
 
 =head1 SEE ALSO
 

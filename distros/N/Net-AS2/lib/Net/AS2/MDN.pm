@@ -1,6 +1,6 @@
-package Net::AS2::MDN;
+package Net::AS2::MDN 1.0;
 use strict;
-use warnings qw(all);
+use warnings;
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ Net::AS2::MDN - AS2 Message Deposition Notification
 =head1 PUBLIC INTERFACE
 
 =cut
- 
+
 use Carp;
 use MIME::Parser;
 use MIME::Entity;
@@ -34,7 +34,7 @@ my $crlf = "\x0d\x0a";
 
 =item $mdn = Net::AS2::MDN->create_success($message, $plain_text)
 
-Create an C<Net::AS2::MDN> indicating processed with transaction information 
+Create an C<Net::AS2::MDN> indicating processed with transaction information
 provided by C<Net::AS2::Message>. Optionally with a human readable text.
 
 =cut
@@ -52,10 +52,10 @@ sub create_success
 
 =item $mdn = Net::AS2::MDN->create_warning($message, $status_text, $plain_text)
 
-Create an C<Net::AS2::MDN> indicating processed with warnings with transaction 
+Create an C<Net::AS2::MDN> indicating processed with warnings with transaction
 information provided by C<Net::AS2::Message>. Optionally with a human readable text.
 
-Status text is required and will goes to the C<Disposition> line. 
+Status text is required and will goes to the C<Disposition> line.
 It is limited to printable ASCII.
 
 =cut
@@ -74,10 +74,10 @@ sub create_warning
 
 =item $mdn = Net::AS2::MDN->create_failure($message, $status_text, $plain_text)
 
-Create an C<Net::AS2::MDN> indicating failed/failure status with transaction 
+Create an C<Net::AS2::MDN> indicating failed/failure status with transaction
 information provided by C<Net::AS2::Message>. Optionally with a human readable text.
 
-Status text is required and will goes to the C<Disposition> line. 
+Status text is required and will goes to the C<Disposition> line.
 It is limited to printable ASCII.
 
 =cut
@@ -95,10 +95,10 @@ sub create_failure
 
 =item $mdn = Net::AS2::MDN->create_error($message, $status_text, $plain_text)
 
-Create an C<Net::AS2::MDN> indicating processed/error status with transaction 
+Create an C<Net::AS2::MDN> indicating processed/error status with transaction
 information provided by C<Net::AS2::Message>. Optionally with a human readable text.
 
-Status text is required and will goes to the C<Disposition> line. 
+Status text is required and will goes to the C<Disposition> line.
 It is limited to printable ASCII.
 
 =cut
@@ -114,7 +114,7 @@ sub create_error
 
 =item $mdn = Net::AS2::MDN->create_from_unsuccessful_message($message)
 
-Create a corresponding C<Net::AS2::MDN> for unsuccessful C<Net::AS2::Message> 
+Create a corresponding C<Net::AS2::MDN> for unsuccessful C<Net::AS2::Message>
 notice generated while receiving and decoding. Message's error text
 will be used.
 
@@ -149,20 +149,26 @@ sub _create_from_message
     croak "message is not an Net::AS2::Message"
         unless blessed($message) && $message->isa('Net::AS2::Message');
 
-    croak "status_text should be in English" unless 
+    croak "status_text should be in English" unless
         defined $status_text && $status_text =~ /^[\x20-\x7E^]+$/;
 
-    my $self = {         
+    my $self = {
         status_text => $status_text,
         plain_text => $plain_text // $status_text,
         original_message_id => $message->message_id,
         mic_hash => $message->mic,
-        mic_alg => defined $message->mic ? 'sha1' : undef,
+        mic_alg => $message->mic_alg,
         async_url => $message->async_url,
         should_sign => $message->should_mdn_sign,
     };
     return bless ($self, ref($class) || $class);
 }
+
+=item $mdn->parse_mdn($content)
+
+Parses the given content as an MDN.
+
+=cut
 
 sub parse_mdn
 {
@@ -176,16 +182,28 @@ sub parse_mdn
     return $self;
 }
 
+=item $mdn = Net::AS2::MDN->create_error_mdn($reason)
+
+Create an 'error' C<Net::AS2::MDN> with the status text of C<$reason>.
+
+=cut
+
 sub create_error_mdn
 {
     my ($class, $reason) = @_;
 
     $class = ref($class) || $class;
-    my $self = { unparsable => 1, status_text => $reason };
+    my $self = { error => 1, status_text => $reason };
     bless ($self, $class);
 
     return $self;
 }
+
+=item $mdn = Net::AS2::MDN->create_unparsable_mdn($reason)
+
+Create an 'unparsable' C<Net::AS2::MDN> with the status text of C<$reason>.
+
+=cut
 
 sub create_unparsable_mdn
 {
@@ -240,7 +258,7 @@ sub _parse_mdn
             $self->{recipient} = Net::AS2::_parse_as2_id($1);
         }
     }
-        
+
     $self->{original_message_id} = $disposition{'original-message-id'}
         if defined $disposition{'original-message-id'};
 
@@ -271,7 +289,7 @@ sub _parse_mdn
             } elsif ($op =~ m{^failed/failure}i) {
                 # Failed (Failure - EDI level)
                 $self->{failure} = 1;
-            } else { 
+            } else {
                 # including processed/error
                 # Failed (Content - protocol level, e.g. parse/decode/auth)
                 $self->{error} = 1;
@@ -293,13 +311,13 @@ sub _parse_mdn
 
 =over 4
 
-=item $mdn->match($mic, $alg)
+=item $mdn->match_mic($mic, $alg)
 
 Verify the MDN MIC value with a pre-calculated one to make sure the receiving party got what we sent.
 
 The MDN will be marked C<is_error> if the MICs do not match.
 
-    $mdn->match($mic, 'sha1');
+    $mdn->match_mic($mic, 'sha1');
     if ($mdn->is_success) {
         # still success after comparing mic
     }
@@ -309,7 +327,7 @@ The MDN will be marked C<is_error> if the MICs do not match.
 sub match_mic
 {
     my ($self, $hash, $alg) = @_;
-    return undef if !$self->is_success;
+    return if !$self->is_success;
     unless (
         defined $self->{mic_hash} &&
         defined $hash && defined $alg &&
@@ -318,7 +336,7 @@ sub match_mic
     {
         $self->{success} = $self->{warning} = $self->{failure} = 0;
         $self->{error} = 1;
-        $self->{status_text} .= "; MDN MIC validation failure";
+        $self->{status_text} .= "; MDN MIC validation failure $self->{mic_alg} ne $alg";
         return 0;
     }
     return 1;
@@ -394,10 +412,10 @@ Returns the AS2 name of the final recipient field of the MDN
 
 =cut
 
-sub recipient { 
-    my ($self, $value) = @_; 
+sub recipient {
+    my ($self, $value) = @_;
     $self->{recipient} = $value if @_ >= 2;
-    return $self->{recipient}; 
+    return $self->{recipient};
 }
 
 =item $mdn->original_message_id
@@ -410,19 +428,19 @@ sub original_message_id { return (shift)->{original_message_id}; }
 
 =item $mdn->description
 
-Returns a concatenated text message of the MDN status, machine readable text 
+Returns a concatenated text message of the MDN status, machine readable text
 and human readable text.
 
 =cut
 
-sub description { 
+sub description {
     my $self = shift;
-    return sprintf("%s; %s", 
+    return sprintf("%s; %s",
         $self->{warning} ? 'processed/warning: ' . $self->{status_text} :
         $self->{success} ? 'processed' :
         $self->{failure} ? 'failed/failure: ' . $self->{status_text} :
         $self->{error} ? 'processed/error: ' . $self->{status_text} :
-        'unparsable: ' . $self->{status_text}, 
+        'unparsable: ' . $self->{status_text},
         $self->{plain_text} // '');
 }
 
@@ -458,16 +476,16 @@ sub as_mime
     ));
 
     my $human_report_mime = new MIME::Entity->build(
-        Type => 'text/plain', 
+        Type => 'text/plain',
         Data => $self->{plain_text} // $self->{status_text} // (
-            $self->{success} ? 
+            $self->{success} ?
                 'Message is received successfully.' :
                 'Message could not be processed.'),
         Top => 0);
     $human_report_mime->head->delete('Content-disposition');
     my $machine_report_mime = new MIME::Entity->build(
-        Type => 'message/disposition-notification', 
-        Data => $machine_report, 
+        Type => 'message/disposition-notification',
+        Data => $machine_report,
         Top => 0);
     $machine_report_mime->head->delete('Content-disposition');
     my $report_mime = new MIME::Entity->build(

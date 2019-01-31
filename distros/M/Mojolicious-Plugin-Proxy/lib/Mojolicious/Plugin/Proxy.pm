@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Proxy;
 
 use base 'Mojolicious::Plugin';
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 
 sub register {
   my ($self, $app) = @_;
@@ -35,7 +35,8 @@ sub register {
 
 sub _proxy_tx {
   my ($self, $tx) = @_;
-  if (my $res = $tx->success) {
+  if (!$tx->error) {
+    my $res = $tx->res;
     $self->tx->res($res);
     $self->rendered;
   }

@@ -13,9 +13,15 @@ Date::CutOff::JP - Get the day cutoff and payday for in Japanese timezone
 
 # DESCRIPTION
 
-Date::CutOff::JP provides how to calculate the day cutoff and the payday from Japanese calender.
+Date::CutOff::JP provides how to calculate the day cutoff and the payday from Japanese calendar.
 
-you can calculate the weekday for cutoff and paying without holiday in Japan.
+You can calculate the weekday for cutoff and paying without holidays in Japan.
+
+# Constructor
+
+### new({ \[cutoff => $day\], \[payday => $day\], \[late => 0||1||2\] })
+
+You may omit parameters. defaults are { cutoff => 0, payday => 0, late => 1 }
 
 ## Accessor Methods
 
@@ -23,9 +29,13 @@ you can calculate the weekday for cutoff and paying without holiday in Japan.
 
 get/set the day cutoff in every months. 0 means the end of the month.
 
+**caution** Int over 28 is denied
+
 ### payday()
 
 get/set the payday in every months. 0 means the end of the month.
+
+**caution** Int over 28 is denied
 
 ### late()
 
@@ -35,7 +45,9 @@ The all you can set is Int of \[ 0 .. 2 \] 3 or more returns error.
 
 ## Method
 
-### calc\_date($date)
+### calc\_date(\[$date\])
+
+You may omit the parameter. default is TODAY.
 
 returns hash value with keys below:
 

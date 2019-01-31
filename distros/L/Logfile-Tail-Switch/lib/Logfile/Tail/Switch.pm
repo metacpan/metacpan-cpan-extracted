@@ -1,13 +1,15 @@
 package Logfile::Tail::Switch;
 
-our $DATE = '2017-06-09'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-01-30'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Time::HiRes 'time';
+
+our $WARN_NO_MATCH = 1;
 
 sub new {
     my ($class, %args) = @_;
@@ -81,7 +83,7 @@ sub getline {
             my @files = sort glob($glob);
             #say "D: files matching glob: ".join(", ", @files);
             unless (@files) {
-                warn "No files matched '$glob'";
+                warn "No files matched '$glob'" if $WARN_NO_MATCH;
                 next;
             }
             if (defined $self->{_cur_fh}{$glob}) {
@@ -135,7 +137,7 @@ Logfile::Tail::Switch - Tail a file, but switch when another file with newer nam
 
 =head1 VERSION
 
-This document describes version 0.003 of Logfile::Tail::Switch (from Perl distribution Logfile-Tail-Switch), released on 2017-06-09.
+This document describes version 0.004 of Logfile::Tail::Switch (from Perl distribution Logfile-Tail-Switch), released on 2019-01-30.
 
 =head1 SYNOPSIS
 
@@ -190,6 +192,12 @@ start to finish then tail'ed. When C<http_access.2017-06-09.log> appears the
 next day, that file will be read then tail'ed. And so on.
 
 =for Pod::Coverage ^(DESTROY)$
+
+=head1 PACKAGE VARIABLES
+
+=head2 $WARN_NO_MATCH
+
+Boolean, default 1. Whether to warn when the glob does not match any files.
 
 =head1 METHODS
 
@@ -250,7 +258,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

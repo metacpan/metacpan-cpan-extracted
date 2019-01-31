@@ -13,7 +13,7 @@ plan skip_all => 'Test requires C++ compiler'
 
 subtest 'basic' => sub {
 
-  my $file = FFI::Build::File::CXX->new(['corpus','basic.cxx']);
+  my $file = FFI::Build::File::CXX->new(['corpus','ffi_build_file_cxx','basic.cxx']);
   
   isa_ok $file, 'FFI::Build::File::CXX';
   isa_ok $file, 'FFI::Build::File::C';
@@ -40,7 +40,7 @@ subtest 'compile' => sub {
 subtest 'headers' => sub {
 
   my $build = FFI::Build->new('foo',
-    verbose => 1,
+    verbose => 2,
     cflags  => "-Icorpus/ffi_build_file_cxx/include",
   );
 

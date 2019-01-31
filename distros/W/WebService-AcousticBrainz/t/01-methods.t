@@ -11,6 +11,12 @@ use_ok 'WebService::AcousticBrainz';
 my $ws = WebService::AcousticBrainz->new;
 isa_ok $ws, 'WebService::AcousticBrainz';
 
+my $data = try { $ws->fetch() } catch { $_ };
+like $data, qr/No mbid provided/, 'fetch with no mbid';
+
+$data = try { $ws->fetch(mbid => 1234) } catch { $_ };
+like $data, qr/No endpoint provided/, 'fetch with no endpoint';
+
 my $mock = Mojolicious->new;
 $mock->log->level('fatal'); # only log fatal errors to keep the server quiet
 $mock->routes->get('/1234567890/low-level' => sub {
@@ -25,7 +31,7 @@ $ws->base(Mojo::URL->new(''));
 
 can_ok($ws, 'fetch');
 
-my $data = try {
+$data = try {
     $ws->fetch(
         mbid     => '1234567890',
         endpoint => 'low-level',

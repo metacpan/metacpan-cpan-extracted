@@ -24,7 +24,6 @@ MANIFEST			This list of files
 README.md
 t/00-basic.t
 t/acceptance.t
-t/booleans-xs.t
 t/booleans.t
 t/bundle.t
 t/coerce.t

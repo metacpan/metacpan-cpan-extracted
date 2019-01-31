@@ -1,0 +1,47 @@
+NAME
+
+    EPublisher::Target::Plugin::OTRSDoc - Create HTML version of OTRS
+    documentation
+
+VERSION
+
+    version 1.01
+
+SYNOPSIS
+
+      use EPublisher::Target;
+      my $EPub = EPublisher::Target->new( { type => 'OTRSDoc' } );
+      $EPub->deploy;
+
+METHODS
+
+ deploy
+
+    creates the output.
+
+      $EPub->deploy;
+
+YAML SPEC
+
+      EPubTest:
+        source:
+          #...
+        target:
+          type: ÓTRSDoc
+
+TODO
+
+ document methods
+
+AUTHOR
+
+    Renee Bäcker <module@renee-baecker.de>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2013 by Renee Bäcker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

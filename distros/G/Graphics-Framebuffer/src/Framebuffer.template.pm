@@ -1,4 +1,4 @@
-6.15 Jan 20, 2019
+6.18 Jan 30, 2019
 package Graphics::Framebuffer;
 
 =head1 NAME
@@ -12,26 +12,6 @@ Direct drawing (usually for 32 and 24 bit framebuffers)
  use Graphics::Framebuffer;
 
  our $fb = Graphics::Framebuffer->new('FB_DEVICE' => '/dev/fb0');
-
-Or for double buffering (usually for 16 bit framebuffers)
-
- use Time::HiRes qw(alarm);
- use Graphics::Framebuffer;
-
- our ($pfb,$fb) = Graphics::Framebuffer->new(
-     'FB_DEVICE' => '/dev/fb0',
-     'DOUBLE_BUFFER' => 1
- );
-
- my $delay = 1/20; # Make it smaller for slower machines
- $SIG{'ALRM'} = sub {
-     alarm(0);
-     $pfb->blit_flip($fb);
-     alarm($delay);
- };
-
- $pfb->cls('OFF');
- alarm($delay);
 
 Drawing is this simple
 
@@ -576,25 +556,6 @@ Also, when the object is destroyed, it is assumed you are exiting your script.  
 
 You can disable this behavior by setting this to 0.
 
-=item B<DOUBLE_BUFFER> [0 (default) or 1]
-
-Instead of returning one framebuffer object, it returns two.  The first is the real framebuffer in whatever mode you screen is (usually 16 bit for double buffer).  The second is a virtual 32 bit framebuffer used for page flipping via the B<blit_flip> method.
-
- my ($FB,$VFB) = Graphics::Frambuffer->new('DOUBLE_BUFFER'=>1);
-
- # $FB is the physical framebuffer
- # $VFB is the virtual 32 bit framebuffer.
-
- ###  SOMETHING NEW
-
- If you set DOUBLE_BUFFER to 16, it will act conditionally, and only double buffer if the physical framebuffer is 16 bits.
-
-To use B<blit_flip> just do this:
-
- $FB->blit_flip($VFB);
-
-It is highly suggested you only use this with acceleration on.
-
 =back
 
 =head3 EMULATION MODE OPTIONS
@@ -643,7 +604,6 @@ sub new {
     my $self = {
         'SCREEN'        => '',            # The all mighty framebuffer
 
-        'DOUBLE_BUFFER' => FALSE,
         'RESET'         => TRUE,
         'VERSION'       => $VERSION,      # Helps with debugging for people sending me dumps
         'HATCHES'       => [@HATCHES],    # Pull in hatches from Imager
@@ -1124,7 +1084,6 @@ sub new {
             } until (($self->{'fscreeninfo'}->{'line_length'} < $self->{'fscreeninfo'}->{'smem_len'} && $self->{'fscreeninfo'}->{'line_length'} > 0) || $extra > 4);
         }
         $self->{'fscreeninfo'}->{'id'} =~ s/[\x00-\x1F,\x7F-\xFF]//gs;
-
         if ($self->{'fscreeninfo'}->{'id'} eq '') {
             chomp(my $model = `cat /proc/device-tree/model`);
             $model =~ s/[\x00-\x1F,\x7F-\xFF]//gs;
@@ -1145,8 +1104,6 @@ sub new {
         $self->{'BITS'}    = $self->{'vscreeninfo'}->{'bits_per_pixel'};
         $self->{'BYTES'}   = $self->{'BITS'} / 8;
         $self->{'BYTES_PER_LINE'} = $self->{'fscreeninfo'}->{'line_length'};
-
-        #        $self->{'fscreeninfo'}->{'id'} =~ s/\s+//g;
 
         if ($self->{'BYTES_PER_LINE'} < ($self->{'XRES'} * $self->{'BYTES'})) {    # I really wish I didn't need this
             warn __LINE__ . " Unable to detect line length due to improper byte alignment in C structure from IOCTL call, going to 'fbset -i' for more reliable information\n" if ($self->{'SHOW_ERRORS'});
@@ -1170,6 +1127,11 @@ sub new {
         $self->{'fscreeninfo'}->{'visual'}   = $self->{'VISUAL_TYPES'}->[$self->{'fscreeninfo'}->{'visual'}];
         $self->{'fscreeninfo'}->{'accel'}    = $self->{'ACCEL_TYPES'}->[$self->{'fscreeninfo'}->{'accel'}];
 
+        if ($self->{'BITS'} == 32 && $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'} == 0) {
+            # The video driver doesn't use the alpha channel, but we do, so force it.
+            $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'} = 8;
+            $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
+        }
         ## For debugging only
         # print Dumper($self,\%Config),"\n"; exit;
 
@@ -1184,20 +1146,9 @@ sub new {
             $self->{'YRES'} = $self->{'SIMULATED_Y'};
             $self->{'YOFFSET'} += ($h - $self->{'SIMULATED_Y'}) / 2;
         }
-        if ($self->{'DOUBLE_BUFFER'} == 16) { # Conditional double buffer if set to 16.  Only double buffer if hardware framebuffer is 16 bits.
-            if ($self->{'BITS'} == 16) {
-                $self->{'DOUBLE_BUFFER'} = TRUE;
-            } else {
-                $self->{'DOUBLE_BUFFER'} = FALSE;
-            }
-        }
-        %{$this} = %{$self} if ($self->{'DOUBLE_BUFFER'});    # A copy
         bless($self, $class);
         $self->_color_order();                                # Automatically determine color mode
         $self->attribute_reset();
-        if ($self->{'DOUBLE_BUFFER'}) {
-            $this->{'COLOR_ORDER'} = $self->{'COLOR_ORDER'};
-        }
 
         # Now that everything is set up, let's map the framebuffer to SCREEN
 
@@ -1315,13 +1266,13 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
         $self->{'BYTES_PER_LINE'} = int($self->{'fscreeninfo'}->{'smem_len'} / $self->{'VYRES'});
 
         bless($self, $class);
-
     }
     if ($self->{'RESET'}) {
         $SIG{'QUIT'} = $SIG{'INT'} = \&_reset;
     }
     $self->_gather_fonts('/usr/share/fonts');
-    foreach my $font (qw(FreeSans Ubuntu-R Arial Oxygen-Sans Garuda LiberationSans-Regular Loma)) {
+    # Loop and find the default font.  One of these should work for Debian and Redhat variants.
+    foreach my $font (qw(FreeSans Ubuntu-R Arial Oxygen-Sans Garuda LiberationSans-Regular Loma Helvetica)) {
         if (exists($self->{'FONTS'}->{$font})) {
             $self->{'FONT_PATH'} = $self->{'FONTS'}->{$font}->{'path'};
             $self->{'FONT_FACE'} = $self->{'FONTS'}->{$font}->{'font'};
@@ -1334,76 +1285,8 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
         sleep $self->{'SPLASH'};
     }
     $self->attribute_reset();
-    if ($self->{'DOUBLE_BUFFER'}) {
-        delete($this->{'vscreeninfo'});
-        delete($this->{'fscreeninfo'});
-        $this->{'SPLASH'} = FALSE;
-        $this->{'BITS'}   = 32;
-        $this->{'BYTES'}  = 4;
-        $this->{'VXRES'}  = $this->{'XRES'} = $self->{'VXRES'};
-        $this->{'VYRES'}  = $this->{'YRES'} = $self->{'VYRES'};
-
-        $this->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'}      = 8;
-        $this->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'msb_right'}   = 0;
-        $this->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'}    = 8;
-        $this->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'msb_right'} = 0;
-        $this->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'}     = 8;
-        $this->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'msb_right'}  = 0;
-        $this->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'}    = 8;
-        $this->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'msb_right'} = 0;
-
-        if ($this->{'COLOR_ORDER'} == BGR) {
-            $this->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 16;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 8;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 0;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
-        } elsif ($this->{'COLOR_ORDER'} == RGB) {
-            $this->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 0;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 8;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 16;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
-        } elsif ($this->{'COLOR_ORDER'} == BRG) {
-            $this->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 8;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 16;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 0;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
-        } elsif ($this->{'COLOR_ORDER'} == RBG) {
-            $this->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 0;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 16;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 8;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
-        } elsif ($this->{'COLOR_ORDER'} == GRB) {
-            $this->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 8;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 0;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 16;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
-        } elsif ($this->{'COLOR_ORDER'} == GBR) {
-            $this->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 16;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 0;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 8;
-            $this->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
-        }
-
-        $this->{'SCREEN'}              = chr(0) x ($this->{'VXRES'} * $this->{'VYRES'} * $this->{'BYTES'});
-        $this->{'XOFFSET'}             = 0;
-        $this->{'YOFFSET'}             = 0;
-        $this->{'PIXELS'}              = (($this->{'XOFFSET'} + $this->{'VXRES'}) * ($this->{'YOFFSET'} + $this->{'VYRES'}));
-        $this->{'SIZE'}                = $this->{'PIXELS'} * $this->{'BYTES'};
-        $this->{'fscreeninfo'}->{'id'} = 'Virtual Framebuffer';
-        $this->{'FB_DEVICE'}           = 'virtual';
-        $this->{'DOUBLE_BUFFER'}       = FALSE;
-        $this->{'SHOW_ERRORS'}         = $self->{'SHOW_ERRORS'};
-        $this->{'GPU'}                 = $this->{'fscreeninfo'}->{'id'};
-        $this->{'fscreeninfo'}->{'smem_len'} = $this->{'BYTES'} * ($this->{'VXRES'} * $this->{'VYRES'}) if (!defined($this->{'fscreeninfo'}->{'smem_len'}) || $this->{'fscreeninfo'}->{'smem_len'} <= 0);
-        $this->{'BYTES_PER_LINE'} = int($this->{'fscreeninfo'}->{'smem_len'} / $this->{'VYRES'});
-
-        bless($this, $class);
-
-        $this->attribute_reset();
-        return ($self, $this);
-    }
     if (wantarray) {
-        return ($self, undef);
+        return ($self, $self); # For those that coded for double buffering
     }
     return ($self);
 }
@@ -3300,7 +3183,6 @@ sub circle {
             $lypy = $ypy;
             $lypx = $ypx;
         } else {
-
             # Top left
             ($params->{'x'}, $params->{'y'}) = ($xmx, $ymy);
             $self->plot($params);
@@ -3606,6 +3488,10 @@ sub _generate_fill {
 
     my $gradient = '';
     my $bytes    = $self->{'BYTES'};
+    my $r_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'};
+    my $g_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'};
+    my $b_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'};
+    my $a_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'};
     if (ref($type) eq 'HASH') {    # texture
         if ($type->{'width'} != $width || $type->{'height'} != $height) {
             if ($self->{'BITS'} > 16) {
@@ -3687,39 +3573,32 @@ sub _generate_fill {
         my $end = scalar(@rc) - 1;
         foreach my $gcc (0 .. $end) {
             if ($self->{'BITS'} == 32) {
-                if ($self->{'COLOR_ORDER'} == BGR) {
-                    $gradient .= pack('CCCC', $bc[$gcc], $gc[$gcc], $rc[$gcc], $ac[$gcc]);
-                } elsif ($self->{'COLOR_ORDER'} == BRG) {
-                    $gradient .= pack('CCCC', $bc[$gcc], $rc[$gcc], $gc[$gcc], $ac[$gcc]);
-                } elsif ($self->{'COLOR_ORDER'} == RGB) {
-                    $gradient .= pack('CCCC', $rc[$gcc], $gc[$gcc], $bc[$gcc], $ac[$gcc]);
-                } elsif ($self->{'COLOR_ORDER'} == RBG) {
-                    $gradient .= pack('CCCC', $rc[$gcc], $bc[$gcc], $gc[$gcc], $ac[$gcc]);
-                } elsif ($self->{'COLOR_ORDER'} == GRB) {
-                    $gradient .= pack('CCCC', $gc[$gcc], $rc[$gcc], $bc[$gcc], $ac[$gcc]);
-                } elsif ($self->{'COLOR_ORDER'} == GBR) {
-                    $gradient .= pack('CCCC', $gc[$gcc], $bc[$gcc], $rc[$gcc], $ac[$gcc]);
-                }
+                $gradient .= pack('I', (
+                    ($rc[$gcc] << $r_offset) |
+                    ($gc[$gcc] << $g_offset) |
+                    ($bc[$gcc] << $b_offset) |
+                    ($ac[$gcc] << $a_offset)
+                ));
             } elsif ($self->{'BITS'} == 24) {
-                if ($self->{'COLOR_ORDER'} == BGR) {
-                    $gradient .= pack('CCC', $bc[$gcc], $gc[$gcc], $rc[$gcc]);
-                } elsif ($self->{'COLOR_ORDER'} == BRG) {
-                    $gradient .= pack('CCC', $bc[$gcc], $rc[$gcc], $gc[$gcc]);
-                } elsif ($self->{'COLOR_ORDER'} == RGB) {
-                    $gradient .= pack('CCC', $gc[$gcc], $gc[$gcc], $bc[$gcc]);
-                } elsif ($self->{'COLOR_ORDER'} == RBG) {
-                    $gradient .= pack('CCC', $gc[$gcc], $bc[$gcc], $gc[$gcc]);
-                } elsif ($self->{'COLOR_ORDER'} == GRB) {
-                    $gradient .= pack('CCC', $gc[$gcc], $rc[$gcc], $bc[$gcc]);
-                } elsif ($self->{'COLOR_ORDER'} == GBR) {
-                    $gradient .= pack('CCC', $gc[$gcc], $bc[$gcc], $rc[$gcc]);
-                }
+                my $temp = pack('I', (
+                    ($rc[$gcc] << $r_offset) |
+                    ($gc[$gcc] << $g_offset) |
+                    ($bc[$gcc] << $b_offset) |
+                    ($ac[$gcc] << $a_offset)
+                ));
+                chop($temp);
+                $gradient .= $temp;
             } elsif ($self->{'BITS'} == 16) {
-                my $temp;
-
+                my $R = $rc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'});
+                my $G = $gc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
+                my $B = $bc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
                 # Color conversion is done in the pixel conversion
-                $temp = $self->RGB888_to_RGB565({ 'color' => pack('CCC', $rc[$gcc], $gc[$gcc], $bc[$gcc]) });
-                $gradient .= $temp->{'color'};
+                my $temp = pack('S',(
+                    ($R << $r_offset) |
+                    ($G << $g_offset) |
+                    ($B << $b_offset)
+                ));
+                $gradient .= $temp;
             }
         }
         $gradient = $gradient x $height;
@@ -3748,39 +3627,32 @@ sub _generate_fill {
         my $end = scalar(@rc) - 1;
         foreach my $gcc (0 .. $end) {
             if ($self->{'BITS'} == 32) {
-                if ($self->{'COLOR_ORDER'} == BGR) {
-                    $gradient .= pack('CCCC', $bc[$gcc], $gc[$gcc], $rc[$gcc], $ac[$gcc]) x $width;
-                } elsif ($self->{'COLOR_ORDER'} == BRG) {
-                    $gradient .= pack('CCCC', $bc[$gcc], $rc[$gcc], $gc[$gcc], $ac[$gcc]) x $width;
-                } elsif ($self->{'COLOR_ORDER'} == RGB) {
-                    $gradient .= pack('CCCC', $rc[$gcc], $gc[$gcc], $bc[$gcc], $ac[$gcc]) x $width;
-                } elsif ($self->{'COLOR_ORDER'} == RBG) {
-                    $gradient .= pack('CCCC', $rc[$gcc], $bc[$gcc], $gc[$gcc], $ac[$gcc]) x $width;
-                } elsif ($self->{'COLOR_ORDER'} == GRB) {
-                    $gradient .= pack('CCCC', $gc[$gcc], $rc[$gcc], $bc[$gcc], $ac[$gcc]) x $width;
-                } elsif ($self->{'COLOR_ORDER'} == GBR) {
-                    $gradient .= pack('CCCC', $gc[$gcc], $bc[$gcc], $rc[$gcc], $ac[$gcc]) x $width;
-                }
+                $gradient .= pack('I', (
+                    ($rc[$gcc] << $r_offset) |
+                    ($gc[$gcc] << $g_offset) |
+                    ($bc[$gcc] << $b_offset) |
+                    ($ac[$gcc] << $a_offset)
+                )) x $width;
             } elsif ($self->{'BITS'} == 24) {
-                if ($self->{'COLOR_ORDER'} == BGR) {
-                    $gradient .= pack('CCC', $bc[$gcc], $gc[$gcc], $rc[$gcc]) x $width;
-                } elsif ($self->{'COLOR_ORDER'} == BRG) {
-                    $gradient .= pack('CCC', $bc[$gcc], $rc[$gcc], $gc[$gcc]) x $width;
-                } elsif ($self->{'COLOR_ORDER'} == RGB) {
-                    $gradient .= pack('CCC', $gc[$gcc], $gc[$gcc], $bc[$gcc]) x $width;
-                } elsif ($self->{'COLOR_ORDER'} == RBG) {
-                    $gradient .= pack('CCC', $gc[$gcc], $bc[$gcc], $gc[$gcc]) x $width;
-                } elsif ($self->{'COLOR_ORDER'} == GRB) {
-                    $gradient .= pack('CCC', $gc[$gcc], $rc[$gcc], $bc[$gcc]) x $width;
-                } elsif ($self->{'COLOR_ORDER'} == GBR) {
-                    $gradient .= pack('CCC', $gc[$gcc], $bc[$gcc], $rc[$gcc]) x $width;
-                }
+                my $temp = pack('I', (
+                    ($rc[$gcc] << $r_offset) |
+                    ($gc[$gcc] << $g_offset) |
+                    ($bc[$gcc] << $b_offset) |
+                    ($ac[$gcc] << $a_offset)
+                ));
+                chop($temp);
+                $gradient .= $temp x $width;
             } elsif ($self->{'BITS'} == 16) {
-                my $temp;
-
+                my $R = $rc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'});
+                my $G = $gc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
+                my $B = $bc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
                 # Color conversion is done in the pixel conversion
-                $temp = $self->RGB888_to_RGB565({ 'color' => pack('CCC', $rc[$gcc], $gc[$gcc], $bc[$gcc]) });
-                $gradient .= $temp->{'color'} x $width;
+                my $temp = pack('S',(
+                    ($R << $r_offset) |
+                    ($G << $g_offset) |
+                    ($B << $b_offset)
+                ));
+                $gradient .= $temp x $width;
             }
         }
     } else {    # Hatch
@@ -4034,56 +3906,54 @@ sub set_color {
     my $params = shift;
     my $name   = shift || 'COLOR';
 
-    my $bytes     = $self->{'BYTES'};
-    my $R         = int($params->{'red'}) & 255;
-    my $G         = int($params->{'green'}) & 255;
-    my $B         = int($params->{'blue'}) & 255;
-    my $def_alpha = ($name eq 'COLOR') ? 255 : 0;
-    my $A         = int($params->{'alpha'} || $def_alpha) & 255;
+    my $bytes       = $self->{'BYTES'};
+    my $R           = int($params->{'red'}) & 255;
+    my $G           = int($params->{'green'}) & 255;
+    my $B           = int($params->{'blue'}) & 255;
+    my $def_alpha   = ($name eq 'COLOR') ? 255 : 0;
+    my $A           = int($params->{'alpha'} || $def_alpha) & 255;
+    my $color_order = $self->{'COLOR_ORDER'};
 
     map { $self->{ $name . '_' . uc($_) } = $params->{$_} } (keys %{$params});
     $params->{'red'}   = $R;
     $params->{'green'} = $G;
     $params->{'blue'}  = $B;
     $params->{'alpha'} = $A;
+    my $r_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'};
+    my $g_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'};
+    my $b_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'};
+    my $a_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'};
     $self->{'COLOR_ALPHA'}   = $A;
-    if ($self->{'BITS'} > 16) {
-        if ($self->{'COLOR_ORDER'} == BGR) {
-            ($R, $G, $B) = ($B, $G, $R);
-        } elsif ($self->{'COLOR_ORDER'} == BRG) {
-            ($R, $G, $B) = ($B, $R, $G);
-
-            #       } elsif ($self->{'COLOR_ORDER'} == RGB) {
-        } elsif ($self->{'COLOR_ORDER'} == RBG) {
-            ($R, $G, $B) = ($R, $B, $G);
-        } elsif ($self->{'COLOR_ORDER'} == GRB) {
-            ($R, $G, $B) = ($G, $R, $B);
-        } elsif ($self->{'COLOR_ORDER'} == GBR) {
-            ($R, $G, $B) = ($G, $B, $R);
-        }
-        $self->{$name} = pack("C$bytes", $R, $G, $B, $A);
+    if ($self->{'BITS'} >= 24) {
+        $self->{$name} = pack('I',(
+            ($R << $r_offset) |
+            ($G << $g_offset) |
+            ($B << $b_offset) |
+            ($A << $a_offset)
+        ));
+        $self->{$name} = substr($self->{$name},0,3) if ($self->{'BITS'} == 24);
         $self->{"INT_$name"} = unpack('I', $self->{$name});
     } elsif ($self->{'BITS'} == 16) {
         my $r = $R >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'});
         my $g = $G >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
         my $b = $B >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
-        if ($self->{'COLOR_ORDER'} == BGR) {
-            $self->{$name} = pack('S', $b | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})));
-        } elsif ($self->{'COLOR_ORDER'} == BRG) {
-            $self->{$name} = pack('S', $b | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})));
-        } elsif ($self->{'COLOR_ORDER'} == RGB) {
-            $self->{$name} = pack('S', $r | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})));
-        } elsif ($self->{'COLOR_ORDER'} == RBG) {
-            $self->{$name} = pack('S', $r | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})));
-        } elsif ($self->{'COLOR_ORDER'} == GRB) {
-            $self->{$name} = pack('S', $g | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})));
-        } elsif ($self->{'COLOR_ORDER'} == GBR) {
-            $self->{$name} = pack('S', $g | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})));
-        }
+        $self->{$name} = pack('S', ($r << $r_offset) | ($g << $g_offset) | ($b << $b_offset));
+
         $self->{"INT_$name"} = unpack('S', $self->{$name});
     }
 
     $self->{"SET_$name"} = $params;
+    if ($color_order == BGR) {
+        ($B, $G, $R) = ($R,$G,$B);
+    } elsif ($color_order == BRG) {
+        ($B, $R, $G) = ($R,$G,$B);
+    } elsif ($color_order == RBG) {
+        ($R, $B, $G) = ($R,$G,$B);
+    } elsif ($color_order == GRB) {
+        ($G, $R, $B) = ($R,$G,$B);
+    } elsif ($color_order == GBR) {
+        ($G, $B, $R) = ($R,$G,$B);
+    }
     if ($name eq 'COLOR') {
         $self->{'I_COLOR'} = ($self->{'BITS'} == 32) ? Imager::Color->new($R, $G, $B, $A) : Imager::Color->new($R, $G, $B);
     } else {
@@ -4569,58 +4439,37 @@ sub blit_copy {
 
 =head2 blit_flip
 
-Copies one screen buffer to another for double buffering.  Due to artifacts in drawing, this is the recommended menthod for drawing to 16 bit screens.
-
-It takes the source object as its single parameter.
-
-You set up two Graphics::Framebuffer objects.  The first being mapped to your display in 16 bit as normal.  The second being a virtual framebuffer that is 32 bits.  Do all of your drawing to the second (32 bit) frambuffer object, and when you want to display it, you call this method to "flip" it over to the display.
-
-=over 4
-
- my ($fb16,$fb32) = Graphics::Framebuffer->new('DOUBLE_BUFFER' => 1);
-
- $fb32->box(
-     {
-         'x'      => 20,
-         'y'      => 60,
-         'xx'     => 300,
-         'yy'     => 200,
-         'filled' => 1
-     }
- );
- $fb16->blit_flip($fb32);
-
-=back
-
-You can use the "alarm" function to always update the screen (with a loss of speed, but always works), or you can just call blit_flip after you draw what you need to then update the physical screen with it.  This is how double buffering works, except in this case, it's also converting the 32 bit screen to a 16 bit one.
+ NO LONGER USED
 
 =cut
 
 sub blit_flip {
+    return;
     my $self = shift;
     my $them = shift;
 
+    my $color_order = $self->{'COLOR_ORDER'};
     if ($them->{'BITS'} == 32) {
         if ($self->{'BITS'} == 32) {
-            substr($self->{'SCREEN'}, 0) = $them->{'SCREEN'};    # Simple copy
+            substr($self->{'SCREEN'}, 0) = substr($them->{'SCREEN'},0);    # Simple copy
         } elsif ($self->{'BITS'} == 24) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_32_to_24($them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_32_to_24($them->{'SCREEN'}, $color_order);
         } else {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_32_to_16($them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_32_to_16($them->{'SCREEN'}, $color_order);
         }
     } elsif ($them->{'BITS'} == 24) {
         if ($self->{'BITS'} == 32) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_24_to_32($them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_24_to_32($them->{'SCREEN'}, $color_order);
         } elsif ($self->{'BITS'} == 24) {
             substr($self->{'SCREEN'}, 0) = substr($them->{'SCREEN'}, 0);    # Simple copy
         } else {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_24_to_16($them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_24_to_16($them->{'SCREEN'}, $color_order);
         }
-    } else {
+    } elsif ($them->{'BITS'} == 16) {
         if ($self->{'BITS'} == 32) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_16_to_32($them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_16_to_32($them->{'SCREEN'}, $color_order);
         } elsif ($self->{'BITS'} == 24) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_16_to_24($them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_16_to_24($them->{'SCREEN'}, $color_order);
         } else {
             substr($self->{'SCREEN'}, 0) = substr($them->{'SCREEN'}, 0);    # Simple copy
         }
@@ -4705,7 +4554,7 @@ sub play_animation {
         my $begin = time;
         $self->blit_write($image->[$frame]);
 
-        my $delay = ((($image->[$frame]->{'tags'}->{'gif_delay'} * .01)) * $rate) - (time - $begin);
+        my $delay = (($image->[$frame]->{'tags'}->{'gif_delay'} * .01) * $rate) - (time - $begin);
         if ($delay > 0) {
             sleep $delay;
         }
@@ -4880,6 +4729,7 @@ It takes a hash reference.  It draws in the current drawing mode.
 sub blit_write {
     my $self    = shift;
     my $pparams = shift;
+    return unless(defined($pparams));
 
     my $fb     = $self->{'FB'};
     my $params = $self->_blit_adjust_for_clipping($pparams);
@@ -4889,6 +4739,7 @@ sub blit_write {
     my $y = int($params->{'y'}      || 0);
     my $w = int($params->{'width'}  || 1);
     my $h = int($params->{'height'} || 1);
+
     my $draw_mode      = $self->{'DRAW_MODE'};
     my $bytes          = $self->{'BYTES'};
     my $bytes_per_line = $self->{'BYTES_PER_LINE'};
@@ -5049,6 +4900,10 @@ sub _blit_adjust_for_clipping {
 
     # Make a copy so the original isn't modified.
     %{$params} = %{$pparams};
+#    if (exists($params->{'tags'})) {
+#        $params->{'x'} += $params->{'tags'}->{'gif_left'} if (exists($params->{'tags'}->{'gif_left'}));
+#        $params->{'y'} += $params->{'tags'}->{'git_top'} if (exists($params->{'tags'}->{'gif_top'}));
+#    }
 
     # First fix the vertical errors
     my $XX = $params->{'x'} + $params->{'width'};
@@ -6079,8 +5934,9 @@ sub load_image {
         foreach my $img (@Img) {
             next unless (defined($img));
             my %tags = map(@$_, $img->tags());
-            unless (exists($params->{'preserve_transparency'}) && $params->{'preserve_transparency'}) {
-                if (exists($tags{'gif_trans_color'}) && defined($last_img)) {
+            # Must loop and layer the frames on top of each other to get full frames.
+            unless (exists($params->{'gif_left'})) {
+                if (defined($last_img)) {
                     $last_img->compose(
                         'src' => $img,
                         'tx'  => $tags{'gif_left'},
@@ -6211,30 +6067,24 @@ sub load_image {
                     $y = 0;
                 }
             }
-            if (exists($tags->{'gif_left'})) {
-                $x += $tags->{'gif_left'};
-                $y += $tags->{'gif_top'};
-            }
             $bench_convert = sprintf('%.03f', time - $bench_convert);
             $bench_total   = sprintf('%.03f', time - $bench_start);
-            push(
-                @odata,
-                {
-                    'x'         => $x,
-                    'y'         => $y,
-                    'width'     => $w,
-                    'height'    => $h,
-                    'image'     => $data,
-                    'tags'      => \%tags,
-                    'benchmark' => {
-                        'load'    => $bench_load,
-                        'rotate'  => $bench_rotate,
-                        'scale'   => $bench_scale,
-                        'convert' => $bench_convert,
-                        'total'   => $bench_total
-                    }
+            my $temp_image = {
+                'x'         => $x,
+                'y'         => $y,
+                'width'     => $w,
+                'height'    => $h,
+                'image'     => $data,
+                'tags'      => \%tags,
+                'benchmark' => {
+                    'load'    => $bench_load,
+                    'rotate'  => $bench_rotate,
+                    'scale'   => $bench_scale,
+                    'convert' => $bench_convert,
+                    'total'   => $bench_total
                 }
-            );
+            };
+            push(@odata,$temp_image);
             if ($self->{'DIAGNOSTICS'}) {
                 my $saved = $self->{'DRAW_MODE'};
                 $self->mask_mode() if ($self->{'ACCELERATED'});
@@ -6452,7 +6302,7 @@ sub _convert_24_to_16 {
         } elsif ($color eq $white24) {
             $new_img .= $white16;
         } else {
-            $color = $self->RGB888_to_RGB565({ 'color' => $color, 'color_order' => $co });
+            $color = $self->RGB888_to_RGB565({ 'color' => $color, 'color_order' => $color_order });
             $new_img .= $color->{'color'};
         }
         $idx += 3;
@@ -6469,33 +6319,32 @@ sub _convert_32_to_16 {
     my $color_order = shift;
 
     my $size = length($img);
-    if ($self->{'ACCELERATED'}) {
-        my $new_img = chr(0) x ($size / 2);
-        c_convert_32_16($img, $size, $new_img, $color_order);
-        return ($new_img);
-    }
     my $new_img = '';
-    my $black32 = chr(0) x 4;
-    my $black16 = chr(0) x 2;
-    my $white32 = chr(255) x 4;
-    my $white16 = chr(255) x 2;
+    if ($self->{'ACCELERATED'}) {
+        $new_img = chr(0) x ($size / 2);
+        c_convert_32_16($img, $size, $new_img, $color_order);
+    } else {
+        my $black32 = chr(0) x 4;
+        my $black16 = chr(0) x 2;
+        my $white32 = chr(255) x 4;
+        my $white16 = chr(255) x 2;
 
-    my $idx = 0;
-    while ($idx < $size) {
-        my $color = substr($img, $idx, 4);
+        my $idx = 0;
+        while ($idx < $size) {
+            my $color = substr($img, $idx, 4);
 
-        # Black and white can be optimized
-        if ($color eq $black32) {
-            $new_img .= $black16;
-        } elsif ($color eq $white32) {
-            $new_img .= $white16;
-        } else {
-            $color = $self->RGBA8888_to_RGB565({ 'color' => $color, 'color_order' => $co });
-            $new_img .= $color->{'color'};
+            # Black and white can be optimized
+            if ($color eq $black32) {
+                $new_img .= $black16;
+            } elsif ($color eq $white32) {
+                $new_img .= $white16;
+            } else {
+                $color = $self->RGBA8888_to_RGB565({ 'color' => $color, 'color_order' => $color_order });
+                $new_img .= $color->{'color'};
+            }
+            $idx += 4;
         }
-        $idx += 4;
     }
-
     return ($new_img);
 }
 
@@ -6528,7 +6377,7 @@ sub _convert_32_to_24 {
         } elsif ($color eq $white32) {
             $new_img .= $white24;
         } else {
-            $color = $self->RGBA8888_to_RGB888({ 'color' => $color, 'color_order' => $co });
+            $color = $self->RGBA8888_to_RGB888({ 'color' => $color, 'color_order' => $color_order });
             $new_img .= $color->{'color'};
         }
         $idx += 4;
@@ -6566,7 +6415,7 @@ sub _convert_24_to_32 {
         } elsif ($color eq $white24) {
             $new_img .= $white32;
         } else {
-            $color = $self->RGB888_to_RGBA8888({ 'color' => $color, 'color_order' => $co });
+            $color = $self->RGB888_to_RGBA8888({ 'color' => $color, 'color_order' => $color_order });
             $new_img .= $color->{'color'};
         }
         $idx += 3;
@@ -6694,7 +6543,7 @@ sub RGB888_to_RGB565 {
     my $params = shift;
 
     my $big_data       = $params->{'color'};
-    my $in_color_order = defined($params->{'color_order'}) ? $params->{'color_order'} : RGB;
+    my $in_color_order = defined($params->{'color_order'}) ? $params->{'color_order'} : $self->{'COLOR_ORDER'};
     my $color_order    = $self->{'COLOR_ORDER'};
 
     my $n_data;
@@ -6717,20 +6566,10 @@ sub RGB888_to_RGB565 {
         $r = $r >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'});
         $g = $g >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
         $b = $b >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
-        my $color;
-        if ($color_order == BGR) {
-            $color = $b | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}));
-        } elsif ($color_order == RGB) {
-            $color = $r | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}));
-        } elsif ($color_order == BRG) {
-            $color = $b | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}));
-        } elsif ($color_order == RBG) {
-            $color = $r | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}));
-        } elsif ($color_order == GRB) {
-            $color = $g | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}));
-        } elsif ($color_order == GBR) {
-            $color = $g | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}));
-        }
+        my $color =
+          ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) |
+          ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) |
+          ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}));
         $n_data = pack('S', $color);
     }
     return ({ 'color' => $n_data });
@@ -6738,12 +6577,11 @@ sub RGB888_to_RGB565 {
 
 =head2 RGBA8888_to_RGB565
 
-Convert 32 bit color value to a 16 bit color value.  This requires a four byte packed string.  The alpha value is either a value passed in or the default 255.
+Convert 32 bit color value to a 16 bit color value.  This requires a four byte packed string.
 
  my $color16 = $fb->RGB8888_to_RGB565(
      {
          'color' => $color32,
-         'alpha' => 128
      }
  );
 
@@ -6754,7 +6592,7 @@ sub RGBA8888_to_RGB565 {
     my $params = shift;
 
     my $big_data       = $params->{'color'};
-    my $in_color_order = defined($params->{'color_order'}) ? $params->{'color_order'} : RGB;
+    my $in_color_order = defined($params->{'color_order'}) ? $params->{'color_order'} : $self->{'COLOR_ORDER'};
     my $color_order    = $self->{'COLOR_ORDER'};
 
     my $n_data;
@@ -6777,23 +6615,41 @@ sub RGBA8888_to_RGB565 {
         }
 
         # Alpha is tossed
-        $r = $r >> $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'};
-        $g = $g >> $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'};
-        $b = $b >> $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'};
+        $r = $r >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'});
+        $g = $g >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
+        $b = $b >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
 
         my $color;
         if ($color_order == BGR) {
-            $color = $b | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}));
+            $color = 
+              $b |
+              ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) |
+              ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}));
         } elsif ($color_order == RGB) {
-            $color = $r | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}));
+            $color =
+              $r |
+              ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) |
+              ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}));
         } elsif ($color_order == BRG) {
-            $color = $b | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}));
+            $color =
+              $b |
+              ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) |
+              ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}));
         } elsif ($color_order == RBG) {
-            $color = $r | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) | ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}));
+            $color =
+              $r |
+              ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) |
+              ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}));
         } elsif ($color_order == GRB) {
-            $color = $g | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}));
+            $color =
+              $g |
+              ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) |
+              ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}));
         } elsif ($color_order == GBR) {
-            $color = $g | ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) | ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}));
+            $color =
+              $g |
+              ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) |
+              ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}));
         }
         $n_data .= pack('S', $color);
     }

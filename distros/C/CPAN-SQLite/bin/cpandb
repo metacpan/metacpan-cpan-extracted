@@ -1,6 +1,6 @@
 #!usr/bin/perl -w
 
-# $Id: cpandb 76 2019-01-24 19:50:04Z stro $
+# $Id: cpandb 79 2019-01-30 02:35:31Z stro $
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use warnings;
 use CPAN::SQLite;
 use Getopt::Long;
 
-our $VERSION = 0.216;
+our $VERSION = 0.217;
 
 my ($CPAN, $setup, $help, $reindex, $index, $query,
     $db_name, $db_dir, $module, $dist, $cpanid, $update);
@@ -60,7 +60,7 @@ if ($index) {
 }
 else {
 
-  my $max_results = 100;
+  my $max_results = $ENV{'CPAN_SQLITE_MAX_RESULTS'};
   my $obj = CPAN::SQLite->new(CPAN => $CPAN,
                               db_name => $db_name,
                               db_dir => $db_dir,
@@ -155,7 +155,7 @@ cpandb - interface to C<CPAN::SQLite>
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 DESCRIPTION
 
@@ -255,6 +255,10 @@ This provides information on the specified CPAN author id
 
 All search terms are assumed to be exact matches in a
 case-insensitive manner.
+
+There's no limit on maximum number of records. If you need to adjust the number
+because you get too many results, set the CPAN_SQLITE_MAX_RESULTS environment
+variable.
 
 =head1 SEE ALSO
 

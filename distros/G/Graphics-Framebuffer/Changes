@@ -1320,7 +1320,7 @@ Revision history for Graphics-Framebuffer
       test script given double buffering for 16 bit displays.  This doesn't
       affect 32 bit displays.
 
-6.14 Jan 20, 2019
+6.15 Jan 20, 2019
 
       Minor changes to the Splash module.  Turned off alpha output for
       Nouveau framebuffer devices, and alpha appears to be slow for anything
@@ -1328,3 +1328,30 @@ Revision history for Graphics-Framebuffer
       Nouveau devices.
 
       Minor changes to the double buffer setup of the test scripts.
+
+6.16  Jan 30, 2019
+
+      Improvements to image animation in the module and in the examples
+      scripts.  Some errors were accounted for.
+
+6.17  Jan 30, 2019
+
+      Completely removed the double buffer feature.  The 16 bit drawing is
+      sufficiently speedy now with the C acceleration code.  Besides, it was
+      more trouble than it was worth.
+
+      Color mapping optimized and corrected for some modes.
+
+      'blit_flip' now does nothing, and was only for the double buffering.
+
+      The splash screen has been corrected.  Now the "coin" displays correctly.
+      The same screen is displayed for all resolutions.  If your screen is too
+      small to read the splash screen, then just disable it.
+
+      All sample scripts have been modified to accommodate the new changes,
+      including the template script.
+
+6.18  Jan 30, 2019
+
+      Holy smokes!  The META files weren't updating.  No wonder some people
+      were having prerequisite issues.

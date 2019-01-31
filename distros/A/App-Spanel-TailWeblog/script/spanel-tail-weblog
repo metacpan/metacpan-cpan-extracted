@@ -1,0 +1,183 @@
+#!perl
+
+our $DATE = '2019-01-30'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+use Time::HiRes 'sleep';
+
+my $PROG = "spanel-tail-weblog";
+
+my $Site;
+my %Opts = (
+    http => 1,
+    https => 1,
+);
+
+sub parse_options {
+    GetOptionsWithCompletion(
+        sub {
+            my %args = @_;
+            my $word = $args{word};
+            my $type = $args{type};
+            if ($type eq 'arg') {
+                require Complete::Spanel;
+                return Complete::Spanel::complete_spanel_site(
+                    word => $word,
+                );
+            }
+            [];
+        },
+        'help|h|?' => sub {
+            print "Usage: $PROG [options]\n";
+            print <<EOT;
+Usage: $PROG [options] <site>
+Options:
+  --no-http     Don't tail HTTP log.
+  --no-https    Don't tail HTTPS log.
+For more details, see the documentation (man $PROG).
+EOT
+            exit 0;
+        },
+        'version|v' => sub {
+            no warnings 'once';
+            print "$PROG version ", ($main::VERSION // "dev"), "\n";
+            exit 0;
+        },
+        'http!' => \$Opts{http},
+        'https!' => \$Opts{https},
+        '<>' => sub {
+            die "$PROG: Extraneous argument '$_[0]'\n" if defined $Site;
+            $_[0] =~ /\A[\w-]+(\.[\w-]+)*\z/
+                or die "$PROG: Invalid site '$_[0]'\n";
+            $Site = $_[0];
+        },
+    );
+
+    die "$PROG: Please specify site\n" unless $Site;
+    my $dir = "/s/$Site/syslog";
+    (-d $dir) or die "$PROG: Site not found: '$Site': no $dir\n";
+    chdir $dir or die "$PROG: Can't chdir to '$dir'\n";
+}
+
+sub run {
+    require Logfile::Tail::Switch;
+
+    no warnings 'once';
+    local $Logfile::Tail::Switch::WARN_NO_MATCH = 0;
+
+    my @globs;
+    if ($Opts{http})  { push @globs, "http_access.*.log"  }
+    if ($Opts{https}) { push @globs, "https_access.*.log" }
+
+    my $tail = Logfile::Tail::Switch->new(
+        globs => \@globs,
+        #check_freq => $Opts{check_freq},
+        #tail_new   => $Opts{tail_new},
+    );
+
+    while (1) {
+        my $line = $tail->getline;
+        if (length $line) {
+            print $line;
+        } else {
+            sleep 0.1;
+        }
+    }
+}
+
+# MAIN
+
+$|++;
+parse_options();
+run();
+
+# PODNAME: spanel-tail-weblog
+# ABSTRACT: Tail -f spanel HTTP and/or HTTPS access log
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+spanel-tail-weblog - Tail -f spanel HTTP and/or HTTPS access log
+
+=head1 VERSION
+
+This document describes version 0.002 of spanel-tail-weblog (from Perl distribution App-Spanel-TailWeblog), released on 2019-01-30.
+
+=head1 SYNOPSIS
+
+ % spanel-tail-weblog example.com            ; # both http & https
+ % spanel-tail-weblog --no-https example.com ; # http only
+ % spanel-tail-weblog --no-http  example.com ; # https only
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C spanel-tail-weblog spanel-tail-weblog
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete spanel-tail-weblog 'p/*/`spanel-tail-weblog`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-Spanel-TailWeblog>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-Spanel-TailWeblog>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Spanel-TailWeblog>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

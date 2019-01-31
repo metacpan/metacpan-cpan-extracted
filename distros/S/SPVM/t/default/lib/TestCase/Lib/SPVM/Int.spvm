@@ -1,0 +1,12 @@
+package TestCase::Lib::SPVM::Int {
+  sub basic : int () {
+    my $oval = SPVM::Int->new(INT32_MIN());
+    my $value1 = $oval->val;
+    
+    unless ($value1 == INT32_MIN()) {
+      return 0;
+    }
+    
+    return 1;
+  }
+}

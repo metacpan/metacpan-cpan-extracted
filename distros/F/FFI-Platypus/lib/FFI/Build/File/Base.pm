@@ -10,7 +10,7 @@ use FFI::Build::Platform;
 use overload '""' => sub { $_[0]->path };
 
 # ABSTRACT: Base class for File::Build files
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 
 sub new
@@ -121,6 +121,7 @@ sub needs_rebuild
   foreach my $source (@source)
   {
     my $source_time = [stat "$source"]->[9];
+    return 1 if ! defined $source_time;
     return 1 if $source_time > $target_time;
   }
   return 0;
@@ -156,7 +157,7 @@ FFI::Build::File::Base - Base class for File::Build files
 
 =head1 VERSION
 
-version 0.74
+version 0.78
 
 =head1 SYNOPSIS
 

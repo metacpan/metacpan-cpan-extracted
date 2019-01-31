@@ -24,7 +24,7 @@ subtest 'basic' => sub {
   
   subtest 'array filename' => sub {
   
-    my $file = FFI::Build::File::Foo->new(['corpus', 'basic.foo']);
+    my $file = FFI::Build::File::Foo->new(['corpus', 'ffi_build_file_base', 'basic.foo']);
     isa_ok $file, 'FFI::Build::File::Base';
     isa_ok $file, 'FFI::Build::File::Foo';
     is("$file", $file->path, "stringifies to path");
@@ -37,7 +37,7 @@ subtest 'basic' => sub {
 
     if($^O eq 'MSWin32')
     {
-      is($file->native, "corpus\\basic.foo", "native name");
+      is($file->native, "corpus\\ffi_build_file_base\\basic.foo", "native name");
     }
     else
     {
@@ -48,7 +48,7 @@ subtest 'basic' => sub {
 
   subtest 'string filename' => sub {
   
-    my $file = FFI::Build::File::Foo->new("corpus/basic.foo");
+    my $file = FFI::Build::File::Foo->new("corpus/ffi_build_file_base/basic.foo");
     isa_ok $file, 'FFI::Build::File::Base';
     isa_ok $file, 'FFI::Build::File::Foo';
     is($file->slurp, "This is a basic foo.\n");

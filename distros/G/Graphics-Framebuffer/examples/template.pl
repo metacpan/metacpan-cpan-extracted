@@ -3,58 +3,28 @@
 use strict;
 # use warnings; # Use just for development, otherwise leave warnings off
 
-# We use Time::HiRes for the alarm, and we need fractions of a second.
-use Time::HiRes qw(alarm time sleep);
 use Graphics::Framebuffer;
 
 ## Initialize any global variables here
 
 my $device        = '/dev/fb0'; # Change this to your frambuffer device
-my $double_buffer = FALSE;      # Make this TRUE, if you have a 16 bit display
-my $delay         = 1/20;       # For double-buffering, use smaller numbers
-                                # for slower machines
 
-our ($PFB,$DFB); # The framebuffer objects MUST be as global as possible
+our $FB; # The framebuffer objects MUST be as global as possible
 
-# $PFB = Physical framebuffer
-# $DFB = Double-buffered framebuffer
-# We will always draw to $DFB
+# $FB = Framebuffer
 
-unless ($double_buffer) {
-    $DFB = Graphics::Framebuffer->new(
-        'FB_DEVICE' => $device,
-        'SPLASH'    => 0,
-    );
-} else { # This is best used in this way for 16 bit mode only
-    ($PFB,$DFB) = Graphics::Framebuffer->new(
-        'FB_DEVICE'     => $device,
-        'DOUBLE_BUFFER' => TRUE,
-        'SPLASH'        => 0,
-    );
-}
-
-
-if ($double_buffer) { # We are in 16 bit mode and are double-buffering
-    $PFB->cls('OFF'); # Turn off the cursor with the physical framebuffer
-    $SIG{'ALRM'} = \&flip_it; # We use 'alarm' to act as a frame flipper
-    alarm($delay);
-}
+$FB = Graphics::Framebuffer->new(
+    'FB_DEVICE' => $device,
+    'SPLASH'    => 0,
+);
 
 ## Do your stuff here ########################################################
 
 
 ##############################################################################
 
-alarm(0); # Turn this off as soon as possible to prevent weirdness.
-$PFB->cls('ON'); # Restore the cursor
+$FB->cls('ON'); # Restore the cursor
 exit(0);
-
-sub flip_it { # This does the double-buffering magic for 16 bit mode
-    alarm(0); # Prevent call stacking.  So temporarily shut off alarms
-    $PFB->blit_flip($DFB); # Convert and move the 32 bit virtual screen to the
-                           # physical 16 bit screen
-    alarm($delay); # Turn the alarm handler back on
-}
 
 __END__
 

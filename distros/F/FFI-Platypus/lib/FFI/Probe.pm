@@ -11,7 +11,7 @@ use Capture::Tiny qw( capture_merged capture );
 use File::Temp qw( tempdir );
 
 # ABSTRACT: System detection and probing for FFI extensions.
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 
 sub new
@@ -51,13 +51,19 @@ sub new
     data          => $data,
     dir           => tempdir( CLEANUP => 1, TEMPLATE => 'ffi-probe-XXXXXX', DIR => '.' ),
     counter       => 0,
-    runner        => $args{runner} || FFI::Probe::Runner->new,
+    runner        => $args{runner},
     alien         => $args{alien} || [],
     cflags        => $args{cflags},
     libs          => $args{libs},
   }, $class;
 
   $self;
+}
+
+sub _runner
+{
+  my($self) = @_;
+  $self->{runner} ||= FFI::Probe::Runner->new;
 }
 
 
@@ -201,7 +207,7 @@ sub check_eval
     $lib;
   };
 
-  my $result = $self->{runner}->run($lib->path);
+  my $result = $self->_runner->run($lib->path);
 
   $self->log("[stdout]");
   $self->log($result->stdout);
@@ -354,9 +360,18 @@ sub set
   my $value = pop;
   my @key = @_;
 
+  my $print_value = $value;
+  if(ref $print_value)
+  {
+    my $d = Data::Dumper->new([$value], [qw($value)]);
+    $d->Indent(0);
+    $d->Terse(1);
+    $print_value = $d->Dump;
+  }
+
   my $key = join ".", map { /\./ ? "\"$_\"" : $_ } @key;
-  print "$key=$value\n";
-  $self->log("$key=$value");
+  print "PR $key=$print_value\n";
+  $self->log("$key=$print_value");
   _set($self->{data}, $value, @key);
 }
 
@@ -440,7 +455,7 @@ FFI::Probe - System detection and probing for FFI extensions.
 
 =head1 VERSION
 
-version 0.74
+version 0.78
 
 =head1 SYNOPSIS
 

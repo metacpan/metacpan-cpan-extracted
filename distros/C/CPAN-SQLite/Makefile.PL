@@ -1,4 +1,4 @@
-# $Id: Makefile.PL 74 2019-01-23 22:42:55Z stro $
+# $Id: Makefile.PL 77 2019-01-25 00:39:14Z stro $
 
 use strict;
 use warnings;
@@ -52,7 +52,7 @@ my $prereqs = {
     'CPAN::DistnameInfo'    => 0.09,
     'DBD::SQLite'           => 1.27, # for REGEXP implementation
     'File::HomeDir'         => 0,
-    'HTTP::Tiny'            => 0,
+    'HTTP::Tiny'            => 0.041,
     'CPAN::Index'           => 1.93, # No more false negatives because of CPAN-Index
     'parent'                => 0,
 };

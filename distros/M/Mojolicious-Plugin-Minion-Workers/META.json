@@ -1,0 +1,51 @@
+{
+   "abstract" : "does extend base Mojolicious::Plugin::Minion on manage Minion workers.",
+   "author" : [
+      "ÐÐ¸ÑÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) <mche[-at-]cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Minion-Workers",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Minion" : "9.07",
+            "Mojolicious" : "8"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mche/Mojolicious-Plugin-Minion-Workers.git",
+         "web" : "https://github.com/mche/Mojolicious-Plugin-Minion-Workers"
+      }
+   },
+   "version" : "0.09072",
+   "x_homepage" : "https://github.com/mche",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

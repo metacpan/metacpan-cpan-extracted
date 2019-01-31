@@ -1,14 +1,21 @@
-SYNOPSIS
+NAME
+    Logfile::Tail::Switch - Tail a file, but switch when another file with
+    newer name appears
 
+VERSION
+    This document describes version 0.004 of Logfile::Tail::Switch (from
+    Perl distribution Logfile-Tail-Switch), released on 2019-01-30.
+
+SYNOPSIS
      use Logfile::Tail::Switch;
      use Time::HiRes 'sleep'; # for subsecond sleep
-    
+
      my $tail = Logfile::Tail::Switch->new(
          globs => ["/s/example.com/syslog/http_access.*.log"],
          # check_freq => 2,
          # tail_new => 0,
      );
-    
+
      # tail
      while (1) {
          my $line = $tail->getline;
@@ -20,9 +27,8 @@ SYNOPSIS
      }
 
 DESCRIPTION
-
-    This class can be used to tail a file, but switch when a file of a
-    newer name appears. For example, on an Spanel server, the webserver is
+    This class can be used to tail a file, but switch when a file of a newer
+    name appears. For example, on an Spanel server, the webserver is
     configured to write to daily log files:
 
      /s/<SITE-NAME>/syslog/http_access.<YYYY>-<MM>-<DD>.log
@@ -32,7 +38,7 @@ DESCRIPTION
     day boundary.
 
     When using this class, you specify a glob pattern of files, e.g.
-    /s/example.com/syslog/http_access.*.log. Then you call the getline
+    "/s/example.com/syslog/http_access.*.log". Then you call the "getline"
     method.
 
     This class will first select the newest file (via asciibetical sorting)
@@ -40,47 +46,73 @@ DESCRIPTION
     most every 2 seconds) the glob pattern will be checked again. If there
     is one or more newer files, they will be read in full and then tail-ed,
     until an even newer file comes along. For example, this is the list of
-    files in /s/example.com/syslog at time t1:
+    files in "/s/example.com/syslog" at time *t1*:
 
      http_access.2017-06-05.log.gz
      http_access.2017-06-06.log
      http_access.2017-06-07.log
 
-    http_access.2017-06-07.log will first be tail-ed. When
-    http_access.2017-06-08.log appears at time t2, this file will be read
-    from start to finish then tail'ed. When http_access.2017-06-09.log
-    appears the next day, that file will be read then tail'ed. And so on.
+    "http_access.2017-06-07.log" will first be tail-ed. When
+    "http_access.2017-06-08.log" appears at time *t2*, this file will be
+    read from start to finish then tail'ed. When
+    "http_access.2017-06-09.log" appears the next day, that file will be
+    read then tail'ed. And so on.
+
+PACKAGE VARIABLES
+  $WARN_NO_MATCH
+    Boolean, default 1. Whether to warn when the glob does not match any
+    files.
 
 METHODS
-
- Logfile::Tail::Switch->new(%args) => obj
-
+  Logfile::Tail::Switch->new(%args) => obj
     Constructor.
 
     Known arguments:
 
-      * globs => array
+    *   globs => array
 
-      Glob patterns.
+        Glob patterns.
 
-      * check_freq => posint (default: 2)
+    *   check_freq => posint (default: 2)
 
-      * tail_new => bool
+    *   tail_new => bool
 
-      If set to true, then new file that appears will be tail'ed instead of
-      read from the beginning.
+        If set to true, then new file that appears will be tail'ed instead
+        of read from the beginning.
 
- $tail->getline() => str
-
+  $tail->getline() => str
     Will return the next line or empty string if no new line is available.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Logfile-Tail-Switch>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Logfile-Tail-Switch>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Logfile-Tail-Switch>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     File::Tail, File::Tail::Dir, IO::Tail
 
     Tie::Handle::TailSwitch
 
     tailswitch from App::tailswitch
 
-    Spanel, http://spanel.info.
+    Spanel, <http://spanel.info>.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

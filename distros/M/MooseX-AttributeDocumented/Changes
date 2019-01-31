@@ -1,5 +1,99 @@
 Revision history for MooseX-AttributeDocumented
 
+0.1004 2019-01-30 18:43:02 UTC
+ [Other]
+ - No functional changes.
+ - Rebuilt with current toolset.
+
+ [Stats & Dependency Changes]
+ - 6 files changed, 40 insertions(+), 21 deletions(-)
+ - (test req) + ExtUtils::MakeMaker (any)
+ - (test req) + File::Spec (any)
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (test req) - Test::Warnings
+ - (test rec) + CPAN::Meta 2.120900
+ - (conf req) + ExtUtils::MakeMaker (any)
+ - (conf req) - Module::Build::Tiny
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 6.012
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.008
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0200
+ - (dev req) + Dist::Zilla::Plugin::CheckChangesHasContent 0.008
+ - (dev req) + Dist::Zilla::Plugin::Clean 0.07
+ - (dev req) + Dist::Zilla::Plugin::ConfirmRelease (any)
+ - (dev req) + Dist::Zilla::Plugin::CopyFilesFromBuild 0.170880
+ - (dev req) + Dist::Zilla::Plugin::DistIller::MetaGeneratedBy (any)
+ - (dev req) + Dist::Zilla::Plugin::ExecDir (any)
+ - (dev req) + Dist::Zilla::Plugin::Git 2.045
+ - (dev req) + Dist::Zilla::Plugin::Git::Check (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.014
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Contributors 0.034
+ - (dev req) + Dist::Zilla::Plugin::Git::GatherDir (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Push (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Tag (any)
+ - (dev req) + Dist::Zilla::Plugin::GithubMeta 0.54
+ - (dev req) + Dist::Zilla::Plugin::InstallRelease 0.008
+ - (dev req) + Dist::Zilla::Plugin::License (any)
+ - (dev req) + Dist::Zilla::Plugin::MakeMaker (any)
+ - (dev req) + Dist::Zilla::Plugin::Manifest (any)
+ - (dev req) + Dist::Zilla::Plugin::ManifestSkip (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaJSON (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaNoIndex (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaProvides::Package 2.004003
+ - (dev req) + Dist::Zilla::Plugin::MetaYAML (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::PodSyntaxTests (any)
+ - (dev req) + Dist::Zilla::Plugin::PodWeaver 4.006
+ - (dev req) + Dist::Zilla::Plugin::Prereqs (any)
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale 0.055
+ - (dev req) + Dist::Zilla::Plugin::Readme (any)
+ - (dev req) + Dist::Zilla::Plugin::ReadmeAnyFromPod 0.163250
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::RunExtraTests 0.028
+ - (dev req) + Dist::Zilla::Plugin::ShareDir (any)
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile 2.057
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra v0.2.1
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Dist::Zilla::Plugin::Test::ReportPrereqs 0.027
+ - (dev req) + Dist::Zilla::Plugin::Test::Version 1.05
+ - (dev req) + Dist::Zilla::Plugin::TestRelease (any)
+ - (dev req) + Dist::Zilla::Plugin::TravisYML 1.15
+ - (dev req) + Dist::Zilla::Plugin::UploadToCPAN (any)
+ - (dev req) + Pod::Elemental::Transformer::List (any)
+ - (dev req) + Pod::Weaver::Plugin::SingleEncoding (any)
+ - (dev req) + Pod::Weaver::Plugin::Transformer (any)
+ - (dev req) + Pod::Weaver::PluginBundle::CorePrep (any)
+ - (dev req) + Pod::Weaver::Section::Authors (any)
+ - (dev req) + Pod::Weaver::Section::Badges 0.0401
+ - (dev req) + Pod::Weaver::Section::Collect (any)
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Pod::Weaver::Section::Generic (any)
+ - (dev req) + Pod::Weaver::Section::Leftovers (any)
+ - (dev req) + Pod::Weaver::Section::Legal (any)
+ - (dev req) + Pod::Weaver::Section::Name (any)
+ - (dev req) + Pod::Weaver::Section::Region (any)
+ - (dev req) + Pod::Weaver::Section::Version (any)
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs 1.4
+ - (dev req) + Test::Version 1
+ - (dev req) + Test::Warnings 0.026
+ - (dev sug) + Dist::Iller 0.1408
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0322
+
 0.1003 2015-01-18T00:03:46Z CET
  [Requirements]
  - Added Test::Warnings as a test prereq.
@@ -14,4 +108,3 @@ Revision history for MooseX-AttributeDocumented
 
 0.1000 2015-01-12T22:43:59Z CET
  - Initial release
-

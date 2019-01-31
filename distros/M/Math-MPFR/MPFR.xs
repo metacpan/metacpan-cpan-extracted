@@ -8155,7 +8155,20 @@ void _nvtoa(pTHX_ SV * pnv, NV nv_max, NV normal_min, int min_pow, int b, int ma
   mpfr_set_prec(ws, bits);
   Rmpfr_set_NV(aTHX_ &ws, pnv, GMP_RNDN);
 
+#if MPFR_VERSION < MPFR_VERSION_NUM(4,0,2) /* work around mpfr_get_str bug */
+
+  if(bits == 1) {
+    sprintf(f, "%s", "1"); /* Would have already returned if "0" */
+    e = mpfr_get_exp(ws);
+  }
+  else  mpfr_get_str(f, &e, 2, bits, ws, GMP_RNDN);
+
+#else
+
   mpfr_get_str(f, &e, 2, bits, ws, GMP_RNDN);
+
+#endif
+
   mpz_set_str(R, f, 2);
   mpz_set(TMP, R);
 

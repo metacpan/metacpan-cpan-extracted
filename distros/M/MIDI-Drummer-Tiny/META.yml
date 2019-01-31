@@ -27,7 +27,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MIDI-Drummer-Tiny
   repository: https://github.com/ology/MIDI-Drummer-Tiny
-version: '0.0800'
+version: '0.0801'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

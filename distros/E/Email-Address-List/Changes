@@ -1,3 +1,12 @@
+0.06 2019-01-02
+
+ - Changes to address CVE-2018-18898 which could allow DDoS-type attacks.
+   Thanks to Lukas Kramer for reporting the issue and Alex Vandiver for
+   contributing fixes.
+   - Fix pathological backtracking for unkown regex
+   - Fix pathological backtracking in obs-phrase(i.e. obs-display-name)
+   - Fix pathological backtracking in cfws, quoted strings
+
 0.05 2014-02-16
 
  - Correct typos in documentation; no functionality changes

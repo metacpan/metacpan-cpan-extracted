@@ -1,5 +1,8 @@
+use strict;
+use warnings;
+
+use lib './t/lib';
 use Test::Clipboard;
-use strict; # XXX make Test::Clipboard do this
 my %map = qw(
     linux Xclip
     freebsd Xclip
