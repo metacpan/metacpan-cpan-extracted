@@ -117,12 +117,14 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Exporter" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Moo" : "0",
             "PDL::Lite" : "0",
+            "Test2::API" : "0",
             "Test2::Tools::PDL" : "0",
             "Test2::V0" : "0",
             "Test::Lib" : "0",
@@ -134,7 +136,7 @@
    "provides" : {
       "MooX::PDL::Role::Proxy" : {
          "file" : "lib/MooX/PDL/Role/Proxy.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -148,7 +150,7 @@
          "web" : "https://gitlab.com/djerius/moox-pdl-role-proxy"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }

@@ -23,16 +23,16 @@ name: Clipboard
 provides:
   Clipboard:
     file: lib/Clipboard.pm
-    version: '0.18'
+    version: '0.19'
   Clipboard::MacPasteboard:
     file: lib/Clipboard/MacPasteboard.pm
-    version: '0.18'
+    version: '0.19'
   Clipboard::Win32:
     file: lib/Clipboard/Win32.pm
-    version: '0.18'
+    version: '0.19'
   Clipboard::Xclip:
     file: lib/Clipboard/Xclip.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   CGI: '0'
   File::Temp: '0'
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://github.com/shlomif/clipboard/issues
   homepage: http://metacpan.org/release/Clipboard
   repository: https://github.com/shlomif/Clipboard
-version: '0.18'
+version: '0.19'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -105,6 +105,10 @@ x_Dist_Zilla:
       name: '@Filter/MakeMaker'
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@Filter/CheckChangesHasContent'
+      version: '0.011'
+    -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/ConfirmRelease'
       version: '6.012'
@@ -163,6 +167,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::PodVersion
       name: '@Filter/PodVersion'
       version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      config:
+        Dist::Zilla::Plugin::Test::CPAN::Changes:
+          changelog: Changes
+      name: '@Filter/Test::CPAN::Changes'
+      version: '0.012'
     -
       class: Dist::Zilla::Plugin::Test::EOL
       config:

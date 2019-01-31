@@ -9,10 +9,15 @@ README
 cpanfile
 dist.ini
 lib/MooX/PDL/Role/Proxy.pm
+lib/MooX/PDL/Role/Proxy.pm.orig
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/lib/My/Class.pm
+t/lib/My/NestedClass.pm
+t/lib/My/Util.pm
+t/lib/My/Util.pm.orig
+t/nested.t
 t/test.t
 tidyall.ini
 weaver.ini

@@ -50,4 +50,41 @@ for my $info ( @infos ) {
     $t->get_ok( '/' . $info->{url} )->status_is( 200 )->json_is( $info->{check} );
 }
 
+my $app = $t->app;
+
+{
+    # no file - should croak
+    my $error = '';
+    eval {
+        FieldInfoTest::fi();
+    } or $error = $@;
+
+    like $error, qr/fi\.yml does not exist/;
+}
+
+{
+    # an invalid YAML file - should croak
+    my $error = '';
+    eval {
+        FieldInfoTest::finfo();
+    } or $error = $@;
+
+    like $error, qr/YAML::Tiny failed to classify line/;
+}
+
+is $app->fieldinfo('test', 'Unittest'), undef;
+
 done_testing();
+
+{
+    package
+        FieldInfoTest;
+
+    sub finfo {
+        $app->fieldinfo(@_);
+    }
+
+    sub fi {
+        $app->fieldinfo(@_);
+    }
+}

@@ -1,12 +1,25 @@
 package Clipboard::Xclip;
-$Clipboard::Xclip::VERSION = '0.18';
+$Clipboard::Xclip::VERSION = '0.19';
+use strict;
+use warnings;
+
 use Clipboard;
 
 sub copy {
     my $self = shift;
     my ($input) = @_;
-    $self->copy_to_selection($self->favorite_selection, $input);
+    return $self->copy_to_selection($self->favorite_selection, $input);
 }
+
+sub copy_to_all_selections {
+    my $self = shift;
+    my ($input) = @_;
+    foreach my $sel ($self->all_selections) {
+        $self->copy_to_selection($sel, $input);
+    }
+    return;
+}
+
 sub copy_to_selection {
     my $self = shift;
     my ($selection, $input) = @_;
@@ -14,6 +27,8 @@ sub copy_to_selection {
     my $r = open my $exe, $cmd or die "Couldn't run `$cmd`: $!\n";
     print $exe $input;
     close $exe or die "Error closing `$cmd`: $!";
+
+    return;
 }
 sub paste {
     my $self = shift;
@@ -21,7 +36,7 @@ sub paste {
         my $data = $self->paste_from_selection($_);
         return $data if length $data;
     }
-    undef
+    return undef;
 }
 sub paste_from_selection {
     my $self = shift;
@@ -59,7 +74,7 @@ Clipboard::Xclip
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

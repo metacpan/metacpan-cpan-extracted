@@ -179,50 +179,50 @@ real Redis backend. This can be useful in unit tests.
 
 =head2 connection
 
-  $conn = $self->connection;
-  $self = $self->connection(Mojo::Redis::Connection->new);
+  $conn  = $cache->connection;
+  $cache = $cache->connection(Mojo::Redis::Connection->new);
 
 Holds a L<Mojo::Redis::Connection> object.
 
 =head2 default_expire
 
-  $num  = $self->default_expire;
-  $self = $self->default_expire(600);
+  $num  = $cache->default_expire;
+  $cache = $cache->default_expire(600);
 
 Holds the default expire time for cached data.
 
 =head2 deserialize
 
-  $cb   = $self->deserialize;
-  $self = $self->deserialize(\&Mojo::JSON::decode_json);
+  $cb   = $cache->deserialize;
+  $cache = $cache->deserialize(\&Mojo::JSON::decode_json);
 
 Holds a callback used to deserialize data from Redis.
 
 =head2 namespace
 
-  $str  = $self->namespace;
-  $self = $self->namespace("cache:mojo:redis");
+  $str  = $cache->namespace;
+  $cache = $cache->namespace("cache:mojo:redis");
 
 Prefix for the cache key.
 
 =head2 redis
 
-  $conn = $self->redis;
-  $self = $self->redis(Mojo::Redis->new);
+  $conn = $cache->redis;
+  $cache = $cache->redis(Mojo::Redis->new);
 
 Holds a L<Mojo::Redis> object used to create the connection to talk with Redis.
 
 =head2 refresh
 
-  $bool = $self->refresh;
-  $self = $self->refresh(1);
+  $bool = $cache->refresh;
+  $cache = $cache->refresh(1);
 
 Will force the cache to be computed again if set to a true value.
 
 =head2 serialize
 
-  $cb   = $self->serialize;
-  $self = $self->serialize(\&Mojo::JSON::encode_json);
+  $cb   = $cache->serialize;
+  $cache = $cache->serialize(\&Mojo::JSON::encode_json);
 
 Holds a callback used to serialize before storing the data in Redis.
 
@@ -230,9 +230,9 @@ Holds a callback used to serialize before storing the data in Redis.
 
 =head2 compute_p
 
-  $promise = $self->compute_p($key => $expire => $compute_function);
-  $promise = $self->compute_p($key => $expire => sub { return "data" });
-  $promise = $self->compute_p($key => $expire => sub { return Mojo::Promise->new });
+  $promise = $cache->compute_p($key => $expire => $compute_function);
+  $promise = $cache->compute_p($key => $expire => sub { return "data" });
+  $promise = $cache->compute_p($key => $expire => sub { return Mojo::Promise->new });
 
 This method will store the return value from the C<$compute_function> the
 first time it is called and pass the same value to L<Mojo::Promise/then>.
@@ -279,16 +279,16 @@ Negative C<$expire> is currently EXPERIMENTAL, but unlikely to go away.
 
 =head2 memoize_p
 
-  $promise = $self->memoize_p($obj, $method_name, \@args, $expire);
-  $promise = $self->memoize_p($class, $method_name, \@args, $expire);
+  $promise = $cache->memoize_p($obj, $method_name, \@args, $expire);
+  $promise = $cache->memoize_p($class, $method_name, \@args, $expire);
 
 L</memoize_p> behaves the same way as L</compute_p>, but has a convenient
 interface for calling methods on an object. One of the benefits is that you
 do not have to come up with your own cache key. This method is pretty much
 the same as:
 
-  $promise = $self->compute_p(
-    join(":", $self->namespace, "@M", ref($obj), $method_name, serialize(\@args)),
+  $promise = $cache->compute_p(
+    join(":", $cache->namespace, "@M", ref($obj), $method_name, serialize(\@args)),
     $expire,
     sub { return $obj->$method_name(@args) }
   );

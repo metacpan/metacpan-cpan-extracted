@@ -2,6 +2,7 @@
 
 # PODNAME: clipaccumulate
 use strict;
+use warnings;
 
 use Clipboard;
 my $END_STRING = 'endEndENDenDend';
@@ -37,7 +38,7 @@ clipaccumulate
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 USAGE
 
@@ -62,7 +63,7 @@ clipaccumulate - Make a bunch of little clipboards into one big one.
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 MOTIVATION
 

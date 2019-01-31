@@ -1,0 +1,57 @@
+NAME
+    Music::KNRadio::NowPlaying - Now playing metadata for Karlstad Rock 92.2
+
+SYNOPSIS
+        use Music::KNRadio::NowPlaying qw(knnp);
+
+        my $info = knnp();
+
+        printf "artist: %s | title: %s\n", $info->{artist}, $info->{title};
+
+DESCRIPTION
+    Music::KNRadio::NowPlaying provides a method for looking up now-playing
+    metadata for the swedish radiostation 'Karlstad Rock 92.2', also known
+    as 'knradio'.
+
+EXPORTS
+    None by default.
+
+FUNCTIONS
+  knnp()
+    Arguments: $none
+    Return value: \%info
+
+    example return data structure:
+
+        $info->{artist} => 'Laleh'
+        $info->{title}  => 'Der Yek Gooshe'
+        $info->{state}  => 'playing'
+
+Scripts
+    An example script is provided in the bin/ directory as knnp.
+
+REPORTING BUGS
+    Report bugs and/or feature requests on rt.cpan.org, the repository issue
+    tracker or directly to m@japh.se
+
+AUTHOR
+      Magnus Woldrich
+      CPAN ID: WOLDRICH
+      m@japh.se
+      http://japh.se
+      http://github.com/trapd00r
+
+CONTRIBUTORS
+    None required yet.
+
+COPYRIGHT
+    Copyright 2019- THIS MODULEs "AUTHOR" and "CONTRIBUTORS" as listed
+    above.
+
+LICENSE
+    This library is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    ~/ <http://japh.se>
+

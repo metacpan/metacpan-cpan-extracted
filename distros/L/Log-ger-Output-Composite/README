@@ -1,5 +1,10 @@
-SYNOPSIS
+NAME
+    Log::ger::Output::Composite - Composite output
 
+VERSION
+    version 0.008
+
+SYNOPSIS
      use Log::ger::Output Composite => (
          outputs => {
              # single screen output
@@ -31,85 +36,87 @@ SYNOPSIS
              ],
          },
          category_level => {                                        # set per-category level. optional.
-    
             'MyApp::SubModule1' => 'info',
             'MyApp::SubModule2' => 'debug',
             ...
          },
      );
      use Log::ger;
-    
+
      log_warn "blah...";
 
 DESCRIPTION
-
     This is a Log::ger output that can multiplex output to several outputs
     and do filtering on the basis of per-category level, per-output level,
     or per-output per-category level. It can also apply per-output layout.
 
 CONFIGURATION
-
- outputs => hash
-
+  outputs => hash
     Specify outputs. It's a hash with output name as keys and output
     specification as values.
 
-    Output name is the name of output module without the Log::ger::Output::
-    prefix, e.g. Screen or File.
+    Output name is the name of output module without the
+    "Log::ger::Output::" prefix, e.g. Screen or File.
 
     Output specification is either a hashref or arrayref of hashrefs to
     specify multiple outputs per type (e.g. if you want to output to two
     File's). Known hashref keys:
 
-      * conf => hashref
+    *   conf => hashref
 
-      Specify output configuration. Optional. See each output documentation
-      for the list of available configuration parameters.
+        Specify output configuration. Optional. See each output
+        documentation for the list of available configuration parameters.
 
-      * level => str|int|[min, max]
+    *   level => str|int|[min, max]
 
-      Specify per-output level. Optional. If specified, logging will be
-      done at this level instead of the general level. For example, if this
-      is set to debug then debug messages and higher will be sent to output
-      even though the general level is warn. Vice versa, if this is set to
-      error then even though the general level is warn, warning messages
-      won't be sent to this output; only error messages and higher will be
-      sent.
+        Specify per-output level. Optional. If specified, logging will be
+        done at this level instead of the general level. For example, if
+        this is set to "debug" then debug messages and higher will be sent
+        to output even though the general level is "warn". Vice versa, if
+        this is set to "error" then even though the general level is "warn",
+        warning messages won't be sent to this output; only "error" messages
+        and higher will be sent.
 
-      You can specify a single level (e.g. 1 or "trace") or a two-element
-      array to specify minimum and maximum level (e.g. <["trace",
-      "info"]>). If you accidentally mix up minimum and maximum, this
-      module will helpfully fix it for you.
+        You can specify a single level (e.g. 1 or "trace") or a two-element
+        array to specify minimum and maximum level (e.g. "<["trace",
+        "info"]">). If you accidentally mix up minimum and maximum, this
+        module will helpfully fix it for you.
 
-      * category_level => hash
+    *   category_level => hash
 
-      Specify per-output per-category level. Optional. Hash key is category
-      name, value is level (which can be a string/numeric level or a
-      two-element array containing minimum and maximum level).
+        Specify per-output per-category level. Optional. Hash key is
+        category name, value is level (which can be a string/numeric level
+        or a two-element array containing minimum and maximum level).
 
-      * layout => [Name => {conf1=>..., conf2=>..., ...}]
+    *   layout => [Name => {conf1=>..., conf2=>..., ...}]
 
-      Specify per-output layout. Optional. Value is two-element array
-      containing layout name (without the Log::ger::Layout:: prefix, e.g.
-      Pattern) and configuration hash. See each layout module documentation
-      for the list of available configuration parameters.
+        Specify per-output layout. Optional. Value is two-element array
+        containing layout name (without the "Log::ger::Layout::" prefix,
+        e.g. Pattern) and configuration hash. See each layout module
+        documentation for the list of available configuration parameters.
 
-      Note that if you also use a layout module outside of Composite
-      configuration, e.g.:
+        Note that if you also use a layout module outside of Composite
+        configuration, e.g.:
 
-       use Log::ger::Output Composite => (...);
-       use Log::ger::Layout Pattern => (format => '...');
+         use Log::ger::Output Composite => (...);
+         use Log::ger::Layout Pattern => (format => '...');
 
-      then both layouts will be applied, the general layout will be applied
-      before the per-output layout.
+        then both layouts will be applied, the general layout will be
+        applied before the per-output layout.
 
- category_level => hash
-
+  category_level => hash
     Specify per-category level. Optional. Hash key is category name, value
     is level (which can be a string/numeric level or a two-element array
     containing minimum and maximum level).
 
 ENVIRONMENT
-
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

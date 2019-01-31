@@ -68,6 +68,14 @@ the provided "_set_attrs" method.
 To support inplace operations, attributes tagged with the "piddle"
 option must have write accessors. They may be public or private.
 
+  Nested Proxy Objects
+
+A class with the applied role should respond equivalently to a true
+piddle when the supported methods are called on it (it's a bug
+otherwise). Thus, it is possible for a proxy object to contain another,
+and as long as the contained object has the "piddle" attribute set, the
+supported method will be applied to the contained object appropriately.
+
 INSTALLATION
 
 This is a Perl module distribution. It should be installed with whichever

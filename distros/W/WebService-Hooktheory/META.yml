@@ -37,7 +37,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Hooktheory
   repository: https://github.com/ology/WebService-Hooktheory
-version: '0.0401'
+version: '0.0404'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

@@ -13,14 +13,14 @@ use App::Sky::Exception;
 {
     my $m = App::Sky::Module->new(
         {
-            base_upload_cmd => [qw(rsync -a -v --progress --inplace)],
-            dest_upload_prefix => 'hostgator:public_html/',
+            base_upload_cmd        => [qw(rsync -a -v --progress --inplace)],
+            dest_upload_prefix     => 'hostgator:public_html/',
             dest_upload_url_prefix => 'http://www.shlomifish.org/',
         }
     );
 
     # TEST
-    ok ($m, 'Module App::Sky::Module was created.');
+    ok( $m, 'Module App::Sky::Module was created.' );
 
     # TEST
     eq_or_diff(
@@ -32,27 +32,27 @@ use App::Sky::Exception;
     {
         my $results = $m->get_upload_results(
             {
-                'filenames' => ['Shine4U.webm'],
+                'filenames'  => ['Shine4U.webm'],
                 'target_dir' => 'Files/files/video/',
             }
         );
 
         # TEST
-        ok ($results, "Results were returned.");
+        ok( $results, "Results were returned." );
 
         # TEST
-        eq_or_diff (
+        eq_or_diff(
             $results->upload_cmd(),
-            [qw(rsync -a -v --progress --inplace Shine4U.webm hostgator:public_html/Files/files/video/)],
+            [
+                qw(rsync -a -v --progress --inplace Shine4U.webm hostgator:public_html/Files/files/video/)
+            ],
             "results->upload_cmd() is correct.",
         );
 
         # TEST
-        eq_or_diff (
-            [map { $_->as_string() } @{$results->urls()}],
-            [
-                'http://www.shlomifish.org/Files/files/video/Shine4U.webm',
-            ],
+        eq_or_diff(
+            [ map { $_->as_string() } @{ $results->urls() } ],
+            [ 'http://www.shlomifish.org/Files/files/video/Shine4U.webm', ],
             'The result URLs are correct.',
         );
     }
@@ -60,27 +60,27 @@ use App::Sky::Exception;
     {
         my $results = $m->get_upload_results(
             {
-                'filenames' => ['../../My-Lemon.webm'],
+                'filenames'  => ['../../My-Lemon.webm'],
                 'target_dir' => 'Files/files/video/',
             }
         );
 
         # TEST
-        ok ($results, "../../ Results were returned.");
+        ok( $results, "../../ Results were returned." );
 
         # TEST
-        eq_or_diff (
+        eq_or_diff(
             $results->upload_cmd(),
-            [qw(rsync -a -v --progress --inplace ../../My-Lemon.webm hostgator:public_html/Files/files/video/)],
+            [
+                qw(rsync -a -v --progress --inplace ../../My-Lemon.webm hostgator:public_html/Files/files/video/)
+            ],
             "../../ results->upload_cmd() is correct.",
         );
 
         # TEST
-        eq_or_diff (
-            [map { $_->as_string() } @{$results->urls()}],
-            [
-                'http://www.shlomifish.org/Files/files/video/My-Lemon.webm',
-            ],
+        eq_or_diff(
+            [ map { $_->as_string() } @{ $results->urls() } ],
+            [ 'http://www.shlomifish.org/Files/files/video/My-Lemon.webm', ],
             'URLs for using basename.',
         );
     }
@@ -88,27 +88,27 @@ use App::Sky::Exception;
     {
         my $results = $m->get_upload_results(
             {
-                'filenames' => ['/home/shlomif/progs/perl/MetaData.pm'],
+                'filenames'  => ['/home/shlomif/progs/perl/MetaData.pm'],
                 'target_dir' => 'share-dir/code/',
             }
         );
 
         # TEST
-        ok ($results, "Absolute URL - results obj was returned.");
+        ok( $results, "Absolute URL - results obj was returned." );
 
         # TEST
-        eq_or_diff (
+        eq_or_diff(
             $results->upload_cmd(),
-            [qw(rsync -a -v --progress --inplace /home/shlomif/progs/perl/MetaData.pm hostgator:public_html/share-dir/code/)],
+            [
+                qw(rsync -a -v --progress --inplace /home/shlomif/progs/perl/MetaData.pm hostgator:public_html/share-dir/code/)
+            ],
             "Absolute URL - results->upload_cmd() is correct.",
         );
 
         # TEST
-        eq_or_diff (
-            [map { $_->as_string() } @{$results->urls()}],
-            [
-                'http://www.shlomifish.org/share-dir/code/MetaData.pm',
-            ],
+        eq_or_diff(
+            [ map { $_->as_string() } @{ $results->urls() } ],
+            [ 'http://www.shlomifish.org/share-dir/code/MetaData.pm', ],
             'Absolute URL - URLs for using basename.',
         );
     }
@@ -118,18 +118,17 @@ use App::Sky::Exception;
 {
     my $m = App::Sky::Module->new(
         {
-            base_upload_cmd => [qw(rsync -a -v --progress --inplace)],
-            dest_upload_prefix => 'shlomif@perl-begin.org:sites/perl-begin',
+            base_upload_cmd        => [qw(rsync -a -v --progress --inplace)],
+            dest_upload_prefix     => 'shlomif@perl-begin.org:sites/perl-begin',
             dest_upload_url_prefix => 'http://perl-begin.org/',
         }
     );
 
     {
-        eval
-        {
+        eval {
             my $results = $m->get_upload_results(
                 {
-                    'filenames' => ['/home/shlomif/progs/foo:bar.pm'],
+                    'filenames'  => ['/home/shlomif/progs/foo:bar.pm'],
                     'target_dir' => 'Files/files/code/',
                 }
             );
@@ -138,19 +137,17 @@ use App::Sky::Exception;
         my $E = $@;
 
         # TEST
-        ok ($E, 'An exception was thrown.');
+        ok( $E, 'An exception was thrown.' );
 
         # TEST
-        isa_ok ($E, 'App::Sky::Exception::Upload::Filename::InvalidChars',
+        isa_ok(
+            $E,
+            'App::Sky::Exception::Upload::Filename::InvalidChars',
             'Exception is right.'
         );
 
         # TEST
-        eq_or_diff
-        (
-            $E->invalid_chars(),
-            [':'],
-            "Invalid characters is fine.",
-        );
+        eq_or_diff( $E->invalid_chars(), [':'],
+            "Invalid characters is fine.", );
     }
 }

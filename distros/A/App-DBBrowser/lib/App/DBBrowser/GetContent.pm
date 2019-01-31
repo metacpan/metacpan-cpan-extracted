@@ -435,7 +435,7 @@ sub __parse_file {
             return $sheet_count;
         }
         $sql->{insert_into_args} = [ Spreadsheet::Read::rows( $book->[$sheet_idx] ) ];
-        if ( length $book->[$sheet_idx]{label} ){
+        if ( ! -T $file_ec && length $book->[$sheet_idx]{label} ){
             $sf->{d}{sheet_name} = $book->[$sheet_idx]{label};
         }
         return $sheet_count;

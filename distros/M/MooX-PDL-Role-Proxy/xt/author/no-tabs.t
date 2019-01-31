@@ -12,6 +12,10 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/lib/My/Class.pm',
+    't/lib/My/NestedClass.pm',
+    't/lib/My/Util.pm',
+    't/lib/My/Util.pm.orig',
+    't/nested.t',
     't/test.t'
 );
 

@@ -1,9 +1,7 @@
 package App::Sky::CmdLine;
-
+$App::Sky::CmdLine::VERSION = '0.4.1';
 use strict;
 use warnings;
-
-our $VERSION = '0.2.1';
 
 
 use Carp ();
@@ -21,7 +19,7 @@ use YAML::XS qw(LoadFile);
 
 use Scalar::Util qw(reftype);
 
-has 'argv' => (isa => 'ArrayRef[Str]', is => 'rw', required => 1,);
+has 'argv' => ( isa => 'ArrayRef[Str]', is => 'rw', required => 1, );
 
 
 sub _basic_help
@@ -31,6 +29,8 @@ sub _basic_help
     print <<'EOF';
 sky upload /path/to/myfile.txt
 sky up-r /path/to/directory
+
+Specifying --copy or -x will copy the URL to the clipboard.
 EOF
 
     exit(0);
@@ -48,26 +48,38 @@ sub run
 {
     my ($self) = @_;
 
-    if (! @{$self->argv()})
+    my $copy = 0;
+
+    if ( !@{ $self->argv() } )
     {
         return $self->_basic_usage();
     }
 
-    my $verb = shift(@{$self->argv()});
+    my $verb = shift( @{ $self->argv() } );
 
-    if (($verb eq '--help') or ($verb eq '-h'))
+    if ( ( $verb eq '--help' ) or ( $verb eq '-h' ) )
     {
         return $self->_basic_help();
     }
 
-    my $_calc_manager = sub {
-        my $dist_config_dir = File::HomeDir->my_dist_config( 'App-Sky', {create => 1}, );
+    if ( $verb =~ /\A(--copy|-x)\z/ )
+    {
+        $copy = 1;
 
-        my $config_fn = File::Spec->catfile($dist_config_dir, 'app_sky_conf.yml');
+        $verb = shift( @{ $self->argv() } );
+    }
+
+    my $_calc_manager = sub {
+        my $dist_config_dir =
+            File::HomeDir->my_dist_config( 'App-Sky', { create => 1 }, );
+
+        my $config_fn =
+            File::Spec->catfile( $dist_config_dir, 'app_sky_conf.yml' );
 
         my $config = LoadFile($config_fn);
 
-        my $validator = App::Sky::Config::Validate->new({ config => $config });
+        my $validator =
+            App::Sky::Config::Validate->new( { config => $config } );
         $validator->is_valid();
 
         return App::Sky::Manager->new(
@@ -81,24 +93,32 @@ sub run
         my ($results) = @_;
 
         my $upload_cmd = $results->upload_cmd();
-        my $urls = $results->urls();
+        my $urls       = $results->urls();
 
-        if ((system { $upload_cmd->[0] } @$upload_cmd) != 0)
+        if ( ( system { $upload_cmd->[0] } @$upload_cmd ) != 0 )
         {
             die "Upload cmd <<@$upload_cmd>> failed with $!";
         }
 
-        print "Got URL:\n" , $urls->[0]->as_string(), "\n";
+        my $URL = $urls->[0]->as_string();
+
+        print "Got URL:\n", $URL, "\n";
+
+        if ($copy)
+        {
+            eval "use Clipboard 0.19;";
+            Clipboard->copy_to_all_selections($URL);
+        }
 
         exit(0);
     };
 
     my $op;
-    if ((($verb eq 'up') || ($verb eq 'upload')))
+    if ( ( ( $verb eq 'up' ) || ( $verb eq 'upload' ) ) )
     {
         $op = 'upload';
     }
-    elsif (($verb eq 'up-r') || ($verb eq 'upload-recursive'))
+    elsif ( ( $verb eq 'up-r' ) || ( $verb eq 'upload-recursive' ) )
     {
         $op = "up-r";
     }
@@ -107,19 +127,20 @@ sub run
         return $self->_basic_usage();
     }
 
-
     # GetOptionsFromArray(
     #     $self->argv(),
     # );
 
-    my $filename = shift(@{$self->argv()});
+    my $filename = shift( @{ $self->argv() } );
 
-    if (not (($op eq 'upload') ? (-f $filename) : (-d $filename)))
+    if ( not( ( $op eq 'upload' ) ? ( -f $filename ) : ( -d $filename ) ) )
     {
-        die "Can only upload directories. '$filename' is not a valid directory name.";
+        die
+"Can only upload directories. '$filename' is not a valid directory name.";
     }
 
-    my $meth = $op eq 'upload' ? 'get_upload_results' : 'get_recursive_upload_results';
+    my $meth =
+        $op eq 'upload' ? 'get_upload_results' : 'get_recursive_upload_results';
 
     $_handle_results->(
         scalar(
@@ -144,11 +165,19 @@ __END__
 
 =head1 NAME
 
+App::Sky::CmdLine
+
+=head1 VERSION
+
+version 0.4.1
+
+=head1 NAME
+
 App::Sky::CmdLine - command line program
 
 =head1 VERSION
 
-version 0.2.1
+version 0.4.1
 
 =head1 METHODS
 
@@ -160,37 +189,9 @@ The array of command line arguments - should be supplied to the constructor.
 
 Run the application.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2013 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Sky or by email to
-bug-app-sky@rt.cpan.org.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc App::Sky
 
 =head2 Websites
 
@@ -205,7 +206,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/App-Sky>
+L<https://metacpan.org/release/App-Sky>
 
 =item *
 
@@ -221,7 +222,7 @@ RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Sky>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Sky>
 
 =item *
 
@@ -241,25 +242,17 @@ L<http://cpanratings.perl.org/d/App-Sky>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/App-Sky>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/App-Sky>
+L<http://cpants.cpanauthors.org/dist/App-Sky>
 
 =item *
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/A/App-Sky>
 
@@ -284,7 +277,7 @@ L<http://deps.cpantesters.org/?module=App::Sky>
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests by email to C<bug-app-sky at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Sky>. You will be automatically notified of any
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=App-Sky>. You will be automatically notified of any
 progress on the request by the system.
 
 =head2 Source Code
@@ -296,5 +289,26 @@ from your repository :)
 L<https://github.com/shlomif/Sky-uploader>
 
   git clone git://github.com/shlomif/Sky-uploader.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/Sky-uploader/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

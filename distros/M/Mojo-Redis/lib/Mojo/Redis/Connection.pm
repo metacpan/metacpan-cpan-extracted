@@ -31,7 +31,7 @@ sub is_connected { $_[0]->{stream} && !$_[0]->{gone_away} ? 1 : 0 }
 
 sub write_p {
   my $self = shift;
-  my $p = Mojo::Promise->new(ioloop => $self->ioloop);
+  my $p    = Mojo::Promise->new(ioloop => $self->ioloop);
   $self->write_q(@_, $p);
   $self->is_connected ? $self->_write : $self->_connect;
   return $p;
@@ -159,7 +159,7 @@ sub _on_close_cb {
     $self->{gone_away} = 1;
     $self->_reject_queue($err);
     $self->emit('close') if @_ == 1;
-    warn qq([@{[$self->_id]}] @{[$err ? "ERROR $err" : "CLOSED"]}\n) if DEBUG;
+    warn qq([@{[$self->_id]}] @{[$err ? "ERROR $err" : "CLOSED"]}\n) if $self and DEBUG;
   };
 }
 
@@ -268,27 +268,27 @@ You probably want to use L<Mojo::Redis> instead of this class.
 
 =head2 close
 
-  $cb = $self->on(close => sub { my ($self) = @_; });
+  $cb = $conn->on(close => sub { my ($conn) = @_; });
 
 Emitted when the connection to the redis server gets closed.
 
 =head2 connect
 
-  $cb = $self->on(connect => sub { my ($self) = @_; });
+  $cb = $conn->on(connect => sub { my ($conn) = @_; });
 
 Emitted right after a connection is established to the Redis server, but
 after the AUTH and SELECT commands are queued.
 
 =head2 error
 
-  $cb = $self->on(error => sub { my ($self, $error) = @_; });
+  $cb = $conn->on(error => sub { my ($conn, $error) = @_; });
 
 Emitted if there's a connection error or the Redis server emits an error, and
 there's not a promise to handle the message.
 
 =head2 response
 
-  $cb = $self->on(response => sub { my ($self, $res) = @_; });
+  $cb = $conn->on(response => sub { my ($conn, $res) = @_; });
 
 Emitted if L</write_q> is not passed a L<Mojo::Promise> as the last argument,
 or if the Redis server emits a message that is not handled.
@@ -297,8 +297,8 @@ or if the Redis server emits a message that is not handled.
 
 =head2 encoding
 
-  $str  = $self->encoding;
-  $self = $self->encoding("UTF-8");
+  $str  = $conn->encoding;
+  $conn = $conn->encoding("UTF-8");
 
 Holds the character encoding to use for data from/to Redis. Set to C<undef>
 to disable encoding/decoding data. Without an encoding set, Redis expects and
@@ -306,42 +306,42 @@ returns bytes. See also L<Mojo::Redis/encoding>.
 
 =head2 ioloop
 
-  $loop = $self->ioloop;
-  $self = $self->ioloop(Mojo::IOLoop->new);
+  $loop = $conn->ioloop;
+  $conn = $conn->ioloop(Mojo::IOLoop->new);
 
 Holds an instance of L<Mojo::IOLoop>.
 
 =head2 protocol
 
-  $protocol = $self->protocol;
-  $self     = $self->protocol(Protocol::Redis::XS->new(api => 1));
+  $protocol = $conn->protocol;
+  $conn     = $conn->protocol(Protocol::Redis::XS->new(api => 1));
 
 Holds a protocol object, such as L<Protocol::Redis> that is used to generate
 and parse Redis messages.
 
 =head2 url
 
-  $url  = $self->url;
-  $self = $self->url(Mojo::URL->new->host("/tmp/redis.sock")->path("/5"));
-  $self = $self->url("redis://localhost:6379/1");
+  $url  = $conn->url;
+  $conn = $conn->url(Mojo::URL->new->host("/tmp/redis.sock")->path("/5"));
+  $conn = $conn->url("redis://localhost:6379/1");
 
 =head1 METHODS
 
 =head2 disconnect
 
-  $self = $self->disconnect;
+  $conn = $conn->disconnect;
 
 Used to disconnect from the Redis server.
 
 =head2 is_connected
 
-  $bool = $self->is_connected;
+  $bool = $conn->is_connected;
 
 True if a connection to the Redis server is established.
 
 =head2 write_p
 
-  $promise = $self->write_p($command => @args);
+  $promise = $conn->write_p($command => @args);
 
 Will write a command to the Redis server and establish a connection if not
 already connected and returns a L<Mojo::Promise>. The arguments will be
@@ -349,8 +349,8 @@ passed on to L</write_q>.
 
 =head2 write_q
 
-  $self = $self->write_q(@command => @args, Mojo::Promise->new);
-  $self = $self->write_q(@command => @args, undef);
+  $conn = $conn->write_q(@command => @args, Mojo::Promise->new);
+  $conn = $conn->write_q(@command => @args, undef);
 
 Will enqueue a Redis command and either resolve/reject the L<Mojo::Promise>
 or emit a L</error> or L</message> event when the Redis server responds.

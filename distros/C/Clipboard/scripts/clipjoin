@@ -1,8 +1,11 @@
 #!/usr/bin/perl
 
+use strict;
+use warnings;
+
 # PODNAME: clipjoin
 use Clipboard;
-use strict;
+
 my $data = join '', Clipboard->paste;
 $data =~ s/\s+\|\s+//gm;
 $data =~ s/^\+//gm;
@@ -24,7 +27,7 @@ clipjoin
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 NAME
 
@@ -32,7 +35,7 @@ clipjoin - Remove superfluous spaces from the clipboard.
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 MOTIVATION
 

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the Hooktheory API
 
-our $VERSION = '0.0401';
+our $VERSION = '0.0404';
 
 use Moo;
 use strictures 2;
@@ -64,6 +64,9 @@ sub BUILD {
 sub fetch {
     my ( $self, %args ) = @_;
 
+    croak 'No activkey provided' unless $self->activkey;
+    croak 'No endpoint provided' unless $args{endpoint};
+
     my $query;
     if ( $args{query} ) {
         $query = join '&', map { "$_=$args{query}->{$_}" } keys %{ $args{query} };
@@ -117,14 +120,18 @@ WebService::Hooktheory - Access to the Hooktheory API
 
 =head1 VERSION
 
-version 0.0401
+version 0.0404
 
 =head1 SYNOPSIS
 
   use WebService::Hooktheory;
+
   my $w = WebService::Hooktheory->new( username => 'foo', password => 'bar' );
+  print $w->activkey, "\n";
+
   # Or:
   $w = WebService::Hooktheory->new( activkey => '1234567890abcdefghij' );
+
   my $r = $w->fetch( endpoint => '/trends/nodes', query => { cp => '4,1' } );
   print Dumper $r;
 
@@ -160,7 +167,8 @@ Create a new C<WebService::Hooktheory> object.
 
 =head2 BUILD()
 
-Authenticate and set the B<activkey> attribute if given the right credentials.
+Authenticate and set the B<activkey> attribute if given a valid username and
+password.
 
 Skip this step if given an B<activkey> in the constructor.
 
@@ -176,15 +184,21 @@ Dan Book (DBOOK)
 
 =head1 SEE ALSO
 
+The examples in the F<eg/> directory.
+
+The tests in F<t/01-methods.t>
+
 L<https://www.hooktheory.com/api/trends/docs>
 
 L<Moo>
 
-L<Mojo::UserAgent>
+L<Mojo::JSON>
 
 L<Mojo::JSON::MaybeXS>
 
-L<Mojo::JSON>
+L<Mojo::UserAgent>
+
+L<Mojo::URL>
 
 =head1 AUTHOR
 

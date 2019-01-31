@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.001';
+  $VERSION = '0.002';
   @ISA     = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -26,6 +26,7 @@ sub fgd {
     return "^fg()"
   }
   my ($color, $data) = @_;
+  $color = "#$color" unless $color =~ m/^#/;
   return "^fg($color)$data^fg()";
 }
 
@@ -34,6 +35,7 @@ sub bgd {
     return "^bg()"
   }
   my ($color, $data) = @_;
+  $color = "#$color" unless $color =~ m/^#/;
   return "^bg($color)$data^bg()";
 }
 

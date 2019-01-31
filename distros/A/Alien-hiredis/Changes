@@ -1,2 +1,5 @@
+0.002     2019-01-31 02:52:07 EST
+  - Require GNU make for building hiredis (#1)
+
 0.001     2019-01-30 21:18:12 EST
   - First release

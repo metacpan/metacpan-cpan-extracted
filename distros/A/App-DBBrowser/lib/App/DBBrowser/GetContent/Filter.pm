@@ -31,12 +31,12 @@ sub input_filter {
 
     FILTER: while ( 1 ) {
         my @pre = ( undef, $sf->{i}{ok} );
-        my $input_cols       = 'Choose Columns';
-        my $input_rows       = 'Choose Rows';
-        my $input_rows_range = 'A Range of Rows';
-        my $add_col          = 'Add Column';
-        my $cols_to_rows     = 'Cols to Rows';
-        my $empty_to_null    = 'Empty to NULL';
+        my $input_cols       = 'Choose_Cols';
+        my $input_rows       = 'Choose_Rows';
+        my $input_rows_range = 'Range_Rows';
+        my $add_col          = 'Add_Col';
+        my $cols_to_rows     = 'Cols_to_Rows';
+        my $empty_to_null    = 'Empty_to_NULL';
         my $reset            = 'Reset';
         my $choices = [ @pre, $input_cols, $input_rows, $input_rows_range, $add_col, $cols_to_rows, $empty_to_null, $reset ];
         my $waiting = 'Working ... ';

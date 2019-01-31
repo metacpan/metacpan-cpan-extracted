@@ -7,7 +7,7 @@ WriteMakefile(
     NAME             => 'Mojolicious::Plugin::Minion::Workers',
     AUTHOR           => q{Михаил Че (Mikhail Che) <mche[-at-]cpan.org>},
     VERSION_FROM     => 'lib/Mojolicious/Plugin/Minion/Workers.pm',
-    ABSTRACT_FROM    => 'lib/Mojolicious/Plugin/Minion/Workers.pm',
+    ABSTRACT_FROM    => 'lib/Mojolicious/Plugin/Minion/Workers.pod',
     LICENSE          => 'Perl',
     PL_FILES         => {},
     #~ MIN_PERL_VERSION => '5.014',

@@ -8,6 +8,8 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/analyze
+eg/analyze.png
 eg/example
 lib/WebService/Hooktheory.pm
 t/00-compile.t

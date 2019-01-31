@@ -58,7 +58,7 @@ sub all_p {
 }
 
 sub next {
-  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  my $cb   = ref $_[-1] eq 'CODE' ? pop : undef;
   my $self = shift;
 
   # Cursor is exhausted
@@ -158,7 +158,7 @@ See L<https://redis.io/commands/scan> for more information.
 
 =head2 command
 
-  $array_ref = $self->command;
+  $array_ref = $cursor->command;
 
 The current command used to get data from Redis. This need to be set in the
 constructor, but reading it out might not reflect the value put in. Examples:
@@ -178,21 +178,21 @@ Also, calling L</next> will change the value of L</command>. Example:
 
 =head2 connection
 
-  $conn = $self->connection;
-  $self = $self->connection(Mojo::Redis::Connection->new);
+  $conn   = $cursor->connection;
+  $cursor = $cursor->connection(Mojo::Redis::Connection->new);
 
 Holds a L<Mojo::Redis::Connection> object.
 
 =head2 finished
 
-  $bool = $self->finished;
+  $bool = $cursor->finished;
 
 True after calling L</all> or if L</next> has iterated the whole list of members.
 
 =head2 redis
 
-  $conn = $self->connection;
-  $self = $self->connection(Mojo::Redis::Connection->new);
+  $conn   = $cursor->connection;
+  $cursor = $cursor->connection(Mojo::Redis::Connection->new);
 
 Holds a L<Mojo::Redis> object used to create the connections to talk with Redis.
 
@@ -200,43 +200,43 @@ Holds a L<Mojo::Redis> object used to create the connections to talk with Redis.
 
 =head2 again
 
-  $self->again;
+  $cursor->again;
 
 Used to reset the cursor and make L</next> start over.
 
 =head2 all
 
-  $res  = $self->all;
-  $self = $self->all(sub { my ($self, $res) = @_ });
+  $res    = $cursor->all;
+  $cursor = $cursor->all(sub { my ($cursor, $res) = @_ });
 
 Used to return all members. C<$res> is an array ref of strings, except when
 using the command "hgetall".
 
 =head2 all_p
 
-  $promise = $self->all_p->then(sub { my $res = shift });
+  $promise = $cursor->all_p->then(sub { my $res = shift });
 
 Same as L</all> but returns a L<Mojo::Promise>.
 
 =head2 new
 
-  $self = Mojo::Redis::Cursor->new(command => [...], redis => Mojo::Redis->new);
+  $cursor = Mojo::Redis::Cursor->new(command => [...], redis => Mojo::Redis->new);
 
 Used to construct a new object. L</command> and L</redis> is required as input.
 
 Here are some examples of the differnet commands that are supported:
 
   # Custom cursor commands
-  $cursor = $self->cursor(hscan => 0, match => '*', count => 100);
-  $cursor = $self->cursor(scan  => 0, match => '*', count => 100);
-  $cursor = $self->cursor(sscan => 0, match => '*', count => 100);
-  $cursor = $self->cursor(zscan => 0, match => '*', count => 100);
+  $cursor = $cursor->cursor(hscan => 0, match => '*', count => 100);
+  $cursor = $cursor->cursor(scan  => 0, match => '*', count => 100);
+  $cursor = $cursor->cursor(sscan => 0, match => '*', count => 100);
+  $cursor = $cursor->cursor(zscan => 0, match => '*', count => 100);
 
   # Convenient cursor commands
-  $cursor = $self->cursor(hgetall  => "some:hash:key");
-  $cursor = $self->cursor(hkeys    => "some:hash:key");
-  $cursor = $self->cursor(keys     => "some:key:pattern*");
-  $cursor = $self->cursor(smembers => "some:set:key");
+  $cursor = $cursor->cursor(hgetall  => "some:hash:key");
+  $cursor = $cursor->cursor(hkeys    => "some:hash:key");
+  $cursor = $cursor->cursor(keys     => "some:key:pattern*");
+  $cursor = $cursor->cursor(smembers => "some:set:key");
 
 The convenient commands are alternatives to L<Mojo::Redis::Database/hgetall>,
 L<Mojo::Redis::Database/hkeys>, L<Mojo::Redis::Database/keys> and
@@ -244,8 +244,8 @@ L<Mojo::Redis::Database/smembers>.
 
 =head2 next
 
-  $res  = $self->next;
-  $self = $self->next(sub { my ($self, $err, $res) = @_ });
+  $res    = $cursor->next;
+  $cursor = $cursor->next(sub { my ($cursor, $err, $res) = @_ });
 
 Used to return a chunk of members. C<$res> is an array ref of strings, except
 when using the command "hgetall". C<$res> will also be C<undef()> when the
@@ -253,7 +253,7 @@ cursor is exhausted and L</finished> will be true.
 
 =head2 next_p
 
-  $promise = $self->next_p;
+  $promise = $cursor->next_p;
 
 Same as L</next> but returns a L<Mojo::Prmoise>.
 

@@ -1,0 +1,31 @@
+requires "Carp" => "0";
+requires "Cwd" => "0";
+requires "Data::Dump" => "0";
+requires "Data::Dumper" => "0";
+requires "Exporter" => "0";
+requires "File::Basename" => "0";
+requires "Getopt::Long::Descriptive" => "0";
+requires "List::Compare" => "0";
+requires "List::MoreUtils" => "0";
+requires "List::Util" => "0";
+requires "Module::Info" => "0";
+requires "Module::Metadata" => "0";
+requires "Module::Util" => "0";
+requires "Package::Constants" => "0";
+requires "Text::CSV" => "0";
+requires "feature" => "0";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'test' => sub {
+  requires "Test::Exception" => "0";
+  requires "Test::More" => "0";
+  requires "constant" => "0";
+  requires "lib" => "0";
+  requires "parent" => "0";
+  requires "utf8" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};

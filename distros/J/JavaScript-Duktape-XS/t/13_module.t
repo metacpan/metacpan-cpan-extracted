@@ -3,6 +3,7 @@ use warnings;
 
 use Data::Dumper;
 use Test::More;
+use Test::Exception;
 
 my $CLASS = 'JavaScript::Duktape::XS';
 
@@ -103,10 +104,39 @@ sub test_module {
     is($vm->get('shebang.bar'), 234, 'shebang.bar');
 }
 
+sub test_module_die {
+    foreach my $die_resolve (0..1) {
+        foreach my $die_load (0..1) {
+            my $vm = $CLASS->new();
+            $vm->set('perl_module_resolve', sub {
+                if ($die_resolve) {
+                    die "module test died in module resolve"
+                }
+                return "index.js";
+            });
+            $vm->set('perl_module_load', sub {
+                if ($die_load) {
+                    die "module test died in module load"
+                }
+                return "module.exports = {}";
+            });
+            ok($vm, sprintf("created $CLASS object with die configured as resolve=%d, load=%d",
+                            $die_resolve, $die_load));
+            if ($die_resolve || $die_load) {
+                my $rx = 'module test died in module (resolve|load)';
+                throws_ok { $vm->eval('require("foo");'); } qr/$rx/, 'code died as expected';
+            } else {
+                lives_ok { $vm->eval('require("foo");'); } 'code lived as expected';
+            }
+        }
+    }
+}
+
 sub main {
     use_ok($CLASS);
 
     test_module();
+    test_module_die();
     done_testing;
 
     return 0;

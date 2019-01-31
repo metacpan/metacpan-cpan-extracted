@@ -34,6 +34,18 @@ Crowdin CLI path to the configuration file
 
 Upload translations on push. Default YES.
 
+=item I<import_duplicates>
+
+Add translation if there is the same translation already existing in Crowdin project. Default NO.
+
+=item I<import_eq_suggestions>
+
+Add translation if it is equal to source string in Crowdin project. Default NO.
+
+=item I<auto_approve_imported>
+
+Automatically approves uploaded translations. Default NO.
+
 =back
 
 =head1 INSTALLATION

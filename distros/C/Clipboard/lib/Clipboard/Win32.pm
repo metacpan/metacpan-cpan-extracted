@@ -1,5 +1,8 @@
 package Clipboard::Win32;
-$Clipboard::Win32::VERSION = '0.18';
+$Clipboard::Win32::VERSION = '0.19';
+use strict;
+use warnings;
+
 use Win32::Clipboard;
 
 our $board = Win32::Clipboard();
@@ -9,7 +12,7 @@ sub copy {
 }
 sub paste {
     my $self = shift;
-    $board->Get();
+    return $board->Get();
 }
 
 1;
@@ -26,7 +29,7 @@ Clipboard::Win32
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

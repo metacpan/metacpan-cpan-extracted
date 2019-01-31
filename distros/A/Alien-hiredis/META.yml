@@ -12,6 +12,7 @@ build_requires:
 configure_requires:
   Alien::Build: '1.19'
   Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Build::Make: '0.99'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
@@ -31,7 +32,7 @@ no_index:
 provides:
   Alien::hiredis:
     file: lib/Alien/hiredis.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Alien::Base: '0.038'
   parent: '0'
@@ -40,7 +41,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Alien-hiredis/issues
   homepage: https://github.com/Grinnz/Alien-hiredis
   repository: https://github.com/Grinnz/Alien-hiredis.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -186,7 +187,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
@@ -411,7 +412,6 @@ x_alienfile:
   requires:
     share:
       Archive::Tar: '0'
-      Config: '0'
       HTML::LinkExtor: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'

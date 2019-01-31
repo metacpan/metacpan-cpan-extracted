@@ -1,5 +1,14 @@
 Revision history for perl distribution Mojo-Redis
 
+3.19 2019-01-31T13:03:11+0900
+ - Add support for encoding and decoding of JSON messages in Mojo::Redis::PubSub
+
+3.18 2019-01-31T12:39:46+0900
+ - Add reconnect logic for Mojo::Redis::PubSub #37
+ - Add CAVEATS for Protocol::Redis::XS #38
+ - Changed default protocol to Protocol::Redis #38
+ - Updated documentation to use nicer variable names
+
 3.17 2018-12-17T19:03:43+0900
  - Made connection-lost.t more robust
  - Add xread_structured() method

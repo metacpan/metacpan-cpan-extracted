@@ -1,8 +1,17 @@
 package Clipboard;
-$Clipboard::VERSION = '0.18';
+$Clipboard::VERSION = '0.19';
+use strict;
+use warnings;
+
 our $driver;
 
 sub copy { my $self = shift; $driver->copy(@_); }
+sub copy_to_all_selections {
+    my $self = shift;
+    my $meth = $driver->can('copy_to_all_selections');
+    return $meth ? $meth->($driver, @_) : $driver->copy(@_);
+}
+
 sub cut { goto &copy }
 sub paste { my $self = shift; $driver->paste(@_); }
 
@@ -46,13 +55,15 @@ Clipboard
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
-use Clipboard;
-print Clipboard->paste;
-Clipboard->copy('foo');
+    use Clipboard;
+    print Clipboard->paste;
+    Clipboard->copy('foo');
+    # Same as copy on non-X / non-Xclip systems
+    Clipboard->copy_to_all_selections('text_to_copy');
 
 Clipboard->cut() is an alias for copy(). copy() is the preferred
 method, because we're not really "cutting" anything.
@@ -79,7 +90,7 @@ Clipboard - Copy and paste with any OS
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 STATUS
 

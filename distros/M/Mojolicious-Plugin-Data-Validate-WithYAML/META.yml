@@ -2,21 +2,34 @@
 abstract: 'validate form input with Data::Validate::WithYAML'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
-build_requires: {}
+build_requires:
+  File::Copy: '0'
+  File::Path: '0'
+  FindBin: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::LongString: '0.16'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Mojolicious-Plugin-Data-Validate-WithYAML
+provides:
+  Mojolicious::Plugin::Data::Validate::WithYAML:
+    file: lib/Mojolicious/Plugin/Data/Validate/WithYAML.pm
+    version: '0.05'
 requires:
-  Data::Validate::WithYAML: 0.11
-  Mojolicious: 4.0
+  Data::Validate::WithYAML: '0.17'
+  Mojolicious: '8.0'
 resources:
-  bugtracker: http://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML/issues
-  homepage: http://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML
+  bugtracker: https://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML/issues
+  homepage: https://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML
   repository: git://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML.git
-version: 0.04
+version: '0.05'
+x_contributors:
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

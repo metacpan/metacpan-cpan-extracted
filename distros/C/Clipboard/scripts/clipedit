@@ -2,20 +2,36 @@
 
 # PODNAME: clipedit
 use strict;
+use warnings;
+
 use Clipboard;
 use File::Temp qw( tempfile );
 
 my $orig = Clipboard->paste;
 
-my ($tmpfile, $tmpfilename) = tempfile();
-print {$tmpfile} $orig;
-close $tmpfile;
+my ($tmp_fh, $tmpfilename) = tempfile();
+print {$tmp_fh} $orig;
+close $tmp_fh;
 
 my $ed = $ENV{VISUAL} || $ENV{EDITOR} || 'vim';
 system($ed, $tmpfilename);
 
-open $tmpfile, $tmpfilename or die "Failure to open $tmpfilename: $!";
-my $edited = join '', <$tmpfile>;
+sub _slurp
+{
+    my $filename = shift;
+
+    open my $in, '<', $filename
+        or die "Cannot open '$filename' for slurping - $!";
+
+    local $/;
+    my $contents = <$in>;
+
+    close($in);
+
+    return $contents;
+}
+
+my $edited = _slurp($tmpfilename);
 
 my $current = Clipboard->paste;
 
@@ -69,7 +85,7 @@ clipedit
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 NAME
 
@@ -77,7 +93,7 @@ clipedit - Edit clipboard contents in one swoop.
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 MOTIVATION
 

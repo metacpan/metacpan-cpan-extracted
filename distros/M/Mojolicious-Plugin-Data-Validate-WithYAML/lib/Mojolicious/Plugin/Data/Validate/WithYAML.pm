@@ -11,37 +11,25 @@ use Carp;
 use Data::Validate::WithYAML;
 use File::Spec;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub register {
     my ($self, $app, $config) = @_;
 
-    $config->{conf_path} ||= $self->home;
-    $config->{no_steps}  //= 1;
+    $config->{conf_path} = $app->home if !$config->{conf_path};
+    $config->{no_steps}  = 1          if !defined $config->{no_steps};
 
     $app->helper( 'validate' => sub {
         my ($c, $file) = @_;
 
-        if ( !$file ) {
-            my @caller = caller(2);
-            $file      = (split /::/, $caller[3])[-1];
-        }
+        my $validator = _validator( $file, $config );
+        my %params    = %{ $c->req->params->to_hash };
+        my %errors    = $validator->validate( %params );
 
-        my $path = File::Spec->rel2abs( File::Spec->catfile( $config->{conf_path}, $file . '.yml' ) );
+        my $prefix = exists $config->{error_prefix} ?
+            $config->{error_prefix} :
+            'ERROR_';
 
-        if ( !-e $path ) {
-            croak "$path does not exist";
-        }
-
-        my $validator = Data::Validate::WithYAML->new(
-            $path,
-            %{ $config || { no_steps => 1 } },
-        ) or croak $Data::Validate::WithYAML::errstr;
-
-        my $params = $c->req->params->to_hash;
-        my %errors = $validator->validate( %{ $params || {} } );
-
-        my $prefix          = exists $config->{error_prefix} ? $config->{error_prefix} : 'ERROR_';
         my %prefixed_errors = map{ ( "$prefix$_" => $errors{$_} ) } keys %errors;
 
         return %prefixed_errors;
@@ -50,23 +38,8 @@ sub register {
     $app->helper( 'fieldinfo' => sub {
         my ($c, $file, $field, $subinfo) = @_;
 
-        if ( !$file ) {
-            my @caller = caller(2);
-            $file      = (split /::/, $caller[3])[-1];
-        }
-
-        my $path = File::Spec->rel2abs( File::Spec->catfile( $config->{conf_path}, $file . '.yml' ) );
-
-        if ( !-e $path ) {
-            croak "$path does not exist";
-        }
-
-        my $validator = Data::Validate::WithYAML->new(
-            $path,
-            %{ $config || { no_steps => 1 } },
-        ) or croak $Data::Validate::WithYAML::errstr;
-
-        my $info = $validator->fieldinfo( $field );
+        my $validator = _validator( $file, $config );
+        my $info      = $validator->fieldinfo( $field );
 
         return if !$info;
 
@@ -75,11 +48,35 @@ sub register {
     });
 }
 
+sub _validator {
+    my ($file, $config) = @_;
+
+    if ( !$file ) {
+        my @caller = caller(3);
+        $file      = (split /::/, $caller[3])[-1];
+    }
+
+    my $path = File::Spec->rel2abs(
+        File::Spec->catfile( $config->{conf_path}, $file . '.yml' )
+    );
+
+    croak "$path does not exist" if !-e $path;
+
+    my $validator = Data::Validate::WithYAML->new(
+        $path,
+        %{$config},
+    ) or croak $Data::Validate::WithYAML::errstr;
+
+    return $validator;
+}
+
 1;
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -87,7 +84,7 @@ Mojolicious::Plugin::Data::Validate::WithYAML - validate form input with Data::V
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

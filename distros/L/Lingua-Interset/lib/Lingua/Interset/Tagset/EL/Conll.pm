@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::EL::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.013';
+our $VERSION = '3.014';
 
 use utf8;
 use open ':utf8';
@@ -899,7 +899,7 @@ Lingua::Interset::Tagset::EL::Conll - Driver for the Greek tagset of the CoNLL 2
 
 =head1 VERSION
 
-version 3.013
+version 3.014
 
 =head1 SYNOPSIS
 

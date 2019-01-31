@@ -52,11 +52,36 @@ without warning. Please report at
 useful, annoying or if you simply find bugs. Feedback can also be sent to
 `jhthorsen@cpan.org`.
 
+# CAVEATS
+
+[Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) is not the default ["protocol"](#protocol) because it has some
+limitations:
+
+- Cannot handle binary data
+
+    [Mojo::Redis::Cache](https://metacpan.org/pod/Mojo::Redis::Cache) uses [Protocol::Redis](https://metacpan.org/pod/Protocol::Redis) for now, since
+    [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) fail to handle binary data.
+
+    See [https://github.com/dgl/protocol-redis-xs/issues/4](https://github.com/dgl/protocol-redis-xs/issues/4) for more information.
+
+- Cannot handle multi bulk replies with depth higher than 2
+
+    ["xread" in Mojo::Redis::Database](https://metacpan.org/pod/Mojo::Redis::Database#xread) and other Redis commands returns complex nested
+    data structures with depth higher than two. [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) is unable to
+    handle these messages.
+
+    See [https://github.com/dgl/protocol-redis-xs/issues/5](https://github.com/dgl/protocol-redis-xs/issues/5) for more information.
+
+If you experience any issues with [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) then please report
+them to [https://github.com/dgl/protocol-redis-xs/issues](https://github.com/dgl/protocol-redis-xs/issues). It is still the
+default ["protocol"](#protocol) though, since it is a lot faster than [Protocol::Redis](https://metacpan.org/pod/Protocol::Redis)
+for most tasks.
+
 # EVENTS
 
 ## connection
 
-    $cb = $self->on(connection => sub { my ($self, $connection) = @_; });
+    $cb = $redis->on(connection => sub { my ($redis, $connection) = @_; });
 
 Emitted when [Mojo::Redis::Connection](https://metacpan.org/pod/Mojo::Redis::Connection) connects to the Redis.
 
@@ -64,8 +89,8 @@ Emitted when [Mojo::Redis::Connection](https://metacpan.org/pod/Mojo::Redis::Con
 
 ## encoding
 
-    $str  = $self->encoding;
-    $self = $self->encoding("UTF-8");
+    $str   = $redis->encoding;
+    $redis = $redis->encoding("UTF-8");
 
 The value of this attribute will be passed on to
 ["encoding" in Mojo::Redis::Connection](https://metacpan.org/pod/Mojo::Redis::Connection#encoding) when a new connection is created. This
@@ -76,31 +101,32 @@ Default value is "UTF-8".
 
 ## max\_connections
 
-    $int = $self->max_connections;
-    $self = $self->max_connections(5);
+    $int   = $redis->max_connections;
+    $redis = $redis->max_connections(5);
 
 Maximum number of idle database handles to cache for future use, defaults to
 5\. (Default is subject to change)
 
 ## protocol\_class
 
-    $str = $self->protocol_class;
-    $self = $self->protocol_class("Protocol::Redis::XS");
+    $str   = $redis->protocol_class;
+    $redis = $redis->protocol_class("Protocol::Redis::XS");
 
-Default to [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) if the optional module is available, or
-falls back to [Protocol::Redis](https://metacpan.org/pod/Protocol::Redis).
+Default to [Protocol::Redis](https://metacpan.org/pod/Protocol::Redis). This will be changed in the future, if we see a
+more stable version of an alternative to [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS).  See
+["CAVEATS"](#caveats) for details.
 
 ## pubsub
 
-    $pubsub = $self->pubsub;
+    $pubsub = $redis->pubsub;
 
 Lazy builds an instance of [Mojo::Redis::PubSub](https://metacpan.org/pod/Mojo::Redis::PubSub) for this object, instead of
 returning a new instance like ["db"](#db) does.
 
 ## url
 
-    $url = $self->url;
-    $self = $self->url(Mojo::URL->new("redis://localhost/3"));
+    $url   = $redis->url;
+    $redis = $redis->url(Mojo::URL->new("redis://localhost/3"));
 
 Holds an instance of [Mojo::URL](https://metacpan.org/pod/Mojo::URL) that describes how to connect to the Redis server.
 
@@ -108,19 +134,19 @@ Holds an instance of [Mojo::URL](https://metacpan.org/pod/Mojo::URL) that descri
 
 ## db
 
-    $db = $self->db;
+    $db = $redis->db;
 
 Returns an instance of [Mojo::Redis::Database](https://metacpan.org/pod/Mojo::Redis::Database).
 
 ## cache
 
-    $cache = $self->cache(%attrs);
+    $cache = $redis->cache(%attrs);
 
 Returns an instance of [Mojo::Redis::Cache](https://metacpan.org/pod/Mojo::Redis::Cache).
 
 ## cursor
 
-    $cursor = $self->cursor(@command);
+    $cursor = $redis->cursor(@command);
 
 Returns an instance of [Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo::Redis::Cursor) with
 ["command" in Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo::Redis::Cursor#command) set to the arguments passed. See
@@ -128,10 +154,10 @@ Returns an instance of [Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo::Redi
 
 ## new
 
-    $self = Mojo::Redis->new("redis://localhost:6379/1");
-    $self = Mojo::Redis->new(Mojo::URL->new->host("/tmp/redis.sock"));
-    $self = Mojo::Redis->new(\%attrs);
-    $self = Mojo::Redis->new(%attrs);
+    $redis = Mojo::Redis->new("redis://localhost:6379/1");
+    $redis = Mojo::Redis->new(Mojo::URL->new->host("/tmp/redis.sock"));
+    $redis = Mojo::Redis->new(\%attrs);
+    $redis = Mojo::Redis->new(%attrs);
 
 Object constructor. Can coerce a string into a [Mojo::URL](https://metacpan.org/pod/Mojo::URL) and set ["url"](#url)
 if present.

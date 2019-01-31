@@ -1,3 +1,16 @@
+3.014     2019-01-31 14:30:16+01:00 Europe/Prague
+
+Drivers:
+* LT::Multext: The sixth character of nouns is not adjform. It is probably
+  reflexivity.
+* LT::Multext: The seventh character of adjectives, sixth of pronouns, seventh
+  of numerals and tenth of verbs is better characterized as definiteness,
+  although adjform is not exactly wrong.
+* LT::Multext: The last character of verbs (participles only) is degree
+  of comparison.
+
+
+
 3.013     2019-01-14 21:42:51+01:00 Europe/Prague
 
 Features:
@@ -5,7 +18,6 @@ Features:
 
 Drivers:
 * LT::Multext
-
 
 
 

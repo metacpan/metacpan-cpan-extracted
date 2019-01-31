@@ -2,7 +2,7 @@
 
 use Mojolicious::Lite;
 
-use Test::More tests => 13;
+use Test::More;
 use Test::Mojo;
 
 use Data::Dumper;
@@ -67,3 +67,5 @@ my %negative       = (
 
 $t->post_ok( '/', form => \%negative )->status_is( 200 )->json_is( \%negative_check );
 $t->post_ok( '/hello', form => \%negative )->status_is( 200 )->json_is( \%negative_check );
+
+done_testing();

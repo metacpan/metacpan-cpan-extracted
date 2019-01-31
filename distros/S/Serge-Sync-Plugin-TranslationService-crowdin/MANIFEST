@@ -27,6 +27,11 @@ t/data/plugins/crowdin/03/commands/push.json
 t/data/plugins/crowdin/03/files/config/serge_test.yml
 t/data/plugins/crowdin/03/files/resources/.gitignore
 t/data/plugins/crowdin/03/translate.serge
+t/data/plugins/crowdin/04/commands/pull.json
+t/data/plugins/crowdin/04/commands/push.json
+t/data/plugins/crowdin/04/files/config/serge_test.yml
+t/data/plugins/crowdin/04/files/resources/.gitignore
+t/data/plugins/crowdin/04/translate.serge
 t/lib/Test/Diff.pm
 t/lib/Test/PluginHost.pm
 t/lib/Test/PluginsConfig.pm

@@ -1,0 +1,69 @@
+{
+   "abstract" : "quick print info about modules in directory at CSV file",
+   "author" : [
+      "Pavel Serikov <pavelsr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-iperlmoddir",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Data::Dump" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "Getopt::Long::Descriptive" : "0",
+            "List::Compare" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Module::Info" : "0",
+            "Module::Metadata" : "0",
+            "Module::Util" : "0",
+            "Package::Constants" : "0",
+            "Text::CSV" : "0",
+            "feature" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "constant" : "0",
+            "lib" : "0",
+            "parent" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pavelsr/iperlmoddir/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pavelsr/iperlmoddir.git",
+         "web" : "https://github.com/pavelsr/iperlmoddir"
+      }
+   },
+   "version" : "1.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
+}
+

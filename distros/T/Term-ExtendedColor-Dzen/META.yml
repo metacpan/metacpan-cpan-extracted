@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/trapd00r/Term-ExtendedColor-Dzen/issues
   repository: https://github.com/trapd00r/Term-ExtendedColor-Dzen
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # prove that Clipboard::Xclip will dig around through the selections until it
 # finds something.
 use strict;
+use warnings;
+
 use lib 'lib';
 use Clipboard;
 use Test::More 'no_plan';

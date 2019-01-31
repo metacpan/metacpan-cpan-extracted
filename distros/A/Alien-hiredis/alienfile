@@ -1,6 +1,7 @@
 use alienfile;
 
 plugin PkgConfig => pkg_name => 'hiredis', minimum_version => '0.9.0';
+plugin 'Build::Make' => make_type => 'gmake';
 
 share {
   start_url 'https://github.com/redis/hiredis/archive/v0.14.0.tar.gz';

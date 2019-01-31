@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use GraphViz2;
+use WebService::Hooktheory;
+
+my $key = shift || die "Usage: perl $0 1234567890abcdefghij [end_point] [query]\n";
+my $ep  = shift || '/trends/nodes';
+my $mod = shift // ''; # http://forum.hooktheory.com/t/trends-api-chord-input/272
+
+my $threshold = 0.2;
+
+my $ws = WebService::Hooktheory->new( activkey => $key );
+
+my @found;
+
+for my $i ( map { $mod . $_ } 1 .. 7 ) {
+    my %query = ( query => { cp => $i } );
+
+    print "Fetching $i...\n";
+    my $r = $ws->fetch( endpoint => $ep, %query );
+
+    for my $item ( @$r ) {
+        if ( $item->{probability} >= $threshold ) {
+            push @found, $item;
+            print "\tFound!\n";
+        }
+    }
+
+    sleep 5;
+}
+
+my $g = GraphViz2->new(
+    global => { directed => 1 },
+    node   => { shape => 'oval' },
+    edge   => { color => 'grey' },
+);
+
+my %nodes;
+my %edges;
+
+for my $item ( @found ) {
+    my ( $i, $j ) = split ',', $item->{child_path};
+
+    $g->add_node( name => $i )
+        unless $nodes{$i}++;
+
+    $g->add_node( name => $j )
+        unless $nodes{$j}++;
+
+    $g->add_edge( from => $i, to => $j, label => $item->{probability} )
+        unless $edges{ $item->{child_path} }++;
+}
+
+$g->run( format => 'png', output_file => $0 . '.png' );

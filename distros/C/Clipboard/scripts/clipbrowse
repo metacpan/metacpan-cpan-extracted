@@ -22,7 +22,7 @@ clipbrowse
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 USAGE
 
@@ -40,7 +40,7 @@ clipbrowse - Load a URL from the clipboard into your browser.
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 MOTIVATION
 

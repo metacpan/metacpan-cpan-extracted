@@ -1,14 +1,83 @@
+NAME
 
+    Mojolicious::Plugin::Data::Validate::WithYAML - validate form input
+    with Data::Validate::WithYAML
 
-This archive contains the distribution Mojolicious-Plugin-Data-Validate-WithYAML,
-version 0.04:
+VERSION
 
-  validate form input with Data::Validate::WithYAML
+    version 0.05
 
-This software is Copyright (c) 2013 by Renee Baecker.
+SYNOPSIS
 
-This is free software, licensed under:
+    In your startup method:
 
-  The Artistic License 2.0 (GPL Compatible)
+      sub startup {
+          my $self = shift;
+      
+          # more Mojolicious stuff
+      
+          $self->plugin(
+              'Data::Validate::WithYAML',
+              {
+                  error_prefix => 'ERROR_',        # optional
+                  conf_path    => '/opt/app/conf', # path to the dir where all the .ymls are (optional)
+              }
+          );
+      }
 
+    In your controller:
+
+      sub register {
+          my $self = shift;
+    
+          # might be (age => 'You are too young', name => 'name is required')
+          # or with error_prefix (ERROR_age => 'You are too young', ERROR_name => 'name is required')
+          my %errors = $self->validate( 'registration' );
+      
+          if ( %errors ) {
+             $self->stash( %errors );
+             $self->render;
+             return; 
+          }
+      
+          # create new user
+      }
+
+    Your registration.yml
+
+      ---
+      age:
+        type: required
+        message: You are too young
+        min: 18
+      name:
+        type: required
+        message: name is required
+      password:
+        type: required
+        plugin: PasswordPolicy
+      website:
+        type: optional
+        plugin: URL
+
+HELPERS
+
+ validate
+
+        my %errors = $controller->validate( $yaml_name );
+
+    Validates the parameters. Optional parameter is $yaml_name. If
+    $yaml_name is ommitted, the subroutine name (e.g. "register") is used.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2013 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

@@ -3,9 +3,9 @@ use Test::More;
 use Mojo::Redis;
 
 my $redis = Mojo::Redis->new;
-like $redis->protocol_class, qr{Protocol::Redis},      'connection_class';
-is $redis->max_connections,  5,                        'max_connections';
-is $redis->url,              'redis://localhost:6379', 'default url';
+is $redis->protocol_class,  'Protocol::Redis',        'connection_class';
+is $redis->max_connections, 5,                        'max_connections';
+is $redis->url,             'redis://localhost:6379', 'default url';
 
 $redis = Mojo::Redis->new('redis://redis.localhost', max_connections => 1);
 is $redis->url, 'redis://redis.localhost', 'custom url';

@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
-$VERSION = '0.059';
+$VERSION = '0.067';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -73,9 +73,10 @@ my $minreq_formerge = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIA
 my $minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
 my $minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
 my $condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
-my $nfilter = 20; # do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
-my $limit_checkdistgrades = 10000; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
-my $limit_checkdistpoints = 10000; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
+my $nfilter = "20"; # do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
+my $limit_checkdistgrades = 20000; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
+my $limit_checkdistpoints = 20000; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
+my $fulldo = "no"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
 my $tee = new IO::Tee(\*STDOUT, ">>$report");
 
 #######################################################################
@@ -573,12 +574,35 @@ sub calcdistgrad
 
 sub calcmaxdist
 {
-  my ( $arr_ref, $factlevels_ref ) = @_;
+  my ( $arr_ref, $factlevels_ref, $limit ) = @_;
+  my $thislimit; # $limit is unused.
   my @arr = @{ $arr_ref };
+
+  my @arrc;
+  #if ( $limit ne "" )
+  #{
+    if ( ( scalar( @arr ) > 3000 ) and ( scalar( @arr ) <= 20000 ) )
+    {
+      $thislimit = int( scalar( @arr ) ** ( 3 / 4 ) );
+      #$thislimit = int( scalar( @arr ) ** ( 2 / 3 ) );
+    }
+    elsif ( scalar( @arr ) > 20000 )
+    {
+      $thislimit = int( scalar( @arr ) ** ( 2 / 3 ) );
+    }
+    else
+    {
+      $thislimit = scalar( @arr );
+    }
+
+    @arrc = shuffle( @arr );
+    @arrc = @arrc[0..$thislimit];
+  #}
+
   my @rawdists;
-  foreach my $el ( @arr )
+  foreach my $el ( @arrc )
   {
-    foreach my $elt ( @arr )
+    foreach my $elt ( @arrc )
     {
       my $hash_ref = calcdist( $el->[1], $elt->[1], $factlevels_ref );
       my %hash = %{ $hash_ref }; #say $tee "00\%hash: " . dump( %hash );
@@ -593,33 +617,42 @@ sub calcmaxdist
 sub wei
 {
   my ( $arr_ref, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count,
-    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints ) = @_;
+    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, $bank_ref, $fulldo ) = @_;
   my @arr = @{ $arr_ref };
   #say $tee "ARR VERY_BEFORE: " . dump(@arr);
   my %factlevels = %{ $factlevels_ref };  #say $tee "AND \%factlevels: " . dump( %factlevels );
   # my ( %magic, %wand, %spell, %bank );
+  my %bank = %{ $bank_ref };
+
+  say "nfilter: $nfilter.";
   $nfilter = ( $nfilter - 1 );
 
-  my @arra;
+  my @arr__ = shuffle( @arr );
+
+  my ( @arra, @arrah );
   if ( $limit_checkdistgrades ne "" )
   {
-    @arra = shuffle( @arr );
-    @arra = @arra[0..$limit_checkdistgrades];
+    @arrah = @arr__;
+    @arra = @arrah[0..$limit_checkdistgrades];
   }
   else
   {
-    @arra = @arr;
+    @arra = @arr__;
   }
 
   my @arrb;
-  if ( $limit_checkdistpoints ne "" )
+  if ( $limit_checkdistgrades ne "" )
   {
-    @arrb = shuffle( @arr );
+    @arrb = @arrah[0..$limit_checkdistpoints];
+  }
+  elsif ( $limit_checkdistpoints ne "" )
+  {
+    @arrb = @arr__;
     @arrb = @arrb[0..$limit_checkdistpoints];
   }
   else
   {
-    @arrb = @arr;
+    @arrb = @arr__;
   }
 
   sub fillbank
@@ -629,6 +662,11 @@ sub wei
     my @arra = @{ $arra_r };
     my %factlevels = %{ $factlevels_r };
 
+    my $nstop;
+    if ( $nfilter ne "" )
+    {
+      $nstop = ( $nfilter * 2 );
+    }
 
     my %bank;
     foreach my $el ( @arr )
@@ -673,23 +711,32 @@ sub wei
               my $benchmark;
               if ( $nfilter ne "" )
               {
-                my @sorteds = sort { $b <=> $a } @{ $bank{$trio}{strengths} };
-                if ( scalar( @sorteds ) > $nfilter )
+                if ( scalar( @{ $bank{$trio}{strengths} } ) > $nstop )
                 {
-                  @{ $bank{$trio}{strengths} } = @sorteds[0..$nfilter];
-                  $benchmark = ${ $bank{$trio}{strengths} }[-1];
+                  $benchmark = ${ $bank{$trio}{strengths} }[$nstop]; #say "BENCHMARK1: $benchmark.";
                 }
                 else
                 {
                   $benchmark = 0;
                 }
               }
+              #say "BENCHMARK2: $benchmark.";
+              #say $tee "\$strength: " . dump( $strength );
 
               if ( ( $strength > $benchmark ) or ( $nfilter eq "" ) )
               {
+                #say "NOW INTO.";
+
                 my $count = 0;
                 foreach my $d10 ( @da1 )
                 { #say $tee "WORKING \$d10: " . dump( $d10 );
+                  #say "IN FOREACH.";
+
+                  if ( ( $nstop ne "" ) and ( scalar( @{ $bank{$trio}{strengths} } ) > $nfilter ) )
+                  {
+                    #say "NEXT!";
+                    next;
+                  }
 
                   my $d11 = $da1par[$count]; #say $tee "WORKING \$d11: " . dump( $d11 );
                   #my $nearness = abs( $d11 - $d21 );
@@ -764,6 +811,7 @@ sub wei
                     $co++;
                   }
                   $count++;
+
                 }
 
               }
@@ -775,9 +823,6 @@ sub wei
     }
     return ( \%bank );
   }
-
-  my %bank = %{ fillbank( \@arr, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter, \@arra ) };
-  say $tee "IN WEI \%bank: " . dump( %bank );
 
   sub clean
   {
@@ -804,17 +849,25 @@ sub wei
     }
     return( \%bank );
   }
-  %bank = %{ clean( %bank ) }; #say $tee "IN WEI CLEANED \%bank: " . dump( %bank ) ;
-  #my %bank =  %{ $bank_ref }; say $tee "CLEANED \%bank: " . dump( %bank );
+
+  if ( !keys %bank )
+  {
+    say $tee "Now in gradients' \%bank.";
+    %bank = %{ fillbank( \@arr__, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter, \@arra ) };
+    %bank = %{ clean( %bank ) }; say $tee "CLEANED \%bank: " . dump( %bank ) ;
+    #my %bank =  %{ $bank_ref }; say $tee "CLEANED \%bank: " . dump( %bank );
+  }
+
 
   sub cyclearr
   {
-    my ( $arr_r, $minreq_forinclusion, $minreq_forgrad, $bank_r, $factlevels, $arrb_r ) = @_;
+    my ( $arr_r, $minreq_forinclusion, $minreq_forgrad, $bank_r, $factlevels, $nfilter, $arrb_r ) = @_;
     my @arr = @{ $arr_r };
     my @arrb = @{ $arrb_r };
     my %bank = %{ $bank_r };
     my %factlevels = %{ $factlevels };
     #say $tee "IN cyclearr ARR: " . dump( @arr );
+    # %nfilter is not used here.
 
     my %wand;
     my $coun = 0;
@@ -969,11 +1022,11 @@ sub wei
           }
         }
       }
-    } #say $tee "END77 \%wand IN: " . dump( %wand );
+    } #say $tee "MAGIC WAND. " . dump( %wand );
     return( \%wand );
   }
 
-  my %wand = %{ cyclearr( \@arr, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, \@arrb ) }; say $tee "\%wand OUT: " . dump( %wand );
+  my %wand = %{ cyclearr( \@arr__, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, $nfilter, \@arrb ) }; say $tee "\%wand OUT: " . dump( %wand );
 
 
   my @limb0;
@@ -987,8 +1040,14 @@ sub wei
       push ( @limb0, [ $wand{$ke}{name}, $wand{$ke}{bulk}, $soughtval, $totstrength ] ); #say $tee "\$avg: $avg"; say $tee "\${ \$magic{\$ke}{\$dee} }->[1] : ${ $magic{$ke}{$dee} }->[1] ";
     }
   }
+
+  if ( $fulldo eq "yes" )
+  {
+    %bank = "";
+  }
+
   #say $tee "LIMBO_WEI: " . dump( @limbo_wei );
-  return( @limb0 )
+  return( \@limb0, \%bank )
 } ##### END SUB wei
 
 
@@ -1467,6 +1526,7 @@ sub interlinear
   #say $tee "ARRIVED IN INTERLINEAR \$blockelts_r ". dump( $blockelts_r );
   #say $tee "ARRIVED IN INTERLINEAR \$reportf $reportf";
   #say $tee "ARRIVED IN INTERLINEAR \$countblock $countblock";
+  my %bank;
 
   if ( $reportf ne "" ){ $report = $reportf; } #say $tee "CHECK5 \$report: " . dump( $report );
   $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
@@ -1487,6 +1547,8 @@ sub interlinear
   close SOURCEFILE;
 
   say $tee "Preparing the dataseries, IN INTERLINEAR: \$countblock $countblock";
+  say "nfilter: $nfilter";
+
   my $aarr_ref;
   ( $aarr_ref, $optformat ) = preparearr( @lines );
 
@@ -1494,11 +1556,14 @@ sub interlinear
 
   say $tee "Checking factors and levels.";
   my %factlevels = %{ prepfactlev( \@aarr ) }; #say $tee "IN INTERLINEAR REALLY \%factlevels: " . dump( \%factlevels );
+  say $tee "Done.";
 
   my ( $factlev_ref ) = tellstepsize( \%factlevels );
   my %factlev = %{ $factlev_ref }; #say $tee "REALLY \%factlev: " . dump( %factlev );
+  say $tee "Understood step sizes.";
 
-  my $maxdist = calcmaxdist( \@aarr, \%factlev ); #say $tee "001\$maxdist: " . dump( $maxdist );
+  my $maxdist = calcmaxdist( \@aarr, \%factlev, $limit_checkdistpoints );
+  say $tee "DONE CALCMAXDIST: " . dump( $maxdist );
 
   my $count = 0;
   while ( $count < $maxloops )
@@ -1516,7 +1581,7 @@ sub interlinear
     #say $tee "COUNT: " . dump( $count + 1 );
     my $mode__ = $mode[$count] ;
 
-    my ( @limbo_wei, @limbo_purelin, @limbo_near, @limbo, %bank, %wand );
+    my ( @limbo_wei, @limbo_purelin, @limbo_near, @limbo, %wand );
 
 
     #if ( ( $mode__ eq "vault" ) or ( $mode__ eq "mix" ) )
@@ -1550,7 +1615,11 @@ sub interlinear
 
     if ( ( $mode__ eq "wei" ) or ( $mode__ eq "mix" ) )
     {
-      @limbo_wei = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints );
+      my ( $limbo_wei_ref, $bank_ref ) = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, \%bank, $fulldo );
+
+      @limbo_wei = @{ $limbo_wei_ref };
+      %bank = %{ $bank_ref };
+
       say $tee "THERE ARE " . scalar( @limbo_wei ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR WEIGHTED GRADIENT INTERPOLATION OF THE NEAREST NEIGHBOUR.";
     }
     #say $tee "OBTAINED LIMBO_WEI: " . dump( @limbo_wei );
@@ -1722,6 +1791,7 @@ Sim::OPT::Interlinear
   # or as a script, from the command line, from a directory where the file "Interlinear.pm" has been copied:
   interlinear .
   # (note the dot at the end). In that case, Interlinear will look for the source file "sourcefile.csv" in the "$HOME" directory, and restitute back a file "sourcefile_meta.csv" in the same directory.
+  # and also, note that, in this case, the opening lines in the script saying "use Sim::OPT" etc. have to be deleted.
   # or, again, from the command line, for beginning with a dialogue question:
   interlinear interstart
 

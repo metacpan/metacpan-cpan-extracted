@@ -51,7 +51,12 @@ sub main {
     }
 
     my $clver = get_cl_version();
-    return warn_cl_version_bad() if $clver lt $minclversion;
+
+    my ($thismajor, $thisminor, $thispatch) = split/\./, $clver;
+    my ($minmajor, $minminor, $minpatch) = split/\./, $minclversion;
+    if($thismajor < $minmajor || ($thismajor == $minmajor && $thisminor < $minmajor) || (thismajor == $minmajor && $thisminor == $minminor && $thispatch < $minpatch)) {
+        return warn_cl_version_bad($clver);
+    }
 
     my $inc = get_cl_inc_paths();
     my $libs = get_cl_libs();
@@ -87,7 +92,8 @@ sub main {
 }
 
 sub warn_cl_version_bad {
-    warn "The clamav version you are using is too old. Please upgrade to at least $minclversion\n";
+    my $clver = shift;
+    warn "The clamav version ($clver) you are using is too old. Please upgrade to at least $minclversion\n";
     return 0;
 }
 

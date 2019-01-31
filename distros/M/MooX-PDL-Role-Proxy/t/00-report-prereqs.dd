@@ -92,12 +92,14 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Exporter' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Moo' => '0',
                                    'PDL::Lite' => '0',
+                                   'Test2::API' => '0',
                                    'Test2::Tools::PDL' => '0',
                                    'Test2::V0' => '0',
                                    'Test::Lib' => '0',

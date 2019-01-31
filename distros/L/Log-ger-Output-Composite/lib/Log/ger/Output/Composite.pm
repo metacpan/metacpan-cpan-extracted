@@ -1,7 +1,7 @@
 package Log::ger::Output::Composite;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2019-01-31'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use strict;
 use warnings;
@@ -24,6 +24,27 @@ sub _get_min_max_level {
 
 sub get_hooks {
     my %conf = @_;
+
+    # check arguments
+    for my $k (keys %conf) {
+        my $conf = $conf{$k};
+        if ($k eq 'outputs') {
+            for my $o (keys %$conf) {
+                for my $oconf (ref $conf->{$o} eq 'ARRAY' ?
+                                   @{ $conf->{$o} } : $conf->{$o}) {
+                    for my $k2 (keys %$oconf) {
+                        unless ($k2 =~
+                                    /\A(conf|level|category_level|layout)\z/) {
+                            die "Unknown configuration for output '$o': '$k2'";
+                        }
+                    }
+                }
+            }
+        } elsif ($k =~ /\A(category_level)\z/) {
+        } else {
+            die "Unknown configuration: '$k'";
+        }
+    }
 
     my @ospecs;
     {
@@ -244,7 +265,7 @@ Log::ger::Output::Composite - Composite output
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -279,7 +300,6 @@ version 0.007
          ],
      },
      category_level => {                                        # set per-category level. optional.
-
         'MyApp::SubModule1' => 'info',
         'MyApp::SubModule2' => 'debug',
         ...
@@ -373,7 +393,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

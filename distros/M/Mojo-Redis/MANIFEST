@@ -28,6 +28,7 @@ t/db.t
 t/geo.t
 t/method-coverage.t
 t/pipelining.t
+t/pubsub-reconnect.t
 t/pubsub.t
 t/redis.t
 t/scripting.t

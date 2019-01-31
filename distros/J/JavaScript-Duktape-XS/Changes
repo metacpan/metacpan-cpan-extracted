@@ -1,3 +1,10 @@
+0.000075    2019-00-31
+            * Fix memory leak associated to checking for cyclic data.
+            * Properly cleanup duktape stack in several cases.
+            * Add test for calling Perl callback with non-Perl args.
+            * Support passing Perl objects with magic into JS.
+            * Allow proper dying from perl module handlers.
+
 0.000074    2018-09-11
             * Treat references with more care:
               + Recursively dereference any references.

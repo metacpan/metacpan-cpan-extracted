@@ -71,6 +71,19 @@ $pubsub->{chans}{'__keyevent@1__:del *'} = [$cb];
 is $pubsub->keyspace_unlisten(undef, 'del', {db => 1}), $pubsub, 'keyspace_unlisten without callback';
 ok !$pubsub->{chans}{'__keyevent@1__:del *'}, 'callback is removed';
 
+note 'test json data';
+@messages = ();
+$pubsub->json("rtest:$$:1");
+$pubsub->listen("rtest:$$:1" => \&gather);
+Mojo::IOLoop->timer(
+  0.2 => sub {
+    $pubsub->notify("rtest:$$:1" => {some => 'data'});
+    $pubsub->notify("rtest:$$:1" => 'just a string');
+  }
+);
+Mojo::IOLoop->start;
+is_deeply \@messages, [{some => 'data'}, 'just a string'], 'got json messages';
+
 done_testing;
 
 sub gather {

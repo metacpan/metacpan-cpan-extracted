@@ -1,0 +1,23 @@
+==================================================
+Changes from 2018-01-31 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 1.0 at 2019-01-31 16:25:44 +0000
+----------------------------------------
+
+  Change: 28717a1adbbeb2ed71543e526e472ee606fb80c7
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2019-01-31 19:24:43 +0000
+
+    Added README.md and fixed pod 
+
+  Change: 93708f4abfe83744f28ba71ddcc8fdd05b24b999
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2019-01-31 19:19:35 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

@@ -13,6 +13,8 @@
 
 static duk_ret_t perl_caller(duk_context* ctx);
 
+static HV* seen;
+
 static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
 {
     SV* ret = &PL_sv_undef; /* return undef by default */
@@ -138,6 +140,11 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
 static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int ref)
 {
     int ret = 1;
+    if (SvTYPE(value) >= SVt_PVMG) {
+        /* any Perl SV that has magic (think tied objects) needs to have that
+         * magic actually called to retrieve the value */
+        mg_get(value);
+    }
     if (!SvOK(value)) {
         duk_push_null(ctx);
     } else if (sv_isa(value, PL_JSON_BOOLEAN_CLASS)) {
@@ -273,17 +280,21 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
 
 SV* pl_duk_to_perl(pTHX_ duk_context* ctx, int pos)
 {
-    HV* seen = newHV();
+    if (!seen) {
+        seen = newHV();
+    }
     SV* ret = pl_duk_to_perl_impl(aTHX_ ctx, pos, seen);
-    hv_undef(seen);
+    hv_clear(seen);
     return ret;
 }
 
 int pl_perl_to_duk(pTHX_ SV* value, duk_context* ctx)
 {
-    HV* seen = newHV();
+    if (!seen) {
+        seen = newHV();
+    }
     int ret = pl_perl_to_duk_impl(aTHX_ value, ctx, seen, 0);
-    hv_undef(seen);
+    hv_clear(seen);
     return ret;
 }
 
@@ -350,6 +361,7 @@ int pl_call_perl_sv(duk_context* ctx, SV* func)
     duk_idx_t j = 0;
     duk_idx_t nargs = 0;
     SV* ret = 0;
+    SV *err_tmp;
 
     /* prepare Perl environment for calling the CV */
     dTHX;
@@ -365,10 +377,18 @@ int pl_call_perl_sv(duk_context* ctx, SV* func)
         mXPUSHs(val);
     }
 
+    /* you would think we need to pop off the args from duktape's stack, but
+     * they get popped off somewhere else, probably by duktape itself */
+
     /* call actual Perl CV, passing all params */
     PUTBACK;
     call_sv(func, G_SCALAR | G_EVAL);
     SPAGAIN;
+
+    err_tmp = ERRSV;
+    if (SvTRUE(err_tmp)) {
+        croak("Perl sub died with error: %s", SvPV_nolen(err_tmp));
+    }
 
     /* get returned value from Perl and push its JS equivalent back in */
     /* duktape's stack */
@@ -385,12 +405,13 @@ int pl_call_perl_sv(duk_context* ctx, SV* func)
 static int find_last_dot(const char* name, int* len)
 {
     int last_dot = -1;
-    *len = 0;
-    for (; name[*len] != '\0'; ++*len) {
-        if (name[*len] == '.') {
-            last_dot = *len;
+    int l = 0;
+    for (; name[l] != '\0'; ++l) {
+        if (name[l] == '.') {
+            last_dot = l;
         }
     }
+    *len = l;
     return last_dot;
 }
 
@@ -401,18 +422,26 @@ static int find_global_or_property(duk_context* ctx, const char* name)
     int last_dot = find_last_dot(name, &len);
     if (last_dot < 0) {
         if (duk_get_global_string(ctx, name)) {
+            /* that leaves global value in stack, for caller to deal with */
             ret = 1;
+        } else {
+            duk_pop(ctx); /* pop value (which was undef) */
         }
     } else {
         if (duk_peval_lstring(ctx, name, last_dot) == 0) {
+            /* that leaves object containing value in stack */
             if (duk_get_prop_lstring(ctx, -1, name + last_dot + 1, len - last_dot - 1)) {
+                /* that leaves value in stack */
                 ret = 1;
-                duk_swap(ctx, -2, -1);
-                duk_pop(ctx); /* pop object, leave value */
+
+                /* have [object, value], need just [value] */
+                duk_swap(ctx, -2, -1); /* now have [value, object] */
+                duk_pop(ctx); /* pop object, leave canoli... er, value */
             } else {
                 duk_pop_2(ctx); /* pop object and value (which was undef) */
             }
         } else {
+            duk_pop(ctx); /* pop error */
         }
     }
     return ret;
@@ -449,9 +478,9 @@ SV* pl_instanceof_global_or_property(pTHX_ duk_context* ctx, const char* object,
             if (duk_instanceof(ctx, -2, -1)) {
                 ret = &PL_sv_yes;
             }
-            duk_pop(ctx);
+            duk_pop(ctx); /* pop class */
         }
-        duk_pop(ctx);
+        duk_pop(ctx); /* pop value */
     }
     return ret;
 }
@@ -460,7 +489,9 @@ SV* pl_get_global_or_property(pTHX_ duk_context* ctx, const char* name)
 {
     SV* ret = &PL_sv_undef; /* return undef by default */
     if (find_global_or_property(ctx, name)) {
+        /* Convert found value to Perl and pop it off the stack */
         ret = pl_duk_to_perl(aTHX_ ctx, -1);
+        duk_pop(ctx);
     }
     return ret;
 }
@@ -469,23 +500,36 @@ int pl_set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* valu
 {
     int len = 0;
     int last_dot = 0;
-    if (!pl_perl_to_duk(aTHX_ value, ctx)) {
+
+    // fprintf(stderr, "STACK: %ld\n", (long) duk_get_top(ctx));
+
+    if (pl_perl_to_duk(aTHX_ value, ctx)) {
+        /* that put value in stack */
+    } else {
         return 0;
     }
     last_dot = find_last_dot(name, &len);
     if (last_dot < 0) {
-        if (!duk_put_global_lstring(ctx, name, len)) {
+        if (duk_put_global_lstring(ctx, name, len)) {
+            /* that consumed value that was in stack */
+        } else {
+            duk_pop(ctx); /* pop value */
             croak("Could not save duk value for %s\n", name);
         }
     } else {
         duk_push_lstring(ctx, name + last_dot + 1, len - last_dot - 1);
-        if (duk_peval_lstring(ctx, name, last_dot) != 0) {
+        /* that put key in stack */
+        if (duk_peval_lstring(ctx, name, last_dot) == 0) {
+            /* that put object in stack */
+        } else {
+            duk_pop_2(ctx);  /* object (error) and value */
             croak("Could not eval JS object %*.*s: %s\n",
                   last_dot, last_dot, name, duk_safe_to_string(ctx, -1));
         }
         /* Have [value, key, object], need [object, key, value], hence swap */
         duk_swap(ctx, -3, -1);
-        duk_put_prop(ctx, -3);
+
+        duk_put_prop(ctx, -3); /* consumes key and value */
         duk_pop(ctx); /* pop object */
     }
     return 1;
@@ -499,13 +543,16 @@ int pl_del_global_or_property(pTHX_ duk_context* ctx, const char* name)
         duk_push_global_object(ctx);
         duk_del_prop_lstring(ctx, -1, name, len);
     } else {
-        if (duk_peval_lstring(ctx, name, last_dot) != 0) {
+        if (duk_peval_lstring(ctx, name, last_dot) == 0) {
+            /* that put object in stack */
+        } else {
+            duk_pop(ctx);  /* object (error) */
             croak("Could not eval JS object %*.*s: %s\n",
                   last_dot, last_dot, name, duk_safe_to_string(ctx, -1));
         }
         duk_del_prop_lstring(ctx, -1, name + last_dot + 1, len - last_dot - 1);
     }
-    duk_pop(ctx); /* pop (global) object */
+    duk_pop(ctx); /* pop global or property object */
     return 1;
 }
 
@@ -554,6 +601,8 @@ SV* pl_eval(pTHX_ Duk* duk, const char* js, const char* file)
         /* This call only returns after the eventloop terminates. */
         rc = duk_safe_call(ctx, eventloop_run, duk, 0 /*nargs*/, 1 /*nrets*/);
         check_duktape_call_for_errors(rc, ctx);
+
+        duk_pop(ctx); /* pop return value from duk_safe_call */
     } while (0);
 
     return ret;

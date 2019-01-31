@@ -29,10 +29,10 @@ package main;
     );
 
     # TEST
-    ok ($validator, 'Validator was initialised.');
+    ok( $validator, 'Validator was initialised.' );
 
     $validator->is_valid();
 
     # TEST
-    ok (1, 'Reached here');
+    ok( 1, 'Reached here' );
 }

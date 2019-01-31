@@ -8,7 +8,7 @@ use strict;
 use Serge::Util qw(subst_macros);
 use version;
 
-our $VERSION = qv('0.901.0');
+our $VERSION = qv('0.902.0');
 
 sub name {
     return 'Crowdin translation software (https://crowdin.com) synchronization plugin';
@@ -23,7 +23,10 @@ sub init {
 
     $self->merge_schema({
         config_file => 'STRING',
-        upload_translations => 'BOOLEAN'
+        upload_translations => 'BOOLEAN',
+        import_duplicates => 'BOOLEAN',
+        import_eq_suggestions => 'BOOLEAN',
+        auto_approve_imported => 'BOOLEAN',
     });
 }
 
@@ -34,11 +37,17 @@ sub validate_data {
 
     $self->{data}->{config_file} = subst_macros($self->{data}->{config_file});
     $self->{data}->{upload_translations} = subst_macros($self->{data}->{upload_translations});
+    $self->{data}->{import_duplicates} = subst_macros($self->{data}->{import_duplicates});
+    $self->{data}->{import_eq_suggestions} = subst_macros($self->{data}->{import_eq_suggestions});
+    $self->{data}->{auto_approve_imported} = subst_macros($self->{data}->{auto_approve_imported});
 
     die "'config_file' not defined" unless defined $self->{data}->{config_file};
     die "'config_file', which is set to '$self->{data}->{config_file}', does not point to a valid file.\n" unless -f $self->{data}->{config_file};
 
     $self->{data}->{upload_translations} = 1 unless defined $self->{data}->{upload_translations};
+    $self->{data}->{import_duplicates} = 0 unless defined $self->{data}->{import_duplicates};
+    $self->{data}->{import_eq_suggestions} = 0 unless defined $self->{data}->{import_eq_suggestions};
+    $self->{data}->{auto_approve_imported} = 0 unless defined $self->{data}->{auto_approve_imported};
 }
 
 sub run_crowdin_cli {
@@ -76,7 +85,17 @@ sub push_ts {
     }
 
     if ($self->{data}->{upload_translations}) {
-        $cli_return = $self->run_crowdin_cli('upload translations', $langs);
+        my $action = 'upload translations';
+        if ($self->{data}->{import_duplicates}) {
+            $action .= ' --import-duplicates';
+        }
+        if ($self->{data}->{import_eq_suggestions}) {
+            $action .= ' --import-eq-suggestions'
+        }
+        if ($self->{data}->{auto_approve_imported}) {
+            $action .= ' --auto-approve-imported'
+        }
+        $cli_return = $self->run_crowdin_cli($action, $langs);
     }
 
     return $cli_return;

@@ -1,0 +1,19 @@
+lib/Music/KNRadio/NowPlaying.pm
+bin/knnp
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-pod.t
+t/10-strict.t
+t/20-synopsis.t
+t/30-eol.t
+t/30-fixme.t
+t/30-notabs.t
+t/40-kwalitee.t
+t/50-complexity.t
+t/60-pod-coverage.t
+t/60-pod-syntax.t
+t/80-minperl.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

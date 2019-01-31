@@ -35,6 +35,8 @@ Mojo::IOLoop->timer(
 
 Mojo::IOLoop->start;
 
+plan skip_all => 'xread is not supported' if $err and $err =~ m!unknown command!i;
+
 ok !$err, 'no error' or diag $err;
 is $len, 2, 'xlen';
 is_deeply $range->[1][1], [xn => 22], 'xrange[1]' or diag explain($range);

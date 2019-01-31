@@ -1,5 +1,8 @@
 Revision history for Perl extension Mail::ClamAV.
 
+0.30  Thu Jan 31 12:00:00 CET 2019
+  - Fix Makefile.PL to detect clamav version correctly
+
 0.29  Wed Apr 29 18:02:17 CDT 2009
   - Makefile.PL dies with 'No support for OS' when OS is unsupported, per
     recommended solution at http://wiki.cpantesters.org/wiki/CPANAuthorNotes

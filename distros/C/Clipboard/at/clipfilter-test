@@ -8,4 +8,4 @@ perl -Ilib scripts/clipfilter -html # TODO: | tail <--buggy
 reset_data
 perl -Ilib scripts/clipfilter -uri
 reset_data
-perl -Ilib scripts/clipfilter tac 
+perl -Ilib scripts/clipfilter tac

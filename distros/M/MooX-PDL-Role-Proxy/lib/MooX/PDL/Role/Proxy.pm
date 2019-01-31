@@ -5,7 +5,7 @@ package MooX::PDL::Role::Proxy;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Types::Standard -types;
 
@@ -252,7 +252,7 @@ MooX::PDL::Role::Proxy - treat a container of piddles as if it were a piddle
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -358,6 +358,15 @@ operation, see the provided L</_set_attrs> method.
 
 To support inplace operations, attributes tagged with the C<piddle>
 option must have write accessors.  They may be public or private.
+
+=head2 Nested Proxy Objects
+
+A class with the applied role should respond equivalently to a true
+piddle when the supported methods are called on it (it's a bug
+otherwise).  Thus, it is possible for a proxy object to contain
+another, and as long as the contained object has the C<piddle>
+attribute set, the supported method will be applied to the
+contained object appropriately.
 
 =head1 METHODS
 

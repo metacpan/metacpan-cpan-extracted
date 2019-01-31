@@ -7,7 +7,7 @@ use Carp;
 
 our $VERSION;
 BEGIN {
-    $VERSION = '0.29';
+    $VERSION = '0.30';
 }
 
 # guard against memory errors not being reported
@@ -941,6 +941,8 @@ The ClamAV API documentation L<http://www.clamav.net/doc/html-0.65/node44.html>
 =head1 AUTHOR
 
 David P.C. Wollmann E<lt>converter42@gmail.comE<gt>
+
+Co-Maintainer: Rene Schickbauer E<lt>cavac@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
