@@ -5,6 +5,7 @@ no warnings 'numeric';
 use Data::RecordStore;
 
 use Data::Dumper;
+use File::Copy::Recursive qw/dircopy/;
 use File::Path qw/remove_tree/;
 use File::Temp qw/ :mktemp tempdir /;
 use Test::More;
@@ -14,14 +15,15 @@ $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 BEGIN {
     use_ok( "Data::RecordStore" ) || BAIL_OUT( "Unable to load Data::RecordStore" );
-    use_ok( "Data::RecordStore::Converter" ) || BAIL_OUT( "Unable to load Data::RecordStore" );
+    use_ok( "Data::RecordStore::Converter" ) || BAIL_OUT( "Unable to load Data::RecordStore::Converter" );
 }
 
 my $is_windows = $^O eq 'MSWin32';
 
-
-test_suite();
-
+eval {
+    test_suite();
+};
+fail( "failed $@ $! $?") if $@;
 done_testing;
 
 exit;
@@ -37,66 +39,113 @@ sub test_suite {
   sub check {
     my( $store, $size, $old_id, $new_id, $ver ) = @_;
     my $d = $store->fetch( $id ) || '';
-    is( length( $d ), $size, "converting $id from old store $old_id to new store $new_id for version $ver" );
+    is( length( $d ), $size, "converting $id from old silo $old_id to new silo $new_id for version $ver" );
     if ( $d eq 'x'x$size ) {
-      pass( "converting $id from old store $old_id to new store $new_id for version $ver" );
+      pass( "converting $id from old silo $old_id to new silo $new_id for version $ver" );
     }
     else {
-      fail( "converting $id from old store $old_id to new store $new_id for version $ver" );
+      fail( "converting $id from old silo $old_id to new silo $new_id for version $ver" );
     }
     $id++;
   }
 
+  sub failright {
+      my( $sub, $failmsg, $errrx, $succmsg ) = @_;
+      eval {
+          &$sub();
+          fail( $failmsg );
+      };
+      like( $@, $errrx, $succmsg );
+  }
+
   # test the directory that isn't there, really.
-  my $notthere = tempdir( CLEANUP => 1 )."/nothing_here";
-  eval {
-    Data::RecordStore::Converter::convert( "$base/4.03" );
-    fail( "did not die when trying to convert to ja not there directory" );
-  };
-  like( $@, qr/must be given a destination/, "error message for convert dest directory not there" );
+  my $notthere       = tempdir( CLEANUP => 1 )."/nothing_here";
+  my $notthere_too   = "$notthere/../nothing_here_too";
+  my $notthere_three = "$notthere/../nothing_here_three";
 
-  my $isthere = tempdir( CLEANUP => 1 );
-  eval {
-    Data::RecordStore::Converter::convert( $notthere, $isthere );
-    fail( "did not die when trying to convert from a not there directory" );
-  };
-  like( $@, qr/cannot find source directory/, "error message for source dest directory not there" );
+  my $isthere     = tempdir( CLEANUP => 1 );
+  my $isthere_too = tempdir( CLEANUP => 1 );
 
-  eval {
-    Data::RecordStore::Converter::convert( $notthere );
-    fail( "did not die when trying to convert to a not there directory and from a not there directory" );
-  };
-  like( $@, qr/must be given a destination/, "error message for convert dest directory not there" );
+  # error matrix
+  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03" ); },
+             "did not die when trying given no destination directory",
+             qr/must be given a destination/, 
+             "error message for convert dest directory not given" );
 
+  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03", $notthere ); },
+             "did not die when given no working directory",
+             qr/must be given a working/,
+             "error message for convert working directory not given" );
+
+  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03", $notthere, $notthere ); },
+             "did not die when working directory same as dest directory",
+             qr/destination and working directories may not be the same/,
+             "error message for same dest and working directory" );
+
+  failright( sub { Data::RecordStore::Converter->convert( $notthere, $notthere_too, $notthere_three ); },
+             "did not die when working directory same as dest directory",
+             qr/cannot find source directory/,
+             "error message for source directory missing" );
+
+  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03", $isthere, $notthere ); },
+             "did not die when dest directory exists",
+             qr/destination directory.*already exists/i,
+             "error message for existing dest directory" );
+
+  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03", $notthere, $isthere ); },
+             "did not die when working directory exists",
+             qr/working directory.*already exists/i,
+             "error message for existing working directory" );
+
+  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03", $isthere, $isthere_too ); },
+             "did not die when dest directory exists",
+             qr/destination directory.*already exists/i,
+             "error message for existing dest directory" );
 
   for my $old_version_store (grep { $_ > 0 } @subs) {
 
     diag "Testing $old_version_store";
-    my $new_version_store = tempdir( CLEANUP => 1 )."/new_version";
+    my $tmp = tempdir( CLEANUP => 1 );
+    my $dest_dir = "$tmp/new_version";
+    my $working_dir = "$tmp/working";
+    my $source_dir  = "$tmp/old_version";
 
-    my $source_dir = "$base/$old_version_store";
+    # copy the source dir to a temp directory
+    dircopy( "$base/$old_version_store", $source_dir );
 
     $id = 1;
-    if( $old_version_store eq '4.03' ) {
+    if( $old_version_store eq '5.0' ) {
       local( *STDERR );
       my $out;
       open( STDERR, ">>", \$out );
       
-      Data::RecordStore::Converter::convert( $source_dir, $new_version_store );
+      Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
       like( $out, qr/already at version/, 'warning message for trying to convert store that didnt need it' );
       close $out;
 
-      ok( Data::RecordStore::open_store( $source_dir ), "able to open correct version" );
-    }
-    elsif( $old_version_store eq '3.22' ) {
-      eval {
-        Data::RecordStore::open_store( $source_dir );
-        fail( "was able to open store with older version" );
-      };
-      like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
+      ok( Data::RecordStore->open_store( $source_dir ), "able to open correct version" );
+    } #5.0
+    if( $old_version_store eq '4.03' ) {
 
-      Data::RecordStore::Converter::convert( $source_dir, $new_version_store );
-      my $store = Data::RecordStore::open_store( $new_version_store );
+        Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
+
+        my $store = Data::RecordStore->open_store( $dest_dir );
+        
+
+        # the store created was touched up manually, the last few blank entries not created by the creation program. 
+        # Make them match and update the tests.";
+        is( $store->entry_count, 49, '4 store has 49 entries' );
+        is( $store->active_entry_count, 37, '4 store has 37 active entries' );
+        is( $store->record_count, 37, '4 store has 37 records' );
+    } #4.03
+    elsif( $old_version_store eq '3.22' ) {
+      failright( sub { Data::RecordStore->open_store( $source_dir ); },
+                 "was able to open store with older version",
+                 qr/run the record_store_convert/,
+                 "fail message for opening store without version" );
+
+      Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
+      my $store = Data::RecordStore->open_store( $dest_dir );
 
       #the store created was touched up manually, the last few blank entries not created by the creation program. Make them match and update the tests.";
       is( $store->entry_count, 45, 'converted store has 45 entries' );
@@ -141,16 +190,16 @@ sub test_suite {
         $last_new_id = $new_store_id;
         $old_min_size = $old_max_size + 1;
       }
-    } 
+    } #3.22 
     elsif( $old_version_store eq '3.00' ) {
       eval {
-        Data::RecordStore::open_store( $source_dir );
+        Data::RecordStore->open_store( $source_dir );
         fail( "was able to open store with older version" );
       };
       like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
 
-      Data::RecordStore::Converter::convert( $source_dir, $new_version_store );
-      my $store = Data::RecordStore::open_store( $new_version_store );
+      Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
+      my $store = Data::RecordStore->open_store( $dest_dir );
 
       is( $store->entry_count, 49, 'converted store has 49 entries' );
       is( $store->active_entry_count, 37, 'converted store has 37 active entries' );
@@ -199,17 +248,17 @@ sub test_suite {
         $old_min_size = $old_max_size + 1;
       }
       
-    }
+    } #3.00
     elsif( $old_version_store eq '2.03' ) {
       eval {
-        Data::RecordStore::open_store( $source_dir );
+        Data::RecordStore->open_store( $source_dir );
         fail( "was able to open store with older version" );
       };
       like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
 
 
-      Data::RecordStore::Converter::convert( $source_dir, $new_version_store );
-      my $store = Data::RecordStore::open_store( $new_version_store );
+      Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
+      my $store = Data::RecordStore->open_store( $dest_dir );
 
       is( $store->entry_count, 49, 'converted store has 49 entries' );
       is( $store->active_entry_count, 37, 'converted store has 37 active entries' );
@@ -257,18 +306,18 @@ sub test_suite {
         $last_new_id = $new_store_id;
         $old_min_size = $old_max_size + 1;
       }
-    }
+    } #2.03
     elsif( $old_version_store eq '1.07' ) {
 
       eval {
-        Data::RecordStore::open_store( $source_dir );
+        Data::RecordStore->open_store( $source_dir );
         fail( "was able to open store with older version" );
       };
       like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
 
 
-      Data::RecordStore::Converter::convert( $source_dir, $new_version_store );
-      my $store = Data::RecordStore::open_store( $new_version_store );
+      Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
+      my $store = Data::RecordStore->open_store( $dest_dir );
 
       #the store created was touched up manually, the last few blank entries not created by the creation program. Make them match and update the tests.";
       is( $store->entry_count, 24, 'converted store has 24 entries' );
@@ -311,8 +360,10 @@ sub test_suite {
         $last_new_id = $new_store_id;
         $old_min_size = $old_max_size + 1;
       }
-      
-      
+    } # 1.07
+    
+    if( $old_version_store < 5 ) {
+        is( Data::RecordStore->detect_version( $dest_dir ), 5, "upgrade to current version" );
     }
   } #each version test
 } #test_suite

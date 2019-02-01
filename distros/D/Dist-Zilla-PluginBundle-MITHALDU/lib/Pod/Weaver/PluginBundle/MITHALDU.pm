@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Pod::Weaver::PluginBundle::MITHALDU;
-our $VERSION = '1.172230'; # VERSION
+our $VERSION = '1.190321'; # VERSION
 
 use Pod::Weaver::Config::Assembler;
 
@@ -97,7 +97,7 @@ Pod::Weaver::PluginBundle::MITHALDU - MITHALDU's default Pod::Weaver config
 
 =head1 VERSION
 
-version 1.172230
+version 1.190321
 
 =head1 DESCRIPTION
 

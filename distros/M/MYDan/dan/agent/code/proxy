@@ -171,7 +171,8 @@ eval
 		eval{ $filecache->save( $temp ); };
 		warn "save filecache fail: $@" if $@;
 
-        return unless my $file = $filecache->check( $filemd5 );
+        my $file = $filecache->check( $filemd5 ) || $temp;
+
         syswrite( \*STDOUT, "MYDanExtractFile_::${file}::_MYDanExtractFile" );
         syswrite \*STDOUT, "$size:$filemd5:$own:$mode:";
     }

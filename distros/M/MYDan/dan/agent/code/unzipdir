@@ -1,0 +1,118 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+
+local $/ = "\n";
+
+my ( $path, $uuid, $chmod, $chown, $delete ) = map{ $param{argv}{$_}}qw( path uuid chmod chown delete );
+
+my $idie = sub{ print shift;exit 1; };
+my $call = sub
+{
+	my $cmd = shift;
+	my $pid = open( my $H, "$cmd|" );
+	my @list = <$H>;
+	chomp @list;
+	waitpid( $pid, 0 );
+	&$idie( "run $cmd fail" ) if $? >> 8;
+	close $H;
+	return @list;
+};
+
+&$idie( "uuid format error:$uuid" ) unless $uuid && $uuid =~ /^[a-zA-Z0-9]+$/;
+
+my $prefix = '.TEMP_MYDan_Grsync_';
+my $temp = "${prefix}$uuid";
+
+for my $p ( @$path )
+{
+    &$idie( "cd $p fail" ) unless chdir $p;
+    &$idie( "nofile $temp" ) unless -f $temp;
+    &$idie( "untar fail: $!" ) if system "tar -zxf $temp";
+
+    my $dirlist = eval{ YAML::XS::LoadFile "$temp.dlist" };
+    &$idie( "load $temp.dlist fail: $@" ) if $@;
+
+    for my $d ( @$dirlist )
+    {
+        if( ref $d )
+        {
+            my ( $dir, $mode, $owner ) = @$d;
+            unless( -d $dir )
+            {
+                &$idie( "mkdir $dir fail" ) unless mkdir $dir;
+            }
+
+            &$idie( "chmod fail:$!( chmod $mode $dir )" ) if system "chmod $mode '$dir'";
+
+            if( defined $owner )
+            {
+                &$idie( "getpwnam fail" ) unless my @pw = getpwnam $owner;
+                &$idie( "getpwnam fail" ) unless my $gname  = getgrgid($pw[3]);
+                &$idie( "chmod fail:$!" ) if system "chown $chown.$gname '$dir'";
+            }
+            else
+            {
+                print "[warn]$dir not chown\n";
+            }
+        }
+        else
+        {
+            unless( -d $d )
+            {
+                &$idie( "mkdir $d fail" ) unless mkdir $d;
+            }
+        }
+    }
+
+    if( defined $chmod )
+    {
+        &$idie( "chmod format error: $chmod" ) unless $chmod =~ /^\d+$/;
+        &$idie( "chmod fail:$!" ) if system "chmod $chmod . -R";
+    }
+
+    if( defined $chown )
+    {
+        &$idie( "chown format error: $chown" ) unless $chown =~ /^[a-zA-Z0-9_\-\.]+$/;
+        &$idie( "getpwnam fail" ) unless my @pw = getpwnam $chown;
+        &$idie( "getpwnam fail" ) unless my $gname = getgrgid($pw[3]);
+        &$idie( "chmod fail:$!" ) if system "chown $chown.$gname . -R";
+    }
+
+    if( $delete )
+    {
+        my $list = eval{ YAML::XS::LoadFile "$temp.flist" };
+        &$idie( "load flist fail: $@" ) if $@;
+        my %list = map{ $_ => 1 }@$list;
+
+        my @file = &$call( 'find . -type f && find . -type l' );
+        map{ 
+            unless( $_ =~ /^\.\/\.TEMP_MYDan_Grsync_/ || $list{$_} )
+            {
+                print "delete: $_\n";
+                &$idie( "unlink $_ fail" ) unless unlink $_;
+            }
+        }@file;
+
+        $list = eval{ YAML::XS::LoadFile "$temp.dlist" };
+        &$idie( "load dlist fail: $@" ) if $@;
+        %list = map{ ref $_ ? ( $_->[0]  => 1 ) : ( $_ => 1 ) }@$list;
+
+        my @file = &$call( 'find . -type d' );
+        chomp @file;
+        map{ 
+            unless( $list{$_} )
+            {
+                print "delete: $_\n";
+                &$idie( "rmdir $_ fail" ) unless rmdir $_;
+            }
+        }@file;
+    }
+}
+
+exit 0;

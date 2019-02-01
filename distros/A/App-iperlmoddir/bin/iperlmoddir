@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package iperlmoddir;
-$iperlmoddir::VERSION = '1.0';
+$iperlmoddir::VERSION = '1.02';
 use Getopt::Long::Descriptive;
 use App::iperlmoddir;
 use Data::Dumper;
@@ -44,7 +44,7 @@ iperlmoddir
 
 =head1 VERSION
 
-version 1.0
+version 1.02
 
 =head1 AUTHOR
 

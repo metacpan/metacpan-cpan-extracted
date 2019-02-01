@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9998';
+our $VERSION = '0.9999';
 
 BEGIN {
     # We tell the Oracle connector which encoding to use. The last part of the
@@ -39,7 +39,7 @@ sub destination {
     $uri->password(undef) if $uri->password;
     $uri->dbname(
            $ENV{TWO_TASK}
-        || ( $^O eq 'MSWin32' ? $ENV{LOCAL} : undef )
+        || ( App::Sqitch::ISWIN ? $ENV{LOCAL} : undef )
         || $ENV{ORACLE_SID}
         || $self->username
     );
@@ -139,9 +139,18 @@ sub _log_conflicts_param {
 }
 
 sub _ts2char_format {
-    q{CAST(to_char(%1$s AT TIME ZONE 'UTC', '"year":YYYY:"month":MM:"day":DD') AS VARCHAR2(100 byte)) || CAST(to_char(%1$s AT TIME ZONE 'UTC', ':"hour":HH24:"minute":MI:"second":SS:"time_zone":"UTC"')  AS VARCHAR2(168 byte))}
+    # q{CAST(to_char(%1$s AT TIME ZONE 'UTC', '"year":YYYY:"month":MM:"day":DD') AS VARCHAR2(100 byte)) || CAST(to_char(%1$s AT TIME ZONE 'UTC', ':"hour":HH24:"minute":MI:"second":SS:"time_zone":"UTC"')  AS VARCHAR2(168 byte))}
+    # Good grief, Oracle, WTF? https://github.com/sqitchers/sqitch/issues/316
+    join ' || ', (
+        q{to_char(%1$s AT TIME ZONE 'UTC', '"year":YYYY')},
+        q{to_char(%1$s AT TIME ZONE 'UTC', ':"month":MM')},
+        q{to_char(%1$s AT TIME ZONE 'UTC', ':"day":DD')},
+        q{to_char(%1$s AT TIME ZONE 'UTC', ':"hour":HH24')},
+        q{to_char(%1$s AT TIME ZONE 'UTC', ':"minute":MI')},
+        q{to_char(%1$s AT TIME ZONE 'UTC', ':"second":SS')},
+        q{':time_zone:UTC'},
+    );
 }
-
 sub _ts_default { 'current_timestamp' }
 
 sub _can_limit { 0 }
@@ -579,7 +588,7 @@ sub _file_for_script {
         );
     }
 
-    if ($^O eq 'MSWin32') {
+    if (App::Sqitch::ISWIN) {
         # Copy it.
         $file->copy_to($alias) or hurl oracle => __x(
             'Cannot copy {file} to {alias}: {error}',

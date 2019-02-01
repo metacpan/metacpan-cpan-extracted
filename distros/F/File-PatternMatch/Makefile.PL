@@ -21,6 +21,7 @@ WriteMakefile1(
     PL_FILES            => {},
     PREREQ_PM => {
       'Term::ExtendedColor' => 0.16,
+      'File::LsColor'       => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'File-PatternMatch-*' },

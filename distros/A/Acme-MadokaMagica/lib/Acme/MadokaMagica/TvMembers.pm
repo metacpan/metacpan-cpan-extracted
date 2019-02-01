@@ -1,19 +1,41 @@
 package Acme::MadokaMagica::TvMembers;
-
-use Mouse;
-
+use strict;
+use warnings;
 use utf8;
 use Data::Section::Simple;
 use YAML::Tiny;
 
-has has_qb => (
-    is => 'rw',
-    isa => 'Bool',
-    required => 1,
-    default => 0,
-);
+sub new {
+    my ($class, %args) = @_;
 
-no Mouse;
+    my $self = { _has_qb => undef };
+    my $ds = Data::Section::Simple->new($class);
+    my $sections = $ds->get_data_section;
+    for my $section_name ( keys %{$sections} ) {
+        my $yml = YAML::Tiny->read_string($sections->{$section_name});
+        my $member_info = $yml->[0];
+        for my $key ( keys %{$member_info} ) {
+            $self->{$key} = $member_info->{$key};
+        }
+    }
+    if (defined $args{line}) {
+        $self->{startline} = $args{line};
+    } else {
+        $self->{startline} = (caller)[2];
+    }
+
+    return bless $self, $class;
+}
+
+sub has_qb {
+    my $self = shift;
+
+    if (@_){
+      $self->{_has_qb} = shift;
+    }
+
+    return $self->{_has_qb};
+}
 
 sub name {
     my ($self) = @_;
@@ -23,7 +45,7 @@ sub name {
     if( $line >= $limit ) {
         return undef;
     }
-    return $self->has_qb ? $self->{witchename}:$self->lastname . ' ' .$self->firstname;
+    return $self->has_qb ? $self->{witchename} : $self->lastname.' '.$self->firstname;
 }
 
 sub firstname {
@@ -127,23 +149,5 @@ sub cv {
     return $self->{cv};
 }
 
-sub BUILD {
-    my ($self, $args) = @_;
-
-    my $ds = Data::Section::Simple->new( ref $self );
-    my $sections = $ds->get_data_section;
-    for my $section_name ( keys %{$sections} ) {
-        my $yml = YAML::Tiny->read_string( $sections->{$section_name} );
-        my $member_info = $yml->[0];
-        for my $key ( keys %{$member_info} ) {
-            $self->{$key} = $member_info->{$key};
-        }
-    }
-    if (defined $args->{line}) {
-        $self->{startline} = $args->{line};
-    } else {
-        $self->{startline} = (caller)[2];
-    }
-}
 
 1;

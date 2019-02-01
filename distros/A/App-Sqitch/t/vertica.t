@@ -22,6 +22,7 @@ use App::Sqitch::Target;
 use App::Sqitch::Plan;
 use lib 't/lib';
 use DBIEngineTest;
+use TestConfig;
 
 my $CLASS;
 
@@ -30,9 +31,6 @@ delete $ENV{"VSQL_$_"} for qw(USER PASSWORD DATABASE HOST PORT);
 BEGIN {
     $CLASS = 'App::Sqitch::Engine::vertica';
     require_ok $CLASS or die;
-    $ENV{SQITCH_CONFIG}        = 'nonexistent.conf';
-    $ENV{SQITCH_SYSTEM_CONFIG} = 'nonexistent.user';
-    $ENV{SQITCH_USER_CONFIG}   = 'nonexistent.sys';
 }
 
 is_deeply [$CLASS->config_vars], [
@@ -42,7 +40,8 @@ is_deeply [$CLASS->config_vars], [
 ], 'config_vars should return three vars';
 
 my $uri = URI::db->new('db:vertica:');
-my $sqitch = App::Sqitch->new(options => { engine => 'vertica' });
+my $config = TestConfig->new('core.engine' => 'vertica');
+my $sqitch = App::Sqitch->new(config => $config);
 my $target = App::Sqitch::Target->new(
     sqitch => $sqitch,
     uri    => $uri,
@@ -55,7 +54,7 @@ isa_ok my $vta = $CLASS->new(
 is $vta->key, 'vertica', 'Key should be "vertica"';
 is $vta->name, 'Vertica', 'Name should be "Vertica"';
 
-my $client = 'vsql' . ($^O eq 'MSWin32' ? '.exe' : '');
+my $client = 'vsql' . (App::Sqitch::ISWIN ? '.exe' : '');
 is $vta->client, $client, 'client should default to vsql';
 is $vta->registry, 'sqitch', 'registry default should be "sqitch"';
 is $vta->uri, $uri, 'DB URI should be "db:vertica:"';
@@ -128,14 +127,12 @@ ENV: {
 
 ##############################################################################
 # Make sure config settings override defaults.
-my %config = (
+$config->update(
     'engine.vertica.client'   => '/path/to/vsql',
     'engine.vertica.target'   => 'db:vertica://localhost/try',
     'engine.vertica.registry' => 'meta',
 );
 $std_opts[-1] = 'registry=meta';
-my $mock_config = Test::MockModule->new('App::Sqitch::Config');
-$mock_config->mock(get => sub { $config{ $_[2] } });
 
 $target = App::Sqitch::Target->new( sqitch => $sqitch );
 ok $vta = $CLASS->new(sqitch => $sqitch, target => $target),
@@ -151,28 +148,6 @@ is_deeply [$vta->vsql], [
     '--host',     'localhost',
     @std_opts
 ], 'vsql command should be configured from URI config';
-
-##############################################################################
-# Now make sure that (deprecated?) Sqitch options override configurations.
-$sqitch = App::Sqitch->new(
-    options => {
-        engine     => 'vertica',
-        client     => '/some/other/vsql',
-    },
-);
-
-$target = App::Sqitch::Target->new( sqitch => $sqitch );
-ok $vta = $CLASS->new(sqitch => $sqitch, target => $target),
-    'Create a vertica with sqitch with options';
-
-is $vta->client, '/some/other/vsql', 'client should be as optioned';
-is_deeply [$vta->vsql], [
-    '/some/other/vsql',
-    '--username', $sqitch->sysuser,
-    '--dbname',   'try',
-    '--host',     'localhost',
-    @std_opts
-], 'vsql command should be as optioned';
 
 ##############################################################################
 # Test _run(), _capture(), and _spool().
@@ -266,7 +241,6 @@ is_deeply \@run, [$vta->vsql, '--file', 'foo/bar.sql'],
     'Verifile file should be passed to run() for high verbosity';
 
 $mock_sqitch->unmock_all;
-$mock_config->unmock_all;
 
 ##############################################################################
 # Test DateTime formatting stuff.
@@ -319,12 +293,8 @@ my $err = try {
 };
 
 DBIEngineTest->run(
-    class         => $CLASS,
-    sqitch_params => [options => {
-        engine    => 'vertica',
-        top_dir   => Path::Class::dir(qw(t engine)),
-        plan_file => Path::Class::file(qw(t engine sqitch.plan)),
-    }],
+    class             => $CLASS,
+    version_query     => 'SELECT version()',
     target_params     => [ uri => $uri ],
     alt_target_params => [ uri => $uri, registry => '__sqitchtest' ],
     skip_unless       => sub {

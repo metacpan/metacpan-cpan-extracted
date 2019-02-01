@@ -54,34 +54,34 @@ subtest 'container' => sub {
                         msg => 'anchor + offset == 0 (default)',
                     },
                     {
-                        src    => [ 11, 12 ],
-                        offset => 2,
+                        src      => [ 11, 12 ],
+                        offset   => 2,
                         expected => [ 0, 10, 11, 12, 20, 30, 40 ],
-                        msg => '0 < anchor + offset < maxidx',
+                        msg      => '0 < anchor + offset < maxidx',
                     },
                     {
-                        src    => [ -30, -20 ],
-                        offset => -1,
+                        src      => [ -30, -20 ],
+                        offset   => -1,
                         expected => [ -30, -20, undef, 0, 10, 20, 30, 40 ],
-                        msg => 'anchor + offset < 0',
+                        msg      => 'anchor + offset < 0',
                     },
                     {
-                        src    => [ 31, 32 ],
-                        offset => $maxidx,
+                        src      => [ 31, 32 ],
+                        offset   => $maxidx,
                         expected => [ 0, 10, 20, 30, 31, 32, 40 ],
-                        msg => 'anchor + offset == maxidx',
+                        msg      => 'anchor + offset == maxidx',
                     },
                     {
-                        src    => [ 50, 60 ],
-                        offset => $maxidx + 1,
+                        src      => [ 50, 60 ],
+                        offset   => $maxidx + 1,
                         expected => [ 0, 10, 20, 30, 40, 50, 60 ],
-                        msg => 'anchor + offset == maxidx + 1',
+                        msg      => 'anchor + offset == maxidx + 1',
                     },
                     {
-                        src    => [ 60, 70 ],
-                        offset => $maxidx + 2,
+                        src      => [ 60, 70 ],
+                        offset   => $maxidx + 2,
                         expected => [ 0, 10, 20, 30, 40, undef, 60, 70 ],
-                        msg => 'offset == maxidx + 2',
+                        msg      => 'offset == maxidx + 2',
                     },
                   );
             };
@@ -155,10 +155,10 @@ subtest 'container' => sub {
                         msg      => 'anchor + offset == 0 (default)',
                     },
                     {
-                        src    => [ 21, 22 ],
-                        offset => 2,
+                        src      => [ 21, 22 ],
+                        offset   => 2,
                         expected => [ 0, 10, 20, 21, 22, 30, 40 ],
-                        msg => '0 < offset < maxidx',
+                        msg      => '0 < offset < maxidx',
                     },
                     {
                         src      => [-10],
@@ -173,10 +173,10 @@ subtest 'container' => sub {
                         msg      => 'anchor + offset < -1',
                     },
                     {
-                        src    => [ 41, 42 ],
-                        offset => $maxidx,
+                        src      => [ 41, 42 ],
+                        offset   => $maxidx,
                         expected => [ 0, 10, 20, 30, 40, 41, 42 ],
-                        msg => 'anchor + offset == maxidx',
+                        msg      => 'anchor + offset == maxidx',
                     },
                     {
                         src      => [60],
@@ -244,14 +244,14 @@ subtest 'container' => sub {
 
         test_insert( %defaults, %$_ )
           for ( {
-                dest  => { foo => 1, bar => 2 },
-                dpath => '/',
+                dest     => { foo => 1, bar => 2 },
+                dpath    => '/',
                 src      => [ baz => 3 ],
                 expected => { foo => 1, bar => 2, baz => 3 },
             },
             {
-                dest  => { foo => 1, bar => 2 },
-                dpath => '/',
+                dest     => { foo => 1, bar => 2 },
+                dpath    => '/',
                 src      => { baz => 3 },
                 expected => { foo => 1, bar => 2, baz => 3 },
             },
@@ -283,7 +283,7 @@ subtest 'container' => sub {
                         %defaults,
                         dest  => { foo => 1 },
                         dpath => '/foo',
-                        src => [ 0, 1 ],
+                        src   => [ 0, 1 ],
                     } )
             },
             ['Data::Edit::Struct::failure::input::dest'],
@@ -296,8 +296,8 @@ subtest 'container' => sub {
 subtest 'element' => sub {
 
     my %defaults = (
-        dtype => 'element',
-        dest  => [ 0, 10, 20, 30, 40 ],
+        dtype   => 'element',
+        dest    => [ 0, 10, 20, 30, 40 ],
         exclude => [ 'dest', 'dtype', 'src' ],
     );
 
@@ -458,7 +458,7 @@ subtest 'element' => sub {
                 %$_
               )
 
-            for ( {
+              for ( {
                     dpath    => '/*[0]',
                     src      => [1],
                     expected => [ 0, 1, 10, 20, 30, 40 ],
@@ -603,7 +603,7 @@ subtest 'element' => sub {
                     msg      => 'idx + offset < -1',
                 },
 
-            );
+              );
 
         };
 
@@ -615,19 +615,19 @@ subtest 'element' => sub {
         my @params = ( {
                 dest  => { foo => 1 },
                 dpath => '/foo',
-                src => [ 0, 1 ],
+                src   => [ 0, 1 ],
             },
             {
                 dest  => [ 10, 20 ],
                 dpath => '/',
-                src   => [ 0,  1 ],
+                src   => [ 0, 1 ],
             } );
 
         for ( @params ) {
 
             my %arg = ( %defaults, %$_ );
 
-	    delete $arg{exclude};
+            delete $arg{exclude};
 
             isa_ok(
                 dies { edit( insert => \%arg ) },
@@ -646,10 +646,10 @@ subtest auto => sub {
 
         test_insert( %defaults, %$_ )
           for ( {
-              dest  => [ 10, 20, 30, 40 ],
-              dpath => '/',
-              src    => [ 1, 2 ],
-              offset => 0,
+              dest     => [ 10, 20, 30, 40 ],
+              dpath    => '/',
+              src      => [ 1, 2 ],
+              offset   => 0,
               expected => [ 1, 2, 10, 20, 30, 40 ],
           } );
     };
@@ -658,10 +658,10 @@ subtest auto => sub {
 
         test_insert( %defaults, %$_ )
           for ( {
-                dest  => [ 10, 20, 30, 40 ],
-                dpath => '/*[0]',
-                src    => [ 1, 2 ],
-                offset => 0,
+                dest     => [ 10, 20, 30, 40 ],
+                dpath    => '/*[0]',
+                src      => [ 1, 2 ],
+                offset   => 0,
                 expected => [ 1, 2, 10, 20, 30, 40 ],
             },
           );
@@ -695,7 +695,7 @@ sub _make_label {
 
     my ( $arg, $exclude ) = @_;
 
-    $exclude = [] if ! defined $exclude;
+    $exclude = [] if !defined $exclude;
 
     my %args = %$arg;
 

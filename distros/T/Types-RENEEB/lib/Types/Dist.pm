@@ -66,7 +66,7 @@ Types::Dist - Types related to distributions (e.g. distributions on CPAN)
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 TYPES
 
@@ -80,7 +80,7 @@ A version of a distribution
 
 =head2 DistFQ
 
-I<DistName>-I<DistFQ>
+I<DistName>-I<DistVersion>
 
 =head1 AUTHOR
 

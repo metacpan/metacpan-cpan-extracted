@@ -1,11 +1,12 @@
 #!/usr/bin/perl
 use strict;
+use File::LsColor qw(ls_color);
 use File::PatternMatch qw(patternmatch);
 
 my $dir = shift;;
 not defined $dir and $dir = $ENV{HOME};
 
-my @files = glob("$dir/*");
+my @files = ls_color(glob("$dir/*"));
 my $data = patternmatch(256, @files);
 
 for my $i(sort(keys(%{$data}))) {

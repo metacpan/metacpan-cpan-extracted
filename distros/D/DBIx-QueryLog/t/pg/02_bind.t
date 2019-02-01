@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::Requires qw(DBD::Pg Test::PostgreSQL);
 use Test::More;
 use Test::PostgreSQL;

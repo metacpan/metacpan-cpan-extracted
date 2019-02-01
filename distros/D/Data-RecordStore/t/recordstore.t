@@ -5,6 +5,9 @@ use Data::RecordStore;
 use lib 't/lib';
 
 use Data::Dumper;
+
+use Data::RecordStore;
+use File::Path qw(make_path);
 use Fcntl ':mode';
 use File::Temp qw/ :mktemp tempdir /;
 use Test::More;
@@ -13,10 +16,6 @@ use Errno qw(ENOENT);
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
-BEGIN {
-    use_ok( "Data::RecordStore" ) || BAIL_OUT( "Unable to load Data::RecordStore" );
-}
-
 my $is_windows = $^O eq 'MSWin32';
 
 diag "running tests on $^O";
@@ -24,11 +23,22 @@ diag "running tests on $^O";
 # -----------------------------------------------------
 #               init
 # -----------------------------------------------------
-test_suite();
-test_open();
-test_stow_and_fetch_and_delete();
-test_recycle();
-test_record_silos();
+
+local( *STDERR );
+my $out;
+open( STDERR, ">>", \$out );
+eval {
+    test_suite();
+    test_open();
+    test_locks();
+    test_stow_and_fetch_and_delete();
+    test_recycle();
+    test_record_silos();
+    test_timing();
+};
+if( $@ ) {
+    fail( "got errors $@" );
+}
 
 done_testing;
 
@@ -79,50 +89,11 @@ sub test_open {
     is( $out, "HI THERE AGAIN\n", "log is now loud" );
     $Data::RecordStore::DEBUG = 0;
 
-    #
-    # test permatations of open and open_store
-    #
-
     my $dir = tempdir( CLEANUP => 1 );
-    my $store = Data::RecordStore->open( $dir );
-    ok( -d $dir, "directory created with ->open" );
-    ok( -d "$dir/RECYC_SILO", "recyc silo exists with ->open" );
-    ok( -d "$dir/RECORD_INDEX_SILO", "index silo created with ->open" );
-
-    pass( "able to open store via deprecated open" );
-    like( $out, qr/Data::RecordStore::open is deprecated/, "open is deprecated" );
-
-    $dir = tempdir( CLEANUP => 1 );
-    $store = Data::RecordStore::open( $dir );
-    ok( -d $dir, "directory created with ::open" );
-    ok( -d "$dir/RECYC_SILO", "recyc silo exists with ::open" );
-    ok( -d "$dir/RECORD_INDEX_SILO", "index silo created with ::open" );
-
-    $dir = tempdir( CLEANUP => 1 );
-
-    $dir = tempdir( CLEANUP => 1 );
-    $store = Data::RecordStore->open_store( $dir );
-    ok( -d $dir, "directory created with ->open" );
+    my $store = Data::RecordStore->open_store( $dir );
+    ok( -d $dir, "directory created with ->open_store" );
     ok( -d "$dir/RECYC_SILO", "recyc silo exists with ->open_store" );
     ok( -d "$dir/RECORD_INDEX_SILO", "index silo created with ->open_store" );
-
-    $dir = tempdir( CLEANUP => 1 );
-    $store = Data::RecordStore::open_store( $dir );
-    ok( -d $dir, "directory created with ::open_store" );
-    ok( -d "$dir/RECYC_SILO", "recyc silo exists with ::open_store" );
-    ok( -d "$dir/RECORD_INDEX_SILO", "index silo created with ::open_store" );
-
-    $dir = tempdir( CLEANUP => 1 );
-    $store->open_store( $dir );
-    ok( -d $dir, "directory created with ->open_store and args" );
-    ok( -d "$dir/RECYC_SILO", "recyc silo exists with ->open_store and args" );
-    ok( -d "$dir/RECORD_INDEX_SILO", "index silo created with ->open_store and args" );
-
-    $dir = tempdir( CLEANUP => 1 );
-    $store->open( $dir );
-    ok( -d $dir, "directory created with ->open_store and args" );
-    ok( -d "$dir/RECYC_SILO", "recyc silo exists with ->open_store and args" );
-    ok( -d "$dir/RECORD_INDEX_SILO", "index silo created with ->open_store and args" );
 
     #
     # Test directory that can't be written to
@@ -131,7 +102,7 @@ sub test_open {
         $dir = tempdir( CLEANUP => 1 );
         chmod 0666, $dir;
         eval {
-            $store = Data::RecordStore::open_store( $dir );
+            $store = Data::RecordStore->open_store( $dir );
             fail( "Was able to open store in unwritable directory" );
         };
 
@@ -214,13 +185,11 @@ sub test_stow_and_fetch_and_delete {
         };
         like( $@, qr/unable to open/, "unable to open" );
 
-        $store->delete( 5 );
-        like( $out, qr/Data::RecordStore::delete is deprecated/, "delete is deprecated" );
     }
     
-    is( $store->active_entry_count, 3, "3 active records" );
+    is( $store->active_entry_count, 4, "4 active records" );
     eval{    $store->delete_record( 1 );};
-    is( $store->active_entry_count, 3, "still 3 active records" );
+    is( $store->active_entry_count, 4, "still 4 active records" );
 
     $store->recycle_id( 3 );
     $store->recycle_id( 5 );
@@ -285,8 +254,62 @@ sub test_stow_and_fetch_and_delete {
     is( $store->fetch( $id ), 'X', 'tinystored stored okey' );
     is( $store->_get_silo( 12 )->entry_count, 1, "tiny stored in silo 12" );
 
-    
 } #test_stow_and_fetch_and_delete
+
+sub test_locks {
+    my $dir = tempdir( CLEANUP => 1 );
+    make_path( "$dir/LOCKS" );
+    my $store = Data::RecordStore->open_store( $dir );
+    $store->lock( "FOO", "BAR", "BAZ", "BAZ" );
+    
+    eval {
+        $store->lock( "SOMETHING" );
+        fail( "Data::RecordStore->lock called twice in a row" );
+    };
+    like( $@, qr/cannot be called twice in a row/, 'Data::RecordStore->lock called twice in a row error message' );
+    $store->unlock;
+    $store->lock( "SOMETHING" );
+    pass( "Store was able to lock after unlocking" );
+
+    unless( $is_windows ) {
+        $dir = tempdir( CLEANUP => 1 );
+        open my $bla, '>', "$dir/ilock";
+        print $bla "CANTOPEN\n";
+        chmod 0444, "$dir/ilock";
+        eval {
+            my $store = Data::RecordStore->open_store( $dir );
+            $store->stow( "XXX" );
+            fail( "Was able to open store with unwriteable index lock file" );
+        };
+        like( $@, qr/unable to create ilock/, "unable to open because of unwriteable ilock" );
+
+        $dir = tempdir( CLEANUP => 1 );
+        make_path( "$dir/LOCKS" );
+        chmod 0444, "$dir/LOCKS";
+        eval {
+            $store = Data::RecordStore->open_store( $dir );
+            pass( "Was able to open store" );
+            $store->lock( "FOO" );
+            fail( "Data::RecordStore->lock didnt die trying to lock to unwriteable directory" );
+        };
+        like( $@, qr/lock failed/, "unable to lock because of unwriteable lock directory" );
+
+
+        $dir = tempdir( CLEANUP => 1 );
+        make_path( "$dir/LOCKS" );
+        open my $out, '>', "$dir/LOCKS/BAR";
+        chmod 0444, "$dir/LOCKS/BAR";
+        eval {
+            $store = Data::RecordStore->open_store( $dir );
+            pass( "Was able to open store" );
+            $store->lock( "FOO", "BAR", "BAZ" );
+            fail( "Data::RecordStore->lock didnt die trying to lock unwriteable lock file" );
+        };
+        like( $@, qr/lock failed/, "unable to lock because of unwriteable lock file" );
+
+    }
+
+}
 
 sub test_suite {
     my $dir = tempdir( CLEANUP => 1 );
@@ -424,6 +447,73 @@ sub test_suite {
     is( $store->next_id, 12, 'after recycler emptied' );
 
 } #test suite
+
+sub test_timing {
+    no strict 'refs';
+
+    my $ptr;
+
+    *Data::RecordStore::_time = sub {
+        my $val = $$ptr;
+        return $val;
+    };
+
+    use strict 'refs';
+
+    # test the update time field. Make sure that it is preversed
+    # if a record is swapped out
+
+    $$ptr = 3;
+
+    my $dir = tempdir( CLEANUP => 1 );
+    my $store = Data::RecordStore->open_store( $dir );
+    $store->stow( "DATAONEZ", 1 );
+
+    $$ptr = 4;
+    $store->stow( "DATATWOO", 2 );
+
+    is( $store->last_updated(1), 3, "first update time");
+    is( $store->last_updated(2), 4, "second update time");
+
+    my $rec_silo = Data::RecordStore::Silo->open_silo( "LZ*", "$dir/silos/12_RECSTORE", 2**12 );
+    my $index_silo = Data::RecordStore::Silo->open_silo( "ILL", "$dir/RECORD_INDEX_SILO" );
+
+    is( $rec_silo->entry_count, 2, "2 entries in rec silo 12" );
+    my( $idx ) = @{ $rec_silo->get_record( 1 ) };
+    is( $idx, 1, "first is first" );
+    ( $idx ) = @{ $rec_silo->get_record( 2 ) };
+    is( $idx, 2, "second is second" );
+
+    is( $index_silo->entry_count, 2, "2 entries in index silo" );
+    my( $index_silo_idx, $idx_in_silo, $update_time ) = @{ $index_silo->get_record( 1 ) };
+    is( $index_silo_idx, 12, "in silo 12" );
+    is( $idx_in_silo, 1, "at first" );
+    is( $update_time, 3, "was written at 3" );
+
+    ( $index_silo_idx, $idx_in_silo, $update_time ) = @{ $index_silo->get_record( 2 ) };
+    is( $index_silo_idx, 12, "also in silo 12" );
+    is( $idx_in_silo, 2, "at second" );
+    is( $update_time, 4, "was written at 4" );
+
+    $store->delete_record( 1 ); # swaps out 2nd record to its location
+
+    is( $rec_silo->entry_count, 1, "1 entry in rec silo 12 after deletion" );
+    ( $idx ) = @{ $rec_silo->get_record( 1 ) };
+    is( $idx, 2, "first is now second" );
+
+    is( $index_silo->entry_count, 2, "still 2 entries in index silo after deletion" );
+    ( $index_silo_idx, $idx_in_silo, $update_time ) = @{ $index_silo->get_record( 1 ) };
+    is( $index_silo_idx, 0, "no silo after deletion" );
+    is( $idx_in_silo, 0, "no index after deletion" );
+    is( $update_time, 0, "no update time after deletion" );
+
+
+    ( $index_silo_idx, $idx_in_silo, $update_time ) = @{ $index_silo->get_record( 2 ) };
+    is( $index_silo_idx, 12, "also in silo 12" );
+    is( $idx_in_silo, 1, "now at first" );
+    is( $update_time, 4, "kept same update time. this was a move, not an update" );
+
+} #test_time
 
 sub test_record_silos {
     my $dir = tempdir( CLEANUP => 1 );

@@ -10,7 +10,6 @@ use IPC::Open3 'open3';
 use Path::Class;
 use Exporter 'import'; # for the error codes, in Archive::Zip API compatibility
 
-
 =head1 NAME
 
 Archive::SevenZip - Read/write 7z , zip , ISO9960 and other archives
@@ -32,12 +31,7 @@ Archive::SevenZip - Read/write 7z , zip , ISO9960 and other archives
 
 =cut
 
-use vars qw(
-    %sevenzip_charsetname
-    %sevenzip_stdin_support
-    %class_defaults
-    $VERSION @EXPORT_OK %EXPORT_TAGS);
-$VERSION= '0.07';
+our $VERSION= '0.08';
 
 # Archive::Zip API
 # Error codes
@@ -46,8 +40,8 @@ use constant AZ_OK           => 0;
 use constant COMPRESSION_STORED        => 'Store';   # file is stored (no compression)
 use constant COMPRESSION_DEFLATED      => 'Deflate';   # file is Deflated
 
-@EXPORT_OK = (qw(AZ_OK COMPRESSION_STORED COMPRESSION_DEFLATED));
-%EXPORT_TAGS = (
+our @EXPORT_OK = (qw(AZ_OK COMPRESSION_STORED COMPRESSION_DEFLATED));
+our %EXPORT_TAGS = (
         ERROR_CODES => [
             qw(
               AZ_OK
@@ -62,14 +56,14 @@ use constant COMPRESSION_DEFLATED      => 'Deflate';   # file is Deflated
         ],
 );
 
-%sevenzip_charsetname = (
+our %sevenzip_charsetname = (
     'UTF-8' => 'UTF-8',
     'Latin-1' => 'WIN',
     'ISO-8859-1' => 'WIN',
     '' => 'DOS', # dunno what the appropriate name would be
 );
 
-%sevenzip_stdin_support = (
+our %sevenzip_stdin_support = (
     #'7z'   => 1,
     'xz'    => 1,
     'lzma'  => 1,
@@ -84,7 +78,7 @@ if( $^O !~ /MSWin/ ) {
         for keys %sevenzip_charsetname;
 };
 
-%class_defaults = (
+our %class_defaults = (
     '7zip' => '7z',
     fs_encoding => 'UTF-8',
     default_options => [ "-y", "-bd" ],
@@ -93,10 +87,17 @@ if( $^O !~ /MSWin/ ) {
 
 =head2 C<< Archive::SevenZip->find_7z_executable >>
 
+    my $version = Archive::SevenZip->find_7z_executable()
+        or die "No 7z found.";
+    print "Found 7z version '$version'";
+
 Finds the 7z executable in the path or in C<< $ENV{ProgramFiles} >>
 or C<< $ENV{ProgramFiles(x86)} >>. This is called
 when a C<< Archive::SevenZip >> instance is created with the C<find>
 parameter set to 1.
+
+If C<< $ENV{PERL_ARCHIVE_SEVENZIP_BIN} >> is set, this value will be used as
+the 7z executable and the path will not be searched.
 
 =cut
 
@@ -104,21 +105,28 @@ sub find_7z_executable {
     my($class) = @_;
     my $old_default = $class_defaults{ '7zip' };
     my $envsep = $^O =~ /MSWin/ ? ';' : ':';
-    my @search = split /$envsep/, $ENV{PATH};
-    if( $^O =~ /MSWin/i ) {
-        push @search, map { "$_\\7-Zip" } grep {defined} ($ENV{'ProgramFiles'}, $ENV{'ProgramFiles(x86)'});
-    };
-    my $found = $class->version;
-
-    while( ! defined $found and @search) {
-        my $dir = shift @search;
-        if ($^O eq 'MSWin32') {
-            next unless -e file("$dir", "7z.exe" );
-        }
-        $class_defaults{'7zip'} = "" . file("$dir", "7z" );
+    my $found;
+    if( $ENV{PERL_ARCHIVE_SEVENZIP_BIN}) {
+        $class_defaults{'7zip'} = $ENV{PERL_ARCHIVE_SEVENZIP_BIN};
         $found = $class->version;
+    } else {
+        my @search;
+        push @search, split /$envsep/, $ENV{PATH};
+        if( $^O =~ /MSWin/i ) {
+            push @search, map { "$_\\7-Zip" } grep {defined} ($ENV{'ProgramFiles'}, $ENV{'ProgramFiles(x86)'});
+        };
+        $found = $class->version;
+
+        while( ! defined $found and @search) {
+            my $dir = shift @search;
+            if ($^O eq 'MSWin32') {
+                next unless -e file("$dir", "7z.exe" );
+            }
+            $class_defaults{'7zip'} = "" . file("$dir", "7z" );
+            $found = $class->version;
+        };
     };
-    
+
     if( ! $found) {
         $class_defaults{ '7zip' } = $old_default;
     };
@@ -147,16 +155,16 @@ sub new {
     } else {
         ($class, %options) = @_;
     };
-    
+
     if( $options{ find }) {
         $class->find_7z_executable();
     };
-    
+
     for( keys %class_defaults ) {
         $options{ $_ } = $class_defaults{ $_ }
             unless defined $options{ $_ };
     };
-    
+
     bless \%options => $class
 }
 
@@ -167,7 +175,7 @@ sub version {
             unless defined $options{ $_ };
     };
     my $self = ref $self_or_class ? $self_or_class : $self_or_class->new( %options );
-    
+
     my $cmd = $self->get_command(
         command => '',
         archivename => undef,
@@ -227,7 +235,7 @@ API.
 # Archive::Zip API
 sub memberNamed {
     my( $self, $name, %options )= @_;
-    
+
     my( $entry ) = grep { $_->fileName eq $name } $self->members( %options );
     $entry
 }
@@ -235,13 +243,13 @@ sub memberNamed {
 # Archive::Zip API
 sub list {
     my( $self, %options )= @_;
-    
+
     if( ! grep { defined $_ } $options{archivename}, $self->{archivename}) {
         # We are an archive that does not exist on disk yet
         return
     };
     my $cmd = $self->get_command( command => "l", options => ["-slt"], %options );
-    
+
     my $fh = $self->run($cmd,
         encoding => $options{ fs_encoding },
         stdin_fh => $options{ fh },
@@ -251,21 +259,21 @@ sub list {
         header => [],
         archive => [],
     );
-    
+
     # Get/skip header
     while( @output and $output[0] !~ /^--\s*$/ ) {
         my $line = shift @output;
         $line =~ s!\s+$!!;
         push @{ $results{ header }}, $line;
     };
-    
+
     # Get/skip archive information
     while( @output and $output[0] !~ /^----------\s*$/ ) {
         my $line = shift @output;
         $line =~ s!\s+$!!;
         push @{ $results{ archive }}, $line;
     };
-    
+
     if( $output[0] =~ /^----------\s*$/ ) {
         shift @output;
     } else {
@@ -290,7 +298,7 @@ sub list {
             croak "Unknown file entry [$line]";
         };
     };
-    
+
     return @members
 }
 { no warnings 'once';
@@ -319,7 +327,7 @@ sub openMemberFH {
         ($self,%options) = @_;
     };
     defined $options{ membername } or croak "Need member name to extract";
-    
+
     my $cmd = $self->get_command( command => "e", options => ["-so"], members => [$options{membername}] );
     my $fh = $self->run($cmd, encoding => $options{ encoding }, binmode => $options{ binmode });
     return $fh
@@ -348,19 +356,19 @@ sub extractMember {
     my( $self, $memberOrName, $extractedName, %_options ) = @_;
     $extractedName = $memberOrName
         unless defined $extractedName;
-    
+
     my %options = (%$self, %_options);
-    
+
     my $target_dir = dirname $extractedName;
     my $target_name = basename $extractedName;
     my $cmd = $self->get_command(
         command     => "e",
-        archivename => $options{ archivename }, 
+        archivename => $options{ archivename },
         members     => [ $memberOrName ],
         options     => [ "-o$target_dir" ],
     );
     my $fh = $self->run($cmd, encoding => $options{ encoding });
-    
+
     while( <$fh>) {
         warn $_ if $options{ verbose };
     };
@@ -368,7 +376,7 @@ sub extractMember {
         rename "$target_dir/" . basename($memberOrName) => $extractedName
             or croak "Couldn't move '$memberOrName' to '$extractedName': $!";
     };
-    
+
     return AZ_OK;
 };
 
@@ -385,19 +393,19 @@ sub removeMember {
     my( $self, $name, %_options ) = @_;
 
     my %options = (%$self, %_options);
-    
+
     if( $^O =~ /MSWin/ ) {
         $name =~ s!/!\\!g;
     }
-    
+
     my $cmd = $self->get_command(
         command     => "d",
-        archivename => $options{ archivename }, 
+        archivename => $options{ archivename },
         members     => [ $name ],
     );
     my $fh = $self->run($cmd, encoding => $options{ encoding } );
     $self->wait($fh, %options);
-    
+
     return AZ_OK;
 };
 
@@ -418,7 +426,7 @@ sub get_command {
     if( ! defined $options{ default_options }) {
         $options{ default_options } = defined $self->{ default_options } ? $self->{ default_options } : $class_defaults{ default_options };
     };
-    
+
     my @charset;
     if( defined $options{ fs_encoding }) {
         exists $sevenzip_charsetname{ $options{ fs_encoding }}
@@ -449,7 +457,7 @@ sub get_command {
 
 sub run {
     my( $self, $cmd, %options )= @_;
-    
+
     my $mode = '-|';
     if( defined $options{ stdin } || defined $options{ stdin_fh }) {
         $mode = '|-';
@@ -482,7 +490,7 @@ sub run {
     } elsif( $options{ binmode } ) {
         binmode $fh, $options{ binmode };
     };
-    
+
     if( $options{ stdin }) {
         print {$fh} $options{ stdin };
         close $fh;
@@ -497,7 +505,7 @@ sub run {
             scalar <$fh>;
         };
     };
-    
+
     $fh;
 }
 
@@ -537,7 +545,7 @@ This requires 7zip version 9.30+
 
 sub add_scalar {
     my( $self, $name, $scalar )= @_;
-    
+
     if( $sevenzip_stdin_support{ $self->{type} } ) {
         my $cmd = $self->get_command(
             command => 'a',
@@ -551,13 +559,13 @@ sub add_scalar {
         );
 
     } else {
-    
+
         # 7zip doesn't really support reading archive members from STDIN :-(
         my($fh, $tempname) = tempfile;
         binmode $fh, ':raw';
         print {$fh} $scalar;
         close $fh;
-        
+
         # Only supports 7z archive type?!
         # 7zip will magically append .7z to the filename :-(
         my $cmd = $self->get_command(
@@ -568,10 +576,10 @@ sub add_scalar {
         );
         $fh = $self->run( $cmd );
         $self->wait($fh);
-        
+
         unlink $tempname
             or warn "Couldn't unlink '$tempname': $!";
-        
+
         # Hopefully your version of 7zip can rename members (9.30+):
         $cmd = $self->get_command(
             command => 'rn',
@@ -597,13 +605,13 @@ exists
 
 sub add_directory {
     my( $self, $localname, $target )= @_;
-    
+
     $target ||= $localname;
-    
+
     # Create an empty directory, add it to the archive,
     # then rename that temp name to the wanted name:
     my $tempname = tempdir;
-    
+
     my $cmd = $self->get_command(
         command => 'a',
         archivename => $self->archive_or_temp,
@@ -612,7 +620,7 @@ sub add_directory {
     );
     my $fh = $self->run( $cmd );
     $self->wait($fh);
-    
+
     # Hopefully your version of 7zip can rename members (9.30+):
     $cmd = $self->get_command(
         command => 'rn',
@@ -621,7 +629,7 @@ sub add_directory {
     );
     $fh = $self->run( $cmd );
     $self->wait($fh);
-    
+
     # Once 7zip supports reading from stdin, this will work again:
     #my $fh = $self->run( $cmd,
     #    binmode => ':raw',
@@ -632,12 +640,12 @@ sub add_directory {
 
 sub add {
     my( $self, %options )= @_;
-    
+
     my @items = @{ delete $options{ items } || [] };
-    
+
     # Split up the list into one batch for the listfiles
     # and the list of files we need to rename
-    
+
     my @filelist;
     for my $item (@items) {
         if( ! ref $item ) {
@@ -672,13 +680,13 @@ sub add {
             push @filelist, $name;
         };
     };
-    
+
     if( @filelist ) {
         my( $fh, $name) = tempfile;
         binmode $fh, ':raw';
         print {$fh} join "\r\n", @filelist;
         close $fh;
-        
+
         my @options;
         if( $options{ recursive }) {
             push @options, '-r';
@@ -771,8 +779,8 @@ L<Archive::Any>
 
 =head1 REPOSITORY
 
-The public repository of this module is 
-L<http://github.com/Corion/archive-sevenzip>.
+The public repository of this module is
+L<https://github.com/Corion/archive-sevenzip>.
 
 =head1 SUPPORT
 
@@ -791,7 +799,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

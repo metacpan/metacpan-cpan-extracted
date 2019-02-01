@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/xaicron/p5-DBIx-QueryLog.svg?branch=master)](https://travis-ci.com/xaicron/p5-DBIx-QueryLog)
 # NAME
 
 DBIx::QueryLog - Logging queries for DBI
@@ -220,7 +221,7 @@ Default `$OUTPUT` is `STDERR`.
 
 # AUTHOR
 
-xaicron <xaicron {at} cpan.org>
+xaicron &lt;xaicron {at} cpan.org>
 
 # THANKS TO
 

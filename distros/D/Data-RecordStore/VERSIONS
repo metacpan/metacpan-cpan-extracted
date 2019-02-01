@@ -1,3 +1,31 @@
+5.02 - change how/when the lockfile is made so that ro stores can be opened.
+
+5.01 - oops, actually record the update time that has a place waiting
+       for it in the index. Added a last_upated($id) method to the 
+       store and testing to boot.
+
+5.00 - major number increases indicate either a change in the API
+       or a change that requires an upgrade of an older version
+       database.
+       
+       enforcing the calling convention Data::RecordStore->open_store
+       meaning that Data::RecordStore::open_store wont work
+  
+       Adding locking for the index file.
+
+       Removed deprecated methods.
+
+       Adding locks methods in general
+
+       Adding last modified timestamp to index.
+
+       Now have a standard way to do database upgrades, for this
+       and for Data::ObjectStore. Hopefully this surprises people
+       the least.
+         3 directories : source, destination, working
+         
+       Added Data::RecordStore->detect_version function.
+
 4.06 - updating tests for windows. Windows tests seem to be
        failing because chmod is having no effect.
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -36,6 +36,16 @@ SYNOPSIS
 DESCRIPTION
 
     Types::RENEEB is a collection of types I need very often
+
+MODULES
+
+    These Types:: modules are shipped in this distribution:
+
+      * Types::Dist
+
+      * Types::OTRS
+
+    Types::RENEEB inherits the types of the mentioned modules.
 
 AUTHOR
 

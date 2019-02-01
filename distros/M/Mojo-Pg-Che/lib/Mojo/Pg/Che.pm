@@ -22,27 +22,30 @@ See L<Mojo::Pg>
 
 =head1 VERSION
 
-Version 0.852
+Version 0.854
 
 =cut
 
-our $VERSION = '0.852';
+our $VERSION = '0.854';
 
 
 =head1 SYNOPSIS
 
     use Mojo::Pg::Che;
 
-    my $pg = Mojo::Pg::Che->connect("dbname=test;", "postgres", 'pg-pwd', \%attrs);
+    my $pg = Mojo::Pg::Che->connect("dbname=test;", "postgres", 'pg-pwd', \%attrs, max_connections=>10);
     # or
     my $pg = Mojo::Pg::Che->new
       ->dsn("DBI:Pg:dbname=test;")
       ->username("postgres")
       ->password('pg--pw')
-      ->options(\%attrs);
+      ->options(\%attrs)
+      ->connect();
     
     # or
-    my $pg = Mojo::Pg->new('pg://postgres@/test');
+    my $pg = Mojo::Pg::Che->new('pg://postgres@/test');
+    # or
+    my $pg = Mojo::Pg::Che->new()->connect(...);
 
     # Bloking query
     my $result = $pg->query('select ...', undef, @bind);
@@ -100,21 +103,7 @@ our $VERSION = '0.852';
   $db->query('insert into foo (name) values (?)', 'barrr');
   $db->commit;
 
-=head1 Non-blocking query cases
-
-Depends on $attr->{Async} and callback:
-
-1. $attr->{Async} set to 1. None $cb pass. Callback will create inside methods C<< ->query() >> C<< ->select...() >> and will returns ref on that callback. You need start Mojo::IOLoop:
-
-  # async sth
-  my $sth = $pg->prepare('select ...', {Async => 1,},);
-  # Result non-blocking query for async sth
-  my $res_cb = $pg->query($sth, {Async => 1,}, @bind,);
-  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-  # Mojo::Pg::Results style
-  my res = $$res_cb->()->hash;
-
-2. $attr->{Async} not set. $cb defined. Results pass to $cb. You need start Mojo::IOLoop:
+=head1 Non-blocking query
 
   my @results;
   my $cb = sub {
@@ -128,8 +117,6 @@ Depends on $attr->{Async} and callback:
   like($_->hash->{d}, qr/2016-06-\d+/, 'correct async query')
     for @results;
 
-
-3. $attr->{Async} set to 1. $cb defined. Results pass to $cb. You need start Mojo::IOLoop.
 
 
 =head1 METHODS
@@ -228,84 +215,90 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojo-Pg-
 
 =head1 COPYRIGHT
 
-Copyright 2016 Mikhail Che.
+Copyright 2016+ Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
 
+use Mojo::Pg;
 use DBI;
 use Carp qw(croak);
 use Mojo::Pg::Che::Database;
-use Mojo::URL;
-use Scalar::Util 'blessed';
+#~ use Mojo::URL;
+#~ use Scalar::Util 'blessed';
 
+has pg => sub { Mojo::Pg->new };#, weak => 1;
 has database_class => 'Mojo::Pg::Che::Database';
 has dsn             => 'dbi:Pg:';
 has max_connections => 5;
 has [qw(password username)] => '';
-has [qw(parent)];
-has pubsub => sub {
-  require Mojo::Pg::PubSub;
-  my $pubsub = Mojo::Pg::PubSub->new(pg => shift);
-  #~ weaken $pubsub->{pg};#???
-#Mojo::Reactor::EV: Timer failed: Can't call method "db" on an undefined value at t/06-pubsub.t line 21.
-#EV: error in callback (ignoring): Can't call method "db" on an undefined value at Mojo/Pg/PubSub.pm line 44.
-  return $pubsub;
-};
-
+has [qw(parent search_path)];
 has options => sub {
-  {AutoCommit => 1, AutoInactiveDestroy => 1, PrintError => 0, RaiseError => 1, ShowErrorStatement => 1, pg_enable_utf8 => 1,};
+  {
+    AutoCommit => 1,
+    AutoInactiveDestroy => 1,
+    PrintError => 0,
+    RaiseError => 1,
+    ShowErrorStatement => 1,
+    pg_enable_utf8 => 1,
+  };
 };
 
 has debug => $ENV{DEBUG_Mojo_Pg_Che} || 0;
 my $PKG = __PACKAGE__;
 
-sub from_string {# copy/paste Mojo::Pg
-  my ($self, $str) = @_;
+sub new {
+  my $class = shift;
+  my $from_string = @_ == 1;
+  my $pg = $from_string && Mojo::Pg->new->from_string(shift);
+
+  my $self = $class->SUPER::new(@_);
+  $self->pg($pg)
+    if $pg;
+
+  if ($from_string) {
+    map $self->$_($self->pg->$_),
+    qw(dsn username password options search_path);
+  } else {
+    map $self->pg->$_($self->$_),
+    qw(dsn username password options search_path max_connections);#database_class pubsub
+  }
+
+  $self->dsn('dbi:Pg:'.$self->dsn)
+    unless !$self->dsn || $self->dsn =~ /^dbi:Pg:/;
   
-  # Parent
-  return $self unless $str;
-  return $self->parent($str) if blessed $str && $str->isa('Mojo::Pg');
-
-  # Protocol
-  return $self unless $str;
-  my $url = Mojo::URL->new($str);
-  croak qq{Invalid PostgreSQL connection string "$str"}
-    unless $url->protocol =~ /^(?:pg|postgres(?:ql)?)$/;
-
-  # Connection information
-  my $db = $url->path->parts->[0];
-  my $dsn = defined $db ? "dbi:Pg:dbname=$db" : 'dbi:Pg:';
-  if (my $host = $url->host) { $dsn .= ";host=$host" }
-  if (my $port = $url->port) { $dsn .= ";port=$port" }
-  if (defined(my $username = $url->username)) { $self->username($username) }
-  if (defined(my $password = $url->password)) { $self->password($password) }
-
-  # Service
-  my $hash = $url->query->to_hash;
-  if (my $service = delete $hash->{service}) { $dsn .= "service=$service" }
-
-  # Options
-  @{$self->options}{keys %$hash} = values %$hash;
-
-  return $self->dsn($dsn);
+  return $self;
 }
 
-sub new { @_ > 1 ? shift->SUPER::new->from_string(@_) : shift->SUPER::new }# copy/paste Mojo::Pg
-
+#DBI
 sub connect {
-  my $self = shift->SUPER::new;
-  map $self->$_(shift), qw(dsn username password);
-  if (my $attrs = shift) {
+  my $self = ref $_[0] ? shift : shift->SUPER::new;
+  map { my $has = shift; $has && $self->$_($has)} qw(dsn username password);
+
+  if (ref $_[0]) {
+    my $attrs =  shift;
     my $options = $self->options;
     @$options{ keys %$attrs } = values %$attrs;
   }
-  $self->dsn('DBI:Pg:'.$self->dsn)
-    unless $self->dsn =~ /^DBI:Pg:/;
-  say STDERR sprintf("[$PKG->connect] prepare connection data for [%s]", $self->dsn, )
-    if $self->debug;
+  if (@_) {
+    my $attrs = {@_};
+    map $self->$_($attrs->{$_}), keys %$attrs;
+  }
+  
+  $self->dsn('dbi:Pg:'.$self->dsn)
+    unless !$self->dsn || $self->dsn =~ /^dbi:Pg:/;
+  
+  #~ $self->pg(Mojo::Pg->new)
+    #~ unless $self->pg;
+  
+  map $self->pg->$_($self->$_),
+    qw(dsn username password options search_path max_connections);#database_class  pubsub
+  
+  #~ say STDERR sprintf("[$PKG->connect] prepare connection data for [%s]", $self->dsn, )
+    #~ if $self->debug;
+  
   return $self;
 }
 
@@ -323,17 +316,39 @@ sub db {
 sub prepare { shift->db->prepare(@_); }
 sub prepare_cached { shift->db->prepare_cached(@_); }
 
-sub _db_sth {shift->db(ref $_[0] && $_[0]->{Database})}
+# если уже sth и он не в асинхроне - взять его dbh
+sub _db {
+  my $self = shift;
+  my $sth = ref $_[0] ? shift : return $self->db;
+  return $self->db
+    if !!$sth->{pg_async_status};
+  #~ my $db = $sth->{private_mojo_db};
+  #~ return $db
+    #~ if $db && !$db->dbh->{pg_async_status};
 
-sub query { shift->_db_sth(@_)->select(@_) }
-sub select { shift->_db_sth(@_)->select(@_) }
-sub selectrow_array { shift->_db_sth(@_)->selectrow_array(@_) }
-sub selectrow_arrayref { shift->_db_sth(@_)->selectrow_arrayref(@_) }
-sub selectrow_hashref { shift->_db_sth(@_)->selectrow_hashref(@_) }
-sub selectall_arrayref { shift->_db_sth(@_)->selectall_arrayref(@_) }
-sub selectall_hashref { shift->_db_sth(@_)->selectall_hashref(@_) }
-sub selectcol_arrayref { shift->_db_sth(@_)->selectcol_arrayref(@_) }
-sub do { shift->_db_sth(@_)->do(@_) }
+  $self->db($sth->{Database});
+}
+
+# если уже sth и он не в асинхроне - взять в запрос его
+# или просто у него взять строку запроса для нового dbh
+sub _sth {
+  my $self = shift;
+  my $sth = ref $_[0] ? shift : return @_;
+  #~ warn "_sth: $sth->{pg_async_status}, ";
+  return ($sth, @_)
+    if $sth->{pg_async_status} != 1;
+  return ($sth->{Statement}, @_);
+}
+
+sub query { my $self = shift; $self->_db(@_)->select($self->_sth(@_)) }
+sub select { my $self = shift; $self->_db(@_)->select($self->_sth(@_)) }
+sub selectrow_array { my $self = shift; $self->_db(@_)->selectrow_array($self->_sth(@_)) }
+sub selectrow_arrayref { my $self = shift; $self->_db(@_)->selectrow_arrayref($self->_sth(@_)) }
+sub selectrow_hashref { my $self = shift; $self->_db(@_)->selectrow_hashref($self->_sth(@_)) }
+sub selectall_arrayref { my $self = shift; $self->_db(@_)->selectall_arrayref($self->_sth(@_)) }
+sub selectall_hashref { my $self = shift; $self->_db(@_)->selectall_hashref($self->_sth(@_)) }
+sub selectcol_arrayref { my $self = shift; $self->_db(@_)->selectcol_arrayref($self->_sth(@_)) }
+sub do { my $self = shift; $self->_db(@_)->do($self->_sth(@_)) }
 
 #~ sub begin_work {croak 'Use $pg->db->tx | $pg->db->begin';}
 sub tx {shift->begin}
@@ -345,14 +360,12 @@ sub begin {
   return $db;
 }
 
-sub commit {croak 'Use: $tx = $pg->begin; $tx->do(...); $tx->commit;';}
-sub rollback {croak 'Use: $tx = $pg->begin; $tx->do(...); $tx->rollback;';}
+sub commit  {croak 'Instead use: $tx = $pg->begin; $tx->do(...); $tx->commit;';}
+sub rollback {croak 'Instead use: $tx = $pg->begin; $tx->do(...); $tx->rollback;';}
 
 # Patch parent Mojo::Pg::_dequeue
 sub _dequeue {
   my $self = shift;
-
-  #~ while (my $dbh = shift @{$self->{queue} || []}) { return $dbh if $dbh->ping }
   
   my $queue = $self->{queue} ||= [];
   for my $i (0..$#$queue) {
@@ -375,7 +388,6 @@ sub _dequeue {
   my $dbh = DBI->connect(map { $self->$_ } qw(dsn username password options));
   $self->debug
     && say STDERR sprintf("[$PKG->_dequeue] new DBI connection [$dbh]", );
-  #~ say STDERR "НОвое [$dbh] соединение";
   
 
   $self->emit(connection => $dbh);
@@ -400,5 +412,18 @@ sub _enqueue {
 }
 
 1;
+
+__END__
+
+has pubsub => sub {
+  require Mojo::Pg::PubSub;
+  my $pubsub = Mojo::Pg::PubSub->new(pg => shift);
+  #~ weaken $pubsub->{pg};#???
+#Mojo::Reactor::EV: Timer failed: Can't call method "db" on an undefined value at t/06-pubsub.t line 21.
+#EV: error in callback (ignoring): Can't call method "db" on an undefined value at Mojo/Pg/PubSub.pm line 44.
+  return $pubsub;
+};
+
+
 
 

@@ -17,7 +17,7 @@ name: Data-RecordStore
 provides:
   Data::RecordStore:
     file: lib/Data/RecordStore.pm
-    version: '4.06'
+    version: '5.02'
   Data::RecordStore::Converter:
     file: lib/Data/RecordStore/Converter.pm
   Data::RecordStore::Converter::OldSilo:
@@ -27,8 +27,9 @@ provides:
   Data::RecordStore::Transaction:
     file: lib/Data/RecordStore.pm
 requires:
+  File::Copy::Recursive: '0.44'
   perl: v5.9.4
 resources:
   license: http://dev.perl.org/licenses/
-version: '4.06'
+version: '5.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-PluginBundle-MITHALDU
 
+1.190321  2019-02-01 21:54:06+01:00 Europe/Berlin
+    - also allow perlcritic.rc as dirty on-release file
+
+1.190320  2019-02-01 21:43:33+01:00 Europe/Berlin
+    - disable another critic policy
+    - generate both build and repo readme with ReadmeAnyFromPod
+
 1.172230  2017-08-11 14:07:34+02:00 Europe/Berlin
     - remove need for manual gitignore and exclude entries
     - switch to github issues as default tracker

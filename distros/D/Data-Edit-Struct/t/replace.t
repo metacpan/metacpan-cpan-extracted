@@ -96,9 +96,8 @@ isa_ok(
         edit(
             replace => {
                 replace => 'key',
-			dest    => [],
-			src => ['foo']
-            } )
+                dest    => [],
+                src     => ['foo'] } )
     },
     ['Data::Edit::Struct::failure::input::dest'],
     "can't replace root"
@@ -109,9 +108,9 @@ isa_ok(
         edit(
             replace => {
                 replace => 'key',
-			dest    => [ 0 ],
-			dpath => '/*[0]',
-			src => 'foo'
+                dest    => [0],
+                dpath   => '/*[0]',
+                src     => 'foo'
             } )
     },
     ['Data::Edit::Struct::failure::input::dest'],

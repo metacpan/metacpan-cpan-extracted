@@ -1,5 +1,10 @@
 Revision history for Perl extension DBIx::QueryLog
 
+0.42 2019-02-01T17:43:24Z
+    - Fixed t::Util problem
+    - #18 Fxied typo in README (fadlil++)
+    - #20 Fixed uuv when skip_bind(1) (Hirofumi-Narita++)
+
 0.41 2015-07-31T08:19:07Z
     - Fixed exception when using EXPLAIN if statement error.
 

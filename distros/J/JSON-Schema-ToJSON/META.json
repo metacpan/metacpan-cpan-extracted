@@ -4,13 +4,13 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "JSON-Schema-ToJSON",
    "no_index" : {
@@ -34,7 +34,7 @@
          "requires" : {
             "Cpanel::JSON::XS" : "3.0213",
             "Data::Dump" : "0",
-            "DateTime" : "0",
+            "Data::Fake" : "0.004",
             "File::Slurper" : "0",
             "FindBin" : "0",
             "Hash::Merge" : "0",
@@ -56,7 +56,7 @@
       "bugtracker" : {
          "web" : "https://github.com/Humanstate/json-schema-tojson/issues"
       },
-      "homepage" : "https://metacpan.org/module/JSON::Schame::ToJSON",
+      "homepage" : "https://metacpan.org/module/JSON::Schema::ToJSON",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -64,6 +64,6 @@
          "url" : "https://github.com/Humanstate/json-schema-tojson"
       }
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

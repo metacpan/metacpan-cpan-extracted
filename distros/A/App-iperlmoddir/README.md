@@ -4,7 +4,7 @@ App::iperlmoddir
 
 # VERSION
 
-version 1.0
+version 1.02
 
 # SYNOPSIS
 

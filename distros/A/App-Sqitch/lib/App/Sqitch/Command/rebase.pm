@@ -15,7 +15,7 @@ use namespace::autoclean;
 extends 'App::Sqitch::Command';
 with 'App::Sqitch::Role::RevertDeployCommand';
 
-our $VERSION = '0.9998';
+our $VERSION = '0.9999';
 
 has onto_change => (
     is  => 'ro',
@@ -31,32 +31,15 @@ sub options {
     return qw(
         onto-change|onto=s
         upto-change|upto=s
-        onto-target=s
-        upto-target=s
     );
 }
 
 sub configure {
     my ( $class, $config, $opt ) = @_;
-
-    my $p = { map { $_ => $opt->{$_} } grep { exists $opt->{$_} } qw(
+    return { map { $_ => $opt->{$_} } grep { exists $opt->{$_} } qw(
         onto_change
         upto_change
     ) };
-
-    # Handle deprecated options.
-    for my $key (qw(onto upto)) {
-        if (my $val = $opt->{"$key\_target"}) {
-            App::Sqitch->warn(__x(
-                'Option --{old} has been deprecated; use --{new} instead',
-                old => "$key-target",
-                new => "$key-change",
-            ));
-            $p->{"$key\_change"} ||= $val;
-        }
-    }
-
-    return $p;
 }
 
 sub execute {
@@ -91,7 +74,7 @@ sub execute {
     $engine->log_only( $self->log_only );
 
     # Revert.
-    if (my %v = %{ $self->revert_variables }) { $engine->set_variables(%v) }
+    $engine->set_variables( $self->_collect_revert_vars($target) );
     try {
         $engine->revert( $onto );
     } catch {
@@ -99,12 +82,12 @@ sub execute {
         die $_ if ! eval { $_->isa('App::Sqitch::X') }
             || $_->exitval > 1
             || $_->ident eq 'revert:confirm';
-        # Emit notice of non-fatal errors (e.g., nothign to revert).
+        # Emit notice of non-fatal errors (e.g., nothing to revert).
         $self->info($_->message)
     };
 
     # Deploy.
-    if (my %v = %{ $self->deploy_variables }) { $engine->set_variables(%v) }
+    $engine->set_variables( $self->_collect_deploy_vars($target) );
     $engine->deploy( $upto, $self->mode );
     return $self;
 }

@@ -15,10 +15,10 @@ isa_ok(
             replace => {
                 dest  => [ 0, 10, 20, 40 ],
                 dpath => '/*[0]',
-                src => [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ] ],
+                src   => [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ] ],
                 spath => '/*/*[0]',
             },
-          )
+        )
     },
     ['Data::Edit::Struct::failure::input::src'],
     'multiple sources not accepted in default mode'
@@ -35,10 +35,10 @@ subtest 'hash' => sub {
                     %defaults,
                     dest  => [ 0, 10, 20, 40 ],
                     dpath => '/*[0]',
-                    src => [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ] ],
+                    src   => [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ] ],
                     spath => '/',
                 },
-              )
+            )
         },
         ['Data::Edit::Struct::failure::input::src'],
         "can't convert root to hash"
@@ -103,9 +103,9 @@ subtest 'hash' => sub {
                 sxfrm_args => { key => 'goo' },
                 dest       => \@dest,
                 dpath      => '/*[1]',
-                src   => { foo => 1, bar => 5, baz => 3 },
-                spath => '/bar',
-                stype => 'element',
+                src        => { foo => 1, bar => 5, baz => 3 },
+                spath      => '/bar',
+                stype      => 'element',
             },
         );
 
@@ -175,11 +175,11 @@ subtest 'iterate' => sub {
                 replace => {
                     dest  => [ 0, 10, 20, 40 ],
                     dpath => '/*[0]',
-                    src => [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ] ],
+                    src   => [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ] ],
                     spath => '/*/*[0]',
                     sxfrm => 'iterate',
                 },
-              )
+            )
         },
         ['Data::Edit::Struct::failure::input::src'],
         'multiple sources not accepted for replace operation'
@@ -194,7 +194,7 @@ subtest 'coderef' => sub {
         splice => {
             sxfrm => sub {
 
-		my ( $ctx, $spath, $args ) = @_;
+                my ( $ctx, $spath, $args ) = @_;
 
                 my $src = $ctx->matchr( $spath );
                 die( "source path may not have multiple resolutions\n" )
@@ -204,9 +204,9 @@ subtest 'coderef' => sub {
             sxfrm_args => { key => 'goo' },
             dest       => \@dest,
             dpath      => '/*[1]',
-            src   => { foo => 1, bar => 5, baz => 3 },
-            spath => '/bar',
-            stype => 'element',
+            src        => { foo => 1, bar => 5, baz => 3 },
+            spath      => '/bar',
+            stype      => 'element',
         },
     );
 

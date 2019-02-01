@@ -1,6 +1,12 @@
 Version history for MojoX::GlobalEvents
 =======================================
 
+0.03 2019-02-01 09:41:00
+
+  * fix bug: when two listeners registered for the same event, it wouldn't work
+  * add tests
+  * updated dist.ini
+
 0.02 2014-06-12
 
   * fixed prereq list in dist.ini

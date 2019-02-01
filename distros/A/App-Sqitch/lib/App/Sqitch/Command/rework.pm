@@ -12,8 +12,9 @@ use App::Sqitch::Types qw(Str ArrayRef Bool Maybe);
 use namespace::autoclean;
 
 extends 'App::Sqitch::Command';
+with 'App::Sqitch::Role::ContextCommand';
 
-our $VERSION = '0.9998';
+our $VERSION = '0.9999';
 
 has change_name => (
     is  => 'ro',
@@ -83,7 +84,6 @@ sub execute {
         names      => [$self->change_name],
         all        => $self->all,
         args       => \@_,
-        no_default => 1,
         no_changes => 1,
     );
 

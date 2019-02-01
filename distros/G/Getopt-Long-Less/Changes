@@ -1,4 +1,11 @@
-Revision history for Getopt-Long-Less
+0.090   2019-02-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- Mention no support for hash storage mode, implicit destination;
+	  replace term 'handler' with 'destination' (ref:
+	  https://github.com/perlancar/perl-Getopt-Long-More/issues/21).
+
 
 0.08    2016-12-03 (PERLANCAR)
 

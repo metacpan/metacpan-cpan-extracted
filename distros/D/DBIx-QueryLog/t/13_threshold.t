@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::Requires 'DBD::SQLite';
 use Test::More;
 use t::Util;

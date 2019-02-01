@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::Requires qw(DBD::Pg Test::PostgreSQL);
 use Test::More;
 use Test::PostgreSQL;
@@ -39,6 +40,17 @@ subtest 'bind_param' => sub {
     };
 
     like $res, qr/SELECT \* FROM user WHERE User = \? : \[root\]/;
+};
+
+subtest 'bind_param including undefined' => sub {
+    my $res = capture {
+        my $sth = $dbh->prepare('SELECT * FROM user WHERE User IN (?, ?)');
+        $sth->bind_param(1, undef);
+        $sth->bind_param(2, 'root');
+        $sth->execute;
+    };
+
+    like $res, qr/SELECT \* FROM user WHERE User IN \(\?, \?\) : \[NULL, root\]/;
 };
 
 DBIx::QueryLog->skip_bind(0);

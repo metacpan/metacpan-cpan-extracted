@@ -20,13 +20,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "App::ColorThemeUtils",
   "PREREQ_PM" => {
-    "Color::ANSI::Util" => "0.160",
+    "Color::ANSI::Util" => "0.161",
     "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "PERLANCAR::Module::List" => 0,
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.810",
+    "Perinci::CmdLine::Base" => "1.816",
     "Perinci::CmdLine::Classic" => "1.770",
     "Sah::Schema::perl::modname" => 0,
     "strict" => 0,
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Color::ANSI::Util" => "0.160",
+  "Color::ANSI::Util" => "0.161",
   "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
@@ -55,7 +55,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "PERLANCAR::Module::List" => 0,
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.810",
+  "Perinci::CmdLine::Base" => "1.816",
   "Perinci::CmdLine::Classic" => "1.770",
   "Sah::Schema::perl::modname" => 0,
   "Test::More" => 0,

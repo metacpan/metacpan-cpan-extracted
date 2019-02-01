@@ -113,7 +113,6 @@ lib/Mojolicious/Plugin/EPRenderer.pm
 lib/Mojolicious/Plugin/HeaderCondition.pm
 lib/Mojolicious/Plugin/JSONConfig.pm
 lib/Mojolicious/Plugin/Mount.pm
-lib/Mojolicious/Plugin/PODRenderer.pm
 lib/Mojolicious/Plugin/TagHelpers.pm
 lib/Mojolicious/Plugins.pm
 lib/Mojolicious/Renderer.pm
@@ -134,7 +133,6 @@ lib/Mojolicious/resources/public/mojo/prettify/run_prettify.js
 lib/Mojolicious/resources/templates/mojo/debug.html.ep
 lib/Mojolicious/resources/templates/mojo/exception.html.ep
 lib/Mojolicious/resources/templates/mojo/not_found.html.ep
-lib/Mojolicious/resources/templates/mojo/perldoc.html.ep
 lib/Mojolicious/Routes.pm
 lib/Mojolicious/Routes/Match.pm
 lib/Mojolicious/Routes/Pattern.pm

@@ -2,6 +2,7 @@
 Build.PL
 Changes
 LICENSE
+LICENSE.md
 MANIFEST
 META.json
 META.yml
@@ -104,6 +105,8 @@ lib/App/Sqitch/Plan/Line.pm
 lib/App/Sqitch/Plan/LineList.pm
 lib/App/Sqitch/Plan/Pragma.pm
 lib/App/Sqitch/Plan/Tag.pm
+lib/App/Sqitch/Role/ConnectingCommand.pm
+lib/App/Sqitch/Role/ContextCommand.pm
 lib/App/Sqitch/Role/DBIEngine.pm
 lib/App/Sqitch/Role/RevertDeployCommand.pm
 lib/App/Sqitch/Role/TargetConfigCommand.pm
@@ -179,8 +182,10 @@ t/checkout.t
 t/command.t
 t/config.t
 t/configuration.t
+t/conn_cmd_role.t
 t/core.conf
 t/core_target.conf
+t/cx_cmd_role.t
 t/datetime.t
 t/depend.t
 t/deploy.t
@@ -211,6 +216,7 @@ t/lib/App/Sqitch/Engine/good.pm
 t/lib/DBIEngineTest.pm
 t/lib/LC.pm
 t/lib/MockOutput.pm
+t/lib/TestConfig.pm
 t/lib/upgradable_registries/exasol.sql
 t/lib/upgradable_registries/firebird.sql
 t/lib/upgradable_registries/mysql.sql
@@ -231,7 +237,7 @@ t/options.t
 t/oracle.t
 t/pg.t
 t/plan.t
-t/plan_command.t
+t/plan_cmd.t
 t/plans/bad-change.plan
 t/plans/changes-only.plan
 t/plans/dependencies.plan

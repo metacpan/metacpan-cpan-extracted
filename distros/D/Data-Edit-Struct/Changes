@@ -1,5 +1,18 @@
 Revision history for Data-Edit-Struct
 
+0.07      2019-02-01 13:30:47-05:00 America/New_York
+
+  [ ENHANCEMENT ]
+
+    *  new 'transform' action, which uses a user provided
+    subroutine to transform elements.
+
+
+  [ DISTRIBUTION ]
+
+    * switch to Module::Build::Tiny
+
+
 0.06      2017-12-25 22:41:05-05:00 America/New_York
 
   [ DISTRIBUTION ]

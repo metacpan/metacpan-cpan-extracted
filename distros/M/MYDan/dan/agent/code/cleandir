@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+my ( $path, $uuid, $expire ) = map{ $param{argv}{$_}}qw( path uuid expire );
+
+$expire = 0 unless $expire && $expire =~ /^\d+$/;
+my $idie = sub{ print shift;exit 1; };
+
+&$idie( "uuid format error:$uuid" ) unless $uuid && $uuid =~ /^[a-zA-Z0-9]+$/;
+
+my $prefix = '.TEMP_MYDan_Grsync_';
+my ( $temp, $fail )= "${prefix}$uuid";
+
+for my $p ( @$path )
+{
+    next unless -e $p;
+    unless( chdir $p )
+    {
+        print "cd $p fail\n";
+        $fail = 1 ;
+        next;
+    }
+
+    if( system "rm -f $temp*" )
+    {
+        print "clean temp fail\n";
+        $fail = 1;
+        next;
+    }
+    
+    next unless  $expire;
+    my $timeout = time - $expire;
+
+    for my $f ( grep{ -f $_ } glob "${prefix}*" )
+    {
+        my $mtime = ( stat $f )[9];
+        next if $mtime > $timeout;
+        unless( unlink  $f )
+        {
+            print "unlink $f fail: $!\n";
+            $fail = 1;
+        }
+    }
+}
+
+$fail ? exit( 1 ) : exit( 0 );

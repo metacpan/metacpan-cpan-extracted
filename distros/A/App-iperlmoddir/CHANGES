@@ -2,9 +2,22 @@
 Changes from 2018-01-31 00:00:00 +0000 to present.
 ==================================================
 
-----------------------------------------
-version 1.0 at 2019-01-31 16:25:44 +0000
-----------------------------------------
+-----------------------------------------
+version 1.02 at 2019-01-31 18:11:17 +0000
+-----------------------------------------
+
+  Change: c6c744d31afbd8a66844728e87cebc79978a3e87
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2019-01-31 21:11:05 +0000
+
+    Added more verbose error messages 
+
+  Change: ef68538013e375f763da147d3813d8fb724d8a36
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2019-01-31 20:38:59 +0000
+
+    Fixed new_from_loaded to new_from_module at Module::Info and added
+    more verbose output 
 
   Change: 28717a1adbbeb2ed71543e526e472ee606fb80c7
   Author: Pavel Serikov <pavelsr@cpan.org>

@@ -11,7 +11,7 @@ our $AUTOLOAD;
 
 BEGIN {
 	use vars qw ($VERSION);
-	$VERSION     = "1.12";
+	$VERSION     = "1.14";
 }
 
 =head1 NAME
@@ -25,31 +25,31 @@ WWW::Mechanize::Pluggable - A WWW::Mechanize that's custmomizable via plugins
 
 =head1 DESCRIPTION
 
-This module provides all of the same functionality of C<WWW::Mechanize>, but 
-adds support for I<plugins> using C<Module::Pluggable>; this means that 
+This module provides all of the same functionality of C<WWW::Mechanize>, but
+adds support for I<plugins> using C<Module::Pluggable>; this means that
 any module named C<WWW::Mechanize::Plugin::I<whatever...>> will
 be found and loaded when C<WWW::Mechanize::Pluggable> is loaded.
 
-Big deal, you say. Well, it I<becomes> a big deal in conjunction with 
+Big deal, you say. Well, it I<becomes> a big deal in conjunction with
 C<WWW::Mechanize::Pluggable>'s other feature: I<plugin hooks>. When plugins
 are loaded, their C<import()> methods can call C<WWW::Mechanize::Pluggable>'s
-C<prehook> and C<posthook> methods. These methods add callbacks to the 
+C<prehook> and C<posthook> methods. These methods add callbacks to the
 plugin code in C<WWW::Mechanize::Pluggable>'s methods. These callbacks can
 act before a method or after it, and have to option of short-circuiting the
 call to the C<WWW::Mechanize::Pluggable> method altogether.
 
 These methods receive whatever parameters the C<WWW::Mechanize::Pluggable>
-methods received, plus a reference to the actvive C<Mech> object. 
+methods received, plus a reference to the actvive C<Mech> object.
 
 All other extensions to C<WWW::Mechanize::Pluggable> are handled by the
 plugins.
 
 =head1 SUBCLASSING
 
-Subclassing this class is not recommended; partly because the method 
+Subclassing this class is not recommended; partly because the method
 redispatch we need to do internally doesn't play well with the standard
-Perl OO model, and partly because you should be using plugins and hooks 
-instead. 
+Perl OO model, and partly because you should be using plugins and hooks
+instead.
 
 In C<WWW::Mechanize>, it is recommended that you extend functionality by
 subclassing C<WWW::Mechanize>, because there's no other way to extend the
@@ -57,16 +57,16 @@ class. With C<Module::Pluggable> support, it is easy to load another method
 directly into C<WWW::Mechanize::Pluggable>'s namespace; it then appears as
 if it had always been there. In addition, the C<pre_hook()> and C<post_hook()>
 methods provide a way to intercept a call and replace it with your output, or
-to tack on further processing at the end of a standard method (or even a 
-plugin!). 
+to tack on further processing at the end of a standard method (or even a
+plugin!).
 
 The advantage of this is in not having a large number of subclasses, all of
 which add or alter C<WWW::Mechanize>'s function, and all of which have to be
-loaded if you want them available in your code. With 
+loaded if you want them available in your code. With
 C<WWW::Mechanize::Pluggable>, one simply installs the desired plugins and they
 are all automatically available when you C<use WWW::Mechanize::Pluggable>.
 
-Configuration is a possible problem area; if three different plugins all 
+Configuration is a possible problem area; if three different plugins all
 attempt to replace C<get()>, only one will win. It's better to create more
 sophisticated methods that call on lower-level ones than to alter existing
 known behavior.
@@ -108,7 +108,7 @@ L<WWW::Mechanize>
 
 Handles the delegation of import options to the appropriate plugins.
 
-C<import> loads the plugins (found via a call to C<__PACKAGE__->plugins>) using 
+C<import> loads the plugins (found via a call to C<__PACKAGE__->plugins>) using
 C<erquire>; it then calls each plugin's C<import> method with the parameters
 specific to it, if there are any.
 
@@ -123,16 +123,16 @@ C<WWW::Mechanize::Plugin::Zonk>'s import() would get called like this:
 
   WWW::Mechanize::Plugin::Zonk->import(foo => 1, bar => [qw(a b c)]);
 
-And C<WWW::Mechanize::Plugin::Thud>'s import() would get 
+And C<WWW::Mechanize::Plugin::Thud>'s import() would get
 
   WWW::Mechanize::Plugin::Thud->import(baz => 'quux');
 
 So each plugin only sees what it's supposed to.
 
-=cut 
+=cut
 
 sub import {
-  my ($class, %plugin_args) = @_; 
+  my ($class, %plugin_args) = @_;
   foreach my $plugin (__PACKAGE__->plugins) {
     my ($plugin_name) = ($plugin =~ /.*::(.*)$/);
     if ($plugin->can('import')) {
@@ -148,11 +148,11 @@ sub import {
 
 =head2 init
 
-C<init> runs through all of the plugins for this class and calls 
+C<init> runs through all of the plugins for this class and calls
 their C<init> methods (if they exist). Not meant to be called by your
 code; it's internal-use-only.
 
-C<init> gets all of the arguments supplied to C<new>; it can 
+C<init> gets all of the arguments supplied to C<new>; it can
 process them or not as it pleases.
 
 =head3 What your plugin sees
@@ -171,13 +171,13 @@ As an example:
    my $mech = new WWW::Mechanize::Pluggable foo=>'bar';
 
 A plugin's C<init> could process the C<foo> argument and return C<foo>;
-this parameter would then be deleted from the arguments. 
+this parameter would then be deleted from the arguments.
 
-=cut 
+=cut
 
 sub init {
   my ($self, %args) = @_;
-  # call all the inits (if defined) in all our 
+  # call all the inits (if defined) in all our
   # plugins so they can all set up their defaults
   my @deletes;
   foreach my $plugin (__PACKAGE__->plugins) {
@@ -191,7 +191,7 @@ sub init {
 =head2 new
 
 C<new> constructs a C<WWW::Mechanize::Pluggable> object and initializes
-its pre and port hook queues. You can add parameters to be passed to 
+its pre and port hook queues. You can add parameters to be passed to
 plugins' C<init> methods by adding them to this C<new> call.
 
 =cut
@@ -208,7 +208,7 @@ sub new {
 
   local $_;
   delete $args{$_} foreach @deletes;
-  
+
 
   $self->mech($self->_create_mech_object(\%args));
 
@@ -239,10 +239,10 @@ to create it and forget about the details. We don't use C<Class::Accessor>,
 though, because we want the C<WWW::Mechanize::Pluggable> class to have no
 superclass (other than C<UNIVERSAL>).
 
-This is necessary because we use X<AUTOLOAD> (q.v.) to trap all of the calls
+This is necessary because we use C<AUTOLOAD> (q.v.) to trap all of the calls
 to this class so they can be pre- and post-processed before being passed on
 to the underlying C<WWW::Mechanize> object.  If we C<use base qw(Class::Accessor)>,
-as is needed to make it work properly, C<Class::Accessor>'s C<AUTOLOAD> gets control 
+as is needed to make it work properly, C<Class::Accessor>'s C<AUTOLOAD> gets control
 instead of ours, and the hooks don't work.
 
 =cut
@@ -279,7 +279,7 @@ reference to the hook sub itself.
 
 sub _remove_hook {
   my ($self, $which, $method, $hook_sub) = @_;
-  $self->{$which}->{$method} = 
+  $self->{$which}->{$method} =
     [grep { "$_" ne "$hook_sub"} @{$self->{$which}->{$method}}]
       if defined $self->{$which}->{$method};
 }
@@ -308,7 +308,7 @@ sub post_hook {
   $self->_insert_hook(PostHooks=>@_);
 }
 
-=head2 last_method 
+=head2 last_method
 
 Records the last method used to call C<WWW::Mechanize::Pluggable>.
 This allows plugins to call a method again if necessary without
@@ -329,7 +329,7 @@ the "proxy" pattern. It intercepts all the calls to the underlying class,
 and also wraps them with pre-hooks (called before the method is called)
 and post-hooks (called after the method is called). This allows us to
 provide all of the functionality of C<WWW::Mechanize> in this class
-without copying any of the code, and to alter the behavior as well 
+without copying any of the code, and to alter the behavior as well
 without altering the original class.
 
 Pre-hooks can cause the actual method call to the underlying class
@@ -337,7 +337,7 @@ to be skipped altogether by returning a true value.
 
 =cut
 
-sub AUTOLOAD { 
+sub AUTOLOAD {
   return if $AUTOLOAD =~ /DESTROY/;
 
   # don't shift; this might be a straight sub call!
@@ -349,7 +349,7 @@ sub AUTOLOAD {
 
   # Determine if this is a class method call or a subroutine call. Getting here
   # for either means that they haven't been defined and we don't know how to
-  # find them. 
+  # find them.
   my $call_type;
   if (scalar @_ == 0 or !defined $_[0] or !ref $_[0]) {
     $call_type = ( $_[0] eq $class ? 'class method' :  'subroutine' );
@@ -357,7 +357,7 @@ sub AUTOLOAD {
 
   die "Can't resolve $call_type $plain_sub(). Did your plugins define it?"
     if $call_type;
- 
+
   # Record the method name so plugins can check it.
   $self->last_method($plain_sub);
 
@@ -394,24 +394,24 @@ sub AUTOLOAD {
 =head2 clone
 
 An ovveride for C<WWW::Mechanize>'s C<clone()> method; uses YAML to make sure
-that the code references get cloned too. Note that this is important for 
-later code (the cache stuff in particular); general users won't notice 
+that the code references get cloned too. Note that this is important for
+later code (the cache stuff in particular); general users won't notice
 any real difference.
 
-There's been some discussion as to whether this is totally adequate (for 
+There's been some discussion as to whether this is totally adequate (for
 instance, if the code references are closures, they  won't be properly cloned).
 For now, we'll go with this and see how it works.
 
-=cut 
+=cut
 
 sub clone {
   my $self = shift;
   # Name created by eval; works out to a no-op.
-  my $value = 
-  eval { no strict; 
-         local $WWW_Mechanize_Pluggable1; 
-         eval Dump($self)->Out(); 
-         $WWW_Mechanize_Pluggable1; 
+  my $value =
+  eval { no strict;
+         local $WWW_Mechanize_Pluggable1;
+         eval Dump($self)->Out();
+         $WWW_Mechanize_Pluggable1;
        };
   die "clone failed: $@\n" if $@;
   return $value;

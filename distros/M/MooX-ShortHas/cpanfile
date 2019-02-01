@@ -11,7 +11,6 @@ on 'test' => sub {
   requires "Test::Fatal" => "0";
   requires "Test::InDistDir" => "0";
   requires "Test::More" => "0";
-  requires "blib" => "1.01";
   requires "perl" => "5.006";
   requires "strict" => "0";
   requires "warnings" => "0";
@@ -23,10 +22,10 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
-  requires "English" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Test::CPAN::Meta" => "0";
   requires "Test::More" => "0";
+  requires "Test::Perl::Critic" => "0";
   requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Portability::Files" => "0";

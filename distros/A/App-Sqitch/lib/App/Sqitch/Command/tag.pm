@@ -12,8 +12,9 @@ use List::Util qw(first);
 use namespace::autoclean;
 
 extends 'App::Sqitch::Command';
+with 'App::Sqitch::Role::ContextCommand';
 
-our $VERSION = '0.9998';
+our $VERSION = '0.9999';
 
 has tag_name => (
     is  => 'ro',
@@ -58,7 +59,6 @@ sub execute {
         names      => [$self->tag_name, $self->change_name],
         all        => $self->all,
         args       => \@_,
-        no_default => 1,
         no_changes => 1,
     );
 

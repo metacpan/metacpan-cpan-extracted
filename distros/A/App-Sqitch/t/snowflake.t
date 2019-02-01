@@ -25,6 +25,7 @@ use App::Sqitch::Plan;
 use App::Sqitch::DateTime;
 use lib 't/lib';
 use DBIEngineTest;
+use TestConfig;
 
 my $CLASS;
 
@@ -33,10 +34,7 @@ delete $ENV{"SNOWSQL_$_"} for qw(USER PASSWORD DATABASE HOST PORT);
 BEGIN {
     $CLASS = 'App::Sqitch::Engine::snowflake';
     require_ok $CLASS or die;
-    $ENV{SQITCH_CONFIG}        = 'nonexistent.conf';
-    $ENV{SQITCH_SYSTEM_CONFIG} = 'nonexistent.user';
-    $ENV{SQITCH_USER_CONFIG}   = 'nonexistent.sys';
-    $ENV{SNOWSQL_ACCOUNT}      = 'nonesuch';
+    $ENV{SNOWSQL_ACCOUNT} = 'nonesuch';
 }
 
 # Mock the home directory to prevent reading a user config file.
@@ -52,7 +50,8 @@ is_deeply [$CLASS->config_vars], [
 ], 'config_vars should return three vars';
 
 my $uri = 'db:snowflake:';
-my $sqitch = App::Sqitch->new(options => { engine => 'snowflake' });
+my $config = TestConfig->new('core.engine' => 'snowflake');
+my $sqitch = App::Sqitch->new(config => $config);
 my $target = App::Sqitch::Target->new(
     sqitch => $sqitch,
     uri    => URI::db->new($uri),
@@ -73,7 +72,7 @@ is $snow->key, 'snowflake', 'Key should be "snowflake"';
 is $snow->name, 'Snowflake', 'Name should be "Snowflake"';
 is $snow->driver, 'DBD::ODBC 1.59', 'Driver should be DBD::ODBC';
 is $snow->default_client, 'snowsql', 'Default client should be snowsql';
-my $client = 'snowsql' . ($^O eq 'MSWin32' ? '.exe' : '');
+my $client = 'snowsql' . (App::Sqitch::ISWIN ? '.exe' : '');
 is $snow->client, $client, 'client should default to snowsql';
 
 is $snow->registry, 'sqitch', 'Registry default should be "sqitch"';
@@ -220,10 +219,13 @@ SNOWSQLCFGFILE: {
     my $cfgfn = $cfgdir->file('config');
 
     my $cfg = {
-        username    => 'jonSnow',
-        password    => 'winter is cøming',
-        accountname => 'golem',
-        region      => 'Africa',
+        username      => 'jonSnow',
+        password      => 'winter is cøming',
+        accountname   => 'golem',
+        region        => 'Africa',
+        warehousename => 'LaBries',
+        rolename      => 'ACCOUNTADMIN',
+        dbname        => 'dolphin',
     };
 
     # Unset the mock.
@@ -266,9 +268,12 @@ SNOWSQLCFG: {
 
     # Read config.
     $mock_snow->mock(_snowcfg => {
-        username => 'jon_snow',
-        password => 'let me in',
-        accountname => 'flipr',
+        username      => 'jon_snow',
+        password      => 'let me in',
+        accountname   => 'flipr',
+        rolename      => 'SYSADMIN',
+        warehousename => 'Waterbed',
+        dbname        => 'monkey',
     });
     my $snow = $CLASS->new( sqitch => $sqitch, target => $target );
     is $snow->username, 'jon_snow',
@@ -277,6 +282,12 @@ SNOWSQLCFG: {
         'Should read password fron snowsql config file';
     is $snow->account, 'flipr',
         'Should read accountname fron snowsql config file';
+    is $snow->uri->dbname, 'monkey',
+        'Should read dbname from snowsql config file';
+    is $snow->warehouse, 'Waterbed',
+        'Should read warehousename fron snowsql config file';
+    is $snow->role, 'SYSADMIN',
+        'Should read rolename fron snowsql config file';
     is $snow->uri->host, 'flipr.snowflakecomputing.com',
         'Should derive host name from config file accounte name';
 
@@ -286,15 +297,13 @@ SNOWSQLCFG: {
 
 ##############################################################################
 # Make sure config settings override defaults.
-my %config = (
+$config->update(
     'engine.snowflake.client'   => '/path/to/snowsql',
-    'engine.snowflake.target'   => 'db:snowflake://fred:hi@foo/try?warehouse=foo',
+    'engine.snowflake.target'   => 'db:snowflake://fred:hi@foo/try?warehouse=foo;role=yup',
     'engine.snowflake.registry' => 'meta',
 );
 $std_opts[-3] = 'registry=meta';
 $std_opts[-1] = 'warehouse=foo';
-my $mock_config = Test::MockModule->new('App::Sqitch::Config');
-$mock_config->mock(get => sub { $config{ $_[2] } });
 
 $target = App::Sqitch::Target->new( sqitch => $sqitch );
 ok $snow = $CLASS->new(sqitch => $sqitch, target => $target),
@@ -304,12 +313,13 @@ is $snow->account, 'foo', 'Should extract account from URI';
 is $snow->username, 'fred', 'Should extract username from URI';
 is $snow->password, 'hi', 'Should extract password from URI';
 is $snow->warehouse, 'foo', 'Should extract warehouse from URI';
+is $snow->role, 'yup', 'Should extract role from URI';
 is $snow->registry, 'meta', 'registry should be as configured';
 is $snow->uri->as_string,
-    'db:snowflake://fred:hi@foo.snowflakecomputing.com/try?warehouse=foo',
+    'db:snowflake://fred:hi@foo.snowflakecomputing.com/try?warehouse=foo;role=yup',
     'URI should be as configured with full domain name';
 is $snow->destination,
-    'db:snowflake://fred:@foo.snowflakecomputing.com/try?warehouse=foo',
+    'db:snowflake://fred:@foo.snowflakecomputing.com/try?warehouse=foo;role=yup',
     'Destination should omit password';
 
 is $snow->client, '/path/to/snowsql', 'client should be as configured';
@@ -318,33 +328,8 @@ is_deeply [$snow->snowsql], [qw(
     --accountname foo
     --username    fred
     --dbname      try
+    --rolename    yup
 ), @std_opts], 'snowsql command should be configured from URI config';
-
-
-##############################################################################
-# Now make sure that (deprecated?) Sqitch options override configurations.
-$sqitch = App::Sqitch->new(
-    options => {
-        engine     => 'snowflake',
-        client     => '/some/other/snowsql',
-    },
-);
-
-$target = App::Sqitch::Target->new( sqitch => $sqitch );
-my $exp_pass = 's3cr3t';
-$target->uri->password($exp_pass);
-ok $snow = $CLASS->new(sqitch => $sqitch, target => $target),
-    'Create a snowflake with sqitch with options';
-
-is $snow->client, '/some/other/snowsql', 'client should be as optioned';
-is_deeply [$snow->snowsql], [qw(
-    /some/other/snowsql
-    --accountname foo
-    --username    fred
-    --dbname      try
-), @std_opts], 'snowsql command should be as optioned';
-
-$mock_config->unmock('get');
 
 ##############################################################################
 # Test SQL helpers.
@@ -387,9 +372,10 @@ is_deeply [$snow->_regex_expr('corn', 'Obama$')],
 
 ##############################################################################
 # Test _run(), _capture() _spool(), and _probe().
+$config->replace('core.engine' => 'snowflake');
 can_ok $snow, qw(_run _capture _spool);
 my $mock_sqitch = Test::MockModule->new('App::Sqitch');
-my @capture;
+my ($exp_pass, @capture) = ('s3cr3t');
 $mock_sqitch->mock(capture => sub {
     local $Test::Builder::Level = $Test::Builder::Level + 2;
     shift;
@@ -426,6 +412,11 @@ $mock_sqitch->mock(probe => sub {
     }
     return;
 });
+
+$target = App::Sqitch::Target->new(sqitch => $sqitch, uri => URI->new($uri));
+$target->uri->password($exp_pass);
+ok $snow = $CLASS->new(sqitch => $sqitch, target => $target),
+    'Create a snowflake with sqitch with options';
 
 ok $snow->_run(qw(foo bar baz)), 'Call _run';
 is_deeply \@capture, [$snow->snowsql, qw(foo bar baz)],
@@ -485,7 +476,6 @@ is_deeply \@capture, [$snow->snowsql, $snow->_verbose_opts, '--filename', 'foo/b
     'Verifile file should be passed to run() for high verbosity';
 
 $mock_sqitch->unmock_all;
-$mock_config->unmock_all;
 
 ##############################################################################
 # Test DateTime formatting stuff.
@@ -543,12 +533,8 @@ my $err = try {
 };
 
 DBIEngineTest->run(
-    class         => $CLASS,
-    sqitch_params => [options => {
-        engine    => 'snowflake',
-        top_dir   => dir(qw(t engine)),
-        plan_file => file(qw(t engine sqitch.plan)),
-    }],
+    class             => $CLASS,
+    version_query     => q{SELECT 'Snowflake ' || CURRENT_VERSION()},
     target_params     => [ uri => $uri ],
     alt_target_params => [ uri => $uri, registry => '__sqitchtest' ],
     skip_unless       => sub {

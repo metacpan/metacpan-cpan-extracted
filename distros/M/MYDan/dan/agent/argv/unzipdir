@@ -1,0 +1,17 @@
+#!# perl: agent/argv/unzipdir
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+return sub
+{
+    local $/;
+    my %o;
+
+    Getopt::Long::GetOptionsFromArray( \@_, \%o, qw( uuid=s chmod=s chown=s delete ) );
+
+    $o{path} = \@_;
+
+    return \%o;
+};

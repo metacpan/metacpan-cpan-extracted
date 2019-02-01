@@ -18,9 +18,10 @@ no_index:
     - t
     - inc
 requires:
+  File::LsColor: '0'
   Term::ExtendedColor: '0.16'
 resources:
   bugtracker: https://github.com/trapd00r/File-PatternMatch/issues
   repository: https://github.com/trapd00r/File-PatternMatch
-version: '0.045'
+version: '0.050'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

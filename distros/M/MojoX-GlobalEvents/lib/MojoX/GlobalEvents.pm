@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed);
 use base 'Exporter';
 our @EXPORT = qw(on publish);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 my %subscriber;
 
@@ -34,14 +34,18 @@ sub on {
     my ($event,$sub) = @_;
 
     if ( !blessed $object ) {
-        $sub   = $event;
-        $event = $object;
+        $sub    = $event;
+        $event  = $object;
+        $object = '';
     }
 
     return if ref $event or !ref $sub or ref $sub ne 'CODE';
 
-    my $package = "$object" || caller;
+    my $package = "$object";
+    $package    = caller if !$package;
     $subscriber{$event}->{$package} = $sub;
+
+    return 1;
 }
 
 sub publish {
@@ -50,6 +54,8 @@ sub publish {
     for my $package ( sort keys %{ $subscriber{$event} || {} } ) {
         $subscriber{$event}->{$package}->(@param);
     }
+
+    return 1;
 }
 
 
@@ -59,13 +65,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 MojoX::GlobalEvents - A module to handle events
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

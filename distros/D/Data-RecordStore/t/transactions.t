@@ -71,6 +71,7 @@ sub test_suite {
         );
 
     my $trans = $store->start_transaction;
+    is( $trans, $store->use_transaction, "use transaction is same as current transaction" );
     check( $store, "create trans",
            entries => 0,
            records => 0,
@@ -614,12 +615,12 @@ sub test_suite {
     unlike( $@, qr/\S/, 'no commit error moar multimove' );
     unlike( $@, qr/_swapout/, 'no swapout error moar multimove' );
 
-
     $dir = tempdir( CLEANUP => 1 );
     $store = Data::RecordStore->open_store( $dir );
     $store->stow( "NOTOUCHY" );
     $store->stow( "DELME", 3 );
-    $store->use_transaction;
+     $trans = $store->use_transaction;
+    is( $trans, $store->use_transaction, "use transaction is same as current transaction" );
     $store->stow( "FREENY", 2 );
     is( $store->fetch(2), "FREENY", "returns value it has in transaction" );
     $store->delete_record( 3 );
@@ -630,7 +631,7 @@ sub test_suite {
     is( $store->fetch(3), 'DELME', "transaction deletion rolled back" );
     is( $store->fetch(1), "NOTOUCHY", "returns value not affected by transaction after rollback" );
     is( $store->_current_transaction, undef, "No current transaction after rollback" );
-    $trans = $store->create_transaction();
+    $trans = $store->start_transaction();
     is( $trans, $store->use_transaction, "use transaction is same as current transaction" );
     $store->stow( "GOST", 3 );
     $store->commit_transaction();
@@ -647,10 +648,10 @@ sub test_suite {
         like( $out, qr/No transaction in progress/, "no trasnaction to commit" );
     }
 
-    $store->create_transaction;
+    $store->start_transaction;
     $id = $store->stow( "x" x 8001 );
     is( $store->fetch( $id ), "x" x 8001, "fetched the 8001" );
-    $store->delete( $id );
+    $store->delete_record( $id );
     is( $store->fetch( $id ), undef, "fetched the delted thing" );
     $store->stow( "x" x 8002, $id );
     is( $store->fetch( $id ), "x" x 8002, "fetched the 8002" );

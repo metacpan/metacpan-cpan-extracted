@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9998';
+our $VERSION = '0.9999';
 
 has registry_uri => (
     is       => 'ro',
@@ -240,7 +240,7 @@ sub run_upgrade {
 sub _read {
     my $self = shift;
     my $cmd = '.read ' . $self->dbh->quote(shift);
-    return $cmd if $^O ne 'MSWin32';
+    return $cmd unless App::Sqitch::ISWIN;
     return $self->sqitch->quote_shell($cmd);
 }
 

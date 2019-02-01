@@ -1,5 +1,11 @@
-DESCRIPTION
+NAME
+    Getopt::Long::Less - Like Getopt::Long, but with less features
 
+VERSION
+    This document describes version 0.090 of Getopt::Long::Less (from Perl
+    distribution Getopt-Long-Less), released on 2019-02-02.
+
+DESCRIPTION
     This module is a reimplementation of Getopt::Long, with less
     features/configurability. Only the subset which I'm currently using
     (which I think already serves a lot of common use cases for a lot of
@@ -8,20 +14,25 @@ DESCRIPTION
     Only three functions are implemented: GetOptions, GetOptionsFromArray,
     and Configure.
 
-    No configuring from use statement. No OO interface.
+    No configuring from "use" statement. No OO interface.
 
     Much much less modes/configuration. No support for POSIXLY_CORRECT. We
-    always do bundling (this is not Getopt::Long's default), we never
-    ignore case (this is not Getopt::Long's default), we always permute, we
-    always autoabbreviate, we always do GNU compatibility (allow --opt=VAL
-    in addition to --opt VAL including allowing --opt=), we never do
-    getopt_compat. Basically currently there's no mode you can configure
-    (although pass_through might be added in the future).
+    always do bundling (*this is not Getopt::Long's default*), we never
+    ignore case (*this is not Getopt::Long's default*), we always permute,
+    we always autoabbreviate, we always do GNU compatibility (allow
+    "--opt=VAL" in addition to "--opt VAL" including allowing "--opt="), we
+    never do getopt_compat. Basically currently there's no mode you can
+    configure (although pass_through might be added in the future).
 
     No autoversion, no autohelp. No support to configure prefix pattern.
 
-    Currently no support for arrayref handler (e.g. "foo=s" => \@ary). No
-    support for array desttype ('foo=s@' => ...).
+    No support for GetOptions' "hash storage mode" (where the first argument
+    is a hashref) nor "classic mode" (where destination is not explicitly
+    specified). Basically, the arguments need to be pairs of option
+    specifications and destinations.
+
+    Currently no support for arrayref destination (e.g. ""foo=s" => \@ary").
+    No support for array desttype ("'foo=s@' => ...").
 
     Also, this module requires 5.010.
 
@@ -30,13 +41,34 @@ DESCRIPTION
     squeezing out milliseconds from startup overhead of my CLI scripts.
     That's it :-)
 
-    Sample startup overhead benchmark:
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Getopt-Long-Less>.
 
-    # COMMAND: perl devscripts/bench-startup 2>&1
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Getopt-Long-Less>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Less>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Getopt::Long
 
-    If you want more features intead of less, try Getopt::Long::More.
+    If you want *more* features intead of less, try Getopt::Long::More.
+
+    Benchmarks in Bencher::Scenario::GetoptModules
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

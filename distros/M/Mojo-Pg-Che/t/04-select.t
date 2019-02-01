@@ -12,9 +12,9 @@ use Mojo::Pg::Che;
 my $class = 'Mojo::Pg::Che';
 
 # 1
-my $pg = $class->connect($dsn, $user, $pw, )->max_connections(20);#{pg_enable_utf8 => 1,}
+my $pg = $class->connect($dsn, $user, $pw, max_connections=>20);#{pg_enable_utf8 => 1,}
 
-$pg->on(connection=>sub {shift; shift->do('set datestyle to "DMY, ISO";');});
+$pg->on(connection=>sub {$_[1]->do('set datestyle to "DMY, ISO";');});
 
 subtest 'blocking pg select' => sub {
   my $r = $pg->selectrow_hashref('select now() as now',);
@@ -28,23 +28,24 @@ subtest 'blocking db select' => sub {
   
 };
 
+=pod
 subtest 'attr Async=>1' => sub {
   my $sth = $pg->prepare('select now() as now, pg_sleep(?)');
   like $pg->selectrow_hashref($sth, undef, (1))->{now}, qr/\d{4}-\d{2}-\d{2}/, 'async sth pg selectrow_hashref';
   my $cb = $pg->selectrow_hashref($sth, {Async=>1}, ($_,));
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   like $$cb->()->hash->{now}, qr/\d{4}-\d{2}-\d{2}/, "right convert to async sth";
-  my @cb = ();
-  for (1..5) {
-    my $rand = rand;
-    push @cb, [(my $cb = $pg->selectrow_hashref('select now() as now, pg_sleep(?), ?::numeric as rand', {Async=>1}, (10-$_,$rand))), $rand];
-  }
-  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-  for (@cb) {
-    my $r = ${$_->[0]}->()->fetchrow_hashref();
-    like $r->{now}, qr/\d{4}-\d{2}-\d{2}/, 'async sth pg selectrow_hashref';
-    is $r->{rand}, $_->[1], 'right result';
-  }
+  #~ my @cb = ();
+  #~ for (1..5) {
+    #~ my $rand = rand;
+    #~ push @cb, [(my $cb = $pg->selectrow_hashref('select now() as now, pg_sleep(?), ?::numeric as rand', {Async=>1}, (10-$_,$rand))), $rand];
+  #~ }
+  #~ Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+  #~ for (@cb) {
+    #~ my $r = ${$_->[0]}->()->fetchrow_hashref();
+    #~ like $r->{now}, qr/\d{4}-\d{2}-\d{2}/, 'async sth pg selectrow_hashref';
+    #~ is $r->{rand}, $_->[1], 'right result';
+  #~ }
   
   #~ eval {local $sth; my $res = $pg->selectrow_hashref($sth, undef, (1))->{now};};
   #~ like $@, qr/.+/, 'blocking sth error after async query';
@@ -53,6 +54,7 @@ subtest 'attr Async=>1' => sub {
   $sth->{pg_async} = 0;
   like $pg->selectrow_hashref($sth, undef, (1))->{now}, qr/\d{4}-\d{2}-\d{2}/, 'right convert from async sth';
 };
+=cut
 
 subtest 'blocking selectrow_array' => sub {
   my @result;
@@ -62,16 +64,15 @@ subtest 'blocking selectrow_array' => sub {
   is scalar @result, 6, 'blocking pg selectrow_array';
 };
 
-subtest 'async selectrow_arrayref' => sub {
-  my @cb;
-  #~ my $sth = $pg->prepare('select ?::int, pg_sleep(1)', {Async=>1},);
-  for (142..144) {
-    push @cb, $pg->selectrow_arrayref('select ?::int, pg_sleep(1)', {Async=>1, Cached=>1,}, ($_));
-  }
-  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-  is scalar @cb, 3*2, 'selectrow_arrayref';
-  #~ is scalar @{$result[2]}, 2, 'selectrow_arrayref';
-};
+#~ subtest 'async selectrow_arrayref' => sub {
+  #~ my @cb;
+  #~ ##~ my $sth = $pg->prepare('select ?::int, pg_sleep(1)', {Async=>1},);
+  #~ for (142..144) {
+    #~ push @cb, $pg->selectrow_arrayref('select ?::int, pg_sleep(1)', {Async=>1, Cached=>1,}, ($_));
+  #~ }
+  #~ Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+  #~ is scalar @cb, 3*2, 'selectrow_arrayref';
+#~ };
 
 
 subtest 'blocking selectall_arrayref' => sub {
@@ -94,7 +95,7 @@ subtest 'blocking selectall_arrayref' => sub {
 #~ };
 
 
-subtest 'async cb selectall_arrayref' => sub {
+subtest 'async selectall_arrayref' => sub {
   my @result;
   my $cb = sub {
     my ($db, $err, $results) = @_;
@@ -113,18 +114,11 @@ subtest 'async cb selectall_arrayref' => sub {
     like $r->[0]{c1}, qr/^\d{3}$/, 'selectall_arrayref Slice';
     like $r->[0]{c2}, qr/\d{4}-\d{2}-\d{2}/, 'selectall_arrayref slice column value';
   }
-  my $cb2 = $pg->selectrow_arrayref('select ?::int as c1, now() as c2, pg_sleep(5) as c3', {Async=>1}, (777)); # 
-  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-  
-  #~ while (my $r = shift @result) {
-    my $r = $$cb2->()->fetchall_arrayref([0]);
-    like $r->[0][0], qr/^\d{3}$/, 'selectall_arrayref Slice';
-  #~ }
 };
 
 
 subtest 'selectall_hashref' => sub {
-  my @result;
+  my @result = ();
   my $cb = sub {
     my ($db, $err, $results) = @_;
     die $err if $err;
@@ -155,12 +149,23 @@ subtest 'selectall_hashref' => sub {
   is scalar @result, 3, 'async query cb  -attr';
   is $_->fetchall_hashref('name')->{baz}{name}, 'baz', 'async query result fetchall_hashref'
     for @result;
+  
+  @result = ();
+  for (17..17) {
+    $pg->selectall_hashref($sth, undef, {}, ($_, 'baz'), $cb);
+    $pg->query($sth, {}, ($_, 'baz'), $cb);
+    $pg->selectrow_array($sth, {}, ($_, 'baz'), $cb);
+  }
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+  is scalar @result, 3, 'async ';
+  is $_->fetchall_hashref('name')->{baz}{name}, 'baz', 'async query result fetchall_hashref'
+    for @result;
 
 };
 
-subtest 'prepare(Async=>1) fetchcol_arrayref'=> sub {
+subtest 'prepare fetchcol_arrayref'=> sub {
   my $sql = 'select * FROM (VALUES(1, 200000, 1.2), (2, 400000, 1.4)) AS v (depno, target, increase);';
-  my $sth = $pg->prepare($sql, {Async=>1});
+  my $sth = $pg->prepare($sql);
   my $res;
   my $cb = sub {
     my ($db, $err, $results) = @_;
@@ -192,14 +197,18 @@ subtest 'select query fetch' => sub {
     die $err if $err;
     $row = $res->fetchrow_hashref();
   };
-  $pg->select("select now() as now", undef, $cb);
+  my $sth = $pg->prepare("select now() as now");
+  $pg->select($sth, undef, $cb);
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   like $row->{now}, qr/\d{4}-\d{2}-\d{2}/, 'select+fetchrow_hashref';
-  $pg->query("select now() as now", undef, $cb);
+  # повторно асинхрон sth
+  $pg->query($sth, undef, $cb);
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   like $row->{now}, qr/\d{4}-\d{2}-\d{2}/, 'select+fetchrow_hashref';
 };
 
-
+#~ warn "\nпрошел: ", scalar @{$pg->{queue}};
+#~ sleep 20;
 
 done_testing();
+

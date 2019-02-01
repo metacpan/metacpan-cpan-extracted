@@ -9,6 +9,7 @@ build_requires:
   File::Spec: '0'
   File::Spec::Functions: '0'
   FindBin: '0'
+  IO::Pager: '0'
   Module::Build: '0.35'
   Module::Runtime: '0'
   Path::Class: '0.33'
@@ -20,6 +21,8 @@ build_requires:
   Test::MockModule: '0.05'
   Test::More: '0.94'
   Test::NoWarnings: '0.083'
+  Test::Warn: '0'
+  base: '0'
   lib: '0'
 configure_requires:
   Module::Build: '0.35'
@@ -95,7 +98,7 @@ requires:
   File::Temp: '0'
   Getopt::Long: '0'
   Hash::Merge: '0'
-  IO::Pager: '0'
+  IO::Handle: '0'
   IPC::Run3: '0'
   IPC::System::Simple: '1.17'
   List::MoreUtils: '0'
@@ -143,6 +146,6 @@ resources:
   bugtracker: https://github.com/sqitchers/sqitch/issues/
   homepage: https://sqitch.org/
   repository: https://github.com/sqitchers/sqitch/
-version: '0.9998'
-x_generated_by_perl: v5.28.0
+version: '0.9999'
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

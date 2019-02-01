@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::Requires 'DBD::SQLite';
 use Test::More;
 use t::Util;
@@ -15,7 +16,7 @@ my $res = capture_logger {
 
 ok exists $res->{time}, 'time is exists';
 ok exists $res->{localtime}, 'localtime is exists';
-is $res->{line}, 13, 'line ok';
+is $res->{line}, 14, 'line ok';
 like $res->{file}, qr/30_logger\.t/, 'file ok';
 is $res->{pkg}, 'main', 'pkg ok';
 is $res->{sql}, 'SELECT * FROM sqlite_master', 'query ok';

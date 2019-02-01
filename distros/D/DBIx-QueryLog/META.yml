@@ -7,9 +7,9 @@ build_requires:
   Test::More: '0.96'
   Test::Requires: '0'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   DBIx::QueryLog:
     file: lib/DBIx/QueryLog.pm
-    version: '0.41'
+    version: '0.42'
 recommends:
   DBD::Pg: '0'
   DBD::SQLite: '0'
@@ -44,14 +44,18 @@ resources:
   bugtracker: https://github.com/xaicron/p5-DBIx-QueryLog/issues
   homepage: https://github.com/xaicron/p5-DBIx-QueryLog
   repository: git://github.com/xaicron/p5-DBIx-QueryLog.git
-version: '0.41'
+version: '0.42'
+x_authority: cpan:XAICRON
 x_contributors:
-  - 'Yuki Ibe <yibe@yibe.org>'
-  - 'tokuhirom <tokuhirom@gmail.com>'
-  - 'cho45 <cho45@lowreal.net>'
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
-  - 'makamaka <makamaka.donzoko@gmail.com>'
-  - 'Ryuta Kamizono <kamipo@gmail.com>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Ryuta Kamizono <kamipo@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Yuki Ibe <yibe@yibe.org>'
+  - 'cho45 <cho45@lowreal.net>'
+  - 'fadlil <lord_nesh2004@yahoo.com>'
+  - 'makamaka <makamaka.donzoko@gmail.com>'
+  - 'narita <narita.cpp@gmail.com>'
+  - 'tokuhirom <tokuhirom@gmail.com>'
   - 'xaicron <xaicron@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

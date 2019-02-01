@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Dist::Zilla::PluginBundle::MITHALDU;
-our $VERSION = '1.172230'; # VERSION
+our $VERSION = '1.190321'; # VERSION
 
 # Dependencies
 use autodie 2.00;
@@ -33,7 +33,6 @@ use Dist::Zilla::Plugin::Test::Perl::Critic ();
 use Dist::Zilla::Plugin::PodWeaver ();
 use Dist::Zilla::Plugin::Test::Portability ();
 use Dist::Zilla::Plugin::ReadmeAnyFromPod 0.120051 ();
-use Dist::Zilla::Plugin::ReadmeFromPod ();
 use Dist::Zilla::Plugin::StaticVersion ();
 use Dist::Zilla::Plugin::TaskWeaver 0.101620 ();
 use Dist::Zilla::Plugin::Test::Version ();
@@ -197,8 +196,8 @@ sub configure {
   my $is_release = grep /^release$/, @ARGV;
   $version_provider = [ 'AutoVersion' => { major => $self->major_version } ] if $is_release;
 
-  my @generated_files = qw( META.json Makefile.PL cpanfile README.pod );
-  my @on_release_files = ( qw/dist.ini Changes/, @generated_files );
+  my @generated_files = qw( META.json Makefile.PL cpanfile );
+  my @on_release_files = ( qw/dist.ini Changes README.pod perlcritic.rc/, @generated_files );
   my @exclude_match = ( '^' . $meta->{name} . '-', @{$self->exclude_match} );
 
   my @plugins = (
@@ -224,9 +223,9 @@ sub configure {
     ),
 
   # generated distribution files
-    'ReadmeFromPod',
     'License',            # core
-    [ ReadmeAnyFromPod => { # generate in root for github, etc.
+    'ReadmeAnyFromPod',
+    [ ReadmeAnyFromPod => ReadmePodInRoot => { # generate in root for github, etc.
         type => 'pod',
         filename => 'README.pod',
         location => 'root',
@@ -336,7 +335,7 @@ Dist::Zilla::PluginBundle::MITHALDU - Dist::Zilla configuration the way MITHALDU
 
 =head1 VERSION
 
-version 1.172230
+version 1.190321
 
 =head1 SYNOPSIS
 
@@ -377,8 +376,8 @@ following dist.ini:
  
    ; generated files
    [License]           ; boilerplate license
-   [ReadmeFromPod]     ; from Pod (runs after PodWeaver)
-   [ReadmeAnyFromPod]  ; create README.pod in repo directory
+   [ReadmeAnyFromPod]     ; from Pod (runs after PodWeaver)
+   [ReadmeAnyFromPod / ReadmePodInRoot]  ; create README.pod in repo directory
    type = pod
    filename = README.pod
    location = root
@@ -574,11 +573,21 @@ L<https://github.com/wchristian/dist-zilla-pluginbundle-mithaldu>
 
 Christian Walde <walde.christian@gmail.com>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords David Golden
+=for stopwords Christian Walde David Golden
+
+=over 4
+
+=item *
+
+Christian Walde <walde.christian@googlemail.com>
+
+=item *
 
 David Golden <dagolden@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

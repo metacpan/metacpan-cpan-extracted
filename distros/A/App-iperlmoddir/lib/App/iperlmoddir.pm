@@ -1,5 +1,5 @@
 package App::iperlmoddir;
-$App::iperlmoddir::VERSION = '1.0';
+$App::iperlmoddir::VERSION = '1.02';
 use strict;
 use warnings;
 use Data::Dumper;
@@ -19,7 +19,7 @@ sub run {
 
     my $cwd = getcwd();
     chdir $dir;
-    my $res = parse_modules($modules);
+    my $res = parse_modules( $modules, $opts->verbose );
     chdir $cwd;
 
     my $part_rows    = {};
@@ -56,7 +56,7 @@ App::iperlmoddir
 
 =head1 VERSION
 
-version 1.0
+version 1.02
 
 =head1 SYNOPSIS
 

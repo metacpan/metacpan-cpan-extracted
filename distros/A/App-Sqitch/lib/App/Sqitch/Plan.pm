@@ -18,7 +18,7 @@ use Moo;
 use App::Sqitch::Types qw(Str Int HashRef ChangeList LineList Maybe Sqitch URI File Target);
 use constant SYNTAX_VERSION => '1.0.0';
 
-our $VERSION = '0.9998';
+our $VERSION = '0.9999';
 
 # Like [:punct:], but excluding _. Copied from perlrecharclass.
 my $punct = q{-!"#$%&'()*+,./:;<=>?@[\\]^`{|}~};
@@ -35,8 +35,7 @@ my $name_re = qr{
     (?<![$punct])\b                # last character isn't punctuation
 }x;
 
-# XXX FIRST & LAST deprecated. Remove at some point?
-my %reserved = map { $_ => undef } qw(ROOT HEAD FIRST LAST);
+my %reserved = map { $_ => undef } qw(ROOT HEAD);
 
 sub name_regex { $name_re }
 

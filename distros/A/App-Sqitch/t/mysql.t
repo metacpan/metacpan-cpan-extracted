@@ -1,5 +1,11 @@
 #!/usr/bin/perl -w
 
+# To test against a live MySQL database, you must set the MYSQL_URI environment variable.
+# this is a stanard URI::db URI, and should look something like this:
+#
+#     export MYSQL_URI=db:mysql://root:password@localhost:3306/information_schema
+#
+
 use strict;
 use warnings;
 use 5.010;
@@ -14,6 +20,7 @@ use Locale::TextDomain qw(App-Sqitch);
 use File::Temp 'tempdir';
 use lib 't/lib';
 use DBIEngineTest;
+use TestConfig;
 
 my $CLASS;
 
@@ -23,11 +30,8 @@ $mm->mock(parse_defaults => {}) if $mm;
 BEGIN {
     $CLASS = 'App::Sqitch::Engine::mysql';
     require_ok $CLASS or die;
-    $ENV{SQITCH_CONFIG}        = 'nonexistent.conf';
-    $ENV{SQITCH_SYSTEM_CONFIG} = 'nonexistent.user';
-    $ENV{SQITCH_USER_CONFIG}   = 'nonexistent.sys';}
     delete $ENV{$_} for qw(MYSQL_PWD MYSQL_HOST MYSQL_TCP_PORT);
-
+}
 
 is_deeply [$CLASS->config_vars], [
     target   => 'any',
@@ -35,14 +39,15 @@ is_deeply [$CLASS->config_vars], [
     client   => 'any',
 ], 'config_vars should return three vars';
 
-my $sqitch = App::Sqitch->new( options => { engine => 'mysql'} );
+my $config = TestConfig->new('core.engine' => 'mysql');
+my $sqitch = App::Sqitch->new(config => $config);
 my $target = App::Sqitch::Target->new(sqitch => $sqitch);
 isa_ok my $mysql = $CLASS->new(sqitch => $sqitch, target => $target), $CLASS;
 
 is $mysql->key, 'mysql', 'Key should be "mysql"';
 is $mysql->name, 'MySQL', 'Name should be "MySQL"';
 
-my $client = 'mysql' . ($^O eq 'MSWin32' ? '.exe' : '');
+my $client = 'mysql' . (App::Sqitch::ISWIN ? '.exe' : '');
 my $uri = URI::db->new('db:mysql:');
 is $mysql->client, $client, 'client should default to mysql';
 is $mysql->registry, 'sqitch', 'registry default should be "sqitch"';
@@ -54,11 +59,19 @@ is $mysql->registry_destination, 'db:mysql:sqitch',
     'registry_destination should be the same as registry_uri';
 
 my @std_opts = (
-    ($^O eq 'MSWin32' ? () : '--skip-pager' ),
+    (App::Sqitch::ISWIN ? () : '--skip-pager' ),
     '--silent',
     '--skip-column-names',
     '--skip-line-numbers',
 );
+my $vinfo = try { $sqitch->probe($mysql->client, '--version') } || '';
+if ($vinfo =~ /mariadb/i) {
+    my ($version) = $vinfo =~ /Ver\s(\S+)/;
+    my ($maj, undef, $pat) = split /[.]/ => $version;
+    push @std_opts => '--abort-source-on-error'
+        if $maj > 5 || ($maj == 5 && $pat >= 66);
+}
+
 my $mock_sqitch = Test::MockModule->new('App::Sqitch');
 my $warning;
 $mock_sqitch->mock(warn => sub { shift; $warning = [@_] });
@@ -95,15 +108,15 @@ ENV: {
 
 ##############################################################################
 # Make sure config settings override defaults.
-my %config = (
+$config->update(
     'engine.mysql.client'   => '/path/to/mysql',
     'engine.mysql.target'   => 'db:mysql://foo.com/widgets',
     'engine.mysql.registry' => 'meta',
 );
-my $mock_config = Test::MockModule->new('App::Sqitch::Config');
-$mock_config->mock(get => sub { $config{ $_[2] } });
 my $mysql_version = 'mysql  Ver 15.1 Distrib 10.0.15-MariaDB';
 $mock_sqitch->mock(probe => sub { $mysql_version });
+push @std_opts => '--abort-source-on-error'
+    unless $std_opts[-1] eq '--abort-source-on-error';
 
 $target = App::Sqitch::Target->new(sqitch => $sqitch);
 ok $mysql = $CLASS->new(sqitch => $sqitch, target => $target),
@@ -187,33 +200,6 @@ is_deeply [$mysql->mysql], [qw(
 ), @std_opts, qw(
     --connect_timeout 20
 )], 'mysql command should not have disabled param options';
-
-##############################################################################
-# Now make sure that Sqitch options override configurations.
-$sqitch = App::Sqitch->new(
-    options => {
-        engine   => 'mysql',
-        client   => '/some/other/mysql',
-    },
-);
-
-$target = App::Sqitch::Target->new(sqitch => $sqitch);
-ok $mysql = $CLASS->new(sqitch => $sqitch, target => $target),
-    'Create a mysql with sqitch with options';
-
-is $mysql->client, '/some/other/mysql', 'client should be as optioned';
-is $mysql->registry, 'meta', 'registry should be as configured';
-is $mysql->registry_uri->as_string, 'db:mysql://foo.com/meta',
-    'Sqitch DB URI should be the same as uri but with DB name "meta"';
-is $mysql->registry_destination, 'db:mysql://foo.com/meta',
-    'registry_destination should be the sqitch DB URL sans password';
-is $mysql->registry, 'meta', 'registry should still be as configured';
-is_deeply [$mysql->mysql], [qw(
-    /some/other/mysql
-), '--user', $sqitch->sysuser, qw(
-    --database widgets
-    --host     foo.com
-), @std_opts], 'mysql command should be as optioned';
 
 ##############################################################################
 # Test _run(), _capture(), and _spool().
@@ -351,7 +337,6 @@ is_deeply \@capture, [$mysql->mysql, '--execute', "${set}source foo/bar.sql"],
 
 $mysql->clear_variables;
 $mock_sqitch->unmock_all;
-$mock_config->unmock_all;
 
 ##############################################################################
 # Test DateTime formatting stuff.
@@ -423,7 +408,7 @@ is_deeply [$mysql->_limit_offset(8, 4)],
     [['LIMIT ?', 'OFFSET ?'], [8, 4]],
     'Should get limit and offset';
 is_deeply [$mysql->_limit_offset(0, 2)],
-    [['LIMIT ?', 'OFFSET ?'], [18446744073709551615, 2]],
+    [['LIMIT ?', 'OFFSET ?'], ['18446744073709551615', 2]],
     'Should get limit and offset when offset only';
 is_deeply [$mysql->_limit_offset(12, 0)], [['LIMIT ?'], [12]],
     'Should get only limit with 0 offset';
@@ -458,9 +443,11 @@ END {
 }
 
 
+$uri = URI->new($ENV{MYSQL_URI} || 'db:mysql://root@/information_schema');
+$uri->dbname('information_schema') unless $uri->dbname;
 my $err = try {
     $mysql->use_driver;
-    $dbh = DBI->connect('dbi:mysql:database=information_schema', 'root', '', {
+    $dbh = DBI->connect($uri->dbi_dsn, $uri->user, $uri->password, {
         PrintError => 0,
         RaiseError => 1,
         AutoCommit => 1,
@@ -477,32 +464,23 @@ my $err = try {
     }
 
     $dbh->do("CREATE DATABASE $db");
+    $uri->dbname($db);
     undef;
 } catch {
     eval { $_->message } || $_;
 };
 
 DBIEngineTest->run(
-    class         => $CLASS,
-    sqitch_params => [options => {
-        engine      => 'mysql',
-        top_dir     => Path::Class::dir(qw(t engine))->stringify,
-        plan_file   => Path::Class::file(qw(t engine sqitch.plan))->stringify,
-    }],
-    target_params     => [
-        registry => $reg1,
-        uri => URI::db->new("db:mysql://root@/$db"),
-    ],
-    alt_target_params => [
-        registry => $reg2,
-        uri => URI::db->new("db:mysql://root@/$db"),
-    ],
+    class             => $CLASS,
+    target_params     => [ registry => $reg1, uri => $uri ],
+    alt_target_params => [ registry => $reg2, uri => $uri ],
     skip_unless       => sub {
         my $self = shift;
         die $err if $err;
-        # Make sure we have psql and can connect to the database.
+        # Make sure we have mysql and can connect to the database.
         $self->sqitch->probe( $self->client, '--version' );
-        $self->_capture('--execute' => 'SELECT version()');
+        say '# Connected to MySQL ' . $self->_capture('--execute' => 'SELECT version()');
+        1;
     },
     engine_err_regex  => qr/^You have an error /,
     init_error        => __x(

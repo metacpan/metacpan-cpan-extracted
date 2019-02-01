@@ -32,7 +32,7 @@ BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(Getopt::Long)
 BuildRequires:  perl(Hash::Merge)
-BuildRequires:  perl(IO::Pager)
+BuildRequires:  perl(IO::Pager) >= 0.34
 BuildRequires:  perl(IPC::Run3)
 BuildRequires:  perl(IPC::System::Simple) >= 1.17
 BuildRequires:  perl(List::Util)
@@ -70,6 +70,7 @@ BuildRequires:  perl(Test::File::Contents) >= 0.20
 BuildRequires:  perl(Test::MockModule) >= 0.05
 BuildRequires:  perl(Test::More) >= 0.94
 BuildRequires:  perl(Test::NoWarnings) >= 0.083
+BuildRequires:  perl(Test::Warn)
 BuildRequires:  perl(Throwable) >= 0.200009
 BuildRequires:  perl(Time::HiRes)
 BuildRequires:  perl(Try::Tiny)
@@ -100,7 +101,7 @@ Requires:       perl(File::Path)
 Requires:       perl(File::Temp)
 Requires:       perl(Getopt::Long)
 Requires:       perl(Hash::Merge)
-Requires:       perl(IO::Pager)
+Requires:       perl(IO::Pager) >= 0.34
 Requires:       perl(IPC::Run3)
 Requires:       perl(IPC::System::Simple) >= 1.17
 Requires:       perl(List::Util)
@@ -306,6 +307,12 @@ also be installed.
 # No additional files required.
 
 %changelog
+* Fri Feb 1 2019 David E. Wheeler <david.wheeler@iovation.com> 0.9999-1
+- Upgrade to v0.9999.
+- Added requirement for IO::Pager 0.34 or higher.
+- Added Test::Warn build requirement.
+- Removed cross-project dependency patch, since it's part of v0.99999.
+
 * Wed Oct 3 2018 David E. Wheeler <david.wheeler@iovation.com> 0.9998-1
 - Upgrade to v0.9998.
 - Added sqitch-snowflake package.

@@ -13,6 +13,7 @@ WriteMakefile
   'VERSION_FROM' => 'lib/Data/RecordStore.pm',
   'PREREQ_PM' => {
                    'Test::More' => 0,
+                   'File::Copy::Recursive' => '0.44',
                    'Module::Build' => 0
                  }
 )

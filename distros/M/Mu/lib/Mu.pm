@@ -6,7 +6,7 @@ use Import::Into;
 use Moo            ();
 use MooX::ShortHas ();
 
-our $VERSION = '1.172231'; # VERSION
+our $VERSION = '1.190320'; # VERSION
 
 # ABSTRACT: Moo but with less typing
 
@@ -41,7 +41,7 @@ Mu - Moo but with less typing
 
 =head1 VERSION
 
-version 1.172231
+version 1.190320
 
 =head1 SYNOPSIS
 
@@ -56,6 +56,16 @@ version 1.172231
 
 Mu imports both L<Moo> and L<MooX::ShortHas>, making it even less work in typing
 and reading to set up an object.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Mus> - Mu but with slightly more typing and strict constructors
+
+=back
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

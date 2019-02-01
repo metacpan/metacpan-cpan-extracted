@@ -1,0 +1,51 @@
+---
+abstract: 'read epubs in the terminal'
+author:
+  - 'Mario Domgoergen C<< <mario@domgoergen.com> >> '
+build_requires: {}
+configure_requires:
+  Archive::Zip: '0'
+  Curses: '0'
+  Module::Build::Tiny: '0.035'
+  Mojolicious: '0'
+  perl: 5.010_001
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-termpub
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::termpub:
+    file: lib/App/termpub.pm
+    version: '1.00'
+  App::termpub::Epub:
+    file: lib/App/termpub/Epub.pm
+  App::termpub::Epub::Chapter:
+    file: lib/App/termpub/Epub/Chapter.pm
+  App::termpub::InfoBox:
+    file: lib/App/termpub/InfoBox.pm
+  App::termpub::Pager:
+    file: lib/App/termpub/Pager.pm
+  App::termpub::Renderer:
+    file: lib/App/termpub/Renderer.pm
+resources:
+  bugtracker: https://github.com/mdom/termpub/issues
+  homepage: https://github.com/mdom/termpub
+  repository: git://github.com/mdom/termpub.git
+version: '1.00'
+x_contributors:
+  - 'Mario Domgoergen <mdom@taz.de>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

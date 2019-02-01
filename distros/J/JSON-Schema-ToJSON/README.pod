@@ -6,10 +6,10 @@ use warnings;
 use Mojo::Base -base;
 use Cpanel::JSON::XS;
 use String::Random;
-use DateTime;
 use Hash::Merge qw/ merge /;
+use Data::Fake qw/ Core Names Text Dates /;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 has _validator  => sub {
 	$ENV{JSON_VALIDATOR_RECURSION_LIMIT} = shift->max_depth;
@@ -78,38 +78,28 @@ sub _random_integer {
 	return $self->_example_from_spec( $schema )
 		if scalar $self->_example_from_spec( $schema );
 
-	my $min = $schema->{minimum};
-	my $max = $schema->{maximum};
-	my $mof = $schema->{multipleOf};
+	my $min = $schema->{minimum} || 1;
+	my $max = $schema->{maximum} || 1000;
 
 	# by default the min/max values are exclusive
 	$min++ if defined $min && $schema->{exclusiveMinimum};
 	$max-- if defined $max && $schema->{exclusiveMaximum};
 
-	my @possible_values = defined $min && defined $max
-		? $min .. $max
-		: defined $min
-			? $min .. $min + 1000
-			: defined $max
-				? 1 .. $max
-				: defined $mof
-					? $mof .. $mof
-					: 1 .. 1000 # short range, prevent creation of a massive array
-	;
+	if ( my $mof = $schema->{multipleOf} ) {
 
-	# if we have multipleOf just return the first value that fits. note that
-	# there is a possible bug here and the JSON schema spec isn't clear about
-	# it - it's possible to have a multipleOf that would never be possible
-	# given certain minimum and maximum (e.g. 1 .. 3, multiple of 4)
-	if ( $mof ) {
-		shift( @possible_values ) until (
-			! @possible_values
-			|| $possible_values[0] % $mof == 0
-		);
-		return $possible_values[0];
+		# if we have multipleOf just return the first value that fits. note that
+		# there is a possible bug here and the JSON schema spec isn't clear about
+		# it - it's possible to have a multipleOf that would never be possible
+		# given certain minimum and maximum (e.g. 1 .. 3, multiple of 4)
+		foreach my $int ( $min .. $max ) {
+			return $int if $int % $mof == 0;
+		}
+
 	} else {
-		return $self->_random_element( [ @possible_values ] );
+		return fake_int( $min,$max )->();
 	}
+
+	return undef;
 }
 
 sub _random_number {
@@ -138,31 +128,21 @@ sub _random_string {
 		if $schema->{pattern};
 
 	if ( my $format = $schema->{format} ) {
+
+		my $fake_name = fake_name()->();
+		$fake_name =~ s/ //g;
+
 		return {
-			"date-time" => DateTime->now->subtract(
-				weeks => $self->_random_integer({ minimum => 1, maximum => 500 }),
-				days => $self->_random_integer({ minimum => 1 }),
-				hours => $self->_random_integer({ minimum => 1 }),
-				minutes => $self->_random_integer({ minimum => 1 }),
-				seconds => $self->_random_integer({ minimum => 1 }),
-			)->iso8601 . '.000Z',
-			"email"     =>
-				$self->_random_string( { pattern => '[A-Za-z]{12}' } )
-				. '@'
-				. $self->_random_string( { pattern => '[A-Za-z]{12}' } )
-				. '.com',
-			"hostname"  => $self->_random_string( { pattern => '[A-Za-z]{12}' } ),
+			"date-time" => fake_past_datetime( "%Y-%m-%dT%H:%M:%S.000Z" )->(),
+			"email"     => "$fake_name\@gmail.com",
+			"hostname"  => "www.$fake_name.com",
 			"ipv4"      => join( '.',map {  $self->_random_integer({
 				minimum => 1,
 				maximum => 254,
 			}) } 1 .. 4 ),
 			"ipv6"      => '2001:0db8:0000:0000:0000:0000:1428:57ab',
-			"uri"       => 'https://www.'
-				. $self->_random_string( { pattern => '[a-z]{12}' } )
-				. '.com',
-			"uriref"    => 'https://www.'
-				. $self->_random_string( { pattern => '[a-z]{12}' } )
-				. '.com',
+			"uri"       => "https://www.$fake_name.com",
+			"uriref"    => "https://www.$fake_name.com",
 		}->{ $format };
 	}
 
@@ -172,9 +152,8 @@ sub _random_string {
 	my $max = $schema->{maxLength}
 		|| ( $schema->{minLength} ? $schema->{minLength} + 1 : 50 );
 
-	return $self->_str_rand->randpattern(
-		'.' x $self->_random_integer( { minimum => $min, maximum => $max } ),
-	);
+	my $words = substr( fake_words( $max )->(),0,$max );
+	return $words;
 }
 
 sub _random_array {
@@ -437,7 +416,7 @@ JSON::Schema::ToJSON - Generate example JSON structures from JSON Schema definit
 
 =head1 VERSION
 
-0.15
+0.16
 
 =head1 SYNOPSIS
 

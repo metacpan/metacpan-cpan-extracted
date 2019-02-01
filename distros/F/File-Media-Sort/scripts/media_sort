@@ -12,6 +12,9 @@ use Getopt::Long;
 use Pod::Usage;
 use File::Basename;
 use Cwd;
+use Data::Dumper;
+
+use File::PatternMatch qw(patternmatch);
 
 my $opt_type;
 GetOptions(
@@ -25,7 +28,14 @@ my $directory = shift // getcwd();
 my @results = map { basename($_); } media_sort($opt_type, glob("$directory/*"));
 
 
-print "$_\n" for @results;
+my $pm =  patternmatch(256, @results);
+
+
+for my $k(sort(keys(%{ $pm }))) {
+  for my $media(sort(keys(%{ $pm->{$k} }))) {
+    printf "%s [%-15s]\n", $media, $pm->{$k}->{$media};
+  }
+}
 
 
 

@@ -16,7 +16,7 @@ StreamFinder - Fetch actual raw streamable URLs from various radio-station websi
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017 by
+This module is Copyright (C) 2017-2019 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -207,7 +207,7 @@ L<http://search.cpan.org/dist/StreamFinder/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Jim Turner.
+Copyright 2017-2019 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -255,7 +255,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 require Exporter;
 
@@ -277,10 +277,8 @@ sub new
 
 	my $self = {};
 	return undef  unless ($url);
-	if ($haveit{'Youtube'} && ($url =~ m#^http[s]?\:\/\/\w*\.*youtu(?:be)?\.# 
-			|| $url =~ m#^http[s]?\:\/\/\w*\.*vimeo\.#)) {
-		return new StreamFinder::Youtube($url);
-	} elsif ($haveit{'Facebook'} && ($url =~ m#^http[s]?\:\/\/\w*\.facebook\.#)) {
+
+	if ($haveit{'Facebook'} && ($url =~ m#^http[s]?\:\/\/\w*\.facebook\.#)) {
 		return new StreamFinder::Facebook($url);
 	} elsif ($haveit{'IHeartRadio'} && $url =~ m#\biheart\.com\/#) {
 		return new StreamFinder::IHeartRadio($url, 'secure_shoutcast', 'secure', 'any', '!rtmp');
@@ -288,8 +286,8 @@ sub new
 		return new StreamFinder::Reciva($url);
 	} elsif ($haveit{'Radionomy'} && $url =~ m#\bradionomy\.com\/#) {
 		return new StreamFinder::Radionomy($url);
-	} else {
-		return undef;
+	} else {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+		return new StreamFinder::Youtube($url);
 	}
 }
 

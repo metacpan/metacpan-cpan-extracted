@@ -9,7 +9,7 @@ use Pod::Usage;
 use Getopt::Long;
 use File::Basename qw(basename);
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 our $app;
 
@@ -55,7 +55,7 @@ sub run {
     }
 
     if ( $options{help} ) {
-        pod2usage( -verbose => 1, -exitstatus => 'NOEXIT' );
+        pod2usage( -exitstatus => 'NOEXIT', -verbose => 1 );
         return 0;
     }
     if ( $options{man} ) {

@@ -10,7 +10,7 @@ use warnings;
 use Type::Library -base;
 use Type::Utils ();
 
-our $VERSION = '0.03';
+our $VERSION = 0.04;
 
 Type::Utils::extends(qw/Types::OTRS Types::Dist/);
 
@@ -28,7 +28,7 @@ Types::RENEEB - Several predefined Type::Tiny types
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,20 @@ version 0.03
 =head1 DESCRIPTION
 
 C<Types::RENEEB> is a collection of types I need very often
+
+=head1 MODULES
+
+These C<Types::> modules are shipped in this distribution:
+
+=over 4
+
+=item * L<Types::Dist>
+
+=item * L<Types::OTRS>
+
+=back
+
+C<Types::RENEEB> inherits the types of the mentioned modules.
 
 =head1 AUTHOR
 

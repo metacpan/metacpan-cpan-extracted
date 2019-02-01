@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::Requires qw(DBD::mysql Test::mysqld);
 use Test::More;
 use Test::mysqld;

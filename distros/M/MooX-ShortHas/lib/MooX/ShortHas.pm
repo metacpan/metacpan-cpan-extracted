@@ -2,7 +2,7 @@ package MooX::ShortHas;
 
 use strictures 2;
 
-our $VERSION = '1.172300'; # VERSION
+our $VERSION = '1.190320'; # VERSION
 
 # ABSTRACT: shortcuts for common Moo has attribute configurations
 
@@ -53,7 +53,7 @@ MooX::ShortHas - shortcuts for common Moo has attribute configurations
 
 =head1 VERSION
 
-version 1.172300
+version 1.190320
 
 =head1 SYNOPSIS
 
@@ -130,6 +130,10 @@ L<Mu> - automatically wraps this module into Moo
 =item *
 
 L<Mu::Role> - automatically wraps this module into Moo::Role
+
+=item *
+
+L<Mus> - Mu but with slightly more typing and strict constructors
 
 =back
 

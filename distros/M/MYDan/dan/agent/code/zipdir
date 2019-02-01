@@ -1,0 +1,106 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+use Tie::File;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+
+local $/ = "\n";
+
+my ( $path, $uuid, $makelist, $dirdetail ) = map{ $param{argv}{$_} }qw( path uuid makelist dirdetail );
+
+my $idie = sub{ print shift; exit 1; };
+
+my $call = sub
+{
+	my $cmd = shift;
+	my $pid = open( my $H, "$cmd|" );
+	my @list = <$H>;
+	chomp @list;
+	waitpid( $pid, 0 );
+	&$idie( "run $cmd fail" ) if $? >> 8;
+	close $H;
+	return @list;
+};
+
+my %getp;
+my $getp = sub
+{
+    my $uid = shift;
+    $getp{$uid} = getpwuid( $uid ) unless exists $getp{$uid};
+    return $getp{$uid};
+};
+
+my $dirl = sub
+{
+    my $dir = shift;
+    my @stat = stat $dir;
+    my $user = &$getp( $stat[4] );
+    my $mode =  sprintf( "%04o", $stat[2] & 07777 );
+    return $user ? [ $dir, $mode, $user ] : [ $dir, $mode ];
+};
+
+&$idie( "uuid format error:$uuid" ) unless $uuid && $uuid =~ /^[a-zA-Z0-9]+$/;
+
+my $prefix = '.TEMP_MYDan_Grsync_';
+my $temp = "${prefix}$uuid";
+
+my $chars = [ "A" .. "Z", "a" .. "z", 0 .. 9 ];
+my $tempuuid = join("", @$chars[ map { rand @$chars } ( 1 .. 8 ) ]);
+
+for my $p ( @$path )
+{
+    if( $p =~ /\/$/ )
+    {
+        &$idie( "cd $p fail" ) unless chdir $p;
+        
+        unless( -f $temp )
+        {
+            my ( @dlist, %dlist ) = &$call( "find . -type d" ); 
+            map{ $dlist[$_] = &$dirl( $dlist[$_] ) } 0 .. @dlist - 1 if $dirdetail;
+
+            eval{ YAML::XS::DumpFile "$temp.dlist", \@dlist; };
+            &$idie( "DumpFile $temp.dlist fail: $@" ) if $@;
+
+            if( $makelist )
+            {
+				my @list = &$call( "find . -type l && find . -type f" );
+                eval{ YAML::XS::DumpFile "$temp.flist", \@list; };
+                &$idie( "DumpFile $temp.flist fail: $@" ) if $@;
+            }
+
+            my @tar =  grep{ $_ !~ /\.TEMP_MYDan_Grsync_/ }&$call( "find . -size -1048577c -type f && find . -type l" );
+            push @tar, grep{ -f $_ }map{ "$temp.${_}list" }qw( d f );
+
+            &$idie( "tar list null" ) unless @tar;
+
+            &$idie( "tie tarlist fail" ) unless( tie my @t, 'Tie::File', "$temp.$tempuuid.tarlist", recsep => "\n" );
+            push @t, @tar;
+            untie @t;
+
+            &$idie( "tar fail" ) if system "tar -T $temp.$tempuuid.tarlist -zcf $temp.$tempuuid && mv $temp.$tempuuid $temp";
+            &$idie( "clean list" ) if system "rm -f $temp.$tempuuid.tarlist $temp.dlist";
+
+            if( $makelist )
+            {
+                &$idie( "clean list fail" ) if system "rm -f $temp.flist";
+            }
+        }
+
+        print "./$temp\n";
+        &$idie( "find file fail" ) if system 'find . -type f -size +1048576c';
+    }
+    elsif( $p =~ /\*/ )
+    {
+        map{ print "$_\n"; }grep{ -f $_ }glob $p;
+    }
+    else
+    {
+        print "$p\n" if -f $p;
+    }
+}
+
+exit 0;

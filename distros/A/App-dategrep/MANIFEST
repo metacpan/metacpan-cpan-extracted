@@ -34,6 +34,7 @@ t/09time_formats.t
 t/10time_modifiers.t
 t/11strptime.t
 t/12syslog_new_year.t
+t/13february.t
 t/files/empty
 t/files/interleave01.log
 t/files/interleave02.log
@@ -49,6 +50,7 @@ t/files/test01.log
 t/files/test02.log
 t/files/test03.log
 t/lib/Test/Dategrep.pm
+update-debian-changelog
 xt/01tidy.t
 xt/critic.t
 xt/pod.t

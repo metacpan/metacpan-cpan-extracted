@@ -4,7 +4,7 @@
       "@ie.u-ryukyu.ac.jp>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,6 @@
       "runtime" : {
          "requires" : {
             "Data::Section::Simple" : "0",
-            "Mouse" : "0",
             "Readonly" : "0",
             "YAML::Tiny" : "0",
             "perl" : "5.008001"
@@ -58,7 +57,7 @@
    "provides" : {
       "Acme::MadokaMagica" : {
          "file" : "lib/Acme/MadokaMagica.pm",
-         "version" : "0.07"
+         "version" : "0.09"
       },
       "Acme::MadokaMagica::TvMembers" : {
          "file" : "lib/Acme/MadokaMagica/TvMembers.pm"
@@ -90,10 +89,12 @@
          "web" : "https://github.com/AnaTofuZ/perl-acme-MadokaMagica"
       }
    },
-   "version" : "0.07",
+   "version" : "0.09",
    "x_contributors" : [
-      "papix <mail@papix.net>",
-      "Anagura <e155730@ie.u-ryukyu.ac.jp>"
+      "AnaTofuZ <e155730@ie.u-ryukyu.ac.jp>",
+      "Takahiro SHIMIZU <anatofuz@gmail.com>",
+      "papix <mail@papix.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

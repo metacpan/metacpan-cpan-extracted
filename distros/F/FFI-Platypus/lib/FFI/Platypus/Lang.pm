@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 # ABSTRACT: Language specific customizations
-our $VERSION = '0.78'; # VERSION
+our $VERSION = '0.80'; # VERSION
 
 
 
@@ -23,7 +23,7 @@ FFI::Platypus::Lang - Language specific customizations
 
 =head1 VERSION
 
-version 0.78
+version 0.80
 
 =head1 SYNOPSIS
 

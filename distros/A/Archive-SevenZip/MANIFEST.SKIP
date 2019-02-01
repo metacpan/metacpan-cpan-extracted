@@ -1,4 +1,6 @@
 ^\.git\/
+^\.travis.yml$
+^\.appveyor.yml$
 maint
 ^tags$
 .last_cover_stats

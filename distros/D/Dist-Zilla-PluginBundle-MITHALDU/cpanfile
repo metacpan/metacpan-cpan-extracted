@@ -16,7 +16,6 @@ requires "Dist::Zilla::Plugin::MinimumPerl" => "0";
 requires "Dist::Zilla::Plugin::OurPkgVersion" => "0.001008";
 requires "Dist::Zilla::Plugin::PodWeaver" => "0";
 requires "Dist::Zilla::Plugin::ReadmeAnyFromPod" => "0.120051";
-requires "Dist::Zilla::Plugin::ReadmeFromPod" => "0";
 requires "Dist::Zilla::Plugin::StaticVersion" => "0";
 requires "Dist::Zilla::Plugin::TaskWeaver" => "0.101620";
 requires "Dist::Zilla::Plugin::Test::Compile" => "0";
@@ -49,7 +48,6 @@ on 'test' => sub {
   requires "IPC::Open3" => "0";
   requires "Test::Exception" => "0.29";
   requires "Test::More" => "0.88";
-  requires "blib" => "1.01";
   requires "perl" => "5.006";
 };
 
@@ -59,10 +57,10 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
-  requires "English" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Test::CPAN::Meta" => "0";
   requires "Test::More" => "0";
+  requires "Test::Perl::Critic" => "0";
   requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Portability::Files" => "0";

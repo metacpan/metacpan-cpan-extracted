@@ -1,0 +1,66 @@
+NAME
+      id3shit - commandline based id3 editor
+
+SYNOPSIS
+      id3shit [OPTION]... FILES
+
+DESCRIPTION
+    id3shit is a commandline based id3 editor that sucks a little bit less
+    then the alternatives.
+
+    It can read, write and strip tags, rename files based on the metadata
+    and that's about it.
+
+    All functions will operate recursively if given a directory.
+
+OPTIONS
+      -t,   --tags    show tags for FILEs
+      -i,   --info    show audio info for FILEs
+      -s,   --strip   strip all tags from FILEs
+      -w,   --write   write TAG DATA to FILEs ( -w artist Laleh )
+      -g,   --genres  list all available genres
+      -r,   --rename  rename FILEs based on ID3 data
+      -h,   --help    display a short help and exit
+      -m,   --man     display the manual
+
+  'write' syntax
+        write will take two arguments: the tag field to change, and the data to place
+        there:
+
+        id3shit -w artist Laleh
+
+        Legal fields are ARTIST, ALBUM, TITLE, YEAR, COMMENT, GENRE and TRACKNUM
+
+AUTHOR
+    Written by Magnus Woldrich.
+
+REPORTING BUGS
+    Report bugs and/or feature requests to m@japh.se or use the issue
+    tracker located at http://github.com/trapd00r/id3shit/issues
+
+    id3shit homepage: http://github.com/trapd00r/id3shit
+
+COPYRIGHT
+    Copyright (C) 2010, 2019- Magnus Woldrich
+
+    Copyright (C) 2009 Olof Johansson, Magnus Woldrich
+
+    License: GPLv2
+
+HISTORY
+    The original id3shit started out as a way for me to learn some Perl,
+    being teached by zibri (also known as The Perl Dude).
+
+    The original id3shit project was founded because the authors were trying
+    to strip tags from some mp3 files (a simple task, eh?) and none of the
+    available commandline based editors worked.
+
+    Zibri and trapd00r started hacking (this was my chance to learn some
+    Perl from The Perl Dude) and soon we had a working version.
+
+    Well, it was working, but it really sucked. Just like all the others.
+
+    As of today (2010-08-17), I once again felt the need to edit some id3
+    tags. I remembered id3shit and it worked just fine, but I had to check
+    the source code and man, it was fugly.
+

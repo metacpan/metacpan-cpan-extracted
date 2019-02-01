@@ -63,6 +63,8 @@ deployment plan file and the change script directories.
 
 =item C<--plan-file>
 
+=item C<-f>
+
   sqitch init widgets --plan-file my.plan
 
 Specifies the path to the deployment plan file. Defaults to
@@ -143,6 +145,8 @@ Sets the C<core.top_dir> configuration variable.
 
 =item C<--plan-file>
 
+=item C<-f>
+
 Sets the C<core.plan_file> configuration variable.
 
 =item C<--extension>
@@ -185,6 +189,14 @@ passed.
 
 Sets the C<engine.$engine.client> configuration variable if C<--engine> is
 also passed.
+
+=item C<-s>
+
+=item C<--set>
+
+Set a variable name and value for use by the database engine client, if it
+supports variables. The format must be C<name=value>, e.g.,
+C<--set defuser='Homer Simpson'>. Variables are set in C<core.variables>.
 
 =back
 

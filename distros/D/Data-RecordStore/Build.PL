@@ -21,6 +21,7 @@ my $builder = Module::Build->new(
                         ],
     requires => {
         'perl'       => 'v5.9.4',
+        'File::Copy::Recursive' => '0.44',
     },
     );
 

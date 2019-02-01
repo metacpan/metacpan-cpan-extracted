@@ -40,5 +40,5 @@ requires:
 resources:
   bugtracker: https://github.com/pavelsr/iperlmoddir/issues
   repository: git://github.com/pavelsr/iperlmoddir.git
-version: '1.0'
+version: '1.02'
 x_serialization_backend: 'YAML::Tiny version 1.70'

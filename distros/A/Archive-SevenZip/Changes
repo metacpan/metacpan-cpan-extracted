@@ -1,3 +1,6 @@
+0.08 2018-10-28
+    * Introduce PERL_ARCHIVE_SEVENZIP_BIN environment variable
+
 0.07 2018-10-28
     * Include proper META.* data
     * Catch and ignore SIGCHLD

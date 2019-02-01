@@ -1,7 +1,7 @@
 package App::ColorThemeUtils;
 
-our $DATE = '2018-02-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-02-02'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,6 +54,7 @@ $SPEC{list_color_themes} = {
 sub list_color_themes {
     no strict 'refs';
     require Color::ANSI::Util;
+    require PERLANCAR::Module::List;
 
     my %args = @_;
 
@@ -125,7 +126,7 @@ App::ColorThemeUtils - CLI utilities related to color themes
 
 =head1 VERSION
 
-This document describes version 0.001 of App::ColorThemeUtils (from Perl distribution App-ColorThemeUtils), released on 2018-02-25.
+This document describes version 0.002 of App::ColorThemeUtils (from Perl distribution App-ColorThemeUtils), released on 2019-02-02.
 
 =head1 DESCRIPTION
 
@@ -146,7 +147,7 @@ This distribution contains the following CLI utilities:
 
 Usage:
 
- list_color_theme_modules(%args) -> [status, msg, result, meta]
+ list_color_theme_modules(%args) -> [status, msg, payload, meta]
 
 List color theme modules.
 
@@ -165,7 +166,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -176,7 +177,7 @@ Return value:  (any)
 
 Usage:
 
- list_color_themes(%args) -> [status, msg, result, meta]
+ list_color_themes(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -195,7 +196,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -227,7 +228,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

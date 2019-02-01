@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::Requires 'DBD::SQLite';
 use Test::More;
 use t::Util;
@@ -26,6 +27,17 @@ subtest 'bind_param' => sub {
     };
 
     like $res, qr/SELECT \* FROM sqlite_master WHERE name = \? : \[foo\]/, 'SQL';
+};
+
+subtest 'bind_param including undefined' => sub {
+    my $res = capture {
+        my $sth = $dbh->prepare('SELECT * FROM sqlite_master WHERE name IN (?, ?)');
+        $sth->bind_param(1, undef);
+        $sth->bind_param(2, 'foo');
+        $sth->execute;
+    };
+
+    like $res, qr/SELECT \* FROM sqlite_master WHERE name IN \(\?, \?\) : \[NULL, foo\]/, 'SQL';
 };
 
 DBIx::QueryLog->skip_bind(0);

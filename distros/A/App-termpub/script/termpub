@@ -1,0 +1,185 @@
+#!/usr/bin/perl
+
+use Mojo::Base -strict;
+use Curses;
+
+use lib 'lib';
+use App::termpub;
+use App::termpub::Epub;
+use Pod::Usage;
+
+initscr;
+noecho;
+cbreak;
+curs_set(0);
+
+my $filename = shift;
+
+if ( !$filename ) {
+    endwin;
+    pod2usage(
+        -message    => 'Missing file',
+        -exitstatus => 1,
+        -verbose    => 0,
+    );
+}
+
+my $epub = App::termpub::Epub->new( filename => $filename );
+
+eval { App::termpub->new( epub => $epub )->run };
+
+if ($@) {
+    endwin;
+    pod2usage(
+        -message    => $@,
+        -exitstatus => 1,
+        -verbose    => 0,
+    );
+}
+
+END {
+    endwin;
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+App::termpub - read epubs in the terminal
+
+=head1 SYNOPSIS
+
+termpub I<file>
+
+=head1 DESCRIPTION
+
+termpub is a I<terminal> viewer for epubs.
+
+At startup termpub displays the first chapter with real content if
+possible. It will save your reading position and restore it.
+
+=head1 KEY BINDINGS
+
+=over 4
+
+=item h, ?
+
+Display help screen.
+
+=item n
+
+Go to the next chapter.
+
+=item p
+
+Go to the previous chapter.
+
+=item t
+
+Jump to the table of contents.
+
+=item m
+
+Followed by any lowercase letter, marks the current position with that
+letter.
+
+=item '
+
+Followed by any lowercase letter, returns to the position which was
+previously marked with that letter.
+
+=item [num] %
+
+Go to a line N percent into the chapter.
+
+=item [num] g
+
+Go to line I<num> in the chapter, defaults to 1.
+
+=item [num] G
+
+Go to line I<num> in the chapter, default to the end of the chapter.
+
+=item [num] o
+
+Open link I<num>. I<termpub> calls I<xdg-open> with the url as first
+argument if the link references an external ressource.
+
+=item C-g
+
+Cancel numeric prefix I<num> argument.
+
+=item KEY_DOWN, j
+
+Scroll one line down.
+
+=item KEY_UP, k
+
+Scroll one line up.
+
+=item KEY_NPAGE, SPACE
+
+Scroll forward one window.
+
+=item KEY_PPAGE, KEY_BACKSPACE
+
+Scroll backward one window.
+
+=item KEY_HOME
+
+Go to the beginning of the current chapter.
+
+=item KEY_END
+
+Go to the ned of the current chapter.
+
+=item <,>
+
+Go back or forward in the chapter history.
+
+=item q
+
+Quit.
+
+=back
+
+=head1 INSTALLATION
+
+If you have cpanminus installed, you can simply install this program
+by calling
+
+  $ cpanm .
+
+Otherwise you can build a standalone script with
+
+  $ ./build-standalone
+
+and copy the generated script I<termpub> somewhere in your path. In this
+case you need to installed the dependencies yourself. Termpub depends
+on the perl modules Mojolicious, Curses and Archive::Zip. On Debian the
+following command will install these packages.
+
+  $ apt-get install libmojolicious-perl libcurses-perl libarchive-zip-perl
+
+=head1 COPYRIGHT AND LICENSE 
+
+Copyright 2019 Mario Domgoergen C<< <mario@domgoergen.com> >> 
+
+This program is free software: you can redistribute it and/or modify 
+it under the terms of the GNU General Public License as published by 
+the Free Software Foundation, either version 3 of the License, or 
+(at your option) any later version. 
+
+This program is distributed in the hope that it will be useful, 
+but WITHOUT ANY WARRANTY; without even the implied warranty of 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+GNU General Public License for more details. 
+
+You should have received a copy of the GNU General Public License 
+along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+
+=cut

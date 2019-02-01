@@ -27,8 +27,8 @@ Should you wish to install this module manually, the procedure is
 
 REPOSITORY
 
-The public repository of this module is 
-L<http://github.com/Corion/archive-sevenzip>.
+The public repository of this module is
+L<https://github.com/Corion/archive-sevenzip>.
 
 SUPPORT
 
@@ -64,4 +64,4 @@ This module is released under the same terms as Perl itself.
 
 COPYRIGHT (c)
 
-Copyright 2015-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2019 by Max Maischein C<corion@cpan.org>.

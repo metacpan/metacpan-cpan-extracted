@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Documentation and tools for using Platypus with the Assembly
-our $VERSION = '0.78'; # VERSION
+our $VERSION = '0.80'; # VERSION
 
 
 sub native_type_map
@@ -26,7 +26,7 @@ FFI::Platypus::Lang::ASM - Documentation and tools for using Platypus with the A
 
 =head1 VERSION
 
-version 0.78
+version 0.80
 
 =head1 SYNOPSIS
 

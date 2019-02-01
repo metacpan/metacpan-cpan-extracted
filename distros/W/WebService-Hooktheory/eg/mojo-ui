@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+
+use WebService::Hooktheory;
+
+get '/' => sub {
+  my $c = shift;
+
+  $c->stash( activkey => '' );
+  $c->stash( endpoint => '/trends/nodes' );
+  $c->stash( query => '' );
+  $c->stash( page => 1 );
+  $c->stash( results => [] );
+
+  $c->render( template => 'index' );
+};
+
+post '/' => sub {
+  my $c = shift;
+
+  my $ws = WebService::Hooktheory->new( activkey => $c->param('activkey') );
+
+  my $results = $ws->fetch(
+    endpoint => $c->param('endpoint'),
+    $c->param('query') ? ( query => { cp => $c->param('query'), page => $c->param('page') } ) : (),
+  );
+
+  $c->stash( activkey => $c->param('activkey') );
+  $c->stash( endpoint => $c->param('endpoint') );
+  $c->stash( query => $c->param('query') );
+  $c->stash( page => $c->param('page') );
+  $c->stash( results => $results );
+
+  $c->render( template => 'index' );
+};
+
+app->start;
+__DATA__
+
+@@ index.html.ep
+% layout 'default';
+% title 'Hooktheory';
+<h1>Hooktheory</h1>
+<form action="/" method="post">
+    Activkey:
+    <input type="text" name="activkey" size="30" value="<%= $activkey %>">
+    Endpoint:
+    <select name="endpoint">
+% for my $ep (qw( /trends/nodes /trends/songs )) {
+        <option value="<%= $ep %>"
+%   if ( $ep eq $endpoint ) {
+        selected
+%   }
+        ><%= $ep %></option>
+% }
+    </select>
+    Query:
+    <input type="text" name="query" size="8" value="<%= $query %>">
+    Page:
+    <input type="text" name="page" size="3" value="<%= $page %>">
+    <input type="submit" value="Submit">
+</form>
+% for my $r ( @$results ) {
+%   if ( $endpoint eq '/trends/nodes' ) {
+<p><%== $r->{chord_HTML} %> with probability = <%= $r->{probability} %></p>
+%   } else {
+<p><%== $r->{artist} %>, "<%== $r->{song} %>", <%== $r->{section} %></p>
+%   }
+% }
+<p><a href="https://www.hooktheory.com/api/trends/docs">Hooktheory API</a>
+
+@@ layouts/default.html.ep
+<!DOCTYPE html>
+<html>
+  <head><title><%= title %></title></head>
+  <body><%= content %></body>
+</html>

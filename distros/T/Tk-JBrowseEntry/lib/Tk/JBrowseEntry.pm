@@ -799,7 +799,7 @@ package Tk::JBrowseEntry;
 BEGIN
 {
 	use vars qw($VERSION $haveHListbox);
-	$VERSION = '5.21';
+	$VERSION = '5.22';
 
 	use strict;
 	use Carp;
@@ -1803,6 +1803,9 @@ no strict 'refs';
 				{
 					$w->delete($index);
 					$w->Callback('-deletecmd', $w, -1);   #CALL AGAIN W/-1 TO ALLOW PROGRAMMER TO DO SOMETHING WHEN DELETED, IE. UPDATE A CURRENT ITEM LIST VARABLE, ETC!
+					#NEXT 2 ADDED 20190131 (v5.22) TO SELECT NOW-ACTIVE ITEM AFTER DELETE:
+					$index = $w->LbIndex(1);
+					$l->selectionSet($index);
 				}
 			}
 		});   #ADDED 20060429 TO SUPPORT OPTION FOR USER DELETION OF LISTBOX ITEMS.

@@ -2,7 +2,7 @@
 package File::PatternMatch;
 
 use vars qw($VERSION);
-$VERSION = '0.045';
+$VERSION = '0.050';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -126,12 +126,6 @@ our %patterns                        = (
     none                            => "Vinyl",
     weight                          => 70,
   },
-  '\(?_?-?WEB-?_?\)?'               => {
-    256                             => "\e[38;5;19mWEB\e[0m",
-    dzen                            => "^fg(#ffabcd)WEB^fg()",
-    none                            => "WEB",
-    weight                          => 4,
-  },
   'Live_(on|at|in)'                 => {
     256                             => "\e[38;5;181mLive\e[0m",
     dzen                            => "^fg(#d7afaf)Live^fg()",
@@ -245,6 +239,7 @@ sub patternmatch {
   for my $file(@files) {
     if( ($fmt == 256) or ($fmt eq 'extended') or ($fmt eq 'plain')) {
       $file = sprintf("%70.70s", $file);
+#      $file = sprintf("%$ENV{COLUMNS}.$ENV{COLUMNS}s", $file);
     }
 
     for my $keyword(keys(%wanted)) {

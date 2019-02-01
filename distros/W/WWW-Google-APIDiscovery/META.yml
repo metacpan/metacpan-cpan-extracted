@@ -20,20 +20,20 @@ no_index:
 provides:
   WWW::Google::APIDiscovery:
     file: lib/WWW/Google/APIDiscovery.pm
-    version: '0.26'
+    version: '0.27'
   WWW::Google::APIDiscovery::API:
     file: lib/WWW/Google/APIDiscovery/API.pm
-    version: '0.26'
+    version: '0.27'
   WWW::Google::APIDiscovery::API::MetaData:
     file: lib/WWW/Google/APIDiscovery/API/MetaData.pm
-    version: '0.26'
+    version: '0.27'
 requires:
   JSON: '2.53'
   Moo: '2.000000'
-  WWW::Google::UserAgent: '0.21'
+  WWW::Google::UserAgent: '0.22'
   namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/WWW-Google-APIDiscovery.git
-version: '0.26'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

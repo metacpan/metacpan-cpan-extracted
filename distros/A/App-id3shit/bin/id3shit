@@ -1,0 +1,333 @@
+#!/usr/bin/perl
+use strict;
+use vars qw($VERSION);
+$VERSION = '2.60';
+
+our $APP       = 'id3shit';
+our $DEBUG     = 0;
+
+
+use Data::Dumper;
+use MP3::Info;
+use MP3::Info ':genres';
+use File::Copy;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+
+use open qw(:utf8 :std);
+
+pod2usage(verbose=>1) unless(@ARGV);
+
+my $mp3 = MP3::Info->new();
+
+our(@opt_write,@opt_rename,@opt_read_tags,@opt_read_info,@opt_strip_tags);
+GetOptions(
+  'tags=s{1,}'    => \@opt_read_tags,
+  'rename=s{1,}'  => \@opt_rename,
+  'info=s{1,}'    => \@opt_read_info,
+  'genres'        => \&list_genres,
+  'write=s{1,}'   => \@opt_write,
+  'strip=s{1,}'   => \@opt_strip_tags,,
+  'help'          => sub {pod2usage(verbose=>1);},
+  'man'           => sub {pod2usage(verbose=>3);},
+
+);
+
+#FIXME dispatch table or something...
+if(@opt_read_tags) {
+  # Dir to traverse?
+  if(scalar(@opt_read_tags) == 1 && $opt_read_tags[0] !~ /\.mp3$/) {
+    my $all_mp3 = find_mp3(@opt_read_tags);
+    read_tags(undef, @$all_mp3);
+  }
+  # nope
+  else {
+    # we feed read_tags() with undef because it expects the fi
+    read_tags(undef, @opt_read_tags);
+  }
+}
+
+elsif(@opt_read_info) {
+  print scalar(@opt_read_info);
+  if(scalar(@opt_read_info) == 1 && $opt_read_info[0] !~ /\.mp3$/) {
+    my $all_mp3 = find_mp3(@opt_read_info);
+    show_info(@$all_mp3);
+  }
+  else {
+    show_info(@opt_read_tags);
+  }
+}
+
+elsif(@opt_write) {
+  my $tag   = shift(@opt_write);
+  my $value = shift(@opt_write);
+  # is it a dir?
+  if(scalar(@opt_write) == 1 && $opt_write[0] !~ /\.mp3$/) {
+    my $all_mp3 = find_mp3(@opt_write);
+    write_tags($tag, $value, @$all_mp3);
+  }
+  else {
+    write_tags($tag, $value, @opt_write);
+  }
+}
+
+elsif(@opt_rename) {
+  if(scalar(@opt_rename) == 1 && $opt_write[0] !~ /\.mp3$/) {
+    my $all_mp3 = find_mp3(@opt_rename);
+    rename_by_tag(@$all_mp3);
+  }
+  else {
+    rename_by_tag(@opt_rename);
+  }
+}
+elsif(@opt_strip_tags) {
+  if(scalar(@opt_strip_tags) == 1 && $opt_strip_tags[0] !~ /\.mp3$/) {
+    my $all_mp3 = find_mp3(@opt_strip_tags);
+    strip_tags(@$all_mp3);
+  }
+  else {
+    strip_tags(@opt_strip_tags);
+  }
+}
+
+my @mp3;
+sub find_mp3 {
+  my $dir = shift;
+  #return(-1) if(!-d $dir or !-f $dir);
+
+  my $i = 0;
+  for(glob("$dir/*")) {
+    ++$i;
+    if(-d $_) {
+      find_mp3($_);
+    }
+    elsif(-f $_ && $_ =~ m;\.mp3$;) {
+      push(@mp3, $_);
+    }
+  }
+  print "find_mp3(): $i iterations\n" if($DEBUG);
+  return(\@mp3);
+}
+
+sub show_info {
+  my @files = @_;
+  return unless(@files);
+
+  for my $f(@files) {
+    my $info = get_mp3info($f);
+    print "Doesnt look like audio to me\n" and exit(1) unless($info);
+
+    printf("%12s: \033[1m%s\033[0m\n", 'File', $f);
+    for my $k(sort(keys(%{$info}))) {
+      printf("%12s: %s\n",ucfirst(lc($k)),$info->{$k}) unless(ref($info->{$k}));
+    }
+    print "\e[30;1m",'-' x 20, "\e[0m\n";
+  }
+  exit(0);
+}
+
+sub read_tags {
+  my $changed_tag = shift; # called from write_tags()?
+  my @files = @_;
+
+  if(-f $changed_tag) {
+    push(@files, $changed_tag); # ... nope
+  }
+
+  for my $f(@files) {
+    my $tag = get_mp3tag($f);
+    printf("%7s: \033[1m%s\033[0m\n",'File', $f);
+
+    for(qw(ARTIST ALBUM TITLE GENRE COMMENT)) {
+      if(!($tag->{$_})) {
+        printf("\e[31;1m%7s\e[0m: %s\n", ucfirst(lc($_)), 'Missing');
+      }
+      else {
+        if($_ eq uc($changed_tag)) {
+          printf("%7s: \033[31;1m%s\033[0m\n", ucfirst(lc($_)),$tag->{$_});
+        }
+        else {
+          printf("%7s: %s\n", ucfirst(lc($_)),$tag->{$_});
+        }
+      }
+    }
+    print "\e[30;1m",'-' x 20, "\e[0m\n";
+  }
+}
+
+sub strip_tags {
+  my @files = @_;
+
+  for my $f(@files) {
+    my $bytes_removed = remove_mp3tag($f, 'ALL');
+    if($bytes_removed < 0) {
+      printf("No tags to remove on \033[1m$f\033[0m!\n");
+      exit(1);
+    }
+    else {
+      printf("Removed %d bytes from \033[1m$f\033[0m\n", $bytes_removed);
+    }
+  }
+  exit(0);
+}
+
+sub rename_by_tag {
+  my @nameless = @_;
+
+  for my $f(@nameless) {
+    print ">$f\n";
+    my $info  = get_mp3tag($f);
+    if(!$info) {
+      printf("\033[1m\033[31m%6s\033[0m: %s\n",'NO TAG', $f);
+      next;
+    }
+
+    (my $extension) = $f =~ m;\.(.+)$;;
+    if(!$extension) {
+      $extension = 'mp3';
+    }
+
+    my ($artist,$album,$title,$year,$genre,$comment,$tracknum)
+      = ($info->{ARTIST}, $info->{ALBUM}, $info->{TITLE}, $info->{YEAR},
+        $info->{GENRE}, $info->{COMMENT}, $info->{TRACKNUM});
+
+    if(!defined($artist)) {
+      print("$f: Missing artist tag\n");
+    }
+    for(($artist,$album,$title,)) {
+      s;\s;_;g;
+      s;\(;-;g;
+      s;\);-;g;
+      s;/;-;g;
+    }
+    # without the basedir, the renamed files will end up in ./ :)
+    my ($basedir) = $f =~ m;(.+)/.+$;; 
+    my $newfile = sprintf("$basedir%s_-_%s-%s",$artist, $album, $title) . ".$extension";
+    if($f eq $newfile) {
+      printf("\033[1m%6s\033[0m: %s\n", 'OK', $f);
+      next;
+    }
+    printf("\033[1m%6s\033[0m:\033[31m %s\033[0m\n", 'OLD',$f);
+    printf("\033[1m%6s\033[0m:\033[34m %s\033[0m\n", 'NEW',$newfile);
+
+    print "Accept [y/N]: ";
+    chomp(my $confirmation = <STDIN>);
+
+    exit(0) if(lc($confirmation) ne 'y');
+    print "---\n";
+
+    print "$f\n";
+    if(move("$f", $newfile)) {
+      printf("%s => \033[1m%s\033[0m\n", $f, $newfile);
+    }
+    else {
+      print("[$f => $newfile]: \033[1m$!\033[0m");
+    }
+    print "---\n";
+  }
+  exit(0);
+}
+
+sub write_tags {
+  my $tag_name = shift;
+  my $tag_data = shift;
+  my @files = @_;
+  #print Dumper \@files;
+  for my $f(@files) {
+    my $tags = get_mp3tag($f);
+    $tags->{uc($tag_name)} = ucfirst($tag_data); # ARTIST Laleh
+    if(set_mp3tag($f, $tags)) {
+      read_tags($tag_name,$f);
+    }
+    else {
+      print($!);
+    }
+  }
+  exit(0);
+}
+
+sub list_genres {
+  for my $genre(sort(keys(%mp3_genres))) {
+    printf("%2d: %s\n", $mp3_genres{$genre},$genre);
+  }
+  exit(0);
+}
+
+=pod
+
+=head1 NAME
+
+  id3shit - commandline based id3 editor
+
+=head1 SYNOPSIS
+
+  id3shit [OPTION]... FILES
+
+=head1 DESCRIPTION
+
+B<id3shit> is a commandline based id3 editor that sucks a little bit less then
+the alternatives.
+
+It can read, write and strip tags, rename files based on the metadata and that's
+about it.
+
+All functions will operate recursively if given a directory.
+
+=head1 OPTIONS
+
+  -t,   --tags    show tags for FILEs
+  -i,   --info    show audio info for FILEs
+  -s,   --strip   strip all tags from FILEs
+  -w,   --write   write TAG DATA to FILEs ( -w artist Laleh )
+  -g,   --genres  list all available genres
+  -r,   --rename  rename FILEs based on ID3 data
+  -h,   --help    display a short help and exit
+  -m,   --man     display the manual
+
+=head2 'write' syntax
+
+    write will take two arguments: the tag field to change, and the data to place
+    there:
+
+    id3shit -w artist Laleh
+
+    Legal fields are ARTIST, ALBUM, TITLE, YEAR, COMMENT, GENRE and TRACKNUM
+
+=head1 AUTHOR
+
+Written by Magnus Woldrich.
+
+=head1 REPORTING BUGS
+
+Report bugs and/or feature requests to m@japh.se  or use the
+issue tracker located at http://github.com/trapd00r/id3shit/issues
+
+id3shit homepage: http://github.com/trapd00r/id3shit
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010, 2019- Magnus Woldrich
+
+Copyright (C) 2009 Olof Johansson, Magnus Woldrich
+
+License: GPLv2
+
+=head1 HISTORY
+
+The original id3shit started out as a way for me to learn some Perl, being
+teached by zibri (also known as The Perl Dude).
+
+The original id3shit project was founded because the authors were trying to
+strip tags from some mp3 files (a simple task, eh?) and none of the available
+commandline based editors worked.
+
+Zibri and trapd00r started hacking (this was my chance to learn some Perl from
+The Perl Dude) and soon we had a working version.
+
+Well, it was working, but it really sucked. Just like all the others.
+
+As of today (2010-08-17), I once again felt the need to edit some id3 tags. I
+remembered id3shit and it worked just fine, but I had to check the source code
+and man, it was fugly.
+=cut

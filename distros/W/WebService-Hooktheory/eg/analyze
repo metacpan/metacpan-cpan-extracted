@@ -5,11 +5,10 @@ use warnings;
 use GraphViz2;
 use WebService::Hooktheory;
 
-my $key = shift || die "Usage: perl $0 1234567890abcdefghij [end_point] [query]\n";
+my $key = shift || die "Usage: perl $0 activkey [endpoint] [modifier] [threshold]\n";
 my $ep  = shift || '/trends/nodes';
 my $mod = shift // ''; # http://forum.hooktheory.com/t/trends-api-chord-input/272
-
-my $threshold = 0.2;
+my $threshold = shift // 0.2;
 
 my $ws = WebService::Hooktheory->new( activkey => $key );
 
@@ -19,12 +18,13 @@ for my $i ( map { $mod . $_ } 1 .. 7 ) {
     my %query = ( query => { cp => $i } );
 
     print "Fetching $i...\n";
-    my $r = $ws->fetch( endpoint => $ep, %query );
+    my $r = eval { $ws->fetch( endpoint => $ep, %query ) };
+    next if $@;
 
     for my $item ( @$r ) {
         if ( $item->{probability} >= $threshold ) {
             push @found, $item;
-            print "\tFound!\n";
+            print "\tFound $item->{child_path} with probability = $item->{probability}\n";
         }
     }
 

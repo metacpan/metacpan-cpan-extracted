@@ -469,8 +469,10 @@ sub having {
 
 sub order_by {
     my ( $sf, $stmt_h, $sql ) = @_;
+    my $clause = 'order_by';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my @pre = ( undef, $sf->{i}{ok} );
+    my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
+    my @pre = ( undef, $sf->{i}{ok}, $ext_sign ? $ext_sign : () );
     my @cols;
     if ( @{$sql->{aggr_cols}} || @{$sql->{group_by_cols}} ) {
         @cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
@@ -500,6 +502,17 @@ sub order_by {
                 $sql->{order_by_stmt} = '';
             }
             return 1;
+        }
+        elsif ( $col eq $ext_sign ) {
+            my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $ext_col = $ext->extended_col( $sql, $clause );
+            if ( ! defined $ext_col ) {
+                if ( @$bu ) {
+                    ( $sql->{order_by_stmt}, $col_sep ) = @{pop @$bu};
+                }
+                next ORDER_BY;
+            }
+            $col = $ext_col;
         }
         push @$bu, [ $sql->{order_by_stmt}, $col_sep ];
         $sql->{order_by_stmt} .= $col_sep . $col;

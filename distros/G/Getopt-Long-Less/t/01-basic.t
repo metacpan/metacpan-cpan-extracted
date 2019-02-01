@@ -126,7 +126,7 @@ subtest "gnu compat" => sub {
     );
 };
 
-subtest "handler" => sub {
+subtest "destination" => sub {
     my $h = {};
     test_getopt(
         name => 'nonref (noop)',

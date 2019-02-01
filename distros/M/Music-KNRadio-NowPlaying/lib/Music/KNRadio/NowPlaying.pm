@@ -8,7 +8,7 @@ BEGIN {
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
   @ISA = qw(Exporter);
 
-  $VERSION = '0.004';
+  $VERSION = '0.008';
   @EXPORT_OK = qw(knnp);
 }
 
@@ -33,12 +33,17 @@ sub knnp {
         last;
       }
       ($now_playing{artist}, $now_playing{title}) = $1 =~ m/(.+) - (.+)/;
+
+      last unless defined $now_playing{artist};
       $now_playing{artist} =~ s/[^[:ascii:]]//g;
       $now_playing{title}  =~ s/[^[:ascii:]]//g;
       $now_playing{title}  =~ s/\r//g;
 
       $now_playing{state} = 'playing';
       last;
+    }
+    else {
+      $now_playing{state} = 'paused';
     }
   }
   return \%now_playing;

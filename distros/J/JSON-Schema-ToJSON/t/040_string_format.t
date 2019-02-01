@@ -32,12 +32,12 @@ cmp_deeply(
 	$json,
 	{
 		'a_date-time' => re( '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$' ),
-		'a_email' => re( '^[A-Za-z]{12}@[A-Za-z]{12}.com$' ),
-		'a_hostname' => re( '^[A-Za-z]{12}$' ),
+		'a_email' => re( '^[A-Za-z]+@gmail.com$' ),
+		'a_hostname' => re( 'www.[A-Za-z]+.com' ),
 		'a_ipv4' => re( '^\d+\.\d+\.\d+\.\d+$' ),
 		'a_ipv6' => '2001:0db8:0000:0000:0000:0000:1428:57ab',
-		'a_uri' => re( '^https://www.[a-z]{12}.com$' ),
-		'a_uriref' => re( '^https://www.[a-z]{12}.com$' ),
+		'a_uri' => re( '^https://www.[A-z]+.com$' ),
+		'a_uriref' => re( '^https://www.[A-z]+.com$' ),
 	},
 	'object'
 );

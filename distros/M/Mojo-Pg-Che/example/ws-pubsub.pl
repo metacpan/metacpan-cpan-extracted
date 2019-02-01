@@ -44,12 +44,12 @@ sub unsubws {
 #====================================================================
 package main;
 use Mojolicious::Lite;
-use Mojo::Pg::Che;
+use Mojo::Pg;
 
 app->config(hypnotoad => {listen => ['https://*:443?cert=ssl.crt&key=ssl.key'],});
 
 helper pubsub => sub {
-  state $pubsub = PubSub->new->pubsub(Mojo::Pg::Che->new("postgres://guest@/test")->pubsub)
+  state $pubsub = PubSub->new->pubsub(Mojo::Pg->new("postgres://guest@/test")->pubsub)
   ->listen('channel');
 };
 

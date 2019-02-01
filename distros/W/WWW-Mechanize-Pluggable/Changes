@@ -1,4 +1,12 @@
 Revision history for Perl module WWW::Mechanize::Pluggable
+1.14  Fri Feb  1 10:27:43 PST 2019
+  - Fix X<> POD that was not working as desired
+  - Fix "new year's check" error in Changes entry
+
+1.13  Thu Jan 31 19:08:19 PST 2019
+  - Remove MYMETA.yml
+    https://rt.cpan.org/Ticket/Display.html?id=108160
+
 1.12  Fri Jul  8 22:57:10 PDT 2011
 	- Update prereqs: add HTTP::Cookies
 

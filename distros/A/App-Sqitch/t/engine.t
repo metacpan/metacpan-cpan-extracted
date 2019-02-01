@@ -19,6 +19,7 @@ use App::Sqitch::DateTime;
 use List::Util qw(max);
 use lib 't/lib';
 use MockOutput;
+use TestConfig;
 
 my $CLASS;
 
@@ -28,7 +29,6 @@ BEGIN {
     delete $ENV{PGDATABASE};
     delete $ENV{PGUSER};
     delete $ENV{USER};
-    $ENV{SQITCH_CONFIG} = 'nonexistent.conf';
 }
 
 can_ok $CLASS, qw(load new name no_prompt run_deploy run_revert run_verify uri);
@@ -42,7 +42,6 @@ my @load_changes;
 my $offset_change;
 my $die = '';
 my $record_work = 1;
-my $updated_idx;
 my ( $earliest_change_id, $latest_change_id, $initialized );
 my $registry_version = $CLASS->registry_release;
 my $script_hash;
@@ -87,7 +86,6 @@ ENGINE: {
     sub mock_check_revert  { shift; push @SEEN => [ check_revert_dependencies => [@_] ] }
     sub begin_work         { push @SEEN => ['begin_work']  if $record_work }
     sub finish_work        { push @SEEN => ['finish_work'] if $record_work }
-    sub _update_ids        { push @SEEN => ['_update_ids']; $updated_idx }
     sub log_new_tags       { push @SEEN => [ log_new_tags => $_[1] ]; $_[0] }
     sub _update_script_hashes { push @SEEN => ['_update_script_hashes']; $_[0] }
 
@@ -98,13 +96,13 @@ ENGINE: {
     sub registry_version { $registry_version }
 }
 
-ok my $sqitch = App::Sqitch->new(
-    options => {
-        engine    => 'sqlite',
-        top_dir   => dir(qw(t sql))->stringify,
-        plan_file => file(qw(t plans multi.plan))->stringify,
-    }
-), 'Load a sqitch sqitch object';
+my $config = TestConfig->new(
+    'core.engine' => 'sqlite',
+    'core.top_dir'   => dir(qw(t sql))->stringify,
+    'core.plan_file' => file(qw(t plans multi.plan))->stringify,
+);
+ok my $sqitch = App::Sqitch->new(config => $config),
+    'Load a sqitch sqitch object';
 
 my $mock_engine = Test::MockModule->new($CLASS);
 
@@ -135,7 +133,7 @@ isa_ok $CLASS->new({sqitch => $sqitch, target => $target}), $CLASS, 'Engine';
 
 ##############################################################################
 # Test load().
-$sqitch->options->{engine} = 'whu';
+$config->update('core.engine' => 'whu');
 $target = App::Sqitch::Target->new( sqitch => $sqitch );
 ok my $engine = $CLASS->load({
     sqitch => $sqitch,
@@ -186,7 +184,7 @@ ok $engine = $CLASS->new({ sqitch => $sqitch, target => $target }),
 throws_ok { $engine->name } 'App::Sqitch::X',
     'Should get error from base engine name';
 is $@->ident, 'engine', 'Name error ident should be "engine"';
-is $@->message, __('No engine specified; use --engine or set core.engine'),
+is $@->message, __('No engine specified; specify via target or core.engine'),
     'Name error message should be correct';
 
 ok $engine = App::Sqitch::Engine::whu->new({sqitch => $sqitch, target => $target}),
@@ -290,7 +288,7 @@ throws_ok { $engine->_check_registry } 'App::Sqitch::X',
     'Should get error for out-of-date registry';
 is $@->ident, 'engine', 'Out-of-date registry error ident should be "engine"';
 is $@->message, __x(
-    'Registry is at version {old} but latest is {new}. Please run the "upgrade" conmand',
+    'Registry is at version {old} but latest is {new}. Please run the "upgrade" command',
     old => 0.1,
     new => $engine->registry_release,
 ), 'Out-of-date registry error message should be correct';
@@ -831,13 +829,11 @@ $record_work = 0;
 chdir 't';
 my $plan_file = file qw(sql sqitch.plan);
 my $sqitch_old = $sqitch; # Hang on to this because $change does not retain it.
-$sqitch = App::Sqitch->new(
-    options => {
-        engine    => 'sqlite',
-        plan_file => $plan_file->stringify,
-        top_dir   => 'sql',
-    },
+$config->update(
+    'core.top_dir'   => 'sql',
+    'core.plan_file' => $plan_file->stringify,
 );
+$sqitch = App::Sqitch->new(config => $config);
 $target = App::Sqitch::Target->new( sqitch => $sqitch );
 $change = App::Sqitch::Plan::Change->new( name => 'foo', plan => $target->plan );
 ok $engine = App::Sqitch::Engine::whu->new( sqitch => $sqitch, target => $target ),
@@ -889,14 +885,12 @@ is_deeply $engine->seen, [['current_state', undef]],
     'Still should not have updated IDs or hashes';
 
 # Have latest_item return a tag.
-$latest_change_id = $changes[1]->old_id;
-$updated_idx = 2;
+$latest_change_id = $changes[2]->id;
 ok $engine->_sync_plan, 'Sync the plan to a tag';
-is $plan->position, 2, 'Plan should now be at position 1';
+is $plan->position, 2, 'Plan should now be at position 2';
 is $engine->start_at, 'widgets@beta', 'start_at should now be widgets@beta';
 is_deeply $engine->seen, [
     ['current_state', undef],
-    ['_update_ids'],
     ['log_new_tags' => $plan->change_at(2)],
 ], 'Should have updated IDs';
 
@@ -907,7 +901,6 @@ is $plan->position, 2, 'Plan should now be at position 1';
 is $engine->start_at, 'widgets@beta', 'start_at should now be widgets@beta';
 is_deeply $engine->seen, [
     ['current_state', undef],
-    ['_update_ids'],
     ['log_new_tags' => $plan->change_at(2)],
 ], 'Should have updated IDs but not hashes';
 
@@ -918,7 +911,6 @@ is $plan->position, 2, 'Plan should now be at position 1';
 is $engine->start_at, 'widgets@beta', 'start_at should now be widgets@beta';
 is_deeply $engine->seen, [
     ['current_state', undef],
-    ['_update_ids'],
     ['_update_script_hashes'],
     ['log_new_tags' => $plan->change_at(2)],
 ], 'Should have updated IDs and hashes';
@@ -1166,14 +1158,8 @@ NOSTEPS: {
     say $fh '%project=empty';
     $fh->close or die "Error closing $plan_file: $!";
     END { $plan_file->remove }
-    my $sqitch = App::Sqitch->new(
-        _engine => 'sqlite',
-        plan_file => $plan_file,
-        options => {
-            engine => 'sqlite',
-            plan_file => $plan_file->stringify,
-        }
-    );
+    $config->update('core.plan_file' => $plan_file->stringify);
+    my $sqitch = App::Sqitch->new(config => $config);
     my $target = App::Sqitch::Target->new(sqitch => $sqitch );
     ok my $engine = App::Sqitch::Engine::whu->new(
         sqitch => $sqitch,
@@ -2117,6 +2103,7 @@ PLANOK: {
             change    => $dep->change,
             tag       => $dep->tag,
             project   => $dep->project,
+            first     => 1,
         }],
     ], 'Should have passed dependency params to change_id_for()';
 }
@@ -2281,12 +2268,14 @@ CHECK_DEPLOY_DEPEND: {
             change    => 'foo',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
         } ],
         [ change_id_for => {
             change_id => undef,
             change    => 'bar',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
         } ],
     ], 'Should have called change_id_for() twice';
     is_deeply [ map { $_->resolved_id } @conflicts ], [undef, undef],
@@ -2313,18 +2302,21 @@ CHECK_DEPLOY_DEPEND: {
             change    => 'users',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
         } ],
         [ change_id_for => {
             change_id => undef,
             change    => 'foo',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
         } ],
         [ change_id_for => {
             change_id => undef,
             change    => 'bar',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
         } ],
     ], 'Should have called change_id_for() twice';
     is_deeply [ map { $_->resolved_id } @conflicts ], [undef, undef],
@@ -2332,7 +2324,7 @@ CHECK_DEPLOY_DEPEND: {
 
     ##########################################################################
     # Die on missing dependencies.
-    my @requires = $make_deps->( 0, qw(foo bar) );
+    my @requires = $make_deps->( 0, qw(foo bar foo) );
     $change = App::Sqitch::Plan::Change->new(
         name      => 'blah',
         plan      => $target->plan,
@@ -2351,7 +2343,7 @@ CHECK_DEPLOY_DEPEND: {
         'Missing required changes: {changes}',
         scalar 2,
         changes => 'foo bar',
-    ), 'Should have localized message missing dependencies';
+    ), 'Should have localized message missing dependencies without dupes';
 
     is_deeply $engine->seen, [
         [ change_id_for => {
@@ -2359,15 +2351,24 @@ CHECK_DEPLOY_DEPEND: {
             change    => 'foo',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
         } ],
         [ change_id_for => {
             change_id => undef,
             change    => 'bar',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
+        } ],
+        [ change_id_for => {
+            change_id => undef,
+            change    => 'foo',
+            tag       => undef,
+            project   => 'sql',
+            first     => 1,
         } ],
     ], 'Should have called check_requires';
-    is_deeply [ map { $_->resolved_id } @requires ], [undef, undef],
+    is_deeply [ map { $_->resolved_id } @requires ], [undef, undef, undef],
         'Missing requirements should not have resolved';
 
     # Make sure we see both conflict and prereq failures.
@@ -2399,39 +2400,52 @@ CHECK_DEPLOY_DEPEND: {
             change    => 'widgets',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
         } ],
         [ change_id_for => {
             change_id => undef,
             change    => 'users',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
         } ],
         [ change_id_for => {
             change_id => undef,
             change    => 'foo',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
         } ],
         [ change_id_for => {
             change_id => undef,
             change    => 'bar',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
         } ],
         [ change_id_for => {
             change_id => undef,
             change    => 'foo',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
         } ],
         [ change_id_for => {
             change_id => undef,
             change    => 'bar',
             tag       => undef,
             project   => 'sql',
+            first     => 1,
+        } ],
+        [ change_id_for => {
+            change_id => undef,
+            change    => 'foo',
+            tag       => undef,
+            project   => 'sql',
+            first     => 1,
         } ],
     ], 'Should have called check_requires';
-    is_deeply [ map { $_->resolved_id } @requires ], [undef, undef],
+    is_deeply [ map { $_->resolved_id } @requires ], [undef, undef, undef],
         'Missing requirements should not have resolved';
 }
 

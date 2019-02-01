@@ -1,5 +1,9 @@
 Revision history for WebService-Hooktheory
 
+0.0405 2019-01-31 22:49:49
+    - Improve the eg/analyze program.
+    - Add the eg/mojo-ui program.
+
 0.0404 2019-01-30 23:34:52
     - Add the eg/analyze program.
     - Improve documentation slightly.

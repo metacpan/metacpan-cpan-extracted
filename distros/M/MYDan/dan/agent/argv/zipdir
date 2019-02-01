@@ -1,0 +1,20 @@
+#!# perl: agent/argv/zipdir
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+return sub
+{
+    local $/;
+    my %o;
+
+    Getopt::Long::GetOptionsFromArray( \@_, \%o, qw( uuid=s makelist dirdetail) );
+
+    my $chars = [ "A" .. "Z", "a" .. "z", 0 .. 9 ];
+    $o{uuid} ||= join("", @$chars[ map { rand @$chars } ( 1 .. 8 ) ]);
+
+    $o{path} = \@_;
+
+    return \%o;
+};

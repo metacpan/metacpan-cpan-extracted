@@ -5,11 +5,11 @@ use utf8;
 use Acme::MadokaMagica;
 use Test::More;
 
-
 subtest 'Soulgem' => sub{
-    my ($mami) = Acme::MadokaMagica->alone_members;
-    is ref $mami,'Acme::MadokaMagica::TvMembers::TomoeMami';
-    is $mami->color,'yellow';
+    subtest 'alone_members' => sub {
+        my ($mami) = Acme::MadokaMagica->alone_members;
+        is ref $mami,'Acme::MadokaMagica::TvMembers::TomoeMami';
+        is $mami->color,'yellow';
 
 
 
@@ -107,9 +107,113 @@ subtest 'Soulgem' => sub{
 
 
 
-    is $mami->color,undef;
+        is $mami->color,undef;
 
+    };
 
+    subtest 'members_of' => sub {
+        my ($kyoko,) = Acme::MadokaMagica->members_of($Acme::MadokaMagica::KyoSaya);
+        is ref $kyoko,'Acme::MadokaMagica::TvMembers::SakuraKyoko';
+        is $kyoko->color,'Red';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        is $kyoko->color,undef;
+    };
 };
 
 done_testing;

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the Hooktheory API
 
-our $VERSION = '0.0404';
+our $VERSION = '0.0405';
 
 use Moo;
 use strictures 2;
@@ -120,7 +120,7 @@ WebService::Hooktheory - Access to the Hooktheory API
 
 =head1 VERSION
 
-version 0.0404
+version 0.0405
 
 =head1 SYNOPSIS
 

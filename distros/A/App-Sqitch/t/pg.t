@@ -14,18 +14,15 @@ use App::Sqitch::Target;
 use App::Sqitch::Plan;
 use lib 't/lib';
 use DBIEngineTest;
+use TestConfig;
 
 my $CLASS;
 
 BEGIN {
     $CLASS = 'App::Sqitch::Engine::pg';
     require_ok $CLASS or die;
-    $ENV{SQITCH_CONFIG}        = 'nonexistent.conf';
-    $ENV{SQITCH_SYSTEM_CONFIG} = 'nonexistent.user';
-    $ENV{SQITCH_USER_CONFIG}   = 'nonexistent.sys';
     delete $ENV{PGPASSWORD};
 }
-
 
 is_deeply [$CLASS->config_vars], [
     target   => 'any',
@@ -34,7 +31,8 @@ is_deeply [$CLASS->config_vars], [
 ], 'config_vars should return three vars';
 
 my $uri = URI::db->new('db:pg:');
-my $sqitch = App::Sqitch->new(options => { engine => 'pg' });
+my $config = TestConfig->new('core.engine' => 'pg');
+my $sqitch = App::Sqitch->new(config => $config);
 my $target = App::Sqitch::Target->new(
     sqitch => $sqitch,
     uri    => $uri,
@@ -44,7 +42,7 @@ isa_ok my $pg = $CLASS->new(sqitch => $sqitch, target => $target), $CLASS;
 is $pg->key, 'pg', 'Key should be "pg"';
 is $pg->name, 'PostgreSQL', 'Name should be "PostgreSQL"';
 
-my $client = 'psql' . ($^O eq 'MSWin32' ? '.exe' : '');
+my $client = 'psql' . (App::Sqitch::ISWIN ? '.exe' : '');
 is $pg->client, $client, 'client should default to psqle';
 is $pg->registry, 'sqitch', 'registry default should be "sqitch"';
 is $pg->uri, $uri, 'DB URI should be "db:pg:"';
@@ -64,7 +62,7 @@ my @std_opts = (
     '--set' => 'registry=sqitch',
 );
 my $sysuser = $sqitch->sysuser;
-is_deeply [$pg->psql], [$client, '--dbname', "user=$sysuser", @std_opts],
+is_deeply [$pg->psql], [$client, @std_opts],
     'psql command should be conninfo, and std opts-only';
 
 isa_ok $pg = $CLASS->new(sqitch => $sqitch, target => $target), $CLASS;
@@ -72,7 +70,6 @@ ok $pg->set_variables(foo => 'baz', whu => 'hi there', yo => 'stellar'),
     'Set some variables';
 is_deeply [$pg->psql], [
     $client,
-    '--dbname', "user=$sysuser",
     '--set' => 'foo=baz',
     '--set' => 'whu=hi there',
     '--set' => 'yo=stellar',
@@ -84,18 +81,12 @@ is_deeply [$pg->psql], [
 ENV: {
     # Make sure we override system-set vars.
     local $ENV{PGDATABASE};
-    local $ENV{PGUSER};
-    local $ENV{PGPASSWORD};
     for my $env (qw(PGDATABASE PGUSER PGPASSWORD)) {
         my $pg = $CLASS->new(sqitch => $sqitch, target => $target);
         local $ENV{$env} = "\$ENV=whatever";
         is $pg->target->uri, "db:pg:", "Target should not read \$$env";
         is $pg->registry_destination, $pg->destination,
             'Registry target should be the same as destination';
-        is $pg->username, $ENV{PGUSER} || $sysuser,
-            "Should have username when $env set";
-        is $pg->password, $ENV{PGPASSWORD},
-            "Should have password when $env set";
     }
 
     my $mocker = Test::MockModule->new('App::Sqitch');
@@ -114,14 +105,12 @@ ENV: {
 
 ##############################################################################
 # Make sure config settings override defaults.
-my %config = (
+$config->update(
     'engine.pg.client'   => '/path/to/psql',
     'engine.pg.target'   => 'db:pg://localhost/try?sslmode=disable&connect_timeout=5',
     'engine.pg.registry' => 'meta',
 );
 $std_opts[-1] = 'registry=meta';
-my $mock_config = Test::MockModule->new('App::Sqitch::Config');
-$mock_config->mock(get => sub { $config{ $_[2] } });
 
 $target = App::Sqitch::Target->new( sqitch => $sqitch );
 ok $pg = $CLASS->new(sqitch => $sqitch, target => $target), 'Create another pg';
@@ -132,31 +121,8 @@ is $pg->registry, 'meta', 'registry should be as configured';
 is_deeply [$pg->psql], [
     '/path/to/psql',
     '--dbname',
-    "user=$sysuser dbname=try host=localhost connect_timeout=5 sslmode=disable",
+    "dbname=try host=localhost connect_timeout=5 sslmode=disable",
 @std_opts], 'psql command should be configured from URI config';
-
-##############################################################################
-# Now make sure that (deprecated?) Sqitch options override configurations.
-$sqitch = App::Sqitch->new(
-    options => {
-        engine => 'pg',
-        client => '/some/other/psql',
-    }
-);
-
-$target = App::Sqitch::Target->new( sqitch => $sqitch );
-ok $pg = $CLASS->new(sqitch => $sqitch, target => $target),
-    'Create a pg with sqitch with options';
-
-is $pg->client, '/some/other/psql', 'client should be as optioned';
-is $pg->registry_destination, $pg->destination,
-    'registry_destination should be the same as destination';
-is $pg->registry, 'meta', 'registry should still be as configured';
-is_deeply [$pg->psql], [
-    '/some/other/psql',
-    '--dbname',
-    "user=$sysuser dbname=try host=localhost connect_timeout=5 sslmode=disable",
-@std_opts], 'psql command should be as optioned';
 
 ##############################################################################
 # Test _run(), _capture(), and _spool().
@@ -250,7 +216,6 @@ is_deeply \@run, [$pg->psql, '--file', 'foo/bar.sql'],
     'Verifile file should be passed to run() for high verbosity';
 
 $mock_sqitch->unmock_all;
-$mock_config->unmock_all;
 
 ##############################################################################
 # Test DateTime formatting stuff.
@@ -289,7 +254,8 @@ $mock_sqitch->unmock('probe');
 
 ##############################################################################
 # Can we do live tests?
-$sqitch = App::Sqitch->new( options => { engine => 'pg' } );
+$config->replace('core.engine' => 'pg');
+$sqitch = App::Sqitch->new(config => $config);
 $target = App::Sqitch::Target->new( sqitch => $sqitch );
 $pg     = $CLASS->new(sqitch => $sqitch, target => $target);
 my $dbh;
@@ -325,11 +291,7 @@ my $err = try {
 
 DBIEngineTest->run(
     class         => $CLASS,
-    sqitch_params => [options => {
-        engine     => 'pg',
-        top_dir     => Path::Class::dir(qw(t engine))->stringify,
-        plan_file   => Path::Class::file(qw(t engine sqitch.plan))->stringify,
-    }],
+    version_query => 'SELECT version()',
     target_params => [
         uri => URI::db->new("db:pg://$pguser\@/$db"),
     ],

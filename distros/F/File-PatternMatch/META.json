@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "File::LsColor" : "0",
             "Term::ExtendedColor" : "0.16"
          }
       }
@@ -45,6 +46,6 @@
          "url" : "https://github.com/trapd00r/File-PatternMatch"
       }
    },
-   "version" : "0.045",
+   "version" : "0.050",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

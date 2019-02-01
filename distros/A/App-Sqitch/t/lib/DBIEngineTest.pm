@@ -63,6 +63,11 @@ sub run {
             @sqitch_params,
             user_name  => $user1_name,
             user_email => $user1_email,
+            config => TestConfig->new(
+                'core.engine'    => $class->key,
+                'core.top_dir'   => dir(qw(t engine))->stringify,
+                'core.plan_file' => file(qw(t engine sqitch.plan))->stringify,
+            )
         );
         my $target = App::Sqitch::Target->new(
             sqitch => $sqitch,
@@ -82,10 +87,14 @@ sub run {
                     'Unable to live-test %s engine: %s',
                     $class->name,
                     substr($msg, 2),
-                );
-            };
+                ) unless $ENV{'LIVE_' . uc $engine->key . '_REQUIRED'};
+                fail 'Connect to ' . $class->name;
+                diag substr $msg, 2;
+            } or return;
         }
-
+        if (my $q = $p{version_query}) {
+            say '# Connected to ', $engine->dbh->selectcol_arrayref($q)->[0];
+        }
         ok $engine, 'Engine instantiated';
 
         ok !$engine->initialized, 'Database should not yet be initialized';
@@ -118,7 +127,11 @@ sub run {
             my @args;
             $sqitch_mocker->mock(info => sub { shift; push @args => @_ });
             ok $engine->upgrade_registry, 'Upgrade the registry';
-            is_deeply \@args, ['  * ' . __x(
+            is_deeply \@args, [__x(
+                'Upgrading the Sqitch registry from {old} to {new}',
+                old => 0,
+                new => '1.1',
+            ), '  * ' . __x(
                 'From {old} to {new}',
                 old => 0,
                 new => '1.0',
@@ -1243,18 +1256,8 @@ sub run {
                 $change->id,
             ],
             [
-                'FIRST',
-                { tag => 'FIRST' },
-                $change->id,
-            ],
-            [
                 'HEAD',
                 { tag => 'HEAD' },
-                $barney->id,
-            ],
-            [
-                'LAST',
-                { tag => 'LAST' },
                 $barney->id,
             ],
             [
@@ -1591,66 +1594,6 @@ sub run {
         ok $engine->log_deploy_change($_),
             'Deploy "' . $_->name . '" change' for @all_changes;
 
-        if ($class eq 'App::Sqitch::Engine::pg') {
-            # Test _update_ids by old ID; required only for pg, which was the
-            # only engine that existed at the time.
-            my @proj_changes = ($change, $change2, $fred, $barney, $hyper);
-            my @proj_tags    = ($change->tags, $beta, $gamma);
-            my @all_tags     = (@proj_tags, $ext_tag);
-
-            my $upd_change = $engine->dbh->prepare(
-                'UPDATE changes SET change_id = ? WHERE change_id = ?'
-            );
-            my $upd_tag = $engine->dbh->prepare(
-                'UPDATE tags SET tag_id = ? WHERE tag_id = ?'
-            );
-
-            for my $change (@proj_changes) {
-                $upd_change->execute($change->old_id, $change->id);
-            }
-            for my $tag (@proj_tags) {
-                $upd_tag->execute($tag->old_id, $tag->id);
-            }
-
-            # Mock Engine to silence the info notice.
-            my $mock_engine = Test::MockModule->new('App::Sqitch::Engine');
-            $mock_engine->mock(plan => $plan);
-            $mock_engine->mock(_update_ids => sub { shift });
-
-            is $engine->_update_ids, 10, 'Update IDs by old ID should return 10';
-
-            # All of the current project changes should be updated.
-            is_deeply [ map { [@{$_}[0,1]] } @{ all_changes($engine) }],
-                [ map { [ $_->id, $_->name ] } @all_changes ],
-                'All of the change IDs should have been updated';
-
-            # All of the current project tags should be updated.
-            is_deeply [ map { [@{$_}[0,1]] } @{ all_tags($engine) }],
-                [ map { [ $_->id, $_->format_name ] } @all_tags ],
-                'All of the tag IDs should have been updated';
-
-            # Now reset them so they have to be found by name.
-            $i = 0;
-            for my $change (@proj_changes) {
-                $upd_change->execute($change->old_id . $i++, $change->id);
-            }
-            for my $tag (@proj_tags) {
-                $upd_tag->execute($tag->old_id . $i++, $tag->id);
-            }
-
-            is $engine->_update_ids, 10, 'Update IDs by name should also return 10';
-
-            # All of the current project changes should be updated.
-            is_deeply [ map { [@{$_}[0,1]] } @{ all_changes($engine) }],
-                [ map { [ $_->id, $_->name ] } @all_changes ],
-                'All of the change IDs should have been updated by name';
-
-            # All of the current project tags should be updated.
-            is_deeply [ map { [@{$_}[0,1]] } @{ all_tags($engine) }],
-                [ map { [ $_->id, $_->format_name ] } @all_tags ],
-                'All of the tag IDs should have been updated by name';
-        }
-
         ######################################################################
         # Add a reworked change.
         ok my $rev_change = $plan->rework( name => 'users' ), 'Rework change "users"';
@@ -1686,6 +1629,11 @@ sub run {
                 [ '  * ', $rev_change->format_name . '@HEAD' ],
                 [ '  * ', $change->format_tag_qualified_name ],
             ], 'Should have vented output for lookup failure';
+
+            # But it should work okay if we ask for the first ID.
+            ok my $id = $engine->change_id_for(change => 'users', first => 1),
+                'Should get ID for first of ambiguous change spec';
+            is $id, $change->id, 'Should now have first change id';
         }
 
         is $engine->change_id_for( change => 'users', tag => 'alpha'), $change->id,

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+build-standalone
+cpanfile
+lib/App/termpub.pm
+lib/App/termpub/Epub.pm
+lib/App/termpub/Epub/Chapter.pm
+lib/App/termpub/Pager.pm
+lib/App/termpub/Renderer.pm
+minil.toml
+script/termpub
+t/01renderer.t
+META.yml
+MANIFEST

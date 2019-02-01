@@ -139,19 +139,6 @@ sub test_open_silo {
         $silo = Data::RecordStore::Silo->open_silo( 'L', $dir, 4 );
         pass( "created silo with a match between template size and given size" );
     };
-  {
-    local( *STDERR );
-    undef $out;
-    open( STDERR, ">>", \$out );
-    $dir = tempdir( CLEANUP => 1 );
-    $silo = Data::RecordStore::Silo->open( 'L', $dir, 4 );
-    like( $out, qr/deprecate/, "deprecation warning for Data::RecordStore::Silo::open" );
-    eval {
-      $dir = tempdir( CLEANUP => 1 );
-      $silo = Data::RecordStore::Silo::open( 'L', $dir, 4 );
-      like( $out, qr/deprecate/, "deprecation warning for Data::RecordStore::Silo::open" );
-    };
-  }
     my $ndir = tempdir( CLEANUP => 1 );
     diag( " $ndir  ".(-d $ndir)." )" );
     eval {

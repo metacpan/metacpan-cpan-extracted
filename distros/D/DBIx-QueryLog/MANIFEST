@@ -3,7 +3,6 @@ Changes
 LICENSE
 META.json
 README.md
-builder/MyBuilder.pm
 cpanfile
 lib/DBIx/QueryLog.pm
 minil.toml
@@ -35,7 +34,7 @@ t/35_useqq_and_compact.t
 t/36_show_data_srouce.t
 t/90_alias.t
 t/99_regression_sqlite_148.t
-t/Util.pm
+t/lib/t/Util.pm
 t/mysql/01_simple.t
 t/mysql/02_bind.t
 t/mysql/10_do.t

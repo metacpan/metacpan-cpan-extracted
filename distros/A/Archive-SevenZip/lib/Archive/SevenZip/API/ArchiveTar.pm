@@ -3,8 +3,7 @@ use strict;
 use Archive::SevenZip;
 use Carp 'croak';
 
-use vars qw($VERSION);
-$VERSION= '0.07';
+our $VERSION= '0.08';
 
 =head1 NAME
 
@@ -80,7 +79,7 @@ sub extract_file {
 =head1 REPOSITORY
 
 The public repository of this module is 
-L<http://github.com/Corion/archive-sevenzip>.
+L<https://github.com/Corion/archive-sevenzip>.
 
 =head1 SUPPORT
 
@@ -99,7 +98,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

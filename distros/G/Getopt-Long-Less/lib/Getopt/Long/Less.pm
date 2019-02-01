@@ -1,7 +1,7 @@
 package Getopt::Long::Less;
 
-our $DATE = '2016-12-03'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2019-02-02'; # DATE
+our $VERSION = '0.090'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -120,15 +120,15 @@ sub GetOptionsFromArray {
 
         my $parsed   = $parsed_spec{$name};
         my $spec_key = $parsed->{_orig};
-        my $handler  = $spec->{$spec_key};
-        my $ref      = ref($handler);
+        my $destination = $spec->{$spec_key};
+        my $ref      = ref $destination;
 
         my $val;
         if (@_) {
             $val = shift;
         } else {
             if ($parsed->{is_inc} && $ref eq 'SCALAR') {
-                $val = ($$handler // 0) + 1;
+                $val = ($$destination // 0) + 1;
             } elsif ($parsed->{is_inc} && $vals) {
                 $val = ($vals->{$name} // 0) + 1;
             } elsif ($parsed->{type} && $parsed->{type} eq 'i' ||
@@ -164,9 +164,9 @@ sub GetOptionsFromArray {
             my $cb = Getopt::Long::Less::Callback->new(
                 name => $name,
             );
-            $handler->($cb, $val);
+            $destination->($cb, $val);
         } elsif ($ref eq 'SCALAR') {
-            $$handler = $val;
+            $$destination = $val;
         } else {
             # no nothing
         }
@@ -383,7 +383,7 @@ Getopt::Long::Less - Like Getopt::Long, but with less features
 
 =head1 VERSION
 
-This document describes version 0.08 of Getopt::Long::Less (from Perl distribution Getopt-Long-Less), released on 2016-12-03.
+This document describes version 0.090 of Getopt::Long::Less (from Perl distribution Getopt-Long-Less), released on 2019-02-02.
 
 =head1 DESCRIPTION
 
@@ -407,7 +407,12 @@ future).
 
 No autoversion, no autohelp. No support to configure prefix pattern.
 
-Currently no support for arrayref handler (e.g. C<< "foo=s" => \@ary >>). No
+No support for GetOptions' "hash storage mode" (where the first argument is a
+hashref) nor "classic mode" (where destination is not explicitly specified).
+Basically, the arguments need to be pairs of option specifications and
+destinations.
+
+Currently no support for arrayref destination (e.g. C<< "foo=s" => \@ary >>). No
 support for array desttype (C<< 'foo=s@' => ... >>).
 
 Also, this module requires 5.010.
@@ -415,18 +420,6 @@ Also, this module requires 5.010.
 So what's good about this module? Slightly less compile time overhead, due to
 less code. This should not matter for most people. I just like squeezing out
 milliseconds from startup overhead of my CLI scripts. That's it :-)
-
-Sample startup overhead benchmark:
-
-                      Rate     load_gl load_glless   perl
- load_gl     77.72+-0.25/s          --      -42.4% -86.9%
- load_glless   135+-0.28/s 73.7+-0.67%          -- -77.3%
- perl         594.5+-2.1/s   665+-3.7% 340.4+-1.8%     --
- 
- Average times:
-   perl       :     1.6821ms
-   load_glless:     7.4074ms
-   load_gl    :    12.8667ms
 
 =for Pod::Coverage .+
 
@@ -452,13 +445,15 @@ L<Getopt::Long>
 
 If you want I<more> features intead of less, try L<Getopt::Long::More>.
 
+Benchmarks in L<Bencher::Scenario::GetoptModules>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package App::iperlmoddir::Utils;
-$App::iperlmoddir::Utils::VERSION = '1.0';
+$App::iperlmoddir::Utils::VERSION = '1.02';
 use strict;
 use warnings;
 use feature 'say';
@@ -68,6 +68,9 @@ sub _substr_aldc {
 sub _extract_base {
     my (%p) = @_;
 
+    croak "Abs path is not defined" if !defined $p{abs};
+    croak "Rel path is not defined" if !defined $p{rel};
+
 # https://stackoverflow.com/questions/7283274/check-whether-a-string-contains-a-substring
     if ( index( $p{abs}, $p{rel} ) == -1 ) {
         croak "Relative path "
@@ -97,15 +100,23 @@ sub _validate_module_fullname {
 
 
 sub parse_modules {
-    my ($files) = @_;
+    my ( $files, $v ) = @_;
+
+    say "Start parsing modules : \n" . join( "\n", @$files ) if $v;
 
     my @res = ();
     for my $f ( sort @$files ) {
 
         _validate_module_fullname($f);
 
-        my $info         = Module::Metadata->new_from_file($f);
-        my $name         = $info->name;
+        my $info = Module::Metadata->new_from_file($f);
+
+        my $name = $info->name;
+
+        say "Module::Metadata can not define module name of $f"
+          if ( $v && !defined $name );
+        next if !defined $name;
+
         my $abs_filename = $info->filename;
         my $rel_filename = module_path $name;
 
@@ -124,7 +135,11 @@ sub parse_modules {
 
         # or autoload $name;
 
-        my $mod  = Module::Info->new_from_loaded($name);
+        my $mod = Module::Info->new_from_module($name);
+
+        croak "Problems with getting Module::Info at module " . $name
+          if !defined $mod;
+
         my %subs = $mod->subroutines;
         my @used = sort { "\L$a" cmp "\L$b" } $mod->modules_used;
 
@@ -244,7 +259,7 @@ App::iperlmoddir::Utils
 
 =head1 VERSION
 
-version 1.0
+version 1.02
 
 =head1 get_inspected_modules_list
 

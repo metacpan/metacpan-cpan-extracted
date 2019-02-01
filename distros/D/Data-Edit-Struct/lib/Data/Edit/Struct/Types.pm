@@ -5,7 +5,7 @@ package  Data::Edit::Struct::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Data::DPath qw[ dpath dpathi ];
 use Type::Library
@@ -16,20 +16,15 @@ use Types::Standard -types;
 
 
 
-declare Context,
-  as InstanceOf ['Data::DPath::Context'],;
+declare Context, as InstanceOf ['Data::DPath::Context'],;
 
-coerce Context,
-  from HashRef | ArrayRef | ScalarRef, via sub { dpathi( $_ ) };
+coerce Context, from HashRef | ArrayRef | ScalarRef, via sub { dpathi( $_ ) };
 
-declare UseDataAs,
-  as Enum [ 'element', 'container', 'auto' ];
+declare UseDataAs, as Enum [ 'element', 'container', 'auto' ];
 
-declare IntArray,
-  as ArrayRef[Int];
+declare IntArray, as ArrayRef [Int];
 
-coerce IntArray,
-  from Int, via sub { [ $_ ] };
+coerce IntArray, from Int, via sub { [$_] };
 
 
 1;
@@ -47,6 +42,8 @@ coerce IntArray,
 #   The GNU General Public License, Version 3, June 2007
 #
 
+__END__
+
 =pod
 
 =head1 NAME
@@ -55,7 +52,7 @@ Data::Edit::Struct::Types - Types for Data::Edit::Struct;
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -74,11 +71,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-
-#pod =head1 SYNOPSIS
-#pod
-#pod
-#pod =head1 SEE ALSO

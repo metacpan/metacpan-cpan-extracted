@@ -45,6 +45,9 @@ sub new
 {
     my ( $class, %self ) = ( @_, 'usetime' => 0 );
 
+	my $chars = [ "A" .. "Z", "a" .. "z", 0 .. 9 ];
+	$self{uuid} ||= join("", @$chars[ map { rand @$chars } ( 1 .. 8 ) ]);
+
     unless( defined $self{task} )
     {
         map{ die "$_ undef" unless $self{$_} }qw( opt sync );
@@ -53,9 +56,12 @@ sub new
         my @file;
         if( scalar @{$self{sync}{src}} && ( $self{opt}{sp} =~ /\/$/ || $self{opt}{sp} =~ /\*/ ) )
         {
+                $self{spIsDir} = 1;
                 my $time = time;
+
                 my %query = ( 
-                    code => 'filelist', argv => [ $self{opt}{sp} ], 
+                    code => 'zipdir', argv => +{ uuid => $self{uuid}, path => [ $self{opt}{sp} ], 
+                        makelist => $self{opt}{delete} ? 1 : 0, dirdetail => $self{opt}{cc} ? 1 : 0 }, 
                     map{ $_ => $self{opt}{$_} }qw( user sudo ) );
                 my %result = MYDan::Agent::Client->new( $self{sync}{src}[0] )
                              ->run( %{$self{opt}}, %{$self{sync}{agent}}, query => \%query );
@@ -63,11 +69,11 @@ sub new
                 my $result = $result{$self{sync}{src}[0]} || '';
                 unless( $result =~ s/--- 0\n$// )
                 {
-                    warn $self{error} = "[ERROR]get filelist from $self{sync}{src}[0] failed\n";
+                    warn $self{error} = "[ERROR]get zipdir from $self{sync}{src}[0] failed\n";
                 }
                 elsif( $result =~ /The content was truncated/ )
                 {
-                    warn $self{error} = "[ERROR]filelist on $self{sync}{src}[0] too long.\n$result\n";
+                    warn $self{error} = "[ERROR]zipdir on $self{sync}{src}[0] too long.\n$result\n";
                 }
                 else
                 {
@@ -158,7 +164,52 @@ sub run
     }
 
     print '=' x 60, "\n";
+
+    if( $this->{spIsDir} )
+    {
+    	my %query = ( 
+    		code => 'unzipdir', argv => +{ uuid => $this->{uuid}, 
+                path => [ $this->{opt}{dp} ], map{ $_ => $opt->{$_} }qw( delete chown chmod ) }, 
+    		map{ $_ => $opt->{$_} }qw( user sudo ) );
+    	my %result = MYDan::Agent::Client->new( @{$sync->{dst}} )
+    	    ->run( %$opt, %{$sync->{agent}}, query => \%query );
+    
+        print "untar.\n";
+        for my $node ( keys %result )
+        {
+            if( $result{$node} =~ s/--- 0\n$// )
+            {
+                 print "$node: $result{$node}\n" if $result{$node};
+            }
+            else
+            {
+                print "$node: $result{$node}\n";
+                $failed{$node} = 1;
+            }
+        }
+        
+    
+        print '=' x 60, "\n";
+        print "clean dir.\n";
+    
+    	%query = ( 
+    		code => 'cleandir', argv => +{ uuid => $this->{uuid}, 
+                path => [ $this->{opt}{sp}, $this->{opt}{dp} ], expire => 86400 }, 
+    		map{ $_ => $this->{opt}{$_} }qw( user sudo ) );
+    	%result = MYDan::Agent::Client->new( @{$sync->{src}}, @{$sync->{dst}} )
+    	    ->run( %$opt, %{$sync->{agent}}, query => \%query );
+    
+        for my $node ( keys %result )
+        {
+            unless( $result{$node} =~ s/--- 0\n$// )
+            {
+                print "[warn]$node: $result{$node}\n";
+            }
+        }
+    }
+
     my @failed = keys %failed;
+
     return wantarray ? @failed : \@failed;
 }
 

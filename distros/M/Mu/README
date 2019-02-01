@@ -1,0 +1,61 @@
+NAME
+
+    Mu - Moo but with less typing
+
+VERSION
+
+    version 1.190320
+
+SYNOPSIS
+
+        use Mu;
+        
+        ro "hro";
+        lazy hlazy => sub { 2 };
+        rwp "hrwp";
+        rw "hrw";
+
+DESCRIPTION
+
+    Mu imports both Moo and MooX::ShortHas, making it even less work in
+    typing and reading to set up an object.
+
+SEE ALSO
+
+      * Mus - Mu but with slightly more typing and strict constructors
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the issue tracker at
+    https://github.com/wchristian/Mu/issues. You will be notified
+    automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/wchristian/Mu
+
+      git clone https://github.com/wchristian/Mu.git
+
+AUTHOR
+
+    Christian Walde <walde.christian@gmail.com>
+
+CONTRIBUTOR
+
+    mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    Christian Walde has dedicated the work to the Commons by waiving all of
+    his or her rights to the work worldwide under copyright law and all
+    related or neighboring legal rights he or she had in the work, to the
+    extent allowable by law.
+
+    Works under CC0 do not require attribution. When citing the work, you
+    should not imply endorsement by the author.
+

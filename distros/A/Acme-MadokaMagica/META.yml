@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Acme::MadokaMagica:
     file: lib/Acme/MadokaMagica.pm
-    version: '0.07'
+    version: '0.09'
   Acme::MadokaMagica::TvMembers:
     file: lib/Acme/MadokaMagica/TvMembers.pm
   Acme::MadokaMagica::TvMembers::AkemiHomura:
@@ -41,7 +41,6 @@ provides:
     file: lib/Acme/MadokaMagica/TvMembers/TomoeMami.pm
 requires:
   Data::Section::Simple: '0'
-  Mouse: '0'
   Readonly: '0'
   YAML::Tiny: '0'
   perl: '5.008001'
@@ -49,8 +48,10 @@ resources:
   bugtracker: https://github.com/AnaTofuZ/perl-acme-MadokaMagica/issues
   homepage: https://github.com/AnaTofuZ/perl-acme-MadokaMagica
   repository: git://github.com/AnaTofuZ/perl-acme-MadokaMagica.git
-version: '0.07'
+version: '0.09'
 x_contributors:
+  - 'AnaTofuZ <e155730@ie.u-ryukyu.ac.jp>'
+  - 'Takahiro SHIMIZU <anatofuz@gmail.com>'
   - 'papix <mail@papix.net>'
-  - 'Anagura <e155730@ie.u-ryukyu.ac.jp>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

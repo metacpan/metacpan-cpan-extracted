@@ -1,7 +1,12 @@
 use strict;
 use warnings;
 
-require '/home/wolf/opensource/Yote/FixedRecordStore/lib/Data/RecordStore.pm';
+# this program is for use by a developer to write a test to upgrade
+# from one version to the current. It requires the Data::RecordStore
+# required to be the old version to test.
+
+# control which version of test file to be created.
+require '/home/wolf/opensource/recordstore/lib/Data/RecordStore.pm';
 
 print $Data::RecordStore::VERSION,"\n";
 
@@ -20,7 +25,7 @@ print $Data::RecordStore::VERSION,"\n";
 #
 
 mkdir ( "t/upgrade_data/$Data::RecordStore::VERSION" );
-my $store = Data::RecordStore->open( "t/upgrade_data/$Data::RecordStore::VERSION" );
+my $store = Data::RecordStore->open_store( "t/upgrade_data/$Data::RecordStore::VERSION" );
 
 sub make_1 {
   my $old_min_size = 0;
@@ -255,13 +260,13 @@ sub make_2 {
   print STDERR "Did $stows stows, $recs records\n";
 } #make_2
 
-sub make_4 {
+sub make_4_or_5 {
   my $old_min_size = 0;
   my $last_new_id = 12;
   my $stows = 0;
   my $recs = 0;
-  for my $old_store_id (1..12,12) {
-    my $old_max_size = int( exp( $old_store_id ) );
+  for my $old_silo_id (1..12,12) {
+    my $old_max_size = int( exp( $old_silo_id ) );
     $old_max_size -= 4; # long,rest. Its the rest that we get the size for
     if ( $old_max_size < 0 ) {
       next;
@@ -270,12 +275,12 @@ sub make_4 {
     if ( $new_size < 1 ) {
       $new_size = 1;
     }
-    my $new_store_id = log( $new_size ) / log( 2 );
-    if ( int( $new_store_id ) < $new_store_id ) {
-      $new_store_id = 1 + int( $new_store_id );
+    my $new_silo_id = log( $new_size ) / log( 2 );
+    if ( int( $new_silo_id ) < $new_silo_id ) {
+      $new_silo_id = 1 + int( $new_silo_id );
     }
-    if ( $new_store_id < 12 ) {
-      $new_store_id = 12;       #4096
+    if ( $new_silo_id < 12 ) {
+      $new_silo_id = 12;       #4096
     }
     my $avg = int( ($old_min_size+$old_max_size) / 2 );
     $store->stow( 'x'x$old_min_size ) if $old_min_size;
@@ -286,12 +291,12 @@ sub make_4 {
     ++$recs;
     $store->stow( 'x'x$old_max_size );
     ++$stows;
-    $store->delete( $id );
+    $store->delete_record( $id );
     ++$recs;
 
-    if ( $new_store_id > ($last_new_id+1) ) {
+    if ( $new_silo_id > ($last_new_id+1) ) {
       my $mid_boundary = 2**($last_new_id+1);
-      print "   new store ".($new_store_id-1)." with min ".($mid_boundary-1)."\n";
+      print "   new store ".($new_silo_id-1)." with min ".($mid_boundary-1)."\n";
       $store->stow( 'x'x($mid_boundary-1) ); #still on the first new store id
       ++$stows;
       ++$recs;
@@ -305,16 +310,17 @@ sub make_4 {
       ++$recs;
     }
     
-    $last_new_id = $new_store_id;
+    $last_new_id = $new_silo_id;
     $old_min_size = $old_max_size + 1;
   }
 
   print STDERR "Did $stows stows, $recs records\n";
-} #make_4
+} #make_4_or_5
+
 #make_2();
 #make_3();
-make_3_1();
-#make_4();
+#make_3_1();
+make_4_or_5();
 
 __END__
 

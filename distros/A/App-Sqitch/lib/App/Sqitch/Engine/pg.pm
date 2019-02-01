@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9998';
+our $VERSION = '0.9999';
 
 sub destination {
     my $self = shift;
@@ -28,12 +28,22 @@ sub destination {
     # Use the URI sans password, and with the database name added.
     my $uri = $self->target->uri->clone;
     $uri->password(undef) if $uri->password;
-    $uri->dbname( $ENV{PGDATABASE} || $self->username );
+    $uri->dbname(
+        $ENV{PGDATABASE}
+        || $self->username
+        || $ENV{PGUSER}
+        || $self->sqitch->sysuser
+    );
     return $uri->as_string;
 }
 
-sub _def_user { $ENV{PGUSER} || shift->sqitch->sysuser }
-sub _def_pass { $ENV{PGPASSWORD} }
+# DBD::pg and psql use fallbacks consistently, thanks to libpq. These include
+# environment variables, system info (username), the password file, and the
+# connection service file. Best for us not to second-guess these values,
+# though we admittedly try when setting the database name in the destination
+# URI for unnamed targets a few lines up from here.
+sub _def_user { }
+sub _def_pass { }
 
 has _psql => (
     is         => 'ro',
@@ -380,115 +390,6 @@ sub _no_column_error  {
 sub _in_expr {
     my ($self, $vals) = @_;
     return '= ANY(?)', $vals;
-}
-
-# This method only required by pg, as no other engines existed when change and
-# tag IDs changed.
-sub _update_ids {
-    my $self = shift;
-    my $plan = $self->plan;
-    my $proj = $plan->project;
-    my $maxi = 0;
-
-    $self->SUPER::_update_ids;
-    my $dbh = $self->dbh;
-    $dbh->begin_work;
-    try {
-        # First, we have to recreate the FK constraint on dependencies.
-        $dbh->do(q{
-            ALTER TABLE dependencies
-             DROP CONSTRAINT dependencies_change_id_fkey,
-              ADD FOREIGN KEY (change_id) REFERENCES changes (change_id)
-                  ON UPDATE CASCADE ON DELETE CASCADE;
-        });
-
-        my $sth = $dbh->prepare(q{
-            SELECT change_id, change, committed_at
-              FROM changes
-             WHERE project = ?
-        });
-        my $atag_sth = $dbh->prepare(q{
-            SELECT tag
-              FROM tags
-             WHERE project = ?
-               AND committed_at < ?
-             LIMIT 1
-        });
-        my $btag_sth = $dbh->prepare(q{
-            SELECT tag
-              FROM tags
-             WHERE project = ?
-               AND committed_at >= ?
-             LIMIT 1
-        });
-        my $upd = $dbh->prepare(
-            'UPDATE changes SET change_id = ? WHERE change_id = ?'
-        );
-
-        $sth->execute($proj);
-        $sth->bind_columns(\my ($old_id, $name, $date));
-
-        while ($sth->fetch) {
-            # Try to find it in the plan by the old ID.
-            if (my $idx = $plan->index_of($old_id)) {
-                $upd->execute($plan->change_at($idx)->id, $old_id);
-                $maxi = $idx if $idx > $maxi;
-                next;
-            }
-
-            # Try to find it by the tag that precedes it.
-            if (my $tag = $dbh->selectcol_arrayref($atag_sth, undef, $proj, $date)->[0]) {
-                if (my $idx = $plan->first_index_of($name, $tag)) {
-                    $upd->execute($plan->change_at($idx)->id, $old_id);
-                    $maxi = $idx if $idx > $maxi;
-                    next;
-                }
-            }
-
-            # Try to find it by the tag that succeeds it.
-            if (my $tag = $dbh->selectcol_arrayref($btag_sth, undef, $proj, $date)->[0]) {
-                if (my $change = $plan->find($name . $tag)) {
-                    $upd->execute($change->id, $old_id);
-                    my $idx = $plan->index_of($change->id);
-                    $maxi = $idx if $idx > $maxi;
-                    next;
-                }
-            }
-
-            # Try to find it by name. Throws an exception if there is more than one.
-            if (my $change = $plan->get($name)) {
-                $upd->execute($change->id, $old_id);
-                my $idx = $plan->index_of($change->id);
-                $maxi = $idx if $idx > $maxi;
-                next;
-            }
-
-            # If we get here, we're fucked.
-            hurl engine => "Unable to find $name ($old_id) in the plan; update failed";
-        }
-
-        # Now update tags.
-        $sth = $dbh->prepare('SELECT tag_id, tag FROM tags WHERE project = ?');
-        $upd = $dbh->prepare('UPDATE tags SET tag_id = ? WHERE tag_id = ?');
-        $sth->execute($proj);
-        $sth->bind_columns(\($old_id, $name));
-        while ($sth->fetch) {
-            my $change = $plan->find($old_id) || $plan->find($name)
-                or hurl engine => "Unable to find $name ($old_id) in the plan; update failed";
-            my $tag = first { $_->old_id eq $old_id } $change->tags;
-            $tag ||= first { $_->format_name eq $name } $change->tags;
-            hurl engine => "Unable to find $name ($old_id) in the plan; update failed"
-                unless $tag;
-            $upd->execute($tag->id, $old_id);
-        }
-
-        # Success!
-        $dbh->commit;
-    } catch {
-        $dbh->rollback;
-        die $_;
-    };
-    return $maxi;
 }
 
 sub _run {

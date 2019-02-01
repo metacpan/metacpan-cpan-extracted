@@ -67,7 +67,7 @@
    "provides" : {
       "App::dategrep" : {
          "file" : "lib/App/dategrep.pm",
-         "version" : "2.06"
+         "version" : "2.07"
       },
       "App::dategrep::Date" : {
          "file" : "lib/App/dategrep/Date.pm"
@@ -99,7 +99,7 @@
          "web" : "https://github.com/mdom/dategrep"
       }
    },
-   "version" : "2.06",
+   "version" : "2.07",
    "x_contributors" : [
       "Mario Domgoergen <mario@domgoergen.com>",
       "Mario Domgoergen <mdom@taz.de>",

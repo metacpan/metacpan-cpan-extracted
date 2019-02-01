@@ -4,7 +4,7 @@ use Module::Build;
 my $b = Module::Build->new(
   configure_requires   => {'Module::Build'=>0.4224},
   create_readme        =>  0,
-  dist_abstract        => 'Cross reference Dita XML.',
+  dist_abstract        => 'Cross reference Dita XML, match topics and ameliorate missing references.',
   dist_author          => 'philiprbrenan@gmail.com',
   license              => 'perl',
   module_name          => 'Data::Edit::Xml::Xref',

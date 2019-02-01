@@ -13,6 +13,7 @@
     [--chown root]
     [--chmod 777]
     [--cc]
+    [--delete]
 
      -1      Forces grsync to try protocol version 1
      -2      Forces grsync to try protocol version 2
@@ -41,7 +42,7 @@ $| ++;
 
 my $option = MYDan::Util::OptConf->load();
 my %o = $option->set( retry => 2, timeout => 300, gave => 3 )
-    ->get( qw( src=s dst=s sp=s dp=s timeout=i max=i retry=i nice=i user=s sudo=s gave=i chown=s chmod=s cc 1 2 3 4 ) )
+    ->get( qw( src=s dst=s sp=s dp=s timeout=i max=i retry=i nice=i user=s sudo=s gave=i chown=s chmod=s cc delete 1 2 3 4 ) )
     ->dump();
 
 $o{delete $o{ProtocolVersion}} = 1 unless $o{ProtocolVersion} && $o{ProtocolVersion} =~ /^\d$/ && grep{ $o{$_} }1..3;

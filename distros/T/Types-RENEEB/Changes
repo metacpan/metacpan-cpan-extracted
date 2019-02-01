@@ -1,6 +1,10 @@
 Revision history for Types::RENEEB
 ==================================
 
+0.04  2019-02-01 09:53:00
+
+   * minor documentation fixes
+
 0.03  2019-01-27 08:15:00
 
    * add type "CPANfile" to Types::Dist

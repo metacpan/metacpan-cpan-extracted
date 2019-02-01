@@ -13,6 +13,7 @@ $eumm_version =~ s/_//;
 my $module = 'Archive::SevenZip';
 (my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
 (my $distbase = $module) =~ s!::!-!g;
+my $distlink = $distbase;
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
@@ -25,8 +26,8 @@ my %module = (
         "meta-spec" => { version => 2 },
         resources => {
             repository => {
-                web => "https://github.com/Corion/$distbase",
-                url => "git://github.com/Corion/$distbase.git",
+                web => "https://github.com/Corion/$distlink",
+                url => "git://github.com/Corion/$distlink.git",
                 type => 'git',
             }
         },
@@ -34,7 +35,7 @@ my %module = (
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.006', # I use // in some places
 
     'LICENSE'=> 'perl',
 
@@ -58,6 +59,7 @@ my %module = (
         'Test::More'   => 0,
     },
 
+
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => "$distbase-*" },
 
@@ -73,7 +75,7 @@ sub get_module_info { %module }
 if( ! caller ) {
     # I should maybe use something like Shipwright...
     regen_README($main_file);
-    #regen_EXAMPLES();
+    regen_EXAMPLES() if -d 'examples';
     WriteMakefile1(get_module_info);
 };
 
@@ -159,14 +161,8 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Travis Build Status](https://travis-ci.org/Corion/$distbase.svg?branch=master)](https://travis-ci.org/Corion/$distbase)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distbase?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distbase)
-
-CONTRIBUTING
-
-See lib/WWW/Mechanize/Chrome/Contributing.pod
-
-[Google Keep Extraction](https://github.com/Corion/WWW-Mechanize-Chrome/raw/master/demo/keep-export-demo.mp4)
+[![Travis Build Status](https://travis-ci.org/Corion/$distlink.svg?branch=master)](https://travis-ci.org/Corion/$distlink)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distlink?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distlink)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );
@@ -201,11 +197,12 @@ sub regen_EXAMPLES {
     if ($perl =~/\s/) {
         $perl = qq{"$perl"};
     };
+    (my $example_file = $main_file) =~ s!\.pm$!/Examples.pm!;
     my $examples = `$perl -w examples/gen_examples_pod.pl`;
     if ($examples) {
-        warn "(Re)Creating lib/WWW/Mechanize/Chrome/Examples.pm\n";
+        warn "(Re)Creating $example_file\n";
         $examples =~ s/\r\n/\n/g;
-        update_file( 'lib/WWW/Mechanize/Chrome/Examples.pm', $examples );
+        update_file( $example_file, $examples );
     };
 };
 

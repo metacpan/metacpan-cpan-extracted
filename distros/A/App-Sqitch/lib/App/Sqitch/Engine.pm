@@ -14,7 +14,7 @@ use App::Sqitch::Types qw(Str Int Sqitch Plan Bool HashRef URI Maybe Target);
 use namespace::autoclean;
 use constant registry_release => '1.1';
 
-our $VERSION = '0.9998';
+our $VERSION = '0.9999';
 
 has sqitch => (
     is       => 'ro',
@@ -130,7 +130,7 @@ sub load {
 
     # Load the engine class.
     my $ekey = $target->engine_key or hurl engine => __(
-        'No engine specified; use --engine or set core.engine'
+        'No engine specified; specify via target or core.engine'
     );
 
     my $pkg = __PACKAGE__ . '::' . $target->engine_key;
@@ -142,7 +142,7 @@ sub driver { shift->key }
 
 sub key {
     my $class = ref $_[0] || shift;
-    hurl engine => __ 'No engine specified; use --engine or set core.engine'
+    hurl engine => __ 'No engine specified; specify via target or core.engine'
         if $class eq __PACKAGE__;
     my $pkg = quotemeta __PACKAGE__;
     $class =~ s/^$pkg\:://;
@@ -576,21 +576,22 @@ sub check_deploy_dependencies {
 
     if (@conflicts or @required) {
         require List::MoreUtils;
+        my $listof = sub { List::MoreUtils::uniq(map { $_->as_string } @_) };
         # Dependencies not satisfied. Put together the error messages.
         my @msg;
         push @msg, __nx(
             'Conflicts with previously deployed change: {changes}',
             'Conflicts with previously deployed changes: {changes}',
             scalar @conflicts,
-            changes => join ' ', map { $_->as_string } @conflicts,
-        ) if @conflicts = List::MoreUtils::uniq(@conflicts);
+            changes => join ' ', @conflicts,
+        ) if @conflicts = $listof->(@conflicts);
 
         push @msg, __nx(
             'Missing required change: {changes}',
             'Missing required changes: {changes}',
             scalar @required,
-            changes => join ' ', map { $_->as_string } @required,
-        ) if @required = List::MoreUtils::uniq(@required);
+            changes => join ' ', @required,
+        ) if @required = $listof->(@required);
 
         hurl deploy => join "\n" => @msg;
     }
@@ -650,11 +651,13 @@ sub change_id_for_depend {
           || defined $dep->change
           || defined $dep->tag;
 
+    # Return the first one.
     return $self->change_id_for(
         change_id => $dep->id,
         change    => $dep->change,
         tag       => $dep->tag,
         project   => $dep->project,
+        first     => 1,
     );
 }
 
@@ -890,13 +893,6 @@ sub _sync_plan {
             file   => $plan->file,
         );
 
-        my $change = $plan->change_at($idx);
-        if ($state->{change_id} eq $change->old_id) {
-            # Old IDs need to be replaced.
-            $idx    = $self->_update_ids;
-            $change = $plan->change_at($idx);
-        }
-
         # Upgrade the registry if there is no script_hash column.
         unless ( exists $state->{script_hash} ) {
             $self->upgrade_registry;
@@ -904,10 +900,13 @@ sub _sync_plan {
         }
 
         # Update the script hashes if they're the same as the change ID.
+        # DEPRECATTION: Added in v0.998 (Jan 2015, c86cba61c); consider removing
+        # in the future when all databases are likely to be updated already.
         $self->_update_script_hashes if $state->{script_hash}
             && $state->{script_hash} eq $state->{change_id};
 
         $plan->position($idx);
+        my $change = $plan->change_at($idx);
         if (my @tags = $change->tags) {
             $self->log_new_tags($change);
             $self->start_at( $change->format_name . $tags[-1]->format_name );
@@ -919,16 +918,6 @@ sub _sync_plan {
         $plan->reset;
     }
     return $plan;
-}
-
-sub _update_ids {
-    # We do nothing but inform, by default.
-    my $self = shift;
-    $self->sqitch->info(__x(
-        'Updating legacy change and tag IDs in {destination}',
-        destination => $self->destination,
-    ));
-    return $self;
 }
 
 sub is_deployed {
@@ -1049,7 +1038,7 @@ sub _check_registry {
     ) if $newver < $oldver;
 
     hurl engine => __x(
-        'Registry is at version {old} but latest is {new}. Please run the "upgrade" conmand',
+        'Registry is at version {old} but latest is {new}. Please run the "upgrade" command',
         old => $oldver,
         new => $newver,
     ) if $newver > $oldver;
@@ -1085,6 +1074,11 @@ sub upgrade_registry {
     ) unless @scripts && $scripts[-1]->[0] == $newver;
 
     # Run the upgrades.
+    $sqitch->info(__x(
+        'Upgrading the Sqitch registry from {old} to {new}',
+        old => $oldver,
+        new => $newver,
+    ));
     for my $script (@scripts) {
         my ($version, $file) = @{ $script };
         $sqitch->info('  * ' . __x(
@@ -1898,33 +1892,38 @@ re-deployed.
   say $engine->change_id_for(
       change  => $change_name,
       tag     => $tag_name,
-      offset  => $offset,
       project => $project,
-);
+  );
 
-Searches the database for the change with the specified name, tag, and offset.
-Throws an exception if the key matches more than one changes. Returns C<undef>
-if it matches no changes. The parameters are as follows:
+Searches the database for the change with the specified name, tag, project,
+or ID. Returns C<undef> if it matches no changes. If it matches more than one
+change, it returns the earliest deployed change if the C<first> parameter is
+passed; otherwise it throws an exception The parameters are as follows:
 
 =over
 
 =item C<change>
 
-The name of a change. Required unless C<tag> is passed.
+The name of a change. Required unless C<tag> or C<change_id> is passed.
+
+=item C<change_id>
+
+The ID of a change. Required unless C<tag> or C<change> is passed. Useful
+to determine whether an ID in a plan has been deployed to the database.
 
 =item C<tag>
 
 The name of a tag. Required unless C<change> is passed.
 
-=item C<offset>
-
-The number of changes offset from the change found by the tag and/or change
-name. May be positive or negative to mean later or earlier changes,
-respectively. Defaults to 0.
-
 =item C<project>
 
 The name of the project to search. Defaults to the current project.
+
+=item C<first>
+
+Return the earliest deployed change ID if the search matches more than one
+change. If false or not passed and more than one change is found, an
+exception will be thrown.
 
 =back
 

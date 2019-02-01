@@ -23,13 +23,15 @@ The following actions may be performed on the destination structure:
 *   "replace" - replace array or hash elements (and in the latter case
     keys)
 
+*   "transform" - transform elements
+
   Elements *vs.* Containers
 
 Data::Edit::Struct operates on elements in the destination structure by
 following a Data::DPath path. For example, if
 
  $src  = { dogs => 'rule' };
- $dest = { bar => [ 2, { cats => 'rule' }, 4 ] };
+ $dest = { bar  => [ 2, { cats => 'rule' }, 4 ] };
 
 then a data path of
 
@@ -112,7 +114,7 @@ to perform their own.
 Most of the transformations have to do with multiple values being
 returned by the source path. For example,
 
- $src  = { foo => [1], bar => [5], baz => [5] };
+ $src   = { foo => [1], bar => [5], baz => [5] };
  $spath = '/*/*[value == 5]';
 
 would result in multiple extracted values:
@@ -179,7 +181,7 @@ $args
 
   Data Copying
 
-By defult, copying of data from the source structure is done
+By default, copying of data from the source structure is done
 *shallowly*, e.g. references to arrays or hashes are not copied
 recursively. This may cause problems if further modifications are made
 to the destination structure which may, through references, alter the
@@ -194,8 +196,8 @@ and this edit operation:
 
  edit(
      insert => {
-               src  => $src,
-               dest => $dest,
+         src  => $src,
+         dest => $dest,
      } );
 
 We get a destination structure that looks like this:
@@ -226,10 +228,10 @@ tool you use to manage your installation of Perl, e.g. any of
 Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
-  perl Makefile.PL
-  make
-  make test
-  make install
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
 
 COPYRIGHT AND LICENSE
 

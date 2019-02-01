@@ -10,7 +10,7 @@ use File::Temp ();
 use Capture::Tiny ();
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '0.78'; # VERSION
+our $VERSION = '0.80'; # VERSION
 
 
 sub new
@@ -345,7 +345,6 @@ sub which
 sub run
 {
   my $self = shift;
-  $DB::single = 1;
   my @command  = map { ref $_ ? @$_ : $_ } grep { defined $_ } @_;
   print "+@command\n";
   system @command;
@@ -390,7 +389,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 0.78
+version 0.80
 
 =head1 SYNOPSIS
 

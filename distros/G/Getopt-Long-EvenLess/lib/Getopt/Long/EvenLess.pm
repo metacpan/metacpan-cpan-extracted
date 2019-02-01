@@ -1,7 +1,7 @@
 package Getopt::Long::EvenLess;
 
-our $DATE = '2017-08-09'; # DATE
-our $VERSION = '0.111'; # VERSION
+our $DATE = '2019-02-02'; # DATE
+our $VERSION = '0.112'; # VERSION
 
 # IFUNBUILT
 # # use strict 'subs', 'vars';
@@ -110,9 +110,9 @@ sub GetOptionsFromArray {
         my $name = shift;
 
         my $spec_key = $spec_by_opt_name{$name};
-        my $handler  = $spec{$spec_key};
+        my $destination = $spec{$spec_key};
 
-        $handler->({name=>$name}, @_ ? $_[0] : 1);
+        $destination->({name=>$name}, @_ ? $_[0] : 1);
     };
 
     my $i = -1;
@@ -234,7 +234,7 @@ Getopt::Long::EvenLess - Like Getopt::Long::Less, but with even less features
 
 =head1 VERSION
 
-This document describes version 0.111 of Getopt::Long::EvenLess (from Perl distribution Getopt-Long-EvenLess), released on 2017-08-09.
+This document describes version 0.112 of Getopt::Long::EvenLess (from Perl distribution Getopt-Long-EvenLess), released on 2019-02-02.
 
 =head1 DESCRIPTION
 
@@ -270,10 +270,10 @@ No support for configuring via import options e.g.:
 
 =item * does not support desttypes (C<foo=s@>)
 
-=item * does not support handler other than coderef (so no C<< "foo=s" => \$scalar >>, C<< "foo=s" => \@ary >>, only C<< "foo=s" => sub { ... } >>)
+=item * does not support destination other than coderef (so no C<< "foo=s" => \$scalar >>, C<< "foo=s" => \@ary >>, no C<< "foo=s" => \%hash >>, only C<< "foo=s" => sub { ... } >>)
 
-Also, in coderef handler, code will get a simple hash instead of a "callback"
-object as its first argument.
+Also, in coderef destination, code will get a simple hash instead of a
+"callback" object as its first argument.
 
 =item * does not support hashref as first argument
 
@@ -292,27 +292,7 @@ code to get options:
 and you're already able to extract C<--flag> or C<--opt=val> from C<@ARGV> but
 you also lose a lot of stuffs like autoabbreviation, C<--opt val> syntax support
 syntax (which is more common, but requires you specify an option spec), custom
-handler, etc.
-
-B<Startup overhead>. Here's a sample startup overhead benchmark:
-
-                             Rate        run_gl     load_gl run_gl_evenless load_gl_evenless run_gl_less load_gl_less   perl
- run_gl           64.096+-0.092/s            --       -0.5%          -68.6%           -69.2%      -70.1%       -70.4% -90.6%
- load_gl            64.39+-0.16/s   0.46+-0.29%          --          -68.4%           -69.1%      -70.0%       -70.3% -90.5%
- run_gl_evenless   203.88+-0.74/s   218.1+-1.2% 216.6+-1.4%              --            -2.1%       -4.9%        -5.8% -70.0%
- load_gl_evenless  208.24+-0.57/s     224.9+-1% 223.4+-1.2%     2.14+-0.46%               --       -2.8%        -3.8% -69.4%
- run_gl_less       214.28+-0.62/s   234.3+-1.1% 232.8+-1.3%      5.1+-0.49%       2.9+-0.41%          --        -1.0% -68.5%
- load_gl_less      216.44+-0.45/s 237.68+-0.85% 236.1+-1.1%     6.16+-0.44%      3.94+-0.36% 1.01+-0.36%           -- -68.2%
- perl                679.7+-3.7/s     960.5+-6% 955.7+-6.4%     233.4+-2.2%        226.4+-2%   217.2+-2%  214.1+-1.8%     --
- 
- Average times:
-   perl            :     1.4712ms
-   load_gl_less    :     4.6202ms
-   run_gl_less     :     4.6668ms
-   load_gl_evenless:     4.8022ms
-   run_gl_evenless :     4.9048ms
-   load_gl         :    15.5304ms
-   run_gl          :    15.6016ms
+destination, etc.
 
 =head1 FUNCTIONS
 
@@ -386,13 +366,15 @@ L<Getopt::Long::Less>
 
 If you want I<more> features intead of less, try L<Getopt::Long::More>.
 
+Benchmarks in L<Bencher::Scenario::GetoptModules>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

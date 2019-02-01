@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-ToJSON
 
+0.16  2019-02-01
+        - Use Data::Fake for better string data (GH #4)
+
 0.15  2018-06-04
         - Add script jsonschema2json to MANIFEST
 

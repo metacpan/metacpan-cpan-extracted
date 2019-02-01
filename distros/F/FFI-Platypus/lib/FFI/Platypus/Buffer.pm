@@ -7,7 +7,7 @@ use base qw( Exporter );
 our @EXPORT = qw( scalar_to_buffer buffer_to_scalar );
 
 # ABSTRACT: Convert scalars to C buffers
-our $VERSION = '0.78'; # VERSION
+our $VERSION = '0.80'; # VERSION
 
 
 use constant _incantation => 
@@ -41,7 +41,7 @@ FFI::Platypus::Buffer - Convert scalars to C buffers
 
 =head1 VERSION
 
-version 0.78
+version 0.80
 
 =head1 SYNOPSIS
 

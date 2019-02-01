@@ -12,7 +12,7 @@ use Data::Dumper ();
 
 $ENV{ANSI_COLORS_DISABLED} = 1 if $^O eq 'MSWin32';
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use constant _ORG_EXECUTE               => \&DBI::st::execute;
 use constant _ORG_BIND_PARAM            => \&DBI::st::bind_param;
@@ -357,7 +357,10 @@ sub _logging {
     my $sql = $ret;
     if ($container->{skip_bind} || $ENV{DBIX_QUERYLOG_SKIP_BIND}) {
         local $" = ', ';
-        $ret .= " : [@$bind_params]" if @$bind_params;
+        if (@$bind_params) {
+            my @bind_data = map { defined $_ ? $_ : 'NULL' } @$bind_params;
+            $ret .= " : [@bind_data]";
+        }
     }
 
     if ($container->{compact} || $ENV{DBIX_QUERYLOG_COMPACT}) {

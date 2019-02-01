@@ -63,7 +63,7 @@
          "web" : "https://github.com/pavelsr/iperlmoddir"
       }
    },
-   "version" : "1.0",
+   "version" : "1.02",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
 }
 

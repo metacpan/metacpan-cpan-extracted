@@ -1,0 +1,116 @@
+NAME
+
+    MooX::ShortHas - shortcuts for common Moo has attribute configurations
+
+VERSION
+
+    version 1.190320
+
+SYNOPSIS
+
+    Instead of:
+
+        use Moo;
+        
+        has hro => is => ro => required => 1;
+        has hlazy => is => lazy => builder => sub { 2 };
+        has hrwp => is => rwp => required => 1;
+        has hrw => is => rw => required => 1;
+
+    You can now write:
+
+        use Moo;
+        use MooX::ShortHas;
+        
+        ro "hro";
+        lazy hlazy => sub { 2 };
+        rwp "hrwp";
+        rw "hrw";
+
+    And options can be added or overriden by appending them:
+
+        ro hro_opt => required => 0;
+
+DESCRIPTION
+
+    Moo's has asks developers to repeat themselves a lot to set up
+    attributes, and since its inceptions the most common configurations of
+    attributes have crystallized through long usage.
+
+    This module provides sugar shortcuts that wrap around has under the
+    appropriate names to reduce the effort of setting up an attribute to
+    naming it with a shortcut.
+
+EXPORTS
+
+ ro, rwp, rw
+
+    These three work the same, they convert a call like this:
+
+        ro $name => @extra_args;
+
+    To this corresponding has call:
+
+        has $name => is => ro => required => 1 => @extra_args;
+
+    The appending of extra args makes it easy to override the required if
+    necessary.
+
+ lazy
+
+    This one is slightly different than the others, as lazy arguments don't
+    require a constructor value, but almost always want a builder of some
+    kind:
+
+        lazy $name => @extra_args;
+
+    Corresponds to:
+
+        has $name => is => lazy => builder => @extra_args;
+
+    The first extra argument is thus expected to be any of the values
+    appropriate for the builder option.
+
+SEE ALSO
+
+      * Mu - automatically wraps this module into Moo
+
+      * Mu::Role - automatically wraps this module into Moo::Role
+
+      * Mus - Mu but with slightly more typing and strict constructors
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the issue tracker at
+    https://github.com/wchristian/MooX-ShortHas/issues. You will be
+    notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/wchristian/MooX-ShortHas
+
+      git clone https://github.com/wchristian/MooX-ShortHas.git
+
+AUTHOR
+
+    Christian Walde <walde.christian@gmail.com>
+
+CONTRIBUTOR
+
+    mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    Christian Walde has dedicated the work to the Commons by waiving all of
+    his or her rights to the work worldwide under copyright law and all
+    related or neighboring legal rights he or she had in the work, to the
+    extent allowable by law.
+
+    Works under CC0 do not require attribution. When citing the work, you
+    should not imply endorsement by the author.
+

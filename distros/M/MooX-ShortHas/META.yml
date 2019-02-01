@@ -11,7 +11,6 @@ build_requires:
   Test::Fatal: '0'
   Test::InDistDir: '0'
   Test::More: '0'
-  blib: '1.01'
   perl: '5.006'
   strict: '0'
   warnings: '0'
@@ -19,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,7 +35,7 @@ no_index:
 provides:
   MooX::ShortHas:
     file: lib/MooX/ShortHas.pm
-    version: '1.172300'
+    version: '1.190320'
 requires:
   Moo::_Utils: '0'
   perl: '5.006'
@@ -45,7 +44,8 @@ resources:
   bugtracker: https://github.com/wchristian/MooX-ShortHas/issues
   homepage: https://github.com/wchristian/MooX-ShortHas
   repository: https://github.com/wchristian/MooX-ShortHas.git
-version: '1.172300'
+version: '1.190320'
 x_contributors:
   - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

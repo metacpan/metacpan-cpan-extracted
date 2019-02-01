@@ -11,7 +11,7 @@ use File::Path ();
 use FFI::Build::File::Object;
 
 # ABSTRACT: Class to track C source file in FFI::Build
-our $VERSION = '0.78'; # VERSION
+our $VERSION = '0.80'; # VERSION
 
 
 sub accept_suffix
@@ -40,7 +40,6 @@ sub build_item
   
   File::Path::mkpath($object->dirname, { verbose => 0, mode => 0700 });
 
-  $DB::single = 1;
   my @cmd = (
     $self->_base_args,
     -c => $self->path,
@@ -185,7 +184,7 @@ FFI::Build::File::C - Class to track C source file in FFI::Build
 
 =head1 VERSION
 
-version 0.78
+version 0.80
 
 =head1 SYNOPSIS
 

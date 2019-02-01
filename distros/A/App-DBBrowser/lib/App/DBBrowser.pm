@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.050';
+our $VERSION = '2.051';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -659,7 +659,7 @@ sub __derived_table {
     require App::DBBrowser::Subqueries;
     my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sf->{i}{stmt_types} = [ 'Select' ];
-    my $tmp = { table => '(SQ)' };
+    my $tmp = { table => '()' };
     $ax->reset_sql( $tmp );
     $ax->print_sql( $tmp );
     my $qt_table = $sq->choose_subquery( $tmp, 'from' );
@@ -697,7 +697,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.050
+Version 2.051
 
 =head1 DESCRIPTION
 

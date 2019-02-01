@@ -1,0 +1,17 @@
+"### subs"
+ABC,Bar,Baz,Foo,XYZ
+foo,abc,LOOKS_LIKE_CONSTANT,hello,bar
+,print_info,new,,
+,,print_info,,
+,,some_attr,,
+"### used"
+ABC,Bar,Baz,Foo,XYZ
+Exporter,Carp,constant,strict,ABC
+,Cwd,lib,utf8,
+,lib,parent,warnings,
+,parent,,,
+"### consts"
+ABC,Bar,Baz,Foo,XYZ
+,,lowercase,,
+,,MINIMAL_MATCH,,
+,,SEC,,

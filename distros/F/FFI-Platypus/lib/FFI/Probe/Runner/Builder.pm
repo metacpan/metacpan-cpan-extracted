@@ -8,7 +8,7 @@ use Text::ParseWords ();
 use FFI::Build::Platform;
 
 # ABSTRACT: Probe runner builder for FFI
-our $VERSION = '0.78'; # VERSION
+our $VERSION = '0.80'; # VERSION
 
 
 sub new
@@ -21,6 +21,7 @@ sub new
 
   my $self = bless {
     dir      => $args{dir},
+    platform => $platform,
     # we don't use the platform ccflags, etc because they are geared
     # for building dynamic libs not exes
     cc       => [$platform->shellwords($Config{cc})],
@@ -28,8 +29,10 @@ sub new
     ccflags  => [$platform->shellwords($Config{ccflags})],
     optimize => [$platform->shellwords($Config{optimize})],
     ldflags  => [$platform->shellwords($Config{ldflags})],
-    libs     => [$platform->shellwords($Config{perllibs})],
-    platform => $platform,
+    libs     =>
+      $^O eq 'MSWin32'
+        ? [[]]
+        : [['-ldl'], [], map { [$_] } grep !/^-ldl/, $platform->shellwords($Config{perllibs})],
   }, $class;
 
   $self;
@@ -117,7 +120,7 @@ sub extract
     print "XX bin/\n" unless $VERBOSE;
     $self->dir('bin');
   }
-  
+
 }
 
 
@@ -138,6 +141,33 @@ sub run
 }
 
 
+sub run_list
+{
+  my($self, $type, @commands) = @_;
+
+  my $log = '';
+
+  foreach my $cmd (@commands)
+  {
+    my($out, $ret) = capture_merged {
+      $self->{platform}->run(@$cmd);
+    };
+    if($VERBOSE)
+    {
+      print $out;
+    }
+    else
+    {
+      $log .= $out;
+    }
+    return if !$ret;
+  }
+
+  print $log;
+  die "$type failed";
+}
+
+
 sub build
 {
   my($self) = @_;
@@ -153,7 +183,9 @@ sub build
 
   # link
   print "LD src/dlrun$Config{obj_ext}\n" unless $VERBOSE;
-  $self->run(link => $self->ld, $self->ldflags, '-o' => $xfn, $ofn, $self->libs);
+  $self->run_list(link =>
+    map { [$self->ld, $self->ldflags, '-o' => $xfn, $ofn, @$_ ] } @{ $self->libs },
+  );
 
   # verify
   print "VV bin/dlrun$Config{exe_ext}\n" unless $VERBOSE;
@@ -183,7 +215,7 @@ FFI::Probe::Runner::Builder - Probe runner builder for FFI
 
 =head1 VERSION
 
-version 0.78
+version 0.80
 
 =head1 SYNOPSIS
 
@@ -214,7 +246,7 @@ Create a new instance.
 =item dir
 
 The root directory for where to place the probe runner files.
-Will be created if it doesn't already exist.  The default 
+Will be created if it doesn't already exist.  The default
 makes sense for when L<FFI::Platypus> is being built.
 
 =back
@@ -290,9 +322,16 @@ Extract the source for the probe runner.
 
 =head2 run
 
- $builder->run(@command);
+ $builder->run($type, @command);
 
-Runs the given command.
+Runs the given command.  Dies if the command fails.
+
+=head2 run_list
+
+ $builder->run($type, \@command, \@command, ...);
+
+Runs the given commands in order until one succeeds.
+Dies if they all fail.
 
 =head2 build
 
@@ -395,7 +434,7 @@ main(int argc, char **argv)
   dlib handle;
   int n;
   int ret;
-  
+
   if(argc < 3)
   {
     fprintf(stderr, "usage: %s dlfilename dlflags [ ... ]\n", argv[0]);

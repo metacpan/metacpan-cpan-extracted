@@ -197,3 +197,7 @@ Revision history for "ptkftp".
 	  examples.
 5.21   * Fixed minor color issue in M$-Windows where the text part wasn't 
 	  always readable when in "readonly" mode.
+5.22	  * Set newly-active item (row) to selected after user deletes a row 
+	  (when -deleteitemsok is set).  This makes it easier to delete multiple 
+	  items without having to move the cursor up and down between deleting 
+	  each row.

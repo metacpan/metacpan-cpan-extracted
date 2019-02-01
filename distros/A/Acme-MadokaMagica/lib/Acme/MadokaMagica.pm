@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use parent 'Exporter';
 
-our $VERSION = "0.07";
+our $VERSION = "0.09";
 our $miracle = "奇跡";
 our $magical = "魔法";
 
@@ -43,23 +43,23 @@ Readonly our $MainMembers => [
 
 sub alone_members {
     my $self = shift;
-    return $self->members_of($AloneMembers, (caller)[2]);
+    return $self->members_of($AloneMembers,(caller)[2]);
 }
 
 sub main_members {
     my $self = shift;
-    return $self->members_of($MainMembers, (caller)[2]);
+    return $self->members_of($MainMembers,(caller)[2]);
 }
 
 sub members_of {
-    my ($self, $team, $line) = @_;
+    my ($self, $team) = @_;
+    my $line = $_[2] ||  (caller)[2];
     my @members;
 
     for my $member_name (@{ $team }){
         my $pkg = "Acme::MadokaMagica::TvMembers::$member_name";
         if (eval "require $pkg;1;"){
-#            push @members,$pkg->new($line);
-            push @members,$pkg->new({"line" => $line});
+            push @members,$pkg->new("line" => $line);
         }
     }
 

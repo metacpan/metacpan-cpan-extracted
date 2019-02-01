@@ -1,0 +1,17 @@
+#!# perl: agent/argv/cleandir
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+return sub
+{
+    local $/;
+    my %o;
+
+    Getopt::Long::GetOptionsFromArray( \@_, \%o, qw( uuid=s expire ) );
+
+    $o{path} = \@_;
+
+    return \%o;
+};

@@ -63,6 +63,13 @@ sub then {
   return $new;
 }
 
+sub timeout {
+  my ($self, $after, $err)
+    = (ref $_[0] ? shift : shift->new, @_, 'Promise timeout');
+  $self->ioloop->timer($after => sub { $self->reject($err) });
+  return $self;
+}
+
 sub wait {
   my $self = shift;
   return if (my $loop = $self->ioloop)->is_running;
@@ -347,6 +354,17 @@ L<Mojo::Promise> object resolving to the return value of the called handler.
       return "This is bad: $reason[0]";
     }
   );
+
+=head2 timeout
+
+  my $new  = Mojo::Promise->timeout(5 => 'Timeout!');
+  $promise = $promise->timeout(5 => 'Timeout!');
+  $promise = $promise->timeout(5);
+
+Create a new L<Mojo::Promise> object with a timeout or attach a timeout to an
+existing promise. The promise will be rejected after the given amount of time in
+seconds with a reason, which defaults to C<Promise timeout>. Note that this
+method is EXPERIMENTAL and might change without warning!
 
 =head2 wait
 

@@ -48,6 +48,6 @@
          "url" : "https://github.com/trapd00r/Music-KNRadio-NowPlaying"
       }
    },
-   "version" : "0.004",
+   "version" : "0.008",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

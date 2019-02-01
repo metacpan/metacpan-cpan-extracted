@@ -9,8 +9,8 @@ README
 README.md
 dist.ini
 eg/analyze
-eg/analyze.png
 eg/example
+eg/mojo-ui
 lib/WebService/Hooktheory.pm
 t/00-compile.t
 t/01-methods.t

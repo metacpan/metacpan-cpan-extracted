@@ -3,18 +3,18 @@ package Data::RecordStore;
 use strict;
 use warnings;
 
-use Fcntl qw( SEEK_SET );
+use Fcntl qw( :flock SEEK_SET );
 use File::Path qw(make_path);
 use Data::Dumper;
 
 use vars qw($VERSION);
 
-$VERSION = '4.06';
+$VERSION = '5.02';
 
 our $DEBUG = 0;
 
 #
-# On disc block size. If the reads align with block sizes, the reads will go faster
+# On disc block size : If the reads align with block sizes, the reads will go faster
 #  however, there is some annoying things about finding out what that blocksize is.
 #  (spoiler: it is currently either 4096 or 512 bytes and probably the former)
 #
@@ -35,7 +35,9 @@ use constant {
     SILOS        => 3,
     VERSION      => 4,
     TRANSACTION  => 5,
-
+    ILOCK        => 6,
+    ILOCKED      => 7,
+    LOCKS        => 8,
 
     SILO         => 5,    # lookup of trans-id to transaction action [ action from_silo_id from_record_id to_silo_id to_record_id  ]    
     SILODIR      => 6,    # lookup of obj to last silo action [ record-id action-id ]
@@ -53,13 +55,8 @@ use constant {
     TRA_DONE             => 6, # transaction complete. It may be removed.
 };
 
-sub open {
-    warn "Data::RecordStore::open is deprecated. Please use open_store instead.";
-    goto &Data::RecordStore::open_store;
-}
 sub open_store {
-    my( $directory ) = grep{! ref($_) } reverse @_;
-    my $pkg = 'Data::RecordStore';
+    my( $cls, $directory ) = @_;
 
     # directory structure
     #   root/VERSION <-- version file
@@ -67,11 +64,13 @@ sub open_store {
     #   root/RECYC_SILO        <-- recycle silo directory
     #   root/silos/            <-- directory for silo directories
 
-    make_path( "$directory/silos", { error => \my $err } );
-
+    make_path( "$directory/LOCKS", { error => \my $err } );
     if( @$err ) {
         die join ',',map { values %$_ } @$err;
     }
+
+    make_path( "$directory/silos" );
+
     my $record_index_directory = "$directory/RECORD_INDEX_SILO";
 
     #
@@ -105,26 +104,44 @@ sub open_store {
 
     my $self = [
         $directory,
-        Data::RecordStore::Silo->open_silo( "IL", $record_index_directory ),
+        Data::RecordStore::Silo->open_silo( "ILL", $record_index_directory ),
         Data::RecordStore::Silo->open_silo( "L", "$directory/RECYC_SILO" ),
         [],
         $version,
         [],
+        undef,
+        undef,
+        [],
         ];
 
-    my $store = bless $self, $pkg;
+    my $store = bless $self, $cls;
 
     _log( "Opening store '$directory' with entry count of ".$store->entry_count." and record count of ".$store->record_count );
     
-    $store;
+    return $store;
 } #open_store
+
+sub detect_version {
+    my( $cls, $dir ) = @_;
+    my $ver_file = "$dir/VERSION";
+    my $source_version;
+    if ( -e $ver_file ) {
+        CORE::open( my $FH, "<", $ver_file );
+        $source_version = <$FH>;
+        chomp $source_version;
+        close $FH;
+    }
+    return $source_version;
+} #detect_version
 
 #
 # If there is no current transaction, this starts one.
 #
 sub use_transaction {
     my $self = shift;
-    $self->_current_transaction || $self->start_transaction;
+    my $trans = $self->_current_transaction;
+    return $trans if $trans;
+    return $self->start_transaction;
 }
 
 sub commit_transaction {
@@ -147,20 +164,18 @@ sub rollback_transaction {
     }
 } #rollback_transaction
 
-sub create_transaction {
-    warn "create_transaction is deprecated. Please use start_transaction instead.";
-    goto &start_transaction;
-}
-
 sub start_transaction {
     my $self = shift;
+    $self->_lock_index;
     my $trans = Data::RecordStore::Transaction->_create( $self );
     unshift @{$self->[TRANSACTION]}, $trans;
-    $trans;
+    $self->_unlock_index;
+    return $trans;
 } #start_transaction
 
 sub list_transactions {
     my $self = shift;
+    $self->_lock_index;
     my $trans_directory = Data::RecordStore::Silo->open_silo( "ILLI", "$self->[DIRECTORY]/TRANS/META" );
     my @trans;
     my $items = $trans_directory->entry_count;
@@ -173,11 +188,14 @@ sub list_transactions {
             push @trans, $trans;
         }
     }
-    @trans;
+    $self->_unlock_index;
+    return @trans;
 }
 
 sub stow {
     my( $self, $data, $id ) = @_;
+
+    $self->_lock_index;
 
     my $trans = $self->_current_transaction;
     if( $trans ) {
@@ -186,9 +204,13 @@ sub stow {
 
     unless( defined $id ) {
         $id = $self->next_id;
-    }
+    } 
 
-    die "ID must be a positive integer" if $id < 1;
+
+    if(  $id < 1 ) {
+        $self->_unlock_index;
+        die "ID must be a positive integer";
+    }
     
     $self->_ensure_entry_count( $id );
 
@@ -200,7 +222,7 @@ sub stow {
 
     _log( "RECSTORE STOW id $id with entry count of ".$self->[RECORD_INDEX]->entry_count );
 
-    my( $current_silo_id, $current_id_in_silo ) = @{ $self->[RECORD_INDEX]->get_record( $id ) };
+    my( $current_silo_id, $current_id_in_silo, $update_time ) = @{ $self->[RECORD_INDEX]->get_record( $id ) };
 
     _log( "  id $id is currently in $current_silo_id/$current_id_in_silo" );
 
@@ -224,6 +246,7 @@ sub stow {
              ( $current_silo_id == 12 || $old_silo->[RECORD_SIZE] < (3 * $save_size) ) ) 
         {
             $old_silo->put_record( $current_id_in_silo, [$id,$data] );
+            $self->_unlock_index;
             return $id;
         }
 
@@ -266,7 +289,7 @@ sub stow {
     #
     my $silo = $self->_get_silo( $silo_id );
     my $id_in_silo = $silo->next_id;
-    $self->[RECORD_INDEX]->put_record( $id, [ $silo_id, $id_in_silo ] );
+    $self->[RECORD_INDEX]->put_record( $id, [ $silo_id, $id_in_silo, _time() ] );
     $silo->put_record( $id_in_silo, [ $id, $data ] );
 
     #
@@ -278,8 +301,17 @@ sub stow {
     elsif( $needs_pop ) {
         $old_silo->pop;
     }
-    $id;
+
+    $self->_unlock_index;
+
+    return $id;
 } #stow
+
+sub last_updated {
+    my( $self, $id ) = @_;
+    (undef,undef,my $update_time) = @{$self->[RECORD_INDEX]->get_record( $id )};
+    return $update_time;
+}
 
 sub fetch {
     my( $self, $id ) = @_;
@@ -322,12 +354,12 @@ sub fetch {
     # skip the included id, just get the data
     ( undef, my $data ) = @{ $silo->get_record( $id_in_silo ) };
 
-    $data;
+    return $data;
 } #fetch
 
 sub entry_count {
     my $self = shift;
-    $self->[RECORD_INDEX]->entry_count - $self->[RECYC_SILO]->entry_count;
+    return $self->[RECORD_INDEX]->entry_count - $self->[RECYC_SILO]->entry_count;
 } #entry_count
 
 sub active_entry_count {
@@ -337,7 +369,7 @@ sub active_entry_count {
         my( $silo_id, $id_in_silo ) = @{ $self->[RECORD_INDEX]->get_record( $id ) };
         $count++ if $silo_id;
     }
-    $count;
+    return $count;
 } #entry_count
 
 
@@ -348,28 +380,37 @@ sub record_count {
     for my $silo (@$silos) {
         $count += $silo->entry_count;
     }
-    $count;
+    return $count;
 } #record_count
 
 sub delete_record {
     my( $self, $del_id ) = @_;
 
+    $self->_lock_index;
     my $trans = $self->_current_transaction;
     if( $trans ) {
         return $trans->delete_record( $del_id );
     }
-    return undef if $del_id > $self->[RECORD_INDEX]->entry_count;
+    if( $del_id > $self->[RECORD_INDEX]->entry_count ) {
+        $self->_unlock_index;
+        return undef;
+    }
     
     my( $from_silo_id, $current_id_in_silo ) = @{ $self->[RECORD_INDEX]->get_record( $del_id ) };
 
     _log( " DELETE RECORD $del_id IN $from_silo_id" );
     
-    return unless $from_silo_id;
+    unless(  $from_silo_id ) {
+        $self->_unlock_index;
+        return;
+    }
 
     my $from_silo = $self->_get_silo( $from_silo_id );
-    $self->[RECORD_INDEX]->put_record( $del_id, [ 0, 0 ] );
+    $self->[RECORD_INDEX]->put_record( $del_id, [ 0, 0, 0 ] );
     $self->_swapout( $from_silo, $from_silo_id, $current_id_in_silo );
-    1;
+
+    $self->_unlock_index;
+    return 1;
 } #delete_record
 
 
@@ -380,49 +421,127 @@ sub has_id {
     return 0 if $ec < $id || $id < 1;
 
     my( $silo_id ) = @{ $self->[RECORD_INDEX]->get_record( $id ) };
-    $silo_id > 0;
+    return $silo_id > 0;
 } #has_id
 
 sub next_id {
     my $self = shift;
+    $self->_lock_index;
     my $next = $self->[RECYC_SILO]->pop;
     if( $next->[0] ) {
+        $self->_unlock_index;
         return $next->[0];
     }
-    $self->[RECORD_INDEX]->next_id;
+    my $ret = $self->[RECORD_INDEX]->next_id;
+    $self->_unlock_index;
+    return $ret;
 }
 
 sub empty {
     my $self = shift;
+    $self->_lock_index;
     my $silos = $self->_all_silos;
     $self->[RECYC_SILO]->empty;
     $self->[RECORD_INDEX]->empty;
     for my $silo (@$silos) {
         $silo->empty;
     }
+    $self->_unlock_index;
 } #empty
 
 sub empty_recycler {
-    shift->[RECYC_SILO]->empty;
+    my $self = shift;
+    $self->_lock_index;
+    my $ret = $self->[RECYC_SILO]->empty;
+    $self->_unlock_index;
+    return $ret;
 } #empty_recycler
 
 sub recycle_id {
     my( $self, $id ) = @_;
+    $self->_lock_index;
     my $trans = $self->_current_transaction;
     if( $trans ) {
-        return $trans->recycle_id( $id );
+        my $ret = $trans->recycle_id( $id );
+        $self->_unlock_index;
+        return $ret;
     }
     $self->delete_record( $id );
-    $self->[RECYC_SILO]->push( [$id] );
+    my $ret = $self->[RECYC_SILO]->push( [$id] );
+    $self->_unlock_index;
+    return $ret;
 } #empty_recycler
 
 
-sub delete {
-    warn "Data::RecordStore::delete is deprecated. Please use delete_record instead.";
-    goto &Data::RecordStore::delete_record;
-}
+# locks the given lock names
+sub lock {
+    my( $self, @locknames ) = @_;
+    if( @{$self->[LOCKS]} ) {
+        die "Data::RecordStore->lock cannot be called twice in a row without unlocking between";
+    }
+    my @fhs;
+    my %seen;
+    my $failed;
+    for my $name (sort @locknames) {
+        next if $seen{$name}++;
+        if( open my $fh, '>', "$self->[DIRECTORY]/LOCKS/$name" ) {
+            flock( $fh, LOCK_EX ); #WRITE LOCK
+            push @fhs, $fh;
+        } else {
+            $failed = 1;
+        }
+    }
+    if( $failed ) {
+        for my $fh (@fhs) {
+            flock( $fh, LOCK_UN );
+        }
+        die "Data::RecordStore->lock : lock failed";
+    } else {
+        push @{$self->[LOCKS]}, @fhs;
+    }
+} #lock
+
+# unlocks all locks
+sub unlock {
+    my $self = shift;
+    my $fhs = $self->[LOCKS];
+    for my $fh (@$fhs) {
+        flock( $fh, LOCK_UN );
+    }
+    $self->[LOCKS] = [];
+    splice @$fhs;
+} #unlock
+
 
 # -///     PRIVATES    ///-
+
+sub _time { #overridable for tests
+    return time();
+}
+
+sub _lock_index {
+    my $self = shift;
+    return if $self->[ILOCKED];
+
+    my $ilock = "$self->[DIRECTORY]/ilock";
+    unless( -e $ilock ) {
+        CORE::open( my $fh, ">", $ilock );
+        print $fh "INDEX LOCK\n";
+        close $fh;
+    }
+    die "Data::RecordStore::Silo->open_silo : unable to create ilock file $ilock" unless -w $ilock;
+    open $self->[ILOCK], '>', $ilock;
+
+    $self->[ILOCKED] = 1;
+    flock( $self->[ILOCK], LOCK_EX );
+}
+
+sub _unlock_index {
+    my $self = shift;
+    flock( $self->[ILOCK], LOCK_UN );
+    $self->[ILOCKED] = 0;
+}
+
 
 #
 # Returns a list of all the silos created in this Data::RecordStore
@@ -458,7 +577,7 @@ sub _get_silo {
     my $silo = Data::RecordStore::Silo->open_silo( "LZ*", "$self->[DIRECTORY]/silos/${silo_index}_RECSTORE", $silo_row_size );
 
     $self->[SILOS][ $silo_index ] = $silo;
-    $silo;
+    return $silo;
 } #_get_silo
 
 sub _log {
@@ -482,20 +601,19 @@ sub _swapout {
         # update the record db with the new silo index for the moved record id
         #
         my( $moving_id ) = unpack( $silo->[TMPL], $data );
+        my( $last_updated ) = $self->last_updated( $moving_id );
 
-        $self->[RECORD_INDEX]->put_record( $moving_id, [ $silo_id, $vacated_silo_id ] );
+        $self->[RECORD_INDEX]->put_record( $moving_id, [ $silo_id, $vacated_silo_id, $last_updated ] );
     }
 
     # remove the record from the end. This is either the record being vacated or the
     # record that was moved into its place.
-    $silo->pop;
+    return $silo->pop;
 
 } #_swapout
 
 
 # ----------- end Data::RecordStore
-
-
 
 package Data::RecordStore::Silo;
 
@@ -515,6 +633,8 @@ use constant {
     TMPL             => 4,
 };
 
+# this really isn't much of a limit anymore, but...
+# keeping it for now
 $Data::RecordStore::Silo::MAX_SIZE = 2_000_000_000;
 
 
@@ -555,7 +675,7 @@ sub open_silo {
     Data::RecordStore::_log( "open silo $directory of size $record_size and template $template with ".$silo->entry_count." records" );
 
     
-    $silo;
+    return $silo;
 } #open_silo
 
 sub empty {
@@ -565,7 +685,7 @@ sub empty {
     for my $file (@files) {
         unlink( $file );
     }
-    undef;
+    return undef;
 } #empty
 
 sub entry_count {
@@ -578,7 +698,7 @@ sub entry_count {
         $filesize += -s "$self->[DIRECTORY]/$file";
     }
 
-    int( $filesize / $self->[RECORD_SIZE] );
+    return int( $filesize / $self->[RECORD_SIZE] );
 } #entry_count
 
 sub get_record {
@@ -594,14 +714,14 @@ sub get_record {
     my $srv = sysread $fh, my $data, $self->[RECORD_SIZE];
     close $fh;
 
-    [unpack( $self->[TMPL], $data )];
+    return [unpack( $self->[TMPL], $data )];
 } #get_record
 
 sub next_id {
     my( $self ) = @_;
     my $next_id = 1 + $self->entry_count;
     $self->_ensure_entry_count( $next_id );
-    $next_id;
+    return $next_id;
 } #next_id
 
 
@@ -621,7 +741,7 @@ sub pop {
     }
     close $fh;
 
-    $ret;
+    return $ret;
 } #pop
 
 sub last_entry {
@@ -629,7 +749,7 @@ sub last_entry {
 
     my $entries = $self->entry_count;
     return undef unless $entries;
-    $self->get_record( $entries );
+    return $self->get_record( $entries );
 } #last_entry
 
 sub push {
@@ -639,7 +759,7 @@ sub push {
 
     # the problem is that the second file has stuff in it not sure how
     $self->put_record( $next_id, $data );
-    $next_id;
+    return $next_id;
 } #push
 
 
@@ -664,21 +784,13 @@ sub put_record {
     
     close $fh;
 
-    1;
+    return 1;
 } #put_record
 
 sub unlink_store {
     my $self = shift;
     remove_tree( $self->[DIRECTORY] );# // die "Data::RecordStore::Silo->unlink_store: Error unlinking store : $!";
 } #unlink_store
-
-
-
-sub open {
-    warn "Data::RecordStore::Silo::open is deprecated. Please use open_silo instead.";
-    goto &Data::RecordStore::Silo::open_silo;
-}
-
 
 #
 # This copies a record from one index in the store to an other.
@@ -700,7 +812,7 @@ sub _copy_record {
     sysseek( $fh_to, $self->[RECORD_SIZE] * $to_file_idx, SEEK_SET );
     syswrite( $fh_to, $data );
 
-    $data;
+    return $data;
 } #_copy_record
 
 
@@ -722,7 +834,7 @@ sub _ensure_entry_count {
         $records_needed_to_fill = $needed if $records_needed_to_fill > $needed;
 
         if( $records_needed_to_fill > 0 ) {
-            # fill the last flie up with \0
+            # fill the last file up with \0
 
             CORE::open( my $fh, "+<", "$self->[DIRECTORY]/$write_file" ) or die "Data::RecordStore::Silo->ensure_entry_count : unable to open '$self->[DIRECTORY]/$write_file' : $!";
             binmode $fh; # for windows
@@ -730,6 +842,7 @@ sub _ensure_entry_count {
             sysseek( $fh, $self->[RECORD_SIZE] * $existing_file_records, SEEK_SET );
             syswrite( $fh, $nulls );
             close $fh;
+            
             $needed -= $records_needed_to_fill;
         }
         while( $needed > $self->[FILE_MAX_RECORDS] ) {
@@ -758,6 +871,7 @@ sub _ensure_entry_count {
             close $fh;
         }
     }
+    return;
 } #_ensure_entry_count
 
 #
@@ -782,7 +896,7 @@ sub _fh {
     }
     binmode $fh; # for windows
 
-    (($id - ($f_idx*$self->[FILE_MAX_RECORDS])) - 1,$fh,"$self->[DIRECTORY]/$file",$f_idx);
+    return (($id - ($f_idx*$self->[FILE_MAX_RECORDS])) - 1,$fh,"$self->[DIRECTORY]/$file",$f_idx);
 
 } #_fh
 
@@ -794,7 +908,7 @@ sub _files {
     opendir( my $dh, $self->[DIRECTORY] ) or die "Data::RecordStore::Silo->_files : can't open $self->[DIRECTORY]\n";
     my( @files ) = (sort { $a <=> $b } grep { $_ eq '0' || (-s "$self->[DIRECTORY]/$_") > 0 } grep { $_ > 0 || $_ eq '0' } readdir( $dh ) );
     closedir $dh;
-    @files;
+    return @files;
 } #_files
 
 # ----------- end Data::RecordStore::Silo
@@ -872,7 +986,7 @@ sub _create {
     
     push @$trans_data, $trans_catalog;
 
-    bless $trans_data, $pkg;
+    return bless $trans_data, $pkg;
 
 } #_create
 
@@ -893,11 +1007,16 @@ sub stow {
     my $dir_silo   = $self->[SILODIR];
 
     my $store = $self->[STORE];
+    $store->_lock_index;
+
     unless( defined $id ) {
         $id = $store->next_id;
     }
 
-    die "ID must be a positive integer" if $id < 1 || int($id) != $id;
+    if( $id < 1 || int($id) != $id ) {
+        $store->_unlock_index;
+        die "ID must be a positive integer";
+    }
     
     $store->_ensure_entry_count( $id );
 
@@ -935,53 +1054,65 @@ sub stow {
 
     $dir_silo->_ensure_entry_count( $id );
     $dir_silo->put_record( $id, [ $next_trans_id ] );
-    $id;
+    $store->_unlock_index;
 
+    return $id;
 } #stow
 
 
 sub delete_record {
     my( $self, $id_to_delete ) = @_;
     die "Data::RecordStore::Transaction::delete_record Error : is not active" unless $self->[STATE] == TRA_ACTIVE;
+
+    my $store = $self->[STORE];
+    $store->_lock_index;
     my $trans_silo = $self->[SILO];
     my $dir_silo   = $self->[SILODIR];
     
-    my( $from_silo_id, $from_record_id ) = @{ $self->[STORE]->[Data::RecordStore::RECORD_INDEX]->get_record( $id_to_delete ) };
+    my( $from_silo_id, $from_record_id ) = @{ $store->[Data::RecordStore::RECORD_INDEX]->get_record( $id_to_delete ) };
     my $next_trans_id = $trans_silo->next_id;
     $trans_silo->put_record( $next_trans_id,
                              [ 'D', $id_to_delete, $from_silo_id, $from_record_id, 0, 0 ] );
     $dir_silo->_ensure_entry_count( $id_to_delete );
     $dir_silo->put_record( $id_to_delete, [ $next_trans_id ] );
+    $store->_unlock_index;
 
-    1;    
+    return 1;
 } #delete_record
 
 
 sub recycle_id {
     my( $self, $id_to_recycle ) = @_;
     die "Data::RecordStore::Transaction::recycle Error : is not active" unless $self->[STATE] == TRA_ACTIVE;
+
+    my $store = $self->[STORE];
+    $store->_lock_index;
+
     my $trans_silo = $self->[SILO];
     my $dir_silo   = $self->[SILODIR];
     
-    my( $from_silo_id, $from_record_id ) = @{ $self->[STORE]->[Data::RecordStore::RECORD_INDEX]->get_record( $id_to_recycle ) };
+    my( $from_silo_id, $from_record_id ) = @{ $store->[Data::RecordStore::RECORD_INDEX]->get_record( $id_to_recycle ) };
     my $next_trans_id = $trans_silo->next_id;
     $trans_silo->put_record( $next_trans_id,
                              [ 'R', $id_to_recycle, $from_silo_id, $from_record_id, 0, 0 ] );
     
     $dir_silo->_ensure_entry_count( $id_to_recycle );
     $dir_silo->put_record( $id_to_recycle, [ $next_trans_id ] );
-    1;
+    $store->_unlock_index;
+    return 1;
 } #recycle
 
 sub commit {
     my $self = shift;
     
     my $store = $self->[STORE];
+    $store->_lock_index;
 
     my $trans = shift @{$store->[TRANSACTION]};
 
     unless( $trans eq $self ) {
         unshift @{$store->[TRANSACTION]}, $trans;
+        $store->_unlock_index;
         die "Cannot commit outer transaction intil inner transactions have been committed";
     }
 
@@ -989,6 +1120,7 @@ sub commit {
     unless( $state == TRA_ACTIVE || $state == TRA_IN_COMMIT ||
             $state == TRA_IN_ROLLBACK || $state == TRA_CLEANUP_COMMIT ) {
         unshift @{$store->[TRANSACTION]}, $trans;
+        $store->_unlock_index;
         die "Cannot commit transaction. Transaction state is ".$STATE_LOOKUP[$state];
     }
 
@@ -1000,7 +1132,7 @@ sub commit {
 
     my $trans_id = $self->[ID];
 
-    $cat_silo->put_record( $trans_id, [ $trans_id, $$, time, TRA_IN_COMMIT ] );
+    $cat_silo->put_record( $trans_id, [ $trans_id, $$, Data::RecordStore::_time, TRA_IN_COMMIT ] );
     $self->[STATE] = TRA_IN_COMMIT;
 
     my $actions = $trans_silo->entry_count;
@@ -1022,7 +1154,7 @@ sub commit {
         if( 0 == $foundid{$record_id}++ ) {
             # first time this record is acted upon
             if( $action eq 'S' ) {
-                $index->put_record( $record_id, [ $to_silo_id, $to_record_id ] );
+                $index->put_record( $record_id, [ $to_silo_id, $to_record_id, Data::RecordStore::_time ] );
             }
             push @$purges, [ $action, $record_id, $from_silo_id, $from_record_id ];
 
@@ -1052,26 +1184,28 @@ sub commit {
     #
     # Update the state of this transaction and remove the record.
     #
-    $cat_silo->put_record( $trans_id, [ $trans_id, $$, time, TRA_DONE ] );
+    $cat_silo->put_record( $trans_id, [ $trans_id, $$, Data::RecordStore::_time, TRA_DONE ] );
     $self->[STATE] = TRA_DONE;
 
     $trans_silo->unlink_store;
     $dir_silo->unlink_store;
+    $store->_unlock_index;
 
-
+    return 1;
 } #commit
 
 
 sub rollback {
     my $self = shift;
-
     my $store = $self->[STORE];
+    $store->_lock_index;
     my $trans = shift @{$store->[TRANSACTION]};
     
     my $state = $self->get_state;
     unless( $state == TRA_ACTIVE || $state == TRA_IN_COMMIT ||
             $state == TRA_IN_ROLLBACK || $state == TRA_CLEANUP_ROLLBACK ) {
         unshift @{$store->[TRANSACTION]}, $trans;
+        $store->_unlock_index;
         die "Cannot rollback transaction. Transaction state is ".$STATE_LOOKUP[$state];
     }
 
@@ -1095,9 +1229,9 @@ sub rollback {
             @{ $trans_silo->get_record($a_id) };
 
         if( $from_silo_id ) {
-            $index->put_record( $record_id, [ $from_silo_id, $from_record_id ] );
+            $index->put_record( $record_id, [ $from_silo_id, $from_record_id, time ] );
         } else {
-            $index->put_record( $record_id, [ 0, 0 ] );
+            $index->put_record( $record_id, [ 0, 0, 0 ] );
         }
         if( $to_silo_id ) {
             push @{$swapout{ $to_silo_id }}, $to_record_id;
@@ -1130,7 +1264,8 @@ sub rollback {
     if( $trans_id == $cat_silo->entry_count ) {
         $cat_silo->pop;
     }
-
+    $store->_unlock_index;
+    return;
 } #rollback
 
 1;
@@ -1188,19 +1323,16 @@ in a thread safe manner if the controlling program uses locking mechanisms.
 
 =head1 METHODS
 
-=head2 open( directory )
-
-Deprecated alias to open_store
-
 =head2 open_store( directory )
 
 Takes a directory, and constructs the data store in it.
 The directory must be writeable or creatible. If a RecordStore already exists
 there, it opens it, otherwise it creates a new one.
 
-=head2 create_transaction()
+=head2 detect_version( directory )
 
-Deprecated alias to start_transaction
+Tries to detect version of the record store in the directory.
+Returns undef if it is unable to detect it.
 
 =head2 start_transaction()
 
@@ -1222,6 +1354,10 @@ Rolls back the current transaction, if any.
 =head2 list_transactions
 
 Returns a list of currently existing transaction objects not marked TRA_DONE.
+
+=head2 last_updated( id )
+
+Returns the timestamp that this record was last written to the database.
 
 =head2 stow( data, optionalID )
 
@@ -1249,7 +1385,7 @@ are contained in them.
 
 =head2 entry_count
 
-How many entries there are for records. This is equal to
+Returns how many record ids exist. This is equal to
 the highest ID that has been assigned minus the number of
 pending recycles. It is different from
 the record count, as entries may be marked deleted.
@@ -1257,10 +1393,6 @@ the record count, as entries may be marked deleted.
 =head2 record_count
 
 Return how many records there actually are
-
-=head2 delete( id )
-
-Deprecated alias to delete_record
 
 =head2 delete_record( id )
 
@@ -1291,10 +1423,14 @@ Use only if you mean it.
   This removes the data occupied by the id, freeing up space unles
   keep_data_flag is set to true.
 
-=head1 LIMITATIONS
+=head2 lock( @names )
 
-Data::RecordStore is not thread safe. Thread coordination
-and locking can be done on a level above Data::RecordStore.
+Adds an advisory (flock) lock for each of the unique names given.
+This may not be called twice in a row without an unlock in between.
+
+=head2 unlock
+
+Unlocks all names locked by this thread
 
 =head1 HELPER PACKAGE
 
@@ -1353,7 +1489,7 @@ for my $trans ($store->list_transactions) {
   }
 }
 
-=head1 METHODS
+=head1 HELPER METHODS
 
 =head2 get_update_time
 
@@ -1404,7 +1540,6 @@ Commit applies
 
 Removes the file for this record store entirely from the file system.
 
-
 =head1 AUTHOR
        Eric Wolf        coyocanid@gmail.com
 
@@ -1415,6 +1550,6 @@ Removes the file for this record store entirely from the file system.
        and/or modify it under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 4.06  (November, 2018))
+       Version 5.02  (Jan, 2019))
 
 =cut

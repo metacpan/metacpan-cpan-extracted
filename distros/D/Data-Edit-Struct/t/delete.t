@@ -53,16 +53,18 @@ subtest 'array section' => sub {
 
 subtest 'root' => sub {
 
-    my @dest = ( 0, 10, 20, 40, 50  );
+    my @dest = ( 0, 10, 20, 40, 50 );
 
-    isa_ok( dies {
-	edit(
-	     delete => {
-			dest   => \@dest,
-			dpath  => '/',
-		       } ) },
-			 [ 'Data::Edit::Struct::failure::input::dest' ],
-			 "can't delete root"
+    isa_ok(
+        dies {
+            edit(
+                delete => {
+                    dest  => \@dest,
+                    dpath => '/',
+                } )
+        },
+        ['Data::Edit::Struct::failure::input::dest'],
+        "can't delete root"
     );
 
 };

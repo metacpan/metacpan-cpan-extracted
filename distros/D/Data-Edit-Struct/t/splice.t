@@ -44,20 +44,20 @@ subtest 'container' => sub {
             {
                 input  => [ 10, 20, 30, 40 ],
                 offset => 1,
-                src => [ 50, 60 ],
+                src    => [ 50, 60 ],
             },
             {
                 input  => [ 10, 20, 30, 40 ],
                 offset => 1,
                 length => 2,
-                src => [ 50, 60 ],
+                src    => [ 50, 60 ],
             },
             {
                 input  => [ 10, 20, 30, 40 ],
                 offset => 1,
                 length => 2,
-                src   => [ 50, 60 ],
-                stype => 'element',
+                src    => [ 50, 60 ],
+                stype  => 'element',
             },
             {
                 input  => [ 10, 20, 30, 40 ],
@@ -157,13 +157,13 @@ subtest 'element' => sub {
             {
                 input  => [ 10, 20, 30, 40 ],
                 offset => 1,
-                src => [ 50, 60 ],
+                src    => [ 50, 60 ],
             },
             {
                 input  => [ 10, 20, 30, 40 ],
                 offset => 1,
                 length => 2,
-                src => [ 50, 60 ],
+                src    => [ 50, 60 ],
             },
           );
 
@@ -178,7 +178,7 @@ subtest 'element' => sub {
             dies {
                 edit(
                     splice => { %defaults, dest => { foo => 1 }, dpath => '/' }
-                  )
+                )
             },
             ['Data::Edit::Struct::failure::input::dest'],
             'illegal destination: root',
@@ -228,7 +228,7 @@ subtest 'auto' => sub {
                     input  => [ 10, 20, 30, 40 ],
                     offset => 1,
                     length => 2,
-                    src => [ 50, 60 ],
+                    src    => [ 50, 60 ],
                 },
               );
 
@@ -258,7 +258,7 @@ subtest 'auto' => sub {
                     input  => [ 10, 20, 30, 40 ],
                     offset => 1,
                     length => 2,
-                    src => [ 50, 60 ],
+                    src    => [ 50, 60 ],
                 },
               );
         };
@@ -272,7 +272,7 @@ subtest 'auto' => sub {
                     dest  => { foo => 1 },
                     dpath => '/'
                 },
-              )
+            )
         },
         ['Data::Edit::Struct::failure::input::dest'],
         'illegal destination: root',
@@ -304,20 +304,21 @@ sub cmp_splice {
     my $idx   = delete $arg{idx};
 
 
-    my @input = @{ $input };
+    my @input = @{$input};
     splice(
         @input,
         ( $idx || 0 ) + ( $arg{offset} || 0 ),
         $arg{length} || 1,
         defined $arg{src}
         ? is_arrayref( $arg{src} )
-          && ( ( defined $arg{stype} ? $arg{stype} :  'container' ) eq 'container' )
+          && (
+            ( defined $arg{stype} ? $arg{stype} : 'container' ) eq 'container' )
               ? @{ $arg{src} }
               : $arg{src}
         : (),
     );
 
-    my $dest = [ @{ $input } ];
+    my $dest = [ @{$input} ];
     edit(
         splice => {
             %arg, dest => $dest,

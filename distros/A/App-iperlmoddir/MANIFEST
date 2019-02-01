@@ -12,6 +12,7 @@ cpanfile
 dist.ini
 lib/App/iperlmoddir.pm
 lib/App/iperlmoddir/Utils.pm
+meta.csv
 t/samples/ABC.pm
 t/samples/Bar.pm
 t/samples/Baz.pm

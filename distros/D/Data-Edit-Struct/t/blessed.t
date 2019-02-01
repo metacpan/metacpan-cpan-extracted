@@ -27,7 +27,7 @@ subtest 'src' => sub {
 
     subtest 'hash' => sub {
         $dest = [];
-        $src = { a => 1 };
+        $src  = { a => 1 };
 
         is( $edit->(), [%$src], "unblessed" );
 
@@ -40,7 +40,7 @@ subtest 'src' => sub {
     subtest "array" => sub {
 
         $dest = [];
-        $src = [ a => 1 ];
+        $src  = [ a => 1 ];
 
         is( $edit->(), [@$src], "unblessed" );
 
@@ -61,8 +61,8 @@ subtest 'dest' => sub {
         edit(
             insert => {
                 dest  => $dest,
-		dtype => 'auto',
-	        dpath => '/*[0]',
+                dtype => 'auto',
+                dpath => '/*[0]',
                 src   => $src,
                 stype => 'container'
             },
@@ -76,8 +76,8 @@ subtest 'dest' => sub {
 
         is( $edit->(), [ { a => 1, b => 2 } ], "unblessed" );
 
-	my $obj = bless { a => 1 };
-        $dest = [ $obj  ];
+        my $obj = bless { a => 1 };
+        $dest = [$obj];
 
         is( $edit->(), [ 'b', '2', $obj ], "blessed" );
     };
@@ -88,8 +88,8 @@ subtest 'dest' => sub {
 
         is( $edit->(), [ [ b => 2, a => 1 ] ], "unblessed" );
 
-	my $obj = bless [ a => 1 ];
-        $dest = [ $obj  ];
+        my $obj = bless [ a => 1 ];
+        $dest = [$obj];
 
         is( $edit->(), [ @$src, $obj ], "blessed" );
     };

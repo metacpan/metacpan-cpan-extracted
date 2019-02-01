@@ -18,7 +18,7 @@ my %module_build_args = (
     "\"iovation Inc.\""
   ],
   "dist_name" => "App-Sqitch",
-  "dist_version" => "0.9998",
+  "dist_version" => "0.9999",
   "license" => "mit",
   "module_name" => "App::Sqitch",
   "recommends" => {
@@ -45,7 +45,7 @@ my %module_build_args = (
     "File::Temp" => 0,
     "Getopt::Long" => 0,
     "Hash::Merge" => 0,
-    "IO::Pager" => 0,
+    "IO::Handle" => 0,
     "IPC::Run3" => 0,
     "IPC::System::Simple" => "1.17",
     "List::MoreUtils" => 0,
@@ -100,6 +100,7 @@ my %module_build_args = (
     "File::Spec" => 0,
     "File::Spec::Functions" => 0,
     "FindBin" => 0,
+    "IO::Pager" => 0,
     "Module::Runtime" => 0,
     "Path::Class" => "0.33",
     "Test::Deep" => 0,
@@ -110,6 +111,8 @@ my %module_build_args = (
     "Test::MockModule" => "0.05",
     "Test::More" => "0.94",
     "Test::NoWarnings" => "0.083",
+    "Test::Warn" => 0,
+    "base" => 0,
     "lib" => 0
   }
 );
@@ -122,6 +125,7 @@ my %fallback_build_requires = (
   "File::Spec" => 0,
   "File::Spec::Functions" => 0,
   "FindBin" => 0,
+  "IO::Pager" => 0,
   "Module::Build" => "0.35",
   "Module::Runtime" => 0,
   "Path::Class" => "0.33",
@@ -133,6 +137,8 @@ my %fallback_build_requires = (
   "Test::MockModule" => "0.05",
   "Test::More" => "0.94",
   "Test::NoWarnings" => "0.083",
+  "Test::Warn" => 0,
+  "base" => 0,
   "lib" => 0
 );
 

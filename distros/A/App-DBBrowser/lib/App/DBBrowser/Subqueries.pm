@@ -143,11 +143,11 @@ sub choose_subquery {
         }
         my ( $prompt, $default, $info );
         if ( $choices->[$idx] eq $readline ) {
-            $info = ' ';
-            $prompt = 'Stmt: ';
+            $info = 'Enter SQ:';
+            $prompt = '';
         }
         else {
-            $info = "\nPress 'Enter'";
+            $info = "Edit SQ:";
             $prompt = '';
             $idx -= @pre;
             #if ( $history->[$idx][0] ne $history->[$idx][1] ) {

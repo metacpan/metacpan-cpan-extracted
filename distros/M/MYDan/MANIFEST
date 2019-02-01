@@ -7,6 +7,7 @@ Changes
 dan/.config
 dan/agent/argv/apps
 dan/agent/argv/check
+dan/agent/argv/cleandir
 dan/agent/argv/deploy
 dan/agent/argv/dump
 dan/agent/argv/edump
@@ -14,6 +15,8 @@ dan/agent/argv/mrsync
 dan/agent/argv/reborn
 dan/agent/argv/scripts
 dan/agent/argv/sdump
+dan/agent/argv/unzipdir
+dan/agent/argv/zipdir
 dan/agent/bin/agent
 dan/agent/bin/filecache
 dan/agent/bin/keyupdate
@@ -22,6 +25,7 @@ dan/agent/code/apps
 dan/agent/code/call
 dan/agent/code/check
 dan/agent/code/chpasswd
+dan/agent/code/cleandir
 dan/agent/code/collector
 dan/agent/code/deploy
 dan/agent/code/download
@@ -41,7 +45,9 @@ dan/agent/code/shell
 dan/agent/code/show
 dan/agent/code/sysinfo
 dan/agent/code/tail2tcp
+dan/agent/code/unzipdir
 dan/agent/code/version
+dan/agent/code/zipdir
 dan/agent/path
 dan/agent/run/.gitkeep
 dan/bootstrap/bin/bootstrap

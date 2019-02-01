@@ -258,10 +258,13 @@ An example:
   [connections]
   accountname = myaccount
   region = us-east-1
+  warehousename = compute
   username = frank
   password = fistula postmark bag
+  rolename = ACCOUNTADMIN
+  dbname = reporting
 
-The four variables that Sqitch currently reads are:
+The variables that Sqitch currently reads are:
 
 =over
 
@@ -271,7 +274,13 @@ The four variables that Sqitch currently reads are:
 
 =item C<connections.password>
 
+=item C<connections.rolename>
+
 =item C<connections.region>
+
+=item C<connections.warehousename>
+
+=item C<connections.dbname>
 
 =back
 

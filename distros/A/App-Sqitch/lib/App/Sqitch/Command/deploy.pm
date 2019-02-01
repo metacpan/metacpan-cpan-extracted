@@ -5,15 +5,18 @@ use strict;
 use warnings;
 use utf8;
 use Moo;
-use App::Sqitch::Types qw(URI Maybe Str Bool HashRef);
+use App::Sqitch::Types qw(URI Str Bool HashRef);
 use Locale::TextDomain qw(App-Sqitch);
 use Type::Utils qw(enum);
 use App::Sqitch::X qw(hurl);
 use List::Util qw(first);
 use namespace::autoclean;
-extends 'App::Sqitch::Command';
 
-our $VERSION = '0.9998';
+extends 'App::Sqitch::Command';
+with 'App::Sqitch::Role::ContextCommand';
+with 'App::Sqitch::Role::ConnectingCommand';
+
+our $VERSION = '0.9999';
 
 has target => (
     is  => 'ro',
@@ -51,9 +54,7 @@ has variables => (
     is       => 'ro',
     isa      => HashRef,
     lazy     => 1,
-    default  => sub {
-        shift->sqitch->config->get_section( section => 'deploy.variables' );
-    },
+    default  => sub { {} },
 );
 
 sub options {
@@ -64,7 +65,6 @@ sub options {
         set|s=s%
         log-only
         verify!
-        to-target=s
     );
 }
 
@@ -79,23 +79,22 @@ sub configure {
     $params{to_change} = $opt->{to_change} if exists $opt->{to_change};
     $params{target}    = $opt->{target}    if exists $opt->{target};
 
-    if ( exists $opt->{to_target} ) {
-        # Deprecated option.
-        App::Sqitch->warn(
-            __ 'The --to-target and --target option has been deprecated; use --to-change instead.'
-        );
-        $params{to_change} ||= $opt->{to_target};
-    }
-
     if ( my $vars = $opt->{set} ) {
-        # Merge with config.
-        $params{variables} = {
-            %{ $config->get_section( section => 'deploy.variables' ) || {} },
-            %{ $vars },
-        };
+        $params{variables} = $vars;
     }
 
     return \%params;
+}
+
+sub _collect_vars {
+    my ($self, $target) = @_;
+    my $cfg = $self->sqitch->config;
+    return (
+        %{ $cfg->get_section(section => 'core.variables') },
+        %{ $cfg->get_section(section => 'deploy.variables') },
+        %{ $target->variables }, # includes engine
+        %{ $self->variables },   # --set
+    );
 }
 
 sub execute {
@@ -123,7 +122,7 @@ sub execute {
     my $engine = $target->engine;
     $engine->with_verify( $self->verify );
     $engine->log_only( $self->log_only );
-    if (my %v = %{ $self->variables }) { $engine->set_variables(%v) }
+    $engine->set_variables( $self->_collect_vars($target) );
     $engine->deploy( $change, $self->mode );
     return $self;
 }

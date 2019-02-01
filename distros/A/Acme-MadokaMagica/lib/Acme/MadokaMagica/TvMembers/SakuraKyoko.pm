@@ -1,9 +1,7 @@
 package Acme::MadokaMagica::TvMembers::SakuraKyoko;
-use Mouse;
-extends 'Acme::MadokaMagica::TvMembers';
+use parent 'Acme::MadokaMagica::TvMembers';
 use utf8;
 
-no Mouse;
 
 1;
 

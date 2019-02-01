@@ -1,10 +1,10 @@
 =head1 NAME
 
-StreamFinder::Youtube - Fetch actual raw streamable URLs from radio-station websites on Youtube.com
+StreamFinder::Youtube - Fetch actual raw streamable URLs from Youtube and others.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017 by
+This module is Copyright (C) 2017-2019 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -74,8 +74,8 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::Youtube accepts a valid Youtube video URL on youtube.com and 
-returns the actual stream URL and cover art icon for that video.  
+StreamFinder::Youtube accepts a valid Youtube video URL on youtube.com, et. al. 
+and returns the actual stream URL, title and cover art icon for that video.  
 The purpose is that one needs this URL in order to have the option to stream 
 the video in one's own choice of media player software rather than using their 
 web browser and accepting any / all flash, ads, javascript, cookies, trackers, 
@@ -83,6 +83,9 @@ web-bugs, and other crapware that can come with that method of playing.
 The author uses his own custom all-purpose audio player called "fauxdacious" 
 (his custom hacked version of the open-source "audacious" media player).  
 "fauxdacious" incorporates this module to decode and play youtube.com streams.
+This is a submodule of the general StreamFinder module.
+
+Depends:  WWW::YouTube::Download, LWP::UserAgent, URI::Escape.
 
 =head1 SUBROUTINES/METHODS
 
@@ -183,7 +186,7 @@ L<http://search.cpan.org/dist/StreamFinder-Youtube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Jim Turner.
+Copyright 2017-2019 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -281,8 +284,14 @@ sub new
 	$self->{'artist'} = $metadata{'user'};
 	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."=\n"  if ($DEBUG);
 
-	$_ = `youtube-dl --get-url --get-thumbnail -f mp4 "$url"`;
-	print STDERR "--cmd=youtube-dl --get-url --get-thumbnail -f mp4 \"$url\"=\n"  if ($DEBUG);
+	if ($url =~ /www\.brighteon\.com/) {  #NO AUDIO+VIDEO STREAMS AVAILABLE FOR INFOWARZ (SO GET AUDIO ONLY!):
+		#$url =~ s#embed\/##;
+		#$_ = `youtube-dl -x --get-url "$url"`;
+		$_ = `youtube-dl --get-url --get-thumbnail -f 'bestaudio[ext=mp4]' "$url"`;
+	} else {
+		$_ = `youtube-dl --get-url --get-thumbnail -f mp4 "$url"`;
+	}
+	print STDERR "--cmd=$_=\n"  if ($DEBUG);
 	my @urls = split(/\r?\n/);
 	while (@urls && $urls[0] !~ m#\:\/\/#o) {
 		shift @urls;
@@ -294,6 +303,11 @@ sub new
 	$self->{'cnt'} = 1;
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'iconurl'} = ($#urls >= 1) ? $urls[$#urls] : '';
+	unless ($self->{'title'} =~ /\w/) {   #TRY AGAIN TO GET TITLE, IF WE DON'T HAVE IT:
+		$self->{'title'} = `youtube-dl --get-title "$url"`;
+		chomp $self->{'title'};
+		$self->{'title'} = $self->{'Url'} || $url  unless ($self->{'title'} =~ /\w/); #STILL NO TITLE, USE URL.
+	}
 	print STDERR "-count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);
 	print STDERR "--SUCCESS: stream url=".$self->{'Url'}."=\n"  if ($DEBUG);
 

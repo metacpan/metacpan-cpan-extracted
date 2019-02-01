@@ -5,3 +5,6 @@ Revision history for StreamFinder
 1.01    2018/08/10
         - Fixed issue with some Facebook videos on Youtube.
         - Removed Tunein as a valid site (can no longer extract streams).
+1.02    2019/01/31
+        - Make StreamFinder::Youtube the default and handle pretty much 
+        anything youtube-dl handles.

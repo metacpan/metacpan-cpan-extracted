@@ -5,7 +5,15 @@ use warnings;
 
 use Data::RecordStore;
 
+use File::Copy::Recursive qw( dircopy dirmove );
+use File::Path qw(remove_tree);
+
 package Data::RecordStore::Converter::OldSilo;
+
+#
+# This package is a helper one that simulates
+# older silo formats before version 3.1
+#
 
 use strict;
 use warnings;
@@ -70,7 +78,7 @@ sub _filehandle {
 
 package Data::RecordStore::Converter;
 
-=head2 convert( $source_dir, $dest_dir )
+=head2 Data::RecordStore::Converter->convert( $source_dir, $dest_dir )
 
 Analyzes the source directory to find version
 then creates a new version of the store in the
@@ -78,32 +86,32 @@ destination directory.
 
 =cut
 sub convert {
-    my( $source_dir, $dest_dir ) = @_;
+    my( $cls, $source_dir, $dest_dir, $working_dir ) = @_;
 
-    die "Data::RecordStore::Converter::convert must be given a destination directory" unless $dest_dir;
+    die "Data::RecordStore::Converter->convert must be given a destination directory" unless $dest_dir;
+    die "Data::RecordStore::Converter->convert must be given a working directory" unless $working_dir;
 
-    die "Data::RecordStore::Converter::convert cannot find source directory '$source_dir'" unless -d $source_dir;
+    die "Data::RecordStore::Converter->convert : cannot find source directory '$source_dir'" unless -d $source_dir;
+    die "Data::RecordStore::Converter->convert  : Destination directory '$dest_dir' already exists" if -d $dest_dir;
+    die "Data::RecordStore::Converter->convert  : Working directory '$working_dir' already exists" if -d $working_dir;
 
-    my $ver_file = "$source_dir/VERSION";
-    my $source_version = 0;
-    if ( -e $ver_file ) {
-        CORE::open( my $FH, "<", $ver_file );
-        $source_version = <$FH>;
-        chomp $source_version;
-        close $FH;
-    }
+    die "Data::RecordStore::Converter->convert : destination and working directories may not be the same" if $working_dir eq $dest_dir;
 
-    if( $source_version >= 4 ) {
+    my $source_version = Data::RecordStore->detect_version( $source_dir );
+
+    if( $source_version >= 5 ) {
         warn "Database at '$source_dir' already at version $source_version. Doing nothing\n";
         return;
     }
 
     my $converter = bless {
-      source_dir => $source_dir,
-      dest_dir   => $dest_dir,
-      to_silos   => [],
-      to_index   => Data::RecordStore::Silo->open_silo( "IL", "$dest_dir/RECORD_INDEX_SILO" ),
+      source_dir  => $source_dir,
+      dest_dir    => $dest_dir,
+      working_dir => $working_dir,
+      to_silos    => [],
+      to_index    => Data::RecordStore::Silo->open_silo( "IL", "$dest_dir/RECORD_INDEX_SILO" ),
     }, 'Data::RecordStore::Converter';
+
     if ( $source_version < 2 ) {
       $converter->_convert_1_to_4;
     }
@@ -113,15 +121,38 @@ sub convert {
     elsif ( $source_version < 3.1 ) {
       $converter->_convert_3_to_4;
     } 
-    else { #if( $source_version < 4 ) {
+    elsif( $source_version < 4 ) {
         $converter->_convert_3_1_to_4;
     }
     
-
+    # this is a break here. The earlier 
+    # versions convert from whatever to 4.
+    # This will convert from 4 to 5
+    # and when/if there is a version 6, it
+    # will then play towers of hanoi and convert
+    # from 5 to 6.
     # stamp the correct version
     open( my $FH, ">", "$dest_dir/VERSION");
-    print $FH "$Data::RecordStore::VERSION\n";
+    print $FH "4\n";
     close $FH;
+
+    if( $source_version < 4 ) {
+        # --- the destination directory contains a version 4 db right now
+        #     make this destination the working directory
+        dirmove( $dest_dir, $working_dir );
+        $converter->{from_working} = 1;
+    }
+
+    $converter->_convert_4_to_5;
+
+    open( $FH, ">", "$dest_dir/VERSION");
+    print $FH "5\n";
+    close $FH;
+
+    # remove the working directory if any
+    if( -e $working_dir ) {
+        remove_tree( $working_dir );
+    }
 
 } #convert
 
@@ -180,7 +211,6 @@ sub _convert_1_to_4 {
     my( $data ) = @$rec;
     $self->_write_data( $id, $data );
   } #each entry
-
 } #_convert_1_to_4
 
 sub _convert_2_to_4 {
@@ -275,11 +305,46 @@ sub _convert_3_1_to_4 {
 
 } #_convert_3_1_to_4
 
+sub _convert_4_to_5 {
+    my $self = shift;
+
+    my $source_dir = $self->{from_working} ? $self->{working_dir} : $self->{source_dir};
+    my $dest_dir   = $self->{dest_dir};
+
+
+    # the silos are unchanged
+    if( $self->{from_working} ) {
+        dirmove( "$source_dir/silos", "$dest_dir/silos" );
+    } else {
+        dircopy( "$source_dir/silos", "$dest_dir/silos" );
+    }
+
+    my $from_index = Data::RecordStore::Silo->open_silo( "IL", "$source_dir/RECORD_INDEX_SILO" );
+    my $to_index = Data::RecordStore::Silo->open_silo( "ILL", "$dest_dir/RECORD_INDEX_SILO" );
+
+    my $entries = $from_index->entry_count;
+
+    $to_index->_ensure_entry_count( $entries );
+
+    for my $id (1..$entries) {
+        my $rec = $from_index->get_record( $id);
+        my( $silo_id, $idx_in_silo ) = @$rec;
+        $to_index->put_record( $id, [ $silo_id, $idx_in_silo, time ] );
+    }
+
+} #_convert_4_to_5
+
 1;
 
 __END__
 
 VERSIONS
+
+ 5)  RECORD_INDEX_SILO - ILL (silo_id, idx_in_silo, last_updated_timestamp)
+     silos/${silo_id}_RECSTORE - LZ (record id, record data)
+     VERSION
+     * store size = 2 ** silo_id, min size 4096
+
   
  4)  RECORD_INDEX_SILO - IL (silo_id, idx_in_silo)
      silos/${silo_id}_RECSTORE - LZ (record id, record data)

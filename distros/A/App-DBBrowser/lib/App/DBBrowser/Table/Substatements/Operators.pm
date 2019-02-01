@@ -75,7 +75,7 @@ sub add_operator_with_value {
     else {
         $ext_sign = '=' . $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
         @operators = @{$sf->{o}{G}{operators}};
-        @operators_ext = ( "IN", "NOT IN", " = ", " != ", " < ", " > ", " >= ", " <= " );
+        @operators_ext = ( " = ", " != ", " < ", " > ", " >= ", " <= ", "IN", "NOT IN" );
     }
     if ( $ext_sign ) {
         unshift @operators, $ext_sign;
