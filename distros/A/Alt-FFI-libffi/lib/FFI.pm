@@ -7,7 +7,7 @@ use FFI::Platypus;
 use constant _is_win32 => $^O =~ /^(MSWin32|cygwin|msys2?)$/ && FFI::Platypus->abis->{stdcall};
 
 # ABSTRACT: Perl Foreign Function Interface based on libffi
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 our $ffi = FFI::Platypus->new;
 $ffi->lib(undef);
@@ -33,6 +33,7 @@ our %typemap = qw(
   d   double
   p   string
   v   void
+  o   opaque
 );
 
 sub _ffi
@@ -51,10 +52,11 @@ sub _ffi
 
 sub call
 {
-  my($addr, $signature, @args) = @_;
+  my $addr = shift;
+  my $signature = shift;
   my $ffi = _ffi($signature);
   my($ret_type, @args_types) = map { $typemap{$_} } split //, $signature;
-  $ffi->function($addr => \@args_types => $ret_type)->call(@args);
+  $ffi->function($addr => \@args_types => $ret_type)->call(@_);
 }
 
 sub callback
@@ -89,7 +91,7 @@ FFI - Perl Foreign Function Interface based on libffi
 
 =head1 VERSION
 
-version 0.05
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -160,7 +162,8 @@ values are based on the codes used for the L<pack> function, namely
     L   An unsigned long value.
     f   A single-precision float.
     d   A double-precision float.
-    p   A pointer.
+    p   A pointer to a Perl scalar.
+    o   A opaque pointer, ie, an address.
     v   No value (only valid as a return type).
 
 Note that all of the above codes refer to "native" format values.

@@ -9,9 +9,8 @@ use Cwd                   qw( realpath );
 use Encode                qw( encode decode );
 use File::Basename        qw( dirname );
 use File::Spec::Functions qw( catfile );
-use List::Util            qw( all );
 
-use List::MoreUtils   qw( first_index any );
+use List::MoreUtils   qw( all any first_index );
 use Encode::Locale    qw();
 #use Spreadsheet::Read qw( ReadData rows ); # required
 #use Text::CSV         qw();                # required

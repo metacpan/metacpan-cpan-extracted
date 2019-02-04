@@ -68,10 +68,12 @@ sub extended_col {
     elsif ( $type eq $set_to_null ) {
         return "NULL";
     }
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $alias = $ax->alias( 'subqueries', $ext_col );
-    if ( defined $alias && length $alias ) {
-        $sql->{alias}{$ext_col} = $ax->quote_col_qualified( [ $alias ] );
+    if ( $clause !~ /^(?:set|where|having|group_by|oder_by)\z/i ) {
+        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        my $alias = $ax->alias( 'subqueries', $ext_col );
+        if ( defined $alias && length $alias ) {
+            $sql->{alias}{$ext_col} = $ax->quote_col_qualified( [ $alias ] );
+        }
     }
     return $ext_col;
 }

@@ -1,21 +1,22 @@
 ---
 abstract: 'A plugin bundle for distributions built by TABULO'
 author:
-  - 'Ayhan Ulusoy <tabulo@cpan.org>'
+  - 'Tabulo <tabulo@cpan.org>'
 build_requires:
   Dist::Zilla::Plugin::MakeMaker: '0'
   Dist::Zilla::PluginBundle::Basic: '0'
   Dist::Zilla::Role::MetaProvider: '0'
   Dist::Zilla::Tester: '0'
   Exporter: '0'
+  ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   File::pushd: '0'
   JSON::MaybeXS: '0'
-  Module::Metadata: '0'
   Moose::Util: '0'
   Path::Tiny: '0.062'
   Pod::Weaver::PluginBundle::Default: '4.000'
   Term::ANSIColor: '2.01'
+  Test::Compile: '0'
   Test::DZil: '0'
   Test::Deep: '0'
   Test::Fatal: '0'
@@ -27,15 +28,14 @@ build_requires:
   lib: '0'
   namespace::clean: '0'
   parent: '0'
-  perl: '5.010'
+  perl: '5.014'
 configure_requires:
   Devel::CheckBin: '0'
   ExtUtils::MakeMaker: '0'
-  File::ShareDir::Install: '0.03'
-  Module::Build::Tiny: '0.034'
-  perl: '5.010'
+  File::ShareDir::Install: '0.06'
+  perl: '5.014'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 keywords:
   - author
   - bundle
@@ -53,15 +53,24 @@ no_index:
     - t
     - xt
 provides:
+  Banal::Dist::Zilla::Role::PluginBundle::Easier:
+    file: lib/Banal/Dist/Zilla/Role/PluginBundle/Easier.pm
+    version: '0.198'
+  Banal::Dist::Zilla::Role::Text::Template::Selfish:
+    file: lib/Banal/Dist/Zilla/Role/Text/Template/Selfish.pm
+    version: '0.198'
   Dist::Zilla::MintingProfile::Author::TABULO:
     file: lib/Dist/Zilla/MintingProfile/Author/TABULO.pm
-    version: '0.197'
+    version: '0.198'
   Dist::Zilla::PluginBundle::Author::TABULO:
     file: lib/Dist/Zilla/PluginBundle/Author/TABULO.pm
-    version: '0.197'
+    version: '0.198'
+  Dist::Zilla::PluginBundle::Author::TABULO::Config:
+    file: lib/Dist/Zilla/PluginBundle/Author/TABULO/Config.pm
+    version: '0.198'
   Pod::Weaver::PluginBundle::Author::TABULO:
     file: lib/Pod/Weaver/PluginBundle/Author/TABULO.pm
-    version: '0.197'
+    version: '0.198'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -71,8 +80,7 @@ recommends:
   Dist::Zilla::Plugin::MakeMaker::Fallback: '0.012'
   Dist::Zilla::Plugin::ModuleBuildTiny: '0.012'
   Dist::Zilla::Plugin::ModuleBuildTiny::Fallback: '0.018'
-  Dist::Zilla::Plugin::SurgicalPodWeaver: '0'
-  Dist::Zilla::Plugin::VerifyPhases: '0.015'
+  Dist::Zilla::Stash::PodWeaver: '0'
   Pod::Coverage::TrustPod: '0'
   Pod::Wordlist: '1.09'
   Test::CPAN::Changes: '0'
@@ -85,9 +93,18 @@ recommends:
   Test::Pod::Coverage: '1.08'
   Test::Spelling: '0.19'
 requires:
+  Banal::Dist::Util: '0'
+  Banal::Dist::Util::Git: '0'
+  Banal::Dist::Util::Pause: '0'
+  Banal::Moosy::Mungers: '0'
+  Banal::Role::Fallback: '0'
+  Banal::Role::Fallback::Moo: '0'
+  Banal::Util::Mini: '0'
   CPAN::Changes: '0.23'
   CPAN::Meta::Requirements: '0'
   Carp: '0'
+  Config: '0'
+  Data::Printer: '0'
   Devel::CheckBin: '0'
   Dist::Zilla: '5.038'
   Dist::Zilla::Plugin::Authority: '1.009'
@@ -102,6 +119,7 @@ requires:
   Dist::Zilla::Plugin::ConfirmRelease: '0'
   Dist::Zilla::Plugin::CopyFilesFromRelease: '0'
   Dist::Zilla::Plugin::EnsureLatestPerl: '0'
+  Dist::Zilla::Plugin::EnsurePrereqsInstalled: '0'
   Dist::Zilla::Plugin::ExecDir: '0'
   Dist::Zilla::Plugin::FileFinder::ByName: '0'
   Dist::Zilla::Plugin::GatherDir::Template: '0'
@@ -136,6 +154,7 @@ requires:
   Dist::Zilla::Plugin::ModuleBuildTiny: '0.012'
   Dist::Zilla::Plugin::ModuleBuildTiny::Fallback: '0.018'
   Dist::Zilla::Plugin::MojibakeTests: '0.8'
+  Dist::Zilla::Plugin::NameFromDirectory: '0'
   Dist::Zilla::Plugin::PodCoverageTests: '5.040'
   Dist::Zilla::Plugin::PodSyntaxTests: '5.040'
   Dist::Zilla::Plugin::PodWeaver: '4.005'
@@ -150,6 +169,7 @@ requires:
   Dist::Zilla::Plugin::RunExtraTests: '0.024'
   Dist::Zilla::Plugin::ShareDir: '0'
   Dist::Zilla::Plugin::StaticInstall: '0.005'
+  Dist::Zilla::Plugin::SurgicalPodWeaver: '0'
   Dist::Zilla::Plugin::TemplateModule: '0'
   Dist::Zilla::Plugin::Test::CPAN::Changes: '0.012'
   Dist::Zilla::Plugin::Test::ChangesHasContent: '0'
@@ -159,6 +179,7 @@ requires:
   Dist::Zilla::Plugin::Test::Kwalitee: '2.10'
   Dist::Zilla::Plugin::Test::MinimumVersion: '2.000003'
   Dist::Zilla::Plugin::Test::NoTabs: '0.08'
+  Dist::Zilla::Plugin::Test::Pod::LinkCheck: '0'
   Dist::Zilla::Plugin::Test::Pod::No404s: '1.003'
   Dist::Zilla::Plugin::Test::PodSpelling: '2.006003'
   Dist::Zilla::Plugin::Test::Portability: '2.000007'
@@ -166,49 +187,96 @@ requires:
   Dist::Zilla::Plugin::TestRelease: '0'
   Dist::Zilla::Plugin::UploadToCPAN: '0'
   Dist::Zilla::Plugin::UseUnsafeInc: '0'
+  Dist::Zilla::Plugin::VerifyPhases: '0'
+  Dist::Zilla::Plugin::lib: '0'
   Dist::Zilla::PluginBundle::Git::VersionManager: '0.001'
   Dist::Zilla::Role::MintingProfile: '5.047'
   Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
   Dist::Zilla::Role::PluginBundle::PluginRemover: '0.103'
+  Dist::Zilla::Role::TextTemplate: '0'
   Dist::Zilla::Util: '0'
+  Exporter::Shiny: '0'
   File::ShareDir: '0'
+  Git::Wrapper: '0'
+  Hash::MoreUtils: '0'
+  List::MoreUtils: '0'
   List::Util: '1.45'
   Module::Runtime: '0'
   Moose: '0'
+  Moose::Role: '0'
   Moose::Util::TypeConstraints: '0'
+  MooseX::MungeHas: '0'
+  Object::Tiny: '0'
   PadWalker: '0'
   Path::Tiny: '0.062'
   Pod::Elemental::PerlMunger: '0.200001'
   Pod::Elemental::Transformer::List: '0.102000'
   Pod::Elemental::Transformer::Verbatim: '0'
+  Pod::Elemental::Transformer::WikiDoc: '0'
   Pod::Markdown: '1.500'
   Pod::Weaver::Config::Assembler: '0'
+  Pod::Weaver::Plugin::AppendPrepend: '0'
   Pod::Weaver::Plugin::EnsurePod5: '0'
+  Pod::Weaver::Plugin::EnsureUniqueSections: '0'
   Pod::Weaver::Plugin::H1Nester: '0'
+  Pod::Weaver::Plugin::Include: '0'
+  Pod::Weaver::Plugin::StopWords: '0'
   Pod::Weaver::Plugin::Transformer: '0'
   Pod::Weaver::PluginBundle::Default: '4.000'
   Pod::Weaver::Section::AllowOverride: '0'
   Pod::Weaver::Section::Contributors: '0.008'
   Pod::Weaver::Section::GenerateSection: '0'
   Pod::Weaver::Section::Legal: '4.011'
+  Pod::Weaver::Section::WarrantyDisclaimer: '0'
+  Scalar::Does: '0'
+  Scalar::Util: '0'
   Term::ANSIColor: '2.01'
   Test::Portability::Files: '0.07'
   Test::Spelling: '0.19'
   Text::Tabs: '2013.0426'
   namespace::autoclean: '0'
-  perl: '5.010'
+  perl: '5.014'
   strict: '0'
+  utf8: '0'
+  vars: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-TABULO
   homepage: https://github.com/tabulon/p5-Dist-Zilla-PluginBundle-Author-TABULO
   repository: https://github.com/tabulon/p5-Dist-Zilla-PluginBundle-Author-TABULO.git
-version: '0.197'
+version: '0.198'
 x_Dist_Zilla:
   perl:
-    version: '5.026001'
+    version: '5.028001'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::Bootstrap::lib
+      config:
+        Dist::Zilla::Role::Bootstrap:
+          $Dist::Zilla::Role::Bootstrap::VERSION: '1.001004'
+          distname: Dist-Zilla-PluginBundle-Author-TABULO
+          fallback: '1'
+          try_built: ~
+          try_built_method: mtime
+      name: Bootstrap::lib
+      version: '1.001002'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: 'general-purpose modules (direct)'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: 'own food (direct)'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -216,7 +284,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: 'dzil plugin bundle (direct)'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -224,7 +292,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: 'dzil plugin bundle (indirect)'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -232,7 +300,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: 'dzil plugin bundle (direct, optional but help the contributor out)'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -240,7 +308,7 @@ x_Dist_Zilla:
           phase: runtime
           type: recommends
       name: 'dzil plugin bundle (direct, optional)'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -248,7 +316,15 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: 'minting profile (direct)'
-      version: '6.010'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: recommends
+      name: 'dzil stash (direct, optional but help the contributor out)'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -256,7 +332,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: 'podweaver plugin bundle (direct)'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -264,7 +340,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: 'podweaver plugin bundle (indirect)'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -272,7 +348,7 @@ x_Dist_Zilla:
           phase: runtime
           type: recommends
       name: release_tests
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -280,7 +356,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: missing_test_injections
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -288,7 +364,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: author_tests
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MungeFile
       config:
@@ -307,14 +383,22 @@ x_Dist_Zilla:
           exclude_filename: []
           exclude_match: []
           follow_symlinks: 0
-          include_dotfiles: 0
+          include_dotfiles: 1
           prefix: share/profiles/default
           prune_directory: []
           root: share/profiles/github
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: 'default minting profile'
-      version: '2.043'
+      version: '2.045'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@Author::ETHER/pluginbundle version'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -322,28 +406,16 @@ x_Dist_Zilla:
           check_all_plugins: 0
           check_all_prereqs: 0
           modules:
-            - Dist::Zilla::PluginBundle::Author::TABULO
+            - Dist::Zilla::PluginBundle::Author::ETHER
           phase: build
           run_under_travis: 0
           skip: []
-      name: '@Author::TABULO/stale modules, build'
-      version: '0.054'
-    -
-      class: Dist::Zilla::Plugin::PromptIfStale
-      config:
-        Dist::Zilla::Plugin::PromptIfStale:
-          check_all_plugins: 1
-          check_all_prereqs: 1
-          modules: []
-          phase: release
-          run_under_travis: 0
-          skip: []
-      name: '@Author::TABULO/stale modules, release'
-      version: '0.054'
+      name: '@Author::ETHER/stale modules, build'
+      version: '0.055'
     -
       class: Dist::Zilla::Plugin::FileFinder::ByName
-      name: '@Author::TABULO/Examples'
-      version: '6.010'
+      name: '@Author::ETHER/Examples'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -355,40 +427,40 @@ x_Dist_Zilla:
             - README.pod
           exclude_match: []
           follow_symlinks: 0
-          include_dotfiles: 0
+          include_dotfiles: 1
           prefix: ''
           prune_directory: []
           root: .
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
-      name: '@Author::TABULO/Git::GatherDir'
-      version: '2.043'
+      name: '@Author::ETHER/Git::GatherDir'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::MetaYAML
-      name: '@Author::TABULO/MetaYAML'
-      version: '6.010'
+      name: '@Author::ETHER/MetaYAML'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaJSON
-      name: '@Author::TABULO/MetaJSON'
-      version: '6.010'
+      name: '@Author::ETHER/MetaJSON'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Readme
-      name: '@Author::TABULO/Readme'
-      version: '6.010'
+      name: '@Author::ETHER/Readme'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Manifest
-      name: '@Author::TABULO/Manifest'
-      version: '6.010'
+      name: '@Author::ETHER/Manifest'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::License
-      name: '@Author::TABULO/License'
-      version: '6.010'
+      name: '@Author::ETHER/License'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::GenerateFile::FromShareDir
       config:
         Dist::Zilla::Plugin::GenerateFile::FromShareDir:
           destination_filename: CONTRIBUTING
-          dist: Dist-Zilla-PluginBundle-Author-TABULO
+          dist: Dist-Zilla-PluginBundle-Author-ETHER
           encoding: UTF-8
           has_xs: 0
           location: build
@@ -396,13 +468,13 @@ x_Dist_Zilla:
         Dist::Zilla::Role::RepoFileInjector:
           allow_overwrite: 1
           repo_root: .
-          version: '0.007'
-      name: '@Author::TABULO/generate CONTRIBUTING'
-      version: '0.013'
+          version: '0.009'
+      name: '@Author::ETHER/generate CONTRIBUTING'
+      version: '0.014'
     -
       class: Dist::Zilla::Plugin::InstallGuide
-      name: '@Author::TABULO/InstallGuide'
-      version: '1.200007'
+      name: '@Author::ETHER/InstallGuide'
+      version: '1.200012'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -417,10 +489,10 @@ x_Dist_Zilla:
           phase: develop
           script_finder:
             - ':PerlExecFiles'
-            - '@Author::TABULO/Examples'
+            - '@Author::ETHER/Examples'
           skips: []
           switch: []
-      name: '@Author::TABULO/Test::Compile'
+      name: '@Author::ETHER/Test::Compile'
       version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
@@ -430,10 +502,10 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
             - ':ExecFiles'
-            - '@Author::TABULO/Examples'
+            - '@Author::ETHER/Examples'
             - ':TestFiles'
             - ':ExtraTestFiles'
-      name: '@Author::TABULO/Test::NoTabs'
+      name: '@Author::ETHER/Test::NoTabs'
       version: '0.15'
     -
       class: Dist::Zilla::Plugin::Test::EOL
@@ -445,33 +517,48 @@ x_Dist_Zilla:
             - ':ExtraTestFiles'
             - ':InstallModules'
             - ':TestFiles'
-            - '@Author::TABULO/Examples'
+            - '@Author::ETHER/Examples'
           trailing_whitespace: 1
-      name: '@Author::TABULO/Test::EOL'
+      name: '@Author::ETHER/Test::EOL'
       version: '0.19'
     -
       class: Dist::Zilla::Plugin::MetaTests
-      name: '@Author::TABULO/MetaTests'
-      version: '6.010'
+      name: '@Author::ETHER/MetaTests'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Changes
       config:
         Dist::Zilla::Plugin::Test::CPAN::Changes:
           changelog: Changes
-      name: '@Author::TABULO/Test::CPAN::Changes'
+      name: '@Author::ETHER/Test::CPAN::Changes'
       version: '0.012'
     -
+      class: Dist::Zilla::Plugin::GenerateFile::FromShareDir
+      config:
+        Dist::Zilla::Plugin::GenerateFile::FromShareDir:
+          destination_filename: xt/author/changes_has_content.t
+          dist: Dist-Zilla-PluginBundle-Author-ETHER
+          encoding: UTF-8
+          location: build
+          source_filename: changes_has_content.t
+        Dist::Zilla::Role::RepoFileInjector:
+          allow_overwrite: 1
+          repo_root: .
+          version: '0.009'
+      name: '@Author::ETHER/generate xt/author/changes_has_content.t'
+      version: '0.014'
+    -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
-      name: '@Author::TABULO/Test::ChangesHasContent'
+      name: '@Author::ETHER/Test::ChangesHasContent'
       version: '0.011'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
-      name: '@Author::TABULO/Test::MinimumVersion'
-      version: '2.000007'
+      name: '@Author::ETHER/Test::MinimumVersion'
+      version: '2.000008'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
-      name: '@Author::TABULO/PodSyntaxTests'
-      version: '6.010'
+      name: '@Author::ETHER/PodSyntaxTests'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -486,7 +573,7 @@ x_Dist_Zilla:
           stopwords:
             - irc
           wordlist: Pod::Wordlist
-      name: '@Author::TABULO/Test::PodSpelling'
+      name: '@Author::ETHER/Test::PodSpelling'
       version: '2.007005'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
@@ -494,22 +581,22 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::Kwalitee:
           filename: xt/author/kwalitee.t
           skiptest: []
-      name: '@Author::TABULO/Test::Kwalitee'
+      name: '@Author::ETHER/Test::Kwalitee'
       version: '2.12'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
-      name: '@Author::TABULO/MojibakeTests'
+      name: '@Author::ETHER/MojibakeTests'
       version: '0.8'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
-      name: '@Author::TABULO/Test::ReportPrereqs'
+      name: '@Author::ETHER/Test::ReportPrereqs'
       version: '0.027'
     -
       class: Dist::Zilla::Plugin::Test::Portability
       config:
         Dist::Zilla::Plugin::Test::Portability:
-          options: ''
-      name: '@Author::TABULO/Test::Portability'
+          options: 'test_dos_length = 0, test_one_dot = 0'
+      name: '@Author::ETHER/Test::Portability'
       version: '2.001000'
     -
       class: Dist::Zilla::Plugin::Test::CleanNamespaces
@@ -517,61 +604,57 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::CleanNamespaces:
           filename: xt/author/clean-namespaces.t
           skips: []
-      name: '@Author::TABULO/Test::CleanNamespaces'
+      name: '@Author::ETHER/Test::CleanNamespaces'
       version: '0.006'
     -
       class: Dist::Zilla::Plugin::Git::Describe
-      name: '@Author::TABULO/Git::Describe'
+      name: '@Author::ETHER/Git::Describe'
       version: '0.007'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
         Dist::Zilla::Plugin::PodWeaver:
           config_plugins:
-            - '@Author::TABULO'
+            - '@Author::ETHER'
           finder:
             - ':InstallModules'
             - ':ExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
-              name: '@Author::TABULO/EnsurePod5'
+              name: '@Author::ETHER/EnsurePod5'
               version: '4.015'
             -
               class: Pod::Weaver::Plugin::H1Nester
-              name: '@Author::TABULO/H1Nester'
+              name: '@Author::ETHER/H1Nester'
               version: '4.015'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
-              name: '@Author::TABULO/SingleEncoding'
+              name: '@Author::ETHER/SingleEncoding'
               version: '4.015'
             -
               class: Pod::Weaver::Plugin::Transformer
-              name: '@Author::TABULO/List'
+              name: '@Author::ETHER/List'
               version: '4.015'
             -
               class: Pod::Weaver::Plugin::Transformer
-              name: '@Author::TABULO/Verbatim'
-              version: '4.015'
-            -
-              class: Pod::Weaver::Plugin::Transformer
-              name: '@Author::TABULO/WikiDoc'
+              name: '@Author::ETHER/Verbatim'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Region
-              name: '@Author::TABULO/header'
+              name: '@Author::ETHER/header'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Name
-              name: '@Author::TABULO/Name'
+              name: '@Author::ETHER/Name'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Version
-              name: '@Author::TABULO/Version'
+              name: '@Author::ETHER/Version'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Region
-              name: '@Author::TABULO/prelude'
+              name: '@Author::ETHER/prelude'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
@@ -603,54 +686,58 @@ x_Dist_Zilla:
               version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
-              name: '@Author::TABULO/Leftovers'
+              name: '@Author::ETHER/Leftovers'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Region
-              name: '@Author::TABULO/postlude'
+              name: '@Author::ETHER/postlude'
               version: '4.015'
             -
               class: Pod::Weaver::Section::GenerateSection
-              name: '@Author::TABULO/generate SUPPORT'
+              name: '@Author::ETHER/generate SUPPORT'
               version: '1.06'
             -
               class: Pod::Weaver::Section::AllowOverride
-              name: '@Author::TABULO/allow override SUPPORT'
+              name: '@Author::ETHER/allow override SUPPORT'
               version: '0.05'
             -
               class: Pod::Weaver::Section::Authors
-              name: '@Author::TABULO/Authors'
+              name: '@Author::ETHER/Authors'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::AllowOverride
+              name: '@Author::ETHER/allow override AUTHOR'
+              version: '0.05'
+            -
               class: Pod::Weaver::Section::Contributors
-              name: '@Author::TABULO/Contributors'
+              name: '@Author::ETHER/Contributors'
               version: '0.009'
             -
               class: Pod::Weaver::Section::Legal
-              name: '@Author::TABULO/Legal'
+              name: '@Author::ETHER/Legal'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Region
-              name: '@Author::TABULO/footer'
+              name: '@Author::ETHER/footer'
               version: '4.015'
-      name: '@Author::TABULO/PodWeaver'
+      name: '@Author::ETHER/PodWeaver'
       version: '4.008'
     -
       class: Dist::Zilla::Plugin::GithubMeta
-      name: '@Author::TABULO/GithubMeta'
-      version: '0.54'
+      name: '@Author::ETHER/GithubMeta'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::AutoMetaResources
-      name: '@Author::TABULO/AutoMetaResources'
+      name: '@Author::ETHER/AutoMetaResources'
       version: '1.21'
     -
       class: Dist::Zilla::Plugin::Authority
-      name: '@Author::TABULO/Authority'
+      name: '@Author::ETHER/Authority'
       version: '1.009'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
-      name: '@Author::TABULO/MetaNoIndex'
-      version: '6.010'
+      name: '@Author::ETHER/MetaNoIndex'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -661,7 +748,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: ':InstallModules'
-              version: '6.010'
+              version: '6.012'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -670,13 +757,13 @@ x_Dist_Zilla:
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.004'
-      name: '@Author::TABULO/MetaProvides::Package'
+          version: '0.006'
+      name: '@Author::ETHER/MetaProvides::Package'
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaConfig
-      name: '@Author::TABULO/MetaConfig'
-      version: '6.010'
+      name: '@Author::ETHER/MetaConfig'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Keywords
       config:
@@ -686,80 +773,59 @@ x_Dist_Zilla:
             - bundle
             - distribution
             - tool
-      name: '@Author::TABULO/Keywords'
+      name: '@Author::ETHER/Keywords'
       version: '0.007'
     -
       class: Dist::Zilla::Plugin::UseUnsafeInc
       config:
         Dist::Zilla::Plugin::UseUnsafeInc:
           dot_in_INC: 0
-      name: '@Author::TABULO/UseUnsafeInc'
+      name: '@Author::ETHER/UseUnsafeInc'
       version: '0.001'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
-      name: '@Author::TABULO/AutoPrereqs'
-      version: '6.010'
+      name: '@Author::ETHER/AutoPrereqs'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs::AuthorDeps
-      name: '@Author::TABULO/Prereqs::AuthorDeps'
+      name: '@Author::ETHER/Prereqs::AuthorDeps'
       version: '0.006'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
-      name: '@Author::TABULO/MinimumPerl'
+      name: '@Author::ETHER/MinimumPerl'
       version: '1.006'
     -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: recommends
-      name: '@Author::TABULO/pluginbundle_version'
-      version: '6.010'
-    -
-      class: Dist::Zilla::Plugin::MakeMaker::Fallback
-      config:
-        Dist::Zilla::Plugin::MakeMaker:
-          make_path: make
-          version: '6.010'
-        Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.39'
-        Dist::Zilla::Role::TestRunner:
-          default_jobs: 9
-          version: '6.010'
-      name: '@Author::TABULO/MakeMaker::Fallback'
-      version: '0.026'
-    -
-      class: Dist::Zilla::Plugin::ModuleBuildTiny
+      class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
-      name: '@Author::TABULO/ModuleBuildTiny'
-      version: '0.015'
+      name: '@Author::ETHER/MakeMaker'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.15.1
+          git_version: 2.20.1
           include_authors: 0
           include_releaser: 1
           order_by: commits
           paths: []
-      name: '@Author::TABULO/Git::Contributors'
-      version: '0.032'
+      name: '@Author::ETHER/Git::Contributors'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
         Dist::Zilla::Plugin::StaticInstall:
           dry_run: 0
           mode: off
-      name: '@Author::TABULO/StaticInstall'
-      version: '0.011'
+      name: '@Author::ETHER/StaticInstall'
+      version: '0.012'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
-      name: '@Author::TABULO/RunExtraTests'
+      name: '@Author::ETHER/RunExtraTests'
       version: '0.029'
     -
       class: Dist::Zilla::Plugin::CheckSelfDependency
@@ -769,8 +835,8 @@ x_Dist_Zilla:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.004'
-      name: '@Author::TABULO/CheckSelfDependency'
+          version: '0.006'
+      name: '@Author::ETHER/CheckSelfDependency'
       version: '0.011'
     -
       class: Dist::Zilla::Plugin::Run::AfterBuild
@@ -780,9 +846,9 @@ x_Dist_Zilla:
           quiet: 1
           run:
             - "bash -c \"test -e .ackrc && grep -q -- '--ignore-dir=.latest' .ackrc || echo '--ignore-dir=.latest' >> .ackrc; if [[ `dirname '%d'` != .build ]]; then test -e .ackrc && grep -q -- '--ignore-dir=%d' .ackrc || echo '--ignore-dir=%d' >> .ackrc; fi\""
-          version: '0.046'
-      name: '@Author::TABULO/.ackrc'
-      version: '0.046'
+          version: '0.047'
+      name: '@Author::ETHER/.ackrc'
+      version: '0.047'
     -
       class: Dist::Zilla::Plugin::Run::AfterBuild
       config:
@@ -791,24 +857,36 @@ x_Dist_Zilla:
             - "if ('%d' =~ /^%n-[.[:xdigit:]]+$/) { unlink '.latest'; symlink '%d', '.latest'; }"
           fatal_errors: 0
           quiet: 1
-          version: '0.046'
-      name: '@Author::TABULO/.latest'
-      version: '0.046'
+          version: '0.047'
+      name: '@Author::ETHER/.latest'
+      version: '0.047'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
-      name: '@Author::TABULO/CheckStrictVersion'
+      name: '@Author::ETHER/CheckStrictVersion'
       version: '0.001'
     -
       class: Dist::Zilla::Plugin::CheckMetaResources
-      name: '@Author::TABULO/CheckMetaResources'
+      name: '@Author::ETHER/CheckMetaResources'
       version: '0.001'
     -
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20171220'
-      name: '@Author::TABULO/EnsureLatestPerl'
-      version: '0.006'
+          Module::CoreList: '5.20190120'
+      name: '@Author::ETHER/EnsureLatestPerl'
+      version: '0.008'
+    -
+      class: Dist::Zilla::Plugin::PromptIfStale
+      config:
+        Dist::Zilla::Plugin::PromptIfStale:
+          check_all_plugins: 1
+          check_all_prereqs: 1
+          modules: []
+          phase: release
+          run_under_travis: 0
+          skip: []
+      name: '@Author::ETHER/stale modules, release'
+      version: '0.055'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -819,38 +897,38 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.20.1
           repo_root: .
-      name: '@Author::TABULO/initial check'
-      version: '2.043'
+      name: '@Author::ETHER/initial check'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.20.1
           repo_root: .
-      name: '@Author::TABULO/Git::CheckFor::MergeConflicts'
+      name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.20.1
           repo_root: .
-      name: '@Author::TABULO/Git::CheckFor::CorrectBranch'
+      name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::Git::Remote::Check
-      name: '@Author::TABULO/Git::Remote::Check'
+      name: '@Author::ETHER/Git::Remote::Check'
       version: 0.1.2
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
-      name: '@Author::TABULO/CheckPrereqsIndexed'
+      name: '@Author::ETHER/CheckPrereqsIndexed'
       version: '0.020'
     -
       class: Dist::Zilla::Plugin::TestRelease
-      name: '@Author::TABULO/TestRelease'
-      version: '6.010'
+      name: '@Author::ETHER/TestRelease'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -861,18 +939,18 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.20.1
           repo_root: .
-      name: '@Author::TABULO/after tests'
-      version: '2.043'
+      name: '@Author::ETHER/after tests'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::CheckIssues
-      name: '@Author::TABULO/CheckIssues'
+      name: '@Author::ETHER/CheckIssues'
       version: '0.010'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
-      name: '@Author::TABULO/UploadToCPAN'
-      version: '6.010'
+      name: '@Author::ETHER/UploadToCPAN'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -884,15 +962,23 @@ x_Dist_Zilla:
             - LICENSE
             - ppport.h
           match: []
-      name: '@Author::TABULO/copy generated files'
+      name: '@Author::ETHER/copy generated files'
       version: '0.006'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
         Dist::Zilla::Role::FileWatcher:
           version: '0.006'
-      name: '@Author::TABULO/ReadmeAnyFromPod'
+      name: '@Author::ETHER/ReadmeAnyFromPod'
       version: '0.163250'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@Author::ETHER/@Git::VersionManager/pluginbundle version'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
@@ -904,12 +990,12 @@ x_Dist_Zilla:
           global: 1
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
-      name: '@Author::TABULO/@Git::VersionManager/RewriteVersion::Transitional'
-      version: '0.008'
+      name: '@Author::ETHER/@Git::VersionManager/RewriteVersion::Transitional'
+      version: '0.009'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Update
-      name: '@Author::TABULO/@Git::VersionManager/MetaProvides::Update'
-      version: '0.004'
+      name: '@Author::ETHER/@Git::VersionManager/MetaProvides::Update'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -917,7 +1003,7 @@ x_Dist_Zilla:
           filename:
             - Changes
           match: []
-      name: '@Author::TABULO/@Git::VersionManager/CopyFilesFromRelease'
+      name: '@Author::ETHER/@Git::VersionManager/CopyFilesFromRelease'
       version: '0.006'
     -
       class: Dist::Zilla::Plugin::Git::Commit
@@ -936,12 +1022,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
-      name: '@Author::TABULO/@Git::VersionManager/release snapshot'
-      version: '2.043'
+      name: '@Author::ETHER/@Git::VersionManager/release snapshot'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -949,16 +1035,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.197
+          tag: v0.198
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
-      name: '@Author::TABULO/@Git::VersionManager/Git::Tag'
-      version: '2.043'
+      name: '@Author::ETHER/@Git::VersionManager/Git::Tag'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -969,12 +1055,12 @@ x_Dist_Zilla:
           global: 1
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
-      name: '@Author::TABULO/@Git::VersionManager/BumpVersionAfterRelease::Transitional'
-      version: '0.008'
+      name: '@Author::ETHER/@Git::VersionManager/BumpVersionAfterRelease::Transitional'
+      version: '0.009'
     -
       class: Dist::Zilla::Plugin::NextRelease
-      name: '@Author::TABULO/@Git::VersionManager/NextRelease'
-      version: '6.010'
+      name: '@Author::ETHER/@Git::VersionManager/NextRelease'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -990,12 +1076,20 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
-      name: '@Author::TABULO/@Git::VersionManager/post-release commit'
-      version: '2.043'
+      name: '@Author::ETHER/@Git::VersionManager/post-release commit'
+      version: '2.045'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: x_Dist_Zilla
+          type: requires
+      name: '@Author::ETHER/@Git::VersionManager/prereqs for @Git::VersionManager'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -1004,17 +1098,17 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.20.1
           repo_root: .
-      name: '@Author::TABULO/Git::Push'
-      version: '2.043'
+      name: '@Author::ETHER/Git::Push'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
-      name: '@Author::TABULO/GitHub::Update'
-      version: '0.44'
+      name: '@Author::ETHER/GitHub::Update'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::Run::AfterRelease
       config:
@@ -1023,9 +1117,9 @@ x_Dist_Zilla:
           quiet: 0
           run:
             - REDACTED
-          version: '0.046'
-      name: '@Author::TABULO/install release'
-      version: '0.046'
+          version: '0.047'
+      name: '@Author::ETHER/install release'
+      version: '0.047'
     -
       class: Dist::Zilla::Plugin::Run::AfterRelease
       config:
@@ -1034,21 +1128,21 @@ x_Dist_Zilla:
             - 'print "release complete!\xa"'
           fatal_errors: 1
           quiet: 1
-          version: '0.046'
-      name: '@Author::TABULO/release complete'
-      version: '0.046'
+          version: '0.047'
+      name: '@Author::ETHER/release complete'
+      version: '0.047'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
-      name: '@Author::TABULO/ConfirmRelease'
-      version: '6.010'
+      name: '@Author::ETHER/ConfirmRelease'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: suggests
-      name: '@Author::TABULO/prereqs for @Author::TABULO'
-      version: '6.010'
+          phase: x_Dist_Zilla
+          type: requires
+      name: '@Author::ETHER/prereqs for @Author::ETHER'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::CheckBreaks
       config:
@@ -1059,7 +1153,7 @@ x_Dist_Zilla:
           no_forced_deps: 0
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.004'
+          version: '0.006'
       name: Test::CheckBreaks
       version: '0.019'
     -
@@ -1073,65 +1167,62 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: ShareDir
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.010'
-    -
-      class: Dist::Zilla::Plugin::VerifyPhases
-      name: '@Author::TABULO/PHASE VERIFICATION'
-      version: '0.016'
+      version: '6.012'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.010'
+    version: '6.012'
 x_authority: cpan:TABULO
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
-  - 'Dave Rolsky <autarch@urth.org>'
   - 'Edward Betts <edward@4angle.com>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'Randy Stauner <rwstauner@cpan.org>'
   - 'Roy Ivy III <rivy@cpan.org>'
   - 'Сергей Романов <sromanov@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  - 'Dave Rolsky <autarch@urth.org>'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 0
 x_use_unsafe_inc: 0

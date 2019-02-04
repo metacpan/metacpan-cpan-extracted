@@ -7,7 +7,7 @@ WriteMakefile(
     NAME             => 'Mojo::Pg::Che',
     AUTHOR           => q{Михаил Че (Mikhail Che) <mche[-at-]cpan.org>},
     VERSION_FROM     => 'lib/Mojo/Pg/Che.pm',
-    ABSTRACT_FROM    => 'lib/Mojo/Pg/Che.pm',
+    ABSTRACT_FROM    => 'lib/Mojo/Pg/Che.pod',
     LICENSE          => 'perl',
     PL_FILES         => {},
     # MIN_PERL_VERSION => 5.006,

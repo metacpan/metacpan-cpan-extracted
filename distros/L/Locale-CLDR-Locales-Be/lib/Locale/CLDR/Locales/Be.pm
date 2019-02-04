@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Be - Package for language Belarusian
 
 package Locale::CLDR::Locales::Be;
 # This file auto generated from Data\common\main\be.xml
-#	on Sun  7 Oct 10:21:31 am GMT
+#	on Sun  3 Feb  1:40:05 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2314,6 +2314,7 @@ has 'display_name_language' => (
  				'rm' => 'рэтараманская',
  				'rn' => 'рундзі',
  				'ro' => 'румынская',
+ 				'ro_MD' => 'малдаўская',
  				'rof' => 'ромба',
  				'root' => 'корань',
  				'ru' => 'руская',
@@ -3037,6 +3038,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(кірунак свету),
+					},
 					'acre' => {
 						'few' => q({0} акры),
 						'many' => q({0} акраў),
@@ -3078,6 +3082,13 @@ has 'units' => (
 						'name' => q(астранамічныя адзінкі),
 						'one' => q({0} астранамічная адзінка),
 						'other' => q({0} астранамічнай адзінкі),
+					},
+					'atmosphere' => {
+						'few' => q({0} атм),
+						'many' => q({0} атм),
+						'name' => q(атмасферы),
+						'one' => q({0} атм),
+						'other' => q({0} атм),
 					},
 					'bit' => {
 						'few' => q({0} біты),
@@ -3791,6 +3802,27 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'few' => q({0}%),
+						'many' => q({0}%),
+						'name' => q(працэнтаў),
+						'one' => q({0} працэнт),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'few' => q({0}‰),
+						'many' => q({0}‰),
+						'name' => q(праміле),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'few' => q({0} ПБ),
+						'many' => q({0} ПБ),
+						'name' => q(петабайты),
+						'one' => q({0} ПБ),
+						'other' => q({0} ПБ),
+					},
 					'picometer' => {
 						'few' => q({0} пікаметры),
 						'many' => q({0} пікаметраў),
@@ -3991,6 +4023,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(кірунак),
+					},
 					'celsius' => {
 						'few' => q({0}°C),
 						'many' => q({0}°C),
@@ -4105,6 +4140,13 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'few' => q({0}%),
+						'many' => q({0}%),
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'second' => {
 						'few' => q({0} с),
 						'many' => q({0} с),
@@ -4128,6 +4170,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(кірунак),
+					},
 					'acre' => {
 						'few' => q({0} акры),
 						'many' => q({0} акраў),
@@ -4169,6 +4214,13 @@ has 'units' => (
 						'name' => q(а. а.),
 						'one' => q({0} а. а.),
 						'other' => q({0} а. а.),
+					},
+					'atmosphere' => {
+						'few' => q({0} атм),
+						'many' => q({0} атм),
+						'name' => q(атм),
+						'one' => q({0} атм),
+						'other' => q({0} атм),
 					},
 					'bit' => {
 						'few' => q({0} біты),
@@ -4881,6 +4933,27 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'few' => q({0}%),
+						'many' => q({0}%),
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'few' => q({0}‰),
+						'many' => q({0}‰),
+						'name' => q(праміле),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'few' => q({0} ПБ),
+						'many' => q({0} ПБ),
+						'name' => q(ПБайт),
+						'one' => q({0} ПБ),
+						'other' => q({0} ПБ),
 					},
 					'picometer' => {
 						'few' => q({0} пм),
@@ -6898,6 +6971,16 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(венесуальскі балівар \(2008–2018\)),
+				'few' => q(венесуальскія балівары \(2008–2018\)),
+				'many' => q(венесуальскіх балівараў \(2008–2018\)),
+				'one' => q(венесуальскі балівар \(2008–2018\)),
+				'other' => q(венесуальскага балівара \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
+			display_name => {
 				'currency' => q(венесуальскі балівар),
 				'few' => q(венесуальскія балівары),
 				'many' => q(венесуальскіх балівараў),
@@ -7283,10 +7366,6 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'narrow' => {
 					'am' => q{am},
 					'pm' => q{pm},
@@ -7295,19 +7374,23 @@ has 'day_periods' => (
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
+				'abbreviated' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'narrow' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 				'wide' => {
 					'am' => q{AM},
 					'pm' => q{PM},
+				},
+				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
 				},
 			},
 		},
@@ -7456,28 +7539,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 			yw => q{w 'тыдзень' Y},
 		},
-		'buddhist' => {
-			Ed => q{E, d},
-			Gy => q{G y},
-			Hm => q{HH.mm},
-			Hms => q{HH.mm.ss},
-			M => q{L},
-			MEd => q{E, d.M},
-			MMM => q{LLL},
-			MMMEd => q{E, d MMM},
-			MMMd => q{d MMM},
-			Md => q{d.M},
-			d => q{d},
-			hm => q{h.mm a},
-			hms => q{h.mm.ss a},
-			y => q{G y},
-			yM => q{M.y},
-			yMEd => q{E, d.M.y},
-			yMMM => q{MMM y G},
-			yMMMEd => q{E, d MMM y G},
-			yMMMd => q{d MMM y G},
-			yMd => q{d.M.y},
-		},
 		'generic' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -7520,6 +7581,28 @@ has 'datetime_formats_available_formats' => (
 			yyyyMd => q{d.M.y G},
 			yyyyQQQ => q{QQQ y G},
 			yyyyQQQQ => q{QQQQ y G},
+		},
+		'buddhist' => {
+			Ed => q{E, d},
+			Gy => q{G y},
+			Hm => q{HH.mm},
+			Hms => q{HH.mm.ss},
+			M => q{L},
+			MEd => q{E, d.M},
+			MMM => q{LLL},
+			MMMEd => q{E, d MMM},
+			MMMd => q{d MMM},
+			Md => q{d.M},
+			d => q{d},
+			hm => q{h.mm a},
+			hms => q{h.mm.ss a},
+			y => q{G y},
+			yM => q{M.y},
+			yMEd => q{E, d.M.y},
+			yMMM => q{MMM y G},
+			yMMMEd => q{E, d MMM y G},
+			yMMMd => q{d MMM y G},
+			yMd => q{d.M.y},
 		},
 	} },
 );
@@ -8080,7 +8163,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Эйрунэпе#,
 		},
 		'America/El_Salvador' => {
-			exemplarCity => q#Эль-Сальвадор#,
+			exemplarCity => q#Сальвадор#,
 		},
 		'America/Fort_Nelson' => {
 			exemplarCity => q#Форт-Нельсан#,
@@ -8809,9 +8892,9 @@ has 'time_zone_names' => (
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q#Заходні летні час Цэнтральнай Аўстраліі#,
-				'generic' => q#Заходні час Цэнтральнай Аўстраліі#,
-				'standard' => q#Заходні стандартны час Цэнтральнай Аўстраліі#,
+				'daylight' => q#Летні цэнтральна-заходні час Аўстраліі#,
+				'generic' => q#Цэнтральна-заходні час Аўстраліі#,
+				'standard' => q#Стандартны цэнтральна-заходні час Аўстраліі#,
 			},
 		},
 		'Australia_Eastern' => {
@@ -9395,7 +9478,7 @@ has 'time_zone_names' => (
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q#Час вострава Касрае#,
+				'standard' => q#Час астравоў Кусаіе#,
 			},
 		},
 		'Krasnoyarsk' => {
@@ -9441,7 +9524,7 @@ has 'time_zone_names' => (
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q#Час Мальдыў#,
+				'standard' => q#Час Мальдываў#,
 			},
 		},
 		'Marquesas' => {

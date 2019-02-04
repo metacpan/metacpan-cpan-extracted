@@ -37,7 +37,7 @@
       },
       "test" : {
          "requires" : {
-            "Moo" : "0",
+            "Moo" : "2.003004",
             "Pod::Coverage::TrustPod" : "0",
             "Test::More" : "0"
          }
@@ -46,15 +46,15 @@
    "provides" : {
       "Types::Dist" : {
          "file" : "lib/Types/Dist.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Types::OTRS" : {
          "file" : "lib/Types/OTRS.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Types::RENEEB" : {
          "file" : "lib/Types/RENEEB.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
          "web" : "http://github.com/reneeb/Types-RENEEB"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

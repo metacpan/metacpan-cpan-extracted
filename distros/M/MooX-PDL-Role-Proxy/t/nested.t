@@ -106,7 +106,7 @@ sub test_not_inplace {
         for my $c ( 'c1', 'c2' ) {
             subtest $c => sub {
                 test_not_inplace_flat_obj( $orig->$c, $new->$c,
-                    $expected->$c, $data{$c}->%* );
+                    $expected->$c, %{ $data{$c} } );
             };
         }
 

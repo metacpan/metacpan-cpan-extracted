@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-IOD-Reader
   homepage: https://metacpan.org/release/Config-IOD-Reader
   repository: git://github.com/perlancar/perl-Config-IOD-Reader.git
-version: '0.341'
+version: '0.342'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

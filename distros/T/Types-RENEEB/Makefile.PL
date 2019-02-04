@@ -23,11 +23,11 @@ my %WriteMakefileArgs = (
     "Types::Standard" => "1.004004"
   },
   "TEST_REQUIRES" => {
-    "Moo" => 0,
+    "Moo" => "2.003004",
     "Pod::Coverage::TrustPod" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t t/dist/*.t t/otrs/*.t"
   }
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Module::CPANfile" => 0,
-  "Moo" => 0,
+  "Moo" => "2.003004",
   "Pod::Coverage::TrustPod" => 0,
   "Test::More" => 0,
   "Type::Library" => "1.004004",

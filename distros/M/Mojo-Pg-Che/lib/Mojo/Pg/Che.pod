@@ -1,0 +1,218 @@
+=pod
+
+=encoding utf-8
+
+Доброго всем
+
+=head1 Mojo::Pg::Che
+
+¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
+
+=head1 NAME
+
+Mojo::Pg::Che - mix of parent Mojo::Pg and DBI.pm
+
+=head1 DESCRIPTION
+
+See L<Mojo::Pg>
+
+=head1 VERSION
+
+Version 0.8551
+
+
+=head1 SYNOPSIS
+
+    use Mojo::Pg::Che;
+
+    my $pg = Mojo::Pg::Che->connect("dbname=test;", "postgres", 'pg-pwd', \%attrs, max_connections=>10);
+    # or
+    my $pg = Mojo::Pg::Che->new
+      ->dsn("DBI:Pg:dbname=test;")
+      ->username("postgres")
+      ->password('pg--pw')
+      ->options(\%attrs)
+      ->connect();
+    
+    # or
+    my $pg = Mojo::Pg::Che->new('pg://postgres@/test');
+    # or
+    my $pg = Mojo::Pg::Che->new(dsn=>"dbname=test;", username=>"postgres", password=>'pg-pwd', options=>\%attrs, max_connections=>10);
+    
+    #Parent
+    my $pg2 = Mojo::Pg::Che->new($pg);
+
+    # Bloking query
+    my $result = $pg->query('select ...', undef, @bind);
+    
+    # Non-blocking query
+    my $result = $pg->query('select ...', {Async => 1, ...}, @bind);
+    
+    # Cached query
+    my $result = $pg->query('select ...', {Cached => 1, ...}, @bind);
+    
+    # prepare sth
+    my $sth = $pg->prepare('select ...');
+    
+    # cached async sth
+    my $sth = $pg->prepare_cached('select ...', {Async => 1,},);
+    
+    # Non-blocking query for async sth
+    $pg->query($sth, undef, @bind, sub {my ($db, $err, $result) = @_; ...});
+    Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+    
+    
+    # Result non-blocking query for async sth
+    my $ref_cb = $pg->query($sth, {Async => 1,}, @bind,);
+    Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+    # Mojo::Pg::Results style
+    my res = $$ref_cb->()->hash;
+    # same DBI style
+    my $res  = $$ref_cb->()->fetchrow_hashref;
+    
+    # Mojo::Pg style
+    my $now = $pg->db->query('select now() as now')->hash->{now};
+    $pg->db->query('select pg_sleep(?::int), now() as now', undef, 2, $cb);
+    
+    # DBI style
+    my $now = $pg->selectrow_hashref('select now() as now')->{now};
+    my $now = $pg->db->selectrow_hashref('select now() as now')->{now};
+    
+    my $now = $pg->selectrow_array('select now() as now');
+
+=head2 Transaction syntax
+
+  eval {
+    my $tx = $pg->begin;
+    $tx->query('insert into foo (name) values (?)', 'bar');
+    $tx->do('insert into foo (name) values (?)', 'baz');
+    $tx->commit;
+  };
+  die $@ if $@;
+  
+  my $db = $pg->db;
+  $db->begin;
+  $db->do('insert into foo (name) values (?)', 'bazzzz');
+  $db->rollback;
+  $db->begin;
+  $db->query('insert into foo (name) values (?)', 'barrr');
+  $db->commit;
+
+=head1 Non-blocking query
+
+  my @results;
+  my $cb = sub {
+    my ($db, $err, $results) = @_;
+    die $err if $err;
+    push @results, $results;
+  };
+  $pg->query('select ?::date as d, pg_sleep(?::int)', undef, ("2016-06-$_", 1), $cb)
+    for 17..23;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+  like($_->hash->{d}, qr/2016-06-\d+/, 'correct async query')
+    for @results;
+
+
+
+=head1 METHODS
+
+All methods from parent module L<Mojo::Pg> are inherits and implements the following new ones.
+
+=head2 connect
+
+DBI-style of new object instance. See L<DBI#connect>
+
+=head2 db
+
+Overriden method of L<Mojo::Pg#db>. Because can first input param - DBI database handler (when prepared statement used).
+
+=head2 prepare
+
+Prepare and return DBI statement handler for query string.
+
+=head2 prepare_cached
+
+Prepare and return DBI cached statement handler for query string.
+
+=head2 query
+
+Like L<Mojo::Pg::Database#query> but input params - L<Mojo::Pg::Che#Params-for-quering-methods>
+
+Blocking query without attr B<Async> or callback.
+
+Non-blocking query with attr B<Async> or callback.
+
+=head2 select
+
+Same method C<query>.
+
+=head2 selectrow_array
+
+DBI style quering. See L<DBI#selectrow_array>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che#Params-for-quering-methods>.
+
+=head2 selectrow_arrayref
+
+DBI style quering. See L<DBI#selectrow_arrayref>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che#Params-for-quering-methods>.
+
+=head2 selectrow_hashref
+
+DBI style quering. See L<DBI#selectrow_hashref>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che#Params-for-quering-methods>.
+
+=head2 selectall_arrayref
+
+DBI style quering. See L<DBI#selectall_arrayref>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che#Params-for-quering-methods>.
+
+=head2 selectall_hashref
+
+DBI style quering. See L<DBI#selectall_hashref>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che#Params-for-quering-methods>.
+
+=head2 selectcol_arrayref
+
+DBI style quering. See L<DBI#selectcol_arrayref>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che#Params-for-quering-methods>.
+
+=head2 do
+
+DBI style quering. See L<DBI#do>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che#Params-for-quering-methods>.
+
+=head2 begin
+
+Start transaction and return new L<Mojo::Pg::Che::Database> object which attr C< {tx} > is a L<Mojo::Pg::Transaction> object. Sinonyms are: C<< ->tx >> and C<< ->begin_work >>.
+
+=head1 Params for quering methods
+
+The methods C<query>, C<select...>, C<do> has next ordered input params:
+
+=over 4
+
+=item * String query | statement handler object
+
+=item * Hashref attrs (optional)
+
+=item * Array of bind values (optional)
+
+=item * Last param - callback/coderef for non-blocking (optional)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mojo::Pg>
+
+L<DBI>
+
+=head1 AUTHOR
+
+Михаил Че (Mikhail Che), C<< <mche[-at-]cpan.org> >>
+
+=head1 BUGS / CONTRIBUTING
+
+Please report any bugs or feature requests at L<https://github.com/mche/Mojo-Pg-Che/issues>. Pull requests also welcome.
+
+=head1 COPYRIGHT
+
+Copyright 2016+ Mikhail Che.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

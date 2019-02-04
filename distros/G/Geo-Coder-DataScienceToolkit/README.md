@@ -5,7 +5,7 @@ http://www.datasciencetoolkit.org/
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
@@ -32,8 +32,8 @@ a free geocode database covering the US and UK.
 
     $location = $geocoder->geocode(location => $location);
 
-    print 'Latitude: ', $location->{'latt'}, "\n";
-    print 'Longitude: ', $location->{'longt'}, "\n";
+    print 'Latitude: ', $location->{'results'}[0]->{'geometry'}->{'location'}->{'lat'}, 38.90, 1e-2); "\n";
+    print 'Longitude: ', delta_within($location->{'results'}[0]->{'geometry'}->{'location'}->{'lng'}, -77.04, 1e-2); "\n";
 
     @locations = $geocoder->geocode('Portland, USA');
     diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
@@ -53,9 +53,8 @@ You can also set your own User-Agent object:
 
 ## reverse\_geocode
 
-    $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
-
-Similar to geocode except it expects a latitude/longitude parameter.
+Reverse geocoding is not supported by datasciencetoolkit.org, so calls to
+this will generate an error.
 
 # AUTHOR
 

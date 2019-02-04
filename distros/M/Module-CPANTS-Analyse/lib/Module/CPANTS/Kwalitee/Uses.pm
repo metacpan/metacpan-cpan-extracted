@@ -2,11 +2,11 @@ package Module::CPANTS::Kwalitee::Uses;
 use warnings;
 use strict;
 use File::Spec::Functions qw(catfile);
-use Module::ExtractUse 0.33;
+use Perl::PrereqScanner::NotQuiteLite 0.9901;
 use List::Util 1.33 qw/none/;
 use version;
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 $VERSION =~ s/_//; ## no critic
 
 # These equivalents should be reasonably well-known and, preferably,
@@ -22,7 +22,7 @@ our @STRICT_WARNINGS_EQUIV = qw(
   Any::Moose
   Catmandu::Sane Coat
   Dancer
-  Mo
+  Mo Mu
   Modern::Perl
   Moo Moo::Role
   Moose Moose::Role Moose::Exporter
@@ -30,6 +30,7 @@ our @STRICT_WARNINGS_EQUIV = qw(
   MooseX::Declare MooseX::Role::Parameterized MooseX::Types
   Mouse Mouse::Role
   perl5 perl5i::1 perl5i::2 perl5i::latest
+  Pegex::Base
   Role::Tiny
   strictures
 );
@@ -56,113 +57,116 @@ sub analyse {
     # NOTE: all files in xt/ should be ignored because they are
     # for authors only and their dependencies may not be (and
     # often are not) listed in meta files.
-    my @tests = grep {m|^t\b.*\.t|} sort keys %$files;
-    $me->d->{test_files} = \@tests;
+    my @test_files = grep {m!^t\b.*\.t!} sort keys %$files;
+    $me->d->{test_files} = \@test_files;
 
-    my @test_modules = map {
+    my %test_modules = map {
         my $m = $_;
         $m =~ s|\.pm$||;
-        $m =~ s|^t/(?:lib/)?||;
         $m =~ s|/|::|g;
-        $m;
+        ($m => $_)
     } grep {m|^t\b.*\.pm$|} keys %$files;
-    my %test_modules = map {$_ => 1} @test_modules;
 
-    my %skip = map {$_->{module} => 1} @$modules;
+    my %skip=map {$_->{module}=>1 } @$modules;
+
+    # d->{versions} (from SiteKwalitee) knows inner packages as well
+    if (my $versions = $me->d->{versions}) {
+        for my $file (keys %$versions) {
+            for my $module (keys %{$versions->{$file}}) {
+                $skip{$module} = 1;
+            }
+        }
+    }
+
     my %uses;
 
-    # used in modules
-    foreach my $module (@$modules) {
-        my $combined = $class->_extract_use($me, $module->{file});
-        for my $key (keys %$combined) {
-            for my $mod (keys %{$combined->{$key}}) {
-                next if $skip{$mod};
-                $uses{$key.'_in_code'}{$mod} += $combined->{$key}{$mod};
-            }
-        }
-    }
+    my $scanner = Perl::PrereqScanner::NotQuiteLite->new(
+        parsers => [':bundled'],
+        suggests => 1,
+        recommends => 1,
+        quick => 1,
+    );
     
-    # used in tests
-    foreach my $tf (@tests) {
-        my $combined = $class->_extract_use($me, $tf);
-        for my $key (keys %$combined) {
-            for my $mod (keys %{$combined->{$key}}) {
-                next if $mod =~ /^t::/;
-                next if $skip{$mod};
-                next if $test_modules{$mod};
-                $uses{$key.'_in_tests'}{$mod} += $combined->{$key}{$mod};
-            }
-        }
+    # modules
+    my @module_files = map {$_->{file}} grep {!$_->{not_exists}} @$modules;
+
+    # Makefile.PL runs other Makefile.PL files at configure time (except ones under t)
+    # Build.PL runs other *.PL files at build time
+    my @configure_files = grep {/(?:^Build|\bMakefile)\.PL$/ && !/^t[\\\/]/} @{$me->d->{files_array} || []};
+    my %configure_files_map = map {$_ => 1} @configure_files;
+
+    # Other *.PL files (including lib/Build.PL) would (probably) be run at bulid time
+    my @build_files = grep {/\.PL$/ && !/^t[\\\/]/ && !$configure_files_map{$_}} @{$me->d->{files_array} || []};
+
+    $uses{runtime} = $class->_scan($scanner, $files, $distdir, \@module_files);
+    $uses{configure} = $class->_scan($scanner, $files, $distdir, \@configure_files);
+    $uses{build} = $class->_scan($scanner, $files, $distdir, \@build_files);
+    $uses{test} = $class->_scan($scanner, $files, $distdir, \@test_files);
+
+    # See also .pm files under t (only) if they are used in .t files
+    my $test_requirements = $uses{test}{requires}->as_string_hash;
+    my @test_pmfiles;
+    for my $module (keys %$test_requirements) {
+        push @test_pmfiles, $test_modules{$module} if $test_modules{$module};
+    }
+    my $additional_test_requirements = $class->_scan($scanner, $files, $distdir, \@test_pmfiles);
+    for my $relationship (keys %$additional_test_requirements) {
+        $uses{test}{$relationship} = ($uses{test}{$relationship})
+            ? $uses{test}{$relationship}->add_requirements($additional_test_requirements->{$relationship})
+            : $additional_test_requirements->{$relationship};
     }
 
-    # used in Makefile.PL/Build.PL
-    foreach my $f (grep /\b(?:Makefile|Build)\.PL$/, @{$me->d->{files_array} || []}) {
-        my $combined = $class->_extract_use($me, $f);
-        for my $key (keys %$combined) {
-            for my $mod (keys %{$combined->{$key}}) {
-                next if $skip{$mod};
-                $uses{$key.'_in_config'}{$mod} += $combined->{$key}{$mod};
+    for my $phase (keys %uses) {
+        for my $relationship (keys %{$uses{$phase}}) {
+            my $requirements = $uses{$phase}{$relationship}->as_string_hash;
+            for my $requirement (keys %$requirements) {
+                if (
+                    $skip{$requirement}
+                    or $requirement =~ /^(?:inc|t)::/
+                    or ($phase eq 'test' and $test_modules{$requirement})
+                ) {
+                    delete $requirements->{$requirement};
+                }
+            }
+            if (%$requirements) {
+                $uses{$phase}{$relationship} = $requirements;
+            } else {
+                delete $uses{$phase}{$relationship};
             }
         }
+        delete $uses{$phase} unless %{$uses{$phase}};
     }
 
     $me->d->{uses} = \%uses;
     return;
 }
 
-sub _extract_use {
-    my ($class, $me, $path) = @_;
-    my $file = catfile($me->distdir, $path);
-    $file =~ s|\\|/|g;
-    return unless -f $file;
+sub _scan {
+    my ($class, $scanner, $files_hash, $distdir, $files) = @_;
 
-    my $p = Module::ExtractUse->new;
-    $p->extract_use($file);
+    my @methods = qw/requires recommends suggests noes/;
+    my %reqs = map {$_ => CPAN::Meta::Requirements->new} @methods;
+    for my $file (@$files) {
+        my $ctx = $scanner->scan_file("$distdir/$file");
 
-    # used actually contains required/noed
-    my %used = %{ $p->used || {} };
-    my %required = %{ $p->required || {} };
-    my %noed = %{ $p->noed || {} };
+        # There may be broken files (intentionally, or unintentionally, esp in tests)
+        if (@{$ctx->{errors} || []}) {
+            $files_hash->{$file}{scan_error} = 1;
+        }
 
-    my %combined;
-    for my $mod (keys %used) {
-        next if $mod =~ /::$/; # see RT#35092
-        next unless $mod =~ /^(?:v?5\.[0-9.]+|[A-za-z0-9:_]+)$/;
-        $combined{used}{$mod} += $used{$mod};
-        if (my $used_in_eval = $p->used_in_eval($mod)) {
-            $combined{used_in_eval}{$mod} += $used_in_eval;
-            $combined{used}{$mod} -= $used_in_eval;
+        if ($ctx->{perl6}) {
+            $files_hash->{$file}{perl6} = 1;
+            next;
         }
-        if ($required{$mod}) {
-            $combined{used}{$mod} -= $required{$mod};
-            $combined{required}{$mod} += $required{$mod};
-            if (my $required_in_eval = $p->required_in_eval($mod)) {
-                $combined{used}{$mod} += $required_in_eval;
-                $combined{used_in_eval}{$mod} -= $required_in_eval;
-                $combined{required}{$mod} -= $required_in_eval;
-                $combined{required_in_eval}{$mod} += $required_in_eval;
-            }
-        }
-        if ($noed{$mod}) {
-            $combined{used}{$mod} -= $noed{$mod};
-            $combined{noed}{$mod} += $noed{$mod};
-            if (my $noed_in_eval = $p->noed_in_eval($mod)) {
-                $combined{used}{$mod} += $noed_in_eval;
-                $combined{used_in_eval}{$mod} -= $noed_in_eval;
-                $combined{noed}{$mod} -= $noed_in_eval;
-                $combined{noed_in_eval}{$mod} += $noed_in_eval;
-            }
-        }
-        for (qw/used used_in_eval required noed/) {
-            delete $combined{$_}{$mod} unless $combined{$_}{$mod};
+        for my $method (@methods) {
+            my $requirements = $ctx->$method;
+            my $hash = $requirements->as_string_hash;
+            next unless %$hash;
+            $files_hash->{$file}{$method} = $hash;
+            $reqs{$method} = $reqs{$method}->add_requirements($requirements);
         }
     }
-
-    for my $key (keys %combined) {
-        next unless %{$combined{$key}};
-        $me->d->{files_hash}{$path}{$key} = [sort keys %{$combined{$key}}];
-    }
-    return \%combined;
+    return \%reqs;
 }
 
 ##################################################################
@@ -186,19 +190,18 @@ sub kwalitee_indicators {
                 for my $file (keys %$files) {
                     next unless exists $files->{$file}{module};
                     next if $files->{$file}{unreadable};
+                    next if $files->{$file}{perl6};
                     next if $file =~ /\.pod$/;
                     my $module = $files->{$file}{module};
-                    my %used;
-                    for my $key (qw/used required/) {
-                        next unless exists $files->{$file}{$key};
-                        $used{$_} = 1 for @{$files->{$file}{$key} || []};
+                    my $requires = $files->{$file}{requires} || {};
+                    my $required_perl = $requires->{perl};
+                    if (defined $required_perl) {
+                        $required_perl =~ s/_//;  # tweak 5.008_001 and the likes for silence
+                        next if version->parse($required_perl)->numify >= $perl_version_with_implicit_stricture;
                     }
-                    next if grep {
-                      (/^v?5\./ && version->parse($_)->numify >= $perl_version_with_implicit_stricture) or /^v6\b/
-                    } keys %used;
 
                     # There are lots of acceptable strict alternatives
-                    push @no_strict, $module if none {exists $used{$_}} (@STRICT_EQUIV, @STRICT_WARNINGS_EQUIV);
+                    push @no_strict, $module if none {exists $requires->{$_}} (@STRICT_EQUIV, @STRICT_WARNINGS_EQUIV);
                 }
                 if (@no_strict) {
                     $d->{error}{use_strict} = join ", ", sort @no_strict;
@@ -225,15 +228,11 @@ sub kwalitee_indicators {
                 for my $file (keys %$files) {
                     next unless exists $files->{$file}{module};
                     next if $files->{$file}{unreadable};
+                    next if $files->{$file}{perl6};
                     next if $file =~ /\.pod$/;
                     my $module = $files->{$file}{module};
-                    my %used;
-                    for my $key (qw/used required/) {
-                        next unless exists $files->{$file}{$key};
-                        $used{$_} = 1 for @{$files->{$file}{$key} || []};
-                    }
-                    next if grep {/^v6\b/} keys %used;
-                    push @no_warnings, $module if none {exists $used{$_}} (@WARNINGS_EQUIV, @STRICT_WARNINGS_EQUIV);
+                    my $requires = $files->{$file}{requires} || {};
+                    push @no_warnings, $module if none {exists $requires->{$_}} (@WARNINGS_EQUIV, @STRICT_WARNINGS_EQUIV);
                 }
                 if (@no_warnings) {
                     $d->{error}{use_warnings} = join ", ", sort @no_warnings;

@@ -6,6 +6,6 @@ package Locale::CLDR::Transformations;
 
 use version;
 
-our VERSION = version->declare('v0.33.1');
+our VERSION = version->declare('v0.34.0');
 
 1;

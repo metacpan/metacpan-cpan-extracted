@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mgo - Package for language Metaʼ
 
 package Locale::CLDR::Locales::Mgo;
 # This file auto generated from Data\common\main\mgo.xml
-#	on Sun  7 Oct 10:45:36 am GMT
+#	on Sun  3 Feb  2:04:42 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -565,11 +565,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'abbreviated' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'wide' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
@@ -655,10 +655,10 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			d => q{d},
 		},
-		'gregorian' => {
+		'generic' => {
 			d => q{d},
 		},
 	} },
@@ -677,10 +677,10 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			fallback => '{0} – {1}',
 		},
-		'gregorian' => {
+		'generic' => {
 			fallback => '{0} – {1}',
 		},
 	} },

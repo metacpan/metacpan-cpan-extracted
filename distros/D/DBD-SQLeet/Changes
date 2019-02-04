@@ -1,5 +1,8 @@
 Changes for DBD::SQLeet CPAN module
 
+0.26.0 2019-03-02
+  - sqleet version 0.26.0
+
 0.24.3 2018-31-08
   - removal of obsolete test code
   - documentation update

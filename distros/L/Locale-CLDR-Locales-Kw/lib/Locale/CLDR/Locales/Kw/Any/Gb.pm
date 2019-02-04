@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Kw::Any::Gb - Package for language Cornish
 
 package Locale::CLDR::Locales::Kw::Any::Gb;
 # This file auto generated from Data\common\main\kw_GB.xml
-#	on Sun  7 Oct 10:43:15 am GMT
+#	on Sun  3 Feb  2:02:01 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

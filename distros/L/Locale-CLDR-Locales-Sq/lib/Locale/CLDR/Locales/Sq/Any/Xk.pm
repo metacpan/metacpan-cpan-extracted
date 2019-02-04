@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sq::Any::Xk - Package for language Albanian
 
 package Locale::CLDR::Locales::Sq::Any::Xk;
 # This file auto generated from Data\common\main\sq_XK.xml
-#	on Sun  7 Oct 10:59:10 am GMT
+#	on Sun  3 Feb  2:18:48 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -35,31 +35,31 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
 				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 400
 						&& $time < 900;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
 					return 'night1' if $time >= 0
 						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}

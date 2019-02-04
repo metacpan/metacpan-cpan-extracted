@@ -60,7 +60,12 @@ cmp_deeply(
 diag 'got log messages: ', explain \$tzil->log_messages
     if not Test::Builder->new->is_passing;
 PLUGIN
-        : 'use ' . $dist->name =~ s/-/::/gr . ';'
-            . "\n\nfail('this test is TODO!');"
+        : 'use ' . $dist->name =~ s/-/::/gr . ';' . <<'__EOF__'
+
+TODO: {
+  local $TODO = "Write some tests!" ;
+  fail('this test is TODO!');
+}
+__EOF__
 }}
 done_testing;

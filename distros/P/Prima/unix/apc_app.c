@@ -23,6 +23,7 @@
 #endif
 
 UnixGuts guts, *pguts = &guts;
+static XErrorEvent *save_xerror_event = NULL;
 
 UnixGuts *
 prima_unix_guts(void)
@@ -33,12 +34,18 @@ prima_unix_guts(void)
 static int
 x_error_handler( Display *d, XErrorEvent *ev)
 {
-	int tail = guts. ri_tail; 
+	int tail = guts. ri_tail;
 	int prev = tail;
 	char *name = "Prima";
 	char buf[BUFSIZ];
 	char mesg[BUFSIZ];
 	char number[32];
+
+	if ( save_xerror_event ) {
+		*save_xerror_event = *ev;
+		save_xerror_event = NULL;
+		return 0;
+	}
 
 	while ( tail != guts. ri_head) {
 		if ( guts. ri[ tail]. request > ev-> serial)
@@ -59,9 +66,9 @@ x_error_handler( Display *d, XErrorEvent *ev)
 
 #ifdef NEED_X11_EXTENSIONS_XRENDER_H
 	if ( ev-> request_code == guts. xft_xrender_major_opcode &&
-		ev-> request_code > 127 && 
+		ev-> request_code > 127 &&
 		ev-> error_code == BadLength)
-		/* Xrender large polygon request failed */ 
+		/* Xrender large polygon request failed */
 		guts. xft_disable_large_fonts = 1;
 #endif
 
@@ -92,6 +99,21 @@ x_error_handler( Display *d, XErrorEvent *ev)
 					guts. ri[ tail]. file, guts. ri[ tail]. line);
 	return 0;
 }
+
+void
+prima_save_xerror_event( XErrorEvent *xr)
+{
+	bzero( xr, sizeof(XErrorEvent));
+	save_xerror_event = xr;
+}
+
+void
+prima_restore_xerror_event( XErrorEvent *xr)
+{
+	save_xerror_event = NULL;
+	if ( xr && xr->display != NULL) x_error_handler( xr-> display, xr);
+}
+
 
 static int
 x_io_error_handler( Display *d)
@@ -143,7 +165,8 @@ static char* do_display = NULL;
 static int   do_debug   = 0;
 static Bool  do_icccm_only = false;
 static Bool  do_no_shmem   = false;
-static Bool  do_no_gtk   = false;
+static Bool  do_no_gtk     = false;
+static Bool  do_no_quartz  = false;
 
 static Bool
 init_x11( char * error_buf )
@@ -200,7 +223,7 @@ init_x11( char * error_buf )
 		"_NET_WORKAREA",
 		"_NET_WM_STATE_ABOVE"
 	};
-	char hostname_buf[256], *hostname = hostname_buf;
+	char hostname_buf[256], *hostname = hostname_buf, *env;
 
 	guts. click_time_frame = 200;
 	guts. double_click_time_frame = 200;
@@ -211,10 +234,10 @@ init_x11( char * error_buf )
 
 	guts. ri_head = guts. ri_tail = 0;
 	DISP = XOpenDisplay( do_display);
-	
+
 	if (!DISP) {
 		char * disp = getenv("DISPLAY");
-		snprintf( error_buf, 256, "Error: Can't open display '%s'", 
+		snprintf( error_buf, 256, "Error: Can't open display '%s'",
 					do_display ? do_display : (disp ? disp : ""));
 		free( do_display);
 		do_display = nil;
@@ -261,21 +284,21 @@ init_x11( char * error_buf )
 		int dummy;
 		if ( XRRQueryExtension( DISP, &dummy, &dummy))
 			guts. randr_extension = true;
-	}	 
+	}
 #endif
 #ifdef HAVE_X11_EXTENSIONS_XRENDER_H
 	{
 		int dummy;
 		if ( XRenderQueryExtension( DISP, &dummy, &dummy))
 			guts. render_extension = true;
-	}	 
+	}
 #endif
 #ifdef HAVE_X11_EXTENSIONS_XCOMPOSITE_H
 	{
 		int dummy;
 		if (XQueryExtension(DISP, COMPOSITE_NAME, &guts.composite_opcode, &dummy, &dummy))
 			guts. composite_extension = true;
-	}	 
+	}
 #endif
 	XrmInitialize();
 	guts.db = get_database();
@@ -328,7 +351,7 @@ init_x11( char * error_buf )
 							&guts. cursor_height);
 #endif
 	XCHECKPOINT;
-	
+
 	TAILQ_INIT( &guts.paintq);
 	TAILQ_INIT( &guts.peventq);
 	TAILQ_INIT( &guts.bitmap_gc_pool);
@@ -341,8 +364,12 @@ init_x11( char * error_buf )
 	guts. ximages = hash_create();
 	gcv. graphics_exposures = false;
 	guts. menugc = XCreateGC( DISP, guts. root, GCGraphicsExposures, &gcv);
-	guts. resolution. x = 25.4 * guts. displaySize. x / DisplayWidthMM( DISP, SCREEN) + .5;
-	guts. resolution. y = 25.4 * DisplayHeight( DISP, SCREEN) / DisplayHeightMM( DISP, SCREEN) + .5;
+	guts. resolution. x = ( DisplayWidthMM( DISP, SCREEN) > 0) ? 
+		25.4 * guts. displaySize. x / DisplayWidthMM( DISP, SCREEN) + .5:
+		96;
+	guts. resolution. y = ( DisplayHeightMM( DISP, SCREEN) > 0) ? 
+		25.4 * DisplayHeight( DISP, SCREEN) / DisplayHeightMM( DISP, SCREEN) + .5:
+		96;
 	guts. depth = DefaultDepth( DISP, SCREEN);
 	guts. idepth = get_idepth();
 	if ( guts.depth == 1) guts. qdepth = 1; else
@@ -358,7 +385,7 @@ init_x11( char * error_buf )
 	else {
 		sprintf( error_buf, "UAA_001: weird machine byte order: %08x", BYTEORDER);
 		return false;
-	}  
+	}
 
 	XInternAtoms( DISP, atom_names, AI_count, 0, guts. atoms);
 
@@ -382,6 +409,9 @@ init_x11( char * error_buf )
 #ifdef WITH_GTK
 	guts. use_gtk = do_no_gtk ? false : ( prima_gtk_init() != NULL );
 #endif
+#ifdef WITH_COCOA
+	guts. use_quartz = !do_no_quartz;
+#endif
 	bzero( &guts. cursor_gcv, sizeof( guts. cursor_gcv));
 	guts. cursor_gcv. cap_style = CapButt;
 	guts. cursor_gcv. function = GXcopy;
@@ -389,8 +419,14 @@ init_x11( char * error_buf )
 	gethostname( hostname, 256);
 	hostname[255] = '\0';
 	XStringListToTextProperty((char **)&hostname, 1, &guts. hostname);
-	
+
 	guts. net_wm_maximization = prima_wm_net_state_read_maximization( guts. root, NET_SUPPORTED);
+
+	env = getenv("XDG_SESSION_TYPE");
+	if (( env != NULL) && (strcmp(env, "wayland") == 0)) {
+		guts. is_xwayland = true;
+		Mdebug("XWayland detected\n");
+	}
 
 	if ( do_sync) XSynchronize( DISP, true);
 	return true;
@@ -402,7 +438,7 @@ window_subsystem_init( char * error_buf)
 	bzero( &guts, sizeof( guts));
 	guts. debug = do_debug;
 	guts. icccm_only = do_icccm_only;
-	Mdebug("init x11:%d, debug:%x, sync:%d, display:%s\n", do_x11, guts.debug, 
+	Mdebug("init x11:%d, debug:%x, sync:%d, display:%s\n", do_x11, guts.debug,
 			do_sync, do_display ? do_display : "(default)");
 	if ( do_x11) {
 		Bool ret = init_x11( error_buf );
@@ -457,10 +493,13 @@ window_subsystem_get_options( int * argc, char *** argv)
 #ifdef WITH_GTK
 	"no-gtk",        "do not use GTK",
 #endif
-	"font", 
+#ifdef WITH_COCOA
+	"no-quartz",     "do not use Quartz",
+#endif
+	"font",
 #ifdef USE_XFT
 				"default prima font in XLFD (-helv-misc-*-*-) or XFT(Helv-12) format",
-#else      
+#else
 				"default prima font in XLFD (-helv-misc-*-*-) format",
 #endif
 	"menu-font", "default menu font",
@@ -509,6 +548,10 @@ window_subsystem_set_option( char * option, char * value)
 	} else if ( strcmp( option, "no-gtk") == 0) {
 		if ( value) warn("`--no-gtk' option has no parameters");
 		do_no_gtk = true;
+		return true;
+	} else if ( strcmp( option, "no-quartz") == 0) {
+		if ( value) warn("`--no-quartz' option has no parameters");
+		do_no_quartz = true;
 		return true;
 	} else if ( strcmp( option, "debug") == 0) {
 		if ( !value) {
@@ -604,7 +647,7 @@ window_subsystem_done( void)
 	}
 	XCloseDisplay( DISP);
 	DISP = nil;
-	
+
 	plist_destroy( guts. files);
 	guts. files = nil;
 
@@ -617,11 +660,47 @@ window_subsystem_done( void)
 	prima_cleanup_font_subsystem();
 }
 
+static int
+can_access_root_screen(void)
+{
+	static int result = -1;
+	XImage * im;
+	XErrorEvent xr;
+
+	if ( result >= 0 ) return result;
+	result = 0;
+
+	XFlush(DISP);
+	prima_save_xerror_event(&xr);
+	im = XGetImage( DISP, guts.root, 0, 0, 1, 1, AllPlanes, ZPixmap); /* XWayland fails here */
+	prima_restore_xerror_event(NULL);
+	if (im == NULL) goto EXIT;
+
+	XDestroyImage( im);
+
+#ifdef WITH_GTK_NONX11
+	/* detect XQuartz */
+	{
+		char * display_str = getenv("DISPLAY");
+		if ( display_str ) {
+			struct stat s;
+			if ((stat( display_str, &s) >= 0) && S_ISSOCK(s.st_mode))  /* is a socket */
+				goto EXIT;
+		}
+	}
+#endif
+
+	result = 1;
+EXIT:
+	return result;
+}
+
 Bool
 apc_application_begin_paint( Handle self)
 {
 	DEFXX;
 	if ( guts. appLock > 0) return false;
+	if ( !can_access_root_screen()) return false;
 	prima_prepare_drawable_for_painting( self, false);
 	XX-> flags. force_flush = 1;
 	return true;
@@ -721,27 +800,29 @@ apc_application_end_paint_info( Handle self)
 int
 apc_application_get_gui_info( char * description, int len)
 {
+	int ret = guiXLib;
+	if ( description)
+		strncpy( description, "X Window System", len);
+
 #ifdef WITH_GTK
 	if ( guts. use_gtk ) {
 		if ( description) {
+			strncat( description, " + GTK", len);
 #ifdef WITH_GTK_NONX11
-			strncpy( description, "X Window System + GTK", len);
-#else
-			strncpy( description, "X Window System + XQuartz + GTK", len);
+			strncat( description, " with native support", len);
 #endif
-#define _xstr(s) #s
-			strncpy( description, _xstr(WITH_GTK), len);
-#undef _xstr
-			description[len-1] = 0;
+#ifdef WITH_COCOA
+			if ( guts. use_quartz)
+				strncat( description, " + Cocoa", len);
+#endif
 		}
-		return guiGTK;
+		ret = guiGTK;
 	}
 #endif
-	if ( description) {
-		strncpy( description, "X Window System", len);
+
+	if ( description)
 		description[len-1] = 0;
-	}
-	return guiXLib;
+	return ret;
 }
 
 Handle
@@ -780,15 +861,15 @@ wm_net_get_current_workarea( Rect * r)
 
 	if ( guts. icccm_only) return false;
 
-	desktop = ( unsigned long *) prima_get_window_property( guts. root, 
-					NET_CURRENT_DESKTOP, XA_CARDINAL, 
+	desktop = ( unsigned long *) prima_get_window_property( guts. root,
+					NET_CURRENT_DESKTOP, XA_CARDINAL,
 					NULL, NULL,
 					&n);
 	if ( desktop == NULL || n < 1) goto EXIT;
 	Mdebug("wm: current desktop = %d\n", *desktop);
-	
-	workarea = ( unsigned long *) prima_get_window_property( guts. root, 
-					NET_WORKAREA, XA_CARDINAL, 
+
+	workarea = ( unsigned long *) prima_get_window_property( guts. root,
+					NET_WORKAREA, XA_CARDINAL,
 					NULL, NULL,
 					&n);
 	if ( desktop == NULL || n < 1 || n <= *desktop ) goto EXIT;
@@ -908,7 +989,7 @@ apc_application_get_monitor_rects( Handle self, int * nrects)
 		*nrects = 0;
 	}
 	return ret;
-#else   
+#else
 	*nrects = 0;
 	return nil;
 #endif

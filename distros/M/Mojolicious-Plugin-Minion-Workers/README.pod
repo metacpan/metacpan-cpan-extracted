@@ -8,7 +8,7 @@
 
 =head1 VERSION
 
-0.09074 (up to Minion 9.07/100+C<my minors>)
+0.09075 (up to Minion 9.07/100+C<minor>)
 
 =head1 NAME
 
@@ -19,18 +19,21 @@ on manage Minion workers.
 
   # Mojolicious (define amount workers in config)
   $self->plugin('Minion::Workers' => {Pg => ..., workers=>2});
-  # or pass to $app->minion->manage_workers(<num>) later
+  # or pass to $app->minion->workers-.manage(<num>) later
   $self->plugin('Minion::Workers' => {Pg => ...});
 
   # Mojolicious::Lite (define amount workers in config)
   plugin 'Minion::Workers' => {Pg => ..., workers=>2};
 
   # Add tasks to your application
-  app->minion->add_task(slow_log => sub {
-    my ($job, $msg) = @_;
+  app->minion->add_task(something_slow => sub {
+    my ($job, @args) = @_;
     sleep 5;
-    $job->app->log->debug(qq{Received message "$msg"});
+    say 'This is a background worker process.';
   });
+  
+  # But you can define tasks in config as well
+  $self->plugin('Minion::Workers' => {Pg => ..., tasks => { foo_task => sub { ... }, }, });
   
   # Start manage with amount workers
   app->minion->workers->manage(4);
@@ -43,6 +46,21 @@ on manage Minion workers.
 
 L<Mojolicious::Plugin::Minion::Workers> is a L<Mojolicious> plugin for the L<Minion> job
 queue and has extending base L<Mojolicious::Plugin::Minion> for enable workers managment.
+
+=head1 Extend base plugin config
+
+L<Mojolicious::Plugin::Minion::Workers> apply all config options of the base plugin L<Mojolicious::Plugin::Minion>,
+and define following
+
+=head2 workers(integer)
+
+Amount of Minion workers need to start/restart. This value can be overriden on C< $app->minion->workers->manage(...) >.
+
+=head2 tasks(hashref)
+
+You can define Minion tasks in config.
+
+  ..., tasks => { foo_task => sub { ... }, },
 
 =head1 Manage workers
 
@@ -58,26 +76,26 @@ None workers mean skip managment.
 
 Tested on standard commands (on Linux):
 
-  $ perl script/app.pl daemon      # one minion worker will be starting
+  $ perl script/app.pl daemon       # one minion worker will be starting
   $ perl script/app.pl prefork        # your amount minion workers will be starting
-  $ morbo script/app.pl                  # when morbo restarts on watch changes one minion worker will be restarting too
+  $ morbo script/app.pl                 # when morbo restarts on watch changes one minion worker will be restarting too
   $ hypnotoad script/app.pl           # your amount minion workers will be starting
   $ hypnotoad script/app.pl           # on hot deploy minion workers will be restarting too
   $ hypnotoad -s script/app.pl        # minion workers will stoping too
 
 B<NOTE>. For commands C<$ morbo script/app.pl> and C<$ perl script/app.pl daemon>
-workers always one.
+amount workers always one process.
 
 B<NOTE>. In case hypnotoad and C<$ kill -USR2 app_pid> minion workers will not restarts, sorry.
-Always use command C<$ hypnotoad script/app.pl>.
+Always use hot deploy command C<$ hypnotoad script/app.pl>.
 
 B<BIG NOTE>. When minion workers restarts (hypnotoad | morbo) then B<ALL> exists minion processes stoped.
 So if you run many separate apps with one database backend then dont use this module.
-Or set separate backends as well.
+Or set separate backend databases as well.
 
 =head1 HELPERS
 
-L<Mojolicious::Plugin::Minion::Workers> enable all helpers trough base plugin L<Mojolicious::Plugin::Minion>,
+L<Mojolicious::Plugin::Minion::Workers> enable all helpers through base plugin L<Mojolicious::Plugin::Minion>,
 thus you dont need apply base plugin (auto register).
 
 =head1 METHODS

@@ -7,11 +7,15 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'lib/Banal/Dist/Zilla/Role/PluginBundle/Easier.pm',
+    'lib/Banal/Dist/Zilla/Role/Text/Template/Selfish.pm',
     'lib/Dist/Zilla/MintingProfile/Author/TABULO.pm',
     'lib/Dist/Zilla/PluginBundle/Author/TABULO.pm',
+    'lib/Dist/Zilla/PluginBundle/Author/TABULO/Config.pm',
     'lib/Pod/Weaver/PluginBundle/Author/TABULO.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/00-use.t',
     't/01-pluginbundle-basic.t',
     't/02-minter-github.t',
     't/03-pluginbundle-server.t',
@@ -37,9 +41,11 @@ my @files = (
     't/lib/NoPrereqChecks.pm',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',
+    'xt/author/changes_has_content.t',
     'xt/author/clean-namespaces.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
+    'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
     'xt/author/no-tabs.t',
     'xt/author/pod-spell.t',
@@ -47,8 +53,7 @@ my @files = (
     'xt/author/portability.t',
     'xt/release/changes_has_content.t',
     'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t',
-    'xt/release/minimum-version.t'
+    'xt/release/distmeta.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

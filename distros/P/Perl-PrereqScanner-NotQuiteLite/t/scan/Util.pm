@@ -5,6 +5,7 @@ use warnings;
 use Test::More;
 use Perl::PrereqScanner::NotQuiteLite;
 use Exporter qw/import/;
+use if -d ".git", "Test::FailWarnings";
 
 our @EXPORT = (@Test::More::EXPORT, qw/test test_with_error/);
 

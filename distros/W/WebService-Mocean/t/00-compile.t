@@ -6,10 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'WebService/Mocean.pm'
+    'WebService/Mocean.pm',
+    'WebService/Mocean/Account.pm',
+    'WebService/Mocean/Client.pm',
+    'WebService/Mocean/Report.pm',
+    'WebService/Mocean/Sms.pm'
 );
 
 

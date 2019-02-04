@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.131;
+our $VERSION = 1.132;
 
 use Quiq::Hash;
 use Quiq::Html::List;
@@ -40,6 +40,20 @@ DOM-Id der Reiterleiste.
 =item tabs => \@arr (Default: [])
 
 Definition der Reiter.
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<Tabs Widget API|http://api.jqueryui.com/tabs/>
+
+=item *
+
+L<Tabs Widget Beispiele|http://jqueryui.com/tabs/>
 
 =back
 
@@ -184,21 +198,7 @@ sub html {
 
 =head1 VERSION
 
-1.131
-
-=head1 SEE ALSO
-
-=over 2
-
-=item *
-
-L<Tabs Widget API|http://api.jqueryui.com/tabs/>
-
-=item *
-
-L<Tabs Widget Beispiele|http://jqueryui.com/tabs/>
-
-=back
+1.132
 
 =head1 AUTHOR
 

@@ -20,8 +20,8 @@ XML::LibXML::Pattern - XML::LibXML::Pattern - interface to libxml2 XPath pattern
 
   print $reader->nodePath while $reader->nextPatternMatch($pattern);
 
-  $pattern = XML::LibXML::Pattern->new( pattern, { prefix => namespace_URI, ... } );
-  $bool = $pattern->matchesNode($node);
+  $pattern = XML::LibXML::Pattern-E<gt>new( pattern, { prefix =E<gt> namespace_URI, ... } );
+  $bool = $pattern-E<gt>matchesNode($node);
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ Patterns are particularly useful for stream parsing provided via the C<<<<<< XML
 
 =item new()
 
-  $pattern = XML::LibXML::Pattern->new( pattern, { prefix => namespace_URI, ... } );
+  $pattern = XML::LibXML::Pattern-E<gt>new( pattern, { prefix =E<gt> namespace_URI, ... } );
 
 The constructor of a pattern takes a pattern expression (as described by the
 BNF grammar above) and an optional HASH reference mapping prefixes to namespace
@@ -62,7 +62,7 @@ URIs. The method returns a compiled pattern object.
 
 Note that if the document has a default namespace, it must still be given an
 prefix in order to be matched (as demanded by the XPath 1.0 specification). For
-example, to match an element C<<<<<< <a xmlns="http://foo.bar"</a> >>>>>>, one should use a pattern like this:
+example, to match an element C<<<<<< E<lt>a xmlns="http://foo.bar"E<lt>/aE<gt> >>>>>>, one should use a pattern like this:
 
 
 
@@ -71,7 +71,7 @@ example, to match an element C<<<<<< <a xmlns="http://foo.bar"</a> >>>>>>, one s
 
 =item matchesNode($node)
 
-  $bool = $pattern->matchesNode($node);
+  $bool = $pattern-E<gt>matchesNode($node);
 
 Given an XML::LibXML::Node object, returns a true value if the node is matched
 by the compiled pattern expression.
@@ -94,7 +94,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0132
+2.0133
 
 =head1 COPYRIGHT
 

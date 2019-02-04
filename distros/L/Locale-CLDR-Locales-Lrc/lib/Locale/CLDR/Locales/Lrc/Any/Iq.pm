@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lrc::Any::Iq - Package for language Northern Luri
 
 package Locale::CLDR::Locales::Lrc::Any::Iq;
 # This file auto generated from Data\common\main\lrc_IQ.xml
-#	on Sun  7 Oct 10:44:29 am GMT
+#	on Sun  3 Feb  2:03:24 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

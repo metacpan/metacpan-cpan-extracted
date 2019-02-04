@@ -4,7 +4,7 @@ use strict;
 use File::Spec::Functions qw(catfile);
 use Array::Diff;
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 $VERSION =~ s/_//; ## no critic
 
 sub order { 100 }
@@ -145,7 +145,7 @@ L<Module::CPANTS::Analyse>
 
 =head1 AUTHOR
 
-Thomas Klausner, <domm@cpan.org>, http://domm.plix.at
+Thomas Klausner, <domm@cpan.org>, https://domm.plix.at/
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -22,25 +22,25 @@ name: Locale-CLDR-Locales-Ta
 provides:
   Locale::CLDR::Locales::Ta:
     file: lib/Locale/CLDR/Locales/Ta.pm
-    version: v0.33.1
+    version: v0.34.0
   Locale::CLDR::Locales::Ta::Any:
     file: lib/Locale/CLDR/Locales/Ta/Any.pm
-    version: v0.33.1
+    version: v0.34.0
   Locale::CLDR::Locales::Ta::Any::In:
     file: lib/Locale/CLDR/Locales/Ta/Any/In.pm
-    version: v0.33.1
+    version: v0.34.0
   Locale::CLDR::Locales::Ta::Any::Lk:
     file: lib/Locale/CLDR/Locales/Ta/Any/Lk.pm
-    version: v0.33.1
+    version: v0.34.0
   Locale::CLDR::Locales::Ta::Any::My:
     file: lib/Locale/CLDR/Locales/Ta/Any/My.pm
-    version: v0.33.1
+    version: v0.34.0
   Locale::CLDR::Locales::Ta::Any::Sg:
     file: lib/Locale/CLDR/Locales/Ta/Any/Sg.pm
-    version: v0.33.1
+    version: v0.34.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.33.1
+  Locale::CLDR: v0.34.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -50,5 +50,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.33.1
+version: v0.34.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

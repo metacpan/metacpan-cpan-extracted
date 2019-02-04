@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mgh - Package for language Makhuwa-Meetto
 
 package Locale::CLDR::Locales::Mgh;
 # This file auto generated from Data\common\main\mgh.xml
-#	on Sun  7 Oct 10:45:35 am GMT
+#	on Sun  3 Feb  2:04:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -412,11 +412,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{wichishu},
 					'pm' => q{mchochil’l},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'am' => q{wichishu},
 					'pm' => q{mchochil’l},
 				},

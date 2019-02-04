@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Os - Package for language Ossetic
 
 package Locale::CLDR::Locales::Os;
 # This file auto generated from Data\common\main\os.xml
-#	on Sun  7 Oct 10:53:06 am GMT
+#	on Sun  3 Feb  2:12:37 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -794,13 +794,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'wide' => {
+					'pm' => q{ӕмбисбоны фӕстӕ},
+					'am' => q{ӕмбисбоны размӕ},
+				},
 				'abbreviated' => {
 					'am' => q{AM},
 					'pm' => q{PM},
-				},
-				'wide' => {
-					'am' => q{ӕмбисбоны размӕ},
-					'pm' => q{ӕмбисбоны фӕстӕ},
 				},
 			},
 		},
@@ -884,7 +884,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -907,7 +907,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{y-'ӕм' 'азы' QQQ},
 			yQQQQ => q{y-'ӕм' 'азы' QQQQ},
 		},
-		'generic' => {
+		'gregorian' => {
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -946,7 +946,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -991,7 +991,7 @@ has 'datetime_formats_interval' => (
 				h => q{h–h a v},
 			},
 		},
-		'generic' => {
+		'gregorian' => {
 			H => {
 				H => q{HH–HH},
 			},

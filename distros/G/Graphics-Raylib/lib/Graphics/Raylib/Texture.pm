@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Texture;
 
 # ABSTRACT: Drawable Texture from Image
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 use List::Util qw(min max);
 use Graphics::Raylib::XS qw(:all);
@@ -23,7 +23,7 @@ Graphics::Raylib::Texture - Drawable Texture from Image
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

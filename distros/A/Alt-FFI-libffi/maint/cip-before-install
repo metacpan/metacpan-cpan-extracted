@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -ex
+
+cip sudo apt-get update
+cip sudo apt-get -y install libffi-dev
+
+# Platypus 0.81 should make this a configure
+# require that may make this unnecessary
+cip exec cpanm -n version ExtUtils::ParseXS

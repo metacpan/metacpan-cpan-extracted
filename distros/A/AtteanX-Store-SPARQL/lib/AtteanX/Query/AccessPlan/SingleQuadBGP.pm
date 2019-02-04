@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.010';
+our $VERSION   = '0.012';
 
 use Moo::Role;
 use AtteanX::Plan::SPARQLBGP;

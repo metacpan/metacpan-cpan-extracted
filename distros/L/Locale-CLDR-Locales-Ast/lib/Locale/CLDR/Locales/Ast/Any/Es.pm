@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ast::Any::Es - Package for language Asturian
 
 package Locale::CLDR::Locales::Ast::Any::Es;
 # This file auto generated from Data\common\main\ast_ES.xml
-#	on Sun  7 Oct 10:21:06 am GMT
+#	on Sun  3 Feb  1:39:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

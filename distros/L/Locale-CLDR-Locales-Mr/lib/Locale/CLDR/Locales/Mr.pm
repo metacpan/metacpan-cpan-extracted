@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mr - Package for language Marathi
 
 package Locale::CLDR::Locales::Mr;
 # This file auto generated from Data\common\main\mr.xml
-#	on Sun  7 Oct 10:46:56 am GMT
+#	on Sun  3 Feb  2:06:03 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1357,6 +1357,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(मुख्य दिशा),
+					},
 					'acre' => {
 						'name' => q(एकर),
 						'one' => q({0} एकर),
@@ -1386,6 +1389,11 @@ has 'units' => (
 						'name' => q(खगोलीय एकके),
 						'one' => q({0} खगोलीय एकक),
 						'other' => q({0} खगोलीय एकके),
+					},
+					'atmosphere' => {
+						'name' => q(वातावरण),
+						'one' => q({0} वातावरण),
+						'other' => q({0} वातावरण),
 					},
 					'bit' => {
 						'name' => q(बिट),
@@ -1903,6 +1911,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0} प्रति {1}),
 					},
+					'percent' => {
+						'name' => q(टक्के),
+						'one' => q({0} टक्के),
+						'other' => q({0} टक्के),
+					},
+					'permille' => {
+						'name' => q(प्रतिमैल),
+						'one' => q({0} प्रतिमैल),
+						'other' => q({0} प्रतिमैल),
+					},
+					'petabyte' => {
+						'name' => q(पेटाबाइट्स),
+						'one' => q({0} पेटाबाइट),
+						'other' => q({0} पेटाबाइट्स),
+					},
 					'picometer' => {
 						'name' => q(पिकोमीटर),
 						'one' => q({0} पिकोमीटर),
@@ -2054,6 +2077,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(दिशा),
+					},
 					'acre' => {
 						'one' => q({0}एकर),
 						'other' => q({0}एकर),
@@ -2310,6 +2336,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'name' => q(पिमी),
 						'one' => q({0}पिमी),
@@ -2381,6 +2412,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(दिशा),
+					},
 					'acre' => {
 						'name' => q(एकर),
 						'one' => q({0} एकर),
@@ -2410,6 +2444,11 @@ has 'units' => (
 						'name' => q(au),
 						'one' => q({0} au),
 						'other' => q({0} au),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(बिट),
@@ -2926,6 +2965,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(टक्के),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(प्रतिमैल),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PByte),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
 					},
 					'picometer' => {
 						'name' => q(पिमी),
@@ -3691,7 +3745,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(डॅनिश क्रोन),
 				'one' => q(डॅनिश क्रोन),
-				'other' => q(डॅनिश क्रोनर),
+				'other' => q(डॅनिश क्रोन),
 			},
 		},
 		'DOP' => {
@@ -4132,6 +4186,7 @@ has 'currencies' => (
 			},
 		},
 		'MRU' => {
+			symbol => 'MRU',
 			display_name => {
 				'currency' => q(मॉरिटानियन ओगिया),
 				'one' => q(मॉरिटानियन ओगिया),
@@ -4572,6 +4627,14 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			symbol => 'VEF',
+			display_name => {
+				'currency' => q(व्हेनेझुएला बोलिव्हार \(2008–2018\)),
+				'one' => q(व्हेनेझुएला बोलिव्हार \(2008–2018\)),
+				'other' => q(व्हेनेझुएला बोलिव्हार्स \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
 			display_name => {
 				'currency' => q(व्हेनेझुएला बोलिव्हार),
 				'one' => q(व्हेनेझुएला बोलिव्हार),
@@ -5716,333 +5779,333 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'roc') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'indian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-				}
 				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
 					return 'evening2' if $time >= 1800
 						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
 				}
-				last SWITCH;
-				}
-			if ($_ eq 'buddhist') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1600
 						&& $time < 1800;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
 					return 'evening2' if $time >= 1800
 						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'coptic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
+				if($day_period_type eq 'selection') {
 					return 'evening2' if $time >= 1800
 						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
 					return 'morning1' if $time >= 400
 						&& $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
 				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
 					return 'evening2' if $time >= 1800
 						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'coptic') {
+				if($day_period_type eq 'selection') {
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'persian') {
+				if($day_period_type eq 'selection') {
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'roc') {
+				if($day_period_type eq 'selection') {
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic') {
+				if($day_period_type eq 'selection') {
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'selection') {
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
@@ -6062,79 +6125,79 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'evening1' => q{सं},
-					'am' => q{स},
-					'morning1' => q{प},
-					'night1' => q{रा},
-					'evening2' => q{सा},
-					'midnight' => q{म.रा.},
-					'morning2' => q{स},
-					'afternoon1' => q{दु},
-					'noon' => q{दु},
-					'pm' => q{सं},
-				},
 				'wide' => {
 					'noon' => q{मध्यान्ह},
-					'pm' => q{म.उ.},
-					'midnight' => q{मध्यरात्र},
+					'evening2' => q{सायंकाळ},
 					'afternoon1' => q{दुपार},
+					'evening1' => q{संध्याकाळ},
+					'morning1' => q{पहाट},
 					'morning2' => q{सकाळ},
 					'night1' => q{रात्र},
-					'morning1' => q{पहाट},
-					'evening2' => q{सायंकाळ},
-					'evening1' => q{संध्याकाळ},
+					'pm' => q{म.उ.},
+					'midnight' => q{मध्यरात्र},
 					'am' => q{म.पू.},
 				},
+				'narrow' => {
+					'evening1' => q{सं},
+					'morning1' => q{प},
+					'afternoon1' => q{दु},
+					'evening2' => q{सा},
+					'noon' => q{दु},
+					'pm' => q{सं},
+					'midnight' => q{म.रा.},
+					'am' => q{स},
+					'night1' => q{रा},
+					'morning2' => q{स},
+				},
 				'abbreviated' => {
-					'midnight' => q{मध्यरात्र},
-					'afternoon1' => q{दुपार},
-					'morning2' => q{सकाळ},
-					'pm' => q{म.उ.},
-					'noon' => q{मध्यान्ह},
 					'am' => q{म.पू.},
-					'evening1' => q{संध्याकाळ},
-					'evening2' => q{सायंकाळ},
+					'pm' => q{म.उ.},
+					'midnight' => q{मध्यरात्र},
+					'morning2' => q{सकाळ},
 					'night1' => q{रात्र},
 					'morning1' => q{पहाट},
+					'evening1' => q{संध्याकाळ},
+					'afternoon1' => q{दुपार},
+					'noon' => q{मध्यान्ह},
+					'evening2' => q{सायंकाळ},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'morning1' => q{पहाट},
-					'night1' => q{रात्र},
-					'evening2' => q{सायंकाळ},
-					'evening1' => q{संध्याकाळ},
+				'narrow' => {
 					'am' => q{म.पू.},
-					'noon' => q{मध्यान्ह},
+					'midnight' => q{म.रा.},
 					'pm' => q{म.उ.},
-					'morning2' => q{सकाळ},
-					'afternoon1' => q{दुपार},
-					'midnight' => q{मध्यरात्र},
+					'night1' => q{रात्र},
+					'morning2' => q{स},
+					'morning1' => q{प},
+					'evening1' => q{सं},
+					'afternoon1' => q{दु},
+					'evening2' => q{सा},
+					'noon' => q{म},
 				},
 				'wide' => {
-					'evening1' => q{संध्याकाळ},
-					'am' => q{म.पू.},
-					'night1' => q{रात्र},
-					'morning1' => q{पहाट},
-					'evening2' => q{सायंकाळ},
-					'midnight' => q{मध्यरात्र},
-					'morning2' => q{सकाळ},
 					'afternoon1' => q{दुपार},
 					'noon' => q{मध्यान्ह},
-					'pm' => q{म.उ.},
-				},
-				'narrow' => {
-					'morning1' => q{प},
+					'evening2' => q{सायंकाळ},
+					'evening1' => q{संध्याकाळ},
+					'morning1' => q{पहाट},
 					'night1' => q{रात्र},
-					'evening2' => q{सा},
-					'evening1' => q{सं},
-					'am' => q{म.पू.},
-					'noon' => q{म},
+					'morning2' => q{सकाळ},
 					'pm' => q{म.उ.},
-					'morning2' => q{स},
-					'afternoon1' => q{दु},
-					'midnight' => q{म.रा.},
+					'midnight' => q{मध्यरात्र},
+					'am' => q{म.पू.},
+				},
+				'abbreviated' => {
+					'am' => q{म.पू.},
+					'midnight' => q{मध्यरात्र},
+					'pm' => q{म.उ.},
+					'night1' => q{रात्र},
+					'morning2' => q{सकाळ},
+					'morning1' => q{पहाट},
+					'evening1' => q{संध्याकाळ},
+					'noon' => q{मध्यान्ह},
+					'evening2' => q{सायंकाळ},
+					'afternoon1' => q{दुपार},
 				},
 			},
 		},

@@ -1,5 +1,3 @@
-// http://www.cpantesters.org/cpan/report/bdd1ffc0-0c96-11e8-a1cf-bb670eaac09d
-#include <stdbool.h>
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
@@ -10,80 +8,9 @@
 #include <raylib.h>
 
 #include "const-c.inc"
+#include "ImageSet.h"
 
-typedef struct {
-    int x;
-    int y;
-    int width;
-    int height;
-} IntRectangle;
-
-static int ColorEqual(Color a, Color b) {
-    return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
-}
-typedef IntRectangle ImageSet_t(Color*, IntRectangle, Color, unsigned, unsigned);
-
-static IntRectangle
-TransposedImageSet(Color *dst, IntRectangle dst_rect, Color color, unsigned width, unsigned height)
-{ /* FIXME height/width */
-    IntRectangle ret = dst_rect;
-    if (width > dst_rect.width-dst_rect.y || height > dst_rect.height-dst_rect.x)
-        return dst_rect;
-
-    if (!ColorEqual(color, BLANK)) {
-        unsigned y, x;
-        for(y = 0; y < height; y++) {
-            for(x = 0; x < width; x++) {
-                Color *pixel = &dst[(x+dst_rect.x)*dst_rect.width + (dst_rect.y+y)];
-                *pixel = color;
-            }
-        }
-    }
-
-    ret.x += width;
-    if (ret.x >= ret.width) {
-        ret.x -= ret.width;
-        ret.y += height;
-    }
-    if (ret.y >= ret.height) {
-        ret.y -= ret.height;
-    }
-
-    return ret;
-}
-
-static IntRectangle
-ImageSet(Color *dst, IntRectangle dst_rect, Color color, unsigned width, unsigned height)
-{ /* FIXME height/width */
-    IntRectangle ret = dst_rect;
-    if (width > dst_rect.width-dst_rect.x || height > dst_rect.height-dst_rect.y)
-        return dst_rect;
-
-    if (!ColorEqual(color, BLANK)) {
-        unsigned y, x;
-        for(y = 0; y < height; y++) {
-            for(x = 0; x < width; x++) {
-                Color *pixel = &dst[(y+dst_rect.y)*dst_rect.width + (dst_rect.x+x)];
-                *pixel = color;
-            }
-        }
-    }
-
-    ret.x += width;
-    if (ret.x >= ret.width) {
-        ret.x -= ret.width;
-        ret.y += height;
-    }
-    if (ret.y >= ret.height) {
-        ret.y -= ret.height;
-    }
-
-    return ret;
-}
-
-
-
-MODULE = Graphics::Raylib::XS        PACKAGE = Graphics::Raylib::XS
+MODULE = Graphics::Raylib::XS		PACKAGE = Graphics::Raylib::XS		
 
 INCLUDE: const-xs.inc
 
@@ -101,6 +28,13 @@ BeginMode2D(camera)
 void
 BeginMode3D(camera)
 	Camera3D	camera
+
+void
+BeginScissorMode(x, y, width, height)
+	int	x
+	int	y
+	int	width
+	int	height
 
 void
 BeginShaderMode(shader)
@@ -194,6 +128,9 @@ ClearBackground(color)
 	Color	color
 
 void
+ClearDirectoryFiles()
+
+void
 ClearDroppedFiles()
 
 void
@@ -208,6 +145,10 @@ CloseVrSimulator()
 
 void
 CloseWindow()
+
+Color
+ColorFromHSV(hsv)
+	Vector3	hsv
 
 Vector4
 ColorNormalize(color)
@@ -559,6 +500,16 @@ DrawTextEx(font, text, position, fontSize, spacing, tint)
 	Color	tint
 
 void
+DrawTextRec(font, text, rec, fontSize, spacing, wordWrap, tint)
+	Font	font
+	char *	text
+	Rectangle	rec
+	float	fontSize
+	float	spacing
+	bool	wordWrap
+	Color	tint
+
+void
 DrawTexture(texture, posX, posY, tint)
 	Texture2D	texture
 	int	posX
@@ -589,6 +540,14 @@ DrawTexturePro(texture, sourceRec, destRec, origin, rotation, tint)
 	Rectangle	destRec
 	Vector2	origin
 	float	rotation
+	Color	tint
+
+void
+DrawTextureQuad(texture, tiling, offset, quad, tint)
+	Texture2D	texture
+	Vector2	tiling
+	Vector2	offset
+	Rectangle	quad
 	Color	tint
 
 void
@@ -634,6 +593,9 @@ void
 EndMode3D()
 
 void
+EndScissorMode()
+
+void
 EndShaderMode()
 
 void
@@ -648,6 +610,11 @@ ExportImage(image, fileName)
 	char *	fileName
 
 void
+ExportImageAsCode(image, fileName)
+	Image	image
+	char *	fileName
+
+void
 ExportMesh(mesh, fileName)
 	Mesh	mesh
 	char *	fileName
@@ -657,14 +624,19 @@ ExportWave(wave, fileName)
 	Wave	wave
 	char *	fileName
 
+void
+ExportWaveAsCode(wave, fileName)
+	Wave	wave
+	char *	fileName
+
 Color
 Fade(color, alpha)
 	Color	color
 	float	alpha
 
-char *
-FormatText(text, ...)
-	char *	text
+bool
+FileExists(fileName)
+	char *	fileName
 
 Image
 GenImageCellular(width, height, tileSize)
@@ -688,10 +660,10 @@ GenImageColor(width, height, color)
 	Color	color
 
 Image
-GenImageFontAtlas(chars, fontSize, charsCount, padding, packMethod)
+GenImageFontAtlas(chars, charsCount, fontSize, padding, packMethod)
 	CharInfo *	chars
-	int	fontSize
 	int	charsCount
+	int	fontSize
 	int	padding
 	int	packMethod
 
@@ -774,6 +746,11 @@ GenMeshPlane(width, length, resX, resZ)
 	int	resZ
 
 Mesh
+GenMeshPoly(sides, radius)
+	int	sides
+	float	radius
+
+Mesh
 GenMeshSphere(radius, rings, slices)
 	float	radius
 	int	rings
@@ -787,9 +764,8 @@ GenMeshTorus(radius, size, radSeg, sides)
 	int	sides
 
 Texture2D
-GenTextureBRDF(shader, cubemap, size)
+GenTextureBRDF(shader, size)
 	Shader	shader
-	Texture2D	cubemap
 	int	size
 
 Texture2D
@@ -844,19 +820,32 @@ Color
 GetColor(hexValue)
 	int	hexValue
 
-char *
+char **
+GetDirectoryFiles(dirPath, count)
+	char *	dirPath
+	int *	count
+
+const char *
 GetDirectoryPath(fileName)
 	char *	fileName
 
-char *
+const char *
 GetExtension(fileName)
 	char *	fileName
 
 int
 GetFPS()
 
-char *
+long
+GetFileModTime(fileName)
+	char *	fileName
+
+const char *
 GetFileName(filePath)
+	char *	filePath
+
+const char *
+GetFileNameWithoutExt(filePath)
 	char *	filePath
 
 Font
@@ -877,7 +866,7 @@ GetGamepadAxisMovement(gamepad, axis)
 int
 GetGamepadButtonPressed()
 
-char *
+const char *
 GetGamepadName(gamepad)
 	int	gamepad
 
@@ -925,7 +914,7 @@ int
 GetMonitorHeight(monitor)
 	int	monitor
 
-char *
+const char *
 GetMonitorName(monitor)
 	int	monitor
 
@@ -1022,7 +1011,10 @@ float *
 GetWaveData(wave)
 	Wave	wave
 
-char *
+void *
+GetWindowHandle()
+
+const char *
 GetWorkingDirectory()
 
 Vector2
@@ -1032,6 +1024,9 @@ GetWorldToScreen(position, camera)
 
 void
 HideCursor()
+
+void
+HideWindow()
 
 void
 ImageAlphaClear(image, color, threshold)
@@ -1107,10 +1102,16 @@ ImageDraw(dst, src, srcRec, dstRec)
 	Rectangle	dstRec
 
 void
-ImageDrawRectangle(dst, position, rec, color)
+ImageDrawRectangle(dst, rec, color)
 	Image *	dst
-	Vector2	position
 	Rectangle	rec
+	Color	color
+
+void
+ImageDrawRectangleLines(dst, rec, thick, color)
+	Image *	dst
+	Rectangle	rec
+	int	thick
 	Color	color
 
 void
@@ -1130,6 +1131,12 @@ ImageDrawTextEx(dst, position, font, text, fontSize, spacing, color)
 	float	fontSize
 	float	spacing
 	Color	color
+
+Color *
+ImageExtractPalette(image, maxPaletteSize, extractCount)
+	Image	image
+	int	maxPaletteSize
+	int *	extractCount
 
 void
 ImageFlipHorizontal(image)
@@ -1314,6 +1321,9 @@ bool
 IsVrSimulatorReady()
 
 bool
+IsWindowHidden()
+
+bool
 IsWindowMinimized()
 
 bool
@@ -1332,11 +1342,17 @@ LoadFontData(fileName, fontSize, fontChars, charsCount, type)
 	int	type
 
 Font
-LoadFontEx(fileName, fontSize, charsCount, fontChars)
+LoadFontEx(fileName, fontSize, fontChars, charsCount)
 	char *	fileName
 	int	fontSize
-	int	charsCount
 	int *	fontChars
+	int	charsCount
+
+Font
+LoadFontFromImage(image, key, firstChar)
+	Image	image
+	Color	key
+	int	firstChar
 
 Image
 LoadImage(fileName)
@@ -1362,93 +1378,6 @@ LoadImageRaw(fileName, width, height, format, headerSize)
 	int	height
 	int	format
 	int	headerSize
-
-Image
-LoadImageFromAV(array_ref, color_cb)
-    SV *array_ref
-    SV *color_cb
-  ALIAS:
-    LoadImageFromAV_uninitialized_mem = 1
-    LoadImageFromAV_transposed = 2
-    LoadImageFromAV_transposed_uninitialized_mem = 3
-  INIT:
-    int i;
-    AV *av;
-    Color *pixels;
-    Image img;
-    int literal_color = 0;
-    int currwidth = 0;
-    IntRectangle where = { 0, 0, 0, 0 };
-    ImageSet_t *my_ImageSet = ImageSet;
-  PPCODE:
-    if (!SvROK(array_ref) || SvTYPE(SvRV(array_ref)) != SVt_PVAV)
-        croak("expected ARRAY ref as first argument");
-    literal_color = !SvOK(color_cb);
-    if (!literal_color && (!SvROK(color_cb) || SvTYPE(SvRV(color_cb)) != SVt_PVCV))
-        croak("expected CODE ref as second argument");
-
-    av = (AV*)SvRV(array_ref);
-    where.height = av_len(av) + 1;
-    for (i = 0; i < where.height; i++) {
-        SV** row_sv = av_fetch(av, i, 0);
-        if (!row_sv || !SvROK(*row_sv) || SvTYPE(SvRV(*row_sv)) != SVt_PVAV)
-            croak("expected ARRAY ref as rows");
-        currwidth = av_len((AV*)SvRV(*row_sv)) + 1;
-        if (currwidth > where.width)
-            where.width = currwidth;
-    }
-    if (ix & 1) /* Looks cool, try it! */
-        Newx(pixels, where.height * where.width, Color);
-    else
-        Newxz(pixels, where.height * where.width, Color);
-
-    if (ix & 2)
-        my_ImageSet = TransposedImageSet;
-
-    EXTEND(SP, 3);
-    for (i = 0; i < where.height; i++) {
-        AV* row = (AV*)SvRV(*av_fetch(av, i, 0));
-
-        for (int j = 0; j < where.width; j++) {
-            SV *ret;
-            SV** pixel = av_fetch(row, j, 0);
-            if (!pixel) {
-                /* do something ? */
-            }
-
-            Color color = BLANK;
-            if (literal_color && pixel) {
-                // No check! stay safe
-                color = *(Color *)SvPV_nolen(SvRV(*pixel));
-            } else {
-                PUSHMARK(SP);
-                PUSHs(pixel ? *pixel : &PL_sv_undef);
-                PUSHs(sv_2mortal(newSViv(j)));
-                PUSHs(sv_2mortal(newSViv(i)));
-                PUTBACK;
-
-                call_sv(color_cb, G_SCALAR);
-                SPAGAIN;
-                SV *ret = POPs;
-                if (sv_isa(ret, "Graphics::Raylib::XS::Color"))
-                    color = *(Color *)SvPV_nolen(SvRV(ret));
-            }
-
-            where = my_ImageSet(pixels, where, color, 1, 1);
-
-        }
-    }
-    RETVAL = LoadImageEx(pixels, where.width, where.height);
-    Safefree(pixels);
-    {
-        SV * RETVALSV;
-        RETVALSV = sv_newmortal();
-        sv_setref_pvn(RETVALSV, "Graphics::Raylib::XS::Image", (char *)&RETVAL, sizeof(RETVAL));
-        ST(0) = RETVALSV;
-    }
-    XSRETURN(1);
-
-
 
 Material
 LoadMaterial(fileName)
@@ -1543,6 +1472,10 @@ MeshBoundingBox(mesh)
 void
 MeshTangents(mesh)
 	Mesh *	mesh
+
+void
+OpenURL(url)
+	char *	url
 
 void
 PauseAudioStream(stream)
@@ -1641,12 +1574,19 @@ SetMatrixProjection(proj)
 	Matrix	proj
 
 void
-SetMousePosition(position)
-	Vector2	position
+SetMouseOffset(offsetX, offsetY)
+	int	offsetX
+	int	offsetY
 
 void
-SetMouseScale(scale)
-	float	scale
+SetMousePosition(x, y)
+	int	x
+	int	y
+
+void
+SetMouseScale(scaleX, scaleY)
+	float	scaleX
+	float	scaleY
 
 void
 SetMusicLoopCount(music, count)
@@ -1664,11 +1604,11 @@ SetMusicVolume(music, volume)
 	float	volume
 
 void
-SetShaderValue(shader, uniformLoc, value, size)
+SetShaderValue(shader, uniformLoc, value, uniformType)
 	Shader	shader
 	int	uniformLoc
-	float *	value
-	int	size
+	const void *	value
+	int	uniformType
 
 void
 SetShaderValueMatrix(shader, uniformLoc, mat)
@@ -1677,11 +1617,17 @@ SetShaderValueMatrix(shader, uniformLoc, mat)
 	Matrix	mat
 
 void
-SetShaderValuei(shader, uniformLoc, value, size)
+SetShaderValueV(shader, uniformLoc, value, uniformType, count)
 	Shader	shader
 	int	uniformLoc
-	int *	value
-	int	size
+	const void *	value
+	int	uniformType
+	int	count
+
+void
+SetShapesTexture(texture, source)
+	Texture2D	texture
+	Rectangle	source
 
 void
 SetSoundPitch(sound, pitch)
@@ -1750,9 +1696,6 @@ void
 ShowCursor()
 
 void
-ShowLogo()
-
-void
 StopAudioStream(stream)
 	AudioStream	stream
 
@@ -1773,12 +1716,6 @@ StorageSaveValue(position, value)
 	int	position
 	int	value
 
-char *
-SubText(text, position, length)
-	char *	text
-	int	position
-	int	length
-
 void
 TakeScreenshot(fileName)
 	char *	fileName
@@ -1793,6 +1730,9 @@ void
 TraceLog(logType, text, ...)
 	int	logType
 	char *	text
+
+void
+UnhideWindow()
 
 void
 UnloadFont(font)
@@ -1841,7 +1781,7 @@ UnloadWave(wave)
 void
 UpdateAudioStream(stream, data, samplesCount)
 	AudioStream	stream
-	void *	data
+	const void *	data
 	int	samplesCount
 
 void
@@ -1855,20 +1795,13 @@ UpdateMusicStream(music)
 void
 UpdateSound(sound, data, samplesCount)
 	Sound	sound
-	void *	data
+	const void *	data
 	int	samplesCount
 
 void
 UpdateTexture(texture, pixels)
 	Texture2D	texture
-	void *	pixels
-
-void
-UpdateTextureFromImage(texture, image)
-	Texture2D    texture
-	Image image
-  CODE:
-	UpdateTexture(texture, GetImageData(image));
+	const void *	pixels
 
 void
 UpdateVrTracking(camera)
@@ -1893,3 +1826,95 @@ WaveFormat(wave, sampleRate, sampleSize, channels)
 
 bool
 WindowShouldClose()
+
+Image
+LoadImageFromAV(array_ref, color_cb)
+    SV *array_ref
+    SV *color_cb
+  ALIAS:
+    LoadImageFromAV_uninitialized_mem = 1
+    LoadImageFromAV_transposed = 2
+    LoadImageFromAV_transposed_uninitialized_mem = 3
+  INIT:
+    int i;
+    AV *av;
+    Color *pixels;
+    Image img;
+    int literal_color = 0;
+    int currwidth = 0;
+    IntRectangle where = { 0, 0, 0, 0 };
+    ImageSet_t *my_ImageSet = ImageSet;
+  PPCODE:
+    if (!SvROK(array_ref) || SvTYPE(SvRV(array_ref)) != SVt_PVAV)
+        croak("expected ARRAY ref as first argument");
+    literal_color = !SvOK(color_cb);
+    if (!literal_color && (!SvROK(color_cb) || SvTYPE(SvRV(color_cb)) != SVt_PVCV))
+        croak("expected CODE ref as second argument");
+
+    av = (AV*)SvRV(array_ref);
+    where.height = av_len(av) + 1;
+    for (i = 0; i < where.height; i++) {
+        SV** row_sv = av_fetch(av, i, 0);
+        if (!row_sv || !SvROK(*row_sv) || SvTYPE(SvRV(*row_sv)) != SVt_PVAV)
+            croak("expected ARRAY ref as rows");
+        currwidth = av_len((AV*)SvRV(*row_sv)) + 1;
+        if (currwidth > where.width)
+            where.width = currwidth;
+    }
+    if (ix & 1) /* Looks cool, try it! */
+        Newx(pixels, where.height * where.width, Color);
+    else
+        Newxz(pixels, where.height * where.width, Color);
+
+    if (ix & 2)
+        my_ImageSet = TransposedImageSet;
+
+    EXTEND(SP, 3);
+    for (i = 0; i < where.height; i++) {
+        AV* row = (AV*)SvRV(*av_fetch(av, i, 0));
+
+        for (int j = 0; j < where.width; j++) {
+            SV *ret;
+            SV** pixel = av_fetch(row, j, 0);
+            if (!pixel) {
+                /* do something ? */
+            }
+
+            Color color = BLANK;
+            if (literal_color && pixel) {
+                // No check! stay safe
+                color = *(Color *)SvPV_nolen(SvRV(*pixel));
+            } else {
+                PUSHMARK(SP);
+                PUSHs(pixel ? *pixel : &PL_sv_undef);
+                PUSHs(sv_2mortal(newSViv(j)));
+                PUSHs(sv_2mortal(newSViv(i)));
+                PUTBACK;
+
+                call_sv(color_cb, G_SCALAR);
+                SPAGAIN;
+                SV *ret = POPs;
+                if (sv_isa(ret, "Graphics::Raylib::XS::Color"))
+                    color = *(Color *)SvPV_nolen(SvRV(ret));
+            }
+
+            where = my_ImageSet(pixels, where, color, 1, 1);
+
+        }
+    }
+    RETVAL = LoadImageEx(pixels, where.width, where.height);
+    Safefree(pixels);
+    {
+        SV * RETVALSV;
+        RETVALSV = sv_newmortal();
+        sv_setref_pvn(RETVALSV, "Graphics::Raylib::XS::Image", (char *)&RETVAL, sizeof(RETVAL));
+        ST(0) = RETVALSV;
+    }
+    XSRETURN(1);
+
+void
+UpdateTextureFromImage(texture, image)
+	Texture2D    texture
+	Image image
+  CODE:
+	UpdateTexture(texture, GetImageData(image));

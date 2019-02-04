@@ -1,6 +1,6 @@
 package WWW::Google::Places::Review;
 
-$WWW::Google::Places::Review::VERSION   = '0.35';
+$WWW::Google::Places::Review::VERSION   = '0.36';
 $WWW::Google::Places::Review::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::Places::Review - Represent 'review' of place.
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 

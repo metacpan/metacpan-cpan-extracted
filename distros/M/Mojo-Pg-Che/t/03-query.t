@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 
-plan skip_all => 'set env TEST_PG="DBI:Pg:dbname=<...>/<pg_user>/<passwd>" to enable this test' unless $ENV{TEST_PG};
+plan skip_all => 'set env TEST_PG="dbname=<...>/<pg_user>/<passwd>" to enable this test' unless $ENV{TEST_PG};
 
 my ($dsn, $user, $pw) = split m|[/]|, $ENV{TEST_PG};
 

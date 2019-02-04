@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-Feed",
    "prereqs" : {
@@ -28,7 +28,10 @@
          "requires" : {
             "Class::ErrorHandler" : "0",
             "DateTime" : "0",
+            "DateTime::Format::Flexible" : "0",
+            "DateTime::Format::ISO8601" : "0",
             "DateTime::Format::Mail" : "0",
+            "DateTime::Format::Natural" : "0",
             "DateTime::Format::W3CDTF" : "0",
             "Feed::Find" : "0",
             "HTML::Entities" : "0",
@@ -49,51 +52,48 @@
    "provides" : {
       "XML::Feed" : {
          "file" : "lib/XML/Feed.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "XML::Feed::Content" : {
          "file" : "lib/XML/Feed/Content.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "XML::Feed::Enclosure" : {
          "file" : "lib/XML/Feed/Enclosure.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "XML::Feed::Entry" : {
          "file" : "lib/XML/Feed/Entry.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "XML::Feed::Entry::Format::Atom" : {
          "file" : "lib/XML/Feed/Entry/Format/Atom.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "XML::Feed::Entry::Format::RSS" : {
          "file" : "lib/XML/Feed/Entry/Format/RSS.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "XML::Feed::Format::Atom" : {
          "file" : "lib/XML/Feed/Format/Atom.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "XML::Feed::Format::RSS" : {
          "file" : "lib/XML/Feed/Format/RSS.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "XML::Feed::Util" : {
          "file" : "lib/XML/Feed/Util.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ],
-      "repository" : {
-         "url" : "https://github.com/davorg/xml-feed"
-      }
+      ]
    },
-   "version" : "0.55",
+   "version" : "0.56",
    "x_contributors" : [
       "Dave Cross <davecross@cpan.org>",
       "Jakob Voss <voss@gbv.de>",
@@ -105,5 +105,5 @@
       "Gerard Ribugent Navarro <ribugent@cpan.org>",
       "Matthew D. Miller <matthew.miller@okbu.edu>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

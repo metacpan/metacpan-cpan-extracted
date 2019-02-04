@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Uk - Package for language Ukrainian
 
 package Locale::CLDR::Locales::Uk;
 # This file auto generated from Data\common\main\uk.xml
-#	on Sun  7 Oct 11:05:11 am GMT
+#	on Sun  3 Feb  2:24:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -660,7 +660,7 @@ has 'display_name_language' => (
  				'arq' => 'алжирська арабська',
  				'ars' => 'надждійська арабська',
  				'arw' => 'аравакська',
- 				'as' => 'ассамська',
+ 				'as' => 'асамська',
  				'asa' => 'асу',
  				'ase' => 'американська мова рухів',
  				'ast' => 'астурська',
@@ -796,6 +796,7 @@ has 'display_name_language' => (
  				'ga' => 'ірландська',
  				'gaa' => 'га',
  				'gag' => 'гагаузька',
+ 				'gan' => 'ґань',
  				'gay' => 'гайо',
  				'gba' => 'гбайя',
  				'gd' => 'гаельська',
@@ -817,6 +818,7 @@ has 'display_name_language' => (
  				'gwi' => 'кучін',
  				'ha' => 'хауса',
  				'hai' => 'хайда',
+ 				'hak' => 'хаккаська',
  				'haw' => 'гавайська',
  				'he' => 'іврит',
  				'hi' => 'гінді',
@@ -1124,7 +1126,7 @@ has 'display_name_language' => (
  				'twq' => 'тасавак',
  				'ty' => 'таїтянська',
  				'tyv' => 'тувинська',
- 				'tzm' => 'центральномароканська тамазіт',
+ 				'tzm' => 'центральноатласька тамазігт',
  				'udm' => 'удмуртська',
  				'ug' => 'уйгурська',
  				'uga' => 'угаритська',
@@ -1359,7 +1361,7 @@ has 'display_name_region' => (
  			'014' => 'Східна Африка',
  			'015' => 'Північна Африка',
  			'017' => 'Центральна Африка',
- 			'018' => 'Південна Африка',
+ 			'018' => 'Південний регіон Африки',
  			'019' => 'Америка',
  			'021' => 'Північна Америка (регіон)',
  			'029' => 'Карибський басейн',
@@ -1395,7 +1397,7 @@ has 'display_name_region' => (
  			'AT' => 'Австрія',
  			'AU' => 'Австралія',
  			'AW' => 'Аруба',
- 			'AX' => 'Аландські острови',
+ 			'AX' => 'Аландські Острови',
  			'AZ' => 'Азербайджан',
  			'BA' => 'Боснія і Герцеґовина',
  			'BB' => 'Барбадос',
@@ -1407,7 +1409,7 @@ has 'display_name_region' => (
  			'BI' => 'Бурунді',
  			'BJ' => 'Бенін',
  			'BL' => 'Сен-Бартельмі',
- 			'BM' => 'Бермудські острови',
+ 			'BM' => 'Бермудські Острови',
  			'BN' => 'Бруней',
  			'BO' => 'Болівія',
  			'BQ' => 'Нідерландські Карибські острови',
@@ -1419,14 +1421,14 @@ has 'display_name_region' => (
  			'BY' => 'Білорусь',
  			'BZ' => 'Беліз',
  			'CA' => 'Канада',
- 			'CC' => 'Кокосові (Кілінгові) острови',
+ 			'CC' => 'Кокосові (Кілінґ) Острови',
  			'CD' => 'Конго – Кіншаса',
  			'CD@alt=variant' => 'Конго (ДРК)',
  			'CF' => 'Центральноафриканська Республіка',
  			'CG' => 'Конго – Браззавіль',
  			'CG@alt=variant' => 'Конго (Республіка)',
  			'CH' => 'Швейцарія',
- 			'CI' => 'Кот-д’Івуар',
+ 			'CI' => 'Кот-дʼІвуар',
  			'CI@alt=variant' => 'Берег Слонової Кістки',
  			'CK' => 'Острови Кука',
  			'CL' => 'Чілі',
@@ -1461,8 +1463,8 @@ has 'display_name_region' => (
  			'EZ' => 'Єврозона',
  			'FI' => 'Фінляндія',
  			'FJ' => 'Фіджі',
- 			'FK' => 'Фолклендські острови',
- 			'FK@alt=variant' => 'Фолклендські (Мальвінські) острови',
+ 			'FK' => 'Фолклендські Острови',
+ 			'FK@alt=variant' => 'Фолклендські (Мальвінські) Острови',
  			'FM' => 'Мікронезія',
  			'FM@alt=variant' => 'Федеративні Штати Мікронезії',
  			'FO' => 'Фарерські Острови',
@@ -1482,19 +1484,19 @@ has 'display_name_region' => (
  			'GP' => 'Ґваделупа',
  			'GQ' => 'Екваторіальна Гвінея',
  			'GR' => 'Греція',
- 			'GS' => 'Південна Джорджія та Південні Сандвічеві острови',
+ 			'GS' => 'Південна Джорджія та Південні Сандвічеві Острови',
  			'GT' => 'Ґватемала',
  			'GU' => 'Ґуам',
  			'GW' => 'Гвінея-Бісау',
  			'GY' => 'Ґайана',
  			'HK' => 'Гонконг, О.А.Р. Китаю',
  			'HK@alt=short' => 'Гонконг',
- 			'HM' => 'острів Герд і острови Макдоналд',
+ 			'HM' => 'Острови Герд і Макдоналд',
  			'HN' => 'Гондурас',
  			'HR' => 'Хорватія',
  			'HT' => 'Гаїті',
  			'HU' => 'Угорщина',
- 			'IC' => 'Канарські острови',
+ 			'IC' => 'Канарські Острови',
  			'ID' => 'Індонезія',
  			'IE' => 'Ірландія',
  			'IL' => 'Ізраїль',
@@ -1513,12 +1515,12 @@ has 'display_name_region' => (
  			'KG' => 'Киргизстан',
  			'KH' => 'Камбоджа',
  			'KI' => 'Кірібаті',
- 			'KM' => 'Коморські острови',
+ 			'KM' => 'Комори',
  			'KN' => 'Сент-Кітс і Невіс',
  			'KP' => 'Північна Корея',
  			'KR' => 'Південна Корея',
  			'KW' => 'Кувейт',
- 			'KY' => 'Кайманові острови',
+ 			'KY' => 'Кайманові Острови',
  			'KZ' => 'Казахстан',
  			'LA' => 'Лаос',
  			'LB' => 'Ліван',
@@ -1599,7 +1601,7 @@ has 'display_name_region' => (
  			'SG' => 'Сінгапур',
  			'SH' => 'Острів Святої Єлени',
  			'SI' => 'Словенія',
- 			'SJ' => 'Шпіцберґен і Ян-Майен',
+ 			'SJ' => 'Шпіцберген та Ян-Маєн',
  			'SK' => 'Словаччина',
  			'SL' => 'Сьєрра-Леоне',
  			'SM' => 'Сан-Маріно',
@@ -1743,7 +1745,7 @@ has 'display_name_type' => (
  				'buddhist' => q{буддійський календар},
  				'chinese' => q{китайський календар},
  				'coptic' => q{коптський календар},
- 				'dangi' => q{календар дангі},
+ 				'dangi' => q{корейський календар},
  				'ethiopic' => q{ефіопський календар},
  				'ethiopic-amete-alem' => q{ефіопський амете алем календар},
  				'gregorian' => q{григоріанський календар},
@@ -1784,7 +1786,7 @@ has 'display_name_type' => (
  				'big5han' => q{китайський традиційний порядок сортування Big5},
  				'compat' => q{попередній порядок сортування, для сумісності},
  				'dictionary' => q{порядок сортування за словником},
- 				'ducet' => q{типовий порядок сортування Unicode},
+ 				'ducet' => q{типовий порядок сортування Юнікод},
  				'emoji' => q{порядок сортування за емодзі},
  				'eor' => q{європейські правила упорядкування},
  				'gb2312han' => q{китайський спрощений},
@@ -1832,8 +1834,8 @@ has 'display_name_type' => (
  				'strict' => q{точний стиль розриву рядка},
  			},
  			'm0' => {
- 				'bgn' => q{BGN},
- 				'ungegn' => q{UNGEGN},
+ 				'bgn' => q{транслітерація BGN США},
+ 				'ungegn' => q{транслітерація ГЕГН ООН},
  			},
  			'ms' => {
  				'metric' => q{мертична система},
@@ -1845,7 +1847,7 @@ has 'display_name_type' => (
  				'arabext' => q{арабсько-індійські розширені цифри},
  				'armn' => q{вірменські цифри},
  				'armnlow' => q{вірменські малі цифри},
- 				'beng' => q{бенґальські},
+ 				'beng' => q{бенґальські цифри},
  				'deva' => q{цифри деванагарі},
  				'ethi' => q{ефіопські цифри},
  				'finance' => q{фінансові символи чисел},
@@ -2006,6 +2008,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(сторона світу),
+					},
 					'acre' => {
 						'few' => q({0} акри),
 						'many' => q({0} акрів),
@@ -2047,6 +2052,13 @@ has 'units' => (
 						'name' => q(астрономічні одиниці),
 						'one' => q({0} астрономічна одиниця),
 						'other' => q({0} астрономічної одиниці),
+					},
+					'atmosphere' => {
+						'few' => q({0} атмосфери),
+						'many' => q({0} атмосфер),
+						'name' => q(атмосфери),
+						'one' => q({0} атмосфера),
+						'other' => q({0} атмосфери),
 					},
 					'bit' => {
 						'few' => q({0} біти),
@@ -2760,6 +2772,27 @@ has 'units' => (
 					'per' => {
 						'1' => q({0} на {1}),
 					},
+					'percent' => {
+						'few' => q({0} відсотки),
+						'many' => q({0} відсотків),
+						'name' => q(відсоток),
+						'one' => q({0} відсоток),
+						'other' => q({0} відсотка),
+					},
+					'permille' => {
+						'few' => q({0} проміле),
+						'many' => q({0} проміле),
+						'name' => q(проміле),
+						'one' => q({0} проміле),
+						'other' => q({0} проміле),
+					},
+					'petabyte' => {
+						'few' => q({0} петабайти),
+						'many' => q({0} петабайтів),
+						'name' => q(петабайти),
+						'one' => q({0} петабайт),
+						'other' => q({0} петабайту),
+					},
 					'picometer' => {
 						'few' => q({0} пікометри),
 						'many' => q({0} пікометрів),
@@ -2967,6 +3000,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(напрям),
+					},
 					'acre' => {
 						'few' => q({0} акри),
 						'many' => q({0} акрів),
@@ -3346,6 +3382,13 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'few' => q({0}%),
+						'many' => q({0}%),
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'few' => q({0} пм),
 						'many' => q({0} пм),
@@ -3445,6 +3488,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(напрямок),
+					},
 					'acre' => {
 						'few' => q({0} акри),
 						'many' => q({0} акрів),
@@ -3486,6 +3532,13 @@ has 'units' => (
 						'name' => q(а. о.),
 						'one' => q({0} а. о.),
 						'other' => q({0} а. о.),
+					},
+					'atmosphere' => {
+						'few' => q({0} атм),
+						'many' => q({0} атм),
+						'name' => q(атм),
+						'one' => q({0} атм),
+						'other' => q({0} атм),
 					},
 					'bit' => {
 						'few' => q({0} б),
@@ -4199,6 +4252,27 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'few' => q({0}%),
+						'many' => q({0}%),
+						'name' => q(відсоток),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'few' => q({0}‰),
+						'many' => q({0}‰),
+						'name' => q(проміле),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'few' => q({0} ПБ),
+						'many' => q({0} ПБ),
+						'name' => q(ПБ),
+						'one' => q({0} ПБ),
+						'other' => q({0} ПБ),
+					},
 					'picometer' => {
 						'few' => q({0} пм),
 						'many' => q({0} пм),
@@ -4728,8 +4802,7 @@ has 'number_currency_formats' => (
 			'pattern' => {
 				'default' => {
 					'accounting' => {
-						'negative' => '(#,##0.00¤)',
-						'positive' => '#,##0.00¤',
+						'positive' => '#,##0.00 ¤',
 					},
 					'standard' => {
 						'positive' => '#,##0.00 ¤',
@@ -6022,6 +6095,7 @@ has 'currencies' => (
 			},
 		},
 		'MRU' => {
+			symbol => 'MRU',
 			display_name => {
 				'currency' => q(мавританська угія),
 				'few' => q(мавританські угії),
@@ -6771,6 +6845,16 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			symbol => 'VEF',
+			display_name => {
+				'currency' => q(венесуельський болівар \(2008–2018\)),
+				'few' => q(венесуельські болівари \(2008–2018\)),
+				'many' => q(венесуельських боліварів \(2008–2018\)),
+				'one' => q(венесуельський болівар \(2008–2018\)),
+				'other' => q(венесуельського болівара \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
 			display_name => {
 				'currency' => q(венесуельський болівар),
 				'few' => q(венесуельські болівари),
@@ -7955,253 +8039,253 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'night1' if $time >= 0
 						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
-				last SWITCH;
-				}
-			if ($_ eq 'indian') {
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
-				last SWITCH;
-				}
-			if ($_ eq 'coptic') {
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'japanese') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'persian') {
-				if($day_period_type eq 'selection') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'night1' if $time >= 0
 						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 				}
+				last SWITCH;
+				}
+			if ($_ eq 'coptic') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'indian') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'hebrew') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
@@ -8221,67 +8305,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'evening1' => q{вечора},
-					'am' => q{дп},
-					'morning1' => q{ранку},
+				'wide' => {
 					'night1' => q{ночі},
-					'afternoon1' => q{дня},
 					'midnight' => q{опівночі},
-					'noon' => q{пополудні},
 					'pm' => q{пп},
+					'am' => q{дп},
+					'noon' => q{пополудні},
+					'afternoon1' => q{дня},
+					'evening1' => q{вечора},
+					'morning1' => q{ранку},
 				},
 				'narrow' => {
-					'pm' => q{пп},
-					'noon' => q{п},
-					'afternoon1' => q{дня},
-					'midnight' => q{північ},
+					'evening1' => q{вечора},
 					'morning1' => q{ранку},
+					'afternoon1' => q{дня},
+					'noon' => q{п},
+					'midnight' => q{північ},
+					'pm' => q{пп},
+					'am' => q{дп},
+					'night1' => q{ночі},
+				},
+				'abbreviated' => {
 					'night1' => q{ночі},
 					'am' => q{дп},
-					'evening1' => q{вечора},
-				},
-				'wide' => {
+					'pm' => q{пп},
 					'midnight' => q{опівночі},
 					'afternoon1' => q{дня},
-					'pm' => q{пп},
 					'noon' => q{пополудні},
-					'am' => q{дп},
-					'evening1' => q{вечора},
-					'night1' => q{ночі},
 					'morning1' => q{ранку},
+					'evening1' => q{вечора},
 				},
 			},
 			'stand-alone' => {
+				'narrow' => {
+					'night1' => q{ніч},
+					'am' => q{дп},
+					'pm' => q{пп},
+					'midnight' => q{північ},
+					'afternoon1' => q{день},
+					'noon' => q{полудень},
+					'morning1' => q{ранок},
+					'evening1' => q{вечір},
+				},
 				'wide' => {
 					'night1' => q{ніч},
-					'morning1' => q{ранок},
+					'pm' => q{пп},
+					'midnight' => q{опівніч},
 					'am' => q{дп},
-					'evening1' => q{вечір},
-					'pm' => q{пп},
-					'noon' => q{полудень},
-					'midnight' => q{північ},
-					'afternoon1' => q{день},
-				},
-				'narrow' => {
-					'pm' => q{пп},
 					'noon' => q{полудень},
 					'afternoon1' => q{день},
-					'midnight' => q{північ},
-					'morning1' => q{ранок},
-					'night1' => q{ніч},
-					'am' => q{дп},
 					'evening1' => q{вечір},
+					'morning1' => q{ранок},
 				},
 				'abbreviated' => {
-					'afternoon1' => q{день},
-					'midnight' => q{північ},
-					'noon' => q{полудень},
-					'pm' => q{пп},
-					'evening1' => q{вечір},
-					'am' => q{дп},
-					'morning1' => q{ранок},
 					'night1' => q{ніч},
+					'midnight' => q{північ},
+					'pm' => q{пп},
+					'am' => q{дп},
+					'noon' => q{полудень},
+					'afternoon1' => q{день},
+					'evening1' => q{вечір},
+					'morning1' => q{ранок},
 				},
 			},
 		},
@@ -9076,7 +9160,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Алжир#,
 		},
 		'Africa/Asmera' => {
-			exemplarCity => q#Асмара#,
+			exemplarCity => q#Асмера#,
 		},
 		'Africa/Bamako' => {
 			exemplarCity => q#Бамако#,
@@ -9091,7 +9175,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Бісау#,
 		},
 		'Africa/Blantyre' => {
-			exemplarCity => q#Блантир#,
+			exemplarCity => q#Блантайр#,
 		},
 		'Africa/Brazzaville' => {
 			exemplarCity => q#Браззавіль#,
@@ -9313,7 +9397,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Беліз#,
 		},
 		'America/Blanc-Sablon' => {
-			exemplarCity => q#Бланк-Саблон#,
+			exemplarCity => q#Блан-Саблон#,
 		},
 		'America/Boa_Vista' => {
 			exemplarCity => q#Боа-Віста#,
@@ -9346,7 +9430,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Каєнна#,
 		},
 		'America/Cayman' => {
-			exemplarCity => q#Кайманові острови#,
+			exemplarCity => q#Кайманові Острови#,
 		},
 		'America/Chicago' => {
 			exemplarCity => q#Чікаґо#,
@@ -9550,7 +9634,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Монтевідео#,
 		},
 		'America/Montserrat' => {
-			exemplarCity => q#Монсеррат#,
+			exemplarCity => q#Монтсеррат#,
 		},
 		'America/Nassau' => {
 			exemplarCity => q#Насау#,
@@ -11011,7 +11095,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Тонґатапу#,
 		},
 		'Pacific/Truk' => {
-			exemplarCity => q#Трук#,
+			exemplarCity => q#Чуук#,
 		},
 		'Pacific/Wake' => {
 			exemplarCity => q#Вейк#,
@@ -11134,7 +11218,7 @@ has 'time_zone_names' => (
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q#за часом на Соломонових островах#,
+				'standard' => q#за часом на Соломонових Островах#,
 			},
 		},
 		'South_Georgia' => {

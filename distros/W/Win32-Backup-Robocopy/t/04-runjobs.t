@@ -1,10 +1,9 @@
 #!perl
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use Test::More qw(no_plan);
 use Test::Exception;
-use File::Path qw( make_path remove_tree );
 use Capture::Tiny qw(capture);
 use Win32::Backup::Robocopy;
 

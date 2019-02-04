@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Mw - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Mw;
 # This file auto generated from Data\common\main\en_MW.xml
-#	on Sun  7 Oct 10:29:23 am GMT
+#	on Sun  3 Feb  1:48:20 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

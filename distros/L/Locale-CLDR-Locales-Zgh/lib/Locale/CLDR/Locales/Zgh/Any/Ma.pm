@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Zgh::Any::Ma - Package for language Standard Moroccan Tam
 
 package Locale::CLDR::Locales::Zgh::Any::Ma;
 # This file auto generated from Data\common\main\zgh_MA.xml
-#	on Sun  7 Oct 11:07:53 am GMT
+#	on Sun  3 Feb  2:27:19 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

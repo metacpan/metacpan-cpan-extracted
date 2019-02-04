@@ -1,3 +1,8 @@
+0.041   2019-02-04 (PERLANCAR)
+
+	- [ux] Log output of code using log_debug() instead of log().
+
+
 0.040   2018-04-06 (PERLANCAR)
 
 	- Log output of code for debugging.

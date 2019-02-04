@@ -15,7 +15,7 @@ my $locale = Locale::CLDR->new('de_DE');
 my $months = $locale->month_format_wide();
 is_deeply ($months, [qw( Januar Februar März April Mai Juni Juli August September Oktober November Dezember )], 'Month format wide');
 $months = $locale->month_format_abbreviated();
-is_deeply ($months, [qw( Jan. Feb. März Apr. Mai Juni Juli Aug. Sep. Okt. Nov. Dez. )], 'Month format abbreviated');
+is_deeply ($months, [qw( Jan. Feb. März Apr. Mai Juni Juli Aug. Sept. Okt. Nov. Dez. )], 'Month format abbreviated');
 $months = $locale->month_format_narrow();
 is_deeply ($months, [qw( J F M A M J J A S O N D )], 'Month format narrow');
 $months = $locale->month_stand_alone_wide();

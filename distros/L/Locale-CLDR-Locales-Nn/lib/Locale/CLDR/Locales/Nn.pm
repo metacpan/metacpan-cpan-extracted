@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nn - Package for language Norwegian Nynorsk
 
 package Locale::CLDR::Locales::Nn;
 # This file auto generated from Data\common\main\nn.xml
-#	on Sun  7 Oct 10:52:24 am GMT
+#	on Sun  3 Feb  2:11:47 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -5327,6 +5327,13 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(venezuelanske bolivar \(2008–2018\)),
+				'one' => q(venezuelansk bolivar \(2008–2018\)),
+				'other' => q(venezuelanske bolivar \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(venezuelanske bolivar),
 				'one' => q(venezuelansk bolivar),
 				'other' => q(venezuelanske bolivar),
@@ -5845,17 +5852,17 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{ettermiddag},
-					'am' => q{formiddag},
+				'abbreviated' => {
+					'pm' => q{e.m.},
+					'am' => q{f.m.},
 				},
 				'narrow' => {
-					'am' => q{f.m.},
 					'pm' => q{e.m.},
+					'am' => q{f.m.},
 				},
-				'abbreviated' => {
-					'am' => q{f.m.},
-					'pm' => q{e.m.},
+				'wide' => {
+					'am' => q{formiddag},
+					'pm' => q{ettermiddag},
 				},
 			},
 			'stand-alone' => {
@@ -5864,8 +5871,8 @@ has 'day_periods' => (
 					'pm' => q{e.m.},
 				},
 				'wide' => {
-					'pm' => q{e.m.},
 					'am' => q{f.m.},
+					'pm' => q{e.m.},
 				},
 				'abbreviated' => {
 					'pm' => q{e.m.},

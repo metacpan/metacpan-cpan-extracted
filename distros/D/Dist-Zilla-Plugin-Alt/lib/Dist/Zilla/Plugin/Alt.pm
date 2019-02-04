@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Alt 0.06 {
+package Dist::Zilla::Plugin::Alt 0.07 {
 
   use 5.014;
   use Moose;
@@ -32,7 +32,17 @@ package Dist::Zilla::Plugin::Alt 0.06 {
                           q{  my @prefix = split /:/, $Config::Config{prefix};},
                           q{  $WriteMakefileArgs{PREFIX} = File::Spec->catdir($WriteMakefileArgs{DESTDIR}, @prefix);},
                           q{  delete $WriteMakefileArgs{DESTDIR};},
-                          q<}>,
+                          q{    # DO NOT DO THIS SORT OF THING},
+                          q{    # THIS IS PRETTY UGLY AND PROBABLY BAD},
+                          q{    # DO AS I SAY AND NOT AS I DO},
+                          q<    package ExtUtils::MM_Any;>,
+                          q<    my $orig = \&init_INSTALL;>,
+                          q<    *init_INSTALL = sub {>,
+                          q<      my($self, @args) = @_;>,
+                          q{      delete $self->{ARGS}{INSTALL_BASE} if $self->{ARGS}{PREFIX};},
+                          q{      $self->$orig(@args);},
+                          q<    }>,
+                          q<  }>,
                           qq{# end inserted by @{[blessed $self ]} @{[ $self->VERSION || 'dev' ]}},
                           q{};
       if($content =~ s{^WriteMakefile}{${extra}WriteMakefile}m)
@@ -119,7 +129,7 @@ Dist::Zilla::Plugin::Alt - Create Alt distributions with Dist::Zilla
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

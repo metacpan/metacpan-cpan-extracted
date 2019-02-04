@@ -5,7 +5,7 @@ use warnings;
 
 use Net::Async::Github::RateLimit::Core;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 =head1 NAME
 
@@ -20,9 +20,9 @@ Instantiates.
 =cut
 
 sub new {
-	my ($class, %args) = @_;
-	$args{core} = Net::Async::Github::RateLimit::Core->new(%{ delete $args{resources}{core} });
-	bless \%args, $class
+    my ($class, %args) = @_;
+    $args{core} = Net::Async::Github::RateLimit::Core->new(%{ delete $args{resources}{core} });
+    bless \%args, $class
 }
 
 =head2 core

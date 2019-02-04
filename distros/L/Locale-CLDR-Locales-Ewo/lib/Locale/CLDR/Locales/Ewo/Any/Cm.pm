@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ewo::Any::Cm - Package for language Ewondo
 
 package Locale::CLDR::Locales::Ewo::Any::Cm;
 # This file auto generated from Data\common\main\ewo_CM.xml
-#	on Sun  7 Oct 10:31:01 am GMT
+#	on Sun  3 Feb  1:49:48 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

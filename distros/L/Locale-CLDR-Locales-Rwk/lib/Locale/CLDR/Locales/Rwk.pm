@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Rwk - Package for language Rwa
 
 package Locale::CLDR::Locales::Rwk;
 # This file auto generated from Data\common\main\rwk.xml
-#	on Sun  7 Oct 10:56:45 am GMT
+#	on Sun  3 Feb  2:16:24 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -843,8 +843,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{utuko},
 					'pm' => q{kyiukonyi},
+					'am' => q{utuko},
 				},
 				'abbreviated' => {
 					'am' => q{utuko},

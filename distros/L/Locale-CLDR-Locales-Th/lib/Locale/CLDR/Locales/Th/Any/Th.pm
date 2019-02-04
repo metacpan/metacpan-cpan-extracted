@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Th::Any::Th - Package for language Thai
 
 package Locale::CLDR::Locales::Th::Any::Th;
 # This file auto generated from Data\common\main\th_TH.xml
-#	on Sun  7 Oct 11:02:15 am GMT
+#	on Sun  3 Feb  2:21:48 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

@@ -1,0 +1,5 @@
+Revision history for 'Banal-Mini-Utils'
+
+0.002     2019-02-02 12:50:21Z
+            - Initial release.
+            - Created a separate distribution package for these modules that used to reside in <Dist-Zilla-Plugin-Bundle-Author-TABULO> 

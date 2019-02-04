@@ -8,13 +8,13 @@ Locale::CLDR::Locales::He::Any::Il - Package for language Hebrew
 
 package Locale::CLDR::Locales::He::Any::Il;
 # This file auto generated from Data\common\main\he_IL.xml
-#	on Sun  7 Oct 10:36:04 am GMT
+#	on Sun  3 Feb  1:54:51 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

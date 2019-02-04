@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ksb - Package for language Shambala
 
 package Locale::CLDR::Locales::Ksb;
 # This file auto generated from Data\common\main\ksb.xml
-#	on Sun  7 Oct 10:43:04 am GMT
+#	on Sun  3 Feb  2:01:49 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -846,8 +846,8 @@ has 'day_periods' => (
 					'am' => q{makeo},
 				},
 				'wide' => {
-					'pm' => q{nyiaghuo},
 					'am' => q{makeo},
+					'pm' => q{nyiaghuo},
 				},
 			},
 		},
@@ -927,7 +927,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -950,7 +950,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

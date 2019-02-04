@@ -1,5 +1,23 @@
 Revision history for Net-Async-Redis
 
+1.014     2019-02-04 02:05:21+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - increase default buffer sizes from 8KB to 1MB, to improve efficiency
+    in the common case where there are only a few active Redis connections
+    - support configurable buffer sizes via `stream_read_len` / `stream_write_len`
+
+    New examples:
+
+    - `incr-ratelimit-aa.pl` and `consumer-groups-aa.pl` for Future::AsyncAwait basic
+    examples
+
+    Bugs fixed:
+
+    - the example for `->subscription` was wrong, thanks to Michael Mueller for catching
+    and patching!
+    - retain completion Future when executing commands
+
 1.013     2018-12-10 02:03:19+08:00 Asia/Kuala_Lumpur
     New features:
 
@@ -151,16 +169,16 @@ Revision history for Net-Async-Redis
     string methods.
 
 0.003     2015-11-15 03:16:27+00:00 Europe/London
-	No new features.
+    No new features.
 
-	Dependencies:
+    Dependencies:
 
-	- Added List::Util 1.29, for pairmap
+    - Added List::Util 1.29, for pairmap
 
 0.002     2015-11-13 16:35:59+00:00 Europe/London
-	Bugs fixed:
+    Bugs fixed:
 
-	- [RT107134](https://rt.cpan.org/Public/Bug/Display.html?id=107134) Include JSON::MaybeXS dependency
+    - [RT107134](https://rt.cpan.org/Public/Bug/Display.html?id=107134) Include JSON::MaybeXS dependency
 
 0.001     2015-09-14 02:30:30+01:00 Europe/London
-	Initial CPAN release
+    Initial CPAN release

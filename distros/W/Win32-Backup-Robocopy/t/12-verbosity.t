@@ -1,5 +1,5 @@
 #!perl
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use Test::More;
@@ -44,6 +44,12 @@ my $bkp = Win32::Backup::Robocopy->new(
 );
 
 my ($stdout, $stderr, $exit, $exitstr,$createdfolder) = $bkp->run();
+	sleep 1;
+	($stdout, $stderr, $exit, $exitstr,$createdfolder) = $bkp->run();
+	sleep 1;
+	($stdout, $stderr, $exit, $exitstr,$createdfolder) = $bkp->run();
+	# sleep 1;
+	# ($stdout, $stderr, $exit, $exitstr,$createdfolder) = $bkp->run();
 
 # get the position of last HISTORY backup
 my $completedest = File::Spec->catdir($bkp->{dst},$bkp->{name});
@@ -51,6 +57,7 @@ opendir my $lastdir,
 			$completedest,
 			or BAIL_OUT ("Unable to read directory [$completedest]!");
 my @ordered_dirs = sort grep {!/^\./} readdir($lastdir);
+		# print map {"ORDERED DIRS: $_\n"}@ordered_dirs;
 my $lastfilepath = File::Spec->catfile( $completedest, $ordered_dirs[-1], $file1);
 
 
@@ -60,7 +67,12 @@ my ($out, $err, @res) = capture {
 		$bkp->restore(from=> $completedest, to => $tbasedir, 
 		verbose => 1);
 };
-ok (3 == (split "\n", $out), "4 lines expected with verbosity = 1");
+		# print "OUTPUT:\n";
+		# my $linenum = 0;
+		# foreach my $line (split "\n", $out){
+			# print "LINE ",++$linenum," [$line]\n";
+		# }
+ok (7 == (split "\n", $out), "7 lines expected with verbosity = 1");
 
 # verbosity 2
 ($out, $err, @res) = capture {

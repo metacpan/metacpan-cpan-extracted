@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Kde::Any::Tz - Package for language Makonde
 
 package Locale::CLDR::Locales::Kde::Any::Tz;
 # This file auto generated from Data\common\main\kde_TZ.xml
-#	on Sun  7 Oct 10:40:50 am GMT
+#	on Sun  3 Feb  2:00:03 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

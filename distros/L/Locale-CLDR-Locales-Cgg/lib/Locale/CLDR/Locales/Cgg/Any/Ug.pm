@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Cgg::Any::Ug - Package for language Chiga
 
 package Locale::CLDR::Locales::Cgg::Any::Ug;
 # This file auto generated from Data\common\main\cgg_UG.xml
-#	on Sun  7 Oct 10:25:14 am GMT
+#	on Sun  3 Feb  1:44:28 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

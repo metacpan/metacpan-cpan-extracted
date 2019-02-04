@@ -52,7 +52,7 @@ Extends L<"Constructors" in Geo::Shape|Geo::Shape/"Constructors">.
 =item Geo::Point-E<gt>B<fromString>( $string, [$projection] )
 
 Create a new point from a $string.  The coordinates can be separated by
-a comma (preferrably), or blanks.  When the coordinates end on NSEW, the
+a comma (preferably), or blanks.  When the coordinates end on NSEW, the
 order does not matter, otherwise lat-long or xy order is presumed.
 
 This routine is very smart.  It understands:
@@ -396,8 +396,8 @@ See L<dms2deg()|Geo::Shape/"Display"> for permitted formats.
 =item Error: illegal UTM zone in $string
 
 A UTM zone can be detected at the beginning or at the end of the
-input.  It contains a number (from 1 upto 60) and an optional
-latitude indication (C upto X, except I and O).
+input.  It contains a number (from 1 up to 60) and an optional
+latitude indication (C up to X, except I and O).
 
 =item Error: illegal character in x coordinate $x
 
@@ -422,12 +422,12 @@ L<Geo::Proj::new()|Geo::Proj/"Constructors"> about how to defined them.
 
 =head1 SEE ALSO
 
-This module is part of Geo-Point distribution version 0.97,
-built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Geo-Point distribution version 0.98,
+built on February 01, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2005-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2005-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -2,7 +2,7 @@
 abstract: 'Attean SPARQL store'
 author:
   - 'Kjetil Kjernsmo <kjetilk@cpan.org>'
-  - 'KJETILK <kjetilk@cpan.org>'
+  - 'Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>'
 build_requires:
   HTTP::Message::PSGI: '0'
   RDF::Endpoint: '0'
@@ -13,8 +13,9 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
-keywords: []
+generated_by: 'Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - 'Semantic Web'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,19 +32,19 @@ optional_features: {}
 provides:
   AtteanX::Model::SPARQL:
     file: lib/AtteanX/Model/SPARQL.pm
-    version: '0.010'
+    version: '0.012'
   AtteanX::Plan::SPARQLBGP:
     file: lib/AtteanX/Plan/SPARQLBGP.pm
-    version: '0.010'
+    version: '0.012'
   AtteanX::Query::AccessPlan::SingleQuadBGP:
     file: lib/AtteanX/Query/AccessPlan/SingleQuadBGP.pm
-    version: '0.010'
+    version: '0.012'
   AtteanX::Store::SPARQL:
     file: lib/AtteanX/Store/SPARQL.pm
-    version: '0.010'
+    version: '0.012'
   Test::Attean::Store::SPARQL::Role::CreateStore:
     file: lib/Test/Attean/Store/SPARQL/Role/CreateStore.pm
-    version: '0.010'
+    version: '0.012'
 requires:
   Attean: '0.010'
   Carp: '0'
@@ -55,10 +56,14 @@ requires:
   Types::URI: '0'
   perl: '5.014'
 resources:
+  IRC: irc://irc.perl.org/#perlrdf
   Identifier: http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/project
   bugtracker: https://github.com/kjetilk/p5-atteanx-store-sparql/issues
   homepage: https://metacpan.org/release/AtteanX-Store-SPARQL
   license: http://dev.perl.org/licenses/
   repository: git://github.com/kjetilk/p5-atteanx-store-sparql.git
-version: '0.010'
+version: '0.012'
+x_contributors:
+  - 'Gregory Todd Williams <gwilliams@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

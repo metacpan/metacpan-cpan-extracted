@@ -8,13 +8,13 @@ Locale::CLDR::Locales::As::Any::In - Package for language Assamese
 
 package Locale::CLDR::Locales::As::Any::In;
 # This file auto generated from Data\common\main\as_IN.xml
-#	on Sun  7 Oct 10:20:37 am GMT
+#	on Sun  3 Feb  1:39:15 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

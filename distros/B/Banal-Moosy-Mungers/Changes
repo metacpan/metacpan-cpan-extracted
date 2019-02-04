@@ -1,0 +1,8 @@
+Revision history for 'Banal-Moosy-Mungers'
+
+0.002     2019-02-03 02:25:47Z
+            - Tidied up POD. [Thanks, MANWAR]
+
+0.001     2019-02-02 22:43:04Z
+            - Initial release.
+            - Created a separate distribution package for these modules that used to reside in <Dist-Zilla-Plugin-Bundle-Author-TABULO>

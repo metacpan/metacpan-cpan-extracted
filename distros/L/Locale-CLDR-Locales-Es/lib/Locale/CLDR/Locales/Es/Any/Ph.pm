@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Es::Any::Ph - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Ph;
 # This file auto generated from Data\common\main\es_PH.xml
-#	on Sun  7 Oct 10:30:14 am GMT
+#	on Sun  3 Feb  1:49:06 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -48,25 +48,25 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}

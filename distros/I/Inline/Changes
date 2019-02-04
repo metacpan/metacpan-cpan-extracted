@@ -1,3 +1,19 @@
+0.81 Sun 03 Feb 2019 04:42:05 PM CET
+ - Regular release, see developer releases
+
+0.80_03 Fri 01 Feb 2019 11:26:18 PM CET
+ - Fix @inc, add another exception for Inline::C (SISYPHUS++)
+
+0.80_02 Fri Jun 22 22:21:11 MDT 2018
+ - Revert PR/61 - failed on travis
+
+0.80_01 Fri Jun 22 21:39:49 MDT 2018
+ - PR/59 @pypt++ Travis test against Perl 5.22, 5.24, 5.26
+ - PR/60 @pypt++ Calculate MD5 hashes of UTF-8 source by encoding it first
+ - PR/61 @rurban++ Fix wrong -I in subcmd
+ - PR/66 @soren++ Fix failing tests on systems missing perldiag.pod
+ - PR/67 NERDVANA++ Relax the version requirement for installing modules
+
 0.80 Fri Mar 13 20:03:52 PDT 2015
  - Fix dependency problem in Inline::MakeMaker affecting parallel builds
 
@@ -63,8 +79,7 @@
 
 0.61 Sun Jul 13 21:47:14 PDT 2014
  - Make Inline dep on perl 5.8.1 per The Lancaster Consensus
- - https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancas
-   ter-consensus.md#minimum-supported-perl
+ - https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md#minimum-supported-perl
  - Fix Metadata errors
 
 0.60 Sun Jul 13 21:19:48 PDT 2014
@@ -192,8 +207,7 @@
  - Inline.pm - Add a warning prior to croaking with
    M62_invalid_config_file(). That way, we'll at least see what $config
    contains. This is in response to FAIL report
-   http://www.cpantesters.org/cpan/report/3287249c-5151-11e1-9dba-4238887bd
-   19e
+   http://www.cpantesters.org/cpan/report/3287249c-5151-11e1-9dba-4238887bd19e
  - Bump version number to 0.50_01
 
 0.50 Tues 7 Feb 2012
@@ -482,4 +496,3 @@
 
 0.01 Mon Jul 24 11:23:25 2000
  - original version; created by h2xs 1.19
-

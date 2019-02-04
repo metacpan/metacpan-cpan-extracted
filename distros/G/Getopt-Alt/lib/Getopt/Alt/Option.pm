@@ -19,7 +19,7 @@ Moose::Exporter->setup_import_methods(
     #with_meta => ['operation'],
 );
 
-our $VERSION = version->new('0.4.8');
+our $VERSION = version->new('0.5.0');
 
 Moose::Util::meta_attribute_alias('Getopt::Alt::Option');
 
@@ -293,7 +293,7 @@ Getopt::Alt::Option - Sets up a particular command line option
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt::Option version 0.4.8.
+This documentation refers to Getopt::Alt::Option version 0.5.0.
 
 =head1 SYNOPSIS
 

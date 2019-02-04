@@ -2,9 +2,9 @@
 use strict;
 use warnings;
 
-use 5.014000;
+use 5.006;
 
-use ExtUtils::MakeMaker 6.48;
+use ExtUtils::MakeMaker;
 
 use File::ShareDir::Install;
 $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
@@ -13,35 +13,46 @@ install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "support for L<https://github.com>'s REST API with L<IO::Async>",
+  "ABSTRACT" => "support for the L<https://github.com> REST API with L<IO::Async>",
   "AUTHOR" => "Tom Molesworth <TEAM\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.48",
+    "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Net-Async-Github",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014000",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Net::Async::Github",
   "PREREQ_PM" => {
+    "Adapter::Async::OrderedList::Array" => 0,
     "Cache::LRU" => "0.04",
     "Dir::Self" => 0,
     "File::ShareDir" => "1.102",
-    "Future" => "0.34",
+    "Future" => "0.39",
+    "Future::Utils" => 0,
     "IO::Async::Notifier" => "0.71",
     "IO::Async::SSL" => "0.19",
-    "JSON::MaybeXS" => "1.003008",
+    "JSON::MaybeXS" => "1.004",
     "Log::Any" => "1.045",
     "Net::Async::HTTP" => "0.41",
     "Net::Async::WebSocket" => 0,
+    "Net::Async::WebSocket::Client" => 0,
     "Path::Tiny" => "0.098",
     "Ryu" => "0.031",
     "Ryu::Async" => "0.013",
+    "Ryu::Observable" => 0,
+    "Scalar::Util" => 0,
     "Syntax::Keyword::Try" => "0.04",
     "Time::Moment" => "0.41",
     "URI" => "1.71",
+    "URI::QueryParam" => 0,
     "URI::Template" => "0.22",
-    "indirect" => 0
+    "Variable::Disposition" => 0,
+    "indirect" => 0,
+    "namespace::clean" => 0,
+    "parent" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -51,7 +62,7 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,30 +70,41 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Adapter::Async::OrderedList::Array" => 0,
   "Cache::LRU" => "0.04",
   "Dir::Self" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::ShareDir" => "1.102",
   "File::Spec" => 0,
-  "Future" => "0.34",
+  "Future" => "0.39",
+  "Future::Utils" => 0,
   "IO::Async::Notifier" => "0.71",
   "IO::Async::SSL" => "0.19",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "JSON::MaybeXS" => "1.003008",
+  "JSON::MaybeXS" => "1.004",
   "Log::Any" => "1.045",
   "Net::Async::HTTP" => "0.41",
   "Net::Async::WebSocket" => 0,
+  "Net::Async::WebSocket::Client" => 0,
   "Path::Tiny" => "0.098",
   "Ryu" => "0.031",
   "Ryu::Async" => "0.013",
+  "Ryu::Observable" => 0,
+  "Scalar::Util" => 0,
   "Syntax::Keyword::Try" => "0.04",
   "Test::CheckDeps" => "0.010",
   "Test::More" => "0.94",
   "Time::Moment" => "0.41",
   "URI" => "1.71",
+  "URI::QueryParam" => 0,
   "URI::Template" => "0.22",
-  "indirect" => 0
+  "Variable::Disposition" => 0,
+  "indirect" => 0,
+  "namespace::clean" => 0,
+  "parent" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Hant::Hans;
 # This file auto generated from Data\common\transforms\Simplified-Traditional.xml
-#	on Sun  7 Oct 10:18:20 am GMT
+#	on Sun  3 Feb  1:37:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -10930,8 +10930,22 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(硏),
+					result  => q(研),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(矯),
 					result  => q(矫),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(眞),
+					result  => q(真),
 					revisit => 0,
 				},
 				{

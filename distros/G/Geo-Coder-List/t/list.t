@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 57;
+use Test::Most tests => 65;
 use Test::NoWarnings;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
@@ -15,7 +15,7 @@ LIST: {
 	SKIP: {
 		if(!-e 't/online.enabled') {
 			diag('Online tests disabled');
-			skip('Online tests disabled', 55);
+			skip('Online tests disabled', 63);
 		}
 
 		eval {
@@ -47,7 +47,11 @@ LIST: {
 
 			require Geo::Coder::Postcodes;
 
-			Geo::Coder::Postcodes->import;
+			Geo::Coder::Postcodes->import();
+
+			require Geo::Coder::DataScienceToolkit;
+
+			Geo::Coder::DataScienceToolkit->import();
 
 			if($ENV{BMAP_KEY}) {
 				require Geo::Coder::Bing;
@@ -59,7 +63,7 @@ LIST: {
 		if($@) {
 			diag($@);
 			diag('Not enough geocoders installed - skipping tests');
-			skip 'Not enough geocoders installed', 55;
+			skip 'Not enough geocoders installed', 63;
 		}
 		my $geocoderlist = new_ok('Geo::Coder::List')
 			->push({ regex => qr/(Canada|USA|United States)$/, geocoder => new_ok('Geo::Coder::CA') })
@@ -86,7 +90,7 @@ LIST: {
 		$location = $geocoderlist->geocode('Reading, Berkshire, England');
 		delta_within($location->{geometry}{location}{lat}, 51.46, 1e-2);
 		delta_within($location->{geometry}{location}{lng}, -0.97, 1e-2);
-		is(ref($location->{'geocoder'}), 'Geo::Coder::OSM', 'Verify OSM encoder is used');
+		is(ref($location->{'geocoder'}), 'Geo::Coder::Postcodes', 'Verify Postcodes encoder is used');
 		sleep(1);	# play nicely
 
 		$location = $geocoderlist->geocode(location => '8600 Rockville Pike, Bethesda MD, 20894 USA');
@@ -161,5 +165,15 @@ LIST: {
 		foreach my $l(@{$log}) {
 			diag($l->{location}, ': ',  $l->{timetaken}, 's with ',  $l->{geocoder}, '(error: ', $l->{error}, ')');
 		}
+
+		$geocoderlist = new_ok('Geo::Coder::List')
+			->push({ regex => qr/Canada$/, geocoder => new_ok('Geo::Coder::CA') })
+			->push({ regex => qr/(England|UK|United Kingdom|USA|United States)$/, geocoder => new_ok('Geo::Coder::DataScienceToolkit') });
+		$location = $geocoderlist->geocode('Margate, Kent, England');
+		ok(defined($location));
+		ok(ref($location) eq 'HASH');
+		delta_within($location->{geometry}{location}{lat}, 51.38, 1e-2);
+		delta_within($location->{geometry}{location}{lng}, 1.39, 1e-2);
+		is(ref($location->{'geocoder'}), 'Geo::Coder::DataScienceToolkit', 'Verify DSTK encoder is used');
 	}
 }

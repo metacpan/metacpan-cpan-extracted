@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Om - Package for language Oromo
 
 package Locale::CLDR::Locales::Om;
 # This file auto generated from Data\common\main\om.xml
-#	on Sun  7 Oct 10:52:47 am GMT
+#	on Sun  3 Feb  2:12:15 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -597,27 +597,27 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{WD},
-					'pm' => q{WB},
-				},
 				'abbreviated' => {
+					'pm' => q{WB},
+					'am' => q{WD},
+				},
+				'wide' => {
 					'pm' => q{WB},
 					'am' => q{WD},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'am' => q{WD},
-					'pm' => q{WB},
-				},
-				'wide' => {
-					'pm' => q{WB},
-					'am' => q{WD},
-				},
 				'abbreviated' => {
 					'pm' => q{WB},
 					'am' => q{WD},
+				},
+				'wide' => {
+					'am' => q{WD},
+					'pm' => q{WB},
+				},
+				'narrow' => {
+					'am' => q{WD},
+					'pm' => q{WB},
 				},
 			},
 		},
@@ -700,6 +700,13 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			MMMMdd => q{dd MMMM},
+			MMdd => q{dd/MM},
+			yMM => q{MM/y},
+			yMMMM => q{MMMM y},
+			yQQQ => q{QQQ y},
+		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E HH:mm},
@@ -745,13 +752,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{y QQQQ},
 			yw => q{'week' w 'of' Y},
-		},
-		'generic' => {
-			MMMMdd => q{dd MMMM},
-			MMdd => q{dd/MM},
-			yMM => q{MM/y},
-			yMMMM => q{MMMM y},
-			yQQQ => q{QQQ y},
 		},
 	} },
 );

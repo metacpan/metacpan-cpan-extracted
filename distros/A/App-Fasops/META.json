@@ -69,7 +69,7 @@
    "provides" : {
       "App::Fasops" : {
          "file" : "lib/App/Fasops.pm",
-         "version" : "v0.6.1"
+         "version" : "v0.6.2"
       },
       "App::Fasops::Command::axt2fas" : {
          "file" : "lib/App/Fasops/Command/axt2fas.pm"
@@ -143,7 +143,7 @@
          "web" : "https://github.com/wang-q/App-Fasops"
       }
    },
-   "version" : "0.6.1",
+   "version" : "0.6.2",
    "x_authority" : "cpan:WANGQ",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1

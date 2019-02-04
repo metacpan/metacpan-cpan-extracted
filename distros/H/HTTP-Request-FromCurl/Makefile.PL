@@ -34,7 +34,7 @@ my %module = (
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.008',
+    MIN_PERL_VERSION => '5.008008',
 
     'LICENSE'=> 'perl',
 
@@ -64,6 +64,7 @@ my %module = (
         'Path::Tiny'              => 0,
         'WWW::Mechanize'          => 0,
         'LWP::UserAgent'          => 0,
+        'IO::Socket::SSL'         => 0, # for allowing -k to compile
         #'HTTP::Cookies::Netscape' => 0, # this can't cope with the Netscape cookie files that curl writes :(
         'HTTP::CookieJar'         => 0, # this one doesn't have an adapter to save/load at all :(
         'HTTP::CookieJar::LWP'    => 0, # this one doesn't have an adapter to save/load at all :(

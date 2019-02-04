@@ -115,20 +115,32 @@ FOO
     my $module = $tzil->slurp_file('build/lib/Foo.pm');
     my $version = $tzil->version;
 
-    isnt(index($module, <<POD), -1, 'module has woven the encoding, NAME and VERSION sections into pod');
-=pod
+    # TAU : Split ETHER's test that checked for econding/NAME/VERSION in one monobloc
+    #       so that it plays well with C<Pod::Weaver::Plugin::StopWords> which puts
+    #       '=for stopwords' stuff in several places.
+    my $regex_pod_encoding = qr/[=]pod\n\n[=]encoding UTF-8\n/ms;
+    like($module, $regex_pod_encoding, 'module has woven the encoding into pod');
 
-=encoding UTF-8
+    my $regex_pod_NAME = qr/\n[=]head1 NAME\n\nFoo - Hello, this is foo\n/ms;
+    like($module, $regex_pod_NAME, 'module has woven the NAME section into pod');
 
-=head1 NAME
+    my $regex_pod_VERSION = qr/\n[=]head1 VERSION\n\nversion $version\n/ms;
+    like($module, $regex_pod_VERSION, 'module has woven the VERSION section into pod');
 
-Foo - Hello, this is foo
-
-=head1 VERSION
-
-version $version
-
-POD
+#     isnt(index($module, <<POD), -1, 'module has woven the encoding, NAME and VERSION sections into pod');
+# =pod
+#
+# =encoding UTF-8
+#
+# =head1 NAME
+#
+# Foo - Hello, this is foo
+#
+# =head1 VERSION
+#
+# version $version
+#
+# POD
 
     like($module, qr/^=head1 AUTHOR\n\n/m, 'module has woven the AUTHOR section into pod');
 

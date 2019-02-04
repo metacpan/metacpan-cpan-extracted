@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Zgh - Package for language Standard Moroccan Tamazight
 
 package Locale::CLDR::Locales::Zgh;
 # This file auto generated from Data\common\main\zgh.xml
-#	on Sun  7 Oct 11:07:51 am GMT
+#	on Sun  3 Feb  2:27:18 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1063,23 +1063,23 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{ⵜⵉⴼⴰⵡⵜ},
+				'narrow' => {
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
+					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 				},
 				'wide' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
-				'narrow' => {
+				'abbreviated' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
+					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
 				'narrow' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},

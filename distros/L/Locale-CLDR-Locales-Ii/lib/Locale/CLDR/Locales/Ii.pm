@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ii - Package for language Sichuan Yi
 
 package Locale::CLDR::Locales::Ii;
 # This file auto generated from Data\common\main\ii.xml
-#	on Sun  7 Oct 10:38:25 am GMT
+#	on Sun  3 Feb  1:57:20 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -504,11 +504,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{ꁯꋒ},
 					'am' => q{ꎸꄑ},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'am' => q{ꎸꄑ},
 					'pm' => q{ꁯꋒ},
 				},

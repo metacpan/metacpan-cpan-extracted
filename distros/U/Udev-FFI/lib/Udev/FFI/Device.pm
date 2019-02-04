@@ -187,53 +187,53 @@ Udev::FFI::Device
 
 =head1 METHODS
 
-=head2 get_devpath ()
+=head2 get_devpath()
 
-=head2 get_subsystem ()
+=head2 get_subsystem()
 
-=head2 get_devtype ()
+=head2 get_devtype()
 
-=head2 get_syspath ()
+=head2 get_syspath()
 
-=head2 get_sysname ()
+=head2 get_sysname()
 
-=head2 get_sysnum ()
+=head2 get_sysnum()
 
-=head2 get_devnode ()
+=head2 get_devnode()
 
-=head2 get_is_initialized ()
+=head2 get_is_initialized()
 
-=head2 get_property_value ( KEY )
+=head2 get_property_value( KEY )
 
-=head2 get_driver ()
+=head2 get_driver()
 
-=head2 get_devnum ()
+=head2 get_devnum()
 
-=head2 get_action ()
+=head2 get_action()
 
-=head2 get_seqnum ()
+=head2 get_seqnum()
 
-=head2 get_usec_since_initialized ()
+=head2 get_usec_since_initialized()
 
-=head2 get_sysattr_value ( SYSATTR )
+=head2 get_sysattr_value( SYSATTR )
 
-=head2 set_sysattr_value ( SYSATTR, VALUE )
+=head2 set_sysattr_value( SYSATTR, VALUE )
 
-=head2 has_tag ( TAG )
+=head2 has_tag( TAG )
 
-=head2 get_parent ()
+=head2 get_parent()
 
-=head2 get_parent_with_subsystem_devtype ( SUBSYSTEM [, DEVTYPE] )
+=head2 get_parent_with_subsystem_devtype( SUBSYSTEM [, DEVTYPE] )
 
-=head2 get_devlinks_list_entries ()
+=head2 get_devlinks_list_entries()
 
-=head2 get_properties_list_entries ()
+=head2 get_properties_list_entries()
 
-=head2 get_tags_list_entries ()
+=head2 get_tags_list_entries()
 
-=head2 get_sysattr_list_entries ()
+=head2 get_sysattr_list_entries()
 
-=head2 get_udev ()
+=head2 get_udev()
 
 =head1 SEE ALSO
 

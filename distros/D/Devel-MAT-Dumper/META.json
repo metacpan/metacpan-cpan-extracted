@@ -39,11 +39,11 @@
    "provides" : {
       "Devel::MAT::Dumper" : {
          "file" : "lib/Devel/MAT/Dumper.pm",
-         "version" : "0.39"
+         "version" : "0.40"
       },
       "Devel::MAT::Dumper::Helper" : {
          "file" : "lib/Devel/MAT/Dumper/Helper.pm",
-         "version" : "0.39"
+         "version" : "0.40"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.39",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.40",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

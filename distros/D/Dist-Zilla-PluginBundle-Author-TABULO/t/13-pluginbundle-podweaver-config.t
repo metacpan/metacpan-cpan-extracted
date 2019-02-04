@@ -35,6 +35,11 @@ my $tzil = Builder->from_config(
                     -remove => \@REMOVED_PLUGINS,
                     'RewriteVersion::Transitional.skip_version_provider' => 1,
                     'Test::MinimumVersion.max_target_perl' => '5.008',
+
+                    # TABULO : As it seems, ETHER's tests were designed
+                    # specifically for the 'PodWeaver' plugin (and NOT 'SurgicalPodWeaver')
+                    'surgical_podweaver' => 0,
+
                 } ],
             ),
             path(qw(source lib Foo.pm)) => <<FOO,

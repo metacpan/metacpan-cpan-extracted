@@ -32,6 +32,16 @@ sub test_fromString2 : Test(1) {
     $self->isDeeply(\@arr,\@Rec);
 }
 
+sub test_fromString3 : Test(1) {
+    my $self = shift;
+
+    my @Rec = (A=>'Dies',B=>"ist\nein",C=>'Test');
+    my $Str = "\@\@A\@\@\nDies\n\@\@B\@\@\nist\nein\n\@\@C\@\@\nTest\n";
+
+    my @arr = Quiq::Record->fromString(\$Str);
+    $self->isDeeply(\@arr,\@Rec);
+}
+
 # -----------------------------------------------------------------------------
 
 sub test_toString : Test(6) {

@@ -1,5 +1,8 @@
 Revision history for WWW::Google::PageSpeedOnline
 
+0.28  Sun Feb 03 11:10:00 2019
+      - Updated dependency on WWW::Google::UserAgent v0.22.
+
 0.27  Sun Jan 27 10:40:00 2019
       - Updated dependency on WWW::Google::UserAgent v0.21.
 

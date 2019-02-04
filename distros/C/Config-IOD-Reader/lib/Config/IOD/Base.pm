@@ -1,7 +1,7 @@
 package Config::IOD::Base;
 
 our $DATE = '2019-01-17'; # DATE
-our $VERSION = '0.341'; # VERSION
+our $VERSION = '0.342'; # VERSION
 
 use 5.010001;
 use strict;
@@ -543,7 +543,7 @@ Config::IOD::Base - Base class for Config::IOD and Config::IOD::Reader
 
 =head1 VERSION
 
-This document describes version 0.341 of Config::IOD::Base (from Perl distribution Config-IOD-Reader), released on 2019-01-17.
+This document describes version 0.342 of Config::IOD::Base (from Perl distribution Config-IOD-Reader), released on 2019-01-17.
 
 =head1 EXPRESSION
 

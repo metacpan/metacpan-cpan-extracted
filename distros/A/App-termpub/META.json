@@ -1,5 +1,5 @@
 {
-   "abstract" : "read epubs in the terminal",
+   "abstract" : "Epubreader for the terminal",
    "author" : [
       "Mario Domgoergen C<< <mario@domgoergen.com> >> "
    ],
@@ -48,7 +48,7 @@
    "provides" : {
       "App::termpub" : {
          "file" : "lib/App/termpub.pm",
-         "version" : "1.00"
+         "version" : "1.03"
       },
       "App::termpub::Epub" : {
          "file" : "lib/App/termpub/Epub.pm"
@@ -77,7 +77,7 @@
          "web" : "https://github.com/mdom/termpub"
       }
    },
-   "version" : "1.00",
+   "version" : "1.03",
    "x_contributors" : [
       "Mario Domgoergen <mdom@taz.de>"
    ],

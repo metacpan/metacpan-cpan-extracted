@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sd - Package for language Sindhi
 
 package Locale::CLDR::Locales::Sd;
 # This file auto generated from Data\common\main\sd.xml
-#	on Sun  7 Oct 10:56:52 am GMT
+#	on Sun  3 Feb  2:16:30 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -470,8 +470,8 @@ has 'display_name_script' => (
  			'Hanb' => 'بوپوموفو سان هين',
  			'Hang' => 'هنگول',
  			'Hani' => 'هين',
- 			'Hans' => 'آسان ڪيل',
- 			'Hans@alt=stand-alone' => 'آسان ڪيل هين',
+ 			'Hans' => 'سادي',
+ 			'Hans@alt=stand-alone' => 'سادي هين',
  			'Hant' => 'روايتي',
  			'Hant@alt=stand-alone' => 'روايتي هين',
  			'Hebr' => 'عبراني',
@@ -537,7 +537,7 @@ has 'display_name_region' => (
  			'039' => 'ڏکڻ يورپ',
  			'053' => 'آسٽریلیشیا',
  			'054' => 'میلانیشیا',
- 			'057' => 'مائکرونیشیائي',
+ 			'057' => 'مائڪرونيشائي خطو',
  			'061' => 'پولینیشیا',
  			'142' => 'ايشيا',
  			'143' => 'وچ ايشيا',
@@ -545,8 +545,8 @@ has 'display_name_region' => (
  			'150' => 'يورپ',
  			'151' => 'اوڀر يورپ',
  			'154' => 'اترين يورپ',
- 			'155' => 'اولهندي يورپ',
- 			'202' => 'سب سهارا آفريڪا',
+ 			'155' => 'اولهه يورپ',
+ 			'202' => 'سب-سهارا آفريڪا',
  			'419' => 'لاطيني آمريڪا',
  			'AC' => 'طلوع ٻيٽ',
  			'AD' => 'اندورا',
@@ -568,7 +568,7 @@ has 'display_name_region' => (
  			'BA' => 'بوسنیا اور هرزیگوینا',
  			'BB' => 'باربڊوس',
  			'BD' => 'بنگلاديش',
- 			'BE' => 'آسٽريا',
+ 			'BE' => 'بيلجيم',
  			'BF' => 'برڪينا فاسو',
  			'BG' => 'بلغاريا',
  			'BH' => 'بحرين',
@@ -593,7 +593,7 @@ has 'display_name_region' => (
  			'CF' => 'وچ آفريقي جمهوريه',
  			'CG' => 'ڪانگو - برازاویل',
  			'CG@alt=variant' => 'ڪانگو (جمهوري)',
- 			'CH' => 'سئيٽرزلينڊ',
+ 			'CH' => 'سوئزرلينڊ',
  			'CI' => 'آئيوري ڪنارو',
  			'CI@alt=variant' => 'آئيوري ڪوسٽ',
  			'CK' => 'ڪوڪ ٻيٽ',
@@ -630,6 +630,7 @@ has 'display_name_region' => (
  			'FI' => 'فن لينڊ',
  			'FJ' => 'فجي',
  			'FK' => 'فاڪ لينڊ ٻيٽ',
+ 			'FK@alt=variant' => 'فلڪ لينڊ ٻيٽ',
  			'FM' => 'مائڪرونيشيا',
  			'FO' => 'فارو ٻيٽ',
  			'FR' => 'فرانس',
@@ -705,6 +706,7 @@ has 'display_name_region' => (
  			'MG' => 'مداگيسڪر',
  			'MH' => 'مارشل ڀيٽ',
  			'MK' => 'ميسي ڊونيا',
+ 			'MK@alt=variant' => 'ميڪدونيا',
  			'ML' => 'مالي',
  			'MM' => 'ميانمار (برما)',
  			'MN' => 'منگوليا',
@@ -744,8 +746,8 @@ has 'display_name_region' => (
  			'PM' => 'سینٽ پیئر و میڪوئیلون',
  			'PN' => 'پٽڪئرن ٻيٽ',
  			'PR' => 'پيوئرٽو ريڪو',
- 			'PS' => 'فلسطینی',
- 			'PS@alt=short' => 'فلسطینی',
+ 			'PS' => 'فلسطيني حدون',
+ 			'PS@alt=short' => 'فلسطين',
  			'PT' => 'پرتگال',
  			'PW' => 'پلائو',
  			'PY' => 'پيراگوءِ',
@@ -949,9 +951,9 @@ has 'display_name_code_patterns' => (
 	init_arg	=> undef,
 	default		=> sub { 
 		{
-			'language' => '{0}',
- 			'script' => '{0}',
- 			'region' => '{0}',
+			'language' => 'زبان: {0}',
+ 			'script' => 'اسڪرپٽ: {0}',
+ 			'region' => 'خطو: {0}',
 
 		}
 	},
@@ -980,6 +982,7 @@ has 'characters' => (
 			index => ['ا', 'ب', 'ٻ', 'پ', 'ڀ', 'ت', 'ث', 'ٺ', 'ٽ', 'ٿ', 'ج', '{جھ}', 'ڃ', 'ڄ', 'چ', 'ڇ', 'ح', 'خ', 'د', 'ذ', 'ڊ', 'ڌ', 'ڍ', 'ڏ', 'ر', 'ز', 'ڙ', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ڦ', 'ق', 'ک', 'ڪ', 'گ', '{گھ}', 'ڱ', 'ڳ', 'ل', 'م', 'ن', 'ڻ', 'ه', 'ھ', 'و', 'ي'],
 			main => qr{[آ ا ب ٻ پ ڀ ت ث ٺ ٽ ٿ ج {جھ} ڃ ڄ چ ڇ ح خ د ذ ڊ ڌ ڍ ڏ ر ز ڙ س ش ص ض ط ظ ع غ ف ڦ ق ک ڪ گ {گھ} ڱ ڳ ل م ن ڻ ه ھ و ي]},
 			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[⹁ ⁏ \: ! ۔ ‘ ( ) \[ \] \{ \} /]},
 		};
 	},
 EOT
@@ -1057,6 +1060,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(ڪارڊينل ڊائريڪشن),
+					},
 					'acre' => {
 						'name' => q(ايڪڙ),
 						'one' => q({0} ايڪڙ),
@@ -1086,6 +1092,11 @@ has 'units' => (
 						'name' => q(فلڪيات جا يونٽ),
 						'one' => q({0} فلڪيات جا يونٽ),
 						'other' => q({0} فلڪيات جا يونٽ),
+					},
+					'atmosphere' => {
+						'name' => q(ايٽماس فيئر),
+						'one' => q({0} ايٽماس فيئر),
+						'other' => q({0} ايٽماس فيئر),
 					},
 					'bit' => {
 						'name' => q(بٽز),
@@ -1397,9 +1408,9 @@ has 'units' => (
 						'per' => q({0} في ليٽر),
 					},
 					'liter-per-100kilometers' => {
-						'name' => q(ليٽرز في سوءِ ڪلو ميٽر),
+						'name' => q(ليٽرز في 100 ڪلو ميٽر),
 						'one' => q({0} L/100km),
-						'other' => q({0} ليٽرز في سوءِ ڪلو ميٽر),
+						'other' => q({0} ليٽرز في 100 ڪلو ميٽر),
 					},
 					'liter-per-kilometer' => {
 						'name' => q(ليٽرز في ڪلو ميٽر),
@@ -1576,7 +1587,7 @@ has 'units' => (
 					},
 					'ohm' => {
 						'name' => q(اوهمس),
-						'one' => q({0} Ω),
+						'one' => q({0} اوهم),
 						'other' => q({0} اوهمس),
 					},
 					'ounce' => {
@@ -1601,7 +1612,22 @@ has 'units' => (
 						'other' => q({0} حصا في ملين),
 					},
 					'per' => {
-						'1' => q({0}/{1}),
+						'1' => q(في {1} تي {0}),
+					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(پيرا بائيٽس),
+						'one' => q({0} پيرا بائيٽس),
+						'other' => q({0} پيرا بائيٽس),
 					},
 					'picometer' => {
 						'name' => q(پيڪو ميٽر),
@@ -1749,6 +1775,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(ڊائريڪشن),
+					},
 					'celsius' => {
 						'name' => q(ڊگري سيلسيس),
 						'one' => q({0}°C),
@@ -1803,7 +1832,7 @@ has 'units' => (
 						'other' => q({0} ليٽر),
 					},
 					'liter-per-100kilometers' => {
-						'name' => q(ليٽرز في سوءِ ڪلو ميٽر),
+						'name' => q(L/100km),
 						'one' => q({0} L/100km),
 						'other' => q({0} L/100km),
 					},
@@ -1845,6 +1874,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'second' => {
 						'name' => q(سيڪنڊ),
 						'one' => q({0} s),
@@ -1862,6 +1896,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(ڊائريڪشن),
+					},
 					'acre' => {
 						'name' => q(ايڪڙ),
 						'one' => q({0} ايڪڙ),
@@ -1891,6 +1928,11 @@ has 'units' => (
 						'name' => q(فلڪيات جا يونٽ),
 						'one' => q({0} فلڪيات جا يونٽ),
 						'other' => q({0} فلڪيات جا يونٽ),
+					},
+					'atmosphere' => {
+						'name' => q(ايٽماس فيئر),
+						'one' => q({0} ايٽماس فيئر),
+						'other' => q({0} ايٽماس فيئر),
 					},
 					'bit' => {
 						'name' => q(بٽ),
@@ -2149,8 +2191,8 @@ has 'units' => (
 						'other' => q({0} ڪلو ڪيلوريز),
 					},
 					'kilogram' => {
-						'name' => q(ڪ.گـ.),
-						'one' => q({0} ڪ.گـ.),
+						'name' => q(ڪلو گرام),
+						'one' => q({0} ڪلو گرام),
 						'other' => q({0} ڪ.گـ.),
 						'per' => q({0}/ڪ.گـ.),
 					},
@@ -2202,14 +2244,14 @@ has 'units' => (
 						'per' => q({0} في ليٽر),
 					},
 					'liter-per-100kilometers' => {
-						'name' => q(ليٽرز في سوءِ ڪلو ميٽر),
+						'name' => q(L/100km),
 						'one' => q({0} L/100km),
 						'other' => q({0} L/100km),
 					},
 					'liter-per-kilometer' => {
 						'name' => q(ليٽرز في ڪلو ميٽر),
-						'one' => q({0} ليٽرز في ڪلو ميٽر),
-						'other' => q({0} ليٽرز في ڪلو ميٽر),
+						'one' => q({0} L/km),
+						'other' => q({0} L/km),
 					},
 					'lux' => {
 						'name' => q(لڪس),
@@ -2408,6 +2450,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(پيرا بائيٽس),
+						'one' => q({0} پيرا بائيٽس),
+						'other' => q({0} پيرا بائيٽس),
+					},
 					'picometer' => {
 						'name' => q(پيڪو ميٽر),
 						'one' => q({0} پيڪو ميٽر),
@@ -2560,14 +2617,14 @@ has 'yesstr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
 	init_arg	=> undef,
-	default		=> sub { qr'^(?i:جي ها، ها|yes|y)$' }
+	default		=> sub { qr'^(?i:ها|ها|yes|y)$' }
 );
 
 has 'nostr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
 	init_arg	=> undef,
-	default		=> sub { qr'^(?i:جي نه، نه|no|n)$' }
+	default		=> sub { qr'^(?i:نه|نه|no|n)$' }
 );
 
 has 'listPatterns' => (
@@ -3562,6 +3619,7 @@ has 'currencies' => (
 			},
 		},
 		'MRU' => {
+			symbol => 'MRU',
 			display_name => {
 				'currency' => q(موريشيائي اوگوئیا),
 				'one' => q(موريشيائي اوگوئیا),
@@ -4003,6 +4061,13 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(Venezuelan Bolívar \(2008–2018\)),
+				'one' => q(وینزویلا بولیور \(2008–2018\)),
+				'other' => q(وینزویلا بولیور \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(وینزویلا بولیور),
 				'one' => q(وینزویلا بولیور),
 				'other' => q(وینزویلا بولیور),
@@ -4127,18 +4192,18 @@ has 'calendar_months' => (
 					},
 					narrow => {
 						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
+							'J',
+							'F',
+							'M',
+							'A',
+							'M',
+							'J',
+							'J',
+							'A',
+							'S',
+							'O',
+							'N',
+							'D'
 						],
 						leap => [
 							
@@ -4186,18 +4251,18 @@ has 'calendar_months' => (
 					},
 					narrow => {
 						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
+							'J',
+							'F',
+							'M',
+							'A',
+							'M',
+							'J',
+							'J',
+							'A',
+							'S',
+							'O',
+							'N',
+							'D'
 						],
 						leap => [
 							
@@ -4283,12 +4348,12 @@ has 'calendar_days' => (
 					},
 					narrow => {
 						mon => 'سو',
-						tue => 'اڱ',
-						wed => 'ار',
+						tue => 'اڱارو',
+						wed => 'اربع',
 						thu => 'خم',
-						fri => 'جم',
-						sat => 'ڇن',
-						sun => 'آچ'
+						fri => 'جمعو',
+						sat => 'ڇنڇر',
+						sun => 'آچر'
 					},
 					short => {
 						mon => 'سومر',
@@ -4320,10 +4385,10 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'پهرين ٽي ماهي',
-						1 => 'ٻين ٽي ماهي',
-						2 => 'ٽين ٽي ماهي',
-						3 => 'چوٿين ٽي ماهي'
+					abbreviated => {0 => 'Q1',
+						1 => 'Q2',
+						2 => 'Q3',
+						3 => 'Q5'
 					},
 					narrow => {0 => '1',
 						1 => '2',
@@ -4337,10 +4402,10 @@ has 'calendar_quarters' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {0 => 'پهرين ٽي ماهي',
-						1 => 'ٻين ٽي ماهي',
-						2 => 'ٽين ٽي ماهي',
-						3 => 'چوٿين ٽي ماهي'
+					abbreviated => {0 => 'Q1',
+						1 => 'Q2',
+						2 => 'Q3',
+						3 => 'Q4'
 					},
 					narrow => {0 => '1',
 						1 => '2',
@@ -4364,20 +4429,24 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{منجهند، شام},
-					'am' => q{صبح، منجهند},
-				},
-				'narrow' => {
-					'pm' => q{منجهند، شام},
-					'am' => q{صبح، منجهند},
-				},
 				'abbreviated' => {
 					'pm' => q{شام، منجهند},
 					'am' => q{صبح، منجهند},
 				},
+				'narrow' => {
+					'am' => q{صبح، منجهند},
+					'pm' => q{منجهند، شام},
+				},
+				'wide' => {
+					'pm' => q{منجهند، شام},
+					'am' => q{صبح، منجهند},
+				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'am' => q{صبح، منجهند},
+					'pm' => q{منجهند، شام},
+				},
 				'narrow' => {
 					'pm' => q{منجهند، شام},
 					'am' => q{صبح، منجهند},
@@ -4385,10 +4454,6 @@ has 'day_periods' => (
 				'wide' => {
 					'am' => q{صبح، منجهند},
 					'pm' => q{منجهند، شام},
-				},
-				'abbreviated' => {
-					'pm' => q{منجهند، شام},
-					'am' => q{صبح، منجهند},
 				},
 			},
 		},
@@ -4404,8 +4469,8 @@ has 'eras' => (
 		},
 		'gregorian' => {
 			abbreviated => {
-				'0' => 'BCE',
-				'1' => 'CE'
+				'0' => 'BC',
+				'1' => 'CD'
 			},
 			wide => {
 				'0' => 'مسيح کان اڳ',
@@ -4476,49 +4541,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d, E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{MM-dd, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{MM-dd},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{G y},
-			yyyy => q{G y},
-			yyyyM => q{GGGGG y-MM},
-			yyyyMEd => q{GGGGG y-MM-dd, E},
-			yyyyMMM => q{G y MMM},
-			yyyyMMMEd => q{G y MMM d, E},
-			yyyyMMMM => q{G y MMMM},
-			yyyyMMMd => q{G y MMM d},
-			yyyyMd => q{GGGGG y-MM-dd},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
-		},
 		'gregorian' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -4567,6 +4589,49 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{y QQQQ},
 			yw => q{ھفتو w جو Y},
 		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{MM-dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d, E},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{MM-dd},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{G y},
+			yyyy => q{G y},
+			yyyyM => q{GGGGG y-MM},
+			yyyyMEd => q{GGGGG y-MM-dd, E},
+			yyyyMMM => q{G y MMM},
+			yyyyMMMEd => q{G y MMM d, E},
+			yyyyMMMM => q{G y MMMM},
+			yyyyMMMd => q{G y MMM d},
+			yyyyMd => q{GGGGG y-MM-dd},
+			yyyyQQQ => q{G y QQQ},
+			yyyyQQQQ => q{G y QQQQ},
+		},
 	} },
 );
 
@@ -4586,69 +4651,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{G y–y},
-			},
-			yM => {
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-			},
-			yMMM => {
-				M => q{G y MMM–MMM},
-				y => q{G y MMM – y MMM},
-			},
-			yMMMEd => {
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
-			},
-			yMMMM => {
-				M => q{G y MMMM–MMMM},
-				y => q{G y MMMM – y MMMM},
-			},
-			yMMMd => {
-				M => q{G y MMM d – MMM d},
-				d => q{G y MMM d–d},
-				y => q{G y MMM d – y MMM d},
-			},
-			yMd => {
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
-				y => q{GGGGG y-MM-dd – y-MM-dd},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -4744,6 +4746,69 @@ has 'datetime_formats_interval' => (
 				y => q{y-MM-dd – y-MM-dd},
 			},
 		},
+		'generic' => {
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{G y–y},
+			},
+			yM => {
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				M => q{G y MMM–MMM},
+				y => q{G y MMM – y MMM},
+			},
+			yMMMEd => {
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				M => q{G y MMMM–MMMM},
+				y => q{G y MMMM – y MMMM},
+			},
+			yMMMd => {
+				M => q{G y MMM d – MMM d},
+				d => q{G y MMM d–d},
+				y => q{G y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
+			},
+		},
 	} },
 );
 
@@ -4756,8 +4821,8 @@ has 'time_zone_names' => (
 		gmtFormat => q(GMT{0}),
 		gmtZeroFormat => q(GMT),
 		regionFormat => q({0} وقت),
-		regionFormat => q({0} (+1)),
-		regionFormat => q({0} (+0)),
+		regionFormat => q({0} ڏينهن جو وقت),
+		regionFormat => q({0} معياري وقت),
 		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {

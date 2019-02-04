@@ -32,7 +32,7 @@ Test::PONAPI::Repository::MockDB::Table::Relationships - mock repository - table
 
 =head1 VERSION
 
-version 0.003002
+version 0.003003
 
 =head1 AUTHORS
 
@@ -54,7 +54,7 @@ Brian Fraser <hugmeir@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Mickey Nasriachi, Stevan Little, Brian Fraser.
+This software is copyright (c) 2019 by Mickey Nasriachi, Stevan Little, Brian Fraser.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

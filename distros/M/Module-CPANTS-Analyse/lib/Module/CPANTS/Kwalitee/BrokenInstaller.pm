@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 $VERSION =~ s/_//; ## no critic
 
 sub order { 100 }

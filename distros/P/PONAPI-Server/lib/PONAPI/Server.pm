@@ -4,7 +4,7 @@ package PONAPI::Server;
 use strict;
 use warnings;
 
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 
 use Plack::Request;
 use Plack::Response;
@@ -239,7 +239,7 @@ sub _ponapi_query_params {
     my $unesacpe_values = !!$req->headers->header('X-PONAPI-Escaped-Values');
 
     # loop over query parameters (unique keys)
-    for my $k ( keys %{ $query_params } ) {
+    for my $k ( sort keys %{ $query_params } ) {
         my ( $p, $f ) = $k =~ /^ (\w+?) (?:\[(\w+)\])? $/x;
 
         # key not matched
@@ -398,7 +398,7 @@ PONAPI::Server - PONAPI - Perl implementation of {JSON:API} (http://jsonapi.org/
 
 =head1 VERSION
 
-version 0.003002
+version 0.003003
 
 =head1 SYNOPSIS
 
@@ -444,7 +444,7 @@ Brian Fraser <hugmeir@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Mickey Nasriachi, Stevan Little, Brian Fraser.
+This software is copyright (c) 2019 by Mickey Nasriachi, Stevan Little, Brian Fraser.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

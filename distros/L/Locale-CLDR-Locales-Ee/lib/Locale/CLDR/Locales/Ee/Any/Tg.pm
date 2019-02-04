@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ee::Any::Tg - Package for language Ewe
 
 package Locale::CLDR::Locales::Ee::Any::Tg;
 # This file auto generated from Data\common\main\ee_TG.xml
-#	on Sun  7 Oct 10:28:18 am GMT
+#	on Sun  3 Feb  1:47:22 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -35,33 +35,33 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
+				if($day_period_type eq 'default') {
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
 					return 'morning2' if $time >= 500
 						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1800;
 				}
-				if($day_period_type eq 'default') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'morning2' if $time >= 500
 						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 				}
 				last SWITCH;
 				}

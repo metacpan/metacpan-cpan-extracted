@@ -1,11 +1,11 @@
 ---
 bookmark: ''
 branch: default
-date: 2019-01-25T10:46:44Z
-node: 6e3fe2de8bf2
+date: 2019-02-04T06:48:13Z
+node: 3dfb47d7c1c6
 phase: public
-release: v0.78.9
+release: v0.78.12
 release_distance: 0
-release_id: v0.78.9
+release_id: v0.78.12
 tags:
 - tip

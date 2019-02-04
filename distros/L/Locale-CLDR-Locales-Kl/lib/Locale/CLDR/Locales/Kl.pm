@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Kl - Package for language Kalaallisut
 
 package Locale::CLDR::Locales::Kl;
 # This file auto generated from Data\common\main\kl.xml
-#	on Sun  7 Oct 10:41:23 am GMT
+#	on Sun  3 Feb  2:00:28 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -968,8 +968,8 @@ has 'units' => (
 					},
 					'fathom' => {
 						'name' => q(fm),
-						'one' => q({0} fm),
-						'other' => q({0} fm),
+						'one' => q({0} fth),
+						'other' => q({0} fth),
 					},
 					'foot' => {
 						'name' => q(fod),
@@ -1343,8 +1343,8 @@ has 'units' => (
 					},
 					'fathom' => {
 						'name' => q(fm),
-						'one' => q({0} fm),
-						'other' => q({0} fm),
+						'one' => q({0} fth),
+						'other' => q({0} fth),
 					},
 					'foot' => {
 						'one' => q({0} fod),
@@ -1698,8 +1698,8 @@ has 'units' => (
 					},
 					'fathom' => {
 						'name' => q(fm),
-						'one' => q({0} fm),
-						'other' => q({0} fm),
+						'one' => q({0} fth),
+						'other' => q({0} fth),
 					},
 					'foot' => {
 						'name' => q(fod),
@@ -2457,7 +2457,7 @@ has 'calendar_days' => (
 						thu => 'sis',
 						fri => 'tal',
 						sat => 'arf',
-						sun => 'sab'
+						sun => 'sap'
 					},
 					short => {
 						mon => 'ata',
@@ -2466,7 +2466,7 @@ has 'calendar_days' => (
 						thu => 'sis',
 						fri => 'tal',
 						sat => 'arf',
-						sun => 'sab'
+						sun => 'sap'
 					},
 					wide => {
 						mon => 'ataasinngorneq',
@@ -2475,7 +2475,7 @@ has 'calendar_days' => (
 						thu => 'sisamanngorneq',
 						fri => 'tallimanngorneq',
 						sat => 'arfininngorneq',
-						sun => 'sabaat'
+						sun => 'sapaat'
 					},
 				},
 				'stand-alone' => {
@@ -2495,7 +2495,7 @@ has 'calendar_days' => (
 						thu => 'sis',
 						fri => 'tal',
 						sat => 'arf',
-						sun => 'sab'
+						sun => 'sap'
 					},
 					wide => {
 						mon => 'ataasinngorneq',
@@ -2504,7 +2504,7 @@ has 'calendar_days' => (
 						thu => 'sisamanngorneq',
 						fri => 'tallimanngorneq',
 						sat => 'arfininngorneq',
-						sun => 'sabaat'
+						sun => 'sapaat'
 					},
 				},
 			},
@@ -2562,13 +2562,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{ulloqeqqata-kingorna},
-					'am' => q{ulloqeqqata-tungaa},
-				},
 				'abbreviated' => {
 					'am' => q{u.t.},
 					'pm' => q{u.k.},
+				},
+				'wide' => {
+					'am' => q{ulloqeqqata-tungaa},
+					'pm' => q{ulloqeqqata-kingorna},
 				},
 			},
 		},

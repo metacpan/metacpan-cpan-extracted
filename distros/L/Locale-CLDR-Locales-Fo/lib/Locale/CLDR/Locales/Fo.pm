@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fo - Package for language Faroese
 
 package Locale::CLDR::Locales::Fo;
 # This file auto generated from Data\common\main\fo.xml
-#	on Sun  7 Oct 10:32:30 am GMT
+#	on Sun  3 Feb  1:51:07 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -4650,6 +4650,13 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(Venesuela bolívar \(2008–2018\)),
+				'one' => q(Venesuela bolívar \(2008–2018\)),
+				'other' => q(Venesuela bolívar \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(Venesuela bolívar),
 				'one' => q(Venesuela bolívar),
 				'other' => q(Venesuela bolívar),
@@ -5039,29 +5046,29 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'narrow' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
 				'wide' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
-				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 				'abbreviated' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
 				'narrow' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
 				'wide' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
-				'abbreviated' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},

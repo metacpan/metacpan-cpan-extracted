@@ -8,7 +8,7 @@ Locale::CLDR - A Module to create locale objects with localisation data from the
 
 =head1 VERSION
 
-Version 0.33.1
+Version 0.34
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ or
 
 use v5.10.1;
 use version;
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34');
 
 use open ':encoding(utf8)';
 use utf8;
@@ -1197,6 +1197,8 @@ my $has_Line_Break_ZWJ = eval '1 !~ /\p{Line_Break=ZWJ}/';
 my $has_Line_Break_E_Base = eval '1 !~ /\p{Line_Break=E_Base}/';
 my $has_Line_Break_E_Base_GAZ = eval '1 !~ /\p{Line_Break=E_Base_GAZ}/';
 my $has_Line_Break_E_Modifier = eval '1 !~ /\p{Line_Break=E_Modifier}/';
+my $has_Extended_Pictographic = eval '1 !~ /\p{Extended_Pictographic}/';
+my $has_Word_Break_WSegSpace = eval '1 !~ /\p{Word_Break=WSegSpace}/';
 
 sub _fix_missing_unicode_properties {
 	my $regex = shift;
@@ -1248,6 +1250,12 @@ sub _fix_missing_unicode_properties {
 	$regex =~ s/\\(p)\{Line_Break=E_Modifier\}/\\${1}{IsCLDREmpty}/ig
 		unless $has_Line_Break_E_Modifier;
 
+	$regex =~ s/\\(p)\{Extended_Pictographic\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Extended_Pictographic;
+	
+	$regex =~ s/\\(p)\{Word_Break=WSegSpace\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Word_Break_WSegSpace;
+	
 	return $regex;
 }
 

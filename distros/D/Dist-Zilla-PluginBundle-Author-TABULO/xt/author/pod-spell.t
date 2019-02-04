@@ -11,10 +11,12 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( examples lib script t xt ) );
 __DATA__
 Author
-Ayhan
+Banal
 Betts
+Config
 Dave
 Dist
+Easier
 Edward
 Etheridge
 Graham
@@ -26,11 +28,15 @@ MintingProfile
 PluginBundle
 Pod
 Randy
+Role
 Rolsky
 Roy
+Selfish
 Stauner
 TABULO
-Ulusoy
+Tabulo
+Template
+Text
 Weaver
 Zilla
 autarch

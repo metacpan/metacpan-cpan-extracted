@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Text;
 
 # ABSTRACT: Output text to window
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 use Graphics::Raylib::XS qw(:all);
 use Graphics::Raylib::Color;
@@ -19,7 +19,7 @@ Graphics::Raylib::Text - Output text to window
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

@@ -33,7 +33,7 @@ $ENV{TIMETRACKER_MIN_TIME} ||= 300;
 
 sub cmd_edit {
   my $self = shift;
-  my $dir = readlink($self->_root) || $self->_root;
+  my $dir  = readlink($self->_root) || $self->_root;
   my ($code, $date, @files) = ('');
 
   if (@_ and -f $_[0]) {
@@ -379,7 +379,7 @@ sub _from_iso_8601 {
 }
 
 sub _get_previous_event {
-  my $self = shift;
+  my $self     = shift;
   my $trc_file = File::Spec->catfile($self->_root, 'previous');
 
   warn "[APP_TT] _get_previous_event $trc_file\n" if DEBUG;
@@ -435,15 +435,7 @@ sub _log {
   my $tags       = join ',', @{$self->tag};
   my @project_re = map {qr{^$_\b}} split /,/, $self->project || '.+';
 
-  my $res = {
-    events          => 0,
-    fill            => 0,
-    interval        => 'month',
-    log             => [],
-    max_project_chr => 0,
-    seconds         => 0,
-    start_at        => 0,
-  };
+  my $res = {events => 0, log => [], max_project_chr => 0, seconds => 0};
 
   for (@_) {
     /^(-\d+)(m|y|month|year)$/ and ($res->{start_at} = $1 and $res->{interval} = $2);
@@ -451,6 +443,10 @@ sub _log {
     /^(month|year)/ and $res->{interval} ||= $1;
     /^--fill/       and $res->{fill}     ||= 1;
   }
+
+  $res->{fill}     ||= 0;
+  $res->{interval} ||= 'month';
+  $res->{start_at} ||= 0;
 
   if ($res->{interval} =~ m!^y!) {
     $res->{when} = $self->_tp(Y => $self->_now->year + $res->{start_at}, m => 1, d => 1);
@@ -511,7 +507,7 @@ sub _set_now {
   if (my ($hm) = grep {/^\d+:\d+$/} @_) {
     $hm =~ /^(\d+):(\d+)$/;
     $self->{custom_now} = $hm;
-    $self->{now} = $self->_tp(H => $1, M => $2);
+    $self->{now}        = $self->_tp(H => $1, M => $2);
   }
 
   return $self;
@@ -576,13 +572,13 @@ sub _tp {
   my ($self, %t) = @_;
 
   $t{Y} ||= $self->_now->year;
-  $t{m} ||= $self->_now->mon;
-  $t{d} ||= $self->_now->mday;
+  $t{m} //= $self->_now->mon;
+  $t{d} //= $self->_now->mday;
   $t{H} ||= 0;
   $t{M} ||= 0;
   $t{S} ||= 0;
 
-  if ($t{m} < 0) {
+  if ($t{m} <= 0) {
     $t{m} = 12 - $t{m};
     $t{Y}--;
   }
@@ -603,7 +599,7 @@ sub _trc_path {
 }
 
 app {
-  my $self = shift;
+  my $self   = shift;
   my $action = sprintf 'cmd_%s', shift || 'status';
 
   if ($ENV{APP_TT_HELP}) {

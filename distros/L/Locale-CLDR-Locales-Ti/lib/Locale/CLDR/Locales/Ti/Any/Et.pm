@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ti::Any::Et - Package for language Tigrinya
 
 package Locale::CLDR::Locales::Ti::Any::Et;
 # This file auto generated from Data\common\main\ti_ET.xml
-#	on Sun  7 Oct 11:02:25 am GMT
+#	on Sun  3 Feb  2:21:57 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

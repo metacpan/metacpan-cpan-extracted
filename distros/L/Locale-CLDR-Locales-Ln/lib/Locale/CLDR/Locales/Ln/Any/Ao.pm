@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ln::Any::Ao - Package for language Lingala
 
 package Locale::CLDR::Locales::Ln::Any::Ao;
 # This file auto generated from Data\common\main\ln_AO.xml
-#	on Sun  7 Oct 10:43:58 am GMT
+#	on Sun  3 Feb  2:02:53 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

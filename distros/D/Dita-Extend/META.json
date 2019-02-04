@@ -25,8 +25,9 @@
             "Carp" : "0",
             "Data::DFA" : "20181027",
             "Data::Dump" : "0",
-            "Data::Edit::Xml" : "20181216",
-            "Data::Table::Text" : "20181216",
+            "Data::Edit::Xml" : "20190124",
+            "Data::NFA" : "20181027",
+            "Data::Table::Text" : "20190121",
             "Storable" : "0",
             "Test2::API" : "0",
             "Test::More" : "0",
@@ -46,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20181217",
+   "version" : "20190201",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

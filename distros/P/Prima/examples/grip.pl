@@ -1,4 +1,4 @@
-=pod 
+=pod
 
 =head1 NAME
 
@@ -52,6 +52,7 @@ my $w = Prima::MainWindow-> create(
 			$self-> capture( 1);
 			$self-> { cap} = 2;
 		}],
+		[ "~Full screen" => sub { shift-> IV-> image( $::application->get_fullscreen_image) }],
 	],
 	onMouseDown => sub {
 		my ( $self, $btn, $mod, $x, $y) = @_;

@@ -28,7 +28,8 @@ Net::Async::Redis - talk to Redis servers via L<IO::Async>
         print "Value: " . shift;
     })->get;
 
-    # ... or with Future::AsyncAwait
+    # ... or with Future::AsyncAwait (as of version 0.21+ is
+    # stable enough to consider using in real code)
     await $redis->connect;
     my $value = await $redis->get('some_key');
     $value ||= await $redis->set(some_key => 'some_value');
@@ -66,10 +67,11 @@ Example:
  $redis->subscribe('notifications')
     ->then(sub {
         my $sub = shift;
-        $sub->map('payload')
+        $sub->events
+            ->map('payload')
             ->take(5)
             ->say
-            ->completion
+            ->completed
     })->then(sub {
         $redis->unsubscribe('notifications')
     })->get
@@ -128,6 +130,21 @@ See L<https://redis.io/topics/pipelining> for more details on this concept.
 This are still supported, but no longer recommended.
 
 =head1 METHODS - Internal
+
+=head2 stream_read_len
+
+Defines the buffer size when reading from a Redis connection.
+
+Defaults to 1MB, reduce this if you're dealing with a lot of connections and
+want to minimise memory usage. Alternatively, if you're reading large amounts
+of data and spend too much time in needless C<epoll_wait> calls, try a larger
+value.
+
+=head2 stream_write_len
+
+The buffer size when writing to Redis connections, in bytes.
+
+See L</stream_read_len>.
 
 =head1 SEE ALSO
 

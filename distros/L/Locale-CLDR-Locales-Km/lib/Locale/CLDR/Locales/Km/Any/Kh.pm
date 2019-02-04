@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Km::Any::Kh - Package for language Khmer
 
 package Locale::CLDR::Locales::Km::Any::Kh;
 # This file auto generated from Data\common\main\km_KH.xml
-#	on Sun  7 Oct 10:41:50 am GMT
+#	on Sun  3 Feb  2:00:48 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

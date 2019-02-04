@@ -50,12 +50,14 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	FLAG_MSAA_4X_HINT
 	FLAG_SHOW_LOGO
 	FLAG_VSYNC_HINT
+	FLAG_WINDOW_HIDDEN
 	FLAG_WINDOW_RESIZABLE
 	FLAG_WINDOW_TRANSPARENT
 	FLAG_WINDOW_UNDECORATED
 	FONT_BITMAP
 	FONT_DEFAULT
 	FONT_SDF
+	FormatText
 	GAMEPAD_ANDROID_BUTTON_A
 	GAMEPAD_ANDROID_BUTTON_B
 	GAMEPAD_ANDROID_BUTTON_C
@@ -296,6 +298,8 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	NPT_3PATCH_VERTICAL
 	NPT_9PATCH
 	RAD2DEG
+	ShowWindow
+	SubText
 	UNCOMPRESSED_GRAYSCALE
 	UNCOMPRESSED_GRAY_ALPHA
 	UNCOMPRESSED_R32
@@ -306,8 +310,18 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	UNCOMPRESSED_R5G6B5
 	UNCOMPRESSED_R8G8B8
 	UNCOMPRESSED_R8G8B8A8
+	UNIFORM_FLOAT
+	UNIFORM_INT
+	UNIFORM_IVEC2
+	UNIFORM_IVEC3
+	UNIFORM_IVEC4
+	UNIFORM_SAMPLER2D
+	UNIFORM_VEC2
+	UNIFORM_VEC3
+	UNIFORM_VEC4
 	WRAP_CLAMP
-	WRAP_MIRROR
+	WRAP_MIRROR_CLAMP
+	WRAP_MIRROR_REPEAT
 	WRAP_REPEAT
 	false
 	true
@@ -315,6 +329,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	BeginDrawing
 	BeginMode2D
 	BeginMode3D
+	BeginScissorMode
 	BeginShaderMode
 	BeginTextureMode
 	BeginVrDrawing
@@ -332,11 +347,13 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	CheckCollisionRecs
 	CheckCollisionSpheres
 	ClearBackground
+	ClearDirectoryFiles
 	ClearDroppedFiles
 	CloseAudioDevice
 	CloseAudioStream
 	CloseVrSimulator
 	CloseWindow
+	ColorFromHSV
 	ColorNormalize
 	ColorToHSV
 	ColorToInt
@@ -388,10 +405,12 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	DrawSphereWires
 	DrawText
 	DrawTextEx
+	DrawTextRec
 	DrawTexture
 	DrawTextureEx
 	DrawTextureNPatch
 	DrawTexturePro
+	DrawTextureQuad
 	DrawTextureRec
 	DrawTextureV
 	DrawTriangle
@@ -401,14 +420,17 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	EndDrawing
 	EndMode2D
 	EndMode3D
+	EndScissorMode
 	EndShaderMode
 	EndTextureMode
 	EndVrDrawing
 	ExportImage
+	ExportImageAsCode
 	ExportMesh
 	ExportWave
+	ExportWaveAsCode
 	Fade
-	FormatText
+	FileExists
 	GenImageCellular
 	GenImageChecked
 	GenImageColor
@@ -425,6 +447,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	GenMeshHemiSphere
 	GenMeshKnot
 	GenMeshPlane
+	GenMeshPoly
 	GenMeshSphere
 	GenMeshTorus
 	GenTextureBRDF
@@ -438,10 +461,13 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	GetCollisionRayTriangle
 	GetCollisionRec
 	GetColor
+	GetDirectoryFiles
 	GetDirectoryPath
 	GetExtension
 	GetFPS
+	GetFileModTime
 	GetFileName
+	GetFileNameWithoutExt
 	GetFontDefault
 	GetFrameTime
 	GetGamepadAxisCount
@@ -487,9 +513,11 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	GetTouchY
 	GetVrDeviceInfo
 	GetWaveData
+	GetWindowHandle
 	GetWorkingDirectory
 	GetWorldToScreen
 	HideCursor
+	HideWindow
 	ImageAlphaClear
 	ImageAlphaCrop
 	ImageAlphaMask
@@ -505,8 +533,10 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	ImageDither
 	ImageDraw
 	ImageDrawRectangle
+	ImageDrawRectangleLines
 	ImageDrawText
 	ImageDrawTextEx
+	ImageExtractPalette
 	ImageFlipHorizontal
 	ImageFlipVertical
 	ImageFormat
@@ -547,11 +577,13 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	IsMusicPlaying
 	IsSoundPlaying
 	IsVrSimulatorReady
+	IsWindowHidden
 	IsWindowMinimized
 	IsWindowReady
 	LoadFont
 	LoadFontData
 	LoadFontEx
+	LoadFontFromImage
 	LoadImage
 	LoadImageEx
 	LoadImagePro
@@ -581,6 +613,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	MeshBinormals
 	MeshBoundingBox
 	MeshTangents
+	OpenURL
 	PauseAudioStream
 	PauseMusicStream
 	PauseSound
@@ -603,6 +636,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	SetMasterVolume
 	SetMatrixModelview
 	SetMatrixProjection
+	SetMouseOffset
 	SetMousePosition
 	SetMouseScale
 	SetMusicLoopCount
@@ -610,7 +644,8 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	SetMusicVolume
 	SetShaderValue
 	SetShaderValueMatrix
-	SetShaderValuei
+	SetShaderValueV
+	SetShapesTexture
 	SetSoundPitch
 	SetSoundVolume
 	SetTargetFPS
@@ -626,17 +661,16 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	SetWindowSize
 	SetWindowTitle
 	ShowCursor
-	ShowLogo
 	StopAudioStream
 	StopMusicStream
 	StopSound
 	StorageLoadValue
 	StorageSaveValue
-	SubText
 	TakeScreenshot
 	ToggleFullscreen
 	ToggleVrMode
 	TraceLog
+	UnhideWindow
 	UnloadFont
 	UnloadImage
 	UnloadMaterial
@@ -696,12 +730,14 @@ our @EXPORT = qw(
 	FLAG_MSAA_4X_HINT
 	FLAG_SHOW_LOGO
 	FLAG_VSYNC_HINT
+	FLAG_WINDOW_HIDDEN
 	FLAG_WINDOW_RESIZABLE
 	FLAG_WINDOW_TRANSPARENT
 	FLAG_WINDOW_UNDECORATED
 	FONT_BITMAP
 	FONT_DEFAULT
 	FONT_SDF
+	FormatText
 	GAMEPAD_ANDROID_BUTTON_A
 	GAMEPAD_ANDROID_BUTTON_B
 	GAMEPAD_ANDROID_BUTTON_C
@@ -942,6 +978,8 @@ our @EXPORT = qw(
 	NPT_3PATCH_VERTICAL
 	NPT_9PATCH
 	RAD2DEG
+	ShowWindow
+	SubText
 	UNCOMPRESSED_GRAYSCALE
 	UNCOMPRESSED_GRAY_ALPHA
 	UNCOMPRESSED_R32
@@ -952,8 +990,18 @@ our @EXPORT = qw(
 	UNCOMPRESSED_R5G6B5
 	UNCOMPRESSED_R8G8B8
 	UNCOMPRESSED_R8G8B8A8
+	UNIFORM_FLOAT
+	UNIFORM_INT
+	UNIFORM_IVEC2
+	UNIFORM_IVEC3
+	UNIFORM_IVEC4
+	UNIFORM_SAMPLER2D
+	UNIFORM_VEC2
+	UNIFORM_VEC3
+	UNIFORM_VEC4
 	WRAP_CLAMP
-	WRAP_MIRROR
+	WRAP_MIRROR_CLAMP
+	WRAP_MIRROR_REPEAT
 	WRAP_REPEAT
 	false
 	true
@@ -1005,7 +1053,7 @@ Graphics::Raylib::XS - XS wrapper around raylib
 
 =head1 DESCRIPTION
 
-See L<Graphics::Raylib> for a Perlish wrapper. This XS wrapper wraps version 1.9.1-dev.
+See L<Graphics::Raylib> for a Perlish wrapper. This XS wrapper wrap the raylib packaged by L<Alien::raylib>. raylib adds new features and breaks ABI often as well, therefore use with system raylib isn't recommended.
 
 =head2 EXPORT
 
@@ -1045,12 +1093,14 @@ None by default.
   FLAG_MSAA_4X_HINT
   FLAG_SHOW_LOGO
   FLAG_VSYNC_HINT
+  FLAG_WINDOW_HIDDEN
   FLAG_WINDOW_RESIZABLE
   FLAG_WINDOW_TRANSPARENT
   FLAG_WINDOW_UNDECORATED
   FONT_BITMAP
   FONT_DEFAULT
   FONT_SDF
+  FormatText
   GAMEPAD_ANDROID_BUTTON_A
   GAMEPAD_ANDROID_BUTTON_B
   GAMEPAD_ANDROID_BUTTON_C
@@ -1291,6 +1341,8 @@ None by default.
   NPT_3PATCH_VERTICAL
   NPT_9PATCH
   RAD2DEG
+  ShowWindow
+  SubText
   UNCOMPRESSED_GRAYSCALE
   UNCOMPRESSED_GRAY_ALPHA
   UNCOMPRESSED_R32
@@ -1301,8 +1353,18 @@ None by default.
   UNCOMPRESSED_R5G6B5
   UNCOMPRESSED_R8G8B8
   UNCOMPRESSED_R8G8B8A8
+  UNIFORM_FLOAT
+  UNIFORM_INT
+  UNIFORM_IVEC2
+  UNIFORM_IVEC3
+  UNIFORM_IVEC4
+  UNIFORM_SAMPLER2D
+  UNIFORM_VEC2
+  UNIFORM_VEC3
+  UNIFORM_VEC4
   WRAP_CLAMP
-  WRAP_MIRROR
+  WRAP_MIRROR_CLAMP
+  WRAP_MIRROR_REPEAT
   WRAP_REPEAT
   false
   true
@@ -1313,10 +1375,11 @@ None by default.
   void BeginDrawing(void)
   void BeginMode2D(Camera2D camera)
   void BeginMode3D(Camera3D camera)
+  void BeginScissorMode(int x, int y, int width, int height)
   void BeginShaderMode(Shader shader)
   void BeginTextureMode(RenderTexture2D target)
   void BeginVrDrawing(void)
-  bool ChangeDirectory(const char *dir)
+  bool ChangeDirectory(char *dir)
   bool CheckCollisionBoxSphere(BoundingBox box, Vector3 centerSphere, float radiusSphere)
   bool CheckCollisionBoxes(BoundingBox box1, BoundingBox box2)
   bool CheckCollisionCircleRec(Vector2 center, float radius, Rectangle rec)
@@ -1330,11 +1393,13 @@ None by default.
   bool CheckCollisionRecs(Rectangle rec1, Rectangle rec2)
   bool CheckCollisionSpheres(Vector3 centerA, float radiusA, Vector3 centerB, float radiusB)
   void ClearBackground(Color color)
+  void ClearDirectoryFiles(void)
   void ClearDroppedFiles(void)
   void CloseAudioDevice(void)
   void CloseAudioStream(AudioStream stream)
   void CloseVrSimulator(void)
   void CloseWindow(void)
+  Color ColorFromHSV(Vector3 hsv)
   Vector4 ColorNormalize(Color color)
   Vector3 ColorToHSV(Color color)
   int ColorToInt(Color color)
@@ -1384,12 +1449,14 @@ None by default.
   void DrawSphere(Vector3 centerPos, float radius, Color color)
   void DrawSphereEx(Vector3 centerPos, float radius, int rings, int slices, Color color)
   void DrawSphereWires(Vector3 centerPos, float radius, int rings, int slices, Color color)
-  void DrawText(const char *text, int posX, int posY, int fontSize, Color color)
-  void DrawTextEx(Font font, const char* text, Vector2 position, float fontSize, float spacing, Color tint)
+  void DrawText(char *text, int posX, int posY, int fontSize, Color color)
+  void DrawTextEx(Font font, char *text, Vector2 position, float fontSize, float spacing, Color tint)
+  void DrawTextRec(Font font, char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint)
   void DrawTexture(Texture2D texture, int posX, int posY, Color tint)
   void DrawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint)
   void DrawTextureNPatch(Texture2D texture, NPatchInfo nPatchInfo, Rectangle destRec, Vector2 origin, float rotation, Color tint)
   void DrawTexturePro(Texture2D texture, Rectangle sourceRec, Rectangle destRec, Vector2 origin, float rotation, Color tint)
+  void DrawTextureQuad(Texture2D texture, Vector2 tiling, Vector2 offset, Rectangle quad, Color tint)
   void DrawTextureRec(Texture2D texture, Rectangle sourceRec, Vector2 position, Color tint)
   void DrawTextureV(Texture2D texture, Vector2 position, Color tint)
   void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color)
@@ -1399,18 +1466,21 @@ None by default.
   void EndDrawing(void)
   void EndMode2D(void)
   void EndMode3D(void)
+  void EndScissorMode(void)
   void EndShaderMode(void)
   void EndTextureMode(void)
   void EndVrDrawing(void)
-  void ExportImage(Image image, const char *fileName)
-  void ExportMesh(Mesh mesh, const char *fileName)
-  void ExportWave(Wave wave, const char *fileName)
+  void ExportImage(Image image, char *fileName)
+  void ExportImageAsCode(Image image, char *fileName)
+  void ExportMesh(Mesh mesh, char *fileName)
+  void ExportWave(Wave wave, char *fileName)
+  void ExportWaveAsCode(Wave wave, char *fileName)
   Color Fade(Color color, float alpha)
-  const char *FormatText(const char *text, ...)
+  bool FileExists(char *fileName)
   Image GenImageCellular(int width, int height, int tileSize)
   Image GenImageChecked(int width, int height, int checksX, int checksY, Color col1, Color col2)
   Image GenImageColor(int width, int height, Color color)
-  Image GenImageFontAtlas(CharInfo *chars, int fontSize, int charsCount, int padding, int packMethod)
+  Image GenImageFontAtlas(CharInfo *chars, int charsCount, int fontSize, int padding, int packMethod)
   Image GenImageGradientH(int width, int height, Color left, Color right)
   Image GenImageGradientRadial(int width, int height, float density, Color inner, Color outer)
   Image GenImageGradientV(int width, int height, Color top, Color bottom)
@@ -1423,9 +1493,10 @@ None by default.
   Mesh GenMeshHemiSphere(float radius, int rings, int slices)
   Mesh GenMeshKnot(float radius, float size, int radSeg, int sides)
   Mesh GenMeshPlane(float width, float length, int resX, int resZ)
+  Mesh GenMeshPoly(int sides, float radius)
   Mesh GenMeshSphere(float radius, int rings, int slices)
   Mesh GenMeshTorus(float radius, float size, int radSeg, int sides)
-  Texture2D GenTextureBRDF(Shader shader, Texture2D cubemap, int size)
+  Texture2D GenTextureBRDF(Shader shader, int size)
   Texture2D GenTextureCubemap(Shader shader, Texture2D skyHDR, int size)
   Texture2D GenTextureIrradiance(Shader shader, Texture2D cubemap, int size)
   void GenTextureMipmaps(Texture2D *texture)
@@ -1436,10 +1507,13 @@ None by default.
   RayHitInfo GetCollisionRayTriangle(Ray ray, Vector3 p1, Vector3 p2, Vector3 p3)
   Rectangle GetCollisionRec(Rectangle rec1, Rectangle rec2)
   Color GetColor(int hexValue)
-  const char *GetDirectoryPath(const char *fileName)
-  const char *GetExtension(const char *fileName)
+  char **GetDirectoryFiles(char *dirPath, int *count)
+  const char *GetDirectoryPath(char *fileName)
+  const char *GetExtension(char *fileName)
   int GetFPS(void)
-  const char *GetFileName(const char *filePath)
+  long GetFileModTime(char *fileName)
+  const char *GetFileName(char *filePath)
+  const char *GetFileNameWithoutExt(char *filePath)
   Font GetFontDefault(void)
   float GetFrameTime(void)
   int GetGamepadAxisCount(int gamepad)
@@ -1475,7 +1549,7 @@ None by default.
   int GetScreenHeight(void)
   int GetScreenWidth(void)
   Shader GetShaderDefault(void)
-  int GetShaderLocation(Shader shader, const char *uniformName)
+  int GetShaderLocation(Shader shader, char *uniformName)
   Image GetTextureData(Texture2D texture)
   Texture2D GetTextureDefault(void)
   double GetTime(void)
@@ -1485,9 +1559,11 @@ None by default.
   int GetTouchY(void)
   VrDeviceInfo GetVrDeviceInfo(int vrDeviceType)
   float *GetWaveData(Wave wave)
+  void *GetWindowHandle(void)
   const char *GetWorkingDirectory(void)
   Vector2 GetWorldToScreen(Vector3 position, Camera3D camera)
   void HideCursor(void)
+  void HideWindow(void)
   void ImageAlphaClear(Image *image, Color color, float threshold)
   void ImageAlphaCrop(Image *image, float threshold)
   void ImageAlphaMask(Image *image, Image alphaMask)
@@ -1502,9 +1578,11 @@ None by default.
   void ImageCrop(Image *image, Rectangle crop)
   void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp)
   void ImageDraw(Image *dst, Image src, Rectangle srcRec, Rectangle dstRec)
-  void ImageDrawRectangle(Image *dst, Vector2 position, Rectangle rec, Color color)
-  void ImageDrawText(Image *dst, Vector2 position, const char *text, int fontSize, Color color)
-  void ImageDrawTextEx(Image *dst, Vector2 position, Font font, const char *text, float fontSize, float spacing, Color color)
+  void ImageDrawRectangle(Image *dst, Rectangle rec, Color color)
+  void ImageDrawRectangleLines(Image *dst, Rectangle rec, int thick, Color color)
+  void ImageDrawText(Image *dst, Vector2 position, char *text, int fontSize, Color color)
+  void ImageDrawTextEx(Image *dst, Vector2 position, Font font, char *text, float fontSize, float spacing, Color color)
+  Color *ImageExtractPalette(Image image, int maxPaletteSize, int *extractCount)
   void ImageFlipHorizontal(Image *image)
   void ImageFlipVertical(Image *image)
   void ImageFormat(Image *image, int newFormat)
@@ -1514,25 +1592,25 @@ None by default.
   void ImageResizeNN(Image *image, int newWidth,int newHeight)
   void ImageRotateCCW(Image *image)
   void ImageRotateCW(Image *image)
-  Image ImageText(const char *text, int fontSize, Color color)
-  Image ImageTextEx(Font font, const char *text, float fontSize, float spacing, Color tint)
+  Image ImageText(char *text, int fontSize, Color color)
+  Image ImageTextEx(Font font, char *text, float fontSize, float spacing, Color tint)
   void ImageToPOT(Image *image, Color fillColor)
   void InitAudioDevice(void)
   AudioStream InitAudioStream(unsigned int sampleRate, unsigned int sampleSize, unsigned int channels)
   void InitVrSimulator(VrDeviceInfo info)
-  void InitWindow(int width, int height, const char *title)
+  void InitWindow(int width, int height, char *title)
   bool IsAudioBufferProcessed(AudioStream stream)
   bool IsAudioDeviceReady(void)
   bool IsAudioStreamPlaying(AudioStream stream)
   bool IsCursorHidden(void)
   bool IsFileDropped(void)
-  bool IsFileExtension(const char *fileName, const char *ext)
+  bool IsFileExtension(char *fileName, char *ext)
   bool IsGamepadAvailable(int gamepad)
   bool IsGamepadButtonDown(int gamepad, int button)
   bool IsGamepadButtonPressed(int gamepad, int button)
   bool IsGamepadButtonReleased(int gamepad, int button)
   bool IsGamepadButtonUp(int gamepad, int button)
-  bool IsGamepadName(int gamepad, const char *name)
+  bool IsGamepadName(int gamepad, char *name)
   bool IsGestureDetected(int gesture)
   bool IsKeyDown(int key)
   bool IsKeyPressed(int key)
@@ -1545,41 +1623,39 @@ None by default.
   bool IsMusicPlaying(Music music)
   bool IsSoundPlaying(Sound sound)
   bool IsVrSimulatorReady(void)
+  bool IsWindowHidden(void)
   bool IsWindowMinimized(void)
   bool IsWindowReady(void)
-  Font LoadFont(const char *fileName)
-  CharInfo *LoadFontData(const char *fileName, int fontSize, int *fontChars, int charsCount, int type)
-  Font LoadFontEx(const char *fileName, int fontSize, int charsCount, int *fontChars)
-  Image LoadImage(const char *fileName)
+  Font LoadFont(char *fileName)
+  CharInfo *LoadFontData(char *fileName, int fontSize, int *fontChars, int charsCount, int type)
+  Font LoadFontEx(char *fileName, int fontSize, int *fontChars, int charsCount)
+  Font LoadFontFromImage(Image image, Color key, int firstChar)
+  Image LoadImage(char *fileName)
   Image LoadImageEx(Color *pixels, int width, int height)
   Image LoadImagePro(void *data, int width, int height, int format)
-  Image LoadImageRaw(const char *fileName, int width, int height, int format, int headerSize)
   Image LoadImageRaw(char *fileName, int width, int height, int format, int headerSize)
-  Image LoadImageFromAV(SV *array_ref, SV *color_cb)
-  Image LoadImageFromAV_uninitialized_mem(SV *array_ref, SV *color_cb)
-  Image LoadImageFromAV_transposed(SV *array_ref, SV *color_cb)
-  Image LoadImageFromAV_transposed_uninitialized_mem(SV *array_ref, SV *color_cb)
-  Material LoadMaterial(const char *fileName)
+  Material LoadMaterial(char *fileName)
   Material LoadMaterialDefault(void)
-  Mesh LoadMesh(const char *fileName)
-  Model LoadModel(const char *fileName)
+  Mesh LoadMesh(char *fileName)
+  Model LoadModel(char *fileName)
   Model LoadModelFromMesh(Mesh mesh)
-  Music LoadMusicStream(const char *fileName)
+  Music LoadMusicStream(char *fileName)
   RenderTexture2D LoadRenderTexture(int width, int height)
-  Shader LoadShader(const char *vsFileName, const char *fsFileName)
+  Shader LoadShader(char *vsFileName, char *fsFileName)
   Shader LoadShaderCode(char *vsCode, char *fsCode)
-  Sound LoadSound(const char *fileName)
+  Sound LoadSound(char *fileName)
   Sound LoadSoundFromWave(Wave wave)
-  char *LoadText(const char *fileName)
-  Texture2D LoadTexture(const char *fileName)
+  char *LoadText(char *fileName)
+  Texture2D LoadTexture(char *fileName)
   Texture2D LoadTextureFromImage(Image image)
-  Wave LoadWave(const char *fileName)
+  Wave LoadWave(char *fileName)
   Wave LoadWaveEx(void *data, int sampleCount, int sampleRate, int sampleSize, int channels)
-  int MeasureText(const char *text, int fontSize)
-  Vector2 MeasureTextEx(Font font, const char *text, float fontSize, float spacing)
+  int MeasureText(char *text, int fontSize)
+  Vector2 MeasureTextEx(Font font, char *text, float fontSize, float spacing)
   void MeshBinormals(Mesh *mesh)
   BoundingBox MeshBoundingBox(Mesh mesh)
   void MeshTangents(Mesh *mesh)
+  void OpenURL(char *url)
   void PauseAudioStream(AudioStream stream)
   void PauseMusicStream(Music music)
   void PauseSound(Sound sound)
@@ -1602,14 +1678,16 @@ None by default.
   void SetMasterVolume(float volume)
   void SetMatrixModelview(Matrix view)
   void SetMatrixProjection(Matrix proj)
-  void SetMousePosition(Vector2 position)
-  void SetMouseScale(float scale)
+  void SetMouseOffset(int offsetX, int offsetY)
+  void SetMousePosition(int x, int y)
+  void SetMouseScale(float scaleX, float scaleY)
   void SetMusicLoopCount(Music music, int count)
   void SetMusicPitch(Music music, float pitch)
   void SetMusicVolume(Music music, float volume)
-  void SetShaderValue(Shader shader, int uniformLoc, const float *value, int size)
+  void SetShaderValue(Shader shader, int uniformLoc, const void *value, int uniformType)
   void SetShaderValueMatrix(Shader shader, int uniformLoc, Matrix mat)
-  void SetShaderValuei(Shader shader, int uniformLoc, const int *value, int size)
+  void SetShaderValueV(Shader shader, int uniformLoc, const void *value, int uniformType, int count)
+  void SetShapesTexture(Texture2D texture, Rectangle source)
   void SetSoundPitch(Sound sound, float pitch)
   void SetSoundVolume(Sound sound, float volume)
   void SetTargetFPS(int fps)
@@ -1623,19 +1701,18 @@ None by default.
   void SetWindowMonitor(int monitor)
   void SetWindowPosition(int x, int y)
   void SetWindowSize(int width, int height)
-  void SetWindowTitle(const char *title)
+  void SetWindowTitle(char *title)
   void ShowCursor(void)
-  void ShowLogo(void)
   void StopAudioStream(AudioStream stream)
   void StopMusicStream(Music music)
   void StopSound(Sound sound)
   int StorageLoadValue(int position)
   void StorageSaveValue(int position, int value)
-  const char *SubText(const char *text, int position, int length)
-  void TakeScreenshot(const char *fileName)
+  void TakeScreenshot(char *fileName)
   void ToggleFullscreen(void)
   void ToggleVrMode(void)
-  void TraceLog(int logType, const char *text, ...)
+  void TraceLog(int logType, char *text, ...)
+  void UnhideWindow(void)
   void UnloadFont(Font font)
   void UnloadImage(Image image)
   void UnloadMaterial(Material material)
@@ -1652,7 +1729,6 @@ None by default.
   void UpdateMusicStream(Music music)
   void UpdateSound(Sound sound, const void *data, int samplesCount)
   void UpdateTexture(Texture2D texture, const void *pixels)
-  void UpdateTextureFromImage(Texture2D texture, Image image)
   void UpdateVrTracking(Camera3D *camera)
   Wave WaveCopy(Wave wave)
   void WaveCrop(Wave *wave, int initSample, int finalSample)

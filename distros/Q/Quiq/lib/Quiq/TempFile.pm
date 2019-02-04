@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.131;
+our $VERSION = 1.132;
 
 use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
 use File::Temp ();
@@ -37,7 +37,7 @@ im String-Kontext automatisch zum Datei-Pfad.
 
 =head4 Synopsis
 
-    $dir = $class->new(@opt);
+    $file = $class->new(@opt);
 
 =head4 Options
 
@@ -102,7 +102,7 @@ sub new {
 
 =head1 VERSION
 
-1.131
+1.132
 
 =head1 AUTHOR
 

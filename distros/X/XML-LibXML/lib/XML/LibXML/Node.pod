@@ -8,65 +8,65 @@ XML::LibXML::Node - Abstract Base Class of XML::LibXML Nodes
 
   use XML::LibXML;
 
-  $name = $node->nodeName;
-  $node->setNodeName( $newName );
-  $bool = $node->isSameNode( $other_node );
-  $bool = $node->isEqual( $other_node );
-  $num = $node->unique_key;
-  $content = $node->nodeValue;
-  $content = $node->textContent;
-  $type = $node->nodeType;
-  $node->unbindNode();
-  $childnode = $node->removeChild( $childnode );
-  $oldnode = $node->replaceChild( $newNode, $oldNode );
-  $node->replaceNode($newNode);
-  $childnode = $node->appendChild( $childnode );
-  $childnode = $node->addChild( $childnode );
-  $node = $parent->addNewChild( $nsURI, $name );
-  $node->addSibling($newNode);
-  $newnode =$node->cloneNode( $deep );
-  $parentnode = $node->parentNode;
-  $nextnode = $node->nextSibling();
-  $nextnode = $node->nextNonBlankSibling();
-  $prevnode = $node->previousSibling();
-  $prevnode = $node->previousNonBlankSibling();
-  $boolean = $node->hasChildNodes();
-  $childnode = $node->firstChild;
-  $childnode = $node->lastChild;
-  $documentnode = $node->ownerDocument;
-  $node = $node->getOwner;
-  $node->setOwnerDocument( $doc );
-  $node->insertBefore( $newNode, $refNode );
-  $node->insertAfter( $newNode, $refNode );
-  @nodes = $node->findnodes( $xpath_expression );
-  $result = $node->find( $xpath );
-  print $node->findvalue( $xpath );
-  $bool = $node->exists( $xpath_expression );
-  @childnodes = $node->childNodes();
-  @childnodes = $node->nonBlankChildNodes();
-  $xmlstring = $node->toString($format,$docencoding);
-  $c14nstring = $node->toStringC14N();
-  $c14nstring = $node->toStringC14N($with_comments, $xpath_expression , $xpath_context);
-  $c14nstring = $node->toStringC14N_v1_1();
-  $c14nstring = $node->toStringC14N_v1_1($with_comments, $xpath_expression , $xpath_context);
-  $ec14nstring = $node->toStringEC14N();
-  $ec14nstring = $node->toStringEC14N($with_comments, $xpath_expression, $inclusive_prefix_list);
-  $ec14nstring = $node->toStringEC14N($with_comments, $xpath_expression, $xpath_context, $inclusive_prefix_list);
-  $str = $doc->serialize($format);
-  $localname = $node->localname;
-  $nameprefix = $node->prefix;
-  $uri = $node->namespaceURI();
-  $boolean = $node->hasAttributes();
-  @attributelist = $node->attributes();
-  $URI = $node->lookupNamespaceURI( $prefix );
-  $prefix = $node->lookupNamespacePrefix( $URI );
-  $node->normalize;
-  @nslist = $node->getNamespaces;
-  $node->removeChildNodes();
-  $strURI = $node->baseURI();
-  $node->setBaseURI($strURI);
-  $node->nodePath();
-  $lineno = $node->line_number();
+  $name = $node-E<gt>nodeName;
+  $node-E<gt>setNodeName( $newName );
+  $bool = $node-E<gt>isSameNode( $other_node );
+  $bool = $node-E<gt>isEqual( $other_node );
+  $num = $node-E<gt>unique_key;
+  $content = $node-E<gt>nodeValue;
+  $content = $node-E<gt>textContent;
+  $type = $node-E<gt>nodeType;
+  $node-E<gt>unbindNode();
+  $childnode = $node-E<gt>removeChild( $childnode );
+  $oldnode = $node-E<gt>replaceChild( $newNode, $oldNode );
+  $node-E<gt>replaceNode($newNode);
+  $childnode = $node-E<gt>appendChild( $childnode );
+  $childnode = $node-E<gt>addChild( $childnode );
+  $node = $parent-E<gt>addNewChild( $nsURI, $name );
+  $node-E<gt>addSibling($newNode);
+  $newnode =$node-E<gt>cloneNode( $deep );
+  $parentnode = $node-E<gt>parentNode;
+  $nextnode = $node-E<gt>nextSibling();
+  $nextnode = $node-E<gt>nextNonBlankSibling();
+  $prevnode = $node-E<gt>previousSibling();
+  $prevnode = $node-E<gt>previousNonBlankSibling();
+  $boolean = $node-E<gt>hasChildNodes();
+  $childnode = $node-E<gt>firstChild;
+  $childnode = $node-E<gt>lastChild;
+  $documentnode = $node-E<gt>ownerDocument;
+  $node = $node-E<gt>getOwner;
+  $node-E<gt>setOwnerDocument( $doc );
+  $node-E<gt>insertBefore( $newNode, $refNode );
+  $node-E<gt>insertAfter( $newNode, $refNode );
+  @nodes = $node-E<gt>findnodes( $xpath_expression );
+  $result = $node-E<gt>find( $xpath );
+  print $node-E<gt>findvalue( $xpath );
+  $bool = $node-E<gt>exists( $xpath_expression );
+  @childnodes = $node-E<gt>childNodes();
+  @childnodes = $node-E<gt>nonBlankChildNodes();
+  $xmlstring = $node-E<gt>toString($format,$docencoding);
+  $c14nstring = $node-E<gt>toStringC14N();
+  $c14nstring = $node-E<gt>toStringC14N($with_comments, $xpath_expression , $xpath_context);
+  $c14nstring = $node-E<gt>toStringC14N_v1_1();
+  $c14nstring = $node-E<gt>toStringC14N_v1_1($with_comments, $xpath_expression , $xpath_context);
+  $ec14nstring = $node-E<gt>toStringEC14N();
+  $ec14nstring = $node-E<gt>toStringEC14N($with_comments, $xpath_expression, $inclusive_prefix_list);
+  $ec14nstring = $node-E<gt>toStringEC14N($with_comments, $xpath_expression, $xpath_context, $inclusive_prefix_list);
+  $str = $doc-E<gt>serialize($format);
+  $localname = $node-E<gt>localname;
+  $nameprefix = $node-E<gt>prefix;
+  $uri = $node-E<gt>namespaceURI();
+  $boolean = $node-E<gt>hasAttributes();
+  @attributelist = $node-E<gt>attributes();
+  $URI = $node-E<gt>lookupNamespaceURI( $prefix );
+  $prefix = $node-E<gt>lookupNamespacePrefix( $URI );
+  $node-E<gt>normalize;
+  @nslist = $node-E<gt>getNamespaces;
+  $node-E<gt>removeChildNodes();
+  $strURI = $node-E<gt>baseURI();
+  $node-E<gt>setBaseURI($strURI);
+  $node-E<gt>nodePath();
+  $lineno = $node-E<gt>line_number();
 
 =head1 DESCRIPTION
 
@@ -86,7 +86,7 @@ Many functions listed here are extensively documented in the DOM Level 3 specifi
 
 =item nodeName
 
-  $name = $node->nodeName;
+  $name = $node-E<gt>nodeName;
 
 Returns the node's name. This function is aware of namespaces and returns the
 full name of the current node (C<<<<<< prefix:localname >>>>>>).
@@ -98,7 +98,7 @@ constant names, namely: #text, #cdata-section, #comment, #document,
 
 =item setNodeName
 
-  $node->setNodeName( $newName );
+  $node-E<gt>setNodeName( $newName );
 
 In very limited situations, it is useful to change a nodes name. In the DOM
 specification this should throw an error. This Function is aware of namespaces.
@@ -106,7 +106,7 @@ specification this should throw an error. This Function is aware of namespaces.
 
 =item isSameNode
 
-  $bool = $node->isSameNode( $other_node );
+  $bool = $node-E<gt>isSameNode( $other_node );
 
 returns TRUE (1) if the given nodes refer to the same node structure, otherwise
 FALSE (0) is returned.
@@ -114,7 +114,7 @@ FALSE (0) is returned.
 
 =item isEqual
 
-  $bool = $node->isEqual( $other_node );
+  $bool = $node-E<gt>isEqual( $other_node );
 
 deprecated version of isSameNode().
 
@@ -123,7 +123,7 @@ I<<<<<< NOTE >>>>>> isEqual will change behaviour to follow the DOM specificatio
 
 =item unique_key
 
-  $num = $node->unique_key;
+  $num = $node-E<gt>unique_key;
 
 This function is not specified for any DOM level. It returns a key guaranteed
 to be unique for this node, and to always be the same value for this node. In
@@ -135,7 +135,7 @@ The returned key value is useful as a key in hashes.
 
 =item nodeValue
 
-  $content = $node->nodeValue;
+  $content = $node-E<gt>nodeValue;
 
 If the node has any content (such as stored in a C<<<<<< text node >>>>>>) it can get requested through this function.
 
@@ -145,7 +145,7 @@ Element use textContent() instead!
 
 =item textContent
 
-  $content = $node->textContent;
+  $content = $node-E<gt>textContent;
 
 this function returns the content of all text nodes in the descendants of the
 given node as specified in DOM.
@@ -153,7 +153,7 @@ given node as specified in DOM.
 
 =item nodeType
 
-  $type = $node->nodeType;
+  $type = $node-E<gt>nodeType;
 
 Return a numeric value representing the node type of this node. The module
 XML::LibXML by default exports constants for the node types (see the EXPORT
@@ -162,7 +162,7 @@ section in the L<<<<<< XML::LibXML >>>>>> manual page).
 
 =item unbindNode
 
-  $node->unbindNode();
+  $node-E<gt>unbindNode();
 
 Unbinds the Node from its siblings and Parent, but not from the Document it
 belongs to. If the node is not inserted into the DOM afterwards, it will be
@@ -172,14 +172,14 @@ stripped from the context it is and inserted into a (hidden) document-fragment.
 
 =item removeChild
 
-  $childnode = $node->removeChild( $childnode );
+  $childnode = $node-E<gt>removeChild( $childnode );
 
 This will unbind the Child Node from its parent C<<<<<< $node >>>>>>. The function returns the unbound node. If C<<<<<< oldNode >>>>>> is not a child of the given Node the function will fail.
 
 
 =item replaceChild
 
-  $oldnode = $node->replaceChild( $newNode, $oldNode );
+  $oldnode = $node-E<gt>replaceChild( $newNode, $oldNode );
 
 Replaces the C<<<<<< $oldNode >>>>>> with the C<<<<<< $newNode >>>>>>. The C<<<<<< $oldNode >>>>>> will be unbound from the Node. This function differs from the DOM L2
 specification, in the case, if the new node is not part of the document, the
@@ -188,7 +188,7 @@ node will be imported first.
 
 =item replaceNode
 
-  $node->replaceNode($newNode);
+  $node-E<gt>replaceNode($newNode);
 
 This function is very similar to replaceChild(), but it replaces the node
 itself rather than a childnode. This is useful if a node found by any XPath
@@ -197,7 +197,7 @@ function, should be replaced.
 
 =item appendChild
 
-  $childnode = $node->appendChild( $childnode );
+  $childnode = $node-E<gt>appendChild( $childnode );
 
 The function will add the C<<<<<< $childnode >>>>>> to the end of C<<<<<< $node >>>>>>'s children. The function should fail, if the new childnode is already a child
 of C<<<<<< $node >>>>>>. This function differs from the DOM L2 specification, in the case, if the new
@@ -206,7 +206,7 @@ node is not part of the document, the node will be imported first.
 
 =item addChild
 
-  $childnode = $node->addChild( $childnode );
+  $childnode = $node-E<gt>addChild( $childnode );
 
 As an alternative to appendChild() one can use the addChild() function. This
 function is a bit faster, because it avoids all DOM conformity checks.
@@ -243,7 +243,7 @@ being more error tolerant.
 
 =item addNewChild
 
-  $node = $parent->addNewChild( $nsURI, $name );
+  $node = $parent-E<gt>addNewChild( $nsURI, $name );
 
 Similar to C<<<<<< addChild() >>>>>>, this function uses low level libxml2 functionality to provide faster
 interface for DOM building. I<<<<<< addNewChild() >>>>>> uses C<<<<<< xmlNewChild() >>>>>> to create a new node on a given parent element.
@@ -261,7 +261,7 @@ code to XML::LibXML.
 
 =item addSibling
 
-  $node->addSibling($newNode);
+  $node-E<gt>addSibling($newNode);
 
 addSibling() allows adding an additional node to the end of a nodelist, defined
 by the given node.
@@ -269,7 +269,7 @@ by the given node.
 
 =item cloneNode
 
-  $newnode =$node->cloneNode( $deep );
+  $newnode =$node-E<gt>cloneNode( $deep );
 
 I<<<<<< cloneNode >>>>>> creates a copy of C<<<<<< $node >>>>>>. When $deep is set to 1 (true) the function will copy all child nodes as well.
 If $deep is 0 only the current node will be copied. Note that in case of
@@ -282,21 +282,21 @@ namespace information was not copied for elements).
 
 =item parentNode
 
-  $parentnode = $node->parentNode;
+  $parentnode = $node-E<gt>parentNode;
 
 Returns simply the Parent Node of the current node.
 
 
 =item nextSibling
 
-  $nextnode = $node->nextSibling();
+  $nextnode = $node-E<gt>nextSibling();
 
 Returns the next sibling if any .
 
 
 =item nextNonBlankSibling
 
-  $nextnode = $node->nextNonBlankSibling();
+  $nextnode = $node-E<gt>nextNonBlankSibling();
 
 Returns the next non-blank sibling if any (a node is blank if it is a Text or
 CDATA node consisting of whitespace only). This method is not defined by DOM.
@@ -304,14 +304,14 @@ CDATA node consisting of whitespace only). This method is not defined by DOM.
 
 =item previousSibling
 
-  $prevnode = $node->previousSibling();
+  $prevnode = $node-E<gt>previousSibling();
 
 Analogous to I<<<<<< getNextSibling >>>>>> the function returns the previous sibling if any.
 
 
 =item previousNonBlankSibling
 
-  $prevnode = $node->previousNonBlankSibling();
+  $prevnode = $node-E<gt>previousNonBlankSibling();
 
 Returns the previous non-blank sibling if any (a node is blank if it is a Text
 or CDATA node consisting of whitespace only). This method is not defined by
@@ -320,7 +320,7 @@ DOM.
 
 =item hasChildNodes
 
-  $boolean = $node->hasChildNodes();
+  $boolean = $node-E<gt>hasChildNodes();
 
 If the current node has child nodes this function returns TRUE (1), otherwise
 it returns FALSE (0, not undef).
@@ -328,7 +328,7 @@ it returns FALSE (0, not undef).
 
 =item firstChild
 
-  $childnode = $node->firstChild;
+  $childnode = $node-E<gt>firstChild;
 
 If a node has child nodes this function will return the first node in the child
 list.
@@ -336,14 +336,14 @@ list.
 
 =item lastChild
 
-  $childnode = $node->lastChild;
+  $childnode = $node-E<gt>lastChild;
 
 If the C<<<<<< $node >>>>>> has child nodes this function returns the last child node.
 
 
 =item ownerDocument
 
-  $documentnode = $node->ownerDocument;
+  $documentnode = $node-E<gt>ownerDocument;
 
 Through this function it is always possible to access the document the current
 node is bound to.
@@ -351,7 +351,7 @@ node is bound to.
 
 =item getOwner
 
-  $node = $node->getOwner;
+  $node = $node-E<gt>getOwner;
 
 This function returns the node the current node is associated with. In most
 cases this will be a document node or a document fragment node.
@@ -359,7 +359,7 @@ cases this will be a document node or a document fragment node.
 
 =item setOwnerDocument
 
-  $node->setOwnerDocument( $doc );
+  $node-E<gt>setOwnerDocument( $doc );
 
 This function binds a node to another DOM. This method unbinds the node first,
 if it is already bound to another document.
@@ -370,7 +370,7 @@ Entity References as adoptNode().
 
 =item insertBefore
 
-  $node->insertBefore( $newNode, $refNode );
+  $node-E<gt>insertBefore( $newNode, $refNode );
 
 The method inserts C<<<<<< $newNode >>>>>> before C<<<<<< $refNode >>>>>>. If C<<<<<< $refNode >>>>>> is undefined, the newNode will be set as the new last child of the parent node.
 This function differs from the DOM L2 specification, in the case, if the new
@@ -391,7 +391,7 @@ parent node.
 
 =item insertAfter
 
-  $node->insertAfter( $newNode, $refNode );
+  $node-E<gt>insertAfter( $newNode, $refNode );
 
 The method inserts C<<<<<< $newNode >>>>>> after C<<<<<< $refNode >>>>>>. If C<<<<<< $refNode >>>>>> is undefined, the newNode will be set as the new last child of the parent node.
 
@@ -400,7 +400,7 @@ Note, that $refNode has to be passed explicitly even if it is undef.
 
 =item findnodes
 
-  @nodes = $node->findnodes( $xpath_expression );
+  @nodes = $node-E<gt>findnodes( $xpath_expression );
 
 I<<<<<< findnodes >>>>>> evaluates the xpath expression (XPath 1.0) on the current node and returns the
 resulting node set as an array. In scalar context, returns an L<<<<<< XML::LibXML::NodeList >>>>>> object.
@@ -414,7 +414,7 @@ element name with no prefix match elements in the default namespace. This
 assumption is wrong - by XPath specification, such node tests can only match
 elements that are in no (i.e. null) namespace.
 
-So, for example, one cannot match the root element of an XHTML document with C<<<<<< $node->find('/html') >>>>>> since C<<<<<< '/html' >>>>>> would only match if the root element C<<<<<< <html> >>>>>> had no namespace, but all XHTML elements belong to the namespace
+So, for example, one cannot match the root element of an XHTML document with C<<<<<< $node-E<gt>find('/html') >>>>>> since C<<<<<< '/html' >>>>>> would only match if the root element C<<<<<< E<lt>htmlE<gt> >>>>>> had no namespace, but all XHTML elements belong to the namespace
 http://www.w3.org/1999/xhtml. (Note that C<<<<<< xmlns="..." >>>>>> namespace declarations can also be specified in a DTD, which makes the
 situation even worse, since the XML document looks as if there was no default
 namespace).
@@ -456,7 +456,7 @@ See also XML::LibXML::XPathContext->findnodes.
 
 =item find
 
-  $result = $node->find( $xpath );
+  $result = $node-E<gt>find( $xpath );
 
 I<<<<<< find >>>>>> evaluates the XPath 1.0 expression using the current node as the context of the
 expression, and returns the result depending on what type of result the XPath
@@ -470,7 +470,7 @@ See also L<<<<<< XML::LibXML::XPathContext >>>>>>->find.
 
 =item findvalue
 
-  print $node->findvalue( $xpath );
+  print $node-E<gt>findvalue( $xpath );
 
 I<<<<<< findvalue >>>>>> is exactly equivalent to:
 
@@ -490,7 +490,7 @@ The xpath expression can be passed either as a string, or as a L<<<<<< XML::LibX
 
 =item exists
 
-  $bool = $node->exists( $xpath_expression );
+  $bool = $node-E<gt>exists( $xpath_expression );
 
 This method behaves like I<<<<<< findnodes >>>>>>, except that it only returns a boolean value (1 if the expression matches a
 node, 0 otherwise) and may be faster than I<<<<<< findnodes >>>>>>, because the XPath evaluation may stop early on the first match (this is true
@@ -502,7 +502,7 @@ the returned value is a non-zero number or a non-empty string.
 
 =item childNodes
 
-  @childnodes = $node->childNodes();
+  @childnodes = $node-E<gt>childNodes();
 
 I<<<<<< childNodes >>>>>> implements a more intuitive interface to the childnodes of the current node. It
 enables you to pass all children directly to a C<<<<<< map >>>>>> or C<<<<<< grep >>>>>>. If this function is called in scalar context, a L<<<<<< XML::LibXML::NodeList >>>>>> object will be returned.
@@ -510,7 +510,7 @@ enables you to pass all children directly to a C<<<<<< map >>>>>> or C<<<<<< gre
 
 =item nonBlankChildNodes
 
-  @childnodes = $node->nonBlankChildNodes();
+  @childnodes = $node-E<gt>nonBlankChildNodes();
 
 This is like I<<<<<< childNodes >>>>>>, but returns only non-blank nodes (where a node is blank if it is a Text or
 CDATA node consisting of whitespace only). This method is not defined by DOM.
@@ -518,7 +518,7 @@ CDATA node consisting of whitespace only). This method is not defined by DOM.
 
 =item toString
 
-  $xmlstring = $node->toString($format,$docencoding);
+  $xmlstring = $node-E<gt>toString($format,$docencoding);
 
 This method is similar to the method C<<<<<< toString >>>>>> of a L<<<<<< XML::LibXML::Document >>>>>> but for a single node. It returns a string consisting of XML serialization of
 the given node and all its descendants. Unlike C<<<<<< XML::LibXML::Document::toString >>>>>>, in this case the resulting string is by default a character string (UTF-8
@@ -529,8 +529,8 @@ string in the document encoding (see C<<<<<< XML::LibXML::Document::actualEncodi
 
 =item toStringC14N
 
-  $c14nstring = $node->toStringC14N();
-  $c14nstring = $node->toStringC14N($with_comments, $xpath_expression , $xpath_context);
+  $c14nstring = $node-E<gt>toStringC14N();
+  $c14nstring = $node-E<gt>toStringC14N($with_comments, $xpath_expression , $xpath_context);
 
 The function is similar to toString(). Instead of simply serializing the
 document tree, it transforms it as it is specified in the XML-C14N
@@ -566,8 +566,8 @@ not the context node of $xpath_context!
 
 =item toStringC14N_v1_1
 
-  $c14nstring = $node->toStringC14N_v1_1();
-  $c14nstring = $node->toStringC14N_v1_1($with_comments, $xpath_expression , $xpath_context);
+  $c14nstring = $node-E<gt>toStringC14N_v1_1();
+  $c14nstring = $node-E<gt>toStringC14N_v1_1($with_comments, $xpath_expression , $xpath_context);
 
 This function behaves like toStringC14N() except that it uses the
 "XML_C14N_1_1" constant for canonicalising using the "C14N 1.1 spec".
@@ -575,9 +575,9 @@ This function behaves like toStringC14N() except that it uses the
 
 =item toStringEC14N
 
-  $ec14nstring = $node->toStringEC14N();
-  $ec14nstring = $node->toStringEC14N($with_comments, $xpath_expression, $inclusive_prefix_list);
-  $ec14nstring = $node->toStringEC14N($with_comments, $xpath_expression, $xpath_context, $inclusive_prefix_list);
+  $ec14nstring = $node-E<gt>toStringEC14N();
+  $ec14nstring = $node-E<gt>toStringEC14N($with_comments, $xpath_expression, $inclusive_prefix_list);
+  $ec14nstring = $node-E<gt>toStringEC14N($with_comments, $xpath_expression, $xpath_context, $inclusive_prefix_list);
 
 The function is similar to toStringC14N() but follows the XML-EXC-C14N
 Specification (see L<<<<<< http://www.w3.org/TR/xml-exc-c14n >>>>>>) for exclusive canonization of XML.
@@ -591,7 +591,7 @@ output even if the namespace is not used). C.f. the spec for details.
 
 =item serialize
 
-  $str = $doc->serialize($format);
+  $str = $doc-E<gt>serialize($format);
 
 An alias for toString(). This function was name added to be more consistent
 with libxml2.
@@ -609,28 +609,28 @@ An alias for toStringEC14N().
 
 =item localname
 
-  $localname = $node->localname;
+  $localname = $node-E<gt>localname;
 
 Returns the local name of a tag. This is the part behind the colon.
 
 
 =item prefix
 
-  $nameprefix = $node->prefix;
+  $nameprefix = $node-E<gt>prefix;
 
 Returns the prefix of a tag. This is the part before the colon.
 
 
 =item namespaceURI
 
-  $uri = $node->namespaceURI();
+  $uri = $node-E<gt>namespaceURI();
 
 returns the URI of the current namespace.
 
 
 =item hasAttributes
 
-  $boolean = $node->hasAttributes();
+  $boolean = $node-E<gt>hasAttributes();
 
 returns 1 (TRUE) if the current node has any attributes set, otherwise 0
 (FALSE) is returned.
@@ -638,7 +638,7 @@ returns 1 (TRUE) if the current node has any attributes set, otherwise 0
 
 =item attributes
 
-  @attributelist = $node->attributes();
+  @attributelist = $node-E<gt>attributes();
 
 This function returns all attributes and namespace declarations assigned to the
 given node.
@@ -653,14 +653,14 @@ an array. In scalar context, the function will return a L<<<<<< XML::LibXML::Nam
 
 =item lookupNamespaceURI
 
-  $URI = $node->lookupNamespaceURI( $prefix );
+  $URI = $node-E<gt>lookupNamespaceURI( $prefix );
 
 Find a namespace URI by its prefix starting at the current node.
 
 
 =item lookupNamespacePrefix
 
-  $prefix = $node->lookupNamespacePrefix( $URI );
+  $prefix = $node-E<gt>lookupNamespacePrefix( $URI );
 
 Find a namespace prefix by its URI starting at the current node.
 
@@ -671,7 +671,7 @@ namespace.
 
 =item normalize
 
-  $node->normalize;
+  $node-E<gt>normalize;
 
 This function normalizes adjacent text nodes. This function is not as strict as
 libxml2's xmlTextMerge() function, since it will not free a node that is still
@@ -680,7 +680,7 @@ referenced by the perl layer.
 
 =item getNamespaces
 
-  @nslist = $node->getNamespaces;
+  @nslist = $node-E<gt>getNamespaces;
 
 If a node has any namespaces defined, this function will return these
 namespaces. Note, that this will not return all namespaces that are in scope,
@@ -692,7 +692,7 @@ with element nodes.
 
 =item removeChildNodes
 
-  $node->removeChildNodes();
+  $node-E<gt>removeChildNodes();
 
 This function is not specified for any DOM level: It removes all childnodes
 from a node in a single step. Other than the libxml2 function itself
@@ -703,7 +703,7 @@ referred to from the Perl level.
 
 =item baseURI ()
 
-  $strURI = $node->baseURI();
+  $strURI = $node-E<gt>baseURI();
 
 Searches for the base URL of the node. The method should work on both XML and
 HTML documents even if base mechanisms for these are completely different. It
@@ -714,7 +714,7 @@ it does not return the document base (5.1.3), use method C<<<<<< URI >>>>>> of C
 
 =item setBaseURI ($strURI)
 
-  $node->setBaseURI($strURI);
+  $node-E<gt>setBaseURI($strURI);
 
 This method only does something useful for an element node in an XML document.
 It sets the xml:base attribute on the node to $strURI, which effectively sets
@@ -727,7 +727,7 @@ be desired, since it does not effectively set the base URI of the node. See RFC
 
 =item nodePath
 
-  $node->nodePath();
+  $node-E<gt>nodePath();
 
 This function is not specified for any DOM level: It returns a canonical
 structure based XPath for a given node.
@@ -735,7 +735,7 @@ structure based XPath for a given node.
 
 =item line_number
 
-  $lineno = $node->line_number();
+  $lineno = $node-E<gt>line_number();
 
 This function returns the line number where the tag was found during parsing.
 If a node is added to the document the line number is 0. Problems may occur, if
@@ -763,7 +763,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0132
+2.0133
 
 =head1 COPYRIGHT
 

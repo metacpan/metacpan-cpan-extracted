@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use Carp;
 
@@ -335,16 +335,12 @@ L<https://rt.cpan.org/Ticket/Display.html?id=122793>
 
 =item *
 
-Clean up the implementation; check for and fix memory leaks.
-
-L<https://rt.cpan.org/Ticket/Display.html?id=128222>
-
-=item *
-
-Currently this module requires perl version 5.16 or later. Support perl
-version 5.14.
+Currently this module requires perl version 5.16 or later. Additionally,
+threaded builds of perl earlier than 5.22 are not supported.
 
 L<https://rt.cpan.org/Ticket/Display.html?id=122252>
+
+L<https://rt.cpan.org/Ticket/Display.html?id=124351>
 
 =item *
 
@@ -365,11 +361,19 @@ at L<https://rt.cpan.org/Dist/Display.html?Name=Future-AsyncAwait>.
 
 =item *
 
-Various failures on threaded perls version 5.20 and earlier. These don't seem
-to be happening on non-threaded builds of the same versions, nor at any
-version 5.22 or later.
+Named loop controls do not work; they fail to find the jump label when split
+across an C<await> call.
 
-L<https://rt.cpan.org/Ticket/Display.html?id=124351>
+   async sub func
+   {
+      FUTURE: foreach my $f ( @futures ) {
+         await $f and last FUTURE;
+      }
+   }
+
+This only affects the label search; non-labeled loop controls work fine.
+
+L<https://rt.cpan.org/Ticket/Display.html?id=128205>
 
 =back
 

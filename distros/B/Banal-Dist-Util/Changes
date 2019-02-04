@@ -1,0 +1,17 @@
+Revision history for 'Banal-Dist-Util'
+
+0.005     2019-02-03 02:24:37Z
+            - Tidied up ABSTRACT in the pod. [Thanks, MANWAR]
+
+0.004     2019-02-02 22:16:26Z
+            - Tested release process
+
+0.003     2019-02-02 22:13:32Z
+            - Prepared for release
+
+0.002     2019-02-02 21:57:52Z
+            - Reorganized code.
+
+0.001     2019-02-02 21:49:11Z
+            - Initial release.
+            - Created a separate distribution package for these modules that used to reside in <Dist-Zilla-Plugin-Bundle-Author-TABULO>

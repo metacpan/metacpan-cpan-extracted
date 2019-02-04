@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ksf - Package for language Bafia
 
 package Locale::CLDR::Locales::Ksf;
 # This file auto generated from Data\common\main\ksf.xml
-#	on Sun  7 Oct 10:43:06 am GMT
+#	on Sun  3 Feb  2:01:50 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -843,13 +843,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{cɛɛ́nko},
-					'am' => q{sárúwá},
-				},
 				'wide' => {
 					'pm' => q{cɛɛ́nko},
 					'am' => q{sárúwá},
+				},
+				'abbreviated' => {
+					'am' => q{sárúwá},
+					'pm' => q{cɛɛ́nko},
 				},
 			},
 		},
@@ -929,7 +929,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -953,7 +953,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

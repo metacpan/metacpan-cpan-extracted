@@ -15,7 +15,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -158,6 +158,7 @@ our @option_spec = (
     'head|I',
     'header|H=s@',
     'include|i',         # ignored
+    'insecure|k',
     'location|L',        # ignored, we always follow redirects
     'max-time|m=s',
     'keepalive!',
@@ -376,6 +377,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             maybe timeout => $options->{ 'max-time' },
             maybe cookie_jar => $options->{'cookie-jar'},
             maybe cookie_jar_options => $options->{'cookie-jar-options'},
+            maybe insecure => $options->{'insecure'},
         });
     }
 

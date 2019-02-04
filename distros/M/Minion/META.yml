@@ -19,7 +19,7 @@ no_index:
     - inc
     - t
 requires:
-  Mojolicious: '8.03'
+  Mojolicious: '8.12'
   perl: '5.010001'
 resources:
   IRC: irc://irc.freenode.net/#mojo
@@ -27,5 +27,5 @@ resources:
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/minion.git
-version: '9.07'
+version: '9.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

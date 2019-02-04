@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sl::Any::Si - Package for language Slovenian
 
 package Locale::CLDR::Locales::Sl::Any::Si;
 # This file auto generated from Data\common\main\sl_SI.xml
-#	on Sun  7 Oct 10:58:44 am GMT
+#	on Sun  3 Feb  2:18:07 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

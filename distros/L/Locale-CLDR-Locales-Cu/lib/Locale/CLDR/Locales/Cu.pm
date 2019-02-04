@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Cu - Package for language Church Slavic
 
 package Locale::CLDR::Locales::Cu;
 # This file auto generated from Data\common\main\cu.xml
-#	on Sun  7 Oct 10:26:09 am GMT
+#	on Sun  3 Feb  1:45:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -733,8 +733,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{ДП},
 					'pm' => q{ПП},
+					'am' => q{ДП},
 				},
 				'abbreviated' => {
 					'am' => q{ДП},
@@ -742,7 +742,7 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{ПП},
 					'am' => q{ДП},
 				},
@@ -750,9 +750,9 @@ has 'day_periods' => (
 					'am' => q{ДП},
 					'pm' => q{ПП},
 				},
-				'abbreviated' => {
-					'am' => q{ДП},
+				'wide' => {
 					'pm' => q{ПП},
+					'am' => q{ДП},
 				},
 			},
 		},

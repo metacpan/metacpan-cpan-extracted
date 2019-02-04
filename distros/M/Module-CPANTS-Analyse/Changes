@@ -1,5 +1,13 @@
 Revision history for Module-CPANTS-Analyse
 
+1.00 2019-02-03
+  ** BACKWARD INCOMPATIBLE CHANGE **
+  - Module::CPANTS::Kwalitee::Uses now uses a different prereq scanner
+    (Perl::PrereqScanner::NotQuiteLite).
+  - Added new kwalitee metrics:
+    no_maniskip_error, no_missing_files_in_provides, no_files_to_be_skipped
+  - Delayed plugin loading
+
 0.99 2019-01-15
   - requires Module::Find
 

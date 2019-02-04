@@ -1,0 +1,12 @@
+#-----------------------------------------------------------------------
+# git help shortlog
+# or see <https://www.kernel.org/pub/software/scm/git/docs/git-shortlog.html#_mapping_authors>
+#-----------------------------------------------------------------------
+# newname <newaddr> oldname <oldaddr>
+#-----------------------------------------------------------------------
+Сергей Романов <sromanov@cpan.org> Sergey Romanov <complefor@rambler.ru>
+Randy Stauner <rwstauner@cpan.org> <randy@magnificent-tears.com>
+#-----
+Ayhan Ulusoy <tabulo@cpan.org> <dev@tabulo.net>
+Ayhan Ulusoy <tabulo@cpan.org> <tm-git.au@tabulo.net>
+Ayhan Ulusoy <tabulo@cpan.org> <dev-gitlab@tabulo.net>

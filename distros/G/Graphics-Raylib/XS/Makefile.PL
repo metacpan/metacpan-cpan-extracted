@@ -39,58 +39,10 @@ if  (eval {require ExtUtils::Constant; 1}) {
   # you will need to use the generated const-c.inc and const-xs.inc
   # files to replace their "fallback" counterparts before distributing your
   # changes.
-  my @names = (qw(DEG2RAD FLAG_FULLSCREEN_MODE FLAG_MSAA_4X_HINT FLAG_SHOW_LOGO
-		 FLAG_VSYNC_HINT FLAG_WINDOW_RESIZABLE FLAG_WINDOW_TRANSPARENT
-		 FLAG_WINDOW_UNDECORATED GAMEPAD_ANDROID_BUTTON_A
-		 GAMEPAD_ANDROID_BUTTON_B GAMEPAD_ANDROID_BUTTON_C
-		 GAMEPAD_ANDROID_BUTTON_L1 GAMEPAD_ANDROID_BUTTON_L2
-		 GAMEPAD_ANDROID_BUTTON_R1 GAMEPAD_ANDROID_BUTTON_R2
-		 GAMEPAD_ANDROID_BUTTON_X GAMEPAD_ANDROID_BUTTON_Y
-		 GAMEPAD_ANDROID_BUTTON_Z GAMEPAD_ANDROID_DPAD_CENTER
-		 GAMEPAD_ANDROID_DPAD_DOWN GAMEPAD_ANDROID_DPAD_LEFT
-		 GAMEPAD_ANDROID_DPAD_RIGHT GAMEPAD_ANDROID_DPAD_UP
-		 GAMEPAD_PLAYER1 GAMEPAD_PLAYER2 GAMEPAD_PLAYER3
-		 GAMEPAD_PLAYER4 GAMEPAD_PS3_AXIS_L2 GAMEPAD_PS3_AXIS_LEFT_X
-		 GAMEPAD_PS3_AXIS_LEFT_Y GAMEPAD_PS3_AXIS_R2
-		 GAMEPAD_PS3_AXIS_RIGHT_X GAMEPAD_PS3_AXIS_RIGHT_Y
-		 GAMEPAD_PS3_BUTTON_CIRCLE GAMEPAD_PS3_BUTTON_CROSS
-		 GAMEPAD_PS3_BUTTON_DOWN GAMEPAD_PS3_BUTTON_L1
-		 GAMEPAD_PS3_BUTTON_L2 GAMEPAD_PS3_BUTTON_LEFT
-		 GAMEPAD_PS3_BUTTON_PS GAMEPAD_PS3_BUTTON_R1
-		 GAMEPAD_PS3_BUTTON_R2 GAMEPAD_PS3_BUTTON_RIGHT
-		 GAMEPAD_PS3_BUTTON_SELECT GAMEPAD_PS3_BUTTON_SQUARE
-		 GAMEPAD_PS3_BUTTON_START GAMEPAD_PS3_BUTTON_TRIANGLE
-		 GAMEPAD_PS3_BUTTON_UP GAMEPAD_XBOX_AXIS_LEFT_X
-		 GAMEPAD_XBOX_AXIS_LEFT_Y GAMEPAD_XBOX_AXIS_LT
-		 GAMEPAD_XBOX_AXIS_RIGHT_X GAMEPAD_XBOX_AXIS_RIGHT_Y
-		 GAMEPAD_XBOX_AXIS_RT GAMEPAD_XBOX_BUTTON_A
-		 GAMEPAD_XBOX_BUTTON_B GAMEPAD_XBOX_BUTTON_DOWN
-		 GAMEPAD_XBOX_BUTTON_HOME GAMEPAD_XBOX_BUTTON_LB
-		 GAMEPAD_XBOX_BUTTON_LEFT GAMEPAD_XBOX_BUTTON_RB
-		 GAMEPAD_XBOX_BUTTON_RIGHT GAMEPAD_XBOX_BUTTON_SELECT
-		 GAMEPAD_XBOX_BUTTON_START GAMEPAD_XBOX_BUTTON_UP
-		 GAMEPAD_XBOX_BUTTON_X GAMEPAD_XBOX_BUTTON_Y KEY_A
-		 KEY_APOSTROPHE KEY_B KEY_BACK KEY_BACKSLASH KEY_BACKSPACE
-		 KEY_C KEY_CAPS_LOCK KEY_COMMA KEY_D KEY_DELETE KEY_DOWN KEY_E
-		 KEY_EIGHT KEY_END KEY_ENTER KEY_EQUAL KEY_ESCAPE KEY_F KEY_F1
-		 KEY_F10 KEY_F11 KEY_F12 KEY_F2 KEY_F3 KEY_F4 KEY_F5 KEY_F6
-		 KEY_F7 KEY_F8 KEY_F9 KEY_FIVE KEY_FOUR KEY_G KEY_GRAVE KEY_H
-		 KEY_HOME KEY_I KEY_INSERT KEY_J KEY_K KEY_KB_MENU KEY_KP_0
-		 KEY_KP_1 KEY_KP_2 KEY_KP_3 KEY_KP_4 KEY_KP_5 KEY_KP_6 KEY_KP_7
-		 KEY_KP_8 KEY_KP_9 KEY_KP_ADD KEY_KP_DECIMAL KEY_KP_DIVIDE
-		 KEY_KP_ENTER KEY_KP_EQUAL KEY_KP_MULTIPLY KEY_KP_SUBTRACT
-		 KEY_L KEY_LEFT KEY_LEFT_ALT KEY_LEFT_BRACKET KEY_LEFT_CONTROL
-		 KEY_LEFT_SHIFT KEY_LEFT_SUPER KEY_M KEY_MENU KEY_MINUS KEY_N
-		 KEY_NINE KEY_NUM_LOCK KEY_O KEY_ONE KEY_P KEY_PAGE_DOWN
-		 KEY_PAGE_UP KEY_PAUSE KEY_PERIOD KEY_PRINT_SCREEN KEY_Q KEY_R
-		 KEY_RIGHT KEY_RIGHT_ALT KEY_RIGHT_BRACKET KEY_RIGHT_CONTROL
-		 KEY_RIGHT_SHIFT KEY_RIGHT_SUPER KEY_S KEY_SCROLL_LOCK
-		 KEY_SEMICOLON KEY_SEVEN KEY_SIX KEY_SLASH KEY_SPACE KEY_T
-		 KEY_TAB KEY_THREE KEY_TWO KEY_U KEY_UP KEY_V KEY_VOLUME_DOWN
-		 KEY_VOLUME_UP KEY_W KEY_X KEY_Y KEY_Z KEY_ZERO LOC_MAP_DIFFUSE
-		 LOC_MAP_SPECULAR MAP_DIFFUSE MAP_SPECULAR MAX_MATERIAL_MAPS
-		 MAX_SHADER_LOCATIONS MAX_TOUCH_POINTS MOUSE_LEFT_BUTTON
-		 MOUSE_MIDDLE_BUTTON MOUSE_RIGHT_BUTTON RAD2DEG),
+  my @names = (qw(DEG2RAD FormatText LOC_MAP_DIFFUSE LOC_MAP_SPECULAR
+		 MAP_DIFFUSE MAP_SPECULAR MAX_MATERIAL_MAPS
+		 MAX_SHADER_LOCATIONS MAX_TOUCH_POINTS RAD2DEG ShowWindow
+		 SubText),
               {name=>"BLEND_ADDITIVE", macro=>"1"},
               {name=>"BLEND_ALPHA", macro=>"1"},
               {name=>"BLEND_MULTIPLIED", macro=>"1"},
@@ -118,9 +70,76 @@ if  (eval {require ExtUtils::Constant; 1}) {
               {name=>"FILTER_BILINEAR", macro=>"1"},
               {name=>"FILTER_POINT", macro=>"1"},
               {name=>"FILTER_TRILINEAR", macro=>"1"},
+              {name=>"FLAG_FULLSCREEN_MODE", macro=>"1"},
+              {name=>"FLAG_MSAA_4X_HINT", macro=>"1"},
+              {name=>"FLAG_SHOW_LOGO", macro=>"1"},
+              {name=>"FLAG_VSYNC_HINT", macro=>"1"},
+              {name=>"FLAG_WINDOW_HIDDEN", macro=>"1"},
+              {name=>"FLAG_WINDOW_RESIZABLE", macro=>"1"},
+              {name=>"FLAG_WINDOW_TRANSPARENT", macro=>"1"},
+              {name=>"FLAG_WINDOW_UNDECORATED", macro=>"1"},
               {name=>"FONT_BITMAP", macro=>"1"},
               {name=>"FONT_DEFAULT", macro=>"1"},
               {name=>"FONT_SDF", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_BUTTON_A", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_BUTTON_B", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_BUTTON_C", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_BUTTON_L1", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_BUTTON_L2", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_BUTTON_R1", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_BUTTON_R2", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_BUTTON_X", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_BUTTON_Y", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_BUTTON_Z", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_DPAD_CENTER", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_DPAD_DOWN", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_DPAD_LEFT", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_DPAD_RIGHT", macro=>"1"},
+              {name=>"GAMEPAD_ANDROID_DPAD_UP", macro=>"1"},
+              {name=>"GAMEPAD_PLAYER1", macro=>"1"},
+              {name=>"GAMEPAD_PLAYER2", macro=>"1"},
+              {name=>"GAMEPAD_PLAYER3", macro=>"1"},
+              {name=>"GAMEPAD_PLAYER4", macro=>"1"},
+              {name=>"GAMEPAD_PS3_AXIS_L2", macro=>"1"},
+              {name=>"GAMEPAD_PS3_AXIS_LEFT_X", macro=>"1"},
+              {name=>"GAMEPAD_PS3_AXIS_LEFT_Y", macro=>"1"},
+              {name=>"GAMEPAD_PS3_AXIS_R2", macro=>"1"},
+              {name=>"GAMEPAD_PS3_AXIS_RIGHT_X", macro=>"1"},
+              {name=>"GAMEPAD_PS3_AXIS_RIGHT_Y", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_CIRCLE", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_CROSS", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_DOWN", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_L1", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_L2", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_LEFT", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_PS", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_R1", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_R2", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_RIGHT", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_SELECT", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_SQUARE", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_START", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_TRIANGLE", macro=>"1"},
+              {name=>"GAMEPAD_PS3_BUTTON_UP", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_AXIS_LEFT_X", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_AXIS_LEFT_Y", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_AXIS_LT", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_AXIS_RIGHT_X", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_AXIS_RIGHT_Y", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_AXIS_RT", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_A", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_B", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_DOWN", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_HOME", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_LB", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_LEFT", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_RB", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_RIGHT", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_SELECT", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_START", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_UP", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_X", macro=>"1"},
+              {name=>"GAMEPAD_XBOX_BUTTON_Y", macro=>"1"},
               {name=>"GESTURE_DOUBLETAP", macro=>"1"},
               {name=>"GESTURE_DRAG", macro=>"1"},
               {name=>"GESTURE_HOLD", macro=>"1"},
@@ -138,6 +157,115 @@ if  (eval {require ExtUtils::Constant; 1}) {
               {name=>"HMD_OCULUS_RIFT_DK2", macro=>"1"},
               {name=>"HMD_SONY_PSVR", macro=>"1"},
               {name=>"HMD_VALVE_HTC_VIVE", macro=>"1"},
+              {name=>"KEY_A", macro=>"1"},
+              {name=>"KEY_APOSTROPHE", macro=>"1"},
+              {name=>"KEY_B", macro=>"1"},
+              {name=>"KEY_BACK", macro=>"1"},
+              {name=>"KEY_BACKSLASH", macro=>"1"},
+              {name=>"KEY_BACKSPACE", macro=>"1"},
+              {name=>"KEY_C", macro=>"1"},
+              {name=>"KEY_CAPS_LOCK", macro=>"1"},
+              {name=>"KEY_COMMA", macro=>"1"},
+              {name=>"KEY_D", macro=>"1"},
+              {name=>"KEY_DELETE", macro=>"1"},
+              {name=>"KEY_DOWN", macro=>"1"},
+              {name=>"KEY_E", macro=>"1"},
+              {name=>"KEY_EIGHT", macro=>"1"},
+              {name=>"KEY_END", macro=>"1"},
+              {name=>"KEY_ENTER", macro=>"1"},
+              {name=>"KEY_EQUAL", macro=>"1"},
+              {name=>"KEY_ESCAPE", macro=>"1"},
+              {name=>"KEY_F", macro=>"1"},
+              {name=>"KEY_F1", macro=>"1"},
+              {name=>"KEY_F10", macro=>"1"},
+              {name=>"KEY_F11", macro=>"1"},
+              {name=>"KEY_F12", macro=>"1"},
+              {name=>"KEY_F2", macro=>"1"},
+              {name=>"KEY_F3", macro=>"1"},
+              {name=>"KEY_F4", macro=>"1"},
+              {name=>"KEY_F5", macro=>"1"},
+              {name=>"KEY_F6", macro=>"1"},
+              {name=>"KEY_F7", macro=>"1"},
+              {name=>"KEY_F8", macro=>"1"},
+              {name=>"KEY_F9", macro=>"1"},
+              {name=>"KEY_FIVE", macro=>"1"},
+              {name=>"KEY_FOUR", macro=>"1"},
+              {name=>"KEY_G", macro=>"1"},
+              {name=>"KEY_GRAVE", macro=>"1"},
+              {name=>"KEY_H", macro=>"1"},
+              {name=>"KEY_HOME", macro=>"1"},
+              {name=>"KEY_I", macro=>"1"},
+              {name=>"KEY_INSERT", macro=>"1"},
+              {name=>"KEY_J", macro=>"1"},
+              {name=>"KEY_K", macro=>"1"},
+              {name=>"KEY_KB_MENU", macro=>"1"},
+              {name=>"KEY_KP_0", macro=>"1"},
+              {name=>"KEY_KP_1", macro=>"1"},
+              {name=>"KEY_KP_2", macro=>"1"},
+              {name=>"KEY_KP_3", macro=>"1"},
+              {name=>"KEY_KP_4", macro=>"1"},
+              {name=>"KEY_KP_5", macro=>"1"},
+              {name=>"KEY_KP_6", macro=>"1"},
+              {name=>"KEY_KP_7", macro=>"1"},
+              {name=>"KEY_KP_8", macro=>"1"},
+              {name=>"KEY_KP_9", macro=>"1"},
+              {name=>"KEY_KP_ADD", macro=>"1"},
+              {name=>"KEY_KP_DECIMAL", macro=>"1"},
+              {name=>"KEY_KP_DIVIDE", macro=>"1"},
+              {name=>"KEY_KP_ENTER", macro=>"1"},
+              {name=>"KEY_KP_EQUAL", macro=>"1"},
+              {name=>"KEY_KP_MULTIPLY", macro=>"1"},
+              {name=>"KEY_KP_SUBTRACT", macro=>"1"},
+              {name=>"KEY_L", macro=>"1"},
+              {name=>"KEY_LEFT", macro=>"1"},
+              {name=>"KEY_LEFT_ALT", macro=>"1"},
+              {name=>"KEY_LEFT_BRACKET", macro=>"1"},
+              {name=>"KEY_LEFT_CONTROL", macro=>"1"},
+              {name=>"KEY_LEFT_SHIFT", macro=>"1"},
+              {name=>"KEY_LEFT_SUPER", macro=>"1"},
+              {name=>"KEY_M", macro=>"1"},
+              {name=>"KEY_MENU", macro=>"1"},
+              {name=>"KEY_MINUS", macro=>"1"},
+              {name=>"KEY_N", macro=>"1"},
+              {name=>"KEY_NINE", macro=>"1"},
+              {name=>"KEY_NUM_LOCK", macro=>"1"},
+              {name=>"KEY_O", macro=>"1"},
+              {name=>"KEY_ONE", macro=>"1"},
+              {name=>"KEY_P", macro=>"1"},
+              {name=>"KEY_PAGE_DOWN", macro=>"1"},
+              {name=>"KEY_PAGE_UP", macro=>"1"},
+              {name=>"KEY_PAUSE", macro=>"1"},
+              {name=>"KEY_PERIOD", macro=>"1"},
+              {name=>"KEY_PRINT_SCREEN", macro=>"1"},
+              {name=>"KEY_Q", macro=>"1"},
+              {name=>"KEY_R", macro=>"1"},
+              {name=>"KEY_RIGHT", macro=>"1"},
+              {name=>"KEY_RIGHT_ALT", macro=>"1"},
+              {name=>"KEY_RIGHT_BRACKET", macro=>"1"},
+              {name=>"KEY_RIGHT_CONTROL", macro=>"1"},
+              {name=>"KEY_RIGHT_SHIFT", macro=>"1"},
+              {name=>"KEY_RIGHT_SUPER", macro=>"1"},
+              {name=>"KEY_S", macro=>"1"},
+              {name=>"KEY_SCROLL_LOCK", macro=>"1"},
+              {name=>"KEY_SEMICOLON", macro=>"1"},
+              {name=>"KEY_SEVEN", macro=>"1"},
+              {name=>"KEY_SIX", macro=>"1"},
+              {name=>"KEY_SLASH", macro=>"1"},
+              {name=>"KEY_SPACE", macro=>"1"},
+              {name=>"KEY_T", macro=>"1"},
+              {name=>"KEY_TAB", macro=>"1"},
+              {name=>"KEY_THREE", macro=>"1"},
+              {name=>"KEY_TWO", macro=>"1"},
+              {name=>"KEY_U", macro=>"1"},
+              {name=>"KEY_UP", macro=>"1"},
+              {name=>"KEY_V", macro=>"1"},
+              {name=>"KEY_VOLUME_DOWN", macro=>"1"},
+              {name=>"KEY_VOLUME_UP", macro=>"1"},
+              {name=>"KEY_W", macro=>"1"},
+              {name=>"KEY_X", macro=>"1"},
+              {name=>"KEY_Y", macro=>"1"},
+              {name=>"KEY_Z", macro=>"1"},
+              {name=>"KEY_ZERO", macro=>"1"},
               {name=>"LOC_COLOR_AMBIENT", macro=>"1"},
               {name=>"LOC_COLOR_DIFFUSE", macro=>"1"},
               {name=>"LOC_COLOR_SPECULAR", macro=>"1"},
@@ -179,6 +307,9 @@ if  (eval {require ExtUtils::Constant; 1}) {
               {name=>"MAP_OCCLUSION", macro=>"1"},
               {name=>"MAP_PREFILTER", macro=>"1"},
               {name=>"MAP_ROUGHNESS", macro=>"1"},
+              {name=>"MOUSE_LEFT_BUTTON", macro=>"1"},
+              {name=>"MOUSE_MIDDLE_BUTTON", macro=>"1"},
+              {name=>"MOUSE_RIGHT_BUTTON", macro=>"1"},
               {name=>"NPT_3PATCH_HORIZONTAL", macro=>"1"},
               {name=>"NPT_3PATCH_VERTICAL", macro=>"1"},
               {name=>"NPT_9PATCH", macro=>"1"},
@@ -192,8 +323,18 @@ if  (eval {require ExtUtils::Constant; 1}) {
               {name=>"UNCOMPRESSED_R5G6B5", macro=>"1"},
               {name=>"UNCOMPRESSED_R8G8B8", macro=>"1"},
               {name=>"UNCOMPRESSED_R8G8B8A8", macro=>"1"},
+              {name=>"UNIFORM_FLOAT", macro=>"1"},
+              {name=>"UNIFORM_INT", macro=>"1"},
+              {name=>"UNIFORM_IVEC2", macro=>"1"},
+              {name=>"UNIFORM_IVEC3", macro=>"1"},
+              {name=>"UNIFORM_IVEC4", macro=>"1"},
+              {name=>"UNIFORM_SAMPLER2D", macro=>"1"},
+              {name=>"UNIFORM_VEC2", macro=>"1"},
+              {name=>"UNIFORM_VEC3", macro=>"1"},
+              {name=>"UNIFORM_VEC4", macro=>"1"},
               {name=>"WRAP_CLAMP", macro=>"1"},
-              {name=>"WRAP_MIRROR", macro=>"1"},
+              {name=>"WRAP_MIRROR_CLAMP", macro=>"1"},
+              {name=>"WRAP_MIRROR_REPEAT", macro=>"1"},
               {name=>"WRAP_REPEAT", macro=>"1"},
               {name=>"false", macro=>"1"},
               {name=>"true", macro=>"1"});

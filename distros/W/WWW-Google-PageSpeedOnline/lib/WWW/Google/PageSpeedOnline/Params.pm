@@ -1,6 +1,6 @@
 package WWW::Google::PageSpeedOnline::Params;
 
-$WWW::Google::PageSpeedOnline::Params::VERSION   = '0.27';
+$WWW::Google::PageSpeedOnline::Params::VERSION   = '0.28';
 $WWW::Google::PageSpeedOnline::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::PageSpeedOnline::Params - Placeholder for parameters for L<WWW::Goo
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 

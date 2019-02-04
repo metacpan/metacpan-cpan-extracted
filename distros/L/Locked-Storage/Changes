@@ -5,3 +5,16 @@ Revision history for Perl extension Locked::Storage.
 
 1.01  29 Jan 2019
 	- fixed test following CPAN tester reports.
+
+1.02  31 Jan 2019
+	- tidied up return codes.
+
+1.03  2 Feb 2019
+	- reordered tests as CPAN testers seem to fail spuriously
+	  Added test for unlockall
+
+1.04  3 Feb 2019
+	- Moved to Test::Harness to try fix the CPAN testers
+
+1.05  4 Feb 2019
+	- Set sequencial processing for testers

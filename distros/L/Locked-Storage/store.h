@@ -9,9 +9,10 @@ typedef struct
     int   processLocked; /* mlockall() has been called */
 } AddressRegion;
 
-extern AddressRegion *new      (int nSize);
-extern void           DESTROY  (AddressRegion *pAddressRegion);
-extern void           dump     (AddressRegion *pAddressRegion);
-extern int            store    (AddressRegion *pAddressRegion, char *data, int len);
-extern char          *get      (AddressRegion *pAddressRegion);
-extern int            lockall  (AddressRegion *pAddressRegion);
+extern AddressRegion *new       (int nSize);
+extern void           DESTROY   (AddressRegion *pAddressRegion);
+extern void           dump      (AddressRegion *pAddressRegion);
+extern int            store     (AddressRegion *pAddressRegion, char *data, int len);
+extern char          *get       (AddressRegion *pAddressRegion);
+extern int            lockall   (AddressRegion *pAddressRegion);
+extern int            unlockall (AddressRegion *pAddressRegion);

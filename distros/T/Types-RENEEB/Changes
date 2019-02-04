@@ -1,6 +1,10 @@
 Revision history for Types::RENEEB
 ==================================
 
+0.05  2019-02-02 08:31:00
+
+   * fix required version of Moo
+
 0.04  2019-02-01 09:53:00
 
    * minor documentation fixes

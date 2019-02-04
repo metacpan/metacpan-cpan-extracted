@@ -5,7 +5,6 @@ package JLdap;
 require 5.002;
 
 use Net::LDAP::Entry;
-use vars qw($VERSION);
 no warnings qw (uninitialized);
 
 #use Fcntl; 
@@ -17,7 +16,7 @@ no warnings qw (uninitialized);
 use vars qw ($VERSION);
 ##--
 
-$JLdap::VERSION = '0.22';
+$JLdap::VERSION = '0.24';
 
 #my $NUMERICTYPES = '^(NUMBER|FLOAT|DOUBLE|INT|INTEGER|NUM)$';       #20000224
 #my $STRINGTYPES = '^(VARCHAR|CHAR|VARCHAR|DATE|LONG|BLOB|MEMO)$';

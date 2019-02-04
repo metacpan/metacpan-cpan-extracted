@@ -71,7 +71,7 @@ Returns the proj4 object which handles the projection.
 
 =item $obj-E<gt>B<in>( <$label|'utm'> )
 
-The coordinates of this point in a certain projection, refered to with
+The coordinates of this point in a certain projection, referred to with
 the $label.  The projection is defined with L<new()|Geo::Shape/"Constructors">.  When simply
 'utm' is provided, the best UTM zone is selected.
 
@@ -215,12 +215,12 @@ The limitation is purely caused by lack of time to implement this.
 
 =head1 SEE ALSO
 
-This module is part of Geo-Point distribution version 0.97,
-built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Geo-Point distribution version 0.98,
+built on February 01, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2005-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2005-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,5 +1,5 @@
 ---
-abstract: 'read epubs in the terminal'
+abstract: 'Epubreader for the terminal'
 author:
   - 'Mario Domgoergen C<< <mario@domgoergen.com> >> '
 build_requires: {}
@@ -29,7 +29,7 @@ no_index:
 provides:
   App::termpub:
     file: lib/App/termpub.pm
-    version: '1.00'
+    version: '1.03'
   App::termpub::Epub:
     file: lib/App/termpub/Epub.pm
   App::termpub::Epub::Chapter:
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://github.com/mdom/termpub/issues
   homepage: https://github.com/mdom/termpub
   repository: git://github.com/mdom/termpub.git
-version: '1.00'
+version: '1.03'
 x_contributors:
   - 'Mario Domgoergen <mdom@taz.de>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

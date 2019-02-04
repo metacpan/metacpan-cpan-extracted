@@ -1,5 +1,13 @@
 Revision history for MooX-PDL-Role-Proxy
 
+0.05      2019-02-02 13:48:18-05:00 America/New_York
+
+  [BUILD FIX]
+
+    * remove postderef syntax in test so will once again work on older Perls
+    * specify minimum Perl version of 5.10
+
+
 0.04      2019-01-31 10:01:32-05:00 America/New_York
 
   [ENHANCEMENTS]

@@ -32,7 +32,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker::CPANfile" : "0.08"
+            "ExtUtils::MakeMaker::CPANfile" : "0.08",
+            "perl" : "5.008001"
          }
       },
       "runtime" : {
@@ -48,10 +49,11 @@
             "File::Find::Object" : "v0.2.1",
             "JSON::PP" : "0",
             "List::Util" : "1.33",
-            "Module::ExtractUse" : "0.33",
             "Module::Find" : "0",
+            "Perl::PrereqScanner::NotQuiteLite" : "0.9901",
             "Software::License" : "0.103012",
             "Text::Balanced" : "0",
+            "perl" : "5.008001",
             "version" : "0.73"
          }
       },
@@ -68,11 +70,11 @@
       "bugtracker" : {
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Module-CPANTS-Analyse"
       },
-      "homepage" : "http://cpants.cpanauthors.org",
+      "homepage" : "https://cpants.cpanauthors.org",
       "repository" : {
          "url" : "https://github.com/cpants/Module-CPANTS-Analyse"
       }
    },
-   "version" : "0.99",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -1,5 +1,10 @@
 Revision history for Future-AsyncAwait
 
+0.21    2019-02-02 17:19:35
+        [BUGFIXES]
+         * Fix more memory leaks - simple test case now executes cleanly
+           (RT128222)
+
 0.20    2019-01-16 22:34:20
         [BUGFIXES]
          * Ensure mortal SVs aren't reclaimed prematurely during

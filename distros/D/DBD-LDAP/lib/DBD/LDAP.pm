@@ -4,13 +4,13 @@ DBD::LDAP - Provides an SQL/Perl DBI interface to LDAP
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2000-2010 by
+This module is Copyright (C) 2000-2019 by
 
           Jim Turner
 
-        Email:  turnerjw784 .att. yahoo.com
+        Email:  turnerjw784 .att. yahoo dot com
 
-All rights reserved Without Prejudice.
+All rights reserved.
 
 You may distribute this module under the same terms as Perl itself.
 
@@ -340,7 +340,7 @@ no warnings qw (uninitialized);
 #@EXPORT = qw(
 	
 #);
-$VERSION = '0.22';
+$VERSION = '0.24';
 
 # Preloaded methods go here.
 

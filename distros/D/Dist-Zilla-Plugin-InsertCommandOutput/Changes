@@ -1,3 +1,8 @@
+0.051   2019-02-04 (PERLANCAR)
+
+	- [ux] Log result of command to log_debug(), not log() [RT#128404].
+
+
 0.050   2018-04-06 (PERLANCAR)
 
 	- Log output of command for debugging.

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Af - Package for language Afrikaans
 
 package Locale::CLDR::Locales::Af;
 # This file auto generated from Data\common\main\af.xml
-#	on Sun  7 Oct 10:19:04 am GMT
+#	on Sun  3 Feb  1:37:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -573,7 +573,7 @@ has 'display_name_language' => (
  				'de_CH' => 'Switserse hoog-Duits',
  				'dgr' => 'Dogrib',
  				'dje' => 'Zarma',
- 				'dsb' => 'Lae Sorbies',
+ 				'dsb' => 'Benedesorbies',
  				'dua' => 'Duala',
  				'dv' => 'Divehi',
  				'dyo' => 'Jola-Fonyi',
@@ -624,7 +624,7 @@ has 'display_name_language' => (
  				'gwi' => 'Gwichʼin',
  				'ha' => 'Hausa',
  				'hak' => 'Hakka-Sjinees',
- 				'haw' => 'Hawaiies',
+ 				'haw' => 'Hawais',
  				'he' => 'Hebreeus',
  				'hi' => 'Hindi',
  				'hil' => 'Hiligaynon',
@@ -741,7 +741,7 @@ has 'display_name_language' => (
  				'ms' => 'Maleis',
  				'mt' => 'Maltees',
  				'mua' => 'Mundang',
- 				'mul' => 'Veelvuldige tale',
+ 				'mul' => 'Verskeie tale',
  				'mus' => 'Kreek',
  				'mwl' => 'Mirandees',
  				'my' => 'Birmaans',
@@ -751,7 +751,7 @@ has 'display_name_language' => (
  				'nan' => 'Min Nan-Sjinees',
  				'nap' => 'Neapolitaans',
  				'naq' => 'Nama',
- 				'nb' => 'Noorse Bokmål',
+ 				'nb' => 'Boeknoors',
  				'nd' => 'Noord-Ndebele',
  				'nds' => 'Lae Duits',
  				'nds_NL' => 'Nedersaksies',
@@ -763,7 +763,7 @@ has 'display_name_language' => (
  				'nl' => 'Nederlands',
  				'nl_BE' => 'Vlaams',
  				'nmg' => 'Kwasio',
- 				'nn' => 'Noorweegse Nynorsk',
+ 				'nn' => 'Nuwe Noors',
  				'nnh' => 'Ngiemboon',
  				'no' => 'Noors',
  				'nog' => 'Nogai',
@@ -797,7 +797,6 @@ has 'display_name_language' => (
  				'rm' => 'Reto-Romaans',
  				'rn' => 'Rundi',
  				'ro' => 'Roemeens',
- 				'ro_MD' => 'Moldawies',
  				'rof' => 'Rombo',
  				'root' => 'Root',
  				'ru' => 'Russies',
@@ -844,7 +843,6 @@ has 'display_name_language' => (
  				'suk' => 'Sukuma',
  				'sv' => 'Sweeds',
  				'sw' => 'Swahili',
- 				'sw_CD' => 'Swahili (Kongo)',
  				'swb' => 'Comoraans',
  				'syr' => 'Siries',
  				'ta' => 'Tamil',
@@ -852,7 +850,7 @@ has 'display_name_language' => (
  				'tem' => 'Timne',
  				'teo' => 'Teso',
  				'tet' => 'Tetoem',
- 				'tg' => 'Tadzjieks',
+ 				'tg' => 'Tadjiks',
  				'th' => 'Thai',
  				'ti' => 'Tigrinya',
  				'tig' => 'Tigre',
@@ -1007,7 +1005,7 @@ has 'display_name_region' => (
  			'018' => 'Suider-Afrika',
  			'019' => 'Amerikas',
  			'021' => 'Noordelike Amerika',
- 			'029' => 'Karibies',
+ 			'029' => 'Karibiese streek',
  			'030' => 'Oos-Asië',
  			'034' => 'Suid-Asië',
  			'035' => 'Suidoos-Asië',
@@ -1228,7 +1226,7 @@ has 'display_name_region' => (
  			'PW' => 'Palau',
  			'PY' => 'Paraguay',
  			'QA' => 'Katar',
- 			'QO' => 'Omliggende Oseanië',
+ 			'QO' => 'Afgeleë Oseanië',
  			'RE' => 'Réunion',
  			'RO' => 'Roemenië',
  			'RS' => 'Serwië',
@@ -1330,14 +1328,14 @@ has 'display_name_key' => (
  			'colbackwards' => 'Omgekeerde aksentsortering',
  			'colcasefirst' => 'Hoofletters/kleinletters-sortering',
  			'colcaselevel' => 'Kassensitiewe sortering',
- 			'collation' => 'Sorteervolgorde',
+ 			'collation' => 'Rangskikvolgorde',
  			'colnormalization' => 'Genormaliseerde sortering',
  			'colnumeric' => 'Numeriese sortering',
  			'colstrength' => 'Sorteringssterkte',
  			'currency' => 'Geldeenheid',
  			'hc' => 'Uursiklus (12 vs 24)',
- 			'lb' => 'Reëlbreek-styl',
- 			'ms' => 'Meetstelsel',
+ 			'lb' => 'Reëlafbreek-styl',
+ 			'ms' => 'Maatstelsel',
  			'numbers' => 'Syfers',
  			'timezone' => 'Tydsone',
  			'va' => 'Lokaalvariant',
@@ -1358,9 +1356,9 @@ has 'display_name_type' => (
  				'chinese' => q{Sjinese kalender},
  				'coptic' => q{Koptiese kalender},
  				'dangi' => q{Dangi-kalender},
- 				'ethiopic' => q{Ethiopiese kalender},
+ 				'ethiopic' => q{Etiopiese kalender},
  				'ethiopic-amete-alem' => q{Etiopiese Amete Alem-kalender},
- 				'gregorian' => q{Gregoriese kalender},
+ 				'gregorian' => q{Gregoriaanse kalender},
  				'hebrew' => q{Hebreeuse kalender},
  				'indian' => q{Indiese nasionale kalender},
  				'islamic' => q{Islamitiese kalender},
@@ -1372,7 +1370,7 @@ has 'display_name_type' => (
  			},
  			'cf' => {
  				'account' => q{Rekeningkundige geldeenheidformaat},
- 				'standard' => q{Standaard Geldeenheidformaat},
+ 				'standard' => q{Standaard geldeenheidformaat},
  			},
  			'colalternate' => {
  				'non-ignorable' => q{Sorteer simbole},
@@ -1394,7 +1392,7 @@ has 'display_name_type' => (
  			'collation' => {
  				'big5han' => q{Tradisionele Chinese sorteervolgorde - Groot5},
  				'dictionary' => q{Woordeboek-sorteervolgorde},
- 				'ducet' => q{Verstek Unicode-sorteervolgorde},
+ 				'ducet' => q{Verstek Unicode-rangskikvolgorde},
  				'gb2312han' => q{Vereenvoudigde Chinese sorteervolgorde - GB2312},
  				'phonebook' => q{Foonboek-sorteervolgorde},
  				'phonetic' => q{Fonetiese sorteerorde},
@@ -1402,7 +1400,7 @@ has 'display_name_type' => (
  				'reformed' => q{Gereformeerde sorteervolgorde},
  				'search' => q{Algemenedoel-soektog},
  				'searchjl' => q{Soek volgens Hangul-beginkonsonant},
- 				'standard' => q{Standaard sorteervolgorde},
+ 				'standard' => q{Standaard rangskikvolgorde},
  				'stroke' => q{Slag-sorteervolgorde},
  				'traditional' => q{Tradisionele sorteervolgorde},
  				'unihan' => q{Radikale-slag-sorteervolgorde},
@@ -1424,7 +1422,7 @@ has 'display_name_type' => (
  			},
  			'd0' => {
  				'fwidth' => q{Vollewydte},
- 				'hwidth' => q{halfwydte},
+ 				'hwidth' => q{Halfwydte},
  				'npinyin' => q{Numeries},
  			},
  			'hc' => {
@@ -1434,18 +1432,18 @@ has 'display_name_type' => (
  				'h24' => q{24-uur-stelsel (1-24)},
  			},
  			'lb' => {
- 				'loose' => q{Los reëlbreek-styl},
- 				'normal' => q{Normale reëlbreek-styl},
- 				'strict' => q{Streng reëlbreek-styl},
+ 				'loose' => q{Losse reëlafbreek-styl},
+ 				'normal' => q{Normale reëlafbreek-styl},
+ 				'strict' => q{Streng reëlafbreek-styl},
  			},
  			'm0' => {
- 				'bgn' => q{BGN},
- 				'ungegn' => q{UNGEGN},
+ 				'bgn' => q{BGN-transliterasie},
+ 				'ungegn' => q{UNGEGN-transliterasie},
  			},
  			'ms' => {
  				'metric' => q{Metrieke stelsel},
- 				'uksystem' => q{Imperiale meetstelsel},
- 				'ussystem' => q{VS-meetstelsel},
+ 				'uksystem' => q{Imperiale maatstelsel},
+ 				'ussystem' => q{VSA-maatstelsel},
  			},
  			'numbers' => {
  				'arab' => q{Arabies-Indiese syfers},
@@ -1454,7 +1452,7 @@ has 'display_name_type' => (
  				'armnlow' => q{Armeense kleinletter-syfers},
  				'beng' => q{Bengaalse syfers},
  				'deva' => q{Devanagari-syfers},
- 				'ethi' => q{Ethiopiese syfers},
+ 				'ethi' => q{Etiopiese syfers},
  				'finance' => q{Finansiële syfers},
  				'fullwide' => q{Vollewydte-syfers},
  				'geor' => q{Georgiese syfers},
@@ -1500,7 +1498,7 @@ has 'display_name_measurement_system' => (
 	init_arg	=> undef,
 	default		=> sub { 
 		{
-			'metric' => q{Metriek},
+			'metric' => q{Metrieke stelsel},
  			'UK' => q{VK},
  			'US' => q{VSA},
 
@@ -1613,6 +1611,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(kardinale rigting),
+					},
 					'acre' => {
 						'name' => q(akker),
 						'one' => q({0} akker),
@@ -1642,6 +1643,11 @@ has 'units' => (
 						'name' => q(astronomiese eenheid),
 						'one' => q({0} astronomiese eenheid),
 						'other' => q({0} astronomiese eenheid),
+					},
+					'atmosphere' => {
+						'name' => q(atmosfere),
+						'one' => q({0} atmosfeer),
+						'other' => q({0} atmosfere),
 					},
 					'bit' => {
 						'name' => q(bis),
@@ -2159,6 +2165,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0} per {1}),
 					},
+					'percent' => {
+						'name' => q(persent),
+						'one' => q({0} persent),
+						'other' => q({0} persent),
+					},
+					'permille' => {
+						'name' => q(per mille),
+						'one' => q({0} per mille),
+						'other' => q({0} per mille),
+					},
+					'petabyte' => {
+						'name' => q(petagrepe),
+						'one' => q({0} petagreep),
+						'other' => q({0} petagrepe),
+					},
 					'picometer' => {
 						'name' => q(pikometer),
 						'one' => q({0} pikometer),
@@ -2305,6 +2326,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(rigting),
+					},
 					'acre' => {
 						'one' => q({0} ak),
 						'other' => q({0} ak),
@@ -2473,6 +2497,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'one' => q({0}pm),
 						'other' => q({0}pm),
@@ -2522,6 +2551,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(rigting),
+					},
 					'acre' => {
 						'name' => q(akker),
 						'one' => q({0} ak),
@@ -2551,6 +2583,11 @@ has 'units' => (
 						'name' => q(AE),
 						'one' => q({0} AE),
 						'other' => q({0} AE),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(bis),
@@ -3067,6 +3104,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(percent),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(per mille),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PGrepe),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
 					},
 					'picometer' => {
 						'name' => q(pm),
@@ -3851,7 +3903,7 @@ has 'currencies' => (
 		'EUR' => {
 			symbol => '€',
 			display_name => {
-				'currency' => q(Euro),
+				'currency' => q(euro),
 				'one' => q(euro),
 				'other' => q(euro),
 			},
@@ -4181,6 +4233,7 @@ has 'currencies' => (
 			},
 		},
 		'LVL' => {
+			symbol => 'LVL',
 			display_name => {
 				'currency' => q(Lettiese lats),
 			},
@@ -4715,8 +4768,16 @@ has 'currencies' => (
 			symbol => 'VEF',
 			display_name => {
 				'currency' => q(Venezolaanse bolivar),
-				'one' => q(Venezolaanse bolivar),
-				'other' => q(Venezolaanse bolivar),
+				'one' => q(Venezolaanse bolívar \(2008–2018\)),
+				'other' => q(Venezolaanse bolívare \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
+			display_name => {
+				'currency' => q(Venezolaanse Bolívar),
+				'one' => q(Venezolaanse bolívar),
+				'other' => q(Venezolaanse bolívare),
 			},
 		},
 		'VND' => {
@@ -4777,7 +4838,7 @@ has 'currencies' => (
 		},
 		'XXX' => {
 			display_name => {
-				'currency' => q(Onbekende geldeenheid),
+				'currency' => q(onbekende geldeenheid),
 				'one' => q(\(onbekende geldeenheid\)),
 				'other' => q(\(onbekende geldeenheid\)),
 			},
@@ -5088,51 +5149,51 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
 				}
 				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'night1' if $time >= 0
 						&& $time < 500;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -5152,61 +5213,61 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'morning1' => q{die oggend},
-					'night1' => q{die nag},
-					'pm' => q{nm.},
-					'afternoon1' => q{die middag},
+				'abbreviated' => {
 					'midnight' => q{middernag},
+					'pm' => q{nm.},
 					'evening1' => q{die aand},
+					'am' => q{vm.},
+					'morning1' => q{die oggend},
+					'afternoon1' => q{die middag},
+					'night1' => q{die nag},
+				},
+				'wide' => {
+					'afternoon1' => q{die middag},
+					'night1' => q{die nag},
+					'evening1' => q{die aand},
+					'pm' => q{nm.},
+					'midnight' => q{middernag},
+					'morning1' => q{die oggend},
 					'am' => q{vm.},
 				},
 				'narrow' => {
+					'afternoon1' => q{m},
 					'night1' => q{n},
-					'morning1' => q{o},
 					'pm' => q{n},
 					'midnight' => q{mn},
 					'evening1' => q{a},
-					'afternoon1' => q{m},
 					'am' => q{v},
-				},
-				'abbreviated' => {
-					'morning1' => q{die oggend},
-					'night1' => q{die nag},
-					'pm' => q{nm.},
-					'afternoon1' => q{die middag},
-					'evening1' => q{die aand},
-					'midnight' => q{middernag},
-					'am' => q{vm.},
+					'morning1' => q{o},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'am' => q{v},
-					'afternoon1' => q{m},
-					'midnight' => q{mn},
-					'evening1' => q{a},
-					'pm' => q{n},
-					'morning1' => q{o},
-					'night1' => q{n},
-				},
-				'wide' => {
-					'afternoon1' => q{middag},
-					'evening1' => q{aand},
-					'midnight' => q{middernag},
-					'am' => q{vm.},
-					'morning1' => q{oggend},
-					'night1' => q{nag},
-					'pm' => q{nm.},
-				},
 				'abbreviated' => {
 					'night1' => q{nag},
+					'afternoon1' => q{middag},
 					'morning1' => q{oggend},
+					'am' => q{vm.},
+					'evening1' => q{aand},
 					'pm' => q{nm.},
 					'midnight' => q{middernag},
+				},
+				'wide' => {
 					'evening1' => q{aand},
-					'afternoon1' => q{middag},
+					'midnight' => q{middernag},
+					'pm' => q{nm.},
+					'morning1' => q{oggend},
 					'am' => q{vm.},
+					'afternoon1' => q{middag},
+					'night1' => q{nag},
+				},
+				'narrow' => {
+					'afternoon1' => q{m},
+					'night1' => q{n},
+					'evening1' => q{a},
+					'pm' => q{n},
+					'midnight' => q{mn},
+					'morning1' => q{o},
+					'am' => q{v},
 				},
 			},
 		},
@@ -5249,7 +5310,7 @@ has 'date_formats' => (
 			'short' => q{GGGGG y-MM-dd},
 		},
 		'gregorian' => {
-			'full' => q{EEEE, dd MMMM y},
+			'full' => q{EEEE dd MMMM y},
 			'long' => q{dd MMMM y},
 			'medium' => q{dd MMM y},
 			'short' => q{y-MM-dd},
@@ -5318,10 +5379,10 @@ has 'datetime_formats_available_formats' => (
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
-			MEd => q{E, d/M},
+			MEd => q{E M/d},
 			MMM => q{LLL},
-			MMMEd => q{E, d MMM},
-			MMMMEd => q{E, d MMMM},
+			MMMEd => q{E d MMM},
+			MMMMEd => q{E d MMMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
@@ -5333,9 +5394,9 @@ has 'datetime_formats_available_formats' => (
 			y => q{y G},
 			yyyy => q{y G},
 			yyyyM => q{M/y GGGGG},
-			yyyyMEd => q{E, d/M/y G},
+			yyyyMEd => q{E d/M/y G},
 			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E, d MMM y G},
+			yyyyMMMEd => q{E d MMM y G},
 			yyyyMMMM => q{MMMM y G},
 			yyyyMMMd => q{d MMM y G},
 			yyyyMd => q{d/M/y GGGGG},
@@ -5356,7 +5417,7 @@ has 'datetime_formats_available_formats' => (
 			Ehms => q{E hh:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
-			GyMMMEd => q{E, dd MMM y G},
+			GyMMMEd => q{E dd MMM y G},
 			GyMMMd => q{dd MMM y G},
 			H => q{HH},
 			Hm => q{HH:mm},
@@ -5364,7 +5425,7 @@ has 'datetime_formats_available_formats' => (
 			Hmsv => q{HH:mm:ss v},
 			Hmv => q{HH:mm v},
 			M => q{L},
-			MEd => q{E, d/M},
+			MEd => q{E d/M},
 			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMMEd => q{E d MMMM},
@@ -5383,7 +5444,7 @@ has 'datetime_formats_available_formats' => (
 			yM => q{MM-y},
 			yMEd => q{E y-MM-dd},
 			yMMM => q{MMM y},
-			yMMMEd => q{E, d MMM y},
+			yMMMEd => q{E d MMM y},
 			yMMMM => q{MMMM y},
 			yMMMd => q{d MMM y},
 			yMd => q{y-MM-dd},
@@ -5524,15 +5585,15 @@ has 'datetime_formats_interval' => (
 				M => q{M–M},
 			},
 			MEd => {
-				M => q{E, d/M – E, d/M},
-				d => q{E, d/M – E, d/M},
+				M => q{E d/M – E d/M},
+				d => q{E d/M – E d/M},
 			},
 			MMM => {
 				M => q{MMM–MMM},
 			},
 			MMMEd => {
-				M => q{E, d MMM – E, d MMM},
-				d => q{E, d MMM – E, d MMM},
+				M => q{E d MMM – E d MMM},
+				d => q{E d MMM – E d MMM},
 			},
 			MMMd => {
 				M => q{d MMM – d MMM},
@@ -5572,18 +5633,18 @@ has 'datetime_formats_interval' => (
 				y => q{M/y – M/y},
 			},
 			yMEd => {
-				M => q{E, d/M/y – E, d/M/y},
-				d => q{E, d/M/y – E, d/M/y},
-				y => q{E, d/M/y – E, d/M/y},
+				M => q{E d/M/y – E d/M/y},
+				d => q{E d/M/y – E d/M/y},
+				y => q{E d/M/y – E d/M/y},
 			},
 			yMMM => {
 				M => q{MMM–MMM y},
 				y => q{MMM y – MMM y},
 			},
 			yMMMEd => {
-				M => q{E, d MMM – E, d MMM, y},
-				d => q{E, d MMM – E, d MMM y},
-				y => q{E, d MMM y – E, d MMM y},
+				M => q{E d MMM – E d MMM y},
+				d => q{E d MMM – E d MMM y},
+				y => q{E d MMM y – E d MMM y},
 			},
 			yMMMM => {
 				M => q{MMMM – MMMM y},
@@ -6654,7 +6715,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Suid-Georgië#,
 		},
 		'Atlantic/St_Helena' => {
-			exemplarCity => q#St. Helena#,
+			exemplarCity => q#Sint Helena#,
 		},
 		'Atlantic/Stanley' => {
 			exemplarCity => q#Stanley#,
@@ -7578,7 +7639,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Wake#,
 		},
 		'Pacific/Wallis' => {
-			exemplarCity => q#Wallis#,
+			exemplarCity => q#Mata-Utu#,
 		},
 		'Pakistan' => {
 			long => {

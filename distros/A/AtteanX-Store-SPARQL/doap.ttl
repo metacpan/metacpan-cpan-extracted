@@ -6,10 +6,17 @@
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix types: <http://rdfs.org/sioc/types#> .
+@prefix wot:   <http://xmlns.com/wot/0.1/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
+<http://dbpedia.org/resource/Category:Semantic_Web>
+	rdfs:label           "Semantic Web"@en;
+	dc:description       "The Semantic Web is an extension of the current World Wide Web to enable wide data access and integration."@en.
+
 <http://dev.perl.org/licenses/>
-	dc:title             "the same terms as the perl 5 programming language system itself".
+	dc:title             "the same terms as the perl 5 programming language system itself";
+	rdfs:comment         "the same terms as the Perl 5 programming language system itself"@en.
 
 <http://kasei.us/about/foaf.xrdf#greg>
 	a                    foaf:Person;
@@ -44,13 +51,15 @@
 	doap:maintainer      <http://www.kjetil.kjernsmo.net/foaf#me>;
 	doap:name            "AtteanX-Store-SPARQL";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-001>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-002>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-004>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-006>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-008>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-010>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-001>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-002>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-004>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-006>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-008>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-010>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-012>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-atteanx-store-sparql>;
 		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-atteanx-store-sparql&serialization=PROV-O#>;
 	];
-	doap:shortdesc       "Attean SPARQL store".
+	doap:security-contact <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:shortdesc       "Attean SPARQL store";
+	doap:support-forum   <irc://irc.perl.org/#perlrdf>.
 
 <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-001>
 	a                    doap:Version;
@@ -102,6 +111,9 @@
 	dc:issued            "2016-04-11"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Do the SPARQL serialization in the impl method.";
+		], [
 			a doap-changeset:Addition;
 			rdfs:label "Add single-BGP access plan.";
 		], [
@@ -110,9 +122,6 @@
 		], [
 			a doap-changeset:Change;
 			rdfs:label "Use the content method on the response object.";
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Do the SPARQL serialization in the impl method.";
 		];
 		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-006>;
 	];
@@ -142,9 +151,47 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-SPARQL-0.010.tar.gz>;
 	doap:revision        "0.010"^^xsd:string.
 
-<http://www.kjetil.kjernsmo.net/foaf#me>
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-012>
+	a                    doap:Version;
+	rdfs:label           "Fix bug from upstream changes.";
+	dc:identifier        "AtteanX-Store-SPARQL-0.012"^^xsd:string;
+	dc:issued            "2019-02-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Add count estimate handling.";
+			doap-changeset:blame <http://kasei.us/about/foaf.xrdf#greg>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-010>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-SPARQL-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
 	foaf:name            "Kjetil Kjernsmo";
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2Fp5-atteanx-store-sparql&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk>.
+	foaf:nick            "KjetilK";
+	owl:sameAs           <http://www.kjetil.kjernsmo.net/foaf#me>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	wot:hasKey           _:B1.
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+	a                    foaf:Person;
+	foaf:homepage        <http://kjetil.kjernsmo.net/>;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KjetilK";
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2Fp5-atteanx-store-sparql&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	wot:hasKey           _:B1.
+
+<irc://irc.perl.org/#perlrdf>
+	a                    types:ChatChannel;
+	dc:title             "The Perl and RDF IRC channel"@en.
+
+_:B1
+	a                    wot:PubKey;
+	wot:fingerprint      "0ECC8BC6D0A2E9B93BA417267FBEE8DF3A9E4AA5".
 

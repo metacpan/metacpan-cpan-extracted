@@ -15,9 +15,9 @@ my $locale = Locale::CLDR->new('bg_u_ca_islamic');
 my $day_period_data = $locale->get_day_period('0000');
 is($day_period_data, 'полунощ', 'Islamic Day period data AM');
 $day_period_data = $locale->get_day_period('1200');
-is($day_period_data, 'на обед', 'Islamic Day period data Noon');
+is($day_period_data, 'на обяд', 'Islamic Day period data Noon');
 $day_period_data = $locale->get_day_period('1210');
-is($day_period_data, 'на обед', 'Islamic Day period data PM');
+is($day_period_data, 'на обяд', 'Islamic Day period data PM');
 
 my $date_format = $locale->date_format_full;
 is($date_format, q(EEEE, d MMMM y 'г'.), 'Islamic Date Format Full');

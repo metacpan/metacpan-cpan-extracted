@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mk::Any::Mk - Package for language Macedonian
 
 package Locale::CLDR::Locales::Mk::Any::Mk;
 # This file auto generated from Data\common\main\mk_MK.xml
-#	on Sun  7 Oct 10:46:06 am GMT
+#	on Sun  3 Feb  2:05:15 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

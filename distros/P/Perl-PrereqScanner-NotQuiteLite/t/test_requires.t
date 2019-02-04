@@ -18,6 +18,11 @@ use Test::Requires qw(
 );
 END
 
+test('empty ()', <<'END', {'Test::More' => 0, 'Test::Requires' => 0}, {}, {});
+use Test::More tests => 10;
+use Test::Requires ();
+END
+
 test('function', <<'END', {'Test::More' => 0, 'Test::Requires' => 0}, {}, {'Some::Optional::Test::Required::Modules' => 0});
 use Test::More tests => 10;
 use Test::Requires;

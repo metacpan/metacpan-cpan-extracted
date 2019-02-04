@@ -175,10 +175,10 @@ is($locale->unit(1, 'fahrenheit', 'short'), '1°F', 'English short 1 degree Fahr
 is($locale->unit(2, 'fahrenheit', 'short'), '2°F', 'English short 2 degrees Fahrenheit');
 is($locale->unit(1, 'fahrenheit'), '1 degree Fahrenheit', 'English long 1 degree Fahrenheit');
 is($locale->unit(2, 'fahrenheit'), '2 degrees Fahrenheit', 'English long 2 degrees Fahrenheit');
-is($locale->unit(1, 'fathom', 'narrow'), '1fm', 'English narrow 1 fathom');
-is($locale->unit(2, 'fathom', 'narrow'), '2fm', 'English narrow 2 fathoms');
-is($locale->unit(1, 'fathom', 'short'), '1 ftm', 'English short 1 fathom');
-is($locale->unit(2, 'fathom', 'short'), '2 ftm', 'English short 2 fathoms');
+is($locale->unit(1, 'fathom', 'narrow'), '1fth', 'English narrow 1 fathom');
+is($locale->unit(2, 'fathom', 'narrow'), '2fth', 'English narrow 2 fathoms');
+is($locale->unit(1, 'fathom', 'short'), '1 fth', 'English short 1 fathom');
+is($locale->unit(2, 'fathom', 'short'), '2 fth', 'English short 2 fathoms');
 is($locale->unit(1, 'fathom'), '1 fathom', 'English long 1 fathom');
 is($locale->unit(2, 'fathom'), '2 fathoms', 'English long 2 fathoms');
 is($locale->unit(1, 'fluid-ounce', 'narrow'), '1fl oz', 'English narrow 1 fluid ounce');

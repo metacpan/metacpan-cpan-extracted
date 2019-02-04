@@ -4,7 +4,6 @@ package Mojo::Pg::Che::Database;
 use Mojo::Base 'Mojo::Pg::Database';
 use Carp qw(croak shortmess);
 use DBD::Pg ':async';
-#~ use Mojo::IOLoop;
 
 use Mojo::Pg::Che::Results;
 use Mojo::Pg::Transaction;

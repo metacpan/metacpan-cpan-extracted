@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Jmc - Package for language Machame
 
 package Locale::CLDR::Locales::Jmc;
 # This file auto generated from Data\common\main\jmc.xml
-#	on Sun  7 Oct 10:39:53 am GMT
+#	on Sun  3 Feb  1:58:45 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -842,11 +842,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{utuko},
-					'pm' => q{kyiukonyi},
-				},
 				'abbreviated' => {
+					'pm' => q{kyiukonyi},
+					'am' => q{utuko},
+				},
+				'wide' => {
 					'pm' => q{kyiukonyi},
 					'am' => q{utuko},
 				},

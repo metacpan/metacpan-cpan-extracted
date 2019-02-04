@@ -19,12 +19,12 @@ DESCRIPTION
 
 SQLITE VERSION
   DBD::SQLeet is compiled with a bundled sqleet library:
-  sqleet version 0.24.0 as of this release.
+  sqleet version 0.26.0 as of this release.
 
   DBD::SQLeet follows the sqleet versioning scheme.
   <https://github.com/resilar/sqleet#versioning-scheme>
 
-  Version 0.24.0 of sqleet is based on SQLite v3.24.0
+  Version 0.26.0 of sqleet is based on SQLite v3.26.0
 
 DIFFERENCES FROM DBD::SQLite
   URI filename syntax

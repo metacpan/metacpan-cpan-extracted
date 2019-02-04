@@ -220,17 +220,15 @@ sub alias {
     my $term_w = term_width();
     my $info;
     if ( $identifier eq '' ) { # Union
-        #$info = ' ';
-        $identifier .= 'AS: ';
+        $identifier .= 'UNION Alias: ';
     }
-    elsif ( print_columns( $identifier . ' AS: ' ) > $term_w / 3 ) {
-        #$info = "\n" . $identifier;
-        $info = $identifier;
-        $identifier = 'AS: ';
+    elsif ( print_columns( $identifier . ' AS ' ) > $term_w / 3 ) {
+        $info = 'Alias: ' . "\n" . $identifier;
+        $identifier = 'AS ';
     }
     else {
-        #$info = ' ';
-        $identifier .= ' AS: ';
+        $info = 'Alias: ';
+        $identifier .= ' AS ';
     }
     my $alias;
     if ( $sf->{o}{alias}{$type} ) {

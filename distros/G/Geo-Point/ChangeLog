@@ -1,5 +1,12 @@
 Revision history for Perl extension Geo::Point
 
+version 0.98: Fri Feb  1 23:31:14 CET 2019
+
+	Fixes:
+	- fix metadata [Mohammad S Anwar]
+	- doc typos, rt.cpan.org#126960 [Xavier Guimard]
+	- bbox of Geo::Point [Chad Windnagle]
+
 version 0.97: Tue Jan 23 20:43:58 CET 2018
 
 	Improvements:

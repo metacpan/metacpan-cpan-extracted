@@ -8,13 +8,17 @@ use Pcore::CDN::Static::FA qw[:ALL];
 # TODO scale to match width
 # TODO page navigation
 # TODO scale change
-# TODO error handling
 
 sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
     my $pdfjs_root = $cdn->get_resource_root('pdfjs');
 
     return {
-        control => { '#' => { onSetSrc => 'onSetSrc', } },
+        control => {
+            '#' => {
+                onSetSrc   => 'loadPdf',
+                onClearPdf => 'clearPdf',
+            }
+        },
 
         init => func ['view'], <<"JS",
             if ( !window.pdfjsLib ) {
@@ -41,55 +45,72 @@ JS
 
             pdfjsLib.GlobalWorkerOptions.workerSrc = baseUrl + "/pdf.worker.min.js";
 
-            if (src) this.onSetSrc(src);
+            if (src) this.loadPdf(src);
 
             this.getView().fireEvent('pdfReady');
 JS
 
-        onSetSrc => func ['src'], <<'JS',
-                var me = this,
-                    scale = this.getView().getScale(),
-                    el = me.getView().innerElement.dom,
-                    loadingTask = pdfjsLib.getDocument(src);
+        loadPdf => func ['src'], <<"JS",
+            var me = this,
+                view = me.getView(),
+                el = view.innerElement.dom,
+                scale = view.getScale();
+
+            view.fireEvent('beforePdfLoad');
+
+            pdfjsLib.getDocument(src).promise.then( function(pdf) {
+                var numPages = pdf.numPages,
+                    container = document.createElement("div");
 
                 el.innerHTML = '';
+                view.pdf = pdf;
 
-                loadingTask.promise.then( function(pdf) {
-                    var numPages = pdf.numPages,
-                        container = document.createElement("div");
+                container.setAttribute("style", "display:flex;flex-direction:column;justify-content:flex-start;text-align:center;width:100%;");
 
-                    container.setAttribute("style", "display:flex;flex-direction:column;justify-content:flex-start;text-align:center;width:100%;");
-                    el.appendChild(container);
+                el.appendChild(container);
 
-                    for ( var i = 1; i <= numPages; i++ ) {
+                for ( var i = 1; i <= numPages; i++ ) {
 
-                        // fetch page
-                        pdf.getPage(i).then( function(page) {
-                            var viewport = page.getViewport(scale);
+                    // fetch page
+                    pdf.getPage(i).then( function(page) {
+                        var viewport = page.getViewport(scale);
 
-                            // Prepare canvas using PDF page dimensions
-                            var div = document.createElement("div");
-                            container.appendChild(div);
+                        // Prepare canvas using PDF page dimensions
+                        var div = document.createElement("div");
+                        container.appendChild(div);
 
-                            var canvas = document.createElement("canvas");
-                            div.appendChild(canvas);
+                        var canvas = document.createElement("canvas");
+                        div.appendChild(canvas);
 
-                            var context = canvas.getContext('2d');
-                            canvas.height = viewport.height;
-                            canvas.width = viewport.width;
+                        var context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
 
-                            // Render PDF page into canvas context
-                            var renderContext = {
-                                canvasContext: context,
-                                viewport: viewport,
-                            };
+                        // Render PDF page into canvas context
+                        var renderContext = {
+                            canvasContext: context,
+                            viewport: viewport,
+                        };
 
-                            page.render(renderContext);
-                        });
-                    }
-                }).catch(function (error) {
-                    alert(error.message);
-                });
+                        page.render(renderContext);
+                    });
+                }
+
+                view.fireEvent('afterPdfLoad', false);
+            }).catch( function (error) {
+                view.fireEvent('afterPdfLoad', error.message);
+            });
+JS
+
+        clearPdf => func <<'JS',
+            var me = this,
+                view = me.getView(),
+                el = view.innerElement.dom;
+
+            // clear current pdf
+             el.innerHTML = '';
+
+            view.pdf = null;
 JS
     };
 }
@@ -103,6 +124,8 @@ sub EXT_panel : Extend('Ext.Panel') {
             scale => 1,
         },
 
+        pdf => undef,
+
         layout     => 'fit',
         scrollable => \1,
 
@@ -110,6 +133,14 @@ sub EXT_panel : Extend('Ext.Panel') {
             this.callParent(arguments);
 
             this.fireEvent('onSetSrc', src);
+JS
+
+        clearPdf => func <<'JS',
+            this.fireEvent('onClearPdf');
+JS
+
+        reloadPdf => func <<'JS',
+            this.fireEvent('onSetSrc', this.getSrc());
 JS
     };
 }

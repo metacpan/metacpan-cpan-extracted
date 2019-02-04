@@ -292,6 +292,8 @@ static SuspendedState *MY_suspendedstate_new(pTHX_ CV *cv)
   ret->awaiting_future = NULL;
   ret->returning_future = NULL;
   ret->frames = NULL;
+  ret->mortals = NULL;
+  ret->padslots = NULL;
 
   sv_magicext((SV *)cv, NULL, PERL_MAGIC_ext, &vtbl, (char *)ret, 0);
 
@@ -312,6 +314,14 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
 
   if(state->frames) {
     fprintf(stderr, "TODO: free ->frames\n");
+  }
+
+  if(state->padslots) {
+    fprintf(stderr, "TODO: free ->padslots\n");
+  }
+
+  if(state->mortals) {
+    fprintf(stderr, "TODO: free ->mortals\n");
   }
 
   Safefree(state);
@@ -1019,6 +1029,9 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
       SvREFCNT_dec(PadARRAY(pad)[i]);
       PadARRAY(pad)[i] = state->padslots[i-1];
     }
+
+    Safefree(state->padslots);
+    state->padslots = NULL;
   }
 
   if(state->mortallen) {

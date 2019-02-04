@@ -1,5 +1,5 @@
 ---
-abstract: "support for L<https://github.com>'s REST API with L<IO::Async>"
+abstract: 'support for the L<https://github.com> REST API with L<IO::Async>'
 author:
   - 'Tom Molesworth <TEAM@cpan.org>'
 build_requires:
@@ -9,9 +9,9 @@ build_requires:
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
   Test::More: '0.94'
-  perl: '5.014000'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
@@ -20,28 +20,79 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-Async-Github
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Net::Async::Github:
+    file: lib/Net/Async/Github.pm
+    version: '0.005'
+  Net::Async::Github::Branch:
+    file: lib/Net/Async/Github/Branch.pm
+    version: '0.005'
+  Net::Async::Github::Common:
+    file: lib/Net/Async/Github/Common.pm
+    version: '0.005'
+  Net::Async::Github::Plan:
+    file: lib/Net/Async/Github/Plan.pm
+    version: '0.005'
+  Net::Async::Github::PullRequest:
+    file: lib/Net/Async/Github/PullRequest.pm
+    version: '0.005'
+  Net::Async::Github::RateLimit:
+    file: lib/Net/Async/Github/RateLimit.pm
+    version: '0.005'
+  Net::Async::Github::RateLimit::Core:
+    file: lib/Net/Async/Github/RateLimit/Core.pm
+    version: '0.005'
+  Net::Async::Github::Repository:
+    file: lib/Net/Async/Github/Repository.pm
+    version: '0.005'
+  Net::Async::Github::Team:
+    file: lib/Net/Async/Github/Team.pm
+    version: '0.005'
+  Net::Async::Github::User:
+    file: lib/Net/Async/Github/User.pm
+    version: '0.005'
 requires:
+  Adapter::Async::OrderedList::Array: '0'
   Cache::LRU: '0.04'
   Dir::Self: '0'
   File::ShareDir: '1.102'
-  Future: '0.34'
+  Future: '0.39'
+  Future::Utils: '0'
   IO::Async::Notifier: '0.71'
   IO::Async::SSL: '0.19'
-  JSON::MaybeXS: '1.003008'
+  JSON::MaybeXS: '1.004'
   Log::Any: '1.045'
   Net::Async::HTTP: '0.41'
   Net::Async::WebSocket: '0'
+  Net::Async::WebSocket::Client: '0'
   Path::Tiny: '0.098'
   Ryu: '0.031'
   Ryu::Async: '0.013'
+  Ryu::Observable: '0'
+  Scalar::Util: '0'
   Syntax::Keyword::Try: '0.04'
   Time::Moment: '0.41'
   URI: '1.71'
+  URI::QueryParam: '0'
   URI::Template: '0.22'
+  Variable::Disposition: '0'
   indirect: '0'
+  namespace::clean: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-Github
-  homepage: http://search.cpan.org/dist/Net-Async-Github/
-version: '0.004'
-x_generated_by_perl: v5.28.0
+  bugtracker: https://github.com/team-at-cpan/Net-Async-Github/issues
+  homepage: https://github.com/team-at-cpan/Net-Async-Github
+  repository: https://github.com/team-at-cpan/Net-Async-Github.git
+version: '0.005'
+x_authority: cpan:TEAM
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

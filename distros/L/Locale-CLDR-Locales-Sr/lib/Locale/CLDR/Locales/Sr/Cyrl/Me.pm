@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr::Cyrl::Me - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Cyrl::Me;
 # This file auto generated from Data\common\main\sr_Cyrl_ME.xml
-#	on Sun  7 Oct 10:59:37 am GMT
+#	on Sun  3 Feb  2:19:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -190,53 +190,53 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -256,41 +256,41 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'afternoon1' => q{по под.},
-					'evening1' => q{вече},
-					'midnight' => q{поноћ},
-					'night1' => q{ноћ},
-					'morning1' => q{јутро},
-					'noon' => q{подне},
-				},
 				'wide' => {
 					'pm' => q{по подне},
 					'am' => q{прије подне},
 				},
-				'abbreviated' => {
-					'am' => q{прије подне},
-					'evening1' => q{вече},
-					'night1' => q{ноћу},
-					'morning1' => q{јутро},
-					'afternoon1' => q{по под.},
-					'midnight' => q{поноћ},
-					'pm' => q{по подне},
+				'narrow' => {
 					'noon' => q{подне},
+					'afternoon1' => q{по под.},
+					'night1' => q{ноћ},
+					'midnight' => q{поноћ},
+					'evening1' => q{вече},
+					'morning1' => q{јутро},
+				},
+				'abbreviated' => {
+					'night1' => q{ноћу},
+					'am' => q{прије подне},
+					'pm' => q{по подне},
+					'midnight' => q{поноћ},
+					'noon' => q{подне},
+					'afternoon1' => q{по под.},
+					'morning1' => q{јутро},
+					'evening1' => q{вече},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{по подне},
-					'am' => q{прије подне},
-				},
-				'wide' => {
 					'am' => q{прије подне},
 					'pm' => q{по подне},
 				},
 				'narrow' => {
-					'pm' => q{p},
 					'am' => q{a},
+					'pm' => q{p},
+				},
+				'wide' => {
+					'pm' => q{по подне},
+					'am' => q{прије подне},
 				},
 			},
 		},
@@ -355,7 +355,7 @@ has 'datetime_formats_available_formats' => (
 	default		=> sub { {
 		'gregorian' => {
 			MMMMW => q{W. 'сједмица' 'у' MMM},
-			yw => q{w. 'сједмица' 'у' y.},
+			yw => q{w. 'сједмица' 'у' Y.},
 		},
 	} },
 );

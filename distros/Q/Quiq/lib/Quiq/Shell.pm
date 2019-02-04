@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.131;
+our $VERSION = 1.132;
 
 use Time::HiRes ();
 use Quiq::Option;
@@ -72,7 +72,7 @@ Zeichenkette, die jeder Meldung im Log vorangestellt wird.
 
 =item quiet => $bool
 
-Unterdrck stdout und stderr.
+Unterdrücke stdout und stderr.
 
 =item time => $bool (Default: 0)
 
@@ -574,7 +574,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.131
+1.132
 
 =head1 AUTHOR
 

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Tk - Package for language Turkmen
 
 package Locale::CLDR::Locales::Tk;
 # This file auto generated from Data\common\main\tk.xml
-#	on Sun  7 Oct 11:02:25 am GMT
+#	on Sun  3 Feb  2:21:58 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -114,7 +114,7 @@ has 'display_name_language' => (
  				'dar' => 'dargi dili',
  				'dav' => 'taita dili',
  				'de' => 'nemes dili',
- 				'de_CH' => 'nemes dili (Daglyk Şweýsariýa)',
+ 				'de_CH' => 'ýokarky nemes dili (Şweýsariýa)',
  				'dgr' => 'dogrib dili',
  				'dje' => 'zarma dili',
  				'dsb' => 'aşaky lužits dili',
@@ -130,12 +130,10 @@ has 'display_name_language' => (
  				'el' => 'grek dili',
  				'en' => 'iňlis dili',
  				'en_GB' => 'iňlis dili (Beýik Britaniýa)',
- 				'en_GB@alt=short' => 'iňlis dili (Birleşen Korollyk)',
  				'en_US' => 'iňlis dili (Amerika)',
  				'en_US@alt=short' => 'iňlis dili (ABŞ)',
  				'eo' => 'esperanto dili',
  				'es' => 'ispan dili',
- 				'es_419' => 'ispan dili (Günorta Amerika)',
  				'es_ES' => 'ispan dili (Ýewropa)',
  				'et' => 'eston dili',
  				'eu' => 'bask dili',
@@ -331,7 +329,7 @@ has 'display_name_language' => (
  				'rof' => 'rombo dili',
  				'root' => 'kök',
  				'ru' => 'rus dili',
- 				'rup' => 'aromun dili',
+ 				'rup' => 'arumyn dili',
  				'rw' => 'kinýaruanda dili',
  				'rwk' => 'rwa dili',
  				'sa' => 'sanskrit dili',
@@ -511,7 +509,7 @@ has 'display_name_region' => (
 	init_arg	=> undef,
 	default		=> sub { 
 		{
-			'001' => 'Dunýä',
+			'001' => 'Dünýä',
  			'002' => 'Afrika',
  			'003' => 'Demirgazyk Amerika',
  			'005' => 'Günorta Amerika',
@@ -534,12 +532,13 @@ has 'display_name_region' => (
  			'057' => 'Mikroneziýa sebti',
  			'061' => 'Polineziýa',
  			'142' => 'Aziýa',
- 			'143' => 'Orta Aziýa',
+ 			'143' => 'Merkezi Aziýa',
  			'145' => 'Günbatar Aziýa',
  			'150' => 'Ýewropa',
  			'151' => 'Gündogar Ýewropa',
  			'154' => 'Demirgazyk Ýewropa',
  			'155' => 'Günbatar Ýewropa',
+ 			'202' => 'Saharadan aşakdaky Afrika',
  			'419' => 'Latyn Amerikasy',
  			'AC' => 'Beýgeliş adasy',
  			'AD' => 'Andorra',
@@ -559,7 +558,7 @@ has 'display_name_region' => (
  			'AX' => 'Aland adalary',
  			'AZ' => 'Azerbaýjan',
  			'BA' => 'Bosniýa we Gersegowina',
- 			'BB' => 'Barbadow',
+ 			'BB' => 'Barbados',
  			'BD' => 'Bangladeş',
  			'BE' => 'Belgiýa',
  			'BF' => 'Burkina-Faso',
@@ -571,7 +570,7 @@ has 'display_name_region' => (
  			'BM' => 'Bermuda',
  			'BN' => 'Bruneý',
  			'BO' => 'Boliwiýa',
- 			'BQ' => 'Karib Niderlandy',
+ 			'BQ' => 'Karib Niderlandlary',
  			'BR' => 'Braziliýa',
  			'BS' => 'Bagama adalary',
  			'BT' => 'Butan',
@@ -583,7 +582,7 @@ has 'display_name_region' => (
  			'CC' => 'Kokos (Kiling) adalary',
  			'CD' => 'Kongo - Kinşasa',
  			'CD@alt=variant' => 'Kongo (KDR)',
- 			'CF' => 'Orta Afrika Respublikasy',
+ 			'CF' => 'Merkezi Afrika Respublikasy',
  			'CG' => 'Kongo - Brazzawil',
  			'CG@alt=variant' => 'Kongo (Respublika)',
  			'CH' => 'Şweýsariýa',
@@ -619,8 +618,8 @@ has 'display_name_region' => (
  			'ES' => 'Ispaniýa',
  			'ET' => 'Efiopiýa',
  			'EU' => 'Ýewropa Bileleşigi',
- 			'EZ' => 'Ýewro sebti',
- 			'FI' => 'Finlandiýa',
+ 			'EZ' => 'Ýewro sebiti',
+ 			'FI' => 'Finlýandiýa',
  			'FJ' => 'Fiji',
  			'FK' => 'Folklend adalary',
  			'FK@alt=variant' => 'Folklend (Malwina) adalary',
@@ -660,7 +659,7 @@ has 'display_name_region' => (
  			'IL' => 'Ysraýyl',
  			'IM' => 'Men adasy',
  			'IN' => 'Hindistan',
- 			'IO' => 'Britaniýanyň Hint okeanyndaky territoriýalary',
+ 			'IO' => 'Britaniýanyň Hindi okeanyndaky territoriýalary',
  			'IQ' => 'Yrak',
  			'IR' => 'Eýran',
  			'IS' => 'Islandiýa',
@@ -673,7 +672,7 @@ has 'display_name_region' => (
  			'KG' => 'Gyrgyzystan',
  			'KH' => 'Kamboja',
  			'KI' => 'Kiribati',
- 			'KM' => 'Komor Adalary',
+ 			'KM' => 'Komor adalary',
  			'KN' => 'Sent-Kits we Newis',
  			'KP' => 'Demirgazyk Koreýa',
  			'KR' => 'Günorta Koreýa',
@@ -722,7 +721,7 @@ has 'display_name_region' => (
  			'NF' => 'Norfolk adasy',
  			'NG' => 'Nigeriýa',
  			'NI' => 'Nikaragua',
- 			'NL' => 'Niderlandiýa',
+ 			'NL' => 'Niderlandlar',
  			'NO' => 'Norwegiýa',
  			'NP' => 'Nepal',
  			'NR' => 'Nauru',
@@ -753,7 +752,7 @@ has 'display_name_region' => (
  			'RW' => 'Ruanda',
  			'SA' => 'Saud Arabystany',
  			'SB' => 'Solomon adalary',
- 			'SC' => 'Seýşel Adalary',
+ 			'SC' => 'Seýşel adalary',
  			'SD' => 'Sudan',
  			'SE' => 'Şwesiýa',
  			'SG' => 'Singapur',
@@ -878,7 +877,7 @@ has 'display_name_type' => (
  				'strict' => q{Setirden setire geçişiň berk stili},
  			},
  			'ms' => {
- 				'metric' => q{Metriki ulgam},
+ 				'metric' => q{Metrik ulgam},
  				'uksystem' => q{Imperial ölçeg ulgamy},
  				'ussystem' => q{ABŞ ölçeg ulgamy},
  			},
@@ -1043,6 +1042,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(esasy ugur),
+					},
 					'acre' => {
 						'name' => q(akr),
 						'one' => q({0} akr),
@@ -1072,6 +1074,11 @@ has 'units' => (
 						'name' => q(astronomik birlik),
 						'one' => q({0} astronomik birlik),
 						'other' => q({0} astronomik birlik),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atmosfera),
+						'other' => q({0} atmosfera),
 					},
 					'bit' => {
 						'name' => q(bit),
@@ -1189,14 +1196,14 @@ has 'units' => (
 						'other' => q({0} dereje),
 					},
 					'fahrenheit' => {
-						'name' => q(Farangeýt gradusy),
-						'one' => q({0} Farangeýt gradusy),
-						'other' => q({0} Farangeýt gradusy),
+						'name' => q(Farengeýt gradusy),
+						'one' => q({0} Farengeýt gradusy),
+						'other' => q({0} Farengeýt gradusy),
 					},
 					'fluid-ounce' => {
-						'name' => q(suwuklyk unsiý),
-						'one' => q({0} suwuklyk unsiý),
-						'other' => q({0} suwuklyk unsiý),
+						'name' => q(suwuklyk unsiýasy),
+						'one' => q({0} suwuklyk unsiýasy),
+						'other' => q({0} suwuklyk unsiýasy),
 					},
 					'foodcalorie' => {
 						'name' => q(Kaloriýa),
@@ -1242,14 +1249,14 @@ has 'units' => (
 						'other' => q({0} gigabaýt),
 					},
 					'gigahertz' => {
-						'name' => q(gigagerts),
-						'one' => q({0} gigagerts),
-						'other' => q({0} gigagerts),
+						'name' => q(gigagers),
+						'one' => q({0} gigagers),
+						'other' => q({0} gigagers),
 					},
 					'gigawatt' => {
-						'name' => q(gigawatt),
-						'one' => q({0} gigawatt),
-						'other' => q({0} gigawatt),
+						'name' => q(gigawat),
+						'one' => q({0} gigawat),
+						'other' => q({0} gigawat),
 					},
 					'gram' => {
 						'name' => q(gram),
@@ -1273,9 +1280,9 @@ has 'units' => (
 						'other' => q({0} gektopaskal),
 					},
 					'hertz' => {
-						'name' => q(gerts),
-						'one' => q({0} gerts),
-						'other' => q({0} gerts),
+						'name' => q(gers),
+						'one' => q({0} gers),
+						'other' => q({0} gers),
 					},
 					'horsepower' => {
 						'name' => q(at güýji),
@@ -1295,14 +1302,14 @@ has 'units' => (
 						'per' => q({0}/dýuým),
 					},
 					'inch-hg' => {
-						'name' => q(simap sütüniň dýuýmy),
-						'one' => q({0} simap sütüniň dýuýmy),
-						'other' => q({0} simap sütüniň dýuýmy),
+						'name' => q(dýuým simap sütüni),
+						'one' => q({0} dýuým simap sütüni),
+						'other' => q({0} dýuým simap sütüni),
 					},
 					'joule' => {
-						'name' => q(džul),
-						'one' => q({0} džul),
-						'other' => q({0} džul),
+						'name' => q(joul),
+						'one' => q({0} joul),
+						'other' => q({0} joul),
 					},
 					'karat' => {
 						'name' => q(karat),
@@ -1336,14 +1343,14 @@ has 'units' => (
 						'per' => q({0}/kilogram),
 					},
 					'kilohertz' => {
-						'name' => q(kilogerts),
-						'one' => q({0} kilogerts),
-						'other' => q({0} kilogerts),
+						'name' => q(kilogers),
+						'one' => q({0} kilogers),
+						'other' => q({0} kilogers),
 					},
 					'kilojoule' => {
-						'name' => q(kilodžul),
-						'one' => q({0} kilodžul),
-						'other' => q({0} kilodžul),
+						'name' => q(kilojoul),
+						'one' => q({0} kilojoul),
+						'other' => q({0} kilojoul),
 					},
 					'kilometer' => {
 						'name' => q(kilometr),
@@ -1357,9 +1364,9 @@ has 'units' => (
 						'other' => q({0} kilometr/sagat),
 					},
 					'kilowatt' => {
-						'name' => q(kilowatt),
-						'one' => q({0} kilowatt),
-						'other' => q({0} kilowatt),
+						'name' => q(kilowat),
+						'one' => q({0} kilowat),
+						'other' => q({0} kilowat),
 					},
 					'kilowatt-hour' => {
 						'name' => q(kilowat-sagat),
@@ -1367,9 +1374,9 @@ has 'units' => (
 						'other' => q({0} kilowat-sagat),
 					},
 					'knot' => {
-						'name' => q(uzel),
-						'one' => q({0} uzel),
-						'other' => q({0} uzel),
+						'name' => q(düwün),
+						'one' => q({0} düwün),
+						'other' => q({0} düwün),
 					},
 					'light-year' => {
 						'name' => q(ýagtylyk ýyly),
@@ -1408,9 +1415,9 @@ has 'units' => (
 						'other' => q({0} megabaýt),
 					},
 					'megahertz' => {
-						'name' => q(megagerts),
-						'one' => q({0} megagerts),
-						'other' => q({0} megagerts),
+						'name' => q(megagers),
+						'one' => q({0} megagers),
+						'other' => q({0} megagers),
 					},
 					'megaliter' => {
 						'name' => q(megalitr),
@@ -1418,9 +1425,9 @@ has 'units' => (
 						'other' => q({0} megalitr),
 					},
 					'megawatt' => {
-						'name' => q(megawatt),
-						'one' => q({0} megawatt),
-						'other' => q({0} megawatt),
+						'name' => q(megawat),
+						'one' => q({0} megawat),
+						'other' => q({0} megawat),
 					},
 					'meter' => {
 						'name' => q(metr),
@@ -1514,9 +1521,9 @@ has 'units' => (
 						'other' => q({0} millimetr),
 					},
 					'millimeter-of-mercury' => {
-						'name' => q(simap sütüniň millimetri),
-						'one' => q({0} simap sütüniň millimetri),
-						'other' => q({0} simap sütüniň millimetri),
+						'name' => q(millimetr simap sütüni),
+						'one' => q({0} millimetr simap sütüni),
+						'other' => q({0} millimetr simap sütüni),
 					},
 					'millimole-per-liter' => {
 						'name' => q(millimol/litr),
@@ -1529,9 +1536,9 @@ has 'units' => (
 						'other' => q({0} millisekunt),
 					},
 					'milliwatt' => {
-						'name' => q(milliwatt),
-						'one' => q({0} milliwatt),
-						'other' => q({0} milliwatt),
+						'name' => q(milliwat),
+						'one' => q({0} milliwat),
+						'other' => q({0} milliwat),
 					},
 					'minute' => {
 						'name' => q(minut),
@@ -1566,15 +1573,15 @@ has 'units' => (
 						'other' => q({0} om),
 					},
 					'ounce' => {
-						'name' => q(unsiý),
-						'one' => q({0} unsiý),
-						'other' => q({0} unsiý),
-						'per' => q({0}/unsiý),
+						'name' => q(unsiýa),
+						'one' => q({0} unsiýa),
+						'other' => q({0} unsiýa),
+						'per' => q({0}/unsiýa),
 					},
 					'ounce-troy' => {
-						'name' => q(troý unsiý),
-						'one' => q({0} troý unsiý),
-						'other' => q({0} troý unsiý),
+						'name' => q(troý unsiýa),
+						'one' => q({0} troý unsiýa),
+						'other' => q({0} troý unsiýa),
 					},
 					'parsec' => {
 						'name' => q(parsek),
@@ -1589,20 +1596,35 @@ has 'units' => (
 					'per' => {
 						'1' => q({1} başyna {0}),
 					},
+					'percent' => {
+						'name' => q(göterim),
+						'one' => q({0} göterim),
+						'other' => q({0} göterim),
+					},
+					'permille' => {
+						'name' => q(promille),
+						'one' => q({0} promille),
+						'other' => q({0} promille),
+					},
+					'petabyte' => {
+						'name' => q(petabaýt),
+						'one' => q({0} petabaýt),
+						'other' => q({0} petabaýt),
+					},
 					'picometer' => {
 						'name' => q(pikometr),
 						'one' => q({0} pikometr),
 						'other' => q({0} pikometr),
 					},
 					'pint' => {
-						'name' => q(pint),
-						'one' => q({0} pint),
-						'other' => q({0} pint),
+						'name' => q(pinta),
+						'one' => q({0} pinta),
+						'other' => q({0} pinta),
 					},
 					'pint-metric' => {
-						'name' => q(metrik pint),
-						'one' => q({0} metrik pint),
-						'other' => q({0} metrik pint),
+						'name' => q(metrik pinta),
+						'one' => q({0} metrik pinta),
+						'other' => q({0} metrik pinta),
 					},
 					'point' => {
 						'name' => q(punkt),
@@ -1712,9 +1734,9 @@ has 'units' => (
 						'other' => q({0} wolt),
 					},
 					'watt' => {
-						'name' => q(watt),
-						'one' => q({0} watt),
-						'other' => q({0} watt),
+						'name' => q(wat),
+						'one' => q({0} wat),
+						'other' => q({0} wat),
 					},
 					'week' => {
 						'name' => q(hepde),
@@ -1735,6 +1757,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(ugur),
+					},
 					'celsius' => {
 						'name' => q(°C),
 						'one' => q({0}°C),
@@ -1819,6 +1844,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'second' => {
 						'name' => q(se),
 						'one' => q({0}se),
@@ -1836,6 +1866,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(ugur),
+					},
 					'acre' => {
 						'name' => q(akr),
 						'one' => q({0} akr),
@@ -1847,14 +1880,14 @@ has 'units' => (
 						'other' => q({0} ak-ft),
 					},
 					'ampere' => {
-						'name' => q(A),
+						'name' => q(amp),
 						'one' => q({0} A),
 						'other' => q({0} A),
 					},
 					'arc-minute' => {
 						'name' => q(burç minudy),
-						'one' => q({0} minuta),
-						'other' => q({0} minuta),
+						'one' => q({0} burç min.),
+						'other' => q({0} burç min.),
 					},
 					'arc-second' => {
 						'name' => q(burç sekundy),
@@ -1865,6 +1898,11 @@ has 'units' => (
 						'name' => q(ab),
 						'one' => q({0} ab),
 						'other' => q({0} ab),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(bit),
@@ -2035,9 +2073,9 @@ has 'units' => (
 						'other' => q({0} GB),
 					},
 					'gigahertz' => {
-						'name' => q(GHz),
-						'one' => q({0} GHz),
-						'other' => q({0} GHz),
+						'name' => q(GGs),
+						'one' => q({0} GGs),
+						'other' => q({0} GGs),
 					},
 					'gigawatt' => {
 						'name' => q(GWt),
@@ -2066,9 +2104,9 @@ has 'units' => (
 						'other' => q({0} gPa),
 					},
 					'hertz' => {
-						'name' => q(Hz),
-						'one' => q({0} Hz),
-						'other' => q({0} Hz),
+						'name' => q(Gs),
+						'one' => q({0} Gs),
+						'other' => q({0} Gs),
 					},
 					'horsepower' => {
 						'name' => q(a.g.),
@@ -2088,14 +2126,14 @@ has 'units' => (
 						'per' => q({0}/dý),
 					},
 					'inch-hg' => {
-						'name' => q(dýHg),
-						'one' => q({0} dýHg),
-						'other' => q({0} dýHg),
+						'name' => q(dý sim.süt.),
+						'one' => q({0} dý sim.süt.),
+						'other' => q({0} dý sim.süt.),
 					},
 					'joule' => {
-						'name' => q(dž),
-						'one' => q({0} dž),
-						'other' => q({0} dž),
+						'name' => q(J),
+						'one' => q({0} J),
+						'other' => q({0} J),
 					},
 					'karat' => {
 						'name' => q(karat),
@@ -2129,14 +2167,14 @@ has 'units' => (
 						'per' => q({0}/kg),
 					},
 					'kilohertz' => {
-						'name' => q(kHz),
-						'one' => q({0} kHz),
-						'other' => q({0} kHz),
+						'name' => q(kGs),
+						'one' => q({0} kGs),
+						'other' => q({0} kGs),
 					},
 					'kilojoule' => {
-						'name' => q(kdž),
-						'one' => q({0} kdž),
-						'other' => q({0} kdž),
+						'name' => q(kilojoul),
+						'one' => q({0} kJ),
+						'other' => q({0} kJ),
 					},
 					'kilometer' => {
 						'name' => q(km),
@@ -2155,14 +2193,14 @@ has 'units' => (
 						'other' => q({0} kWt),
 					},
 					'kilowatt-hour' => {
-						'name' => q(kWt-sag),
-						'one' => q({0} kWt-sag),
-						'other' => q({0} kWt-sag),
+						'name' => q(kWt. sag),
+						'one' => q({0} kWt. sag),
+						'other' => q({0} kWt. sag),
 					},
 					'knot' => {
-						'name' => q(uz.),
-						'one' => q({0} uz.),
-						'other' => q({0} uz.),
+						'name' => q(dü.),
+						'one' => q({0} dü.),
+						'other' => q({0} dü.),
 					},
 					'light-year' => {
 						'name' => q(ýý),
@@ -2201,9 +2239,9 @@ has 'units' => (
 						'other' => q({0} MB),
 					},
 					'megahertz' => {
-						'name' => q(MHz),
-						'one' => q({0} MHz),
-						'other' => q({0} MHz),
+						'name' => q(MGs),
+						'one' => q({0} MGs),
+						'other' => q({0} MGs),
 					},
 					'megaliter' => {
 						'name' => q(Ml),
@@ -2232,9 +2270,9 @@ has 'units' => (
 						'other' => q({0} m/s²),
 					},
 					'metric-ton' => {
-						'name' => q(tn),
-						'one' => q({0} m.tn),
-						'other' => q({0} m.tn),
+						'name' => q(t),
+						'one' => q({0} t),
+						'other' => q({0} t),
 					},
 					'microgram' => {
 						'name' => q(µg),
@@ -2277,7 +2315,7 @@ has 'units' => (
 						'other' => q({0} smi),
 					},
 					'milliampere' => {
-						'name' => q(mA),
+						'name' => q(milliamp),
 						'one' => q({0} mA),
 						'other' => q({0} mA),
 					},
@@ -2307,9 +2345,9 @@ has 'units' => (
 						'other' => q({0} mm),
 					},
 					'millimeter-of-mercury' => {
-						'name' => q(mmHg),
-						'one' => q({0} mmHg),
-						'other' => q({0} mmHg),
+						'name' => q(mm sim.süt.),
+						'one' => q({0} mm sim.süt.),
+						'other' => q({0} mm sim.süt.),
 					},
 					'millimole-per-liter' => {
 						'name' => q(millimol/litr),
@@ -2381,6 +2419,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(göterim),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(promille),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PB),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
 					},
 					'picometer' => {
 						'name' => q(pm),
@@ -2844,9 +2897,9 @@ has 'currencies' => (
 		'AOA' => {
 			symbol => 'AOA',
 			display_name => {
-				'currency' => q(Angol kwanzasy),
-				'one' => q(angol kwanzasy),
-				'other' => q(angol kwanzasy),
+				'currency' => q(Angola kwanzasy),
+				'one' => q(angola kwanzasy),
+				'other' => q(angola kwanzasy),
 			},
 		},
 		'ARS' => {
@@ -2884,9 +2937,9 @@ has 'currencies' => (
 		'BAM' => {
 			symbol => 'BAM',
 			display_name => {
-				'currency' => q(Konwertirlenýän Bosniýa we Gersogowina markasy),
-				'one' => q(konwertirlenýän bosniýa we gersogowina markasy),
-				'other' => q(konwertirlenýän bosniýa we gersogowina markasy),
+				'currency' => q(Konwertirlenýän Bosniýa we Gersegowina markasy),
+				'one' => q(konwertirlenýän bosniýa we gersegowina markasy),
+				'other' => q(konwertirlenýän bosniýa we gersegowina markasy),
 			},
 		},
 		'BBD' => {
@@ -3042,10 +3095,11 @@ has 'currencies' => (
 			},
 		},
 		'CNH' => {
+			symbol => 'CNH',
 			display_name => {
-				'currency' => q(CNH),
-				'one' => q(CNH),
-				'other' => q(CNH),
+				'currency' => q(Hytaý ýuany \(ofşor\)),
+				'one' => q(hytaý ýuany \(ofşor\)),
+				'other' => q(hytaý ýuany \(ofşor\)),
 			},
 		},
 		'CNY' => {
@@ -3537,6 +3591,7 @@ has 'currencies' => (
 			},
 		},
 		'MRU' => {
+			symbol => 'MRU',
 			display_name => {
 				'currency' => q(Mawritan ugiýasy),
 				'one' => q(mawritan ugiýasy),
@@ -3840,7 +3895,7 @@ has 'currencies' => (
 			},
 		},
 		'STN' => {
-			symbol => 'Db',
+			symbol => 'STN',
 			display_name => {
 				'currency' => q(San-Tome we Prinsipi dobrasy),
 				'one' => q(san-tome we prinsipi dobrasy),
@@ -3874,9 +3929,9 @@ has 'currencies' => (
 		'TJS' => {
 			symbol => 'TJS',
 			display_name => {
-				'currency' => q(Täjik somonisy),
-				'one' => q(täjik somonisy),
-				'other' => q(täjik somonisy),
+				'currency' => q(Täjik somonisi),
+				'one' => q(täjik somonisi),
+				'other' => q(täjik somonisi),
 			},
 		},
 		'TMT' => {
@@ -3977,6 +4032,14 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			symbol => 'VEF',
+			display_name => {
+				'currency' => q(Wenesuela boliwary \(2008–2018\)),
+				'one' => q(wenesuela boliwary \(2008–2018\)),
+				'other' => q(wenesuela boliwary \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
 			display_name => {
 				'currency' => q(Wenesuela boliwary),
 				'one' => q(wenesuela boliwary),
@@ -4144,7 +4207,7 @@ has 'calendar_months' => (
 						nonleap => [
 							'Ýan',
 							'Few',
-							'Mart',
+							'Mar',
 							'Apr',
 							'Maý',
 							'Iýun',
@@ -4348,7 +4411,7 @@ has 'calendar_quarters' => (
 					abbreviated => {0 => '1Ç',
 						1 => '2Ç',
 						2 => '3Ç',
-						3 => 'Q4'
+						3 => '4Ç'
 					},
 					narrow => {0 => '1',
 						1 => '2',
@@ -4372,31 +4435,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{go.öň},
-					'pm' => q{go.soň},
+				'wide' => {
+					'pm' => q{günortadan soň},
+					'am' => q{günortadan öň},
 				},
 				'narrow' => {
 					'am' => q{öň},
 					'pm' => q{soň},
 				},
-				'wide' => {
-					'pm' => q{günortadan soň},
-					'am' => q{günortadan öň},
+				'abbreviated' => {
+					'pm' => q{go.soň},
+					'am' => q{go.öň},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{g.öň},
-					'pm' => q{g.soň},
+				'narrow' => {
+					'pm' => q{soň},
+					'am' => q{öň},
 				},
 				'wide' => {
 					'pm' => q{günortadan soň},
 					'am' => q{günortadan öň},
 				},
-				'narrow' => {
-					'am' => q{öň},
-					'pm' => q{soň},
+				'abbreviated' => {
+					'pm' => q{g.soň},
+					'am' => q{g.öň},
 				},
 			},
 		},
@@ -4488,6 +4551,56 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{L},
+			MEd => q{dd.MM E},
+			MMM => q{LLL},
+			MMMEd => q{d MMM E},
+			MMMMEd => q{d MMMM E},
+			MMMMW => q{'hepde' W, MMMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{dd.MM},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			mmss => q{mm:ss},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{MM.y},
+			yMEd => q{dd.MM.y E},
+			yMMM => q{MMM y},
+			yMMMEd => q{d MMM y E},
+			yMMMM => q{MMMM y},
+			yMMMd => q{d MMM y},
+			yMd => q{dd.MM.y},
+			yQQQ => q{y QQQ},
+			yQQQQ => q{y QQQQ},
+			yw => q{'hepde' w, Y},
+		},
 		'generic' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -4540,56 +4653,6 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{G y QQQ},
 			yyyyQQQQ => q{G y QQQQ},
 		},
-		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
-			MEd => q{dd.MM E},
-			MMM => q{LLL},
-			MMMEd => q{d MMM E},
-			MMMMEd => q{d MMMM E},
-			MMMMW => q{'hepde' W, MMMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{dd.MM},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			mmss => q{mm:ss},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{MM.y},
-			yMEd => q{dd.MM.y E},
-			yMMM => q{MMM y},
-			yMMMEd => q{d MMM y E},
-			yMMMM => q{MMMM y},
-			yMMMd => q{d MMM y},
-			yMd => q{dd.MM.y},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
-			yw => q{'hepde' w, Y},
-		},
 	} },
 );
 
@@ -4609,7 +4672,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -4704,7 +4767,7 @@ has 'datetime_formats_interval' => (
 				y => q{dd.MM.y – dd.MM.y},
 			},
 		},
-		'gregorian' => {
+		'generic' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -5007,7 +5070,7 @@ has 'time_zone_names' => (
 		'Amazon' => {
 			long => {
 				'daylight' => q#Amazon tomusky wagty#,
-				'generic' => q#Amazan wagty#,
+				'generic' => q#Amazon wagty#,
 				'standard' => q#Amazon standart wagty#,
 			},
 		},

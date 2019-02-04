@@ -1,5 +1,18 @@
 Revision history for Alt-FFI-libffi
 
+0.08      2019-02-03 22:11:41 -0500
+  - Fix bug related to the `p` type (strings)
+
+0.07      2019-02-03 20:31:42 -0500
+  - Installer fixes for windows
+
+0.06      2019-02-02 18:04:59 -0500
+  - Rewrote new win32 API tests as the old
+    ones were not very reliable.
+  - Add `o` type, equivalent to FFI::Platypus
+    `opaque`.
+  - Numerous test fixes
+
 0.05      2018-12-20 21:53:10 -0700
   - Added test for FFI::Library
   - Added address method on FFI::Library

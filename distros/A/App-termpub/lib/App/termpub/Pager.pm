@@ -3,6 +3,7 @@ use Mojo::Base -base;
 use Curses;
 
 has line => 0;
+has positions => sub { {} };
 
 has rows => sub {
     my $self = shift;
@@ -20,17 +21,18 @@ has columns => sub {
     $columns;
 };
 
-has 'pad';
-has 'title';
-has max_lines => sub {
-    shift->get_max_lines;
-};
+has [qw(title pad_lines pad_columns )];
 
-sub get_max_lines {
-    my $self = shift;
-    my ( $rows, $columns );
-    $self->pad->getmaxyx( $rows, $columns );
-    return $rows;
+sub pad {
+    my ( $self, $pad ) = @_;
+    if ($pad) {
+        my ( $rows, $columns );
+        $pad->getmaxyx( $rows, $columns );
+        $self->pad_lines( $rows - 1 );
+        $self->pad_columns($columns);
+        $self->{pad} = $pad;
+    }
+    return $self->{pad};
 }
 
 has key_bindings => sub {
@@ -50,10 +52,61 @@ has key_bindings => sub {
         'g'                   => 'goto_line',
         'G'                   => 'goto_line_or_end',
         '%'                   => 'goto_percent',
+        'm'                   => 'mark_position',
+        "'"                   => 'restore_position',
     };
 };
 
 has 'prefix' => '';
+
+sub goto_position {
+    my ( $self, $position ) = @_;
+    if (   $position->{line}
+        && $position->{columns}
+        && $position->{columns} == $self->pad_columns )
+    {
+        $self->goto_line( $position->{line} );
+    }
+    else {
+        $self->goto_percent( $position->{percent} );
+    }
+}
+
+sub get_position {
+    my $self = shift;
+    return {
+        percent => $self->get_percent,
+        line    => $self->line,
+        columns => $self->pad_columns,
+    };
+}
+
+sub set_mark {
+    my ( $self, $position ) = @_;
+    $self->positions->{"'"} = $position || $self->get_position;
+}
+
+sub mark_position {
+    my $self = shift;
+    my $c    = getch();
+    if ( $c =~ /[a-z]/ ) {
+        $self->positions->{$c} = $self->get_position;
+    }
+    return;
+}
+
+sub restore_position {
+    my $self = shift;
+    my $c    = getch();
+    if ( $c =~ /[a-z']/ ) {
+        return if not exists $self->positions->{$c};
+        my $old = $self->get_position;
+        $self->goto_position( $self->positions->{$c} );
+        $self->set_mark($old);
+
+    }
+    return;
+}
 
 sub handle_resize {
     my $self = shift;
@@ -91,7 +144,7 @@ sub run {
 sub goto_line {
     my ( $self, $num ) = @_;
     $num ||= ( $self->prefix || 1 ) - 1;
-    if ( $num <= $self->max_lines ) {
+    if ( $num <= $self->pad_lines ) {
         $self->line($num);
         $self->update_screen if $self->rows;
     }
@@ -101,11 +154,13 @@ sub goto_line {
 sub goto_percent {
     my ( $self, $num ) = @_;
     $num ||= ( $self->prefix || 0 );
-    $self->goto_line( int( $num * $self->max_lines / 100 ) );
+    $self->set_mark;
+    $self->goto_line( int( $num * $self->pad_lines / 100 ) );
 }
 
 sub goto_line_or_end {
     my $self = shift;
+    $self->set_mark;
     if ( $self->prefix ) {
         $self->goto_line;
     }
@@ -117,8 +172,8 @@ sub goto_line_or_end {
 
 sub next_line {
     my $self = shift;
-    if (    $self->line + 1 <= $self->max_lines
-        and $self->line + $self->rows <= $self->max_lines )
+    if (    $self->line + 1 <= $self->pad_lines
+        and $self->line + $self->rows <= $self->pad_lines )
     {
         $self->line( $self->line + 1 );
         $self->update_screen;
@@ -135,20 +190,23 @@ sub prev_line {
 
 sub first_page {
     my $self = shift;
+    $self->set_mark;
     $self->line(0);
     $self->update_screen;
 }
 
 sub last_page {
     my $self = shift;
-    my $line = $self->max_lines - $self->rows + 1;
+    $self->set_mark;
+    my $line = $self->pad_lines - $self->rows + 1;
     $self->line( $line >= 0 ? $line : 0 );
     $self->update_screen;
 }
 
 sub next_page {
     my $self = shift;
-    if ( $self->line + $self->rows <= $self->max_lines ) {
+    $self->set_mark;
+    if ( $self->line + $self->rows <= $self->pad_lines ) {
         $self->line( $self->line + $self->rows );
         $self->update_screen;
         return 1;
@@ -158,6 +216,7 @@ sub next_page {
 
 sub prev_page {
     my $self = shift;
+    $self->set_mark;
     if ( $self->line == 0 && $self->chapter - 1 >= 0 ) {
         return 0;
     }
@@ -174,7 +233,7 @@ sub prev_page {
 
 sub get_percent {
     my $self = shift;
-    int( ( $self->line + 1 ) * 100 / $self->max_lines );
+    int( ( $self->line + 1 ) * 100 / $self->pad_lines );
 }
 
 sub update_screen {
@@ -187,7 +246,7 @@ sub update_screen {
     addstring( $self->title );
 
     my $pos = $self->get_percent . '%';
-    if ( $self->line + $self->rows - 1 >= $self->max_lines ) {
+    if ( $self->line + $self->rows - 1 >= $self->pad_lines ) {
         $pos = "end";
     }
     $pos = "($pos)";

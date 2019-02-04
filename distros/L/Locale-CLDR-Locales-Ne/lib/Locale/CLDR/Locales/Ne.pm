@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ne - Package for language Nepali
 
 package Locale::CLDR::Locales::Ne;
 # This file auto generated from Data\common\main\ne.xml
-#	on Sun  7 Oct 10:50:12 am GMT
+#	on Sun  3 Feb  2:09:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -146,7 +146,7 @@ has 'display_name_language' => (
  				'chp' => 'चिपेव्यान',
  				'chr' => 'चेरोकी',
  				'chy' => 'चेयेन्ने',
- 				'ckb' => 'केन्द्रीय कुर्दी',
+ 				'ckb' => 'मध्यवर्ती कुर्दिस',
  				'co' => 'कोर्सिकन',
  				'cop' => 'कोप्टिक',
  				'cps' => 'कापिज्नोन',
@@ -264,6 +264,7 @@ has 'display_name_language' => (
  				'ho' => 'हिरी मोटु',
  				'hr' => 'क्रोयसियाली',
  				'hsb' => 'माथिल्लो सोर्बियन',
+ 				'hsn' => 'जियाङ चिनियाँ',
  				'ht' => 'हैटियाली क्रियोल',
  				'hu' => 'हङ्गेरियाली',
  				'hup' => 'हुपा',
@@ -800,7 +801,7 @@ has 'display_name_region' => (
  			'155' => 'पश्चिमी युरोप',
  			'202' => 'उप-साहारा अफ्रिका',
  			'419' => 'ल्याटिन अमेरिका',
- 			'AC' => 'एस्केन्सन टापु',
+ 			'AC' => 'असेन्सन टापु',
  			'AD' => 'अन्डोर्रा',
  			'AE' => 'संयुक्त अरब इमिराट्स',
  			'AF' => 'अफगानिस्तान',
@@ -821,12 +822,12 @@ has 'display_name_region' => (
  			'BB' => 'बार्बाडोस',
  			'BD' => 'बङ्गलादेश',
  			'BE' => 'बेल्जियम',
- 			'BF' => 'बर्किना फासो',
+ 			'BF' => 'बुर्किना फासो',
  			'BG' => 'बुल्गेरिया',
  			'BH' => 'बहराइन',
  			'BI' => 'बुरूण्डी',
  			'BJ' => 'बेनिन',
- 			'BL' => 'सेन्ट बार्थालेमी',
+ 			'BL' => 'सेन्ट बार्थेलेमी',
  			'BM' => 'बर्मुडा',
  			'BN' => 'ब्रुनाइ',
  			'BO' => 'बोलिभिया',
@@ -842,12 +843,12 @@ has 'display_name_region' => (
  			'CC' => 'कोकोस (किलिंग) टापुहरु',
  			'CD' => 'कङ्गो - किन्शासा',
  			'CD@alt=variant' => 'कङ्गो (डीआर्‌सी)',
- 			'CF' => 'केन्द्रीय अफ्रिकी गणतन्त्र',
+ 			'CF' => 'मध्य अफ्रिकी गणतन्त्र',
  			'CG' => 'कङ्गो ब्राजाभिल',
  			'CG@alt=variant' => 'कङ्गो (गणतन्त्र)',
  			'CH' => 'स्विजरल्याण्ड',
- 			'CI' => 'आइभोरी कोस्ट',
- 			'CI@alt=variant' => 'CI',
+ 			'CI' => 'कोट दिभोर',
+ 			'CI@alt=variant' => 'आइभोरी कोस्ट',
  			'CK' => 'कुक टापुहरु',
  			'CL' => 'चिली',
  			'CM' => 'क्यामरून',
@@ -879,7 +880,7 @@ has 'display_name_region' => (
  			'ET' => 'इथियोपिया',
  			'EU' => 'युरोपियन युनियन',
  			'EZ' => 'युरोजोन',
- 			'FI' => 'फिन्ल्याण्ड',
+ 			'FI' => 'फिनल्याण्ड',
  			'FJ' => 'फिजी',
  			'FK' => 'फकल्याण्ड टापुहरु',
  			'FK@alt=variant' => 'फक्ल्याण्ड टापुहरू (इज्लास माल्भिनास)',
@@ -887,8 +888,7 @@ has 'display_name_region' => (
  			'FO' => 'फारो टापुहरू',
  			'FR' => 'फ्रान्स',
  			'GA' => 'गावोन',
- 			'GB' => 'बेलायत',
- 			'GB@alt=short' => 'बेलायत',
+ 			'GB' => 'संयुक्त अधिराज्य',
  			'GD' => 'ग्रेनाडा',
  			'GE' => 'जर्जिया',
  			'GF' => 'फ्रान्सेली गायना',
@@ -900,13 +900,13 @@ has 'display_name_region' => (
  			'GN' => 'गिनी',
  			'GP' => 'ग्वाडेलुप',
  			'GQ' => 'भू-मध्यीय गिनी',
- 			'GR' => 'ग्रिस',
+ 			'GR' => 'ग्रीस',
  			'GS' => 'दक्षिण जर्जिया र दक्षिण स्यान्डवीच टापुहरू',
  			'GT' => 'ग्वाटेमाला',
  			'GU' => 'गुवाम',
  			'GW' => 'गिनी-बिसाउ',
  			'GY' => 'गुयाना',
- 			'HK' => 'हङकङ चिनियाँ समाजबादी स्वायत्त क्षेत्र',
+ 			'HK' => 'हङकङ चिनियाँ विशेष प्रशासनिक क्षेत्र',
  			'HK@alt=short' => 'हङकङ',
  			'HM' => 'हर्ड टापु र म्याकडोनाल्ड टापुहरु',
  			'HN' => 'हन्डुरास',
@@ -925,7 +925,7 @@ has 'display_name_region' => (
  			'IS' => 'आइस्ल्याण्ड',
  			'IT' => 'इटाली',
  			'JE' => 'जर्सी',
- 			'JM' => 'जमाइका',
+ 			'JM' => 'जमैका',
  			'JO' => 'जोर्डन',
  			'JP' => 'जापान',
  			'KE' => 'केन्या',
@@ -942,7 +942,7 @@ has 'display_name_region' => (
  			'LA' => 'लाओस',
  			'LB' => 'लेबनन',
  			'LC' => 'सेन्ट लुसिया',
- 			'LI' => 'लिएखटेन्स्टाइन',
+ 			'LI' => 'लिकटेन्सटाइन',
  			'LK' => 'श्रीलङ्का',
  			'LR' => 'लाइबेरिया',
  			'LS' => 'लेसोथो',
@@ -953,7 +953,7 @@ has 'display_name_region' => (
  			'MA' => 'मोरोक्को',
  			'MC' => 'मोनाको',
  			'MD' => 'माल्डोभा',
- 			'ME' => 'मोन्टेनेग्रो',
+ 			'ME' => 'मोन्टेनिग्रो',
  			'MF' => 'सेन्ट मार्टिन',
  			'MG' => 'माडागास्कर',
  			'MH' => 'मार्शल टापुहरु',
@@ -962,14 +962,14 @@ has 'display_name_region' => (
  			'ML' => 'माली',
  			'MM' => 'म्यान्मार (बर्मा)',
  			'MN' => 'मङ्गोलिया',
- 			'MO' => 'मकाउ चिनियाँ स्वशासित क्षेत्र',
+ 			'MO' => '(मकाउ चिनियाँ विशेष प्रशासनिक क्षेत्र',
  			'MO@alt=short' => 'मकाउ',
  			'MP' => 'उत्तरी मारिआना टापु',
  			'MQ' => 'मार्टिनिक',
  			'MR' => 'माउरिटानिया',
  			'MS' => 'मोन्टसेर्राट',
  			'MT' => 'माल्टा',
- 			'MU' => 'माउरिटस',
+ 			'MU' => 'मौरिसियस',
  			'MV' => 'माल्दिभ्स',
  			'MW' => 'मालावी',
  			'MX' => 'मेक्सिको',
@@ -1025,7 +1025,7 @@ has 'display_name_region' => (
  			'SN' => 'सेनेगल',
  			'SO' => 'सोमालिया',
  			'SR' => 'सुरिनेम',
- 			'SS' => 'दक्षिणी सुडान',
+ 			'SS' => 'दक्षिण सुडान',
  			'ST' => 'साओ टोमे र प्रिन्सिप',
  			'SV' => 'एल् साल्भाडोर',
  			'SX' => 'सिन्ट मार्टेन',
@@ -1061,7 +1061,7 @@ has 'display_name_region' => (
  			'VA' => 'भेटिकन सिटी',
  			'VC' => 'सेन्ट भिन्सेन्ट र ग्रेनाडिन्स',
  			'VE' => 'भेनेजुएला',
- 			'VG' => 'बेलायती भर्जिन टापुहरु',
+ 			'VG' => 'बेलायती भर्जिन टापुहरू',
  			'VI' => 'संयुक्त राज्य भर्जिन टापुहरु',
  			'VN' => 'भिएतनाम',
  			'VU' => 'भानुआतु',
@@ -1072,7 +1072,7 @@ has 'display_name_region' => (
  			'YT' => 'मायोट्ट',
  			'ZA' => 'दक्षिण अफ्रिका',
  			'ZM' => 'जाम्बिया',
- 			'ZW' => 'जिम्बाबे',
+ 			'ZW' => 'जिम्बाबवे',
  			'ZZ' => 'अज्ञात क्षेत्र',
 
 		}
@@ -1324,6 +1324,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(मुख्य दिशा),
+					},
 					'acre' => {
 						'name' => q(वर्ग गज),
 						'one' => q({0}वर्ग गज),
@@ -1353,6 +1356,11 @@ has 'units' => (
 						'name' => q(खगोल एकाइ),
 						'one' => q({0}खगोल एकाइ),
 						'other' => q({0}खगोल एकाइ),
+					},
+					'atmosphere' => {
+						'name' => q(वायुमण्डल),
+						'one' => q({0} वायुमण्डल),
+						'other' => q({0} वायुमण्डलहरू),
 					},
 					'bit' => {
 						'name' => q(बिट),
@@ -1870,6 +1878,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}प्रति{1}),
 					},
+					'percent' => {
+						'name' => q(प्रतिशत),
+						'one' => q({0} प्रतिशत),
+						'other' => q({0} प्रतिशत),
+					},
+					'permille' => {
+						'name' => q(प्रति मिल),
+						'one' => q({0} प्रति मिल),
+						'other' => q({0} प्रति मिल),
+					},
+					'petabyte' => {
+						'name' => q(पिटाबाइटहरू),
+						'one' => q({0} पिटाबाइट),
+						'other' => q({0} पिटाबाइटहरू),
+					},
 					'picometer' => {
 						'name' => q(पिकोमिटर),
 						'one' => q({0} पिकोमिटर),
@@ -2016,6 +2039,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(दिशा),
+					},
 					'acre' => {
 						'one' => q({0} एकर),
 						'other' => q({0} एकर),
@@ -2186,6 +2212,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}प्रति {1}),
 					},
+					'percent' => {
+						'name' => q(प्रतिशत),
+						'one' => q({0}प्रतिशत),
+						'other' => q({0}प्रतिशत),
+					},
 					'picometer' => {
 						'one' => q({0} pm),
 						'other' => q({0} pm),
@@ -2235,6 +2266,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(दिशा),
+					},
 					'acre' => {
 						'name' => q(वर्ग गज),
 						'one' => q({0}वर्ग गज),
@@ -2264,6 +2298,11 @@ has 'units' => (
 						'name' => q(au),
 						'one' => q({0} au),
 						'other' => q({0} au),
+					},
+					'atmosphere' => {
+						'name' => q(वायु),
+						'one' => q({0} वायु),
+						'other' => q({0} वायु),
 					},
 					'bit' => {
 						'name' => q(bit),
@@ -2780,6 +2819,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}प्रति {1}),
+					},
+					'percent' => {
+						'name' => q(प्रतिशत),
+						'one' => q({0}प्रतिशत),
+						'other' => q({0}प्रतिशत),
+					},
+					'permille' => {
+						'name' => q(प्रति मिल),
+						'one' => q({0}प्रति मिल),
+						'other' => q({0}प्रतिशत १),
+					},
+					'petabyte' => {
+						'name' => q(पिटाबाइट),
+						'one' => q({0} पिटा),
+						'other' => q({0} पिटा),
 					},
 					'picometer' => {
 						'name' => q(पिकोमिटर),
@@ -4421,9 +4475,16 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
-				'currency' => q(भेनेजुएलन बोलिभर),
+				'currency' => q(भेनेजुएलन बोलिभर \(२००८–२०१८\)),
 				'one' => q(भेनेजुएलन बोलिभर),
 				'other' => q(भेनेजुएलन बोलिभर),
+			},
+		},
+		'VES' => {
+			display_name => {
+				'currency' => q(भेनेजुएलन बोलिभर-2),
+				'one' => q(भेनेजुएलन बोलिभर मुद्रा),
+				'other' => q(भेनेजुएलन बोलिभर-3),
 			},
 		},
 		'VND' => {
@@ -4815,30 +4876,59 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'indian') {
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 					return 'afternoon2' if $time >= 1600
 						&& $time < 1900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1900
 						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 					return 'afternoon2' if $time >= 1600
 						&& $time < 1900;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'indian') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1600
+						&& $time < 1900;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1900
+						&& $time < 2200;
+					return 'afternoon2' if $time >= 1600
+						&& $time < 1900;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
 				}
@@ -4846,57 +4936,28 @@ has 'day_period_data' => (
 				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 					return 'afternoon2' if $time >= 1600
 						&& $time < 1900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1900
 						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 					return 'afternoon2' if $time >= 1600
 						&& $time < 1900;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
-					return 'afternoon2' if $time >= 1600
-						&& $time < 1900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1900
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'afternoon2' if $time >= 1600
-						&& $time < 1900;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
 				}
@@ -4918,73 +4979,73 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'evening1' => q{बेलुकी},
-					'am' => q{पूर्वाह्न},
-					'morning1' => q{बिहान},
-					'night1' => q{रात},
-					'afternoon2' => q{साँझ},
-					'afternoon1' => q{अपरान्ह},
+				'narrow' => {
 					'midnight' => q{मध्यरात},
-					'noon' => q{मध्यान्ह},
 					'pm' => q{अपराह्न},
+					'am' => q{पूर्वाह्न},
+					'afternoon2' => q{साँझ},
+					'night1' => q{रात},
+					'evening1' => q{बेलुकी},
+					'morning1' => q{बिहान},
+					'noon' => q{मध्यान्ह},
+					'afternoon1' => q{अपरान्ह},
 				},
 				'wide' => {
-					'noon' => q{मध्यान्ह},
-					'pm' => q{अपराह्न},
-					'midnight' => q{मध्यरात},
-					'afternoon1' => q{अपरान्ह},
 					'night1' => q{रात},
-					'morning1' => q{बिहान},
+					'midnight' => q{मध्यरात},
+					'pm' => q{अपराह्न},
 					'afternoon2' => q{साँझ},
-					'evening1' => q{बेलुकी},
 					'am' => q{पूर्वाह्न},
+					'afternoon1' => q{अपरान्ह},
+					'noon' => q{मध्यान्ह},
+					'evening1' => q{बेलुकी},
+					'morning1' => q{बिहान},
 				},
-				'narrow' => {
-					'noon' => q{मध्यान्ह},
-					'pm' => q{अपराह्न},
-					'afternoon1' => q{अपरान्ह},
-					'midnight' => q{मध्यरात},
-					'morning1' => q{बिहान},
+				'abbreviated' => {
 					'night1' => q{रात},
 					'afternoon2' => q{साँझ},
-					'evening1' => q{बेलुकी},
 					'am' => q{पूर्वाह्न},
+					'midnight' => q{मध्यरात},
+					'pm' => q{अपराह्न},
+					'afternoon1' => q{अपरान्ह},
+					'noon' => q{मध्यान्ह},
+					'morning1' => q{बिहान},
+					'evening1' => q{बेलुकी},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{अपराह्न},
-					'noon' => q{मध्यान्ह},
-					'midnight' => q{मध्यरात},
-					'afternoon1' => q{अपरान्ह},
-					'afternoon2' => q{साँझ},
-					'morning1' => q{बिहान},
-					'night1' => q{रात},
-					'am' => q{पूर्वाह्न},
 					'evening1' => q{बेलुकी},
+					'morning1' => q{बिहान},
+					'afternoon1' => q{अपरान्ह},
+					'noon' => q{मध्यान्ह},
+					'pm' => q{अपराह्न},
+					'midnight' => q{मध्यरात},
+					'afternoon2' => q{साँझ},
+					'am' => q{पूर्वाह्न},
+					'night1' => q{रात},
 				},
 				'narrow' => {
+					'night1' => q{रात},
+					'am' => q{पूर्वाह्न},
+					'afternoon2' => q{साँझ},
 					'midnight' => q{मध्यरात},
-					'afternoon1' => q{अपरान्ह},
 					'pm' => q{अपराह्न},
 					'noon' => q{मध्यान्ह},
-					'am' => q{पूर्वाह्न},
-					'evening1' => q{बेलुकी},
-					'afternoon2' => q{साँझ},
+					'afternoon1' => q{अपरान्ह},
 					'morning1' => q{बिहान},
-					'night1' => q{रात},
+					'evening1' => q{बेलुकी},
 				},
 				'wide' => {
-					'afternoon1' => q{अपरान्ह},
+					'afternoon2' => q{साँझ},
+					'am' => q{पूर्वाह्न},
 					'midnight' => q{मध्यरात},
 					'pm' => q{अपराह्न},
-					'noon' => q{मध्यान्ह},
-					'am' => q{पूर्वाह्न},
-					'evening1' => q{बेलुकी},
-					'afternoon2' => q{साँझ},
 					'night1' => q{रात},
 					'morning1' => q{बिहान},
+					'evening1' => q{बेलुकी},
+					'afternoon1' => q{अपरान्ह},
+					'noon' => q{मध्यान्ह},
 				},
 			},
 		},
@@ -5080,6 +5141,49 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{MM/dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d, E},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{MM-dd},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{G y},
+			yyyy => q{G y},
+			yyyyM => q{GGGGG y-MM},
+			yyyyMEd => q{GGGGG y-MM-dd, E},
+			yyyyMMM => q{G y MMM},
+			yyyyMMMEd => q{G y MMM d, E},
+			yyyyMMMM => q{G y MMMM},
+			yyyyMMMd => q{G y MMM d},
+			yyyyMd => q{GGGGG y-MM-dd},
+			yyyyQQQ => q{G y QQQ},
+			yyyyQQQQ => q{G y QQQQ},
+		},
 		'gregorian' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -5128,49 +5232,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{y QQQQ},
 			yw => q{Y को w हप्ता},
 		},
-		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d, E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{MM/dd, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{MM-dd},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{G y},
-			yyyy => q{G y},
-			yyyyM => q{GGGGG y-MM},
-			yyyyMEd => q{GGGGG y-MM-dd, E},
-			yyyyMMM => q{G y MMM},
-			yyyyMMMEd => q{G y MMM d, E},
-			yyyyMMMM => q{G y MMMM},
-			yyyyMMMd => q{G y MMM d},
-			yyyyMd => q{GGGGG y-MM-dd},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
-		},
 	} },
 );
 
@@ -5190,6 +5251,69 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{MM/dd, E – MM/dd, E},
+				d => q{MM/dd, E – MM/dd, E},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{G y–y},
+			},
+			yM => {
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				M => q{G y MMM–MMM},
+				y => q{G y MMM – y MMM},
+			},
+			yMMMEd => {
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				M => q{G y MMMM–MMMM},
+				y => q{G y MMMM – y MMMM},
+			},
+			yMMMd => {
+				M => q{G y MMM d – MMM d},
+				d => q{G y MMM d–d},
+				y => q{G y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
+			},
+		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -5283,69 +5407,6 @@ has 'datetime_formats_interval' => (
 				M => q{y-MM-dd – y-MM-dd},
 				d => q{y-MM-dd – y-MM-dd},
 				y => q{y-MM-dd – y-MM-dd},
-			},
-		},
-		'generic' => {
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{MM/dd, E – MM/dd, E},
-				d => q{MM/dd, E – MM/dd, E},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{G y–y},
-			},
-			yM => {
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-			},
-			yMMM => {
-				M => q{G y MMM–MMM},
-				y => q{G y MMM – y MMM},
-			},
-			yMMMEd => {
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
-			},
-			yMMMM => {
-				M => q{G y MMMM–MMMM},
-				y => q{G y MMMM – y MMMM},
-			},
-			yMMMd => {
-				M => q{G y MMM d – MMM d},
-				d => q{G y MMM d–d},
-				y => q{G y MMM d – y MMM d},
-			},
-			yMd => {
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
-				y => q{GGGGG y-MM-dd – y-MM-dd},
 			},
 		},
 	} },

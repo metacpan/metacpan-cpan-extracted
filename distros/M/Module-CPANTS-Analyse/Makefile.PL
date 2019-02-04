@@ -1,4 +1,4 @@
-use 5.006;
+use 5.008001;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker::CPANfile;
@@ -15,7 +15,7 @@ WriteMakefile(
 
   META_MERGE => {
     resources => {
-      homepage => 'http://cpants.cpanauthors.org',
+      homepage => 'https://cpants.cpanauthors.org',
       repository => 'https://github.com/cpants/Module-CPANTS-Analyse',
       bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Module-CPANTS-Analyse',
     },

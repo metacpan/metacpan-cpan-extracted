@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fr::Any::Cm - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Cm;
 # This file auto generated from Data\common\main\fr_CM.xml
-#	on Sun  7 Oct 10:33:27 am GMT
+#	on Sun  3 Feb  1:52:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -35,25 +35,25 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 0
-						&& $time < 400;
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
@@ -75,24 +75,20 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{mat.},
-					'pm' => q{soir},
-				},
 				'narrow' => {
 					'am' => q{mat.},
 					'pm' => q{soir},
 				},
 				'wide' => {
-					'pm' => q{soir},
 					'am' => q{matin},
+					'pm' => q{soir},
+				},
+				'abbreviated' => {
+					'am' => q{mat.},
+					'pm' => q{soir},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{mat.},
-					'pm' => q{soir},
-				},
 				'narrow' => {
 					'pm' => q{soir},
 					'am' => q{mat.},
@@ -100,6 +96,10 @@ has 'day_periods' => (
 				'wide' => {
 					'pm' => q{soir},
 					'am' => q{matin},
+				},
+				'abbreviated' => {
+					'am' => q{mat.},
+					'pm' => q{soir},
 				},
 			},
 		},

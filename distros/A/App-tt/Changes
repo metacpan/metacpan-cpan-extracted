@@ -1,5 +1,9 @@
 Revision history for perl distribution App-tt
 
+0.10 2019-02-04T09:35:24+0100
+ - Fix "tt log -1" when running in January
+ - Fix "tt log" when specifying interval
+
 0.09 2018-09-28T11:17:05+0900
  - Add "export" action
 

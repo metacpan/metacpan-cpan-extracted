@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Es::Any::Us - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Us;
 # This file auto generated from Data\common\main\es_US.xml
-#	on Sun  7 Oct 10:30:15 am GMT
+#	on Sun  3 Feb  1:49:07 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,10 +44,12 @@ has 'display_name_language' => (
  				'enm' => 'inglés medieval',
  				'eu' => 'euskera',
  				'frm' => 'francés medieval',
+ 				'gan' => 'gan (China)',
  				'gmh' => 'alemán de la alta edad media',
  				'grc' => 'griego antiguo',
  				'gu' => 'gurayatí',
  				'hak' => 'hak',
+ 				'hsn' => 'xiang (China)',
  				'ht' => 'criollo haitiano',
  				'kbd' => 'kabardiano',
  				'krc' => 'karachay-balkar',
@@ -412,8 +414,8 @@ has 'number_formats' => (
 			},
 			'short' => {
 				'1000' => {
-					'one' => '0',
-					'other' => '0',
+					'one' => '0 K',
+					'other' => '0 K',
 				},
 				'10000' => {
 					'one' => '00 K',
@@ -473,11 +475,6 @@ has 'currencies' => (
 				'one' => q(som),
 			},
 		},
-		'MWK' => {
-			display_name => {
-				'one' => q(kwacha malauí),
-			},
-		},
 		'MYR' => {
 			display_name => {
 				'currency' => q(ringit),
@@ -487,9 +484,6 @@ has 'currencies' => (
 		},
 		'RON' => {
 			symbol => 'lei',
-			display_name => {
-				'one' => q(leu rumano),
-			},
 		},
 		'SSP' => {
 			symbol => '£',
@@ -599,49 +593,49 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
@@ -661,32 +655,32 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
+				'narrow' => {
+					'evening1' => q{de la tarde},
+					'morning1' => q{de la madrugada},
+					'noon' => q{del mediodía},
+					'morning2' => q{mañana},
+					'night1' => q{de la noche},
+				},
+				'wide' => {
 					'am' => q{a. m.},
 					'pm' => q{p. m.},
 				},
-				'narrow' => {
-					'morning2' => q{mañana},
-					'evening1' => q{de la tarde},
-					'night1' => q{de la noche},
-					'morning1' => q{de la madrugada},
-					'noon' => q{del mediodía},
-				},
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{a. m.},
 					'pm' => q{p. m.},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'pm' => q{p. m.},
+				'abbreviated' => {
 					'am' => q{a. m.},
+					'pm' => q{p. m.},
 				},
 				'narrow' => {
 					'am' => q{a. m.},
 					'pm' => q{p. m.},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{p. m.},
 					'am' => q{a. m.},
 				},
@@ -754,6 +748,15 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			GyMMM => q{MMM y G},
+			GyMMMd => q{d MMM y G},
+			MMMEd => q{E d MMM},
+			MMMMd => q{d 'de' MMM},
+			MMMd => q{d MMM},
+			yyyyMEd => q{E, d/M/y GGGGG},
+			yyyyMMM => q{MMM y G},
+		},
 		'gregorian' => {
 			EHm => q{E HH:mm},
 			EHms => q{E HH:mm:ss},
@@ -771,13 +774,6 @@ has 'datetime_formats_available_formats' => (
 			yMMMEd => q{EEE, d 'de' MMMM 'de' y},
 			yQQQ => q{QQQ y},
 		},
-		'generic' => {
-			GyMMM => q{MMM y G},
-			GyMMMd => q{d MMM y G},
-			MMMEd => q{E d MMM},
-			MMMMd => q{d 'de' MMM},
-			MMMd => q{d MMM},
-		},
 	} },
 );
 
@@ -794,6 +790,27 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			Md => {
+				M => q{d/M – d/M},
+				d => q{d/M – d/M},
+			},
+			fallback => '{0} – {1}',
+			yM => {
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			yMEd => {
+				M => q{E, d/M/y–E, d/M/y G},
+				d => q{E, d/M/y–E, d/M/y G},
+				y => q{E, d/M/y–E, d/M/y G},
+			},
+			yMd => {
+				M => q{d/M/y – d/M/y G},
+				d => q{d/M/y – d/M/y G},
+				y => q{d/M/y – d/M/y G},
+			},
+		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -847,27 +864,6 @@ has 'datetime_formats_interval' => (
 			yMMMd => {
 				M => q{d 'de' MMM – d 'de' MMM y},
 				d => q{d–d 'de' MMM 'de' y},
-			},
-		},
-		'generic' => {
-			Md => {
-				M => q{d/M – d/M},
-				d => q{d/M – d/M},
-			},
-			fallback => '{0} – {1}',
-			yM => {
-				M => q{M/y – M/y G},
-				y => q{M/y – M/y G},
-			},
-			yMEd => {
-				M => q{E, d/M/y–E, d/M/y G},
-				d => q{E, d/M/y–E, d/M/y G},
-				y => q{E, d/M/y–E, d/M/y G},
-			},
-			yMd => {
-				M => q{d/M/y – d/M/y G},
-				d => q{d/M/y – d/M/y G},
-				y => q{d/M/y – d/M/y G},
 			},
 		},
 	} },
@@ -951,9 +947,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Dusambé#,
-		},
-		'Asia/Rangoon' => {
-			exemplarCity => q#Yangón (Rangún)#,
 		},
 		'Atlantic' => {
 			short => {
@@ -1049,11 +1042,6 @@ has 'time_zone_names' => (
 		'Marshall_Islands' => {
 			long => {
 				'standard' => q#hora de las Islas Marshall#,
-			},
-		},
-		'Myanmar' => {
-			long => {
-				'standard' => q#hora de Myanmar (Birmania)#,
 			},
 		},
 		'Norfolk' => {

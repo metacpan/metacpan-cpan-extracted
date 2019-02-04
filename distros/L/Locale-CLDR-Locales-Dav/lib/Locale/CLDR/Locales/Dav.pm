@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Dav - Package for language Taita
 
 package Locale::CLDR::Locales::Dav;
 # This file auto generated from Data\common\main\dav.xml
-#	on Sun  7 Oct 10:27:03 am GMT
+#	on Sun  3 Feb  1:46:13 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

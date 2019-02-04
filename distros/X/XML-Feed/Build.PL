@@ -9,7 +9,10 @@ my $build = Module::Build
          requires      => {
                           'Class::ErrorHandler'        => 0,
                           'DateTime'                   => 0,
+                          'DateTime::Format::Flexible' => 0,
+                          'DateTime::Format::ISO8601'  => 0,
                           'DateTime::Format::Mail'     => 0,
+                          'DateTime::Format::Natural'  => 0,
                           'DateTime::Format::W3CDTF'   => 0,
                           'Feed::Find'                 => 0,
                           'HTML::Entities'             => 0,
@@ -33,7 +36,12 @@ my $build = Module::Build
          {
              resources =>
              {
-                 repository => "https://github.com/davorg/xml-feed",
+                  bugtracker => { web => 'https://github.com/davorg/xml-feed/issues' },
+                  repository => {
+                    url  => 'https://github.com/davorg/xml-feed.git',
+                    web  => 'https://github.com/davorg/xml-feed',
+                    type => 'git',
+                  }
              },
              x_contributors => [
                 'Dave Cross <davecross@cpan.org>',

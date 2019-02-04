@@ -1,5 +1,11 @@
 Revision history for App-Fasops
 
+0.6.2 2019-02-01T23:35:08Z
+
+    - Add parse_block_array() to Common.pm
+    - `fasops refine`
+        - Use array to avoid IxHash
+
 0.6.1 2019-01-25T15:45:18Z
 
     - Add `fasops vars`

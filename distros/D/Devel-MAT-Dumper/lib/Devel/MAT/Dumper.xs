@@ -93,6 +93,7 @@ static uint8_t svx_sizes[] = {
   0,          2,     0,     /* saved HELEM */
   0,          1,     0,     /* saved CV */
   0,          1,     1,     /* SV->SV annotation */
+  2*UVSIZE,   0,     1,     /* SV leak report */
 };
 
 static uint8_t ctx_sizes[] = {
@@ -128,6 +129,7 @@ enum PMAT_SVt {
   PMAT_SVxSAVED_HELEM,
   PMAT_SVxSAVED_CV,
   PMAT_SVxSVSVnote,
+  PMAT_SVxDEBUGREPORT,
 };
 
 enum PMAT_CODEx {
@@ -524,6 +526,12 @@ static void write_private_cv(FILE *fh, const CV *cv)
   bool is_xsub = CvISXSUB(cv);
   PADLIST *padlist = (is_xsub ? NULL : CvPADLIST(cv));
 
+  /* If the optree contains custom ops, the OP_CLASS() macro will allocate
+   * a mortal SV. We'll need to FREETMPS it to ensure we don't dump it
+   * accidentally
+   */
+  SAVETMPS;
+
   // TODO: accurate size information on CVs
   write_common_sv(fh, (const SV *)cv, sizeof(XPVCV));
 
@@ -638,6 +646,8 @@ static void write_private_cv(FILE *fh, const CV *cv)
 #endif
 
   write_u8(fh, 0);
+
+  FREETMPS;
 }
 
 static void write_private_io(FILE *fh, const IO *io)
@@ -781,6 +791,19 @@ static void write_sv(FILE *fh, const SV *sv)
       }
     }
   }
+
+#ifdef DEBUG_LEAKING_SCALARS
+  {
+    write_u8(fh, PMAT_SVxDEBUGREPORT);
+    write_svptr(fh, sv);
+    write_uint(fh, sv->sv_debug_serial);
+    write_uint(fh, sv->sv_debug_line);
+    /* TODO: this is going to make the file a lot larger, due to nonshared
+     * strings. Consider if there's a way we can share these somehow
+     */
+    write_str(fh, sv->sv_debug_file);
+  }
+#endif
 }
 
 #if (PERL_REVISION == 5) && (PERL_VERSION < 14)
@@ -977,7 +1000,9 @@ static void dumpfh(FILE *fh)
     { "utf8_xidstart",          (SV*)PL_utf8_xidstart },
     { "utf8_xidcont",           (SV*)PL_utf8_xidcont },
     { "utf8_foldclosures",      (SV*)PL_utf8_foldclosures },
+#if (PERL_REVISION == 5) && ((PERL_VERSION < 29) || (PERL_VERSION == 29 && PERL_SUBVERSION < 7))
     { "utf8_foldable",          (SV*)PL_utf8_foldable },
+#endif
 #endif
 #if (PERL_REVISION == 5) && (PERL_VERSION >= 16)
     { "Latin1",                 (SV*)PL_Latin1 },
@@ -985,7 +1010,9 @@ static void dumpfh(FILE *fh)
     { "utf8_perl_idstart",      (SV*)PL_utf8_perl_idstart },
 #endif
 #if (PERL_REVISION == 5) && (PERL_VERSION >= 18)
+#if (PERL_REVISION == 5) && ((PERL_VERSION < 29) || (PERL_VERSION == 29 && PERL_SUBVERSION < 7))
     { "NonL1NonFinalFold",      (SV*)PL_NonL1NonFinalFold },
+#endif
     { "HasMultiCharFold",       (SV*)PL_HasMultiCharFold },
 #  if (PERL_VERSION <= 20)
     { "utf8_X_regular_begin",   (SV*)PL_utf8_X_regular_begin },

@@ -50,11 +50,13 @@
             "perl" : "5.008001"
          },
          "suggests" : {
+            "CPAN::Common::Index" : "0",
             "JSON::PP" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Test::FailWarnings" : "0",
             "Test::More" : "0.98",
             "Test::UseAllModules" : "0.17"
          }
@@ -66,6 +68,6 @@
          "url" : "https://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite"
       }
    },
-   "version" : "0.9902",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.9903",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

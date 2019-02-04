@@ -21,7 +21,11 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "File::Path" : "0",
+            "Test::Exception" : "0",
+            "Win32::File" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -33,16 +37,16 @@
             "Algorithm::Cron" : "0",
             "Capture::Tiny" : "0",
             "Carp" : "0",
-            "DateTime::Tiny" : "0",
             "File::Path" : "0",
             "File::Spec" : "0",
             "JSON::PP" : "0",
             "Test::More" : "0",
-            "perl" : "5.010"
+            "Time::Piece" : "0",
+            "perl" : "5.014"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "7",
+   "version" : "10",
    "x_serialization_backend" : "JSON version 2.90"
 }

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Dyo::Any::Sn - Package for language Jola-Fonyi
 
 package Locale::CLDR::Locales::Dyo::Any::Sn;
 # This file auto generated from Data\common\main\dyo_SN.xml
-#	on Sun  7 Oct 10:27:48 am GMT
+#	on Sun  3 Feb  1:46:56 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

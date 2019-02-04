@@ -1,12 +1,12 @@
 package Locale::CLDR::Currencies;
 # This file auto generated from Data.xml
-#	on Sun  7 Oct 10:18:10 am GMT
+#	on Sun  3 Feb  1:37:03 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -40,9 +40,9 @@ has '_currency_fractions' => (
 			'cashrounding' => '0',
 		},
 		AMD => {
-			'digits' => '0',
+			'digits' => '2',
 			'rounding' => '0',
-			'cashdigits' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		BHD => {
@@ -94,9 +94,9 @@ has '_currency_fractions' => (
 			'cashrounding' => '0',
 		},
 		COP => {
-			'digits' => '0',
+			'digits' => '2',
 			'rounding' => '0',
-			'cashdigits' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		CRC => {
@@ -142,9 +142,9 @@ has '_currency_fractions' => (
 			'cashrounding' => '0',
 		},
 		GYD => {
-			'digits' => '0',
+			'digits' => '2',
 			'rounding' => '0',
-			'cashdigits' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		HUF => {
@@ -154,9 +154,9 @@ has '_currency_fractions' => (
 			'cashrounding' => '0',
 		},
 		IDR => {
-			'digits' => '0',
+			'digits' => '2',
 			'rounding' => '0',
-			'cashdigits' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		IQD => {
@@ -262,9 +262,9 @@ has '_currency_fractions' => (
 			'cashrounding' => '0',
 		},
 		MNT => {
-			'digits' => '0',
+			'digits' => '2',
 			'rounding' => '0',
-			'cashdigits' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		MRO => {
@@ -274,9 +274,9 @@ has '_currency_fractions' => (
 			'cashrounding' => '0',
 		},
 		MUR => {
-			'digits' => '0',
+			'digits' => '2',
 			'rounding' => '0',
-			'cashdigits' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		NOK => {
@@ -292,9 +292,9 @@ has '_currency_fractions' => (
 			'cashrounding' => '0',
 		},
 		PKR => {
-			'digits' => '0',
+			'digits' => '2',
 			'rounding' => '0',
-			'cashdigits' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		PYG => {
@@ -370,9 +370,9 @@ has '_currency_fractions' => (
 			'cashrounding' => '0',
 		},
 		TZS => {
-			'digits' => '0',
+			'digits' => '2',
 			'rounding' => '0',
-			'cashdigits' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		UGX => {
@@ -387,10 +387,16 @@ has '_currency_fractions' => (
 			'cashdigits' => '0',
 			'cashrounding' => '0',
 		},
-		UZS => {
-			'digits' => '0',
+		UYW => {
+			'digits' => '4',
 			'rounding' => '0',
-			'cashdigits' => '0',
+			'cashdigits' => '4',
+			'cashrounding' => '0',
+		},
+		UZS => {
+			'digits' => '2',
+			'rounding' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		VEF => {
@@ -715,7 +721,7 @@ has '_default_currency' => (
 				'UZ' => 'UZS',
 				'VA' => 'EUR',
 				'VC' => 'XCD',
-				'VE' => 'VEF',
+				'VE' => 'VES',
 				'VG' => 'USD',
 				'VI' => 'USD',
 				'VN' => 'VND',

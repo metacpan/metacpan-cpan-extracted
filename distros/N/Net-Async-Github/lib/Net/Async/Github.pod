@@ -10,7 +10,7 @@ sure you change the first line.
 
 =head1 NAME
 
-Net::Async::Github - support for L<https://github.com>'s REST API with L<IO::Async>
+Net::Async::Github - support for the L<https://github.com> REST API with L<IO::Async>
 
 =head1 SYNOPSIS
 
@@ -245,5 +245,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2014-2018. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2014-2019. Licensed under the same terms as Perl itself.
 

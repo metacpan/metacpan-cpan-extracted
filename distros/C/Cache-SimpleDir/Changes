@@ -1,0 +1,16 @@
+Revision history for Cache-SimpleDir
+
+2.1.2  2019-02-04 02:00:00+02:00 Europe/Athens
+  - No need for a key, it is using the callback subroutine name
+  - Rename the property "callback_setdata" to "callback"
+  - speed fixes
+  - Documenation changes
+
+2.0.5  2019-02-02 00:50:00+02:00 Europe/Athens
+  - Drop the support for multiple keys, use multiple objects instead
+  - Drop the clean up of cache dir at object creation
+  - Rewrite as OO
+  - Support multiple process using a lock file
+
+1.0.0  2019-01-20 21:00:00+02:00 Europe/Athens
+  - Initial release

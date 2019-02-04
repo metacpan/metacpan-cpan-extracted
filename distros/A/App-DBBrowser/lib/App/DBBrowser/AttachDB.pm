@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-use List::Util qw( any );
+use List::MoreUtils qw( any );
 
 use Term::Choose qw( choose );
 use Term::Form   qw();

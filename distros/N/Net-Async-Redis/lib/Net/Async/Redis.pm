@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Net::Async::Redis::Commands IO::Async::Notifier);
 
-our $VERSION = '1.013';
+our $VERSION = '1.014';
 
 =head1 NAME
 
@@ -27,7 +27,8 @@ Net::Async::Redis - talk to Redis servers via L<IO::Async>
         print "Value: " . shift;
     })->get;
 
-    # ... or with Future::AsyncAwait
+    # ... or with Future::AsyncAwait (as of version 0.21+ is
+    # stable enough to consider using in real code)
     await $redis->connect;
     my $value = await $redis->get('some_key');
     $value ||= await $redis->set(some_key => 'some_value');
@@ -105,10 +106,11 @@ Example:
  $redis->subscribe('notifications')
     ->then(sub {
         my $sub = shift;
-        $sub->map('payload')
+        $sub->events
+            ->map('payload')
             ->take(5)
             ->say
-            ->completion
+            ->completed
     })->then(sub {
         $redis->unsubscribe('notifications')
     })->get
@@ -258,6 +260,10 @@ sub connect : method {
         my $proto = $self->protocol;
         my $stream = IO::Async::Stream->new(
             handle    => $sock,
+            read_len  => $self->stream_read_len,
+            write_len => $self->stream_write_len,
+            read_high_watermark => 8 * $self->stream_read_len,
+            read_low_watermark  => 2 * $self->stream_read_len,
             on_closed => $self->curry::weak::notify_close,
             on_read   => sub {
                 $proto->parse($_[1]);
@@ -466,7 +472,7 @@ sub execute_command {
         )->then(sub {
             $f->done if $is_sub_command;
             $f
-        })
+        })->retain
     };
     return $code->() if $self->{stream} and ($self->{is_multi} or 0 == @{$self->{pending_multi}});
     return (
@@ -476,7 +482,8 @@ sub execute_command {
             $self->connected,
             @{$self->{pending_multi}}
         )
-    )->then($code);
+    )->then($code)
+     ->retain;
 }
 
 sub ryu {
@@ -509,10 +516,33 @@ sub host { shift->{host} }
 sub port { shift->{port} }
 sub uri { shift->{uri} //= URI->new('redis://localhost') }
 
+=head2 stream_read_len
+
+Defines the buffer size when reading from a Redis connection.
+
+Defaults to 1MB, reduce this if you're dealing with a lot of connections and
+want to minimise memory usage. Alternatively, if you're reading large amounts
+of data and spend too much time in needless C<epoll_wait> calls, try a larger
+value.
+
+=cut
+
+sub stream_read_len { shift->{stream_read_len} //= 1048576 }
+
+=head2 stream_write_len
+
+The buffer size when writing to Redis connections, in bytes.
+
+See L</stream_read_len>.
+
+=cut
+
+sub stream_write_len { shift->{stream_read_len} //= 1048576 }
+
 sub configure {
     my ($self, %args) = @_;
     $self->{pending_multi} //= [];
-    for (qw(host port auth uri pipeline_depth)) {
+    for (qw(host port auth uri pipeline_depth stream_read_len stream_write_len)) {
         $self->{$_} = delete $args{$_} if exists $args{$_};
     }
     $self->{uri} = URI->new($self->{uri}) unless ref $self->uri;

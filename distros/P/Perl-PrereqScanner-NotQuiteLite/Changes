@@ -1,5 +1,9 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.9903 2019/02/03
+  - added an option to dedupe modules that belong to the
+    same distribution with the help of CPAN::Common::Index
+
 0.9902 2018/12/06
   - implemented ignore and ignore_re options to exclude
     specific paths

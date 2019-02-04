@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ga - Package for language Irish
 
 package Locale::CLDR::Locales::Ga;
 # This file auto generated from Data\common\main\ga.xml
-#	on Sun  7 Oct 10:33:53 am GMT
+#	on Sun  3 Feb  1:52:34 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1784,7 +1784,7 @@ has 'display_name_region' => (
 	default		=> sub { 
 		{
 			'001' => 'an Domhan',
- 			'002' => 'An Afraic',
+ 			'002' => 'an Afraic',
  			'003' => 'Meiriceá Thuaidh',
  			'005' => 'Meiriceá Theas',
  			'009' => 'an Aigéine',
@@ -1792,7 +1792,7 @@ has 'display_name_region' => (
  			'013' => 'Meiriceá Láir',
  			'014' => 'Oirthear na hAfraice',
  			'015' => 'Tuaisceart na hAfraice',
- 			'017' => 'An Afraic Láir',
+ 			'017' => 'an Afraic Láir',
  			'018' => 'Deisceart na hAfraice',
  			'019' => 'Críocha Mheiriceá',
  			'021' => 'Tuaisceart Mheiriceá',
@@ -1874,7 +1874,7 @@ has 'display_name_region' => (
  			'CW' => 'Curaçao',
  			'CX' => 'Oileán na Nollag',
  			'CY' => 'an Chipir',
- 			'CZ' => 'An tSeicia',
+ 			'CZ' => 'an tSeicia',
  			'CZ@alt=variant' => 'Poblacht na Seice',
  			'DE' => 'an Ghearmáin',
  			'DG' => 'Diego Garcia',
@@ -2054,6 +2054,7 @@ has 'display_name_region' => (
  			'TJ' => 'an Táidsíceastáin',
  			'TK' => 'Tócalá',
  			'TL' => 'Tíomór Thoir',
+ 			'TL@alt=variant' => 'TL',
  			'TM' => 'an Tuircméanastáin',
  			'TN' => 'an Túinéis',
  			'TO' => 'Tonga',
@@ -2394,6 +2395,7 @@ has 'characters' => (
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a á b c d e é f g h i í l m n o ó p r s t u ú]},
 			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -2471,6 +2473,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(treo chairdinéil),
+					},
 					'acre' => {
 						'few' => q({0} acra),
 						'many' => q({0} n-acra),
@@ -2518,6 +2523,14 @@ has 'units' => (
 						'one' => q({0} aonad réalteolaíoch),
 						'other' => q({0} aonad réalteolaíoch),
 						'two' => q({0} aonad réalteolaíoch),
+					},
+					'atmosphere' => {
+						'few' => q({0} atm),
+						'many' => q({0} atm),
+						'name' => q(atmaisféar),
+						'one' => q({0} atmaisféar),
+						'other' => q({0} atmaisféar),
+						'two' => q({0} atm),
 					},
 					'bit' => {
 						'few' => q({0} ghiotán),
@@ -3353,6 +3366,30 @@ has 'units' => (
 					'per' => {
 						'1' => q({0} sa {1}),
 					},
+					'percent' => {
+						'few' => q({0}%),
+						'many' => q({0}%),
+						'name' => q(faoin gcéad),
+						'one' => q({0} faoin gcéad),
+						'other' => q({0} faoin gcéad),
+						'two' => q({0}%),
+					},
+					'permille' => {
+						'few' => q({0}‰),
+						'many' => q({0}‰),
+						'name' => q(faoin míle),
+						'one' => q({0} faoin míle),
+						'other' => q({0} faoin míle),
+						'two' => q({0}‰),
+					},
+					'petabyte' => {
+						'few' => q({0} PB),
+						'many' => q({0} PB),
+						'name' => q(peitibheart),
+						'one' => q({0} peitibheart),
+						'other' => q({0} petabytes),
+						'two' => q({0} PB),
+					},
 					'picometer' => {
 						'few' => q({0} phiciméadar),
 						'many' => q({0} bpiciméadar),
@@ -3588,6 +3625,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(treo),
+					},
 					'acre' => {
 						'few' => q({0} ac),
 						'many' => q({0} ac),
@@ -3831,12 +3871,12 @@ has 'units' => (
 						'two' => q({0}°F),
 					},
 					'fathom' => {
-						'few' => q({0} fm),
-						'many' => q({0} fm),
+						'few' => q({0} fth),
+						'many' => q({0} fth),
 						'name' => q(feá),
-						'one' => q({0} fm),
-						'other' => q({0} fm),
-						'two' => q({0} fm),
+						'one' => q({0} fth),
+						'other' => q({0} fth),
+						'two' => q({0} fth),
 					},
 					'fluid-ounce' => {
 						'few' => q({0} unsa l.),
@@ -4470,6 +4510,14 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'few' => q({0}%),
+						'many' => q({0}%),
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+						'two' => q({0}%),
+					},
 					'picometer' => {
 						'few' => q({0}pm),
 						'many' => q({0}pm),
@@ -4705,6 +4753,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(treo),
+					},
 					'acre' => {
 						'few' => q({0} ac),
 						'many' => q({0} ac),
@@ -4752,6 +4803,14 @@ has 'units' => (
 						'one' => q({0} AR),
 						'other' => q({0} AR),
 						'two' => q({0} AR),
+					},
+					'atmosphere' => {
+						'few' => q({0} atm),
+						'many' => q({0} atm),
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
+						'two' => q({0} atm),
 					},
 					'bit' => {
 						'few' => q({0} ghiotán),
@@ -4948,12 +5007,12 @@ has 'units' => (
 						'two' => q({0}°F),
 					},
 					'fathom' => {
-						'few' => q({0} fm),
-						'many' => q({0} fm),
+						'few' => q({0} fth),
+						'many' => q({0} fth),
 						'name' => q(feánna),
-						'one' => q({0} fm),
-						'other' => q({0} fm),
-						'two' => q({0} fm),
+						'one' => q({0} fth),
+						'other' => q({0} fth),
+						'two' => q({0} fth),
 					},
 					'fluid-ounce' => {
 						'few' => q({0} unsa l.),
@@ -5586,6 +5645,30 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'few' => q({0}%),
+						'many' => q({0}%),
+						'name' => q(faoin gcéad),
+						'one' => q({0}%),
+						'other' => q({0}%),
+						'two' => q({0}%),
+					},
+					'permille' => {
+						'few' => q({0}‰),
+						'many' => q({0}‰),
+						'name' => q(faoin míle),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+						'two' => q({0}‰),
+					},
+					'petabyte' => {
+						'few' => q({0} PB),
+						'many' => q({0} PB),
+						'name' => q(PBheart),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
+						'two' => q({0} PB),
 					},
 					'picometer' => {
 						'few' => q({0} pm),
@@ -8871,6 +8954,17 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(Bolívar Veiniséala \(2008–2018\)),
+				'few' => q(bholívar Veiniséala \(2008–2018\)),
+				'many' => q(mbolívar Veiniséala \(2008–2018\)),
+				'one' => q(bholívar Veiniséala \(2008–2018\)),
+				'other' => q(bolívar Veiniséala \(2008–2018\)),
+				'two' => q(bholívar Veiniséala \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
+			display_name => {
 				'currency' => q(Bolívar Veiniséala),
 				'few' => q(bholívar Veiniséala),
 				'many' => q(mbolívar Veiniséala),
@@ -9521,30 +9615,30 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{i.n.},
 					'am' => q{r.n.},
+					'pm' => q{i.n.},
+				},
+				'wide' => {
+					'am' => q{r.n.},
+					'pm' => q{i.n.},
 				},
 				'narrow' => {
 					'pm' => q{p},
 					'am' => q{a},
-				},
-				'wide' => {
-					'pm' => q{i.n.},
-					'am' => q{r.n.},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'am' => q{a},
-					'pm' => q{p},
+				'abbreviated' => {
+					'pm' => q{p.m.},
+					'am' => q{a.m.},
 				},
 				'wide' => {
 					'pm' => q{p.m.},
 					'am' => q{a.m.},
 				},
-				'abbreviated' => {
-					'am' => q{a.m.},
-					'pm' => q{p.m.},
+				'narrow' => {
+					'am' => q{a},
+					'pm' => q{p},
 				},
 			},
 		},
@@ -9661,6 +9755,33 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+			E => q{ccc},
+			Ed => q{E d},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E d MMM y G},
+			GyMMMd => q{d MMM y G},
+			M => q{LL},
+			MEd => q{E dd/MM},
+			MMM => q{LLL},
+			MMMEd => q{E d MMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{dd/MM},
+			d => q{d},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{MM/y GGGGG},
+			yyyyMEd => q{E dd/MM/y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d MMM y G},
+			yyyyMd => q{dd/MM/y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
 		'generic' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -9752,33 +9873,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 			yw => q{'seachtain' 'a' w 'i' Y},
 		},
-		'buddhist' => {
-			E => q{ccc},
-			Ed => q{E d},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E d MMM y G},
-			GyMMMd => q{d MMM y G},
-			M => q{LL},
-			MEd => q{E dd/MM},
-			MMM => q{LLL},
-			MMMEd => q{E d MMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{dd/MM},
-			d => q{d},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{MM/y GGGGG},
-			yyyyMEd => q{E dd/MM/y GGGGG},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E d MMM y G},
-			yyyyMMMM => q{MMMM y G},
-			yyyyMMMd => q{d MMM y G},
-			yyyyMd => q{dd/MM/y GGGGG},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
 	} },
 );
 
@@ -9798,6 +9892,101 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+			H => {
+				H => q{HH – HH},
+			},
+			Hm => {
+				H => q{HH:mm – HH:mm},
+				m => q{HH:mm – HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm – HH:mm v},
+				m => q{HH:mm – HH:mm v},
+			},
+			Hv => {
+				H => q{HH – HH v},
+			},
+			M => {
+				M => q{MM – MM},
+			},
+			MEd => {
+				M => q{E dd/MM – E dd/MM},
+				d => q{E dd/MM – E dd/MM},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{E d MMM – E d MMM},
+				d => q{E d MMM – E d MMM},
+			},
+			MMMd => {
+				M => q{d MMM – d MMM},
+				d => q{d – d MMM},
+			},
+			Md => {
+				M => q{dd/MM – dd/MM},
+				d => q{dd/MM – dd/MM},
+			},
+			d => {
+				d => q{d – d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h – h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm – h:mm a},
+				m => q{h:mm – h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm – h:mm a v},
+				m => q{h:mm – h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h – h a v},
+			},
+			y => {
+				y => q{y – y G},
+			},
+			yM => {
+				M => q{MM/y – MM/y GGGGG},
+				y => q{MM/y – MM/y GGGGG},
+			},
+			yMEd => {
+				M => q{E dd/MM/y – E dd/MM/y GGGGG},
+				d => q{E dd/MM/y – E dd/MM/y GGGGG},
+				y => q{E dd/MM/y – E dd/MM/y GGGGG},
+			},
+			yMMM => {
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E d MMM – E d MMM y G},
+				d => q{E d MMM – E d MMM y G},
+				y => q{E d MMM y – E d MMM y G},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM y G},
+				y => q{MMMM y – MMMM y G},
+			},
+			yMMMd => {
+				M => q{d MMM – d MMM y G},
+				d => q{d – d MMM y G},
+				y => q{d MMM y – d MMM y G},
+			},
+			yMd => {
+				M => q{dd/MM/y – dd/MM/y GGGGG},
+				d => q{dd/MM/y – dd/MM/y GGGGG},
+				y => q{dd/MM/y – dd/MM/y GGGGG},
+			},
+		},
 		'generic' => {
 			H => {
 				H => q{HH – HH},
@@ -9986,101 +10175,6 @@ has 'datetime_formats_interval' => (
 				M => q{dd/MM/y – dd/MM/y},
 				d => q{dd/MM/y – dd/MM/y},
 				y => q{dd/MM/y – dd/MM/y},
-			},
-		},
-		'buddhist' => {
-			H => {
-				H => q{HH – HH},
-			},
-			Hm => {
-				H => q{HH:mm – HH:mm},
-				m => q{HH:mm – HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm – HH:mm v},
-				m => q{HH:mm – HH:mm v},
-			},
-			Hv => {
-				H => q{HH – HH v},
-			},
-			M => {
-				M => q{MM – MM},
-			},
-			MEd => {
-				M => q{E dd/MM – E dd/MM},
-				d => q{E dd/MM – E dd/MM},
-			},
-			MMM => {
-				M => q{MMM – MMM},
-			},
-			MMMEd => {
-				M => q{E d MMM – E d MMM},
-				d => q{E d MMM – E d MMM},
-			},
-			MMMd => {
-				M => q{d MMM – d MMM},
-				d => q{d – d MMM},
-			},
-			Md => {
-				M => q{dd/MM – dd/MM},
-				d => q{dd/MM – dd/MM},
-			},
-			d => {
-				d => q{d – d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h – h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm – h:mm a},
-				m => q{h:mm – h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm – h:mm a v},
-				m => q{h:mm – h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h – h a v},
-			},
-			y => {
-				y => q{y – y G},
-			},
-			yM => {
-				M => q{MM/y – MM/y GGGGG},
-				y => q{MM/y – MM/y GGGGG},
-			},
-			yMEd => {
-				M => q{E dd/MM/y – E dd/MM/y GGGGG},
-				d => q{E dd/MM/y – E dd/MM/y GGGGG},
-				y => q{E dd/MM/y – E dd/MM/y GGGGG},
-			},
-			yMMM => {
-				M => q{MMM – MMM y G},
-				y => q{MMM y – MMM y G},
-			},
-			yMMMEd => {
-				M => q{E d MMM – E d MMM y G},
-				d => q{E d MMM – E d MMM y G},
-				y => q{E d MMM y – E d MMM y G},
-			},
-			yMMMM => {
-				M => q{MMMM – MMMM y G},
-				y => q{MMMM y – MMMM y G},
-			},
-			yMMMd => {
-				M => q{d MMM – d MMM y G},
-				d => q{d – d MMM y G},
-				y => q{d MMM y – d MMM y G},
-			},
-			yMd => {
-				M => q{dd/MM/y – dd/MM/y GGGGG},
-				d => q{dd/MM/y – dd/MM/y GGGGG},
-				y => q{dd/MM/y – dd/MM/y GGGGG},
 			},
 		},
 	} },

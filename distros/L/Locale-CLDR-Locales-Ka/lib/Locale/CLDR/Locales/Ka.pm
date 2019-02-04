@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ka - Package for language Georgian
 
 package Locale::CLDR::Locales::Ka;
 # This file auto generated from Data\common\main\ka.xml
-#	on Sun  7 Oct 10:39:55 am GMT
+#	on Sun  3 Feb  1:59:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -622,7 +622,7 @@ has 'display_name_language' => (
  				'lol' => 'მონგო',
  				'loz' => 'ლოზი',
  				'lrc' => 'ჩრდილოეთ ლური',
- 				'lt' => 'ლიტვური',
+ 				'lt' => 'ლიეტუვური',
  				'lu' => 'ლუბა-კატანგა',
  				'lua' => 'ლუბა-ლულუა',
  				'lui' => 'ლუისენიო',
@@ -1082,7 +1082,7 @@ has 'display_name_region' => (
  			'AE' => 'არაბთა გაერთიანებული საამიროები',
  			'AF' => 'ავღანეთი',
  			'AG' => 'ანტიგუა და ბარბუდა',
- 			'AI' => 'ანგვილა',
+ 			'AI' => 'ანგილია',
  			'AL' => 'ალბანეთი',
  			'AM' => 'სომხეთი',
  			'AO' => 'ანგოლა',
@@ -1183,7 +1183,7 @@ has 'display_name_region' => (
  			'GU' => 'გუამი',
  			'GW' => 'გვინეა-ბისაუ',
  			'GY' => 'გაიანა',
- 			'HK' => 'ჰონკონგის სპეციალური ადმინისტრაციული რეგიონი ჩინეთი',
+ 			'HK' => 'ჰონკონგის სპეციალური ადმინისტრაციული რეგიონი, ჩინეთი',
  			'HK@alt=short' => 'ჰონკონგი',
  			'HM' => 'ჰერდი და მაკდონალდის კუნძულები',
  			'HN' => 'ჰონდურასი',
@@ -1223,7 +1223,7 @@ has 'display_name_region' => (
  			'LK' => 'შრი-ლანკა',
  			'LR' => 'ლიბერია',
  			'LS' => 'ლესოთო',
- 			'LT' => 'ლიტვა',
+ 			'LT' => 'ლიეტუვა',
  			'LU' => 'ლუქსემბურგი',
  			'LV' => 'ლატვია',
  			'LY' => 'ლიბია',
@@ -1239,7 +1239,7 @@ has 'display_name_region' => (
  			'ML' => 'მალი',
  			'MM' => 'მიანმარი (ბირმა)',
  			'MN' => 'მონღოლეთი',
- 			'MO' => 'მაკაოს სპეციალური ადმინისტრაციული რეგიონი ჩინეთი',
+ 			'MO' => 'მაკაოს სპეციალური ადმინისტრაციული რეგიონი, ჩინეთი',
  			'MO@alt=short' => 'მაკაო',
  			'MP' => 'ჩრდილოეთ მარიანას კუნძულები',
  			'MQ' => 'მარტინიკა',
@@ -1684,6 +1684,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(კარდინალური მიმართულება),
+					},
 					'acre' => {
 						'name' => q(აკრი),
 						'one' => q({0} აკრი),
@@ -1713,6 +1716,11 @@ has 'units' => (
 						'name' => q(ასტრონომიული ერთეული),
 						'one' => q({0} ასტრონომიული ერთეული),
 						'other' => q({0} ასტრონომიული ერთეული),
+					},
+					'atmosphere' => {
+						'name' => q(ატმოსფეროები),
+						'one' => q({0} ატმოსფერო),
+						'other' => q({0} ატმოსფერო),
 					},
 					'bit' => {
 						'name' => q(ბიტი),
@@ -2230,6 +2238,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(პროცენტი),
+						'one' => q({0} პროცენტი),
+						'other' => q({0} პროცენტი),
+					},
+					'permille' => {
+						'name' => q(პრომილე),
+						'one' => q({0} პრომილე),
+						'other' => q({0} პრომილე),
+					},
+					'petabyte' => {
+						'name' => q(პბაიტი),
+						'one' => q({0} პბაიტი),
+						'other' => q({0} პეტაბაიტი),
+					},
 					'picometer' => {
 						'name' => q(პიკომეტრი),
 						'one' => q({0} პიკომეტრი),
@@ -2376,6 +2399,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(მიმართულება),
+					},
 					'acre' => {
 						'one' => q({0} აკრი),
 						'other' => q({0} აკრი),
@@ -2544,6 +2570,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'one' => q({0} პმ),
 						'other' => q({0} პმ),
@@ -2593,6 +2624,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(მიმართულება),
+					},
 					'acre' => {
 						'name' => q(აკრი),
 						'one' => q({0} აკრი),
@@ -2622,6 +2656,11 @@ has 'units' => (
 						'name' => q(ა.ე.),
 						'one' => q({0} ა.ე.),
 						'other' => q({0} ა.ე.),
+					},
+					'atmosphere' => {
+						'name' => q(ატმ.),
+						'one' => q({0} ატმ.),
+						'other' => q({0} ატმ.),
 					},
 					'bit' => {
 						'name' => q(ბიტი),
@@ -3138,6 +3177,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(პბაიტი),
+						'one' => q({0} პბაიტი),
+						'other' => q({0} პბაიტი),
 					},
 					'picometer' => {
 						'name' => q(პმ),
@@ -4104,7 +4158,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(ბრიტანული გირვანქა სტერლინგი),
 				'one' => q(ბრიტანული გირვანქა სტერლინგი),
-				'other' => q(ინგლისური გირვანქა სტერლინგი),
+				'other' => q(ბრიტანული გირვანქა სტერლინგი),
 			},
 		},
 		'GEK' => {
@@ -4538,6 +4592,7 @@ has 'currencies' => (
 			},
 		},
 		'MRU' => {
+			symbol => 'MRU',
 			display_name => {
 				'currency' => q(მავრიტანული უგია),
 				'one' => q(მავრიტანული უგია),
@@ -4928,7 +4983,7 @@ has 'currencies' => (
 			},
 		},
 		'STN' => {
-			symbol => 'Db',
+			symbol => 'STN',
 			display_name => {
 				'currency' => q(სან-ტომე და პრინსიპის დობრა),
 				'one' => q(სან-ტომე და პრინსიპის დობრა),
@@ -5116,6 +5171,14 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(ვენესუელის ბოლივარი \(2008–2018\)),
+				'one' => q(ვენესუელის ბოლივარი \(2008–2018\)),
+				'other' => q(ვენესუელის ბოლივარი \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
+			display_name => {
 				'currency' => q(ვენესუელის ბოლივარი),
 				'one' => q(ვენესუელის ბოლივარი),
 				'other' => q(ვენესუელის ბოლივარი),
@@ -5189,7 +5252,7 @@ has 'currencies' => (
 		'XOF' => {
 			symbol => 'CFA',
 			display_name => {
-				'currency' => q(\(CFA\) ფრანკი \(BCEAO\)),
+				'currency' => q(დასავლეთ აფრიკული CFA ფრანკი),
 				'one' => q(დასავლეთ აფრიკული CFA ფრანკი),
 				'other' => q(დასავლეთ აფრიკული CFA ფრანკი),
 			},
@@ -5898,103 +5961,28 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 500;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'islamic') {
 				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 500;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 500;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 500;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 500;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 500;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -6002,24 +5990,99 @@ has 'day_period_data' => (
 				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 500;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 500;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 500;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'persian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -6039,67 +6102,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{AM},
-					'evening1' => q{საღამოს},
-					'night1' => q{ღამით},
-					'morning1' => q{დილით},
-					'afternoon1' => q{ნაშუადღევს},
+				'abbreviated' => {
+					'noon' => q{შუადღ.},
+					'afternoon1' => q{ნაშუადღ.},
+					'evening1' => q{საღ.},
+					'morning1' => q{დილ.},
+					'night1' => q{ღამ.},
 					'midnight' => q{შუაღამეს},
 					'pm' => q{PM},
-					'noon' => q{შუადღეს},
+					'am' => q{AM},
 				},
 				'narrow' => {
+					'midnight' => q{შუაღამეს},
 					'pm' => q{p},
-					'noon' => q{შუადღ.},
-					'midnight' => q{შუაღამეს},
-					'afternoon1' => q{ნაშუადღ.},
-					'night1' => q{ღამ.},
-					'morning1' => q{დილ.},
 					'am' => q{a},
-					'evening1' => q{საღ.},
-				},
-				'abbreviated' => {
-					'am' => q{AM},
+					'night1' => q{ღამ.},
 					'evening1' => q{საღ.},
 					'morning1' => q{დილ.},
-					'night1' => q{ღამ.},
-					'midnight' => q{შუაღამეს},
 					'afternoon1' => q{ნაშუადღ.},
-					'pm' => q{PM},
 					'noon' => q{შუადღ.},
+				},
+				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+					'midnight' => q{შუაღამეს},
+					'night1' => q{ღამით},
+					'morning1' => q{დილით},
+					'evening1' => q{საღამოს},
+					'afternoon1' => q{ნაშუადღევს},
+					'noon' => q{შუადღეს},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
+				'wide' => {
+					'pm' => q{შუადღ. შემდეგ},
+					'midnight' => q{შუაღამე},
+					'am' => q{AM},
+					'night1' => q{ღამე},
+					'evening1' => q{საღამო},
+					'morning1' => q{დილა},
+					'afternoon1' => q{ნაშუადღევი},
 					'noon' => q{შუადღე},
+				},
+				'narrow' => {
 					'pm' => q{PM},
 					'midnight' => q{შუაღამე},
-					'afternoon1' => q{ნაშუადღევი},
-					'night1' => q{ღამე},
-					'morning1' => q{დილა},
-					'evening1' => q{საღამო},
-					'am' => q{AM},
-				},
-				'wide' => {
-					'evening1' => q{საღამო},
 					'am' => q{AM},
 					'night1' => q{ღამე},
+					'evening1' => q{საღამო},
 					'morning1' => q{დილა},
 					'afternoon1' => q{ნაშუადღევი},
-					'midnight' => q{შუაღამე},
 					'noon' => q{შუადღე},
-					'pm' => q{შუადღ. შემდეგ},
 				},
 				'abbreviated' => {
-					'morning1' => q{დილა},
-					'night1' => q{ღამე},
-					'am' => q{AM},
-					'evening1' => q{საღამო},
+					'midnight' => q{შუაღამე},
 					'pm' => q{PM},
+					'am' => q{AM},
+					'night1' => q{ღამე},
+					'evening1' => q{საღამო},
+					'morning1' => q{დილა},
 					'noon' => q{შუადღე},
 					'afternoon1' => q{ნაშუადღევი},
-					'midnight' => q{შუაღამე},
 				},
 			},
 		},
@@ -7532,7 +7595,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#აზორის კუნძულები#,
 		},
 		'Atlantic/Bermuda' => {
-			exemplarCity => q#ბერმუდი#,
+			exemplarCity => q#ბერმუდა#,
 		},
 		'Atlantic/Canary' => {
 			exemplarCity => q#კანარი#,

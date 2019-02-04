@@ -1,31 +1,31 @@
 Revision history for Perl extension DBD::Ldap.
 
-0.01  Fri Jun 06 13:00:55 2000
+0.01 Fri Jun 06 13:00:55 2000
 	- original version; created by h2xs 1.18
-0.02  Thu Jun 07
+0.02 Thu Jun 07
 	- Changed name from "DBD::Ldap" to "DBD::LDAP".
-0.03  Tue Jun 12
+0.03 Tue Jun 12
 	- Fixed bug that produced error if last attribute was null for any of 
 	  the records returned by a search.  Removed lots of commented-out code.
 	- Changed datatype from "VARCHAR" (12) to "LONG" (-1).
 	- 1st release to CPAN!
-0.04  Fri Aug 10
+0.04 Fri Aug 10
     - Fixed bug involving autocommit on statements containing "select" in data. 
       Caught by Simon Elliott, Thanks!
-0.05  Mon Sep 17
+0.05 Mon Sep 17
 	- Fixed "ldap_..." attributes to work, ie. "ldap_firstonly" did not work.
 	  Also made "ldap_firstonly" to allow values > 1 to limit number of 
 	  returned valued to that number.  Previously, =1 ment 1 value, =0 ment 
 	  all values.
-0.06  Fri Jun 27
+0.06 Fri Jun 27
 	- Fixed Makefile.PL bug in Perl 5.8+ where make would fail with something 
 	  like "Can't use string ("*.xsi") as a HASH ref...".  Thanks to everyone 
 	  who reported this.
-0.07	 Sun Mar 14 2004
+0.07 Sun Mar 14 2004
 	- Add compatability with Class::DBI and Netscape LDAP Server (added 
 	  patches by jmorano per bug#12269 and 12270 in rt.cpan.org).  NOTE:  
 	  Type VARCHAR is now 12 instead of -1.
-0.08 	Wed Jul 19 2006
+0.08 Wed Jul 19 2006
 	- Stop appending base DN (2nd field in the table definition line) 
 	  to the base insert attributes (5th field in the table definition line) 
 	  per request / patch by R.K. Owen.  The attribute "ldap_appendbase2ins" 
@@ -33,17 +33,17 @@ Revision history for Perl extension DBD::Ldap.
 	  behaviour is used.  I couldn't find a case where this was ever actually 
 	  used, but if anyone needs it, then set this attribute in the "connect" 
 	  call.  Default is zero (new behavior - no append).
-0.09  Tue Oct 24 2006
+0.09 Tue Oct 24 2006
 	- Cause execute() to return "0E0" instead of raising a -402 error for 
 	  "No matching Records" (which is not an error).  This fix was made in 
 	  DBD::Sprite many moons ago, but never made it here.  Thanks to 
 	  R. K. Owen for catching this.
-0.10  Wed Sep 9 2009
+0.10 Wed Sep 9 2009
 	- Fix bug that caused queries with 3 or more operands in a where 
 	  clause without parenthesis to generate invalid filters, ie:
 	  "where a and b and c".  Also added "o" option to numerous regices 
 	  that do not contain variables to optimize for speed.
-0.21	Thu Nov 5 2009
+0.21 Thu Nov 5 2009
 	- Fix bug that prevented query field data from containing escaped single 
 	  quotes.  Note:  Perl generally requires a double-backslash to 
 	  preceed the quote in order to pas the escape on to LDAP.
@@ -64,5 +64,14 @@ Revision history for Perl extension DBD::Ldap.
 	  commit() call should now be rolled back.
 	- TYPE and PRECISION, etc. data are now properly returned (as 
 	  VARCHAR(255)) for all fields.
-0.22	- POD Documentation changes (patch provided by Michael R. Davis) to 
+0.22
+	- POD Documentation changes (patch provided by Michael R. Davis) to 
 	  polish up the indentation, etc.  Thanks, Michael.
+0.23 Fri Feb 1 2019
+	- Add DBI to prerequisites (adresses bug#128038) & clean up Makefile.PL.
+0.24 Sat Feb 2 2019
+	- Remove CONFIGURE section, add CONFIGURE_REQUIRES in Makefile.PL
+	  to further address bug#128038.
+	- Make dbd_postamble to actually work
+	- tweak test.pl (remove unneeded "require DBI" stmt).
+	- update META.yml

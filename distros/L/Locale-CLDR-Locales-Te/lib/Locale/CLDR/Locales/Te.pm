@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Te - Package for language Telugu
 
 package Locale::CLDR::Locales::Te;
 # This file auto generated from Data\common\main\te.xml
-#	on Sun  7 Oct 11:01:23 am GMT
+#	on Sun  3 Feb  2:20:57 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -69,7 +69,7 @@ has 'display_name_language' => (
  				'anp' => 'ఆంగిక',
  				'ar' => 'అరబిక్',
  				'ar_001' => 'ఆధునిక ప్రామాణిక అరబిక్',
- 				'arc' => 'అరామేక్',
+ 				'arc' => 'అరామైక్',
  				'arn' => 'మపుచే',
  				'arp' => 'అరాపాహో',
  				'arw' => 'అరావాక్',
@@ -82,11 +82,11 @@ has 'display_name_language' => (
  				'ay' => 'ఐమారా',
  				'az' => 'అజర్బైజాని',
  				'az@alt=short' => 'అజెరి',
- 				'ba' => 'బష్కిర్',
+ 				'ba' => 'బాష్కిర్',
  				'bal' => 'బాలుచి',
  				'ban' => 'బాలినీస్',
  				'bas' => 'బసా',
- 				'be' => 'బెలరుషియన్',
+ 				'be' => 'బెలారుషియన్',
  				'bej' => 'బేజా',
  				'bem' => 'బెంబా',
  				'bez' => 'బెనా',
@@ -98,7 +98,7 @@ has 'display_name_language' => (
  				'bin' => 'బిని',
  				'bla' => 'సిక్సికా',
  				'bm' => 'బంబారా',
- 				'bn' => 'బాంగ్లా',
+ 				'bn' => 'బంగ్లా',
  				'bo' => 'టిబెటన్',
  				'bpy' => 'బిష్ణుప్రియ',
  				'br' => 'బ్రెటన్',
@@ -113,7 +113,7 @@ has 'display_name_language' => (
  				'car' => 'కేరిబ్',
  				'cch' => 'అట్సామ్',
  				'ce' => 'చెచెన్',
- 				'ceb' => 'సెబుయానో',
+ 				'ceb' => 'సెబువానో',
  				'cgg' => 'ఛిగా',
  				'ch' => 'చమర్రో',
  				'chb' => 'చిబ్చా',
@@ -187,7 +187,7 @@ has 'display_name_language' => (
  				'fi' => 'ఫిన్నిష్',
  				'fil' => 'ఫిలిపినో',
  				'fj' => 'ఫిజియన్',
- 				'fo' => 'ఫారోయీజ్',
+ 				'fo' => 'ఫారోస్',
  				'fon' => 'ఫాన్',
  				'fr' => 'ఫ్రెంచ్',
  				'fr_CA' => 'కెనడియెన్ ఫ్రెంచ్',
@@ -226,20 +226,20 @@ has 'display_name_language' => (
  				'hai' => 'హైడా',
  				'hak' => 'హక్కా చైనీస్',
  				'haw' => 'హవాయియన్',
- 				'he' => 'హీబ్రూ',
+ 				'he' => 'హిబ్రూ',
  				'hi' => 'హిందీ',
- 				'hil' => 'హిలిగేయినోన్',
+ 				'hil' => 'హిలిగెనాన్',
  				'hit' => 'హిట్టిటే',
  				'hmn' => 'మోంగ్',
  				'ho' => 'హిరి మోటు',
- 				'hr' => 'క్రోయేషియన్',
+ 				'hr' => 'క్రొయేషియన్',
  				'hsb' => 'అప్పర్ సోర్బియన్',
  				'hsn' => 'జియాంగ్ చైనీస్',
  				'ht' => 'హైటియన్ క్రియోల్',
  				'hu' => 'హంగేరియన్',
  				'hup' => 'హుపా',
  				'hy' => 'ఆర్మేనియన్',
- 				'hz' => 'హిరేరో',
+ 				'hz' => 'హెరెరో',
  				'ia' => 'ఇంటర్లింగ్వా',
  				'iba' => 'ఐబాన్',
  				'ibb' => 'ఇబిబియో',
@@ -275,7 +275,7 @@ has 'display_name_language' => (
  				'kfo' => 'కోరో',
  				'kg' => 'కోంగో',
  				'kha' => 'ఖాసి',
- 				'kho' => 'ఖటోనీస్',
+ 				'kho' => 'ఖోటనీస్',
  				'khq' => 'కొయరా చీన్నీ',
  				'ki' => 'కికుయు',
  				'kj' => 'క్వాన్యామ',
@@ -341,15 +341,15 @@ has 'display_name_language' => (
  				'men' => 'మెండే',
  				'mer' => 'మెరు',
  				'mfe' => 'మొరిస్యేన్',
- 				'mg' => 'మాలాగసి',
+ 				'mg' => 'మలగాసి',
  				'mga' => 'మధ్యమ ఐరిష్',
  				'mgh' => 'మక్వా-మిట్టో',
  				'mgo' => 'మెటా',
  				'mh' => 'మార్షలీస్',
- 				'mi' => 'మయోరి',
+ 				'mi' => 'మావొరీ',
  				'mic' => 'మికమాక్',
  				'min' => 'మినాంగ్‌కాబో',
- 				'mk' => 'మసడోనియన్',
+ 				'mk' => 'మాసిడోనియన్',
  				'ml' => 'మలయాళం',
  				'mn' => 'మంగోలియన్',
  				'mnc' => 'మంచు',
@@ -357,7 +357,7 @@ has 'display_name_language' => (
  				'moh' => 'మోహాక్',
  				'mos' => 'మోస్సి',
  				'mr' => 'మరాఠీ',
- 				'ms' => 'మలాయ్',
+ 				'ms' => 'మలయ్',
  				'mt' => 'మాల్టీస్',
  				'mua' => 'మండాంగ్',
  				'mul' => 'బహుళ భాషలు',
@@ -379,7 +379,7 @@ has 'display_name_language' => (
  				'new' => 'నెవారి',
  				'ng' => 'డోంగా',
  				'nia' => 'నియాస్',
- 				'niu' => 'నాయియన్',
+ 				'niu' => 'నియాన్',
  				'nl' => 'డచ్',
  				'nl_BE' => 'ఫ్లెమిష్',
  				'nmg' => 'క్వాసియె',
@@ -432,7 +432,7 @@ has 'display_name_language' => (
  				'rar' => 'రారోటొంగాన్',
  				'rm' => 'రోమన్ష్',
  				'rn' => 'రుండి',
- 				'ro' => 'రోమానియన్',
+ 				'ro' => 'రోమేనియన్',
  				'ro_MD' => 'మొల్డావియన్',
  				'rof' => 'రోంబో',
  				'rom' => 'రోమానీ',
@@ -443,18 +443,18 @@ has 'display_name_language' => (
  				'rwk' => 'ర్వా',
  				'sa' => 'సంస్కృతం',
  				'sad' => 'సండావి',
- 				'sah' => 'సఖా',
- 				'sam' => 'సమారిటన్ అరమేక్',
+ 				'sah' => 'సాఖా',
+ 				'sam' => 'సమారిటన్ అరామైక్',
  				'saq' => 'సంబురు',
  				'sas' => 'ససక్',
- 				'sat' => 'సంటాలి',
+ 				'sat' => 'సంతాలి',
  				'sba' => 'గాంబే',
  				'sbp' => 'సాంగు',
  				'sc' => 'సార్డీనియన్',
  				'scn' => 'సిసిలియన్',
  				'sco' => 'స్కాట్స్',
  				'sd' => 'సింధీ',
- 				'sdh' => 'దక్షిణ కుర్దిష్',
+ 				'sdh' => 'దక్షిణ కుర్డిష్',
  				'se' => 'ఉత్తర సామి',
  				'seh' => 'సెనా',
  				'sel' => 'సేల్కప్',
@@ -466,7 +466,7 @@ has 'display_name_language' => (
  				'shn' => 'షాన్',
  				'si' => 'సింహళం',
  				'sid' => 'సిడామో',
- 				'sk' => 'స్లోవాక్',
+ 				'sk' => 'స్లోవక్',
  				'sl' => 'స్లోవేనియన్',
  				'sm' => 'సమోవన్',
  				'sma' => 'దక్షిణ సామి',
@@ -503,7 +503,7 @@ has 'display_name_language' => (
  				'tet' => 'టేటం',
  				'tg' => 'తజిక్',
  				'th' => 'థాయ్',
- 				'ti' => 'తిగ్రిన్యా',
+ 				'ti' => 'టిగ్రిన్యా',
  				'tig' => 'టీగ్రె',
  				'tiv' => 'టివ్',
  				'tk' => 'తుర్క్‌మెన్',
@@ -531,7 +531,7 @@ has 'display_name_language' => (
  				'udm' => 'ఉడ్ముర్ట్',
  				'ug' => 'ఉయ్‌ఘర్',
  				'uga' => 'ఉగారిటిక్',
- 				'uk' => 'ఉక్రేనియన్',
+ 				'uk' => 'ఉక్రెయినియన్',
  				'umb' => 'ఉమ్బుండు',
  				'und' => 'తెలియని భాష',
  				'ur' => 'ఉర్దూ',
@@ -548,7 +548,7 @@ has 'display_name_language' => (
  				'war' => 'వారే',
  				'was' => 'వాషో',
  				'wbp' => 'వార్లపిరి',
- 				'wo' => 'వొలాఫ్',
+ 				'wo' => 'ఉలూఫ్',
  				'wuu' => 'వు చైనీస్',
  				'xal' => 'కల్మిక్',
  				'xh' => 'షోసా',
@@ -789,7 +789,7 @@ has 'display_name_region' => (
  			'AW' => 'అరుబా',
  			'AX' => 'ఆలాండ్ దీవులు',
  			'AZ' => 'అజర్బైజాన్',
- 			'BA' => 'బోస్నియా మరియు హెర్జెగొవీనా',
+ 			'BA' => 'బోస్నియా మరియు హెర్జిగోవినా',
  			'BB' => 'బార్బడోస్',
  			'BD' => 'బంగ్లాదేశ్',
  			'BE' => 'బెల్జియం',
@@ -798,7 +798,7 @@ has 'display_name_region' => (
  			'BH' => 'బహ్రెయిన్',
  			'BI' => 'బురుండి',
  			'BJ' => 'బెనిన్',
- 			'BL' => 'సెయింట్ బర్తేలెమీ',
+ 			'BL' => 'సెయింట్ బర్థెలిమి',
  			'BM' => 'బెర్ముడా',
  			'BN' => 'బ్రూనే',
  			'BO' => 'బొలీవియా',
@@ -806,7 +806,7 @@ has 'display_name_region' => (
  			'BR' => 'బ్రెజిల్',
  			'BS' => 'బహామాస్',
  			'BT' => 'భూటాన్',
- 			'BV' => 'బొవెట్ దీవి',
+ 			'BV' => 'బువై దీవి',
  			'BW' => 'బోట్స్వానా',
  			'BY' => 'బెలారస్',
  			'BZ' => 'బెలిజ్',
@@ -829,7 +829,7 @@ has 'display_name_region' => (
  			'CR' => 'కోస్టా రికా',
  			'CU' => 'క్యూబా',
  			'CV' => 'కేప్ వెర్డె',
- 			'CW' => 'కురాకవో',
+ 			'CW' => 'క్యూరసో',
  			'CX' => 'క్రిస్మస్ దీవి',
  			'CY' => 'సైప్రస్',
  			'CZ' => 'చెకియా',
@@ -858,7 +858,7 @@ has 'display_name_region' => (
  			'FM' => 'మైక్రోనేషియా',
  			'FO' => 'ఫారో దీవులు',
  			'FR' => 'ఫ్రాన్స్‌',
- 			'GA' => 'గాబన్',
+ 			'GA' => 'గేబన్',
  			'GB' => 'యునైటెడ్ కింగ్‌డమ్',
  			'GB@alt=short' => 'యు.కె.',
  			'GD' => 'గ్రెనడా',
@@ -873,22 +873,22 @@ has 'display_name_region' => (
  			'GP' => 'గ్వాడెలోప్',
  			'GQ' => 'ఈక్వటోరియల్ గినియా',
  			'GR' => 'గ్రీస్',
- 			'GS' => 'దక్షిణ జార్జియా & దక్షిణ శాండ్విచ్ దీవులు',
+ 			'GS' => 'దక్షిణ జార్జియా మరియు దక్షిణ శాండ్విచ్ దీవులు',
  			'GT' => 'గ్వాటిమాలా',
  			'GU' => 'గ్వామ్',
  			'GW' => 'గినియా-బిస్సావ్',
  			'GY' => 'గయానా',
- 			'HK' => 'హాంకాంగ్ ఎస్ఏఆర్ చైనా',
+ 			'HK' => 'హాంకాంగ్ ఎస్ఏఆర్',
  			'HK@alt=short' => 'హాంకాంగ్',
- 			'HM' => 'హెర్డ్ & మెక్ డొనాల్డ్ దీవులు',
+ 			'HM' => 'హెర్డ్ దీవి మరియు మెక్‌డొనాల్డ్ దీవులు',
  			'HN' => 'హోండురాస్',
- 			'HR' => 'క్రోయేషియా',
+ 			'HR' => 'క్రొయేషియా',
  			'HT' => 'హైటి',
  			'HU' => 'హంగేరీ',
  			'IC' => 'కేనరీ దీవులు',
  			'ID' => 'ఇండోనేషియా',
  			'IE' => 'ఐర్లాండ్',
- 			'IL' => 'ఇజ్రాయిల్',
+ 			'IL' => 'ఇజ్రాయెల్',
  			'IM' => 'ఐల్ ఆఫ్ మాన్',
  			'IN' => 'భారతదేశం',
  			'IO' => 'బ్రిటీష్ హిందూ మహాసముద్ర ప్రాంతం',
@@ -919,20 +919,20 @@ has 'display_name_region' => (
  			'LR' => 'లైబీరియా',
  			'LS' => 'లెసోతో',
  			'LT' => 'లిథువేనియా',
- 			'LU' => 'లక్సంబర్గ్',
+ 			'LU' => 'లక్సెంబర్గ్',
  			'LV' => 'లాత్వియా',
  			'LY' => 'లిబియా',
  			'MA' => 'మొరాకో',
  			'MC' => 'మొనాకో',
  			'MD' => 'మోల్డోవా',
- 			'ME' => 'మోంటెనీగ్రో',
+ 			'ME' => 'మాంటెనెగ్రో',
  			'MF' => 'సెయింట్ మార్టిన్',
  			'MG' => 'మడగాస్కర్',
  			'MH' => 'మార్షల్ దీవులు',
  			'MK' => 'మేసిడోనియా',
- 			'MK@alt=variant' => 'మేసిడోనియా (FYROM)',
+ 			'MK@alt=variant' => 'పూర్వ రిపబ్లిక్ యుగోస్లావ్ మేసిడోనియా',
  			'ML' => 'మాలి',
- 			'MM' => 'మయన్మార్ (బర్మా)',
+ 			'MM' => 'మయన్మార్',
  			'MN' => 'మంగోలియా',
  			'MO' => 'మకావ్ ఎస్ఏఆర్ చైనా',
  			'MO@alt=short' => 'మకావ్',
@@ -943,7 +943,7 @@ has 'display_name_region' => (
  			'MT' => 'మాల్టా',
  			'MU' => 'మారిషస్',
  			'MV' => 'మాల్దీవులు',
- 			'MW' => 'మాలావి',
+ 			'MW' => 'మలావీ',
  			'MX' => 'మెక్సికో',
  			'MY' => 'మలేషియా',
  			'MZ' => 'మొజాంబిక్',
@@ -959,7 +959,7 @@ has 'display_name_region' => (
  			'NR' => 'నౌరు',
  			'NU' => 'నియూ',
  			'NZ' => 'న్యూజిలాండ్',
- 			'OM' => 'ఒమన్',
+ 			'OM' => 'ఓమన్',
  			'PA' => 'పనామా',
  			'PE' => 'పెరూ',
  			'PF' => 'ఫ్రెంచ్ పోలినీషియా',
@@ -977,8 +977,8 @@ has 'display_name_region' => (
  			'PY' => 'పరాగ్వే',
  			'QA' => 'ఖతార్',
  			'QO' => 'ఒషీనియా బయటున్నవి',
- 			'RE' => 'రియూనియన్',
- 			'RO' => 'రోమానియా',
+ 			'RE' => 'రీయూనియన్',
+ 			'RO' => 'రోమేనియా',
  			'RS' => 'సెర్బియా',
  			'RU' => 'రష్యా',
  			'RW' => 'రువాండా',
@@ -990,21 +990,21 @@ has 'display_name_region' => (
  			'SG' => 'సింగపూర్',
  			'SH' => 'సెయింట్ హెలెనా',
  			'SI' => 'స్లోవేనియా',
- 			'SJ' => 'స్వాల్‌బార్డ్ & జాన్ మాయెన్',
- 			'SK' => 'స్లోవేకియా',
+ 			'SJ' => 'స్వాల్‌బార్డ్ మరియు జాన్ మాయెన్',
+ 			'SK' => 'స్లొవేకియా',
  			'SL' => 'సియెర్రా లియాన్',
  			'SM' => 'శాన్ మారినో',
  			'SN' => 'సెనెగల్',
  			'SO' => 'సోమాలియా',
  			'SR' => 'సూరినామ్',
  			'SS' => 'దక్షిణ సూడాన్',
- 			'ST' => 'సావోటోమ్ & ప్రిన్సిపే',
+ 			'ST' => 'సావో టోమ్ మరియు ప్రిన్సిపి',
  			'SV' => 'ఎల్ సాల్వడోర్',
  			'SX' => 'సింట్ మార్టెన్',
  			'SY' => 'సిరియా',
  			'SZ' => 'స్వాజిల్యాండ్',
  			'TA' => 'ట్రిస్టన్ డ కన్హా',
- 			'TC' => 'టర్క్స్ & కైకోస్ దీవులు',
+ 			'TC' => 'టర్క్స్ మరియు కైకోస్ దీవులు',
  			'TD' => 'చాద్',
  			'TF' => 'ఫ్రెంచ్ దక్షిణ ప్రాంతాలు',
  			'TG' => 'టోగో',
@@ -1015,7 +1015,7 @@ has 'display_name_region' => (
  			'TL@alt=variant' => 'తూర్పు టిమోర్',
  			'TM' => 'టర్క్‌మెనిస్తాన్',
  			'TN' => 'ట్యునీషియా',
- 			'TO' => 'టాంగా',
+ 			'TO' => 'టోంగా',
  			'TR' => 'టర్కీ',
  			'TT' => 'ట్రినిడాడ్ మరియు టొబాగో',
  			'TV' => 'టువాలు',
@@ -1031,13 +1031,13 @@ has 'display_name_region' => (
  			'UY' => 'ఉరుగ్వే',
  			'UZ' => 'ఉజ్బెకిస్తాన్',
  			'VA' => 'వాటికన్ నగరం',
- 			'VC' => 'సెయింట్ విన్సెంట్ & గ్రెనడీన్స్',
+ 			'VC' => 'సెయింట్ విన్సెంట్ మరియు గ్రెనడీన్స్',
  			'VE' => 'వెనిజులా',
  			'VG' => 'బ్రిటిష్ వర్జిన్ దీవులు',
  			'VI' => 'యు.ఎస్. వర్జిన్ దీవులు',
  			'VN' => 'వియత్నాం',
  			'VU' => 'వనాటు',
- 			'WF' => 'వాలిస్ & ఫ్యుత్యునా',
+ 			'WF' => 'వాల్లిస్ మరియు ఫుటునా',
  			'WS' => 'సమోవా',
  			'XK' => 'కొసోవో',
  			'YE' => 'యెమెన్',
@@ -1370,6 +1370,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(కార్డినల్ దిశ),
+					},
 					'acre' => {
 						'name' => q(ఎకరాలు),
 						'one' => q({0} ఎకరం),
@@ -1399,6 +1402,11 @@ has 'units' => (
 						'name' => q(ఖగోళ ప్రమాణాలు),
 						'one' => q({0} ఖగోళ ప్రమాణం),
 						'other' => q({0} ఖగోళ ప్రమాణాలు),
+					},
+					'atmosphere' => {
+						'name' => q(వాతావరణాలు),
+						'one' => q({0} వాతావరణం),
+						'other' => q({0} వాతావరణాలు),
 					},
 					'bit' => {
 						'name' => q(బిట్‌లు),
@@ -1921,6 +1929,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(శాతం),
+						'one' => q({0} శాతం),
+						'other' => q({0} శాతం),
+					},
+					'permille' => {
+						'name' => q(మైలుకు),
+						'one' => q({0}/మైలుకు),
+						'other' => q({0}/మైలుకు),
+					},
+					'petabyte' => {
+						'name' => q(పెటాబైట్లు),
+						'one' => q({0} పెటాబైట్),
+						'other' => q({0} పెటాబైట్లు),
+					},
 					'picometer' => {
 						'name' => q(పికోమీటర్లు),
 						'one' => q({0} పికోమీటరు),
@@ -2072,6 +2095,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(దిశ),
+					},
 					'acre' => {
 						'one' => q({0} ఎక.),
 						'other' => q({0} ఎక.),
@@ -2286,6 +2312,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'one' => q({0} పి.మీ),
 						'other' => q({0} పి.మీ),
@@ -2353,6 +2384,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(దిశ),
+					},
 					'acre' => {
 						'name' => q(ఎకరాలు),
 						'one' => q({0} ఎక.),
@@ -2382,6 +2416,11 @@ has 'units' => (
 						'name' => q(au),
 						'one' => q(au),
 						'other' => q({0} au),
+					},
+					'atmosphere' => {
+						'name' => q(వాతావ),
+						'one' => q({0} వాతావ),
+						'other' => q({0} వాతావ),
 					},
 					'bit' => {
 						'name' => q(బిట్),
@@ -2555,9 +2594,9 @@ has 'units' => (
 						'other' => q({0} జీబీ),
 					},
 					'gigahertz' => {
-						'name' => q(గిగా హె),
-						'one' => q({0} గిగా హె),
-						'other' => q({0} గిగా హె),
+						'name' => q(గిగా హెడ్జ్),
+						'one' => q({0} గిగా హెడ్జ్),
+						'other' => q({0} గిగా హెడ్జ్),
 					},
 					'gigawatt' => {
 						'name' => q(గి.వా),
@@ -2901,6 +2940,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(శాతం),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(మైలుకు),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(పె.బైట్),
+						'one' => q({0} పీబీ),
+						'other' => q({0} పీబీ),
 					},
 					'picometer' => {
 						'name' => q(పి.మీ.),
@@ -3904,9 +3958,9 @@ has 'currencies' => (
 		'JPY' => {
 			symbol => 'JP¥',
 			display_name => {
-				'currency' => q(జపాను దేశ యెస్),
-				'one' => q(జపాను దేశ యెస్),
-				'other' => q(జపాను దేశ యెస్),
+				'currency' => q(జపాను దేశ యెన్),
+				'one' => q(జపాను దేశ యెన్),
+				'other' => q(జపాను దేశ యెన్),
 			},
 		},
 		'KES' => {
@@ -4107,6 +4161,7 @@ has 'currencies' => (
 			},
 		},
 		'MRU' => {
+			symbol => 'MRU',
 			display_name => {
 				'currency' => q(మౌరిటానియన్ ఒగ్యియా),
 				'one' => q(మౌరిటానియన్ ఒగ్యియా),
@@ -4417,7 +4472,7 @@ has 'currencies' => (
 			},
 		},
 		'STN' => {
-			symbol => 'Db',
+			symbol => 'STN',
 			display_name => {
 				'currency' => q(సావో టోమ్ మరియు ప్రిన్సిపి డోబ్రా),
 				'one' => q(సావో టోమ్ మరియు ప్రిన్సిపి డోబ్రా),
@@ -4554,6 +4609,14 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			symbol => 'VEF',
+			display_name => {
+				'currency' => q(వెనుజులా బోలివర్ \(2008–2018\)),
+				'one' => q(వెనుజులా బోలివర్ \(2008–2018\)),
+				'other' => q(వెనుజులా బోలివర్‌లు \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
 			display_name => {
 				'currency' => q(వెనుజులా బోలివర్),
 				'one' => q(వెనుజులా బోలివర్),
@@ -5713,243 +5776,243 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'persian') {
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'coptic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'ethiopic') {
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'indian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'buddhist') {
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'roc') {
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'coptic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'hebrew') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'indian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -5970,59 +6033,59 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'afternoon1' => q{మధ్యాహ్నం},
-					'midnight' => q{అర్ధరాత్రి},
-					'evening1' => q{సాయంత్రం},
 					'am' => q{AM},
-					'night1' => q{రాత్రి},
 					'morning1' => q{ఉదయం},
 					'pm' => q{PM},
-				},
-				'narrow' => {
-					'night1' => q{రాత్రి},
-					'morning1' => q{ఉదయం},
-					'pm' => q{సా},
 					'midnight' => q{అర్ధరాత్రి},
 					'evening1' => q{సాయంత్రం},
+					'night1' => q{రాత్రి},
 					'afternoon1' => q{మధ్యాహ్నం},
+				},
+				'narrow' => {
+					'afternoon1' => q{మధ్యాహ్నం},
+					'night1' => q{రాత్రి},
+					'evening1' => q{సాయంత్రం},
+					'pm' => q{సా},
+					'midnight' => q{అర్ధరాత్రి},
+					'morning1' => q{ఉదయం},
 					'am' => q{ఉ},
 				},
 				'wide' => {
-					'pm' => q{PM},
-					'morning1' => q{ఉదయం},
 					'night1' => q{రాత్రి},
-					'am' => q{AM},
-					'midnight' => q{అర్ధరాత్రి},
-					'evening1' => q{సాయంత్రం},
 					'afternoon1' => q{మధ్యాహ్నం},
+					'morning1' => q{ఉదయం},
+					'am' => q{AM},
+					'evening1' => q{సాయంత్రం},
+					'pm' => q{PM},
+					'midnight' => q{అర్ధరాత్రి},
 				},
 			},
 			'stand-alone' => {
+				'wide' => {
+					'morning1' => q{ఉదయం},
+					'am' => q{AM},
+					'evening1' => q{సాయంత్రం},
+					'midnight' => q{అర్ధరాత్రి},
+					'pm' => q{PM},
+					'night1' => q{రాత్రి},
+					'afternoon1' => q{మధ్యాహ్నం},
+				},
 				'narrow' => {
 					'am' => q{AM},
-					'afternoon1' => q{మధ్యాహ్నం},
-					'midnight' => q{అర్ధరాత్రి},
-					'evening1' => q{సాయంత్రం},
-					'pm' => q{PM},
 					'morning1' => q{ఉదయం},
-					'night1' => q{రాత్రి},
-				},
-				'wide' => {
-					'pm' => q{PM},
-					'morning1' => q{ఉదయం},
-					'night1' => q{రాత్రి},
-					'am' => q{AM},
-					'afternoon1' => q{మధ్యాహ్నం},
-					'evening1' => q{సాయంత్రం},
 					'midnight' => q{అర్ధరాత్రి},
+					'pm' => q{PM},
+					'evening1' => q{సాయంత్రం},
+					'night1' => q{రాత్రి},
+					'afternoon1' => q{మధ్యాహ్నం},
 				},
 				'abbreviated' => {
-					'pm' => q{PM},
-					'morning1' => q{ఉదయం},
-					'night1' => q{రాత్రి},
 					'am' => q{AM},
-					'evening1' => q{సాయంత్రం},
+					'morning1' => q{ఉదయం},
+					'pm' => q{PM},
 					'midnight' => q{అర్ధరాత్రి},
+					'evening1' => q{సాయంత్రం},
+					'night1' => q{రాత్రి},
 					'afternoon1' => q{మధ్యాహ్నం},
 				},
 			},

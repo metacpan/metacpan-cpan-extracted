@@ -1,9 +1,9 @@
-package Pcore::Ext v0.19.5;
+package Pcore::Ext v0.19.7;
 
 use Pcore -dist, -class;
 use Pcore::Util::Scalar qw[is_ref];
 use Package::Stash::XS qw[];
-use Pcore::Ext::Build::Class;
+use Pcore::Ext::App::Class;
 
 has namespace => ( required => 1 );
 
@@ -50,7 +50,7 @@ sub _load_module ( $self, $module ) {
 
     if ( exists $MODULES->{$module} ) {
         for my $class ( keys $MODULES->{$module}->%* ) {
-            $self->{classes}->{$class} = Pcore::Ext::Build::Class->new( $MODULES->{$module}->{$class}->%*, app => $self );
+            $self->{classes}->{$class} = Pcore::Ext::App::Class->new( $MODULES->{$module}->{$class}->%*, app => $self );
 
             $classes->{$class} = 1;
         }
@@ -112,7 +112,7 @@ sub _load_module ( $self, $module ) {
             # set ExtJS class name
             $MODULES->{$module}->{$path}->{name} //= "$prefix/$name" =~ s[/][.]smgr;
 
-            my $class = $self->{classes}->{$path} = Pcore::Ext::Build::Class->new( $MODULES->{$module}->{$path}->%*, app => $self );
+            my $class = $self->{classes}->{$path} = Pcore::Ext::App::Class->new( $MODULES->{$module}->{$path}->%*, app => $self );
 
             $classes->{$path} = 1;
         }
@@ -282,8 +282,8 @@ sub _build_class ( $self, $class, $requires ) {
     die qq[Do not use "requires" for class "$class->{path}"] if exists $class->{build}->{requires};
 
     # set build data
-    $class->{build}->{extend}   = Pcore::Ext::Build::Class::Ctx::Class->new( class => $class, name => $class->{extend} )   if $class->{extend};
-    $class->{build}->{override} = Pcore::Ext::Build::Class::Ctx::Class->new( class => $class, name => $class->{override} ) if $class->{override};
+    $class->{build}->{extend}   = Pcore::Ext::App::Class::Ctx::Class->new( class => $class, name => $class->{extend} )   if $class->{extend};
+    $class->{build}->{override} = Pcore::Ext::App::Class::Ctx::Class->new( class => $class, name => $class->{override} ) if $class->{override};
     $class->{build}->{alias} = "$class->{type}.$class->{alias}" if $class->{alias};
 
     # generate

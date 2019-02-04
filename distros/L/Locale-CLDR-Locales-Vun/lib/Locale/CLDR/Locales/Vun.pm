@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Vun - Package for language Vunjo
 
 package Locale::CLDR::Locales::Vun;
 # This file auto generated from Data\common\main\vun.xml
-#	on Sun  7 Oct 11:06:38 am GMT
+#	on Sun  3 Feb  2:26:07 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -843,12 +843,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{utuko},
 					'pm' => q{kyiukonyi},
+					'am' => q{utuko},
 				},
 				'wide' => {
-					'am' => q{utuko},
 					'pm' => q{kyiukonyi},
+					'am' => q{utuko},
 				},
 			},
 		},
@@ -928,7 +928,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -951,7 +951,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

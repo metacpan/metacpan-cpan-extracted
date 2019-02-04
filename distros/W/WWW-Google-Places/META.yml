@@ -22,43 +22,43 @@ no_index:
 provides:
   WWW::Google::Places:
     file: lib/WWW/Google/Places.pm
-    version: '0.35'
+    version: '0.36'
   WWW::Google::Places::Address:
     file: lib/WWW/Google/Places/Address.pm
-    version: '0.35'
+    version: '0.36'
   WWW::Google::Places::DetailResult:
     file: lib/WWW/Google/Places/DetailResult.pm
-    version: '0.35'
+    version: '0.36'
   WWW::Google::Places::Geometry:
     file: lib/WWW/Google/Places/Geometry.pm
-    version: '0.35'
+    version: '0.36'
   WWW::Google::Places::Location:
     file: lib/WWW/Google/Places/Location.pm
-    version: '0.35'
+    version: '0.36'
   WWW::Google::Places::Params:
     file: lib/WWW/Google/Places/Params.pm
-    version: '0.35'
+    version: '0.36'
   WWW::Google::Places::Photo:
     file: lib/WWW/Google/Places/Photo.pm
-    version: '0.35'
+    version: '0.36'
   WWW::Google::Places::Review:
     file: lib/WWW/Google/Places/Review.pm
-    version: '0.35'
+    version: '0.36'
   WWW::Google::Places::Review::Aspect:
     file: lib/WWW/Google/Places/Review/Aspect.pm
-    version: '0.35'
+    version: '0.36'
   WWW::Google::Places::SearchResult:
     file: lib/WWW/Google/Places/SearchResult.pm
-    version: '0.35'
+    version: '0.36'
 requires:
   File::Share: '0.25'
   JSON: '2.53'
   Method::ParamValidator: '0.10'
   Moo: '2.000000'
-  WWW::Google::UserAgent: '0.21'
+  WWW::Google::UserAgent: '0.22'
   namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/WWW-Google-Places.git
-version: '0.35'
+version: '0.36'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

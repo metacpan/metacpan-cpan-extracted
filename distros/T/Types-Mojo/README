@@ -1,0 +1,206 @@
+NAME
+
+    Types::Mojo - Types related to Mojo
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+        package MyClass;
+        
+        use Moo;
+        use Types::Mojo qw(MojoFile MojoCollection);
+        
+        has file => ( is => 'rw', isa => MojoFile, coerce => 1 );
+        has coll => ( is => 'rw', isa => MojoCollection, coerce => 1 );
+        has ints => ( is => 'rw', isa => MojoCollection[Int] );
+        
+        1;
+
+    In the script
+
+        use MyClass;
+        my $object = MyClass->new( file => __FILE__ ); # will be coerced into a Mojo::File object
+        say $object->file->move_to( '/path/to/new/location' );
+    
+        my $object2 = MyClass->new( coll => [qw/a b/] );
+        $object2->coll->each(sub {
+            say $_;
+        });
+
+TYPES
+
+ MojoCollection[`a]
+
+    An object of Mojo::Collection. Can be parameterized with an other
+    Type::Tiny type.
+
+        has ints => ( is => 'rw', isa => MojoCollection[Int] );
+
+    will accept only a Mojo::Collection of integers.
+
+ MojoFile
+
+    An object of Mojo::File
+
+ MojoFileList
+
+    A MojoCollection of MojoFiles.
+
+COERCIONS
+
+    These coercions are defined.
+
+ To MojoCollection
+
+      * Array reference to MojoCollection
+
+      In a class
+
+          package Test;
+          
+          use Moo;
+          use Types::Mojo qw(MojoCollection);
+          
+          has 'collection' => ( is => 'ro', isa => MojoCollection, coerce => 1 );
+          
+          1;
+
+      In the script
+
+          use Test;
+      
+          use v5.22;
+          use feature 'postderef';
+      
+          my $obj = Test->new(
+              collection => [ 1, 2 ],
+          );
+          
+          my $sqrs = $obj->collection->map( sub { $_ ** 2 } );
+          say $_ for $sqrs->to_array->@*;
+
+ To MojoFile
+
+      * String to MojoFile
+
+      In a class
+
+          package Test;
+          
+          use Moo;
+          use Types::Mojo qw(MojoFile);
+          
+          has 'file' => ( is => 'ro', isa => MojoFile, coerce => 1 );
+          
+          1;
+
+      In the script
+
+          use Test;
+      
+          use v5.22;
+      
+          my $obj = Test->new(
+              file => __FILE__,
+          );
+          
+          say $obj->file->slurp;
+
+ To MojoFileList
+
+      * MojoCollection of Strings
+
+      In a class
+
+          package Test;
+          
+          use Moo;
+          use Types::Mojo qw(MojoFile);
+          
+          has 'files' => ( is => 'ro', isa => MojoFileList, coerce => 1 );
+          
+          1;
+
+      In the script
+
+          use Test;
+      
+          use v5.22;
+      
+          my $obj = Test->new(
+              files => Mojo::Collection->(__FILE__),
+          );
+      
+          for my $file ( @{ $obj->files->to_array } ) {
+              say $file->basename;
+          }
+
+      * Array of Strings
+
+      In a class
+
+          package Test;
+          
+          use Moo;
+          use Types::Mojo qw(MojoFile);
+          
+          has 'files' => ( is => 'ro', isa => MojoFileList, coerce => 1 );
+          
+          1;
+
+      In the script
+
+          use Test;
+      
+          use v5.22;
+      
+          my $obj = Test->new(
+              files => [__FILE__],
+          );
+      
+          for my $file ( @{ $obj->files->to_array } ) {
+              say $file->basename;
+          }
+
+      * Array of MojoFile
+
+      In a class
+
+          package Test;
+          
+          use Moo;
+          use Types::Mojo qw(MojoFileList);
+          
+          has 'files' => ( is => 'ro', isa => MojoFileList, coerce => 1 );
+          
+          1;
+
+      In the script
+
+          use Test;
+      
+          use v5.22;
+      
+          my $obj = Test->new(
+              files => [Mojo::File->new(__FILE__)],
+          );
+      
+          for my $file ( @{ $obj->files->to_array } ) {
+              say $file->basename;
+          }
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

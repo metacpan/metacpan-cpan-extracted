@@ -322,7 +322,7 @@ subtest 'installer = ModuleBuildTiny, StaticInstall.mode = off' => sub {
 
 foreach my $static (undef, 'off', 'on')
 {
-    subtest 'default installer (MakeMaker::Fallback, ModuleBuildTiny::Fallback), StaticInstall.mode = ' . ($static // '<undef>') => sub {
+    subtest 'installer (MakeMaker::Fallback, ModuleBuildTiny::Fallback), StaticInstall.mode = ' . ($static // '<undef>') => sub {
         my $tempdir = no_git_tempdir();
         my $tzil = Builder->from_config(
             { dist_root => 'does-not-exist' },
@@ -334,8 +334,10 @@ foreach my $static (undef, 'off', 'on')
                         [ '@Author::TABULO' => {
                             '-remove' => \@REMOVED_PLUGINS,
                             server => 'none',
+                            installer => [ qw(MakeMaker::Fallback ModuleBuildTiny::Fallback) ],
                             'RewriteVersion::Transitional.skip_version_provider' => 1,
                             'Test::MinimumVersion.max_target_perl' => '5.008',
+#                            'no_author_specific_prefs' => 1,        # TAU : so that author-specific installer prefs don't spoil the tests which count on certain defaults
                             defined $static ? ( 'StaticInstall.mode' => $static ) : (),
                           },
                         ],

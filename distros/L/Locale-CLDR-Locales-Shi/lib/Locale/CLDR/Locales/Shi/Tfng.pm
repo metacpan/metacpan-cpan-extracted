@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Shi::Tfng - Package for language Tachelhit
 
 package Locale::CLDR::Locales::Shi::Tfng;
 # This file auto generated from Data\common\main\shi_Tfng.xml
-#	on Sun  7 Oct 10:57:25 am GMT
+#	on Sun  3 Feb  2:17:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

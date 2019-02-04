@@ -43,7 +43,7 @@
             "PerlX::Maybe" : "0",
             "URI" : "0",
             "URL::Encode" : "0",
-            "perl" : "5.008"
+            "perl" : "5.008008"
          }
       },
       "test" : {
@@ -52,6 +52,7 @@
             "Data::Dumper" : "0",
             "HTTP::CookieJar" : "0",
             "HTTP::CookieJar::LWP" : "0",
+            "IO::Socket::SSL" : "0",
             "LWP::UserAgent" : "0",
             "Path::Tiny" : "0",
             "Test::HTTP::LocalServer" : "0.61",
@@ -68,7 +69,7 @@
          "web" : "https://github.com/Corion/HTTP-Request-FromCurl"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

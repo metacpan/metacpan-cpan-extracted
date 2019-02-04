@@ -1,7 +1,7 @@
 package Config::IOD::Reader;
 
 our $DATE = '2019-01-17'; # DATE
-our $VERSION = '0.341'; # VERSION
+our $VERSION = '0.342'; # VERSION
 
 use 5.010001;
 use strict;
@@ -230,7 +230,7 @@ Config::IOD::Reader - Read IOD/INI configuration files
 
 =head1 VERSION
 
-This document describes version 0.341 of Config::IOD::Reader (from Perl distribution Config-IOD-Reader), released on 2019-01-17.
+This document describes version 0.342 of Config::IOD::Reader (from Perl distribution Config-IOD-Reader), released on 2019-01-17.
 
 =head1 SYNOPSIS
 
@@ -238,6 +238,7 @@ This document describes version 0.341 of Config::IOD::Reader (from Perl distribu
  my $reader = Config::IOD::Reader->new(
      # list of known attributes, with their default values
      # default_section     => 'GLOBAL',
+     # enable_directive    => 1,
      # enable_encoding     => 1,
      # enable_quoting      => 1,
      # enable_backet       => 1,

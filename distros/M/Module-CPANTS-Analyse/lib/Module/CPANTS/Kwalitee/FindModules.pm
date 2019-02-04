@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 $VERSION =~ s/_//; ## no critic
 
 sub order { 30 }
@@ -39,6 +39,8 @@ sub analyse {
             push @{$me->d->{modules}}, $found;
             if (exists $me->d->{files_hash}{$file}) {
                 $me->d->{files_hash}{$file}{module} = $module;
+            } else {
+                $found->{not_exists} = 1;
             }
         }
     }
@@ -150,6 +152,29 @@ sub kwalitee_indicators {
                 my @modules = @{$d->{modules} || []};
                 return "No modules were found" unless @modules;
                 return "The following files were found: ".$d->{error}{proper_libs};
+            },
+        },
+        {
+            name => 'no_missing_files_in_provides',
+            error => q{Provides field in the META.yml lists a file that does not found in the distribution.},
+            remedy => q{Use authoring tool like Dist::Zilla, Milla, and Minilla to generate correct provides.},
+            is_extra => 1,
+            code => sub {
+                my $d = shift;
+                my @modules = @{$d->{modules} || []};
+                return 1 unless @modules;
+
+                if (my @not_exists = grep { $_->{not_exists} } @modules) {
+                    $d->{error}{no_missing_files_in_provides} = join ', ', map {$_->{file}} @not_exists;
+                    return 0;
+                }
+                return 1;
+            },
+            details => sub {
+                my $d = shift;
+                my @modules = @{$d->{modules} || []};
+                return "No modules were found" unless @modules;
+                return "The following files were missing: ".$d->{error}{no_missing_files_in_provides};
             },
         },
     ];

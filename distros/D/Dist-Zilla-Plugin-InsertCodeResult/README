@@ -3,9 +3,9 @@ NAME
     into your POD
 
 VERSION
-    This document describes version 0.050 of
+    This document describes version 0.051 of
     Dist::Zilla::Plugin::InsertCodeResult (from Perl distribution
-    Dist-Zilla-Plugin-InsertCodeResult), released on 2018-04-06.
+    Dist-Zilla-Plugin-InsertCodeResult), released on 2019-02-04.
 
 SYNOPSIS
     In dist.ini:
@@ -48,7 +48,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2015, 2014 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

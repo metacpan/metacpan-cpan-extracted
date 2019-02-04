@@ -1,12 +1,12 @@
 package Locale::CLDR::LikelySubtags;
 # This file auto generated from Data\common\supplemental\likelySubtags.xml
-#	on Sun  7 Oct 10:18:07 am GMT
+#	on Sun  3 Feb  1:37:01 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -502,7 +502,7 @@ has 'likely_subtags' => (
 		'hui'	=> 'hui_Latn_ZZ',
 		'hy'	=> 'hy_Armn_AM',
 		'hz'	=> 'hz_Latn_NA',
-		'ia'	=> 'ia_Latn_FR',
+		'ia'	=> 'ia_Latn_001',
 		'ian'	=> 'ian_Latn_ZZ',
 		'iar'	=> 'iar_Latn_ZZ',
 		'iba'	=> 'iba_Latn_MY',

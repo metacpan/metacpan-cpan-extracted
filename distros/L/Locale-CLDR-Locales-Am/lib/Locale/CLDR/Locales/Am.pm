@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Am - Package for language Amharic
 
 package Locale::CLDR::Locales::Am;
 # This file auto generated from Data\common\main\am.xml
-#	on Sun  7 Oct 10:19:25 am GMT
+#	on Sun  3 Feb  1:38:14 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -306,7 +306,7 @@ has 'display_name_language' => (
  				'as' => 'አሳሜዛዊ',
  				'asa' => 'አሱ',
  				'ase' => 'የአሜሪካ የምልክት ቋንቋ',
- 				'ast' => 'አውስትሪያን',
+ 				'ast' => 'አስቱሪያን',
  				'av' => 'አቫሪክ',
  				'awa' => 'አዋድሂ',
  				'ay' => 'አያማርኛ',
@@ -393,7 +393,7 @@ has 'display_name_language' => (
  				'dsb' => 'የታችኛው ሰርቢያንኛ',
  				'dtp' => 'ሴንተራል ዱሰን',
  				'dua' => 'ዱዋላኛ',
- 				'dv' => 'ዲቬህ',
+ 				'dv' => 'ዲቬሂ',
  				'dyo' => 'ጆላ ፎንያኛ',
  				'dyu' => 'ድዩላ',
  				'dz' => 'ድዞንግኻኛ',
@@ -517,7 +517,7 @@ has 'display_name_language' => (
  				'ks' => 'ካሽሚርኛ',
  				'ksb' => 'ሻምባላ',
  				'ksf' => 'ባፊያ',
- 				'ksh' => 'ኮሎኝያን',
+ 				'ksh' => 'ኮሎኝኛ',
  				'ku' => 'ኩርድሽኛ',
  				'kum' => 'ኩማይክ',
  				'kv' => 'ኮሚ',
@@ -561,7 +561,7 @@ has 'display_name_language' => (
  				'min' => 'ሚናንግካባኡ',
  				'mk' => 'ማሴዶንኛ',
  				'ml' => 'ማላያላምኛ',
- 				'mn' => 'ሞንጎላዊኛ',
+ 				'mn' => 'ሞንጎሊያኛ',
  				'mni' => 'ማኒፑሪ',
  				'moh' => 'ሞሃውክ',
  				'mos' => 'ሞሲ',
@@ -584,7 +584,7 @@ has 'display_name_language' => (
  				'nds' => 'የታችኛው ጀርመን',
  				'nds_NL' => 'የታችኛው ሳክሰን',
  				'ne' => 'ኔፓሊኛ',
- 				'new' => 'ነዋሪ',
+ 				'new' => 'ኒዋሪ(ኔፓል)',
  				'ng' => 'ንዶንጋ',
  				'nia' => 'ኒአስ',
  				'niu' => 'ኒዩአንኛ',
@@ -669,7 +669,7 @@ has 'display_name_language' => (
  				'snk' => 'ሶኒንኬ',
  				'so' => 'ሱማልኛ',
  				'sq' => 'አልባንያንኛ',
- 				'sr' => 'ሰርቢኛ',
+ 				'sr' => 'ሰርብያኛ',
  				'srn' => 'ስራናን ቶንጎ',
  				'ss' => 'ስዋቲኛ',
  				'ssy' => 'ሳሆኛ',
@@ -707,7 +707,7 @@ has 'display_name_language' => (
  				'twq' => 'ታሳዋቅ',
  				'ty' => 'ታሂታንኛ',
  				'tyv' => 'ቱቪንያንኛ',
- 				'tzm' => 'መካከለኛ አትላስ ታማዚግት',
+ 				'tzm' => 'መካከለኛው አትላስ ታማዚኛ',
  				'udm' => 'ኡድሙርት',
  				'ug' => 'ኡዊግሁርኛ',
  				'ug@alt=variant' => 'ኡይገር',
@@ -864,17 +864,17 @@ has 'display_name_region' => (
  			'019' => 'አሜሪካ',
  			'021' => 'ሰሜናዊ አሜሪካ',
  			'029' => 'ካሪቢያን',
- 			'030' => 'ምዕራባዊ እሲያ',
+ 			'030' => 'ምስራቃዊ እስያ',
  			'034' => 'ደቡባዊ እሲያ',
  			'035' => 'ምዕራባዊ ደቡብ እሲያ',
  			'039' => 'ደቡባዊ አውሮፓ',
- 			'053' => 'አውስትራሊያ',
+ 			'053' => 'አውስትራሌዥያ',
  			'054' => 'ሜላኔዥያ',
  			'057' => 'የማይክሮኔዥያን ክልል',
  			'061' => 'ፖሊኔዥያ',
  			'142' => 'እሲያ',
  			'143' => 'መካከለኛው እሲያ',
- 			'145' => 'ምስራቃዊ እሲያ',
+ 			'145' => 'ምዕራባዊ እስያ',
  			'150' => 'አውሮፓ',
  			'151' => 'ምዕራባዊ አውሮፓ',
  			'154' => 'ሰሜናዊ አውሮፓ',
@@ -939,9 +939,9 @@ has 'display_name_region' => (
  			'CU' => 'ኩባ',
  			'CV' => 'ኬፕ ቬርዴ',
  			'CW' => 'ኩራሳዎ',
- 			'CX' => 'የገና ደሴት',
+ 			'CX' => 'ክሪስማስ ደሴት',
  			'CY' => 'ሳይፕረስ',
- 			'CZ' => 'ቼችኒያ',
+ 			'CZ' => 'ቼቺያ',
  			'CZ@alt=variant' => 'ቼክ ሪፑብሊክ',
  			'DE' => 'ጀርመን',
  			'DG' => 'ዲዬጎ ጋርሺያ',
@@ -969,7 +969,7 @@ has 'display_name_region' => (
  			'FR' => 'ፈረንሳይ',
  			'GA' => 'ጋቦን',
  			'GB' => 'ዩናይትድ ኪንግደም',
- 			'GB@alt=short' => 'ዩናይትድ ኪንግደም',
+ 			'GB@alt=short' => 'ዩኬ',
  			'GD' => 'ግሬናዳ',
  			'GE' => 'ጆርጂያ',
  			'GF' => 'የፈረንሳይ ጉዊአና',
@@ -1120,7 +1120,7 @@ has 'display_name_region' => (
  			'TH' => 'ታይላንድ',
  			'TJ' => 'ታጃኪስታን',
  			'TK' => 'ቶክላው',
- 			'TL' => 'ምስራቅ ሌስት',
+ 			'TL' => 'ቲሞር ሌስቴ',
  			'TL@alt=variant' => 'ምስራቅ ቲሞር',
  			'TM' => 'ቱርክሜኒስታን',
  			'TN' => 'ቱኒዚያ',
@@ -1205,7 +1205,7 @@ has 'display_name_type' => (
  				'gregorian' => q{የግሪጎሪያን የቀን አቆጣጠር},
  				'hebrew' => q{የእብራዊያን የቀን አቆጣጠር},
  				'indian' => q{የህንድ ብሔራዊ የቀን አቆጣጠር},
- 				'islamic' => q{የእስላማዊ የሰዓት አቆጣጠር},
+ 				'islamic' => q{እስላማዊ የቀን አቆጣጠር},
  				'islamic-civil' => q{የእስላም ህዝባዊ የቀን አቆጣጠር},
  				'iso8601' => q{ISO-8601 የቀን አቆጣጠር},
  				'japanese' => q{የጃፓን የቀን አቆጣጠር},
@@ -1266,7 +1266,7 @@ has 'display_name_type' => (
  			},
  			'd0' => {
  				'fwidth' => q{ሙሉ ወርድ},
- 				'hwidth' => q{ሃልፍዊድዝ},
+ 				'hwidth' => q{ግማሽ ወርድ},
  				'npinyin' => q{አሃዛዊ},
  			},
  			'hc' => {
@@ -1296,7 +1296,7 @@ has 'display_name_type' => (
  				'armnlow' => q{የአሜሪካን ንዑስ ሆሄ አሃዞች},
  				'beng' => q{የቤንጋሊ አሃዞች},
  				'deva' => q{የዴቫንጋሪ አሃዞች},
- 				'ethi' => q{የኢትዮፒክ ቁጥሮች},
+ 				'ethi' => q{የኢትዮጵያ ቁጥሮች},
  				'finance' => q{የፋይናንስ ቁጥሮች},
  				'fullwide' => q{የሙሉ ወርድ አሃዞች},
  				'geor' => q{የጆርጂያን ቁጥሮች},
@@ -1454,6 +1454,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(ዓቢይ አቅጣጫ),
+					},
 					'acre' => {
 						'name' => q(ኤክር),
 						'one' => q({0} ኤክር),
@@ -1483,6 +1486,11 @@ has 'units' => (
 						'name' => q(au),
 						'one' => q({0} au),
 						'other' => q({0} au),
+					},
+					'atmosphere' => {
+						'name' => q(ከባቢ አየር),
+						'one' => q({0} ከባቢ አየር),
+						'other' => q({0} ከባቢ አየር),
 					},
 					'bit' => {
 						'name' => q(ቢት),
@@ -2000,6 +2008,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0} በ{1}),
 					},
+					'percent' => {
+						'name' => q(ፐርሰንት),
+						'one' => q({0} ፐርሰንት),
+						'other' => q({0} ፐርሰንት),
+					},
+					'permille' => {
+						'name' => q(በማይል),
+						'one' => q({0} በማይል),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(ፔታ ባይት),
+						'one' => q({0} ፔታ ባይት),
+						'other' => q({0} ፔታ ባይቶች),
+					},
 					'picometer' => {
 						'name' => q(ፒኮሜትር),
 						'one' => q({0} ፒኮሜትር),
@@ -2103,7 +2126,7 @@ has 'units' => (
 						'other' => q({0} tsp),
 					},
 					'terabit' => {
-						'name' => q(ቴባ),
+						'name' => q(ቴራባይትስ),
 						'one' => q({0} ቴባ),
 						'other' => q({0} ቴባ),
 					},
@@ -2146,6 +2169,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(አቅጣጫ),
+					},
 					'acre' => {
 						'one' => q({0} ኤክር),
 						'other' => q({0} ኤክር),
@@ -2314,6 +2340,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'one' => q({0} ፒሜ),
 						'other' => q({0} ፒሜ),
@@ -2366,6 +2397,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(አቅጣጫ),
+					},
 					'acre' => {
 						'name' => q(ኤክር),
 						'one' => q({0} ኤክር),
@@ -2395,6 +2429,11 @@ has 'units' => (
 						'name' => q(au),
 						'one' => q({0} au),
 						'other' => q({0} au),
+					},
+					'atmosphere' => {
+						'name' => q(ከባቢ አየር),
+						'one' => q({0} ከባቢ አየር),
+						'other' => q({0} ከባቢ አየር),
 					},
 					'bit' => {
 						'name' => q(ቢት),
@@ -2911,6 +2950,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(ፐርሰንት),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(በማይል),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(ፔ ባይት),
+						'one' => q({0} ፔባ),
+						'other' => q({0} ፔባ),
 					},
 					'picometer' => {
 						'name' => q(ፒኮሜትር),
@@ -4102,6 +4156,7 @@ has 'currencies' => (
 			},
 		},
 		'MRU' => {
+			symbol => 'MRU',
 			display_name => {
 				'currency' => q(የሞሪቴኒያ ኦውጉያ),
 				'one' => q(የሞሪቴኒያ ኦውጉያ),
@@ -4335,14 +4390,16 @@ has 'currencies' => (
 		'SDG' => {
 			symbol => 'SDG',
 			display_name => {
-				'currency' => q(የሱዳን ዲናር),
-				'one' => q(የሱዳን ዲናር),
-				'other' => q(የሱዳን ዲናር),
+				'currency' => q(የሱዳን ፓውንድ),
+				'one' => q(የሱዳን ፓውንድ),
+				'other' => q(የሱዳን ፓውንድ),
 			},
 		},
 		'SDP' => {
 			display_name => {
-				'currency' => q(የሱዳን ፓውንድ),
+				'currency' => q(የሱዳን ፓውንድ \(1957–1998\)),
+				'one' => q(የሱዳን ፓውንድ \(1957–1998\)),
+				'other' => q(የሱዳን ፓውንድ \(1957–1998\)),
 			},
 		},
 		'SEK' => {
@@ -4410,7 +4467,7 @@ has 'currencies' => (
 			},
 		},
 		'STN' => {
-			symbol => 'Db',
+			symbol => 'STN',
 			display_name => {
 				'currency' => q(የሳኦ ቶሜ እና ፕሪንሲፔ ዶብራ),
 				'one' => q(የሳኦ ቶሜ እና ፕሪንሲፔ ዶብራ),
@@ -4548,9 +4605,17 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
-				'currency' => q(የቬንዝዌላ ቦሊቫር),
-				'one' => q(የቬንዝዌላ ቦሊቫር),
-				'other' => q(የቬንዝዌላ ቦሊቫር),
+				'currency' => q(የቬንዝዌላ ቦሊቫር \(2008–2018\)),
+				'one' => q(የቬንዝዌላ ቦሊቫር \(2008–2018\)),
+				'other' => q(የቬንዝዌላ ቦሊቫር \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
+			display_name => {
+				'currency' => q(የቬንዝዌላ-ቦሊቫር),
+				'one' => q(የቬንዝዌላ-ቦሊቫር),
+				'other' => q(የቬንዝዌላ-ቦሊቫር),
 			},
 		},
 		'VND' => {
@@ -4633,6 +4698,7 @@ has 'currencies' => (
 			},
 		},
 		'ZMK' => {
+			symbol => 'ZMK',
 			display_name => {
 				'currency' => q(የዛምቢያ ክዋቻ \(1968–2012\)),
 				'one' => q(የዛምቢያ ክዋቻ \(1968–2012\)),
@@ -5074,150 +5140,175 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'islamic') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'coptic') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic-amete-alem') {
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'ethiopic') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 				}
@@ -5240,66 +5331,66 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'noon' => q{ቀትር},
-					'pm' => q{ከሰዓት},
-					'midnight' => q{እኩለ ሌሊት},
-					'afternoon1' => q{ከሰዓት1},
-					'morning1' => q{ጥዋት1},
-					'night1' => q{ሌሊት1},
 					'evening1' => q{ማታ1},
+					'morning1' => q{ጥዋት1},
+					'afternoon1' => q{ከሰዓት 7},
+					'noon' => q{ቀትር},
+					'midnight' => q{እኩለ ሌሊት},
+					'pm' => q{ከሰዓት},
 					'am' => q{ጥዋት},
+					'night1' => q{ሌሊት1},
 				},
 				'wide' => {
-					'am' => q{ጥዋት},
-					'evening1' => q{ማታ1},
-					'morning1' => q{ጥዋት1},
 					'night1' => q{ሌሊት1},
-					'afternoon1' => q{ከሰዓት1},
-					'midnight' => q{እኩለ ሌሊት},
+					'am' => q{ጥዋት},
 					'pm' => q{ከሰዓት},
+					'midnight' => q{እኩለ ሌሊት},
+					'afternoon1' => q{ከሰዓት 7 ሰዓት},
 					'noon' => q{ቀትር},
+					'morning1' => q{ጥዋት1},
+					'evening1' => q{ማታ1},
 				},
 				'narrow' => {
 					'am' => q{ጠ},
-					'evening1' => q{ማታ1},
-					'night1' => q{ሌሊት1},
-					'morning1' => q{ጥዋት1},
-					'afternoon1' => q{ከሰዓት1},
 					'midnight' => q{እኩለ ሌሊት},
 					'pm' => q{ከ},
+					'night1' => q{ሌሊት1},
+					'morning1' => q{ጥዋት1},
+					'evening1' => q{ማታ1},
 					'noon' => q{ቀ},
+					'afternoon1' => q{ከሰዓት1},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'evening1' => q{ማታ},
-					'am' => q{ጥዋት},
-					'morning1' => q{ጥዋት1},
-					'night1' => q{ሌሊት},
-					'afternoon1' => q{ከሰዓት በኋላ},
-					'midnight' => q{እኩለ ሌሊት},
-					'noon' => q{ቀትር},
-					'pm' => q{ከሰዓት},
-				},
 				'wide' => {
-					'morning1' => q{ጥዋት1},
-					'night1' => q{ሌሊት},
-					'am' => q{ጥዋት},
 					'evening1' => q{ማታ},
-					'pm' => q{ከሰዓት},
+					'morning1' => q{ጥዋት1},
 					'noon' => q{ቀትር},
 					'afternoon1' => q{ከሰዓት በኋላ},
 					'midnight' => q{እኩለ ሌሊት},
+					'pm' => q{ከሰዓት},
+					'am' => q{ጥዋት},
+					'night1' => q{ሌሊት},
 				},
 				'narrow' => {
 					'afternoon1' => q{ከሰዓት በኋላ},
+					'noon' => q{ቀትር},
+					'morning1' => q{ጥዋት},
+					'evening1' => q{ማታ},
+					'night1' => q{ሌሊት},
+					'am' => q{ጠ},
+					'pm' => q{ከ},
+					'midnight' => q{እኩለ ሌሊት},
+				},
+				'abbreviated' => {
+					'night1' => q{ሌሊት},
+					'am' => q{ጥዋት},
+					'pm' => q{ከሰዓት},
 					'midnight' => q{እኩለ ሌሊት},
 					'noon' => q{ቀትር},
-					'pm' => q{ከ},
+					'afternoon1' => q{ከሰዓት በኋላ},
+					'morning1' => q{ጥዋት1},
 					'evening1' => q{ማታ},
-					'am' => q{ጠ},
-					'morning1' => q{ጥዋት},
-					'night1' => q{ሌሊት},
 				},
 			},
 		},
@@ -5342,6 +5433,17 @@ has 'eras' => (
 				'1' => 'ERA1'
 			},
 		},
+		'ethiopic-amete-alem' => {
+			abbreviated => {
+				'0' => 'ERA0'
+			},
+			narrow => {
+				'0' => 'ERA0'
+			},
+			wide => {
+				'0' => 'ERA0'
+			},
+		},
 		'generic' => {
 		},
 		'gregorian' => {
@@ -5382,6 +5484,8 @@ has 'date_formats' => (
 			'medium' => q{d MMM y G},
 			'short' => q{dd/MM/y GGGGG},
 		},
+		'ethiopic-amete-alem' => {
+		},
 		'generic' => {
 			'full' => q{EEEE፣ d MMMM y G},
 			'long' => q{d MMMM y G},
@@ -5389,7 +5493,7 @@ has 'date_formats' => (
 			'short' => q{dd/MM/y GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{EEEE ፣d MMMM y},
+			'full' => q{y MMMM d, EEEE},
 			'long' => q{d MMMM y},
 			'medium' => q{d MMM y},
 			'short' => q{dd/MM/y},
@@ -5409,6 +5513,8 @@ has 'time_formats' => (
 		'coptic' => {
 		},
 		'ethiopic' => {
+		},
+		'ethiopic-amete-alem' => {
 		},
 		'generic' => {
 		},
@@ -5442,6 +5548,8 @@ has 'datetime_formats' => (
 			'medium' => q{{1} {0}},
 			'short' => q{{1} {0}},
 		},
+		'ethiopic-amete-alem' => {
+		},
 		'generic' => {
 			'full' => q{{1} {0}},
 			'long' => q{{1} {0}},
@@ -5464,78 +5572,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'ethiopic' => {
-			E => q{ccc},
-			Ed => q{E d},
-			Gy => q{y G},
-			GyMMM => q{MMM፣ y G},
-			GyMMMEd => q{E MMM d፣ y G},
-			GyMMMd => q{MMM d፣ y G},
-			M => q{L},
-			MEd => q{E፣ M/d},
-			MMM => q{LLL},
-			MMMEd => q{E፣ MMM d},
-			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{M/d},
-			d => q{d},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E፣ d/M/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E፣ MMM d y},
-			yMMMM => q{MMMM y},
-			yMMMd => q{d MMM y},
-			yMd => q{d/M/y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
-			yyyy => q{G y},
-			yyyyM => q{GGGGG y-MM},
-			yyyyMEd => q{GGGGG y-MM-dd, E},
-			yyyyMMM => q{G y MMM},
-			yyyyMMMEd => q{G y MMM d, E},
-			yyyyMMMd => q{G y MMM d},
-			yyyyMd => q{GGGGG y-MM-dd},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
-		},
-		'buddhist' => {
-			E => q{ccc},
-			Ed => q{E d},
-			Gy => q{y G},
-			GyMMM => q{MMM፣ y G},
-			GyMMMEd => q{E MMM d፣ y G},
-			GyMMMd => q{MMM d፣ y G},
-			M => q{L},
-			MEd => q{E፣ M/d},
-			MMM => q{LLL},
-			MMMEd => q{E፣ MMM d},
-			MMMMEd => q{E፣ MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{M/d},
-			d => q{d},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E፣ d/M/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E፣ MMM d y},
-			yMMMM => q{MMMM y},
-			yMMMd => q{d MMM y},
-			yMd => q{d/M/y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
-			yyyy => q{G y},
-			yyyyM => q{GGGGG y-MM},
-			yyyyMEd => q{GGGGG y-MM-dd, E},
-			yyyyMMM => q{G y MMM},
-			yyyyMMMEd => q{G y MMM d, E},
-			yyyyMMMd => q{G y MMM d},
-			yyyyMd => q{GGGGG y-MM-dd},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
-		},
 		'gregorian' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -5550,8 +5586,8 @@ has 'datetime_formats_available_formats' => (
 			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
-			GyMMMEd => q{E፣ MMM d፣ y G},
-			GyMMMd => q{MMM d፣ y G},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
 			H => q{H},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -5598,7 +5634,7 @@ has 'datetime_formats_available_formats' => (
 			Ehm => q{E h:mm a},
 			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
-			GyMMM => q{MMM፣ y G},
+			GyMMM => q{G y MMM},
 			GyMMMEd => q{E MMM d፣ y G},
 			GyMMMd => q{MMM d፣ y G},
 			H => q{H},
@@ -5638,6 +5674,78 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{G y QQQ},
 			yyyyQQQQ => q{G y QQQQ},
 		},
+		'buddhist' => {
+			E => q{ccc},
+			Ed => q{E d},
+			Gy => q{y G},
+			GyMMM => q{MMM፣ y G},
+			GyMMMEd => q{E MMM d፣ y G},
+			GyMMMd => q{MMM d፣ y G},
+			M => q{L},
+			MEd => q{E፣ M/d},
+			MMM => q{LLL},
+			MMMEd => q{E፣ MMM d},
+			MMMMEd => q{E፣ MMMM d},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{E፣ d/M/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E፣ MMM d y},
+			yMMMM => q{MMMM y},
+			yMMMd => q{d MMM y},
+			yMd => q{d/M/y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
+			yyyy => q{G y},
+			yyyyM => q{GGGGG y-MM},
+			yyyyMEd => q{GGGGG y-MM-dd, E},
+			yyyyMMM => q{G y MMM},
+			yyyyMMMEd => q{G y MMM d, E},
+			yyyyMMMd => q{G y MMM d},
+			yyyyMd => q{GGGGG y-MM-dd},
+			yyyyQQQ => q{G y QQQ},
+			yyyyQQQQ => q{G y QQQQ},
+		},
+		'ethiopic' => {
+			E => q{ccc},
+			Ed => q{E d},
+			Gy => q{y G},
+			GyMMM => q{MMM፣ y G},
+			GyMMMEd => q{E MMM d፣ y G},
+			GyMMMd => q{MMM d፣ y G},
+			M => q{L},
+			MEd => q{E፣ M/d},
+			MMM => q{LLL},
+			MMMEd => q{E፣ MMM d},
+			MMMMEd => q{E, MMMM d},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{E፣ d/M/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E፣ MMM d y},
+			yMMMM => q{MMMM y},
+			yMMMd => q{d MMM y},
+			yMd => q{d/M/y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
+			yyyy => q{G y},
+			yyyyM => q{GGGGG y-MM},
+			yyyyMEd => q{GGGGG y-MM-dd, E},
+			yyyyMMM => q{G y MMM},
+			yyyyMMMEd => q{G y MMM d, E},
+			yyyyMMMd => q{G y MMM d},
+			yyyyMd => q{GGGGG y-MM-dd},
+			yyyyQQQ => q{G y QQQ},
+			yyyyQQQQ => q{G y QQQQ},
+		},
 	} },
 );
 
@@ -5657,7 +5765,102 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'ethiopic' => {
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E፣ d/M – E፣ d/M},
+				d => q{E d/M – E d/M},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{E d – E d፣ MMM},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{d/M – d/M},
+				d => q{d–d/M},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h – h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm – h:mm a},
+				m => q{h:mm – h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm – h:mm a v},
+				m => q{h:mm – h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h – h a v},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yM => {
+				M => q{M/y – M/y},
+				y => q{M/y – M/y},
+			},
+			yMEd => {
+				M => q{E d/M/ – E d/M፣ y},
+				d => q{y-MM-dd, E – y-MM-dd, E},
+				y => q{E፣ d/M/y – E፣ d/M/y},
+			},
+			yMMM => {
+				M => q{MMM–MMM፣ y},
+				y => q{MMM y – MMM y},
+			},
+			yMMMEd => {
+				M => q{E MMM d – E MMM d፣ y},
+				d => q{E MMM d – E MMM d፣ y},
+				y => q{E፣ MMM d፣ y – E፣ MMM d፣ y},
+			},
+			yMMMM => {
+				M => q{MMMM–MMMM y},
+				y => q{MMMM y – MMMM y},
+			},
+			yMMMd => {
+				M => q{MMM d – MMM d፣ y},
+				d => q{MMM d–d፣ y},
+				y => q{MMM d፣ y – MMM d፣ y},
+			},
+			yMd => {
+				M => q{d/M/y – d/M/y},
+				d => q{d/M/y – d/M/y},
+				y => q{d/M/y – d/M/y},
+			},
+		},
+		'generic' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -5847,102 +6050,7 @@ has 'datetime_formats_interval' => (
 				y => q{d/M/y – d/M/y},
 			},
 		},
-		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{M–M},
-			},
-			MEd => {
-				M => q{E፣ d/M – E፣ d/M},
-				d => q{E d/M – E d/M},
-			},
-			MMM => {
-				M => q{MMM–MMM},
-			},
-			MMMEd => {
-				M => q{E፣ MMM d – E፣ MMM d},
-				d => q{E d – E d፣ MMM},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{d/M – d/M},
-				d => q{d–d/M},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h – h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm – h:mm a},
-				m => q{h:mm – h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm – h:mm a v},
-				m => q{h:mm – h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h – h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
-			yM => {
-				M => q{M/y – M/y},
-				y => q{M/y – M/y},
-			},
-			yMEd => {
-				M => q{E d/M/ – E d/M፣ y},
-				d => q{E፣ d/M/y – E፣ d/M/y},
-				y => q{E፣ d/M/y – E፣ d/M/y},
-			},
-			yMMM => {
-				M => q{MMM–MMM፣ y},
-				y => q{MMM y – MMM y},
-			},
-			yMMMEd => {
-				M => q{E MMM d – E MMM d፣ y},
-				d => q{E MMM d – E MMM d፣ y},
-				y => q{E፣ MMM d፣ y – E፣ MMM d፣ y},
-			},
-			yMMMM => {
-				M => q{MMMM–MMMM y},
-				y => q{MMMM y – MMMM y},
-			},
-			yMMMd => {
-				M => q{MMM d – MMM d፣ y},
-				d => q{MMM d–d፣ y},
-				y => q{MMM d፣ y – MMM d፣ y},
-			},
-			yMd => {
-				M => q{d/M/y – d/M/y},
-				d => q{d/M/y – d/M/y},
-				y => q{d/M/y – d/M/y},
-			},
-		},
-		'generic' => {
+		'ethiopic' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -6696,15 +6804,15 @@ has 'time_zone_names' => (
 		'America_Central' => {
 			long => {
 				'daylight' => q#የመካከለኛ የቀን ሰዓት አቆጣጠር#,
-				'generic' => q#የመካከለኛ ሰዓት አቆጣጠር#,
-				'standard' => q#የመካከለኛ መደበኛ ሰዓት አቆጣጠር#,
+				'generic' => q#የሰሜን አሜሪካ የመካከለኛ ሰዓት አቆጣጠር#,
+				'standard' => q#የሰሜን አሜሪካ የመካከለኛ መደበኛ ሰዓት አቆጣጠር#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q#የምዕራባዊ የቀን ሰዓት አቆጣጠር#,
-				'generic' => q#የምዕራባዊ ሰዓት አቆጣጠር#,
-				'standard' => q#የምዕራባዊ መደበኛ የሰዓት አቆጣጠር#,
+				'daylight' => q#ምስራቃዊ የቀን ሰዓት አቆጣጠር#,
+				'generic' => q#ምስራቃዊ ሰዓት አቆጣጠር#,
+				'standard' => q#ምስራቃዊ መደበኛ ሰዓት አቆጣጠር#,
 			},
 		},
 		'America_Mountain' => {

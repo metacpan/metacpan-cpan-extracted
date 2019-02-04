@@ -1,0 +1,8 @@
+Revision history for 'Banal-Util-Mini'
+
+0.002     2019-02-03 03:18:45Z
+            - Fixed version dependency on <List::MoreUtils>; now requiring 0.426, because of arrayify() and listcmp()
+
+0.001     2019-02-02 22:26:15Z
+            - Initial release.
+            - Created a separate distribution package for these modules that used to reside in <Dist-Zilla-Plugin-Bundle-Author-TABULO>

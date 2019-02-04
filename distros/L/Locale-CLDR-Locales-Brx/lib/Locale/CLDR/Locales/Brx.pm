@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Brx - Package for language Bodo
 
 package Locale::CLDR::Locales::Brx;
 # This file auto generated from Data\common\main\brx.xml
-#	on Sun  7 Oct 10:23:00 am GMT
+#	on Sun  3 Feb  1:41:58 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2419,6 +2419,11 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			display_name => {
+				'currency' => q(वेनेज़ुएलाई बोलिवार \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(वेनेज़ुएलाई बोलिवार),
 			},
 		},
@@ -2821,7 +2826,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Gy => q{y G},
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, MMM d, y G},
@@ -2848,7 +2853,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Gy => q{y G},
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, MMM d, y G},

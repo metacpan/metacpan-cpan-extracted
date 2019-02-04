@@ -1,5 +1,5 @@
 package Module::CPANTS::Analyse;
-use 5.006;
+use 5.008001;
 use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
@@ -11,7 +11,7 @@ use Archive::Any::Lite;
 use Carp;
 use CPAN::DistnameInfo;
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 $VERSION =~ s/_//; ## no critic
 
 __PACKAGE__->mk_accessors(qw(dist opts tarball distdir d mck));
@@ -272,13 +272,13 @@ Returns a hash reference that holds normalized information set in the "x_cpants"
 
 =head1 WEBSITE
 
-L<http://cpants.cpanauthors.org/>
+L<https://cpants.cpanauthors.org/>
 
 =head1 BUGS
 
 Please report any bugs or feature requests, or send any patches, to
 C<bug-module-cpants-analyse at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-CPANTS-Analyse>.
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-CPANTS-Analyse>.
 I will be notified, and then you'll automatically be notified of progress
 on your bug as I make changes.
 
@@ -287,7 +287,7 @@ on your bug as I make changes.
 L<Thomas Klausner|https://metacpan.org/author/domm>
 
 Please use the C<perl-qa> mailing list for discussing all things CPANTS:
-L<http://lists.perl.org/list/perl-qa.html>
+L<https://lists.perl.org/list/perl-qa.html>
 
 Based on work by L<Léon Brocard|https://metacpan.org/author/lbrocard> and the
 original idea proposed by

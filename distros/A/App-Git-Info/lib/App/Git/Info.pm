@@ -1,32 +1,13 @@
 package App::Git::Info;
-$App::Git::Info::VERSION = '0.2.0';
+$App::Git::Info::VERSION = '0.4.0';
 # ABSTRACT: Displays a summary of information about the git repository.
 
 use strict;
 use warnings;
 use 5.016;
+use autodie;
 
-package main;
-$main::VERSION = '0.2.0';
-use App::Rad;
-
-sub run
-{
-    return App::Rad->run;
-}
-
-sub info
-{
-    my $ret =
-        (     `git status` =~ s#\A(On branch \S+).*#⇒ $1#mrs . "\n"
-            . `git status -s`
-            . "⇒ Remotes:\n"
-            . `git remote -v` );
-    chomp $ret;
-    return $ret;
-}
-
-1;
+use App::Cmd::Setup -app;
 
 __END__
 
@@ -40,7 +21,7 @@ App::Git::Info - Displays a summary of information about the git repository.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -48,7 +29,7 @@ version 0.2.0
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
     shlomif@telaviv1:~/conf/trunk$ git info info
     ⇒ On branch master

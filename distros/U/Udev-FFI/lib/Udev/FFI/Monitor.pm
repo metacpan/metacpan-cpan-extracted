@@ -3,6 +3,8 @@ package Udev::FFI::Monitor;
 use strict;
 use warnings;
 
+use Errno qw(EPERM);
+use Carp qw(croak);
 use IO::Select;
 
 use Udev::FFI::Functions qw(:all);
@@ -26,79 +28,74 @@ sub new {
 
 
 sub get_udev {
-    my $self = shift;
-
-    return $self->{_udev};
+    return $_[0]->{_udev};
 }
 
 
 
 sub set_receive_buffer_size {
-    my $self = shift;
-    my $bytes = shift;
-
-    if(0 != udev_monitor_set_receive_buffer_size($self->{_monitor}, $bytes)) {
-        return 0;
+    # self, bytes
+    if(0 == udev_monitor_set_receive_buffer_size($_[0]->{_monitor}, $_[1])) {
+        return 1;
     }
 
-    return 1;
+    return 0;
 }
 
 
 
 sub filter_by_subsystem_devtype {
-    my $self = shift;
-    my $subsystem = shift;
-    my $devtype = shift;
-
-    return 0
-        if 1 == $self->{_is_started};
-
-    if(0 != udev_monitor_filter_add_match_subsystem_devtype($self->{_monitor}, $subsystem, $devtype)) {
+    if(1 == $_[0]->{_is_started}) {
+        $! = EPERM;
         return 0;
     }
 
-    return 1;
+    # self, subsystem, devtype
+    if(0 == ($! = udev_monitor_filter_add_match_subsystem_devtype($_[0]->{_monitor}, $_[1], $_[2]))) {
+        return 1;
+    }
+
+    $! = -$!;
+    return 0;
 }
 
 
 
 sub filter_by_tag {
-    my $self = shift;
-    my $tag = shift;
-
-    return 0
-        if 1 == $self->{_is_started};
-
-    if(0 != udev_monitor_filter_add_match_tag($self->{_monitor}, $tag)) {
+    if(1 == $_[0]->{_is_started}) {
+        $! = EPERM;
         return 0;
     }
 
-    return 1;
+    # self, tag
+    if(0 == ($! = udev_monitor_filter_add_match_tag($_[0]->{_monitor}, $_[1]))) {
+        return 1;
+    }
+
+    $! = -$!;
+    return 0;
 }
 
 
 
 sub filter_update {
-    my $self = shift;
-
-    if(0 != udev_monitor_filter_update($self->{_monitor})) {
-        return 0;
+    if(0 == ($! = udev_monitor_filter_update($_[0]->{_monitor}))) {
+        return 1;
     }
 
-    return 1;
+    $! = -$!;
+    return 0;
 }
 
 
 
 sub filter_remove {
-    my $self = shift;
-
-    if(0 != udev_monitor_filter_remove($self->{_monitor})) {
-        return 0;
+    if(0 != udev_monitor_filter_remove($_[0]->{_monitor})) {
+        return 1;
     }
 
-    return 1;
+    $! = -$!;
+    return 0;
 }
 
 
@@ -109,7 +106,8 @@ sub start {
     return 1
         if $self->{_is_started};
 
-    if(0 != udev_monitor_enable_receiving( $self->{_monitor} )) {
+    if(0 != ($! = udev_monitor_enable_receiving( $self->{_monitor} ))) {
+        $! = -$!;
         return 0;
     }
 
@@ -133,9 +131,8 @@ sub poll {
     my $self = shift;
     my $timeout = shift;
 
-    unless($self->{_is_started}) {
-        die "udev monitor is not running";
-    }
+     croak('udev monitor is not running')
+        unless $self->{_is_started};
 
     if($self->{_select}->can_read($timeout)) {
         my $device = udev_monitor_receive_device( $self->{_monitor} );
@@ -149,17 +146,13 @@ sub poll {
 
 
 sub is_started {
-    my $self = shift;
-
-    return $self->{_is_started};
+    return $_[0]->{_is_started};
 }
 
 
 
 sub DESTROY {
-    my $self = shift;
-
-    udev_monitor_unref( $self->{_monitor} );
+    udev_monitor_unref( $_[0]->{_monitor} );
 }
 
 
@@ -200,23 +193,28 @@ Udev::FFI::Monitor
 
 =head1 METHODS
 
-=head2 set_receive_buffer_size ( BYTES )
+=head2 set_receive_buffer_size( BYTES )
 
-=head2 filter_by_subsystem_devtype ( SUBSYSTEM [, DEVTYPE] )
+Set the size of the kernel socket buffer. This call needs the
+appropriate privileges to succeed.
 
-=head2 filter_by_tag ( TAG )
+Returns: 1 on success, otherwise 0 on error.
 
-=head2 filter_update ()
+=head2 filter_by_subsystem_devtype( SUBSYSTEM [, DEVTYPE] )
 
-=head2 filter_remove ()
+=head2 filter_by_tag( TAG )
 
-=head2 start ()
+=head2 filter_update()
 
-=head2 poll ( [TIMEOUT] )
+=head2 filter_remove()
 
-=head2 is_started ()
+=head2 start()
 
-=head2 get_udev ()
+=head2 poll( [TIMEOUT] )
+
+=head2 is_started()
+
+=head2 get_udev()
 
 =head1 SEE ALSO
 

@@ -17,6 +17,7 @@ subtest 'bad input' => sub {
 
   is( FFI::Library->new('bogus.so'), undef, 'returns undef with bogus dll' );
 
+  done_testing;
 };
 
 subtest 'basic' => sub {
@@ -34,6 +35,8 @@ subtest 'basic' => sub {
   ok($0, "f0 is defined");
 
   is($f0->(42), 42, "f0(42) = 42");
+
+  done_testing;
 };
 
 subtest 'call exe functions' => sub {
@@ -47,6 +50,8 @@ subtest 'call exe functions' => sub {
   ok($strlen, "strlen is defined");
 
   is($strlen->("foo"), 3, "strlen of foo is 3");
+
+  done_testing;
 };
 
 done_testing;

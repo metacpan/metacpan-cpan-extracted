@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.131;
+our $VERSION = 1.132;
 
 use Time::HiRes ();
 
@@ -36,6 +36,10 @@ Mit Aufruf des Konstruktors wird die Zeitmessung gestartet. Mit der
 Methode elapsed() kann die seitdem vergangene Zeit abgefragt werden.
 Die Zeit wird in Sekunden gemessen. Die Genauigkeit (d.h. die maximale
 Anzahl der Nachkommastellen) ist systemabhängig.
+
+=head1 SEE ALSO
+
+Klasse Quiq::Duration
 
 =head1 METHODS
 
@@ -97,11 +101,7 @@ sub elapsed {
 
 =head1 VERSION
 
-1.131
-
-=head1 SEE ALSO
-
-Klasse Quiq::Duration
+1.132
 
 =head1 AUTHOR
 

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Uz::Cyrl - Package for language Uzbek
 
 package Locale::CLDR::Locales::Uz::Cyrl;
 # This file auto generated from Data\common\main\uz_Cyrl.xml
-#	on Sun  7 Oct 11:06:06 am GMT
+#	on Sun  3 Feb  2:25:32 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2184,6 +2184,13 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			display_name => {
+				'currency' => q(Венесуэла боливари \(2008–2018\)),
+				'one' => q(Венесуэла боливари \(2008–2018\)),
+				'other' => q(Венесуэла боливари \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(Венесуэла боливари),
 				'one' => q(Венесуэла боливари),
 				'other' => q(Венесуэла боливари),
@@ -2227,7 +2234,7 @@ has 'calendar_months' => (
 							'мар',
 							'апр',
 							'май',
-							'июн',
+							'',
 							'июл',
 							'авг',
 							'сен',
@@ -2281,18 +2288,18 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'Янв',
-							'Фев',
-							'Мар',
-							'Апр',
-							'Май',
-							'Июн',
-							'Июл',
-							'Авг',
-							'Сен',
-							'Окт',
-							'Ноя',
-							'Дек'
+							'янв',
+							'фев',
+							'мар',
+							'апр',
+							'май',
+							'июн',
+							'июл',
+							'авг',
+							'сен',
+							'окт',
+							'ноя',
+							'дек'
 						],
 						leap => [
 							
@@ -2319,18 +2326,18 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'Январ',
-							'Феврал',
-							'Март',
-							'Апрел',
-							'Май',
-							'Июн',
-							'Июл',
-							'Август',
-							'Сентябр',
-							'Октябр',
-							'Ноябр',
-							'Декабр'
+							'январ',
+							'феврал',
+							'март',
+							'апрел',
+							'май',
+							'июн',
+							'июл',
+							'август',
+							'сентябр',
+							'октябр',
+							'ноябр',
+							'декабр'
 						],
 						leap => [
 							
@@ -2390,13 +2397,13 @@ has 'calendar_days' => (
 						sun => 'Я'
 					},
 					short => {
-						mon => 'Ду',
-						tue => 'Се',
-						wed => 'Чо',
-						thu => 'Па',
-						fri => 'Жу',
-						sat => 'Ша',
-						sun => 'Як'
+						mon => 'ду',
+						tue => 'се',
+						wed => 'чо',
+						thu => 'па',
+						fri => 'жу',
+						sat => 'ша',
+						sun => 'як'
 					},
 					wide => {
 						mon => 'душанба',
@@ -2410,13 +2417,13 @@ has 'calendar_days' => (
 				},
 				'stand-alone' => {
 					abbreviated => {
-						mon => 'Душ',
-						tue => 'Сеш',
-						wed => 'Чор',
-						thu => 'Пай',
-						fri => 'Жум',
-						sat => 'Шан',
-						sun => 'Якш'
+						mon => 'душ',
+						tue => 'сеш',
+						wed => 'чор',
+						thu => 'пай',
+						fri => 'жум',
+						sat => 'шан',
+						sun => 'якш'
 					},
 					narrow => {
 						mon => 'Д',
@@ -2428,22 +2435,22 @@ has 'calendar_days' => (
 						sun => 'Я'
 					},
 					short => {
-						mon => 'Ду',
-						tue => 'Се',
-						wed => 'Чо',
-						thu => 'Па',
-						fri => 'Жу',
-						sat => 'Ша',
-						sun => 'Як'
+						mon => 'ду',
+						tue => 'се',
+						wed => 'чо',
+						thu => 'па',
+						fri => 'жу',
+						sat => 'ша',
+						sun => 'як'
 					},
 					wide => {
-						mon => 'Душанба',
-						tue => 'Сешанба',
-						wed => 'Чоршанба',
-						thu => 'Пайшанба',
-						fri => 'Жума',
-						sat => 'Шанба',
-						sun => 'Якшанба'
+						mon => 'душанба',
+						tue => 'сешанба',
+						wed => 'чоршанба',
+						thu => 'пайшанба',
+						fri => 'жума',
+						sat => 'шанба',
+						sun => 'якшанба'
 					},
 				},
 			},
@@ -2504,28 +2511,53 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1100
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
+					return 'afternoon1' if $time >= 1100
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
+				}
+				last SWITCH;
+				}
 			if ($_ eq 'islamic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
 					return 'afternoon1' if $time >= 1100
 						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1100
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
+					return 'afternoon1' if $time >= 1100
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
 				}
 				last SWITCH;
 				}
@@ -2533,49 +2565,24 @@ has 'day_period_data' => (
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
 					return 'afternoon1' if $time >= 1100
 						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1100
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1100;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
 					return 'afternoon1' if $time >= 1100
 						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1100
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
 				}
 				last SWITCH;
 				}
@@ -2595,67 +2602,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'morning1' => q{эрталаб},
-					'night1' => q{кечаси},
-					'evening1' => q{кечқурун},
+				'narrow' => {
 					'am' => q{ТО},
-					'noon' => q{туш пайти},
 					'pm' => q{ТК},
 					'midnight' => q{ярим тун},
+					'night1' => q{кечаси},
+					'morning1' => q{эрталаб},
+					'evening1' => q{кечқурун},
 					'afternoon1' => q{кундузи},
+					'noon' => q{туш пайти},
 				},
 				'wide' => {
-					'midnight' => q{ярим тун},
-					'afternoon1' => q{кундузи},
-					'pm' => q{ТК},
-					'noon' => q{туш пайти},
-					'am' => q{ТО},
-					'evening1' => q{кечқурун},
-					'morning1' => q{эрталаб},
 					'night1' => q{кечаси},
+					'am' => q{ТО},
+					'pm' => q{ТК},
+					'midnight' => q{ярим тун},
+					'noon' => q{туш пайти},
+					'afternoon1' => q{кундузи},
+					'morning1' => q{эрталаб},
+					'evening1' => q{кечқурун},
 				},
-				'narrow' => {
-					'night1' => q{кечаси},
+				'abbreviated' => {
 					'morning1' => q{эрталаб},
 					'evening1' => q{кечқурун},
-					'am' => q{ТО},
-					'noon' => q{туш пайти},
-					'pm' => q{ТК},
 					'afternoon1' => q{кундузи},
+					'noon' => q{туш пайти},
+					'am' => q{ТО},
+					'pm' => q{ТК},
 					'midnight' => q{ярим тун},
+					'night1' => q{кечаси},
 				},
 			},
 			'stand-alone' => {
 				'wide' => {
+					'noon' => q{туш пайти},
+					'afternoon1' => q{кундузи},
 					'morning1' => q{эрталаб},
+					'evening1' => q{кечқурун},
 					'night1' => q{кечаси},
 					'am' => q{ТО},
-					'evening1' => q{кечқурун},
-					'pm' => q{ТК},
-					'noon' => q{туш пайти},
 					'midnight' => q{ярим тун},
-					'afternoon1' => q{кундузи},
+					'pm' => q{ТК},
 				},
 				'narrow' => {
-					'morning1' => q{эрталаб},
 					'night1' => q{кечаси},
 					'am' => q{ТО},
-					'evening1' => q{кечқурун},
-					'pm' => q{ТК},
-					'noon' => q{туш пайти},
-					'afternoon1' => q{кундузи},
 					'midnight' => q{ярим тун},
+					'pm' => q{ТК},
+					'afternoon1' => q{кундузи},
+					'noon' => q{туш пайти},
+					'morning1' => q{эрталаб},
+					'evening1' => q{кечқурун},
 				},
 				'abbreviated' => {
-					'noon' => q{туш пайти},
-					'pm' => q{ТК},
-					'midnight' => q{ярим тун},
-					'afternoon1' => q{кундузи},
-					'night1' => q{кечаси},
-					'morning1' => q{эрталаб},
 					'evening1' => q{кечқурун},
+					'morning1' => q{эрталаб},
+					'noon' => q{туш пайти},
+					'afternoon1' => q{кундузи},
+					'midnight' => q{ярим тун},
+					'pm' => q{ТК},
 					'am' => q{ТО},
+					'night1' => q{кечаси},
 				},
 			},
 		},
@@ -2752,6 +2759,11 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
+			Bh => q{B h},
+			Bhm => q{B h:mm},
+			Bhms => q{B h:mm:ss},
+			EBhm => q{E, B h:mm},
+			EBhms => q{E, B h:mm:ss},
 			EHm => q{E, HH:mm},
 			EHms => q{E, HH:mm:ss},
 			Ed => q{d, E},

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nmg::Any::Cm - Package for language Kwasio
 
 package Locale::CLDR::Locales::Nmg::Any::Cm;
 # This file auto generated from Data\common\main\nmg_CM.xml
-#	on Sun  7 Oct 10:52:24 am GMT
+#	on Sun  3 Feb  2:11:46 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

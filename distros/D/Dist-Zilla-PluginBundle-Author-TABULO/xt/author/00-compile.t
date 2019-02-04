@@ -6,11 +6,14 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 4;
+plan tests => 7;
 
 my @module_files = (
+    'Banal/Dist/Zilla/Role/PluginBundle/Easier.pm',
+    'Banal/Dist/Zilla/Role/Text/Template/Selfish.pm',
     'Dist/Zilla/MintingProfile/Author/TABULO.pm',
     'Dist/Zilla/PluginBundle/Author/TABULO.pm',
+    'Dist/Zilla/PluginBundle/Author/TABULO/Config.pm',
     'Pod/Weaver/PluginBundle/Author/TABULO.pm'
 );
 

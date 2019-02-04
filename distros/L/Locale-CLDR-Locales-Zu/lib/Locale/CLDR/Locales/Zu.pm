@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Zu - Package for language Zulu
 
 package Locale::CLDR::Locales::Zu;
 # This file auto generated from Data\common\main\zu.xml
-#	on Sun  7 Oct 11:11:42 am GMT
+#	on Sun  3 Feb  2:31:09 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -58,7 +58,7 @@ has 'display_name_language' => (
  				'ain' => 'isi-Ainu',
  				'ak' => 'isi-Akan',
  				'ale' => 'isi-Aleut',
- 				'alt' => 'i-Southern Altai',
+ 				'alt' => 'isi-Southern Altai',
  				'am' => 'isi-Amharic',
  				'an' => 'isi-Aragonese',
  				'anp' => 'isi-Angika',
@@ -83,9 +83,9 @@ has 'display_name_language' => (
  				'bg' => 'isi-Bulgari',
  				'bgn' => 'isi-Western Balochi',
  				'bho' => 'isi-Bhojpuri',
- 				'bi' => 'i-Bislama',
- 				'bin' => 'i-Bini',
- 				'bla' => 'i-Siksika',
+ 				'bi' => 'isi-Bislama',
+ 				'bin' => 'isi-Bini',
+ 				'bla' => 'isi-Siksika',
  				'bm' => 'isi-Bambara',
  				'bn' => 'isi-Bengali',
  				'bo' => 'isi-Tibetan',
@@ -93,7 +93,7 @@ has 'display_name_language' => (
  				'brx' => 'isi-Bodo',
  				'bs' => 'isi-Bosnian',
  				'bug' => 'isi-Buginese',
- 				'byn' => 'i-Blin',
+ 				'byn' => 'isi-Blin',
  				'ca' => 'isi-Catalan',
  				'ce' => 'isi-Chechen',
  				'ceb' => 'isi-Cebuano',
@@ -117,7 +117,7 @@ has 'display_name_language' => (
  				'dav' => 'isi-Taita',
  				'de' => 'isi-German',
  				'de_AT' => 'isi-Austrian German',
- 				'de_CH' => 'i-Swiss High German',
+ 				'de_CH' => 'Isi-Swiss High German',
  				'dgr' => 'isi-Dogrib',
  				'dje' => 'isi-Zarma',
  				'dsb' => 'isi-Lower Sorbian',
@@ -132,7 +132,7 @@ has 'display_name_language' => (
  				'eka' => 'isi-Ekajuk',
  				'el' => 'isi-Greek',
  				'en' => 'i-English',
- 				'en_AU' => 'isi-Austrillian English',
+ 				'en_AU' => 'i-Australian English',
  				'en_CA' => 'i-Canadian English',
  				'en_GB' => 'i-British English',
  				'en_GB@alt=short' => 'i-UK English',
@@ -141,8 +141,8 @@ has 'display_name_language' => (
  				'eo' => 'isi-Esperanto',
  				'es' => 'isi-Spanish',
  				'es_419' => 'isi-Latin American Spanish',
- 				'es_ES' => 'i-European Spanish',
- 				'es_MX' => 'i-Mexican Spanish',
+ 				'es_ES' => 'isi-European Spanish',
+ 				'es_MX' => 'Isi-Mexican Spanish',
  				'et' => 'isi-Estonia',
  				'eu' => 'isi-Basque',
  				'ewo' => 'isi-Ewondo',
@@ -154,15 +154,15 @@ has 'display_name_language' => (
  				'fo' => 'isi-Faroese',
  				'fon' => 'isi-Fon',
  				'fr' => 'isi-French',
- 				'fr_CA' => 'i-Canadian French',
- 				'fr_CH' => 'i-Swiss French',
+ 				'fr_CA' => 'isi-Canadian French',
+ 				'fr_CH' => 'isi-Swiss French',
  				'fur' => 'isi-Friulian',
  				'fy' => 'isi-Western Frisian',
  				'ga' => 'isi-Irish',
  				'gaa' => 'isi-Ga',
  				'gag' => 'isi-Gagauz',
  				'gan' => 'isi-Gan Chinese',
- 				'gd' => 'i-Scottish Gaelic',
+ 				'gd' => 'isi-Scottish Gaelic',
  				'gez' => 'isi-Geez',
  				'gil' => 'isi-Gilbertese',
  				'gl' => 'isi-Galicia',
@@ -254,7 +254,7 @@ has 'display_name_language' => (
  				'li' => 'isi-Limburgish',
  				'lkt' => 'isi-Lakota',
  				'ln' => 'isi-Lingala',
- 				'lo' => 'i-Lao',
+ 				'lo' => 'isi-Lao',
  				'loz' => 'isi-Lozi',
  				'lrc' => 'isi-Northern Luri',
  				'lt' => 'isi-Lithuanian',
@@ -313,19 +313,19 @@ has 'display_name_language' => (
  				'nl' => 'isi-Dutch',
  				'nl_BE' => 'isi-Flemish',
  				'nmg' => 'isi-Kwasio',
- 				'nn' => 'i-Norwegian Nynorsk',
+ 				'nn' => 'isi-Norwegian Nynorsk',
  				'nnh' => 'isi-Ngiemboon',
  				'no' => 'isi-Norwegian',
  				'nog' => 'isi-Nogai',
  				'nqo' => 'isi-N’Ko',
- 				'nr' => 'i-South Ndebele',
+ 				'nr' => 'isi-South Ndebele',
  				'nso' => 'isi-Northern Sotho',
  				'nus' => 'isi-Nuer',
  				'nv' => 'isi-Navajo',
  				'ny' => 'isi-Nyanja',
  				'nyn' => 'isi-Nyankole',
  				'oc' => 'isi-Occitan',
- 				'om' => 'i-Oromo',
+ 				'om' => 'isi-Oromo',
  				'or' => 'isi-Odia',
  				'os' => 'isi-Ossetic',
  				'pa' => 'isi-Punjabi',
@@ -343,28 +343,28 @@ has 'display_name_language' => (
  				'pt_PT' => 'isi-European Portuguese',
  				'qu' => 'isi-Quechua',
  				'quc' => 'isi-Kʼicheʼ',
- 				'rap' => 'i-Rapanui',
- 				'rar' => 'i-Rarotongan',
+ 				'rap' => 'isi-Rapanui',
+ 				'rar' => 'isi-Rarotongan',
  				'rm' => 'isi-Romansh',
  				'rn' => 'isi-Rundi',
  				'ro' => 'isi-Romanian',
  				'ro_MD' => 'isi-Moldavian',
  				'rof' => 'isi-Rombo',
- 				'root' => 'i-Root',
+ 				'root' => 'isi-Root',
  				'ru' => 'isi-Russian',
  				'rup' => 'isi-Aromanian',
  				'rw' => 'isi-Kinyarwanda',
  				'rwk' => 'isi-Rwa',
  				'sa' => 'isi-Sanskrit',
- 				'sad' => 'i-Sandawe',
+ 				'sad' => 'isi-Sandawe',
  				'sah' => 'i-Sakha',
  				'saq' => 'isi-Samburu',
- 				'sat' => 'i-Santali',
+ 				'sat' => 'isi-Santali',
  				'sba' => 'isi-Ngambay',
  				'sbp' => 'isi-Sangu',
- 				'sc' => 'i-Sardinian',
- 				'scn' => 'i-Sicilian',
- 				'sco' => 'i-Scots',
+ 				'sc' => 'isi-Sardinian',
+ 				'scn' => 'isi-Sicilian',
+ 				'sco' => 'isi-Scots',
  				'sd' => 'isi-Sindhi',
  				'sdh' => 'i-Southern Kurdish',
  				'se' => 'isi-Northern Sami',
@@ -373,31 +373,31 @@ has 'display_name_language' => (
  				'sg' => 'isi-Sango',
  				'sh' => 'isi-Serbo-Croatian',
  				'shi' => 'isi-Tachelhit',
- 				'shn' => 'i-Shan',
- 				'si' => 'i-Sinhala',
+ 				'shn' => 'isi-Shan',
+ 				'si' => 'isi-Sinhala',
  				'sk' => 'isi-Slovak',
  				'sl' => 'isi-Slovenian',
  				'sm' => 'isi-Samoan',
- 				'sma' => 'i-Southern Sami',
+ 				'sma' => 'isi-Southern Sami',
  				'smj' => 'isi-Lule Sami',
  				'smn' => 'isi-Inari Sami',
  				'sms' => 'isi-Skolt Sami',
  				'sn' => 'isiShona',
- 				'snk' => 'i-Soninke',
+ 				'snk' => 'isi-Soninke',
  				'so' => 'isi-Somali',
  				'sq' => 'isi-Albania',
  				'sr' => 'isi-Serbian',
- 				'srn' => 'i-Sranan Tongo',
+ 				'srn' => 'isi-Sranan Tongo',
  				'ss' => 'isiSwati',
- 				'ssy' => 'i-Saho',
- 				'st' => 'isiSuthu',
+ 				'ssy' => 'isi-Saho',
+ 				'st' => 'isi-Southern Sotho',
  				'su' => 'isi-Sundanese',
- 				'suk' => 'i-Sukuma',
+ 				'suk' => 'isi-Sukuma',
  				'sv' => 'isi-Swedish',
  				'sw' => 'isiSwahili',
  				'sw_CD' => 'isi-Congo Swahili',
  				'swb' => 'isi-Comorian',
- 				'syr' => 'i-Syriac',
+ 				'syr' => 'isi-Syriac',
  				'ta' => 'isi-Tamil',
  				'te' => 'isi-Telugu',
  				'tem' => 'isi-Timne',
@@ -1065,6 +1065,7 @@ has 'characters' => (
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a b {bh} c {ch} d {dl} {dy} e f g {gc} {gq} {gx} h {hh} {hl} i j k {kh} {kl} {kp} l m n {nc} {ngc} {ngq} {ngx} {nhl} {nk} {nkc} {nkq} {nkx} {nq} {ntsh} {nx} {ny} o p {ph} q {qh} r {rh} s {sh} t {th} {tl} {ts} {tsh} u v w x {xh} y z]},
 			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- , ; \: ! ? . ( ) \[ \] \{ \}]},
 		};
 	},
 EOT
@@ -1142,6 +1143,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(indlela),
+					},
 					'acre' => {
 						'name' => q(acre),
 						'one' => q({0} ac),
@@ -1171,6 +1175,11 @@ has 'units' => (
 						'name' => q(au),
 						'one' => q({0} au),
 						'other' => q({0} au),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(bits),
@@ -1688,6 +1697,20 @@ has 'units' => (
 					'per' => {
 						'1' => q({0} nge-{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PB),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
+					},
 					'picometer' => {
 						'name' => q(pm),
 						'one' => q({0} pm),
@@ -1834,6 +1857,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(indlela),
+					},
 					'arc-minute' => {
 						'one' => q({0}′),
 						'other' => q({0}′),
@@ -1938,6 +1964,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'second' => {
 						'name' => q(isekhondi),
 						'one' => q({0} s),
@@ -1955,6 +1986,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(indlela),
+					},
 					'acre' => {
 						'name' => q(acre),
 						'one' => q({0} ac),
@@ -1984,6 +2018,11 @@ has 'units' => (
 						'name' => q(au),
 						'one' => q({0} au),
 						'other' => q({0} au),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(bit),
@@ -2500,6 +2539,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PB),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
 					},
 					'picometer' => {
 						'name' => q(pm),
@@ -4112,6 +4166,13 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(i-Venezuelan Bolívar \(2008–2018\)),
+				'one' => q(i-Venezuelan Bolívar \(2008–2018\)),
+				'other' => q(i-Venezuelan Bolívar \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(i-Venezuelan Bolívar),
 				'one' => q(i-Venezuelan Bolívar),
 				'other' => q(i-Venezuelan Bolívar),
@@ -4481,57 +4542,57 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'morning2' if $time >= 600
-						&& $time < 1000;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1300;
-					return 'evening1' if $time >= 1300
-						&& $time < 1900;
-				}
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1300
 						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 					return 'afternoon1' if $time >= 1000
 						&& $time < 1300;
 					return 'morning2' if $time >= 600
 						&& $time < 1000;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1300;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'evening1' if $time >= 1300
+						&& $time < 1900;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'morning2' if $time >= 600
-						&& $time < 1000;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1300;
-					return 'evening1' if $time >= 1300
-						&& $time < 1900;
-				}
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1300
 						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 					return 'afternoon1' if $time >= 1000
 						&& $time < 1300;
 					return 'morning2' if $time >= 600
 						&& $time < 1000;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1300;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'evening1' if $time >= 1300
+						&& $time < 1900;
 				}
 				last SWITCH;
 				}
@@ -4551,61 +4612,61 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{AM},
+				'wide' => {
 					'evening1' => q{ntambama},
+					'pm' => q{PM},
+					'morning1' => q{entathakusa},
+					'am' => q{AM},
 					'afternoon1' => q{emini},
 					'morning2' => q{ekuseni},
-					'pm' => q{PM},
 					'night1' => q{ebusuku},
-					'morning1' => q{entathakusa},
 				},
 				'narrow' => {
-					'morning2' => q{ekuseni},
 					'afternoon1' => q{emini},
+					'morning2' => q{ekuseni},
+					'night1' => q{ebusuku},
+					'pm' => q{p},
 					'evening1' => q{ntambama},
 					'am' => q{a},
-					'night1' => q{ebusuku},
 					'morning1' => q{entathakusa},
-					'pm' => q{p},
 				},
-				'wide' => {
-					'pm' => q{PM},
-					'morning1' => q{entathakusa},
+				'abbreviated' => {
 					'night1' => q{ebusuku},
-					'am' => q{AM},
 					'morning2' => q{ekuseni},
 					'afternoon1' => q{emini},
+					'morning1' => q{entathakusa},
+					'am' => q{AM},
 					'evening1' => q{ntambama},
+					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'evening1' => q{ntambama},
-					'morning2' => q{ekuseni},
-					'afternoon1' => q{emini},
-					'am' => q{AM},
-					'morning1' => q{entathakusa},
-					'night1' => q{ebusuku},
-					'pm' => q{PM},
-				},
 				'wide' => {
-					'afternoon1' => q{emini},
-					'morning2' => q{ekuseni},
+					'pm' => q{PM},
 					'evening1' => q{ntambama},
 					'am' => q{AM},
 					'morning1' => q{entathakusa},
+					'afternoon1' => q{emini},
 					'night1' => q{ebusuku},
+					'morning2' => q{ekuseni},
+				},
+				'narrow' => {
+					'afternoon1' => q{emini},
+					'night1' => q{ebusuku},
+					'morning2' => q{ekuseni},
+					'evening1' => q{ntambama},
 					'pm' => q{PM},
+					'morning1' => q{entathakusa},
+					'am' => q{AM},
 				},
 				'abbreviated' => {
-					'morning1' => q{entathakusa},
-					'night1' => q{ebusuku},
 					'pm' => q{PM},
-					'morning2' => q{ekuseni},
-					'afternoon1' => q{emini},
 					'evening1' => q{ntambama},
 					'am' => q{AM},
+					'morning1' => q{entathakusa},
+					'afternoon1' => q{emini},
+					'morning2' => q{ekuseni},
+					'night1' => q{ebusuku},
 				},
 			},
 		},

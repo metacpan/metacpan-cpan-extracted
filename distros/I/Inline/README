@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Inline version 0.80.
+    This document describes Inline version 0.81.
 
 SYNOPSIS
 
@@ -1155,7 +1155,7 @@ AUTHOR
 
 COPYRIGHT
 
-      * Copyright 2000-2015. Ingy döt Net.
+      * Copyright 2000-2019. Ingy döt Net.
 
       * Copyright 2008, 2010-2014. Sisyphus.
 

@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-List
 
+0.23	Fri Feb  1 20:57:05 EST 2019
+	Add the calling line to the log
+	Added support for Geo::Coder::DataScienceToolkit
+
 0.22	Sun Jun  3 10:36:51 EDT 2018
 	Fix call on unblessed instance
 

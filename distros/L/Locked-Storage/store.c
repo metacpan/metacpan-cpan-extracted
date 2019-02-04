@@ -77,29 +77,38 @@ char *get(AddressRegion *pAddressRegion)
 
 int store(AddressRegion *pAddressRegion, char *data, int len)
 {
-        if (len > pAddressRegion->nBytes)
-                return 0;
-        memcpy(pAddressRegion->pBytes, data, (size_t) len);
-        pAddressRegion->sBytes = len;
-        return 1;
+    if (len > pAddressRegion->nBytes)
+        return 0;
+    memcpy(pAddressRegion->pBytes, data, (size_t) len);
+    pAddressRegion->sBytes = len;
+    return 1;
 }
 
 int unlockall(AddressRegion *pAddressRegion)
 {
+    int r;
     if (pAddressRegion->processLocked)
     {
-        munlockall(); /* unlock the process */
-        if (pAddressRegion->memLocked)
+        r = munlockall(); /* unlock the process */
+        if (!r && pAddressRegion->memLocked)
             mlock(pAddressRegion->pBytes, pAddressRegion->nBytes); /* relock it to memory */
         pAddressRegion->processLocked = 0;
+    } else {
+        r = -1;
     }
+    return r;
 }
 
 int lockall(AddressRegion *pAddressRegion)
 {
     int r;
-    r = mlockall(MCL_CURRENT | MCL_FUTURE); /* Lock everything now and future */
-    if (!r)
-        pAddressRegion->processLocked = 1; /* Record that it's locked if it succeeded */
+    if (pAddressRegion->processLocked)
+    {
+        r = -1;
+    } else {
+        r = mlockall(MCL_CURRENT | MCL_FUTURE); /* Lock everything now and future */
+        if (!r)
+            pAddressRegion->processLocked = 1; /* Record that it's locked if it succeeded */
+    }
     return r;
 }

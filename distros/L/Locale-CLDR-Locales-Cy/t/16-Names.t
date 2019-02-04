@@ -761,7 +761,7 @@ my $all_regions = {
 	'GU' => 'Guam',
 	'GW' => 'Guiné-Bissau',
 	'GY' => 'Guyana',
-	'HK' => 'Hong Kong RhGA Tsieina',
+	'HK' => 'Hong Kong SAR Tseina',
 	'HK@alt=short' => 'Hong Kong',
 	'HM' => 'Ynys Heard ac Ynysoedd McDonald',
 	'HN' => 'Honduras',

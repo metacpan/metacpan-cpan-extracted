@@ -34,9 +34,18 @@ plan skip_all => 'All the modules we found were excluded from POD coverage test.
 plan tests => scalar @modules;
 
 my %trustme = (
-             'WebService::Mocean' => [
-                                       qr/^(?:BUILD)$/
-                                     ]
+             'WebService::Mocean::Account' => [
+                                                qr/^(?:get_balance|get_pricing)$/
+                                              ],
+             'WebService::Mocean::Client' => [
+                                               qr/^(?:BUILD|request)$/
+                                             ],
+             'WebService::Mocean::Report' => [
+                                               qr/^(?:get_message_status)$/
+                                             ],
+             'WebService::Mocean::Sms' => [
+                                            qr/^(?:send|send_verification_code|check_verification_code)$/
+                                          ]
            );
 
 my @also_private;

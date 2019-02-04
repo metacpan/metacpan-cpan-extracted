@@ -1,7 +1,144 @@
 Revision history for Dist-Zilla-PluginBundle-Author-TABULO
 
+0.198     2019-02-03 01:55:30Z
+          - Reorganized and factored out some of our own code 
+          - Carried out major refactoring to ease maintenance
+          - Added some extra functionality & properties for 'dist.ini'
+
+          Here are details :
+
+            1.  Split the pre-checks and verifications that happen
+                in configure() into a dedicated subroutine.
+
+            2.  Factor all settings, defaults, and related logic out of
+                configure()
+
+            3.  Generalize author-specific settings & preferences so as to
+                refrain from having to refer to individual authors within
+                actual code, and hence put all such references into settings
+                data.
+
+            4.  Add or expose some settings / parameters:
+
+                a) Make sure that most, if not all, settings and preferences are
+                 surfaced as parameters in 'dist.ini'.
+
+                 New parameters include :
+                  - do_not_gather                       (multivalue)
+                  - spelling_pref / spelling_preference
+                  - static_install_mode
+                  - static_install_dry_run
+                  - install_release_from_cpan
+                  - verify_phases
+
+
+              b) Add some other settings/parameters inspired by DAGOLDEN's bundle and then some:
+                  - weaver_config
+                  - version_regexp
+                  - tag_format
+                  - tag_message
+                  - release_snapshot_commit_msg
+
+              c)Expose some settings from [@Git::VersionManager] :
+                  - changes_version_columns (int)
+                  - bump_version_global
+                  - rewrite_version_global
+
+
+              d)Add some new settings/parameters :
+                  - allow_insecure_operations   # Mainly for shaperoning 'install_release_from_cpan'
+                  - commit_copied       # default = 1.  When set (the default), the files which were previously
+                                        #               copied from the release will also be committed to the
+                                        #               repository afterwards.
+                  - git_branch          # default = 'master'
+                  - git_remote          # default = 'origin'
+                  - git_remote_branch   # default = git_branch() || 'master'
+                  - vcs_check           # default = 1. Check cleanliness of the VCS repository (initially and after tests)
+                  - vcs_check_more      # default = 1. Additional VCS related checks (merge conflicts, correct branch, remote branch, ...)
+
+            5.  Ability to specify 'implicit' additions to multi-value parameters can now to be overridden in 'dist.ini'
+                while also eliminating hard-coded values for those, e.g. :
+
+                    - installer_implicit
+                    - do_not_gather_implicit
+                    - copy_file_from_release_implicit
+                    - commit_file_from_release_implicit
+                    - ...
+
+            6.  Adjust 'never_gather_implicit' (i.e. 'do_not_gather_implicit'), adding:
+
+                    - README, README.mkdn,
+                    - META.yml
+                    - TODO.yml todo.yml todo.txt notes.txt notes.COMMIT.txt
+                    _ .dzil.out
+
+            7.  Refactor 'profile.ini' functionality
+                    - Put templates of hidden files in skel (now that dzil supports this):
+
+                      * .gitignore    (used to be generated from within 'profile.ini')
+                      * .travis.yml   (renamed from 'travis.yml')
+
+            9.  Refactor the way attribute defaults are obtained.
+
+                This is now done via the _resolve*() family of methods.
+                Defaults are searched through a predictable list of source hashes.
+                The list of sources is obtained from _fallback_settings() method.
+
+            10. Refactor Config data into a dedicated module (...::Config)
+
+            11. Refactor some routines into utility modules in separate distros :
+                - Banal-Util-Mini      # General purpose utility functions.
+                                        # This may later get merged into the 'Banal-Utils' distro
+                - Banal-Dist-Tools      # (Dist related utilities and roles)
+                - Banal-Role-Fallback   # (fallback mechanism for attribute defaults, including author-specific preferences)
+
+            12. Refactor some functionality to a dedicated role 'Banal::Dist::Zilla::PluginBundle::Easier'
+
+            13. Improve the POD Weaver plugin-bundle, adding some more stuff:
+
+                - Pod::Weaver::Plugin::*
+                  * -AppendPrepend
+                  * -EnsureUniqueSections
+                  * -Include
+                  * -StopWords
+
+                - Pod::Weaver::Section::*
+                  * WarrantyDisclaimer
+
+            14. Adapt the templates in the minting profile
+            15. Adapt tests whenever it made sense to do so (to cover expected changes)
+
+
+            ADDITIONAL NOTES:
+
+            - Also fixed the test in 't/06-airplaine.t', failing since switching
+            to the 'dev' branch. ( ETHER is probably testing only on 'master').
+
+            -  The fix involved adding a few plugins, such as
+            (CheckIssues CheckPrereqsIndexed)
+            to the list of plugins to be removed during all tests
+            ('@REMOVED_PLUGINS' array) in 't/lib/Helper.pm'.
+
+            - Took the opportinity to make a small improvement
+            in 't/06-airplain.t', by removing an explict reference to the name of
+            our plugin-bundle.
+
+            - '.gitignore' closely follows what's in the minting skeleton.
+
+            - Bootsrapping (i.e. using the development version of this very
+             pluginbundle to build itself) now works with both
+             'lib' and 'Bootsrap::lib', the former ('lib') being the preferred
+             method (as it appears to involve less magic),
+             and the latter (Bootstrap::lib) commented out in 'dist.ini'.
+
+            Also fixed some minor POD syntax issues. For example, POD weaver
+            appears to be eating some blank lines
+            which then causes the POD syntax tests to fail. Pay extra attention to
+            the start and end of lists (Pod::Elemental::Transformer::List)
+            signalled by '=begin :list' and '=end :list'.
+
 0.197     2018-01-03 01:46:36Z
-         - Fix POD section ordering wrt to the newly added
+          - Fix POD section ordering wrt to the newly added
           sections (WARNING, ...).
 
 0.182     2018-01-03 01:38:02Z
@@ -30,7 +167,7 @@ Revision history for Dist-Zilla-PluginBundle-Author-TABULO
             StaticInstall plugin and also the choice for the licence file name
             between : LICENCE vs LICENSE (notice the spelling).
 
-            For some reason, all along, I kept singing "Tomaito, tomaatoo..."" :-)
+            For some reason, all along, I kept singing "Tomato, tomaatoo..."" :-)
 
             Finally, we now have all the tests passing again...
 

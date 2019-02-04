@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::InsertCodeResult;
 
-our $DATE = '2018-04-06'; # DATE
-our $VERSION = '0.050'; # VERSION
+our $DATE = '2019-02-04'; # DATE
+our $VERSION = '0.051'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,7 +31,8 @@ sub munge_file {
     my ($self, $file) = @_;
     my $content = $file->content;
     if ($content =~ s{^#\s*CODE:\s*(.*)\s*$}{$self->_code_result($1)."\n"}egm) {
-        $self->log(["inserting result of code '%s' in %s: '%s'", $1, $file->name, $content]);
+        $self->log(["inserting result of code '%s' in %s", $1, $file->name]);
+        $self->log_debug(["result of code: '%s'", $content]);
         $file->content($content);
     }
 }
@@ -72,7 +73,7 @@ Dist::Zilla::Plugin::InsertCodeResult - Insert the result of Perl code into your
 
 =head1 VERSION
 
-This document describes version 0.050 of Dist::Zilla::Plugin::InsertCodeResult (from Perl distribution Dist-Zilla-Plugin-InsertCodeResult), released on 2018-04-06.
+This document describes version 0.051 of Dist::Zilla::Plugin::InsertCodeResult (from Perl distribution Dist-Zilla-Plugin-InsertCodeResult), released on 2019-02-04.
 
 =head1 SYNOPSIS
 
@@ -121,7 +122,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

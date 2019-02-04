@@ -6,7 +6,9 @@ use Config;
 use Minion::Job;
 use Minion::Worker;
 use Mojo::Date;
+use Mojo::IOLoop;
 use Mojo::Loader 'load_class';
+use Mojo::Promise;
 use Mojo::Server;
 use Mojo::Util 'steady_time';
 
@@ -20,7 +22,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '9.07';
+our $VERSION = '9.09';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -65,8 +67,7 @@ sub history { shift->backend->history }
 sub job {
   my ($self, $id) = @_;
 
-  return undef
-    unless my $job = $self->backend->list_jobs(0, 1, {ids => [$id]})->{jobs}[0];
+  return undef unless my $job = $self->_info($id);
   return Minion::Job->new(
     args    => $job->{args},
     id      => $job->{id},
@@ -98,6 +99,18 @@ sub perform_jobs {
 sub repair { shift->_delegate('repair') }
 sub reset  { shift->_delegate('reset') }
 
+sub result_p {
+  my ($self, $id, $options) = (shift, shift, shift // {});
+
+  my $promise = Mojo::Promise->new;
+  my $cb      = sub { $self->_result($promise, $id) };
+  my $timer   = Mojo::IOLoop->recurring($options->{interval} // 3 => $cb);
+  $promise->finally(sub { Mojo::IOLoop->remove($timer) });
+  $cb->();
+
+  return $promise;
+}
+
 sub stats  { shift->backend->stats }
 sub unlock { shift->backend->unlock(@_) }
 
@@ -126,6 +139,15 @@ sub _delegate {
   my ($self, $method) = @_;
   $self->backend->$method;
   return $self;
+}
+
+sub _info { shift->backend->list_jobs(0, 1, {ids => [shift]})->{jobs}[0] }
+
+sub _result {
+  my ($self, $promise, $id) = @_;
+  return $promise->resolve unless my $job = $self->_info($id);
+  if    ($job->{state} eq 'finished') { $promise->resolve($job) }
+  elsif ($job->{state} eq 'failed')   { $promise->reject($job) }
 }
 
 package Minion::_Guard;
@@ -648,6 +670,41 @@ Repair worker registry and job queue if necessary.
 
 Reset job queue.
 
+=head2 result_p
+
+  my $promise = $minion->result_p($id);
+  my $promise = $minion->result_p($id, {interval => 5});
+
+Return a L<Mojo::Promise> object for the result of a job. The state C<finished>
+will result in the promise being C<fullfilled>, and the state C<failed> in the
+promise being C<rejected>. This operation can be cancelled by resolving the
+promise manually at any time. Note that this method is EXPERIMENTAL and might
+change without warning!
+
+  # Enqueue job and receive the result at some point in the future
+  my $id = $minion->enqueue('foo');
+  $minion->result_p($id)->then(sub {
+    my $info   = shift;
+    my $result = ref $info ? $info->{result} : 'Job already removed';
+    say "Finished: $result";
+  })->catch(sub {
+    my $info = shift;
+    say "Failed: $info->{result}";
+  })->wait;
+
+These options are currently available:
+
+=over 2
+
+=item interval
+
+  interval => 5
+
+Polling interval in seconds for checking if the state of the job has changed,
+defaults to C<3>.
+
+=back
+
 =head2 stats
 
   my $stats = $minion->stats;
@@ -880,7 +937,7 @@ Stefan Adams
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2018, Sebastian Riedel and others.
+Copyright (C) 2014-2019, Sebastian Riedel and others.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

@@ -22,6 +22,6 @@ requires:
   Mojolicious: '8'
 resources:
   repository: git://github.com/mche/Mojolicious-Plugin-Minion-Workers.git
-version: '0.09074'
+version: '0.09075'
 x_homepage: https://github.com/mche
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

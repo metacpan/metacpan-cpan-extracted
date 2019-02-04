@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Se - Package for language Northern Sami
 
 package Locale::CLDR::Locales::Se;
 # This file auto generated from Data\common\main\se.xml
-#	on Sun  7 Oct 10:57:12 am GMT
+#	on Sun  3 Feb  2:16:49 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2622,12 +2622,12 @@ has 'day_periods' => (
 					'am' => q{i.b.},
 				},
 				'wide' => {
-					'am' => q{iđitbeaivet},
 					'pm' => q{eahketbeaivet},
+					'am' => q{iđitbeaivet},
 				},
 				'abbreviated' => {
-					'pm' => q{e.b.},
 					'am' => q{i.b.},
+					'pm' => q{e.b.},
 				},
 			},
 			'stand-alone' => {
@@ -2635,13 +2635,13 @@ has 'day_periods' => (
 					'am' => q{i.b.},
 					'pm' => q{e.b.},
 				},
-				'narrow' => {
-					'am' => q{i.b.},
-					'pm' => q{e.b.},
-				},
 				'wide' => {
-					'am' => q{iđitbeaivi},
 					'pm' => q{eahketbeaivi},
+					'am' => q{iđitbeaivi},
+				},
+				'narrow' => {
+					'pm' => q{e.b.},
+					'am' => q{i.b.},
 				},
 			},
 		},

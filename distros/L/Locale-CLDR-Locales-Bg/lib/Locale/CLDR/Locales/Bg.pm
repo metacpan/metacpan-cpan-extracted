@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Bg - Package for language Bulgarian
 
 package Locale::CLDR::Locales::Bg;
 # This file auto generated from Data\common\main\bg.xml
-#	on Sun  7 Oct 10:21:55 am GMT
+#	on Sun  3 Feb  1:40:32 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -572,7 +572,7 @@ has 'display_name_language' => (
  				'bez' => 'бена',
  				'bg' => 'български',
  				'bgn' => 'западен балочи',
- 				'bho' => 'божпури',
+ 				'bho' => 'боджпури',
  				'bi' => 'бислама',
  				'bik' => 'биколски',
  				'bin' => 'бини',
@@ -603,7 +603,7 @@ has 'display_name_language' => (
  				'cho' => 'чокто',
  				'chp' => 'чиипувски',
  				'chr' => 'черокски',
- 				'chy' => 'чейенски',
+ 				'chy' => 'шайенски',
  				'ckb' => 'кюрдски (централен)',
  				'co' => 'корсикански',
  				'cop' => 'коптски',
@@ -617,7 +617,7 @@ has 'display_name_language' => (
  				'cy' => 'уелски',
  				'da' => 'датски',
  				'dak' => 'дакотски',
- 				'dar' => 'даргва',
+ 				'dar' => 'даргински',
  				'dav' => 'таита',
  				'de' => 'немски',
  				'del' => 'делауер',
@@ -825,7 +825,7 @@ has 'display_name_language' => (
  				'mt' => 'малтийски',
  				'mua' => 'мунданг',
  				'mul' => 'многоезични',
- 				'mus' => 'крик',
+ 				'mus' => 'мускогски',
  				'mwl' => 'мирандийски',
  				'mwr' => 'марвари',
  				'my' => 'бирмански',
@@ -1252,7 +1252,7 @@ has 'display_name_region' => (
  			'BO' => 'Боливия',
  			'BQ' => 'Карибска Нидерландия',
  			'BR' => 'Бразилия',
- 			'BS' => 'Бахами',
+ 			'BS' => 'Бахамски острови',
  			'BT' => 'Бутан',
  			'BV' => 'остров Буве',
  			'BW' => 'Ботсвана',
@@ -1267,7 +1267,6 @@ has 'display_name_region' => (
  			'CG@alt=variant' => 'Конго (Република)',
  			'CH' => 'Швейцария',
  			'CI' => 'Кот д’Ивоар',
- 			'CI@alt=variant' => 'Бряг на слоновата кост',
  			'CK' => 'острови Кук',
  			'CL' => 'Чили',
  			'CM' => 'Камерун',
@@ -1301,8 +1300,8 @@ has 'display_name_region' => (
  			'EZ' => 'Еврозона',
  			'FI' => 'Финландия',
  			'FJ' => 'Фиджи',
- 			'FK' => 'Фолклендски острови',
- 			'FK@alt=variant' => 'Фолклендски острови (Малвински острови)',
+ 			'FK' => 'Фолкландски острови',
+ 			'FK@alt=variant' => 'Фолкландски острови (Малвински острови)',
  			'FM' => 'Микронезия',
  			'FO' => 'Фарьорски острови',
  			'FR' => 'Франция',
@@ -1834,6 +1833,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(основна посока),
+					},
 					'acre' => {
 						'name' => q(акри),
 						'one' => q({0} акър),
@@ -1863,6 +1865,11 @@ has 'units' => (
 						'name' => q(астрономически единици),
 						'one' => q({0} астрономическа единица),
 						'other' => q({0} астрономически единици),
+					},
+					'atmosphere' => {
+						'name' => q(атмосфери),
+						'one' => q({0} атмосфера),
+						'other' => q({0} атмосфери),
 					},
 					'bit' => {
 						'name' => q(битове),
@@ -2380,6 +2387,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0} на {1}),
 					},
+					'percent' => {
+						'name' => q(процент),
+						'one' => q({0} процент),
+						'other' => q({0} процента),
+					},
+					'permille' => {
+						'name' => q(промил),
+						'one' => q({0} промил),
+						'other' => q({0} промила),
+					},
+					'petabyte' => {
+						'name' => q(петабайти),
+						'one' => q({0} петабайт),
+						'other' => q({0} петабайта),
+					},
 					'picometer' => {
 						'name' => q(пикометри),
 						'one' => q({0} пикометър),
@@ -2526,6 +2548,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(посока),
+					},
 					'acre' => {
 						'one' => q({0} акър),
 						'other' => q({0} акра),
@@ -2673,9 +2698,9 @@ has 'units' => (
 						'other' => q({0} mm),
 					},
 					'millisecond' => {
-						'name' => q(ms),
-						'one' => q({0} ms),
-						'other' => q({0} ms),
+						'name' => q(мсек),
+						'one' => q({0} мсек),
+						'other' => q({0} мсек),
 					},
 					'minute' => {
 						'name' => q(мин),
@@ -2683,9 +2708,9 @@ has 'units' => (
 						'other' => q({0} мин),
 					},
 					'month' => {
-						'name' => q(м),
-						'one' => q({0} м),
-						'other' => q({0} м),
+						'name' => q(мес.),
+						'one' => q({0} мес.),
+						'other' => q({0} мес.),
 					},
 					'ounce' => {
 						'one' => q({0} унц.),
@@ -2693,6 +2718,11 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
 					},
 					'picometer' => {
 						'one' => q({0} pm),
@@ -2743,6 +2773,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(посока),
+					},
 					'acre' => {
 						'name' => q(акри),
 						'one' => q({0} акър),
@@ -2772,6 +2805,11 @@ has 'units' => (
 						'name' => q(AU),
 						'one' => q({0} AU),
 						'other' => q({0} AU),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(б),
@@ -2986,7 +3024,7 @@ has 'units' => (
 						'name' => q(часове),
 						'one' => q({0} ч),
 						'other' => q({0} ч),
-						'per' => q({0}/h),
+						'per' => q({0}/ч),
 					},
 					'inch' => {
 						'name' => q(инчове),
@@ -3225,8 +3263,8 @@ has 'units' => (
 					},
 					'millisecond' => {
 						'name' => q(милисекунди),
-						'one' => q({0} ms),
-						'other' => q({0} ms),
+						'one' => q({0} мсек),
+						'other' => q({0} мсек),
 					},
 					'milliwatt' => {
 						'name' => q(mW),
@@ -3289,6 +3327,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(процент),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(промил),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PByte),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
+					},
 					'picometer' => {
 						'name' => q(пикометри),
 						'one' => q({0} pm),
@@ -3337,9 +3390,9 @@ has 'units' => (
 					},
 					'second' => {
 						'name' => q(секунди),
-						'one' => q({0} с),
-						'other' => q({0} с),
-						'per' => q({0}/с),
+						'one' => q({0} сек),
+						'other' => q({0} сек),
+						'per' => q({0}/сек),
 					},
 					'square-centimeter' => {
 						'name' => q(cm²),
@@ -3429,8 +3482,8 @@ has 'units' => (
 					},
 					'year' => {
 						'name' => q(години),
-						'one' => q({0} г),
-						'other' => q({0} г),
+						'one' => q({0} год.),
+						'other' => q({0} год.),
 						'per' => q({0}/год.),
 					},
 				},
@@ -5466,6 +5519,14 @@ has 'currencies' => (
 				'other' => q(венецуелски боливара),
 			},
 		},
+		'VES' => {
+			symbol => 'VES',
+			display_name => {
+				'currency' => q(Венецуелски боливар \(VES\)),
+				'one' => q(венецуелски боливар \(VES\)),
+				'other' => q(венецуелски боливара \(VES\)),
+			},
+		},
 		'VND' => {
 			symbol => 'VND',
 			display_name => {
@@ -6032,142 +6093,142 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1100;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1400
-						&& $time < 1800;
-					return 'morning2' if $time >= 1100
-						&& $time < 1400;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 1100
+						&& $time < 1400;
+					return 'afternoon1' if $time >= 1400
+						&& $time < 1800;
 					return 'morning1' if $time >= 400
 						&& $time < 1100;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
-					return 'afternoon1' if $time >= 1400
-						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
 					return 'morning2' if $time >= 1100
 						&& $time < 1400;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1400
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1100;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'islamic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1100;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1400
-						&& $time < 1800;
-					return 'morning2' if $time >= 1100
-						&& $time < 1400;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 1100
+						&& $time < 1400;
+					return 'afternoon1' if $time >= 1400
+						&& $time < 1800;
 					return 'morning1' if $time >= 400
 						&& $time < 1100;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
-					return 'afternoon1' if $time >= 1400
-						&& $time < 1800;
-					return 'morning2' if $time >= 1100
-						&& $time < 1400;
 				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 1100
+						&& $time < 1400;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1400
+						&& $time < 1800;
 					return 'morning1' if $time >= 400
 						&& $time < 1100;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
-					return 'afternoon1' if $time >= 1400
-						&& $time < 1800;
-					return 'morning2' if $time >= 1100
-						&& $time < 1400;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1100;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1400
-						&& $time < 1800;
-					return 'morning2' if $time >= 1100
-						&& $time < 1400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1100;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1400
-						&& $time < 1800;
-					return 'morning2' if $time >= 1100
-						&& $time < 1400;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 1100
+						&& $time < 1400;
+					return 'afternoon1' if $time >= 1400
+						&& $time < 1800;
 					return 'morning1' if $time >= 400
 						&& $time < 1100;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
-					return 'afternoon1' if $time >= 1400
-						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
 					return 'morning2' if $time >= 1100
 						&& $time < 1400;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1400
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1100;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'indian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1100;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1400
-						&& $time < 1800;
-					return 'morning2' if $time >= 1100
-						&& $time < 1400;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 1100
+						&& $time < 1400;
+					return 'afternoon1' if $time >= 1400
+						&& $time < 1800;
 					return 'morning1' if $time >= 400
 						&& $time < 1100;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
-					return 'afternoon1' if $time >= 1400
-						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
 					return 'morning2' if $time >= 1100
 						&& $time < 1400;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1400
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1100;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 1100
+						&& $time < 1400;
+					return 'afternoon1' if $time >= 1400
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1100;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 1100
+						&& $time < 1400;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1400
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1100;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 				}
 				last SWITCH;
 				}
@@ -6187,67 +6248,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{am},
-					'evening1' => q{вечерта},
-					'morning1' => q{сутринта},
-					'night1' => q{през нощта},
-					'afternoon1' => q{следобед},
-					'morning2' => q{на обед},
-					'midnight' => q{полунощ},
-					'pm' => q{pm},
-				},
 				'narrow' => {
-					'night1' => q{през нощта},
 					'morning1' => q{сутринта},
-					'am' => q{am},
 					'evening1' => q{вечерта},
-					'pm' => q{pm},
-					'morning2' => q{на обед},
 					'afternoon1' => q{следобед},
+					'am' => q{am},
+					'pm' => q{pm},
 					'midnight' => q{полунощ},
+					'night1' => q{през нощта},
+					'morning2' => q{на обяд},
 				},
 				'wide' => {
-					'evening1' => q{вечерта},
-					'am' => q{пр.об.},
-					'morning1' => q{сутринта},
-					'night1' => q{през нощта},
-					'midnight' => q{полунощ},
 					'morning2' => q{на обяд},
-					'afternoon1' => q{следобед},
+					'night1' => q{през нощта},
+					'am' => q{пр.об.},
+					'midnight' => q{полунощ},
 					'pm' => q{сл.об.},
+					'afternoon1' => q{следобед},
+					'morning1' => q{сутринта},
+					'evening1' => q{вечерта},
+				},
+				'abbreviated' => {
+					'pm' => q{pm},
+					'midnight' => q{полунощ},
+					'am' => q{am},
+					'morning2' => q{на обяд},
+					'night1' => q{през нощта},
+					'evening1' => q{вечерта},
+					'morning1' => q{сутринта},
+					'afternoon1' => q{следобед},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'evening1' => q{вечерта},
-					'am' => q{am},
-					'night1' => q{през нощта},
-					'morning1' => q{сутринта},
-					'afternoon1' => q{следобед},
-					'morning2' => q{на обед},
-					'midnight' => q{полунощ},
-					'pm' => q{pm},
-				},
-				'narrow' => {
-					'evening1' => q{вечерта},
-					'am' => q{am},
-					'night1' => q{през нощта},
-					'morning1' => q{сутринта},
-					'afternoon1' => q{следобед},
-					'morning2' => q{наобед},
-					'midnight' => q{полунощ},
-					'pm' => q{pm},
-				},
 				'wide' => {
 					'midnight' => q{полунощ},
-					'afternoon1' => q{следобед},
-					'morning2' => q{на обед},
 					'pm' => q{pm},
 					'am' => q{am},
-					'evening1' => q{вечерта},
+					'morning2' => q{на обяд},
 					'night1' => q{през нощта},
+					'evening1' => q{вечерта},
 					'morning1' => q{сутринта},
+					'afternoon1' => q{следобед},
+				},
+				'narrow' => {
+					'am' => q{am},
+					'pm' => q{pm},
+					'midnight' => q{полунощ},
+					'night1' => q{през нощта},
+					'morning2' => q{на обяд},
+					'morning1' => q{сутринта},
+					'evening1' => q{вечерта},
+					'afternoon1' => q{следобед},
+				},
+				'abbreviated' => {
+					'afternoon1' => q{следобед},
+					'evening1' => q{вечерта},
+					'morning1' => q{сутринта},
+					'morning2' => q{на обяд},
+					'night1' => q{през нощта},
+					'pm' => q{pm},
+					'midnight' => q{полунощ},
+					'am' => q{am},
 				},
 			},
 		},
@@ -6359,56 +6420,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			Bh => q{h 'ч' .B},
-			Bhm => q{h:mm 'ч'. B},
-			Bhms => q{h:mm:ss 'ч'. B},
-			E => q{ccc},
-			EBhm => q{E, h:mm 'ч'. B},
-			EBhms => q{E, h:mm:ss 'ч'. B},
-			EHm => q{E, HH:mm 'ч'.},
-			EHms => q{E, HH:mm:ss 'ч'.},
-			Ed => q{E, d},
-			Ehm => q{E, h:mm 'ч'. a},
-			Ehms => q{E, h:mm:ss 'ч'. a},
-			Gy => q{y 'г'. G},
-			GyMMM => q{MM.y 'г'. G},
-			GyMMMEd => q{E, d.MM.y 'г'. G},
-			GyMMMM => q{MMMM y 'г'. G},
-			GyMMMMEd => q{E, d MMMM y 'г'. G},
-			GyMMMMd => q{d MMMM y 'г'. G},
-			GyMMMd => q{d.MM.y 'г'. G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{M},
-			MEd => q{E, d.MM},
-			MMM => q{MM},
-			MMMEd => q{E, d.MM},
-			MMMM => q{LLLL},
-			MMMMEd => q{E, d MMMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d.MM},
-			Md => q{d.MM},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm 'ч'. a},
-			hms => q{h:mm:ss 'ч'. a},
-			ms => q{mm:ss},
-			y => q{y 'г'. G},
-			yyyy => q{y 'г'. G},
-			yyyyM => q{M.y 'г'. G},
-			yyyyMEd => q{E, d.MM.y 'г'. G},
-			yyyyMMM => q{MM.y 'г'. G},
-			yyyyMMMEd => q{E, d.MM.y 'г'. G},
-			yyyyMMMM => q{MMMM y 'г'. G},
-			yyyyMMMMEd => q{E, d MMMM y 'г'. G},
-			yyyyMMMMd => q{d MMMM y 'г'. G},
-			yyyyMMMd => q{d.MM.y 'г'. G},
-			yyyyMd => q{d.MM.y 'г'. G},
-			yyyyQQQ => q{QQQ y 'г'. G},
-			yyyyQQQQ => q{QQQQ y 'г'. G},
-		},
 		'gregorian' => {
 			Bh => q{h 'ч'. B},
 			Bhm => q{h:mm 'ч'. B},
@@ -6465,6 +6476,56 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y 'г'.},
 			yw => q{'седмица' w 'от' Y 'г'.},
 		},
+		'generic' => {
+			Bh => q{h 'ч' .B},
+			Bhm => q{h:mm 'ч'. B},
+			Bhms => q{h:mm:ss 'ч'. B},
+			E => q{ccc},
+			EBhm => q{E, h:mm 'ч'. B},
+			EBhms => q{E, h:mm:ss 'ч'. B},
+			EHm => q{E, HH:mm 'ч'.},
+			EHms => q{E, HH:mm:ss 'ч'.},
+			Ed => q{E, d},
+			Ehm => q{E, h:mm 'ч'. a},
+			Ehms => q{E, h:mm:ss 'ч'. a},
+			Gy => q{y 'г'. G},
+			GyMMM => q{MM.y 'г'. G},
+			GyMMMEd => q{E, d.MM.y 'г'. G},
+			GyMMMM => q{MMMM y 'г'. G},
+			GyMMMMEd => q{E, d MMMM y 'г'. G},
+			GyMMMMd => q{d MMMM y 'г'. G},
+			GyMMMd => q{d.MM.y 'г'. G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{M},
+			MEd => q{E, d.MM},
+			MMM => q{MM},
+			MMMEd => q{E, d.MM},
+			MMMM => q{LLLL},
+			MMMMEd => q{E, d MMMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d.MM},
+			Md => q{d.MM},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm 'ч'. a},
+			hms => q{h:mm:ss 'ч'. a},
+			ms => q{mm:ss},
+			y => q{y 'г'. G},
+			yyyy => q{y 'г'. G},
+			yyyyM => q{M.y 'г'. G},
+			yyyyMEd => q{E, d.MM.y 'г'. G},
+			yyyyMMM => q{MM.y 'г'. G},
+			yyyyMMMEd => q{E, d.MM.y 'г'. G},
+			yyyyMMMM => q{MMMM y 'г'. G},
+			yyyyMMMMEd => q{E, d MMMM y 'г'. G},
+			yyyyMMMMd => q{d MMMM y 'г'. G},
+			yyyyMMMd => q{d.MM.y 'г'. G},
+			yyyyMd => q{d.MM.y 'г'. G},
+			yyyyQQQ => q{QQQ y 'г'. G},
+			yyyyQQQQ => q{QQQQ y 'г'. G},
+		},
 	} },
 );
 
@@ -6484,122 +6545,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{M – M},
-			},
-			MEd => {
-				M => q{E, d.MM – E, d.MM},
-				d => q{E, d.MM – E, d.MM},
-			},
-			MMM => {
-				M => q{MM – MM},
-			},
-			MMMEd => {
-				M => q{E, d.MM – E, d.MM},
-				d => q{E, d.MM – E, d.MM},
-			},
-			MMMM => {
-				M => q{LLLL – LLLL},
-			},
-			MMMMEd => {
-				M => q{E, d MMMM – E, d MMMM},
-				d => q{E, d MMMM – E, d MMMM},
-			},
-			MMMMd => {
-				M => q{d MMMM – d MMMM},
-				d => q{d – d MMMM},
-			},
-			MMMd => {
-				M => q{d.MM – d.MM},
-				d => q{d.MM – d.MM},
-			},
-			Md => {
-				M => q{d.MM – d.MM},
-				d => q{d.MM – d.MM},
-			},
-			d => {
-				d => q{d – d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y – y 'г'.G},
-			},
-			yM => {
-				M => q{MM – MM.y 'г'. G},
-				y => q{MM.y 'г'. – MM.y 'г'. G},
-			},
-			yMEd => {
-				M => q{E, d.MM – E, d.MM.y 'г'. G},
-				d => q{E, d.MM – E, d.MM.y 'г'. G},
-				y => q{E, d.MM.y 'г'. – E, d.MM.y 'г'. G},
-			},
-			yMMM => {
-				M => q{MM – MM.y 'г'. G},
-				y => q{MM.y 'г'. – MM.y 'г'. G},
-			},
-			yMMMEd => {
-				M => q{E, d.MM – E, d.MM.y 'г'. G},
-				d => q{E, d.MM – E, d.MM.y 'г'. G},
-				y => q{E, d.MM.y 'г'. – E, d.MM.y 'г'. G},
-			},
-			yMMMM => {
-				M => q{MMMM – MMMM y 'г'. G},
-				y => q{MMMM y 'г'. – MMMM y 'г'. G},
-			},
-			yMMMMEd => {
-				M => q{E, d MMMM – E, d MMMM y 'г'. G},
-				d => q{E, d MMMM – E, d MMMM y 'г'. G},
-				y => q{E, d MMMM y 'г'. – E, d MMMM y 'г'. G},
-			},
-			yMMMMd => {
-				M => q{d MMMM – d MMMM y 'г'. G},
-				d => q{d – d MMMM y 'г'. G},
-				y => q{d MMMM y 'г'. – d MMMM y 'г'. G},
-			},
-			yMMMd => {
-				M => q{d.MM – d.MM.y 'г'. G},
-				d => q{d.MM – d.MM.y 'г'. G},
-				y => q{d.MM.y 'г'. – d.MM.y 'г'. G},
-			},
-			yMd => {
-				M => q{d.MM – d.MM.y 'г'. G},
-				d => q{d.MM – d.MM.y 'г'. G},
-				y => q{d.MM.y 'г'. – d.MM.y 'г'. G},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{H – H 'ч'.},
@@ -6714,6 +6659,122 @@ has 'datetime_formats_interval' => (
 				M => q{d.MM – d.MM.y 'г'.},
 				d => q{d.MM – d.MM.y 'г'.},
 				y => q{d.MM.y 'г'. – d.MM.y 'г'.},
+			},
+		},
+		'generic' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{M – M},
+			},
+			MEd => {
+				M => q{E, d.MM – E, d.MM},
+				d => q{E, d.MM – E, d.MM},
+			},
+			MMM => {
+				M => q{MM – MM},
+			},
+			MMMEd => {
+				M => q{E, d.MM – E, d.MM},
+				d => q{E, d.MM – E, d.MM},
+			},
+			MMMM => {
+				M => q{LLLL – LLLL},
+			},
+			MMMMEd => {
+				M => q{E, d MMMM – E, d MMMM},
+				d => q{E, d MMMM – E, d MMMM},
+			},
+			MMMMd => {
+				M => q{d MMMM – d MMMM},
+				d => q{d – d MMMM},
+			},
+			MMMd => {
+				M => q{d.MM – d.MM},
+				d => q{d.MM – d.MM},
+			},
+			Md => {
+				M => q{d.MM – d.MM},
+				d => q{d.MM – d.MM},
+			},
+			d => {
+				d => q{d – d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y – y 'г'.G},
+			},
+			yM => {
+				M => q{MM – MM.y 'г'. G},
+				y => q{MM.y 'г'. – MM.y 'г'. G},
+			},
+			yMEd => {
+				M => q{E, d.MM – E, d.MM.y 'г'. G},
+				d => q{E, d.MM – E, d.MM.y 'г'. G},
+				y => q{E, d.MM.y 'г'. – E, d.MM.y 'г'. G},
+			},
+			yMMM => {
+				M => q{MM – MM.y 'г'. G},
+				y => q{MM.y 'г'. – MM.y 'г'. G},
+			},
+			yMMMEd => {
+				M => q{E, d.MM – E, d.MM.y 'г'. G},
+				d => q{E, d.MM – E, d.MM.y 'г'. G},
+				y => q{E, d.MM.y 'г'. – E, d.MM.y 'г'. G},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM y 'г'. G},
+				y => q{MMMM y 'г'. – MMMM y 'г'. G},
+			},
+			yMMMMEd => {
+				M => q{E, d MMMM – E, d MMMM y 'г'. G},
+				d => q{E, d MMMM – E, d MMMM y 'г'. G},
+				y => q{E, d MMMM y 'г'. – E, d MMMM y 'г'. G},
+			},
+			yMMMMd => {
+				M => q{d MMMM – d MMMM y 'г'. G},
+				d => q{d – d MMMM y 'г'. G},
+				y => q{d MMMM y 'г'. – d MMMM y 'г'. G},
+			},
+			yMMMd => {
+				M => q{d.MM – d.MM.y 'г'. G},
+				d => q{d.MM – d.MM.y 'г'. G},
+				y => q{d.MM.y 'г'. – d.MM.y 'г'. G},
+			},
+			yMd => {
+				M => q{d.MM – d.MM.y 'г'. G},
+				d => q{d.MM – d.MM.y 'г'. G},
+				y => q{d.MM.y 'г'. – d.MM.y 'г'. G},
 			},
 		},
 	} },

@@ -1,3 +1,12 @@
+v0.78.12 2019-02-04T06:48:00Z
+ - resources updated
+
+v0.78.11 2019-02-04T05:01:25Z
+ - Google FCM API
+
+v0.78.10 2019-02-04T04:51:48Z
+ - Google FCM API
+
 v0.78.9 2019-01-25T10:46:01Z
  - index controller must inherit index role
 

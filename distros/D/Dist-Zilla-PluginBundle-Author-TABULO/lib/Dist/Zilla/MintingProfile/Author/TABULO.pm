@@ -1,11 +1,12 @@
 use strict;
 use warnings;
 package Dist::Zilla::MintingProfile::Author::TABULO;
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=2 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Mint distributions like TABULO does
 # BASED_ON: Dist::Zilla::MintingProfile::Author::ETHER
 
-our $VERSION = '0.197';
+our $VERSION = '0.198';
+# AUTHORITY
 
 use Moose;
 with 'Dist::Zilla::Role::MintingProfile' => { -version => '5.047' };
@@ -43,7 +44,7 @@ Dist::Zilla::MintingProfile::Author::TABULO - Mint distributions like TABULO doe
 
 =head1 VERSION
 
-version 0.197
+version 0.198
 
 =head1 SYNOPSIS
 
@@ -146,11 +147,11 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 =head1 AUTHOR
 
-Ayhan Ulusoy <tabulo@cpan.org>
+Tabulo <tabulo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ayhan Ulusoy.
+This software is copyright (c) 2018 by Tabulo.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

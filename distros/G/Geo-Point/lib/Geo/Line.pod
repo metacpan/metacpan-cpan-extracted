@@ -49,7 +49,7 @@ Extends L<"Constructors" in Geo::Shape|Geo::Shape/"Constructors">.
 =item Geo::Line-E<gt>B<bboxFromString>( $string, [$projection] )
 
 Create a square from the $string.  The coordinates can be separated by
-a comma (preferrably), or blanks.  When the coordinates end on NSEW, the
+a comma (preferably), or blanks.  When the coordinates end on NSEW, the
 order does not matter, otherwise lat-long or xy order is presumed.
 
 This routine is very smart.  It understands 
@@ -450,12 +450,12 @@ The limitation is purely caused by lack of time to implement this.
 
 =head1 SEE ALSO
 
-This module is part of Geo-Point distribution version 0.97,
-built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Geo-Point distribution version 0.98,
+built on February 01, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2005-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2005-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

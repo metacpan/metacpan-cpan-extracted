@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Wo::Any::Sn - Package for language Wolof
 
 package Locale::CLDR::Locales::Wo::Any::Sn;
 # This file auto generated from Data\common\main\wo_SN.xml
-#	on Sun  7 Oct 11:06:42 am GMT
+#	on Sun  3 Feb  2:26:11 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

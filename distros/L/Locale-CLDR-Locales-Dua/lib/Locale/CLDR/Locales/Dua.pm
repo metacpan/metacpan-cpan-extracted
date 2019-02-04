@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Dua - Package for language Duala
 
 package Locale::CLDR::Locales::Dua;
 # This file auto generated from Data\common\main\dua.xml
-#	on Sun  7 Oct 10:27:46 am GMT
+#	on Sun  3 Feb  1:46:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -310,11 +310,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{ebyámu},
 					'am' => q{idiɓa},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{ebyámu},
 					'am' => q{idiɓa},
 				},

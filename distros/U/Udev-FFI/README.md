@@ -5,6 +5,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
 # SYNOPSIS
 
     use Udev::FFI;
+    use Udev::FFI::Devnum qw(:all); # <- import major, minor and makedev
     
     # get udev library version
     my $udev_version = Udev::FFI::udev_version() or
@@ -21,13 +22,13 @@ Udev::FFI - Perl bindings for libudev using ffi.
         die "Can't create udev monitor: $@";
     
     # add filter to monitor
-    unless($monitor->filter_by_subsystem_devtype('block')) {
+    unless ($monitor->filter_by_subsystem_devtype('block')) {
         warn "Ouch!";
     }
     
     # start monitor
-    if($monitor->start()) {
-        for(;;) {
+    if ($monitor->start()) {
+        for (;;) {
             # poll devices, now insert or remove your block device
             my $device = $monitor->poll(); #blocking read
             my $action = $device->get_action();
@@ -39,9 +40,9 @@ Udev::FFI - Perl bindings for libudev using ffi.
             last; # for example
         }
     
-        for(;;) {
+        for (;;) {
             # poll devices, now insert or remove your block device
-            if(defined(my $device = $monitor->poll(0))) { #non-blocking read like can_read in IO::Select
+            if (defined(my $device = $monitor->poll(0))) { #non-blocking read like can_read in IO::Select
                 my $action = $device->get_action();
     
                 print 'ACTION: '.$action, "\n";
@@ -73,14 +74,15 @@ Udev::FFI - Perl bindings for libudev using ffi.
     my @a = $enumerate->get_list_entries();
     print Dumper(@a), "\n";
     
-    if(@a) { # get major and minor
-        use Udev::FFI::Devnum qw(:all); # import major, minor and makedev
-    
+    if (@a) { # we got devices
         my $device = $udev->new_device_from_syspath($a[0]);
-        if(defined $device) {
+    
+        if (defined $device) {
             print "Device: ".$device->get_sysname(), "\n";
     
             my $devnum = $device->get_devnum();
+    
+            # major, minor and makedev from Udev::FFI::Devnum
             my ($ma, $mi) = (major($devnum), minor($devnum));
     
             print "Major: $ma\n";
@@ -106,7 +108,7 @@ Udev::FFI exposes OO interface to libudev.
 
 # CONSTRUCTOR
 
-- new ()
+- new()
 
     This is the constructor for a new Udev::FFI object.
 
@@ -118,7 +120,7 @@ Udev::FFI exposes OO interface to libudev.
 
 # METHODS
 
-## new\_monitor ( \[SOURCE\] )
+## new\_monitor( \[SOURCE\] )
 
 Create new udev monitor and connect to a specified event source. Valid sources
 identifiers are `'udev'` and `'kernel'`. This argument is optional and
@@ -130,7 +132,7 @@ on failure.
     my $monitor = $udev->new_monitor() or
         die "Can't create udev monitor: $@";
 
-## new\_enumerate ()
+## new\_enumerate()
 
 Create an enumeration context to scan /sys.
 
@@ -140,7 +142,7 @@ on failure.
     my $enumerate = $udev->new_enumerate() or
         die "Can't create enumerate context: $@";
 
-## new\_device\_from\_syspath ( SYSPATH )
+## new\_device\_from\_syspath( SYSPATH )
 
 Create new udev device, and fill in information from the sys device and the udev
 database entry. The syspath is the absolute path to the device, including the
@@ -153,11 +155,11 @@ Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) objec
     
     # ... some code
     my @devices = $enumerate->get_list_entries();
-    for(@devices) {
+    for (@devices) {
         my $device = $udev->new_device_from_syspath($_);
     # ... some code
 
-## new\_device\_from\_devnum ( TYPE, DEVNUM )
+## new\_device\_from\_devnum( TYPE, DEVNUM )
 
 Create new udev device, and fill in information from the sys device and the udev
 database entry. The device is looked-up by its type and major/minor number.
@@ -168,7 +170,7 @@ Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) objec
     my $device0 = $udev->new_device_from_devnum('b', makedev(8, 1));
     my $device1 = $udev->new_device_from_devnum('c', makedev(189, 515));
 
-## new\_device\_from\_subsystem\_sysname ( SUBSYSTEM, SYSNAME )
+## new\_device\_from\_subsystem\_sysname( SUBSYSTEM, SYSNAME )
 
 Create new udev device, and fill in information from the sys device and the udev
 database entry. The device is looked up by the subsystem and name string of the
@@ -180,7 +182,7 @@ Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) objec
     my $device1 = $udev->new_device_from_subsystem_sysname('net', 'lo');
     my $device2 = $udev->new_device_from_subsystem_sysname('mem', 'urandom');
 
-## new\_device\_from\_device\_id ( ID )
+## new\_device\_from\_device\_id( ID )
 
 Create new udev device, and fill in information from the sys device and the udev
 database entry. The device is looked-up by a special string:
@@ -197,7 +199,7 @@ Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) objec
 
     my $device = $udev->new_device_from_device_id('b8:1');
 
-## new\_device\_from\_environment ()
+## new\_device\_from\_environment()
 
 Create new udev device, and fill in information from the current process
 environment. This only works reliable if the process is called from a udev rule.
@@ -211,11 +213,11 @@ Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) objec
     my $udev = Udev::FFI->new() or
         die "Can't create Udev::FFI object: $@";
     my $device = $udev->new_device_from_environment();
-    if(defined $device) {
+    if (defined $device) {
         # $device is the device from the udev rule (backlight in this example)
         # work with $device
 
-## Udev::FFI::udev\_version ()
+## Udev::FFI::udev\_version()
 
 Return the version of the udev library. Because the udev library does not
 provide a function to get the version number, this function runs the \`udevadm\`
@@ -231,11 +233,11 @@ ENOENT (\`udevadm\` not found) or EACCES (permission denied).
     # or catch the error
     use Errno qw( :POSIX );
     my $udev_version = Udev::FFI::udev_version();
-    unless(defined $udev_version) {
-        if($!{ENOENT}) {
+    unless (defined $udev_version) {
+        if ($!{ENOENT}) {
             # udevadm not found
         }
-        elsif($!{EACCES}) {
+        elsif ($!{EACCES}) {
             # permission denied
         }
     

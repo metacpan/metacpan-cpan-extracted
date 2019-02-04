@@ -91,7 +91,8 @@ cmp_deeply(
             [ isa => 'Dist::Zilla::Plugin::NextRelease' ] => bool(1),
             plugin_name => re(qr{^\@Author::TABULO/\@Git::VersionManager/NextRelease$}),
             time_zone => 'UTC',
-            format => '%-8v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T',
+  #         TABULO : Deactivate the check on 'format', because it depends on setting 'changes_version_columns'
+  #          format => '%-8v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T',
         ),
         methods(
             [ isa => 'Dist::Zilla::Plugin::Git::Commit' ] => bool(1),

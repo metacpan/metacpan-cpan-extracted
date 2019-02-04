@@ -13,7 +13,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -77,6 +77,10 @@ has timeout => (
 has form_args => (
     is => 'ro',
     default => sub { [] },
+);
+
+has insecure => (
+    is => 'ro',
 );
 
 has output => (
@@ -231,6 +235,7 @@ sub as_snippet( $self, %options ) {
 
     my @preamble;
     push @preamble, @{ $options{ preamble } } if $options{ preamble };
+    my @setup_ua = ('');
 
     my $request_args = join ", ",
                                  '$r',
@@ -249,19 +254,28 @@ sub as_snippet( $self, %options ) {
                                maybe cookie_jar => $init_cookie_jar->{code},
                            ], '')
                            ;
-    my $setup_credentials = '';
     if( defined( my $credentials = $self->credentials )) {
         my( $user, $pass ) = split /:/, $credentials, 2;
-        $setup_credentials = sprintf q{\n    $ua->credentials("%s","%s");\n},
+        my $setup_credentials = sprintf qq{\$ua->credentials("%s","%s");},
             quotemeta $user,
             quotemeta $pass;
+        push @setup_ua, $setup_credentials;
+    };
+    if( $self->insecure ) {
+        push @preamble, 'use IO::Socket::SSL;';
+        my $setup_insecure = q{$ua->ssl_opts( SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE, SSL_hostname => '', verify_hostname => 0 );};
+        push @setup_ua, $setup_insecure;
     };
 
+    @setup_ua = ()
+        if @setup_ua == 1;
+
     @preamble = map { "$options{prefix}    $_\n" } @preamble;
+    @setup_ua = map { "$options{prefix}    $_\n" } @setup_ua;
 
     return <<SNIPPET;
 @preamble
-    my \$ua = WWW::Mechanize->new($constructor_args);$setup_credentials
+    my \$ua = WWW::Mechanize->new($constructor_args);@setup_ua
     my \$r = HTTP::Request->new(
         '@{[$self->method]}' => '@{[$self->uri]}',
         [

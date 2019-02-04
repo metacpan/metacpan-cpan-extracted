@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Km - Package for language Khmer
 
 package Locale::CLDR::Locales::Km;
 # This file auto generated from Data\common\main\km.xml
-#	on Sun  7 Oct 10:41:28 am GMT
+#	on Sun  3 Feb  2:00:32 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1291,6 +1291,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(ទិសទាំងបួន),
+					},
 					'acre' => {
 						'name' => q(អា),
 						'other' => q({0} អា),
@@ -1314,6 +1317,10 @@ has 'units' => (
 					'astronomical-unit' => {
 						'name' => q(ឯកតាតារាសាស្ត្រ),
 						'other' => q({0} ឯកតាតារាសាស្ត្រ),
+					},
+					'atmosphere' => {
+						'name' => q(បរិយាកាស),
+						'other' => q(បរិយាកាស {0}),
 					},
 					'bit' => {
 						'name' => q(ប៊ីត),
@@ -1733,6 +1740,18 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}​ ក្នុង​មួយ​ {1}),
 					},
+					'percent' => {
+						'name' => q(ភាគរយ),
+						'other' => q({0} ភាគរយ),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PB),
+						'other' => q({0} PB),
+					},
 					'picometer' => {
 						'name' => q(ពីកូម៉ែត្រ),
 						'other' => q({0} ពីកូម៉ែត្រ),
@@ -1852,6 +1871,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(ទិស),
+					},
 					'acre' => {
 						'other' => q({0} អា),
 					},
@@ -1984,6 +2006,10 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'other' => q({0} ព.ម.),
 					},
@@ -2022,6 +2048,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(ទិស),
+					},
 					'acre' => {
 						'name' => q(អា),
 						'other' => q({0} ac),
@@ -2045,6 +2074,10 @@ has 'units' => (
 					'astronomical-unit' => {
 						'name' => q(au),
 						'other' => q({0} au),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(bit),
@@ -2464,6 +2497,18 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(ភាគរយ),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PB),
+						'other' => q({0} PB),
+					},
 					'picometer' => {
 						'name' => q(pm),
 						'other' => q({0} pm),
@@ -2665,37 +2710,37 @@ has 'number_formats' => (
 					'other' => '0ពាន់',
 				},
 				'10000' => {
-					'other' => '0​មឺុន',
+					'other' => '00 ពាន់',
 				},
 				'100000' => {
-					'other' => '0សែន',
+					'other' => '000 ពាន់',
 				},
 				'1000000' => {
-					'other' => '0លាន',
+					'other' => '0 លាន',
 				},
 				'10000000' => {
-					'other' => '0​ដប់​លាន',
+					'other' => '00 លាន',
 				},
 				'100000000' => {
-					'other' => '0​រយលាន',
+					'other' => '000 លាន',
 				},
 				'1000000000' => {
-					'other' => '0​កោដិ',
+					'other' => '0 ប៊ីលាន',
 				},
 				'10000000000' => {
-					'other' => '0​ដប់​កោដិ',
+					'other' => '00 ប៊ីលាន',
 				},
 				'100000000000' => {
-					'other' => '0​រយ​កោដិ',
+					'other' => '000 ប៊ីលាន',
 				},
 				'1000000000000' => {
-					'other' => '0​ពាន់​កោដិ',
+					'other' => '0 ទ្រីលាន',
 				},
 				'10000000000000' => {
-					'other' => '0​មឺុន​កោដិ',
+					'other' => '00 ទ្រីលាន',
 				},
 				'100000000000000' => {
-					'other' => '0​សែន​កោដិ',
+					'other' => '000 ទ្រីលាន',
 				},
 				'standard' => {
 					'default' => '#,##0.###',
@@ -2703,40 +2748,40 @@ has 'number_formats' => (
 			},
 			'long' => {
 				'1000' => {
-					'other' => '0ពាន់',
+					'other' => '0 ពាន់',
 				},
 				'10000' => {
-					'other' => '0​មឺុន',
+					'other' => '00 ពាន់',
 				},
 				'100000' => {
-					'other' => '0សែន',
+					'other' => '000ពាន់',
 				},
 				'1000000' => {
-					'other' => '0លាន',
+					'other' => '0 លាន',
 				},
 				'10000000' => {
-					'other' => '0​ដប់​លាន',
+					'other' => '00 លាន',
 				},
 				'100000000' => {
-					'other' => '0​រយលាន',
+					'other' => '000 លាន',
 				},
 				'1000000000' => {
-					'other' => '0​កោដិ',
+					'other' => '0 ប៊ីលាន',
 				},
 				'10000000000' => {
-					'other' => '0​ដប់​កោដិ',
+					'other' => '00 ប៊ីលាន',
 				},
 				'100000000000' => {
-					'other' => '0​រយ​កោដិ',
+					'other' => '000 ប៊ីលាន',
 				},
 				'1000000000000' => {
-					'other' => '0​ពាន់​កោដិ',
+					'other' => '0 ទ្រីលាន',
 				},
 				'10000000000000' => {
-					'other' => '0​មឺុន​កោដិ',
+					'other' => '00 ទ្រីលាន',
 				},
 				'100000000000000' => {
-					'other' => '0​សែន​កោដិ',
+					'other' => '000 ទ្រីលាន',
 				},
 			},
 			'short' => {
@@ -2744,37 +2789,37 @@ has 'number_formats' => (
 					'other' => '0ពាន់',
 				},
 				'10000' => {
-					'other' => '0​មឺុន',
+					'other' => '00 ពាន់',
 				},
 				'100000' => {
-					'other' => '0សែន',
+					'other' => '000 ពាន់',
 				},
 				'1000000' => {
-					'other' => '0លាន',
+					'other' => '0 លាន',
 				},
 				'10000000' => {
-					'other' => '0​ដប់​លាន',
+					'other' => '00 លាន',
 				},
 				'100000000' => {
-					'other' => '0​រយលាន',
+					'other' => '000 លាន',
 				},
 				'1000000000' => {
-					'other' => '0​កោដិ',
+					'other' => '0 ប៊ីលាន',
 				},
 				'10000000000' => {
-					'other' => '0​ដប់​កោដិ',
+					'other' => '00 ប៊ីលាន',
 				},
 				'100000000000' => {
-					'other' => '0​រយ​កោដិ',
+					'other' => '000 ប៊ីលាន',
 				},
 				'1000000000000' => {
-					'other' => '0​ពាន់​កោដិ',
+					'other' => '0 ទ្រីលាន',
 				},
 				'10000000000000' => {
-					'other' => '0​មឺុន​កោដិ',
+					'other' => '00 ទ្រីលាន',
 				},
 				'100000000000000' => {
-					'other' => '0​សែន​កោដិ',
+					'other' => '000 ទ្រីលាន',
 				},
 			},
 		},
@@ -3865,6 +3910,12 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(ប៊ូលីវ៉ា​វ៉េណេស៊ុយអេឡា \(2008–2018\)),
+				'other' => q(ប៊ូលីវ៉ា​វ៉េណេស៊ុយអេឡា \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(ប៊ូលីវ៉ា​វ៉េណេស៊ុយអេឡា),
 				'other' => q(ប៊ូលីវ៉ា​វ៉េណេស៊ុយអេឡា),
 			},
@@ -4090,10 +4141,10 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
-						mon => 'ច័ន្ទ',
+						mon => 'ចន្ទ',
 						tue => 'អង្គារ',
 						wed => 'ពុធ',
-						thu => 'ព្រហស្បតិ៍',
+						thu => 'ព្រហ',
 						fri => 'សុក្រ',
 						sat => 'សៅរ៍',
 						sun => 'អាទិត្យ'
@@ -4128,10 +4179,10 @@ has 'calendar_days' => (
 				},
 				'stand-alone' => {
 					abbreviated => {
-						mon => 'ច័ន្ទ',
+						mon => 'ចន្ទ',
 						tue => 'អង្គារ',
 						wed => 'ពុធ',
-						thu => 'ព្រហស្បតិ៍',
+						thu => 'ព្រហ',
 						fri => 'សុក្រ',
 						sat => 'សៅរ៍',
 						sun => 'អាទិត្យ'
@@ -4155,7 +4206,7 @@ has 'calendar_days' => (
 						sun => 'អា'
 					},
 					wide => {
-						mon => 'ច័ន្ទ',
+						mon => 'ចន្ទ',
 						tue => 'អង្គារ',
 						wed => 'ពុធ',
 						thu => 'ព្រហស្បតិ៍',
@@ -4223,77 +4274,77 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -4313,67 +4364,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'evening1' => q{ល្ងាច},
-					'am' => q{AM},
-					'morning1' => q{ព្រឹក},
-					'night1' => q{យប់},
-					'afternoon1' => q{រសៀល},
-					'midnight' => q{អធ្រាត្រ},
-					'noon' => q{ថ្ងៃត្រង់},
-					'pm' => q{PM},
-				},
 				'narrow' => {
-					'evening1' => q{ល្ងាច},
-					'am' => q{a},
-					'morning1' => q{ព្រឹក},
-					'night1' => q{យប់},
-					'afternoon1' => q{រសៀល},
-					'midnight' => q{អធ្រាត្រ},
+					'afternoon1' => q{នៅពេលរសៀល},
 					'noon' => q{ថ្ងៃត្រង់},
+					'morning1' => q{នៅពេល​ព្រឹក},
+					'evening1' => q{នៅពេល​ល្ងាច},
+					'night1' => q{នៅពេល​យប់},
+					'am' => q{a},
+					'midnight' => q{អធ្រាត្រ},
 					'pm' => q{p},
 				},
-				'abbreviated' => {
-					'night1' => q{យប់},
-					'morning1' => q{ព្រឹក},
-					'am' => q{AM},
-					'evening1' => q{ល្ងាច},
-					'pm' => q{PM},
+				'wide' => {
+					'evening1' => q{នៅពេល​ល្ងាច},
+					'morning1' => q{នៅពេល​ព្រឹក},
 					'noon' => q{ថ្ងៃត្រង់},
-					'afternoon1' => q{រសៀល},
+					'afternoon1' => q{នៅពេលរសៀល},
+					'pm' => q{PM},
 					'midnight' => q{អធ្រាត្រ},
+					'am' => q{AM},
+					'night1' => q{នៅពេល​យប់},
+				},
+				'abbreviated' => {
+					'night1' => q{នៅពេល​យប់},
+					'am' => q{AM},
+					'midnight' => q{អធ្រាត្រ},
+					'pm' => q{PM},
+					'afternoon1' => q{នៅពេលរសៀល},
+					'noon' => q{ថ្ងៃត្រង់},
+					'morning1' => q{នៅពេល​ព្រឹក},
+					'evening1' => q{នៅពេល​ល្ងាច},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'morning1' => q{ព្រឹក},
-					'night1' => q{យប់},
+				'wide' => {
 					'am' => q{AM},
-					'evening1' => q{ល្ងាច},
 					'pm' => q{PM},
+					'midnight' => q{អធ្រាត្រ},
+					'night1' => q{យប់},
+					'morning1' => q{ព្រឹក},
+					'evening1' => q{ល្ងាច},
 					'noon' => q{ថ្ងៃ​ត្រង់},
 					'afternoon1' => q{រសៀល},
-					'midnight' => q{អធ្រាត្រ},
 				},
 				'narrow' => {
+					'evening1' => q{ល្ងាច},
+					'morning1' => q{ព្រឹក},
+					'afternoon1' => q{រសៀល},
 					'noon' => q{ថ្ងៃ​ត្រង់},
 					'pm' => q{PM},
-					'afternoon1' => q{រសៀល},
 					'midnight' => q{អធ្រាត្រ},
-					'night1' => q{យប់},
-					'morning1' => q{ព្រឹក},
-					'evening1' => q{ល្ងាច},
 					'am' => q{AM},
+					'night1' => q{យប់},
 				},
-				'wide' => {
-					'evening1' => q{ល្ងាច},
+				'abbreviated' => {
 					'am' => q{AM},
+					'pm' => q{PM},
+					'midnight' => q{អធ្រាត្រ},
 					'night1' => q{យប់},
 					'morning1' => q{ព្រឹក},
-					'midnight' => q{អធ្រាត្រ},
-					'afternoon1' => q{រសៀល},
+					'evening1' => q{ល្ងាច},
 					'noon' => q{ថ្ងៃ​ត្រង់},
-					'pm' => q{PM},
+					'afternoon1' => q{រសៀល},
 				},
 			},
 		},
@@ -4527,10 +4578,10 @@ has 'datetime_formats_available_formats' => (
 			Ed => q{d E},
 			Ehm => q{E h:mm a},
 			Ehms => q{E h:mm:ss a},
-			Gy => q{y នៃ G},
-			GyMMM => q{MMM y នៃ G},
-			GyMMMEd => q{E d MMM y នៃ G},
-			GyMMMd => q{d MMM y នៃ G},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E d MMM y G},
+			GyMMMd => q{d MMM y G},
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

@@ -11,12 +11,13 @@ README
 cpanfile
 dist.ini
 lib/Perl/Critic/Policy/RegularExpressions/RequireDefault.pm
-lib/Perl/Critic/Policy/RegularExpressions/RequireDefault.pm.bak
 perl-critic-policy-regularexpressions-requiredefault.code-workspace
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/example_strict_notset.conf
+t/example_strict_set.conf
 t/implementation.t
 t/perlcriticrc
 t/release-cpan-changes.t

@@ -13,6 +13,11 @@ our @EXPORT = qw(
     git_in_path
     notexists
     recursive_child_files
+
+    m_pluginbundle_name
+    m_pluginbundle_ini_name
+    m_pluginbundle_ini_section
+    m_pluginbundle_pkg_name
 );
 
 use Test::More 0.96;
@@ -43,6 +48,7 @@ use Pod::Weaver::PluginBundle::Author::TABULO;
 # plugins to always remove from test dists, as they use git or the network
 # Our files are copied into source, so Git::GatherDir doesn't see them and
 # besides, we would like to run these tests at install time too!
+# [TABULO] : Added : CheckIssues CheckPrereqsIndexed
 our @REMOVED_PLUGINS = qw(
     Git::GatherDir
     Git::NextVersion
@@ -55,6 +61,8 @@ our @REMOVED_PLUGINS = qw(
     Git::CheckFor::MergeConflicts
     Git::CheckFor::CorrectBranch
     Git::Remote::Check
+    CheckIssues
+    CheckPrereqsIndexed
     PromptIfStale
     EnsurePrereqsInstalled
 );
@@ -217,5 +225,11 @@ sub recursive_child_files
     );
     @found_files;
 }
+
+# Below were added by TABULO for making tests a bit more DRY (over time)
+sub m_pluginbundle_name { 'Author::TABULO' }
+sub m_pluginbundle_ini_name { '@' . tzil_plugin_bundle_name() }
+sub m_pluginbundle_ini_section { '[' . tzil_plugin_bundle_ini_name() . ']' }
+sub m_pluginbundle_pkg_name { 'Dist::Zilla::PluginBundle::' . tzil_plugin_bundle_name() }
 
 1;

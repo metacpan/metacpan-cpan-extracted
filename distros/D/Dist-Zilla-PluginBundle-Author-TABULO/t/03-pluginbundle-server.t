@@ -99,7 +99,7 @@ subtest "server = $_" => sub {
     }
     else
     {
-        my $expected = "server = $server: recommend instead using server = github and GithubMeta.remote = $server with a read-only mirror";
+        my $expected = "server = '$server': recommend instead using server = github and GithubMeta.remote = '$server' with a read-only mirror";
         my $ok = cmp_deeply(
             [ map { colorstrip($_) } @warnings ],
             superbagof(re(qr/^\[\@Author::TABULO\] $expected/)),

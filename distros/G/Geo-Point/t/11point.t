@@ -8,7 +8,7 @@ use warnings;
 
 use lib qw(. lib tests ../MathPolygon/lib ../../MathPolygon/lib);
 
-use Test::More tests => 42;
+use Test::More tests => 43;
 
 use Geo::Point;
 use Geo::Proj;
@@ -90,6 +90,8 @@ is($p->string, 'point[utm-31](5.0000 4.0000)');
 
 is($p->x, 5);
 is($p->y, 4);
+
+is_deeply([$p->bbox], [ 5,4, 5,4 ]);
 
 #
 # distance

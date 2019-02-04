@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mt - Package for language Maltese
 
 package Locale::CLDR::Locales::Mt;
 # This file auto generated from Data\common\main\mt.xml
-#	on Sun  7 Oct 10:47:39 am GMT
+#	on Sun  3 Feb  2:06:44 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1902,12 +1902,12 @@ has 'display_name_region' => (
  			'CF' => 'ir-Repubblika Ċentru-Afrikana',
  			'CG' => 'il-Kongo - Brazzaville',
  			'CG@alt=variant' => 'ir-Repubblika tal-Kongo',
- 			'CH' => 'Żvizzera',
+ 			'CH' => 'l-Iżvizzera',
  			'CI' => 'il-Kosta tal-Avorju',
  			'CK' => 'Gżejjer Cook',
  			'CL' => 'iċ-Ċili',
  			'CM' => 'il-Kamerun',
- 			'CN' => 'CN',
+ 			'CN' => 'iċ-Ċina',
  			'CO' => 'il-Kolombja',
  			'CP' => 'il-Gżira Clipperton',
  			'CR' => 'il-Costa Rica',
@@ -1917,6 +1917,7 @@ has 'display_name_region' => (
  			'CX' => 'il-Gżira Christmas',
  			'CY' => 'Ċipru',
  			'CZ' => 'ir-Repubblika Ċeka',
+ 			'CZ@alt=variant' => 'Ir-Repubblika Ċeka',
  			'DE' => 'il-Ġermanja',
  			'DG' => 'Diego Garcia',
  			'DJ' => 'il-Djibouti',
@@ -2012,6 +2013,7 @@ has 'display_name_region' => (
  			'MG' => 'Madagascar',
  			'MH' => 'Gżejjer Marshall',
  			'MK' => 'l-Eks-Repubblika Jugoslava tal-Maċedonia',
+ 			'MK@alt=variant' => 'l-Eks Repubblika Jugoslava tal-Maċedonia',
  			'ML' => 'il-Mali',
  			'MM' => 'il-Myanmar/Burma',
  			'MN' => 'il-Mongolja',
@@ -2117,7 +2119,7 @@ has 'display_name_region' => (
  			'VU' => 'Vanuatu',
  			'WF' => 'Wallis u Futuna',
  			'WS' => 'Samoa',
- 			'XK' => 'Kosovo',
+ 			'XK' => 'il-Kosovo',
  			'YE' => 'il-Jemen',
  			'YT' => 'Mayotte',
  			'ZA' => 'l-Afrika t’Isfel',
@@ -2530,6 +2532,9 @@ has 'number_currency_formats' => (
 		'latn' => {
 			'pattern' => {
 				'default' => {
+					'accounting' => {
+						'positive' => '¤#,##0.00',
+					},
 					'standard' => {
 						'positive' => '¤#,##0.00',
 					},
@@ -3938,6 +3943,15 @@ has 'currencies' => (
 				'other' => q(VEF),
 			},
 		},
+		'VES' => {
+			display_name => {
+				'currency' => q(VES),
+				'few' => q(VES),
+				'many' => q(VES),
+				'one' => q(VES),
+				'other' => q(VES),
+			},
+		},
 		'VND' => {
 			symbol => '₫',
 			display_name => {
@@ -4317,8 +4331,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'narrow' => {
-					'pm' => q{pm},
 					'am' => q{am},
+					'pm' => q{pm},
 				},
 				'wide' => {
 					'pm' => q{PM},
@@ -4330,17 +4344,17 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'wide' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 				'narrow' => {
-					'pm' => q{pm},
 					'am' => q{am},
+					'pm' => q{pm},
+				},
+				'abbreviated' => {
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 		},
@@ -4426,7 +4440,12 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
 			EHm => q{E HH:mm},
 			EHms => q{E HH:mm:ss},
 			Ed => q{d, E},
@@ -4439,10 +4458,13 @@ has 'datetime_formats_available_formats' => (
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
 			M => q{L},
 			MEd => q{E, M-d},
 			MMM => q{LLL},
 			MMMEd => q{E, d 'ta'’ MMM},
+			MMMMW => q{W 'ġimgħa' 'ta''' MMMM},
 			MMMMd => q{d 'ta'’ MMMM},
 			MMMd => q{MMM d},
 			Md => q{MM-dd},
@@ -4450,6 +4472,8 @@ has 'datetime_formats_available_formats' => (
 			h => q{h a},
 			hm => q{h:mm a},
 			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
 			ms => q{mm:ss},
 			y => q{y},
 			yM => q{y-MM},
@@ -4458,8 +4482,10 @@ has 'datetime_formats_available_formats' => (
 			yMMMEd => q{E, d 'ta'’ MMM, y},
 			yMMMM => q{MMMM y},
 			yMMMd => q{d 'ta'’ MMM, y},
+			yMd => q{M/d/y},
 			yQQQ => q{QQQ - y},
 			yQQQQ => q{QQQQ - y},
+			yw => q{w 'ġimgħa' 'ta''' Y},
 		},
 		'generic' => {
 			E => q{ccc},
@@ -4584,6 +4610,10 @@ has 'datetime_formats_interval' => (
 				M => q{E, d 'ta'’ MMM – E, d 'ta'’ MMM y},
 				d => q{E, d MMM – E, d MMM, y},
 				y => q{E, d 'ta'’ MMM y – E, d 'ta'’ MMM y},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM y},
+				y => q{MMMM y – MMMM y},
 			},
 			yMMMd => {
 				M => q{y MMM d – MMM d},

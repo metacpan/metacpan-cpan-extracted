@@ -1,0 +1,78 @@
+Cache time consuming subroutines or paid api calls
+
+SYNOPSIS
+
+  #!/usr/bin/perl
+  use Cache::SimpleDir;
+
+  my $cache  =  Cache::SimpleDir->new(
+  cache_dir  => '/tmp',
+  callback   => 'GetWeather',
+  expire_sec => 1800,
+  verbose    => 'false') or die $SimpleDir::ERROR;
+
+  my $where_are_my_data = $cache->get('a','b','c') or die "oups $SimpleDir::ERROR\n";
+  print "data are at: $where_are_my_data\n";
+
+  #     How to get and cache new data
+  sub   GetWeather {
+  my    $dir = shift;
+  open  FILE, '>', "$dir/file.txt" or return undef;
+  print FILE 'Example of callback. Arguments: ', join ',', @_;
+  close FILE
+  }
+
+DESCRIPTION
+
+Every time you use the "get" method, it returns only
+the cache directory where your files are stored.
+It is up to your code, to do something with these files.
+Read them, copy them or whatever.
+
+If the cache data are older than "expire_sec" then the 
+"callback" subroutine is called automatically;
+new data are cached, while the old are deleted.
+So there is no need for a "set" method.
+
+Write at the "callback" subroutine the code, that generate new data.
+Its first argument is always the directory that you should write your cached files.
+Any optional argument used at the "get" is passed at the "callback"
+
+It is thread safe.
+
+ERROR HANDLING
+
+On error "get" returns FALSE. Sets the error message at the variable $SimpleDir::ERROR
+and at the property $obj->error_msg while the error code is at $obj->error
+
+METHODS
+
+new
+
+Generate and return a new cache object, while it initialize/overwrite the default properties
+
+  cache_dir  The root cache directory of your key
+  callback   The subroutine name that cache new data. Becarefull not it is a simple name not a code reference
+  expire_sec After how many seconds the record will be considered expired and a new one should cached using the callback
+  verbose    Verbose operation if TRUE or 1
+
+There is not support for multiple cache keys at the same object.
+This is by design, because it must be fast and simple.
+If you want multiple keys, then create multiple objects with different properties e.g.
+
+  my $key1 = SimpleDir->new(callback=>'Sub1', cache_dir=>'/tmp', expire_sec=>300);
+  my $key2 = SimpleDir->new(callback=>'Sub2', cache_dir=>'/tmp', expire_sec=>800);
+  ...
+
+get
+
+Returns the cache directory where your files/dirs are stored.
+If the the files/dirs are older than "expire_sec" seconds then
+are deleted and new one are cached by calling automatically the subroutine
+defined at the "callback"
+
+If your code at the B<callback> encount an error then you must return with FALSE.
+On success, at the end, your code must return TRUE.
+
+George Bouras
+george.mpouras@yandex.com

@@ -9,6 +9,7 @@ Makefile.PL
 README
 TODO
 XS/Changes
+XS/ImageSet.h
 XS/LICENSE.md
 XS/MANIFEST
 XS/Makefile.PL

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ce - Package for language Chechen
 
 package Locale::CLDR::Locales::Ce;
 # This file auto generated from Data\common\main\ce.xml
-#	on Sun  7 Oct 10:24:58 am GMT
+#	on Sun  3 Feb  1:44:09 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2573,6 +2573,13 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			symbol => 'VEF',
+			display_name => {
+				'currency' => q(Венесуэлан боливар \(2008–2018\)),
+				'one' => q(Венесуэлан боливар \(2008–2018\)),
+				'other' => q(Венесуэлан боливарш \(2008–2018\)),
+			},
+		},
+		'VES' => {
 			display_name => {
 				'currency' => q(Венесуэлан боливар),
 				'one' => q(Венесуэлан боливар),

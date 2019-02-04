@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Kk - Package for language Kazakh
 
 package Locale::CLDR::Locales::Kk;
 # This file auto generated from Data\common\main\kk.xml
-#	on Sun  7 Oct 10:41:00 am GMT
+#	on Sun  3 Feb  2:00:11 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -470,11 +470,11 @@ has 'display_name_script' => (
 			'Arab' => 'араб жазуы',
  			'Armn' => 'армян жазуы',
  			'Beng' => 'бенгал жазуы',
- 			'Bopo' => 'бопомофо жазу',
+ 			'Bopo' => 'бопомофо жазуы',
  			'Brai' => 'Брайль жазуы',
  			'Cyrl' => 'кирилл жазуы',
  			'Deva' => 'деванагари жазуы',
- 			'Ethi' => 'эфиоп жазу',
+ 			'Ethi' => 'эфиопиялық жазу',
  			'Geor' => 'грузин жазуы',
  			'Grek' => 'грек жазуы',
  			'Gujr' => 'гуджарати жазуы',
@@ -488,8 +488,8 @@ has 'display_name_script' => (
  			'Hant@alt=stand-alone' => 'дәстүрлі қытай иероглифы',
  			'Hebr' => 'иврит жазуы',
  			'Hira' => 'хирагана жазуы',
- 			'Hrkt' => 'жапон силлабарийі',
- 			'Jamo' => 'чамо жазуы',
+ 			'Hrkt' => 'хирагана немесе катакана',
+ 			'Jamo' => 'джамо жазуы',
  			'Jpan' => 'жапон жазуы',
  			'Kana' => 'катакана жазуы',
  			'Khmr' => 'кхмер жазуы',
@@ -504,7 +504,7 @@ has 'display_name_script' => (
  			'Sinh' => 'сингаль жазуы',
  			'Taml' => 'тамиль жазуы',
  			'Telu' => 'телугу жазуы',
- 			'Thaa' => 'таана жазуы',
+ 			'Thaa' => 'тана жазуы',
  			'Thai' => 'тай жазуы',
  			'Tibt' => 'тибет жазуы',
  			'Zmth' => 'математикалық жазу',
@@ -540,7 +540,7 @@ has 'display_name_region' => (
  			'015' => 'Солтүстік Африка',
  			'017' => 'Орталық Африка',
  			'018' => 'Оңтүстік Африка',
- 			'019' => 'Солтүстік және Оңтүстік Америка',
+ 			'019' => 'Америка',
  			'021' => 'Солтүстік Америка (аймақ)',
  			'029' => 'Кариб',
  			'030' => 'Шығыс Азия',
@@ -607,7 +607,6 @@ has 'display_name_region' => (
  			'CG@alt=variant' => 'Конго Республикасы',
  			'CH' => 'Швейцария',
  			'CI' => 'Кот-д’Ивуар',
- 			'CI@alt=variant' => 'Піл Сүйегі жағалауы',
  			'CK' => 'Кук аралдары',
  			'CL' => 'Чили',
  			'CM' => 'Камерун',
@@ -764,7 +763,7 @@ has 'display_name_region' => (
  			'PW' => 'Палау',
  			'PY' => 'Парагвай',
  			'QA' => 'Катар',
- 			'QO' => 'Алыс Океания',
+ 			'QO' => 'Сыртқы Океания',
  			'RE' => 'Реюньон',
  			'RO' => 'Румыния',
  			'RS' => 'Сербия',
@@ -861,10 +860,10 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'Күнтізбе',
- 			'cf' => 'Валюта пішімі',
+ 			'cf' => 'Валюта форматы',
  			'collation' => 'Сұрыптау реті',
  			'currency' => 'Валюта',
- 			'hc' => 'Уақыт пішімі (12 не 24)',
+ 			'hc' => 'Уақыт форматы (12 не 24)',
  			'lb' => 'Жолды тасымалдау стилі',
  			'ms' => 'Өлшемдер жүйесі',
  			'numbers' => 'Сандар',
@@ -895,8 +894,8 @@ has 'display_name_type' => (
  				'roc' => q{Мингуо күнтізбесі},
  			},
  			'cf' => {
- 				'account' => q{Есептік валюта пішімі},
- 				'standard' => q{Стандартты валюта пішімі},
+ 				'account' => q{Есептік валюта форматы},
+ 				'standard' => q{Стандартты валюта форматы},
  			},
  			'collation' => {
  				'ducet' => q{Әдепкі уникод сұрыптау реті},
@@ -916,7 +915,7 @@ has 'display_name_type' => (
  			},
  			'ms' => {
  				'metric' => q{Метрлік жүйе},
- 				'uksystem' => q{Империялық өлшемдер жүйесі},
+ 				'uksystem' => q{Британиялық өлшемдер жүйесі},
  				'ussystem' => q{Америкалық өлшемдер жүйесі},
  			},
  			'numbers' => {
@@ -927,7 +926,7 @@ has 'display_name_type' => (
  				'beng' => q{Бенгал сандары},
  				'deva' => q{Деванагари сандары},
  				'ethi' => q{Эфиопия сандары},
- 				'fullwide' => q{Сандардың толық пішімі},
+ 				'fullwide' => q{Толық енді цифрлар},
  				'geor' => q{Грузин сандары},
  				'grek' => q{Грек сандары},
  				'greklow' => q{Кіші әріппен берілген грек сандары},
@@ -1079,6 +1078,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(негізгі бағыт),
+					},
 					'acre' => {
 						'name' => q(акр),
 						'one' => q({0} акр),
@@ -1108,6 +1110,11 @@ has 'units' => (
 						'name' => q(астрономиялық бірлік),
 						'one' => q({0} астрономиялық бірлік),
 						'other' => q({0} астрономиялық бірлік),
+					},
+					'atmosphere' => {
+						'name' => q(атмосфера),
+						'one' => q({0} атмосфера),
+						'other' => q({0} атмосфера),
 					},
 					'bit' => {
 						'name' => q(бит),
@@ -1151,10 +1158,10 @@ has 'units' => (
 						'other' => q({0} ғасыр),
 					},
 					'coordinate' => {
-						'east' => q({0} Ш),
-						'north' => q({0} С),
-						'south' => q({0} О),
-						'west' => q({0} Б),
+						'east' => q({0} шығыс),
+						'north' => q({0} солтүстік),
+						'south' => q({0} оңтүстік),
+						'west' => q({0} батыс),
 					},
 					'cubic-centimeter' => {
 						'name' => q(текше сантиметр),
@@ -1625,6 +1632,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(пайыз),
+						'one' => q({0} пайыз),
+						'other' => q({0} пайыз),
+					},
+					'permille' => {
+						'name' => q(промилле),
+						'one' => q({0} промилле),
+						'other' => q({0} промилле),
+					},
+					'petabyte' => {
+						'name' => q(петабайт),
+						'one' => q({0} петабайт),
+						'other' => q({0} петабайт),
+					},
 					'picometer' => {
 						'name' => q(пикометр),
 						'one' => q({0} пикометр),
@@ -1771,6 +1793,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(бағыт),
+					},
 					'acre' => {
 						'one' => q({0} акр),
 						'other' => q({0} акр),
@@ -1892,7 +1917,7 @@ has 'units' => (
 						'other' => q({0} л/100 км),
 					},
 					'meter' => {
-						'name' => q(метр),
+						'name' => q(м),
 						'one' => q({0} м),
 						'other' => q({0} м),
 					},
@@ -1938,6 +1963,11 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
 					},
 					'picometer' => {
 						'one' => q({0} пм),
@@ -1988,6 +2018,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(бағыт),
+					},
 					'acre' => {
 						'name' => q(акр),
 						'one' => q({0} акр),
@@ -2017,6 +2050,11 @@ has 'units' => (
 						'name' => q(а.б.),
 						'one' => q({0} а.б.),
 						'other' => q({0} а.б.),
+					},
+					'atmosphere' => {
+						'name' => q(атм),
+						'one' => q({0} атм),
+						'other' => q({0} атм),
 					},
 					'bit' => {
 						'name' => q(бит),
@@ -2240,7 +2278,7 @@ has 'units' => (
 						'per' => q({0}/дюйм),
 					},
 					'inch-hg' => {
-						'name' => q(in Hg),
+						'name' => q(сынап бағаны дюймі),
 						'one' => q({0} inHg),
 						'other' => q({0} inHg),
 					},
@@ -2368,7 +2406,7 @@ has 'units' => (
 						'other' => q({0} МВт),
 					},
 					'meter' => {
-						'name' => q(метр),
+						'name' => q(м),
 						'one' => q({0} м),
 						'other' => q({0} м),
 						'per' => q({0}/м),
@@ -2533,6 +2571,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(пайыз),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(промилле),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(Пбайт),
+						'one' => q({0} ПБ),
+						'other' => q({0} ПБ),
 					},
 					'picometer' => {
 						'name' => q(пикометр),
@@ -4149,6 +4202,13 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(Венесуэла боливары \(2008–2018\)),
+				'one' => q(Венесуэла боливары \(2008–2018\)),
+				'other' => q(Венесуэла боливары \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(Венесуэла боливары),
 				'one' => q(Венесуэла боливары),
 				'other' => q(Венесуэла боливары),
@@ -4337,18 +4397,18 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'Қаң.',
-							'Ақп.',
-							'Нау.',
-							'Сәу.',
-							'Мам.',
-							'Мау.',
-							'Шіл.',
-							'Там.',
-							'Қыр.',
-							'Қаз.',
-							'Қар.',
-							'Жел.'
+							'қаң.',
+							'ақп.',
+							'нау.',
+							'сәу.',
+							'мам.',
+							'мау.',
+							'шіл.',
+							'там.',
+							'қыр.',
+							'қаз.',
+							'қар.',
+							'жел.'
 						],
 						leap => [
 							
@@ -4405,13 +4465,13 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
-						mon => 'Дс',
-						tue => 'Сс',
-						wed => 'Ср',
-						thu => 'Бс',
-						fri => 'Жм',
-						sat => 'Сб',
-						sun => 'Жс'
+						mon => 'дс',
+						tue => 'сс',
+						wed => 'ср',
+						thu => 'бс',
+						fri => 'жм',
+						sat => 'сб',
+						sun => 'жс'
 					},
 					narrow => {
 						mon => 'Д',
@@ -4423,13 +4483,13 @@ has 'calendar_days' => (
 						sun => 'Ж'
 					},
 					short => {
-						mon => 'Дс',
-						tue => 'Сс',
-						wed => 'Ср',
-						thu => 'Бс',
-						fri => 'Жм',
-						sat => 'Сб',
-						sun => 'Жс'
+						mon => 'дс',
+						tue => 'сс',
+						wed => 'ср',
+						thu => 'бс',
+						fri => 'жм',
+						sat => 'сб',
+						sun => 'жс'
 					},
 					wide => {
 						mon => 'дүйсенбі',
@@ -4443,13 +4503,13 @@ has 'calendar_days' => (
 				},
 				'stand-alone' => {
 					abbreviated => {
-						mon => 'Дс',
-						tue => 'Сс',
-						wed => 'Ср',
-						thu => 'Бс',
-						fri => 'Жм',
-						sat => 'Сб',
-						sun => 'Жс'
+						mon => 'дс',
+						tue => 'сс',
+						wed => 'ср',
+						thu => 'бс',
+						fri => 'жм',
+						sat => 'сб',
+						sun => 'жс'
 					},
 					narrow => {
 						mon => 'Д',
@@ -4461,22 +4521,22 @@ has 'calendar_days' => (
 						sun => 'Ж'
 					},
 					short => {
-						mon => 'Дс',
-						tue => 'Сс',
-						wed => 'Ср',
-						thu => 'Бс',
-						fri => 'Жм',
-						sat => 'Сб',
-						sun => 'Жс'
+						mon => 'дс',
+						tue => 'сс',
+						wed => 'ср',
+						thu => 'бс',
+						fri => 'жм',
+						sat => 'сб',
+						sun => 'жс'
 					},
 					wide => {
-						mon => 'Дүйсенбі',
-						tue => 'Сейсенбі',
-						wed => 'Сәрсенбі',
-						thu => 'Бейсенбі',
-						fri => 'Жұма',
-						sat => 'Сенбі',
-						sun => 'Жексенбі'
+						mon => 'дүйсенбі',
+						tue => 'сейсенбі',
+						wed => 'сәрсенбі',
+						thu => 'бейсенбі',
+						fri => 'жұма',
+						sat => 'сенбі',
+						sun => 'жексенбі'
 					},
 				},
 			},
@@ -4538,77 +4598,77 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'coptic') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -4629,66 +4689,66 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'afternoon1' => q{түстен кейінгі},
+					'night1' => q{түнгі},
 					'midnight' => q{түн жарымы},
 					'pm' => q{PM},
-					'noon' => q{түскі},
 					'am' => q{AM},
-					'evening1' => q{кешкі},
-					'night1' => q{түнгі},
-					'morning1' => q{таңғы},
-				},
-				'wide' => {
-					'midnight' => q{түн жарымы},
+					'noon' => q{түскі},
 					'afternoon1' => q{түстен кейінгі},
-					'pm' => q{PM},
-					'noon' => q{түскі},
-					'am' => q{AM},
 					'evening1' => q{кешкі},
-					'night1' => q{түнгі},
 					'morning1' => q{таңғы},
 				},
 				'narrow' => {
+					'evening1' => q{кешкі},
+					'morning1' => q{таңғы},
+					'afternoon1' => q{түстен кейінгі},
 					'noon' => q{түскі},
 					'pm' => q{PM},
 					'midnight' => q{түнгі},
-					'afternoon1' => q{түстен кейінгі},
-					'morning1' => q{таңғы},
-					'night1' => q{түнгі},
-					'evening1' => q{кешкі},
 					'am' => q{AM},
+					'night1' => q{түнгі},
+				},
+				'wide' => {
+					'afternoon1' => q{түстен кейінгі},
+					'noon' => q{түскі},
+					'morning1' => q{таңғы},
+					'evening1' => q{кешкі},
+					'night1' => q{түнгі},
+					'am' => q{AM},
+					'pm' => q{PM},
+					'midnight' => q{түн жарымы},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'afternoon1' => q{түстен кейін},
-					'midnight' => q{түн жарымы},
-					'noon' => q{талтүс},
-					'pm' => q{PM},
-					'evening1' => q{кеш},
-					'am' => q{AM},
+				'narrow' => {
 					'night1' => q{түн},
+					'pm' => q{PM},
+					'midnight' => q{түн жарымы},
+					'am' => q{AM},
+					'noon' => q{талтүс},
+					'afternoon1' => q{түстен кейін},
+					'evening1' => q{кеш},
 					'morning1' => q{таң},
 				},
 				'wide' => {
-					'evening1' => q{кеш},
 					'am' => q{AM},
-					'morning1' => q{таң},
-					'night1' => q{түн},
 					'midnight' => q{түн жарымы},
+					'pm' => q{PM},
+					'night1' => q{түн},
+					'morning1' => q{таң},
+					'evening1' => q{кеш},
 					'afternoon1' => q{түстен кейін},
 					'noon' => q{талтүс},
-					'pm' => q{PM},
 				},
-				'narrow' => {
-					'am' => q{AM},
-					'evening1' => q{кеш},
-					'night1' => q{түн},
-					'morning1' => q{таң},
-					'afternoon1' => q{түстен кейін},
-					'midnight' => q{түн жарымы},
+				'abbreviated' => {
 					'pm' => q{PM},
+					'midnight' => q{түн жарымы},
+					'am' => q{AM},
+					'night1' => q{түн},
+					'evening1' => q{кеш},
+					'morning1' => q{таң},
 					'noon' => q{талтүс},
+					'afternoon1' => q{түстен кейін},
 				},
 			},
 		},
@@ -4833,12 +4893,12 @@ has 'datetime_formats_available_formats' => (
 			yw => q{Y 'жылдың' w-'аптасы'},
 		},
 		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
+			Bh => q{B h},
+			Bhm => q{B h:mm},
+			Bhms => q{B h:mm:ss},
 			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
+			EBhm => q{E B h:mm},
+			EBhms => q{E B h:mm:ss},
 			EHm => q{E HH:mm},
 			EHms => q{E HH:mm:ss},
 			Ed => q{d, E},

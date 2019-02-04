@@ -11,6 +11,7 @@
 *.alces.network;*.alces.network
 *.awdev.ca;*.awdev.ca
 *.bd;*.bd
+*.bzz.dapps.earth;*.bzz.dapps.earth
 *.ck;*.ck
 *.cns.joyent.com;*.cns.joyent.com
 *.compute-1.amazonaws.com;*.compute-1.amazonaws.com
@@ -18,6 +19,7 @@
 *.compute.amazonaws.com.cn;*.compute.amazonaws.com.cn
 *.compute.estate;*.compute.estate
 *.cryptonomic.net;*.cryptonomic.net
+*.dapps.earth;*.dapps.earth
 *.elb.amazonaws.com;*.elb.amazonaws.com
 *.elb.amazonaws.com.cn;*.elb.amazonaws.com.cn
 *.er;*.er
@@ -53,6 +55,7 @@
 *.spectrum.myjino.ru;*.spectrum.myjino.ru
 *.statics.cloud;*.statics.cloud
 *.stolos.io;*.stolos.io
+*.telebit.xyz;*.telebit.xyz
 *.transurl.be;*.transurl.be
 *.transurl.eu;*.transurl.eu
 *.transurl.nl;*.transurl.nl
@@ -94,6 +97,7 @@
 9guacu.br;9guacu.br
 a.bg;a.bg
 a.prod.fastly.net;a.prod.fastly.net
+a.run.app;a.run.app
 a.se;a.se
 a.ssl.fastly.net;a.ssl.fastly.net
 aa.no;aa.no
@@ -140,6 +144,7 @@ ac.ke;ac.ke
 ac.kr;ac.kr
 ac.leg.br;ac.leg.br
 ac.lk;ac.lk
+ac.ls;ac.ls
 ac.ma;ac.ma
 ac.me;ac.me
 ac.mu;ac.mu
@@ -615,7 +620,7 @@ ballangen.no;ballangen.no
 ballooning.aero;ballooning.aero
 balsan-sudtirol.it;balsan-sudtirol.it
 balsan-suedtirol.it;balsan-suedtirol.it
-balsan-südtirol.it;xn--balsan-sdtirol-nsb.it
+balsan-südtirol.it;xn--balsan-sdtirol-nsb.it
 balsan.it;balsan.it
 balsfjord.no;balsfjord.no
 baltimore.museum;baltimore.museum
@@ -775,6 +780,7 @@ biz.dk;biz.dk
 biz.et;biz.et
 biz.id;biz.id
 biz.ki;biz.ki
+biz.ls;biz.ls
 biz.mv;biz.mv
 biz.mw;biz.mw
 biz.ni;biz.ni
@@ -939,7 +945,7 @@ box;box
 boxfuse.io;boxfuse.io
 bozen-sudtirol.it;bozen-sudtirol.it
 bozen-suedtirol.it;bozen-suedtirol.it
-bozen-südtirol.it;xn--bozen-sdtirol-2ob.it
+bozen-südtirol.it;xn--bozen-sdtirol-2ob.it
 bozen.it;bozen.it
 bplaced.com;bplaced.com
 bplaced.de;bplaced.de
@@ -993,7 +999,7 @@ building.museum;building.museum
 bukhara.su;bukhara.su
 bulsan-sudtirol.it;bulsan-sudtirol.it
 bulsan-suedtirol.it;bulsan-suedtirol.it
-bulsan-südtirol.it;xn--bulsan-sdtirol-nsb.it
+bulsan-südtirol.it;xn--bulsan-sdtirol-nsb.it
 bulsan.it;bulsan.it
 bungoono.oita.jp;bungoono.oita.jp
 bungotakada.oita.jp;bungotakada.oita.jp
@@ -1009,17 +1015,18 @@ buyshouses.net;buyshouses.net
 buzen.fukuoka.jp;buzen.fukuoka.jp
 buzz;buzz
 bv;bv
-bv.nl;bv.nl
 bw;bw
 by;by
 bydgoszcz.pl;bydgoszcz.pl
 byen.site;byen.site
 bygland.no;bygland.no
 bykle.no;bykle.no
+bytemark.co.uk;bytemark.co.uk
 bytom.pl;bytom.pl
 bz;bz
 bz.it;bz.it
 bzh;bzh
+bzz.dapps.earth;bzz.dapps.earth
 báhcavuotna.no;xn--bhcavuotna-s4a.no
 báhccavuotna.no;xn--bhccavuotna-k7a.no
 báidár.no;xn--bidr-5nac.no
@@ -1194,9 +1201,9 @@ cern;cern
 certification.aero;certification.aero
 certmgr.org;certmgr.org
 cesena-forli.it;cesena-forli.it
-cesena-forlì.it;xn--cesena-forl-mcb.it
+cesena-forlì.it;xn--cesena-forl-mcb.it
 cesenaforli.it;cesenaforli.it
-cesenaforlì.it;xn--cesenaforl-i8a.it
+cesenaforlì.it;xn--cesenaforl-i8a.it
 cf;cf
 cfa;cfa
 cfd;cfd
@@ -1714,6 +1721,7 @@ dallas.museum;dallas.museum
 damnserver.com;damnserver.com
 dance;dance
 daplie.me;daplie.me
+dapps.earth;dapps.earth
 data;data
 database.museum;database.museum
 date;date
@@ -1792,6 +1800,7 @@ devices.resinstaging.io;devices.resinstaging.io
 df.gov.br;df.gov.br
 df.leg.br;df.leg.br
 dgca.aero;dgca.aero
+dh.bytemark.co.uk;dh.bytemark.co.uk
 dhl;dhl
 diamonds;diamonds
 dielddanuorri.no;dielddanuorri.no
@@ -2044,6 +2053,7 @@ edu.lb;edu.lb
 edu.lc;edu.lc
 edu.lk;edu.lk
 edu.lr;edu.lr
+edu.ls;edu.ls
 edu.lv;edu.lv
 edu.ly;edu.ly
 edu.me;edu.me
@@ -2403,8 +2413,8 @@ forgot.her.name;forgot.her.name
 forgot.his.name;forgot.his.name
 forli-cesena.it;forli-cesena.it
 forlicesena.it;forlicesena.it
-forlì-cesena.it;xn--forl-cesena-fcb.it
-forlìcesena.it;xn--forlcesena-c8a.it
+forlì-cesena.it;xn--forl-cesena-fcb.it
+forlìcesena.it;xn--forlcesena-c8a.it
 forsale;forsale
 forsand.no;forsand.no
 fortal.br;fortal.br
@@ -2711,6 +2721,7 @@ gmo;gmo
 gmx;gmx
 gn;gn
 gniezno.pl;gniezno.pl
+go-vip.co;go-vip.co
 go.ci;go.ci
 go.cr;go.cr
 go.dyndns.org;go.dyndns.org
@@ -2851,6 +2862,7 @@ gov.lb;gov.lb
 gov.lc;gov.lc
 gov.lk;gov.lk
 gov.lr;gov.lr
+gov.ls;gov.ls
 gov.lt;gov.lt
 gov.lv;gov.lv
 gov.ly;gov.ly
@@ -3473,6 +3485,7 @@ info.hu;info.hu
 info.ke;info.ke
 info.ki;info.ki
 info.la;info.la
+info.ls;info.ls
 info.mv;info.mv
 info.na;info.na
 info.nf;info.nf
@@ -3495,6 +3508,7 @@ ing.pa;ing.pa
 ingatlan.hu;ingatlan.hu
 ink;ink
 ino.kochi.jp;ino.kochi.jp
+instantcloud.cn;instantcloud.cn
 institute;institute
 insurance;insurance
 insurance.aero;insurance.aero
@@ -4158,6 +4172,7 @@ kraanghke.no;kraanghke.no
 kragero.no;kragero.no
 kragerø.no;xn--krager-gya.no
 krakow.pl;krakow.pl
+krasnik.pl;krasnik.pl
 krasnodar.su;krasnodar.su
 krd;krd
 kred;kred
@@ -4310,6 +4325,7 @@ lc.it;lc.it
 lcube-server.de;lcube-server.de
 lds;lds
 le.it;le.it
+leadpages.co;leadpages.co
 leangaviika.no;leangaviika.no
 lease;lease
 leasing.aero;leasing.aero
@@ -4320,6 +4336,7 @@ lebtimnetz.de;lebtimnetz.de
 lecce.it;lecce.it
 lecco.it;lecco.it
 leclerc;leclerc
+leczna.pl;leczna.pl
 lefrak;lefrak
 leg.br;leg.br
 legal;legal
@@ -4482,8 +4499,10 @@ louvre.museum;louvre.museum
 love;love
 lowicz.pl;lowicz.pl
 loyalist.museum;loyalist.museum
+lpages.co;lpages.co
 lpl;lpl
 lplfinancial;lplfinancial
+lpusercontent.com;lpusercontent.com
 lr;lr
 ls;ls
 lt;lt
@@ -4502,7 +4521,9 @@ ltda;ltda
 lu;lu
 lu.eu.org;lu.eu.org
 lu.it;lu.it
+lubartow.pl;lubartow.pl
 lubin.pl;lubin.pl
+lublin.pl;lublin.pl
 lucania.it;lucania.it
 lucca.it;lucca.it
 lucerne.museum;lucerne.museum
@@ -5074,6 +5095,7 @@ mydatto.com;mydatto.com
 mydatto.net;mydatto.net
 myddns.rocks;myddns.rocks
 mydissent.net;mydissent.net
+mydobiss.com;mydobiss.com
 mydrobo.com;mydrobo.com
 myds.me;myds.me
 myeffect.net;myeffect.net
@@ -5343,6 +5365,7 @@ net.lb;net.lb
 net.lc;net.lc
 net.lk;net.lk
 net.lr;net.lr
+net.ls;net.ls
 net.lv;net.lv
 net.ly;net.ly
 net.ma;net.ma
@@ -5809,6 +5832,7 @@ onjuku.chiba.jp;onjuku.chiba.jp
 onl;onl
 online;online
 online.museum;online.museum
+online.th;online.th
 onna.okinawa.jp;onna.okinawa.jp
 ono.fukui.jp;ono.fukui.jp
 ono.fukushima.jp;ono.fukushima.jp
@@ -6255,6 +6279,7 @@ polkowice.pl;polkowice.pl
 poltava.ua;poltava.ua
 pomorskie.pl;pomorskie.pl
 pomorze.pl;pomorze.pl
+poniatowa.pl;poniatowa.pl
 ponpes.id;ponpes.id
 pordenone.it;pordenone.it
 porn;porn
@@ -6430,6 +6455,7 @@ re.kr;re.kr
 read;read
 read-books.org;read-books.org
 readmyblog.org;readmyblog.org
+readthedocs.io;readthedocs.io
 realestate;realestate
 realestate.pl;realestate.pl
 realm.cz;realm.cz
@@ -6577,6 +6603,7 @@ ru.net;ru.net
 rugby;rugby
 ruhr;ruhr
 run;run
+run.app;run.app
 ruovat.no;ruovat.no
 russia.museum;russia.museum
 rv.ua;rv.ua
@@ -6795,6 +6822,7 @@ sc.gov.br;sc.gov.br
 sc.ke;sc.ke
 sc.kr;sc.kr
 sc.leg.br;sc.leg.br
+sc.ls;sc.ls
 sc.tz;sc.tz
 sc.ug;sc.ug
 sc.us;sc.us
@@ -7044,6 +7072,7 @@ shop.ht;shop.ht
 shop.hu;shop.hu
 shop.pl;shop.pl
 shop.ro;shop.ro
+shop.th;shop.th
 shopping;shopping
 shouji;shouji
 show;show
@@ -7074,6 +7103,7 @@ singles;singles
 siracusa.it;siracusa.it
 sirdal.no;sirdal.no
 site;site
+siteleaf.net;siteleaf.net
 sites.static.land;sites.static.land
 sj;sj
 sjc.br;sjc.br
@@ -7216,6 +7246,7 @@ sr.it;sr.it
 srl;srl
 srt;srt
 srv.br;srv.br
+ss;ss
 ss.it;ss.it
 ssl.fastly.net;ssl.fastly.net
 ssl.origin.cdn77-secure.org;ssl.origin.cdn77-secure.org
@@ -7244,7 +7275,6 @@ static-access.net;static-access.net
 static.land;static.land
 statics.cloud;statics.cloud
 station.museum;station.museum
-statoil;statoil
 stavanger.no;stavanger.no
 stavern.no;stavern.no
 stc;stc
@@ -7327,7 +7357,6 @@ suzaka.nagano.jp;suzaka.nagano.jp
 suzu.ishikawa.jp;suzu.ishikawa.jp
 suzuka.mie.jp;suzuka.mie.jp
 suzuki;suzuki
-südtirol.it;xn--sdtirol-n2a.it
 sv;sv
 sv.it;sv.it
 svalbard.no;svalbard.no
@@ -7339,6 +7368,7 @@ swatch;swatch
 sweden.museum;sweden.museum
 sweetpepper.org;sweetpepper.org
 swidnica.pl;swidnica.pl
+swidnik.pl;swidnik.pl
 swiebodzin.pl;swiebodzin.pl
 swiftcover;swiftcover
 swinoujscie.pl;swinoujscie.pl
@@ -7373,6 +7403,7 @@ sør-varanger.no;xn--sr-varanger-ggb.no
 sørfold.no;xn--srfold-bya.no
 sørreisa.no;xn--srreisa-q1a.no
 sørum.no;xn--srum-gra.no
+südtirol.it;xn--sdtirol-n2a.it
 t.bg;t.bg
 t.se;t.se
 t3l3p0rt.net;t3l3p0rt.net
@@ -7503,6 +7534,9 @@ tecnologia.bo;tecnologia.bo
 tel;tel
 tel.tr;tel.tr
 tele.amune.org;tele.amune.org
+telebit.app;telebit.app
+telebit.io;telebit.io
+telebit.xyz;telebit.xyz
 telefonica;telefonica
 telekommunikation.museum;telekommunikation.museum
 telemark.no;telemark.no
@@ -7727,8 +7761,8 @@ trentin-sud-tirol.it;trentin-sud-tirol.it
 trentin-sudtirol.it;trentin-sudtirol.it
 trentin-sued-tirol.it;trentin-sued-tirol.it
 trentin-suedtirol.it;trentin-suedtirol.it
-trentin-süd-tirol.it;xn--trentin-sd-tirol-rzb.it
-trentin-südtirol.it;xn--trentin-sdtirol-7vb.it
+trentin-süd-tirol.it;xn--trentin-sd-tirol-rzb.it
+trentin-südtirol.it;xn--trentin-sdtirol-7vb.it
 trentino-a-adige.it;trentino-a-adige.it
 trentino-aadige.it;trentino-aadige.it
 trentino-alto-adige.it;trentino-alto-adige.it
@@ -7739,8 +7773,8 @@ trentino-sud-tirol.it;trentino-sud-tirol.it
 trentino-sudtirol.it;trentino-sudtirol.it
 trentino-sued-tirol.it;trentino-sued-tirol.it
 trentino-suedtirol.it;trentino-suedtirol.it
-trentino-süd-tirol.it;xn--trentino-sd-tirol-c3b.it
-trentino-südtirol.it;xn--trentino-sdtirol-szb.it
+trentino-süd-tirol.it;xn--trentino-sd-tirol-c3b.it
+trentino-südtirol.it;xn--trentino-sdtirol-szb.it
 trentino.it;trentino.it
 trentinoa-adige.it;trentinoa-adige.it
 trentinoaadige.it;trentinoaadige.it
@@ -7752,14 +7786,14 @@ trentinosud-tirol.it;trentinosud-tirol.it
 trentinosudtirol.it;trentinosudtirol.it
 trentinosued-tirol.it;trentinosued-tirol.it
 trentinosuedtirol.it;trentinosuedtirol.it
-trentinosüd-tirol.it;xn--trentinosd-tirol-rzb.it
-trentinosüdtirol.it;xn--trentinosdtirol-7vb.it
+trentinosüd-tirol.it;xn--trentinosd-tirol-rzb.it
+trentinosüdtirol.it;xn--trentinosdtirol-7vb.it
 trentinsud-tirol.it;trentinsud-tirol.it
 trentinsudtirol.it;trentinsudtirol.it
 trentinsued-tirol.it;trentinsued-tirol.it
 trentinsuedtirol.it;trentinsuedtirol.it
-trentinsüd-tirol.it;xn--trentinsd-tirol-6vb.it
-trentinsüdtirol.it;xn--trentinsdtirol-nsb.it
+trentinsüd-tirol.it;xn--trentinsd-tirol-6vb.it
+trentinsüdtirol.it;xn--trentinsdtirol-nsb.it
 trento.it;trento.it
 treviso.it;treviso.it
 trieste.it;trieste.it
@@ -8017,10 +8051,10 @@ vallee-d-aoste.it;vallee-d-aoste.it
 valleeaoste.it;valleeaoste.it
 valleedaoste.it;valleedaoste.it
 valley.museum;valley.museum
-vallée-aoste.it;xn--valle-aoste-ebb.it
-vallée-d-aoste.it;xn--valle-d-aoste-ehb.it
-valléeaoste.it;xn--valleaoste-e7a.it
-valléedaoste.it;xn--valledaoste-ebb.it
+vallée-aoste.it;xn--valle-aoste-ebb.it
+vallée-d-aoste.it;xn--valle-d-aoste-ehb.it
+valléeaoste.it;xn--valleaoste-e7a.it
+valléedaoste.it;xn--valledaoste-ebb.it
 vana;vana
 vang.no;vang.no
 vanguard;vanguard
@@ -8122,6 +8156,7 @@ vladikavkaz.su;vladikavkaz.su
 vladimir.ru;vladimir.ru
 vladimir.su;vladimir.su
 vlog.br;vlog.br
+vm.bytemark.co.uk;vm.bytemark.co.uk
 vn;vn
 vn.ua;vn.ua
 voagat.no;voagat.no
@@ -8277,6 +8312,7 @@ workshop.museum;workshop.museum
 world;world
 worse-than.tv;worse-than.tv
 wow;wow
+wpcomstaging.com;wpcomstaging.com
 wpdevcloud.com;wpdevcloud.com
 writesthisblog.com;writesthisblog.com
 wroc.pl;wroc.pl
@@ -8563,6 +8599,7 @@ zw;zw
 مصر;xn--wgbh1c
 مليسيا;xn--mgbx4cd0ab
 موبايلي;xn--mgbb9fbpob
+موريتانيا;xn--mgbah1a3hjkrd
 موقع;xn--4gbrim
 همراه;xn--mgbt3dhd
 پاكستان;xn--mgbai9a5eva00b

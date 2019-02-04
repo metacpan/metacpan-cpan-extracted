@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Et::Any::Ee - Package for language Estonian
 
 package Locale::CLDR::Locales::Et::Any::Ee;
 # This file auto generated from Data\common\main\et_EE.xml
-#	on Sun  7 Oct 10:30:41 am GMT
+#	on Sun  3 Feb  1:49:30 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

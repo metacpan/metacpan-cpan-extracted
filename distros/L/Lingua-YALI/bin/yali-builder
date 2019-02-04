@@ -14,7 +14,7 @@ use Pod::Usage;
 use Carp;
 use File::Basename;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 my $output_file = undef;
 my $file_list = undef;
@@ -97,7 +97,7 @@ yali-builder - Script for building language models
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -116,7 +116,7 @@ Options:
 
 More examples are available at L<http://search.cpan.org/perldoc?Lingua%3A%3AYALI%3A%3AExamples>
 
-Version: 0.015 (2014-05-04)
+Version: 0.016 (2019-02-02)
 
 =head1 AUTHOR
 

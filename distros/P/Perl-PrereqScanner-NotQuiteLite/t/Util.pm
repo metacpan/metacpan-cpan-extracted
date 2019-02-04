@@ -9,6 +9,7 @@ use Exporter qw/import/;
 use File::Temp qw/tempdir/;
 use File::Basename qw/dirname/;
 use File::Path qw/mkpath rmtree/;
+use if -d ".git", "Test::FailWarnings";
 
 our @EXPORT = qw/
   test todo_test used test_app test_file test_cpanfile

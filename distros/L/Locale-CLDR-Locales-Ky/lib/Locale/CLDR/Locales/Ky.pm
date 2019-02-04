@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ky - Package for language Kyrgyz
 
 package Locale::CLDR::Locales::Ky;
 # This file auto generated from Data\common\main\ky.xml
-#	on Sun  7 Oct 10:43:15 am GMT
+#	on Sun  3 Feb  2:02:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -997,6 +997,7 @@ has 'display_name_language' => (
  				'el' => 'грекче',
  				'en' => 'англисче',
  				'en_GB@alt=short' => 'англисче (УБ)',
+ 				'en_US' => 'англисче (Америка Кошмо Штаттары)',
  				'en_US@alt=short' => 'англисче (АКШ)',
  				'eo' => 'эсперанто',
  				'es' => 'испанча',
@@ -1155,7 +1156,7 @@ has 'display_name_language' => (
  				'nan' => 'nan',
  				'nap' => 'неополитанча',
  				'naq' => 'намача',
- 				'nb' => 'норвежче (Букмал)',
+ 				'nb' => 'норвежче (букмал)',
  				'nd' => 'түндүк ндыбелче',
  				'nds' => 'төмөнкү немисче',
  				'nds_NL' => 'төмөнкү саксончо',
@@ -1418,6 +1419,7 @@ has 'display_name_region' => (
  			'151' => 'Чыгыш Европа',
  			'154' => 'Түндүк Европа',
  			'155' => 'Батыш Европа',
+ 			'202' => 'Африка өлкөлөрү',
  			'419' => 'Латын Америкасы',
  			'AC' => 'Вознесение аралы',
  			'AD' => 'Андорра',
@@ -1475,7 +1477,7 @@ has 'display_name_region' => (
  			'CP' => 'Клиппертон аралы',
  			'CR' => 'Коста-Рика',
  			'CU' => 'Куба',
- 			'CV' => 'Капе Верде',
+ 			'CV' => 'Кабо-Верде',
  			'CW' => 'Кюрасао',
  			'CX' => 'Рождество аралы',
  			'CY' => 'Кипр',
@@ -1595,7 +1597,7 @@ has 'display_name_region' => (
  			'MY' => 'Малайзия',
  			'MZ' => 'Мозамбик',
  			'NA' => 'Намибия',
- 			'NC' => 'Жаӊы Каледония',
+ 			'NC' => 'Жаңы Каледония',
  			'NE' => 'Нигер',
  			'NF' => 'Норфолк аралы',
  			'NG' => 'Нигерия',
@@ -1605,13 +1607,13 @@ has 'display_name_region' => (
  			'NP' => 'Непал',
  			'NR' => 'Науру',
  			'NU' => 'Ниуэ',
- 			'NZ' => 'Жаӊы Зеландия',
+ 			'NZ' => 'Жаңы Зеландия',
  			'OM' => 'Оман',
  			'PA' => 'Панама',
  			'PE' => 'Перу',
  			'PF' => 'Полинезия (франциялык)',
  			'PG' => 'Папуа-Жаңы Гвинея',
- 			'PH' => 'Филлипин',
+ 			'PH' => 'Филиппин',
  			'PK' => 'Пакистан',
  			'PL' => 'Польша',
  			'PM' => 'Сен-Пьер жана Микелон',
@@ -1672,7 +1674,7 @@ has 'display_name_region' => (
  			'UG' => 'Уганда',
  			'UM' => 'АКШнын сырткы аралдары',
  			'UN' => 'БУ',
- 			'US' => 'Америка Кошмо Штаттары',
+ 			'US' => 'Кошмо Штаттар',
  			'US@alt=short' => 'АКШ',
  			'UY' => 'Уругвай',
  			'UZ' => 'Өзбекстан',
@@ -1846,7 +1848,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[в ф ц щ ь]},
 			index => ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'Ң', 'О', 'Ө', 'П', 'Р', 'С', 'Т', 'У', 'Ү', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'],
-			main => qr{[а б г д е ё ж з и й к л м н ӊ о ө п р с т у ү х ч ш ъ ы э ю я]},
+			main => qr{[а б г д е ё ж з и й к л м н ң о ө п р с т у ү х ч ш ъ ы э ю я]},
 			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
@@ -1926,6 +1928,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(негизги багыт),
+					},
 					'acre' => {
 						'name' => q(акр),
 						'one' => q({0} акр),
@@ -1955,6 +1960,11 @@ has 'units' => (
 						'name' => q(астрономиялык бирдик),
 						'one' => q({0} астрономиялык бирдик),
 						'other' => q({0} астрономиялык бирдик),
+					},
+					'atmosphere' => {
+						'name' => q(атмосфера),
+						'one' => q({0} атмосфера),
+						'other' => q({0} атм),
 					},
 					'bit' => {
 						'name' => q(бит),
@@ -2472,6 +2482,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({1}/{0}),
 					},
+					'percent' => {
+						'name' => q(пайыз),
+						'one' => q({0} пайыз),
+						'other' => q({0} пайыз),
+					},
+					'permille' => {
+						'name' => q(промилле),
+						'one' => q({0} промилле),
+						'other' => q({0} промилле),
+					},
+					'petabyte' => {
+						'name' => q(петабайт),
+						'one' => q({0} петабайт),
+						'other' => q({0} ПТБ),
+					},
 					'picometer' => {
 						'name' => q(пикометр),
 						'one' => q({0} пикометр),
@@ -2618,6 +2643,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(багыт),
+					},
 					'acre' => {
 						'one' => q({0} акр),
 						'other' => q({0} акр),
@@ -2786,6 +2814,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({1}/{0}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'one' => q({0} пм),
 						'other' => q({0} пм),
@@ -2835,6 +2868,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(багыт),
+					},
 					'acre' => {
 						'name' => q(акр),
 						'one' => q({0} акр),
@@ -2864,6 +2900,11 @@ has 'units' => (
 						'name' => q(а. б.),
 						'one' => q({0} а.б.),
 						'other' => q({0} а.б.),
+					},
+					'atmosphere' => {
+						'name' => q(атм),
+						'one' => q({0} атм),
+						'other' => q({0} атмс),
 					},
 					'bit' => {
 						'name' => q(бит),
@@ -3381,6 +3422,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({1}/{0}),
 					},
+					'percent' => {
+						'name' => q(пайыз),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(промилле),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(ПТб),
+						'one' => q({0} Птб),
+						'other' => q({0} Птб),
+					},
 					'picometer' => {
 						'name' => q(пм),
 						'one' => q({0} пм),
@@ -3605,16 +3661,16 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'1000' => {
-					'one' => '0 миӊ',
-					'other' => '0 миӊ',
+					'one' => '0 миң',
+					'other' => '0 миң',
 				},
 				'10000' => {
-					'one' => '00 миӊ',
-					'other' => '00 миӊ',
+					'one' => '00 миң',
+					'other' => '00 миң',
 				},
 				'100000' => {
-					'one' => '000 миӊ',
-					'other' => '000 миӊ',
+					'one' => '000 миң',
+					'other' => '000 миң',
 				},
 				'1000000' => {
 					'one' => '0 млн',
@@ -3658,16 +3714,16 @@ has 'number_formats' => (
 			},
 			'long' => {
 				'1000' => {
-					'one' => '0 миӊ',
-					'other' => '0 миӊ',
+					'one' => '0 миң',
+					'other' => '0 миң',
 				},
 				'10000' => {
-					'one' => '00 миӊ',
-					'other' => '00 миӊ',
+					'one' => '00 миң',
+					'other' => '00 миң',
 				},
 				'100000' => {
-					'one' => '000 миӊ',
-					'other' => '000 миӊ',
+					'one' => '000 миң',
+					'other' => '000 миң',
 				},
 				'1000000' => {
 					'one' => '0 миллион',
@@ -3708,16 +3764,16 @@ has 'number_formats' => (
 			},
 			'short' => {
 				'1000' => {
-					'one' => '0 миӊ',
-					'other' => '0 миӊ',
+					'one' => '0 миң',
+					'other' => '0 миң',
 				},
 				'10000' => {
-					'one' => '00 миӊ',
-					'other' => '00 миӊ',
+					'one' => '00 миң',
+					'other' => '00 миң',
 				},
 				'100000' => {
-					'one' => '000 миӊ',
-					'other' => '000 миӊ',
+					'one' => '000 миң',
+					'other' => '000 миң',
 				},
 				'1000000' => {
 					'one' => '0 млн',
@@ -4425,9 +4481,9 @@ has 'currencies' => (
 		'KZT' => {
 			symbol => 'KZT',
 			display_name => {
-				'currency' => q(Казакстан теӊгеси),
-				'one' => q(Казакстан теӊгеси),
-				'other' => q(Казакстан теӊгеси),
+				'currency' => q(Казакстан теңгеси),
+				'one' => q(Казакстан теңгеси),
+				'other' => q(Казакстан теңгеси),
 			},
 		},
 		'LAK' => {
@@ -4648,9 +4704,9 @@ has 'currencies' => (
 		'NZD' => {
 			symbol => 'NZD',
 			display_name => {
-				'currency' => q(Жаӊы Зеландия доллары),
-				'one' => q(Жаӊы Зеландия доллары),
-				'other' => q(Жаӊы Зеландия доллары),
+				'currency' => q(Жаңы Зеландия доллары),
+				'one' => q(Жаңы Зеландия доллары),
+				'other' => q(Жаңы Зеландия доллары),
 			},
 		},
 		'OMR' => {
@@ -4680,9 +4736,9 @@ has 'currencies' => (
 		'PGK' => {
 			symbol => 'PGK',
 			display_name => {
-				'currency' => q(Папуа Жаӊы Гвинея кинасы),
-				'one' => q(Папуа Жаӊы Гвинея кинасы),
-				'other' => q(Папуа Жаӊы Гвинея кинасы),
+				'currency' => q(Папуа Жаңы Гвинея кинасы),
+				'one' => q(Папуа Жаңы Гвинея кинасы),
+				'other' => q(Папуа Жаңы Гвинея кинасы),
 			},
 		},
 		'PHP' => {
@@ -4936,9 +4992,9 @@ has 'currencies' => (
 		'TWD' => {
 			symbol => 'TWD',
 			display_name => {
-				'currency' => q(Тайвань жаӊы доллары),
-				'one' => q(Тайвань жаӊы доллары),
-				'other' => q(Тайвань жаӊы доллары),
+				'currency' => q(Тайвань жаңы доллары),
+				'one' => q(Тайвань жаңы доллары),
+				'other' => q(Тайвань жаңы доллары),
 			},
 		},
 		'TZS' => {
@@ -4992,17 +5048,24 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
-				'currency' => q(венесуэла боливары),
-				'one' => q(венесуэла боливары),
-				'other' => q(венесуэла боливары),
+				'currency' => q(венесуэла боливары \(2008–2018\)),
+				'one' => q(венесуэла боливары \(2008–2018\)),
+				'other' => q(венесуэла боливары \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
+				'currency' => q(VES),
+				'one' => q(VES),
+				'other' => q(VES),
 			},
 		},
 		'VND' => {
 			symbol => '₫',
 			display_name => {
-				'currency' => q(Вьетнам доӊу),
-				'one' => q(Вьетнам доӊу),
-				'other' => q(Вьетнам доӊу),
+				'currency' => q(Вьетнам доңу),
+				'one' => q(Вьетнам доңу),
+				'other' => q(Вьетнам доңу),
 			},
 		},
 		'VUV' => {
@@ -5242,13 +5305,13 @@ has 'calendar_days' => (
 						sun => 'Ж'
 					},
 					short => {
-						mon => 'дүй.',
-						tue => 'шейш.',
-						wed => 'шарш.',
-						thu => 'бейш.',
-						fri => 'жума',
-						sat => 'ишм.',
-						sun => 'жек.'
+						mon => 'дш.',
+						tue => 'шш.',
+						wed => 'шр.',
+						thu => 'бш.',
+						fri => 'жм.',
+						sat => 'иш.',
+						sun => 'жш.'
 					},
 					wide => {
 						mon => 'дүйшөмбү',
@@ -5286,7 +5349,7 @@ has 'calendar_days' => (
 						thu => 'бш.',
 						fri => 'жм.',
 						sat => 'иш.',
-						sun => 'жк'
+						sun => 'жш.'
 					},
 					wide => {
 						mon => 'дүйшөмбү',
@@ -5356,53 +5419,53 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -5423,66 +5486,66 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'evening1' => q{кечинде},
-					'am' => q{тң},
-					'night1' => q{түн ичинде},
 					'morning1' => q{эртең менен},
+					'evening1' => q{кечинде},
 					'afternoon1' => q{түштөн кийин},
-					'midnight' => q{түн ортосу},
 					'noon' => q{чак түш},
+					'am' => q{тң},
+					'midnight' => q{түн ортосу},
 					'pm' => q{тк},
+					'night1' => q{түн ичинде},
 				},
 				'wide' => {
-					'afternoon1' => q{түштөн кийин},
-					'midnight' => q{түн ортосу},
-					'pm' => q{түштөн кийинки},
-					'noon' => q{чак түш},
-					'am' => q{таңкы},
 					'evening1' => q{кечинде},
-					'night1' => q{түн ичинде},
 					'morning1' => q{эртең менен},
+					'afternoon1' => q{түштөн кийин},
+					'noon' => q{чак түш},
+					'pm' => q{түштөн кийинки},
+					'midnight' => q{түн ортосу},
+					'am' => q{таңкы},
+					'night1' => q{түн ичинде},
 				},
 				'narrow' => {
-					'evening1' => q{кечк},
-					'am' => q{тң},
-					'night1' => q{түн},
-					'morning1' => q{эртң мн},
 					'afternoon1' => q{түшт кйн},
-					'midnight' => q{түн орт},
 					'noon' => q{чт},
+					'morning1' => q{эртң мн},
+					'evening1' => q{кечк},
+					'night1' => q{түн},
+					'am' => q{тң},
 					'pm' => q{тк},
+					'midnight' => q{түн орт},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
+				'abbreviated' => {
 					'pm' => q{тк},
+					'midnight' => q{түн ортосу},
+					'am' => q{тң},
+					'night1' => q{түн},
+					'evening1' => q{кечкурун},
+					'morning1' => q{эртең менен},
 					'noon' => q{чак түш},
 					'afternoon1' => q{түштөн кийин},
-					'midnight' => q{түн ортосу},
-					'morning1' => q{эртең менен},
+				},
+				'narrow' => {
 					'night1' => q{түн},
+					'midnight' => q{түн ортосу},
+					'pm' => q{тк},
 					'am' => q{тң},
+					'afternoon1' => q{түштөн кийин},
+					'noon' => q{чак түш},
 					'evening1' => q{кечкурун},
+					'morning1' => q{эртең менен},
 				},
 				'wide' => {
+					'noon' => q{чак түш},
+					'afternoon1' => q{түштөн кийин},
+					'morning1' => q{эртең менен},
 					'evening1' => q{кечкурун},
+					'night1' => q{түн},
 					'am' => q{таңкы},
-					'morning1' => q{эртең менен},
-					'night1' => q{түн},
-					'midnight' => q{түн ортосу},
-					'afternoon1' => q{түштөн кийин},
-					'noon' => q{чак түш},
 					'pm' => q{түштөн кийинки},
-				},
-				'abbreviated' => {
-					'afternoon1' => q{түштөн кийин},
 					'midnight' => q{түн ортосу},
-					'noon' => q{чак түш},
-					'pm' => q{тк},
-					'evening1' => q{кечкурун},
-					'am' => q{тң},
-					'morning1' => q{эртең менен},
-					'night1' => q{түн},
 				},
 			},
 		},
@@ -5574,49 +5637,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d, E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y-'ж'. d-MMM, E},
-			GyMMMd => q{G y-'ж'. d-MMM},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{dd/MM, E},
-			MMM => q{LLL},
-			MMMEd => q{d-MMM, E},
-			MMMMd => q{d MMMM},
-			MMMd => q{d-MMM},
-			Md => q{dd/MM},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y-G},
-			yyyy => q{y-G},
-			yyyyM => q{GGGGG y-MM},
-			yyyyMEd => q{GGGGG y-dd-MM, E},
-			yyyyMMM => q{G y-'ж'. MMM},
-			yyyyMMMEd => q{G y-'ж'. d-MMM, E},
-			yyyyMMMM => q{G y-'ж'., MMMM},
-			yyyyMMMd => q{G y-'ж'. d-MMM},
-			yyyyMd => q{GGGGG y-dd-MM},
-			yyyyQQQ => q{G y-'ж'. QQQ},
-			yyyyQQQQ => q{G y-'ж'. QQQQ},
-		},
 		'gregorian' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -5665,6 +5685,49 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{y-'ж'., QQQQ},
 			yw => q{Y-'жылдын' w-'аптасы'},
 		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y-'ж'. d-MMM, E},
+			GyMMMd => q{G y-'ж'. d-MMM},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{dd/MM, E},
+			MMM => q{LLL},
+			MMMEd => q{d-MMM, E},
+			MMMMd => q{d MMMM},
+			MMMd => q{d-MMM},
+			Md => q{dd/MM},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{y-G},
+			yyyy => q{y-G},
+			yyyyM => q{GGGGG y-MM},
+			yyyyMEd => q{GGGGG y-dd-MM, E},
+			yyyyMMM => q{G y-'ж'. MMM},
+			yyyyMMMEd => q{G y-'ж'. d-MMM, E},
+			yyyyMMMM => q{G y-'ж'., MMMM},
+			yyyyMMMd => q{G y-'ж'. d-MMM},
+			yyyyMd => q{GGGGG y-dd-MM},
+			yyyyQQQ => q{G y-'ж'. QQQ},
+			yyyyQQQQ => q{G y-'ж'. QQQQ},
+		},
 	} },
 );
 
@@ -5684,97 +5747,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{M–M},
-			},
-			MEd => {
-				M => q{E, dd.MM – E, dd.MM},
-				d => q{E, dd.MM – E, dd.MM},
-			},
-			MMM => {
-				M => q{MMM–MMM},
-			},
-			MMMEd => {
-				M => q{E, d MMM – E, d MMM},
-				d => q{E, d – E, d MMM},
-			},
-			MMMd => {
-				M => q{d MMM – d MMM},
-				d => q{d–d MMM},
-			},
-			Md => {
-				M => q{dd.MM – dd.MM},
-				d => q{dd.MM – dd.MM},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} - {1}',
-			h => {
-				h => q{h–h a},
-			},
-			hm => {
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y-'ж'.–y-'ж'. G},
-			},
-			yM => {
-				M => q{MM.y – MM.y G},
-				y => q{MM.y – MM.y G},
-			},
-			yMEd => {
-				M => q{E, dd.MM.y – E, dd.MM.y G},
-				d => q{E, dd.MM.y – E, dd.MM.y G},
-				y => q{E, dd.MM.y – E, dd.MM.y G},
-			},
-			yMMM => {
-				M => q{MMM–MMM y-'ж'. G},
-				y => q{MMM y-'ж'. - MMM y-'ж'. G},
-			},
-			yMMMEd => {
-				M => q{E, d-MMM – E, d-MMM y-'ж'. G},
-				d => q{E, d – E, d-MMM y-'ж'. G},
-				y => q{E, d-MMM y-'ж'. - E, d-MMM y-'ж'. G},
-			},
-			yMMMM => {
-				M => q{G y-'ж'. MMMM – MMMM},
-				y => q{G y-'ж'. MMMM – y-'ж'. MMMM},
-			},
-			yMMMd => {
-				M => q{d-MMM – d-MMM y-'ж'. G},
-				d => q{d–d-MMM y-'ж'. G},
-				y => q{d-MMM y-'ж'. - d-MMM y-'ж'. G},
-			},
-			yMd => {
-				M => q{dd.MM.y – dd.MM.y G},
-				d => q{dd.MM.y – dd.MM.y G},
-				y => q{dd.MM.y – dd.MM.y G},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -5868,6 +5840,97 @@ has 'datetime_formats_interval' => (
 				M => q{dd.MM.y – dd.MM.y},
 				d => q{dd.MM.y – dd.MM.y},
 				y => q{dd.MM.y – dd.MM.y},
+			},
+		},
+		'generic' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E, dd.MM – E, dd.MM},
+				d => q{E, dd.MM – E, dd.MM},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E, d MMM – E, d MMM},
+				d => q{E, d – E, d MMM},
+			},
+			MMMd => {
+				M => q{d MMM – d MMM},
+				d => q{d–d MMM},
+			},
+			Md => {
+				M => q{dd.MM – dd.MM},
+				d => q{dd.MM – dd.MM},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} - {1}',
+			h => {
+				h => q{h–h a},
+			},
+			hm => {
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y-'ж'.–y-'ж'. G},
+			},
+			yM => {
+				M => q{MM.y – MM.y G},
+				y => q{MM.y – MM.y G},
+			},
+			yMEd => {
+				M => q{E, dd.MM.y – E, dd.MM.y G},
+				d => q{E, dd.MM.y – E, dd.MM.y G},
+				y => q{E, dd.MM.y – E, dd.MM.y G},
+			},
+			yMMM => {
+				M => q{MMM–MMM y-'ж'. G},
+				y => q{MMM y-'ж'. - MMM y-'ж'. G},
+			},
+			yMMMEd => {
+				M => q{E, d-MMM – E, d-MMM y-'ж'. G},
+				d => q{E, d – E, d-MMM y-'ж'. G},
+				y => q{E, d-MMM y-'ж'. - E, d-MMM y-'ж'. G},
+			},
+			yMMMM => {
+				M => q{G y-'ж'. MMMM – MMMM},
+				y => q{G y-'ж'. MMMM – y-'ж'. MMMM},
+			},
+			yMMMd => {
+				M => q{d-MMM – d-MMM y-'ж'. G},
+				d => q{d–d-MMM y-'ж'. G},
+				y => q{d-MMM y-'ж'. - d-MMM y-'ж'. G},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y G},
+				d => q{dd.MM.y – dd.MM.y G},
+				y => q{dd.MM.y – dd.MM.y G},
 			},
 		},
 	} },
@@ -6410,7 +6473,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Панама#,
 		},
 		'America/Pangnirtung' => {
-			exemplarCity => q#Пангиртуӊ#,
+			exemplarCity => q#Пангиртуң#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Парамарибо#,
@@ -6749,7 +6812,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Куала Лумпур#,
 		},
 		'Asia/Kuching' => {
-			exemplarCity => q#Кучиӊ#,
+			exemplarCity => q#Кучиң#,
 		},
 		'Asia/Kuwait' => {
 			exemplarCity => q#Кувейт#,
@@ -7359,7 +7422,7 @@ has 'time_zone_names' => (
 		},
 		'GMT' => {
 			long => {
-				'standard' => q#GMT, кышкы убакыты#,
+				'standard' => q#Гринвич боюнча орточо убакыт#,
 			},
 		},
 		'Galapagos' => {
@@ -7400,7 +7463,7 @@ has 'time_zone_names' => (
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q#Персия булуңунун жайкы убакыты#,
+				'standard' => q#Булуңдун стандарттык убакыты#,
 			},
 		},
 		'Guyana' => {
@@ -7655,16 +7718,16 @@ has 'time_zone_names' => (
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q#Жаӊы Каледония жайкы убактысы#,
-				'generic' => q#Жаӊы Каледония убактысы#,
-				'standard' => q#Жаӊы Каледония кышкы убакыты#,
+				'daylight' => q#Жаңы Каледония жайкы убактысы#,
+				'generic' => q#Жаңы Каледония убактысы#,
+				'standard' => q#Жаңы Каледония кышкы убакыты#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
 				'daylight' => q#Жаңы Зеландия жайкы убакыты#,
-				'generic' => q#Жаӊы Зеландия убактысы#,
-				'standard' => q#Жаӊы Зеландия кышкы убакыты#,
+				'generic' => q#Жаңы Зеландия убактысы#,
+				'standard' => q#Жаңы Зеландия кышкы убакыты#,
 			},
 		},
 		'Newfoundland' => {
@@ -7836,7 +7899,7 @@ has 'time_zone_names' => (
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q#Папуа-Жаңы Гвинея убактысы#,
+				'standard' => q#Папуа-Жаңы Гвинея убакыты#,
 			},
 		},
 		'Paraguay' => {

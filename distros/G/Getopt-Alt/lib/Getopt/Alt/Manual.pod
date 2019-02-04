@@ -4,7 +4,9 @@ Getopt::Alt Manual
 
 =head1 AIM
 
-The aim of Getopt::Alt is to be a reasonably easy replacement of Getopt::Long as well as having much more power and options (like supporting command type interfaces).
+The aim of Getopt::Alt is to be a reasonably easy replacement of Getopt::Long
+as well as having much more power and options (like supporting command type
+interfaces).
 
 There are three different usage cases for Getopt::Alt:
 
@@ -16,11 +18,13 @@ Simple option list, i.e. a simple replacement of Getopt::Long
 
 =item 2
 
-Simple command & option list for running commands (as subs) in the calling file
+Simple command & option list for running commands (as subs) in the calling
+file
 
 =item 3
 
-More complex commands & option list where each command is a method of different modules.
+More complex commands & option list where each command is a method of
+different modules.
 
 =back
 

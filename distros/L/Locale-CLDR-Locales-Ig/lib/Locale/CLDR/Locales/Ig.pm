@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ig - Package for language Igbo
 
 package Locale::CLDR::Locales::Ig;
 # This file auto generated from Data\common\main\ig.xml
-#	on Sun  7 Oct 10:38:23 am GMT
+#	on Sun  3 Feb  1:57:18 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -593,12 +593,12 @@ has 'day_periods' => (
 			},
 			'stand-alone' => {
 				'narrow' => {
-					'am' => q{A.M.},
 					'pm' => q{P.M.},
+					'am' => q{A.M.},
 				},
 				'wide' => {
-					'am' => q{A.M.},
 					'pm' => q{P.M.},
+					'am' => q{A.M.},
 				},
 				'abbreviated' => {
 					'pm' => q{P.M.},
@@ -732,7 +732,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{y-MM-dd},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
-			yw => q{'week' w 'of' y},
+			yw => q{'week' w 'of' Y},
 		},
 		'generic' => {
 			Hm => q{HH:mm},

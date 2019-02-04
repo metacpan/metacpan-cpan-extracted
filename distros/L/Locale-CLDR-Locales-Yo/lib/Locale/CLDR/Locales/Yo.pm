@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Yo - Package for language Yoruba
 
 package Locale::CLDR::Locales::Yo;
 # This file auto generated from Data\common\main\yo.xml
-#	on Sun  7 Oct 11:06:46 am GMT
+#	on Sun  3 Feb  2:26:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1063,29 +1063,29 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
+				'narrow' => {
 					'am' => q{Àárọ̀},
 					'pm' => q{Ọ̀sán},
 				},
 				'wide' => {
-					'am' => q{Àárọ̀},
 					'pm' => q{Ọ̀sán},
+					'am' => q{Àárọ̀},
 				},
-				'narrow' => {
-					'pm' => q{Ọ̀sán},
+				'abbreviated' => {
 					'am' => q{Àárọ̀},
+					'pm' => q{Ọ̀sán},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'pm' => q{Ọ̀sán},
+				'abbreviated' => {
 					'am' => q{Àárọ̀},
+					'pm' => q{Ọ̀sán},
 				},
 				'narrow' => {
 					'am' => q{Àárọ̀},
 					'pm' => q{Ọ̀sán},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{Ọ̀sán},
 					'am' => q{Àárọ̀},
 				},
@@ -1236,7 +1236,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{y-MM-dd},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
-			yw => q{'week' w 'of' y},
+			yw => q{'week' w 'of' Y},
 		},
 	} },
 );

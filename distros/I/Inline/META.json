@@ -1,10 +1,10 @@
 {
    "abstract" : "Write Perl Subroutines in Other Programming Languages",
    "author" : [
-      "Ingy döt Net <ingy@cpan.org>"
+      "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,10 +15,10 @@
    "name" : "Inline",
    "no_index" : {
       "directory" : [
+         "example",
          "inc",
          "t",
-         "xt",
-         "example"
+         "xt"
       ]
    },
    "prereqs" : {
@@ -36,7 +36,8 @@
          "requires" : {
             "Digest::MD5" : "0",
             "File::Spec" : "0.8",
-            "perl" : "v5.8.1"
+            "perl" : "v5.8.1",
+            "version" : "0.82"
          }
       },
       "test" : {
@@ -58,6 +59,8 @@
          "web" : "https://github.com/ingydotnet/inline-pm"
       }
    },
-   "version" : "0.80"
+   "version" : "0.81",
+   "x_generated_by_perl" : "v5.24.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

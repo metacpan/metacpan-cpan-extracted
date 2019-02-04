@@ -40,14 +40,21 @@ $tzil->mint_dist;
 my $mint_dir = path($tzil->tempdir)->child('mint');
 
 my $dist_ini = path($mint_dir, 'dist.ini')->slurp_utf8;
+# TAU: Now we go for perl 5.10 (which is written as 5.010)
+# Test::MinimumVersion.max_target_perl = 5.010
+# qr/\[Bootstrap::lib\]
+# \[Foo::Bar\]
+
 like(
     $dist_ini,
-    qr/\[Bootstrap::lib\]
-\[Foo::Bar\]
+    qr/\[lib\]
+lib = lib
 
 \[\@Author::TABULO\]
 :version = [\d.]+
-Test::MinimumVersion.max_target_perl = 5.008003
+-remove = PodCoverageTests
+-remove = Test::Pod::No404s
+;max_target_perl = 5.014
 
 \[MetaResources\]
 x_IRC/,
@@ -76,7 +83,7 @@ my $module = path($mint_dir, 'lib/Dist/Zilla/Plugin/Foo/Bar.pm')->slurp_utf8;
 
 like(
     $module,
-    qr/^use strict;\nuse warnings;\npackage Dist::Zilla::Plugin::Foo::Bar;/,
+    qr/^(?:use utf8;\n)?use strict;\nuse warnings;\npackage Dist::Zilla::Plugin::Foo::Bar;/,
     'our new module has a valid package declaration',
 );
 

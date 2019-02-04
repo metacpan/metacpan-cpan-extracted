@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Is::Any::Is - Package for language Icelandic
 
 package Locale::CLDR::Locales::Is::Any::Is;
 # This file auto generated from Data\common\main\is_IS.xml
-#	on Sun  7 Oct 10:38:52 am GMT
+#	on Sun  3 Feb  1:57:45 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

@@ -1,11 +1,12 @@
 use strict;
 use warnings;
 package Pod::Weaver::PluginBundle::Author::TABULO;
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=2 sts=2 sw=2 tw=115 et :
 # ABSTRACT: A plugin bundle for pod woven for TABULO
 # BASED_ON: Pod::Weaver::PluginBundle::Author::ETHER
 
-our $VERSION = '0.197';
+our $VERSION = '0.198';
+# AUTHORITY
 
 use namespace::autoclean -also => ['_exp'];
 use Pod::Weaver::Config::Assembler;
@@ -17,73 +18,88 @@ sub _exp { Pod::Weaver::Config::Assembler->expand_package($_[0]) }
 # This sub behaves somewhat like a Dist::Zilla pluginbundle's configure() -- it returns a list of strings or 1, 2
 # or 3-element arrayrefs containing plugin specifications. The goal is to make this look as close to what
 # weaver.ini looks like as possible.
+
+# Some other possibilities (found on CPAN) include :
+#
+# Pod::Weaver::Section::*
+#   * AllowOverride       - Allow POD to override a Pod::Weaver-provided
+#   * Collect::FromOther  - Import sections from other POD
+#   * CommentString       - Add Pod::Weaver section with content extracted from comment with specified key
+#   * Bugs::DefaultRT     - Add a BUGS section to refer to bugtracker (or RT as default)
+#   * GenerateSection     - add pod section from an interpolated piece of text
+#   * ReplaceName         - Add or replace a NAME section with abstract.
+#   * SeeAlso             - add a SEE ALSO pod section. Also supports #SEEALSO comments (preferrable).
+#                           WARNING:  The 'SEE ALSO' section in your POD, if present,
+#                                     should just be a list of links (one per line), without any POD commands.
+#   * Template            - add pod section from a Text::Template template
+#   * WarrantyDisclaimer  - Add a standard DISCLAIMER OF WARRANTY section (for your Perl module)
+#
+#   * Extends  - Add a list of parent classes to your POD.
+#   * Consumes - Add a list of roles to your POD. WARNING: This one has some CAVEATS (refer to CPAN).
+#   * Requires - Add Pod::Weaver section with all used modules from package excluding listed ones, e.g. :
+#               [Requires]
+#               ignore = base lib constant namespace::sweep
+#
+# Pod::Weaver::Plugin::*
+#  .* AppendPrepend         - Merge append:FOO and prepend:FOO sections in POD
+#  .* Include               - Support for including sections of Pod from other files
+#  .* EnsureUniqueSections  - Ensure that POD has no duplicate section headers.
+#                             NOTE: Setting strict=1 will disable smart detection of duplicates (plural forms, collapsed space, ...)
+#   * Exec                  - include output of commands in your pod
+#   * Run                   - Write Pod::Weaver::Plugin directly in 'weaver.ini'
+#                             WARNING: Seems to be a bit exoteric.
+#   * SortSections          - Sort POD sections
+#  .* StopWords             - Dynamically add stopwords to your woven pod
+#  .* WikiDoc               - allow wikidoc-format regions to be translated during dialect phase
+
 sub configure
 {
     my $self = shift;
 
-    # I wouldn't have to do this ugliness if I could have some configuration values passed in from weaver.ini or
+    # ETHER says: I wouldn't have to do this ugliness if I could have some configuration values passed in from weaver.ini or
     # the [PodWeaver] plugin's use of config_plugin (where I could define a 'licence' option)
     my $podweaver_plugin = ${ peek_sub(\&Dist::Zilla::Plugin::PodWeaver::weaver)->{'$self'} };
-    my $licence_plugin = $podweaver_plugin && $podweaver_plugin->zilla->plugin_named('@Author::TABULO/License');
-    my $licence_filename = $licence_plugin ? $licence_plugin->filename : 'LICENCE';
+    my $lic_plugin = $podweaver_plugin && $podweaver_plugin->zilla->plugin_named('@Author::TABULO/License');
+    my $lic_filename = $lic_plugin ? $lic_plugin->filename : 'LICENSE'; # TAU: Changed default from 'LICENCE'
 
     return (
-        # equivalent to [@CorePrep]
+        # equivalent to [@CorePrep].  These are REQUIRED for anything to work.
         [ '-EnsurePod5' ],
         [ '-H1Nester' ],
 
-        '-SingleEncoding',
-        [ '-Transformer' => List => { transformer => 'List' } ],
-        [ '-Transformer' => Verbatim => { transformer => 'Verbatim' } ],
-        [ '-Transformer' => WikiDoc => { transformer => 'WikiDoc' } ],  # TAU : Added WikiDoc
+          '-AppendPrepend',         #  + by TAU. Merge append:FOO and prepend:FOO sections in POD
+          '-EnsureUniqueSections',  #  + by TAU. Ensure that POD has no duplicate section headers.
+        [ '-Include'                    =>  { pod_path => 'lib:bin:script:scripts:docs/pod', insert_errors => 0 } ],  # + by TAU
+          '-SingleEncoding',        #  Encoding defaults to UTF-8.
+        # In addition to the below, other stopWords may be added in several places, such as the [%PodWeaver] stash in 'dist.ini'
+        [ '-StopWords'                  =>  { gather=>1,   include   => [ stopwords() ] } ],
+        [ '-Transformer'  => Verbatim   =>  { transformer => 'Verbatim' } ],
+        [ '-Transformer'  => WikiDoc    =>  { transformer => 'WikiDoc'  } ],  # TAU : Added WikiDoc
+
 
         [ 'Region' => 'header' ],
-        'Name',
-        'Version',
-        [ 'Region' => 'prelude' ],
-        [ 'Generic' => 'SYNOPSIS' ],
-        [ 'Generic' => 'DESCRIPTION' ],
-        [ 'Generic' => 'OVERVIEW' ],
-        [ 'Collect' => 'ATTRIBUTES' => { command => 'attr' } ],
-        [ 'Collect' => 'METHODS'    => { command => 'method' } ],
-        [ 'Collect' => 'FUNCTIONS'  => { command => 'func' } ],
-        [ 'Collect' => 'TYPES'      => { command => 'type' } ],
-        'Leftovers',
-        [ 'Region' => 'postlude' ],
+          'Name',
+          'Version',
+        [ 'Region'  => 'prelude'      ],
+        [ 'Generic' => 'SYNOPSIS'     ],
+        [ 'Generic' => 'DESCRIPTION'  ],
+        [ 'Generic' => 'OVERVIEW'     ],
+        [ 'Collect' => 'ATTRIBUTES'           => { command => 'attr'    } ],
+        # [ 'Collect' => 'ATTRIBUTES (PRIVATE)' => { command => 'pattr'   } ],
+        [ 'Collect' => 'METHODS'              => { command => 'method'  } ],
+        # [ 'Collect' => 'METHODS (PRIVATE)'    => { command => 'pmethod' } ],
+        [ 'Collect' => 'FUNCTIONS'            => { command => 'func'    } ],
+        # [ 'Collect' => 'FUNCTIONS (PRIVATE)'  => { command => 'pfunc'   } ],
+        [ 'Collect' => 'TYPES'                => { command => 'type'    } ],
+
+          'Leftovers',
+        [ 'Region'  => 'postlude'     ],
 
         [ 'GenerateSection' => 'generate SUPPORT' => {
                 title => 'SUPPORT',
                 main_module_only => 0,
-                text => [ <<'SUPPORT',
-{{ join("\n\n",
-    ($bugtracker_email && $bugtracker_email =~ /rt\.cpan\.org/)
-    ? "Bugs may be submitted through L<the RT bug tracker|$bugtracker_web>\n(or L<$bugtracker_email|mailto:$bugtracker_email>)."
-    : $bugtracker_web
-    ? "bugs may be submitted through L<$bugtracker_web>."
-    : (),
-
-    $distmeta->{resources}{x_MailingList} ? 'There is also a mailing list available for users of this distribution, at' . "\nL<" . $distmeta->{resources}{x_MailingList} . '>.' : (),
-
-    $distmeta->{resources}{x_IRC}
-        ? 'There is also an irc channel available for users of this distribution, at' . "\nL<"
-            . do {
-                # try to extract the channel
-                if (my ($network, $channel) = ($distmeta->{resources}{x_IRC} =~ m!(?:://)?(\w+(?:\.\w+)*)/?(#\w+)!)) {
-                    'C<' . $channel . '> on C<' . $network . '>|' . $distmeta->{resources}{x_IRC}
-                }
-                else {
-                    $distmeta->{resources}{x_IRC}
-                }
-            }
-            . '>.'
-        : (),
-
-    (($distmeta->{x_authority} // '') eq 'cpan:ETHER')    # Disabled for TABULO because I am not active on IRC, but ETHER can still use this profile:-)
-    ? "I am also usually active on irc, as 'ether' at C<irc.perl.org>."
-    : (),
-) }}
-SUPPORT
-                        ] },
+                text => [ support_section_text() ],
+            },
         ],
 
         [ 'AllowOverride' => 'allow override SUPPORT' => {
@@ -93,15 +109,84 @@ SUPPORT
             },
         ],
 
-        'Authors',
+          'Authors',
         [ 'Contributors' => { ':version' => '0.008' } ],
-        [ 'Legal' => { ':version' => '4.011', header => 'COPYRIGHT AND ' . $licence_filename } ],
+        [ 'Legal' => { ':version' => '4.011', header => 'COPYRIGHT AND ' . $lic_filename } ],
+          'WarrantyDisclaimer', # + by TABULO
         [ 'Region' => 'footer' ],
     );
 }
 
-sub mvp_bundle_config
-{
+
+#--------------------------------------
+sub stopwords {
+
+#pod =for COMMENT
+#pod
+#pod NOTE: See C<Pod::Wordlist> for a list of stopwords that are already taken into account
+#pod automatically by L<[Test::PodSpelling]|Dist::Zilla::Plugin::Test::PodSpelling/stopwords>.
+#pod
+#pod =cut
+
+  (
+
+  # Frequently mentioned proper names
+  qw ( bitbucket BitBucket CPAN irc GitHub metacpan ),
+
+  # Frequently mentioned Perl module names (without the '::')
+  qw ( FakeRelease ModuleBuildTiny PodWeaver SurgicalPodWeaver UploadToCPAN),
+
+  # Common idioms found in Perl docuentation
+  qw ( foo foobar bar baz ),
+
+  # Frequently mentioned authors
+  qw ( DAGOLDEN ETHER TABULO KENTNL ),
+
+  # Some made-up words or americanisms that TABULO likes to use anyway
+  qw ( customization customizations stopword stopwords repo submodule optimization optimizations),
+
+  # Some words that are somehow not known to the spell-checker
+  qw (
+    MERCHANTABILITY
+  ),
+)
+}
+
+#--------------------------------------
+sub support_section_text {  # [TAU] : Note that this is actualy a template.
+#--------------------------------------
+  return <<'SUPPORT',
+{{ join("\n\n",
+($bugtracker_email && $bugtracker_email =~ /rt\.cpan\.org/)
+? "Bugs may be submitted through L<the RT bug tracker|$bugtracker_web>\n(or L<$bugtracker_email|mailto:$bugtracker_email>)."
+: $bugtracker_web
+? "bugs may be submitted through L<$bugtracker_web>."
+: (),
+
+$distmeta->{resources}{x_MailingList} ? 'There is also a mailing list available for users of this distribution, at' . "\nL<" . $distmeta->{resources}{x_MailingList} . '>.' : (),
+
+$distmeta->{resources}{x_IRC}
+? 'There is also an irc channel available for users of this distribution, at' . "\nL<"
+. do {
+# try to extract the channel
+if (my ($network, $channel) = ($distmeta->{resources}{x_IRC} =~ m!(?:://)?(\w+(?:\.\w+)*)/?(#\w+)!)) {
+    'C<' . $channel . '> on C<' . $network . '>|' . $distmeta->{resources}{x_IRC}
+}
+else {
+    $distmeta->{resources}{x_IRC}
+}
+}
+. '>.'
+: (),
+
+(($distmeta->{x_authority} // '') eq 'cpan:ETHER')    # Disabled for TABULO because I am not active on IRC, but ETHER can still use this profile:-)
+? "I am also usually active on irc, as 'ether' at C<irc.perl.org>."
+: (),
+) }}
+SUPPORT
+}
+
+sub mvp_bundle_config {
     my $self = shift || __PACKAGE__;
 
     return map {
@@ -109,9 +194,9 @@ sub mvp_bundle_config
     } $self->configure;
 }
 
+
 my $prefix;
-sub _prefix
-{
+sub _prefix {
     my $self = shift;
     return $prefix if defined $prefix;
     ($prefix = (ref($self) || $self)) =~ s/^Pod::Weaver::PluginBundle:://;
@@ -180,7 +265,7 @@ Pod::Weaver::PluginBundle::Author::TABULO - A plugin bundle for pod woven for TA
 
 =head1 VERSION
 
-version 0.197
+version 0.198
 
 =head1 SYNOPSIS
 
@@ -199,6 +284,16 @@ It is also used automatically when your F<dist.ini> contains:
     :version = 0.094    ; or any higher version
 
 =head1 DESCRIPTION
+
+=begin COMMENT
+
+
+
+
+=end COMMENT
+
+NOTE: See C<Pod::Wordlist> for a list of stopwords that are already taken into account
+automatically by L<[Test::PodSpelling]|Dist::Zilla::Plugin::Test::PodSpelling/stopwords>.
 
 =for stopwords TABULO ETHER
 =for stopwords GitHub
@@ -234,7 +329,23 @@ following F<weaver.ini>, minus some optimizations:
     [-EnsurePod5]
     [-H1Nester]
 
+    [-AppendPrepend]
+
+    [-EnsureUniqueSections]
+
+    [-Include]
+    insert_errors = 0
+    pod_path = lib:bin:script:scripts:docs/pod
+
     [-SingleEncoding]
+
+    [-StopWords]
+    gather = 1
+    include = CPAN
+    include = DZIL
+    include = GITHUB
+    include = MERCHANTABILITY
+    ; include = ... (a bunch of other stopwords for the spell-checker, too many to list here)
 
     [-Transformer / List]
     transformer = List
@@ -242,7 +353,7 @@ following F<weaver.ini>, minus some optimizations:
     [-Transformer / Verbatim]
     transformer = Verbatim
 
-    [-Transformer / WikiDoc]  ; Added by TABULO
+    [-Transformer / WikiDoc]
     transformer = WikiDoc
 
     [Region / header]
@@ -288,9 +399,27 @@ following F<weaver.ini>, minus some optimizations:
     :version = 4.011
     header = COPYRIGHT AND <licence filename>
 
+    [WarrantyDisclaimer]
+
     [Region / footer]
 
 This is also equivalent (other than section ordering) to:
+
+    [-AppendPrepend]
+
+    [-EnsureUniqueSections]
+
+    [-Include]
+    insert_errors = 0
+    pod_path = lib:bin:script:scripts:docs/pod
+
+    [-StopWords]
+    gather = 1
+    include = CPAN
+    include = DZIL
+    include = GITHUB
+    include = MERCHANTABILITY
+    ; include = ... (a bunch of other stopwords for the spell-checker, too many to list here)
 
     [-Transformer / List]
     transformer = List
@@ -318,6 +447,8 @@ This is also equivalent (other than section ordering) to:
 
     [Contributors]
     :version = 0.008
+
+    [WarrantyDisclaimer]
 
     [Region / footer]
 
@@ -404,11 +535,11 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 =head1 AUTHOR
 
-Ayhan Ulusoy <tabulo@cpan.org>
+Tabulo <tabulo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ayhan Ulusoy.
+This software is copyright (c) 2018 by Tabulo.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

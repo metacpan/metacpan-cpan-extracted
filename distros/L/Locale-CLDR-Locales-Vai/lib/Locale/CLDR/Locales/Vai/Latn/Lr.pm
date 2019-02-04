@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Vai::Latn::Lr - Package for language Vai
 
 package Locale::CLDR::Locales::Vai::Latn::Lr;
 # This file auto generated from Data\common\main\vai_Latn_LR.xml
-#	on Sun  7 Oct 11:06:13 am GMT
+#	on Sun  3 Feb  2:25:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

@@ -479,7 +479,7 @@ BEGIN {
 
         use Moose;
 
-        with 'PONAPI::Builder::Role::HasPagination';
+        with 'PONAPI::Document::Builder::Role::HasPagination';
 
         has port => (
             is => 'ro',

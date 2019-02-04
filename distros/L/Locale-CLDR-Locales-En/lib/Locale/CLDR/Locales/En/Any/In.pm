@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::In - Package for language English
 
 package Locale::CLDR::Locales::En::Any::In;
 # This file auto generated from Data\common\main\en_IN.xml
-#	on Sun  7 Oct 10:29:18 am GMT
+#	on Sun  3 Feb  1:48:15 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -979,6 +979,26 @@ has 'display_name_type' => (
 	},
 );
 
+has 'units' => (
+	is			=> 'ro',
+	isa			=> HashRef[HashRef[HashRef[Str]]],
+	init_arg	=> undef,
+	default		=> sub { {
+				'narrow' => {
+					'kilometer-per-hour' => {
+						'one' => q({0}kph),
+						'other' => q({0}kph),
+					},
+				},
+				'short' => {
+					'kilometer-per-hour' => {
+						'one' => q({0} kph),
+						'other' => q({0} kph),
+					},
+				},
+			} }
+);
+
 has 'number_formats' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -1018,6 +1038,29 @@ has 'number_currency_formats' => (
 } },
 );
 
+has 'currencies' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'VEF' => {
+			display_name => {
+				'currency' => q(Venezuelan Bolívar),
+				'one' => q(Venezuelan bolívar),
+				'other' => q(Venezuelan bolívars),
+			},
+		},
+		'VES' => {
+			display_name => {
+				'currency' => q(VES),
+				'one' => q(VES),
+				'other' => q(VES),
+			},
+		},
+	} },
+);
+
+
 has 'day_period_data' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -1030,76 +1073,76 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'islamic') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -1144,7 +1187,9 @@ has 'date_formats' => (
 		},
 		'islamic' => {
 			'full' => q{EEEE d MMMM y G},
+			'long' => q{d MMMM, y G},
 			'medium' => q{dd-MMM-y G},
+			'short' => q{d/M/y/ GGGGG},
 		},
 	} },
 );
@@ -1183,8 +1228,6 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			EBhm => q{E, h:mm B},
-			EBhms => q{E, h:mm:ss B},
 			EHm => q{E, HH:mm},
 			EHms => q{E, HH:mm:ss},
 			Ehm => q{E, h:mm a},
@@ -1193,17 +1236,23 @@ has 'datetime_formats_available_formats' => (
 			yMMMEd => q{E, d MMM, y},
 			yMd => q{d/M/y},
 		},
-		'generic' => {
-			EBhm => q{E, h:mm B},
-			EBhms => q{E, h:mm:ss B},
-			EHm => q{E, HH:mm},
-			EHms => q{E, HH:mm:ss},
-			Ehm => q{E, h:mm a},
-			Ehms => q{E, h:mm:ss a},
+		'islamic' => {
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, d MMM, y G},
 			GyMMMd => q{d MMM, y G},
-			MEd => q{E, d/M},
+			Md => q{d/M},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E d/M/y G},
+			yyyyMMM => q{MMM, y G},
+			yyyyMMMEd => q{E, d MMM, y G},
+			yyyyMMMM => q{MMMM, y G},
+			yyyyMMMd => q{d MMM, y G},
+			yyyyMd => q{d/M/y G},
+		},
+		'generic' => {
+			GyMMM => q{MMM, y G},
+			GyMMMEd => q{E, d MMM, y G},
+			GyMMMd => q{d MMM, y G},
 			Md => q{d/M},
 			yyyyM => q{M/y GGGGG},
 			yyyyMEd => q{E, d/M/y GGGGG},
@@ -1212,9 +1261,6 @@ has 'datetime_formats_available_formats' => (
 			yyyyMMMM => q{MMMM, y G},
 			yyyyMMMd => q{d MMM, y G},
 			yyyyMd => q{d/M/y G},
-		},
-		'islamic' => {
-			yyyyMEd => q{E d/M/y G},
 		},
 	} },
 );

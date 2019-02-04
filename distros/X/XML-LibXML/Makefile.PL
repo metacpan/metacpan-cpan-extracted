@@ -190,7 +190,7 @@ unless ( $is_Win32 ) { # cannot get config in W32
                      [2,7,8,1], # tested, ok
                      [2,9,3,1], # schema regression
                      [2,9,4,0], # schema regression
-                     [2,9,6,1],
+                     [2,9,9,1],
                     );
     my $xml2cfg = "xml2-config";
     my $libprefix = $ENV{XMLPREFIX} || $config{XMLPREFIX};
@@ -526,7 +526,12 @@ sub MY::postamble {
             : ''
     );
 
-  my $ret = "$CC\n\n" . <<'MAKE_FRAG';
+  my $ret = "$CC\n" . <<'MAKE_FRAG';
+
+# emacs flymake-mode
+check-syntax :
+	test -n "$(CHK_SOURCES)" && \
+	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) -o /dev/null -S $(CHK_SOURCES)
 
 # used to update version numbers in all modules
 version:
@@ -535,7 +540,7 @@ version:
 	perl -pi~ -e '$$_=q('"$$version"')."\n" if /#\ VERSION TEMPLATE/ ' $(TO_INST_PM);
 
 runtest: pure_all
-	perl -MFile::Spec -MTest::Run::CmdLine::Iface -e \
+	$(ABSPERLRUN) -MFile::Spec -MTest::Run::CmdLine::Iface -e \
         "local @INC = @INC;	unshift @INC, map { File::Spec->rel2abs(\$$_) } ('$(INST_LIB)', '$(INST_ARCHLIB)'); Test::Run::CmdLine::Iface->new({test_files => [glob(q{t/*.t})]})->run();"
 
 distruntest: distdir

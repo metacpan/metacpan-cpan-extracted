@@ -296,6 +296,13 @@ SV extensions:
     STRs(1):
             NAME
 
+  type: DEBUGREPORT (DEBUG_LEAKING_SCALARS) (0x88)
+    Header(2I):
+      UINT  SERIAL
+      UINT  LINE
+    STRs(1):
+            FILE
+
 Context:
   type==0-terminated list of CTXs
 

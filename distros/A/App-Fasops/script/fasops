@@ -44,6 +44,8 @@ cat t/example.fas | perl -I lib/ script/fasops replace stdin t/replace.tsv -o st
 
 cat t/example.fas | perl -I lib/ script/fasops refine stdin --msa mafft -o stdout
 perl -I lib/ script/fasops refine t/example.fas --msa none --chop 10 -o stdout
+perl -I lib/ script/fasops refine t/example.fas --quick -o stdout
+perl -I lib/ script/fasops refine t/refine.fas -p 2 -o stdout
 
 cat t/example.fas | perl -I lib script/fasops split stdin -o stdout
 perl -I lib script/fasops split t/example.fas --simple -o stdout

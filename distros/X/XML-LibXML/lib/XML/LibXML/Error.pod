@@ -16,23 +16,23 @@ XML::LibXML::Error - Structured Errors
           }
 
   $XML::LibXML::Error::WARNINGS=1;
-  $message = $@->as_string();
-  print $@->dump();
-  $error_domain = $@->domain();
-  $error_code = $@->code();
-  $error_message = $@->message();
-  $error_level = $@->level();
-  $filename = $@->file();
-  $line = $@->line();
-  $nodename = $@->nodename();
-  $error_str1 = $@->str1();
-  $error_str2 = $@->str2();
-  $error_str3 = $@->str3();
-  $error_num1 = $@->num1();
-  $error_num2 = $@->num2();
-  $string = $@->context();
-  $offset = $@->column();
-  $previous_error = $@->_prev();
+  $message = $@-E<gt>as_string();
+  print $@-E<gt>dump();
+  $error_domain = $@-E<gt>domain();
+  $error_code = $@-E<gt>code();
+  $error_message = $@-E<gt>message();
+  $error_level = $@-E<gt>level();
+  $filename = $@-E<gt>file();
+  $line = $@-E<gt>line();
+  $nodename = $@-E<gt>nodename();
+  $error_str1 = $@-E<gt>str1();
+  $error_str2 = $@-E<gt>str2();
+  $error_str3 = $@-E<gt>str3();
+  $error_num1 = $@-E<gt>num1();
+  $error_num2 = $@-E<gt>num2();
+  $string = $@-E<gt>context();
+  $offset = $@-E<gt>column();
+  $previous_error = $@-E<gt>_prev();
 
 =head1 DESCRIPTION
 
@@ -67,7 +67,7 @@ warnings via Perl C<<<<<< warn >>>>>> and to 2 to report hem via C<<<<<< die >>>
 
 =item as_string
 
-  $message = $@->as_string();
+  $message = $@-E<gt>as_string();
 
 This function serializes an XML::LibXML::Error object to a string containing
 the full error message close to the message produced by I<<<<<< libxml2 >>>>>> default error handlers and tools like xmllint. This method is also used to
@@ -77,7 +77,7 @@ whenever XML::LibXML::Error object is treated as a string (e.g. in print $@).
 
 =item dump
 
-  print $@->dump();
+  print $@-E<gt>dump();
 
 This function serializes an XML::LibXML::Error to a string displaying all
 fields of the error structure individually on separate lines of the form 'name'
@@ -86,7 +86,7 @@ fields of the error structure individually on separate lines of the form 'name'
 
 =item domain
 
-  $error_domain = $@->domain();
+  $error_domain = $@-E<gt>domain();
 
 Returns string containing information about what part of the library raised the
 error. Can be one of: "parser", "tree", "namespace", "validity", "HTML parser",
@@ -97,7 +97,7 @@ parser", "Relax-NG validity", "Catalog", "C14N", "XSLT", "validity".
 
 =item code
 
-  $error_code = $@->code();
+  $error_code = $@-E<gt>code();
 
 Returns the actual libxml2 error code. The XML::LibXML::ErrNo module defines
 constants for individual error codes. Currently libxml2 uses over 480 different
@@ -106,14 +106,14 @@ error codes.
 
 =item message
 
-  $error_message = $@->message();
+  $error_message = $@-E<gt>message();
 
 Returns a human-readable informative error message.
 
 
 =item level
 
-  $error_level = $@->level();
+  $error_level = $@-E<gt>level();
 
 Returns an integer value describing how consequent is the error.
 XML::LibXML::Error defines the following constants:
@@ -150,21 +150,21 @@ XML_ERR_FATAL = 3 : A fatal error.
 
 =item file
 
-  $filename = $@->file();
+  $filename = $@-E<gt>file();
 
 Returns the filename of the file being processed while the error occurred.
 
 
 =item line
 
-  $line = $@->line();
+  $line = $@-E<gt>line();
 
 The line number, if available.
 
 
 =item nodename
 
-  $nodename = $@->nodename();
+  $nodename = $@-E<gt>nodename();
 
 Name of the node where error occurred, if available. When this field is
 non-empty, libxml2 actually returned a physical pointer to the specified node.
@@ -175,35 +175,35 @@ XML::LibXML::Error currently only exposes the name the node.
 
 =item str1
 
-  $error_str1 = $@->str1();
+  $error_str1 = $@-E<gt>str1();
 
 Error specific. Extra string information.
 
 
 =item str2
 
-  $error_str2 = $@->str2();
+  $error_str2 = $@-E<gt>str2();
 
 Error specific. Extra string information.
 
 
 =item str3
 
-  $error_str3 = $@->str3();
+  $error_str3 = $@-E<gt>str3();
 
 Error specific. Extra string information.
 
 
 =item num1
 
-  $error_num1 = $@->num1();
+  $error_num1 = $@-E<gt>num1();
 
 Error specific. Extra numeric information.
 
 
 =item num2
 
-  $error_num2 = $@->num2();
+  $error_num2 = $@-E<gt>num2();
 
 In recent libxml2 versions, this value contains a column number of the error or
 0 if N/A.
@@ -211,22 +211,22 @@ In recent libxml2 versions, this value contains a column number of the error or
 
 =item context
 
-  $string = $@->context();
+  $string = $@-E<gt>context();
 
 For parsing errors, this field contains about 80 characters of the XML near the
-place where the error occurred. The field C<<<<<< $@->column() >>>>>> contains the corresponding offset. Where N/A, the field is undefined.
+place where the error occurred. The field C<<<<<< $@-E<gt>column() >>>>>> contains the corresponding offset. Where N/A, the field is undefined.
 
 
 =item column
 
-  $offset = $@->column();
+  $offset = $@-E<gt>column();
 
-See C<<<<<< $@->column() >>>>>> above.
+See C<<<<<< $@-E<gt>column() >>>>>> above.
 
 
 =item _prev
 
-  $previous_error = $@->_prev();
+  $previous_error = $@-E<gt>_prev();
 
 This field can possibly hold a reference to another XML::LibXML::Error object
 representing an error which occurred just before this error.
@@ -244,7 +244,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0132
+2.0133
 
 =head1 COPYRIGHT
 

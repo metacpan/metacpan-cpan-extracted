@@ -8,13 +8,13 @@ Locale::CLDR::Locales::As - Package for language Assamese
 
 package Locale::CLDR::Locales::As;
 # This file auto generated from Data\common\main\as.xml
-#	on Sun  7 Oct 10:20:20 am GMT
+#	on Sun  3 Feb  1:38:59 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -632,6 +632,7 @@ has 'display_name_region' => (
  			'FI' => 'ফিনলেণ্ড',
  			'FJ' => 'ফিজি',
  			'FK' => 'ফকলেণ্ড দ্বীপপুঞ্জ',
+ 			'FK@alt=variant' => 'ফকলেণ্ড দ্বীপপুঞ্জ (আইলেছ মালভিনাছ)',
  			'FM' => 'মাইক্ৰোনেচিয়া',
  			'FO' => 'ফাৰো দ্বীপপুঞ্জ',
  			'FR' => 'ফ্ৰান্স',
@@ -981,6 +982,7 @@ has 'characters' => (
 			index => ['অ', 'আ', 'ই', 'ঈ', 'উ', 'ঊ', 'ঋ', 'ৠ', 'ঌ', 'ৡ', 'এ', 'ঐ', 'ও', 'ঔ', 'ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ', 'ট', 'ঠ', 'ড', 'ঢ', 'ণ', 'ৎ', 'ত', 'থ', 'দ', 'ধ', 'ন', 'প', 'ফ', 'ব', 'ভ', 'ম', 'য', 'ৰ', 'ল', 'ৱ', 'শ', 'ষ', 'স', 'হ', 'ঽ'],
 			main => qr{[় অ আ ই ঈ উ ঊ ঋ এ ঐ ও ঔ ং ঁ ঃ ক খ গ ঘ ঙ চ ছ জ ঝ ঞ ট ঠ ড {ড়} ঢ {ঢ়} ণ ত থ দ ধ ন প ফ ব ভ ম য {য়} ৰ ল ৱ শ ষ স হ {ক্ষ} া ি ী ু ূ ৃ ে ৈ ো ৌ ্]},
 			numbers => qr{[\- , . % ‰ + 0০ 1১ 2২ 3৩ 4৪ 5৫ 6৬ 7৭ 8৮ 9৯]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … । ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1058,6 +1060,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(প্ৰধান দিক্-নিৰ্দেশনা),
+					},
 					'acre' => {
 						'name' => q(একৰ),
 						'one' => q({0} একৰ),
@@ -1087,6 +1092,11 @@ has 'units' => (
 						'name' => q(জ্যোতিৰ্বিজ্ঞান একক),
 						'one' => q({0} জ্যোতিৰ্বিজ্ঞান একক),
 						'other' => q({0} জ্যোতিৰ্বিজ্ঞান একক),
+					},
+					'atmosphere' => {
+						'name' => q(বতৰ),
+						'one' => q({0} বতৰ),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(বিট),
@@ -1604,6 +1614,21 @@ has 'units' => (
 					'per' => {
 						'1' => q(প্ৰতি {1}ত {0}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0} শতাংশ),
+						'other' => q({0} শতাংশ),
+					},
+					'permille' => {
+						'name' => q(প্ৰতিমাইল),
+						'one' => q({0} প্ৰতিমাইল),
+						'other' => q({0} প্ৰতিমাইল),
+					},
+					'petabyte' => {
+						'name' => q(পেটাবাইট),
+						'one' => q({0} পেটাবাইট),
+						'other' => q({0} পেটাবাইট),
+					},
 					'picometer' => {
 						'name' => q(পিকোমিটাৰ),
 						'one' => q({0} পিকোমিটাৰ),
@@ -1750,6 +1775,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(দিক্-নিৰ্দেশনা),
+					},
 					'celsius' => {
 						'name' => q(°চেঃ),
 						'one' => q({0}°চেঃ),
@@ -1834,6 +1862,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'second' => {
 						'name' => q(ছেকেণ্ড),
 						'one' => q({0} ছেকেণ্ড),
@@ -1851,6 +1884,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(দিক্-নিৰ্দেশনা),
+					},
 					'acre' => {
 						'name' => q(একৰ),
 						'one' => q({0} একৰ),
@@ -1880,6 +1916,11 @@ has 'units' => (
 						'name' => q(জ্যোঃ এঃ),
 						'one' => q({0} জ্যোঃ এঃ),
 						'other' => q({0} জ্যোঃ এঃ),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(বিট),
@@ -2396,6 +2437,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(শতাংশ),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(প্ৰতিমাইল),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PByte),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
 					},
 					'picometer' => {
 						'name' => q(পিঃ মিঃ),
@@ -4002,12 +4058,26 @@ has 'currencies' => (
 				'other' => q(উজবেকিস্তানী ছোম),
 			},
 		},
+		'VEB' => {
+			display_name => {
+				'currency' => q(ভেনিজুৱেলান বলিভাৰ \(1871–2008\)),
+				'one' => q(ভেনিজুৱেলান বলিভাৰ \(1871–2008\)),
+				'other' => q(ভেনিজুৱেলান বলিভাৰ \(1871–2008\)),
+			},
+		},
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(ভেনিজুৱেলান বলিভাৰ \(2008–2018\)),
+				'one' => q(ভেনিজুৱেলান বলিভাৰ \(2008–2018\)),
+				'other' => q(ভেনিজুৱেলান বলিভাৰ \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(ভেনিজুৱেলান বলিভাৰ),
-				'one' => q(ভেনিজুৱেলান বলিভাৰ),
-				'other' => q(ভেনিজুৱেলান বলিভাৰ),
+				'one' => q(ভেনিজুৱেলান ব’লিভাৰ),
+				'other' => q(ভেনিজুৱেলান ব’লিভাৰছ্),
 			},
 		},
 		'VND' => {
@@ -4367,8 +4437,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{পূৰ্বাহ্ন},
 					'pm' => q{অপৰাহ্ন},
+					'am' => q{পূৰ্বাহ্ন},
 				},
 				'narrow' => {
 					'pm' => q{অপৰাহ্ন},
@@ -4380,7 +4450,7 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
+				'narrow' => {
 					'am' => q{পূৰ্বাহ্ন},
 					'pm' => q{অপৰাহ্ন},
 				},
@@ -4388,7 +4458,7 @@ has 'day_periods' => (
 					'am' => q{পূৰ্বাহ্ন},
 					'pm' => q{অপৰাহ্ন},
 				},
-				'narrow' => {
+				'abbreviated' => {
 					'am' => q{পূৰ্বাহ্ন},
 					'pm' => q{অপৰাহ্ন},
 				},
@@ -4478,49 +4548,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			Bh => q{B h},
-			Bhm => q{B h:mm},
-			Bhms => q{B h:mm:ss},
-			E => q{ccc},
-			EBhm => q{E B h:mm},
-			EBhms => q{E, B h:mm:ss},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d, E},
-			Ehm => q{E, a h:mm},
-			Ehms => q{E, a h:mm:ss},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{MM-dd, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{MM-dd},
-			d => q{d},
-			h => q{a h},
-			hm => q{a h:mm},
-			hms => q{a h:mm:ss},
-			ms => q{mm:ss},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{MM-y GGGGG},
-			yyyyMEd => q{E, dd-MM-y GGGGG},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E, d MMM y G},
-			yyyyMMMM => q{MMMM y G},
-			yyyyMMMd => q{d MMM y G},
-			yyyyMd => q{dd-MM-y GGGGG},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
-		},
 		'gregorian' => {
 			Bh => q{B h},
 			Bhm => q{B h:mm},
@@ -4569,6 +4596,49 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 			yw => q{Yৰ সপ্তাহ w},
 		},
+		'generic' => {
+			Bh => q{B h},
+			Bhm => q{B h:mm},
+			Bhms => q{B h:mm:ss},
+			E => q{ccc},
+			EBhm => q{E B h:mm},
+			EBhms => q{E, B h:mm:ss},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E, a h:mm},
+			Ehms => q{E, a h:mm:ss},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{MM-dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d, E},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{MM-dd},
+			d => q{d},
+			h => q{a h},
+			hm => q{a h:mm},
+			hms => q{a h:mm:ss},
+			ms => q{mm:ss},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{MM-y GGGGG},
+			yyyyMEd => q{E, dd-MM-y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d MMM y G},
+			yyyyMd => q{dd-MM-y GGGGG},
+			yyyyQQQ => q{G y QQQ},
+			yyyyQQQQ => q{G y QQQQ},
+		},
 	} },
 );
 
@@ -4588,69 +4658,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
-			},
-			MMM => {
-				M => q{MMM – MMM},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{G y–y},
-			},
-			yM => {
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-			},
-			yMMM => {
-				M => q{G y MMM–MMM},
-				y => q{G y MMM – y MMM},
-			},
-			yMMMEd => {
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
-			},
-			yMMMM => {
-				M => q{G y MMMM–MMMM},
-				y => q{G y MMMM – y MMMM},
-			},
-			yMMMd => {
-				M => q{G y MMM d – MMM d},
-				d => q{G y MMM d–d},
-				y => q{G y MMM d – y MMM d},
-			},
-			yMd => {
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
-				y => q{GGGGG y-MM-dd – y-MM-dd},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -4744,6 +4751,69 @@ has 'datetime_formats_interval' => (
 				M => q{dd-MM-y – dd-MM-y},
 				d => q{dd-MM-y – dd-MM-y},
 				y => q{dd-MM-y – dd-MM-y},
+			},
+		},
+		'generic' => {
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{G y–y},
+			},
+			yM => {
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				M => q{G y MMM–MMM},
+				y => q{G y MMM – y MMM},
+			},
+			yMMMEd => {
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				M => q{G y MMMM–MMMM},
+				y => q{G y MMMM – y MMMM},
+			},
+			yMMMd => {
+				M => q{G y MMM d – MMM d},
+				d => q{G y MMM d–d},
+				y => q{G y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
 			},
 		},
 	} },

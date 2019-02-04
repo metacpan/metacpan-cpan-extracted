@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Latn::Knda;
 # This file auto generated from Data\common\transforms\Latin-Kannada.xml
-#	on Sun  7 Oct 10:18:18 am GMT
+#	on Sun  3 Feb  1:37:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

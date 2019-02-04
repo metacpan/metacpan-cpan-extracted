@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.131;
+our $VERSION = 1.132;
 
 use POSIX qw/:locale_h/;
 
@@ -25,6 +25,17 @@ L<Quiq::Object>
 
 Die von der Klasse generierte Zeitangabe wird für Expires und
 Set-Cookie HTTP-Header verwendet.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+Zeitangabe nach RFC 822
+(L<http://tools.ietf.org/html/rfc822#section-5>)
+
+=back
 
 =head1 METHODS
 
@@ -135,18 +146,7 @@ sub get {
 
 =head1 VERSION
 
-1.131
-
-=head1 SEE ALSO
-
-=over 2
-
-=item *
-
-Zeitangabe nach RFC 822
-(L<http://tools.ietf.org/html/rfc822#section-5>)
-
-=back
+1.132
 
 =head1 AUTHOR
 

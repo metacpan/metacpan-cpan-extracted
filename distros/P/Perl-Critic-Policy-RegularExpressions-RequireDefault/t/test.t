@@ -60,4 +60,118 @@ foreach my $data (
     is( scalar @violations, 0 );
 }
 
+$critic = Perl::Critic->new(
+    '-profile'       => 't/example_strict_set.conf',
+    '-single-policy' => 'RegularExpressions::RequireDefault'
+);
+
+{
+    my $str = q[
+        my $digits = 1234;
+        if ($digits =~ m/\d/a) {
+            print "We have digits\n";
+        }
+    ];
+
+    my @violations = $critic->critique( \$str );
+
+    is( scalar @violations, 1 );
+}
+
+{
+    my $str = q[
+        my $greeting = 'hello world';
+
+        my $greeting =~ s/hello/goodmorning/aa;
+    ];
+
+    my @violations = $critic->critique( \$str );
+
+    is( scalar @violations, 0 );
+}
+
+{
+    my $str = q[
+        use re '/a';
+        my $digits = 1234;
+        if ($digits =~ m/\d/) {
+            print "We have digits\n";
+        }
+    ];
+
+    my @violations = $critic->critique( \$str );
+
+    is( scalar @violations, 1 );
+}
+
+{
+    my $str = q[
+        use re '/aa';
+        my $greeting = 'hello world';
+
+        my $greeting =~ s/hello/goodmorning/;
+    ];
+
+    my @violations = $critic->critique( \$str );
+
+    is( scalar @violations, 0 );
+}
+
+$critic = Perl::Critic->new(
+    '-profile'       => 't/example_strict_notset.conf',
+    '-single-policy' => 'RegularExpressions::RequireDefault'
+);
+
+{
+    my $str = q[
+        my $digits = 1234;
+        if ($digits =~ m/\d/a) {
+            print "We have digits\n";
+        }
+    ];
+
+    my @violations = $critic->critique( \$str );
+
+    is( scalar @violations, 0 );
+}
+
+{
+    my $str = q[
+        my $greeting = 'hello world';
+
+        my $greeting =~ s/hello/goodmorning/aa;
+    ];
+
+    my @violations = $critic->critique( \$str );
+
+    is( scalar @violations, 0 );
+}
+
+{
+    my $str = q[
+        use re '/a';
+        my $digits = 1234;
+        if ($digits =~ m/\d/) {
+            print "We have digits\n";
+        }
+    ];
+
+    my @violations = $critic->critique( \$str );
+
+    is( scalar @violations, 0 );
+}
+
+{
+    my $str = q[
+        use re '/aa';
+        my $greeting = 'hello world';
+
+        my $greeting =~ s/hello/goodmorning/;
+    ];
+
+    my @violations = $critic->critique( \$str );
+
+    is( scalar @violations, 0 );
+}
+
 exit 0;

@@ -57,6 +57,13 @@ sub new {
     $opts{ignore_re} ||= $re->_regexp;
   }
 
+  if (my $index_name = delete $opts{use_index}) {
+    my $index_package = "CPAN::Common::Index::$index_name";
+    if (eval "require $index_package; 1") {
+      $opts{index} = $index_package->new;
+    }
+  }
+
   bless \%opts, $class;
 }
 
@@ -102,6 +109,10 @@ sub run {
     $self->_exclude_core_prereqs;
   }
 
+  if ($self->{index}) {
+    $self->_dedupe_indexed_prereqs;
+  }
+
   $self->_dedupe;
 
   if ($self->{print} or $self->{cpanfile}) {
@@ -113,6 +124,9 @@ sub run {
       eval { require Perl::PrereqScanner::NotQuiteLite::Util::CPANfile } or die "requires Module::CPANfile";
       my $file = File::Spec->catfile($self->{base_dir}, "cpanfile");
       my $cpanfile = Perl::PrereqScanner::NotQuiteLite::Util::CPANfile->load_and_merge($file, $self->{prereqs}, $self->{features});
+
+      $self->_dedupe_indexed_prereqs($cpanfile->prereqs) if $self->{index};
+
       if ($self->{save_cpanfile}) {
         $cpanfile->save($file);
       } else {
@@ -143,9 +157,9 @@ sub _print_prereqs {
 }
 
 sub _requirements {
-  my $self = shift;
+  my ($self, $prereqs) = @_;
 
-  my $prereqs = $self->{prereqs};
+  $prereqs ||= $self->{prereqs};
   my @phases = qw/configure runtime test/;
   push @phases, 'develop' if $self->{develop};
   my @types = $self->{suggests} ? qw/requires recommends suggests/ : $self->{recommends} ? qw/requires recommends/ : qw/requires/;
@@ -276,6 +290,51 @@ sub _dedupe {
   my %features = map {$_ => $self->{features}{$_}{prereqs}} keys %{$self->{features} || {}};
 
   dedupe_prereqs_and_features($prereqs, \%features);
+}
+
+sub _dedupe_indexed_prereqs {
+  my ($self, $prereqs) = @_;
+
+  my $index = $self->{index};
+  for my $req ($self->_requirements($prereqs)) {
+    my %uri_map;
+    for my $module ($req->required_modules) {
+      next if $module eq 'perl';
+      my $uri = $self->{uri_cache}{$module} ||= do {
+        my $res = $index->search_packages({ package => $module });
+        $res ? $res->{uri} : undef;
+      };
+      if ($uri) {
+        $uri_map{$uri}{$module} = $req->requirements_for_module($module);
+      }
+    }
+    for my $uri (keys %uri_map) {
+      my @modules = keys %{$uri_map{$uri}};
+      next if @modules < 2;
+
+      my @modules_without_version = grep {!$uri_map{$uri}{$_}} @modules;
+      next unless @modules_without_version;
+
+      # clear unversioned prereqs if a versioned prereq exists
+      if (@modules > @modules_without_version) {
+        $req->clear_requirement($_) for @modules_without_version;
+        next;
+      }
+
+      # keep the topmost if none is versioned
+      my %score;
+      for my $module (@modules_without_version) {
+        my $depth = $module =~ s/::/::/g;
+        my $length = length $module;
+        $score{$module} = join ".", ($depth || 0), $length;
+      }
+      my $topmost = (sort {$score{$a} <=> $score{$b}} @modules_without_version)[0];
+      for my $module (@modules_without_version) {
+        next if $topmost eq $module;
+        $req->clear_requirement($module);
+      }
+    }
+  }
 }
 
 sub _scan_dir {

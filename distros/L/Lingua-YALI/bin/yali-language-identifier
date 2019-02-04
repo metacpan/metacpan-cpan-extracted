@@ -13,7 +13,7 @@ use Getopt::Long;
 use Pod::Usage;
 use File::Basename;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 my $file_list = undef;
 my $input_file = undef;
@@ -105,7 +105,7 @@ yali-language-identifier - Script for language identification
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -136,7 +136,7 @@ EXAMPLES:
 
 More examples are available at L<http://search.cpan.org/perldoc?Lingua%3A%3AYALI%3A%3AExamples>
 
-Version: 0.015 (2014-05-04)
+Version: 0.016 (2019-02-02)
 
 =head1 AUTHOR
 

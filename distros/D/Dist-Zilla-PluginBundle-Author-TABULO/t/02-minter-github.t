@@ -39,6 +39,7 @@ $tzil->chrome->logger->set_debug(1);
 $tzil->mint_dist;
 my $mint_dir = path($tzil->tempdir)->child('mint');
 
+ # TAU [ 2018-06-20 ] : Added TODO.yml
 my @expected_files = qw(
     .ackrc
     .gitignore
@@ -49,7 +50,9 @@ my @expected_files = qw(
     CONTRIBUTING
     LICENSE
     README.pod
+    TODO.yml
     lib/My/New/Dist.pm
+    t/00-use.t
     t/01-basic.t
 );
 
@@ -110,14 +113,14 @@ like(
 
 like(
     path($mint_dir, 't', '01-basic.t')->slurp_utf8,
-    qr/^use My::New::Dist;\n\nfail\('this test is TODO!'\);$/m,
+    qr/^use My::New::Dist;\n(?:.*)?TODO/ms,  # TAU: Relaxed the regexp a bit.
     'test gets generic content',
 );
 
 my $dist_ini = path($mint_dir, 'dist.ini')->slurp_utf8;
 like(
     $dist_ini,
-    qr/\[\@Author::TABULO\]\n:version = [\d.]+\n\n/,
+    qr/\[\@Author::TABULO\]\n:version = [\d.]+\n/,
     'plugin bundle and version is referenced in dist.ini',
 );
 
@@ -140,10 +143,10 @@ like(
 is(
     path($mint_dir, 'Changes')->slurp_utf8,
     <<'CHANGES',
-Revision history for My-New-Dist
+Revision history for 'My-New-Dist'
 
 {{$NEXT}}
-          - Initial release.
+            - Initial release.
 CHANGES
     'Changes file is created properly, with dist name filled in but version template and whitespace preserved',
 );

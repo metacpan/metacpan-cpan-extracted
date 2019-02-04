@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sw - Package for language Swahili
 
 package Locale::CLDR::Locales::Sw;
 # This file auto generated from Data\common\main\sw.xml
-#	on Sun  7 Oct 11:00:37 am GMT
+#	on Sun  3 Feb  2:20:14 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -317,7 +317,7 @@ has 'display_name_language' => (
  				'ay' => 'Kiaymara',
  				'az' => 'Kiazerbaijani',
  				'az@alt=short' => 'Kiazeri',
- 				'ba' => 'Kibashkir',
+ 				'ba' => 'Kibashkiri',
  				'ban' => 'Kibali',
  				'bas' => 'Kibasaa',
  				'bax' => 'Kibamun',
@@ -340,7 +340,7 @@ has 'display_name_language' => (
  				'br' => 'Kibretoni',
  				'brx' => 'Kibodo',
  				'bs' => 'Kibosnia',
- 				'bug' => 'Lugha ya Buginese',
+ 				'bug' => 'Kibugini',
  				'bum' => 'Kibulu',
  				'byn' => 'Kiblin',
  				'byv' => 'Kimedumba',
@@ -359,7 +359,7 @@ has 'display_name_language' => (
  				'cop' => 'Kikhufti',
  				'crs' => 'Krioli ya Shelisheli',
  				'cs' => 'Kicheki',
- 				'cu' => 'Kislovakia cha Church',
+ 				'cu' => 'Kislovakia cha Kanisa',
  				'cv' => 'Kichuvash',
  				'cy' => 'Kiwelisi',
  				'da' => 'Kidenmaki',
@@ -369,7 +369,7 @@ has 'display_name_language' => (
  				'de' => 'Kijerumani',
  				'dgr' => 'Kidogrib',
  				'dje' => 'Kizarma',
- 				'dsb' => 'Kidolnoserbski',
+ 				'dsb' => 'Kisobia cha Chini',
  				'dua' => 'Kiduala',
  				'dv' => 'Kidivehi',
  				'dyo' => 'Kijola-Fonyi',
@@ -384,16 +384,18 @@ has 'display_name_language' => (
  				'el' => 'Kigiriki',
  				'en' => 'Kiingereza',
  				'en_CA' => 'Kiingereza (Canada)',
+ 				'en_GB' => 'Kiingereza (Uingereza)',
  				'en_GB@alt=short' => 'Kiingereza (UK)',
  				'en_US@alt=short' => 'Kiingereza (US)',
  				'eo' => 'Kiesperanto',
  				'es' => 'Kihispania',
- 				'es_MX' => 'Kihispania (Mexico)',
+ 				'es_419' => 'Kihispania (Amerika ya Latini)',
+ 				'es_ES' => 'Kihispania (Ulaya)',
  				'et' => 'Kiestonia',
- 				'eu' => 'Kibasque',
+ 				'eu' => 'Kibaski',
  				'ewo' => 'Kiewondo',
  				'fa' => 'Kiajemi',
- 				'ff' => 'Kifula',
+ 				'ff' => 'Kifulani',
  				'fi' => 'Kifini',
  				'fil' => 'Kifilipino',
  				'fj' => 'Kifiji',
@@ -432,7 +434,7 @@ has 'display_name_language' => (
  				'hr' => 'Kikroeshia',
  				'hsb' => 'Kisobia cha Ukanda wa Juu',
  				'ht' => 'Kihaiti',
- 				'hu' => 'Kihangari',
+ 				'hu' => 'Kihungaria',
  				'hup' => 'Hupa',
  				'hy' => 'Kiarmenia',
  				'hz' => 'Kiherero',
@@ -442,13 +444,13 @@ has 'display_name_language' => (
  				'id' => 'Kiindonesia',
  				'ie' => 'lugha ya kisayansi',
  				'ig' => 'Kiigbo',
- 				'ii' => 'Sichuan Yi',
+ 				'ii' => 'Kiyi cha Sichuan',
  				'ilo' => 'Kiilocano',
  				'inh' => 'Kiingush',
  				'io' => 'Kiido',
- 				'is' => 'Kiaisilandi',
+ 				'is' => 'Kiisilandi',
  				'it' => 'Kiitaliano',
- 				'iu' => 'Kiinuktitut',
+ 				'iu' => 'Kiinuktituti',
  				'ja' => 'Kijapani',
  				'jbo' => 'Lojban',
  				'jgo' => 'Kingomba',
@@ -535,7 +537,7 @@ has 'display_name_language' => (
  				'mic' => 'Mi’kmaq',
  				'min' => 'Kiminangkabau',
  				'mk' => 'Kimacedonia',
- 				'ml' => 'Kimalayalam',
+ 				'ml' => 'Kimalayalamu',
  				'mn' => 'Kimongolia',
  				'mni' => 'Kimanipuri',
  				'moh' => 'Lugha ya Mohawk',
@@ -595,15 +597,17 @@ has 'display_name_language' => (
  				'ps' => 'Kipashto',
  				'ps@alt=variant' => 'Kipushto',
  				'pt' => 'Kireno',
- 				'qu' => 'Kiquechua',
+ 				'pt_PT' => 'Kireno (Ulaya)',
+ 				'qu' => 'Kikechua',
  				'quc' => 'Kʼicheʼ',
  				'rap' => 'Kirapanui',
  				'rar' => 'Kirarotonga',
  				'rm' => 'Kiromanshi',
  				'rn' => 'Kirundi',
  				'ro' => 'Kiromania',
+ 				'ro_MD' => 'Kimoldova cha Romania',
  				'rof' => 'Kirombo',
- 				'root' => 'Root',
+ 				'root' => 'Kiroot',
  				'ru' => 'Kirusi',
  				'rup' => 'Kiaromania',
  				'rw' => 'Kinyarwanda',
@@ -651,16 +655,15 @@ has 'display_name_language' => (
  				'sus' => 'Kisusu',
  				'sv' => 'Kiswidi',
  				'sw' => 'Kiswahili',
- 				'sw_CD' => 'Kingwana',
  				'swb' => 'Shikomor',
  				'syr' => 'Lugha ya Syriac',
- 				'ta' => 'Kitamil',
+ 				'ta' => 'Kitamili',
  				'te' => 'Kitelugu',
  				'tem' => 'Kitemne',
  				'teo' => 'Kiteso',
  				'tet' => 'Kitetum',
  				'tg' => 'Kitajiki',
- 				'th' => 'Kitailandi',
+ 				'th' => 'Kithai',
  				'ti' => 'Kitigrinya',
  				'tig' => 'Kitigre',
  				'tk' => 'Kiturukimeni',
@@ -678,10 +681,10 @@ has 'display_name_language' => (
  				'twq' => 'Kitasawaq',
  				'ty' => 'Kitahiti',
  				'tyv' => 'Kituva',
- 				'tzm' => 'Central Atlas Tamazight',
- 				'udm' => 'Udmurt',
+ 				'tzm' => 'Kitamazighati cha Atlasi ya Kati',
+ 				'udm' => 'Kiudmurt',
  				'ug' => 'Kiuyghur',
- 				'uk' => 'Kiukraine',
+ 				'uk' => 'Kiukraini',
  				'umb' => 'Umbundu',
  				'und' => 'Lugha Isiyojulikana',
  				'ur' => 'Kiurdu',
@@ -691,12 +694,12 @@ has 'display_name_language' => (
  				'vi' => 'Kivietinamu',
  				'vo' => 'Kivolapuk',
  				'vun' => 'Kivunjo',
- 				'wa' => 'Walloon',
- 				'wae' => 'Walser',
+ 				'wa' => 'Kiwaloon',
+ 				'wae' => 'Kiwalser',
  				'wal' => 'Kiwolaytta',
  				'war' => 'Kiwaray',
  				'wbp' => 'Kiwarlpiri',
- 				'wo' => 'Lugha ya Wolof',
+ 				'wo' => 'Kiwolofu',
  				'xal' => 'Kikalmyk',
  				'xh' => 'Kixhosa',
  				'xog' => 'Kisoga',
@@ -823,6 +826,7 @@ has 'display_name_region' => (
  			'151' => 'Ulaya ya Mashariki',
  			'154' => 'Ulaya ya Kaskazini',
  			'155' => 'Ulaya ya Magharibi',
+ 			'202' => 'Afrika Kusine mwa Jangwa la Sahara',
  			'419' => 'Amerika ya Kilatini',
  			'AC' => 'Kisiwa cha Ascension',
  			'AD' => 'Andorra',
@@ -840,7 +844,7 @@ has 'display_name_region' => (
  			'AU' => 'Australia',
  			'AW' => 'Aruba',
  			'AX' => 'Visiwa vya Aland',
- 			'AZ' => 'Azerbaijan',
+ 			'AZ' => 'Azerbaijani',
  			'BA' => 'Bosnia na Hezegovina',
  			'BB' => 'Babadosi',
  			'BD' => 'Bangladeshi',
@@ -911,8 +915,8 @@ has 'display_name_region' => (
  			'FO' => 'Visiwa vya Faroe',
  			'FR' => 'Ufaransa',
  			'GA' => 'Gabon',
- 			'GB' => 'Uingereza',
- 			'GB@alt=short' => 'Uingereza',
+ 			'GB' => 'Ufalme wa Muungano',
+ 			'GB@alt=short' => 'Ufalme wa Muungano',
  			'GD' => 'Grenada',
  			'GE' => 'Jojia',
  			'GF' => 'Guiana ya Ufaransa',
@@ -925,7 +929,7 @@ has 'display_name_region' => (
  			'GP' => 'Guadeloupe',
  			'GQ' => 'Guinea ya Ikweta',
  			'GR' => 'Ugiriki',
- 			'GS' => 'Georgia Kusini na Visiwa vya Sandwich Kusini',
+ 			'GS' => 'Visiwa vya Georgia Kusini na Sandwich Kusini',
  			'GT' => 'Guatemala',
  			'GU' => 'Guam',
  			'GW' => 'Ginebisau',
@@ -941,12 +945,12 @@ has 'display_name_region' => (
  			'ID' => 'Indonesia',
  			'IE' => 'Ayalandi',
  			'IL' => 'Israeli',
- 			'IM' => 'Isle of Man',
+ 			'IM' => 'Kisiwa cha Man',
  			'IN' => 'India',
  			'IO' => 'Eneo la Uingereza katika Bahari Hindi',
  			'IQ' => 'Iraki',
  			'IR' => 'Iran',
- 			'IS' => 'Aislandi',
+ 			'IS' => 'Aisilandi',
  			'IT' => 'Italia',
  			'JE' => 'Jersey',
  			'JM' => 'Jamaika',
@@ -1058,7 +1062,7 @@ has 'display_name_region' => (
  			'TA' => 'Tristan da Cunha',
  			'TC' => 'Visiwa vya Turks na Caicos',
  			'TD' => 'Chad',
- 			'TF' => 'Maeneo ya Kusini ya Ufaransa',
+ 			'TF' => 'Himaya za Kusini za Kifaranza',
  			'TG' => 'Togo',
  			'TH' => 'Tailandi',
  			'TJ' => 'Tajikistani',
@@ -1303,9 +1307,9 @@ has 'display_name_code_patterns' => (
 	init_arg	=> undef,
 	default		=> sub { 
 		{
-			'language' => '{0}',
- 			'script' => '{0}',
- 			'region' => '{0}',
+			'language' => 'Lugha: {0}',
+ 			'script' => 'Hati: {0}',
+ 			'region' => 'Eneo: {0}',
 
 		}
 	},
@@ -1402,6 +1406,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(sehemu kuu za dira),
+					},
 					'acre' => {
 						'name' => q(ekari),
 						'one' => q(ekari {0}),
@@ -1431,6 +1438,11 @@ has 'units' => (
 						'name' => q(vipimo vya astronomia),
 						'one' => q(kipimo {0} cha astronomia),
 						'other' => q(vipimo {0} vya astronomia),
+					},
+					'atmosphere' => {
+						'name' => q(kanieneo ya hewa),
+						'one' => q(kanieneo {0}),
+						'other' => q(kanieneo {0}),
 					},
 					'bit' => {
 						'name' => q(biti),
@@ -1948,6 +1960,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0} kwa kila {1}),
 					},
+					'percent' => {
+						'name' => q(asilimia),
+						'one' => q(asilimia {0}),
+						'other' => q(asilimia {0}),
+					},
+					'permille' => {
+						'name' => q(kwa elfu),
+						'one' => q({0} kwa kila elfu),
+						'other' => q({0} kwa kila elfu),
+					},
+					'petabyte' => {
+						'name' => q(petabaiti),
+						'one' => q(petabaiti {0}),
+						'other' => q(petabaiti {0}),
+					},
 					'picometer' => {
 						'name' => q(pikomita),
 						'one' => q(pikomita {0}),
@@ -2094,6 +2121,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(mwelekeo),
+					},
 					'acre' => {
 						'one' => q(Ekari {0}),
 						'other' => q(Ekari {0}),
@@ -2263,6 +2293,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(asilimia),
+						'one' => q(asilimia {0}),
+						'other' => q(asilimia {0}),
+					},
 					'picometer' => {
 						'one' => q(pm {0}),
 						'other' => q(pm {0}),
@@ -2316,6 +2351,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(mwelekeo),
+					},
 					'acre' => {
 						'name' => q(ekari),
 						'one' => q(ekari {0}),
@@ -2345,6 +2383,11 @@ has 'units' => (
 						'name' => q(vipimo vya astronomia),
 						'one' => q(au {0}),
 						'other' => q(au {0}),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q(atm {0}),
+						'other' => q(atm {0}),
 					},
 					'bit' => {
 						'name' => q(biti),
@@ -2862,6 +2905,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(asilimia),
+						'one' => q(asilimia {0}),
+						'other' => q(asilimia {0}),
+					},
+					'permille' => {
+						'name' => q(kwa elfu),
+						'one' => q({0} kwa elfu),
+						'other' => q({0} kwa elfu),
+					},
+					'petabyte' => {
+						'name' => q(petabaiti),
+						'one' => q(PB {0}),
+						'other' => q(PB {0}),
+					},
 					'picometer' => {
 						'name' => q(pikomita),
 						'one' => q(pikomita {0}),
@@ -3099,40 +3157,40 @@ has 'number_formats' => (
 					'other' => 'elfu 000;elfu -000',
 				},
 				'1000000' => {
-					'one' => 'M0;M-0',
-					'other' => 'M0;M-0',
+					'one' => '0M;-0M',
+					'other' => '0M',
 				},
 				'10000000' => {
-					'one' => 'M00;M-00',
-					'other' => 'M00;M-00',
+					'one' => '00M;-00M',
+					'other' => '00M',
 				},
 				'100000000' => {
-					'one' => 'M000;M-000',
-					'other' => 'M000;M-000',
+					'one' => '000M;-000M',
+					'other' => '000M',
 				},
 				'1000000000' => {
-					'one' => 'B0;B-0',
-					'other' => 'B0;B-0',
+					'one' => '0B;-0B',
+					'other' => '0B;-0B',
 				},
 				'10000000000' => {
-					'one' => 'B00;B-00',
-					'other' => 'B00;B-00',
+					'one' => '00B;-00B',
+					'other' => '00B;-00B',
 				},
 				'100000000000' => {
-					'one' => 'B000;B-000',
-					'other' => 'B000;B-000',
+					'one' => '000B;-000B',
+					'other' => '000B;-000B',
 				},
 				'1000000000000' => {
-					'one' => 'T0;T-0',
-					'other' => 'T0;T-0',
+					'one' => '0T;-0T',
+					'other' => '0T',
 				},
 				'10000000000000' => {
-					'one' => 'T00;T-00',
-					'other' => 'T00;T-00',
+					'one' => '00T;-00T',
+					'other' => '00T',
 				},
 				'100000000000000' => {
-					'one' => 'T000;T-000',
-					'other' => 'T000;T-000',
+					'one' => '000T;-000T',
+					'other' => '000T',
 				},
 				'standard' => {
 					'default' => '#,##0.###',
@@ -3202,40 +3260,40 @@ has 'number_formats' => (
 					'other' => 'elfu 000;elfu -000',
 				},
 				'1000000' => {
-					'one' => 'M0;M-0',
-					'other' => 'M0;M-0',
+					'one' => '0M;-0M',
+					'other' => '0M',
 				},
 				'10000000' => {
-					'one' => 'M00;M-00',
-					'other' => 'M00;M-00',
+					'one' => '00M;-00M',
+					'other' => '00M',
 				},
 				'100000000' => {
-					'one' => 'M000;M-000',
-					'other' => 'M000;M-000',
+					'one' => '000M;-000M',
+					'other' => '000M',
 				},
 				'1000000000' => {
-					'one' => 'B0;B-0',
-					'other' => 'B0;B-0',
+					'one' => '0B;-0B',
+					'other' => '0B;-0B',
 				},
 				'10000000000' => {
-					'one' => 'B00;B-00',
-					'other' => 'B00;B-00',
+					'one' => '00B;-00B',
+					'other' => '00B;-00B',
 				},
 				'100000000000' => {
-					'one' => 'B000;B-000',
-					'other' => 'B000;B-000',
+					'one' => '000B;-000B',
+					'other' => '000B;-000B',
 				},
 				'1000000000000' => {
-					'one' => 'T0;T-0',
-					'other' => 'T0;T-0',
+					'one' => '0T;-0T',
+					'other' => '0T',
 				},
 				'10000000000000' => {
-					'one' => 'T00;T-00',
-					'other' => 'T00;T-00',
+					'one' => '00T;-00T',
+					'other' => '00T',
 				},
 				'100000000000000' => {
-					'one' => 'T000;T-000',
-					'other' => 'T000;T-000',
+					'one' => '000T;-000T',
+					'other' => '000T',
 				},
 			},
 		},
@@ -3265,11 +3323,10 @@ has 'number_currency_formats' => (
 			'pattern' => {
 				'default' => {
 					'accounting' => {
-						'negative' => '(¤#,##0.00)',
-						'positive' => '¤#,##0.00',
+						'positive' => '¤ #,##0.00',
 					},
 					'standard' => {
-						'positive' => '¤#,##0.00',
+						'positive' => '¤ #,##0.00',
 					},
 				},
 			},
@@ -3613,9 +3670,9 @@ has 'currencies' => (
 		'DZD' => {
 			symbol => 'DZD',
 			display_name => {
-				'currency' => q(Dinar ya Algeria),
-				'one' => q(dinar ya Algeria),
-				'other' => q(dinar za Algeria),
+				'currency' => q(Dinar ya Aljeria),
+				'one' => q(dinar ya Aljeria),
+				'other' => q(dinar za Aljeria),
 			},
 		},
 		'EGP' => {
@@ -4050,6 +4107,7 @@ has 'currencies' => (
 			},
 		},
 		'MRU' => {
+			symbol => 'MRU',
 			display_name => {
 				'currency' => q(Ouguiya ya Mauritania),
 				'one' => q(ouguiya ya Mauritania),
@@ -4367,7 +4425,7 @@ has 'currencies' => (
 			},
 		},
 		'STN' => {
-			symbol => 'Db',
+			symbol => 'STN',
 			display_name => {
 				'currency' => q(Dobra ya Sao Tome na Principe),
 				'one' => q(dobra ya Sao Tome na Principe),
@@ -4504,6 +4562,14 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			symbol => 'VEF',
+			display_name => {
+				'currency' => q(Bolivar ya Venezuela \(2008–2018\)),
+				'one' => q(Bolivar ya Venezuela \(2008–2018\)),
+				'other' => q(Bolivar za Venezuela \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
 			display_name => {
 				'currency' => q(Bolivar ya Venezuela),
 				'one' => q(Bolivar ya Venezuela),
@@ -4879,59 +4945,59 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 700;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning2' if $time >= 700
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
-				}
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 400
+						&& $time < 700;
 					return 'evening1' if $time >= 1600
 						&& $time < 1900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning2' if $time >= 700
-						&& $time < 1200;
 					return 'night1' if $time >= 1900;
 					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 700
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 700
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1900;
 					return 'morning1' if $time >= 400
 						&& $time < 700;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 700;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning2' if $time >= 700
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
-				}
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'morning1' if $time >= 400
+						&& $time < 700;
 					return 'evening1' if $time >= 1600
 						&& $time < 1900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning2' if $time >= 700
-						&& $time < 1200;
 					return 'night1' if $time >= 1900;
 					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 700
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
+					return 'morning2' if $time >= 700
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 1900;
 					return 'morning1' if $time >= 400
 						&& $time < 700;
 				}
@@ -4953,73 +5019,73 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'midnight' => q{usiku},
-					'morning2' => q{asubuhi},
-					'afternoon1' => q{mchana},
-					'pm' => q{pm},
-					'noon' => q{mchana},
-					'am' => q{am},
-					'evening1' => q{jioni},
-					'night1' => q{usiku},
-					'morning1' => q{alfajiri},
-				},
 				'wide' => {
-					'pm' => q{PM},
-					'noon' => q{saa sita za mchana},
-					'midnight' => q{saa sita za usiku},
 					'morning2' => q{asubuhi},
-					'afternoon1' => q{mchana},
 					'night1' => q{usiku},
-					'morning1' => q{alfajiri},
 					'am' => q{AM},
+					'midnight' => q{saa sita za usiku},
+					'pm' => q{PM},
+					'afternoon1' => q{mchana},
+					'noon' => q{saa sita za mchana},
+					'morning1' => q{alfajiri},
 					'evening1' => q{jioni},
+				},
+				'narrow' => {
+					'afternoon1' => q{mchana},
+					'noon' => q{mchana},
+					'evening1' => q{jioni},
+					'morning1' => q{alfajiri},
+					'night1' => q{usiku},
+					'morning2' => q{asubuhi},
+					'midnight' => q{usiku},
+					'pm' => q{pm},
+					'am' => q{am},
 				},
 				'abbreviated' => {
-					'noon' => q{saa sita za mchana},
-					'pm' => q{PM},
-					'morning2' => q{asubuhi},
-					'afternoon1' => q{mchana},
-					'midnight' => q{saa sita za usiku},
 					'night1' => q{usiku},
+					'morning2' => q{asubuhi},
+					'am' => q{AM},
+					'midnight' => q{saa sita za usiku},
+					'pm' => q{PM},
+					'afternoon1' => q{mchana},
+					'noon' => q{saa sita za mchana},
 					'morning1' => q{alfajiri},
 					'evening1' => q{jioni},
-					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'night1' => q{usiku},
-					'morning1' => q{alfajiri},
-					'am' => q{AM},
 					'evening1' => q{jioni},
-					'pm' => q{PM},
+					'morning1' => q{alfajiri},
 					'noon' => q{saa sita za mchana},
-					'midnight' => q{saa sita za usiku},
-					'morning2' => q{asubuhi},
 					'afternoon1' => q{alasiri},
+					'pm' => q{PM},
+					'midnight' => q{saa sita za usiku},
+					'am' => q{AM},
+					'night1' => q{usiku},
+					'morning2' => q{asubuhi},
 				},
 				'wide' => {
-					'evening1' => q{jioni},
-					'am' => q{AM},
-					'night1' => q{usiku},
-					'morning1' => q{alfajiri},
-					'afternoon1' => q{mchana},
-					'morning2' => q{asubuhi},
-					'midnight' => q{saa sita za usiku},
 					'noon' => q{saa sita za mchana},
+					'afternoon1' => q{mchana},
+					'morning1' => q{alfajiri},
+					'evening1' => q{jioni},
+					'night1' => q{usiku},
+					'morning2' => q{asubuhi},
+					'am' => q{AM},
+					'midnight' => q{saa sita za usiku},
 					'pm' => q{PM},
 				},
 				'narrow' => {
-					'evening1' => q{jioni},
-					'am' => q{AM},
-					'morning1' => q{alfajiri},
-					'night1' => q{usiku},
-					'midnight' => q{saa sita za usiku},
-					'afternoon1' => q{mchana},
 					'morning2' => q{asubuhi},
-					'noon' => q{saa sita za mchana},
+					'night1' => q{usiku},
 					'pm' => q{PM},
+					'midnight' => q{saa sita za usiku},
+					'am' => q{AM},
+					'afternoon1' => q{mchana},
+					'noon' => q{saa sita za mchana},
+					'evening1' => q{jioni},
+					'morning1' => q{alfajiri},
 				},
 			},
 		},

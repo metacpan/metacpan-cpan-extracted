@@ -1,4 +1,4 @@
-# Udev::FFI::Devnum - Copyright (C) 2017-2018 Ilya Pavlov
+# Udev::FFI::Devnum - Copyright (C) 2017-2019 Ilya Pavlov
 package Udev::FFI::Devnum;
 
 use strict;
@@ -67,15 +67,15 @@ This module provides major, minor and  makedev functions.
 
 =head1 FUNCTIONS
 
-=head2  major ( DEVNUM )
+=head2  major( DEVNUM )
 
 Return major ID.
 
-=head2  minor ( DEVNUM )
+=head2  minor( DEVNUM )
 
 Return minor ID.
 
-=head2  makedev ( MAJOR, MINOR )
+=head2  makedev( MAJOR, MINOR )
 
 Return device number.
 

@@ -6,7 +6,7 @@ use IO::Socket::INET;
 
 my $online_tests;
 
-if($ENV{RELEASE_TESTING}) {
+if($ENV{AUTHOR_TESTING}) {
 	$online_tests = are_online();
 } elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING} || (!-t STDIN)) {
 	$online_tests = 0;
@@ -14,7 +14,7 @@ if($ENV{RELEASE_TESTING}) {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
 
 	if(!defined($online_tests)) {
-		if($ENV{RELEASE_TESTING}) {
+		if($ENV{AUTHOR_TESTING}) {
 			$online_tests = are_online();
 		} else {
 			$online_tests = 0;
@@ -99,7 +99,7 @@ EOF
 		# Timeout inspired by Mail::IMAPClient
 		my $rc;
 		eval {
-			local $SIG{ALRM} = sub { die "alarm\n" };
+			local $SIG{ALRM} = sub { die 'alarm' };
 			alarm(60);
 			$rc = prompt('Do you want to enable these tests?', 'y') =~ /^y/i ? 1 : 0;
 			alarm(0);

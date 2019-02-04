@@ -18,12 +18,13 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-Git-Info",
-  "dist_version" => "0.2.0",
+  "dist_version" => "0.4.0",
   "license" => "mit",
   "module_name" => "App::Git::Info",
   "recursive_test_files" => 1,
   "requires" => {
-    "App::Rad" => 0,
+    "App::Cmd::Setup" => 0,
+    "autodie" => 0,
     "perl" => "5.016",
     "strict" => 0,
     "warnings" => 0

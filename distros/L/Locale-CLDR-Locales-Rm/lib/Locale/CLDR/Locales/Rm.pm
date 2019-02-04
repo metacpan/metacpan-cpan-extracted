@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Rm - Package for language Romansh
 
 package Locale::CLDR::Locales::Rm;
 # This file auto generated from Data\common\main\rm.xml
-#	on Sun  7 Oct 10:55:04 am GMT
+#	on Sun  3 Feb  2:14:43 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2858,6 +2858,11 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			display_name => {
+				'currency' => q(bolivar venezuelan \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(bolivar venezuelan),
 			},
 		},
@@ -3313,31 +3318,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'narrow' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 				'wide' => {
 					'pm' => q{PM},
 					'am' => q{AM},
+				},
+				'abbreviated' => {
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
 				'wide' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
 				'narrow' => {
-					'am' => q{AM},
 					'pm' => q{PM},
-				},
-				'abbreviated' => {
 					'am' => q{AM},
-					'pm' => q{PM},
 				},
 			},
 		},

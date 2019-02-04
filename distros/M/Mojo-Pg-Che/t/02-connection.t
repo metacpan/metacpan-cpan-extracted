@@ -9,12 +9,26 @@ my $db_class = 'Mojo::Pg::Che::Database';
 #~ my $mojo_db_class = 'Mojo::Pg::Database';
 my $dbi_db_class = 'DBI::db';
 
-plan skip_all => 'set env TEST_PG="dbi:Pg:dbname=<...>/<pg_user>/<passwd>" to enable this test' unless $ENV{TEST_PG};
+plan skip_all => 'set env TEST_PG="dbname=<...>/<pg_user>/<passwd>" to enable this test' unless $ENV{TEST_PG};
 
 my ($dsn, $user, $pw) = split m|[/]|, $ENV{TEST_PG};
 
 # 1
-my $pg1 = $class->connect($dsn, $user, $pw, {pg_enable_utf8 => 1,});
+my $pg1 = $class->connect($dsn, $user, $pw, {PrintWarn => 0,},);
+my $options =   {
+  AutoCommit => 1,
+  AutoInactiveDestroy => 1,
+  PrintError => 0,
+  PrintWarn => 0,
+  RaiseError => 1,
+  ShowErrorStatement => 1,
+  pg_enable_utf8 => 1,
+};
+is_deeply $pg1->options, $options, 'default options';
+is_deeply $pg1->pg->options, $pg1->options, 'default options';
+is $pg1->pg->options, $pg1->options, 'same options';
+is($pg1->options->{pg_enable_utf8}, 1, 'options pg');
+is($pg1->db->dbh->{pg_enable_utf8}, 1, 'options dbh');
 # 2
 my $pg2 = $class->new->dsn($dsn)->username($user)->password($pw)->connect;
 # 3
@@ -45,8 +59,6 @@ cmp_ok(refaddr($pg1->db->dbh), '!=', refaddr($pg2->db->dbh),);
 
 
 
-is($pg1->options->{pg_enable_utf8}, 1, 'options pg');
-is($pg1->db->dbh->{pg_enable_utf8}, 1, 'options dbh');
 
 
 # Invalid connection string

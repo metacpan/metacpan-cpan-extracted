@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sv::Any::Ax - Package for language Swedish
 
 package Locale::CLDR::Locales::Sv::Any::Ax;
 # This file auto generated from Data\common\main\sv_AX.xml
-#	on Sun  7 Oct 11:00:36 am GMT
+#	on Sun  3 Feb  2:20:13 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

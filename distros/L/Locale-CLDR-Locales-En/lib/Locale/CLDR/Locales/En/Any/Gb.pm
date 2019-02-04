@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Gb - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Gb;
 # This file auto generated from Data\common\main\en_GB.xml
-#	on Sun  7 Oct 10:29:14 am GMT
+#	on Sun  3 Feb  1:48:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -42,24 +42,6 @@ has 'display_name_language' => (
 	},
 );
 
-has 'display_name_script' => (
-	is			=> 'ro',
-	isa			=> CodeRef,
-	init_arg	=> undef,
-	default		=> sub {
-		sub {
-			my %scripts = (
-			'Thai' => 'Thai',
-
-			);
-			if ( @_ ) {
-				return $scripts{$_[0]};
-			}
-			return \%scripts;
-		}
-	}
-);
-
 has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -81,59 +63,29 @@ has 'display_name_region' => (
 	},
 );
 
-has 'display_name_key' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'colcaselevel' => 'Case-Sensitive Sorting',
-
-		}
-	},
-);
-
-has 'display_name_type' => (
-	is			=> 'ro',
-	isa			=> HashRef[HashRef[Str]],
-	init_arg	=> undef,
-	default		=> sub {
-		{
-			'hc' => {
- 				'h11' => q{12-Hour System (0–11)},
- 				'h12' => q{12-Hour System (1–12)},
- 				'h23' => q{24-Hour System (0–23)},
- 				'h24' => q{24-Hour System (1–24)},
- 			},
-
-		}
-	},
-);
-
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
-					'kilometer-per-hour' => {
-						'one' => q({0} kilometre per hour),
+					'percent' => {
+						'name' => q(per cent),
+						'one' => q({0} per cent),
+						'other' => q({0} per cent),
 					},
-				},
-				'narrow' => {
-					'hour' => {
-						'per' => q({0}/h),
-					},
-					'second' => {
-						'per' => q({0}/s),
+					'permille' => {
+						'name' => q(per mille),
+						'one' => q({0} per mille),
+						'other' => q({0} per mille),
 					},
 				},
 				'short' => {
-					'megaliter' => {
-						'other' => q({0} Ml),
+					'percent' => {
+						'name' => q(per cent),
 					},
-					'stone' => {
-						'other' => q({0} st),
+					'permille' => {
+						'name' => q(per mille),
 					},
 				},
 			} }
@@ -153,21 +105,11 @@ has 'currencies' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'MKD' => {
-			display_name => {
-				'other' => q(Macedonian denari),
-			},
-		},
 		'SHP' => {
 			display_name => {
 				'currency' => q(St Helena Pound),
 				'one' => q(St Helena pound),
 				'other' => q(St Helena pounds),
-			},
-		},
-		'XOF' => {
-			display_name => {
-				'other' => q(West African CFA francs),
 			},
 		},
 	} },
@@ -186,76 +128,76 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'islamic') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -267,44 +209,6 @@ around day_period_data => sub {
 	my ($orig, $self) = @_;
 	return $self->$orig;
 };
-
-has 'day_periods' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-			'format' => {
-				'abbreviated' => {
-					'pm' => q{pm},
-					'noon' => q{noon},
-					'am' => q{am},
-				},
-				'narrow' => {
-					'noon' => q{n},
-				},
-				'wide' => {
-					'noon' => q{noon},
-					'pm' => q{pm},
-					'am' => q{am},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'pm' => q{pm},
-					'am' => q{am},
-				},
-				'narrow' => {
-					'pm' => q{pm},
-				},
-				'wide' => {
-					'pm' => q{pm},
-					'am' => q{am},
-				},
-			},
-		},
-	} },
-);
 
 has 'eras' => (
 	is			=> 'ro',
@@ -376,23 +280,6 @@ has 'datetime_formats_available_formats' => (
 			MMMEd => q{E d MMM},
 		},
 		'generic' => {
-			Bhm => q{h.mm B},
-			Bhms => q{h.mm.ss B},
-			EBhm => q{E, h.mm B},
-			EBhms => q{E, h.mm.ss B},
-			EHm => q{E, HH:mm},
-			EHms => q{E, HH:mm:ss},
-			Ehm => q{E, h.mm a},
-			Ehms => q{E, h.mm.ss a},
-			MEd => q{E, d/M},
-			hm => q{h.mm a},
-			hms => q{h.mm.ss a},
-		},
-		'gregorian' => {
-			Bhm => q{h.mm B},
-			Bhms => q{h.mm.ss B},
-			EBhm => q{E, h.mm B},
-			EBhms => q{E, h.mm.ss B},
 			MEd => q{E dd/MM},
 			MMMEd => q{E d MMM},
 		},
@@ -412,27 +299,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			M => {
-				M => q{M–M},
-			},
-			MMMd => {
-				d => q{d–d MMM},
-			},
-			Md => {
-				M => q{dd/MM–dd/MM},
-				d => q{dd/MM–dd/MM},
-			},
-			d => {
-				d => q{d–d},
-			},
-			y => {
-				y => q{y–y G},
-			},
-			yMMMd => {
-				d => q{d–d MMM y G},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -470,6 +336,27 @@ has 'datetime_formats_interval' => (
 				d => q{d–d MMM y},
 			},
 		},
+		'generic' => {
+			M => {
+				M => q{M–M},
+			},
+			MMMd => {
+				d => q{d–d MMM},
+			},
+			Md => {
+				M => q{dd/MM–dd/MM},
+				d => q{dd/MM–dd/MM},
+			},
+			d => {
+				d => q{d–d},
+			},
+			y => {
+				y => q{y–y G},
+			},
+			yMMMd => {
+				d => q{d–d MMM y G},
+			},
+		},
 	} },
 );
 
@@ -496,17 +383,8 @@ has 'time_zone_names' => (
 		'America/St_Vincent' => {
 			exemplarCity => q#St Vincent#,
 		},
-		'Asia/Rangoon' => {
-			exemplarCity => q#Rangoon#,
-		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#St Helena#,
-		},
-		'Australia_Central' => {
-			long => {
-				'generic' => q#Central Australia Time#,
-				'standard' => q#Australian Central Standard Time#,
-			},
 		},
 		'Europe/London' => {
 			short => {
@@ -533,21 +411,6 @@ has 'time_zone_names' => (
 				'generic' => q#WET#,
 				'standard' => q#WET#,
 			},
-		},
-		'Kyrgystan' => {
-			long => {
-				'standard' => q#Kyrgystan Time#,
-			},
-		},
-		'Mongolia' => {
-			long => {
-				'daylight' => q#Ulan Bator Summer Time#,
-				'generic' => q#Ulan Bator Time#,
-				'standard' => q#Ulan Bator Standard Time#,
-			},
-		},
-		'Pacific/Honolulu' => {
-			exemplarCity => q#Honolulu#,
 		},
 		'Pierre_Miquelon' => {
 			long => {

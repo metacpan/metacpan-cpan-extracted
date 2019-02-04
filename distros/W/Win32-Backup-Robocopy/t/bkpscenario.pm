@@ -8,6 +8,9 @@ use File::Spec;
 
 sub create_dirs{
 	my $base = shift // 'test_backup';
+	# better a different name to avoid collision if multiple perls
+	# try to test my module. 
+	$base = $base.'-'.int(rand(1000)).int(rand(1000)).int(rand(1000));
 	my $tbasedir = File::Spec->catdir(File::Spec->tmpdir(),$base);
 	my $tsrc = File::Spec->catdir( $tbasedir,'src');
 	my $tdst = File::Spec->catdir( $tbasedir,'dst');

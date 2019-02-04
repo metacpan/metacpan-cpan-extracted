@@ -10,14 +10,14 @@ XML::LibXML::Attr - XML::LibXML Attribute Class
   # Only methods specific to Attribute nodes are listed here,
   # see the XML::LibXML::Node manpage for other methods
 
-  $attr = XML::LibXML::Attr->new($name [,$value]);
-  $string = $attr->getValue();
-  $string = $attr->value;
-  $attr->setValue( $string );
-  $node = $attr->getOwnerElement();
-  $attr->setNamespace($nsURI, $prefix);
-  $bool = $attr->isId;
-  $string = $attr->serializeContent;
+  $attr = XML::LibXML::Attr-E<gt>new($name [,$value]);
+  $string = $attr-E<gt>getValue();
+  $string = $attr-E<gt>value;
+  $attr-E<gt>setValue( $string );
+  $node = $attr-E<gt>getOwnerElement();
+  $attr-E<gt>setNamespace($nsURI, $prefix);
+  $bool = $attr-E<gt>isId;
+  $string = $attr-E<gt>serializeContent;
 
 =head1 DESCRIPTION
 
@@ -35,14 +35,14 @@ Many functions listed here are extensively documented in the DOM Level 3 specifi
 
 =item new
 
-  $attr = XML::LibXML::Attr->new($name [,$value]);
+  $attr = XML::LibXML::Attr-E<gt>new($name [,$value]);
 
 Class constructor. If you need to work with ISO encoded strings, you should I<<<<<< always >>>>>> use the C<<<<<< createAttribute >>>>>> of L<<<<<< XML::LibXML::Document >>>>>>.
 
 
 =item getValue
 
-  $string = $attr->getValue();
+  $string = $attr-E<gt>getValue();
 
 Returns the value stored for the attribute. If undef is returned, the attribute
 has no value, which is different of being C<<<<<< not specified >>>>>>.
@@ -50,14 +50,14 @@ has no value, which is different of being C<<<<<< not specified >>>>>>.
 
 =item value
 
-  $string = $attr->value;
+  $string = $attr-E<gt>value;
 
 Alias for I<<<<<< getValue() >>>>>>
 
 
 =item setValue
 
-  $attr->setValue( $string );
+  $attr-E<gt>setValue( $string );
 
 This is needed to set a new attribute value. If ISO encoded strings are passed
 as parameter, the node has to be bound to a document, otherwise the encoding
@@ -66,7 +66,7 @@ might be done incorrectly.
 
 =item getOwnerElement
 
-  $node = $attr->getOwnerElement();
+  $node = $attr-E<gt>getOwnerElement();
 
 returns the node the attribute belongs to. If the attribute is not bound to a
 node, undef will be returned. Overwriting the underlying implementation, the I<<<<<< parentNode >>>>>> function will return undef, instead of the owner element.
@@ -74,7 +74,7 @@ node, undef will be returned. Overwriting the underlying implementation, the I<<
 
 =item setNamespace
 
-  $attr->setNamespace($nsURI, $prefix);
+  $attr-E<gt>setNamespace($nsURI, $prefix);
 
 This function tries to bound the attribute to a given namespace. If C<<<<<< $nsURI >>>>>> is undefined or empty, the function discards any previous association of the
 attribute with a namespace. If the namespace was not previously declared in the
@@ -89,7 +89,7 @@ This function returns 1 on success, 0 otherwise.
 
 =item isId
 
-  $bool = $attr->isId;
+  $bool = $attr-E<gt>isId;
 
 Determine whether an attribute is of type ID. For documents with a DTD, this
 information is only available if DTD loading/validation has been requested. For
@@ -99,7 +99,7 @@ In XML documents, all "xml:id" attributes are considered to be of type ID.
 
 =item serializeContent($docencoding)
 
-  $string = $attr->serializeContent;
+  $string = $attr-E<gt>serializeContent;
 
 This function is not part of DOM API. It returns attribute content in the form
 in which it serializes into XML, that is with all meta-characters properly
@@ -121,7 +121,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0132
+2.0133
 
 =head1 COPYRIGHT
 

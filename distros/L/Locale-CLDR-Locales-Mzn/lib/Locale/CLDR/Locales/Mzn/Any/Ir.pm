@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mzn::Any::Ir - Package for language Mazanderani
 
 package Locale::CLDR::Locales::Mzn::Any::Ir;
 # This file auto generated from Data\common\main\mzn_IR.xml
-#	on Sun  7 Oct 10:48:17 am GMT
+#	on Sun  3 Feb  2:07:21 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fa::Any::Af - Package for language Persian
 
 package Locale::CLDR::Locales::Fa::Any::Af;
 # This file auto generated from Data\common\main\fa_AF.xml
-#	on Sun  7 Oct 10:31:26 am GMT
+#	on Sun  3 Feb  1:50:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -287,9 +287,10 @@ has 'display_name_language' => (
 		 sub {
 			 my %languages = (
 				'ab' => 'افریکانس',
+ 				'ar_001' => 'عربی فصیح',
  				'as' => 'اسامی',
+ 				'ast' => 'اتریشی',
  				'az' => 'آذربایجانی',
- 				'ba' => 'باشقیری',
  				'ckb' => 'کردی سورانی',
  				'dv' => 'مالدیوی',
  				'es' => 'هسپانوی',
@@ -301,17 +302,28 @@ has 'display_name_language' => (
  				'it' => 'ایتالوی',
  				'ja' => 'جاپانی',
  				'ko' => 'کوریایی',
+ 				'ksh' => 'کلنی',
+ 				'kw' => 'کورنی',
  				'ky' => 'قرغزی',
+ 				'lus' => 'میزویی',
+ 				'mai' => 'مایتیلی',
  				'mn' => 'مغلی',
+ 				'nb' => 'نروژی کتابی',
  				'ne' => 'نیپالی',
  				'nl' => 'هالندی',
+ 				'nl_BE' => 'فلمیش',
+ 				'nn' => 'نروژی نو',
  				'no' => 'نارویژی',
  				'pl' => 'پولندی',
+ 				'ps@alt=variant' => 'پشتو',
  				'pt' => 'پرتگالی',
  				'sq' => 'البانیایی',
+ 				'srn' => 'زبان سرانان',
  				'sv' => 'سویدنی',
  				'sw' => 'سواحلی',
  				'tg' => 'تاجکی',
+ 				'zh_Hans' => 'چینی ساده شده',
+ 				'zza' => 'زازاکی',
 
 			);
 			if (@_) {
@@ -352,7 +364,6 @@ has 'display_name_region' => (
  			'AO' => 'انگولا',
  			'AQ' => 'انترکتیکا',
  			'AR' => 'ارجنتاین',
- 			'AU' => 'آسترالیا',
  			'BA' => 'بوسنیا و هرزه‌گوینا',
  			'BD' => 'بنگله‌دیش',
  			'BE' => 'بلجیم',
@@ -368,7 +379,10 @@ has 'display_name_region' => (
  			'CO' => 'کولمبیا',
  			'CR' => 'کاستریکا',
  			'CU' => 'کیوبا',
+ 			'CZ' => 'چک',
+ 			'CZ@alt=variant' => 'جمهوری چک',
  			'DK' => 'دنمارک',
+ 			'EA' => 'سئوتا و ملیلا',
  			'EE' => 'استونیا',
  			'ER' => 'اریتریا',
  			'ES' => 'هسپانیه',
@@ -382,6 +396,8 @@ has 'display_name_region' => (
  			'GT' => 'گواتیمالا',
  			'GW' => 'گینیا بیسائو',
  			'GY' => 'گیانا',
+ 			'HK' => 'هانگ کانگ، ناحیهٔ ویژهٔ حکومتی چین',
+ 			'HK@alt=short' => 'هانگ کانگ',
  			'HN' => 'هاندوراس',
  			'HR' => 'کروشیا',
  			'HT' => 'هایتی',
@@ -390,7 +406,6 @@ has 'display_name_region' => (
  			'IS' => 'آیسلند',
  			'JP' => 'جاپان',
  			'KE' => 'کینیا',
- 			'KG' => 'قرغزستان',
  			'KH' => 'کمپوچیا',
  			'KP' => 'کوریای شمالی',
  			'KR' => 'کوریای جنوبی',
@@ -406,7 +421,6 @@ has 'display_name_region' => (
  			'MX' => 'مکسیکو',
  			'MY' => 'مالیزیا',
  			'MZ' => 'موزمبیق',
- 			'NE' => 'نایجر',
  			'NG' => 'نیجریا',
  			'NI' => 'نیکاراگوا',
  			'NL' => 'هالند',
@@ -420,17 +434,16 @@ has 'display_name_region' => (
  			'PT' => 'پرتگال',
  			'PY' => 'پاراگوای',
  			'RO' => 'رومانیا',
- 			'RW' => 'روآندا',
  			'SE' => 'سویدن',
  			'SG' => 'سینگاپور',
  			'SI' => 'سلونیا',
+ 			'SJ' => 'اسوالبارد و جان ماین',
  			'SK' => 'سلواکیا',
  			'SL' => 'سیرالیون',
  			'SN' => 'سینیگال',
  			'SO' => 'سومالیه',
  			'SV' => 'السلوادور',
  			'TJ' => 'تاجکستان',
- 			'UA' => 'اکراین',
  			'UG' => 'یوگاندا',
  			'UY' => 'یوروگوای',
  			'VC' => 'سنت وینسنت و گرنادین‌ها',
@@ -792,52 +805,52 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'persian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
-				}
 				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1700
 						&& $time < 1900;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1700;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
-				}
 				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1700
 						&& $time < 1900;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1700;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
 				}
 				last SWITCH;
 				}
@@ -857,49 +870,49 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'night1' => q{شب},
-					'morning1' => q{صبح},
-					'noon' => q{ظهر},
+				'abbreviated' => {
 					'afternoon1' => q{بعد از چاشت},
-					'midnight' => q{نیمه‌شب},
+					'noon' => q{ظهر},
+					'night1' => q{شب},
 					'evening1' => q{شام},
+					'midnight' => q{نیمه‌شب},
+					'morning1' => q{صبح},
 				},
 				'narrow' => {
-					'noon' => q{ظ},
 					'night1' => q{ش},
+					'noon' => q{ظ},
+					'afternoon1' => q{ب.ظ.},
 					'morning1' => q{ص},
 					'midnight' => q{ن},
 					'evening1' => q{ش},
-					'afternoon1' => q{ب.ظ.},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'morning1' => q{صبح},
+					'midnight' => q{نیمه‌شب},
+					'evening1' => q{شام},
 					'night1' => q{شب},
 					'noon' => q{ظهر},
 					'afternoon1' => q{بعد از چاشت},
-					'evening1' => q{شام},
-					'midnight' => q{نیمه‌شب},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'afternoon1' => q{بعد از چاشت},
-					'evening1' => q{شام},
-					'morning1' => q{صبح},
-					'night1' => q{شب},
-				},
-				'wide' => {
-					'night1' => q{شب},
-					'morning1' => q{صبح},
-					'afternoon1' => q{بعد از چاشت},
-					'evening1' => q{شام},
-				},
 				'narrow' => {
-					'night1' => q{ش},
 					'morning1' => q{ص},
 					'evening1' => q{شام},
+					'night1' => q{ش},
 					'afternoon1' => q{بعد از چاشت},
+				},
+				'wide' => {
+					'afternoon1' => q{بعد از چاشت},
+					'night1' => q{شب},
+					'evening1' => q{شام},
+					'morning1' => q{صبح},
+				},
+				'abbreviated' => {
+					'afternoon1' => q{بعد از چاشت},
+					'night1' => q{شب},
+					'evening1' => q{شام},
+					'morning1' => q{صبح},
 				},
 			},
 		},

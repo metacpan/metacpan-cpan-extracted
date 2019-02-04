@@ -4,82 +4,85 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "Attean SPARQL store",
-  "author"         => [
-                        "Kjetil Kjernsmo <kjetilk\@cpan.org>",
-                        "KJETILK <kjetilk\@cpan.org>",
-                      ],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "AtteanX-Store-SPARQL",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        develop   => { recommends => { "Dist::Inkt" => 0.001 } },
-                        runtime   => {
-                                       requires => {
-                                                     "Attean" => "0.010",
-                                                     "Carp" => 0,
-                                                     "Data::Dumper" => 0,
-                                                     "LWP::UserAgent" => 0,
-                                                     "Moo" => "1.006000",
-                                                     "MooX::Log::Any" => 0,
-                                                     "perl" => 5.014,
-                                                     "Types::Standard" => 0,
-                                                     "Types::URI" => 0,
-                                                   },
-                                       suggests => {
-                                                     "HTTP::Message::PSGI"  => 0,
-                                                     "RDF::Endpoint"        => 0,
-                                                     "RDF::Trine"           => 0,
-                                                     "Test::LWP::UserAgent" => 0.027,
-                                                   },
-                                     },
-                        test      => {
-                                       requires => {
-                                         "HTTP::Message::PSGI"  => 0,
-                                         "RDF::Endpoint"        => 0,
-                                         "RDF::Trine"           => 0,
-                                         "Test::LWP::UserAgent" => 0.027,
-                                         "Test::Modern"         => 0,
-                                         "Test::Roo"            => 0,
+  "abstract"         => "Attean SPARQL store",
+  "author"           => [
+                          "Kjetil Kjernsmo <kjetilk\@cpan.org>",
+                          "Kjetil Kjernsmo (KJETILK) <kjetilk\@cpan.org>",
+                        ],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => ["Semantic Web"],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "AtteanX-Store-SPARQL",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          develop   => { recommends => { "Dist::Inkt" => 0.001 } },
+                          runtime   => {
+                                         requires => {
+                                                       "Attean" => "0.010",
+                                                       "Carp" => 0,
+                                                       "Data::Dumper" => 0,
+                                                       "LWP::UserAgent" => 0,
+                                                       "Moo" => "1.006000",
+                                                       "MooX::Log::Any" => 0,
+                                                       "perl" => 5.014,
+                                                       "Types::Standard" => 0,
+                                                       "Types::URI" => 0,
+                                                     },
+                                         suggests => {
+                                                       "HTTP::Message::PSGI"  => 0,
+                                                       "RDF::Endpoint"        => 0,
+                                                       "RDF::Trine"           => 0,
+                                                       "Test::LWP::UserAgent" => 0.027,
+                                                     },
                                        },
-                                     },
-                      },
-  "provides"       => {
-                        "AtteanX::Model::SPARQL"                         => { file => "lib/AtteanX/Model/SPARQL.pm", version => "0.010" },
-                        "AtteanX::Plan::SPARQLBGP"                       => { file => "lib/AtteanX/Plan/SPARQLBGP.pm", version => "0.010" },
-                        "AtteanX::Query::AccessPlan::SingleQuadBGP"      => {
-                                                                              file => "lib/AtteanX/Query/AccessPlan/SingleQuadBGP.pm",
-                                                                              version => "0.010",
-                                                                            },
-                        "AtteanX::Store::SPARQL"                         => { file => "lib/AtteanX/Store/SPARQL.pm", version => "0.010" },
-                        "Test::Attean::Store::SPARQL::Role::CreateStore" => {
-                                                                              file => "lib/Test/Attean/Store/SPARQL/Role/CreateStore.pm",
-                                                                              version => "0.010",
-                                                                            },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "https://github.com/kjetilk/p5-atteanx-store-sparql/issues",
-                                        },
-                        homepage     => "https://metacpan.org/release/AtteanX-Store-SPARQL",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/kjetilk/p5-atteanx-store-sparql.git",
-                                          web  => "https://github.com/kjetilk/p5-atteanx-store-sparql",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/project",
-                      },
-  "version"        => "0.010",
+                          test      => {
+                                         requires => {
+                                           "HTTP::Message::PSGI"  => 0,
+                                           "RDF::Endpoint"        => 0,
+                                           "RDF::Trine"           => 0,
+                                           "Test::LWP::UserAgent" => 0.027,
+                                           "Test::Modern"         => 0,
+                                           "Test::Roo"            => 0,
+                                         },
+                                       },
+                        },
+  "provides"         => {
+                          "AtteanX::Model::SPARQL"                         => { file => "lib/AtteanX/Model/SPARQL.pm", version => 0.012 },
+                          "AtteanX::Plan::SPARQLBGP"                       => { file => "lib/AtteanX/Plan/SPARQLBGP.pm", version => 0.012 },
+                          "AtteanX::Query::AccessPlan::SingleQuadBGP"      => {
+                                                                                file => "lib/AtteanX/Query/AccessPlan/SingleQuadBGP.pm",
+                                                                                version => 0.012,
+                                                                              },
+                          "AtteanX::Store::SPARQL"                         => { file => "lib/AtteanX/Store/SPARQL.pm", version => 0.012 },
+                          "Test::Attean::Store::SPARQL::Role::CreateStore" => {
+                                                                                file => "lib/Test/Attean/Store/SPARQL/Role/CreateStore.pm",
+                                                                                version => 0.012,
+                                                                              },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "https://github.com/kjetilk/p5-atteanx-store-sparql/issues",
+                                          },
+                          homepage     => "https://metacpan.org/release/AtteanX-Store-SPARQL",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/kjetilk/p5-atteanx-store-sparql.git",
+                                            web  => "https://github.com/kjetilk/p5-atteanx-store-sparql",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/project",
+                          x_IRC        => "irc://irc.perl.org/#perlrdf",
+                        },
+  "version"          => 0.012,
+  "x_contributors"   => ["Gregory Todd Williams <gwilliams\@cpan.org>"],
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

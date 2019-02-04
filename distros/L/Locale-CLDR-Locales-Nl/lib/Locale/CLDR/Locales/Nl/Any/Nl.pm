@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nl::Any::Nl - Package for language Dutch
 
 package Locale::CLDR::Locales::Nl::Any::Nl;
 # This file auto generated from Data\common\main\nl_NL.xml
-#	on Sun  7 Oct 10:52:22 am GMT
+#	on Sun  3 Feb  2:11:45 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

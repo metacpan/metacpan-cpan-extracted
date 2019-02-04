@@ -1,12 +1,12 @@
 package Locale::CLDR::RegionContainment;
 # This file auto generated from Data.xml
-#	on Sun  7 Oct 10:18:12 am GMT
+#	on Sun  3 Feb  1:37:05 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'region_contains' => (
 		'009' => [ qw( 053 054 057 061 QO ) ], 
 		'011' => [ qw( BF BJ CI CV GH GM GN GW LR ML MR NE NG SH SL SN TG ) ], 
 		'013' => [ qw( BZ CR GT HN MX NI PA SV ) ], 
-		'014' => [ qw( BI DJ ER ET IO KE KM MG MU MW MZ RE RW SC SO SS TZ UG YT ZM ZW ) ], 
+		'014' => [ qw( BI DJ ER ET IO KE KM MG MU MW MZ RE RW SC SO SS TF TZ UG YT ZM ZW ) ], 
 		'015' => [ qw( DZ EG EH LY MA SD TN EA IC ) ], 
 		'017' => [ qw( AO CD CF CG CM GA GQ ST TD ) ], 
 		'018' => [ qw( BW LS NA SZ ZA ) ], 
@@ -45,7 +45,7 @@ has 'region_contains' => (
 		'061' => [ qw( AS CK NU PF PN TK TO TV WF WS ) ], 
 		'142' => [ qw( 145 143 030 034 035 ) ], 
 		'143' => [ qw( TM TJ KG KZ UZ ) ], 
-		'145' => [ qw( AE AM AZ BH CY GE IL IQ JO KW LB OM PS QA SA SY TF TR YE ) ], 
+		'145' => [ qw( AE AM AZ BH CY GE IL IQ JO KW LB OM PS QA SA SY TR YE ) ], 
 		'150' => [ qw( 154 155 151 039 ) ], 
 		'151' => [ qw( BG BY CZ HU MD PL RO RU SK UA ) ], 
 		'154' => [ qw( GG IM JE AX DK EE FI FO GB IE IS LT LV NO SE SJ ) ], 
@@ -319,7 +319,7 @@ has 'region_contained_by' => (
 		'TA' => 'QO', 
 		'TC' => '029', 
 		'TD' => '017', 
-		'TF' => '145', 
+		'TF' => '014', 
 		'TG' => '011', 
 		'TH' => '035', 
 		'TJ' => '143', 

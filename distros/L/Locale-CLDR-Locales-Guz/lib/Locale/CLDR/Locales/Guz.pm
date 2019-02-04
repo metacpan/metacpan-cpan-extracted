@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Guz - Package for language Gusii
 
 package Locale::CLDR::Locales::Guz;
 # This file auto generated from Data\common\main\guz.xml
-#	on Sun  7 Oct 10:35:34 am GMT
+#	on Sun  3 Feb  1:54:20 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -841,13 +841,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'pm' => q{Mo},
+					'am' => q{Ma},
+				},
 				'wide' => {
 					'pm' => q{Mog},
 					'am' => q{Mambia},
-				},
-				'abbreviated' => {
-					'am' => q{Ma},
-					'pm' => q{Mo},
 				},
 			},
 		},
@@ -927,7 +927,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -950,7 +950,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

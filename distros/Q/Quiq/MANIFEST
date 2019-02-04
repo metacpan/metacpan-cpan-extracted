@@ -105,7 +105,7 @@ lib/Quiq/LineProcessor.pm
 lib/Quiq/LineProcessor/Line.pm
 lib/Quiq/LockedCounter.pm
 lib/Quiq/Math.pm
-lib/Quiq/MediaWiki/Api.pm
+lib/Quiq/MediaWiki/Client.pm
 lib/Quiq/MediaWiki/Markup.pm
 lib/Quiq/ModelCache.pm
 lib/Quiq/Mojolicious/Plugin/Log/Parameters.pm
@@ -288,7 +288,7 @@ t/bin/Quiq/LineProcessor.t
 t/bin/Quiq/LineProcessor/Line.t
 t/bin/Quiq/LockedCounter.t
 t/bin/Quiq/Math.t
-t/bin/Quiq/MediaWiki/Api.t
+t/bin/Quiq/MediaWiki/Client.t
 t/bin/Quiq/MediaWiki/Markup.t
 t/bin/Quiq/ModelCache.t
 t/bin/Quiq/Mojolicious/Plugin/Log/Parameters.t

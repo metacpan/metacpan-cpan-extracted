@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Eo - Package for language Esperanto
 
 package Locale::CLDR::Locales::Eo;
 # This file auto generated from Data\common\main\eo.xml
-#	on Sun  7 Oct 10:29:34 am GMT
+#	on Sun  3 Feb  1:48:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1873,15 +1873,15 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
+				'wide' => {
 					'am' => q{atm},
 					'pm' => q{ptm},
 				},
 				'narrow' => {
-					'am' => q{a},
 					'pm' => q{p},
+					'am' => q{a},
 				},
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{ptm},
 					'am' => q{atm},
 				},

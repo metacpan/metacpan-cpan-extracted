@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Zu::Fa;
 # This file auto generated from Data\common\transforms\zu-fa.xml
-#	on Sun  7 Oct 10:18:26 am GMT
+#	on Sun  3 Feb  1:37:18 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

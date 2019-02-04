@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.010';
+our $VERSION   = '0.012';
 
 use Moo;
 use Types::Standard qw(InstanceOf);
@@ -18,7 +18,8 @@ has 'store'    => (
 										  get_quads => 'get_triples',
 										  count_quads => 'count_triples',
 										  get_sparql => 'get_sparql',
-										  plans_for_algebra => 'plans_for_algebra'
+										  plans_for_algebra => 'plans_for_algebra',
+										  count_quads_estimate => 'count_quads_estimate'
 										}
 						);
 

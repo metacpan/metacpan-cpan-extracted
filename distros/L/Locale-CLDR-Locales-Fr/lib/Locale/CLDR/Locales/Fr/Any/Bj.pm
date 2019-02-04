@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fr::Any::Bj - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Bj;
 # This file auto generated from Data\common\main\fr_BJ.xml
-#	on Sun  7 Oct 10:33:20 am GMT
+#	on Sun  3 Feb  1:51:59 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lb - Package for language Luxembourgish
 
 package Locale::CLDR::Locales::Lb;
 # This file auto generated from Data\common\main\lb.xml
-#	on Sun  7 Oct 10:43:37 am GMT
+#	on Sun  3 Feb  2:02:27 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -3125,8 +3125,8 @@ has 'units' => (
 					},
 					'fathom' => {
 						'name' => q(fm),
-						'one' => q({0} fm),
-						'other' => q({0} fm),
+						'one' => q({0} fth),
+						'other' => q({0} fth),
 					},
 					'fluid-ounce' => {
 						'one' => q({0} fl oz),
@@ -3531,8 +3531,8 @@ has 'units' => (
 					},
 					'fathom' => {
 						'name' => q(fm),
-						'one' => q({0} fm),
-						'other' => q({0} fm),
+						'one' => q({0} fth),
+						'other' => q({0} fth),
 					},
 					'fluid-ounce' => {
 						'name' => q(fl oz),
@@ -5995,6 +5995,13 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			display_name => {
+				'currency' => q(Venezolanesche Bolívar \(2008–2018\)),
+				'one' => q(Venezolanesche Bolívar \(2008–2018\)),
+				'other' => q(Venezolanesch Bolívares \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(Venezolanesche Bolívar),
 				'one' => q(Venezolanesche Bolívar),
 				'other' => q(Venezolanesch Bolívares),
@@ -6527,16 +6534,16 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{nomëttes},
 					'am' => q{moies},
-				},
-				'narrow' => {
-					'am' => q{mo.},
-					'pm' => q{nomë.},
+					'pm' => q{nomëttes},
 				},
 				'wide' => {
 					'am' => q{moies},
 					'pm' => q{nomëttes},
+				},
+				'narrow' => {
+					'pm' => q{nomë.},
+					'am' => q{mo.},
 				},
 			},
 		},

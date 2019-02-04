@@ -5,20 +5,63 @@ use Test::More;
 use Prima::Test;
 use Prima::Application;
 
-plan tests => 9;
+plan tests => 12;
 
 my $a = $::application;
 
 my @sz = $a->size;
 
-$a-> begin_paint;
-ok( $a-> get_paint_state, "get_paint_state");
+# Test screen grabbing
+SKIP: {
+	if ($^O eq 'darwin') {
+		skip "not compiled with cocoa", 3 unless $a->get_system_info->{guiDescription} =~ /Cocoa/;
+	} elsif ( ($ENV{XDG_SESSION_TYPE} // 'x11') ne 'x11') {
+		skip "not compiled with gtk", 3 unless $a->get_system_info->{gui} == gui::GTK;
+	}
+
+
+	reset_flag;
+	my $w = $a->insert(
+		(($^O =~ /win32/i) ? (
+			Window =>
+				borderStyle => bs::None,
+				borderIcons => 0,
+				onTop => 1,
+			) : ('Widget')),
+		rect => [0,0,5,5],
+		color => cl::White,
+		backColor => cl::Black,
+		onPaint => sub {
+			my $w = shift;
+			$w->fillPattern(fp::SimpleDots);
+			$w->bar(0,0,$w->size);
+			set_flag;
+		},
+	);
+	$w->show;
+	$w->bring_to_front;
+	wait_flag;
+	select(undef,undef,undef,0.1);
+
+	my $i = $a->get_image(1,1,2,1);
+	ok( $i && $i->width == 2 && $i->height == 1, "some bitmap grabbing succeeded");
+	skip "no bitmap", 1 unless $i;
+	$i->type(im::BW);
+	my ( $a, $b ) = ( $i->pixel(0,0), $i->pixel(1,0) );
+	($a,$b) = ($b,$a) if $b < $a;
+	is($a, 0, "one pixel is black");
+	is($b, 255, "another is white");
+	$w->destroy;
+}
+
+
 
 SKIP: {
-	skip "xquartz doesn't support this", 2 if $^O eq 'darwin';
+	skip "system doesn't allow direct access to screen", 3 unless $a-> begin_paint;
+	ok( $a-> get_paint_state, "get_paint_state");
 	my $pix = $a-> pixel( 10, 10);
 	skip "rdesktop", 2 if $^O =~ /win32/i && $pix == cl::Invalid;
-	
+
 	$a-> pixel( 10, 10, 0);
 	my $bl = $a-> pixel( 10, 10);
 	$a-> pixel( 10, 10, 0xFFFFFF);
@@ -28,9 +71,9 @@ SKIP: {
 	$wh =  ( $xr + $xg + $xb ) / 3;
 	is( $bl, 0, "black pixel");
 	cmp_ok( $wh, '>', 200, "white pixel");
+	$a-> end_paint;
 }
 
-$a-> end_paint;
 
 $a-> visible(0);
 ok( $a-> visible && $a-> width == $sz[0] && $a-> height == $sz[1], "width and height");
@@ -48,15 +91,19 @@ $e &= $::application->yield(1) while !get_flag;
 ok( $e && get_flag, "timer triggers yield return");
 $t->stop;
 
-alarm(1);
 reset_flag;
 $SIG{ALRM} = \&set_flag;
+alarm(1);
 my $p = 0;
-$::application->onIdle( sub { $p+=1 } );
-$::application->onIdle( sub { $p+=8 } );
-$::application->yield(1);
+$::application->onIdle( sub { $p|=1 } );
+$::application->onIdle( sub { $p|=2 } );
+my $time = time + 2;
+while ( 1) {
+	$::application->yield(1);
+	last if $time < time or get_flag;
+}
 ok( get_flag, "yield without events sleeps, but still is alive");
-ok( $p == 9, "idle event"); 
+ok( $p == 3, "idle event");
 
 $SIG{ALRM} = 'DEFAULT';
 alarm(10);

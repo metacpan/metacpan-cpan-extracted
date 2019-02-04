@@ -1,0 +1,45 @@
+# This is a simple TODO list which may best be viewed and edited with
+# the 'tasks' plugin of the 'Atom' cross-platform text editor.
+#
+# Just make sure you set the following custom settings, either in the UI
+# under tasks plugin preferences:=
+#
+# tasks: (or under 'editor:' in 'config.cson')
+#  baseMarker: "-"
+#  cancelledMarker: "-"
+#  completeMarker: "-"
+# -------------------------------
+# You may also use the 'PlainTasks' plugin of SublimeText (again with similar
+# customs settings that enable YAML compatibility...
+#
+# in your User's PlainTasks.sublime-settings:=
+# {
+#  "open_tasks_bullet": "-", // options: - | ❍ | ❑ | ■ | □ | ☐ | ▪ | ▫ | – | — | ≡ | → | › | [ ]
+#  "done_tasks_bullet": "-", // options: + | ✓ | ✔ | √ | [x]
+#  "cancelled_tasks_bullet": "-", // options: x | ✘ | [-]
+# }
+# -------------------------------
+# The structure is in fact a YAML-compatible variation of the popular
+# '.todo' file format (introduced by the 'TaskPaper' application).
+#
+# TaskPaper should still be able to read the file, but "saving" from
+# TaskPaper will currently break YAML compatibility (by emitting tab characters
+# for indentation, instead of the spaces expected by YAML)
+
+--- !tabulo.net/todo
+
+§settings:
+  project: p5/Banal-Moosy-Mungers
+
+.:
+  - This is an example task;
+  - Here is an other task, which has been tagged; @critical
+  - This task was marked as 'done', and then archived. @done(2018-01-15 18:09) @project(.)
+  - This one was marked as 'cancelled', but not yet archived. @cancelled(2018-01-15 18:10) @project(.)
+
+
+#＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
+
+Archive:
+  - This task was marked as 'done', but not yet archived;
+  - This one was marked as 'cancelled', and then archived. @cancelled(2018-01-15 18:10) @project(.)

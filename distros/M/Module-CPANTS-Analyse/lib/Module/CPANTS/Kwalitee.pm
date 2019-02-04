@@ -4,30 +4,40 @@ use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
 use Carp;
-use Module::Find qw(useall);
+use Module::Find qw(usesub);
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 $VERSION =~ s/_//; ## no critic
 
 __PACKAGE__->mk_accessors(qw(_available _total));
 
 my @Plugins;
+my @SearchPaths = ('Module::CPANTS::Kwalitee');
 my @Indicators;
 my %IndicatorHash;
 my $Total;
 my $Available;
 
 sub import {
+    my ($class, @search_paths) = @_;
+    for my $path (@search_paths) {
+        next unless $path =~ /^[A-Za-z][A-Za-z0-9_]*(::[A-Za-z][A-Za-z0-9_]*)*$/;
+        push @SearchPaths, $path =~ /^Module::CPANTS::/ ? $path : "Module::CPANTS::$path";
+
+        my %seen;
+        @SearchPaths = grep {!$seen{$_}++} @SearchPaths;
+    }
+}
+
+sub _load_plugins {
     my $class = shift;
-    my @search_path = map {(/^Module::CPANTS::/ ? $_ : "Module::CPANTS::$_") => 1 } @_;
-    push @search_path, 'Module::CPANTS::Kwalitee';
-
-    my %seen;
-    push @Plugins, useall $_ for grep {!$seen{$_}++} @search_path;
-
-    %seen = ();
-    @Plugins = sort {$a->order <=> $b->order or $a cmp $b} grep {!$seen{$_}++} @Plugins;
-    $class->_cache_indicators;
+    unless (@Plugins) {
+        my %seen;
+        @Plugins = sort {$a->order <=> $b->order or $a cmp $b}
+                   grep {!$seen{$_}++}
+                   map  {usesub $_} @SearchPaths;
+        $class->_cache_indicators;
+    }
 }
 
 # I suppose nobody wants to change the generators dynamically though
@@ -50,6 +60,7 @@ sub plugins { @Plugins }
 
 sub new {
     my $class = shift;
+    $class->_load_plugins;
     bless {}, $class;
 }
 

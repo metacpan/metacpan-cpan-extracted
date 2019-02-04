@@ -3,13 +3,13 @@ abstract: 'Perl Foreign Function interface based on libffi'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  FFI::Build: '0.10'
+  FFI::Build: '0.80'
   FFI::CheckLib: '0.06'
-  Test::More: '0.94'
+  Test::More: '0.98'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '7.24'
-  FFI::Build: '0.10'
+  FFI::Build: '0.80'
   perl: '5.006'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
@@ -23,14 +23,14 @@ no_index:
     - lib/FFI.pm
     - lib/FFI/Library.pm
 requires:
-  FFI::Platypus: '0.59'
+  FFI::Platypus: '0.80'
   perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/Perl5-FFI/Alt-FFI-libffi/issues
   homepage: https://metacpan.org/pod/Alt::FFI::libffi
   repository: git://github.com/Perl5-FFI/Alt-FFI-libffi.git
-version: '0.05'
-x_generated_by_perl: v5.29.4
+version: '0.08'
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

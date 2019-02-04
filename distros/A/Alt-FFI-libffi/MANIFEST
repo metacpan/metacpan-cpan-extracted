@@ -12,13 +12,14 @@ dist.ini
 lib/Alt/FFI/libffi.pm
 lib/FFI.pm
 lib/FFI/Library.pm
+maint/cip-before-install
 t/00_diag.t
 t/01_use.t
 t/alt_ffi_libffi.t
 t/ffi.t
 t/ffi/basic.c
-t/ffi__callback.t
-t/ffi__win32.t
+t/ffi/closure2.c
+t/ffi/win32.c
 t/ffi_library.t
 xt/author/eol.t
 xt/author/no_tabs.t

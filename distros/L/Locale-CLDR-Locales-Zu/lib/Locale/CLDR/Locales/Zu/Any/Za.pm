@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Zu::Any::Za - Package for language Zulu
 
 package Locale::CLDR::Locales::Zu::Any::Za;
 # This file auto generated from Data\common\main\zu_ZA.xml
-#	on Sun  7 Oct 11:11:59 am GMT
+#	on Sun  3 Feb  2:31:26 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

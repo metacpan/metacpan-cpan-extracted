@@ -7,7 +7,10 @@ use Test::Deep;
 use Test::DZil;
 use Test::Fatal;
 use Path::Tiny;
-use List::Util 'first';
+use List::Util      qw(first uniq );
+use List::MoreUtils qw(arrayify);
+
+use Data::Printer;
 
 use Test::File::ShareDir -share => { -dist => { 'Dist-Zilla-PluginBundle-Author-TABULO' => 'share' } };
 
@@ -50,12 +53,14 @@ is(
 );
 
 # in 0.006, this accessor changed from returning a listref to a (sorted) list.
-my @filenames = $tzil->plugin_named('@Author::TABULO/copy generated files')->filename;
+my @filenames = sort(uniq(arrayify ($tzil->plugin_named('@Author::TABULO/copy generated files')->filename)));
+#say STDERR "TAU : I got filenames : " . np @filenames;
 cmp_deeply(
-    (eval { Dist::Zilla::Plugin::CopyFilesFromRelease->VERSION('0.006') }
-        ? \@filenames
-        : $filenames[0]),
-    [ qw(CONTRIBUTING INSTALL LICENCE LICENSE extra_file ppport.h) ],
+    \@filenames,
+    # (eval { Dist::Zilla::Plugin::CopyFilesFromRelease->VERSION('0.006') }
+    #     ? \@filenames
+    #     : $filenames[0]),
+    [ sort(uniq(qw(CONTRIBUTING INSTALL LICENCE LICENSE extra_file ppport.h))) ],
     'additional copy_files_from_release file does not overshadow the defaults',
 );
 

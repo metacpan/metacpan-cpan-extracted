@@ -10,6 +10,7 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.08'
+  perl: '5.008001'
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 keywords:
@@ -36,14 +37,15 @@ requires:
   File::Find::Object: v0.2.1
   JSON::PP: '0'
   List::Util: '1.33'
-  Module::ExtractUse: '0.33'
   Module::Find: '0'
+  Perl::PrereqScanner::NotQuiteLite: '0.9901'
   Software::License: '0.103012'
   Text::Balanced: '0'
+  perl: '5.008001'
   version: '0.73'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-CPANTS-Analyse
-  homepage: http://cpants.cpanauthors.org
+  homepage: https://cpants.cpanauthors.org
   repository: https://github.com/cpants/Module-CPANTS-Analyse
-version: '0.99'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

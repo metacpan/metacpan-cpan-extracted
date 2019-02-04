@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Smn - Package for language Inari Sami
 
 package Locale::CLDR::Locales::Smn;
 # This file auto generated from Data\common\main\smn.xml
-#	on Sun  7 Oct 10:58:45 am GMT
+#	on Sun  3 Feb  2:18:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1338,31 +1338,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{ep.},
+				'abbreviated' => {
 					'am' => q{ip.},
+					'pm' => q{ep.},
 				},
 				'narrow' => {
-					'am' => q{ip.},
 					'pm' => q{ep.},
+					'am' => q{ip.},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'am' => q{ip.},
 					'pm' => q{ep.},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{ip.},
+				'narrow' => {
 					'pm' => q{ep.},
+					'am' => q{ip.},
 				},
 				'wide' => {
-					'am' => q{ip.},
 					'pm' => q{ep.},
+					'am' => q{ip.},
 				},
-				'narrow' => {
-					'am' => q{ip.},
+				'abbreviated' => {
 					'pm' => q{ep.},
+					'am' => q{ip.},
 				},
 			},
 		},

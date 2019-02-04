@@ -74,6 +74,11 @@ subtest "expecting $_->{expected_file} from config: " . join(' => ', %{ $_->{con
                         '-remove' =>  \@REMOVED_PLUGINS,
                         installer => 'MakeMaker',
                         'RewriteVersion::Transitional.skip_version_provider' => 1,
+
+                        # TABULO : As it seems, ETHER's tests were designed
+                        # specifically for the 'PodWeaver' plugin (and NOT 'SurgicalPodWeaver')
+                        'surgical_podweaver' => 0,
+
                         %$config,
                       },
                     ],

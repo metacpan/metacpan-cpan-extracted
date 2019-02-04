@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ebu::Any::Ke - Package for language Embu
 
 package Locale::CLDR::Locales::Ebu::Any::Ke;
 # This file auto generated from Data\common\main\ebu_KE.xml
-#	on Sun  7 Oct 10:27:54 am GMT
+#	on Sun  3 Feb  1:47:01 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

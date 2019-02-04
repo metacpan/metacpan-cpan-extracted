@@ -1,3 +1,9 @@
+0.10 2019-02-02
+    * Handle -k, --insecure
+      This is the easy way out of encryption
+    * Minimum Perl version is now 5.8.8
+      Earlier versions are unsupported by IO::Socket::SSL
+
 0.09 2018-12-19
     * Sequence expansion
       Curl and this module now support specifying sequences of URLs such as

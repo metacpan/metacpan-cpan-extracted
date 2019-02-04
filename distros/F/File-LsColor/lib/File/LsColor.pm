@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.302';
+  $VERSION = '0.312';
   @ISA = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -27,6 +27,12 @@ BEGIN {
       )
     ],
   );
+}
+
+# alias for compatibility reasons with File::LsColor prior to 0.300
+{
+  no warnings 'once';
+  *ls_color_lookup = *can_ls_color;
 }
 
 use Carp qw(croak);
@@ -219,6 +225,17 @@ sub ls_color {
     chomp $file;
     my($ext) = $file =~ m/^.*\.(.+)$/m;
 
+# since we need to stat files, we need a real filename that's not padded with
+# whitespace.
+
+    my $real_file;
+    if($file =~ m/^\s+(.+)/) {
+      $real_file = $1;
+    }
+    else {
+      $real_file = $file;
+    }
+
 
 # no extension found. let's check file attributes. this will only
 # work if called with absolute paths or from ./ since we can't stat files that
@@ -226,13 +243,13 @@ sub ls_color {
 # https://github.com/trapd00r/File-LsColor/issues/1
 
     if(!defined($ext)) { # no extension found
-       -l $file and $ext = 'ln'; # symlink
-       -x $file and $ext = 'ex'; # executable
-       -d $file and $ext = 'di'; # beware, dirs have +x
-       -S $file and $ext = 'so'; # socket
-       -p $file and $ext = 'pi'; # fifo, pipe
-       -b $file and $ext = 'bd'; # block device
-       -c $file and $ext = 'ca'; # character special file
+       -l $real_file and $ext = 'ln'; # symlink
+       -x $real_file and $ext = 'ex'; # executable
+       -d $real_file and $ext = 'di'; # beware, dirs have +x
+       -S $real_file and $ext = 'so'; # socket
+       -p $real_file and $ext = 'pi'; # fifo, pipe
+       -b $real_file and $ext = 'bd'; # block device
+       -c $real_file and $ext = 'ca'; # character special file
 
 # looks like we can't decide on any attribute based on a stat(), so we use the
 # fallback FILE dircolors key.
@@ -318,11 +335,15 @@ File::LsColor - Colorize input filenames just like ls does
       ls_color_custom
       ls_color_default
       ls_color_internal
+      get_ls_colors
+      can_ls_color
     );
+
+    use feature qw(say);
 
     my @files = glob("$ENV{HOME}/*");
 
-    print ls_color($_), "\n" for(@files);
+    say ls_color $_ for @files;
 
     # or specify own pattern
 
@@ -406,6 +427,10 @@ attributes attached to it.
 
 Given a valid name, returns the defined attributes associated with it.
 Else, returns undef.
+
+=head2 ls_color_lookup()
+
+The same as can_ls_color(), exportable because of compatibility reasons.
 
 =head1 AUTHOR
 

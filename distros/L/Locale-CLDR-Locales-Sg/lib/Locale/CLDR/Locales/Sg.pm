@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sg - Package for language Sango
 
 package Locale::CLDR::Locales::Sg;
 # This file auto generated from Data\common\main\sg.xml
-#	on Sun  7 Oct 10:57:21 am GMT
+#	on Sun  3 Feb  2:16:58 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -852,12 +852,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{ND},
 					'pm' => q{LK},
+					'am' => q{ND},
 				},
 				'wide' => {
-					'pm' => q{LK},
 					'am' => q{ND},
+					'pm' => q{LK},
 				},
 			},
 		},

@@ -1,5 +1,8 @@
 Revision history for Perl extension Udev-FFI
 
+0.102001 2019-02-03T22:06:55Z
+    - improve error handling
+
 0.102000 2018-02-02T21:01:31Z
     - improve documentation
     - Module::Build::Tiny -> Module::Build

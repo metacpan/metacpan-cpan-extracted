@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/AtteanX-Store-SPARQL>
 Bug tracker:  <https://github.com/kjetilk/p5-atteanx-store-sparql/issues>
 Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
 
+0.012	2019-02-02	Fix bug from upstream changes.
+
+ - Updated: Add count estimate handling.
+   Gregory Todd Williams++
+
 0.010	2016-05-15	Quality improvements.
 
  - Added: Set version in all perl modules.

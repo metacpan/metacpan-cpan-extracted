@@ -1,5 +1,18 @@
 Revision history for Getopt-Alt
 
+0.5.0   2019-02-03
+        Updating for release of version 0.5.0
+        Fixing accedentally copied code (Ivan Wills)
+        Adding documentation about conf_section (Ivan Wills)
+        Added perl 5.26 to .travis build (Ivan Wills)
+        Updated date (Ivan Wills)
+        Fixing line length (Ivan Wills)
+        Updating todo (Ivan Wills)
+        New file to test all things configuration (Ivan Wills)
+        Need example on how configurations work (Ivan Wills)
+        Fixing not using the config section name (Ivan Wills)
+        Allowing config file to include default sections (Ivan Wills)
+
 0.4.8   2018-07-09
         Updating for release of version 0.4.8
         Adding new files to manifest (Ivan Wills)

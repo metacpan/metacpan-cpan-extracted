@@ -6,7 +6,7 @@ use File::Spec::Functions 'catdir';
 plan skip_all => '.git missing' unless -d '.git';
 
 my $tt   = t::Helper->tt;
-my $year = 1900 + (localtime)[5];
+my $year = 1900 + (localtime)[5] - 1;
 my @args = ("$year-09-17T09:00:00", "17:00:00");
 
 is $tt->cmd_register(@args), 0, 'register with missing args';
@@ -22,7 +22,7 @@ is $tt->cmd_register(@args), 0, 'register with hh::mm::ss';
 is $tt->cmd_register(@args), 1, 'register with same time';
 
 $main::out = '';
-is $tt->cmd_log('year'), 0, 'cmd_log';
+is $tt->cmd_log('-1year'), 0, 'cmd_log';
 like $main::out, qr{\s+17\s+09:00\s+8:00\s+project-name\s+foo,bar}i, 'log sep';
 like $main::out, qr{\s+17\s+09:00\s+8:00\s+other\s+foo,bar}i,        'log oct';
 

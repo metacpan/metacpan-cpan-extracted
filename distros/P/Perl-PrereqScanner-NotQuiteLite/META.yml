@@ -4,6 +4,7 @@ author:
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::FailWarnings: '0'
   Test::More: '0.98'
   Test::UseAllModules: '0.17'
 configure_requires:
@@ -32,5 +33,5 @@ requires:
   perl: '5.008001'
 resources:
   repository: https://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite
-version: '0.9902'
+version: '0.9903'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

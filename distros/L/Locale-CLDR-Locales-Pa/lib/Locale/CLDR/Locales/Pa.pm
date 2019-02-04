@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Pa - Package for language Punjabi
 
 package Locale::CLDR::Locales::Pa;
 # This file auto generated from Data\common\main\pa.xml
-#	on Sun  7 Oct 10:53:09 am GMT
+#	on Sun  3 Feb  2:12:39 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -137,10 +137,12 @@ has 'display_name_language' => (
  				'en_GB' => 'ਅੰਗਰੇਜ਼ੀ (ਬਰਤਾਨਵੀ)',
  				'en_GB@alt=short' => 'ਅੰਗਰੇਜ਼ੀ (ਯੂ.ਕੇ.)',
  				'en_US' => 'ਅੰਗਰੇਜ਼ੀ (ਅਮਰੀਕੀ)',
- 				'en_US@alt=short' => 'ਅੰਗਰੇਜ਼ੀ (ਯੂ.ਐਸ.)',
+ 				'en_US@alt=short' => 'ਅੰਗਰੇਜ਼ੀ (ਯੂ.ਐੱਸ.)',
  				'eo' => 'ਇਸਪੇਰਾਂਟੋ',
  				'es' => 'ਸਪੇਨੀ',
+ 				'es_419' => 'ਸਪੇਨੀ (ਲਾਤੀਨੀ ਅਮਰੀਕੀ)',
  				'es_ES' => 'ਸਪੇਨੀ (ਯੂਰਪੀ)',
+ 				'es_MX' => 'ਸਪੇਨੀ (ਮੈਕਸੀਕੀ)',
  				'et' => 'ਇਸਟੋਨੀਆਈ',
  				'eu' => 'ਬਾਸਕ',
  				'ewo' => 'ਇਵੋਂਡੋ',
@@ -238,7 +240,7 @@ has 'display_name_language' => (
  				'ksb' => 'ਸ਼ੰਬਾਲਾ',
  				'ksf' => 'ਬਫ਼ੀਆ',
  				'ksh' => 'ਕਲੋਗਨੀਅਨ',
- 				'ku' => 'ਕੁਰਦ',
+ 				'ku' => 'ਕੁਰਦਿਸ਼',
  				'kum' => 'ਕੁਮੀਕ',
  				'kv' => 'ਕੋਮੀ',
  				'kw' => 'ਕੋਰਨਿਸ਼',
@@ -427,7 +429,7 @@ has 'display_name_language' => (
  				'uk' => 'ਯੂਕਰੇਨੀਆਈ',
  				'umb' => 'ਉਮਬੁੰਡੂ',
  				'und' => 'ਅਣਪਛਾਤੀ ਬੋਲੀ',
- 				'ur' => 'ਉੜਦੂ',
+ 				'ur' => 'ਉਰਦੂ',
  				'uz' => 'ਉਜ਼ਬੇਕ',
  				'vai' => 'ਵਾਈ',
  				've' => 'ਵੇਂਡਾ',
@@ -608,7 +610,7 @@ has 'display_name_region' => (
  			'CA' => 'ਕੈਨੇਡਾ',
  			'CC' => 'ਕੋਕੋਸ (ਕੀਲਿੰਗ) ਟਾਪੂ',
  			'CD' => 'ਕਾਂਗੋ - ਕਿੰਸ਼ਾਸਾ',
- 			'CD@alt=variant' => 'ਕਾਂਗੋ ਲੋਕਤੰਤਰੀ ਗਣਰਾਜ',
+ 			'CD@alt=variant' => 'ਕਾਂਗੋ (ਡੀਆਰਸੀ)',
  			'CF' => 'ਕੇਂਦਰੀ ਅਫ਼ਰੀਕੀ ਗਣਰਾਜ',
  			'CG' => 'ਕਾਂਗੋ - ਬ੍ਰਾਜ਼ਾਵਿਲੇ',
  			'CG@alt=variant' => 'ਕਾਂਗੋ ਗਣਰਾਜ',
@@ -645,7 +647,7 @@ has 'display_name_region' => (
  			'ES' => 'ਸਪੇਨ',
  			'ET' => 'ਇਥੋਪੀਆ',
  			'EU' => 'ਯੂਰਪੀ ਸੰਘ',
- 			'EZ' => 'EZ',
+ 			'EZ' => 'ਯੂਰੋਜ਼ੋਨ',
  			'FI' => 'ਫਿਨਲੈਂਡ',
  			'FJ' => 'ਫ਼ਿਜੀ',
  			'FK' => 'ਫ਼ਾਕਲੈਂਡ ਟਾਪੂ',
@@ -940,8 +942,8 @@ has 'display_name_type' => (
  				'hant' => q{ਰਵਾਇਤੀ ਚੀਨੀ ਸੰਖਿਆਵਾਂ},
  				'hantfin' => q{ਰਵਾਇਤੀ ਚੀਨੀ ਵਿੱਤੀ ਸੰਖਿਆਵਾਂ},
  				'hebr' => q{ਹਿਬਰੂ ਸੰਖਿਆਵਾਂ},
- 				'jpan' => q{ਜਾਪਾਨੀ ਸੰਖਿਆਵਾਂ},
- 				'jpanfin' => q{ਜਾਪਾਨੀ ਵਿੱਤੀ ਸੰਖਿਆਵਾਂ},
+ 				'jpan' => q{ਜਪਾਨੀ ਸੰਖਿਆਵਾਂ},
+ 				'jpanfin' => q{ਜਪਾਨੀ ਵਿੱਤੀ ਸੰਖਿਆਵਾਂ},
  				'khmr' => q{ਖਮੇਰ ਅੰਕ},
  				'knda' => q{ਕੰਨੜ ਅੰਕ},
  				'laoo' => q{ਲਾਓ ਅੰਕ},
@@ -1082,6 +1084,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(ਮੁੱਖ ਦਿਸ਼ਾ),
+					},
 					'acre' => {
 						'name' => q(ਏਕੜ),
 						'one' => q({0} ਏਕੜ),
@@ -1111,6 +1116,11 @@ has 'units' => (
 						'name' => q(ਖਗੋਲੀ ਇਕਾਈਆਂ),
 						'one' => q({0} ਖਗੋਲੀ ਇਕਾਈ),
 						'other' => q({0} ਖਗੋਲੀ ਇਕਾਈਆਂ),
+					},
+					'atmosphere' => {
+						'name' => q(ਵਾਯੂਮੰਡਲ),
+						'one' => q({0} ਵਾਯੂਮੰਡਲ),
+						'other' => q({0} ਵਾਯੂਮੰਡਲ),
 					},
 					'bit' => {
 						'name' => q(ਬਿਟ),
@@ -1643,6 +1653,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0} ਪ੍ਰਤੀ {1}),
 					},
+					'percent' => {
+						'name' => q(ਪ੍ਰਤੀਸ਼ਤ),
+						'one' => q({0} ਪ੍ਰਤੀਸ਼ਤ),
+						'other' => q({0} ਪ੍ਰਤੀਸ਼ਤ),
+					},
+					'permille' => {
+						'name' => q(ਪਰਮਾਈਲ),
+						'one' => q({0} ਪਰਮਾਈਲ),
+						'other' => q({0} ਪਰਮਾਈਲ),
+					},
+					'petabyte' => {
+						'name' => q(ਪੈਟਾਬਾਇਟ),
+						'one' => q({0} ਪੈਟਾਬਾਇਟ),
+						'other' => q({0} ਪੈਟਾਬਾਇਟ),
+					},
 					'picometer' => {
 						'name' => q(ਪਿਕੋਮੀਟਰ),
 						'one' => q({0} ਪਿਕੋਮੀਟਰ),
@@ -1794,6 +1819,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(ਦਿਸ਼ਾ),
+					},
 					'acre' => {
 						'one' => q({0}ਏਕੜ),
 						'other' => q({0}ਏਕੜ),
@@ -2224,6 +2252,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(ਪ੍ਰਤੀਸ਼ਤ),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'name' => q(ਪਿ.ਮੀ.),
 						'one' => q({0} ਪਿ.ਮੀ.),
@@ -2328,6 +2361,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(ਦਿਸ਼ਾ),
+					},
 					'acre' => {
 						'name' => q(ਏਕੜ),
 						'one' => q({0} ਏਕੜ),
@@ -2357,6 +2393,11 @@ has 'units' => (
 						'name' => q(au),
 						'one' => q({0} au),
 						'other' => q({0} au),
+					},
+					'atmosphere' => {
+						'name' => q(ਵਾ. ਮੰ.),
+						'one' => q({0} ਵਾ. ਮੰ.),
+						'other' => q({0} ਵਾ. ਮੰ.),
 					},
 					'bit' => {
 						'name' => q(ਬਿਟ),
@@ -2888,6 +2929,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(ਪ੍ਰਤੀਸ਼ਤ),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(ਪਰਮਾਈਲ),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(ਪੈਟਾਬਾਇਟ),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
 					},
 					'picometer' => {
 						'name' => q(ਪਿ.ਮੀ.),
@@ -4235,6 +4291,7 @@ has 'currencies' => (
 			},
 		},
 		'MRU' => {
+			symbol => 'MRU',
 			display_name => {
 				'currency' => q(ਮੋਰਿਟਾਨੀਆਈ ਊਗੀਆ),
 				'one' => q(ਮੋਰਿਟਾਨੀਆਈ ਊਗੀਆ),
@@ -4541,10 +4598,10 @@ has 'currencies' => (
 			},
 		},
 		'STN' => {
-			symbol => 'Db',
+			symbol => 'STN',
 			display_name => {
 				'currency' => q(ਸਾਉ ਟੋਮੀ ਐਂਡ ਪ੍ਰਿੰਸਪੀ ਡੋਬਰਾ),
-				'one' => q(ਸਾਉ ਟੋਮੀ ਐਂਡ ਪ੍ਰਿੰਸਪੀ ਡੋਬਰਾ),
+				'one' => q(ਸਾਉ ਟੋਮੀ ਅਤੇ ਪ੍ਰਿੰਸਪੀ ਡੋਬਰਾ),
 				'other' => q(ਸਾਉ ਟੋਮੀ ਐਂਡ ਪ੍ਰਿੰਸਪੀ ਡੋਬਰਾ),
 			},
 		},
@@ -4705,6 +4762,14 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			symbol => 'VEF',
+			display_name => {
+				'currency' => q(ਵੇਨੇਜ਼ੂਏਲਨ ਬੋਲੀਵਰ \(2008–2018\)),
+				'one' => q(ਵੇਨੇਜ਼ੂਏਲਨ ਬੋਲੀਵਰ \(2008–2018\)),
+				'other' => q(ਵੇਨੇਜ਼ੂਏਲਨ ਬੋਲੀਵਰ \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
 			display_name => {
 				'currency' => q(ਵੇਨੇਜ਼ੂਏਲਨ ਬੋਲੀਵਰ),
 				'one' => q(ਵੇਨੇਜ਼ੂਏਲਨ ਬੋਲੀਵਰ),
@@ -5894,243 +5959,267 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'coptic') {
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'hebrew') {
+			if ($_ eq 'ethiopic-amete-alem') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'roc') {
+			if ($_ eq 'coptic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'islamic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'indian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 				}
+				last SWITCH;
+				}
+			if ($_ eq 'hebrew') {
 				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'ethiopic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 				}
+				last SWITCH;
+				}
+			if ($_ eq 'roc') {
 				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'persian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -6150,61 +6239,61 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'evening1' => q{ਸ਼ਾਮੀਂ},
+				'abbreviated' => {
+					'pm' => q{ਬਾ.ਦੁ.},
 					'midnight' => q{ਅੱਧੀ ਰਾਤ},
+					'evening1' => q{ਸ਼ਾਮੀਂ},
+					'am' => q{ਪੂ.ਦੁ.},
+					'morning1' => q{ਸਵੇਰੇ},
+					'afternoon1' => q{ਦੁਪਹਿਰੇ},
+					'night1' => q{ਰਾਤੀਂ},
+				},
+				'wide' => {
+					'night1' => q{ਰਾਤੀਂ},
 					'afternoon1' => q{ਦੁਪਹਿਰੇ},
 					'am' => q{ਪੂ.ਦੁ.},
-					'night1' => q{ਰਾਤੀਂ},
 					'morning1' => q{ਸਵੇਰੇ},
+					'midnight' => q{ਅੱਧੀ ਰਾਤ},
 					'pm' => q{ਬਾ.ਦੁ.},
+					'evening1' => q{ਸ਼ਾਮੀਂ},
 				},
 				'narrow' => {
+					'evening1' => q{ਸ਼ਾਮੀਂ},
+					'midnight' => q{ਅੱਧੀ ਰਾਤ},
 					'pm' => q{ਸ਼.},
 					'morning1' => q{ਸਵੇਰੇ},
-					'night1' => q{ਰਾਤੀਂ},
 					'am' => q{ਸ.},
 					'afternoon1' => q{ਦੁਪਹਿਰੇ},
-					'midnight' => q{ਅੱਧੀ ਰਾਤ},
-					'evening1' => q{ਸ਼ਾਮੀਂ},
-				},
-				'abbreviated' => {
-					'evening1' => q{ਸ਼ਾਮੀਂ},
-					'midnight' => q{ਅੱਧੀ ਰਾਤ},
-					'afternoon1' => q{ਦੁਪਹਿਰੇ},
-					'am' => q{ਪੂ.ਦੁ.},
-					'morning1' => q{ਸਵੇਰੇ},
 					'night1' => q{ਰਾਤੀਂ},
-					'pm' => q{ਬਾ.ਦੁ.},
 				},
 			},
 			'stand-alone' => {
 				'narrow' => {
-					'afternoon1' => q{ਦੁਪਹਿਰੇ},
-					'midnight' => q{ਅੱਧੀ ਰਾਤ},
-					'evening1' => q{ਸ਼ਾਮੀਂ},
-					'am' => q{ਪੂ.ਦੁ.},
-					'morning1' => q{ਸਵੇਰੇ},
 					'night1' => q{ਰਾਤੀਂ},
+					'afternoon1' => q{ਦੁਪਹਿਰੇ},
+					'morning1' => q{ਸਵੇਰੇ},
+					'am' => q{ਪੂ.ਦੁ.},
+					'evening1' => q{ਸ਼ਾਮੀਂ},
 					'pm' => q{ਬਾ.ਦੁ.},
+					'midnight' => q{ਅੱਧੀ ਰਾਤ},
 				},
 				'wide' => {
-					'morning1' => q{ਸਵੇਰੇ},
 					'night1' => q{ਰਾਤ},
+					'afternoon1' => q{ਦੁਪਹਿਰੇ},
+					'morning1' => q{ਸਵੇਰੇ},
+					'am' => q{ਪੂ.ਦੁ.},
+					'evening1' => q{ਸ਼ਾਮ},
 					'pm' => q{ਬਾ.ਦੁ.},
 					'midnight' => q{ਅੱਧੀ ਰਾਤ},
-					'evening1' => q{ਸ਼ਾਮ},
-					'afternoon1' => q{ਦੁਪਹਿਰੇ},
-					'am' => q{ਪੂ.ਦੁ.},
 				},
 				'abbreviated' => {
-					'am' => q{ਪੂ.ਦੁ.},
-					'evening1' => q{ਸ਼ਾਮੀਂ},
-					'midnight' => q{ਅੱਧੀ ਰਾਤ},
-					'afternoon1' => q{ਦੁਪਹਿਰੇ},
-					'pm' => q{ਬਾ.ਦੁ.},
 					'night1' => q{ਰਾਤੀਂ},
+					'afternoon1' => q{ਦੁਪਹਿਰੇ},
+					'am' => q{ਪੂ.ਦੁ.},
 					'morning1' => q{ਸਵੇਰੇ},
+					'pm' => q{ਬਾ.ਦੁ.},
+					'midnight' => q{ਅੱਧੀ ਰਾਤ},
+					'evening1' => q{ਸ਼ਾਮੀਂ},
 				},
 			},
 		},
@@ -6253,6 +6342,17 @@ has 'eras' => (
 			wide => {
 				'0' => 'ਕਾਲ0',
 				'1' => 'ਕਾਲ1'
+			},
+		},
+		'ethiopic-amete-alem' => {
+			abbreviated => {
+				'0' => 'ERA0'
+			},
+			narrow => {
+				'0' => 'ERA0'
+			},
+			wide => {
+				'0' => 'ERA0'
 			},
 		},
 		'generic' => {
@@ -6343,6 +6443,8 @@ has 'date_formats' => (
 		},
 		'ethiopic' => {
 		},
+		'ethiopic-amete-alem' => {
+		},
 		'generic' => {
 			'full' => q{EEEE, dd MMMM y G},
 			'long' => q{d MMMM y G},
@@ -6378,6 +6480,8 @@ has 'time_formats' => (
 		'coptic' => {
 		},
 		'ethiopic' => {
+		},
+		'ethiopic-amete-alem' => {
 		},
 		'generic' => {
 		},
@@ -6415,6 +6519,8 @@ has 'datetime_formats' => (
 		},
 		'ethiopic' => {
 		},
+		'ethiopic-amete-alem' => {
+		},
 		'generic' => {
 			'full' => q{{1} {0}},
 			'long' => q{{1} {0}},
@@ -6445,51 +6551,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{E, d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E, d MMM y G},
-			GyMMMd => q{d MMM,y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, d/M},
-			MMM => q{LLL},
-			MMMEd => q{E, d MMM},
-			MMMMd => q{MMMM d},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y G},
-			yMMM => q{MMM y G},
-			yQQQ => q{QQQ y G},
-			yyyy => q{y G},
-			yyyyM => q{M/y GGGGG},
-			yyyyMEd => q{E, d/M/y GGGGG},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E, d MMM y G},
-			yyyyMMMM => q{MMMM y G},
-			yyyyMMMd => q{d MMM y G},
-			yyyyMd => q{d/M/y GGGGG},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
 		'gregorian' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -6539,6 +6600,51 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 			yw => q{Y ਦਾ w ਹਫ਼ਤਾ},
 		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{E, d},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, d MMM y G},
+			GyMMMd => q{d MMM,y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, d/M},
+			MMM => q{LLL},
+			MMMEd => q{E, d MMM},
+			MMMMd => q{MMMM d},
+			MMMd => q{d MMM},
+			Md => q{d/M},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{y G},
+			yMMM => q{MMM y G},
+			yQQQ => q{QQQ y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E, d/M/y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d MMM y G},
+			yyyyMd => q{d/M/y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
 	} },
 );
 
@@ -6558,69 +6664,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{E, d/M – E, d/M},
-				d => q{E, d/M – E, d/M},
-			},
-			MMM => {
-				M => q{MMM – MMM},
-			},
-			MMMEd => {
-				M => q{E, d MMM – E, d MMM},
-				d => q{E, d MMM – E, d MMM},
-			},
-			MMMd => {
-				M => q{d MMM – d MMM},
-				d => q{d – d MMM},
-			},
-			Md => {
-				M => q{d/M – d/M},
-				d => q{d/M – d/M},
-			},
-			d => {
-				d => q{d – d},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{y – y G},
-			},
-			yM => {
-				M => q{M/y – M/y GGGGG},
-				y => q{M/y – M/y GGGGG},
-			},
-			yMEd => {
-				M => q{E, d/M/y – E, d/M/y GGGGG},
-				d => q{E, d/M/y – E, d/M/y GGGGG},
-				y => q{E, d/M/y – E, d/M/y GGGGG},
-			},
-			yMMM => {
-				M => q{MMM – MMM y G},
-				y => q{MMM y – MMM y G},
-			},
-			yMMMEd => {
-				M => q{E, d MMM – E, d MMM y G},
-				d => q{E, d MMM – E, d MMM y G},
-				y => q{E, d MMM y – E, d MMM y G},
-			},
-			yMMMM => {
-				M => q{MMMM – MMMM y G},
-				y => q{MMMM y – MMMM y G},
-			},
-			yMMMd => {
-				M => q{d MMM – d MMM y G},
-				d => q{d – d, MMM y G},
-				y => q{d, MMM y – d, MMM y G},
-			},
-			yMd => {
-				M => q{d/M/y – d/M/y GGGGG},
-				d => q{d/M/y – d/M/y GGGGG},
-				y => q{d/M/y – d/M/y GGGGG},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -6716,7 +6759,105 @@ has 'datetime_formats_interval' => (
 				y => q{d/M/y – d/M/y},
 			},
 		},
+		'generic' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{E, d/M – E, d/M},
+				d => q{E, d/M – E, d/M},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{E, d MMM – E, d MMM},
+				d => q{E, d MMM – E, d MMM},
+			},
+			MMMd => {
+				M => q{d MMM – d MMM},
+				d => q{d – d MMM},
+			},
+			Md => {
+				M => q{d/M – d/M},
+				d => q{d/M – d/M},
+			},
+			d => {
+				d => q{d – d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y – y G},
+			},
+			yM => {
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
+			},
+			yMEd => {
+				M => q{E, d/M/y – E, d/M/y GGGGG},
+				d => q{E, d/M/y – E, d/M/y GGGGG},
+				y => q{E, d/M/y – E, d/M/y GGGGG},
+			},
+			yMMM => {
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E, d MMM – E, d MMM y G},
+				d => q{E, d MMM – E, d MMM y G},
+				y => q{E, d MMM y – E, d MMM y G},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM y G},
+				y => q{MMMM y – MMMM y G},
+			},
+			yMMMd => {
+				M => q{d MMM – d MMM y G},
+				d => q{d – d, MMM y G},
+				y => q{d, MMM y – d, MMM y G},
+			},
+			yMd => {
+				M => q{d/M/y – d/M/y GGGGG},
+				d => q{d/M/y – d/M/y GGGGG},
+				y => q{d/M/y – d/M/y GGGGG},
+			},
+		},
 		'islamic' => {
+			fallback => '{0} – {1}',
+		},
+		'buddhist' => {
 			fallback => '{0} – {1}',
 		},
 	} },

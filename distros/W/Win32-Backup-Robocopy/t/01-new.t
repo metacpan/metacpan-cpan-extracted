@@ -1,5 +1,5 @@
 #!perl
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use Test::More;
@@ -15,11 +15,13 @@ map{ note( join ' ',$_,($_->VERSION // '?' ) ) }
 	'Win32::Backup::Robocopy',
 	'Carp',
 	'File::Spec',
+	'File::Path',
 	'JSON::PP',
 	'Capture::Tiny',
-	'DateTime::Tiny',
-	
+	'Time::Piece',
+	'Algorithm::Cron',
 ;
+
 # object of proper class
 isa_ok( Win32::Backup::Robocopy->new( name => 'zero', source =>'X:/'), 'Win32::Backup::Robocopy' );
 

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Hi - Package for language Hindi
 
 package Locale::CLDR::Locales::Hi;
 # This file auto generated from Data\common\main\hi.xml
-#	on Sun  7 Oct 10:36:05 am GMT
+#	on Sun  3 Feb  1:54:52 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1081,7 +1081,7 @@ has 'display_name_language' => (
  				'frs' => 'पूर्वी फ़्रीसियाई',
  				'fur' => 'फ्रीयुलीयान',
  				'fy' => 'पश्चिमी फ़्रिसियाई',
- 				'ga' => 'आइरिश',
+ 				'ga' => 'आयरिश',
  				'gaa' => 'गा',
  				'gag' => 'गागौज़',
  				'gay' => 'गायो',
@@ -1407,7 +1407,7 @@ has 'display_name_language' => (
  				'tyv' => 'तुवीनियन',
  				'tzm' => 'मध्य एटलस तमाज़ित',
  				'udm' => 'उदमुर्त',
- 				'ug' => 'विघुर',
+ 				'ug' => 'उइगर',
  				'uga' => 'युगैरिटिक',
  				'uk' => 'यूक्रेनियाई',
  				'umb' => 'उम्बुन्डु',
@@ -1882,7 +1882,7 @@ has 'display_name_region' => (
  			'SX' => 'सिंट मार्टिन',
  			'SY' => 'सीरिया',
  			'SZ' => 'स्वाज़ीलैंड',
- 			'TA' => 'त्रिस्टान डा कुना',
+ 			'TA' => 'ट्रिस्टन दा कुना',
  			'TC' => 'तुर्क और कैकोज़ द्वीपसमूह',
  			'TD' => 'चाड',
  			'TF' => 'फ़्रांसीसी दक्षिणी क्षेत्र',
@@ -2249,6 +2249,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(प्रधान दिशा),
+					},
 					'acre' => {
 						'name' => q(एकड़),
 						'one' => q({0} एकड़),
@@ -2278,6 +2281,11 @@ has 'units' => (
 						'name' => q(खगोलीय इकाइयाँ),
 						'one' => q({0} खगोलीय इकाई),
 						'other' => q({0} खगोलीय इकाईयां),
+					},
+					'atmosphere' => {
+						'name' => q(वायुमण्डलीय दबाव),
+						'one' => q({0} वायुमंडलीय दबाव),
+						'other' => q({0} वायुमंडलीय दबाव),
 					},
 					'bit' => {
 						'name' => q(बिट),
@@ -2640,7 +2648,7 @@ has 'units' => (
 						'other' => q({0} मीटर प्रति सेकंड),
 					},
 					'meter-per-second-squared' => {
-						'name' => q(मीटर प्रति सेकंड वर्ग),
+						'name' => q(मीटर/से²),
 						'one' => q({0} मीटर प्रति सेकंड वर्ग),
 						'other' => q({0} मीटर प्रति सेकंड वर्ग),
 					},
@@ -2795,6 +2803,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0} प्रति {1}),
 					},
+					'percent' => {
+						'name' => q(प्रतिशत),
+						'one' => q({0} प्रतिशत),
+						'other' => q({0} प्रतिशत),
+					},
+					'permille' => {
+						'name' => q(प्रति हज़ार),
+						'one' => q({0} प्रति हज़ार),
+						'other' => q({0} प्रति हज़ार),
+					},
+					'petabyte' => {
+						'name' => q(पेटाबाइट),
+						'one' => q({0} पेटाबाइट),
+						'other' => q({0} पेटाबाइट),
+					},
 					'picometer' => {
 						'name' => q(पिकोमीटर),
 						'one' => q({0} पिकोमीटर),
@@ -2941,6 +2964,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(दिशा),
+					},
 					'acre' => {
 						'one' => q({0}एकड़),
 						'other' => q({0}एकड़),
@@ -3110,6 +3136,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'one' => q({0}पि॰मी॰),
 						'other' => q({0}पि॰मी॰),
@@ -3159,6 +3190,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(दिशा),
+					},
 					'acre' => {
 						'name' => q(एकड़),
 						'one' => q({0} एकड़),
@@ -3188,6 +3222,11 @@ has 'units' => (
 						'name' => q(खगो॰ इका॰),
 						'one' => q({0} खगो॰ इका॰),
 						'other' => q({0} खगो॰ इका॰),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(बिट),
@@ -3306,8 +3345,8 @@ has 'units' => (
 					},
 					'fahrenheit' => {
 						'name' => q(डिग्री फ़ेरनहाइट),
-						'one' => q({0}°फेरन॰),
-						'other' => q({0}°फेरन॰),
+						'one' => q({0}°फ़ेरन),
+						'other' => q({0}°फ़ेरन),
 					},
 					'fluid-ounce' => {
 						'name' => q(फ़्लूइड आउंस),
@@ -3327,8 +3366,8 @@ has 'units' => (
 					},
 					'g-force' => {
 						'name' => q(गु–बल),
-						'one' => q({0} गु॰),
-						'other' => q({0} गु॰),
+						'one' => q({0} G),
+						'other' => q({0} G),
 					},
 					'gallon' => {
 						'name' => q(गैलन),
@@ -3469,8 +3508,8 @@ has 'units' => (
 					},
 					'kilometer-per-hour' => {
 						'name' => q(कि॰मी॰/घं॰),
-						'one' => q({0} कि॰मी॰ प्रति घं॰),
-						'other' => q({0} कि॰मी॰ प्रति घं॰),
+						'one' => q({0} कि॰मी॰/घं॰),
+						'other' => q({0} कि॰मी॰/घं॰),
 					},
 					'kilowatt' => {
 						'name' => q(kW),
@@ -3545,7 +3584,7 @@ has 'units' => (
 						'per' => q({0}/मी),
 					},
 					'meter-per-second' => {
-						'name' => q(मी॰/से॰),
+						'name' => q(मीटर/से॰),
 						'one' => q({0} मी॰/से॰),
 						'other' => q({0} मी॰/से॰),
 					},
@@ -3683,8 +3722,8 @@ has 'units' => (
 					},
 					'ounce' => {
 						'name' => q(औंस),
-						'one' => q({0} औं॰),
-						'other' => q({0} औं॰),
+						'one' => q({0} औंस),
+						'other' => q({0} औंस),
 						'per' => q({0}/औंस),
 					},
 					'ounce-troy' => {
@@ -3704,6 +3743,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(प्रतिशत),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(प्रति हज़ार),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(पेटाबाइट),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
 					},
 					'picometer' => {
 						'name' => q(पि॰मी॰),
@@ -4943,6 +4997,7 @@ has 'currencies' => (
 			},
 		},
 		'MRU' => {
+			symbol => 'MRU',
 			display_name => {
 				'currency' => q(मॉरीटेनियन ओगुइया),
 				'one' => q(मॉरीटेनियन ओगुइया),
@@ -5278,9 +5333,9 @@ has 'currencies' => (
 		'STN' => {
 			symbol => 'STN',
 			display_name => {
-				'currency' => q(साओ तोम और प्रिंसिपे डोबरा),
-				'one' => q(साओ तोम और प्रिंसिपे डोबरा),
-				'other' => q(साओ तोम और प्रिंसिपे डोबरा),
+				'currency' => q(साओ टोम और प्रिंसिपे डोबरा),
+				'one' => q(साओ टोम और प्रिंसिपे डोबरा),
+				'other' => q(साओ टोम और प्रिंसिपे डोबरा),
 			},
 		},
 		'SUR' => {
@@ -5443,6 +5498,14 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			symbol => 'VEF',
+			display_name => {
+				'currency' => q(वेनेज़ुएला बोलिवर \(2008–2018\)),
+				'one' => q(वेनेज़ुएला बोलिवर \(2008–2018\)),
+				'other' => q(वेनेज़ुएला बोलिवर \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
 			display_name => {
 				'currency' => q(वेनेज़ुएला बोलिवर),
 				'one' => q(वेनेज़ुएला बोलिवर),
@@ -6003,171 +6066,171 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'indian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 				}
-				last SWITCH;
-				}
-			if ($_ eq 'japanese') {
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'islamic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 2000;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'persian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 2000;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'japanese') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 				}
 				last SWITCH;
 				}
@@ -6187,61 +6250,61 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'night1' => q{रात},
-					'morning1' => q{सुबह},
-					'pm' => q{अपराह्न},
-					'afternoon1' => q{अपराह्न},
-					'evening1' => q{शाम},
-					'midnight' => q{मध्यरात्रि},
-					'am' => q{पूर्वाह्न},
-				},
-				'wide' => {
-					'night1' => q{रात},
-					'morning1' => q{सुबह},
-					'pm' => q{अपराह्न},
-					'afternoon1' => q{अपराह्न},
-					'midnight' => q{मध्यरात्रि},
-					'evening1' => q{शाम},
-					'am' => q{पूर्वाह्न},
-				},
 				'narrow' => {
+					'night1' => q{रात},
+					'afternoon1' => q{अपराह्न},
+					'morning1' => q{सुबह},
 					'am' => q{पू},
 					'evening1' => q{शाम},
 					'midnight' => q{मध्यरात्रि},
-					'afternoon1' => q{अपराह्न},
 					'pm' => q{अ},
+				},
+				'wide' => {
+					'am' => q{पूर्वाह्न},
 					'morning1' => q{सुबह},
+					'pm' => q{अपराह्न},
+					'midnight' => q{मध्यरात्रि},
+					'evening1' => q{शाम},
 					'night1' => q{रात},
+					'afternoon1' => q{अपराह्न},
+				},
+				'abbreviated' => {
+					'afternoon1' => q{अपराह्न},
+					'night1' => q{रात},
+					'pm' => q{अपराह्न},
+					'midnight' => q{मध्यरात्रि},
+					'evening1' => q{शाम},
+					'am' => q{पूर्वाह्न},
+					'morning1' => q{सुबह},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'am' => q{पूर्वाह्न},
 					'afternoon1' => q{दोपहर},
-					'evening1' => q{शाम},
-					'midnight' => q{मध्यरात्रि},
-					'pm' => q{अपराह्न},
-					'morning1' => q{सुबह},
 					'night1' => q{रात},
+					'pm' => q{अपराह्न},
+					'midnight' => q{मध्यरात्रि},
+					'evening1' => q{शाम},
+					'am' => q{पूर्वाह्न},
+					'morning1' => q{सुबह},
 				},
 				'narrow' => {
+					'morning1' => q{सुबह},
 					'am' => q{पू},
 					'evening1' => q{शाम},
 					'midnight' => q{आधी रात},
-					'afternoon1' => q{अपराह्न},
 					'pm' => q{अ},
-					'morning1' => q{सुबह},
 					'night1' => q{रात},
+					'afternoon1' => q{अपराह्न},
 				},
 				'wide' => {
 					'afternoon1' => q{दोपहर},
-					'evening1' => q{शाम},
-					'midnight' => q{मध्यरात्रि},
-					'am' => q{पूर्वाह्न},
 					'night1' => q{रात},
-					'morning1' => q{सुबह},
+					'evening1' => q{शाम},
 					'pm' => q{अपराह्न},
+					'midnight' => q{मध्यरात्रि},
+					'morning1' => q{सुबह},
+					'am' => q{पूर्वाह्न},
 				},
 			},
 		},

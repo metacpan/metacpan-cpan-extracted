@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fr::Any::Ch - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Ch;
 # This file auto generated from Data\common\main\fr_CH.xml
-#	on Sun  7 Oct 10:33:25 am GMT
+#	on Sun  3 Feb  1:52:06 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1071,51 +1071,51 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 0
-						&& $time < 400;
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 0
-						&& $time < 400;
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
@@ -1137,28 +1137,28 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'afternoon1' => q{de l’ap.m.},
-					'midnight' => q{min.},
-					'evening1' => q{du soir},
-					'morning1' => q{du mat.},
-					'night1' => q{du mat.},
-					'noon' => q{midi},
-				},
 				'abbreviated' => {
 					'morning1' => q{du mat.},
+					'midnight' => q{min.},
+					'evening1' => q{du soir},
 					'night1' => q{du mat.},
 					'noon' => q{midi},
 					'afternoon1' => q{de l’ap.m.},
-					'evening1' => q{du soir},
+				},
+				'narrow' => {
+					'morning1' => q{du mat.},
 					'midnight' => q{min.},
+					'evening1' => q{du soir},
+					'night1' => q{du mat.},
+					'noon' => q{midi},
+					'afternoon1' => q{de l’ap.m.},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
+				'abbreviated' => {
 					'midnight' => q{min.},
 				},
-				'abbreviated' => {
+				'narrow' => {
 					'midnight' => q{min.},
 				},
 			},

@@ -108,6 +108,10 @@ subtest $_->{test_name} => sub
                         '-remove' => [ @REMOVED_PLUGINS, 'Authority' ],
                         installer => 'MakeMaker',
                         'RewriteVersion::Transitional.skip_version_provider' => 1,
+
+                        # TABULO : As it seems, ETHER's tests were designed
+                        # specifically for the 'PodWeaver' plugin (and NOT 'SurgicalPodWeaver')
+                        'surgical_podweaver' => 0,
                       },
                     ],
                     @$config,

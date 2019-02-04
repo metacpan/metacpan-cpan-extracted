@@ -1,3 +1,17 @@
+1.132 2019-01-27
+================
+In der Doku Abschnitt SEE ALSO vorgezogen.
+
+[Quiq::MediaWiki::Client]
+Von Quiq::MediaWiki::Api umbenammt.
+
+Methode load() implementiert.
+
+Doku überarbeitet.
+
+[Quiq::Cascm]
+Klasse substantiell erweitert.
+
 1.131 2019-01-21
 ================
 [Quiq::MediaWiki::Api]

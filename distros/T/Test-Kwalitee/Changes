@@ -1,5 +1,9 @@
 Revision history for Test-Kwalitee
 
+1.28      2019-02-02 19:29:29Z
+    - fix taint-mode tests to accomodate failures with Module::CPANTS::Analyse
+      0.99 (insecure loading of a backend implementation)
+
 1.27      2017-11-05 18:45:40Z
     - make taint test TODO when version.pm is not current (see RT#118087)
 

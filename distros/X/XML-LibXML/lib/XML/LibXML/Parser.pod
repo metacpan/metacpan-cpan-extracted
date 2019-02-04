@@ -10,70 +10,70 @@ XML::LibXML::Parser - Parsing XML Data with XML::LibXML
 
   # Parser constructor
 
-  $parser = XML::LibXML->new();
-  $parser = XML::LibXML->new(option=>value, ...);
-  $parser = XML::LibXML->new({option=>value, ...});
+  $parser = XML::LibXML-E<gt>new();
+  $parser = XML::LibXML-E<gt>new(option=E<gt>value, ...);
+  $parser = XML::LibXML-E<gt>new({option=E<gt>value, ...});
 
   # Parsing XML
 
-  $dom = XML::LibXML->load_xml(
-      location => $file_or_url
+  $dom = XML::LibXML-E<gt>load_xml(
+      location =E<gt> $file_or_url
       # parser options ...
     );
-  $dom = XML::LibXML->load_xml(
-      string => $xml_string
+  $dom = XML::LibXML-E<gt>load_xml(
+      string =E<gt> $xml_string
       # parser options ...
     );
-  $dom = XML::LibXML->load_xml(
-      string => (\$xml_string)
+  $dom = XML::LibXML-E<gt>load_xml(
+      string =E<gt> (\$xml_string)
       # parser options ...
     );
-  $dom = XML::LibXML->load_xml({
-      IO => $perl_file_handle
+  $dom = XML::LibXML-E<gt>load_xml({
+      IO =E<gt> $perl_file_handle
       # parser options ...
     );
-  $dom = $parser->load_xml(...);
+  $dom = $parser-E<gt>load_xml(...);
 
   # Parsing HTML
 
-  $dom = XML::LibXML->load_html(...);
-  $dom = $parser->load_html(...);
+  $dom = XML::LibXML-E<gt>load_html(...);
+  $dom = $parser-E<gt>load_html(...);
 
   # Parsing well-balanced XML chunks
 
-  $fragment = $parser->parse_balanced_chunk( $wbxmlstring, $encoding );
+  $fragment = $parser-E<gt>parse_balanced_chunk( $wbxmlstring, $encoding );
 
   # Processing XInclude
 
-  $parser->process_xincludes( $doc );
-  $parser->processXIncludes( $doc );
+  $parser-E<gt>process_xincludes( $doc );
+  $parser-E<gt>processXIncludes( $doc );
 
   # Old-style parser interfaces
 
-  $doc = $parser->parse_file( $xmlfilename );
-  $doc = $parser->parse_fh( $io_fh );
-  $doc = $parser->parse_string( $xmlstring);
-  $doc = $parser->parse_html_file( $htmlfile, \%opts );
-  $doc = $parser->parse_html_fh( $io_fh, \%opts );
-  $doc = $parser->parse_html_string( $htmlstring, \%opts );
+  $doc = $parser-E<gt>parse_file( $xmlfilename );
+  $doc = $parser-E<gt>parse_fh( $io_fh );
+  $doc = $parser-E<gt>parse_string( $xmlstring);
+  $doc = $parser-E<gt>parse_html_file( $htmlfile, \%opts );
+  $doc = $parser-E<gt>parse_html_fh( $io_fh, \%opts );
+  $doc = $parser-E<gt>parse_html_string( $htmlstring, \%opts );
 
   # Push parser
 
-  $parser->parse_chunk($string, $terminate);
-  $parser->init_push();
-  $parser->push(@data);
-  $doc = $parser->finish_push( $recover );
+  $parser-E<gt>parse_chunk($string, $terminate);
+  $parser-E<gt>init_push();
+  $parser-E<gt>push(@data);
+  $doc = $parser-E<gt>finish_push( $recover );
 
   # Set/query parser options
 
-  $parser->option_exists($name);
-  $parser->get_option($name);
-  $parser->set_option($name,$value);
-  $parser->set_options({$name=>$value,...});
+  $parser-E<gt>option_exists($name);
+  $parser-E<gt>get_option($name);
+  $parser-E<gt>set_option($name,$value);
+  $parser-E<gt>set_options({$name=E<gt>$value,...});
 
   # XML catalogs
 
-  $parser->load_catalog( $catalog_file );
+  $parser-E<gt>load_catalog( $catalog_file );
 
 =head1 PARSING
 
@@ -121,9 +121,9 @@ have to create a parser instance before you can parse any XML data.
 =item new
 
 
-  $parser = XML::LibXML->new();
-  $parser = XML::LibXML->new(option=>value, ...);
-  $parser = XML::LibXML->new({option=>value, ...});
+  $parser = XML::LibXML-E<gt>new();
+  $parser = XML::LibXML-E<gt>new(option=E<gt>value, ...);
+  $parser = XML::LibXML-E<gt>new({option=E<gt>value, ...});
 
 Create a new XML and HTML parser instance. Each parser instance holds default
 values for various parser options. Optionally, one can pass a hash reference or
@@ -154,23 +154,23 @@ eval{} block
 =item load_xml
 
 
-  $dom = XML::LibXML->load_xml(
-      location => $file_or_url
+  $dom = XML::LibXML-E<gt>load_xml(
+      location =E<gt> $file_or_url
       # parser options ...
     );
-  $dom = XML::LibXML->load_xml(
-      string => $xml_string
+  $dom = XML::LibXML-E<gt>load_xml(
+      string =E<gt> $xml_string
       # parser options ...
     );
-  $dom = XML::LibXML->load_xml(
-      string => (\$xml_string)
+  $dom = XML::LibXML-E<gt>load_xml(
+      string =E<gt> (\$xml_string)
       # parser options ...
     );
-  $dom = XML::LibXML->load_xml({
-      IO => $perl_file_handle
+  $dom = XML::LibXML-E<gt>load_xml({
+      IO =E<gt> $perl_file_handle
       # parser options ...
     );
-  $dom = $parser->load_xml(...);
+  $dom = $parser-E<gt>load_xml(...);
 
 
 This function is available since XML::LibXML 1.70. It provides easy to use
@@ -186,8 +186,8 @@ to the new parser. See the constructor C<<<<<< new >>>>>> and L<<<<<< Parser Opt
 =item load_html
 
 
-  $dom = XML::LibXML->load_html(...);
-  $dom = $parser->load_html(...);
+  $dom = XML::LibXML-E<gt>load_html(...);
+  $dom = $parser-E<gt>load_html(...);
 
 
 This function is available since XML::LibXML 1.70. It has the same usage as C<<<<<< load_xml >>>>>>, providing interface to the HTML parser. See C<<<<<< load_xml >>>>>> for more information.
@@ -213,7 +213,7 @@ well balanced XML fragments.
 
 =item parse_balanced_chunk
 
-  $fragment = $parser->parse_balanced_chunk( $wbxmlstring, $encoding );
+  $fragment = $parser-E<gt>parse_balanced_chunk( $wbxmlstring, $encoding );
 
 This function parses a well balanced XML string into a L<<<<<< XML::LibXML::DocumentFragment >>>>>>. The first arguments contains the input string, the optional second argument
 can be used to specify character encoding of the input (UTF-8 is assumed by
@@ -237,7 +237,7 @@ to expand XInclude tags.
 
 =item process_xincludes
 
-  $parser->process_xincludes( $doc );
+  $parser-E<gt>process_xincludes( $doc );
 
 After a document is parsed into a DOM structure, you may want to expand the
 documents XInclude tags. This function processes the given document structure
@@ -259,14 +259,14 @@ the parsed document.
 
 =item processXIncludes
 
-  $parser->processXIncludes( $doc );
+  $parser-E<gt>processXIncludes( $doc );
 
 This is an alias to process_xincludes, but through a JAVA like function name.
 
 
 =item parse_file
 
-  $doc = $parser->parse_file( $xmlfilename );
+  $doc = $parser-E<gt>parse_file( $xmlfilename );
 
 This function parses an XML document from a file or network; $xmlfilename can
 be either a filename or an URL. Note that for parsing files, this function is
@@ -275,7 +275,7 @@ the fastest choice, about 6-8 times faster then parse_fh().
 
 =item parse_fh
 
-  $doc = $parser->parse_fh( $io_fh );
+  $doc = $parser-E<gt>parse_fh( $io_fh );
 
 parse_fh() parses a IOREF or a subclass of IO::Handle.
 
@@ -290,7 +290,7 @@ parse_fh() as follows:
 
 =item parse_string
 
-  $doc = $parser->parse_string( $xmlstring);
+  $doc = $parser-E<gt>parse_string( $xmlstring);
 
 This function is similar to parse_fh(), but it parses an XML document that is
 available as a single string in memory, or alternatively as a reference to a
@@ -305,7 +305,7 @@ function.
 
 =item parse_html_file
 
-  $doc = $parser->parse_html_file( $htmlfile, \%opts );
+  $doc = $parser-E<gt>parse_html_file( $htmlfile, \%opts );
 
 Similar to parse_file() but parses HTML (strict) documents; $htmlfile can be
 filename or URL.
@@ -316,7 +316,7 @@ as a HASH reference. See options labeled with HTML in L<<<<<< Parser Options >>>
 
 =item parse_html_fh
 
-  $doc = $parser->parse_html_fh( $io_fh, \%opts );
+  $doc = $parser-E<gt>parse_html_fh( $io_fh, \%opts );
 
 Similar to parse_fh() but parses HTML (strict) streams.
 
@@ -329,7 +329,7 @@ Note: encoding option may not work correctly with this function in libxml2 <
 
 =item parse_html_string
 
-  $doc = $parser->parse_html_string( $htmlstring, \%opts );
+  $doc = $parser-E<gt>parse_html_string( $htmlstring, \%opts );
 
 Similar to parse_string() but parses HTML (strict) strings.
 
@@ -366,7 +366,7 @@ In XML::LibXML this is done by a single function:
 
 =item parse_chunk
 
-  $parser->parse_chunk($string, $terminate);
+  $parser-E<gt>parse_chunk($string, $terminate);
 
 parse_chunk() tries to parse a given chunk of data, which isn't necessarily
 well balanced data. The function takes two parameters: The chunk of data as a
@@ -393,14 +393,14 @@ process:
 
 =item init_push
 
-  $parser->init_push();
+  $parser-E<gt>init_push();
 
 Initializes the push parser.
 
 
 =item push
 
-  $parser->push(@data);
+  $parser-E<gt>push(@data);
 
 This function pushes the data stored inside the array to libxml2's parser. Each
 entry in @data must be a normal scalar! This method can be called repeatedly.
@@ -408,7 +408,7 @@ entry in @data must be a normal scalar! This method can be called repeatedly.
 
 =item finish_push
 
-  $doc = $parser->finish_push( $recover );
+  $doc = $parser-E<gt>finish_push( $recover );
 
 This function returns the result of the parsing process. If this function is
 called without a parameter it will complain about non well-formed documents. If
@@ -535,21 +535,21 @@ If skipDTD is defined and not '0', an existing DTD would not be serialized with
 the document.
 
 If setTagCompression is defined and not '0' empty tags are displayed as open
-and closing tags rather than the shortcut. For example the empty tag I<<<<<< foo >>>>>> will be rendered as I<<<<<< <foo></foo> >>>>>> rather than I<<<<<< <foo/> >>>>>>.
+and closing tags rather than the shortcut. For example the empty tag I<<<<<< foo >>>>>> will be rendered as I<<<<<< E<lt>fooE<gt>E<lt>/fooE<gt> >>>>>> rather than I<<<<<< E<lt>foo/E<gt> >>>>>>.
 
 
 =head1 PARSER OPTIONS
 
 Handling of libxml2 parser options has been unified and improved in XML::LibXML
 1.70. You can now set default options for a particular parser instance by
-passing them to the constructor as C<<<<<< XML::LibXML->new({name=>value, ...}) >>>>>> or C<<<<<< XML::LibXML->new(name=>value,...) >>>>>>. The options can be queried and changed using the following methods (pre-1.70
-interfaces such as C<<<<<< $parser->load_ext_dtd(0) >>>>>> also exist, see below):
+passing them to the constructor as C<<<<<< XML::LibXML-E<gt>new({name=E<gt>value, ...}) >>>>>> or C<<<<<< XML::LibXML-E<gt>new(name=E<gt>value,...) >>>>>>. The options can be queried and changed using the following methods (pre-1.70
+interfaces such as C<<<<<< $parser-E<gt>load_ext_dtd(0) >>>>>> also exist, see below):
 
 =over 4
 
 =item option_exists
 
-  $parser->option_exists($name);
+  $parser-E<gt>option_exists($name);
 
 Returns 1 if the current XML::LibXML version supports the option C<<<<<< $name >>>>>>, otherwise returns 0 (note that this does not necessarily mean that the option
 is supported by the underlying libxml2 library).
@@ -557,21 +557,21 @@ is supported by the underlying libxml2 library).
 
 =item get_option
 
-  $parser->get_option($name);
+  $parser-E<gt>get_option($name);
 
 Returns the current value of the parser option C<<<<<< $name >>>>>>.
 
 
 =item set_option
 
-  $parser->set_option($name,$value);
+  $parser-E<gt>set_option($name,$value);
 
 Sets option C<<<<<< $name >>>>>> to value C<<<<<< $value >>>>>>.
 
 
 =item set_options
 
-  $parser->set_options({$name=>$value,...});
+  $parser-E<gt>set_options({$name=E<gt>$value,...});
 
 Sets multiple parsing options at once.
 
@@ -589,7 +589,7 @@ Each of the flags listed below is labeled
 
 =item /parser/
 
-if it can be used with a C<<<<<< XML::LibXML >>>>>> parser object (i.e. passed to C<<<<<< XML::LibXML->new >>>>>>, C<<<<<< XML::LibXML->set_option >>>>>>, etc.)
+if it can be used with a C<<<<<< XML::LibXML >>>>>> parser object (i.e. passed to C<<<<<< XML::LibXML-E<gt>new >>>>>>, C<<<<<< XML::LibXML-E<gt>set_option >>>>>>, etc.)
 
 
 =item /html/
@@ -940,7 +940,7 @@ resolving systems at the same time.
 
 =item load_catalog
 
-  $parser->load_catalog( $catalog_file );
+  $parser-E<gt>load_catalog( $catalog_file );
 
 Loads the XML catalog file $catalog_file.
 
@@ -984,7 +984,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0132
+2.0133
 
 =head1 COPYRIGHT
 

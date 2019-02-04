@@ -191,7 +191,7 @@ use Scalar::Util 'refaddr';
 use base 'Exporter';
 use v5.14;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 our @EXPORT = qw{
   one_row
@@ -245,12 +245,13 @@ INS
 						\$_->do(\$insert, undef, \@bind)
 INS
         }
-        $ret .= <<INS
+        $ret .= <<INS;
 						or DBIx::Struct::error_message {
 							result  => 'SQLERR',
 							message => 'error '.\$_->errstr.' inserting into table $table'
 						};
 INS
+        $ret;
     },
     _last_id_undef => sub {
         my ($table, $pk_row_data) = @_;
@@ -267,6 +268,7 @@ INS
 						$pk_row_data = \$_->last_insert_id(undef, undef, undef, undef);
 INS
         }
+        $ret;
     },
     _last_id_empty => sub {
         my ($table, $pk_row_data) = @_;
@@ -283,6 +285,7 @@ INS
 						$pk_row_data = \$_->last_insert_id("", "", "", "");
 INS
         }
+        $ret;
     }
 );
 

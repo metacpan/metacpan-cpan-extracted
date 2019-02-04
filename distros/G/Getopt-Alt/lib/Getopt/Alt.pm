@@ -28,7 +28,7 @@ Moose::Exporter->setup_import_methods(
     as_is => [qw/get_options/],
 );
 
-our $VERSION = version->new('0.4.8');
+our $VERSION = version->new('0.5.0');
 our $EXIT    = 1;
 
 has options => (
@@ -111,10 +111,20 @@ has name => (
     isa     => 'Str',
     default => sub { path($0)->basename },
 );
+has config => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    predicate => 'has_config',
+);
 has conf_prefix => (
     is      => 'rw',
     isa     => 'Str',
     default => '.',
+);
+has conf_section => (
+    is      => 'rw',
+    isa     => 'HashRef[Str]',
+    predicate => 'has_conf_section',
 );
 
 my $count = 1;
@@ -190,6 +200,7 @@ sub BUILD {
 
     # perlcritic is confused here combining hashes is not the same as comma separated arguments
     $self->default({ %{$self->default}, %$conf, });  ## no critic
+    $self->config($conf);
 
     if ($conf->{aliases}) {
         for my $alias (keys %{ $conf->{aliases} }) {
@@ -243,6 +254,7 @@ sub process {
     $self->clear_cmd;
     $self->files([]);
 
+    my @args_orig = @args;
     my $class = $self->options;
     $self->opt( $class->new( %{ $self->default } ) );
     my @errors;
@@ -287,6 +299,16 @@ sub process {
 
             if ( !$used && $short && defined $arg_data && length $arg_data ) {
                 unshift @args, '-' . $arg_data;
+            }
+            if ($self->has_conf_section
+                && $self->conf_section->{param}
+                && $self->conf_section->{param} == $opt_name
+                && @args_orig
+            ) {
+                $self->opt( $class->new(%{ $self->default }, %{ $self->config->{$self->conf_section->{param}}{$value} } ) );
+                # restart the process
+                @args = @args_orig;
+                @args_orig = ();
             }
         }
         catch {
@@ -534,7 +556,7 @@ Getopt::Alt - Command line option passing with with lots of features
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt version 0.4.8.
+This documentation refers to Getopt::Alt version 0.5.0.
 
 =head1 SYNOPSIS
 
@@ -774,6 +796,10 @@ When using sub-commands this allows you to configure aliases for those
 commands, aliases are recursed, they can have extra arguments though.
 If a configuration file is used aliases can be specified in that file.
 
+=item C<config>
+
+Stores the data in the configuration files
+
 =item C<conf_prefix> - Str (Default ".")
 
 The prefix for finding the configuration files. By default the following
@@ -794,6 +820,14 @@ is used:
 /etc/$conf_prefix$name
 
 =back
+
+=item C<conf_section>
+
+Used if the using program wants the ability to set up configuration groups
+so that the user can have a bunch of default values. This attribute sets the
+name in the configuration where configuration groups can be found. There
+should also be a matching argument so that the user can choose the appropriate
+configuration.
 
 =back
 
@@ -827,7 +861,7 @@ file to get auto-completion.
     }
     complete -F _eg eg
 
-B<Note>: This is different from version 0.4.8 and earlier
+B<Note>: This is different from version 0.5.0 and earlier
 
 =head1 DIAGNOSTICS
 

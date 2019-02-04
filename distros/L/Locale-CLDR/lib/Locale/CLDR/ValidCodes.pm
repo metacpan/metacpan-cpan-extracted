@@ -1,12 +1,12 @@
 package Locale::CLDR::ValidCodes;
 # This file auto generated from Data\common\supplemental\supplementalMetadata.xml
-#	on Sun  7 Oct 10:18:08 am GMT
+#	on Sun  3 Feb  1:37:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1517,6 +1517,7 @@ has 'valid_languages' => (
  cuv
  cuw
  cux
+ cuy
  cv
  cvg
  cvn
@@ -2206,6 +2207,7 @@ has 'valid_languages' => (
  gjr
  gju
  gka
+ gkd
  gke
  gkn
  gko
@@ -2249,6 +2251,7 @@ has 'valid_languages' => (
  gng
  gnh
  gni
+ gnj
  gnk
  gnl
  gnm
@@ -2389,6 +2392,7 @@ has 'valid_languages' => (
  gyl
  gym
  gyn
+ gyo
  gyr
  gyy
  gza
@@ -2459,6 +2463,7 @@ has 'valid_languages' => (
  hka
  hke
  hkk
+ hkn
  hks
  hla
  hlb
@@ -2584,6 +2589,7 @@ has 'valid_languages' => (
  hwo
  hy
  hya
+ hyw
  hyx
  hz
  ia
@@ -3903,6 +3909,7 @@ has 'valid_languages' => (
  lwl
  lwm
  lwo
+ lws
  lwt
  lwu
  lww
@@ -4816,6 +4823,7 @@ has 'valid_languages' => (
  nlj
  nlk
  nll
+ nlm
  nln
  nlo
  nlq
@@ -5060,6 +5068,7 @@ has 'valid_languages' => (
  nyy
  nza
  nzb
+ nzd
  nzi
  nzk
  nzm
@@ -5272,6 +5281,7 @@ has 'valid_languages' => (
  pbh
  pbi
  pbl
+ pbm
  pbn
  pbo
  pbp
@@ -6468,6 +6478,7 @@ has 'valid_languages' => (
  tew
  tex
  tey
+ tez
  tfi
  tfn
  tfo
@@ -8759,6 +8770,7 @@ has 'valid_scripts' => (
  Zanb
  Zinh
  Zyyy
+ Qaag
  Zmth
  Zsye
  Zsym
@@ -8769,7 +8781,6 @@ has 'valid_scripts' => (
  Qaad
  Qaae
  Qaaf
- Qaag
  Qaah
  Qaaj
  Qaak
@@ -9083,6 +9094,8 @@ has 'valid_regions' => (
  ZA
  ZM
  ZW
+ XA
+ XB
  001
  002
  003
@@ -9131,8 +9144,6 @@ has 'valid_regions' => (
  QX
  QY
  QZ
- XA
- XB
  XC
  XD
  XE
@@ -9182,9 +9193,11 @@ has 'valid_variants' => (
  alalc97
  aluku
  ao1990
+ aranes
  arevela
  arevmda
  asante
+ auvern
  baku1926
  balanka
  barla
@@ -9194,15 +9207,22 @@ has 'valid_variants' => (
  biske
  bohoric
  boont
+ cisaup
  colb1945
  cornu
+ creiss
  dajnko
  ekavsk
  emodeng
  fonipa
+ fonkirsh
  fonnapa
  fonupa
  fonxsamp
+ gascon
+ grclass
+ grital
+ grmistr
  hepburn
  heploc
  hognorsk
@@ -9216,6 +9236,8 @@ has 'valid_variants' => (
  kociewie
  kscor
  laukika
+ lemosin
+ lengadoc
  lipaw
  luna1918
  metelko
@@ -9223,6 +9245,7 @@ has 'valid_variants' => (
  ndyuka
  nedis
  newfound
+ nicard
  njiva
  nulik
  osojs
@@ -9234,6 +9257,7 @@ has 'valid_variants' => (
  petr1708
  pinyin
  polyton
+ provenc
  puter
  rigik
  rozaj
@@ -9255,6 +9279,7 @@ has 'valid_variants' => (
  vaidika
  valencia
  vallader
+ vivaraup
  wadegile
  xsistemo
  	)]},
@@ -9361,7 +9386,7 @@ has 'valid_currencies' => (
  MMK
  MNT
  MOP
- MRO
+ MRU
  MUR
  MVR
  MWK
@@ -9415,7 +9440,7 @@ has 'valid_currencies' => (
  USD
  UYU
  UZS
- VEF
+ VES
  VND
  VUV
  WST
@@ -10132,37 +10157,40 @@ has 'valid_subdivisions' => (
  cmou
  cmsu
  cmsw
- cn11
- cn12
- cn13
- cn14
- cn15
- cn21
- cn22
- cn23
- cn31
- cn32
- cn33
- cn34
- cn35
- cn36
- cn37
- cn41
- cn42
- cn43
- cn44
- cn45
- cn46
- cn50
- cn51
- cn52
- cn53
- cn54
- cn61
- cn62
- cn63
- cn64
- cn65
+ cnah
+ cnbj
+ cncq
+ cnfj
+ cngd
+ cngs
+ cngx
+ cngz
+ cnha
+ cnhb
+ cnhe
+ cnhi
+ cnhk
+ cnhl
+ cnhn
+ cnjl
+ cnjs
+ cnjx
+ cnln
+ cnmo
+ cnnm
+ cnnx
+ cnqh
+ cnsc
+ cnsd
+ cnsh
+ cnsn
+ cnsx
+ cntj
+ cntw
+ cnxj
+ cnxz
+ cnyn
+ cnzj
  coama
  coant
  coara
@@ -11751,6 +11779,7 @@ has 'valid_subdivisions' => (
  kp09
  kp10
  kp13
+ kp14
  kr11
  kr26
  kr27
@@ -12132,10 +12161,6 @@ has 'valid_subdivisions' => (
  ma10
  ma11
  ma12
- ma13
- ma14
- ma15
- ma16
  maagd
  maaou
  maasz
@@ -12145,17 +12170,21 @@ has 'valid_subdivisions' => (
  mabes
  mabod
  mabom
+ mabrr
  macas
  mache
  machi
  macht
+ madri
  maerr
  maesi
  maesm
  mafah
  mafes
  mafig
+ mafqh
  mague
+ maguf
  mahaj
  mahao
  mahoc
@@ -12170,10 +12199,11 @@ has 'valid_subdivisions' => (
  makho
  malaa
  malar
+ mamar
+ mamdf
  mamed
  mamek
- mammd
- mammn
+ mamid
  mamoh
  mamou
  manad
@@ -12181,23 +12211,30 @@ has 'valid_subdivisions' => (
  maoua
  maoud
  maouj
+ maouz
  marab
+ mareh
  masaf
  masal
  masef
  maset
+ masib
+ masif
  masik
+ masil
  maskh
- masyb
+ mataf
  matai
  matao
  matar
  matat
  mataz
  matet
+ matin
  matiz
  matng
  matnt
+ mayus
  mazag
  mccl
  mcco
@@ -12380,6 +12417,7 @@ has 'valid_subdivisions' => (
  mk83
  mk85
  ml1
+ ml10
  ml2
  ml3
  ml4
@@ -12387,6 +12425,7 @@ has 'valid_subdivisions' => (
  ml6
  ml7
  ml8
+ ml9
  mlbko
  mm01
  mm02
@@ -13073,6 +13112,7 @@ has 'valid_subdivisions' => (
  qakh
  qams
  qara
+ qash
  qaus
  qawa
  qaza
@@ -14017,6 +14057,7 @@ has 'valid_subdivisions' => (
  ug122
  ug123
  ug124
+ ug125
  ug201
  ug202
  ug203
@@ -14049,6 +14090,8 @@ has 'valid_subdivisions' => (
  ug230
  ug231
  ug232
+ ug233
+ ug234
  ug301
  ug302
  ug303
@@ -14079,6 +14122,8 @@ has 'valid_subdivisions' => (
  ug328
  ug329
  ug330
+ ug331
+ ug332
  ug401
  ug402
  ug403
@@ -14105,6 +14150,11 @@ has 'valid_subdivisions' => (
  ug424
  ug425
  ug426
+ ug427
+ ug428
+ ug429
+ ug430
+ ug431
  ugc
  uge
  ugn
@@ -15149,9 +15199,11 @@ has 'valid_keys' => (
 			'uyi',
 			'uyp',
 			'uyu',
+			'uyw',
 			'uzs',
 			'veb',
 			'vef',
+			'ves',
 			'vnd',
 			'vnn',
 			'vuv',
@@ -15220,6 +15272,7 @@ has 'valid_keys' => (
 			'numericPinyin',
 			'null',
 			'remove',
+			'zawgyi',
 		],
 		em	=> [
 			'emoji',

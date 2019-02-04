@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib;
 
 # ABSTRACT: Perlish wrapper for Raylib videogame library
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 use Carp;
 use Graphics::Raylib::XS qw(:all);
@@ -22,7 +22,7 @@ Graphics::Raylib - Perlish wrapper for Raylib videogame library
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

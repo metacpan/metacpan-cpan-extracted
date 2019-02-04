@@ -3,37 +3,41 @@ abstract: 'YALI - Yet Another Language Identifier.'
 author:
   - 'Martin Majlis <martin@majlis.cz>'
 build_requires:
-  File::Spec: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Test::Command: 0
-  Test::Exception: 0
-  Test::More: 0
-  Time::HiRes: 0
-  perl: 5.006
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Command: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
-  File::ShareDir::Install: 0.03
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Lingua-YALI
 requires:
-  Carp: 0
-  File::Basename: 0
-  File::Glob: 0
-  File::ShareDir: 0
-  Getopt::Long: 0
-  List::MoreUtils: 0
-  Moose: 0
-  Moose::Util::TypeConstraints: 0
-  POSIX: 0
-  PerlIO::gzip: 0
-  Pod::Usage: 0
-  bytes: 0
-  strict: 0
-  warnings: 0
-version: 0.015
+  Carp: '0'
+  File::Basename: '0'
+  File::Glob: '0'
+  File::ShareDir: '0'
+  Getopt::Long: '0'
+  List::MoreUtils: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  POSIX: '0'
+  PerlIO::gzip: '0'
+  Pod::Usage: '0'
+  bytes: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/martin-majlis/YALI.git
+version: '0.016'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

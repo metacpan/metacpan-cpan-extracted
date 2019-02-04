@@ -1,5 +1,9 @@
 Revision history for App-Git-Info
 
+0.4.0       2019-02-03
+    - Switch from App::Rad to App::Cmd .
+        - For cleaner code.
+
 0.2.0       2018-08-22
     - Put the actual processing in a main::run() sub.
         - In part to silence the tests.

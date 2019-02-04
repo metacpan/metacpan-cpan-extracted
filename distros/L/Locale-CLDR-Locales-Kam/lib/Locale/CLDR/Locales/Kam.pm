@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Kam - Package for language Kamba
 
 package Locale::CLDR::Locales::Kam;
 # This file auto generated from Data\common\main\kam.xml
-#	on Sun  7 Oct 10:40:48 am GMT
+#	on Sun  3 Feb  1:59:59 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -840,13 +840,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{Ĩyawĩoo},
-					'am' => q{Ĩyakwakya},
-				},
 				'wide' => {
 					'am' => q{Ĩyakwakya},
 					'pm' => q{Ĩyawĩoo},
+				},
+				'abbreviated' => {
+					'pm' => q{Ĩyawĩoo},
+					'am' => q{Ĩyakwakya},
 				},
 			},
 		},
@@ -926,7 +926,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -949,7 +949,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

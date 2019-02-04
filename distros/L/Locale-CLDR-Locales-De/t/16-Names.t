@@ -15,7 +15,7 @@ my $locale = Locale::CLDR->new('de_DE');
 my $other_locale = Locale::CLDR->new('de_BE');
 
 is($locale->locale_name(), 'Deutsch (Deutschland)', 'Locale name from current locale');
-is($locale->locale_name('fr_CA'), 'Kanadisches Französisch', 'Locale name from string');
+is($locale->locale_name('fr_CA'), 'Französisch (Kanada)', 'Locale name from string');
 is($locale->locale_name($other_locale), 'Deutsch (Belgien)', 'Locale name from other locale object');
 
 is($locale->language_name(), 'Deutsch', 'Language name from current locale');
@@ -52,7 +52,7 @@ my $all_languages = {
 	'aro' => 'Araona',
 	'arp' => 'Arapaho',
 	'arq' => 'Algerisches Arabisch',
-	'ars' => 'Nadschd-Arabisch',
+	'ars' => 'Arabisch (Nadschd)',
 	'arw' => 'Arawak',
 	'ary' => 'Marokkanisches Arabisch',
 	'arz' => 'Ägyptisches Arabisch',
@@ -167,18 +167,11 @@ my $all_languages = {
 	'el' => 'Griechisch',
 	'elx' => 'Elamisch',
 	'en' => 'Englisch',
-	'en_AU' => 'Australisches Englisch',
-	'en_CA' => 'Kanadisches Englisch',
-	'en_GB' => 'Britisches Englisch',
-	'en_GB@alt=short' => 'UK-Englisch',
-	'en_US' => 'Amerikanisches Englisch',
-	'en_US@alt=short' => 'US-Englisch',
+	'en_GB@alt=short' => 'Englisch (GB)',
+	'en_US@alt=short' => 'Englisch (USA)',
 	'enm' => 'Mittelenglisch',
 	'eo' => 'Esperanto',
 	'es' => 'Spanisch',
-	'es_419' => 'Lateinamerikanisches Spanisch',
-	'es_ES' => 'Europäisches Spanisch',
-	'es_MX' => 'Mexikanisches Spanisch',
 	'esu' => 'Zentral-Alaska-Yupik',
 	'et' => 'Estnisch',
 	'eu' => 'Baskisch',
@@ -195,8 +188,6 @@ my $all_languages = {
 	'fo' => 'Färöisch',
 	'fon' => 'Fon',
 	'fr' => 'Französisch',
-	'fr_CA' => 'Kanadisches Französisch',
-	'fr_CH' => 'Schweizer Französisch',
 	'frc' => 'Cajun',
 	'frm' => 'Mittelfranzösisch',
 	'fro' => 'Altfranzösisch',
@@ -218,7 +209,7 @@ my $all_languages = {
 	'gl' => 'Galicisch',
 	'glk' => 'Gilaki',
 	'gmh' => 'Mittelhochdeutsch',
-	'gn' => 'Guarani',
+	'gn' => 'Guaraní',
 	'goh' => 'Althochdeutsch',
 	'gom' => 'Goa-Konkani',
 	'gon' => 'Gondi',
@@ -464,8 +455,6 @@ my $all_languages = {
 	'pro' => 'Altprovenzalisch',
 	'ps' => 'Paschtu',
 	'pt' => 'Portugiesisch',
-	'pt_BR' => 'Brasilianisches Portugiesisch',
-	'pt_PT' => 'Europäisches Portugiesisch',
 	'qu' => 'Quechua',
 	'quc' => 'K’iche’',
 	'qug' => 'Chimborazo Hochland-Quechua',
@@ -666,7 +655,7 @@ my $all_scripts = {
 	'Blis' => 'Bliss-Symbole',
 	'Bopo' => 'Bopomofo',
 	'Brah' => 'Brahmi',
-	'Brai' => 'Blindenschrift',
+	'Brai' => 'Braille',
 	'Bugi' => 'Buginesisch',
 	'Buhd' => 'Buhid',
 	'Cakm' => 'Chakma',
@@ -860,6 +849,7 @@ my $all_regions = {
 	'151' => 'Osteuropa',
 	'154' => 'Nordeuropa',
 	'155' => 'Westeuropa',
+	'202' => 'Subsahara-Afrika',
 	'419' => 'Lateinamerika',
 	'AC' => 'Ascension',
 	'AD' => 'Andorra',

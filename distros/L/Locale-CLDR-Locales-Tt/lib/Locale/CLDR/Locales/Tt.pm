@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Tt - Package for language Tatar
 
 package Locale::CLDR::Locales::Tt;
 # This file auto generated from Data\common\main\tt.xml
-#	on Sun  7 Oct 11:04:52 am GMT
+#	on Sun  3 Feb  2:24:13 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -72,6 +72,7 @@ has 'display_name_language' => (
  				'cy' => 'уэльс',
  				'da' => 'дания',
  				'de' => 'алман',
+ 				'de_CH' => 'югары алман (Швейцария)',
  				'dsb' => 'түбән сорб',
  				'dv' => 'мальдив',
  				'dz' => 'дзонг-кха',
@@ -80,6 +81,7 @@ has 'display_name_language' => (
  				'eo' => 'эсперанто',
  				'es' => 'испан',
  				'es_419' => 'испан (Латин Америкасы)',
+ 				'es_ES' => 'испан (Европа)',
  				'et' => 'эстон',
  				'eu' => 'баск',
  				'fa' => 'фарсы',
@@ -151,6 +153,7 @@ has 'display_name_language' => (
  				'pl' => 'поляк',
  				'ps' => 'пушту',
  				'pt' => 'португал',
+ 				'pt_PT' => 'португал (Европа)',
  				'qu' => 'кечуа',
  				'quc' => 'киче',
  				'rm' => 'ретороман',
@@ -194,7 +197,7 @@ has 'display_name_language' => (
  				'wo' => 'волоф',
  				'yi' => 'идиш',
  				'yo' => 'йоруба',
- 				'zh' => 'кытай (тәрҗемә киңәше: аерым алганда, мандарин кытайчасы)',
+ 				'zh' => 'кытай',
  				'zh_Hans' => 'гадиләштерелгән кытай',
  				'zh_Hant' => 'традицион кытай',
 
@@ -546,9 +549,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
+			auxiliary => qr{[ғ қ ӯ]},
 			index => ['А', 'Ә', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'Җ', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'Ң', 'О', 'Ө', 'П', 'Р', 'С', 'Т', 'У', 'Ү', 'Ф', 'Х', 'Һ', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'],
 			main => qr{[а ә б в г д е ё ж җ з и й к л м н ң о ө п р с т у ү ф х һ ц ч ш щ ъ ы ь э ю я]},
 			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # ′ ″]},
 		};
 	},
 EOT
@@ -736,7 +741,7 @@ has 'currencies' => (
 		'CNY' => {
 			symbol => 'CN¥',
 			display_name => {
-				'currency' => q(кытай юане),
+				'currency' => q(Кытай юане),
 				'other' => q(юань),
 			},
 		},
@@ -764,7 +769,7 @@ has 'currencies' => (
 		'JPY' => {
 			symbol => 'JP¥',
 			display_name => {
-				'currency' => q(япон иенасы),
+				'currency' => q(Япония иенасы),
 				'other' => q(иена),
 			},
 		},
@@ -1061,30 +1066,30 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 				'narrow' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
 				'wide' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 				'wide' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
-				'abbreviated' => {
-					'am' => q{AM},
+				'narrow' => {
 					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
 				},
 			},
 		},
@@ -1211,7 +1216,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{dd.MM.y},
 			yQQQ => q{QQQ, y 'ел'},
 			yQQQQ => q{QQQQ, y 'ел'},
-			yw => q{y 'елның' w 'атнасы'},
+			yw => q{Y 'елның' w 'атнасы'},
 		},
 	} },
 );
@@ -1232,9 +1237,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			fallback => '{0} – {1}',
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -1329,6 +1331,9 @@ has 'datetime_formats_interval' => (
 				d => q{dd.MM.y – dd.MM.y},
 				y => q{dd.MM.y – dd.MM.y},
 			},
+		},
+		'generic' => {
+			fallback => '{0} – {1}',
 		},
 	} },
 );

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.131;
+our $VERSION = 1.132;
 
 use Quiq::Option;
 use Quiq::Hash;
@@ -776,41 +776,41 @@ definiert eine Primäschlüsselkolumne.
 Bestimme Informationen zu Route, Abschnitt, Fahrt, Fahrt_Parameter
 und Parameter zu der Kombination aus Fahrten und Parametern:
 
-     1: my @pas_id = $req->getArray('pas_id');
-     2: my @mea_id = $req->getArray('mea_id');
-     3: 
-     4: my $tab = FerryBox::Model::Join::RouSecPasPamMea->select($db2,
-     5:     -select=>'rou.id rou_id','sec.id sec_id','pas.id pas_id',
-     6:         'pam.id pam_id','mea.id mea_id',
-     7:     -where,
-     8:         'pas.id'=>['IN',@pas_id],
-     9:         'mea.id'=>['IN',@mea_id],
-    10: );
-    11: 
-    12: my $rouT = $tab->selectParentRows($db2,
-    13:     rou_id=>'FerryBox::Model::Table::Route',
-    14:     -select=>qw/id name/,
-    15: );
-    16: 
-    17: my $secT = $tab->selectParentRows($db2,
-    18:     sec_id=>'FerryBox::Model::Table::Section',
-    19:     -select=>qw/id route_id secname/,
-    20: );
-    21: 
-    22: my $pasT = $tab->selectParentRows($db2,
-    23:     pas_id=>'FerryBox::Model::Table::Passage',
-    24:     -select=>qw/id section_id starttime/,
-    25: );
-    26: 
-    27: my $pamT = $tab->selectParentRows($db2,
-    28:     pam_id=>'FerryBox::Model::Table::Passage_Measseq',
-    29:     -select=>qw/id passage_id measseq_id/,
-    30: );
-    31: 
-    32: my $meaT = $tab->selectParentRows($db2,
-    33:     mea_id=>'FerryBox::Model::Table::Measseq',
-    34:     -select=>qw/id route_id meas/,
-    35: );
+    my @pas_id = $req->getArray('pas_id');
+    my @mea_id = $req->getArray('mea_id');
+    
+    my $tab = FerryBox::Model::Join::RouSecPasPamMea->select($db2,
+        -select=>'rou.id rou_id','sec.id sec_id','pas.id pas_id',
+            'pam.id pam_id','mea.id mea_id',
+        -where,
+            'pas.id'=>['IN',@pas_id],
+            'mea.id'=>['IN',@mea_id],
+    );
+    
+    my $rouT = $tab->selectParentRows($db2,
+        rou_id=>'FerryBox::Model::Table::Route',
+        -select=>qw/id name/,
+    );
+    
+    my $secT = $tab->selectParentRows($db2,
+        sec_id=>'FerryBox::Model::Table::Section',
+        -select=>qw/id route_id secname/,
+    );
+    
+    my $pasT = $tab->selectParentRows($db2,
+        pas_id=>'FerryBox::Model::Table::Passage',
+        -select=>qw/id section_id starttime/,
+    );
+    
+    my $pamT = $tab->selectParentRows($db2,
+        pam_id=>'FerryBox::Model::Table::Passage_Measseq',
+        -select=>qw/id passage_id measseq_id/,
+    );
+    
+    my $meaT = $tab->selectParentRows($db2,
+        mea_id=>'FerryBox::Model::Table::Measseq',
+        -select=>qw/id route_id meas/,
+    );
 
 =cut
 
@@ -837,7 +837,7 @@ sub selectParentRows {
 
 =head1 VERSION
 
-1.131
+1.132
 
 =head1 AUTHOR
 

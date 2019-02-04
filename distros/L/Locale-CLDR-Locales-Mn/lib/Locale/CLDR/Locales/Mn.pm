@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mn - Package for language Mongolian
 
 package Locale::CLDR::Locales::Mn;
 # This file auto generated from Data\common\main\mn.xml
-#	on Sun  7 Oct 10:46:35 am GMT
+#	on Sun  3 Feb  2:05:45 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -52,7 +52,7 @@ has 'display_name_language' => (
  				'ace' => 'ачин',
  				'ada' => 'адангмэ',
  				'ady' => 'адигэ',
- 				'af' => 'африк',
+ 				'af' => 'африкаанс',
  				'agq' => 'агем',
  				'ain' => 'айну',
  				'ak' => 'акан',
@@ -100,11 +100,11 @@ has 'display_name_language' => (
  				'chk' => 'чуук',
  				'chm' => 'мари хэл',
  				'cho' => 'чоктау',
- 				'chr' => 'чироки',
+ 				'chr' => 'чероки',
  				'chy' => 'чэенн',
  				'ckb' => 'төв курд',
  				'co' => 'корсик',
- 				'crs' => 'сеселва креолын франц',
+ 				'crs' => 'сеселва креол франц',
  				'cs' => 'чех',
  				'cu' => 'сүмийн славян',
  				'cv' => 'чуваш',
@@ -115,7 +115,7 @@ has 'display_name_language' => (
  				'dav' => 'тайта',
  				'de' => 'герман',
  				'de_AT' => 'австри-герман',
- 				'de_CH' => 'швейцари дээр герман',
+ 				'de_CH' => 'швейцарь-герман',
  				'dgr' => 'догриб',
  				'dje' => 'зарма',
  				'dsb' => 'доод сорби',
@@ -146,8 +146,8 @@ has 'display_name_language' => (
  				'ewo' => 'эвондо',
  				'fa' => 'перс',
  				'ff' => 'фула',
- 				'fi' => 'финлянд',
- 				'fil' => 'филиппин',
+ 				'fi' => 'фин',
+ 				'fil' => 'филипино',
  				'fj' => 'фижи',
  				'fo' => 'фарер',
  				'fon' => 'фон',
@@ -178,8 +178,8 @@ has 'display_name_language' => (
  				'hmn' => 'хмонг',
  				'hr' => 'хорват',
  				'hsb' => 'дээд сорби',
- 				'ht' => 'гаитийн креол',
- 				'hu' => 'унгар',
+ 				'ht' => 'Гаитийн креол',
+ 				'hu' => 'мажар',
  				'hup' => 'хупа',
  				'hy' => 'армен',
  				'hz' => 'хереро',
@@ -215,7 +215,7 @@ has 'display_name_language' => (
  				'khq' => 'койра чини',
  				'ki' => 'кикуюү',
  				'kj' => 'куаньяма',
- 				'kk' => 'хасаг',
+ 				'kk' => 'казах',
  				'kkj' => 'како',
  				'kl' => 'калалисут',
  				'kln' => 'каленжин',
@@ -231,7 +231,7 @@ has 'display_name_language' => (
  				'krl' => 'карель',
  				'kru' => 'курук',
  				'ks' => 'кашмир',
- 				'ksb' => 'шамбала',
+ 				'ksb' => 'шамбал',
  				'ksf' => 'бафиа',
  				'ksh' => 'кёльш',
  				'ku' => 'курд',
@@ -328,7 +328,7 @@ has 'display_name_language' => (
  				'pcm' => 'нигерийн пиджин',
  				'pl' => 'польш',
  				'prg' => 'прусс',
- 				'ps' => 'пашто',
+ 				'ps' => 'пушту',
  				'pt' => 'португал',
  				'pt_BR' => 'португал хэл (Бразил)',
  				'pt_PT' => 'португал хэл (Европ)',
@@ -412,7 +412,7 @@ has 'display_name_language' => (
  				'twq' => 'тасавак',
  				'ty' => 'таити',
  				'tyv' => 'тува',
- 				'tzm' => 'төв атласын тамазайт',
+ 				'tzm' => 'Төв Атласын тамазайт',
  				'udm' => 'удмурт',
  				'ug' => 'уйгур',
  				'uk' => 'украин',
@@ -438,7 +438,7 @@ has 'display_name_language' => (
  				'yi' => 'иддиш',
  				'yo' => 'ёруба',
  				'yue' => 'кантон',
- 				'zgh' => 'тамазит',
+ 				'zgh' => 'Мороккогийн стандарт тамазайт',
  				'zh' => 'хятад',
  				'zh_Hans' => 'хялбаршуулсан хятад',
  				'zh_Hant' => 'уламжлалт хятад',
@@ -465,7 +465,7 @@ has 'display_name_script' => (
 			my %scripts = (
 			'Arab' => 'араб',
  			'Armn' => 'армени',
- 			'Beng' => 'бенгал хэл',
+ 			'Beng' => 'бенгал',
  			'Bopo' => 'вопомофо',
  			'Brai' => 'брайл',
  			'Cyrl' => 'кирилл',
@@ -538,12 +538,12 @@ has 'display_name_region' => (
  			'018' => 'Өмнөд Африк тив',
  			'019' => 'Америк',
  			'021' => 'Хойд Америк тив',
- 			'029' => 'Карибын',
+ 			'029' => 'Карибын тэнгис',
  			'030' => 'Зүүн Ази',
  			'034' => 'Өмнөд Ази',
  			'035' => 'Зүүн өмнөд Ази',
  			'039' => 'Өмнөд Европ',
- 			'053' => 'Австралиази',
+ 			'053' => 'Австрали-Ази',
  			'054' => 'Меланези',
  			'057' => 'Микронезийн бүс',
  			'061' => 'Полинези',
@@ -558,7 +558,7 @@ has 'display_name_region' => (
  			'419' => 'Латин Америк',
  			'AC' => 'Асенсион арал',
  			'AD' => 'Андорра',
- 			'AE' => 'Арабын Нэгдсэн Эмират Улс',
+ 			'AE' => 'Арабын Нэгдсэн Эмирт Улс',
  			'AF' => 'Афганистан',
  			'AG' => 'Антигуа ба Барбуда',
  			'AI' => 'Ангилья',
@@ -591,15 +591,15 @@ has 'display_name_region' => (
  			'BS' => 'Багамын арлууд',
  			'BT' => 'Бутан',
  			'BV' => 'Буве арал',
- 			'BW' => 'Ботсвана',
+ 			'BW' => 'Ботсван',
  			'BY' => 'Беларусь',
- 			'BZ' => 'Белиз',
+ 			'BZ' => 'Белизе',
  			'CA' => 'Канад',
  			'CC' => 'Кокос (Кийлинг) арлууд',
  			'CD' => 'Конго-Киншаса',
  			'CD@alt=variant' => 'Бүгд Найрамдах Ардчилсан Конго Улс',
  			'CF' => 'Төв Африкийн Бүгд Найрамдах Улс',
- 			'CG' => 'Конго Браззавиль',
+ 			'CG' => 'Конго-Браззавиль',
  			'CG@alt=variant' => 'Конго (Бүгд Найрамдах улс)',
  			'CH' => 'Швейцарь',
  			'CI' => 'Кот-д’Ивуар',
@@ -635,7 +635,7 @@ has 'display_name_region' => (
  			'ET' => 'Этиоп',
  			'EU' => 'Европын Холбоо',
  			'EZ' => 'Евро бүс',
- 			'FI' => 'Финланд',
+ 			'FI' => 'Финлянд',
  			'FJ' => 'Фижи',
  			'FK' => 'Фолклендийн арлууд',
  			'FK@alt=variant' => 'Фолклендийн арлууд (Мальвины арлууд)',
@@ -657,7 +657,7 @@ has 'display_name_region' => (
  			'GP' => 'Гваделуп',
  			'GQ' => 'Экваторын Гвиней',
  			'GR' => 'Грек',
- 			'GS' => 'Өмнөд Жоржиа ба Өмнөд Сэндвичийн Арлууд',
+ 			'GS' => 'Өмнөд Жоржиа ба Өмнөд Сэндвичийн арлууд',
  			'GT' => 'Гватемал',
  			'GU' => 'Гуам',
  			'GW' => 'Гвиней-Бисау',
@@ -714,7 +714,7 @@ has 'display_name_region' => (
  			'MG' => 'Мадагаскар',
  			'MH' => 'Маршаллын арлууд',
  			'MK' => 'Македон',
- 			'MK@alt=variant' => 'Македон (Хуучин Югославын бүрэлдэхүүний Македон)',
+ 			'MK@alt=variant' => 'Македон (Хуучин ЮБНМУ)',
  			'ML' => 'Мали',
  			'MM' => 'Мьянмар',
  			'MN' => 'Монгол',
@@ -725,7 +725,7 @@ has 'display_name_region' => (
  			'MR' => 'Мавритани',
  			'MS' => 'Монтсеррат',
  			'MT' => 'Мальта',
- 			'MU' => 'Маврики',
+ 			'MU' => 'Маврикий',
  			'MV' => 'Мальдив',
  			'MW' => 'Малави',
  			'MX' => 'Мексик',
@@ -754,7 +754,7 @@ has 'display_name_region' => (
  			'PM' => 'Сент-Пьер ба Микело',
  			'PN' => 'Питкэрн арлууд',
  			'PR' => 'Пуэрто-Рико',
- 			'PS' => 'Палестины нутаг дэвсгэрүүд',
+ 			'PS' => 'Палестины нутаг дэвсгэр',
  			'PS@alt=short' => 'Палестин',
  			'PT' => 'Португал',
  			'PW' => 'Палау',
@@ -782,7 +782,7 @@ has 'display_name_region' => (
  			'SO' => 'Сомали',
  			'SR' => 'Суринам',
  			'SS' => 'Өмнөд Судан',
- 			'ST' => 'Сан-Томе Принсипи',
+ 			'ST' => 'Сан-Томе ба Принсипи',
  			'SV' => 'Эль Сальвадор',
  			'SX' => 'Синт Мартен',
  			'SY' => 'Сири',
@@ -817,8 +817,8 @@ has 'display_name_region' => (
  			'VA' => 'Ватикан хот улс',
  			'VC' => 'Сент-Винсент ба Гренадин',
  			'VE' => 'Венесуэл',
- 			'VG' => 'Британийн Виржиний Арлууд',
- 			'VI' => 'АНУ-ын Виржиний Арлууд',
+ 			'VG' => 'Британийн Виржиний арлууд',
+ 			'VI' => 'АНУ-ын Виржиний арлууд',
  			'VN' => 'Вьетнам',
  			'VU' => 'Вануату',
  			'WF' => 'Уоллис ба Футуна',
@@ -841,14 +841,14 @@ has 'display_name_key' => (
 	init_arg	=> undef,
 	default		=> sub { 
 		{
-			'calendar' => 'хуанли',
- 			'cf' => 'валютын формат',
- 			'collation' => 'Захиалга ялгах',
+			'calendar' => 'цаглавар',
+ 			'cf' => 'мөнгөн тэмдэгтийн хэлбэр',
+ 			'collation' => 'эрэмбэлэх дараалал',
  			'currency' => 'мөнгөн тэмдэгт',
- 			'hc' => 'Цагийн горим (12 эсвэл 24)',
- 			'lb' => 'Мөрийн зайн загвар',
- 			'ms' => 'Хэмжүүрийн систем',
- 			'numbers' => 'Тоо',
+ 			'hc' => 'цагийн мөчлөг (12 эсвэл 24)',
+ 			'lb' => 'мөрийн зайн загвар',
+ 			'ms' => 'нэгжийн систем',
+ 			'numbers' => 'тоо',
 
 		}
 	},
@@ -861,25 +861,25 @@ has 'display_name_type' => (
 	default		=> sub {
 		{
 			'calendar' => {
- 				'buddhist' => q{буддын хуанли},
- 				'chinese' => q{хятад хуанли},
- 				'dangi' => q{данги хуанли},
- 				'ethiopic' => q{этиоп хуанли},
- 				'gregorian' => q{грегорийн хуанли},
- 				'hebrew' => q{еврей хуанли},
- 				'islamic' => q{исламын хуанли},
- 				'iso8601' => q{ISO-8601 хуанли},
- 				'japanese' => q{япон хуанли},
- 				'persian' => q{перс хуанли},
- 				'roc' => q{минго хуанли},
+ 				'buddhist' => q{буддын цаглавар},
+ 				'chinese' => q{хятад цаглавар},
+ 				'dangi' => q{данги цаглавар},
+ 				'ethiopic' => q{этиоп цаглавар},
+ 				'gregorian' => q{грегорийн цаглавар},
+ 				'hebrew' => q{еврей цаглавар},
+ 				'islamic' => q{исламын цаглавар},
+ 				'iso8601' => q{ISO-8601 цаглавар},
+ 				'japanese' => q{япон цаглавар},
+ 				'persian' => q{перс цаглавар},
+ 				'roc' => q{минго цаглавар},
  			},
  			'cf' => {
- 				'account' => q{Нягтлангийн валютын формат},
- 				'standard' => q{стандарт валютын формат},
+ 				'account' => q{мөнгөн тэмдэгтийн нягтлан бодох бүртгэлийн хэлбэр},
+ 				'standard' => q{мөнгөн тэмдэгтийн стандарт хэлбэр},
  			},
  			'collation' => {
  				'ducet' => q{юникодын үндсэн эрэмбэлэх дараалал},
- 				'search' => q{ерөнхий зорилготой хайлт},
+ 				'search' => q{ерөнхий хайлт},
  				'standard' => q{стандарт эрэмбэлэх дараалал},
  			},
  			'hc' => {
@@ -895,14 +895,14 @@ has 'display_name_type' => (
  			},
  			'ms' => {
  				'metric' => q{метрийн систем},
- 				'uksystem' => q{английн хэмжүүрийн систем},
- 				'ussystem' => q{америк хэмжүүрийн систем},
+ 				'uksystem' => q{Англи нэгжийн систем},
+ 				'ussystem' => q{Америк нэгжийн систем},
  			},
  			'numbers' => {
  				'arab' => q{араб-энэтхэг тоо},
  				'arabext' => q{өргөтгөсөн араб-энэтхэг тоо},
- 				'armn' => q{армени тоо},
- 				'armnlow' => q{жижиг армени тоо},
+ 				'armn' => q{армен тоо},
+ 				'armnlow' => q{жижиг армен тоо},
  				'beng' => q{бенгал тоо},
  				'deva' => q{деванагари тоо},
  				'ethi' => q{этиоп тоо},
@@ -911,7 +911,7 @@ has 'display_name_type' => (
  				'grek' => q{грек тоо},
  				'greklow' => q{жижиг грек тоо},
  				'gujr' => q{гүжарати тоо},
- 				'guru' => q{гүрмүкхи тоо},
+ 				'guru' => q{гүрмүхи тоо},
  				'hanidec' => q{хятад аравтын тоо},
  				'hans' => q{хялбаршуулсан хятад тоо},
  				'hansfin' => q{хялбаршуулсан хятад санхүүгийн тоо},
@@ -932,7 +932,7 @@ has 'display_name_type' => (
  				'romanlow' => q{жижиг ром тоо},
  				'taml' => q{уламжлалт тамил тоо},
  				'tamldec' => q{тамил тоо},
- 				'telu' => q{телүгү тоо},
+ 				'telu' => q{тэлүгү тоо},
  				'thai' => q{тай тоо},
  				'tibt' => q{төвд тоо},
  			},
@@ -1089,6 +1089,11 @@ has 'units' => (
 						'name' => q(сансрын нэгж),
 						'one' => q({0} сансрын нэгж),
 						'other' => q({0} сансрын нэгж),
+					},
+					'atmosphere' => {
+						'name' => q(уур амьсгал),
+						'one' => q({0} уур амьсгал),
+						'other' => q({0} уур амьсгал),
 					},
 					'bit' => {
 						'name' => q(бит),
@@ -1606,6 +1611,19 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(хувь),
+						'one' => q({0} хувь),
+						'other' => q({0} хувь),
+					},
+					'permille' => {
+						'name' => q(‰),
+					},
+					'petabyte' => {
+						'name' => q(петабайт),
+						'one' => q({0} петабайт),
+						'other' => q({0} петабайт),
+					},
 					'picometer' => {
 						'name' => q(пикометр),
 						'one' => q({0} пикометр),
@@ -1752,6 +1770,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(чиглэл),
+					},
 					'acre' => {
 						'one' => q({0} акр),
 						'other' => q({0} акр),
@@ -1920,6 +1941,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'one' => q({0} пм),
 						'other' => q({0} пм),
@@ -1969,6 +1995,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(чиглэл),
+					},
 					'acre' => {
 						'name' => q(акр),
 						'one' => q({0} акр),
@@ -1998,6 +2027,11 @@ has 'units' => (
 						'name' => q(сн),
 						'one' => q({0} сн),
 						'other' => q({0} сн),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(бит),
@@ -2515,6 +2549,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(хувь),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(ПБайт),
+						'one' => q({0} ПБ),
+						'other' => q({0} ПБ),
+					},
 					'picometer' => {
 						'name' => q(пм),
 						'one' => q({0} пм),
@@ -2740,36 +2789,36 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'1000' => {
-					'one' => '0мянга',
-					'other' => '0мянга',
+					'one' => '0 мянга',
+					'other' => '0 мянга',
 				},
 				'10000' => {
-					'one' => '00мянга',
-					'other' => '00мянга',
+					'one' => '00 мянга',
+					'other' => '00 мянга',
 				},
 				'100000' => {
-					'one' => '000мянга',
-					'other' => '000мянга',
+					'one' => '000 мянга',
+					'other' => '000 мянга',
 				},
 				'1000000' => {
-					'one' => '0сая',
-					'other' => '0сая',
+					'one' => '0 сая',
+					'other' => '0 сая',
 				},
 				'10000000' => {
-					'one' => '00сая',
-					'other' => '00сая',
+					'one' => '00 сая',
+					'other' => '00 сая',
 				},
 				'100000000' => {
-					'one' => '000сая',
-					'other' => '000сая',
+					'one' => '000 сая',
+					'other' => '000 сая',
 				},
 				'1000000000' => {
-					'one' => '0тэрбум',
-					'other' => '0тэрбум',
+					'one' => '0 тэрбум',
+					'other' => '0 тэрбум',
 				},
 				'10000000000' => {
-					'one' => '00тэрбум',
-					'other' => '00тэрбум',
+					'one' => '00 тэрбум',
+					'other' => '00 тэрбум',
 				},
 				'100000000000' => {
 					'one' => '000Т',
@@ -2843,36 +2892,36 @@ has 'number_formats' => (
 			},
 			'short' => {
 				'1000' => {
-					'one' => '0мянга',
-					'other' => '0мянга',
+					'one' => '0 мянга',
+					'other' => '0 мянга',
 				},
 				'10000' => {
-					'one' => '00мянга',
-					'other' => '00мянга',
+					'one' => '00 мянга',
+					'other' => '00 мянга',
 				},
 				'100000' => {
-					'one' => '000мянга',
-					'other' => '000мянга',
+					'one' => '000 мянга',
+					'other' => '000 мянга',
 				},
 				'1000000' => {
-					'one' => '0сая',
-					'other' => '0сая',
+					'one' => '0 сая',
+					'other' => '0 сая',
 				},
 				'10000000' => {
-					'one' => '00сая',
-					'other' => '00сая',
+					'one' => '00 сая',
+					'other' => '00 сая',
 				},
 				'100000000' => {
-					'one' => '000сая',
-					'other' => '000сая',
+					'one' => '000 сая',
+					'other' => '000 сая',
 				},
 				'1000000000' => {
-					'one' => '0тэрбум',
-					'other' => '0тэрбум',
+					'one' => '0 тэрбум',
+					'other' => '0 тэрбум',
 				},
 				'10000000000' => {
-					'one' => '00тэрбум',
-					'other' => '00тэрбум',
+					'one' => '00 тэрбум',
+					'other' => '00 тэрбум',
 				},
 				'100000000000' => {
 					'one' => '000Т',
@@ -4128,6 +4177,13 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(венесуэлийн боливар \(2008–2018\)),
+				'one' => q(венесуэлийн боливар \(2008–2018\)),
+				'other' => q(венесуэлийн боливар \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(венесуэлийн боливар),
 				'one' => q(венесуэлийн боливар),
 				'other' => q(венесуэлийн боливар),
@@ -4278,18 +4334,18 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'Нэгдүгээр сар',
-							'Хоёрдугаар сар',
-							'Гуравдугаар сар',
-							'Дөрөвдүгээр сар',
-							'Тавдугаар сар',
-							'Зургаадугаар сар',
-							'Долдугаар сар',
-							'Наймдугаар сар',
-							'Есдүгээр сар',
-							'Аравдугаар сар',
-							'Арван нэгдүгээр сар',
-							'Арван хоёрдугаар сар'
+							'нэгдүгээр сар',
+							'хоёрдугаар сар',
+							'гуравдугаар сар',
+							'дөрөвдүгээр сар',
+							'тавдугаар сар',
+							'зургаадугаар сар',
+							'долоодугаар сар',
+							'наймдугаар сар',
+							'есдүгээр сар',
+							'аравдугаар сар',
+							'арван нэгдүгээр сар',
+							'арван хоёрдугаар сар'
 						],
 						leap => [
 							
@@ -4343,7 +4399,7 @@ has 'calendar_months' => (
 							'Дөрөвдүгээр сар',
 							'Тавдугаар сар',
 							'Зургаадугаар сар',
-							'Долдугаар сар',
+							'Долоодугаар сар',
 							'Наймдугаар сар',
 							'Есдүгээр сар',
 							'Аравдугаар сар',
@@ -4432,13 +4488,13 @@ has 'calendar_days' => (
 						sun => 'Ня'
 					},
 					wide => {
-						mon => 'даваа',
-						tue => 'мягмар',
-						wed => 'лхагва',
-						thu => 'пүрэв',
-						fri => 'баасан',
-						sat => 'бямба',
-						sun => 'ням'
+						mon => 'Даваа',
+						tue => 'Мягмар',
+						wed => 'Лхагва',
+						thu => 'Пүрэв',
+						fri => 'Баасан',
+						sat => 'Бямба',
+						sun => 'Ням'
 					},
 				},
 			},
@@ -4469,10 +4525,10 @@ has 'calendar_quarters' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {0 => 'I',
-						1 => 'II',
-						2 => 'III',
-						3 => 'IV'
+					abbreviated => {0 => 'I улирал',
+						1 => 'II улирал',
+						2 => 'III улирал',
+						3 => 'IV улирал'
 					},
 					narrow => {0 => 'I',
 						1 => 'II',
@@ -4505,22 +4561,22 @@ has 'day_period_data' => (
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 				}
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 				}
 				last SWITCH;
 				}
@@ -4530,22 +4586,22 @@ has 'day_period_data' => (
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 				}
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 				}
 				last SWITCH;
 				}
@@ -4565,67 +4621,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'night1' => q{шөнө},
-					'morning1' => q{өглөө},
-					'am' => q{ҮӨ},
-					'evening1' => q{орой},
-					'pm' => q{ҮХ},
-					'noon' => q{үд дунд},
-					'midnight' => q{шөнө дунд},
-					'afternoon1' => q{өдөр},
-				},
 				'wide' => {
-					'afternoon1' => q{өдөр},
+					'pm' => q{ү.х.},
 					'midnight' => q{шөнө дунд},
-					'pm' => q{ү.х},
-					'noon' => q{үд дунд},
-					'am' => q{ү.ө},
+					'am' => q{ү.ө.},
+					'night1' => q{шөнө},
 					'evening1' => q{орой},
 					'morning1' => q{өглөө},
-					'night1' => q{шөнө},
+					'noon' => q{үд дунд},
+					'afternoon1' => q{өдөр},
 				},
 				'narrow' => {
+					'pm' => q{ү.х.},
 					'midnight' => q{шөнө дунд},
+					'am' => q{ү.ө.},
+					'night1' => q{шөнө},
+					'evening1' => q{орой},
+					'morning1' => q{өглөө},
 					'afternoon1' => q{өдөр},
-					'pm' => q{үх},
 					'noon' => q{үд дунд},
-					'am' => q{үө},
+				},
+				'abbreviated' => {
+					'afternoon1' => q{өдөр},
+					'noon' => q{үд дунд},
 					'evening1' => q{орой},
 					'morning1' => q{өглөө},
 					'night1' => q{шөнө},
+					'midnight' => q{шөнө дунд},
+					'pm' => q{ү.х.},
+					'am' => q{ү.ө.},
 				},
 			},
 			'stand-alone' => {
 				'wide' => {
-					'afternoon1' => q{өдөр},
 					'midnight' => q{шөнө дунд},
-					'noon' => q{үд дунд},
-					'pm' => q{ҮХ},
-					'evening1' => q{орой},
-					'am' => q{ҮӨ},
+					'pm' => q{ү.х.},
+					'am' => q{ү.ө.},
 					'night1' => q{шөнө},
+					'evening1' => q{орой},
 					'morning1' => q{өглөө},
+					'afternoon1' => q{өдөр},
+					'noon' => q{үд дунд},
 				},
 				'narrow' => {
-					'am' => q{ҮӨ},
-					'evening1' => q{орой},
-					'night1' => q{шөнө},
-					'morning1' => q{өглөө},
+					'pm' => q{ү.х.},
 					'midnight' => q{шөнө дунд},
+					'am' => q{ү.ө.},
+					'night1' => q{шөнө},
+					'evening1' => q{орой},
+					'morning1' => q{өглөө},
 					'afternoon1' => q{өдөр},
-					'pm' => q{ҮХ},
 					'noon' => q{үд дунд},
 				},
 				'abbreviated' => {
-					'night1' => q{шөнө},
-					'morning1' => q{өглөө},
-					'am' => q{ҮӨ},
 					'evening1' => q{орой},
-					'pm' => q{ҮХ},
+					'morning1' => q{өглөө},
 					'noon' => q{үд дунд},
 					'afternoon1' => q{өдөр},
+					'pm' => q{ү.х.},
 					'midnight' => q{шөнө дунд},
+					'am' => q{ү.ө.},
+					'night1' => q{шөнө},
 				},
 			},
 		},
@@ -4662,15 +4718,15 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{EEEE, y 'оны' MM 'сарын' dd},
-			'long' => q{y 'оны' MM 'сарын' dd},
-			'medium' => q{y MM d},
-			'short' => q{y-MM-dd},
+			'full' => q{G y 'оны' MMMM'ын' d. cccc 'гараг'},
+			'long' => q{G y 'оны' MM 'сарын' dd},
+			'medium' => q{G y 'оны' MMM'ын' d},
+			'short' => q{GGGGG y.MM.dd},
 		},
 		'gregorian' => {
 			'full' => q{y.MM.dd, EEEE},
 			'long' => q{y.MM.dd},
-			'medium' => q{y.MM.dd},
+			'medium' => q{y 'оны' MMM'ын' d},
 			'short' => q{y.MM.dd},
 		},
 	} },
@@ -4701,7 +4757,7 @@ has 'datetime_formats' => (
 			'full' => q{{1} {0}},
 			'long' => q{{1} {0}},
 			'medium' => q{{1} {0}},
-			'short' => q{{1}, {0}},
+			'short' => q{{1} {0}},
 		},
 		'gregorian' => {
 			'full' => q{{1} {0}},
@@ -4718,95 +4774,95 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			Bh => q{B h},
+			Bh => q{B h 'ц'},
 			Bhm => q{B h:mm},
 			Bhms => q{B h:mm:ss},
 			E => q{ccc},
-			EBhm => q{E, B h:mm},
-			EBhms => q{E, B h:mm:ss},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{dd E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
+			EBhm => q{E. B h:mm},
+			EBhms => q{E. B h:mm:ss},
+			EHm => q{E. HH:mm},
+			EHms => q{E. HH:mm:ss},
+			Ed => q{dd. E},
+			Ehm => q{E. h:mm a},
+			Ehms => q{E. h:mm:ss a},
 			Gy => q{G y},
 			GyMMM => q{G y 'оны' MMM},
-			GyMMMEd => q{G y 'оны' MMM'ын' d, E},
+			GyMMMEd => q{G y 'оны' MMM'ын' d. E},
 			GyMMMd => q{G y 'оны' MMM'ын' d},
 			H => q{HH 'ц'},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
-			MEd => q{MM/dd, E},
+			Hmsv => q{HH:mm:ss (v)},
+			Hmv => q{HH:mm (v)},
+			M => q{LLLLL},
+			MEd => q{MMMMM/dd. E},
 			MMM => q{LLL},
-			MMMEd => q{MMM'ын' d, E},
-			MMMMW => q{MMM'ын' W-'р' 'долоо' 'хоног'},
-			MMMMd => q{MMM'ын' d},
+			MMMEd => q{MMM'ын' d. E},
+			MMMMW => q{MMMM'ын' W-'р' 'долоо' 'хоног'},
+			MMMMd => q{MMMM'ын' d},
 			MMMd => q{MMM'ын' d},
-			Md => q{MM/dd},
+			Md => q{MMMMM/dd},
 			d => q{d},
-			h => q{h a},
+			h => q{h 'ц' a},
 			hm => q{h:mm a},
 			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
+			hmsv => q{h:mm:ss a (v)},
+			hmv => q{h:mm a (v)},
 			ms => q{mm:ss},
 			y => q{y},
-			yM => q{y M},
-			yMEd => q{y.MM.dd, E},
+			yM => q{y MMMMM},
+			yMEd => q{y.MM.dd. E},
 			yMMM => q{y 'оны' MMM},
-			yMMMEd => q{y.MM.dd, E},
+			yMMMEd => q{y 'оны' MMM'ын' d. E},
 			yMMMM => q{y 'оны' MMM},
-			yMMMd => q{y.MM.dd},
+			yMMMd => q{y 'оны' MMM'ын' d},
 			yMd => q{y.MM.dd},
-			yQQQ => q{y QQQ},
+			yQQQ => q{y 'оны' QQQ},
 			yQQQQ => q{y 'оны' QQQQ},
 			yw => q{Y 'оны' w-'р' 'долоо' 'хоног'},
 		},
 		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
+			Bh => q{B h 'ц'},
+			Bhm => q{B h:mm},
+			Bhms => q{B h:mm:ss},
 			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{dd E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{HH},
+			EBhm => q{E. B h:mm},
+			EBhms => q{E. B h:mm:ss},
+			EHm => q{E. HH:mm},
+			EHms => q{E. HH:mm:ss},
+			Ed => q{dd. E},
+			Ehm => q{E. h:mm a},
+			Ehms => q{E. h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y 'оны' MMM},
+			GyMMMEd => q{G y 'оны' MMM'ын' d. E},
+			GyMMMd => q{G y 'оны' MMM'ын' d},
+			H => q{HH 'ц'},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, M-d},
+			M => q{LLLLL},
+			MEd => q{MMMMM/dd. E},
 			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{M-d},
+			MMMEd => q{MMM'ын' d. E},
+			MMMMd => q{MMMM'ын' d},
+			MMMd => q{MMM'ын' d},
+			Md => q{MMMMM/dd},
 			d => q{d},
-			h => q{h a},
+			h => q{h 'ц' a},
 			hm => q{h:mm a},
 			hms => q{h:mm:ss a},
 			ms => q{mm:ss},
 			y => q{G y},
 			yyyy => q{G y},
-			yyyyM => q{GGGGG y-MM},
-			yyyyMEd => q{GGGGG y-MM-dd, E},
-			yyyyMMM => q{G y MMM},
-			yyyyMMMEd => q{G y MMM d, E},
-			yyyyMMMM => q{G y MMMM},
-			yyyyMMMd => q{G y MMM d},
-			yyyyMd => q{GGGGG y-MM-dd},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
+			yyyyM => q{GGGGG y MMMMM},
+			yyyyMEd => q{GGGGG y.MM.dd. E},
+			yyyyMMM => q{G y 'оны' MMM},
+			yyyyMMMEd => q{G y 'оны' MMM'ын' d. E},
+			yyyyMMMM => q{G y 'оны' MMM},
+			yyyyMMMd => q{G y 'оны' MMM'ын' d},
+			yyyyMd => q{GGGGG y.MM.dd},
+			yyyyQQQ => q{G y 'оны' QQQ},
+			yyyyQQQQ => q{G y 'оны' QQQQ},
 		},
 	} },
 );
@@ -4817,7 +4873,7 @@ has 'datetime_formats_append_item' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			'Timezone' => '{0} {1}',
+			'Timezone' => '{0} ({1})',
 		},
 	} },
 );
@@ -4836,33 +4892,33 @@ has 'datetime_formats_interval' => (
 				m => q{HH:mm – HH:mm},
 			},
 			Hmv => {
-				H => q{HH:mm – HH:mm v},
-				m => q{HH:mm – HH:mm v},
+				H => q{HH:mm – HH:mm (v)},
+				m => q{HH:mm – HH:mm (v)},
 			},
 			Hv => {
-				H => q{HH – HH 'ц' v},
+				H => q{HH – HH 'ц' (v)},
 			},
 			M => {
-				M => q{M – M-'р' 'сар'},
+				M => q{MMMMM – MMMMM 'сар'},
 			},
 			MEd => {
-				M => q{E, MM/dd – E, MM/dd},
-				d => q{E, MM/dd – E, MM/dd},
+				M => q{MMMMM/d E – MMMMM/d E},
+				d => q{MMMMM/d E – MMMMM/d E},
 			},
 			MMM => {
-				M => q{MMM – MMM},
+				M => q{MMMMM – MMMMM 'сар'},
 			},
 			MMMEd => {
-				M => q{E, MM/dd – E, MM/dd},
-				d => q{E, MM/dd – E, MM/dd},
+				M => q{MMMMM/d E – MMMMM/d E},
+				d => q{MMMMM/d E – MMMMM/d E},
 			},
 			MMMd => {
-				M => q{MM/d – MM/d},
-				d => q{MM/d–d},
+				M => q{MMMMM/d – MMMMM/d},
+				d => q{MMMMM/d – d},
 			},
 			Md => {
-				M => q{MM/dd–MM/dd},
-				d => q{MM/dd–MM/dd},
+				M => q{MMMMM/d – MMMMM/d},
+				d => q{MMMMM/d – MMMMM/d},
 			},
 			d => {
 				d => q{d – d},
@@ -4878,48 +4934,48 @@ has 'datetime_formats_interval' => (
 				m => q{h:mm – h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm – h:mm a v},
-				m => q{h:mm – h:mm a v},
+				a => q{h:mm a – h:mm a (v)},
+				h => q{h:mm – h:mm a (v)},
+				m => q{h:mm – h:mm a (v)},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h – h a v},
+				a => q{h a – h a (v)},
+				h => q{h – h a (v)},
 			},
 			y => {
 				y => q{y – y},
 			},
 			yM => {
-				M => q{y/MM–MM},
-				y => q{y/MM – y/MM},
+				M => q{y 'оны' MMMMM–MMMMM 'сар'},
+				y => q{y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMEd => {
-				M => q{E, y/MM/dd – E, y/MM/dd},
-				d => q{E, y/MM/dd – E, y/MM/dd},
-				y => q{E, y/MM/dd – E, y/MM/dd},
+				M => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
+				d => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
+				y => q{y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
 			},
 			yMMM => {
-				M => q{y/MM–MM},
-				y => q{y/MM – y/MM},
+				M => q{y 'оны' MMMMM – MMMMM 'сар'},
+				y => q{y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMMMEd => {
-				M => q{E, y/MM/dd – E, y/MM/dd},
-				d => q{E, y/MM/dd – E, y/MM/dd},
-				y => q{E, y/MM/dd – E, y/MM/dd},
+				M => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
+				d => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
+				y => q{y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
 			},
 			yMMMM => {
-				M => q{y 'оны' MM–MM-'р' 'сар'},
-				y => q{y/MM –y/MM},
+				M => q{y 'оны' MMMMM – MMMMM 'сар'},
+				y => q{y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMMMd => {
-				M => q{y/MM/dd – MM/dd},
-				d => q{y/MM/d–d},
-				y => q{y/MM/dd – y/MM/dd},
+				M => q{y 'оны' MMMMM/dd – MMMMM/dd},
+				d => q{y 'оны' MMMMM/dd – dd},
+				y => q{y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
 			},
 			yMd => {
-				M => q{y/MM/dd –MM/dd},
-				d => q{y/MM/dd–dd},
-				y => q{y/MM/dd – y/MM/dd},
+				M => q{y 'оны' MMMMM/dd – MMMMM/dd},
+				d => q{y 'оны' MMMMM/dd – MMMMM/dd},
+				y => q{y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
 			},
 		},
 		'generic' => {
@@ -4938,26 +4994,26 @@ has 'datetime_formats_interval' => (
 				H => q{HH–HH v},
 			},
 			M => {
-				M => q{M – M},
+				M => q{MMMMM – MMMMM 'сар'},
 			},
 			MEd => {
-				M => q{E, MM/dd – E, MM/dd},
-				d => q{E, MM/dd – E, MM/dd},
+				M => q{MMMMM/d E – MMMMM/d E},
+				d => q{MMMMM/d E – MMMMM/d E},
 			},
 			MMM => {
-				M => q{MMM – MMM},
+				M => q{MMMMM – MMMMM 'сар'},
 			},
 			MMMEd => {
-				M => q{E, MM/dd – E, MM/dd},
-				d => q{E, MM/dd – E, MM/dd},
+				M => q{MMMMM/d E – MMMMM/d E},
+				d => q{MMMMM/d E – MMMMM/d E},
 			},
 			MMMd => {
-				M => q{MM/d – MM/d},
-				d => q{MMM d–d},
+				M => q{MMMMM/d – MMMMM/d},
+				d => q{MMMMM/d – d},
 			},
 			Md => {
-				M => q{MM/dd–MM/dd},
-				d => q{MM/dd–MM/dd},
+				M => q{MMMMM/d – MMMMM/d},
+				d => q{MMMMM/d – MMMMM/d},
 			},
 			d => {
 				d => q{d – d},
@@ -4985,36 +5041,36 @@ has 'datetime_formats_interval' => (
 				y => q{G y–y},
 			},
 			yM => {
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
+				M => q{GGGGG y 'оны' MMMMM–MMMMM 'сар'},
+				y => q{GGGGG y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMEd => {
-				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				M => q{GGGGG y 'оны' MMMMM/dd E – MMMMM/dd E},
+				d => q{GGGGG y 'оны' MMMMM/dd E – MMMMM/dd E},
+				y => q{GGGGG y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
 			},
 			yMMM => {
-				M => q{G y MMM–MMM},
-				y => q{G y MMM – y MMM},
+				M => q{G y 'оны' MMMMM – MMMMM 'сар'},
+				y => q{G y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMMMEd => {
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
+				M => q{G y 'оны' MMMMM/dd E – MMMMM/dd E},
+				d => q{G y 'оны' MMMMM/dd E – MMMMM/dd E},
+				y => q{G y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
 			},
 			yMMMM => {
-				M => q{G y MMMM–MMMM},
-				y => q{G y MMMM – y MMMM},
+				M => q{G y 'оны' MMMMM – MMMMM 'сар'},
+				y => q{G y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMMMd => {
-				M => q{G y MMM d – MMM d},
-				d => q{G y MMM d–d},
-				y => q{G y MMM d – y MMM d},
+				M => q{G y 'оны' MMMMM/dd – MMMMM/dd},
+				d => q{G y 'оны' MMMMM/dd – dd},
+				y => q{G y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
 			},
 			yMd => {
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
-				y => q{GGGGG y-MM-dd – y-MM-dd},
+				M => q{GGGGG y 'оны' MMMMM/dd – MMMMM/dd},
+				d => q{GGGGG y 'оны' MMMMM/dd – MMMMM/dd},
+				y => q{GGGGG y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
 			},
 		},
 	} },
@@ -5028,9 +5084,9 @@ has 'time_zone_names' => (
 		hourFormat => q(+HH:mm;-HH:mm),
 		gmtFormat => q(GMT{0}),
 		gmtZeroFormat => q(GMT),
-		regionFormat => q({0} цаг),
-		regionFormat => q({0} зуны цаг),
-		regionFormat => q({0} стандарт цаг),
+		regionFormat => q({0}-н цаг),
+		regionFormat => q({0}-н зуны цаг),
+		regionFormat => q({0}-н стандарт цаг),
 		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {

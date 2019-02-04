@@ -23,7 +23,7 @@ sub parse_test_requires_args {
     $c->add($used_module => shift @$tokens);
   }
 
-  if (ref $tokens->[0] and $tokens->[0][1] eq '{}') {
+  if (ref $tokens->[0] and $tokens->[0][1] and $tokens->[0][1] eq '{}') {
     my $tokens_in_hashref = convert_string_tokens($tokens->[0][0]);
     while(my ($key, undef, $value, undef) = splice @$tokens_in_hashref, 0, 4) {
       next unless is_module_name($key);

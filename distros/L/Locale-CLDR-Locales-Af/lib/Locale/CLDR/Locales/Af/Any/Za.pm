@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Af::Any::Za - Package for language Afrikaans
 
 package Locale::CLDR::Locales::Af::Any::Za;
 # This file auto generated from Data\common\main\af_ZA.xml
-#	on Sun  7 Oct 10:19:22 am GMT
+#	on Sun  3 Feb  1:38:11 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sn::Any::Zw - Package for language Shona
 
 package Locale::CLDR::Locales::Sn::Any::Zw;
 # This file auto generated from Data\common\main\sn_ZW.xml
-#	on Sun  7 Oct 10:58:48 am GMT
+#	on Sun  3 Feb  2:18:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

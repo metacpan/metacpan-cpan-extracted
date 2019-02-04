@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Dje - Package for language Zarma
 
 package Locale::CLDR::Locales::Dje;
 # This file auto generated from Data\common\main\dje.xml
-#	on Sun  7 Oct 10:27:35 am GMT
+#	on Sun  3 Feb  1:46:43 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -875,11 +875,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{Zaarikay b},
-					'am' => q{Subbaahi},
-				},
 				'abbreviated' => {
+					'am' => q{Subbaahi},
+					'pm' => q{Zaarikay b},
+				},
+				'wide' => {
 					'am' => q{Subbaahi},
 					'pm' => q{Zaarikay b},
 				},

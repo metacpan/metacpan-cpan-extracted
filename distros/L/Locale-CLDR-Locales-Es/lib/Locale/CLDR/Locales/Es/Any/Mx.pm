@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Es::Any::Mx - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Mx;
 # This file auto generated from Data\common\main\es_MX.xml
-#	on Sun  7 Oct 10:30:11 am GMT
+#	on Sun  3 Feb  1:49:03 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -35,9 +35,10 @@ has 'display_name_language' => (
  				'arp' => 'arapaho',
  				'bas' => 'basa',
  				'bax' => 'bamun',
- 				'bho' => 'bhojpuri',
+ 				'bho' => 'bhoshpuri',
  				'bla' => 'siksika',
  				'bua' => 'buriat',
+ 				'de_AT' => 'alemán austriaco',
  				'dum' => 'neerlandés medieval',
  				'en_GB@alt=short' => 'inglés (R. U.)',
  				'enm' => 'inglés medieval',
@@ -47,9 +48,12 @@ has 'display_name_language' => (
  				'gmh' => 'alemán de la alta edad media',
  				'grc' => 'griego antiguo',
  				'hak' => 'kejia (China)',
+ 				'hil' => 'hiligainón',
  				'hsn' => 'xiang (China)',
+ 				'inh' => 'ingusetio',
  				'kbd' => 'kabardiano',
- 				'krc' => 'karachay-balkar',
+ 				'krc' => 'karachái bálkaro',
+ 				'kum' => 'cumuco',
  				'lo' => 'lao',
  				'lus' => 'lushai',
  				'mga' => 'irlandés medieval',
@@ -92,7 +96,7 @@ has 'display_name_script' => (
 			my %scripts = (
 			'Hanb' => 'hanb',
  			'Mlym' => 'malayálam',
- 			'Telu' => 'telugú',
+ 			'Telu' => 'telegu',
 
 			);
 			if ( @_ ) {
@@ -127,6 +131,7 @@ has 'display_name_region' => (
  			'EZ' => 'zona euro',
  			'GB@alt=short' => 'RU',
  			'GG' => 'Guernsey',
+ 			'SA' => 'Arabia Saudita',
  			'TA' => 'Tristán de Acuña',
  			'TL' => 'Timor-Leste',
  			'UM' => 'Islas menores alejadas de EE. UU.',
@@ -219,7 +224,8 @@ has 'display_name_measurement_system' => (
 	init_arg	=> undef,
 	default		=> sub { 
 		{
-			'US' => q{estadounidense},
+			'UK' => q{imperial},
+ 			'US' => q{estadounidense},
 
 		}
 	},
@@ -232,34 +238,6 @@ has 'more_information' => (
 	default		=> qq{[...]},
 );
 
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{«},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{»},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
@@ -267,7 +245,6 @@ has 'units' => (
 	default		=> sub { {
 				'long' => {
 					'acre-foot' => {
-						'name' => q(acre-pies),
 						'one' => q({0} acre-pie),
 						'other' => q({0} acre-pies),
 					},
@@ -307,7 +284,7 @@ has 'units' => (
 						'other' => q({0} hercios),
 					},
 					'horsepower' => {
-						'one' => q({0} caballo de vapor),
+						'one' => q({0} caballo de fuerza),
 					},
 					'kelvin' => {
 						'name' => q(kelvines),
@@ -325,7 +302,6 @@ has 'units' => (
 						'other' => q({0} kilovatios),
 					},
 					'kilowatt-hour' => {
-						'name' => q(kilowatt-hora),
 						'one' => q(kilowatt-hora),
 						'other' => q({0} kilowatts-hora),
 					},
@@ -341,6 +317,9 @@ has 'units' => (
 						'name' => q(megavatios),
 						'one' => q({0} megavatio),
 						'other' => q({0} megavatios),
+					},
+					'microgram' => {
+						'other' => q({0} microgramos),
 					},
 					'micrometer' => {
 						'name' => q(micrometros),
@@ -399,6 +378,10 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'celsius' => {
+						'one' => q({0} °C),
+						'other' => q({0} °C),
+					},
 					'day' => {
 						'name' => q(días),
 						'one' => q({0}d),
@@ -450,6 +433,9 @@ has 'units' => (
 						'one' => q({0} c),
 						'other' => q({0} c),
 					},
+					'celsius' => {
+						'one' => q({0} °C),
+					},
 					'cup' => {
 						'name' => q(tza.),
 						'one' => q({0} tza.),
@@ -477,11 +463,16 @@ has 'units' => (
 						'one' => q({0} CV),
 						'other' => q({0} CV),
 					},
+					'karat' => {
+						'name' => q(kt),
+						'one' => q({0} kt),
+						'other' => q({0} kt),
+					},
 					'kilometer-per-hour' => {
 						'name' => q(km/hora),
 					},
 					'light-year' => {
-						'name' => q(al),
+						'name' => q(a. l.),
 						'one' => q({0} a. l.),
 						'other' => q({0} a. l.),
 					},
@@ -511,6 +502,12 @@ has 'units' => (
 					'parsec' => {
 						'name' => q(pc),
 					},
+					'percent' => {
+						'name' => q(%),
+					},
+					'permille' => {
+						'name' => q(‰),
+					},
 					'pint' => {
 						'name' => q(pt),
 					},
@@ -518,6 +515,9 @@ has 'units' => (
 						'name' => q(pt),
 						'one' => q({0} pt),
 						'other' => q({0} pt),
+					},
+					'volt' => {
+						'name' => q(V),
 					},
 					'week' => {
 						'name' => q(sem),
@@ -585,12 +585,27 @@ has 'currencies' => (
 	default		=> sub { {
 		'AMD' => {
 			display_name => {
-				'currency' => q(dram),
+				'one' => q(dram armenio),
+				'other' => q(drams armenios),
+			},
+		},
+		'BDT' => {
+			display_name => {
+				'currency' => q(taka bangladesí),
+				'one' => q(taka bangladesí),
+				'other' => q(takas bangladesíes),
 			},
 		},
 		'BGN' => {
 			display_name => {
 				'other' => q(levas búlgaras),
+			},
+		},
+		'BTN' => {
+			display_name => {
+				'currency' => q(ngultrum butanés),
+				'one' => q(ngultrum butanés),
+				'other' => q(gultrums bultaneses),
 			},
 		},
 		'BYN' => {
@@ -611,10 +626,49 @@ has 'currencies' => (
 		'FKP' => {
 			symbol => '£',
 		},
+		'KGS' => {
+			display_name => {
+				'currency' => q(som kirguís),
+				'one' => q(som kirguís),
+				'other' => q(soms kirguises),
+			},
+		},
+		'KHR' => {
+			display_name => {
+				'currency' => q(riel camboyano),
+				'one' => q(riel camboyano),
+				'other' => q(rieles camboyanos),
+			},
+		},
+		'LAK' => {
+			display_name => {
+				'currency' => q(kip laosiano),
+				'one' => q(kip laosiano),
+				'other' => q(kips laosianos),
+			},
+		},
 		'LVL' => {
 			display_name => {
 				'one' => q(lats letón),
 				'other' => q(lats letones),
+			},
+		},
+		'MRO' => {
+			symbol => 'MRU',
+		},
+		'MRU' => {
+			symbol => 'UM',
+		},
+		'MVR' => {
+			display_name => {
+				'currency' => q(rupia de Maldivas),
+				'one' => q(rupia de Maldivas),
+				'other' => q(rupias de Maldivas),
+			},
+		},
+		'MWK' => {
+			display_name => {
+				'one' => q(kwacha malauí),
 			},
 		},
 		'MXN' => {
@@ -637,7 +691,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(dobra santotomense),
 				'one' => q(dobra santotomense),
-				'other' => q(dobra santotomense),
+				'other' => q(dobras santotomenses),
 			},
 		},
 		'SYP' => {
@@ -647,7 +701,11 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(baht tailandés),
 				'one' => q(baht tailandés),
-				'other' => q(bats),
+			},
+		},
+		'TMT' => {
+			display_name => {
+				'other' => q(manats turcomanos),
 			},
 		},
 		'UZS' => {
@@ -659,6 +717,25 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			symbol => 'Bs',
+			display_name => {
+				'currency' => q(bolívar venezolano \(2008–2018\)),
+				'one' => q(bolívar venezolano \(2008–2018\)),
+				'other' => q(bolívares venezolanos \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
+				'currency' => q(bolívar venezolano),
+				'one' => q(bolívar venezolano),
+				'other' => q(bolivares venezolanos),
+			},
+		},
+		'VND' => {
+			display_name => {
+				'currency' => q(dong vietnamita),
+				'one' => q(dong vietnamita),
+				'other' => q(dongs vietnamitas),
+			},
 		},
 		'XXX' => {
 			display_name => {
@@ -793,49 +870,49 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
@@ -855,34 +932,34 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'wide' => {
+					'am' => q{a. m.},
+					'pm' => q{p. m.},
+				},
+				'narrow' => {
+					'noon' => q{del mediodía},
+					'morning2' => q{mañana},
+					'night1' => q{de la noche},
+					'evening1' => q{de la tarde},
+					'morning1' => q{de la madrugada},
+				},
 				'abbreviated' => {
 					'am' => q{a. m.},
 					'pm' => q{p. m.},
-				},
-				'wide' => {
-					'pm' => q{p. m.},
-					'am' => q{a. m.},
-				},
-				'narrow' => {
-					'evening1' => q{de la tarde},
-					'morning2' => q{mañana},
-					'noon' => q{del mediodía},
-					'morning1' => q{de la madrugada},
-					'night1' => q{de la noche},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'pm' => q{p. m.},
+				'abbreviated' => {
 					'am' => q{a. m.},
+					'pm' => q{p. m.},
+				},
+				'narrow' => {
+					'am' => q{a. m.},
+					'pm' => q{p. m.},
 				},
 				'wide' => {
-					'pm' => q{p. m.},
 					'am' => q{a. m.},
-				},
-				'abbreviated' => {
 					'pm' => q{p. m.},
-					'am' => q{a. m.},
 				},
 			},
 		},
@@ -949,13 +1026,16 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			EHm => q{E H:mm},
-			EHms => q{E H:mm:ss},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
 			Ehm => q{E h:mm a},
 			Ehms => q{E h:mm:ss a},
 			GyMMMd => q{d MMM y G},
 			Hm => q{H:mm},
 			Hms => q{H:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmsvvvv => q{HH:mm:ss (vvvv)},
+			Hmv => q{HH:mm v},
 			MMMEd => q{E d 'de' MMM},
 			MMd => q{d/MM},
 			MMdd => q{dd/MM},
@@ -1012,7 +1092,7 @@ has 'datetime_formats_interval' => (
 				H => q{HH–HH v},
 			},
 			MEd => {
-				M => q{E, d/M – E, d/M},
+				M => q{E, M/d–E, M/d},
 				d => q{E, d/M – E, d/M},
 			},
 			MMMEd => {
@@ -1129,13 +1209,6 @@ has 'time_zone_names' => (
 		'America/St_Thomas' => {
 			exemplarCity => q#St. Thomas#,
 		},
-		'America_Mountain' => {
-			long => {
-				'daylight' => q#hora de verano de las Montañas Rocosas#,
-				'generic' => q#hora de las Montañas Rocosas#,
-				'standard' => q#hora estándar de las Montañas Rocosas#,
-			},
-		},
 		'Apia' => {
 			long => {
 				'daylight' => q#hora de verano de Apia#,
@@ -1152,6 +1225,12 @@ has 'time_zone_names' => (
 		'Asia/Almaty' => {
 			exemplarCity => q#Almatý#,
 		},
+		'Asia/Aqtobe' => {
+			exemplarCity => q#Aktobé#,
+		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atirau#,
+		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Dusambé#,
 		},
@@ -1160,9 +1239,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Qatar' => {
 			exemplarCity => q#Qatar#,
-		},
-		'Asia/Rangoon' => {
-			exemplarCity => q#Yangón (Rangún)#,
 		},
 		'Christmas' => {
 			long => {
@@ -1184,7 +1260,7 @@ has 'time_zone_names' => (
 		'Easter' => {
 			long => {
 				'daylight' => q#hora de verano de la isla de Pascua#,
-				'generic' => q#hora de la isla de Pascua#,
+				'generic' => q#hora de Isla de Pascua#,
 				'standard' => q#hora estándar de la isla de Pascua#,
 			},
 		},
@@ -1217,14 +1293,14 @@ has 'time_zone_names' => (
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q#hora de verano de las islas Malvinas#,
-				'generic' => q#hora de las islas Malvinas#,
-				'standard' => q#hora estándar de las islas Malvinas#,
+				'daylight' => q#hora de verano de Islas Malvinas#,
+				'generic' => q#hora de Islas Malvinas#,
+				'standard' => q#hora estándar de Islas Malvinas#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q#hora de las islas Gilbert#,
+				'standard' => q#hora de las Islas Gilbert#,
 			},
 		},
 		'Irkutsk' => {
@@ -1242,11 +1318,6 @@ has 'time_zone_names' => (
 		'Marshall_Islands' => {
 			long => {
 				'standard' => q#hora de las Islas Marshall#,
-			},
-		},
-		'Myanmar' => {
-			long => {
-				'standard' => q#hora de Myanmar (Birmania)#,
 			},
 		},
 		'Norfolk' => {
@@ -1272,7 +1343,7 @@ has 'time_zone_names' => (
 		},
 		'Wake' => {
 			long => {
-				'standard' => q#hora de la isla Wake#,
+				'standard' => q#hora de la Isla Wake#,
 			},
 		},
 	 } }

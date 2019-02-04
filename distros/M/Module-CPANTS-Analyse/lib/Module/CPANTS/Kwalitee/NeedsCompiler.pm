@@ -2,7 +2,7 @@ package Module::CPANTS::Kwalitee::NeedsCompiler;
 use warnings;
 use strict;
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 $VERSION =~ s/_//; ## no critic
 
 sub order { 200 }
@@ -78,8 +78,8 @@ on ExtUtils::CBuilder or ExtUtils::ParseXS.
 
 =head3 TODO:
 
-How to recognize cases such as http://search.cpan.org/dist/Perl-API/ 
-and http://search.cpan.org/dist/Term-Size-Perl
+How to recognize cases such as https://metacpan.org/release/GAAS/Perl-API-0.01/
+and https://metacpan.org/release/Term-Size-Perl
 that generate the .c files during installation
 
 In addition there are modules that can work without their XS part.

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ak - Package for language Akan
 
 package Locale::CLDR::Locales::Ak;
 # This file auto generated from Data\common\main\ak.xml
-#	on Sun  7 Oct 10:19:23 am GMT
+#	on Sun  3 Feb  1:38:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1097,11 +1097,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{EW},
-					'am' => q{AN},
-				},
 				'abbreviated' => {
+					'am' => q{AN},
+					'pm' => q{EW},
+				},
+				'wide' => {
 					'pm' => q{EW},
 					'am' => q{AN},
 				},

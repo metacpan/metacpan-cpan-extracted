@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lag - Package for language Langi
 
 package Locale::CLDR::Locales::Lag;
 # This file auto generated from Data\common\main\lag.xml
-#	on Sun  7 Oct 10:43:36 am GMT
+#	on Sun  3 Feb  2:02:25 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -820,12 +820,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{TOO},
 					'pm' => q{MUU},
+					'am' => q{TOO},
 				},
 				'wide' => {
-					'am' => q{TOO},
 					'pm' => q{MUU},
+					'am' => q{TOO},
 				},
 			},
 		},

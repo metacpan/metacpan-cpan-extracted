@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Eu - Package for language Basque
 
 package Locale::CLDR::Locales::Eu;
 # This file auto generated from Data\common\main\eu.xml
-#	on Sun  7 Oct 10:30:42 am GMT
+#	on Sun  3 Feb  1:49:30 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -53,7 +53,7 @@ has 'display_name_language' => (
  				'ach' => 'acholiera',
  				'ada' => 'adangmera',
  				'ady' => 'adigera',
- 				'af' => 'afrikaansa',
+ 				'af' => 'afrikaans',
  				'agq' => 'aghemera',
  				'ain' => 'ainuera',
  				'ak' => 'akanera',
@@ -64,8 +64,8 @@ has 'display_name_language' => (
  				'anp' => 'angikera',
  				'ar' => 'arabiera',
  				'ar_001' => 'arabiera moderno estandarra',
- 				'arn' => 'maputxea',
- 				'arp' => 'arapahoa',
+ 				'arn' => 'maputxe',
+ 				'arp' => 'arapaho',
  				'as' => 'assamera',
  				'asa' => 'asua',
  				'ast' => 'asturiera',
@@ -74,7 +74,7 @@ has 'display_name_language' => (
  				'ay' => 'aimara',
  				'az' => 'azerbaijanera',
  				'az@alt=short' => 'azerbaijanera',
- 				'ba' => 'bashkirrera',
+ 				'ba' => 'baxkirera',
  				'ban' => 'baliera',
  				'bas' => 'basaa',
  				'be' => 'bielorrusiera',
@@ -93,8 +93,8 @@ has 'display_name_language' => (
  				'bs' => 'bosniera',
  				'bug' => 'buginera',
  				'byn' => 'bilena',
- 				'ca' => 'katalana',
- 				'ce' => 'txetxeniera',
+ 				'ca' => 'katalan',
+ 				'ce' => 'txetxenera',
  				'ceb' => 'cebuera',
  				'cgg' => 'chigera',
  				'ch' => 'chamorrera',
@@ -105,18 +105,18 @@ has 'display_name_language' => (
  				'chy' => 'cheyennera',
  				'ckb' => 'sorania',
  				'co' => 'korsikera',
- 				'crs' => 'seselwa frantses-kreolera',
+ 				'crs' => 'Seychelleetako kreolera',
  				'cs' => 'txekiera',
- 				'cu' => 'Elizako eslaviera',
- 				'cv' => 'chuvashera',
- 				'cy' => 'galesa',
+ 				'cu' => 'elizako eslaviera',
+ 				'cv' => 'txuvaxera',
+ 				'cy' => 'gales',
  				'da' => 'daniera',
  				'dak' => 'dakotera',
  				'dar' => 'dargvera',
  				'dav' => 'taitera',
- 				'de' => 'alemana',
- 				'de_AT' => 'Austriako alemana',
- 				'de_CH' => 'aleman garaia (Suitza)',
+ 				'de' => 'aleman',
+ 				'de_AT' => 'Austriako aleman',
+ 				'de_CH' => 'Suitzako aleman garai',
  				'dgr' => 'dogribera',
  				'dje' => 'zarma',
  				'dsb' => 'behe-sorabiera',
@@ -130,14 +130,14 @@ has 'display_name_language' => (
  				'efi' => 'efikera',
  				'eka' => 'akajuka',
  				'el' => 'greziera',
- 				'en' => 'ingelesa',
- 				'en_AU' => 'Australiako ingelesa',
- 				'en_CA' => 'Kanadako ingelesa',
- 				'en_GB' => 'Britainia Handiko ingelesa',
- 				'en_GB@alt=short' => 'Erresuma Batuko ingelesa',
- 				'en_US' => 'AEBko ingelesa',
+ 				'en' => 'ingeles',
+ 				'en_AU' => 'Australiako ingeles',
+ 				'en_CA' => 'Kanadako ingeles',
+ 				'en_GB' => 'Britania Handiko ingeles',
+ 				'en_GB@alt=short' => 'Erresuma Batuko ingeles',
+ 				'en_US' => 'AEBko ingeles',
  				'en_US@alt=short' => 'AEBko ingelesa',
- 				'eo' => 'esperantoa',
+ 				'eo' => 'esperanto',
  				'es' => 'espainiera',
  				'es_419' => 'Latinoamerikako espainiera',
  				'es_ES' => 'espainiera (Europa)',
@@ -152,21 +152,21 @@ has 'display_name_language' => (
  				'fj' => 'fijiera',
  				'fo' => 'faroera',
  				'fon' => 'fona',
- 				'fr' => 'frantsesa',
- 				'fr_CA' => 'Kanadako frantsesa',
- 				'fr_CH' => 'Suitzako frantsesa',
+ 				'fr' => 'frantses',
+ 				'fr_CA' => 'Kanadako frantses',
+ 				'fr_CH' => 'Suitzako frantses',
  				'fur' => 'friuliera',
  				'fy' => 'frisiera',
- 				'ga' => 'gaelikoa',
+ 				'ga' => 'gaeliko',
  				'gaa' => 'ga',
  				'gag' => 'gagauzera',
- 				'gd' => 'Eskoziako gaelikoa',
+ 				'gd' => 'Eskoziako gaeliko',
  				'gez' => 'ge’ez',
  				'gil' => 'gilbertera',
  				'gl' => 'galiziera',
  				'gn' => 'guaraniera',
  				'gor' => 'gorontaloa',
- 				'gsw' => 'alemana (Suitza)',
+ 				'gsw' => 'Suitzako aleman',
  				'gu' => 'gujaratera',
  				'guz' => 'gusiiera',
  				'gv' => 'manxera',
@@ -174,8 +174,8 @@ has 'display_name_language' => (
  				'ha' => 'hausa',
  				'haw' => 'hawaiiera',
  				'he' => 'hebreera',
- 				'hi' => 'hindia',
- 				'hil' => 'hiligainona',
+ 				'hi' => 'hindi',
+ 				'hil' => 'hiligainon',
  				'hmn' => 'hmong',
  				'hr' => 'kroaziera',
  				'hsb' => 'goi-sorabiera',
@@ -183,7 +183,7 @@ has 'display_name_language' => (
  				'hu' => 'hungariera',
  				'hup' => 'hupera',
  				'hy' => 'armeniera',
- 				'hz' => 'herera',
+ 				'hz' => 'hereroera',
  				'ia' => 'interlingua',
  				'iba' => 'ibanera',
  				'ibb' => 'ibibioera',
@@ -196,7 +196,7 @@ has 'display_name_language' => (
  				'io' => 'ido',
  				'is' => 'islandiera',
  				'it' => 'italiera',
- 				'iu' => 'inuitera',
+ 				'iu' => 'inuktitut',
  				'ja' => 'japoniera',
  				'jbo' => 'lojbanera',
  				'jgo' => 'ngomba',
@@ -210,7 +210,7 @@ has 'display_name_language' => (
  				'kbd' => 'kabardiera',
  				'kcg' => 'kataba',
  				'kde' => 'makondera',
- 				'kea' => 'Cabo Verdeko kreola',
+ 				'kea' => 'Cabo Verdeko kreolera',
  				'kfo' => 'koroa',
  				'kg' => 'kikongoa',
  				'kha' => 'kashia',
@@ -241,8 +241,8 @@ has 'display_name_language' => (
  				'kv' => 'komiera',
  				'kw' => 'kornubiera',
  				'ky' => 'kirgizera',
- 				'la' => 'latina',
- 				'lad' => 'ladinera',
+ 				'la' => 'latin',
+ 				'lad' => 'ladino',
  				'lag' => 'langiera',
  				'lb' => 'luxenburgera',
  				'lez' => 'lezgiera',
@@ -270,7 +270,7 @@ has 'display_name_language' => (
  				'men' => 'mendeera',
  				'mer' => 'meruera',
  				'mfe' => 'Mauritaniako kreolera',
- 				'mg' => 'malgaxea',
+ 				'mg' => 'malgaxe',
  				'mgh' => 'makhuwa-meettoera',
  				'mgo' => 'metera',
  				'mh' => 'marshallera',
@@ -296,18 +296,18 @@ has 'display_name_language' => (
  				'na' => 'nauruera',
  				'nap' => 'napoliera',
  				'naq' => 'namera',
- 				'nb' => 'bokmala (Norvegia)',
+ 				'nb' => 'bokmål (norvegiera)',
  				'nd' => 'iparraldeko ndebeleera',
  				'nds_NL' => 'behe-saxoiera',
  				'ne' => 'nepalera',
  				'new' => 'newarera',
  				'ng' => 'ndongera',
- 				'nia' => 'niasa',
- 				'niu' => 'niuera',
+ 				'nia' => 'niasera',
+ 				'niu' => 'niueera',
  				'nl' => 'nederlandera',
  				'nl_BE' => 'flandriera',
  				'nmg' => 'kwasiera',
- 				'nn' => 'nynorsk norvegiera',
+ 				'nn' => 'nynorsk (norvegiera)',
  				'nnh' => 'ngiemboonera',
  				'no' => 'norvegiera',
  				'nog' => 'nogaiera',
@@ -315,7 +315,7 @@ has 'display_name_language' => (
  				'nr' => 'hegoaldeko ndebelera',
  				'nso' => 'pediera',
  				'nus' => 'nuerera',
- 				'nv' => 'navahoera',
+ 				'nv' => 'navajoera',
  				'ny' => 'chewera',
  				'nyn' => 'ankolera',
  				'oc' => 'okzitaniera',
@@ -325,15 +325,15 @@ has 'display_name_language' => (
  				'pa' => 'punjabera',
  				'pag' => 'pangasinanera',
  				'pam' => 'pampangera',
- 				'pap' => 'papiamentoa',
+ 				'pap' => 'papiamento',
  				'pau' => 'palauera',
  				'pcm' => 'Nigeriako pidgina',
  				'pl' => 'poloniera',
  				'prg' => 'prusiera',
  				'ps' => 'paxtuera',
- 				'pt' => 'portugesa',
- 				'pt_BR' => 'Brasilgo portugesa',
- 				'pt_PT' => 'portugesa (Europa)',
+ 				'pt' => 'portuges',
+ 				'pt_BR' => 'Brasilgo portuges',
+ 				'pt_PT' => 'Europako portuges',
  				'qu' => 'kitxua',
  				'quc' => 'quicheera',
  				'rap' => 'rapa nui',
@@ -345,11 +345,11 @@ has 'display_name_language' => (
  				'rof' => 'romboera',
  				'root' => 'erroa',
  				'ru' => 'errusiera',
- 				'rup' => 'aromania',
+ 				'rup' => 'aromaniera',
  				'rw' => 'kinyaruanda',
  				'rwk' => 'rwaera',
- 				'sa' => 'sanskritoa',
- 				'sad' => 'sandawea',
+ 				'sa' => 'sanskrito',
+ 				'sad' => 'sandaweera',
  				'sah' => 'sakhera',
  				'saq' => 'samburuera',
  				'sat' => 'santalera',
@@ -358,11 +358,11 @@ has 'display_name_language' => (
  				'sc' => 'sardiniera',
  				'scn' => 'siziliera',
  				'sco' => 'eskoziera',
- 				'sd' => 'sindhia',
+ 				'sd' => 'sindhi',
  				'se' => 'iparraldeko samiera',
  				'seh' => 'senera',
  				'ses' => 'koyraboro sennia',
- 				'sg' => 'sangoa',
+ 				'sg' => 'sango',
  				'sh' => 'serbokroaziera',
  				'shi' => 'tachelhita',
  				'shn' => 'shanera',
@@ -371,8 +371,8 @@ has 'display_name_language' => (
  				'sl' => 'esloveniera',
  				'sm' => 'samoera',
  				'sma' => 'hegoaldeko samiera',
- 				'smj' => 'lule samiera',
- 				'smn' => 'inari-samiera',
+ 				'smj' => 'Luleko samiera',
+ 				'smn' => 'Inariko samiera',
  				'sms' => 'skolten samiera',
  				'sn' => 'shonera',
  				'snk' => 'soninkera',
@@ -389,22 +389,22 @@ has 'display_name_language' => (
  				'sw' => 'swahilia',
  				'sw_CD' => 'Kongoko swahilia',
  				'swb' => 'komoreera',
- 				'syr' => 'asiriera',
+ 				'syr' => 'siriera',
  				'ta' => 'tamilera',
- 				'te' => 'telugua',
+ 				'te' => 'telugu',
  				'tem' => 'temnea',
  				'teo' => 'tesoera',
- 				'tet' => 'tetuma',
+ 				'tet' => 'tetum',
  				'tg' => 'tajikera',
  				'th' => 'thailandiera',
- 				'ti' => 'tigriñera',
+ 				'ti' => 'tigrinyera',
  				'tig' => 'tigrea',
  				'tk' => 'turkmenera',
  				'tl' => 'tagalog',
  				'tlh' => 'klingonera',
  				'tn' => 'tswanera',
  				'to' => 'tongera',
- 				'tpi' => 'tok pisina',
+ 				'tpi' => 'tok pisin',
  				'tr' => 'turkiera',
  				'trv' => 'tarokoa',
  				'ts' => 'tsongera',
@@ -412,22 +412,22 @@ has 'display_name_language' => (
  				'tum' => 'tumbukera',
  				'tvl' => 'tuvaluera',
  				'tw' => 'twia',
- 				'twq' => 'tasawaqa',
+ 				'twq' => 'tasawaq',
  				'ty' => 'tahitiera',
  				'tyv' => 'tuvera',
  				'tzm' => 'Erdialdeko Atlaseko amazigera',
  				'udm' => 'udmurtera',
  				'ug' => 'uigurrera',
  				'uk' => 'ukrainera',
- 				'umb' => 'umbunduera',
+ 				'umb' => 'umbundu',
  				'und' => 'hizkuntza ezezaguna',
- 				'ur' => 'urdua',
+ 				'ur' => 'urdu',
  				'uz' => 'uzbekera',
  				'vai' => 'vaiera',
  				've' => 'vendera',
  				'vi' => 'vietnamera',
- 				'vo' => 'volapüka',
- 				'vun' => 'vunjoa',
+ 				'vo' => 'volapük',
+ 				'vun' => 'vunjo',
  				'wa' => 'waloiera',
  				'wae' => 'walserera',
  				'wal' => 'welayta',
@@ -438,7 +438,7 @@ has 'display_name_language' => (
  				'xog' => 'sogera',
  				'yav' => 'jangbenera',
  				'ybb' => 'yemba',
- 				'yi' => 'yiddisha',
+ 				'yi' => 'yiddish',
  				'yo' => 'jorubera',
  				'yue' => 'kantonera',
  				'zgh' => 'amazigera estandarra',
@@ -448,7 +448,7 @@ has 'display_name_language' => (
  				'zu' => 'zuluera',
  				'zun' => 'zuñia',
  				'zxx' => 'ez dago eduki linguistikorik',
- 				'zza' => 'zazakia',
+ 				'zza' => 'zazera',
 
 			);
 			if (@_) {
@@ -469,15 +469,15 @@ has 'display_name_script' => (
 			'Arab' => 'arabiarra',
  			'Arab@alt=variant' => 'persiar-arabiarra',
  			'Armn' => 'armeniarra',
- 			'Beng' => 'bengaliarra',
+ 			'Beng' => 'bengalarra',
  			'Bopo' => 'bopomofoa',
  			'Brai' => 'braillea',
  			'Cyrl' => 'zirilikoa',
  			'Deva' => 'devanagaria',
  			'Ethi' => 'etiopiarra',
  			'Geor' => 'georgiarra',
- 			'Grek' => 'greziarra',
- 			'Gujr' => 'gujaratera',
+ 			'Grek' => 'grekoa',
+ 			'Gujr' => 'gujaratarra',
  			'Guru' => 'gurmukhia',
  			'Hanb' => 'hänera',
  			'Hang' => 'hangula',
@@ -486,9 +486,9 @@ has 'display_name_script' => (
  			'Hans@alt=stand-alone' => 'idazkera txinatar sinplifikatua',
  			'Hant' => 'tradizionala',
  			'Hant@alt=stand-alone' => 'idazkera txinatar tradizionala',
- 			'Hebr' => 'hebreera',
+ 			'Hebr' => 'hebrearra',
  			'Hira' => 'hiragana',
- 			'Hrkt' => 'silaba japoniarrak',
+ 			'Hrkt' => 'silabario japoniarrak',
  			'Jamo' => 'jamo-bihurketa',
  			'Jpan' => 'japoniarra',
  			'Kana' => 'katakana',
@@ -496,8 +496,8 @@ has 'display_name_script' => (
  			'Knda' => 'kanadarra',
  			'Kore' => 'korearra',
  			'Laoo' => 'laosarra',
- 			'Latn' => 'latina',
- 			'Mlym' => 'malayalamera',
+ 			'Latn' => 'latinoa',
+ 			'Mlym' => 'malayalamarra',
  			'Mong' => 'mongoliarra',
  			'Mymr' => 'birmaniarra',
  			'Orya' => 'oriyarra',
@@ -541,11 +541,11 @@ has 'display_name_region' => (
  			'017' => 'Erdialdeko Afrika',
  			'018' => 'Afrika hegoaldea',
  			'019' => 'Amerika',
- 			'021' => 'Amerika iparraldea',
+ 			'021' => 'Amerikako iparraldea',
  			'029' => 'Karibea',
  			'030' => 'Asia ekialdea',
  			'034' => 'Asia hegoaldea',
- 			'035' => 'Asia hego-ekialdea',
+ 			'035' => 'Asiako hego-ekialdea',
  			'039' => 'Europa hegoaldea',
  			'053' => 'Australasia',
  			'054' => 'Melanesia',
@@ -575,7 +575,7 @@ has 'display_name_region' => (
  			'AT' => 'Austria',
  			'AU' => 'Australia',
  			'AW' => 'Aruba',
- 			'AX' => 'Aland uharteak',
+ 			'AX' => 'Åland',
  			'AZ' => 'Azerbaijan',
  			'BA' => 'Bosnia-Herzegovina',
  			'BB' => 'Barbados',
@@ -599,7 +599,7 @@ has 'display_name_region' => (
  			'BY' => 'Bielorrusia',
  			'BZ' => 'Belize',
  			'CA' => 'Kanada',
- 			'CC' => 'Cocos uharteak',
+ 			'CC' => 'Cocos (Keeling) uharteak',
  			'CD' => 'Kongoko Errepublika Demokratikoa',
  			'CD@alt=variant' => 'Kongo (DR)',
  			'CF' => 'Afrika Erdiko Errepublika',
@@ -607,7 +607,6 @@ has 'display_name_region' => (
  			'CG@alt=variant' => 'Kongoko Errepublika',
  			'CH' => 'Suitza',
  			'CI' => 'Boli Kosta',
- 			'CI@alt=variant' => 'CI',
  			'CK' => 'Cook uharteak',
  			'CL' => 'Txile',
  			'CM' => 'Kamerun',
@@ -641,8 +640,8 @@ has 'display_name_region' => (
  			'EZ' => 'Eurogunea',
  			'FI' => 'Finlandia',
  			'FJ' => 'Fiji',
- 			'FK' => 'Malvinak',
- 			'FK@alt=variant' => 'Falkland uharteak',
+ 			'FK' => 'Falklandak',
+ 			'FK@alt=variant' => 'Falklandak (Malvinak)',
  			'FM' => 'Mikronesia',
  			'FO' => 'Faroe uharteak',
  			'FR' => 'Frantzia',
@@ -758,7 +757,7 @@ has 'display_name_region' => (
  			'PM' => 'Saint-Pierre eta Mikelune',
  			'PN' => 'Pitcairn uharteak',
  			'PR' => 'Puerto Rico',
- 			'PS' => 'Palestinako Lurraldeak',
+ 			'PS' => 'Palestinar Lurralde Okupatuak',
  			'PS@alt=short' => 'Palestina',
  			'PT' => 'Portugal',
  			'PW' => 'Palau',
@@ -800,7 +799,6 @@ has 'display_name_region' => (
  			'TJ' => 'Tajikistan',
  			'TK' => 'Tokelau',
  			'TL' => 'Ekialdeko Timor',
- 			'TL@alt=variant' => 'TL',
  			'TM' => 'Turkmenistan',
  			'TN' => 'Tunisia',
  			'TO' => 'Tonga',
@@ -975,8 +973,8 @@ has 'display_name_type' => (
  				'strict' => q{Lerro-jauziaren estilo zorrotza},
  			},
  			'm0' => {
- 				'bgn' => q{BGN bihurketa},
- 				'ungegn' => q{UNGEGN bihurketa},
+ 				'bgn' => q{US BGN transliterazioa},
+ 				'ungegn' => q{UN GEGN transliterazioa},
  			},
  			'ms' => {
  				'metric' => q{Sistema metrikoa},
@@ -988,7 +986,7 @@ has 'display_name_type' => (
  				'arabext' => q{Digitu arabiar-hindiko hedatuak},
  				'armn' => q{Zenbaki armeniarrak},
  				'armnlow' => q{Zenbaki armeniarrak minuskulaz},
- 				'beng' => q{digitu bengalarrak},
+ 				'beng' => q{Digitu bengalarrak},
  				'deva' => q{Digitu devanagariak},
  				'ethi' => q{Zenbaki etiopiarrak},
  				'finance' => q{Finantza-zenbakiak},
@@ -1149,6 +1147,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(puntu kardinala),
+					},
 					'acre' => {
 						'name' => q(akre),
 						'one' => q({0} akre),
@@ -1178,6 +1179,11 @@ has 'units' => (
 						'name' => q(unitate astronomiko),
 						'one' => q({0} unitate astronomiko),
 						'other' => q({0} unitate astronomiko),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(bit-ak),
@@ -1695,6 +1701,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q(% {0}),
+						'other' => q(% {0}),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'one' => q(‰ {0}),
+						'other' => q(‰ {0}),
+					},
+					'petabyte' => {
+						'name' => q(PB),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
+					},
 					'picometer' => {
 						'name' => q(pikometro),
 						'one' => q({0} pikometro),
@@ -1841,6 +1862,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(norabidea),
+					},
 					'acre' => {
 						'one' => q({0} ac),
 						'other' => q({0} ac),
@@ -2009,6 +2033,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q(% {0}),
+						'other' => q(% {0}),
+					},
 					'picometer' => {
 						'one' => q({0} pm),
 						'other' => q({0} pm),
@@ -2058,6 +2087,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(norabidea),
+					},
 					'acre' => {
 						'name' => q(akre),
 						'one' => q({0} ac),
@@ -2087,6 +2119,11 @@ has 'units' => (
 						'name' => q(ua),
 						'one' => q({0} au),
 						'other' => q({0} au),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(bit),
@@ -2603,6 +2640,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q(% {0}),
+						'other' => q(% {0}),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'one' => q(‰ {0}),
+						'other' => q(‰ {0}),
+					},
+					'petabyte' => {
+						'name' => q(PB),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
 					},
 					'picometer' => {
 						'name' => q(pm),
@@ -4089,9 +4141,9 @@ has 'currencies' => (
 		'STN' => {
 			symbol => 'STN',
 			display_name => {
-				'currency' => q(Sao Tomeko eta Principeko dobra),
-				'one' => q(Sao Tomeko eta Principeko dobra),
-				'other' => q(Sao Tomeko eta Principeko dobra),
+				'currency' => q(Sao Tome eta Principeko dobra),
+				'one' => q(Sao Tome eta Principeko dobra),
+				'other' => q(Sao Tome eta Principeko dobra),
 			},
 		},
 		'SYP' => {
@@ -4224,6 +4276,13 @@ has 'currencies' => (
 		},
 		'VEF' => {
 			symbol => 'VEF',
+			display_name => {
+				'currency' => q(Venezuelako bolivarra \(2008–2018\)),
+				'one' => q(Venezuelako bolivar \(2008–2018\)),
+				'other' => q(Venezuelako bolivar \(2008–2018\)),
+			},
+		},
+		'VES' => {
 			display_name => {
 				'currency' => q(Venezuelako bolivarra),
 				'one' => q(Venezuelako bolivar),
@@ -4433,17 +4492,17 @@ has 'calendar_months' => (
 					wide => {
 						nonleap => [
 							'urtarrila',
-							'Otsaila',
-							'Martxoa',
-							'Apirila',
-							'Maiatza',
-							'Ekaina',
-							'Uztaila',
-							'Abuztua',
-							'Iraila',
-							'Urria',
-							'Azaroa',
-							'Abendua'
+							'otsaila',
+							'martxoa',
+							'apirila',
+							'maiatza',
+							'ekaina',
+							'uztaila',
+							'abuztua',
+							'iraila',
+							'urria',
+							'azaroa',
+							'abendua'
 						],
 						leap => [
 							
@@ -4527,13 +4586,13 @@ has 'calendar_days' => (
 						sun => 'ig.'
 					},
 					wide => {
-						mon => 'Astelehena',
-						tue => 'Asteartea',
-						wed => 'Asteazkena',
-						thu => 'Osteguna',
-						fri => 'Ostirala',
-						sat => 'Larunbata',
-						sun => 'Igandea'
+						mon => 'astelehena',
+						tue => 'asteartea',
+						wed => 'asteazkena',
+						thu => 'osteguna',
+						fri => 'ostirala',
+						sat => 'larunbata',
+						sun => 'igandea'
 					},
 				},
 			},
@@ -4594,33 +4653,65 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1900
+						&& $time < 2100;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'evening1' if $time >= 1900
+						&& $time < 2100;
+				}
+				last SWITCH;
+				}
 			if ($_ eq 'roc') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1900;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
 					return 'evening1' if $time >= 1900
 						&& $time < 2100;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
 				}
 				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1900;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'evening1' if $time >= 1900
 						&& $time < 2100;
 				}
@@ -4629,62 +4720,30 @@ has 'day_period_data' => (
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1900;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
 					return 'evening1' if $time >= 1900
 						&& $time < 2100;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
 				}
 				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1900;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'evening1' if $time >= 1900
-						&& $time < 2100;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1900;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'evening1' if $time >= 1900
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1900;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'evening1' if $time >= 1900
 						&& $time < 2100;
 				}
@@ -4693,30 +4752,30 @@ has 'day_period_data' => (
 			if ($_ eq 'buddhist') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1900;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
 					return 'evening1' if $time >= 1900
 						&& $time < 2100;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
 				}
 				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1900;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'evening1' if $time >= 1900
 						&& $time < 2100;
 				}
@@ -4738,73 +4797,73 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'am' => q{g},
+				'abbreviated' => {
 					'evening1' => q{iluntz.},
-					'afternoon2' => q{arrats.},
 					'morning1' => q{goizald.},
-					'night1' => q{gaueko},
-					'midnight' => q{gauerdia},
-					'morning2' => q{goizeko},
 					'afternoon1' => q{eguerd.},
-					'pm' => q{a},
+					'midnight' => q{gauerdia},
+					'pm' => q{PM},
+					'am' => q{AM},
+					'afternoon2' => q{arrats.},
+					'morning2' => q{goizeko},
+					'night1' => q{gaueko},
 				},
 				'wide' => {
 					'afternoon1' => q{eguerdiko},
-					'morning2' => q{goizeko},
-					'midnight' => q{gauerdia},
-					'pm' => q{PM},
-					'am' => q{AM},
 					'evening1' => q{iluntzeko},
-					'afternoon2' => q{arratsaldeko},
-					'night1' => q{gaueko},
 					'morning1' => q{goizaldeko},
-				},
-				'abbreviated' => {
-					'am' => q{AM},
-					'evening1' => q{iluntz.},
-					'afternoon2' => q{arrats.},
+					'morning2' => q{goizeko},
 					'night1' => q{gaueko},
-					'morning1' => q{goizald.},
+					'pm' => q{PM},
+					'midnight' => q{gauerdia},
+					'am' => q{AM},
+					'afternoon2' => q{arratsaldeko},
+				},
+				'narrow' => {
 					'afternoon1' => q{eguerd.},
+					'evening1' => q{iluntz.},
+					'morning1' => q{goizald.},
+					'night1' => q{gaueko},
 					'morning2' => q{goizeko},
 					'midnight' => q{gauerdia},
-					'pm' => q{PM},
+					'pm' => q{a},
+					'am' => q{g},
+					'afternoon2' => q{arrats.},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'night1' => q{gaua},
 					'morning1' => q{goiz.},
-					'afternoon2' => q{arrats.},
 					'evening1' => q{iluntz.},
+					'afternoon1' => q{eguerd.},
+					'afternoon2' => q{arrats.},
 					'am' => q{AM},
+					'midnight' => q{gauerdia},
 					'pm' => q{PM},
 					'morning2' => q{goiza},
-					'afternoon1' => q{eguerd.},
-					'midnight' => q{gauerdia},
+					'night1' => q{gaua},
 				},
 				'wide' => {
-					'morning2' => q{goiza},
+					'morning1' => q{goizaldea},
+					'evening1' => q{iluntzea},
 					'afternoon1' => q{eguerdia},
+					'afternoon2' => q{arratsaldea},
+					'am' => q{AM},
 					'midnight' => q{gauerdia},
 					'pm' => q{PM},
-					'am' => q{AM},
-					'evening1' => q{iluntzea},
-					'afternoon2' => q{arratsaldea},
+					'morning2' => q{goiza},
 					'night1' => q{gaua},
-					'morning1' => q{goizaldea},
 				},
 				'narrow' => {
-					'pm' => q{PM},
-					'midnight' => q{gauerdia},
-					'morning2' => q{goiza},
-					'afternoon1' => q{eguerd.},
-					'afternoon2' => q{arrats.},
-					'morning1' => q{goizald.},
-					'night1' => q{gaua},
-					'am' => q{AM},
 					'evening1' => q{iluntz.},
+					'morning1' => q{goizald.},
+					'afternoon1' => q{eguerd.},
+					'midnight' => q{gauerdia},
+					'pm' => q{PM},
+					'am' => q{AM},
+					'afternoon2' => q{arrats.},
+					'night1' => q{gaua},
+					'morning2' => q{goiza},
 				},
 			},
 		},
@@ -4858,7 +4917,7 @@ has 'date_formats' => (
 		'gregorian' => {
 			'full' => q{y('e')'ko' MMMM'ren' d('a'), EEEE},
 			'long' => q{y('e')'ko' MMMM'ren' d('a')},
-			'medium' => q{y MMM d},
+			'medium' => q{y('e')'ko' MMM d('a')},
 			'short' => q{yy/M/d},
 		},
 		'roc' => {
@@ -4915,56 +4974,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			Bh => q{B h},
-			Bhm => q{B h:mm},
-			Bhms => q{B h:mm:ss},
-			E => q{ccc},
-			EBhm => q{E B h:mm},
-			EBhms => q{E B h:mm:ss},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d, E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y. 'urteko' MMM},
-			GyMMMEd => q{G y. 'urteko' MMM d, E},
-			GyMMMd => q{G y. 'urteko' MMM d},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
-			MEd => q{M/d, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMMW => q{MMM W. 'astea'},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{M/d},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{y/M},
-			yMEd => q{y/M/d, E},
-			yMMM => q{y MMM},
-			yMMMEd => q{y MMM d, E},
-			yMMMM => q{y('e')'ko' MMMM},
-			yMMMMEd => q{y('e')'ko' MMMM'k' d, E},
-			yMMMMd => q{y('e')'ko' MMMM'ren' d},
-			yMMMd => q{y MMM d},
-			yMd => q{y/M/d},
-			yQQQ => q{y('e')'ko' QQQ},
-			yQQQQ => q{y('e')'ko' QQQQ},
-			yw => q{Y. 'urteko' w. 'astea'},
-		},
 		'generic' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -5018,6 +5027,56 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{G y QQQ},
 			yyyyQQQQ => q{G y('e')'ko' QQQQ},
 		},
+		'gregorian' => {
+			Bh => q{B h},
+			Bhm => q{B h:mm},
+			Bhms => q{B h:mm:ss},
+			E => q{ccc},
+			EBhm => q{E B h:mm},
+			EBhms => q{E B h:mm:ss},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y. 'urteko' MMM},
+			GyMMMEd => q{G y. 'urteko' MMM d, E},
+			GyMMMd => q{G y. 'urteko' MMM d},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{L},
+			MEd => q{M/d, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d, E},
+			MMMMW => q{MMM W. 'astea'},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{y/M},
+			yMEd => q{y/M/d, E},
+			yMMM => q{y MMM},
+			yMMMEd => q{y MMM d, E},
+			yMMMM => q{y('e')'ko' MMMM},
+			yMMMMEd => q{y('e')'ko' MMMM'k' d, E},
+			yMMMMd => q{y('e')'ko' MMMM'ren' d},
+			yMMMd => q{y MMM d},
+			yMd => q{y/M/d},
+			yQQQ => q{y('e')'ko' QQQ},
+			yQQQQ => q{y('e')'ko' QQQQ},
+			yw => q{Y. 'urteko' w. 'astea'},
+		},
 	} },
 );
 
@@ -5037,101 +5096,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{M–M},
-			},
-			MEd => {
-				M => q{M/d, E – M/d, E},
-				d => q{M/d, E – M/d, E},
-			},
-			MMM => {
-				M => q{MMM–MMM},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{M/d – M/d},
-				d => q{M/d – M/d},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
-			yM => {
-				M => q{y/M – y/M},
-				y => q{y/M – y/M},
-			},
-			yMEd => {
-				M => q{y/M/d, E – y/M/d, E},
-				d => q{y/M/d, E – y/M/d, E},
-				y => q{y/M/d, E – y/M/d, E},
-			},
-			yMMM => {
-				M => q{y('e')'ko' MMM–MMM},
-				y => q{y('e')'ko' MMM – y('e')'ko' MMM},
-			},
-			yMMMEd => {
-				M => q{y('e')'ko' MMM d, E – MMM d, E},
-				d => q{y('e')'ko' MMM d, E – y('e')'ko' MMM d, E},
-				y => q{y('e')'ko' MMM d, E – y('e')'ko' MMM d, E},
-			},
-			yMMMM => {
-				M => q{y('e')'ko' MMMM–MMMM},
-				y => q{y('e')'ko' MMMM – y('e')'ko' MMMM},
-			},
-			yMMMd => {
-				M => q{y('e')'ko' MMM d – MMM d},
-				d => q{y('e')'ko' MMM d–d},
-				y => q{y('e')'ko' MMM d – y('e')'ko' MMM d},
-			},
-			yMd => {
-				M => q{y/M/d – y/M/d},
-				d => q{y/M/d – y/M/d},
-				y => q{y/M/d – y/M/d},
-			},
-		},
 		'generic' => {
 			H => {
 				H => q{HH–HH},
@@ -5225,6 +5189,101 @@ has 'datetime_formats_interval' => (
 				M => q{G y/MM/dd – y/MM/dd},
 				d => q{G y/MM/dd – y/MM/dd},
 				y => q{G y/MM/dd – y/MM/dd},
+			},
+		},
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{M/d, E – M/d, E},
+				d => q{M/d, E – M/d, E},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{M/d – M/d},
+				d => q{M/d – M/d},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yM => {
+				M => q{y/M – y/M},
+				y => q{y/M – y/M},
+			},
+			yMEd => {
+				M => q{y/M/d, E – y/M/d, E},
+				d => q{y/M/d, E – y/M/d, E},
+				y => q{y/M/d, E – y/M/d, E},
+			},
+			yMMM => {
+				M => q{y('e')'ko' MMM–MMM},
+				y => q{y('e')'ko' MMM – y('e')'ko' MMM},
+			},
+			yMMMEd => {
+				M => q{y('e')'ko' MMM d, E – MMM d, E},
+				d => q{y('e')'ko' MMM d, E – y('e')'ko' MMM d, E},
+				y => q{y('e')'ko' MMM d, E – y('e')'ko' MMM d, E},
+			},
+			yMMMM => {
+				M => q{y('e')'ko' MMMM–MMMM},
+				y => q{y('e')'ko' MMMM – y('e')'ko' MMMM},
+			},
+			yMMMd => {
+				M => q{y('e')'ko' MMM d – MMM d},
+				d => q{y('e')'ko' MMM d–d},
+				y => q{y('e')'ko' MMM d – y('e')'ko' MMM d},
+			},
+			yMd => {
+				M => q{y/M/d – y/M/d},
+				d => q{y/M/d – y/M/d},
+				y => q{y/M/d – y/M/d},
 			},
 		},
 	} },

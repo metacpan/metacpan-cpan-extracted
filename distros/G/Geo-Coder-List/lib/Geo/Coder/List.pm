@@ -6,7 +6,7 @@ use Carp;
 use Time::HiRes;
 use HTML::Entities;
 
-use constant DEBUG => 0;
+use constant DEBUG => 0;	# The higher the number, the more is debugged
 
 # TODO: investigate Geo, Coder::ArcGIS
 
@@ -16,11 +16,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 our %locations;
 
 =head1 SYNOPSIS
@@ -78,7 +78,7 @@ and OpenStreetMap for other places:
     }
 
     # It is also possible to limit the number of enquires used by a particular encoder
-    $geo_coderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234', limit => 100) });
+    $geo_coderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234'), limit => 100) });
 
 =cut
 
@@ -125,6 +125,7 @@ sub geocode {
 	$location =~ s/\s\s+/ /g;
 	$location = decode_entities($location);
 
+	my @call_details = caller(0);
 	print "location: $location\n" if(DEBUG);
 	if((!wantarray) && (my $rc = $locations{$location})) {
 		if(ref($rc) eq 'ARRAY') {
@@ -133,6 +134,7 @@ sub geocode {
 		if(ref($rc) eq 'HASH') {
 			delete $rc->{'geocoder'};
 			my $log = {
+				line => $call_details[2],
 				location => $location,
 				timetaken => 0,
 				wantarray => wantarray,
@@ -153,6 +155,7 @@ sub geocode {
 				}
 			}
 			my $log = {
+				line => $call_details[2],
 				location => $location,
 				timetaken => 0,
 				wantarray => wantarray,
@@ -199,14 +202,14 @@ sub geocode {
 		eval {
 			# e.g. over QUERY LIMIT with this one
 			# TODO: remove from the list of geocoders
-			print "trying ", ref($geocoder), "\n" if(DEBUG);
+			print 'trying ', ref($geocoder), "\n" if(DEBUG);
 			if(ref($geocoder) eq 'Geo::GeoNames') {
-				print "username => ", $geocoder->username(), "\n" if(DEBUG);
-				die "lost username" if(!defined($geocoder->username()));
+				print 'username => ', $geocoder->username(), "\n" if(DEBUG);
+				die 'lost username' if(!defined($geocoder->username()));
 				@rc = $geocoder->geocode($location);
 			} else {
 				if(ref($geocoder) eq 'Geo::Coder::GooglePlaces::V3') {
-					print "key: ", $geocoder->key(), "\n" if(DEBUG);
+					print 'key: ', $geocoder->key(), "\n" if(DEBUG);
 				}
 				@rc = $geocoder->geocode(%params);
 			}
@@ -214,6 +217,7 @@ sub geocode {
 		$timetaken = Time::HiRes::time() - $timetaken;
 		if($@) {
 			my $log = {
+				line => $call_details[2],
 				location => $location,
 				geocoder => ref($geocoder),
 				timetaken => $timetaken,
@@ -225,6 +229,19 @@ sub geocode {
 			$error = $@;
 			next;
 		}
+		if(scalar(@rc) == 0) {
+			my $log = {
+				line => $call_details[2],
+				location => $location,
+				timetaken => $timetaken,
+				geocoder => ref($geocoder),
+				wantarray => wantarray,
+				result => 'not found',
+			};
+			CORE::push @{$self->{'log'}}, $log;
+			@rc = ();
+			next ENCODER;
+		}
 		POSSIBLE_LOCATION: foreach my $l(@rc) {
 			if(ref($l) eq 'ARRAY') {
 				# Geo::GeoNames
@@ -233,10 +250,12 @@ sub geocode {
 			}
 			if(!defined($l)) {
 				my $log = {
+					line => $call_details[2],
 					location => $location,
 					timetaken => $timetaken,
 					geocoder => ref($geocoder),
 					wantarray => wantarray,
+					result => 'not found',
 				};
 				CORE::push @{$self->{'log'}}, $log;
 				@rc = ();
@@ -246,6 +265,7 @@ sub geocode {
 			next if(ref($l) ne 'HASH');
 			if($l->{'error'}) {
 				my $log = {
+					line => $call_details[2],
 					location => $location,
 					timetaken => $timetaken,
 					geocoder => ref($geocoder),
@@ -283,6 +303,10 @@ sub geocode {
 						# ovi
 						$l->{geometry}{location}{lat} = $l->{properties}{geoLatitude};
 						$l->{geometry}{location}{lng} = $l->{properties}{geoLongitude};
+					} elsif($l->{'results'}[0]->{'geometry'}) {
+						# DataScienceToolkit
+						$l->{'geometry'}{'location'}{'lat'} = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
+						$l->{'geometry'}{'location'}{'lng'} = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
 					} elsif($l->{'RESULTS'}) {
 						# GeoCodeFarm
 						$l->{geometry}{location}{lat} = $l->{'RESULTS'}[0]{'COORDINATES'}{'latitude'};
@@ -306,6 +330,7 @@ sub geocode {
 					print $l->{geometry}{location}{lat}, '/', $l->{geometry}{location}{lng}, "\n" if(DEBUG);
 					$l->{geocoder} = $geocoder;
 					my $log = {
+						line => $call_details[2],
 						location => $location,
 						timetaken => $timetaken,
 						geocoder => ref($geocoder),

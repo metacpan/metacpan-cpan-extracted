@@ -8,13 +8,13 @@ Locale::CLDR::Locales::My - Package for language Burmese
 
 package Locale::CLDR::Locales::My;
 # This file auto generated from Data\common\main\my.xml
-#	on Sun  7 Oct 10:47:53 am GMT
+#	on Sun  3 Feb  2:06:58 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -440,7 +440,7 @@ has 'display_name_language' => (
  				'ha' => 'ဟာဥစာ',
  				'haw' => 'ဟာဝိုင်ယီ',
  				'he' => 'ဟီးဘရူး',
- 				'hi' => 'ဟိန္ဒူ',
+ 				'hi' => 'ဟိန်ဒူ',
  				'hil' => 'ဟီလီဂေနွန်',
  				'hmn' => 'မုံ',
  				'hr' => 'ခရိုအေးရှား',
@@ -484,13 +484,13 @@ has 'display_name_language' => (
  				'khq' => 'ကိုရာ ချီအီနီ',
  				'ki' => 'ကီကူယူ',
  				'kj' => 'ကွန်းယာမာ',
- 				'kk' => 'ကာဇာခ်',
+ 				'kk' => 'ကာဇာချ',
  				'kkj' => 'ကကို',
  				'kl' => 'ကလာအ်လီဆပ်',
  				'kln' => 'ကလန်ဂျင်',
  				'km' => 'ခမာ',
  				'kmb' => 'ကင်ဘွန်ဒူ',
- 				'kn' => 'ကန္နာဒါ',
+ 				'kn' => 'ကန်နာဒါ',
  				'ko' => 'ကိုရီးယား',
  				'koi' => 'ကိုမီ-ပါမြက်',
  				'kok' => 'ကွန်ကနီ',
@@ -557,7 +557,7 @@ has 'display_name_language' => (
  				'mt' => 'မော်လ်တာ',
  				'mua' => 'မွန်ဒန်း',
  				'mul' => 'ဘာသာစကား အမျိုးမျိုး',
- 				'mus' => 'ခရိခ်',
+ 				'mus' => 'ခရိချ',
  				'mwl' => 'မီရန်ဒီးဇ်',
  				'my' => 'မြန်မာ',
  				'myv' => 'အီဇယာ',
@@ -645,7 +645,7 @@ has 'display_name_language' => (
  				'sma' => 'တောင် ဆာမိ',
  				'smj' => 'လူလီ ဆာမိ',
  				'smn' => 'အီနာရီ ဆာမိ',
- 				'sms' => 'စခိုးလ် ဆမ်မီ',
+ 				'sms' => 'စခိုးလ် ဆာမိ',
  				'sn' => 'ရှိုနာ',
  				'snk' => 'ဆိုနင်ကေး',
  				'so' => 'ဆိုမာလီ',
@@ -682,7 +682,7 @@ has 'display_name_language' => (
  				'tt' => 'တာတာ',
  				'tum' => 'တမ်ဘူကာ',
  				'tvl' => 'တူဗာလူ',
- 				'twq' => 'တာဆာဝါခ်',
+ 				'twq' => 'တာဆာဝါချ',
  				'ty' => 'တဟီတီ',
  				'tyv' => 'တူဗန်',
  				'tzm' => 'အလယ်အာ့တလာစ် တာမာဇိုက်',
@@ -739,7 +739,7 @@ has 'display_name_script' => (
  			'Armn' => 'အာမေးနီးယား',
  			'Beng' => 'ဘင်္ဂါလီ',
  			'Bopo' => 'ဘိုပို',
- 			'Brah' => 'ဗြဟ္မမီ',
+ 			'Brah' => 'ဗွဟ်မမီ',
  			'Brai' => 'ဘရေ',
  			'Cyrl' => 'စစ်ရိလစ်',
  			'Deva' => 'ဒီဗနာဂရီ',
@@ -764,7 +764,7 @@ has 'display_name_script' => (
  			'Kali' => 'ကယားလီ',
  			'Kana' => 'ခတခန',
  			'Khmr' => 'ခမာ',
- 			'Knda' => 'ခန္နာဒါ',
+ 			'Knda' => 'ခန်နာဒါ',
  			'Kore' => 'ကိုရီးယား',
  			'Laoo' => 'လာအို',
  			'Latn' => 'လက်တင်',
@@ -845,7 +845,7 @@ has 'display_name_region' => (
  			'AL' => 'အယ်လ်ဘေးနီးယား',
  			'AM' => 'အာမေးနီးယား',
  			'AO' => 'အန်ဂိုလာ',
- 			'AQ' => 'အန္တာတိက',
+ 			'AQ' => 'အန်တာတိက',
  			'AR' => 'အာဂျင်တီးနား',
  			'AS' => 'အမေရိကန် ဆမိုးအား',
  			'AT' => 'ဩစတြီးယား',
@@ -1000,7 +1000,7 @@ has 'display_name_region' => (
  			'MN' => 'မွန်ဂိုးလီးယား',
  			'MO' => 'မကာအို (တရုတ်ပြည်)',
  			'MO@alt=short' => 'မကာအို',
- 			'MP' => 'တောင်ပိုင်းမာရီအာနာကျွန်းစု',
+ 			'MP' => 'မြောက်ပိုင်းမာရီအာနာကျွန်းစု',
  			'MQ' => 'မာတီနိခ်',
  			'MR' => 'မော်ရီတေးနီးယား',
  			'MS' => 'မောင့်စဲရက်',
@@ -1008,7 +1008,7 @@ has 'display_name_region' => (
  			'MU' => 'မောရစ်ရှ',
  			'MV' => 'မော်လ်ဒိုက်',
  			'MW' => 'မာလာဝီ',
- 			'MX' => 'မက္ကဆီကို',
+ 			'MX' => 'မက်ကဆီကို',
  			'MY' => 'မလေးရှား',
  			'MZ' => 'မိုဇမ်ဘစ်',
  			'NA' => 'နမီးဘီးယား',
@@ -1363,6 +1363,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(အရပ် လေးမျက်နှာ),
+					},
 					'acre' => {
 						'name' => q(ဧက),
 						'other' => q({0} ဧက),
@@ -1384,8 +1387,12 @@ has 'units' => (
 						'other' => q({0} စက္ကန့်),
 					},
 					'astronomical-unit' => {
-						'name' => q(နက္ခတ္တဗေဒယူနစ်),
-						'other' => q({0} နက္ခတ္တဗေဒယူနစ်),
+						'name' => q(နက်ခတ်တဗဒေယူနဈ),
+						'other' => q({0} နက်ခတ်တဗဒေယူနဈ),
+					},
+					'atmosphere' => {
+						'name' => q(ကမ္ဘာ့လေထု),
+						'other' => q({0} ကမ္ဘာ့လေထု),
 					},
 					'bit' => {
 						'name' => q(ဘစ်),
@@ -1805,6 +1812,18 @@ has 'units' => (
 					'per' => {
 						'1' => q(တစ်{1} လျှင် {0}),
 					},
+					'percent' => {
+						'name' => q(ရာခိုင်နှုန်း),
+						'other' => q({0} ရာခိုင်နှုန်း),
+					},
+					'permille' => {
+						'name' => q(ထောင်လီစိတ်),
+						'other' => q({0} ထောင်လီစိတ်),
+					},
+					'petabyte' => {
+						'name' => q(ပက်တာဘိုက်),
+						'other' => q({0} ပက်တာဘိုက်),
+					},
 					'picometer' => {
 						'name' => q(ပီကိုမီတာ),
 						'other' => q({0} ပီကိုမီတာ),
@@ -1924,6 +1943,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(လမ်းကြောင်း),
+					},
 					'acre' => {
 						'other' => q({0} ac),
 					},
@@ -2056,6 +2078,10 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'other' => q({0} pm),
 					},
@@ -2094,6 +2120,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(လမ်းကြောင်း),
+					},
 					'acre' => {
 						'name' => q(ဧက),
 						'other' => q({0} ac),
@@ -2115,8 +2144,12 @@ has 'units' => (
 						'other' => q({0}″),
 					},
 					'astronomical-unit' => {
-						'name' => q(နက္ခတ္တဗေဒယူနစ်),
+						'name' => q(နက်ခတ်တဗဒေယူနဈ),
 						'other' => q({0} au),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(ဘစ်),
@@ -2239,8 +2272,8 @@ has 'units' => (
 						'per' => q({0}/gal US),
 					},
 					'gallon-imperial' => {
-						'name' => q(ယူကေဂါလံ),
-						'other' => q({0} ယူကေဂါလံ),
+						'name' => q(ယူကဂေါလံ),
+						'other' => q({0} ယူကဂေါလံ),
 						'per' => q({0}/gal Imp.),
 					},
 					'generic' => {
@@ -2535,6 +2568,18 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PB),
+						'other' => q({0} PB),
 					},
 					'picometer' => {
 						'name' => q(pm),
@@ -3616,14 +3661,14 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
-				'currency' => q(မော်ရီတေးနီးယား အူဂီးယာ \(1973–2017\)),
-				'other' => q(မော်ရီတေးနီးယား အူဂီးယာ \(1973–2017\)),
+				'currency' => q(မော်ရီတေးနီးယား အူဂီးယာ \(၁၉၇၃–၂၀၁၇\)),
+				'other' => q(မော်ရီတေးနီးယား အူဂီးယာ \(၁၉၇၃–၂၀၁၇\)),
 			},
 		},
 		'MRU' => {
 			display_name => {
-				'currency' => q(မော်ရီတေးနီးယား အူဂီးယာ),
-				'other' => q(မော်ရီတေးနီးယား အူဂီးယာ),
+				'currency' => q(မော်ရီတေးနီးယန်း အူဂီးယာ),
+				'other' => q(မော်ရီတေးနီးယန်း အူဂီးယာ),
 			},
 		},
 		'MUR' => {
@@ -3650,8 +3695,8 @@ has 'currencies' => (
 		'MXN' => {
 			symbol => 'MX$',
 			display_name => {
-				'currency' => q(မက္ကဆီကို ပီဆို),
-				'other' => q(မက္ကဆီကို ပီဆို),
+				'currency' => q(မက်ကဆီကို ပီဆို),
+				'other' => q(မက်ကဆီကို ပီဆို),
 			},
 		},
 		'MYR' => {
@@ -3720,8 +3765,8 @@ has 'currencies' => (
 		'PAB' => {
 			symbol => 'B/.',
 			display_name => {
-				'currency' => q(ပနားမား ဘလ်ဘိုးအာ),
-				'other' => q(ပနားမား ဘလ်ဘိုးအာ),
+				'currency' => q(ပနားမား ဘလျဘိုးအာ),
+				'other' => q(ပနားမား ဘလျဘိုးအာ),
 			},
 		},
 		'PEN' => {
@@ -3891,15 +3936,15 @@ has 'currencies' => (
 		'STD' => {
 			symbol => 'STD',
 			display_name => {
-				'currency' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ \(1977–2017\)),
-				'other' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ \(1977–2017\)),
+				'currency' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ),
+				'other' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ),
 			},
 		},
 		'STN' => {
 			symbol => 'Db',
 			display_name => {
-				'currency' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ),
-				'other' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ),
+				'currency' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ \(၂၀၁၈\)),
+				'other' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာစ် \(၂၀၁၈\)),
 			},
 		},
 		'SUR' => {
@@ -4037,8 +4082,14 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
-				'currency' => q(ဗင်နီဇွဲလား ဘိုလီဗာ),
-				'other' => q(ဗင်နီဇွဲလား ဘိုလီဗာ),
+				'currency' => q(ဗင်နီဇွဲလား ဘိုလီဗာ \(၂၀၀၈–၂၀၁၈\)),
+				'other' => q(ဗင်နီဇွဲလား ဘိုလီဗာ \(၂၀၀၈–၂၀၁၈\)),
+			},
+		},
+		'VES' => {
+			display_name => {
+				'currency' => q(ဗင်နီဇွဲလန်း ဘိုလီဗာ),
+				'other' => q(ဗင်နီဇွဲလန်း ဘိုလီဗာ),
 			},
 		},
 		'VND' => {
@@ -4430,22 +4481,22 @@ has 'day_period_data' => (
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1600
 						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
+					return 'evening1' if $time >= 1600
+						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
@@ -4455,22 +4506,22 @@ has 'day_period_data' => (
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1600
 						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
+					return 'evening1' if $time >= 1600
+						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
@@ -4490,67 +4541,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{နံနက်},
-					'evening1' => q{ညနေ},
-					'night1' => q{ည},
-					'morning1' => q{နံနက်},
-					'afternoon1' => q{နေ့လယ်},
-					'midnight' => q{သန်းခေါင်ယံ},
-					'pm' => q{ညနေ},
-					'noon' => q{မွန်းတည့်},
-				},
-				'narrow' => {
-					'morning1' => q{နံနက်},
-					'night1' => q{ည},
-					'evening1' => q{ညနေ},
-					'am' => q{နံနက်},
-					'noon' => q{မွန်းတည့်},
-					'pm' => q{ညနေ},
-					'midnight' => q{သန်းခေါင်ယံ},
-					'afternoon1' => q{နေ့လယ်},
-				},
 				'wide' => {
 					'noon' => q{မွန်းတည့်},
-					'pm' => q{ညနေ},
 					'afternoon1' => q{နေ့လယ်},
-					'midnight' => q{သန်းခေါင်ယံ},
 					'morning1' => q{နံနက်},
-					'night1' => q{ည},
 					'evening1' => q{ညနေ},
+					'night1' => q{ည},
 					'am' => q{နံနက်},
+					'midnight' => q{သန်းခေါင်ယံ},
+					'pm' => q{ညနေ},
+				},
+				'narrow' => {
+					'night1' => q{ည},
+					'pm' => q{ညနေ},
+					'midnight' => q{သန်းခေါင်ယံ},
+					'am' => q{နံနက်},
+					'noon' => q{မွန်းတည့်},
+					'afternoon1' => q{နေ့လယ်},
+					'evening1' => q{ညနေ},
+					'morning1' => q{နံနက်},
+				},
+				'abbreviated' => {
+					'evening1' => q{ညနေ},
+					'morning1' => q{နံနက်},
+					'afternoon1' => q{နေ့လယ်},
+					'noon' => q{မွန်းတည့်},
+					'pm' => q{ညနေ},
+					'midnight' => q{သန်းခေါင်ယံ},
+					'am' => q{နံနက်},
+					'night1' => q{ည},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'am' => q{နံနက်},
-					'evening1' => q{ညနေ},
-					'morning1' => q{နံနက်},
 					'night1' => q{ည},
-					'midnight' => q{သန်းခေါင်ယံ},
-					'afternoon1' => q{နေ့လယ်},
+					'am' => q{နံနက်},
 					'pm' => q{ညနေ},
+					'midnight' => q{သန်းခေါင်ယံ},
 					'noon' => q{မွန်းတည့်},
+					'afternoon1' => q{နေ့လယ်},
+					'morning1' => q{နံနက်},
+					'evening1' => q{ညနေ},
 				},
 				'wide' => {
-					'pm' => q{ညနေ},
-					'noon' => q{မွန်းတည့်},
-					'midnight' => q{သန်းခေါင်ယံ},
-					'afternoon1' => q{နေ့လယ်},
 					'morning1' => q{နံနက်},
-					'night1' => q{ည},
-					'am' => q{နံနက်},
 					'evening1' => q{ညနေ},
+					'noon' => q{မွန်းတည့်},
+					'afternoon1' => q{နေ့လယ်},
+					'am' => q{နံနက်},
+					'pm' => q{ညနေ},
+					'midnight' => q{သန်းခေါင်ယံ},
+					'night1' => q{ည},
 				},
 				'narrow' => {
-					'afternoon1' => q{နေ့လယ်},
 					'midnight' => q{သန်းခေါင်ယံ},
 					'pm' => q{ညနေ},
-					'noon' => q{မွန်းတည့်},
 					'am' => q{နံနက်},
+					'night1' => q{ည},
 					'evening1' => q{ညနေ},
 					'morning1' => q{နံနက်},
-					'night1' => q{ည},
+					'afternoon1' => q{နေ့လယ်},
+					'noon' => q{မွန်းတည့်},
 				},
 			},
 		},
@@ -4567,7 +4618,7 @@ has 'eras' => (
 		'gregorian' => {
 			abbreviated => {
 				'0' => 'ဘီစီ',
-				'1' => 'အေဒီ'
+				'1' => 'အဒေီ'
 			},
 			wide => {
 				'0' => 'ခရစ်တော် မပေါ်မီနှစ်',
@@ -4685,7 +4736,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{dd-MM-y},
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
-			yw => q{y ခု w ပတ်မြောက်},
+			yw => q{Y ခု w ပတ်မြောက်},
 		},
 		'generic' => {
 			Bh => q{B h},
@@ -5009,7 +5060,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ကိုနာကရီး#,
 		},
 		'Africa/Dakar' => {
-			exemplarCity => q#ဒက္ကား#,
+			exemplarCity => q#ဒက်ကား#,
 		},
 		'Africa/Dar_es_Salaam' => {
 			exemplarCity => q#ဒါရက်စ်ဆာလမ်#,
@@ -5153,7 +5204,7 @@ has 'time_zone_names' => (
 			},
 		},
 		'America/Adak' => {
-			exemplarCity => q#အာဒခ်#,
+			exemplarCity => q#အာဒချ#,
 		},
 		'America/Anchorage' => {
 			exemplarCity => q#အန်ကာရေ့ဂျ်#,
@@ -5237,7 +5288,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ကာရာကာစ်#,
 		},
 		'America/Catamarca' => {
-			exemplarCity => q#ကာတာမာရ်ကာ#,
+			exemplarCity => q#ကာတာမာရျကာ#,
 		},
 		'America/Cayenne' => {
 			exemplarCity => q#ကေညင်န်#,
@@ -5399,7 +5450,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#လိုအာပရင့်စ် ကွာတာ#,
 		},
 		'America/Maceio' => {
-			exemplarCity => q#မာဆဲသြာ#,
+			exemplarCity => q#မာဆဲသွာ#,
 		},
 		'America/Managua' => {
 			exemplarCity => q#မာနာဂွါ#,
@@ -5432,7 +5483,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#မက်တ်လာကက်လာ#,
 		},
 		'America/Mexico_City' => {
-			exemplarCity => q#မက္ကဆီကို စီးတီး#,
+			exemplarCity => q#မက်ကဆီကို စီးတီး#,
 		},
 		'America/Miquelon' => {
 			exemplarCity => q#မီကွီလွန်#,
@@ -5711,7 +5762,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#အက်တာဥု#,
 		},
 		'Asia/Aqtobe' => {
-			exemplarCity => q#အာခ်တူးဘီ#,
+			exemplarCity => q#အာချတူးဘီ#,
 		},
 		'Asia/Ashgabat' => {
 			exemplarCity => q#အာရှ်ဂါဘာဒ်#,
@@ -5744,7 +5795,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ဘရူနိုင်း#,
 		},
 		'Asia/Calcutta' => {
-			exemplarCity => q#ကိုလ်ကတ္တား#,
+			exemplarCity => q#ကိုလျကတ်တား#,
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#ချီတာ#,
@@ -5759,7 +5810,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ဒမားစကပ်#,
 		},
 		'Asia/Dhaka' => {
-			exemplarCity => q#ဒက္ကာ#,
+			exemplarCity => q#ဒက်ကာ#,
 		},
 		'Asia/Dili' => {
 			exemplarCity => q#ဒစ်လီ#,
@@ -5783,7 +5834,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ဟောင်ကောင်#,
 		},
 		'Asia/Hovd' => {
-			exemplarCity => q#ဟိုးဗ်#,
+			exemplarCity => q#ဟိုးဗျ#,
 		},
 		'Asia/Irkutsk' => {
 			exemplarCity => q#အီရူခူတ်#,
@@ -5798,7 +5849,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ဂျေရုဆလင်#,
 		},
 		'Asia/Kabul' => {
-			exemplarCity => q#ကဘူးလ်#,
+			exemplarCity => q#ကဘူးလျ#,
 		},
 		'Asia/Kamchatka' => {
 			exemplarCity => q#ခမ်ချာ့ခါ#,
@@ -5807,7 +5858,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ကရာချိ#,
 		},
 		'Asia/Katmandu' => {
-			exemplarCity => q#ခတ္တမန္ဒူ#,
+			exemplarCity => q#ခတ်တမန်ဒူ#,
 		},
 		'Asia/Khandyga' => {
 			exemplarCity => q#ခန်ဒိုင်ဂါ#,

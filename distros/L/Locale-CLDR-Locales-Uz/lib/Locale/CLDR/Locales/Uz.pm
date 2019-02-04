@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Uz - Package for language Uzbek
 
 package Locale::CLDR::Locales::Uz;
 # This file auto generated from Data\common\main\uz.xml
-#	on Sun  7 Oct 11:05:49 am GMT
+#	on Sun  3 Feb  2:25:14 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -119,7 +119,7 @@ has 'display_name_language' => (
  				'de_CH' => 'yuqori nemis (Shveytsariya)',
  				'dgr' => 'dogrib',
  				'dje' => 'zarma',
- 				'dsb' => 'quyi sorbcha',
+ 				'dsb' => 'quyi sorb',
  				'dua' => 'duala',
  				'dv' => 'divexi',
  				'dyo' => 'diola-fogni',
@@ -354,13 +354,13 @@ has 'display_name_language' => (
  				'sad' => 'sandave',
  				'sah' => 'saxa',
  				'saq' => 'samburu',
- 				'sat' => 'santal',
+ 				'sat' => 'santali',
  				'sba' => 'ngambay',
  				'sbp' => 'sangu',
  				'sc' => 'sardin',
  				'scn' => 'sitsiliya',
  				'sco' => 'shotland',
- 				'sd' => 'sindxi',
+ 				'sd' => 'sindhi',
  				'sdh' => 'janubiy kurd',
  				'se' => 'shimoliy saam',
  				'seh' => 'sena',
@@ -1064,6 +1064,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(yo‘nalish),
+					},
 					'acre' => {
 						'name' => q(akr),
 						'one' => q({0} akr),
@@ -1093,6 +1096,11 @@ has 'units' => (
 						'name' => q(astronomik birlik),
 						'one' => q({0} astronomik birlik),
 						'other' => q({0} astronomik birlik),
+					},
+					'atmosphere' => {
+						'name' => q(atmosfera),
+						'one' => q({0} atmosfera),
+						'other' => q({0} atmosfera),
 					},
 					'bit' => {
 						'name' => q(bit),
@@ -1610,6 +1618,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(foiz),
+						'one' => q({0} foiz),
+						'other' => q({0} foiz),
+					},
+					'permille' => {
+						'name' => q(promille),
+						'one' => q({0} promille),
+						'other' => q({0} promille),
+					},
+					'petabyte' => {
+						'name' => q(petabayt),
+						'one' => q({0} petabayt),
+						'other' => q({0} petabayt),
+					},
 					'picometer' => {
 						'name' => q(pikometr),
 						'one' => q({0} pikometr),
@@ -1756,6 +1779,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(yo‘nalish),
+					},
 					'acre' => {
 						'one' => q({0} ac),
 						'other' => q({0} ac),
@@ -1924,6 +1950,11 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'picometer' => {
 						'one' => q({0} pm),
 						'other' => q({0} pm),
@@ -1973,6 +2004,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(yo‘nalish),
+					},
 					'acre' => {
 						'name' => q(akr),
 						'one' => q({0} akr),
@@ -2002,6 +2036,11 @@ has 'units' => (
 						'name' => q(a.b.),
 						'one' => q({0} a.b.),
 						'other' => q({0} a.b.),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(bit),
@@ -2518,6 +2557,21 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(foiz),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(promille),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PB),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
 					},
 					'picometer' => {
 						'name' => q(pm),
@@ -4152,6 +4206,13 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
+				'currency' => q(Venesuela bolivari \(2008–2018\)),
+				'one' => q(Venesuela bolivari \(2008–2018\)),
+				'other' => q(Venesuela bolivari \(2008–2018\)),
+			},
+		},
+		'VES' => {
+			display_name => {
 				'currency' => q(Venesuela bolivari),
 				'one' => q(Venesuela bolivari),
 				'other' => q(Venesuela bolivari),
@@ -4543,49 +4604,24 @@ has 'day_period_data' => (
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
 					return 'afternoon1' if $time >= 1100
 						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1100
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1100;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
 					return 'afternoon1' if $time >= 1100
 						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1100
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
 				}
 				last SWITCH;
 				}
@@ -4593,24 +4629,49 @@ has 'day_period_data' => (
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
 					return 'afternoon1' if $time >= 1100
 						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1100
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
+					return 'afternoon1' if $time >= 1100
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1100
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
+					return 'afternoon1' if $time >= 1100
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
 				}
 				last SWITCH;
 				}
@@ -4631,66 +4692,66 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{TO},
-					'evening1' => q{kechqurun},
-					'night1' => q{kechasi},
 					'morning1' => q{ertalab},
-					'midnight' => q{yarim tun},
+					'evening1' => q{kechqurun},
 					'afternoon1' => q{kunduzi},
-					'pm' => q{TK},
 					'noon' => q{tush payti},
-				},
-				'wide' => {
-					'noon' => q{tush payti},
+					'am' => q{TO},
 					'pm' => q{TK},
 					'midnight' => q{yarim tun},
-					'afternoon1' => q{kunduzi},
-					'morning1' => q{ertalab},
 					'night1' => q{kechasi},
-					'evening1' => q{kechqurun},
-					'am' => q{TO},
 				},
 				'narrow' => {
-					'noon' => q{tush payti},
-					'pm' => q{TK},
-					'afternoon1' => q{kunduzi},
-					'midnight' => q{yarim tun},
 					'night1' => q{kechasi},
-					'morning1' => q{ertalab},
-					'evening1' => q{kechqurun},
+					'midnight' => q{yarim tun},
+					'pm' => q{TK},
 					'am' => q{TO},
+					'afternoon1' => q{kunduzi},
+					'noon' => q{tush payti},
+					'evening1' => q{kechqurun},
+					'morning1' => q{ertalab},
+				},
+				'wide' => {
+					'night1' => q{kechasi},
+					'pm' => q{TK},
+					'midnight' => q{yarim tun},
+					'am' => q{TO},
+					'noon' => q{tush payti},
+					'afternoon1' => q{kunduzi},
+					'evening1' => q{kechqurun},
+					'morning1' => q{ertalab},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'pm' => q{TK},
-					'noon' => q{tush payti},
-					'afternoon1' => q{kunduzi},
-					'midnight' => q{yarim tun},
-					'morning1' => q{ertalab},
-					'night1' => q{kechasi},
-					'am' => q{TO},
-					'evening1' => q{kechqurun},
-				},
-				'narrow' => {
-					'pm' => q{TK},
-					'noon' => q{tush payti},
-					'afternoon1' => q{kunduzi},
-					'midnight' => q{yarim tun},
-					'night1' => q{kechasi},
-					'morning1' => q{ertalab},
-					'am' => q{TO},
-					'evening1' => q{kechqurun},
-				},
 				'wide' => {
 					'am' => q{TO},
-					'evening1' => q{kechqurun},
+					'midnight' => q{yarim tun},
+					'pm' => q{TK},
 					'night1' => q{kechasi},
 					'morning1' => q{ertalab},
-					'midnight' => q{yarim tun},
+					'evening1' => q{kechqurun},
 					'afternoon1' => q{kunduzi},
-					'pm' => q{TK},
 					'noon' => q{tush payti},
+				},
+				'narrow' => {
+					'evening1' => q{kechqurun},
+					'morning1' => q{ertalab},
+					'afternoon1' => q{kunduzi},
+					'noon' => q{tush payti},
+					'pm' => q{TK},
+					'midnight' => q{yarim tun},
+					'am' => q{TO},
+					'night1' => q{kechasi},
+				},
+				'abbreviated' => {
+					'noon' => q{tush payti},
+					'afternoon1' => q{kunduzi},
+					'evening1' => q{kechqurun},
+					'morning1' => q{ertalab},
+					'night1' => q{kechasi},
+					'midnight' => q{yarim tun},
+					'pm' => q{TK},
+					'am' => q{TO},
 				},
 			},
 		},
@@ -4786,6 +4847,49 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			Bh => q{B h},
+			Bhm => q{B h:mm},
+			Bhms => q{B h:mm:ss},
+			E => q{ccc},
+			EBhm => q{E, B h:mm},
+			EBhms => q{E, B h:mm:ss},
+			EHm => q{E, HH:mm},
+			EHms => q{E, HH:mm:ss},
+			Ed => q{E, d},
+			Ehm => q{E, h:mm (a)},
+			Ehms => q{E, h:mm:ss (a)},
+			Gy => q{y (G)},
+			GyMMM => q{MMM, y (G)},
+			GyMMMEd => q{E, d-MMM, y (G)},
+			GyMMMd => q{d-MMM, y (G)},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, dd.MM},
+			MMM => q{LLL},
+			MMMEd => q{E, d-MMM},
+			MMMMd => q{d-MMMM},
+			MMMd => q{d-MMM},
+			Md => q{dd.MM},
+			d => q{d},
+			h => q{h (a)},
+			hm => q{h:mm (a)},
+			hms => q{h:mm:ss (a)},
+			ms => q{mm:ss},
+			y => q{y (G)},
+			yyyy => q{y (G)},
+			yyyyM => q{MM.y (GGGGG)},
+			yyyyMEd => q{E, dd.MM.y (GGGGG)},
+			yyyyMMM => q{y (G), MMM},
+			yyyyMMMEd => q{E, d-MMM, y (G)},
+			yyyyMMMM => q{y (G), MMMM},
+			yyyyMMMd => q{d-MMM, y (G)},
+			yyyyMd => q{dd.MM.y (GGGGG)},
+			yyyyQQQ => q{y (G), QQQ},
+			yyyyQQQQ => q{y (G), QQQQ},
+		},
 		'gregorian' => {
 			Bh => q{B h},
 			Bhm => q{B h:mm},
@@ -4832,50 +4936,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{dd/MM/y},
 			yQQQ => q{y, QQQ},
 			yQQQQ => q{y, QQQQ},
-			yw => q{y, w-'hafta'},
-		},
-		'generic' => {
-			Bh => q{B h},
-			Bhm => q{B h:mm},
-			Bhms => q{B h:mm:ss},
-			E => q{ccc},
-			EBhm => q{E, B h:mm},
-			EBhms => q{E, B h:mm:ss},
-			EHm => q{E, HH:mm},
-			EHms => q{E, HH:mm:ss},
-			Ed => q{E, d},
-			Ehm => q{E, h:mm (a)},
-			Ehms => q{E, h:mm:ss (a)},
-			Gy => q{y (G)},
-			GyMMM => q{MMM, y (G)},
-			GyMMMEd => q{E, d-MMM, y (G)},
-			GyMMMd => q{d-MMM, y (G)},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, dd.MM},
-			MMM => q{LLL},
-			MMMEd => q{E, d-MMM},
-			MMMMd => q{d-MMMM},
-			MMMd => q{d-MMM},
-			Md => q{dd.MM},
-			d => q{d},
-			h => q{h (a)},
-			hm => q{h:mm (a)},
-			hms => q{h:mm:ss (a)},
-			ms => q{mm:ss},
-			y => q{y (G)},
-			yyyy => q{y (G)},
-			yyyyM => q{MM.y (GGGGG)},
-			yyyyMEd => q{E, dd.MM.y (GGGGG)},
-			yyyyMMM => q{y (G), MMM},
-			yyyyMMMEd => q{E, d-MMM, y (G)},
-			yyyyMMMM => q{y (G), MMMM},
-			yyyyMMMd => q{d-MMM, y (G)},
-			yyyyMd => q{dd.MM.y (GGGGG)},
-			yyyyQQQ => q{y (G), QQQ},
-			yyyyQQQQ => q{y (G), QQQQ},
+			yw => q{Y, w-'hafta'},
 		},
 	} },
 );
@@ -4896,6 +4957,69 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{E, dd.MM – E, dd.MM},
+				d => q{E, dd.MM – E, dd.MM},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{E, d-MMM – E, d-MMM},
+				d => q{E, d-MMM – E, d-MMM},
+			},
+			MMMd => {
+				M => q{d-MMM – d-MMM},
+				d => q{d – d-MMM},
+			},
+			Md => {
+				M => q{dd.MM – dd.MM},
+				d => q{dd.MM – dd.MM},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{y–y (G)},
+			},
+			yM => {
+				M => q{MM.y – MM.y (GGGGG)},
+				y => q{MM.y – MM.y (GGGGG)},
+			},
+			yMEd => {
+				M => q{E, dd.MM.y – E, dd.MM.y (GGGGG)},
+				d => q{E, dd.MM.y – E, dd.MM.y (GGGGG)},
+				y => q{E, dd.MM.y – E, dd.MM.y (GGGGG)},
+			},
+			yMMM => {
+				M => q{y (G), MMM – MMM},
+				y => q{y (G), MMM – y, MMM},
+			},
+			yMMMEd => {
+				M => q{E, d-MMM – E, d-MMM, y (G)},
+				d => q{E, d-MMM – E, d-MMM, y (G)},
+				y => q{E, d-MMM, y – E, d-MMM, y (G)},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM, y (G)},
+				y => q{MMMM, y – MMMM, y (G)},
+			},
+			yMMMd => {
+				M => q{d-MMM – d-MMM, y (G)},
+				d => q{d – d-MMM, y (G)},
+				y => q{d-MMM, y – d-MMM, y (G)},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y (GGGGG)},
+				d => q{dd.MM.y – dd.MM.y (GGGGG)},
+				y => q{dd.MM.y – dd.MM.y (GGGGG)},
+			},
+		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -4989,69 +5113,6 @@ has 'datetime_formats_interval' => (
 				M => q{dd/MM/y – dd/MM/y},
 				d => q{dd/MM/y – dd/MM/y},
 				y => q{dd/MM/y – dd/MM/y},
-			},
-		},
-		'generic' => {
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{E, dd.MM – E, dd.MM},
-				d => q{E, dd.MM – E, dd.MM},
-			},
-			MMM => {
-				M => q{MMM – MMM},
-			},
-			MMMEd => {
-				M => q{E, d-MMM – E, d-MMM},
-				d => q{E, d-MMM – E, d-MMM},
-			},
-			MMMd => {
-				M => q{d-MMM – d-MMM},
-				d => q{d – d-MMM},
-			},
-			Md => {
-				M => q{dd.MM – dd.MM},
-				d => q{dd.MM – dd.MM},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{y–y (G)},
-			},
-			yM => {
-				M => q{MM.y – MM.y (GGGGG)},
-				y => q{MM.y – MM.y (GGGGG)},
-			},
-			yMEd => {
-				M => q{E, dd.MM.y – E, dd.MM.y (GGGGG)},
-				d => q{E, dd.MM.y – E, dd.MM.y (GGGGG)},
-				y => q{E, dd.MM.y – E, dd.MM.y (GGGGG)},
-			},
-			yMMM => {
-				M => q{y (G), MMM – MMM},
-				y => q{y (G), MMM – y, MMM},
-			},
-			yMMMEd => {
-				M => q{E, d-MMM – E, d-MMM, y (G)},
-				d => q{E, d-MMM – E, d-MMM, y (G)},
-				y => q{E, d-MMM, y – E, d-MMM, y (G)},
-			},
-			yMMMM => {
-				M => q{MMMM – MMMM, y (G)},
-				y => q{MMMM, y – MMMM, y (G)},
-			},
-			yMMMd => {
-				M => q{d-MMM – d-MMM, y (G)},
-				d => q{d – d-MMM, y (G)},
-				y => q{d-MMM, y – d-MMM, y (G)},
-			},
-			yMd => {
-				M => q{dd.MM.y – dd.MM.y (GGGGG)},
-				d => q{dd.MM.y – dd.MM.y (GGGGG)},
-				y => q{dd.MM.y – dd.MM.y (GGGGG)},
 			},
 		},
 	} },

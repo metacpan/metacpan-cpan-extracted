@@ -8,13 +8,13 @@ Locale::CLDR::Locales::De::Any::Ch - Package for language German
 
 package Locale::CLDR::Locales::De::Any::Ch;
 # This file auto generated from Data\common\main\de_CH.xml
-#	on Sun  7 Oct 10:27:33 am GMT
+#	on Sun  3 Feb  1:46:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -956,6 +956,7 @@ has 'display_name_language' => (
 			 my %languages = (
 				'ace' => 'Aceh-Sprache',
  				'ach' => 'Acholi-Sprache',
+ 				'ars' => 'Nadschd-Arabisch',
  				'bas' => 'Basaa-Sprache',
  				'be' => 'Weissrussisch',
  				'bik' => 'Bikol-Sprache',
@@ -1071,6 +1072,7 @@ has 'units' => (
 						'per' => q({0} pro Fuss),
 					},
 					'gallon-imperial' => {
+						'one' => q({0} gal Imp.),
 						'other' => q({0} gal Imp.),
 						'per' => q({0}/gal Imp.),
 					},
@@ -1163,17 +1165,25 @@ has 'currencies' => (
 		'EUR' => {
 			symbol => 'EUR',
 		},
-		'PEN' => {
-			display_name => {
-				'currency' => q(Peruanischer Neuer Sol),
-				'one' => q(Peruanischer Neuer Sol),
-			},
-		},
 		'STN' => {
 			display_name => {
 				'currency' => q(São-toméischer Dobra \(2018\)),
 				'one' => q(São-toméischer Dobra \(2018\)),
 				'other' => q(São-toméischer Dobra \(2018\)),
+			},
+		},
+		'VEF' => {
+			display_name => {
+				'currency' => q(Venezolanischer Bolívar),
+				'one' => q(Venezolanischer Bolívar),
+				'other' => q(Venezolanische Bolívares),
+			},
+		},
+		'VES' => {
+			display_name => {
+				'currency' => q(VES),
+				'one' => q(VES),
+				'other' => q(VES),
 			},
 		},
 	} },
@@ -1213,33 +1223,33 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'morning2' if $time >= 1000
 						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1800;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
 					return 'morning1' if $time >= 500
 						&& $time < 1000;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'morning1' if $time >= 500
 						&& $time < 1000;
-					return 'night1' if $time >= 0
-						&& $time < 500;
 					return 'afternoon2' if $time >= 1300
 						&& $time < 1800;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
 					return 'morning2' if $time >= 1000
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 				}
 				last SWITCH;
 				}
@@ -1321,8 +1331,24 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
+		'Asia/Brunei' => {
+			exemplarCity => q#Brunei#,
+		},
+		'Asia/Macau' => {
+			exemplarCity => q#Macao#,
+		},
+		'Brunei' => {
+			long => {
+				'standard' => q#Brunei-Zeit#,
+			},
+		},
 		'Europe/Saratov' => {
 			exemplarCity => q#Saratov#,
+		},
+		'Solomon' => {
+			long => {
+				'standard' => q#Salomoninseln-Zeit#,
+			},
 		},
 	 } }
 );

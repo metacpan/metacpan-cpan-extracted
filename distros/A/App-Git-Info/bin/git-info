@@ -7,7 +7,7 @@ use warnings;
 
 use App::Git::Info;
 
-run();
+App::Git::Info->run;
 
 # PODNAME: git-info
 
@@ -23,7 +23,7 @@ git-info - Displays a summary of information about the git repository.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ version 0.2.0
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
     shlomif@telaviv1:~/conf/trunk$ git info info
     ⇒ On branch master

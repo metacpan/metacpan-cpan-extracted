@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nd::Any::Zw - Package for language North Ndebele
 
 package Locale::CLDR::Locales::Nd::Any::Zw;
 # This file auto generated from Data\common\main\nd_ZW.xml
-#	on Sun  7 Oct 10:50:09 am GMT
+#	on Sun  3 Feb  2:09:09 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

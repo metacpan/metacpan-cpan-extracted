@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.051';
+our $VERSION = '2.053';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.051
+Version 2.053
 
 =cut
 
@@ -222,7 +222,7 @@ database.
 
 =head4 Drop table
 
-Drop a table. The whole table is shown (if not empty) before the user confirms to drop the table.
+Drop a table. The whole table is shown before the user confirms to drop the table.
 
 =head4 Attache DB
 
@@ -614,9 +614,13 @@ derived tables which get then a default alias.
 
 =item Functions
 
+Functions in the SELECT sub-statement.
+
 =item Join
 
 =item Subqueries
+
+Derived Tables and subqueries in the SELECT sub-statement.
 
 =item Union
 

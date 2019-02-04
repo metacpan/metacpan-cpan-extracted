@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lrc - Package for language Northern Luri
 
 package Locale::CLDR::Locales::Lrc;
 # This file auto generated from Data\common\main\lrc.xml
-#	on Sun  7 Oct 10:44:28 am GMT
+#	on Sun  3 Feb  2:03:23 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1095,6 +1095,74 @@ has 'calendar_months' => (
 	} },
 );
 
+has 'calendar_days' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+			'gregorian' => {
+				'format' => {
+					abbreviated => {
+						mon => 'Mon',
+						tue => 'Tue',
+						wed => 'Wed',
+						thu => 'Thu',
+						fri => 'Fri',
+						sat => 'Sat',
+						sun => 'Sun'
+					},
+					narrow => {
+						mon => 'M',
+						tue => 'T',
+						wed => 'W',
+						thu => 'T',
+						fri => 'F',
+						sat => 'S',
+						sun => 'S'
+					},
+					wide => {
+						mon => 'Mon',
+						tue => 'Tue',
+						wed => 'Wed',
+						thu => 'Thu',
+						fri => 'Fri',
+						sat => 'Sat',
+						sun => 'Sun'
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						mon => 'Mon',
+						tue => 'Tue',
+						wed => 'Wed',
+						thu => 'Thu',
+						fri => 'Fri',
+						sat => 'Sat',
+						sun => 'Sun'
+					},
+					narrow => {
+						mon => 'M',
+						tue => 'T',
+						wed => 'W',
+						thu => 'T',
+						fri => 'F',
+						sat => 'S',
+						sun => 'S'
+					},
+					wide => {
+						mon => 'Mon',
+						tue => 'Tue',
+						wed => 'Wed',
+						thu => 'Thu',
+						fri => 'Fri',
+						sat => 'Sat',
+						sun => 'Sun'
+					},
+				},
+			},
+	} },
+);
+
 has 'calendar_quarters' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -1147,8 +1215,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 				'wide' => {
 					'am' => q{AM},
@@ -1252,10 +1320,10 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			fallback => '{0} – {1}',
 		},
-		'generic' => {
+		'gregorian' => {
 			fallback => '{0} – {1}',
 		},
 	} },

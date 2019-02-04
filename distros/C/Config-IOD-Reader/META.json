@@ -72,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-Config-IOD-Reader"
       }
    },
-   "version" : "0.341",
+   "version" : "0.342",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

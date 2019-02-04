@@ -1,5 +1,15 @@
 Revision history for Devel-MAT-Dumper
 
+0.40    2019-02-02 17:14:49
+        [CHANGES]
+         * Define an SV extension to notate extra SV information when perl is
+           compiled with -DDEBUG_LEAKING_SCALARS
+
+        [BUGFIXES]
+         * Perl 5.29.7 removed two UTF-8-related root SVs
+         * Don't dump the mortal UV+PVs that are generated as a side-effect of
+           calling dump_optree() on custom ops (related to RT128222)
+
 0.39    2019-01-16 14:20:35
         [BUGFIXES]
          * Handle the incorrect value of AvFILL(PL_curstack)

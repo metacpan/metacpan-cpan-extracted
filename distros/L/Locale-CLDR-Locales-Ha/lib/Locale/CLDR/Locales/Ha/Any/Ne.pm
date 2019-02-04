@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ha::Any::Ne - Package for language Hausa
 
 package Locale::CLDR::Locales::Ha::Any::Ne;
 # This file auto generated from Data\common\main\ha_NE.xml
-#	on Sun  7 Oct 10:35:37 am GMT
+#	on Sun  3 Feb  1:54:24 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

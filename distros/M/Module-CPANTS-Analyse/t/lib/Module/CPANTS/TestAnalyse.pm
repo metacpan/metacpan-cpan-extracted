@@ -53,6 +53,7 @@ sub test_distribution (&) {
   note "tests under $dir";
   eval { $code->($mca, $dir) };
   ok !$@, "no errors";
+  diag $@ if $@;
 
   chdir $cwd;
   rmtree $dir;

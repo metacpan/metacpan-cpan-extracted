@@ -41,7 +41,7 @@
             "Data::Dumper" : "0",
             "HTTP::Request::Common" : "0",
             "IPC::Cmd" : "0",
-            "PONAPI::Builder::Role::HasPagination" : "0",
+            "PONAPI::Document::Builder::Role::HasPagination" : "0",
             "Test::More" : "0"
          }
       },
@@ -83,23 +83,23 @@
    "provides" : {
       "PONAPI::Constants" : {
          "file" : "lib/PONAPI/Constants.pm",
-         "version" : "0.003002"
+         "version" : "0.003003"
       },
       "PONAPI::DAO" : {
          "file" : "lib/PONAPI/DAO.pm",
-         "version" : "0.003002"
+         "version" : "0.003003"
       },
       "PONAPI::Exception" : {
          "file" : "lib/PONAPI/Exception.pm",
-         "version" : "0.003002"
+         "version" : "0.003003"
       },
       "PONAPI::Repository" : {
          "file" : "lib/PONAPI/Repository.pm",
-         "version" : "0.003002"
+         "version" : "0.003003"
       },
       "PONAPI::Server" : {
          "file" : "lib/PONAPI/Server.pm",
-         "version" : "0.003002"
+         "version" : "0.003003"
       }
    },
    "release_status" : "stable",
@@ -108,7 +108,7 @@
          "url" : "https://github.com/mickeyn/PONAPI/tree/master/Server"
       }
    },
-   "version" : "0.003002",
+   "version" : "0.003003",
    "x_contributors" : [
       "Paolo Mazzoncini",
       "Andrei Vereha"

@@ -1,12 +1,12 @@
 package Locale::CLDR::Plurals;
 # This file auto generated from Data\common\supplemental\ordinals.xml
-#	on Sun  7 Oct 10:18:08 am GMT
+#	on Sun  3 Feb  1:37:01 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1451,6 +1451,22 @@ my %_plurals = (
 				return  scalar (grep {$i == $_} (0,1)) ;
 			},
 		},
+		ia => {
+			one => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
+			},
+		},
 		io => {
 			one => sub {
 				
@@ -2771,6 +2787,22 @@ my %_plurals = (
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
+			},
+		},
+		sc => {
+			one => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
 			},
 		},
 		scn => {
@@ -4153,6 +4185,50 @@ my %_plurals = (
 				return  scalar (grep {$n == $_} (1)) ;
 			},
 		},
+		gd => {
+			few => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (3,13)) ;
+			},
+			one => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (1,11)) ;
+			},
+			two => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (2,12)) ;
+			},
+		},
 		gu => {
 			few => sub {
 				
@@ -4587,6 +4663,22 @@ my %_plurals = (
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
+			},
+		},
+		sc => {
+			many => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (11,8,80,800)) ;
 			},
 		},
 		scn => {
@@ -5163,6 +5255,15 @@ my %_plural_ranges = (
 			other => 'other',
 		},
 	},
+	ia => {
+		one => {
+			other => 'other',
+		},
+		other => {
+			one => 'other',
+			other => 'other',
+		},
+	},
 	id => {
 		other => {
 			other => 'other',
@@ -5467,6 +5568,15 @@ my %_plural_ranges = (
 		other => {
 			few => 'few',
 			many => 'many',
+			one => 'one',
+			other => 'other',
+		},
+	},
+	sc => {
+		one => {
+			other => 'other',
+		},
+		other => {
 			one => 'one',
 			other => 'other',
 		},

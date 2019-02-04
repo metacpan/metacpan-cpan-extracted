@@ -1,12 +1,12 @@
 package Locale::CLDR::EraBoundries;
 # This file auto generated from Data.xml
-#	on Sun  7 Oct 10:18:09 am GMT
+#	on Sun  3 Feb  1:37:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -182,7 +182,7 @@ has '_era_boundry' => (
 				$return = 138 if $date >= 12750425;
 				$return = 139 if $date >= 12780229;
 				$return = 140 if $date >= 12880428;
-				$return = 141 if $date >= 12930855;
+				$return = 141 if $date >= 12930805;
 				$return = 142 if $date >= 12990425;
 				$return = 143 if $date >= 13021121;
 				$return = 144 if $date >= 13030805;
@@ -207,7 +207,7 @@ has '_era_boundry' => (
 				$return = 163 if $date >= 13790322;
 				$return = 164 if $date >= 13810210;
 				$return = 165 if $date >= 13840428;
-				$return = 166 if $date >= 13840227;
+				$return = 166 if $date >= 13870822;
 				$return = 167 if $date >= 13870823;
 				$return = 168 if $date >= 13890209;
 				$return = 169 if $date >= 13900326;
@@ -277,6 +277,7 @@ has '_era_boundry' => (
 				$return = 233 if $date >= 19120730;
 				$return = 234 if $date >= 19261225;
 				$return = 235 if $date >= 19890108;
+				$return = 236 if $date >= 20190501;
 			last SWITCH
 			}
 			if ($_ eq 'islamic') {

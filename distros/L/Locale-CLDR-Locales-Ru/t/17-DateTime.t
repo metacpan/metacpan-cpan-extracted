@@ -45,6 +45,6 @@ my $dt_ru_winter_evening = DateTime->new(
     locale         => $locale,
         time_zone  => 'Europe/Moscow',
 );
-is ($dt_ru_summer_morning->format_cldr($locale->datetime_format_full), 'вторник, 14 июля 2015 г., 7:15:47 Europe/Moscow', 'Date Time Format Russian: summer, morning');
+is ($dt_ru_summer_morning->format_cldr($locale->datetime_format_full), 'вторник, 14 июля 2015 г., 07:15:47 Europe/Moscow', 'Date Time Format Russian: summer, morning');
 is ($dt_ru_summer_evening->format_cldr($locale->datetime_format_full), 'вторник, 14 июля 2015 г., 17:15:47 Europe/Moscow', 'Date Time Format Russian: summer, evening');
 is ($dt_ru_winter_evening->format_cldr($locale->datetime_format_full), 'вторник, 15 декабря 2015 г., 17:15:47 Europe/Moscow', 'Date Time Format Russian: winter, evening');

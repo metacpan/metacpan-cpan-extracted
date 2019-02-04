@@ -2,10 +2,11 @@ package MooX::PDL::Role::Proxy;
 
 # ABSTRACT: treat a container of piddles as if it were a piddle
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Types::Standard -types;
 
@@ -252,7 +253,7 @@ MooX::PDL::Role::Proxy - treat a container of piddles as if it were a piddle
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

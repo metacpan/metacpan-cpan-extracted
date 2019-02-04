@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Qu - Package for language Quechua
 
 package Locale::CLDR::Locales::Qu;
 # This file auto generated from Data\common\main\qu.xml
-#	on Sun  7 Oct 10:54:54 am GMT
+#	on Sun  3 Feb  2:14:33 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -248,6 +248,7 @@ has 'display_name_language' => (
  				'ar' => 'Arabe Simi',
  				'arn' => 'Mapuche Simi',
  				'as' => 'Asames Simi',
+ 				'ay' => 'Aymara Simi',
  				'az' => 'Azerbaiyano Simi',
  				'ba' => 'Baskir Simi',
  				'be' => 'Bielorruso Simi',
@@ -268,7 +269,10 @@ has 'display_name_language' => (
  				'dv' => 'Divehi Simi',
  				'el' => 'Griego Simi',
  				'en' => 'Ingles Simi',
+ 				'en_GB@alt=short' => 'Ingles Simi (GB)',
+ 				'en_US@alt=short' => 'Ingles Simi (US)',
  				'es' => 'Español Simi',
+ 				'es_419' => 'Español Simi (Latino América)',
  				'et' => 'Estonio Simi',
  				'eu' => 'Euskera Simi',
  				'fa' => 'Persa Simi',
@@ -351,6 +355,7 @@ has 'display_name_language' => (
  				'sr' => 'Serbio Simi',
  				'sv' => 'Sueco Simi',
  				'sw' => 'Suajili Simi',
+ 				'sw_CD' => 'Suajili Simi (Congo (RDC))',
  				'syr' => 'Siriaco Simi',
  				'ta' => 'Tamil Simi',
  				'te' => 'Telugu Simi',
@@ -643,6 +648,13 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 			} }
+);
+
+has 'minimum_grouping_digits' => (
+	is			=>'ro',
+	isa			=> Int,
+	init_arg	=> undef,
+	default		=> 1,
 );
 
 has 'number_symbols' => (
@@ -1117,15 +1129,15 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'pm' => q{p.m.},
+				'abbreviated' => {
 					'am' => q{a.m.},
+					'pm' => q{p.m.},
+				},
+				'wide' => {
+					'am' => q{a.m.},
+					'pm' => q{p.m.},
 				},
 				'narrow' => {
-					'pm' => q{p.m.},
-					'am' => q{a.m.},
-				},
-				'abbreviated' => {
 					'am' => q{a.m.},
 					'pm' => q{p.m.},
 				},
@@ -1139,6 +1151,8 @@ has 'eras' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+		},
 		'gregorian' => {
 			abbreviated => {
 				'0' => 'BCE',
@@ -1160,6 +1174,12 @@ has 'date_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			'full' => q{EEEE, d MMMM y, G},
+			'long' => q{d MMMM y, G},
+			'medium' => q{d MMM y, G},
+			'short' => q{d/M/y GGGGG},
+		},
 		'gregorian' => {
 			'full' => q{EEEE, d MMMM, y},
 			'long' => q{d MMMM y},
@@ -1174,6 +1194,8 @@ has 'time_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+		},
 		'gregorian' => {
 			'full' => q{HH:mm:ss zzzz},
 			'long' => q{HH:mm:ss z},
@@ -1188,6 +1210,12 @@ has 'datetime_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
+		},
 		'gregorian' => {
 			'full' => q{{1} {0}},
 			'long' => q{{0} {1}},
@@ -1249,6 +1277,49 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
 			yw => q{w 'semana' Y 'watapa'},
+		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{E, d},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, d MMMM y G},
+			GyMMMd => q{d MMM y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, dd-MM},
+			MMM => q{LLL},
+			MMMEd => q{E, d MMMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{dd-MM},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{MM-y GGGGG},
+			yyyyMEd => q{E, dd-MM-y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d MMM y G},
+			yyyyMd => q{dd-MM-y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
 		},
 	} },
 );
@@ -1362,6 +1433,69 @@ has 'datetime_formats_interval' => (
 				M => q{d/M/y – d/M/y},
 				d => q{d/M/y – d/M/y},
 				y => q{d/M/y – d/M/y},
+			},
+		},
+		'generic' => {
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{E, dd-MM – E, dd-MM},
+				d => q{E, dd-MM – E, dd-MM},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{E, d MMM – E, d MMM},
+				d => q{E, d MMM – E, d MMM},
+			},
+			MMMd => {
+				M => q{d MMM – d MMM},
+				d => q{d–d MMM},
+			},
+			Md => {
+				M => q{dd-MM – dd-MM},
+				d => q{dd-MM – dd-MM},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{MM-y – MM-y GGGGG},
+				y => q{MM-y – MM-y GGGGG},
+			},
+			yMEd => {
+				M => q{E, dd-MM-y – E, dd-MM-y GGGGG},
+				d => q{E, dd-MM-y – E, dd-MM-y GGGGG},
+				y => q{E, dd-MM-y – E, dd-MM-y GGGGG},
+			},
+			yMMM => {
+				M => q{MMM–MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E, d MMM – E, d MMM y G},
+				d => q{E, d MMM y – E, d MMM y G},
+				y => q{E, d MMM y – E, d MMM y G},
+			},
+			yMMMM => {
+				M => q{MMMM–MMMM y G},
+				y => q{MMMM y – MMMM y G},
+			},
+			yMMMd => {
+				M => q{d MMM – d MMM y G},
+				d => q{d–d MMM y G},
+				y => q{d MMM y – d MMM y G},
+			},
+			yMd => {
+				M => q{dd-MM-y – dd-MM-y GGGGG},
+				d => q{dd-MM-y – dd-MM-y GGGGG},
+				y => q{dd-MM-y – dd-MM-y GGGGG},
 			},
 		},
 	} },

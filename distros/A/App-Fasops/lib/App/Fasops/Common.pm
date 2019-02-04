@@ -102,6 +102,30 @@ sub parse_block {
     return \%info_of;
 }
 
+sub parse_block_array {
+    my $block     = shift;
+
+    my @lines = grep {/\S/} split /\n/, $block;
+    Carp::croak "Numbers of headers not equal to seqs\n" if @lines % 2;
+
+    my $info_ary = [];
+    while (@lines) {
+        my $header = shift @lines;
+        $header =~ s/^\>//;
+        chomp $header;
+
+        my $seq = shift @lines;
+        chomp $seq;
+
+        my $info_ref = App::RL::Common::decode_header($header);
+        $info_ref->{seq} = $seq;
+
+        push @{$info_ary}, $info_ref;
+    }
+
+    return $info_ary;
+}
+
 sub parse_block_header {
     my $block = shift;
 

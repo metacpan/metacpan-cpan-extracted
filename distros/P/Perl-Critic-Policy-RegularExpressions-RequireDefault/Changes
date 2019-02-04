@@ -1,5 +1,10 @@
 Changelog for Perl-Critic-Policy-RegularExpressions-RequireDefault
 
+2.00 2019-02-03T20:20:55Z Feature release, update not required
+
+- This release introduced the strict configuration parameter
+  Ref: https://github.com/jonasbn/perl-critic-policy-regularexpressions-requiredefault/issues/5
+
 1.01 2019-01-15T07:48:31Z Maintenance release, update not required
 
 - Corrected the homepage metadata link

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Tzm - Package for language Central Atlas Tamazight
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Tzm - Package for language Central Atlas Tamazight
 
 package Locale::CLDR::Locales::Tzm;
 # This file auto generated from Data\common\main\tzm.xml
-#	on Sun  5 Aug  6:26:31 pm GMT
+#	on Sun  3 Feb  2:24:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -857,8 +859,8 @@ has 'day_periods' => (
 					'am' => q{Zdat azal},
 				},
 				'abbreviated' => {
-					'am' => q{Zdat azal},
 					'pm' => q{Ḍeffir aza},
+					'am' => q{Zdat azal},
 				},
 			},
 		},

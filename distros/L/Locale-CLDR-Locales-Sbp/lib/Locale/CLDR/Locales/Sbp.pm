@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sbp - Package for language Sangu
 
 package Locale::CLDR::Locales::Sbp;
 # This file auto generated from Data\common\main\sbp.xml
-#	on Sun  7 Oct 10:56:50 am GMT
+#	on Sun  3 Feb  2:16:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -851,11 +851,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{Lwamilawu},
-					'pm' => q{Pashamihe},
-				},
 				'wide' => {
+					'pm' => q{Pashamihe},
+					'am' => q{Lwamilawu},
+				},
+				'abbreviated' => {
 					'am' => q{Lwamilawu},
 					'pm' => q{Pashamihe},
 				},

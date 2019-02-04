@@ -74,6 +74,9 @@ feature linux => sub {
     requires 'IO::Uncompress::Brotli';
 };
 
+# Pcore::API::Google::OAuth
+requires 'Crypt::OpenSSL::RSA', v0.310.0;
+
 # Pcore::API::SMTP
 requires 'Authen::SASL', v2.16.0;
 

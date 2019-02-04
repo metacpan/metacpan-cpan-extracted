@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Se::Any::Fi - Package for language Northern Sami
 
 package Locale::CLDR::Locales::Se::Any::Fi;
 # This file auto generated from Data\common\main\se_FI.xml
-#	on Sun  7 Oct 10:57:15 am GMT
+#	on Sun  3 Feb  2:16:51 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -388,8 +388,8 @@ has 'day_periods' => (
 					'pm' => q{e},
 				},
 				'wide' => {
-					'pm' => q{eb},
 					'am' => q{ib},
+					'pm' => q{eb},
 				},
 				'abbreviated' => {
 					'pm' => q{eb},
@@ -398,12 +398,12 @@ has 'day_periods' => (
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{eb},
 					'am' => q{ib},
+					'pm' => q{eb},
 				},
 				'narrow' => {
-					'pm' => q{eb},
 					'am' => q{ib},
+					'pm' => q{eb},
 				},
 				'wide' => {
 					'pm' => q{eb},
@@ -491,7 +491,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMMd => q{d MMM y G},
 			MEd => q{E d.M},
 			MMMEd => q{E d MMM},
-			MMMMW => q{MMM:a 'vahkku' W},
+			MMMMW => q{MMMM':a vahkku' W},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},

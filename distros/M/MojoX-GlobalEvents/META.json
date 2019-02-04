@@ -37,6 +37,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "File::Basename" : "0",
             "Test::More" : "0"
          }
@@ -45,7 +46,7 @@
    "provides" : {
       "MojoX::GlobalEvents" : {
          "file" : "lib/MojoX/GlobalEvents.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -60,7 +61,7 @@
          "web" : "http://github.com/reneeb/MojoX-GlobalEvents"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"

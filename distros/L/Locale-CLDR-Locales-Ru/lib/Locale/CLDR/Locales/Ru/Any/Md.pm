@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ru::Any::Md - Package for language Russian
 
 package Locale::CLDR::Locales::Ru::Any::Md;
 # This file auto generated from Data\common\main\ru_MD.xml
-#	on Sun  7 Oct 10:56:42 am GMT
+#	on Sun  3 Feb  2:16:22 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

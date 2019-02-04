@@ -5,5 +5,12 @@ Storage.pm
 Storage.xs
 store.c
 store.h
-t/storage.t
+t/00-init.t
+t/01-new.t
+t/02-lockall.t
+t/03-store-get.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/testrules.yml
 typemap

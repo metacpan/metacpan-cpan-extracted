@@ -9,9 +9,9 @@ XML::LibXML::Schema - XML Schema Validation
   use XML::LibXML;
   $doc = XML::LibXML->new->parse_file($url);
 
-  $xmlschema = XML::LibXML::Schema->new( location => $filename_or_url );
-  $xmlschema = XML::LibXML::Schema->new( string => $xmlschemastring );
-  eval { $xmlschema->validate( $doc ); };
+  $xmlschema = XML::LibXML::Schema-E<gt>new( location =E<gt> $filename_or_url );
+  $xmlschema = XML::LibXML::Schema-E<gt>new( string =E<gt> $xmlschemastring );
+  eval { $xmlschema-E<gt>validate( $doc ); };
 
 =head1 DESCRIPTION
 
@@ -27,8 +27,8 @@ validation. As of 2.6.32, libxml2 only supports decimal types up to 24 digits
 
 =item new
 
-  $xmlschema = XML::LibXML::Schema->new( location => $filename_or_url );
-  $xmlschema = XML::LibXML::Schema->new( string => $xmlschemastring );
+  $xmlschema = XML::LibXML::Schema-E<gt>new( location =E<gt> $filename_or_url );
+  $xmlschema = XML::LibXML::Schema-E<gt>new( string =E<gt> $xmlschemastring );
 
 The constructor of XML::LibXML::Schema may get called with either one of two
 parameters. The parameter tells the class from which source it should generate
@@ -46,7 +46,7 @@ constraints of the XML Schema specification.
 
 =item validate
 
-  eval { $xmlschema->validate( $doc ); };
+  eval { $xmlschema-E<gt>validate( $doc ); };
 
 This function allows one to validate a (parsed) document against the given XML
 Schema. The argument of this function should be a L<<<<<< XML::LibXML::Document >>>>>> object. If this function succeeds, it will return 0, otherwise it will die()
@@ -66,7 +66,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0132
+2.0133
 
 =head1 COPYRIGHT
 

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lu - Package for language Luba-Katanga
 
 package Locale::CLDR::Locales::Lu;
 # This file auto generated from Data\common\main\lu.xml
-#	on Sun  7 Oct 10:45:01 am GMT
+#	on Sun  3 Feb  2:04:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -869,12 +869,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{Dinda},
 					'pm' => q{Dilolo},
+					'am' => q{Dinda},
 				},
 				'abbreviated' => {
-					'am' => q{Dinda},
 					'pm' => q{Dilolo},
+					'am' => q{Dinda},
 				},
 			},
 		},

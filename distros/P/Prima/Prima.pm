@@ -9,7 +9,7 @@ require DynaLoader;
 use vars qw($VERSION @ISA $__import @preload $pid);
 @ISA = qw(DynaLoader);
 sub dl_load_flags { 0x00 }
-$VERSION = '1.53';
+$VERSION = '1.54';
 $pid = $$;
 bootstrap Prima $VERSION;
 unless ( UNIVERSAL::can('Prima', 'init')) {
@@ -137,6 +137,7 @@ The core classes form an hierarchy, which is displayed below:
 				Prima::Image
 					Prima::Icon
 			Prima::File
+			Prima::Region
 			Prima::Timer
 			Prima::Widget
 				Prima::Application

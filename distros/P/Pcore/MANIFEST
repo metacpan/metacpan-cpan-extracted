@@ -14,6 +14,8 @@ lib/Pcore/API/Client.pm
 lib/Pcore/API/Docker/Engine.pm
 lib/Pcore/API/Docker/Hub.pm
 lib/Pcore/API/GitHub.pm
+lib/Pcore/API/Google/FCM.pm
+lib/Pcore/API/Google/OAuth.pm
 lib/Pcore/API/IPPool.pm
 lib/Pcore/API/PAUSE.pm
 lib/Pcore/API/Proxy.pm

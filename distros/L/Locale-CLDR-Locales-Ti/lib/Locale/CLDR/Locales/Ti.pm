@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ti - Package for language Tigrinya
 
 package Locale::CLDR::Locales::Ti;
 # This file auto generated from Data\common\main\ti.xml
-#	on Sun  7 Oct 11:02:15 am GMT
+#	on Sun  3 Feb  2:21:48 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1028,9 +1028,9 @@ has 'calendar_days' => (
 					},
 					wide => {
 						mon => 'ሰኑይ',
-						tue => 'ሰሉስ',
+						tue => 'ሠሉስ',
 						wed => 'ረቡዕ',
-						thu => 'ሓሙስ',
+						thu => 'ኃሙስ',
 						fri => 'ዓርቢ',
 						sat => 'ቀዳም',
 						sun => 'ሰንበት'
@@ -1091,29 +1091,29 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{ንጉሆ ሰዓተ},
+				'wide' => {
 					'pm' => q{ድሕር ሰዓት},
+					'am' => q{ንጉሆ ሰዓተ},
 				},
 				'narrow' => {
 					'am' => q{ንጉሆ ሰዓተ},
 					'pm' => q{ድሕር ሰዓት},
 				},
-				'wide' => {
-					'pm' => q{ድሕር ሰዓት},
+				'abbreviated' => {
 					'am' => q{ንጉሆ ሰዓተ},
+					'pm' => q{ድሕር ሰዓት},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{ንጉሆ ሰዓተ},
+				'narrow' => {
 					'pm' => q{ድሕር ሰዓት},
+					'am' => q{ንጉሆ ሰዓተ},
 				},
 				'wide' => {
 					'pm' => q{ድሕር ሰዓት},
 					'am' => q{ንጉሆ ሰዓተ},
 				},
-				'narrow' => {
+				'abbreviated' => {
 					'am' => q{ንጉሆ ሰዓተ},
 					'pm' => q{ድሕር ሰዓት},
 				},
@@ -1248,7 +1248,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{y-MM-dd},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{y QQQQ},
-			yw => q{መበል w ሰሙን ናይ y},
+			yw => q{መበል w ሰሙን ናይ Y},
 		},
 		'generic' => {
 			MMMMdd => q{dd MMMM},

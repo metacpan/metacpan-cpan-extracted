@@ -1,15 +1,18 @@
 use strict; use warnings;
 package Inline;
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 use Inline::denter;
 use Config;
 use Carp;
 use Cwd qw(abs_path cwd);
+use Encode;
 use File::Spec;
 use File::Spec::Unix;
 use Fcntl qw(LOCK_EX LOCK_UN);
+use version;
+use utf8;
 
 my %CONFIG = ();
 my @DATA_OBJS = ();
@@ -395,7 +398,8 @@ sub check_config {
                   unless $value =~ /^[a-zA-Z_](\w|::)*$/;
             }
             elsif ($key eq 'VERSION') {
-                croak M13_usage_VERSION($value) unless $value =~ /^\d\.\d\d*$/;
+                croak M13_usage_VERSION($value)
+                    unless version::is_lax($value);
             }
             $o->{CONFIG}{$key} = $value;
         }
@@ -459,7 +463,11 @@ sub check_installed {
     $o->{INLINE}{object_ready} = 0;
     unless ($o->{API}{code} =~ /^[A-Fa-f0-9]{32}$/) {
         require Digest::MD5;
-        $o->{INLINE}{md5} = Digest::MD5::md5_hex($o->{API}{code});
+        my $encoded_code = $o->{API}{code};
+        if ( utf8::is_utf8($encoded_code)) {
+            $encoded_code = Encode::encode_utf8($encoded_code);
+        }
+        $o->{INLINE}{md5} = Digest::MD5::md5_hex($encoded_code);
     }
     else {
         $o->{INLINE}{md5} = $o->{API}{code};
@@ -821,7 +829,7 @@ sub create_config_file {
         # Inline::CPP (and perhaps other Inline modules) will fail because P::RD isn't found.
         my @_inc = map { "-I$_" }
        ($inline,
-        grep {(-d File::Spec->catdir($_,"Inline") or -d File::Spec->catdir($_,"auto","Inline") or -e File::Spec->catdir($_,"Parse/RecDescent.pm"))} @INC);
+        grep {(-d File::Spec->catdir($_,"Inline") or -d File::Spec->catdir($_,"auto","Inline") or -e File::Spec->catdir($_,"Win32/Mutex.pm") or -e File::Spec->catdir($_,"Parse/RecDescent.pm"))} @INC);
        system $perl, @_inc, "-MInline=_CONFIG_", "-e1", "$dir"
           and croak M20_config_creation_failed($dir);
         return;
@@ -1536,8 +1544,7 @@ END
 sub M13_usage_VERSION {
     my ($version) = @_;
     return <<END;
-Invalid value for VERSION config option: '$version'
-Must be of the form '#.##'.
+Invalid (according to version.pm) VERSION config option: '$version'
 (Should also be specified as a string rather than a floating point number)
 
 END

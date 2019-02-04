@@ -143,7 +143,7 @@ subtest '... bad requests (GET)' => sub {
             'fields',
             'fields=',
             'include',
-            'include=&',
+            #'include=&', # Cannot test because parsing creates two arguments
             'include=',
             'include[articles]',
             'page=page',
@@ -159,6 +159,7 @@ subtest '... bad requests (GET)' => sub {
             "... bad request $req caught",
         );
     }
+
 };
 
 subtest '... bad requests (POST)' => sub {

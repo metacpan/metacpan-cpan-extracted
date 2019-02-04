@@ -9,7 +9,9 @@ Makefile.PL
 README
 cpanfile
 dist.ini
+examples/consumer-groups-aa.pl
 examples/consumer-groups.pl
+examples/incr-ratelimit-aa.pl
 examples/incr-ratelimit.pl
 examples/job-benchmark.pl
 examples/job-hash-submit.pl

@@ -1,9 +1,29 @@
 ==================================================
-Changes from 2018-01-19 00:00:00 +0000 to present.
+Changes from 2018-02-03 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.024 at 2019-01-19 17:57:35 +0000
+version 0.025 at 2019-02-03 10:43:25 +0000
+------------------------------------------
+
+  Change: 73b3972d23bf8397e39a4e3fb26105cd3438bd57
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-02-03 11:42:36 +0000
+
+    Rerun h2xs.sh to fix some build issues
+
+    XS was out of synx with header..
+
+    wip 
+
+  Change: 4904b5cfc2150de26aa69e1c48013e1055875155
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2019-02-03 10:50:08 +0000
+
+    XS: move non-generated parts out/to end of the XS.xs 
+
+------------------------------------------
+version 0.024 at 2019-01-16 13:17:00 +0000
 ------------------------------------------
 
   Change: 0a6d50cb242db0d926c8896eecd6033df5c2892e
@@ -340,36 +360,6 @@ version 0.013 at 2018-02-03 14:17:51 +0000
 
     Skip graphical testing if graphic device unavailable 
 
-------------------------------------------
-version 0.012 at 2018-01-27 08:44:17 +0000
-------------------------------------------
-
-  Change: 967c5c3f90ded43833f726638768f4cb8734ba95
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-01-27 09:44:17 +0000
-
-    Move C struct types into Graphics::Raylib::XS namespace 
-
-------------------------------------------
-version 0.011 at 2018-01-27 02:24:55 +0000
-------------------------------------------
-
-  Change: 386f2106729b1792db6b234ef0655c0f9e2a6c18
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-01-27 03:24:55 +0000
-
-    Don't collect AutoPrereqs 
-
-------------------------------------------
-version 0.010 at 2018-01-27 01:54:39 +0000
-------------------------------------------
-
-  Change: ffaec5488afd669b92e2fc7fc4da0b89cdce4c4a
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-01-27 02:54:39 +0000
-
-    Update Graphics::Raylib::XS for newest Alien::raylib 
-
-================================================
-Plus 9 releases after 2018-01-19 00:00:00 +0000.
-================================================
+=================================================
+Plus 12 releases after 2018-02-03 00:00:00 +0000.
+=================================================

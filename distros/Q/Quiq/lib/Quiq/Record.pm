@@ -5,12 +5,11 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.131;
+our $VERSION = 1.132;
 
 use Quiq::String;
 use Quiq::Option;
 use Quiq::Path;
-use Quiq::String;
 
 # -----------------------------------------------------------------------------
 
@@ -56,7 +55,15 @@ oder
     Schlüssel2: Wert2
     ...
 
-oder ein Mischung aus beidem.
+oder ein Mischung aus beidem oder
+
+    @@Schlüssel@@
+    Wert1
+    @@Schlüsse2@@
+    Wert2
+
+Um die dritte Repräsentation (mit @@Schlüssel@@) zu erzeugen, muss
+als Option -format => '@' angegeben werden.
 
 =head1 METHODS
 
@@ -109,8 +116,15 @@ sub fromString {
         $ref = \$_[0];    # String
     }
 
-    my @keys = $$ref =~ /^([\w-]+) *[:=] */gm;
-    my @vals = split /^[\w-]+ *[:=] */m,$$ref;
+    my (@keys,@vals);
+    if (substr($$ref,0,1) eq '@') {
+        @keys = $$ref =~ /^\@\@([\w-]+)\@\@ */gm;
+        @vals = split /^\@\@[\w-]+\@\@ */m,$$ref;
+    }
+    else {
+        @keys = $$ref =~ /^([\w-]+) *[:=] */gm;
+        @vals = split /^[\w-]+ *[:=] */m,$$ref;
+    }
     shift @vals;
 
     my @arr;
@@ -189,6 +203,18 @@ sub fromFile {
 
 =over 4
 
+=item --format => ':'|'@' (Default: ':')
+
+Im Falle von ':' erzeuge das Format:
+
+    <KEY>:
+        <VAL>
+
+Im Falle von '@' erzeuge das Format:
+
+    @@<KEY>@@
+    <VAL>
+
 =item -indent => $n (Default: 4)
 
 Tiefe der Einrückung.
@@ -221,16 +247,18 @@ sub toString {
     my $arr = ref $_[0]? shift: \@_;
     # @_: Argumente
 
+    my $format = ':';
     my $indent = 4;
     my $ignoreNull = 0;
     my $space = 0;
     my $strip = 1;
 
     Quiq::Option->extract(\@_,
-        -indent=>\$indent,
-        -ignoreNull=>\$ignoreNull,
-        -space=>\$space,
-        -strip=>\$strip,
+        -format => \$format,
+        -indent => \$indent,
+        -ignoreNull => \$ignoreNull,
+        -space => \$space,
+        -strip => \$strip,
     );
 
     $indent = ' ' x $indent;
@@ -251,14 +279,19 @@ sub toString {
         if ($val eq '' && $ignoreNull) {
             next;
         }
-        if ($indent) {
+        if ($format eq ':' && $indent) {
             Quiq::String->indent(\$val,$indent);
         }
         if ($space && $str) {
             $str .= $space;
         }
-        
-        $str .= sprintf "%s:\n%s\n",$key,$val;
+
+        if ($format eq ':') {        
+            $str .= sprintf "%s:\n%s\n",$key,$val;
+        }
+        else {
+            $str .= sprintf "\@\@%s\@\@\n%s\n",$key,$val;
+        }
     }
 
     return $str;
@@ -299,7 +332,7 @@ sub toFile {
 
 =head1 VERSION
 
-1.131
+1.132
 
 =head1 AUTHOR
 

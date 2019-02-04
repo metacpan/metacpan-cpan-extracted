@@ -1,12 +1,12 @@
 package Locale::CLDR::WeekData;
 # This file auto generated from Data.xml
-#	on Sun  7 Oct 10:18:12 am GMT
+#	on Sun  3 Feb  1:37:05 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -114,6 +114,7 @@ has '_week_data_first_day' => (
 		'GR' => 'mon',
 		'HR' => 'mon',
 		'HU' => 'mon',
+		'IE' => 'mon',
 		'IS' => 'mon',
 		'IT' => 'mon',
 		'KG' => 'mon',
@@ -135,7 +136,6 @@ has '_week_data_first_day' => (
 		'NO' => 'mon',
 		'NZ' => 'mon',
 		'PL' => 'mon',
-		'PT' => 'mon',
 		'RE' => 'mon',
 		'RO' => 'mon',
 		'RS' => 'mon',
@@ -165,7 +165,6 @@ has '_week_data_first_day' => (
 		'JO' => 'sat',
 		'KW' => 'sat',
 		'LY' => 'sat',
-		'MA' => 'sat',
 		'OM' => 'sat',
 		'QA' => 'sat',
 		'SD' => 'sat',
@@ -191,7 +190,6 @@ has '_week_data_first_day' => (
 		'HK' => 'sun',
 		'HN' => 'sun',
 		'ID' => 'sun',
-		'IE' => 'sun',
 		'IL' => 'sun',
 		'IN' => 'sun',
 		'JM' => 'sun',
@@ -213,12 +211,12 @@ has '_week_data_first_day' => (
 		'PH' => 'sun',
 		'PK' => 'sun',
 		'PR' => 'sun',
+		'PT' => 'sun',
 		'PY' => 'sun',
 		'SA' => 'sun',
 		'SG' => 'sun',
 		'SV' => 'sun',
 		'TH' => 'sun',
-		'TN' => 'sun',
 		'TT' => 'sun',
 		'TW' => 'sun',
 		'UM' => 'sun',
@@ -249,13 +247,11 @@ has '_week_data_weekend_start' => (
 		'JO' => 'fri',
 		'KW' => 'fri',
 		'LY' => 'fri',
-		'MA' => 'fri',
 		'OM' => 'fri',
 		'QA' => 'fri',
 		'SA' => 'fri',
 		'SD' => 'fri',
 		'SY' => 'fri',
-		'TN' => 'fri',
 		'YE' => 'fri',
 		'001' => 'sat',
 		'IN' => 'sun',
@@ -278,13 +274,11 @@ has '_week_data_weekend_end' => (
 		'JO' => 'sat',
 		'KW' => 'sat',
 		'LY' => 'sat',
-		'MA' => 'sat',
 		'OM' => 'sat',
 		'QA' => 'sat',
 		'SA' => 'sat',
 		'SD' => 'sat',
 		'SY' => 'sat',
-		'TN' => 'sat',
 		'YE' => 'sat',
 		'001' => 'sun',
 	}},

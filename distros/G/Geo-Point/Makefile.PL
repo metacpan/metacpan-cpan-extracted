@@ -4,7 +4,7 @@ require 5.008;
 
 WriteMakefile
   ( NAME        => 'Geo::Point'
-  , VERSION     => '0.97'
+  , VERSION     => '0.98'
   , PREREQ_PM   =>
      { Test::More    => 0.47
      , Geo::Distance => 0.06
@@ -14,7 +14,7 @@ WriteMakefile
      }
   , AUTHOR      => 'Mark Overmeer'
   , ABSTRACT    => 'Geographical structures'
-  , LICENSE     => 'perl'
+  , LICENSE     => 'perl_5'
 
   , META_MERGE =>
       { 'meta-spec' => { version => 2 }
@@ -24,9 +24,9 @@ WriteMakefile
               , url  => 'https://github.com/markov2/perl5-Geo-Point.git'
               , web  => 'https://github.com/markov2/perl5-Geo-Point'
               }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
           }
-      , homepage => 'http://perl.overmeer.net/CPAN/'
-      , license  => [ 'http://dev.perl.org/licenses/' ]
       }
   );
 
@@ -45,7 +45,7 @@ EMAIL           = markov@cpan.org
 WEBSITE         = http://perl.overmeer.net/CPAN/
 
 # for HTML
-EXTENDS		= ../Geo-Proj4:../Geo-WKT:../Geo-GML:../Geo-ISO19139:../../perl/GeoEOP:../../perl/XMLCompile:../../perl/XMLCache:../Geo-Format-Envisat:../Geo-Format-Landsat:../../perl/DBD-mysql-Geom:../Geo-WKT:../Math-Polygon
+EXTENDS		= ../Geo-Proj4:../Geo-WKT:../Geo-GML:../Geo-ISO19139:../../perl/GeoEOP:../XML-Compile:../XML-Compile-Cache:../Geo-Format-Envisat:../Geo-Format-Landsat:../../perl/DBD-mysql-Geom:../Geo-WKT:../Math-Polygon
 HTML_OUTPUT     = ../public_html/geo/html
 HTML_DOCROOT    = /geo/html
 HTML_PACKAGE    = ../public_html/geo-point/htmlpkg

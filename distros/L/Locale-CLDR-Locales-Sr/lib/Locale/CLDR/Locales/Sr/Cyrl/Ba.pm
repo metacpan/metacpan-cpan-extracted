@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr::Cyrl::Ba - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Cyrl::Ba;
 # This file auto generated from Data\common\main\sr_Cyrl_BA.xml
-#	on Sun  7 Oct 10:59:37 am GMT
+#	on Sun  3 Feb  2:19:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -87,42 +87,21 @@ has 'calendar_months' => (
 	init_arg	=> undef,
 	default		=> sub { {
 			'gregorian' => {
-				'format' => {
-					abbreviated => {
-						nonleap => [
-							'јан.',
-							'феб.',
-							'март',
-							'апр.',
-							'мај',
-							'јун',
-							'јул',
-							'авг.',
-							'септ.',
-							'окт.',
-							'нов.',
-							'дец.'
-						],
-						leap => [
-							
-						],
-					},
-				},
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'јан.',
-							'феб.',
+							'јан',
+							'феб',
 							'март',
-							'апр.',
+							'апр',
 							'мај',
 							'јун',
 							'јул',
-							'авг.',
-							'септ.',
-							'окт.',
-							'нов.',
-							'дец.'
+							'авг',
+							'септ',
+							'окт',
+							'нов',
+							'дец'
 						],
 						leap => [
 							
@@ -141,13 +120,13 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
-						mon => 'пон.',
-						tue => 'ут.',
-						wed => 'ср.',
-						thu => 'чет.',
-						fri => 'пет.',
-						sat => 'суб.',
-						sun => 'нед.'
+						mon => 'пон',
+						tue => 'ут',
+						wed => 'ср',
+						thu => 'чет',
+						fri => 'пет',
+						sat => 'суб',
+						sun => 'нед'
 					},
 					wide => {
 						mon => 'понедељак',
@@ -161,13 +140,13 @@ has 'calendar_days' => (
 				},
 				'stand-alone' => {
 					abbreviated => {
-						mon => 'пон.',
-						tue => 'ут.',
-						wed => 'ср.',
-						thu => 'чет.',
-						fri => 'пет.',
-						sat => 'суб.',
-						sun => 'нед.'
+						mon => 'пон',
+						tue => 'ут',
+						wed => 'ср',
+						thu => 'чет',
+						fri => 'пет',
+						sat => 'суб',
+						sun => 'нед'
 					},
 					wide => {
 						mon => 'понедељак',
@@ -193,53 +172,53 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -260,36 +239,36 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'afternoon1' => q{по под.},
-					'midnight' => q{поноћ},
 					'pm' => q{по подне},
-					'noon' => q{подне},
+					'midnight' => q{поноћ},
 					'am' => q{прије подне},
+					'night1' => q{ноћу},
 					'evening1' => q{вече},
 					'morning1' => q{јутро},
-					'night1' => q{ноћу},
+					'noon' => q{подне},
+					'afternoon1' => q{по под.},
 				},
 				'wide' => {
 					'am' => q{прије подне},
 					'pm' => q{по подне},
 				},
 				'narrow' => {
-					'noon' => q{подне},
-					'night1' => q{ноћ},
-					'morning1' => q{јутро},
 					'midnight' => q{поноћ},
 					'evening1' => q{вече},
+					'morning1' => q{јутро},
+					'noon' => q{подне},
 					'afternoon1' => q{по под.},
+					'night1' => q{ноћ},
 				},
 			},
 			'stand-alone' => {
 				'narrow' => {
-					'pm' => q{p},
 					'am' => q{а},
+					'pm' => q{p},
 				},
 				'wide' => {
-					'am' => q{прије подне},
 					'pm' => q{по подне},
+					'am' => q{прије подне},
 				},
 				'abbreviated' => {
 					'am' => q{прије подне},
@@ -358,7 +337,7 @@ has 'datetime_formats_available_formats' => (
 	default		=> sub { {
 		'gregorian' => {
 			MMMMW => q{W. 'сједмица' 'у' MMM},
-			yw => q{w. 'сједмица' 'у' y.},
+			yw => q{w. 'сједмица' 'у' Y.},
 		},
 	} },
 );
@@ -376,15 +355,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. MMM – E, d. MMM},
-			},
-			yMd => {
-				M => q{d.M.y. – d.M.y. GGGGG},
-			},
-		},
 		'gregorian' => {
 			MEd => {
 				M => q{E, MM-dd – E, MM-dd},
@@ -407,6 +377,15 @@ has 'datetime_formats_interval' => (
 				M => q{y-MM-dd – y-MM-dd},
 				d => q{y-MM-dd – y-MM-dd},
 				y => q{y-MM-dd – y-MM-dd},
+			},
+		},
+		'generic' => {
+			MMMEd => {
+				M => q{E, d. MMM – E, d. MMM},
+				d => q{E, d. MMM – E, d. MMM},
+			},
+			yMd => {
+				M => q{d.M.y. – d.M.y. GGGGG},
 			},
 		},
 	} },

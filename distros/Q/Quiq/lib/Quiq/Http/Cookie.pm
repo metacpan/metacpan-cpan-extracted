@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.131;
+our $VERSION = 1.132;
 
 use Quiq::Time::RFC822;
 
@@ -60,6 +60,17 @@ verfällt der Cookie mit dem Schließen des Browsers.
 
 Wenn wahr, wird der Cookie vom Browser nur über eine sichere
 HTTPS-Verbindung geschickt.
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+Cookie-Spezifikation von Netscape
+(L<http://de.wikipedia.org/wiki/HTTP-Cookie#Cookie_nach_Netscape>)
 
 =back
 
@@ -188,18 +199,7 @@ ohne Semikolon, Komma, Gleichheitszeichen und Leerzeichen bestehen.
 
 =head1 VERSION
 
-1.131
-
-=head1 SEE ALSO
-
-=over 2
-
-=item *
-
-Cookie-Spezifikation von Netscape
-(L<http://de.wikipedia.org/wiki/HTTP-Cookie#Cookie_nach_Netscape>)
-
-=back
+1.132
 
 =head1 AUTHOR
 

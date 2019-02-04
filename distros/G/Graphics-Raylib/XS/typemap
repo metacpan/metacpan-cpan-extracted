@@ -36,6 +36,9 @@ VrDeviceInfo					T_OPAQUE_STRUCT
 Wave						T_OPAQUE_STRUCT
 Wave *						T_PTROBJ
 const char *					T_PTROBJ
+const char *					T_PTROBJ
+const char **					T_PTROBJ
+char **						T_PTROBJ
 const float *					T_PTROBJ
 const int *					T_PTROBJ
 const void *					T_PTROBJ

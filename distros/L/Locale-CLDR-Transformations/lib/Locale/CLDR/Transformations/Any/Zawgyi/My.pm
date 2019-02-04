@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Zawgyi::My;
 # This file auto generated from Data\common\transforms\my-t-my-s0-zawgyi.xml
-#	on Sun  7 Oct 10:18:24 am GMT
+#	on Sun  3 Feb  1:37:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -94,13 +94,6 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(([က-အ])်ႌဳ),
-					result  => q(င်္$1\u103B\u102E\u102F),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
 					replace => q(([က-အ])်ႌ),
 					result  => q(င်္$1\u103B\u102E),
 					revisit => 0,
@@ -143,13 +136,6 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ၪ([ါ-ူဲ])း),
-					result  => q(\u1025$1\u1038),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
 					replace => q(ၪ),
 					result  => q(\u1009),
 					revisit => 0,
@@ -185,21 +171,21 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(်),
+					replace => q([်|ၽ]),
 					result  => q(\u103B),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ၽ),
-					result  => q(\u103B),
+					replace => q(([ျၾ-ႄ])+),
+					result  => q(\u103C),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ြႊ),
+					replace => q(ြ*ႊ),
 					result  => q(\u103D\u103E),
 					revisit => 0,
 				},
@@ -213,21 +199,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ႊ),
-					result  => q(\u103D\u103E),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(ွ),
-					result  => q(\u103E),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(ႇ),
+					replace => q([ွ|ႇ]),
 					result  => q(\u103E),
 					revisit => 0,
 				},
@@ -248,13 +220,6 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(္),
-					result  => q(\u103A),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
 					replace => q(ဳ),
 					result  => q(\u102F),
 					revisit => 0,
@@ -269,36 +234,22 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ၚ),
-					result  => q(\u102B\u103A),
+					replace => q(္),
+					result  => q(\u103A),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ႎ),
-					result  => q(\u102D\u1036),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(ေ႔([က-အ])ွ),
-					result  => q($1\u103E\u1031\u1037),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(႔),
+					replace => q([႔႕]),
 					result  => q(\u1037),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(႕),
-					result  => q(\u1037),
+					replace => q(ဥ္),
+					result  => q(\u1009\u103a),
 					revisit => 0,
 				},
 				{
@@ -360,8 +311,8 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(([က-အ])်္),
-					result  => q($1\u103A\u103B),
+					replace => q(ၚ),
+					result  => q(\u102B\u103A),
 					revisit => 0,
 				},
 				{
@@ -402,14 +353,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ၦ),
-					result  => q(\u1039\u1006),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(ၧ),
+					replace => q([ၦၧ]),
 					result  => q(\u1039\u1006),
 					revisit => 0,
 				},
@@ -451,14 +395,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ၱ),
-					result  => q(\u1039\u1010),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(ၲ),
+					replace => q([ၱၲ]),
 					result  => q(\u1039\u1010),
 					revisit => 0,
 				},
@@ -472,14 +409,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ၳ),
-					result  => q(\u1039\u1011),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(ၴ),
+					replace => q([ၳၴ]),
 					result  => q(\u1039\u1011),
 					revisit => 0,
 				},
@@ -528,14 +458,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ၻ),
-					result  => q(\u1039\u1018),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(႓),
+					replace => q([ၻ႓]),
 					result  => q(\u1039\u1018),
 					revisit => 0,
 				},
@@ -551,6 +474,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(ႅ),
 					result  => q(\u1039\u101C),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ႎ),
+					result  => q(\u102D\u1036),
 					revisit => 0,
 				},
 				{
@@ -595,11 +525,60 @@ has 'transforms' => (
 					result  => q(\u104E\u1004\u103A\u1038),
 					revisit => 0,
 				},
+			],
+		},
+		{
+			type => 'transform',
+			data => [
+				{
+					from => q(Any),
+					to => q(Null),
+				},
+			],
+		},
+		{
+			type => 'conversion',
+			data => [
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([ျၾ-ႄ]),
-					result  => q(\u103C),
+					replace => q(^၀([^၀-၉])),
+					result  => q(\u101D$1),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(^၄([^၀-၉])),
+					result  => q(),
+					revisit => 8,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(([^၀-၉])၀$),
+					result  => q($1\u101D),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(([^၀-၉])၄$),
+					result  => q($1\u104e),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(([ါ-ဿ])၀([^၀-၉])),
+					result  => q($1\u101d$2),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(([ါ-ဿ])၄([^၀-၉])),
+					result  => q($1\u104E$2),
 					revisit => 0,
 				},
 			],
@@ -619,38 +598,31 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([$]၀([^၀-၉])),
-					result  => q(\u101D$1),
+					replace => q(([    -‍⁠  　﻿]+)([ါ-ူဲ-ျွှ])),
+					result  => q($2),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(([ါ-ဿ])၀([^၀-၉])),
-					result  => q($1\u101d$2),
+					replace => q(့+),
+					result  => q(\u1037),
 					revisit => 0,
 				},
+			],
+		},
+		{
+			type => 'transform',
+			data => [
 				{
-					before  => q(),
-					after   => q(),
-					replace => q(^၄([^၀-၉])),
-					result  => q(),
-					revisit => 8,
+					from => q(Any),
+					to => q(Null),
 				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(([ါ-ဿ])၄([^၀-၉])),
-					result  => q($1\u104E$2),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(ဥ်),
-					result  => q(\u1009\u103A),
-					revisit => 0,
-				},
+			],
+		},
+		{
+			type => 'conversion',
+			data => [
 				{
 					before  => q(),
 					after   => q(),
@@ -686,13 +658,6 @@ has 'transforms' => (
 					result  => q($1\u103C),
 					revisit => 0,
 				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(စျ),
-					result  => q(\u1008),
-					revisit => 0,
-				},
 			],
 		},
 		{
@@ -707,27 +672,6 @@ has 'transforms' => (
 		{
 			type => 'conversion',
 			data => [
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(([ေ]+)င်္([က-အ])),
-					result  => q(င်္$2$1),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(([ေ]+)([က-အ])([ျ-ှ]+)),
-					result  => q($2$3$1),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q([^ျြွှ]),
-					replace => q(([ေ]+)([က-အ])),
-					result  => q($2$1),
-					revisit => 0,
-				},
 				{
 					before  => q(),
 					after   => q(),
@@ -801,14 +745,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(့([ိ-ူဲံ])),
-					result  => q($1\u1037),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(့([ျ-ှ]+)),
+					replace => q(့([ိ-ူဲံျ-ှ]+)),
 					result  => q($1\u1037),
 					revisit => 0,
 				},
@@ -843,14 +780,14 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(([ေ]+)([ျ-ှ]+)),
-					result  => q($2$1),
+					replace => q(စျ),
+					result  => q(\u1008),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(([ါ-ူဲ])([ျ-ှ])),
+					replace => q(([ါ-ဲ])([ျ-ှ])),
 					result  => q($2$1),
 					revisit => 0,
 				},
@@ -878,14 +815,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(း([ါ-ူဲျ-ဿ])),
-					result  => q($1\u1038),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(း([ံ့်])),
+					replace => q(း([ါ-ူဲ\1u36့်-ဿ])),
 					result  => q($1\u1038),
 					revisit => 0,
 				},
@@ -913,6 +843,20 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(ိိ+),
+					result  => q(\u102D),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ီီ+),
+					result  => q(\u102E),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(ုု+),
 					result  => q(\u102F),
 					revisit => 0,
@@ -920,14 +864,77 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ုူ),
-					result  => q(\u102F),
+					replace => q(ူူ+),
+					result  => q(\u1030),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ု်),
+					replace => q(ဲဲ+),
+					result  => q(\u1032),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ံံ+),
+					result  => q(\u1036),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(့့+),
+					result  => q(\u1037),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(္္+),
+					result  => q(\u1039),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(််+),
+					result  => q(\u103a),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ျျ+),
+					result  => q(\u103b),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ြြ+),
+					result  => q(\u103c),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ွွ+),
+					result  => q(\u103d),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ှှ+),
+					result  => q(\u103e),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ု[ူ်]),
 					result  => q(\u102F),
 					revisit => 0,
 				},
@@ -941,29 +948,29 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ံံ+),
-					result  => q(\u1036),
+					replace => q(([    -‍⁠  　﻿])+([ါ-ဲံ-ှ])),
+					result  => q($2),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ှှ+),
-					result  => q(\u103e),
+					replace => q(^​+),
+					result  => q(),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(\p{WSpace}([ါ-ဲံ-ှ])),
-					result  => q($1),
+					replace => q(​+$),
+					result  => q(),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(([က-အ])ျ်),
-					result  => q($1\u103A\u103B),
+					replace => q([    -‍⁠  　﻿]*​[    -‍⁠  　﻿]*),
+					result  => q(\u200b),
 					revisit => 0,
 				},
 			]

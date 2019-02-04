@@ -1,7 +1,7 @@
 package Test::Config::IOD::Common;
 
 our $DATE = '2019-01-17'; # DATE
-our $VERSION = '0.341'; # VERSION
+our $VERSION = '0.342'; # VERSION
 
 use 5.010;
 use strict;
@@ -304,7 +304,7 @@ Test::Config::IOD::Common - Common tests for Config::IOD and Config::IOD::Reader
 
 =head1 VERSION
 
-This document describes version 0.341 of Test::Config::IOD::Common (from Perl distribution Config-IOD-Reader), released on 2019-01-17.
+This document describes version 0.342 of Test::Config::IOD::Common (from Perl distribution Config-IOD-Reader), released on 2019-01-17.
 
 =for Pod::Coverage .+
 

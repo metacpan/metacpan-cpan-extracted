@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.002';
+  $VERSION = '0.004';
   @ISA     = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -27,7 +27,10 @@ sub fgd {
   }
   my ($color, $data) = @_;
   $color = "#$color" unless $color =~ m/^#/;
-  return "^fg($color)$data^fg()";
+
+  return (defined($data))
+    ? "^fg($color)$data^fg()"
+    : "^fg($color)"
 }
 
 sub bgd {
@@ -36,7 +39,10 @@ sub bgd {
   }
   my ($color, $data) = @_;
   $color = "#$color" unless $color =~ m/^#/;
-  return "^bg($color)$data^bg()";
+
+  return (defined($data))
+    ? "^bg($color)$data^bg()"
+    : "^bg($color)"
 }
 
 
@@ -75,7 +81,8 @@ None by default.
 =head2 fgd('#fff', $string)
 
 Sets foreground color. When called without arguments, returns the fg
-reset string.
+reset string. When called with only one argument, sets the color and
+emits the end color reset string.
 
     my $white_fg = fgd('#fff', 'white foreground');
 

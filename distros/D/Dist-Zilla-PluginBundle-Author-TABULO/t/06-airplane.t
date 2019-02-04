@@ -95,9 +95,9 @@ all_plugins_in_prereqs($tzil,
     ],
 );
 
-my @network_plugins = Dist::Zilla::PluginBundle::Author::TABULO->_network_plugins;
+my @netwrk_plugins = Dist::Zilla::PluginBundle::Author::TABULO->_network_plugins;
 my %network_plugins;
-@network_plugins{ map { Dist::Zilla::Util->expand_config_package_name($_) } @network_plugins } = () x @network_plugins;
+@network_plugins{ map { Dist::Zilla::Util->expand_config_package_name($_) } @netwrk_plugins } = () x @netwrk_plugins;
 
 cmp_deeply(
     [ grep { exists $network_plugins{$_} } @plugin_classes ],
@@ -114,11 +114,13 @@ cmp_deeply(
     'no network-using plugins, nor BlockRelease, were added to develop prereqs',
 );
 
+
 like(
     colorstrip(exception { $tzil->release }),
-    qr{\[\@Author::TABULO/BlockRelease\] halting release},
+    qr{/BlockRelease\] halting release},
     'release halts',
 );
+
 
 diag 'got log messages: ', explain $tzil->log_messages
     if not Test::Builder->new->is_passing;

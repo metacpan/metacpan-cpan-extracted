@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Pt::Any::Mo - Package for language Portuguese
 
 package Locale::CLDR::Locales::Pt::Any::Mo;
 # This file auto generated from Data\common\main\pt_MO.xml
-#	on Sun  7 Oct 10:54:44 am GMT
+#	on Sun  3 Feb  2:14:23 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -48,24 +48,24 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1900;
+					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1900
 						&& $time < 2400;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1900;
+					return 'night1' if $time >= 0
+						&& $time < 600;
 				}
 				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1900
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1900;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1900;
 					return 'night1' if $time >= 0
 						&& $time < 600;
 				}

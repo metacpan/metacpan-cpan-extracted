@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Gsw::Any::Li - Package for language Swiss German
 
 package Locale::CLDR::Locales::Gsw::Any::Li;
 # This file auto generated from Data\common\main\gsw_LI.xml
-#	on Sun  7 Oct 10:35:12 am GMT
+#	on Sun  3 Feb  1:54:00 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

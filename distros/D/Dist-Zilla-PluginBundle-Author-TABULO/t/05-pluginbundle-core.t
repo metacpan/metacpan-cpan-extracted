@@ -54,10 +54,14 @@ use NoPrereqChecks;
         additional => [ 'Dist::Zilla::Plugin::MakeMaker' ], # via installer option
     );
 
+    # TABULO's max_target_perl setting may differ from the others who rely on  ETHER's global setting ('5.006')
+    my $max_tgt_perl = ( $tzil->plugin_named('@Author::TABULO/Authority')->authority =~ /^cpan[:]TABULO/ ) ? '5.014' : '5.006';
+
+    #my $max_tgt_perl = '5.014'; # TABULO's setting
     is(
         $tzil->plugin_named('@Author::TABULO/Test::MinimumVersion')->max_target_perl,
-        '5.006',
-        'max_target_perl option defaults to 5.006 (when not overridden with a slice)',
+        $max_tgt_perl,
+        "max_target_perl option defaults to $max_tgt_perl (when not overridden with a slice)",
     );
 
     ok(!-e "build/$_", "no $_ was created in the dist") foreach qw(Makefile.PL Build.PL);

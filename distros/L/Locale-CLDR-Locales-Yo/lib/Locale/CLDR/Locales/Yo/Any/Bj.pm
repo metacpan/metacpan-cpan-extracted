@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Yo::Any::Bj - Package for language Yoruba
 
 package Locale::CLDR::Locales::Yo::Any::Bj;
 # This file auto generated from Data\common\main\yo_BJ.xml
-#	on Sun  7 Oct 11:06:48 am GMT
+#	on Sun  3 Feb  2:26:18 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -794,8 +794,8 @@ has 'day_periods' => (
 					'pm' => q{Ɔ̀sán},
 				},
 				'wide' => {
-					'pm' => q{Ɔ̀sán},
 					'am' => q{Àárɔ̀},
+					'pm' => q{Ɔ̀sán},
 				},
 				'narrow' => {
 					'pm' => q{Ɔ̀sán},
@@ -807,11 +807,11 @@ has 'day_periods' => (
 					'pm' => q{Ɔ̀sán},
 					'am' => q{Àárɔ̀},
 				},
-				'wide' => {
+				'narrow' => {
 					'am' => q{Àárɔ̀},
 					'pm' => q{Ɔ̀sán},
 				},
-				'narrow' => {
+				'wide' => {
 					'am' => q{Àárɔ̀},
 					'pm' => q{Ɔ̀sán},
 				},

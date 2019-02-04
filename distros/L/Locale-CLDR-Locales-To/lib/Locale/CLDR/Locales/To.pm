@@ -8,13 +8,13 @@ Locale::CLDR::Locales::To - Package for language Tongan
 
 package Locale::CLDR::Locales::To;
 # This file auto generated from Data\common\main\to.xml
-#	on Sun  7 Oct 11:02:46 am GMT
+#	on Sun  3 Feb  2:22:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -809,54 +809,6 @@ has 'display_name_script' => (
  			'Phnx' => 'tohinima fakafoinikia',
  			'Plrd' => 'tohinima fakafonētiki-polāti',
  			'Prti' => 'tohinima fakapātia-tongi',
- 			'Qaaa' => 'tohinima fakapulipuli-aaa',
- 			'Qaab' => 'tohinima fakapulipuli-aab',
- 			'Qaac' => 'tohinima fakapulipuli-aac',
- 			'Qaad' => 'tohinima fakapulipuli-aad',
- 			'Qaae' => 'tohinima fakapulipuli-aae',
- 			'Qaaf' => 'tohinima fakapulipuli-aaf',
- 			'Qaag' => 'tohinima fakapulipuli-aag',
- 			'Qaah' => 'tohinima fakapulipuli-aah',
- 			'Qaak' => 'tohinima fakapulipuli-aak',
- 			'Qaal' => 'tohinima fakapulipuli-aal',
- 			'Qaam' => 'tohinima fakapulipuli-aam',
- 			'Qaan' => 'tohinima fakapulipuli-aan',
- 			'Qaao' => 'tohinima fakapulipuli-aao',
- 			'Qaap' => 'tohinima fakapulipuli-aap',
- 			'Qaaq' => 'tohinima fakapulipuli-aaq',
- 			'Qaar' => 'tohinima fakapulipuli-aar',
- 			'Qaas' => 'tohinima fakapulipuli-aas',
- 			'Qaat' => 'tohinima fakapulipuli-aat',
- 			'Qaau' => 'tohinima fakapulipuli-aau',
- 			'Qaav' => 'tohinima fakapulipuli-aav',
- 			'Qaaw' => 'tohinima fakapulipuli-aaw',
- 			'Qaax' => 'tohinima fakapulipuli-aax',
- 			'Qaay' => 'tohinima fakapulipuli-aay',
- 			'Qaaz' => 'tohinima fakapulipuli-aaz',
- 			'Qaba' => 'tohinima fakapulipuli-aba',
- 			'Qabb' => 'tohinima fakapulipuli-abb',
- 			'Qabc' => 'tohinima fakapulipuli-abc',
- 			'Qabd' => 'tohinima fakapulipuli-abd',
- 			'Qabe' => 'tohinima fakapulipuli-abe',
- 			'Qabf' => 'tohinima fakapulipuli-abf',
- 			'Qabg' => 'tohinima fakapulipuli-abg',
- 			'Qabh' => 'tohinima fakapulipuli-abh',
- 			'Qabi' => 'tohinima fakapulipuli-abi',
- 			'Qabj' => 'tohinima fakapulipuli-abj',
- 			'Qabk' => 'tohinima fakapulipuli-abk',
- 			'Qabl' => 'tohinima fakapulipuli-abl',
- 			'Qabm' => 'tohinima fakapulipuli-abm',
- 			'Qabn' => 'tohinima fakapulipuli-abn',
- 			'Qabo' => 'tohinima fakapulipuli-abo',
- 			'Qabp' => 'tohinima fakapulipuli-abp',
- 			'Qabq' => 'tohinima fakapulipuli-abq',
- 			'Qabr' => 'tohinima fakapulipuli-abr',
- 			'Qabs' => 'tohinima fakapulipuli-abs',
- 			'Qabt' => 'tohinima fakapulipuli-abt',
- 			'Qabu' => 'tohinima fakapulipuli-abu',
- 			'Qabv' => 'tohinima fakapulipuli-abv',
- 			'Qabw' => 'tohinima fakapulipuli-abw',
- 			'Qabx' => 'tohinima fakapulipuli-abx',
  			'Rjng' => 'tohinima fakalesiangi',
  			'Roro' => 'tohinima fakalongolongo',
  			'Runr' => 'tohinima fakaluniki',
@@ -1113,7 +1065,7 @@ has 'display_name_region' => (
  			'MK' => 'Masetōnia',
  			'MK@alt=variant' => 'Masetōnia (FYROM)',
  			'ML' => 'Māli',
- 			'MM' => 'Pema',
+ 			'MM' => 'Mianimā (Pema)',
  			'MN' => 'Mongokōlia',
  			'MO' => 'Makau SAR Siaina',
  			'MO@alt=short' => 'Makau',
@@ -1576,6 +1528,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(fua tefitoʻi),
+					},
 					'acre' => {
 						'name' => q(ʻeka),
 						'other' => q(ʻeka ʻe {0}),
@@ -1599,6 +1554,10 @@ has 'units' => (
 					'astronomical-unit' => {
 						'name' => q(ʻiuniti fakaʻasitalōnoma),
 						'other' => q(ʻiuniti fakaʻasitalōnoma ʻe {0}),
+					},
+					'atmosphere' => {
+						'name' => q(ʻatimosifia),
+						'other' => q(ʻatimosifia ʻe {0}),
 					},
 					'bit' => {
 						'name' => q(piti),
@@ -1793,8 +1752,8 @@ has 'units' => (
 						'per' => q({0} ki he ʻinise),
 					},
 					'inch-hg' => {
-						'name' => q(ʻinisi mēkuli),
-						'other' => q(ʻinisi mēkuli ʻe {0}),
+						'name' => q(ʻinisi meakuli),
+						'other' => q(ʻinisi meakuli ʻe {0}),
 					},
 					'joule' => {
 						'name' => q(siule),
@@ -1969,8 +1928,8 @@ has 'units' => (
 						'other' => q(milimita ʻe {0}),
 					},
 					'millimeter-of-mercury' => {
-						'name' => q(milimita mēkuli),
-						'other' => q(milimita mēkuli ʻe {0}),
+						'name' => q(milimita meakuli),
+						'other' => q(milimita meakuli ʻe {0}),
 					},
 					'millimole-per-liter' => {
 						'name' => q(milimole he lita),
@@ -2029,6 +1988,18 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0} ʻi he {1}),
+					},
+					'percent' => {
+						'name' => q(peseti),
+						'other' => q(peseti ʻe {0}),
+					},
+					'permille' => {
+						'name' => q(pemili),
+						'other' => q(pemili ʻe {0}),
+					},
+					'petabyte' => {
+						'name' => q(petapaiti),
+						'other' => q(petapaiti ʻe {0}),
 					},
 					'picometer' => {
 						'name' => q(pikomita),
@@ -2153,6 +2124,9 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(fua),
+					},
 					'acre' => {
 						'name' => q(ʻek),
 						'other' => q({0} ʻek),
@@ -2176,6 +2150,10 @@ has 'units' => (
 					'astronomical-unit' => {
 						'name' => q(ʻiʻa),
 						'other' => q({0} ʻiʻa),
+					},
+					'atmosphere' => {
+						'name' => q(ʻati),
+						'other' => q({0} ʻati),
 					},
 					'bit' => {
 						'name' => q(b),
@@ -2212,7 +2190,7 @@ has 'units' => (
 					},
 					'century' => {
 						'name' => q(tt),
-						'other' => q(tt ʻe {0}),
+						'other' => q({0} tt),
 					},
 					'coordinate' => {
 						'east' => q({0} ha),
@@ -2607,6 +2585,18 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PB),
+						'other' => q({0} PB),
+					},
 					'picometer' => {
 						'name' => q(pm),
 						'other' => q({0} pm),
@@ -2730,6 +2720,9 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(fua),
+					},
 					'acre' => {
 						'name' => q(ʻek),
 						'other' => q(ʻek ʻe {0}),
@@ -2753,6 +2746,10 @@ has 'units' => (
 					'astronomical-unit' => {
 						'name' => q(ʻiʻa),
 						'other' => q(ʻiʻa ʻe {0}),
+					},
+					'atmosphere' => {
+						'name' => q(ʻati),
+						'other' => q(ʻati ʻe {0}),
 					},
 					'bit' => {
 						'name' => q(piti),
@@ -2893,7 +2890,7 @@ has 'units' => (
 					},
 					'generic' => {
 						'name' => q(°),
-						'other' => q({0}°),
+						'other' => q(° ʻe {0}),
 					},
 					'gigabit' => {
 						'name' => q(kikapiti),
@@ -3183,6 +3180,18 @@ has 'units' => (
 					},
 					'per' => {
 						'1' => q({0}/{1}),
+					},
+					'percent' => {
+						'name' => q(%),
+						'other' => q(% ʻe {0}),
+					},
+					'permille' => {
+						'name' => q(‰),
+						'other' => q(‰ ʻe {0}),
+					},
+					'petabyte' => {
+						'name' => q(PB),
+						'other' => q(PB ʻe {0}),
 					},
 					'picometer' => {
 						'name' => q(pm),
@@ -4961,21 +4970,21 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
+				'wide' => {
+					'pm' => q{efiafi},
+					'am' => q{hengihengi},
 				},
 				'narrow' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'abbreviated' => {
 					'am' => q{AM},
 					'pm' => q{PM},
-				},
-				'wide' => {
-					'am' => q{hengihengi},
-					'pm' => q{efiafi},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
+				'abbreviated' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
@@ -4983,9 +4992,9 @@ has 'day_periods' => (
 					'pm' => q{EA},
 					'am' => q{HH},
 				},
-				'abbreviated' => {
-					'am' => q{AM},
+				'narrow' => {
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 			},
 		},
@@ -5179,7 +5188,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d/M/y},
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
-			yw => q{'uike' 'hono' w ʻ'o' y},
+			yw => q{'uike' 'hono' w ʻ'o' Y},
 		},
 	} },
 );

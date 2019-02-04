@@ -102,14 +102,14 @@ sub execute {
             $line = $in_fh->getline;
         }
         if ( ( $line eq '' or $line =~ /^\s+$/ ) and $content ne '' ) {
-            my $info_of = App::Fasops::Common::parse_block( $content, 1 );
+            my $info_ary = App::Fasops::Common::parse_block_array( $content );
             $content = '';
 
             if ( $opt->{parallel} >= 2 ) {
-                push @infos, $info_of;
+                push @infos, $info_ary;
             }
             else {
-                my $out_string = proc_block( $info_of, $opt );
+                my $out_string = proc_block( $info_ary, $opt );
                 print {$out_fh} $out_string;
             }
         }
@@ -123,8 +123,8 @@ sub execute {
         my $worker = sub {
             my ( $self, $chunk_ref, $chunk_id ) = @_;
 
-            my $info_of = $chunk_ref->[0];
-            my $out_string = proc_block( $info_of, $opt );
+            my $info_ary = $chunk_ref->[0];
+            my $out_string = proc_block( $info_ary, $opt );
 
             # preserving output order
             MCE->gather( $chunk_id, $out_string );
@@ -143,17 +143,16 @@ sub execute {
 }
 
 sub proc_block {
-    my $info_of = shift;
-    my $opt     = shift;
+    my $info_ary = shift;
+    my $opt      = shift;
 
     #----------------------------#
     # processing seqs, leave headers untouched
     #----------------------------#
     {
-        my @keys     = keys %{$info_of};
         my $seq_refs = [];
-        for my $key (@keys) {
-            push @{$seq_refs}, $info_of->{$key}{seq};
+        for my $info ( @{$info_ary} ) {
+            push @{$seq_refs}, $info->{seq};
         }
 
         #----------------------------#
@@ -179,8 +178,8 @@ sub proc_block {
             App::Fasops::Common::trim_complex_indel($seq_refs);
         }
 
-        for my $i ( 0 .. $#keys ) {
-            $info_of->{ $keys[$i] }{seq} = uc $seq_refs->[$i];
+        for my $i ( 0 .. scalar @{$seq_refs} - 1 ) {
+            $info_ary->[$i]{seq} = uc $seq_refs->[$i];
         }
     }
 
@@ -188,14 +187,13 @@ sub proc_block {
     # change headers
     #----------------------------#
     if ( $opt->{chop} ) {
-        trim_head_tail( $info_of, $opt->{chop} );
+        trim_head_tail( $info_ary, $opt->{chop} );
     }
 
     my $out_string;
-
-    for my $key ( keys %{$info_of} ) {
-        $out_string .= sprintf ">%s\n", App::RL::Common::encode_header( $info_of->{$key} );
-        $out_string .= sprintf "%s\n",  $info_of->{$key}{seq};
+    for my $info ( @{$info_ary} ) {
+        $out_string .= sprintf ">%s\n", App::RL::Common::encode_header($info);
+        $out_string .= sprintf "%s\n",  $info->{seq};
     }
     $out_string .= "\n";
 
@@ -211,27 +209,25 @@ sub proc_block {
 #   --AAAGC...
 #   GAAAAGC...
 sub trim_head_tail {
-    my $info_of     = shift;
+    my $info_ary    = shift;
     my $chop_length = shift;    # indels in this region will also be trimmed
 
     # default value means only trimming indels starting at the first base
     $chop_length = defined $chop_length ? $chop_length : 1;
 
-    my @keys         = keys %{$info_of};
-    my $align_length = length $info_of->{ $keys[0] }{seq};
+    my $align_length = length $info_ary->[0]{seq};
 
     # chop region covers all
     return if $chop_length * 2 >= $align_length;
 
     my $indel_set = AlignDB::IntSpan->new;
-    for my $key (@keys) {
-        my $seq_indel_set
-            = App::Fasops::Common::indel_intspan( $info_of->{$key}{seq} );
+    for my $info ( @{$info_ary} ) {
+        my $seq_indel_set = App::Fasops::Common::indel_intspan( $info->{seq} );
         $indel_set->merge($seq_indel_set);
     }
 
     # There're no indels at all
-    # Leave $info_of untouched
+    # Leave $info_ary untouched
     return if $indel_set->is_empty;
 
     {    # head indel(s) to be trimmed
@@ -241,15 +237,15 @@ sub trim_head_tail {
 
         # head indels
         if ( $head_indel_set->is_not_empty ) {
-            for my $i ( 1 .. $head_indel_set->max ) {
-                for my $key (@keys) {
-                    my $base = substr( $info_of->{$key}{seq}, 0, 1, '' );
+            for ( 1 .. $head_indel_set->max ) {
+                for my $info ( @{$info_ary} ) {
+                    my $base = substr( $info->{seq}, 0, 1, '' );
                     if ( $base ne '-' ) {
-                        if ( $info_of->{$key}{strand} eq "+" ) {
-                            $info_of->{$key}{start}++;
+                        if ( $info->{strand} eq "+" ) {
+                            $info->{start}++;
                         }
                         else {
-                            $info_of->{$key}{end}--;
+                            $info->{end}--;
                         }
                     }
                 }
@@ -264,15 +260,15 @@ sub trim_head_tail {
 
         # tail indels
         if ( $tail_indel_set->is_not_empty ) {
-            for my $i ( $tail_indel_set->min .. $align_length ) {
-                for my $key (@keys) {
-                    my $base = substr( $info_of->{$key}{seq}, -1, 1, '' );
+            for ( $tail_indel_set->min .. $align_length ) {
+                for my $info ( @{$info_ary} ) {
+                    my $base = substr( $info->{seq}, -1, 1, '' );
                     if ( $base ne '-' ) {
-                        if ( $info_of->{$key}{strand} eq "+" ) {
-                            $info_of->{$key}{end}--;
+                        if ( $info->{strand} eq "+" ) {
+                            $info->{end}--;
                         }
                         else {
-                            $info_of->{$key}{start}++;
+                            $info->{start}++;
                         }
                     }
                 }
@@ -280,15 +276,6 @@ sub trim_head_tail {
         }
     }
 
-    # create new $info_of
-    my $new_info_of = {};
-    for my $key (@keys) {
-        my $info    = $info_of->{$key};
-        my $new_key = App::RL::Common::encode_header($info);
-        $new_info_of->{$new_key} = $info;
-    }
-
-    $info_of = $new_info_of;
 }
 
 1;

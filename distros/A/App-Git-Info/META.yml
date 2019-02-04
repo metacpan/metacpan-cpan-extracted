@@ -20,9 +20,13 @@ name: App-Git-Info
 provides:
   App::Git::Info:
     file: lib/App/Git/Info.pm
-    version: v0.2.0
+    version: v0.4.0
+  App::Git::Info::Command::info:
+    file: lib/App/Git/Info/Command/info.pm
+    version: v0.4.0
 requires:
-  App::Rad: '0'
+  App::Cmd::Setup: '0'
+  autodie: '0'
   perl: '5.016'
   strict: '0'
   warnings: '0'
@@ -30,10 +34,10 @@ resources:
   bugtracker: https://github.com/shlomif/app-git-info/issues
   homepage: http://metacpan.org/release/App-Git-Info
   repository: https://github.com/shlomif/perl-App-Git-Info.git
-version: 0.2.0
+version: 0.4.0
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.028001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -389,5 +393,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

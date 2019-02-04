@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Jgo - Package for language Ngomba
 
 package Locale::CLDR::Locales::Jgo;
 # This file auto generated from Data\common\main\jgo.xml
-#	on Sun  7 Oct 10:39:52 am GMT
+#	on Sun  3 Feb  1:58:44 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -647,8 +647,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'pm' => q{ŋka mbɔ́t nji},
 					'am' => q{mbaꞌmbaꞌ},
+					'pm' => q{ŋka mbɔ́t nji},
 				},
 				'abbreviated' => {
 					'pm' => q{ŋka mbɔ́t nji},
@@ -740,17 +740,17 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			Ed => q{E d},
-			MEd => q{E, d.M},
-			Md => q{d.M},
-			yMd => q{M.d.y},
-		},
 		'generic' => {
 			Ed => q{E d},
 			MEd => q{E, d.M},
 			Md => q{d.M},
 			yyyyMd => q{M.d.y G},
+		},
+		'gregorian' => {
+			Ed => q{E d},
+			MEd => q{E, d.M},
+			Md => q{d.M},
+			yMd => q{M.d.y},
 		},
 	} },
 );
@@ -768,10 +768,10 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			fallback => '{0} – {1}',
 		},
-		'generic' => {
+		'gregorian' => {
 			fallback => '{0} – {1}',
 		},
 	} },

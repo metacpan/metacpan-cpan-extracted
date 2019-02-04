@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ce::Any::Ru - Package for language Chechen
 
 package Locale::CLDR::Locales::Ce::Any::Ru;
 # This file auto generated from Data\common\main\ce_RU.xml
-#	on Sun  7 Oct 10:25:13 am GMT
+#	on Sun  3 Feb  1:44:26 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

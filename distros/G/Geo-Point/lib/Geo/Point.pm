@@ -1,4 +1,4 @@
-# Copyrights 2005-2018 by [Mark Overmeer].
+# Copyrights 2005-2019 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Geo::Point;
 use vars '$VERSION';
-$VERSION = '0.97';
+$VERSION = '0.98';
 
 use base 'Geo::Shape';
 
@@ -219,7 +219,7 @@ sub normalize()
 
 #----------------
 
-sub bbox() { @{(shift)}[ qw/GP_x GP_y GP_x GP_y/ ] }
+sub bbox() { @{(shift)}{qw/GP_x GP_y GP_x GP_y/} }
 
 
 sub area() { 0 }

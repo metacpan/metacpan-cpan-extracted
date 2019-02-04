@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Prg - Package for language Prussian
 
 package Locale::CLDR::Locales::Prg;
 # This file auto generated from Data\common\main\prg.xml
-#	on Sun  7 Oct 10:53:56 am GMT
+#	on Sun  3 Feb  2:13:37 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';

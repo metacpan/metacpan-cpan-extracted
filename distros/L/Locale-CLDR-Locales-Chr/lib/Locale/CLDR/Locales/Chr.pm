@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Chr - Package for language Cherokee
 
 package Locale::CLDR::Locales::Chr;
 # This file auto generated from Data\common\main\chr.xml
-#	on Sun  7 Oct 10:25:15 am GMT
+#	on Sun  3 Feb  1:44:28 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.1');
+our $VERSION = version->declare('v0.34.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -738,7 +738,7 @@ has 'display_name_script' => (
  			'Grek' => 'ᎪᎢ',
  			'Gujr' => 'ᎫᏣᎳᏘ',
  			'Guru' => 'ᎬᎹᎩ',
- 			'Hanb' => 'ᎭᏂ-ᏆᏉᎼᏬ',
+ 			'Hanb' => 'ᎭᏂ ᎾᎿ ᏆᏉᎼᏬ',
  			'Hang' => 'ᎭᏂᎫᎵ',
  			'Hani' => 'ᎭᏂ',
  			'Hans' => 'ᎠᎯᏗᎨ',
@@ -1062,7 +1062,7 @@ has 'display_name_region' => (
  			'TL@alt=variant' => 'ᏗᎧᎸᎬᎢ ᏘᎼᎵ',
  			'TM' => 'ᏛᎵᎩᎺᏂᏍᏔᏂ',
  			'TN' => 'ᏚᏂᏏᏍᎠ',
- 			'TO' => 'ᏔᏂᎪ',
+ 			'TO' => 'ᏙᎾᎦ',
  			'TR' => 'ᎬᏃ',
  			'TT' => 'ᏟᏂᏕᏗ ᎠᎴ ᏙᏆᎪ',
  			'TV' => 'ᏚᏩᎷ',
@@ -1319,6 +1319,9 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					'' => {
+						'name' => q(ᏅᎩ ᏫᏂᏚᏳᎪᏛᎢ),
+					},
 					'acre' => {
 						'name' => q(ᎢᏧᏟᎶᏓ),
 						'one' => q({0} ᏑᏟᎶᏓᎢ),
@@ -1348,6 +1351,11 @@ has 'units' => (
 						'name' => q(ᎡᎶᎯ ᎠᎴ ᎤᏓ ᏭᏍᏗᎬ ᎧᎵ ᎨᏒᎢ),
 						'one' => q({0} ᎡᎶᎯ ᎠᎴ ᎤᏓ ᏭᏍᏗᎬ ᎧᎵ ᎨᏒᎢ),
 						'other' => q({0} ᎡᎶᎯ ᎠᎴ ᎤᏓ ᏭᏍᏗᎬ ᎧᎵ ᎨᏒᎢ),
+					},
+					'atmosphere' => {
+						'name' => q(ᏗᎦᏃᎴᏍᎬ),
+						'one' => q({0} ᎦᏃᎴᏍᎬ),
+						'other' => q({0} ᏗᎦᏃᎴᏍᎬ),
 					},
 					'bit' => {
 						'name' => q(ᎤᏍᎦᎵᏨ),
@@ -1486,9 +1494,9 @@ has 'units' => (
 						'per' => q({0} ᎢᎳᏏᏗ ᎢᏳᏓᎵ),
 					},
 					'g-force' => {
-						'name' => q(ᎠᏓᎾᏌᏁᏍᎩ ᎦᏌᏙᏯᏍᏗ),
-						'one' => q({0} ᎠᏓᎾᏌᏁᏍᎩ ᎦᏌᏙᏯᏍᏗ),
-						'other' => q({0} ᎠᏓᎾᏌᏁᏍᎩ ᎦᏌᏙᏯᏍᏗ),
+						'name' => q(ᎠᏓᎾᏌᏁᏍᎩ-ᎦᏌᏙᏯᏍᏗ),
+						'one' => q({0} ᎠᏓᎾᏌᏁᏍᎩ-ᎦᏌᏙᏯᏍᏗ),
+						'other' => q({0} ᎠᏓᎾᏌᏁᏍᎩ-ᎦᏌᏙᏯᏍᏗ),
 					},
 					'gallon' => {
 						'name' => q(ᎢᏧᎵᎶᏓ),
@@ -1524,7 +1532,7 @@ has 'units' => (
 					},
 					'gigawatt' => {
 						'name' => q(ᎩᎦᏩᏗ),
-						'one' => q({0} ᎩᎦ ᏩᏗ),
+						'one' => q({0} ᎩᎦᏩᏗ),
 						'other' => q({0} ᎩᎦᏩᏗ),
 					},
 					'gram' => {
@@ -1865,6 +1873,21 @@ has 'units' => (
 					'per' => {
 						'1' => q({0} ᎾᎿ {1}),
 					},
+					'percent' => {
+						'name' => q(ᏓᎬᏩᎶᏛ),
+						'one' => q({0} ᏓᎬᏩᎶᏛ),
+						'other' => q({0} ᏓᎬᏩᎶᏛ),
+					},
+					'permille' => {
+						'name' => q(ᏈᎻᎴ),
+						'one' => q({0} ᏈᎻᎴ),
+						'other' => q({0} ᏈᎻᎴ),
+					},
+					'petabyte' => {
+						'name' => q(ᏇᏔ ᏗᏓᏍᎦᎵᎩ),
+						'one' => q({0} ᏇᏔ ᏗᏓᏍᎦᎵᎩ),
+						'other' => q({0} ᏇᏔ ᏗᏓᏍᎦᎵᎩ),
+					},
 					'picometer' => {
 						'name' => q(ᏇᎪ ᎢᏯᎦᎨᎵᏁᎢ ᏗᏟᎶᏍᏗ),
 						'one' => q({0} ᏇᎪ ᎢᏯᎦᎨᎵᏁᎢ ᎠᏟᎶᏍᏗ),
@@ -2011,15 +2034,18 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					'' => {
+						'name' => q(ᏫᏚᏳᎪᏛ),
+					},
 					'celsius' => {
 						'name' => q(°C),
 						'one' => q({0}°C),
 						'other' => q({0}°C),
 					},
 					'centimeter' => {
-						'name' => q(cm),
-						'one' => q({0}cm),
-						'other' => q({0}cm),
+						'name' => q(ᏧᎠ),
+						'one' => q({0}ᏧᎠ),
+						'other' => q({0}ᏧᎠ),
 					},
 					'coordinate' => {
 						'east' => q({0}Ꮧ),
@@ -2029,8 +2055,8 @@ has 'units' => (
 					},
 					'day' => {
 						'name' => q(ᎢᎦ),
-						'one' => q({0}ᎢᎦ),
-						'other' => q({0}ᎢᎦ),
+						'one' => q({0}Ꭲ),
+						'other' => q({0}Ꭲ),
 					},
 					'fahrenheit' => {
 						'one' => q({0}°),
@@ -2052,14 +2078,14 @@ has 'units' => (
 						'other' => q({0}kg),
 					},
 					'kilometer' => {
-						'name' => q(km),
-						'one' => q({0}km),
-						'other' => q({0}km),
+						'name' => q(ᎠᏗ),
+						'one' => q({0}ᎠᏗ),
+						'other' => q({0}ᎠᏗ),
 					},
 					'kilometer-per-hour' => {
 						'name' => q(km/hr),
-						'one' => q({0}kph),
-						'other' => q({0}kph),
+						'one' => q({0}km/h),
+						'other' => q({0}km/h),
 					},
 					'liter' => {
 						'name' => q(ᎢᏳᏆᏗᏅᏛ),
@@ -2068,23 +2094,23 @@ has 'units' => (
 					},
 					'liter-per-100kilometers' => {
 						'name' => q(L/100km),
-						'one' => q({0} L/100km),
-						'other' => q({0} L/100km),
+						'one' => q({0}L/100km),
+						'other' => q({0}L/100km),
 					},
 					'meter' => {
-						'name' => q(ᎠᏟᎶᏍᏗ),
-						'one' => q({0}m),
-						'other' => q({0}m),
+						'name' => q(ᎠᏟ),
+						'one' => q({0}ᎠᏟ),
+						'other' => q({0}ᎠᏟ),
 					},
 					'millimeter' => {
-						'name' => q(mm),
-						'one' => q({0}mm),
-						'other' => q({0}mm),
+						'name' => q(ᏌᎢᎠ),
+						'one' => q({0}ᏌᎢᎠ),
+						'other' => q({0}ᏌᎢᎠ),
 					},
 					'millisecond' => {
-						'name' => q(msec),
-						'one' => q({0}ms),
-						'other' => q({0}ms),
+						'name' => q(ᏌᎠ),
+						'one' => q({0}ᏌᎠ),
+						'other' => q({0}ᏌᎠ),
 					},
 					'minute' => {
 						'name' => q(ᎢᏯᏔ),
@@ -2099,10 +2125,15 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
 					'second' => {
 						'name' => q(ᎠᏎᏢ),
-						'one' => q({0}s),
-						'other' => q({0}s),
+						'one' => q({0}ᎠᏎ),
+						'other' => q({0}ᎠᏎ),
 					},
 					'week' => {
 						'name' => q(ᏒᎾ),
@@ -2116,10 +2147,13 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					'' => {
+						'name' => q(ᏫᏚᏳᎪᏛ),
+					},
 					'acre' => {
 						'name' => q(ᎢᏧᏟᎶᏓ),
-						'one' => q({0} ac),
-						'other' => q({0} ac),
+						'one' => q({0} ᏑᏟᎶ),
+						'other' => q({0} ᏑᏟᎶ),
 					},
 					'acre-foot' => {
 						'name' => q(ᏑᏟᎶᏛ-ᎢᏗᎳᏏᏗ),
@@ -2142,9 +2176,14 @@ has 'units' => (
 						'other' => q({0} arcsecs),
 					},
 					'astronomical-unit' => {
-						'name' => q(au),
-						'one' => q({0} au),
-						'other' => q({0} au),
+						'name' => q(ᎡᎨ),
+						'one' => q({0} ᎡᎨ),
+						'other' => q({0} ᎡᎨ),
+					},
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
 					},
 					'bit' => {
 						'name' => q(ᎤᏍᎦᎳ),
@@ -2177,15 +2216,15 @@ has 'units' => (
 						'other' => q({0} cL),
 					},
 					'centimeter' => {
-						'name' => q(cm),
-						'one' => q({0} cm),
-						'other' => q({0} cm),
-						'per' => q({0}/cm),
+						'name' => q(ᏧᎠ),
+						'one' => q({0} ᏧᎠ),
+						'other' => q({0} ᏧᎠ),
+						'per' => q({0}/ᏧᎠ),
 					},
 					'century' => {
-						'name' => q(c),
-						'one' => q({0} c),
-						'other' => q({0} c),
+						'name' => q(ᏍᏧ),
+						'one' => q({0} ᏍᏧ),
+						'other' => q({0} ᏍᏧ),
 					},
 					'coordinate' => {
 						'east' => q({0} Ꮧ),
@@ -2200,12 +2239,12 @@ has 'units' => (
 						'per' => q({0}/cm³),
 					},
 					'cubic-foot' => {
-						'name' => q(ᏅᎩ ᏧᏅᏏᏯ ᎢᏗᎳᏏᏗ),
+						'name' => q(ᎢᏗᎳᏏᏗ³),
 						'one' => q({0} ft³),
 						'other' => q({0} ft³),
 					},
 					'cubic-inch' => {
-						'name' => q(ᏅᎩ ᏧᏅᏏᏯ ᎢᏗᏏᏔᏗᏍᏗ),
+						'name' => q(ᎢᏗᏏᏔᏗᏍᏗ³),
 						'one' => q({0} in³),
 						'other' => q({0} in³),
 					},
@@ -2226,7 +2265,7 @@ has 'units' => (
 						'other' => q({0} mi³),
 					},
 					'cubic-yard' => {
-						'name' => q(ᏅᎩ ᏧᏅᏏᏯ ᎢᏯᏯᏗ),
+						'name' => q(ᎢᏯᏯᏗ³),
 						'one' => q({0} yd³),
 						'other' => q({0} yd³),
 					},
@@ -2244,7 +2283,7 @@ has 'units' => (
 						'name' => q(ᎯᎸᏍᎩ ᏧᏒᎯᏓ),
 						'one' => q({0} ᎢᎦ),
 						'other' => q({0} ᏧᏒᎯᏓ),
-						'per' => q({0}/ᎢᎦ),
+						'per' => q({0}/Ꭲ),
 					},
 					'deciliter' => {
 						'name' => q(dL),
@@ -2252,9 +2291,9 @@ has 'units' => (
 						'other' => q({0} dL),
 					},
 					'decimeter' => {
-						'name' => q(dm),
-						'one' => q({0} dm),
-						'other' => q({0} dm),
+						'name' => q(ᏌᏟ),
+						'one' => q({0} ᏌᏟ),
+						'other' => q({0} ᏌᏟ),
 					},
 					'degree' => {
 						'name' => q(ᎢᎦᎢ ᎢᏗᎦᏘ),
@@ -2278,12 +2317,12 @@ has 'units' => (
 					},
 					'foot' => {
 						'name' => q(ᎢᏗᎳᏏᏗ),
-						'one' => q({0} ft),
-						'other' => q({0} ft),
-						'per' => q({0}/ft),
+						'one' => q({0} ᎢᏗᎳ),
+						'other' => q({0} ᎢᏗᎳ),
+						'per' => q({0}/ᎢᏗᎳ),
 					},
 					'g-force' => {
-						'name' => q(ᎠᏓᎾᏌᏁᏍᎩ ᎦᏌᏙᏯᏍᏗ),
+						'name' => q(ᎠᏓᎾᏌᏁᏍᎩ-ᎦᏌᏙᏯᏍᏗ),
 						'one' => q({0} G),
 						'other' => q({0} G),
 					},
@@ -2332,8 +2371,8 @@ has 'units' => (
 					},
 					'hectare' => {
 						'name' => q(ᎮᏔ ᎢᏳᏟᎶᏛ),
-						'one' => q({0} ha),
-						'other' => q({0} ha),
+						'one' => q({0} ᎨᏑ),
+						'other' => q({0} ᎨᏑ),
 					},
 					'hectoliter' => {
 						'name' => q(hL),
@@ -2358,17 +2397,17 @@ has 'units' => (
 					'hour' => {
 						'name' => q(ᎢᏳᏟᎶᏓ),
 						'one' => q({0} ᏑᏟ),
-						'other' => q({0} ᎢᏳᏟ),
+						'other' => q({0} ᏑᏟ),
 						'per' => q({0}/Ꮡ),
 					},
 					'inch' => {
 						'name' => q(ᎢᏗᏏᏔᏗᏍᏗ),
-						'one' => q({0} in),
-						'other' => q({0} in),
-						'per' => q({0}/in),
+						'one' => q({0} ᎢᏏᏔ),
+						'other' => q({0} ᎢᏏᏔ),
+						'per' => q({0}/ᎢᏏᏔ),
 					},
 					'inch-hg' => {
-						'name' => q(in Hg),
+						'name' => q(inHg),
 						'one' => q({0} inHg),
 						'other' => q({0} inHg),
 					},
@@ -2419,15 +2458,15 @@ has 'units' => (
 						'other' => q({0} kJ),
 					},
 					'kilometer' => {
-						'name' => q(km),
-						'one' => q({0} km),
-						'other' => q({0} km),
-						'per' => q({0}/km),
+						'name' => q(ᎠᏗ),
+						'one' => q({0} ᎠᏗ),
+						'other' => q({0} ᎠᏗ),
+						'per' => q({0}/ᎠᏗ),
 					},
 					'kilometer-per-hour' => {
 						'name' => q(km/ᏑᏟᎶᏓ),
-						'one' => q({0} kph),
-						'other' => q({0} kph),
+						'one' => q({0} km/h),
+						'other' => q({0} km/h),
 					},
 					'kilowatt' => {
 						'name' => q(kW),
@@ -2446,8 +2485,8 @@ has 'units' => (
 					},
 					'light-year' => {
 						'name' => q(ᏗᏨᏍᏗ ᏧᏕᏘ),
-						'one' => q({0} ly),
-						'other' => q({0} ly),
+						'one' => q({0} ᏗᏧ),
+						'other' => q({0} ᏗᏧ),
 					},
 					'liter' => {
 						'name' => q(ᎢᏧᏆᏗᏅᏛ),
@@ -2496,10 +2535,10 @@ has 'units' => (
 						'other' => q({0} MW),
 					},
 					'meter' => {
-						'name' => q(ᏗᏟᎶᏍᏗ),
-						'one' => q({0} m),
-						'other' => q({0} m),
-						'per' => q({0}/m),
+						'name' => q(ᎠᏟ),
+						'one' => q({0} ᎠᏟ),
+						'other' => q({0} ᎠᏟ),
+						'per' => q({0}/ᎠᏟ),
 					},
 					'meter-per-second' => {
 						'name' => q(ᏗᏟᎶᏗ/ᎠᏎ),
@@ -2533,8 +2572,8 @@ has 'units' => (
 					},
 					'mile' => {
 						'name' => q(ᎢᏳᏟᎶᏓ),
-						'one' => q({0} mi),
-						'other' => q({0} mi),
+						'one' => q({0} ᎢᏳ),
+						'other' => q({0} ᎢᏳ),
 					},
 					'mile-per-gallon' => {
 						'name' => q(ᎢᏧᏟᎶᏓ/ᎢᏳᎵᎶᏓ),
@@ -2548,13 +2587,13 @@ has 'units' => (
 					},
 					'mile-per-hour' => {
 						'name' => q(ᎢᏧᏟᎶᏓ/ᏑᏟᎶᏛ),
-						'one' => q({0} mi/h),
-						'other' => q({0} mi/h),
+						'one' => q({0} mph),
+						'other' => q({0} mph),
 					},
 					'mile-scandinavian' => {
-						'name' => q(smi),
-						'one' => q({0} smi),
-						'other' => q({0} smi),
+						'name' => q(ᏍᏑ),
+						'one' => q({0} ᏍᏑ),
+						'other' => q({0} ᏍᏑ),
 					},
 					'milliampere' => {
 						'name' => q(milliamps),
@@ -2582,14 +2621,14 @@ has 'units' => (
 						'other' => q({0} mL),
 					},
 					'millimeter' => {
-						'name' => q(mm),
-						'one' => q({0} mm),
-						'other' => q({0} mm),
+						'name' => q(ᏌᎢᎠ),
+						'one' => q({0} ᏌᎢᎠ),
+						'other' => q({0} ᏌᎢᎠ),
 					},
 					'millimeter-of-mercury' => {
-						'name' => q(mm Hg),
-						'one' => q({0} mm Hg),
-						'other' => q({0} mm Hg),
+						'name' => q(mmHg),
+						'one' => q({0} mmHg),
+						'other' => q({0} mmHg),
 					},
 					'millimole-per-liter' => {
 						'name' => q(ᏌᏉ ᎢᏯᎦᎨᎵᏁᎢ ᎼᎵ ᎵᏔᎢ ᎢᏳᏓᎵ),
@@ -2598,8 +2637,8 @@ has 'units' => (
 					},
 					'millisecond' => {
 						'name' => q(ᏌᏉ ᎢᏯᎦᎨᎵᏁᎢ ᏗᏎᏢ),
-						'one' => q({0} ms),
-						'other' => q({0} ms),
+						'one' => q({0} ᏌᎠ),
+						'other' => q({0} ᏌᎠ),
 					},
 					'milliwatt' => {
 						'name' => q(mW),
@@ -2619,19 +2658,19 @@ has 'units' => (
 						'per' => q({0}/Ꭷ),
 					},
 					'nanometer' => {
-						'name' => q(nm),
-						'one' => q({0} nm),
-						'other' => q({0} nm),
+						'name' => q(ᎾᎠ),
+						'one' => q({0} ᎾᎠ),
+						'other' => q({0} ᎾᎠ),
 					},
 					'nanosecond' => {
 						'name' => q(ᎾᏃᏗᏎᏢ),
-						'one' => q({0} ns),
-						'other' => q({0} ns),
+						'one' => q({0} ᎾᏃ),
+						'other' => q({0} ᎾᏃ),
 					},
 					'nautical-mile' => {
-						'name' => q(nmi),
-						'one' => q({0} nmi),
-						'other' => q({0} nmi),
+						'name' => q(ᎠᎺᎢ),
+						'one' => q({0} ᎠᎺᎢ),
+						'other' => q({0} ᎠᎺᎢ),
 					},
 					'ohm' => {
 						'name' => q(ᏗᎣᎻ),
@@ -2651,8 +2690,8 @@ has 'units' => (
 					},
 					'parsec' => {
 						'name' => q(ᎢᏯᏆᏎᎦ),
-						'one' => q({0} pc),
-						'other' => q({0} pc),
+						'one' => q({0} ᎢᏆ),
+						'other' => q({0} ᎢᏆ),
 					},
 					'part-per-million' => {
 						'name' => q(ᏚᏙᏢᏒ/ᎢᏳᏆᏗᏅᏛ),
@@ -2662,10 +2701,25 @@ has 'units' => (
 					'per' => {
 						'1' => q({0}/{1}),
 					},
+					'percent' => {
+						'name' => q(ᏓᎬᏩᎶᏛ),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					'permille' => {
+						'name' => q(ᏈᎻᎴ),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					'petabyte' => {
+						'name' => q(PByte),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
+					},
 					'picometer' => {
-						'name' => q(pm),
-						'one' => q({0} pm),
-						'other' => q({0} pm),
+						'name' => q(ᏇᎢᎠ),
+						'one' => q({0} ᏇᎢᎠ),
+						'other' => q({0} ᏇᎢᎠ),
 					},
 					'pint' => {
 						'name' => q(ᏔᎵ ᏧᎵᏍᏈᏗ ᎠᎧᎵ),
@@ -2712,7 +2766,7 @@ has 'units' => (
 						'name' => q(ᏓᏓᎾ),
 						'one' => q({0} ᎠᏎᏢ),
 						'other' => q({0} ᎠᏎᏢ),
-						'per' => q({0}/s),
+						'per' => q({0}/ᎠᏎ),
 					},
 					'square-centimeter' => {
 						'name' => q(cm²),
@@ -2722,11 +2776,11 @@ has 'units' => (
 					},
 					'square-foot' => {
 						'name' => q(ᏅᎩ ᏧᏅᏏᏱ ᎢᏗᎳᏏᏗ),
-						'one' => q({0} ft²),
-						'other' => q({0} ft²),
+						'one' => q({0} sq ft),
+						'other' => q({0} sq ft),
 					},
 					'square-inch' => {
-						'name' => q(ᏅᎩ ᏧᏅᏏᏳ ᎢᏗᏏᏔᏗᏍᏗ),
+						'name' => q(ᎢᏗᏏᏔᏗᏍᏗ²),
 						'one' => q({0} in²),
 						'other' => q({0} in²),
 						'per' => q({0}/in²),
@@ -2738,19 +2792,19 @@ has 'units' => (
 						'per' => q({0}/km²),
 					},
 					'square-meter' => {
-						'name' => q(ᏅᎩ ᏧᏅᏏᏱ ᏗᏟᎶᏍᏗ),
+						'name' => q(ᏗᏟᎶᏍᏗ²),
 						'one' => q({0} m²),
 						'other' => q({0} m²),
 						'per' => q({0}/m²),
 					},
 					'square-mile' => {
 						'name' => q(ᏅᎩ ᏧᏅᏏᏱ ᎢᏳᏟᎶᏓ),
-						'one' => q({0} sq mi),
-						'other' => q({0} sq mi),
+						'one' => q({0} ᏅᏧᎢ),
+						'other' => q({0} ᏅᏧᎢ),
 						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
-						'name' => q(ᏅᎩ ᏧᏅᏏᏱ ᏗᏯᏯᏗ),
+						'name' => q(ᏗᏯᏯᏗ²),
 						'one' => q({0} yd²),
 						'other' => q({0} yd²),
 					},
@@ -2797,8 +2851,8 @@ has 'units' => (
 					},
 					'yard' => {
 						'name' => q(ᎢᏯᏯᏗ),
-						'one' => q({0} yd),
-						'other' => q({0} yd),
+						'one' => q({0} ᏯᏗ),
+						'other' => q({0} ᏯᏗ),
 					},
 					'year' => {
 						'name' => q(ᏧᏕᏘᏴᏌᏗᏒᎢ),
@@ -3086,8 +3140,8 @@ has 'currencies' => (
 			symbol => 'AED',
 			display_name => {
 				'currency' => q(ᏌᏊ ᎢᏳᎾᎵᏍᏔᏅ ᎡᎳᏈ ᎢᎹᎵᏘᏏ ᎠᏕᎳ),
-				'one' => q(ᏌᏊ ᎢᏳᎾᎵᏍᏔᏅ ᎡᎳᏈ ᎢᎹᎵᏘᏏ ᎠᏕᎳ),
-				'other' => q(ᏌᏊ ᎢᏳᎾᎵᏍᏔᏅ ᎡᎳᏈ ᎢᎹᎵᏘᏏ ᎠᏕᎳ),
+				'one' => q(UAE ᎠᏕᎳ),
+				'other' => q(UAE ᎠᏕᎳ),
 			},
 		},
 		'AFN' => {
@@ -3165,9 +3219,9 @@ has 'currencies' => (
 		'BAM' => {
 			symbol => 'BAM',
 			display_name => {
-				'currency' => q(ᏉᏏᏂᎠ ᎠᎴ ᎲᏤᎪᏫ ᎦᏁᏟᏴᏍᏔᏅ ᎠᏕᎳ),
-				'one' => q(ᏉᏏᏂᎠ ᎠᎴ ᎲᏤᎪᏫ ᎦᏁᏟᏴᏍᏔᏅ ᎠᏕᎳ),
-				'other' => q(ᏉᏏᏂᎠ ᎠᎴ ᎲᏤᎪᏫ ᎦᏁᏟᏴᏍᏔᏅ ᎠᏕᎳ),
+				'currency' => q(ᏉᏏᏂᎠ-ᎲᏤᎪᏫ ᎦᏁᏟᏴᏍᏔᏅ ᎠᏕᎳ),
+				'one' => q(ᏉᏏᏂᎠ-ᎲᏤᎪᏫ ᎦᏁᏟᏴᏍᏔᏅ ᎠᏕᎳ),
+				'other' => q(ᏉᏏᏂᎠ-ᎲᏤᎪᏫ ᎦᏁᏟᏴᏍᏔᏅ ᎠᏕᎳ),
 			},
 		},
 		'BBD' => {
@@ -3323,6 +3377,7 @@ has 'currencies' => (
 			},
 		},
 		'CNH' => {
+			symbol => 'CNH',
 			display_name => {
 				'currency' => q(ᏣᏂᏏ ᎠᏕᎳ \(ᏓᎹᏳᏟᏗ\)),
 				'one' => q(ᏣᏂᏏ ᎠᏕᎳ \(ᏓᎹᏳᏟᏗ\)),
@@ -3732,9 +3787,9 @@ has 'currencies' => (
 		'LKR' => {
 			symbol => 'LKR',
 			display_name => {
-				'currency' => q(ᏍᎵᎳᏂᎧ ᎠᏕᎳ),
-				'one' => q(ᏍᎵᎳᏂᎧ ᎠᏕᎳ),
-				'other' => q(ᏍᎵᎳᏂᎧ ᎠᏕᎳ),
+				'currency' => q(ᏍᎵ ᎳᏂᎧ ᎠᏕᎳ),
+				'one' => q(ᏍᎵ ᎳᏂᎧ ᎠᏕᎳ),
+				'other' => q(ᏍᎵ ᎳᏂᎧ ᎠᏕᎳ),
 			},
 		},
 		'LRD' => {
@@ -3812,16 +3867,17 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
-				'currency' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ \(1973–2017\)),
-				'one' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ \(1973–2017\)),
-				'other' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ \(1973–2017\)),
+				'currency' => q(ᎹᏈᏔᏂᎠ ᎠᏕᎳ \(1973–2017\)),
+				'one' => q(ᎹᏈᏔᏂᎠ ᎠᏕᎳ \(1973–2017\)),
+				'other' => q(ᎹᏈᏔᏂᎠ ᎠᏕᎳ \(1973–2017\)),
 			},
 		},
 		'MRU' => {
+			symbol => 'MRU',
 			display_name => {
-				'currency' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ),
-				'one' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ),
-				'other' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ),
+				'currency' => q(ᎹᏈᏔᏂᎠ ᎠᏕᎳ),
+				'one' => q(ᎹᏈᏔᏂᎠ ᎠᏕᎳ),
+				'other' => q(ᎹᏈᏔᏂᎠ ᎠᏕᎳ),
 			},
 		},
 		'MUR' => {
@@ -4121,11 +4177,11 @@ has 'currencies' => (
 			},
 		},
 		'STN' => {
-			symbol => 'Db',
+			symbol => 'STN',
 			display_name => {
-				'currency' => q(ᏌᎣᏙᎺ ᎠᎴ ᏈᏂᏏᏇ ᎠᏕᎳ),
-				'one' => q(ᏌᎣᏙᎺ ᎠᎴ ᏈᏂᏏᏇ ᎠᏕᎳ),
-				'other' => q(ᏌᎣᏙᎺ ᎠᎴ ᏈᏂᏏᏇ ᎠᏕᎳ),
+				'currency' => q(ᏌᎣᏙᎺ & ᏈᏂᏏᏇ ᎠᏕᎳ),
+				'one' => q(ᏌᎣᏙᎺ & ᏈᏂᏏᏇ ᎠᏕᎳ),
+				'other' => q(ᏌᎣᏙᎺ & ᏈᏂᏏᏇ ᎠᏕᎳ),
 			},
 		},
 		'SYP' => {
@@ -4195,9 +4251,9 @@ has 'currencies' => (
 		'TTD' => {
 			symbol => 'TTD',
 			display_name => {
-				'currency' => q(ᏟᏂᏕᏗ ᎠᎴ ᏙᏆᎪ ᎠᏕᎳ),
-				'one' => q(ᏟᏂᏕᏗ ᎠᎴ ᏙᏆᎪ ᎠᏕᎳ),
-				'other' => q(ᏟᏂᏕᏗ ᎠᎴ ᏙᏆᎪ ᎠᏕᎳ),
+				'currency' => q(ᏟᏂᏕᏗ & ᏙᏆᎪ ᎠᏕᎳ),
+				'one' => q(ᏟᏂᏕᏗ & ᏙᏆᎪ ᎠᏕᎳ),
+				'other' => q(ᏟᏂᏕᏗ & ᏙᏆᎪ ᎠᏕᎳ),
 			},
 		},
 		'TWD' => {
@@ -4259,9 +4315,17 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'VEF',
 			display_name => {
-				'currency' => q(ᏪᏁᏑᏪᎳ ᎠᏕᎳ),
+				'currency' => q(ᏪᏁᏑᏪ ᎠᏕᎳ \(2008–2018\)),
 				'one' => q(ᏪᏁᏑᏪᎳ ᎠᏕᎳ),
 				'other' => q(ᏪᏁᏑᏪᎳ ᎠᏕᎳ),
+			},
+		},
+		'VES' => {
+			symbol => 'VES',
+			display_name => {
+				'currency' => q(ᏪᏁᏑᏪ ᎠᏕᎳ),
+				'one' => q(ᏪᏁᏑᏪ ᎠᏕᎳ),
+				'other' => q(ᏪᏁᏑᏪ ᎠᏕᎳ),
 			},
 		},
 		'VND' => {
@@ -4624,14 +4688,14 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
+				if($day_period_type eq 'selection') {
 					return 'afternoon1' if $time >= 1200
 						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
 				}
-				if($day_period_type eq 'selection') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
@@ -4640,14 +4704,14 @@ has 'day_period_data' => (
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
+				if($day_period_type eq 'selection') {
 					return 'afternoon1' if $time >= 1200
 						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
 				}
-				if($day_period_type eq 'selection') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
@@ -4671,48 +4735,48 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'noon' => q{ᎢᎦ},
-					'morning1' => q{ᏌᎾᎴ},
-					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
-					'am' => q{ᏌᎾᎴ},
-				},
 				'narrow' => {
-					'am' => q{Ꮜ},
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
-					'pm' => q{Ꮢ},
 					'morning1' => q{ᏌᎾᎴ},
+					'am' => q{Ꮜ},
+					'pm' => q{Ꮢ},
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
 					'noon' => q{Ꭲ},
 				},
-				'abbreviated' => {
+				'wide' => {
+					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
+					'morning1' => q{ᏌᎾᎴ},
+					'am' => q{ᏌᎾᎴ},
 					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'noon' => q{ᎢᎦ},
+				},
+				'abbreviated' => {
+					'noon' => q{ᎢᎦ},
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'pm' => q{ᏒᎯᏱᎢ},
 					'am' => q{ᏌᎾᎴ},
 					'morning1' => q{ᏌᎾᎴ},
-					'noon' => q{ᎢᎦ},
-					'pm' => q{ᏒᎯᏱᎢ},
 				},
 			},
 			'stand-alone' => {
 				'narrow' => {
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
-					'am' => q{ᏌᎾᎴ},
-					'noon' => q{ᎢᎦ},
-					'morning1' => q{ᏌᎾᎴ},
 					'pm' => q{ᏒᎯᏱᎢ},
+					'morning1' => q{ᏌᎾᎴ},
+					'am' => q{ᏌᎾᎴ},
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'noon' => q{ᎢᎦ},
 				},
 				'wide' => {
-					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
 					'morning1' => q{ᏌᎾᎴ},
-					'noon' => q{ᎢᎦ},
 					'am' => q{ᏌᎾᎴ},
+					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
 					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'noon' => q{ᎢᎦ},
 				},
 				'abbreviated' => {
-					'noon' => q{ᎢᎦ},
-					'morning1' => q{ᏌᎾᎴ},
-					'pm' => q{ᏒᎯᏱᎢ},
 					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'noon' => q{ᎢᎦ},
+					'pm' => q{ᏒᎯᏱᎢ},
+					'morning1' => q{ᏌᎾᎴ},
 					'am' => q{ᏌᎾᎴ},
 				},
 			},
@@ -4801,49 +4865,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E, MMM d, y G},
-			GyMMMd => q{MMM d, y G},
-			H => q{HH},
-			Hm => q{H:mm},
-			Hms => q{H:mm:ss},
-			M => q{L},
-			MEd => q{E, M/d},
-			MMM => q{LLL},
-			MMMEd => q{E, MMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{M/d},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{M/y GGGGG},
-			yyyyMEd => q{E, M/d/y GGGGG},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E, MMM d, y G},
-			yyyyMMMM => q{MMMM y G},
-			yyyyMMMd => q{MMM d, y G},
-			yyyyMd => q{M/d/y GGGGG},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
 		'gregorian' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -4892,6 +4913,49 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 			yw => q{’ᏒᎾᏙᏓᏆᏍᏗ’ w ’ᎾᎿ’ Y},
 		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, MMM d, y G},
+			GyMMMd => q{MMM d, y G},
+			H => q{HH},
+			Hm => q{H:mm},
+			Hms => q{H:mm:ss},
+			M => q{L},
+			MEd => q{E, M/d},
+			MMM => q{LLL},
+			MMMEd => q{E, MMM d},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E, M/d/y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, MMM d, y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{MMM d, y G},
+			yyyyMd => q{M/d/y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
 	} },
 );
 
@@ -4911,69 +4975,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			M => {
-				M => q{M – M},
-			},
-			MEd => {
-				M => q{E, M/d – E, M/d},
-				d => q{E, M/d – E, M/d},
-			},
-			MMM => {
-				M => q{MMM – MMM},
-			},
-			MMMEd => {
-				M => q{E, MMM d – E, MMM d},
-				d => q{E, MMM d – E, MMM d},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d – d},
-			},
-			Md => {
-				M => q{M/d – M/d},
-				d => q{M/d – M/d},
-			},
-			d => {
-				d => q{d – d},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{y – y G},
-			},
-			yM => {
-				M => q{M/y – M/y GGGGG},
-				y => q{M/y – M/y GGGGG},
-			},
-			yMEd => {
-				M => q{E, M/d/y – E, M/d/y GGGGG},
-				d => q{E, M/d/y – E, M/d/y GGGGG},
-				y => q{E, M/d/y – E, M/d/y GGGGG},
-			},
-			yMMM => {
-				M => q{MMM – MMM y G},
-				y => q{MMM y – MMM y G},
-			},
-			yMMMEd => {
-				M => q{E, MMM d – E, MMM d, y G},
-				d => q{E, MMM d – E, MMM d, y G},
-				y => q{E, MMM d, y – E, MMM d, y G},
-			},
-			yMMMM => {
-				M => q{MMMM – MMMM y G},
-				y => q{MMMM y – MMMM y G},
-			},
-			yMMMd => {
-				M => q{MMM d – MMM d, y G},
-				d => q{MMM d – d, y G},
-				y => q{MMM d, y – MMM d, y G},
-			},
-			yMd => {
-				M => q{M/d/y – M/d/y GGGGG},
-				d => q{M/d/y – M/d/y GGGGG},
-				y => q{M/d/y – M/d/y GGGGG},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH – HH},
@@ -5069,6 +5070,69 @@ has 'datetime_formats_interval' => (
 				y => q{M/d/y – M/d/y},
 			},
 		},
+		'generic' => {
+			M => {
+				M => q{M – M},
+			},
+			MEd => {
+				M => q{E, M/d – E, M/d},
+				d => q{E, M/d – E, M/d},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{E, MMM d – E, MMM d},
+				d => q{E, MMM d – E, MMM d},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d – d},
+			},
+			Md => {
+				M => q{M/d – M/d},
+				d => q{M/d – M/d},
+			},
+			d => {
+				d => q{d – d},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{y – y G},
+			},
+			yM => {
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
+			},
+			yMEd => {
+				M => q{E, M/d/y – E, M/d/y GGGGG},
+				d => q{E, M/d/y – E, M/d/y GGGGG},
+				y => q{E, M/d/y – E, M/d/y GGGGG},
+			},
+			yMMM => {
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E, MMM d – E, MMM d, y G},
+				d => q{E, MMM d – E, MMM d, y G},
+				y => q{E, MMM d, y – E, MMM d, y G},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM y G},
+				y => q{MMMM y – MMMM y G},
+			},
+			yMMMd => {
+				M => q{MMM d – MMM d, y G},
+				d => q{MMM d – d, y G},
+				y => q{MMM d, y – MMM d, y G},
+			},
+			yMd => {
+				M => q{M/d/y – M/d/y GGGGG},
+				d => q{M/d/y – M/d/y GGGGG},
+				y => q{M/d/y – M/d/y GGGGG},
+			},
+		},
 	} },
 );
 
@@ -5081,7 +5145,7 @@ has 'time_zone_names' => (
 		gmtFormat => q(GMT{0}),
 		gmtZeroFormat => q(GMT),
 		regionFormat => q({0} ᎠᏟᎢᎵᏒ),
-		regionFormat => q({0} ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ),
+		regionFormat => q({0} ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ),
 		regionFormat => q({0} ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ),
 		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
@@ -5269,7 +5333,7 @@ has 'time_zone_names' => (
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q#ᎠᎳᏍᎦ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ#,
+				'daylight' => q#ᎠᎳᏍᎦ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎠᎳᏍᎦ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎠᎳᏍᎦ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -5729,7 +5793,7 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q#ᎠᏰᏟ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ#,
+				'daylight' => q#ᎠᏰᏟ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎠᏰᏟ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎠᏰᏟ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -5741,7 +5805,7 @@ has 'time_zone_names' => (
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q#ᏗᎧᎸᎬ ᏗᏜ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ#,
+				'daylight' => q#ᏗᎧᎸᎬ ᏗᏜ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᏗᎧᎸᎬ ᏗᏜ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᏗᎧᎸᎬ ᏗᏜ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -5753,7 +5817,7 @@ has 'time_zone_names' => (
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q#ᎣᏓᎸ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ#,
+				'daylight' => q#ᎣᏓᎸ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎣᏓᎸ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎣᏓᎸ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -5765,7 +5829,7 @@ has 'time_zone_names' => (
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q#ᏭᏕᎵᎬ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ#,
+				'daylight' => q#ᏭᏕᎵᎬ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᏭᏕᎵᎬ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᏭᏕᎵᎬ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -5810,14 +5874,14 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q#ᎠᏈᎠ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᎠᏈᎠ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎠᏈᎠ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎠᏈᎠ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q#ᎠᎴᏈᏯ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᎠᎴᏈᏯ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎠᎴᏈᏯ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎠᎴᏈᏯ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6094,7 +6158,7 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q#ᏗᎧᎸᎬ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ#,
+				'daylight' => q#ᏗᎧᎸᎬ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᏗᎧᎸᎬ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᏗᎧᎸᎬ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6172,28 +6236,28 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q#ᎠᏰᏟ ᎡᎳᏗᏜ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᎠᏰᏟ ᎡᎳᏗᏜ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎠᏰᏟ ᎡᎳᏗᏜ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎠᏰᏟ ᎡᎳᏗᏜ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q#ᎠᏰᏟ ᎡᎳᏗᏜ ᏭᏕᎵᎬ ᏗᏜ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᎠᏰᏟ ᎡᎳᏗᏜ ᏭᏕᎵᎬ ᏗᏜ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎠᏰᏟ ᎡᎳᏗᏜ ᏭᏕᎵᎬ ᏗᏜ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎠᏰᏟ ᎡᎳᏗᏜ ᏭᏕᎵᎬ ᏗᏜ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q#ᎡᎳᏗᏜ ᏗᎧᎸᎬ ᏗᏜ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᎡᎳᏗᏜ ᏗᎧᎸᎬ ᏗᏜ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎡᎳᏗᏜ ᏗᎧᎸᎬ ᏗᏜ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎡᎳᏗᏜ ᏗᎧᎸᎬ ᏗᏜ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q#ᎡᎳᏗᏜ ᏭᏕᎵᎬ ᏗᏜ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᎡᎳᏗᏜ ᏭᏕᎵᎬ ᏗᏜ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎡᎳᏗᏜ ᏭᏕᎵᎬ ᏗᏜ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎡᎳᏗᏜ ᏭᏕᎵᎬ ᏗᏜ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6255,7 +6319,7 @@ has 'time_zone_names' => (
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q#ᏣᏝᎻ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᏣᏝᎻ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᏣᏝᎻ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᏣᏝᎻ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6269,7 +6333,7 @@ has 'time_zone_names' => (
 		},
 		'China' => {
 			long => {
-				'daylight' => q#ᏓᎶᏂᎨᏍᏛ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᏓᎶᏂᎨᏍᏛ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᏓᎶᏂᎨᏍᏛ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᏓᎶᏂᎨᏍᏛ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6307,7 +6371,7 @@ has 'time_zone_names' => (
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q#ᎫᏆ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ#,
+				'daylight' => q#ᎫᏆ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎫᏆ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎫᏆ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6580,7 +6644,7 @@ has 'time_zone_names' => (
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q#ᎠᏂᎦᎸᏥ ᎤᎦᏃᏮ ᎠᎴ ᎤᏁᏍᏓᎶ ᎠᏟᎢᎵᏒ#,
+				'standard' => q#ᎠᏂᎦᎸᏥ ᎤᎦᏃᏮ & ᎤᏁᏍᏓᎶ ᎠᏟᎢᎵᏒ#,
 			},
 		},
 		'GMT' => {
@@ -6636,7 +6700,7 @@ has 'time_zone_names' => (
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q#ᎭᏩᏱ-ᎠᎵᏳᏏᎠᏂ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ#,
+				'daylight' => q#ᎭᏩᏱ-ᎠᎵᏳᏏᎠᏂ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎭᏩᏱ-ᎠᎵᏳᏏᎠᏂ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎭᏩᏱ-ᎠᎵᏳᏏᎠᏂ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6725,7 +6789,7 @@ has 'time_zone_names' => (
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q#ᎢᎳᏂ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᎢᎳᏂ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎢᎳᏂ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎢᎳᏂ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6746,7 +6810,7 @@ has 'time_zone_names' => (
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q#ᏣᏩᏂᏏ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᏣᏩᏂᏏ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᏣᏩᏂᏏ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᏣᏩᏂᏏ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6763,7 +6827,7 @@ has 'time_zone_names' => (
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q#ᎪᎵᎠᏂ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᎪᎵᎠᏂ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎪᎵᎠᏂ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎪᎵᎠᏂ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6792,7 +6856,7 @@ has 'time_zone_names' => (
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q#ᎤᎬᏫᏳᎯ ᎭᏫ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᎤᎬᏫᏳᎯ ᎭᏫ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎤᎬᏫᏳᎯ ᎭᏫ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎤᎬᏫᏳᎯ ᎭᏫ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6843,14 +6907,14 @@ has 'time_zone_names' => (
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q#ᏧᏴᏢ ᏭᏕᎵᎬ ᎠᏂᏍᏆᏂ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ#,
+				'daylight' => q#ᏧᏴᏢ ᏭᏕᎵᎬ ᎠᏂᏍᏆᏂ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᏧᏴᏢ ᏭᏕᎵᎬ ᎠᏂᏍᏆᏂ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᏧᏴᏢ ᏭᏕᎵᎬ ᎠᏂᏍᏆᏂ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q#ᎠᏂᏍᏆᏂ ᏭᏕᎵᎬ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ#,
+				'daylight' => q#ᎠᏂᏍᏆᏂ ᏭᏕᎵᎬ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎠᏂᏍᏆᏂ ᏭᏕᎵᎬ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎠᏂᏍᏆᏂ ᏭᏕᎵᎬ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -6893,14 +6957,14 @@ has 'time_zone_names' => (
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q#ᎢᏤ ᏏᎢᎴᏂᏗ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᎢᏤ ᏏᎢᎴᏂᏗ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎢᏤ ᏏᎢᎴᏂᏗ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎢᏤ ᏏᎢᎴᏂᏗ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q#ᎢᏤᎤᏂᏩᏛᏓᎦᏙᎯ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏍᏒᎩ#,
+				'daylight' => q#ᎢᏤᎤᏂᏩᏛᏓᎦᏙᎯ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᎢᏤᎤᏂᏩᏛᏓᎦᏙᎯ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᎢᏤᎤᏂᏩᏛᏓᎦᏙᎯ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -7103,9 +7167,9 @@ has 'time_zone_names' => (
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q#ᎤᏓᏅᏘ ᏈᏰ ᎠᎴ ᎻᏇᎶᏂ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
-				'generic' => q#ᎤᏓᏅᏘ ᏈᏰ ᎠᎴ ᎻᏇᎶᏂ ᎠᏟᎢᎵᏒ#,
-				'standard' => q#ᎤᏓᏅᏘ ᏈᏰ ᎠᎴ ᎻᏇᎶᏂ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
+				'daylight' => q#ᎤᏓᏅᏘ ᏈᏰ & ᎻᏇᎶᏂ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
+				'generic' => q#ᎤᏓᏅᏘ ᏈᏰ & ᎻᏇᎶᏂ ᎠᏟᎢᎵᏒ#,
+				'standard' => q#ᎤᏓᏅᏘ ᏈᏰ & ᎻᏇᎶᏂ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
 		},
 		'Pitcairn' => {
@@ -7142,7 +7206,7 @@ has 'time_zone_names' => (
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q#ᏌᎼᎠ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᏌᎼᎠ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᏌᎼᎠ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᏌᎼᎠ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
@@ -7184,7 +7248,7 @@ has 'time_zone_names' => (
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q#ᏔᏱᏇ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒᎩ#,
+				'daylight' => q#ᏔᏱᏇ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᏔᏱᏇ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᏔᏱᏇ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},

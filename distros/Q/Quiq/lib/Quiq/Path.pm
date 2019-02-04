@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.131;
+our $VERSION = 1.132;
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -146,7 +146,9 @@ Ist dies der Fall, liefere I<wahr>, andernfalls I<falsch>.
 # -----------------------------------------------------------------------------
 
 sub compare {
-    my ($class,$file1,$file2) = @_;
+    my $class = shift;
+    my $file1 = $class->expandTilde(shift);
+    my $file2 = $class->expandTilde(shift);
 
     if (-s $file1 != -s $file2) {
         return 1;
@@ -2267,7 +2269,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.131
+1.132
 
 =head1 AUTHOR
 

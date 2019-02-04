@@ -3,13 +3,13 @@ package Net::Async::Github;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use parent qw(IO::Async::Notifier);
 
 =head1 NAME
 
-Net::Async::Github - support for L<https://github.com>'s REST API with L<IO::Async>
+Net::Async::Github - support for the L<https://github.com> REST API with L<IO::Async>
 
 =head1 SYNOPSIS
 
@@ -197,10 +197,12 @@ sub pr {
     $uri->path(
         join '/', 'repos', $args{owner}, $args{repo}, 'pulls', $args{id}
     );
+    $log->tracef('Check Github pull request via URI %s', "$uri");
     $self->http_get(
         uri => $uri,
     )->transform(
         done => sub {
+            $log->tracef('Github PR data was ', $_[0]);
             Net::Async::Github::PullRequest->new(
                 %{$_[0]},
                 github => $self,
@@ -211,7 +213,7 @@ sub pr {
 
 sub teams {
     my ($self, %args) = @_;
-	$self->validate_args(%args);
+    $self->validate_args(%args);
     $self->api_get_list(
         uri   => $self->endpoint('team', org => $args{organisation}),
         class => 'Net::Async::Github::Team',
@@ -221,7 +223,7 @@ sub teams {
 sub Net::Async::Github::Repository::branches {
     my ($self, %args) = @_;
     my $gh = $self->github;
-	$gh->validate_args(%args);
+    $gh->validate_args(%args);
     $gh->api_get_list(
         uri   => $self->branches_url->process,
         class => 'Net::Async::Github::Branch',
@@ -231,7 +233,7 @@ sub Net::Async::Github::Repository::branches {
 sub Net::Async::Github::Repository::grant_team {
     my ($self, %args) = @_;
     my $gh = $self->github;
-	$gh->validate_args(%args);
+    $gh->validate_args(%args);
     $self->github->http_put(
         uri => $self->github->endpoint(
             'team_repo',
@@ -245,6 +247,97 @@ sub Net::Async::Github::Repository::grant_team {
     )
 }
 
+# Example:
+#
+# $repo->protect_branch(
+#  branch => 'master',
+#  required_status_checks => {
+#   strict => 1,
+#   contexts => [
+#    '',
+#   ]
+#  },
+#  enforce_admins => 0,
+#  restrictions => {
+#   teams => [
+#    'WRITE-Admin',
+#   ]
+#  }
+sub Net::Async::Github::Repository::protect_branch {
+    my ($self, %args) = @_;
+    my $gh = $self->github;
+    $gh->validate_args(%args);
+
+    # Coërce the true/false values into something appropriate for JSON
+    $args{required_status_checks} = { %{$args{required_status_checks}} };
+    $_->{strict} = $_->{strict} ? JSON->true : JSON->false for $args{required_status_checks};
+    $args{enforce_admins} = $args{enforce_admins} ? JSON->true : JSON->false;
+    $args{required_pull_request_reviews} //= undef;
+    if($args{restrictions} //= undef) {
+        $args{restrictions}{users} ||= [];
+        $args{restrictions}{teams} ||= [];
+    }
+
+    $self->github->http_put(
+        uri => $self->github->endpoint(
+            'branch_protection',
+            owner => $self->owner->{login},
+            repo  => $self->name,
+            branch  => ($args{branch} // die 'need a branch'),
+        ),
+        data => {
+            map {;
+                $_ => $args{$_}
+            } grep {
+                exists $args{$_}
+            } qw(
+                required_status_checks
+                enforce_admins
+                required_pull_request_reviews
+                restrictions
+            )
+        },
+    )
+}
+
+sub Net::Async::Github::Repository::branch_protection {
+    my ($self, %args) = @_;
+    my $gh = $self->github;
+    $gh->validate_args(%args);
+    $self->github->http_get(
+        uri => $self->github->endpoint(
+            'branch_protection',
+            owner => $self->owner->{login},
+            repo  => $self->name,
+            branch  => ($args{branch} // die 'need a branch'),
+        ),
+    )
+}
+
+sub Net::Async::Github::Repository::get_file {
+    my ($self, %args) = @_;
+    my $gh = $self->github;
+    $gh->validate_args(%args);
+    $self->github->http_get(
+        uri => $self->github->endpoint(
+            'contents',
+            owner => $self->owner->{login},
+            repo  => $self->name,
+            path  => ($args{path} // die 'need a path'),
+            (exists $args{branch} ? (branch  => $args{branch}) : ()),
+        ),
+    )->transform(
+        done => sub {
+            my ($result) = @_;
+            if($result->{encoding} eq 'base64') {
+                return MIME::Base64::decode_base64($result->{content})
+            } else {
+                return $result->{content}
+            }
+        }
+    )
+}
+
 sub Net::Async::Github::PullRequest::owner { shift->{base}{repo}{owner}{login} }
 sub Net::Async::Github::PullRequest::repo { shift->{base}{repo}{name} }
 sub Net::Async::Github::PullRequest::branch_name { shift->{head}{ref} }
@@ -252,7 +345,7 @@ sub Net::Async::Github::PullRequest::branch_name { shift->{head}{ref} }
 sub Net::Async::Github::PullRequest::merge {
     my ($self, %args) = @_;
     my $gh = $self->github;
-	$gh->validate_args(%args);
+    $gh->validate_args(%args);
     die 'invalid owner' if ref $self->owner;
     die 'invalid repo' if ref $self->repo;
     die 'invalid id' if ref $self->id;
@@ -281,7 +374,7 @@ sub Net::Async::Github::PullRequest::merge {
 sub Net::Async::Github::PullRequest::cleanup {
     my ($self, %args) = @_;
     my $gh = $self->github;
-	$gh->validate_args(%args);
+    $gh->validate_args(%args);
     die 'invalid owner' if ref $self->owner;
     die 'invalid repo' if ref $self->repo;
     die 'invalid id' if ref $self->id;
@@ -300,16 +393,17 @@ sub Net::Async::Github::PullRequest::cleanup {
 
 sub repos {
     my ($self, %args) = @_;
-	if(my $user = delete $args{owner}) {
+    if(my $user = delete $args{owner}) {
         $self->validate_owner_name($user);
         $self->api_get_list(
             endpoint => 'user_repositories',
             endpoint_args => {
                 user => $user,
+                visibility => $args{visibility} // 'all',
             },
             class => 'Net::Async::Github::Repository',
         )
-	} else {
+    } else {
         $self->api_get_list(
             endpoint => 'current_user_repositories',
             endpoint_args => {
@@ -318,6 +412,30 @@ sub repos {
             class => 'Net::Async::Github::Repository',
         )
     }
+}
+
+sub repo {
+    my ($self, %args) = @_;
+    die 'need an owner name' unless my $owner = delete $args{owner};
+    die 'need a repo name' unless my $repo_name = delete $args{name};
+    $self->validate_owner_name($owner);
+    $self->validate_repo_name($repo_name);
+    $self->http_get(
+        uri => $self->endpoint(
+            repository => (
+                owner => $owner,
+                repo => $repo_name,
+            )
+        ),
+    )->transform(
+        done => sub {
+            $log->tracef('Github repo data was ', $_[0]);
+            Net::Async::Github::Repository->new(
+                %{$_[0]},
+                github => $self,
+            )
+        }
+    )
 }
 
 =head2 user
@@ -496,7 +614,7 @@ templates, used by L</endpoint>.
 
 sub endpoints {
     my ($self) = @_;
-	$self->{endpoints} ||= do {
+    $self->{endpoints} ||= do {
         my $path = Path::Tiny::path(__DIR__)->parent(3)->child('share/endpoints.json');
         $path = Path::Tiny::path(
             File::ShareDir::dist_file(
@@ -649,7 +767,13 @@ sub http_get {
     $self->http->GET(
         $uri,
         %args,
-    )->then(sub {
+    )->on_fail(sub {
+        $log->tracef('Response failed for %s', "$uri");
+    })->on_cancel(sub {
+        $log->tracef('Request cancelled for %s', "$uri");
+    })->on_done(sub {
+        $log->tracef('Response received for %s', "$uri");
+    })->then(sub {
         my ($resp) = @_;
         $log->tracef("Github response: %s", $resp->as_string("\n"));
         # If we had ratelimiting headers, apply them
@@ -661,7 +785,8 @@ sub http_get {
         }
 
         if($cached && $resp->code == 304) {
-            $resp = $cached
+            $resp = $cached;
+            $log->tracef("Using cached version of [%s] for %d byte response", $uri->as_string, $resp->content_length);
         } elsif($resp->is_success) {
             $log->tracef("Caching [%s] with %d byte response", $uri->as_string, $resp->content_length);
             $self->page_cache->set($uri->as_string => $resp);
@@ -910,16 +1035,13 @@ sub api_get_list {
         $self->base_uri . delete($args{uri})
     );
 
-    my $per_page = (delete $args{per_page}) || 10;
-#    $uri->query_param(
-#        limit => $per_page
-#    );
+    my $per_page = (delete $args{per_page}) || 100;
+    $uri->query_param(
+        limit => $per_page
+    );
     my @pending = $uri;
     my $f = (fmap0 {
         my $uri = shift;
-#        $uri->query_param(
-#            before => $per_page
-#        );
         $self->http_get(
             uri => $uri,
         )->on_done(sub {
@@ -959,20 +1081,18 @@ sub api_get_list {
 
     # Track active requests
     my $refaddr = Scalar::Util::refaddr($f);
-    retain_future(
-        $self->pending_requests->push([ {
-            id     => $refaddr,
-            src    => $src,
-            uri    => $uri,
-            future => $f,
-        } ])->then(sub {
-            $f->on_ready(sub {
-                retain_future(
-                    $self->pending_requests->extract_first_by(sub { $_->{id} == $refaddr })
-                )
-            });
-        })
-    );
+    $self->pending_requests->push([ {
+        id     => $refaddr,
+        src    => $src,
+        uri    => $uri,
+        future => $f,
+    } ])->then(sub {
+        $f->on_ready(sub {
+            retain_future(
+                $self->pending_requests->extract_first_by(sub { $_->{id} == $refaddr })
+            )
+        });
+    })->retain;
     $src
 }
 
@@ -1117,5 +1237,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2014-2018. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2014-2019. Licensed under the same terms as Perl itself.
 

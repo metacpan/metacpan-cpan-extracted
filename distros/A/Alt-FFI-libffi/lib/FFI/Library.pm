@@ -6,7 +6,7 @@ use Carp ();
 use constant _is_win => $^O =~ /^(MSWin32|cygwin|msys2?)$/;
 
 # ABSTRACT: Perl Access to Dynamically Loaded Libraries
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 sub new
 {
@@ -133,7 +133,7 @@ FFI::Library - Perl Access to Dynamically Loaded Libraries
 
 =head1 VERSION
 
-version 0.05
+version 0.08
 
 =head1 SYNOPSIS
 
