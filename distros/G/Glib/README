@@ -132,25 +132,25 @@ You can send us patches by...
 OBTAINING SOURCE FROM THE GNOME.ORG GIT REPO
 --------------------------------------------
 Assuming you already have the 'git' command installed on your system, you can
-use the 'git://' protocol:
+use the 'git://' or 'https://' protocols
 
-git clone git://git.gnome.org/perl-Glib
+git clone git@gitlab.gnome.org:GNOME/perl-glib.git
 
-Or, read-only access via HTTP:
+- or -
 
-git clone http://git.gnome.org/browse/perl-Glib
+git clone https://gitlab.gnome.org/GNOME/perl-glib.git
 
 To update an existing clone of the source:
 
 git pull
 
-Most Linux distros package the 'git' command in a package called 'git-core'.
+Most Linux distros now package the 'git' command in the 'git' package. 
 
 
 COPYRIGHT AND LICENSE
 ---------------------
 
-Copyright (C) 2003-2012 by the gtk2-perl team (see the file AUTHORS for the
+Copyright (C) 2003-2018 by the gtk2-perl team (see the file AUTHORS for the
 full list)
 
 See the LICENSE file in the top-level directory of this distribution for the

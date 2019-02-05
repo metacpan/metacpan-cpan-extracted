@@ -2,7 +2,7 @@
 use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 5;
 my(@a,@r);
-sub okk{ok(join(', ',@r) eq $_[0], "Result: ".join(', ',@r))}
+sub okk{ is(join(', ',@r),shift,shift) }
 
 @a = 1..20;
 @r = egrep { $_ % 3 == 0 } @a;   # grep is sufficient for this

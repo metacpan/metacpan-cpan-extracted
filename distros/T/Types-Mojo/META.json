@@ -40,17 +40,17 @@
       "test" : {
          "requires" : {
             "File::Basename" : "0",
-            "File::Spec" : "0",
             "Moo" : "2",
             "Pod::Coverage::TrustPod" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Spec" : "0"
          }
       }
    },
    "provides" : {
       "Types::Mojo" : {
          "file" : "lib/Types/Mojo.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "http://github.com/reneeb/Types-Mojo"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

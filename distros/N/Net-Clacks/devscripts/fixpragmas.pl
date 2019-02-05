@@ -7,12 +7,12 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 4.9;
+our $VERSION = 5.0;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
 
-# MAPLAT  (C) 2008-2018 Rene Schickbauer
+# MAPLAT  (C) 2008-2019 Rene Schickbauer
 # Developed under Artistic license
 
 
@@ -69,7 +69,7 @@ foreach my $file (@files) {
             print $ofh "use mro 'c3';\n";
             print $ofh "use English qw(-no_match_vars);\n";
             print $ofh "use Carp;\n";
-            print $ofh "our \$VERSION = 4.9;\n";
+            print $ofh "our \$VERSION = 5.0;\n";
             print $ofh "use Fatal qw( close );\n";
             print $ofh "use Array::Contains;\n";
             print $ofh "#---AUTOPRAGMAEND---\n";

@@ -1,5 +1,5 @@
 ---
-abstract: "Test double framework with method stubs and behaviour verification\r"
+abstract: 'Test double framework with method stubs and behaviour verification'
 author:
   - 'Steven Lee <stevenwh.lee@gmail.com>'
 build_requires:
@@ -8,6 +8,7 @@ build_requires:
   Test::More: '1.001002'
   Test::Requires: '0'
   lib: '0'
+  ok: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -25,10 +26,12 @@ optional_features:
     description: 'Modules required for author tests'
   MooseTypes:
     description: 'Support using Moose types as argument matchers'
+  UnivesalRef:
+    description: 'UNIVERAL::ref fails tests during installation on Perl 5.025+'
 provides:
   Test::Mocha:
     file: lib/Test/Mocha.pm
-    version: '0.65'
+    version: '0.66'
 requires:
   Carp: '1.22'
   Devel::PartialDump: '0.17'
@@ -38,8 +41,8 @@ requires:
   Type::Library: '0'
   Type::Utils: '0'
   Types::Standard: '0.008'
-  UNIVERSAL::ref: '0'
   experimental: '0'
+  if: '0'
   overload: '0'
   parent: '0'
   perl: '5.010001'
@@ -49,10 +52,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Mocha
   homepage: https://github.com/stevenl/Test-Mocha
   repository: https://github.com/stevenl/Test-Mocha.git
-version: '0.65'
+version: '0.66'
 x_Dist_Zilla:
   perl:
-    version: '5.022003'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -245,6 +248,7 @@ x_Dist_Zilla:
           name: AuthorTests
           phase: develop
           prereqs:
+            Dist::Zilla: '0'
             Pod::Coverage::TrustPod: '0'
             Test::NoTabs: '0'
             Test::Perl::Critic: '0'
@@ -270,8 +274,24 @@ x_Dist_Zilla:
             MooseX::Types::Structured: '0'
           prompt: 0
           require_develop: 1
-          type: suggests
+          type: recommends
       name: MooseTypes
+      version: '0.023'
+    -
+      class: Dist::Zilla::Plugin::OptionalFeature
+      config:
+        Dist::Zilla::Plugin::OptionalFeature:
+          always_recommend: 0
+          always_suggest: 1
+          description: 'UNIVERAL::ref fails tests during installation on Perl 5.025+'
+          name: UnivesalRef
+          phase: runtime
+          prereqs:
+            UNIVERSAL::ref: '0.14'
+          prompt: 0
+          require_develop: 1
+          type: suggests
+      name: UnivesalRef
       version: '0.023'
     -
       class: Dist::Zilla::Plugin::NextRelease
@@ -368,7 +388,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1.windows.1
+          git_version: 2.20.1
           repo_root: .
       name: '@Git/Check'
       version: '2.045'
@@ -386,7 +406,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1.windows.1
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -399,11 +419,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.65
+          tag: v0.66
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1.windows.1
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -417,7 +437,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1.windows.1
+          git_version: 2.20.1
           repo_root: .
       name: '@Git/Push'
       version: '2.045'
@@ -470,5 +490,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.22.3
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

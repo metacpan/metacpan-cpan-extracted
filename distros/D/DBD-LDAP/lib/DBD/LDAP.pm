@@ -67,14 +67,17 @@ example, consider a typical LDAP database of employees within different
 departments within a company.  You might have a "company" names "Acme" and 
 the root "dn" of "dc=Acme, dc=com" (Acme.com).  Below the company level, are 
 divisions, ie. "Widgets", and "Blivets".  Each division would have an entry 
-with a "dn" of "ou=Widgets, dc=Acme, dc=com".  Employees within each division 
-could have a "dn" of "cn=John Doe, ou=Widgets, dc=Acme, dc=com".  
+with a "dn" of "ou=Widgets, dc=Acme, dc=com", "ou=Blivets, dc=Acme, dc=com", 
+etc.  Employees within each division could have a "dn" 
+like "cn=John Doe, ou=Widgets, dc=Acme, dc=com", etc.  
+
 With DBD::LDAP, we could create tables to access these different levels, 
 ie. "top", which would have a "DN" of "dc=Acme, dc=com", "WidgetDivision" for 
-"dc=Acme, dc=com".  Tables can also be constained by additional 
+"ou=Widgets, dc=Acme, dc=com".  "BlivetDivision" for "ou=Blivets, dc=Acme, dc=com", 
+etc.  Tables can also be constained by additional 
 attribute specifications (filters), ie constraining by "objectclass", ie. 
 "(objectclass=person)".  Then, doing a "select * from WidgetDivision" would 
-display all "person"s with a "dn" containing ""ou=Widgets, dc=Acme, dc=com".
+display all "person"s with a "dn" containing "ou=Widgets, dc=Acme, dc=com".
 
 =head1 INSTALLATION
 
@@ -173,35 +176,62 @@ Note that you almost definitely need root or administrator permissions.  If you 
 
           #!/usr/bin/perl
           use DBI;
-          $dbh = DBI->connect('DBD:LDAP:mydb','me','mypassword') || 
+          $dbh = DBI->connect('DBD:LDAP:foo','me','mypassword') || 
                     die "Could not connect (".$DBI->err.':'.$DBI->errstr.")!";
           ...
-          #CREATE A TABLE, INSERT SOME RECORDS, HAVE SOME FUN!
 
 3) get your application working.
 
 =head1 INSERTING, FETCHING AND MODIFYING DATA
 
-1st, we'll create a database called "ldapdb" with the tables previously mentioned in the example in the DESCRIPTION section:
+EXAMPLE:  1st, we'll create a database called "ldapdb" with the tables previously mentioned in the example in the DESCRIPTION section.  
+In our example, "ldapserver" is our LDAP server hostname[:port] or ip-address[:port].  If port is omitted, 
+it defaults to 389.  "dc=Acme, dc=com" represents our optional (relative) "root DN" for our "database".  
+"cn=*, <ROOT>" is our optional "login rule", which allows our $dbh->connect() command to specify a simple 
+user-name without having to specify a full DN to log in.  In this example, if the "user-name" is "Bob", then 
+the it's converted to "cn=Bob, dc=Acme, dc=com" by replacing "<ROOT> with the "root DN" and replacing any 
+asterisk with the "user-name".  If the user-name is a single-pair RDN (relative DN), then the root DN is 
+appended onto that, ie. "cn=Bob" => "cn=Bob, dc=Acme, dc=com".  If the user-name is empty, blank, or a 
+full DN, no transformation is done (See example below):  
+
+EXAMPLE database file with 3 tables defined (user must create one for each of his/her own 
+databases).  NOTE:  The "root dn" is the root access level for the database and tables being created, NOT 
+necessarily the "root dn" for the entire LDAP tree itself, as the user (developer) may not want to permit 
+access in a given "database" above a certain level in the LDAP tree:
 
   ----------------- file "ldapdb.ldb" ----------------
   ldapserver:dc=Acme, dc=com:cn=*,<ROOT>
   top:::dc
   WidgetDivision:ou=Widgets, :&(objectclass=top)(objectclass=person):cn:cn,sn,ou,title,telephonenumber,description,objectclass,dn:objectclass=top|person|organizationalPerson:ldap_outseparator => ":"
+  BlivetDivision:ou=Blivets, :&(objectclass=top)(objectclass=person):cn:cn,sn,ou,title,telephonenumber,description,objectclass,dn:objectclass=top|person|organizationalPerson:ldap_outseparator => ":"
   ----------------------------------------------------
+
+Now, to connect to the newly created example database above, one would use:
+
+    my $dbh = DBI->connect('DBD:LDAP:ldapdb','Bob','Bobs_password') || 
+          die "Could not connect (".$DBI->err.':'.$DBI->errstr.")!";
+
+    In this case "Bob" would be converted to "cn=Bob, dc=Acme, dc=com".  It could've also been 
+specified as "cn=Bob" or the full "cn=Bob, dc=Acme, dc=com", based on the first line of the 
+database (.ldb) file we created above.  A different full DN could also have been specified.  NOTE: If 
+your login user-names are not defined in your database's common root-dn, it may be necessary to specify 
+a relative DN to log in, ie. "cn=Bob, ou=Widgets" or a full DN.  If you need or wish to mandate a full 
+DN to log in and connect, simply omit the login-rule (3rd argument of line 1 in your database file) 
+which in this case is the "cn=*,<ROOT>" part.
 
 The following examples insert some data in a table and fetch it back: First all data in the string:
 
-        $dbh->do(q{
-          INSERT INTO top (ou, cn, objectclass)  
-          VALUES ('Widgets', 'WidgetDivision', 'top|organizationalUnit')
-        };
+    $dbh->do(q{
+        INSERT INTO top (ou, cn, objectclass)  
+        VALUES ('Widgets', 'WidgetDivision', 'top|organizationalUnit')
+    };
 
 Next an example using parameters:
 
-        $dbh->do("INSERT INTO WidgetDivision (cn,sn,title,telephonenumber) VALUES (?, ?, ?, ?)",
+    $dbh->do("INSERT INTO WidgetDivision (cn,sn,title,telephonenumber) VALUES (?, ?, ?, ?)",
         'John Doe','DoeJ','Manager','123-1111');
-        $dbh->commit;
+
+    $dbh->commit;
 
 NOTE:  Unlike most other DBD modules which support transactions, changes made do NOT show up until the "commit" function is called, unless "AutoCommit" is set.  This is due to the fact that fetches are done from the LDAP server and changes do not take effect there until the Net::LDAP "update" function is called, which is called by "commit".  
 
@@ -270,17 +300,17 @@ The following DBI attributes are handled by DBD::LDAP:
 
 These attributes and methods are not supported:
 
-        bind_param_inout
-        CursorName
+    bind_param_inout
+    CursorName
 
 In addition to the DBI attributes, you can use the following dbh attributes.  These attributes are read-only after "connect".
 
-     ldap_dbuser
-          Current database user.
+    ldap_dbuser
+        Current database user.
 
-     ldap_HOME
-          Environment variable specifying a path to search for LDAP 
-          databases (*.ldb) files.
+    ldap_HOME
+        Environment variable specifying a path to search for LDAP 
+        databases (*.ldb) files.
 
 
 =head1 DRIVER PRIVATE METHODS
@@ -302,9 +332,10 @@ In addition to the DBI attributes, you can use the following dbh attributes.  Th
 
 =head1 RESTRICTIONS
 
-DBD::LDAP currently treats all data as strings and all fields as VARCHAR(255).
+DBD::LDAP currently treats all data as strings and all fields as VARCHAR(255) (type 12), though data is not 
+limited nor truncated to that arbitrary length, but rather just returned as that by DBI's *info() functions.
 
-Currently, you must define tables manually in the "<database>.ldb" file using your favorite text editor.  I hope to add support for the SQL "Create Table", "Alter Table", and "Drop Table" functions to handle this eventually.  
+Currently, you must define tables manually in the "<database>.ldb" file using your favorite text editor.
 
 =head1 TODO
 
@@ -340,7 +371,7 @@ no warnings qw (uninitialized);
 #@EXPORT = qw(
 	
 #);
-$VERSION = '0.24';
+$VERSION = '1.00';
 
 # Preloaded methods go here.
 
@@ -415,6 +446,8 @@ sub connect
 	s#\:(\d+)#\x02$1#go;         #PROTECT COLON BEFORE PORT#S (ADDED ON)
 	my ($ldap_hostname, $ldap_root, $ldap_loginrule) = split(/\:/o);
 	$ldap_hostname =~ s/\x02/\:/go;
+	$ldap_root = ''  unless (defined $ldap_root);
+	$ldap_loginrule  = ''  unless (defined $ldap_loginrule);
 
 	my %ldap_tables;
 	my %ldap_ops;
@@ -435,26 +468,37 @@ sub connect
 		eval "\$ldap_ops{$tablename} = \{$dbdattbs\};";
 	}
 
-	#CREATE A 'BLANK' DBH
-
-	if ($dbuser && $ldap_loginrule =~ /\*/o)
+	if ($dbuser !~ /\S/o)    #USERID IS EMPTY OR BLANK, TREAT AS "GUEST":
 	{
-		$ldap_loginrule =~ s/\<root\>/$ldap_root/gi;
-		$_ = $dbuser;
-		$dbuser = $ldap_loginrule;
-		$dbuser =~ s/\*/$_/g;
+		$dbuser = '';   #ie: " " => "".
 	}
-	my ($privateattr) = 
+	elsif ($dbuser =~ /\=/o) #USERID IS A DN/RDN:
 	{
-		'Name' => $ldap_hostname,
-				'user' => $dbuser,
-				'dbpswd' => $dbpswd
-	};
+		#IF USERID IS A (SINGLE-PAIR) RDN AND LOGIN-RULE CALLS FOR IT, APPEND ROOT-DN (IF ANY) TO IT:
+		$dbuser .= ", $ldap_root"  if ($dbuser !~ /\,/o && $ldap_loginrule =~ /\<root\>/io && $ldap_root);
+	}
+	elsif ($ldap_loginrule)  #USERID IS A SIMPLE USER-NAME, CONVERT TO DN ACCORDING TO LOGIN-RULE:
+	{
+		$ldap_loginrule =~ s/\<root\>/$ldap_root/i;
+		$ldap_loginrule =~ s/\*/$dbuser/g;
+		$ldap_loginrule =~ s/\,\s*$//;
+		$dbuser = $ldap_loginrule;
+	}
+	if ($dbuser && $dbuser !~ /\=/o)  #WE'RE STILL NOT A VALID DN, PUNT!
+	{
+		$_ = "User-id ($dbuser) is not a proper DN and/or no login-rule provided to properly convert it to one!";
+		DBI::set_err($drh, -1, $_);
+		warn $_  if ($attr->{PrintError});
+		$_ = '-1:'.$_;
+		return undef;
+	}
+
+	#CREATE A 'BLANK' DBH:
 
 	my $this = DBI::_new_dbh($drh, 
 	{
-		'Name' => $ldap_hostname,              #LDAP URL!
-				'USER' => $dbuser,              #OPTIONAL, '' = ANONYMOUS!	
+		'Name' => $ldap_hostname,  #LDAP URL!
+		'USER' => $dbuser,         #OPTIONAL, '' = ANONYMOUS!	
 		'CURRENT_USER' => $dbuser,
 	}
 	);
@@ -466,7 +510,6 @@ sub connect
 		$_ = '-1:'.$_;
 		return undef;
 	}
-
 
 	my $ldap_hostport = 389;
 	$ldap_hostport = $1  if ($ldap_hostname =~ s/\;(.*)$//o);
@@ -485,6 +528,9 @@ sub connect
 		}
 		push (@connectArgs, 'verify', 'require', 'capath', $attr->{ldaps_capath});
 	}
+
+	#CONNECT TO DATABASE VIA Net::LDAP:
+
 	$ldap = Net::LDAP->new(@connectArgs);
 	unless ($ldap)
 	{

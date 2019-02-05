@@ -6,9 +6,9 @@ use DBI;
 use Carp qw(croak);
 use Mojo::Pg::Che::Database;
 #~ use Mojo::URL;
-#~ use Scalar::Util 'blessed';
+use Scalar::Util 'blessed';
 
-our $VERSION = '0.8551';
+our $VERSION = '0.8552';
 
 has pg => sub { Mojo::Pg->new };#, weak => 1;
 has database_class => 'Mojo::Pg::Che::Database';
@@ -36,12 +36,12 @@ sub new {
   my $pg = $from_string && Mojo::Pg->new->from_string(shift);
 
   my $self = $class->SUPER::new(@_);
-  $self->pg($pg)
+  $self->pg($pg->parent || $pg)
     if $pg;
   
-  $pg ||= $self->pg->parent || $self->pg;
+  #~ $pg ||= $self->pg->parent || $self->pg;
 
-  map { $self->$_($pg->$_); }
+  map { $self->$_($self->pg->$_); }
     qw(dsn username password search_path)#options
     if $from_string;
 
@@ -50,10 +50,10 @@ sub new {
   
   #~ $self->pg->dsn('dbi:Pg:'.$self->pg->dsn)
     #~ unless !$self->pg->dsn || $self->pg->dsn =~ /^dbi:Pg:/;
-  map { $pg->$_($self->$_); }
+  map { $self->pg->$_($self->$_); }
     qw(dsn username password options search_path max_connections);#database_class pubsub 
   
-  $pg->attr(debug => $self->debug);
+  $self->pg->attr(debug => $self->debug);
   
   return $self;
 }
@@ -81,8 +81,9 @@ sub connect {
   map $pg->$_($self->$_),
     qw(dsn username password options search_path max_connections);#database_class  pubsub
   
-  #~ say STDERR sprintf("[$PKG->connect] prepare connection data for [%s]", $self->dsn, )
-    #~ if $self->debug;
+  $self->debug
+    && say STDERR sprintf("[$PKG->connect] prepare connection data for [%s]", $self->dsn, );
+    
   $pg->attr(debug => $self->debug);
   return $self;
 }
@@ -90,14 +91,15 @@ sub connect {
 sub db {
   my ($self, $dbh) = (shift, shift);
 
-  # Fork-safety
-  delete @$self{qw(pid queue)} unless ($self->{pid} //= $$) eq $$;
-  
   my $pg = $self->pg->parent || $self->pg;
   
+  # Fork-safety if $dbh
+  undef $dbh
+    unless ($pg->{pid} //= $$) eq $$;
+
   $dbh ||= $pg->_dequeue;
 
-  return $self->database_class->new(dbh => $dbh, pg => $pg);
+  return $self->database_class->new(dbh => $dbh, pg => $pg, debug=>$self->debug);
 }
 
 sub prepare { shift->db->prepare(@_); }
@@ -109,9 +111,6 @@ sub _db {
   my $sth = ref $_[0] ? shift : return $self->db;
   return $self->db
     if !!$sth->{pg_async_status};
-  #~ my $db = $sth->{private_mojo_db};
-  #~ return $db
-    #~ if $db && !$db->dbh->{pg_async_status};
 
   $self->db($sth->{Database});
 }
@@ -150,6 +149,9 @@ sub begin {
 sub commit  {croak 'Instead use: $tx = $pg->begin; $tx->do(...); $tx->commit;';}
 sub rollback {croak 'Instead use: $tx = $pg->begin; $tx->do(...); $tx->rollback;';}
 
+sub dequeue { my $pg = $_[0]->pg->parent || $_[0]->pg; $pg->_dequeue; }
+sub enqueue { my $pg = $_[0]->pg->parent || $_[0]->pg; $pg->_enqueue; }
+
 { # Patches
   no warnings 'redefine';
 # Patch Mojo::Pg::_dequeue
@@ -170,17 +172,17 @@ sub Mojo::Pg::_dequeue {
     splice(@$queue, $i, 1);    #~ delete $queue->[$i]
 
     next
-      unless $dbh->ping;
+      unless blessed($dbh) && $dbh->ping; # не понятно почему может $dbh не blessed
 
     $self->debug
-      && say STDERR sprintf("[$PKG->_dequeue] [$dbh] does dequeued, pool count:[%s]", scalar @$queue);
+      && say STDERR sprintf("[$PKG->_dequeue] [$dbh][pg_pid %s] does dequeued, pool count:[%s]", $dbh->{pg_pid}, scalar @$queue);
     
     return $dbh;
   }
   
   my $dbh = DBI->connect(map { $self->$_ } qw(dsn username password options));
   $self->debug
-    && say STDERR sprintf("[$PKG->_dequeue] new DBI connection [$dbh]", );
+    && say STDERR sprintf("[$PKG->_dequeue] new DBI connection [$dbh][pg_pid %s]", $dbh->{pg_pid});
   
   # Search path
   if (my $path = $self->search_path) {
@@ -195,19 +197,23 @@ sub Mojo::Pg::_dequeue {
 # Patch Mojo::Pg::_enqueue
 sub Mojo::Pg::_enqueue {
   my ($self, $dbh) = @_;
+  # Fork-safety
+  delete @$self{qw(pid queue)}
+    and return
+    unless ($self->{pid} //= $$) eq $$;
+  
   my $queue = $self->{queue} ||= [];
-  #~ warn "queue++ $dbh:", scalar @$queue and
   
   if ($dbh->{Active} && $dbh->ping && @$queue < $self->max_connections) {#($dbh->{pg_async_status} && $dbh->{pg_async_status} > 0) || 
     unshift @$queue, $dbh;
-    #~ push @$queue, $dbh; # /home/guest/Mojo-Pg-Che/t/09-base-database.t line 108
+    # push @$queue, $dbh; # /home/guest/Mojo-Pg-Che/t/09-base-database.t line 108
     $self->debug
-      && say STDERR sprintf("[$PKG->_enqueue] [$dbh] does enqueued, pool count:[%s], pg_async_status=[%s]", scalar @$queue, $dbh->{pg_async_status});
+      && say STDERR sprintf("[$PKG->_enqueue] [$dbh][pg_pid %s] does enqueued, pool count:[%s], pg_async_status=[%s]", $dbh->{pg_pid}, scalar @$queue, $dbh->{pg_async_status});
     return;
   }
-  #~ shift @$queue while @$queue > $self->max_connections;
+  
   $self->debug
-    && say STDERR sprintf("[$PKG->_enqueue] [$dbh] does not enqueued, pool count:[%s]", scalar @$queue);
+    && say STDERR sprintf("[$PKG->_enqueue] [$dbh][pg_pid %s] does not enqueued, pool count:[%s]", $dbh->{pg_pid}, scalar @$queue);
 }
 
 }# end no warnings 'redefine';

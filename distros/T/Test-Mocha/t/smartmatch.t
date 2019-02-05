@@ -11,7 +11,7 @@ use 5.010001;
 
 use Test::More tests => 11;
 
-BEGIN { use_ok 'Test::Mocha' }
+use ok 'Test::Mocha';
 
 subtest 'X ~~ Array' => sub {
     my $mock = mock;

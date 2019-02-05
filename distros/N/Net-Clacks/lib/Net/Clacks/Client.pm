@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 4.9;
+our $VERSION = 5.0;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -840,6 +840,20 @@ sub sendRawCommand {
     return;
 }
 
+# Meta function that internally calls both SET and STORE
+sub setAndStore {
+    my ($self, $varname, $value, $forcesend) = @_;
+
+    if(!defined($forcesend)) {
+        $forcesend = 0;
+    }
+
+    $self->set($varname, $value, $forcesend);
+    $self->store($varname, $value);
+    return;
+}
+
+
 sub DESTROY {
     my ($self) = @_;
 
@@ -923,6 +937,12 @@ Get server name and version.
 =head2 getNext
 
 Get the next incoming event in the queue.
+
+=head2 setAndStore
+
+Meta-function that both calls set() and store() internally with a single library call.
+Useful in some circumstances when you both want to remember the variable and also 
+tell everyone interested immediately that it has changed.
 
 =head2 DESTROY
 

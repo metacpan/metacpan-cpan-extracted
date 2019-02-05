@@ -15,16 +15,16 @@ name: Data-Edit-Xml-Xref
 provides:
   Data::Edit::Xml::Xref:
     file: lib/Data/Edit/Xml/Xref.pm
-    version: '20190131'
+    version: '20190204'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Edit::Xml: '20190119'
-  Data::Table::Text: '20190119'
+  Data::Edit::Xml: '20190204'
+  Data::Table::Text: '20190124'
   Test2::API: '0'
   Test::More: '0'
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20190131'
+version: '20190204'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

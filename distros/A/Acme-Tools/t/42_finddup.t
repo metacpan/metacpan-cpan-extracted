@@ -14,7 +14,7 @@ sub mkf {
 mkf();
 sub fd{Acme::Tools::cmd_finddup(@_)}
 sub f{fd('-R',@_)}
-sub sr{srlz(@_)=~s,$tmp/,,gr}
+sub sr{repl(srlz(@_),"$tmp/")}
 
 my %f=f(qw(-P 4 -M -F),@f);
 my $s=sr(\%f,'f');

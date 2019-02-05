@@ -14,7 +14,19 @@
         }
       }
     },
+    "Article": {
+      "x-id-field": "slug",
+      "properties": {
+        "favorited": {
+          "x-artifact": true
+        },
+        "favoritesCount": {
+          "x-artifact": true
+        }
+      }
+    },
     "User": {
+      "x-id-field": "username",
       "properties": {
         "token": {
           "x-artifact": true
@@ -46,6 +58,26 @@
         "following": {
           "x-artifact": true
         }
+      }
+    }
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "x-parameters-implicit": {
+          "_current_user": {
+            "helper": "yancy.auth.current_user"
+          }
+        },
+        "x-id-field": "_current_user"
+      },
+      "put": {
+        "x-parameters-implicit": {
+          "_current_user": {
+            "helper": "yancy.auth.current_user"
+          }
+        },
+        "x-id-field": "_current_user"
       }
     }
   }

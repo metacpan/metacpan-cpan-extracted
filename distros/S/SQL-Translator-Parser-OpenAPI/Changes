@@ -1,5 +1,14 @@
 Revision history for Perl extension SQL-Translator-Parser-OpenAPI
 
+0.07	Tue  5 Feb 05:27:26 GMT 2019
+ - update to dep on JSON::Validator::OpenAPI::Mojolicious as actually use that
+
+0.06	Tue  5 Feb 05:13:26 GMT 2019
+ - doc tweaks
+ - add x-id-field
+ - snake_case arg
+ - update to JSON::Validator 3 - fix #2 (thanks @rabbiveesh for report)
+
 0.05	Mon 29 Oct 03:48:22 GMT 2018
  - thin object also if 2 properties, 1 =~ /count/i
  - add x-artifact, x-input-only, x-view-of

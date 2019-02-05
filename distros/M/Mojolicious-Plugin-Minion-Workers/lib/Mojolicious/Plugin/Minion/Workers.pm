@@ -1,6 +1,8 @@
 package Mojolicious::Plugin::Minion::Workers;
 use Mojo::Base 'Mojolicious::Plugin::Minion';
 
+our $VERSION = '0.090781';# as to Minion/100+0.000<minor>
+
 has minion => undef, weak=>1;
 has qw(conf);
 
@@ -8,20 +10,27 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   my $workers = delete $conf->{workers};
+  my $manage = delete $conf->{manage};
   my $tasks = delete $conf->{tasks} || {};
+  
+  my $backend = (keys %$conf)[0]
+    if keys %$conf == 1;
+  
+  $conf->{$backend} = $conf->{$backend}->($app)
+    if $backend && ref($conf->{$backend}) eq 'CODE';
 
   $self->SUPER::register($app, $conf)
-    unless $app->renderer->get_helper('minion');
+    unless $app->renderer->get_helper('minion') && !$backend;
 
   $self->minion($app->minion);
   $self->conf({
     %$conf,
     workers => $workers,
     is_manage => !$ARGV[0]
-                            || $ARGV[0] eq 'daemon'
-                            || $ARGV[0] eq 'prefork',
+                    || $ARGV[0] eq 'daemon'
+                    || $ARGV[0] eq 'prefork',
     is_prefork => $ENV{HYPNOTOAD_APP}
-                            || ($ARGV[0] && $ARGV[0] eq 'prefork'),
+                    || ($ARGV[0] && $ARGV[0] eq 'prefork'),
   });
 
   $app->minion->attr('workers'=> sub { $self }, weak=>1);
@@ -29,6 +38,10 @@ sub register {
   while (my ($name, $sub) = each %$tasks) {
     $app->log->debug(sprintf("Applied task [%s] in [%s] from config", $name, $app->minion->add_task($name => $sub)));
   }
+  
+  $self->manage()
+    and $self->conf->{is_manage} = 0
+    if $manage;
 
   return $self;
 }
@@ -43,7 +56,6 @@ sub manage {
     or return;
 
   my $minion = $self->minion;
-  #~ $minion->app->log->info("Minion tasks @{[ keys %{$minion->tasks} ]}");
 
   if ($conf->{is_prefork}) {
     $self->prefork;
@@ -100,7 +112,7 @@ sub worker_run {
   my $minion = $self->minion;
   $ENV{MINION_PID} = $$;
   $0 = "$0 minion worker";
-  $minion->app->log->info("Minion worker (pid $$) was started");
+  $minion->app->log->info("Minion worker (pid $$) was starting");
   $minion->worker->run;
 }
 
@@ -109,14 +121,14 @@ sub worker_run {
 sub kill_workers {
   my ($self, $workers) = @_;
   my $minion = $self->minion;
-
   $workers ||= $minion->backend->list_workers->{workers};
+
   kill 'QUIT', $_->{pid}
-    and $minion->app->log->info("Minion worker (pid $_->{pid}) was stoped")
+    and $minion->app->log->info("Minion worker (pid $_->{pid}) was stopped")
     for @$workers;
 }
 
-our $VERSION = '0.09075';# as to Minion/100+0.000<minor>
+1;
 
 __END__
 

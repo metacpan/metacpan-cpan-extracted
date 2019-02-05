@@ -497,8 +497,12 @@ gsize g_variant_n_children (GVariant *value);
 
 GVariant_noinc * g_variant_get_child_value (GVariant *value, gsize index_);
 
+#if GLIB_CHECK_VERSION (2, 28, 0)
+
 # gboolean g_variant_lookup (GVariant *dictionary, const gchar *key, const gchar *format_string, ...);
 GVariant_noinc * g_variant_lookup_value (GVariant *dictionary, const gchar *key, const GVariantType *expected_type);
+
+#endif
 
 # FIXME:
 # gconstpointer g_variant_get_fixed_array (GVariant *value, gsize *n_elements, gsize element_size);

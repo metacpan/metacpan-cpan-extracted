@@ -60,7 +60,20 @@ ok ( $exit == 1, "new file $file1 correctly backed up" );
 
 # check $exit code: now has to be 0 as for no new file 
 ($stdout, $stderr, $exit, $exitstr) = $bkp->run( emptysufolders => 1 );
-ok ( $exit == 0, "no new file present" );
+if( not ok ( $exit == 0, "no new file present" ) ) {
+	diag "basedir : $tbasedir\n",
+		 "tempsrc : $tsrc\n",
+		 "tempdst : $tdst\n",
+		 "file    : $file1\n";
+	diag "Dumping returned values from 'run'..\n";
+	diag "stdout : $stdout\n";
+	diag "stdrerr: $stderr\n";
+	diag "exit   : $exit\n";
+	diag "string : $exitstr\n";
+	
+	bkpscenario::check_robocopy_version('verbose');
+
+}
 
 # add some line to file
 # check $exit code: now has to be 1 as for modified file
@@ -71,14 +84,39 @@ ok ( $exit == 1, "updated file $file1 correctly backed up" );
 
 # try to backuk *.doc
 ($stdout, $stderr, $exit, $exitstr) = $bkp->run( files => '*.doc' );
-ok ( $exit == 0, "no *.doc files to backed up" );
+#ok ( $exit == 0, "no *.doc files to backed up" );
+if( not ok ( $exit == 0, "no *.doc files to backed up" ) ) {
+	diag "basedir : $tbasedir\n",
+		 "tempsrc : $tsrc\n",
+		 "tempdst : $tdst\n",
+		 "file    : $file1\n";
+	diag "Dumping returned values from 'run'..\n";
+	diag "stdout : $stdout\n";
+	diag "stdrerr: $stderr\n";
+	diag "exit   : $exit\n";
+	diag "string : $exitstr\n";
+
+	bkpscenario::check_robocopy_version('verbose');
+	
+}
 
 # check archive attribute was removed from the file
 my $attr;
 my $getattrexit = GetAttributes( File::Spec->catfile($tsrc, $file1), $attr );
 BAIL_OUT( "impossible to retrieve attributes of $file1" ) unless $getattrexit;
 my $archiveset = $attr & ARCHIVE;
-cmp_ok($archiveset, '==', 0, "ARCHIVE bit not present in $file1");
+#cmp_ok($archiveset, '==', 0, "ARCHIVE bit not present in $file1");
+if( not cmp_ok($archiveset, '==', 0, "ARCHIVE bit not present in $file1") ) {
+	diag "basedir : $tbasedir\n",
+		 "tempsrc : $tsrc\n",
+		 "tempdst : $tdst\n",
+		 "file    : $file1\n",
+		 "attr    : $attr\n",
+		 "archive : $archiveset\n";
+
+	bkpscenario::check_robocopy_version('verbose');
+	
+}
 
 # modify another time the file and do an HISTORY backup
 $tfh1 = bkpscenario::open_file($tsrc,$file1);

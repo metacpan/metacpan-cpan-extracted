@@ -18,7 +18,7 @@ name: Model-Envoy
 provides:
   Model::Envoy:
     file: lib/Model/Envoy.pm
-    version: v0.4.1
+    version: v0.5.3
   Model::Envoy::Meta::Attribute::Trait::Envoy:
     file: lib/Model/Envoy.pm
   Model::Envoy::Set:
@@ -26,10 +26,10 @@ provides:
     version: v0.3.0
   Model::Envoy::Storage:
     file: lib/Model/Envoy/Storage.pm
-    version: v0.1.0
+    version: v0.5.3
   Model::Envoy::Storage::DBIC:
     file: lib/Model/Envoy/Storage/DBIC.pm
-    version: v0.3.2
+    version: v0.5.3
   Model::Envoy::Storage::Memory:
     file: lib/Model/Envoy/Storage/Memory.pm
     version: v0.1.1
@@ -46,5 +46,5 @@ requires:
   MooseX::ClassAttribute: '0.29'
   MooseX::Role::Parameterized: '1.10'
   perl: v5.18.2
-version: v0.4.1
+version: v0.5.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

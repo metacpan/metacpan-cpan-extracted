@@ -5,17 +5,17 @@ use warnings;
 
 sub new {
     my ($class) = @_;
-    return bless {}, $class;
+    return bless { foo => 'bar' }, $class;
 }
 
-sub test_method {
+sub getter {
+    my ( $self, $attr ) = @_;
+    return $self->{$attr};
+}
+
+sub echo {
     my ( $self, $value ) = @_;
     return $value;
-}
-
-sub does {
-    my ( $class, $role ) = @_;
-    return $class->DOES($role);
 }
 
 sub get  { }
@@ -25,11 +25,5 @@ sub next { }
 sub once   { }
 sub twice  { }
 sub thrice { }
-
-sub direct {
-    my $self = shift;
-    $self->indirect;
-}
-sub indirect { 'indirect' }
 
 1;

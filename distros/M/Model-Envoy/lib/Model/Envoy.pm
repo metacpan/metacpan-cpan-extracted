@@ -2,9 +2,9 @@ package Model::Envoy;
 
 use MooseX::Role::Parameterized;
 use Module::Runtime 'use_module';
-use List::AllUtils 'first_result';
+use List::AllUtils qw( first first_result );
 
-our $VERSION = '0.4.1';
+our $VERSION = '0.5.3';
 
 =head1 Model::Envoy
 
@@ -18,6 +18,7 @@ A Moose Role that can be used to build a model layer which keeps business logic 
         with 'Model::Envoy' => { storage => {
             'DBIC' => {
                 schema => sub {
+                    my ( $class ) = @_;
                     My::DB->db_connect(...);
                 }
             },
@@ -29,7 +30,7 @@ A Moose Role that can be used to build a model layer which keeps business logic 
         has 'id' => (
             is => 'ro',
             isa => 'Num',
-            traits => ['DBIC'],
+            traits => ['Envoy','DBIC'],
             primary_key => 1,
 
         );
@@ -37,19 +38,25 @@ A Moose Role that can be used to build a model layer which keeps business logic 
         has 'name' => (
             is => 'rw',
             isa => 'Maybe[Str]',
-            traits => ['DBIC'],
+            traits => ['Envoy','DBIC'],
         );
 
         has 'no_storage' => (
             is => 'rw',
             isa => 'Maybe[Str]',
+            traits => ['Envoy'],
         );
 
         has 'parts' => (
             is => 'rw',
             isa => 'ArrayRef[My::Model::Part]',
-            traits => ['DBIC','Envoy'],
+            traits => ['Envoy','DBIC'],
             rel => 'has_many',
+        );
+
+        has 'envoy_ignores_me' => (
+            is => 'rw',
+            isa => 'Str',
         );
 
     package My::Models;
@@ -70,6 +77,7 @@ A Moose Role that can be used to build a model layer which keeps business logic 
                 name => 'baz',
             },
         ],
+        envoy_ignores_me => 'hi there',
     });
 
     $widget->name('renamed');
@@ -97,6 +105,7 @@ do this in a base class which your models can inherit from:
         with 'Model::Envoy' => { storage => {
             'DBIC' => {
                 schema => sub {
+                    my ( $class ) = @_;
                     $schema ||= My::DB->db_connect(...);
                 }
             },
@@ -116,11 +125,13 @@ do this in a base class which your models can inherit from:
 =head2 Model attributes
 
 Model::Envoy classes use normal Moose attribute declarations. Depending on the storage layer plugin, they may add attribute traits or other methods
-your models need to implement to indicate how each attribute finds its way into and out of storage.
+your models need to implement to indicate how each attribute finds its way into and out of storage. All attributes that you want Model::Envoy to manage
+do need to have at least this one trait specified:
 
-=head3 Attribute Type Coercion with the 'Envoy' trait
+=head3 The 'Envoy' trait
 
-This trait is handy for class attributes that represent other Model::Envoy
+This trait indicates an attribute is part of your model's data, rather than being a secondary or utility attribute (such as a handle to a logging utility).
+It also provides some automatic coercion for class attributes that represent other Model::Envoy
 enabled classes (or arrays of them).  It will allow you to pass in hashrefs
 (or arrays of hashrefs) to those attributes and have them automagically elevated
 into an instance of the intended class.
@@ -178,7 +189,9 @@ Remove the instance from your persistent storage layer.
 
 =head3 dump()
 
-Provide an unblessed copy of the datastructure of your instance object.
+Provide an unblessed copy of the datastructure of your instance object. If any attributes are an instance of a Model::Envoy-using class (or an array of same),
+they will be recursively dumped. Other blessed objects will return undef unless they have a C<stringify> or C<to_string> method, in which case those will be
+used to represent the object.
 
 =head3 get_storage('Plugin')
 
@@ -402,13 +415,18 @@ sub _dump_property {
 
     return $value->dump if $value->can('does') && $value->does('Model::Envoy');
 
+    if ( my $method = first { $value->can($_) } qw( stringify to_string as_string to_str ) ) {
+
+        return $value->$method;
+    }
+
     return undef;
 }
 
 sub _get_all_attributes {
     my ( $self ) = @_;
 
-    return grep { $_->name !~ /^_/ } $self->meta->get_all_attributes;
+    return grep { $_->does('Envoy') } $self->meta->get_all_attributes;
 }
 
 sub _dispatch {
@@ -438,7 +456,7 @@ sub _class_dispatch {
         first_result { $self->_get_configured_plugin_class('storage',$_)->$method( $self, @params ) }
         keys %{$self->_plugins->{storage}};
 
-    if ( $result ) {
+    if ( blessed $result && $result->can('does') && $result->does('Model::Envoy') ) {
         for my $plugin ( keys %{$self->_plugins->{cache}} ) {
             $result->get_cache($plugin)->save();
         }
@@ -467,7 +485,7 @@ sub _get_configured_plugin_class {
 
     my $conf = $self->_plugins->{$store}{$package};
     if ( ! $conf->{_configured} ) {
-        $package->configure($conf);
+        $package->configure($self,$conf);
     }
 
     return $package;
@@ -510,8 +528,11 @@ sub _install_types {
         $options->{moose_class} = $1;
         $options->{isa} = $self->_coerce_maybe($1);
     }
-    else {
+    elsif( ! find_type_constraint( $options->{isa} ) ) {
         $self->_coerce_class($options->{isa});
+    }
+    else {
+        return $self->$orig($name,$options);
     }
 
     $options->{coerce} = 1 unless $options->{moose_class} && any { $options->{moose_class} eq $_ } qw( HashRef ArrayRef );
@@ -542,7 +563,7 @@ sub _coerce_array {
 
 sub _coerce_maybe {
     my ( $self, $class ) = @_;
-    my $type = ( $class =~ /\:\:([^:]+)$/ )[0];
+    my $type = ( $class =~ /\:\:([^:]+)$/ )[0] || $class;
 
     unless( find_type_constraint("Maybe_$type") ) {
 

@@ -26,12 +26,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Basename" => 0,
-    "File::Spec" => 0,
     "Moo" => 2,
     "Pod::Coverage::TrustPod" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Test::Spec" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,13 +40,13 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Basename" => 0,
-  "File::Spec" => 0,
   "List::Util" => 0,
   "Mojolicious" => 8,
   "Moo" => 2,
   "Pod::Coverage::TrustPod" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,
+  "Test::Spec" => 0,
   "Type::Library" => "1.004004",
   "Type::Utils" => "1.004004",
   "Types::Standard" => "1.004004"

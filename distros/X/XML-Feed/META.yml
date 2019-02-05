@@ -16,31 +16,31 @@ name: XML-Feed
 provides:
   XML::Feed:
     file: lib/XML/Feed.pm
-    version: '0.56'
+    version: '0.58'
   XML::Feed::Content:
     file: lib/XML/Feed/Content.pm
-    version: '0.56'
+    version: '0.58'
   XML::Feed::Enclosure:
     file: lib/XML/Feed/Enclosure.pm
-    version: '0.56'
+    version: '0.58'
   XML::Feed::Entry:
     file: lib/XML/Feed/Entry.pm
-    version: '0.56'
+    version: '0.58'
   XML::Feed::Entry::Format::Atom:
     file: lib/XML/Feed/Entry/Format/Atom.pm
-    version: '0.56'
+    version: '0.58'
   XML::Feed::Entry::Format::RSS:
     file: lib/XML/Feed/Entry/Format/RSS.pm
-    version: '0.56'
+    version: '0.58'
   XML::Feed::Format::Atom:
     file: lib/XML/Feed/Format/Atom.pm
-    version: '0.56'
+    version: '0.58'
   XML::Feed::Format::RSS:
     file: lib/XML/Feed/Format/RSS.pm
-    version: '0.56'
+    version: '0.58'
   XML::Feed::Util:
     file: lib/XML/Feed/Util.pm
-    version: '0.56'
+    version: '0.58'
 requires:
   Class::ErrorHandler: '0'
   DateTime: '0'
@@ -63,8 +63,10 @@ requires:
   XML::RSS: '1.47'
   perl: v5.10.0
 resources:
+  bugtracker: https://github.com/davorg/xml-feed/issues
   license: http://dev.perl.org/licenses/
-version: '0.56'
+  repository: https://github.com/davorg/xml-feed.git
+version: '0.58'
 x_contributors:
   - 'Dave Cross <davecross@cpan.org>'
   - 'Jakob Voss <voss@gbv.de>'

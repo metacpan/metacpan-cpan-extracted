@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,15 +23,15 @@ no_index:
 provides:
   App::PDF::Link:
     file: lib/App/PDF/Link.pm
-    version: '0.21'
+    version: '0.22'
   pdflink:
     file: script/pdflink
-    version: '0.21'
+    version: '0.22'
 requires:
   PDF::API2: '2.029'
   Text::CSV_XS: '0'
   perl: '5.010000'
 resources:
   repository: git://github.com/sciurius/pdflink
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

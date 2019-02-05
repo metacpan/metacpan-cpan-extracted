@@ -9,7 +9,7 @@ package My::Envoy::CachedWidget;
     has 'id' => (
         is => 'ro',
         isa => 'Num',
-        traits => ['DBIC'],
+        traits => ['Envoy','DBIC'],
         primary_key => 1,
 
     );
@@ -17,7 +17,7 @@ package My::Envoy::CachedWidget;
     has 'name' => (
         is => 'rw',
         isa => 'Maybe[Str]',
-        traits => ['DBIC'],
+        traits => ['Envoy','DBIC'],
     );
 
 1;

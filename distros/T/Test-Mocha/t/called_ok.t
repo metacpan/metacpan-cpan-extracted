@@ -11,7 +11,7 @@ use Types::Standard qw( Any slurpy );
 use lib 't/lib';
 use TestClass;
 
-BEGIN { use_ok 'Test::Mocha' }
+use ok 'Test::Mocha';
 
 my $FILE = __FILE__;
 
@@ -20,13 +20,13 @@ my $spy  = spy( TestClass->new );
 
 foreach my $subj ( $mock, $spy ) {
     subtest 'diagnostics with no method call history' => sub {
-        my $test_name = 'test_method() was called 1 time(s)';
+        my $test_name = 'echo() was called 1 time(s)';
         my $line      = __LINE__ + 14;
 
         chomp( my $err = <<"ERR" );
 #   Failed test '$test_name'
     #   at $FILE line $line.
-    # Error: unexpected number of calls to 'test_method()'
+    # Error: unexpected number of calls to 'echo()'
     #          got: 0 time(s)
     #     expected: 1 time(s)
     # Complete method call history (most recent call last):
@@ -35,7 +35,7 @@ ERR
 
         test_out("not ok 1 - $test_name");
         test_err($err);
-        called_ok { $subj->test_method };
+        called_ok { $subj->echo };
         test_test();
     };
 
@@ -64,13 +64,13 @@ END
     };
 
     subtest 'simple called_ok() that fails' => sub {
-        my $test_name = 'test_method() was called 1 time(s)';
+        my $test_name = 'echo() was called 1 time(s)';
         my $line      = __LINE__ + 13;
 
         chomp( my $err = <<"ERR" );
 #   Failed test '$test_name'
     #   at $FILE line $line.
-    # Error: unexpected number of calls to 'test_method()'
+    # Error: unexpected number of calls to 'echo()'
     #          got: 0 time(s)
     #     expected: 1 time(s)
 $diag_call_history
@@ -78,7 +78,7 @@ ERR
 
         test_out("not ok 1 - $test_name");
         test_err($err);
-        called_ok { $subj->test_method };
+        called_ok { $subj->echo };
         test_test();
     };
 
@@ -364,7 +364,7 @@ ERR
     # conditional verifications - verify that failure diagnostics are not output
 
     subtest 'called_ok() in a TODO block' => sub {
-        my $test_name = 'test_method() was called 1 time(s)';
+        my $test_name = 'echo() was called 1 time(s)';
         my $line      = __LINE__ + 10;
 
         chomp( my $out = <<"OUT" );
@@ -375,7 +375,7 @@ OUT
         test_out($out);
       TODO: {
             local $TODO = "should fail";
-            called_ok { $subj->test_method };
+            called_ok { $subj->echo };
         }
         test_test();
     };
@@ -385,7 +385,7 @@ OUT
         test_out("ok 1 # skip $test_name");
       SKIP: {
             skip $test_name, 1;
-            called_ok { $subj->test_method };
+            called_ok { $subj->echo };
         }
         test_test();
     };

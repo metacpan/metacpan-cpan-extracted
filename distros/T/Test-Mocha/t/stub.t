@@ -12,7 +12,7 @@ use MyNonThrowable;
 use MyThrowable;
 use TestClass;
 
-BEGIN { use_ok 'Test::Mocha' }
+use ok 'Test::Mocha';
 
 # setup
 my $FILE = __FILE__;
@@ -44,61 +44,60 @@ foreach my $subj ( $mock, $spy ) {
     };
 
     subtest 'create stub that returns a scalar' => sub {
-        stub { $subj->test_method(1) } returns 4;
+        stub { $subj->echo(1) } returns 4;
 
-        is( $subj->__stubs->{test_method}[0]->stringify, 'test_method(1)' );
-        is( $subj->test_method(1), 4, '... and stub returns the scalar' );
-        is_deeply( [ $subj->test_method(1) ],
+        is( $subj->__stubs->{echo}[0]->stringify, 'echo(1)' );
+        is( $subj->echo(1), 4, '... and stub returns the scalar' );
+        is_deeply( [ $subj->echo(1) ],
             [4], '...or the single-element in a list' );
     };
 
     subtest 'create stub that returns an array' => sub {
-        stub { $subj->test_method(2) } returns 1, 2, 3;
+        stub { $subj->echo(2) } returns 1, 2, 3;
 
-        is( $subj->__stubs->{test_method}[0]->stringify, 'test_method(2)' );
+        is( $subj->__stubs->{echo}[0]->stringify, 'echo(2)' );
         is_deeply(
-            [ $subj->test_method(2) ],
+            [ $subj->echo(2) ],
             [ 1, 2, 3 ],
             '... and stub returns the array'
         );
-        is( $subj->test_method(2),
-            3, '... or the array size in scalar context' );
+        is( $subj->echo(2), 3, '... or the array size in scalar context' );
     };
 
     subtest 'create stub that returns nothing' => sub {
-        stub { $subj->test_method(3) } returns;
+        stub { $subj->echo(3) } returns;
 
-        is( $subj->__stubs->{test_method}[0]->stringify, 'test_method(3)' );
-        is( $subj->test_method(3), undef, '... and stub returns undef' );
-        is_deeply( [ $subj->test_method(3) ], [], '... or an empty list' );
+        is( $subj->__stubs->{echo}[0]->stringify, 'echo(3)' );
+        is( $subj->echo(3), undef, '... and stub returns undef' );
+        is_deeply( [ $subj->echo(3) ], [], '... or an empty list' );
     };
 
     subtest 'create stub that throws' => sub {
-        stub { $subj->test_method(4) } throws 'error, ', 'stopped';
+        stub { $subj->echo(4) } throws 'error, ', 'stopped';
 
-        is( $subj->__stubs->{test_method}[0]->stringify, 'test_method(4)' );
+        is( $subj->__stubs->{echo}[0]->stringify, 'echo(4)' );
 
-        my $e = exception { $subj->test_method(4) };
+        my $e = exception { $subj->echo(4) };
         like( $e, qr/^error, stopped at /, '... and stub does die' );
         like( $e, qr/\Q$FILE\E/, '... and error traces back to this script' );
     };
 
     subtest 'create stub that throws with no arguments' => sub {
-        stub { $subj->test_method('4a') } throws;
+        stub { $subj->echo('4a') } throws;
 
-        is( $subj->__stubs->{test_method}[0]->stringify, 'test_method("4a")' );
+        is( $subj->__stubs->{echo}[0]->stringify, 'echo("4a")' );
 
-        my $e = exception { $subj->test_method('4a') };
+        my $e = exception { $subj->echo('4a') };
         like( $e, qr/^ at /, '... and stub does die' );
     };
 
     subtest 'create stub that throws with an exception object' => sub {
-        stub { $subj->test_method(5) } throws(
+        stub { $subj->echo(5) } throws(
             MyThrowable->new('my exception'),
             qw( remaining args are ignored ),
         );
         like(
-            my $e = exception { $subj->test_method(5) },
+            my $e = exception { $subj->echo(5) },
             qr/^my exception/,
             '... and the exception is thrown'
         );
@@ -114,8 +113,8 @@ foreach my $subj ( $mock, $spy ) {
     };
 
     subtest 'create stub throws with a non-exception object' => sub {
-        stub { $subj->test_method(6) } throws( MyNonThrowable->new );
-        like( my $e = exception { $subj->test_method(6) },
+        stub { $subj->echo(6) } throws( MyNonThrowable->new );
+        like( my $e = exception { $subj->echo(6) },
             qr/^died/, '... and stub does throw' );
       TODO: {
             local $TODO = 'Carp does not handle objects';
@@ -128,10 +127,10 @@ foreach my $subj ( $mock, $spy ) {
     };
 
     subtest 'create stub with no specified response' => sub {
-        stub { $subj->test_method(7) };
-        is( $subj->__stubs->{test_method}[0]->stringify, 'test_method(7)' );
-        is( $subj->test_method(7), undef, '... and stub returns undef' );
-        is_deeply( [ $subj->test_method(7) ], [], '... or an empty list' );
+        stub { $subj->echo(7) };
+        is( $subj->__stubs->{echo}[0]->stringify, 'echo(7)' );
+        is( $subj->echo(7), undef, '... and stub returns undef' );
+        is_deeply( [ $subj->echo(7) ], [], '... or an empty list' );
     };
 
     subtest 'stub applies to the exact name and arguments specified' => sub {
@@ -147,11 +146,11 @@ foreach my $subj ( $mock, $spy ) {
     };
 
     subtest 'stub response persists until it is overridden' => sub {
-        stub { $subj->test_method(1) } returns 10;
-        is( $subj->test_method(1), 10 ) for 1 .. 3;
+        stub { $subj->echo(1) } returns 10;
+        is( $subj->echo(1), 10 ) for 1 .. 3;
 
-        stub { $subj->test_method(1) } returns 20;
-        is( $subj->test_method(1), 20 ) for 1 .. 3;
+        stub { $subj->echo(1) } returns 20;
+        is( $subj->echo(1), 20 ) for 1 .. 3;
     };
 
     subtest 'stub can chain responses' => sub {
@@ -167,12 +166,12 @@ foreach my $subj ( $mock, $spy ) {
     subtest 'stub() coderef may contain multiple method call specifications' =>
       sub {
         stub {
-            $subj->test_method(8);
-            $subj->test_method(9);
+            $subj->echo(8);
+            $subj->echo(9);
         }
         returns 1;
-        is( $subj->test_method(8), 1 );
-        is( $subj->test_method(9), 1 );
+        is( $subj->echo(8), 1 );
+        is( $subj->echo(9), 1 );
       };
 
     subtest 'stub with callback' => sub {
@@ -261,14 +260,14 @@ subtest
   'stub() coderef may contain multiple method call specifications for multiple objects'
   => sub {
     stub {
-        $mock->test_method(10);
-        $spy->test_method(11);
+        $mock->echo(10);
+        $spy->echo(11);
     }
     returns(2), returns(1);
 
-    is( $mock->test_method(10), 2 );
-    is( $spy->test_method(11),  2 );
+    is( $mock->echo(10), 2 );
+    is( $spy->echo(11),  2 );
 
-    is( $mock->test_method(10), 1 );
-    is( $spy->test_method(11),  1 );
+    is( $mock->echo(10), 1 );
+    is( $spy->echo(11),  1 );
   };

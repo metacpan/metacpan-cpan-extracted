@@ -1,272 +1,305 @@
-'SET foreign_key_checks=0;
+'
+BEGIN TRANSACTION;
 
 --
--- Table: `accepted_reports`
+-- Table: accepted_reports
 --
-CREATE TABLE `accepted_reports` (
-  `id` varchar(255) NOT NULL auto_increment,
-  `status` varchar(255) NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
+CREATE TABLE accepted_reports (
+  _relational_id00 INTEGER PRIMARY KEY NOT NULL,
+  id varchar NOT NULL,
+  status varchar
 );
 
---
--- Table: `distributions`
---
-CREATE TABLE `distributions` (
-  `id` integer NOT NULL auto_increment,
-  `name` varchar(255) NOT NULL,
-  `version` varchar(255) NOT NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+CREATE INDEX pk__relational_id00 ON accepted_reports (_relational_id00);
 
 --
--- Table: `environments`
+-- Table: distributions
 --
-CREATE TABLE `environments` (
-  `id` integer NOT NULL auto_increment,
-  `user_agent` varchar(255) NULL,
-  `language_id` integer NOT NULL,
-  `system_id` integer NOT NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`language_id`),
-  INDEX (`system_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `environments_fk` FOREIGN KEY (`language_id`) REFERENCES `languages` (`id`),
-  CONSTRAINT `environments_fk_1` FOREIGN KEY (`system_id`) REFERENCES `systems` (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE distributions (
+  id INTEGER PRIMARY KEY NOT NULL,
+  name varchar NOT NULL,
+  version varchar NOT NULL
+);
+
+CREATE INDEX pk_id ON distributions (id);
 
 --
--- Table: `environment_toolchains`
+-- Table: environments
 --
-CREATE TABLE `environment_toolchains` (
-  `id` integer NOT NULL auto_increment,
-  `key` varchar(255) NULL,
-  `value` varchar(255) NULL,
-  `toolchain_id` integer NOT NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`toolchain_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `environment_toolchains_fk` FOREIGN KEY (`toolchain_id`) REFERENCES `environments` (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE environments (
+  id INTEGER PRIMARY KEY NOT NULL,
+  user_agent varchar,
+  language_id int NOT NULL,
+  system_id int NOT NULL,
+  FOREIGN KEY (language_id) REFERENCES languages(id),
+  FOREIGN KEY (system_id) REFERENCES systems(id)
+);
+
+CREATE INDEX pk_id02 ON environments (id);
 
 --
--- Table: `languages`
+-- Table: environment_toolchains
 --
-CREATE TABLE `languages` (
-  `archname` varchar(255) NOT NULL,
-  `build` varchar(255) NULL,
-  `commit_id` varchar(255) NULL,
-  `id` integer NOT NULL auto_increment,
-  `implementation` varchar(255) NULL,
-  `name` enum(\'Perl 5\', \'Perl 6\') NOT NULL,
-  `version` varchar(255) NOT NULL,
-  `backend_id` integer NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`backend_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `languages_fk` FOREIGN KEY (`backend_id`) REFERENCES `language_backends` (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE environment_toolchains (
+  id INTEGER PRIMARY KEY NOT NULL,
+  key varchar,
+  value varchar,
+  toolchain_id int NOT NULL,
+  FOREIGN KEY (toolchain_id) REFERENCES environments(id)
+);
+
+CREATE INDEX pk_id03 ON environment_toolchains (id);
 
 --
--- Table: `language_backends`
+-- Table: languages
 --
-CREATE TABLE `language_backends` (
-  `engine` varchar(255) NULL,
-  `id` integer NOT NULL auto_increment,
-  `version` varchar(255) NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE languages (
+  archname varchar NOT NULL,
+  build varchar,
+  commit_id varchar,
+  id INTEGER PRIMARY KEY NOT NULL,
+  implementation varchar,
+  name enum NOT NULL,
+  version varchar NOT NULL,
+  backend_id int,
+  FOREIGN KEY (backend_id) REFERENCES language_backends(id)
+);
+
+CREATE INDEX pk_id04 ON languages (id);
 
 --
--- Table: `language_variables`
+-- Table: language_backends
 --
-CREATE TABLE `language_variables` (
-  `id` integer NOT NULL auto_increment,
-  `key` varchar(255) NULL,
-  `value` varchar(255) NULL,
-  `variable_id` integer NOT NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`variable_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `language_variables_fk` FOREIGN KEY (`variable_id`) REFERENCES `languages` (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE language_backends (
+  engine varchar,
+  id INTEGER PRIMARY KEY NOT NULL,
+  version varchar
+);
+
+CREATE INDEX pk_id05 ON language_backends (id);
 
 --
--- Table: `prerequisites`
+-- Table: language_variables
 --
-CREATE TABLE `prerequisites` (
-  `have` varchar(255) NULL,
-  `id` integer NOT NULL auto_increment,
-  `name` varchar(255) NOT NULL,
-  `need` varchar(255) NOT NULL,
-  `phase` varchar(255) NOT NULL,
-  `prerequisite_id` integer NOT NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`prerequisite_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `prerequisites_fk` FOREIGN KEY (`prerequisite_id`) REFERENCES `distributions` (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE language_variables (
+  id INTEGER PRIMARY KEY NOT NULL,
+  key varchar,
+  value varchar,
+  variable_id int NOT NULL,
+  FOREIGN KEY (variable_id) REFERENCES languages(id)
+);
+
+CREATE INDEX pk_id06 ON language_variables (id);
 
 --
--- Table: `releases`
+-- Table: prerequisites
 --
-CREATE TABLE `releases` (
-  `author` varchar(255) NULL comment \'The CPAN ID of the author who released this version of this distribution\',
-  `dist` varchar(255) NULL comment \'The distribution name\',
-  `fail` integer NULL comment \'The number of test failures for this release\',
-  `id` integer NOT NULL auto_increment,
-  `na` integer NULL comment \'The number of NA results for this release, which means the release does not apply to the tester\'\'s machine due to OS, Perl version, or other conditions\',
-  `pass` integer NULL comment \'The number of test passes for this release\',
-  `unknown` integer NULL comment \'The number of unknown reports for this release\',
-  `version` varchar(255) NULL comment \'The distribution release version\',
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) comment=\'A summary of test reports for a single CPAN release\';
+CREATE TABLE prerequisites (
+  have varchar,
+  id INTEGER PRIMARY KEY NOT NULL,
+  name varchar NOT NULL,
+  need varchar NOT NULL,
+  phase varchar NOT NULL,
+  prerequisite_id int NOT NULL,
+  FOREIGN KEY (prerequisite_id) REFERENCES distributions(id)
+);
+
+CREATE INDEX pk_id07 ON prerequisites (id);
 
 --
--- Table: `reports`
+-- Table: releases
 --
-CREATE TABLE `reports` (
-  `comments`  NULL,
-  `created` varchar(255) NULL,
-  `id` varchar(255) NOT NULL auto_increment,
-  `distribution_id` integer NOT NULL,
-  `environment_id` integer NOT NULL,
-  `reporter_id` integer NOT NULL,
-  `result_id` integer NOT NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`distribution_id`),
-  INDEX (`environment_id`),
-  INDEX (`reporter_id`),
-  INDEX (`result_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `reports_fk` FOREIGN KEY (`distribution_id`) REFERENCES `distributions` (`id`),
-  CONSTRAINT `reports_fk_1` FOREIGN KEY (`environment_id`) REFERENCES `environments` (`id`),
-  CONSTRAINT `reports_fk_2` FOREIGN KEY (`reporter_id`) REFERENCES `reporters` (`id`),
-  CONSTRAINT `reports_fk_3` FOREIGN KEY (`result_id`) REFERENCES `results` (`id`)
-) ENGINE=InnoDB comment=\'CPAN Testers report\';
+CREATE TABLE releases (
+-- Comments: 
+-- A summary of test reports for a single CPAN release
+--
+
+  -- The CPAN ID of the author who released this version of this distribution
+  author varchar,
+  -- The distribution name
+  dist varchar,
+  -- The number of test failures for this release
+  fail int,
+  id INTEGER PRIMARY KEY NOT NULL,
+  -- The number of NA results for this release, which means the release does not apply to the tester\'s machine due to OS, Perl version, or other conditions
+  na int,
+  -- The number of test passes for this release
+  pass int,
+  -- The number of unknown reports for this release
+  unknown int,
+  -- The distribution release version
+  version varchar
+);
+
+CREATE INDEX pk_id08 ON releases (id);
 
 --
--- Table: `report_summaries`
+-- Table: reports
 --
-CREATE TABLE `report_summaries` (
-  `date` varchar(255) NULL comment \'The date/time of the report in ISO8601 format\',
-  `dist` varchar(255) NULL comment \'The name of the distribution tested\',
-  `grade` enum(\'pass\', \'fail\', \'na\', \'unknown\') NULL comment \'The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.\',
-  `guid` varchar(255) NULL comment \'The GUID of the full report this data came from\',
-  `id` integer NOT NULL auto_increment,
-  `osname` varchar(255) NULL comment \'The name of the operating system, like \'\'linux\'\', \'\'MSWin32\'\', \'\'darwin\'\'\',
-  `osvers` varchar(255) NULL comment \'The version of the operating system, like \'\'4.8.0-2-amd64\'\'\',
-  `perl` varchar(255) NULL comment \'The Perl version that ran the tests, like \'\'5.24.0\'\'\',
-  `platform` varchar(255) NULL comment \'The Perl platform that ran the tests, like \'\'x86_64-linux\'\'\',
-  `reporter` varchar(255) NULL comment \'The name/email of the reporter who submitted this report\',
-  `version` varchar(255) NULL comment \'The version of the distribution tested\',
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) comment=\'Flattened summary data from the test report data structure\';
+CREATE TABLE reports (
+-- Comments: 
+-- CPAN Testers report
+--
+
+  _relational_id00 INTEGER PRIMARY KEY NOT NULL,
+  comments ,
+  created varchar,
+  id varchar NOT NULL,
+  distribution_id int NOT NULL,
+  environment_id int NOT NULL,
+  reporter_id int NOT NULL,
+  result_id int NOT NULL,
+  FOREIGN KEY (distribution_id) REFERENCES distributions(id),
+  FOREIGN KEY (environment_id) REFERENCES environments(id),
+  FOREIGN KEY (reporter_id) REFERENCES reporters(id),
+  FOREIGN KEY (result_id) REFERENCES results(id)
+);
+
+CREATE INDEX pk__relational_id0002 ON reports (_relational_id00);
 
 --
--- Table: `reporters`
+-- Table: report_summaries
 --
-CREATE TABLE `reporters` (
-  `email` varchar(255) NOT NULL,
-  `id` integer NOT NULL auto_increment,
-  `name` varchar(255) NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE report_summaries (
+-- Comments: 
+-- Flattened summary data from the test report data structure
+--
+
+  -- The date/time of the report in ISO8601 format
+  date varchar,
+  -- The name of the distribution tested
+  dist varchar,
+  -- The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.
+  grade enum,
+  -- The GUID of the full report this data came from
+  guid varchar,
+  id INTEGER PRIMARY KEY NOT NULL,
+  -- The name of the operating system, like \'linux\', \'MSWin32\', \'darwin\'
+  osname varchar,
+  -- The version of the operating system, like \'4.8.0-2-amd64\'
+  osvers varchar,
+  -- The Perl version that ran the tests, like \'5.24.0\'
+  perl varchar,
+  -- The Perl platform that ran the tests, like \'x86_64-linux\'
+  platform varchar,
+  -- The name/email of the reporter who submitted this report
+  reporter varchar,
+  -- The version of the distribution tested
+  version varchar
+);
+
+CREATE INDEX pk_id09 ON report_summaries (id);
 
 --
--- Table: `results`
+-- Table: reporters
 --
-CREATE TABLE `results` (
-  `duration` integer NULL,
-  `failures` integer NULL,
-  `grade` enum(\'pass\', \'fail\', \'na\', \'unknown\') NOT NULL comment \'The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.\',
-  `id` integer NOT NULL auto_increment,
-  `skipped` integer NULL,
-  `tests` integer NULL,
-  `warnings` integer NULL,
-  `output_id` integer NOT NULL,
-  `todo_id` integer NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`output_id`),
-  INDEX (`todo_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `results_fk` FOREIGN KEY (`output_id`) REFERENCES `test_outputs` (`id`),
-  CONSTRAINT `results_fk_1` FOREIGN KEY (`todo_id`) REFERENCES `result_todoes` (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE reporters (
+  email varchar NOT NULL,
+  id INTEGER PRIMARY KEY NOT NULL,
+  name varchar
+);
+
+CREATE INDEX pk_id10 ON reporters (id);
 
 --
--- Table: `result_todoes`
+-- Table: results
 --
-CREATE TABLE `result_todoes` (
-  `fail` integer NOT NULL,
-  `id` integer NOT NULL auto_increment,
-  `pass` integer NOT NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE results (
+  duration int,
+  failures int,
+  -- The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.
+  grade enum NOT NULL,
+  id INTEGER PRIMARY KEY NOT NULL,
+  skipped int,
+  tests int,
+  warnings int,
+  output_id int NOT NULL,
+  todo_id int,
+  FOREIGN KEY (output_id) REFERENCES test_outputs(id),
+  FOREIGN KEY (todo_id) REFERENCES result_todoes(id)
+);
+
+CREATE INDEX pk_id11 ON results (id);
 
 --
--- Table: `systems`
+-- Table: result_todoes
 --
-CREATE TABLE `systems` (
-  `cpu_count` varchar(255) NULL,
-  `cpu_description` varchar(255) NULL,
-  `cpu_type` varchar(255) NULL,
-  `filesystem` varchar(255) NULL,
-  `hostname` varchar(255) NULL,
-  `id` integer NOT NULL auto_increment,
-  `osname` varchar(255) NOT NULL,
-  `osversion` varchar(255) NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE result_todoes (
+  fail int NOT NULL,
+  id INTEGER PRIMARY KEY NOT NULL,
+  pass int NOT NULL
+);
+
+CREATE INDEX pk_id12 ON result_todoes (id);
 
 --
--- Table: `system_variables`
+-- Table: systems
 --
-CREATE TABLE `system_variables` (
-  `id` integer NOT NULL auto_increment,
-  `key` varchar(255) NULL,
-  `value` varchar(255) NULL,
-  `variable_id` integer NOT NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`variable_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `system_variables_fk` FOREIGN KEY (`variable_id`) REFERENCES `systems` (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE systems (
+  cpu_count varchar,
+  cpu_description varchar,
+  cpu_type varchar,
+  filesystem varchar,
+  hostname varchar,
+  id INTEGER PRIMARY KEY NOT NULL,
+  osname varchar NOT NULL,
+  osversion varchar
+);
+
+CREATE INDEX pk_id13 ON systems (id);
 
 --
--- Table: `test_outputs`
+-- Table: system_variables
 --
-CREATE TABLE `test_outputs` (
-  `build` varchar(255) NULL,
-  `configure` varchar(255) NULL,
-  `id` integer NOT NULL auto_increment,
-  `install` varchar(255) NULL,
-  `test` varchar(255) NULL,
-  `uncategorized` varchar(255) NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB comment=\'At least one of the properties must be set\';
+CREATE TABLE system_variables (
+  id INTEGER PRIMARY KEY NOT NULL,
+  key varchar,
+  value varchar,
+  variable_id int NOT NULL,
+  FOREIGN KEY (variable_id) REFERENCES systems(id)
+);
+
+CREATE INDEX pk_id14 ON system_variables (id);
 
 --
--- Table: `uploads`
+-- Table: test_outputs
 --
-CREATE TABLE `uploads` (
-  `author` varchar(255) NULL comment \'The CPAN ID of the author who released this version of this distribution\',
-  `dist` varchar(255) NULL comment \'The distribution name\',
-  `filename` varchar(255) NULL comment \'The filename on PAUSE, without the author directory\',
-  `id` integer NOT NULL auto_increment,
-  `released` datetime NULL comment \'The date/time the file was released to CPAN, in UTC\',
-  `version` varchar(255) NULL comment \'The distribution release version\',
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) comment=\'A release to CPAN\';
+CREATE TABLE test_outputs (
+-- Comments: 
+-- At least one of the properties must be set
+--
 
-SET foreign_key_checks=1;'
+  build varchar,
+  configure varchar,
+  id INTEGER PRIMARY KEY NOT NULL,
+  install varchar,
+  test varchar,
+  uncategorized varchar
+);
+
+CREATE INDEX pk_id15 ON test_outputs (id);
+
+--
+-- Table: uploads
+--
+CREATE TABLE uploads (
+-- Comments: 
+-- A release to CPAN
+--
+
+  -- The CPAN ID of the author who released this version of this distribution
+  author varchar,
+  -- The distribution name
+  dist varchar,
+  -- The filename on PAUSE, without the author directory
+  filename varchar,
+  id INTEGER PRIMARY KEY NOT NULL,
+  -- The date/time the file was released to CPAN, in UTC
+  released datetime,
+  -- The distribution release version
+  version varchar
+);
+
+CREATE INDEX pk_id16 ON uploads (id);
+
+COMMIT;'

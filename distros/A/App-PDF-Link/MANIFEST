@@ -4,6 +4,7 @@ Makefile.PL
 README
 lib/App/PDF/Link.pm
 lib/App/PDF/Link/Icons.pm
+lib/App/PDF/Link/Icons/ABC.pm
 lib/App/PDF/Link/Icons/BandInABox.pm
 lib/App/PDF/Link/Icons/Border.pm
 lib/App/PDF/Link/Icons/Document.pm

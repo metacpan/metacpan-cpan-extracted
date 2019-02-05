@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More 0.88;
 
-BEGIN { use_ok 'Test::Mocha' }
+use ok 'Test::Mocha';
 
 my $mock = mock;
 
@@ -33,12 +33,24 @@ ok( !$mock->can('foo'), '... and called' );
 is( ( inspect { $mock->can('foo') } )[0], 'can("foo")', '... and inspected' );
 called_ok { $mock->can('foo') } '... and verified';
 
+my $nr_calls = 1;
 stub { $mock->ref } returns 'Foo';
 is( $mock->__stubs->{ref}[0], 'ref()', 'ref() can be stubbed' );
 is( $mock->ref,               'Foo',   '... and called as a method' );
-is( ref($mock), 'Foo', '... or as a function (via UNIVERSAL::ref)' );
 is( ( my $call = ( inspect { $mock->ref } )[0] ), 'ref()',
     '... and inspected' );
-# Ensure UNIVERSAL::ref is not recorded as caller when it intercepts the call
-is( ( $call->caller )[0], __FILE__, '... and caller is not UNIVERSAL::ref' );
-called_ok { $mock->ref } &times(2), '... and verified';
+SKIP: {
+    skip 'UNIVERSAL::ref not compatible with Perl version >= 5.025', 1
+      if $] ge '5.025';
+
+    $nr_calls++;
+    is( ref($mock), 'Foo', '... or called as a function (via UNIVERSAL::ref)' );
+    my $call = ( inspect { ref($mock) } )[-1];
+    is( $call, 'ref()', '... and inspected' );
+   # Ensure UNIVERSAL::ref is not recorded as caller when it intercepts the call
+    is( ( $call->caller )[0], __FILE__,
+        '... and caller is not UNIVERSAL::ref' );
+}
+called_ok { $mock->ref } &times($nr_calls), '... and verified';
+
+done_testing;

@@ -12,11 +12,11 @@ use Data::Dumper;
 $Data::Dumper::Indent=1;
 
 my $BRREG_TIMEOUT = 60; # secs (default is 180 secs but we want shorter time).
+my $MAX_PAGES     = 10;  # max pages to fetch if no max is specified
+my $MAX_SIZE      = 100; # max size to ask for in each request
 
-my $MAX_PAGES = 10; # max pages to fetch if no max is specified
-
-my $BRREG     = "https://data.brreg.no/enhetsregisteret/api";
-my $BRREG_UPD = "https://data.brreg.no/enhetsregisteret/api/oppdateringer";
+my $BRREG         = "https://data.brreg.no/enhetsregisteret/api";
+my $BRREG_UPD     = "https://data.brreg.no/enhetsregisteret/api/oppdateringer";
 
 my @module_methods = qw /
 
@@ -34,7 +34,11 @@ my @module_methods = qw /
     data
     size
     total_size
+
+    cur_page
     next_page
+    prev_page
+    total_page_count
 
     raw_json_decoded
    /;
@@ -51,14 +55,20 @@ __PACKAGE__->mk_accessors(
 sub lookup_orgno {
     my ($self, $orgno, $sok_underenheter) = @_;
 
+    unless ($orgno) {
+        $self->status("mandatory parameter 'orgno' not specified");
+        $self->error(1);
+	return 0;
+    }
+
     my $ENHETER="enheter";
-    
     if ($sok_underenheter) {
         $ENHETER = "under" . $ENHETER;
     }
     
     # validate the organizaton number
-    unless (orgno_ok($self, $orgno)) {
+    unless ($self->orgno_ok($orgno)) {
+	# errno has been set
         return $self;
     }
     
@@ -71,47 +81,36 @@ sub lookup_orgno {
 }
 
 sub lookup_orgname {
-    my ($self, $orgname, $max_no_pages, $sok_underenheter) = @_;
+    my ($self, $orgname, $max_no_pages, $page_ix, $sok_underenheter) = @_;
     
-    die "mandatory parameter 'orgname' not specified" unless ($orgname);
-
+    unless ($orgname) {
+        $self->status("mandatory parameter 'orgname' not specified");
+        $self->error(1);
+	return 0;
+    }
+    
     my $ENHETER="enheter";
-    
     if ($sok_underenheter) {
         $ENHETER = "under" . $ENHETER;
     }
-    
-    my $max_pg_to_fetch = $max_no_pages || $MAX_PAGES;
-    
     # Use the orgname as filter in search to brreg
-    # Note a limitation in the brreg API service that 
-    # only names starting with $orgname is supported,
-    # ref. the 'startswith' filter in the URL.
-    # We should've liked a 'contains' instead. 
-
     my $onm_e = uri_encode($orgname, {encode_reserved => 1});
 
-    my $BR = "$BRREG/$ENHETER/?size=100&navn=$onm_e";
+    my $BR = "$BRREG/$ENHETER/?size=$MAX_SIZE&navn=$onm_e";
 
-    # First page is 0
-    my $pcnt = 0;
-    $self->size(0);
-    $self->next_page(1); # force the first lookup
-
-    while ($self->next_page && $pcnt < $max_pg_to_fetch) {
-        #print STDERR "Page count is: $pcnt, fetching next page...\n";
-        $self->_lookup_org_entries("$BR&page=$pcnt");
-        ++$pcnt;
-    }
+    $self->_fetch_pages($BR, $max_no_pages, $page_ix);
 }
 
 sub lookup_reg_dates {
-    my ($self, $from_date, $to_date, $max_no_pages, $sok_underenheter) = @_;
-
-    my $max_pg_to_fetch = $max_no_pages || $MAX_PAGES;
-
-    my $ENHETER="enheter";
+    my ($self, $from_date, $to_date, $max_no_pages, $page_ix, $sok_underenheter) = @_;
     
+    unless ($from_date || $to_date) {
+	$self->status("mandatory parameter 'from_date or to_date' not specified");
+	$self->error(1);
+	return 0;
+    }
+    
+    my $ENHETER="enheter";
     if ($sok_underenheter) {
         $ENHETER = "under" . $ENHETER;
     }
@@ -120,7 +119,9 @@ sub lookup_reg_dates {
     # registration dates
     my $rdateF = "fraRegistreringsdatoEnhetsregisteret";
     my $rdateT = "tilRegistreringsdatoEnhetsregisteret";
+
     my $dateFilter;
+
     if ($from_date && !$to_date) {
         $dateFilter = "$rdateF=$from_date";
     } elsif (!$from_date && $to_date) {
@@ -129,59 +130,44 @@ sub lookup_reg_dates {
         $dateFilter = "$rdateF=$from_date&$rdateT=$to_date";
     }
     
-    my $BR = "$BRREG/$ENHETER/?size=100&$dateFilter";
-      
-    # First page is 0
-    my $pcnt = 0;
-    $self->size(0);
-    $self->next_page(1); # force the first lookup
+    my $BR = "$BRREG/$ENHETER/?size=$MAX_SIZE&$dateFilter";
+    
+    $self->_fetch_pages($BR, $max_no_pages, $page_ix);
 
-    # Fetch max 5 pages
-    while ($self->next_page && $pcnt < $max_pg_to_fetch) {
-        #print STDERR "Page count is: $pcnt, fetching next page...\n";
-        $self->_lookup_org_entries("$BR&page=$pcnt");
-        ++$pcnt;
-    }
 }
 
 
 sub lookup_update_dates {
-    my ($self, $from_date, $update_id, $max_no_pages, $sok_underenheter) = @_;
+    my ($self, $from_date, $update_id, $max_no_pages, $page_ix, $sok_underenheter) = @_;
 
-    my $max_pg_to_fetch = $max_no_pages || $MAX_PAGES;
-
-    my $ENHETER="enheter";
+    unless ($from_date || $update_id) {
+	$self->status("mandatory parameter 'update from_date or update_id' not specified");
+	$self->error(1);
+	return 0;
+    }
     
+    my $ENHETER="enheter";
     if ($sok_underenheter) {
         $ENHETER = "under" . $ENHETER;
     }
-    
+
     # Use the from / to dates as filter for lookup on 
     # update date
     my $updFilter;
-    $from_date .= "T00:00:00.000Z";
+    my $midnight = "T00:00:00.000Z";
           
     if ($from_date && !$update_id) {
-        $updFilter = "dato=$from_date";
+        $updFilter = "dato=$from_date$midnight";
     } elsif (!$from_date && $update_id) {
         $updFilter = "oppdateringsid=$update_id";
     } else {
-        $updFilter = "dato=$from_date&oppdateringsid=$update_id";
+        $updFilter = "dato=$from_date$midnight&oppdateringsid=$update_id";
     }
     
-    my $BR = "$BRREG_UPD/$ENHETER/?size=100&$updFilter";
-      
-    # First page is 0
-    my $pcnt = 0;
-    $self->size(0);
-    $self->next_page(1); # force the first lookup
+    my $BR = "$BRREG_UPD/$ENHETER/?size=$MAX_SIZE&$updFilter";
+    
+    $self->_fetch_pages($BR, $max_no_pages, $page_ix);
 
-    # Fetch max 5 pages
-    while ($self->next_page && $pcnt < $max_pg_to_fetch) {
-        #print STDERR "Page count is: $pcnt, fetching next page...\n";
-        $self->_lookup_org_entries("$BR&page=$pcnt");
-        ++$pcnt;
-    }
 }
 
 
@@ -204,8 +190,35 @@ sub orgno_ok {
     return 1;
 }
 
-#####
-# The lookup itself, internal method only.
+
+
+sub _fetch_pages {
+    my ($self, $BR, $max_no_pages, $page_ix) = @_;
+	
+    # Fetch the requested pages
+    # First page is 0
+    # Set size and total size so we get the first lookup
+
+    my $max_pg_to_fetch = $max_no_pages || $MAX_PAGES;
+    my $pg_ix           = $page_ix      || 0;
+
+    my $pix   = $pg_ix;
+    my $pcnt  = 1;
+    my $bsize = -1;
+
+    $self->size(0);  
+    $self->total_size(1);
+    $self->next_page(1); # force the first lookup
+
+    while ($pcnt <= $max_pg_to_fetch && $bsize < $self->size && $self->size < $self->total_size) {
+	# Remember size before next lookup. If size has not increased, stop the loop.
+	$bsize = $self->size;
+
+        $self->_lookup_org_entries("$BR&page=$pix");
+        ++$pcnt;
+	++$pix;
+    }
+}
 
 sub _lookup_org_entries {
     my ($self, $URL) = @_;
@@ -236,8 +249,8 @@ sub _lookup_org_entries {
         my $eo = NOLookup::Brreg::Entry->new;
         my $entries = $eo->map_json_entries($json);
 
-        #print STDERR "Entries: ", Dumper $entries;
-        
+        #print STDERR "eo: ", Dumper $eo;
+
         # Collect any accumulated problems
         $self->status($eo->status) if ($eo->status);
         $self->warning($eo->warning) if ($eo->warning);
@@ -246,22 +259,16 @@ sub _lookup_org_entries {
         # Save the found data
         if (@$entries) {
             push @{$self->{data}}, @$entries;
-            $self->size($self->size + scalar @$entries);
 
-            if ($eo->next_page) {
-                # more pages are available.
-                $self->next_page($eo->next_page);
-            } else {
-                # No more pages, all results are returned,
-                # and we know the total_size (=totalElementssize)
-                # Only if total_size is set, the user can assume
-                # that all data has been fetched.
-                $self->total_size($self->size);
-                $self->next_page(undef);
-            }
-        } else {
-            $self->next_page(undef);
-        }
+            $self->size($self->size + scalar @$entries);
+	    $self->total_size($eo->total_result_count);  
+
+	    $self->total_page_count($eo->total_page_count);
+
+	    $self->cur_page($eo->cur_page);
+	    $self->next_page($eo->next_page);
+	    $self->prev_page($eo->prev_page);
+	}
     }
 
     #print STDERR Dumper $self;
@@ -374,27 +381,35 @@ Further description of error/warning situations.
 
 =head3 data()
 
-Found data, an array of NOLookup::Brreg::Entry data objects.
+The found data, an array of NOLookup::Brreg::Entry data objects.
 
 See doc. for NOLookup::Brreg::Entry for details.
 
 =head3 size()
 
-The number of objects in data().
+The number of objects found in a page lookup
 
 =head3 total_size()
 
-The total number of objects in data().
+The total number of objects found by the search.
 
 Only set if all data has been fetched.
 
-Only if total_size is set, the user can assume
-that all data has been fetched.
+Only if total_size is set, the user can assume that all data has been
+fetched.
 
-=head3 next_page()
+=head3 cur_page()/prev_page()/next_page()
 
-If more pages (of 100 elements) can be fetched,
-this method gives the URL to that page.
+If more pages can be fetched, those methods give the URL to that page
+
+=head3 total_page_count()
+
+Count of total nuber of pages matching the search
+
+=head3 result_count()
+
+Count of total results for the search
+
 
 =head1 SUPPORT
 

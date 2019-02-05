@@ -7,7 +7,7 @@ use Test::More tests => 14;
 use Test::Fatal;
 use Test::Builder::Tester;
 
-BEGIN { use_ok 'Test::Mocha' }
+use ok 'Test::Mocha';
 
 my $e;
 

@@ -1,3 +1,10 @@
+Overview of changes in Glib::Object::Introspection 0.047
+========================================================
+
+* Add missing version checks to t/param-specs.t
+* Fix a version check in t/arrays.t
+* README: updated project Git URIs
+
 Overview of changes in Glib::Object::Introspection 0.046
 ========================================================
 

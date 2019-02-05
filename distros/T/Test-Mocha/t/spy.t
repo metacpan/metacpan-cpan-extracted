@@ -3,14 +3,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More 0.88;
 use Test::Fatal;
 #use Scalar::Util qw( blessed );
 
 use lib 't/lib';
 use TestClass;
 
-BEGIN { use_ok 'Test::Mocha' }
+use ok 'Test::Mocha';
 
 my $FILE = __FILE__;
 
@@ -35,31 +35,34 @@ subtest 'spy() must be given a blessed object' => sub {
 # spy acts as a wrapper to the real object
 
 ok( $spy->isa('TestClass'),  'spy isa(TestClass)' );
-ok( $spy->does('TestClass'), 'spy does(TestClass)' );
 ok( $spy->DOES('TestClass'), 'spy DOES(TestClass)' );
 
-is( ref($spy), 'TestClass', 'ref(spy)' );
+SKIP: {
+    skip 'UNIVERSAL::ref not compatible with Perl version >= 5.025', 1
+      if $] ge '5.025';
+    is( ref($spy), 'TestClass', 'ref(spy)' );
+}
 #iis( blessed($spy), 'TestClass' );
 
 ok( !$spy->isa('Foo'),  'spy does not isa(Anything)' );
-ok( !$spy->does('Bar'), 'spy does not does(Anything)' );
 ok( !$spy->DOES('Baz'), 'spy does not DOES(Anything)' );
 
 # ----------------------
 # spy delegates method calls to the real object
 
-is( $spy->test_method( bar => 1 ),
-    'bar', 'spy accepts methods that it can delegate' );
+is( $spy->echo('bar'), 'bar', 'spy accepts methods that it can delegate' );
+is( $spy->getter('foo'), 'bar',
+    '... and the method is invoked on the real object' );
 
-subtest 'spy can(test_method)' => sub {
-    ok( my $coderef = $spy->can('test_method'), 'can() returns positively' );
+subtest 'spy can(echo)' => sub {
+    ok( my $coderef = $spy->can('echo'), 'can() returns positively' );
     is( ref($coderef), 'CODE', '... and return value is a coderef' );
     is( $coderef->( $spy, 5 ),
         5, '... and coderef delegates method call by default' );
     my $line = __LINE__ - 2;
     is(
         $spy->__calls->[-1]->stringify_long,
-        qq{test_method(5) called at $FILE line $line},
+        qq{echo(5) called at $FILE line $line},
         '... and method call is recorded'
     );
 };
@@ -72,14 +75,6 @@ subtest 'spy does not can(any_method)' => sub {
         qq{can("foo") called at $FILE line $line},
         '... and method call is recorded'
     );
-};
-
-# ----------------------
-# spy is passed to real object's methods
-
-subtest 'spy invokes a stubbed method indirectly' => sub {
-    stub { $spy->indirect } returns('stubbed indirect');
-    is( $spy->direct, 'stubbed indirect', '... and invokes the method' );
 };
 
 # ----------------------
@@ -130,3 +125,5 @@ subtest 'spy does not inspect methods it cannot delegate' => sub {
 $spy->DESTROY;
 isnt( $spy->__calls->[-1]->stringify,
     'DESTROY()', 'DESTROY() is not AUTOLOADed' );
+
+done_testing;

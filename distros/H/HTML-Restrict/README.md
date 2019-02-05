@@ -4,7 +4,7 @@ HTML::Restrict - Strip unwanted HTML tags and attributes
 
 # VERSION
 
-version v2.3.0
+version v2.4.1
 
 # SYNOPSIS
 
@@ -18,9 +18,7 @@ version v2.3.0
     # $processed now equals: 'i am bold'
 
     # Now, a less restrictive example:
-    use HTML::Restrict;
-
-    my $hr = HTML::Restrict->new(
+    $hr = HTML::Restrict->new(
         rules => {
             b   => [],
             img => [qw( src alt / )]
@@ -28,7 +26,7 @@ version v2.3.0
     );
 
     my $html = q[<body><b>hello</b> <img src="pic.jpg" alt="me" id="test" /></body>];
-    my $processed = $hr->process( $html );
+    $processed = $hr->process( $html );
 
     # $processed now equals: <b>hello</b> <img src="pic.jpg" alt="me" />
 
@@ -234,6 +232,30 @@ HTML::Restrict recognizes:
         my $hr = HTML::Restrict->new( allow_comments => 1 );
         $html = $hr->process( $html );
         # $html is now: "<!-- comments! -->foo"
+
+- max\_parser\_loops => \[Integer\]
+
+    Defaults to 25.  Should never be less than 2.
+
+    As of v2.4.0, calling `process()` will force the parser to clean the text
+    multiple times, stopping only once the text is no longer changed or once
+    `max_parser_loops` has been reached.
+
+    The reason for this is that [HTML::Parser](https://metacpan.org/pod/HTML::Parser) could take malformed HTML and turn
+    it into well formed HTML.  This can defeat our processing logic and allow
+    malicious input to be returned.  In order to mitigate this, we will clean all
+    input at least two times.  If the second attempt at cleaning does not match
+    the previous attempt, we will make a third attempt and so on.  This helps to
+    ensure that we get the expected output.
+
+    If we are unable to get unchanged values after reaching `max_parser_loops`, an
+    exception will be thrown.  Returning partially cleaned text would be wrong, as
+    would be returning `undef` or an empty string.  Throwing an exception forces
+    the user to choose the appropriate way of dealing with this.
+
+    If you choose to set this value, please note that it can be no less than 2, or
+    the parser will never be able to make a comparison with a previous value.  An
+    exception will be thrown if you attempt to set this to a value less than 2.
 
 - replace\_img => \[0|1|CodeRef\]
 

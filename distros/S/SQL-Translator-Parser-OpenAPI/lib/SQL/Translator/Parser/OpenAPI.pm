@@ -1,15 +1,16 @@
 package SQL::Translator::Parser::OpenAPI;
-use 5.008001;
 use strict;
 use warnings;
-use JSON::Validator::OpenAPI;
+use JSON::Validator::OpenAPI::Mojolicious;
 
-our $VERSION = "0.05";
+our $VERSION = "0.07";
 use constant DEBUG => $ENV{SQLTP_OPENAPI_DEBUG};
-use String::CamelCase qw(camelize decamelize wordsplit);
+use String::CamelCase qw(camelize decamelize);
 use Lingua::EN::Inflect::Number qw(to_PL to_S);
 use SQL::Translator::Schema::Constants;
 use Math::BigInt;
+use Hash::MoreUtils qw(slice_grep);
+use Hash::Merge qw(merge);
 
 my %TYPE2SQL = (
   integer => 'int',
@@ -38,18 +39,20 @@ sub _debug {
   Test::More::diag("$func: ", Data::Dumper::Dumper([ @_ ]));
 }
 
-# heuristic 1: strip out single-item objects
+# heuristic 1: strip out single-item objects - RHS = ref if array
 sub _strip_thin {
   my ($defs) = @_;
-  my @thin = grep {
-    my @props = keys %{ $defs->{$_}{properties} };
-    @props == 1 or (@props == 2 and grep /count/i, @props)
+  my %thin2real = map {
+    my $theseprops = $defs->{$_}{properties};
+    my @props = grep !/count/i, keys %$theseprops;
+    my $real = @props == 1 ? $theseprops->{$props[0]} : undef;
+    my $is_array = $real = $real->{items} if $real and $real->{type} eq 'array';
+    $real = $real->{'$ref'} if $real;
+    $real = _ref2def($real) if $real;
+    @props == 1 ? ($_ => $is_array ? \$real : $real) : ()
   } keys %$defs;
-  if (DEBUG) {
-    _debug("OpenAPI($_) thin, ignoring", $defs->{$_}{properties})
-      for sort @thin;
-  }
-  @thin;
+  DEBUG and _debug("OpenAPI._strip_thin", \%thin2real);
+  \%thin2real;
 }
 
 # heuristic 2: find objects with same propnames, drop those with longer names
@@ -60,16 +63,16 @@ sub _strip_dup {
   DEBUG and _debug("OpenAPI sig2names", \%sig2names);
   my @nondups = grep @{ $sig2names{$_} } == 1, keys %sig2names;
   delete @sig2names{@nondups};
-  my @dups;
+  my %dup2real;
   for my $sig (keys %sig2names) {
     next if grep $reffed->{$_}, @{ $sig2names{$sig} };
     my @names = sort { (length $a <=> length $b) } @{ $sig2names{$sig} };
     DEBUG and _debug("OpenAPI dup($sig)", \@names);
-    shift @names; # keep the first i.e. shortest
-    push @dups, @names;
+    my $real = shift @names; # keep the first i.e. shortest
+    $dup2real{$_} = $real for @names;
   }
-  DEBUG and _debug("dup ret", \@dups);
-  @dups;
+  DEBUG and _debug("dup ret", \%dup2real);
+  \%dup2real;
 }
 
 # sorted list of all propnames
@@ -104,7 +107,7 @@ sub defs2mask {
 #   another object's propnames
 sub _strip_subset {
   my ($defs, $def2mask, $reffed) = @_;
-  my %subsets;
+  my %subset2real;
   for my $defname (keys %$defs) {
     DEBUG and _debug("_strip_subset $defname maybe", $reffed);
     next if $reffed->{$defname};
@@ -113,12 +116,11 @@ sub _strip_subset {
       my $supermask = $def2mask->{$supersetname};
       next unless ($thismask & $supermask) == $thismask;
       DEBUG and _debug("mask $defname subset $supersetname");
-      $subsets{$defname} = 1;
+      $subset2real{$defname} = $supersetname;
     }
   }
-  my @subset = keys %subsets;
-  DEBUG and _debug("subset ret", [ sort @subset ]);
-  @subset;
+  DEBUG and _debug("subset ret", \%subset2real);
+  \%subset2real;
 }
 
 sub _prop2sqltype {
@@ -149,7 +151,7 @@ sub _make_pk {
   my ($table, $field_in) = @_;
   my @fields = ref($field_in) eq 'ARRAY' ? @$field_in : $field_in;
   $_->is_primary_key(1) for @fields;
-  $fields[0]->is_auto_increment(1) if @fields == 1;
+  $fields[0]->is_auto_increment(1) if @fields == 1 and $fields[0]->data_type =~ /int/;
   $table->add_constraint(type => $_, fields => \@fields)
     for (PRIMARY_KEY);
   my $index = $table->add_index(
@@ -160,7 +162,9 @@ sub _make_pk {
 }
 
 sub _def2tablename {
-  to_PL decamelize $_[0];
+  my ($def, $args) = @_;
+  return $def unless $args->{snake_case};
+  to_PL decamelize $def;
 }
 
 sub _ref2def {
@@ -199,21 +203,22 @@ sub _fk_hookup {
 }
 
 sub _def2table {
-  my ($name, $def, $schema, $m2m, $view2real) = @_;
+  my ($name, $def, $schema, $m2m, $view2real, $def2relationalid, $args) = @_;
   my $props = $def->{properties};
-  my $tname = _def2tablename($name);
+  my $tname = _def2tablename($name, $args);
   DEBUG and _debug("_def2table($name)($tname)($m2m)", $props);
   if (my $view_of = $def->{'x-view-of'}) {
-    my $target_table = _def2tablename($view_of);
+    my $target_table = _def2tablename($view_of, $args);
     $view2real->{$tname} = $target_table;
     return (undef, []);
   }
   my $table = $schema->add_table(
     name => $tname, comments => $def->{description},
   );
-  if (!$props->{id} and !$m2m) {
+  my $relational_id_field = $def2relationalid->{$name};
+  if (!$m2m and !$props->{$relational_id_field}) {
     # we need a relational id
-    $props->{id} = { type => 'integer' };
+    $props->{$relational_id_field} = { type => 'integer' };
   }
   my %prop2required = map { ($_ => 1) } @{ $def->{required} || [] };
   my (@fixups);
@@ -222,21 +227,29 @@ sub _def2table {
     my $thisprop = $props->{$propname};
     DEBUG and _debug("_def2table($propname)");
     if (my $ref = $thisprop->{'$ref'}) {
+      my $refname = _ref2def($ref);
       push @fixups, {
         from => $tname,
         fromkey => $propname . '_id',
-        to => _def2tablename(_ref2def($ref)),
-        tokey => 'id',
+        to => _def2tablename($refname, $args),
+        tokey => $def2relationalid->{$refname},
         required => $prop2required{$propname},
         type => 'one',
       };
     } elsif (($thisprop->{type} // '') eq 'array') {
       if (my $ref = $thisprop->{items}{'$ref'}) {
+        my $refname = _ref2def($ref);
+        my $fromkey;
+        if ($args->{snake_case}) {
+          $fromkey = to_S($propname) . "_id";
+        } else {
+          $fromkey = $propname . "_id";
+        }
         push @fixups, {
-          from => _ref2def(_def2tablename($ref)),
-          fromkey => to_S($propname) . "_id",
+          from => _def2tablename($refname, $args),
+          fromkey => $fromkey,
           to => $tname,
-          tokey => 'id',
+          tokey => $relational_id_field,
           required => 1,
           type => 'many',
         };
@@ -247,11 +260,18 @@ sub _def2table {
       $field = $table->add_field(
         name => $propname, %$sqltype, comments => $thisprop->{description},
       );
-      if ($propname eq 'id') {
+      if ($propname eq ($relational_id_field // '')) {
         _make_pk($table, $field);
+      } elsif ($propname eq ($def->{'x-id-field'} // '')) {
+        $table->add_constraint(type => $_, fields => [ $field ])
+          for (UNIQUE);
+        my $index = $table->add_index(
+          name => join('_', 'unique', map $_->name, $field),
+          fields => [ $field ],
+        );
       }
     }
-    if ($field and $prop2required{$propname} and $propname ne 'id') {
+    if ($field and $prop2required{$propname} and $propname ne $relational_id_field) {
       _make_not_null($table, $field);
     }
   }
@@ -262,73 +282,39 @@ sub _def2table {
   ($table, \@fixups);
 }
 
-# mutates $def
-sub _merge_one {
-  my ($def, $from, $ignore_required) = @_;
-  DEBUG and _debug('OpenAPI._merge_one', $def, $from);
-  push @{ $def->{required} }, @{ $from->{required} || [] } if !$ignore_required;
-  $def->{properties} = { %{$def->{properties} || {}}, %{$from->{properties}} };
-  $def->{type} = $from->{type} if $from->{type};
-}
-
 sub _merge_allOf {
   my ($defs) = @_;
   DEBUG and _debug('OpenAPI._merge_allOf', $defs);
-  my %def2discrim = map {
-    ($_ => 1)
-  } grep $defs->{$_}{discriminator}, keys %$defs;
-  my %def2referrers;
-  for my $defname (sort keys %$defs) {
-    my $thisdef = $defs->{$defname};
-    next if !exists $thisdef->{allOf};
-    for my $partial (@{ $thisdef->{allOf} }) {
-      next if !(my $ref = $partial->{'$ref'});
-      push @{ $def2referrers{_ref2def($ref)} }, $defname;
-    }
-  }
-  DEBUG and _debug('OpenAPI._merge_allOf(def2referrers)', \%def2referrers);
-  my %newdefs;
+  my %r2ds = slice_grep { $_{$_}{allOf} } $defs;
+  my @defref_pairs = map {
+    my $referrer = $_;
+    map [ $_, $referrer ],
+      grep $defs->{$_}{discriminator}, map _ref2def($_), grep defined, map $_->{'$ref'}, @{ $r2ds{$referrer}{allOf} }
+  } keys %r2ds;
+  DEBUG and _debug('OpenAPI._merge_allOf(defref_pairs)', \@defref_pairs);
+  my %newdefs = %$defs;
   my %def2ignore;
-  for my $defname (sort grep $def2discrim{$_}, keys %def2referrers) {
-    # assimilate instead of be assimilated by
-    $def2ignore{$defname} = 1;
-    my $thisdef = $defs->{$defname};
-    my %new = %$thisdef;
-    for my $assimilee (@{ $def2referrers{$defname} }) {
-      $def2ignore{$assimilee} = 1;
-      my $assimileedef = $defs->{$assimilee};
-      my @all = @{ $assimileedef->{allOf} };
-      for my $partial (@all) {
-        next if exists $partial->{'$ref'};
-        _merge_one(\%new, $partial, 1);
-      }
-    }
-    $newdefs{$defname} = \%new;
+  for (@defref_pairs) {
+    my ($defname, $assimilee) = @$_;
+    @def2ignore{@$_} = (1, 1);
+    $newdefs{$defname} = merge $newdefs{$defname}, $_
+      for grep !$_->{'$ref'}, @{ $defs->{$assimilee}{allOf} };
   }
-  for my $defname (sort grep !$def2ignore{$_}, keys %$defs) {
-    my $thisdef = $defs->{$defname};
-    my %new = %$thisdef;
-    if (exists $thisdef->{allOf}) {
-      my @all = @{ delete $thisdef->{allOf} };
-      for my $partial (@all) {
-        if (exists $partial->{'$ref'}) {
-          _merge_one(\%new, $defs->{ _ref2def($partial->{'$ref'}) }, 0);
-        } else {
-          _merge_one(\%new, $partial, 0);
-        }
-      }
-    }
-    $newdefs{$defname} = \%new;
+  for my $defname (grep !$def2ignore{$_} && exists $newdefs{$_}{allOf}, keys %$defs) {
+    $newdefs{$defname} = merge $newdefs{$defname}, (exists $_->{'$ref'}
+      ? $defs->{ _ref2def($_->{'$ref'}) }
+      : $_) for @{ $newdefs{$defname}{allOf} };
+    delete $newdefs{$defname}{allOf}; # delete as will now be copy
   }
   DEBUG and _debug('OpenAPI._merge_allOf(end)', \%newdefs);
   \%newdefs;
 }
 
 sub _find_referenced {
-  my ($defs) = @_;
+  my ($defs, $thin2real) = @_;
   DEBUG and _debug('OpenAPI._find_referenced', $defs);
   my %reffed;
-  for my $defname (sort keys %$defs) {
+  for my $defname (grep !$thin2real->{$_}, keys %$defs) {
     my $theseprops = $defs->{$defname}{properties} || {};
     for my $propname (keys %$theseprops) {
       if (my $ref = $theseprops->{$propname}{'$ref'}
@@ -343,7 +329,7 @@ sub _find_referenced {
 }
 
 sub _extract_objects {
-  my ($defs) = @_;
+  my ($defs, $args) = @_;
   DEBUG and _debug('OpenAPI._extract_objects', $defs);
   my %newdefs = %$defs;
   for my $defname (sort keys %$defs) {
@@ -362,7 +348,12 @@ sub _extract_objects {
       } else {
         next;
       }
-      my $newtype = join '', map camelize($_), $defname, $propname;
+      my $newtype;
+      if ($args->{snake_case}) {
+        $newtype = join '', map camelize($_), $defname, $propname;
+      } else {
+        $newtype = join '_', $defname, $propname;
+      }
       $newdefs{$newtype} = { %$ref };
       %$ref = ('$ref' => "#/definitions/$newtype");
     }
@@ -372,7 +363,7 @@ sub _extract_objects {
 }
 
 sub _extract_array_simple {
-  my ($defs) = @_;
+  my ($defs, $args) = @_;
   DEBUG and _debug('OpenAPI._extract_array_simple', $defs);
   my %newdefs = %$defs;
   for my $defname (sort keys %$defs) {
@@ -383,7 +374,12 @@ sub _extract_array_simple {
       next unless
         $thisprop->{items} && ($thisprop->{items}{type} // '') ne 'object';
       my $ref = $thisprop->{items};
-      my $newtype = join '', map camelize($_), $defname, $propname;
+      my $newtype;
+      if ($args->{snake_case}) {
+        $newtype = join '', map camelize($_), $defname, $propname;
+      } else {
+        $newtype = join '_', $defname, $propname;
+      }
       $newdefs{$newtype} = {
         type => 'object',
         properties => {
@@ -476,16 +472,20 @@ sub _absorb_nonobject {
 }
 
 sub _tuple2name {
-  my ($fixup) = @_;
+  my ($fixup, $args) = @_;
   my $from = $fixup->{from};
   my $fromkey = $fixup->{fromkey};
   $fromkey =~ s#_id$##;
-  camelize join '_', map to_S($_), $from, $fromkey;
+  if ($args->{snake_case}) {
+    camelize join '_', map to_S($_), $from, $fromkey;
+  } else {
+    join '_', $from, $fromkey;
+  }
 }
 
 sub _make_many2many {
-  my ($fixups, $schema) = @_;
-  DEBUG and _debug("tables to do", $fixups);
+  my ($fixups, $schema, $def2relationalid, $args) = @_;
+  DEBUG and _debug("_make_many2many", $fixups);
   my @manyfixups = grep $_->{type} eq 'many', @$fixups;
   my %from_tos;
   push @{ $from_tos{$_->{from}}{$_->{to}} }, $_ for @manyfixups;
@@ -499,7 +499,7 @@ sub _make_many2many {
       for my $fixup (@{ $from_tos{$from}{$to} }) {
         for my $other (@{ $to_froms{$from}{$to} }) {
           my ($f1, $f2) = sort { $a->{from} cmp $b->{from} } $fixup, $other;
-          $m2m{_tuple2name($f1)}{_tuple2name($f2)} = [ $f1, $f2 ];
+          $m2m{_tuple2name($f1, $args)}{_tuple2name($f2, $args)} = [ $f1, $f2 ];
           delete $ref2nonm2mfixup{$_} for $f1, $f2;
         }
       }
@@ -516,8 +516,14 @@ sub _make_many2many {
         $f1_fromkey =~ s#_id$#_to_id#;
         $f2_fromkey =~ s#_id$#_from_id#;
       }
+      my $new_table = $n1.$n2;
+      if ($args->{snake_case}) {
+        $new_table = $n1.$n2;
+      } else {
+        $new_table = join '_', $n1, $n2;
+      }
       my ($table) = _def2table(
-        $n1.$n2,
+        $new_table,
         {
           type => 'object',
           properties => {
@@ -531,6 +537,9 @@ sub _make_many2many {
         },
         $schema,
         1,
+        undef,
+        $def2relationalid,
+        $args,
       );
       push @replacefixups, {
         to => $f1->{from},
@@ -571,35 +580,92 @@ sub _remove_fields {
   }
 }
 
+sub _decide_id_fields {
+  my ($defs) = @_;
+  DEBUG and _debug('OpenAPI._decide_id_fields', $defs);
+  my %def2relationalid;
+  for my $defname (sort keys %$defs) {
+    my $thisdef = $defs->{$defname} || {};
+    my $theseprops = $thisdef->{properties} || {};
+    DEBUG and _debug("OpenAPI._decide_id_fields($defname)", $thisdef);
+    if (
+      ($theseprops->{id} and $theseprops->{id}{type} =~ /int/) or
+      !$theseprops->{id}
+    ) {
+      $def2relationalid{$defname} = 'id';
+    } elsif (
+      ($thisdef->{'x-id-field'} and $theseprops->{$thisdef->{'x-id-field'}}{type} =~ /int/)
+    ) {
+      $def2relationalid{$defname} = $thisdef->{'x-id-field'};
+    } else {
+      $def2relationalid{$defname} = _find_unique_name($theseprops);
+    }
+  }
+  DEBUG and _debug('OpenAPI._decide_id_fields(end)', \%def2relationalid);
+  \%def2relationalid;
+}
+
+sub _find_unique_name {
+  my ($props) = @_;
+  DEBUG and _debug('OpenAPI._find_unique_name', $props);
+  my $id_field = '_relational_id00';
+  $id_field++ while $props->{$id_field};
+  DEBUG and _debug('OpenAPI._find_unique_name(end)', $id_field);
+  $id_field;
+}
+
+sub _maybe_deref { ref($_[0]) ? ${$_[0]} : $_[0] }
+
+sub _map_thru {
+  my ($x2y) = @_;
+  DEBUG and _debug("OpenAPI._map_thru 1", $x2y);
+  my %mapped = %$x2y;
+  for my $fake (keys %mapped) {
+    my $real = $mapped{$fake};
+    next if !_maybe_deref $real;
+    $mapped{$_} = (ref $mapped{$_} ? \$real : $real) for
+      grep $fake eq _maybe_deref($mapped{$_}),
+      grep _maybe_deref($mapped{$_}),
+      keys %mapped;
+  }
+  DEBUG and _debug("OpenAPI._map_thru 2", \%mapped);
+  \%mapped;
+}
+
+sub definitions_non_fundamental {
+  my ($defs) = @_;
+  my $thin2real = _strip_thin($defs);
+  my $def2mask = defs2mask($defs);
+  my $reffed = _find_referenced($defs, $thin2real);
+  my $dup2real = _strip_dup($defs, $def2mask, $reffed);
+  my $subset2real = _strip_subset($defs, $def2mask, $reffed);
+  _map_thru({ %$thin2real, %$dup2real, %$subset2real });
+}
+
 sub parse {
   my ($tr, $data) = @_;
-  my $openapi_schema = JSON::Validator::OpenAPI->new->schema($data)->schema;
+  my $args = $tr->parser_args;
+  my $openapi_schema = JSON::Validator::OpenAPI::Mojolicious->new->schema($data)->schema;
   my %defs = %{ $openapi_schema->get("/definitions") };
   DEBUG and _debug('OpenAPI.definitions', \%defs);
   my $schema = $tr->schema;
   DEBUG and $schema->translator(undef); # reduce debug output
-  my @thin = _strip_thin(\%defs);
-  DEBUG and _debug("thin ret", \@thin);
-  delete @defs{@thin};
   _remove_fields(\%defs, 'x-artifact');
   _remove_fields(\%defs, 'x-input-only');
   %defs = %{ _merge_allOf(\%defs) };
-  my $def2mask = defs2mask(\%defs);
-  my $reffed = _find_referenced(\%defs);
-  my @dup = _strip_dup(\%defs, $def2mask, $reffed);
-  delete @defs{@dup};
-  my @subset = _strip_subset(\%defs, $def2mask, $reffed);
-  delete @defs{@subset};
-  %defs = %{ _extract_objects(\%defs) };
-  %defs = %{ _extract_array_simple(\%defs) };
+  my $bestmap = definitions_non_fundamental(\%defs);
+  delete @defs{keys %$bestmap};
+  %defs = %{ _extract_objects(\%defs, $args) };
+  %defs = %{ _extract_array_simple(\%defs, $args) };
   my (@fixups, %view2real);
   %defs = %{ _fixup_addProps(\%defs) };
   %defs = %{ _absorb_nonobject(\%defs) };
+  my $def2relationalid = _decide_id_fields(\%defs);
   for my $name (sort keys %defs) {
-    my ($table, $thesefixups) = _def2table($name, $defs{$name}, $schema, 0, \%view2real);
+    my ($table, $thesefixups) = _def2table($name, $defs{$name}, $schema, 0, \%view2real, $def2relationalid, $args);
     push @fixups, @$thesefixups;
   }
-  my ($newfixups) = _make_many2many(\@fixups, $schema);
+  my ($newfixups) = _make_many2many(\@fixups, $schema, $def2relationalid, $args);
   for my $fixup (@$newfixups) {
     _fk_hookup($schema, @{$fixup}{qw(from fromkey to tokey required)}, \%view2real);
   }
@@ -637,10 +703,16 @@ SQL::Translator::Parser::OpenAPI - convert OpenAPI schema to SQL::Translator sch
   # or...
   $ sqlt -f OpenAPI -t MySQL <my-openapi.json >my-mysqlschema.sql
 
+  # or, applying an overlay:
+  $ perl -MHash::Merge=merge -Mojo \
+    -e 'print j merge map j(f($_)->slurp), @ARGV' \
+      t/06-corpus.json t/06-corpus.json.overlay |
+    sqlt -f OpenAPI -t MySQL >my-mysqlschema.sql
+
 =head1 DESCRIPTION
 
 This module implements a L<SQL::Translator::Parser> to convert
-a L<JSON::Validator::OpenAPI> specification to a L<SQL::Translator::Schema>.
+a L<JSON::Validator::OpenAPI::Mojolicious> specification to a L<SQL::Translator::Schema>.
 
 It uses, from the given API spec, the given "definitions" to generate
 tables in an RDBMS with suitable columns and types.
@@ -651,24 +723,13 @@ To try to make the data model represent the "real" data, it applies heuristics:
 
 =item *
 
-to remove object definitions that only have one property (which the
-author calls "thin objects"), or that have two properties, one of whose
-names has the substring "count" (case-insensitive).
+to remove object definitions considered non-fundamental; see
+L</definitions_non_fundamental>.
 
 =item *
 
 for definitions that have C<allOf>, either merge them together if there
 is a C<discriminator>, or absorb properties from referred definitions
-
-=item *
-
-to find object definitions that have all the same properties as another,
-and remove all but the shortest-named one
-
-=item *
-
-to remove object definitions whose properties are a strict subset
-of another
 
 =item *
 
@@ -699,7 +760,11 @@ creates many-to-many tables for any two-way array relationships
 
 =head1 ARGUMENTS
 
-None at present.
+=head2 snake_case
+
+If true, will create table names that are not the definition names, but
+instead the pluralised snake_case version, in line with SQL convention. By
+default, the tables will be named after simply the definitions.
 
 =head1 PACKAGE FUNCTIONS
 
@@ -740,7 +805,55 @@ in the definitions. Not exported. E.g.
     d2 => (1 << 1) | (1 << 2),
   }
 
+=head2 definitions_non_fundamental
+
+Given the C<definitions> of an OpenAPI spec, will return a hash-ref
+mapping names of definitions considered non-fundamental to a
+value. The value is either the name of another definition that I<is>
+fundamental, or or C<undef> if it just contains e.g. a string. It will
+instead be a reference to such a value if it is to an array of such.
+
+This may be used e.g. to determine the "real" input or output of an
+OpenAPI operation.
+
+Non-fundamental is determined according to these heuristics:
+
+=over
+
+=item *
+
+object definitions that only have one property (which the author calls
+"thin objects"), or that have two properties, one of whose names has
+the substring "count" (case-insensitive).
+
+=item *
+
+object definitions that have all the same properties as another, and
+are not the shortest-named one between the two.
+
+=item *
+
+object definitions whose properties are a strict subset of another.
+
+=back
+
 =head1 OPENAPI SPEC EXTENSIONS
+
+=head2 C<x-id-field>
+
+Under C</definitions/$defname>, a key of C<x-id-field> will name a
+field within the C<properties> to be the unique ID for that entity.
+If it is not given, the C<id> field will be used if in the spec, or
+created if not.
+
+This will form the ostensible "key" for the generated table. If the
+key used here is an integer type, it will also be the primary key,
+being a suitable "natural" key. If not, then a "surrogate" key (with a
+generated name starting with C<_relational_id>) will be added as the primary
+key. If a surrogate key is made, the natural key will be given a unique
+constraint and index, making it still suitable for lookups. Foreign key
+relations will however be constructed using the relational primary key,
+be that surrogate if created, or natural.
 
 =head2 C<x-view-of>
 
@@ -788,7 +901,7 @@ L<SQL::Translator>.
 
 L<SQL::Translator::Parser>.
 
-L<JSON::Validator::OpenAPI>.
+L<JSON::Validator::OpenAPI::Mojolicious>.
 
 =cut
 

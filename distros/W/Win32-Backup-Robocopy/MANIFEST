@@ -6,6 +6,7 @@ MANIFEST.SKIP
 README
 README.md
 t/00-load.t
+t/00-robocopycheck.t
 t/01-new.t
 t/02-run.t
 t/03-job.t

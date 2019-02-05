@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Test double framework with method stubs and behaviour verification\r",
+  "ABSTRACT" => "Test double framework with method stubs and behaviour verification",
   "AUTHOR" => "Steven Lee <stevenwh.lee\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -25,8 +25,8 @@ my %WriteMakefileArgs = (
     "Type::Library" => 0,
     "Type::Utils" => 0,
     "Types::Standard" => "0.008",
-    "UNIVERSAL::ref" => 0,
     "experimental" => 0,
+    "if" => 0,
     "overload" => 0,
     "parent" => 0,
     "strict" => 0,
@@ -37,9 +37,10 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => "1.001002",
     "Test::Requires" => 0,
-    "lib" => 0
+    "lib" => 0,
+    "ok" => 0
   },
-  "VERSION" => "0.65",
+  "VERSION" => "0.66",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,9 +60,10 @@ my %FallbackPrereqs = (
   "Type::Library" => 0,
   "Type::Utils" => 0,
   "Types::Standard" => "0.008",
-  "UNIVERSAL::ref" => 0,
   "experimental" => 0,
+  "if" => 0,
   "lib" => 0,
+  "ok" => 0,
   "overload" => 0,
   "parent" => 0,
   "strict" => 0,

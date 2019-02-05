@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Model-Envoy",
    "prereqs" : {
@@ -40,7 +40,7 @@
    "provides" : {
       "Model::Envoy" : {
          "file" : "lib/Model/Envoy.pm",
-         "version" : "v0.4.1"
+         "version" : "v0.5.3"
       },
       "Model::Envoy::Meta::Attribute::Trait::Envoy" : {
          "file" : "lib/Model/Envoy.pm"
@@ -51,11 +51,11 @@
       },
       "Model::Envoy::Storage" : {
          "file" : "lib/Model/Envoy/Storage.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.5.3"
       },
       "Model::Envoy::Storage::DBIC" : {
          "file" : "lib/Model/Envoy/Storage/DBIC.pm",
-         "version" : "v0.3.2"
+         "version" : "v0.5.3"
       },
       "Model::Envoy::Storage::Memory" : {
          "file" : "lib/Model/Envoy/Storage/Memory.pm",
@@ -72,6 +72,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.4.1",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v0.5.3",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

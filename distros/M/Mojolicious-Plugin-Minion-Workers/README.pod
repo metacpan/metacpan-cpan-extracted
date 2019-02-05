@@ -2,13 +2,13 @@
 
 =head1 Mojolicious::Plugin::Minion::Workers
 
-Доброго всем
+★★★ Доброго всем ★★★
 
 ¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
 
 =head1 VERSION
 
-0.09075 (up to Minion 9.07/100+C<minor>)
+0.090781 (up to Minion 9.07/100+C<minor>)
 
 =head1 NAME
 
@@ -18,8 +18,8 @@ on manage Minion workers.
 =head1 SYNOPSIS
 
   # Mojolicious (define amount workers in config)
-  $self->plugin('Minion::Workers' => {Pg => ..., workers=>2});
-  # or pass to $app->minion->workers-.manage(<num>) later
+  $self->plugin('Minion::Workers' => {Pg => ..., workers=>2, manage=>1, });
+  # or pass to $app->minion->workers->manage(<number>) for run later
   $self->plugin('Minion::Workers' => {Pg => ...});
 
   # Mojolicious::Lite (define amount workers in config)
@@ -28,8 +28,7 @@ on manage Minion workers.
   # Add tasks to your application
   app->minion->add_task(something_slow => sub {
     my ($job, @args) = @_;
-    sleep 5;
-    say 'This is a background worker process.';
+    ...
   });
   
   # But you can define tasks in config as well
@@ -37,7 +36,7 @@ on manage Minion workers.
   
   # Start manage with amount workers
   app->minion->workers->manage(4);
-  # or get from config
+  # or get number from config
   app->minion->workers->manage();
 
   # Start jobs from anywhere in your application
@@ -49,23 +48,42 @@ queue and has extending base L<Mojolicious::Plugin::Minion> for enable workers m
 
 =head1 Extend base plugin config
 
-L<Mojolicious::Plugin::Minion::Workers> apply all config options of the base plugin L<Mojolicious::Plugin::Minion>,
-and define following
+L<Mojolicious::Plugin::Minion::Workers> apply all config options
+of the base plugin L<Mojolicious::Plugin::Minion>, and define following:
 
-=head2 workers(integer)
+=head2 workers => <integer>
 
-Amount of Minion workers need to start/restart. This value can be overriden on C< $app->minion->workers->manage(...) >.
+Amount of Minion workers need to start/restart. None defaults.
+This value can be overriden on C<< $app->minion->workers->manage(...) >>.
 
-=head2 tasks(hashref)
+  ..., workers => 4, ...
+
+=head2 manage => <boolean>
+
+Start/restart Minion workers during plugin registration. Defaults to false.
+If this option is not set then you can start Minion workers
+by C<< $app->minion->workers->manage() >> see below.
+
+  ..., manage => 1, ...
+
+=head2 tasks = > <hashref>
 
 You can define Minion tasks in config.
 
-  ..., tasks => { foo_task => sub { ... }, },
+  ..., tasks => {foo_task => sub { ... }, ...},
+
+=head2 <backend name: Pg|SQLite|...> => <connection string> | <backend object> | <coderef>
+
+If config parameter B<backend name> is a B<coderef> then returned value (connection string or backend object)
+from callback will reassigned to B<backend name> config option,
+i.e. C<< $conf->{<backend name>} = $conf->{<backend name>}->($app); >>.
+
+  ..., Pg => sub { my $app = shift; ... }, ...
 
 =head1 Manage workers
 
 L<Mojolicious::Plugin::Minion::Workers> add attr B<workers> to the C<< $app->minion >> object.
-C<< $app->minion->workers >> object has following new one public method.
+The C<< $app->minion->workers >> object has following public methods.
 
 =head2 manage(integer amount)
 
@@ -74,28 +92,33 @@ None workers mean skip managment.
 
   $app->minion->workers->manage(2);
 
-Tested on standard commands (on Linux):
+Tested on standard shell commands (on Linux):
 
-  $ perl script/app.pl daemon       # one minion worker will be starting
-  $ perl script/app.pl prefork        # your amount minion workers will be starting
-  $ morbo script/app.pl                 # when morbo restarts on watch changes one minion worker will be restarting too
-  $ hypnotoad script/app.pl           # your amount minion workers will be starting
-  $ hypnotoad script/app.pl           # on hot deploy minion workers will be restarting too
-  $ hypnotoad -s script/app.pl        # minion workers will stoping too
+  $ perl script/app.pl daemon         # one Minion worker will be starting
+  $ perl script/app.pl prefork        # your amount Minion workers will be starting
+  $ morbo script/app.pl               # when morbo restarts on watch changes one Minion worker will be restarting too
+  $ hypnotoad script/app.pl           # your amount Minion workers will be starting
+  $ hypnotoad script/app.pl           # on hot deploy Minion workers will be restarting too
+  $ hypnotoad -s script/app.pl        # Minion workers will stoping too
 
-B<NOTE>. For commands C<$ morbo script/app.pl> and C<$ perl script/app.pl daemon>
-amount workers always one process.
+B<NOTE>. For shell commands C< $ morbo script/app.pl > and C< $ perl script/app.pl daemon >
+amount Minion workers is B<one> process always.
 
-B<NOTE>. In case hypnotoad and C<$ kill -USR2 app_pid> minion workers will not restarts, sorry.
-Always use hot deploy command C<$ hypnotoad script/app.pl>.
+B<NOTE>. In case with hypnotoad if you want C< $ kill -USR2 app_pid >
+then Minion workers will not restarts, sorry.
+Always use hot deploy command C< $ hypnotoad script/app.pl >.
 
-B<BIG NOTE>. When minion workers restarts (hypnotoad | morbo) then B<ALL> exists minion processes stoped.
-So if you run many separate apps with one database backend then dont use this module.
-Or set separate backend databases as well.
+B<BIG NOTE>. When Minion workers restarts (hypnotoad | morbo) then
+B<ALL> exists Minion processes stopped and then running.
+So if you run many separate apps with one database backend
+then dont use this module or set separate backend databases as well.
+
+B<NOTE>. PSGI application did not tested.
 
 =head1 HELPERS
 
-L<Mojolicious::Plugin::Minion::Workers> enable all helpers through base plugin L<Mojolicious::Plugin::Minion>,
+L<Mojolicious::Plugin::Minion::Workers> enable all helpers through
+base plugin L<Mojolicious::Plugin::Minion>,
 thus you dont need apply base plugin (auto register).
 
 =head1 METHODS
@@ -105,7 +128,7 @@ L<Mojolicious::Plugin::Minion> and override the following new ones.
 
 =head2 register
 
-  $plugin->register(Mojolicious->new, {Pg => ..., worker=>1});
+  $plugin->register(Mojolicious->new, <config pairs>);
 
 Register plugin in L<Mojolicious> application.
 
@@ -119,7 +142,8 @@ L<Mojolicious::Plugin::Minion>, L<Minion>, L<Mojolicious::Guides>, L<https://moj
 
 =head1 BUGS / CONTRIBUTING
 
-Please report any bugs or feature requests at L<https://github.com/mche/Mojolicious-Plugin-Minion-Workers/issues>.
+Please report any bugs or feature requests at
+L<https://github.com/mche/Mojolicious-Plugin-Minion-Workers/issues>.
 Pull requests also welcome.
 
 =head1 COPYRIGHT

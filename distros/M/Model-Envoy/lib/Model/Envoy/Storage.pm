@@ -1,6 +1,6 @@
 package Model::Envoy::Storage;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.5.3';
 
 use Moose;
 
@@ -12,7 +12,7 @@ has 'model' => (
 );
 
 sub configure {
-    my ( $class, $conf ) = @_;
+    my ( $plugin_class, $envoy_class, $conf ) = @_;
 
     $conf->{_configured} = 1;
 }

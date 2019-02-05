@@ -1,5 +1,9 @@
 Revision history for MojoX::Log::Dispatch::Simple
 
+1.06      2019-02-04 17:08:39-08:00 America/Los_Angeles
+        - Handle log being passed a coderef (as Mojolicious now does)
+        - Adding Perl versions to test; annual general update for 2018
+
 1.05      2015-07-08 06:41:19-07:00 America/Los_Angeles
         - Fix for silly POD bug
 

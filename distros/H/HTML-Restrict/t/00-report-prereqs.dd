@@ -7,18 +7,26 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.005'
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
+                                      'Code::TidyAll' => '0.71',
+                                      'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
+                                      'Code::TidyAll::Plugin::Test::Vars' => '0.04',
+                                      'Code::TidyAll::Plugin::UniqueLines' => '0.000003',
+                                      'Parallel::ForkManager' => '1.19',
+                                      'Perl::Critic' => '1.132',
+                                      'Perl::Tidy' => '20180220',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::Code::TidyAll' => '0.50',
                                       'Test::More' => '0.96',
+                                      'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Spelling' => '0.12',
                                       'Test::Synopsis' => '0',
-                                      'warnings' => '0'
+                                      'Test::Vars' => '0.014'
                                     }
                     },
        'runtime' => {
@@ -31,12 +39,15 @@ do { my $x = {
                                       'Moo' => '1.002000',
                                       'Scalar::Util' => '0',
                                       'Sub::Quote' => '0',
-                                      'Types::Standard' => '1.000001',
+                                      'Type::Library' => '0',
+                                      'Type::Tiny' => '1.002001',
+                                      'Type::Utils' => '0',
                                       'URI' => '0',
                                       'namespace::clean' => '0',
                                       'perl' => '5.006',
                                       'strict' => '0',
-                                      'version' => '0'
+                                      'version' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -48,8 +59,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0',
-                                   'perl' => '5.006',
-                                   'warnings' => '0'
+                                   'perl' => '5.006'
                                  }
                  }
      };

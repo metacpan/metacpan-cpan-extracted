@@ -10,7 +10,7 @@ use Types::Standard qw( Int slurpy );
 use lib 't/lib';
 use TestClass;
 
-BEGIN { use_ok 'Test::Mocha' }
+use ok 'Test::Mocha';
 
 my $FILE = __FILE__;
 my $mock = mock;

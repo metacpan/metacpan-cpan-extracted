@@ -6,8 +6,6 @@ use utf8;
 
 package App::PDF::Link::Icons;
 
-our $VERSION = "0.01";
-
 use Carp;
 use parent qw(Exporter);
 
@@ -24,6 +22,7 @@ sub _load_icon_images {
 	html	    => 'builtin:iRealPro',
 	sib	    => 'builtin:Sibelius',
 	xml	    => 'builtin:XML',
+	abc	    => 'builtin:ABC',
       );
 
     if ( $env->{all} ) {

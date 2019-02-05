@@ -205,7 +205,9 @@ note ('new_dict_entry');
 }
 
 note ('lookup_value');
-{
+SKIP: {
+  skip 'lookup_value', 3
+    unless Glib->CHECK_VERSION (2, 28, 0);
   my $entries = [map { Glib::Variant->new_dict_entry (Glib::Variant->new_string ($_->[0]),
                                                       Glib::Variant->new_byte ($_->[1])) }
                      (['one' => 1], ['two' => 2], ['four' => 4], ['eight' => 8])];

@@ -1,6 +1,6 @@
 package Test::Mocha::Mock;
 # ABSTRACT: Mock objects
-$Test::Mocha::Mock::VERSION = '0.65';
+$Test::Mocha::Mock::VERSION = '0.66';
 use parent 'Test::Mocha::SpyBase';
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use Test::Mocha::MethodCall;
 use Test::Mocha::MethodStub;
 use Test::Mocha::Util ();
 use Types::Standard   ();
-use UNIVERSAL::ref;
+use if $] lt '5.025', 'UNIVERSAL::ref';
 
 our $AUTOLOAD;
 

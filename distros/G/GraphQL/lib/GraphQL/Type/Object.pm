@@ -82,12 +82,12 @@ sub _build_to_doc {
       $main,
     )
   } $self->_make_fieldtuples($self->fields);
-  my $implements = join ', ', map $_->name, @{ $self->interfaces || [] };
+  my $implements = join ' & ', map $_->name, @{ $self->interfaces || [] };
   $implements &&= 'implements ' . $implements . ' ';
   join '', map "$_\n",
-    ($self->description ? (map "# $_", split /\n/, $self->description) : ()),
+    $self->_description_doc_lines($self->description),
     "type @{[$self->name]} $implements\{",
-      (map "  $_", @fieldlines),
+      (map length() ? "  $_" : "", @fieldlines),
     "}";
 }
 

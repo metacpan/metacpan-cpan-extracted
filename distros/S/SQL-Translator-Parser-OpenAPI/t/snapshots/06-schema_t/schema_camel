@@ -1,0 +1,82 @@
+'
+BEGIN TRANSACTION;
+
+--
+-- Table: Article
+--
+CREATE TABLE Article (
+  body varchar NOT NULL,
+  createdAt datetime NOT NULL,
+  description varchar NOT NULL,
+  id INTEGER PRIMARY KEY NOT NULL,
+  slug varchar NOT NULL,
+  title varchar NOT NULL,
+  updatedAt datetime NOT NULL,
+  author_id int NOT NULL,
+  FOREIGN KEY (author_id) REFERENCES User(id)
+);
+
+CREATE INDEX pk_id ON Article (id);
+
+CREATE INDEX unique_slug ON Article (slug);
+
+CREATE UNIQUE INDEX Article_idx ON Article (slug);
+
+--
+-- Table: Article_tagList
+--
+CREATE TABLE Article_tagList (
+  id INTEGER PRIMARY KEY NOT NULL,
+  value varchar NOT NULL,
+  tagList_id int NOT NULL,
+  FOREIGN KEY (tagList_id) REFERENCES Article(id)
+);
+
+CREATE INDEX pk_id02 ON Article_tagList (id);
+
+--
+-- Table: Comment
+--
+CREATE TABLE Comment (
+  body varchar NOT NULL,
+  createdAt datetime NOT NULL,
+  id INTEGER PRIMARY KEY NOT NULL,
+  updatedAt datetime NOT NULL,
+  author_id int NOT NULL,
+  FOREIGN KEY (author_id) REFERENCES User(id)
+);
+
+CREATE INDEX pk_id03 ON Comment (id);
+
+--
+-- Table: User
+--
+CREATE TABLE User (
+  bio varchar NOT NULL,
+  email varchar NOT NULL,
+  id INTEGER PRIMARY KEY NOT NULL,
+  image varchar NOT NULL,
+  password_hash varchar NOT NULL,
+  username varchar NOT NULL
+);
+
+CREATE INDEX pk_id04 ON User (id);
+
+CREATE INDEX unique_username ON User (username);
+
+CREATE UNIQUE INDEX User_idx ON User (username);
+
+--
+-- Table: User_follow_User_follow
+--
+CREATE TABLE User_follow_User_follow (
+  follow_from_id int NOT NULL,
+  follow_to_id int NOT NULL,
+  PRIMARY KEY (follow_from_id, follow_to_id),
+  FOREIGN KEY (follow_to_id) REFERENCES User(id),
+  FOREIGN KEY (follow_from_id) REFERENCES User(id)
+);
+
+CREATE INDEX pk_follow_from_id_follow_to_id ON User_follow_User_follow (follow_from_id, follow_to_id);
+
+COMMIT;'

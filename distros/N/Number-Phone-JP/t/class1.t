@@ -5,7 +5,6 @@ use_ok('Number::Phone::JP', 'class1');
 
 my $tel = Number::Phone::JP->new;
 ok($tel->set_number('001 12345678')->is_valid_number, 'checking for 001 12345678');
-ok($tel->set_number('0030 12345678')->is_valid_number, 'checking for 0030 12345678');
 ok($tel->set_number('0031 12345678')->is_valid_number, 'checking for 0031 12345678');
 ok($tel->set_number('0032 12345678')->is_valid_number, 'checking for 0032 12345678');
 ok($tel->set_number('0033 12345678')->is_valid_number, 'checking for 0033 12345678');
@@ -50,6 +49,7 @@ ok(!$tel->set_number('006 12345678')->is_valid_number, 'checking for 006 1234567
 ok(!$tel->set_number('007 12345678')->is_valid_number, 'checking for 007 12345678');
 ok(!$tel->set_number('008 12345678')->is_valid_number, 'checking for 008 12345678');
 ok(!$tel->set_number('009 12345678')->is_valid_number, 'checking for 009 12345678');
+ok(!$tel->set_number('0030 12345678')->is_valid_number, 'checking for 0030 12345678');
 ok(!$tel->set_number('0040 12345678')->is_valid_number, 'checking for 0040 12345678');
 ok(!$tel->set_number('0042 12345678')->is_valid_number, 'checking for 0042 12345678');
 ok(!$tel->set_number('0043 12345678')->is_valid_number, 'checking for 0043 12345678');

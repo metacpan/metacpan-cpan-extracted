@@ -75,3 +75,11 @@ Revision history for Perl extension DBD::Ldap.
 	- Make dbd_postamble to actually work
 	- tweak test.pl (remove unneeded "require DBI" stmt).
 	- update META.yml
+1.00 Mon Feb 4 2019
+	- Fix $dbh->connect() method to not apply login-rule parameter if user-name 
+	  is a full DN but still append <ROOT> if it's a relative (single-pair) DN.
+	  This addresses bug#127341.
+	- Make sure blank user-name field is converted to empty in $dbh->connect().
+	- Tweak docs and add examples to better explain user-name and login-rule 
+	  parameters and the $dbh->connect() method to also address bug#127341.
+	- Take the plunge and rename this to v1.00 just for marketing purposes!

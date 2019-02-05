@@ -1,95 +1,96 @@
-'SET foreign_key_checks=0;
+'
+BEGIN TRANSACTION;
 
 --
--- Table: `api_responses`
+-- Table: api_responses
 --
-CREATE TABLE `api_responses` (
-  `code` integer NULL,
-  `id` integer NOT NULL auto_increment,
-  `message` varchar(255) NULL,
-  `type` varchar(255) NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
+CREATE TABLE api_responses (
+  code int,
+  id INTEGER PRIMARY KEY NOT NULL,
+  message varchar,
+  type varchar
 );
 
---
--- Table: `categories`
---
-CREATE TABLE `categories` (
-  `id` bigint NOT NULL auto_increment,
-  `name` varchar(255) NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+CREATE INDEX pk_id ON api_responses (id);
 
 --
--- Table: `orders`
+-- Table: categories
 --
-CREATE TABLE `orders` (
-  `complete` tinyint NULL,
-  `id` bigint NOT NULL auto_increment,
-  `petId` bigint NULL,
-  `quantity` integer NULL,
-  `shipDate` datetime NULL,
-  `status` enum(\'placed\', \'approved\', \'delivered\') NULL comment \'Order Status\',
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
+CREATE TABLE categories (
+  id INTEGER PRIMARY KEY NOT NULL,
+  name varchar
 );
 
---
--- Table: `pets`
---
-CREATE TABLE `pets` (
-  `id` bigint NOT NULL auto_increment,
-  `name` varchar(255) NOT NULL,
-  `status` enum(\'available\', \'pending\', \'sold\') NULL comment \'pet status in the store\',
-  `category_id` bigint NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`category_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `pets_fk` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
-) ENGINE=InnoDB;
+CREATE INDEX pk_id02 ON categories (id);
 
 --
--- Table: `pet_photo_urls`
+-- Table: orders
 --
-CREATE TABLE `pet_photo_urls` (
-  `id` integer NOT NULL auto_increment,
-  `value` varchar(255) NOT NULL,
-  `photoUrl_id` bigint NOT NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`photoUrl_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `pet_photo_urls_fk` FOREIGN KEY (`photoUrl_id`) REFERENCES `pets` (`id`)
-) ENGINE=InnoDB;
-
---
--- Table: `tags`
---
-CREATE TABLE `tags` (
-  `id` bigint NOT NULL auto_increment,
-  `name` varchar(255) NULL,
-  `tag_id` bigint NOT NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`tag_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `tags_fk` FOREIGN KEY (`tag_id`) REFERENCES `pets` (`id`)
-) ENGINE=InnoDB;
-
---
--- Table: `users`
---
-CREATE TABLE `users` (
-  `email` varchar(255) NULL,
-  `firstName` varchar(255) NULL,
-  `id` bigint NOT NULL auto_increment,
-  `lastName` varchar(255) NULL,
-  `password` varchar(255) NULL,
-  `phone` varchar(255) NULL,
-  `userStatus` integer NULL comment \'User Status\',
-  `username` varchar(255) NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
+CREATE TABLE orders (
+  complete bit,
+  id INTEGER PRIMARY KEY NOT NULL,
+  petId bigint,
+  quantity int,
+  shipDate datetime,
+  -- Order Status
+  status enum
 );
 
-SET foreign_key_checks=1;'
+CREATE INDEX pk_id03 ON orders (id);
+
+--
+-- Table: pets
+--
+CREATE TABLE pets (
+  id INTEGER PRIMARY KEY NOT NULL,
+  name varchar NOT NULL,
+  -- pet status in the store
+  status enum,
+  category_id bigint,
+  FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+CREATE INDEX pk_id04 ON pets (id);
+
+--
+-- Table: pet_photo_urls
+--
+CREATE TABLE pet_photo_urls (
+  id INTEGER PRIMARY KEY NOT NULL,
+  value varchar NOT NULL,
+  photoUrl_id bigint NOT NULL,
+  FOREIGN KEY (photoUrl_id) REFERENCES pets(id)
+);
+
+CREATE INDEX pk_id05 ON pet_photo_urls (id);
+
+--
+-- Table: tags
+--
+CREATE TABLE tags (
+  id INTEGER PRIMARY KEY NOT NULL,
+  name varchar,
+  tag_id bigint NOT NULL,
+  FOREIGN KEY (tag_id) REFERENCES pets(id)
+);
+
+CREATE INDEX pk_id06 ON tags (id);
+
+--
+-- Table: users
+--
+CREATE TABLE users (
+  email varchar,
+  firstName varchar,
+  id INTEGER PRIMARY KEY NOT NULL,
+  lastName varchar,
+  password varchar,
+  phone varchar,
+  -- User Status
+  userStatus int,
+  username varchar
+);
+
+CREATE INDEX pk_id07 ON users (id);
+
+COMMIT;'

@@ -16,7 +16,7 @@ use Moose::Util::TypeConstraints;
 use MooseX::Types::Moose qw( Any ArrayRef Int Str );
 use MooseX::Types::Structured qw( Tuple );
 
-BEGIN { use_ok 'Test::Mocha' }
+use ok 'Test::Mocha';
 
 my $mock = mock;
 

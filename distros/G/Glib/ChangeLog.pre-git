@@ -2,7 +2,7 @@
 
 	With the move to git, we stop maintaining a separate ChangeLog and
 	rely on proper commit messages instead.  Web view of changes:
-	<http://git.gnome.org/browse/perl-Glib/>.
+	<https://gitlab.gnome.org/GNOME/perl-glib>
 
 2009-03-31  Torsten Schoenfeld  <kaffeetisch@gmx.de>
 

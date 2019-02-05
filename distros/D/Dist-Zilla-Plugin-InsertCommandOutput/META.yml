@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertCommandOutput
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-InsertCommandOutput
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCommandOutput.git
-version: '0.051'
+version: '0.052'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

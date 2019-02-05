@@ -1,5 +1,13 @@
 Revision history for Perl extension NOLookup
 
+1.14 2019-02-05
+
+     - Added NOLookup::Brreg::DataLookup::lookup_update_dates()
+       to support lookup on update date and update id.
+       The method can be used to find changed organizations.
+     - Various doc. and code simplifications.
+     - Some doc fixes
+
 1.13 2019-01-15
 
      - A few doc fixes

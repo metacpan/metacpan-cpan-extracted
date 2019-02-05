@@ -1,6 +1,10 @@
 Revision history for Types::Mojo
 ================================
 
+0.02  2019-02-05 07:15:00
+
+    + fix list of prereqs in dist.ini
+
 0.01  2019-02-04 10:29:00
 
     + initial release

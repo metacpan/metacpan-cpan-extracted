@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::Author::OALDERS;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use feature qw( say );
 
@@ -86,6 +86,7 @@ sub configure {
                 'Code::TidyAll'                               => '0.71',
                 'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                 'Code::TidyAll::Plugin::Test::Vars'           => '0.04',
+                'Code::TidyAll::Plugin::UniqueLines'          => '0.000003',
                 'Parallel::ForkManager'                       => '1.19',
                 'Perl::Critic'                                => '1.132',
                 'Perl::Tidy'                                  => '20180220',
@@ -184,7 +185,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000020
+version 0.000021
 
 =head2 configure
 

@@ -39,14 +39,6 @@ GraphQL::Type::InputObject - GraphQL input object type
 Has C<name>, C<description> from L<GraphQL::Role::Named>.
 Has C<fields> from L<GraphQL::Role::FieldsInput>.
 
-=head2 interfaces
-
-Optional array-ref of interface type objects implemented.
-
-=cut
-
-has interfaces => (is => 'ro', isa => ArrayRef[InstanceOf['GraphQL::Type::Interface']]);
-
 =head1 METHODS
 
 =head2 is_valid
@@ -113,9 +105,9 @@ sub _build_to_doc {
     )
   } $self->_make_fieldtuples($self->fields);
   join '', map "$_\n",
-    ($self->description ? (map "# $_", split /\n/, $self->description) : ()),
+    $self->_description_doc_lines($self->description),
     "input @{[$self->name]} {",
-      (map "  $_", @fieldlines),
+      (map length() ? "  $_" : "", @fieldlines),
     "}";
 }
 

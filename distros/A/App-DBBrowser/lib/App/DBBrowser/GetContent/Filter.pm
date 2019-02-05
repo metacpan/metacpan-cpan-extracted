@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 
 use Term::Choose       qw( choose );
-use Term::Choose::Util qw( choose_a_subset settings_menu insert_sep );
+use Term::Choose::Util qw( choose_a_subset choose_a_number settings_menu insert_sep );
 
 use App::DBBrowser::Auxil;
 
@@ -27,39 +27,49 @@ sub input_filter {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
     my $backup = [ map { [ @$_ ] } @{$sql->{insert_into_args}} ];
+    my $waiting = 'Working ... ';
+    my $input_cols       = 'Choose_Cols';
+    my $input_rows       = 'Choose_Rows';
+    my $input_rows_range = 'Range_Rows';
+    my $add_col          = 'Add_Col';
+    my $cols_to_rows     = 'Cols_to_Rows';
+    my $empty_to_null    = 'Empty_to_NULL';
+    my $merge_rows       = 'Merge_Rows';
+    my $split_table      = 'Split_Table';
+    my $split_col        = 'Split_Col';
+    my $replace          = 'Search_Replace';
+    my $various          = '>';
+    my $reset            = 'Reset';
     $sf->{empty_to_null} = $default_e2n;
+    my $old_idx = 0;
 
     FILTER: while ( 1 ) {
-        my @pre = ( undef, $sf->{i}{ok} );
-        my $input_cols       = 'Choose_Cols';
-        my $input_rows       = 'Choose_Rows';
-        my $input_rows_range = 'Range_Rows';
-        my $add_col          = 'Add_Col';
-        my $cols_to_rows     = 'Cols_to_Rows';
-        my $empty_to_null    = 'Empty_to_NULL';
-        my $reset            = 'Reset';
-        my $choices = [ @pre, $input_cols, $input_rows, $input_rows_range, $add_col, $cols_to_rows, $empty_to_null, $reset ];
-        my $waiting = 'Working ... ';
         $ax->print_sql( $sql );
+        my @filters = ( $input_cols, $input_rows, $input_rows_range, $add_col, $empty_to_null );
+        my $choices = [  undef, $sf->{i}{ok}, $various, @filters, $reset ];
+        $ENV{TC_RESET_AUTO_UP} = 0;
         # Choose
-        my $filter = $stmt_h->choose(
+        my $idx = $stmt_h->choose(
             $choices,
-            { prompt => 'Filter:' }
+            { prompt => 'Filter:', default => $old_idx, index => 1 }
         );
         $ax->print_sql( $sql, $waiting );
-        if ( ! defined $filter ) {
+        if ( ! $idx ) {
             $sql->{insert_into_args} = [];
             return;
-            #$sql->{insert_into_args} = [ map { [ @$_ ] } @$backup ];
-            #$sf->{empty_to_null} = $default_e2n;
-            #if ( $sf->{empty_to_null} ) {
-            #    $ax->print_sql( $sql, $waiting );
-            #    no warnings 'uninitialized';
-            #    $sql->{insert_into_args} = [ map { [ map { length ? $_ : undef } @$_ ] } @{$sql->{insert_into_args}} ];
-            #}
-            #return 1;
         }
-        elsif ( $filter eq $reset ) {
+        if ( $sf->{o}{G}{menu_memory} ) {
+            if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $old_idx = 0;
+                next FILTER;
+            }
+            else {
+                $old_idx = $idx;
+            }
+        }
+        delete $ENV{TC_RESET_AUTO_UP};
+        my $filter = $choices->[$idx];
+        if ( $filter eq $reset ) {
             $sql->{insert_into_args} = [ map { [ @$_ ] } @$backup ];
             $sf->{empty_to_null} = $default_e2n;
             next FILTER
@@ -81,17 +91,62 @@ sub input_filter {
         elsif ( $filter eq $input_rows_range ) {
             $sf->__range_of_rows( $sql, $waiting );
         }
-        elsif ( $filter eq $cols_to_rows ) {
-            $sf->__transpose_rows_to_cols( $sql );
-        }
+
         elsif ( $filter eq $empty_to_null ) {
             $sf->__empty_to_null();
         }
         elsif ( $filter eq $add_col ) {
             $sf->__add_column( $sql );
         }
+        elsif ( $filter eq $various ) {
+            my $old_idx_v = 0;
+
+            VARIOUS: while ( 1 ) {
+                $ax->print_sql( $sql );
+                my @pre = ( undef );
+                my $choices = [ @pre, $cols_to_rows, $merge_rows, $split_table, $split_col, $replace ];
+                 $ENV{TC_RESET_AUTO_UP} = 0;
+                # Choose
+                my $idx_v = $stmt_h->choose(
+                    $choices,
+                    { prompt => 'Filter:', undef => '<=', index => 1, default => $old_idx_v }
+                );
+                $ax->print_sql( $sql, $waiting );
+                if ( ! $idx_v ) {
+                    next FILTER;
+                }
+                if ( $sf->{o}{G}{menu_memory} ) {
+                    if ( $old_idx_v == $idx_v && ! $ENV{TC_RESET_AUTO_UP} ) {
+                        $old_idx_v = 0;
+                        next VARIOUS;
+                    }
+                    else {
+                        $old_idx_v = $idx_v;
+                    }
+                }
+                delete $ENV{TC_RESET_AUTO_UP};
+                my $filter = $choices->[$idx_v];
+                if ( $filter eq $cols_to_rows ) {
+                    $sf->__transpose_rows_to_cols( $sql );
+                }
+                elsif ( $filter eq $merge_rows ) {
+                    $sf->__merge_rows( $sql, $waiting );
+                }
+                elsif ( $filter eq $split_table ) {
+                    $sf->__split_table( $sql, $waiting );
+                }
+                elsif ( $filter eq $split_col ) {
+                    $sf->__split_column( $sql, $waiting );
+                }
+                elsif ( $filter eq $replace ) {
+                    $sf->__search_and_replace( $sql, $waiting );
+                }
+            }
+        }
+
     }
 }
+
 
 sub __empty_to_null {
     my ( $sf ) = @_;
@@ -123,6 +178,7 @@ sub __choose_columns {
     if ( @$mark == $col_count ) {
         $mark = undef; # no preselect if all cols have entries
     }
+    # Choose
     my $col_idx = choose_a_subset(
         \@{$aoa->[0]},
         { back => '<<', confirm => $sf->{i}{ok}, index => 1, mark => $mark, layout => 0,
@@ -230,6 +286,18 @@ sub __choose_rows {
 
 sub __range_of_rows {
     my ( $sf, $sql, $waiting ) = @_;
+    my $aoa = $sql->{insert_into_args};
+    my ( $first_row, $last_row ) = $sf->__choose_range( $sql, $waiting );
+    if ( ! defined $first_row || ! defined $last_row ) {
+        return;
+    }
+    $sql->{insert_into_args} = [ @{$aoa}[$first_row .. $last_row] ];
+    return;
+}
+
+
+sub __choose_range {
+    my ( $sf, $sql, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aoa = $sql->{insert_into_args};
     my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
@@ -268,8 +336,7 @@ sub __range_of_rows {
         );
         return;
     }
-    $sql->{insert_into_args} = [ @{$aoa}[$first_row .. $last_row] ];
-    return;
+    return $first_row, $last_row;
 }
 
 
@@ -298,6 +365,193 @@ sub __transpose_rows_to_cols {
     $sql->{insert_into_args} = $tmp_aoa;
     return;
 }
+
+
+sub __merge_rows {
+    my ( $sf, $sql, $waiting ) = @_;
+    my ( $first_row, $last_row ) = $sf->__choose_range( $sql, $waiting );
+    if ( ! defined $first_row || ! defined $last_row ) {
+        return;
+    }
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    $ax->print_sql( $sql, $waiting );
+    my $aoa = $sql->{insert_into_args};
+    my $first = 0;
+    my $last = 1;
+    my @rows_to_merge = @{$aoa}[ $first_row .. $last_row ];
+    my $merged = [];
+    for my $col ( 0 .. $#{$rows_to_merge[0]} ) {
+        my @tmp;
+        for my $row ( 0 .. $#rows_to_merge ) {
+            next if ! defined $rows_to_merge[$row][$col];
+            next if $rows_to_merge[$row][$col] =~ /^\s*\z/;
+            $rows_to_merge[$row][$col] =~ s/^\s+|\s+\z//g;
+            push @tmp, $rows_to_merge[$row][$col];
+        }
+        $merged->[$col] = join ' ', @tmp;
+    }
+    my $col_number = 0;
+    my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$merged ];
+    my $trs = Term::Form->new();
+    # Fill_form
+    my $form = $trs->fill_form(
+        $fields,
+        { prompt => 'Edit result:', auto_up => 2, confirm => '  CONFIRM', back => '  BACK   ' }
+    );
+    if ( ! $form ) {
+        return;
+    }
+    $merged = [ map { $_->[1] } @$form ];
+    splice @$aoa, $first_row, ( $last_row - $first_row + 1 ), $merged; # modifies $aoa
+    $sql->{insert_into_args} = $aoa;
+    return;
+}
+
+
+sub __split_table {
+    my ( $sf, $sql, $waiting ) = @_;
+    my $aoa = $sql->{insert_into_args};
+    # Choose
+    my $col_count = choose_a_number(
+        length( scalar @{$aoa->[0]} ),
+        { name => 'Number columns new table: ', small_on_top => 1 }
+    );
+    if ( ! defined $col_count ) {
+        return;
+    }
+    if ( @{$aoa->[0]} < $col_count ) {
+        choose(
+            [ 'Chosen number bigger than the available columns!' ],
+            { %{$sf->{i}{lyt_m}}, prompt => 'Close with ENTER' }
+        );
+        return;
+    }
+    if ( @{$aoa->[0]} % $col_count ) {
+        choose(
+            [ 'The number of available columns cannot be divided by the chosen number without rest!' ],
+            { %{$sf->{i}{lyt_m}}, prompt => 'Close with ENTER' }
+        );
+        return;
+    }
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    $ax->print_sql( $sql, $waiting );
+    my $begin = 0;
+    my $end   = $col_count - 1;
+    my $tmp = [];
+
+    while ( 1 ) {
+        for my $row ( @$aoa ) {
+            push @$tmp, [ @{$row}[ $begin .. $end ] ];
+        }
+        $begin = $end + 1;
+        if ( $begin > $#{$aoa->[0]} ) {
+            last;
+        }
+        $end = $end + $col_count;
+    }
+    $sql->{insert_into_args} = $tmp;
+}
+
+
+sub __split_column {
+    my ( $sf, $sql, $waiting ) = @_;
+    my $aoa = $sql->{insert_into_args};
+    my @pre = ( undef );
+    # Choose
+    my $idx = choose(
+        [ @pre, @{$aoa->[0]} ],
+        { %{$sf->{i}{lyt_m}}, prompt => 'Choose Column:', index => 1 }
+    );
+    if ( ! $idx ) {
+        return;
+    }
+    $idx -= @pre;
+    my $trl = Term::Form->new();
+    # Readline
+    my $sep = $trl->readline( 'Separator: ' );
+    if ( ! defined $sep ) {
+        return;
+    }
+    # Readline
+    my $left_trim = $trl->readline( 'Left trim: ', '\s+' );
+    if ( ! defined $left_trim ) {
+        return;
+    }
+    # Readline
+    my $right_trim = $trl->readline( 'Right trim: ', '\s+' );
+    if ( ! defined $right_trim ) {
+        return;
+    }
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    $ax->print_sql( $sql, $waiting );
+
+    for my $row ( @$aoa ) { # modifies $aoa
+        my $col = splice @$row, $idx, 1;
+        my @split_col = split /$sep/, $col;
+        for my $c ( @split_col ) {
+            $c =~ s/^$left_trim//   if length $left_trim;
+            $c =~ s/$right_trim\z// if length $right_trim;
+        }
+        splice @$row, $idx, 0, @split_col;
+    }
+    $sql->{insert_into_args} = $aoa;
+}
+
+
+sub __search_and_replace {
+    my ( $sf, $sql, $waiting ) = @_;
+
+    my @choices = (  '  s///', '  s///g', '  s///i', '  s///gi' );
+    my @pre = ( undef );
+    # Choose
+    my $type = choose (
+        [ @pre, @choices ],
+        { %{$sf->{i}{lyt_stmt_v}}, prompt => 'Choose:', index => 1 }
+    );
+    if ( ! $type ) {
+        return;
+    }
+    ( my $info = $choices[$type-@pre] ) =~ s/\s+//;
+    my $trl = Term::Form->new();
+    # Readline
+    my $pattern = $trl->readline( 'Pattern: ', { info => $info } );
+    if ( ! defined $pattern ) {
+        return;
+    }
+    $info =~ s/^(s\/)/$1$pattern/;
+    # Readline
+    my $replacement_str = $trl->readline( 'Replacement string: ', { info => $info } );
+    if ( ! defined $replacement_str ) {
+        return;
+    }
+    $info =~ s/(\/[gi]{0,2})\z/$replacement_str$1/;
+    my $aoa = $sql->{insert_into_args};
+    # Choose
+    my $col_idx = choose_a_subset(
+        $aoa->[0],
+        { back => '<<', confirm => $sf->{i}{ok}, index => 1, layout => 0, info => $info, sofar_sep => ',',
+          name => 'Affected Columns: ', clear_screen => 0, mouse => $sf->{o}{table}{mouse} } #
+    );
+    if ( ! defined $col_idx || ! @$col_idx ) {
+        return;
+    }
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    $ax->print_sql( $sql, $waiting );
+
+    for my $row ( @$aoa ) { # modifies $aoa
+        for my $i ( @$col_idx ) {
+            if ( ! defined $row->[$i] ) { next; }
+            elsif ( $type == 1 ) { $row->[$i] =~ s/$pattern/$replacement_str/;   }
+            elsif ( $type == 2 ) { $row->[$i] =~ s/$pattern/$replacement_str/g;  }
+            elsif ( $type == 3 ) { $row->[$i] =~ s/$pattern/$replacement_str/i;  }
+            elsif ( $type == 4 ) { $row->[$i] =~ s/$pattern/$replacement_str/gi; }
+        }
+    }
+    $sql->{insert_into_args} = $aoa;
+}
+
+
+
 
 
 

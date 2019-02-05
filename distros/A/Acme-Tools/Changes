@@ -2,11 +2,13 @@ Revision history for Perl extension Acme::Tools.
 
 See also HISTORY in Acme::Tools doc.
 
-0.23  Jan 2019   subs: logn, egrep, which. More UTF-8 "oriented" (lower, upper, ...)
+0.24  Feb 2019   Fixed failes on perl5.16 and older
+
+0.23  Jan 2019   Subs: logn, egrep, which. More UTF-8 "oriented" (lower, upper, ...)
                  Commands: zsize, finddup, due (improved), conv (improved, [MGT]?Wh
                  and many more units), due -M for stdin of filenames.
 
-0.22  Feb 2018   subs: subarr, sim, sim_perm, aoh2sql. command: resubst
+0.22  Feb 2018   Subs: subarr, sim, sim_perm, aoh2sql. command: resubst
 
 0.21  Mar 2017   Improved nicenum() and its tests
 
@@ -17,7 +19,7 @@ See also HISTORY in Acme::Tools doc.
 
 0.172 Dec 2015   Subs: curb openstr pwgen sleepms sleepnm srlz tms username
                   self_update install_acme_command_tools
-                  Commands: conv due freq wipe xcat (see "Commands")
+                 Commands: conv due freq wipe xcat (see "Commands")
 
 0.16  Feb 2015   bigr curb cpad isnum parta parth read_conf resolve_equation
                  roman2int trim. Improved: conv (numbers currency) range ("derivatives")

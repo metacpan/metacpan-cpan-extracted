@@ -1,77 +1,82 @@
-'SET foreign_key_checks=0;
+'
+BEGIN TRANSACTION;
 
 --
--- Table: `articles`
+-- Table: articles
 --
-CREATE TABLE `articles` (
-  `body` varchar(255) NOT NULL,
-  `createdAt` datetime NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `favorited` tinyint NOT NULL,
-  `favoritesCount` integer NOT NULL,
-  `id` integer NOT NULL auto_increment,
-  `slug` varchar(255) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `updatedAt` datetime NOT NULL,
-  `author_id` integer NOT NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`author_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `articles_fk` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE articles (
+  body varchar NOT NULL,
+  createdAt datetime NOT NULL,
+  description varchar NOT NULL,
+  id INTEGER PRIMARY KEY NOT NULL,
+  slug varchar NOT NULL,
+  title varchar NOT NULL,
+  updatedAt datetime NOT NULL,
+  author_id int NOT NULL,
+  FOREIGN KEY (author_id) REFERENCES users(id)
+);
+
+CREATE INDEX pk_id ON articles (id);
+
+CREATE INDEX unique_slug ON articles (slug);
+
+CREATE UNIQUE INDEX articles_idx ON articles (slug);
 
 --
--- Table: `article_tag_lists`
+-- Table: article_tag_lists
 --
-CREATE TABLE `article_tag_lists` (
-  `id` integer NOT NULL auto_increment,
-  `value` varchar(255) NOT NULL,
-  `tagList_id` integer NOT NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`tagList_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `article_tag_lists_fk` FOREIGN KEY (`tagList_id`) REFERENCES `articles` (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE article_tag_lists (
+  id INTEGER PRIMARY KEY NOT NULL,
+  value varchar NOT NULL,
+  tagList_id int NOT NULL,
+  FOREIGN KEY (tagList_id) REFERENCES articles(id)
+);
+
+CREATE INDEX pk_id02 ON article_tag_lists (id);
 
 --
--- Table: `comments`
+-- Table: comments
 --
-CREATE TABLE `comments` (
-  `body` varchar(255) NOT NULL,
-  `createdAt` datetime NOT NULL,
-  `id` integer NOT NULL auto_increment,
-  `updatedAt` datetime NOT NULL,
-  `author_id` integer NOT NULL,
-  INDEX `pk_id` (`id`),
-  INDEX (`author_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `comments_fk` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE comments (
+  body varchar NOT NULL,
+  createdAt datetime NOT NULL,
+  id INTEGER PRIMARY KEY NOT NULL,
+  updatedAt datetime NOT NULL,
+  author_id int NOT NULL,
+  FOREIGN KEY (author_id) REFERENCES users(id)
+);
+
+CREATE INDEX pk_id03 ON comments (id);
 
 --
--- Table: `users`
+-- Table: users
 --
-CREATE TABLE `users` (
-  `bio` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `id` integer NOT NULL auto_increment,
-  `image` varchar(255) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE users (
+  bio varchar NOT NULL,
+  email varchar NOT NULL,
+  id INTEGER PRIMARY KEY NOT NULL,
+  image varchar NOT NULL,
+  password_hash varchar NOT NULL,
+  username varchar NOT NULL
+);
+
+CREATE INDEX pk_id04 ON users (id);
+
+CREATE INDEX unique_username ON users (username);
+
+CREATE UNIQUE INDEX users_idx ON users (username);
 
 --
--- Table: `user_follow_user_follows`
+-- Table: user_follow_user_follows
 --
-CREATE TABLE `user_follow_user_follows` (
-  `follow_from_id` integer NOT NULL,
-  `follow_to_id` integer NOT NULL,
-  INDEX `pk_follow_from_id_follow_to_id` (`follow_from_id`, `follow_to_id`),
-  PRIMARY KEY (`follow_from_id`, `follow_to_id`),
-  CONSTRAINT `user_follow_user_follows_fk` FOREIGN KEY (`follow_to_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `user_follow_user_follows_fk_1` FOREIGN KEY (`follow_from_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB;
+CREATE TABLE user_follow_user_follows (
+  follow_from_id int NOT NULL,
+  follow_to_id int NOT NULL,
+  PRIMARY KEY (follow_from_id, follow_to_id),
+  FOREIGN KEY (follow_to_id) REFERENCES users(id),
+  FOREIGN KEY (follow_from_id) REFERENCES users(id)
+);
 
-SET foreign_key_checks=1;'
+CREATE INDEX pk_follow_from_id_follow_to_id ON user_follow_user_follows (follow_from_id, follow_to_id);
+
+COMMIT;'

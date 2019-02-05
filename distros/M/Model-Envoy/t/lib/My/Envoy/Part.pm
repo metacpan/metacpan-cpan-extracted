@@ -9,7 +9,7 @@ package My::Envoy::Part;
     has 'id' => (
         is => 'ro',
         isa => 'Num',
-        traits => ['DBIC'],
+        traits => ['Envoy','DBIC'],
         primary_key => 1,
 
     );
@@ -17,13 +17,13 @@ package My::Envoy::Part;
     has 'name' => (
         is => 'rw',
         isa => 'Maybe[Str]',
-        traits => ['DBIC'],
+        traits => ['Envoy','DBIC'],
     );
 
     has 'widget' => (
         is => 'rw',
         isa => 'Maybe[My::Envoy::Widget]',
-        traits => ['DBIC','Envoy'],
+        traits => ['Envoy','DBIC'],
         rel => 'belongs_to',
     );
 

@@ -39,7 +39,9 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON::Validator" : "2.01",
+            "Hash::Merge" : "0",
+            "Hash::MoreUtils" : "0.06",
+            "JSON::Validator::OpenAPI::Mojolicious" : "0",
             "Lingua::EN::Inflect::Number" : "0",
             "Math::BigInt" : "0",
             "SQL::Translator" : "0.11024",
@@ -50,7 +52,6 @@
       },
       "test" : {
          "requires" : {
-            "Hash::Merge" : "0",
             "Test::More" : "0.98",
             "Test::Snapshot" : "0.02",
             "YAML::XS" : "0.67"
@@ -71,6 +72,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

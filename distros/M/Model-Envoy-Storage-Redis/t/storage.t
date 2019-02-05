@@ -39,6 +39,13 @@ subtest "Saving a Model" => sub {
 
 };
 
+subtest "listing Models" => sub {
+
+    my $test2 = $widgets->list( id => 1 );
+
+    is( $test2, undef, 'unimplemented' );
+};
+
 subtest "Fetching a Model" => sub {
 
     my $test2 = $widgets->fetch(2);

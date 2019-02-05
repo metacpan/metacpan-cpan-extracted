@@ -12,7 +12,7 @@ use Mojo::Pg::Transaction;
 my $handler_err = sub {$_[0] = shortmess $_[0]; 0;};
 has handler_err => sub {$handler_err};
 has results_class => 'Mojo::Pg::Che::Results';
-has debug => sub { shift->pg->debug };
+has debug => 0;
 
 my $PKG = __PACKAGE__;
 
@@ -20,8 +20,7 @@ sub query { shift->select(@_) }
 
 sub execute_sth {
   my ($self, $sth,) = map shift, 1..2;
-  #~ warn "execute_sth: ", $self->dbh;
-  
+
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   
   #~ croak 'Previous async query has not finished'
@@ -61,15 +60,11 @@ sub prepare {
   my ($self, $query, $attrs,)  = @_;
   
   my $dbh = $self->dbh;
-  
-  #~ $attrs->{pg_async} = PG_ASYNC
-    #~ if delete $attrs->{Async};
 
   my $sth = delete $attrs->{Cached}
     ? $dbh->prepare_cached($query, $attrs, 3)
     : $dbh->prepare($query, $attrs);
-  
-  #~ $sth->{private_mojo_db} = $self;
+
   return $sth;
 }
 
@@ -77,7 +72,7 @@ sub prepare_cached {
   my $self = shift;
   
   my $sth = $self->dbh->prepare_cached(@_);
-  #~ $sth->{private_mojo_db} = $self;
+
   return $sth;
 }
 
@@ -152,10 +147,7 @@ sub _DBH_METHOD {
     if $sth && $attrs->{pg_async};
 
   $sth ||= $self->prepare($query, $attrs);
-  
-  #~ $cb ||= $self->_async_cb()
-    #~ if $attrs->{pg_async};
-  
+
   my @bind = @_;
   
   my @result = $self->execute_sth($sth, @bind, $cb ? ($cb) : ());# 

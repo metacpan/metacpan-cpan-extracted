@@ -17,15 +17,16 @@ WriteMakefile(
     'Test::More' => '0.98',
     'Test::Snapshot' => '0.02', # better snapshot filenames
     'YAML::XS' => '0.67', # YAML loader used by JV
-    'Hash::Merge' => '0',
   },
   PREREQ_PM => {
     'SQL::Translator' => '0.11024', # 0.11021 gives YAML diffs on "comments"
-    'JSON::Validator' => '2.01', # fqn bundle fix
+    'JSON::Validator::OpenAPI::Mojolicious' => '0', # after pointless zapping of ::OpenAPI from J::V
     'String::CamelCase' => '0',
     'SQL::Translator::Schema::Constants' => 0,
     'Lingua::EN::Inflect::Number' => '0',
     'Math::BigInt' => '0',
+    'Hash::MoreUtils' => '0.06',
+    'Hash::Merge' => '0',
   },
   clean => { FILES => 'SQL-Translator-Parser-OpenAPI-*' },
   META_MERGE => {

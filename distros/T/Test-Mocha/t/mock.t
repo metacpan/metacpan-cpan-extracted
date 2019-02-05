@@ -4,10 +4,9 @@ use strict;
 use warnings;
 
 use Test::More tests => 12;
-
-BEGIN { use_ok 'Test::Mocha' }
-
 use Scalar::Util qw( blessed );
+
+use ok 'Test::Mocha';
 
 # ----------------------
 # creating a mock

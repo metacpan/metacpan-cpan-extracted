@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::PkgConfig: '1'
   Glib: '1.32'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,5 +37,5 @@ resources:
   homepage: http://gtk2-perl.sourceforge.net
   license: http://www.gnu.org/licenses/lgpl-2.1.html
   repository: https://gitlab.gnome.org/GNOME/perl-glib-object-introspection
-version: '0.046'
+version: '0.047'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

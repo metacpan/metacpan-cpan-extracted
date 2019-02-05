@@ -1,6 +1,8 @@
 #! perl
 
-use Test::More tests => 10;
+use strict;
+use warnings;
+use Test::More tests => 11;
 
 BEGIN {
 	use_ok( 'PDF::API2' );
@@ -15,16 +17,17 @@ App::PDF::Link::Icons::_load_icon_images( {}, $pdf );
 my $icons = App::PDF::Link::Icons::__icons();
 
 ok( defined $icons->{mscz}, "Got MuseScore icon" );
-ok( defined $icons->{html}, "Got iRealPro icon" );
-ok( defined $icons->{sib},  "Got Sibelius icon" );
-ok( defined $icons->{xml},  "Got MusicXML icon" );
+ok( defined $icons->{html}, "Got iRealPro icon"  );
+ok( defined $icons->{sib},  "Got Sibelius icon"  );
+ok( defined $icons->{xml},  "Got MusicXML icon"  );
+ok( defined $icons->{abc},  "Got ABC icon"       );
 
 App::PDF::Link::Icons::_load_icon_images( { all => 1 }, $pdf );
 
 $icons = App::PDF::Link::Icons::__icons();
 
-my $xp = 9 + 23;
-ok( keys(%$icons) == $xp, "Got all $xp icons" );
+my $xp = 9 + 24;
+ok( keys(%$icons) == $xp, "Got all @{[scalar(keys(%$icons))]} icons" );
 
 my $i = App::PDF::Link::Icons::get_icon( {}, $pdf, "html" );
 

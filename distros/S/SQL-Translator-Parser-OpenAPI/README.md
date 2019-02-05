@@ -23,25 +23,26 @@ SQL::Translator::Parser::OpenAPI - convert OpenAPI schema to SQL::Translator sch
     # or...
     $ sqlt -f OpenAPI -t MySQL <my-openapi.json >my-mysqlschema.sql
 
+    # or, applying an overlay:
+    $ perl -MHash::Merge=merge -Mojo \
+      -e 'print j merge map j(f($_)->slurp), @ARGV' \
+        t/06-corpus.json t/06-corpus.json.overlay |
+      sqlt -f OpenAPI -t MySQL >my-mysqlschema.sql
+
 # DESCRIPTION
 
 This module implements a [SQL::Translator::Parser](https://metacpan.org/pod/SQL::Translator::Parser) to convert
-a [JSON::Validator::OpenAPI](https://metacpan.org/pod/JSON::Validator::OpenAPI) specification to a [SQL::Translator::Schema](https://metacpan.org/pod/SQL::Translator::Schema).
+a [JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON::Validator::OpenAPI::Mojolicious) specification to a [SQL::Translator::Schema](https://metacpan.org/pod/SQL::Translator::Schema).
 
 It uses, from the given API spec, the given "definitions" to generate
 tables in an RDBMS with suitable columns and types.
 
 To try to make the data model represent the "real" data, it applies heuristics:
 
-- to remove object definitions that only have one property (which the
-author calls "thin objects"), or that have two properties, one of whose
-names has the substring "count" (case-insensitive).
+- to remove object definitions considered non-fundamental; see
+["definitions\_non\_fundamental"](#definitions_non_fundamental).
 - for definitions that have `allOf`, either merge them together if there
 is a `discriminator`, or absorb properties from referred definitions
-- to find object definitions that have all the same properties as another,
-and remove all but the shortest-named one
-- to remove object definitions whose properties are a strict subset
-of another
 - creates object definitions for any properties that are an object
 - creates object definitions for any properties that are an array of simple
 OpenAPI types (e.g. `string`)
@@ -55,7 +56,11 @@ creates many-to-many tables for any two-way array relationships
 
 # ARGUMENTS
 
-None at present.
+## snake\_case
+
+If true, will create table names that are not the definition names, but
+instead the pluralised snake\_case version, in line with SQL convention. By
+default, the tables will be named after simply the definitions.
 
 # PACKAGE FUNCTIONS
 
@@ -96,7 +101,43 @@ in the definitions. Not exported. E.g.
       d2 => (1 << 1) | (1 << 2),
     }
 
+## definitions\_non\_fundamental
+
+Given the `definitions` of an OpenAPI spec, will return a hash-ref
+mapping names of definitions considered non-fundamental to a
+value. The value is either the name of another definition that _is_
+fundamental, or or `undef` if it just contains e.g. a string. It will
+instead be a reference to such a value if it is to an array of such.
+
+This may be used e.g. to determine the "real" input or output of an
+OpenAPI operation.
+
+Non-fundamental is determined according to these heuristics:
+
+- object definitions that only have one property (which the author calls
+"thin objects"), or that have two properties, one of whose names has
+the substring "count" (case-insensitive).
+- object definitions that have all the same properties as another, and
+are not the shortest-named one between the two.
+- object definitions whose properties are a strict subset of another.
+
 # OPENAPI SPEC EXTENSIONS
+
+## `x-id-field`
+
+Under `/definitions/$defname`, a key of `x-id-field` will name a
+field within the `properties` to be the unique ID for that entity.
+If it is not given, the `id` field will be used if in the spec, or
+created if not.
+
+This will form the ostensible "key" for the generated table. If the
+key used here is an integer type, it will also be the primary key,
+being a suitable "natural" key. If not, then a "surrogate" key (with a
+generated name starting with `_relational_id`) will be added as the primary
+key. If a surrogate key is made, the natural key will be given a unique
+constraint and index, making it still suitable for lookups. Foreign key
+relations will however be constructed using the relational primary key,
+be that surrogate if created, or natural.
 
 ## `x-view-of`
 
@@ -144,4 +185,4 @@ it under the same terms as Perl itself.
 
 [SQL::Translator::Parser](https://metacpan.org/pod/SQL::Translator::Parser).
 
-[JSON::Validator::OpenAPI](https://metacpan.org/pod/JSON::Validator::OpenAPI).
+[JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON::Validator::OpenAPI::Mojolicious).

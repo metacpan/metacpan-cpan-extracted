@@ -4,7 +4,6 @@ author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Hash::Merge: '0'
   Test::More: '0.98'
   Test::Snapshot: '0.02'
   YAML::XS: '0.67'
@@ -22,7 +21,9 @@ no_index:
     - t
     - inc
 requires:
-  JSON::Validator: '2.01'
+  Hash::Merge: '0'
+  Hash::MoreUtils: '0.06'
+  JSON::Validator::OpenAPI::Mojolicious: '0'
   Lingua::EN::Inflect::Number: '0'
   Math::BigInt: '0'
   SQL::Translator: '0.11024'
@@ -34,5 +35,5 @@ resources:
   bugtracker: https://github.com/mohawk2/SQL-Translator-Parser-OpenAPI/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/mohawk2/SQL-Translator-Parser-OpenAPI
-version: '0.05'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

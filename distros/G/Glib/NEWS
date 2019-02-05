@@ -1,3 +1,9 @@
+Overview of changes in Glib 1.329 (stable)
+============================================
+
+* Fix compilation and testing against glib < 2.28.0 (RT# 127831)
+* ChangeLog.pre-git/README: Updated Git URIs
+
 Overview of changes in Glib 1.328 (stable)
 ============================================
 

@@ -65,7 +65,7 @@ Revision history for Perl extension DBD::Sprite.
 	  CaseTableNames was set (CaseTableNames only applies to the file-name).
 	  Also added code to display "$@" and "$?" in the error details message on 
 	  -511 errors (could not [over]write file).
-0.21	 Wed Sep 12, 2001
+0.21  Wed Sep 12, 2001
 	- Fixed AutoCommit to actually work.  Caught by Jojo Kamote Escubil, Thanks,
 	  Jojo!  Also fixed another bug affecting quoted value strings containing 
 	  question marks (Caught by me!)
@@ -99,7 +99,7 @@ Revision history for Perl extension DBD::Sprite.
 	  It should be noted that these functions do almost no error-checking.
 	- Added "AUTONUMBER" datatype to allow autonumbering without sequences.  
 	  This emulates the way M$-Access(ODBC) does things.
-0.27	 Fri Nov 15, 2001
+0.27  Fri Nov 15, 2001
 	- Eliminated "reserved" status of special characters \x02 .. \x06 and \n 
 	  by now using single "reserved" string pattern:  "\x02\^#jSpR1tE\x02", 
 	  where "#" can be any digit 0..9.  The purpose of this is to allow for 
@@ -215,7 +215,7 @@ Revision history for Perl extension DBD::Sprite.
 	  Traditional behavior was to convert all field names to upper-case as 
 	  does Oracle(tm).  This is similar to the "sprite_CaseTableNames" option 
 	  for table names.
-0.40	 Tue Jul 9
+0.40  Tue Jul 9
 	- Fixed restriction which prevented one from sorting on fields not in the 
 	  selected result-set.
 	- Added multiple ascending/descending selection to the sort "order by" 
@@ -226,7 +226,7 @@ Revision history for Perl extension DBD::Sprite.
 	  WERE broken since both would sort in descending order!  Now it works like 
 	  Oracle where field1 will sort ascending and within that, field2 sorts 
 	  descending.
-0.41	Fri Aug 16
+0.41  Fri Aug 16
 	- Fixed bug resulting from a missing "require" stmt that returned error 
 	  when unencoding base64-encoded values in XML tables.
 0.42  Thu Sep 5
@@ -235,7 +235,7 @@ Revision history for Perl extension DBD::Sprite.
 	  The former are incremented by a call to "sequencename".NEXTVAL in a query, 
 	  the latter are incremented by inserting NULL into a "AUTONUMBER" field 
 	  in an "INSERT" query.
-0.43	 Thu Oct 24
+0.43  Thu Oct 24
 	- Fixed problem with error-handling with DBI when DBI->connect() fails.
 	  Sprite now calls "warn" if "PrintError" is in effect and returns error 
 	  code and string separated by a colon in "$_", if DBI->connect() fails. 
@@ -249,7 +249,7 @@ Revision history for Perl extension DBD::Sprite.
 	  and sql.pl to change my existing text tables to the new XML format.
 	- Added code to "drop()" (drop table) function to make sure no dangling 
 	  data is left in memory from the dropped table.
-0.44	 Tue Feb 11
+0.44  Tue Feb 11
 	- Fixed 2 bugs related to the "sprite_CaseFieldNames" option.  First, the 
 	  option did not work with the "xml" option.  Second, the option precedence 
 	  was wrong -- Options specified in the connect() method should override 
@@ -298,7 +298,7 @@ Revision history for Perl extension DBD::Sprite.
 	  to "CURRVAL".  Caught by Steven Bray.
 	- Fixed variable declaration buglet which "masked earlier declaration".
 	  Caught by Steven Bray.  Thanks, Steven.
-0.55	 Fri Apr 29 2005
+0.55  Fri Apr 29 2005
 	- Fixed bug that caused single-quotes enclosed in variables bound to 
 	  placeholders to fail and or seg-fault.
 	- Fixed bug that caused single-quotes in in-line where-cluse values 
@@ -344,3 +344,13 @@ Revision history for Perl extension DBD::Sprite.
 	  to N records AFTER sorting and works as it would in other databases.  
 	  For compatibility, this can also be specified in the options hash in 
 	  PREPARE statements as "sprite_actlimit" ("actual limit").
+6.11  Tue Jan 19 2015
+	- Changed test.pl (make test) to not assume Perl is in or symlinked in 
+	  /usr/bin/ to stop make test from failing on step 2 (cant invoke 
+	  makesdb.pl) in non-Windows systems (In Windows systems it was already 
+	  handling it the new way).  Hopefully to get the CPAN Testers off my 
+	  back (since they keep Perl in a wierd place w/o a symlink in 
+	  /usr/bin/). :D  Also some POD improvements to reflect modern features.
+6.12  Mon Feb 04 2019
+	- Tweak Makefile.PL to make dbd_postamble to actually work, & clean up.
+	  (Found this issue after addressing bug#127341 against DBD::LDAP).

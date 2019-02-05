@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 #use Test::More;
-use Acme::Tools 0.22;
+use Acme::Tools 0.24;
+#todo: faster make test, group some *.t together, 6s is too long
 sub deb($) { print STDERR @_ if $ENV{ATDEBUG} }
 sub tmp    { require File::Temp;File::Temp::tempdir(CLEANUP=>$ENV{ATDEBUG}?0:1,@_) }
 sub ok_ca  { ok( abs( 1 - $_[0]/$_[1] ) < 1e-4, $_[2]) }

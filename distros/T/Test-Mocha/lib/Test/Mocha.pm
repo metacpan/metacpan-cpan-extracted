@@ -1,6 +1,6 @@
 package Test::Mocha;
 # ABSTRACT: Test double framework with method stubs and behaviour verification
-$Test::Mocha::VERSION = '0.65';
+$Test::Mocha::VERSION = '0.66';
 
 use strict;
 use warnings;
@@ -264,7 +264,7 @@ Test::Mocha - Test double framework with method stubs and behaviour verification
 
 =head1 VERSION
 
-version 0.65
+version 0.66
 
 =head1 SYNOPSIS
 

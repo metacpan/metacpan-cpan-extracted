@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.053';
+our $VERSION = '2.054';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.053
+Version 2.054
 
 =cut
 
@@ -322,10 +322,6 @@ Add an empty column: adds a column to the header row and adjusts the remaining r
 
 If the input has rows with different numbers of columns, use first I<Choose Rows> to select the rows to use.
 
-=item Cols_to_Rows
-
-Transpose columns to rows.
-
 =item Empty_to_NULL
 
 Convert fields containing an empty string to NULL (undefined).
@@ -335,6 +331,57 @@ With I<Plain> and I<Copy & Paste> this filter is enabled by default.
 =item Reset
 
 Reset the filters to the default values.
+
+
+=item Cols_to_Rows
+
+Transpose columns to rows.
+
+     Year | 2000 | 2001 | 2002              Year | Max | Min
+    ------|------|------|------             -----|-----|----
+     Max  |   14 |   22 |   17              2000 |  14 |  11
+    ------|------|------|------             2001 |  22 |  10
+     Min  |   11 |   10 |    9              2002 |  17 |   9
+
+=item Merge_Rows
+
+     Month | Average | Average              Month | Average MinTemp | Average MaxTemp
+    -------|---------|---------             ------|-----------------|----------------
+           | MinTemp | MaxTemp              Jan   |               9 |              22
+    -------|---------|---------             Feb   |              10 |              23
+     Jan   |       9 |      22
+    -------|---------|---------
+     Feb   |      10 |      23
+
+=item Split_Table
+
+     y  | factor  | y  | factor             y  | factor
+    ----|---------|----|---------           ---|--------
+     62 | 8,975.1 | 64 | 9,986.5            62 | 8,975.1
+    ----|---------|----|---------           63 | 9,745.8
+     63 | 9,745.8 | 65 | 9,782.7            y  | factor
+                                            64 | 9,818.2
+                                            65 | 9,986.5
+
+=item Split_Col
+
+     Item | length/width/heigh              Item | length | width | heigh
+    ------|--------------------             -----|--------|-------|------
+      423 | 40/30/25                         423 |     40 |    30 |    25
+    ------|--------------------               64 |     80 |    60 |    30
+       64 | 80/60/30                         705 |     50 |    50 |    40
+    ------|--------------------
+      705 | 50/50/40
+
+=item Search_Replace
+
+     y  | factor                            y  | factor
+    ----|---------                          ---|-------
+     62 | 8,975.1                           62 | 8975.1
+    ----|---------                          63 | 9745.8
+     63 | 9,745.8                           64 | 9818.2
+    ----|---------
+     64 | 9,818.2
 
 =back
 

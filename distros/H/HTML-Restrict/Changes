@@ -1,5 +1,14 @@
 Revision history for HTML-Restrict
 
+v2.4.1    2019-02-05 14:13:16Z
+        - Bump version of Type::Tiny to 1.002001. (GH#33) (Olaf Alders).  Issue
+          reported by Slaven Rezić (GH#32).
+
+v2.4.0    2019-02-05 02:51:05Z
+        - Process text until it returns the same value twice. (GH#31) (Olaf
+          Alders).  Issue raised in (GH#29) by Juraj Major.
+        - Add max_parser_loops attribute
+
 v2.3.0    2018-02-09 16:00:41Z
         - Add code filters for attribute values (GH#27) (Graham Knop)
 

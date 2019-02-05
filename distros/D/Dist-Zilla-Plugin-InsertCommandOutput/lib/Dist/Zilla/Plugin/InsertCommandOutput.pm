@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::InsertCommandOutput;
 
 our $DATE = '2019-02-04'; # DATE
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +32,7 @@ sub munge_file {
     my $content = $file->content;
     if ($content =~ s{^#\s*COMMAND:\s*(.*)\s*$}{$self->_command_output($1)."\n"}egm) {
         $self->log(["inserting output of command '%s' in %s", $1, $file->name]);
-        $self->log_debug(["output of command: %s", $file->content]);
+        $self->log_debug(["output of command: %s", $content]);
         $file->content($content);
     }
 }
@@ -66,7 +66,7 @@ Dist::Zilla::Plugin::InsertCommandOutput - Insert the output of command into you
 
 =head1 VERSION
 
-This document describes version 0.051 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2019-02-04.
+This document describes version 0.052 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2019-02-04.
 
 =head1 SYNOPSIS
 

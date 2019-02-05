@@ -18,18 +18,24 @@ my @module_methods = (
        warning
 
        map_json_entries
+
        next_page
+       cur_page
+       prev_page
+       total_page_count
+
+       result_count
+       total_result_count
 
     /);
 
-# note: orgnr is inserted to be compatible with
-# Difi entry name
+
+# Brreg entry name
 my @json_data_methods = ( 
     
     # number and name
     qw /
        organisasjonsnummer
-       orgnr
        navn
        oppdateringsid
     /,
@@ -56,7 +62,6 @@ my @json_data_methods = (
        registrertIFrivillighetsregisteret
        registrertIMvaregisteret
        registrertIForetaksregisteret
-       frivilligRegistrertIMvaregisteret
        underAvvikling
        konkurs
        underTvangsavviklingEllerTvangsopplosning
@@ -72,7 +77,7 @@ my @json_data_methods = (
        naeringskode2
        naeringskode3
        _links
-       orgform
+       page
        organisasjonsform
     /,
 
@@ -80,7 +85,13 @@ my @json_data_methods = (
     qw /
        hjemmeside
        antallAnsatte
-    / 
+    /,
+
+    # Arrays
+    qw / 
+       frivilligMvaRegistrertBeskrivelser
+    /
+    
     );
 
 # The new method and also the accessor methods
@@ -103,63 +114,61 @@ sub map_json_entries {
         push @aj, $json;
 
     } elsif ($json->{_embedded} && $json->{_embedded}->{enheter}) {
-        # multiple entries V2
+        # multiple entries
         push @aj, @{$json->{_embedded}->{enheter}};
 
     } elsif ($json->{_embedded} && $json->{_embedded}->{underenheter}) {
-        # multiple entries V2
+        # multiple entries
         push @aj, @{$json->{_embedded}->{underenheter}};
 
     } elsif ($json->{_embedded} && $json->{_embedded}->{oppdaterteEnheter}) {
-        # multiple updated entries V2
+        # multiple updated entries
         push @aj, @{$json->{_embedded}->{oppdaterteEnheter}};
 
     } elsif ($json->{_embedded} && $json->{_embedded}->{oppdaterteUnderenheter}) {
-        # multiple updated entries V2
+        # multiple updated entries
         push @aj, @{$json->{_embedded}->{oppdaterteUnderenheter}};
 
-    } elsif ($json->{data}) {
-        # multiple entries V1
-        push @aj, @{$json->{data}};
     }
+
+    # count the current posts
+    $self->result_count(scalar  @aj);
     
-    # Check entry array for supported keys
-    # set a warning if some are not expected
+    #print STDERR "Entry self: ", Dumper $self;
+
+    if ($json->{page}) {
+        # page data
+        #print STDERR "page entry: ", Dumper $json->{page};
+
+	$self->total_result_count($json->{page}->{totalElements});
+	$self->cur_page($json->{page}->{number});
+	$self->total_page_count($json->{page}->{totalPages});
+	    
+	$self->prev_page(undef);
+	$self->next_page(undef);
+
+	if ($self->cur_page > 0) {
+	    $self->prev_page($self->cur_page - 1);
+	}
+	if ($self->total_page_count > $self->cur_page) {
+	    $self->next_page($self->cur_page + 1);
+	}
+    }
+
+    # Mape found orgs into NOLookup::Brreg::Entry objects
     foreach my $ej (@aj) {
         foreach my $k (keys %$ej) {
+	    # Check entry array for supported keys
+	    # set a warning if some are not expected
             unless ($self->can($k)) {
                 $self->status($self->status . "JSON data key entry not expected: $k\n");
                 $self->warning(1);
             }
         }
         my $eo = NOLookup::Brreg::Entry->new($ej);
-        $eo->orgnr($eo->organisasjonsnummer);  
         push @ao, $eo;
     }
-    # Set next link page if more pages are present
 
-    $self->next_page(undef);
-    
-    if ($json->{links}) {
-        # V1 entry
-        #print STDERR "V1 json entry: ", Dumper $json;
-        foreach my $l (@{$json->{links}}) {
-            if ($l->{rel} eq 'next') {
-                $self->next_page($l->{href});
-            }
-        }
-
-    } elsif ($json->{_links}) {
-
-        #print STDERR "V2 json entry: ", Dumper $json;
-        # V2 entry
-        if ($json->{_links}->{next}) {
-            $self->next_page($json->{_links}->{next}->{href});
-            #print STDERR "self entry: ", Dumper $self;
-            #exit;
-        }
-    }
-    
     # return a ref to the data array
     return \@ao;
  }    
@@ -215,10 +224,22 @@ data objects.
 
 Returns a ref. to an array of NOLookup::Brreg::Entry data objects.
 
-=head3 next_page()
+=head3 cur_page()/prev_page()/next_page()
 
-If more pages (of 100 elements) can be fetched,
-this method gives the URL to that page.
+If more pages can be fetched, those methods give the URL to that page
+
+=head3 total_page_count()
+
+Count of total nuber of pages matching the search
+
+=head3 result_count()
+
+Count of results on this page
+
+=head3 total_result_count()
+
+Count of total results for the search
+
 
 =head2 Accessor methods
 
@@ -230,18 +251,20 @@ The accessor methods from @json_data_methods
 
   organisasjonsnummer 
   navn 
-  orgnr
   oppdateringsid
   registreringsdatoEnhetsregisteret 
-  stiftelsesdato 
+  stiftelsesdato
+  oppstartsdato
   sisteInnsendteAarsregnskap 
-* organisasjonsform / orgform
+* organisasjonsform
   overordnetEnhet
+  maalform
   registrertIStiftelsesregisteret
   registrertIFrivillighetsregisteret
   registrertIMvaregisteret
   registrertIForetaksregisteret
-* frivilligRegistrertIMvaregisteret
+  frivilligMvaRegistrertBeskrivelser
+
   underAvvikling
   konkurs
   underTvangsavviklingEllerTvangsopplosning
@@ -251,7 +274,8 @@ The accessor methods from @json_data_methods
 * naeringskode1 
 * naeringskode2
 * naeringskode3
-* _links 
+* _links
+* page
   hjemmeside 
   antallAnsatte
 
@@ -305,7 +329,7 @@ The hash looks like follows:
     'kode' => '1120'
   }
 
-=head3 naeringskode1() / naeringskode2()
+=head3 naeringskode1/2/3()
 
 The hash looks like follows:
 
@@ -314,11 +338,11 @@ The hash looks like follows:
     'kode' => '06.100'
   },
 
-=head3 frivilligRegistrertIMvaregisteret()
+=head3 frivilligMvaRegistrertBeskrivelser()
 
 The hash looks like follows:
 
-  'frivilligRegistrertIMvaregisteret' => [
+  'frivilligMvaRegistrertBeskrivelser' => [
     'Utleier av bygg eller anlegg'
   ],
 
@@ -352,7 +376,7 @@ Trond Haugen, E<lt>(nospam)info(at)norid.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2017 Trond Haugen <(nospam)info(at)norid.no>.
+Copyright (c) 2017- Trond Haugen <(nospam)info(at)norid.no>.
 All rights reserved.
 
 This program is free software; you can redistribute it and/or modify

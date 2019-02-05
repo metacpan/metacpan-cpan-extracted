@@ -11,7 +11,7 @@ use JSON::PP; # only this support sort_by(custom_func)
 use Capture::Tiny qw(capture);
 use Algorithm::Cron;
 
-our $VERSION = 10;
+our $VERSION = 12;
 
 sub new {
 	my $class = shift;
@@ -415,7 +415,7 @@ sub _wrap_robocpy{
 		print "executing [robocopy.exe ",(join ' ', @cmdargs, @safest),"]\n";
 	}
 	my ($stdout, $stderr, $exit) = capture {
-		system( 'ROBOCOPY.EXE', @cmdargs, @safest );
+		system( 'robocopy.exe', @cmdargs, @safest );
 	};
 	# !!
 	$exit = $exit>>8;

@@ -2,7 +2,7 @@
 
 =encoding utf-8
 
-Доброго всем
+★★★ Доброго всем ★★★
 
 =head1 Mojo::Pg::Che
 
@@ -10,7 +10,7 @@
 
 =head1 NAME
 
-Mojo::Pg::Che - mix of parent Mojo::Pg and DBI.pm
+Mojo::Pg::Che - mix of great Mojo::Pg and DBI
 
 =head1 DESCRIPTION
 
@@ -18,7 +18,7 @@ See L<Mojo::Pg>
 
 =head1 VERSION
 
-Version 0.8551
+Version 0.8552
 
 
 =head1 SYNOPSIS

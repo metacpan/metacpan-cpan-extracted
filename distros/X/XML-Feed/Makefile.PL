@@ -4,31 +4,31 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
   'PL_FILES' => {},
+  'INSTALLDIRS' => 'site',
+  'VERSION_FROM' => 'lib/XML/Feed.pm',
   'PREREQ_PM' => {
                    'XML::RSS' => '1.47',
                    'HTML::TokeParser' => 0,
-                   'DateTime' => 0,
-                   'URI' => 0,
-                   'DateTime::Format::Flexible' => 0,
-                   'URI::Fetch' => 0,
-                   'Test::More' => 0,
-                   'DateTime::Format::Mail' => 0,
-                   'Module::Pluggable' => 0,
-                   'DateTime::Format::Natural' => 0,
-                   'List::Util' => 0,
-                   'LWP::UserAgent' => 0,
-                   'DateTime::Format::ISO8601' => 0,
-                   'Feed::Find' => 0,
                    'HTML::Entities' => 0,
-                   'XML::LibXML' => '1.66',
+                   'Module::Pluggable' => 0,
+                   'URI::Fetch' => 0,
+                   'Scalar::Util' => 0,
+                   'List::Util' => 0,
                    'Class::ErrorHandler' => 0,
+                   'DateTime::Format::ISO8601' => 0,
+                   'LWP::UserAgent' => 0,
+                   'Test::More' => 0,
+                   'Feed::Find' => 0,
+                   'XML::LibXML' => '1.66',
+                   'DateTime' => 0,
                    'XML::Atom' => '0.38',
+                   'DateTime::Format::Flexible' => 0,
+                   'DateTime::Format::Mail' => 0,
                    'DateTime::Format::W3CDTF' => 0,
-                   'Scalar::Util' => 0
+                   'DateTime::Format::Natural' => 0,
+                   'URI' => 0
                  },
-  'EXE_FILES' => [],
-  'INSTALLDIRS' => 'site',
-  'VERSION_FROM' => 'lib/XML/Feed.pm',
-  'NAME' => 'XML::Feed'
+  'NAME' => 'XML::Feed',
+  'EXE_FILES' => []
 )
 ;

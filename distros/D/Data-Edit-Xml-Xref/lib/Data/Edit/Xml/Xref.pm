@@ -4,11 +4,12 @@
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
 #-------------------------------------------------------------------------------
 # It is easier to criticize than to fix.
+# Use nex confluence to  check size of reloaded files in analyze
 # Details of reports in documentation
 # podDocumentation
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 20190131;
+our $VERSION = 20190204;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -21,11 +22,6 @@ use utf8;
 #D1 Cross reference                                                             # Check the cross references in a set of Dita files and report the results.
 
 sub improvementLength {80}                                                      #P Improvement length
-
-sub lll(@)                                                                      #P Write a message
- {my (@m) = @_;                                                                 # Message text
-  say STDERR timeStamp, join "", " Xref: ", @_;
- }
 
 sub xref(%)                                                                     # Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible attributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
  {my (%attributes) = @_;                                                        # Attributes
@@ -43,7 +39,9 @@ sub xref(%)                                                                     
     badXml2=>{},                                                                # [Files] with a bad xml doc type on the second line.
     badXRefs=>{},                                                               # Bad Xrefs - by file
     badXRefsList=>{},                                                           # Bad Xrefs - all
+    baseTag=>{},                                                                # Base Tag for each file
     conRefs=>{},                                                                # {file}{href}   Count of conref definitions in each file.
+    debugTimes=>undef,                                                          #I Write timing information if true
     docType=>{},                                                                # {file} == docType:  the docType for each xml file.
     duplicateIds=>{},                                                           # [file, id]     Duplicate id definitions within each file.
     duplicateTopicIds=>{},                                                      # Duplicate topic ids
@@ -74,6 +72,7 @@ sub xref(%)                                                                     
     missingTopicIds=>{},                                                        # Missing topic ids.
     noHref=>{},                                                                 # Tags that should have an href but do not have one.
     notReferenced=>{},                                                          # Files in input area that are not referenced by a conref, image, topicref or xref tag and are not a bookmap.
+    olBody=>{},                                                                 # The number of ol under body by file
     parseFailed=>{},                                                            # [file] files that failed to parse.
     reports=>q(reports),                                                        #I Reports folder: the cross referencer will write reports to files in this folder.
     results=>[],                                                                # Summary of results table.
@@ -137,6 +136,7 @@ sub xref(%)                                                                     
                 q(reportTopicDetails),
                 q(reportTopicReuse),
                 q(reportMd5Sum),
+                q(reportOlBody),
                );
 
   if ($xref->matchTopics)                                                       # Topic matching reports
@@ -145,14 +145,14 @@ sub xref(%)                                                                     
    }
 
   for my $phase(@phases)                                                        # Perform analysis phases
-   {#lll "Phase: $phase";
+   {lll "Phase: $phase" if $xref->debugTimes;
     $xref->$phase;
    }
 
   if ($xref->fixBadRefs)                                                        # Fix files if requested
-   {#lll "Phase: fixFiles";
+   {lll "Phase: fixFiles" if $xref->debugTimes;
     $xref->fixFiles;
-    #lll "Phase: fixFiles end";
+    lll "Phase: fixFiles end" if $xref->debugTimes;
    }
 
   formattedTablesReport
@@ -397,6 +397,13 @@ sub analyzeOneFile($)                                                           
     elsif ($tag eq q(author))                                                   # Author
      {$xref->author->{$iFile} = my $t = &$content;
      }
+    elsif ($tag eq q(ol))                                                       # Ol
+     {if (my $p = $o->parent)
+       {if ($p->tag =~ m(body\Z)s)
+         {$xref->olBody->{$iFile}++;
+         }
+       }
+     }
     elsif ($tag eq q(tgroup))                                                   # Tgroup cols
      {my $error = sub                                                           # Table error message
        {push @{$xref->badTables},
@@ -438,6 +445,7 @@ sub analyzeOneFile($)                                                           
   $xref->topicIds->{$iFile} = $x->id;                                           # Topic Id
   $xref->docType ->{$iFile} = $x->tag;                                          # Document type
   $xref->attributeCount->{$iFile} = $x->countAttrNames;                         # Attribute names
+  $xref->baseTag       ->{$iFile} = $x->tag;                                    # Tag on base node
   $xref->tagCount      ->{$iFile} = $x->countTagNames;                          # Tag names
   $xref->vocabulary    ->{$iFile} = $x->stringTagsAndText;                      # Text of topic minus attributes
 
@@ -453,7 +461,6 @@ sub analyzeOneFile($)                                                           
 
     $xref->validationErrors->{$iFile}++ if $s =~ m(<!--compressedErrors:)s;     # File has validation errors
    }
-
   $xref
  } # analyzeOneFile
 
@@ -604,10 +611,13 @@ sub analyze($)                                                                  
       [@r]                                                                      # Return results as a reference
      });
    }
+# Load results takes 4 minutes while merge takes 10 seconds for all fields
+  lll "Phase: analyze load results start" if $xref->debugTimes;
+  my @x = deSquareArray($ps->finish);                                           # mmmm Merge results from each file analyzed
+  lll "Phase: analyze load results end"   if $xref->debugTimes;
 
-  for my $x(deSquareArray($ps->finish))                                         # mmmm Merge results from each file analyzed
-   {for my $field(                                                              # Merge hashes by file names which are unique - ffff
-      qw(
+  for my $field(                                                                # Merge hashes by file names which are unique - ffff
+    qw(
 attributeCount
 author
 badXml1
@@ -621,6 +631,7 @@ images
 improvements
 md5Sum
 noHref
+olBody
 parseFailed
 tagCount
 title
@@ -632,17 +643,23 @@ xrefBadFormat
 xrefBadScope
 xRefs
          ))
-     {next unless my $xf = $x->{$field};
-      for my $f(sort keys %$xf)
-       {$xref->{$field}{$f} = $xf->{$f};
+   {for my $x(@x)                                                               # mmmm Merge results from each file analyzed
+     {if (my $xf = $x->{$field})
+      #for my $f(sort keys %$xf)
+      # {$xref->{$field}{$f} = $xf->{$f};
+      # }
+       {$xref->{$field} = {%{$xref->{$field}}, %$xf};
        }
      }
-    for my $field(                                                              # Merge arrays
-      qw(badTables))
+   }
+  for my $field(                                                                # Merge arrays
+    qw(badTables))
+   {for my $x(@x)                                                               # mmmm Merge results from each file analyzed
      {next unless my $xf = $x->{$field};
       push @{$xref->{$field}}, @$xf;
      }
    }
+  lll "Phase: analyze merge fields end" if $xref->debugTimes;
  }
 
 sub reportDuplicateIds($)                                                       #P Report duplicate ids
@@ -1650,6 +1667,53 @@ END
     summarize=>1);
  }
 
+sub reportOlBody($)                                                             #P ol under body - indicative of a task
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my $select = sub                                                              # Select files with specified body
+   {my ($body) = @_;
+    my %b = %{$xref->olBody};
+    for my $b(keys %b)
+     {if (my $tag = $xref->baseTag->{$b})
+       {if ($tag ne $body)
+         {delete $b{$b} if $tag ne $body;
+         }
+       }
+     }
+    %b
+   };
+
+  my %c = $select->(q(conbody));
+
+  formatTable([map {[$c{$_}, $_]} sort {$c{$b} <=> $c{$a}} sort keys %c], <<END,
+Count             Number of ol under a conbody tag
+File_Name         The name of the file containing an ol under conbody
+END
+    title=>qq(ol under conbody indicative of task),
+    head=><<END,
+Xref found NNNN files with ol under a conbody tag on DDDD.
+
+ol under a conbody tag is often indicative of steps in a task.
+END
+    file=>(fpe($xref->reports, qw(bad olUnderConBody txt))),
+    summarize=>1);
+
+  my %t = $select->(q(taskbody));
+
+  formatTable([map {[$t{$_}, $_]} sort {$t{$b} <=> $t{$a}} sort keys %t], <<END,
+Count             Number of ol under a taskbody tag
+File_Name         The name of the file containing an ol under taskbody
+END
+    title=>qq(ol under taskbody indicative of steps),
+    head=><<END,
+Xref found NNNN files with ol under a taskbody tag on DDDD.
+
+ol under a taskbody tag is often indicative of steps in a task.
+END
+    file=>(fpe($xref->reports, qw(bad olUnderTaskBody txt))),
+    summarize=>1);
+ }
+
 sub createSampleInputFiles($)                                                   #P Create sample input files for testing. The attribute B<inputFolder> supplies the name of the folder in which to create the sample files.
  {my ($N) = @_;                                                                 # Number of sample files
   my $in = q(in);
@@ -1672,6 +1736,7 @@ sub createSampleInputFiles($)                                                   
      <p conref="#b$n">Bad conref</p>
      <image href="a$n.png"/>
      <image href="b$n.png"/>
+     <ol><li/><li/></ol>
   </conbody>
 </concept>
 END
@@ -1689,6 +1754,8 @@ END
     <image href="guid-9999"/>
     <image href="act1.dita"/>
     <xref/>
+     <ol><li/><li/></ol>
+     <ol><li/><li/></ol>
   </conbody>
 </concept>
 END
@@ -2044,8 +2111,8 @@ Check the cross references in a set of Dita files held in  L<inputFolder|/inputF
 B<Example:>
 
 
-    my $N = 8;                                                                    
-  
+    my $N = 8;
+
 
 
 =head2 Data::Edit::Xml::Xref Definition
@@ -2199,7 +2266,7 @@ default value supplied for this attribute by this package.
 =head2 Replaceable Attribute List
 
 
-improvementLength 
+improvementLength
 
 
 =head2 improvementLength

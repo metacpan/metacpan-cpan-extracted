@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.20';
+our $VERSION = '3.21';
 
 use vars qw(@ALL_TESTS);
 
@@ -676,7 +676,7 @@ sub _init_core {
         $browser_tests->{epiphany} = 1;
     }
     elsif ( $ua
-        =~ m{^mozilla/.+windows (?:nt|phone) \d{2}\.\d+;?.+ applewebkit/.+ chrome/.+ safari/.+ edge/[\d.]+$}
+        =~ m{^mozilla/[\d.]+ [(]windows (?:nt|phone) \d{2}\..+?[)] applewebkit/[\d.]+ [(]khtml,? like gecko[)] chrome/[\d.]+ (?:mobile )?safari/[\d.]+ edge/[\d.]+$}
     ) {
         $browser        = 'edge';
         $browser_string = 'Edge';
@@ -2960,7 +2960,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.20
+version 3.21
 
 =head1 SYNOPSIS
 

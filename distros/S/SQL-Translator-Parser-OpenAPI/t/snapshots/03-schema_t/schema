@@ -1,25 +1,26 @@
-'SET foreign_key_checks=0;
+'
+BEGIN TRANSACTION;
 
 --
--- Table: `errors`
+-- Table: errors
 --
-CREATE TABLE `errors` (
-  `code` integer NOT NULL,
-  `id` integer NOT NULL auto_increment,
-  `message` varchar(255) NOT NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
+CREATE TABLE errors (
+  code int NOT NULL,
+  id INTEGER PRIMARY KEY NOT NULL,
+  message varchar NOT NULL
 );
 
+CREATE INDEX pk_id ON errors (id);
+
 --
--- Table: `pets`
+-- Table: pets
 --
-CREATE TABLE `pets` (
-  `id` bigint NOT NULL auto_increment,
-  `name` varchar(255) NOT NULL,
-  `tag` varchar(255) NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
+CREATE TABLE pets (
+  id INTEGER PRIMARY KEY NOT NULL,
+  name varchar NOT NULL,
+  tag varchar
 );
 
-SET foreign_key_checks=1;'
+CREATE INDEX pk_id02 ON pets (id);
+
+COMMIT;'

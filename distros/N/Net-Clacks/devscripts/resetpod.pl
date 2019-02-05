@@ -7,12 +7,12 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 4.9;
+our $VERSION = 5.0;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
 
-# MAPLAT  (C) 2008-2018 Rene Schickbauer
+# MAPLAT  (C) 2008-2019 Rene Schickbauer
 # Developed under Artistic license
 
 die("Program disabled, because it destroys POD on purpose. Enable program by commenting out this line!");

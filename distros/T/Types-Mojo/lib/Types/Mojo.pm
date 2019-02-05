@@ -21,7 +21,7 @@ use List::Util qw(first);
 
 Type::Utils::extends(qw/Types::Standard/);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $meta = __PACKAGE__->meta;
 
@@ -98,7 +98,7 @@ Types::Mojo - Types related to Mojo
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

@@ -22,6 +22,7 @@ t/snapshots/01-schema_t/schema
 t/snapshots/03-schema_t/schema
 t/snapshots/04-schema_t/schema
 t/snapshots/06-schema_t/schema
+t/snapshots/06-schema_t/schema_camel
 t/snapshots/07-schema_t/schema
 xt/manifest.t
 xt/pod-coverage.t

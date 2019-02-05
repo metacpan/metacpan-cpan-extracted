@@ -9,7 +9,7 @@ package My::Envoy::Widget;
     has 'id' => (
         is => 'ro',
         isa => 'Num',
-        traits => ['DBIC'],
+        traits => ['Envoy','DBIC'],
         primary_key => 1,
 
     );
@@ -17,19 +17,25 @@ package My::Envoy::Widget;
     has 'name' => (
         is => 'rw',
         isa => 'Maybe[Str]',
-        traits => ['DBIC'],
+        traits => ['Envoy','DBIC'],
     );
 
     has 'no_storage' => (
         is => 'rw',
         isa => 'Maybe[Str]',
+        traits => ['Envoy'],
     );
 
     has 'parts' => (
         is => 'rw',
         isa => 'ArrayRef[My::Envoy::Part]',
-        traits => ['DBIC','Envoy'],
+        traits => ['Envoy','DBIC'],
         rel => 'has_many',
+    );
+
+    has 'no_envoy' => (
+        is => 'rw',
+        isa => 'Str'
     );
 
 1;

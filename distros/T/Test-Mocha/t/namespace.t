@@ -4,9 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN {
-    use_ok 'Test::Mocha';
-}
+use ok 'Test::Mocha';
 
 my %permitted = map { $_ => 1 } qw(
   AUTOLOAD

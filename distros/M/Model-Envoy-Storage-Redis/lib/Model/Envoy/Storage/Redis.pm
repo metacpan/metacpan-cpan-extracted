@@ -1,6 +1,6 @@
 package Model::Envoy::Storage::Redis;
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 use Moose;
 use MooseX::ClassAttribute;
@@ -22,10 +22,10 @@ class_has 'redis' => (
 );
 
 sub configure {
-    my ( $class, $conf ) = @_;
+    my ( $plugin_class, $envoy_class, $conf ) = @_;
 
-    $class->redis(
-        ref $conf->{redis} eq 'CODE' ? $conf->{redis}->() : $conf->{redis}
+    $plugin_class->redis(
+        ref $conf->{redis} eq 'CODE' ? $conf->{redis}->($envoy_class) : $conf->{redis}
     );
     $conf->{_configured} = 1;
 }

@@ -24,6 +24,8 @@ t/lib/My/Envoy/Part.pm
 t/lib/My/Envoy/Widget.pm
 t/dbic_belongs_to.t
 t/dbic_dynamic_property.t
+t/envoy_attributes.t
+t/envoy_complex_attrs.t
 t/envoy_set_cached.t
 t/envoy_set_list.t
 t/envoy_set_load.t

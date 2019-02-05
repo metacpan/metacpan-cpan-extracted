@@ -1,14 +1,13 @@
 ##++
 ##    JSprite
 ##    Sprite v.3.2
-##    Last modified: August 22, 1998
 ##
-##    Copyright (c) 1998, Jim Turner, from
+##    Copyright (c) 1998-2019, Jim Turner, from
 ##    Sprite.pm (c) 1995-1998, Shishir Gundavaram
 ##    All Rights Reserved
 ##
-##    E-Mail: shishir@ora.com
-##    E-Mail: jim.turner@lmco.com
+##    E-Mail: shishir att ora dot com
+##    E-Mail: turnerjw784 att yahoo dot com
 ##
 ##    Permission  to  use,  copy, and distribute is hereby granted,
 ##    providing that the above copyright notice and this permission
@@ -477,7 +476,7 @@ eval {require 'OraSpriteFns.pl';};
 use vars qw ($VERSION $LOCK_SH $LOCK_EX);
 ##--
 
-$JSprite::VERSION = '6.11';
+$JSprite::VERSION = '6.12';
 $JSprite::LOCK_SH = 1;
 $JSprite::LOCK_EX = 2;
 

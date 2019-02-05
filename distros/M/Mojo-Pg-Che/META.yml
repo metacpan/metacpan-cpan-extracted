@@ -1,5 +1,5 @@
 ---
-abstract: 'mix of parent Mojo::Pg and DBI.pm'
+abstract: 'mix of great Mojo::Pg and DBI'
 author:
   - "Ð\x9CÐ¸Ñ\NÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) <mche[-at-]cpan.org>"
 build_requires:
@@ -18,6 +18,8 @@ no_index:
     - t
     - inc
 requires:
-  Mojo::Pg: '3.01'
-version: '0.8551'
+  Mojo::Pg: '4.1'
+resources:
+  repository: git://github.com/mche/Mojo-Pg-Che.git
+version: '0.8552'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

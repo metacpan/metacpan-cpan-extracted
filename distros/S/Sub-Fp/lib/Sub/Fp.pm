@@ -6,7 +6,7 @@ use POSIX;
 use List::Util;
 use Data::Dumper qw(Dumper);
 use Exporter qw(import);
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 our @EXPORT_OK = qw(
     incr        reduces   flatten
     drop_right  drop      take_right  take
@@ -507,9 +507,14 @@ sub maps {
 
     my $idx = 0;
 
+    if (!is_sub($func) && $coll) {
+        return maps(get($func, __), $coll);
+    }
+
     my @vals = map {
-      $idx++;
-      $func->($_, $idx - 1, $coll);
+
+        $idx++;
+        $func->($_, $idx - 1, $coll);
     } @$coll;
 
     return [@vals];

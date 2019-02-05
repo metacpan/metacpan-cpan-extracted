@@ -9,7 +9,7 @@ use Test::Builder::Tester;
 use Type::Utils -all;
 use Types::Standard -all;
 
-BEGIN { use_ok 'Test::Mocha' }
+use ok 'Test::Mocha';
 
 my $mock = mock;
 

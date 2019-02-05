@@ -1,13 +1,14 @@
 package MojoX::Log::Dispatch::Simple;
 # ABSTRACT: Simple Log::Dispatch replacement of Mojo::Log
 
+use 5.010;
 use strict;
 use warnings;
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::Util 'encode';
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 has history          => sub { [] };
 has level            => 'debug';
@@ -30,7 +31,8 @@ sub new {
 }
 
 sub _log {
-    shift->emit( 'message', @_ );
+    my ( $self, $level, @input ) = @_;
+    $self->emit( 'message', $level, ref $input[0] eq 'CODE' ? $input[0]() : @input );
 }
 
 {
@@ -121,7 +123,7 @@ MojoX::Log::Dispatch::Simple - Simple Log::Dispatch replacement of Mojo::Log
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/MojoX-Log-Dispatch-Simple.svg)](https://travis-ci.org/gryphonshafer/MojoX-Log-Dispatch-Simple)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/MojoX-Log-Dispatch-Simple/badge.png)](https://coveralls.io/r/gryphonshafer/MojoX-Log-Dispatch-Simple)
@@ -436,7 +438,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

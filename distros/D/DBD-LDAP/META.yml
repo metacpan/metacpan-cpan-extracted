@@ -21,5 +21,5 @@ no_index:
 requires:
   DBI: '1.03'
   Net::LDAP: '0.01'
-version: '0.24'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

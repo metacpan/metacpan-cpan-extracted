@@ -67,7 +67,7 @@ okk('find -ls|due -ihz');
 
 my @f;File::Find::find(sub{-f$_&&push@f,"$tmp/$_"},$tmp);
 @Acme::Tools::Due_fake_stdin=@f;
-utime 0, .5<rand?8e8:9e8, $_ for @f;
+utime 0, .5<rand()?8e8:9e8, $_ for @f;
 $ok=repl($answer,'ymd','1998/07/09');
 $p=printed { Acme::Tools::cmd_due('-Mihz') };
 $p=~s{\b(\d{4}/\d\d/\d\d)\b}{push@d,$1;'1998/07/09'}ge;

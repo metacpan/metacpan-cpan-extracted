@@ -81,6 +81,39 @@ fun _merge_hash (Any $param = undef, Any $arraykey = undef) {
   \%def;
 }
 
+fun _unescape (Str $str) {
+  # https://facebook.github.io/graphql/June2018/#EscapedCharacter
+  $str =~ s|\\(["\\/bfnrt])|"qq!\\$1!"|gee;
+  return $str;
+}
+
+fun _blockstring_value (Str $str) {
+  # https://facebook.github.io/graphql/June2018/#BlockStringValue()
+  my @lines = split(/(?:\n|\r(?!\r)|\r\n)/s, $str);
+  if (1 < @lines) {
+    my $common_indent;
+    for my $line (@lines[1..$#lines]) {
+      my $length = length($line);
+      my $indent = length(($line =~ /^([\t ]*)/)[0] || '');
+      if ($indent < $length && (!defined($common_indent) || $indent < $common_indent)) {
+        $common_indent = $indent;
+      }
+    }
+    if (defined $common_indent) {
+      for my $line (@lines[1..$#lines]) {
+        $line =~ s/^[\t ]{$common_indent}//;
+      }
+    }
+  }
+  my ($start, $end);
+  for ($start = 0; $start < @lines && $lines[$start] =~ /^[\t ]*$/; ++$start) {}
+  for ($end = $#lines; $end >= 0 && $lines[$end] =~ /^[\t ]*$/; --$end) {}
+  @lines = @lines[$start..$end];
+  my $formatted = join("\n", @lines);
+  $formatted =~ s/\\"""/"""/g;
+  return $formatted;
+}
+
 method got_arguments (Any $param = undef) {
   return unless defined $param;
   my %args = map { ($_->[0]{name} => $_->[1]) } @$param;
@@ -211,6 +244,16 @@ method got_string (Any $param = undef) {
   return $param;
 }
 
+method got_stringValue (Any $param = undef) {
+  return unless defined $param;
+  return _unescape($param);
+}
+
+method got_blockStringValue (Any $param = undef) {
+  return unless defined $param;
+  return _blockstring_value($param);
+}
+
 method got_int (Any $param = undef) {
   $param+0;
 }
@@ -312,17 +355,22 @@ method got_comment (Any $param = undef) {
 
 method got_description (Any $param = undef) {
   return unless defined $param;
-  my $string = join "\n", @$param;
+  my $string = ref($param) eq 'ARRAY' ? join("\n", @$param) : $param;
   return $string ? {$self->{parser}{rule} => $string} : {};
 }
 
 method got_schema (Any $param = undef) {
   return unless defined $param;
+  my $directives = {};
+  if (ref $param->[1] eq 'ARRAY') {
+    # got directives
+    $directives = shift @$param;
+  }
   my %type2count;
   $type2count{(keys %$_)[0]}++ for @{$param->[0]};
   $type2count{$_} > 1 and die "Must provide only one $_ type in schema.\n"
     for keys %type2count;
-  return {kind => $self->{parser}{rule}, %{$self->_locate_hash(_merge_hash($param->[0]))}};
+  return {kind => $self->{parser}{rule}, %{$self->_locate_hash(_merge_hash($param->[0]))}, %$directives};
 }
 
 method got_typeSystemDefinition (Any $param = undef) {

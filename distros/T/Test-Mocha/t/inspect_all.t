@@ -9,7 +9,7 @@ use Test::Fatal;
 use lib 't/lib';
 use TestClass;
 
-BEGIN { use_ok 'Test::Mocha' }
+use ok 'Test::Mocha';
 
 my $FILE = __FILE__;
 

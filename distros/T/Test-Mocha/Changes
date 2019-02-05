@@ -1,5 +1,11 @@
 Revision history for Test-Mocha
 
+0.66    2019-02-04
+
+    - Revert the change from 0.65 because it broke spies.
+    - Make UNIVERSAL::ref optional because it can't be installed on Perl 5.025
+      and above.
+
 0.65    2019-01-13
 
     Pass spy when dispatching to real object method to enable stubbed

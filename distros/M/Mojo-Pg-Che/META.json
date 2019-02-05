@@ -1,5 +1,5 @@
 {
-   "abstract" : "mix of parent Mojo::Pg and DBI.pm",
+   "abstract" : "mix of great Mojo::Pg and DBI",
    "author" : [
       "ÐÐ¸ÑÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) <mche[-at-]cpan.org>"
    ],
@@ -32,11 +32,18 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojo::Pg" : "3.01"
+            "Mojo::Pg" : "4.1"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.8551",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mche/Mojo-Pg-Che.git",
+         "web" : "https://github.com/mche/Mojo-Pg-Che"
+      }
+   },
+   "version" : "0.8552",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -10,7 +10,7 @@ GraphQL - Perl implementation of GraphQL
 
 =cut
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 =begin markdown
 
@@ -20,7 +20,7 @@ our $VERSION = '0.31';
 |:-------:|--------------:|
 | Linux   | [![Build Status](https://travis-ci.org/graphql-perl/graphql-perl.svg?branch=master)](https://travis-ci.org/graphql-perl/graphql-perl) |
 
-[![CPAN version](https://badge.fury.io/pl/GraphQL.svg)](https://metacpan.org/pod/GraphQL)
+[![CPAN version](https://badge.fury.io/pl/GraphQL.svg)](https://metacpan.org/pod/GraphQL) [![Coverage Status](https://coveralls.io/repos/github/graphql-perl/graphql-perl/badge.svg?branch=master)](https://coveralls.io/github/graphql-perl/graphql-perl?branch=master)
 
 =end markdown
 
