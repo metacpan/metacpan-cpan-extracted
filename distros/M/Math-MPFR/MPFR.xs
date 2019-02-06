@@ -8045,9 +8045,9 @@ void _nvtoa(pTHX_ SV * pnv, NV nv_max, NV normal_min, int min_pow, int b, int ma
   mpfr_t ws;
   mpz_t R, S, M_minus, M_plus, LHS, TMP;
   mpq_t Q, QT;
-#if REQUIRED_LDBL_MANT_DIG == 2098
+#if REQUIRED_LDBL_MANT_DIG == 2098 && defined(NV_IS_LONG_DOUBLE)
   void *nvptr = &nv; /* The NV, not the SV */
-  unsigned long msd_exp, lsd_exp;
+  int msd_exp, lsd_exp;
 #endif
 
   char *f, *out;
@@ -8085,7 +8085,7 @@ void _nvtoa(pTHX_ SV * pnv, NV nv_max, NV normal_min, int min_pow, int b, int ma
 
   if(nv < normal_min) {
     is_subnormal = 1;
-#if REQUIRED_LDBL_MANT_DIG == 2098
+#if REQUIRED_LDBL_MANT_DIG == 2098 && defined(NV_IS_LONG_DOUBLE)
     bits = 53;
 #endif
     mpfr_set_prec(ws, bits);
@@ -8096,7 +8096,7 @@ void _nvtoa(pTHX_ SV * pnv, NV nv_max, NV normal_min, int min_pow, int b, int ma
     bits -= subnormal_prec_adjustment;
   }
 
-#if REQUIRED_LDBL_MANT_DIG == 2098
+#if REQUIRED_LDBL_MANT_DIG == 2098 && defined(NV_IS_LONG_DOUBLE)
 #ifdef MPFR_HAVE_BENDIAN                   /* Big Endian architecture */
 
     if(!is_subnormal) {

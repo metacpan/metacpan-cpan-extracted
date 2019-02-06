@@ -27,16 +27,16 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => 0,
     "IO::Handle" => 0,
     "IO::Poll" => 0,
-    "Moose" => 0,
     "POSIX" => 0,
     "autodie" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Dumper" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0.4",
+  "VERSION" => "0.0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,13 +45,13 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Data::Dumper" => 0,
   "File::Basename" => 0,
   "File::LibMagic" => 0,
   "File::Slurp" => 0,
   "Getopt::Long" => 0,
   "IO::Handle" => 0,
   "IO::Poll" => 0,
-  "Moose" => 0,
   "POSIX" => 0,
   "Test::More" => 0,
   "autodie" => 0,

@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Koha-Contrib-Mirabel,
-version 0.0.6:
+version 1.0.0:
 
   Synchronise un catalogue Koha avec Mir@bel
 
-This software is copyright (c) 2018 by Frédéric Demians.
+This software is copyright (c) 2019 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

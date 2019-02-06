@@ -3,7 +3,7 @@ package Net::Async::Trello::Common;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =head2 new
 

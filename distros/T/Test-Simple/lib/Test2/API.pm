@@ -9,7 +9,7 @@ BEGIN {
     $ENV{TEST2_ACTIVE} = 1;
 }
 
-our $VERSION = '1.302160';
+our $VERSION = '1.302162';
 
 
 my $INST;
@@ -129,7 +129,6 @@ our @EXPORT_OK = qw{
     test2_ipc_set_pending
     test2_ipc_get_timeout
     test2_ipc_set_timeout
-    test2_ipc_enable_shm
 
     test2_formatter
     test2_formatters
@@ -231,7 +230,7 @@ sub test2_ipc_get_pending     { $INST->get_ipc_pending }
 sub test2_ipc_set_pending     { $INST->set_ipc_pending(@_) }
 sub test2_ipc_set_timeout     { $INST->set_ipc_timeout(@_) }
 sub test2_ipc_get_timeout     { $INST->ipc_timeout() }
-sub test2_ipc_enable_shm      { $INST->ipc_enable_shm }
+sub test2_ipc_enable_shm      { 0 }
 
 sub test2_formatter     {
     if ($ENV{T2_FORMATTER} && $ENV{T2_FORMATTER} =~ m/^(\+)?(.*)$/) {
@@ -1298,7 +1297,7 @@ to turn this off.
 
 These functions return the filehandles that test output should be written to.
 They are primarily useful when writing a custom formatter and code that turns
-events into actual output (TAP, etc.)  They will return a dupe of the original
+events into actual output (TAP, etc.).  They will return a dupe of the original
 filehandles that formatted output can be sent to regardless of whatever state
 the currently running test may have left STDOUT and STDERR in.
 
@@ -1474,8 +1473,7 @@ Turn off IPC polling.
 
 =item test2_ipc_enable_shm()
 
-Turn on IPC SHM. Only some IPC drivers use this, and most will turn it on
-themselves.
+Legacy, this is currently a no-op that returns 0;
 
 =item test2_ipc_set_pending($uniq_val)
 

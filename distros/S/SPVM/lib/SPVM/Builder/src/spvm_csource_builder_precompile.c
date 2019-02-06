@@ -1193,7 +1193,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_head(SPVM_ENV* env, SPVM_STRING_BUFFE
   SPVM_STRING_BUFFER_add(string_buffer, "    SPVM_RUNTIME_API_INC_REF_COUNT_ONLY(tmp_object);\\\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  }\\\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  if (*(void**)(dist_address) != NULL) {\\\n");
-  SPVM_STRING_BUFFER_add(string_buffer, "    if (SPVM_RUNTIME_API_ISWEAK(dist_address)) { env->unweaken(env, dist_address); }\\\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "    if (__builtin_expect(SPVM_RUNTIME_API_ISWEAK(dist_address), 0)) { env->unweaken(env, dist_address); }\\\n");
   SPVM_STRING_BUFFER_add(string_buffer, "    if (SPVM_RUNTIME_API_GET_REF_COUNT(*(void**)(dist_address)) > 1) { SPVM_RUNTIME_API_DEC_REF_COUNT_ONLY(*(void**)(dist_address)); }\\\n");
   SPVM_STRING_BUFFER_add(string_buffer, "    else { env->dec_ref_count(env, *(void**)(dist_address)); }\\\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  }\\\n");
@@ -3064,35 +3064,6 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
         break;
       }
-      case SPVM_OPCODE_C_ID_WEAKEN_ARRAY_ELEMENT: {
-        SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    void* array = ");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t index = ");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    if (__builtin_expect(!array, 0)) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      void* exception = env->new_str_raw(env, \"Array must not be undef\", 0);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      env->set_exception(env, exception);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      exception_flag = 1;\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    else {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      if (__builtin_expect(index < 0 || index >= *(SPVM_VALUE_int*)((intptr_t)array + (intptr_t)env->object_array_length_offset), 0)) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_str_raw(env, \"Index is out of range\", 0);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        exception_flag = 1;\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      else {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        SPVM_VALUE_object* elements = (void**)((intptr_t)array + env->object_header_byte_size);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        void** object_element_address = (void**)&elements[index];\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        env->weaken(env, object_element_address);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
-        
-        break;
-      }
       case SPVM_OPCODE_C_ID_UNWEAKEN_FIELD: {
         int32_t constant_pool_id = opcode->operand1;
         int32_t field_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3149,35 +3120,6 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
         break;
       }
-      case SPVM_OPCODE_C_ID_UNWEAKEN_ARRAY_ELEMENT: {
-        SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    void* array = ");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t index = ");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    if (__builtin_expect(!array, 0)) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      void* exception = env->new_str_raw(env, \"Array must not be undef\", 0);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      env->set_exception(env, exception);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      exception_flag = 1;\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    else {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      if (__builtin_expect(index < 0 || index >= *(SPVM_VALUE_int*)((intptr_t)array + (intptr_t)env->object_array_length_offset), 0)) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_str_raw(env, \"Index is out of range\", 0);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        exception_flag = 1;\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      else {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        SPVM_VALUE_object* elements = (void**)((intptr_t)array + env->object_header_byte_size);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        void** object_element_address = (void**)&elements[index];\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        env->unweaken(env, object_element_address);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
-        
-        break;
-      }
       case SPVM_OPCODE_C_ID_ISWEAK_FIELD: {
         int32_t constant_pool_id = opcode->operand1;
         int32_t field_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3232,35 +3174,6 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         SPVM_STRING_BUFFER_add(string_buffer, "      env->isweak(env, ofield_address);\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
-        break;
-      }
-      case SPVM_OPCODE_C_ID_ISWEAK_ARRAY_ELEMENT: {
-        SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    void* array = ");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t index = ");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    if (__builtin_expect(!array, 0)) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      void* exception = env->new_str_raw(env, \"Array must not be undef\", 0);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      env->set_exception(env, exception);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      exception_flag = 1;\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    else {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      if (__builtin_expect(index < 0 || index >= *(SPVM_VALUE_int*)((intptr_t)array + (intptr_t)env->object_array_length_offset), 0)) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_str_raw(env, \"Index is out of range\", 0);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        exception_flag = 1;\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      else {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        SPVM_VALUE_object* elements = (void**)((intptr_t)array + env->object_header_byte_size);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        void** object_element_address = (void**)&elements[index];\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "        env->isweak(env, object_element_address);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
-        
         break;
       }
       case SPVM_OPCODE_C_ID_CONCAT:

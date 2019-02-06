@@ -3,7 +3,7 @@ verbose  = 9
 exclude  = ValuesAndExpressions::ProhibitImplicitNewlines
 
 [Subroutines::ProhibitCallsToUndeclaredSubs]
-exempt_subs = Moose::with
+exempt_subs = Moose::with Moose::has
 
 [-ErrorHandling::RequireUseOfExceptions]
 [-ValuesAndExpressions::RequireNumericVersion]

@@ -1,14 +1,13 @@
 # ABSTRACT: Cache time consuming subroutines, rest api calls
 # George Bouras , george.mpouras@yandex.com
-# Hellas/Athens , 04 Feb 2019
-
+# Hellas/Athens , 06 Feb 2019
 
 package	Cache::SimpleDir;
+use B;
 use File::Path::Tiny;
-our $VERSION = '2.1.2';
+our $VERSION = '2.1.4';
 our @ISA     = ();
-our $ERROR   = 0;
-
+our $ERROR   = undef;
 
 #	Object constructor
 #	__* properties are module privates
@@ -23,8 +22,7 @@ expire_sec	=> 3600,			# After how many seconds the record will be considered exp
 verbose		=> 'False',			# Verbose if TRUE or 1
 callback	=> '__NEW_RECORD',	# Subroutine name that cache new data
 cache_dir	=> $^O=~/(?i)MSWin/ ? (local $_="$ENV{TEMP}\\cache", s/\\/\//g, $_) : '/tmp/cache',
-__userclass	=> $class,			# Class of callback
-__dir		=> undef,			# The subdirectory under the "cache_dir" of your cached files
+__dir 		=> undef,			# The subdirectory under the "cache_dir" of your cached files
 __record	=> undef,
 __tmp		=> undef};
 
@@ -42,29 +40,50 @@ __tmp		=> undef};
 
 		$self->{$_[$i]}=$_[$j]
 		}
-		else {
+		else {		
 		$ERROR = "You tried to define the invalid property \"$_[$i]\" to value \"$_[$j]\" , sorry this is not permitted . Valid proerties are : ". join(', ', sort grep /^[^_]/ , keys %{$self});
 		@{$self}{qw/error error_msg/}=(11,$ERROR);
 		return undef
 		}
 	}
 
+$self->{verbose}	= $self->{verbose}=~/(?i)t|y|1/ ?1:0;
+$self->{cache_dir}	=~s/[\/\\]*$//;
+
+
+
+# Define the "__userclass" Class of the callback
 # Check if the subroutine exists	$self->{callback}  
 # You can call it as				$self->{__userclass}->can($self->{callback})->( 1547328808 )
 
-	if ($self->{callback} ne '__NEW_RECORD') {
-	$self->{__userclass} = [caller]->[0]
+	if ($self->{callback} eq '__NEW_RECORD') {
+	$self->{__userclass} = $class
 	}
+	else {
+	$self->{__userclass} = [caller]->[0];
 
-	if ('CODE' ne ref $self->{__userclass}->can($self->{callback}))	{
-	$ERROR = "Function \"$self->{__userclass}::$self->{callback}\" does not exist";
-	@{$self}{qw/error error_msg/}=(12,$ERROR);
-	return undef
+		if (ref $self->{callback}) {
+
+			if ('CODE' eq ref $self->{callback}) {
+			$self->{__callbackname} = B::svref_2object($self->{callback})->GV->NAME;
+			$self->{__dir} = "$self->{cache_dir}/$self->{__userclass}-$self->{__callbackname}"
+			}
+			else {
+			$ERROR = "As callback you used a non CODE reference";
+			@{$self}{qw/error error_msg/}=(12,$ERROR);
+			return undef
+			}
+		}
+		else {
+		$self->{__dir} = "$self->{cache_dir}/$self->{__userclass}-$self->{callback}";
+
+			if ('CODE' ne ref $self->{__userclass}->can($self->{callback}))	{	
+			$ERROR = "Function \"$self->{__userclass}::$self->{callback}\" does not exist";
+			@{$self}{qw/error error_msg/}=(13,$ERROR);
+			return undef
+			}
+		}
 	}
-
-$self->{verbose}	= $self->{verbose}=~/(?i)t|y|1/ ?1:0;
-$self->{cache_dir}	=~s/[\/\\]*$//;
-$self->{__dir}		= "$self->{cache_dir}/$self->{__userclass}-$self->{callback}";
 
 # Create and clear the top cache directory if missing
 
@@ -77,7 +96,7 @@ $self->{__dir}		= "$self->{cache_dir}/$self->{__userclass}-$self->{callback}";
 
 				unless ( unlink "$self->{__dir}/lock" ) {
 				$ERROR = "Could not remove lock \"$self->{__dir}/lock\" because \"$!\"";
-				@{$self}{qw/error error_msg/}=(13,$ERROR);
+				@{$self}{qw/error error_msg/}=(14,$ERROR);
 				return undef
 				}
 			}
@@ -92,23 +111,23 @@ $self->{__dir}		= "$self->{cache_dir}/$self->{__userclass}-$self->{callback}";
 
 						unless ( unlink "$self->{__dir}/lock" ) {
 						$ERROR = "Could not remove lock \"$self->{__dir}/lock\" of non existing process \"$self->{__tmp}\" because \"$!\"";
-						@{$self}{qw/error error_msg/}=(14,$ERROR);
+						@{$self}{qw/error error_msg/}=(15,$ERROR);
 						return undef
 						}							
 					}
 				}
 				else {
 				$ERROR = "Could not read lock file \"$self->{__dir}/lock\" because \"$!\"\n";
-				@{$self}{qw/error error_msg/}=(15,$ERROR);
+				@{$self}{qw/error error_msg/}=(16,$ERROR);
 				return undef
 				}
 			}
 		}
 
-	unless (opendir CACHE, $self->{__dir}) {$ERROR="Could not read cache directory \"$self->{__dir}\" because \"$!\""; @{$self}{qw/error error_msg/}=(16,$ERROR); return undef}
+	unless (opendir CACHE, $self->{__dir}) {$ERROR="Could not read cache directory \"$self->{__dir}\" because \"$!\""; @{$self}{qw/error error_msg/}=(17,$ERROR); return undef}
 
 		while (my $node = readdir CACHE) {
-			if ((-d "$self->{__dir}/$node") && ($node =~/^\d+$/)) {
+			if ((-d "$self->{__dir}/$node") && ($node=~/^\d+$/)) {
 			$self->{__record} = $node;
 			last
 			}
@@ -120,7 +139,7 @@ $self->{__dir}		= "$self->{cache_dir}/$self->{__userclass}-$self->{callback}";
 
 		unless ( File::Path::Tiny::mk $self->{__dir} ) {
 		$ERROR = "Could not create the top cache directory \"$self->{__dir}\" because \"$!\"";
-		@{$self}{qw/error error_msg/}=(17,$ERROR);
+		@{$self}{qw/error error_msg/}=(18,$ERROR);
 		return undef
 		}
 	}
@@ -218,10 +237,21 @@ my $time= time;
 		return undef
 		}
 
-		unless ( $obj->{__userclass}->can($obj->{callback})->("$obj->{__dir}/$time", @_) ) {
-		$ERROR = "Cache new data fuction $obj->{__userclass}::$obj->{callback} return a false value";
-		@{$obj}{qw/error error_msg/}=(23,$ERROR);		
-		return undef
+		if ( 'CODE' eq ref $obj->{callback} ) {
+
+			unless ( $obj->{callback}->("$obj->{__dir}/$time", @_) ) {
+			$ERROR = "Cache new data fuction $obj->{__userclass}::$obj->{__callbackname} return a false value";
+			@{$obj}{qw/error error_msg/}=(24,$ERROR);
+			return undef
+			}
+		}
+		else {
+
+			unless ( $obj->{__userclass}->can($obj->{callback})->("$obj->{__dir}/$time", @_) ) {
+			$ERROR = "Cache new data fuction $obj->{__userclass}::$obj->{callback} return a false value";
+			@{$obj}{qw/error error_msg/}=(25,$ERROR);
+			return undef
+			}
 		}
 
 	unlink "$obj->{__dir}/lock"
@@ -297,20 +327,26 @@ Cache::SimpleDir - Cache time consuming subroutines, rest api calls
 
 =head1 VERSION
 
-version 2.1.2
+version 2.1.4
 
 =head1 SYNOPSIS
 
   #!/usr/bin/perl
   use Cache::SimpleDir;
 
-  my $cache  =  Cache::SimpleDir->new(
-  cache_dir  => '/tmp',
+  my $key1   =  Cache::SimpleDir->new(
   callback   => 'GetWeather',
+  cache_dir  => '/tmp',
   expire_sec => 1800,
-  verbose    => 'false') or die $SimpleDir::ERROR;
+  verbose    => 'false') or die $Cache::SimpleDir::ERROR;
 
-  my $where_are_my_data = $cache->get('a','b','c') or die $SimpleDir::ERROR;
+  my $key2   =  Cache::SimpleDir->new(
+  callback   => \&GetCountryInfo,
+  cache_dir  => '/tmp',
+  expire_sec => 2592000,
+  verbose    => 'true') or die $Cache::SimpleDir::ERROR;
+
+  my $where_are_my_data = $key1->get('a','b','c') or die $Cache::SimpleDir::ERROR;
   print "data are at: $where_are_my_data\n";
 
   #     How to get and cache new data
@@ -319,6 +355,11 @@ version 2.1.2
   open  FILE, '>', "$dir/file.txt" or return undef;
   print FILE 'Example of callback. Arguments: ', join ',', @_;
   close FILE
+  }
+
+  sub   GetCountryInfo {
+  my    $dir = shift;
+  ...
   }
 
 =head1 DESCRIPTION
@@ -345,7 +386,7 @@ Cache time consuming subroutines or paid api calls
 
 =head1 ERROR HANDLING
 
-On error B<get> returns FALSE. Sets the error message at the variable $SimpleDir::ERROR
+On error B<get> returns FALSE. Sets the error message at the variable $Cache::SimpleDir::ERROR
 and at the property $obj->error_msg while the error code is at $obj->error
 
 =head1 METHODS
@@ -356,7 +397,7 @@ Generate and return a new cache object, while it initialize/overwrite the defaul
 
 B<cache_dir>  I<The root cache directory of your key>
 
-B<callback>   I<The subroutine name that cache new data. Becarefull not it is a simple name not a code reference>
+B<callback>   I<Name or code reference, of the subroutine that caches new data>
 
 B<expire_sec> I<After how many seconds the record will be considered expired and a new one should cached using the callback>
 

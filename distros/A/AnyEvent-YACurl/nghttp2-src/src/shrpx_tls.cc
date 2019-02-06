@@ -2042,13 +2042,13 @@ StringRef get_x509_serial(BlockAllocator &balloc, X509 *x) {
   auto sn = X509_get_serialNumber(x);
   auto bn = BN_new();
   auto bn_d = defer(BN_free, bn);
-  if (!ASN1_INTEGER_to_BN(sn, bn)) {
+  if (!ASN1_INTEGER_to_BN(sn, bn) || BN_num_bytes(bn) > 20) {
     return StringRef{};
   }
 
-  std::array<uint8_t, 8> b;
+  std::array<uint8_t, 20> b;
   auto n = BN_bn2bin(bn, b.data());
-  assert(n == b.size());
+  assert(n <= 20);
 
   return util::format_hex(balloc, StringRef{std::begin(b), std::end(b)});
 #endif // !OPENSSL_1_1_API

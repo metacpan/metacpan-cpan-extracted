@@ -553,6 +553,7 @@ sub EXT_change_password : Extend('Ext.Dialog') : Type('widget') {
         draggable    => \0,
         closable     => \1,
         width        => 320,
+        scrollable   => \1,
 
         keyMap => { ENTER => 'submit', },
 

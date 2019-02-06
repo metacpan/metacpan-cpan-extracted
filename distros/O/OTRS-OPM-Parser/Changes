@@ -1,6 +1,13 @@
 Change history for OTRS::OPM::Parser
 ====================================
 
+1.01 2019-02-06 13:36:00
+
+  + switched from Moose to Moo
+  + removed auto_deref from attributes
+  + added tests
+  + moved own type definitions to extra .pm
+
 0.01 2016-09-28
 
   + initial release

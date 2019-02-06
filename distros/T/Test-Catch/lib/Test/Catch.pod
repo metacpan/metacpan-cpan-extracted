@@ -1,0 +1,72 @@
+=head1 NAME
+
+Test::Catch - Run C++ catch tests from perl test file
+
+=head1 SYNOPSIS
+
+in Makefile.PL
+
+    use XS::Install;
+    WriteMakefile(
+        ...
+        BIN_DEPS => 'Test::Catch',
+        test => {
+            SRC => 't', # make all C files compile in 't' folder into separate SO file when 'make test'
+                        # it's an XS::Install feature
+        },
+        ...
+    );
+    
+in your C test files
+
+    #include <catch.hpp>
+    ...
+    
+Run tests from perl .t file:
+    
+    use MyModule;
+    XS::Loader::load_tests(); # XS::Install's feature - loads second SO which contains code of C tests (not installed)
+    
+    use Test::Catch;
+    catch_run(); # or Test::Catch::run()
+    catch_run("[tag]");
+    done_testing();
+    
+    use Test::Catch '[tag]'; # makes done_testing automatically
+    
+=head1 DESCRIPTION
+
+This module provides C<catch>'s run function which runs CPP catch tests, so that you don't need to have catch run main in every module tests.
+Also this module makes tests output compatible with perl format and can work with perl tests in the same process
+(tests count and subtests nesting are shared).
+
+=head1 FUNCTIONS
+
+=head4 run([@args])
+
+Runs catch tests. If @args are provided the result is if it was provided in command-line for native catch test binary.
+
+Separate arguments work as '&&'. If you want to run, for example test 'name' and all tests with tag 'tag' and all tests with both tag 'tag2' and 'tag3',
+use
+
+    catch_run("name,[tag],[tag2][tag3]");
+    
+=head4 import(@args)
+
+If @args provided, runs tests the same way as C<run(@args)> and calls C<done_testing()> after that.
+
+=head1 EXPORTED FUNCTIONS
+
+=head4 catch_run([@tags])
+
+See C<run>
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,10 @@
+0.1.3    06.02.2019
+           - moved to XS::Install
+           - bugfix with switching off rmagical flag (panic with backrefs)
+           - renamed from Panda::next to next::XS
+0.1.2    16.04.2018
+           - remove useless dependencies, remove static algo from code
+0.1.1    13.04.2018
+           - remove useless tests (from perl core)
+0.1.0    12.04.2018
+           - first release

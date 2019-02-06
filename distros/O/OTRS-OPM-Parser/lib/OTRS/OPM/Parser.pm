@@ -2,89 +2,69 @@ package OTRS::OPM::Parser;
 
 # ABSTRACT: Parser for the .opm file
 
-our $VERSION = 1.00;
+our $VERSION = 1.01;
 
-use Moose;
-use Moose::Util::TypeConstraints;
+use Moo;
+use MooX::HandlesVia;
+use OTRS::OPM::Parser::Types qw(:all);
 
 use MIME::Base64 ();
 use Path::Class;
 use Try::Tiny;
 use XML::LibXML;
 
-# define types
-subtype 'VersionString' =>
-  as 'Str' =>
-  where { $_ =~ m{ \A (?:[0-9]+) (?:\.[0-9]+){0,2} (?:_\d+)? \z }xms };
-
-subtype 'FrameworkVersionString' =>
-  as 'Str' =>
-  where { $_ =~ m{ \A (?: (?:x|[0-9]+x?) \. ){1,2} (?: x | [0-9]+x? ) \z }xms };
-
-subtype 'XMLTree' =>
-  as 'Object' =>
-  where { $_->isa( 'XML::LibXML::Document' ) };
-
 # declare attributes
-has name         => ( is  => 'rw', isa => 'Str', );
-has version      => ( is  => 'rw', isa => 'VersionString', );
-has vendor       => ( is  => 'rw', isa => 'Str', );
-has url          => ( is  => 'rw', isa => 'Str', );
-has license      => ( is  => 'rw', isa => 'Str', );
-has description  => ( is  => 'rw', isa => 'Str', );
-has error_string => ( is  => 'rw', isa => 'Str', );
-
-has tree => (
-    is       => 'rw',
-    isa      => 'XMLTree',
-);
+has name         => ( is  => 'rw', isa => Str, );
+has version      => ( is  => 'rw', isa => VersionString, );
+has vendor       => ( is  => 'rw', isa => Str, );
+has url          => ( is  => 'rw', isa => Str, );
+has license      => ( is  => 'rw', isa => Str, );
+has description  => ( is  => 'rw', isa => Str, );
+has error_string => ( is  => 'rw', isa => Str, );
+has tree         => ( is  => 'rw', isa => XMLTree, );
 
 has opm_file => (
     is       => 'ro',
-    isa      => 'Str',
+    isa      => Str,
     required => 1,
 );
 
 has files => (
-    traits     => ['Array'],
-    is         => 'rw',
-    isa        => 'ArrayRef[HashRef]',
-    auto_deref => 1,
-    default    => sub{ [] },
-    handles    => {
+    is          => 'rw',
+    isa         => ArrayRef[HashRef],
+    default     => sub{ [] },
+    handles_via => 'Array',
+    handles     => {
         add_file => 'push',
     },
 );
 
 has framework  => (
-    traits     => ['Array'],
-    is         => 'rw',
-    isa        => 'ArrayRef[FrameworkVersionString]',
-    auto_deref => 1,
-    default    => sub { [] },
-    handles    => {
+    handles_via => 'Array',
+    is          => 'rw',
+    isa         => ArrayRef[FrameworkVersionString],
+    default     => sub { [] },
+    handles     => {
         add_framework => 'push',
     },
 );
 
 has framework_details => (
-    traits     => ['Array'],
-    is         => 'rw',
-    isa        => 'ArrayRef[HashRef]',
-    auto_deref => 1,
-    default    => sub { [] },
-    handles    => {
+    handles_via => 'Array',
+    is          => 'rw',
+    isa         => ArrayRef[HashRef],
+    default     => sub { [] },
+    handles     => {
         add_framework_detail => 'push',
     },
 );
 
 has dependencies => (
-    traits     => ['Array'],
-    is         => 'rw',
-    isa        => 'ArrayRef[HashRef[Str]]',
-    auto_deref => 1,
-    default    => sub { [] },
-    handles    => {
+    handles_via => 'Array',
+    is          => 'rw',
+    isa         => ArrayRef[HashRef[Str]],
+    default     => sub { [] },
+    handles     => {
         add_dependency => 'push',
     },
 );
@@ -96,7 +76,11 @@ sub documentation {
     my $doc_file;
     my $found_file;
     
-    for my $file ( $self->files ) {
+    my $lang = $params{lang} || 'en';
+    my $type = $params{type} || '';
+
+    for my $file ( @{ $self->files } ) {
+
         my $filename = $file->{filename};
         next if $filename !~ m{ \A doc/ }x;
         
@@ -105,7 +89,6 @@ sub documentation {
             $found_file = $filename;
         }
         
-        my $lang = $params{lang} || '';
         next if $lang && $filename !~ m{ \A doc/$lang/ }x;
         
         if ( $lang && $found_file !~ m{ \A doc/$lang/ }x ) {
@@ -113,7 +96,6 @@ sub documentation {
             $found_file = $filename;
         }
         
-        my $type = $params{type} || '';
         next if $type && $filename !~ m{ \A doc/[^/]+/.*\.$type \z }x;
         
         if ( $type && $found_file !~ m{ \A doc/$lang/ }x ) {
@@ -127,6 +109,41 @@ sub documentation {
     }
     
     return $doc_file;
+}
+
+sub validate {
+    my ($self) = @_;
+
+    $self->error_string( '' );
+    
+    if ( !-e $self->opm_file ) {
+        $self->error_string( 'File does not exist' );
+        return;
+    }
+
+    my $tree;
+    try {
+        my $parser = XML::LibXML->new;
+        $tree      = $parser->parse_file( $self->opm_file );
+    }
+    catch {
+        $self->error_string( 'Could not parse .opm: ' . $_ );
+    };
+
+    return if $self->error_string;
+
+    try {
+        my $xsd    = $self->_get_xsd;
+        my $schema = XML::LibXML::Schema->new( string => $xsd );
+
+        $schema->validate( $tree );
+    }
+    catch {
+        $self->error_string( 'Could not validate against XML schema: ' . $_ );
+    };
+
+    return if $self->error_string;
+    return 1;
 }
 
 sub parse {
@@ -155,7 +172,7 @@ sub parse {
     
     # check if the opm file is valid.
     try {
-        my $xsd = do{ local $/; <DATA> };
+        my $xsd = $self->_get_xsd;
         XML::LibXML::Schema->new( string => $xsd )
     }
     catch {
@@ -279,109 +296,23 @@ sub as_sopm {
 
 no Moose;
 
-1;
 
-=pod
+sub _get_xsd {
 
-=encoding UTF-8
-
-=head1 NAME
-
-OTRS::OPM::Parser - Parser for the .opm file
-
-=head1 VERSION
-
-version 0.01
-
-=head1 SYNOPSIS
-
-    use OTRS::OPM::Parser;
-    
-    my $opm_file = 'QuickMerge-3.3.2.opm';
-    my $opm      = OTRS::OPM::Parser->new( opm_file => $opm_file );
-    
-    say sprintf "This is version %s of package %s",
-        $opm->version,
-        $opm->name;
-    
-    say "You can install it on those OTRS versions: ", join ", ", $opm->framework;
-    
-    say "Dependencies: ";
-    for my $dep ( $opm->dependencies ) {
-        say sprintf "%s (%s) - (%s)", 
-            $dep->{name},
-            $dep->{version},
-            $dep->{type};
-    }
-
-=head1 METHODS
-
-=head2 new
-
-=head2 parse
-
-=head2 as_sopm
-
-=head2 documentation
-
-=head1 ATTRIBUTES
-
-=over 4
-
-=item * opm_file
-
-=item * tree
-
-=item * framework
-
-=item * dependencies
-
-=item * files
-
-=item * error_string
-
-=item * description
-
-=item * license
-
-=item * url
-
-=item * vendor
-
-=item * version
-
-=item * name
-
-=back
-
-=head1 AUTHOR
-
-Renee Baecker <reneeb@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2016 by Renee Baecker.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
-=cut
-
-__DATA__
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    return q~<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
     <xs:import namespace="http://www.w3.org/XML/1998/namespace"/>
     
     <xs:element name="otrs_package">
         <xs:complexType>
-            <xs:sequence>
+            <xs:all>
+                <xs:element ref="CVS" minOccurs="0" maxOccurs="1"/>
                 <xs:element ref="Name" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="Version"/>
-                <xs:element ref="Vendor"/>
-                <xs:element ref="URL"/>
-                <xs:element ref="License"/>
-                <xs:element ref="ChangeLog" minOccurs="0" maxOccurs="unbounded" />
+                <xs:element ref="Version" maxOccurs="1"/>
+                <xs:element ref="Vendor" maxOccurs="1"/>
+                <xs:element ref="URL" maxOccurs="1"/>
+                <xs:element ref="License" maxOccurs="1"/>
+                <xs:element ref="ChangeLog" minOccurs="0" />
                 <xs:element ref="Description" maxOccurs="unbounded" />
                 <xs:element ref="Framework" maxOccurs="unbounded" />
                 <xs:element ref="OS" minOccurs="0" maxOccurs="unbounded" />
@@ -395,14 +326,14 @@ __DATA__
                 <xs:element ref="CodeUpgrade" minOccurs="0" maxOccurs="unbounded" />
                 <xs:element ref="CodeUninstall" minOccurs="0" maxOccurs="unbounded" />
                 <xs:element ref="CodeReinstall" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="BuildDate" minOccurs="0" />
-                <xs:element ref="BuildHost" minOccurs="0" />
-                <xs:element ref="Filelist"/>
+                <xs:element ref="BuildDate" minOccurs="0" maxOccurs="1" />
+                <xs:element ref="BuildHost" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="Filelist" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="DatabaseInstall" minOccurs="0" maxOccurs="unbounded" />
                 <xs:element ref="DatabaseUpgrade" minOccurs="0" maxOccurs="unbounded" />
                 <xs:element ref="DatabaseReinstall" minOccurs="0" maxOccurs="unbounded" />
                 <xs:element ref="DatabaseUninstall" minOccurs="0" maxOccurs="unbounded" />
-            </xs:sequence>
+            </xs:all>
             <xs:attribute name="version" use="required" type="xs:anySimpleType"/>
         </xs:complexType>
     </xs:element>
@@ -435,6 +366,7 @@ __DATA__
             <xs:simpleContent>
                 <xs:extension base="xs:string">
                     <xs:attribute name="Minimum" use="optional" type="xs:anySimpleType"/>
+                    <xs:attribute name="Maximum" use="optional" type="xs:anySimpleType"/>
                 </xs:extension>
             </xs:simpleContent>
         </xs:complexType>
@@ -572,6 +504,7 @@ __DATA__
         </xs:complexType>
     </xs:element>
     
+    <xs:element name="CVS" type="xs:token"/>
     <xs:element name="Name" type="xs:token"/>
     <xs:element name="Vendor" type="xs:token"/>
     <xs:element name="URL" type="xs:token"/>
@@ -871,3 +804,98 @@ __DATA__
     </xs:element>
     
 </xs:schema>
+~;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+OTRS::OPM::Parser - Parser for the .opm file
+
+=head1 VERSION
+
+version 1.01
+
+=head1 SYNOPSIS
+
+    use OTRS::OPM::Parser;
+    
+    my $opm_file = 'QuickMerge-3.3.2.opm';
+    my $opm      = OTRS::OPM::Parser->new( opm_file => $opm_file );
+    
+    say sprintf "This is version %s of package %s",
+        $opm->version,
+        $opm->name;
+    
+    say "You can install it on those OTRS versions: ", join ", ", @{ $opm->framework };
+    
+    say "Dependencies: ";
+    for my $dep ( @{ $opm->dependencies } ) {
+        say sprintf "%s (%s) - (%s)", 
+            $dep->{name},
+            $dep->{version},
+            $dep->{type};
+    }
+
+=head1 METHODS
+
+=head2 new
+
+=head2 parse
+
+=head2 as_sopm
+
+=head2 documentation
+
+=head2 validate
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item * opm_file
+
+=item * tree
+
+=item * framework
+
+=item * dependencies
+
+=item * files
+
+=item * error_string
+
+=item * description
+
+=item * license
+
+=item * url
+
+=item * vendor
+
+=item * version
+
+=item * name
+
+=back
+
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

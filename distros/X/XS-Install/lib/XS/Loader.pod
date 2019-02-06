@@ -1,0 +1,68 @@
+=head1 NAME
+
+XS::Loader - Load XS modules which exports C functionality and check for binary compability.
+
+=head1 SYNOPSIS
+
+    package MyXS;
+    use XS::Loader;
+    
+    our $VERSION = '0.1.3';
+    XS::Loader::bootstrap(); # loads XS and checks for binary compability
+    
+=head1 FUNCTIONS
+
+=head4 load ([$module], [$VERSION], [$flags])
+
+=head4 bootstrap ([$module], [$VERSION], [$flags])
+
+Dynamically loads your module's C library. It is more convenient usage of:
+
+    use DynaLoader;
+    sub dl_load_flags { $flags }
+    DynaLoader::bootstrap_inherit($module, $VERSION);
+
+Or (if $flags == 0)
+
+    use XSLoader;
+    XSLoader::load($module, $VERSION);
+
+If you don't provide $module it will be detected as caller. If no $VERSION provided, ${module}::VERSION variable will be used.
+If $flags is undef or not provided, 0x01 used.
+
+Additionally, checks for binary compability with all XS modules you depend on (binary).
+If any of these have changed their versions, croaks.
+
+0x01 in $flags is not required for XS::Install's XS modules as it tells linker to link against all SO/DLL dependencies explicitly
+(except for MacOS, where it is required).
+However if you don't set $flags, and someone uses your XS module's C API, and someone's module neither use XS::Install nor link
+against your SO/DLL explicitly, it won't work. So it is recommended to set $flags = 0x01.
+
+=head4 load_tests($module)
+
+Tries to load C<blib/ctest.so> (or <blib/ctest.dll>) file and exectute it's boostrap section.
+
+The C<ctest.so> is created for you if the C<Makefile.PL> has the following:
+
+	use XS::Install;
+
+	write_makefile(
+		...
+		test             => {
+			SRC                  => 't',
+			RECURSIVE_TEST_FILES => 1,
+		},
+		...
+	);
+
+If you don't provide C<$module> it will be detected as caller.
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

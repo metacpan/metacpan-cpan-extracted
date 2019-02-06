@@ -1,5 +1,8 @@
 File::BOM changes document
 
+0.16 - Wed Feb  6 2019
+    - Fix tests failing under Encode 2.99. Thanks to Petr Pisar.
+
 0.15 - Mon Dec 14 2015
     - Fix spelling errors spotted by debian team. Thanks to Gregor Herrmann.
 

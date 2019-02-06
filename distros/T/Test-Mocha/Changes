@@ -1,5 +1,11 @@
 Revision history for Test-Mocha
 
+0.67    2019-02-05
+
+    - Add compile tests.
+    - Make UNIVERSAL::ref required again because of tests failing on Perl
+      versions less than 5.025.
+
 0.66    2019-02-04
 
     - Revert the change from 0.65 because it broke spies.

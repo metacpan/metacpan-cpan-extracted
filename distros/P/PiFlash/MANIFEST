@@ -13,8 +13,12 @@ bin/piflash
 dist.ini
 lib/PiFlash.pm
 lib/PiFlash/Command.pm
+lib/PiFlash/Hook.pm
 lib/PiFlash/Inspector.pm
+lib/PiFlash/MediaWriter.pm
 lib/PiFlash/State.pm
 t/001module_load.t
+t/010PiFlash_State.t
+t/011PiFlash_Command.t
 t/author-critic.t
 t/author-pod-syntax.t

@@ -1,5 +1,7 @@
 #!perl
 
+BEGIN { pop @INC if $INC[-1] eq '.' }
+
 use strict;
 use warnings;
 use lib ();
@@ -8,7 +10,9 @@ use Getopt::Long;
 use Pod::Usage;
 
 GetOptions(\my %opts, qw/
-  lib|I=s@
+  inc|lib|I=s@
+  libs|scan_also|scan-also|also=s@
+  parsers|parser=s@
   version
   help
   json
@@ -17,10 +21,12 @@ GetOptions(\my %opts, qw/
   exclude_core|exclude-core
   perl_version|perl-version=s
   allow_test_pms|allow-test-pms
-  features=s
+  features|feature=s@
   base_dir|base-dir=s
   ignore_re|ignore-re=s
   ignore=s@
+  private_re|private-re=s
+  private=s@
   recommends
   suggests
   develop
@@ -38,7 +44,7 @@ if ($opts{help}) {
   exit;
 }
 
-lib->import(@{$opts{lib}}) if $opts{lib};
+lib->import(@{$opts{inc}}) if $opts{inc};
 
 for my $key (keys %opts) {
   next unless $key =~ /\-/;
@@ -72,7 +78,7 @@ a single combined list of prerequisites, which should be suitable
 for piping to C<cpanm> or similar tools.
 
 You can also pass files and/or directories to limit files to scan.
-In this case, however, C<scan-perl-prereqs-nqlite> doesn't try to
+In this case, however, C<scan-perl-prereqs-nqlite> may fail to
 exclude modules that should belong to the same distribution.
 
 =head1 OPTIONS
@@ -136,6 +142,33 @@ useful when your distribution has a set of OS-specific modules, for example.
 You can also specify a regexp instead of a list of paths. If this is
 set, C<ignore> options are ignored.
 
+=item private
+
+Set a list of modules C<scan-perl-prereqs-nqlite> should consider
+private, that is, that are not uploaded to the CPAN. Contrary to
+the C<ignore> option, which makes the scanner skip scanning the
+file, this option lets the scanner scan files, and excludes matched
+prerequisites afterwards.
+
+=item private_re
+
+You can also specify a regexp instead of a list of modules. If this
+is set, C<private> options are ignored.
+
+=item scan_also
+
+Set a list of extra paths C<scan-perl-prereqs-nqlite> should also
+scan. This is useful when your application/distribution uses an
+untraditional file layout.
+
+=item feature
+
+  scan-perl-prereqs-nqlite \
+    --feature name:description:lib/My/Plugin/For/SpecificOS \
+    --feature name:description:web/lib,web/bin
+
+Specify a feature name, a description, and matching paths.
+
 =item use_index
 
 You can specify an index name of CPAN::Common::Index module (such as "Mirror" or "MetaDB") not to list all the modules of a required distribution.
@@ -149,6 +182,17 @@ some uncommon places and/or some of them are listed in C<no_index>.
 However, files in C<blib> may be older than the ones under C<lib>
 etc, and you need to update them by running a make or a C<Build>
 script before you run C<scan-perl-prereqs-nqlite>.
+
+=item parser
+
+Set a list of parsers (or parser tags) C<scan-perl-prereqs-nqlite>
+uses. If this option is not set, the scanner uses C<:installed>
+parsers by default.
+
+=item inc
+
+Add a list of additional @INC path C<scan-perl-prereqs-nqlite>
+looks for private parsers.
 
 =back
 

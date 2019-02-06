@@ -29,7 +29,7 @@ is $opm->description, 'A module to merge tickets more quickly.', 'description';
 
 is $opm->opm_file, $opm_file, 'opm_file';
 
-is_deeply [ map{ $_->{filename} }$opm->files ], [qw!
+is_deeply [ map{ $_->{filename} }@{ $opm->files } ], [qw!
   Kernel/Config/Files/QuickMerge.xml
   Kernel/Output/HTML/OutputFilterMergeOverview.pm
   doc/en/QuickMerge.pod
@@ -38,14 +38,14 @@ is_deeply [ map{ $_->{filename} }$opm->files ], [qw!
 my ($doc) = map{ $_->{filename} }$opm->documentation;
 is $doc, 'doc/en/QuickMerge.pod', 'documentation';
 
-is_deeply [ $opm->framework ], [qw/
+is_deeply $opm->framework, [qw/
     3.0.x
     3.1.x
     3.2.x
     3.3.x
 /], 'framework';
 
-is_deeply [ $opm->dependencies ], [
+is_deeply $opm->dependencies, [
     { type => 'OTRS', version => '0.0.1', name => 'TestPackage' },
     { type => 'OTRS', version => '1.2.4', name => 'LocalPackage' },
     { type => 'CPAN', version => '4.32', name => 'Mojolicious' },

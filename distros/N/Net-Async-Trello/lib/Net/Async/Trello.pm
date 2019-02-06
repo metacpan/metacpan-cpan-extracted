@@ -6,7 +6,7 @@ use warnings;
 
 use parent qw(IO::Async::Notifier);
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 =head1 NAME
 
@@ -259,7 +259,7 @@ sub http_get {
         return { } if $resp->code == 204;
         return { } if 3 == ($resp->code / 100);
         try {
-            return Future->done(decode_json_text($resp->decoded_content))
+            return Future->done(decode_json_utf8($resp->decoded_content))
         } catch {
             $log->errorf("JSON decoding error %s from HTTP response %s", $@, $resp->as_string("\n"));
             return Future->fail($@ => json => $resp);
@@ -296,7 +296,7 @@ sub http_post {
         return { } if $resp->code == 204;
         return { } if 3 == ($resp->code / 100);
         try {
-            return Future->done(decode_json_text($resp->decoded_content))
+            return Future->done(decode_json_utf8($resp->decoded_content))
         } catch {
             $log->errorf("JSON decoding error %s from HTTP response %s", $@, $resp->as_string("\n"));
             return Future->fail($@ => json => $resp);
@@ -333,7 +333,7 @@ sub http_put {
         return { } if $resp->code == 204;
         return { } if 3 == ($resp->code / 100);
         try {
-            return Future->done(decode_json_text($resp->decoded_content))
+            return Future->done(decode_json_utf8($resp->decoded_content))
         } catch {
             $log->errorf("JSON decoding error %s from HTTP response %s", $@, $resp->as_string("\n"));
             return Future->fail($@ => json => $resp);

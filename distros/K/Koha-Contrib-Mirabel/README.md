@@ -325,9 +325,9 @@ EXPORT PERL5LIB=<koha_mirabel_root>/lib:$PERL5LIB
 
 ## Copyright et license
 
-Copyright 2015 by Tamil, s.a.r.l.
+Copyright 2019 by Tamil, s.a.r.l.
 
-<http://www.tamil.fr>
+<https://www.tamil.fr>
 
 This script is free software; you can redistribute it and/or modify it under
 the same terms as Perl 5 itself.

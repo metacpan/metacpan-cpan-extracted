@@ -97,6 +97,8 @@ struct Config {
   uint32_t encoder_header_table_size;
   // file descriptor for upload data
   int data_fd;
+  // file descriptor to write per-request stats to.
+  int log_fd;
   uint16_t port;
   uint16_t default_port;
   bool verbose;
@@ -122,10 +124,14 @@ struct Config {
 struct RequestStat {
   // time point when request was sent
   std::chrono::steady_clock::time_point request_time;
+  // same, but in wall clock reference frame
+  std::chrono::system_clock::time_point request_wall_time;
   // time point when stream was closed
   std::chrono::steady_clock::time_point stream_close_time;
   // upload data length sent so far
   int64_t data_offset;
+  // HTTP status code
+  int status;
   // true if stream was successfully closed.  This means stream was
   // not reset, but it does not mean HTTP level error (e.g., 404).
   bool completed;

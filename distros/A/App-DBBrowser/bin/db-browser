@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.054';
+our $VERSION = '2.056';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.054
+Version 2.056
 
 =cut
 
@@ -114,7 +114,7 @@ With the option I<mouse> enabled it can be used the mouse with the left mouse ke
 To confirm a chosen menu item use the C<Return> key.
 
 In some sub-menus it is possible to select more then one item before C<Return> is pressed (for example I<Choose Rows>
-and I<Choose Columns> from the input filter - see L</Insert Into>); in such sub-menus the list of items marked with the
+and I<Choose Cols> from the input filters; in such sub-menus the list of items marked with the
 C<SpaceBar> are added to the chosen items when C<Return> is pressed. If a mouse mode is enabled, it can be used the
 right mouse key instead of the C<SpaceBar>. A C<Ctrl-SpaceBar> inverts the made choices - so for example to select all
 but one select the one with the C<SpaceBar> and then press C<Ctrl-SpaceBar>.
@@ -192,46 +192,26 @@ The menu entries of the table menu:
 
 Selecting the prompt line (the database name) opens a menu with these entries:
 
-=head4 Create Table
-
-Selecting I<Create Table> opens a sub-menu with these entries:
-
 =over
 
-=item Plain
+=item Create Table
 
-Create a table.
+See L</WRITE ACCESS>
 
-=item Copy and Paste
+=item Drop Table
 
-Reads from STDIN until the end of input. Then it creates a table and inserts the records of fields parsed from the input
-data. In the I<Settings> one can configure how the data is parsed.
+See L</WRITE ACCESS>
 
-See also L</Create Table>.
-
-=item From File
-
-Like I<Copy and Paste> with the difference that the data is read from a chosen file.
-
-=item Settings
-
-Selecting I<Settings> allows one to set the options described in the option group L</Insert Into> for the current
-database.
-
-=back
-
-=head4 Drop table
-
-Drop a table. The whole table is shown before the user confirms to drop the table.
-
-=head4 Attache DB
+=item Attach DB
 
 I<Attache DB> is available only for C<SQLite> databases. I<Attach DB> can be used to attach databases to the current
 database.
 
-=head4 Detach DB
+=item Detach DB
 
 This entry is available if a C<SQLite> database has attached databases.
+
+=back
 
 =head3 Tables
 
@@ -268,132 +248,17 @@ The SQL Menu has the following menu entries:
 
 Selecting this prompt line (I<Customize:>) opens a menu with these entries:
 
-(C<DELETE>, C<UPDATE> or C<INSERT INTO> are not available with C<JOIN> and C<UNION> statements (except C<INSERT> with
-C<mysql> and C<JOIN>))
-
-=head4 Insert Into
-
-Three different ways to insert data into a table are available:
-
 =over
 
-=item Plain
+=item Insert Into
 
-Insert data column by column.
+=item Update
 
-=item Copy and Paste
-
-Multi line input: reads until the end of input. It is OS-depend how to indicate the end of input.
-
-=item From File
-
-Read the input from am file. Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
+=item Delete
 
 =back
 
-If the first column of a table is an auto-increment column, the C<INSERT INTO> statement is build without this first
-column. This feature is available if it is supported by the database plugin.
-
-Input filters:
-
-=over
-
-=item Choose Columns
-
-Use only selected columns of the imported data.
-
-If the imported data has empty columns, the non-empty columns are preselected. Columns are regarded as empty if the
-values of all fields in the column - including the column header - have no length.
-
-=item Choose Rows
-
-Use only selected rows of the imported data.
-
-If the input has rows with different numbers of columns, this filter sorts the rows in groups with the same number of
-columns. The user can then select the group of rows which should be used.
-
-=item A Range of Rows
-
-Use only a range of rows.
-
-=item Add Column
-
-Add an empty column: adds a column to the header row and adjusts the remaining rows to the length of the header row.
-
-If the input has rows with different numbers of columns, use first I<Choose Rows> to select the rows to use.
-
-=item Empty_to_NULL
-
-Convert fields containing an empty string to NULL (undefined).
-
-With I<Plain> and I<Copy & Paste> this filter is enabled by default.
-
-=item Reset
-
-Reset the filters to the default values.
-
-
-=item Cols_to_Rows
-
-Transpose columns to rows.
-
-     Year | 2000 | 2001 | 2002              Year | Max | Min
-    ------|------|------|------             -----|-----|----
-     Max  |   14 |   22 |   17              2000 |  14 |  11
-    ------|------|------|------             2001 |  22 |  10
-     Min  |   11 |   10 |    9              2002 |  17 |   9
-
-=item Merge_Rows
-
-     Month | Average | Average              Month | Average MinTemp | Average MaxTemp
-    -------|---------|---------             ------|-----------------|----------------
-           | MinTemp | MaxTemp              Jan   |               9 |              22
-    -------|---------|---------             Feb   |              10 |              23
-     Jan   |       9 |      22
-    -------|---------|---------
-     Feb   |      10 |      23
-
-=item Split_Table
-
-     y  | factor  | y  | factor             y  | factor
-    ----|---------|----|---------           ---|--------
-     62 | 8,975.1 | 64 | 9,986.5            62 | 8,975.1
-    ----|---------|----|---------           63 | 9,745.8
-     63 | 9,745.8 | 65 | 9,782.7            y  | factor
-                                            64 | 9,818.2
-                                            65 | 9,986.5
-
-=item Split_Col
-
-     Item | length/width/heigh              Item | length | width | heigh
-    ------|--------------------             -----|--------|-------|------
-      423 | 40/30/25                         423 |     40 |    30 |    25
-    ------|--------------------               64 |     80 |    60 |    30
-       64 | 80/60/30                         705 |     50 |    50 |    40
-    ------|--------------------
-      705 | 50/50/40
-
-=item Search_Replace
-
-     y  | factor                            y  | factor
-    ----|---------                          ---|-------
-     62 | 8,975.1                           62 | 8975.1
-    ----|---------                          63 | 9745.8
-     63 | 9,745.8                           64 | 9818.2
-    ----|---------
-     64 | 9,818.2
-
-=back
-
-=head4 Update
-
-Update records.
-
-See also L</Extended SET> and L</Extended WHERE>
-
-=head4 Delete
-
-Delete records.
+See L</WRITE ACCESS>
 
 =head3 Print TABLE
 
@@ -437,6 +302,173 @@ C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is
 =head3 Reset
 
 Reset the SQL statement.
+
+=head1 WRITE ACCESS
+
+=head2 Create/Drop Table
+
+I<Create/Drop Table> can be reached by selecting the prompt-line in the L</Table Menu> if the respective option is
+activated.
+
+=head3 Create Table
+
+Selecting I<Create Table> opens a sub-menu with these entries:
+
+=over
+
+=item Plain
+
+Create a table.
+
+=item Copy and Paste
+
+Reads from STDIN until the end of input. Then it creates a table and inserts the records of fields parsed from the input
+data. In the I<Settings> one can configure how the data is parsed.
+
+=item From File
+
+Like I<Copy and Paste> with the difference that the data is read from a chosen file.
+
+=item Settings
+
+Selecting I<Settings> allows one to set the options described in the option group L</Input> for the current
+database.
+
+=back
+
+=head3 Drop table
+
+Drop a table. The whole table is shown before the user confirms to drop the table.
+
+=head2 Insert Into/Update/Delete
+
+I<Insert Into>, I<Update> and I<Delete> can be reached by selecting the prompt-line in the L</SQL Menu> if the respective
+option is activated.
+
+I<Delete>, I<Update> or I<Insert Into>  may not be available with C<JOIN> and C<UNION> statements.
+
+=head3 Insert Into
+
+Three different ways to insert data into a table are available:
+
+=over
+
+=item Plain
+
+Insert data column by column.
+
+=item Copy and Paste
+
+Multi line input: reads until the end of input. It is OS-depend how to indicate the end of input.
+
+=item From File
+
+Read the input from am file. Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
+
+=back
+
+If the first column of a table is an auto-increment column, the C<INSERT INTO> statement is build without this first
+column. This feature is available if it is supported by the database plugin.
+
+=head4 Input filters
+
+=over
+
+=item Choose Cols
+
+Use only selected columns of the imported data.
+
+If the imported data has empty columns, the non-empty columns are preselected. Columns are regarded as empty if the
+values of all fields in the column - including the column header - have no length.
+
+=item Choose Rows
+
+Use only selected rows of the imported data.
+
+If the input has rows with different numbers of columns, this filter sorts the rows in groups with the same number of
+columns. The user can then select the group of rows which should be used.
+
+=item Range Rows
+
+Use only a range of rows.
+
+=item Add Col
+
+Add an empty column: adds a column to the header row and adjusts the remaining rows to the length of the header row.
+
+If the input has rows with different numbers of columns, use first I<Choose Rows> to select the rows to use.
+
+=item Empty to NULL
+
+Convert fields containing an empty string to NULL (undefined).
+
+With I<Plain> and I<Copy & Paste> this filter is enabled by default.
+
+=item Reset
+
+Reset the filters to the default values.
+
+=item Cols to Rows
+
+Transpose columns to rows.
+
+     Year | 2000 | 2001 | 2002              Year | Max | Min
+    ------|------|------|------             -----|-----|----
+     Max  |   14 |   22 |   17              2000 |  14 |  11
+    ------|------|------|------             2001 |  22 |  10
+     Min  |   11 |   10 |    9              2002 |  17 |   9
+
+=item Merge Rows
+
+     Month | Average | Average              Month | Average MinTemp | Average MaxTemp
+    -------|---------|---------             ------|-----------------|----------------
+           | MinTemp | MaxTemp              Jan   |               9 |              22
+    -------|---------|---------             Feb   |              10 |              23
+     Jan   |       9 |      22
+    -------|---------|---------
+     Feb   |      10 |      23
+
+=item Split Table
+
+     y  | factor  | y  | factor             y  | factor
+    ----|---------|----|---------           ---|--------
+     62 | 8,975.1 | 64 | 9,986.5            62 | 8,975.1
+    ----|---------|----|---------           63 | 9,745.8
+     63 | 9,745.8 | 65 | 9,782.7            y  | factor
+                                            64 | 9,818.2
+                                            65 | 9,986.5
+
+=item Split Col
+
+     Item | length/width/heigh              Item | length | width | heigh
+    ------|--------------------             -----|--------|-------|------
+      423 | 40/30/25                         423 |     40 |    30 |    25
+    ------|--------------------               64 |     80 |    60 |    30
+       64 | 80/60/30                         705 |     50 |    50 |    40
+    ------|--------------------
+      705 | 50/50/40
+
+=item Search Replace
+
+     y  | factor                            y  | factor
+    ----|---------                          ---|-------
+     62 | 8,975.1                           62 | 8975.1
+    ----|---------                          63 | 9745.8
+     63 | 9,745.8                           64 | 9818.2
+    ----|---------
+     64 | 9,818.2
+
+=back
+
+=head3 Update
+
+Update records.
+
+See also L</Extended SET> and L</Extended WHERE>
+
+=head3 Delete
+
+Delete records.
 
 =head1 OPTIONS
 
@@ -774,7 +806,7 @@ to the default value (dot).
 
 Enable/disable C<File::Find> warnings when searching for C<SQLite> databases.
 
-=head2 Insert Into
+=head2 Input
 
 =head3 Parse Tool
 

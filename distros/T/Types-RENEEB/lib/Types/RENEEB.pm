@@ -10,7 +10,7 @@ use warnings;
 use Type::Library -base;
 use Type::Utils ();
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 Type::Utils::extends(qw/Types::OTRS Types::Dist/);
 
@@ -28,7 +28,7 @@ Types::RENEEB - Several predefined Type::Tiny types
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

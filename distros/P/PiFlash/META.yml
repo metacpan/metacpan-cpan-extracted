@@ -3,6 +3,7 @@ abstract: 'Raspberry Pi SD-flashing script with safety checks to avoid erasing t
 author:
   - 'Ian Kluft <cpan-dev@iankluft.com>'
 build_requires:
+  Data::Dumper: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -21,7 +22,6 @@ requires:
   Getopt::Long: '0'
   IO::Handle: '0'
   IO::Poll: '0'
-  Moose: '0'
   POSIX: '0'
   autodie: '0'
   perl: v5.18.0
@@ -30,5 +30,5 @@ requires:
 resources:
   homepage: https://github.com/ikluft/piflash
   repository: https://github.com/ikluft/piflash.git
-version: 0.0.4
+version: 0.0.6
 x_serialization_backend: 'YAML::Tiny version 1.73'

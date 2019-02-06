@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.12
+    version 0.14
 
 SYNOPSIS
 
@@ -149,6 +149,13 @@ PROPERTIES
       This is arguably the correct thing to do, but changes the line
       numbering of the generated Perl module or source, and thus optional.
 
+    skip_main_module
+
+      Set to true to ignore the main module in the distribution. This
+      prevents a warning when using
+      Dist::Zilla::Plugin::VersionFromMainModule to obtain the version
+      number instead of the dist.ini file.
+
 BUGS
 
     Please report any bugs or feature requests on the bugtracker website
@@ -160,6 +167,8 @@ BUGS
 CONTRIBUTORS
 
       * Alexandr Ciornii <alexchorny@gmail.com>
+
+      * Stephan Loyd <stephanloyd9@gmail.com>
 
       * Alexei Znamensky <russoz@cpan.org>
 
@@ -173,9 +182,11 @@ CONTRIBUTORS
 
       * Graham Ollis <plicease@cpan.org>
 
+      * Graham✈️✈️ <plicease@cpan.org>
+
       * Ian Sealy <git@iansealy.com>
 
-      * Stephan Loyd <stephanloyd9@gmail.com>
+      * Michael Jemmeson <mjemmeson@cpan.org>
 
 AUTHORS
 
@@ -185,7 +196,7 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2017 by Caleb Cushing.
+    This software is Copyright (c) 2019 by Caleb Cushing.
 
     This is free software, licensed under:
 

@@ -8,7 +8,7 @@ unsigned int STDCALL
 fill_my_string(unsigned int size, char *buffer)
 {
   static const char *my_string = "The quick brown fox jumps over the lazy dog.";
-  int i;
+  int i=0;
 
   while(i < size-1 && my_string[i] != '\0')
   {

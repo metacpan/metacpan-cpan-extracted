@@ -1,0 +1,87 @@
+# Crazy Panda LTD
+
+TYPEMAP
+
+int32_t     T_IV
+int16_t     T_IV
+int8_t      T_IV
+uint32_t    T_UV
+uint16_t    T_UV
+uint8_t     T_UV
+
+# time_t should follow IV size of machine
+time_t      T_IV
+
+AV* T_AV
+HV* T_HV
+CV* T_CV
+IO* T_IO
+GV* T_GV
+
+string           T_STRING
+std::string      T_STRING
+string_view      T_STRING_VIEW
+std::string_view T_STRING_VIEW
+
+######################################################################
+OUTPUT
+
+T_AV
+    $arg = $var ? newRV_noinc((SV*)$var) : &PL_sv_undef;
+    
+T_HV
+    $arg = $var ? newRV_noinc((SV*)$var) : &PL_sv_undef;
+    
+T_CV
+    $arg = $var ? newRV_noinc((SV*)$var) : &PL_sv_undef;
+
+T_IO
+    $arg = $var ? newRV_noinc((SV*)$var) : &PL_sv_undef;
+    
+T_GV
+    $arg = $var ? (SV*)$var : &PL_sv_undef;
+
+T_STRING
+    sv_setpvn((SV*)$arg, $var.data(), $var.length());
+
+T_STRING_VIEW
+    sv_setpvn((SV*)$arg, $var.data(), $var.length());
+
+######################################################################
+INPUT
+
+T_AV
+    if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) $var = (AV*)SvRV($arg);
+    else if (SvOK($arg)) throw \"${Package}::$func_name() -- $var is not an ARRAY reference\";
+    else $var = NULL;
+    
+T_HV
+    if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) $var = (HV*)SvRV($arg);
+    else if (SvOK($arg)) throw \"${Package}::$func_name() -- $var is not a HASH reference\";
+    else $var = NULL;
+
+T_CV
+    if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVCV) $var = (CV*)SvRV($arg);
+    else if (SvOK($arg)) throw \"${Package}::$func_name() -- $var is not a CODE reference\";
+    else $var = NULL;
+
+T_IO
+    if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVIO) $var = (IO*)SvRV($arg);
+    else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVGV && ($var = GvIO(SvRV($arg)))) {} 
+    else if (SvOK($arg)) throw \"${Package}::$func_name() -- $var is not an IO reference\";
+    else $var = NULL;
+    
+T_GV
+    if (SvTYPE($arg) == SVt_PVGV) $var = (GV*)$arg;
+    else if (SvOK($arg)) throw \"${Package}::$func_name() -- $var is not a GLOB\";
+    else $var = NULL;
+
+T_STRING
+  { STRLEN __${var}_len;
+    const char* __${var}_buf = SvPV($arg, __${var}_len);
+    $var.assign(__${var}_buf, __${var}_len); }
+    
+T_STRING_VIEW
+  { STRLEN __${var}_len;
+    const char* __${var}_buf = SvPV($arg, __${var}_len);
+    $var = decltype($var)(__${var}_buf, __${var}_len); }

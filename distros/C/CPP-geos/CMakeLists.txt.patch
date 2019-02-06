@@ -1,0 +1,50 @@
+--- CMakeLists.txt	2018-10-05 16:02:11.309600525 +0300
++++ /home/b/development/crazy-panda/geos-3.7.0/CMakeLists.txt	2018-10-05 15:55:18.063908758 +0300
+@@ -95,6 +95,10 @@
+ option(GEOS_BUILD_SHARED
+   "Set to OFF|ON (default) to build GEOS shared libraries" ON)
+ 
++option(GEOS_BUILD_CAPI
++  "Set to OFF|ON (default) to build GEOS C API library" ON)
++
++
+ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+   option(GEOS_ENABLE_FLOATSTORE
+     "Set to OFF|ON (default) to control IEEE754 conformance and remove extra precision" ON)
+@@ -250,7 +254,9 @@
+ include_directories(${PROJECT_SOURCE_DIR}/include)
+ 
+ # for including build-specific GEOS C API headers
+-include_directories(${PROJECT_BINARY_DIR}/capi)
++if (GEOS_BUILD_CAPI)
++    include_directories(${PROJECT_BINARY_DIR}/capi)
++endif()
+ 
+ # for including build-specific version.h, platform.h and geos_c.h
+ include_directories(${PROJECT_BINARY_DIR}/include)
+@@ -309,9 +315,11 @@
+ configure_file(${PROJECT_SOURCE_DIR}/include/geos/version.h.in
+   ${PROJECT_BINARY_DIR}/include/geos/version.h @ONLY)
+ 
+-message(STATUS "Generating GEOS ${PROJECT_BINARY_DIR}/capi/geos_c.h")
+-configure_file(${PROJECT_SOURCE_DIR}/capi/geos_c.h.in
+-  ${PROJECT_BINARY_DIR}/capi/geos_c.h @ONLY)
++if(GEOS_BUILD_CAPI)
++    message(STATUS "Generating GEOS ${PROJECT_BINARY_DIR}/capi/geos_c.h")
++    configure_file(${PROJECT_SOURCE_DIR}/capi/geos_c.h.in
++      ${PROJECT_BINARY_DIR}/capi/geos_c.h @ONLY)
++endif()
+ 
+ #################################################################################
+ # Configure tests
+@@ -344,7 +352,9 @@
+ #################################################################################
+ add_subdirectory(include)
+ add_subdirectory(src)
+-add_subdirectory(capi)
++if(GEOS_BUILD_CAPI)
++    add_subdirectory(capi)
++endif()
+ add_subdirectory(tests)
+ add_subdirectory(tools)
+ 

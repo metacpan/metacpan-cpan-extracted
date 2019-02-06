@@ -11,7 +11,7 @@
 
     # FontAwesome
     fa5 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v5.7.0 );
+        my $ver = version->parse( $args->{ver} // v5.7.1 );
 
         state $native_prefix = 'https://use.fontawesome.com/releases';
 
@@ -89,7 +89,7 @@
 
     # amCharts4
     amcharts4 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.1.1 );
+        my $ver = version->parse( $args->{ver} // v4.1.2 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4';
 

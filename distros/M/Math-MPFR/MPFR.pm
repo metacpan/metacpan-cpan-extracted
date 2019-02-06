@@ -180,7 +180,7 @@ Rmpfr_round_nearest_away rndna
 atonv nvtoa atodouble Rmpfr_dot Rmpfr_get_str_ndigits
 );
 
-    our $VERSION = '4.08';
+    our $VERSION = '4.09';
     #$VERSION = eval $VERSION;
 
     DynaLoader::bootstrap Math::MPFR $VERSION;
@@ -766,7 +766,7 @@ sub _get_NV_properties {
     }
 
     elsif(_required_ldbl_mant_dig() == 2098) {
-      $bits = 2098;  $PREC = 2104;  $max_dig = 633; $min_pow = -1074;
+      $bits = 2098;  $PREC = 2104;  $max_dig = 33; $min_pow = -1074;
       $normal_min = 2 ** -1022; $NV_MAX = POSIX::LDBL_MAX; $emin = -1073; $emax = 1024;
     }
 
@@ -835,7 +835,7 @@ sub nvtoa {
    return $significand_sign . _std($output, $k);
 }
 
-# standardize the string returned by the _FPP2() XSub.
+# standardize the string returned by the _nvtoa() XSub.
 sub _std {
   my $output = shift;
   my $k = shift;

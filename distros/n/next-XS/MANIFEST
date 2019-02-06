@@ -1,0 +1,33 @@
+Changes
+lib/next/XS.pm
+lib/next/XS.pod
+Makefile.PL
+MANIFEST			This list of files
+perf.plx
+src/xs/next.cc
+src/xs/next.h
+t/00-use.t
+t/01-next-replace.t
+t/02-super.t
+t/MyTest.pm
+t/patch.sh
+t/perl/complex_c3.t
+t/perl/complex_c3_utf8.t
+t/perl/next_edgecases.t
+t/perl/next_edgecases_utf8.t
+t/perl/next_goto.t
+t/perl/next_goto_utf8.t
+t/perl/next_inanon.t
+t/perl/next_inanon_utf8.t
+t/perl/next_ineval.t
+t/perl/next_ineval_utf8.t
+t/perl/next_method.t
+t/perl/next_method_utf8.t
+t/perl/next_NEXT.t
+t/perl/next_NEXT_utf8.t
+t/perl/next_skip.t
+t/perl/next_skip_utf8.t
+t/test.pl
+XS.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,13 @@
+4.09
+ - Hopefully fix bugs in t/nvtoa.t reported by (eg):
+   http://www.cpantesters.org/cpan/report/844b433e-2463-11e9-b3bd-8a932d9bfb17
+   and
+   http://www.cpantesters.org/cpan/report/608800de-245b-11e9-b3bd-8a932d9bfb17
+ - Add t/nvtoa2.t for additional testing of nvtoa function\
+ - Fix nvtoa() for Double-Double long doubles. (Previous to fix, strings being
+   returned by nvtoa() for this nvtype were not always the minimum required
+   length.)
+
 4.08
  - In nvtoa(), Work around mpfr_get_str() bug that was not fixed until
    mpfr-4.0.2

@@ -4,6 +4,7 @@ package Test::Framework;
 # Common resources for tests
 #
 
+use Encode qw( encode :fallback_all );
 use File::Spec::Functions qw( catfile );
 use File::Temp qw( tmpnam );
 use POSIX qw( mkfifo );
@@ -13,7 +14,7 @@ use utf8;
 
 use base qw( Exporter );
 
-our(%file2path, %file2enc, %filecontent, @test_files, $fifo_supported);
+our(%file2path, %file2enc, %filecontent, %fileeol, @test_files, $fifo_supported);
 
 @EXPORT = qw(
 	make_test_data
@@ -21,6 +22,7 @@ our(%file2path, %file2enc, %filecontent, @test_files, $fifo_supported);
 	%file2path
 	%file2enc
 	%filecontent
+	%fileeol
 	@test_files
 	write_fifo
 	$fifo_supported
@@ -44,6 +46,14 @@ our(%file2path, %file2enc, %filecontent, @test_files, $fifo_supported);
 	'no_bom.txt'   => 'ascii',
     );
 @test_files = keys %file2enc;
+
+for (@test_files) {
+    my $enc = $file2enc{$_};
+    $enc = 'ASCII' if $enc eq '';
+    my $eol = "\n";
+    $eol = encode($enc, $eol, FB_CROAK);
+    $fileeol{$_} = $eol;
+}
 
 $file2path{$_} = catfile(qw(t data), $_) for @test_files;
 

@@ -3717,28 +3717,6 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_WEAKEN_ARRAY_ELEMENT: {
-        void* array = *(void**)&object_vars[opcode->operand0];
-        int32_t index = int_vars[opcode->operand1];
-        if (__builtin_expect(!array, 0)) {
-          void* exception = env->new_str_raw(env, "Array must not be undef", 0);
-          env->set_exception(env, exception);
-          exception_flag = 1;
-        }
-        else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_VALUE_int*)((intptr_t)array + (intptr_t)env->object_array_length_offset), 0)) {
-            void* exception = env->new_str_raw(env, "Index is out of range", 0);
-            env->set_exception(env, exception);
-            exception_flag = 1;
-          }
-          else {
-            void** elements = (void**)((intptr_t)array + env->object_header_byte_size);
-            void** object_element_address = (void**)&elements[index];
-            env->weaken(env, object_element_address);
-          }
-        }
-        break;
-      }
       case SPVM_OPCODE_C_ID_UNWEAKEN_FIELD: {
         int32_t constant_pool_id = opcode->operand1;
         int32_t field_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3756,28 +3734,6 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_UNWEAKEN_ARRAY_ELEMENT: {
-        void* array = *(void**)&object_vars[opcode->operand0];
-        int32_t index = int_vars[opcode->operand1];
-        if (__builtin_expect(!array, 0)) {
-          void* exception = env->new_str_raw(env, "Array must not be undef", 0);
-          env->set_exception(env, exception);
-          exception_flag = 1;
-        }
-        else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_VALUE_int*)((intptr_t)array + (intptr_t)env->object_array_length_offset), 0)) {
-            void* exception = env->new_str_raw(env, "Index is out of range", 0);
-            env->set_exception(env, exception);
-            exception_flag = 1;
-          }
-          else {
-            void** elements = (void**)((intptr_t)array + env->object_header_byte_size);
-            void** object_element_address = (void**)&elements[index];
-            env->unweaken(env, object_element_address);
-          }
-        }
-        break;
-      }
       case SPVM_OPCODE_C_ID_ISWEAK_FIELD: {
         int32_t constant_pool_id = opcode->operand1;
         int32_t field_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3792,28 +3748,6 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         else {
           void** ofield_address = (SPVM_VALUE_object*)((intptr_t)object + object_header_byte_size + field_offset);
           env->isweak(env, ofield_address);
-        }
-        break;
-      }
-      case SPVM_OPCODE_C_ID_ISWEAK_ARRAY_ELEMENT: {
-        void* array = *(void**)&object_vars[opcode->operand0];
-        int32_t index = int_vars[opcode->operand1];
-        if (__builtin_expect(!array, 0)) {
-          void* exception = env->new_str_raw(env, "Array must not be undef", 0);
-          env->set_exception(env, exception);
-          exception_flag = 1;
-        }
-        else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_VALUE_int*)((intptr_t)array + (intptr_t)env->object_array_length_offset), 0)) {
-            void* exception = env->new_str_raw(env, "Index is out of range", 0);
-            env->set_exception(env, exception);
-            exception_flag = 1;
-          }
-          else {
-            void** elements = (void**)((intptr_t)array + env->object_header_byte_size);
-            void** object_element_address = (void**)&elements[index];
-            env->isweak(env, object_element_address);
-          }
         }
         break;
       }
@@ -5248,95 +5182,90 @@ void SPVM_RUNTIME_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
   // Not weakened
   assert((((intptr_t)object) & 1) == 0);
   
-  if (object->ref_count < 1) {
-    fprintf(stderr, "Found invalid reference count object(SPVM_RUNTIME_API_dec_ref_count())");
-    abort();
-  }
-  
-  // Decrement reference count
-  object->ref_count--;
-  
   // If reference count is zero, free address.
-  if (object->ref_count == 0) {
-    SPVM_RUNTIME* runtime = env->runtime;
-    
-    SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[object->basic_type_id];
-    SPVM_RUNTIME_PACKAGE* package;
-    if (basic_type->package_id < 0) {
-      package = NULL;
-    }
-    else {
-      package = &runtime->packages[basic_type->package_id];
-    }
-    int32_t is_pointer = 0;
-    if (package) {
-      if (package->flag & SPVM_PACKAGE_C_FLAG_POINTER) {
-        is_pointer = 1;
-      }
-    }
-
+  if (object->ref_count == 1) {
+    // Free elements of object array
     if (object->runtime_type == SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY) {
       int32_t length = object->array_length;
       for (int32_t index = 0; index < length; index++) {
         SPVM_OBJECT** ofield_address = &(((SPVM_OBJECT**)((intptr_t)object + env->object_header_byte_size))[index]);
 
         if (*ofield_address != NULL) {
-          // If object is weak, unweaken
-          if (SPVM_RUNTIME_API_isweak(env, ofield_address)) {
-            SPVM_RUNTIME_API_unweaken(env, ofield_address);
-            (*ofield_address)->ref_count--;
-          }
-          else {
-            SPVM_RUNTIME_API_dec_ref_count(env, *ofield_address);
-          }
+          SPVM_RUNTIME_API_dec_ref_count(env, *ofield_address);
         }
       }
     }
+    // Free package object
     else if (object->runtime_type == SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE) {
+
+      // Package
+      SPVM_RUNTIME* runtime = env->runtime;
+      SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[object->basic_type_id];
+      SPVM_RUNTIME_PACKAGE* package;
+      if (basic_type->package_id < 0) {
+        package = NULL;
+      }
+      else {
+        package = &runtime->packages[basic_type->package_id];
+      }
       
-      if (object->has_destructor) {
-        if (object->in_destroy) {
-          return;
-        }
-        else {
-          // Call destructor
-          SPVM_VALUE args[1];
-          args[0].oval = object;
-          object->in_destroy = 1;
-          SPVM_RUNTIME_API_call_sub(env, package->destructor_sub_id, args);
-          object->in_destroy = 0;
-          
-          if (object->ref_count < 0) {
-            printf("object reference count become minus in DESTROY()\n");
-            abort();
-          }
+      int32_t is_pointer = 0;
+      if (package) {
+        if (package->flag & SPVM_PACKAGE_C_FLAG_POINTER) {
+          is_pointer = 1;
         }
       }
       
+      // Call destructor
+      if (object->has_destructor) {
+        SPVM_VALUE args[1];
+        args[0].oval = object;
+        int32_t exception_flag = SPVM_RUNTIME_API_call_sub(env, package->destructor_sub_id, args);
+        
+        // Exception in destructor is changed to warning
+        if (exception_flag) {
+          void* exception = env->exception(env);
+          char* exception_str = (char*)env->belems(env, exception);
+          fprintf(stderr, exception_str);
+        }
+        
+        if (object->ref_count < 1) {
+          printf("Invalid reference count in DESTROY()\n");
+          abort();
+        }
+      }
+      
+      // Free object fields
       int32_t object_fields_offset = package->object_fields_offset;
       int32_t object_fields_length = package->object_fields_length;
-      
       for (int32_t index = 0; index < object_fields_length; index++) {
         SPVM_OBJECT** ofield_address = &(((SPVM_OBJECT**)((intptr_t)object + (intptr_t)env->object_header_byte_size + object_fields_offset))[index]);
         if (*ofield_address != NULL) {
           // If object is weak, unweaken
           if (SPVM_RUNTIME_API_isweak(env, ofield_address)) {
             SPVM_RUNTIME_API_unweaken(env, ofield_address);
-            (*ofield_address)->ref_count--;
           }
-          else {
-            SPVM_RUNTIME_API_dec_ref_count(env, *ofield_address);
-          }
+          
+          SPVM_RUNTIME_API_dec_ref_count(env, *ofield_address);
         }
       }
     }
+    
+    // Free weak back refenreces
     if (object->weaken_backref_head != NULL) {
       SPVM_RUNTIME_API_free_weaken_back_refs(env, object->weaken_backref_head);
       object->weaken_backref_head = NULL;
     }
     
+    // Decrement reference count
+    object->ref_count--;
+  
     // Free object
     SPVM_RUNTIME_API_free_memory_block(env, object);
+  }
+  else {
+    // Decrement reference count
+    object->ref_count--;
   }
 }
 

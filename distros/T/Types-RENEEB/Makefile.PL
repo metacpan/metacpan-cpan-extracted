@@ -18,16 +18,19 @@ my %WriteMakefileArgs = (
   "NAME" => "Types::RENEEB",
   "PREREQ_PM" => {
     "Module::CPANfile" => 0,
+    "OTRS::OPM::Parser" => "1.01",
     "Type::Library" => "1.004004",
     "Type::Utils" => "1.004004",
     "Types::Standard" => "1.004004"
   },
   "TEST_REQUIRES" => {
+    "File::Basename" => 0,
     "Moo" => "2.003004",
     "Pod::Coverage::TrustPod" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Test::Spec" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t t/dist/*.t t/otrs/*.t"
   }
@@ -35,10 +38,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "File::Basename" => 0,
   "Module::CPANfile" => 0,
   "Moo" => "2.003004",
+  "OTRS::OPM::Parser" => "1.01",
   "Pod::Coverage::TrustPod" => 0,
   "Test::More" => 0,
+  "Test::Spec" => 0,
   "Type::Library" => "1.004004",
   "Type::Utils" => "1.004004",
   "Types::Standard" => "1.004004"

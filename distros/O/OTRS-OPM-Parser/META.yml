@@ -2,30 +2,46 @@
 abstract: 'Parser for the .opm file'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
-build_requires: {}
+build_requires:
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: OTRS-OPM-Parser
+provides:
+  OTRS::OPM::Parser:
+    file: lib/OTRS/OPM/Parser.pm
+    version: '1.01'
+  OTRS::OPM::Parser::Types:
+    file: lib/OTRS/OPM/Parser/Types.pm
+    version: '1.01'
 requires:
   File::Basename: '0'
   File::Spec: '0'
+  File::Temp: '0'
+  LWP::Simple: '0'
   MIME::Base64: '0'
-  Moose: '0'
-  Moose::Role: '0'
+  Moo: '2'
+  MooX::HandlesVia: '0.001'
   Path::Class: '0'
-  Test::Exception: '0'
-  Test::More: '0'
   Try::Tiny: '0'
+  Type::Library: '1'
+  Type::Tiny: '1'
+  Type::Utils: '1'
+  Types::Standard: '1'
   XML::LibXML: '0'
+  perl: '5.010'
 resources:
   bugtracker: http://github.com/reneeb/OTRS-OPM-Parser/issues
   homepage: http://github.com/reneeb/OTRS-OPM-Parser
   repository: http://github.com/reneeb/OTRS-OPM-Parser.git
-version: '0.01'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '1.01'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -9,12 +9,13 @@ use warnings;
 
 use Type::Library
    -base,
-   -declare => qw(OTRSVersion OTRSVersionWildcard);
+   -declare => qw(OTRSVersion OTRSVersionWildcard OPMFile);
 
 use Type::Utils -all;
 use Types::Standard -types;
+use OTRS::OPM::Parser;
 
-our $VERSION = '0.02';
+our $VERSION = 0.03;
 
 declare OTRSVersion =>
     as Str,
@@ -33,6 +34,18 @@ declare OTRSVersionWildcard =>
         }xms
     };
 
+declare OPMFile =>
+    as InstanceOf['OTRS::OPM::Parser'];
+
+coerce OPMFile =>
+    from Str,
+        via {
+            my $p = OTRS::OPM::Parser->new( opm_file => $_ );
+            $p->parse;
+            $p;
+        }
+;
+
 1;
 
 __END__
@@ -47,7 +60,7 @@ Types::OTRS - OTRS related types
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 TYPES
 

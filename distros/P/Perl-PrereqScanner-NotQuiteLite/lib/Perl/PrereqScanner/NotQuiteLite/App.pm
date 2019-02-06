@@ -35,14 +35,20 @@ sub new {
 
   $opts{cpanfile} = 1 if $opts{save_cpanfile};
 
-  if ($opts{features} and !ref $opts{features}) {
+  if ($opts{features} and ref $opts{features} ne 'HASH') {
+    my @features;
+    if (!ref $opts{features}) {
+      @features = split ';', $opts{features};
+    } elsif (ref $opts{features} eq 'ARRAY') {
+      @features = @{$opts{features}};
+    }
     my %map;
-    for my $spec (split ';', $opts{features}) {
+    for my $spec (@features) {
       my ($identifier, $description, $paths) = split ':', $spec;
       $map{$identifier} = {
         description => $description,
         paths => [split ',', $paths],
-      }
+      };
     }
     $opts{features} = \%map;
   }
@@ -55,6 +61,15 @@ sub new {
         $re->add($_);
     }
     $opts{ignore_re} ||= $re->_regexp;
+  }
+
+  if ($opts{private} and ref $opts{private} eq 'ARRAY') {
+    require Regexp::Trie;
+    my $re = Regexp::Trie->new;
+    for (@{$opts{private}}) {
+        $re->add($_);
+    }
+    $opts{private_re} ||= $re->_regexp;
   }
 
   if (my $index_name = delete $opts{use_index}) {
@@ -171,6 +186,20 @@ sub _requirements {
       push @requirements, $req;
     }
   }
+
+  if ($self->{features}) {
+    my @feature_prereqs = grep defined, map {$self->{features}{$_}{prereqs}} keys %{$self->{features} || {}};
+    for my $feature_prereqs (@feature_prereqs) {
+      for my $phase (@phases) {
+        for my $type (@types) {
+          my $req = $feature_prereqs->requirements_for($phase, $type);
+          next unless $req->required_modules;
+          push @requirements, $req;
+        }
+      }
+    }
+  }
+
   @requirements;
 }
 
@@ -198,9 +227,10 @@ sub _exclude_local_modules {
     }, $local_dir);
   }
 
+  my $private_re = $self->{private_re};
   for my $req ($self->_requirements) {
     for my $module ($req->required_modules) {
-      $req->clear_requirement($module) if $self->{possible_modules}{$module};
+      $req->clear_requirement($module) if $self->{possible_modules}{$module} or ($private_re and $module =~ /$private_re/);
     }
   }
 }

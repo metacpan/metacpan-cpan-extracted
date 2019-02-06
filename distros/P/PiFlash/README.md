@@ -4,18 +4,22 @@ piflash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 # SYNOPSIS
 
-    piflash [--verbose] input-file output-device
+    piflash [--verbose] [--resize] input-file output-device
 
-    piflash [--verbose] --SDsearch
+    piflash [--verbose] --sdsearch
+
+    piflash --version
 
 # DESCRIPTION
 
-This script flashes an SD card for a Raspberry Pi. It includes safety checks so that it can only erase and write to an SD card, not another device on the system. The safety checks are probably of most use to beginners. For more advanced users (like the author) it also has the convenience of flashing directly from the file formats downloadable from raspberrypi.org without extracting a .img file from a zip/gz/xz file.
+This script writes (or "flashes") an SD card for a Raspberry Pi. It includes safety checks so that it can only erase and write to an SD card, not another device on the system. The safety checks are probably of most use to beginners. For more advanced users (like the author) it also has the convenience of flashing directly from the file formats downloadable from raspberrypi.org without extracting a .img file from a zip/gz/xz file.
 
 - The optional parameter --verbose makes much more verbose status and error messages.  Use this when troubleshooting any problem or preparing program output to ask for help or report a bug.
+- The optional parameter --resize may be used when writing to an SD card. After writing, it attempts to find the root filesystem on the SD card and resizes it to take the remainder of the free space on the device. This has been tested to work with the popular OS distributions and how they set up their partitions on installation. (However, in case any distributions make changes, please report any errors so they can be fixed.)
 - input-file is the path of the binary image file used as input for flashing the SD card. If it's a .img file then it will be flashed directly. If it's a gzip (.gz), xz (.xz) or zip (.zip) file then the .img file will be extracted from it to flash the SD card. It is not necessary to unpack the file if it's in one of these formats. This covers most of the images downloadable from the Raspberry Pi foundation's web site.
 - output-file is the path to the block device where the SSD card is located. The device should not be mounted - if it ismounted the script will detect it and exit with an error. This operation will erase the SD card and write the new image from the input-file to it. (So make sure it's an SD card you're willing to have erased.)
-- The --SDsearch parameter tells piflash to print a list of device names for SD cards available on the system and then exit. Do not specify an input file or output device when using this option - it will exit before they would be used.
+- The --sdsearch parameter tells piflash to print a list of device names for SD cards available on the system and then exit. Do not specify an input file or output device when using this option - it will exit before they would be used.
+- The --version parameter tells piflash to print its version number and exit.
 
 ## Safety Checks
 
@@ -33,10 +37,11 @@ Piflash automates the process of flashing an SD card from various Raspberry Pi O
 
 - For most disk images, either in a raw \*.img file, compressed in a \*.gz or \*.xz file, or included in a \*.zip archive, piflash recognizes the file format and extracts the disk image for flashing, eliminating the step of uncompressing or unarchiving it before it can be flashed to the SD.
 - For zip archives, it checks if it contains the Raspberry Pi NOOBS (New Out Of the Box System), in which case it handles it differently. The steps it takes are similar to the instructions that one would have to follow manually.  It formats a new VFAT filesystem on the card. (FAT/VFAT is the only format recognized by the Raspberry Pi's simple boot loader.) Then it copies the contents of the zip archive into the card, automating the entire flashing process even for a NOOBS system, which previously didn't even have instructions to be done from Linux systems.
+- When the --resize option is provided, it requests piflash to resize the root filesystem to the maximum available size of the SD card. It's ignored for NOOBS because it will wipe out the initial partitions upong installing anything else. In all other cases, it will expand the last filesystem on the SD card, which is traditionally where the root filesystem is placed. (Exceptions may be added if needed for distributions which don't follow this layout.)
 
 # INSTALLATION
 
-The piflash script only works on Linux systems. It depends on features of the Linux kernel to look up whether the output device is an SD card and other information about it. It has been tested so far on Fedora 25, and some experimentation with Ubuntu 16.04 (in a virtual machine) to get the kernel parameters right for a USB SD card reader.
+The piflash script only works on Linux systems. It depends on features of the Linux kernel to look up whether the output device is an SD card and other information about it. It has been tested so far on Fedora and Ubuntu to get the kernel parameters right for various USB SD card adapters.
 
 ## System Dependencies
 
@@ -44,18 +49,18 @@ Some programs and libraries must be installed on the system for piflash to work 
 
 On RPM-based Linux systems (Red Hat, Fedora, CentOS) the following command, run as root, will install the dependencies.
 
-        dnf install coreutils util-linux sudo perl file-libs perl-File-LibMagic perl-IO gzip unzip xz e2fsprogs dosfstools
+        dnf install coreutils util-linux sudo perl file-libs perl-File-LibMagic perl-IO perl-Exception-Class perl-Try-Tiny gzip unzip xz e2fsprogs dosfstools
 
 On Deb-based Linux systems (Debian, Ubuntu, Raspbian) the following command, run as root, will install the dependencies.
 
-        apt-get install coreutils util-linux klibc-utils sudo perl-base libmagic1 libfile-libmagic-perl gzip xz-utils e2fsprogs dosfstools
+        apt-get install coreutils util-linux klibc-utils sudo perl-base libmagic1 libfile-libmagic-perl libio-all-perl libexception-class-perl libtry-tiny-perl gzip xz-utils e2fsprogs dosfstools
 
 On source-based or other Linux distributions, make sure the following are installed:
 
 - programs:
 blockdev, dd, echo, gunzip, lsblk, mkdir, mkfs.vfat, mount, perl, sfdisk, sudo, sync, true, umount, unzip, xz
 - libraries:
-libmagic/file-libs, File::LibMagic (perl)
+libmagic/file-libs, File::LibMagic (perl), IO (perl), Exception::Class (perl), Try::Tiny (perl)
 
 ## Piflash script
 
@@ -91,8 +96,6 @@ install configure prerequisites (see below), then build it:
 Then install it:
  
     % make install
- 
-On Windows platforms, you should use `dmake` or `nmake`, instead of `make`.
  
 If your perl is system-managed, you can create a local::lib in your home
 directory to install modules to. For details, see the local::lib documentation:

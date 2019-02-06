@@ -22,17 +22,17 @@ my @files = (
     'lib/Test/Mocha/MethodStub.pm',       'lib/Test/Mocha/Mock.pm',
     'lib/Test/Mocha/Spy.pm',              'lib/Test/Mocha/SpyBase.pm',
     'lib/Test/Mocha/Types.pm',            'lib/Test/Mocha/Util.pm',
-    't/author-critic.t',                  't/author-no-tabs.t',
-    't/author-pod-syntax.t',              't/called_ok.t',
-    't/class_mock.t',                     't/clear.t',
-    't/inspect.t',                        't/inspect_all.t',
-    't/lib/MyNonThrowable.pm',            't/lib/MyThrowable.pm',
-    't/lib/TestClass.pm',                 't/matcher_moose.t',
-    't/matcher_typetiny.t',               't/mock.t',
-    't/mock_universal.t',                 't/namespace.t',
-    't/release-pod-coverage.t',           't/smartmatch.t',
-    't/spy.t',                            't/spy_universal.t',
-    't/stub.t'
+    't/00-compile.t',                     't/author-critic.t',
+    't/author-no-tabs.t',                 't/author-pod-syntax.t',
+    't/called_ok.t',                      't/class_mock.t',
+    't/clear.t',                          't/inspect.t',
+    't/inspect_all.t',                    't/lib/MyNonThrowable.pm',
+    't/lib/MyThrowable.pm',               't/lib/TestClass.pm',
+    't/matcher_moose.t',                  't/matcher_typetiny.t',
+    't/mock.t',                           't/mock_universal.t',
+    't/namespace.t',                      't/release-pod-coverage.t',
+    't/smartmatch.t',                     't/spy.t',
+    't/spy_universal.t',                  't/stub.t'
 );
 
 notabs_ok($_) foreach @files;

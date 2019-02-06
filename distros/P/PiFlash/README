@@ -1,13 +1,15 @@
 SYNOPSIS
 
-     piflash [--verbose] input-file output-device
+     piflash [--verbose] [--resize] input-file output-device
     
-     piflash [--verbose] --SDsearch
+     piflash [--verbose] --sdsearch
+    
+     piflash --version
 
 DESCRIPTION
 
-    The "piflash" program flashes an SD card for a Raspberry Pi
-    single-board computer. It includes safety checks so that it can only
+    The "piflash" program writes (or "flashes") an SD card for a Raspberry
+    Pi single-board computer. It includes safety checks so that it can only
     erase and write to an SD card, not another device on the system. The
     safety checks are probably of most use to beginners. For more advanced
     users (like the author, which is why this was written) it also has the
@@ -18,6 +20,14 @@ DESCRIPTION
       * The optional parameter --verbose makes much more verbose status and
       error messages. Use this when troubleshooting any problem or
       preparing program output to ask for help or report a bug.
+
+      * The optional parameter --resize may be used when writing to an SD
+      card. After writing, it attempts to find the root filesystem on the
+      SD card and resizes it to take the remainder of the free space on the
+      device. This has been tested to work with the popular OS
+      distributions and how they set up their partitions on installation.
+      (However, in case any distributions make changes, please report any
+      errors so they can be fixed.)
 
       * input-file is the path of the binary image file used as input for
       flashing the SD card. If it's a .img file then it will be flashed
@@ -33,10 +43,13 @@ DESCRIPTION
       erase the SD card and write the new image from the input-file to it.
       (So make sure it's an SD card you're willing to have erased.)
 
-      * The --SDsearch parameter tells piflash to print a list of device
+      * The --sdsearch parameter tells piflash to print a list of device
       names for SD cards available on the system and then exit. Do not
       specify an input file or output device when using this option - it
       will exit before they would be used.
+
+      * The --version parameter tells piflash to print its version number
+      and exit.
 
  Safety Checks
 
@@ -79,13 +92,21 @@ DESCRIPTION
       NOOBS system, which previously didn't even have instructions to be
       done from Linux systems.
 
+      * When the --resize option is provided, it requests piflash to resize
+      the root filesystem to the maximum available size of the SD card.
+      It's ignored for NOOBS because it will wipe out the initial
+      partitions upong installing anything else. In all other cases, it
+      will expand the last filesystem on the SD card, which is
+      traditionally where the root filesystem is placed. (Exceptions may be
+      added if needed for distributions which don't follow this layout.)
+
 INSTALLATION
 
     The piflash script only works on Linux systems. It depends on features
     of the Linux kernel to look up whether the output device is an SD card
-    and other information about it. It has been tested so far on Fedora 25,
-    and some experimentation with Ubuntu 16.04 (in a virtual machine) to
-    get the kernel parameters right for a USB SD card reader.
+    and other information about it. It has been tested so far on Fedora and
+    Ubuntu to get the kernel parameters right for various USB SD card
+    adapters.
 
  System Dependencies
 
@@ -95,12 +116,12 @@ INSTALLATION
     On RPM-based Linux systems (Red Hat, Fedora, CentOS) the following
     command, run as root, will install the dependencies.
 
-            dnf install coreutils util-linux sudo perl file-libs perl-File-LibMagic perl-IO gzip unzip xz e2fsprogs dosfstools
+            dnf install coreutils util-linux sudo perl file-libs perl-File-LibMagic perl-IO perl-Exception-Class gzip unzip xz e2fsprogs dosfstools
 
     On Deb-based Linux systems (Debian, Ubuntu, Raspbian) the following
     command, run as root, will install the dependencies.
 
-            apt-get install coreutils util-linux klibc-utils sudo perl-base libmagic1 libfile-libmagic-perl gzip xz-utils e2fsprogs dosfstools
+            apt-get install coreutils util-linux klibc-utils sudo perl-base libmagic1 libfile-libmagic-perl libio-all-perl libexception-class-perl gzip xz-utils e2fsprogs dosfstools
 
     On source-based or other Linux distributions, make sure the following
     are installed:
@@ -108,7 +129,8 @@ INSTALLATION
     programs: blockdev, dd, echo, gunzip, lsblk, mkdir, mkfs.vfat, mount,
     perl, sfdisk, sudo, sync, true, umount, unzip, xz
 
-    libraries: libmagic/file-libs, File::LibMagic (perl)
+    libraries: libmagic/file-libs, File::LibMagic (perl), IO (perl),
+    Exception::Class (perl)
 
  Piflash script
 

@@ -22,7 +22,7 @@ docmake
 
 =head1 VERSION
 
-version 0.0603
+version 0.0700
 
 =head1 SYNOPSIS
 
@@ -148,7 +148,7 @@ docmake - a tool to render DocBook/XML into various output formats.
 
 =head1 VERSION
 
-version 0.0603
+version 0.0700
 
 =head1 SUPPORT
 
@@ -315,7 +315,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2019 by Shlomi Fish.
 
 This is free software, licensed under:
 

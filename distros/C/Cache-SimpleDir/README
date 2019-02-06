@@ -5,13 +5,19 @@ SYNOPSIS
   #!/usr/bin/perl
   use Cache::SimpleDir;
 
-  my $cache  =  Cache::SimpleDir->new(
-  cache_dir  => '/tmp',
+  my $key1   =  Cache::SimpleDir->new(
   callback   => 'GetWeather',
+  cache_dir  => '/tmp',
   expire_sec => 1800,
-  verbose    => 'false') or die $SimpleDir::ERROR;
+  verbose    => 'false') or die $Cache::SimpleDir::ERROR;
 
-  my $where_are_my_data = $cache->get('a','b','c') or die "oups $SimpleDir::ERROR\n";
+  my $key2   =  Cache::SimpleDir->new(
+  callback   => \&GetCountryInfo,
+  cache_dir  => '/tmp',
+  expire_sec => 2592000,
+  verbose    => 'true') or die $Cache::SimpleDir::ERROR;
+
+  my $where_are_my_data = $key1->get('a','b','c') or die $Cache::SimpleDir::ERROR;
   print "data are at: $where_are_my_data\n";
 
   #     How to get and cache new data
@@ -20,6 +26,11 @@ SYNOPSIS
   open  FILE, '>', "$dir/file.txt" or return undef;
   print FILE 'Example of callback. Arguments: ', join ',', @_;
   close FILE
+  }
+
+  sub   GetCountryInfo {
+  my    $dir = shift;
+  ...
   }
 
 DESCRIPTION
@@ -42,7 +53,7 @@ It is thread safe.
 
 ERROR HANDLING
 
-On error "get" returns FALSE. Sets the error message at the variable $SimpleDir::ERROR
+On error "get" returns FALSE. Sets the error message at the variable $Cache::SimpleDir::ERROR
 and at the property $obj->error_msg while the error code is at $obj->error
 
 METHODS
@@ -52,7 +63,7 @@ new
 Generate and return a new cache object, while it initialize/overwrite the default properties
 
   cache_dir  The root cache directory of your key
-  callback   The subroutine name that cache new data. Becarefull not it is a simple name not a code reference
+  callback   Name or code reference, of the subroutine that caches new data
   expire_sec After how many seconds the record will be considered expired and a new one should cached using the callback
   verbose    Verbose operation if TRUE or 1
 

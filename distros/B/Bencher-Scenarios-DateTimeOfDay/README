@@ -1,0 +1,41 @@
+NAME
+    Bencher::Scenarios::DateTimeOfDay - Scenarios to benchmark
+    Date::TimeOfDay
+
+VERSION
+    This document describes version 0.001 of
+    Bencher::Scenarios::DateTimeOfDay (from Perl distribution
+    Bencher-Scenarios-DateTimeOfDay), released on 2019-02-07.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::DateTimeOfDay::create
+
+    *   Bencher::Scenario::DateTimeOfDay::format
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-DateTimeOfDay>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenarios-DateTimeOfDay>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Dat
+    eTimeOfDay>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

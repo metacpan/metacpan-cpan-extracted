@@ -29,6 +29,7 @@
       "runtime" : {
          "requires" : {
             "Module::CPANfile" : "0",
+            "OTRS::OPM::Parser" : "1.01",
             "Type::Library" : "1.004004",
             "Type::Utils" : "1.004004",
             "Types::Standard" : "1.004004",
@@ -37,24 +38,26 @@
       },
       "test" : {
          "requires" : {
+            "File::Basename" : "0",
             "Moo" : "2.003004",
             "Pod::Coverage::TrustPod" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Spec" : "0"
          }
       }
    },
    "provides" : {
       "Types::Dist" : {
          "file" : "lib/Types/Dist.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Types::OTRS" : {
          "file" : "lib/Types/OTRS.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Types::RENEEB" : {
          "file" : "lib/Types/RENEEB.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -69,7 +72,7 @@
          "web" : "http://github.com/reneeb/Types-RENEEB"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

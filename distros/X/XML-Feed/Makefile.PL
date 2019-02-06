@@ -3,32 +3,32 @@ require 5.010000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PL_FILES' => {},
-  'INSTALLDIRS' => 'site',
+  'NAME' => 'XML::Feed',
   'VERSION_FROM' => 'lib/XML/Feed.pm',
   'PREREQ_PM' => {
-                   'XML::RSS' => '1.47',
-                   'HTML::TokeParser' => 0,
-                   'HTML::Entities' => 0,
-                   'Module::Pluggable' => 0,
-                   'URI::Fetch' => 0,
-                   'Scalar::Util' => 0,
-                   'List::Util' => 0,
                    'Class::ErrorHandler' => 0,
-                   'DateTime::Format::ISO8601' => 0,
-                   'LWP::UserAgent' => 0,
-                   'Test::More' => 0,
-                   'Feed::Find' => 0,
-                   'XML::LibXML' => '1.66',
                    'DateTime' => 0,
-                   'XML::Atom' => '0.38',
                    'DateTime::Format::Flexible' => 0,
+                   'DateTime::Format::ISO8601' => 0,
                    'DateTime::Format::Mail' => 0,
-                   'DateTime::Format::W3CDTF' => 0,
                    'DateTime::Format::Natural' => 0,
-                   'URI' => 0
+                   'DateTime::Format::W3CDTF' => 0,
+                   'Feed::Find' => 0,
+                   'HTML::Entities' => 0,
+                   'HTML::TokeParser' => 0,
+                   'LWP::UserAgent' => 0,
+                   'List::Util' => 0,
+                   'Module::Pluggable' => 0,
+                   'Scalar::Util' => 0,
+                   'Test::More' => 0,
+                   'URI' => 0,
+                   'URI::Fetch' => 0,
+                   'XML::Atom' => '0.38',
+                   'XML::LibXML' => '1.66',
+                   'XML::RSS' => '1.47'
                  },
-  'NAME' => 'XML::Feed',
-  'EXE_FILES' => []
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
+  'PL_FILES' => {}
 )
 ;

@@ -22,7 +22,6 @@ my %WriteMakefileArgs = (
     "DateTime" => 0,
     "FindBin" => 0,
     "Getopt::Long" => 0,
-    "Koha::Contrib::Tamil::Koha" => 0,
     "LWP::Simple" => 0,
     "List::Util" => 0,
     "MARC::Moose::Field::Std" => 0,
@@ -33,7 +32,7 @@ my %WriteMakefileArgs = (
     "YAML" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.0.6",
+  "VERSION" => "1.0.0",
   "test" => {
     "TESTS" => ""
   }
@@ -44,7 +43,6 @@ my %FallbackPrereqs = (
   "DateTime" => 0,
   "FindBin" => 0,
   "Getopt::Long" => 0,
-  "Koha::Contrib::Tamil::Koha" => 0,
   "LWP::Simple" => 0,
   "List::Util" => 0,
   "MARC::Moose::Field::Std" => 0,

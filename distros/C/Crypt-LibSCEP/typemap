@@ -1,0 +1,4 @@
+TYPEMAP
+Crypt::LibSCEP	T_PTROBJ
+Handle			T_PTROBJ
+unsignedChar*	T_PTROBJ

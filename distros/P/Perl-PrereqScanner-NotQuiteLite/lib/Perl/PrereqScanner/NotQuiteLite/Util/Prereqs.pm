@@ -9,13 +9,14 @@ our @EXPORT = qw/dedupe_prereqs_and_features/;
 sub dedupe_prereqs_and_features {
   my ($prereqs, $features) = @_;
 
+  my @valid_features = grep defined, values %$features;
   for my $phase ($prereqs->phases) {
     my $requires = $prereqs->requirements_for($phase, 'requires');
     for my $type (qw/recommends suggests/) {
       my $target = $prereqs->requirements_for($phase, $type);
       _dedupe($requires, $target);
     }
-    for my $feature (values %$features) {
+    for my $feature (@valid_features) {
       for my $type (qw/requires recommends suggests/) {
         my $target = $feature->requirements_for($phase, $type);
         _dedupe($requires, $target);
@@ -26,14 +27,14 @@ sub dedupe_prereqs_and_features {
       my $target = $prereqs->requirements_for($phase, $type);
       _dedupe($recommends, $target);
     }
-    for my $feature (values %$features) {
+    for my $feature (@valid_features) {
       for my $type (qw/recommends suggests/) {
         my $target = $feature->requirements_for($phase, $type);
         _dedupe($recommends, $target);
       }
     }
     my $suggests = $prereqs->requirements_for($phase, 'suggests');
-    for my $feature (values %$features) {
+    for my $feature (@valid_features) {
       for my $type (qw/suggests/) {
         my $target = $feature->requirements_for($phase, $type);
         _dedupe($suggests, $target);

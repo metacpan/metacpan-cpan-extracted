@@ -23,6 +23,9 @@ t/dist/name.t
 t/dist/version.t
 t/distname.t
 t/distversion.t
+t/otrs/OPMFileTest.pm
+t/otrs/QuickMerge-3.3.2.opm
+t/otrs/opmfile.t
 t/otrs/version.t
 t/otrs/version_wildcard.t
 t/otrsversion.t

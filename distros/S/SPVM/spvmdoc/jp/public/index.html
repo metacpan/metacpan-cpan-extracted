@@ -36,7 +36,7 @@
     
     <div class="container">
       <div>
-        最終更新日 2019年1月29日
+        最終更新日 2019年2月5日
       </div>
       <h2>目次</h2>
       <ul class="toc">
@@ -413,8 +413,11 @@ my $total = MyMath->sum($sp_nums);
         <li><a href="#language-block">ブロック</a></li>
         <li><a href="#language-scope">スコープ</a></li>
         <li><a href="#language-exception">例外処理</a></li>
+        <li><a href="#language-weak-ref">ウィークリファレンス</a></li>
         <li><a href="#language-interface">インターフェース</a></li>
         <li><a href="#language-array">配列</a></li>
+        <li><a href="#language-value">値</a></li>
+        <li><a href="#language-value-array">値の配列</a></li>
         <li><a href="#language-ref">リファレンス</a></li>
         <li><a href="#language-deref">デリファレンス</a></li>
         <li><a href="#language-term">項</a></li>
@@ -426,7 +429,6 @@ my $total = MyMath->sum($sp_nums);
         <li><a href="#language-undef">未定義値</a></li>
         <li><a href="#language-operator">演算子</a></li>
         <li><a href="#language-operator-precedence">演算子の優先順位</a></li>
-        <li><a href="#language-new-object">オブジェクトの生成</a></li>
         <li><a href="#language-statement">文</a></li>
         <li><a href="#language-type">型</a></li>
         <li><a href="#language-type-inference">型推論</a></li>
@@ -632,18 +634,22 @@ my $total = MyMath->sum($sp_nums);
         <li><a href="#language-parser-separator">区切り文字</a>
         <li><a href="#language-parser-operator">演算子</a>
       </ul>
+      
       <h4 id="language-parser-encoding">ソースコードの文字コード</h4>
       <p>
         SPVMのソースコードの文字コードは、BOMなしのUTF-8で記述されます。
       </p>
+      
       <h4 id="language-parser-lalr">LALR(1)法</h4>
       <p>
         SPVMのソースコードは、LALR(1)法によって解析できます。yacc/bisonで生成されたパーサージェネレータによって解析することができます。
       </p>
+      
       <h4 id="language-parser-component">構成要素</h4>
       <p>
         SPVMのソースコードは「<a href="#language-parser-space-character">空白文字</a>」「<a href="#language-comment">コメント</a>」「<a href="#language-literal">リテラル</a>」「<a href="#language-parser-keyword">キーワード</a>」「<a href="#language-parser-identifier">識別子</a>」「<a href="#language-parser-separator">区切り文字</a>」「<a href="#language-parser-operator">演算子</a>」で構成されます。
       </p>
+      
       <h4 id="language-parser-line-terminater">行終端</h4>
       <p>
         SPVMのソースコードの行終端は、ASCIIコードの「LF」「CR」「CR LF」です。
@@ -651,6 +657,7 @@ my $total = MyMath->sum($sp_nums);
       <p>
         行終端が現れたときは、適切に行番号がインクリメントされます。
       </p>
+      
       <h4 id="language-parser-space-character">空白文字</h4>
       <p>
         SPVMにおける空白文字はASCIIコードの「SP」「HT」「FF」と「<a href="#language-parser-line-terminater">行終端</a>」です。
@@ -658,6 +665,7 @@ my $total = MyMath->sum($sp_nums);
       <p>
         空白文字はソースコード上では意味を持ちません。
       </p>
+      
       <h4 id="language-parser-keyword">キーワード</h4>
       <p>
         SPVMにおけるキーワードは以下です。
@@ -693,7 +701,436 @@ weaken wo __END__ __PACKAGE__ __FILE__ __LINE__
 +=  -=  *=  /=  &=  |=  ^=  %=  <<=  >>=  >>>=
 \   $   @   .   .=
 </pre>
-      
+
+      <h4 id="language-parser-table">構文解析表</h4>
+      <p>
+        yacc/bisonにおける、SPVM文法の構文解析表です。
+      </p>
+<pre>
+%token <opval> PACKAGE HAS SUB OUR ENUM MY SELF USE REQUIRE
+%token <opval> DESCRIPTOR
+%token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT EVAL
+%token <opval> NAME VAR_NAME CONSTANT PACKAGE_VAR_NAME EXCEPTION_VAR
+%token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT
+%token <opval> DOT3 FATCAMMA RW RO WO BEGIN NEW
+%token <opval> RETURN WEAKEN CROAK CURRENT_PACKAGE UNWEAKEN '[' '{' '('
+
+%type <opval> grammar
+%type <opval> opt_packages packages package package_block
+%type <opval> opt_declarations declarations declaration
+%type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
+%type <opval> sub anon_sub opt_args args arg invocant has use require our string_length
+%type <opval> opt_descriptors descriptors sub_names opt_sub_names
+%type <opval> opt_statements statements statement if_statement else_statement 
+%type <opval> for_statement while_statement switch_statement case_statement default_statement
+%type <opval> block eval_block begin_block if_require_statement
+%type <opval> unary_op binary_op comparison_op num_comparison_op str_comparison_op isa logical_op
+%type <opval> call_sub opt_vaarg
+%type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
+%type <opval> deref ref assign inc dec
+%type <opval> new array_init
+%type <opval> my_var var package_var_access
+%type <opval> term opt_expressions expressions expression condition opt_expression
+%type <opval> field_name sub_name
+%type <opval> type basic_type array_type array_type_with_length ref_type  type_or_void
+
+%right <opval> ASSIGN SPECIAL_ASSIGN
+%left <opval> LOGICAL_OR
+%left <opval> LOGICAL_AND
+%left <opval> BIT_OR BIT_XOR
+%left <opval> '&'
+%nonassoc <opval> NUMEQ NUMNE STREQ STRNE
+%nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA
+%left <opval> SHIFT
+%left <opval> '+' '-' '.'
+%left <opval> MULTIPLY DIVIDE REMAINDER
+%right <opval> LOGICAL_NOT BIT_NOT '@' REF DEREF PLUS MINUS CONVERT SCALAR LENGTH ISWEAK
+%nonassoc <opval> INC DEC
+%left <opval> ARROW
+
+%%
+
+grammar
+  : opt_packages
+
+opt_packages
+  :	/* Empty */
+  |	packages
+  
+packages
+  : packages package
+  | package
+
+package
+  : PACKAGE basic_type package_block
+  | PACKAGE basic_type ':' opt_descriptors package_block
+
+package_block
+  : '{' opt_declarations '}'
+
+opt_declarations
+  :	/* Empty */
+  |	declarations
+
+declarations
+  : declarations declaration
+  | declaration
+
+declaration
+  : has
+  | sub
+  | enumeration
+  | our ';'
+  | use
+  | begin_block
+
+begin_block
+  : BEGIN block
+    
+use
+  : USE basic_type ';'
+  | USE basic_type '(' opt_sub_names ')' ';'
+
+require
+  : REQUIRE basic_type
+
+enumeration
+  : ENUM enumeration_block
+
+enumeration_block 
+  : '{' opt_enumeration_values '}'
+
+opt_enumeration_values
+  :	/* Empty */
+  |	enumeration_values
+    
+enumeration_values
+  : enumeration_values ',' enumeration_value 
+  | enumeration_values ','
+  | enumeration_value
+  
+enumeration_value
+  : sub_name
+  | sub_name ASSIGN CONSTANT
+
+our
+  : OUR PACKAGE_VAR_NAME ':' opt_descriptors type
+has
+  : HAS field_name ':' opt_descriptors type ';'
+
+sub
+  : opt_descriptors SUB sub_name ':' type_or_void '(' opt_args opt_vaarg')' block
+  | opt_descriptors SUB sub_name ':' type_or_void '(' opt_args opt_vaarg')' ';'
+
+anon_sub
+  : opt_descriptors SUB ':' type_or_void '(' opt_args opt_vaarg')' block
+  | '[' args ']' opt_descriptors SUB ':' type_or_void '(' opt_args opt_vaarg')' block
+
+opt_args
+  :	/* Empty */
+  |	args
+  | invocant
+  | invocant ',' args
+
+args
+  : args ',' arg
+  | arg
+
+arg
+  : var ':' type
+
+opt_vaarg
+  : /* Empty */
+  | DOT3
+
+invocant
+  : var ':' SELF
+
+opt_descriptors
+  :	/* Empty */
+  |	descriptors
+    
+descriptors
+  : descriptors DESCRIPTOR
+  | DESCRIPTOR
+
+opt_statements
+  :	/* Empty */
+  |	statements
+    
+statements
+  : statements statement 
+  | statement
+
+statement
+  : if_statement
+  | for_statement
+  | while_statement
+  | block
+  | switch_statement
+  | case_statement
+  | default_statement
+  | eval_block
+  | if_require_statement
+  | expression ';'
+  | LAST ';'
+  | NEXT ';'
+  | RETURN ';'
+  | RETURN expression ';'
+  | CROAK ';'
+  | CROAK expression ';'
+  | weaken_field ';'
+  | unweaken_field ';'
+  | ';'
+
+for_statement
+  : FOR '(' opt_expression ';' term ';' opt_expression ')' block
+
+while_statement
+  : WHILE '(' term ')' block
+
+switch_statement
+  : SWITCH '(' expression ')' block
+
+case_statement
+  : CASE expression ':'
+
+default_statement
+  : DEFAULT ':'
+
+if_require_statement
+  : IF '(' require ')' block
+
+if_statement
+  : IF '(' term ')' block else_statement
+  | UNLESS '(' term ')' block else_statement
+
+else_statement
+  : /* NULL */
+  | ELSE block
+  | ELSIF '(' term ')' block else_statement
+
+block 
+  : '{' opt_statements '}'
+
+eval_block
+  : EVAL block ';'
+
+opt_expressions
+  :	/* Empty */
+  |	expressions
+term
+  : expression
+  | condition
+
+opt_expression
+  : /* Empty */
+  | expression
+
+expression
+  : var
+  | EXCEPTION_VAR
+  | package_var_access
+  | CONSTANT
+  | UNDEF
+  | call_sub
+  | field_access
+  | array_access
+  | convert
+  | new
+  | array_init
+  | array_length
+  | string_length
+  | my_var
+  | binary_op
+  | unary_op
+  | ref
+  | deref
+  | assign
+  | inc
+  | dec
+  | '(' expressions ')'
+  | CURRENT_PACKAGE
+
+expressions
+  : expressions ',' expression
+  | expressions ','
+  | expression
+
+unary_op
+  : '+' expression %prec PLUS
+  | '-' expression %prec MINUS
+  | BIT_NOT expression
+
+inc
+  : INC expression
+  | expression INC
+
+dec
+  : DEC expression
+  | expression DEC
+
+binary_op
+  : expression '+' expression
+  | expression '-' expression
+  | expression MULTIPLY expression
+  | expression DIVIDE expression
+  | expression REMAINDER expression
+  | expression BIT_XOR expression
+  | expression '&' expression
+  | expression BIT_OR expression
+  | expression SHIFT expression
+  | expression '.' expression
+
+condition
+  : comparison_op
+  | logical_op
+  | isweak_field ';'
+  | '(' condition ')'
+
+comparison_op
+  : num_comparison_op
+  | str_comparison_op
+  | isa
+
+num_comparison_op
+  : expression NUMEQ expression
+  | expression NUMNE expression
+  | expression NUMGT expression
+  | expression NUMGE expression
+  | expression NUMLT expression
+  | expression NUMLE expression
+
+str_comparison_op
+  : expression STREQ expression
+  | expression STRNE expression
+  | expression STRGT expression
+  | expression STRGE expression
+  | expression STRLT expression
+  | expression STRLE expression
+    
+isa
+  : expression ISA type
+
+logical_op
+  : term LOGICAL_OR term
+  | term LOGICAL_AND term
+  | LOGICAL_NOT term
+
+assign
+  : expression ASSIGN expression
+  | expression SPECIAL_ASSIGN expression
+
+new
+  : NEW basic_type
+  | NEW array_type_with_length
+  | anon_sub
+
+array_init
+  : '[' opt_expressions ']'
+
+convert
+  : '(' type ')' expression %prec CONVERT
+
+array_access
+  : expression ARROW '[' expression ']'
+  | array_access '[' expression ']'
+  | field_access '[' expression ']'
+
+call_sub
+  : NAME '(' opt_expressions  ')'
+  | basic_type ARROW sub_name '(' opt_expressions  ')'
+  | basic_type ARROW sub_name
+  | expression ARROW sub_name '(' opt_expressions ')'
+  | expression ARROW sub_name
+  | expression ARROW '(' opt_expressions ')'
+
+field_access
+  : expression ARROW '{' field_name '}'
+  | field_access '{' field_name '}'
+  | array_access '{' field_name '}'
+
+weaken_field
+  : WEAKEN field_access
+
+unweaken_field
+  : UNWEAKEN field_access
+
+isweak_field
+  : ISWEAK field_access
+
+array_length
+  : '@' expression
+  | '@' '{' expression '}'
+  | SCALAR '@' expression
+  | SCALAR '@' '{' expression '}'
+
+string_length
+  : LENGTH expression
+    
+deref
+  : DEREF var
+
+ref
+  : REF var
+
+my_var
+  : MY var ':' type
+  | MY var
+
+var
+  : VAR_NAME
+
+package_var_access
+  : PACKAGE_VAR_NAME
+
+type
+  : basic_type
+  | array_type
+  | ref_type
+
+basic_type
+  : NAME
+  | BYTE
+  | SHORT
+  | INT
+  | LONG
+  | FLOAT
+  | DOUBLE
+  | OBJECT
+  | STRING
+
+ref_type
+  : basic_type '&'
+
+array_type
+  : basic_type '[' ']'
+  | array_type '[' ']'
+
+array_type_with_length
+  : basic_type '[' expression ']'
+  | array_type '[' expression ']'
+
+type_or_void
+  : type
+  | VOID
+
+field_name
+  : NAME
+
+sub_name
+  : NAME
+
+opt_sub_names
+  :	/* Empty */
+  |	sub_names
+
+sub_names
+  : sub_names ',' sub_name
+  | sub_name
+
+%%
+</pre>
       <h3 id="language-comment">コメント</h3>
       <p>
         コメントは「#」で始まり改行で終わります。
@@ -728,6 +1165,7 @@ weaken wo __END__ __PACKAGE__ __FILE__ __LINE__
       <h3 id="language-package">パッケージ</h3>
       <ul class="list">
         <li><a href="#language-package-definition">パッケージの定義</a></li>
+        <li><a href="#language-package-destructor">デストラクタ</a></li>
       </ul>
       
       <h4 id="language-package-definition">パッケージの定義</h4>
@@ -863,6 +1301,49 @@ package Foo {
   }
 }
 </pre>
+
+      <h4 id="language-package-destructor">デストラクタ</h4>
+      <p>
+        パッケージが<a href="#language-type-class">クラス型</a>である場合は、デストラクタを定義することができます。
+      </p>
+      <p>
+        デストラクタとは、オブジェクトが解放されるときに実行される特別な<a href="#language-sub">サブルーチン</a>のことです。
+      </p>
+      <p>
+        デストラクタの名前は「DESTROY」でなければなりません。
+      </p>
+      <p>
+        デストラクタの戻り値の型は、<a href="#language-type-void">void型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        デストラクタの引数は、ひとつで、<a href="#language-type-self">self型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+<pre>
+sub DESTROY : void ($self : self) {
+  
+}
+</pre>
+      <p>
+        デストラクタの中で<a href="#language-exception-occur">例外の発生</a>が起こった場合は、プログラムは終了せず、例外メッセージが、標準エラーに出力されます。
+      </p>
+      <p>
+        <b>デストラクタのサンプル</b>
+      </p>
+      <p>
+        デストラクタのサンプルです。
+      </p>
+<pre>
+package Foo {
+  sub new : Foo {
+    return new Foo;
+  }
+  
+  sub DESTROY : void ($self : self) {
+    print("DESTROY");
+  }
+}
+</pre>
+      
       <h3 id="language-module">モジュール</h3>
       <ul>
         <li>モジュールの概要</li>
@@ -1321,6 +1802,7 @@ $z_ref->{im} = 3;
         <li><a href="#language-sub-method">メソッド</a></li>
         <li><a href="#language-sub-signature">シグネチャ</a></li>
         <li><a href="#language-sub-invocant">インボカント</a></li>
+        <li><a href="#language-sub-stack">サブルーチンのコールスタック</a></li>
       </ul>
       <h4 id="language-sub-definition">サブルーチンの定義</h4>
       <p>
@@ -1527,6 +2009,21 @@ void()
       <p>
         シグネチャは、SPVMを記述しているときには、意識する必要はありません。ネイティブからSPVMのサブルーチンを呼び出すときに使用します。
       </p>
+      
+      <h4 id="language-sub-stack">サブルーチンのコールスタック</h4>
+      <p>
+        サブルーチンのコールスタックとは、<a href="#language-expression-callsub">サブルーチンの呼び出し</a>が行われるときに、確保されるメモリ領域のことを指します。
+      </p>
+      <p>
+        サブルーチンのコールスタックには、以下の情報が保存されます。
+      </p>
+      <p>
+        1. <a href="#language-lex-var">レキシカル変数</a>のためのメモリ領域
+      </p>
+      <p>
+        2. モータル変数の場所
+      </p>
+
       <h3 id="language-enum">列挙</h3>
       <ul class="list">
         <li>
@@ -1753,6 +2250,10 @@ while (my $bar = 1) {
 }
 </pre>
 
+      <p>
+        レキシカル変数の宣言は、レキシカル変数が<a href="#language-type-object">オブジェクト型</a>であった場合に、レキシカル変数を、モータル変数として、実行時に登録します。モータル変数として登録されたレキシカル変数に代入されているオブジェクトは、<a href="#language-scope">スコープ</a>の末尾で、リファレンスカウントが自動的に1減らされます。
+      </p>
+
       <h4 id="language-lex-var-initial-value">レキシカル変数の初期値</h4>
       <p>
         レキシカル変数は、<a href="#language-type-initial-value">型の初期値</a>で初期化されます。
@@ -1828,8 +2329,17 @@ while (my $bar = 1) {
       <p>
         <b>スコープブロックの一覧</b>
       <p>
-        
-      </p>
+      <ul class="list">
+        <li><a href="#language-block-statement-simple">単純なブロック</a></li>
+        <li><a href="#language-block-statement-sub">サブルーチンブロック</a></li>
+        <li><a href="#language-block-statement-eval">evalブロック</a></li>
+        <li><a href="#language-block-statement-if">ifブロック</a></li>
+        <li><a href="#language-block-statement-elsif">elsifブロック</a></li>
+        <li><a href="#language-block-statement-else">elseブロック</a></li>
+        <li><a href="#language-block-statement-for">forブロック</a></li>
+        <li><a href="#language-block-statement-while">whileブロック</a></li>
+        <li><a href="#language-block-statement-switch">switchブロック</a></li>
+      </ul>
 
       <h5 id="language-block-statement-simple">単純なブロック</h5>
 <pre>
@@ -1905,19 +2415,19 @@ switch (条件) {
       <h3 id="language-exception">例外処理</h3>
       <ul class="list">
         <li><a href="#language-exception-summary">例外処理の概要</a></li>
-        <li><a href="#language-exception-throw">例外のスロー</a></li>
+        <li><a href="#language-exception-occur">例外の発生</a></li>
         <li><a href="#language-exception-catch">例外変数のキャッチ</a></li>
         <li><a href="#language-exception-var">例外変数</a></li>
       </ul>
       
       <h4 id="language-exception-summary">例外処理の概要</h4>
       <p>
-        SPVMは例外処理の仕組みを持っています。例外処理は、例外のスローと例外のキャッチからなります。
+        SPVMは例外処理の仕組みを持っています。例外処理は、例外の発生と例外のキャッチからなります。
       </p>
 
-      <h4 id="language-exception-throw">例外のスロー</h4>
+      <h4 id="language-exception-occur">例外の発生</h4>
       <p>
-        例外のスローを行うには、croak文を使用します。
+        例外の発生を行うには、croak文を使用します。
       </p>
 <pre>
 croak 式;
@@ -1934,7 +2444,7 @@ Error
   from TestCase->main at TestCase.spvm line 1198
 </pre>
 
-      <h4 id="language-exception-throw">例外のキャッチ</h4>
+      <h4 id="language-exception-occur">例外のキャッチ</h4>
       <p>
         例外のキャッチとは、例外がスローされた場合に、プログラムが終了するのを止め、エラーメッセージを取得できる機能のことです。
       </p>
@@ -1947,7 +2457,7 @@ eval {
 };
 </pre>
       <p>
-        evalブロックで例外をキャッチした場合は、プログラムの終了は止められ、<a href="#language-exception-var">例外変数</a>に<a href="#language-exception-throw">例外のスロー</a>で指定したメッセージが代入されます。
+        evalブロックで例外をキャッチした場合は、プログラムの終了は止められ、<a href="#language-exception-var">例外変数</a>に<a href="#language-exception-occur">例外の発生</a>で指定したメッセージが代入されます。
       </p>
       
       <h4 id="language-exception-var">例外変数</h4>
@@ -1967,6 +2477,77 @@ $@
         例外変数の値の設定については、<a href="#language-expression-set-exception-var">例外変数の値の設定</a>を見てください。
       </p>
 
+      <h3 id="language-weak-ref">ウィークリファレンス</h3>
+      <p>
+        ウィークリファレンスとは、リファレンスカウントを増やさない参照のことです。ウィークリファレンスを使用すると、循環参照の問題を解決することができます。
+      </p>
+      <p>
+        SPVMは、リファレンスカウント型のGCを持ちます。リファレンスカウント型のGCにおいては、リファレンスカウントが0になった場合に、オブジェクトは自動的に開放されますが、循環参照が発生した場合は、リファレンスカウントが0にならず、オブジェクトが自動的に解放されません。
+      </p>
+      <p>
+        オブジェクトのフィールドが、循環参照している場合のサンプルです。
+      </p>
+<pre>
+{
+  my $foo = new Foo;
+  my $bar = new Bar;
+
+  $foo->{bar} = $bar;
+  $bar->{foo} = $foo;
+}
+</pre>
+      <p>
+        この場合は、スコープが終了しても、両方のオブジェクトは解放されません。なぜなら、循環参照が発生しており、リファレンスカウントが0にならないためです。
+      </p>
+      <p>
+        ウィークリファレンスは、リファレンスカウントGCを持つプログラミング言語において、循環参照が発生した場合に、オブジェクトの破棄を正しく行うための機能です。
+      </p>
+      <p>
+        このような場合は、ひとつのフィールドを、<a href="#language-statement-weaken">weaken文</a>を使って、ウィークリファレンスに設定することで、正しく解放することができます。
+      </p>
+<pre>
+{
+  my $foo = new Foo;
+  my $bar = new Bar;
+
+  $foo->{bar} = $bar;
+  $bar->{foo} = $foo;
+  
+  weaken $foo->{bar};
+}
+</pre>
+      <p>
+        weaken文が実行される前の、$fooのリファレンスカウントは2、$barのリファレンスカウントは2です。
+      </p>
+      <p>
+        もしweaken文がない場合は、スコープが終了したとしても、$fooのリファレンスカウントも、$barのリファレンスカウントも0にならず、解放されません。
+      </p>
+      <p>
+        weaken文が実行されるとは、$fooのリファレンスカウントは2、$barのリファレンスカウントは1になります。
+      </p>
+      <p>
+        スコープが終了すると、$barのリファレンスカウントが1減らされ0になるので、正しく解放されます。
+      </p>
+      <p>
+        3つの循環参照の場合でも、ひとつのフィールドにウィークリファレンスを設定すれば、正しく解放できます。
+      </p>
+<pre>
+{
+  my $foo = new Foo;
+  my $bar = new Bar;
+  my $baz = new Baz;
+
+  $foo->{bar} = $bar;
+  $bar->{baz} = $baz;
+  $baz->{foo} = $foo;
+  
+  weaken $foo->{bar};
+}
+</pre>
+      <p>
+        ウィークリファレンス関連の文法として、ウィークリファレンスを解除できる<a href="#language-statement-weaken">weaken文</a>と、フィールドがウィークリファレンスかどうかを確認できる<a href="#language-operator-isweak">isweak演算子</a>があります。
+      </p>
+      
       <h3 id="language-interface">インターフェース</h3>
       <p>
         SPVMにおけるインターフェースとは、実装を持たないメソッドが一つだけ定義されたパッケージ型のことをいいます。<a href="#language-package-definition">パッケージの定義</a>においてinterface_tデスクリプタを指定すると、インターフェースになります。
@@ -2081,11 +2662,193 @@ my $ret = $foo->bar(2);
 </pre>
 
       <p>
-        配列の取得については、<a href="#language-expression-get-array">配列の値の取得</a>を見てください。
+        配列の取得については、<a href="#language-expression-get-array-element">配列の要素の値の取得</a>を見てください。
       </p>
       <p>
-        配列の設定については、<a href="#language-expression-set-set-array">配列の値の設定</a>を見てください。
+        配列の設定については、<a href="#language-expression-set-set-array-element">配列の要素の値の設定</a>を見てください。
       </p>
+
+      <h3 id="language-value">値</h3>
+      <ul class="list">
+        <li><a href="#language-value-definition">値型の定義</a></li>
+        <li><a href="#language-value-usage">値型の使用</a></li>
+        <li><a href="#language-value-access">値型のフィールドへのアクセス</a></li>
+      </ul>
+      
+      <h4 id="language-value-definition">値型の定義</h3>
+      <p>
+        SPVMには、他の言語ではあまり見ることのない値というものがあります。
+      </p>
+      <p>
+        値は、連続した数値を表現します。たとえば、連続した32bit符号付整数が3つであるとか、連続した倍精度浮動小数点が2つなどです。3次元の点、複素数、四元数などを表現することが想定されています。
+      </p>
+      <p>
+        値を使用するには、最初に、値型を定義します。値型は、<a href="#language-package-definition">パッケージの定義</a>において、value_tデスクリプタを指定することで定義できます。
+      </p>
+<pre>
+# 連続した32bit符号付整数が3つ
+package Point_3i : value_t {
+  has x : int;
+  has y : int;
+  has z : int;
+}
+
+連続した倍精度浮動小数点が2つ
+package Complex_2d : value_t {
+  re : double;
+  im : double;
+}
+</pre>
+      <p>
+        すべてのフィールドは同じ<a href="#language-type-numeric">数値型</a>でなければなりません。
+      </p>
+      <p>
+        値型の末尾は「_」「フィールドの個数」「値型のサフィックス」でなければなりません。
+      </p>
+      <p>
+        <b>値型のサフィクスの一覧</b>
+      </p>
+      <table>
+        <tr>
+          <th>
+            <b>数値型</b>
+          </th>
+          <th>
+            サフィックス
+          </th>
+        </tr>
+        <tr>
+          <td>
+            <b>byte</b>
+          </td>
+          <td>
+            b
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>short</b>
+          </td>
+          <td>
+            s
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>int</b>
+          </td>
+          <td>
+            i
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>long</b>
+          </td>
+          <td>
+            l
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>float</b>
+          </td>
+          <td>
+            f
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>double</b>
+          </td>
+          <td>
+            d
+          </td>
+        </tr>
+      </table>
+      <p>
+        サフィックスは、実際に定義されている数値型と対応している必要があります。
+      </p>
+      <p>
+        数値型の定義において、フィールドの個数の最大は16です。
+      </p>
+      <p>
+        不正な値型の定義の場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        値型は、<a href="#language-lex-var-declaration">レキシカル変数の宣言</a>の型として利用することができます。
+      </p>
+      <p>
+        値型は、<a href="#language-sub-definition">サブルーチンの定義</a>における引数の型として利用することができます。
+      </p>
+      <p>
+        値型は、<a href="#language-sub-definition">サブルーチンの定義</a>における戻り値の型として利用することができます。
+      </p>
+      <p>
+        値型は<a href="#language-type-array">配列型</a>の<a href="#language-type-basic">基本型</a>として利用することができます。
+      </p>
+<pre>
+my $points = new Point_3i[5];
+</pre>
+      <p>
+        値型は、フィールドの型として利用することはできません。
+      </p>
+      <p>
+        値型は、パッケージ変数の型として利用することはできません。
+      </p>
+      <p>
+        値型の値に対しては、リファレンスを生成することができます。
+      </p>
+<pre>
+my $point : Point_3i;
+my $point_ref = \$point;
+</pre>
+
+      <h4 id="language-value-usage">値型の使用</h3>
+      <p>
+        値型を使用するにはuse文を使って、モジュールをロードします。
+      </p>
+<pre>
+use Point_3i;
+use Complex_2d;
+</pre>
+      <p>
+        次に、レキシカル変数の宣言を行います。レキシカル変数の宣言を行うと、連続した領域が、<a href="#language-sub-stack">サブルーチンのコールスタック</a>上に確保されます。フィールドのすべての値は、<a href="language-type-initial-value">型の初期値</a>で初期化されます。
+      </p>
+<pre>
+my $point : Point_3i;
+my $z : Complex_2d;
+</pre>
+      <p>
+        値型の値は、オブジェクトではないので、<a href="#language-expression-new-object">オブジェクトの生成</a>の構文では生成できないことに注意してください。
+      </p>
+
+      <h4 id="language-value-access">値型のフィールドへのアクセス</h3>
+      <p>
+        値型のフィールドへのアクセスとは、値型のフィールドにアクセスして、値を取得したり、設定したりする操作のことです。また、以下の記述そのものを指します。
+      </p>
+<pre>
+インボカント->{フィールド名}
+</pre>
+      <p>
+        値型のフィールドの取得については、<a href="#language-expression-get-field-value">値型のフィールドの値の取得</a>を見てください。
+      </p>
+      <p>
+        値型のフィールドの設定については、<a href="#language-expression-set-field-value">値型のフィールドの値の設定</a>を見てください。
+      </p>
+      <p>
+        <b>値型のフィールドの値の取得・設定のサンプル</b>
+      </p>
+      <p>
+        値型のフィールドの値の取得・設定のサンプルです。
+      </p>
+<pre>
+$ival2->{x} = 1;
+my $y = $ival2->{y};
+
+$dval4->{t} = 2.5;
+my $z = $dval4->{z};
+</pre>
 
       <h4 id="language-array-summary">配列の生成</h4>
       
@@ -2100,7 +2863,7 @@ my $ret = $foo->bar(2);
         式と条件の違いは、条件は、式として利用できないということだけです。
       </p>
       <p>
-        項は常に、左から右の順番で評価されます。たとえば、以下の例では、3 * 3 が実行され結果は9になります。
+        項は、代入演算子を除く、ほとんどの場合に、左から右の順番で評価されます。たとえば、以下の例では、3 * 3 が実行され結果は9になります。
       </p>
 <pre>
   my $i = 2;
@@ -2147,11 +2910,12 @@ my $ret = $foo->bar(2);
         <li><a href="#language-expression-set-field-value">値型のフィールドの値の設定</a></li>
         <li><a href="#language-expression-get-field-value-deref">デリファレンスによる値型のフィールドの取得</a></li>
         <li><a href="#language-expression-set-field-value-deref">デリファレンスによる値型のフィールドの設定</a></li>
-        <li>配列の要素の値の設定</li>
-        <li>配列の要素の値の取得</li>
+        <li><a href="#language-expression-get-array-element">配列の要素の値の取得</a></li>
+        <li><a href="#language-expression-set-array-element">配列の要素の値の設定</a></li>
         <li><a href="#language-expression-typecast">型キャスト</a></li>
         <li><a href="#language-expression-new-object">オブジェクトの生成</a></li>
         <li><a href="#language-expression-new-array">配列の生成</a></li>
+        <li><a href="#language-expression-release-object">オブジェクトの解放</a></li>
         <li><a href="#language-expression-array-init">配列の初期化</a></li>
         <li><a href="#language-operator-array-length">配列長演算子</a></li>
         <li><a href="#language-operator-string-length">文字列長演算子</a></li>
@@ -2196,6 +2960,12 @@ $var = 右式
       </p>
       <p>
         レキシカル変数の値の設定は、<a href="#language-expression">式</a>です。
+      </p>
+      <p>
+        右式が、オブジェクト型であった場合は、オブジェクトのリファレンスカウントが1増やされます。
+      </p>
+      <p>
+        代入前に、すでに$varにオブジェクトが代入されていた場合は、そのオブジェクトのリファレンスカウントが1減らされます。
       </p>
       
       <h4 id="language-expression-get-package-var">パッケージ変数の値の取得</h4>
@@ -2323,26 +3093,6 @@ $@ = 右式
 <pre>
 $@ = "Error";
 </pre>
-
-      <h4 id="language-field-access">クラス型のフィールドの取得</h4>
-      <p>
-        フィールドの取得の構文は以下です。
-      </p>
-<pre>
-インボーカー式->{フィールド名}
-</pre>
-      <p>
-        フィールドの設定の構文は以下です。
-      </p>
-<pre>
-インボーカー式->{フィールド名} = 右式;
-</pre>
-      <p>
-        インボーカー式は、<a href="#language-type-class">クラス型</a>あるいは<a href="#language-type-value">値型</a>あるいは<a href="#language-type-ref-value">値のリファレンス型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
-      </p>
-      <p>
-        フィールド名がインボーカー式のパッケージに存在しない場合は、コンパイル時エラーが発生します。
-      </p>
 
       <h4 id="language-expression-callsub">サブルーチンの呼び出し</h4>
       <p>
@@ -2579,9 +3329,6 @@ package Foo::Bar {
   }
 }
 </pre>
-      <h4 id="language-expression-current-file">現在のファイル名の取得</h4>
-      <h4 id="language-expression-current-line">現在の行番号の取得</h4>
-
       <h3 id="language-condition">条件</h3>
       <p>
         条件は次の項目で定義されます。
@@ -2590,17 +3337,20 @@ package Foo::Bar {
         <b>条件の一覧</b>
       </p>
       <ul class="list">
-        <li>比較演算子</li>
-        <li>論理演算子</li>
+        <li><a href="#language-operator-comparison">比較演算子</a></li>
+        <li><a href="#language-operator-logical">論理演算子</a></li>
         <li>(条件)</li>
       </ul>
       <p>
-        条件の結果の型は、int型です。0以外の値の場合は真、0の場合は偽です。
+        条件の結果は、真または偽です。
+      </p>
+      <p>
+        最後の「(条件)」というのは、条件を「()」で囲ったという意味です。
       </p>
 
       <h3 id="language-condition-part">条件部</h3>
       <p>
-        条件部とは、条件判定が行われる部分のことです。条件部には「<a href="#language-expression">式</a>」と「<a href="#language-condition">条件</a>」が記述できます。
+        条件部とは、条件判定が行われる部分のことです。条件部には「<a href="#language-term">項</a>」が記述できます。
       </p>
       <p>
         <b>if文のかっこの中</b>
@@ -3256,6 +4006,7 @@ undef
         <li><a href="#language-operator-array-length">配列長演算子</a></li>
         <li><a href="#language-operator-string-length">文字列長演算子</a></li>
         <li><a href="#language-operator-scalar">スカラ演算子</a></li>
+        <li><a href="#language-operator-isweak">isweak演算子</a></li>
       </ul>
       
       <h4 id="language-operator-summary">演算子の概要</h4>
@@ -4073,27 +4824,28 @@ x <= y;
       <p>
         論理演算子は、<a href="#language-condition">条件</a>を返します。
       </p>
+      
       <h4 id="language-operator-logical-and">論理AND演算子</h4>
       <p>
-        論理AND演算子とは、論理AND演算を行うために、左項と右項の間に置かれる演算子で、「&&」で表現される<a href="#language-condition">条件</a>を返す二項演算子です。項については、<a href="#language-term">項</a>を参考にしてください。
+        論理AND演算子とは、論理AND演算を行うために、「&&」で表現される、<a href="#language-term">項</a>をオペランドとする<a href="#language-operator-binary">二項演算子</a>です。
       </p>
 <pre>
 左項 && 右項
 </pre>
       <p>
-        左項と右項は<a href="#language-condition-part">条件部</a>です。
-      </p>
-      <p>
         論理AND演算子は次のように動作します。
       </p>
       <p>
-        1. 左項の評価が真であれば、右項を実行し、右項の評価が、真であれば、全体として真を返し、右項の評価が偽であれば、全体として偽を返します。
+        1. 左項の評価が真であれば、右項を実行し、右項の評価が、真であれば、真を返し、右項の評価が偽であれば、偽を返します。
       </p>
       <p>
-        2. 左項の評価が偽であれば、全体として偽を返します。右項は実行されません。
+        2. 左項の評価が偽であれば、偽を返します。右項は実行されません。
       </p>
       <p>
         論理AND演算子の結果の型は、int型です。
+      </p>
+      <p>
+        論理AND演算子は<a href="#language-condition">条件</a>を返します。
       </p>
       <p>
         論理AND演算子は、例外を発生させません。
@@ -4101,25 +4853,25 @@ x <= y;
       
       <h4 id="language-operator-logical-and">論理OR演算子</h4>
       <p>
-        論理OR演算子とは、論理OR演算を行うために、左項と右項の間に置かれる演算子で、「||」で表現される<a href="#language-condition">条件</a>を返す<a href="#language-operator-binary">二項演算子</a>です。項については、<a href="#language-term">項</a>を参考にしてください。
+        論理OR演算子とは、論理OR演算を行うために、「||」で表現される、<a href="#language-term">項</a>をオペランドとする<a href="#language-operator-binary">二項演算子</a>です。
       </p>
 <pre>
 左項 || 右項
 </pre>
       <p>
-        左項と右項は<a href="#language-condition-part">条件部</a>です。
-      </p>
-      <p>
         論理OR演算子は次のように動作します。
       </p>
       <p>
-        1. 左項の評価が真であれば、全体として、真を返します。右項は実行されません。
+        1. 左項の評価が真であれば、真を返します。右項は実行されません。
       </p>
       <p>
-        2. 左項の評価が偽であれば、右項を実行し、右項の評価が、真であれば、全体として真を返し、右項の評価が偽であれば、全体として偽を返します。
+        2. 左項の評価が偽であれば、右項を実行し、右項の評価が、真であれば、真を返し、右項の評価が偽であれば、偽を返します。
       </p>
       <p>
         論理OR演算子の結果の型は、int型です。
+      </p>
+      <p>
+        論理OR演算子は<a href="#language-condition">条件</a>を返します。
       </p>
       <p>
         論理OR演算子は、例外を発生させません。
@@ -4133,13 +4885,13 @@ x <= y;
 !項
 </pre>
       <p>
-        項は<a href="#language-condition-part">条件部</a>です。
-      </p>
-      <p>
         論理NOT演算子は、項が真であれば、偽を返します。項が偽であれば、真を返します。
       </p>
       <p>
         論理NOT演算子の結果の型は、int型です。
+      </p>
+      <p>
+        論理NOT演算子は<a href="#language-condition">条件</a>うぃを返します。
       </p>
       <p>
         論理NOT演算子は、例外を発生させません。
@@ -4182,9 +4934,16 @@ my $str = 123 . 456;
       <p>
         代入演算子は「=」で表現される、代入を行うための<a href="#language-operator-binary">二項演算子</a>です。
       </p>
+<pre>
+左式 = 右式
+</pre>
       <p>
         代入演算子は、右辺と左辺によって、複数の意味を持ちます。各項目を参考にしてください。
       </p>
+      <p>
+        代入演算子においては、右式が評価された後に、左式が評価されます。これは、原則として、式は左から右へ実行されるということの例外です。
+      </p>
+      
       <ul>
         <li><a href="#language-expression-set-lex-var">レキシカル変数の値の設定</a></li>
       </ul>
@@ -4394,6 +5153,443 @@ my $nums = new int[3];
 foo(scalar @$nums);
 </pre>
 
+      <h3 id="language-expression-get-field-class">クラス型のフィールドの値の取得</h3>
+      <p>
+        クラス型のフィールドの値の取得は、次のように記述します。
+      </p>
+<pre>
+インボカント式->{フィールド名}
+</pre>
+      <p>
+        インボカント式は、<a href="#language-type-class">クラス型</a>の値でなければなりません。インボカント式が、<a href="#language-type-value">値型</a>の値であった場合は、<a href="#language-expression-get-field-value">値型のフィールドの値の取得</a>になり、<a href="#language-type-ref-value">値のリファレンス型</a>の値であった場合は、<a href="#language-expression-get-field-value-deref">デリファレンスによる値型のフィールドの取得</a>になり、それ以外の場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールド名が、存在しない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        クラス型のフィールドの値の取得は、オブジェクトに保存されているフィールドの値を返します。これは<a href="#language-expression">式</a>です。
+      </p>
+      <p>
+        返される値の型は、フィールドの型です。
+      </p>
+      <p>
+        <b>クラス型のフィールドの値の取得のサンプル</b>
+      </p>
+      <p>
+        クラス型のフィールドの値の取得のサンプルです。
+      </p>
+<pre>
+my $point = Point->new;
+my $x = $point->{x};
+</pre>
+      
+      <h3 id="language-expression-set-field-class">クラス型のフィールドの値の設定</h3>
+      <p>
+        クラス型のフィールドの値の設定は、次のように記述します。
+      </p>
+<pre>
+インボカント式->{フィールド名} = 右式
+</pre>
+      <p>
+        インボカント式は、<a href="#language-type-class">クラス型</a>の値でなければなりません。インボカント式が、<a href="#language-type-value">値型</a>の値であった場合は、<a href="#language-expression-get-field-value">値型のフィールドの値の設定</a>になり、<a href="#language-type-ref-value">値のリファレンス型</a>の値であった場合は、<a href="#language-expression-get-field-value-deref">デリファレンスによる値型のフィールドの設定</a>になり、それ以外の場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールド名が、存在しない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        右式の型は、フィールドの型と同じでなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        クラス型のフィールドの値の設定は、設定後のオブジェクトに保存されているフィールドの値を返します。これは<a href="#language-expression">式</a>です。
+      </p>
+      <p>
+        返される値の型は、フィールドの型です。
+      </p>
+      <p>
+        右式が、オブジェクト型であった場合は、オブジェクトのリファレンスカウントが1増やされます。
+      </p>
+      <p>
+        代入前に、すでにフィールドにオブジェクトが代入されていた場合は、そのオブジェクトのリファレンスカウントが1減らされます。
+      </p>
+      <p>
+        <b>クラス型のフィールドの値の設定のサンプル</b>
+      </p>
+      <p>
+        クラス型のフィールドの値の設定のサンプルです。
+      </p>
+<pre>
+my $point = Point->new;
+$point->{x} = 1;
+</pre>
+      
+      <h3 id="language-expression-get-field-value">値型のフィールドの値の取得</h3>
+      <p>
+        値型のフィールドの値の取得は、次のように記述します。
+      </p>
+<pre>
+インボカント式->{フィールド名}
+</pre>
+      <p>
+        インボカント式は、<a href="#language-type-class">値型</a>の値でなければなりません。インボカント式が、<a href="#language-type-class">クラス型</a>の値であった場合は、<a href="#language-expression-get-field-class">クラス型のフィールドの値の取得</a>になり、<a href="#language-type-ref-value">値のリファレンス型</a>の値であった場合は、<a href="#language-expression-get-field-value-deref">デリファレンスによる値型のフィールドの取得</a>になり、それ以外の場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールド名が、存在しない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        値型のフィールドの値の取得は、<a href="#language-sub-stack">サブルーチンのコールスタック</a>に保存されている該当するフィールドの値を返します。これは<a href="#language-expression">式</a>です。
+      </p>
+      <p>
+        返される値の型は、フィールドの型です。
+      </p>
+      <p>
+        <b>値型のフィールドの値の取得のサンプル</b>
+      </p>
+      <p>
+        値型のフィールドの値の取得のサンプルです。
+      </p>
+<pre>
+my $z : SPVM::Complex_2d;
+my $re = $z->{re};
+</pre>
+
+      <h3 id="language-expression-set-field-value">値型のフィールドの値の設定</h3>
+      <p>
+        値型のフィールドの値の設定は、次のように記述します。
+      </p>
+<pre>
+インボカント式->{フィールド名} = 右式
+</pre>
+      <p>
+        インボカント式は、<a href="#language-type-class">値型</a>の値でなければなりません。インボカント式が、<a href="#language-type-class">クラス型</a>の値であった場合は、<a href="#language-expression-set-field-class">クラス型のフィールドの値の設定</a>になり、<a href="#language-type-ref-value">値のリファレンス型</a>の値であった場合は、<a href="#language-expression-set-field-value-deref">デリファレンスによる値型のフィールドの設定</a>になり、それ以外の場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールド名が、存在しない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        右式の型は、フィールドの型と同じでなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        値型のフィールドの値の設定は、設定後の<a href="#language-sub-stack">サブルーチンのコールスタック</a>に保存されている該当するフィールドの値を返します。これは<a href="#language-expression">式</a>です。
+      </p>
+      <p>
+        返される値の型は、フィールドの型です。
+      </p>
+      <p>
+        <b>値型のフィールドの値の設定のサンプル</b>
+      </p>
+      <p>
+        値型のフィールドの値の設定のサンプルです。
+      </p>
+<pre>
+my $z : SPVM::Complex_2d;
+$z->{re} = 2.5;
+</pre>
+
+      <h3 id="language-expression-get-field-value-deref">デリファレンスによる値型のフィールドの値の取得</h3>
+      <p>
+        デリファレンスによる値型のフィールドの値の取得は、次のように記述します。
+      </p>
+<pre>
+インボカント式->{フィールド名}
+</pre>
+      <p>
+        インボカント式は、<a href="#language-type-ref-value">値のリファレンス型</a>の値でなければなりません。インボカント式が、<a href="#language-type-class">クラス型</a>の値であった場合は、<a href="#language-expression-get-field-class">クラス型のフィールドの値の取得</a>になり、<a href="#language-type-value">値型</a>の値であった場合は、<a href="#language-expression-get-field-value">値型のフィールドの値の取得</a>になり、それ以外の場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールド名が、存在しない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        デリファレンスによる値型のフィールドの値の取得は、<a href="#language-sub-stack">サブルーチンのコールスタック</a>に保存されている該当するフィールドの値を返します。これは<a href="#language-expression">式</a>です。
+      </p>
+      <p>
+        返される値の型は、フィールドの型です。
+      </p>
+      <p>
+        <b>デリファレンスによる値型のフィールドの値の取得のサンプル</b>
+      </p>
+      <p>
+        デリファレンスによる値型のフィールドの値の取得のサンプルです。
+      </p>
+<pre>
+my $z : SPVM::Complex_2d;
+my $z_ref = \$z;
+my $re = $z_ref->{re};
+</pre>
+
+      <h3 id="language-expression-set-field-value-deref">デリファレンスによる値型のフィールドの値の設定</h3>
+      <p>
+        デリファレンスによる値型のフィールドの値の設定は、次のように記述します。
+      </p>
+<pre>
+インボカント式->{フィールド名} = 右式
+</pre>
+      <p>
+        インボカント式は、<a href="#language-type-ref-value">値のリファレンス型</a>の値でなければなりません。インボカント式が、<a href="#language-type-class">クラス型</a>の値であった場合は、<a href="#language-expression-set-field-class">クラス型のフィールドの値の設定</a>になり、<a href="#language-type-value">値型</a>の値であった場合は、<a href="#language-expression-set-field-value">値型のフィールドの値の設定</a>になり、それ以外の場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールド名が、存在しない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        右式の型は、フィールドの型と同じでなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        デリファレンスによる値型のフィールドの値の設定は、設定後の<a href="#language-sub-stack">サブルーチンのコールスタック</a>に保存されている該当するフィールドの値を返します。これは<a href="#language-expression">式</a>です。
+      </p>
+      <p>
+        返される値の型は、フィールドの型です。
+      </p>
+      <p>
+        <b>デリファレンスによる値型のフィールドの値の設定のサンプル</b>
+      </p>
+      <p>
+        デリファレンスによる値型のフィールドの値の設定のサンプルです。
+      </p>
+<pre>
+my $z : SPVM::Complex_2d;
+my $z_ref = \$z;
+$z_ref->{re} = 2.5;
+</pre>
+      
+      <h3 id="language-expression-get-array-element">配列の要素の値の取得</h3>
+      <p>
+        配列の要素の値を取得するには、次のように記述します。
+      </p>
+<p>
+配列式->[インデックス式]
+</p>
+      <p>
+        配列式は、<a href="#language-type-array">配列型</a>の値でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        インデックス式は、int型の値でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        配列の要素の値を取得は、指定したインデックスの要素の値を返します。これは、式です。
+      </p>
+      <p>
+        実行時に、配列式の値が、未定義値である場合は、実行時例外が発生します。
+      </p>
+      <p>
+        実行時に、インデックスの値が、0より小さい場合、あるいは、配列の最大のインデックスを超えている場合は、実行時例外が発生します。
+      </p>
+      <p>
+        <b>配列の要素の値の取得のサンプル</b>
+      </p>
+      <p>
+        配列の要素の値の取得のサンプルです。
+      </p>
+<pre>
+my $nums = new int[3];
+my $num = $nums->[1];
+
+my $points = new Point[3];
+my $point = $points->[1];
+
+my $objects : oarray = $points;
+my $object = (Point)$objects->[1];
+</pre>
+      
+      <h3 id="language-expression-set-array-element">配列の要素の値の設定</h3>
+      <p>
+        配列の要素の値を設定するには、次のように記述します。
+      </p>
+<p>
+配列式->[インデックス式] = 右式
+</p>
+      <p>
+        配列式は、<a href="#language-type-array">配列型</a>の値でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        インデックス式は、int型の値でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        右式の型は、配列の要素の型と<a href="#language-type-compatible">型の互換性</a>がなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        配列の要素の値を設定は、設定後の値を返します。これは、式です。
+      </p>
+      <p>
+        実行時に、配列式の値が、未定義値である場合は、実行時例外が発生します。
+      </p>
+      <p>
+        実行時に、インデックスの値が、0より小さい場合、あるいは、配列の最大のインデックスを超えている場合は、実行時例外が発生します。
+      </p>
+      <p>
+        右式が、オブジェクト型であった場合は、オブジェクトのリファレンスカウントが1増やされます。
+      </p>
+      <p>
+        代入前に、すでに配列の要素にオブジェクトが代入されていた場合は、そのオブジェクトのリファレンスカウントが1減らされます。
+      </p>
+      <p>
+        <b>配列の要素の値の設定のサンプル</b>
+      </p>
+      <p>
+        配列の要素の値の設定のサンプルです。
+      </p>
+<pre>
+my $nums = new int[3];
+$nums->[1] = 3;
+
+my $points = new Point[3];
+$points->[1] = Point->new(1, 2);
+
+my $objects : oarray = $points;
+$objects->[2] = Point->new(3, 5);;
+</pre>
+
+      <h3 id="language-expression-new-object">オブジェクトの生成</h3>
+      <p>
+        オブジェクトを生成するには、newキーワードと以下の構文をを使用します。
+      </p>
+<pre>
+my $object = new パッケージ名;
+</pre>
+      <p>
+        指定されたパッケージは、<a href="#language-type-class">クラス型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールドは、すべて<a href="language-type-initial-value">型の初期値</a>で初期化されます。
+      </p>
+      <p>
+        オブジェクトの生成は、<a href="#language-expression">式</a>を返します。
+      </p>
+      <p>
+        生成直後のオブジェクトのリファレンスカウントは、0です。代入が実行されるタイミングで、リファレンスカウントが1増やされます。明示的な代入が行われない場合でも、一時変数が作成され、そこに代入されます。
+      </p>
+      <p>
+        <b>オブジェクトの生成のサンプル</b>
+      </p>
+<pre>
+my $object = new Foo;
+</pre>
+      <p>
+        生成されたオブジェクトは内部的に次の情報を持っています。
+      </p>
+      <ul class="list">
+        <li>リファレンスカウント</li>
+        <li>ウィークリファレンスのバックリファレンス</li>
+        <li>基本型のID</li>
+        <li>型の次元(常に0)</li>
+      </ul>
+      
+      <h3 id="language-expression-new-array">配列の生成</h3>
+      <p>
+        配列を作成するには、newキーワードと以下の構文をを使用します。
+      </p>
+<pre>
+my $object = new 型[要素数式];
+</pre>
+      <p>
+        型には、<a href="#language-type-numeric">数値型</a>、<a href="#language-type-object">オブジェクト型</a>、<a href="#language-type-value">値型</a>が指定できます。それ以外の型を指定した場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        要素数式は、int型以下の<a href="#language-type-numeric">数値型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        要素数式に対して、<a href="#language-type-convertion-unary-numeric-widening">単項数値拡大型変換</a>が行われます。
+      </p>
+      <p>
+        要素数式で指定された長さの配列が生成されます。
+      </p>
+      <p>
+        配列の要素は、すべて<a href="language-type-initial-value">型の初期値</a>で初期化されます。
+      </p>
+      <p>
+        配列において、要素は、メモリ上に連続していることが保証されます。
+      </p>
+      <p>
+        配列の生成は、<a href="#language-expression">式</a>を返します。
+      </p>
+      <p>
+        配列は、<a href="#language-type-object">オブジェクト型</a>です。
+      </p>
+      <p>
+        <b>配列の生成のサンプル</b>
+      </p>
+<pre>
+my $nums = new int[3];
+my $objects = new Foo[3];
+my $objects = new object[3];
+my $values = new Complex_2d[3]
+</pre>
+      <p>
+        生成された配列は、内部的に次の情報を持っています。
+      </p>
+      <ul class="list">
+        <li>リファレンスカウント</li>
+        <li>基本型のID</li>
+        <li>型の次元(1以上の値)</li>
+        <li>配列の長さ</li>
+      </ul>
+      <p>
+        多次元配列は、上記の構文を使用して、作成できます。要素は、<a href="#language-type-initial-value">型の初期値</a>によって初期化されます。
+      </p>
+<pre>
+my $nums = new int[][3];
+my $nums = new int[][][3];
+</pre>
+      <p>
+        多次元配列の次元数の最大は、255です。
+      </p>
+      
+      <h3 id="language-expression-array-init">配列の初期化</h3>
+      <p>
+        SPVMには、配列の生成を簡単にするための配列の初期化の構文があります。式はなくてもかまいません。
+      </p>
+<pre>
+[]
+[式1, 式2, 式3]
+</pre>
+      <p>
+        配列の初期化は、式の要素数の長さを持った配列を返します。
+      </p>
+      <p>
+        配列の型は、式1の型を配列型にしたものです。要素が指定されない場合は、<a href="#language-type-any-object">汎用オブジェクト型</a>を配列型にしたものになります。
+      </p>
+      <p>
+        式2以降が、<a href="#language-type-compatible">型の互換性</a>を満たさない場合は、コンパイルエラーになります。
+      </p>
+
+      <h3 id="language-expression-release-object">オブジェクトの解放</h3>
+      <p>
+        オブジェクトは、リファレンスカウントが0になるとメモリから解放されます。
+      </p>
+      <p>
+        オブジェクトが、オブジェクト型の値を要素として持つ配列だった場合は、オブジェクトの解放の前に、未定義値ではないすべての配列の要素のリファレンスカウントが1減らされます
+      </p>
+      <p>
+        オブジェクトが、クラス型で、オブジェクト型のフィールドを持つときは、オブジェクトの解放の前に、未定義値ではないすべてのオブジェクト型のフィールドが所有するオブジェクトのリファレンスカウントが1減らされます。フィールドに保存されているオブジェクトにウィークリファレンスが設定されていた場合は、リファレンスカウントが1減らされる前に、ウィークリファレンスが解除されます。
+      </p>
+      <p>
+        オブジェクトがウィークリファレンスのバックリファレンスを持つときは、バックリファレンスとして登録されているフィールドすべてに、未定義値を代入し、バックリファレンスをすべて削除します。
+      </p>
+      <p>
+        上記の処理は、再帰的に行われます。
+      </p>
+
+      <h3 id="language-operator-isweak">isweak演算子</h3>
+      <p>
+        isweak演算子は、フィールドが、<a href="#language-weak-ref">ウィークリファレンス</a>かを確認する演算子です。
+      </p>
+<pre>
+isweak オブジェクト式->{フィールド名};
+</pre>
+      <p>
+        オブジェクト式の型は、<a href="#language-type-class">クラス型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールド名は、存在するフィールド名でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールドに保存される値の型は、<a href="#language-type-object">オブジェクト型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        実行時にフィールドに保存されている値が、<a href="#language-undef">未定義値</a>だった場合は、偽を返します。これは、<a href="#language-condition">条件</a>です。
+      </p>
+      <p>
+        isweak演算子は、フィールドがウィークリファレンスの場合は、真を、そうでない場合は偽を返します。これは、<a href="#language-condition">条件</a>です。
+      </p>
+
       <h3 id="language-operator-precedence">演算子の優先順位</h3>
       <p>
         演算子の優先順位は、以下の通りです。下にいくほど、優先順位が高くなります。
@@ -4562,104 +5758,23 @@ a * b + c
 # b + c が先
 a * (b + c)
 </pre>
-      <h3 id="language-expression-new-object">オブジェクトの生成</h3>
-      <p>
-        オブジェクトを生成するには、newキーワードと以下の構文をを使用します。
-      </p>
-<pre>
-my $object = new パッケージ名;
-</pre>
-      <p>
-        指定されたパッケージは、<a href="#language-type-class">クラス型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
-      </p>
-      <p>
-        フィールドは、すべて<a href="language-type-initial-value">型の初期値</a>で初期化されます。
-      </p>
-      <p>
-        オブジェクトの生成は、<a href="#language-expression">式</a>を返します。
-      </p>
-      <p>
-        <b>オブジェクトの生成のサンプル</b>
-      </p>
-<pre>
-my $object = new Foo;
-</pre>
-      <h3 id="language-expression-new-array">配列の生成</h3>
-      <p>
-        配列を作成するには、newキーワードと以下の構文をを使用します。
-      </p>
-<pre>
-my $object = new 型[要素数式];
-</pre>
-      <p>
-        型には、<a href="#language-type-numeric">数値型</a>、<a href="#language-type-object">オブジェクト型</a>、<a href="#language-type-value">値型</a>が指定できます。それ以外の型を指定した場合は、コンパイル時エラーが発生します。
-      </p>
-      <p>
-        要素数式は、int型以下の<a href="#language-type-numeric">数値型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
-      </p>
-      <p>
-        要素数式に対して、<a href="#language-type-convertion-unary-numeric-widening">単項数値拡大型変換</a>が行われます。
-      </p>
-      <p>
-        要素数式で指定された長さの配列が生成されます。
-      </p>
-      <p>
-        配列の要素は、すべて<a href="language-type-initial-value">型の初期値</a>で初期化されます。
-      </p>
-      <p>
-        配列において、要素は、メモリ上に連続していることが保証されます。
-      </p>
-      <p>
-        配列の生成は、<a href="#language-expression">式</a>を返します。
-      </p>
-      <p>
-        <b>配列の生成のサンプル</b>
-      </p>
-<pre>
-my $nums = new int[3];
-my $objects = new Foo[3];
-my $objects = new object[3];
-my $values = new Complex_2d[3]
-</pre>
-      <p>
-        配列型自体も、オブジェクト型ですので、上記の構文を使用して、多次元配列を作成することができます。
-      </p>
-<pre>
-my $nums = new int[][3];
-my $nums = new int[][][3];
-</pre>
-      
-      <h3 id="language-expression-array-init">配列の初期化</h3>
-      <p>
-        SPVMには、配列の生成を簡単にするための配列の初期化の構文があります。式はなくてもかまいません。
-      </p>
-<pre>
-[]
-[式1, 式2, 式3]
-</pre>
-      <p>
-        配列の初期化は、式の要素数の長さを持った配列を返します。
-      </p>
-      <p>
-        配列の型は、式1の型を配列型にしたものです。要素が指定されない場合は、<a href="#language-type-any-object">汎用オブジェクト型</a>を配列型にしたものになります。
-      </p>
-      <p>
-        式2以降が、<a href="#language-type-compatible">型の互換性</a>を満たさない場合は、コンパイルエラーになります。
-      </p>
       
       <h3 id="language-statement">文</h3>
       <p>
-        文とは、ひとつの処理のことで「<a href="#language-scope-block">スコープブロック</a>」の中に記述することができます。
+        文は、ひとつの処理のことで「<a href="#language-scope-block">スコープブロック</a>」の中に複数記述することができます。<a href="#language-expression">式</a>のように値として評価されることはありません。
+      </p>
+      <p>
+        <b>文の一覧</b>
       </p>
       <p>
         文の一覧です。
       </p>
       <ul class="list">
         <li><a href="#language-statement-if">if文</a></li>
-        <li><a href="#language-statement-for">for文</a></li>
-        <li><a href="#language-statement-while">while文</a></li>
         <li><a href="#language-statement-switch">switch文</a></li>
         <li><a href="#language-statement-case">case文</a></li>
+        <li><a href="#language-statement-while">while文</a></li>
+        <li><a href="#language-statement-for">for文</a></li>
         <li><a href="#language-statement-default">default文</a></li>
         <li><a href="#language-statement-block-simple">単純ブロック</a></li>
         <li><a href="#language-statement-eval">eval文</a></li>
@@ -4669,11 +5784,390 @@ my $nums = new int[][][3];
         <li><a href="#language-statement-return">return文</a></li>
         <li><a href="#language-statement-croak">croak文</a></li>
         <li><a href="#language-statement-weaken">weaken文</a></li>
+        <li><a href="#language-statement-unweaken">unweaken文</a></li>
         <li><a href="#language-statement-expression">式文</a></li>
         <li><a href="#language-statement-empty">空文</a></li>
       </ul>
+      
+      <h4 id="language-statement-if">if文</h3>
+      <p>
+        if文は、条件分岐を行うための文です。
+      </p>
+<pre>
+if (項) {
+  
+}
+</pre>
+      <p>
+        項が真の場合に、ブロックが実行されます。SPVMにおける真偽については<a href="#language-condition-part">条件部</a>を見てください。
+      </p>
+      <p>
+        条件を複数書きたい場合には「elsif文」を続けることができます。 条件判定は上から実行され、項が真になった場合に対応するブロックが実行されます。
+      </p>
+<pre>
+if (項) {
+  
+}
+elsif(項) {
+  
+}
+</pre>
+      <p>
+        「else文」を使って、項が真ではなかった場合の処理を記述することができます。if文とelsif文の条件判定がすべて偽であった場合にelseのブロックの内部の文が実行されます。elsif文は、なくてもかまいません。
+      </p>
+<pre>
+if (項) {
+  
+}
+elsif(項) {
+  
+}
+else {
+  
+}
+</pre>
+      <p>
+        <b>if文のサンプル</b>
+      </p>
+      <p>
+        if文のサンプルです。
+      </p>
+<pre>
+my $flag = 1;
 
-      <h4 id="language-statement-return">return文</h3>
+if ($flag == 1) {
+  print("One\n");
+}
+elsif ($flag == 2) {
+  print("Tow\n");
+}
+else {
+  print("Other");
+}
+</pre>
+      <p>
+        if文は、内部的には、目には見えない単純なブロックで囲まれています。
+      </p>
+<pre>
+{
+  if (項) {
+    
+  }
+}
+</pre>
+      <p>
+        elsifは、内部的には、if文とelse文に展開されます。
+      </p>
+<pre>
+# 展開前
+if (項1) {
+
+}
+elsif (項2) {
+
+}
+else {
+
+}
+
+# 展開後
+if (項1) {
+}
+else {
+  if (項2) {
+  
+  }
+  else {
+  
+  }
+}
+</pre>
+      <p>
+        if文の条件部で、変数宣言を行うときは、目には見えない<a href="#language-block-statement-simple">単純なブロック</a>で囲まれていることと、elsifは、内部的には、if文とelse文に展開されるということを、意識してください。
+      </p>
+<pre>
+# 展開前
+my $num = 1;
+if (my $num = 2) {
+  
+}
+elsif (my $num = 3) {
+  
+}
+else {
+  
+}
+
+# 展開後
+my $num = 1;
+{
+  if (my $num = 2) {
+    
+  }
+  else {
+    {
+      if (my $num = 3) {
+        
+      }
+      else {
+        
+      }
+    }
+  }
+}
+</pre>
+
+      <h4 id="language-statement-switch">switch文</h4>
+      <p>
+        switch文は、int型の整数を条件にして、条件分岐を行うための文です。条件がint型の整数で、たくさんの分岐がある場合は、if文よりも高速です。
+      </p>
+<pre>
+switch (条件式) {
+  case 定数1:
+  
+  case 定数2:
+  
+  case 定数n:
+  
+  default:
+}
+</pre>
+      <p>
+        条件式は、<a href="#language-expression">式</a>を指定できます。式の型は、int型の値でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        case文で指定される定数は、int型の定数でなければなりません。enum型の値や、int型の定数サブルーチンは、int型の定数として、構文解析時に展開されるので、利用することができます。
+      </p>
+      <p>
+        case文に指定される定数は、重複してはいけません。重複している場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        条件式で指定された値が、case文で指定された値にマッチした場合は、そのcase文の位置にジャンプします。
+      </p>
+      <p>
+        マッチしなかった場合でdefault文が指定されている場合は、default文の位置にジャンプします。default文が指定されていなかった場合は、switchブロックは実行されません。
+      </p>
+      <p>
+        switchブロックの中で、last文を使用した場合は、switchブロックから抜けることができます。
+      </p>
+
+<pre>
+switch (条件式) {
+  case 定数1:
+    last;
+  case 定数2:
+    last;
+  case 定数n:
+    last;
+  default:
+}
+</pre>
+
+      <p>
+        <b>switch文のサンプル</b>
+      </p>
+      <p>
+        switch文のサンプルです。
+      </p>
+<pre>
+my $code = 2;
+switch ($code) {
+  case 1:
+    print("1\n");
+    last;
+  case 2:
+    print("2\n");
+    last;
+  case 3:
+    print("3\n");
+    last;
+  default:
+    print("Other\n");
+}
+</pre>
+      <p>
+        last文を書かない場合は、下にあるcase文やdefault文も実行されてしまうので注意してください。以下のように書いてしまうと「2」「3」「Other」と表示されます。
+      </p>
+<pre>
+my $code = 2;
+switch ($code) {
+  case 1:
+    print("1\n");
+  case 2:
+    print("2\n");
+  case 3:
+    print("3\n");
+  default:
+    print("Other\n");
+}
+</pre>
+
+      <h4 id="language-statement-switch">case文</h4>
+      <p>
+        case文は、switchブロックの中で使うことができる、条件を指定するための文です。case文についての詳細は、<a href="#language-statement-switch">switch文</a>の解説を見てください。
+      </p>
+
+      <h4 id="language-statement-switch">default文</h4>
+      <p>
+        default文は、switchブロックの中で使うことができる、デフォルトの条件を指定するための文です。default文についての詳細は、<a href="#language-statement-switch">switch文</a>の解説を見てください。
+      </p>
+
+      <h4 id="language-statement-switch">switch文</h4>
+      <p>
+        for文は、繰り返しを行うための文です。
+      </p>
+
+      <h4 id="language-statement-while">while文</h4>
+      <p>
+        while文は、繰り返しを行うための文です。
+      </p>
+<pre>
+while (条件項) {
+  
+}
+</pre>
+      <p>
+        条件項、<a href="#language-term">項</a>を記述できます。条件項が真であった場合に、ブロックが実行されます。そうでない場合は、ブロックを抜けます。
+      </p>
+      <p>
+        <b>while文のサンプル</b>
+      </p>
+      <p>
+        while文のサンプルです。
+      </p>
+<pre>
+my $i = 0;
+while ($i < 5) {
+  
+  print("$i\n");
+  
+  $i++;
+}
+</pre>
+      <p>
+        whileブロックの内部では、<a href="#language-statement-last">last文</a>を使って、whileブロックを抜けることができます。
+      </p>
+<pre>
+while (1) {
+  last;
+}
+</pre>
+
+      <p>
+        whileブロックの内部では、<a href="#language-statement-next">next文</a>を使って、次に実行される条件項の直前に移動することができます。
+      </p>
+<pre>
+my $i = 0;
+while ($i < 5) {
+  
+  if ($i == 3) {
+    $i++;
+    next;
+  }
+  
+  print("$i\n");
+  $i++;
+}
+</pre>
+      
+      <p>
+        while文は、内部的には、目には見えない<a href="#language-block-statement-simple">単純なブロック</a>で囲まれています。
+      </p>
+<pre>
+{
+  while (条件項) {
+    
+  }
+}
+</pre>
+      <p>
+        while文の条件部で、変数宣言を行うときは、目には見えない<a href="#language-block-statement-simple">単純なブロック</a>で囲まれていることを意識してください。
+      </p>
+<pre>
+# 展開前
+my $num = 5;
+while (my $num = 3) {
+  
+  $i++;
+}
+
+# 展開後
+my $num = 5;
+{
+  while (my $num = 3) {
+    
+    $i++;
+  }
+}
+</pre>
+
+      <h4 id="language-statement-for">for文</h4>
+      <p>
+        for文は、繰り返しを行うための文です。
+      </p>
+<pre>
+for (初期化式; 条件項; インクリメント式) {
+  
+}
+</pre>
+      <p>
+        初期化式には、<a href="#language-expression">式</a>を記述できます。一般的には、ループ変数の初期化などの式を記述します。初期化式は省略することが可能です。
+      </p>
+      <p>
+        条件項、<a href="#language-term">項</a>を記述できます。条件項が真であった場合に、ブロックが実行されます。そうでない場合は、ブロックを抜けます。
+      </p>
+      <p>
+        インクリメント式には、<a href="#language-expression">式</a>を記述できます。一般的には、ループ変数のインクリメントの式を記述します。インクリメント式は省略することが可能です。
+      </p>
+      <p>
+        for文は以下のwhile文と同じ意味を持ちます。インクリメント式は、ブロックの最後に実行されます。初期化式は、<a href="#language-block-statement-simple">単純なブロック</a>に囲まれています。
+      </p>
+<pre>
+{
+  初期化式;
+  while (条件項) {
+    
+    
+    
+    インクリメント式;
+  }
+}
+</pre>
+      <p>
+        <b>for文のサンプル</b>
+      </p>
+      <p>
+        for文のサンプルです。
+      </p>
+<pre>
+for (my $i = 0; $i < 5; $i++) {
+  
+  print("$i\n");
+}
+</pre>
+      <p>
+        forブロックの内部では、<a href="#language-statement-last">last文</a>を使って、forブロックを抜けることができます。
+      </p>
+
+<pre>
+for (初期化式; 条件項; インクリメント式) {
+  
+}
+</pre>
+      
+      <p>
+        forブロックの内部では、<a href="#language-statement-next">next文</a>を使って、次に実行されるインクリメント式の直前に移動することができます。
+      </p>
+<pre>
+for (my $i = 0; $i < 5; $i++) {
+  
+  if ($i == 3) {
+    next;
+  }
+}
+</pre>
+
+      <h4 id="language-statement-return">return文</h4>
       <p>
         return文を使うと、サブルーチンから脱出します。モータル変数に代入されているオブジェクトは、自動的に解放されます。
       </p>
@@ -4693,78 +6187,136 @@ return 式;
         <a href="#language-sub-definition">サブルーチンの定義</a>において戻り値の型が「void型」以外の場合は、式の型と一致していなければなりません。そうでない場合は、コンパイル時エラーが発生します。
       </p>
 
-      <h4 id="language-statement-next">next文</h3>
+      <h4 id="language-statement-croak">croak文</h4>
       <p>
-        「next文」によって「<a href="#language-block-statement-for">forブロック</a>」または「<a href="#language-block-statement-while">whileブロック</a>」を脱出して、次のループの先頭に移動することができます。
+        croak文は、例外を発生させるための文です。
+      </p>
+<pre>
+croak 式;
+</pre>
+      <p>
+        式は、文字列互換型でなければなりません。
+      </p>
+      <p>
+        croak文の詳しい解説については、<a href="#language-exception">例外処理</a>を見てください。
+      </p>
+      
+      <h4 id="language-statement-weaken">weaken文</h4>
+      <p>
+        weaken文は、フィールドに対して、<a href="#language-weak-ref">ウィークリファレンス</a>を設定する文です。
+      </p>
+<pre>
+weaken オブジェクト式->{フィールド名};
+</pre>
+      <p>
+        オブジェクト式の型は、<a href="#language-type-class">クラス型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールド名は、存在するフィールド名でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールドに保存される値の型は、<a href="#language-type-object">オブジェクト型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        実行時にフィールドに保存されている値が、<a href="#language-undef">未定義値</a>だった場合は、weaken文は、何もしません。
+      </p>
+      <p>
+        実行時にフィールドに保存されている値が、<a href="#language-undef">未定義値</a>でない場合は、次のことが行われます。
+      </p>
+      <p>
+        1. フィールドに保存されているオブジェクトのリファレンスカウントを1減らします。
+      </p>
+      <p>
+        2. フィールドに、ウィークリファレンスフラグを設定します。
+      </p>
+      <p>
+        3. フィールドに保存されているオブジェクトのバックリファレンスに、フィールドを追加します。
+      </p>
+      <p>
+        ウィークリファレンスフラグは、フィールドに保存されているオブジェクトに設定されるのではなく、フィールド自体に設定されることに注意してください。
+      </p>
+      <p>
+        フィールドに保存されているオブジェクトのリファレンスカウントが、0になってしまった場合は、ウィークリファレンスは作成されず、フィールドに保存されているオブジェクトは解放されます。
+      </p>
+      <p>
+        バックリファレンスとは、フィールドに保存されているオブジェクトが持つデータで、ウィークリファレンスフラグが設定されたフィールドを知るために、追加されます。これは、複数存在することがあります。
+      </p>
+<pre>
+# バックリファレンスが、複数あるサンプル
+my $foo = new Foo;
+my $bar = new Bar;
+my $baz = new Baz;
+
+$foo->{bar} = $bar;
+$foo->{baz} = $baz;
+
+$bar->{foo} = $foo;
+$baz->{foo} = $foo;
+
+weaken $bar->{foo};
+weaken $baz->{foo};
+</pre>
+      <p>
+        上記の例では「$bar->{foo}」と「$baz->{foo}」に、ウィークリファレンスフラグが立ちます。$fooで表現されるオブジェクトは、バックリファレンス「$bar->{foo}」と「$baz->{foo}」を持ちます。
+      </p>
+      <p>
+        バックリファレンスの情報が必要なのは、<a href="#language-expression-release-object">オブジェクトの解放</a>が行われるときに、バックリファレンスが指すフィールドに未定義値を代入する必要があるからです。
+      </p>
+
+      <h4 id="language-statement-unweaken">unweaken文</h4>
+      <p>
+        unweaken文は、フィールドに対して、<a href="#language-weak-ref">ウィークリファレンス</a>を解除する文です。
+      </p>
+<pre>
+unweaken オブジェクト式->{フィールド名};
+</pre>
+      <p>
+        オブジェクト式の型は、<a href="#language-type-class">クラス型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールド名は、存在するフィールド名でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        フィールドに保存される値の型は、<a href="#language-type-object">オブジェクト型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        実行時にフィールドに保存されている値が、<a href="#language-undef">未定義値</a>だった場合は、unweaken文は、何もしません。
+      </p>
+      <p>
+        実行時にフィールドに保存されている値が、<a href="#language-undef">未定義値</a>でない場合は、次のことが行われます。
+      </p>
+      <p>
+        1. フィールドに保存されているオブジェクトのリファレンスカウントを1増やします。
+      </p>
+      <p>
+        2. フィールドのウィークリファレンスフラグを解除します。
+      </p>
+      <p>
+        3. フィールドに保存されているオブジェクトのバックリファレンスから、フィールドを削除します。
+      </p>
+
+      <h4 id="language-statement-next">next文</h4>
+      <p>
+        「next文」は、次のループの先頭に移動するための文です。<a href="#language-block-statement-while">whileブロック</a>、<a href="#language-block-statement-for">forブロック</a>の中で使うことができます。
       </p>
 <pre>
 next;
 </pre>
       <p>
-        <b>next文のサンプル</b>
+        実際の動作については<a href="#language-statement-while">while文</a>、<a href="#language-statement-for">for文</a>の解説を見てください。
       </p>
-<pre>
-# for
-for (my $i = 0; $i < 3; $i++) {
-  if ($i == 1) {
-    next;
-  }
-}
 
-# while
-my $i = 0;
-while ($i < 3;) {
-  if ($i == 1) {
-    next;
-  }
-  $i++;
-}
-
-</pre>
-
-      <h4 id="language-statement-last">last文</h3>
+      <h4 id="language-statement-last">last文</h4>
       <p>
-        「last文」によって「<a href="#language-block-statement-for">forブロック</a>」または「<a href="#language-block-statement-while">whileブロック</a>」または「<a href="#language-block-statement-switch">switchブロック</a>」を脱出することができます。
+        「last文」は、ループあるいはswitchブロックを脱出するための文です。<a href="#language-block-statement-while">whileブロック</a>、<a href="#language-block-statement-for">forブロック</a>、<a href="#language-block-statement-switch">switchブロック</a>の中で使うことができます。
+      </p>
+      <p>
+        実際の動作については<a href="#language-statement-while">while文</a>、<a href="#language-statement-for">for文</a>、<a href="#language-statement-switch">switch文</a>の解説を見てください。
       </p>
 <pre>
 last;
 </pre>
-      <p>
-        <b>last文のサンプル</b>
-      </p>
-<pre>
-# for
-for (my $i = 0; $i < 3; $i++) {
-  if ($i == 1) {
-    last;
-  }
-}
 
-# while
-my $i = 0;
-while ($i < 3;) {
-  if ($i == 1) {
-    next;
-  }
-  $i++;
-}
-
-# switch
-my $num = 3;
-switch ($num) {
-  case 1 :
-    # 処理1
-    last;
-  case 2 :
-    # 処理2
-    last;
-  case 3 :
-    # 処理3
-    last;
-  default:
-    # デフォルト
-}
-</pre>
       <h4 id="language-statement-expression">式文</h4>
       <p>
         式文は「<a href="#language-expression">式</a>」と「;」で構成される文のことです。
@@ -4796,9 +6348,16 @@ my $num = 1 + 2;
       <ul class="list">
         <li><a href="#language-type-summary">型の概要</a></li>
         <li><a href="#language-type-initial-value">型の初期値</a></li>
+        <li><a href="#language-type-void">void型</a></li>
         <li><a href="#language-type-numeric">数値型</a></li>
         <li><a href="#language-type-integral">整数型</a></li>
+        <li><a href="#language-type-byte">byte型</a></li>
+        <li><a href="#language-type-short">short型</a></li>
+        <li><a href="#language-type-int">int型</a></li>
+        <li><a href="#language-type-long">long型</a></li>
         <li><a href="#language-type-floating-point">浮動小数点型</a></li>
+        <li><a href="#language-type-float">float型</a></li>
+        <li><a href="#language-type-double">double型</a></li>
         <li><a href="#language-type-package">パッケージ型</a></li>
         <li><a href="#language-type-object">オブジェクト型</a></li>
         <li><a href="#language-type-numeric-object">数値オブジェクト型</a></li>
@@ -4809,7 +6368,7 @@ my $num = 1 + 2;
         <li><a href="#language-type-self">self型</a></li>
         <li><a href="#language-type-array">配列型</a></li>
         <li><a href="#language-type-array-numeric">数値の配列型</a></li>
-        <li><a href="#language-type-array-byte">byteの配列型</a></li>
+        <li><a href="#language-type-array-byte">byte[]型</a></li>
         <li><a href="#language-type-string">文字列型</a></li>
         <li><a href="#language-type-string-compatible">文字列互換型</a></li>
         <li><a href="#language-type-value">値型</a></li>
@@ -4914,6 +6473,7 @@ my $num = 1 + 2;
       <p>
         数値型は「<a href="#language-type-integral">整数型</a>」と「<a href="#language-type-floating-point">浮動小数点型</a>」からなります。
       </p>
+      
       <h4 id="language-type-integral">整数型</h3>
       <p>
         SPVMの整数型は以下の4つです。
@@ -4981,6 +6541,22 @@ my $num = 1 + 2;
       <p>
         整数の計算規則については、<a href="#language-operator-arithmetic">算術演算子</a>を参考にしてください。
       </p>
+      <h4 id="language-type-byte">byte型</h3>
+      <p>
+        byte型は、符号付8bit整数を表現する<a href="#language-type-integral">整数型</a>です。C99のint8_t型と同じ型です。
+      </p>
+      <h4 id="language-type-short">short型</h3>
+      <p>
+        byte型は、符号付16bit整数を表現する<a href="#language-type-integral">整数型</a>です。C99のint16_t型と同じ型です。
+      </p>
+      <h4 id="language-type-int">int型</h3>
+      <p>
+        int型は、符号付32bit整数を表現する<a href="#language-type-integral">整数型</a>です。C99のint32_t型と同じ型です。
+      </p>
+      <h4 id="language-type-int">long型</h3>
+      <p>
+        long型は、符号付64bit整数を表現する<a href="#language-type-integral">整数型</a>です。C99のint64_t型と同じ型です。
+      </p>
       
       <h4 id="language-type-floating-point">浮動小数点型</h3>
       <p>
@@ -5023,6 +6599,16 @@ my $num = 1 + 2;
       </table>
       <p>
         浮動小数点の計算規則については、<a href="#language-operator-arithmetic">算術演算子</a>を参考にしてください。
+      </p>
+      
+      <h4 id="language-type-float">float型</h3>
+      <p>
+        float型は、単精度浮動小数点(32bit)を表現する<a href="#language-type-floating-point">浮動小数点型</a>です。C99のfloat型と同じ型です。
+      </p>
+      
+      <h4 id="language-type-float">double型</h3>
+      <p>
+        double型は、倍精度浮動小数点(64bit)を表現する<a href="#language-type-floating-point">浮動小数点型</a>です。C99のdouble型と同じ型です。
       </p>
       
       <h4 id="language-type-package">パッケージ型</h4>
@@ -5367,15 +6953,15 @@ my $nums = new int[][3];
       <p>
         数値の配列型のすべての要素は、配列の生成が行われたときに<a href="#language-type-initial-value">型の初期値</a>によって初期化されます。
       </p>
-      <h4 id="language-type-array-byte">byteの配列型</h4>
+      <h4 id="language-type-array-byte">byte[]型</h4>
       <p>
-        SPVMにおいては、byteの配列型は<a href="#language-type-string-compatible">文字列互換型</a>であるという点において特別な型です。
+        SPVMにおいては、byte[]型は<a href="#language-type-string-compatible">文字列互換型</a>であるという点において特別な型です。
       </p>
 <pre>
 byte[]
 </pre>
       <p>
-        <a href="#language-type-string">文字列型</a>は、コンパイル時には文字列型として扱われますが、実行時にはbyteの配列型になります。
+        <a href="#language-type-string">文字列型</a>は、コンパイル時には文字列型として扱われますが、実行時にはbyte[]型になります。
       </p>
       <h4 id="language-type-array-object">オブジェクトの配列型</h4>
       <p>
@@ -5483,14 +7069,15 @@ $bytes->[1] = 'd';
 
       <h4 id="language-type-string-compatible">文字列互換型</h4>
       <p>
-        文字列互換型とは、<a href="#language-type-string">文字列型</a>と<a href="#language-type-array-byte">byteの配列型</a>のことを言います。
+        文字列互換型とは、<a href="#language-type-string">文字列型</a>と<a href="#language-type-array-byte">byte[]型</a>のことを言います。
       </p>
+      
       <h4 id="language-type-value">値型</h4>
       <p>
-        値型とは、同一の複数の数値型を定義できる型です。連続した数値型のデータ構造を、メモリ節約的で高速に処理するために設計されました。
+        値型とは、連続した数値を表現できる型です。
       </p>
       <p>
-        パッケージの定義において「value_t」デスクリプタを指定することで、値型となります。
+        パッケージの定義において「value_t」デスクリプタを指定することで、値型を定義できます。
       </p>
 <pre>
 package Point_3i : value_t {
@@ -5500,138 +7087,9 @@ package Point_3i : value_t {
 }
 </pre>
       <p>
-        このサンプルでは、3つの連続したint型を「Point_3i」として定義しています。
+        値型の詳しい解説については、<a href="#language-value">値</a>を見てください。
       </p>
-      <p>
-        フィールドに指定できるのは、整数型と浮動小数点型だけです。
-      </p>
-      <p>
-        値型のフィールドの個数の最大値は16個に制限されています。
-      </p>
-      <p>
-        すべてのフィールドのデータ型は、同一の型でなければなりません。
-      </p>
-      <p>
-        利用する場合は、変数の宣言を行ってください。すべての領域が、0で初期化されます。
-      </p>
-<pre>
-my $point : Point_3i;
-</pre>
-      <p>
-        値型のデータは、サブルーチンのスタック領域に確保されます。
-      </p>
-      <p>
-        値型の各フィールドは、連続していなければなりません。
-      </p>
-      <p>
-        値型の名前は、パッケージ名の規則を満たしている必要があります。
-      </p>
-      <p>
-        それに加えて、最後が「_」「フィールドの個数」「サフィックス」で終わる必要があります。
-      </p>
-      <p>
-        フィールドの個数は、実際に定義されているフィールドの個数と一致している必要があります。
-      </p>
-      <p>
-        サフィックスは、実際に定義されている数値型と対応している必要があります。
-      </p>
-      <p>
-        不正な値型の定義の場合は、コンパイル時エラーが発生します。
-      </p>
-      <p>
-        <b>値型のサフィクスの一覧</b>
-      </p>
-      <table>
-        <tr>
-          <th>
-            <b>数値型</b>
-          </th>
-          <th>
-            サフィックス
-          </th>
-        </tr>
-        <tr>
-          <td>
-            <b>byte</b>
-          </td>
-          <td>
-            b
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <b>short</b>
-          </td>
-          <td>
-            s
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <b>int</b>
-          </td>
-          <td>
-            i
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <b>long</b>
-          </td>
-          <td>
-            l
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <b>float</b>
-          </td>
-          <td>
-            f
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <b>double</b>
-          </td>
-          <td>
-            d
-          </td>
-        </tr>
-      </table>
-      <p>
-        値型のサイズは、値型のフィールドになっている数値型のサイズに、フィールドの個数を書けたものになります。
-      </p>
-      <p>
-        値型のフィールドの設定と取得は、アロー演算子で行うことができます。
-      </p>
-<pre>
-# 値型のフィールドの取得
-my $x = $point->{x};
 
-# 値型のフィールドの設定
-$point->{x} = 1;
-</pre>
-      <p>
-        サブルーチンの引数として値型を渡す場合は、内部的にはフィールドで定義された複数のデータ型に展開されて渡されます。
-      </p>
-<pre>
-# SPVM上
-foo($point);
-
-# 内部
-foo($x, $y, $z);
-</pre>
-      <p>
-        このことはSPVMから値型を利用している場合は、意識する必要がありませんが、エクステンションにおいて、サーブルーチンの引数を受け取るときに、意識する必要があります。
-      </p>
-      <p>
-        値型は配列にすることができます。この場合、配列の領域は、値型として定義されたデータがヒープ領域上で、連続していることが保証されます。
-      </p>
-     
-<pre>
-my $points : Point_3i[] = new Point_3i[];
-</pre>
       <h4 id="language-type-ref">リファレンス型</h4>
       <p>
         リファレンス型とは、変数への参照を表現する型のことです。数値型か値型の名前の後ろに「&」を付けることで定義できます。
@@ -5707,13 +7165,16 @@ my $foo = new Foo;
 </pre>
       <h3 id="language-type-compatible">型の互換性</h3>
       <p>
-        型に互換性があるというのは、型変換なしで、値の移動ができる型のことです。
+        型に互換性があるというのは、<a href="#language-expression-typecast">型キャスト</a>を行わないで、値が移動ができる型のことです。
       </p>
       <p>
         型に互換性があるのは次の場合です。
       </p>
       <p>
-        <b>移動元と移動先の型が同名の場合</b>
+        <b>移動元と移動先の型が同一の場合</b>
+      </p>
+      <p>
+        移動元と移動先の型が同一の場合は、型の互換性があります。
       </p>
 <pre>
 my $num1 : int;
@@ -5722,6 +7183,9 @@ $num1 = $num2;
 </pre>
       <p>
         <b>移動元の型がbyte[]型で、移動先の型が文字列型の場合</b>
+      </p>
+      <p>
+        移動元の型がbyte[]型で、移動先の型が文字列型の場合は、型の互換性があります。
       </p>
 <pre>
 my $bytes = new byte[3];
@@ -5758,6 +7222,7 @@ my $objets : object[] = new int[3];
       <h3 id="language-type-convertion">型変換</h3>
       <ul class="list">
         <li><a href="#language-type-convertion-typecast">型キャスト</a></li>
+        <li><a href="#language-type-convertion-typecast">数値型の型変換</a></li>
         <li><a href="#language-type-convertion-implicite">暗黙的な型変換</a></li>
         <li><a href="#language-type-convertion-numeric-type-order">数値型の順序</a></li>
         <li><a href="#language-type-convertion-unary-numeric-widening">単項数値拡大型変換</a></li>
@@ -5768,6 +7233,7 @@ my $objets : object[] = new int[3];
         <li><a href="#language-type-convertion-boxing">ボクシング変換</a></li>
         <li><a href="#language-type-convertion-unboxing">アンボクシング変換</a></li>
       </ul>
+      
       <h4 id="language-type-convertion-typecast">型キャスト</h4>
       <p>
         型キャストとは、明示的に記述して行う型変換のことを言います。
@@ -5792,10 +7258,10 @@ my $num = (long)3;
 my $num : int = (int)4;
 </pre>
       <p>
-        明示的な型変換の一覧です。
+        <b>型キャストにおける型変換の一覧</b>
       </p>
       <p>
-        移動元の型と指定した型における変換の内容の一覧です。移動元の型と指定した型において<a href="#language-type-compatible">型の互換性</a>がなく、この一覧にない場合は、コンパイルエラーになります。
+        型キャストにおける型変換の一覧です。この表にない型キャストが行われた場合は、コンパイル時エラーが発生します。
       </p>
       <table>
         <tr>
@@ -5817,40 +7283,40 @@ my $num : int = (int)4;
             <b>string</b>
           </td>
           <td>
-            オブジェクトがコピーされます。
+            アドレス値がコピーされます。
           </td>
         </tr>
         <tr>
           <td>
-            <b>大きな数値型</b>
+            <b>string</b>
           </td>
           <td>
-            <b>小さな数値型</b>
+            <b>byte[]</b>
           </td>
           <td>
-            <a href="#language-type-convertion-numeric-widening">数値拡大型変換</a>が行われます。
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <b>小さな数値型</b>
-          </td>
-          <td>
-            <b>大きな数値型</b>
-          </td>
-          <td>
-            <a href="#language-type-convertion-numeric-narrowing">数値縮小型変換</a>が行われます。
+            アドレス値がコピーされます。
           </td>
         </tr>
         <tr>
           <td>
-            <b>対応する数値オブジェクト型</b>
+            <b>数値型</b>
           </td>
           <td>
             <b>数値型</b>
           </td>
           <td>
-            <a href="#language-type-convertion-boxing">ボクシング変換</a>が行われます。
+            <a href="#language-type-convertion-numeric-widening">数値型の型変換</a>が行われます。
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>数値オブジェクト型</b>
+          </td>
+          <td>
+            <b>数値型</b>
+          </td>
+          <td>
+            <a href="#language-type-convertion-boxing">ボクシング変換</a>が行われます。数値型と数値オブジェクト型が表現する数値型は、同じでなければなりません。たとえば、数値型がintの場合は、数値オブジェクト型はSPVM::Int型でなければなりません。
           </td>
         </tr>
         <tr>
@@ -5869,10 +7335,10 @@ my $num : int = (int)4;
             <b>数値型</b>
           </td>
           <td>
-            <b>対応する数値オブジェクト型</b>
+            <b>数値オブジェクト型</b>
           </td>
           <td>
-            <a href="#language-type-convertion-unboxing">アンボクシング変換</a>が行われます。
+            <a href="#language-type-convertion-unboxing">アンボクシング変換</a>が行われます。数値型と数値オブジェクト型が表現する数値型は、同じでなければなりません。たとえば、数値型がintの場合は、数値オブジェクト型はSPVM::Int型でなければなりません。
           </td>
         </tr>
         <tr>
@@ -5898,6 +7364,29 @@ my $num : int = (int)4;
           </td>
         </tr>
       </table>
+
+      <h4 id="language-type-convertion-numeric">数値型の型変換</h4>
+      <p>
+        数値型の型変換とは、<a href="#language-type-numeric">数値型</a>から<a href="#language-type-numeric">数値型</a>への変換のことです。
+      </p>
+      <p>
+        数値型の型変換は、対応するC言語における数値型による型変換と全く同じ処理を行います。例えば、SPVMにおけるintからlongへの型変換は、C言語のint32_t型からint64_t型への型変換と同じ処理を行います。
+      </p>
+<pre>
+# SPVMの変換
+my $src : int = 5;
+my $dist = (long)$src;
+
+# C言語における対応
+int32_t src = 5;
+int64_t dist = (int64_t)src;
+</pre>
+      <p>
+        型の対応については、<a href="#language-c99-type">C99との型の対応</a>を見てください。
+      </p>
+      <p>
+        大きな型から小さな型に変換した場合や、浮動小数点から整数型に変換した場合は、正しい情報が保持されない場合があります。SPVMでは、C99に対応する型変換をそのまま行っているので、正しい情報が保持されない場合に、どの値に変換されるかは、C99の仕様と同じです。
+      </p>
       
       <h4 id="language-type-convertion-implicite">暗黙的な型変換</h4>
       <p>
@@ -6193,27 +7682,29 @@ else {
       <p>
        少なくとも<b>デバイスドライバやC/C++ライブラリと連携でき、WebにHTTPSで接続できる、ネイティブアプリケーション</b>が作成できることの確認が必要です。
       </p>
+      
       <h3>
         SPVMを開発するにあたって参考にした言語を教えてください。
       </h3>
       <p>
-        言語仕様と文法についてはPerlを主に参考にしています。必要な部分でPerl 6の文法・キーワードも採用しています。「has」「native」「ro」「rw」「wo」など。
+        言語仕様と文法についてはPerlを主に参考にしています。
       </p>
       <p>
-        言語仕様とバーチャルマシンについては、Java言語とJavaVMの言語仕様を参考にしました。
-      </p>
-      <p>
-        数値型と数値計算においては、Javaの計算規則とほぼ同じです。数値型の種類、演算子の種類、拡張型変換、縮小型変換などです。
-      </p>
-      <p>
-        言語仕様においては、ボクシング、アンボクシング、可変長引数については、Javaを参考に作りました。
+        Perl 6の文法・キーワードを部分的に採用しています。「has」「native」「ro」「rw」「wo」など。
       </p>
       <p>
         SPVMのバーチャルマシンの初期実装は、JavaVMを参考にして、可変長バイト命令を解釈するスタック型VMとして作成されました。現在のSPVMは、64bitの固定長命令を解釈するレジスター型VMとなっています。
       </p>
       <p>
-        文字列がUTF-8であることと、インターフェースの実装については、go言語の言語仕様を参考にしています。
+        数値型と数値計算においては、Javaの計算規則を参考にしました。
       </p>
+      <p>
+        ボクシング、アンボクシング、可変長引数については、Javaを参考にしました。
+      </p>
+      <p>
+        文字列がUTF-8であることと、インターフェースについては、go言語を参考にしました。
+      </p>
+      
       <h3>なぜレジスタ型VMを採用していますか</h3>
       <p>
         レジスタ型VMを採用している最も大きな理由は、SPVMのオペレーションコードを、C言語のソースコードに変換するときに、1対1で対応させることができるためです。gccの最適化が適用できます。

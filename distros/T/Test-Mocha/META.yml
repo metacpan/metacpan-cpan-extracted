@@ -3,6 +3,9 @@ abstract: 'Test double framework with method stubs and behaviour verification'
 author:
   - 'Steven Lee <stevenwh.lee@gmail.com>'
 build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::Builder::Tester: '0'
   Test::Fatal: '0'
   Test::More: '1.001002'
@@ -26,12 +29,10 @@ optional_features:
     description: 'Modules required for author tests'
   MooseTypes:
     description: 'Support using Moose types as argument matchers'
-  UnivesalRef:
-    description: 'UNIVERAL::ref fails tests during installation on Perl 5.025+'
 provides:
   Test::Mocha:
     file: lib/Test/Mocha.pm
-    version: '0.66'
+    version: '0.67'
 requires:
   Carp: '1.22'
   Devel::PartialDump: '0.17'
@@ -41,6 +42,7 @@ requires:
   Type::Library: '0'
   Type::Utils: '0'
   Types::Standard: '0.008'
+  UNIVERSAL::ref: '0.14'
   experimental: '0'
   if: '0'
   overload: '0'
@@ -52,7 +54,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Mocha
   homepage: https://github.com/stevenl/Test-Mocha
   repository: https://github.com/stevenl/Test-Mocha.git
-version: '0.66'
+version: '0.67'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -239,6 +241,14 @@ x_Dist_Zilla:
       name: AutoPrereqs
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '6.012'
+    -
       class: Dist::Zilla::Plugin::OptionalFeature
       config:
         Dist::Zilla::Plugin::OptionalFeature:
@@ -276,22 +286,6 @@ x_Dist_Zilla:
           require_develop: 1
           type: recommends
       name: MooseTypes
-      version: '0.023'
-    -
-      class: Dist::Zilla::Plugin::OptionalFeature
-      config:
-        Dist::Zilla::Plugin::OptionalFeature:
-          always_recommend: 0
-          always_suggest: 1
-          description: 'UNIVERAL::ref fails tests during installation on Perl 5.025+'
-          name: UnivesalRef
-          phase: runtime
-          prereqs:
-            UNIVERSAL::ref: '0.14'
-          prompt: 0
-          require_develop: 1
-          type: suggests
-      name: UnivesalRef
       version: '0.023'
     -
       class: Dist::Zilla::Plugin::NextRelease
@@ -345,6 +339,24 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
       version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '1'
+          fail_on_warning: author
+          fake_home: 0
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: test
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+          switch: []
+      name: Test::Compile
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -419,7 +431,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.66
+          tag: v0.67
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

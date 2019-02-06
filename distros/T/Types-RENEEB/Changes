@@ -1,6 +1,10 @@
 Revision history for Types::RENEEB
 ==================================
 
+0.06  2019-02-06 14:37:00
+
+   * add type OPMFile to Types::OTRS
+
 0.05  2019-02-02 08:31:00
 
    * fix required version of Moo

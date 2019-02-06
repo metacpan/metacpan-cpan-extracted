@@ -38,7 +38,7 @@ my $object = OTRS::OPM::Parser->new(
 
 $object->parse;
 
-for my $file ( $object->files ) {
+for my $file ( @{ $object->files } ) {
     print "create $file->{filename}...\n";
     my $full_path = File::Spec->catfile( $out_dir, $file->{filename} );
     my $dir       = dirname( $full_path );
@@ -74,7 +74,7 @@ de_opm.pl - create the files listed in the .opm (unpack it)
 
 =head1 VERSION
 
-version 0.01
+version 1.01
 
 =head1 AUTHOR
 

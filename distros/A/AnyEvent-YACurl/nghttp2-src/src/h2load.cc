@@ -91,6 +91,7 @@ Config::Config()
       header_table_size(4_k),
       encoder_header_table_size(4_k),
       data_fd(-1),
+      log_fd(-1),
       port(0),
       default_port(0),
       verbose(false),
@@ -748,6 +749,7 @@ void Client::on_header(int32_t stream_id, const uint8_t *name, size_t namelen,
       }
     }
 
+    stream.req_stat.status = status;
     if (status >= 200 && status < 300) {
       ++worker->stats.status[2];
       stream.status_success = 1;
@@ -775,6 +777,7 @@ void Client::on_status_code(int32_t stream_id, uint16_t status) {
     return;
   }
 
+  stream.req_stat.status = status;
   if (status >= 200 && status < 300) {
     ++worker->stats.status[2];
     stream.status_success = 1;
@@ -821,6 +824,33 @@ void Client::on_stream_close(int32_t stream_id, bool success, bool final) {
     }
     ++worker->stats.req_done;
     ++req_done;
+
+    if (worker->config->log_fd != -1) {
+      auto start = std::chrono::duration_cast<std::chrono::microseconds>(
+          req_stat->request_wall_time.time_since_epoch());
+      auto delta = std::chrono::duration_cast<std::chrono::microseconds>(
+          req_stat->stream_close_time - req_stat->request_time);
+
+      std::array<uint8_t, 256> buf;
+      auto p = std::begin(buf);
+      p = util::utos(p, start.count());
+      *p++ = '\t';
+      if (success) {
+        p = util::utos(p, req_stat->status);
+      } else {
+        *p++ = '-';
+        *p++ = '1';
+      }
+      *p++ = '\t';
+      p = util::utos(p, delta.count());
+      *p++ = '\n';
+
+      auto nwrite = static_cast<size_t>(std::distance(std::begin(buf), p));
+      assert(nwrite <= buf.size());
+      while (write(worker->config->log_fd, buf.data(), nwrite) == -1 &&
+             errno == EINTR)
+        ;
+    }
   }
 
   worker->report_progress();
@@ -1177,6 +1207,7 @@ int Client::write_tls() {
 
 void Client::record_request_time(RequestStat *req_stat) {
   req_stat->request_time = std::chrono::steady_clock::now();
+  req_stat->request_wall_time = std::chrono::system_clock::now();
 }
 
 void Client::record_connect_start_time() {
@@ -1940,6 +1971,14 @@ Options:
               this option value and the value which server specified.
               Default: )"
       << util::utos_unit(config.encoder_header_table_size) << R"(
+  --log-file=<PATH>
+              Write per-request information to a file as tab-separated
+              columns: start  time as  microseconds since  epoch; HTTP
+              status code;  microseconds until end of  response.  More
+              columns may be added later.  Rows are ordered by end-of-
+              response  time when  using  one worker  thread, but  may
+              appear slightly  out of order with  multiple threads due
+              to buffering.  Status code is -1 for failed streams.
   -v, --verbose
               Output debug information.
   --version   Display version information and exit.
@@ -1966,6 +2005,7 @@ int main(int argc, char **argv) {
 #endif // NOTHREADS
 
   std::string datafile;
+  std::string logfile;
   bool nreqs_set_manually = false;
   while (1) {
     static int flag = 0;
@@ -1996,6 +2036,7 @@ int main(int argc, char **argv) {
         {"header-table-size", required_argument, &flag, 7},
         {"encoder-header-table-size", required_argument, &flag, 8},
         {"warm-up-time", required_argument, &flag, 9},
+        {"log-file", required_argument, &flag, 10},
         {nullptr, 0, nullptr, 0}};
     int option_index = 0;
     auto c = getopt_long(argc, argv,
@@ -2219,6 +2260,10 @@ int main(int argc, char **argv) {
           exit(EXIT_FAILURE);
         }
         break;
+      case 10:
+        // --log-file
+        logfile = optarg;
+        break;
       }
       break;
     default:
@@ -2379,6 +2424,15 @@ int main(int argc, char **argv) {
       exit(EXIT_FAILURE);
     }
     config.data_length = data_stat.st_size;
+  }
+
+  if (!logfile.empty()) {
+    config.log_fd = open(logfile.c_str(), O_WRONLY | O_CREAT | O_APPEND,
+                         S_IRUSR | S_IWUSR | S_IRGRP);
+    if (config.log_fd == -1) {
+      std::cerr << "--log-file: Could not open file " << logfile << std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
 
   struct sigaction act {};
@@ -2730,6 +2784,10 @@ time for request: )"
             << util::dtos(ts.rps.within_sd) << "%" << std::endl;
 
   SSL_CTX_free(ssl_ctx);
+
+  if (config.log_fd != -1) {
+    close(config.log_fd);
+  }
 
   return 0;
 }

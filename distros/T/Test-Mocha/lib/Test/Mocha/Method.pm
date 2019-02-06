@@ -1,6 +1,6 @@
 package Test::Mocha::Method;
 # ABSTRACT: Objects to represent methods and their arguuments
-$Test::Mocha::Method::VERSION = '0.66';
+$Test::Mocha::Method::VERSION = '0.67';
 use strict;
 use warnings;
 

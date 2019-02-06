@@ -95,6 +95,7 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         [
             [
                 "xsltproc",
+                "--nonet",
                 "-o",
                 "my-output-dir/",
                 "--stringparam",
@@ -141,6 +142,7 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         [
             [
                 "xsltproc",
+                "--nonet",
                 "-o",
                 "GOTO-THE-output.fo",
 "http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl",
@@ -221,6 +223,7 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         [
             [
                 "xsltproc",
+                "--nonet",
                 "-o",
                 "my-output.fo",
 "http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl",
@@ -255,6 +258,7 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         [
             [
                 "xsltproc",
+                "--nonet",
                 "-o",
                 "my-output-dir/",
                 "--stringparam",
@@ -291,6 +295,7 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         [
             [
                 "xsltproc",
+                "--nonet",
                 "-o",
                 "my-output-dir/",
                 "--stringparam",
@@ -327,6 +332,7 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         [
             [
                 "xsltproc",
+                "--nonet",
                 "-o",
                 "my-output-dir/",
                 "--stringparam",
@@ -368,6 +374,7 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         [
             [
                 "xsltproc",
+                "--nonet",
                 "--stringparam",
                 "root.filename",
 "lib/docbook/5/essays/foss-and-other-beasts-v3/all-in-one.xhtml.temp.xml",
@@ -434,6 +441,7 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         [
             [
                 "xsltproc",
+                "--nonet",
                 "-o",
                 "my-output-dir/notneeded.xhtml",
                 "--stringparam",

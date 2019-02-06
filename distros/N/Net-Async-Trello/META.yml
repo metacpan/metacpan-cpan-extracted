@@ -48,6 +48,6 @@ requires:
 resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Trello/issues
   repository: git://github.com/team-at-cpan/Net-Async-Trello.git
-version: '0.003'
-x_generated_by_perl: v5.28.0
+version: '0.004'
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

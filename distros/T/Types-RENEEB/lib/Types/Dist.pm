@@ -66,7 +66,7 @@ Types::Dist - Types related to distributions (e.g. distributions on CPAN)
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 TYPES
 

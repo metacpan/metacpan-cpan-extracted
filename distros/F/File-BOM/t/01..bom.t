@@ -56,8 +56,12 @@ for my $file (@test_files) {
     }
 
     open FH, '<', $file2path{$file};
-    my $first_line = <FH>;
-    chomp $first_line;
+    my $first_line;
+    {
+	local $/ = $fileeol{$file};
+	$first_line = <FH>;
+	chomp $first_line;
+    }
 
     seek(FH, 0, SEEK_SET);
 

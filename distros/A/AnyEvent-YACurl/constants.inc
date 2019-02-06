@@ -403,6 +403,7 @@
         hv_stores(the_hv, "CURLOPT_HEADERDATA", newSViv(CURLOPT_HEADERDATA));
         hv_stores(the_hv, "CURLOPT_HEADERFUNCTION", newSViv(CURLOPT_HEADERFUNCTION));
         hv_stores(the_hv, "CURLOPT_HEADEROPT", newSViv(CURLOPT_HEADEROPT));
+        hv_stores(the_hv, "CURLOPT_HTTP09_ALLOWED", newSViv(CURLOPT_HTTP09_ALLOWED));
         hv_stores(the_hv, "CURLOPT_HTTP200ALIASES", newSViv(CURLOPT_HTTP200ALIASES));
         hv_stores(the_hv, "CURLOPT_HTTPAUTH", newSViv(CURLOPT_HTTPAUTH));
         hv_stores(the_hv, "CURLOPT_HTTPGET", newSViv(CURLOPT_HTTPGET));
@@ -580,6 +581,8 @@
         hv_stores(the_hv, "CURLOPT_TLSAUTH_PASSWORD", newSViv(CURLOPT_TLSAUTH_PASSWORD));
         hv_stores(the_hv, "CURLOPT_TLSAUTH_TYPE", newSViv(CURLOPT_TLSAUTH_TYPE));
         hv_stores(the_hv, "CURLOPT_TLSAUTH_USERNAME", newSViv(CURLOPT_TLSAUTH_USERNAME));
+        hv_stores(the_hv, "CURLOPT_TRAILERDATA", newSViv(CURLOPT_TRAILERDATA));
+        hv_stores(the_hv, "CURLOPT_TRAILERFUNCTION", newSViv(CURLOPT_TRAILERFUNCTION));
         hv_stores(the_hv, "CURLOPT_TRANSFERTEXT", newSViv(CURLOPT_TRANSFERTEXT));
         hv_stores(the_hv, "CURLOPT_TRANSFER_ENCODING", newSViv(CURLOPT_TRANSFER_ENCODING));
         hv_stores(the_hv, "CURLOPT_UNIX_SOCKET_PATH", newSViv(CURLOPT_UNIX_SOCKET_PATH));
@@ -853,6 +856,8 @@
         hv_stores(the_hv, "CURL_TIMECOND_NONE", newSViv(CURL_TIMECOND_NONE));
         hv_stores(the_hv, "CURL_TLSAUTH_NONE", newSViv(CURL_TLSAUTH_NONE));
         hv_stores(the_hv, "CURL_TLSAUTH_SRP", newSViv(CURL_TLSAUTH_SRP));
+        hv_stores(the_hv, "CURL_TRAILERFUNC_ABORT", newSViv(CURL_TRAILERFUNC_ABORT));
+        hv_stores(the_hv, "CURL_TRAILERFUNC_OK", newSViv(CURL_TRAILERFUNC_OK));
         hv_stores(the_hv, "CURL_UPKEEP_INTERVAL_DEFAULT", newSViv(CURL_UPKEEP_INTERVAL_DEFAULT));
         hv_stores(the_hv, "CURL_VERSION_ASYNCHDNS", newSViv(CURL_VERSION_ASYNCHDNS));
         hv_stores(the_hv, "CURL_VERSION_BROTLI", newSViv(CURL_VERSION_BROTLI));

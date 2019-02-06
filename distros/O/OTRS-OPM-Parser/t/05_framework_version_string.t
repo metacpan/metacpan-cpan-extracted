@@ -22,7 +22,7 @@ isa_ok $opm->tree, 'XML::LibXML::Document';
 
 is $opm->name, 'QuickMerge', 'name';
 
-is_deeply [ $opm->framework ], [qw/
+is_deeply $opm->framework, [qw/
     3.0.x
     3.1.x
     3.2.x

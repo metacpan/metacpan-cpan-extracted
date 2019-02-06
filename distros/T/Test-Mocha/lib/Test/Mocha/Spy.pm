@@ -1,6 +1,6 @@
 package Test::Mocha::Spy;
 # ABSTRACT: Spy objects
-$Test::Mocha::Spy::VERSION = '0.66';
+$Test::Mocha::Spy::VERSION = '0.67';
 use parent 'Test::Mocha::SpyBase';
 use strict;
 use warnings;

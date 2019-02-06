@@ -56,6 +56,9 @@ else {
              '9.163063426407029e+16', '2.5922126328248068e+16', '5e-324', '1.4142135623730951',
              '1.5e-323', '1.7320508075688772', '0.0', '-0.0', '1e-09', '-7.373243991138e+17');
 
+###############################################
+################## 53 BIT #####################
+
   if($Math::MPFR::NV_properties{bits} == 53) {
     print "1..8\n";
 
@@ -71,14 +74,16 @@ else {
       print "not ok 2\n";
     }
 
-    if($] < 5.010) {
-      warn "This version of perl ($]) is old - skipping test 3\n";
-    }
-    else {
+
     if(nvtoa($nzero) eq '-0.0') { print "ok 3\n" }
-      else {
+    else {
+      unless($nzero == 0 && $] < 5.01) {
         warn nvtoa($nzero), " ne '-0.0'\n";
         print "not ok 3\n";
+      }
+      else {
+        warn "Ignoring that this perl doesn't accommodate signed zero\n";
+        print "ok 3\n";
       }
     }
 
@@ -108,7 +113,8 @@ else {
     for(@in) {
       if(abs($_) >= $Math::MPFR::NV_properties{normal_min}) {
         Rmpfr_strtofr($t1, nvtoa($_), 10, MPFR_RNDN);
-        Rmpfr_set_NV($t2, $_, MPFR_RNDN);
+        eval {Rmpfr_set_NV($t2, $_, MPFR_RNDN);};	# in case NV flag is unset
+        if($@) {Rmpfr_strtofr($t2, $_, 10, MPFR_RNDN)}
         if($t1 != $t2) {
           $ok = 0;
           warn "$t1 != $t2\n";
@@ -118,7 +124,7 @@ else {
         # We need to subnormalize the mpfr objects.
         my $s = nvtoa($_);
         Rmpfr_set_emin($Math::MPFR::NV_properties{emin}); #(-1073);
-        Rmpfr_set_emax($Math::MPFR::NV_properties{emin}); #(1024);
+        Rmpfr_set_emax($Math::MPFR::NV_properties{emax}); #(1024);
         my $inex = Rmpfr_strtofr($t1, $s, 10, MPFR_RNDN);
         Rmpfr_subnormalize($t1, $inex, MPFR_RNDN);
 
@@ -149,10 +155,15 @@ else {
 
     for(my $i = 0; $i < @in; $i++) {
       my $t = nvtoa($in[$i]);
-      if($t =~ /e\-0\d\d$/i) {$t =~ s/e\-0/e-/i}
+      #if($t =~ /e\-0\d\d$/i) {$t =~ s/e\-0/e-/i} # I think this would be incorrect
       if($t ne $py3[$i]) {
-        $ok = 0;
-        warn "$t ne $py3[$i]\n";
+        unless($in[$i] == 0 && $py3[$i] eq '-0.0' && $] < 5.01) {
+          $ok = 0;
+          warn "$t ne $py3[$i]\n";
+        }
+        else {
+          warn "Ignoring that this perl doesn't accommodate signed zero\n";
+        }
       }
     }
 
@@ -161,6 +172,9 @@ else {
 
     $ok = 1;
   }
+
+###############################################
+################## 64 BIT #####################
 
   elsif($Math::MPFR::NV_properties{bits} == 64) {
     print "1..8\n";
@@ -177,14 +191,15 @@ else {
       print "not ok 2\n";
     }
 
-    if($] < 5.010) {
-      warn "This version of perl ($]) is old - skipping test 3\n";
-    }
-    else {
     if(nvtoa($nzero) eq '-0.0') { print "ok 3\n" }
-      else {
+    else {
+      unless($nzero == 0 && $] < 5.01) {
         warn nvtoa($nzero), " ne '-0.0'\n";
         print "not ok 3\n";
+      }
+      else {
+        warn "Ignoring that this perl doesn't accommodate signed zero\n";
+        print "ok 3\n";
       }
     }
 
@@ -219,7 +234,8 @@ else {
     for(@in) {
       if(abs($_) >= $Math::MPFR::NV_properties{normal_min}) {
         Rmpfr_strtofr($t1, nvtoa($_), 10, MPFR_RNDN);
-        Rmpfr_set_NV($t2, $_, MPFR_RNDN);
+        eval {Rmpfr_set_NV($t2, $_, MPFR_RNDN);};	# in case NV flag is unset
+        if($@) {Rmpfr_strtofr($t2, $_, 10, MPFR_RNDN)}
         if($t1 != $t2) {
           $ok = 0;
           warn "$t1 != $t2\n";
@@ -229,7 +245,7 @@ else {
         # We need to subnormalize the mpfr objects.
         my $s = nvtoa($_);
         Rmpfr_set_emin($Math::MPFR::NV_properties{emin}); #(-16444);
-        Rmpfr_set_emax($Math::MPFR::NV_properties{emin}); #(16384);
+        Rmpfr_set_emax($Math::MPFR::NV_properties{emax}); #(16384);
         my $inex = Rmpfr_strtofr($t1, $s, 10, MPFR_RNDN);
         Rmpfr_subnormalize($t1, $inex, MPFR_RNDN);
         $inex = Rmpfr_set_NV($t2, $_, MPFR_RNDN);
@@ -259,8 +275,13 @@ else {
     for(my $i = 0; $i < @in; $i++) {
       my $t = nvtoa($in[$i]);
       if($t ne $correct[$i]) {
-        $ok = 0;
-        warn "$t ne $correct[$i]\n";
+        unless($in[$i] == 0 && $correct[$i] eq '-0.0' && $] < 5.01) {
+          $ok = 0;
+          warn "$t ne $correct[$i]\n";
+        }
+        else {
+          warn "Ignoring that this perl doesn't accommodate signed zero\n";
+        }
       }
     }
 
@@ -270,6 +291,9 @@ else {
     $ok = 1;
 
   }
+
+###############################################
+################## 113 BIT ####################
 
   elsif($Math::MPFR::NV_properties{bits} == 113) {
     print "1..8\n";
@@ -286,16 +310,13 @@ else {
       print "not ok 2\n";
     }
 
-    if($] < 5.010) {
-      warn "This version of perl ($]) is old - skipping test 3\n";
-    }
-    else {
+
     if(nvtoa($nzero) eq '-0.0') { print "ok 3\n" }
-      else {
-        warn nvtoa($nzero), " ne '-0.0'\n";
-        print "not ok 3\n";
-      }
+    else {
+      warn nvtoa($nzero), " ne '-0.0'\n";
+      print "not ok 3\n";
     }
+
 
     if(nvtoa($inf) eq 'Inf') { print "ok 4\n" }
     else {
@@ -338,7 +359,7 @@ else {
         # We need to subnormalize the mpfr objects.
         my $s = nvtoa($_);
         Rmpfr_set_emin($Math::MPFR::NV_properties{emin}); #(-16493);
-        Rmpfr_set_emax($Math::MPFR::NV_properties{emin}); #(16384);
+        Rmpfr_set_emax($Math::MPFR::NV_properties{emax}); #(16384);
         my $inex = Rmpfr_strtofr($t1, $s, 10, MPFR_RNDN);
         Rmpfr_subnormalize($t1, $inex, MPFR_RNDN);
         $inex = Rmpfr_set_NV($t2, $_, MPFR_RNDN);
@@ -380,6 +401,9 @@ else {
     $ok = 1;
   }
 
+###############################################
+################## 2098 BIT ###################
+
   elsif($Math::MPFR::NV_properties{bits} == 2098) {
     print "1..8\n";
 
@@ -395,14 +419,15 @@ else {
       print "not ok 2\n";
     }
 
-    if($] < 5.010) {
-      warn "This version of perl ($]) is old - skipping test 3\n";
-    }
-    else {
     if(nvtoa($nzero) eq '-0.0') { print "ok 3\n" }
-      else {
+    else {
+      unless($nzero == 0 && $] < 5.01) {
         warn nvtoa($nzero), " ne '-0.0'\n";
         print "not ok 3\n";
+      }
+      else {
+        warn "Ignoring that this perl doesn't accommodate -0\n";
+        print "ok 3\n";
       }
     }
 

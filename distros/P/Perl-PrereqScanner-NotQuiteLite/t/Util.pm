@@ -12,7 +12,7 @@ use File::Path qw/mkpath rmtree/;
 use if -d ".git", "Test::FailWarnings";
 
 our @EXPORT = qw/
-  test todo_test used test_app test_file test_cpanfile
+  test todo_test used test_app test_file test_cpanfile test_bin
 /;
 our $EVAL;
 our $PARSERS;
@@ -127,6 +127,32 @@ sub test_cpanfile {
   my $file = "$tmpdir/cpanfile";
   if (ok -f $file, "cpanfile exists") {
     my $got = do { open my $fh, '<', $file; local $/; <$fh> };
+    is $got => $expected;
+  }
+
+  rmtree($tmpdir);
+}
+
+sub test_bin {
+  my ($description, $setup, $args, $expected) = @_;
+  note $description;
+
+  my $tmpdir = tempdir(
+    'PerlPrereqScannerNQLite_XXXX',
+    CLEANUP => 1,
+    TMPDIR => 1,
+  );
+  $setup->($tmpdir);
+
+  my $opt = join ' ', @{$args || []};
+  my $bin = "bin/scan-perl-prereqs-nqlite";
+  SKIP: {
+    skip "bin not found", 1 unless -e $bin;
+    # note "$^X $bin --base-dir $tmpdir --cpanfile $opt";
+    my $got = `$^X $bin --base-dir $tmpdir --cpanfile $opt`;
+    $got =~ s/(?:\015\012|\015|\012)/\n/g;
+    $got =~ s/\n+$//s;
+    $expected =~ s/\n+$//s;
     is $got => $expected;
   }
 

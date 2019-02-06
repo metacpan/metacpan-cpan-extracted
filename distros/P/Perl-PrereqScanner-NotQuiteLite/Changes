@@ -1,5 +1,10 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.9904 2019/02/07
+  - made sure to exclude local/core/private modules from feature
+    prereqs
+  - added scan_also/parser/private options
+
 0.9903 2019/02/03
   - added an option to dedupe modules that belong to the
     same distribution with the help of CPAN::Common::Index

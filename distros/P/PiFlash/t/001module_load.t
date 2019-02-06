@@ -1,28 +1,16 @@
-#
-#===============================================================================
-#
-#         FILE: 001module_load.t
-#
-#  DESCRIPTION: 
-#
-#        FILES: ---
-#         BUGS: ---
-#        NOTES: ---
-#       AUTHOR: YOUR NAME (), 
-# ORGANIZATION: 
-#      VERSION: 1.0
-#      CREATED: 10/07/2018 03:27:10 AM
-#     REVISION: ---
-#===============================================================================
+#!/usr/bin/perl
+# 001module_load.t - basic test that the modules all load
 
 use strict;
 use warnings;
 
-use Test::More tests => 4;                      # last test to print
+use Test::More tests => 6;                      # last test to print
 
 require_ok( 'PiFlash::State' );
 require_ok( 'PiFlash::Command' );
 require_ok( 'PiFlash::Inspector' );
+require_ok( 'PiFlash::MediaWriter' );
+require_ok( 'PiFlash::Hook' );
 require_ok( 'PiFlash' );
 
 1;

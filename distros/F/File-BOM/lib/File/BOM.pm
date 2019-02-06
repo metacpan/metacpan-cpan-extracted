@@ -101,7 +101,7 @@ my @subs = qw(
 
 my @vars = qw( %bom2enc %enc2bom );
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 our @EXPORT = ();
 our @EXPORT_OK = ( @subs, @vars );

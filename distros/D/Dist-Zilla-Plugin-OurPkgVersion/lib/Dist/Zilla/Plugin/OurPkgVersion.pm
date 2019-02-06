@@ -3,7 +3,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 use Moose;
 with (
@@ -11,11 +11,7 @@ with (
 	'Dist::Zilla::Role::FileFinderUser' => {
         default_finders => [
             ':InstallModules',
-            (
-                eval { Dist::Zilla::Dist::Builder->VERSION('5.038'); 1 }
-                    ? ':PerlExecFiles'
-                    : ':ExecFiles'
-            )
+            ':PerlExecFiles',
         ],
 	},
 	'Dist::Zilla::Role::PPI',
@@ -32,10 +28,19 @@ has underscore_eval_version => (
   default => 0,
 );
 
+has skip_main_module => (
+  is      => 'ro',
+  isa     => 'Int',
+  default => 0,
+);
+
 sub munge_files {
 	my $self = shift;
 
-	$self->munge_file($_) for @{ $self->found_files };
+	$self->munge_file($_) for
+		grep { $self->skip_main_module ? $_->name ne $self->zilla->main_module->name : 1 }
+		@{ $self->found_files };
+
 	return;
 }
 
@@ -120,7 +125,7 @@ Dist::Zilla::Plugin::OurPkgVersion - No line insertion and does Package version 
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -231,6 +236,8 @@ becomes
 
 	our $VERSION = '0.01'; # TRIAL VERSION
 
+=encoding UTF-8
+
 =head1 METHODS
 
 =over
@@ -268,6 +275,12 @@ immediately after the our version assignment:
 This is arguably the correct thing to do, but changes the line numbering
 of the generated Perl module or source, and thus optional.
 
+=item skip_main_module
+
+Set to true to ignore the main module in the distribution. This prevents
+a warning when using L<Dist::Zilla::Plugin::VersionFromMainModule> to
+obtain the version number instead of the C<dist.ini> file.
+
 =back
 
 =head1 BUGS
@@ -281,13 +294,17 @@ feature.
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexandr Ciornii Alexei Znamensky Christian Walde Christopher J. Madsen David Golden Graham Ollis Ian Sealy Stephan Loyd
+=for stopwords Alexandr Ciornii Stephan Loyd Alexei Znamensky Christian Walde Christopher J. Madsen David Golden Graham Ollis Graham✈️✈️ Ian Sealy Michael Jemmeson
 
 =over 4
 
 =item *
 
 Alexandr Ciornii <alexchorny@gmail.com>
+
+=item *
+
+Stephan Loyd <stephanloyd9@gmail.com>
 
 =item *
 
@@ -315,11 +332,15 @@ Graham Ollis <plicease@cpan.org>
 
 =item *
 
+Graham✈️✈️ <plicease@cpan.org>
+
+=item *
+
 Ian Sealy <git@iansealy.com>
 
 =item *
 
-Stephan Loyd <stephanloyd9@gmail.com>
+Michael Jemmeson <mjemmeson@cpan.org>
 
 =back
 
@@ -339,7 +360,7 @@ Grahan Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Caleb Cushing.
+This software is Copyright (c) 2019 by Caleb Cushing.
 
 This is free software, licensed under:
 

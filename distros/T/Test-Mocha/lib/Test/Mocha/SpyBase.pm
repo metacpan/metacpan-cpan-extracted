@@ -1,6 +1,6 @@
 package Test::Mocha::SpyBase;
 # ABSTRACT: Abstract base class for Spy and Mock
-$Test::Mocha::SpyBase::VERSION = '0.66';
+$Test::Mocha::SpyBase::VERSION = '0.67';
 use strict;
 use warnings;
 

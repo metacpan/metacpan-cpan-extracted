@@ -16,7 +16,6 @@ requires:
   DateTime: '0'
   FindBin: '0'
   Getopt::Long: '0'
-  Koha::Contrib::Tamil::Koha: '0'
   LWP::Simple: '0'
   List::Util: '0'
   MARC::Moose::Field::Std: '0'
@@ -28,4 +27,4 @@ requires:
   utf8: '0'
 resources:
   repository: https://github.com/fredericd/Koha-Contrib-Mirabel
-version: 0.0.6
+version: 1.0.0

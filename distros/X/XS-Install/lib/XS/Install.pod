@@ -1,0 +1,399 @@
+=head1 NAME
+
+XS::Install - ExtUtils::MakeMaker based module installer for XS modules.
+
+=head1 DESCRIPTION
+
+XS::Install (formerly known as L<Panda::Install>) makes it much easier to write MakeMaker's makefiles especially for XS modules.
+It provides dependecies support between XS modules, so that one could easily use header files, code, compilation
+options, ...etc of another. XS::Install also lets you put source files in subdirectories any level deep
+(MakeMaker doesn't handle that) and easily compile-in external C libraries.
+
+The params for XS::Install are compatible with MakeMaker with some additions.
+
+Also it greatly extends typemap functionality and adds C-like XS synopsis.
+
+=head1 SYNOPSIS
+
+    # Makefile.PL
+    use XS::Install;
+    
+    write_makefile(
+        NAME    => 'My::XS',
+        INC     => '-Isrc -I/usr/local/libevent/include',
+        LIBS    => '-levent',
+        SRC     => 'src', # all source files (code,header,xs) under 'src' are included in build
+        C       => 'src2/foo.cc src2/bar.cc src3/baz/*.c', # plus src2/foo.cc, src2/bar.cc, and first-level c files in src3/baz/
+        CPLUS   => 11,
+        PAYLOAD => {
+            # implements File::ShareDir functionality
+            'data.txt'   => '/data.txt',
+            'list.txt'   => '/',
+            'abc.dat'    => '/mydir/bca.dat',
+            'payloaddir' => '/',
+        },
+        BIN_DEPS  => ['XS::Module1', 'XS::Module2'],
+        BIN_SHARE => {
+            # modules that depend on My::XS will compile with this INC, LIBS, etc set.
+            TYPEMAPS    => {'typemap1.map' => '/typemap.map'},
+            INC         => '-I/usr/local/libevent/include', 
+            INCLUDE     => {'src' => '/'},
+            LIBS        => '-levent',
+            DEFINE      => '-DHELLO_FROM_MYXS',
+            CCFLAGS     => 'something',
+        },
+        postamble => 'mytarget: blah-blah; echo "hello"',
+        CLIB => [{
+            DIR    => 'libuv',
+            FILE   => 'libuv.a',
+            TARGET => 'libuv.a',
+            FLAGS  => 'CFLAGS="-fPIC -O2"',
+        }],
+    );
+    
+=head1 LOADING XS MODULE SYNOPSIS
+
+    package MyXSModule;
+    use XS::Loader;
+    
+    our $VERSION = '1.0.0';
+    XS::Loader::load(); # same as XS::Loader::load('MyXSModule', $VERSION, 0x01);
+    
+see L<XS::Loader>
+    
+=head1 C-LIKE XS SYNOPSIS
+
+    #include <xs.h>
+
+    char* my_xs_sub (SV* sv) { // CODE
+        if (badsv(sv)) XSRETURN_UNDEF;
+        RETVAL = process(sv);
+    }
+    
+    void other_xs_sub (SV* sv) : ALIAS(other_name=1, yet_another=2) { // PPCODE
+        xPUSHi(1);
+        xPUSHi(2);
+    }
+    
+=head1 GETTING PAYLOAD SYNOPSIS
+
+    my $payload_dir = XS::Install::Payload::payload_dir('My::Module');
+    
+see L<XS::Install::Payload>
+
+=head1 FUNCTIONS
+
+=head4 write_makefile(%params)
+
+Same as WriteMakefile(makemaker_args(%params))
+
+=head4 makemaker_args(%params)
+
+Processes %params, does all the neccessary job and returns final parameters for passing to MakeMaker's WriteMakefile.
+
+=head2 PARAMETERS
+
+Only differences from MakeMaker params are listed.
+
+=over 2
+
+=item ALL_FROM [default: NAME]
+
+Sets ABSTRACT_FROM and VERSION_FROM to value of ALL_FROM.
+
+If not defined, defaults to NAME. That means that if you have version and abstract in your module's main package, then
+you don't need to define anything.
+
+=item XS [*.xs]
+
+Sets source files for xsubpp. If you define this param, defaults are aborted.
+
+    XS => 'myxs/*.xs'
+    XS => 'file1.xs folder/file2.xs folder2/*.xs'
+    XS => ['file1.xs', 'folder/file2.xs folder2/*.xs']
+
+=item C [*.c, *.cc, *.cxx, *.cpp, <xsubpp's output files>]
+
+Sets source files to compile. If you define this param, defaults are aborted, however C files created by xsubpp are
+still included.
+
+Usage: see "XS".
+
+=item H [*.h *.hh *.hxx *.hpp]
+
+Sets header files for makefile's dependencies (forces module to recompile if any of these changes). Useful during development.
+If you define this param, defaults are aborted.
+
+Usage: see "XS".
+
+=item SRC
+
+Scans specified folder(s), finds all XS, C and H files and includes them in build. No matter whether you define XS/C/H
+parameters or not, SRCs are always added to them.
+
+    SRC => 'src'
+    SRC => 'src src2 src3',
+    SRC => ['src src2', 'src3'],
+    
+=item CPLUS
+
+If true, will use c++ to build current extension. Additionally, if > 1, will set -std=c++<CPLUS>
+With this flag set, wraps every XSUB function into try-catch block, catching C++ exceptions and rethrowing it as perl exceptions.
+Additionally, the default extension for XS files output becomes C<.cc> instead of C<.c>
+    
+=item postamble
+
+Passed unchanged to Makefile. Can be HASHREF for your convenience, in which case keys are ignored, values are concatenated
+in undefined order. If it is important to keep the order, ARRAYREF can be supplied.
+
+    postamble => 'sayhello: ; echo "hello"'
+    postamble => {
+        memd_dep   => 'linkext:: libmemd/libmemd.a; cd libmemd && $(MAKE) static',
+        memd_clean => 'clean:: ; cd libmemd && $(MAKE) clean',
+    }
+    postamble => [
+        'linkext:: libmemd/libmemd.a; cd libmemd && $(MAKE) static',
+        'clean:: ; cd libmemd && $(MAKE) clean',
+    ]
+
+=item PARSE_XS
+
+	PARSE_XS => 'XS::Framework::ParseXS'
+
+Allows to inject custom ParseXS-plugin into xsubpp. As the module use on-the-fly patching of L<ExtUtils::ParseXS>
+there is no sense of documenting it's internals, please, read the sources. Among the sources of L<XS::Framework>
+you can find and example.
+
+=item test/SRC
+
+=item test/RECURSIVE_TEST_FILES
+
+Sometimes XS-extension itself is written in C/C++, while XS/XSI files are only a thin perl-wrapper layer. In that
+cases it is desirable to test C/C++ code independently, but using perl-testing infrastructure. C<XS::Install> 
+does the trick: it compiles C/C++  test sources into additional XS-extension, and you should load it in perl
+C<t>-files (see L<XS::Loader>).
+
+The compiled test XS-extension is B<not> installed, and availale only during testing phase
+
+    test     => {
+        SRC                  => 't',
+        RECURSIVE_TEST_FILES => 1,
+    },
+
+You still have to provide XS-file for the test extension. If you like to omit it and fond of 
+L<Catch2|https://github.com/catchorg/Catch2> C++ module, then, please, familiarize yourself with L<Test::Catch>
+module, which already provides all needed glue. To let C++ test work, there will be need:
+
+	# t/some-file.t
+	XS::Loader::load_tests();
+
+	# t/some-file.cc
+	#include <catch.hpp>
+	TEST_CASE("description", "[tag]") {
+		...
+	}
+
+=item MIN_PERL_VERSION [5.10.0]
+
+Is set to 5.10.0 if you don't provide it.
+
+=item PAYLOAD
+
+Implements L<File::ShareDir> functionality. Specified files are installed together with module and can later be accessed
+at runtime by the module itself or by other modules (via L<XS::Install::Payload>'s payload_dir()).
+
+Value is a HASHREF where key is a file or directory path relative to module's dist dir and value is relative to payload's
+installation dir. If key is a directory then all content of that directory is installed to the destination path. If value
+is not specified (undef, '') then dest path is the same as source path.
+
+Examples (given that $payload is a directory where payload is installed and $dist is a module's dist dir):
+
+    'file.txt' => ''       # $dist/file.txt => $payload/file.txt
+    'file.txt' => 'a.txt'  # $dist/file.txt => $payload/a.txt
+    'mydir'    => '',      # $dist/mydir    => $payload/mydir
+    'mydir'    => 'a/b/c', # $dist/mydir/*  => $payload/a/b/c/*
+    'mydir'    => '/',     # $dist/mydir/*  => $payload/*
+
+=item BIN_DEPS
+
+List of modules current module binary depends on. That means all that those modules specified in BIN_SHARE section will be applied
+while building current module. It also adds those modules to CONFIGURE_REQUIRES and PREREQ_PM sections.
+
+Also if your module has BIN_SHARE section then all modules in BIN_DEPS goes to BIN_SHARE/PASSTHROUGH unless module name is prefixed
+with '-' (minus).
+
+Examples:
+
+    BIN_DEPS => 'Module1'
+    BIN_DEPS => ['Module1', '-Module2']
+
+=item BIN_SHARE
+
+In this section you put values that you want to be applied to any module which specified your module as a dependency.
+
+=item BIN_SHARE/TYPEMAPS
+
+Installs specified typemaps and also adds it to the list of typemaps when building descendant modules.
+
+Receives HASHREF, format is the same as for PAYLOAD, the only difference is that it scans folders for *.map files only.
+
+=item BIN_SHARE/INC
+
+Adds include file dirs to INC when building descendant modules.
+
+=item BIN_SHARE/INCLUDE
+
+Installs specified include files/dirs into module's installation include directory and adds that directory to INC
+when building descendant modules.
+
+Receives HASHREF, format is the same as for PAYLOAD, the only difference is that it scans folders for header files only.
+
+=item BIN_SHARE/LIBS
+
+Added to LIBS when building descendant modules.
+
+=item BIN_SHARE/DEFINE
+
+Added to DEFINE when building descendant modules.
+
+=item BIN_SHARE/CCFLAGS
+
+Added to CCFLAGS when building descendant modules.
+
+=item BIN_SHARE/XSOPT
+
+Added to XSOPT when building descendant modules.
+
+=item BIN_SHARE/PASSTHROUGH
+
+Merge 'BIN_SHARE' of this module with 'BIN_SHARE' of specified modules. Everything gets concatenated (strings, arrays, etc) while merging.
+You don't need to manually manage this setting as it's managed automatically (see BIN_DEPS section).
+
+=item BIN_SHARE/CPLUS
+
+If set to true, will use c++ when building descendant modules. If > 1, then will use this version -std=c++<CPLUS> for building descendant modules
+(however if a descendant module sets its own CPLUS version then the highest version will be in use). Propagates all behaviour of C<CPLUS> for
+descendant modules.
+
+=item CLIB
+
+List of external C libraries that need to be built and compiled into the extension.
+
+=item CLIB/DIR
+
+Directory where external library is. Makefile must present in that directory!
+
+=item CLIB/FILE
+
+Static library file which is built by the library (relative to CLIB/DIR).
+
+=item CLIB/TARGET
+
+Name of the target for Makefile to built static library.
+
+=item CLIB/FLAGS
+
+Flags to build external library with.
+
+=back
+
+=head1 C-LIKE XS
+
+If you're using XS::Install then all of your XS files support C-like XS. It means that code
+    
+    char* my_xs_sub (SV* sv) { // CODE
+        if (badsv(sv)) XSRETURN_UNDEF;
+        RETVAL = process(sv);
+    }
+    
+    void other_xs_sub (SV* sv) : ALIAS(other_name=1, yet_another=2) { // PPCODE
+        xPUSHi(1);
+        xPUSHi(2);
+    }
+        
+is replaced with code
+
+    char*
+    my_xs_sub (SV* sv)
+    CODE:
+        if (badsv(sv)) XSRETURN_UNDEF;
+        RETVAL = process(sv);
+    OUTPUT:
+        RETVAL
+    
+    void
+    other_xs_sub (SV* sv)
+    ALIAS:
+        other_name=1
+        yet_another=2
+    PPCODE:
+        xPUSHi(1);
+        xPUSHi(2);
+    
+Note that writing
+
+    int myfunc (int a)
+    
+    int myfunc (int a): ALIAS(other_name=1)
+
+will result in default ParseXS behaviour (calling C function myfunc(a) and returning its result). That's because it has no body.
+
+However this function has a body (empty) and therefore prevents default behaviour
+
+    int myfunc (int a) {}
+    
+It is possible to have split C<BOOT> section across multiple xs/xsi source. The
+special macros-like keywords are available in .xs/.xsi files: C<__MODULE__> and C<__PACKAGE__>,
+they will be replaced with corresponding string literals of the most recently parsed XS header.
+Here is an example:
+
+	# module.xs
+	MODULE = My::Module                PACKAGE = My::Module
+
+	INCLUDE: my-package1.xsi
+
+	INCLUDE: my-package2.xsi
+
+	# my-package1.xsi
+	MODULE = My::Module                PACKAGE = My::Module::Package1
+
+	BOOT {
+		hello(__PACKAGE__);
+	}
+
+	# my-package2.xsi
+	MODULE = My::Module                PACKAGE = My::Module::Package2
+
+	BOOT {
+		world(__PACKAGE__);
+	}
+
+Will be merged into:
+
+	BOOT {
+		hello("My::Module::Package1");
+		world("My::Module::Package2");
+	}
+
+    
+=head1 ENVIRONMENT VARIABLES
+
+=over
+
+=item CC
+
+=item COMPILER
+
+Allows to redefine the compiler in C<CC> setting.
+
+=back
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

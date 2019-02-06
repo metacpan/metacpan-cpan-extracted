@@ -7,21 +7,20 @@
 use strict;
 use warnings;
 use v5.18.0; # require 2014 or newer version of Perl
-use autodie;
-use Moose; 
-use Carp;
 
 # State class to hold program state, and print it all out in case of errors
 # this is a low-level package - it stores state data but at this level has no knowledge of what is being stored in it
 package PiFlash::State;
-$PiFlash::State::VERSION = '0.0.4';
+$PiFlash::State::VERSION = '0.0.6';
+use autodie;
+use Carp qw(croak);
+
 # ABSTRACT: PiFlash::State class to store configuration, device info and program state
 
 
 
 # initialize state as empty
 ## no critic (ProhibitPackageVars)
-#BEGIN { $PiFlash::State::state = undef; }
 our $state;
 ## use critic
 
@@ -35,6 +34,11 @@ sub init
 	$PiFlash::State::state = {};
 	bless $PiFlash::State::state, $class;
 	my $self = $PiFlash::State::state;
+
+	# get symbol table for State package so we can add accessor functions named for top-level hashes
+	my $symtab = \%PiFlash::State::;
+
+	# loop through parameters adding each name as a top-level state hash and accessor functions
 	while (scalar @_ > 0) {
 		my $top_level_param = shift;
 
@@ -43,9 +47,6 @@ sub init
 
 		# generate class accessor methods named for the parameter
 		{
-			# get symbol table for State package so we can add accessor functions named for top-level hashes
-			my $symtab = \%PiFlash::State::;
-
 			# accessor fieldname()
 			$symtab->{$top_level_param} = sub {
 				my $name = shift;
@@ -53,6 +54,7 @@ sub init
 				if (defined $value) {
 					# got name & value - set the new value for name
 					$self->{$top_level_param}{$name} = $value;
+					return;
 				} elsif (defined $name) {
 					# got only name - return the value/ref of name
 					return (exists $self->{$top_level_param}{$name})
@@ -77,7 +79,7 @@ sub init
 # return boolean value for verbose mode
 sub verbose
 {
-	return PiFlash::State::option("verbose") // 0;
+	return PiFlash::State::cli_opt("verbose") // 0;
 }
 
 # dump data structure recursively, part of verbose state output
@@ -98,7 +100,7 @@ sub odump
 		# process scalar reference
 		return ("    " x $level).($$obj // "undef")."\n";
 	}
-	if (ref $obj eq "HASH" or ref $obj eq "State") {
+	if (ref $obj eq "HASH" or ref $obj eq "PiFlash::State") {
 		# process hash reference
 		my $str = "";
 		foreach my $key (sort {lc $a cmp lc $b} keys %$obj) {
@@ -139,7 +141,7 @@ sub error
 	## no critic (ProhibitPackageVars)
 	my $class = shift;
 	my $message = shift;
-	Carp::croak "error: ".$message.(verbose() ? "\nProgram state dump...\n".odump($PiFlash::State::state,0) : "");
+	croak "error: ".$message.(verbose() ? "\nProgram state dump...\n".odump($PiFlash::State::state,0) : "");
 }
 
 1;
@@ -156,23 +158,57 @@ PiFlash::State - PiFlash::State class to store configuration, device info and pr
 
 =head1 VERSION
 
-version 0.0.4
+version 0.0.6
 
 =head1 SYNOPSIS
 
+ # initialize: creates empty sub-objects and accessor functions as shown below
+ PiFlash::State->init("system", "input", "output", "cli_opt", "log");
+
+ # core functions
  $bool = PiFlash::State::verbose()
  PiFlash::State::odump
  PiFlash::State->error("error message");
 
+ # system accessors
+ my $system = PiFlash::State::system();
+ my $bool = PiFlash::State::has_system($key);
+ my $value = PiFlash::State::system($key);
+ PiFlash::State::system($key, $value);
+
+ # input accessors
+ my $input = PiFlash::State::input();
+ my $bool = PiFlash::State::has_input($key);
+ my $value = PiFlash::State::input($key);
+ PiFlash::State::input($key, $value);
+
+ # output accessors
+ my $output = PiFlash::State::output();
+ my $bool = PiFlash::State::has_output($key);
+ my $value = PiFlash::State::output($key);
+ PiFlash::State::output($key, $value);
+
+ # cli_opt accessors
+ my $cli_opt = PiFlash::State::cli_opt();
+ my $bool = PiFlash::State::has_cli_opt($key);
+ my $value = PiFlash::State::cli_opt($key);
+ PiFlash::State::cli_opt($key, $value);
+
+ # log accessors
+ my $log = PiFlash::State::log();
+ my $bool = PiFlash::State::has_log($key);
+ my $value = PiFlash::State::log($key);
+ PiFlash::State::log($key, $value);
+
 =head1 DESCRIPTION
 
-This class contains internal functions used by L<PiFlash> to gather data about available devices on the system and determine if they are SD card devices.
+This class contains internal functions used by L<PiFlash> to store command-line parameters, input & output file data, available device data and program logs.
 
-PiFlash uses this info to refuse to write/destroy a device which is not an SD card. This provides a safeguard while using root permissions against a potential error which has happened where users have accidentally erased the wrong block device, losing a hard drive they wanted to keep.
+PiFlash uses the device info to refuse to write/destroy a device which is not an SD card. This provides a safeguard while using root permissions against a potential error which has happened where users have accidentally erased the wrong block device, losing a hard drive they wanted to keep.
 
 =head1 SEE ALSO
 
-L<piflash>, L<PiFlash::Command>, L<PiFlash::Inspector>, L<PiFlash::State>
+L<piflash>, L<PiFlash::Command>, L<PiFlash::Inspector>
 
 =head1 AUTHOR
 

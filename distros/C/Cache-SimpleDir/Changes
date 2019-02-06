@@ -1,5 +1,9 @@
 Revision history for Cache-SimpleDir
 
+2.1.4  2019-02-05 23:30:00+02:00 Europe/Athens
+  - callback can be defined either by its name or by code reference
+  - bug fixes, documentation changes
+
 2.1.2  2019-02-04 02:00:00+02:00 Europe/Athens
   - No need for a key, it is using the callback subroutine name
   - Rename the property "callback_setdata" to "callback"

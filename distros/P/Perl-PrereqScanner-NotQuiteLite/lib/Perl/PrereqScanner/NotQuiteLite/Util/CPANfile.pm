@@ -21,8 +21,9 @@ sub load_and_merge {
   if ($features) {
     for my $identifier (keys %$features) {
       my $feature = $features->{$identifier};
+      next unless $feature->{prereqs};
+      $self->_merge_prereqs($feature->{prereqs}, $identifier) or next;
       $self->{_prereqs}->add_feature($identifier, $feature->{description});
-      $self->_merge_prereqs($feature->{prereqs}, $identifier);
     }
   }
 
@@ -46,6 +47,7 @@ sub __replace_prereqs {
   $prereqs = $prereqs->as_string_hash unless ref $prereqs eq 'HASH';
 
   @{$self->{_prereqs}{prereqs}{$feature_id || ''}} = ();
+  my $added = 0;
   for my $phase (keys %$prereqs) {
     for my $type (keys %{$prereqs->{$phase}}) {
       while (my($module, $requirement) = each %{$prereqs->{$phase}{$type}}) {
@@ -56,9 +58,11 @@ sub __replace_prereqs {
           module => $module,
           requirement => Module::CPANfile::Requirement->new(name => $module, version => $requirement),
         );
+        $added++
       }
     }
   }
+  $added;
 }
 
 sub _dedupe {

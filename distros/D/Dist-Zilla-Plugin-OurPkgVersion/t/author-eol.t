@@ -23,11 +23,12 @@ my @files = (
     't/02-vstring.t',
     't/03-trial.t',
     't/04-underscore.t',
+    't/05-skip_main_module.t',
     't/author-critic.t',
     't/author-eol.t',
+    't/author-minimum-version.t',
     't/author-mojibake.t',
     't/author-pod-coverage.t',
-    't/author-pod-linkcheck.t',
     't/author-pod-spell.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
@@ -37,7 +38,6 @@ my @files = (
     't/release-distmeta.t',
     't/release-kwalitee.t',
     't/release-meta-json.t',
-    't/release-minimum-version.t',
     't/release-unused-vars.t'
 );
 
