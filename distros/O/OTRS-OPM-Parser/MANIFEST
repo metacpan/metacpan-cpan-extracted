@@ -19,6 +19,7 @@ t/05_framework_version_string.t
 t/06_minimum_framework.t
 t/07_validate.t
 t/08_documentation.t
+t/09_parse.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/data/QuickMerge-3.3.2.opm
@@ -29,3 +30,4 @@ t/data/QuickMergeInvalid-3.3.3.opm
 t/data/QuickMergeInvalid-3.3.4.opm
 t/data/QuickMergeTwoDocs-3.3.2.opm
 t/data/config.yml
+t/data/validate.opm

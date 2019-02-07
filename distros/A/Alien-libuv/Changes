@@ -1,5 +1,9 @@
 Revision history for Alien-libuv
 
+1.008     2019-02-07
+  - Update to the libuv v1.25.0 release
+  - Re-add the previously removed build flags for Windows
+
 1.007     2019-01-13
   - Update to the libuv v1.24.1 release
   - Remove some unnecessary build flags

@@ -7,12 +7,12 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.0;
+our $VERSION = 5.1;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
 
-# MAPLAT  (C) 2008-2019 Rene Schickbauer
+# PAGECAMEL  (C) 2008-2019 Rene Schickbauer
 # Developed under Artistic license
 
 die("Program disabled, because it destroys POD on purpose. Enable program by commenting out this line!");
@@ -99,7 +99,7 @@ foreach my $func (@funcs) {
 my $footer = <<"END_FOOT";
 =head1 IMPORTANT NOTE
 
-This module is part of the Maplat framework. Currently, only limited support
+This module is part of the PageCamel framework. Currently, only limited support
 and documentation exists outside my DarkPAN repositories. This source is 
 currently only provided for your reference and usage in other projects (just
 copy&paste what you need, see license terms below).
@@ -110,7 +110,7 @@ Rene Schickbauer, E<lt>cavac\@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2016 by Rene Schickbauer
+Copyright (C) 2008-2019 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

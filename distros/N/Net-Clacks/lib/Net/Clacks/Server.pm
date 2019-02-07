@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.0;
+our $VERSION = 5.1;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -194,7 +194,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         socket => $msocket,
                         lastping => time,
                         mirror => 0,
-                        outbuffer => "CLACKS Maplat $VERSION in interclacks client mode\r\n" .  # Tell the server we are using Maplat Interclacks...
+                        outbuffer => "CLACKS PageCamel $VERSION in interclacks client mode\r\n" .  # Tell the server we are using PageCamel Interclacks...
                                      "OVERHEAD A " . $self->{authtoken} . "\r\n" .              # ...send Auth token
                                      "OVERHEAD I 1\r\n",                                        # ...and turn interclacks master mode ON on remote side
                         clientinfo => 'Interclacks link',
@@ -259,7 +259,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     socket => $clientsocket,
                     lastping => time,
                     mirror => 0,
-                    outbuffer => "CLACKS Maplat $VERSION\r\n" .
+                    outbuffer => "CLACKS PageCamel $VERSION\r\n" .
                                  "OVERHEAD M Authentication required\r\n",  # Informal message
                     clientinfo => 'UNKNOWN',
                     host => $chost,
@@ -305,7 +305,6 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             if($clients{$cid}->{interclacks} && $clients{$cid}->{lastinterclacksping} < $interclackspinginterval) {
                 $clients{$cid}->{lastinterclacksping} = time;
                 $clients{$cid}->{outbuffer} .= "PING\r\n";
-                #$clients{$cid}->{outbuffer} .= "OVERHEAD GNU Terry Pratchett\r\n";
             }
         }
 
@@ -476,7 +475,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                                 $clients{$cid}->{lastping} = time;
 
 
-                                $clients{$cid}->{outbuffer} .= "CLACKS Maplat $VERSION in interclacks master mode\r\n" .  # Tell client we are in interclacks master mode
+                                $clients{$cid}->{outbuffer} .= "CLACKS PageCamel $VERSION in interclacks master mode\r\n" .  # Tell client we are in interclacks master mode
                                                                "OVERHEAD M Authentication required\r\n" .                 # Informal message
                                                                "OVERHEAD A " . $self->{authtoken} . "\r\n" .              # ...and send Auth token...
                                                                "OVERHEAD L 1\r\n";                                            # ...and lock client for sync
@@ -803,7 +802,7 @@ Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2018 by Rene Schickbauer
+Copyright (C) 2008-2019 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

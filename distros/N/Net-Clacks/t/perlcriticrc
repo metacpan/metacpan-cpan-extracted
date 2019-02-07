@@ -14,7 +14,7 @@ minimum_regex_length_to_complain_about = 200
 [RegularExpressions::ProhibitComplexRegexes]
 max_characters = 200
 
-# Maplat is a highly complex project. Splitting
+# PageCamel is a highly complex project. Splitting
 # everything into multiple subroutines just makes matters worse
 [Subroutines::ProhibitExcessComplexity]
 max_mccabe = 67

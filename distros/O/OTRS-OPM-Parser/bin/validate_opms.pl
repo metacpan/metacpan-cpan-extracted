@@ -57,7 +57,7 @@ validate_opms.pl - Validate .opms against the XML schema
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 AUTHOR
 

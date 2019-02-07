@@ -43,6 +43,16 @@ $opm->parse;
 }
 
 {
+    my $doc = $opm->documentation( lang => 'en', type => 'pod' );
+    is $doc->{filename}, 'doc/en/QuickMerge.pod';
+}
+
+{
+    my $doc = $opm->documentation( lang => 'en', type => 'pdf' );
+    is $doc->{filename}, 'doc/en/QuickMerge.pdf';
+}
+
+{
     $opm->files([]);
     my $doc = $opm->documentation;
     is $doc, undef;

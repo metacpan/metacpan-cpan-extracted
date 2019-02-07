@@ -1,0 +1,91 @@
+state_t
+	i --- --- libvlc_NothingSpecial
+	i --- --- libvlc_Opening
+	i --- --- libvlc_Paused
+	i --- --- libvlc_Playing
+	i --- --- libvlc_Stopped
+	i --- --- libvlc_Buffering
+	i --- --- libvlc_Ended
+	i --- --- libvlc_Error
+track_type_t
+	i --- --- libvlc_track_audio
+	i --- --- libvlc_track_text
+	i --- --- libvlc_track_unknown
+	i --- --- libvlc_track_video
+video_orient_t
+	i 3.0 --- libvlc_video_orient_top_left
+	i 3.0 --- libvlc_video_orient_top_right
+	i 3.0 --- libvlc_video_orient_bottom_left
+	i 3.0 --- libvlc_video_orient_bottom_right
+	i 3.0 --- libvlc_video_orient_left_top
+	i 3.0 --- libvlc_video_orient_left_bottom
+	i 3.0 --- libvlc_video_orient_right_top
+	i 3.0 --- libvlc_video_orient_right_bottom
+video_projection_t
+	i 3.0 --- libvlc_video_projection_rectangular
+	i 3.0 --- libvlc_video_projection_equirectangular
+	i 3.0 --- libvlc_video_projection_cubemap_layout_standard
+media_type_t
+	i 3.0 --- libvlc_media_type_unknown
+	i 3.0 --- libvlc_media_type_file
+	i 3.0 --- libvlc_media_type_directory
+	i 3.0 --- libvlc_media_type_disc
+	i 3.0 --- libvlc_media_type_stream
+	i 3.0 --- libvlc_media_type_playlist
+media_parse_flag_t
+	i 3.0 --- libvlc_media_parse_local
+	i 3.0 --- libvlc_media_parse_network
+	i 3.0 --- libvlc_media_fetch_local
+	i 3.0 --- libvlc_media_fetch_network
+	i 3.0 --- libvlc_media_do_interact
+media_parsed_status_t
+	i 3.0 --- libvlc_media_parsed_status_skipped
+	i 3.0 --- libvlc_media_parsed_status_failed
+	i 3.0 --- libvlc_media_parsed_status_timeout
+	i 3.0 --- libvlc_media_parsed_status_done
+media_slave_type_t
+	i 3.0 --- libvlc_media_slave_type_subtitle
+	i 3.0 --- libvlc_media_slave_type_audio
+meta_t
+	i 2.2 --- libvlc_meta_Actors
+	i --- --- libvlc_meta_Album
+	i 3.0 --- libvlc_meta_AlbumArtist
+	i --- --- libvlc_meta_Artist
+	i --- --- libvlc_meta_ArtworkURL
+	i --- --- libvlc_meta_Copyright
+	i --- --- libvlc_meta_Date
+	i --- --- libvlc_meta_Description
+	i 2.2 --- libvlc_meta_Director
+	i 3.0 --- libvlc_meta_DiscNumber
+	i 3.0 --- libvlc_meta_DiscTotal
+	i --- --- libvlc_meta_EncodedBy
+	i 2.2 --- libvlc_meta_Episode
+	i --- --- libvlc_meta_Genre
+	i --- --- libvlc_meta_Language
+	i --- --- libvlc_meta_NowPlaying
+	i --- --- libvlc_meta_Publisher
+	i --- --- libvlc_meta_Rating
+	i 2.2 --- libvlc_meta_Season
+	i --- --- libvlc_meta_Setting
+	i 2.2 --- libvlc_meta_ShowName
+	i --- --- libvlc_meta_Title
+	i --- --- libvlc_meta_TrackID
+	i --- --- libvlc_meta_TrackNumber
+	i 2.2 --- libvlc_meta_TrackTotal
+	i --- --- libvlc_meta_URL
+log_level_t
+	i 2.1 --- LIBVLC_DEBUG
+	i 2.1 --- LIBVLC_NOTICE
+	i 2.1 --- LIBVLC_WARNING
+	i 2.1 --- LIBVLC_ERROR
+position_t
+	i 2.2 --- libvlc_position_disable
+	i 2.2 --- libvlc_position_center
+	i 2.2 --- libvlc_position_left
+	i 2.2 --- libvlc_position_right
+	i 2.2 --- libvlc_position_top
+	i 2.2 --- libvlc_position_top_left
+	i 2.2 --- libvlc_position_top_right
+	i 2.2 --- libvlc_position_bottom
+	i 2.2 --- libvlc_position_bottom_left
+	i 2.2 --- libvlc_position_bottom_right

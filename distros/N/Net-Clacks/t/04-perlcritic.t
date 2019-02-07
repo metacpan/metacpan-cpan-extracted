@@ -26,7 +26,7 @@ my $tests = 0;
 my @fnames;
 foreach my $module (@modules) {
     next if($module =~ /Cache::Memcached/);
-    next if($module =~ /Maplat::Server/);
+    next if($module =~ /PageCamel::Server/);
     next if($module =~ /WSockFrame/);
     my $fname = 'lib/' . $module . '.pm';
     $fname =~ s/\:\:/\//go;

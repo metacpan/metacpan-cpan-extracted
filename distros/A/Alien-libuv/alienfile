@@ -13,7 +13,7 @@ share {
     meta->prop->{env}->{LIBTOOLIZE} = 'libtoolize' if $^O eq 'darwin';
 
     plugin Download => (
-        url     => 'https://dist.libuv.org/dist/v1.24.1',
+        url     => 'https://dist.libuv.org/dist/v1.25.0',
         version => qr/^libuv-v([0-9\.]+)\.tar\.gz$/,
     );
 
@@ -41,9 +41,10 @@ share {
 
         meta->after_hook(gather_share => sub {
             my $build= shift;
+            my $ver = '0x0601'; # win7+ compat
             my $flags = '-DWIN32 -D_WIN32';
             $flags .= ' -DWIN64 -D_WIN64' if $bits == 64;
-
+            $flags .= " -D_WIN32_WINNT=$ver -DWINVER=$ver";
             $build->runtime_prop->{$_} .= " $flags" for qw( cflags cflags_static );
             # on windows, we need the following libraries to be included. MinGW can't pull these
             # from source on windows, so we add the equivalent to these pragma comments

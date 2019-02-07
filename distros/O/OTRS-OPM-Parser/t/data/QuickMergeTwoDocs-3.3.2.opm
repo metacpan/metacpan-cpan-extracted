@@ -10,12 +10,13 @@
     <Vendor>Perl-Services.de</Vendor>
     <URL>http://www.perl-services.de/</URL>
     <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
-    <Description Lang="en">A module to merge tickets more quickly.</Description>
     <Description Lang="de">Ein Modul, mit dem Tickets schneller/einfacher zusammengefasst werden können.</Description>
+    <Description Lang="en">A module to merge tickets more quickly.</Description>
     <PackageRequired Version="0.0.1">TestPackage</PackageRequired>
     <PackageRequired Version="1.2.4">LocalPackage</PackageRequired>
     <ModuleRequired Version="4.32">Mojolicious</ModuleRequired>
     <Filelist>
+        <File Permission="644" Location="Kernel/Config/Files/QuickMerge.xml"></File>
         <File Permission="644" Location="Kernel/Config/Files/QuickMerge.xml" Encode="Base64">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8b3Ryc19jb25maWcg
 dmVyc2lvbj0iMS4wIiBpbml0PSJBcHBsaWNhdGlvbiI+CiAgICA8Q1ZTPiRJZDogUXVpY2tNZXJn
 ZS54bWwsdiAxLjEuMS4xIDIwMTEvMDQvMTUgMDc6NDk6NTggcmIgRXhwICQ8L0NWUz4KICAgIDxD
@@ -105,6 +106,26 @@ LCBhbiBBSkFYIGNhbGwgaXMgc2VudCB0byBtZXJnZSBhbGwgdGlja2V0cyBpbnRvIHRoZSBvbGRl
 c3Qgc2VsZWN0ZWQgdGlja2V0LgoK
 </File>
         <File Permission="644" Location="doc/de/QuickMerge.pod" Encode="Base64">PWhlYWQxIE5BTUUKClF1aWNrTWVyZ2UKCj1oZWFkMSBERVNDUklQVElPTgoKV2hlbiB5b3UgaGF2
+ZSB0byBtZXJnZSB0aWNrZXRzIHF1aXRlIG9mdGVuIGJlY2F1c2UgeW91ciBjbGllbnRzIGRvIG5v
+dCByZXBseSB0byB5b3VyIG1haWxzIG9yIG1hbnkgc2ltaWxhciB0aWNrZXQgdGhhdCBiZWxvbmcg
+dG9nZXRoZXIgYXJlIGNyZWF0ZWQsIHRoZW4gdGhpcyBhZGQgb24gbWlnaHQgYmUgaW50ZXJlc3Rp
+bmcgdG8geW91LgoKSW4gdGhlIHRpY2tldCBvdmVydmlld3MgKGUuZy4gc3RhdHVzIHZpZXcgb3Ig
+cXVldWUgdmlldykgeW91IGNhbiB0aWNrIHRoZSBjaGVja2JveGVzIG9mIHRoZSB0aWNrZXRzIHlv
+dSB3YW50IHRvIG1lcmdlLiBXaGVuIHlvdSBjbGljayBvbiB0aGUgIlF1aWNrIE1lcmdlIiBsaW5r
+LCBhbiBBSkFYIGNhbGwgaXMgc2VudCB0byBtZXJnZSBhbGwgdGlja2V0cyBpbnRvIHRoZSBvbGRl
+c3Qgc2VsZWN0ZWQgdGlja2V0LgoK
+</File>
+        <File Permission="644" Location="doc/en/QuickMerge.pdf" Encode="Base64">PWhlYWQxIE5BTUUKClF1aWNrTWVyZ2UKCj1oZWFkMSBERVNDUklQVElPTgoKV2hlbiB5b3UgaGF2
+ZSB0byBtZXJnZSB0aWNrZXRzIHF1aXRlIG9mdGVuIGJlY2F1c2UgeW91ciBjbGllbnRzIGRvIG5v
+dCByZXBseSB0byB5b3VyIG1haWxzIG9yIG1hbnkgc2ltaWxhciB0aWNrZXQgdGhhdCBiZWxvbmcg
+dG9nZXRoZXIgYXJlIGNyZWF0ZWQsIHRoZW4gdGhpcyBhZGQgb24gbWlnaHQgYmUgaW50ZXJlc3Rp
+bmcgdG8geW91LgoKSW4gdGhlIHRpY2tldCBvdmVydmlld3MgKGUuZy4gc3RhdHVzIHZpZXcgb3Ig
+cXVldWUgdmlldykgeW91IGNhbiB0aWNrIHRoZSBjaGVja2JveGVzIG9mIHRoZSB0aWNrZXRzIHlv
+dSB3YW50IHRvIG1lcmdlLiBXaGVuIHlvdSBjbGljayBvbiB0aGUgIlF1aWNrIE1lcmdlIiBsaW5r
+LCBhbiBBSkFYIGNhbGwgaXMgc2VudCB0byBtZXJnZSBhbGwgdGlja2V0cyBpbnRvIHRoZSBvbGRl
+c3Qgc2VsZWN0ZWQgdGlja2V0LgoK
+</File>
+        <File Permission="644" Location="doc/en/QuickMerge.anything" Encode="anything">PWhlYWQxIE5BTUUKClF1aWNrTWVyZ2UKCj1oZWFkMSBERVNDUklQVElPTgoKV2hlbiB5b3UgaGF2
 ZSB0byBtZXJnZSB0aWNrZXRzIHF1aXRlIG9mdGVuIGJlY2F1c2UgeW91ciBjbGllbnRzIGRvIG5v
 dCByZXBseSB0byB5b3VyIG1haWxzIG9yIG1hbnkgc2ltaWxhciB0aWNrZXQgdGhhdCBiZWxvbmcg
 dG9nZXRoZXIgYXJlIGNyZWF0ZWQsIHRoZW4gdGhpcyBhZGQgb24gbWlnaHQgYmUgaW50ZXJlc3Rp

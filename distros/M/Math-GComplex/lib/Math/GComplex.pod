@@ -6,7 +6,7 @@ Math::GComplex - Generic complex number library.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -48,8 +48,8 @@ The following functions are exportable:
         log logn exp pow pown sqrt cbrt root
 
     :misc
-        cplx abs acmp sgn conj norm inv
-        real imag reals floor ceil round
+        cplx polar abs acmp sgn conj norm
+        inv real imag reals floor ceil round
 
 Multiple functions can be exported as:
 
@@ -111,96 +111,96 @@ This section describes all the basic operations provided by this module.
 
 =head2 add
 
-    $x + $y
-    $x->add($y)
+    my $z = $x + $y;
+    my $z = $x->add($y);
 
-Addition of C<$x> and C<$y>, defined as:
+Addition of C<x> and C<y>, defined as:
 
     (a + b*i) + (x + y*i) = (a + x) + (b + y)*i
 
 =head2 sub
 
-    $x - $y
-    $x->sub($y)
+    my $z = $x - $y;
+    my $z = $x->sub($y);
 
-Subtraction of C<$y> from C<$x>, defined as:
+Subtraction of C<y> from C<x>, defined as:
 
     (a + b*i) - (x + y*i) = (a - x) + (b - y)*i
 
 =head2 mul
 
-    $x * $y
-    $x->mul($y)
+    my $z = $x * $y;
+    my $z = $x->mul($y);
 
-Multiplication of C<$x> and C<$y>, defined as:
+Multiplication of C<x> and C<y>, defined as:
 
-    (a + b*i) * (x + y*i) = i*(a*y + b*x) + a*x - b*y
+    (a + b*i) * (x + y*i) = (a*x - b*y) + (a*y + b*x)*i
 
 =head2 div
 
-    $x / $y
-    $x->div($y)
+    my $z = $x / $y;
+    my $z = $x->div($y);
 
-Division of C<$x> by C<$y>, defined as:
+Division of C<x> by C<y>, defined as:
 
     (a + b*i) / (x + y*i) = (a*x + b*y)/(x^2 + y^2) + (b*x - a*y)/(x^2 + y^2)*i
 
 =head2 mod
 
-    $x % $y
-    $x->mod($y)
+    my $z = $x % $y;
+    my $z = $x->mod($y);
 
-Remainder of C<$x> when divided by C<$y>, defined as:
+Remainder of C<x> when divided by C<y>, defined as:
 
     mod(a, b) = a - b * floor(a/b)
 
 =head2 neg
 
-    -$x
-    $x->neg
+    my $z = -$x;
+    my $z = $x->neg;
 
-Additive inverse of C<$x>, defined as:
+Additive inverse of C<x>, defined as:
 
     neg(a + b*i) = -a - b*i
 
 =head2 conj
 
-    ~$x
-    $x->conj
+    my $z = ~$x;
+    my $z = $x->conj;
 
-Complex conjugate of C<$x>, defined as:
+Complex conjugate of C<x>, defined as:
 
     conj(a + b*i) = a - b*i
 
 =head2 inv
 
-    $x->inv
+    my $z = $x->inv;
 
-Multiplicative inverse of C<$x>, defined as:
+Multiplicative inverse of C<x>, defined as:
 
     inv(x) = 1/x
 
 =head2 norm
 
-    $x->norm
+    my $z = $x->norm;
 
-Normalized value of C<$x>, defined as:
+Normalized value of C<x>, defined as:
 
     norm(a + b*i) = a^2 + b^2
 
 =head2 abs
 
-    $x->abs
+    my $z = $x->abs;
 
-Absolute value of C<$x>, defined as:
+Absolute value of C<x>, defined as:
 
     abs(a + b*i) = sqrt(a^2 + b^2)
 
 =head2 sgn
 
-    $x->sgn
+    my $z = $x->sgn;
 
-The sign of C<$x>, defined as:
+The sign of C<x>, defined as:
 
     sgn(x) = x / abs(x)
 
@@ -210,60 +210,60 @@ This section describes the special mathematical functions provided by this modul
 
 =head2 log
 
-    log($x)
-    $x->log
+    my $z = log($x);
+    my $z = $x->log;
 
-Natural logarithm of C<$x>, defined as:
+Natural logarithm of C<x>, defined as:
 
     log(a + b*i) = log(a^2 + b^2)/2 + atan2(b, a) * i
 
 =head2 logn
 
-    $x->logn($y)
+    my $z = $x->logn($y);
 
-Logarithm of C<$x> to base C<$y>, defined as:
+Logarithm of C<x> to base C<y>, defined as:
 
     logn(a, b) = log(a) / log(b)
 
 =head2 exp
 
-    exp($x)
-    $x->exp
+    my $z = exp($x);
+    my $z = $x->exp;
 
-Natural exponentiation of C<$x>, defined as:
+Natural exponentiation of C<x>, defined as:
 
     exp(a + b*i) = exp(a) * cos(b) + exp(a) * sin(b) * i
 
 =head2 pow
 
-    $x**$y
-    $x->pow($y)
+    my $z = $x**$y;
+    my $z = $x->pow($y);
 
-Raises C<$x> to power C<$y> and returns the result, defined as:
+Raises C<x> to power C<y> and returns the result, defined as:
 
     a^b = exp(log(a) * b)
 
 =head2 pown
 
-    $x->pown($n)
+    my $z = $x->pown($n);
 
-Raises C<$x> to power C<$n> and returns the result, where C<$n> is a native integer.
+Raises C<x> to power C<n>, using the exponentiation by squaring method, and returns the result, where C<n> is a native integer.
 
 =head2 powmod
 
-    $x->powmod($n, $m)
+    my $z = $x->powmod($n, $m);
 
-Modular exponentiation C<$x**$n % $m>, where C<$n> is a native integer.
+Modular exponentiation C<x^n mod m>, where C<n> in an arbitrary large integer.
 
 =head2 gcd
 
-    $n->gcd($k)
+    my $z = $n->gcd($k);
 
 Greatest common divisors of two complex numbers.
 
 =head2 invmod
 
-    $n->invmod($m)
+    my $x = $n->invmod($m);
 
 Modular multiplicative inverse of two complex numbers.
 
@@ -275,26 +275,26 @@ Returns C<undef> when a multiplicative inverse mod C<m> does not exist.
 
 =head2 root
 
-    $x->root($y)
+    my $z = $x->root($y);
 
-Nth root of C<$x>, defined as:
+Nth root of C<x>, defined as:
 
     root(a, b) = exp(log(a) / b)
 
 =head2 sqrt
 
-    sqrt($x)
-    $x->sqrt
+    my $z = sqrt($x);
+    my $z = $x->sqrt;
 
-Square root of C<$x>, defined as:
+Square root of C<x>, defined as:
 
     sqrt(x) = exp(log(x) / 2)
 
 =head2 cbrt
 
-    $x->cbrt
+    my $z = $x->cbrt;
 
-Cube root of C<$x>, defined as:
+Cube root of C<x>, defined as:
 
     cbrt(x) = exp(log(x) / 3)
 
@@ -304,10 +304,10 @@ This section includes all the trigonometric functions provied by Math::GComplex.
 
 =head2 sin / sinh / asin / asinh
 
-    $x->sin
-    $x->sinh
-    $x->asin
-    $x->asinh
+    my $z = $x->sin;
+    my $z = $x->sinh;
+    my $z = $x->asin;
+    my $z = $x->asinh;
 
 Sine, hyperbolic sine, inverse sine and inverse hyperbolic sine.
 
@@ -320,10 +320,10 @@ Defined as:
 
 =head2 cos / cosh / acos / acosh
 
-    $x->cos
-    $x->cosh
-    $x->acos
-    $x->acosh
+    my $z = $x->cos;
+    my $z = $x->cosh;
+    my $z = $x->acos;
+    my $z = $x->acosh;
 
 Cosine, hyperbolic cosine, inverse cosine and inverse hyperbolic cosine.
 
@@ -336,10 +336,10 @@ Defined as:
 
 =head2 tan / tanh / atan / atanh
 
-    $x->tan
-    $x->tanh
-    $x->atan
-    $x->atanh
+    my $z = $x->tan;
+    my $z = $x->tanh;
+    my $z = $x->atan;
+    my $z = $x->atanh;
 
 Tangent, hyperbolic tangent, inverse tangent and inverse hyperbolic tangent.
 
@@ -352,10 +352,10 @@ Defined as:
 
 =head2 cot / coth / acot / acoth
 
-    $x->cot
-    $x->coth
-    $x->acot
-    $x->acoth
+    my $z = $x->cot;
+    my $z = $x->coth;
+    my $z = $x->acot;
+    my $z = $x->acoth;
 
 Cotangent, hyperbolic cotangent, inverse cotangent and inverse hyperbolic cotangent.
 
@@ -368,10 +368,10 @@ Defined as:
 
 =head2 sec / sech / asec / asech
 
-    $x->sec
-    $x->sech
-    $x->asec
-    $x->asech
+    my $z = $x->sec;
+    my $z = $x->sech;
+    my $z = $x->asec;
+    my $z = $x->asech;
 
 Secant, hyperbolic secant, inverse secant and inverse hyperbolic secant.
 
@@ -384,10 +384,10 @@ Defined as:
 
 =head2 csc / csch / acsc / acsch
 
-    $x->csc
-    $x->csch
-    $x->acsc
-    $x->acsch
+    my $z = $x->csc;
+    my $z = $x->csch;
+    my $z = $x->acsc;
+    my $z = $x->acsch;
 
 Cosecant, hyperbolic cosecant, inverse cosecant and inverse hyperbolic cosecant.
 
@@ -400,14 +400,16 @@ Defined as:
 
 =head2 atan2
 
-    atan2($x, $y)
-    $x->atan2($y)
+    my $z = atan2($x, $y);
+    my $z = $x->atan2($y);
 
-The arc tangent of C<$x> and C<$y>, defined as:
+The arc tangent of C<x> and C<y>, defined as:
 
     atan2(a, b) = -i * log((b + a*i) / sqrt(a^2 + b^2))
 
 =head2 deg2rad
+
+    my $rad = $x->deg2rad;
 
 Returns the value of C<x> converted from degrees to radians.
 
@@ -431,7 +433,7 @@ This section describes the various useful methods provided by this module.
 
 =head2 floor
 
-    $x->floor
+    my $z = $x->floor;
 
 The floor function, defined as:
 
@@ -439,7 +441,7 @@ The floor function, defined as:
 
 =head2 ceil
 
-    $x->ceil
+    my $z = $x->ceil;
 
 The ceil function, defined as:
 
@@ -447,19 +449,21 @@ The ceil function, defined as:
 
 =head2 round
 
-    $x->round
+    my $z = $x->round;
 
-Round C<$x> to the nearest Gaussian integer.
+The round function, rounding C<x> to the nearest Gaussian integer, defined as:
 
-The half away from zero tie-breaking method is used, such that:
+    round(a + b*i) = round(a) + round(b)*i
+
+This function uses the half-away-from-zero tie-breaking method, defined as:
 
     round(+0.5) = +1
     round(-0.5) = -1
 
 =head2 int
 
-    int($x)
-    $x->int
+    my $z = int($x);
+    my $z = $x->int;
 
 The integer-truncation function, defined as:
 
@@ -467,8 +471,8 @@ The integer-truncation function, defined as:
 
 =head2 and
 
-    $x & $y
-    $x->and($y)
+    my $z = $x & $y;
+    my $z = $x->and($y);
 
 Bitwise AND-logical operation, defined as:
 
@@ -476,8 +480,8 @@ Bitwise AND-logical operation, defined as:
 
 =head2 or
 
-    $x | $y
-    $x->or($y)
+    my $z = $x | $y;
+    my $z = $x->or($y);
 
 Bitwise OR-logical operation, defined as:
 
@@ -485,8 +489,8 @@ Bitwise OR-logical operation, defined as:
 
 =head2 xor
 
-    $x ^ $y
-    $x->xor($y)
+    my $z = $x ^ $y;
+    my $z = $x->xor($y);
 
 Bitwise XOR-logical operation, defined as:
 
@@ -494,8 +498,8 @@ Bitwise XOR-logical operation, defined as:
 
 =head2 lsft
 
-    $x << $n
-    $x->lsft($n)
+    my $z = $x << $n;
+    my $z = $x->lsft($n);
 
 Bitwise left-shift operation, defined as:
 
@@ -504,8 +508,8 @@ Bitwise left-shift operation, defined as:
 
 =head2 rsft
 
-    $x >> $n
-    $x->rsft($n)
+    my $z = $x >> $n;
+    my $z = $x->rsft($n);
 
 Bitwise right-shift operation, defined as:
 
@@ -514,73 +518,73 @@ Bitwise right-shift operation, defined as:
 
 =head2 real
 
-    $x->real
+    my $re = $x->real;
 
-Return the real part of C<$x>.
+Return the real part of C<x>.
 
 =head2 imag
 
-    $x->imag
+    my $im = $x->imag;
 
-Returns the imaginary part of C<$x>.
+Returns the imaginary part of C<x>.
 
 =head2 reals
 
-    ($real, $imag) = $x->reals
+    my ($re, $im) = $x->reals
 
-Returns the real and the imaginary part of C<$x>, as real numbers.
+Returns the real and the imaginary part of C<x>, as real numbers.
 
 =head1 * Comparisons
 
 =head2 eq
 
-    $x == $y
-    $x->eq($y)
+    my $bool = $x == $y;
+    my $bool = $x->eq($y);
 
-Equality check: returns a true value when C<$x> and C<$y> are equal.
+Equality check: returns a true value when C<x> and C<y> are equal.
 
 =head2 ne
 
-    $x != $y
-    $x->ne($y)
+    my $bool = $x != $y;
+    my $bool = $x->ne($y);
 
-Inequality check: returns a true value when C<$x> and C<$y> are not equal.
+Inequality check: returns a true value when C<x> and C<y> are not equal.
 
 =head2 gt
 
-    $x > $y
-    $x->gt($y)
+    my $bool = $x > $y;
+    my $bool = $x->gt($y);
 
-Returns a true value when C<$x> is greater than C<$y>.
+Returns a true value when C<x> is greater than C<y>.
 
 =head2 ge
 
-    $x >= $y
-    $x->ge($y)
+    my $bool = $x >= $y;
+    my $bool = $x->ge($y);
 
-Returns a true value when C<$x> is equal or greater than C<$y>.
+Returns a true value when C<x> is equal or greater than C<y>.
 
 =head2 lt
 
-    $x < $y
-    $x->lt($y)
+    my $bool = $x < $y;
+    my $bool = $x->lt($y);
 
-Returns a true value when C<$x> is less than C<$y>.
+Returns a true value when C<x> is less than C<y>.
 
 =head2 le
 
-    $x <= $y
-    $x->le($y)
+    my $bool = $x <= $y;
+    my $bool = $x->le($y)
 
-Returns a true value when C<$x> is equal or less than C<$y>.
+Returns a true value when C<x> is equal or less than C<y>.
 
 =head2 cmp
 
-    $x <=> $y
-    $x->cmp($y)
+    my $int = $x <=> $y;
+    my $int = $x->cmp($y);
 
-Compares C<$x> to C<$y> and returns a negative value when C<$x> is less than C<$y>,
-0 when C<$x> and C<$y> are equal, and a positive value when C<$x> is greater than C<$y>.
+Compares C<x> to C<y> and returns a negative value when C<x> is less than C<y>,
+0 when C<x> and C<y> are equal, and a positive value when C<x> is greater than C<y>.
 
 Complex numbers are compared as:
 
@@ -589,31 +593,39 @@ Complex numbers are compared as:
 
 =head2 acmp
 
-    $x->acmp($y)
+    my $int = $x->acmp($y);
 
-Absolute comparison of C<$x> and C<$y>, defined as:
+Absolute comparison of C<x> and C<y>, defined as:
 
     acmp(a, b) = abs(a) <=> abs(b)
 
 =head1 * Conversions
 
+=head2 polar
+
+    my ($rho, $theta) = $x->polar;
+
+Returns the polar form of C<x>, such that:
+
+    x = rho * exp(theta * i)
+
 =head2 boolify
 
-    $x->boolify
+    my $bool = $x->boolify;
 
-Returns a true value when either the real part or the imaginary part of C<$x> is non-zero.
+Returns a true value when either the real part or the imaginary part of C<x> is non-zero.
 
 =head2 numify
 
-    $x->numify
+    my $num = $x->numify;
 
-Returns the real part of C<$x>.
+Returns the real part of C<x>.
 
 =head2 stringify
 
-    $x->stringify
+    my $str = $x->stringify;
 
-Returns a stringification version of C<$x>.
+Returns a stringification version of C<x>.
 
 Example:
 

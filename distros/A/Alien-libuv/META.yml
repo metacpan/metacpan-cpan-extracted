@@ -37,7 +37,7 @@ no_index:
 provides:
   Alien::libuv:
     file: lib/Alien/libuv.pm
-    version: '1.007'
+    version: '1.008'
 requires:
   Alien::Base: '1.00'
   base: '0'
@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/genio/Alien-libuv/issues
   homepage: https://github.com/genio/Alien-libuv
   repository: https://github.com/genio/Alien-libuv.git
-version: '1.007'
+version: '1.008'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -306,7 +306,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.007
+          tag: v1.008
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

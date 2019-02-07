@@ -16,10 +16,10 @@ name: OTRS-OPM-Parser
 provides:
   OTRS::OPM::Parser:
     file: lib/OTRS/OPM/Parser.pm
-    version: '1.01'
+    version: '1.02'
   OTRS::OPM::Parser::Types:
     file: lib/OTRS/OPM/Parser/Types.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   File::Basename: '0'
   File::Spec: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: http://github.com/reneeb/OTRS-OPM-Parser/issues
   homepage: http://github.com/reneeb/OTRS-OPM-Parser
   repository: http://github.com/reneeb/OTRS-OPM-Parser.git
-version: '1.01'
+version: '1.02'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <info@perl-services.de>'

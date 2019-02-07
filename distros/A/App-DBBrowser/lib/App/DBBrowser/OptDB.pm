@@ -283,7 +283,7 @@ sub database_setting {
                         }
                     }
                 }
-                my $prompt = 'Default login data (' . $plugin . '):';
+                my $prompt = 'Default login data (' . $plugin . ')';
                 $sf->__group_readline_db( $db_opt, $section, $items->{$group}, $prompt );
             }
             elsif ( $group eq 'attributes' ) {
@@ -331,7 +331,7 @@ sub __group_readline_db {
     my $trs = Term::Form->new();
     my $new_list = $trs->fill_form(
         $list,
-        { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} }
+        { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
     );
     if ( $new_list ) {
         for my $i ( 0 .. $#$items ) {

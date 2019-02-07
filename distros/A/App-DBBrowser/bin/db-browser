@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.056';
+our $VERSION = '2.057';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.056
+Version 2.057
 
 =cut
 
@@ -747,6 +747,16 @@ Enable write access - use with care.
 
 =back
 
+=head3 Data types
+
+If this option is enabled and a table is created, C<SQL::Type::Guess> is used to detect the data types. These data types
+are then used as default values when the user is asked for the data types.
+
+=head3 Auto increment
+
+Setting I<Auto increment> to a value which is not the empty string enables the option to set an auto increment column
+when creating a table. The value set here is then used as the default name for the auto increment column.
+
 =head2 Output
 
 =head3 Colwidth
@@ -937,19 +947,7 @@ How to decode text files.
 
 =head3 File History
 
-Set how many input file names should be saved. A value of C<0> disables the file history.
-
-=head2 Create Table
-
-=head3 Data type guessing
-
-If this option is enabled and a table is created, C<SQL::Type::Guess> is used to detect the data types. These data types
-are then used as default values when the user is asked for the data types.
-
-=head3 Auto increment
-
-Setting I<Auto increment> to a value which is not the empty string enables the option to set an auto increment column
-when creating a table. The value set here is then used as the default name for the auto increment column.
+Set how many input file names and searched directories should be saved. A value of C<0> disables the history.
 
 =head1 CONFIGURATION FILES
 

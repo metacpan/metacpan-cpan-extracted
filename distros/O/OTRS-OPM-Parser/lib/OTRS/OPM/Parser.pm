@@ -2,7 +2,7 @@ package OTRS::OPM::Parser;
 
 # ABSTRACT: Parser for the .opm file
 
-our $VERSION = 1.01;
+our $VERSION = 1.02;
 
 use Moo;
 use MooX::HandlesVia;
@@ -89,23 +89,21 @@ sub documentation {
             $found_file = $filename;
         }
         
-        next if $lang && $filename !~ m{ \A doc/$lang/ }x;
+        next if $filename !~ m{ \A doc/$lang/ }x;
         
-        if ( $lang && $found_file !~ m{ \A doc/$lang/ }x ) {
+        if ( $found_file !~ m{ \A doc/$lang/ }x ) {
             $doc_file   = $file;
             $found_file = $filename;
         }
         
         next if $type && $filename !~ m{ \A doc/[^/]+/.*\.$type \z }x;
         
-        if ( $type && $found_file !~ m{ \A doc/$lang/ }x ) {
+        if ( $type && $found_file !~ m{ \A doc/[^/]+/.*\.$type \z }x ) {
             $doc_file   = $file;
             $found_file = $filename;
-            
-            if ( !$lang || ( $lang && $found_file !~ m{ \A doc/$lang/ }x ) ) {                
-                last;
-            }
         }
+
+        last if $found_file =~ m{ \A doc/$lang/.*\.$type \z }x;
     }
     
     return $doc_file;
@@ -293,8 +291,6 @@ sub as_sopm {
     
     return $tree->toString;
 }
-
-no Moose;
 
 
 sub _get_xsd {
@@ -821,7 +817,7 @@ OTRS::OPM::Parser - Parser for the .opm file
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 

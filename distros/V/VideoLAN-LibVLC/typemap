@@ -1,0 +1,58 @@
+TYPEMAP
+libvlc_instance_t *      O_LIBVLC
+PerlVLC_vlc_t *          O_LIBVLC_WRAPPER
+libvlc_media_t *         O_LIBVLC_MEDIA
+libvlc_media_player_t *  O_LIBVLC_MEDIA_PLAYER
+PerlVLC_player_t *       O_LIBVLC_MEDIA_PLAYER_WRAPPER
+PerlVLC_picture_t *      O_LIBVLC_PICTURE
+libvlc_log_level         T_INT
+libvlc_time_t            T_INT
+libvlc_position_t        T_INT
+
+INPUT
+O_LIBVLC
+	PerlVLC_vlc_t *inst= PerlVLC_get_instance_mg($arg);
+    if (!inst) croak(\"argument is not a libvlc instance\");
+	$var= inst->instance;
+
+INPUT
+O_LIBVLC_WRAPPER
+	$var= PerlVLC_get_instance_mg($arg);
+    if (!$var) croak(\"argument is not a libvlc instance\");
+
+OUTPUT
+O_LIBVLC
+    $arg = $var? PerlVLC_wrap_instance($var) : &PL_sv_undef;
+
+INPUT
+O_LIBVLC_MEDIA
+    $var = PerlVLC_get_media_mg($arg);
+    if (!$var) croak(\"argument is not a libvlc_media_t\");
+
+OUTPUT
+O_LIBVLC_MEDIA
+    $arg = $var? PerlVLC_wrap_media($var) : &PL_sv_undef;
+
+INPUT
+O_LIBVLC_MEDIA_PLAYER
+	PerlVLC_player_t *mpinfo= PerlVLC_get_media_player_mg($arg);
+    if (!mpinfo) croak(\"argument is not a libvlc_media_player_t\");
+	$var= mpinfo->player;
+
+INPUT
+O_LIBVLC_MEDIA_PLAYER_WRAPPER
+	$var= PerlVLC_get_media_player_mg($arg);
+	if (!$var) croak(\"argument is not a libvlc_media_player_t\");
+
+OUTPUT
+O_LIBVLC_MEDIA_PLAYER
+	$arg = $var? PerlVLC_wrap_media_player($var) : &PL_sv_undef;
+
+INPUT
+O_LIBVLC_PICTURE
+	$var= PerlVLC_get_picture_mg($arg);
+	if (!$var) croak(\"argument is not a PerlVLC_picture_t\");
+
+OUTPUT
+O_LIBVLC_PICTURE
+	$arg = PerlVLC_wrap_picture($var);

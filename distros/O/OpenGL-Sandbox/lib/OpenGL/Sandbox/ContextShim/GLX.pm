@@ -6,8 +6,8 @@ use Scalar::Util 'weaken';
 use OpenGL::Sandbox qw/ glGetString GL_VERSION /;
 use X11::GLX::DWIM;
 
-# ABSTRACT: Subclass of X11::GLX::DWIM to meet contract of OpenGL::Sandbox::make_context
-our $VERSION = '0.042'; # VERSION
+# ABSTRACT: Create OpenGL context with X11::GLX::DWIM
+our $VERSION = '0.100'; # VERSION
 
 our %instances;
 sub new {
@@ -62,35 +62,36 @@ __END__
 
 =head1 NAME
 
-OpenGL::Sandbox::ContextShim::GLX - Subclass of X11::GLX::DWIM to meet contract of OpenGL::Sandbox::make_context
+OpenGL::Sandbox::ContextShim::GLX - Create OpenGL context with X11::GLX::DWIM
 
 =head1 VERSION
 
-version 0.042
+version 0.100
 
 =head1 DESCRIPTION
 
 This class is loaded automatically if needed by L<OpenGL::Sandbox/make_context>.
+It uses L<X11::GLX::DWIM> to create an OpenGL context.
 
-It provides
+=head1 ATTRIBUTES
+
+=head2 glx
+
+The L<X11::GLX::DWIM> object
+
+=head1 METHODS
+
+=head2 Standard ContextShim API:
 
 =over 14
 
 =item new
 
-Accepting all the options of make_context
+Accepting all the options of L<OpenGL::Sandbox/make_context>
 
 =item context_info
 
-=back
-
-It also provides:
-
-=over 14
-
-=item glx
-
-The L<X11::GLX::DWIM> object
+=item swap_buffers
 
 =back
 

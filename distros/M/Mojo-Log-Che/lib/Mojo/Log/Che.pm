@@ -7,6 +7,7 @@ use Mojo::File;
 #~ use Debug::LTrace qw/Mojo::Log::_log/;;
 #~ use Carp::Trace;
 #~ use Encode qw(decode_utf8);
+use Mojo::Util 'encode';
 #~ binmode STDERR, ":utf8";
 
 has paths => sub { {} };
@@ -50,7 +51,7 @@ sub handler {
     return; # Parent way to handle
   }
   
-  $handler = Mojo::File->new($file)->open('>>:encoding(UTF-8)')
+  $handler = Mojo::File->new($file)->open('>>')#:encoding(UTF-8)
     or croak "Cant create log handler for [$file]";
   
   $self->handlers->{$level} = $handler;
@@ -63,20 +64,20 @@ sub append {
 
   return unless $handle ||= $self->handle;
   flock $handle, LOCK_EX;
-  $handle->print( $msg)
+  $handle->print(encode('UTF-8', $msg))#
     or croak "Can't write to log: $!";
   flock $handle, LOCK_UN;
 }
 
 my @mon = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-my @wday = qw(Sn Mn Ts Wn Th Fr St);
+#~ my @wday = qw(Sn Mn Ts Wn Th Fr St);
 sub _format {
   my ($time, $level) = (shift, shift);
   $level = '['.($LEVEL{$level} ? ($level =~ /^(\w)/)[0] : $level) . '] ' #"[$level] "
     if $level //= '';
   
   my ($sec,$min,$hour,$mday,$mon,$year,$wday) = localtime($time);
-  $time = sprintf "%s %s %s %s:%s:%s", $wday[$wday], $mday, map(length == 1 ? "0$_" : $_, $mon[$mon], $hour, $min, $sec);
+  $time = sprintf "%s %s %s:%s:%s", $mday, map(length == 1 ? "0$_" : $_, $mon[$mon], $hour, $min, $sec);#$wday[$wday], 
   
   #~ my $trace =  '['. join(" ", @{_trace()}[1..2]) .']';
   
@@ -129,11 +130,11 @@ sub AUTOLOAD {
   Carp::croak "Undefined log level(subroutine) &${package}::$method called"
     unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
 
-  return $self->_log( $method => @_ );
+  return $self->_log(@_ , $method);
   
 }
 
-our $VERSION = '0.07';
+our $VERSION = '0.8121';# as to Mojolicious version/10+<child minor>
 
 =encoding utf8
 
@@ -145,7 +146,7 @@ I<¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !>
 
 =head1 VERSION
 
-0.07
+0.8121 (up to Mojolicious version/10+C<child minor>)
 
 =head1 NAME
 

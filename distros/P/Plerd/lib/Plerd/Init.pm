@@ -24,27 +24,37 @@ sub initialize ( $$ ) {
 
     if (-e $dir) {
         unless (-d $dir) {
-            push @messages,
-                "$dir exists, but it's not a directory!\nExiting.";
+            return [
+                @messages,
+                "$dir exists, but it's not a directory!\nExiting."
+            ];
         }
         if ( $dir->children ) {
-            push @messages,
+            return [
+                @messages,
                 "$dir exists, but it's not empty!\nExiting."
+            ];
         }
     }
     else {
-        mkdir $dir or (push @messages, "Cannot create $dir: $!");
-        my $success = populate_directory( $dir, \@messages );
-
-        if ( $success ) {
-            my $config_file = Path::Class::File->new( $dir, 'plerd.conf' );
-            push @messages,
-                "I have created and populated a new Plerd working directory at "
-                . "$dir. Your next step involves updating the configuration file "
-                . "at $config_file.\n"
-                . "For full documentation, links to mailing lists, and other stuff, "
-                . "please visit http://plerd.jmac.org/. Enjoy!";
+        unless (mkdir $dir) {
+            return [
+                @messages,
+                "Cannot create $dir: $!"
+            ];
         }
+    }
+
+    my $success = populate_directory( $dir, \@messages );
+
+    if ( $success ) {
+        my $config_file = Path::Class::File->new( $dir, 'plerd.conf' );
+        push @messages,
+            "I have created and populated a new Plerd working directory at "
+            . "$dir. Your next step involves updating the configuration file "
+            . "at $config_file.\n"
+            . "For full documentation, links to mailing lists, and other stuff, "
+            . "please visit http://plerd.jmac.org/. Enjoy!";
     }
     return \@messages;
 }
@@ -60,7 +70,7 @@ sub populate_directory ( $$ ) {
             mkdir $subdir or die "Can't create subdir $subdir: $!";
         }
 
-        foreach ( qw( archive atom jsonfeed post wrapper ) ) {
+        foreach ( qw( archive atom jsonfeed post wrapper tags ) ) {
             my $template = Path::Class::File->new(
                 $dir, 'templates', "$_.tt",
             );
@@ -187,6 +197,14 @@ post => <<EOF,
     <data class="u-url u-uid" value="[% post.uri %]"></data>
 
     <div class="body e-content">[% post.body %]</div>
+    [% IF post.tags.size > 0 %]
+        <ul class="list-inline tag-list">
+            <li class="list-inline-item">Tags:</li>
+            [% FOREACH tag = post.tags.sort %]
+                <li class="list-inline-item p-category"><a href="[% plerd.tag_uri(tag) %]">[% tag %]</a></li>
+            [% END %]
+        </ul>
+    [% END %]
 </div>
 [% END %]
 
@@ -489,6 +507,35 @@ image_alt: "My Cool Blog's logo -- a photograph of Fido, the author's gray tabby
 # database_path:    /opt/plerd/db
 # run_path:         /tmp/plerd/run
 # log_path:         /var/log/plerd/
+EOF
+tags => <<EOF,
+[% WRAPPER wrapper.tt title = 'Tags' %]
+
+[%   IF is_tags_index_page %]
+<section>
+    <h1>All Tags</h1>
+
+    <ul>
+    [% FOREACH tag = tags.keys.sort %]
+        <li><a href="[% plerd.tag_uri(tag) %]">[% tag %]</a> ([% tags.\$tag.size %])</li>
+    [% END %]
+    </ul>
+</section>
+[%   ELSE %]
+
+    [% FOREACH tag = tags.keys %]
+      <h1>Tag: [% tag %]</h1>
+      <ul>
+        [% FOREACH post = tags.\$tag %]
+            <li><a href="[% post.uri %]">[% post.title %]</a></li>
+        [% END %]
+      </ul>
+    [% END %]
+
+[%   END %]
+
+[% END %]
+
 EOF
 );
 return %file_content;

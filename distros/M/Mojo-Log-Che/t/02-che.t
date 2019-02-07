@@ -6,7 +6,7 @@ use Mojo::Log::Che;
 use Mojo::Util qw'decode';
 #~ binmode STDERR, ":utf8";
 
-my $time_re = qr/\w{2} \d{1,2} \w{3} \d{2}:\d{2}:\d{2}/;
+my $time_re = qr/\d{1,2} \w{3} \d{2}:\d{2}:\d{2}/;#\w{2} 
 my $line_re = qr/\d+〉t\/02-che.t:\d+/;
 
 # Logging to folder
@@ -18,8 +18,10 @@ $log->debug('Does not work');
 $log->foo('Foo level');
 is scalar keys %{$log->handlers}, 3, 'right 3 handlers';
 my $ls = `ls $dir`;
-like $ls, qr/error\.log/, 'right file ';
-like $ls, qr/fatal\.log/, 'right file ';
+#~ warn "[$ls]";
+like $ls, qr/error\.log/, 'exists error.log file ';
+like $ls, qr/fatal\.log/, 'exists fatal.log file ';
+unlike $ls, qr/debug\.log/, 'exists debug.log file ';
 like $ls, qr/foo\.log/, 'right file ';
 undef $log;
 my $content_err = decode 'UTF-8', path("$dir/error.log")->slurp;
@@ -29,7 +31,7 @@ like $content_err,   qr/$time_re $line_re Just works/,        'right error messa
 like $content_i,   qr/$time_re $line_re I ♥ Mojolicious/, 'right info message';
 like $content_foo,   qr/$time_re $line_re Foo level/,        'right foo message';
 eval {path("$dir/debug.log")->slurp};
-#~ like $@, qr/No such file or directory/, 'no debug file';
+like $@, qr/No such file or directory/, 'no debug file';
 is defined $@, 1, 'no debug file';
 undef $dir;
 
@@ -46,11 +48,11 @@ like $ls, qr/fatal\.log/, 'right file ';
 like $ls, qr/bar\.log/, 'right file ';
 undef $log;
 $content_err = decode 'UTF-8', path("$dir/err.log")->slurp;
-$content_foo = decode 'UTF-8', path("$dir/bar.log")->slurp;
+my $content_bar = decode 'UTF-8', path("$dir/bar.log")->slurp;
 $content_i = decode 'UTF-8', path("$dir/fatal.log")->slurp;
 like $content_i,   qr/$time_re $line_re I ♥ Mojolicious/, 'right fatal message';
 like $content_err,   qr/$time_re $line_re Just works/,        'right error message';
-like $content_foo,   qr/$time_re $line_re Foo level/,        'right foo message';
+like $content_bar,   qr/$time_re $line_re Foo level/,        'right foo message';
 undef $dir;
 
 # Logging to file + have default "paths" for levels
@@ -84,12 +86,12 @@ is scalar keys %{$log->handlers}, 1, 'right 1 handlers';
 undef $log;
 $content = decode 'UTF-8', path($file)->slurp;
 like $content,   qr/$time_re \[f\] $line_re I ♥ Mojolicious/, 'right fatal message';
-#~ like $content, qr/$time_re \[debug\] Does not work/,     'no debug message';
+unlike $content, qr/Does not work/,     'no debug message';
 like $content,   qr/$time_re \[foo\] $line_re Foo level/,        'right foo level';
 $content = decode 'UTF-8', path($file2)->slurp;
 like $content,   qr/$time_re $line_re Just works/,        'right error message';
 eval {path($file3)->slurp};
-#~ like $@, qr/No such file or directory/, 'no debug file';
+like $@, qr/No such file or directory/, 'no debug file';
 is defined $@, 1, 'no debug file';
 undef $dir;
 

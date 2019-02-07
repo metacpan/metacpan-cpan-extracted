@@ -38,7 +38,7 @@ sub input_filter {
     my $split_table      = 'Split_Table';
     my $split_col        = 'Split_Col';
     my $replace          = 'Search_Replace';
-    my $various          = '>';
+    my $various          = '&&';
     my $reset            = 'Reset';
     $sf->{empty_to_null} = $default_e2n;
     my $old_idx = 0;
@@ -104,7 +104,7 @@ sub input_filter {
             VARIOUS: while ( 1 ) {
                 $ax->print_sql( $sql );
                 my @pre = ( undef );
-                my $choices = [ @pre, $cols_to_rows, $merge_rows, $split_table, $split_col, $replace ];
+                my $choices = [ @pre, $cols_to_rows, $split_table, $merge_rows, $split_col, $replace ];
                  $ENV{TC_RESET_AUTO_UP} = 0;
                 # Choose
                 my $idx_v = $stmt_h->choose(
@@ -182,7 +182,7 @@ sub __choose_columns {
     my $col_idx = choose_a_subset(
         \@{$aoa->[0]},
         { back => '<<', confirm => $sf->{i}{ok}, index => 1, mark => $mark, layout => 0,
-            name => 'Cols: ', clear_screen => 0, mouse => $sf->{o}{table}{mouse} } #
+            name => 'Cols: ', clear_screen => 0, mouse => $sf->{o}{table}{mouse}, order => 0 } # order
     );
     if ( defined $col_idx && @$col_idx ) {
         $sql->{insert_into_args} = [ map { [ @{$_}[@$col_idx] ] } @$aoa ];

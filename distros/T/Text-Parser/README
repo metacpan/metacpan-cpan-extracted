@@ -1,7 +1,7 @@
 This archive contains the distribution Text-Parser,
-version 0.803:
+version 0.900:
 
-  Bare text parser, simplifies text parsing.
+  Simplifies text parsing. Extensible to parse various grammars.
 
 This software is copyright (c) 2018-2019 by Balaji Ramasubramanian.
 

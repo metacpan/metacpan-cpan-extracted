@@ -4,16 +4,16 @@ use Carp;
 use Try::Tiny;
 use OpenGL::Sandbox qw(
 	GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_TEXTURE_MAG_FILTER GL_TEXTURE_WRAP_S GL_TEXTURE_WRAP_T
-	glTexParameteri glBindTexture
+	GL_UNSIGNED_BYTE GL_RGB GL_RGBA GL_BGR GL_BGRA
+	glTexParameteri glBindTexture gen_textures delete_textures
 );
 use OpenGL::Sandbox::MMap;
 
 # ABSTRACT: Wrapper object for OpenGL texture
-BEGIN {
-our $VERSION = '0.042'; # VERSION
-}
+our $VERSION = '0.100'; # VERSION
 
 
+has name       => ( is => 'rw' );
 has filename   => ( is => 'rw' );
 has loader     => ( is => 'rw' );
 has loaded     => ( is => 'rw' );
@@ -22,7 +22,7 @@ has src_height => ( is => 'rw' );
 has tx_id      => ( is => 'rw', lazy => 1, builder => 1, predicate => 1 );
 has width      => ( is => 'rwp' );
 has height     => ( is => 'rwp' );
-has pow2_size  => ( is => 'rw' );
+has internal_format => ( is => 'rw' );
 has has_alpha  => ( is => 'rwp' );
 has mipmap     => ( is => 'rwp' );
 has min_filter => ( is => 'rw', trigger => sub { shift->_maybe_apply_gl_texparam(GL_TEXTURE_MIN_FILTER, shift) } );
@@ -40,6 +40,7 @@ sub _maybe_apply_gl_texparam {
 }
 
 
+sub _build_tx_id { gen_textures(1) }
 sub bind {
 	my ($self, $target)= @_;
 	glBindTexture($target // GL_TEXTURE_2D, $self->tx_id);
@@ -49,50 +50,99 @@ sub bind {
 	$self;
 }
 
+sub DESTROY {
+	my $self= shift;
+	delete_textures(delete $self->{tx_id}) if $self->has_tx_id;
+}
+
 
 sub load {
-	my ($self, $fname)= @_;
-	$fname //= $self->filename;
-	my $loader= $self->loader // do {
-		my ($extension)= ($fname =~ /\.(\w+)$/)
-			or croak "No file extension: \"$fname\"";
-		my $method= "load_$extension";
-		$self->can($method)
-			or croak "Can't load file of type $extension";
-	};
-	$self->$loader($fname);
+	my $self= shift;
+	if (@_ == 0 || (@_ == 1 && ref($_[0]) ne 'HASH')) {
+		my $fname= shift // $self->filename;
+		my $loader= $self->loader // do {
+			defined $fname && length $fname
+				or croak "Can't automatically load texture ".$self->name." without loader or filename";
+			my ($extension)= ($fname =~ /\.(\w+)$/)
+				or croak "Can't determine loader without file extension: \"$fname\"";
+			my $method= "load_$extension";
+			$self->can($method)
+				or croak "Can't load file of type $extension";
+		};
+		$self->$loader($fname);
+	}
+	else {
+		my %opts= @_ == 1? %{ $_[0] } : @_;
+		$self->internal_format(delete $opts{internal_format}) if defined $opts{internal_format};
+		$self->target(delete $opts{target}) if defined $opts{target};
+		my $level= delete $opts{level} // 0;
+		my $xoffset= delete $opts{xoffset} // 0;
+		my $yoffset= delete $opts{yoffset} // 0;
+		my $width= delete $opts{width} // $self->width - $xoffset;
+		my $height= delete $opts{height} // $self->height - $yoffset;
+		defined $opts{format} || !defined $opts{data} or croak("'format' is required");
+		my $format= delete $opts{format} // GL_RGB;
+		my $type= delete $opts{type} // GL_UNSIGNED_BYTE;
+		my $data= delete $opts{data};
+		my $pitch= delete $opts{pitch} // 0;
+		carp "Unknown options to ->load(): ".join(', ', keys %opts)
+			if keys %opts;
+		$self->tx_id; # make sure initialized
+		$self->OpenGL::Sandbox::_texture_load($level, $xoffset, $yoffset, $width, $height, $format, $type, $data, $pitch);
+		# that call automatically sets ->width and ->height and ->internal_format and ->loaded(1)
+	}
+	$self;
 }
 
 
 sub load_rgb {
 	my ($self, $fname)= @_;
 	my $mmap= OpenGL::Sandbox::MMap->new($fname);
-	$self->_load_rgb_square($mmap, 0);
-	$self->loaded(1);
+	my ($dim, $has_alpha)= _from_pow2_filesize($fname, $mmap);
+	$self->tx_id; # make sure it is built
+	$self->OpenGL::Sandbox::_texture_load(0, 0, 0, $dim, $dim, $has_alpha? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, $mmap, 0);
 	return $self;
 }
 sub load_bgr {
 	my ($self, $fname)= @_;
 	my $mmap= OpenGL::Sandbox::MMap->new($fname);
-	$self->_load_rgb_square($mmap, 1);
-	$self->loaded(1);
+	my ($dim, $has_alpha)= _from_pow2_filesize($fname, $mmap);
+	$self->tx_id; # make sure it is built
+	$self->OpenGL::Sandbox::_texture_load(0, 0, 0, $dim, $dim, $has_alpha? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, $mmap, 0);
 	return $self;
+}
+
+sub _from_pow2_filesize {
+	my ($fname, $mmap)= @_;
+	my $size= length $$mmap;
+	my $dim= 1;
+	if ($size) {
+		# Count size's powers of 4, in dim
+		while (($size & 3) == 0) {
+			$size >>= 2;
+			$dim <<= 1;
+		}
+	}
+	# If RGBA, $size == 1, else if RGB, $size == 3, else not a power of 2
+	return $size == 1? ( $dim >> 1, 1 )
+		: $size == 3? ( $dim, 0 )
+		: croak("File $fname length $size is not a power of 2 square of pixels");
 }
 
 
 sub load_png {
 	my ($self, $fname)= @_;
 	my $use_bgr= 1; # TODO: check OpenGL for optimal format
-	my ($imgref, $w, $h)= _load_png_data_and_rescale($fname, $use_bgr);
-	$self->_load_rgb_square($imgref, $use_bgr);
+	$self->tx_id; # make sure it is built
+	my ($w, $h, $fmt, $dataref)= _load_png_data($fname);
+	$self->OpenGL::Sandbox::_texture_load(0, 0, 0, $w, $h, $fmt, GL_UNSIGNED_BYTE, $dataref, 0);
 	$self->src_width($w);
 	$self->src_height($h);
-	$self->loaded(1);
 	return $self;
 }
 
-sub _load_png_data_and_rescale {
-	my ($fname, $use_bgr)= @_;
+sub _load_png_data {
+	my ($fname)= @_;
 	require Image::PNG::Libpng;
 	
 	# Load PNG format, or die
@@ -111,17 +161,13 @@ sub _load_png_data_and_rescale {
 	$bit_depth == 8
 		or croak "$fname must be encoded with 8-bit color channels";
 	
-	# Get the row data and scale it to a square if needed.
 	# PNG data is stored top-to-bottom, but OpenGL considers 0,0 the lower left corner.
 	my $dataref= \join('', reverse @{ $png->get_rows });
 	# Should have exactly the number of bytes for pixels, no extra padding or alignment
 	length($$dataref) == ($has_alpha? 4 : 3) * $width * $height
 		or croak sprintf "$fname does not contain the expected number of data bytes (%d != %d * %d * %d)",
 			length($$dataref), $has_alpha? 4:3, $width, $height;
-	# Result is a ref to a scalar, to avoid copying
-	$dataref= _rescale_to_pow2_square($width, $height, $has_alpha, $use_bgr? 1 : 0, $dataref)
-		unless $width == $height && $width == _round_up_pow2($width);
-	return $dataref, $width, $height;
+	return $width, $height, ($has_alpha? GL_RGBA : GL_RGB), $dataref;
 }
 
 
@@ -143,20 +189,13 @@ sub render {
 
 sub convert_png {
 	my ($src, $dst)= @_;
-	my $use_bgr= $dst =~ /\.bgr$/? 1 : 0;
-	my ($dataref)= _load_png_data_and_rescale($src, $use_bgr);
+	my ($w, $h, $fmt, $dataref)= _load_png_data($src);
+	OpenGL::Sandbox::_img_rgb_to_bgr($dataref, ($fmt == GL_RGBA? 1 : 0)) if $dst =~ /\.bgr$/;
 	open my $dst_fh, '>', $dst or croak "open($dst): $!";
 	binmode $dst_fh;
 	print $dst_fh $$dataref;
 	close $dst_fh or croak "close($dst): $!";
 }
-
-# Pull in the C file and make sure it has all the C libs available
-use OpenGL::Sandbox::Texture::Inline
-	C => do { my $x= __FILE__; $x =~ s|\.pm|\.c|; Cwd::abs_path($x) },
-	INC => '-I'.do{ my $x= __FILE__; $x =~ s|/[^/]+$|/|; Cwd::abs_path($x) }.' -I/usr/include/ffmpeg',
-	LIBS => '-lGL -lswscale',
-	CCFLAGSEX => '-Wall -g3 -Os';
 
 1;
 
@@ -172,9 +211,13 @@ OpenGL::Sandbox::Texture - Wrapper object for OpenGL texture
 
 =head1 VERSION
 
-version 0.042
+version 0.100
 
 =head1 ATTRIBUTES
+
+=head2 name
+
+Human-readable name of this texture (not GL's integer "name")
 
 =head2 filename
 
@@ -216,14 +259,12 @@ Width of texture, in texels.
 
 =head2 height
 
-Height of texture, in texels.  Currently will always equal width.
+Height of texture, in texels.
 
-=head2 pow2_size
+=head2 internal_format
 
-If texture is loaded as a square power-of-two (currently all are) then this returns the
-dimension of the texture.  This can differ from width/height in the event that you configured
-those with the logical dimensions of the image.  If texture was loaded as a rectangular texture,
-this is undef.
+The enum (integer) of the internal storage format of the texture.  See tables at
+L<https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml>.
 
 =head2 has_alpha
 
@@ -268,14 +309,81 @@ Returns C<$self> for convenient chaining.
 
 =head2 load
 
-  $tex->load;
+  $tex->load; # from 'loader' or 'filename'
+  $tex->load( $filename );
+  $tex->load({ format => ..., type => ..., data => ... });
 
-Load image data from a file into OpenGL.  This does not happen when the object is first
-constructed, in case the OpenGL context hasn't been initialized yet.  It automatically happens
-when L</bind> is called for the first time.
+Load image data into the texture.  When no arguments are given, the normal mechanism is to call
+C<< $self->loader->($self, $self->filename) >>.  L</loader> or L</filename> can be configured
+in advance.  This method is B<called automatically> during the first call to L</bind> if
+C<loader> or C<filename> are set.
 
-Calls C<< $self->loader->($self, $self->filename) >>.  L</tx_id> will be a valid texture id
-after this (assuming the loader doesn't die).
+A single non-hashref argument is assumed to be a filename to pass to the loader.
+
+A hashref argument is treated as arguments to C<glTexImage2D> or C<glTexSubImage2D>.
+It uses the same parameter names documented at L<https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml>
+with defaults coming from the attributes of the object.
+
+=over
+
+=item target
+
+Defaults to C<GL_TEXTURE_2D>.  (and other targets are not supported yet)
+
+=item level
+
+Defaults to C<0>. (the main image)
+
+=item internal_format
+
+Defaults to L</internal_format>, and if that isn't set, defaults to something matching C<format>.
+
+=item width
+
+Defaults to L</width>.
+
+=item height
+
+Defaults to L</height>.
+
+=item xoffset
+
+Defaults to C<0>.  Setting this to a non-zero value calls C<glTexSubImage2D>, which requires
+that the image has already had its storage initialized.
+
+=item yoffset
+
+Defaults to C<0>.  Setting this to a non-zero value calls C<glTexSubImage2D>, which requires
+that the image has already had its storage initialized.
+
+=item border
+
+Defaults to C<0>.  Ignored on any modern OpenGL.
+
+=item format
+
+Must be specified, unless C<data> is C<undef>.
+
+=item type
+
+Must be specified, unless C<data> is C<undef>.
+
+=item data
+
+A scalar-ref containing the bytes to be loaded.  May be undef to request that OpenGL allocate
+space for the texture without loading any data into it.  However, if there is a Pixel Buffer 
+Object currently bound to C<GL_PIXEL_UNPACK_BUFFER> then this I<may not> be a ref, and must
+be either undef (0) or a numeric value, since it gets interpreted as an offset.
+
+=item pitch
+
+A number of bytes between one row of image data and the next.  Note that OpenGL doesn't support
+arbitrary pitch values - it must be a multiple of the pixel size rounded up to one of the
+standard alignments.  If you pass in a pitch value that doesn't work, this function dies.
+The values of C<GL_UNPACK_ALIGNMENT> and C<GL_UNPACK_ROW_LENGTH> will be returned to their
+original value afterward.  They will not be changed at all if you don't specify a pitch.
+
+=back
 
 Returns C<$self> for convenient chaining.
 

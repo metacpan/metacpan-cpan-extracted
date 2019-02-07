@@ -1,0 +1,40 @@
+---
+abstract: 'Decode audio/video files using LibVLC'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  Devel::Peek: '0'
+  File::Spec::Functions: '0'
+  FindBin: '0'
+  Log::Any: '0'
+  Log::Any::Adapter::TAP: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+configure_requires:
+  Alien::VideoLAN::LibVLC: '0.04'
+  ExtUtils::Depends: '0.405'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: VideoLAN-LibVLC
+requires:
+  Carp: '0'
+  Exporter::Extensible: '0'
+  IO::Handle: '0'
+  Scalar::Util: '0'
+  Socket: '0'
+  XSLoader: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/nrdvana/perl-VideoLAN-LibVLC/issues
+  repository: https://github.com/nrdvana/perl-VideoLAN-LibVLC.git
+version: '0.01'
+x_generated_by_perl: v5.24.0
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -15,7 +15,7 @@ use Type::Utils -all;
 use Types::Standard -types;
 use OTRS::OPM::Parser;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 declare OTRSVersion =>
     as Str,
@@ -35,11 +35,18 @@ declare OTRSVersionWildcard =>
     };
 
 declare OPMFile =>
-    as InstanceOf['OTRS::OPM::Parser'];
+    as InstanceOf['OTRS::OPM::Parser'],
+    where {
+        $_->opm_file =~ m{\.s?opm\z} &&
+        $_->error_string eq '';
+    }
+;
 
 coerce OPMFile =>
     from Str,
         via {
+            return if !-f $_;
+
             my $p = OTRS::OPM::Parser->new( opm_file => $_ );
             $p->parse;
             $p;
@@ -60,7 +67,7 @@ Types::OTRS - OTRS related types
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 TYPES
 
@@ -76,6 +83,24 @@ that is needed to install the addon, the developer can use 'x' as a wildcard.
 E.g. Addons for OTRS 6.x can be installed on any OTRS 6 installation, whilst addons that
 define 2.4.x as the framework version can only installed on any OTRS 2.4 installation, but
 not on OTRS 2.3 installation.
+
+=head2 OPMFile
+
+An object of L<OTRS::OPM::Parser>.
+
+It checks if the file exists and can be parsed without an error.
+
+=head1 COERCIONS
+
+=head2 OPMFile
+
+=over 4
+
+=item * From String to OTRS::OPM::Parser
+
+When a string is given, it is coerced into an L<OTRS::OPM::Parser> object.
+
+=back
 
 =head1 AUTHOR
 

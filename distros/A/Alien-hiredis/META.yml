@@ -32,16 +32,17 @@ no_index:
 provides:
   Alien::hiredis:
     file: lib/Alien/hiredis.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Alien::Base: '0.038'
   parent: '0'
   perl: '5.008001'
 resources:
+  IRC: irc://irc.perl.org/#redis
   bugtracker: https://github.com/Grinnz/Alien-hiredis/issues
   homepage: https://github.com/Grinnz/Alien-hiredis
   repository: https://github.com/Grinnz/Alien-hiredis.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -103,6 +104,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::DBOOK/MetaNoIndex'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@Author::DBOOK/MetaResources'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
@@ -187,7 +192,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.002'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

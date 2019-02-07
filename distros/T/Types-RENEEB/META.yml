@@ -20,13 +20,13 @@ name: Types-RENEEB
 provides:
   Types::Dist:
     file: lib/Types/Dist.pm
-    version: '0.06'
+    version: '0.07'
   Types::OTRS:
     file: lib/Types/OTRS.pm
-    version: '0.06'
+    version: '0.07'
   Types::RENEEB:
     file: lib/Types/RENEEB.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Module::CPANfile: '0'
   OTRS::OPM::Parser: '1.01'
@@ -38,7 +38,7 @@ resources:
   bugtracker: http://github.com/reneeb/Types-RENEEB/issues
   homepage: http://github.com/reneeb/Types-RENEEB
   repository: git://github.com/reneeb/Types-RENEEB.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'reneeb <info@perl-services.de>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

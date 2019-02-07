@@ -5,27 +5,43 @@ use Test::More;
 use Test::Exception;
 
 BEGIN { use_ok 'Text::Parser'; }
+BEGIN { use_ok 'FileHandle'; }
 
 my $fname = 'text-simple.txt';
 
-my $pars = Text::Parser->new( balaji => 1 );
-is( $pars, undef );
-$pars = Text::Parser->new( multiline_type => 'balaji' );
-is( $pars, undef );
+my $pars;
+throws_ok { $pars = Text::Parser->new('balaji'); }
+'Text::Parser::Exception::Constructor',
+    'Throws an exception for non-hash input';
+throws_ok { $pars = Text::Parser->new( balaji => 1 ); }
+'Text::Parser::Exception::Constructor', 'Throws an exception for bad keys';
+throws_ok { $pars = Text::Parser->new( multiline_type => 'balaji' ); }
+'Moose::Exception::ValidationFailedForInlineTypeConstraint',
+    'Throws an exception for bad value';
+lives_ok { $pars = Text::Parser->new( multiline_type => undef ); }
+'Improve coverage';
 $pars = Text::Parser->new();
 isa_ok( $pars, 'Text::Parser' );
 is( $pars->setting(),         undef, 'When no setting is called' );
 is( $pars->setting('balaji'), undef, 'balaji is not a setting at all' );
 is( $pars->filename(),        undef, 'No filename specified so far' );
-lives_ok { is( $pars->filehandle(), undef, 'No filehandles' ); }
+
+lives_ok { is( $pars->filehandle(), undef, 'Not initialized' ); }
 'This should not die, just return undef';
-throws_ok { $pars->filehandle('bad argument'); } 'Text::Parser::Exception',
-    'filehandle() will take only a GLOB input';
-throws_ok { $pars->filename( { a => 'b' } ); } 'Text::Parser::Exception',
+throws_ok { $pars->filehandle('bad argument'); }
+'Moose::Exception::ValidationFailedForInlineTypeConstraint',
+    'filehandle() will take only a GLOB or FileHandle input';
+throws_ok { $pars->filename( { a => 'b' } ); }
+'Moose::Exception::ValidationFailedForInlineTypeConstraint',
     'filename() will take only string as input';
-throws_ok { $pars->filename($fname) } 'Text::Parser::Exception',
+throws_ok { $pars->filename($fname) }
+'Moose::Exception::ValidationFailedForInlineTypeConstraint',
     'No file by this name';
-throws_ok { $pars->read($fname); } 'Text::Parser::Exception',
+throws_ok { $pars->read( bless {}, 'Something' ); }
+'Text::Parser::Exception::BadReadInput',
+    'filehandle() will take only a GLOB or FileHandle input';
+throws_ok { $pars->read($fname); }
+'Moose::Exception::ValidationFailedForInlineTypeConstraint',
     'Throws exception for non-existent file';
 
 lives_ok { $pars->read(); } 'Returns doing nothing';
@@ -46,7 +62,8 @@ SKIP: {
     close OFILE;
     chmod 0200, 't/unreadable.txt';
     throws_ok { $pars->filename('t/unreadable.txt'); }
-    'Text::Parser::Exception', 'This file cannot be read';
+    'Moose::Exception::ValidationFailedForInlineTypeConstraint',
+        'This file cannot be read';
     is( $pars->filename(), undef, 'Still no file has been read so far' );
     unlink 't/unreadable.txt';
 }
@@ -79,16 +96,8 @@ lives_ok {
         ['Simple text'], 'Read correct data in file' );
 }
 'Exercising the ability to read from file handles directly';
-unlink 'example';
-open OUTFILE, ">example";
-if ( -r OUTFILE ) {
-    chmod 0200, 'example';
-    throws_ok { $pars->filehandle( \*OUTFILE ); } 'Text::Parser::Exception',
-        'Now this is not readable'
-        if not -r OUTFILE;
-}
-chmod 0644, 'example';
-close OUTFILE;
+lives_ok { $pars->read( FileHandle->new( 'example', 'r' ) ); }
+'No issues in reading from a FileHandle object of STDIN';
 unlink 'example';
 
 ## Testing the reading from filehandles on STDOUT and STDIN

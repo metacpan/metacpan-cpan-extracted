@@ -2,29 +2,33 @@
 use strict;
 use warnings;
 
-use 5.012;
+use 5.013010;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Bare text parser, simplifies text parsing.",
+  "ABSTRACT" => "Simplifies text parsing. Extensible to parse various grammars.",
   "AUTHOR" => "Balaji Ramasubramanian <balajiram\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Text-Parser",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.012",
+  "MIN_PERL_VERSION" => "5.013010",
   "NAME" => "Text::Parser",
   "PREREQ_PM" => {
     "Class::Method::Modifiers" => 0,
     "Dist::Zilla::Plugin::Test::TidyAll" => 0,
     "Exception::Class" => 0,
     "Exporter" => 0,
-    "IO::Select" => 0,
-    "Role::Tiny" => 0,
-    "Scalar::Util" => 0,
+    "FileHandle" => 0,
+    "Moose" => 0,
+    "Moose::Role" => 0,
+    "Moose::Util" => 0,
+    "Moose::Util::TypeConstraints" => 0,
+    "MooseX::CoverableModifiers" => 0,
     "Try::Tiny" => 0,
+    "namespace::autoclean" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -36,7 +40,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.803",
+  "VERSION" => "0.900",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,15 +52,19 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Test::TidyAll" => 0,
   "Exception::Class" => 0,
   "Exporter" => 0,
-  "IO::Select" => 0,
-  "Role::Tiny" => 0,
-  "Scalar::Util" => 0,
+  "FileHandle" => 0,
+  "Moose" => 0,
+  "Moose::Role" => 0,
+  "Moose::Util" => 0,
+  "Moose::Util::TypeConstraints" => 0,
+  "MooseX::CoverableModifiers" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Output" => 0,
   "Text::CSV" => 0,
   "Try::Tiny" => 0,
   "constant" => 0,
+  "namespace::autoclean" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

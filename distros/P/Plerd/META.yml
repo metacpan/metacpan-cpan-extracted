@@ -7,7 +7,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 0
 generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150005'
-license: unknown
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -25,7 +25,7 @@ no_index:
 provides:
   Plerd:
     file: lib/Plerd.pm
-    version: '1.72'
+    version: '1.801'
   Plerd::Init:
     file: lib/Plerd/Init.pm
   Plerd::Post:
@@ -38,6 +38,7 @@ provides:
     file: lib/Plerd/WebmentionQueue.pm
 requires:
   App::Daemon: '0'
+  Capture::Tiny: '0'
   Data::GUID: '0'
   DateTime: '0'
   DateTime::Format::W3CDTF: '0'
@@ -61,11 +62,13 @@ resources:
   bugtracker: https://github.com/jmacdotorg/plerd/issues
   homepage: https://github.com/jmacdotorg/plerd
   repository: git://github.com/jmacdotorg/plerd.git
-version: '1.72'
+version: '1.801'
 x_authority: cpan:JMAC
 x_contributors:
   - 'Christian Sánchez <sanchezchristian@gmail.com>'
   - 'David Turner <novalis@novalis.org>'
+  - 'Joe Johnston <jjohn@taskboy.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Rebecca Turner <me@re-becca.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

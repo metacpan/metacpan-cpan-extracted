@@ -1,0 +1,25 @@
+#! /usr/bin/env perl
+
+=head1 DESCRIPTION
+
+This script builds the dist and then runs "prove -lvb" with any
+additional arguments that were passed to this script, such as
+
+   dtest t/01*
+
+to run single test cases instead of the whole thing that you
+get from "dzil test".
+
+=cut
+
+my $out= `dzil build`;
+my ($dir)= ($out =~ /built in (\S*)/);
+-d $dir or die "Can't determine build dir";
+print "chdir $dir\n";
+chdir($dir) or die "Failed chdir $dir";
+print "perl Makefile.PL\n";
+system('perl','Makefile.PL') == 0 or die "Failed building makefile";
+print "make\n";
+system('make') == 0 or die "Failed running make";
+print "prove\n";
+system('prove', '-lvb', @ARGV);

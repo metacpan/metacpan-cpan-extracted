@@ -75,5 +75,37 @@ use File::Spec;
     }
 }
 
+{
+    no warnings 'redefine';
+    local *OTRS::OPM::Parser::_get_xsd = sub {
+
+    return q~<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    
+    <xs:element name="otrs_package">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="Name" minOccurs="0" maxOccurs="1"/>
+            </xs:all>
+            <xs:attribute name="version" use="required" type="xs:anySimpleType"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Name" type="xs:token"/>
+</xs:schema>
+~;
+    };
+
+    my $opm_file = File::Spec->catfile( dirname(__FILE__), 'data', 'validate.opm' );
+    my $opm      = OTRS::OPM::Parser->new( opm_file => $opm_file );
+
+    isa_ok $opm, 'OTRS::OPM::Parser';
+
+    my $success = $opm->validate;
+    is $success, 1;
+    is $opm->error_string, '';
+}
+
 done_testing();
 

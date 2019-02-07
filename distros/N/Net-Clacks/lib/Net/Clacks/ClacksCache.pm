@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.0;
+our $VERSION = 5.1;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -105,11 +105,11 @@ sub get {
     my $value = $self->{clacks}->retrieve($key);
     return if(!defined($value));
 
-    if($value =~ /^MAPLATCLACKSYAMLB64\:(.+)/o) {
+    if($value =~ /^PAGECAMELCLACKSYAMLB64\:(.+)/o) {
         $value = decode_base64($1);
         $value = Load($value);
         $value = $self->deref($value);
-    } elsif($value =~ /^MAPLATCLACKSB64\:(.+)/o) {
+    } elsif($value =~ /^PAGECAMELCLACKSB64\:(.+)/o) {
         $value = decode_base64($1);
     }
     return $value;
@@ -123,14 +123,14 @@ sub set { ## no critic (NamingConventions::ProhibitAmbiguousNames)
     $key = $self->sanitize_key($key);
 
     if(ref $data ne '') {
-        #$data = 'MAPLATCLACKSYAMLB64: ' . encode_base64(Dump($data), '');
+        #$data = 'PAGECAMELCLACKSYAMLB64: ' . encode_base64(Dump($data), '');
         $data = Dump($data);
-        $data = 'MAPLATCLACKSYAMLB64: ' . encode_base64($data, '');
-    } elsif($data =~ /^MAPLATCLACKSB64/o) {
+        $data = 'PAGECAMELCLACKSYAMLB64: ' . encode_base64($data, '');
+    } elsif($data =~ /^PAGECAMELCLACKSB64/o) {
         # Already encoded? Clacks injection alert? Just don't store the thing...
         return 0;
     } elsif($data =~ /\n/o || $data =~ /\r/o) {
-        $data = 'MAPLATCLACKSB64:' . encode_base64($data, '');
+        $data = 'PAGECAMELCLACKSB64:' . encode_base64($data, '');
     }
 
     $self->{clacks}->store($key, $data);
@@ -265,7 +265,7 @@ Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2018 by Rene Schickbauer
+Copyright (C) 2008-2019 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.056';
+our $VERSION = '2.057';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -45,6 +45,7 @@ sub new {
         lyt_stmt_v    => { undef => '  BACK', layout => 3, prompt => 'Choose:'                           },
         quit          => 'QUIT',
         back          => 'BACK',
+        confirm       => 'CONFIRM',
         _quit         => '  QUIT',
         _back         => '  BACK',
         _continue     => '  CONTINUE',
@@ -697,7 +698,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.056
+Version 2.057
 
 =head1 DESCRIPTION
 

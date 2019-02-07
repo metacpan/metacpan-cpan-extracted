@@ -7,10 +7,10 @@ use 5.008003;
 
 use Cwd                   qw( realpath );
 use Encode                qw( encode decode );
-use File::Basename        qw( dirname );
+use File::Basename        qw( dirname basename );
 use File::Spec::Functions qw( catfile );
 
-use List::MoreUtils   qw( all any first_index );
+use List::MoreUtils   qw( all any first_index uniq );
 use Encode::Locale    qw();
 #use Spreadsheet::Read qw( ReadData rows ); # required
 #use Text::CSV         qw();                # required
@@ -34,7 +34,7 @@ sub new {
         o => $options,
         d => $data,
         tmp_copy_paste => catfile( $info->{app_dir}, 'Copy_and_Paste_tmp_file.csv' ),
-        input_files    => catfile( $info->{app_dir}, 'file_history.txt' )
+        input_files    => catfile( $info->{app_dir}, 'file_history.json' )
     };
     bless $sf, $class;
 }
@@ -50,7 +50,7 @@ sub __print_args {
         my $max = 9;
         my @tmp = ( 'Table Data:' );
         my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $arg_rows = $ax->insert_into_args_info_format( $sql, 10, '' );
+        my $arg_rows = $ax->insert_into_args_info_format( $sql, '' );
         push @tmp, @$arg_rows;
         my $str = join( "\n", @tmp ) . "\n\n";
         print CLEAR_SCREEN;
@@ -196,7 +196,7 @@ sub from_file {
     my ( $sf, $sql ) = @_;
 
     FILE: while ( 1 ) {
-        my $file_ec = $sf->__file_name( $sql );
+        my $file_ec = $sf->__file_name();
         my $fh;
         if ( ! defined $file_ec ) {
             return;
@@ -249,79 +249,115 @@ sub from_file {
 
 
 sub __file_name {
-    my ( $sf, $sql ) = @_;
+    my ( $sf ) = @_;
+    if ( ! $sf->{o}{insert}{max_files} ) {
+        return $sf->__new_file_search();
+    }
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $old_idx = 0;
 
     FILE: while ( 1 ) {
-        my @files;
-        if ( $sf->{o}{insert}{max_files} && -e $sf->{input_files} ) {
-            open my $fh_in, '<', $sf->{input_files} or die $!;
-            while ( my $fl = <$fh_in> ) {
-                chomp $fl;
-                next if ! -e $fl;
-                push @files, $fl;
-            }
-            close $fh_in;
-        }
-        my $add_file = '  NEW file';
-        my $del_file = '  Remove file';
+        my $h_ref = $ax->read_json( $sf->{input_files} );
+        my @dirs = sort @{$h_ref->{dirs}||[]};
+        my @files = sort @{$h_ref->{files}||[]};
         my $prompt = sprintf "Choose a file  %s:", $sf->__parse_setting( 'file' );
+        my @pre = ( undef, '  NEW search' );
+        $ENV{TC_RESET_AUTO_UP} = 0;
         # Choose
-        my $file = choose(
-            [ undef, $add_file, map( '  ' . $_, @files ), $del_file ],
-            { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, undef => '  <=' }
+        my $idx = choose(
+            [ @pre, map( '- ' . $_, @dirs ), map( '  ' . basename( $_ ), @files ) ],
+            { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, undef => '  <=', index => 1, default => $old_idx }
         );
-        if ( ! defined $file ) {
+        if ( ! $idx ) {
             return;
         }
-        if ( $file eq $add_file ) {
-            my $prompt = sprintf "%s", $sf->__parse_setting( 'file' );
-            my $dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
-            # Choose_a_file
-            my $file = choose_a_file( { dir => $dir, mouse => $sf->{o}{table}{mouse} } );
-            if ( ! defined $file || ! length $file ) {
-                next FILE;
+        if ( $sf->{o}{G}{menu_memory} ) {
+            if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $old_idx = 0;
+                next DATABASE;
             }
-            if ( $sf->{o}{insert}{max_files} ) {
-                my $i = first_index { $file eq $_ } @files; ##
-                splice @files, $i, 1 if $i > -1;
-                push @files, $file;
-                while ( @files > $sf->{o}{insert}{max_files} ) {
-                    shift @files;
-                }
-                open my $fh_out, '>', $sf->{input_files} or die $!;
-                for my $fl ( @files ) {
-                    print $fh_out $fl . "\n";
-                }
-                close $fh_out;
+            else {
+                $old_idx = $idx;
             }
-            my $file_ec = encode( 'locale_fs', $file );
-            $sf->{i}{tmp_files_dir} = dirname $file_ec;
-            return $file_ec;
         }
-        elsif ( $file eq $del_file ) {
-            $file = undef;
-            my $idx = choose_a_subset(
-                [ @files ],
-                { mouse => $sf->{o}{table}{mouse}, prefix => '  ', info => 'Files to remove:',
-                 index => 1, sofar_begin => "* ", sofar_separator => "\n* ", remove_chosen => 1, clear_screen => 1 }
-            );
-            if ( ! defined $idx || ! @$idx ) {
-                next FILE;
-            }
-            open my $fh_out, '>', $sf->{input_files} or die $!; # file_name
-            for my $i ( 0 .. $#files ) {
-                if ( any { $i == $_ } @$idx ) {
-                    next;
-                }
-                print $fh_out $files[$i] . "\n";
-            }
-            close $fh_out;
+        delete $ENV{TC_RESET_AUTO_UP};
+        my $file_ec;
+        if ( $idx == $#pre ) {
+            $file_ec = $sf->__new_file_search();
+        }
+        elsif ( $idx < @pre + @dirs ) {
+            my $dir_ec = realpath encode 'locale_fs', $dirs[$idx-@pre];
+            $file_ec = $sf->__file_form_history_dir( $dir_ec );
+        }
+        else {
+            $file_ec = realpath encode 'locale_fs', $files[$idx-(@pre+@dirs)];
+        }
+        if ( ! defined $file_ec || ! length $file_ec ) {
             next FILE;
         }
-        $file =~ s/\s\s//;
-        my $file_ec = realpath encode 'locale_fs', $file;
+        $sf->__add_to_history( $file_ec );
         return $file_ec;
     }
+}
+
+sub __new_file_search {
+    my ( $sf ) = @_;
+    my $prompt = sprintf "%s", $sf->__parse_setting( 'file' );
+    my $dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
+    # Choose_a_file
+    my $file = choose_a_file( { dir => $dir, mouse => $sf->{o}{table}{mouse}, clear_screen => 1 } );
+    if ( ! defined $file || ! length $file ) {
+        return;
+    }
+    my $file_ec = encode( 'locale_fs', $file );
+    my $dir_ec  = dirname $file_ec;
+    $sf->{i}{tmp_files_dir} = $dir_ec;
+    return $file_ec;
+}
+
+sub __file_form_history_dir {
+    my ( $sf, $dir_ec ) = @_;
+    opendir my $dir_h, $dir_ec or die "$dir_ec: $!";
+
+    my @files_ec;
+    while ( my $file_ec = readdir( $dir_h ) ) {
+        next if $file_ec =~ m/^\./;
+        $file_ec = catfile $dir_ec, $file_ec;
+        next if ! -f $file_ec;
+        push @files_ec, $file_ec;
+    }
+    close $dir_h;
+    @files_ec = sort @files_ec;
+    my @choices = map { '  ' . decode( 'locale_fs', basename $_ ) } @files_ec;
+    my @pre = ( undef );
+    # Choose
+    my $idx = choose(
+        [ @pre, @choices ],
+        { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose:', undef => '  <=', index => 1,
+          info => decode( 'locale_fs', $dir_ec ) }
+    );
+    if ( ! $idx ) {
+        return;
+    }
+    my $file_ec = $files_ec[$idx-@pre];
+    return $file_ec;
+}
+
+sub __add_to_history {
+    my ( $sf, $file_ec ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $h_ref = $ax->read_json( $sf->{input_files} );
+    my %tmp = ( 'files' => $file_ec, 'dirs' => dirname $file_ec );
+    for my $key ( keys %tmp ) {
+        my $files_ec = [ map { realpath encode( 'locale_fs', $_ ) } @{$h_ref->{$key}||[]} ];
+        unshift @$files_ec, $tmp{$key};
+        @$files_ec = uniq @$files_ec;
+        if ( @$files_ec > $sf->{o}{insert}{max_files} ) {
+            $#{$files_ec} = $sf->{o}{insert}{max_files} - 1;
+        }
+        $h_ref->{$key} = [ map { decode( 'locale_fs', $_ ) } @$files_ec ];
+    }
+    $ax->write_json( $sf->{input_files}, $h_ref );
 }
 
 

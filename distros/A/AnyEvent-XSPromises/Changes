@@ -1,0 +1,6 @@
+Revision history for Perl extension AnyEvent::XSPromises.
+
+0.001  Sat Jul 14 16:07:07 2018
+	- original version; created by h2xs 1.23 with options
+		-b 5.10.0 -n XSPromises --version 0.001 -g -A --skip-exporter
+

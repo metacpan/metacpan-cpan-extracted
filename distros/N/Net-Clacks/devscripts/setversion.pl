@@ -7,12 +7,12 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.0;
+our $VERSION = 5.1;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
 
-# MAPLAT  (C) 2008-2019 Rene Schickbauer
+# PAGECAMEL  (C) 2008-2019 Rene Schickbauer
 # Developed under Artistic license
 
 my $newversion = shift @ARGV || "???";

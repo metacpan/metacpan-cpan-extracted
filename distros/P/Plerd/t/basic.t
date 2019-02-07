@@ -54,8 +54,9 @@ unlink "$FindBin::Bin/source/no-title.md";
 
 $plerd->publish_all;
 
-# The "+4" below accounts for various non-post generated files.
-my $expected_docroot_count = scalar( $source_dir->children( no_hidden => 1 ) ) + 4;
+# The "+5" below accounts for the generated recent, archive, and RSS files,
+# a index.html symlink, and a tags directory.
+my $expected_docroot_count = scalar( $source_dir->children( no_hidden => 1 ) ) + 5;
 is( scalar( $docroot_dir->children ),
             $expected_docroot_count,
             "Correct number of files generated in docroot."
@@ -65,6 +66,12 @@ is( scalar( $docroot_dir->children ),
 {
 my $post = $plerd->posts->[-1];
 is ( $post->reading_time, 4, 'Reading time is as expected.' );
+}
+
+### Test dates and time zones
+{
+my $post = $plerd->posts->[-1];
+is ( $post->utc_date->offset, 0, 'Output of utc_date looks correct.' );
 }
 
 ### Test formatting in titles and filenames
@@ -95,6 +102,20 @@ is (
     1,
     'Source file with formatted title received a nice clean published filename.'
 );
+}
+
+### Make sure tag pages look as expected
+{
+my $tag_index_file =
+    Path::Class::File->new( $docroot_dir, 'tags', 'index.html' );
+my $tag_detail_file =
+    Path::Class::File->new( $docroot_dir, 'tags', 'bar with spaces.html' );
+
+is (-e $tag_index_file, 1, 'Tag index file created.');
+is (-e $tag_detail_file, 1, 'Tag detail file created.');
+
+is ($plerd->has_tags, 1, 'The blog knows that it has tags.');
+
 }
 
 ### Make sure re-titling posts works as expected
@@ -134,11 +155,24 @@ is ( $docroot_dir->contains( $unwelcome_file ),
 );
 
 ### Test GUIDs
-
 $plerd->publish_all;
 like ( $source_file->slurp,
        qr/guid: /,
        'Source file contains a GUID, as expected.',
+);
+
+### Make sure descriptions work in different cases.
+is ( $plerd->post_with_url( "http://blog.example.com/$ymd-metatags.html" )->description,
+     'Fun with social metatags.',
+     'Manually-set post description works.',
+);
+like ( $plerd->post_with_url( "http://blog.example.com/$ymd-metatags-with-image.html" )->description,
+    qr/This file sets up some attributes/,
+    'Automatically derived description works.',
+);
+like ( $plerd->post_with_url( "http://blog.example.com/$ymd-metatags-with-image-and-alt.html" )->description,
+    qr/This file sets up some attributes/,
+    'Automatically derived description works, with leading image tag present.',
 );
 
 ### Test miscellaneous-attribute pass-through
@@ -205,7 +239,7 @@ my $plerd = Plerd->new(
 
 $plerd->publish_all;
 like ( Path::Class::File->new( $docroot_dir, 'recent.html' )->slurp,
-     qr{http://www.example.com/blog/1999-01-02-unicode.html},
+     qr{http://www.example.com/blog/\d{4}-\d{2}-\d{2}-blah.html},
      'Base URIs missing trailing slashes work',
 );
 

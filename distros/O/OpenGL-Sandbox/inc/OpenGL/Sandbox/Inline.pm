@@ -6,9 +6,9 @@
 #
 # To regenerate this stub module, run this command:
 #
-#   perl -MInline::Module=makestub,OpenGL::Sandbox::Texture::Inline
+#   perl -MInline::Module=makestub,OpenGL::Sandbox::Inline
 
 use strict; use warnings;
-package OpenGL::Sandbox::Texture::Inline;
+package OpenGL::Sandbox::Inline;
 use Inline::Module stub => 'v2';
 1;

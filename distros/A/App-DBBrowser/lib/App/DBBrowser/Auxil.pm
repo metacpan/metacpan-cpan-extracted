@@ -65,7 +65,7 @@ sub get_stmt {
         }
         else {
             push @tmp, "  VALUES(";
-            my $arg_rows = $sf->insert_into_args_info_format( $sql, 10, ' ' x 4 );
+            my $arg_rows = $sf->insert_into_args_info_format( $sql, ' ' x 4 );
             push @tmp, @$arg_rows;
             push @tmp, "  )";
         }
@@ -98,8 +98,9 @@ sub get_stmt {
 
 
 sub insert_into_args_info_format {
-    my ( $sf, $sql, $max, $indent ) = @_;
-    my $begin = 4;
+    my ( $sf, $sql, $indent ) = @_;
+    my $begin = 5;
+    my $max = 12;
     my $end = 0;
     if ( $max < $begin ) {
         $begin = $max;

@@ -1,6 +1,6 @@
 package Plerd;
 
-our $VERSION = '1.72';
+our $VERSION = '1.801';
 
 use Moose;
 use MooseX::Types::URI qw(Uri);
@@ -40,12 +40,25 @@ has 'database_path' => (
     isa => 'Str',
 );
 
+has 'tags_publication_path' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy_build => 1,
+);
+
 has 'base_uri' => (
     is => 'ro',
     required => 1,
     isa => Uri,
     coerce => 1,
 );
+
+has 'tags_index_uri' => (
+    is => 'ro',
+    isa => Uri,
+    lazy_build => 1,
+);
+
 
 has 'title' => (
     is => 'ro',
@@ -125,6 +138,12 @@ has 'publication_directory' => (
     lazy_build => 1,
 );
 
+has 'tags_publication_directory' => (
+    is => 'ro',
+    isa => 'Path::Class::Dir',
+    lazy_build => 1,
+);
+
 has 'template' => (
     is => 'ro',
     isa => 'Template',
@@ -144,6 +163,12 @@ has 'archive_template_file' => (
 );
 
 has 'rss_template_file' => (
+    is => 'ro',
+    isa => 'Path::Class::File',
+    lazy_build => 1,
+);
+
+has 'tags_template_file' => (
     is => 'ro',
     isa => 'Path::Class::File',
     lazy_build => 1,
@@ -219,6 +244,19 @@ has 'webmention_queue' => (
     lazy_build => 1,
 );
 
+has 'has_tags' => (
+    is => 'ro',
+    isa => 'Bool',
+    lazy_build => 1,
+);
+
+has 'tags_map' => (
+    is => 'ro',
+    isa => 'HashRef',
+    lazy_build => 1,
+    clearer => 'clear_tags_map',
+);
+
 sub BUILD {
     my $self = shift;
 
@@ -245,6 +283,8 @@ sub publish_all {
         $post->publish;
     }
 
+    $self->publish_tag_indexes;
+
     $self->publish_archive_page;
 
     $self->publish_recent_page;
@@ -255,6 +295,61 @@ sub publish_all {
     $self->clear_posts;
     $self->clear_post_index_hash;
     $self->clear_post_url_index_hash;
+    $self->clear_tags_map;
+}
+
+# Return a structure of tags to post objects
+#  { TAG1 => [ post1, post2, ...],
+#    TAG2 => [],
+#    ...
+#  }
+sub _build_tags_map {
+    my $self = shift;
+    my %tags;
+    for my $post ( @{ $self->posts } ) {
+        for my $tag (@{$post->tags}) {
+            push @{ $tags{ $tag } }, $post;
+        }
+    }
+    return \%tags;
+}
+
+# Create a page that lists all available tags with
+# links to those pages that list the articles that
+# have those tags
+sub publish_tag_indexes {
+    my $self = shift;
+
+    my $tag_map = $self->tags_map;
+
+    # Create all the individual tag pages
+    for my $tag (keys %$tag_map) {
+
+        $self->template->process(
+            $self->tags_template_file->open('<:encoding(utf8)'),
+            {
+                self_uri => $self->tag_uri($tag),
+                is_tags_page => 1,
+                tags => { $tag => $tag_map->{$tag} },
+                plerd => $self,
+            },
+            $self->tags_publication_file($tag)->open('>:encoding(utf8)'),
+            ) || $self->_throw_template_exception( $self->tags_template_file );
+    }
+
+    # Create the tag index
+    $self->template->process(
+        $self->tags_template_file->open('<:encoding(utf8)'),
+        {
+            self_uri => $self->tag_uri,
+            is_tags_index_page => 1,
+            is_tags_page => 1,
+            tags => $tag_map,
+            plerd => $self,
+        },
+        $self->tags_publication_file->open('>:encoding(utf8)'),
+        ) || $self->_throw_template_exception( $self->tags_template_file );
+
 }
 
 sub publish_recent_page {
@@ -574,6 +669,76 @@ sub generates_post_guids {
          . "anyway.)";
 }
 
+# Tag-related builders & methods
+sub _build_tags_index_uri {
+    my $self = shift;
+    return $self->tag_uri;
+}
+
+sub _build_tags_publication_path { 'tags' }
+
+sub _build_tags_publication_directory {
+    my $self = shift;
+
+    return $self->_build_subdirectory( 'tags_publication_path', 'docroot' );
+}
+
+sub _build_tags_template_file {
+    my $self = shift;
+
+    return Path::Class::File->new(
+        $self->template_directory,
+        'tags.tt',
+    );
+}
+
+sub _build_has_tags {
+    my $self = shift;
+
+    my $tags_map = $self->tags_map;
+
+    if (scalar keys %$tags_map) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+
+}
+
+# Return either the tags/index.html file
+# or a tags/TAGNAME.html file if given a tag
+sub tags_publication_file {
+    my ($self, $tag) = @_;
+    $tag //= 'index';
+
+    my $file = Path::Class::File->new($self->publication_directory,
+                                      $self->tags_publication_directory,
+                                      "$tag.html");
+
+    my $dir = $file->parent->stringify;
+    if ( !-d $dir) {
+        mkdir $dir || die ("Cannot make directory: '$dir'. Create it manually, please.");
+    }
+
+    return $file;
+}
+
+sub tag_uri {
+    my ($self, $tag) = @_;
+    my $uri = $self->base_uri->clone;
+    unless (defined $tag) {
+        # master tag list
+        $uri->path($uri->path . $self->tags_publication_path . "/");
+        return $uri;
+    }
+
+    # individual tag page
+    $uri->path($uri->path . $self->tags_publication_path . "/$tag.html");
+    return $uri;
+}
+
+
 sub publish {
     my $self = shift;
 
@@ -710,6 +875,11 @@ The path to the filesystem directory containing this blog's templates directory.
 
 The path to the filesystem directory containing this blog's database directory.
 
+=item tags_publication_path
+
+The path to the filesystem directory containing this blog's out
+directory for tag index files.
+
 =item title
 
 String representing this blog's title.
@@ -774,6 +944,16 @@ the blog's docroot -- in other words, the place Plerd will write HTML and XML fi
 A L<Path::Class::Dir> object representation of the directory that holds
 the blogs's private, not-necessarily-human-readable data files.
 
+=item tags_publication_directory
+
+A L<Path::Class::Dir> object representation of the directory within the docroot that holds
+tag index HTML files.
+
+=item tag_index_uri
+
+This is a L<URI> object that points to the tag index.  It is
+particularly helpful when creating navigation.
+
 =back
 
 =head1 OBJECT METHODS
@@ -789,6 +969,18 @@ Also recreates the recent, archive, and syndication files.
 
 Returns the Plerd::Post object that has the given absolute URL. Returns undef
 if there is no such post.
+
+=item tag_uri( $tag )
+
+If $tag is defined, returns a L<URI> object with the address of the web
+page for the given tag.
+
+Otherwise, returns a L<URI> object referring to the tag index page.
+
+=item has_tags
+
+If the blog's posts declare any tags at all, then this returns true. Otherwise,
+returns false.
 
 =back
 

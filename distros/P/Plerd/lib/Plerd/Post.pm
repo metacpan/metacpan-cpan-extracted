@@ -60,6 +60,12 @@ has 'attributes' => (
     isa => 'HashRef',
 );
 
+has 'tags' => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    default => sub {[]}
+);
+
 has 'image' => (
     is => 'rw',
     isa => 'Maybe[URI]',
@@ -89,6 +95,13 @@ has 'date' => (
         ymd
         hms
     ) ],
+    trigger => \&_build_utc_date,
+);
+
+has 'utc_date' => (
+    is => 'rw',
+    isa => 'DateTime',
+    lazy_build => 1,
 );
 
 has 'published_filename' => (
@@ -159,6 +172,30 @@ has 'socialmeta_mode' => (
 has 'webmentions_by_source' => (
     is => 'ro',
     isa => 'HashRef',
+    lazy_build => 1,
+);
+
+has 'likes' => (
+    is => 'ro',
+    isa => 'ArrayRef[Web::Mention]',
+    lazy_build => 1,
+);
+
+has 'reposts' => (
+    is => 'ro',
+    isa => 'ArrayRef[Web::Mention]',
+    lazy_build => 1,
+);
+
+has 'replies' => (
+    is => 'ro',
+    isa => 'ArrayRef[Web::Mention]',
+    lazy_build => 1,
+);
+
+has 'mentions' => (
+    is => 'ro',
+    isa => 'ArrayRef[Web::Mention]',
     lazy_build => 1,
 );
 
@@ -368,7 +405,7 @@ sub _process_source_file {
     # Slurp the file, storing the title and time metadata, and the body.
     my $fh = $self->source_file->open('<:encoding(utf8)');
     my %attributes;
-    my @ordered_attribute_names = qw( title time published_filename guid );
+    my @ordered_attribute_names = qw( title time published_filename guid tags);
     while ( my $line = <$fh> ) {
         chomp $line;
         last unless $line =~ /\S/;
@@ -418,8 +455,15 @@ sub _process_source_file {
     }
     else {
         my $body = $self->stripped_body;
-        my ( $description ) = $body =~ /^(.*)\n/;
+        my ( $description ) = $body =~ /^\s*(.*)\n/;
         $self->description( $description || '' );
+    }
+
+    if ( $attributes{ tags } ) {
+        my @tags = split /\s*,\s*/, $attributes{ tags };
+        if (@tags) {
+            @{ $self->tags } = @tags;
+        }
     }
 
     if ( $attributes{ image } ) {
@@ -512,7 +556,9 @@ sub _process_source_file {
     if ( $attributes_need_to_be_written_out ) {
         my $new_content = '';
         for my $attribute_name ( @ordered_attribute_names ) {
-            $new_content .= "$attribute_name: $attributes{ $attribute_name }\n";
+            if (defined $attributes{ $attribute_name } ) {
+                $new_content .= "$attribute_name: $attributes{ $attribute_name }\n";
+            }
         }
         $new_content .= "\n$body\n";
         $self->source_file->spew( iomode=>'>:encoding(utf8)', $new_content );
@@ -669,6 +715,61 @@ sub _retrieve {
     }
 }
 
+sub _build_utc_date {
+    my $self = shift;
+
+    my $dt = $self->date->clone;
+    $dt->set_time_zone( 'UTC' );
+    return $dt;
+}
+
+sub _build_likes {
+    my $self = shift;
+
+    return $self->_grep_webmentions( 'like' );
+}
+
+sub _build_mentions {
+    my $self = shift;
+
+    return $self->_grep_webmentions( 'mention' );
+}
+
+sub _build_replies {
+    my $self = shift;
+
+    return $self->_grep_webmentions( 'reply' );
+}
+
+sub _build_quotations {
+    my $self = shift;
+
+    return $self->_grep_webmentions( 'quotation' );
+}
+
+sub _build_replies_and_quotations {
+    my $self = shift;
+
+    return [
+        sort
+        {$a->time_received <=> $b->time_received }
+        @{ $self->replies }, @{ $self->quotations }
+    ];
+}
+
+sub _build_reposts {
+    my $self = shift;
+
+    return $self->_grep_webmentions( 'repost' );
+}
+
+sub _grep_webmentions {
+    my ( $self, $webmention_type ) = @_;
+    return [
+        grep { $_->type eq $webmention_type } $self->ordered_webmentions
+    ];
+}
+
 1;
 
 =head1 NAME
@@ -749,6 +850,10 @@ set to the local timezone.
 The L<URI> of the of the HTML file that this post will generate upon
 publication.
 
+=item utc_date
+
+Returns the value of C<date> (see below), with the time zone set to UTC.
+
 =back
 
 =head2 Read-write attributes
@@ -773,6 +878,10 @@ String representing the post's body text.
 =item date
 
 L<DateTime> object representing this post's presented publication date.
+
+Plerd usually sets this for you, based on the post's metadata, and sets
+the time zone to local. If you'd like the object in UTC time instead,
+use the C<utc_date> attribute.
 
 =item description
 
@@ -803,6 +912,11 @@ by social media and such.
 =item title
 
 String representing this post's title.
+
+=item tags
+
+An array reference to the list of tags associated with this post as
+set in the source file using the 'tags:' header.
 
 =back
 

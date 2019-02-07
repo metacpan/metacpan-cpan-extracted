@@ -1,11 +1,11 @@
 use alienfile;
 
-plugin PkgConfig => pkg_name => 'hiredis', minimum_version => '0.9.0';
+plugin PkgConfig => pkg_name => 'hiredis', minimum_version => '0.11.0';
 plugin 'Build::Make' => make_type => 'gmake';
 
 share {
   start_url 'https://github.com/redis/hiredis/archive/v0.14.0.tar.gz';
-  plugin Download => version => qr/^v([0-9.]+).tar.gz$/;
+  plugin Download => version => qr/^v([0-9.]+)\.tar\.gz$/;
   plugin Extract => format => 'tar.gz';
   build [
     [ '%{make} PREFIX=%{.install.prefix}' ],

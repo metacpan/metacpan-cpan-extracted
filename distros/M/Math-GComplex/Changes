@@ -1,5 +1,10 @@
 Revision history for Math-GComplex
 
+0.13    2019-02-07
+
+        - Documentation improvements.
+        - Added the `polar(x)` method, which returns the polar form of `x`.
+
 0.12    2019-01-07
 
         - Added the `round(z)` method to round `z` to the nearest Gaussian integer.

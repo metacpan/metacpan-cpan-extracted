@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.0;
+our $VERSION = 5.1;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -52,6 +52,13 @@ sub new {
     $self->{inlines} = [];
 
     $self->{memcached_compatibility} = 0;
+
+    $self->{remembrancenames} = [
+        'Ivy Bdubs',
+        'Terry Pratchett',
+    ];
+    $self->{remembranceinterval} = 3600; # One hour
+    $self->{nextremembrance} = time + $self->{remembranceinterval};
 
     $self->reconnect();
 
@@ -115,6 +122,13 @@ sub doNetwork {
 
     if($self->{needreconnect}) {
         $self->reconnect();
+    }
+
+    if($self->{nextremembrance} && time > $self->{nextremembrance}) {
+        # A person is not dead while their name is still spoken.
+        $self->{nextremembrance} = time + $self->{remembranceinterval} + int(rand($self->{remembranceinterval} / 10));
+        my $neverforget = $self->{remembrancenames}->[rand @{$self->{remembrancenames}}];
+        $self->{outbuffer} .= 'OVERHEAD GNU ' . $neverforget . "\r\n";
     }
 
     # doNetwork interleaves handling incoming and outgoing traffic.
@@ -316,7 +330,6 @@ sub ping {
     if($self->{lastping} < (time - 120)) {
         # Only send a ping every 120 seconds or less
         $self->{outbuffer} .= "PING\r\n";
-        $self->{outbuffer} .= "OVERHEAD GNU Ivy Bdubs\r\n";
         $self->{lastping} = time;
     }
 
@@ -887,7 +900,7 @@ Net::Clacks::Client - client for CLACKS interprocess messaging
 =head1 DESCRIPTION
 
 This implements the client network protocol for the CLACKS interprocess messaging. This is
-used a lot in Maplat projects to let different processes (workers, webgui, MaplatSVC) communicate
+used a lot in PageCamel projects to let different processes (workers, webgui, PageCamelSVC) communicate
 with each other
 
 =head2 new
@@ -954,7 +967,7 @@ Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2018 by Rene Schickbauer
+Copyright (C) 2008-2019 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

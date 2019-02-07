@@ -13,7 +13,7 @@ BEGIN {
       if ($Math::AnyNum::VERSION < 0.30);
 }
 
-plan tests => 370;
+plan tests => 372;
 
 use Math::GComplex;
 use Math::AnyNum qw(:overload);
@@ -545,6 +545,11 @@ is(join(' ', Math::GComplex::gcd(Math::GComplex::cplx(11, 12), Math::GComplex::c
 {
     my $m = 2019;
     my $x = Math::GComplex->new(3, 4);
+
+    my ($rho, $theta) = $x->polar;
+
+    is(Math::GComplex->emake($rho, $theta), $x);
+    is(join(' ', ($rho * exp($theta * i))->reals), join(' ', $x->reals));
 
     my $x1 = Math::GComplex::powmod($x, -42, $m);
     my $x2 = Math::GComplex::powmod($x, 42,  $m);

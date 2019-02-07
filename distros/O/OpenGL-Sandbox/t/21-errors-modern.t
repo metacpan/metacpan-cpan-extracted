@@ -11,9 +11,10 @@ plan skip_all => 'OpenGL::Modern not installed'
 
 $ENV{OPENGL_SANDBOX_OPENGLMODULE}= 'OpenGL::Modern';
 require OpenGL::Sandbox;
-OpenGL::Sandbox->import(qw/ make_context get_gl_errors glTexParameteri /);
+OpenGL::Sandbox->import(qw/ make_context gl_error_name get_gl_errors glTexParameteri GL_INVALID_ENUM /);
 
-ok( scalar keys %OpenGL::Sandbox::_gl_err_msg > 3, 'Have at least 3 error codes defined' );
+is( gl_error_name(GL_INVALID_ENUM()), "GL_INVALID_ENUM", 'can look up name of GL_INVALID_ENUM' );
+is( gl_error_name(-9999), undef, "invalid code returns undef" );
 
 my $ctx= try { make_context() };
 

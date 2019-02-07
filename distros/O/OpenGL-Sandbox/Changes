@@ -1,3 +1,18 @@
+Version 0.049_002 - 2019-02-04
+  - Support for many OpenGL 2+ objects:
+     - Buffer
+     - VertexArray
+     - Shader
+     - Program
+  - Many changes to ResMan API:
+     - custom resource paths
+     - standardized pattern of new_X() vs. load_X() vs. X()
+     - configurable via OpenGL::Sandbox -resources => {}
+  - Textures can now load arbitrary data, including from PBOs
+  - No more automatic power-of-two scaling in PNG loader
+  - Removed dependency on LibAV swscale
+  - Shadertoy-compatible fragment shader demo script
+
 Version 0.042 - 2019-01-09
   - New API functions: next_frame, current_context, log_gl_errors
   - New Import Syntax: -V1 loads ::V1 module, ":V1:all" is no longer allowed

@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 
-package Text::Parser::Multiline 0.803;
+package Text::Parser::Multiline 0.900;
 
 # ABSTRACT: Adds multi-line support to the Text::Parser object.
 
 use Exporter 'import';
 our (@EXPORT_OK) = ();
 our (@EXPORT)    = ();
-use Role::Tiny;
+use Moose::Role;
 
 
 requires( qw(save_record setting lines_parsed has_aborted __read_file_handle),
@@ -127,6 +127,8 @@ sub __pop_last_line {
     return $last_line;
 }
 
+no Moose::Role;
+
 1;
 
 __END__
@@ -141,7 +143,7 @@ Text::Parser::Multiline - Adds multi-line support to the Text::Parser object.
 
 =head1 VERSION
 
-version 0.803
+version 0.900
 
 =head1 SYNOPSIS
 

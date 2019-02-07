@@ -92,9 +92,7 @@ sub defaults {
             copy_parse_mode => 1,
             file_encoding   => 'UTF-8',
             file_parse_mode => 0,
-            #files_dir       => undef,
-            #input_modes     => [ 'Cols', 'Rows', 'Multi-row', 'File' ],
-            max_files       => 15,
+            max_files       => 4,
         },
         create => {
             autoincrement_col_name => 'Id',
@@ -132,7 +130,6 @@ sub __menu_insert {
     my ( $sf, $group ) = @_;
     my $menu_insert = {
         main_insert => [
-#            { name => 'files_dir',         text => "- File Dir",         section => 'insert' },
             { name => '_parse_with_split', text => "- Config \"split\"   ",  section => 'split'  },
             { name => '_module_Text_CSV',  text => "- Config \"Text::CSV\"", section => 'csv'    },
             { name => '_parse_mode',       text => "- Parse Mode",           section => 'insert' },
@@ -217,15 +214,15 @@ sub config_insert {
                 $sf->__group_readline( $section, $items, $prompt );
             }
             elsif ( $opt eq 'max_files' ) {
-                my $digits = 3;
-                my $prompt = 'Max file history: ';
+                my $digits = 2;
+                my $prompt = 'Max file history ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
             elsif ( $opt eq '_parse_mode' ) {
                 my $prompt = 'Parsing mode';
                 my $sub_menu = [
-                    [ 'file_parse_mode', "From File   :", [ 'Text::CSV', 'split', 'Spreadsheet::Read' ] ],
-                    [ 'copy_parse_mode', "Copy & Paste:", [ 'Text::CSV', 'split', 'Spreadsheet::Read' ] ],
+                    [ 'file_parse_mode', "- From File   :", [ 'Text::CSV', 'split', 'Spreadsheet::Read' ] ],
+                    [ 'copy_parse_mode', "- Copy & Paste:", [ 'Text::CSV', 'split', 'Spreadsheet::Read' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -284,8 +281,7 @@ sub __menus {
             { name => 'config_menu',     text => "- Menu"   },
             { name => 'config_sql',      text => "- SQL",   },
             { name => 'config_output',   text => "- Output" },
-            { name => 'config_insert',   text => "- Insert Into" },
-            { name => 'config_create',   text => "- Create Table" },
+            { name => 'config_insert',   text => "- Input" },
         ],
         config_database => [
             { name => 'plugins',      text => "- DB Plugins", section => 'G' },
@@ -298,15 +294,16 @@ sub __menus {
             { name => 'mouse',         text => "- Mouse Mode",  section => 'table' },
         ],
         config_sql => [
-            { name => 'max_rows',           text => "- Max Rows",     section => 'G' },
-            { name => 'meta',               text => "- Metadata",     section => 'G' },
-            { name => 'operators',          text => "- Operators",    section => 'G' },
-            { name => '_alias',             text => "- Alias",        section => 'alias' },
-            { name => '_extended_cols',     text => "- Extentions",   section => 'extend' },
-            { name => '_sql_identifiers',   text => "- Identifiers",  section => 'G' },
-            { name => '_write_access',      text => "- Write access", section => 'G' },
-            { name => 'parentheses',        text => "- Parentheses",  section => 'G' },
-
+            { name => 'max_rows',               text => "- Max Rows",       section => 'G' },
+            { name => 'meta',                   text => "- Metadata",       section => 'G' },
+            { name => 'operators',              text => "- Operators",      section => 'G' },
+            { name => '_alias',                 text => "- Alias",          section => 'alias' },
+            { name => '_extended_cols',         text => "- Extentions",     section => 'extend' },
+            { name => '_sql_identifiers',       text => "- Identifiers",    section => 'G' },
+            { name => '_write_access',          text => "- Write access",   section => 'G' },
+            { name => 'parentheses',            text => "- Parentheses",    section => 'G' },
+            { name => 'autoincrement_col_name', text => "- Auto increment", section => 'create' },
+            { name => 'data_type_guessing',     text => "- Data types",     section => 'create' },
         ],
         config_output => [
             { name => 'min_col_width',      text => "- Colwidth",          section => 'table' },
@@ -320,10 +317,6 @@ sub __menus {
             { name => 'squash_spaces',      text => "- Squash spaces",     section => 'table' },
             { name => 'decimal_separator',  text => "- Decimal sep",       section => 'table' },
             { name => 'file_find_warnings', text => "- Warnings",          section => 'G' },
-        ],
-        config_create => [
-            { name => 'autoincrement_col_name', text => "Auto increment column", section => 'create' },
-            { name => 'data_type_guessing',     text => "Data type guessing",    section => 'create' },
         ],
     };
     return $menus->{$group};
@@ -433,42 +426,42 @@ sub set_options {
                     my $glob_pattern = catfile $dir, 'App', 'DBBrowser', 'DB', '*.pm';
                     map { $installed_driver{( fileparse $_, '.pm' )[0]}++ } glob $glob_pattern;
                 }
-                my $prompt = 'Choose DB plugins:';
+                my $prompt = 'Choose DB plugins';
                 $sf->__choose_a_subset_wrap( $section, $opt, [ sort keys %installed_driver ], $prompt );
             }
             elsif ( $opt eq 'tab_width' ) {
                 my $digits = 3;
-                my $prompt = 'Set the tab width: ';
+                my $prompt = 'Set the tab width ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
             elsif ( $opt eq 'grid' ) {
                 my $prompt = '"Grid"';
-                my $sub_menu = [ [ $opt, "  Grid", $no_yes ] ];
+                my $sub_menu = [ [ $opt, "- Grid", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'keep_header' ) {
                 my $prompt = '"Header each Page"';
-                my $sub_menu = [ [ $opt, "  Keep header", $no_yes ] ];
+                my $sub_menu = [ [ $opt, "- Keep header", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'color' ) {
                 my $prompt = '"ANSI color escapes"';
-                my $sub_menu = [ [ $opt, "  ANSI color escapes", $no_yes ] ];
+                my $sub_menu = [ [ $opt, "- ANSI color escapes", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'binary_filter' ) {
                 my $prompt = 'Print "BNRY" instead of binary data';
-                my $sub_menu = [ [ $opt, "  Binary filter", $no_yes ] ];
+                my $sub_menu = [ [ $opt, "- Binary filter", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'squash_spaces' ) {
                 my $prompt = '"Remove leading and trailing spaces and squash consecutive spaces"';
-                my $sub_menu = [ [ $opt, "  Squash spaces", $no_yes ] ];
+                my $sub_menu = [ [ $opt, "- Squash spaces", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'min_col_width' ) {
                 my $digits = 3;
-                my $prompt = 'Set the minimum column width: ';
+                my $prompt = 'Set the minimum column width ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
             elsif ( $opt eq 'undef' ) {
@@ -487,25 +480,25 @@ sub set_options {
             }
             elsif ( $opt eq 'progress_bar' ) {
                 my $digits = 7;
-                my $prompt = 'Set the threshold for the progress bar: ';
+                my $prompt = 'Set the threshold for the progress bar ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
             elsif ( $opt eq 'file_find_warnings' ) {
                 my $prompt = '"SQLite database search"';
                 my $sub_menu = [
-                    [ 'file_find_warnings', "Enable \"File::Find\" warnings", $no_yes ]
+                    [ 'file_find_warnings', "- Enable \"File::Find\" warnings", $no_yes ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'max_rows' ) {
                 my $digits = 7;
-                my $prompt = 'Set the SQL auto LIMIT: ';
+                my $prompt = 'Set the SQL auto LIMIT ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
             elsif ( $opt eq 'meta' ) {
-                my $prompt = 'DB/schemas/tables: ';
+                my $prompt = 'DB/schemas/tables ';
                 my $list = $no_yes;
-                my $sub_menu = [ [ $opt, "  Add metadata", $list ] ];
+                my $sub_menu = [ [ $opt, "- Add metadata", $list ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_alias' ) {
@@ -535,16 +528,16 @@ sub set_options {
             }
             elsif ( $opt eq 'parentheses' ) {
                 my $prompt = 'Parentheses in WHERE/HAVING';
-                my $sub_menu = [ [ $opt, "  Enable parentheses", $no_yes ] ];
+                my $sub_menu = [ [ $opt, "- Enable parentheses", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'alias' ) {
                 my $prompt = 'For complex columns:';
-                my $sub_menu = [ [ $opt, "  Add alias", $no_yes ] ];
+                my $sub_menu = [ [ $opt, "- Add alias", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'operators' ) {
-                my $prompt = 'Choose operators:';
+                my $prompt = 'Choose operators';
                 $sf->__choose_a_subset_wrap( $section, $opt, $sf->{avail_operators}, $prompt );
             }
             elsif ( $opt eq '_sql_identifiers' ) {
@@ -569,13 +562,13 @@ sub set_options {
             elsif ( $opt eq 'mouse' ) {
                 my $prompt = 'Choose: ';
                 my $list = [ 0, 1, 2, 3, 4 ];
-                my $sub_menu = [ [ $opt, "  Mouse mode", $list ] ];
+                my $sub_menu = [ [ $opt, "- Mouse mode", $list ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_menu_memory' ) {
                 my $prompt = 'Choose: ';
                 my $sub_menu = [
-                    [ 'menu_memory',     "- Menu memory", $no_yes ],
+                    [ 'menu_memory', "- Menu memory", $no_yes ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -602,7 +595,7 @@ sub set_options {
             }
             elsif ( $opt eq 'data_type_guessing' ) {
                 my $prompt = 'Data type guessing';
-                my $sub_menu = [ [ $opt, "  Enable data type guessing", $no_yes ] ];
+                my $sub_menu = [ [ $opt, "- Enable data type guessing", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             else { die "Unknown option: $opt" }
@@ -623,8 +616,8 @@ sub __choose_a_subset_wrap {
     my ( $sf, $section, $opt, $available, $prompt ) = @_;
     my $current = $sf->{o}{$section}{$opt};
     # Choose_list
-    my $info = 'Cur> ' . join( ', ', @$current );
-    my $name = 'New> ';
+    my $info = 'Cur: ' . join( ', ', @$current );
+    my $name = 'New: ';
     my $list = choose_a_subset(
         $available,
         { info => $info, name => $name, prompt => $prompt, prefix => '- ', index => 0, remove_chosen => 1,
@@ -642,8 +635,8 @@ sub __choose_a_number_wrap {
     my ( $sf, $section, $opt, $prompt, $digits ) = @_;
     my $current = $sf->{o}{$section}{$opt};
     my $w = $digits + int( ( $digits - 1 ) / 3 ) * length $sf->{o}{G}{thsd_sep};
-    my $info = 'Cur> ' . sprintf( "%*s", $w, insert_sep( $current, $sf->{o}{G}{thsd_sep} ) );
-    my $name = 'New> ';
+    my $info = 'Cur: ' . sprintf( "%*s", $w, insert_sep( $current, $sf->{o}{G}{thsd_sep} ) );
+    my $name = 'New: ';
     #$info = $prompt . "\n" . $info;
     # Choose_a_number
     my $choice = choose_a_number(
@@ -667,7 +660,7 @@ sub __group_readline {
     my $trs = Term::Form->new();
     my $new_list = $trs->fill_form(
         $list,
-        { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} }
+        { prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} }
     );
     if ( $new_list ) {
         for my $i ( 0 .. $#$items ) {

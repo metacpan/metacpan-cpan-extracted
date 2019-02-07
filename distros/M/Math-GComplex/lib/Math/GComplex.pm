@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use overload
   '""' => \&stringify,
@@ -116,8 +116,9 @@ use overload
 
     my %misc = (
 
-        acmp => \&acmp,
-        cplx => \&cplx,
+        acmp  => \&acmp,
+        cplx  => \&cplx,
+        polar => \&polar,
 
         abs => sub (_) { goto &abs },    # built-in function
 
@@ -211,6 +212,15 @@ sub _cartesian {
 sub _polar {
     my ($self) = @_;
     $self->{polar} //= [CORE::sqrt($self->{a} * $self->{a} + $self->{b} * $self->{b}), CORE::atan2($self->{b}, $self->{a})];
+}
+
+#
+## Return the polar form
+#
+
+sub polar {
+    my ($self) = @_;
+    @{$self->_polar};
 }
 
 #

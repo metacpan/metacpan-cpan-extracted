@@ -6,8 +6,8 @@ use Scalar::Util 'weaken';
 use OpenGL::Sandbox qw/ glGetString GL_VERSION /;
 use SDLx::App;
 
-# ABSTRACT: Subclass of SDLx::App to meet contract of OpenGL::Sandbox::make_context
-our $VERSION = '0.042'; # VERSION
+# ABSTRACT: Create OpenGL context with SDLx::App
+our $VERSION = '0.100'; # VERSION
 
 my %instances;
 sub new {
@@ -64,37 +64,36 @@ __END__
 
 =head1 NAME
 
-OpenGL::Sandbox::ContextShim::SDL - Subclass of SDLx::App to meet contract of OpenGL::Sandbox::make_context
+OpenGL::Sandbox::ContextShim::SDL - Create OpenGL context with SDLx::App
 
 =head1 VERSION
 
-version 0.042
+version 0.100
 
 =head1 DESCRIPTION
 
 This class is loaded automatically if needed by L<OpenGL::Sandbox/make_context>.
+It uses L<SDLx::App> to create an OpenGL context.
 
-It provides the standard ContextShim API:
+=head1 ATTRIBUTES
+
+=head2 sdl
+
+The SDLx::App object
+
+=head1 METHODS
+
+=head2 Standard ContextShim API:
 
 =over 14
 
 =item new
 
-Accepting all the options of make_context
+Accepting all the options of L<OpenGL::Sandbox/make_context>
 
 =item context_info
 
 =item swap_buffers
-
-=back
-
-It also provides:
-
-=over 14
-
-=item sdl
-
-The SDL::App object
 
 =back
 

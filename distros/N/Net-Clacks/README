@@ -13,18 +13,18 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,
 at your option, any later version of Perl 5 you may have available.
 
-Warning: Maplat includes code and some other stuff from other projects for ease of
+Warning: PageCamel includes code and some other stuff from other projects for ease of
 development and deployment, some of which may or may not have different open source
-licenses. Wherever dual-licensing is used, Maplat uses the license with fewer restriction
+licenses. Wherever dual-licensing is used, PageCamel uses the license with fewer restriction
 to freedom (e.g. Artistic prefered over GPL).
 
-Maplat includes a bunch of other software (for ease of install), these are
+PageCamel includes a bunch of other software (for ease of install), these are
 mainly jQuery, some jQuery plugins, jQuery.sheet() and the FCKEditor. Some of
 these are distributed under other open source licenses, please see the corresponding
 files in the tarball for details.
 
-Maplat also includes code and test scripts from Cache::Memcached and DBD::Pg, please have a look
+PageCamel also includes code and test scripts from Cache::Memcached and DBD::Pg, please have a look
 at the corresponding tarballs on CPAN.
 
-When submitting code for the Maplat project, please use Artistic license or similar - restricted
+When submitting code for the PageCamel project, please use Artistic license or similar - restricted
 code licensed under GPL will be frowned on.

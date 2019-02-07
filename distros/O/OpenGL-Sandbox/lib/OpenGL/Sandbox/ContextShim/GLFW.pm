@@ -10,8 +10,8 @@ use OpenGL::GLFW qw/ glfwInit glfwGetVersionString glfwTerminate NULL GLFW_TRUE 
 	/;
 use OpenGL::Sandbox qw/ glGetString GL_VERSION /;
 
-# ABSTRACT: Context wrapper around OpenGL::GLFW API
-our $VERSION = '0.042'; # VERSION
+# ABSTRACT: Create OpenGL context with OpenGL::GLFW
+our $VERSION = '0.100'; # VERSION
 
 # would use Moo, but I want to write my own constructor rather than store
 # all these arguments as official attributes.
@@ -86,37 +86,36 @@ __END__
 
 =head1 NAME
 
-OpenGL::Sandbox::ContextShim::GLFW - Context wrapper around OpenGL::GLFW API
+OpenGL::Sandbox::ContextShim::GLFW - Create OpenGL context with OpenGL::GLFW
 
 =head1 VERSION
 
-version 0.042
+version 0.100
 
 =head1 DESCRIPTION
 
 This class is loaded automatically if needed by L<OpenGL::Sandbox/make_context>.
+It uses L<OpenGL::GLFW> to create an OpenGL context.
 
-It provides the standard ContextShim API:
+=head1 ATTRIBUTES
+
+=head2 window
+
+The GLFW window handle
+
+=head1 METHODS
+
+=head2 Standard ContextShim API:
 
 =over 14
 
 =item new
 
-Accepting all the options of make_context
+Accepting all the options of L<OpenGL::Sandbox/make_context>
 
 =item context_info
 
 =item swap_buffers
-
-=back
-
-It also provides:
-
-=over 14
-
-=item window
-
-The GLFW window handle
 
 =back
 

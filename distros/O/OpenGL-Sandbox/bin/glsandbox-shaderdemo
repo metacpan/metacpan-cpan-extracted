@@ -1,0 +1,86 @@
+#! /usr/bin/env perl
+use strict;
+use warnings;
+use Log::Any::Adapter 'Daemontools', -init => { env => 1 };
+use Time::HiRes 'time';
+use File::Spec::Functions qw( splitpath );
+use OpenGL::Sandbox qw( :all GL_FLOAT GL_TRIANGLES GL_VERTEX_SHADER glDrawArrays $res );
+use OpenGL::Sandbox -resources => {
+	shader_config => {
+		xy_screen => { source => "
+			attribute vec2 pos;
+			void main() { gl_Position = vec4(pos,0.0,1.0); }"
+		},
+	},
+	vertex_array_config => {
+		unit_quad => {
+			buffer => { data => pack('f*',
+			  # two triangles covering entire screen
+			  -1.0, -1.0,   1.0, -1.0,    -1.0,  1.0,
+			   1.0, -1.0,   1.0,  1.0,    -1.0,  1.0
+			)},
+			attributes => { pos => { size => 2, type => GL_FLOAT } }
+		},
+	},
+};
+my %provided_uniforms= (
+	iResolution        => ['vec3'],
+	iTime              => ['float'],
+	iTimeDelta         => ['float'],
+	iFrame             => ['float'],
+	iMouse             => ['vec4'],
+	iDate              => ['vec4'],
+	iSampleRate        => ['float'],
+	iChannelTime       => ['float', 4],
+	iChannelResolution => ['vec3', 4],
+	iChannel0          => ['sampler2D'],
+	iChannel1          => ['sampler2D'],
+	iChannel2          => ['sampler2D'],
+	iChannel3          => ['sampler2D'],
+);
+sub augment_shader_code {
+	my $source= shift;
+	for (keys %provided_uniforms) {
+		my ($type, $size)= @{ $provided_uniforms{$_} };
+		# If uniform is used, and not declared, declare it.
+		if (index($source, $_) >= 0 and $source !~ /uniform\s+$type\s+$_/) {
+			$source= "uniform $type $_".($size? "[$size]":'').";\n".$source;
+		}
+	}
+	if ($source =~ /void\s+mainImage\s*\(/ and $source !~ /void\s+main\s*\(/) {
+		$source .= "
+		void main() {
+			vec4 color = vec4(0.0,0.0,0.0,1.0);
+			mainImage( color, gl_FragCoord.xy );
+			gl_FragColor = color;
+		}\n";
+	}
+	return $source;
+}
+
+@ARGV or die "Usage: glsandbox-shaderdemo [SHADER_SOURCE_FILE ...]\n";
+my %shaders;
+my @channels;
+for (@ARGV) {
+	if ($_ =~ /\.png/i) {
+		push @channels, new_texture($_, filename => $_);
+	} else {
+		my $source= ($_ eq '-')? do { $/= undef; <STDIN>; }
+			: ${ OpenGL::Sandbox::MMap->new($_) };
+		$source= augment_shader_code($source);
+		$shaders{$_}= new_shader($_, source => $source);
+	}
+}
+$shaders{vert}= shader('xy_screen') unless grep { $_->type == GL_VERTEX_SHADER } values %shaders;
+
+make_context;
+my $prog= new_program('demo', shaders => \%shaders);
+$prog->bind;
+$prog->set("iResolution", 640, 480, 1.0) if $prog->uniforms->{iResolution};
+vao('unit_quad')->bind;
+my $started= time;
+while (1) {
+	$prog->set("iTime", time - $started) if $prog->uniforms->{iTime};
+	glDrawArrays( GL_TRIANGLES, 0, 6 );
+	next_frame;
+}

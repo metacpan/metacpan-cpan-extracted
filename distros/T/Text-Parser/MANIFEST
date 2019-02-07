@@ -33,6 +33,7 @@ t/dummy-data.csv
 t/example-2.sp
 t/example-3.sp
 t/example-4.sp
+t/example-5.sp
 t/example.sp
 t/join-backslash.t
 t/mult-basic.t

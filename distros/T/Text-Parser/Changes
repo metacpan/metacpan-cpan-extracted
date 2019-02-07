@@ -1,5 +1,11 @@
 Revision history for Text-Parser
 
+0.900     2019-02-06 20:43:40-08:00 America/Los_Angeles
+  - Changed implementation to be Moose-based, so that Moose users can easily use this class.
+  - Deprecated setting method, added two new methods instead: multiline_type, auto_chomp
+  - Added a new method push_records. Save records internally calls push_records.
+  - Added tests for all methods. Updated POD.
+
 0.803     2019-01-21 15:49:03-08:00 America/Los_Angeles
   - Cleaned up code using tidyall ; perlcritic warnings fixed
 

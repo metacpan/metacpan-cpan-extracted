@@ -66,7 +66,7 @@
    "provides" : {
       "Alien::hiredis" : {
          "file" : "lib/Alien/hiredis.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -79,9 +79,10 @@
          "type" : "git",
          "url" : "https://github.com/Grinnz/Alien-hiredis.git",
          "web" : "https://github.com/Grinnz/Alien-hiredis"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#redis"
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028001"
@@ -161,6 +162,11 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaNoIndex",
             "name" : "@Author::DBOOK/MetaNoIndex",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@Author::DBOOK/MetaResources",
             "version" : "6.012"
          },
          {
@@ -270,7 +276,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.002",
+                  "tag" : "0.003",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },

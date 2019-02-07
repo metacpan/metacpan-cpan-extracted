@@ -7,12 +7,12 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 5.0;
+our $VERSION = 5.1;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
 
-# MAPLAT  (C) 2008-2016 Rene Schickbauer
+# PAGECAMEL  (C) 2008-2016 Rene Schickbauer
 # Developed under Artistic license
 
 print "Searching files...\n";
@@ -34,6 +34,7 @@ foreach my $file (@files) {
     open(my $ofh, ">", $file) or die($ERRNO);
     foreach my $line (@lines) {
         $line =~ s/\(C\)\ \d\d\d\d-\d\d\d\d\ Rene\ Schickbauer/\(C\) 2008-2019 Rene Schickbauer/ig;
+        $line =~ s/\(C\)\ \d\d\d\d-\d\d\d\d\ by\ Rene\ Schickbauer/\(C\) 2008-2019 Rene Schickbauer/ig;
         print $ofh $line;
     }
     close $ofh;

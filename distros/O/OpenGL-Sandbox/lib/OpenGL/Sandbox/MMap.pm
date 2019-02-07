@@ -4,7 +4,7 @@ use warnings;
 use File::Map 'map_file';
 
 # ABSTRACT: Wrapper around a memory-mapped scalar ref
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.100'; # VERSION
 
 
 sub size { length(${(shift)}) }
@@ -31,7 +31,7 @@ OpenGL::Sandbox::MMap - Wrapper around a memory-mapped scalar ref
 
 =head1 VERSION
 
-version 0.042
+version 0.100
 
 =head1 SYNOPSIS
 

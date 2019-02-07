@@ -395,7 +395,7 @@ sub check_config {
                   unless $value =~ /^[a-zA-Z_](\w|::)*$/;
             }
             elsif ($key eq 'VERSION') {
-                croak M13_usage_VERSION($value) unless $value =~ /^\d\.\d\d*$/;
+                croak M13_usage_VERSION($value) unless $value =~ /^\d\.\d[\d_]*$/;
             }
             $o->{CONFIG}{$key} = $value;
         }
@@ -483,6 +483,7 @@ sub check_installed {
 
     $dirparts[-1] = 'arch'
       if $dirparts[-2] eq 'blib' && $dirparts[-1] eq 'lib';
+    #warn "compare ".File::Spec->catfile(@endparts)." to $realname";
     File::Spec->catfile(@endparts) eq $realname
       or croak M28_error_grokking_path($realpath);
     $realpath =
@@ -497,6 +498,7 @@ sub check_installed {
     my $suffix = $Config{dlext};
     my $obj = File::Spec->catfile($realpath,'auto',$o->{API}{modpname},
                                   "$o->{API}{modfname}.$suffix");
+    #warn "Want to find $obj";
     croak M30_error_no_obj($o->{CONFIG}{NAME}, $o->{API}{pkg},
                            $realpath) unless -f $obj;
 
@@ -1537,7 +1539,7 @@ sub M13_usage_VERSION {
     my ($version) = @_;
     return <<END;
 Invalid value for VERSION config option: '$version'
-Must be of the form '#.##'.
+Must begin with '#.#'.
 (Should also be specified as a string rather than a floating point number)
 
 END

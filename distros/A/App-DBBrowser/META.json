@@ -44,7 +44,7 @@
             "FindBin" : "0",
             "Getopt::Long" : "0",
             "JSON" : "0",
-            "List::MoreUtils" : "0",
+            "List::MoreUtils" : "0.428",
             "Pod::Usage" : "0",
             "SQL::Type::Guess" : "0",
             "Scalar::Util" : "0",
@@ -72,6 +72,6 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.056",
+   "version" : "2.057",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

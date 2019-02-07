@@ -6,6 +6,7 @@ package Sim::OPT::Interlinear;
 # GPL License 3.0 or newer.
 # This is a program for filling a design space multivariate discrete dataseries
 # through a strategy entailing distance-weighting the nearest-neihbouring gradients.
+
 use v5.14;
 use Math::Round;
 use List::Util qw( min max reduce shuffle any );
@@ -27,20 +28,23 @@ use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Parcoord3d;
+# NOTE THAT TO USE THE PROGRAM AS A SCRIPT, THE ABOVE "use Sim::OPT..." lines should be deleted.
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
-$VERSION = '0.103';
+$VERSION = '0.113';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
 # Interlinear
 #######################################################################
 
+########## AN EXAMPLE OF SETTINGS TO BE PUT IN A CONFIGURATION FILE FOLLOWS.
+
 $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
 my $maxloops= 1000;
-my $sourcefile = "./sourcefile.csv";
+my $sourcefile = "./minitintcleaned.csv";
 my $newfile = $sourcefile . "_meta.csv";
 my $report = $newfile . "_report.txt";
 my @mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
@@ -76,10 +80,10 @@ my $condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIAB
 my $nfilter = "100"; # do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
 my $limit_checkdistgrades = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
 my $limit_checkdistpoints = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
-my $fulldo = ""; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
+my $fulldo = "no"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
 my $lvconversion = ""; # IF "EQUAL", A FRACTION OF LEVEL HAS THE VALUE OF 1, WHATEVER THE NUMBER OF A FRATION OF LEVEL IN A FACTOR. OTHERWISE, A NUMBER.
 
-#######################################################################
+############# END OF THE EXAMPLE SETTINGS TO BE PUT IN A CONFIGURATION FILE.
 
 
 sub odd
@@ -150,8 +154,8 @@ sub diff_old
   my @int = get_intersection( \@aa, \@bb );
   foreach my $el ( @aa )
   {
-    #if ( not ( $_ ~~ @int ) )
-    if ( not ( any { $_ eq $el } @int ) )
+    if ( not ( $_ ~~ @int ) )
+    #if ( not ( any { $_ eq $el } @int ) )
     {
       push ( @difference, $_ );
     }
@@ -160,7 +164,7 @@ sub diff_old
 }
 
 
-sub diff_
+sub diff
 {
   my $aref = shift;
   my $bref = shift;
@@ -174,7 +178,7 @@ sub diff_
 }
 
 
-sub diff
+sub diff_THIS
 {
   my $aref = shift;
   my $bref = shift;
@@ -462,12 +466,25 @@ sub calcdist
   {
     @diff2 = diff( \@{ $elt1 } , \@{ $el1 } ); #say $tee "777b \@diff2: " . dump( @diff2 );
 
-    my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-    @da1 = keys %h1; #say $tee "THEN \@da1: " . dump( @da1 );
-    @da1par = values %h1; #say $tee "\@da1par: " . dump( @da1par );
-    my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
-    @da2 = keys %h2; #say $tee "THEN \@da2: " . dump( @da2 );
-    @da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
+    foreach my $el ( @diff1 )
+    {
+      my @elts = split( "-", $el );
+      push( @da1, $elts[0] );
+      push( @da1par, $elts[1] );
+    }
+    foreach my $el ( @diff2 )
+    {
+      my @elts = split( "-", $el );
+      push( @da2, $elts[0] );
+      push( @da2par, $elts[1] );
+    } # say $tee "YES, I AIM.";
+
+    #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
+    #@da1 = keys %h1; #say $tee "THEN \@da1: " . dump( @da1 );
+    #@da1par = values %h1; #say $tee "\@da1par: " . dump( @da1par );
+    #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
+    #@da2 = keys %h2; #say $tee "THEN \@da2: " . dump( @da2 );
+    #@da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
 
     my $c = 0;
     foreach my $e ( @da1par )
@@ -528,12 +545,25 @@ sub calcdistgrad
   {
     @diff2 = diff( \@{ $elt1 } , \@{ $el1 } ); #say $tee "IN CALCDISTGRAD \@diff2: " . dump( @diff2 );
 
-    my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "IN CALCDISTGRAD \%h1: " . dump( \%h1 );
-    @da1 = keys %h1; # $tee "IN CALCDISTGRAD \@da1: " . dump( @da1 );
-    @da1par = values %h1; #say $tee "IN CALCDISTGRAD \@da1par: " . dump( @da1par );
-    my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "IN CALCDISTGRAD \%h2: " . dump( \%h2 );
-    @da2 = keys %h2; #say $tee "IN CALCDISTGRAD \@da2: " . dump( @da2 );
-    @da2par = values %h2; #say $tee "IN CALCDISTGRAD \@da2par: " . dump( @da2par );
+    foreach my $el ( @diff1 )
+    {
+      my @elts = split( "-", $el );
+      push( @da1, $elts[0] );
+      push( @da1par, $elts[1] );
+    }
+    foreach my $el ( @diff2 )
+    {
+      my @elts = split( "-", $el );
+      push( @da2, $elts[0] );
+      push( @da2par, $elts[1] );
+    }
+
+    #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "IN CALCDISTGRAD \%h1: " . dump( \%h1 );
+    #@da1 = keys %h1; # $tee "IN CALCDISTGRAD \@da1: " . dump( @da1 );
+    #@da1par = values %h1; #say $tee "IN CALCDISTGRAD \@da1par: " . dump( @da1par );
+    #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "IN CALCDISTGRAD \%h2: " . dump( \%h2 );
+    #@da2 = keys %h2; #say $tee "IN CALCDISTGRAD \@da2: " . dump( @da2 );
+    #@da2par = values %h2; #say $tee "IN CALCDISTGRAD \@da2par: " . dump( @da2par );
 
     my $c = 0;
     foreach my $lev1 ( @da1par )
@@ -589,13 +619,16 @@ sub calcmaxdist
 {
   my ( $arr_ref, $factlevels_ref) = @_;
   my @arr = @{ $arr_ref };
-  my @sortarr = sort { $a->[0] <=> $b->[0] } @arr;
-  my $first = $sortarr[0];
-  my $last = $sortarr[-1];
-  my %hash = %{ calcdist( $first->[1], $last->[1], $factlevels_ref ) }; say $tee "raw max distance: " . dump( $hash{rawdist} ); #say $tee "00\%hash: " . dump( %hash );
+  #my @sortarr = sort { $a->[0] <=> $b->[0] } @arr;
+  my $first = $arr[0];
+  my $last = $arr[-1];
+  my %hash = %{ calcdist( $first->[1], $last->[1], $factlevels_ref ) };
+  #say $tee "FIRST: " . dump( $first );
+  #say $tee "LAST: " . dump( $last );
+  say $tee "raw max distance: " . dump( $hash{rawdist} ); #say $tee "00\%hash: " . dump( %hash );
 
   my %nears;
-  foreach my $ar ( @sortarr )
+  foreach my $ar ( @arr )
   {
     my @nrs = @{ isnear( $ar->[0], $first, $last ) };
     $nears{$ar->[0]} = [ @nrs ];
@@ -703,7 +736,7 @@ sub isnear
 sub wei
 {
   my ( $arr_ref, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count,
-    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, $bank_ref, $fulldo, $first0, $last0, $nears_ref ) = @_;
+    $factlevels_ref, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, $bank_ref, $fulldo, $first0, $last0, $nears_ref, $checkstop ) = @_;
   my @arr = @{ $arr_ref };
   #say $tee "ARR VERY_BEFORE: " . dump(@arr);
   my %factlevels = %{ $factlevels_ref };  #say $tee "AND \%factlevels: " . dump( %factlevels );
@@ -717,7 +750,7 @@ sub wei
   my @arr__ = shuffle( @arr );
 
   my ( @arra, @arrah );
-  if ( $limit_checkdistgrades ne "" )
+  if ( ( $limit_checkdistgrades ne "" ) and ( $limit_checkdistgrades > $checkstop ) )
   {
     @arrah = @arr__;
     @arra = @arrah[0..$limit_checkdistgrades];
@@ -728,11 +761,11 @@ sub wei
   }
 
   my @arrb;
-  if ( $limit_checkdistgrades ne "" )
+  if ( ( $limit_checkdistgrades ne "" ) and ( $limit_checkdistgrades > $checkstop ) )
   {
     @arrb = @arrah[0..$limit_checkdistpoints];
   }
-  elsif ( $limit_checkdistpoints ne "" )
+  elsif ( ( $limit_checkdistpoints ne "" ) and ( $limit_checkdistpoints > $checkstop ) )
   {
     @arrb = @arr__;
     @arrb = @arrb[0..$limit_checkdistpoints];
@@ -750,25 +783,27 @@ sub wei
     my %factlevels = %{ $factlevels_r };
     my %nears = %{ $nears_ref };
 
-    my $nstop;
-    if ( $nfilter ne "" )
-    {
-      $nstop = ( $nfilter * 2 );
-    }
+    #my $nstop;
+    #if ( $nfilter ne "" )
+    #{
+    #  $nstop = ( $nfilter * 2 );
+    #}
 
     my %bank;
     foreach my $el ( @arr )
     { #say $tee "SO IN FIRST ARR CHECK" ;  say $tee "\$el->[1]: " . dump( $el->[1] ); #say $tee "EL: " . dump( $el );
-      my $key =  $el->[0] ; #say $tee "\$key: " . dump( $key );
+      #my $key =  $el->[0] ; #say $tee "\$key: " . dump( $key );
       if ( ( $el->[2] ne "" ) and ( $el->[3] >= $minimumcertain ) )
       { #say $tee "SO IN SECOND ARR CHECK" ; say $tee "\nTRYING \$el->[1]: " . dump( $el->[1] );
 
         my @neighbours = @{ $nears{$el->[0]} } ;
 
+        #foreach my $elt ( @neighbours )
         foreach my $elt ( @arra )
         { #say $tee "SO, ELT: " . dump( $elt ); say $tee "IN WHICH, ELT0: " . dump( @{ $elt->[0] } );
           #if ( ( $elt->[0] ~~ @neighbours ) and ( $elt->[2] ne "" ) and ( $elt->[0] ne $el->[0] ) and ( $el->[3] >= $minimumcertain ) )
           #if ( ( $elt->[0] ~~ @neighbours ) and ( $elt->[2] ne "" ) and ( $elt->[0] ne $el->[0] ) and ( $el->[3] >= $minimumcertain ) )
+          #if ( ( $elt->[2] ne "" ) and ( $elt->[0] ne $el->[0] ) and ( $el->[3] >= $minimumcertain ) )
           if ( ( any { $_ eq $elt->[0] } @neighbours ) and ( $elt->[2] ne "" ) and ( $elt->[0] ne $el->[0] ) and ( $el->[3] >= $minimumcertain ) )
           { #say $tee "NOW CHECKING .";
 
@@ -803,9 +838,9 @@ sub wei
               my $benchmark;
               if ( $nfilter ne "" )
               {
-                if ( scalar( @{ $bank{$trio}{strengths} } ) > $nstop )
+                if ( scalar( @{ $bank{$trio}{strengths} } ) > $nfilter )
                 {
-                  $benchmark = ${ $bank{$trio}{strengths} }[$nstop]; #say "BENCHMARK1: $benchmark.";
+                  $benchmark = ${ $bank{$trio}{strengths} }[$nfilter]; #say "BENCHMARK1: $benchmark.";
                 }
                 else
                 {
@@ -824,7 +859,7 @@ sub wei
                 { #say $tee "WORKING \$d10: " . dump( $d10 );
                   #say "IN FOREACH.";
 
-                  if ( ( $nstop ne "" ) and ( scalar( @{ $bank{$trio}{strengths} } ) > $nfilter ) )
+                  if ( ( $nfilter ne "" ) and ( scalar( @{ $bank{$trio}{strengths} } ) > $nfilter ) )
                   {
                     #say "NEXT!";
                     next;
@@ -961,7 +996,7 @@ sub wei
   #if ( ( !keys %bank ) or ( %bank = "" ) )
   if ( %bank = "" )
   {
-    say $tee "Now in gradients' \%bank.";
+    say $tee "Entering gradients' \%bank.";
     %bank = %{ fillbank( \@arr__, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter, \@arra, $first0, $last0, \%nears ) };
     %bank = %{ clean( \%bank, $nfilter ) }; say $tee "CLEANED \%bank: " . dump( %bank ) ;
     #my %bank =  %{ $bank_ref }; say $tee "CLEANED \%bank: " . dump( %bank );
@@ -1001,12 +1036,27 @@ sub wei
             { #say $tee "AND \@diff1 IS 1: " . dump( @diff1 );
               #say "NOW IN.";
               my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
-              my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-              my @da1 = keys %h1;
-              my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
-              my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " .yes dump( %h2 );
-              my @da2 = keys %h2;
-              my @da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
+
+              my ( @da1, @da1par, @da2, @da2par );
+              foreach my $el ( @diff1 )
+              {
+                my @elts = split( "-", $el );
+                push( @da1, $elts[0] );
+                push( @da1par, $elts[1] );
+              }
+              foreach my $el ( @diff2 )
+              {
+                my @elts = split( "-", $el );
+                push( @da2, $elts[0] );
+                push( @da2par, $elts[1] );
+              }
+
+              #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
+              #my @da1 = keys %h1;
+              #my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
+              #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " .yes dump( %h2 );
+              #my @da2 = keys %h2;
+              #my @da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
               #say $tee "SAYYY \$el->[1]: " . dump( $el->[1] );
 
               my $soughtval;
@@ -1193,13 +1243,28 @@ sub purelin
               if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) <= ( 1 + $relaxlimit ) ) )
               { #say $tee "AND \@diff1 IS 1: " . dump( @diff1 );
 
-                my @diffo_wei2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
-                my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-                my @da1 = keys %h1;
-                my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
-                my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " .yes dump( %h2 );
-                my @da2 = keys %h2;
-                my @da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
+                my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
+
+                my ( @da1, @da1par, @da2, @da2par );
+                foreach my $el ( @diff1 )
+                {
+                  my @elts = split( "-", $el );
+                  push( @da1, $elts[0] );
+                  push( @da1par, $elts[1] );
+                }
+                foreach my $el ( @diff2 )
+                {
+                  my @elts = split( "-", $el );
+                  push( @da2, $elts[0] );
+                  push( @da2par, $elts[1] );
+                }
+
+                #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
+                #my @da1 = keys %h1;
+                #my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
+                #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " .yes dump( %h2 );
+                #my @da2 = keys %h2;
+                #my @da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
                 #say $tee "SAYYY \$el->[1]: " . dump( $el->[1] );
 
                 my $count = 0;
@@ -1233,12 +1298,26 @@ sub purelin
               { #say $tee "AND \@diff1 IS 1: " . dump( @diff1 );#SAME CONTENT AS THE PREVIOUS WHILE HERE BELOW
                 my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
 
-                my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-                my @da1 = keys %h1;
-                my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
-                my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
-                my @da2 = keys %h2;
-                my @da2po_weiar = values %h2; #sa_refy $tee "\@da2par: " . dump( @da2par );
+                my ( @da1, @da1par, @da2, @da2par );
+                foreach my $el ( @diff1 )
+                {
+                  my @elts = split( "-", $el );
+                  push( @da1, $elts[0] );
+                  push( @da1par, $elts[1] );
+                }
+                foreach my $el ( @diff2 )
+                {
+                  my @elts = split( "-", $el );
+                  push( @da2, $elts[0] );
+                  push( @da2par, $elts[1] );
+                }
+
+                #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
+                #my @da1 = keys %h1;
+                #my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
+                #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
+                #my @da2 = keys %h2;
+                #my @da2po_weiar = values %h2; #sa_refy $tee "\@da2par: " . dump( @da2par );
                 #say $tee "\$el->[2]: " . dump( $el->[2] );
 
                 if ( $relaxmethod eq "linear" )
@@ -1312,12 +1391,27 @@ sub purelin
               { #say $tee "AND \@diff1 IS 1: " . dump( @diff1 );
                 my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
 
-                my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-                my @da1 = keys %h1;
-                my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
-                my %h2fill = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
-                my @da2 = keys %h2;
-                my @da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
+
+                my ( @da1, @da1par, @da2, @da2par );
+                foreach my $el ( @diff1 )
+                {
+                  my @elts = split( "-", $el );
+                  push( @da1, $elts[0] );
+                  push( @da1par, $elts[1] );
+                }
+                foreach my $el ( @diff2 )
+                {
+                  my @elts = split( "-", $el );
+                  push( @da2, $elts[0] );
+                  push( @da2par, $elts[1] );
+                }
+
+                #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
+                #my @da1 = keys %h1;
+                #my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
+                #my %h2fill = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
+                #my @da2 = keys %h2;
+                #my @da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
                 #say $tee "SAYYY \$el->[1]: " . dump( $el->[1] );
 
                 my $count = 0;
@@ -1353,12 +1447,26 @@ sub purelin
               { #say $tee "AND \@diff1 IS 1: " . dump( @diff1 );#SAME CONTENT AS THE PREVIOUS WHILE HERE BELOW
                 my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } ); #say $tee "SO \@diff2: " . dump( @diff2 );
 
-                my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-                my @da1 = keys %h1;
-                my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
-                my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
-                my @da2 = keys %h2;
-                my @da2par = values %h2; #say $tee "\@da2par: " . du$presence mp( @da2par );
+                my ( @da1, @da1par, @da2, @da2par );
+                foreach my $el ( @diff1 )
+                {
+                  my @elts = split( "-", $el );
+                  push( @da1, $elts[0] );
+                  push( @da1par, $elts[1] );
+                }
+                foreach my $el ( @diff2 )
+                {
+                  my @elts = split( "-", $el );
+                  push( @da2, $elts[0] );
+                  push( @da2par, $elts[1] );
+                }
+
+                #my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
+                #my @da1 = keys %h1;
+                #my @da1par = values %h1; # $tee "\@da1par: " . dump( @da1par );
+                #my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
+                #my @da2 = keys %h2;
+                #my @da2par = values %h2; #say $tee "\@da2par: " . du$presence mp( @da2par );
                 #say $tee "SAYYY \$el->[1]: " . dump( $el->[1] );
 
                 my $count = 0;
@@ -1661,7 +1769,7 @@ sub interlinear
 
   if ( -e $confile )
   {
-    eval $confile; ############## FIX THIS!
+    #eval $confile; ############## FIX THIS!
   }
 
   if ( $sourcef ne "" ){ $sourcefile = $sourcef; } #say $tee "CHECK5 \$sourcefile: " . dump( $sourcefile );
@@ -1677,6 +1785,7 @@ sub interlinear
 
   say $tee "Preparing the dataseries, IN INTERLINEAR: \$countblock $countblock";
   say "nfilter: $nfilter";
+  my $checkstop;
 
   my $aarr_ref;
   ( $aarr_ref, $optformat ) = preparearr( @lines );
@@ -1721,7 +1830,6 @@ sub interlinear
     #say $tee "OBTAINED limbo_vault: " . dump( @limbo_vault );
     #say $tee "THERE ARE " . scalar( @limbo_vault ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR GLOBALLY WEIGHTED GRADIENT INTERPOLATION.";
 
-
     sub checkstop
     {
       my @arr = @_;
@@ -1739,13 +1847,14 @@ sub interlinear
         printend( \@arr, $newfile, $optformat );
         last;
       }
+      $checkstop = $t;
     }
     checkstop( @arr );
 
 
     if ( ( $mode__ eq "wei" ) or ( $mode__ eq "mix" ) )
     {
-      my ( $limbo_wei_ref, $bank_ref ) = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, \%bank, $fulldo, $first0, $last0, \%nears );
+      my ( $limbo_wei_ref, $bank_ref ) = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, \%bank, $fulldo, $first0, $last0, \%nears, $checkstop );
 
       @limbo_wei = @{ $limbo_wei_ref };
       %bank = %{ $bank_ref };
@@ -1919,7 +2028,7 @@ Sim::OPT::Interlinear
   # as a function from Perl (for example, after having launched "re.pl" from the command line):
   interlinear( "/path/to/a-pre-prepared-configfile.pl", "/path/to/a-pre-prepared-sourcefile.csv", "/path/to/the-metamodel-file-to-be-obtained" );
   # or as a script, from the command line, from a directory where the file "Interlinear.pm" has been copied:
-  interlinear .
+  ./Interlinear.pm .
   # (note the dot at the end). In that case, Interlinear will look for the source file "sourcefile.csv" in the "$HOME" directory, and restitute back a file "sourcefile_meta.csv" in the same directory.
   # and also, note that, in this case, the opening lines in the script saying "use Sim::OPT" etc. have to be deleted.
   # or, again, from the command line, for beginning with a dialogue question:
@@ -1930,28 +2039,27 @@ Sim::OPT::Interlinear
 
 
 Interlinear is a program for computing the missing values in multivariate datasieries through a strategy entailing distance-weighting the nearest-neihbouring gradients between points in an n-dimensional space.
-The program can adopt the following algorithmic strategies - including the told, main one - and intermix their result:
+The program adopts a distance-weighted gradient-based strategy. In this strategy, the known gradients are weighted in a manner inversely proportional to the distance of their pivot point from the pivot point of each unknown nearest-neighbouring gradient, then the gradients neighbouring near each unknown point are utilized to define that point, weighting the candidates by distance. In this strategy, the curvatures in the hyperspace derive from the fact that in the calculations local samples of the near-neighbouring gradients are used, which vary for each point. (This strategy is adopted in Interlinear since version 0.103. Before that version, the gradients were calculated on a global basis.)
+Besides the described strategy (a), the following metamodelling strategies are utilized by Interlinear:
 
-a) a propagating distance-weighted gradient-based strategy (by far the best one so far, keeping into account that the behaviour of factors is often not linear and there are curvatures all around the design space). The strategy weights the known gradients in a manner inversely proportional to the distance of their pivot points from the pivot points of the missing nearest-neighbouring gradients.
-
-b) pure linear interpolation (one may want to use this in some occasions: for example, on factorials);
+b) pure linear interpolation (one may want to use this in some occasions: for example with factorials);
 
 c) pure nearest neighbour (a strategy of last resort. One may want to use it to unlock a computation which is based on data which are too sparse to proceed, or when nothing else works).
 
-Strategy a) works for cases which are adjacent in the design space. For example, it cannot work with the gradient between a certain iteration 1 and the corresponding iteration 3. It can only work with the gradient between iterations 1 and 2, or 2 and 3.
-For that reason, it does not work well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from star (coordinate descent) sampling strategies.
+Strategy a) in the adopted setting, works with cases which are adjacent in the design space. In that setting, it the strategy cannot work with the gradient between a certain iteration 1 and the corresponding iteration 3. It can only work with the gradient between iterations 1 and 2, or 2 and 3. (This is a design decision, but it is not inevitable. Versions of Interlinear prior to 0.103 could work with non-adiacent instances, if wanted.)
+For the told reason, Interlinear does not work well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from star (coordinate descent) sampling strategies.
 To work well with a latin hypercube sampling, it is necessary to include a pass of strategy b) before calling strategy a). Then strategy a) will charge itself of reducing the gradient errors created by the initial pass of strategy b).
 
 A configuration file should be prepared following the example in the "examples" folder in this distribution.
 If the configuration file is incomplete or missing, the program adopts its own defaults, exploiting the distance-weighted gradient-based strategy.
 
-The only variable that must mandatorily be specified in a configuration file is $sourcefile : the Unix path to the source file containining the dataseries.
+The only variable that must mandatorily be specified in a configuration file is $sourcefile : the Unix path to the source file containining the dataseries. If not specified, the program will look for "./sourcefile.csv".
 
 The source file has to be prepared by listing in each column the values (levels) of the parameters (factors, variables), putting in the last column the objective function values, in the rows in which they are present.
 
 The parameter number is given by the position of the column (i.e. column 4 host parameter 4).
 
-Here below an example is shown of multivatiate dataseries of 3 parameters assuming 3 levels each. The numbers preceding the objective function (which is in the last colum) are the indices of the multidimensional matrix (tensor).
+Here below an example is shown of multivatiate dataseries of 3 parameters assuming 3 levels each. The numbers preceding the objective function (which is in the last colum) are the indices of the multidimensional matrix (tensor). Note that the parameter listings (i.e. numbers describing levels) cannot be incomplete. Just the objective function entries can be.And the parameter listings must be integer numbers from 1 to n.
 
 
 1,1,1,1.234
@@ -1973,7 +2081,6 @@ Here below an example is shown of multivatiate dataseries of 3 parameters assumi
 3,3,3,3
 
 
-Note that the parameter listings cannot be incomplete. Just the objective function entries can be.
 The program converts this format into the one liked by Sim::OPTS, which is the following, in which the indices of the tensor are expressed more clearly:
 
 
@@ -1999,7 +2106,7 @@ The program converts this format into the one liked by Sim::OPTS, which is the f
 After some computations, Interlinear will output a new dataseries, with the missing values filled in.
 This dataseries can be used by OPT for the optimization of one or more blocks. This can be useful for saving computations in searches involving simulations, especially when the time required by each simulations is long, like it may happen with CFD simulations in building design.
 
-The number of computations required for the creation of a metamodel in OPT increases exponencially with the number of instances in the metamodel. To make the increase linear, a limit has to be set for the size of net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$limit_checkgrades" and "$limit_checkpoints". By default they are both set to 10000. If a null value ("") is specified for them, no limit is assumed.
+The number of computations required for the creation of a metamodel in OPT increases exponencially with the number of instances in the metamodel. To make the increase linear, a limit has to be set for the size of net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$limit_checkgrades" and "$limit_checkpoints". By default they are both set to "", which entails that no limit is assumed.
 
 
 =head2 EXPORT
@@ -2007,11 +2114,6 @@ The number of computations required for the creation of a metamodel in OPT incre
 
 interlinear, interstart.
 
-
-=head1 SEE ALSO
-
-
-An example of configuration file can be found in the "examples" folder in this distribution.
 
 
 =head1 AUTHOR
