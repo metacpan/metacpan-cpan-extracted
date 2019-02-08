@@ -13,6 +13,7 @@ lib/Pandoc.pm
 lib/Pandoc/Error.pm
 lib/Pandoc/Release.pm
 lib/Pandoc/Version.pm
+script/pandoc-version
 t/binmode.t
 t/convert.t
 t/data-dir.t

@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.035'; # VERSION
+our $VERSION = '0.036'; # VERSION
 
 =head1 NAME
 
@@ -1260,6 +1260,40 @@ sub skip_last {
         $src->emit(shift @pending) if @pending > $count;
     });
     $src
+}
+
+=head2 skip_until
+
+Skips the items that arrive before a given condition is reached.
+
+=over 4
+
+=item * Either a L<Future> instance (we skip all items until it's marked as `done`), or a coderef,
+which we call for each item until it first returns true
+
+=back
+
+=cut
+
+sub skip_until {
+    my ($self, $condition) = @_;
+
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    $self->completed->on_ready(sub {
+        return if $src->is_ready;
+        shift->on_ready($src->completed);
+    });
+    $self->each_while_source(do {
+        if(ref($condition) eq 'CODE') {
+            my $reached = 0;
+            sub { return $src->emit($_) if $reached ||= $condition->($_); }
+        } elsif(blessed($condition) && $condition->isa('Future')) {
+            $condition->on_fail($src->completed)->on_cancel($src->completed);
+            sub { $src->emit($_) if $condition->is_done; }
+        } else {
+            die 'unknown type for condition: ' . $condition;
+        }
+    }, $src);
 }
 
 =head2 take

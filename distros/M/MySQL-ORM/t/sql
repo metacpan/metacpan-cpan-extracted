@@ -1,0 +1,35 @@
+CREATE TABLE sport (
+    sport_id    	INT    AUTO_INCREMENT,
+    sport_name 		varchar(50) NOT NULL,
+    
+    PRIMARY KEY (sport_id),
+    UNIQUE INDEX sport_name_ak(sport_name)
+ )ENGINE=INNODB
+;
+
+
+
+CREATE TABLE league (
+    league_id    INT    AUTO_INCREMENT,
+    league_name  varchar(20) NOT NULL,
+    sport_id     INT    NOT NULL,
+    
+    PRIMARY KEY (league_id), 
+    FOREIGN KEY (sport_id) REFERENCES sport(sport_id),
+    UNIQUE INDEX league_name_ak(league_name, sport_id)
+)ENGINE=INNODB
+;
+
+
+CREATE TABLE team (
+    team_id    INT    AUTO_INCREMENT,
+    team_name  varchar(20) NOT NULL,
+    league_id     INT    NOT NULL,
+	city       varchar(30)  NOT NULL,    
+	
+    PRIMARY KEY (team_id), 
+    FOREIGN KEY (league_id) REFERENCES league(league_id),
+    UNIQUE INDEX team_name_ak(team_name, league_id)
+)ENGINE=INNODB
+;
+

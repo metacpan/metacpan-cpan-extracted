@@ -21,7 +21,9 @@ MODULE = Cassandra::Client  PACKAGE = Cassandra::Client::Protocol
 PROTOTYPES: DISABLE
 
 void
-unpack_metadata(data)
+unpack_metadata(protocol_version, is_result, data)
+    int protocol_version
+    int is_result
     SV *data
   PPCODE:
     STRLEN pos, size;
@@ -37,9 +39,24 @@ unpack_metadata(data)
 
     if (UNLIKELY(!ptr))
         croak("Missing data argument to unpack_metadata");
+    if (UNLIKELY(protocol_version != 3 && protocol_version != 4))
+        croak("Invalid protocol version");
 
     flags = unpack_int(aTHX_ ptr, size, &pos);
     column_count = unpack_int(aTHX_ ptr, size, &pos);
+
+    if (protocol_version >= 4 && !is_result) {
+        int i, pk_count;
+
+        pk_count = unpack_int(aTHX_ ptr, size, &pos);
+        if (UNLIKELY(pk_count < 0))
+            croak("Protocol error: pk_count<0");
+
+        for (i = 0; i < pk_count; i++) {
+            // Read the short, but throw it away for now.
+            unpack_short(aTHX_ ptr, size, &pos);
+        }
+    }
 
     if (UNLIKELY(flags < 0 || flags > 7))
         croak("Invalid protocol data passed to unpack_metadata (reason: invalid flags)");

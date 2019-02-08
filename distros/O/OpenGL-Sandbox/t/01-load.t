@@ -11,15 +11,23 @@ ok( eval { OpenGL::Sandbox->import('glBindTexture'); 1 } && main->can('glBindTex
 
 SKIP: {
 	skip "GLX not available", 1 unless eval { require X11::GLX::DWIM; };
-	ok( eval { require OpenGL::Sandbox::ContextShim::GLX; 1 }, 'Load context shim GLX' );
+	ok( eval { require OpenGL::Sandbox::ContextShim::GLX; 1 }, 'Load context shim GLX' )
+		or diag $@;
 }
 SKIP: {
 	skip "SDL not available", 1 unless eval { require SDLx::App; };
-	ok( eval { require OpenGL::Sandbox::ContextShim::SDL; 1 }, 'Load context shim SDL' );
+	ok( eval { require OpenGL::Sandbox::ContextShim::SDL; 1 }, 'Load context shim SDL' )
+		or diag $@;
 }
 SKIP: {
 	skip "GLFW not available", 1 unless eval { require OpenGL::GLFW; };
-	ok( eval { require OpenGL::Sandbox::ContextShim::GLFW; 1 }, 'Load context shim GLFW' );
+	ok( eval { require OpenGL::Sandbox::ContextShim::GLFW; 1 }, 'Load context shim GLFW' )
+		or diag $@;
+}
+SKIP: {
+	skip "GLUT not available", 1 unless eval { require OpenGL; };
+	ok( eval { require OpenGL::Sandbox::ContextShim::GLUT; 1 }, 'Load context shim GLUT' )
+		or diag $@;
 }
 
 done_testing;

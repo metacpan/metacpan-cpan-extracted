@@ -8,12 +8,15 @@ use Git::Helpers qw(
     checkout_root
     current_branch_name
     https_remote_url
+    ignored_files
     is_inside_work_tree
     remote_url
     travis_url
 );
 use Git::Version ();
 use Git::Sub;
+use Path::Tiny qw( path );
+use Test::Deep qw( cmp_deeply );
 use Test::Fatal;
 use Test::Git 1.313;
 use Test::More;
@@ -79,9 +82,49 @@ SKIP: {
     is( current_branch_name(), $file, 'current branch is ' . $file );
 
     ok( is_inside_work_tree(), 'is_inside_work_tree' );
-    chdir('..');
-    ok( !is_inside_work_tree(), 'not is_inside_work_tree' );
-}
+
+    subtest 'ignored_files' => sub {
+        my $gitignore = path('.gitignore');
+        $gitignore->touch;
+        cmp_deeply( ignored_files(), [], 'no ignored files' );
+
+        my $first = 'FOO.HTML';
+
+        path('.gitignore')->append("$first\n");
+        path($first)->touch;
+        cmp_deeply( ignored_files(), [$first], 'one ignored file' );
+
+        my $second = 'GOO.HTML';
+        path('.gitignore')->append("$second\n");
+        path($second)->touch;
+
+        cmp_deeply(
+            ignored_files(), [ $first, $second ],
+            'two ignored files'
+        );
+
+        my $dir = 'empty-dir';
+        path($dir)->mkpath;
+        cmp_deeply(
+            ignored_files($dir), [],
+            'no ignored files in empty dir'
+        );
+
+        like(
+            exception {
+                cmp_deeply(
+                    ignored_files('..'), [],
+                    'no ignored files in empty dir'
+                );
+            },
+            qr{Cannot find ignored files in dir},
+            'dies on check outside repository'
+        );
+
+        chdir('..');
+        ok( !is_inside_work_tree(), 'not is_inside_work_tree' );
+    }
+};
 
 {
     my $dir = tempdir( CLEANUP => 1 );

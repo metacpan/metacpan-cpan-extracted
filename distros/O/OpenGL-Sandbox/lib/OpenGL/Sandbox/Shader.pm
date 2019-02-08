@@ -22,7 +22,7 @@ BEGIN {
 }
 
 # ABSTRACT: Wrapper object for OpenGL shader
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.120'; # VERSION
 
 
 has name       => ( is => 'rw' );
@@ -98,7 +98,7 @@ OpenGL::Sandbox::Shader - Wrapper object for OpenGL shader
 
 =head1 VERSION
 
-version 0.100
+version 0.120
 
 =head1 DESCRIPTION
 

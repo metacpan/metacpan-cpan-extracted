@@ -36,28 +36,28 @@ no_index:
 provides:
   Ryu:
     file: lib/Ryu.pm
-    version: '0.035'
+    version: '0.036'
   Ryu::Buffer:
     file: lib/Ryu/Buffer.pm
-    version: '0.035'
+    version: '0.036'
   Ryu::Exception:
     file: lib/Ryu/Exception.pm
-    version: '0.035'
+    version: '0.036'
   Ryu::Node:
     file: lib/Ryu/Node.pm
-    version: '0.035'
+    version: '0.036'
   Ryu::Observable:
     file: lib/Ryu/Observable.pm
-    version: '0.035'
+    version: '0.036'
   Ryu::Sink:
     file: lib/Ryu/Sink.pm
-    version: '0.035'
+    version: '0.036'
   Ryu::Source:
     file: lib/Ryu/Source.pm
-    version: '0.035'
+    version: '0.036'
   Ryu::Stream:
     file: lib/Ryu/Stream.pm
-    version: '0.035'
+    version: '0.036'
 recommends:
   JSON::MaybeUTF8: '1.000'
   MIME::Base64: '0'
@@ -90,7 +90,10 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Ryu/issues
   homepage: https://github.com/team-at-cpan/Ryu
   repository: https://github.com/team-at-cpan/Ryu.git
-version: '0.035'
+version: '0.036'
 x_authority: cpan:TEAM
+x_contributors:
+  - 'Amin Marashi <marashi.s.amin@gmail.com>'
+  - 'tm604 <tom@perlsite.co.uk>'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

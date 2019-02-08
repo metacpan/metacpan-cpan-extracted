@@ -24,11 +24,12 @@ App::BorgRestore::Borg abstracts borg commands used by L<App::BorgRestore>.
 
 =cut
 
-method new($class: $borg_repo) {
+method new($class: $borg_repo, $backup_prefix) {
 	my $self = {};
 	bless $self, $class;
 
 	$self->{borg_repo} = $borg_repo;
+	$self->{backup_prefix} = $backup_prefix;
 
 	$self->{borg_version} = $self->borg_version();
 
@@ -52,17 +53,18 @@ method borg_version() {
 
 method borg_list() {
 	my @archives;
+	my $backup_prefix = $self->{backup_prefix};
 
 	if (Version::Compare::version_compare($self->{borg_version}, "1.1") >= 0) {
 		$log->debug("Getting archive list via json");
-		run [qw(borg list --json), $self->{borg_repo}], '>', \my $output or die $log->error("borg list returned $?")."\n";
+		run [qw(borg list --prefix), $backup_prefix, qw(--json), $self->{borg_repo}], '>', \my $output or die $log->error("borg list returned $?")."\n";
 		my $json = decode_json($output);
 		for my $archive (@{$json->{archives}}) {
 			push @archives, $archive->{archive};
 		}
 	} else {
 		$log->debug("Getting archive list");
-		run [qw(borg list), $self->{borg_repo}], '>', \my $output or die $log->error("borg list returned $?")."\n";
+		run [qw(borg list --prefix), $backup_prefix, $self->{borg_repo}], '>', \my $output or die $log->error("borg list returned $?")."\n";
 
 		for (split/^/, $output) {
 			if (m/^([^\s]+)\s/) {

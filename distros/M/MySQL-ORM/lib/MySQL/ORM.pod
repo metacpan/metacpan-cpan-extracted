@@ -1,0 +1,117 @@
+=head1 NAME
+
+MySQL::ORM
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+
+=head2 OPTIONAL
+
+=head3 dbh
+
+=cut
+
+
+=head1 METHODS
+
+=head2 delete
+
+
+=head3 parameters
+
+  Str     :$table! 
+  HashRef :$where
+
+=cut
+
+=head2 insert
+
+
+=head3 parameters
+
+  Str     :$table     
+  HashRef :$values    
+  Bool    :$ignore = 0
+
+=cut
+
+=head2 make_where_clause
+
+
+=head3 parameters
+
+  HashRef :$where!
+
+=cut
+
+=head2 prune_ddl_args
+
+
+=head3 parameters
+
+  ArrayRef $args!
+
+=cut
+
+=head2 select
+
+public methods
+sub function1 {
+}
+
+=head3 parameters
+
+  Str      :$table!            
+  ArrayRef :$columns    = ['*']
+  HashRef  :$where      = {}   
+  ArrayRef :$order_by          
+  HashRef  :$other      = {}   
+  Bool     :$distinct   = 0    
+  Bool     :$for_update = 0
+
+=cut
+
+=head2 select_one
+
+
+=head3 parameters
+
+  Str      :$table!                    
+  ArrayRef :$columns            = ['*']
+  HashRef  :$where              = {}   
+  HashRef  :$other              = {}   
+  Bool     :$confess_on_no_rows = 0    
+  Bool     :$for_update         = 0
+
+=cut
+
+=head2 update
+
+
+=head3 parameters
+
+  Str     :$table!      
+  HashRef :$values!     
+  HashRef :$where   = {}
+
+=cut
+
+=head2 upsert
+
+
+=head3 parameters
+
+  Str     :$table!  
+  HashRef :$values!
+
+=cut
+

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # This is a Module::Build script for BioPerl-Run installation.
 # See http://search.cpan.org/~kwilliams/Module-Build/lib/Module/Build.pm
@@ -32,7 +32,7 @@ my $build = Module::Build->subclass(
     )
     )->new(
     dist_name           => 'BioPerl-Run',
-    dist_version        => '1.007002',
+    dist_version        => '1.007003',
     module_name         => 'Bio::Run',
     dist_author         => 'BioPerl Team <bioperl-l@bioperl.org>',
     dist_abstract       => 'BioPerl-Run - wrapper toolkit',
@@ -50,13 +50,14 @@ my $build = Module::Build->subclass(
                             'Bio::Root::Root'    => 0,
                            },
     recommends          => {
+                            'Bio::Cluster::SequenceFamily'   => 0, # Bio::Tools::Run::TribeMCL
                             'Algorithm::Diff' => 0,     # generating consensus protein family descriptions: Bio::Tools::Run::TribeMCL
                             'IPC::Run'        => 0,     # Glimmer and Genemark application wrappers: Bio::Tools::Run::Glimmer Bio::Tools::Run::Genemark
                             'IO::String'      => 0,     # generating Bio::Tree::Tree from strings: Bio::Tools::Run::Phylo::Phylip::Consense
                             'XML::Twig'       => 0,     # processing XML data: Bio::Tools::Run::EMBOSSacd
                             'File::Sort'      => 0,     # BEDTools
                             'Config::Any'     => 0,     # MCS, Match
-                            'Bio::FeatureIO'  => 0,     # MCS, Match, Phastcons, Gumby
+                            'Bio::FeatureIO'  => 0,     # MCS, Match, Phastcons
                             #'SOAP::Lite'      => 0.716, # A bug that affects SoapEU-unit.t tests was fixed in this version (many levels deep object throws error)
                            },
     get_options         => {
@@ -119,4 +120,3 @@ else {
 
 # Create the build script and exit
 $build->create_build_script;
-

@@ -17,6 +17,7 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '0.001'
+requires:
+  AnyEvent: '7'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

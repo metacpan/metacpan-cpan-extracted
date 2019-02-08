@@ -1,3 +1,4 @@
+#include <math.h> // this fixes win32 because <cmath> that is included by <catch.hpp> breaks <perl.h> unless previously included <math.h>
 #define CATCH_CONFIG_RUNNER
 #define CATCH_CONFIG_DEFAULT_REPORTER "perl"
 #include <catch.hpp>

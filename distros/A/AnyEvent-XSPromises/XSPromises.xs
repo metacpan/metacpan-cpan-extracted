@@ -90,6 +90,7 @@ void xspr_promise_incref(pTHX_ xspr_promise_t* promise);
 void xspr_promise_decref(pTHX_ xspr_promise_t* promise);
 
 xspr_result_t* xspr_result_new(pTHX_ xspr_result_state_t state, int count);
+xspr_result_t* xspr_result_from_error(pTHX_ const char *error);
 void xspr_result_incref(pTHX_ xspr_result_t* result);
 void xspr_result_decref(pTHX_ xspr_result_t* result);
 
@@ -148,7 +149,18 @@ void xspr_callback_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* orig
 
                 if (result->count == 1 && result->state == XSPR_RESULT_RESOLVED) {
                     xspr_promise_t* promise = xspr_promise_from_sv(aTHX_ result->result[0]);
-                    if (promise != NULL) {
+                    if (promise != NULL && promise == callback->perl.next) {
+                        /* This is an extreme corner case the A+ spec made us implement: we need to reject
+                         * cases where the promise created from then() is passed back to its own callback */
+                        xspr_result_t* chain_error = xspr_result_from_error(aTHX_ "TypeError");
+                        xspr_promise_finish(aTHX_ callback->perl.next, chain_error);
+
+                        xspr_result_decref(aTHX_ chain_error);
+                        xspr_promise_decref(aTHX_ promise);
+                        skip_passthrough= 1;
+
+                    } else if (promise != NULL) {
+                        /* Fairly normal case: we returned a promise from the callback */
                         xspr_callback_t* chainback = xspr_callback_new_chain(aTHX_ callback->perl.next);
                         xspr_promise_then(aTHX_ promise, chainback);
 
@@ -299,6 +311,10 @@ xspr_result_t* xspr_invoke_perl(pTHX_ SV* perl_fn, SV** input, int input_count)
     SV* error;
     xspr_result_t* result;
 
+    if (!SvROK(perl_fn)) {
+        return xspr_result_from_error(aTHX_ "promise callbacks need to be a CODE reference");
+    }
+
     ENTER;
     SAVETMPS;
 
@@ -380,6 +396,13 @@ xspr_result_t* xspr_result_new(pTHX_ xspr_result_state_t state, int count)
     result->state = state;
     result->refs = 1;
     result->count = count;
+    return result;
+}
+
+xspr_result_t* xspr_result_from_error(pTHX_ const char *error)
+{
+    xspr_result_t* result = xspr_result_new(aTHX_ XSPR_RESULT_REJECTED, 1);
+    result->result[0] = newSVpv(error, 0);
     return result;
 }
 
@@ -628,6 +651,14 @@ reject(self, ...)
         xspr_promise_finish(aTHX_ self->promise, result);
         xspr_result_decref(aTHX_ result);
         xspr_queue_maybe_schedule(aTHX);
+
+bool
+is_in_progress(self)
+        AnyEvent::XSPromises::Deferred* self
+    CODE:
+        RETVAL = (self->promise->state == XSPR_STATE_PENDING);
+    OUTPUT:
+        RETVAL
 
 void
 DESTROY(self)

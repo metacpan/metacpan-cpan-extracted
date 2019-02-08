@@ -2,7 +2,7 @@ package App::BorgRestore;
 use v5.14;
 use strictures 2;
 
-our $VERSION = "3.2.1";
+our $VERSION = "3.3.0";
 
 use App::BorgRestore::Borg;
 use App::BorgRestore::DB;
@@ -93,7 +93,7 @@ method new($class: $deps = {}) {
 
 	my $config = $deps->{settings}->get_config();
 
-	$deps->{borg} //= App::BorgRestore::Borg->new($config->{borg}->{repo});
+	$deps->{borg} //= App::BorgRestore::Borg->new(@{$config->{borg}}{qw(repo backup_prefix)});
 	$deps->{db} //= App::BorgRestore::DB->new($config->{cache}->{database_path}, $config->{cache}->{sqlite_memory_cache_size});
 
 	return $class->new_no_defaults($deps, $config);

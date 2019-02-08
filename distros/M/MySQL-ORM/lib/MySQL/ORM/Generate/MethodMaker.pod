@@ -1,0 +1,39 @@
+=head1 NAME
+
+MySQL::ORM::Generate::MethodMaker
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+=head2 OPTIONAL
+
+none
+
+=cut
+
+
+=head1 METHODS
+
+=head2 make_method
+
+required attributes
+optional attributes
+private attributes
+methods
+
+=head3 parameters
+
+  Str :$name 
+  Str :$sig  
+  Str :$body
+
+=cut
+

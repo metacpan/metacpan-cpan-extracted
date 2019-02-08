@@ -10,7 +10,7 @@ use OpenGL::Sandbox qw(
 );
 
 # ABSTRACT: Wrapper object for OpenGL Buffer Object
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.120'; # VERSION
 
 
 has name       => ( is => 'rw' );
@@ -111,7 +111,7 @@ OpenGL::Sandbox::Buffer - Wrapper object for OpenGL Buffer Object
 
 =head1 VERSION
 
-version 0.100
+version 0.120
 
 =head1 DESCRIPTION
 

@@ -1,9 +1,18 @@
 package Apache::Session::Browseable::Store::Redis;
 
 use strict;
-use Redis;
 
 our $VERSION = '1.2.2';
+our $redis;
+
+BEGIN {
+    $redis = 'Redis::Fast';
+    eval 'use Redis::Fast';
+    if ($@) {
+        require Redis;
+        $redis = 'Redis';
+    }
+}
 
 sub new {
     my ( $class, $session ) = @_;
@@ -14,7 +23,7 @@ sub new {
       if (  $session->{args}->{encoding}
         and $session->{args}->{encoding} eq "undef" );
 
-    $self->{cache} = Redis->new( %{ $session->{args} } );
+    $self->{cache} = $redis->new( %{ $session->{args} } );
 
     # Manage database
     $self->{cache}->select( $session->{args}->{database} )
@@ -88,11 +97,20 @@ Apache::Session::Store
 This module is an implementation of Apache::Session::Browseable. It uses the
 Redis storage system
 
-=head1 AUTHOR
-
-This module was written by Xavier Guimard <x.guimard@free.fr>
-
 =head1 SEE ALSO
 
 L<Apache::Session::Browseable>, L<Apache::Session::NoSQL>, L<Apache::Session>
 
+=head1 AUTHOR
+
+This module was written by Xavier Guimard <x.guimard@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009-2018 by Xavier Guimard
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

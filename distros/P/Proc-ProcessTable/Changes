@@ -334,3 +334,6 @@ Revision history for Perl extension Proc::ProcessTable.
   * Fixed bug in Linux occurring if process name is empty (RT#106571)
   * Added missing includes on AIX (RT#39748)
   * Some minor changes on tests and documentation
+0.56 2019-02-07
+  * Testing support for mswin32
+  * minor fix for FreeBSD

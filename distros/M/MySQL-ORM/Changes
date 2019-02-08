@@ -1,0 +1,9 @@
+Revision history for MySQL-ORM
+
+0.03	removed extraneous tmp dir
+
+0.02	fixed bug in lib/MySQL/ORM.pm
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

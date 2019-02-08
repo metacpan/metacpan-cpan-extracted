@@ -1,0 +1,1879 @@
+package Module::CoreList::List::v5_19_8; # just to make PodWeaver happy
+# VERSION
+1;
+# ABSTRACT: List of core modules for perl v5.19.8
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Module::CoreList::List::v5_19_8 - List of core modules for perl v5.19.8
+
+=head1 VERSION
+
+This document describes version 0.001 of Module::CoreList::List::v5_19_8 (from Perl distribution Module-CoreList-List), released on 2019-02-08.
+
+=head1 DESCRIPTION
+
+This POD page lists all core modules (with their versions) that come with perl v5.19.8.
+
+=head1 CONTENTS
+
+=over
+
+=item * L<Amiga::ARexx> (undef)
+
+=item * L<Amiga::Exec> (undef)
+
+=item * L<AnyDBM_File> (1.01)
+
+=item * L<App::Cpan> (1.61)
+
+=item * L<App::Prove> (3.30)
+
+=item * L<App::Prove::State> (3.30)
+
+=item * L<App::Prove::State::Result> (3.30)
+
+=item * L<App::Prove::State::Result::Test> (3.30)
+
+=item * L<Archive::Extract> (undef)
+
+=item * L<Archive::Tar> (1.96)
+
+=item * L<Archive::Tar::Constant> (1.96)
+
+=item * L<Archive::Tar::File> (1.96)
+
+=item * L<Attribute::Handlers> (0.95)
+
+=item * L<AutoLoader> (5.74)
+
+=item * L<AutoSplit> (1.06)
+
+=item * L<B> (1.47)
+
+=item * L<B::Asmdata> (undef)
+
+=item * L<B::Assembler> (undef)
+
+=item * L<B::Bblock> (undef)
+
+=item * L<B::Bytecode> (undef)
+
+=item * L<B::C> (undef)
+
+=item * L<B::CC> (undef)
+
+=item * L<B::Concise> (0.991)
+
+=item * L<B::Debug> (1.19)
+
+=item * L<B::Deparse> (1.24)
+
+=item * L<B::Disassembler> (undef)
+
+=item * L<B::Lint> (undef)
+
+=item * L<B::Lint::Debug> (undef)
+
+=item * L<B::Op_private> (undef)
+
+=item * L<B::Showlex> (1.04)
+
+=item * L<B::Stackobj> (undef)
+
+=item * L<B::Stash> (undef)
+
+=item * L<B::Terse> (1.06)
+
+=item * L<B::Xref> (1.05)
+
+=item * L<Benchmark> (1.18)
+
+=item * L<Bundle::CPAN> (undef)
+
+=item * L<ByteLoader> (undef)
+
+=item * L<CGI> (3.64)
+
+=item * L<CGI::Apache> (1.02)
+
+=item * L<CGI::Carp> (3.64)
+
+=item * L<CGI::Cookie> (1.31)
+
+=item * L<CGI::Fast> (1.10)
+
+=item * L<CGI::Pretty> (3.64)
+
+=item * L<CGI::Push> (1.06)
+
+=item * L<CGI::Switch> (1.02)
+
+=item * L<CGI::Util> (3.64)
+
+=item * L<CPAN> (2.03)
+
+=item * L<CPAN::API::HOWTO> (undef)
+
+=item * L<CPAN::Author> (5.5001)
+
+=item * L<CPAN::Bundle> (5.5)
+
+=item * L<CPAN::CacheMgr> (5.5001)
+
+=item * L<CPAN::Complete> (5.5)
+
+=item * L<CPAN::Debug> (5.5001)
+
+=item * L<CPAN::DeferedCode> (undef)
+
+=item * L<CPAN::DeferredCode> (5.50)
+
+=item * L<CPAN::Distribution> (2.00)
+
+=item * L<CPAN::Distroprefs> (6)
+
+=item * L<CPAN::Distrostatus> (5.5)
+
+=item * L<CPAN::Exception::RecursiveDependency> (5.5)
+
+=item * L<CPAN::Exception::blocked_urllist> (1.001)
+
+=item * L<CPAN::Exception::yaml_not_installed> (5.5)
+
+=item * L<CPAN::Exception::yaml_process_error> (5.5)
+
+=item * L<CPAN::FTP> (5.5005)
+
+=item * L<CPAN::FTP::netrc> (1.01)
+
+=item * L<CPAN::FirstTime> (5.5304)
+
+=item * L<CPAN::HTTP::Client> (1.9600)
+
+=item * L<CPAN::HTTP::Credentials> (1.9600)
+
+=item * L<CPAN::HandleConfig> (5.5003)
+
+=item * L<CPAN::Index> (1.9600)
+
+=item * L<CPAN::InfoObj> (5.5)
+
+=item * L<CPAN::Kwalify> (5.50)
+
+=item * L<CPAN::LWP::UserAgent> (1.9600)
+
+=item * L<CPAN::Meta> (2.133380)
+
+=item * L<CPAN::Meta::Converter> (2.133380)
+
+=item * L<CPAN::Meta::Feature> (2.133380)
+
+=item * L<CPAN::Meta::History> (2.133380)
+
+=item * L<CPAN::Meta::Merge> (undef)
+
+=item * L<CPAN::Meta::Prereqs> (2.133380)
+
+=item * L<CPAN::Meta::Requirements> (2.125)
+
+=item * L<CPAN::Meta::Spec> (2.133380)
+
+=item * L<CPAN::Meta::Validator> (2.133380)
+
+=item * L<CPAN::Meta::YAML> (0.010)
+
+=item * L<CPAN::Mirrors> (1.9600)
+
+=item * L<CPAN::Module> (5.5001)
+
+=item * L<CPAN::Nox> (5.5001)
+
+=item * L<CPAN::Plugin> (undef)
+
+=item * L<CPAN::Plugin::Specfile> (undef)
+
+=item * L<CPAN::Prompt> (5.5)
+
+=item * L<CPAN::Queue> (5.5001)
+
+=item * L<CPAN::Shell> (5.5002)
+
+=item * L<CPAN::Tarzip> (5.5011)
+
+=item * L<CPAN::URL> (5.5)
+
+=item * L<CPAN::Version> (5.5001)
+
+=item * L<CPANPLUS> (undef)
+
+=item * L<CPANPLUS::Backend> (undef)
+
+=item * L<CPANPLUS::Backend::RV> (undef)
+
+=item * L<CPANPLUS::Config> (undef)
+
+=item * L<CPANPLUS::Config::HomeEnv> (undef)
+
+=item * L<CPANPLUS::Configure> (undef)
+
+=item * L<CPANPLUS::Configure::Setup> (undef)
+
+=item * L<CPANPLUS::Dist> (undef)
+
+=item * L<CPANPLUS::Dist::Autobundle> (undef)
+
+=item * L<CPANPLUS::Dist::Base> (undef)
+
+=item * L<CPANPLUS::Dist::Build> (undef)
+
+=item * L<CPANPLUS::Dist::Build::Constants> (undef)
+
+=item * L<CPANPLUS::Dist::MM> (undef)
+
+=item * L<CPANPLUS::Dist::Sample> (undef)
+
+=item * L<CPANPLUS::Error> (undef)
+
+=item * L<CPANPLUS::Internals> (undef)
+
+=item * L<CPANPLUS::Internals::Constants> (undef)
+
+=item * L<CPANPLUS::Internals::Constants::Report> (undef)
+
+=item * L<CPANPLUS::Internals::Extract> (undef)
+
+=item * L<CPANPLUS::Internals::Fetch> (undef)
+
+=item * L<CPANPLUS::Internals::Report> (undef)
+
+=item * L<CPANPLUS::Internals::Search> (undef)
+
+=item * L<CPANPLUS::Internals::Source> (undef)
+
+=item * L<CPANPLUS::Internals::Source::Memory> (undef)
+
+=item * L<CPANPLUS::Internals::Source::SQLite> (undef)
+
+=item * L<CPANPLUS::Internals::Source::SQLite::Tie> (undef)
+
+=item * L<CPANPLUS::Internals::Utils> (undef)
+
+=item * L<CPANPLUS::Internals::Utils::Autoflush> (undef)
+
+=item * L<CPANPLUS::Module> (undef)
+
+=item * L<CPANPLUS::Module::Author> (undef)
+
+=item * L<CPANPLUS::Module::Author::Fake> (undef)
+
+=item * L<CPANPLUS::Module::Checksums> (undef)
+
+=item * L<CPANPLUS::Module::Fake> (undef)
+
+=item * L<CPANPLUS::Module::Signature> (undef)
+
+=item * L<CPANPLUS::Selfupdate> (undef)
+
+=item * L<CPANPLUS::Shell> (undef)
+
+=item * L<CPANPLUS::Shell::Classic> (undef)
+
+=item * L<CPANPLUS::Shell::Default> (undef)
+
+=item * L<CPANPLUS::Shell::Default::Plugins::CustomSource> (undef)
+
+=item * L<CPANPLUS::Shell::Default::Plugins::Remote> (undef)
+
+=item * L<CPANPLUS::Shell::Default::Plugins::Source> (undef)
+
+=item * L<CPANPLUS::inc> (undef)
+
+=item * L<Carp> (1.32)
+
+=item * L<Carp::Heavy> (1.32)
+
+=item * L<Class::ISA> (undef)
+
+=item * L<Class::Struct> (0.65)
+
+=item * L<Compress::Raw::Bzip2> (2.063)
+
+=item * L<Compress::Raw::Zlib> (2.063)
+
+=item * L<Compress::Zlib> (2.063)
+
+=item * L<Compress::Zlib::Common> (undef)
+
+=item * L<Compress::Zlib::Compress::Gzip::Constants> (undef)
+
+=item * L<Compress::Zlib::Compress::Zip::Constants> (undef)
+
+=item * L<Compress::Zlib::CompressPlugin::Deflate> (undef)
+
+=item * L<Compress::Zlib::CompressPlugin::Identity> (undef)
+
+=item * L<Compress::Zlib::File::GlobMapper> (undef)
+
+=item * L<Compress::Zlib::FileConstants> (undef)
+
+=item * L<Compress::Zlib::IO::Compress::Base> (undef)
+
+=item * L<Compress::Zlib::IO::Compress::Deflate> (undef)
+
+=item * L<Compress::Zlib::IO::Compress::Gzip> (undef)
+
+=item * L<Compress::Zlib::IO::Compress::RawDeflate> (undef)
+
+=item * L<Compress::Zlib::IO::Compress::Zip> (undef)
+
+=item * L<Compress::Zlib::IO::Uncompress::AnyInflate> (undef)
+
+=item * L<Compress::Zlib::IO::Uncompress::AnyUncompress> (undef)
+
+=item * L<Compress::Zlib::IO::Uncompress::Base> (undef)
+
+=item * L<Compress::Zlib::IO::Uncompress::Gunzip> (undef)
+
+=item * L<Compress::Zlib::IO::Uncompress::Inflate> (undef)
+
+=item * L<Compress::Zlib::IO::Uncompress::RawInflate> (undef)
+
+=item * L<Compress::Zlib::IO::Uncompress::Unzip> (undef)
+
+=item * L<Compress::Zlib::ParseParameters> (undef)
+
+=item * L<Compress::Zlib::UncompressPlugin::Identity> (undef)
+
+=item * L<Compress::Zlib::UncompressPlugin::Inflate> (undef)
+
+=item * L<Config> (5.019008)
+
+=item * L<Config::Extensions> (0.01)
+
+=item * L<Config::Perl::V> (0.19)
+
+=item * L<Cwd> (3.45)
+
+=item * L<DB> (1.07)
+
+=item * L<DBM_Filter> (0.06)
+
+=item * L<DBM_Filter::compress> (0.03)
+
+=item * L<DBM_Filter::encode> (0.03)
+
+=item * L<DBM_Filter::int32> (0.03)
+
+=item * L<DBM_Filter::null> (0.03)
+
+=item * L<DBM_Filter::utf8> (0.03)
+
+=item * L<DB_File> (1.831)
+
+=item * L<Data::Dumper> (2.150)
+
+=item * L<Devel::DProf> (undef)
+
+=item * L<Devel::DProf::dprof::V> (undef)
+
+=item * L<Devel::InnerPackage> (undef)
+
+=item * L<Devel::PPPort> (3.21)
+
+=item * L<Devel::Peek> (1.15)
+
+=item * L<Devel::SelfStubber> (1.05)
+
+=item * L<Digest> (1.17)
+
+=item * L<Digest::MD5> (2.53)
+
+=item * L<Digest::SHA> (5.85)
+
+=item * L<Digest::base> (1.16)
+
+=item * L<Digest::file> (1.16)
+
+=item * L<DirHandle> (1.04)
+
+=item * L<Dumpvalue> (1.17)
+
+=item * L<DynaLoader> (1.24)
+
+=item * L<Encode> (2.57)
+
+=item * L<Encode::Alias> (2.18)
+
+=item * L<Encode::Byte> (2.04)
+
+=item * L<Encode::CJKConstants> (2.02)
+
+=item * L<Encode::CN> (2.03)
+
+=item * L<Encode::CN::HZ> (2.07)
+
+=item * L<Encode::Config> (2.05)
+
+=item * L<Encode::EBCDIC> (2.02)
+
+=item * L<Encode::Encoder> (2.03)
+
+=item * L<Encode::Encoding> (2.07)
+
+=item * L<Encode::GSM0338> (2.05)
+
+=item * L<Encode::Guess> (2.06)
+
+=item * L<Encode::Internal> (undef)
+
+=item * L<Encode::JP> (2.04)
+
+=item * L<Encode::JP::Constants> (undef)
+
+=item * L<Encode::JP::H2Z> (2.02)
+
+=item * L<Encode::JP::ISO_2022_JP> (undef)
+
+=item * L<Encode::JP::JIS> (undef)
+
+=item * L<Encode::JP::JIS7> (2.05)
+
+=item * L<Encode::JP::Tr> (undef)
+
+=item * L<Encode::KR> (2.03)
+
+=item * L<Encode::KR::2022_KR> (2.03)
+
+=item * L<Encode::MIME::Header> (2.15)
+
+=item * L<Encode::MIME::Header::ISO_2022_JP> (1.04)
+
+=item * L<Encode::MIME::Name> (1.01)
+
+=item * L<Encode::Symbol> (2.02)
+
+=item * L<Encode::TW> (2.03)
+
+=item * L<Encode::Tcl> (undef)
+
+=item * L<Encode::Tcl::Escape> (undef)
+
+=item * L<Encode::Tcl::Extended> (undef)
+
+=item * L<Encode::Tcl::HanZi> (undef)
+
+=item * L<Encode::Tcl::Table> (undef)
+
+=item * L<Encode::Unicode> (2.09)
+
+=item * L<Encode::Unicode::UTF7> (2.08)
+
+=item * L<Encode::XS> (undef)
+
+=item * L<Encode::iso10646_1> (undef)
+
+=item * L<Encode::usc2_le> (undef)
+
+=item * L<Encode::utf8> (undef)
+
+=item * L<English> (1.08)
+
+=item * L<Env> (1.04)
+
+=item * L<Errno> (1.20_02)
+
+=item * L<Exporter> (5.70)
+
+=item * L<Exporter::Heavy> (5.70)
+
+=item * L<ExtUtils::CBuilder> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Base> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Platform::Unix> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Platform::VMS> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Platform::Windows> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Platform::Windows::BCC> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Platform::Windows::GCC> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Platform::Windows::MSVC> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Platform::aix> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Platform::android> (undef)
+
+=item * L<ExtUtils::CBuilder::Platform::cygwin> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Platform::darwin> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Platform::dec_osf> (0.280213)
+
+=item * L<ExtUtils::CBuilder::Platform::os2> (0.280213)
+
+=item * L<ExtUtils::Command> (1.18)
+
+=item * L<ExtUtils::Command::MM> (6.86)
+
+=item * L<ExtUtils::Constant> (0.23)
+
+=item * L<ExtUtils::Constant::Base> (0.05)
+
+=item * L<ExtUtils::Constant::ProxySubs> (0.08)
+
+=item * L<ExtUtils::Constant::Utils> (0.03)
+
+=item * L<ExtUtils::Constant::XS> (0.03)
+
+=item * L<ExtUtils::Embed> (1.31)
+
+=item * L<ExtUtils::Install> (1.61)
+
+=item * L<ExtUtils::Installed> (1.999003)
+
+=item * L<ExtUtils::Liblist> (6.86)
+
+=item * L<ExtUtils::Liblist::Kid> (6.86)
+
+=item * L<ExtUtils::MM> (6.86)
+
+=item * L<ExtUtils::MM_AIX> (6.86)
+
+=item * L<ExtUtils::MM_Any> (6.86)
+
+=item * L<ExtUtils::MM_BeOS> (6.86)
+
+=item * L<ExtUtils::MM_Cygwin> (6.86)
+
+=item * L<ExtUtils::MM_DOS> (6.86)
+
+=item * L<ExtUtils::MM_Darwin> (6.86)
+
+=item * L<ExtUtils::MM_MacOS> (6.86)
+
+=item * L<ExtUtils::MM_NW5> (6.86)
+
+=item * L<ExtUtils::MM_OS2> (6.86)
+
+=item * L<ExtUtils::MM_QNX> (6.86)
+
+=item * L<ExtUtils::MM_UWIN> (6.86)
+
+=item * L<ExtUtils::MM_Unix> (6.86)
+
+=item * L<ExtUtils::MM_VMS> (6.86)
+
+=item * L<ExtUtils::MM_VOS> (6.86)
+
+=item * L<ExtUtils::MM_Win32> (6.86)
+
+=item * L<ExtUtils::MM_Win95> (6.86)
+
+=item * L<ExtUtils::MY> (6.86)
+
+=item * L<ExtUtils::MakeMaker> (6.86)
+
+=item * L<ExtUtils::MakeMaker::Config> (6.86)
+
+=item * L<ExtUtils::MakeMaker::Locale> (undef)
+
+=item * L<ExtUtils::MakeMaker::YAML> (undef)
+
+=item * L<ExtUtils::MakeMaker::bytes> (undef)
+
+=item * L<ExtUtils::MakeMaker::version> (undef)
+
+=item * L<ExtUtils::MakeMaker::version::regex> (undef)
+
+=item * L<ExtUtils::MakeMaker::version::vpp> (undef)
+
+=item * L<ExtUtils::MakeMaker::vmsish> (undef)
+
+=item * L<ExtUtils::Manifest> (1.63)
+
+=item * L<ExtUtils::Miniperl> (1)
+
+=item * L<ExtUtils::Mkbootstrap> (6.86)
+
+=item * L<ExtUtils::Mksymlists> (6.86)
+
+=item * L<ExtUtils::Packlist> (1.46)
+
+=item * L<ExtUtils::ParseXS> (3.23)
+
+=item * L<ExtUtils::ParseXS::Constants> (3.23)
+
+=item * L<ExtUtils::ParseXS::CountLines> (3.23)
+
+=item * L<ExtUtils::ParseXS::Eval> (3.23)
+
+=item * L<ExtUtils::ParseXS::Utilities> (3.23)
+
+=item * L<ExtUtils::Typemaps> (3.23)
+
+=item * L<ExtUtils::Typemaps::Cmd> (3.23)
+
+=item * L<ExtUtils::Typemaps::InputMap> (3.23)
+
+=item * L<ExtUtils::Typemaps::OutputMap> (3.23)
+
+=item * L<ExtUtils::Typemaps::Type> (3.23)
+
+=item * L<ExtUtils::XSSymSet> (1.3)
+
+=item * L<ExtUtils::testlib> (6.86)
+
+=item * L<Fatal> (2.22)
+
+=item * L<Fcntl> (1.11)
+
+=item * L<File::Basename> (2.85)
+
+=item * L<File::CheckTree> (undef)
+
+=item * L<File::Compare> (1.1006)
+
+=item * L<File::Copy> (2.29)
+
+=item * L<File::DosGlob> (1.12)
+
+=item * L<File::Fetch> (0.46)
+
+=item * L<File::Find> (1.26)
+
+=item * L<File::Glob> (1.23)
+
+=item * L<File::GlobMapper> (1.000)
+
+=item * L<File::Path> (2.09)
+
+=item * L<File::Spec> (3.45)
+
+=item * L<File::Spec::AmigaOS> (undef)
+
+=item * L<File::Spec::Cygwin> (3.45)
+
+=item * L<File::Spec::Epoc> (3.45)
+
+=item * L<File::Spec::Functions> (3.45)
+
+=item * L<File::Spec::Mac> (3.45)
+
+=item * L<File::Spec::OS2> (3.45)
+
+=item * L<File::Spec::Unix> (3.45)
+
+=item * L<File::Spec::VMS> (3.45)
+
+=item * L<File::Spec::Win32> (3.45)
+
+=item * L<File::Temp> (0.2304)
+
+=item * L<File::stat> (1.07)
+
+=item * L<FileCache> (1.09)
+
+=item * L<FileHandle> (2.02)
+
+=item * L<Filter::Simple> (0.90)
+
+=item * L<Filter::Util::Call> (1.49)
+
+=item * L<FindBin> (1.51)
+
+=item * L<GDBM_File> (1.15)
+
+=item * L<Getopt::Long> (2.42)
+
+=item * L<Getopt::Std> (1.10)
+
+=item * L<HTTP::Tiny> (0.039)
+
+=item * L<Hash::Util> (0.16)
+
+=item * L<Hash::Util::FieldHash> (1.14)
+
+=item * L<I18N::Collate> (1.02)
+
+=item * L<I18N::LangTags> (0.40)
+
+=item * L<I18N::LangTags::Detect> (1.05)
+
+=item * L<I18N::LangTags::List> (0.39)
+
+=item * L<I18N::Langinfo> (0.11)
+
+=item * L<IO> (1.30)
+
+=item * L<IO::Compress::Adapter::Bzip2> (2.063)
+
+=item * L<IO::Compress::Adapter::Deflate> (2.063)
+
+=item * L<IO::Compress::Adapter::Identity> (2.063)
+
+=item * L<IO::Compress::Base> (2.063)
+
+=item * L<IO::Compress::Base::Common> (2.063)
+
+=item * L<IO::Compress::Bzip2> (2.063)
+
+=item * L<IO::Compress::Deflate> (2.063)
+
+=item * L<IO::Compress::Gzip> (2.063)
+
+=item * L<IO::Compress::Gzip::Constants> (2.063)
+
+=item * L<IO::Compress::RawDeflate> (2.063)
+
+=item * L<IO::Compress::Zip> (2.063)
+
+=item * L<IO::Compress::Zip::Constants> (2.063)
+
+=item * L<IO::Compress::Zlib::Constants> (2.063)
+
+=item * L<IO::Compress::Zlib::Extra> (2.063)
+
+=item * L<IO::Dir> (1.10)
+
+=item * L<IO::File> (1.16)
+
+=item * L<IO::Handle> (1.35)
+
+=item * L<IO::Pipe> (1.15)
+
+=item * L<IO::Poll> (0.09)
+
+=item * L<IO::Seekable> (1.10)
+
+=item * L<IO::Select> (1.22)
+
+=item * L<IO::Socket> (1.37)
+
+=item * L<IO::Socket::INET> (1.34)
+
+=item * L<IO::Socket::IP> (0.26)
+
+=item * L<IO::Socket::UNIX> (1.26)
+
+=item * L<IO::Uncompress::Adapter::Bunzip2> (2.063)
+
+=item * L<IO::Uncompress::Adapter::Identity> (2.063)
+
+=item * L<IO::Uncompress::Adapter::Inflate> (2.063)
+
+=item * L<IO::Uncompress::AnyInflate> (2.063)
+
+=item * L<IO::Uncompress::AnyUncompress> (2.063)
+
+=item * L<IO::Uncompress::Base> (2.063)
+
+=item * L<IO::Uncompress::Bunzip2> (2.063)
+
+=item * L<IO::Uncompress::Gunzip> (2.063)
+
+=item * L<IO::Uncompress::Inflate> (2.063)
+
+=item * L<IO::Uncompress::RawInflate> (2.063)
+
+=item * L<IO::Uncompress::Unzip> (2.063)
+
+=item * L<IO::Zlib> (1.10)
+
+=item * L<IPC::Cmd> (0.90)
+
+=item * L<IPC::Msg> (2.04)
+
+=item * L<IPC::Open2> (1.04)
+
+=item * L<IPC::Open3> (1.16)
+
+=item * L<IPC::Semaphore> (2.04)
+
+=item * L<IPC::SharedMem> (2.04)
+
+=item * L<IPC::SysV> (2.04)
+
+=item * L<JNI> (undef)
+
+=item * L<JPL::AutoLoader> (undef)
+
+=item * L<JPL::Class> (undef)
+
+=item * L<JPL::Compile> (undef)
+
+=item * L<JSON::PP> (2.27203)
+
+=item * L<JSON::PP::Boolean> (undef)
+
+=item * L<List::Util> (1.36)
+
+=item * L<List::Util::PP> (undef)
+
+=item * L<List::Util::XS> (1.36)
+
+=item * L<Locale::Codes> (3.28)
+
+=item * L<Locale::Codes::Constants> (3.28)
+
+=item * L<Locale::Codes::Country> (3.28)
+
+=item * L<Locale::Codes::Country_Codes> (3.28)
+
+=item * L<Locale::Codes::Country_Retired> (3.28)
+
+=item * L<Locale::Codes::Currency> (3.28)
+
+=item * L<Locale::Codes::Currency_Codes> (3.28)
+
+=item * L<Locale::Codes::Currency_Retired> (3.28)
+
+=item * L<Locale::Codes::LangExt> (3.28)
+
+=item * L<Locale::Codes::LangExt_Codes> (3.28)
+
+=item * L<Locale::Codes::LangExt_Retired> (3.28)
+
+=item * L<Locale::Codes::LangFam> (3.28)
+
+=item * L<Locale::Codes::LangFam_Codes> (3.28)
+
+=item * L<Locale::Codes::LangFam_Retired> (3.28)
+
+=item * L<Locale::Codes::LangVar> (3.28)
+
+=item * L<Locale::Codes::LangVar_Codes> (3.28)
+
+=item * L<Locale::Codes::LangVar_Retired> (3.28)
+
+=item * L<Locale::Codes::Language> (3.28)
+
+=item * L<Locale::Codes::Language_Codes> (3.28)
+
+=item * L<Locale::Codes::Language_Retired> (3.28)
+
+=item * L<Locale::Codes::Script> (3.28)
+
+=item * L<Locale::Codes::Script_Codes> (3.28)
+
+=item * L<Locale::Codes::Script_Retired> (3.28)
+
+=item * L<Locale::Constants> (undef)
+
+=item * L<Locale::Country> (3.28)
+
+=item * L<Locale::Currency> (3.28)
+
+=item * L<Locale::Language> (3.28)
+
+=item * L<Locale::Maketext> (1.25)
+
+=item * L<Locale::Maketext::Guts> (1.20)
+
+=item * L<Locale::Maketext::GutsLoader> (1.20)
+
+=item * L<Locale::Maketext::Simple> (0.21)
+
+=item * L<Locale::Script> (3.28)
+
+=item * L<Log::Message> (undef)
+
+=item * L<Log::Message::Config> (undef)
+
+=item * L<Log::Message::Handlers> (undef)
+
+=item * L<Log::Message::Item> (undef)
+
+=item * L<Log::Message::Simple> (undef)
+
+=item * L<MIME::Base64> (3.14)
+
+=item * L<MIME::QuotedPrint> (3.13)
+
+=item * L<Math::BigFloat> (1.9991)
+
+=item * L<Math::BigFloat::Trace> (0.36)
+
+=item * L<Math::BigInt> (1.9993)
+
+=item * L<Math::BigInt::Calc> (1.998)
+
+=item * L<Math::BigInt::CalcEmu> (1.9991)
+
+=item * L<Math::BigInt::FastCalc> (0.31)
+
+=item * L<Math::BigInt::Lib> (undef)
+
+=item * L<Math::BigInt::Scalar> (undef)
+
+=item * L<Math::BigInt::Trace> (0.36)
+
+=item * L<Math::BigRat> (0.2606)
+
+=item * L<Math::Complex> (1.59)
+
+=item * L<Math::Trig> (1.23)
+
+=item * L<Memoize> (1.03)
+
+=item * L<Memoize::AnyDBM_File> (1.03)
+
+=item * L<Memoize::Expire> (1.03)
+
+=item * L<Memoize::ExpireFile> (1.03)
+
+=item * L<Memoize::ExpireTest> (1.03)
+
+=item * L<Memoize::NDBM_File> (1.03)
+
+=item * L<Memoize::SDBM_File> (1.03)
+
+=item * L<Memoize::Storable> (1.03)
+
+=item * L<Module::Build> (0.4204)
+
+=item * L<Module::Build::Base> (0.4204)
+
+=item * L<Module::Build::Compat> (0.4204)
+
+=item * L<Module::Build::Config> (0.4204)
+
+=item * L<Module::Build::ConfigData> (undef)
+
+=item * L<Module::Build::Cookbook> (0.4204)
+
+=item * L<Module::Build::Dumper> (0.4204)
+
+=item * L<Module::Build::ModuleInfo> (0.4204)
+
+=item * L<Module::Build::Notes> (0.4204)
+
+=item * L<Module::Build::PPMMaker> (0.4204)
+
+=item * L<Module::Build::Platform::Amiga> (undef)
+
+=item * L<Module::Build::Platform::Default> (0.4204)
+
+=item * L<Module::Build::Platform::EBCDIC> (undef)
+
+=item * L<Module::Build::Platform::MPEiX> (undef)
+
+=item * L<Module::Build::Platform::MacOS> (0.4204)
+
+=item * L<Module::Build::Platform::RiscOS> (undef)
+
+=item * L<Module::Build::Platform::Unix> (0.4204)
+
+=item * L<Module::Build::Platform::VMS> (0.4204)
+
+=item * L<Module::Build::Platform::VOS> (0.4204)
+
+=item * L<Module::Build::Platform::Windows> (0.4204)
+
+=item * L<Module::Build::Platform::aix> (0.4204)
+
+=item * L<Module::Build::Platform::cygwin> (0.4204)
+
+=item * L<Module::Build::Platform::darwin> (0.4204)
+
+=item * L<Module::Build::Platform::os2> (0.4204)
+
+=item * L<Module::Build::PodParser> (0.4204)
+
+=item * L<Module::Build::Version> (0.87)
+
+=item * L<Module::Build::YAML> (1.41)
+
+=item * L<Module::CoreList> (3.04)
+
+=item * L<Module::CoreList::TieHashDelta> (3.04)
+
+=item * L<Module::CoreList::Utils> (3.04)
+
+=item * L<Module::Load> (0.28)
+
+=item * L<Module::Load::Conditional> (0.60)
+
+=item * L<Module::Loaded> (0.08)
+
+=item * L<Module::Metadata> (1.000019)
+
+=item * L<Module::Metadata::corpus::BOMTest::UTF16BE> (undef)
+
+=item * L<Module::Metadata::corpus::BOMTest::UTF16LE> (undef)
+
+=item * L<Module::Metadata::corpus::BOMTest::UTF8> (undef)
+
+=item * L<Module::Pluggable> (undef)
+
+=item * L<Module::Pluggable::Object> (undef)
+
+=item * L<Moped::Msg> (0.01)
+
+=item * L<NDBM_File> (1.12)
+
+=item * L<NEXT> (0.65)
+
+=item * L<Net::Cmd> (2.30)
+
+=item * L<Net::Config> (1.13)
+
+=item * L<Net::Domain> (2.22)
+
+=item * L<Net::FTP> (2.78)
+
+=item * L<Net::FTP::A> (1.19)
+
+=item * L<Net::FTP::E> (0.01)
+
+=item * L<Net::FTP::I> (1.12)
+
+=item * L<Net::FTP::L> (0.01)
+
+=item * L<Net::FTP::dataconn> (0.12)
+
+=item * L<Net::NNTP> (2.25)
+
+=item * L<Net::Netrc> (2.14)
+
+=item * L<Net::POP3> (2.30)
+
+=item * L<Net::Ping> (2.42)
+
+=item * L<Net::SMTP> (2.32)
+
+=item * L<Net::Time> (2.10)
+
+=item * L<Net::hostent> (1.01)
+
+=item * L<Net::netent> (1.00)
+
+=item * L<Net::protoent> (1.00)
+
+=item * L<Net::servent> (1.01)
+
+=item * L<O> (1.01)
+
+=item * L<ODBM_File> (1.12)
+
+=item * L<OS2::DLL> (1.05)
+
+=item * L<OS2::ExtAttr> (0.03)
+
+=item * L<OS2::PrfDB> (0.04)
+
+=item * L<OS2::Process> (1.09)
+
+=item * L<OS2::REXX> (1.04)
+
+=item * L<Object::Accessor> (undef)
+
+=item * L<Opcode> (1.27)
+
+=item * L<POSIX> (1.38_01)
+
+=item * L<Package::Constants> (0.04)
+
+=item * L<Params::Check> (0.38)
+
+=item * L<Parse::CPAN::Meta> (1.4409)
+
+=item * L<Perl::OSType> (1.007)
+
+=item * L<PerlIO> (1.08)
+
+=item * L<PerlIO::Scalar> (undef)
+
+=item * L<PerlIO::Via> (undef)
+
+=item * L<PerlIO::encoding> (0.18)
+
+=item * L<PerlIO::mmap> (0.011)
+
+=item * L<PerlIO::scalar> (0.18)
+
+=item * L<PerlIO::via> (0.14)
+
+=item * L<PerlIO::via::QuotedPrint> (0.07)
+
+=item * L<Pod::Checker> (1.60)
+
+=item * L<Pod::Escapes> (1.04)
+
+=item * L<Pod::Find> (1.61)
+
+=item * L<Pod::Functions> (1.08)
+
+=item * L<Pod::Functions::Functions> (undef)
+
+=item * L<Pod::Html> (1.21)
+
+=item * L<Pod::InputObjects> (1.61)
+
+=item * L<Pod::LaTeX> (undef)
+
+=item * L<Pod::Man> (2.28)
+
+=item * L<Pod::ParseLink> (1.10)
+
+=item * L<Pod::ParseUtils> (1.61)
+
+=item * L<Pod::Parser> (1.61)
+
+=item * L<Pod::Perldoc> (3.21)
+
+=item * L<Pod::Perldoc::BaseTo> (3.21)
+
+=item * L<Pod::Perldoc::GetOptsOO> (3.21)
+
+=item * L<Pod::Perldoc::ToANSI> (3.21)
+
+=item * L<Pod::Perldoc::ToChecker> (3.21)
+
+=item * L<Pod::Perldoc::ToMan> (3.21)
+
+=item * L<Pod::Perldoc::ToNroff> (3.21)
+
+=item * L<Pod::Perldoc::ToPod> (3.21)
+
+=item * L<Pod::Perldoc::ToRtf> (3.21)
+
+=item * L<Pod::Perldoc::ToTerm> (3.21)
+
+=item * L<Pod::Perldoc::ToText> (3.21)
+
+=item * L<Pod::Perldoc::ToTk> (3.21)
+
+=item * L<Pod::Perldoc::ToXml> (3.21)
+
+=item * L<Pod::PlainText> (2.06)
+
+=item * L<Pod::Plainer> (undef)
+
+=item * L<Pod::Select> (1.61)
+
+=item * L<Pod::Simple> (3.28)
+
+=item * L<Pod::Simple::BlackBox> (3.28)
+
+=item * L<Pod::Simple::Checker> (3.28)
+
+=item * L<Pod::Simple::Debug> (3.28)
+
+=item * L<Pod::Simple::DumpAsText> (3.28)
+
+=item * L<Pod::Simple::DumpAsXML> (3.28)
+
+=item * L<Pod::Simple::HTML> (3.28)
+
+=item * L<Pod::Simple::HTMLBatch> (3.28)
+
+=item * L<Pod::Simple::HTMLLegacy> (5.01)
+
+=item * L<Pod::Simple::LinkSection> (3.28)
+
+=item * L<Pod::Simple::Methody> (3.28)
+
+=item * L<Pod::Simple::Progress> (3.28)
+
+=item * L<Pod::Simple::PullParser> (3.28)
+
+=item * L<Pod::Simple::PullParserEndToken> (3.28)
+
+=item * L<Pod::Simple::PullParserStartToken> (3.28)
+
+=item * L<Pod::Simple::PullParserTextToken> (3.28)
+
+=item * L<Pod::Simple::PullParserToken> (3.28)
+
+=item * L<Pod::Simple::RTF> (3.28)
+
+=item * L<Pod::Simple::Search> (3.28)
+
+=item * L<Pod::Simple::SimpleTree> (3.28)
+
+=item * L<Pod::Simple::Text> (3.28)
+
+=item * L<Pod::Simple::TextContent> (3.28)
+
+=item * L<Pod::Simple::TiedOutFH> (3.28)
+
+=item * L<Pod::Simple::Transcode> (3.28)
+
+=item * L<Pod::Simple::TranscodeDumb> (3.28)
+
+=item * L<Pod::Simple::TranscodeSmart> (3.28)
+
+=item * L<Pod::Simple::XHTML> (3.28)
+
+=item * L<Pod::Simple::XMLOutStream> (3.28)
+
+=item * L<Pod::Text> (3.18)
+
+=item * L<Pod::Text::Color> (2.07)
+
+=item * L<Pod::Text::Overstrike> (2.05)
+
+=item * L<Pod::Text::Termcap> (2.08)
+
+=item * L<Pod::Usage> (1.63)
+
+=item * L<SDBM_File> (1.11)
+
+=item * L<Safe> (2.37)
+
+=item * L<Scalar::Util> (1.36)
+
+=item * L<Scalar::Util::PP> (undef)
+
+=item * L<Search::Dict> (1.07)
+
+=item * L<SelectSaver> (1.02)
+
+=item * L<SelfLoader> (1.21)
+
+=item * L<Shell> (undef)
+
+=item * L<Socket> (2.013)
+
+=item * L<Storable> (2.48)
+
+=item * L<Storable::Limit> (undef)
+
+=item * L<Sub::Util> (undef)
+
+=item * L<SubstrHash> (undef)
+
+=item * L<Switch> (undef)
+
+=item * L<Symbol> (1.07)
+
+=item * L<Sys::Hostname> (1.18)
+
+=item * L<Sys::Syslog> (0.33)
+
+=item * L<Sys::Syslog::Win32> (undef)
+
+=item * L<Sys::Syslog::win32::Win32> (undef)
+
+=item * L<TAP::Base> (3.30)
+
+=item * L<TAP::Formatter::Base> (3.30)
+
+=item * L<TAP::Formatter::Color> (3.30)
+
+=item * L<TAP::Formatter::Console> (3.30)
+
+=item * L<TAP::Formatter::Console::ParallelSession> (3.30)
+
+=item * L<TAP::Formatter::Console::Session> (3.30)
+
+=item * L<TAP::Formatter::File> (3.30)
+
+=item * L<TAP::Formatter::File::Session> (3.30)
+
+=item * L<TAP::Formatter::Session> (3.30)
+
+=item * L<TAP::Harness> (3.30)
+
+=item * L<TAP::Harness::Env> (3.30)
+
+=item * L<TAP::Object> (3.30)
+
+=item * L<TAP::Parser> (3.30)
+
+=item * L<TAP::Parser::Aggregator> (3.30)
+
+=item * L<TAP::Parser::Grammar> (3.30)
+
+=item * L<TAP::Parser::Iterator> (3.30)
+
+=item * L<TAP::Parser::Iterator::Array> (3.30)
+
+=item * L<TAP::Parser::Iterator::Process> (3.30)
+
+=item * L<TAP::Parser::Iterator::Stream> (3.30)
+
+=item * L<TAP::Parser::IteratorFactory> (3.30)
+
+=item * L<TAP::Parser::Multiplexer> (3.30)
+
+=item * L<TAP::Parser::Result> (3.30)
+
+=item * L<TAP::Parser::Result::Bailout> (3.30)
+
+=item * L<TAP::Parser::Result::Comment> (3.30)
+
+=item * L<TAP::Parser::Result::Plan> (3.30)
+
+=item * L<TAP::Parser::Result::Pragma> (3.30)
+
+=item * L<TAP::Parser::Result::Test> (3.30)
+
+=item * L<TAP::Parser::Result::Unknown> (3.30)
+
+=item * L<TAP::Parser::Result::Version> (3.30)
+
+=item * L<TAP::Parser::Result::YAML> (3.30)
+
+=item * L<TAP::Parser::ResultFactory> (3.30)
+
+=item * L<TAP::Parser::Scheduler> (3.30)
+
+=item * L<TAP::Parser::Scheduler::Job> (3.30)
+
+=item * L<TAP::Parser::Scheduler::Spinner> (3.30)
+
+=item * L<TAP::Parser::Source> (3.30)
+
+=item * L<TAP::Parser::Source::Perl> (undef)
+
+=item * L<TAP::Parser::SourceHandler> (3.30)
+
+=item * L<TAP::Parser::SourceHandler::Executable> (3.30)
+
+=item * L<TAP::Parser::SourceHandler::File> (3.30)
+
+=item * L<TAP::Parser::SourceHandler::Handle> (3.30)
+
+=item * L<TAP::Parser::SourceHandler::Perl> (3.30)
+
+=item * L<TAP::Parser::SourceHandler::RawTAP> (3.30)
+
+=item * L<TAP::Parser::SourceHandler::pgTAP> (undef)
+
+=item * L<TAP::Parser::Utils> (undef)
+
+=item * L<TAP::Parser::YAMLish::Reader> (3.30)
+
+=item * L<TAP::Parser::YAMLish::Writer> (3.30)
+
+=item * L<Term::ANSIColor> (4.02)
+
+=item * L<Term::Cap> (1.15)
+
+=item * L<Term::Complete> (1.402)
+
+=item * L<Term::ReadLine> (1.14)
+
+=item * L<Term::UI> (undef)
+
+=item * L<Term::UI::History> (undef)
+
+=item * L<Test> (1.26)
+
+=item * L<Test2> (undef)
+
+=item * L<Test2::API> (undef)
+
+=item * L<Test2::API::Breakage> (undef)
+
+=item * L<Test2::API::Context> (undef)
+
+=item * L<Test2::API::Instance> (undef)
+
+=item * L<Test2::API::Stack> (undef)
+
+=item * L<Test2::Event> (undef)
+
+=item * L<Test2::Event::Bail> (undef)
+
+=item * L<Test2::Event::Diag> (undef)
+
+=item * L<Test2::Event::Encoding> (undef)
+
+=item * L<Test2::Event::Exception> (undef)
+
+=item * L<Test2::Event::Fail> (undef)
+
+=item * L<Test2::Event::Generic> (undef)
+
+=item * L<Test2::Event::Info> (undef)
+
+=item * L<Test2::Event::Note> (undef)
+
+=item * L<Test2::Event::Ok> (undef)
+
+=item * L<Test2::Event::Pass> (undef)
+
+=item * L<Test2::Event::Plan> (undef)
+
+=item * L<Test2::Event::Skip> (undef)
+
+=item * L<Test2::Event::Subtest> (undef)
+
+=item * L<Test2::Event::TAP::Version> (undef)
+
+=item * L<Test2::Event::V2> (undef)
+
+=item * L<Test2::Event::Waiting> (undef)
+
+=item * L<Test2::EventFacet> (undef)
+
+=item * L<Test2::EventFacet::About> (undef)
+
+=item * L<Test2::EventFacet::Amnesty> (undef)
+
+=item * L<Test2::EventFacet::Assert> (undef)
+
+=item * L<Test2::EventFacet::Control> (undef)
+
+=item * L<Test2::EventFacet::Error> (undef)
+
+=item * L<Test2::EventFacet::Hub> (undef)
+
+=item * L<Test2::EventFacet::Info> (undef)
+
+=item * L<Test2::EventFacet::Info::Table> (undef)
+
+=item * L<Test2::EventFacet::Meta> (undef)
+
+=item * L<Test2::EventFacet::Parent> (undef)
+
+=item * L<Test2::EventFacet::Plan> (undef)
+
+=item * L<Test2::EventFacet::Render> (undef)
+
+=item * L<Test2::EventFacet::Trace> (undef)
+
+=item * L<Test2::Formatter> (undef)
+
+=item * L<Test2::Formatter::TAP> (undef)
+
+=item * L<Test2::Hub> (undef)
+
+=item * L<Test2::Hub::Interceptor> (undef)
+
+=item * L<Test2::Hub::Interceptor::Terminator> (undef)
+
+=item * L<Test2::Hub::Subtest> (undef)
+
+=item * L<Test2::IPC> (undef)
+
+=item * L<Test2::IPC::Driver> (undef)
+
+=item * L<Test2::IPC::Driver::Files> (undef)
+
+=item * L<Test2::Tools::Tiny> (undef)
+
+=item * L<Test2::Util> (undef)
+
+=item * L<Test2::Util::ExternalMeta> (undef)
+
+=item * L<Test2::Util::Facets2Legacy> (undef)
+
+=item * L<Test2::Util::HashBase> (undef)
+
+=item * L<Test2::Util::Trace> (undef)
+
+=item * L<Test::Builder> (1.001002)
+
+=item * L<Test::Builder::Formatter> (undef)
+
+=item * L<Test::Builder::IO::Scalar> (undef)
+
+=item * L<Test::Builder::Module> (1.001002)
+
+=item * L<Test::Builder::Tester> (1.23_002)
+
+=item * L<Test::Builder::Tester::Color> (1.23_002)
+
+=item * L<Test::Builder::TodoDiag> (undef)
+
+=item * L<Test::CanFork> (undef)
+
+=item * L<Test::CanThread> (undef)
+
+=item * L<Test::Harness> (3.30)
+
+=item * L<Test::Harness::Assert> (undef)
+
+=item * L<Test::Harness::Iterator> (undef)
+
+=item * L<Test::Harness::Point> (undef)
+
+=item * L<Test::Harness::Results> (undef)
+
+=item * L<Test::Harness::Straps> (undef)
+
+=item * L<Test::Harness::Util> (undef)
+
+=item * L<Test::More> (1.001002)
+
+=item * L<Test::More::DeepCheck> (undef)
+
+=item * L<Test::More::DeepCheck::Strict> (undef)
+
+=item * L<Test::More::DeepCheck::Tolerant> (undef)
+
+=item * L<Test::More::Tools> (undef)
+
+=item * L<Test::MostlyLike> (undef)
+
+=item * L<Test::Simple> (1.001002)
+
+=item * L<Test::Stream> (undef)
+
+=item * L<Test::Stream::API> (undef)
+
+=item * L<Test::Stream::ArrayBase> (undef)
+
+=item * L<Test::Stream::ArrayBase::Meta> (undef)
+
+=item * L<Test::Stream::Block> (undef)
+
+=item * L<Test::Stream::Carp> (undef)
+
+=item * L<Test::Stream::Context> (undef)
+
+=item * L<Test::Stream::Event> (undef)
+
+=item * L<Test::Stream::Event::Bail> (undef)
+
+=item * L<Test::Stream::Event::Child> (undef)
+
+=item * L<Test::Stream::Event::Diag> (undef)
+
+=item * L<Test::Stream::Event::Finish> (undef)
+
+=item * L<Test::Stream::Event::Note> (undef)
+
+=item * L<Test::Stream::Event::Ok> (undef)
+
+=item * L<Test::Stream::Event::Plan> (undef)
+
+=item * L<Test::Stream::Event::Subtest> (undef)
+
+=item * L<Test::Stream::ExitMagic> (undef)
+
+=item * L<Test::Stream::ExitMagic::Context> (undef)
+
+=item * L<Test::Stream::Exporter> (undef)
+
+=item * L<Test::Stream::Exporter::Meta> (undef)
+
+=item * L<Test::Stream::ForceExit> (undef)
+
+=item * L<Test::Stream::IOSets> (undef)
+
+=item * L<Test::Stream::Meta> (undef)
+
+=item * L<Test::Stream::PackageUtil> (undef)
+
+=item * L<Test::Stream::Subtest> (undef)
+
+=item * L<Test::Stream::Tester> (undef)
+
+=item * L<Test::Stream::Tester::Checks> (undef)
+
+=item * L<Test::Stream::Tester::Checks::Event> (undef)
+
+=item * L<Test::Stream::Tester::Events> (undef)
+
+=item * L<Test::Stream::Tester::Events::Event> (undef)
+
+=item * L<Test::Stream::Tester::Grab> (undef)
+
+=item * L<Test::Stream::Threads> (undef)
+
+=item * L<Test::Stream::Toolset> (undef)
+
+=item * L<Test::Stream::Util> (undef)
+
+=item * L<Test::Tester> (undef)
+
+=item * L<Test::Tester::Capture> (undef)
+
+=item * L<Test::Tester::CaptureRunner> (undef)
+
+=item * L<Test::Tester::Delegate> (undef)
+
+=item * L<Test::use::ok> (undef)
+
+=item * L<Text::Abbrev> (1.02)
+
+=item * L<Text::Balanced> (2.02)
+
+=item * L<Text::ParseWords> (3.29)
+
+=item * L<Text::Soundex> (undef)
+
+=item * L<Text::Tabs> (2013.0523)
+
+=item * L<Text::Wrap> (2013.0523)
+
+=item * L<Thread> (3.04)
+
+=item * L<Thread::Queue> (3.02)
+
+=item * L<Thread::Semaphore> (2.12)
+
+=item * L<Thread::Signal> (undef)
+
+=item * L<Thread::Specific> (undef)
+
+=item * L<Tie::Array> (1.06)
+
+=item * L<Tie::File> (1.00)
+
+=item * L<Tie::Handle> (4.2)
+
+=item * L<Tie::Hash> (1.05)
+
+=item * L<Tie::Hash::NamedCapture> (0.09)
+
+=item * L<Tie::Memoize> (1.1)
+
+=item * L<Tie::RefHash> (1.39)
+
+=item * L<Tie::Scalar> (1.03)
+
+=item * L<Tie::StdHandle> (4.4)
+
+=item * L<Tie::SubstrHash> (1.00)
+
+=item * L<TieHash> (undef)
+
+=item * L<Time::HiRes> (1.9726)
+
+=item * L<Time::Local> (1.2300)
+
+=item * L<Time::Piece> (1.27)
+
+=item * L<Time::Piece::Seconds> (undef)
+
+=item * L<Time::Seconds> (1.27)
+
+=item * L<Time::gmtime> (1.03)
+
+=item * L<Time::localtime> (1.02)
+
+=item * L<Time::tm> (1.00)
+
+=item * L<UNIVERSAL> (1.11)
+
+=item * L<Unicode> (6.3.0)
+
+=item * L<Unicode::Collate> (1.04)
+
+=item * L<Unicode::Collate::CJK::Big5> (0.65)
+
+=item * L<Unicode::Collate::CJK::GB2312> (0.65)
+
+=item * L<Unicode::Collate::CJK::JISX0208> (0.64)
+
+=item * L<Unicode::Collate::CJK::Korean> (1.02)
+
+=item * L<Unicode::Collate::CJK::Pinyin> (0.85)
+
+=item * L<Unicode::Collate::CJK::Stroke> (0.94)
+
+=item * L<Unicode::Collate::CJK::Zhuyin> (0.94)
+
+=item * L<Unicode::Collate::Locale> (1.02)
+
+=item * L<Unicode::Normalize> (1.17)
+
+=item * L<Unicode::UCD> (0.57)
+
+=item * L<User::grent> (1.01)
+
+=item * L<User::pwent> (1.00)
+
+=item * L<VMS::DCLsym> (1.05)
+
+=item * L<VMS::Filespec> (1.12)
+
+=item * L<VMS::Stdio> (2.4)
+
+=item * L<Version::Requirements> (undef)
+
+=item * L<Win32> (0.48)
+
+=item * L<Win32API::File> (0.1201)
+
+=item * L<Win32API::File::ExtUtils::Myconst2perl> (1)
+
+=item * L<Win32API::File::inc::ExtUtils::Myconst2perl> (undef)
+
+=item * L<Win32CORE> (0.04)
+
+=item * L<XS::APItest> (0.59)
+
+=item * L<XS::APItest::KeywordRPN> (undef)
+
+=item * L<XS::Typemap> (0.12)
+
+=item * L<XSLoader> (0.17)
+
+=item * L<_charnames> (1.39)
+
+=item * L<arybase> (0.07)
+
+=item * L<assertions> (undef)
+
+=item * L<assertions::activate> (undef)
+
+=item * L<assertions::compat> (undef)
+
+=item * L<attributes> (0.22)
+
+=item * L<attrs> (undef)
+
+=item * L<autodie> (2.22)
+
+=item * L<autodie::Scope::Guard> (undef)
+
+=item * L<autodie::Scope::GuardStack> (undef)
+
+=item * L<autodie::ScopeUtil> (undef)
+
+=item * L<autodie::Util> (undef)
+
+=item * L<autodie::exception> (2.22)
+
+=item * L<autodie::exception::system> (2.22)
+
+=item * L<autodie::hints> (2.22)
+
+=item * L<autodie::skip> (2.22)
+
+=item * L<autouse> (1.07)
+
+=item * L<base> (2.21)
+
+=item * L<bigint> (0.36)
+
+=item * L<bignum> (0.37)
+
+=item * L<bigrat> (0.36)
+
+=item * L<blib> (1.06)
+
+=item * L<bytes> (1.04)
+
+=item * L<charnames> (1.39)
+
+=item * L<constant> (1.31)
+
+=item * L<deprecate> (0.03)
+
+=item * L<diagnostics> (1.33)
+
+=item * L<encoding> (2.12)
+
+=item * L<encoding::warnings> (0.11)
+
+=item * L<experimental> (undef)
+
+=item * L<feature> (1.34)
+
+=item * L<fields> (2.17)
+
+=item * L<filetest> (1.03)
+
+=item * L<if> (0.0603)
+
+=item * L<inc::latest> (0.4204)
+
+=item * L<integer> (1.01)
+
+=item * L<legacy> (undef)
+
+=item * L<less> (0.03)
+
+=item * L<lib> (0.63)
+
+=item * L<locale> (1.02)
+
+=item * L<meta_notation> (undef)
+
+=item * L<mro> (1.14)
+
+=item * L<ok> (undef)
+
+=item * L<open> (1.10)
+
+=item * L<ops> (1.02)
+
+=item * L<overload> (1.22)
+
+=item * L<overload::numbers> (undef)
+
+=item * L<overloading> (0.02)
+
+=item * L<parent> (0.228)
+
+=item * L<perlfaq> (5.0150044)
+
+=item * L<re> (0.26)
+
+=item * L<sigtrap> (1.07)
+
+=item * L<sort> (2.02)
+
+=item * L<strict> (1.08)
+
+=item * L<subs> (1.02)
+
+=item * L<threads> (1.91)
+
+=item * L<threads::shared> (1.46)
+
+=item * L<unicore::Name> (undef)
+
+=item * L<utf8> (1.13)
+
+=item * L<vars> (1.03)
+
+=item * L<version> (0.9907)
+
+=item * L<version::regex> (0.9907)
+
+=item * L<version::vpp> (0.9907)
+
+=item * L<vmsish> (1.04)
+
+=item * L<warnings> (1.21)
+
+=item * L<warnings::register> (1.02)
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Module-CoreList-List>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Module-CoreList-List>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-CoreList-List>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

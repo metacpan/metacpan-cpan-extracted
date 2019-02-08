@@ -21,19 +21,19 @@ use feature 'say';
 no strict;
 no warnings;
 
-use Sim::OPT;
-use Sim::OPT::Morph;
-use Sim::OPT::Sim;
-use Sim::OPT::Report;
-use Sim::OPT::Descend;
-use Sim::OPT::Takechance;
+use Sim::OPT; 
+use Sim::OPT::Morph; 
+use Sim::OPT::Sim; 
+use Sim::OPT::Report; 
+use Sim::OPT::Descend; 
+use Sim::OPT::Takechance; 
 use Sim::OPT::Parcoord3d;
 # NOTE THAT TO USE THE PROGRAM AS A SCRIPT, THE ABOVE "use Sim::OPT..." lines should be deleted.
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
-$VERSION = '0.113';
+$VERSION = '0.117';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -44,7 +44,7 @@ $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, m
 
 $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
 my $maxloops= 1000;
-my $sourcefile = "./minitintcleaned.csv";
+my $sourcefile = "./prepfile.csv";
 my $newfile = $sourcefile . "_meta.csv";
 my $report = $newfile . "_report.txt";
 my @mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
@@ -77,10 +77,10 @@ my $minreq_formerge = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIA
 my $minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
 my $minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
 my $condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
-my $nfilter = "100"; # do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
+my $nfilter = "10"; # do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
 my $limit_checkdistgrades = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
 my $limit_checkdistpoints = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
-my $fulldo = "no"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
+my $fulldo = "yes"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
 my $lvconversion = ""; # IF "EQUAL", A FRACTION OF LEVEL HAS THE VALUE OF 1, WHATEVER THE NUMBER OF A FRATION OF LEVEL IN A FACTOR. OTHERWISE, A NUMBER.
 
 ############# END OF THE EXAMPLE SETTINGS TO BE PUT IN A CONFIGURATION FILE.
@@ -627,14 +627,14 @@ sub calcmaxdist
   #say $tee "LAST: " . dump( $last );
   say $tee "raw max distance: " . dump( $hash{rawdist} ); #say $tee "00\%hash: " . dump( %hash );
 
-  my %nears;
-  foreach my $ar ( @arr )
-  {
-    my @nrs = @{ isnear( $ar->[0], $first, $last ) };
-    $nears{$ar->[0]} = [ @nrs ];
-  }
+  #my %nears;
+  #foreach my $ar ( @arr )
+  #{
+  #  my @nrs = @{ isnear( $ar->[0], $first, $last ) };
+  #  $nears{$ar->[0]} = [ @nrs ];
+  #}
   #say $tee "NEARS: " . dump( %nears );
-  return( $hash{rawdist}, $first->[0], $last->[1], \%nears );
+  return( $hash{rawdist}, $first->[0], $last->[1] );
 }
 
 
@@ -747,7 +747,15 @@ sub wei
   say "nfilter: $nfilter.";
   $nfilter = ( $nfilter - 1 );
 
-  my @arr__ = shuffle( @arr );
+  my @arr__;
+  if ( ( $limit_checkdistgrades ne "" ) or ( $limit_checkdistpoints ne "" ) )
+  {
+    @arr__ = shuffle( @arr );
+  }
+  else
+  {
+    @arr__ = @arr;
+  }
 
   my ( @arra, @arrah );
   if ( ( $limit_checkdistgrades ne "" ) and ( $limit_checkdistgrades > $checkstop ) )
@@ -796,7 +804,20 @@ sub wei
       if ( ( $el->[2] ne "" ) and ( $el->[3] >= $minimumcertain ) )
       { #say $tee "SO IN SECOND ARR CHECK" ; say $tee "\nTRYING \$el->[1]: " . dump( $el->[1] );
 
-        my @neighbours = @{ $nears{$el->[0]} } ;
+      my @neighbours;
+      if ( $el->[2] ne "" )
+      {
+        if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
+        {
+          @neighbours = @{ isnear( $el->[0], $first0, $last0 ) };
+          $nears{$el->[0]}{neighbours} = [ @neighbours ];
+        }
+        else
+        {
+          @neighbours = @{ $nears{$el->[0]}{neighbours} };
+        }
+        #say $tee "\IT DO NOT EXIST.";
+      }
 
         #foreach my $elt ( @neighbours )
         foreach my $elt ( @arra )
@@ -951,7 +972,7 @@ sub wei
         }
       }
     }
-    return ( \%bank );
+    return ( \%bank, \%nears );
   }
 
   sub clean
@@ -997,8 +1018,11 @@ sub wei
   if ( %bank = "" )
   {
     say $tee "Entering gradients' \%bank.";
-    %bank = %{ fillbank( \@arr__, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter, \@arra, $first0, $last0, \%nears ) };
-    %bank = %{ clean( \%bank, $nfilter ) }; say $tee "CLEANED \%bank: " . dump( %bank ) ;
+    my ( $bank_ref, $nears_ref ) = fillbank( \@arr__, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels, $nfilter, \@arra, $first0, $last0, \%nears );
+    %bank = %{ $bank_ref };
+    %nears = %{ $nears_ref };
+
+    %bank = %{ clean( \%bank, $nfilter ) }; say $tee "BANK DONE."; #say $tee "CLEANED \%bank: " . dump( %bank ) ;
     #my %bank =  %{ $bank_ref }; say $tee "CLEANED \%bank: " . dump( %bank );
   }
 
@@ -1020,7 +1044,16 @@ sub wei
     { #say $tee "\$el->[1]: " . dump( $el->[1] ); #say $tee "EL: " . dump( $el );
       my $key =  $el->[0] ; #say $tee "\$key: " . dump( $key );
 
-      my @neighbours = @{ $nears{$el->[0]} };
+      my @neighbours;
+      if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
+      {
+        @neighbours = @{ isnear( $el->[0], $first0, $last0 ) };
+        $nears{$el->[0]}{neighbours} = [ @neighbours ];
+      }
+      else
+      {
+        @neighbours = @{ $nears{$el->[0]}{neighbours} };
+      }
 
       if ( $el->[2] eq "" )
       { #say $tee "TRYING \$el->[1]: " . dump( $el->[1] );
@@ -1190,11 +1223,13 @@ sub wei
         }
       }
     } #say $tee "MAGIC WAND. " . dump( %wand );
-    return( \%wand );
+    return( \%wand, \%nears );
   }
 
-  my %wand = %{ cyclearr( \@arr__, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, $nfilter, \@arrb, $first0, $last0, \%nears ) }; say $tee "\%wand OUT: " . dump( %wand );
-
+  say $tee "GOING TO CREATE NEW POINTS.";
+  my ( $wand_ref, $nears_ref ) = cyclearr( \@arr__, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, $nfilter, \@arrb, $first0, $last0, \%nears ); say $tee "DONE."; #say $tee "\%wand OUT: " . dump( %wand );
+  my %wand = %{ $wand_ref }; #say $tee "\%wand OUT: " . dump( %wand ) . "\nDONE.";
+  %nears = %{ $nears_ref }; #say $tee "RE-UPDATED \%nears: " . dump( \%nears ) . "\nDONE.";
 
   my @limb0;
   foreach my $ke ( keys %wand )
@@ -1214,7 +1249,7 @@ sub wei
   }
 
   #say $tee "LIMBO_WEI: " . dump( @limbo_wei );
-  return( \@limb0, \%bank )
+  return( \@limb0, \%bank, \%nears )
 } ##### END SUB wei
 
 
@@ -1714,27 +1749,25 @@ sub prepfactlev_delete
 
 sub interstart
 {
-say "
+  say "
 This is Interlinear.
-Name of a configuration file (Unix path):
-";
-	my $confile = <STDIN>;
-	chomp $confile;
-	if (-e $confile )
+Name of a csv file (Unix path):
+    ";
+  my $sourcefile = <STDIN>;
+
+  if ( not ( -e $sourcefile ) )
   {
     say "\
-    Now the name of a csv file:
-    ";
-    my $sourcefile = <STDIN>;
-  }
-  if ( not (-e $sourcefile ) )
-	{
-    say "\
     This csv file seem to be not there.
-    It may be specified in the configuration file.
-    ";
+    It may be specified in the configuration file?
+    If you want to proceed, hit enter.";
+    my $throwaway = <STDIN>;
+    @arr = interlinear(  );
   }
-  @arr = interlinear( $confile, $sourcefile );
+  else
+  {
+    @arr = interlinear( "", $sourcefile );
+  }
 }
 
 
@@ -1752,7 +1785,7 @@ sub interlinear
   #say $tee "ARRIVED IN INTERLINEAR \$blockelts_r ". dump( $blockelts_r );
   #say $tee "ARRIVED IN INTERLINEAR \$reportf $reportf";
   #say $tee "ARRIVED IN INTERLINEAR \$countblock $countblock";
-  my %bank;
+  my ( %bank, %nears );
 
   if ( $reportf ne "" ){ $report = $reportf; } #say $tee "CHECK5 \$report: " . dump( $report );
   $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
@@ -1800,8 +1833,8 @@ sub interlinear
   my %factlev = %{ $factlev_ref }; #say $tee "REALLY \%factlev: " . dump( %factlev );
   say $tee "Understood step sizes.";
 
-  my ( $maxdist, $first0, $last0, $nears_ref ) = calcmaxdist( \@aarr, \%factlev, $limit_checkdistpoints );
-  my %nears = %{ $nears_ref };
+  my ( $maxdist, $first0, $last0 ) = calcmaxdist( \@aarr, \%factlev, $limit_checkdistpoints );
+
   say $tee "DONE CALCMAXDIST: " . dump( $maxdist );
 
   my $count = 0;
@@ -1852,12 +1885,27 @@ sub interlinear
     checkstop( @arr );
 
 
+    #foreach my $el ( @arr )
+    #{
+    #  if ( ( $nears{$el->[0]}{all}->[2] eq "" ) or ( ( $nears{$el->[0]}{all}->[3] != 1 ) and ( $nears{$el->[0]}{all}->[2] != $el->[2] ) ) )
+    #  {
+    #    $nears{$el->[0]}{all} = $el;
+    #  }
+    #}
+
+    #if ( $count > 0 )
+    #{
+    #   say "NEARS: " . dump( \%nears );
+    #}
+
+
     if ( ( $mode__ eq "wei" ) or ( $mode__ eq "mix" ) )
     {
-      my ( $limbo_wei_ref, $bank_ref ) = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, \%bank, $fulldo, $first0, $last0, \%nears, $checkstop );
+      my ( $limbo_wei_ref, $bank_ref, $nears_ref ) = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfilter, $limit_checkdistgrades, $limit_checkdistpoints, \%bank, $fulldo, $first0, $last0, \%nears, $checkstop );
 
       @limbo_wei = @{ $limbo_wei_ref };
       %bank = %{ $bank_ref };
+      %nears = %{ $nears_ref };
 
       say $tee "THERE ARE " . scalar( @limbo_wei ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR WEIGHTED GRADIENT INTERPOLATION OF THE NEAREST NEIGHBOUR.";
     }
@@ -1957,18 +2005,14 @@ sub interlinear
 
 if ( @ARGV )
 {
-  my $first = $_[0];
-  if ( $first eq "interstart" )
+  if ( $ARGV[0] eq "interstart" )
   {
     interstart;
   }
-  elsif ( $first eq "." )
+  elsif ( $ARGV[0] eq "." )
   {
-    @arr = interlinear;
-  }
-  else
-  {
-    @arr = interlinear( @ARGV );
+    my @args = ( @ARGV[1..$#ARGV] );
+    @arr = interlinear( @args );
   }
 }
 
@@ -2024,13 +2068,11 @@ Sim::OPT::Interlinear
 
 
 =head1 SYNOPSIS
-
-  # as a function from Perl (for example, after having launched "re.pl" from the command line):
-  interlinear( "/path/to/a-pre-prepared-configfile.pl", "/path/to/a-pre-prepared-sourcefile.csv", "/path/to/the-metamodel-file-to-be-obtained" );
-  # or as a script, from the command line, from a directory where the file "Interlinear.pm" has been copied:
-  ./Interlinear.pm .
-  # (note the dot at the end). In that case, Interlinear will look for the source file "sourcefile.csv" in the "$HOME" directory, and restitute back a file "sourcefile_meta.csv" in the same directory.
-  # and also, note that, in this case, the opening lines in the script saying "use Sim::OPT" etc. have to be deleted.
+  # As a Perl function:
+    interlinear( "./configfile.pl", "./sourcefile.csv", "./obtainedmetamodel.csv" );
+  # or as a script, from the command line:
+  ./Interlinear.pm . "" ./SOURCEFILE
+  # (note the dot and <"">).
   # or, again, from the command line, for beginning with a dialogue question:
   interlinear interstart
 
@@ -2039,27 +2081,27 @@ Sim::OPT::Interlinear
 
 
 Interlinear is a program for computing the missing values in multivariate datasieries through a strategy entailing distance-weighting the nearest-neihbouring gradients between points in an n-dimensional space.
-The program adopts a distance-weighted gradient-based strategy. In this strategy, the known gradients are weighted in a manner inversely proportional to the distance of their pivot point from the pivot point of each unknown nearest-neighbouring gradient, then the gradients neighbouring near each unknown point are utilized to define that point, weighting the candidates by distance. In this strategy, the curvatures in the hyperspace derive from the fact that in the calculations local samples of the near-neighbouring gradients are used, which vary for each point. (This strategy is adopted in Interlinear since version 0.103. Before that version, the gradients were calculated on a global basis.)
-Besides the described strategy (a), the following metamodelling strategies are utilized by Interlinear:
+The program can adopts a distance-weighted gradient-based strategy. The strategy weights the known gradients in a manner inversely proportional to the distance of their pivot points from the pivot points of the missing nearest-neighbouring gradients, then utilizes recursively the gradients neighbouring near each unknown point to define it, weighting the candidates by distance. In this strategy, the curvatures in the space derive from the fact that in this calculation a local sample of the near-neighbouring gradients is used, which vary for each point. The strategy in question is adopted in Interlinear since version 0.103. Before that version, the gradients were calculated on a global basis.
+Besides the described strategy, a), the following metamodelling strategies are utilized by Interlinear:
 
-b) pure linear interpolation (one may want to use this in some occasions: for example with factorials);
+b) pure linear interpolation (one may want to use this in some occasions: for example, on factorials);
 
 c) pure nearest neighbour (a strategy of last resort. One may want to use it to unlock a computation which is based on data which are too sparse to proceed, or when nothing else works).
 
-Strategy a) in the adopted setting, works with cases which are adjacent in the design space. In that setting, it the strategy cannot work with the gradient between a certain iteration 1 and the corresponding iteration 3. It can only work with the gradient between iterations 1 and 2, or 2 and 3. (This is a design decision, but it is not inevitable. Versions of Interlinear prior to 0.103 could work with non-adiacent instances, if wanted.)
-For the told reason, Interlinear does not work well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from star (coordinate descent) sampling strategies.
+Strategy a) works for cases which are adjacent in the design space. For example, it cannot work with the gradient between a certain iteration 1 and the corresponding iteration 3. It can only work with the gradient between iterations 1 and 2, or 2 and 3.
+For that reason, it does not work well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from star (coordinate descent) sampling strategies.
 To work well with a latin hypercube sampling, it is necessary to include a pass of strategy b) before calling strategy a). Then strategy a) will charge itself of reducing the gradient errors created by the initial pass of strategy b).
 
 A configuration file should be prepared following the example in the "examples" folder in this distribution.
 If the configuration file is incomplete or missing, the program adopts its own defaults, exploiting the distance-weighted gradient-based strategy.
 
-The only variable that must mandatorily be specified in a configuration file is $sourcefile : the Unix path to the source file containining the dataseries. If not specified, the program will look for "./sourcefile.csv".
+The only variable that must mandatorily be specified in a configuration file is $sourcefile : the Unix path to the source file containining the dataseries.
 
 The source file has to be prepared by listing in each column the values (levels) of the parameters (factors, variables), putting in the last column the objective function values, in the rows in which they are present.
 
 The parameter number is given by the position of the column (i.e. column 4 host parameter 4).
 
-Here below an example is shown of multivatiate dataseries of 3 parameters assuming 3 levels each. The numbers preceding the objective function (which is in the last colum) are the indices of the multidimensional matrix (tensor). Note that the parameter listings (i.e. numbers describing levels) cannot be incomplete. Just the objective function entries can be.And the parameter listings must be integer numbers from 1 to n.
+Here below an example is shown of multivatiate dataseries of 3 parameters assuming 3 levels each. The numbers preceding the objective function (which is in the last colum) are the indices of the multidimensional matrix (tensor).
 
 
 1,1,1,1.234
@@ -2081,6 +2123,7 @@ Here below an example is shown of multivatiate dataseries of 3 parameters assumi
 3,3,3,3
 
 
+Note that the parameter listings cannot be incomplete. Just the objective function entries can be.
 The program converts this format into the one liked by Sim::OPTS, which is the following, in which the indices of the tensor are expressed more clearly:
 
 
@@ -2106,7 +2149,20 @@ The program converts this format into the one liked by Sim::OPTS, which is the f
 After some computations, Interlinear will output a new dataseries, with the missing values filled in.
 This dataseries can be used by OPT for the optimization of one or more blocks. This can be useful for saving computations in searches involving simulations, especially when the time required by each simulations is long, like it may happen with CFD simulations in building design.
 
-The number of computations required for the creation of a metamodel in OPT increases exponencially with the number of instances in the metamodel. To make the increase linear, a limit has to be set for the size of net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$limit_checkgrades" and "$limit_checkpoints". By default they are both set to "", which entails that no limit is assumed.
+The number of computations required for the creation of a metamodel in OPT increases exponencially with the number of instances in the metamodel. To make the increase linear, a limit has to be set for the size of net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$limit_checkgrades" and "$limit_checkpoints". By default they are both set to 10000. If a null value ("") is specified for them, no limit is assumed.
+
+To call Interlinear as a Perl function:
+use Sim::OPT::Interlinear;
+interlinear( "./configfile.pl", "./sourcefile.csv", "./obtainedmetamodel.csv" );
+"configfile.pl" is the configuration file. If that file is an empty file, Interlinear will assume the defaults.
+"./sourcefile.csv" is only information which is truly mandatory.
+
+To use Interlinear as a script from the command line:
+./Interlinear.pm . "./sourcefile.csv";
+(Note the dot.) If "./sourcefile.csv" is not specified, the default file "./sourcefile.csv" will be sought.
+
+Or to begin with a dialogue question:
+./Interlinear.pm interstart;
 
 
 =head2 EXPORT

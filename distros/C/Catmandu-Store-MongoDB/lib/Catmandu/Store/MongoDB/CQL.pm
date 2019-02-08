@@ -22,18 +22,17 @@ sub _build_parser {
 sub parse {
     my ($self, $query) = @_;
 
-    my $node = eval {
-        $self->parser->parse($query)
-    } or do {
+    my $node = eval {$self->parser->parse($query)} or do {
         my $error = $@;
         die "cql error: $error";
     };
 
     my $mongo_query = $self->visit($node);
 
-    if ( $self->log->is_debug() ) {
+    if ($self->log->is_debug()) {
 
-        $self->log->debug("CQL query: $query, translated into mongo query: ".Dumper($mongo_query));
+        $self->log->debug("CQL query: $query, translated into mongo query: "
+                . Dumper($mongo_query));
 
     }
 
@@ -72,8 +71,9 @@ sub visit {
 
         #fields to search for
         if ($qualifier =~ $any_field) {
+
             #set default field explicitely
-            if ( $self->mapping && $self->mapping->{default_index} ) {
+            if ($self->mapping && $self->mapping->{default_index}) {
                 $search_field = $self->mapping->{default_index};
             }
             else {
@@ -84,15 +84,20 @@ sub visit {
             $search_field = $qualifier;
 
             #change search field
-            $search_field =~ s/(?<=[^_])_(?=[^_])//g if $self->mapping && $self->mapping->{strip_separating_underscores};
-            my $q_mapping = $indexes->{$search_field} or confess "cql error: unknown index $search_field";
-            $q_mapping->{op}->{$base} or confess "cql error: relation $base not allowed";
+            $search_field =~ s/(?<=[^_])_(?=[^_])//g
+                if $self->mapping
+                && $self->mapping->{strip_separating_underscores};
+            my $q_mapping = $indexes->{$search_field}
+                or confess "cql error: unknown index $search_field";
+            $q_mapping->{op}->{$base}
+                or confess "cql error: relation $base not allowed";
 
             my $op = $q_mapping->{op}->{$base};
 
             if (ref $op && $op->{field}) {
                 $search_field = $op->{field};
-            } elsif ($q_mapping->{field}) {
+            }
+            elsif ($q_mapping->{field}) {
                 $search_field = $q_mapping->{field};
             }
 
@@ -125,55 +130,55 @@ sub visit {
         }
 
         #field search
-        my $unmasked = array_includes([map { $_->[1] } @modifiers],"cql.unmasked");
+        my $unmasked
+            = array_includes([map {$_->[1]} @modifiers], "cql.unmasked");
 
         # trick to force numeric values interpreted as integers
         $term = $term + 0 if ($term =~ /^[1-9]\d*$/);
 
         if ($base eq '=' or $base eq 'scr') {
-            unless($unmasked){
-                $term = _is_wildcard( $term ) ?
-                    _wildcard_to_regex( $term ) :
-                    $term;
+            unless ($unmasked) {
+                $term
+                    = _is_wildcard($term) ? _wildcard_to_regex($term) : $term;
             }
 
-            $search_clause = +{ $search_field => $term };
+            $search_clause = +{$search_field => $term};
         }
         elsif ($base eq '<') {
-            $search_clause = +{ $search_field => { '$lt' => $term } };
+            $search_clause = +{$search_field => {'$lt' => $term}};
         }
         elsif ($base eq '>') {
-            $search_clause = +{ $search_field => { '$gt' => $term } };
+            $search_clause = +{$search_field => {'$gt' => $term}};
         }
         elsif ($base eq '<=') {
-            $search_clause = +{ $search_field => { '$lte' => $term } };
+            $search_clause = +{$search_field => {'$lte' => $term}};
         }
         elsif ($base eq '>=') {
-            $search_clause = +{ $search_field => { '$gte' => $term } };
+            $search_clause = +{$search_field => {'$gte' => $term}};
         }
         elsif ($base eq '<>') {
-            $search_clause = +{ $search_field => { '$ne' => $term } };
+            $search_clause = +{$search_field => {'$ne' => $term}};
         }
         elsif ($base eq 'exact') {
-            $search_clause = +{ $search_field => $term };
+            $search_clause = +{$search_field => $term};
         }
         elsif ($base eq 'all') {
             my @terms = split /\s+/, $term;
 
-            #query $all in mongo means exact matching, so we always need regular expressions here
-            for(my $i = 0; $i < scalar(@terms) ; $i++){
+#query $all in mongo means exact matching, so we always need regular expressions here
+            for (my $i = 0; $i < scalar(@terms); $i++) {
 
                 my $term = $terms[$i];
 
-                if ( $unmasked ) {
+                if ($unmasked) {
 
-                    $term = _quote_wildcard( $term );
+                    $term = _quote_wildcard($term);
                     $term = qr($term);
 
                 }
-                elsif ( _is_wildcard( $term ) ) {
+                elsif (_is_wildcard($term)) {
 
-                    $term = _wildcard_to_regex( $term );
+                    $term = _wildcard_to_regex($term);
 
                 }
                 else {
@@ -186,25 +191,25 @@ sub visit {
 
             }
 
-            $search_clause = +{ $search_field => { '$all' => \@terms } };
+            $search_clause = +{$search_field => {'$all' => \@terms}};
         }
         elsif ($base eq 'any') {
             my @terms = split /\s+/, $term;
 
-            #query $in in mongo means exact matching, so we always need regular expressions here
-            for(my $i = 0; $i < scalar(@terms) ; $i++){
+#query $in in mongo means exact matching, so we always need regular expressions here
+            for (my $i = 0; $i < scalar(@terms); $i++) {
 
                 my $term = $terms[$i];
 
-                if ( $unmasked ) {
+                if ($unmasked) {
 
-                    $term = _quote_wildcard( $term );
+                    $term = _quote_wildcard($term);
                     $term = qr($term);
 
                 }
-                elsif ( _is_wildcard( $term ) ) {
+                elsif (_is_wildcard($term)) {
 
-                    $term = _wildcard_to_regex( $term );
+                    $term = _wildcard_to_regex($term);
 
                 }
                 else {
@@ -217,65 +222,62 @@ sub visit {
 
             }
 
-            $search_clause = +{ $search_field => { '$in' => \@terms } };
+            $search_clause = +{$search_field => {'$in' => \@terms}};
         }
         elsif ($base eq 'within') {
             my @range = split /\s+/, $term;
 
             if (@range == 1) {
-                $search_clause = +{ $search_field => $term };
+                $search_clause = +{$search_field => $term};
             }
             else {
-                $search_clause = +{
-                    $search_field => {
-                        '$gte' => $range[0],
-                        '$lte' => $range[1]
-                    }
-                };
+                $search_clause
+                    = +{$search_field =>
+                        {'$gte' => $range[0], '$lte' => $range[1]}
+                    };
             }
         }
+
         #as $base is always set, this code should be removed?
         else {
-            unless($unmasked){
-                $term = _is_wildcard( $term ) ?
-                    _wildcard_to_regex( $term ) :
-                    $term;
+            unless ($unmasked) {
+                $term
+                    = _is_wildcard($term) ? _wildcard_to_regex($term) : $term;
             }
 
-            $search_clause = +{ $search_field => $term };
+            $search_clause = +{$search_field => $term};
         }
 
         return $search_clause;
     }
     elsif ($node->isa('CQL::ProxNode')) {
+
         # TODO: apply cql_mapping
         confess "not supported";
     }
     elsif ($node->isa('CQL::BooleanNode')) {
-        my $lft = $node->left;
-        my $rgt = $node->right;
+        my $lft   = $node->left;
+        my $rgt   = $node->right;
         my $lft_q = $self->visit($lft);
         my $rgt_q = $self->visit($rgt);
-        my $op = '$'.lc( $node->op );
+        my $op    = '$' . lc($node->op);
 
-        if ( $op eq '$and' || $op eq '$or' ) {
-            return +{ $op => [ $lft_q, $rgt_q ] };
+        if ($op eq '$and' || $op eq '$or') {
+            return +{$op => [$lft_q, $rgt_q]};
         }
-        elsif ( $op eq '$not' ) {
-            my($k,$v) = each(%$rgt_q);
+        elsif ($op eq '$not') {
+            my ($k, $v) = each(%$rgt_q);
 
-            if( $k eq '$or' ){
-                return +{ %$lft_q, '$nor' => $v };
+            if ($k eq '$or') {
+                return +{%$lft_q, '$nor' => $v};
             }
-            elsif ( $k eq '$and' ) {
-                #$nand not implemented yet (https://jira.mongodb.org/browse/SERVER-15577)
-                return +{ %$lft_q, '$nor' => [{
-                    '$and' => $v
-                }] };
-            } else {
-                return +{ %$lft_q, '$nor' => [{
-                    '$and' => [{ $k => $v }]
-                }] };
+            elsif ($k eq '$and') {
+
+     #$nand not implemented yet (https://jira.mongodb.org/browse/SERVER-15577)
+                return +{%$lft_q, '$nor' => [{'$and' => $v}]};
+            }
+            else {
+                return +{%$lft_q, '$nor' => [{'$and' => [{$k => $v}]}]};
             }
         }
     }
@@ -284,10 +286,10 @@ sub visit {
 sub _is_wildcard {
     my $value = $_[0];
 
-    (index($value,'^') == 0) ||
-    (rindex($value,'^') == length($value) - 1) ||
-    (index($value,'*') >= 0) ||
-    (index($value,'?') >= 0);
+           (index($value, '^') == 0)
+        || (rindex($value, '^') == length($value) - 1)
+        || (index($value, '*') >= 0)
+        || (index($value, '?') >= 0);
 }
 
 sub _wildcard_to_regex {

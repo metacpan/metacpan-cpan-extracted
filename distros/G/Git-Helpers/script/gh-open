@@ -28,7 +28,7 @@ gh-open - Open a browser window with the GitHub URL of the repository which you 
 
 =head1 VERSION
 
-version 0.000017
+version 0.000018
 
 =head1 SYNOPSIS
 

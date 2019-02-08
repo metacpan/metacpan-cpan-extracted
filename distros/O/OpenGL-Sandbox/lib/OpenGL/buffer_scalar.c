@@ -26,18 +26,18 @@ struct buffer_scalar_info {
 	buffer_scalar_free_fn destructor;
 };
 
-static int buffer_scalar_mg_write(pTHX_ SV *sv, MAGIC* mg);
-static int buffer_scalar_mg_clear(pTHX_ SV *sv, MAGIC *mg);
-static int buffer_scalar_mg_free(pTHX_ SV *sv, MAGIC *mg);
+static int buffer_scalar_mg_write(SV *sv, MAGIC* mg);
+static int buffer_scalar_mg_clear(SV *sv, MAGIC *mg);
+static int buffer_scalar_mg_free(SV *sv, MAGIC *mg);
 
 #ifdef MGf_LOCAL
-static int buffer_scalar_mg_local(pTHX_ SV* var, MAGIC* mg) {
+static int buffer_scalar_mg_local(SV* var, MAGIC* mg) {
 	croak("Can't localize view of foreign buffer");
 	return 0;
 }
 #endif
 #ifdef USE_ITHREADS
-static int buffer_scalar_mg_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* param) {
+static int buffer_scalar_mg_dup(MAGIC* magic, CLONE_PARAMS* param) {
 	croak("Can't share foreign buffer between iThreads");
 	return 0;
 }
@@ -66,11 +66,11 @@ static void reset_var(SV* var, struct buffer_scalar_info* info) {
 	SvPOK_only_UTF8(var);
 }
 
-static void buffer_scalar_fixup(pTHX_ SV* var, struct buffer_scalar_info* info, const char* string, STRLEN len) {
+static void buffer_scalar_fixup(SV* var, struct buffer_scalar_info* info, const char* string, STRLEN len) {
 	if (ckWARN(WARN_SUBSTR))
-		Perl_warn(aTHX_ "Writing directly to a foreign buffer is not recommended");
+		warn("Writing directly to a foreign buffer is not recommended");
 	if (SvCUR(var) > info->length)
-		Perl_warn(aTHX_ "Truncating new value to size of foreign buffer");
+		warn("Truncating new value to size of foreign buffer");
  
 	if (string && len)
 		Copy(string, info->address, (len < info->length? len : info->length), char);
@@ -82,20 +82,20 @@ static void buffer_scalar_fixup(pTHX_ SV* var, struct buffer_scalar_info* info, 
 	reset_var(var, info);
 }
 
-static int buffer_scalar_mg_write(pTHX_ SV* var, MAGIC* magic) {
+static int buffer_scalar_mg_write(SV* var, MAGIC* magic) {
 	struct buffer_scalar_info* info = (struct buffer_scalar_info*) magic->mg_ptr;
 	if (!SvOK(var))
-		buffer_scalar_fixup(aTHX_ var, info, NULL, 0);
+		buffer_scalar_fixup(var, info, NULL, 0);
 	else if (!SvPOK(var)) {
 		STRLEN len;
 		const char* string = SvPV(var, len);
-		buffer_scalar_fixup(aTHX_ var, info, string, len);
+		buffer_scalar_fixup(var, info, string, len);
 	}
 	else if (SvPVX(var) != info->address)
-		buffer_scalar_fixup(aTHX_ var, info, SvPVX(var), SvCUR(var));
+		buffer_scalar_fixup(var, info, SvPVX(var), SvCUR(var));
 	else {
 		if (ckWARN(WARN_SUBSTR) && SvCUR(var) != info->length) {
-			Perl_warn(aTHX_ "Writing directly to a foreign buffer");
+			warn("Writing directly to a foreign buffer");
 			SvCUR(var) = info->length;
 		}
 		SvPOK_only_UTF8(var);
@@ -103,12 +103,12 @@ static int buffer_scalar_mg_write(pTHX_ SV* var, MAGIC* magic) {
 	return 0;
 }
  
-static int buffer_scalar_mg_clear(pTHX_ SV* var, MAGIC* magic) {
-	Perl_die(aTHX_ "Can't clear a foreign buffer");
+static int buffer_scalar_mg_clear(SV* var, MAGIC* magic) {
+	croak("Can't clear a foreign buffer");
 	return 0;
 }
  
-static int buffer_scalar_mg_free(pTHX_ SV* var, MAGIC* magic) {
+static int buffer_scalar_mg_free(SV* var, MAGIC* magic) {
 	struct buffer_scalar_info* info = (struct buffer_scalar_info*) magic->mg_ptr;
 	if (info->destructor)
 		info->destructor(var, info->address, info->length, info->callback_data);
@@ -119,12 +119,12 @@ static int buffer_scalar_mg_free(pTHX_ SV* var, MAGIC* magic) {
 	return 0;
 }
 
-static void check_new_variable(pTHX_ SV* var) {
+static void check_new_variable(SV* var) {
 	if (SvTYPE(var) > SVt_PVMG && SvTYPE(var) != SVt_PVLV)
-		Perl_croak(aTHX_ "Can't wrap a non-scalar!\n");
+		croak("Can't wrap a non-scalar!\n");
 	SV_CHECK_THINKFIRST_COW_DROP(var);
 	if (SvREADONLY(var))
-		Perl_croak(aTHX_ "%s", PL_no_modify);
+		croak("%s", PL_no_modify);
 	if (SvMAGICAL(var) && mg_find(var, PERL_MAGIC_uvar))
 		sv_unmagic(var, PERL_MAGIC_uvar);
 	if (SvROK(var))
@@ -136,7 +136,7 @@ static void check_new_variable(pTHX_ SV* var) {
 	SvUPGRADE(var, SVt_PVMG);
 }
 
-static struct buffer_scalar_info* add_sv_magic(pTHX_ SV *var) {
+static struct buffer_scalar_info* add_sv_magic(SV *var) {
 	struct buffer_scalar_info* info;
 	MAGIC* magic;
 	check_new_variable(var);
@@ -152,7 +152,7 @@ static struct buffer_scalar_info* add_sv_magic(pTHX_ SV *var) {
 	return info;
 }
 
-static struct buffer_scalar_info* get_sv_magic(pTHX_ SV* var) {
+static struct buffer_scalar_info* get_sv_magic(SV* var) {
 	MAGIC* magic;
 	if (!SvMAGICAL(var)) return NULL;
 	for (magic= SvMAGIC(var); magic; magic = magic->mg_moremagic)
@@ -175,7 +175,8 @@ extern void buffer_scalar_wrap(
 	info->address= address;
 	info->length= length;
 	info->flags= flags;
-	memcpy(info->callback_data, cbdata, sizeof(buffer_scalar_callback_data_t));
+	if (cbdata)
+		memcpy(info->callback_data, cbdata, sizeof(buffer_scalar_callback_data_t));
 	info->destructor= destructor;
 	reset_var(target, info);
 }

@@ -191,7 +191,7 @@ use Scalar::Util 'refaddr';
 use base 'Exporter';
 use v5.14;
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 our @EXPORT = qw{
   one_row
@@ -1282,6 +1282,10 @@ sub setup_row {
                         $json_fields{$chr->{COLUMN_NAME}} = undef;
                     }
                     $chr->{COLUMN_DEF} //= $chr->{mysql_is_auto_increment};
+                    if(not defined $chr->{COLUMN_DEF} and $_->can('sqlite_table_column_metadata')) {
+                        my $col_info = $_->sqlite_table_column_metadata( undef, $table, $chr->{COLUMN_NAME});
+                        $chr->{COLUMN_DEF} //= $col_info->{auto_increment};
+                    }
                     if ($chr->{NULLABLE} == 0 && !defined($chr->{COLUMN_DEF})) {
                         push @required, $chr->{COLUMN_NAME};
                     }

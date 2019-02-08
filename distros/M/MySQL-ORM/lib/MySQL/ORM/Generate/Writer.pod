@@ -1,0 +1,39 @@
+=head1 NAME
+
+MySQL::ORM::Generate::Writer
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+=head2 OPTIONAL
+
+none
+
+=cut
+
+
+=head1 METHODS
+
+=head2 write_class
+
+
+=head3 parameters
+
+  Str      :$file_name!  
+  Str      :$class_name! 
+  ArrayRef :$use         
+  ArrayRef :$with        
+  ArrayRef :$extends     
+  ArrayRef :$attribs     
+  ArrayRef :$methods
+
+=cut
+

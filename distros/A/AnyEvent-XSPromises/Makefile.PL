@@ -5,7 +5,9 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'AnyEvent::XSPromises',
     VERSION_FROM      => 'lib/AnyEvent/XSPromises/Loader.pm', # finds $VERSION
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {
+        AnyEvent => "7",
+    }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/AnyEvent/XSPromises.pm', # retrieve abstract from module
        AUTHOR         => 'Tom van der Woerdt <tomvanderwoerdt@sd.apple.com>') : ()),

@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::InsertModulesList;
 
-our $DATE = '2016-03-25'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2019-02-08'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,7 +11,7 @@ use Moose;
 with (
     'Dist::Zilla::Role::FileMunger',
     'Dist::Zilla::Role::FileFinderUser' => {
-        default_finders => [':InstallModules', ':ExecFiles'],
+        default_finders => [':AllFiles'], # XXX dzil doesn't provide InstallPODs only InstallModules
     },
 );
 
@@ -20,7 +20,11 @@ use namespace::autoclean;
 sub munge_files {
     my $self = shift;
 
-    $self->munge_file($_) for @{ $self->found_files };
+    for my $file (@{ $self->found_files }) {
+        my $name = $file->name;
+        next unless $name =~ m!^(lib|script|bin)[/\\]!;
+        $self->munge_file($file);
+    }
 }
 
 sub munge_file {
@@ -36,9 +40,6 @@ sub _insert_modules_list {
     my($self, $opts) = @_;
 
     $opts = [split /\s+/, $opts];
-
-    # XXX use DZR:FileFinderUser's multiple finder feature instead of excluding
-    # it manually again using regex
 
     my @list0;
     for my $file (@{ $self->found_files }) {
@@ -107,7 +108,7 @@ Dist::Zilla::Plugin::InsertModulesList - Insert a POD containing a list of modul
 
 =head1 VERSION
 
-This document describes version 0.02 of Dist::Zilla::Plugin::InsertModulesList (from Perl distribution Dist-Zilla-Plugin-InsertModulesList), released on 2016-03-25.
+This document describes version 0.030 of Dist::Zilla::Plugin::InsertModulesList (from Perl distribution Dist-Zilla-Plugin-InsertModulesList), released on 2019-02-08.
 
 =head1 SYNOPSIS
 
@@ -162,7 +163,7 @@ To exclude modules matching a regex, use:
 
 To only include modules matching a regex, use:
 
- Below are the included plugins in this distribution"
+ Below are the included plugins in this distribution:
 
  # INSERT_MODULES_LIST /^Foo::Plugin::/
 
@@ -196,7 +197,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

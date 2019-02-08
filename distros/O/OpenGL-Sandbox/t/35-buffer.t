@@ -29,13 +29,18 @@ is( $buf->usage, GL_STATIC_DRAW(), 'got default usage hint' );
 $buf->load_at(50, "y"x100, 20);
 ok( !log_gl_errors, 'load_at: no GL errors' );
 
-is( ${$buf->mmap}, ("x" x 50).("y" x 80).("x" x 20), "memory map works" );
-ok( !log_gl_errors, 'load_at: no GL errors' );
+if ($^O eq 'MSWin32') {
+	# can't use a normal TODO or SKIP because the code still crashes
+	TODO: { local $TODO= "unmap crashes on Windows, so can't test mmap"; fail("memory map works"); }
+} else {
+	is( ${$buf->mmap}, ("x" x 50).("y" x 80).("x" x 20), "memory map works" );
+	ok( !log_gl_errors, 'load_at: no GL errors' );
 
-substr( ${$buf->mmap}, 20, 40 )= "z"x40;
+	substr( ${$buf->mmap}, 20, 40 )= "z"x40;
 
-$buf->unmap;
-is( ${$buf->mmap('r+', 10, 80)}, ("x"x10).("z"x40).("y"x30), 'memory map sub-range matches expected' );
+	$buf->unmap;
+	is( ${$buf->mmap('r+', 10, 80)}, ("x"x10).("z"x40).("y"x30), 'memory map sub-range matches expected' );
+}
 
 undef $buf;
 ok( !log_gl_errors, 'load_at: no GL errors' );

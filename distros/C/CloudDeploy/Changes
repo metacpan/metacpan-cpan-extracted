@@ -1,2 +1,7 @@
+0.06 2019-02-08
+ - Separate dzil packaging from cpanfile
+ - use Text::ASCIITable for rendering tables
+ - Fix #121782 (Undeclared dependency File::Slurp)
+
 0.05 2017-05-17
  - Initial release to CPAN

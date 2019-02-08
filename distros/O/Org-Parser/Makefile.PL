@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Digest::MD5" => 0,
     "File::Slurper" => 0,
     "List::MoreUtils" => 0,
-    "Log::ger" => "0.011",
+    "Log::ger" => "0.023",
     "Module::List" => 0,
     "Module::Load" => 0,
     "Moo" => 0,
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "lib" => 0
   },
-  "VERSION" => "0.54",
+  "VERSION" => "0.550",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,7 +69,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::MoreUtils" => 0,
-  "Log::ger" => "0.011",
+  "Log::ger" => "0.023",
   "Module::List" => 0,
   "Module::Load" => 0,
   "Module::Loaded" => 0,

@@ -1,6 +1,6 @@
 package Cassandra::Client;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::VERSION = '0.14';
+$Cassandra::Client::VERSION = '0.16';
 # ABSTRACT: Perl library for accessing Cassandra using its binary network protocol
 
 use 5.010;
@@ -23,7 +23,7 @@ use Cassandra::Client::Util qw/series whilst/;
 
 use Clone 0.36 qw/clone/;
 use List::Util qw/shuffle/;
-use Promises 0.93 qw/deferred/;
+use AnyEvent::XSPromises qw/deferred/;
 use Time::HiRes ();
 use Ref::Util 0.008 qw/is_ref/;
 use Devel::GlobalDestruction 0.11;
@@ -194,7 +194,7 @@ sub _prepare {
         return _cb($callback);
     }
 
-    $self->_command("prepare", [ $callback, $query ]);
+    $self->_command("prepare", $callback, [ $query ]);
     return;
 }
 
@@ -241,7 +241,7 @@ sub _command {
     goto SLOWPATH if !$connection;
 
     if (my $error= $self->{throttler}->should_fail()) {
-        return _cb($callback, $error);
+        return $self->_command_failed($command, $callback, $args, $command_info, $error);
     }
 
     $self->{active_queries}++;
@@ -253,6 +253,8 @@ sub _command {
         $self->_schedule_command_dequeue if $self->{command_queue}{has_any};
 
         return $self->_command_failed($command, $callback, $args, $command_info, $error) if $error;
+
+        $self->_report_stats($command, $command_info);
         return _cb($callback, $error, $result);
     }, @$args);
 
@@ -292,6 +294,8 @@ sub _command_slowpath {
         $self->_schedule_command_dequeue if $self->{command_queue}{has_any};
 
         return $self->_command_failed($command, $callback, $args, $command_info, $error) if $error;
+
+        $self->_report_stats($command, $command_info);
         return _cb($callback, $error, $result);
     });
     return;
@@ -315,34 +319,35 @@ sub _command_retry {
 sub _command_failed {
     my ($self, $command, $callback, $args, $command_info, $error)= @_;
 
-    return $callback->($error) unless is_ref($error);
+    if (is_ref($error)) {
+        my $retry_decision;
+        if ($error->do_retry) {
+            $retry_decision= Cassandra::Client::Policy::Retry::retry;
+        } elsif ($error->is_request_error) {
+            $retry_decision= $self->{retry_policy}->on_request_error(undef, undef, $error, ($command_info->{retries}||0));
+        } elsif ($error->isa('Cassandra::Client::Error::WriteTimeoutException')) {
+            $retry_decision= $self->{retry_policy}->on_write_timeout(undef, $error->cl, $error->write_type, $error->blockfor, $error->received, ($command_info->{retries}||0));
+        } elsif ($error->isa('Cassandra::Client::Error::ReadTimeoutException')) {
+            $retry_decision= $self->{retry_policy}->on_read_timeout(undef, $error->cl, $error->blockfor, $error->received, $error->data_retrieved, ($command_info->{retries}||0));
+        } elsif ($error->isa('Cassandra::Client::Error::UnavailableException')) {
+            $retry_decision= $self->{retry_policy}->on_unavailable(undef, $error->cl, $error->required, $error->alive, ($command_info->{retries}||0));
+        } else {
+            $retry_decision= Cassandra::Client::Policy::Retry::rethrow;
+        }
 
-    my $retry_decision;
-    if ($error->do_retry) {
-        $retry_decision= Cassandra::Client::Policy::Retry::retry;
-    } elsif ($error->is_request_error) {
-        $retry_decision= $self->{retry_policy}->on_request_error(undef, undef, $error, ($command_info->{retries}||0));
-    } elsif ($error->isa('Cassandra::Client::Error::WriteTimeoutException')) {
-        $retry_decision= $self->{retry_policy}->on_write_timeout(undef, $error->cl, $error->write_type, $error->blockfor, $error->received, ($command_info->{retries}||0));
-    } elsif ($error->isa('Cassandra::Client::Error::ReadTimeoutException')) {
-        $retry_decision= $self->{retry_policy}->on_read_timeout(undef, $error->cl, $error->blockfor, $error->received, $error->data_retrieved, ($command_info->{retries}||0));
-    } elsif ($error->isa('Cassandra::Client::Error::UnavailableException')) {
-        $retry_decision= $self->{retry_policy}->on_unavailable(undef, $error->cl, $error->required, $error->alive, ($command_info->{retries}||0));
-    } else {
-        $retry_decision= Cassandra::Client::Policy::Retry::rethrow;
+        if ($retry_decision && $retry_decision eq 'retry') {
+            return $self->_command_retry($command, $callback, $args, $command_info);
+        }
     }
 
-    if ($retry_decision && $retry_decision eq 'retry') {
-        return $self->_command_retry($command, $callback, $args, $command_info);
-    }
-
+    $self->_report_stats($command, $command_info);
     return $callback->($error);
 }
 
 sub _command_enqueue {
     my ($self, $command, $callback, $args, $command_info)= @_;
     if (my $error= $self->{command_queue}->enqueue([$command, $callback, $args, $command_info])) {
-        return $callback->("Cannot $command: $error");
+        return $self->_command_failed($command, $callback, $args, $command_info, "Cannot $command: $error");
     }
     return;
 }
@@ -357,6 +362,20 @@ sub _schedule_command_dequeue {
                 my $item= $self->{command_queue}->dequeue or return;
                 $self->_command_slowpath(@$item);
             }
+        });
+    }
+}
+
+sub _report_stats {
+    my ($self, $command, $command_info)= @_;
+
+    $command_info->{end_time}= Time::HiRes::time();
+
+    if (my $stats_hook= $self->{options}{stats_hook}) {
+        _cb($stats_hook, timing => {
+            command     => $command,
+            start_time  => $command_info->{start_time},
+            end_time    => $command_info->{end_time},
         });
     }
 }
@@ -531,7 +550,7 @@ Cassandra::Client - Perl library for accessing Cassandra using its binary networ
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 DESCRIPTION
 
@@ -613,6 +632,10 @@ Maximum time to wait for a query, in seconds. Defaults to C<11>.
 
 Whether to connect to the full cluster in C<connect()>, or delay that until queries come in.
 
+=item protocol_version
+
+Cassandra protocol version to use. Currently defaults to C<4>, can also be set to C<3> for compatibility with older versions of Cassandra.
+
 =back
 
 =item $client->batch($queries[, $attributes])
@@ -680,7 +703,7 @@ All C<Cassandra::Client> methods are available as synchronous methods by using t
 
 =head2 Promises
 
-C<Cassandra::Client> methods are also available as promises (see perldoc L<Promises>). This integrates well with other libraries that deal with promises or asynchronous callbacks. Note that for promises to work, C<AnyEvent> is required, and needs to be enabled by passing C<< anyevent => 1 >> to C<< Cassandra::Client->new() >>.
+C<Cassandra::Client> methods are also available as promises (see perldoc L<AnyEvent::XSPromises>). This integrates well with other libraries that deal with promises or asynchronous callbacks. Note that for promises to work, C<AnyEvent> is required, and needs to be enabled by passing C<< anyevent => 1 >> to C<< Cassandra::Client->new() >>.
 
 Promise variants are available by prefixing method names with C<async_>, eg. C<async_connect>, C<async_execute>, etc. The usual result of the method is passed to the promise's success handler, or to the failure handler if there was an error.
 
@@ -698,7 +721,7 @@ Promise variants are available by prefixing method names with C<async_>, eg. C<a
 
 Promises normally get resolved from event loops, so for this to work you need one. Normally you would deal with that by collecting all your promises and then waiting for that :
 
-    use Promises qw/collect/;
+    use AnyEvent::XSPromises qw/collect/;
     use AnyEvent;
 
     my @promises= ( ... ); # See other examples
@@ -763,7 +786,7 @@ Tom van der Woerdt <tvdw@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Tom van der Woerdt.
+This software is copyright (c) 2019 by Tom van der Woerdt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

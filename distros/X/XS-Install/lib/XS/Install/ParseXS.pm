@@ -358,16 +358,15 @@ sub default_constructor {
     
     our @post_callbacks;
 
-    our $obj = bless {}, __PACKAGE__;
-    open $obj->{stdout}, '>&', STDOUT;
+    my ($out, $orig_stdout);
+    open $orig_stdout, '>&', STDOUT;
     close STDOUT;
-    open STDOUT, '>', \$obj->{out} or die $!; # This shouldn't fail
+    open STDOUT, '>', \$out or die $!; # This shouldn't fail
     
     #post-process XS out
-    sub DESTROY {
-        my $self = shift;
-        my $out = $self->{out};
-        select $self->{stdout};
+    sub END {
+        $out //= '';
+        select $orig_stdout;
         
         $out =~ s/^MODE\s*:.+//mg;
         

@@ -1,10 +1,57 @@
 #! /usr/bin/env perl
 use strict;
 use warnings;
-use Log::Any::Adapter 'Daemontools', -init => { env => 1 };
 use Time::HiRes 'time';
-use File::Spec::Functions qw( splitpath );
+use Log::Any::Adapter 'Stderr', log_level => 'info';
 use OpenGL::Sandbox qw( :all GL_FLOAT GL_TRIANGLES GL_VERTEX_SHADER glDrawArrays $res );
+use Getopt::Long;
+use Pod::Usage;
+
+# PODNAME: glsandbox-shaderdemo
+# ABSTRACT: Run shaders in a manner similar to www.shadertoy.com
+our $VERSION = '0.120'; # VERSION
+
+
+my %context_opts;
+GetOptions(
+	'fullscreen' => \$context_opts{fullscreen},
+	'width=i'    => \$context_opts{width},
+	'height=i'   => \$context_opts{height},
+	'title=s'    => \$context_opts{title},
+	'provider=s' => sub { $ENV{OPENGL_SANDBOX_CONTEXT_PROVIDER}= $_[1] },
+	'help'       => sub { pod2usage(1) },
+) or pod2usage(2);
+@ARGV or pod2usage(-message => "Require at least one shader file");
+
+make_context(\%context_opts);
+
+my %shaders;
+my @channels;
+for (@ARGV) {
+	if ($_ =~ /\.png/i) {
+		push @channels, new_texture($_, filename => $_);
+	} else {
+		my $source= ($_ eq '-')? do { $/= undef; <STDIN>; }
+			: ${ OpenGL::Sandbox::MMap->new($_) };
+		$source= augment_shader_code($source);
+		$shaders{$_}= new_shader($_, source => $source)->prepare;
+	}
+}
+$shaders{vert}= shader('xy_screen') unless grep { $_->type == GL_VERTEX_SHADER } values %shaders;
+
+my $prog= new_program('demo', shaders => \%shaders);
+$prog->bind;
+$prog->set("iResolution", $context_opts{width} // 640, $context_opts{height} // 480, 1.0)
+	if $prog->uniforms->{iResolution};
+vao('unit_quad')->bind;
+my $started= time;
+while (1) {
+	$prog->set("iTime", time - $started) if $prog->uniforms->{iTime};
+	glDrawArrays( GL_TRIANGLES, 0, 6 );
+	next_frame;
+}
+
+# This declares the default resources for ResMan's shader(), program() etc. accessors.
 use OpenGL::Sandbox -resources => {
 	shader_config => {
 		xy_screen => { source => "
@@ -23,21 +70,29 @@ use OpenGL::Sandbox -resources => {
 		},
 	},
 };
-my %provided_uniforms= (
-	iResolution        => ['vec3'],
-	iTime              => ['float'],
-	iTimeDelta         => ['float'],
-	iFrame             => ['float'],
-	iMouse             => ['vec4'],
-	iDate              => ['vec4'],
-	iSampleRate        => ['float'],
-	iChannelTime       => ['float', 4],
-	iChannelResolution => ['vec3', 4],
-	iChannel0          => ['sampler2D'],
-	iChannel1          => ['sampler2D'],
-	iChannel2          => ['sampler2D'],
-	iChannel3          => ['sampler2D'],
-);
+
+# The bit below adds compatibility for shaders from www.shadertoy.com
+# by defining any of the inputs that they lack, and wrapping mainImage()
+# with a simple main() implementation.
+
+my %provided_uniforms;
+BEGIN {
+	%provided_uniforms= (
+		iResolution        => ['vec3'],
+		iTime              => ['float'],
+		iTimeDelta         => ['float'],
+		iFrame             => ['float'],
+		iMouse             => ['vec4'],
+		iDate              => ['vec4'],
+		iSampleRate        => ['float'],
+		iChannelTime       => ['float', 4],
+		iChannelResolution => ['vec3', 4],
+		iChannel0          => ['sampler2D'],
+		iChannel1          => ['sampler2D'],
+		iChannel2          => ['sampler2D'],
+		iChannel3          => ['sampler2D'],
+	);
+}
 sub augment_shader_code {
 	my $source= shift;
 	for (keys %provided_uniforms) {
@@ -58,29 +113,64 @@ sub augment_shader_code {
 	return $source;
 }
 
-@ARGV or die "Usage: glsandbox-shaderdemo [SHADER_SOURCE_FILE ...]\n";
-my %shaders;
-my @channels;
-for (@ARGV) {
-	if ($_ =~ /\.png/i) {
-		push @channels, new_texture($_, filename => $_);
-	} else {
-		my $source= ($_ eq '-')? do { $/= undef; <STDIN>; }
-			: ${ OpenGL::Sandbox::MMap->new($_) };
-		$source= augment_shader_code($source);
-		$shaders{$_}= new_shader($_, source => $source);
-	}
-}
-$shaders{vert}= shader('xy_screen') unless grep { $_->type == GL_VERTEX_SHADER } values %shaders;
+__END__
 
-make_context;
-my $prog= new_program('demo', shaders => \%shaders);
-$prog->bind;
-$prog->set("iResolution", 640, 480, 1.0) if $prog->uniforms->{iResolution};
-vao('unit_quad')->bind;
-my $started= time;
-while (1) {
-	$prog->set("iTime", time - $started) if $prog->uniforms->{iTime};
-	glDrawArrays( GL_TRIANGLES, 0, 6 );
-	next_frame;
-}
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+glsandbox-shaderdemo - Run shaders in a manner similar to www.shadertoy.com
+
+=head1 VERSION
+
+version 0.120
+
+=head1 SYNOPSIS
+
+  glsandbox-shaderdemo [OPTIONS] SHADER_FILE [...]
+  glsandbox-shaderdemo --provider=GLX --fullscreen t/data/shader/seascape.frag
+
+This script opens a generic OpenGL context (See OpenGL::Sandbox::make_context)
+and then renders shaders of your selection in a manner similar to www.shadertoy.com
+
+=head1 OPTIONS
+
+=over
+
+=item --provider
+
+The module used to create the OpenGL context.  The default is to use the first working
+provider in the sequence of: GLFW, SDL, GLX, GLUT.
+
+=item --fullscreen
+
+Request full screen.  Support for this depends on which Context Provider you are using.
+
+=item --width=W
+
+Width of window
+
+=item --height=H
+
+Height of window
+
+=item --title=NAME
+
+Title of window
+
+=back
+
+=head1 AUTHOR
+
+Michael Conrad <mike@nrdvana.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Michael Conrad.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,7 +1,7 @@
 package Module::FatPack;
 
-our $DATE = '2018-02-27'; # DATE
-our $VERSION = '0.180'; # VERSION
+our $DATE = '2019-02-08'; # DATE
+our $VERSION = '0.181'; # VERSION
 
 use 5.010001;
 use strict;
@@ -84,7 +84,7 @@ _
         assume_strict => {
             summary => 'Assume code runs under stricture',
             schema => 'bool',
-            default => 1,
+            default => 0,
         },
         line_prefix => {
             schema => ['str*', min_len => 1],
@@ -177,7 +177,7 @@ sub fatpack_modules {
         push @res, "# BEGIN FATPACK CODE: ".join(" ", sort keys %fatpack_keys)."\n";
         push @res, "{\n";
     }
-    push @res, <<'_' if $args{assume_strict} // 1;
+    push @res, <<'_' if $args{assume_strict} // 0;
     no strict 'refs';
 _
     for my $mod_pm (sort keys %module_srcs) {
@@ -277,7 +277,7 @@ Module::FatPack - Generate source code that contains fatpacked modules
 
 =head1 VERSION
 
-This document describes version 0.180 of Module::FatPack (from Perl distribution Module-FatPack), released on 2018-02-27.
+This document describes version 0.181 of Module::FatPack (from Perl distribution Module-FatPack), released on 2019-02-08.
 
 =head1 FUNCTIONS
 
@@ -286,7 +286,7 @@ This document describes version 0.180 of Module::FatPack (from Perl distribution
 
 Usage:
 
- fatpack_modules(%args) -> [status, msg, result, meta]
+ fatpack_modules(%args) -> [status, msg, payload, meta]
 
 Generate source code that contains fatpacked modules.
 
@@ -306,7 +306,7 @@ Arguments ('*' denotes required arguments):
 
 Surround the code inside BEGIN { }.
 
-=item * B<assume_strict> => I<bool> (default: 1)
+=item * B<assume_strict> => I<bool> (default: 0)
 
 Assume code runs under stricture.
 
@@ -379,7 +379,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -421,7 +421,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

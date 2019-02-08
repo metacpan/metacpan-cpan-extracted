@@ -1,5 +1,9 @@
 Revision history for Perl extension Udev-FFI
 
+0.103000 2019-02-08T15:49:32Z
+    - remove IPC::Cmd
+    - add File::Which
+
 0.102001 2019-02-03T22:06:55Z
     - improve error handling
 

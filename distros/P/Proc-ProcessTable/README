@@ -19,7 +19,7 @@ STATUS
 ======
 This is BETA software; it seems to work, but use at your own risk :) 
 
-Currently works on darwin, nonstop-ux, Cygwin on Windows, linux,
+Currently works on darwin, nonstop-ux, Windows (both native MSWin32 and Cygwin), linux,
 solaris, aix, hpux, freebsd, irix, dec_osf, bsdi, netbsd, unixware 7.x,
 SunOS and openbsd. Please see the "README.osname" files for details on
 individual os implementations. Please see the file PORTING if you are
@@ -27,9 +27,7 @@ interested in making it work on something else. Please see the file
 TODO for a list of issues that need to be addressed (and send me
 patches!).
 
-Please note that the Cygwin/windows port requires the Cygwin
-environment to work (available from http://cygwin.com/), and that the
-code for the port is derived from Cygwin code and is therefore covered
+Please note that the Windows port is derived from Cygwin code and is therefore covered
 by the Cygwin license (http://cygwin.com/licensing.html).
 
 Multithread support is now available for Solaris; please see

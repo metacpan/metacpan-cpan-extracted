@@ -4,7 +4,7 @@
       "Jose Luis Martinez <joseluis.martinez@capside.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -17,14 +17,6 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "develop" : {
-         "requires" : {
-            "Dist::Zilla" : "0",
-            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
-            "Dist::Zilla::Plugin::VersionFromModule" : "0",
-            "Dist::Zilla::PluginBundle::Git" : "0"
          }
       },
       "runtime" : {
@@ -44,12 +36,18 @@
             "String::Diff" : "0",
             "Template" : "0",
             "Term::ANSIColor" : "0",
-            "Text::TabularDisplay" : "0"
+            "Text::ASCIITable" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurp" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.05",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
+   "version" : "1.06",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

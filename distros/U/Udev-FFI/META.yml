@@ -27,7 +27,7 @@ no_index:
 provides:
   Udev::FFI:
     file: lib/Udev/FFI.pm
-    version: '0.102001'
+    version: '0.103000'
   Udev::FFI::Device:
     file: lib/Udev/FFI/Device.pm
   Udev::FFI::Devnum:
@@ -41,13 +41,13 @@ provides:
 requires:
   FFI::CheckLib: '0'
   FFI::Platypus: '0'
-  IPC::Cmd: '0'
+  File::Which: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/Ilya33/udev-ffi/issues
   homepage: https://github.com/Ilya33/udev-ffi
   repository: git://github.com/Ilya33/udev-ffi.git
-version: '0.102001'
+version: '0.103000'
 x_authority: cpan:ILUX
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

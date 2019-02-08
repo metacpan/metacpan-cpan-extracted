@@ -10,7 +10,7 @@ Pandoc - wrapper for the mighty Pandoc document converter
 
 =cut
 
-our $VERSION = '0.8.8';
+our $VERSION = '0.9.0';
 
 use Pandoc::Version;
 use Pandoc::Error;
@@ -446,10 +446,10 @@ instructions|https://metacpan.org/pod/App::cpanminus#INSTALLATION> if needed):
 
 Installing instruction for Pandoc itself are given L<at Pandoc
 homepage|http://pandoc.org/installing.html>. On Debian-based systems this
-module can be used to install and update the pandoc executable with
-L<Pandoc::Release>:
+module and script L<pandoc-version> can be used to install and update the
+pandoc executable with L<Pandoc::Release>:
 
-  perl -MPandoc::Release -e 'latest->download->symlink'
+  pandoc-version install
 
 Then add C<~/.pandoc/bin> to your C<PATH> or copy C<~/.pandoc/bin/pandoc> to
 a location where it can be executed.

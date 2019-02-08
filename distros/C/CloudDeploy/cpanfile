@@ -10,15 +10,13 @@ requires 'MooseX::App';
 requires 'String::Diff';
 requires 'Term::ANSIColor';
 requires 'Data::Printer';
-requires 'Text::TabularDisplay';
+requires 'Text::ASCIITable';
 # attributes dependency
 requires 'Paws';
 requires 'MooseX::SlurpyConstructor';
 requires 'Template';
 
-on develop => sub {
-  requires 'Dist::Zilla';
-  requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
-  requires 'Dist::Zilla::Plugin::VersionFromModule';
-  requires 'Dist::Zilla::PluginBundle::Git';
+on test => sub {
+  requires 'File::Slurp';
 };
+

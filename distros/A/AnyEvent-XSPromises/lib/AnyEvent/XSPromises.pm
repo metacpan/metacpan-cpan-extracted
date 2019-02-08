@@ -153,6 +153,25 @@ loop iteration.
 Rejects the deferred object (assigns a reason for why it failed). All associated promises will have their callback invoked
 in the next event loop iteration.
 
+=item $d->is_in_progress()
+
+Returns true iff the C<reject> or C<resolve> method has not been called yet. Useful for racing multiple code paths to
+resolve/reject a single deferred object, like one would do to build a timeout.
+
+    sub get_with_timeout {
+        my $d= deferred;
+        my $timer; $timer= AE::timer 1, 0, sub {
+            undef $timer;
+            $d->reject("Timed out") if $d->is_in_progress;
+        };
+
+        http_get("https://perl.org", sub {
+            my $result= shift
+            $d->resolve($result) if $d->is_in_progress;
+        });
+
+This method is intentionally not available on promise objects.
+
 =back
 
 =head2 Promise objects

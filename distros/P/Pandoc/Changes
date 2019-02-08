@@ -1,5 +1,8 @@
 Revision history for Pandoc Perl module
 
+0.9.0  2019-02-07 17:21:55 CET
+    - Add command line script pandoc-version
+
 0.8.8  2018-08-24 10:42:00 CEST
     - Update dependencies, require Perl 5.14
  

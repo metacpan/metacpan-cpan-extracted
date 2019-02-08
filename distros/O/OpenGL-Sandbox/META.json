@@ -4,13 +4,13 @@
       "Michael Conrad <mike@nrdvana.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OpenGL-Sandbox",
    "no_index" : {
@@ -39,15 +39,21 @@
          "requires" : {
             "Carp" : "0",
             "Cwd" : "0",
+            "Devel::CheckOS" : "0",
             "Exporter::Extensible" : "0",
             "File::Find" : "0",
             "File::Map" : "0",
             "File::Spec::Functions" : "0",
+            "Getopt::Long" : "0",
             "Image::PNG::Libpng" : "0",
             "Log::Any" : "0",
+            "Log::Any::Adapter" : "0",
             "Module::Runtime" : "0",
             "Moo" : "2",
+            "OpenGL" : "0",
+            "Pod::Usage" : "0",
             "Scalar::Util" : "0",
+            "Time::HiRes" : "0",
             "Try::Tiny" : "0",
             "constant" : "0",
             "perl" : "v5.14.0",
@@ -58,7 +64,6 @@
       "test" : {
          "requires" : {
             "FindBin" : "0",
-            "Log::Any::Adapter" : "0",
             "Log::Any::Adapter::TAP" : "0",
             "Test::More" : "0",
             "lib" : "0"
@@ -76,8 +81,8 @@
          "web" : "https://github.com/nrdvana/perl-OpenGL-Sandbox"
       }
    },
-   "version" : "0.100",
-   "x_generated_by_perl" : "v5.24.0",
-   "x_serialization_backend" : "JSON::XS version 3.02"
+   "version" : "0.120",
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

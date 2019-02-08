@@ -7,7 +7,7 @@ use OpenGL::Sandbox qw/ glGetString GL_VERSION /;
 use SDLx::App;
 
 # ABSTRACT: Create OpenGL context with SDLx::App
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.120'; # VERSION
 
 my %instances;
 sub new {
@@ -68,7 +68,7 @@ OpenGL::Sandbox::ContextShim::SDL - Create OpenGL context with SDLx::App
 
 =head1 VERSION
 
-version 0.100
+version 0.120
 
 =head1 DESCRIPTION
 

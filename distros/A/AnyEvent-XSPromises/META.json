@@ -31,10 +31,12 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "AnyEvent" : "7"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.001",
+   "version" : "0.003",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

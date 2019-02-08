@@ -37,7 +37,7 @@ cpan-repo - Open a browser window with the URL of a CPAN module's repository
 
 =head1 VERSION
 
-version 0.000017
+version 0.000018
 
 =head1 SYNOPSIS
 

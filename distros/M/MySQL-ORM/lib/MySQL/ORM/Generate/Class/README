@@ -1,0 +1,1 @@
+- MySQL::ORM::Generate::Class::Table isn't under MySQL::ORM::Generate::Class::Db because there would be a circular dependency.

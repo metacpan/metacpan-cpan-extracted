@@ -4,7 +4,7 @@ Git::Helpers - Shortcuts for common Git commands
 
 # VERSION
 
-version 0.000017
+version 0.000018
 
 # SYNOPSIS
 
@@ -53,6 +53,13 @@ Defaults to using `origin` as the remote if none is supplied.
 Defaults to master branch, but can also display current branch.
 
     my $current_branch_url = https_remote_url( 'origin', 1 );
+
+## ignored\_files( $dir )
+
+Returns an arrayref of files which exist in your checkout, but are ignored by
+Git.  Optionally accepts a directory as an argument.  Defaults to ".".
+
+Throws an exception if there has been an error running the command.
 
 ## is\_inside\_work\_tree
 

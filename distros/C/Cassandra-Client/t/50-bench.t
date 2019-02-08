@@ -2,23 +2,19 @@
 use 5.010;
 use strict;
 use warnings;
+use File::Basename qw//; use lib File::Basename::dirname(__FILE__).'/lib';
 use Test::More;
-use Cassandra::Client;
+use TestCassandra;
 use Cassandra::Client::Policy::Throttle::Adaptive;
 use Time::HiRes qw/time/;
-use Promises qw/collect/, backend => ['AnyEvent'];
+use AnyEvent::XSPromises qw/collect/;
 use AnyEvent;
 
-plan skip_all => "CASSANDRA_HOST not set" unless $ENV{CASSANDRA_HOST};
+plan skip_all => "Missing Cassandra test environment" unless TestCassandra->is_ok;
 
-my $client= Cassandra::Client->new(
-    contact_points => [split /,/, $ENV{CASSANDRA_HOST}],
-    username  => $ENV{CASSANDRA_USER},
-    password  => $ENV{CASSANDRA_AUTH},
+my $client= TestCassandra->new(
     anyevent  => 1,
     throttler => Cassandra::Client::Policy::Throttle::Adaptive->new(),
-    tls       => $ENV{CASSANDRA_TLS},
-    port      => $ENV{CASSANDRA_PORT},
 );
 $client->connect();
 

@@ -14,7 +14,7 @@ use AnyEvent::WebSocket::Connection;
 use PerlX::Maybe qw( maybe provided );
 
 # ABSTRACT: WebSocket client for AnyEvent
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.52'; # VERSION
 
 
 has timeout => (
@@ -83,13 +83,13 @@ has env_proxy => (
 
 sub connect
 {
-  my($self, $uri) = @_;
+  my($self, $uri, $host, $port) = @_;
   unless(ref $uri)
   {
     require URI;
     $uri = URI->new($uri);
   }
-  
+
   my $done = AE::cv;
 
   # TODO: should we also accept http and https URLs?
@@ -99,8 +99,11 @@ sub connect
     $done->croak("URI is not a websocket");
     return $done;
   }
-    
-  $self->_make_tcp_connection($uri->scheme, $uri->host, $uri->port, sub {
+
+  $host = $uri->host unless defined $host;
+  $port = $uri->port unless defined $port;
+
+  $self->_make_tcp_connection($uri->scheme, $host, $port, sub {
     my $fh = shift;
     unless($fh)
     {
@@ -224,7 +227,7 @@ AnyEvent::WebSocket::Client - WebSocket client for AnyEvent
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -371,10 +374,18 @@ end-points, it reads C<wss_proxy> (C<WSS_PROXY>) and C<https_proxy>
 =head2 connect
 
  my $cv = $client->connect($uri)
+ my $cv = $client->connect($uri, $host, $port);
 
 Open a connection to the web server and open a WebSocket to the resource
 defined by the given URL.  The URL may be either an instance of L<URI::ws>,
 L<URI::wss>, or a string that represents a legal WebSocket URL.
+
+You can  override the connection host and port by passing them in as the
+second and third argument.  These values (if provided) are passed directly
+into L<AnyEvent::Socket>'s C<tcp_connect> function, so please note that
+function's idiosyncrasies in the L<AnyEvent::Socket> documentation.  In
+particular,  you can pass in C<unix/> as the host and a filesystem path
+as the "port" to connect to a unix domain socket.
 
 This method will return an L<AnyEvent> condition variable which you can 
 attach a callback to.  The value sent through the condition variable will

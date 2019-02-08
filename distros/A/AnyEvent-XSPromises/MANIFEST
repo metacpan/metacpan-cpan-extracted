@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+XSPromises.xs
+lib/AnyEvent/XSPromises.pm
+lib/AnyEvent/XSPromises/Loader.pm
+ppport.h
+t/XSPromises.t
+t/aplus.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

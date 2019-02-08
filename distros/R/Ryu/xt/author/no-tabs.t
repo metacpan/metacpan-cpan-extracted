@@ -50,6 +50,7 @@ my @files = (
     't/source/prefix.t',
     't/source/skip.t',
     't/source/skip_last.t',
+    't/source/skip_until.t',
     't/source/source.t',
     't/source/statistics.t',
     't/source/suffix.t',

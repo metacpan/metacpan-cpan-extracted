@@ -1,4 +1,17 @@
-Version 0.049_002 - 2019-02-04
+Version 0.120 - 2019-02-08
+  - glsandbox-shaderdemo is now a properly documented installed script
+  - Support for GLUT as a context provider
+  - Change order of preferred context provider to GLFW, SDL, GLX, GLUT
+  - Support 'fullscreen' option in GLX context provider
+  - More fixes for Windows
+  - More documentation improvements
+
+Version 0.110 - 2019-02-07
+  - Dynamically load GL functions on demand instead of relying on linker
+    (Windows compatibility, maybe Mac too)
+  - Documentation improvements
+
+Version 0.100 - 2019-02-06
   - Support for many OpenGL 2+ objects:
      - Buffer
      - VertexArray

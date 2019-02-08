@@ -25,7 +25,7 @@ my %args = (
     requires => {
         'FFI::CheckLib' => '0',
         'FFI::Platypus' => '0',
-        'IPC::Cmd' => '0',
+        'File::Which' => '0',
         'perl' => '5.008001',
     },
 

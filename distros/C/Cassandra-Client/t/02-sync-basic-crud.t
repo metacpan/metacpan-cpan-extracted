@@ -2,13 +2,14 @@
 use 5.010;
 use strict;
 use warnings;
+use File::Basename qw//; use lib File::Basename::dirname(__FILE__).'/lib';
 use Test::More;
-use Cassandra::Client;
+use TestCassandra;
 
-plan skip_all => "CASSANDRA_HOST not set" unless $ENV{CASSANDRA_HOST};
+plan skip_all => "Missing Cassandra test environment" unless TestCassandra->is_ok;
 plan tests => 5;
 
-my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
+my $client= TestCassandra->new;
 $client->connect();
 
 my $db= 'perl_cassandra_client_tests';
@@ -16,6 +17,7 @@ $client->execute("drop keyspace if exists $db");
 $client->execute("create keyspace $db with replication={'class':'SimpleStrategy', 'replication_factor': 1}");
 $client->execute("create table $db.test_int (id int primary key, value int)");
 $client->execute("insert into $db.test_int (id, value) values (5, 6)");
+$client->prepare("insert into $db.test_int (id, value) values (5, 7)");
 {
     my ($result)= $client->execute("select id, value from $db.test_int where id=5");
     my $rows= $result->rows;

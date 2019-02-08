@@ -1,6 +1,6 @@
 package Cassandra::Client::NetworkStatus;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::NetworkStatus::VERSION = '0.14';
+$Cassandra::Client::NetworkStatus::VERSION = '0.16';
 use 5.010;
 use strict;
 use warnings;
@@ -168,7 +168,7 @@ Cassandra::Client::NetworkStatus
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 AUTHOR
 
@@ -176,7 +176,7 @@ Tom van der Woerdt <tvdw@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Tom van der Woerdt.
+This software is copyright (c) 2019 by Tom van der Woerdt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

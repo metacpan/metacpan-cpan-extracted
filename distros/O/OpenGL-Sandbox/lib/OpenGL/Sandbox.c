@@ -258,7 +258,7 @@ void _texture_load(HV *self, int level, int xoffset, int yoffset, int width, int
 	with_mipmaps= level? 0
 		: mipmap_p? SvTRUE(mipmap_p)
 		: !min_filter_p? 1
-		: SvIV(min_filter_p) == GL_NEAREST || SvIV(min_filter_p) == GL_LINEAR ? 0
+		: (SvIV(min_filter_p) == GL_NEAREST || SvIV(min_filter_p) == GL_LINEAR) ? 0
 		: 1;
 	
 	if (with_mipmaps) {
@@ -376,7 +376,7 @@ void load_buffer_data(int target, SV *size_sv, SV *data_sv, SV *usage_sv) {
 	char *data= NULL;
 	_get_buffer_from_sv(data_sv, &data, &data_size);
 	size= (size_sv && SvOK(size_sv))? SvUV(size_sv) : data_size;
-	if (data_size < size) carp_croak("Data not long enough (%d bytes, you requested %d)", data_size, size);
+	if (data_size < size) carp_croak("Data not long enough (%d bytes, you requested %d)", (int) data_size, (int) size);
 	glBufferData(target, size, data, usage);
 }
 
@@ -386,12 +386,12 @@ void load_buffer_sub_data(int target, long offset, SV *size_sv, SV *data_sv, SV 
 	_get_buffer_from_sv(data_sv, &data, &data_size);
 	if (data_offset_sv && SvOK(data_offset_sv)) {
 		data_offset= SvUV(data_offset_sv);
-		if (data_offset > data_size) carp_croak("Invalid data offset (%ld exceeds data length %ld)", data_offset, data_size);
+		if (data_offset > data_size) carp_croak("Invalid data offset (%d exceeds data length %d)", (int) data_offset, (int) data_size);
 		data += data_offset;
 		data_size -= data_offset;
 	}
 	size= (size_sv && SvOK(size_sv))? SvUV(size_sv) : data_size;
-	if (data_size < size) carp_croak("Data not long enough (%ld bytes, you requested %ld)", data_size, size);
+	if (data_size < size) carp_croak("Data not long enough (%d bytes, you requested %d)", (int) data_size, (int) size);
 	glBufferSubData(target, offset, size, data);
 }
 
@@ -400,12 +400,11 @@ SV *mmap_buffer(int buffer_id, SV *target_sv, SV *access_sv, SV *offset_sv, SV *
 	int access= 0, access_r= 0, access_w= 0, mode;
 	GLint actual_size= 0, target;
 	STRLEN len;
-	unsigned offset, length;
+	IV offset, length;
 	const char* access_pv;
 	void *addr;
 	SV *sv;
-	buffer_scalar_callback_data_t cbdata;
-	
+
 	/* OpenGL 2.0 only has MapBuffer, 3.0 has MapBufferRange (needed for access flags)
 	 * and OpenGL 4.5 has MapNamedBufferRange needed to avoid binding the buffer first
 	 */
@@ -445,7 +444,7 @@ SV *mmap_buffer(int buffer_id, SV *target_sv, SV *access_sv, SV *offset_sv, SV *
 		access= (access_r? GL_MAP_READ_BIT : 0) | (access_w? GL_MAP_WRITE_BIT : 0);
 		#endif
 	}
-	
+
 	offset= SvOK(offset_sv)? SvUV(offset_sv) : 0;
 	length= SvOK(length_sv)? SvUV(length_sv) : 0;
 
@@ -465,8 +464,8 @@ SV *mmap_buffer(int buffer_id, SV *target_sv, SV *access_sv, SV *offset_sv, SV *
 
 	/* Make sure the length and offset make sense */
 	if (!actual_size) carp_croak("Cannot mem-map buffer until storage has been allocated");
-	if (offset > actual_size) carp_croak("Offset %d exceeds actual buffer size %d", offset, actual_size);
-	if (offset+length > actual_size) carp_croak("Length %d exceeds actual buffer size %d", length, actual_size);
+	if (offset > actual_size) carp_croak("Offset %d exceeds actual buffer size %d", (int) offset, (int) actual_size);
+	if (offset+length > actual_size) carp_croak("Length %d exceeds actual buffer size %d", (int) length, (int) actual_size);
 	if (!length) length= actual_size - offset;
 	if (!length) carp_croak("Cannot map zero bytes of a buffer"); 
 
@@ -502,8 +501,8 @@ SV *mmap_buffer(int buffer_id, SV *target_sv, SV *access_sv, SV *offset_sv, SV *
 
 	/* at this point, have buffer mapped and know length */
 	sv= sv_2mortal(newRV_noinc((SV*)newSV(0)));
-	buffer_scalar_wrap(SvRV(sv), addr, length, access_w? 0 : BUFFER_SCALAR_READONLY, cbdata, NULL);
 	sv_bless(sv, gv_stashpv("OpenGL::Sandbox::MMap", GV_ADD));
+	buffer_scalar_wrap(SvRV(sv), addr, length, access_w? 0 : BUFFER_SCALAR_READONLY, NULL, NULL);
 	return SvREFCNT_inc(sv);
 }
 

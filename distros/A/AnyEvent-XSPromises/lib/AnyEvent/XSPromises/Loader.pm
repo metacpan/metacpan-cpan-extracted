@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 use AnyEvent;
 
@@ -13,11 +13,22 @@ XSLoader::load('AnyEvent::XSPromises', $VERSION);
 AnyEvent::XSPromises::___set_conversion_helper(sub {
     my $promise= shift;
     my $deferred= AnyEvent::XSPromises::deferred();
-    $promise->then(sub {
-        $deferred->resolve(@_);
-    }, sub {
-        $deferred->reject(@_);
-    });
+    my $called;
+    eval {
+        $promise->then(sub {
+            return if $called++;
+            $deferred->resolve(@_);
+        }, sub {
+            return if $called++;
+            $deferred->reject(@_);
+        });
+        1;
+    } or do {
+        my $error= $@;
+        if (!$called++) {
+            $deferred->reject($error);
+        }
+    };
     return $deferred->promise;
 });
 

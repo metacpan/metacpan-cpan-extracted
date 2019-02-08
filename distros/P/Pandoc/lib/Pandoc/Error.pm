@@ -2,7 +2,7 @@ package Pandoc::Error;
 use 5.014;
 use warnings;
 
-our $VERSION = '0.8.8';
+our $VERSION = '0.9.0';
 
 use overload '""' => 'message', fallback => 1;
 use Carp;

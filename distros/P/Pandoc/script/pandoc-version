@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+use v5.14;
+use Pod::Usage;
+use Pandoc;
+use Pandoc::Version;
+use Pandoc::Release;
+
+my $verbose = grep /^(-v|--verbose)$/, @ARGV;
+my @args = grep {!/^(-v|--verbose)$/} @ARGV;
+pod2usage(-exitval => 0) if grep /^-{0,2}h(elp)?$/, @args;
+
+my $version = eval { Pandoc::Version->new($args[0]) };
+my $command = $version ? 'use' : $args[0] // 'version';
+
+if ($command =~ /^v(ersion)?$/) {
+
+    # TODO: catch if no pandoc installed
+    say pandoc->version;
+
+} elsif ($command =~ /^l(ist)?$/) {
+
+    # print installed versions
+    my $dir = pandoc_data_dir( 'bin' );
+    opendir(DIR, $dir);
+    my @files = grep { -e "$dir/$_" } grep(/^pandoc-/,readdir(DIR));
+    my @versions = map { /^pandoc-(\d+(\.\d+)*)$/ ? $1 : () } @files;
+    say $_ for reverse sort @versions;
+    closedir(DIR);
+
+} elsif ($command =~ /^i(nstall)?$/) {
+    
+    say "Installing latest release of Pandoc...";
+    my $pandoc = Pandoc::Release::latest->download;
+    $pandoc->symlink( verbose => 1 );
+
+} elsif ($command =~ /^u(se)?$/) {
+    $version //= eval { Pandoc::Version->new($args[1]) } 
+             // die "missing or malformed version number!\n";
+
+    if (my $pandoc  = eval { Pandoc->new($version) }) {
+        $pandoc->symlink( verbose => $verbose );
+    } else {
+        say STDERR "Pandoc version $version is not installed!";
+        exit 1;
+    }
+}
+
+exit;
+
+__END__
+
+=head1 NAME
+
+pandoc-version - switch pandoc executable
+
+=head1 SYNOPSIS
+
+pandoc-version [-v|--verbose] [command] [version]
+
+ Commands:
+   v|version      show current version
+   l|list         list installed versions
+   u|use          switch version
+   i|nstall       install latest release version
+   h|help         show help
+
+=head1 DESCRIPTION
+
+This command line can be used to show the current executable version of Pandoc,
+and to switch installed versions.
+
+Full usage is limited to Debian based operating systems.
+
+=head1 SEE ALSO
+
+L<Pandoc::Release>
+
+=cut

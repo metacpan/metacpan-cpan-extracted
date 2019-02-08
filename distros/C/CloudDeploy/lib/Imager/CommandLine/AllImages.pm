@@ -42,10 +42,7 @@ package Imager::CommandLine::AllImages {
 
     my @cols = @{ $self->_cols };
 
-    my $table = Imager::TabularDisplay::generate_table(\@cols, \@res);
-
-    print($table->render, "\n");
-    
+    Imager::TabularDisplay::print_table(\@cols, \@res);
   }
 }
 

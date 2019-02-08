@@ -2,6 +2,7 @@ package OpenGL::Sandbox;
 use v5.14; # I can aim for older upon request.  Not expecting any requests though.
 use Exporter::Extensible -exporter_setup => 1;
 use Try::Tiny;
+use File::Spec::Functions qw/ catpath splitpath catdir splitdir /;
 use Cwd 'abs_path';
 use Carp;
 use Log::Any '$log';
@@ -10,7 +11,7 @@ use Scalar::Util 'weaken';
 
 # ABSTRACT: Rapid-prototyping utilities for OpenGL
 BEGIN {
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.120'; # VERSION
 }
 
 # Choose OpenGL::Modern if available, else fall back to OpenGL.
@@ -111,12 +112,13 @@ BEGIN {
 		'OpenGL::GLFW'   => 'OpenGL::Sandbox::ContextShim::GLFW',
 		'SDL'            => 'OpenGL::Sandbox::ContextShim::SDL',
 		'SDLx::App'      => 'OpenGL::Sandbox::ContextShim::SDL',
+		'GLUT'           => 'OpenGL::Sandbox::ContextShim::GLUT',
 	);
 }
 
 our $current_context;
 sub make_context {
-	my (%opts)= @_;
+	my %opts= (@_ == 1 && ref $_[0] eq 'HASH')? %{ $_[0] } : @_;
 	# Check for geometry specification on command line
 	my ($geom_spec, $w,$h,$l,$t);
 	for (0..$#ARGV) {
@@ -135,22 +137,24 @@ sub make_context {
 		$opts{x} //= $l if defined $l;
 		$opts{y} //= $t if defined $t;
 	}
-	
+
 	# Load user's requested provider, or auto-detect first available
-	my $provider= $ENV{OPENGL_SANDBOX_CONTEXT_PROVIDER};
-	$provider //=
-		# Try X11 first, because lightest weight
-		eval('require X11::GLX::DWIM; 1;') ? 'GLX'
-		: eval('require OpenGL::GLFW; 1;') ? 'GLFW'
-		: eval('require SDLx::App; 1;') ? 'SDL'
-		: croak "make_context needs one of X11::GLX, OpenGL::GLFW, or SDLx::App to be installed";
-	
-	my $class= $context_provider_aliases{$provider}
-		or croak "Unhandled context provider $provider";
-	require_module($class);
-	
+	my $provider;
+	if ($ENV{OPENGL_SANDBOX_CONTEXT_PROVIDER}) {
+		$provider= $context_provider_aliases{$ENV{OPENGL_SANDBOX_CONTEXT_PROVIDER}}
+			or croak "Unhandled context provider $ENV{OPENGL_SANDBOX_CONTEXT_PROVIDER}";
+		require_module($provider);
+	}
+	else {
+		for my $mod (qw/ GLFW SDL GLX GLUT /) {
+			next unless eval "require OpenGL::Sandbox::ContextShim::$mod; 1";
+			$provider= "OpenGL::Sandbox::ContextShim::$mod";
+			last;
+		}
+	}
+
 	undef $current_context;
-	my $cx= $current_context= $class->new(%opts);
+	my $cx= $current_context= $provider->new(%opts);
 	$log->infof("Loaded %s", $cx->context_info);
 	weaken($current_context) if defined wantarray;
 	return $cx;
@@ -192,11 +196,20 @@ sub warn_gl_errors {
 }
 
 # Pull in the C file and make sure it has all the C libs available
-use OpenGL::Sandbox::Inline
-	C => do { my $x= __FILE__; $x =~ s|\.pm|\.c|; abs_path($x) },
-	INC => '-I'.do{ my $x= __FILE__; $x =~ s|/[^/]+$|/|; abs_path($x) }.' -I/usr/include/ffmpeg',
-	LIBS => '-lGL -lswscale',
-	CCFLAGSEX => '-Wall -g3 -Os';
+use Devel::CheckOS 'os_is';
+use OpenGL::Sandbox::Inline do {
+	my $src_dir= abs_path(catpath( (splitpath(__FILE__))[0,1] ));
+	my $src= catdir($src_dir, 'Sandbox.c');
+	my $libs= os_is('MSWin32')? '-lopengl32 -lgdi32 -lmsimg32' : '-lGL';
+	# Inline::C can take a file path, but it mistakes Win32 absolute paths for C code,
+	# so just slurp the file directly.
+	$src= do { local $/= undef; open my $fh, '<', $src; <$fh> } if os_is('MSWin32');
+	
+	C => $src,
+	INC => '-I'.$src_dir.' -I'.catdir($src_dir, qw( .. .. inc )),
+	#CCFLAGSEX => '-Wall -g3 -Os'
+	LIBS => $libs;
+};
 
 
 require OpenGL::Sandbox::ResMan;
@@ -215,7 +228,7 @@ OpenGL::Sandbox - Rapid-prototyping utilities for OpenGL
 
 =head1 VERSION
 
-version 0.100
+version 0.120
 
 =head1 SYNOPSIS
 

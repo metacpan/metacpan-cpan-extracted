@@ -387,7 +387,7 @@ JS
 
         # ROUTES HANDLERS
         routeChangePassword => func ['values'], <<"JS",
-            Ext.create({
+            Ext.Viewport.add({
                 xtype: "$type->{change_password}",
                 token: values.token,
                 redirectOnClose: ''
@@ -447,6 +447,7 @@ sub EXT_signin : Extend('Ext.Dialog') : Type('widget') {
         title        => { text => l10n('SIGN IN') },
         defaultFocus => 'textfield[name=username]',
         draggable    => \0,
+        scrollable   => \1,
         width        => 320,
 
         keyMap => { ENTER => 'submit', },
@@ -548,12 +549,14 @@ sub EXT_change_password : Extend('Ext.Dialog') : Type('widget') {
             redirectOnClose => undef,    # hash, to redirect to on destroy
         },
 
-        title        => { text => l10n('PASSWORD CHANGING') },
-        defaultFocus => 'passwordfield[name=password]',
-        draggable    => \0,
-        closable     => \1,
-        width        => 320,
-        scrollable   => \1,
+        title => { text => l10n('PASSWORD CHANGING') },
+
+        # defaultFocus => 'passwordfield[name=password]',
+        closable   => \1,
+        draggable  => \0,
+        scrollable => \1,
+        width      => 320,
+        maxHeight  => '100%',
 
         keyMap => { ENTER => 'submit', },
 

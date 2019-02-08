@@ -2,10 +2,14 @@ package Pandoc::Version;
 use 5.014;
 use warnings;
 
-our $VERSION = '0.8.8';
+our $VERSION = '0.9.0';
 
-use overload '""' => 'string', '0+' => 'number', 
-    cmp => 'cmp', '<=>' => 'cmp', fallback => 1;
+use overload
+  '""'     => 'string',
+  '0+'     => 'number',
+  cmp      => 'cmp',
+  '<=>'    => 'cmp',
+  fallback => 1;
 use Scalar::Util qw(reftype blessed);
 use Pandoc::Error;
 
@@ -16,20 +20,21 @@ sub new {
 
     # We accept array or string input
     # (or mixed but let's not document that!)
-    my @nums = 
-        map {
-            my $num = $_;
-            $num =~ /^\d+$/ or Pandoc::Error->throw(
-                message => 'invalid version number',
-                version => $num
-            );
-            $num =~ s/^0+(?=\d)//; # ensure decimal interpretation
-            $num = 0+ $num;
-            $num 
-        } 
-        map { s/^v//i; split /\./ } ## no critic
-        map { 'ARRAY' CORE::eq (reftype $_ // "") ? @$_ : $_ }
-        map { $_ // '' } @_;
+    my @nums =
+      map {
+        my $num = $_;
+        $num =~ /^\d+$/
+          or Pandoc::Error->throw(
+            message => 'invalid version number',
+            version => $num
+          );
+        $num =~ s/^0+(?=\d)//;    # ensure decimal interpretation
+        $num = 0 + $num;
+        $num
+      }
+      map { s/^v//i; split /\./ }    ## no critic
+      map { 'ARRAY' CORE::eq ( reftype $_ // "" ) ? @$_ : $_ }
+      map { $_ // '' } @_;
 
     Pandoc::Error->throw('invalid version number') unless @nums;
 
@@ -39,25 +44,26 @@ sub new {
 sub string { join '.', @{ $_[0] } }
 
 sub number {
-    my ($major, @minors) = @{ $_[0] };
+    my ( $major, @minors ) = @{ $_[0] };
     no warnings qw(uninitialized numeric);
-    if ( @minors ) {
+    if (@minors) {
         my $minor = join '', map { sprintf '%03d', $_ } @minors;
-        return 0+ "$major.$minor";    # return a true number
+        return 0 + "$major.$minor";    # return a true number
     }
-    return 0+ $major;
+    return 0 + $major;
 }
 
 sub cmp {
-    my ($a, $b) = map {
-        (blessed $_ and $_->isa('Pandoc::Version'))
-            ? $_ : Pandoc::Version->new($_ // ())   
-    } ($_[0], $_[1]);
+    my ( $a, $b ) = map {
+        ( blessed $_ and $_->isa('Pandoc::Version') )
+          ? $_
+          : Pandoc::Version->new( $_ // () )
+    } ( $_[0], $_[1] );
     return $a->number <=> $b->number;
 }
 
 sub match {
-    my ($a, $b) = map { Pandoc::Version->new($_) } @_;
+    my ( $a, $b ) = map { Pandoc::Version->new($_) } @_;
     pop @$a while @$a > @$b;
     pop @$b while @$b > @$a;
 
@@ -65,30 +71,31 @@ sub match {
 }
 
 my %cmp_truth_table = (
-    '==' => [0,1,0],
-    '!=' => [1,0,1],
-    '>=' => [0,1,1],
-    '<=' => [1,1,0],
-    '<'  => [1,0,0],
-    '>'  => [0,0,1]
+    '==' => [ 0, 1, 0 ],
+    '!=' => [ 1, 0, 1 ],
+    '>=' => [ 0, 1, 1 ],
+    '<=' => [ 1, 1, 0 ],
+    '<'  => [ 1, 0, 0 ],
+    '>'  => [ 0, 0, 1 ]
 );
 
 sub fulfills {
-    my ($self, $req) = @_;
+    my ( $self, $req ) = @_;
     return 1 unless $req;
 
     my @parts = split qr{\s*,\s*}, $req;
     for my $part (@parts) {
-        my ($op, $ver) = $part =~ m{^\s*(==|>=|>|<=|<|!=)?\s*v?(\d+(\.\d+)*)$};
-        if (!defined $ver) {
+        my ( $op, $ver ) =
+          $part =~ m{^\s*(==|>=|>|<=|<|!=)?\s*v?(\d+(\.\d+)*)$};
+        if ( !defined $ver ) {
             Pandoc::Error->throw(
-               message => "invalid version requirement: $req",
-               require => $req,
-            )
+                message => "invalid version requirement: $req",
+                require => $req,
+            );
         }
-        
-        my $cmp = $self->cmp($ver) + 1; # will be 0 for <, 1 for ==, 2 for >
-        return unless $cmp_truth_table{$op || '>='}->[$cmp];
+
+        my $cmp = $self->cmp($ver) + 1;    # will be 0 for <, 1 for ==, 2 for >
+        return unless $cmp_truth_table{ $op || '>=' }->[$cmp];
     }
 
     1;
@@ -96,7 +103,7 @@ sub fulfills {
 
 sub TO_JSON {
     my ($self) = @_;
-    return [ map { 0+ $_ } @$self ];
+    return [ map { 0 + $_ } @$self ];
 }
 
 1;

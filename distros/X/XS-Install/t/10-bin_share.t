@@ -22,10 +22,10 @@ cmp_deeply($args{PM}, {
     'typemap.map'  => '/$(FULLEXT).x/tm/typemap.map',
     'src2/s2.map'  => '/$(FULLEXT).x/tm/s2.map',
     'src/smap.map' => '/$(FULLEXT).x/tm/extra/map.map',
-    'blib/info'    => '/$(FULLEXT).x/info',
     'src/sfile1.h' => '/$(FULLEXT).x/i/sfile1.h',
     'src/sfile2.h' => '/$(FULLEXT).x/i/sfile2.h',
     'src2/s2.h'    => '/$(FULLEXT).x/i/s2.h',
+    'blib/info'    => '/$(FULLEXT).x/info',
 });
 
 open my $fh, '<', 'blib/info' or die $!;

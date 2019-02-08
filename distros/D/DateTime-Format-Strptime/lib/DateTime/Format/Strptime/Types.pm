@@ -3,7 +3,7 @@ package DateTime::Format::Strptime::Types;
 use strict;
 use warnings;
 
-our $VERSION = '1.75';
+our $VERSION = '1.76';
 
 use parent 'Specio::Exporter';
 
@@ -63,7 +63,7 @@ DateTime::Format::Strptime::Types - Types used for parameter checking in DateTim
 
 =head1 VERSION
 
-version 1.75
+version 1.76
 
 =head1 DESCRIPTION
 
@@ -100,7 +100,7 @@ Rick Measham <rickm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2015 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

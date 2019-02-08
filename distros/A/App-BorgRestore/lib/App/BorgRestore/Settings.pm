@@ -47,6 +47,14 @@ This specifies the URL to the borg repo as used in other borg commands. If you
 use the $BORG_REPO environment variable set this to an empty string. Default:
 "backup:borg-".hostname;
 
+=item C<$backup_prefix>
+
+This specifies that only archives with the prefix should be considered. For
+example, if you back up multiple things (file system and database) into
+differntly named archives (fs-* and db-*), this can be used to only consider
+file system archives to keep the database size small. In the example you'd set
+the setting to "fs-". An empty string considers all archives. Default: ""
+
 =item C<$cache_path_base>
 
 This defaults to "C<$XDG_CACHE_HOME>/borg-restore.pl". It contains the lookup database.
@@ -97,6 +105,7 @@ New in version 3.2.0. Deprecated in v3.2.0 for future removal possibly in v4.0.0
 =head2 Example Configuration
 
  $borg_repo = "/path/to/repo";
+ $backup_prefix = "";
  $cache_path_base = "/mnt/somewhere/borg-restore.pl-cache";
  @backup_prefixes = (
  	{regex => "^/home/", replacement => "mnt/snapshots/home/"},
@@ -129,6 +138,7 @@ our @backup_prefixes = (
 );
 our $sqlite_cache_size = 102400;
 our $prepare_data_in_memory = 0;
+our $backup_prefix = "";
 
 method new_no_defaults($class: $deps = {}) {
 	my $self = {};
@@ -157,6 +167,7 @@ method get_config() {
 	return {
 		borg => {
 			repo => $borg_repo,
+			backup_prefix => $backup_prefix,
 			path_prefixes => [@backup_prefixes],
 		},
 		cache => {

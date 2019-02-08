@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use Log::ger;
+use Log::ger::App;
+
+use File::chdir;
+use File::Slurper qw(write_text);
+
+{
+    local $CWD = "lib/Module/CoreList/List";
+    my @mods = <*.pod>;
+    my %mods = map { $_=>0 } @mods;
+
+    my @all_versions;
+    for my $v (`corelist -v`) {
+        chomp $v;
+        next unless $v =~ /\S/;
+        next unless $v =~ /^v?\d/;
+        (my $v_safe = $v) =~ s/\./_/g;
+        $mods{"$v_safe.pod"} = 1;
+        my @content = (
+            "package Module::CoreList::List::$v_safe; # just to make PodWeaver happy\n",
+            "# VERSION\n",
+            "1;\n",
+            "# ABSTRACT: List of core modules for perl $v\n\n",
+
+            "=head1 DESCRIPTION\n\n",
+
+            "This POD page lists all core modules (with their versions) that come with perl $v.\n\n",
+
+            "=head1 CONTENTS\n\n",
+
+            "=over\n\n",
+
+        );
+        for my $line (`corelist -v $v //`) {
+            chomp $line;
+            my ($mod, $modv) = split / /, $line;
+            push @content, "=item * L<$mod> ($modv)\n\n";
+        }
+        push @content, (
+            "=back\n\n",
+
+        );
+
+        log_info "Writing $v_safe.pod ...";
+        write_text("$v_safe.pod", join("", @content));
+    }
+
+    log_info "Deleting extraneous *.pod files ...";
+    for (grep {!$mods{$_}} keys %mods) {
+        log_debug "  Deleting $_ ...";
+        unlink $_;
+    }
+}

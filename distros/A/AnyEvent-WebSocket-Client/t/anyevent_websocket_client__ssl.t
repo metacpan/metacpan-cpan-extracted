@@ -42,7 +42,6 @@ my $connection = eval { AnyEvent::WebSocket::Client->new( ssl_no_verify => 1 )->
 
 if(my $error = $@)
 {
-  #testlib::SSL->diag_about_issue22();
   die $error;
 }
 

@@ -1,0 +1,22 @@
+---
+abstract: 'Convert a data structure into a one level list of keys and values'
+author:
+  - 'Jose Luis Martinez <joseluis.martinez@capside.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DataStruct-Flat
+requires:
+  Moo: '0'
+resources:
+  bugtracker: https://github.com/pplu/datastruct-flat/issues
+  repository: https://github.com/pplu/datastruct-flat.git
+version: '0.01'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

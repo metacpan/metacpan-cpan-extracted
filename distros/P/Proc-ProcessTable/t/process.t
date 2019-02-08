@@ -2,8 +2,8 @@
 # `make test'. After `make install' it should work as `perl test.pl'
 
 use strict;
-use Test;
-BEGIN { plan tests => 3 }
+use Test::More;
+use Config;
 
 # check wether ProcProcessTable is there
 use Proc::ProcessTable;
@@ -31,6 +31,9 @@ foreach $got ( @{$t->table} )
   }
 
 }
+
+plan skip_all => 'This test needs real fork() implementation' if $Config{d_pseudofork} || !$Config{d_fork};
+plan tests => 3;
 
 # fork a child process
 my $child_pid = fork;

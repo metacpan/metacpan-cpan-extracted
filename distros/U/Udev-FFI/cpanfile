@@ -1,9 +1,8 @@
 requires 'perl', '5.008001';
 
-requires 'IPC::Cmd';
-
 requires 'FFI::Platypus';
 requires 'FFI::CheckLib';
+requires 'File::Which';
 
 
 on 'configure' => sub {

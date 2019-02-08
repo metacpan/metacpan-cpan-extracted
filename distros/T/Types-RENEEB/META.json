@@ -49,15 +49,15 @@
    "provides" : {
       "Types::Dist" : {
          "file" : "lib/Types/Dist.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Types::OTRS" : {
          "file" : "lib/Types/OTRS.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Types::RENEEB" : {
          "file" : "lib/Types/RENEEB.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "http://github.com/reneeb/Types-RENEEB"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

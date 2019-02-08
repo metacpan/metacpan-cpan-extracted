@@ -105,21 +105,27 @@ method remove_archive($archive) {
 	}
 
 	my @columns_to_copy = map {'`'._prefix_archive_id($_).'`'} @keep_archives;
+	my @timestamp_columns_to_copy = @columns_to_copy;
 	@columns_to_copy = ('`path`', @columns_to_copy);
-	$self->{dbh}->do('insert into `files_new` select '.join(',', @columns_to_copy).' from files');
+
+	if (@timestamp_columns_to_copy > 0) {
+		$self->{dbh}->do('insert into `files_new` select '.join(',', @columns_to_copy).' from files');
+	}
 
 	$self->{dbh}->do('drop table `files`');
 
 	$self->{dbh}->do('alter table `files_new` rename to `files`');
 
-	my $sql = 'delete from `files` where ';
-	$sql .= join(' is null and ', grep {$_ ne '`path`' } @columns_to_copy);
-	$sql .= " is null";
+	if (@timestamp_columns_to_copy > 0) {
+		my $sql = 'delete from `files` where ';
+		$sql .= join(' is null and ', @timestamp_columns_to_copy);
+		$sql .= " is null";
 
-	my $st = $self->{dbh}->prepare($sql);
-	my $rows = $st->execute();
+		my $st = $self->{dbh}->prepare($sql);
+		$st->execute();
+	}
 
-	$st = $self->{dbh}->prepare('delete from `archives` where `archive_name` = ?;');
+	my $st = $self->{dbh}->prepare('delete from `archives` where `archive_name` = ?;');
 	$st->execute($archive);
 }
 

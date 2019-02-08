@@ -16,6 +16,12 @@ static MGVTBL c3_marker;
 #    endif
 #endif
 
+#if PERL_VERSION >= 20
+    #define HvSUPERCACHE(hv) (HvMROMETA(stash)->super)
+#else
+    #define HvSUPERCACHE(hv) (HvAUX(stash)->xhv_super)
+#endif
+
 static FORCEINLINE I32 __dopoptosub_at (const PERL_CONTEXT* cxstk, I32 startingblock) {
     I32 i;
     for (i = startingblock; i >= 0; --i) if (CxTYPE(cxstk+i) == CXt_SUB) return i;
@@ -205,7 +211,7 @@ static FORCEINLINE CV* _super_method (pTHX_ HV* selfstash, GV* context) {
     // DFS
     HV* stash = GvSTASH(context);
     HEK* hek = GvNAME_HEK(context);
-    HV* cache = HvMROMETA(stash)->super;
+    HV* cache = HvSUPERCACHE(stash);
     if (cache) {
         const HE* const he = (HE*)hv_common(cache, NULL, HEK_KEY(hek), HEK_LEN(hek), HEK_UTF8(hek), 0, NULL, HEK_HASH(hek));
         if (he) {

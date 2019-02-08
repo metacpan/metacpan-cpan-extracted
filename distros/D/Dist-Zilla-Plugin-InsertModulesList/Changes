@@ -1,4 +1,7 @@
-Revision history for Dist-Zilla-Plugin-InsertModulesList
+0.030   2019-02-08 (PERLANCAR)
+
+	- [bugfix] Need to work around FileFinderUser to also list .pod's.
+
 
 0.02    2016-03-25 (PERLANCAR)
 

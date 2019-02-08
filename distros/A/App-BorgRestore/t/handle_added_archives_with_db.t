@@ -42,6 +42,7 @@ for my $in_memory (0,1) {
 	$app->_handle_added_archives(['archive-1']);
 
 	# check database content
+	is($db->get_archive_row_count(), 15, 'correct row count (15 paths with timestamps)');
 	eq_or_diff($db->get_archives_for_path('.'), [{archive => 'archive-1', modification_time => undef},]);
 	eq_or_diff($db->get_archives_for_path('boot'), [{archive => 'archive-1', modification_time => 20},]);
 	eq_or_diff($db->get_archives_for_path('boot/foo'), [{archive => 'archive-1', modification_time => 19},]);
@@ -58,7 +59,7 @@ for my $in_memory (0,1) {
 	eq_or_diff($db->get_archives_for_path('etc/foo'), [{archive => 'archive-1', modification_time => 2},]);
 	eq_or_diff($db->get_archives_for_path('etc/foo/bar'), [{archive => 'archive-1', modification_time => 1},]);
 	eq_or_diff($db->get_archives_for_path('etc/foo/blub'), [{archive => 'archive-1', modification_time => 1},]);
-	eq_or_diff($db->get_archives_for_path('lulz'), [{archive => 'archive-1', modification_time => undef},]);
+	eq_or_diff($db->get_archives_for_path('lulz'), [{archive => 'archive-1', modification_time => undef},], 'test non-existant path');
 
 
 	# add second archive
@@ -85,6 +86,7 @@ for my $in_memory (0,1) {
 	$app->_handle_added_archives(['archive-2']);
 
 	# check database content
+	is($db->get_archive_row_count(), 16, 'correct row count (16 paths with timestamps)');
 	eq_or_diff($db->get_archives_for_path('.'), [
 		{archive => 'archive-1', modification_time => undef},
 		{archive => 'archive-2', modification_time => undef},
@@ -156,7 +158,77 @@ for my $in_memory (0,1) {
 	eq_or_diff($db->get_archives_for_path('lulz'), [
 		{archive => 'archive-1', modification_time => undef},
 		{archive => 'archive-2', modification_time => undef},
-	]);
+	], 'test non-existant path');
+
+	# remove first archive
+	$app->_handle_removed_archives(['archive-2']);
+
+	# check database contents
+	is($db->get_archive_row_count(), 15, 'correct row count (15 paths with timestamps)');
+	eq_or_diff($db->get_archives_for_path('.'), [{archive => 'archive-2', modification_time => undef},]);
+	eq_or_diff($db->get_archives_for_path('boot'), [{archive => 'archive-2', modification_time => 20},]);
+	eq_or_diff($db->get_archives_for_path('boot/foo'), [{archive => 'archive-2', modification_time => 19},]);
+	eq_or_diff($db->get_archives_for_path('boot/foo/bar'), [{archive => 'archive-2', modification_time => 19},]);
+	eq_or_diff($db->get_archives_for_path('boot/foo/blub'), [{archive => 'archive-2', modification_time => 13},]);
+	eq_or_diff($db->get_archives_for_path('boot/grub'), [{archive => 'archive-2', modification_time => 20},]);
+	eq_or_diff($db->get_archives_for_path('boot/grub/grub.cfg'), [{archive => 'archive-2', modification_time => 8},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1'), [{archive => 'archive-2', modification_time => 7},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f1'), [{archive => 'archive-2', modification_time => 3},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f2'), [{archive => 'archive-2', modification_time => 5},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f3'), [{archive => 'archive-2', modification_time => 3},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f4'), [{archive => 'archive-2', modification_time => 2},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f5'), [{archive => 'archive-2', modification_time => 7},]);
+	eq_or_diff($db->get_archives_for_path('etc'), [{archive => 'archive-2', modification_time => 3},]);
+	eq_or_diff($db->get_archives_for_path('etc/foo'), [{archive => 'archive-2', modification_time => 2},]);
+	eq_or_diff($db->get_archives_for_path('etc/foo/bar'), [{archive => 'archive-2', modification_time => 1},]);
+	eq_or_diff($db->get_archives_for_path('etc/foo/blub'), [{archive => 'archive-2', modification_time => undef},]);
+	eq_or_diff($db->get_archives_for_path('lulz'), [{archive => 'archive-2', modification_time => undef},], 'test non-existant path');
+
+	# run remove again. shouldn't change anything
+	$app->_handle_removed_archives(['archive-2']);
+	is($db->get_archive_row_count(), 15, 'correct row count (15 paths with timestamps)');
+	eq_or_diff($db->get_archives_for_path('.'), [{archive => 'archive-2', modification_time => undef},]);
+	eq_or_diff($db->get_archives_for_path('boot'), [{archive => 'archive-2', modification_time => 20},]);
+	eq_or_diff($db->get_archives_for_path('boot/foo'), [{archive => 'archive-2', modification_time => 19},]);
+	eq_or_diff($db->get_archives_for_path('boot/foo/bar'), [{archive => 'archive-2', modification_time => 19},]);
+	eq_or_diff($db->get_archives_for_path('boot/foo/blub'), [{archive => 'archive-2', modification_time => 13},]);
+	eq_or_diff($db->get_archives_for_path('boot/grub'), [{archive => 'archive-2', modification_time => 20},]);
+	eq_or_diff($db->get_archives_for_path('boot/grub/grub.cfg'), [{archive => 'archive-2', modification_time => 8},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1'), [{archive => 'archive-2', modification_time => 7},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f1'), [{archive => 'archive-2', modification_time => 3},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f2'), [{archive => 'archive-2', modification_time => 5},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f3'), [{archive => 'archive-2', modification_time => 3},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f4'), [{archive => 'archive-2', modification_time => 2},]);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f5'), [{archive => 'archive-2', modification_time => 7},]);
+	eq_or_diff($db->get_archives_for_path('etc'), [{archive => 'archive-2', modification_time => 3},]);
+	eq_or_diff($db->get_archives_for_path('etc/foo'), [{archive => 'archive-2', modification_time => 2},]);
+	eq_or_diff($db->get_archives_for_path('etc/foo/bar'), [{archive => 'archive-2', modification_time => 1},]);
+	eq_or_diff($db->get_archives_for_path('etc/foo/blub'), [{archive => 'archive-2', modification_time => undef},]);
+	eq_or_diff($db->get_archives_for_path('lulz'), [{archive => 'archive-2', modification_time => undef},], 'test non-existant path');
+
+	# remove all archives from db (no overlap between archives in db and "current" archives)
+	$app->_handle_removed_archives(['archive-3']);
+
+	# check database contents
+	is($db->get_archive_row_count(), 0, 'db should be empty');
+	eq_or_diff($db->get_archives_for_path('.'), []);
+	eq_or_diff($db->get_archives_for_path('boot'), []);
+	eq_or_diff($db->get_archives_for_path('boot/foo'), []);
+	eq_or_diff($db->get_archives_for_path('boot/foo/bar'), []);
+	eq_or_diff($db->get_archives_for_path('boot/foo/blub'), []);
+	eq_or_diff($db->get_archives_for_path('boot/grub'), []);
+	eq_or_diff($db->get_archives_for_path('boot/grub/grub.cfg'), []);
+	eq_or_diff($db->get_archives_for_path('boot/test1'), []);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f1'), []);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f2'), []);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f3'), []);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f4'), []);
+	eq_or_diff($db->get_archives_for_path('boot/test1/f5'), []);
+	eq_or_diff($db->get_archives_for_path('etc'), []);
+	eq_or_diff($db->get_archives_for_path('etc/foo'), []);
+	eq_or_diff($db->get_archives_for_path('etc/foo/bar'), []);
+	eq_or_diff($db->get_archives_for_path('etc/foo/blub'), []);
+	eq_or_diff($db->get_archives_for_path('lulz'), []);
 }
 
 

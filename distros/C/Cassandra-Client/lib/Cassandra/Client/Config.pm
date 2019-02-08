@@ -1,11 +1,11 @@
 package Cassandra::Client::Config;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Config::VERSION = '0.14';
+$Cassandra::Client::Config::VERSION = '0.16';
 use 5.010;
 use strict;
 use warnings;
 
-use Ref::Util qw/is_plain_arrayref/;
+use Ref::Util qw/is_plain_arrayref is_plain_coderef/;
 
 sub new {
     my ($class, $config)= @_;
@@ -30,6 +30,9 @@ sub new {
         command_queue           => undef,
         retry_policy            => undef,
         load_balancing_policy   => undef,
+        protocol_version        => 4,
+
+        stats_hook              => undef,
     }, $class;
 
     if (my $cp= $config->{contact_points}) {
@@ -45,12 +48,13 @@ sub new {
         }
     }
 
-    # Numbers
+    # Numbers, ignore undef
     for (qw/port timer_granularity request_timeout max_connections max_concurrent_queries/) {
         if (defined($config->{$_})) {
             $self->{$_}= 0+ $config->{$_};
         }
     }
+    # Numbers, undef actually means undef
     for (qw/max_page_size/) {
         if (exists($config->{$_})) {
             $self->{$_}= defined($config->{$_}) ? (0+ $config->{$_}) : undef;
@@ -61,6 +65,14 @@ sub new {
     for (qw/cql_version keyspace compression default_consistency/) {
         if (exists($config->{$_})) {
             $self->{$_}= defined($config->{$_}) ? "$config->{$_}" : undef;
+        }
+    }
+
+    # Coderefs
+    for (qw/stats_hook/) {
+        if (defined($config->{$_})) {
+            die "$_ must be a CODE reference" unless is_plain_coderef($config->{$_});
+            $self->{$_}= $config->{$_};
         }
     }
 
@@ -88,6 +100,14 @@ sub new {
     $self->{username}= $config->{username};
     $self->{password}= $config->{password};
 
+    if (exists $config->{protocol_version}) {
+        if ($config->{protocol_version} == 3 || $config->{protocol_version} == 4) {
+            $self->{protocol_version}= 0+ $config->{protocol_version};
+        } else {
+            die "Invalid protocol_version: must be one of [3, 4]";
+        }
+    }
+
     return $self;
 }
 
@@ -103,7 +123,7 @@ Cassandra::Client::Config
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 AUTHOR
 
@@ -111,7 +131,7 @@ Tom van der Woerdt <tvdw@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Tom van der Woerdt.
+This software is copyright (c) 2019 by Tom van der Woerdt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,6 +17,7 @@ sub load {
     if (my $info = XS::Install::Payload::module_info($module)) {{
         my $bin_deps = $info->{BIN_DEPS} or last;
         foreach my $dep_module (keys %$bin_deps) {
+            next if $dep_module eq 'XS::Install';
             my $path = $dep_module;
             $path =~ s!::!/!g;
             require $path.".pm" or next;
@@ -45,14 +46,16 @@ EOF
 
 sub load_tests {
     my ($module) = @_;
+    require Config;
+    my $fname = 'ctest.'.$Config::Config{dlext};
     
     my $file;
     foreach my $dir (@INC) {
         next unless $dir =~ m#(.*\bblib[/\\:]+)arch\b#;
-        $file = $1.'ctest.so';
+        $file = $1.$fname;
         last;
     }
-    $file ||= 'blib/ctest.so';
+    $file ||= 'blib/'.$fname;
     $module ||= '';
     my $libref = DynaLoader::dl_load_file($file, 0x01) or die "Can't load '$file' for module $module: ".DynaLoader::dl_error();
     

@@ -2,14 +2,14 @@ NAME
     Module::FatPack - Generate source code that contains fatpacked modules
 
 VERSION
-    This document describes version 0.180 of Module::FatPack (from Perl
-    distribution Module-FatPack), released on 2018-02-27.
+    This document describes version 0.181 of Module::FatPack (from Perl
+    distribution Module-FatPack), released on 2019-02-08.
 
 FUNCTIONS
   fatpack_modules
     Usage:
 
-     fatpack_modules(%args) -> [status, msg, result, meta]
+     fatpack_modules(%args) -> [status, msg, payload, meta]
 
     Generate source code that contains fatpacked modules.
 
@@ -28,7 +28,7 @@ FUNCTIONS
 
         Surround the code inside BEGIN { }.
 
-    *   assume_strict => *bool* (default: 1)
+    *   assume_strict => *bool* (default: 0)
 
         Assume code runs under stricture.
 
@@ -101,7 +101,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -140,7 +140,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

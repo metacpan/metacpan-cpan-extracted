@@ -20,7 +20,7 @@ package MongoDB;
 # ABSTRACT: Official MongoDB Driver for Perl
 
 use version;
-our $VERSION = 'v2.0.2';
+our $VERSION = 'v2.0.3';
 
 # regexp_pattern was unavailable before 5.10, had to be exported to load the
 # function implementation on 5.10, and was automatically available in 5.10.1
@@ -83,7 +83,7 @@ MongoDB - Official MongoDB Driver for Perl
 
 =head1 VERSION
 
-version v2.0.2
+version v2.0.3
 
 =head1 SYNOPSIS
 
@@ -558,7 +558,7 @@ Zhihong Zhang <zzh_621@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MongoDB, Inc.
+This software is Copyright (c) 2019 by MongoDB, Inc.
 
 This is free software, licensed under:
 

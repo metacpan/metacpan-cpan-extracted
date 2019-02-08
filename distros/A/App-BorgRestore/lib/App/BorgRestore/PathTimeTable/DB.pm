@@ -2,7 +2,15 @@ package App::BorgRestore::PathTimeTable::DB;
 use strictures 2;
 
 use Function::Parameters;
-use Log::Any qw($log);
+BEGIN {
+	use Log::Any qw($log);
+	# Trace logging statements are disabled here since they incur a performance
+	# overhead because they are in tight loops. This block only works for the
+	# test suite code (set env var TAP_LOG_FILTER=none) since the normal
+	# application only changes the log level at run time. Hardcode to 1 when
+	# necessary (or write a test!).
+	use constant TRACE => $log->is_trace;
+}
 
 =head1 NAME
 
@@ -22,9 +30,6 @@ properly sorted, this results in only a single database write for each path.
 
 =cut
 
-# Trace logging statements are disabled here since they incur a performance
-# overhead because they are in tight loops. Change to 1 when necessary.
-use constant TRACE => 0;
 
 method new($class: $deps = {}) {
 	return $class->new_no_defaults($deps);

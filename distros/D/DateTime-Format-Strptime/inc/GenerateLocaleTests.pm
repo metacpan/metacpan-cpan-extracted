@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use DateTime::Locale 1.03;
+use DateTime::Locale 1.23;
 use Dist::Zilla::File::InMemory;
 
 use Moose;

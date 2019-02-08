@@ -10,6 +10,7 @@ Makefile.PL
 README.md
 cpanfile
 dist.ini
+examples/ignored-files.pl
 lib/Git/Helpers.pm
 lib/Git/Helpers/CPAN.pm
 perlcriticrc

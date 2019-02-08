@@ -8,10 +8,9 @@ our (@ISA, @EXPORT_OK, %EXPORT_TAGS);
 require Exporter;
 @ISA = qw(Exporter);
 
-use IPC::Cmd qw(can_run);
-
 use FFI::Platypus;
 use FFI::CheckLib;
+use File::Which;
 
 
 use constant {
@@ -407,7 +406,7 @@ my $init = 0;
 
 
 sub udev_version {
-    my $full_path = can_run('udevadm');
+    my $full_path = which('udevadm');
 
     if(!defined $full_path) {
         for(@{ +UDEVADM_LOCATIONS }) {
@@ -457,10 +456,10 @@ my $_function_not_attach = sub {
 sub get_entries {
     my $entry = shift;
 
-    if(wantarray) {
+    if (wantarray) { # TODO deprecated
         my @a = ();
 
-        while(defined($entry)) {
+        while (defined($entry)) {
             push @a, udev_list_entry_get_name($entry);
             $entry = udev_list_entry_get_next($entry);
         }
@@ -471,7 +470,7 @@ sub get_entries {
 
     my %h = ();
 
-    while(defined($entry)) {
+    while (defined($entry)) {
         $h{ udev_list_entry_get_name($entry) } = udev_list_entry_get_value($entry);
         $entry = udev_list_entry_get_next($entry);
     }

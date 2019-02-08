@@ -20,6 +20,7 @@ Dan
 Ed
 Handle
 Idle
+Konojacki
 Loop
 Murase
 PRs
@@ -29,6 +30,7 @@ RSS
 SIGPROF
 TCP
 Timer
+Tomasz
 UV
 Whitener
 YAY
@@ -43,6 +45,7 @@ hrtime
 lib
 libuv
 loadavg
+me
 profiler
 ref
 scalable

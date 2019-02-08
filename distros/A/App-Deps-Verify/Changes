@@ -1,5 +1,8 @@
 Revision history for App-Deps-Verify
 
+0.8.0       2019-02-08
+    - Add support for multiple yamls to write_rpm_spec_text_to_fh .
+
 0.6.0       2018-11-19
     - Add the --notest option to plinst.
 

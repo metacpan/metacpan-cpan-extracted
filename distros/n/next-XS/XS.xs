@@ -1,10 +1,22 @@
 #include <xs/next.h>
 #include <stdexcept>
 
-#define _TRYNEXT(code) {                                                                                            \
-    try { code; }                                                                                                   \
-    catch (std::logic_error err) { croak_sv(newSVpvn_flags(err.what(), strlen(err.what()), SVf_UTF8 | SVs_TEMP)); } \
+#define _TRYNEXT(code) {                                                                                                   \
+    try { code; }                                                                                                          \
+    catch (const std::logic_error& err) { croak_sv(newSVpvn_flags(err.what(), strlen(err.what()), SVf_UTF8 | SVs_TEMP)); } \
 }
+
+static inline HV* proto_stash (pTHX_ SV* proto) {
+    if (SvROK(proto)) {
+        SV* val = SvRV(proto);
+        if (SvOBJECT(val)) return SvSTASH(val);
+    }
+    return gv_stashsv(proto, GV_ADD);
+}
+
+#if PERL_VERSION < 22
+    #define optimize(a, ...)
+#else
 
 #define PP_METHOD_EXEC(sub) {   \
     dSP;                        \
@@ -45,7 +57,6 @@
 #  define cGVOPx_gv_set(o,gv) (cSVOPx(o)->op_sv = (SV*)gv)
 #endif
 
-
 static void optimize (pTHX_ OP* op, OP* (*pp_method)(pTHX), OP* (*pp_sub)(pTHX), CV* check, GV* payload = NULL) {
     if ((op->op_spare & 1) || op->op_type != OP_ENTERSUB || !(op->op_flags & OPf_STACKED) || op->op_ppaddr != PL_ppaddr[OP_ENTERSUB]) return;
     op->op_spare |= 1;
@@ -85,25 +96,6 @@ static void optimize (pTHX_ OP* op, OP* (*pp_method)(pTHX), OP* (*pp_sub)(pTHX),
     cGVOPx_gv_set(curop, payload);
     SvREFCNT_inc(payload);
     SvREFCNT_dec(gv);
-}
-
-static inline HV* proto_stash (pTHX_ SV* proto) {
-    if (SvROK(proto)) {
-        SV* val = SvRV(proto);
-        if (SvOBJECT(val)) return SvSTASH(val);
-    }
-    return gv_stashsv(proto, GV_ADD);
-}
-
-static inline GV* get_current_opsub (pTHX_ const char* name, STRLEN len, bool is_utf8, U32 hash) {
-    const HE* const ent = (HE*)hv_common(CopSTASH(PL_curcop), NULL, name, len, is_utf8, 0, NULL, hash);
-    if (ent) return (GV*)HeVAL(ent);
-    
-    SV* fqn = sv_newmortal();
-    sv_catpvn(fqn, HvNAME(CopSTASH(PL_curcop)), HvNAMELEN(CopSTASH(PL_curcop)));
-    sv_catpvs(fqn, "::");
-    sv_catpvn(fqn, name, len);
-    return gv_fetchpvn_flags(SvPVX(fqn), SvCUR(fqn), GV_ADD|(is_utf8 ? SVf_UTF8 : 0), SVt_PVCV);
 }
 
 // $self->next::can
@@ -182,6 +174,19 @@ static OP* pps_super_maybe (pTHX) {
     CV* sub;
     _TRYNEXT({ sub = xs::super::method(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)TOPs); });
     PP_SUB_MAYBE_EXEC(sub);
+}
+
+#endif
+
+static inline GV* get_current_opsub (pTHX_ const char* name, STRLEN len, bool is_utf8, U32 hash) {
+    const HE* const ent = (HE*)hv_common(CopSTASH(PL_curcop), NULL, name, len, is_utf8, 0, NULL, hash);
+    if (ent) return (GV*)HeVAL(ent);
+    
+    SV* fqn = sv_newmortal();
+    sv_catpvn(fqn, HvNAME(CopSTASH(PL_curcop)), HvNAMELEN(CopSTASH(PL_curcop)));
+    sv_catpvs(fqn, "::");
+    sv_catpvn(fqn, name, len);
+    return gv_fetchpvn_flags(SvPVX(fqn), SvCUR(fqn), GV_ADD|(is_utf8 ? SVf_UTF8 : 0), SVt_PVCV);
 }
 
 static void super_xsub (pTHX_ CV* cv) {

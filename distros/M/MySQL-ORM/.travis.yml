@@ -1,0 +1,34 @@
+language: perl
+perl:
+  - "5.26"
+  - "5.24"
+  - "5.22"
+  - "5.20"
+
+before_install:
+  - git clone git://github.com/haarg/perl-travis-helper
+  - source perl-travis-helper/init
+  - build-perl
+  - perl -V
+  - build-dist
+  - cd $BUILD_DIR
+
+install:
+  - export RELEASE_TESTING=1 AUTOMATED_TESTING=1 AUTHOR_TESTING=1 HARNESS_OPTIONS=c HARNESS_TIMER=1
+  - cpanm --notest Devel::Cover::Report::Coveralls
+  - cpanm -v --notest --showdeps .
+  - cpanm -v --notest --installdeps .
+
+script:
+  - PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine,-ignore,t/.*,prove.+perltidier,/MySQL/Util prove -lrsv t
+  - cover
+
+after_success:
+  - cover -report coveralls
+
+notifications:
+  recipients:
+    - gravattj@cpan.org
+  email:
+    on_success: always
+    on_failure: always

@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Test-Catch",
    "no_index" : {
@@ -21,22 +21,18 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "6.76",
-            "ExtUtils::ParseXS" : "3.24"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
             "CPP::catch" : "v1.0.2",
-            "ExtUtils::MakeMaker" : "6.76",
-            "XS::Install" : "v1.0.0"
+            "XS::Install" : "v1.0.5"
          }
       },
       "runtime" : {
          "requires" : {
             "CPP::catch" : "v1.0.2",
-            "XS::Install" : "v1.0.0",
+            "XS::Install" : "v1.0.5",
             "perl" : "5.010000"
          }
       },
@@ -49,6 +45,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.0",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v1.0.1"
 }

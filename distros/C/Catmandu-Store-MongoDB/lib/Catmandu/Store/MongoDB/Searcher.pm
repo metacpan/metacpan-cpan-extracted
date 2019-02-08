@@ -2,7 +2,7 @@ package Catmandu::Store::MongoDB::Searcher;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0701';
+our $VERSION = '0.0802';
 
 use Moo;
 use namespace::clean;
@@ -21,11 +21,12 @@ sub generator {
     my ($self) = @_;
     sub {
         state $cursor = do {
-            my $c = $self->bag->collection->find($self->query);
+            my $c = $self->bag->_cursor($self->query);
             $c->fields($self->fields) if defined $self->fields;
+
             # limit is unused because the perl driver doesn't expose batchSize
             $c->limit($self->total) if defined $self->total;
-            $c->sort($self->sort) if defined $self->sort;
+            $c->sort($self->sort)   if defined $self->sort;
             $c->immortal(1);
             $c;
         };
@@ -33,24 +34,24 @@ sub generator {
     };
 }
 
-sub slice { # TODO constrain total?
+sub slice {    # TODO constrain total?
     my ($self, $start, $total) = @_;
     $start //= 0;
     $self->new(
-        bag   => $self->bag,
-        query => $self->query,
-        start => $self->start + $start,
-        limit => $self->limit,
-        total => $total,
-        sort  => $self->sort,
+        bag    => $self->bag,
+        query  => $self->query,
+        start  => $self->start + $start,
+        limit  => $self->limit,
+        total  => $total,
+        sort   => $self->sort,
         fields => $self->fields,
     );
 }
 
-
-sub count { # TODO constrain on start, total?
+sub count {    # TODO constrain on start, total?
     my ($self) = @_;
-    $self->bag->collection->count_documents($self->query);
+    $self->bag->collection->count_documents($self->query,
+        $self->bag->_options);
 }
 
 1;

@@ -26,7 +26,7 @@ BEGIN {
 }
 
 # ABSTRACT: Wrapper object for OpenGL shader program pipeline
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.120'; # VERSION
 
 
 has name       => ( is => 'rw' );
@@ -136,7 +136,7 @@ OpenGL::Sandbox::Program - Wrapper object for OpenGL shader program pipeline
 
 =head1 VERSION
 
-version 0.100
+version 0.120
 
 =head1 DESCRIPTION
 

@@ -104,5 +104,5 @@ requires:
   JSON: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: v1.2.8
+version: v1.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -13,6 +13,8 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
     my $pdfjs_root = $cdn->get_resource_root('pdfjs');
 
     return {
+        _isReady => 0,
+
         control => {
             '#' => {
                 onSetSrc   => 'loadPdf',
@@ -21,9 +23,12 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
         },
 
         init => func ['view'], <<"JS",
+            var me = this;
+
+            me.callParent(arguments);
+
             if ( !window.pdfjsLib ) {
-                var me = this,
-                    baseUrl = "$pdfjs_root";
+                var baseUrl = "$pdfjs_root";
 
                 Ext.Loader.loadScripts({
                     url: [ baseUrl + '/pdf.min.js' ],
@@ -43,11 +48,11 @@ JS
                 baseUrl = "$pdfjs_root",
                 src = this.getView().getSrc();
 
+            me._isReady = 1;
+
             pdfjsLib.GlobalWorkerOptions.workerSrc = baseUrl + "/pdf.worker.min.js";
 
             if (src) this.loadPdf(src);
-
-            this.getView().fireEvent('pdfReady');
 JS
 
         loadPdf => func ['src'], <<"JS",
@@ -55,6 +60,8 @@ JS
                 view = me.getView(),
                 el = view.innerElement.dom,
                 scale = view.getScale();
+
+            if (!me._isReady) return;
 
             view.fireEvent('beforePdfLoad');
 

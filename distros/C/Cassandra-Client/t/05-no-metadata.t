@@ -2,12 +2,13 @@
 use 5.010;
 use strict;
 use warnings;
+use File::Basename qw//; use lib File::Basename::dirname(__FILE__).'/lib';
 use Test::More;
-use Cassandra::Client;
+use TestCassandra;
 
-plan skip_all => "CASSANDRA_HOST not set" unless $ENV{CASSANDRA_HOST};
+plan skip_all => "Missing Cassandra test environment" unless TestCassandra->is_ok;
 
-my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
+my $client= TestCassandra->new;
 $client->connect();
 
 {

@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-package Text::Parser 0.900;
+package Text::Parser 0.902;
 
 # ABSTRACT: Simplifies text parsing. Extensible to parse various grammars.
 
@@ -36,11 +36,11 @@ use Moose::Util::TypeConstraints;
 coerce FileHandle => from GlobRef =>
     via { FileHandle->new_from_fd( $$_, 'r' ) };
 
-subtype FileReadable => as
+subtype 'Text::Parser::Types::FileReadable' => as
     Any => where { not defined $_ or ( $_ and -f $_ and -r $_ ) },
     message {"\'$_\' is not a valid readable file"};
 
-enum MultilineType => [qw(join_next join_last)];
+enum 'Text::Parser::Types::MultilineType' => [qw(join_next join_last)];
 
 no Moose::Util::TypeConstraints;
 
@@ -66,7 +66,7 @@ sub BUILD {
 
 has multiline_type => (
     is        => 'ro',
-    isa       => 'MultilineType|Undef',
+    isa       => 'Text::Parser::Types::MultilineType|Undef',
     lazy      => 1,
     default   => undef,
     predicate => '_has_mult_type',
@@ -166,7 +166,7 @@ sub __try_to_parse {
 
 has filename => (
     is        => 'rw',
-    isa       => 'FileReadable|Undef',
+    isa       => 'Text::Parser::Types::FileReadable|Undef',
     lazy      => 1,
     init_arg  => undef,
     default   => undef,
@@ -288,7 +288,7 @@ Text::Parser - Simplifies text parsing. Extensible to parse various grammars.
 
 =head1 VERSION
 
-version 0.900
+version 0.902
 
 =head1 SYNOPSIS
 

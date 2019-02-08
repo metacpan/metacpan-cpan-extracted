@@ -1,5 +1,12 @@
 Revision history for AnyEvent-WebSocket-Client
 
+0.52      2019-02-08 14:22:11 -0500
+  - Production version functionally identical to the 0.51_01 release.
+
+0.51_01   2019-02-05 23:22:05 -0500
+  - You may now overide the host and port when using the
+    AnyEvent::WebSocket::Client's connect method.
+
 0.50      2019-01-14 10:49:47 -0500
   - Fixed a testing bug that was reportd on Debian Buster.
 

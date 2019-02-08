@@ -13,19 +13,6 @@ use Test::Warnings qw( warnings );
 use DateTime::Format::Strptime qw( strftime strptime ),
     -api_version => '1.55';
 
-is_deeply(
-    [
-        warnings {
-            my $parser = DateTime::Format::Strptime->new( pattern => '%Y' );
-            $parser->pattern('%y');
-            $parser->locale('fr');
-            $parser->time_zone('UTC');
-        }
-    ],
-    [],
-    'no warnings when calling accessors on constructed object'
-);
-
 is(
     strptime( '%Y', '2005' )->year,
     2005,

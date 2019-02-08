@@ -94,6 +94,52 @@ subtest 'tests against count server' => sub {
   
     is $last, 9, 'last = 9';
   };
+
+  subtest 'override' => sub {
+
+
+    subtest 'host' => sub {
+
+      my $uri = $uri->clone;
+      my $host = $uri->host;
+      $uri->host('bogus.test');
+      my @args = ($uri, $host);
+      note "args=$_" for @args;
+
+      my $connection = eval { AnyEvent::WebSocket::Client->new->connect(@args)->recv };
+      is $@, '', 'connect okay';
+
+    };
+
+    subtest 'port' => sub {
+
+      my $uri = $uri->clone;
+      my $port = $uri->port;
+      $uri->port($port+1);
+      my @args = ($uri, undef, $port);
+      note "args=$_" for map { defined $_ ? $_ : 'undef' } @args;
+
+      my $connection = eval { AnyEvent::WebSocket::Client->new->connect(@args)->recv };
+      is $@, '', 'connect okay';
+
+    };
+
+    subtest 'port' => sub {
+
+      my $uri = $uri->clone;
+      my $host = $uri->host;
+      my $port = $uri->port;
+      $uri->host("bogus.test");
+      $uri->port($port+1);
+      my @args = ($uri, $host, $port);
+      note "args=$_" for @args;
+
+      my $connection = eval { AnyEvent::WebSocket::Client->new->connect(@args)->recv };
+      is $@, '', 'connect okay';
+
+    };
+
+  };
   
   subtest 'version' => sub {
   

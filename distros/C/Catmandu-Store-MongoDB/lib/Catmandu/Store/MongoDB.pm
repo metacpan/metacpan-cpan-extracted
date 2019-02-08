@@ -2,7 +2,7 @@ package Catmandu::Store::MongoDB;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0701';
+our $VERSION = '0.0802';
 
 use Moo;
 use Catmandu::Store::MongoDB::Bag;
@@ -10,10 +10,15 @@ use MongoDB;
 use namespace::clean;
 
 with 'Catmandu::Store';
+with 'Catmandu::Transactional';
 
-has client        => (is => 'ro', lazy => 1, builder => '_build_client');
+has client        => (is => 'lazy');
 has database_name => (is => 'ro', required => 1);
-has database      => (is => 'ro', lazy => 1, builder => '_build_database');
+has database      => (is => 'lazy', handles => [qw(drop)]);
+has session =>
+    (is => 'rw', predicate => 1, clearer => 1, writer => 'set_session');
+
+with 'Catmandu::Droppable';
 
 sub _build_client {
     my $self = shift;
@@ -37,15 +42,56 @@ sub BUILD {
 
     $self->{_args} = {};
     for my $key (keys %$args) {
-        next if $key eq 'client';
-        next if $key eq 'database_name';
-        next if $key eq 'database';
+        next
+            if $key eq 'client'
+            || $key eq 'database_name'
+            || $key eq 'database';
         $self->{_args}{$key} = $args->{$key};
     }
 }
 
-sub drop {
-    $_[0]->database->drop;
+sub transaction {
+    my ($self, $sub) = @_;
+
+    if ($self->has_session) {
+        return $sub->();
+    }
+
+    my $session = $self->client->start_session;
+    my @res;
+
+    eval {
+        $self->set_session($session);
+        $session->start_transaction;
+
+        @res = $sub->();
+
+        COMMIT: {
+            eval {
+                $session->commit_transaction;
+                1;
+            } // do {
+                my $err = $@;
+                if ($err->has_error_label("UnknownTransactionCommitResult")) {
+                    redo COMMIT;
+                }
+                else {
+                    die $err;
+                }
+            };
+        }
+
+        $self->clear_session;
+
+        1;
+    } // do {
+        my $err = $@;
+        $session->abort_transaction;
+        $self->clear_session;
+        die $err;
+    };
+
+    wantarray ? @res : $res[0];
 }
 
 1;
@@ -110,7 +156,7 @@ Databases also have compartments (e.g. tables) called Catmandu::Bag-s.
 
 =head1 METHODS
 
-=head2 new(database_name => $name, %connectio_opts)
+=head2 new(database_name => $name, %connection_opts)
 
 =head2 new(database_name => $name , bags => { data => { cql_mapping => $cql_mapping } })
 
@@ -182,15 +228,26 @@ Return a L<MongoDB::Database> instance.
 
 Delete the store and all it's bags.
 
+=head2 transaction(\&sub)
+
+Execute C<$sub> within a transaction. See L<Catmandu::Transactional>.
+
+Note that only MongoDB databases with feature compatibility >= 4.0 and in a
+replica set have support for transactions.  See
+L<https://docs.mongodb.com/manual/reference/command/setFeatureCompatibilityVersion/#view-fcv>
+and
+L<https://docs.mongodb.com/manual/tutorial/convert-standalone-to-replica-set/>
+for more info.
+
 =head1 Search
 
-Search the database: see L<Catmandu::Searchable>. This module supports an additional search parameter:
+Search the database: see L<Catmandu::Searchable> and  L<Catmandu::CQLSearchable>. This module supports an additional search parameter:
 
     - fields => { <field> => <0|1> } : limit fields to return from a query (see L<MongoDB Tutorial|https://docs.mongodb.org/manual/tutorial/project-fields-from-query-results/>)
 
 =head1 SEE ALSO
 
-L<Catmandu::Bag>, L<Catmandu::Searchable> , L<MongoDB::MongoClient>
+L<Catmandu::Bag>, L<Catmandu::CQLSearchable>, L<Catmandu::Droppable>, L<Catmandu::Transactional>, L<MongoDB::MongoClient>
 
 =head1 AUTHOR
 

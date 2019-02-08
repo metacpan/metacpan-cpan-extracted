@@ -70,7 +70,7 @@ sub module_version {
     my $module = shift;
     my $path = $module;
     $path =~ s!::!/!g;
-    eval { require $path.".pm"; } or return 0;
+    eval { require $path.".pm"; 1 } or return 0;
     no strict 'refs';
     my $v = ${$module."::VERSION"};
     if (!$v and my $vsub = $module->can('VERSION')) {

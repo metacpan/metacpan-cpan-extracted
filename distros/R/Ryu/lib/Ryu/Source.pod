@@ -358,6 +358,17 @@ Skips the first N items.
 
 Skips the last N items.
 
+=head2 skip_until
+
+Skips the items that arrive before a given condition is reached.
+
+=over 4
+
+=item * Either a L<Future> instance (we skip all items until it's marked as `done`), or a coderef,
+which we call for each item until it first returns true
+
+=back
+
 =head2 take
 
 Takes a limited number of items.

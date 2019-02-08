@@ -1,5 +1,8 @@
 Revision history for Git-Helpers
 
+0.000018  2019-02-08 19:16:21Z
+    - Add ignored_files() function (GH#10) (Olaf Alders)
+
 0.000017  2018-12-18 21:55:01Z
     - https_remote_url() now returns earlier if it will fail. (GH#9) (Olaf Alders)
 

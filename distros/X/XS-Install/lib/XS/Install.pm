@@ -7,7 +7,7 @@ use Exporter 'import';
 use ExtUtils::MakeMaker;
 use XS::Install::Payload;
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.0.7';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args/;
@@ -34,8 +34,6 @@ sub makemaker_args {
     my %params = @_;
     _sync();
 
-    $params{MIN_PERL_VERSION} ||= '5.10.0';
-    
     my $postamble = $params{postamble};
     if ($postamble) {
         my $ref = ref $postamble;
@@ -48,24 +46,10 @@ sub makemaker_args {
     
     _string_merge($params{CCFLAGS}, '-o $@');
 
-    die "You must define a NAME param" unless $params{NAME};
-    unless ($params{ALL_FROM} || $params{VERSION_FROM} || $params{ABSTRACT_FROM}) {
-        my $name = $params{NAME};
-        $name =~ s#::#/#g;
-        $params{ALL_FROM} = "lib/$name.pm";
-    }
-    
-    if (my $package_file = delete $params{ALL_FROM}) {
-        $params{VERSION_FROM}  = $package_file;
-        $params{ABSTRACT_FROM} = $package_file;
-    }
+    process_FROM(\%params);
 
     $params{CONFIGURE_REQUIRES} ||= {};
-    $params{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'} ||= '6.76';
-    
     $params{BUILD_REQUIRES} ||= {};
-    $params{BUILD_REQUIRES}{'ExtUtils::MakeMaker'} ||= '6.76';
-    $params{BUILD_REQUIRES}{'ExtUtils::ParseXS'}   ||= '3.24';
     
     $params{TEST_REQUIRES} ||= {};
     $params{TEST_REQUIRES}{'Test::Simple'} ||= '0.96';
@@ -136,6 +120,8 @@ sub makemaker_args {
         my $cppv = int($use_cpp);
         $cppv = 11 if $cppv < 11;
         _string_merge($params{CCFLAGS}, "-std=c++$cppv");
+        
+        _check_sjlj();
     }
     
     # inject ParseXS plugins into xsubpp
@@ -160,9 +146,7 @@ sub makemaker_args {
     $params{CCFLAGS} = "$Config{ccflags} $params{CCFLAGS}" if $params{CCFLAGS};
     $params{OPTIMIZE} = "$Config{optimize} -O2 ".($params{OPTIMIZE}||'');
 
-    if (!$params{C} || !@{$params{C}} and !$params{OBJECT} || !@{$params{OBJECT}} and !$params{XS} || !scalar(keys %{$params{XS}})) {
-        delete $params{$_} for qw/C H OBJECT XS CCFLAGS LDFROM/;
-    }
+    delete @params{qw/C H OBJECT XS CCFLAGS LDFROM/} unless has_binary(\%params);
 
     process_test(\%params, $shared_libs_linking);
     
@@ -199,6 +183,22 @@ sub process_PM {
             $pm->{$file} = $instpath;
         }
     }
+}
+
+sub process_FROM {
+    my $params = shift;
+    my $module = $params->{NAME} or die "You must define a NAME param";
+    
+    if (my $file = delete $params->{ALL_FROM}) {
+        $params->{VERSION_FROM}  = $file;
+        $params->{ABSTRACT_FROM} = $file;
+    }
+    
+    my $pm = 'lib/'._pkg_file($module);
+    my $pod = 'lib/'._pkg_slash($module).'.pod';
+    
+    $params->{VERSION_FROM}  ||= $pm;
+    $params->{ABSTRACT_FROM} ||= (-f $pod) ? $pod : $pm;
 }
 
 sub process_XS {
@@ -333,7 +333,8 @@ sub _apply_BIN_DEPS {
     
     return if $seen->{$module}++;
     
-    my $installed_version = XS::Install::Payload::module_version($module);
+    my $installed_version = XS::Install::Payload::module_version($module)
+        or die "[XS::Install] binary dependency '$module' must be installed to proceed\n";
     $params->{CONFIGURE_REQUIRES}{$module}  ||= $installed_version;
     $params->{PREREQ_PM}{$module}           ||= $installed_version;
     $params->{MODULE_INFO}{BIN_DEPS}{$module} = $installed_version;
@@ -351,7 +352,8 @@ sub _apply_BIN_DEPS {
         last;
     }    
     
-    my $info = XS::Install::Payload::module_info($module);
+    my $info = XS::Install::Payload::module_info($module)
+        or die "[XS::Install] this module wants '$module' as a binary dependence, however '$module' doesn't provide any binary interface\n";
     
     if ($info->{INCLUDE}) {
         my $incdir = XS::Install::Payload::include_dir($module);
@@ -441,7 +443,8 @@ sub process_BIN_SHARE {
     _module_info_write($infopath, $bin_share);
     
     my $pm = $params->{PM} ||= {};
-    $pm->{$infopath} = '$(INST_ARCHLIB)/$(FULLEXT).x/info';
+    my $where = has_binary($params) ? '$(INST_ARCHLIB)' : '$(INST_LIB)';
+    $pm->{$infopath} = $where.'/$(FULLEXT).x/info';
 }
 
 sub attach_BIN_DEPENDENT {
@@ -502,16 +505,24 @@ sub process_test {
         'TEST_XS_FILES = '.join(' ', keys %{$tp->{XS}}),
         '$(TEST_XS_FILES) :: $(FIRST_MAKEFILE) '.join(' ', @xsi_files).'; $(TOUCH) $(TEST_XS_FILES)',
         "TEST_INST_DYNAMIC = $dlpath",
-        'TEST_LDFROM = $(TEST_OBJECT) '.$shared_libs_linking,
-        '$(TEST_INST_DYNAMIC) : $(TEST_OBJECT)'."\n".
+        'TEST_LDFROM = $(TEST_OBJECT) '.($shared_libs_linking||''),
+        '$(TEST_INST_DYNAMIC) : $(TEST_OBJECT) $(INST_DYNAMIC)'."\n".
             "\t".'$(RM_F) $@'."\n".
-            "\t".'$(LD) $(LDDLFLAGS) $(TEST_LDFROM) $(OTHERLDFLAGS) -o $@ $(INST_DYNAMIC_FIX)'."\n".
+            "\t".'$(LD) $(LDDLFLAGS) $(TEST_LDFROM) $(INST_DYNAMIC) $(OTHERLDFLAGS) -o $@ $(INST_DYNAMIC_FIX)'."\n".
             "\t".'$(CHMOD) $(PERM_RWX) $@',
         'subdirs-test_dynamic :: $(TEST_INST_DYNAMIC)',
         'ctest :: subdirs-test_dynamic',
     ;
     
     delete @$tp{qw/SRC C H XS OBJECT CPLUS/};
+}
+
+sub has_binary {
+    my $params = shift;
+    return 1 if $params->{C} && @{$params->{C}};
+    return 1 if $params->{OBJECT} && @{$params->{OBJECT}};
+    return 1 if $params->{XS} && scalar(keys %{$params->{XS}});
+    return;
 }
 
 sub cmd_sync_bin_deps {
@@ -738,15 +749,33 @@ sub _module_info_write {
             chmod $mode, $file;
         }
     }
-    open my $fh, '>', $file or do {
-        warn "Cannot open $file for writing: $!, \033[1;31mbinary deps info won't be synced!\033[0m\n";
-        sleep 2;
-        return;
-    };
+    open my $fh, '>', $file or die "Cannot open $file for writing: $!, binary data could not be written\n";
     print $fh $content;
     close $fh;
     
     chmod $restore_mode, $file if $restore_mode; # restore old perms if we changed it
 }
+
+sub _check_sjlj {
+    return unless $^O eq 'MSWin32' && $Config{myuname} =~ /strawberry/;
+    my $out = `c++ -v 2>&1`;
+    if ($out =~ /--enable-sjlj-exceptions/) {
+        die "***************************************************************\n".
+            "You are using c++ compiler with SJLJ exceptions enabled.\n".
+            "It makes it impossible to use C++ exceptions and perl together.\n".
+            "You need to use compiler with DWARF2 or SEH exceptions configured.\n".
+            "If you are using Strawberry Perl, install Strawberry 5.26 or higher\n".
+            "where they use mingw with SEH exceptions.\n".
+            "***************************************************************\n";
+    }
+}
+
+sub _pkg_slash {
+    my $pkg = shift;
+    $pkg =~ s#::#/#g;
+    return $pkg;
+}
+
+sub _pkg_file { return _pkg_slash(shift).'.pm'  }
 
 1;

@@ -35,6 +35,7 @@ lib/Org/Element/Timestamp.pm
 lib/Org/Parser.pm
 t/00-compile.t
 t/01-basics.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/base_element-field_name.t

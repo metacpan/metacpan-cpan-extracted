@@ -1,6 +1,20 @@
 Revision history for Cassandra-Client
 
-0.14    unreleased
+0.16    2019/02/08
+
+      * Fix issue in the requirements list
+
+0.15    2019/02/08
+
+      * Implement stricter timeout checks in case nodes go away
+      * The client now defaults to protocol version 4. A backwards-compatible
+        protocol_version argument was added.
+      * Fix a bug that would stop prepare() from working
+      * Address performance issue executing DDL on a single-node cluster
+      * Add statistics hook to get timing information about queries
+      * Switch promises library to AnyEvent::XSPromises
+
+0.14    2017/11/27
 
       * Refactor a series of (for now) undocumented APIs
       * Encoder rewritten in XS, for performance

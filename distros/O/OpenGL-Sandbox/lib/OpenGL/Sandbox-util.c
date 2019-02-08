@@ -10,101 +10,7 @@ static void carp_croak_sv(SV* value) {
 }
 #define carp_croak(format_args...) carp_croak_sv(sv_2mortal(newSVpvf(format_args)))
 
-#include <GL/gl.h>
-#include <GL/glext.h>
-
-/* Don't want to get into the whole GLEW stuff, but these don't seem to be in gl.h...
- * Shouldn't hurt to include them as long as all access is guarded by #ifdef GL_VERSION_
- */
-extern void glGenerateMipmap(int);
-extern void glGenBuffers( GLsizei n, GLuint * buffers);
-extern void glDeleteBuffers( GLsizei n, const GLuint * buffers);
-extern void glGenVertexArrays( GLsizei count, GLuint *buffers);
-extern void glDeleteVertexArrays( GLsizei n, const GLuint * buffers);
-extern void glBindBuffer(GLenum target, GLuint buffer);
-extern void glGetBufferParameteriv(GLenum target, GLenum value, GLint * data);
-extern void glGetNamedBufferParameteriv(GLuint buffer, GLenum pname, GLint *params);
-extern void *glMapBuffer(GLenum target, GLenum access);
-extern void *glMapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
-extern void *glMapNamedBufferRange(GLuint buffer, GLintptr offset, GLsizeiptr length, GLbitfield access);
-extern GLboolean glUnmapBuffer(GLenum target);
-extern GLboolean glUnmapNamedBuffer(GLuint buffer);
-extern void glBufferData( GLenum target, GLsizeiptr size, const GLvoid * data, GLenum usage);
-extern void glBufferSubData( GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid * data);
-extern void glGetProgramiv( GLuint program, GLenum pname, GLint *params);
-extern GLint glGetUniformLocation( GLuint program, const GLchar *name);
-extern void glGetActiveUniform( GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name);
-extern void glUniform1fv( GLint location, GLsizei count, const GLfloat *value);
-extern void glUniform2fv( GLint location, GLsizei count, const GLfloat *value);
-extern void glUniform3fv( GLint location, GLsizei count, const GLfloat *value);
-extern void glUniform4fv( GLint location, GLsizei count, const GLfloat *value);
-extern void glUniform1iv( GLint location, GLsizei count, const GLint *value);
-extern void glUniform2iv( GLint location, GLsizei count, const GLint *value);
-extern void glUniform3iv( GLint location, GLsizei count, const GLint *value);
-extern void glUniform4iv( GLint location, GLsizei count, const GLint *value);
-extern void glUniform1uiv( GLint location, GLsizei count, const GLuint *value);
-extern void glUniform2uiv( GLint location, GLsizei count, const GLuint *value);
-extern void glUniform3uiv( GLint location, GLsizei count, const GLuint *value);
-extern void glUniform4uiv( GLint location, GLsizei count, const GLuint *value);
-extern void glUniformMatrix2fv( GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glUniformMatrix3fv( GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glUniformMatrix4fv( GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glUniformMatrix2x3fv( GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glUniformMatrix3x2fv( GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glUniformMatrix2x4fv( GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glUniformMatrix4x2fv( GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glUniformMatrix3x4fv( GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glUniformMatrix4x3fv( GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-#if 0
-//#ifdef GL_VERSION_4_1
-extern void glUniform1dv( GLint location, GLsizei count, const GLdouble *value);
-extern void glUniform2dv( GLint location, GLsizei count, const GLdouble *value);
-extern void glUniform3dv( GLint location, GLsizei count, const GLdouble *value);
-extern void glUniform4dv( GLint location, GLsizei count, const GLdouble *value);
-extern void glUniformMatrix2dv( GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glUniformMatrix3dv( GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glUniformMatrix4dv( GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glUniformMatrix2x3dv( GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glUniformMatrix3x2dv( GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glUniformMatrix2x4dv( GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glUniformMatrix4x2dv( GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glUniformMatrix3x4dv( GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glUniformMatrix4x3dv( GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glProgramUniform1fv( GLuint program, GLint location, GLsizei count, const GLfloat *value);
-extern void glProgramUniform2fv( GLuint program, GLint location, GLsizei count, const GLfloat *value);
-extern void glProgramUniform3fv( GLuint program, GLint location, GLsizei count, const GLfloat *value);
-extern void glProgramUniform4fv( GLuint program, GLint location, GLsizei count, const GLfloat *value);
-extern void glProgramUniform1iv( GLuint program, GLint location, GLsizei count, const GLint *value);
-extern void glProgramUniform2iv( GLuint program, GLint location, GLsizei count, const GLint *value);
-extern void glProgramUniform3iv( GLuint program, GLint location, GLsizei count, const GLint *value);
-extern void glProgramUniform4iv( GLuint program, GLint location, GLsizei count, const GLint *value);
-extern void glProgramUniform1uiv( GLuint program, GLint location, GLsizei count, const GLuint *value);
-extern void glProgramUniform2uiv( GLuint program, GLint location, GLsizei count, const GLuint *value);
-extern void glProgramUniform3uiv( GLuint program, GLint location, GLsizei count, const GLuint *value);
-extern void glProgramUniform4uiv( GLuint program, GLint location, GLsizei count, const GLuint *value);
-extern void glProgramUniformMatrix2fv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glProgramUniformMatrix3fv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glProgramUniformMatrix4fv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glProgramUniformMatrix2x3fv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glProgramUniformMatrix3x2fv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glProgramUniformMatrix2x4fv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glProgramUniformMatrix4x2fv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glProgramUniformMatrix3x4fv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glProgramUniformMatrix4x3fv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-extern void glProgramUniform1dv( GLuint program, GLint location, GLsizei count, const GLdouble *value);
-extern void glProgramUniform2dv( GLuint program, GLint location, GLsizei count, const GLdouble *value);
-extern void glProgramUniform3dv( GLuint program, GLint location, GLsizei count, const GLdouble *value);
-extern void glProgramUniform4dv( GLuint program, GLint location, GLsizei count, const GLdouble *value);
-extern void glProgramUniformMatrix2dv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glProgramUniformMatrix3dv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glProgramUniformMatrix4dv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glProgramUniformMatrix2x3dv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glProgramUniformMatrix3x2dv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glProgramUniformMatrix2x4dv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glProgramUniformMatrix4x2dv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glProgramUniformMatrix3x4dv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-extern void glProgramUniformMatrix4x3dv( GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
-#endif
+#include "glducktape.c"
 
 /* These macros are used to access the OpenGL::Sandbox::MMap object data */
 #define SCALAR_REF_DATA(obj) (SvROK(obj) && SvPOK(SvRV(obj))? (void*)SvPVX(SvRV(obj)) : (void*)0)
@@ -135,6 +41,7 @@ SV *_fetch_if_defined(HV *self, const char *field, int len) {
 
 void _get_buffer_from_sv(SV *s, char **data, unsigned long *size) {
 	dSP;
+	STRLEN len;
 	if (!s || !SvOK(s)) carp_croak("Data is undefined");
 	if (sv_isa(s, "OpenGL::Array")) {
 		/* OpenGL::Array has an internal struct and the only way to correctly
@@ -172,7 +79,8 @@ void _get_buffer_from_sv(SV *s, char **data, unsigned long *size) {
 		*size= SCALAR_REF_LEN(s);
 	}
 	else if (SvPOK(s)) {
-		*data= SvPV(s, (*size));
+		*data= SvPV(s, len);
+		*size= len;
 	}
 	else
 		carp_croak("Don't know how to get data buffer from %s", SvPV_nolen(s));

@@ -1,0 +1,100 @@
+=head1 NAME
+
+MySQL::ORM::Generate::Common
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+=head2 OPTIONAL
+
+none
+
+=cut
+
+
+=head1 METHODS
+
+=head2 attribute_maker
+
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 camelize
+
+methods
+
+=head3 parameters
+
+  Str $str!
+
+=cut
+
+=head2 get_column_attribute_comments
+
+
+=head3 parameters
+
+  MySQL::Util::Lite::Column $col!
+
+=cut
+
+=head2 get_column_trigger
+
+
+=head3 parameters
+
+  MySQL::Util::Lite::Column $col!
+
+=cut
+
+=head2 method_maker
+
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 trace
+
+
+=head3 parameters
+
+  Str $str = ''
+
+=cut
+
+=head2 verbose
+
+
+=head3 parameters
+
+  Str $str!
+
+=cut
+
+=head2 writer
+
+required attributes
+optional attributes
+private attributes
+
+=head3 parameters
+
+none
+
+=cut
+

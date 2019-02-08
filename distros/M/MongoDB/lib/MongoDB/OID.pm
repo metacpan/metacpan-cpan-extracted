@@ -19,7 +19,7 @@ package MongoDB::OID;
 # ABSTRACT: (DEPRECATED) A Mongo Object ID
 
 use version;
-our $VERSION = 'v2.0.2';
+our $VERSION = 'v2.0.3';
 
 
 use Moo;
@@ -73,7 +73,7 @@ MongoDB::OID - (DEPRECATED) A Mongo Object ID
 
 =head1 VERSION
 
-version v2.0.2
+version v2.0.3
 
 =head1 DESCRIPTION
 
@@ -107,7 +107,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by MongoDB, Inc.
+This software is Copyright (c) 2019 by MongoDB, Inc.
 
 This is free software, licensed under:
 

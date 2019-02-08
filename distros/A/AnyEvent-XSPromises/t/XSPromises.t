@@ -10,7 +10,9 @@ my $cv= AE::cv;
 
 my $deferred= deferred;
 my $promise= $deferred->promise;
+is($deferred->is_in_progress, !!1);
 $deferred->resolve(1, 2, 3);
+is($deferred->is_in_progress, !!0);
 my ($next_ok, $any, $finally_called, $reached_end);
 for (1..1) {
     my $final= $promise->then(

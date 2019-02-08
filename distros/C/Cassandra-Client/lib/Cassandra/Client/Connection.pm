@@ -1,6 +1,6 @@
 package Cassandra::Client::Connection;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Connection::VERSION = '0.14';
+$Cassandra::Client::Connection::VERSION = '0.16';
 use 5.010;
 use strict;
 use warnings;
@@ -31,6 +31,7 @@ use Cassandra::Client::Protocol qw/
     unpack_metadata
     unpack_shortbytes
     unpack_string
+    unpack_stringlist
     unpack_stringmultimap
 /;
 use Cassandra::Client::Error::Base;
@@ -69,9 +70,14 @@ sub new {
         pending_write   => undef,
         shutdown        => 0,
         read_buffer     => \(my $empty= ''),
+        bytes_sent      => 0,
+        bytes_read      => 0,
 
         tls             => undef,
         tls_want_write  => undef,
+
+        healthcheck     => undef,
+        protocol_version => $args{options}{protocol_version},
     }, $class;
     weaken($self->{async_io});
     weaken($self->{client});
@@ -379,11 +385,11 @@ sub prepare {
 
             my ($encoder, $decoder);
             eval {
-                ($encoder)= unpack_metadata($body);
+                ($encoder)= unpack_metadata($self->{protocol_version}, 0, $body);
                 1;
             } or return $next->("Unable to unpack query metadata: $@");
             eval {
-                ($decoder)= unpack_metadata($body);
+                ($decoder)= unpack_metadata($self->{protocol_version}, 1, $body);
                 1;
             } or return $next->("Unable to unpack query result metadata: $@");
 
@@ -405,7 +411,12 @@ sub decode_result {
     my $result_type= unpack('l>', substr($_[3], 0, 4, ''));
     if ($result_type == RESULT_ROWS) { # Rows
         my ($paging_state, $decoder);
-        eval { ($decoder, $paging_state)= unpack_metadata($_[3]); 1 } or return $callback->("Unable to unpack query metadata: $@");
+        eval {
+            ($decoder, $paging_state)= unpack_metadata($self->{protocol_version}, 1, $_[3]);
+            1;
+        } or do {
+            return $callback->("Unable to unpack query metadata: $@");
+        };
         $decoder= $prepared->{decoder} || $decoder;
 
         $callback->(undef,
@@ -440,7 +451,7 @@ sub wait_for_schema_agreement {
 
     my $waited= 0;
     my $wait_delay= 0.5;
-    my $max_wait= 5;
+    my $max_wait= 20;
 
     my $done;
     whilst(
@@ -448,17 +459,7 @@ sub wait_for_schema_agreement {
         sub {
             my ($whilst_next)= @_;
 
-            series([
-                sub {
-                    my ($next)= @_;
-                    $self->{async_io}->timer($next, $wait_delay);
-                },
-                sub {
-                    my ($next)= @_;
-                    $waited += $wait_delay;
-                    $self->get_network_status($next);
-                },
-            ], sub {
+            $self->get_network_status(sub {
                 my ($error, $network_status)= @_;
                 return $whilst_next->($error) if $error;
 
@@ -468,10 +469,13 @@ sub wait_for_schema_agreement {
                     if ($waited >= $max_wait) {
                         return $whilst_next->("wait_for_schema_agreement timed out after $waited seconds");
                     }
+
+                    $waited += $wait_delay;
+                    return $self->{async_io}->timer($whilst_next, $wait_delay);
                 } else {
                     $done= 1;
+                    return $whilst_next->();
                 }
-                return $whilst_next->();
             });
         },
         $callback,
@@ -749,7 +753,7 @@ sub request {
             $compress_func->($_[3]);
         }
 
-        my $data= pack('CCsCN/a', 3, $flags, $stream_id, $opcode, $_[3]);
+        my $data= pack('CCsCN/a', $self->{protocol_version}, $flags, $stream_id, $opcode, $_[3]);
 
         if (defined $self->{pending_write}) {
             $self->{pending_write} .= $data;
@@ -760,10 +764,12 @@ sub request {
             my $length= length $data;
             my $rv= Net::SSLeay::write(${$self->{tls}}, $data);
             if ($rv == $length) {
+                $self->{bytes_sent} += $rv;
                 # All good
             } elsif ($rv > 0) {
                 # Partital write
                 substr($data, 0, $rv, '');
+                $self->{bytes_sent} += $rv;
                 $self->{pending_write}= $data;
                 $self->{async_io}->register_write($self->{fileno});
             } else {
@@ -801,9 +807,11 @@ sub request {
             my $length= length $data;
             my $result= syswrite($self->{socket}, $data, $length);
             if ($result && $result == $length) {
+                $self->{bytes_sent} += $result;
                 # All good
             } elsif (defined $result || $! == EAGAIN) {
                 substr($data, 0, $result, '') if $result;
+                $self->{bytes_sent} += $result;
                 $self->{pending_write}= $data;
                 $self->{async_io}->register_write($self->{fileno});
             } else {
@@ -847,6 +855,7 @@ READ:
                 $BUFFER .= $bytes;
                 $bufsize += $rv;
                 $should_read_more= 1;
+                $self->{bytes_read} += $rv;
             }
 
             if ($rv <= 0) {
@@ -874,6 +883,7 @@ READ:
             if ($read_cnt) {
                 $bufsize += $read_cnt;
                 $should_read_more= 1 if $read_cnt >= 16384;
+                $self->{bytes_read} += $read_cnt;
 
             } elsif (!defined $read_cnt) {
                 if ($! != EAGAIN) {
@@ -896,9 +906,20 @@ READ_NEXT:
         my $body= substr($BUFFER, 0, $bodylen, '');
         $bufsize -= 9 + $bodylen;
 
-        # Decompress if needed
         if (($flags & 1) && $body) {
+            # Decompress if needed
             $self->{decompress_func}->($body);
+        }
+        if ($flags & 4) {
+            # FIXME: If we reach this (we shouldn't!), we're corrupting the user's data.
+            warn 'BUG: unexpectedly received custom QueryHandler payload';
+        }
+        if ($flags & 8) {
+            # Warnings were sent from the server. Relay them.
+            my $warnings= unpack_stringlist($body);
+            for my $warning (@$warnings) {
+                warn $warning;
+            }
         }
 
         if ($stream_id != -1) {
@@ -943,6 +964,7 @@ sub can_write {
         my $rv= Net::SSLeay::write(${$self->{tls}}, $self->{pending_write});
         if ($rv > 0) {
             substr($self->{pending_write}, 0, $rv, '');
+            $self->{bytes_sent} += $rv;
             if (!length $self->{pending_write}) {
                 $self->{async_io}->unregister_write($self->{fileno});
                 delete $self->{pending_write};
@@ -980,6 +1002,7 @@ sub can_write {
         }
         if ($result == 0) { return; } # No idea whether that happens, but guard anyway.
         substr($self->{pending_write}, 0, $result, '');
+        $self->{bytes_sent} += $result;
 
         if (!length $self->{pending_write}) {
             $self->{async_io}->unregister_write($self->{fileno});
@@ -999,7 +1022,37 @@ sub can_timeout {
         is_timeout      => 1,
         request_error   => 1,
     ));
+    $self->maybe_healthcheck;
     return;
+}
+
+sub maybe_healthcheck {
+    my ($self)= @_;
+    return if $self->{healthcheck};
+    my $check= $self->{healthcheck}= {};
+
+    # Mark how many bytes we've read right now
+    $check->{bytes_read}= $self->{bytes_read};
+
+    series([
+        sub {
+            my ($next)= @_;
+            $self->request($next, OPCODE_OPTIONS, '');
+        }
+    ], sub {
+        my ($error)= @_;
+        $self->{healthcheck}= undef;
+        if ($self->{bytes_read} > $check->{bytes_read}) {
+            # Don't care what happened, the connection is still fine
+        } elsif (!$error) {
+            # All good
+        } elsif (is_blessed_ref($error) && $error->is_request_error && $error->is_timeout) {
+            # Not good.
+            $self->shutdown("health check timed out");
+        } else {
+            # No clue. :-)
+        }
+    });
 }
 
 sub shutdown {
@@ -1102,7 +1155,7 @@ Cassandra::Client::Connection
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 AUTHOR
 
@@ -1110,7 +1163,7 @@ Tom van der Woerdt <tvdw@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Tom van der Woerdt.
+This software is copyright (c) 2019 by Tom van der Woerdt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

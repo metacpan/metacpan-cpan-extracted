@@ -25,12 +25,17 @@
                          (UV_VERSION_PATCH))
 #endif
 
+/* needed for compatibility with perls 5.14 and older */
+#ifndef newCONSTSUB_flags
+#define newCONSTSUB_flags(stash, name, len, flags, sv) newCONSTSUB((stash), (name), (sv))
+#endif
+
 #define DO_CONST_IV(c) \
-    newCONSTSUB(stash, #c, newSViv(c)); \
-    av_push(export, newSVpv(#c, 0));
+    newCONSTSUB_flags(stash, #c, strlen(#c), 0, newSViv(c)); \
+    av_push(export, newSVpvs(#c));
 #define DO_CONST_PV(c) \
-    newCONSTSUB(stash, #c, newSVpvf("%s", c)); \
-    av_push(export, newSVpv(#c, 0));
+    newCONSTSUB_flags(stash, #c, strlen(#c), 0, newSVpvn(c, strlen(c))); \
+    av_push(export, newSVpvs(#c));
 
 /* all of these call Perl API functions and should have thread context */
 extern void constants_export_uv(pTHX);

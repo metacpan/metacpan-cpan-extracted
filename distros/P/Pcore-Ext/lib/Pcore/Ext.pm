@@ -1,4 +1,4 @@
-package Pcore::Ext v0.19.8;
+package Pcore::Ext v0.19.10;
 
 use Pcore -dist, -class;
 use Pcore::Util::Scalar qw[is_ref];
@@ -468,16 +468,6 @@ sub _build_app ($self) {
                 onRpc: null
             }),
             mainView: '$self->{viewport}',
-            launch: function() {
-
-                // TODO do we need this???
-                // maybe target more specific android versions.
-                if (Ext.os.is.Android) {
-                    Ext.Viewport.on('painted', function() {
-                        Ext.Viewport.setHeight(window.innerHeight);
-                    });
-                }
-            }
         });
 JS
 

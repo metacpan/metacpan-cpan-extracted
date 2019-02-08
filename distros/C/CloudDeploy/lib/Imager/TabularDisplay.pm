@@ -2,13 +2,20 @@ use strict;
 use warnings;
 
 package Imager::TabularDisplay {
-  use Text::TabularDisplay;
+  use Text::ASCIITable;
+
+  sub print_table {
+    my $t = generate_table(@_);
+    print $t;
+  }
   
   sub generate_table {
     my @cols = @{$_[0]};
     my @res = @{$_[1]};
 
-    my $table = Text::TabularDisplay->new(@cols);
+    my $table = Text::ASCIITable->new;
+
+    $table->setCols(@cols);
 
     foreach my $row (sort { ($a->prop('date')||'') cmp ($b->prop('date')||'') } @res) {
       my @line = map {
@@ -19,7 +26,7 @@ package Imager::TabularDisplay {
 	  $val
 	}
       } @cols;
-      $table->add(@line);
+      $table->addRow(@line);
     }
     $table;
   }

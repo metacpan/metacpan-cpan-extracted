@@ -2,8 +2,9 @@
 use 5.010;
 use strict;
 use warnings;
+use File::Basename qw//; use lib File::Basename::dirname(__FILE__).'/lib';
 use Test::More;
-use Cassandra::Client;
+use TestCassandra;
 use AnyEvent;
 
 # Add some junk into our Perl magic variables
@@ -11,13 +12,13 @@ local $"= "junk join string ,";
 local $/= "junk slurp";
 local $\= "abcdef";
 
-plan skip_all => "CASSANDRA_HOST not set" unless $ENV{CASSANDRA_HOST};
+plan skip_all => "Missing Cassandra test environment" unless TestCassandra->is_ok;
 plan tests => 4;
 
 {
     my $cv= AnyEvent->condvar;
 
-    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => 1, tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT});
+    my $client= TestCassandra->new( anyevent => 1 );
     $client->async_connect->then(sub {
         $client->shutdown
 
@@ -35,7 +36,7 @@ plan tests => 4;
 
 
 {
-    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
+    my $client= TestCassandra->new;
     eval {
         $client->connect;
         $client->shutdown;
@@ -47,7 +48,7 @@ plan tests => 4;
 }
 
 {
-    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
+    my $client= TestCassandra->new;
     my ($error)= $client->call_connect;
     ok(!$error) or diag($error);
 
@@ -55,7 +56,7 @@ plan tests => 4;
 }
 
 {
-    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
+    my $client= TestCassandra->new;
     eval {
         my $cfuture= $client->future_connect;
         $cfuture->();

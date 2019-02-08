@@ -1,3 +1,13 @@
+1.76     2019-02-07
+
+[BACKWARDS INCOMPATIBILITIES]
+
+* The ability to set the pattern, time_zone, and locale via accessor methods
+  has been removed. This was deprecated over three years ago in version
+  1.60. It also turns out that the setting was actually broken for a long time
+  but no one seemed to notice, so I think it's afe to remove this feature.
+
+
 1.75     2017-12-24
 
 - Fixed tests to pass with blead Perl. Reported by James Keenan. GH #19.

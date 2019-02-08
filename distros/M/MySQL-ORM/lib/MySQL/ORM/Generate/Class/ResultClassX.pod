@@ -1,0 +1,68 @@
+=head1 NAME
+
+MySQL::ORM::Generate::Class::ResultClassX
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+
+=head2 OPTIONAL
+
+=head3 dir
+
+=cut
+
+=head3 extends
+
+=cut
+
+=head3 table
+
+=cut
+
+=head3 table_class_name
+
+=cut
+
+
+=head1 METHODS
+
+=head2 generate
+
+optional attributes
+private attributes
+methods
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 get_class_name
+
+required attributes
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 get_module_path
+
+
+=head3 parameters
+
+none
+
+=cut
+

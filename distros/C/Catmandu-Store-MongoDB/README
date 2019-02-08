@@ -54,7 +54,7 @@ DESCRIPTION
 
 METHODS
 
- new(database_name => $name, %connectio_opts)
+ new(database_name => $name, %connection_opts)
 
  new(database_name => $name , bags => { data => { cql_mapping =>
  $cql_mapping } })
@@ -128,16 +128,29 @@ METHODS
 
     Delete the store and all it's bags.
 
+ transaction(\&sub)
+
+    Execute $sub within a transaction. See Catmandu::Transactional.
+
+    Note that only MongoDB databases with feature compatibility >= 4.0 and
+    in a replica set have support for transactions. See
+    https://docs.mongodb.com/manual/reference/command/setFeatureCompatibilityVersion/#view-fcv
+    and
+    https://docs.mongodb.com/manual/tutorial/convert-standalone-to-replica-set/
+    for more info.
+
 Search
 
-    Search the database: see Catmandu::Searchable. This module supports an
-    additional search parameter:
+    Search the database: see Catmandu::Searchable and
+    Catmandu::CQLSearchable. This module supports an additional search
+    parameter:
 
         - fields => { <field> => <0|1> } : limit fields to return from a query (see L<MongoDB Tutorial|https://docs.mongodb.org/manual/tutorial/project-fields-from-query-results/>)
 
 SEE ALSO
 
-    Catmandu::Bag, Catmandu::Searchable , MongoDB::MongoClient
+    Catmandu::Bag, Catmandu::CQLSearchable, Catmandu::Droppable,
+    Catmandu::Transactional, MongoDB::MongoClient
 
 AUTHOR
 

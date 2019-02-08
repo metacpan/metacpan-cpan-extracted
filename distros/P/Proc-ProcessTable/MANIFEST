@@ -18,7 +18,6 @@ README.openbsd
 README.hpux
 README.cygwin
 PORTING
-TODO
 example.pl
 Process/Makefile.PL
 Process/Process.pm
@@ -60,8 +59,8 @@ os/bsdi.h
 os/NetBSD.c
 os/NetBSD.h
 os/OpenBSD.c
-os/cygwin.c
-os/cygwin.h
+os/MSWin32.c
+os/MSWin32.h
 t/process.t
 hints/svr4.pl
 hints/svr5.pl

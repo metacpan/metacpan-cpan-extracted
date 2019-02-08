@@ -3,7 +3,7 @@ package CloudDeploy::CommandLine::History {
   use ARGV::Struct;
   use CloudDeploy::Utils;
   use CloudDeploy::DeploymentCollection;
-  use Text::TabularDisplay;
+  use Text::ASCIITable;
   use Data::Printer;
   use Term::ANSIColor;
 
@@ -67,13 +67,14 @@ package CloudDeploy::CommandLine::History {
 
     my @list = $deploys->last_log_deployments($self->limit);
 
-    my $table = Text::TabularDisplay->new(qw(Timestamp Status Name));
+    my $table = Text::ASCIITable->new;
+    $table->setCols(qw(Timestamp Status Name));
 
     foreach my $dep (uniq(@list)) {
-      $table->add(@{ $dep });
+      $table->addRow(@{ $dep });
     }
 
-    print $table->render, "\n";
+    print $table;
   }
 
   sub search_deployments {
@@ -87,13 +88,14 @@ package CloudDeploy::CommandLine::History {
 
     my @list = $deploys->search_log_deployments($self->find_args, $self->limit);
 
-    my $table = Text::TabularDisplay->new(qw(Timestamp Status Name));
+    my $table = Text::ASCIITable->new;
+    $table->setCols(qw(Timestamp Status Name));
 
     foreach my $dep (uniq(@list)) {
-      $table->add(@{ $dep });
+      $table->addRow(@{ $dep });
     }
 
-    print $table->render, "\n";
+    print $table;
   }
 
   sub inspect_deployments {

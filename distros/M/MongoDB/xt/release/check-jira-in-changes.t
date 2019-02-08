@@ -10,21 +10,7 @@ use Test::More;
 plan skip_all => "Disabled" if $ENV{NO_JIRA_CHECK};
 
 my @commits = split /\n/, <<'EOC';
-eb94d14c PERL-1041 Check bulk error can call result before calling it
-ad0ecaeb PERL-1033 Fix docs link to BSON/wrap_numbers
-1a64d910 PERL-927 Skip count hint test before MongoDB 3.6
-41934c83 PERL-927 Coerce hint to IxHash or BSON::Doc if not string
-4003c366 PERL-988 Preserve index key order in results
-18d633cc PERL-970 Allow BSON::Doc as sort argument
-528cdc38 PERL-806 Check compatibility for SDAM tests
-e1b62814 PERL-1005 Defend txn example test vs possible abort
-a6c4f15b PERL-1006 Enable retry_writes during testing
-4d137574 PERL-1006 Force specific tests to disable retry_writes. Fix retryable error check
-73bd1786 PERL-1006 Fix issue with retry_writes and unordered bulk
-72f169f4 PERL-1012 Clear session pool on reconnect after fork/thread
-78b15406 PERL-1004 CI: Update stable branch Evergreen testing
-c4dc4b6c PERL-972 Amended transaction examples for session args to come last
-cc0a5ee5 PERL-972 Amended transaction examples to utilise session
+20dfb74f (origin/maint-v2.0) PERL-1061 Fix mongodb+srv boolean option parsing
 
 EOC
 

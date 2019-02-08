@@ -20,6 +20,6 @@ my $store = Catmandu->store(
     host          => 'mongodb://localhost:0'
 );
 
-dies_ok { $store->first } 'expecting to die';
+dies_ok {$store->first} 'expecting to die';
 
 done_testing;

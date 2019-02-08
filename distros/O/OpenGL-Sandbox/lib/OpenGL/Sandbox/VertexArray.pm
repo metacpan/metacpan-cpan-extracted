@@ -13,8 +13,8 @@ BEGIN {
 }
 use OpenGL::Sandbox::Buffer;
 
-# ABSTRACT: Object that encapsulates the mapping from buffer to vertex shader
-our $VERSION = '0.100'; # VERSION
+# ABSTRACT: Object that describes an array of vertex data
+our $VERSION = '0.120'; # VERSION
 
 
 has name        => ( is => 'rw' );
@@ -154,33 +154,38 @@ __END__
 
 =head1 NAME
 
-OpenGL::Sandbox::VertexArray - Object that encapsulates the mapping from buffer to vertex shader
+OpenGL::Sandbox::VertexArray - Object that describes an array of vertex data
 
 =head1 VERSION
 
-version 0.100
+version 0.120
 
 =head1 DESCRIPTION
 
-Vertex Arrays can be hard to grasp, since their implementation has changed in each major
-version of OpenGL, but I found a very nice write-up in the accepted answer of:
+A Vertex Array is an array of vertex data which can be passed to a rendering pipeline.
+While the concept is simple, the implementation is a mess, and has changed in each major
+revision of OpenGL.
 
-L<https://stackoverflow.com/questions/21652546/what-is-the-role-of-glbindvertexarrays-vs-glbindbuffer-and-what-is-their-relatio>
+The data of a Vertex Array comes from one or more L<Buffer|OpenGL::Sandbox::Buffer> objects.
+A Vertex Array describes how that data maps to the named vertex attributes of a
+L<Shader|OpenGL::Sandbox::Shader>.  For instance, texture data could be stored in one buffer
+object with vertex 3D coordinates stored in another, and as the shader processes each vertex
+it could need the first data in attributes named C<'s'>, C<'t'>, C<'tx_id'> and the second
+into a vector named C<'pos'>.  A Vertex Array describes how to assign the next vertex to each
+named attribute.
 
-In short, there needs to be something to indicate which bytes of the buffer map to which
-vertex attributes as used in the shader.  The shader can declare anything attributes it wants,
-and the buffer(s) need to contain matching arrangement of data.  This configuration
-is called a "VertexArray" (who names these things??)
-
-The oldest versions of OpenGL require this information to be applied on each buffer change.
-The newer versions can cache the configuration in an Object, and the newest versions of OpenGL
-can set it up without mucking around with global state.
+In OpenGL 2.0, there was essentially just one global vertex array, and it needed overwritten
+(via an awkward series of function calls) each time you wanted to change the vertex data.
+In OpenGL 3.0, there are multiple named Vertex Array objects which can be configured once and
+then re-used, though it still requires awkward function calls and binding global targets.
+In OpenGL 4.5, you can finally set up a Vertex Array without binding anything.
+Here's a nice L<write-up on Stack Overflow|https://stackoverflow.com/questions/21652546/what-is-the-role-of-glbindvertexarrays-vs-glbindbuffer-and-what-is-their-relatio>.
 
 This object attempts to represent the configuration in a version-neutral manner.  There are two
 phases: L</prepare> and L</bind>.  On old OpenGL, C<prepare> does nothing, since there is
 no way to cache the results, and C<bind> does all the work.  On new OpenGL (3.0 and up) the
-C<prepare> step creates a cached VertexArray, and C<bind> binds it.  All you need to do is
-call C<bind> and it will C<prepare> if needed.
+C<prepare> step creates a cached VertexArray, and C<bind> binds it.  But, all you need to do is
+call C<bind> and it will C<prepare> automatically if needed.
 
 =head1 ATTRIBUTES
 
@@ -257,8 +262,8 @@ attribute configuration specifies otherwise).
 
 =head2 prepare
 
-For OpenGL 3+ this creates a VertexArrayObject and initializes it.  For earlier OpenGL, this is
-a no-op.
+For OpenGL 3+ this creates a Vertex Array Object (VAO) and initializes it.  For earlier OpenGL,
+this is a no-op.
 
 =head1 AUTHOR
 

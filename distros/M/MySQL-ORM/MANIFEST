@@ -1,0 +1,46 @@
+.includepath
+.project
+.travis.yml
+bin/mysql-orm.pl
+build.sh
+Changes
+cover.sh
+cpan-upload.sh
+ignore.txt
+lib/MySQL/ORM.pm
+lib/MySQL/ORM.pod
+lib/MySQL/ORM/Generate.pm
+lib/MySQL/ORM/Generate.pod
+lib/MySQL/ORM/Generate/AttributeMaker.pm
+lib/MySQL/ORM/Generate/AttributeMaker.pod
+lib/MySQL/ORM/Generate/Class/CustomRole.pm
+lib/MySQL/ORM/Generate/Class/CustomRole.pod
+lib/MySQL/ORM/Generate/Class/Db.pm
+lib/MySQL/ORM/Generate/Class/Db.pod
+lib/MySQL/ORM/Generate/Class/README
+lib/MySQL/ORM/Generate/Class/ResultClass.pm
+lib/MySQL/ORM/Generate/Class/ResultClass.pod
+lib/MySQL/ORM/Generate/Class/ResultClassX.pm
+lib/MySQL/ORM/Generate/Class/ResultClassX.pod
+lib/MySQL/ORM/Generate/Class/Table.pm
+lib/MySQL/ORM/Generate/Class/Table.pod
+lib/MySQL/ORM/Generate/Common.pm
+lib/MySQL/ORM/Generate/Common.pod
+lib/MySQL/ORM/Generate/MethodMaker.pm
+lib/MySQL/ORM/Generate/MethodMaker.pod
+lib/MySQL/ORM/Generate/Writer.pm
+lib/MySQL/ORM/Generate/Writer.pod
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/10-mysql-orm-generate.t
+t/20-foo-testmysqlorm.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/sql
+t/testlib.pl
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

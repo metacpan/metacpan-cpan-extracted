@@ -1,5 +1,5 @@
 package Git::Helpers::CPAN;
-our $VERSION = '0.000017';
+our $VERSION = '0.000018';
 use Moo;
 
 use MetaCPAN::Client ();
@@ -97,7 +97,7 @@ Git::Helpers::CPAN - Get repository information for a CPAN module or release
 
 =head1 VERSION
 
-version 0.000017
+version 0.000018
 
 =head1 SYNOPSIS
 

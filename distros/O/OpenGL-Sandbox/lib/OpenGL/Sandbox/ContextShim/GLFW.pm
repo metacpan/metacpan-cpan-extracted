@@ -11,7 +11,7 @@ use OpenGL::GLFW qw/ glfwInit glfwGetVersionString glfwTerminate NULL GLFW_TRUE 
 use OpenGL::Sandbox qw/ glGetString GL_VERSION /;
 
 # ABSTRACT: Create OpenGL context with OpenGL::GLFW
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.120'; # VERSION
 
 # would use Moo, but I want to write my own constructor rather than store
 # all these arguments as official attributes.
@@ -90,7 +90,7 @@ OpenGL::Sandbox::ContextShim::GLFW - Create OpenGL context with OpenGL::GLFW
 
 =head1 VERSION
 
-version 0.100
+version 0.120
 
 =head1 DESCRIPTION
 

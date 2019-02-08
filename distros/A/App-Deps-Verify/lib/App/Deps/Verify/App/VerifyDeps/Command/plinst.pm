@@ -1,5 +1,5 @@
 package App::Deps::Verify::App::VerifyDeps::Command::plinst;
-$App::Deps::Verify::App::VerifyDeps::Command::plinst::VERSION = '0.6.0';
+$App::Deps::Verify::App::VerifyDeps::Command::plinst::VERSION = '0.8.0';
 use App::Deps::Verify::App::VerifyDeps -command;
 
 use strict;
@@ -62,7 +62,7 @@ App::Deps::Verify::App::VerifyDeps::Command::plinst
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

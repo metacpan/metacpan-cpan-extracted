@@ -1,17 +1,27 @@
 use lib 't/lib';
-use Test2::Require::SSL;
+use Test2::Require::SSL ();
 use Test2::Plugin::EV;
 use Test2::Plugin::AnyEvent::Timeout;
 use Test2::V0 -no_srand => 1;
 use Test2::Tools::WebSocket::Server qw( start_server );
 use AnyEvent::WebSocket::Client;
 
-sub test_case
+my @test_cases = (
+  { label => 'without TLS', tls => 0,                                     },
+  { label => 'with TLS',    tls => 1, tls_cert => do { local $/; <DATA> } },
+);
+
+foreach my $test_case (@test_cases)
 {
-  my (%case_args) = @_;
-  subtest $case_args{label}, sub {
-    my $url = start_server(
-      tls => $case_args{server_tls},
+  subtest $test_case->{label}, sub {
+
+    if($test_case->{tls})
+    {
+      my $reason = Test2::Require::SSL->skip;
+      skip_all $reason if $reason;
+    }
+
+    my %server_args = (
       handshake => sub {
         my $opt = { @_ };
         $opt->{hdl}->push_write(Protocol::WebSocket::Frame->new("initial message from server")->to_bytes);
@@ -21,15 +31,18 @@ sub test_case
         fail("server should not receive a message");
       },
     );
+
+    if($test_case->{tls})
+    {
+      $server_args{tls} = AnyEvent::TLS->new(cert => $test_case->{tls_cert});
+    }
+
+    my $url = start_server(%server_args);
     my $cv_finish = AnyEvent->condvar;
     my $conn = eval { AnyEvent::WebSocket::Client->new(ssl_no_verify => 1)->connect($url)->recv };
     if($@)
     {
       my $error = $@;
-      if($case_args{server_tls})
-      {
-        #testlib::SSL->diag_about_issue22;
-      }
       die $error;
     }
     my @received_messages = ();
@@ -47,9 +60,6 @@ sub test_case
     );
   };
 }
-
-test_case(label => "no ssl");
-test_case(label => "with ssl", server_tls => AnyEvent::TLS->new(cert => do { local $/; <DATA> }));
 
 done_testing;
 

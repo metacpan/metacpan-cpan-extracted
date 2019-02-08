@@ -1,3 +1,6 @@
+3.7 - Mon Feb 04 16:40:00 AEDT 2019
+ - Upgrade to Selenium 3.141.59, released 2018-11-14
+
 3.6 - Sun Oct 28 17:28:00 AEDT 2017
  - Upgrade to Selenium 3.6.0
  - Changed module version to track Selenium Server

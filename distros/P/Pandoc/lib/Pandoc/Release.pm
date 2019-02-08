@@ -2,7 +2,7 @@ package Pandoc::Release;
 use 5.014;
 use warnings;
 
-our $VERSION = '0.8.8';
+our $VERSION = '0.9.0';
 
 use HTTP::Tiny;
 use JSON::PP;
@@ -188,6 +188,8 @@ This utility module fetches information about pandoc releases via GitHub API.
 On Debian-bases systems, this module can update and switch locally installed
 pandoc versions if you add directory C<~/.pandoc/bin> to your C<$PATH>.
 
+See L<pandoc-version> for a command line script that makes use of this module.
+
 =head1 FUNCTIONS
 
 All functions are exported by default.
@@ -262,6 +264,8 @@ L<GitHub token|https://github.com/settings/tokens> to avoid rate limiting.
 =back
 
 =head1 SEE ALSO
+
+L<Pandoc::Version>
 
 L<https://developer.github.com/v3/repos/releases/>
 

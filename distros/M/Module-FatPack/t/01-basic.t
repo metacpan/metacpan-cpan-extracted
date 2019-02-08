@@ -1,8 +1,8 @@
 #!perl
 
 use 5.010001;
-use strict;
-use warnings;
+#use strict;
+#use warnings;
 use Test::Exception;
 use Test::More 0.98;
 
@@ -90,7 +90,7 @@ subtest "opt:pm" => sub {
 # XXX test add_begin_block
 # XXX test preamble & postamble
 # XXX test output, overwrite
-# XXX test assume_strict=0
+# XXX test assume_strict=1
 # XXX test put_hook_at_the_end
 # XXX test stripper option
 

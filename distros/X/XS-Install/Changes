@@ -1,3 +1,15 @@
+1.0.7    08.02.2019
+           - reasonable default for VERSION_FROM, ABSTRACT_FROM
+1.0.6    08.02.2019
+           - automatically reject C++ compiler with SJLJ exceptions (strawberry < 5.26) if XS uses C++, because that leads process to hang
+1.0.5    08.02.2019
+           - bug installing to arch non-binary modules which have BIN_SHARE
+           - fix linking binary tests for windows
+           - fix loading binary tests for windows
+           - misc improvements
+           - update ppport.h to last version
+1.0.4    07.02.2019
+           - misc improvements
 1.0.3    06.02.2019
            - fix makefile
 1.0.2    06.02.2019

@@ -1,3 +1,8 @@
+0.181   2019-02-08 (PERLANCAR)
+
+	- Change default assume_strict to 0.
+
+
 0.180   2018-02-27 (PERLANCAR)
 
 	- No functional changes.

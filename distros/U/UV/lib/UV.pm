@@ -1,6 +1,6 @@
 package UV;
 
-our $VERSION = '1.000008';
+our $VERSION = '1.000009';
 our $XS_VERSION = $VERSION;
 
 use strict;

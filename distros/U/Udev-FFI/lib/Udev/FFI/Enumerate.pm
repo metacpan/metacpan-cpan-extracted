@@ -117,7 +117,6 @@ sub add_match_parent {
 
 
 sub add_match_is_initialized {
-    # self
     if (0 == ($! = udev_enumerate_add_match_is_initialized($_[0]->{_enumerate}))) {
         return 1;
     }
@@ -140,7 +139,6 @@ sub add_syspath {
 
 
 sub scan_devices {
-    # self
     if (0 == ($! = udev_enumerate_scan_devices($_[0]->{_enumerate}))) {
         return 1;
     }
@@ -151,7 +149,6 @@ sub scan_devices {
 
 
 sub scan_subsystems {
-    # self
     if (0 == ($! = udev_enumerate_scan_subsystems($_[0]->{_enumerate}))) {
         return 1;
     }
@@ -163,7 +160,17 @@ sub scan_subsystems {
 
 
 sub get_list_entries {
-    return get_entries( udev_enumerate_get_list_entry($_[0]->{_enumerate}) );
+    my $list_entry = udev_enumerate_get_list_entry($_[0]->{_enumerate});
+
+    if (wantarray) { # TODO deprecated
+        return get_entries($list_entry);
+    }
+
+    if (defined($list_entry)) {
+        return get_entries($list_entry);
+    }
+
+    return undef;
 }
 
 

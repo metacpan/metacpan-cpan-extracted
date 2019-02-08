@@ -16,8 +16,8 @@ sub check_encdec {
     eval {
         $expected= $row unless defined $expected;
 
-        my $metadata= pack_metadata($rowspec);
-        my ($rowmeta)= unpack_metadata($metadata);
+        my $metadata= pack_metadata(4, 1, $rowspec);
+        my ($rowmeta)= unpack_metadata(4, 1, $metadata);
         ok($rowmeta) or diag('No rowmeta');
 
         my $encoded= $rowmeta->encode($row);
@@ -54,8 +54,8 @@ sub check_enc {
         ]
     };
     eval {
-        my $metadata= pack_metadata($meta);
-        my ($rowmeta)= unpack_metadata($metadata);
+        my $metadata= pack_metadata(4, 1, $meta);
+        my ($rowmeta)= unpack_metadata(4, 1, $metadata);
 
         my $encoded= $rowmeta->encode([ $col ]);
         my $rowcount= unpack('n', substr($encoded, 0, 2, ''));

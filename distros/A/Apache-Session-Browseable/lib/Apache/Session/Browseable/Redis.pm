@@ -12,6 +12,8 @@ use Apache::Session::Browseable::_common;
 our $VERSION = '1.2.2';
 our @ISA     = qw(Apache::Session);
 
+our $redis = $Apache::Session::Browseable::Store::Redis::redis;
+
 sub populate {
     my $self = shift;
 
@@ -43,7 +45,7 @@ sub searchOn {
     my $index =
       ref( $args->{Index} ) ? $args->{Index} : [ split /\s+/, $args->{Index} ];
     if ( grep { $_ eq $selectField } @$index ) {
-        my $redisObj = Redis->new(%$args);
+        my $redisObj = $redis->new(%$args);
 
         # Manage database
         $redisObj->select( $args->{database} ) if defined $args->{database};
@@ -95,7 +97,7 @@ sub get_key_from_all_sessions {
       if ( $args->{encoding} and $args->{encoding} eq "undef" );
 
     # TODO new Redis object
-    my $redisObj = Redis->new(%$args);
+    my $redisObj = $redis->new(%$args);
 
     # Manage database
     $redisObj->select( $args->{database} ) if defined $args->{database};
@@ -181,6 +183,8 @@ Apache::Session::Redis
 Apache::Session::browseable provides some class methods to manipulate all
 sessions and add the capability to index some fields to make research faster.
 
+This module use either L<Redis::Fast> or L<Redis>.
+
 =head1 SEE ALSO
 
 L<Apache::Session>
@@ -191,7 +195,7 @@ Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 by Xavier Guimard
+Copyright (C) 2009-2018 by Xavier Guimard
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

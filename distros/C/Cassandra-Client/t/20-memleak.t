@@ -2,15 +2,16 @@
 use 5.010;
 use strict;
 use warnings;
+use File::Basename qw//; use lib File::Basename::dirname(__FILE__).'/lib';
 use Test::More;
-use Cassandra::Client;
+use TestCassandra;
 use Cassandra::Client::Util qw/series parallel/;
 use Scalar::Util 'weaken';
 use Socket qw/PF_INET SOCK_STREAM/;
 use Devel::Cycle;
 use Data::Dumper;
 
-plan skip_all => "CASSANDRA_HOST not set" unless $ENV{CASSANDRA_HOST};
+plan skip_all => "Missing Cassandra test environment" unless TestCassandra->is_ok;
 plan tests => 14;
 
 {
@@ -51,7 +52,7 @@ BEGIN {
 my @fd_sequence_init= get_fd_sequence(100);
 my @fd_sequence_init2= get_fd_sequence(100);
 
-my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
+my $client= TestCassandra->new;
 $client->connect();
 
 my $db= 'perl_cassandra_client_tests';

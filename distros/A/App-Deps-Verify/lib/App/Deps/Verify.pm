@@ -1,5 +1,5 @@
 package App::Deps::Verify;
-$App::Deps::Verify::VERSION = '0.6.0';
+$App::Deps::Verify::VERSION = '0.8.0';
 # ABSTRACT: An app and API to verify the presence of dependencies (Perl 5 modules, python3 modules, executables, etc.
 
 use strict;
@@ -258,8 +258,14 @@ sub write_rpm_spec_text_to_fh
     my ( $self, $args, ) = @_;
 
     my $yaml_data = $args->{data};
-    my $ret       = '';
-    my $o         = $args->{out_fh};
+    my $yamls     = [$yaml_data];
+    if ( !$yaml_data )
+    {
+        $yamls     = $args->{yamls};
+        $yaml_data = $yamls->[0];
+    }
+    my $ret = '';
+    my $o   = $args->{out_fh};
 
     my $keys = $yaml_data->{required}->{meta_data}->{'keys'};
     $o->print(<<"EOF");
@@ -274,39 +280,44 @@ BuildArch:  noarch
 EOF
     {
     EXECUTABLES:
-        foreach my $line ( @{ $yaml_data->{required}->{executables} } )
+        foreach my $exess ( map { $_->{required}->{executables} } @$yamls )
         {
-            my $cmd = $line->{exe};
-            if ( $cmd eq 'sass' )
+            foreach my $line (@$exess)
             {
-                next EXECUTABLES;
+                my $cmd = $line->{exe};
+                if ( $cmd eq 'sass' )
+                {
+                    next EXECUTABLES;
+                }
+                elsif ( $cmd eq 'convert' )
+                {
+                    $cmd = 'imagemagick';
+                }
+                elsif ( $cmd eq 'minify' )
+                {
+                    next EXECUTABLES;
+                }
+                elsif ( $cmd eq 'node' )
+                {
+                    $cmd = 'nodejs';
+                }
+                $o->print("Requires: $cmd\n");
             }
-            elsif ( $cmd eq 'convert' )
-            {
-                $cmd = 'imagemagick';
-            }
-            elsif ( $cmd eq 'minify' )
-            {
-                next EXECUTABLES;
-            }
-            elsif ( $cmd eq 'node' )
-            {
-                $cmd = 'nodejs';
-            }
-            $o->print("Requires: $cmd\n");
         }
     }
+    foreach my $y (@$yamls)
     {
-        my $required_modules = $yaml_data->{required}->{perl5_modules};
+        my $required_modules = $y->{required}->{perl5_modules};
 
         foreach my $m ( sort { $a cmp $b } keys(%$required_modules) )
         {
             $o->print("Requires: perl($m)\n");
         }
     }
+    foreach my $y (@$yamls)
     {
         my @required_modules =
-            keys %{ $yaml_data->{required}->{py3_modules} };
+            keys %{ $y->{required}->{py3_modules} };
 
         foreach my $module (@required_modules)
         {
@@ -347,7 +358,7 @@ App::Deps::Verify - An app and API to verify the presence of dependencies (Perl
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =head1 SYNOPSIS
 
@@ -387,6 +398,10 @@ Verify the presence of deps in all the input hashes.
 =head2 $obj->write_rpm_spec_text_from_yaml_file_to_fh({deps_fn => $path, out_fh => $fh});
 
 =head2 $obj->write_rpm_spec_text_to_fh({data => $yaml_data, out_fh => $fh});
+
+Or:
+
+=head2 $obj->write_rpm_spec_text_to_fh({yamls => [@ARRAY], out_fh => $fh});
 
 =head2 $obj->list_perl5_modules({inputs => [\%hash1, \%hash2, ...]})
 

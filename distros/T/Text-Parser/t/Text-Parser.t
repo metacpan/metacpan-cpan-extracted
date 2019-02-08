@@ -79,14 +79,9 @@ is( $pars->lines_parsed, 1,             'Still lines_parsed returns 1' );
 is( $pars->filename(),   't/' . $fname, 'Last file read' );
 
 open OUTFILE, ">example";
-if ( -r OUTFILE ) {
-    lives_ok { $pars->filehandle( \*OUTFILE ); }
-    'In some systems output file handles are also readable! Your system is one of those. This could be a potential security hole.';
-    is( $pars->filename(), undef, 'Last file read is not available anymore' );
-} else {
-    throws_ok { $pars->filehandle( \*OUTFILE ); } 'Text::Parser::Exception',
-        'Your system is strict and will not read from an output filehandle. This is potentially good for security.';
-}
+lives_ok { $pars->filehandle( \*OUTFILE ); }
+'Convert even a write filehandle into a read FileHandle object.';
+is( $pars->filename(), undef, 'Last file read is not available anymore' );
 print OUTFILE "Simple text";
 close OUTFILE;
 open INFILE, "<example";
@@ -101,13 +96,8 @@ lives_ok { $pars->read( FileHandle->new( 'example', 'r' ) ); }
 unlink 'example';
 
 ## Testing the reading from filehandles on STDOUT and STDIN
-if ( -r STDOUT ) {
-    lives_ok { $pars->filehandle( \*STDOUT ); }
-    'Some systems can read from STDOUT. Your system is one of them.';
-} else {
-    throws_ok { $pars->filehandle( \*STDOUT ); } 'Text::Parser::Exception',
-        'Your system is strict and will not read from STDOUT';
-}
+lives_ok { $pars->filehandle( \*STDOUT ); }
+'Some systems can read from STDOUT. Your system is one of them.';
 lives_ok { $pars->filehandle( \*STDIN ); } 'No issues in reading from STDIN';
 
 throws_ok { $pars->read( { a => 'b' } ); } 'Text::Parser::Exception',

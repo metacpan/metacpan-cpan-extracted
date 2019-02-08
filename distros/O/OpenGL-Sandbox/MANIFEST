@@ -5,14 +5,17 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
 bin/glsandbox-shaderdemo
 dist.ini
+inc/glducktape.c
+inc/glducktape.list
+inc/glducktape.pl
 lib/OpenGL/Sandbox-util.c
 lib/OpenGL/Sandbox.c
 lib/OpenGL/Sandbox.pm
 lib/OpenGL/Sandbox/Buffer.pm
 lib/OpenGL/Sandbox/ContextShim/GLFW.pm
+lib/OpenGL/Sandbox/ContextShim/GLUT.pm
 lib/OpenGL/Sandbox/ContextShim/GLX.pm
 lib/OpenGL/Sandbox/ContextShim/SDL.pm
 lib/OpenGL/Sandbox/Inline.pm
@@ -35,8 +38,6 @@ t/35-buffer.t
 t/36-vertex-array.t
 t/40-shader.t
 t/50-convenience-functions.t
-t/author-pod-coverage.t
-t/author-pod-syntax.t
 t/data/shader/seascape.frag
 t/data/shader/xy_screen.vert
 t/data/shader/zero.frag
@@ -44,6 +45,8 @@ t/data/shader/zero.vert
 t/data/tex/14x7-rgba.png
 t/data/tex/8x8.png
 t/data/tex/default
+xt/author/pod-syntax.t
+xt/release/pod-coverage.t
 inc/OpenGL/Sandbox/Inline.pm
 inc/Inline.pm
 inc/Inline/denter.pm

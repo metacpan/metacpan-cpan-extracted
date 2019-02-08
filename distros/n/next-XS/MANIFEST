@@ -14,7 +14,6 @@ t/patch.sh
 t/perl/complex_c3.t
 t/perl/complex_c3_utf8.t
 t/perl/next_edgecases.t
-t/perl/next_edgecases_utf8.t
 t/perl/next_goto.t
 t/perl/next_goto_utf8.t
 t/perl/next_inanon.t

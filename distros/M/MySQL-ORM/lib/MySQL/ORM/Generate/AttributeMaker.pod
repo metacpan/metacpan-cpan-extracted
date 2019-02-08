@@ -1,0 +1,45 @@
+=head1 NAME
+
+MySQL::ORM::Generate::AttributeMaker
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+=head2 OPTIONAL
+
+none
+
+=cut
+
+
+=head1 METHODS
+
+=head2 make_attribute
+
+required attributes
+optional attributes
+private attributes
+methods
+
+=head3 parameters
+
+  Str      :$name        
+  ArrayRef :$comments    
+  Str      :$is          
+  Str      :$isa         
+  Str      :$trigger     
+  Str      :$default     
+  Bool     :$no_init_arg 
+  Bool     :$lazy        
+  Str      :$builder
+
+=cut
+

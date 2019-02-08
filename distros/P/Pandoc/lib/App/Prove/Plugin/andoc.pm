@@ -2,30 +2,30 @@ package App::Prove::Plugin::andoc;
 use 5.014;
 use warnings;
 
-our $VERSION = '0.8.8';
+our $VERSION = '0.9.0';
 
 use Pandoc;
 use File::Temp qw(tempdir);
 use Cwd qw(realpath);
 
 sub load {
-    my ($class, $p) = @_;
-    my ($bin) = @{$p->{args}};
-    
+    my ( $class, $p ) = @_;
+    my ($bin) = @{ $p->{args} };
+
     die "Usage: prove -Pandoc=EXECUTABLE ...\n" unless defined $bin;
-    die "Pandoc executable not found: $bin\n" unless -x $bin;  
+    die "Pandoc executable not found: $bin\n"   unless -x $bin;
 
     # dies if executable is not pandoc
     my $pandoc = Pandoc->new($bin);
 
-    my $tmp = tempdir(CLEANUP => 1);
-	symlink (realpath($pandoc->bin), "$tmp/pandoc")
-        or die "symlinking pandoc failed!\n";
-    
- 	$ENV{PATH} = "$tmp:".$ENV{PATH};
+    my $tmp = tempdir( CLEANUP => 1 );
+    symlink( realpath( $pandoc->bin ), "$tmp/pandoc" )
+      or die "symlinking pandoc failed!\n";
 
-    if ($p->{app_prove}->{verbose}) {
-       print "# pandoc executable set to $bin\n";
+    $ENV{PATH} = "$tmp:" . $ENV{PATH};
+
+    if ( $p->{app_prove}->{verbose} ) {
+        print "# pandoc executable set to $bin\n";
     }
 }
 

@@ -99,10 +99,15 @@ Only differences from MakeMaker params are listed.
 
 =item ALL_FROM [default: NAME]
 
-Sets ABSTRACT_FROM and VERSION_FROM to value of ALL_FROM.
+Sets C<ABSTRACT_FROM> and C<VERSION_FROM> to value of C<ALL_FROM>.
 
-If not defined, defaults to NAME. That means that if you have version and abstract in your module's main package, then
-you don't need to define anything.
+=item VERSION_FROM [default: lib/Your/Package.pm]
+
+If you don't specify C<VERSION_FROM>, the default is your main package file
+
+=item ABSTRACT_FROM [default: lib/Your/Package.pod or lib/Your/Package.pm]
+
+If you don't specify C<ABSTRACT_FROM>, the default is your main package pod file if it exists, otherwise main package file
 
 =item XS [*.xs]
 

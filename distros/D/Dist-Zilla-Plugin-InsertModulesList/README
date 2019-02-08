@@ -1,5 +1,13 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::InsertModulesList - Insert a POD containing a list
+    of modules in the distribution
 
+VERSION
+    This document describes version 0.030 of
+    Dist::Zilla::Plugin::InsertModulesList (from Perl distribution
+    Dist-Zilla-Plugin-InsertModulesList), released on 2019-02-08.
+
+SYNOPSIS
     In dist.ini:
 
      [InsertModulesList]
@@ -7,38 +15,37 @@ SYNOPSIS
     In lib/Foo.pm:
 
      ...
-    
+
      =head1 DESCRIPTION
-    
+
      This distribution contains the following modules:
-    
+
      #INSERT_MODULES_LIST
-    
+
      ...
 
     After build, lib/Foo.pm will contain:
 
      ...
-    
+
      =head1 DESCRIPTION
-    
+
      This distribution contains the following modules:
-    
+
      =over
-    
+
      =item * L<Foo>
-    
+
      =item * L<Foo::Bar>
-    
+
      =item * L<Foo::Baz>
-    
+
      =back
-    
+
      ...
 
 DESCRIPTION
-
-    This plugin finds # INSERT_MODULES_LIST directive in your POD/code and
+    This plugin finds "# INSERT_MODULES_LIST" directive in your POD/code and
     replace it with a POD containing list of modules in the distribution.
 
     To exclude a module from the generated list, use:
@@ -51,13 +58,37 @@ DESCRIPTION
 
     To only include modules matching a regex, use:
 
-     Below are the included plugins in this distribution"
-    
+     Below are the included plugins in this distribution:
+
      # INSERT_MODULES_LIST /^Foo::Plugin::/
 
     Excludes and includes can be combined.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-InsertModulesList>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertModulesList>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Ins
+    ertModulesList>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Dist::Zilla::Plugin::InsertExecsList
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1,6 +1,6 @@
 package Cassandra::Client::Protocol;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Protocol::VERSION = '0.14';
+$Cassandra::Client::Protocol::VERSION = '0.16';
 use 5.010;
 use strict;
 use warnings;
@@ -334,7 +334,8 @@ sub unpack_stringmultimap {
 
 # Metadata
 sub pack_metadata {
-    my ($metadata)= @_;
+    my ($protoversion, $is_result, $metadata)= @_;
+    die "pack_metadata can only encode v4 results" unless $protoversion == 4 and $is_result;
     my $columns= $metadata->{columns};
     my $paging_state= $metadata->{paging_state};
 
@@ -443,7 +444,7 @@ Cassandra::Client::Protocol
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 AUTHOR
 
@@ -451,7 +452,7 @@ Tom van der Woerdt <tvdw@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Tom van der Woerdt.
+This software is copyright (c) 2019 by Tom van der Woerdt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

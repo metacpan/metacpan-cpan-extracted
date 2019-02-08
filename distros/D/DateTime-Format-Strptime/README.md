@@ -4,7 +4,7 @@ DateTime::Format::Strptime - Parse and format strp and strf time patterns
 
 # VERSION
 
-version 1.75
+version 1.76
 
 # SYNOPSIS
 
@@ -63,7 +63,7 @@ This methods creates a new object. It accepts the following arguments:
 
     By default, this module turns your pattern into a regex that will match
     anywhere in a string. So given the pattern `%Y%m%d%H%M%S` it will match a
-    string like `20161214233712Z`. However, this also means that a this pattern
+    string like `20161214233712`. However, this also means that a this pattern
     will match **any** string that contains 14 or more numbers! This behavior can
     be very surprising.
 
@@ -388,7 +388,7 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2015 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 
