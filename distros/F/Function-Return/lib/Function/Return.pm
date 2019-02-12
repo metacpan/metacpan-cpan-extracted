@@ -3,7 +3,7 @@ package Function::Return;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.031";
 
 use attributes ();
 use Sub::Util ();
@@ -90,7 +90,7 @@ sub wrap_sub {
 
     my $src = q|
 sub {
-    _croak "Required list context in fun $shortname"
+    _croak "Required list context in fun $shortname because of multiple return values function"
         if @$types > 1 && !wantarray;
 
     # force LIST context.
@@ -236,7 +236,7 @@ Function::Return allows you to specify a return type for your functions.
 
 =head3 name
 
-you can change `Return` to your own name:
+you can change C<Return> to your own name:
 
     use Function::Return name => 'MyReturn';
 
@@ -286,14 +286,14 @@ L<Return::Type>
 
 =head1 LICENSE
 
-Copyright (C) Kenta, Kobayashi.
+Copyright (C) kfly8.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Kenta, Kobayashi E<lt>kentafly88@gmail.comE<gt>
+kfly8 E<lt>kfly@cpan.orgE<gt>
 
 =cut
 

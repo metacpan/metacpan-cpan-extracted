@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,5 +15,5 @@ name: Array-Circular
 resources:
   bugtracker: https://github.com/singingfish/p5-array-circular/issues
   repository: git://github.com/singingfish/p5-array-circular.git
-version: '0.002'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,45 @@
+---
+abstract: 'disable touchpad when a mouse is connected'
+author:
+  - 'Ilya Pavlov <ilux@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-DTWMIC
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::DTWMIC:
+    file: lib/App/DTWMIC.pm
+    version: '0.002'
+requires:
+  File::HomeDir: '0'
+  File::Which: '0'
+  Udev::FFI: '0.102000'
+  YAML::Tiny: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/Ilya33/App-DTWMIC/issues
+  homepage: https://github.com/Ilya33/App-DTWMIC
+  repository: git://github.com/Ilya33/App-DTWMIC.git
+version: '0.002'
+x_authority: cpan:ILUX
+x_contributors:
+  - 'Ilya Pavlov <iluxz@mail.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.132;
+our $VERSION = 1.134;
 
 use Quiq::File::Video;
 use POSIX ();
@@ -1533,7 +1533,7 @@ sub execute {
 
 =head1 VERSION
 
-1.132
+1.134
 
 =head1 AUTHOR
 

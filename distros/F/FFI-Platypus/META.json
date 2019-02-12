@@ -26,7 +26,9 @@
       },
       "configure" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "7.12",
+            "ExtUtils::ParseXS" : "3.30",
             "IPC::Cmd" : "0",
             "perl" : "5.008001"
          }
@@ -81,7 +83,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.80",
+   "version" : "0.82",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",
@@ -95,7 +97,7 @@
       "Damyan Ivanov",
       "Ilya Pavlov (Ilya33)"
    ],
-   "x_generated_by_perl" : "v5.29.4",
+   "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
    "x_use_unsafe_inc" : 0
 }

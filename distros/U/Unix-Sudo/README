@@ -1,0 +1,8 @@
+This perl module will let you run blocks of code as root even if your
+program is running as an ordinary user.
+
+Under the bonnet it uses sudo to run those small snippets of code and
+comes with ... some caveats.
+
+It's probably most useful for when you want to port a shell script
+that uses sudo into a somewhat more capable and maintainable language.

@@ -16,6 +16,7 @@ if ( !$ENV{HARNESS_ACTIVE} ) {
 
 use Win32::CommandLine;
 
+use File::Glob;
 use File::Spec;
 
 sub add_test;
@@ -205,17 +206,24 @@ add_test( [ qq{$0 --option="{,0}"} ], ( q/--option={,0}/ ) );
 if ($ENV{TEST_FRAGILE}) {
     sub add_path_tests {
         my ($path_prefix, $path_file) = @_;
-        my $path_dosify = dosify( $path_prefix.$path_file );
-        my $path_unixify = unixify( $path_prefix.$path_file );
+        my $path_original = $path_prefix.$path_file;
+        my $path_dosify = dosify( $path_original );
+        my $path_dosify_if_file = (-e $path_original) ? dosify( $path_original ) : $path_original;
+        my $path_unixify = unixify( $path_original );
+        # diag("path_prefix = '$path_prefix' ; path_file = '$path_file'");
 
-        add_test_for_caller( [ qq{$0 }.double_quote_path($path_prefix.$path_file), { dosify => 1 } ], ( $path_prefix.$path_file ) );
-        add_test_for_caller( [ qq{$0 }.double_quote_path($path_prefix.$path_file), { dosify => 'all'    } ], ( $path_dosify ) );
-        add_test_for_caller( [ qq{$0 }.double_quote_path($path_prefix).q({).double_quote_path($path_file).q(}), { dosify => 1 } ], ( $path_dosify ) );
-        add_test_for_caller( [ qq{$0 }.double_quote_path($path_prefix).q({).double_quote_path($path_file).q(}), { dosify => 1 } ], ( $path_dosify ) );
-        if (not ( $path_prefix =~ m/\s/ or $path_file =~ m/\s/)) {
-            add_test_for_caller( [ qq{$0 }.$path_prefix.$path_file, { dosify => 1 } ], ( $path_dosify ) );
-            add_test_for_caller( [ qq{$0 }.$path_prefix.qq{{"$path_file"}}, { dosify => 1 } ], ( $path_dosify ) );
-            add_test_for_caller( [ qq{$0 }.$path_prefix.qq{{"$path_file"}*}, { dosify => 1 } ], ( $path_dosify ) );
+        add_test_for_caller( [ qq{$0 }.double_quote_path($path_prefix.$path_file), { dosify => 1 } ], ( $path_original ) );
+        add_test_for_caller( [ qq{$0 }.double_quote_path($path_prefix.$path_file), { dosify => 'all' } ], ( $path_dosify_if_file ) );
+        add_test_for_caller( [ qq{$0 }.double_quote_path($path_prefix).q({).double_quote_path($path_file).q(}), { dosify => 1 } ], ( $path_dosify_if_file ) );
+        if (not ($path_prefix =~ m/\s/ or $path_file =~ m/\s/)) {
+            add_test_for_caller( [ qq{$0 }.$path_prefix.$path_file, { dosify => 1 } ], ( $path_original ) );
+            add_test_for_caller( [ qq{$0 }.$path_prefix.$path_file, { dosify => 'all' } ], ( $path_dosify_if_file ) );
+            add_test_for_caller( [ qq{$0 }.$path_prefix.qq{{"$path_file"}}, { dosify => 1 } ], ( $path_dosify_if_file ) );
+            my $p = $path_prefix.qq{{$path_file}*};
+            # diag("p = $p");
+            my @files = File::Glob::bsd_glob( $p, File::Glob::GLOB_BRACE | File::Glob::GLOB_NOCASE );
+            # diag("files = [ @files ]");
+            add_test_for_caller( [ qq{$0 }.$path_prefix.qq{{"$path_file"}*}, { dosify => 1 } ], dosify( @files ) );
             }
         return;
     }
@@ -246,23 +254,24 @@ if ($ENV{TEST_FRAGILE}) {
     add_path_tests( q{//localhost\\}.$drive_letter.q{$/}, $system_root_file );
 
     if (-e q{c:\Documents and Settings}) {
-        my @path = glob( 'c:\\documents and settings*' ); # get path in correct case
-        my ($path_v, $path_d, $path_f) = File::Spec->splitpath( $path[0] );
+        my $path = ( File::Glob::bsd_glob( 'c:\\documents and settings*', File::Glob::GLOB_NOCASE ) )[0]; # get path in correct case
+        # diag("path = $path");
+        my ($path_v, $path_d, $path_f) = File::Spec->splitpath( $path );
         my $path_l;
         ($path_l = $path_v) =~ s/:\z//;
-        add_path_tests( $path_v.q{\\}, $path_d.$path_f );
+        # diag("path_l = '$path_l' ; path_v = '$path_v' ; path_d = '$path_d' ; path_f = '$path_f' ;");
+        add_path_tests( $path_v.q{\\}, $path_f );
         add_path_tests( $path_v.q{/}, $path_d.$path_f );
         add_path_tests( q{//}.$ENV{UserDomain}.q{/}.$path_l.q{$/}, $path_d.$path_f );   # MORE FRAGILE :: USERDOMAIN may not point to this machine
         }
 
     add_path_tests( q{//}.$ENV{UserDomain}.q{/}.$drive_letter.q{$/}, $system_root_file );   # MORE FRAGILE :: USERDOMAIN may not point to this machine
 
-
-    #add_test( [ qq{$0 }.q{c:/{documents}*}, { dosify => 1 } ], ( q{"c:\\Documents and Settings"} ) );
-    #add_test( [ qq{$0 }.q{c:\\{windows}}, { dosify => 1 } ], ( q{c:\\windows} ) );
-    #add_test( [ qq{$0 }.q{c:\\{documents}*}, { dosify => 1 } ], ( q{"c:\\Documents and Settings"} ) );
-    #add_test( [ qq{$0 }.q{"c:\\"win*} ], ( q{Unbalanced command line quotes [#1] (at token`"c:\\"win*` from command line `}.qq{$0}.q{ "c:\\"win*`)} ) );       ##"
-    #add_test( [ qq{$0 }.q{"c:\\"win*}, { dosify => 1 } ], ( q{Unbalanced command line quotes [#1] (at token`"c:\\"win*` from command line `}.qq{$0}.q{ "c:\\"win*`)} ) );
+    add_test( [ qq{$0 }.q{c:/{documents}*}, { dosify => 1 } ], ( q{"c:\\Documents and Settings"} ) );
+    add_test( [ qq{$0 }.q{c:\\{windows}}, { dosify => 1 } ], ( q{c:\\windows} ) );
+    add_test( [ qq{$0 }.q{c:\\{documents}*}, { dosify => 1 } ], ( q{"c:\\Documents and Settings"} ) );
+    add_test( [ qq{$0 }.q{"c:\\"win*} ], ( q{Unbalanced command line quotes [#1] (at token`"c:\\"win*` from command line `}.qq{$0}.q{ "c:\\"win*`)} ) );       ##"
+    add_test( [ qq{$0 }.q{"c:\\"win*}, { dosify => 1 } ], ( q{Unbalanced command line quotes [#1] (at token`"c:\\"win*` from command line `}.qq{$0}.q{ "c:\\"win*`)} ) );
 
 
     # SLIGHTLY-FRAGILE
@@ -358,10 +367,10 @@ do_tests(); # test re-parsing of command_line() by argv()
 ##
 my @tests;
 sub add_test { push @tests, [ (caller(0))[2], @_ ]; return; }       ## NOTE: caller(EXPR) => ($package, $filename, $line, $subroutine, $hasargs, $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller($i);
-sub add_test_for_caller { push @tests, [ (caller(1))[2], @_ ]; return; }        ## NOTE: caller(EXPR) => ($package, $filename, $line, $subroutine, $hasargs, $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller($i);
+sub add_test_for_caller { push @tests, [ (caller(1))[2].'(via line:'.(caller(0))[2].')', @_ ]; return; }        ## NOTE: caller(EXPR) => ($package, $filename, $line, $subroutine, $hasargs, $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller($i);
 sub test_num { return scalar(@tests); }
 ## no critic (Subroutines::ProtectPrivateSubs)
-sub do_tests { foreach my $t (@tests) { my $line = shift @{$t}; my @args = @{shift @{$t}}; my @exp = @{$t}; my @got; eval { @got = Win32::CommandLine::parse(@args); 1; } or ( @got = ( $@ =~ /^(.*)\s+at.*$/ ) ); eq_or_diff \@got, \@exp, "[line:$line] testing: `@args`"; } return; }
+sub do_tests { foreach my $t (@tests) { my $line = shift @{$t}; my @args = @{shift @{$t}}; my @exp = @{$t}; my @got; eval { @got = Win32::CommandLine::parse(@args); 1; } or ( @got = ( $@ =~ /^(.*)\s+at.*$/ ) ); eq_or_diff \@got, \@exp, "[line:$line]: `@args`"; } return; }
 
 #### SUBs
 

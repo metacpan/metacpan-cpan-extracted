@@ -26,7 +26,7 @@ subtest 'single return' => sub {
 };
 
 subtest 'multi return' => sub {
-    my $required_list_context = qr!^Required list context in fun hoge at t/01_wrap_sub\.t line 14\.$!;
+    my $required_list_context = qr!^Required list context in fun hoge because of multiple return values function at t/01_wrap_sub\.t line 14\.$!;
 
     is_deeply([w(sub { 1, undef }, [Int, Undef])], [1, undef], 'multi return values/list context');
     like(exception { my $s = w(sub { 1, undef }, [Int, Undef]) }, $required_list_context, 'multi return values/scalar context');

@@ -1,11 +1,11 @@
 <!DOCTYPE markdown>
 <meta charset="utf-8" content="text/markdown" lang="en">
 
-<!-- "README.mkd" 0.958 (from "PL.#no-dist/README.mkd.PL") -->
+<!-- "README.mkd" 0.960 (from "PL.#no-dist/README.mkd.PL") -->
 
 [![[AppVeyor ~ build status]](https://ci.appveyor.com/api/projects/status/iw1gvhwo95rbfd4t/branch/master?svg=true)](https://ci.appveyor.com/project/rivy/perl-Win32-CommandLine)
 [![[Travis CI ~ build status]](https://travis-ci.org/rivy/perl.Win32-CommandLine.svg?branch=master)](https://travis-ci.org/rivy/perl.Win32-CommandLine)
 [![[Codecov ~ status]](https://codecov.io/gh/rivy/perl.Win32-CommandLine/branch/master/graph/badge.svg)](https://codecov.io/gh/rivy/perl.Win32-CommandLine)
 [![[Coveralls ~ status]](https://coveralls.io/repos/github/rivy/perl.Win32-CommandLine/badge.svg?branch=master)](https://coveralls.io/github/rivy/perl.Win32-CommandLine?branch=master)
 
-# [Win32-CommandLine](https://metacpan.org/pod/Win32::CommandLine)-0.958
+# [Win32-CommandLine](https://metacpan.org/pod/Win32::CommandLine)-0.960

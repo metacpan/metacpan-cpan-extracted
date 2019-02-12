@@ -11,7 +11,7 @@ use Capture::Tiny qw( capture_merged capture );
 use File::Temp qw( tempdir );
 
 # ABSTRACT: System detection and probing for FFI extensions.
-our $VERSION = '0.80'; # VERSION
+our $VERSION = '0.82'; # VERSION
 
 
 sub new
@@ -455,7 +455,7 @@ FFI::Probe - System detection and probing for FFI extensions.
 
 =head1 VERSION
 
-version 0.80
+version 0.82
 
 =head1 SYNOPSIS
 

@@ -14,7 +14,7 @@ my $cf_values = $cf_condition->Values->ItemsArrayRef;
 
 my $cf_conditioned_by = RT::CustomField->new(RT->SystemUser);
 $cf_conditioned_by->Create(Name => 'ConditionedBy', Type => 'Freeform', MaxValues => 1, Queue => 'General');
-$cf_conditioned_by->SetConditionedBy($cf_condition->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
+$cf_conditioned_by->SetConditionedBy($cf_condition->id, 'is', [$cf_values->[0]->Name, $cf_values->[2]->Name]);
 
 my $cf_conditioned_by_child = RT::CustomField->new(RT->SystemUser);
 $cf_conditioned_by_child->Create(Name => 'Child', Type => 'Freeform', MaxValues => 1, Queue => 'General', BasedOn => $cf_conditioned_by->id);
@@ -34,6 +34,7 @@ $ticket->AddCustomFieldValue(Field => $cf_conditioned_by_child->id , Value => 'S
 
 my ($base, $m) = RT::Extension::ConditionalCustomFields::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
+$mjs->driver->ua->timeout(540);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 $mjs->get($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id);
@@ -49,4 +50,4 @@ $mjs->get($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id);
 $ticket_cf_conditioned_by = $mjs->selector('#CF-'. $cf_conditioned_by->id . '-ShowRow', single => 1);
 ok($ticket_cf_conditioned_by->is_displayed, 'Display ConditionalCF when condition cf is not applied to current object');
 $ticket_cf_conditioned_by_child = $mjs->selector('#CF-'. $cf_conditioned_by_child->id . '-ShowRow', single => 1);
-ok($ticket_cf_conditioned_by_child->is_displayed, 'Display Child when condition cf applied to current object');
+ok($ticket_cf_conditioned_by_child->is_displayed, 'Display Child when condition cf is not applied to current object');

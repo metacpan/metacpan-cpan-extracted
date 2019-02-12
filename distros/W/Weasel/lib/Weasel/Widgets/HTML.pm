@@ -21,7 +21,7 @@ Weasel::Widgets::HTML - Helper module for bulk-registration of HTML widgets
 
 =head1 DEPENDENCIES
 
-This module wraps L<Selenium::Remote::Driver>, version 2.
+
 
 =cut
 

@@ -66,7 +66,7 @@ if (WriteMakefile(
         'ExtUtils::MakeMaker' => 4.52,
     },
     BUILD_REQUIRES => {
-        'Test::Most' => '0.30',
+        'Test::More' => '1.00',
         'List::Util' => '1.20',
     },
     PREREQ_PRINT   => 1,

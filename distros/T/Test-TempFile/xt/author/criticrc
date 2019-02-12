@@ -1,0 +1,74 @@
+# Perl::Critic configuration
+#
+# See https://metacpan.org/pod/Perl::Critic#CONFIGURATION for details of the
+# syntax in use here.
+#
+# See https://metacpan.org/pod/distribution/Perl-Critic/lib/Perl/Critic/PolicySummary.pod
+# for details of the policies available to use.
+#
+
+# Use all 'gentle' and 'stern' severity policies
+severity = 4
+
+####
+# Include some policies from more severe settings that we think are worth
+# following
+####
+
+# Use spaces instead of tabs.
+[CodeLayout::ProhibitHardTabs]
+severity = 4
+
+# Don't use whitespace at the end of lines.
+[CodeLayout::ProhibitTrailingWhitespace]
+severity = 4
+
+# The =head1 NAME section should match the package.
+[Documentation::RequirePackageMatchesPodName]
+severity = 4
+
+# Minimize complexity in code that is outside of subroutines.
+[Modules::ProhibitExcessMainComplexity]
+severity = 4
+
+# Minimize complexity in code in subroutines too
+[Subroutines::ProhibitExcessComplexity]
+severity = 4
+max_mccabe = 20
+
+# Too many arguments.
+[Subroutines::ProhibitManyArgs]
+severity = 4
+
+# Prevent access to private subs in other packages.
+[Subroutines::ProtectPrivateSubs]
+severity = 4
+
+# Prevent access to private vars in other packages.
+[Variables::ProtectPrivateVars]
+severity = 4
+
+####
+# Exclude some policies which we think are overly strict. Do this by bumping
+# them into the next severity group.
+####
+
+# End every path through a subroutine with an explicit return statement.
+[Subroutines::RequireFinalReturn]
+severity = 3
+
+# Don't declare your own open function.
+[Subroutines::ProhibitBuiltinHomonyms]
+severity = 3
+
+# Turn this off to allow 'a || b or die' which is a common idiom.
+[ValuesAndExpressions::ProhibitMixedBooleanOperators]
+severity = 3
+
+# This is important to avoid 'code before strictures is enabled' warnings
+# when using Moo.
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Moo Moo::Role
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Moo Moo::Role

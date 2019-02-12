@@ -1,0 +1,29 @@
+---
+abstract: 'TnT-style I/O utilities'
+author:
+  - 'Bryan Jurish <moocow@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-TT
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CDB_File: '0'
+  DB_File: '0'
+  Encode: '0'
+  File::Basename: '0'
+  Getopt::Long: '0'
+  JSON::XS: '0'
+  Pod::Usage: '0'
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

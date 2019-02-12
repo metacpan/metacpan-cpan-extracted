@@ -37,8 +37,8 @@ sub main::HELP_MESSAGE {
 			"-a <decimal days>  Search based on age.\n".
 			"-e <equality>  The equality to use when searching based on age.\n".
 			"-n   Nagios check mode.\n".
-			"-w <warn level>  Number of machines not backed up to warn at. Default is 1.\n".
 			"-c <crit level>  Number of machines not backed up to crit at. Default is 2.\n".
+			"-i <file>  File with hosts to ignore.\n".
 			"\n".
 			"Equilities: either symbol or name can be used\n".
 			"e, =\n".
@@ -50,7 +50,7 @@ sub main::HELP_MESSAGE {
 }
 
 sub main::VERSION_MESSAGE {
-        print "bpc-info v. 0.0.0\n";
+        print "bpc-info v. 0.1.1\n";
 }
 
 #finds the age in days
@@ -64,13 +64,38 @@ sub age{
 
 #gets the options
 my %opts=();
-getopts('lm:a:e:n', \%opts);
+getopts('lm:a:e:ni:c:w:', \%opts);
 
 if(!defined( $opts{w} )){
 	$opts{w}=1;
 }
 if(!defined( $opts{c} )){
 	$opts{c}=2;
+}
+
+#process the ignores file if required
+my %ignore=();
+if (defined( $opts{i} )){
+	my $ignorefh;
+	if (!open( $ignorefh, '<', $opts{i})){
+		warn('bpc-info:251: "'.$opts{i}.'" could not be opened or does not exist');
+		exit 251;
+	}
+
+	while ( my $line=$ignorefh->getline ){
+		#ignore comments and blank lines
+		if (
+			($line !~ /^#/) &
+			($line !~ /^$/)
+			){
+			#chomp it and remove white space
+			chomp($line);
+			$line=~s/^[\ \t]*//;
+			$line=~s/[\t\ ]*$//;
+			#save it in the shash for looking up later
+			$ignore{$line}=1;
+		}
+	}
 }
 
 #sets the default equality
@@ -100,7 +125,7 @@ if (!defined( $opts{e} )){
 }
 
 #as -a is used in a eval, do extra sanity checking
-if ( $opts{a} !~ /^\-?[0123456789]+\.?[0123456789]*$/ ){
+if ( defined($opts{a}) &&  ($opts{a} !~ /^\-?[0123456789]+\.?[0123456789]*$/) ){
 	warn('bpcinfo:253: "'.$opts{a}.'" is non-numeric');
 	exit 252;
 }
@@ -166,18 +191,20 @@ if (defined( $opts{a} )){
 	my $matched=0;
 	
 	foreach my $machine (@machines){
-		my $data=$bpcinfo->get_last($machine);
-		my $age=age($data->{startTime});
-
-		my $hit=0;
-		my $toEval='if ( $age '.$opts{e}.' '.$opts{a}.'){ $hit=1;  }';
-		eval( $toEval );
-
-		if ( $hit ){
-			if (defined( $opts{n} )) {
-				$matched++;
-			}else{
-				print $machine.': '. $age."\n";
+		if (!defined($ignore{$machine}) ){
+			my $data=$bpcinfo->get_last($machine);
+			my $age=age($data->{startTime});
+			
+			my $hit=0;
+			my $toEval='if ( $age '.$opts{e}.' '.$opts{a}.'){ $hit=1;  }';
+			eval( $toEval );
+			
+			if ( $hit ){
+				if (defined( $opts{n} )) {
+					$matched++;
+				}else{
+					print $machine.': '. $age."\n";
+				}
 			}
 		}
 	}
@@ -202,9 +229,9 @@ bpc-info - A utility to get backup information from BackupPC in regards to backu
 
 =head1 SYNOPSIS
 
-cps B<-l> B<-m> <machine>
-cps B<-a> <days> B<-e> <equality>
-cps B<-a> <days> B<-e> <equality> B<-n> [B<-w> <warn level>] [B<-c> <critical level>]
+bpc-info B<-l> B<-m> <machine>
+bpc-info B<-a> <days> B<-e> <equality>
+bpc-info B<-a> <days> B<-e> <equality> B<-n> [B<-w> <warn level>] [B<-c> <critical level>] [B<-i> <ignore file>]
 
 =head1 USAGE
 
@@ -242,6 +269,23 @@ The understood ones are listed below.
     le, <=
     gt, >
     ge, >=
+
+=head2 B<-i> <ignore file>
+
+This is a file that contains the hostnames to be ignored.
+
+Lines starting with # are ignored.
+
+White space at the start or end of a line is removed.
+
+There can be one hostname per line.
+
+Empty lines are ignored.
+
+    # a comment
+    foo.bar
+    # another comment 
+        foo.bar
 
 =head2 B<-l>
 

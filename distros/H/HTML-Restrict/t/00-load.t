@@ -56,7 +56,7 @@ my $img = q[<body><img src="/face.jpg" width="10" height="10" /></body>];
 my $processed_img = $hr->process( $img );
 cmp_ok(
     $processed_img, 'eq',
-    '<img src="/face.jpg" width="10" height="10" />',
+    '<img src="/face.jpg" width="10" height="10">',
     "closing slash preserved in image"
 );
 

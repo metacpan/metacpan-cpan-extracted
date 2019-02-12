@@ -2,7 +2,7 @@ NAME
     Win32::CommandLine - Retrieve and reparse the Win32 command line
 
 VERSION
-     $Win32::CommandLine::VERSION = '0.958';  # Win32-CommandLine-0.958
+     $Win32::CommandLine::VERSION = '0.960';  # Win32-CommandLine-0.960
 
 SYNOPSIS
      @ARGV = Win32::CommandLine::argv() if eval { require Win32::CommandLine; };
@@ -439,9 +439,9 @@ SUPPORT
 
         <https://www.cpantesters.org/distro/W/Win32-CommandLine.html>
 
-        <http://matrix.cpantesters.org/?dist=Win32-CommandLine+0.958>
+        <http://matrix.cpantesters.org/?dist=Win32-CommandLine+0.960>
 
-        <http://fast-matrix.cpantesters.org/?dist=Win32-CommandLine+0.958>
+        <http://fast-matrix.cpantesters.org/?dist=Win32-CommandLine+0.960>
 
     *   CPANTS: CPAN Testing Service module summary
 

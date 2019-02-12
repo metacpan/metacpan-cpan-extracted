@@ -24,6 +24,7 @@ RT->Config->Set('CustomFieldGroupings',
 
 my ($base, $m) = RT::Extension::ConditionalCustomFields::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
+$mjs->driver->ua->timeout(540);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 my $ticket = RT::Ticket->new(RT->SystemUser);
@@ -31,7 +32,7 @@ $ticket->Create(Queue => 'General', Subject => 'Test Ticket ConditionalCF');
 $ticket->AddCustomFieldValue(Field => $cf_condition->id , Value => $cf_values->[0]->Name);
 $ticket->AddCustomFieldValue(Field => $cf_conditioned_by->id , Value => 'See me?');
 
-$cf_conditioned_by->SetConditionedBy($cf_condition->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
+$cf_conditioned_by->SetConditionedBy($cf_condition->id, 'is', [$cf_values->[0]->Name, $cf_values->[2]->Name]);
 
 $cf_conditioned_by->SetPattern('(?#Mandatory).');
 my ($ok, $msg) = $ticket->DeleteCustomFieldValue(Field => $cf_conditioned_by->id , Value => 'See me?');

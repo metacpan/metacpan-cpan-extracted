@@ -2,75 +2,152 @@ package FFI::Library;
 
 use strict;
 use warnings;
-use Carp qw( croak );
-use FFI;
+use Carp ();
+use constant _is_win => $^O =~ /^(MSWin32|cygwin|msys2?)$/;
 
-our $VERSION = '1.12';
+# ABSTRACT: Perl Access to Dynamically Loaded Libraries
+our $VERSION = '1.14'; # VERSION
 
-if ($^O eq 'MSWin32') {
-    require Win32;
-}
-else {
+sub new
+{
+  my($class, $libname, $flags) = @_;
+  Carp::croak('Usage: $lib = FFI::Library->new($filename [, $flags ])')
+    unless @_ <= 3;
+
+  $flags ||= 0;
+
+  if(! defined $libname)
+  {
+    return bless {
+      impl => 'null',
+    }, $class;
+  }
+  elsif(ref $libname and int($libname) == int(\$0))
+  {
+    return $class->_dl_impl(undef, undef);
+  }
+  elsif(_is_win)
+  {
+    return $class->_dl_impl($libname, undef);
+  }
+  elsif(-e $libname)
+  {
+    return $class->_dl_impl(
+      $libname,
+      $flags == 0x01 ? FFI::Platypus::Lang::DL::RTLD_GLOBAL() : undef,
+    );
+  }
+  else
+  {
     require DynaLoader;
+    my $so = DynaLoader::dl_findfile($libname) || $libname;
+    my $handle = DynaLoader::dl_load_file($so, $flags || 0);
+    return unless $handle;
+    return bless {
+      impl => 'dynaloader',
+      handle => $handle,
+    }, $class;
+  }
 }
 
-sub new {
-    my $class = shift;
-    my $libname = shift;
-    scalar(@_) <= 1
-        or croak 'Usage: $lib = new FFI::Library($filename [, $flags])';
-    my $lib;
-    if ($^O eq 'MSWin32') {
-        $lib = Win32::LoadLibrary($libname) or return undef;
-    }
-    else {
-        my $so = $libname;
-        -e $so or $so = DynaLoader::dl_findfile($libname) || $libname;
-        $lib = DynaLoader::dl_load_file($so, @_)
-            or return undef;
-    }
-    bless \$lib, $class;
+sub _dl_impl
+{
+  my($class, $path, $flags) = @_;
+  require FFI::Platypus::DL;
+  $flags = FFI::Platypus::DL::RTLD_PLATYPUS_DEFAULT()
+    unless defined $flags;
+  my $handle = FFI::Platypus::DL::dlopen($path, $flags);
+  return unless defined $handle;
+  bless { impl => 'dl', handle => $handle }, $class;
 }
 
-sub DESTROY {
-    if ($^O eq 'MSWin32') {
-        Win32::FreeLibrary(${$_[0]});
-    }
-    else {
-        DynaLoader::dl_free_file(${$_[0]})
-            if defined (&DynaLoader::dl_free_file);
-    }
+sub address
+{
+  my($self, $name) = @_;
+
+  if($self->{impl} eq 'dl')
+  {
+    return FFI::Platypus::DL::dlsym($self->{handle}, $name);
+  }
+  elsif($self->{impl} eq 'dynaloader')
+  {
+    return DynaLoader::dl_find_symbol($self->{handle}, $name);
+  }
+  elsif($self->{impl} eq 'null')
+  {
+    return;
+  }
+  else
+  {
+    Carp::croak("Unknown implementaton: @{[ $self->{impl} ]}");
+  }
 }
 
-sub function {
-    my $self = shift;
-    my $name = shift;
-    my $sig = shift;
-    my $addr;
-    if ($^O eq 'MSWin32') {
-        $addr = Win32::GetProcAddress(${$self}, $name);
-    }
-    else {
-        $addr = DynaLoader::dl_find_symbol(${$self}, $name);
-    }
-    croak "Unknown function $name" unless defined $addr;
+sub function
+{
+  my($self, $name, $sig) = @_;
 
-    sub { FFI::call($addr, $sig, @_); }
+  my $addr = $self->address($name);
+
+  Carp::croak("Unknown function $name")
+    unless defined $addr;
+
+  require FFI;
+  sub { FFI::call($addr, $sig, @_) };
+}
+
+sub DESTROY
+{
+  my($self) = @_;
+
+  if($self->{impl} eq 'dl')
+  {
+    FFI::Platypus::DL::dlclose($self->{handle});
+  }
+  elsif($self->{impl} eq 'dynaloader')
+  {
+    DynaLoader::dl_free_file($self->{handle})
+      if defined &DynaLoader::dl_free_file;
+  }
+  elsif($self->{impl} eq 'null')
+  {
+    # do nothing
+  }
+  else
+  {
+    Carp::croak("Unknown implementaton: @{[ $self->{impl} ]}");
+  }
 }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 FFI::Library - Perl Access to Dynamically Loaded Libraries
 
+=head1 VERSION
+
+version 1.14
+
 =head1 SYNOPSIS
 
-    use FFI::Library;
-    $lib = FFI::Library->new("mylib");
-    $fn = $lib->function("fn", "signature");
-    $ret = $fn->(...);
+ # call function from arbitrary dynamic library
+ use FFI::Library;
+ $lib = FFI::Library->new("mylib");
+ $fn = $lib->function("fn", "signature");
+ $ret = $fn->(...);
+
+ # call function from libc
+ $clib_file = ($^O eq "MSWin32") ? "MSVCRT40.DLL" : "-lc";
+ $clib = FFI::Library->new($clib_file);
+ $strlen = $clib->function("strlen", "cIp");
+ $n = $strlen->($my_string);
 
 =head1 DESCRIPTION
 
@@ -78,15 +155,38 @@ This module provides access from Perl to functions exported from dynamically
 linked libraries. Functions are described by C<signatures>, for details of
 which see the L<FFI> module's documentation.
 
-Newer and better maintained FFI modules such as L<FFI::Platypus> provide 
-more functionality and should probably be considered for new projects.
+Newer and better maintained FFI modules such as L<FFI::Platypus> provide more
+functionality and should probably be considered for new projects.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+ my $lib = FFI::Library->new($libname);
+
+Creates an instance of C<FFI::Library>.
+
+=head1 FUNCTIONS
+
+=head2 address
+
+ my $address = $lib->address($function_name);
+
+Returns the symbol of the given function.  Returns C<undef> if
+the symbol is not found.
+
+=head2 function
+
+ my $sub = $lib->function($function_name, $signature);
+
+Creates a code-reference like object which you can call.
 
 =head1 EXAMPLES
 
-    $clib_file = ($^O eq "MSWin32") ? "MSVCRT40.DLL" : "-lc";
-    $clib = FFI::Library->new($clib_file);
-    $strlen = $clib->function("strlen", "cIp");
-    $n = $strlen->($my_string);
+ $clib_file = ($^O eq "MSWin32") ? "MSVCRT40.DLL" : "-lc";
+ $clib = FFI::Library->new($clib_file);
+ $strlen = $clib->function("strlen", "cIp");
+ $n = $strlen->($my_string);
 
 =head1 SUPPORT
 
@@ -112,29 +212,29 @@ Portable functions for finding libraries.
 Platypus is another FFI interface based on libffi.  It has a more
 extensive feature set, and libffi has a less restrictive license.
 
-=item L<Win32::API>
-
-An FFI interface for Perl on Microsoft Windows.
-
 =back
 
 =head1 AUTHOR
 
-Paul Moore, C<< <gustav@morpheus.demon.co.uk> >> is the original author
-of L<FFI>.
+Original author: Paul Moore E<lt>gustav@morpheus.demon.co.ukE<gt>
 
-Mitchell Charity C<< <mcharity@vendian.org> >> contributed fixes.
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
-Anatoly Vorobey C<< <avorobey@pobox.com> >> and Gaal Yahas C<<
-<gaal@forum2.org> >> are the current maintainers.
+Contributors:
 
-Graham Ollis C<< <plicease@cpan.org >> is the current maintainer
+Anatoly Vorobey E<lt>avorobey@pobox.comE<gt>
 
-=head1 LICENSE
+Gaal Yahas E<lt>gaal@forum2.orgE<gt>
 
-This software is copyright (c) 1999 by Paul Moore.
+Mitchell Charity E<lt>mcharity@vendian.orgE<gt>
+
+Reini Urban E<lt>E<lt>RURBAN@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016-2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License
+the same terms as the Perl 5 programming language system itself.
 
 =cut

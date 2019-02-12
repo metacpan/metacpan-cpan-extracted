@@ -1,5 +1,5 @@
 This archive contains the distribution Perl-Critic-Policy-RegularExpressions-RequireDefault,
-version 2.00:
+version 2.01:
 
   Always use the C</a> or C</aa> modifier with regular expressions.
 

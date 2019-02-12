@@ -1,6 +1,7 @@
 NAME
 
-    Array::Circular
+    Array::Circular - Provide an array data structure that can go around in
+    circles.
 
  DESCRIPTION
 
@@ -8,7 +9,7 @@ NAME
 
  SYNOPSIS
 
-        my $a = Array->Circular->new(qw/once upon a time there was/);
+        my $a = Array::Circular->new(qw/once upon a time there was/);
         my $current = $l->next;
         say "They are the same" if $current == $l->current;
         my $first = $l->previous;
@@ -86,7 +87,8 @@ NAME
  TODO
 
     Not thread safe. See implementation of Hash::MultiValue for
-    implementation of thread safety.
+    implementation of thread safety. Alternatively use
+    Hash::Util::FieldHash or Hash::Util::FieldHash::Compat.
 
  AUTHOR COPYRIGHT AND LICENSE
 

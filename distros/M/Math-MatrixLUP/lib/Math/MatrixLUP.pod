@@ -1,0 +1,480 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::MatrixLUP - Matrix operations and LUP decomposition.
+
+=head1 VERSION
+
+Version 0.02
+
+=head1 SYNOPSIS
+
+    use Math::MatrixLUP;
+    use Math::AnyNum qw(:overload);
+
+    my $A = Math::MatrixLUP->new([
+        [2, -1,  5,  1],
+        [3,  2,  2, -6],
+        [1,  3,  3, -1],
+        [5, -2, -3,  3],
+    ]);
+
+    my $det = $A->determinant;
+    my $sol = $A->solve([-3, -32, -47, 49]);
+    my $inv = $A->invert;
+    my $pow = $A**3;
+    my $pwm = $A->powmod(100, 10000019);
+    my $mod = $A % 10007;
+
+=head1 DESCRIPTION
+
+Math::MatrixLUP provides generic support for matrix operations and LUP decomposition, allowing any type of numbers inside the matrix, including native Perl numbers and numerical objects provided by other mathematical libraries, such as L<Math::AnyNum>.
+
+The following matrix operations are provided:
+
+=over 2
+
+=item * matrix-scalar arithmetical operations
+
+=item * matrix multiplication and division
+
+=item * matrix exponentiation
+
+=item * determinant of a square-matrix
+
+=item * inverting a square-matrix
+
+=item * solving a system of linear equations
+
+=back
+
+Math::MatrixLUP objects are B<immutable>.
+
+=head1 METHODS
+
+=head2 new
+
+Create a new B<Math::MatrixLUP> object, given a 2D array-ref:
+
+    my $A = Math::MatrixLUP->new([
+            [rand,rand,rand],
+            [rand,rand,rand],
+            [rand,rand,rand],
+    ]);
+
+=head2 identity / I
+
+Returns a nXn identity matrix, given an integer argument:
+
+    my $I = Math::MatrixLUP->I(3);
+    my $I = Math::MatrixLUP->identity(3);
+
+=head2 build
+
+Build a new nXm matrix, given two integers and a subroutine reference as arguments:
+
+    my $A = Math::MatrixLUP->build($n, $m, sub ($i, $j) {
+        $i * $j
+    });
+
+If only one integer is given, it creates a square nXn matrix:
+
+    my $B = Math::MatrixLUP->build($n, sub ($i, $j) {
+        $i**$j
+    });
+
+The values of C<i> (row number) and C<j> (column number) range from C<[0, n-1]> and C<[0, m-1]>.
+
+=head2 zero
+
+Returns a new nXm matrix with all entries set to 0.
+
+    my $A = Math::MatrixLUP->zero(3);       # 3x3 zero-matrix
+    my $A = Math::MatrixLUP->zero(3, 4);    # 3x4 zero-matrix
+
+=head2 scalar
+
+Returns a new square matrix with the diagonal set a given value.
+
+    my $A = Math::MatrixLUP->scalar(3, 42);  # 3x3 scalar with value 42
+
+=head2 from_rows
+
+A construct method that creates a new matrix, given a list of array-ref rows:
+
+    my $A = Math::MatrixLUP->from_rows(
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+    );
+
+=head2 from_columns
+
+A construct method that creates a new matrix, given a list of array-ref columns:
+
+    my $A = Math::MatrixLUP->from_columns(
+        [1, 4, 7],
+        [2, 5, 8],
+        [3, 6, 9],
+    );
+
+=head2 set_row
+
+Returns a new matrix with the n-th (zero-based) row set to the given array-ref of values:
+
+    my $B = $A->set_row(0, [1,2,3,4]);      # set first row
+
+=head2 set_column
+
+Returns a new matrix with the n-th (zero-based) column set to the given array-ref of values:
+
+    my $B = $A->set_column(0, [1,2,3,4]);   # set first column
+
+=head2 row
+
+A constructor method that creates a row vector, given a single array-ref of numbers.
+
+    my $row_vector = Math::MatrixLUP->row([1, 4, 4, 8]);
+
+When called on a matrix object, it returns the n-th row (zero-based) as an array-ref.
+
+    my $row = $A->row(0);     # first row as an array-ref
+
+=head2 rows
+
+Returns the rows of the matrix as an array of array-refs.
+
+    my @rows = $A->rows;
+
+=head2 column
+
+A constructor method that creates a column vector, given a single array-ref of numbers.
+
+    my $column_vector = Math::MatrixLUP->column([1, 4, 4, 8]);
+
+When called on a matrix object, it returns the n-th column (zero-based) as an array-ref.
+
+    my $col = $A->column(0);  # first column as an array-ref
+
+=head2 columns
+
+Returns the columns of the matrix as an array of array-refs.
+
+    my @columns = $A->columns;
+
+=head2 diagonal
+
+A constructor method that creates a diagonal matrix from a single array-ref of numbers.
+
+    my $A = Math::MatrixLUP->diagonal([1, 4, 4, 8]);
+
+The matrix is zero filled except for the diagonal, which take the value of the given vector.
+
+When called on a matrix object, it returns the diagonal as an array-ref:
+
+    my $diag = $A->diagonal;
+
+=head2 anti_diagonal
+
+A constructor method that creates an anti-diagonal matrix from a single array-ref of numbers.
+
+    my $A = Math::MatrixLUP->anti_diagonal([1, 4, 4, 8]);
+
+The matrix is zero filled except for the anti-diagonal, which take the value of the given vector.
+
+When called on a matrix object, it returns the anti-diagonal as an array-ref:
+
+    my $diag = $A->anti_diagonal;
+
+=head1 * Arithmetic operations
+
+=head2 neg
+
+Returns a new matrix with all the terms negated.
+
+    my $B = -$A;
+    my $B =  $A->neg;
+
+=head2 abs
+
+Returns a new matrix with the C<abs()> function applied to all terms.
+
+    my $B = abs($A);
+    my $B = $A->abs;
+
+=head2 floor
+
+Returns a new matrix with the C<floor()> function applied to all terms.
+
+    my $B = $A->floor;
+
+=head2 ceil
+
+Returns a new matrix with the C<ceil()> function applied to all terms.
+
+    my $B = $A->ceil;
+
+=head2 add
+
+Add two matrices of the same dimensions:
+
+    my $C = $A + $B;
+    my $C = $A->add($B);
+
+If one of the arguments it not a B<Math::MatrixLUP> object, scalar addition is performed:
+
+    my $B = $A + $scalar;
+
+=head2 sub
+
+Subtract two matrices of the same dimensions:
+
+    my $C = $A - $B;
+    my $C = $A->sub($B);
+
+If one of the arguments it not a B<Math::MatrixLUP> object, scalar subtraction is performed:
+
+    my $B = $A - $scalar;
+    my $B = $scalar - $A;
+
+=head2 mul
+
+Multiplication of two matrices, where the number of columns in B<A> equals the number of rows in B<B>.
+
+    my $C = $A * $B;
+    my $C = $A->mul($B);
+
+If one of the arguments it not a B<Math::MatrixLUP> object, scalar multiplication is performed:
+
+    my $B = $A * $scalar;
+
+=head2 div
+
+Division of two matrices.
+
+    my $C = $A / $B;
+    my $C = $A->div($B);
+
+Defined as:
+
+    A/B = A * B^(-1)
+
+If one of the arguments it not a B<Math::MatrixLUP> object, scalar division is performed:
+
+    my $B = $A / $scalar;
+    my $B = $scalar / $A;
+
+=head2 mod
+
+Modulo operation.
+
+    my $C = $A % $B;
+    my $C = $A->mod($B);
+
+Defined as:
+
+    A mod B = A - B*floor(A/B)
+
+If one of the arguments it not a B<Math::MatrixLUP> object, scalar modulo is performed:
+
+    my $B = $A % $scalar;
+    my $B = $scalar % $A;
+
+=head2 pow
+
+Matrix exponentiation, where the exponent is a native integer:
+
+    my $B = $A**$n;
+    my $B = $A->pow($n);
+
+For negative C<n>, this operation is defined only if the matrix can be inverted.
+
+=head2 powmod
+
+Matrix exponentiation modulo C<m>, where the exponent is an arbitrary large positive integer:
+
+    my $B = $A->powmod($n, $m);
+
+Negative exponents are not supported yet.
+
+=head1 * Bitwise operations
+
+This section includes method for scalar and entrywise matrix bitwise operations.
+
+=head2 lsft / rsft / or / xor / and
+
+Bitwise scalar operations:
+
+    my $B = $A->lsft(2);  # left-shift by 2 applied to each value
+    my $B = $A->rsft(2);  # right-shift by 2 applied to each value
+    my $B = $A->or(2);    # OR 2 applied to each value
+    my $B = $A->xor(2);   # XOR 2 applied to each value
+    my $B = $A->and(2);   # AND 2 applied to each value
+
+Entrywise bitwise operations:
+
+    my $C = $A->lsft($B);     # entrywise left-shift
+    my $C = $A->rsft($B);     # entrywise right-shift
+    my $C = $A->or($B);       # entrywise OR
+    my $C = $A->xor($B);      # entrywise XOR
+    my $C = $A->and($B);      # entrywise AND
+
+=head1 * Transformations
+
+=head2 flip
+
+Returns a new matrix with rows and columns flipped.
+
+=head2 vertical_flip
+
+Returns a new matrix with rows flipped.
+
+=head2 horizontal_flip
+
+Returns a new matrix with columns flipped.
+
+=head2 transpose
+
+Returns the transposed matrix. This is the matrix where colums and
+rows of the argument matrix are swaped.
+
+=head2 concat
+
+Concatenates two matrices of same row count. The result is a new matrix.
+
+=head2 map
+
+Map each entry of a matrix to a given subroutine callback.
+
+    my $B = $A->map(sub { $_**2 });  # new matrix with each entry squared
+
+The subroutine is called with C<$i> and C<$j> as arguments, such that C<< $_ = $A->[$i][$j] >>.
+
+=head1 * Comparisons
+
+=head2 eq / ne
+
+Decide if two matrices are equal or not.
+
+    $A == $B      # true if equal
+    $A != $B      # true if not equal
+
+=head2 lt / le / gt / ge / cmp
+
+Compare two matrices, entrywise:
+
+    $A  <  $B      # true if A is less than B
+    $A  <= $B      # true if A is less than or equal to B
+    $A  >  $B      # true if A is greater than B
+    $A  >= $B      # true if A is greater than or equal to B
+    $A <=> $B      # -1 if A < B, 0 if A == B, 1 if A > B
+
+=head1 * Linear algebra
+
+=head2 solve
+
+Solve a system of linear equations.
+
+    my $A = Math::MatrixLUP->new([
+        [2, -1,  5,  1],
+        [3,  2,  2, -6],
+        [1,  3,  3, -1],
+        [5, -2, -3,  3],
+    ]);
+
+    my $solution = $A->solve([-3, -32, -47, 49]);
+    say join(', ', @{$solution});  #=> 2, -12, -4, 1
+
+=head2 inv / invert
+
+Invert a square matrix.
+
+    my $B = $A->inv;
+
+=head2 det / determinant
+
+Compute the determinant of a square matrix.
+
+=head2 rref
+
+Returns the reduced row echelon form of the self-matrix.
+
+    my $B = $A->rref;
+
+=head2 decompose
+
+Returns the LUP decomposition of the self matrix.
+
+    my ($N, $A, $P) = $matrix->decompose;
+
+There is no need to call this method explicitly. It is called internally automatically and is cached at object-level.
+
+=head1 * Other methods
+
+=head2 clone
+
+Returns a deep copy of the self-matrix.
+
+=head2 size
+
+Returns the dimensions of the matrix (1-based):
+
+    my ($rows, $cols) = $A->size;
+
+=head1 * Conversions
+
+=head2 as_array
+
+Returns the matrix as a 2D array-ref.
+
+=head2 stringify
+
+Retruns a stringified version of the self-matrix.
+
+=head1 OVERLOADING
+
+The entries of a Math::MatrixLUP object can be accessed as an array-ref:
+
+    my $Aij = $A->[$i][$j];
+
+However, modifying the matrix in-place is not recommended, as Math::MatrixLUP uses dynamic caching
+at object-level in order to avoid recomputing the LUP decomposition multiple times for the same matrix-object.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * Related libraries
+
+L<Math::Matrix> - Multiply and invert matrices.
+
+L<Math::GSL::Matrix> - Mathematical functions concerning Matrices using the GNU Scientific Library (GSL).
+
+L<Math::MatrixDecomposition::LU> - LU decomposition with partial pivoting of a real matrix.
+
+L<Math::AnyNum> - Arbitrary size precision for integers, rationals, floating-points and complex numbers.
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/trizen/Math-MatrixLUP>
+
+=head1 REFERENCES
+
+L<https://en.wikipedia.org/wiki/LU_decomposition>
+
+=head1 AUTHOR
+
+Daniel Șuteu, C<< <trizen at cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2019 Daniel Șuteu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.22.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

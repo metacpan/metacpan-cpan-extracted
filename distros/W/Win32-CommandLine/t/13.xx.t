@@ -82,13 +82,13 @@ add_test( [ q{perl -MPerl::MinimumVersion -e "$pmv = Perl::MinimumVersion->new('
 add_test( [ q{perl -e "$_ = 'abc'; s/a/bb/; print"} ], ( q{perl -e "$_ = 'abc'; s/a/bb/; print"} ) );
 add_test( [ q{xx -e perl -e "$x = split( /x/, q{}); print $x;"} ], ( q{xx -e perl -e "$x = split( /x/, q{}); print $x;"} ) );       ## prior BUG
 
-# design decision = non-quoted/non-glob expanded tokens be NOT be dosified (or really, changed at all)
+# design decision = non-quoted/non-glob expanded tokens should NOT be dosified (or really, changed at all)
 add_test( [ q{/THIS_IS_NOT_A_FILE_sa9435kj4j5j545jn2230096jkjlk5609345k3l5j3lk} ], ( q{/THIS_IS_NOT_A_FILE_sa9435kj4j5j545jn2230096jkjlk5609345k3l5j3lk} ) );   # non-files (can screw up switches) ## assume not FRAGILE (name should be unique)
 
 if (-e 'c:/windows') {
     # case preservation of non-globbed args
-    add_test( [ q{c:/windows} ], ( q{c:/windows} ) );       # non-expanded files have no case changes   ## ? FRAGILE (b/c case differences between WINDOWS)
-    add_test( [ q{c:/WiNDowS} ], ( q{c:/WiNDowS} ) );       # non-expanded files have no case changes   ## ? FRAGILE (b/c case differences between WINDOWS)
+    add_test( [ q{c:/windows} ], ( q{c:/windows} ) );       # non-expanded files have no case changes
+    add_test( [ q{c:/WiNDowS} ], ( q{c:/WiNDowS} ) );       # non-expanded files have no case changes
     }
 
 if (-e "$ENV{SystemRoot}/system" ) {
@@ -108,7 +108,10 @@ if ($ENV{TEST_FRAGILE}) {
     # depends on xx.bat maintaining the exact same version output
     if ($haveExtUtilsMakeMaker)
         {# ExtUtilsMakeMaker present
-        add_test( [ q{-v} ], ( q{xx.bat v}.MM->parse_version($script) ) );
+        # diag("script = $script");
+        my $v = MM->parse_version($script);
+        $v =~ s/_//gmsx;
+        add_test( [ q{-v} ], ( q{xx.bat v}.$v ) );
         }
     }
 
@@ -147,15 +150,17 @@ add_test( [ q{perl -e "print `xx -e t\*.t`"} ], ( q{perl -e "print `xx -e t\*.t`
 
 if ($ENV{TEST_FRAGILE}) {
     # USERNAME expansion
-    add_test( [ q{~} ], ( dosify($ENV{USERPROFILE}) ) );                    ## ? FRAGILE
+    add_test( [ q{~} ], ( dosify($ENV{USERPROFILE}) ) );                ## ? FRAGILE
     add_test( [ qq{~$ENV{USERNAME}} ], ( dosify($ENV{USERPROFILE}) ) ); ## ? FRAGILE
 
     # Overriding USERNAME expansion with %ENV
     $ENV{'~NOTAUSERNAME'} = '/test';    ## no critic ( RequireLocalizedPunctuationVars )
     add_test( [ q{~NOTAUSERNAME} ], ( q{\\test} ) );    ## slightly FRAGILE (unlikely, but could be a USER)
     ## Modifies other tests :: must reverse changes before another test is run ... use startup => "$ENV{qq{~$USERNAME}} = '/test'", breakdown => "$ENV{qq{~$USERNAME}}=undef"
-    ##$ENV{"~$USERNAME"} = '/test';
-    ##do_test( [ qq{~$ENV{USERNAME}} ], ( q{\\test} ) );    ## ? FRAGILE
+    # $ENV{'~'.$ENV{'USERNAME'}} = '/test#2';
+    # add_test( [ qq{~$ENV{USERNAME}} ], ( q{\\test#2} ) );    ## ? FRAGILE
+    # delete $ENV{'~'.$ENV{'USERNAME'}};
+    # add_test( [ qq{~$ENV{USERNAME}} ], ( dosify($ENV{USERPROFILE}) ) ); ## ? FRAGILE
     }
 
 # Subshells - argument generation via subshell execution & subsequent expansion of subshell output

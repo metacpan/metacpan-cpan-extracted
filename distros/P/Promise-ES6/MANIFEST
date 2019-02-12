@@ -1,0 +1,22 @@
+.gitignore
+.travis.yml
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+lib/Promise/ES6.pm
+t/00_compile.t
+t/all.t
+t/await.t
+t/catch.t
+t/lib/.PromiseTest.pm.swp
+t/lib/PromiseTest.pm
+t/multi_then.t
+t/race.t
+t/reject.t
+t/resolve.t
+t/then.t
+t/then_catch.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

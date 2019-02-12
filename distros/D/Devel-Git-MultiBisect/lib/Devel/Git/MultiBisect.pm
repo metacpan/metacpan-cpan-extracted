@@ -14,7 +14,7 @@ use File::Spec;
 use File::Temp;
 use List::Util qw(sum);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -76,8 +76,9 @@ documentation for further discussion.
 
 =item * B<commit>
 
-An individual commit to a F<git> repository as denoted by a SHA.  When a commit is
-called for as the argument to a function, you can also use a F<git tag>.
+A source code change set entered ("committed") to a F<git> repository.  Each
+commit is denoted by a SHA.  In this library, whenever a commit is called for
+as the argument to a function, you can also use a F<git tag>.
 
 =item * B<commit range>
 
@@ -90,7 +91,9 @@ A test file from the test suite of the application or library under study.
 =item * B<test output>
 
 What is sent to STDOUT or STDERR as a result of calling a test program such as
-F<prove> or F<t/harness> on an individual target file.
+F<prove> or F<t/harness> on an individual target file.  Currently we assume
+that all such test programs are written based on the
+L<Test Anything Protocol (TAP)|https://en.wikipedia.org/wiki/Test_Anything_Protocol>.
 
 =item * B<transitional commit>
 
@@ -594,7 +597,7 @@ or through the web interface at L<http://rt.cpan.org>.
 James E. Keenan (jkeenan at cpan dot org).  When sending correspondence, please
 include 'Devel::Git::MultiBisect' or 'Devel-Git-MultiBisect' in your subject line.
 
-Creation date:  October 12 2016. Last modification date:  January 03 2019.
+Creation date:  October 12 2016. Last modification date:  February 11 2019.
 
 Development repository: L<https://github.com/jkeenan/devel-git-multibisect>
 

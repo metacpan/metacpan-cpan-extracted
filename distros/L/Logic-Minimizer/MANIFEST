@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Logic/Minimizer.pm
+MANIFEST
+README.md
+t/00-load.t
+t/manifest.t
+t/pod.t
+Makefile.PL
+LICENSE
+META.yml
+META.json

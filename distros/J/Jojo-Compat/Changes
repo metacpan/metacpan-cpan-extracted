@@ -1,0 +1,13 @@
+
+Revision history for Jojo-Compat
+
+0.2.0     2019-02-09 11:18:16-08:00 America/Los_Angeles
+
+v0.2     2019-02-09 11:13:26-08:00 America/Los_Angeles
+
+   - Promoted to non-trial status
+
+v0.1      2018-09-19 20:16:52+00:00 UTC
+
+   - Initial version
+   - Compatible with Jojo::Role~0.5.0 and Jojo::Base~0.7.0

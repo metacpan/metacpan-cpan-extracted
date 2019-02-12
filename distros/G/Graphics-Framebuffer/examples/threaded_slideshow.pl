@@ -13,15 +13,15 @@ use Sys::CPU;
 
 # use Data::Dumper::Simple; $Data::Dumper::Sortkeys = 1;
 
-my $errors     = 0;
-my $auto       = 0;
-my $showall    = 0;
-my $help       = 0;
-my $delay      = 3;
-my $nosplash   = 0;
-my $dev        = 0;
-my $noaccel    = 0;
-my $threads    = Sys::CPU::cpu_count();
+my $errors           = 0;
+my $auto             = 0;
+my $showall          = 0;
+my $help             = 0;
+my $delay            = 3;
+my $nosplash         = 0;
+my $dev              = 0;
+my $noaccel          = 0;
+my $threads          = Sys::CPU::cpu_count();
 my $RUNNING : shared = 1;
 
 GetOptions(
@@ -35,30 +35,30 @@ GetOptions(
     'threads=i'    => \$threads,
     'dev=i'        => \$dev,
 );
-my @paths      = @ARGV;
+my @paths = @ARGV;
 
-unless (scalar(@paths) && ! $help) {
+unless (scalar(@paths) && !$help) {
     $help = 2;
 }
 
 if ($help) {
-    pod2usage('-exitstatus' => 1,'-verbose' => $help);
+    pod2usage('-exitstatus' => 1, '-verbose' => $help);
 }
 
 my $splash = ($nosplash) ? 0 : 2;
 
 our $FB = Graphics::Framebuffer->new(
-    'SHOW_ERRORS'   => $errors,
-    'RESET'         => 1,
-    'SPLASH'        => $splash,
-    'ACCELERATED'   => ! $noaccel,
-    'FB_DEVICE'     => "/dev/fb$dev",
+    'SHOW_ERRORS' => $errors,
+    'RESET'       => 1,
+    'SPLASH'      => $splash,
+    'ACCELERATED' => !$noaccel,
+    'FB_DEVICE'   => "/dev/fb$dev",
 );
 
 $SIG{'QUIT'} = \&finish;
 $SIG{'INT'}  = \&finish;
 $SIG{'KILL'} = \&finish;
-my $p = gather($FB,@paths);
+my $p = gather($FB, @paths);
 
 if ($errors) {
     print STDERR qq{
@@ -71,67 +71,67 @@ NOSPLASH        = $nosplash
 CPU             = }, Sys::CPU::cpu_type(), qq{
 THREADS         = $threads
 DEVICE          = /dev/fb$dev
-PATH(s)         = }, join('; ',@paths),"\n";
+PATH(s)         = }, join('; ', @paths), "\n";
 
     sleep 5;
-}
+} ## end if ($errors)
 
 system('clear');
 $FB->cls();
-$FB->set_color({'red' => 0,'green' => 0, 'blue' => 0, 'alpha' => 255});
+$FB->set_color({ 'red' => 0, 'green' => 0, 'blue' => 0, 'alpha' => 255 });
 my @thrd;
 
 # Run the slides in threads and have the main thread do housekeeping.
-for (my $t=0;$t<$threads;$t++) {
+for (my $t = 0; $t < $threads; $t++) {
     $thrd[$t] = threads->create(\&show, $p, $threads, $t);
 }
 
-while ($RUNNING) { # Monitors the running threads and restores them if one dies
+while ($RUNNING) {    # Monitors the running threads and restores them if one dies
     my $num = scalar(threads::list(threads::running));
     if ($RUNNING && $num < $threads) {
-        for (my $t=0;$t<$threads;$t++) {
+        for (my $t = 0; $t < $threads; $t++) {
             if ($RUNNING) {
-                unless($thrd[$t]->is_running()) {
+                unless ($thrd[$t]->is_running()) {
                     eval { $thrd[$t]->detach()->kill(); };
                     $thrd[$t] = threads->create(\&show, $p, $threads, $t);
                 }
-            }
-        }
+            } ## end if ($RUNNING)
+        } ## end for (my $t = 0; $t < $threads...)
     } else {
         sleep 1;
     }
-}
+} ## end while ($RUNNING)
 
 $FB->cls('ON');
 exit(0);
 
 sub finish {
-    print_it('SHUTTING DOWN...',1);
+    print_it('SHUTTING DOWN...', 1);
     $RUNNING = 0;
     alarm 0;
     $SIG{'ALRM'} = sub {
         exec('reset');
     };
     alarm 20;
-    while(my @thr = threads->list(threads::running)) {
+    while (my @thr = threads->list(threads::running)) {
         while (my @j = threads->list(threads::joinable)) {
             foreach my $jo (@j) {
                 $jo->join();
-                print_it('SHUTTING DOWN...',1);
+                print_it('SHUTTING DOWN...', 1);
             }
-        }
-    }
+        } ## end while (my @j = threads->list...)
+    } ## end while (my @thr = threads->...)
     while (my @j = threads->list(threads::joinable)) {
         foreach my $jo (@j) {
             $jo->join();
-            print_it('SHUTTING DOWN...',1);
+            print_it('SHUTTING DOWN...', 1);
         }
-    }
+    } ## end while (my @j = threads->list...)
     foreach my $thr (threads->list()) {
         $thr->kill->detach();
     }
     exec('reset');
-}
+} ## end sub finish
 
 sub gather {
     my $FB    = shift;
@@ -144,21 +144,21 @@ sub gather {
         chomp(my @dir = readdir($DIR));
         closedir($DIR);
 
-        return if (! $showall && grep(/^\.nomedia$/, @dir));
+        return if (!$showall && grep(/^\.nomedia$/, @dir));
         foreach my $file (@dir) {
             next if ($file =~ /^\.+/);
             if (-d "$path/$file") {
-                my $r = gather($FB,"$path/$file");
+                my $r = gather($FB, "$path/$file");
                 if (defined($r)) {
-                    @pics = (@pics,@{$r});
+                    @pics = (@pics, @{$r});
                 }
             } elsif (-f "$path/$file" && $file =~ /\.(jpg|jpeg|gif|tiff|bmp|png)$/i) {
                 push(@pics, "$path/$file");
             }
-        }
-    }
-    return(\@pics);
-}
+        } ## end foreach my $file (@dir)
+    } ## end foreach my $path (@paths)
+    return (\@pics);
+} ## end sub gather
 
 sub calculate_window {
     my $max     = shift;
@@ -166,16 +166,16 @@ sub calculate_window {
     my $width   = shift;
     my $height  = shift;
 
-    my ($x,$y,$w,$h) = (0,0,$width,$height);
+    my ($x, $y, $w, $h) = (0, 0, $width, $height);
     if ($max == 2) {
-        $w = int($width/2);
+        $w = int($width / 2);
         if ($current == 0) {
         } else {
             $x = $w;
         }
     } elsif ($max <= 4) {
-        $h = int($height/2);
-        $w = int($width/2);
+        $h = int($height / 2);
+        $w = int($width / 2);
         if ($current == 0) {
         } elsif ($current == 1) {
             $x = $w;
@@ -187,27 +187,27 @@ sub calculate_window {
             $y = $h;
         }
     } elsif ($max <= 6) {
-        $h = int($height/2);
-        $w = int($width/3);
+        $h = int($height / 2);
+        $w = int($width / 3);
         if ($current == 0) {
         } elsif ($current == 1) {
             $x = $w;
         } elsif ($current == 2) {
             $x = int($w * 2);
         } elsif ($current == 3) {
-            $w = int($width/2) if ($max == 5);
+            $w = int($width / 2) if ($max == 5);
             $y = $h;
         } elsif ($current == 4) {
-            $w = int($width/2) if ($max == 5);
+            $w = int($width / 2) if ($max == 5);
             $y = $h;
             $x = $w;
         } else {
             $y = $h;
             $x = int($w * 2);
         }
-    } elsif ($max <= 8) { 
-        $w = int($width/4);
-        $h = int($height/2);
+    } elsif ($max <= 8) {
+        $w = int($width / 4);
+        $h = int($height / 2);
         if ($current == 0) {
         } elsif ($current == 1) {
             $x = $w;
@@ -217,25 +217,25 @@ sub calculate_window {
             $x = int($w * 3);
         } elsif ($current == 4) {
             $y = $h;
-            $w = int($width/3) if ($max == 7);
+            $w = int($width / 3) if ($max == 7);
         } elsif ($current == 5) {
             $y = $h;
-            $w = int($width/3) if ($max == 7);
+            $w = int($width / 3) if ($max == 7);
             $x = $w;
         } elsif ($current == 6) {
             $y = $h;
-            $w = int($width/3) if ($max == 7);
+            $w = int($width / 3) if ($max == 7);
             $x = int($w * 2);
         } else {
             $y = $h;
             $x = int($w * 3);
         }
     } elsif ($max <= 12) {
-        $w = int($width/4);
-        $h = int($height/3);
+        $w = int($width / 4);
+        $h = int($height / 3);
         if ($current == 0) {
         } elsif ($current == 1) {
-            $x = $w
+            $x = $w;
         } elsif ($current == 2) {
             $x = int($w * 2);
         } elsif ($current == 3) {
@@ -263,9 +263,9 @@ sub calculate_window {
             $x = int($w * 3);
             $y = int($h * 2);
         }
-    }
-    return($x,$y,$w,$h);
-}
+    } ## end elsif ($max <= 12)
+    return ($x, $y, $w, $h);
+} ## end sub calculate_window
 
 sub show {
     my $ps   = shift;
@@ -276,13 +276,14 @@ sub show {
     local $SIG{'QUIT'} = undef;
     local $SIG{'KILL'} = undef;
     my @pics = shuffle(@{$ps});
-    my $p = scalar(@pics);
-    my $idx = 0;
-    my ($X,$Y,$W,$H) = calculate_window($jobs,$job,$FB->{'XRES'},$FB->{'YRES'});
+    my $p    = scalar(@pics);
+    my $idx  = 0;
+    my ($X, $Y, $W, $H) = calculate_window($jobs, $job, $FB->{'XRES'}, $FB->{'YRES'});
 
     while ($RUNNING && $idx < $p) {
         my $name = $pics[$idx];
-#        print_it($FB, "Loading image $name");
+
+        #        print_it($FB, "Loading image $name");
 
         my $image = $FB->load_image(
             {
@@ -296,22 +297,22 @@ sub show {
         );
 
         if (defined($image)) {
-            $FB->rbox({'x'=>$X,'y'=>$Y,'width'=>$W,'height'=>$H,'filled'=>1});
+            $FB->rbox({ 'x' => $X, 'y' => $Y, 'width' => $W, 'height' => $H, 'filled' => 1 });
             if (ref($image) eq 'ARRAY') {
                 my $s = time + ($delay * 2);
-                while ($RUNNING && time <= $s) { # We play it as many times as the delay allows, but at least once.
-                    # We don't use "play_animation" for threads.  This is so we can stop the playback quickly.
-                    for (my $frame = 0;$frame < scalar(@{$image});$frame++) {
-                        my $begin = time; # Mark the start time
-                        $FB->blit_write($image->[$frame]); # Write the frame to the display
-                        # Multiply the 'gif_delay' by 0.01 and then subtract from that the amount of time
-                        # it took to actually display the fram.  This givs the true delay, which should
-                        # show an accurate animation.
+                while ($RUNNING && time <= $s) {    # We play it as many times as the delay allows, but at least once.
+                                                    # We don't use "play_animation" for threads.  This is so we can stop the playback quickly.
+                    for (my $frame = 0; $frame < scalar(@{$image}); $frame++) {
+                        my $begin = time;                     # Mark the start time
+                        $FB->blit_write($image->[$frame]);    # Write the frame to the display
+                                                              # Multiply the 'gif_delay' by 0.01 and then subtract from that the amount of time
+                                                              # it took to actually display the fram.  This givs the true delay, which should
+                                                              # show an accurate animation.
                         my $d = (($image->[$frame]->{'tags'}->{'gif_delay'} * .01) - (time - $begin));
                         sleep $d if ($d > 0);
-                        last unless($RUNNING);
-                    }
-                } ## end while (time <= $s)
+                        last unless ($RUNNING);
+                    } ## end for (my $frame = 0; $frame...)
+                } ## end while ($RUNNING && time <=...)
             } else {
                 $FB->blit_write($image);
                 sleep $delay * $RUNNING;
@@ -319,13 +320,13 @@ sub show {
         } ## end if (defined($image))
         $idx++;
         $idx = 0 if ($idx >= $p);
-    } ## end while ($RUNNING)
-    $FB->rbox({'x'=>$X,'y'=>$Y,'width'=>$W,'height'=>$H,'filled'=>1});
+    } ## end while ($RUNNING && $idx <...)
+    $FB->rbox({ 'x' => $X, 'y' => $Y, 'width' => $W, 'height' => $H, 'filled' => 1 });
 } ## end sub show
 
 sub print_it {
     my $message = shift;
-    my $big     = shift || 0;
+    my $big = shift || 0;
 
     unless ($FB->{'XRES'} < 256) {
         my $b = $FB->ttf_print(

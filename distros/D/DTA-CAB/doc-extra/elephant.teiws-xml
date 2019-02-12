@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI>
+  <text>
+    <!-- untokenized material is ignored -->
+    <fw>Running header (untokenized)</fw>
+    <p>
+      <!-- every sentence //s and token //w must have an @id or @xml:id attribute -->
+      <s id="s1">
+        <w id="w1">EJn</w>
+        <w id="w2">zamer</w>
+        <w id="w3">Elephant</w>
+        <w id="w4">gillt</w>
+        <w id="w5">ohngefähr</w>
+        <w id="w6">zweyhundert</w>
+        <w id="w7">Thaler</w>
+        <w id="w8">.</w>
+      </s>
+      <s id="s2">
+        <w id="w9">Ceterum</w>
+        <w id="w10">censeo</w>
+        <w id="w11">Carthaginem</w>
+        <w id="w12">esse</w>
+        <w id="w13">delendam</w>
+        <w id="w14">.</w>
+      </s>
+    </p>
+  </text>
+</TEI>

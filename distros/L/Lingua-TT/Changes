@@ -1,0 +1,172 @@
+##-*- Mode: Change-Log; coding: utf-8; -*-
+##
+## Change log for perl distribution Lingua::TT
+
+v0.11 2019-02-12  moocow
+	* unified versions to v0.11
+	* generated Changes (this file) from SVN log
+	* added JSON::XS to PREREQ_PM (for tj-eval.perl)
+	* updated tests for CPAN release
+	* cleanup for CPAN release
+
+v0.10 2018-03-27  moocow
+	* allow old behavior for tt-dict-merge.perl ('smart' merge of multiple HASH values), needed by dta build system in extra/db_static/
+	* tt-db2dict.perl: added -output-format option
+	* tt-dict2db.perl: added -parse=CODE option
+	* TT/Dict/JSON.pm: load-time append tweaks
+	* tt-dict-merge, TT/Dict.pm, TT/Dict/JSON.pm: load-time append option
+	* added tt-dict-invert.perl -nmax option
+	* added tt-tag-uniq.perl -prepend option (see extracted tag)
+	* tt-tag-uniq.perl: updated for tagh-2.5 style tags
+	* added MANIFEST
+	* svn:executable updates
+	* email updates
+	* /bin/sh -> /bin/bash
+	* tt-split-2.perl fix
+	* fixed bval parsing for DBFile
+	* bval parsing for DBFile
+	* -recno mode for tt-dbapply.perl
+	* improved handling for DB_RECNO files
+	* added more pack/unpack options for tt-db utils
+	* use umask for DBFile modes
+	* tt-ngrams -glob argument
+	* count-mode for tt-ngrams.perl
+	* renamed tt-skipgrams.perl to more accurate tt-cofreqs.perl
+	  - added bos option to tt-cofreqs.perl
+	* added tt-skipgrams.perl
+	* stderr autoflush for tt-ngrams.perl
+	* tt-ngrams.perl output file
+	* list-mode input for tt-ngrams.perl
+	* added basic tt-ngrams.perl
+	* fix-relinking tt-rtt-(expand|compact).perl
+	* fix-relinking tt-tiger-diff-autofix.perl
+	* set svn:executable' on *.perl
+	* updated emails
+	* added LevelDB, RocksDB test (no epiphanous improvement over BerkeleyDB atm)
+	* tt-split-2.perl fixes for token-wise splitting
+	* TextAlignment: trim text comments by default
+	* tt-rtt2txt.perl fix for waste with annotator
+	* tt-txt2rtt.perl: utf8 fixes
+	* TextAlignment fixes for embedded newlines
+	* TextAlignment fixes for embedded newlines
+	* + added -trim option to tt-tag-uniq.perl
+	* ignore MYMETA.yml
+	* tag-xlate: added -trim option
+	* tt-tag-xlate.perl: in-place and prefix options, defaults
+	* fixed offset/length bug in tt-ensure-stxt.perl
+	* tt-ensure-stxt.perl: added mode to extract sentence text from associated text buffer
+	* added tt-tag-uniq.perl
+	* added tt-tag-xlate.perl : tag-translation utility
+	* -compact|-prolix arguments to tt-txt-merge.perl
+	* tt-rtt-(compact|expand).perl now point to tt-rtt-convert.perl
+	* removed stale tt-rtt-compact.perl
+	* tt-rtt dialect stuff
+	  - tt-rtt-(expand|compact).perl: standalone hacks, obsolete
+	  - tt-rtt-convert.perl : should replace tt-rtt-(expand|compact).perl
+	  - TT/TextAlignment.pm : now with %%$RTT:COMPACT=X processing instruction
+
+v0.09 2013-09-04  moocow
+	* tt-rttdiff-eval.perl added 'w:nolex' class (requires appropriate unclassify.perl and moot --mark-unknown option)
+	* added s:nocaps for non-capitalized sentences
+	* added tt-words.sh: extract tokens from tt file(s) (e.g. for use with wc)
+	* rtt eval again
+	* tt-rttdiff-eval.perl: don't be quite so generous for s:ks (Kiss-Strunk error rate)
+	* TextAlignment.pm fix
+	* tt-rttdiff-eval.perl: kiss-strunk-esque error rate debugging
+	  - added new classes s:dot, s:abbr, s:std
+	  - changed semantics for s:nonstd, s:nopunct (now 'no (sentence-final-word)-final punctuation')
+	* tt-rttdiff-eval.perl debuggin
+	* fixed tt-txt-align.perl missing escape of @ttchars
+	* tt-shuffle.perl bugfix
+	* added tt-shuffle.perl
+	* TT/TextAlignment.pm: better escaping (backslash and form-feed)
+	* added ptb2tt.perl: convert Penn Treebank .mrg files (1 sentence per line) to TT format (hacked)
+	* fixed tt-dbapply.perl bug
+	* TT::Diff.pm fix
+	* added w:apos class
+	* tt-rttdiff-eval.perl : fixed
+	* deleted TT::Diff::saveTextFile0
+	* weird TT::Diff error in saveTextFile vs saveTextFile0
+	* rttdiff-eval work: add classification tags to output
+	* updated verbosity levels in tt-txt-(align|split|merge).perl
+	* re-formulated tt-txt-align.perl in terms of TT::TextAlignment
+	* added Lingua::TT::TextAlignment.pm
+	  - combined text+tt representation
+	  - to be used for tokenizer evaluation
+	  - calling main format 'RTT': RawText + TT-data with '%%$c=...' comments for inter-token text (whitespace)
+	  - added tt-txt-merge.perl, tt-txt-split.perl for converting between (TXT,TT) file-pairs and RTT files
+	  - TODO: update tt-txt-align.perl to produce only RTT output (or tt-diff for debugging)
+	* cleanup
+	* tt-txt-align basically working
+	* tt-txt-align.perl: first stab at generic token-text aligner, output to (huge) tt-diff file
+	* strange fixes found on plato
+	* more sent-string heuristics
+	* added script tt-ensure-stxt.perl
+	* improved tt-sents2raw (method TT::Sentence::rawString())
+	  - extract raw text from formatted comment-lines if available
+
+v0.08 2012-09-20  moocow
+	* added -begin, -end, -use options to t[tj]-eval.perl
+	* tj-eval fix
+	* added $d,$s read-only variables to tj-eval.perl
+	* added -canonical argument to tj-eval.perl
+	* don't include comments in TT::Sentnce::rawString() output
+	* more autofix fixes
+	* more tiger autofix stuff
+	* TT::Diff fix (change-internal aux data wasn't making it through)
+	* tiger autofix updates
+	* more tiger auto-fixes
+	* autofix fixes
+	* added quote-assimilation rule to tt-tiger-diff-autofix-0.4.x.perl
+	* added symlink: tt-tiger-diff-autofix.perl
+	* tt-tiger autofix fixes
+	* updated tt-tiger-diff-autofix-0.4.x.perl : numeric grouping heuristics only
+	* fixes in tt-diff-select.perl
+	* added tt-diff-select.perl: select 'interesting' subsets of tt-diff output
+	* moved tt-tiger-diff-autofix.perl to tt-tiger-diff-autofix-0.3.x.perl (tomasotath 0.3.x version)
+	* fixed 'UNIVERSAL::import' warning in TT/Unify.pm and reporting bug in tt-diff-info.perl
+	* more CDBFile fixes
+	* CDBFile fix
+	* re-arragend Dict and Dict::TJ
+	  - Dict::TJ is now Dict::JSON
+	  - added new class CDBFile::JSON
+	  - re-factored inheritance and apply code for Dict, Dict::JSON, CDBFile, CDBFile::JSON
+	* added TT/Dict/TJ.pm , tj-dict-merge.perl
+	* added CDB_File dep to Makefile.PL
+	* updated to v0.08: new TT::CDBFile class + utilities
+	* replaced generic encoding stuff with utf8 flag in CDBFile
+	* removed encoding stuff from CDBFile: only valid if source and dest encodings are the same
+	* added encoding stuff to CDBFile: __very__ inefficient: remove it again
+
+v0.07 2011-08-20  moocow
+	* added -tmpdir=DIR option to tt-dict2db.perl: build db in temp directory (e.g. tmpfs), for CAB db builds
+	* updated tt-1grams.perl
+	* added tt-dict-merge.perl
+	* added tt-123-eos-compress.perl (found on uhura; no idea if it works)
+	* moved DB::File to DBFile
+	* moving DB::File to DBFile
+
+v0.06 2010-11-18  moocow
+	* argh argh argh argh argh
+	* added DB::File::guesFileType() method
+	* moved Dict stuff to class TT::Dict
+	  + added tt-dict-invert.perl, tt-db-invert.perl for inverting dictionaries (e.g. extensional eq classes)
+
+v0.05 2010-10-25  moocow
+	* added tt-addeos-regex.perl (eos-insertion hack)
+	* moved Packed[AXZ].pm to Packed/
+	* more db stuff... argh
+	* added TT::DB utilities
+
+v0.04 2010-04-30  moocow
+	* added -D DIFF_OPTIONS flag to tt-diff.perl (e.g. -d)
+
+v0.03 2010-01-07  moocow
+	* added tt-2btt.perl, from carrot
+	* mis-alignment bug-hunt
+
+v0.02 2009-12-17  moocow
+	* log not available
+
+v0.01 2009-11-23  moocow
+	* initial import

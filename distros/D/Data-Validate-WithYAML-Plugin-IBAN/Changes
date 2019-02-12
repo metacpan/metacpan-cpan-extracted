@@ -1,6 +1,10 @@
 History for Data::Validate::WithYAML::Plugin::IBAN
 ==================================================
 
+0.04 2019-02-09 15:04:00
+
+    * add documentation
+
 0.03 2015-03-01
 
      * Update dist.ini

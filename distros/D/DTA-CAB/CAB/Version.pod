@@ -1,0 +1,68 @@
+##==============================================================================
+## PODS
+##==============================================================================
+=pod
+
+=head1 NAME
+
+DTA::CAB::Version - version constants for DTA::CAB
+
+=head1 SYNOPSIS
+
+ use DTA::CAB::Version;
+
+ print "version: $DTA::CAB::VERSION\n";
+ print "svn version: $DTA::CAB::SVNVERSION\n";
+
+=cut
+
+##==============================================================================
+## Description
+##==============================================================================
+=pod
+
+=head1 DESCRIPTION
+
+Version constants for DTA::CAB suite.
+
+=cut
+
+##----------------------------------------------------------------
+## DESCRIPTION: DTA::CAB: Constants
+=pod
+
+=head2 Constants
+
+=over 4
+
+=item $DTA::CAB::VERSION
+
+Module version.
+
+=item $DTA::CAB::SVNVERSION
+
+SVN version from which this module was built.
+
+=back
+
+=cut
+
+
+##==============================================================================
+## Footer
+##==============================================================================
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2019 by Bryan Jurish
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

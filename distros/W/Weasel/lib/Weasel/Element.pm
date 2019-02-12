@@ -5,7 +5,7 @@ Weasel::Element - The base HTML/Widget element class
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 SYNOPSIS
 
@@ -22,7 +22,7 @@ attributes and the tag name, etc.
 
 =head1 DEPENDENCIES
 
-This module wraps L<Selenium::Remote::Driver>, version 2.
+
 
 =cut
 
@@ -66,7 +66,7 @@ has _id => (is => 'ro',
 
 =over
 
-=item find($locator [, scheme => $scheme] [, %locator_args])
+=item find($locator [, scheme => $scheme] [, widget_args => \@args ] [, %locator_args])
 
 Finds the first child element matching c<$locator>.  Returns C<undef>
 when not found.  Optionally takes a scheme argument to identify non-xpath
@@ -76,6 +76,9 @@ In case the C<$locator> is a mnemonic (starts with an asterisk ['*']),
 additional arguments may be provided for expansion of the mnemonic.  See
 L<Weasel::FindExpanders::HTML> for documentation of the standard expanders.
 
+Any arguments passed in the C<$widget_args> array reference, are passed to
+the widget's constructor.
+
 =cut
 
 sub find {
@@ -84,7 +87,7 @@ sub find {
     return $self->session->find($self, @args);
 }
 
-=item find_all($locator [, scheme => $scheme] [, %locator_args])
+=item find_all($locator [, scheme => $scheme] [, widget_args => \@args ] [, %locator_args])
 
 Returns, depending on scalar vs array context, a list or an arrayref
 with matching elements.  Returns an empty list or ref to an empty array
@@ -94,6 +97,9 @@ type locators.
 In case the C<$locator> is a mnemonic (starts with an asterisk ['*']),
 additional arguments may be provided for expansion of the mnemonic.  See
 L<Weasel::FindExpanders::HTML> for documentation of the standard expanders.
+
+Any arguments passed in the C<$widget_args> array reference, are passed to
+the widget's constructor.
 
 =cut
 
@@ -231,7 +237,7 @@ L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 LICENSE AND COPYRIGHT
 
- (C) 2016  Erik Huelsmann
+ (C) 2016-2019  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

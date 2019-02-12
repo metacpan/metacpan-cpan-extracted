@@ -31,7 +31,7 @@ BEGIN {
 
 package main;
 
-use RT::Extension::ConditionalCustomFields::Test tests => 26;
+use RT::Extension::ConditionalCustomFields::Test tests => 28;
 
 use WWW::Mechanize::PhantomJS;
 
@@ -64,18 +64,21 @@ $m->get_ok($m->rt_base_url . 'Admin/CustomFields/Modify.html?id=' . $cf_conditio
 my $cf_conditioned_by_form = $m->form_name('ModifyCustomField');
 my $cf_conditioned_by_CF_select = $cf_conditioned_by_form->find_input('ConditionalCF');
 my @cf_conditioned_by_CF_options = $cf_conditioned_by_CF_select->possible_values;
-is(scalar(@cf_conditioned_by_CF_options), 2, 'Can be conditioned by select cf');
+is(scalar(@cf_conditioned_by_CF_options), 3, 'Can be conditioned by select cf');
 is($cf_conditioned_by_CF_options[0], '', 'Can be conditioned by nothing');
-is($cf_conditioned_by_CF_options[1], $cf_condition->id, 'Can be conditioned by Condition CF');
+is($cf_conditioned_by_CF_options[1], $cf_conditioned_by_child->id, 'Can be conditioned by Child CF');
+is($cf_conditioned_by_CF_options[2], $cf_condition->id, 'Can be conditioned by Condition CF');
 
 my $mjs = WWW::Mechanize::PhantomJS->new();
+$mjs->driver->ua->timeout(540);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 $mjs->get($m->rt_base_url . 'Admin/CustomFields/Modify.html?id=' . $cf_conditioned_by->id);
 ok($mjs->content =~ /Customfield is conditioned by/, 'Can be conditioned by select cf (with js)');
 
 @cf_conditioned_by_CF_options = $mjs->xpath('//select[@name="ConditionalCF"]/option');
 is($cf_conditioned_by_CF_options[0]->get_value, '', 'Can be conditioned by nothing (with js)');
-is($cf_conditioned_by_CF_options[1]->get_value, $cf_condition->id, 'Can be conditioned by Condition CF (with js)');
+is($cf_conditioned_by_CF_options[1]->get_value, $cf_conditioned_by_child->id, 'Can be conditioned by Child CF (with js)');
+is($cf_conditioned_by_CF_options[2]->get_value, $cf_condition->id, 'Can be conditioned by Condition CF (with js)');
 
 $cf_conditioned_by_CF_select = $mjs->xpath('//select[@name="ConditionalCF"]', single => 1);
 $mjs->field($cf_conditioned_by_CF_select, $cf_condition->id);

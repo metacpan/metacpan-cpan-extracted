@@ -1,5 +1,5 @@
 ---
-abstract: 'Simplifies text parsing. Extensible to parse various grammars.'
+abstract: 'Simplifies text parsing. Easily extensible to parse various text formats.'
 author:
   - 'Balaji Ramasubramanian <balajiram@cpan.org>'
 build_requires:
@@ -23,12 +23,11 @@ name: Text-Parser
 provides:
   Text::Parser:
     file: lib/Text/Parser.pm
-    version: '0.902'
+    version: '0.910'
   Text::Parser::Multiline:
     file: lib/Text/Parser/Multiline.pm
-    version: '0.902'
+    version: '0.910'
 requires:
-  Class::Method::Modifiers: '0'
   Dist::Zilla::Plugin::Test::TidyAll: '0'
   Exception::Class: '0'
   Exporter: '0'
@@ -38,6 +37,8 @@ requires:
   Moose::Util: '0'
   Moose::Util::TypeConstraints: '0'
   MooseX::CoverableModifiers: '0'
+  MooseX::StrictConstructor: '0'
+  String::Util: '0'
   Try::Tiny: '0'
   namespace::autoclean: '0'
   perl: '5.013010'
@@ -47,7 +48,7 @@ resources:
   bugtracker: http://github.com/balajirama/Text-Parser/issues
   homepage: https://github.com/balajirama/Text-Parser
   repository: https://github.com/balajirama/Text-Parser.git
-version: '0.902'
+version: '0.910'
 x_contributors:
   - 'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>'
 x_generated_by_perl: v5.28.1

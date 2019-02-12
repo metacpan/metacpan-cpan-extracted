@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 use List::Util 'first';
 
@@ -1018,7 +1018,7 @@ Slaven Rezic
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016,2017,2018 by Slaven ReziE<x0107>
+Copyright (C) 2016,2017,2018,2019 by Slaven ReziE<x0107>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

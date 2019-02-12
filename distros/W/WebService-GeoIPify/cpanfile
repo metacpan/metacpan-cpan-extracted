@@ -7,6 +7,7 @@ requires 'Data::Validate::IP';
 requires 'JSON';
 requires 'Moo';
 requires 'REST::Client';
+requires 'Role::Cache::LRU';
 requires 'Role::REST::Client';
 requires 'Sub::Quote';
 requires 'Types::Common::String';

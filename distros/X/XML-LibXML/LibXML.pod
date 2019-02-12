@@ -14,8 +14,8 @@ XML::LibXML - Perl Binding for libxml2
   $Version_String = XML::LibXML::LIBXML_DOTTED_VERSION;
   $Version_ID = XML::LibXML::LIBXML_VERSION;
   $DLL_Version = XML::LibXML::LIBXML_RUNTIME_VERSION;
-  $libxmlnode = XML::LibXML-E<gt>import_GDOME( $node, $deep );
-  $gdomenode = XML::LibXML-E<gt>export_GDOME( $node, $deep );
+  $libxmlnode = XML::LibXML->import_GDOME( $node, $deep );
+  $gdomenode = XML::LibXML->export_GDOME( $node, $deep );
 
 =head1 DESCRIPTION
 
@@ -470,14 +470,14 @@ in the XML::LibXML document will not have this information.
 
 =item import_GDOME
 
-  $libxmlnode = XML::LibXML-E<gt>import_GDOME( $node, $deep );
+  $libxmlnode = XML::LibXML->import_GDOME( $node, $deep );
 
 This clones an XML::GDOME node to an XML::LibXML node explicitly.
 
 
 =item export_GDOME
 
-  $gdomenode = XML::LibXML-E<gt>export_GDOME( $node, $deep );
+  $gdomenode = XML::LibXML->export_GDOME( $node, $deep );
 
 Allows one to clone an XML::LibXML node into an XML::GDOME node.
 
@@ -505,7 +505,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0133
+2.0134
 
 =head1 COPYRIGHT
 

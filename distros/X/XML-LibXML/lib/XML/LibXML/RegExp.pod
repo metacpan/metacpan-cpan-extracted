@@ -11,9 +11,9 @@ XML::LibXML::RegExp - XML::LibXML::RegExp - interface to libxml2 regular express
   if ($compiled_re->isDeterministic()) { ... }
   if ($compiled_re->matches($string)) { ... }
 
-  $compiled_re = XML::LibXML::RegExp-E<gt>new( $regexp_str );
-  $bool = $compiled_re-E<gt>matches($string);
-  $bool = $compiled_re-E<gt>isDeterministic();
+  $compiled_re = XML::LibXML::RegExp->new( $regexp_str );
+  $bool = $compiled_re->matches($string);
+  $bool = $compiled_re->isDeterministic();
 
 =head1 DESCRIPTION
 
@@ -24,7 +24,7 @@ which are used e.g. for validation of XML Schema simple types (pattern facet).
 
 =item new()
 
-  $compiled_re = XML::LibXML::RegExp-E<gt>new( $regexp_str );
+  $compiled_re = XML::LibXML::RegExp->new( $regexp_str );
 
 The constructor takes a string containing a regular expression and returns a
 compiled regexp object.
@@ -32,7 +32,7 @@ compiled regexp object.
 
 =item matches($string)
 
-  $bool = $compiled_re-E<gt>matches($string);
+  $bool = $compiled_re->matches($string);
 
 Given a string value, returns a true value if the value is matched by the
 compiled regular expression.
@@ -40,7 +40,7 @@ compiled regular expression.
 
 =item isDeterministic()
 
-  $bool = $compiled_re-E<gt>isDeterministic();
+  $bool = $compiled_re->isDeterministic();
 
 Returns a true value if the regular expression is deterministic; returns false
 otherwise. (See the definition of determinism in the XML spec (L<<<<<< http://www.w3.org/TR/REC-xml/#determinism >>>>>>))
@@ -58,7 +58,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0133
+2.0134
 
 =head1 COPYRIGHT
 

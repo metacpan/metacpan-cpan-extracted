@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Workbook;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2018, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2019, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -33,7 +33,7 @@ use Excel::Writer::XLSX::Package::XMLwriter;
 use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol xl_rowcol_to_cell);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 
 ###############################################################################
@@ -94,7 +94,7 @@ sub new {
     $self->{_y_window}           = 15;
     $self->{_window_width}       = 16095;
     $self->{_window_height}      = 9660;
-    $self->{_tab_ratio}          = 500;
+    $self->{_tab_ratio}          = 600;
     $self->{_excel2003_style}    = 0;
 
     $self->{_default_format_properties} = {};
@@ -842,6 +842,30 @@ sub set_size {
 
 ###############################################################################
 #
+# set_tab_ratio()
+#
+# Set the ratio of space for worksheet tabs.
+#
+sub set_tab_ratio {
+
+    my $self  = shift;
+    my $tab_ratio = shift;
+
+    if (!defined $tab_ratio) {
+        return;
+    }
+
+    if ( $tab_ratio < 0 or $tab_ratio > 100 ) {
+        carp "Tab ratio outside range: 0 <= zoom <= 100";
+    }
+    else {
+        $self->{_tab_ratio} = int( $tab_ratio * 10 );
+    }
+}
+
+
+###############################################################################
+#
 # set_properties()
 #
 # Set the document properties such as Title, Author etc. These are written to
@@ -1323,14 +1347,25 @@ sub _prepare_num_formats {
     for my $format ( @{ $self->{_xf_formats} }, @{ $self->{_dxf_formats} } ) {
         my $num_format = $format->{_num_format};
 
+
         # Check if $num_format is an index to a built-in number format.
         # Also check for a string of zeros, which is a valid number format
         # string but would evaluate to zero.
         #
         if ( $num_format =~ m/^\d+$/ && $num_format !~ m/^0+\d/ ) {
 
+            # Number format '0' is indexed as 1 in Excel.
+            if ($num_format == 0) {
+                $num_format = 1;
+            }
+
             # Index to a built-in number format.
             $format->{_num_format_index} = $num_format;
+            next;
+        }
+        elsif ( $num_format  eq 'General' ) {
+            # The 'General' format has an number format index of 0.
+            $format->{_num_format_index} = 0;
             next;
         }
 
@@ -2523,7 +2558,7 @@ sub _write_workbook_view {
     );
 
     # Store the tabRatio attribute when it isn't the default.
-    push @attributes, ( tabRatio => $tab_ratio ) if $tab_ratio != 500;
+    push @attributes, ( tabRatio => $tab_ratio ) if $tab_ratio != 600;
 
     # Store the firstSheet attribute when it isn't the default.
     push @attributes, ( firstSheet => $first_sheet + 1 ) if $first_sheet > 0;
@@ -2740,6 +2775,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXVIII, John McNamara.
+(c) MM-MMXIX, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

@@ -23,7 +23,7 @@
       "build" : {
          "requires" : {
             "List::Util" : "1.20",
-            "Test::Most" : "0.30"
+            "Test::More" : "1.00"
          }
       },
       "configure" : {
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "6.18",
+   "version" : "6.20",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

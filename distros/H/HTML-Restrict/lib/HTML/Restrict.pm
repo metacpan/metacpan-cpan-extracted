@@ -4,7 +4,7 @@ use 5.006;
 package HTML::Restrict;
 
 use version;
-our $VERSION = 'v2.4.1';
+our $VERSION = 'v2.5.0';
 
 use Carp qw( croak );
 use Data::Dump qw( dump );
@@ -138,6 +138,7 @@ sub _build_parser {
 
     weaken($self);
     return HTML::Parser->new(
+        empty_element_tags => 1,
 
         start_h => [
             sub {
@@ -150,16 +151,37 @@ sub _build_parser {
 
                     foreach my $source_type ( 'href', 'src', 'cite' ) {
 
-                        if ( $attr->{$source_type} ) {
-                            my $uri = URI->new( $attr->{$source_type} );
-                            if ( defined $uri->scheme ) {
+                        my $link = $attr->{$source_type};
+
+                        # Remove unprintable ASCII control characters, which
+                        # are 0..31. These characters are not valid in URLs,
+                        # but they can prevent the URI parser from recognizing
+                        # the scheme when they are used as leading characters.
+                        # Browsers will helpfully ignore some of them, meaning
+                        # that some of these characters (particularly 1..8 and
+                        # 14..31) can be used to defeat HTML::Restrict when
+                        # used as leading characters in a link.  In our case we
+                        # will strip them all regardless of where they are in
+                        # the URL. See
+                        # https://github.com/oalders/html-restrict/issues/30
+                        # https://url.spec.whatwg.org/
+                        # https://infra.spec.whatwg.org/#c0-control
+
+                        if ($link) {
+
+                            # C0 control chars (decimal 0..31)
+                            # sort of like $link =~ s/[[:^print:]]//g
+                            $link =~ s/[\00-\037]|&#x?0+;/ /g;
+
+                            my $url = URI->new($link);
+                            if ( defined $url->scheme ) {
                                 delete $attr->{$source_type}
-                                    if none { $_ eq $uri->scheme }
-                                grep defined, @{ $self->get_uri_schemes };
+                                    if none { $_ eq $url->scheme }
+                                grep { defined } @{ $self->get_uri_schemes };
                             }
-                            else {    # relative uri
+                            else {    # relative URL
                                 delete $attr->{$source_type}
-                                    unless grep !defined,
+                                    unless grep { !defined }
                                     @{ $self->get_uri_schemes };
                             }
                         }
@@ -382,7 +404,7 @@ HTML::Restrict - Strip unwanted HTML tags and attributes
 
 =head1 VERSION
 
-version v2.4.1
+version v2.5.0
 
 =head1 SYNOPSIS
 

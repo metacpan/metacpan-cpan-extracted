@@ -1,6 +1,16 @@
 <%INIT>
-my $conditioned_by = $CustomField->ConditionedBy;
-my ($good, $msg) = $CustomField->SetConditionedBy($ARGSRef->{ConditionalCF}, $ARGSRef->{ConditionedBy});
+if ($ARGSRef->{ConditionedBy}) {
+    my @conditioned_by = ref($ARGSRef->{ConditionedBy}) eq 'ARRAY' ? @{$ARGSRef->{ConditionedBy}} : ($ARGSRef->{ConditionedBy});
+
+    unless ($ARGSRef->{ConditionalCF}) {
+        $ARGSRef->{ConditionalCF} = undef;
+        $ARGSRef->{ConditionalOp} = undef;
+        $ARGSRef->{ConditionedBy} = ();
+    }
+}
+
+my ($good, $msg) = $CustomField->SetConditionedBy($ARGSRef->{ConditionalCF}, $ARGSRef->{ConditionalOp}, $ARGSRef->{ConditionedBy});
+
 push @$Results, $msg;
 </%INIT>
 <%ARGS>

@@ -31,6 +31,7 @@ RT->Config->Set('CustomFieldGroupings',
 
 my ($base, $m) = RT::Extension::ConditionalCustomFields::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
+$mjs->driver->ua->timeout(540);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 my $ticket = RT::Ticket->new(RT->SystemUser);
@@ -40,8 +41,8 @@ $ticket->AddCustomFieldValue(Field => $cf_condition_two->id , Value => $cf_value
 $ticket->AddCustomFieldValue(Field => $cf_conditioned_by_one->id , Value => 'See me?');
 $ticket->AddCustomFieldValue(Field => $cf_conditioned_by_two->id , Value => 'See me too?');
 
-$cf_conditioned_by_one->SetConditionedBy($cf_condition_one->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
-$cf_conditioned_by_two->SetConditionedBy($cf_condition_two->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
+$cf_conditioned_by_one->SetConditionedBy($cf_condition_one->id, 'is', [$cf_values->[0]->Name, $cf_values->[2]->Name]);
+$cf_conditioned_by_two->SetConditionedBy($cf_condition_two->id, 'is', [$cf_values->[0]->Name, $cf_values->[2]->Name]);
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
 my $ticket_cf_conditioned_by_one = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Groupone-' . $cf_conditioned_by_one->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by_one->is_displayed, "Show ConditionalCF One when Condition One is met by first val");

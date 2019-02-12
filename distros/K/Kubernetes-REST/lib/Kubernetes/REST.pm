@@ -6,7 +6,7 @@ package Kubernetes::REST;
   use Kubernetes::REST::AuthToken;
   use Module::Runtime qw/require_module/;
 
-  our $VERSION = '0.01';
+  our $VERSION = '0.02';
 
   has param_converter => (is => 'ro', isa => HasMethods['params2request'], default => sub {
     require Kubernetes::REST::ListToRequest;

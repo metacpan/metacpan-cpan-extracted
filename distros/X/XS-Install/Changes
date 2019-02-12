@@ -1,3 +1,11 @@
+1.0.11   12.02.2019
+           - added not_available($msg) which leads to grade 'NA' on CPAN testers
+1.0.10   12.02.2019
+           - fix compilation C++ >= 11 for perl <= 5.18 as perl had buggy perl.h
+1.0.9    11.02.2019
+           - simplify Makefile
+1.0.8    11.02.2019
+           - require EUMM 7.12 for subdirs-test_dynamic as we use it to build C tests
 1.0.7    08.02.2019
            - reasonable default for VERSION_FROM, ABSTRACT_FROM
 1.0.6    08.02.2019

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.132;
+our $VERSION = 1.134;
 
 use Quiq::Path;
 use Quiq::Option;
@@ -812,9 +812,34 @@ sub captureStderr {
 
 # -----------------------------------------------------------------------------
 
+=head3 slurpFromStdin() - Lies Eingaben von STDIN
+
+=head4 Synopsis
+
+    $data = $class->slurpFromStdin;
+
+=head4 Returns
+
+String
+
+=head4 Description
+
+Lies alle Eingaben von STDIN und liefere diese als eine
+Zeichenkette zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub slurpFromStdin {
+    return shift->new('<')->slurp;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.132
+1.134
 
 =head1 AUTHOR
 

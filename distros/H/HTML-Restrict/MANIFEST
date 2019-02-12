@@ -11,7 +11,8 @@ Makefile.PL
 README.md
 cpanfile
 dist.ini
-examples/sanitize_file.pl
+examples/naughty-strings.pl
+examples/sanitize-file.pl
 lib/HTML/Restrict.pm
 lib/HTML/Restrict/Types.pm
 perlcriticrc
@@ -21,7 +22,9 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/attribute_constraints.t
 t/comments.t
+t/control-characters.t
 t/declaration.t
+t/empty-element-tags.t
 t/js.t
 t/lowercase.t
 t/malformed-html.t

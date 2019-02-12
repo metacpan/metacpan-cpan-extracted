@@ -1,5 +1,14 @@
 Revision history for Text-Parser
 
+0.910     2019-02-10 17:52:24-08:00 America/Los_Angeles
+  - Added a new attribute auto_trim and have four different values for it
+  - Added a method line_auto_manip that can be overridden in subclasses
+  - Enabled rw accessors for multiline_type and auto_chomp attributes
+  - Edited SpiceParser-3.t and Text-Parser.t to accommodate test changes
+
+0.903     2019-02-08 20:21:31-08:00 America/Los_Angeles
+  - Reduce redundate Moose types, improve code coverage
+
 0.902     2019-02-07 22:24:40-08:00 America/Los_Angeles
   - Namespace all types inside Text::Parser class.
 

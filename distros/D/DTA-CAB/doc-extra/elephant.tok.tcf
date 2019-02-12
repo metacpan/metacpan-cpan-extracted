@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<D-Spin xmlns="http://www.dspin.de/data" version="0.4">
+  <MetaData xmlns="http://www.dspin.de/data/metadata"/>
+  <TextCorpus xmlns="http://www.dspin.de/data/textcorpus" lang="de">
+    <!-- "text" layer is optional if "tokens" and "sentences" layers are present -->
+    <text>
+      EJn zamer Elephant gillt ohngefähr zweyhundert Thaler.
+      Ceterum censeo Carthaginem esse delendam.
+    </text>
+    <tokens>
+      <token ID="w1">EJn</token>
+      <token ID="w2">zamer</token>
+      <token ID="w3">Elephant</token>
+      <token ID="w4">gillt</token>
+      <token ID="w5">ohngefähr</token>
+      <token ID="w6">zweyhundert</token>
+      <token ID="w7">Thaler</token>
+      <token ID="w8">.</token>
+      <token ID="w9">Ceterum</token>
+      <token ID="wa">censeo</token>
+      <token ID="wb">Carthaginem</token>
+      <token ID="wc">esse</token>
+      <token ID="wd">delendam</token>
+      <token ID="we">.</token>
+    </tokens>
+    <sentences>
+      <sentence ID="s1" tokenIDs="w1 w2 w3 w4 w5 w6 w7 w8"/>
+      <sentence ID="s2" tokenIDs="w9 wa wb wc wd we"/>
+    </sentences>
+  </TextCorpus>
+</D-Spin>

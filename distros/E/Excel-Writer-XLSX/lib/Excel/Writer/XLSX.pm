@@ -4,7 +4,7 @@ package Excel::Writer::XLSX;
 #
 # Excel::Writer::XLSX - Create a new file in the Excel 2007+ XLSX format.
 #
-# Copyright 2000-2018, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2019, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -14,11 +14,10 @@ use strict;
 use warnings;
 use Exporter;
 
-use strict;
 use Excel::Writer::XLSX::Workbook;
 
 our @ISA     = qw(Excel::Writer::XLSX::Workbook Exporter);
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 
 ###############################################################################
@@ -436,6 +435,18 @@ The C<set_size()> method can be used to set the size of a workbook window.
 The Excel window size was used in Excel 2007 to define the width and height of a workbook window within the Multiple Document Interface (MDI). In later versions of Excel for Windows this interface was dropped. This method is currently only useful when setting the window size in Excel for Mac 2011. The units are pixels and the default size is 1073 x 644.
 
 Note, this doesn't equate exactly to the Excel for Mac pixel size since it is based on the original Excel 2007 for Windows sizing.
+
+
+
+
+=head2 set_tab_ratio( $tab_ratio )
+
+
+The C<set_tab_ratio()> method can be used to set the ratio between worksheet tabs and the horizontal slider at the bottom of a workbook. This can be increased to give more room to the tabs or reduced to increase the size of the horizontal slider:
+
+    $workbook->set_tab_ratio(75);
+
+The default value in Excel is 60.
 
 
 
@@ -2038,6 +2049,12 @@ The default boolean values are shown above. Individual elements can be protected
 
     $worksheet->protect( 'drowssap', { insert_rows => 1 } );
 
+For chartsheets the allowable options and default values are:
+
+    %options = (
+        objects               => 1,
+        content               => 1,
+    );
 
 
 
@@ -2882,11 +2899,20 @@ An Excel worksheet looks something like the following;
     | 4 |       |       |       |       |  ...
     |...|  ...  |  ...  |  ...  |  ...  |  ...
 
-The headers are the letters and numbers at the top and the left of the worksheet. Since these headers serve mainly as a indication of position on the worksheet they generally do not appear on the printed page. If you wish to have them printed you can use the C<print_row_col_headers()> method :
+The headers are the letters and numbers at the top and the left of the worksheet. Since these headers serve mainly as a indication of position on the worksheet they generally do not appear on the printed page. If you wish to have them printed you can use the C<print_row_col_headers()> method:
 
     $worksheet->print_row_col_headers();
 
 Do not confuse these headers with page headers as described in the C<set_header()> section above.
+
+
+
+
+=head2 hide_row_col_headers()
+
+Similar to C<print_row_col_headers()> above but set the option to hide the row and column headers within Excel so that they aren't visible to the user:
+
+    $worksheet->hide_row_col_headers();
 
 
 
@@ -7485,6 +7511,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXVIII, John McNamara.
+Copyright MM-MMXIX, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

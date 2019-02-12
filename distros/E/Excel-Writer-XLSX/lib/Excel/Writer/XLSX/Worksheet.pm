@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Worksheet;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2018, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2019, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -30,7 +30,7 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
                                     quote_sheetname);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 
 ###############################################################################
@@ -87,9 +87,10 @@ sub new {
     $self->{_active}     = 0;
     $self->{_tab_color}  = 0;
 
-    $self->{_panes}       = [];
-    $self->{_active_pane} = 3;
-    $self->{_selected}    = 0;
+    $self->{_panes}                = [];
+    $self->{_active_pane}          = 3;
+    $self->{_selected}             = 0;
+    $self->{_hide_row_col_headers} = 0;
 
     $self->{_page_setup_changed} = 0;
     $self->{_paper_size}         = 0;
@@ -1680,6 +1681,19 @@ sub print_row_col_headers {
     else {
         $self->{_print_headers} = 0;
     }
+}
+
+
+###############################################################################
+#
+# hide_row_col_headers()
+#
+# Set the option to hide the row and column headers in Excel.
+#
+sub hide_row_col_headers {
+
+    my $self = shift;
+    $self->{_hide_row_col_headers} = 1;
 }
 
 
@@ -3477,27 +3491,16 @@ sub data_validation {
 
     # Convert date/times value if required.
     if ( $param->{validate} eq 'date' || $param->{validate} eq 'time' ) {
-        if ( $param->{value} =~ /T/ ) {
-            my $date_time = $self->convert_date_time( $param->{value} );
+        my $date_time = $self->convert_date_time( $param->{value} );
 
-            if ( !defined $date_time ) {
-                carp "Invalid date/time value '$param->{value}' "
-                  . "in data_validation()";
-                return -3;
-            }
-            else {
-                $param->{value} = $date_time;
-            }
+        if ( defined $date_time ) {
+            $param->{value} = $date_time;
         }
-        if ( defined $param->{maximum} && $param->{maximum} =~ /T/ ) {
+
+        if ( defined $param->{maximum} ) {
             my $date_time = $self->convert_date_time( $param->{maximum} );
 
-            if ( !defined $date_time ) {
-                carp "Invalid date/time value '$param->{maximum}' "
-                  . "in data_validation()";
-                return -3;
-            }
-            else {
+            if ( defined $date_time ) {
                 $param->{maximum} = $date_time;
             }
         }
@@ -4793,6 +4796,12 @@ sub _table_function_to_formula {
     my $function = shift;
     my $col_name = shift;
     my $formula  = '';
+
+    # Escape special characters, as required by Excel.
+    $col_name =~ s/'/''/g;
+    $col_name =~ s/#/'#/g;
+    $col_name =~ s/\[/'[/g;
+    $col_name =~ s/]/']/g;
 
     my %subtotals = (
         average   => 101,
@@ -6155,20 +6164,21 @@ sub _comment_params {
     my $default_height = 74;
 
     my %params = (
-        author     => undef,
-        color      => 81,
-        start_cell => undef,
-        start_col  => undef,
-        start_row  => undef,
-        visible    => undef,
-        width      => $default_width,
-        height     => $default_height,
-        x_offset   => undef,
-        x_scale    => 1,
-        y_offset   => undef,
-        y_scale    => 1,
-        font       => 'Tahoma',
-        font_size  => 8,
+        author      => undef,
+        color       => 81,
+        start_cell  => undef,
+        start_col   => undef,
+        start_row   => undef,
+        visible     => undef,
+        width       => $default_width,
+        height      => $default_height,
+        x_offset    => undef,
+        x_scale     => 1,
+        y_offset    => undef,
+        y_scale     => 1,
+        font        => 'Tahoma',
+        font_size   => 8,
+        font_family => 2,
     );
 
 
@@ -6295,11 +6305,11 @@ sub _comment_params {
         $params{author},
         $params{visible},
         $params{color},
-
-        [@vertices],
-
         $params{font},
         $params{font_size},
+        $params{font_family},
+
+        [@vertices],
     );
 }
 
@@ -6699,12 +6709,18 @@ sub _write_sheet_view {
     my $tab_selected     = $self->{_selected};
     my $view             = $self->{_page_view};
     my $zoom             = $self->{_zoom};
+    my $row_col_headers  = $self->{_hide_row_col_headers};
     my $workbook_view_id = 0;
     my @attributes       = ();
 
-    # Hide screen gridlines if required
+    # Hide screen gridlines if required.
     if ( !$gridlines ) {
         push @attributes, ( 'showGridLines' => 0 );
+    }
+
+    # Hide the row/column headers.
+    if ( $row_col_headers ) {
+        push @attributes, ( 'showRowColHeaders' => 0 );
     }
 
     # Hide zeroes in cells.
@@ -8975,7 +8991,19 @@ sub _write_cf_rule {
             $self->_write_formula( $param->{maximum} );
         }
         else {
-            $self->_write_formula( $param->{value} );
+            my $value = $param->{value};
+
+            # String "Cell" values must be quoted, apart from ranges.
+            if (   $value !~ /(\$?)([A-Z]{1,3})(\$?)(\d+)/
+                && $value !~
+                /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ )
+            {
+                if ( $value !~ /^".*"$/ ) {
+                    $value = qq("$value");
+                }
+            }
+
+            $self->_write_formula( $value );
         }
 
         $self->xml_end_tag( 'cfRule' );
@@ -9998,6 +10026,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXVIII, John McNamara.
+(c) MM-MMXIX, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

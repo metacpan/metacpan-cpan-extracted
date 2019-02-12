@@ -340,6 +340,9 @@ sub __header_row {
         $header_row = shift @{$sql->{insert_into_args}};
     }
     else {
+        for my $col_idx ( @{$sf->{i}{idx_added_cols}||[]} ) {
+            $sql->{insert_into_args}->[0][$col_idx] = undef;
+        }
         my $c = 0;
         $header_row = [ map { 'c' . ++$c } @{$sql->{insert_into_args}->[0]} ];
     }

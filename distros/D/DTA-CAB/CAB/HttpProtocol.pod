@@ -1,0 +1,239 @@
+=pod
+
+=head1 NAME
+
+DTA::CAB::HttpProtocol - HTTP query protocol for use with DTA::CAB::Server::HTTP::Handler::Query
+
+=cut
+
+##========================================================================
+## DESCRIPTION
+=pod
+
+=head1 DESCRIPTION
+
+This manual page describes the conventions used by the
+L<DTA::CAB::Server::HTTP::Handler::Query|DTA::CAB::Server::HTTP::Handler::Query>
+analysis request handler class for
+L<DTA::CAB::Server::HTTP|DTA::CAB::Server::HTTP> servers.
+The examples in this manual page assume your
+L<DTA::CAB::Server::HTTP|DTA::CAB::Server::HTTP> server object is running
+on C<$serverURL> (e.g. $serverURL="http://localhost:8080")
+with a L<DTA::CAB::Server::HTTP::Handler::Query|DTA::CAB::Server::HTTP::Handler::Query>
+handler object $qh bound to path
+C</query> (i.e. $queryURL="$serverURL/query").
+
+=cut
+
+##========================================================================
+=pod
+
+=head2 HEAD Requests
+
+HEAD requests are honored by default,
+but don't currently return any useful information other
+than the fact that the server is (or is not) running.
+
+=cut
+
+##========================================================================
+=pod
+
+=head2 /query/list Requests
+
+Requests whose local path component ends in '/list' are interpreted
+as requests for a list of analyzer names (strings) supported by the query handler object.
+Such C</list> requests may be GET or POST requests may contain the following
+form parameters:
+
+=over 4
+
+=item a =E<gt> $regex
+
+Requests the server to return only those analyzers whose names
+match the regular expression $regex.
+
+=item fmt =E<gt> $fmt
+
+Alias: format
+
+Requests the server to return the list of analyzers in format $fmt,
+which should be a format alias supported by the
+L<DTA::CAB::Format::Registry|DTA::CAB::Format::Registry> object
+associated with the query handler ($qh-E<gt>{formats}),
+which by default is simply the global format registry
+as used by L<DTA::CAB::Format::newFormat|DTA::CAB::Format/newFormat>.
+
+This use of formats constitutes an abuse of the L<DTA::CAB::Format|DTA::CAB::Format>
+API, since the returned data are really just a flat list of strings and not
+"document-like" at all, but it should suffice for most purposes.
+
+The default format is 'TT', which returns a flat newline-separated list
+of analyzers names.
+
+=back
+
+The list of analyzers is returned in the requested format as the response content.
+
+=cut
+
+
+##========================================================================
+=pod
+
+=head2 /query Requests
+
+All other requests are interpreted as a request for analysis of a user-supplied
+L<document|DTA::CAB::Document> by a handler-supported L<analyzer|DTA::CAB::Analyzer>.
+C</query> requests may be GET or POST requests.  Query requests are specified in
+terms of form parameters, which may be passed
+either `GET'-like in the 'query' portion of the requested URL (the portion after the '?')
+or `POST'-like in the request content (if the request Content-Type is either
+'application/x-www-form-urlencoded' or 'multipart/form-data'),
+or a combination of both (in which case GET-like parameters take precedence over POST parameters).
+Additionally, the L<DTA::CAB::Server::HTTP|DTA::CAB::Server::HTTP> class supports
+so-called "xpost" requests, which are nothing more than POST requests with a 'Content-Type' header
+other than 'application/x-www-form-urlencoded' or 'multipart/form-data', in which
+all `option-like' query parameters are assumed to be encoded in the URL (as for typical GET requests),
+and the POST content itself is interpreted as the value of the 'qd' (query document) parameter.
+
+=head3 Query Parameters
+
+=over 4
+
+=item a =E<gt> $a
+
+Name of the analyzer (string) to be queried, which
+must be an analyzer name as returned by a
+"/query/list" request;
+see L</"/query/list Requests"> for details.
+
+If unspecified, the query handler may choose a default
+analyzer.  By convention, this analyzer is accessible
+as $a='default'.
+
+=item q =E<gt> $rawQueryString
+
+A raw untokenized text string to be tokenized
+with L<DTA::CAB::Format::Raw|DTA::CAB::Format::Raw>
+and analyzed.
+
+Each query must specify either a 'q' parameter,
+a 'qd' parameter, or contain raw POST content representing
+the formatted document to be queried.
+
+=item qd =E<gt> $queryDocument
+
+A L<DTA::CAB::Document|DTA::CAB::Document>
+in the format specified by the
+L<'fmt'|/"fmt =E<gt> $fmt">
+parameter.
+
+If $queryDocument does not conform to the structural
+conventions of a L<DTA::CAB::Document|DTA::CAB::Document>
+(i.e. {body=E<gt>[ {tokens=E<gt>[ {text=>$t1}, ... ]}, ... ]}),
+an attempt will be made to heuristically massage it into
+one; see L<DTA::CAB::Format::forceDocument|DTA::CAB::Format/forceDocument>().
+
+Each query must specify either a 'q' parameter,
+a 'qd' parameter, or contain raw POST content representing
+the formatted document to be queried.
+
+=item fmt =E<gt> $fmt
+
+Aliases: format ifmt
+
+Specifies the input format of the document passed in via the "qd" parameter or
+POST request content (see below).  $fmt should be a
+L<DTA::CAB::Format|DTA::CAB::Format> alias known to the
+L<DTA::CAB::Format::Registry|DTA::CAB::Format::Registry> object
+associated with the query handler ($qh-E<gt>{formats}),
+which by default is simply the global format registry
+as used by L<DTA::CAB::Format::newFormat|DTA::CAB::Format/newFormat>.
+See L<DTA::CAB::Format/SUBCLASSES> for a list of known formats and aliases.
+
+The default format is given by the query handler's 'defaultFormat' field,
+which by default is set to $DTA::CAB::Format::CLASS_DEFAULT (usually 'TT').
+
+=item ofmt =E<gt> $ofmt
+
+Specifies the output format to be used for returning
+the analyzed document in file-upload mode.  If unspecified,
+$ofmt defaults to the input format $fmt.
+See L<DTA::CAB::Format/SUBCLASSES> for a list of known formats and aliases.
+
+=item raw =E<gt> $bool
+
+If specified true, a successful query response will be returned
+with C<Content-Type: text/plain> and without a C<Content-Disposition>
+header, regardless of the chosen $fmt.  Otherwise,
+the C<Content-Type> and C<Content-Disposition> headers are determined
+by the specified $fmt.
+
+=item pretty =E<gt> $level
+
+Whether to pretty-print the response data.
+Really just a wrapper for L<$fmt-E<gt>{level}|DTA::CAB::Format/formatLevel>.
+
+=item $analyzerOption =E<gt> $value
+
+Any other form parameter is interpreted as an option
+to be passed to the L<analyzeDocument|DTA::CAB::Analyzer/analyzeDocument>
+method of the selected analyzer.  Note that the query handler $qh can
+block propagation of some or all analyzer options by means of its
+'allowUserOptions' attribute.
+
+=item file =E<gt> $filename
+
+File basename to use for response in attachment-mode.
+Defaults to $rawQueryString or 'data'.
+
+=back
+
+=head3 Query Responses
+
+If an error occurred during analysis, an error response should be returned
+to the client.
+Otherwise, the response has 'Content-Type' and 'Content-Disposition' headers
+as set by the selected format $fmt,
+and the response content is a string representing the analyzed document
+as output by $fmt-E<gt>toString().
+
+=cut
+
+##========================================================================
+=pod
+
+=head2 Response Caching
+
+As of DTA::CAB version 1.16, DTA::CAB::Server::HTTP supports basic in-memory
+caching of responses for GET requests.  Client requests may set the
+C<Cache-Control: no-cache> header option to prevent the server from returning
+a cached response even if one is available.  Similarly, if a client request
+includes a C<Cache-Control: no-store> header option, the server will not cache
+its generated response (although this option has no effect on a previously
+cached response for the same URI, if one exists).  If the response returned
+by the server was drawn from the server-internal cache, it will contain the
+header C<X-Cached: 1>.
+
+=cut
+
+##======================================================================
+## Footer
+##======================================================================
+
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2019 by Bryan Jurish
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

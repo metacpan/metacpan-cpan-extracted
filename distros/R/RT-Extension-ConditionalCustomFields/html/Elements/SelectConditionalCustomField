@@ -1,0 +1,25 @@
+<select name="<%$Name%>">
+<option value="" <% not $Default and qq[ selected="selected"] |n %>>--</option>
+% while (my $CustomFieldObj = $CustomFields->Next) {
+% next if $OnlySelectionType and not $CustomFieldObj->IsSelectionType;
+% next if $Not and $CustomFieldObj->id == $Not;
+<option value="<%$CustomFieldObj->id%>"<% $Default == $CustomFieldObj->id && qq[ selected="selected"] |n%>><% $CustomFieldObj->Name %></option>
+%}
+</select>
+<%INIT>
+my $CustomFields = RT::CustomFields->new($session{'CurrentUser'});
+$CustomFields->UnLimit;
+$CustomFields->LimitToLookupType( $LookupType ) if $LookupType;
+$CustomFields->Limit(FIELD => 'Type', VALUE => 'IPAddressRange', OPERATOR => '!=', ENTRYAGGREGATOR => 'AND');
+$CustomFields->OrderByCols( { FIELD => 'LookupType' }, { FIELD => 'Name' } );
+
+$Default = $Default->id || 0 if ref $Default;
+</%INIT>
+<%ARGS>
+$None => 1
+$Name => 'BasedOn'
+$Default => 0
+$LookupType => 'RT::Queue-RT::Ticket'
+$OnlySelectionType => 1
+$Not => 0
+</%ARGS>

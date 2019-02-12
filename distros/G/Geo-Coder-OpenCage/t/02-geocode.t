@@ -1,7 +1,9 @@
 use strict;
 use warnings;
 use utf8;
-
+use feature qw(say);
+use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
 use Test::More;
 
 binmode Test::More->builder->output,         ":encoding(utf8)";
@@ -60,7 +62,7 @@ my @tests = (
             location => "東京都",
             language => "jp",
         },
-        output => [ 35.79, 139.77 ],
+        output => [ 35.68, 139.76 ],
     },
 
     # country
@@ -81,6 +83,7 @@ for my $test (@tests) {
 
     ok $result, '... got a sane response';
 
+    #say Dumper $result->{results}[0];
     my @results = @{ $result->{results} || [] };
     my $num_results = @results;
 

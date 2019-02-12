@@ -1,11 +1,2 @@
 TYPEMAP
 Locked::Storage        T_PTROBJ
-char *                 T_PV
-
-INPUT
-T_PV
-  $var = ($type)SvPV_nolen($arg)
-
-OUTPUT
-T_PV
-  sv_setpv((SV*)ST(0), RETVAL);

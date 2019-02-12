@@ -38,7 +38,7 @@ no warnings;
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( descend prepareblank ); # our @EXPORT = qw( );
 
-$VERSION = '0.129'; # our $VERSION = '';
+$VERSION = '0.131'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -1026,7 +1026,7 @@ sub descend
 	    #say $tee "WITH, IN TAKEOPTIMA \$metafile: " . dump($metafile);
 	    #say $tee "WITH, IN TAKEOPTIMA \@blockelts: " . dump(@blockelts);
       #say $tee "WITH, IN TAKEOPTIMA \$countblock: " . dump($countblock);
-	    Sim::OPT::Interlinear::interlinear( $confinterlinear, $prepfile, $rawmetafile, \@blockelts, $tofile, $countblock );
+	    Sim::OPT::Interlinear::interlinear( $prepfile, $confinterlinear, $rawmetafile, \@blockelts, $tofile, $countblock );
 
       open( RAWMETAFILE, "$rawmetafile" ) or die;
       my @rawlines = <RAWMETAFILE>;

@@ -8,11 +8,11 @@ XML::LibXML::Dtd - XML::LibXML DTD Handling
 
   use XML::LibXML;
 
-  $dtd = XML::LibXML::Dtd-E<gt>new($public_id, $system_id);
-  $dtd = XML::LibXML::Dtd-E<gt>parse_string($dtd_str);
-  $publicId = $dtd-E<gt>getName();
-  $publicId = $dtd-E<gt>publicId();
-  $systemId = $dtd-E<gt>systemId();
+  $dtd = XML::LibXML::Dtd->new($public_id, $system_id);
+  $dtd = XML::LibXML::Dtd->parse_string($dtd_str);
+  $publicId = $dtd->getName();
+  $publicId = $dtd->publicId();
+  $systemId = $dtd->systemId();
 
 =head1 DESCRIPTION
 
@@ -31,7 +31,7 @@ to Dtd objects.
 
 =item new
 
-  $dtd = XML::LibXML::Dtd-E<gt>new($public_id, $system_id);
+  $dtd = XML::LibXML::Dtd->new($public_id, $system_id);
 
 Parse a DTD from the system identifier, and return a DTD object that you can
 pass to $doc->is_valid() or $doc->validate().
@@ -48,7 +48,7 @@ pass to $doc->is_valid() or $doc->validate().
 
 =item parse_string
 
-  $dtd = XML::LibXML::Dtd-E<gt>parse_string($dtd_str);
+  $dtd = XML::LibXML::Dtd->parse_string($dtd_str);
 
 The same as new() above, except you can parse a DTD from a string. Note that
 parsing from string may fail if the DTD contains external parametric-entity
@@ -57,7 +57,7 @@ references with relative URLs.
 
 =item getName
 
-  $publicId = $dtd-E<gt>getName();
+  $publicId = $dtd->getName();
 
 Returns the name of DTD; i.e., the name immediately following the DOCTYPE
 keyword.
@@ -65,14 +65,14 @@ keyword.
 
 =item publicId
 
-  $publicId = $dtd-E<gt>publicId();
+  $publicId = $dtd->publicId();
 
 Returns the public identifier of the external subset.
 
 
 =item systemId
 
-  $systemId = $dtd-E<gt>systemId();
+  $systemId = $dtd->systemId();
 
 Returns the system identifier of the external subset.
 
@@ -89,7 +89,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0133
+2.0134
 
 =head1 COPYRIGHT
 

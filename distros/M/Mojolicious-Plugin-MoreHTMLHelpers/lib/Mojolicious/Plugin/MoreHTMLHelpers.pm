@@ -5,9 +5,9 @@ package Mojolicious::Plugin::MoreHTMLHelpers;
 use strict;
 use warnings;
 
-use parent 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -33,10 +33,30 @@ sub register {
 
         return $brightness > 130 ? '#000000' : '#ffffff';
     } );
+
+    $app->helper( gradient => sub {
+        my ($c) = shift;
+
+        my $color = shift // '#ffffff';
+
+        return sprintf q~
+            background: %s !important;
+            background: -moz-linear-gradient(top,  %s 0%%,%s 100%%) !important;
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%%, %s), color-stop(100%%,%s)) !important;
+            background: -webkit-linear-gradient(top,  %s 0%%,%s 100%%) !important;
+            background: -o-linear-gradient(top,  %s 0%%,%s 100%%) !important;
+            background: -ms-linear-gradient(top,  %s 0%%,%s 100%%) !important;
+            background: linear-gradient(to bottom,%s 0%%,%s 100%%) !important;
+        ~, ($color) x 13;
+    });
 }
 
 sub _perceived_brightness {
     my ($red, $green, $blue) = @_;
+
+    if ( grep { !defined $_ || $_ =~ m{[^A-Fa-f0-9]} }($red, $green, $blue) ) {
+        return 200;
+    }
 
     $red   = hex $red;
     $green = hex $green;
@@ -65,7 +85,7 @@ Mojolicious::Plugin::MoreHTMLHelpers - Some general helpers
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -97,7 +117,27 @@ on the fly. This is what this helper is for.
 
     <span style="background-color: #135713; color: <% textcolor('#135713') %>">Any text</span>
 
-=back
+=head2 gradient
+
+This creates the CSS directives for a gradient
+
+    <style>
+        .black-gradient { <%= gradient('#000000') %> }
+    </style>
+
+will be
+
+    <style>
+        .black-gradient {
+            background: #000000 !important;
+            background: -moz-linear-gradient(top,  #000000 0%,#000000 100%) !important;
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #000000), color-stop(100%,#000000)) !important;
+            background: -webkit-linear-gradient(top,  #000000 0%,#000000 100%) !important;
+            background: -o-linear-gradient(top,  #000000 0%,#000000 100%) !important;
+            background: -ms-linear-gradient(top,  #000000 0%,#000000 100%) !important;
+            background: linear-gradient(to bottom,#000000 0%,#000000 100%) !important;
+    }
+    </style>
 
 =head1 METHODS
 

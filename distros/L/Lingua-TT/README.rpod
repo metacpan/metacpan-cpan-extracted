@@ -1,0 +1,53 @@
+=encoding utf8
+
+=pod
+
+README for Lingua::TT
+
+=head1 ABSTRACT
+
+Lingua::TT - utility suite for "vertical" text corpus files with TAB-separated record fields
+
+=head1 DESCRIPTION
+
+The Lingua::TT package provides various assorted utilities for
+"vertical" text corpus files using TAB-separated record fields,
+as used e.g. by Corpus WorkBench, DDC, TnT, TreeTagger, etc.
+
+=head1 INSTALLATION
+
+Issue the following commands to the shell:
+
+ bash$ cd Lingua-TT-0.01 # (or wherever you unpacked this distribution)
+ bash$ perl Makefile.PL  # check requirements, etc.
+ bash$ make              # build the module
+ bash$ make test         # (optional): test module before installing
+ bash$ make install      # install the module on your system
+
+=head1 KNOWN BUGS
+
+=over 4
+
+=item *
+
+poorly named
+
+=item *
+
+poorly documented
+
+=item *
+
+neither particularly pretty nor particularly efficient
+
+=item *
+
+basically a good example of How Not To Do It
+
+=back
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=cut

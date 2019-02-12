@@ -36,4 +36,5 @@ WriteMakefile(
     },
     ABSTRACT_FROM => 'lib/Geo/ShapeFile.pm',
     AUTHOR        => 'Shawn Laffan <shawnlaffan@gmail.com>',
+    LICENSE       => 'perl_5',
 );

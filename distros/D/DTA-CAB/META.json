@@ -1,0 +1,70 @@
+{
+   "abstract" : "\"Cascaded Analysis Broker\" for robust linguistic analysis",
+   "author" : [
+      "Bryan Jurish <moocow@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DTA-CAB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CDB_File" : "0",
+            "DB_File" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "File::Map" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "Gfsm" : "0.0216",
+            "Gfsm::XL" : "0.03",
+            "HTTP::Daemon" : "0",
+            "HTTP::Daemon::UNIX" : "0",
+            "JSON::XS" : "0",
+            "LWP::Protocol::http::SocketUnixAlt" : "0",
+            "LWP::UserAgent" : "0",
+            "Lingua::TT" : "0.07",
+            "Log::Log4perl" : "1.07",
+            "Moot" : "0.01",
+            "Pod::Usage" : "0",
+            "RPC::XML" : "0.59",
+            "Storable" : "0",
+            "Template" : "0",
+            "Test::More" : "0",
+            "Text::LevenshteinXS" : "0",
+            "Time::HiRes" : "0",
+            "Unicode::Normalize" : "0",
+            "Unicode::String" : "2.09",
+            "Unicruft" : "0.03",
+            "XML::LibXML" : "2.0001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.106",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

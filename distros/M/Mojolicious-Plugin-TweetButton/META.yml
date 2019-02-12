@@ -1,25 +1,35 @@
---- #YAML:1.0
-name:               Mojolicious-Plugin-TweetButton
-version:            0.0003
-abstract:           TweetButton plugin for Mojolicious
+---
+abstract: 'TweetButton Helper Plugin'
 author:
-    - Viacheslav Tykhanovskyi <vti@cpan.org>
-license:            artistic_2
-distribution_type:  module
-configure_requires:  {}
-build_requires:  {}
-requires:
-    Mojo:  0.999926
-    perl:  5.008007
-resources:
-    license:     http://dev.perl.org/licenses/
-    repository:  http://github.com/vti/mojolicious-plugin-tweet_button
-no_index:
-    directory:
-        - t
-        - inc
-        - t
-generated_by:       ExtUtils::MakeMaker version 6.56
+  - 'Viacheslav Tykhanovskyi <vti@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-TweetButton
+provides:
+  Mojolicious::Plugin::TweetButton:
+    file: lib/Mojolicious/Plugin/TweetButton.pm
+    version: '0.0005'
+requires:
+  Mojolicious: '8.00'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/vti/mojolicious-plugin-tweet_button/issues
+  homepage: http://github.com/vti/mojolicious-plugin-tweet_button
+  repository: http://github.com/vti/mojolicious-plugin-tweet_button.git
+version: '0.0005'
+x_contributors:
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+  - 'Renee <reb@perl-services.de>'
+  - 'Viacheslav Tykhanovskyi <viacheslav.t@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

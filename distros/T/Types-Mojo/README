@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.04
 
 SYNOPSIS
 
@@ -48,6 +48,17 @@ TYPES
  MojoFileList
 
     A MojoCollection of MojoFiles.
+
+ MojoURL[`a]
+
+    An object of Mojo::URL. Can be parameterized with a scheme.
+
+        has http_url => ( is => 'rw', isa => MojoURL["https?"] ); # s? means plain or secure -> http or https
+        has ftp_url  => ( is => 'rw', isa => MojoURL["ftp"] );
+
+ MojoUserAgent
+
+    An object of Mojo::UserAgent
 
 COERCIONS
 
@@ -191,6 +202,33 @@ COERCIONS
           for my $file ( @{ $obj->files->to_array } ) {
               say $file->basename;
           }
+
+ To MojoURL
+
+      * String to MojoURL
+
+      In a class
+
+          package Test;
+          
+          use Moo;
+          use Types::Mojo qw(MojoFile);
+          
+          has 'file' => ( is => 'ro', isa => MojoURL, coerce => 1 );
+          
+          1;
+
+      In the script
+
+          use Test;
+      
+          use v5.22;
+      
+          my $obj = Test->new(
+              url => 'http://perl-services.de',
+          );
+          
+          say $obj->url->host;
 
 AUTHOR
 

@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XS-Install",
    "no_index" : {
@@ -29,7 +29,7 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "5.58",
-            "ExtUtils::MakeMaker" : "6.76",
+            "ExtUtils::MakeMaker" : "7.12",
             "ExtUtils::ParseXS" : "3.24",
             "perl" : "5.010000"
          }
@@ -43,5 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.7"
+   "version" : "v1.0.11",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

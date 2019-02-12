@@ -36,6 +36,16 @@ my %WriteMakefileArgs = (
         'Capture::Tiny' => 0,
         'IO::CaptureOutput' => 0,
     },
+    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
+      'meta-spec' => { version => 2 },
+      resources => {
+        repository  => {
+          url  => 'https://github.com/jkeenan/devel-git-multibisect.git',
+          web  => 'https://github.com/jkeenan/devel-git-multibisect',
+          type => 'git',
+        },
+      },
+    }) : () ),
 );
 
 my %FallbackPrereqs = (

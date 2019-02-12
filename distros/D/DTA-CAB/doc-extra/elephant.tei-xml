@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI>
+ <text>
+   <!-- running headers are ignored by the tokenizer -->
+   <fw>Running header</fw>
+   <p>EJn zamer Elephant gillt ohngefähr zweyhundert Thaler</p>
+   <!-- paragraph boundaries imply sentence boundaries, even without punctuation -->
+   <p>Ceterum censeo Carthaginem esse delendam</p>
+ </text>
+</TEI>

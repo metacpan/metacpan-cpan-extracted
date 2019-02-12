@@ -1,5 +1,5 @@
-Getargs::Mixed version 1.01
-===========================
+Getargs::Mixed
+==============
 
 This is a handy little module to help you handle mixed argument lists passed
 to subroutines. This can handle positional, named, and mixed positional/named
@@ -19,19 +19,30 @@ To install this module type the following:
    make test
    make install
 
+Or, if you have App::cpanminus installed, "cpanm Getargs::Mixed".
+
 DEPENDENCIES
 
-Doesn't have any if you have a typical Perl 5.8.0 or high distribution
-installed. It may work on previous installs of Perl, but the Makefile.PL
+Doesn't have any if you have a typical Perl 5.8.0 or higher distribution
+installed. It may work on earlier versions of Perl, but the Makefile.PL
 and module will have to be modified since I haven't attempted to test this
 theory.
 
+CONTRIBUTING AND REPORTING BUGS
+
+The code is on GitHub:
+    https://github.com/cxw42/Getargs-Mixed
+
+The main bug tracker is also on GitHub:
+    https://github.com/cxw42/Getargs-Mixed/issues
+
+If you want to report bugs through the RT system, that's fine too:
+    Web:   https://rt.cpan.org/Public/Dist/Display.html?Name=Getargs-Mixed
+    Email: bug-Getargs-Mixed@rt.cpan.org
+
 COPYRIGHT AND LICENCE
 
-Put the correct copyright and licence information here.
-
-Copyright (C) 2003 Andrew Sterling Hanenkamp
+Copyright (C) 2003--2019 Andrew Sterling Hanenkamp, Christopher White
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
-
+it under the same terms as Perl itself.

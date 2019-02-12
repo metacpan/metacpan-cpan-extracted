@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.32 {
+package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.33 {
 
   use 5.014;
   use Moose;
@@ -39,7 +39,8 @@ package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.32 {
       Test::Exit                            0.11
       Clustericious                         1.20
       Test::Clustericious::Cluster          0.31
-      Test2::V0                             0.000071
+      Test2::V0                             0.000092
+      ExtUtils::ParseXS                     3.30
     );
     
     $upgrades{$_} = '1.302015' for (
@@ -235,7 +236,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.32
+version 2.33
 
 =head1 SYNOPSIS
 

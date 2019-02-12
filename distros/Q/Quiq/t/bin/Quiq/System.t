@@ -24,15 +24,18 @@ sub test_numberOfCpus : Test(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_hostname : Test(2) {
+sub test_hostname : Test(1) {
     my $self = shift;
 
     my $hostname = Quiq::System->hostname;
     $self->ok($hostname);
 
-    my $ip = Quiq::System->ip;
-    $hostname = Quiq::System->hostname($ip);
-    $self->ok($hostname);
+    # SREZIC: On most systems IP addresses are associated with reverse
+    # DNS entries, but this is not everywhere the case.
+    #
+    # my $ip = Quiq::System->ip;
+    # $hostname = Quiq::System->hostname($ip);
+    # $self->ok($hostname);
 }
 
 # -----------------------------------------------------------------------------

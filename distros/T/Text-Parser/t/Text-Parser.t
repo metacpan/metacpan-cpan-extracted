@@ -11,10 +11,10 @@ my $fname = 'text-simple.txt';
 
 my $pars;
 throws_ok { $pars = Text::Parser->new('balaji'); }
-'Text::Parser::Exception::Constructor',
+'Moose::Exception::SingleParamsToNewMustBeHashRef',
     'Throws an exception for non-hash input';
 throws_ok { $pars = Text::Parser->new( balaji => 1 ); }
-'Text::Parser::Exception::Constructor', 'Throws an exception for bad keys';
+'Moose::Exception::Legacy', 'Throws an exception for bad keys';
 throws_ok { $pars = Text::Parser->new( multiline_type => 'balaji' ); }
 'Moose::Exception::ValidationFailedForInlineTypeConstraint',
     'Throws an exception for bad value';
@@ -26,6 +26,22 @@ is( $pars->setting(),         undef, 'When no setting is called' );
 is( $pars->setting('balaji'), undef, 'balaji is not a setting at all' );
 is( $pars->filename(),        undef, 'No filename specified so far' );
 
+is( $pars->multiline_type, undef, 'Not a multi-line parser' );
+is( $pars->multiline_type('join_next'),
+    'join_next', 'I can set this to join_next if need be' );
+throws_ok {
+    $pars->multiline_type(undef);
+}
+'Text::Parser::Exception',
+    'Correct error when trying to reset multiline_type';
+lives_ok {
+    is( $pars->multiline_type('join_last'),
+        'join_last', 'Make it another type of Multiline Parser' );
+}
+'No errors on changing multiline_type';
+
+$pars = Text::Parser->new();
+
 lives_ok { is( $pars->filehandle(), undef, 'Not initialized' ); }
 'This should not die, just return undef';
 throws_ok { $pars->filehandle('bad argument'); }
@@ -34,6 +50,9 @@ throws_ok { $pars->filehandle('bad argument'); }
 throws_ok { $pars->filename( { a => 'b' } ); }
 'Moose::Exception::ValidationFailedForInlineTypeConstraint',
     'filename() will take only string as input';
+throws_ok { $pars->filename('') }
+'Moose::Exception::ValidationFailedForInlineTypeConstraint',
+    'Empty filename string';
 throws_ok { $pars->filename($fname) }
 'Moose::Exception::ValidationFailedForInlineTypeConstraint',
     'No file by this name';
@@ -128,5 +147,7 @@ is( $pars->pop_record,   undef,    'Now undef is removed' );
 is( $pars->last_record,  $content, 'Now the last record is the one earlier' );
 is_deeply( [ $pars->get_records ],
     [$content], 'Got correct content after pop' );
+
+is( $pars->line_auto_manip, undef, 'Returns nothing for empty call' );
 
 done_testing;

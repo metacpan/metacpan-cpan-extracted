@@ -24,6 +24,7 @@
 .git/logs/refs/heads/no_objects
 .git/logs/refs/heads/outwit_cpantesters
 .git/logs/refs/heads/subtree_experiment_2
+.git/logs/refs/heads/try-build-FAILURE
 .git/logs/refs/heads/weirdcase
 .git/logs/refs/remotes/origin/fix-validate-list-sequence
 .git/logs/refs/remotes/origin/master
@@ -203,6 +204,7 @@
 .git/refs/heads/no_objects
 .git/refs/heads/outwit_cpantesters
 .git/refs/heads/subtree_experiment_2
+.git/refs/heads/try-build-FAILURE
 .git/refs/heads/weirdcase
 .git/refs/remotes/origin/fix-validate-list-sequence
 .git/refs/remotes/origin/master
@@ -221,6 +223,7 @@
 .git/refs/tags/v0.08
 .git/refs/tags/v0.09
 .git/refs/tags/v0.10
+.git/refs/tags/v0.11
 .gitignore
 .gitmodules
 Changes

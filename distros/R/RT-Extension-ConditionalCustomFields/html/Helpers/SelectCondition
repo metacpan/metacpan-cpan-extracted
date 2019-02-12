@@ -7,10 +7,14 @@ if ($CustomFieldId) {
     my $cf = RT::CustomField->new($session{'CurrentUser'});
     $cf->Load($CustomFieldId);
     if ($cf->id) {
-        my $cf_values = $cf->Values;
-        while (my $cf_value = $cf_values->Next) {
-            push @$result, $cf_value->Name;
+        if ($cf->IsSelectionType) {
+            my $cf_values = $cf->Values;
+            while (my $cf_value = $cf_values->Next) {
+                push @{$result->{vals}}, $cf_value->Name;
+            }
         }
+        $result->{op} = $m->scomp('/Elements/SelectConditionalRelation', CustomField => $cf, Name => 'ConditionalOp');
+        $result->{type} = $cf->Type;
     }
 }
 $m->out(JSON($result));

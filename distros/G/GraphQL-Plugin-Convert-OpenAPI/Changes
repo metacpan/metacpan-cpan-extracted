@@ -1,5 +1,11 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-OpenAPI
 
+0.19	Fri  8 Feb 23:21:21 GMT 2019
+ - update to new SDL format
+
+0.18	Fri  8 Feb 23:07:27 GMT 2019
+ - dep on JSON::Validator::OpenAPI::Mojolicious - thanks @eserte
+
 0.17	Thu  2 Aug 17:46:36 BST 2018
  - dep on OpenAPI::Client 0.17 - thanks @vanHoesel
 

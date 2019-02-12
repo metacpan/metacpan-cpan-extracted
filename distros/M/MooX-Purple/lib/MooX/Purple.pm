@@ -3,11 +3,35 @@ package MooX::Purple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use Keyword::Declare;
+use Data::Dumper;
 
 sub import {
-	keyword role (Ident $class, List*? @roles, Block $block) {
+	keytype GATTRS is m{
+			(?:
+				allow (?&PerlNWS)
+					(?:(?!qw)(?&PerlQualifiedIdentifier)|
+					(?&PerlList))
+				|
+				with (?&PerlNWS)
+					(?:(?!qw)(?&PerlQualifiedIdentifier)|
+					(?&PerlList))
+				|
+				is (?&PerlNWS)
+					(?:(?!qw)(?&PerlQualifiedIdentifier)|
+					(?&PerlList))
+			)?+
+	}xms;
+	keytype SATTRS is m{
+			(?:
+				allow (?&PerlNWS)
+					(?:(?!qw)(?&PerlQualifiedIdentifier)|
+					(?&PerlList))
+				|
+			)?+
+	}xms;
+	keyword role (Ident $class, GATTRS @roles, Block $block) {
 		my ($body, %attrs) = _set_class_role_attrs($block, _parse_role_attrs(@roles));
 		return qq|{
 			package $class;
@@ -17,7 +41,7 @@ sub import {
 		}|;
 		return '';
 	}
-	keyword class (Ident $class, List*? @roles, Block $block) {
+	keyword class (Ident $class, GATTRS @roles, Block $block) {
 		my ($body, %attrs) = _set_class_role_attrs($block, _parse_role_attrs(@roles));
 		return qq|{
 			package $class;
@@ -30,7 +54,7 @@ sub import {
 			1;
 		}|;
 	}
-	keyword private (Ident $method, List*? @roles, Block $block) {
+	keyword private (Ident $method, SATTRS @roles, Block $block) {
 		my %attrs = _parse_role_attrs(@roles);
 		my $allowed = $attrs{allow} ? sprintf 'qw(%s)', join ' ', @{$attrs{allow}} : 'qw//';
 		$block =~ s/(^{)|(}$)//g;
@@ -54,7 +78,7 @@ sub _parse_role_attrs {
 	for (@roles) {
 		$_ =~ m/(with|allow|is)(.*)/i;
 		$attrs{$1} = [] unless $attrs{$1};
-		push @{$attrs{$1}}, eval $2;
+		push @{$attrs{$1}}, eval $2 || $2;
 	}
 	return %attrs;
 }
@@ -77,11 +101,11 @@ __END__
 
 =head1 NAME
 
-MooX::Purple - purple
+MooX::Purple - MooX::Purple
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -93,7 +117,7 @@ Version 0.01
 		public seven { return '7' }
 	};
 
-	role World allow qw/Hello/ with qw/Before/ {
+	role World allow Hello with Before {
 		private six { 'six' }
 	};
 

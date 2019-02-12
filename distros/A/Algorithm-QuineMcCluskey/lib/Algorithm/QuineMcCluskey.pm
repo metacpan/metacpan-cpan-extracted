@@ -2,17 +2,18 @@ package Algorithm::QuineMcCluskey;
 
 use strict;
 use warnings;
-use 5.010001;
+use 5.016001;
 
 use Moose;
 use namespace::autoclean;
 
-use Carp qw(croak);
+use Carp;
 
 use Algorithm::QuineMcCluskey::Util qw(:all);
-use List::MoreUtils qw(uniq);
-use List::Compare::Functional qw(get_complement get_intersection is_LequivalentR);
-use Tie::Cycle;
+use List::Util qw(uniqnum);
+use List::Compare::Functional qw(get_complement is_LequivalentR);
+
+extends 'Logic::Minimizer';
 
 #
 # Vaguely consistent Smart-Comment rules:
@@ -21,78 +22,20 @@ use Tie::Cycle;
 # 4 pound signs for code that manipulates prime/essentials/covers hashes:
 #      row_dominance().
 #
-# 5 pound signs for the solve() and recurse_solve() code, and the remels() calls.
+# 5 pound signs for the solve() and recurse_solve() code, and the remels()
+# calls.
 #
 # The ::Format package is only needed for Smart Comments -- comment or uncomment
 # in concert with Smart::Comments as needed.
 #
 #use Algorithm::QuineMcCluskey::Format qw(arrayarray hasharray chart);
-#use Smart::Comments ('###');
+#use Smart::Comments ('###', '#####');
 
 #
-# Required attributes to create the object.
+# Attributes inherited from Logic::Minimizer are width, minterms, maxterms,
+# dontcares, columnstring, title, dc, vars, primes, essentials, covers,
+# group_symbols, order_by, and minonly.
 #
-# 1. 'width' is absolutely required (handled via Moose).
-#
-# 2. If 'columnstring' is provided, 'minterms', 'maxterms', and
-#    'dontcares' can't be used.
-#
-# 3. Either 'minterms' or 'maxterms' is used, but not both.
-#
-# 4. 'dontcares' are used with either 'minterms' or 'maxterms', but
-#    cannot be used by itself.
-#
-has 'width'	=> (
-	isa => 'Int', is => 'ro', required => 1
-);
-
-has 'minterms'	=> (
-	isa => 'ArrayRef[Int]', is => 'rw', required => 0,
-	predicate => 'has_minterms'
-);
-has 'maxterms'	=> (
-	isa => 'ArrayRef[Int]', is => 'rw', required => 0,
-	predicate => 'has_maxterms'
-);
-has 'dontcares'	=> (
-	isa => 'ArrayRef[Int]', is => 'rw', required => 0,
-	predicate => 'has_dontcares'
-);
-has 'columnstring'	=> (
-	isa => 'Str', is => 'ro', required => 0,
-	predicate => 'has_columnstring',
-	lazy => 1,
-	builder => 'to_columnstring'
-);
-
-#
-# Optional attributes.
-#
-has 'title'	=> (
-	isa => 'Str', is => 'rw', required => 0,
-	predicate => 'has_title'
-);
-has 'dc'	=> (
-	isa => 'Str', is => 'rw',
-	default => '-'
-);
-has 'vars'	=> (
-	isa => 'ArrayRef[Str]', is => 'rw', required => 0,
-	default => sub{['A' .. 'Z']}
-);
-
-#
-# Change behavior.
-#
-has 'order_by' => (
-	isa => 'Str', is => 'rw',
-	default => 'none',
-);
-
-has 'minonly' => (
-	isa => 'Bool', is => 'rw',
-	default => 1
-);
 
 #
 # The '_bits' fields are the terms' bitstring fields, and are
@@ -114,59 +57,7 @@ has 'max_bits'	=> (
 	predicate => 'has_max_bits'
 );
 
-#
-# Prime implicants, essentials, and covers (the building blocks
-# to, and final form of, the solution to the equation) are all "lazy"
-# attributes and calculated when asked for in code or by the user.
-#
-
-#
-# The calculated prime implicants.
-#
-has 'primes'	=> (
-	isa => 'HashRef', is => 'ro', required => 0,
-	init_arg => undef,
-	reader => 'get_primes',
-	writer => '_set_primes',
-	predicate => 'has_primes',
-	clearer => 'clear_primes',
-	lazy => 1,
-	builder => 'generate_primes'
-);
-
-#
-# The essential prime implicants (not actually
-# used in the algorithm, we keep track of what's
-# essential in a list local to the recursive
-# solving function).
-#
-has 'essentials'	=> (
-	isa => 'ArrayRef', is => 'ro', required => 0,
-	init_arg => undef,
-	reader => 'get_essentials',
-	writer => '_set_essentials',
-	predicate => 'has_essentials',
-	clearer => 'clear_essentials',
-	lazy => 1,
-	builder => 'generate_essentials'
-);
-
-#
-# The terms that cover the primes needed to solve the
-# truth table.
-#
-has 'covers'	=> (
-	isa => 'ArrayRef[ArrayRef[Str]]', is => 'ro', required => 0,
-	init_arg => undef,
-	reader => 'get_covers',
-	writer => '_set_covers',
-	predicate => 'has_covers',
-	clearer => 'clear_covers',
-	lazy => 1,
-	builder => 'generate_covers'
-);
-
-our $VERSION = 0.19;
+our $VERSION = 1.00;
 
 sub BUILD
 {
@@ -178,76 +69,15 @@ sub BUILD
 	#
 	# Catch errors involving minterms, maxterms, and don't-cares.
 	#
-	croak "Mixing minterms and maxterms not allowed"
-		if ($self->has_minterms and $self->has_maxterms);
-
-	if ($self->has_columnstring)
-	{
-		croak "No other terms necessary when using the columnstring attribute"
-			if ($self->has_minterms or $self->has_maxterms or $self->has_dontcares);
-
-		my $cl = $last_idx + 1 - length $self->columnstring;
-
-		croak "Columnstring length is too short by ", $cl if ($cl > 0);
-		croak "Columnstring length is too long by ", -$cl if ($cl < 0);
-	}
-	else
-	{
-		if ($self->has_minterms)
-		{
-			@terms = @{$self->minterms};
-		}
-		elsif ($self->has_maxterms)
-		{
-			@terms = @{$self->maxterms};
-		}
-		else
-		{
-			croak "Must supply either minterms or maxterms";
-		}
-
-		if ($self->has_dontcares)
-		{
-			my @intersect = get_intersection([$self->dontcares, \@terms]);
-			if (scalar @intersect != 0)
-			{
-				croak "Term(s) ", join(", ", @intersect),
-					" are in both the don't-care list and the term list.";
-			}
-
-			push @terms, @{$self->dontcares};
-		}
-
-		#
-		# Can those terms be expressed in 'width' bits?
-		#
-		my @outside = grep {$_ > $last_idx or $_ < 0} @terms;
-
-		if (scalar @outside)
-		{
-			croak "Terms (" . join(", ", @outside) . ") are larger than $w bits";
-		}
-	}
-
-	#
-	# Do we really need to check if they've set the
-	# don't-care character to '0' or '1'? Oh well...
-	#
-	croak "Don't-care must be a single character" if (length $self->dc != 1);
-	croak "The don't-care character can not be '0' or '1'" if ($self->dc =~ qr([01]));
-
-	#
-	# Make sure we have enough variable names, and limit them to the width.
-	#
-	croak "Not enough variable names for your width" if (scalar @{$self->vars} < $w);
-	$self->vars([ @{$self->vars}[0 .. $w-1] ]);
+	$self->catch_errors();
 
 	#
 	# We've gotten past the error-checking. Create the object.
 	#
 	if ($self->has_columnstring)
 	{
-		my($min_ref, $max_ref, $dc_ref) = $self->break_columnstring();
+		my($min_ref, $max_ref, $dc_ref) =
+			$self->list_to_terms(split(//, $self->columnstring));
 
 		### min_ref: $min_ref
 		### max_ref: $max_ref
@@ -259,7 +89,7 @@ sub BUILD
 
 	if ($self->has_minterms)
 	{
-		@terms = sort(uniq(@{$self->minterms}));
+		@terms = sort(uniqnum(@{$self->minterms}));
 
 		my @bitstrings = map {
 			substr(unpack("B32", pack("N", $_)), -$w)
@@ -270,7 +100,7 @@ sub BUILD
 	}
 	if ($self->has_maxterms)
 	{
-		@terms = sort(uniq(@{$self->maxterms}));
+		@terms = sort(uniqnum(@{$self->maxterms}));
 
 		my @bitstrings = map {
 			substr(unpack("B32", pack("N", $_)), -$w)
@@ -282,7 +112,7 @@ sub BUILD
 
 	if ($self->has_dontcares)
 	{
-		my @dontcares = sort(uniq(@{$self->dontcares}));
+		my @dontcares = sort(uniqnum(@{$self->dontcares}));
 
 		my @bitstrings = map {
 			substr(unpack("B32", pack("N", $_)), -$w)
@@ -295,54 +125,6 @@ sub BUILD
 	$self->title("$w-variable truth table") unless ($self->has_title);
 
 	return $self;
-}
-
-#
-# Return a string made up of the function column. Position 0 in the string is
-# the 0th row of the column, and so on.
-#
-sub to_columnstring
-{
-	my $self = shift;
-	my ($dfltbit, $setbit) = ($self->has_min_bits)? qw(0 1): qw(1 0);
-	my @bitlist = ($dfltbit) x (1 << $self->width);
-
-	my @terms;
-
-	push @terms, @{$self->minterms} if ($self->has_minterms);
-	push @terms, @{$self->maxterms} if ($self->has_maxterms);
-
-	map {$bitlist[$_] = $setbit} @terms;
-
-	if ($self->has_dontcares)
-	{
-		map {$bitlist[$_] = $self->dc} (@{ $self->dontcares});
-	}
-
-	return join "", @bitlist;
-}
-
-#
-# Take a column string and return array refs usable as parameters for
-# minterm, maxterm, and don't-care attributes.
-#
-sub break_columnstring
-{
-	my $self = shift;
-	my @bitlist = split(//, $self->columnstring);
-	my $x = 0;
-
-	my(@maxterms, @minterms, @dontcares);
-
-	for (@bitlist)
-	{
-		push @minterms, $x if ($_ eq '1');
-		push @maxterms, $x if ($_ eq '0');
-		push @dontcares, $x if ($_ eq $self->dc);
-		$x++;
-	}
-
-	return (\@minterms, \@maxterms, \@dontcares);
 }
 
 sub complement_terms
@@ -433,7 +215,7 @@ sub all_bit_terms
 	my $self = shift;
 	my @terms;
 
-	push @terms, $self->minmax_bit_terms();
+	push @terms, ($self->has_min_bits)? @{$self->min_bits}: @{$self->max_bits};
 	push @terms, @{ $self->dc_bits } if ($self->has_dc_bits);
 	return sort @terms;
 }
@@ -561,10 +343,11 @@ sub generate_primes
 	# set of prime implicants.
 	#
 	my %p;
+	my @bit_terms = $self->minmax_bit_terms();
 
 	for my $unmarked (grep { !$implicant{$_} } keys %implicant)
 	{
-		my @matched = maskedmatch($unmarked, $self->minmax_bit_terms());
+		my @matched = maskedmatch($unmarked, @bit_terms);
 		$p{$unmarked} = [@matched] if (@matched);
 	}
 
@@ -585,77 +368,7 @@ sub generate_essentials
 {
 	my $self = shift;
 
-	my $p = $self->get_primes;
-	my %e = find_essentials($p, $self->minmax_bit_terms());
-
-	### generate_essentials() -- essentials: hasharray(\%e)
-
-	return [sort keys %e];
-}
-
-sub to_boolean
-{
-	my $self = shift;
-	my($cref) = @_;
-	my $is_sop = $self->has_min_bits;
-	my $w = $self->width;
-
-	#
-	### to_boolean() called with: arrayarray([$cref])
-	#
-	# Group separators (grouping character pairs)
-	#
-	my($gsb, $gse) = ('(', ')');
-
-	#
-	# Group joiner string, depending on whether this
-	# is a sum-of-products or product-of-sums.
-	#
-	my $gj = $is_sop ? ' + ': '';
-
-	my @covers = @$cref;
-
-	#
-	# Check for the special case where the covers are a single
-	# expression of nothing but dc characters (e.g., "----").
-	# This is caused when all of the terms (including
-	# don't-care) are covered, resulting in an equation that would
-	# be simply "(1)" (or "(0)" if using maxterms). Since the usual
-	# translation will return "()", this has to checked.
-	#
-	if ($#covers == 0 and $covers[0] =~ /[^01]{$w}/)
-	{
-		return ($is_sop)? "(1)": "(0)";
-	}
-
-	@covers = sort @covers if ($self->order_by eq 'covers');
-
-	my @exprns = map {$gsb . $self->to_boolean_term($_, $is_sop) . $gse} @covers;
-	@exprns = sort @exprns if ($self->order_by eq 'vars');
-
-	return join $gj, @exprns;
-}
-
-#
-# Convert an individual term or prime implicant to a boolean variable string.
-#
-sub to_boolean_term
-{
-	my $self = shift;
-	my($term, $is_sop) = @_;
-
-	#
-	# Element joiner and match condition
-	#
-	my($ej, $cond) = $is_sop ? ('', 1) : (' + ', 0);
-	tie my $var, 'Tie::Cycle', [ @{$self->vars} ];
-
-	my $varstring = join $ej, map {
-			my $var = $var;	# Activate cycle even if not used
-			$_ eq $self->dc ? () : $var . ($_ == $cond ? '' : "'")
-		} split(//, $term);
-
-	return $varstring;
+	return [sort find_essentials($self->get_primes) ];
 }
 
 sub solve
@@ -673,7 +386,7 @@ sub all_solutions
 	my $self = shift;
 	my $c = $self->get_covers();
 
-	### solve -- get_covers() returned: arrayarray($c)
+	### all_solutions -- get_covers() returned: arrayarray($c)
 
 	return map {$self->to_boolean($_)} @$c;
 }
@@ -702,15 +415,14 @@ sub recurse_solve
 	my $level = $_[1];
 	my @prefix;
 	my @covers;
-	my @essentials_keys;
+	my @essentials;
 
 	#
 	##### recurse_solve() level: $level
 	##### recurse_solve() called with
 	##### primes: "\n" . chart(\%primes, $self->width)
 	#
-	
-	my %ess = find_essentials(\%primes, $self->minmax_bit_terms());
+	my @essentials_next = find_essentials(\%primes);
 
 	#
 	##### Begin prefix/essentials loop.
@@ -718,18 +430,18 @@ sub recurse_solve
 	do
 	{
 		#
-		##### recurse_solve() essentials: %ess
+		##### recurse_solve() do loop, essentials: %ess
 		#
 		# Remove the essential prime implicants from
 		# the prime implicants table.
 		#
-		@essentials_keys = keys %ess;
+		@essentials = @essentials_next;
 
 		#
-		##### Purging prime hash of: "[" . join(", ", sort @essentials_keys) . "]"
+		##### Purging prime hash of: "[" . join(", ", sort @essentials) . "]"
 		#
-		purge_elements(\%primes, @essentials_keys);
-		push @prefix, grep { $ess{$_} > 0} @essentials_keys;
+		purge_elements(\%primes, @essentials);
+		push @prefix, @essentials;
 
 		##### recurse_solve() @prefix now: "[" . join(", ", sort @prefix) . "]"
 
@@ -739,23 +451,25 @@ sub recurse_solve
 		# Rule 1: A row dominated by another row can be eliminated.
 		# Rule 2: A column that dominated another column can be eliminated.
 		#
+		#### Looking for rows dominated by other rows
+		####    primes table: "\n" . chart(\%primes, $self->width)
 		my @rows = row_dominance(\%primes, 1);
-		#### row_dominance called with primes: "\n" . chart(\%primes, $self->width)
-		#### row_dominance returns for removal: "[" . join(", ", @rows) . "]"
 		delete $primes{$_} for (@rows);
+		#### row_dominance returns rows for removal: "[" . join(", ", @rows) . "]"
+		####      primes now: "\n" . chart(\%primes, $self->width)
 
-		my %cols = columns(\%primes, $self->minmax_bit_terms());
+		my %cols = transpose(\%primes);
 		my @cols = row_dominance(\%cols, 0);
-		#### row_dominance called with primes (rotated): "\n" . chart(\%cols, $self->width)
-		#### row_dominance returns for removal: "[" . join(", ", @cols) . "]"
 		remels(\%primes, @cols);
+		#### row_dominance returns cols for removal: "[" . join(", ", @cols) . "]"
+		####      primes now: "\n" . chart(\%primes, $self->width)
 
-		%ess = find_essentials(\%primes, $self->minmax_bit_terms());
+		@essentials_next = find_essentials(\%primes);
 
 		##### recurse_solve() essentials after purge/dom: %ess
 
 	} until (is_LequivalentR([
-			[ @essentials_keys ] => [ keys %ess ]
+			[ @essentials] => [ @essentials_next ]
 			]));
 
 	return [ reverse sort @prefix ] unless (keys %primes);
@@ -769,7 +483,7 @@ sub recurse_solve
 	##### recurse_solve() Primes after loop
 	##### primes: "\n" . chart(\%primes, $self->width)
 	#
-	my($term, @ta) = covered_least(\%primes, $self->minmax_bit_terms());
+	my($term, @ta) = covered_least(\%primes);
 
 	#
 	##### Least Covered term: $term
@@ -908,7 +622,7 @@ The strings that represent the covered terms are also viewable:
 
     my @covers = $q->get_covers();
 
-    print join(", ", @covers[0];
+    print $q->solve(), "\n", join(", ", @covers[0];
 
 Will print out
 
@@ -997,17 +711,17 @@ The names do not have to be single characters, e.g.:
 Returns a string of the Boolean equation.
 
 For now, the form of the equation is set by the choice of terms used
-to create the object. If you use the minterms attribute, the equation
-will be returned in sum-of-product form. If you use the maxterms
+to create the object. If you use the C<minterms> attribute, the equation
+will be returned in sum-of-product form. If you use the C<maxterms>
 attribute, the equation will be returned in product-of-sum form.
 
-Using the columnstring attribute is the same as using the minterm
+Using the columnstring attribute is the same as using the C<minterms>
 attribute as far as solve() is concerned.
 
 It is possible that there will be more than one equation that solves the
 boolean expression. Therefore solve() can return a different (but equally
 valid) equation on separate runs. You can have the full list of possible
-equations by using L</all_solutions>. Likewise, the terms that describe
+equations by using L</all_solutions()>. Likewise, the terms that describe
 the solution (before they are converted with the variable names) are
 returned with L</get_covers()>, described below.
 
@@ -1100,7 +814,7 @@ expression.
 
 The implicants are in a form that combines 1, 0, and the don't-care character
 (found and set with the C<dc> attribute). These are used by L</solve()> to
-create a boolean equation that solves the set of minterms or maxterms.
+create a boolean equation that solves the set of C<minterms> or C<maxterms>.
 
 It is possible that there will be more than one equation that solves a boolean
 expression. The solve() method returns a minimum set, and all_solutions()
@@ -1164,3 +878,28 @@ John M. Gamble B<jgamble@cpan.org> (current maintainer)
 
 =cut
 
+=head1 SEE ALSO
+
+=over 3
+
+=item
+
+Introduction To Logic Design, by Sajjan G. Shiva, 1998.
+
+=item
+
+Discrete Mathematics and its Applications, by Kenneth H. Rosen, 1995
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2006 Darren Kulp. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
+
+1;

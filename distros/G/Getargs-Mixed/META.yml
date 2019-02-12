@@ -1,0 +1,38 @@
+---
+abstract: 'Perl extension allowing subs to handle mixed parameter lists'
+author:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '3.2701'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Getargs-Mixed
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Getargs::Mixed:
+    file: lib/Getargs/Mixed.pm
+    version: '1.04'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/cxw42/Getargs-Mixed/issues
+  repository: https://github.com/cxw42/Getargs-Mixed.git
+version: '1.04'
+x_contributors:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+  - 'Christopher White <cxw@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

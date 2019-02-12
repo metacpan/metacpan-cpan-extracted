@@ -1,10 +1,13 @@
 package Mojolicious::Command::Author::generate::localplugin;
+
+# ABSTRACT: Plugin generator command
+
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(camelize class_to_path decamelize);
 use Mojolicious;
 
-our $VERSION = '0.02';
+our $VERSION = 0.05;
 
 has description => 'Generate Mojolicious plugin directory structure for application';
 has usage => sub { shift->extract_usage };
@@ -13,17 +16,15 @@ sub run {
   my ($self, $name) = @_;
   $name ||= 'MyPlugin';
 
-  my $use_hash = Mojolicious->VERSION() >= 8 ? 1 : 0;
-
   # Class
-  my $class = $name =~ /^[a-z]/ ? camelize $name : $name;
-  my $app = class_to_path $class;
-  my @app_params = $use_hash ? ({ class => $class, name => $name }) : ($class, $name);
+  my $class      = $name =~ /^[a-z]/ ? camelize $name : $name;
+  my $app        = class_to_path $class;
+  my @app_params = ({ class => $class, name => $name });
   $self->render_to_rel_file('class', "lib/$app", @app_params);
 
   # Test
-  my $testname = decamelize $class;
-  my @test_params = $use_hash ? ({ name => $name }) : ($name);
+  my $testname    = decamelize $class;
+  my @test_params = ({ name => $name });
   $self->render_to_rel_file('test', "t/$testname.t", @test_params);
 }
 
@@ -36,11 +37,11 @@ sub run {
 
 =head1 NAME
 
-Mojolicious::Command::Author::generate::localplugin
+Mojolicious::Command::Author::generate::localplugin - Plugin generator command
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -54,19 +55,15 @@ version 0.02
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::generate::localplugin> generates directory structures for
+L<Mojolicious::Command::Author::generate::localplugin> generates directory structures for
 fully functional L<Mojolicious> plugins.
 
 See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
 available by default.
 
-=head1 NAME
-
-Mojolicious::Command::generate::localplugin - Plugin generator command
-
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::generate::localplugin> inherits all attributes from
+L<Mojolicious::Command::Author::generate::localplugin> inherits all attributes from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 description
@@ -85,7 +82,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::generate::plugin> inherits all methods from
+L<Mojolicious::Command::Author::generate::plugin> inherits all methods from
 L<Mojolicious::Command> and implements the following new ones.
 
 =head2 run

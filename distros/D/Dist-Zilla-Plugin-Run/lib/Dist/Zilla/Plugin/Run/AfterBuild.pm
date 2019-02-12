@@ -4,7 +4,7 @@ use warnings;
 package Dist::Zilla::Plugin::Run::AfterBuild;
 # ABSTRACT: execute a command of the distribution after build
 
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 use Moose;
 with qw(
@@ -12,13 +12,14 @@ with qw(
   Dist::Zilla::Plugin::Run::Role::Runner
 );
 
+use Path::Tiny 'path';
 use namespace::autoclean;
 
 sub after_build {
   my ($self, $param) = @_;
   $self->_call_script({
     dir =>  $param->{ build_root },
-    pos => [$param->{ build_root }, sub { $self->zilla->version }]
+    pos => [path($param->{ build_root })->canonpath, sub { $self->zilla->version }]
   });
 }
 
@@ -59,7 +60,7 @@ Dist::Zilla::Plugin::Run::AfterBuild - execute a command of the distribution aft
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 SYNOPSIS
 

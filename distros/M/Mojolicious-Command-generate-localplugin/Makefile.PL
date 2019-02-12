@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,12 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mojolicious-Command-generate-localplugin",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Mojolicious::Command::generate::localplugin",
   "PREREQ_PM" => {
     "Mojolicious" => "8.0",
     "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }

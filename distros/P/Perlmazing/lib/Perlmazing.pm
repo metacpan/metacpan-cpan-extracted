@@ -2,7 +2,7 @@ package Perlmazing;
 use Perlmazing::Engine;
 use Perlmazing::Engine::Exporter;
 use Perlmazing::Feature;
-our $VERSION = '1.2812';
+our $VERSION = '1.2814';
 our @EXPORT;
 our @found_symbols = Perlmazing::Engine->found_symbols;
 
@@ -19,7 +19,7 @@ sub import {
 	my $self = shift;
 	my @call = caller;
 	Perlmazing::Feature->import;
-	warnings->import(FATAL => qw(closed unopened numeric recursion redefine syntax uninitialized));
+	warnings->import(FATAL => qw(closed unopened numeric recursion syntax uninitialized));
 	if (@_) {
 		@EXPORT = ();
 		my (@YES, @NO);
@@ -650,6 +650,11 @@ the last used one will be the one remaining. For example:
 Works just like Perl's core C<mkdir>, except it will use L<File::Path::make_path()|File::Path> to create any missing directories in the requested path. It will return a list with the directories that were actually created.
 
 
+=head2 move
+
+Same as L<File::Copy::Recursive::rmove()|File::Copy::Recursive>. Moves a file using the native OS file-copy implementation. It will recursively move directories when passed as argument.
+
+
 =head2 no_void
 
 This function is meant to be called from inside a subroutine. The purpose of it is to break the execution of that subroutine and immediatly return with a warning if that subroutine was called in void context. This is useful
@@ -942,13 +947,15 @@ Same as core C<sleep>, except it will accept fractions and behave accordingly. E
 
 =head2 slurp
 
-C<slurp($path_to_file)>
+C<slurp($path_to_file, $force_binary_read)>
 
 This function will efficiently read and return the content of a file. Example:
 
     use Perlmazing;
     
     my $data = slurp 'some/file.txt';
+
+It will use binmode on binary files only. If the second argument is a true value, then binmode will be used no matter what type of file is being read.
 
 
 =head2 sort_by_key
@@ -1031,6 +1038,34 @@ Same as L<Time::Local::timegm()|Time::Local>, except it will include nanoseconds
 =head2 timelocal
 
 Same as L<Time::Local::timelocal()|Time::Local>, except it will include nanoseconds in its return value.
+
+
+=head2 to_number
+
+C<to_number($value)>
+
+C<to_number(@values)>
+
+C<my @result = to_number(@values)>
+
+I<Listable function>
+
+It makes any valid numeric value that is currently treated as string, a valid number. It works with any value that, if it wasn't treated as string, Perl would see as a number (e.g. 123_456), but that when treated as string, fails to to something like $value +=0. The value becomes a real numeric representation. It becomes zero when the value has no numeric interpretation. It is a I<listable> function and will behave like any other
+I<listable> function from this module.
+
+
+=head2 to_string
+
+C<to_string($value)>
+
+C<to_string(@values)>
+
+C<my @result = to_string(@values)>
+
+I<Listable function>
+
+It will simply treat any provided value as a string, making its last use to be seen as string by Perl (e.g. 123 will become "123"). Has no real effect on strings. It is a I<listable> function and will behave like any other
+I<listable> function from this module.
 
 
 =head2 to_utf8

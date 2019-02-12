@@ -11,25 +11,6 @@ use Test::More tests => 3;
 my($q, $eqn, @expected);
 
 $q = Algorithm::QuineMcCluskey->new(
-	title	=> "Example 3.18 from Introduction to Logic Design, by Sajjan G. Shiva, page 131.",
-	width => 5,
-	minterms => [ 0, 1, 2, 5, 14, 16, 18, 24, 26, 30 ],
-	dontcares => [3, 13, 28],
-);
-
-#
-#    (AC'E') + (A'B'C') + (A'B'D'E) + (BCDE')
-# or (AC'E') + (A'B'D'E) + (BCDE') + (B'C'E')
-#
-@expected = (
-	q/(AC'E') + (A'B'C') + (A'B'D'E) + (BCDE')/,
-	q/(AC'E') + (A'B'D'E) + (BCDE') + (B'C'E')/
-);
-
-$eqn = $q->solve;
-ok(scalar (grep($eqn eq $_, @expected)) == 1, $q->title);
-
-$q = Algorithm::QuineMcCluskey->new(
 	title => "A problem with four possible covers",
 	width  => 4,
 	minterms => [ 1, 2, 8, 9, 14, 15 ],
@@ -93,4 +74,29 @@ $eqn = $q->solve;
 
 ok(scalar (grep($eqn eq $_, @expected)) == 1, $q->title);
 
+
+$q = Algorithm::QuineMcCluskey->new(
+	title => "Problem to test the covered_least() function",
+	width  => 6,
+	minterms => [1..14, 32..35, 40..44, 60..63],
+	dontcares => [48, 56],
+	vars => [qw(u v w x y z)],
+);
+
+#
+# All solutions
+#
+@expected = (
+    q/(uvwx) + (uv'x') + (u'v'w'x) + (u'v'xz') + (u'v'y'z) + (v'wy'z') + (v'x'y)/,
+    q/(uvwx) + (uv'x') + (u'v'w'y) + (u'v'xz') + (u'v'y'z) + (v'wy'z') + (v'x'y)/,
+    q/(uvwx) + (uv'x') + (u'v'w'z) + (u'v'xy') + (u'v'yz') + (v'wy'z') + (v'x'y)/,
+    q/(uvwx) + (uv'x') + (u'v'w'z) + (u'v'xy') + (u'v'yz') + (v'wy'z') + (v'x'z)/,
+    q/(uvwx) + (uv'x') + (u'v'w'x) + (u'v'xy') + (u'v'yz') + (v'wy'z') + (v'x'z)/,
+
+);
+
+$eqn = $q->solve;
+#diag(join("\n", $q->title, "All solutions", $q->all_solutions()));
+
+ok(scalar (grep($eqn eq $_, @expected)) == 1, $q->title);
 

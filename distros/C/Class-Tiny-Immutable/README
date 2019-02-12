@@ -1,0 +1,80 @@
+NAME
+
+    Class::Tiny::Immutable - Minimalist class construction, with read-only
+    attributes
+
+SYNOPSIS
+
+    In Person.pm:
+
+      package Person;
+      
+      use Class::Tiny::Immutable qw( name );
+      
+      1;
+
+    In Employee.pm:
+
+      package Employee;
+      use parent 'Person';
+      
+      use Class::Tiny::Immutable qw( ssn ), {
+        timestamp => sub { time }   # lazy attribute with default
+      };
+      
+      1;
+
+    In example.pl:
+
+      use Employee;
+      
+      my $obj = Employee->new; # dies, name and ssn attributes are required
+      my $obj = Employee->new( name => "Larry", ssn => "111-22-3333" );
+      
+      my $name = $obj->name;
+      my $timestamp = $obj->timestamp;
+      
+      # no attributes can be set
+      $obj->ssn("222-33-4444"); # dies
+      $obj->timestamp(time); # dies
+
+DESCRIPTION
+
+    Class::Tiny::Immutable is a wrapper around Class::Tiny which makes the
+    generated attributes read-only, and required to be set in the object
+    constructor if they do not have a lazy default defined. In other words,
+    attributes are either "lazy" or "required".
+
+METHODS
+
+    In addition to methods inherited from Class::Tiny,
+    Class::Tiny::Immutable defines the following additional introspection
+    method:
+
+ get_all_required_attributes_for
+
+      my @required = Class::Tiny::Immutable->get_all_required_attributes_for($class);
+
+    Returns an unsorted list of required attributes known to
+    Class::Tiny::Immutable for a class and its superclasses.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2017 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Moo, MooseX::AttributeShortcuts
+

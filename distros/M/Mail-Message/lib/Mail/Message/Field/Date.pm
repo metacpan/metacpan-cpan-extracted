@@ -1,4 +1,4 @@
-# Copyrights 2001-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2019 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Field::Date;
 use vars '$VERSION';
-$VERSION = '3.007';
+$VERSION = '3.008';
 
 use base 'Mail::Message::Field::Structured';
 
@@ -33,7 +33,7 @@ sub parse($)
            (?: ($dayname) \s* \, \s* )?
            ( 0?[1-9] | [12][0-9] | 3[01] ) \s*    # day
            \s+ ( [A-Z][a-z][a-z]|[0-9][0-9] ) \s+ # month
-           ( 19[0-9][0-9] | 2[0-9]{3} ) \s+       # year
+           ( (?: 19 | 20 | ) [0-9][0-9] ) \s+     # year
                   ( [0-1]?[0-9] | 2[0-3] ) \s*    # hour
                [:.] ( [0-5][0-9] ) \s*            # minute
            (?: [:.] ( [0-5][0-9] ) )? \s+         # second

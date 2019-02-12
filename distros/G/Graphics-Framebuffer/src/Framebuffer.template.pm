@@ -1,4 +1,4 @@
-6.18 Jan 30, 2019
+6.20 Feb 10, 2019
 package Graphics::Framebuffer;
 
 =head1 NAME
@@ -7,7 +7,7 @@ Graphics::Framebuffer - A Simple Framebuffer Graphics Library
 
 =head1 SYNOPSIS
 
-Direct drawing (usually for 32 and 24 bit framebuffers)
+Direct drawing for 32/24/16 bit framebuffers
 
  use Graphics::Framebuffer;
 
@@ -24,6 +24,8 @@ Drawing is this simple
  $fb->box({'x' => 95, 'y' => 100, 'xx' => 400, 'yy' => 600, 'filled' => 1});
 
  # ... and many many more
+
+Methods requiring parameters require a hash (or anonymous hash) reference passed to the method.  All parameters have easy to understand english names, all lower case, to understand exactly what the method is doing.
 
 =head1 DESCRIPTION
 
@@ -43,19 +45,19 @@ You can write this to a file, whatever.  It defaults to a 640x480x32 RGB graphic
 
 You will not be able to see the output directly when in emulation mode.  I mainly created this mode so that you could install this module (on systems without a framebuffer) and test code you may be writing to be used on other devices that have accessible framebuffer devices.  Nevertheless, I have learned that people use emulation mode as an offscreen drawing surface, and blit from one to the other.  Which is pretty clever.
 
-Make sure you have read/write access to the framebuffer device.  Usually this just means adding your account to the "video" group.  Alternately, you can just run your script as root.  Although I don't recommend it.
+Make sure you have read/write access to the framebuffer device.  Usually this just means adding your account to the "video" group (make sure you log out and log in again after doing that).  Alternately, you can just run your script as root.  Although I don't recommend it.
 
 =head1 INSTALLATION
 
 Before you install this, please note it requires the Perl module "Imager".  If you are installing via CPAN, then please first make sure your system has the appropriate JPEG, GIF, PNG, TIFF, Freetype, and Type1 development libraries installed first.  If you don't, then Imager will just be compiled without support for those kinds of files, which pretty much makes it useless.
 
-If you are using a Debian based system (Ubuntu, Weezy, Mint, etc.) then run the following command (and answer yes to the prompt) before doing anything else:
+If you are using a Debian based system (Ubuntu, Weezy, Mint, Raspian, etc.) then run the following command (and answer yes to the prompt) before doing anything else:
 
 =over 6
 
  sudo apt update
  sudo apt upgrade
- sudo apt install build-essential linux-headers-generic fbset libimager-perl libinline-c-perl libmath-bezier-perl libmath-gradient-perl libfile-map-perl libtest-most-perl
+ sudo apt install build-essential linux-headers-generic fbset libimager-perl libinline-c-perl libmath-bezier-perl libmath-gradient-perl libfile-map-perl libtest-more-perl
 
 =back
 
@@ -65,7 +67,7 @@ If you are using a RedHat based system (Fedora, CentOS, etc):
 
  sudo yum update
  sudo yum upgrade
- sudo yum upgrade kernel-headers build-essential perl-math-bezier perl-math-gradient perl-file-map perl-imager perl-inline-c perl-test-most
+ sudo yum upgrade kernel-headers build-essential perl-math-bezier perl-math-gradient perl-file-map perl-imager perl-inline-c perl-test-more
 
 =back
 
@@ -89,6 +91,18 @@ Please note, that the install step may require root permissions (run it with sud
 If testing fails, it will usually be ok to install it anyway, as it will likely work.  The testing is flakey (thank Perl's test mode for that).
 
 I recommend running the scripts inside of the "examples" directory for real testing instead.
+
+=head1 OPERATIONAL THEORY
+
+How many Perl modules actually tell you how they work?  Well, I will tell you how this one works.
+
+The framebuffer is simply a special file that is mapped to the screen.  How the driver does this can be different.  Some may actually directly map the display memory to this file, and some install a second copy of the display to normal memory and copy it to the display on every vertical blank, usually with a fast DMA transfer.
+
+This module maps that file to a string, and that ends up making the string exactly the same size as the physical display.  Plotting is simply a matter of calculating where in the string that pixel is and modifying it, via "substr" (never using "=" directly).  It's that simple.
+
+Drawing lines etc. requires some algorithmic magic though, but they all call the plot routine to do their eventual magic.
+
+Originally everything was done in Perl, and the module's speed was mostly acceptable, unless you had a really slow system.  It still can run in pure Perl, if you turn off the acceleration feature, although I do not recommend it, if you want speed.
 
 =head1 SPECIAL VARIABLES
 
@@ -191,7 +205,7 @@ no warnings;         # We have to be as quiet as possible
 
 The following constants can be used in the various methods.  Each method example will have the possible constants to use for that method.
 
-The default value is in parenthesis:
+The value of the constant is in parenthesis:
 
 CONSTANT (value)
 
@@ -360,23 +374,22 @@ use constant {
 
 use POSIX ();
 use POSIX qw(modf);
-use Time::HiRes qw(sleep time);
-use Math::Trig;                                                     # Usually only PI is used
-use Math::Bezier;                                                   # Bezier curve calculations done here.
-use Math::Gradient qw( gradient array_gradient multi_gradient );    # Awesome gradient calculation module
-use List::Util qw(min max);                                         # min and max are very handy!
-use File::Map 'map_handle';                                         # Absolutely necessary to map the screen to a string.
-use Imager;                                                         # This is used for TrueType font printing, image loading.
+use Time::HiRes qw(sleep time);                                  # The time accuracy has to be milliseconds on many routines
+use Math::Trig ':pi';                                            # Usually only PI is used
+use Math::Bezier;                                                # Bezier curve calculations done here.
+use Math::Gradient qw( gradient array_gradient multi_gradient ); # Awesome gradient calculation module
+use List::Util qw(min max);                                      # min and max are very handy!
+use File::Map 'map_handle';                                      # Absolutely necessary to map the screen to a string.
+use Imager;                                                      # This is used for TrueType font printing, image loading.
 use Imager::Matrix2d;
-use Imager::Fill;
-use Imager::Fountain;
-use Graphics::Framebuffer::Splash;                                  # The splash code is here now
+use Imager::Fill;                                                # For hatch fills
+use Imager::Fountain;                                            #
+use Graphics::Framebuffer::Splash;                               # The splash code is here
 
-Imager->preload;
+Imager->preload; # The Imager documentation says to do this, but doesn't give much of an explanation why.  However, I assume it is to initialize global variables ahead of time.
 
 ## This is for debugging, and should normally be commented out.
-# use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1;
-# use Carp qw(cluck);
+# use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1;$Data::Dumper::Purity=1;
 
 BEGIN {
     require Exporter;
@@ -447,7 +460,7 @@ BEGIN {
     );
 }
 
-DESTROY {
+DESTROY { # Always clean up after yourself before exiting
     my $self = shift;
     $self->_screen_close();
     _reset() if ($self->{'RESET'});    # Exit by calling 'reset' first
@@ -600,6 +613,9 @@ Defines the colorspace for the graphics routines to draw in.  The possible (and 
 sub new {
     my $class = shift;
 
+    # I would have liked to make this a lot more organized, but over the years it
+    # kind of became this mess.  I could change it, but it likely would break any
+    # code that directly uses values.
     my $this;
     my $self = {
         'SCREEN'        => '',            # The all mighty framebuffer
@@ -933,7 +949,7 @@ sub new {
         }
     }
     $ENV{'PATH'} = '/usr/bin:/bin:/usr/local/bin';
-    if (!defined($ENV{'DISPLAY'}) && defined($self->{'FB_DEVICE'}) && $self->{'FB_DEVICE'} !~ /virtual/i && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
+    if ( ! defined($ENV{'DISPLAY'}) && defined($self->{'FB_DEVICE'}) && $self->{'FB_DEVICE'} !~ /virtual/i && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                                                   # We have to be in binary mode first
         $|++;
         if ($self->{'ACCELERATED'}) {
@@ -991,49 +1007,49 @@ sub new {
         } else { # Fallback if not accelerated.  Do it the old way
             # Make the IOCTL call to get info on the virtual (viewable) screen (Sometimes different than physical)
             (
-                $self->{'vscreeninfo'}->{'xres'},                                                                                                                     # (32)
-                $self->{'vscreeninfo'}->{'yres'},                                                                                                                     # (32)
-                $self->{'vscreeninfo'}->{'xres_virtual'},                                                                                                             # (32)
-                $self->{'vscreeninfo'}->{'yres_virtual'},                                                                                                             # (32)
-                $self->{'vscreeninfo'}->{'xoffset'},                                                                                                                  # (32)
-                $self->{'vscreeninfo'}->{'yoffset'},                                                                                                                  # (32)
-                $self->{'vscreeninfo'}->{'bits_per_pixel'},                                                                                                           # (32)
-                $self->{'vscreeninfo'}->{'grayscale'},                                                                                                                # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'},                                                                                           # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'},                                                                                           # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'msb_right'},                                                                                        # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'},                                                                                         # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'},                                                                                         # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'msb_right'},                                                                                      # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'},                                                                                          # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'},                                                                                          # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'msb_right'},                                                                                       # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'},                                                                                         # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'},                                                                                         # (32)
-                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'msb_right'},                                                                                      # (32)
-                $self->{'vscreeninfo'}->{'nonstd'},                                                                                                                   # (32)
-                $self->{'vscreeninfo'}->{'activate'},                                                                                                                 # (32)
-                $self->{'vscreeninfo'}->{'height'},                                                                                                                   # (32)
-                $self->{'vscreeninfo'}->{'width'},                                                                                                                    # (32)
-                $self->{'vscreeninfo'}->{'accel_flags'},                                                                                                              # (32)
-                $self->{'vscreeninfo'}->{'pixclock'},                                                                                                                 # (32)
-                $self->{'vscreeninfo'}->{'left_margin'},                                                                                                              # (32)
-                $self->{'vscreeninfo'}->{'right_margin'},                                                                                                             # (32)
-                $self->{'vscreeninfo'}->{'upper_margin'},                                                                                                             # (32)
-                $self->{'vscreeninfo'}->{'lower_margin'},                                                                                                             # (32)
-                $self->{'vscreeninfo'}->{'hsync_len'},                                                                                                                # (32)
-                $self->{'vscreeninfo'}->{'vsync_len'},                                                                                                                # (32)
-                $self->{'vscreeninfo'}->{'sync'},                                                                                                                     # (32)
-                $self->{'vscreeninfo'}->{'vmode'},                                                                                                                    # (32)
-                $self->{'vscreeninfo'}->{'rotate'},                                                                                                                   # (32)
-                $self->{'vscreeninfo'}->{'colorspace'},                                                                                                               # (32)
-                @{ $self->{'vscreeninfo'}->{'reserved_fb_vir'} }                                                                                                      # (32) x 4
+                $self->{'vscreeninfo'}->{'xres'},                                # (32)
+                $self->{'vscreeninfo'}->{'yres'},                                # (32)
+                $self->{'vscreeninfo'}->{'xres_virtual'},                        # (32)
+                $self->{'vscreeninfo'}->{'yres_virtual'},                        # (32)
+                $self->{'vscreeninfo'}->{'xoffset'},                             # (32)
+                $self->{'vscreeninfo'}->{'yoffset'},                             # (32)
+                $self->{'vscreeninfo'}->{'bits_per_pixel'},                      # (32)
+                $self->{'vscreeninfo'}->{'grayscale'},                           # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'},      # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'},      # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'msb_right'},   # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'},    # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'},    # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'msb_right'}, # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'},     # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'},     # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'msb_right'},  # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'},    # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'},    # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'msb_right'}, # (32)
+                $self->{'vscreeninfo'}->{'nonstd'},                              # (32)
+                $self->{'vscreeninfo'}->{'activate'},                            # (32)
+                $self->{'vscreeninfo'}->{'height'},                              # (32)
+                $self->{'vscreeninfo'}->{'width'},                               # (32)
+                $self->{'vscreeninfo'}->{'accel_flags'},                         # (32)
+                $self->{'vscreeninfo'}->{'pixclock'},                            # (32)
+                $self->{'vscreeninfo'}->{'left_margin'},                         # (32)
+                $self->{'vscreeninfo'}->{'right_margin'},                        # (32)
+                $self->{'vscreeninfo'}->{'upper_margin'},                        # (32)
+                $self->{'vscreeninfo'}->{'lower_margin'},                        # (32)
+                $self->{'vscreeninfo'}->{'hsync_len'},                           # (32)
+                $self->{'vscreeninfo'}->{'vsync_len'},                           # (32)
+                $self->{'vscreeninfo'}->{'sync'},                                # (32)
+                $self->{'vscreeninfo'}->{'vmode'},                               # (32)
+                $self->{'vscreeninfo'}->{'rotate'},                              # (32)
+                $self->{'vscreeninfo'}->{'colorspace'},                          # (32)
+                @{ $self->{'vscreeninfo'}->{'reserved_fb_vir'} }                 # (32) x 4
             ) = _get_ioctl(FBIOGET_VSCREENINFO, $self->{'FBioget_vscreeninfo'}, $self->{'FB'});
             # Make the IOCTL call to get info on the physical screen
             my $extra = 1;
-            do {                                                                                                                                                      # A hacked way to do this, but it seems to work
+            do { # A hacked way to do this, but it seems to work
                 my $typedef = '' . $self->{'FBioget_fscreeninfo'};
-                if ($extra > 1) {                                                                                                                                     # It turns out it was byte alignment issues, not driver weirdness
+                if ($extra > 1) { # It turns out it was byte alignment issues, not driver weirdness
                     if ($extra == 2) {
                         $typedef =~ s/S1/S$extra/;
                     } elsif ($extra == 3) {
@@ -1042,40 +1058,40 @@ sub new {
                         $typedef =~ s/S1/I/;
                     }
                     (
-                        $self->{'fscreeninfo'}->{'id'},                                                                                                               # (8) x 16
-                        $self->{'fscreeninfo'}->{'smem_start'},                                                                                                       # LONG
-                        $self->{'fscreeninfo'}->{'smem_len'},                                                                                                         # (32)
-                        $self->{'fscreeninfo'}->{'type'},                                                                                                             # (32)
-                        $self->{'fscreeninfo'}->{'type_aux'},                                                                                                         # (32)
-                        $self->{'fscreeninfo'}->{'visual'},                                                                                                           # (32)
-                        $self->{'fscreeninfo'}->{'xpanstep'},                                                                                                         # (16)
-                        $self->{'fscreeninfo'}->{'ypanstep'},                                                                                                         # (16)
-                        $self->{'fscreeninfo'}->{'ywrapstep'},                                                                                                        # (16)
-                        $self->{'fscreeninfo'}->{'filler'},                                                                                                           # (16) - Just a filler
-                        $self->{'fscreeninfo'}->{'line_length'},                                                                                                      # (32)
-                        $self->{'fscreeninfo'}->{'mmio_start'},                                                                                                       # LONG
-                        $self->{'fscreeninfo'}->{'mmio_len'},                                                                                                         # (32)
-                        $self->{'fscreeninfo'}->{'accel'},                                                                                                            # (32)
-                        $self->{'fscreeninfo'}->{'capailities'},                                                                                                      # (16)
-                        @{ $self->{'fscreeninfo'}->{'reserved_fb_phys'} }                                                                                             # (16) x 2
+                        $self->{'fscreeninfo'}->{'id'},                   # (8) x 16
+                        $self->{'fscreeninfo'}->{'smem_start'},           # LONG
+                        $self->{'fscreeninfo'}->{'smem_len'},             # (32)
+                        $self->{'fscreeninfo'}->{'type'},                 # (32)
+                        $self->{'fscreeninfo'}->{'type_aux'},             # (32)
+                        $self->{'fscreeninfo'}->{'visual'},               # (32)
+                        $self->{'fscreeninfo'}->{'xpanstep'},             # (16)
+                        $self->{'fscreeninfo'}->{'ypanstep'},             # (16)
+                        $self->{'fscreeninfo'}->{'ywrapstep'},            # (16)
+                        $self->{'fscreeninfo'}->{'filler'},               # (16) - Just a filler
+                        $self->{'fscreeninfo'}->{'line_length'},          # (32)
+                        $self->{'fscreeninfo'}->{'mmio_start'},           # LONG
+                        $self->{'fscreeninfo'}->{'mmio_len'},             # (32)
+                        $self->{'fscreeninfo'}->{'accel'},                # (32)
+                        $self->{'fscreeninfo'}->{'capailities'},          # (16)
+                        @{ $self->{'fscreeninfo'}->{'reserved_fb_phys'} } # (16) x 2
                     ) = _get_ioctl(FBIOGET_FSCREENINFO, $typedef, $self->{'FB'});
             } else {
                 (
-                    $self->{'fscreeninfo'}->{'id'},                                                                                                               # (8) x 16
-                    $self->{'fscreeninfo'}->{'smem_start'},                                                                                                       # LONG
-                    $self->{'fscreeninfo'}->{'smem_len'},                                                                                                         # (32)
-                    $self->{'fscreeninfo'}->{'type'},                                                                                                             # (32)
-                    $self->{'fscreeninfo'}->{'type_aux'},                                                                                                         # (32)
-                    $self->{'fscreeninfo'}->{'visual'},                                                                                                           # (32)
-                    $self->{'fscreeninfo'}->{'xpanstep'},                                                                                                         # (16)
-                    $self->{'fscreeninfo'}->{'ypanstep'},                                                                                                         # (16)
-                    $self->{'fscreeninfo'}->{'ywrapstep'},                                                                                                        # (16)
-                    $self->{'fscreeninfo'}->{'line_length'},                                                                                                      # (32)
-                    $self->{'fscreeninfo'}->{'mmio_start'},                                                                                                       # LONG
-                    $self->{'fscreeninfo'}->{'mmio_len'},                                                                                                         # (32)
-                    $self->{'fscreeninfo'}->{'accel'},                                                                                                            # (32)
-                    $self->{'fscreeninfo'}->{'capailities'},                                                                                                      # (16)
-                    @{ $self->{'fscreeninfo'}->{'reserved_fb_phys'} }                                                                                             # (16) x 2
+                    $self->{'fscreeninfo'}->{'id'},                   # (8) x 16
+                    $self->{'fscreeninfo'}->{'smem_start'},           # LONG
+                    $self->{'fscreeninfo'}->{'smem_len'},             # (32)
+                    $self->{'fscreeninfo'}->{'type'},                 # (32)
+                    $self->{'fscreeninfo'}->{'type_aux'},             # (32)
+                    $self->{'fscreeninfo'}->{'visual'},               # (32)
+                    $self->{'fscreeninfo'}->{'xpanstep'},             # (16)
+                    $self->{'fscreeninfo'}->{'ypanstep'},             # (16)
+                    $self->{'fscreeninfo'}->{'ywrapstep'},            # (16)
+                    $self->{'fscreeninfo'}->{'line_length'},          # (32)
+                    $self->{'fscreeninfo'}->{'mmio_start'},           # LONG
+                    $self->{'fscreeninfo'}->{'mmio_len'},             # (32)
+                    $self->{'fscreeninfo'}->{'accel'},                # (32)
+                    $self->{'fscreeninfo'}->{'capailities'},          # (16)
+                    @{ $self->{'fscreeninfo'}->{'reserved_fb_phys'} } # (16) x 2
                 ) = _get_ioctl(FBIOGET_FSCREENINFO, $typedef, $self->{'FB'});
             }
 
@@ -1094,32 +1110,32 @@ sub new {
             }
         }
 
-        $self->{'GPU'}     = $self->{'fscreeninfo'}->{'id'};
-        $self->{'VXRES'}   = $self->{'vscreeninfo'}->{'xres_virtual'};
-        $self->{'VYRES'}   = $self->{'vscreeninfo'}->{'yres_virtual'};
-        $self->{'XRES'}    = $self->{'vscreeninfo'}->{'xres'};
-        $self->{'YRES'}    = $self->{'vscreeninfo'}->{'yres'};
-        $self->{'XOFFSET'} = $self->{'vscreeninfo'}->{'xoffset'} || 0;
-        $self->{'YOFFSET'} = $self->{'vscreeninfo'}->{'yoffset'} || 0;
-        $self->{'BITS'}    = $self->{'vscreeninfo'}->{'bits_per_pixel'};
-        $self->{'BYTES'}   = $self->{'BITS'} / 8;
-        $self->{'BYTES_PER_LINE'} = $self->{'fscreeninfo'}->{'line_length'};
+        $self->{'GPU'}            = $self->{'fscreeninfo'}->{'id'};             # The name of the GPU or video driver
+        $self->{'VXRES'}          = $self->{'vscreeninfo'}->{'xres_virtual'};   # The virtual width of the screen
+        $self->{'VYRES'}          = $self->{'vscreeninfo'}->{'yres_virtual'};   # The virtual height of the screen
+        $self->{'XRES'}           = $self->{'vscreeninfo'}->{'xres'};           # The physical width of the screen
+        $self->{'YRES'}           = $self->{'vscreeninfo'}->{'yres'};           # The physical height of the screen
+        $self->{'XOFFSET'}        = $self->{'vscreeninfo'}->{'xoffset'} || 0;   # The horizontal offset of the screen from the beginning of the virtual screen
+        $self->{'YOFFSET'}        = $self->{'vscreeninfo'}->{'yoffset'} || 0;   # The vertical offset of the screen from the beginning of the virtual screen
+        $self->{'BITS'}           = $self->{'vscreeninfo'}->{'bits_per_pixel'}; # The bits per pixel of the screen
+        $self->{'BYTES'}          = $self->{'BITS'} / 8;                        # The number of bytes per pixel
+        $self->{'BYTES_PER_LINE'} = $self->{'fscreeninfo'}->{'line_length'};    # The length of a single scan line in bytes
 
-        if ($self->{'BYTES_PER_LINE'} < ($self->{'XRES'} * $self->{'BYTES'})) {    # I really wish I didn't need this
-            warn __LINE__ . " Unable to detect line length due to improper byte alignment in C structure from IOCTL call, going to 'fbset -i' for more reliable information\n" if ($self->{'SHOW_ERRORS'});
+#        if ($self->{'BYTES_PER_LINE'} < ($self->{'XRES'} * $self->{'BYTES'})) {    # I really wish I didn't need this
+#            warn __LINE__ . " Unable to detect line length due to improper byte alignment in C structure from IOCTL call, going to 'fbset -i' for more reliable information\n" if ($self->{'SHOW_ERRORS'});
 
-            # Looks like we still have bad data
-            my $fbset = `fbset -i`;
-            if ($fbset =~ /Frame buffer device information/i) {
-                ($self->{'BYTES_PER_LINE'}) = $fbset =~ /LineLength\s*:\s*(\d+)/m;
-                $self->{'fscreeninfo'}->{'line_length'} = $self->{'BYTES_PER_LINE'};
-                ($self->{'fscreeninfo'}->{'smem_len'}) = $fbset =~ /Size\s*:\s*(\d+)/m;
-                ($self->{'fscreeninfo'}->{'type'})     = $fbset =~ /Type\s*:\s*(.*)/m;
-            }
-        }
+#            # Looks like we still have bad data
+#            my $fbset = `fbset -i`;
+#            if ($fbset =~ /Frame buffer device information/i) {
+#                ($self->{'BYTES_PER_LINE'}) = $fbset =~ /LineLength\s*:\s*(\d+)/m;
+#                $self->{'fscreeninfo'}->{'line_length'} = $self->{'BYTES_PER_LINE'};
+#                ($self->{'fscreeninfo'}->{'smem_len'})  = $fbset =~ /Size\s*:\s*(\d+)/m;
+#                ($self->{'fscreeninfo'}->{'type'})      = $fbset =~ /Type\s*:\s*(.*)/m;
+#            }
+#        }
 
-        $self->{'PIXELS'} = (($self->{'XOFFSET'} + $self->{'VXRES'}) * ($self->{'YOFFSET'} + $self->{'VYRES'}));
-        $self->{'SIZE'} = $self->{'PIXELS'} * $self->{'BYTES'};
+        $self->{'PIXELS'}                    = (($self->{'XOFFSET'} + $self->{'VXRES'}) * ($self->{'YOFFSET'} + $self->{'VYRES'}));
+        $self->{'SIZE'}                      = $self->{'PIXELS'} * $self->{'BYTES'};
         $self->{'fscreeninfo'}->{'smem_len'} = $self->{'BYTES_PER_LINE'} * $self->{'VYRES'} if (!defined($self->{'fscreeninfo'}->{'smem_len'}) || $self->{'fscreeninfo'}->{'smem_len'} <= 0);
 
         $self->{'fscreeninfo'}->{'type'}     = $self->{'PIXEL_TYPES'}->[$self->{'fscreeninfo'}->{'type'}];
@@ -1138,12 +1154,12 @@ sub new {
         # Only useful for debugging and for troubleshooting the module for specific display resolutions
         if (defined($self->{'SIMULATED_X'})) {
             my $w = $self->{'XRES'};
-            $self->{'XRES'} = $self->{'SIMULATED_X'};
+            $self->{'XRES'}     = $self->{'SIMULATED_X'};
             $self->{'XOFFSET'} += ($w - $self->{'SIMULATED_X'}) / 2;
         }
         if (defined($self->{'SIMULATED_Y'})) {
             my $h = $self->{'YRES'};
-            $self->{'YRES'} = $self->{'SIMULATED_Y'};
+            $self->{'YRES'}     = $self->{'SIMULATED_Y'};
             $self->{'YOFFSET'} += ($h - $self->{'SIMULATED_Y'}) / 2;
         }
         bless($self, $class);
@@ -1187,7 +1203,7 @@ This is usually caused by one or more of the following:
      systems).
 
 Actual error reported:\n\n$@\n};
-            sleep 1;
+            sleep ($self->{'RESET'}) ? 10 : 1;
             exit(1);
         }
     } elsif (exists($ENV{'DISPLAY'}) && $self->{'FB_DEVICE'} !~ /virtual/i) {
@@ -1202,12 +1218,11 @@ functionality.  It is command line only (similar to old DOS).
 
 To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
 };
-        sleep 1;
+        sleep ($self->{'RESET'}) ? 10 : 1;
         exit(1);
     } else { # Go into emulation mode if no actual framebuffer available
-        $self->{'SPLASH'} = FALSE;
-        $self->{'ERROR'}  = 'Framebuffer Device Not Found! Emulation mode.  EXPERIMENTAL!!';
-
+        $self->{'SPLASH'}      = FALSE;
+        $self->{'ERROR'}       = 'Framebuffer Device Not Found! Emulation mode.  EXPERIMENTAL!!';
         $self->{'COLOR_ORDER'} = $self->{ uc($self->{'COLOR_ORDER'}) };    # Translate the color order
 
         $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'}      = 8;
@@ -1253,17 +1268,17 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
 
         # Set the resolution.  Either the defaults, or whatever the user passed in.
 
-        $self->{'SCREEN'}              = chr(0) x ($self->{'VXRES'} * $self->{'VYRES'} * $self->{'BYTES'});
-        $self->{'XRES'}                = $self->{'VXRES'};                                                                      # Virtual and physical are the same
-        $self->{'YRES'}                = $self->{'VYRES'};
-        $self->{'XOFFSET'}             = 0;
-        $self->{'YOFFSET'}             = 0;
-        $self->{'PIXELS'}              = (($self->{'XOFFSET'} + $self->{'VXRES'}) * ($self->{'YOFFSET'} + $self->{'VYRES'}));
-        $self->{'SIZE'}                = $self->{'PIXELS'} * $self->{'BYTES'};
-        $self->{'fscreeninfo'}->{'id'} = 'Virtual Framebuffer';
-        $self->{'GPU'}                 = $self->{'fscreeninfo'}->{'id'};
+        $self->{'SCREEN'}                    = chr(0) x ($self->{'VXRES'} * $self->{'VYRES'} * $self->{'BYTES'}); # This is the fake framebuffer
+        $self->{'XRES'}                      = $self->{'VXRES'};                                                  # Virtual and physical are the same
+        $self->{'YRES'}                      = $self->{'VYRES'};
+        $self->{'XOFFSET'}                   = 0;
+        $self->{'YOFFSET'}                   = 0;
+        $self->{'PIXELS'}                    = (($self->{'XOFFSET'} + $self->{'VXRES'}) * ($self->{'YOFFSET'} + $self->{'VYRES'}));
+        $self->{'SIZE'}                      = $self->{'PIXELS'} * $self->{'BYTES'};
+        $self->{'fscreeninfo'}->{'id'}       = 'Virtual Framebuffer';
+        $self->{'GPU'}                       = $self->{'fscreeninfo'}->{'id'};
         $self->{'fscreeninfo'}->{'smem_len'} = $self->{'BYTES'} * ($self->{'VXRES'} * $self->{'VYRES'}) if (!defined($self->{'fscreeninfo'}->{'smem_len'}) || $self->{'fscreeninfo'}->{'smem_len'} <= 0);
-        $self->{'BYTES_PER_LINE'} = int($self->{'fscreeninfo'}->{'smem_len'} / $self->{'VYRES'});
+        $self->{'BYTES_PER_LINE'}            = int($self->{'fscreeninfo'}->{'smem_len'} / $self->{'VYRES'});
 
         bless($self, $class);
     }
@@ -1279,7 +1294,7 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
             last;
         }
     }
-
+    $self->_flush_screen();
     if ($self->{'SPLASH'} > 0) {
         $self->splash($VERSION);
         sleep $self->{'SPLASH'};
@@ -1292,7 +1307,7 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
 }
 
 sub _reset {
-    exec('reset');
+    system('reset');
 }
 
 # Fixes the mapping if Perl garbage collects (naughty Perl)
@@ -1304,7 +1319,7 @@ sub _fix_mapping { # File::Map SHOULD make this obsolete
         open($self->{'FB'}, '+<', $self->{'FB_DEVICE'});
     }
     $self->{'MAP_ATTEMPTS'}++;
-    # Wo don't eval, because it worked originally
+    # We don't eval, because it worked originally
     $self->{'SCREEN_ADDRESS'} = map_handle($self->{'SCREEN'}, $self->{'FB'}, '+<', 0, $self->{'fscreeninfo'}->{'smem_len'});
 }
 
@@ -1329,8 +1344,7 @@ sub _color_order {
     } elsif ($ro < $bo && $bo < $go) {
         $self->{'COLOR_ORDER'} = RBG;
     } else {
-
-        # UNKNOWM - default to RGB
+        # UNKNOWN - default to RGB
         $self->{'COLOR_ORDER'} = RGB;
     }
 }
@@ -1339,7 +1353,7 @@ sub _screen_close {
     my $self = shift;
     unless (defined($self->{'ERROR'})) {    # Only do it if not in emulation mode
         unmap($self->{'SCREEN'}) if (defined($self->{'SCREEN'}));
-        close($self->{'FB'}) if (defined($self->{'FB'}));
+        close($self->{'FB'})     if (defined($self->{'FB'}));
         delete($self->{'FB'});              # We leave no remnants
     }
     delete($self->{'SCREEN'});
@@ -1456,8 +1470,9 @@ When passing a name, it will return a hash reference (if only one match), or an 
 =cut
 
 sub get_font_list {
-    my $self = shift;
+    my $self     = shift;
     my ($filter) = @_;
+
     my $fonts;
     if ($filter) {
         foreach my $font (sort(keys %{ $self->{'FONTS'} })) {
@@ -1520,6 +1535,31 @@ Sets or returns the drawing mode, depending on how it is called.
  $fb->draw_mode(UNMASK_MODE);      # Draws the new pixel on
                                    # screen areas only equal to
                                    # the background color.
+
+ $fb->draw_mode(ALPHA_MODE);       # Draws the new pixel on the screen
+                                   # using the alpha channel value as
+                                   # a transparency value.  This means
+                                   # the new pixel will not be
+                                   # opague.
+
+ $fb->draw_mode(ADD_MODE);         # Draws the new pixel on the screen
+                                   # by mathematically adding its pixel
+                                   # value to the existing pixel value
+
+ $fb->draw_mode(SUBTRACT_MODE);    # Draws the new pixel on the screen
+                                   # by mathematically subtracting the
+                                   # the new pixel value from the existing
+                                   # value
+
+ $fb->draw_mode(MULTIPLY_MODE);    # Draws the new pixel on the screen
+                                   # by mathematically multiplying it with
+                                   # the existing pixel value (usually not
+                                   # too useful, but here for completeness)
+
+ $fb->draw_mode(DUVIDE_MODE);      # Draws the new pixel on the screen
+                                   # by mathematically dividing it with the
+                                   # existing pixel value (usually not too
+                                   # useful, but here for completeness)
 
 =back
 =cut
@@ -1652,6 +1692,74 @@ sub unmask_mode {
     $self->draw_mode(UNMASK_MODE);
 }
 
+=head2 add_mode
+
+This is an alias to draw_mode(ADD_MODE)
+
+=over 4
+
+ $fb->add_mode();
+
+=back
+
+=cut
+
+sub add_mode {
+    my $self = shift;
+    $self->draw_mode(ADD_MODE);
+}
+
+=head2 subtract_mode
+
+This is an alias to draw_mode(SUBTRACT_MODE)
+
+=over 4
+
+ $fb->subtract_mode();
+
+=back
+
+=cut
+
+sub subtract_mode {
+    my $self = shift;
+    $self->draw_mode(SUBTRACT_MODE);
+}
+
+=head2 multiply_mode
+
+This is an alias to draw_mode(MULTIPLY_MODE)
+
+=over 4
+
+ $fb->multiply_mode();
+
+=back
+
+=cut
+
+sub multiply_mode {
+    my $self = shift;
+    $self->draw_mode(MULTIPLY_MODE);
+}
+
+=head2 divide_mode
+
+This is an alias to draw_mode(DIVIDE_MODE)
+
+=over 4
+
+ $fb->divide_mode();
+
+=back
+
+=cut
+
+sub divide_mode {
+    my $self = shift;
+    $self->draw_mode(DIVIDE_MODE);
+}
+
 =head2 clear_screen
 
 Fills the entire screen with the background color
@@ -1669,15 +1777,15 @@ You can add an optional parameter to turn the console cursor on or off too.
 =cut
 
 sub clear_screen {
-
     # Fills the entire screen with the background color fast #
-    my $self = shift;
+    my $self   = shift;
     my $cursor = shift || '';
+
 #    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
     if ($cursor =~ /off/i) {
-        system('clear && tput civis -- invisible');
+        system('tput civis -- invisible');
     } elsif ($cursor =~ /on/i) {
-        system('tput cnorm -- normal && reset');
+        system('tput cnorm -- normal');
     }
     select(STDOUT);
     $|++;
@@ -1686,11 +1794,10 @@ sub clear_screen {
         my $h = $self->{'H_CLIP'};
         $self->blit_write({ 'x' => $self->{'X_CLIP'}, 'y' => $self->{'Y_CLIP'}, 'width' => $w, 'height' => $h, 'image' => $self->{'B_COLOR'} x ($w * $h) }, 0);
     } else {
-        substr($self->{'SCREEN'}, 0) = $self->{'B_COLOR'} x ($self->{'fscreeninfo'}->{'smem_len'} / $self->{'BYTES'});
+        substr($self->{'SCREEN'}, 0)                   = $self->{'B_COLOR'} x ($self->{'fscreeninfo'}->{'smem_len'} / $self->{'BYTES'});
         substr($self->{'SCREEN'}, 0, $self->{'BYTES'}) = $self->{'B_COLOR'};
     }
-    select($self->{'FB'});
-    $|++;
+    $self->_flush_screen();
 }
 
 =head2 cls
@@ -1771,14 +1878,24 @@ sub plot {
             $self->rbox({ 'x' => $x - ($width / 2), 'y' => $y - ($height / 2), 'width' => $size, 'height' => $size, 'filled' => TRUE, 'pixel_size' => 1 });
         }
     } else {
-#        $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
         if ($self->{'ACCELERATED'}) {
-            c_plot($self->{'SCREEN'}, $x, $y, $self->{'DRAW_MODE'}, $self->{'INT_COLOR'}, $self->{'INT_B_COLOR'}, $self->{'BYTES'}, $self->{'BITS'}, $self->{'BYTES_PER_LINE'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'}, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $self->{'COLOR_ALPHA'});
+            c_plot(
+                $self->{'SCREEN'},
+                $x, $y,
+                $self->{'DRAW_MODE'},
+                $self->{'INT_COLOR'},
+                $self->{'INT_B_COLOR'},
+                $self->{'BYTES'},
+                $self->{'BITS'},
+                $self->{'BYTES_PER_LINE'},
+                $self->{'X_CLIP'},  $self->{'Y_CLIP'},
+                $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
+                $self->{'XOFFSET'}, $self->{'YOFFSET'},
+                $self->{'COLOR_ALPHA'}
+            );
         } else {
-
             # Only plot if the pixel is within the clipping region
             unless (($x > $self->{'XX_CLIP'}) || ($y > $self->{'YY_CLIP'}) || ($x < $self->{'X_CLIP'}) || ($y < $self->{'Y_CLIP'})) {
-
                 # The 'history' is a 'draw_arc' optimization and beautifier for xor mode.  It only draws pixels not in
                 # the history buffer.
                 unless (exists($self->{'history'}) && defined($self->{'history'}->{$y}->{$x})) {
@@ -1787,17 +1904,17 @@ sub plot {
                         eval {
                             $c = substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) || chr(0) x $self->{'BYTES'};
                             if ($self->{'DRAW_MODE'} == NORMAL_MODE) {
-                                $c = $self->{'COLOR'};
+                                $c  = $self->{'COLOR'};
                             } elsif ($self->{'DRAW_MODE'} == XOR_MODE) {
                                 $c ^= $self->{'COLOR'};
                             } elsif ($self->{'DRAW_MODE'} == OR_MODE) {
                                 $c |= $self->{'COLOR'};
                             } elsif ($self->{'DRAW_MODE'} == ALPHA_MODE) {
-                                my $back = $self->get_pixel({ 'x' => $x, 'y' => $y });
+                                my $back  = $self->get_pixel({ 'x' => $x, 'y' => $y });
                                 my $saved = { 'main' => $self->{'COLOR'} };
                                 foreach my $color (qw( red green blue )) {
                                     $saved->{$color} = $self->{ 'COLOR_' . uc($color) };
-                                    $back->{$color} = ($self->{ 'COLOR_' . uc($color) } * $self->{'COLOR_ALPHA'}) + ($back->{$color} * (1 - $self->{'COLOR_ALPHA'}));
+                                    $back->{$color}  = ($self->{ 'COLOR_' . uc($color) } * $self->{'COLOR_ALPHA'}) + ($back->{$color} * (1 - $self->{'COLOR_ALPHA'}));
                                 }
                                 $back->{'alpha'} = min(255, $self->{'COLOR_ALPHA'} + $back->{'alpha'});
                                 $self->set_color($back);
@@ -1824,7 +1941,7 @@ sub plot {
                                 }
                             } elsif ($self->{'DRAW_MODE'} == UNMASK_MODE) {
                                 my $pixel = $self->pixel({ 'x' => $x, 'y' => $y });
-                                my $raw = $pixel->{'raw'};
+                                my $raw   = $pixel->{'raw'};
                                 if ($self->{'BITS'} == 32) {
                                     $c = $self->{'COLOR'} if (substr($raw, 0, 3) eq substr($self->{'B_COLOR'}, 0, 3));
                                 } else {
@@ -1845,9 +1962,6 @@ sub plot {
 
     $self->{'X'} = $x;
     $self->{'Y'} = $y;
-
-    select($self->{'FB'});
-    $| = 1;
 }
 
 =head2 setpixel
@@ -1955,15 +2069,14 @@ sub angle_line {
     my $params = shift;
 
     my ($dp_cos, $dp_sin);
-    my $angle = $params->{'angle'};
-    my $index = int($angle * 100);
+    my $index = int($params->{'angle'} * 100);
 
     if (defined($dp_cache[$index])) {
         ($dp_cos, $dp_sin) = (@{ $dp_cache[$index] });
     } else {
-        my $dp = ($angle * pi) / 180;
+        my $dp             = ($params->{'angle'} * pi) / 180;
         ($dp_cos, $dp_sin) = (cos($dp), sin($dp));
-        $dp_cache[$index] = [$dp_cos, $dp_sin];
+        $dp_cache[$index]  = [$dp_cos, $dp_sin];
     }
     $params->{'xx'} = int($params->{'x'} - ($params->{'radius'} * $dp_sin));
     $params->{'yy'} = int($params->{'y'} - ($params->{'radius'} * $dp_cos));
@@ -2023,8 +2136,7 @@ sub drawto {
             $self->{'X_CLIP'},  $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
             $self->{'XOFFSET'}, $self->{'YOFFSET'},
             $self->{'COLOR_ALPHA'},
-
-            #            $antialiased,
+            # $antialiased,
         );
     } else {
 
@@ -2159,9 +2271,12 @@ sub drawto {
     }
     $self->{'X'} = $XX;
     $self->{'Y'} = $YY;
+}
 
+sub _flush_screen {
+    my $self = shift;
     select($self->{'FB'});
-    $| = 1;
+    $|++;
 }
 
 sub _adj_plot {
@@ -2184,10 +2299,10 @@ sub _draw_line_antialiased {
 
     my $saved = { %{ $self->{'SET_COLOR'} } };
 
-    my $plot = \&_adj_plot;
+    my $plot  = \&_adj_plot;
 
     if (abs($y1 - $y0) > abs($x1 - $x0)) {
-        $plot = sub { _adj_plot(@_[0, 2, 1, 3, 4]) };
+        $plot                = sub { _adj_plot(@_[0, 2, 1, 3, 4]) };
         ($x0, $y0, $x1, $y1) = ($y0, $x0, $y1, $x1);
     }
 
@@ -2205,9 +2320,9 @@ sub _draw_line_antialiased {
     # handle the endpoints
     foreach my $xy ([$x0, $y0], [$x1, $y1]) {
         my ($x, $y) = @{$xy};
-        my $xend = int($x + 0.5);                   # POSIX::lround($x);
-        my $yend = $y + $gradient * ($xend - $x);
-        my $xgap = _rfpart($x + 0.5);
+        my $xend    = int($x + 0.5);                   # POSIX::lround($x);
+        my $yend    = $y + $gradient * ($xend - $x);
+        my $xgap    = _rfpart($x + 0.5);
 
         my $x_pixel = $xend;
         my $y_pixel = int($yend);
@@ -2269,9 +2384,10 @@ Draws a Bezier curve, based on a list of control points.
 sub bezier {
     my $self   = shift;
     my $params = shift;
+
     my $size   = $params->{'pixel_size'} || 1;
-    my $closed = $params->{'closed'} || 0;
-    my $filled = $params->{'filled'} || 0;
+    my $closed = $params->{'closed'}     || 0;
+    my $filled = $params->{'filled'}     || 0;
 
     push(@{ $params->{'coordinates'} }, $params->{'coordinates'}->[0], $params->{'coordinates'}->[1]) if ($closed);
 
@@ -2352,16 +2468,16 @@ sub draw_arc {
     my $self   = shift;
     my $params = shift;
 
-    my $x      = int($params->{'x'});
-    my $y      = int($params->{'y'});
-    my $radius = int($params->{'radius'} || 1);
-    $radius = max($radius, 1);
+    my $x             = int($params->{'x'});
+    my $y             = int($params->{'y'});
+    my $radius        = int($params->{'radius'} || 1);
+    $radius           = max($radius, 1);
     my $start_degrees = $params->{'start_degrees'} || 0;
     my $end_degrees   = $params->{'end_degrees'}   || 360;
     my $granularity   = $params->{'granularity'}   || .1;
 
-    my $mode = int($params->{'mode'}       || 0);
-    my $size = int($params->{'pixel_size'} || 1);
+    my $mode  = int($params->{'mode'}       || 0);
+    my $size  = int($params->{'pixel_size'} || 1);
     my $bytes = $self->{'BYTES'};
     unless ($self->{'ACCELERATED'} && $mode == PIE) {    # ($mode == PIE || $mode == ARC)) {
         my ($sx, $sy, $degrees, $ox, $oy) = (0, 0, 1, 1, 1);
@@ -2376,9 +2492,9 @@ sub draw_arc {
                 if (defined($dp_cache[$index])) {
                     ($dp_cos, $dp_sin) = (@{ $dp_cache[$index] });
                 } else {
-                    my $dp = ($degrees * pi) / 180;
+                    my $dp             = ($degrees * pi) / 180;
                     ($dp_cos, $dp_sin) = (cos($dp), sin($dp));
-                    $dp_cache[$index] = [$dp_cos, $dp_sin];
+                    $dp_cache[$index]  = [$dp_cos, $dp_sin];
                 }
                 $sx = int($x - ($radius * $dp_sin));
                 $sy = int($y - ($radius * $dp_cos));
@@ -2412,7 +2528,7 @@ sub draw_arc {
             } else {
                 my $dp = ($degrees * pi) / 180;
                 ($dp_cos, $dp_sin) = (cos($dp), sin($dp));
-                $dp_cache[$index] = [$dp_cos, $dp_sin];
+                $dp_cache[$index]  = [$dp_cos, $dp_sin];
             }
             $sx = int($x - ($radius * $dp_sin));
             $sy = int($y - ($radius * $dp_cos));
@@ -2437,7 +2553,7 @@ sub draw_arc {
             $degrees += $granularity;
         } until ($degrees >= $end_degrees);
         if ($mode != ARC) {
-            $params->{'filled'} = ($mode == PIE) ? TRUE : FALSE;
+            $params->{'filled'}      = ($mode == PIE) ? TRUE : FALSE;
             $params->{'coordinates'} = \@coords;
             $self->polygon($params);
         }
@@ -2457,7 +2573,7 @@ sub draw_arc {
         my $image;
         my $fill;
 
-        eval {
+        eval { # Imager can crash.
             my $img = Imager->new(
                 'xsize'             => $w,
                 'ysize'             => $w,
@@ -2615,6 +2731,7 @@ Draws an arc of a circle at point x,y.  This is an alias to draw_arc above, but 
 sub arc {
     my $self   = shift;
     my $params = shift;
+
     $params->{'mode'} = ARC;
     $self->draw_arc($params);
 }
@@ -2649,7 +2766,7 @@ Draws a filled pie wedge at point x,y.  This is an alias to draw_arc above, but 
     'radius'        => 100,
     'start_degrees' => -40,
     'end_degrees'   => 80,
-    'granularity   => .05,
+    'granularity'   => .05,
     'gradient' => {  # optional
         'direction' => 'horizontal', # or vertical
         'colors'    => { # 2 to any number of transitions allowed
@@ -2677,6 +2794,7 @@ Draws a filled pie wedge at point x,y.  This is an alias to draw_arc above, but 
 sub filled_pie {
     my $self   = shift;
     my $params = shift;
+
     $params->{'mode'} = PIE;
     $self->draw_arc($params);
 }
@@ -2711,7 +2829,7 @@ Draws a poly arc of a circle at point x,y.  This is an alias to draw_arc above, 
     'radius'        => 100,
     'start_degrees' => -40,
     'end_degrees'   => 80,
-    'granularity   => .05,
+    'granularity'   => .05,
  });
 
 =back
@@ -2723,6 +2841,7 @@ Draws a poly arc of a circle at point x,y.  This is an alias to draw_arc above, 
 sub poly_arc {
     my $self   = shift;
     my $params = shift;
+
     $params->{'mode'} = POLY_ARC;
     $self->draw_arc($params);
 }
@@ -2781,8 +2900,8 @@ sub ellipse {
     $XRadius = 1 if ($XRadius < 1);
     $YRadius = 1 if ($YRadius < 1);
 
-    my $filled = int($params->{'filled'} || 0);
-    my $fact   = $params->{'factor'} || 1;
+    my $filled = int($params->{'filled'}     || 0);
+    my $fact   = $params->{'factor'}         || 1;
     my $size   = int($params->{'pixel_size'} || 1);
     $size      = 1 if ($filled);
 
@@ -2805,16 +2924,13 @@ sub ellipse {
     $history_on      = TRUE if (exists($self->{'history'}));
 
     $self->{'history'} = {} unless ($history_on || !$filled || $size > 1);
-    my ($red, $green, $blue, @rc, @gc, @bc);
-    my $gradient = FALSE;
-    my $saved    = $self->{'COLOR'};
-    my $pattern;
-    my $plen;
+    my ($red, $green, $blue, $pattern, $plen, @rc, @gc, @bc);
+    my $gradient  = FALSE;
+    my $saved     = $self->{'COLOR'};
     my $xdiameter = $XRadius * 2;
     my $ydiameter = $YRadius * 2;
     my $bytes     = $self->{'BYTES'};
     if (exists($params->{'gradient'})) {
-
         if ($params->{'gradient'}->{'direction'} !~ /vertical/i) {
             if (exists($params->{'gradient'}->{'colors'})) {
                 $pattern = $self->_generate_fill($xdiameter, $ydiameter, $params->{'gradient'}->{'colors'}, 'horizontal');
@@ -2857,10 +2973,10 @@ sub ellipse {
             $gradient = 1;
         }
     } elsif (exists($params->{'texture'})) {
-        $pattern = $self->_generate_fill($xdiameter, $ydiameter, undef, $params->{'texture'});
+        $pattern  = $self->_generate_fill($xdiameter, $ydiameter, undef, $params->{'texture'});
         $gradient = 2;
     } elsif (exists($params->{'hatch'})) {
-        $pattern = $self->_generate_fill($xdiameter, $ydiameter, undef, $params->{'hatch'});
+        $pattern  = $self->_generate_fill($xdiameter, $ydiameter, undef, $params->{'hatch'});
         $gradient = 2;
     }
 
@@ -2910,7 +3026,7 @@ sub ellipse {
         $YChange      += $TwoASquare;
         if ((($EllipseError * 2) + $XChange) > 0) {
             $x--;
-            $StoppingX -= $TwoBSquare;
+            $StoppingX    -= $TwoBSquare;
             $EllipseError += $XChange;
             $XChange      += $TwoBSquare;
         }
@@ -2967,7 +3083,7 @@ sub ellipse {
         $XChange      += $TwoBSquare;
         if ((($EllipseError * 2) + $YChange) > 0) {
             $y--;
-            $StoppingY -= $TwoASquare;
+            $StoppingY    -= $TwoASquare;
             $EllipseError += $YChange;
             $YChange      += $TwoASquare;
         }
@@ -3019,14 +3135,14 @@ sub circle {
 
     my $x0            = int($params->{'x'});
     my $y0            = int($params->{'y'});
-    my $x1            = int($params->{'xx'}) || $x0;
-    my $y1            = int($params->{'yy'}) || $y0;
-    my $bx            = int($params->{'bx'}) || 0;
-    my $by            = int($params->{'by'}) || 0;
-    my $bxx           = int($params->{'bxx'}) || 1;
-    my $byy           = int($params->{'byy'}) || 1;
+    my $x1            = int($params->{'xx'})    || $x0;
+    my $y1            = int($params->{'yy'})    || $y0;
+    my $bx            = int($params->{'bx'})    || 0;
+    my $by            = int($params->{'by'})    || 0;
+    my $bxx           = int($params->{'bxx'})   || 1;
+    my $byy           = int($params->{'byy'})   || 1;
     my $r             = int($params->{'radius'});
-    my $filled        = $params->{'filled'} || FALSE;
+    my $filled        = $params->{'filled'}     || FALSE;
     my $gradient      = (defined($params->{'gradient'})) ? TRUE : FALSE;
     my $size          = $params->{'pixel_size'} || 1;
     my $start         = $y0 - $r;
@@ -3073,12 +3189,12 @@ sub circle {
         $plen     = $wdth * $bytes;
         $gradient = 2;
     } elsif (exists($params->{'texture'})) {
-        $pattern = $self->_generate_fill($wdth, $hgth, undef, $params->{'texture'});
+        $pattern  = $self->_generate_fill($wdth, $hgth, undef, $params->{'texture'});
         $gradient = 2;
     } elsif (exists($params->{'hatch'})) {
-        $pattern = $self->_generate_fill($wdth, $hgth, undef, $params->{'hatch'});
+        $pattern  = $self->_generate_fill($wdth, $hgth, undef, $params->{'hatch'});
         $gradient = 2;
-    }    # end if ($gradient)
+    }
     my ($ymy, $lymy, $ymx, $lymx, $ypy, $lypy, $ypx, $lypx, $xmy, $xmx, $xpy, $xpx);
     while ($x >= ($y - 1)) {
         $ymy = $y0 - $y;    # Top
@@ -3132,7 +3248,6 @@ sub circle {
                     $self->blit_write($params);
                 }
             } elsif ($gradient) {
-
                 # Top
                 if ($ymy != $lymy && $ymy != $lymx && $ymy != $lypx && $ymy != $lypy) {
                     $self->set_color({ 'red' => $rc[$ymy_i], 'green' => $gc[$ymy_i], 'blue' => $bc[$ymy_i] });
@@ -3157,7 +3272,6 @@ sub circle {
                     $self->line($params);
                 }
             } else {
-
                 # Top
                 if ($ymy != $lymy && $ymy != $lymx && $ymy != $lypx && $ymy != $lypy) {
                     ($params->{'x'}, $params->{'y'}, $params->{'xx'}, $params->{'yy'}) = ($xmx, $ymy, $xpx, $ymy);
@@ -3241,7 +3355,6 @@ sub circle {
                 $self->box({ 'x' => $_x, 'y' => $y0, 'xx' => $_xx, 'yy' => $y1, 'filled' => 1 });
             }
         } else {
-
             # top
             $self->line({ 'x' => $x0, 'y' => $_y, 'xx' => $x1, 'yy' => $_y, 'pixel_size' => $size });
 
@@ -3315,10 +3428,10 @@ sub polygon {
     my $self   = shift;
     my $params = shift;
 
-    my $size = int($params->{'pixel_size'} || 1);
-    my $aa = $params->{'antialiased'} || 0;
-    my $history_on = 0;
-    $history_on = 1 if (exists($self->{'history'}));
+    my $size       = int($params->{'pixel_size'} || 1);
+    my $aa         = $params->{'antialiased'} || 0;
+    my $history_on = FALSE;
+    $history_on    = TRUE if (exists($self->{'history'}));
     if ($params->{'filled'}) {
         $self->_fill_polygon($params);
     } else {
@@ -3343,9 +3456,9 @@ sub _point_in_polygon {
     my $params = shift;
 
     my $poly_corners = (scalar(@{ $params->{'coordinates'} }) / 2);
-    my ($x, $y) = (int($params->{'x'}), int($params->{'y'}));
-    my $j         = $poly_corners - 1;
-    my $odd_nodes = FALSE;
+    my ($x, $y)      = (int($params->{'x'}), int($params->{'y'}));
+    my $j            = $poly_corners - 1;
+    my $odd_nodes    = FALSE;
 
     for (my $i = 0; $i < $poly_corners; $i += 2) {
         my ($ip, $jp) = ($i + 1, $j + 1);
@@ -3369,11 +3482,11 @@ sub _fill_polygon {
     my $bottom = 0;
     my $fill;
     while (scalar(@{ $params->{'coordinates'} })) {
-        my $x = int(shift(@{ $params->{'coordinates'} })) - $self->{'X_CLIP'};    # Compensate for the smaller area in Imager
-        my $y = int(shift(@{ $params->{'coordinates'} })) - $self->{'Y_CLIP'};
-        $left = min($left, $x);
-        $right = max($right, $x);
-        $top = min($top, $y);
+        my $x   = int(shift(@{ $params->{'coordinates'} })) - $self->{'X_CLIP'};    # Compensate for the smaller area in Imager
+        my $y   = int(shift(@{ $params->{'coordinates'} })) - $self->{'Y_CLIP'};
+        $left   = min($left, $x);
+        $right  = max($right, $x);
+        $top    = min($top, $y);
         $bottom = max($bottom, $y);
         push(@{$points}, [$x, $y]);
     }
@@ -3408,7 +3521,7 @@ sub _fill_polygon {
         if ($self->{'ACCELERATED'}) {
             $self->{'DRAW_MODE'} = MASK_MODE;
         } else {
-            $saved = $self->blit_read($saved);
+            $saved            = $self->blit_read($saved);
             $saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
         }
     }
@@ -3476,7 +3589,7 @@ sub _fill_polygon {
     };
     warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
     $self->blit_write($saved);
-    $self->{'DRAM_MODE'} = $saved_mode;
+    $self->{'DRAW_MODE'} = $saved_mode;
 }
 
 sub _generate_fill {
@@ -3513,7 +3626,7 @@ sub _generate_fill {
                 my $wb     = $w * $bytes;
                 my $widthb = $width * $bytes;
                 my $h      = $type->{'height'};
-                $gradient = $type->{'image'};
+                $gradient  = $type->{'image'};
                 if ($w > $width) {
                     my $new = '';
                     foreach my $line (0 .. ($h - 1)) {
@@ -3536,10 +3649,10 @@ sub _generate_fill {
                 }
                 if ($h > $height) {
                     $gradient = substr($gradient, 0, $widthb * $height);
-                    $h = $height;
+                    $h        = $height;
                 } elsif ($h < $height) {
-                    my $new = '';
-                    $new = $gradient x ($height / $h);
+                    my $new   = '';
+                    $new      = $gradient x ($height / $h);
                     $new      = substr($new, 0, $widthb * $height);
                     $gradient = $new;
                     $h        = $height;
@@ -3751,10 +3864,10 @@ sub box {
     my $y      = int($params->{'y'});
     my $xx     = int($params->{'xx'});
     my $yy     = int($params->{'yy'});
-    my $filled = int($params->{'filled'}) || 0;
+    my $filled = int($params->{'filled'})     || 0;
     my $size   = int($params->{'pixel_size'}) || 1;
-    my $radius = int($params->{'radius'}) || 0;
-    $size = 1 if ($filled);
+    my $radius = int($params->{'radius'})     || 0;
+    $size      = 1 if ($filled);
     my ($count, $data, $w, $h);
 
     # This puts $x,$y,$xx,$yy in their correct order if backwards.
@@ -3771,12 +3884,11 @@ sub box {
     my $vc     = $height / 2;
     my $hc     = $width / 2;
     if ($radius) {
-
         # Keep the radius sane
         $radius = $hc if ($hc < $radius);
         $radius = $vc if ($vc < $radius);
 
-        my $p = $params;
+        my $p          = $params;
         $p->{'radius'} = $radius;
         $p->{'x'}      = ($x + $radius);
         $p->{'y'}      = ($y + $radius);
@@ -3790,12 +3902,12 @@ sub box {
     } elsif ($filled) {
         my $X = $xx;
         my $Y = $yy;
-        $x  = max($self->{'X_CLIP'}, min($self->{'XX_CLIP'}, $x));
-        $y  = max($self->{'Y_CLIP'}, min($self->{'YY_CLIP'}, $y));
-        $xx = max($self->{'X_CLIP'}, min($self->{'XX_CLIP'}, $xx));
-        $yy = max($self->{'Y_CLIP'}, min($self->{'YY_CLIP'}, $yy));
-        $w  = abs($xx - $x);
-        $h  = abs($yy - $y);
+        $x    = max($self->{'X_CLIP'}, min($self->{'XX_CLIP'}, $x));
+        $y    = max($self->{'Y_CLIP'}, min($self->{'YY_CLIP'}, $y));
+        $xx   = max($self->{'X_CLIP'}, min($self->{'XX_CLIP'}, $xx));
+        $yy   = max($self->{'Y_CLIP'}, min($self->{'YY_CLIP'}, $yy));
+        $w    = abs($xx - $x);
+        $h    = abs($yy - $y);
         my $pattern;
 
         if (exists($params->{'gradient'})) {
@@ -3871,15 +3983,8 @@ sub rbox {
     my $self   = shift;
     my $params = shift;
 
-    my $x  = $params->{'x'};
-    my $y  = $params->{'y'};
-    my $w  = $params->{'width'};
-    my $h  = $params->{'height'};
-    my $xx = $x + $w;
-    my $yy = $y + $h;
-
-    $params->{'xx'} = $xx;
-    $params->{'yy'} = $yy;
+    $params->{'xx'} = $params->{'x'} + $params->{'width'};
+    $params->{'yy'} = $params->{'y'} + $params->{'height'};
     $self->box($params);
 }
 
@@ -3907,9 +4012,9 @@ sub set_color {
     my $name   = shift || 'COLOR';
 
     my $bytes       = $self->{'BYTES'};
-    my $R           = int($params->{'red'}) & 255;
+    my $R           = int($params->{'red'})   & 255; # Color forced to fit within 0-255 value
     my $G           = int($params->{'green'}) & 255;
-    my $B           = int($params->{'blue'}) & 255;
+    my $B           = int($params->{'blue'})  & 255;
     my $def_alpha   = ($name eq 'COLOR') ? 255 : 0;
     my $A           = int($params->{'alpha'} || $def_alpha) & 255;
     my $color_order = $self->{'COLOR_ORDER'};
@@ -3925,7 +4030,7 @@ sub set_color {
     my $a_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'};
     $self->{'COLOR_ALPHA'}   = $A;
     if ($self->{'BITS'} >= 24) {
-        $self->{$name} = pack('I',(
+        $self->{$name} = pack('L',(
             ($R << $r_offset) |
             ($G << $g_offset) |
             ($B << $b_offset) |
@@ -3943,6 +4048,7 @@ sub set_color {
     }
 
     $self->{"SET_$name"} = $params;
+    # This swapping is only for Imager
     if ($color_order == BGR) {
         ($B, $G, $R) = ($R,$G,$B);
     } elsif ($color_order == BRG) {
@@ -3955,7 +4061,7 @@ sub set_color {
         ($G, $B, $R) = ($R,$G,$B);
     }
     if ($name eq 'COLOR') {
-        $self->{'I_COLOR'} = ($self->{'BITS'} == 32) ? Imager::Color->new($R, $G, $B, $A) : Imager::Color->new($R, $G, $B);
+        $self->{'I_COLOR'}  = ($self->{'BITS'} == 32) ? Imager::Color->new($R, $G, $B, $A) : Imager::Color->new($R, $G, $B);
     } else {
         $self->{'BI_COLOR'} = ($self->{'BITS'} == 32) ? Imager::Color->new($R, $G, $B, $A) : Imager::Color->new($R, $G, $B);
     }
@@ -4068,7 +4174,21 @@ sub pixel {
             } elsif ($color_order == GBR) {
                 ($G, $B, $R, $A) = unpack("C$bytes", $color);
             }
-        } else {
+        } elsif ($self->{'BITS'} == 24) {
+            if ($color_order == BGR) {
+                ($B, $G, $R) = unpack("C$bytes", $color);
+            } elsif ($color_order == BRG) {
+                ($B, $R, $G) = unpack("C$bytes", $color);
+            } elsif ($color_order == RGB) {
+                ($R, $G, $B) = unpack("C$bytes", $color);
+            } elsif ($color_order == RBG) {
+                ($R, $B, $G) = unpack("C$bytes", $color);
+            } elsif ($color_order == GRB) {
+                ($G, $R, $B) = unpack("C$bytes", $color);
+            } elsif ($color_order == GBR) {
+                ($G, $B, $R) = unpack("C$bytes", $color);
+            }
+        } elsif ($self->{'BITS'} == 16) {
             my $C = unpack('S', $color);
             if ($color_order == BGR) {
                 $B = ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'} < 6) ? $C & 31 : $C & 63;
@@ -4151,11 +4271,11 @@ sub fill {
 
         while (scalar(@queue)) {
             my $pointref = shift(@queue);
-            ($x, $y) = @{$pointref};
+            ($x, $y)     = @{$pointref};
             next if (($x < $self->{'X_CLIP'}) || ($x > $self->{'XX_CLIP'}) || ($y < $self->{'Y_CLIP'}) || ($y > $self->{'YY_CLIP'}));
             unless (exists($visited{"$x,$y"})) {
                 $pixel = $self->pixel({ 'x' => $x, 'y' => $y });
-                $back = $pixel->{'raw'};
+                $back  = $pixel->{'raw'};
                 if ($back eq $background) {
                     $self->plot({ 'x' => $x, 'y' => $y });
                     $visited{"$x,$y"}++;
@@ -4305,12 +4425,11 @@ sub replace_color {
     my $new_b = int($params->{'new'}->{'blue'})  || 0;
     my $new_a = int($params->{'new'}->{'alpha'}) || $self->{'COLOR_ALPHA'};
 
-    my $color_order = $self->{'COLOR_ORDER'};
-    my ($sx, $start) = (0, 0);
+    my $color_order      = $self->{'COLOR_ORDER'};
+    my ($sx, $start)     = (0, 0);
     $self->set_color({ 'red' => $new_r, 'green' => $new_g, 'blue' => $new_b });
-    my $old_mode = $self->{'DRAW_MODE'};
+    my $old_mode         = $self->{'DRAW_MODE'};
     $self->{'DRAW_MODE'} = NORMAL_MODE;
-#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
 
     my ($old, $new);
     if ($self->{'BITS'} == 32) {
@@ -4360,25 +4479,20 @@ sub replace_color {
         $new_b = $new_b >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'}));
         $new_g = $new_g >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'}));
         $new_r = $new_r >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'}));
-        if ($color_order == BGR) {
-            $old = pack('S', ($old_b | ($old_g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) | ($old_r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}))));
-            $new = pack('S', ($new_b | ($new_g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) | ($new_r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}))));
-        } elsif ($color_order == RGB) {
-            $old = pack('S', ($old_r | ($old_g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) | ($old_b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}))));
-            $new = pack('S', ($new_r | ($new_g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) | ($new_b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}))));
-        } elsif ($color_order == BRG) {
-            $old = pack('S', ($old_b | ($old_r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) | ($old_g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}))));
-            $new = pack('S', ($new_b | ($new_r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) | ($new_g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}))));
-        } elsif ($color_order == RBG) {
-            $old = pack('S', ($old_r | ($old_b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) | ($old_g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}))));
-            $new = pack('S', ($new_r | ($new_b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) | ($new_g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}))));
-        } elsif ($color_order == GRB) {
-            $old = pack('S', ($old_g | ($old_r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) | ($old_b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}))));
-            $new = pack('S', ($new_g | ($new_r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) | ($new_b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}))));
-        } elsif ($color_order == GBR) {
-            $old = pack('S', ($old_g | ($old_b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) | ($old_r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}))));
-            $new = pack('S', ($new_g | ($new_b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) | ($new_r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}))));
-        }
+        $old = pack('S',
+            (
+                ($old_b << $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}) |
+                ($old_g << $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}) |
+                ($old_r << $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})
+            )
+        );
+        $new = pack('S',
+            (
+                ($new_b << $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}) |
+                ($new_g << $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}) |
+                ($new_r << $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})
+            )
+        );
         $old = sprintf('\x%02x\x%02x', unpack('C2', $old));
         $new = sprintf('\x%02x\x%02x', unpack('C2', $new));
     }
@@ -4391,12 +4505,10 @@ sub replace_color {
         }
     );
 
-    eval("\$save->{'image'} =~ s/$old/$new/sg;");
+    eval(" \$save->{'image'} =~ s/$old/$new/sg; ");
     $self->blit_write($save);
 
     $self->{'DRAW_MODE'} = $old_mode;
-    select($self->{'FB'});
-    $|++;
 }
 
 =head2 blit_copy
@@ -4422,19 +4534,7 @@ sub blit_copy {
     my $self   = shift;
     my $params = shift;
 
-    my $x  = int($params->{'x'});
-    my $y  = int($params->{'y'});
-    my $w  = int($params->{'width'});
-    my $h  = int($params->{'height'});
-    my $xx = int($params->{'x_dest'});
-    my $yy = int($params->{'y_dest'});
-
-    if ($self->{'ACCELERATED'} == HARDWARE && $self->{'DRAW_MODE'} < 1) {
-
-        # accelerated_blit_copy($self->{'FB'}, $x, $y, $w, $h, $xx, $yy);
-    } else {
-        $self->blit_write({ %{ $self->blit_read({ 'x' => $x, 'y' => $y, 'width' => $w, 'height' => $h }) }, 'x' => $xx, 'y' => $yy });
-    }
+    $self->blit_write({ %{ $self->blit_read({ 'x' => int($params->{'x'}), 'y' => int($params->{'y'}), 'width' => int($params->{'width'}), 'height' => int($params->{'height'}) }) }, 'x' => int($params->{'x_dest'}), 'y' => int($params->{'y_dest'}) });
 }
 
 =head2 blit_flip
@@ -4445,35 +4545,6 @@ sub blit_copy {
 
 sub blit_flip {
     return;
-    my $self = shift;
-    my $them = shift;
-
-    my $color_order = $self->{'COLOR_ORDER'};
-    if ($them->{'BITS'} == 32) {
-        if ($self->{'BITS'} == 32) {
-            substr($self->{'SCREEN'}, 0) = substr($them->{'SCREEN'},0);    # Simple copy
-        } elsif ($self->{'BITS'} == 24) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_32_to_24($them->{'SCREEN'}, $color_order);
-        } else {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_32_to_16($them->{'SCREEN'}, $color_order);
-        }
-    } elsif ($them->{'BITS'} == 24) {
-        if ($self->{'BITS'} == 32) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_24_to_32($them->{'SCREEN'}, $color_order);
-        } elsif ($self->{'BITS'} == 24) {
-            substr($self->{'SCREEN'}, 0) = substr($them->{'SCREEN'}, 0);    # Simple copy
-        } else {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_24_to_16($them->{'SCREEN'}, $color_order);
-        }
-    } elsif ($them->{'BITS'} == 16) {
-        if ($self->{'BITS'} == 32) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_16_to_32($them->{'SCREEN'}, $color_order);
-        } elsif ($self->{'BITS'} == 24) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert_16_to_24($them->{'SCREEN'}, $color_order);
-        } else {
-            substr($self->{'SCREEN'}, 0) = substr($them->{'SCREEN'}, 0);    # Simple copy
-        }
-    }
 }
 
 =head2 blit_move
@@ -4499,26 +4570,14 @@ sub blit_move {
     my $self   = shift;
     my $params = shift;
 
-    my $x  = int($params->{'x'});
-    my $y  = int($params->{'y'});
-    my $w  = int($params->{'width'});
-    my $h  = int($params->{'height'});
-    my $xx = int($params->{'x_dest'});
-    my $yy = int($params->{'y_dest'});
-
-    #    if ($self->{'ACCELERATED'} == HARDWARE && $self->{'DRAW_MODE'} == NORMAL_MODE) {
-    # accelerated_blit_move($self->{'FB'}, $x, $y, $w, $h, $xx, $yy);
-    #    } else {
     my $old_mode = $self->{'DRAW_MODE'};
-    my $image = $self->blit_read({ 'x' => $x, 'y' => $y, 'width' => $w, 'height' => $h });
+    my $image    = $self->blit_read({ 'x' => int($params->{'x'}), 'y' => int($params->{'y'}), 'width' => int($params->{'width'}), 'height' => int($params->{'height'}) });
     $self->xor_mode();
     $self->blit_write($image);
     $self->{'DRAW_MODE'} = $old_mode;
-    $image->{'x'}        = $xx;
-    $image->{'y'}        = $yy;
+    $image->{'x'}        = int($params->{'x_dest'});
+    $image->{'y'}        = int($params->{'y_dest'});
     $self->blit_write($image);
-
-    #    }
 }
 
 =head2 play_animation
@@ -4548,7 +4607,6 @@ sub play_animation {
     my $self  = shift;
     my $image = shift;
     my $rate  = shift || 1;
-#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
 
     foreach my $frame (0 .. (scalar(@{$image}) - 1)) {
         my $begin = time;
@@ -4577,9 +4635,14 @@ When called without parameters, it returns the current setting.
 
  $fb->acceleration(SOFTWARE); # Turn C (software) acceleration ON
 
- $fb->acceleration(PERL); # Turn acceleration OFF, using Perl
+ $fb->acceleration(PERL);     # Turn acceleration OFF, using Perl
 
  my $accel = $fb->acceleration(); # Get current acceleration state.  0 = PERL, 1 = SOFTWARE, 2 = HARDWARE (not yet implemented)
+
+ my $accel = $fb->acceleration('english'); # Get current acceleration state in an english string.
+                                           # "PERL"     = PERL     = 0
+                                           # "SOFTWARE" = SOFTWARE = 1
+                                           # "HARDWARE" = HARDWARE = 2
 
 =back
 
@@ -4591,7 +4654,15 @@ sub acceleration {
     my $self = shift;
     if (scalar(@_)) {
         my $set = shift;
-        $self->{'ACCELERATED'} = $set;
+        if ($set =~ /^\d+$/ && $set >= PERL && $set <= HARDWARE) {
+            $self->{'ACCELERATED'} = $set;
+        } elsif ($set =~ /english|string/i) {
+            foreach my $name (qw( PERL SOFTWARE HARDWARE )) {
+                if ($self->{'ACCELERATED'} == $self->{$name}) {
+                    return($name);
+                }
+            }
+        }
     }
     return ($self->{'ACCELERATED'});
 }
@@ -4670,16 +4741,12 @@ sub blit_read {
     my $self   = shift;
     my $params = shift;    # $self->_blit_adjust_for_clipping(shift);
 
-    my $fb             = $self->{'FB'};
     my $x              = int($params->{'x'} || $self->{'X_CLIP'});
     my $y              = int($params->{'y'} || $self->{'Y_CLIP'});
     my $clipw          = $self->{'W_CLIP'};
     my $cliph          = $self->{'H_CLIP'};
-    my $w              = int($params->{'width'} || $clipw);
+    my $w              = int($params->{'width'}  || $clipw);
     my $h              = int($params->{'height'} || $cliph);
-    my $bytes          = $self->{'BYTES'};
-    my $bytes_per_line = $self->{'BYTES_PER_LINE'};
-    my $yoffset        = $self->{'YOFFSET'};
     my $buf;
 
     $x = 0 if ($x < 0);
@@ -4688,16 +4755,27 @@ sub blit_read {
     $h = $self->{'YY_CLIP'} - $y if ($h > ($cliph));
 
     my $yend = $y + $h;
-    my $W    = $w * $bytes;
-    my $XX   = ($self->{'XOFFSET'} + $x) * $bytes;
+    my $W    = $w * $self->{'BYTES'};
+    my $XX   = ($self->{'XOFFSET'} + $x) * $self->{'BYTES'};
     my ($index, $scrn, $line);
-#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
-    if ($h > 1 && $self->{'ACCELERATED'}) {
+    if ($h > 1 && $self->{'ACCELERATED'} == SOFTWARE) {
         $scrn = chr(0) x ($W * $h);
-        c_blit_read($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $scrn, $x, $y, $w, $h, $bytes, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
+        c_blit_read(
+            $self->{'SCREEN'},
+            $self->{'XRES'}, $self->{'YRES'},
+            $self->{'BYTES_PER_LINE'},
+            $self->{'XOFFSET'}, $self->{'YOFFSET'},
+            $scrn,
+            $x, $y, $w, $h,
+            $self->{'BYTES'},
+            $draw_mode,
+            $self->{'COLOR_ALPHA'},
+            $self->{'B_COLOR'},
+            $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'}
+        );
     } else {
         foreach my $line ($y .. ($yend - 1)) {
-            $index = ($bytes_per_line * ($line + $yoffset)) + $XX;
+            $index = ($self->{'BYTES_PER_LINE'} * ($line + $self->{'YOFFSET'})) + $XX;
             $scrn .= substr($self->{'SCREEN'}, $index, $W);
         }
     }
@@ -4731,7 +4809,6 @@ sub blit_write {
     my $pparams = shift;
     return unless(defined($pparams));
 
-    my $fb     = $self->{'FB'};
     my $params = $self->_blit_adjust_for_clipping($pparams);
     return unless (defined($params));
 
@@ -4742,147 +4819,155 @@ sub blit_write {
 
     my $draw_mode      = $self->{'DRAW_MODE'};
     my $bytes          = $self->{'BYTES'};
-    my $bytes_per_line = $self->{'BYTES_PER_LINE'};
 
     return unless (defined($params->{'image'}) && $params->{'image'} ne '' && $h && $w);
-#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
 
-    if ($self->{'ACCELERATED'}) { # && $h > 1) {
-        c_blit_write($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $params->{'image'}, $x, $y, $w, $h, $bytes, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
-        return;
-    }
+    if ($self->{'ACCELERATED'} == SOFTWARE) { # && $h > 1) {
+        c_blit_write(
+            $self->{'SCREEN'},
+            $self->{'XRES'}, $self->{'YRES'},
+            $self->{'BYTES_PER_LINE'},
+            $self->{'XOFFSET'}, $self->{'YOFFSET'},
+            $params->{'image'},
+            $x, $y, $w, $h,
+            $bytes,
+            $draw_mode,
+            $self->{'COLOR_ALPHA'},
+            $self->{'B_COLOR'},
+            $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'}
+        );
+    } else {
+        my $scrn = $params->{'image'};
+        my $max  = $self->{'fscreeninfo'}->{'smem_len'} - $bytes;
+        my $scan = $w * $bytes;
+        my $yend = $y + $h;
 
-    my $scrn = $params->{'image'};
-    my $max  = $self->{'fscreeninfo'}->{'smem_len'} - $bytes;
-    my $scan = $w * $bytes;
-    my $yend = $y + $h;
+        #    my $WW = $scan * $h;
+        my $WW  = int((length($scrn) / $h));
+        my $X_X = ($x + $self->{'XOFFSET'}) * $bytes;
+        my ($index, $data, $px, $line, $idx, $px4, $buf, $ipx);
 
-    #    my $WW = $scan * $h;
-    my $WW  = int((length($scrn) / $h));
-    my $X_X = ($x + $self->{'XOFFSET'}) * $bytes;
-    my ($index, $data, $px, $line, $idx, $px4, $buf, $ipx);
+        $idx   = 0;
+        $y    += $self->{'YOFFSET'};
+        $yend += $self->{'YOFFSET'};
 
-    $idx = 0;
-    $y    += $self->{'YOFFSET'};
-    $yend += $self->{'YOFFSET'};
+        eval {
+            foreach $line ($y .. ($yend - 1)) {
+                $index = ($self->{'BYTES_PER_LINE'} * $line) + $X_X;
+                if ($index >= 0 && $index <= $max && $idx >= 0 && $idx <= (length($scrn) - $bytes)) {
+                    if ($draw_mode == NORMAL_MODE) {
+                        substr($self->{'SCREEN'}, $index, $scan)  = substr($scrn, $idx, $scan);
+                    } elsif ($draw_mode == XOR_MODE) {
+                        substr($self->{'SCREEN'}, $index, $scan) ^= substr($scrn, $idx, $scan);
+                    } elsif ($draw_mode == OR_MODE) {
+                        substr($self->{'SCREEN'}, $index, $scan) |= substr($scrn, $idx, $scan);
+                    } elsif ($draw_mode == ADD_MODE) {
+                        substr($self->{'SCREEN'}, $index, $scan) += substr($scrn, $idx, $scan);
+                    } elsif ($draw_mode == SUBTRACT_MODE) {
+                        substr($self->{'SCREEN'}, $index, $scan) -= substr($scrn, $idx, $scan);
+                    } elsif ($draw_mode == MULTIPLY_MODE) {
+                        substr($self->{'SCREEN'}, $index, $scan) *= substr($scrn, $idx, $scan);
+                    } elsif ($draw_mode == DIVIDE_MODE) {
+                        substr($self->{'SCREEN'}, $index, $scan) /= substr($scrn, $idx, $scan);
+                    } elsif ($draw_mode == ALPHA_MODE) {
+                        foreach $px (0 .. ($w - 1)) {
+                            $px4  = $px * $bytes;
+                            $ipx  = $index + $px4;
+                            $data = substr($self->{'SCREEN'}, $ipx, $bytes) || chr(0) x $bytes;
+                            if ($self->{'BITS'} == 32) {
+                                my ($r, $g, $b, $a) = unpack("C$bytes", $data);
+                                my ($R, $G, $B, $A) = unpack("C$bytes", substr($scrn, ($idx + $px4), $bytes));
+                                my $invA            = (255 - $A);
+                                $r                  = int(($R * $A) + ($r * $invA)) >> 8;
+                                $g                  = int(($G * $A) + ($g * $invA)) >> 8;
+                                $b                  = int(($B * $A) + ($b * $invA)) >> 8;
 
-    eval {
-        foreach $line ($y .. ($yend - 1)) {
-            $index = ($bytes_per_line * $line) + $X_X;
-            if ($index >= 0 && $index <= $max && $idx >= 0 && $idx <= (length($scrn) - $bytes)) {
-                if ($draw_mode == NORMAL_MODE) {
-                    substr($self->{'SCREEN'}, $index, $scan) = substr($scrn, $idx, $scan);
-                } elsif ($draw_mode == XOR_MODE) {
-                    substr($self->{'SCREEN'}, $index, $scan) ^= substr($scrn, $idx, $scan);
-                } elsif ($draw_mode == OR_MODE) {
-                    substr($self->{'SCREEN'}, $index, $scan) |= substr($scrn, $idx, $scan);
-                } elsif ($draw_mode == ADD_MODE) {
-                    substr($self->{'SCREEN'}, $index, $scan) += substr($scrn, $idx, $scan);
-                } elsif ($draw_mode == SUBTRACT_MODE) {
-                    substr($self->{'SCREEN'}, $index, $scan) -= substr($scrn, $idx, $scan);
-                } elsif ($draw_mode == MULTIPLY_MODE) {
-                    substr($self->{'SCREEN'}, $index, $scan) *= substr($scrn, $idx, $scan);
-                } elsif ($draw_mode == DIVIDE_MODE) {
-                    substr($self->{'SCREEN'}, $index, $scan) /= substr($scrn, $idx, $scan);
-                } elsif ($draw_mode == ALPHA_MODE) {
-                    foreach $px (0 .. ($w - 1)) {
-                        $px4  = $px * $bytes;
-                        $ipx  = $index + $px4;
-                        $data = substr($self->{'SCREEN'}, $ipx, $bytes) || chr(0) x $bytes;
-                        if ($self->{'BITS'} == 32) {
-                            my ($r, $g, $b, $a) = unpack("C$bytes", $data);
-                            my ($R, $G, $B, $A) = unpack("C$bytes", substr($scrn, ($idx + $px4), $bytes));
-                            my $invA = (255 - $A);
-                            $r = int(($R * $A) + ($r * $invA)) >> 8;
-                            $g = int(($G * $A) + ($g * $invA)) >> 8;
-                            $b = int(($B * $A) + ($b * $invA)) >> 8;
+#                                $a = int($a + $A) & 255;
+                                my $c = pack("C$bytes", $r, $g, $b, $A);
+                                if (substr($scrn, ($idx + $px4), $bytes) ne $c) {
+                                    substr($self->{'SCREEN'}, $ipx, $bytes) = $c;
+                                }
+                            } elsif ($self->{'BITS'} == 24) {
+                                my ($r, $g, $b) = unpack("C$bytes", $data);
+                                my ($R, $G, $B) = unpack("C$bytes", substr($scrn, ($idx + $px4), $bytes));
+                                my $A           = $self->{'COLOR_ALPHA'};
+                                my $invA        = (255 - $A);
+                                $r              = int(($R * $A) + ($r * $invA)) >> 8;
+                                $g              = int(($G * $A) + ($g * $invA)) >> 8;
+                                $b              = int(($B * $A) + ($b * $invA)) >> 8;
+                                my $c           = pack('C3', $r, $g, $b);
 
-#                            $a = int($a + $A) & 255;
-                            my $c = pack("C$bytes", $r, $g, $b, $A);
-                            if (substr($scrn, ($idx + $px4), $bytes) ne $c) {
-                                substr($self->{'SCREEN'}, $ipx, $bytes) = $c;
+                                if (substr($scrn, ($idx + $px4), $bytes) ne $c) {
+                                    substr($self->{'SCREEN'}, $ipx, $bytes) = $c;
+                                }
+                            } elsif ($self->{'BITS'} == 16) {
+                                my $big         = $self->RGB565_to_RGB888({ 'color' => $data });
+                                my ($r, $g, $b) = unpack('C3', $big->{'color'});
+                                $big            = $self->RGB565_to_RGB888({ 'color' => substr($scrn, ($idx + $px4, $bytes)) });
+                                my ($R, $G, $B) = unpack('C3', $big->{'color'});
+                                my $A           = $self->{'COLOR_ALPHA'};
+                                my $invA        = (255 - $A);
+                                $r              = int(($R * $A) + ($r * $invA)) >> 8;
+                                $g              = int(($G * $A) + ($g * $invA)) >> 8;
+                                $b              = int(($B * $A) + ($b * $invA)) >> 8;
+                                my $c           = $self->RGB888_to_RGB565({ 'color' => pack('C3', $r, $g, $b) });
+                                $c              = $c->{'color'};
+
+                                if (substr($scrn, ($idx + $px4), $bytes) ne $c) {
+                                    substr($self->{'SCREEN'}, $ipx, $bytes) = $c;
+                                }
                             }
-                        } elsif ($self->{'BITS'} == 24) {
-                            my ($r, $g, $b) = unpack("C$bytes", $data);
-                            my ($R, $G, $B) = unpack("C$bytes", substr($scrn, ($idx + $px4), $bytes));
-                            my $A    = $self->{'COLOR_ALPHA'};
-                            my $invA = (255 - $A);
-                            $r = int(($R * $A) + ($r * $invA)) >> 8;
-                            $g = int(($G * $A) + ($g * $invA)) >> 8;
-                            $b = int(($B * $A) + ($b * $invA)) >> 8;
-                            my $c = pack('C3', $r, $g, $b);
-
-                            if (substr($scrn, ($idx + $px4), $bytes) ne $c) {
-                                substr($self->{'SCREEN'}, $ipx, $bytes) = $c;
+                        }
+                    } elsif ($draw_mode == AND_MODE) {
+                        substr($self->{'SCREEN'}, $index, $scan) &= substr($scrn, $idx, $scan);
+                    } elsif ($draw_mode == MASK_MODE) {
+                        foreach $px (0 .. ($w - 1)) {
+                            $px4  = $px * $bytes;
+                            $ipx  = $index + $px4;
+                            $data = substr($self->{'SCREEN'}, $ipx, $bytes) || chr(0) x $bytes;
+                            if ($self->{'BITS'} == 32) {
+                                if (substr($scrn, ($idx + $px4), 3) ne substr($self->{'B_COLOR'}, 0, 3)) {
+                                    substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
+                                }
+                            } elsif ($self->{'BITS'} == 24) {
+                                if (substr($scrn, ($idx + $px4), 3) ne $self->{'B_COLOR'}) {
+                                    substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
+                                }
+                            } elsif ($self->{'BITS'} == 16) {
+                                if (substr($scrn, ($idx + $px4), 2) ne $self->{'B_COLOR'}) {
+                                    substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
+                                }
                             }
-                        } elsif ($self->{'BITS'} == 16) {
-                            my $big = $self->RGB565_to_RGB888({ 'color' => $data });
-                            my ($r, $g, $b) = unpack('C3', $big->{'color'});
-                            $big = $self->RGB565_to_RGB888({ 'color' => substr($scrn, ($idx + $px4, $bytes)) });
-                            my ($R, $G, $B) = unpack('C3', $big->{'color'});
-                            my $A    = $self->{'COLOR_ALPHA'};
-                            my $invA = (255 - $A);
-                            $r = int(($R * $A) + ($r * $invA)) >> 8;
-                            $g = int(($G * $A) + ($g * $invA)) >> 8;
-                            $b = int(($B * $A) + ($b * $invA)) >> 8;
-                            my $c = $self->RGB888_to_RGB565({ 'color' => pack('C3', $r, $g, $b) });
-                            $c = $c->{'color'};
-
-                            if (substr($scrn, ($idx + $px4), $bytes) ne $c) {
-                                substr($self->{'SCREEN'}, $ipx, $bytes) = $c;
+                        }
+                    } elsif ($draw_mode == UNMASK_MODE) {
+                        foreach $px (0 .. ($w - 1)) {
+                            $px4  = $px * $bytes;
+                            $ipx  = $index + $px4;
+                            $data = substr($self->{'SCREEN'}, $ipx, $bytes);
+                            if ($self->{'BITS'} == 32) {
+                                if (substr($self->{'SCREEN'}, $ipx, 3) eq substr($self->{'B_COLOR'}, 0, 3)) {
+                                    substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
+                                }
+                            } elsif ($self->{'BITS'} == 24) {
+                                if (substr($self->{'SCREEN'}, $ipx, 3) eq $self->{'B_COLOR'}) {
+                                    substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
+                                }
+                            } elsif ($self->{'BITS'} == 16) {
+                                if (substr($self->{'SCREEN'}, $ipx, 2) eq $self->{'B_COLOR'}) {
+                                    substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
+                                }
                             }
                         }
                     }
-                } elsif ($draw_mode == AND_MODE) {
-                    substr($self->{'SCREEN'}, $index, $scan) &= substr($scrn, $idx, $scan);
-                } elsif ($draw_mode == MASK_MODE) {
-                    foreach $px (0 .. ($w - 1)) {
-                        $px4  = $px * $bytes;
-                        $ipx  = $index + $px4;
-                        $data = substr($self->{'SCREEN'}, $ipx, $bytes) || chr(0) x $bytes;
-                        if ($self->{'BITS'} == 32) {
-                            if (substr($scrn, ($idx + $px4), 3) ne substr($self->{'B_COLOR'}, 0, 3)) {
-                                substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
-                            }
-                        } elsif ($self->{'BITS'} == 24) {
-                            if (substr($scrn, ($idx + $px4), 3) ne $self->{'B_COLOR'}) {
-                                substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
-                            }
-                        } elsif ($self->{'BITS'} == 16) {
-                            if (substr($scrn, ($idx + $px4), 2) ne $self->{'B_COLOR'}) {
-                                substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
-                            }
-                        }
-                    }
-                } elsif ($draw_mode == UNMASK_MODE) {
-                    foreach $px (0 .. ($w - 1)) {
-                        $px4  = $px * $bytes;
-                        $ipx  = $index + $px4;
-                        $data = substr($self->{'SCREEN'}, $ipx, $bytes);
-                        if ($self->{'BITS'} == 32) {
-                            if (substr($self->{'SCREEN'}, $ipx, 3) eq substr($self->{'B_COLOR'}, 0, 3)) {
-                                substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
-                            }
-                        } elsif ($self->{'BITS'} == 24) {
-                            if (substr($self->{'SCREEN'}, $ipx, 3) eq $self->{'B_COLOR'}) {
-                                substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
-                            }
-                        } elsif ($self->{'BITS'} == 16) {
-                            if (substr($self->{'SCREEN'}, $ipx, 2) eq $self->{'B_COLOR'}) {
-                                substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
-                            }
-                        }
-                    }
+                    $idx += $WW;
                 }
-                $idx += $WW;
             }
+        };
+        if ($@) {
+            warn __LINE__ . " $@\n" if ($self->{'SHOW_ERRORS'});
+            $self->_fix_mapping();
         }
-        select($self->{'FB'});
-        $|++;
-    };
-    my $error = $@;
-    warn __LINE__ . " $error\n" if ($error && $self->{'SHOW_ERRORS'});
-    $self->_fix_mapping() if ($@);
+    }
 }
 
 # Chops up the blit image to stay within the clipping (and screen) boundaries
@@ -4900,24 +4985,20 @@ sub _blit_adjust_for_clipping {
 
     # Make a copy so the original isn't modified.
     %{$params} = %{$pparams};
-#    if (exists($params->{'tags'})) {
-#        $params->{'x'} += $params->{'tags'}->{'gif_left'} if (exists($params->{'tags'}->{'gif_left'}));
-#        $params->{'y'} += $params->{'tags'}->{'git_top'} if (exists($params->{'tags'}->{'gif_top'}));
-#    }
 
     # First fix the vertical errors
     my $XX = $params->{'x'} + $params->{'width'};
     my $YY = $params->{'y'} + $params->{'height'};
     return (undef) if ($YY < $yclip || $params->{'height'} < 1 || $XX < $xclip || $params->{'x'} > $xxclip);
     if ($params->{'y'} < $yclip) {    # Top
-        $params->{'image'} = substr($params->{'image'}, ($yclip - $params->{'y'}) * ($params->{'width'} * $bytes));
+        $params->{'image'}   = substr($params->{'image'}, ($yclip - $params->{'y'}) * ($params->{'width'} * $bytes));
         $params->{'height'} -= ($yclip - $params->{'y'});
-        $params->{'y'} = $yclip;
+        $params->{'y'}       = $yclip;
     }
     $YY = $params->{'y'} + $params->{'height'};
     return (undef) if ($params->{'height'} < 1);
     if ($YY > $yyclip) {              # Bottom
-        $params->{'image'} = substr($params->{'image'}, 0, ($yyclip - $params->{'y'}) * ($params->{'width'} * $bytes));
+        $params->{'image'}  = substr($params->{'image'}, 0, ($yyclip - $params->{'y'}) * ($params->{'width'} * $bytes));
         $params->{'height'} = $yyclip - $params->{'y'};
     }
 
@@ -5373,8 +5454,8 @@ sub clip_set {
     $self->{'XX_CLIP'} = abs(int($params->{'xx'}));
     $self->{'YY_CLIP'} = abs(int($params->{'yy'}));
 
-    $self->{'X_CLIP'} = ($self->{'XRES'} - 2) if ($self->{'X_CLIP'} > ($self->{'XRES'} - 1));
-    $self->{'Y_CLIP'} = ($self->{'YRES'} - 2) if ($self->{'Y_CLIP'} > ($self->{'YRES'} - 1));
+    $self->{'X_CLIP'}  = ($self->{'XRES'} - 2) if ($self->{'X_CLIP'} > ($self->{'XRES'} - 1));
+    $self->{'Y_CLIP'}  = ($self->{'YRES'} - 2) if ($self->{'Y_CLIP'} > ($self->{'YRES'} - 1));
     $self->{'XX_CLIP'} = ($self->{'XRES'} - 1) if ($self->{'XX_CLIP'} >= $self->{'XRES'});
     $self->{'YY_CLIP'} = ($self->{'YRES'} - 1) if ($self->{'YY_CLIP'} >= $self->{'YRES'});
     $self->{'W_CLIP'}  = $self->{'XX_CLIP'} - $self->{'X_CLIP'};
@@ -5462,11 +5543,11 @@ sub monochrome {
                 my $rgb565 = unpack('S', substr($params->{'image'}, $byte, $inc));
                 if ($color_order == RGB) {
                     $r = $rgb565 & 31;
-                    $g = (($rgb565 >> 5) & 63) / 2;    # Normalize green
-                    $b = ($rgb565 >> 11) & 31;
+                    $g = (($rgb565 >> 5)  & 63) / 2;    # Normalize green
+                    $b = ($rgb565  >> 11) & 31;
                 } elsif ($color_order == BGR) {
                     $b = $rgb565 & 31;
-                    $g = (($rgb565 >> 5) & 63) / 2;    # Normalize green
+                    $g = (($rgb565 >> 5) & 63) / 2;     # Normalize green
                     $r = ($rgb565 >> 11) & 31;
                 }
                 my $mono = int(0.2126 * $r + 0.7155 * $g + 0.0722 * $b);
@@ -5613,7 +5694,7 @@ sub ttf_print {
         'color' => $P_color,
         'size'  => $TTF_h
     );
-    if (!defined($font)) {
+    unless (defined($font)) {
         warn __LINE__ . " Can't initialize Imager::Font!\n", Imager->errstr(), "\n" if ($self->{'SHOW_ERRORS'});
         return (undef);
     }
@@ -5806,7 +5887,7 @@ If 'width' and/or 'height' is given, the image is resized.  Note, resizing is CP
                                    #              The image is scaled to
                                    #              width x height exactly.
 
-             'autolevels' => 0,    # Optional.  It does a color
+             'autolevels' => FALSE,# Optional.  It does a color
                                    # correction. Sometimes this
                                    # works well, and sometimes it
                                    # looks quite ugly.  It depends
@@ -5823,13 +5904,13 @@ If 'width' and/or 'height' is given, the image is resized.  Note, resizing is CP
 
              'file'       => 'RWBY_Faces.png', # Usually needs full path
 
-             'convertalpha' => 1,  # Converts the color matching the global
+             'convertalpha' => TRUE, # Converts the color matching the global
                                    # background color to have the same alpha
                                    # channel value as the global background,
                                    # which is beneficial for using 'merge'
                                    # in 'blit_transform'.
 
-             'preserve_transparency' => 0,
+             'preserve_transparency' => FALSE,
                                    # Preserve the transparency of GIFs for
                                    # use with "mask_mode" playback.
                                    # This can allow for slightly faster
@@ -5872,6 +5953,8 @@ If the image has multiple frames, then a reference to an array of hashes is retu
  # NOTE:  X and Y positions can change frame to frame, so use them for each frame!
  #        Also, X and Y are based upon what was originally passed through, else they
  #        reference 0,0 (but only if you didn't give an X,Y value initially).
+
+ # ALSO:  The tags may also specify offsets, and they will be taken into 
 
  [
      { # Frame 1
@@ -5924,7 +6007,7 @@ sub load_image {
         eval { @Img = Imager->read_multi('file' => $params->{'file'},); };
         warn __LINE__ . " $@\n" if ($@ && $self->{'SHOW_ERRORS'});
     } else {
-        eval { $Img[0] = Imager->new('file' => $params->{'file'}, 'interleave' => 0); };
+        eval { $Img[0] = Imager->new('file' => $params->{'file'}, 'interleave' => FALSE); };
         warn __LINE__ . " $@\n" if ($@ && $self->{'SHOW_ERRORS'});
     }
     $bench_load = sprintf('%.03f', time - $bench_load);
@@ -6163,16 +6246,16 @@ sub screen_dump {
     my $params = shift;
 
 #    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
-    my $filename = $params->{'file'} || 'screendump.jpg';
-    my $bytes = $self->{'BYTES'};
+    my $filename         = $params->{'file'} || 'screendump.jpg';
+    my $bytes            = $self->{'BYTES'};
     my ($width, $height) = ($self->{'XRES'}, $self->{'YRES'});
-    my $scrn = $self->blit_read({ 'x' => 0, 'y' => 0, 'width' => $width, 'height' => $height });
+    my $scrn             = $self->blit_read({ 'x' => 0, 'y' => 0, 'width' => $width, 'height' => $height });
 
     $scrn->{'image'} = $self->_convert_16_to_24($scrn->{'image'}, $self->{'COLOR_MODE'}) if ($self->{'BITS'} == 16);
 
     my $type = lc($params->{'format'} || 'jpeg');
-    $type =~ s/jpg/jpeg/;
-    my $img = Imager::new();
+    $type    =~ s/jpg/jpeg/;
+    my $img  = Imager::new();
     $img->read(
         'xsize'             => $scrn->{'width'},
         'ysize'             => $scrn->{'height'},
@@ -6187,16 +6270,16 @@ sub screen_dump {
         'type' => $type || 'raw',
         'datachannels'  => max(3, $bytes),
         'storechannels' => max(3, $bytes),
-        'interleave'    => 0,
+        'interleave'    => FALSE,
         'file'          => $filename
     );
 
     if ($type eq 'jpeg') {
-        $p{'jpegquality'} = $params->{'quality'} if (exists($params->{'quality'}));
-        $p{'jpegoptimize'} = 1;
+        $p{'jpegquality'}  = $params->{'quality'} if (exists($params->{'quality'}));
+        $p{'jpegoptimize'} = TRUE;
     } elsif ($type eq 'gif') {
         $p{'translate'} = 'errdiff';
-        $p{'errdiff'} = lc($params->{'dither'} || 'floyd');
+        $p{'errdiff'}   = lc($params->{'dither'} || 'floyd');
     }
     $img->write(%p);
 }
@@ -6215,8 +6298,8 @@ sub _convert_16_to_24 {
         return ($new_img);
     }
     my $new_img = '';
-    my $black24 = chr(0) x 3;
-    my $black16 = chr(0) x 2;
+    my $black24 = chr(0)   x 3;
+    my $black16 = chr(0)   x 2;
     my $white24 = chr(255) x 3;
     my $white16 = chr(255) x 2;
     my $idx     = 0;
@@ -6251,8 +6334,8 @@ sub _convert_16_to_32 {
         return ($new_img);
     }
     my $new_img = '';
-    my $black32 = chr(0) x 4;
-    my $black16 = chr(0) x 2;
+    my $black32 = chr(0)   x 4;
+    my $black16 = chr(0)   x 2;
     my $white32 = chr(255) x 4;
     my $white16 = chr(255) x 2;
     my $idx     = 0;
@@ -6461,8 +6544,7 @@ sub RGB565_to_RGB888 {
         ($r, $g, $b) = ($b, $g, $r);
     } elsif ($color_order == BRG) {
         ($r, $g, $b) = ($b, $r, $g);
-
-        #    } elsif ($color_order == RGB) {
+#    } elsif ($color_order == RGB) {
     } elsif ($color_order == RBG) {
         ($r, $g, $b) = ($r, $b, $g);
     } elsif ($color_order == GRB) {
@@ -6619,38 +6701,10 @@ sub RGBA8888_to_RGB565 {
         $g = $g >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
         $b = $b >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
 
-        my $color;
-        if ($color_order == BGR) {
-            $color = 
-              $b |
-              ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) |
-              ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}));
-        } elsif ($color_order == RGB) {
-            $color =
-              $r |
-              ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) |
-              ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}));
-        } elsif ($color_order == BRG) {
-            $color =
-              $b |
-              ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) |
-              ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}));
-        } elsif ($color_order == RBG) {
-            $color =
-              $r |
-              ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) |
-              ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}));
-        } elsif ($color_order == GRB) {
-            $color =
-              $g |
-              ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) |
-              ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}));
-        } elsif ($color_order == GBR) {
-            $color =
-              $g |
-              ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) |
-              ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}));
-        }
+        my $color =
+          ($r << ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) |
+          ($g << ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) |
+          ($b << ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}));
         $n_data .= pack('S', $color);
     }
     return ({ 'color' => $n_data });
@@ -6728,7 +6782,7 @@ sub vsync {
 
 =head2 which_console
 
-** DEPRECIATED, Now only returns 1
+** DEPRECIATED, Now only returns 1,1
 
 =cut
 
@@ -6740,7 +6794,7 @@ sub which_console {
 
 =head2 active_console
 
-** DEPRECIATED, Now always returns 1
+** DEPRECIATED, Now always returns TRUE
 
 =cut
 
@@ -6915,7 +6969,7 @@ You can run Linux inside VirtualBox and it works fine.  Put it in full screen mo
 
 This isn't a design choice, nor preference, nor some anti-Windows ego trip.  It's simply because of the fact MS Windows does not allow file mapping of the display, nor variable memory mapping of the display (that I know of), both are the techniques this module uses to achieve its magic.  DirectX is more like OpenGL in how it works, and thus defeats the purpose of this module.  You're better off with SDL instead, if you want to draw in MS Windows from Perl.
 
-* However, if someone knows how to access the framebuffer in MS Windows, and be able to do it reasonable from within Perl, then send me instructions on how to do it, and I'll do my best to get it to work.
+* However, if someone knows how to access the framebuffer (or simulate one) in MS Windows, and be able to do it reasonably from within Perl, then send me instructions on how to do it, and I'll do my best to get it to work.
 
 =head1 TROUBLESHOOTING
 
@@ -6933,7 +6987,7 @@ If you want to run your program within X-Windows, then you have the wrong module
 
 You MUST have a framebuffer based video driver for this to work.  The device ("/dev/fb0" for example) must exist.
 
-If it does exist, but is not "/dev/fb0", then you can define it in the 'new' method with the "FB_DEVICE" parameter, although the module is pretty good at finding it.
+If it does exist, but is not "/dev/fb0", then you can define it in the 'new' method with the "FB_DEVICE" parameter, although the module is pretty good at finding it automatically.
 
 =item B< It's Crashing >
 
@@ -6951,11 +7005,19 @@ If you get this behavior, then it is a bug, and the author needs to be notified,
 
 So how does that help you right now?  Try installing the program F<fbset> via your package manager, then rerun the F<primitives.pl> script without the "x" or "y" options.  If it works, then that is your immediate solution.
 
-How does that suddenly fix things?  Calculating the screen size involves complex data structures returned by an ioget call, and Perl handles these very poorly, as it is not very good with typedef size, and the data can end up being in the wrong place.  The "fbset" utility can just tell us what these values are correctly, and the module uses it as a last resort.  Thus now the module can set up the screen corrwectly, and not cause a crash.  This crash happens because it is trying to access memory that has not been allocated to it.
+How does that suddenly fix things?  Calculating the screen size involves complex data structures returned by an ioget call, and Perl handles these very poorly, as it is not very good with typedef size, and the data can end up being in the wrong place.  The "fbset" utility can just tell us what these values are correctly, and the module uses it as a last resort.  Thus now the module can set up the screen correctly, and not cause a crash.  This crash happens because it is trying to access memory that has not been allocated to it.
+
+=item B< It Only Partially Renders >
+
+Yeah this can look weird.  This is likely because there's some buffering going on.  The module attempts to turn it off, but if, for some reason, it is buffering anyway, try adding the following to points in your code where displaying a full render is necessary:
+
+ $fb->_flush_screen();
+
+This should force a full screen flush.
 
 =item B< It Just Plain Isn't Working >
 
-Well, either your system doesn't have a framebuffer driver, or perhaps the module is getting confusing data back from it and can't properly initialize (see the previous item).
+Well, either your system doesn't have a framebuffer driver, or perhaps the module is getting confusing data back from it and can't properly initialize (see the previous items).
 
 First, make sure your system has a framebuffer by seeing if F</dev/fb0> (actually "fb" then any number) exists.  If you don't see any "fb0" - "fb31" files inside "/dev", then you don't have a framebuffer driver running.  You need to fix that first.  Sometimes you have to manually load the driver with "modprobe -a drivername" (replacing "drivername" with the actual driver name).
 
@@ -6969,7 +7031,7 @@ Once that is run (changing "sparky" to whatever your username is), log out, then
 
 =item B< The Text Cursor Is Messing Things Up >
 
-It is?  Well then turn it off.  Use the $obj->cls('OFF') method to do it.  Use $obj->cls('ON') to turn it back on.
+It is?  Well then turn it off.  Use the $fb->cls('OFF') method to do it.  Use $fb->cls('ON') to turn it back on.
 
 If your script exits without turning the cursor back on, then it will still be off.  To get your cursor back, just type the command "reset" (and make sure you turn it back on before your code exits, so it doesn't do that).
 
@@ -7003,17 +7065,19 @@ Plain and simple, your device just may be too slow for some CPU intensive operat
 
 If none of these ideas work, then send me an email, and I may be able to get it functioning for you.  Please run the F<dump.pl> script inside the "examples" directory inside this module's package:
 
-   perl dump.pl 2> dump.txt
+   perl dump.pl
 
-Please include this dump file as an attachment to your email.  Please do not include it inline as part of the message text.
+Please include this dump file (dump.log) as an attachment to your email.  Please do not include it inline as part of the message text.
 
 Also, please include a copy of your code (or at least the portion of it where you initialize this module), AND explain to me your hardware and OS it is running under.
 
-Screen shots are also helpful.
+Screen shots and photos are also helpful.
 
 KNOW THIS:  I want to get it working on your system, and I will do everything I can to help you get it working, but there may be some conditions where that may not be possible.  It's very rare (and I haven't seen it yet), but possible.
 
 I am not one of those arrogant ogres that spout "RTFM" every time someone asks for help.  I actually will help you.  Please be patient, as I do have other responsibilities that may delay a response, but a response will come.
+
+** Making the subject of your email "PERL GFB HELP" is most helpful for me, and likely will get your email seen sooner.
 
 =back
 
@@ -7025,7 +7089,7 @@ Richard Kelsch <rich@rk-internet.com>
 
 Copyright 2003-## YEAR ## Richard Kelsch, All Rights Reserved.
 
-This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify it under the GNU software license.
 
 =head1 VERSION
 

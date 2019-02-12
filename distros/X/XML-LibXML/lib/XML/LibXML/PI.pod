@@ -10,8 +10,8 @@ XML::LibXML::PI - XML::LibXML Processing Instructions
   # Only methods specific to Processing Instruction nodes are listed here,
   # see the XML::LibXML::Node manpage for other methods
 
-  $pinode-E<gt>setData( $data_string );
-  $pinode-E<gt>setData( name=E<gt>string_value [...] );
+  $pinode->setData( $data_string );
+  $pinode->setData( name=>string_value [...] );
 
 =head1 DESCRIPTION
 
@@ -53,8 +53,8 @@ version as available in L<<<<<< XML::LibXML::Node >>>>>>:
 
 =item setData
 
-  $pinode-E<gt>setData( $data_string );
-  $pinode-E<gt>setData( name=E<gt>string_value [...] );
+  $pinode->setData( $data_string );
+  $pinode->setData( name=>string_value [...] );
 
 This method allows one to change the content data of a PI. Additionally to the
 interface specified for DOM Level2, the method provides a named parameter
@@ -74,7 +74,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0133
+2.0134
 
 =head1 COPYRIGHT
 

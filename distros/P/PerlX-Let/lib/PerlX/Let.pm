@@ -11,7 +11,7 @@ use Const::Fast ();
 use Keyword::Simple;
 use Text::Balanced ();
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.2.1';
 
 
 sub import {
@@ -25,22 +25,41 @@ sub unimport {
 sub _rewrite_let {
     my ($ref) = @_;
 
-    my ( $name, $val, $code );
+    my $let = "";
 
-    ( $name, $$ref ) = Text::Balanced::extract_variable($$ref);
-    $$ref =~ s/^\s*\=>?\s*// or die;
-    ( $val, $$ref ) = Text::Balanced::extract_quotelike($$ref);
-    ( $val, $$ref ) = Text::Balanced::extract_bracketed($$ref)
-      unless defined $val;
+    do {
 
-    unless ( defined $val ) {
-        ($val) = $$ref =~ /^(\S+)/;
-        $$ref =~ s/^\S+//;
-    }
+        my ( $name, $val );
+
+        ( $name, $$ref ) = Text::Balanced::extract_variable($$ref);
+        $$ref =~ s/^\s*\=>?\s*// or die;
+        ( $val, $$ref ) = Text::Balanced::extract_quotelike($$ref);
+        ( $val, $$ref ) = Text::Balanced::extract_bracketed( $$ref, '({[' )
+          unless defined $val;
+
+        unless ( defined $val ) {
+            ($val) = $$ref =~ /^(\S+)/;
+            $$ref =~ s/^\S+//;
+        }
+
+        if ($val !~ /[\$\@\%\&]/ && ($] >= 5.028 || substr($name, 0, 1) eq '$')) {
+
+            # We can't use Const::Fast on state variables, so we use
+            # this workaround.
+
+            $let .= "use feature 'state'; state $name = $val; unless (state \$set = 0) { Const::Fast::_make_readonly(\\$name); \$set = 1; };";
+
+        }
+        else {
+
+            $let .= "Const::Fast::const my $name => $val; ";
+        }
+
+    } while ( $$ref =~ s/^\s*,\s*// );
+
+    my $code;
 
     ( $code, $$ref ) = Text::Balanced::extract_codeblock( $$ref, '{' );
-
-    my $let = "Const::Fast::const my $name => $val;";
 
     if ($code) {
         substr( $code, index( $code, '{' ) + 1, 0 ) = $let;
@@ -68,45 +87,69 @@ PerlX::Let - Syntactic sugar for lexical constants
 
 =head1 VERSION
 
-version v0.0.1
+version v0.2.1
 
 =head1 SYNOPSIS
 
   use PerlX::Let;
 
-  let $val = "key" {
+  let $x = 1,
+      $y = "string" {
 
-    if ( $a->($val} > $b->{$val} ) {
-
-      something( $val );
-
-    }
+      if ( ($a->($y} - $x) > ($b->{$y} + $x) )
+      {
+        something( $y, $x );
+      }
 
   }
 
 =head1 DESCRIPTION
 
-The code
+This module allows you to define lexical constants using a new C<let>
+keyword, for example, code such as
 
-  let $var = "thing" { ... }
+  if (defined $arg{username}) {
+    $row->update( { username => $arg{username} );
+  }
 
-is shorthand for
+is liable to typos. You could simplify it with
+
+  let $key = "username" {
+
+    if (defined $arg{$key}) {
+      $row->update( { $key => $arg{$key} );
+    }
+
+  }
+
+This is roughly equivalent to using
+
+  use Const::Fast;
 
   {
-     use Const::Fast;
-     const $var => "thing";
+   const $key => "username";
 
-     ...
+    if (defined $arg{$key}) {
+      $row->update( { $key => $arg{$key} );
+    }
+
   }
+
+However, if the value does not contain a sigil, and the variable is a
+scalar, or you are using Perl v5.28 or later, this uses state
+variables so that the value is only set once.
 
 =head1 KNOWN ISSUES
 
-This is an experimental version.
-
-The parsing of assignments is rudimentaly, and may fail when assigning
+The parsing of assignments is rudimentary, and may fail when assigning
 to another variable or the result of a function.
 
+Because this modifies the source code during compilation, the line
+numebrs may be changed.
+
 =head1 SEE ALSO
+
+L<Const::Fast>
 
 L<Keyword::Simple>
 

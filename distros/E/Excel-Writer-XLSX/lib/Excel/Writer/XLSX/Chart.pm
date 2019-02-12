@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Chart;
 #
 # Used in conjunction with Excel::Writer::XLSX.
 #
-# Copyright 2000-2018, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2019, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -27,7 +27,7 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
   quote_sheetname );
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 
 ###############################################################################
@@ -79,7 +79,7 @@ sub new {
     $self->{_axis2_ids}         = [];
     $self->{_cat_has_num_fmt}   = 0;
     $self->{_requires_category} = 0;
-    $self->{_legend_position}   = 'right';
+    $self->{_legend}            = {};
     $self->{_cat_axis_position} = 'b';
     $self->{_val_axis_position} = 'l';
     $self->{_formula_ids}       = {};
@@ -423,19 +423,9 @@ sub set_title {
 sub set_legend {
 
     my $self = shift;
-    my %arg  = @_;
 
-    $self->{_legend_position}      = $arg{position} || 'right';
-    $self->{_legend_delete_series} = $arg{delete_series};
-    $self->{_legend_font}          = $self->_convert_font_args( $arg{font} );
-
-    # Set the legend layout.
-    $self->{_legend_layout} = $self->_get_layout_properties( $arg{layout} );
-
-    # Turn off the legend.
-    if ( $arg{none} ) {
-        $self->{_legend_position} = 'none';
-    }
+    # Convert the user defined properties to internal properties.
+    $self->{_legend} = $self->_get_legend_properties( @_ );
 }
 
 
@@ -714,6 +704,7 @@ sub _convert_axis_args {
         _position_axis     => $arg{position_axis},
         _position          => $arg{position},
         _label_position    => $arg{label_position},
+        _label_align       => $arg{label_align},
         _num_format        => $arg{num_format},
         _num_format_linked => $arg{num_format_linked},
         _interval_unit     => $arg{interval_unit},
@@ -1801,6 +1792,71 @@ sub _get_area_properties {
     $area->{_layout}   = $layout;
 
     return $area;
+}
+
+
+###############################################################################
+#
+# _get_legend_properties()
+#
+# Convert user defined legend properties to the structure required internally.
+#
+sub _get_legend_properties {
+
+    my $self = shift;
+    my %arg  = @_;
+    my $legend = {};
+
+    $legend->{_position}      = $arg{position} || 'right';
+    $legend->{_delete_series} = $arg{delete_series};
+    $legend->{_font}          = $self->_convert_font_args( $arg{font} );
+
+    # Set the legend layout.
+    $legend->{_layout} = $self->_get_layout_properties( $arg{layout} );
+
+    # Turn off the legend.
+    if ( $arg{none} ) {
+        $legend->{_position} = 'none';
+    }
+
+    # Set the line properties for the legend.
+    my $line = $self->_get_line_properties( $arg{line} );
+
+    # Allow 'border' as a synonym for 'line'.
+    if ( $arg{border} ) {
+        $line = $self->_get_line_properties( $arg{border} );
+    }
+
+    # Set the fill properties for the legend.
+    my $fill = $self->_get_fill_properties( $arg{fill} );
+
+    # Set the pattern properties for the legend.
+    my $pattern = $self->_get_pattern_properties( $arg{pattern} );
+
+    # Set the gradient fill properties for the legend.
+    my $gradient = $self->_get_gradient_properties( $arg{gradient} );
+
+    # Pattern fill overrides solid fill.
+    if ( $pattern ) {
+        $fill = undef;
+    }
+
+    # Gradient fill overrides solid and pattern fills.
+    if ( $gradient ) {
+        $pattern = undef;
+        $fill    = undef;
+    }
+
+    # Set the legend layout.
+    my $layout = $self->_get_layout_properties( $arg{layout} );
+
+    $legend->{_line}     = $line;
+    $legend->{_fill}     = $fill;
+    $legend->{_pattern}  = $pattern;
+    $legend->{_gradient} = $gradient;
+    $legend->{_layout}   = $layout;
+
+    return $legend;
 }
 
 
@@ -2994,7 +3050,7 @@ sub _write_cat_axis {
     }
 
     # Write the c:labelAlign element.
-    $self->_write_label_align( 'ctr' );
+    $self->_write_label_align( $x_axis->{_label_align} );
 
     # Write the c:labelOffset element.
     $self->_write_label_offset( 100 );
@@ -3702,7 +3758,15 @@ sub _write_auto {
 sub _write_label_align {
 
     my $self = shift;
-    my $val  = 'ctr';
+    my $val  = shift || 'ctr';
+
+    if ( $val eq 'right' ) {
+        $val = 'r';
+    }
+
+    if ( $val eq 'left' ) {
+        $val = 'l';
+    }
 
     my @attributes = ( 'val' => $val );
 
@@ -3920,15 +3984,16 @@ sub _write_c_minor_time_unit {
 sub _write_legend {
 
     my $self          = shift;
-    my $position      = $self->{_legend_position};
-    my $font          = $self->{_legend_font};
+    my $legend        = $self->{_legend};
+    my $position      = $legend->{_position} || 'right';
+    my $font          = $legend->{_font};
     my @delete_series = ();
     my $overlay       = 0;
 
-    if ( defined $self->{_legend_delete_series}
-        && ref $self->{_legend_delete_series} eq 'ARRAY' )
+    if ( defined $legend->{_delete_series}
+        && ref $legend->{_delete_series} eq 'ARRAY' )
     {
-        @delete_series = @{ $self->{_legend_delete_series} };
+        @delete_series = @{ $legend->{_delete_series} };
     }
 
     if ( $position =~ s/^overlay_// ) {
@@ -3936,10 +4001,11 @@ sub _write_legend {
     }
 
     my %allowed = (
-        right  => 'r',
-        left   => 'l',
-        top    => 't',
-        bottom => 'b',
+        right     => 'r',
+        left      => 'l',
+        top       => 't',
+        bottom    => 'b',
+        top_right => 'tr',
     );
 
     return if $position eq 'none';
@@ -3960,15 +4026,18 @@ sub _write_legend {
     }
 
     # Write the c:layout element.
-    $self->_write_layout( $self->{_legend_layout}, 'legend' );
+    $self->_write_layout( $legend->{_layout}, 'legend' );
+
+    # Write the c:overlay element.
+    $self->_write_overlay() if $overlay;
+
+    # Write the c:spPr element.
+    $self->_write_sp_pr( $legend );
 
     # Write the c:txPr element.
     if ( $font ) {
         $self->_write_tx_pr( undef, $font );
     }
-
-    # Write the c:overlay element.
-    $self->_write_overlay() if $overlay;
 
     $self->xml_end_tag( 'c:legend' );
 }
@@ -4690,7 +4759,6 @@ sub _write_sp_pr {
     {
         return;
     }
-
 
     $self->xml_start_tag( 'c:spPr' );
 
@@ -7158,9 +7226,43 @@ The default legend position is C<right>. The available positions are:
     bottom
     left
     right
+    top_right
     overlay_left
     overlay_right
+    overlay_top_right
     none
+
+=item * C<border>
+
+Set the border properties of the legend such as colour and style. See the L</CHART FORMATTING> section below.
+
+=item * C<fill>
+
+Set the fill properties of the legend such as colour. See the L</CHART FORMATTING> section below.
+
+=item * C<pattern>
+
+Set the pattern fill properties of the legend. See the L</CHART FORMATTING> section below.
+
+=item * C<gradient>
+
+Set the gradient fill properties of the legend. See the L</CHART FORMATTING> section below.
+
+
+=item * C<font>
+
+Set the font properties of the chart legend:
+
+    $chart->set_legend( font => { bold => 1, italic => 1 } );
+
+See the L</CHART FONTS> section below.
+
+=item * C<delete_series>
+
+This allows you to remove 1 or more series from the legend (the series will still display on the chart). This property takes an array ref as an argument and the series are zero indexed:
+
+    # Delete/hide series index 0 and 2 from the legend.
+    $chart->set_legend( delete_series => [0, 2] );
 
 =item * C<layout>
 
@@ -7176,23 +7278,6 @@ Set the C<(x, y)> position of the legend in chart relative units:
     );
 
 See the L</CHART LAYOUT> section below.
-
-
-=item * C<delete_series>
-
-This allows you to remove 1 or more series from the legend (the series will still display on the chart). This property takes an array ref as an argument and the series are zero indexed:
-
-    # Delete/hide series index 0 and 2 from the legend.
-    $chart->set_legend( delete_series => [0, 2] );
-
-=item * C<font>
-
-Set the font properties of the chart legend:
-
-    $chart->set_legend( font => { bold => 1, italic => 1 } );
-
-See the L</CHART FONTS> section below.
-
 
 =back
 
@@ -7874,6 +7959,7 @@ The following properties can be set for C<line> formats in a chart.
     color
     width
     dash_type
+    transparency
 
 
 The C<none> property is uses to turn the C<line> off (it is always on by default except in Scatter charts). This is useful if you wish to plot a series with markers but without a line.
@@ -7925,6 +8011,13 @@ The following C<dash_type> values are available. They are shown in the order tha
 
 The default line style is C<solid>.
 
+The C<transparency> property sets the transparency of the C<line> color in the integer range 1 - 100. The color must be set for transparency to work, it doesn't work with an automatic/default color:
+
+    $chart->add_series(
+        values     => '=Sheet1!$B$1:$B$5',
+        line       => { color => 'yellow', transparency => 50 },
+    );
+
 More than one C<line> property can be specified at a time:
 
     $chart->add_series(
@@ -7974,7 +8067,7 @@ The available colours are shown in the main L<Excel::Writer::XLSX> documentation
         fill       => { color => '#FF0000' },
     );
 
-The C<transparency> property sets the transparency of the solid fill color in the integer range 1 - 100:
+The C<transparency> property sets the transparency of the solid fill color in the integer range 1 - 100. The color must be set for transparency to work, it doesn't work with an automatic/default color:
 
     $chart->set_chartarea( fill => { color => 'yellow', transparency => 75 } );
 
@@ -8659,6 +8752,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXVIII, John McNamara.
+Copyright MM-MMXIX, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

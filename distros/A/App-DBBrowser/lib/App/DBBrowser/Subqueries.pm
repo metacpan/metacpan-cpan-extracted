@@ -141,26 +141,21 @@ sub choose_subquery {
             $ax->print_sql( $sql );
             next SUBQUERY;
         }
-        my ( $prompt, $default, $info );
+        my ( $prompt, $default );
         if ( $choices->[$idx] eq $readline ) {
-            $info = 'Enter SQ:';
-            $prompt = '';
+            $prompt = 'Enter SQ: ';
         }
         else {
-            $info = "Edit SQ:";
-            $prompt = '';
+            $prompt = 'Edit SQ: ';
             $idx -= @pre;
-            #if ( $history->[$idx][0] ne $history->[$idx][1] ) {
-            #    return "(" . $history->[$idx][0] . ")";
-            #}
             $default = $history->[$idx][0];
         }
         my $tf = Term::Form->new();
         # Readline
         my $stmt = $tf->readline( $prompt,
-            { default => $default, info => $info, show_context => 1 }
+            { default => $default, show_context => 1 }
         );
-        if ( ! defined $stmt && ! length $stmt ) {
+        if ( ! defined $stmt || ! length $stmt ) {
             $ax->print_sql( $sql );
             next SUBQUERY;
         }

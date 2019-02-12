@@ -279,15 +279,15 @@ type Query {
   pg(id: [String!]!): [Pg]
   photo(id: [String!]!): [Photo]
   photoset(id: [String!]!): [Photoset]
-  # input to search
+  "input to search"
   searchBlog(input: BlogSearchInput!): [Blog]
-  # input to search
+  "input to search"
   searchBlogTag(input: BlogTagSearchInput!): [BlogTag]
-  # input to search
+  "input to search"
   searchPg(input: PgSearchInput!): [Pg]
-  # input to search
+  "input to search"
   searchPhoto(input: PhotoSearchInput!): [Photo]
-  # input to search
+  "input to search"
   searchPhotoset(input: PhotosetSearchInput!): [Photoset]
 }
 '

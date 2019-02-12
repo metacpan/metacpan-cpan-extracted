@@ -1,23 +1,20 @@
 package WebService::GeoIPify;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use namespace::clean;
 use strictures 2;
 use utf8;
 
-use Cache::LRU;
 use Carp qw(croak);
-use CHI;
 use Data::Validate::IP qw(is_ipv4 is_public_ipv4);
 use Moo;
 use Sub::Quote qw(quote_sub);
 use Types::Common::String qw(StrLength);
 use Types::Standard qw(InstanceOf Str);
 
+with 'Role::Cache::LRU';
 with 'Role::REST::Client';
-
-use constant GEOIPIFY_MAX_CACHE_ITEMS => 500;
 
 has api_key => (
     isa => StrLength[32],
@@ -37,18 +34,12 @@ has api_ipify_url => (
     default => quote_sub(q{ 'https://api.ipify.org' })
 );
 
-has cache => (
-    isa => InstanceOf['Cache::LRU'],
-    is => 'lazy',
-    builder => quote_sub(q{ Cache::LRU->new(size => GEOIPIFY_MAX_CACHE_ITEMS) })
-);
-
 sub lookup {
     my ($self, $ip) = @_;
 
     croak "$ip is not a public IPv4 address" if (!is_public_ipv4($ip));
 
-    my $cached_ip_record = $self->cache->get($ip);
+    my $cached_ip_record = $self->get_cache($ip);
     return $cached_ip_record if (defined $cached_ip_record);
 
     $self->set_persistent_header('User-Agent' => __PACKAGE__ . $WebService::GeoIPify::VERSION);
@@ -63,7 +54,7 @@ sub lookup {
     my $response = $self->get('', $queries);
 
     my $ip_record = $response->data;
-    $self->cache->set($ip => $ip_record);
+    $self->set_cache($ip => $ip_record);
 
     return $ip_record;
 }
@@ -125,11 +116,6 @@ The default base URL for API calls.
 =head3 api_ipify_url
 
 The default base URL for ipify API calls to obtain the client public IP.
-
-=head3 cache
-
-The Least Recently Used (LRU) memory caching storage used to cache IP address
-record. The cache will only stored most recent 500 records.
 
 =head2 lookup($ip_address)
 

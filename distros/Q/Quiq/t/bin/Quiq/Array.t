@@ -16,7 +16,7 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_compare : Test(12) {
+sub test_different : Test(12) {
     my $self = shift;
 
     my $arr1 = Quiq::Array->new;
@@ -25,7 +25,7 @@ sub test_compare : Test(12) {
     my $arr2_res = [];
     my $arr_res = [];
 
-    my ($a1,$a2,$a) = $arr1->compare($arr2);
+    my ($a1,$a2,$a) = $arr1->different($arr2);
     # warn "\n@$a1\n@$a2\n@$a\n";
 
     $self->ok($a1->eq($arr1_res));
@@ -40,7 +40,7 @@ sub test_compare : Test(12) {
     $arr2_res = [qw/a b c/];
     $arr_res = [];
 
-    ($a1,$a2,$a) = $arr1->compare($arr2);
+    ($a1,$a2,$a) = $arr1->different($arr2);
     # warn "\n@$a1\n@$a2\n@$a\n";
 
     $self->ok($a1->eq($arr1_res));
@@ -55,7 +55,7 @@ sub test_compare : Test(12) {
     $arr2_res = [qw/e f g/];
     $arr_res = [qw/b d/];
 
-    ($a1,$a2,$a) = $arr1->compare($arr2);
+    ($a1,$a2,$a) = $arr1->different($arr2);
     # warn "\n@$a1\n@$a2\n@$a\n";
 
     $self->ok($a1->eq($arr1_res));
@@ -66,7 +66,7 @@ sub test_compare : Test(12) {
 
     # Aufruf als Klassenmethode
 
-    ($a1,$a2,$a) = Quiq::Array->compare($arr1,$arr2);
+    ($a1,$a2,$a) = Quiq::Array->different($arr1,$arr2);
 
     $self->ok($a1->eq($arr1_res));
     $self->ok($a2->eq($arr2_res));

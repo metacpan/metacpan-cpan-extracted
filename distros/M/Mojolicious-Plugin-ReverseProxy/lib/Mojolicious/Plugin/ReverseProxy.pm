@@ -11,7 +11,7 @@ use Carp qw(croak);
 
 my $ua = Mojo::UserAgent->new(cookie_jar => Mojo::UserAgent::CookieJar->new(ignore => sub { 1 }));
 
-our $VERSION = '0.705';
+our $VERSION = '0.706';
 
 my $make_req = sub {
     my $c = shift;
@@ -19,11 +19,13 @@ my $make_req = sub {
     my $mount_point = shift;
     my $tx = Mojo::Transaction::HTTP->new( req=> $c->req->clone );
     my $url = $tx->req->url;
+    my $req_path = $url->path;
     $url->scheme($dest_url->scheme);
     $url->host($dest_url->host);
     $url->port($dest_url->port);
+    $url->path($dest_url->path);
+    $url->path->trailing_slash(1);
     if ($mount_point){
-        my $req_path = $url->path;
         $req_path =~ s[^\Q${mount_point}\E/*][];
         $url->path($req_path);
     }

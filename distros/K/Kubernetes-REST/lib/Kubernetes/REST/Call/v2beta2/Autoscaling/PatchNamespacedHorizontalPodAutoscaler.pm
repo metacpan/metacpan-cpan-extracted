@@ -13,7 +13,11 @@ package Kubernetes::REST::Call::v2beta2::Autoscaling::PatchNamespacedHorizontalP
   
   has pretty => (is => 'ro', isa => Str);
   
-
+  sub _body_params { [
+  
+    { name => 'body' },
+  
+  ] }
   sub _url_params { [
   
     { name => 'name' },

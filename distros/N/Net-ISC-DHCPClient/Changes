@@ -1,5 +1,10 @@
 Revision history for Net-ISC-DHCPClient
 
+0.10    Sun 10 Feb 2019 22:17:00 PM EET
+        Added parsing of new Netplan-style DHCP lease files by Networkmanager
+
+0.02    Mon 27 Nov 2017 09:46:24 PM EET
+        No code changes. Bumped version for CPAN upload.
+
 0.01    Mon 27 Nov 2017 09:46:24 PM EET
         First version, has functionality to read ISC dhclient leases.
-

@@ -1,23 +1,61 @@
-% if ( $CustomField->Id ) {
 <script type="text/javascript">
-jQuery( function() {
+jQuery(function() {
     var select = jQuery('select[name=ConditionalCF]');
     select.change(function() {
         var cf_id = jQuery(this).find('option:selected').val();
         if (cf_id) {
-            jQuery.getJSON('/Helpers/SelectCondition', {CustomFieldId: cf_id}, function(values) {
-                if (values) {
-                    jQuery('span input[name=ConditionedBy]').each(function() {
-                        if (jQuery(this).val()) {
-                            jQuery(this).parent('.ConditionedByValue').remove();
+            jQuery.ajax({
+                dataType: "json",
+                url: '/Helpers/SelectCondition',
+                async: false,
+                data:  {CustomFieldId: cf_id},
+                success: function(res) {
+                if (res) {
+                    jQuery('select[name=ConditionalOp]').remove();
+                    jQuery('.conditioned-by-admin-op').append(res['op']);
+                    jQuery('input[name=ConditionedBy]').each(function() {
+                        jQuery(this).parent('.ConditionedByValue').remove();
+                    });
+
+                    if (res['type'].match(/^Date(Time)?$/)) {
+                        jQuery('.conditioned-by-admin-vals').append('<span class="ConditionedByValue" style="display: block;"><input type="text" size="16" class="datepicker' + (res['type'] == 'DateTime' ? ' withtime' : '') + '" name="ConditionedBy" value="<% (scalar(@ConditionedByAry) >= 1 && $ConditionedByAry[0] !~ /[a-z]/i) ? $ConditionedByAry[0] : '' %>" /></span>');
+                        activate_datepicker();
+                    } else if (res['vals']) {
+                        jQuery.each(res['vals'], function(id, val) {
+                            var checked = '';
+                            if (cf_id == <% $default %>) {
+                                var conditionedby_vals = ["<% join('", "', @ConditionedByAry) |n%>"];
+                                if (jQuery.inArray(val, conditionedby_vals) != -1) {
+                                    checked = ' checked="checked"';
+                                }
+                            }
+                            jQuery('.conditioned-by-admin-vals').append('<span class="ConditionedByValue" style="display: block;"><input type="checkbox" name="ConditionedBy" value="' + val + '"' + checked + ' />' + val + '</span>');
+                        });
+                    } else {
+                        jQuery('.conditioned-by-admin-vals').append('<span class="ConditionedByValue" style="display: block;"><input type="text" size="20" name="ConditionedBy" value="<% scalar(@ConditionedByAry) >= 1 ? $ConditionedByAry[0] : '' %>" /></span>');
+                    }
+
+                    if (jQuery('.conditioned-by-admin-op select option[value="between"]').length) {
+                        jQuery('.conditioned-by-admin-op select').change(function() {
+                            if (jQuery('.conditioned-by-admin-op select').val() == 'between') {
+                                if (res['type'].match(/^Date(Time)?$/)) {
+                                    jQuery('.conditioned-by-admin-vals').append('<span class="ConditionedByValue" style="display: block;"><input type="text" size="16" class="datepicker' + (res['type'] == 'DateTime' ? ' withtime' : '') + '" name="ConditionedBy" value="<% (scalar(@ConditionedByAry) == 2 && $ConditionedByAry[1] !~ /[a-z]/i) ? $ConditionedByAry[1] : '' %>" /></span>');
+                                    activate_datepicker();
+
+                                } else {
+                                    jQuery('.conditioned-by-admin-vals').append('<span class="ConditionedByValue" style="display: block;"><input type="text" size="20" name="ConditionedBy" value="<% scalar(@ConditionedByAry) == 2 ? $ConditionedByAry[1] : '' %>" /></span>');
+                                }
+                            }
+                        else {
+                            if (jQuery('.conditioned-by-admin-vals .ConditionedByValue').length == 2) {
+                                jQuery('.conditioned-by-admin-vals .ConditionedByValue').get(1).remove();
+                            }
                         }
-                    });
-                    jQuery.each(values, function(id, val) {
-                        jQuery('span[name=ConditionedBy]').append('<span class="ConditionedByValue" style="display: block;"><input type="checkbox" name="ConditionedBy" value="' + val + '" />' + val + '</span>');
-                    });
+                        });
+                    }
                 }
-            });
-            jQuery('.conditional-field-condition').show();
+                jQuery('.conditional-field-condition').show();
+            }});
         } else {
             jQuery('span input[name=ConditionedBy]').each(function() {
                 if (jQuery(this).val()) {
@@ -27,37 +65,93 @@ jQuery( function() {
             jQuery('.conditional-field-condition').hide();
         }
     });
+
+    if (jQuery('.conditioned-by-admin-op select option[value="between"]').length) {
+        jQuery('select[name=ConditionalOp]').change(function() {
+            if (jQuery('.conditioned-by-admin-op select').val() == 'between') {
+%   if ($cf->id && $cf->Type =~ /^Date(Time)?$/)  {
+%       if ($cf->Type eq 'DateTime') {
+                var withtime_class = ' withtime';
+%       } else {
+                var withtime_class = '';
+%       }
+                jQuery('.conditioned-by-admin-vals').append('<span class="ConditionedByValue" style="display: block;"><input type="text" size="16" class="datepicker' + withtime_class + '" name="ConditionedBy" value="<% (scalar(@ConditionedByAry) == 2 && $ConditionedByAry[1] !~ /[a-z]/i) ? $ConditionedByAry[1] : '' %>" /></span>');
+                activate_datepicker();
+%   } else {
+                jQuery('.conditioned-by-admin-vals').append('<span class="ConditionedByValue" style="display: block;"><input type="text" size="20" name="ConditionedBy" value="<% scalar(@ConditionedByAry) == 2 ? $ConditionedByAry[1] : '' %>" /></span>');
+%   }
+            } else {
+                if (jQuery('.conditioned-by-admin-vals .ConditionedByValue').length == 2) {
+                    jQuery('.conditioned-by-admin-vals .ConditionedByValue').get(1).remove();
+                }
+            }
+        });
+    }
 });
 </script>
 <tr class="conditionedby"><td class="label"><&|/l&>Customfield is conditioned by</&></td><td>
-%   my $default = 0;
-%   my $cf = RT::CustomField->new($session{CurrentUser});
-%   my $conditioned_by = $CustomField->ConditionedBy;
-%   if ($conditioned_by && $conditioned_by->{CF}) {
-%       $cf->Load($conditioned_by->{CF});
-%       if ($cf->id) {
-%           $default = $cf->id
-%       }
-%   }
-<& /Admin/Elements/SelectCustomField,
-    Name => "ConditionalCF",
-    LookupType => $CustomField->LookupType,
-    Default => $default,
-    Not => $CustomField->id,
-&>
-<span class="conditional-field-condition"<% $conditioned_by->{vals} ? '' : 'style="display: none;"' |n%>>
-<span class="label">is</span>
-<span name="ConditionedBy">
+<table class="conditioned-by-admin"><tr>
+    <td class="conditioned-by-admin-cf">
+        <& /Elements/SelectConditionalCustomField,
+                            Name => "ConditionalCF",
+                            LookupType => $CustomField->LookupType,
+                            Default => $default,
+                            Not => $CustomField->id,
+                            OnlySelectionType => 0,
+        &>
+    </td>
+    <td class="conditioned-by-admin-op conditional-field-condition"<% $cf->id ? '' : ' style="display: none;"' |n%>>
 %   if ($cf->id) {
-%       my $ConditionedBy = $conditioned_by->{vals} || '';
-%       my @ConditionedByAry = ref($ConditionedBy) eq 'ARRAY' ? @$ConditionedBy : ($ConditionedBy);
-%       my $cf_values = $cf->Values;
-%       while (my $cf_value = $cf_values->Next) {
-    <span class="ConditionedByValue" style="display: block;"><input type="checkbox" name="ConditionedBy" value="<% $cf_value->Name %>"<% (grep {$_ eq $cf_value->Name} @ConditionedByAry) ? qq[ checked="checked"] : '' |n%> /><% $cf_value->Name %></span>
+        <& /Elements/SelectConditionalRelation, CustomField => $cf, Name => 'ConditionalOp', $conditioned_by->{op} ? (Default => $conditioned_by->{op}) : () &>
+%   }
+    </td>
+    <td class="conditioned-by-admin-vals conditional-field-condition"<% $cf->id ? '' : ' style="display: none;"' |n%>>
+%   if ($cf->id) {
+%       if ($cf->IsSelectionType) {
+%           my $cf_values = $cf->Values;
+%           while (my $cf_value = $cf_values->Next) {
+        <span class="ConditionedByValue" style="display: block;"><input type="checkbox" name="ConditionedBy" value="<% $cf_value->Name %>"<% (grep {$_ eq $cf_value->Name} @ConditionedByAry) ? qq[ checked="checked"] : '' |n%> /><% $cf_value->Name %></span>
+%           }
+%       } elsif ($cf->Type =~ /^Date(Time)?$/) {
+%           my $datetime_type = $1 || '';
+%           my @conditioned_by_vals = @ConditionedByAry;
+%           if ($datetime_type) {
+%               for (my $i=0; $i < scalar(@conditioned_by_vals); $i++) {
+%                   my $DateObj = RT::Date->new($session{'CurrentUser'});
+%                   $DateObj->Set(Format => 'unknown', Value => $conditioned_by_vals[$i], Timezone => 'utc');
+%                   $conditioned_by_vals[$i] = $datetime_type ? $DateObj->Strftime("%F %T") : $DateObj->Strftime("%F");
+%               }
+%           }
+        <span class="ConditionedByValue" style="display: block;"><input type="text" size="16" class="datepicker<% ($datetime_type ? ' withtime' : '') %>" name="ConditionedBy" value="<% (scalar(@conditioned_by_vals) >= 1 && $conditioned_by_vals[0] !~ /[a-z]/i) ? $conditioned_by_vals[0] : '' %>" /></span>
+%           if ($conditioned_by->{op} && $conditioned_by->{op} eq 'between') {
+                <span class="ConditionedByValue" style="display: block;"><input type="text" size="16" class="datepicker<% ($datetime_type ? ' withtime' : '') %>" name="ConditionedBy" value="<% (scalar(@conditioned_by_vals) == 2 && $conditioned_by_vals[1] !~ /[a-z]/i) ? $conditioned_by_vals[1] : '' %>" /></span>
+%           }
+%       } else {
+        <span class="ConditionedByValue" style="display: block;"><input type="text" size="20 "name="ConditionedBy" value="<% scalar(@ConditionedByAry) >= 1 ? $ConditionedByAry[0] : '' %>" /></span>
+%           if ($conditioned_by->{op} && $conditioned_by->{op} eq 'between') {
+            <span class="ConditionedByValue" style="display: block;"><input type="text" size="20 "name="ConditionedBy" value="<% scalar(@ConditionedByAry) == 2 ? $ConditionedByAry[1] : '' %>" /></span>
+%           }
 %       }
 %   }
-</span></span></td></tr>
+    </td>
+</table></td></tr>
 % }
+
+<%INIT>
+if ( $CustomField->Id ) {
+    my $default = 0;
+    my $cf = RT::CustomField->new($session{CurrentUser});
+    my $conditioned_by = $CustomField->ConditionedBy;
+    if ($conditioned_by && $conditioned_by->{CF}) {
+        $cf->Load($conditioned_by->{CF});
+        if ($cf->id) {
+            $default = $cf->id
+        }
+    }
+    my $ConditionedBy = $conditioned_by->{vals} || '';
+    my @ConditionedByAry = ref($ConditionedBy) eq 'ARRAY' ? @$ConditionedBy : ($ConditionedBy);
+</%INIT>
+
 <%ARGS>
 $CustomField
 </%ARGS>

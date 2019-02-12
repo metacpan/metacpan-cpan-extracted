@@ -1,7 +1,7 @@
 ---
 abstract: 'add return type for a function'
 author:
-  - 'Kenta, Kobayashi <kentafly88@gmail.com>'
+  - 'kfly8 <kfly@cpan.org>'
 build_requires:
   Test::Fatal: '0'
   Test::More: '0.98'
@@ -28,7 +28,7 @@ no_index:
 provides:
   Function::Return:
     file: lib/Function/Return.pm
-    version: '0.03'
+    version: '0.031'
   Function::Return::Info:
     file: lib/Function/Return/Info.pm
 requires:
@@ -43,9 +43,10 @@ resources:
   bugtracker: https://github.com/kfly8/p5-Function-Return/issues
   homepage: https://github.com/kfly8/p5-Function-Return
   repository: git://github.com/kfly8/p5-Function-Return.git
-version: '0.03'
+version: '0.031'
 x_authority: cpan:KFLY
 x_contributors:
+  - 'Kenta Kobayashi <kentafly88@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

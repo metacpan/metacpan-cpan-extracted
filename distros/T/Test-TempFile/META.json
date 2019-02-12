@@ -1,0 +1,48 @@
+{
+   "abstract" : "Helper library for testing code that uses temp files",
+   "author" : [
+      "Richard Harris <rjh@netcraft.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-TempFile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "0",
+            "Path::Tiny" : "0",
+            "Test2::API" : "0",
+            "Test::Builder::Module" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.96",
+            "YAML::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.90",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

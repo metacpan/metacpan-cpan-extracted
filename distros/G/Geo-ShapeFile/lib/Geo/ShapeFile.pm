@@ -11,7 +11,7 @@ use Scalar::Util qw/weaken/;
 use Tree::R;
 
 
-our $VERSION = '2.64';
+our $VERSION = '2.66';
 
 my $little_endian_sys = unpack 'b', (pack 'S', 1 );
 
@@ -423,11 +423,13 @@ sub _get_shp_shx_header_value {
     my $self = shift;
     my $val  = shift;
 
-    if (!($self->{'shx_' . $val} || $self->{'shp_' . $val})) {
-        $self->_read_shx_header();
+    if (!defined ($self->{'shx_' . $val}) && !defined ($self->{'shp_' . $val})) {
+        $self->_read_shx_header();  #  ensure we load at least one of the headers
     }
 
-    return $self->{'shx_' . $val} || $self->{'shp_' . $val} || undef;
+    return defined($self->{'shx_' . $val})
+      ? $self->{'shx_' . $val}
+      : $self->{'shp_' . $val};
 }
 
 #  factory these
@@ -521,7 +523,7 @@ sub bounds_contains_point {
 }
 
 sub file_version {
-    shift()->_get_shp_shx_header_value('file_version');
+    shift()->_get_shp_shx_header_value('version');
 }
 
 sub shape_type {

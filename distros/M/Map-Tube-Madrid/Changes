@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Madrid
 
+0.29  2019-02-11
+      - Updated dependency on Map::Tube v3.59.
+
 0.28  2018-12-25
       - Updated dependency on Map::Tube v3.58.
 

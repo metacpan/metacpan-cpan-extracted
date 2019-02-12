@@ -41,6 +41,7 @@ sub main {
     test_shapepoint();
     test_files();
     test_files_no_caching();
+    test_file_version_defined();
     test_empty_dbf();
     test_points_in_polygon();
     test_spatial_index();
@@ -55,6 +56,19 @@ sub main {
 
 
 ###########################################
+
+sub test_file_version_defined {
+    #github #22
+    my $empty_file = "$dir/empty_points";
+    
+    foreach my $type (qw /shx shp/) {
+        my $obj = Geo::ShapeFile->new("${empty_file}.${type}");
+        my $version = $obj->file_version; 
+    
+        ok (defined $version, "file_version: got defined value for empty file of type $type");
+    }
+}
+
 
 sub test_dbf_header {
     my %data = Geo::ShapeFile::TestHelpers::get_data();

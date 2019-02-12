@@ -68,6 +68,7 @@ examples/win32_getSystemTime.pl
 examples/zmq3.pl
 ffi/memory.c
 inc/Alien/Base/Wrapper.pm
+inc/Alien/FFI/PkgConfigPP.pm
 inc/Alien/FFI/pkgconfig.pm
 inc/Alien/psapi.pm
 inc/My/Config.pm

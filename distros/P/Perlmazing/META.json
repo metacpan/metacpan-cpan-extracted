@@ -34,7 +34,7 @@
             "List::Util" : "0",
             "Scalar::Util" : "0",
             "Submodules" : "1.0014",
-            "Taint::Util" : "0",
+            "Taint::Util" : "0.08",
             "Time::Precise" : "1.0010",
             "URI::Escape" : "0",
             "strict" : "0",
@@ -56,7 +56,7 @@
             "List::Util" : "0",
             "Scalar::Util" : "0",
             "Submodules" : "1.0014",
-            "Taint::Util" : "0",
+            "Taint::Util" : "0.08",
             "Time::Precise" : "1.0010",
             "URI::Escape" : "0",
             "strict" : "0",
@@ -78,7 +78,7 @@
             "List::Util" : "0",
             "Scalar::Util" : "0",
             "Submodules" : "1.0014",
-            "Taint::Util" : "0",
+            "Taint::Util" : "0.08",
             "Time::Precise" : "1.0010",
             "URI::Escape" : "0",
             "perl" : "5.006",
@@ -101,7 +101,7 @@
             "List::Util" : "0",
             "Scalar::Util" : "0",
             "Submodules" : "1.0014",
-            "Taint::Util" : "0",
+            "Taint::Util" : "0.08",
             "Time::Precise" : "1.0010",
             "URI::Escape" : "0",
             "strict" : "0",
@@ -111,6 +111,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.2812",
+   "version" : "1.2814",
    "x_serialization_backend" : "JSON version 2.97000"
 }

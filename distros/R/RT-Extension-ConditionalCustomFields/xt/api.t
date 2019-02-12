@@ -16,7 +16,7 @@ $cf_conditioned_by->Create(Name => 'ConditionedBy', Type => 'Freeform', MaxValue
 my $cf_conditioned_by_child = RT::CustomField->new(RT->SystemUser);
 $cf_conditioned_by_child->Create(Name => 'Child', Type => 'Freeform', MaxValues => 1, Queue => 'General', BasedOn => $cf_conditioned_by->id);
 
-my ($rv, $msg) = $cf_conditioned_by->SetConditionedBy($cf_condition->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
+my ($rv, $msg) = $cf_conditioned_by->SetConditionedBy($cf_condition->id, 'is', [$cf_values->[0]->Name, $cf_values->[2]->Name]);
 ok($rv, "SetConditionedBy: $msg");
 
 my $cf_condition_conditioned_by = $cf_condition->ConditionedBy;

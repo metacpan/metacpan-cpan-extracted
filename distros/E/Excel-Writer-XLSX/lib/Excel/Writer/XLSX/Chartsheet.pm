@@ -6,7 +6,7 @@ package Excel::Writer::XLSX::Chartsheet;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2018, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2019, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -20,7 +20,7 @@ use Exporter;
 use Excel::Writer::XLSX::Worksheet;
 
 our @ISA     = qw(Excel::Writer::XLSX::Worksheet);
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 
 ###############################################################################
@@ -110,14 +110,36 @@ sub _assemble_xml_file {
 # Over-ride parent protect() method to protect both worksheet and chart.
 sub protect {
 
-    my $self     = shift;
-    my $password = shift || '';
-    my $options  = shift || {};
+    my $self         = shift;
+    my $password     = shift || '';
+    my $user_options = shift;
+    my $options      = {};
+
+    # Objects are default on for chartsheets.
+    if ( defined $user_options->{objects} ) {
+        $options->{objects} = not $user_options->{objects};
+    }
+    else {
+        $options->{objects} = 0;
+    }
+
+    if ( defined $user_options->{content} ) {
+        $options->{content} = $user_options->{content};
+    }
+    else {
+        $options->{content} = 1;
+    }
+
+    # If objects and content are off then the chartsheet isn't locked, except
+    # if it has a password.
+    if ( $password eq '' && $options->{objects} && !$options->{content} ) {
+        return;
+    }
 
     $self->{_chart}->{_protection} = 1;
 
+    # Turn off worksheet defaults.
     $options->{sheet}     = 0;
-    $options->{content}   = 1;
     $options->{scenarios} = 1;
 
     $self->SUPER::protect( $password, $options );
@@ -268,7 +290,7 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXVIII, John McNamara.
+(c) MM-MMXIX, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.
 

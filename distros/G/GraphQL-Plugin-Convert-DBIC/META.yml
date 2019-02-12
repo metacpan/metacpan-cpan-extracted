@@ -6,7 +6,6 @@ build_requires:
   DBD::SQLite: '0'
   DBIx::Class::Schema: '0'
   ExtUtils::MakeMaker: '0'
-  GraphQL: '0.21'
   Test::More: '0.98'
   Test::Snapshot: '0.05'
 configure_requires:
@@ -24,7 +23,7 @@ no_index:
     - inc
 requires:
   DBIx::Class::Schema: '0'
-  GraphQL: '0.21'
+  GraphQL: '0.32'
   Lingua::EN::Inflect::Number: '0'
   SQL::Translator: '0'
   perl: '5.014'
@@ -33,5 +32,5 @@ resources:
   bugtracker: https://github.com/graphql-perl/GraphQL-Plugin-Convert-DBIC/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/GraphQL-Plugin-Convert-DBIC
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -91,6 +91,10 @@ Same as WriteMakefile(makemaker_args(%params))
 
 Processes %params, does all the neccessary job and returns final parameters for passing to MakeMaker's WriteMakefile.
 
+=head4 not_available($msg)
+
+If called, Makefile.PL will die with your C<$msg> the way that CPAN testers will mark it as NA (not available) instead of UNKNOWN.
+
 =head2 PARAMETERS
 
 Only differences from MakeMaker params are listed.

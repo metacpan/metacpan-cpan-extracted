@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.132;
+our $VERSION = 1.134;
 
 use Quiq::Option;
 use Time::HiRes ();
@@ -33,6 +33,7 @@ Mit print:
     $| = 1;
     my $n = 5;
     my $p = Quiq::Progress->new($n);
+    print $p->msg('Waiting...');
     for my $i (1 .. $n) {
         sleep 1;
         print $p->msg($i,'i/n x% t/t(t) x/s t/1');
@@ -163,6 +164,7 @@ sub new {
     # Optionen und Argumente
 
     my $show = 1;
+
     Quiq::Option->extract(\@_,
         -show=>\$show,
     );
@@ -170,7 +172,7 @@ sub new {
 
     # Objekt instantiieren
 
-    return $class->SUPER::new(
+    my $self = $class->SUPER::new(
         t0=>scalar Time::HiRes::gettimeofday,
         n=>$n,
         duration=>0,
@@ -179,6 +181,8 @@ sub new {
         msg=>'', # letzte Meldung
         show=>$show,
     );
+
+    return $self;
 }
 
 # -----------------------------------------------------------------------------
@@ -733,7 +737,7 @@ sub warn {
 
 =head1 VERSION
 
-1.132
+1.134
 
 =head1 AUTHOR
 

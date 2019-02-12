@@ -3,7 +3,7 @@ Changes
 MANIFEST
 META.yml # Will be created by "make dist"
 Makefile.PL
-README
+README.md
 lib/Algorithm/QuineMcCluskey.pm
 lib/Algorithm/QuineMcCluskey/Util.pm
 lib/Algorithm/QuineMcCluskey/Format.pm
@@ -12,20 +12,18 @@ t/01-object.t
 t/02-simple.t
 t/03-rowdominance.t
 t/04-maskmatch.t
+t/10-solvesimple.t
 t/11-solvesimple.t
 t/13-solvesimple.t
-t/14-solvesimple.t
 t/17-solvesimple.t
-t/18-solvesimple.t
+t/20-solve.t
 t/21-solve.t
 t/22-solve.t
 t/23-solve.t
 t/24-solve.t
 t/25-solve.t
-t/26-solve.t
 t/27-solve.t
 t/28-solve.t
-t/29-solve.t
 t/pod.t
 LICENSE
 META.json

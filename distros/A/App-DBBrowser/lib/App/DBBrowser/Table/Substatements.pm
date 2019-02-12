@@ -54,22 +54,22 @@ sub select {
     }
     $sql->{chosen_cols} = [];
     $sql->{alias} = { %{$sql->{alias}} };
-    my $bu = [];
+    my @bu;
 
     COLUMNS: while ( 1 ) {
         $ax->print_sql( $sql );
         # Choose
         my @idx = $stmt_h->choose(
-            $choices, { meta_items => [ 0 .. $#pre - 1 ], index => 1, no_spacebar => [ $#pre ], include_highlighted => 2 }
+            $choices, { meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ], index => 1, include_highlighted => 2 }
         );
         if ( ! $idx[0] ) {
-            if ( @$bu ) {
-                ( $sql->{chosen_cols}, $sql->{alias} ) = @{pop @$bu};
+            if ( @bu ) {
+                ( $sql->{chosen_cols}, $sql->{alias} ) = @{pop @bu};
                 next COLUMNS;
             }
             return;
         }
-        push @$bu, [ [ @{$sql->{chosen_cols}} ], { %{$sql->{alias}} } ];
+        push @bu, [ [ @{$sql->{chosen_cols}} ], { %{$sql->{alias}} } ];
         if ( $choices->[$idx[0]] eq $sf->{i}{ok} ) {
             shift @idx;
             push @{$sql->{chosen_cols}}, @{$choices}[@idx];
@@ -79,7 +79,7 @@ sub select {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( ! defined $ext_col ) {
-                ( $sql->{chosen_cols}, $sql->{alias} ) = @{pop @$bu};
+                ( $sql->{chosen_cols}, $sql->{alias} ) = @{pop @bu};
             }
             else {
                 push @{$sql->{chosen_cols}}, $ext_col;
@@ -209,7 +209,7 @@ sub set {
     my $col_sep = ' ';
     $sql->{set_args} = [];
     $sql->{set_stmt} = " SET";
-    my $bu = [];
+    my @bu;
     my @pre = ( undef, $sf->{i}{ok} );
 
     SET: while ( 1 ) {
@@ -219,8 +219,8 @@ sub set {
             [ @pre, @{$sql->{cols}} ]
         );
         if ( ! defined $col ) {
-            if ( @$bu ) {
-                ( $sql->{set_args}, $sql->{set_stmt}, $col_sep ) = @{pop @$bu};
+            if ( @bu ) {
+                ( $sql->{set_args}, $sql->{set_stmt}, $col_sep ) = @{pop @bu};
                 next SET;
             }
             return;
@@ -231,11 +231,11 @@ sub set {
             }
             return 1;
         }
-        push @$bu, [ [@{$sql->{set_args}}], $sql->{set_stmt}, $col_sep ];
+        push @bu, [ [@{$sql->{set_args}}], $sql->{set_stmt}, $col_sep ];
         $sql->{set_stmt} .= $col_sep . $col;
         my $ok = $op->add_operator_with_value( $sql, $clause, $col );
         if ( ! $ok ) {
-            ( $sql->{set_args}, $sql->{set_stmt}, $col_sep ) = @{pop @$bu};
+            ( $sql->{set_args}, $sql->{set_stmt}, $col_sep ) = @{pop @bu};
             next SET;
         }
         $col_sep = ', ';
@@ -254,7 +254,7 @@ sub where {
     $sql->{where_stmt} = " WHERE";
     my $unclosed = 0;
     my $count = 0;
-    my $bu = [];
+    my @bu;
     my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
     my @pre = ( undef, $sf->{i}{ok}, $ext_sign ? $ext_sign : () );
 
@@ -269,8 +269,8 @@ sub where {
             [ @pre, @choices ]
         );
         if ( ! defined $quote_col ) {
-            if ( @$bu ) {
-                ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+            if ( @bu ) {
+                ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
                 next WHERE;
             }
             return;
@@ -289,15 +289,15 @@ sub where {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( ! defined $ext_col ) {
-                if ( @$bu ) {
-                    ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+                if ( @bu ) {
+                    ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
                 }
                 next WHERE;
             }
             $quote_col = $ext_col;
         }
         if ( $quote_col eq ')' ) {
-            push @$bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
+            push @bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
             $sql->{where_stmt} .= ")";
             $unclosed--;
             next WHERE;
@@ -314,17 +314,17 @@ sub where {
             $AND_OR = ' ' . $AND_OR;
         }
         if ( $quote_col eq '(' ) {
-            push @$bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
+            push @bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
             $sql->{where_stmt} .= $AND_OR . " (";
             $AND_OR = '';
             $unclosed++;
             next WHERE;
         }
-        push @$bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
+        push @bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
         $sql->{where_stmt} .= $AND_OR . ' ' . $quote_col;
         my $ok = $op->add_operator_with_value( $sql, $clause, $quote_col );
         if ( ! $ok ) {
-            ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+            ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
             next WHERE;
         }
         $count++;
@@ -348,8 +348,8 @@ sub group_by {
         $ax->print_sql( $sql );
         # Choose
         my @idx = $stmt_h->choose(
-            [ @pre, @{$sql->{cols}} ],
-            { meta_items => [ 0 .. $#pre - 1 ], index => 1, no_spacebar => [ $#pre ], include_highlighted => 2 }
+            $choices,
+            { meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ], index => 1, include_highlighted => 2 }
         );
         if ( ! $idx[0] ) {
             if ( @{$sql->{group_by_cols}} ) {
@@ -394,7 +394,7 @@ sub having {
     $sql->{having_stmt} = " HAVING";
     my $unclosed = 0;
     my $count = 0;
-    my $bu = [];
+    my @bu;
 
     HAVING: while ( 1 ) {
         my @choices = (
@@ -410,8 +410,8 @@ sub having {
             [ @pre, @choices ]
         );
         if ( ! defined $aggr ) {
-            if ( @$bu ) {
-                ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+            if ( @bu ) {
+                ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
                 next HAVING;
             }
             return;
@@ -427,7 +427,7 @@ sub having {
             return 1;
         }
         if ( $aggr eq ')' ) {
-            push @$bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
+            push @bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
             $sql->{having_stmt} .= ")";
             $unclosed--;
             next HAVING;
@@ -444,22 +444,22 @@ sub having {
             $AND_OR = ' ' . $AND_OR;
         }
         if ( $aggr eq '(' ) {
-            push @$bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
+            push @bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
             $sql->{having_stmt} .= $AND_OR . " (";
             $AND_OR = '';
             $unclosed++;
             next HAVING;
         }
-        push @$bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
+        push @bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
         $sql->{having_stmt} .= $AND_OR;
         my $quote_aggr = $op->build_having_col( $sql, $aggr );
         if ( ! defined $quote_aggr ) {
-            ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+            ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
             next HAVING;
         }
         my $ok = $op->add_operator_with_value( $sql, $clause, $quote_aggr );
         if ( ! $ok ) {
-            ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+            ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @bu};
             next HAVING;
         }
         $count++;
@@ -482,7 +482,7 @@ sub order_by {
     }
     my $col_sep = ' ';
     $sql->{order_by_stmt} = " ORDER BY";
-    my $bu = [];
+    my @bu;
 
     ORDER_BY: while ( 1 ) {
         $ax->print_sql( $sql );
@@ -491,8 +491,8 @@ sub order_by {
             [ @pre, @cols ]
         );
         if ( ! defined $col ) {
-            if ( @$bu ) {
-                ( $sql->{order_by_stmt}, $col_sep ) = @{pop @$bu};
+            if ( @bu ) {
+                ( $sql->{order_by_stmt}, $col_sep ) = @{pop @bu};
                 next ORDER_BY;
             }
             return
@@ -507,14 +507,14 @@ sub order_by {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( ! defined $ext_col ) {
-                if ( @$bu ) {
-                    ( $sql->{order_by_stmt}, $col_sep ) = @{pop @$bu};
+                if ( @bu ) {
+                    ( $sql->{order_by_stmt}, $col_sep ) = @{pop @bu};
                 }
                 next ORDER_BY;
             }
             $col = $ext_col;
         }
-        push @$bu, [ $sql->{order_by_stmt}, $col_sep ];
+        push @bu, [ $sql->{order_by_stmt}, $col_sep ];
         $sql->{order_by_stmt} .= $col_sep . $col;
         $ax->print_sql( $sql );
         # Choose
@@ -522,7 +522,7 @@ sub order_by {
             [ undef, $sf->{asc}, $sf->{desc} ]
         );
         if ( ! defined $direction ){
-            ( $sql->{order_by_stmt}, $col_sep ) = @{pop @$bu}; #
+            ( $sql->{order_by_stmt}, $col_sep ) = @{pop @bu};
             next ORDER_BY;
         }
         $sql->{order_by_stmt} .= ' ' . $direction;
@@ -537,7 +537,7 @@ sub limit_offset {
     my @pre = ( undef, $sf->{i}{ok} );
     $sql->{limit_stmt}  = '';
     $sql->{offset_stmt} = '';
-    my $bu = [];
+    my @bu;
 
     LIMIT: while ( 1 ) {
         my ( $limit, $offset ) = ( 'LIMIT', 'OFFSET' );
@@ -547,8 +547,8 @@ sub limit_offset {
             [ @pre, $limit, $offset ]
         );
         if ( ! defined $choice ) {
-            if ( @$bu ) {
-                ( $sql->{limit_stmt}, $sql->{offset_stmt} )  = @{pop @$bu};
+            if ( @bu ) {
+                ( $sql->{limit_stmt}, $sql->{offset_stmt} )  = @{pop @bu};
                 next LIMIT;
             }
             return;
@@ -556,7 +556,7 @@ sub limit_offset {
         if ( $choice eq $sf->{i}{ok} ) {
             return 1;
         }
-        push @$bu, [ $sql->{limit_stmt}, $sql->{offset_stmt} ];
+        push @bu, [ $sql->{limit_stmt}, $sql->{offset_stmt} ];
         my $digits = 7;
         if ( $choice eq $limit ) {
             $sql->{limit_stmt} = " LIMIT";
@@ -566,7 +566,7 @@ sub limit_offset {
                 { name => 'LIMIT: ', mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
             );
             if ( ! defined $limit ) {
-                ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @$bu};
+                ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
                 next LIMIT;
             }
             $sql->{limit_stmt} .=  sprintf ' %d', $limit;
@@ -584,7 +584,7 @@ sub limit_offset {
                 { name => 'OFFSET: ', mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
             );
             if ( ! defined $offset ) {
-                ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @$bu}; #
+                ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
                 next LIMIT;
             }
             $sql->{offset_stmt} .= sprintf ' %d', $offset;

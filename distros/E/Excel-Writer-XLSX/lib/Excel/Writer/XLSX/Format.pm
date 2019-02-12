@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Format;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2018, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2019, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -20,7 +20,7 @@ use Carp;
 
 
 our @ISA     = qw(Exporter);
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 our $AUTOLOAD;
 
 
@@ -40,7 +40,7 @@ sub new {
         _xf_index           => undef,
         _dxf_index          => undef,
 
-        _num_format        => 0,
+        _num_format        => 'General',
         _num_format_index  => 0,
         _font_index        => 0,
         _has_font          => 0,
@@ -812,6 +812,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXVIII, John McNamara.
+(c) MM-MMXIX, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

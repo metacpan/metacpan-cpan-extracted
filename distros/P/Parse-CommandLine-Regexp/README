@@ -1,0 +1,63 @@
+NAME
+    Parse::CommandLine::Regexp - Parsing string like command line
+
+VERSION
+    This document describes version 0.001 of Parse::CommandLine::Regexp
+    (from Perl distribution Parse-CommandLine-Regexp), released on
+    2019-02-10.
+
+DESCRIPTION
+    This module is an alternative to Parse::CommandLine, using regexp
+    instead of per-character parsing technique employed by
+    Parse::CommandLine, and which might offer better performance in Perl
+    (see benchmarks in Bencher::Scenario::CmdLineParsingModules).
+
+    "parse_command_line", the main routine, basically split a string into
+    "words", with whitespaces as delimiters while also taking into account
+    quoting using """ (double-quote character) and "'" (single-quote
+    character) as well as escaping using "\" (backslash character). This
+    splitting is similar to, albeit simpler than, what a shell like bash
+    does to its command-line string.
+
+FUNCTIONS
+  parse_command_line
+    Usage:
+
+     my @words = parse_command_line($str);
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Parse-CommandLine-Regexp>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Parse-CommandLine-Regexp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-CommandLine-Reg
+    exp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Parse::CommandLine
+
+    Text::ParseWords, which allows you to specify what characters to use as
+    delimiters.
+
+    "parse_cmdline" in Complete::Bash, which also takes into account
+    non-whitespace word-breaking character such as "|".
+
+    Text::CSV and friends
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

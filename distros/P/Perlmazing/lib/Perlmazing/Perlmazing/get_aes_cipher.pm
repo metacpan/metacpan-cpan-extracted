@@ -1,4 +1,5 @@
 use Perlmazing;
+no if "$]" >= 5.027, feature => 'bitwise';
 use Crypt::Rijndael;
 
 # Mainly ripped from Crypt::Rijndael::MySQL

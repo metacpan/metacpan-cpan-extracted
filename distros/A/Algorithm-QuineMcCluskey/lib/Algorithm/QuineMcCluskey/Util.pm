@@ -9,9 +9,9 @@ package Algorithm::QuineMcCluskey::Util;
 
 use strict;
 use warnings;
-use 5.010001;
+use 5.016001;
 
-use List::MoreUtils qw(any indexes);
+use List::Util qw(any);
 use List::Compare::Functional qw(is_LequivalentR is_LsubsetR);
 
 use Exporter;
@@ -19,7 +19,6 @@ our @ISA = qw(Exporter);
 
 our %EXPORT_TAGS = (
 	all => [ qw(
-		columns
 		covered_least
 		find_essentials
 		hammingd1pos
@@ -28,6 +27,7 @@ our %EXPORT_TAGS = (
 		purge_elements
 		remels
 		row_dominance
+		transpose
 		uniqels
 	) ],
 );
@@ -36,7 +36,7 @@ our @EXPORT_OK = (
 	@{ $EXPORT_TAGS{all} }
 );
 
-our $VERSION = 0.19;
+our $VERSION = 1.00;
 
 =head1 DESCRIPTION
 
@@ -44,8 +44,9 @@ This module provides various utilities designed for (but not limited to) use in
 Algorithm::QuineMcCluskey.
 
 The prime implicant and essentials "tables" are in the form of a hash of
-array refs, and are manipulated with the functions columns(), find_essentials(),
-least_covered(), purge_elements(), remels(), row_dominance(), and uniqels().
+array refs, and are manipulated with the functions find_essentials(),
+least_covered(), purge_elements(), remels(), row_dominance(), transpose(),
+and uniqels().
 
 =cut
 
@@ -57,17 +58,17 @@ Returns the count of a search string Y found in the source string X.
 
 E.g.:
 
-      my $str = "d10d11d1d"; 
-      matchcount($str, "d");     # returns 4
-      matchcount($str, "d1");    # returns 3
+    my $str = "d10d11d1d"; 
+    matchcount($str, "d");     # returns 4
+    matchcount($str, "d1");    # returns 3
 
 To search for only the string without a regular expression accidentally
 interfering, enclose the search string between '\Q' and '\E'. E.g.:
 
-      #
-      # We don't know what's in $looking, so de-magic it.
-      #
-      matchcount($str, '\E' . $looking . '\Q]);
+    #
+    # We don't know what's in $looking, so de-magic it.
+    #
+    matchcount($str, '\E' . $looking . '\Q]);
 
 =cut
 
@@ -83,7 +84,7 @@ sub matchcount
 Returns the terms that match a mask made up of zeros, ones, and don't-care
 characters.
 
-      my @rterms = maskedmatch("010-0", @terms);
+    my @rterms = maskedmatch("010-0", @terms);
 
 =cut
 
@@ -111,49 +112,95 @@ sub maskedmatch
 	return @t;
 }
 
+=head3 maskedmatchindexes()
+
+Returns the indexes of the terms that match a mask made up of zeros,
+ones, and don't-care characters.
+
+    my @pos = maskedmatchindexes("010-0", @terms);
+
+=cut
+
+sub maskedmatchindexes
+{
+	my($mask, @terms) = @_;
+	my @p;
+
+	#
+	# Make two patterns based on the don't-care characters
+	# in the mask (assumed to be the character that's not
+	# a zero or a one, an assumption enforced in BUILD.)
+	#
+	(my $m0 = $mask) =~ s/[^01]/0/g;
+	(my $m1 = $mask) =~ s/[^01]/1/g;
+	$m0 = oct "0b" . $m0;
+	$m1 = oct "0b" . $m1;
+
+	for my $j (0 .. $#terms)
+	{
+		my $b = oct "0b" . $terms[$j];
+		push @p, $j if ((($m0 & $b) == $m0) && (($m1 & $b) == $b));
+	}
+
+	return @p;
+}
+
 =head3 find_essentials()
 
-Find the essential prime implicants in a primes table, filtered
-by a list of terms.
+Find the essential prime implicants in a primes table.
 
-      my $ess = find_essentials(\%primes, @terms);
+    my @essentials = find_essentials(\%primes);
 
 =cut
 
 sub find_essentials
 {
-	my($primes, @terms) = @_;
+	my($primes) = @_;
 
-	my @kp = keys %$primes;
 	my %essentials;
+	my %bterms;
 
-	for my $term (@terms)
+	#
+	# Invert the hash-of-arrays
+	#
+	while (my($k, $v) = each %{$primes})
 	{
-		my @tp = grep {
-				grep { $_ eq $term } @{ $primes->{$_} }
-			} @kp;
-
-		#
-		# TODO: It would be nice to track the terms that make
-		# this essential
-		if (scalar @tp == 1)
+		for my $term (@{ $v })
 		{
-			$essentials{$tp[0]}++;
+			$bterms{$term} = [] unless (exists $bterms{$term});
+			push @{$bterms{$term}}, $k;
 		}
 	}
 
-	return %essentials;
+	#
+	# Find the term that can be covered by only one bit term. Those
+	# terms are essentials.
+	#
+	for my $k (keys %bterms)
+	{
+		if (scalar @{ $bterms{$k}} == 1)
+		{
+			my @bt = @{ $bterms{$k}};
+			$essentials{ ${ $bterms{$k}}[0]} = 1;
+		}
+	}
+
+	return keys %essentials;
 }
 
 =head3 row_dominance()
 
 Row dominance checking.
 
-@dominated_rows = row_dominance(\%primes, 0);
-@dominant_rows = row_dominance(\%primes, 1);
+    @dominated_rows = row_dominance(\%primes, 0);
 
-A row (column) I<i> of a PI chart dominates row (column) I<j>
-if row (column) I<i> contains an x in each column (row) dominated by it.
+    @dominant_rows = row_dominance(\%primes, 1);
+
+A row I<i> of a PI chart dominates row I<j> if row I<i> contains an x in each
+column dominated by it.
+
+A column I<p> of a PI chart dominates column I<q> if column I<p> contains an x
+in each row dominated by it.
 
 Return those rows (columns are handled by rotating the primes hash before
 calling this function).
@@ -180,8 +227,8 @@ sub row_dominance
 			#    it isn't dominated by row2).
 			#
 			next if ($row1 eq $row2 or
-				is_LequivalentR([ $primes->{$row1} => $primes->{$row2} ]) or
-				!is_LsubsetR([ $primes->{$row1} => $primes->{$row2} ]));
+				is_LequivalentR([ $primes->{$row1}, $primes->{$row2} ]) or
+				!is_LsubsetR([ $primes->{$row1}, $primes->{$row2} ]));
 
 			$unique_rows{(($dominant_rows)? $row1: $row2)} = 1;
 		}
@@ -195,21 +242,28 @@ sub row_dominance
 Find the term with the fewest implicant covers, along with a list of
 those covers.
 
-      my($term, @covers) = covered_least(\%primes, @terms);
+    my($term, @covers) = covered_least(\%primes);
 
 =cut
 
 sub covered_least
 {
-	my($primes, @bit_terms) = @_;
+	my($primes) = @_;
+	my(@covers);
 
 	#
-	# Find the bit terms that are within the hash's arrays.
+	# Collect the bit terms that are within the hash's arrays.
 	#
-	my @t = grep {
-		my $o = $_;
-		any { $o eq $_  } map {@$_} values %{$primes}
-	} @bit_terms;
+	my %bterms;
+	$bterms{$_} += 1 for (map {@$_} values %{$primes});
+	my @t = keys %bterms;
+
+	#print STDERR "bit terms hash:\n";
+	#for my $j (@t)
+	#{
+	#	print STDERR "\t$j => " . $bterms{$j} . "\n";
+	#}
+	#print STDERR "\n";
 
 	#
 	# Find out which keys in the primes hash
@@ -218,7 +272,6 @@ sub covered_least
 	#
 	my @pkeys = keys %$primes;
 	my $count = 1 + scalar @pkeys;
-	my @covers;
 	my $term = "";
 
 	#
@@ -226,26 +279,27 @@ sub covered_least
 	#
 	for my $o (@t)
 	{
-		my @cvs = grep {
-			any { $_ eq $o } @{ $primes->{$_} }
-		} @pkeys;
-
-		my $c = scalar @cvs;
-
+		my $c = $bterms{$o};
 		if ($c < $count)
 		{
 			$term = $o;
 			$count = $c;
-			@covers = @cvs;
 		}
 	}
+
+	for my $p (@pkeys)
+	{
+		push @covers, $p if any { $_ eq $term } @{ $primes->{$p} };
+	}
+
+	#print STDERR "covered_least() returns term ($term) and covers (" . join(", ", @covers) . ")\n";
 
 	return ($term, @covers);
 }
 
 =head3 purge_elements()
 
-      purge_elements(\%prime_implicants, @essentials);
+    purge_elements(\%prime_implicants, @essentials);
 
 Given a table of prime implicants, delete the list of elements (usually
 the essential prime implicants) from the table, both row-wise and column-wise.
@@ -276,7 +330,7 @@ matches their masks.
 Deletes the entire arrayref from the hash if the last element of the
 array is removed.
 
-      remels(\%primes, @elements);
+    remels(\%primes, @elements);
 
 Returns the number of removals made.
 
@@ -292,7 +346,7 @@ sub remels
 	{
 		for my $k (@kp)
 		{
-			my @pos = indexes { maskedmatch($el, $_) } @{$href->{$k}};
+			my @pos = maskedmatchindexes($el, @{$href->{$k}});
 			$rems += scalar @pos;
 
 			#
@@ -319,7 +373,7 @@ sub remels
 Returns the unique arrays from an array of arrays (i.e., we're
 ensuring non-duplicate answers).
 
-      my @uels = uniqels(@els);
+    my @uels = uniqels(@els);
 
 =cut
 
@@ -329,27 +383,33 @@ sub uniqels
 	return map { $h{ join(",", @{$_}) }++ == 0 ? $_ : () } @_;
 }
 
-=head3 columns()
+=head3 transpose()
 
-Rotates 90 degrees a hashtable of the type used for %primes, using
-only @columms.
+Transposes a hash-of-arrays structure of the type used for %primes.
 
-      my %table90 = columns(\%table, @columns)
+    my %table90 = transpose(\%table)
 
 =cut
 
-sub columns
+sub transpose
 {
-	my ($r, @c) = @_;
-	my %r90;
-	for my $o (@c)
-	{
-		my @t = grep {
-			any { $_ eq $o } @{ $r->{$_} }
-		} keys %$r;
+	my($table) = @_;
+	my(%r90, %hoh);
 
-		$r90{$o} = [@t] if (scalar @t);
+	#
+	# Set up a hash-of-hashes, inverting the
+	# key to array-of-values relationship.
+	#
+	for my $r (keys %{$table})
+	{
+		$hoh{$_}{$r} = 1 for (@{$table->{$r}});
 	}
+
+	#
+	# For each key collect those sub-hash keys into arrays.
+	#
+	%r90 = map{ ($_ , [ keys %{$hoh{$_}} ]) } keys %hoh;
+
 	return %r90;
 }
 
@@ -361,7 +421,7 @@ Our calling code is only interested in Hamming distances of 1.
 In those cases return the string position where the two values differ.
 In all the other cases where the distance isn't one, return a -1.
 
-      $idx = hammingd1pos($val1, $val2);
+    $idx = hammingd1pos($val1, $val2);
 
 =cut
 
@@ -379,6 +439,7 @@ sub hammingd1pos
 	# interest. Otherwise, return that character position.
 	#
 	return -1 unless(scalar(() = $v=~ m/[^0]/g) == 1);
+
 	$v =~ m/[^0]/g;
 	return pos($v) - 1;
 }
@@ -392,6 +453,14 @@ L<Algorithm::QuineMcCluskey>
 Darren M. Kulp C<< <darren@kulp.ch> >>
 
 John M. Gamble B<jgamble@cpan.org> (current maintainer)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2006 Darren Kulp. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+See L<http://dev.perl.org/licenses/> for more information.
 
 =cut
 

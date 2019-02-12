@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<D-Spin xmlns="http://www.dspin.de/data" version="0.4">
+  <MetaData xmlns="http://www.dspin.de/data/metadata"/>
+  <TextCorpus xmlns="http://www.dspin.de/data/textcorpus" lang="de">
+    <text>
+      EJn zamer Elephant gillt ohngefähr zweyhundert Thaler.
+      Ceterum censeo Carthaginem esse delendam.
+    </text>
+  </TextCorpus>
+</D-Spin>

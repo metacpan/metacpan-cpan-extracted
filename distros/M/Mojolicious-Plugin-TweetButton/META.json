@@ -1,0 +1,63 @@
+{
+   "abstract" : "TweetButton Helper Plugin",
+   "author" : [
+      "Viacheslav Tykhanovskyi <vti@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-TweetButton",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "8.00",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::TweetButton" : {
+         "file" : "lib/Mojolicious/Plugin/TweetButton.pm",
+         "version" : "0.0005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/vti/mojolicious-plugin-tweet_button/issues"
+      },
+      "homepage" : "http://github.com/vti/mojolicious-plugin-tweet_button",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/vti/mojolicious-plugin-tweet_button.git",
+         "web" : "http://github.com/vti/mojolicious-plugin-tweet_button"
+      }
+   },
+   "version" : "0.0005",
+   "x_contributors" : [
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>",
+      "Renee <reb@perl-services.de>",
+      "Viacheslav Tykhanovskyi <viacheslav.t@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Matrix operations and LUP decomposition.",
+   "author" : [
+      "Daniel Șuteu <trizen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-MatrixLUP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Math::AnyNum" : "0.31"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Math::MatrixLUP" : {
+         "file" : "lib/Math/MatrixLUP.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trizen/Math-MatrixLUP/issues"
+      },
+      "homepage" : "https://github.com/trizen/Math-MatrixLUP",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/trizen/Math-MatrixLUP"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.00"
+}

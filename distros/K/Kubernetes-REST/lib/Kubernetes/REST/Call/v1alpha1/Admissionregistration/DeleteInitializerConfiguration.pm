@@ -17,7 +17,11 @@ package Kubernetes::REST::Call::v1alpha1::Admissionregistration::DeleteInitializ
   
   has pretty => (is => 'ro', isa => Str);
   
-
+  sub _body_params { [
+  
+    { name => 'body' },
+  
+  ] }
   sub _url_params { [
   
     { name => 'name' },

@@ -1,11 +1,11 @@
 
 =head1 NAME
 
-Weasel::Widgets::HTML::Input - Parent of the INPUT, OPTION and BUTTON wrappers
+Weasel::Widgets::HTML::Input - Parent of the INPUT, OPTION, TEXTAREA and BUTTON wrappers
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 SYNOPSIS
 
@@ -15,7 +15,7 @@ Weasel::Widgets::HTML::Input - Parent of the INPUT, OPTION and BUTTON wrappers
 
 =head1 DEPENDENCIES
 
-This module wraps L<Selenium::Remote::Driver>, version 2.
+
 
 =cut
 
@@ -44,6 +44,12 @@ register_widget_handler(
     tag_name => 'input',
     attributes => {
         type => undef, # default input type == 'text'
+    });
+
+register_widget_handler(
+    __PACKAGE__, 'HTML',
+    tag_name => 'textarea',
+    attributes => {
     });
 
 
@@ -109,7 +115,7 @@ L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 LICENSE AND COPYRIGHT
 
- (C) 2016  Erik Huelsmann
+ (C) 2016-2019  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

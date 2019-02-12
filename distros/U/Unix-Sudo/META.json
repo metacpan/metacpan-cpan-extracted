@@ -1,0 +1,58 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown",
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Unix-Sudo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Deparse" : "0",
+            "Capture::Tiny" : "0",
+            "Data::Compare" : "0",
+            "Data::Dumper" : "0",
+            "PadWalker" : "0",
+            "Probe::Perl" : "0",
+            "Test::More" : "0.88",
+            "tainting" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DrHyde/perl-modules-Unix-Sudo/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/DrHyde/perl-modules-Unix-Sudo"
+      }
+   },
+   "version" : "2",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

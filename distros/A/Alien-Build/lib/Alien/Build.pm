@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1146,7 +1146,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -1895,7 +1895,7 @@ chooses the best C<pkg-config> plugin.
 semicolon separated list of plugins to automatically load before parsing
 your L<alienfile>.
 
-=item ALIEN_BUILD_PRELOAD
+=item ALIEN_BUILD_POSTLOAD
 
 semicolon separated list of plugins to automatically load after parsing
 your L<alienfile>.

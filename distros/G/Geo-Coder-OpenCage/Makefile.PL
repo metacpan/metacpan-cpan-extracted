@@ -17,9 +17,8 @@ my %WriteMakefileArgs = (
   "NAME" => "Geo::Coder::OpenCage",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Cpanel::JSON::XS" => "4.08",
     "HTTP::Tiny" => 0,
-    "JSON" => "2.94",
-    "JSON::XS" => "3.04",
     "Pod::Perldoc" => "3.21",
     "URI" => 0
   },
@@ -29,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.51",
     "Test::Warn" => 0
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,9 +37,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Cpanel::JSON::XS" => "4.08",
   "HTTP::Tiny" => 0,
-  "JSON" => "2.94",
-  "JSON::XS" => "3.04",
   "Pod::Perldoc" => "3.21",
   "Test::Exception" => "0.32",
   "Test::More" => "0.92",

@@ -21,21 +21,16 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "6.76",
-            "ExtUtils::ParseXS" : "3.24"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.76",
-            "XS::Install" : "v1.0.0"
+            "XS::Install" : "v1.0.9"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.0.0",
-            "perl" : "5.010000"
+            "XS::Install" : "v1.0.9"
          }
       },
       "test" : {
@@ -47,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.2",
+   "version" : "v1.0.4",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -35,7 +35,7 @@ my $two    = 1;
 $two = 2 if (-e "/dev/fb0" && -e "/dev/fb1");
 my $device = 0;
 foreach my $thr (0 .. $Threads) {
-    $framebuffer[$thr] = Graphics::Framebuffer->new('FILE_MODE' => $file, 'SPLASH' => $splash, 'FB_DEVICE' => sprintf('/dev/fb%d', $device), 'RESET' => 0);
+    $framebuffer[$thr] = Graphics::Framebuffer->new('SPLASH' => $splash, 'FB_DEVICE' => sprintf('/dev/fb%d', $device), 'RESET' => 0);
     if ($two == 2) {
         $device++;
         $device = 0 if ($device == 2);
@@ -64,7 +64,8 @@ foreach my $page (1 .. $Threads) {
             my $top  = shift;
             my ($screen_width, $screen_height) = $framebuffer[$Page]->screen_dimensions();
             if ($framebuffer[$Page]->{'FB_DEVICE'} eq '/dev/fb0') {
-#                $framebuffer[$page]->clip_set({ 'x' => $clx, 'y' => $top, 'xx' => $clx + $clw, 'yy' => $screen_height });
+
+                #                $framebuffer[$page]->clip_set({ 'x' => $clx, 'y' => $top, 'xx' => $clx + $clw, 'yy' => $screen_height });
                 $framebuffer[$page]->clip_set({ 'x' => 0, 'y' => $top, 'xx' => $screen_width, 'yy' => $screen_height });
                 {
                     lock($clx);

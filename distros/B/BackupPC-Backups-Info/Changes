@@ -1,5 +1,15 @@
 Revision history for BackupPC-Backups-Info
 
+0.1.1	2019-02-12/02:00
+		-Actually document the ignore file in the POD for bin/bpc-info.
+
+0.1.0	2019-02-12/01:00
+		 -Fix $data not being initialized in get_raw, resulting in a warning
+			being printed intially during the first pass through the loop.
+		 -Add ignore functionality to bin/bpc-info.
+
+0.0.1	 2018-11-05/20:20
+		 -Correct bin/bpc-info expecting -a to always be defined.
+
 0.0.0	 2018-11-05/05:00
 		 -Initial release.
-

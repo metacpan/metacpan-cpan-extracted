@@ -1,3 +1,8 @@
+0.080   2019-02-10 (PERLANCAR)
+
+	- Add participant: Parse::CommandLine::Regexp.
+
+
 0.07    2017-05-24 (PERLANCAR)
 
 	- Add participant: Text::ParseWords.

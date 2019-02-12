@@ -1,4 +1,35 @@
 Revision history for PerlX-Let:
 
+v0.2.1    2019-02-10 14:35:13+00:00 Europe/London
+  [Bug Fixes]
+  - Removed newlines from source rewriting so that line numbers are not
+    changed.
+
+  - Fixed bug with setting hashes to read-only on Perl 5.28 or later.
+
+  - Do not use state variable when the value contains a sigil.
+
+  [Documentation]
+  - Added a note about changed line numbers in the KNOWN ISSUES.
+
+v0.2.0    2019-02-09 18:43:47+00:00 Europe/London
+  [Enhancements]
+  - Use state variables (only for scalars if Perl version < 5.28).
+
+  [Documentation]
+  - Added Const::Fast to SEE ALSO.
+
+  - Improved the documentation.
+
+v0.1.0    2019-02-09 01:09:07+00:00 Europe/London
+  [Enhancements]
+  - Allow multiple values to be specified in a single block.
+
+  [Bug Fixes]
+  - Allow fat commas in brackets.
+
+  [Documentation]
+  - Fixed typos in POD.
+
 v0.0.1    2019-02-08 17:47:43+00:00 Europe/London
 - First release

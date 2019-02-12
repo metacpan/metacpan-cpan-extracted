@@ -1,0 +1,29 @@
+##-*- Mode: Change-Log; coding: utf-8; -*-
+##
+## Change log for perl distribution GermaNet::Flat
+
+v0.03 2019-02-12  moocow
+	* cleanup for CPAN release
+
+v0.02 2018-06-04  moocow
+	* gn-view.perl: imprint+privacy (ugly DSGVO hack)
+	* gn-view.perl: better directory-sensitive tweaks
+	* added wp-tabs2gn.perl
+	* suppress 'depth' parameter if not needed
+	* gn-view.perl: added 'depth' parameter (max=2)
+	* added ps,eps formats
+	* fixed multiple edges problem in gn-view.perl
+	  + fixed bogus color selection when a term is own hyp(o|er)nym, e.g. {Haus,Bungalow} ISA {...,Eigenheim,Haus,Heim,...} for OpenThesaurus
+	* gn-view.perl : updates for abstracting/extending to handle openthesaurus gracefully
+	* try local directory first for gn.db in gn-view.perl
+	* allow synset-label queries via q= or l= parameter in gn-view.perl
+	* v0.02 2014-03-24  moocow
+	* added x-germanet-version header to gn-view.perl
+	* gn-view.perl: return empty list instead of 500 for unknown lemma searches
+	* added x-germanet-version header to gn-view.perl
+	* add dbversion key
+
+v0.01 2014-03-03  moocow
+	* added 'json' format to gn-view.psl
+	* created GermaNet::Flat: fast flat access to GermaNet relations
+

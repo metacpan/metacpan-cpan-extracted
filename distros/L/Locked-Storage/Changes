@@ -18,3 +18,25 @@ Revision history for Perl extension Locked::Storage.
 
 1.05  4 Feb 2019
 	- Set sequencial processing for testers
+
+1.06  8 Feb 2019
+	- Changed tests again
+	  Fixed return type for unlockall()
+
+1.07  9 Feb 2019
+	- Fixed typos
+	  Added tests for user/root and not fail if running
+	  'make test' as a user for calls to lockall()
+
+1.08  11 Feb 2019
+	- Fixed typemap to work with ExtUtils::ParseXS >= 3.28
+          Added other functions to resize RAM region
+          Added new tests for the resize
+          Added methods to report the lock status and page size
+          Updated docs
+
+1.09  11 Feb 2019
+	- Fixed mistake in MANIFEST
+
+1.10  11 Feb 2019
+	- Fxed incorrect calling with default parameters

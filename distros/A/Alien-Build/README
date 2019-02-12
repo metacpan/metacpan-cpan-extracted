@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.51
+    version 1.52
 
 SYNOPSIS
 
@@ -712,7 +712,7 @@ ENVIRONMENT
       semicolon separated list of plugins to automatically load before
       parsing your alienfile.
 
-    ALIEN_BUILD_PRELOAD
+    ALIEN_BUILD_POSTLOAD
 
       semicolon separated list of plugins to automatically load after
       parsing your alienfile.

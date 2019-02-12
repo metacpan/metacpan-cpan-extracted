@@ -1,0 +1,32 @@
+---
+abstract: 'Encoding to and decoding from Base 85 strings'
+author:
+  - 'John M. Gamble <jgamble@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - base-85
+  - encode
+  - decode
+  - format
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Convert-Base85
+provides:
+  Convert::Base85:
+    file: lib/Convert/Base85.pm
+    version: '1.00'
+requires:
+  Math::Int128: '0.22'
+  perl: v5.16.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jgamble/Convert-Base85.git
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

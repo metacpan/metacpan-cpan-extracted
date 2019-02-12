@@ -13,3 +13,5 @@ t/00-compile.t
 t/01-new.t
 t/02-geocode.t
 t/03-reverse-geocode.t
+t/04-402-response.t
+t/05-403-response.t

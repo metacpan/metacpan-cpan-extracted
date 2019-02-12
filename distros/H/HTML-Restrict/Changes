@@ -1,5 +1,9 @@
 Revision history for HTML-Restrict
 
+v2.5.0    2019-02-08 22:18:11Z
+        - Strip some control characters from links (GH#34) (Olaf Alders)
+        - Enable empty_element_tags in HTML::Parser (GH#35) (Olaf Alders)
+
 v2.4.1    2019-02-05 14:13:16Z
         - Bump version of Type::Tiny to 1.002001. (GH#33) (Olaf Alders).  Issue
           reported by Slaven Rezić (GH#32).

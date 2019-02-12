@@ -1,0 +1,75 @@
+=encoding utf8
+
+README for GermaNet::Flat
+
+=head1 ABSTRACT
+
+GermaNet::Flat - Simple flat interface to GermaNet (and other) thesaurus relations
+
+=head1 REQUIREMENTS
+
+=over 4
+
+=item Perl Modules
+
+See C<Makefile.PL>, C<META.json>, and/or C<META.yml> in the distribution directory.
+Perl dependencies should be available on L<CPAN|http://metacpan.org>.
+
+=item HTTP Server
+
+If you wish to use the included C<gn-view.perl> CGI script to provide a
+browser-based exploratory interface, you will need a local HTTP server
+(e.g. apache) to handle the dirty work.  See your HTTP server's documentation
+for details on how to configure CGI wrappers.
+
+=back
+
+
+=head1 DESCRIPTION
+
+The C<GermaNet::Flat> package provides a simple object-oriented API
+for "flat" access to L<GermaNet|http://www.sfs.uni-tuebingen.de/GermaNet/> (and other)
+thesaurus relations.  It supports compilation of GermaNet XML sources
+to Berkeley DB using the L<DB_File|DB_File> module,
+CDB using the L<CDB_File|CDB_File> module,
+native perl HASH-refs using the L<Storable|Storable> module,
+or dictionary-like plain text.
+
+=head1 INSTALLATION
+
+Issue the following commands to the shell:
+
+ bash$ cd GermaNet-Flat-0.01  # (or wherever you unpacked this distribution)
+ bash$ perl Makefile.PL       # check requirements, etc.
+ bash$ make                   # build the module
+ bash$ make test              # (optional): test module before installing
+ bash$ make install           # install the module on your system
+
+=cut
+
+
+##======================================================================
+## Footer
+##======================================================================
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2019 by Bryan Jurish
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 SEE ALSO
+
+L<http://www.sfs.uni-tuebingen.de/GermaNet/>,
+L<https://code.google.com/p/perlapi4germanet>,
+L<perl(1)|perl>,
+...
+
+=cut

@@ -34,5 +34,7 @@ requires:
   List::Util: '0'
   strict: '0'
   warnings: '0'
-version: '0.11'
+resources:
+  repository: https://github.com/jkeenan/devel-git-multibisect.git
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

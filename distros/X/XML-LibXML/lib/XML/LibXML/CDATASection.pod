@@ -10,7 +10,7 @@ XML::LibXML::CDATASection - XML::LibXML Class for CDATA Sections
   # Only methods specific to CDATA nodes are listed here,
   # see the XML::LibXML::Node manpage for other methods
 
-  $node = XML::LibXML::CDATASection-E<gt>new( $content );
+  $node = XML::LibXML::CDATASection->new( $content );
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,7 @@ Many functions listed here are extensively documented in the DOM Level 3 specifi
 
 =item new
 
-  $node = XML::LibXML::CDATASection-E<gt>new( $content );
+  $node = XML::LibXML::CDATASection->new( $content );
 
 The constructor is the only provided function for this package. It is required,
 because I<<<<<< libxml2 >>>>>> treats the different text node types slightly differently.
@@ -45,7 +45,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0133
+2.0134
 
 =head1 COPYRIGHT
 

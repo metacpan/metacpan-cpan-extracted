@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Dynamic configuration settings used by Daemontools logging adapters
+our $VERSION = '0.102'; # VERSION
 
 
 use Log::Any::Adapter::Util 'numeric_level', ':levels';
@@ -197,6 +198,13 @@ BEGIN {
 		quiet   => qr/^(--quiet|-q)$/,
 		stop    => '--'
 	};
+	$argv_profile{consume}= {
+		bundle  => 1,
+		verbose => qr/^(--verbose|-v)$/,
+		quiet   => qr/^(--quiet|-q)$/,
+		stop    => '--',
+		remove  => 1,
+	};
 }
 
 my %_init_args= map { $_ => 1 } qw(
@@ -320,47 +328,42 @@ sub _combine_regex {
 sub parse_log_level_opts {
 	my ($class, %spec)= @_;
 	# Warn on unknown arguments
-	my @unknown= grep { !$_process_argv_args{$_} } keys %spec;
+	my @unknown= grep !$_process_argv_args{$_}, keys %spec;
 	carp "Invalid arguments: ".join(', ', @unknown) if @unknown;
 	
 	defined $spec{array} or croak "Parameter 'array' is required";
-	my $stop=    _combine_regex( $spec{stop} );
-	my $verbose= _combine_regex( $spec{verbose} );
-	my $quiet=   _combine_regex( $spec{quiet} );
+	$spec{$_}= _combine_regex($spec{$_}) for qw( stop verbose quiet );
+	return _parse_log_level_opts( $spec{array}, \%spec );
+}
+sub _parse_log_level_opts {
+	my ($array, $spec)= @_;
 	my $level_ofs= 0;
-	
-	my $parse;
-	$parse= sub {
-		my $array= $_[0];
-		for (my $i= 0; $i < @$array; $i++) {
-			last if $array->[$i] =~ $stop;
-			if ($array->[$i] =~ /^-[^-=][^-=]+$/ and $spec{bundle}) {
-				# Un-bundle the arguments
-				my @un_bundled= map { "-$_" } split //, substr($array->[$i], 1);
-				my $len= @un_bundled;
-				# Then filter them as usual
-				$parse->(\@un_bundled);
-				# Then re-bundle them, if altered
-				if ($spec{remove} && $len != @un_bundled) {
-					if (@un_bundled) {
-						$array->[$i]= '-' . join('', map { substr($_,1) } @un_bundled);
-					} else {
-						splice( @$array, $i--, 1 );
-					}
+	for (my $i= 0; $i < @$array; $i++) {
+		last if $array->[$i] =~ $spec->{stop};
+		if ($array->[$i] =~ /^-[^-=][^-=]+$/ and $spec->{bundle}) {
+			# Un-bundle the arguments
+			my @un_bundled= map "-$_", split //, substr($array->[$i], 1);
+			my $len= @un_bundled;
+			# Then filter them as usual
+			$level_ofs += _parse_log_level_opts(\@un_bundled, $spec);
+			# Then re-bundle them, if altered
+			if ($spec->{remove} && $len != @un_bundled) {
+				if (@un_bundled) {
+					$array->[$i]= '-' . join('', map substr($_,1), @un_bundled);
+				} else {
+					splice( @$array, $i--, 1 );
 				}
 			}
-			elsif ($array->[$i] =~ $verbose) {
-				$level_ofs++;
-				splice( @$array, $i--, 1 ) if $spec{remove};
-			}
-			elsif ($array->[$i] =~ $quiet) {
-				$level_ofs--;
-				splice( @$array, $i--, 1 ) if $spec{remove};
-			}
 		}
-	};
-
-	$parse->( $spec{array} );
+		elsif ($array->[$i] =~ $spec->{verbose}) {
+			$level_ofs++;
+			splice( @$array, $i--, 1 ) if $spec->{remove};
+		}
+		elsif ($array->[$i] =~ $spec->{quiet}) {
+			$level_ofs--;
+			splice( @$array, $i--, 1 ) if $spec->{remove};
+		}
+	}
 	return $level_ofs;
 }
 
@@ -505,7 +508,7 @@ Log::Any::Adapter::Daemontools::Config - Dynamic configuration settings used by 
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 
@@ -727,6 +730,16 @@ Profiles:
     stop    => '--'
   }
 
+=item C<'consume'>
+
+  {
+    bundle  => 1,
+    verbose => [ '--verbose', '-v' ],
+    quiet   => [ '--quiet', '-q' ],
+    stop    => '--',
+    remove  => 1,
+  }
+
 =back
 
 =item C<signals>, C<handle_signals>, or C<install_signal_handlers>
@@ -879,7 +892,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

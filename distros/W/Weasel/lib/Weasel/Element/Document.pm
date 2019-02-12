@@ -17,7 +17,7 @@ Weasel::Element::Document - Weasel Element Document
 
 =head1 DEPENDENCIES
 
-This module wraps L<Selenium::Remote::Driver>, version 2.
+
 
 =cut
 

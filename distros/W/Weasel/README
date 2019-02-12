@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Weasel,
-version 0.15:
+version 0.18:
 
   PHP's Mink inspired multi-protocol web-testing library for Perl
 
-This software is copyright (c) 2018 by Erik Huelsmann.
+This software is copyright (c) 2019 by Erik Huelsmann.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

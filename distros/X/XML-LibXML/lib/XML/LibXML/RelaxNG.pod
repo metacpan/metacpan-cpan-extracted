@@ -9,10 +9,10 @@ XML::LibXML::RelaxNG - RelaxNG Schema Validation
   use XML::LibXML;
   $doc = XML::LibXML->new->parse_file($url);
 
-  $rngschema = XML::LibXML::RelaxNG-E<gt>new( location =E<gt> $filename_or_url );
-  $rngschema = XML::LibXML::RelaxNG-E<gt>new( string =E<gt> $xmlschemastring );
-  $rngschema = XML::LibXML::RelaxNG-E<gt>new( DOM =E<gt> $doc );
-  eval { $rngschema-E<gt>validate( $doc ); };
+  $rngschema = XML::LibXML::RelaxNG->new( location => $filename_or_url );
+  $rngschema = XML::LibXML::RelaxNG->new( string => $xmlschemastring );
+  $rngschema = XML::LibXML::RelaxNG->new( DOM => $doc );
+  eval { $rngschema->validate( $doc ); };
 
 =head1 DESCRIPTION
 
@@ -27,9 +27,9 @@ validation.
 
 =item new
 
-  $rngschema = XML::LibXML::RelaxNG-E<gt>new( location =E<gt> $filename_or_url );
-  $rngschema = XML::LibXML::RelaxNG-E<gt>new( string =E<gt> $xmlschemastring );
-  $rngschema = XML::LibXML::RelaxNG-E<gt>new( DOM =E<gt> $doc );
+  $rngschema = XML::LibXML::RelaxNG->new( location => $filename_or_url );
+  $rngschema = XML::LibXML::RelaxNG->new( string => $xmlschemastring );
+  $rngschema = XML::LibXML::RelaxNG->new( DOM => $doc );
 
 The constructor of XML::LibXML::RelaxNG may get called with either one of three
 parameters. The parameter tells the class from which source it should generate
@@ -49,7 +49,7 @@ constraints of the RelaxNG specification.
 
 =item validate
 
-  eval { $rngschema-E<gt>validate( $doc ); };
+  eval { $rngschema->validate( $doc ); };
 
 This function allows one to validate a (parsed) document against the given
 RelaxNG schema. The argument of this function should be an
@@ -70,7 +70,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0133
+2.0134
 
 =head1 COPYRIGHT
 

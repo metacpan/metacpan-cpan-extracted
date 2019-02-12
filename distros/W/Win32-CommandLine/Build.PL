@@ -2379,7 +2379,7 @@ $code{'ACTION_manifest'} = q{
         #print 'skip['.scalar(@skip)."] = {". join(':', @skip) ."}]\n\n";
         # insert vars into regexps
         for (@skip) {
-            s:\$\\{(\w+)\\}:eval '${'.$1.'}':eg;
+            s:\(\$(\w+)\):eval '${'.$1.'}':eg;
             # print STDERR "skip: $_\n";
             }
 

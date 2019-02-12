@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.132;
+our $VERSION = 1.134;
 
 use Encode ();
 use Quiq::Reference;
@@ -71,12 +71,16 @@ sub new {
 
 =head2 Operationen
 
-=head3 compare() - Vergleiche Array gegen Array
+=head3 different() - Vergleiche Array gegen Array
 
 =head4 Synopsis
 
-    ($only1A,$only2A,$bothA) = $arr1->compare(\@arr2);
-    ($only1A,$only2A,$bothA) = $class->compare(\@arr1,\@arr2);
+    ($only1A,$only2A,$bothA) = $arr1->different(\@arr2);
+    ($only1A,$only2A,$bothA) = $class->different(\@arr1,\@arr2);
+
+=head4 Alias
+
+compare()
 
 =head4 Description
 
@@ -121,7 +125,7 @@ durch ihre Objekt-Id identifiziert. Die Liste der
 Datenbankobjekte sei @idsDb und die Liste der Objekte der
 Benutzerauswahl sei @idsUser. Dann liefert der Aufruf
 
-    ($idsNew,$idsDel) = $idsUserA->compare(\@idsDb);
+    ($idsNew,$idsDel) = $idsUserA->different(\@idsDb);
 
 mit @$idsNew die Liste der zur Datenbank hinzuzufügenden Objekte und
 mit @$idsDel die Liste der von der Datenbank zu entfernenden Objekte.
@@ -134,7 +138,7 @@ Prüfe, ob zwei Arrays die gleichen Elemente enthalten
 Prüfe, ob zwei Arrays die gleichen Elemente enthalten, aber nicht
 unbedingt in der gleichen Reihenfolge:
 
-    ($only1,$only2) = $arr1->compare(\@arr2);
+    ($only1,$only2) = $arr1->different(\@arr2);
     if (!@$only1 && !@$only2) {
         # @$arr1 und @$arr2 enthalten die gleichen Elemente
     }
@@ -145,7 +149,7 @@ unbedingt in der gleichen Reihenfolge:
 
 # -----------------------------------------------------------------------------
 
-sub compare {
+sub different {
     my $arr1 = CORE::shift;
     $arr1 = CORE::shift if !ref $arr1; # Klassenmethode
     my $arr2 = CORE::shift;
@@ -169,6 +173,11 @@ sub compare {
         bless(\@arr2,$class),
         bless(\@arr,$class),
     );
+}
+
+{
+    no warnings 'once';
+    *compare = \&different;
 }
 
 # -----------------------------------------------------------------------------
@@ -994,7 +1003,7 @@ sub restore {
 
 =head1 VERSION
 
-1.132
+1.134
 
 =head1 AUTHOR
 

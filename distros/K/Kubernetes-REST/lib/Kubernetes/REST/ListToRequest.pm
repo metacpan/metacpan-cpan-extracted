@@ -32,14 +32,12 @@ package Kubernetes::REST::ListToRequest;
 
     my $body_struct;
     if ($call_object->can('_body_params')) {
-      $body_struct = {};
       foreach my $param (@{ $call_object->_body_params }) {
         my $key = $param->{ name };
         my $value = $call_object->$key;
         next if (not defined $value);
 
-        my $location = defined $param->{ location } ? $param->{ location } : $key;
-        $body_struct->{ $location } = $value;
+        $body_struct = $value;
       }
     }
 

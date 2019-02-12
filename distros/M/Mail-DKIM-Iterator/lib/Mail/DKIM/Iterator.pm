@@ -1,7 +1,7 @@
 package Mail::DKIM::Iterator;
 use v5.10.0;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ my $critical_headers_rx = do {
     qr{$rx}i;
 };
 # all header fields which should be included in the signature
-my @sign_headers = (@critical_headers, 'to', 'cc');
+my @sign_headers = (@critical_headers, 'to', 'cc', 'date');
 
 use Exporter 'import';
 our @EXPORT =qw(
@@ -875,9 +875,9 @@ sub error     { shift->[3] }
 
 __END__
 
-=head1 NAME Mail::DKIM::Iterator
+=head1 NAME 
 
-Iterativ validation of DKIM records or DKIM signing of mails.
+Mail::DKIM::Iterator - Iterative validation of DKIM records or DKIM signing of mails.
 
 =head1 SYNOPSIS
 

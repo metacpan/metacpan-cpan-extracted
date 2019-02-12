@@ -33,7 +33,7 @@ Function::Return allows you to specify a return type for your functions.
 
 ### name
 
-you can change \`Return\` to your own name:
+you can change `Return` to your own name:
 
 ```perl
 use Function::Return name => 'MyReturn';
@@ -89,11 +89,11 @@ Function::Return::info and Function::Parameters::info can be used together.
 
 # LICENSE
 
-Copyright (C) Kenta, Kobayashi.
+Copyright (C) kfly8.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 # AUTHOR
 
-Kenta, Kobayashi <kentafly88@gmail.com>
+kfly8 <kfly@cpan.org>

@@ -1,8 +1,12 @@
+1.0.4   11.02.2019
+         - bump
+1.0.3   11.02.2019
+         - maintenance
 1.0.2   06.02.2019
-    - moved to XS::Install
-    - renamed to CPP::catch
+         - moved to XS::Install
+         - renamed to CPP::catch
 1.0.1   07.04.2018
-    - add empty test to pass cpan client checks
-    - require only perl 5.12 - same as Panda::Install
+         - add empty test to pass cpan client checks
+         - require only perl 5.12 - same as Panda::Install
 1.0.0   31.07.2017
-    - initial release
+         - initial release

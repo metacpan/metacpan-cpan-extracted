@@ -15,29 +15,29 @@ input CategoryInput {
 }
 
 type Mutation {
-  # Add a new pet to the store
+  "Add a new pet to the store"
   addPet(body: PetInput!): String
-  # Create user
+  "Create user"
   createUser(body: UserInput!): String
-  # Creates list of users with given input array
+  "Creates list of users with given input array"
   createUsersWithArrayInput(body: [UserInput]!): String
-  # Creates list of users with given input array
+  "Creates list of users with given input array"
   createUsersWithListInput(body: [UserInput]!): String
-  # Delete purchase order by ID
+  "Delete purchase order by ID"
   deleteOrder(orderId: Int!): String
-  # Deletes a pet
+  "Deletes a pet"
   deletePet(api_key: String, petId: Int!): String
-  # Delete user
+  "Delete user"
   deleteUser(username: String!): String
-  # Place an order for a pet
+  "Place an order for a pet"
   placeOrder(body: OrderInput!): Order
-  # Update an existing pet
+  "Update an existing pet"
   updatePet(body: PetInput!): String
-  # Updates a pet in the store with form data
+  "Updates a pet in the store with form data"
   updatePetWithForm(name: String, petId: Int!, status: String): String
-  # Updated user
+  "Updated user"
   updateUser(body: UserInput!, username: String!): String
-  # uploads an image
+  "uploads an image"
   uploadFile(additionalMetadata: String, file: String, petId: Int!): ApiResponse
 }
 
@@ -47,7 +47,7 @@ type Order {
   petId: Int
   quantity: Int
   shipDate: DateTime
-  # Order Status
+  "Order Status"
   status: OrderStatus
 }
 
@@ -57,11 +57,11 @@ input OrderInput {
   petId: Int
   quantity: Int
   shipDate: DateTime
-  # Order Status
+  "Order Status"
   status: OrderStatus
 }
 
-# Order Status
+"Order Status"
 enum OrderStatus {
   approved
   delivered
@@ -73,7 +73,7 @@ type Pet {
   id: Int
   name: String!
   photoUrls: [String]!
-  # pet status in the store
+  "pet status in the store"
   status: PetStatus
   tags: [Tag]
 }
@@ -83,12 +83,12 @@ input PetInput {
   id: Int
   name: String!
   photoUrls: [String]!
-  # pet status in the store
+  "pet status in the store"
   status: PetStatus
   tags: [TagInput]
 }
 
-# pet status in the store
+"pet status in the store"
 enum PetStatus {
   available
   pending
@@ -96,21 +96,21 @@ enum PetStatus {
 }
 
 type Query {
-  # Finds Pets by status
+  "Finds Pets by status"
   findPetsByStatus(status: [findPetsByStatus_status]!): [Pet]
-  # Finds Pets by tags
+  "Finds Pets by tags"
   findPetsByTags(tags: [String]!): [Pet]
-  # Returns pet inventories by status
+  "Returns pet inventories by status"
   getInventory: [getInventoryReturn]
-  # Find purchase order by ID
+  "Find purchase order by ID"
   getOrderById(orderId: Int!): Order
-  # Find pet by ID
+  "Find pet by ID"
   getPetById(petId: Int!): Pet
-  # Get user by user name
+  "Get user by user name"
   getUserByName(username: String!): User
-  # Logs user into the system
+  "Logs user into the system"
   loginUser(password: String!, username: String!): String
-  # Logs out current logged in user session
+  "Logs out current logged in user session"
   logoutUser: String
 }
 
@@ -131,7 +131,7 @@ type User {
   lastName: String
   password: String
   phone: String
-  # User Status
+  "User Status"
   userStatus: Int
   username: String
 }
@@ -143,7 +143,7 @@ input UserInput {
   lastName: String
   password: String
   phone: String
-  # User Status
+  "User Status"
   userStatus: Int
   username: String
 }

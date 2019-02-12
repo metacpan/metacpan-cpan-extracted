@@ -1,0 +1,29 @@
+---
+abstract: 'Helper library for testing code that uses temp files'
+author:
+  - 'Richard Harris <rjh@netcraft.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-TempFile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::MaybeXS: '0'
+  Path::Tiny: '0'
+  Test2::API: '0'
+  Test::Builder::Module: '0'
+  Test::Exception: '0'
+  Test::More: '0.96'
+  YAML::Tiny: '0'
+version: '0.90'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,6 +8,7 @@ Makefile
 Makefile.PL
 cpanfile
 dist.ini
+examples/create_namespaces.pl
 examples/test.pl
 lib/Kubernetes/REST.pm
 lib/Kubernetes/REST/Admissionregistration.pm

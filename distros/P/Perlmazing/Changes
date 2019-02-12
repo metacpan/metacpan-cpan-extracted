@@ -13,11 +13,16 @@ Revision history for Perlmazing
 1.2810  2016-02-26
         Fix in Perlmazing::Engine POD markup, improperly scaped -> sequences
 		Fix in test case causing an error in rare cases like http://www.cpantesters.org/cpan/report/db62e0b6-dc2a-11e5-ad39-220c874cb8f0
-1.2812	
+1.2812	2018-02-01
 		Made Perl::Critic happy
 		Added weaken and unweaken (from Scalar::Util) to Perlmazing
 		Prevent on-cleanup-during-global-destruction warnings for Perlmazing::Engine on newer versions of Perl
 		Bugfix, Perlmazing wasn't doing the correct thing with specified symbols to import/skip
 		Bugfix, remove_duplicates was failing when an element of the array was undef
 		Bugfix, appeared with Perl 5.26, causing warnings on cleanup under certain circumstances.
-		Removed warnings fatal all. Now its only fatal with qw(closed unopened numeric recursion redefine syntax uninitialized)
+1.2814  2019-02-09
+		Removed warnings fatal all. Now its only fatal with qw(closed unopened numeric recursion syntax uninitialized)
+		Updated required version for Taint::Util.
+		Added move function from File::Copy::Recursive::rmove, as we are already using rcopy from the same module.
+		Added functions to_string and to_number.
+		slurp function now doesn't force binary mode on non binary files, unless a true value is passed as second argument.

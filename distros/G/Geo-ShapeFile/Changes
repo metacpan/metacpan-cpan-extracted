@@ -1,5 +1,14 @@
 Revision history for Geo::ShapeFile.
 
+2.66 2019-02-11
+    - Full release of 2.65_001, with one additional definedness check (pajlpajl++)
+
+2.65_001 2019-02-11
+    - fix file_version method (it was calling the wrong key) (GH #23)
+    - avoid repeated loading of files when getting headers
+      and incorrect undef returns (GH #22)
+    - both reported by pajlpajl
+
 2.64 2017-04-23
     - Update some POD
     - No functional changes from 2.63_001 dev release

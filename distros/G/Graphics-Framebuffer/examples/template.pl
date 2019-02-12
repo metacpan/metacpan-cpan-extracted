@@ -1,15 +1,16 @@
 #!/usr/bin/env perl
 
 use strict;
+
 # use warnings; # Use just for development, otherwise leave warnings off
 
 use Graphics::Framebuffer;
 
 ## Initialize any global variables here
 
-my $device        = '/dev/fb0'; # Change this to your frambuffer device
+my $device = '/dev/fb0';    # Change this to your frambuffer device
 
-our $FB; # The framebuffer objects MUST be as global as possible
+our $FB;                    # The framebuffer objects MUST be as global as possible
 
 # $FB = Framebuffer
 
@@ -20,10 +21,9 @@ $FB = Graphics::Framebuffer->new(
 
 ## Do your stuff here ########################################################
 
-
 ##############################################################################
 
-$FB->cls('ON'); # Restore the cursor
+$FB->cls('ON');    # Restore the cursor
 exit(0);
 
 __END__

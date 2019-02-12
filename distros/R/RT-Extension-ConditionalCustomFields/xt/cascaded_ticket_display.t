@@ -22,8 +22,8 @@ my $cf_conditioned_by_values = $cf_conditioned_by->Values->ItemsArrayRef;
 my $cf_conditioned_by_child = RT::CustomField->new(RT->SystemUser);
 $cf_conditioned_by_child->Create(Name => 'Child', Type => 'Freeform', MaxValues => 1, Queue => 'General');
 
-$cf_conditioned_by->SetConditionedBy($cf_condition->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
-$cf_conditioned_by_child->SetConditionedBy($cf_conditioned_by->id, [$cf_conditioned_by_values->[0]->Name, $cf_conditioned_by_values->[2]->Name]);
+$cf_conditioned_by->SetConditionedBy($cf_condition->id, 'is', [$cf_values->[0]->Name, $cf_values->[2]->Name]);
+$cf_conditioned_by_child->SetConditionedBy($cf_conditioned_by->id, 'is', [$cf_conditioned_by_values->[0]->Name, $cf_conditioned_by_values->[2]->Name]);
 
 RT->Config->Set('CustomFieldGroupings',
     'RT::Ticket' => [
@@ -70,4 +70,4 @@ $mjs->get($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id);
 $ticket_cf_conditioned_by = $mjs->selector('#CF-'. $cf_conditioned_by->id . '-ShowRow', single => 1);
 ok($ticket_cf_conditioned_by->is_hidden, 'Hide ConditionalCF when parent condition is failed and child condition is passed');
 $ticket_cf_conditioned_by_child = $mjs->selector('#CF-'. $cf_conditioned_by_child->id . '-ShowRow', single => 1);
-ok($ticket_cf_conditioned_by_child->is_hidden, 'Hide Child when when parent condition is failed and child condition is passed');
+ok($ticket_cf_conditioned_by_child->is_hidden, 'Hide Child when parent condition is failed and child condition is passed');

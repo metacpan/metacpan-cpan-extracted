@@ -4,34 +4,34 @@ XML::LibXML::XPathContext - XPath Evaluation
 
 =head1 SYNOPSIS
 
-  my $xpc = XML::LibXML::XPathContext-E<gt>new();
-  my $xpc = XML::LibXML::XPathContext-E<gt>new($node);
-  $xpc-E<gt>registerNs($prefix, $namespace_uri)
-  $xpc-E<gt>unregisterNs($prefix)
-  $uri = $xpc-E<gt>lookupNs($prefix)
-  $xpc-E<gt>registerVarLookupFunc($callback, $data)
-  $data = $xpc-E<gt>getVarLookupData();
-  $callback = $xpc-E<gt>getVarLookupFunc();
-  $xpc-E<gt>unregisterVarLookupFunc($name);
-  $xpc-E<gt>registerFunctionNS($name, $uri, $callback)
-  $xpc-E<gt>unregisterFunctionNS($name, $uri)
-  $xpc-E<gt>registerFunction($name, $callback)
-  $xpc-E<gt>unregisterFunction($name)
-  @nodes = $xpc-E<gt>findnodes($xpath)
-  @nodes = $xpc-E<gt>findnodes($xpath, $context_node )
-  $nodelist = $xpc-E<gt>findnodes($xpath, $context_node )
-  $object = $xpc-E<gt>find($xpath )
-  $object = $xpc-E<gt>find($xpath, $context_node )
-  $value = $xpc-E<gt>findvalue($xpath )
-  $value = $xpc-E<gt>findvalue($xpath, $context_node )
-  $bool = $xpc-E<gt>exists( $xpath_expression, $context_node );
-  $xpc-E<gt>setContextNode($node)
-  my $node = $xpc-E<gt>getContextNode;
-  $xpc-E<gt>setContextPosition($position)
-  my $position = $xpc-E<gt>getContextPosition;
-  $xpc-E<gt>setContextSize($size)
-  my $size = $xpc-E<gt>getContextSize;
-  $xpc-E<gt>setContextNode($node)
+  my $xpc = XML::LibXML::XPathContext->new();
+  my $xpc = XML::LibXML::XPathContext->new($node);
+  $xpc->registerNs($prefix, $namespace_uri)
+  $xpc->unregisterNs($prefix)
+  $uri = $xpc->lookupNs($prefix)
+  $xpc->registerVarLookupFunc($callback, $data)
+  $data = $xpc->getVarLookupData();
+  $callback = $xpc->getVarLookupFunc();
+  $xpc->unregisterVarLookupFunc($name);
+  $xpc->registerFunctionNS($name, $uri, $callback)
+  $xpc->unregisterFunctionNS($name, $uri)
+  $xpc->registerFunction($name, $callback)
+  $xpc->unregisterFunction($name)
+  @nodes = $xpc->findnodes($xpath)
+  @nodes = $xpc->findnodes($xpath, $context_node )
+  $nodelist = $xpc->findnodes($xpath, $context_node )
+  $object = $xpc->find($xpath )
+  $object = $xpc->find($xpath, $context_node )
+  $value = $xpc->findvalue($xpath )
+  $value = $xpc->findvalue($xpath, $context_node )
+  $bool = $xpc->exists( $xpath_expression, $context_node );
+  $xpc->setContextNode($node)
+  my $node = $xpc->getContextNode;
+  $xpc->setContextPosition($position)
+  my $position = $xpc->getContextPosition;
+  $xpc->setContextSize($size)
+  my $size = $xpc->getContextSize;
+  $xpc->setContextNode($node)
 
 =head1 DESCRIPTION
 
@@ -109,39 +109,39 @@ This example demonstrates C<<<<<< registerVarLookup() >>>>>> method. We use XPat
 
 =item new
 
-  my $xpc = XML::LibXML::XPathContext-E<gt>new();
+  my $xpc = XML::LibXML::XPathContext->new();
 
 Creates a new XML::LibXML::XPathContext object without a context node.
 
-  my $xpc = XML::LibXML::XPathContext-E<gt>new($node);
+  my $xpc = XML::LibXML::XPathContext->new($node);
 
 Creates a new XML::LibXML::XPathContext object with the context node set to C<<<<<< $node >>>>>>.
 
 
 =item registerNs
 
-  $xpc-E<gt>registerNs($prefix, $namespace_uri)
+  $xpc->registerNs($prefix, $namespace_uri)
 
 Registers namespace C<<<<<< $prefix >>>>>> to C<<<<<< $namespace_uri >>>>>>.
 
 
 =item unregisterNs
 
-  $xpc-E<gt>unregisterNs($prefix)
+  $xpc->unregisterNs($prefix)
 
 Unregisters namespace C<<<<<< $prefix >>>>>>.
 
 
 =item lookupNs
 
-  $uri = $xpc-E<gt>lookupNs($prefix)
+  $uri = $xpc->lookupNs($prefix)
 
 Returns namespace URI registered with C<<<<<< $prefix >>>>>>. If C<<<<<< $prefix >>>>>> is not registered to any namespace URI returns C<<<<<< undef >>>>>>.
 
 
 =item registerVarLookupFunc
 
-  $xpc-E<gt>registerVarLookupFunc($callback, $data)
+  $xpc->registerVarLookupFunc($callback, $data)
 
 Registers variable lookup function C<<<<<< $prefix >>>>>>. The registered function is executed by the XPath engine each time an XPath
 variable is evaluated. It takes three arguments: C<<<<<< $data >>>>>>, variable name, and variable ns-URI and must return one value: a number or
@@ -152,7 +152,7 @@ array references containing only L<<<<<< XML::LibXML::Node >>>>>> objects can be
 
 =item getVarLookupData
 
-  $data = $xpc-E<gt>getVarLookupData();
+  $data = $xpc->getVarLookupData();
 
 Returns the data that have been associated with a variable lookup function
 during a previous call to C<<<<<< registerVarLookupFunc >>>>>>.
@@ -160,21 +160,21 @@ during a previous call to C<<<<<< registerVarLookupFunc >>>>>>.
 
 =item getVarLookupFunc
 
-  $callback = $xpc-E<gt>getVarLookupFunc();
+  $callback = $xpc->getVarLookupFunc();
 
 Returns the variable lookup function previously registered with C<<<<<< registerVarLookupFunc >>>>>>.
 
 
 =item unregisterVarLookupFunc
 
-  $xpc-E<gt>unregisterVarLookupFunc($name);
+  $xpc->unregisterVarLookupFunc($name);
 
 Unregisters variable lookup function and the associated lookup data.
 
 
 =item registerFunctionNS
 
-  $xpc-E<gt>registerFunctionNS($name, $uri, $callback)
+  $xpc->registerFunctionNS($name, $uri, $callback)
 
 Registers an extension function C<<<<<< $name >>>>>> in C<<<<<< $uri >>>>>> namespace. C<<<<<< $callback >>>>>> must be a CODE reference. The arguments of the callback function are either
 simple scalars or C<<<<<< XML::LibXML::* >>>>>> objects depending on the XPath argument types. The function is responsible for
@@ -187,32 +187,32 @@ array references containing only L<<<<<< XML::LibXML::Node >>>>>> objects can be
 
 =item unregisterFunctionNS
 
-  $xpc-E<gt>unregisterFunctionNS($name, $uri)
+  $xpc->unregisterFunctionNS($name, $uri)
 
 Unregisters extension function C<<<<<< $name >>>>>> in C<<<<<< $uri >>>>>> namespace. Has the same effect as passing C<<<<<< undef >>>>>> as C<<<<<< $callback >>>>>> to registerFunctionNS.
 
 
 =item registerFunction
 
-  $xpc-E<gt>registerFunction($name, $callback)
+  $xpc->registerFunction($name, $callback)
 
 Same as C<<<<<< registerFunctionNS >>>>>> but without a namespace.
 
 
 =item unregisterFunction
 
-  $xpc-E<gt>unregisterFunction($name)
+  $xpc->unregisterFunction($name)
 
 Same as C<<<<<< unregisterFunctionNS >>>>>> but without a namespace.
 
 
 =item findnodes
 
-  @nodes = $xpc-E<gt>findnodes($xpath)
+  @nodes = $xpc->findnodes($xpath)
 
-  @nodes = $xpc-E<gt>findnodes($xpath, $context_node )
+  @nodes = $xpc->findnodes($xpath, $context_node )
 
-  $nodelist = $xpc-E<gt>findnodes($xpath, $context_node )
+  $nodelist = $xpc->findnodes($xpath, $context_node )
 
 Performs the xpath statement on the current node and returns the result as an
 array. In scalar context, returns an L<<<<<< XML::LibXML::NodeList >>>>>> object. Optionally, a node may be passed as a second argument to set the
@@ -223,9 +223,9 @@ The xpath expression can be passed either as a string, or as a L<<<<<< XML::LibX
 
 =item find
 
-  $object = $xpc-E<gt>find($xpath )
+  $object = $xpc->find($xpath )
 
-  $object = $xpc-E<gt>find($xpath, $context_node )
+  $object = $xpc->find($xpath, $context_node )
 
 Performs the xpath expression using the current node as the context of the
 expression, and returns the result depending on what type of result the XPath
@@ -238,9 +238,9 @@ The xpath expression can be passed either as a string, or as a L<<<<<< XML::LibX
 
 =item findvalue
 
-  $value = $xpc-E<gt>findvalue($xpath )
+  $value = $xpc->findvalue($xpath )
 
-  $value = $xpc-E<gt>findvalue($xpath, $context_node )
+  $value = $xpc->findvalue($xpath, $context_node )
 
 Is exactly equivalent to:
 
@@ -259,7 +259,7 @@ The xpath expression can be passed either as a string, or as a L<<<<<< XML::LibX
 
 =item exists
 
-  $bool = $xpc-E<gt>exists( $xpath_expression, $context_node );
+  $bool = $xpc->exists( $xpath_expression, $context_node );
 
 This method behaves like I<<<<<< findnodes >>>>>>, except that it only returns a boolean value (1 if the expression matches a
 node, 0 otherwise) and may be faster than I<<<<<< findnodes >>>>>>, because the XPath evaluation may stop early on the first match (this is true
@@ -271,21 +271,21 @@ the returned value is a non-zero number or a non-empty string.
 
 =item setContextNode
 
-  $xpc-E<gt>setContextNode($node)
+  $xpc->setContextNode($node)
 
 Set the current context node.
 
 
 =item getContextNode
 
-  my $node = $xpc-E<gt>getContextNode;
+  my $node = $xpc->getContextNode;
 
 Get the current context node.
 
 
 =item setContextPosition
 
-  $xpc-E<gt>setContextPosition($position)
+  $xpc->setContextPosition($position)
 
 Set the current context position. By default, this value is -1 (and evaluating
 XPath function C<<<<<< position() >>>>>> in the initial context raises an XPath error), but can be set to any value up
@@ -296,14 +296,14 @@ behavior.
 
 =item getContextPosition
 
-  my $position = $xpc-E<gt>getContextPosition;
+  my $position = $xpc->getContextPosition;
 
 Get the current context position.
 
 
 =item setContextSize
 
-  $xpc-E<gt>setContextSize($size)
+  $xpc->setContextSize($size)
 
 Set the current context size. By default, this value is -1 (and evaluating
 XPath function C<<<<<< last() >>>>>> in the initial context raises an XPath error), but can be set to any
@@ -316,14 +316,14 @@ behavior.
 
 =item getContextSize
 
-  my $size = $xpc-E<gt>getContextSize;
+  my $size = $xpc->getContextSize;
 
 Get the current context size.
 
 
 =item setContextNode
 
-  $xpc-E<gt>setContextNode($node)
+  $xpc->setContextNode($node)
 
 Set the current context node.
 
@@ -362,7 +362,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0133
+2.0134
 
 =head1 COPYRIGHT
 

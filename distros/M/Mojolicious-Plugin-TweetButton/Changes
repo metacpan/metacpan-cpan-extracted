@@ -1,0 +1,9 @@
+Revision history of Mojolicious::Plugin::TweetButton
+====================================================
+
+0.0005  2019-02-10 19:31:00
+
+  + add tests
+  + set minimum required version of Mojolicious to 8
+  + Dzilify dist
+

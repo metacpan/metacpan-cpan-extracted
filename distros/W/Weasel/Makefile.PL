@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Weasel",
   "PREREQ_PM" => {
+    "HTML::Selector::XPath" => 0,
     "List::Util" => 0,
     "Module::Runtime" => 0,
     "Moose" => 0,
@@ -25,7 +26,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,6 +34,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "HTML::Selector::XPath" => 0,
   "List::Util" => 0,
   "Module::Runtime" => 0,
   "Moose" => 0,

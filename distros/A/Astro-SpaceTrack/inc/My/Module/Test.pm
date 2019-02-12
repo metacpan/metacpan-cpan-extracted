@@ -13,7 +13,7 @@ use HTTP::Date;
 use HTTP::Status qw{ :constants };
 use Test::More 0.96;	# For subtest
 
-our $VERSION = '0.125';
+our $VERSION = '0.126';
 
 # Set the following to zero if Space Track (or any other SSL host)
 # starts using a certificate that can not be verified.

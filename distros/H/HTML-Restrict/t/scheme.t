@@ -46,7 +46,7 @@ cmp_ok(
 
 cmp_ok(
     $hr->process('<img src="javascript:evil_fc()" />'),
-    'eq', '<img />',
+    'eq', '<img>',
     'img src with javascript removed',
 );
 

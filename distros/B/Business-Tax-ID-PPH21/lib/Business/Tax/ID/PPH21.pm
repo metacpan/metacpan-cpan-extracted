@@ -1,7 +1,7 @@
 package Business::Tax::ID::PPH21;
 
-our $DATE = '2017-12-04'; # DATE
-our $VERSION = '0.060'; # VERSION
+our $DATE = '2019-02-10'; # DATE
+our $VERSION = '0.061'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,7 +11,7 @@ use Exporter::Rinci qw(import);
 
 our %SPEC;
 
-my $latest_supported_year = 2017;
+my $latest_supported_year = 2018;
 
 our %arg_tp_status = (
     tp_status => {
@@ -360,7 +360,7 @@ Business::Tax::ID::PPH21 - Routines to help calculate Indonesian income tax arti
 
 =head1 VERSION
 
-This document describes version 0.060 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2017-12-04.
+This document describes version 0.061 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2019-02-10.
 
 =head1 SYNOPSIS
 
@@ -393,7 +393,7 @@ This module contains several routines to help calculate income tax article 21.
 
 Usage:
 
- calc_net_income_from_pph21_op(%args) -> [status, msg, result, meta]
+ calc_net_income_from_pph21_op(%args) -> [status, msg, payload, meta]
 
 Given that someone pays a certain amount of PPh 21 op, calculate her yearly net income.
 
@@ -403,15 +403,11 @@ Examples:
 
 =item * Someone who doesn't pay PPh 21 op earns at or below PTKP:
 
- calc_net_income_from_pph21_op(year => 2016, pph21_op => 0, tp_status => "TK/0"); # -> [200, "OK", 54000000, {}]
+ calc_net_income_from_pph21_op(year => 2016, pph21_op => 0, tp_status => "TK/0"); # -> 54000000
 
 =item * Example #2:
 
- calc_net_income_from_pph21_op(year => 2016, pph21_op => 20000000, tp_status => "K/2");
-
-Result:
-
- [200, "OK", 234166666.666667, {}]
+ calc_net_income_from_pph21_op(year => 2016, pph21_op => 20000000, tp_status => "K/2"); # -> 234166666.666667
 
 =back
 
@@ -448,7 +444,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -459,7 +455,7 @@ Return value:  (any)
 
 Usage:
 
- calc_pph21_op(%args) -> [status, msg, result, meta]
+ calc_pph21_op(%args) -> [status, msg, payload, meta]
 
 Calculate PPh 21 for individuals ("OP", "orang pribadi").
 
@@ -469,15 +465,11 @@ Examples:
 
 =item * Someone who earns below PTKP:
 
- calc_pph21_op(year => 2015, net_income => 30000000, tp_status => "TK/0"); # -> [200, "OK", 0, {}]
+ calc_pph21_op(year => 2015, net_income => 30000000, tp_status => "TK/0"); # -> 0
 
 =item * Example #2:
 
- calc_pph21_op(year => 2015, net_income => 300000000, tp_status => "K/2");
-
-Result:
-
- [200, "OK", 33750000, {}]
+ calc_pph21_op(year => 2015, net_income => 300000000, tp_status => "K/2"); # -> 33750000
 
 =back
 
@@ -507,7 +499,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -518,7 +510,7 @@ Return value:  (any)
 
 Usage:
 
- get_pph21_op_ptkp(%args) -> [status, msg, result, meta]
+ get_pph21_op_ptkp(%args) -> [status, msg, payload, meta]
 
 Get PPh21 non-taxable income amount ("PTKP") for individuals.
 
@@ -532,21 +524,16 @@ Examples:
 
 Result:
 
- [
-   200,
-   "OK",
-   {
-     "K/0"  => 58500000,
-     "K/1"  => 63000000,
-     "K/2"  => 67500000,
-     "K/3"  => 72000000,
-     "TK/0" => 54000000,
-     "TK/1" => 58500000,
-     "TK/2" => 63000000,
-     "TK/3" => 67500000,
-   },
-   {},
- ]
+ {
+   "K/0"  => 58500000,
+   "K/1"  => 63000000,
+   "K/2"  => 67500000,
+   "K/3"  => 72000000,
+   "TK/0" => 54000000,
+   "TK/1" => 58500000,
+   "TK/2" => 63000000,
+   "TK/3" => 67500000,
+ }
 
 =back
 
@@ -569,7 +556,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -580,7 +567,7 @@ Return value:  (any)
 
 Usage:
 
- get_pph21_op_rates(%args) -> [status, msg, result, meta]
+ get_pph21_op_rates(%args) -> [status, msg, payload, meta]
 
 Get tax rates for PPh21 for individuals ("OP", "orang pribadi").
 
@@ -595,18 +582,10 @@ Examples:
 Result:
 
  [
-   200,
-   "OK",
-   [
-     { max => 50000000, rate => 0.05 },
-     { xmin => 50000000, max => 250000000, rate => 0.15 },
-     { xmin => 250000000, max => 500000000, rate => 0.25 },
-     { xmin => 500000000, rate => 0.3 },
-   ],
-   {
-     "table.fields"        => ["xmin", "max", "rate"],
-     "table.field_formats" => [undef, undef, ["percent", { sprintf => "%3.0f%%" }]],
-   },
+   { max => 50000000, rate => 0.05 },
+   { xmin => 50000000, max => 250000000, rate => 0.15 },
+   { xmin => 250000000, max => 500000000, rate => 0.25 },
+   { xmin => 500000000, rate => 0.3 },
  ]
 
 =back
@@ -632,7 +611,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -662,7 +641,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

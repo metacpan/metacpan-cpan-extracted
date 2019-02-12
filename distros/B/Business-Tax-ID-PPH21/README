@@ -3,8 +3,8 @@ NAME
     tax article 21 (PPh pasal 21)
 
 VERSION
-    This document describes version 0.060 of Business::Tax::ID::PPH21 (from
-    Perl distribution Business-Tax-ID-PPH21), released on 2017-12-04.
+    This document describes version 0.061 of Business::Tax::ID::PPH21 (from
+    Perl distribution Business-Tax-ID-PPH21), released on 2019-02-10.
 
 SYNOPSIS
 DESCRIPTION
@@ -34,7 +34,7 @@ FUNCTIONS
   calc_net_income_from_pph21_op
     Usage:
 
-     calc_net_income_from_pph21_op(%args) -> [status, msg, result, meta]
+     calc_net_income_from_pph21_op(%args) -> [status, msg, payload, meta]
 
     Given that someone pays a certain amount of PPh 21 op, calculate her
     yearly net income.
@@ -43,15 +43,11 @@ FUNCTIONS
 
     *   Someone who doesn't pay PPh 21 op earns at or below PTKP:
 
-         calc_net_income_from_pph21_op(year => 2016, pph21_op => 0, tp_status => "TK/0"); # -> [200, "OK", 54000000, {}]
+         calc_net_income_from_pph21_op(year => 2016, pph21_op => 0, tp_status => "TK/0"); # -> 54000000
 
     *   Example #2:
 
-         calc_net_income_from_pph21_op(year => 2016, pph21_op => 20000000, tp_status => "K/2");
-
-        Result:
-
-         [200, "OK", 234166666.666667, {}]
+         calc_net_income_from_pph21_op(year => 2016, pph21_op => 20000000, tp_status => "K/2"); # -> 234166666.666667
 
     If pph21_op is 0, will return the PTKP amount. Actually one can earn
     between zero and the full PTKP amount to pay zero PPh 21 op.
@@ -82,7 +78,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -91,7 +87,7 @@ FUNCTIONS
   calc_pph21_op
     Usage:
 
-     calc_pph21_op(%args) -> [status, msg, result, meta]
+     calc_pph21_op(%args) -> [status, msg, payload, meta]
 
     Calculate PPh 21 for individuals ("OP", "orang pribadi").
 
@@ -99,15 +95,11 @@ FUNCTIONS
 
     *   Someone who earns below PTKP:
 
-         calc_pph21_op(year => 2015, net_income => 30000000, tp_status => "TK/0"); # -> [200, "OK", 0, {}]
+         calc_pph21_op(year => 2015, net_income => 30000000, tp_status => "TK/0"); # -> 0
 
     *   Example #2:
 
-         calc_pph21_op(year => 2015, net_income => 300000000, tp_status => "K/2");
-
-        Result:
-
-         [200, "OK", 33750000, {}]
+         calc_pph21_op(year => 2015, net_income => 300000000, tp_status => "K/2"); # -> 33750000
 
     This function is not exported by default, but exportable.
 
@@ -131,7 +123,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -140,7 +132,7 @@ FUNCTIONS
   get_pph21_op_ptkp
     Usage:
 
-     get_pph21_op_ptkp(%args) -> [status, msg, result, meta]
+     get_pph21_op_ptkp(%args) -> [status, msg, payload, meta]
 
     Get PPh21 non-taxable income amount ("PTKP") for individuals.
 
@@ -152,21 +144,16 @@ FUNCTIONS
 
         Result:
 
-         [
-           200,
-           "OK",
-           {
-             "K/0"  => 58500000,
-             "K/1"  => 63000000,
-             "K/2"  => 67500000,
-             "K/3"  => 72000000,
-             "TK/0" => 54000000,
-             "TK/1" => 58500000,
-             "TK/2" => 63000000,
-             "TK/3" => 67500000,
-           },
-           {},
-         ]
+         {
+           "K/0"  => 58500000,
+           "K/1"  => 63000000,
+           "K/2"  => 67500000,
+           "K/3"  => 72000000,
+           "TK/0" => 54000000,
+           "TK/1" => 58500000,
+           "TK/2" => 63000000,
+           "TK/3" => 67500000,
+         }
 
     When calculating individual income tax, the net income is subtracted by
     this amount first. This means that if a person has income below this
@@ -183,7 +170,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -192,7 +179,7 @@ FUNCTIONS
   get_pph21_op_rates
     Usage:
 
-     get_pph21_op_rates(%args) -> [status, msg, result, meta]
+     get_pph21_op_rates(%args) -> [status, msg, payload, meta]
 
     Get tax rates for PPh21 for individuals ("OP", "orang pribadi").
 
@@ -205,18 +192,10 @@ FUNCTIONS
         Result:
 
          [
-           200,
-           "OK",
-           [
-             { max => 50000000, rate => 0.05 },
-             { xmin => 50000000, max => 250000000, rate => 0.15 },
-             { xmin => 250000000, max => 500000000, rate => 0.25 },
-             { xmin => 500000000, rate => 0.3 },
-           ],
-           {
-             "table.fields"        => ["xmin", "max", "rate"],
-             "table.field_formats" => [undef, undef, ["percent", { sprintf => "%3.0f%%" }]],
-           },
+           { max => 50000000, rate => 0.05 },
+           { xmin => 50000000, max => 250000000, rate => 0.15 },
+           { xmin => 250000000, max => 500000000, rate => 0.25 },
+           { xmin => 500000000, rate => 0.3 },
          ]
 
     PPh21 differentiates rates between individuals ("OP", "orang pribadi")
@@ -236,7 +215,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -263,7 +242,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017, 2015 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

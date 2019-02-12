@@ -93,19 +93,16 @@ JS
                 else {
                     me.unmask();
 
-                    Ext.create({
-                        xtype: 'dialog',
-                        modal: false,
-                        html: $l10n->{'Error connecting to the server'} + '<br/>' + $l10n->{'Try again.'},
-                        buttons: [{
-                            text: 'retry',
-                            handler: function () {
-                                this.up('dialog').close();
+                    var item = me.getView().add({
+                        xtype: "$type->{connection_error}",
+                        callback: function () {
+                            me.getView().remove(item);
 
-                                me.initApp();
-                            }
-                        }]
-                    }).show();
+                            me.initApp();
+                        }
+                    });
+
+                    me.getView().setActiveItem(item);
                 }
             });
 JS
@@ -395,6 +392,29 @@ JS
 
             this.unmask();
 JS
+    };
+}
+
+# CONNECTION ERROR DIALOG
+sub EXT_connection_error : Extend('Ext.Panel') {
+    return {
+        layout => {
+            type  => 'vbox',
+            pack  => 'center',
+            align => 'center',
+        },
+
+        items => [
+            { html => $l10n->{'Error connecting to the application server.'}, },
+            {   xtype   => 'button',
+                iconCls => $FAS_REDO,
+                text    => $l10n->{'Try again.'},
+                handler => func ['btn'],
+                <<'JS',
+                    btn.up().callback();
+JS
+            }
+        ],
     };
 }
 

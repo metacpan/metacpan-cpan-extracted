@@ -3,7 +3,7 @@ use Perlmazing;
 sub main ($$) {
 	my ($aa, $bb) = ($_[0], $_[1]);
 	if (is_number $aa and is_number $bb) {
-		my $r = $aa <=> $bb;
+		my $r = to_number($aa) <=> to_number($bb);
 		return $r if $r;
 		$aa cmp $bb;
 	} elsif (is_number $aa) {

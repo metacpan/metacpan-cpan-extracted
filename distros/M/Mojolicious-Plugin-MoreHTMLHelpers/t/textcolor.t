@@ -45,5 +45,11 @@ for my $color ( keys %colors ) {
     $t->get_ok( '/' . $color )->status_is( 200 )->content_is( $colors{$color}, '#' . $color );
 }
 
+is $t->app->textcolor( undef ), '#ffffff';
+is $t->app->textcolor( 'tester2' ), '#000000';
+is $t->app->textcolor( 'ster2' ), '#000000';
+is $t->app->textcolor( '12345' ), '#000000';
+is $t->app->textcolor( '##12345' ), '#000000';
+
 done_testing();
 

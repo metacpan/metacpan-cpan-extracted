@@ -1,0 +1,55 @@
+{
+   "abstract" : "Flat relational access to GermaNet data",
+   "author" : [
+      "Bryan Jurish <jurish.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GermaNet-Flat",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "Carp" : "0",
+            "Encode" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "GraphViz" : "0",
+            "HTTP::Status" : "0",
+            "IO::File" : "0",
+            "JSON" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0",
+            "XML::Parser" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 0.03,
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/vti/mojolicious-plugin-tweet_button.svg?branch=master)](https://travis-ci.org/vti/mojolicious-plugin-tweet_button)
+[![Kwalitee status](http://cpants.cpanauthors.org/dist/Mojolicious-Plugin-TweetButton.png)](http://cpants.charsbar.org/dist/overview/Mojolicious-Plugin-TweetButton)
+[![GitHub issues](https://img.shields.io/github/issues/vti/mojolicious-plugin-tweet_button.svg)](https://github.com/vti/mojolicious-plugin-tweet_button/issues)
+
 TweetButton which is described on twitter page http://twitter.com/goodies/tweetbutton
 is now available for Mojolicious. After simply loading a plugin you get an html
 helper that inserts TweetButton using various setup arguments.

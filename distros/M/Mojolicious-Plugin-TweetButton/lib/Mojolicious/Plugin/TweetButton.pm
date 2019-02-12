@@ -7,12 +7,12 @@ use base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
 
-our $VERSION = '0.0003';
+our $VERSION = '0.0005';
 
 sub register {
     my ($self, $app, $conf) = @_;
 
-    $conf ||= {};
+    $conf->{count} = 'vertical' if !$conf->{count};
 
     $app->renderer->add_helper(
         tweet_button => sub {
@@ -20,10 +20,10 @@ sub register {
             my %args = @_;
 
             $args{url}     ||= $conf->{url};
-            $args{count}   ||= $conf->{count} || 'vertical';
             $args{via}     ||= $conf->{via};
             $args{related} ||= $conf->{related};
             $args{lang}    ||= $conf->{lang};
+            $args{count}     = $conf->{count} if !$args{count};
 
             my $attrs = '';
             foreach my $name (qw/url text count via related lang/) {
@@ -39,11 +39,20 @@ EOF
 }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Mojolicious::Plugin::TweetButton - TweetButton Helper Plugin
+Mojolicious::Plugin::TweetButton
+
+=head1 VERSION
+
+version 0.0005
 
 =head1 SYNOPSIS
 
@@ -113,6 +122,10 @@ The language of the tweet (no default).
 
 =back
 
+=head1 NAME
+
+Mojolicious::Plugin::TweetButton - TweetButton Helper Plugin
+
 =head1 METHODS
 
 L<Mojolicious::Plugin::TweetButton> inherits all methods from
@@ -145,10 +158,20 @@ Copyright (C) 2010, Viacheslav Tykhanovskyi
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
 
-=cut
-
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+
+=head1 AUTHOR
+
+Viacheslav Tykhanovskyi <vti@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2010 by Viacheslav Tykhanovskyi <vti@cpan.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

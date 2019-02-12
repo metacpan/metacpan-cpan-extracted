@@ -1,0 +1,4 @@
+   This file has a lot of               
+   whitespace
+ which should be trimmed                     
+       so that it looks neat.     

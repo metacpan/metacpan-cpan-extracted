@@ -5,13 +5,13 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.132;
+our $VERSION = 1.134;
 
 use Quiq::Path;
 use Quiq::CommandLine;
-use Quiq::Shell;
 use Quiq::Stopwatch;
-use File::Temp ();
+use Quiq::TempFile;
+use Quiq::Shell;
 
 # -----------------------------------------------------------------------------
 
@@ -27,20 +27,17 @@ L<Quiq::Hash>
 
 =head1 DESCRIPTION
 
+Ein Objekt der Klasse stellt eine Schnittstelle zu einem
+CA Harvest SCM Server zur Verfügung.
+
 =head2 Begriffe
 
 =over 4
 
-=item Workspace-Verzeichnis
+=item Workspace
 
-Verzeichnis mit den ausgecheckten Dateien. Im CASCM Jargon auch
-"Clientpath" genannt, Option -cp.
-
-=item Repository-Datei
-
-Datei im lokalen Workspace-Verzeichnis. Der Pfad einer
-Repository-Datei ist relativ zum Repository-Verzeichnis, beginnt
-also innerhalb des Workspace-Verzeichnisses.
+Lokales Verzeichnis mit (Kopien von) Repository-Dateien. Der
+Pfad wird "Clientpath" genannt, Option -cp´, z.B. C<~/var/workspace>.
 
 =back
 
@@ -100,13 +97,13 @@ sub new {
 
 # -----------------------------------------------------------------------------
 
-=head2 Kommandos
+=head2 Externe Dateien
 
-=head3 addFiles() - Füge Dateien zu Repository hinzu
+=head3 putFiles() - Füge Dateien zum Repository hinzu
 
 =head4 Synopsis
 
-    $scm->addFiles($package,$repoDir,@files);
+    $scm->putFiles($package,$repoDir,@files);
 
 =head4 Arguments
 
@@ -114,12 +111,12 @@ sub new {
 
 =item $packge
 
-Package, zu dem die Dateien hinzugefügt werden.
+Package, dem die Dateien innerhalb von CASCM zugeordnet werden.
 
 =item $repoDir
 
-Verzeichnis I<innerhalb> des Workspace, in das die Dateien
-kopiert werden.
+Zielverzeichnis I<innerhalb> des Workspace, in das die Dateien
+kopiert werden. Dies ist ein I<relativer> Pfad.
 
 =item @files
 
@@ -131,27 +128,55 @@ Liste von Dateien I<außerhalb> des Workspace.
 
 nichts
 
+=head4 Description
+
+Kopiere die Dateien @files in das Workspace-Verzeichnis $repoDir
+und checke sie anschließend ein, d.h. füge sie zum Repository hinzu.
+Eine Datei, die im Workspace-Verzeichnis schon vorhanden ist, wird
+zuvor ausgecheckt.
+
+Mit dieser Methode ist es möglich, sowohl neue Dateien zum Workspace
+hinzuzufügen als auch bereits existierende Dateien im Workspace
+zu aktualisieren. Dies geschieht für den Aufrufer transparent, er
+braucht sich um die Unterscheidung nicht zu kümmern.
+
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub addFiles {
+sub putFiles {
     my ($self,$package,$repoDir,@files) = @_;
 
     my $workspace = $self->workspace;
+    my $p = Quiq::Path->new;
 
     for my $srcFile (@files) {
-        my (undef,$file) = Quiq::Path->split($srcFile);
+        my (undef,$file) = $p->split($srcFile);
         my $repoFile = sprintf '%s/%s',$repoDir,$file;
 
-        # Kopiere Datei ins Repository
+        if (-e "$workspace/$repoFile") {
+            # Die Workspace-Datei existiert bereits. Prüfe, ob Quelldatei
+            # und die Workspace-Datei sich unterscheiden. Wenn nein, ist
+            # nichts zu tun.
 
-        Quiq::Path->copy($srcFile,"$workspace/$repoFile",
-            -overwrite => 0,
+            if (!$p->different($srcFile,"$workspace/$repoFile")) {
+                # Bei fehlender Differenz tun wir nichts
+                next;
+            }
+
+            # Checke Repository-Datei aus
+            $self->checkout($package,$repoFile);
+        }
+
+        # Kopiere externe Datei in den Workspace. Entweder ist
+        # sie neu oder sie wurde zuvor ausgecheckt.
+
+        $p->copy($srcFile,"$workspace/$repoFile",
+            -overwrite => 1,
             -preserve => 1,
         );
 
-        # Checke Datei ein
+        # Checke Workspace-Datei ins Repository ein
         $self->checkin($package,$repoFile);
     }
 
@@ -160,59 +185,7 @@ sub addFiles {
 
 # -----------------------------------------------------------------------------
 
-=head3 checkin() - Checke Repository-Dateien ein
-
-=head4 Synopsis
-
-    $scm->checkin($package,@repoFiles);
-
-=head4 Arguments
-
-=over 4
-
-=item $packge
-
-Package.
-
-=item @repoFiles
-
-Liste von Repository-Dateien.
-
-=back
-
-=head4 Returns
-
-nichts
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub checkin {
-    my ($self,$package,@repoFiles) = @_;
-
-    # Checke Repository-Dateien ein
-
-    my $c = Quiq::CommandLine->new;
-    for my $repoFile (@repoFiles) {
-        $c->addArgument($repoFile);
-    }
-    $c->addOption(
-        $self->credentialOptions,
-        -b => $self->broker,
-        -en => $self->projectContext,
-        -st => $self->defaultState,
-        -vp => $self->viewPath,
-        -cp => $self->workspace,
-        -p => $package,
-    );
-
-    $self->run('hci',$c);
-
-    return;
-}
-
-# -----------------------------------------------------------------------------
+=head2 Workspace-Dateien
 
 =head3 checkout() - Checke Repository-Dateien aus
 
@@ -224,19 +197,24 @@ sub checkin {
 
 =over 4
 
-=item $packge
+=item $package
 
-Package.
+Package, dem die ausgecheckte Datei (mit reservierter Version)
+zugeordnet wird.
 
 =item @repoFiles
 
-Liste von Repository-Dateien.
+Liste von Workspace-Dateien, die ausgecheckt werden.
 
 =back
 
 =head4 Returns
 
 nichts
+
+=head4 Description
+
+Checke die Workspace-Dateien @repoFiles aus.
 
 =cut
 
@@ -245,7 +223,7 @@ nichts
 sub checkout {
     my ($self,$package,@repoFiles) = @_;
 
-    # Checke aus
+    # Checke Workspace-Dateien aus
 
     my $c = Quiq::CommandLine->new;
     for my $repoFile (@repoFiles) {
@@ -272,19 +250,23 @@ sub checkout {
 
 # -----------------------------------------------------------------------------
 
-=head3 createPackage() - Erzeuge Package
+=head3 checkin() - Checke Workspace-Datei ein
 
 =head4 Synopsis
 
-    $scm->createPackage($package);
+    $scm->checkin($package,$repoFile);
 
 =head4 Arguments
 
 =over 4
 
-=item $packge
+=item $package
 
-Name des Package, das erzeugt werden soll.
+Package, dem die neue Version der Datei zugeordnet wird.
+
+=item $repoFile
+
+Datei I<innerhalb> des Workspace. Der Dateipfad ist ein I<relativer> Pfad.
 
 =back
 
@@ -292,184 +274,33 @@ Name des Package, das erzeugt werden soll.
 
 nichts
 
+=head4 Description
+
+Checke die Workspace-Datei $repoFile ein, d.h. übertrage ihren Stand
+als neue Version ins Repository und ordne diese dem Package $package zu.
+
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub createPackage {
-    my ($self,$package) = @_;
+sub checkin {
+    my ($self,$package,$repoFile) = @_;
 
-    # Erzeuge Package
+    # Checke Repository-Dateien ein
 
     my $c = Quiq::CommandLine->new;
-    $c->addArgument($package);
+    $c->addArgument($repoFile);
     $c->addOption(
         $self->credentialOptions,
         -b => $self->broker,
         -en => $self->projectContext,
         -st => $self->defaultState,
+        -vp => $self->viewPath,
+        -cp => $self->workspace,
+        -p => $package,
     );
 
-    $self->run('hcp',$c);
-
-    return;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 deletePackage() - Lösche Package
-
-=head4 Synopsis
-
-    $scm->deletePackage($package);
-
-=head4 Arguments
-
-=over 4
-
-=item $packge
-
-Name des Package, das gelöscht werden soll.
-
-=back
-
-=head4 Returns
-
-nichts
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub deletePackage {
-    my ($self,$package) = @_;
-
-    # Lösche Package
-
-    # Anmerkung: Das Kommando hdlp kann auch mehrere Packages auf
-    # einmal löschen. Es ist jedoch nicht gut, es so zu
-    # nutzen, da dann nicht-existente Packages nicht bemängelt
-    # werden, wenn mindestens ein Package existiert.
-
-    my $c = Quiq::CommandLine->new;
-    $c->addOption(
-        $self->credentialOptions,
-        -b => $self->broker,
-        -en => $self->projectContext,
-        -pkgs => $package,
-    );
-
-    $self->run('hdlp',$c);
-
-    return;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 demote() - Demote Package
-
-=head4 Synopsis
-
-    $scm->demote($package,$state);
-
-=head4 Arguments
-
-=over 4
-
-=item $packge
-
-Package, das demotet werden soll.
-
-=item $state
-
-Stufe, auf dem sich das Package befindet.
-
-=back
-
-=head4 Returns
-
-nichts
-
-=head4 Description
-
-Demote Package $package, das sich auf Stufe $state befindet
-(befinden muss) auf die darunterliegende Stufe. Befindet sich das
-Package auf einer anderen Stufe, schlägt das Kommando fehl.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub demote {
-    my ($self,$package,$state) = @_;
-
-    # Demote Package
-
-    my $c = Quiq::CommandLine->new;
-    $c->addArgument($package);
-    $c->addOption(
-        $self->credentialOptions,
-        -b => $self->broker,
-        -en => $self->projectContext,
-        -st => $state,
-    );
-
-    $self->run('hdp',$c);
-
-    return;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 promote() - Promote Package
-
-=head4 Synopsis
-
-    $scm->promote($package,$state);
-
-=head4 Arguments
-
-=over 4
-
-=item $packge
-
-Package, das promotet werden soll.
-
-=item $state
-
-Stufe, auf dem sich das Package befindet.
-
-=back
-
-=head4 Returns
-
-nichts
-
-=head4 Description
-
-promote Package $package, das sich auf Stufe $state befindet
-(befinden muss) auf die darüberliegende Stufe. Befindet sich das
-Package auf einer anderen Stufe, schlägt das Kommando fehl.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub promote {
-    my ($self,$package,$state) = @_;
-
-    # Promote Package
-
-    my $c = Quiq::CommandLine->new;
-    $c->addArgument($package);
-    $c->addOption(
-        $self->credentialOptions,
-        -b => $self->broker,
-        -en => $self->projectContext,
-        -st => $state,
-    );
-
-    $self->run('hpp',$c);
+    $self->run('hci',$c);
 
     return;
 }
@@ -480,7 +311,7 @@ sub promote {
 
 =head4 Synopsis
 
-    $versiion = $scm->version($repoFile);
+    $version = $scm->version($repoFile);
 
 =head4 Arguments
 
@@ -609,11 +440,13 @@ sub deleteVersion {
 
 # -----------------------------------------------------------------------------
 
-=head3 putFiles() - Füge Datei zu Repository hinzu oder aktualisiere sie
+=head2 Packages
+
+=head3 createPackage() - Erzeuge Package
 
 =head4 Synopsis
 
-    $scm->putFiles($package,$repoDir,@files);
+    $scm->createPackage($package);
 
 =head4 Arguments
 
@@ -621,17 +454,7 @@ sub deleteVersion {
 
 =item $packge
 
-Package, zu dem die Dateien gehören bzw. zu dem sie
-hinzugefügt werden.
-
-=item $repoDir
-
-Verzeichnis I<innerhalb> des Workspace, in das die Dateien
-kopiert werden.
-
-=item @files
-
-Liste von Dateien I<außerhalb> des Workspace.
+Name des Package, das erzeugt werden soll.
 
 =back
 
@@ -639,53 +462,252 @@ Liste von Dateien I<außerhalb> des Workspace.
 
 nichts
 
+=head4 Description
+
+Erzeuge Package $package.
+
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub putFiles {
-    my ($self,$package,$repoDir,@files) = @_;
+sub createPackage {
+    my ($self,$package) = @_;
 
-    my $workspace = $self->workspace;
-    my $sh = Quiq::Shell->new;
+    # Erzeuge Package
 
-    for my $srcFile (@files) {
-        my (undef,$file) = Quiq::Path->split($srcFile);
-        my $repoFile = sprintf '%s/%s',$repoDir,$file;
+    my $c = Quiq::CommandLine->new;
+    $c->addArgument($package);
+    $c->addOption(
+        $self->credentialOptions,
+        -b => $self->broker,
+        -en => $self->projectContext,
+        -st => $self->defaultState,
+    );
 
-        if (-e "$workspace/$repoFile") {
-            # Die Repository-Datei existiert. Prüfe, ob Quelldatei und
-            # Repository-Datei sich unterscheiden. Wenn nein, ist
-            # nichts zu tun.
-
-            if (!Quiq::Path->compare($srcFile,"$workspace/$repoFile")) {
-                # Bei fehlender Differenz tun wir nichts
-                next;
-            }
-
-            # Checke Repository-Datei aus
-            $self->checkout($package,$repoFile);
-
-            # Kopiere Datei ins Repository
-
-            Quiq::Path->copy($srcFile,"$workspace/$repoFile",
-                -overwrite => 1,
-                -preserve => 1,
-            );
-
-            # Checke Repository-Datei ein
-            $self->checkin($package,$repoFile);
-        }
-        else {
-            # Die Repository-Datei existiert nocht nicht. Füge sie hinzu.
-            $self->addFiles($package,$repoDir,$srcFile);
-        }
-    }
+    $self->run('hcp',$c);
 
     return;
 }
 
 # -----------------------------------------------------------------------------
+
+=head3 deletePackage() - Lösche Package
+
+=head4 Synopsis
+
+    $scm->deletePackage($package);
+
+=head4 Arguments
+
+=over 4
+
+=item $packge
+
+Name des Package, das gelöscht werden soll.
+
+=back
+
+=head4 Returns
+
+nichts
+
+=head4 Description
+
+Lösche Package $package.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub deletePackage {
+    my ($self,$package) = @_;
+
+    # Lösche Package
+
+    # Anmerkung: Das Kommando hdlp kann auch mehrere Packages auf
+    # einmal löschen. Es ist jedoch nicht gut, es so zu
+    # nutzen, da dann nicht-existente Packages nicht bemängelt
+    # werden, wenn mindestens ein Package existiert.
+
+    my $c = Quiq::CommandLine->new;
+    $c->addOption(
+        $self->credentialOptions,
+        -b => $self->broker,
+        -en => $self->projectContext,
+        -pkgs => $package,
+    );
+
+    $self->run('hdlp',$c);
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 renamePackage() - Benenne Package um
+
+=head4 Synopsis
+
+    $scm->renamePackage($oldName,$newName);
+
+=head4 Arguments
+
+=over 4
+
+=item $oldName
+
+Bisheriger Name des Package.
+
+=item $newName
+
+Zukünftiger Name des Package.
+
+=back
+
+=head4 Returns
+
+nichts
+
+=head4 Description
+
+Benenne Package $oldName in $newName um.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub renamePackage {
+    my ($self,$oldName,$newName) = @_;
+
+    # Benenne Package um
+
+    my $c = Quiq::CommandLine->new;
+    $c->addOption(
+        $self->credentialOptions,
+        -b => $self->broker,
+        -en => $self->projectContext,
+        -p => $oldName,
+        -npn => $newName,
+    );
+
+    $self->run('hup',$c);
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 promotePackage() - Promote Package
+
+=head4 Synopsis
+
+    $scm->promotePackage($package,$state);
+
+=head4 Arguments
+
+=over 4
+
+=item $packge
+
+Package, das promotet werden soll.
+
+=item $state
+
+Stufe, auf dem sich das Package befindet.
+
+=back
+
+=head4 Returns
+
+nichts
+
+=head4 Description
+
+promote Package $package, das sich auf Stufe $state befindet
+(befinden muss) auf die darüberliegende Stufe. Befindet sich das
+Package auf einer anderen Stufe, schlägt das Kommando fehl.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub promotePackage {
+    my ($self,$package,$state) = @_;
+
+    # Promote Package
+
+    my $c = Quiq::CommandLine->new;
+    $c->addArgument($package);
+    $c->addOption(
+        $self->credentialOptions,
+        -b => $self->broker,
+        -en => $self->projectContext,
+        -st => $state,
+    );
+
+    $self->run('hpp',$c);
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 demotePackage() - Demote Package
+
+=head4 Synopsis
+
+    $scm->demotePackage($package,$state);
+
+=head4 Arguments
+
+=over 4
+
+=item $packge
+
+Package, das demotet werden soll.
+
+=item $state
+
+Stufe, auf dem sich das Package befindet.
+
+=back
+
+=head4 Returns
+
+nichts
+
+=head4 Description
+
+Demote Package $package, das sich auf Stufe $state befindet
+(befinden muss) auf die darunterliegende Stufe. Befindet sich das
+Package auf einer anderen Stufe, schlägt das Kommando fehl.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub demotePackage {
+    my ($self,$package,$state) = @_;
+
+    # Demote Package
+
+    my $c = Quiq::CommandLine->new;
+    $c->addArgument($package);
+    $c->addOption(
+        $self->credentialOptions,
+        -b => $self->broker,
+        -en => $self->projectContext,
+        -st => $state,
+    );
+
+    $self->run('hdp',$c);
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Workspace
 
 =head3 sync() - Synchronisiere Workspace mit Repository
 
@@ -773,8 +795,9 @@ sub run {
 
     # Output-Datei zu den Optionen hinzufügen
 
-    my $fh2 = File::Temp->new(UNLINK=>!$keepTempFiles); 
-    my $outputFile = $fh2->filename;
+    # my $fh2 = % C-<File::Temp> %->new(UNLINK=>!$keepTempFiles); 
+    # my $outputFile = $fh2->filename;
+    my $outputFile = Quiq::TempFile->new(-unlink=>!$keepTempFiles);
     $c->addOption(-o=>$outputFile);
 
     my $cmd;
@@ -792,8 +815,9 @@ sub run {
         # Hängt das vielleicht mit dem Prozentzeichen (%) in meinem aktuellen
         # Passwort zusammen? Vorher ging es, glaube ich.
 
-        my $fh1 = File::Temp->new(UNLINK=>0);
-        my $parameterFile = $fh1->filename;
+        # my $fh1 = % C-<File::Temp> %->new(UNLINK=>0);
+        # my $parameterFile = $fh1->filename;
+        my $parameterFile = Quiq::TempFile->new(-unlink=>0);
         Quiq::Path->write($parameterFile," ".$c->command."\n");
 
         $cmd = "$scmCmd -di $parameterFile";
@@ -861,7 +885,7 @@ sub writeOutput {
 
 =head1 VERSION
 
-1.132
+1.134
 
 =head1 AUTHOR
 

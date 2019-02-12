@@ -1,0 +1,12 @@
+Revision history for Logic-Minimizer
+
+1.00
+     2019-02-09
+	- Added the formatting functions to_boolean() and
+	  to_boolean_term() from Algorithm::QuineMcCluskey. Re-wrote
+	  the code to not use Tie::Cyle, which was a little overkill.
+
+     5 Dec 2016
+	- First version, used as a base class for the eventual
+	  version 1.00 of Algorithm-QuineMcCluskey.
+

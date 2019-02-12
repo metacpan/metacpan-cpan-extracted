@@ -1,0 +1,9 @@
+Revision history for Math-MatrixLUP
+
+0.02    2019-02-11
+
+        - Fixed some tests which required a recent version of Math::AnyNum.
+
+0.01    2019-02-10
+
+        - First release.

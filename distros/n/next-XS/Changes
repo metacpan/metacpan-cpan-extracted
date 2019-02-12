@@ -1,3 +1,7 @@
+1.0.2    12.02.2019
+           - bump
+1.0.1    11.02.2019
+           - simplify Makefile
 1.0.0    08.02.2019
            - fixed building for perl < 5.22 (min is 5.18)
            - removed bad test

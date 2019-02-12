@@ -56,6 +56,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.11",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/devel-git-multibisect.git",
+         "web" : "https://github.com/jkeenan/devel-git-multibisect"
+      }
+   },
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,6 +1,12 @@
 History for Mojolicious::Plugin::MoreHTMLHelpers
 ================================================
 
+0.02  2019-02-12 07:28:00
+
+      * add helper gradient
+      * add param validation to text color calculation
+      * add tests
+
 0.01  2015-03-23
 
       * initial release

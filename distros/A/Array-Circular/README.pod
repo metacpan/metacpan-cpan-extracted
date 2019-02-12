@@ -48,7 +48,7 @@ sub next {
     if ($num) {
 	carp "Calls to next with a count of how many to go forward must be a positive number" if $num < 0;
 	$num--;
-	$num->next for 1 .. $num; # This is inefficient but simple.  Could use $self->me to compute where we are as optimisation
+	$self->next for 1 .. $num; # This is inefficient but simple.  Could use $self->me to compute where we are as optimisation
     }
 
 
@@ -67,7 +67,7 @@ sub previous {
     if ($num) {
 	carp "Calls to next with a count of how many to go forward must be a positive number" if $num < 0;
 	$num--;
-	$num->previous for 1 .. $num; # This is inefficient but simple.  Could use $self->me to compute where we are as optimisation
+	$self->previous for 1 .. $num; # This is inefficient but simple.  Could use $self->me to compute where we are as optimisation
     }
 
     if ( $self->me->{current} == 0 ) {
@@ -98,7 +98,7 @@ __END__
 
 =head1 NAME
 
-Array::Circular
+Array::Circular - Provide an array data structure that can go around in circles.
 
 =head2 DESCRIPTION
 
@@ -106,7 +106,7 @@ Circular array, tracks how many times it's been round.
 
 =head2 SYNOPSIS
 
-    my $a = Array->Circular->new(qw/once upon a time there was/);
+    my $a = Array::Circular->new(qw/once upon a time there was/);
     my $current = $l->next;
     say "They are the same" if $current == $l->current;
     my $first = $l->previous;
@@ -185,7 +185,8 @@ various similar modules.
 =head2 TODO
 
 Not thread safe.  See implementation of L<Hash::MultiValue> for
-implementation of thread safety.
+implementation of thread safety.  Alternatively use
+L<Hash::Util::FieldHash> or L<Hash::Util::FieldHash::Compat>.
 
 =head2 AUTHOR COPYRIGHT AND LICENSE
 

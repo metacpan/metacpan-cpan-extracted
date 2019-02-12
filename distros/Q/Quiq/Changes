@@ -1,6 +1,46 @@
+1.134 2019-??-??
+================
+[Quiq::System]
+Test, der einen Reverse-DNS Eintrag erfordert, entfernt.
+
+1.133 2019-02-09
+================
+[Quiq::Array]
+Methode compare() in different() umbenannt (alter Name als Alias).
+
+[Quiq::Cascm]
+Klasse überarbeitet/erweitert.
+
+[Quiq::FileHandle]
+Methode slurpFromStdin() hinzugefügt.
+
+[Quiq::Parallel]
+Sammeln der Prozessausgabe in getrennten Dateien hinzugefügt (Optionen
+-outputDir, -outputFile)
+
+[Quiq::Path]
+Methode write() um Option .lock erweitert (für Nutzung via append())
+
+Methode truncate() hinzugefügt.
+
+[Quiq::Progress]
+Doku bearbeitet.
+
+[Quiq::Process]
+Methode user() um parameterlose Fassung erweitert (eigener Benutzername).
+
 1.132 2019-01-27
 ================
-In der Doku Abschnitt SEE ALSO vorgezogen.
+In der Doku global Abschnitt SEE ALSO vorgezogen.
+
+[Quiq::Cascm]
+Authentisierung mit verschlüsseltem Passwort credentialOptions() hinzugefügt.
+
+Methoden addFiles(), putFiles(), checkin(), checkout(), createPackage(),
+deletePackage(), demote(), promote(), version(), deleteVersion() hinzugefügt.
+
+[Quiq::FileHandle]
+Tilde-Expansion zu new()/open() hinzugefügt.
 
 [Quiq::MediaWiki::Client]
 Von Quiq::MediaWiki::Api umbenammt.
@@ -9,8 +49,11 @@ Methode load() implementiert.
 
 Doku überarbeitet.
 
-[Quiq::Cascm]
-Klasse substantiell erweitert.
+[Quiq::Path]
+Tilde-Expansion zu compare() hinzugefügt.
+
+[Quiq::Record]
+Format @@KEY@@ hinzugefügt.
 
 1.131 2019-01-21
 ================

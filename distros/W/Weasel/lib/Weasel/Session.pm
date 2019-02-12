@@ -5,7 +5,7 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =head1 VERSION
 
-0.03
+0.06
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =head1 DEPENDENCIES
 
-This module wraps L<Selenium::Remote::Driver>, version 2.
+
 
 =cut
 
@@ -45,11 +45,12 @@ use warnings;
 use Moose;
 use namespace::autoclean;
 
+use HTML::Selector::XPath;
 use Module::Runtime qw/ use_module /;;
 use Weasel::FindExpanders qw/ expand_finder_pattern /;
 use Weasel::WidgetHandlers qw| best_match_handler_class |;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 
 =head1 ATTRIBUTES
@@ -205,7 +206,7 @@ sub click {
         'click', ($element) ? 'clicking element' : 'clicking window');
 }
 
-=item find($element, $locator [, scheme => $scheme] [, %locator_args])
+=item find($element, $locator [, scheme => $scheme] [, widget_args => \@args ] [, %locator_args])
 
 Finds the first child of C<$element> matching C<$locator>.
 
@@ -229,7 +230,7 @@ sub find {
     return $rv;
 }
 
-=item find_all($element, $locator, [, scheme => $scheme] [, %locator_args ])
+=item find_all($element, $locator, [, scheme => $scheme] [, widget_args => \@args ] [, %locator_args ])
 
 Finds all child elements of C<$element> matching C<$locator>. Returns,
 depending on scalar or list context, an arrayref or a list with matching
@@ -242,11 +243,19 @@ See L<Weasel::Element>'s C<find_all> function for more documentation.
 sub find_all {
     my ($self, $element, $pattern, %args) = @_;
 
-    my $expanded_pattern = expand_finder_pattern($pattern, \%args);
+    my $expanded_pattern;
+    # if (exists $args{scheme} and $args{scheme} eq 'css') {
+    #     delete $args{scheme};
+    #     $expanded_pattern =
+    #         q{.} . HTML::Selector::XPath->new($pattern)->to_xpath;
+    # }
+    # else {
+    $expanded_pattern = expand_finder_pattern($pattern, \%args);
+    # }
     my @rv = $self->_logged(
         sub {
             return
-                map { $self->_wrap_widget($_) }
+                map { $self->_wrap_widget($_, $args{widget_args}) }
                 $self->driver->find_all($element->_id,
                                         $expanded_pattern,
                                         $args{scheme});
@@ -501,10 +510,11 @@ In case of multiple matches, selects the most specific match
 =cut
 
 sub _wrap_widget {
-    my ($self, $_id) = @_;
+    my ($self, $_id, $widget_args) = @_;
     my $best_class = best_match_handler_class(
         $self->driver, $_id, $self->widget_groups) // 'Weasel::Element';
-    return $best_class->new(_id => $_id, session => $self);
+    $widget_args //= [];
+    return $best_class->new(_id => $_id, session => $self, @{$widget_args});
 }
 
 =back
@@ -543,7 +553,7 @@ L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 LICENSE AND COPYRIGHT
 
- (C) 2016  Erik Huelsmann
+ (C) 2016-2019  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

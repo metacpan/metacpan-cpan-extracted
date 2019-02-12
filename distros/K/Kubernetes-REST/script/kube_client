@@ -13,8 +13,9 @@ package T {
 
 use Kubernetes::REST;
 
+my $group = shift @ARGV;
 my $method = shift @ARGV;
-die "Usage $0 method param1 param1value ... paramN paramNvalue" if (not defined $method);
+die "Usage $0 group method param1 param1value ... paramN paramNvalue" if (not defined $method);
 
 my $params = ARGV::Struct->new(argv => [ '{', @ARGV, '}' ])->parse;
 
@@ -30,7 +31,7 @@ my $client = Kubernetes::REST->new(
   },
 );
 
-my $result = $client->$method(%$params);
+my $result = $client->$group->$method(%$params);
 
 use Data::Dumper;
 print Dumper($result);

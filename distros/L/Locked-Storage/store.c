@@ -8,19 +8,98 @@
 AddressRegion *new(int nSize)
 {
     AddressRegion *pAddressRegion = (AddressRegion *) malloc(sizeof (AddressRegion));
-    pAddressRegion->nSize = nSize;
-    pAddressRegion->nPageSize = getpagesize();
-
-    pAddressRegion->nBytes = (nSize * pAddressRegion->nPageSize * sizeof(char));
-
-    pAddressRegion->pBytes = (char *) malloc(pAddressRegion->nBytes); /* Allocate it */
-    mlock(pAddressRegion->pBytes, pAddressRegion->nBytes); /* lock it to memory */
-    memset(pAddressRegion->pBytes, 0, pAddressRegion->nBytes); /* clear it, this will stop copy on write as well */
+    pAddressRegion->pBytes = NULL;
     pAddressRegion->sBytes = 0;
     pAddressRegion->processLocked = 0;
-    pAddressRegion->memLocked = 1;
+    pAddressRegion->memLocked = 0;
+    pAddressRegion->nPageSize = pagesize(pAddressRegion);
 
+    if (nSize)
+    {
+        pAddressRegion->nSize = nSize;
+        pAddressRegion->nBytes = nSize * pAddressRegion->nPageSize * sizeof(char);
+	initialize(pAddressRegion);
+    }
     return pAddressRegion;
+}
+
+
+int initialize(AddressRegion *pAddressRegion)
+{
+    int r;
+    if (!pAddressRegion->pBytes)
+    {
+        pAddressRegion->pBytes = (char *) malloc(pAddressRegion->nBytes); /* Allocate it */
+        r = (!mlock(pAddressRegion->pBytes, pAddressRegion->nBytes)); /* lock it to memory */
+        memset(pAddressRegion->pBytes, 0, pAddressRegion->nBytes); /* clear it, this will stop copy on write as well */
+        pAddressRegion->memLocked = r;
+    }
+    return pAddressRegion->nBytes;
+}
+
+int process_locked(AddressRegion *pAddressRegion)
+{
+    return pAddressRegion->processLocked;
+}
+
+int is_locked(AddressRegion *pAddressRegion)
+{
+    return pAddressRegion->memLocked;
+}
+
+int set_pages(AddressRegion *pAddressRegion, int pages)
+{
+    int ps;
+    ps = pagesize(pAddressRegion);
+    return set_size(pAddressRegion, (pages * ps * (int)sizeof(char)));
+}
+
+int set_size (AddressRegion *pAddressRegion, int bytes)
+{
+    char *t;
+    int r, l;
+    if (pAddressRegion->pBytes) /* realloc (change size) */
+    {
+        /* first determine if we are growing or shrinking */
+        if (bytes <= pAddressRegion->nBytes)
+            l = bytes; /* new length is greater */
+        else
+            l = pAddressRegion->nBytes; /* new length is shorter */
+
+        t = (char *) malloc(bytes); /* new area as requested */
+        memset(t, 0, bytes); /* clear it */
+        r = (!mlock(t, bytes)); /* lock it */
+        if (pAddressRegion->sBytes) /* don't bother copying if there is nothing stored */
+        {
+            if (pAddressRegion->sBytes < l)
+                l = pAddressRegion->sBytes;
+            else
+                l = pAddressRegion->sBytes - 1;
+      
+            memcpy(t, pAddressRegion->pBytes, (size_t) l); /* copy up to the size stored or the size of the new block which ever is the smaler */
+            *(pAddressRegion->pBytes+bytes) = '\0'; /* terminate if we truncate */
+        }
+        memset(pAddressRegion->pBytes, 0, pAddressRegion->nBytes); /* clear the old data */
+        if (pAddressRegion->memLocked)
+            munlock(pAddressRegion->pBytes, pAddressRegion->nBytes); /* unlock it */
+	free(pAddressRegion->pBytes); /* free it */
+        /* update the stored info with the new memory info */
+        pAddressRegion->pBytes = t;
+        pAddressRegion->nBytes = bytes;
+        pAddressRegion->sBytes = l;
+        pAddressRegion->memLocked = r;
+    } else {
+        /* nothing stored, so just initialise */
+        pAddressRegion->nBytes = bytes;
+        initialize(pAddressRegion);
+    }
+    return pAddressRegion->nBytes;
+}
+
+int pagesize(AddressRegion *pAddressRegion)
+{
+    pAddressRegion->nPageSize = getpagesize();
+    return pAddressRegion->nPageSize;
 }
 
 void DESTROY(AddressRegion *pAddressRegion)
@@ -72,6 +151,9 @@ void dump(AddressRegion *pAddressRegion)
 
 char *get(AddressRegion *pAddressRegion)
 {
+    char empty[] = "";
+    if (!pAddressRegion->nBytes)
+	return empty;
     return pAddressRegion->pBytes;
 }
 
@@ -86,26 +168,22 @@ int store(AddressRegion *pAddressRegion, char *data, int len)
 
 int unlockall(AddressRegion *pAddressRegion)
 {
-    int r;
+    int r = -1;
     if (pAddressRegion->processLocked)
     {
         r = munlockall(); /* unlock the process */
         if (!r && pAddressRegion->memLocked)
-            mlock(pAddressRegion->pBytes, pAddressRegion->nBytes); /* relock it to memory */
+            mlock(pAddressRegion->pBytes, pAddressRegion->nBytes); /* relock the region in memory */
         pAddressRegion->processLocked = 0;
-    } else {
-        r = -1;
     }
     return r;
 }
 
 int lockall(AddressRegion *pAddressRegion)
 {
-    int r;
-    if (pAddressRegion->processLocked)
+    int r = -1;
+    if (!pAddressRegion->processLocked)
     {
-        r = -1;
-    } else {
         r = mlockall(MCL_CURRENT | MCL_FUTURE); /* Lock everything now and future */
         if (!r)
             pAddressRegion->processLocked = 1; /* Record that it's locked if it succeeded */

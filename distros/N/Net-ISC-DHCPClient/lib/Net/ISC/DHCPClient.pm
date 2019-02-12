@@ -11,11 +11,11 @@ Net::ISC::DHCPClient - ISC dhclient lease reader
 
 =head1 VERSION
 
-Version 0.02
+Version 0.10
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.10';
 
 
 use Net::ISC::DHCPClient::InetLease;
@@ -53,7 +53,7 @@ sub is_dhcp($$;$)
     if (defined($inteface_to_query) &&
         defined($self->{INTERFACE}) &&
         $self->{INTERFACE} ne $inteface_to_query) {
-        die "Cannot query $inteface_to_query.";
+        die sprintf("Cannot query interface %s, has %s.", $inteface_to_query, $self->{INTERFACE});
     }
     if (defined($self->{INTERFACE})) {
         if ($af eq 'inet') {
@@ -111,19 +111,23 @@ sub leases_af_inet6($)
 sub _read_lease_file($$$$)
 {
     my ($self, $path, $interface, $af) = @_;
-    my @lease_files;
+    my @isc_lease_files;
+    my @netplan_lease_files;
     my $leases = [];
 
     # Search for matching .lease files
     my $leasefile_re1;
     my $leasefile_re2;
+    my $leasefile_re3;
     if ($af eq 'inet') {
         if ($interface) {
             $leasefile_re1 = qr/^dhclient-(.*)?-($interface)\.lease$/;
             $leasefile_re2 = qr/^dhclient\.($interface)\.leases$/;
+            $leasefile_re3 = qr/^internal-(.*)?-($interface)\.lease$/;
         } else {
             $leasefile_re1 = qr/^dhclient-(.*)?-(.+)\.lease$/;
             $leasefile_re2 = qr/^dhclient\.(.+)\.leases$/;
+            $leasefile_re3 = qr/^internal-(.*)?-($interface)\.lease$/;
         }
     } elsif ($af eq 'inet6') {
         if ($interface) {
@@ -148,62 +152,94 @@ sub _read_lease_file($$$$)
         opendir(my $dh, $lease_path) or
             die "Cannot read lease directory $lease_path. Error: $!";
         my @all_files = readdir($dh);
-        @lease_files = grep { /$leasefile_re1/ && -f "$lease_path/$_" } @all_files;
-        @lease_files = grep { /$leasefile_re2/ && -f "$lease_path/$_" } @all_files if (!@lease_files);
+        @isc_lease_files = grep { /$leasefile_re1/ && -f "$lease_path/$_" } @all_files;
+        @isc_lease_files = grep { /$leasefile_re2/ && -f "$lease_path/$_" } @all_files if (!@isc_lease_files);
+        @netplan_lease_files = grep { /$leasefile_re3/ && -f "$lease_path/$_" } @all_files if ($leasefile_re3);
         closedir($dh);
 
-        if (@lease_files) {
-            @lease_files = map("$lease_path/$_", @lease_files);
-            last;
+        if (@isc_lease_files) {
+            @isc_lease_files = map("$lease_path/$_", @isc_lease_files);
         }
+        if (@netplan_lease_files) {
+            @netplan_lease_files = map("$lease_path/$_", @netplan_lease_files);
+        }
+        last if (@isc_lease_files || @netplan_lease_files);
     }
 
-    for my $leaseFile (@lease_files) {
+    for my $leaseFile (@isc_lease_files) {
         open (LEASEFILE, $leaseFile) or
             die "Cannot open leasefile $leaseFile. Error: $!";
 
         my $currentLease;
-        my $hasLease = 0;
+        my $hasIscLeaseData = 0;
         my $ia_type = [];
         while (<LEASEFILE>) {
             chomp();
             if (/^lease? \{/) {
-                $hasLease = 1;
+                $hasIscLeaseData = 1;
                 $currentLease = Net::ISC::DHCPClient::InetLease->new();
                 next;
             }
             if (/^lease6 \{/) {
-                $hasLease = 1;
+                $hasIscLeaseData = 1;
                 $currentLease = Net::ISC::DHCPClient::Inet6Lease->new();
                 next;
             }
             if (/^\}/) {
                 # dhclient will append lease information, newest is last.
                 # unshift() will place newest first.
-                unshift(@$leases, $currentLease) if ($hasLease);
-                $hasLease = 0;
+                unshift(@$leases, $currentLease) if ($hasIscLeaseData);
+                $hasIscLeaseData = 0;
                 next;
             }
 
-            if (!$hasLease) {
+            if (!$hasIscLeaseData) {
                 next;
             }
 
             s/^\s+//;   # Eat starting whitespace
-
-            $self->_af_inet_lease_parser($currentLease) if ($af eq 'inet');
-            $self->_af_inet6_lease_parser($currentLease, $ia_type) if ($af eq 'inet6');
-        }
+            $self->_isc_af_inet_lease_parser($currentLease, $_) if ($af eq 'inet');
+            $self->_isc_af_inet6_lease_parser($currentLease, $ia_type, $_) if ($af eq 'inet6');
+        } # end while (<LEASEFILE>)
+        close (LEASEFILE);
     }
 
-    close (LEASEFILE);
+    for my $leaseFile (@netplan_lease_files) {
+        open (LEASEFILE, $leaseFile) or
+            die "Cannot open leasefile $leaseFile. Error: $!";
+
+        my $currentLease;
+        my $ia_type = [];
+        while (<LEASEFILE>) {
+            chomp();
+            next if (!/^([^=]+)=(.*)$/);
+
+            my $freshLease = 0;
+            if (!$currentLease) {
+                $currentLease = Net::ISC::DHCPClient::InetLease->new();
+                $freshLease = 1;
+            }
+            $self->_netplan_af_inet_lease_parser($currentLease, $1, $2) if ($af eq 'inet');
+            if ($freshLease) {
+                # Netplan lease file doesn't have interface information in
+                # the file. Parse the filename for interface.
+                if ($leaseFile =~ /-([^-.]+)\.lease$/) {
+                    $currentLease->{INTERFACE} = $1;
+                }
+            }
+        } # end while (<LEASEFILE>)
+        close (LEASEFILE);
+
+        # There will be only 1 lease in the netplan lease file
+        unshift(@$leases, $currentLease) if ($currentLease);
+    }
 
     return $leases;
 }
 
-sub _af_inet_lease_parser($$)
+sub _isc_af_inet_lease_parser($$$)
 {
-    my ($self, $currentLease) = @_;
+    my ($self, $currentLease, $line) = @_;
 
     SWITCH: {
         # interface "eth1";
@@ -242,9 +278,9 @@ sub _af_inet_lease_parser($$)
     }
 }
 
-sub _af_inet6_lease_parser($$$)
+sub _isc_af_inet6_lease_parser($$$$)
 {
-    my ($self, $currentLease, $ia_type) = @_;
+    my ($self, $currentLease, $ia_type, $line) = @_;
 
     my $context = '';
     my $addr = '';
@@ -319,6 +355,76 @@ sub _af_inet6_lease_parser($$$)
             # option dhcp6.<option> <value>
             # Collect only global options, skip the IA options
             $currentLease->{OPTION}->{$1} = $2 if (!$context);
+            last SWITCH;
+        };
+    }
+}
+
+sub _netplan_af_inet_lease_parser($$$$)
+{
+    my ($self, $currentLease, $variable, $value) = @_;
+
+    SWITCH: {
+        # ADDRESS=62.248.219.173
+        $variable eq "ADDRESS" && do {
+            $currentLease->{FIXED_ADDRESS} = $value;
+            last SWITCH;
+        };
+        # NETMASK=255.255.255.0
+        $variable eq "NETMASK" && do {
+            $currentLease->{OPTION}{'subnet-mask'} = $value;
+            last SWITCH;
+        };
+        # ROUTER=62.248.219.1
+        $variable eq "ROUTER" && do {
+            $currentLease->{OPTION}{'routers'} = $value;
+            last SWITCH;
+        };
+        # SERVER_ADDRESS=195.74.3.56
+        $variable eq "SERVER_ADDRESS" && do {
+            $currentLease->{OPTION}{'dhcp-server-identifier'} = $value;
+            last SWITCH;
+        };
+        # DNS=195.197.54.100 212.54.0.3
+        $variable eq "DNS" && do {
+            # Have the IP-list comma separated
+            $currentLease->{OPTION}{'domain-name-servers'} = ($value =~ s/ +/,/gr);
+            last SWITCH;
+        };
+        # NTP=193.66.253.102 193.66.253.82
+        $variable eq "NTP" && do {
+            # Have the IP-list comma separated
+            $currentLease->{OPTION}{'ntp-servers'} = ($value =~ s/ +/,/gr);
+            last SWITCH;
+        };
+        # DOMAINNAME=elisa-laajakaista.fi
+        $variable eq "SERVER_ADDRESS" && do {
+            $currentLease->{OPTION}{'domain-name'} = $value;
+            last SWITCH;
+        };
+        # T1=3600
+        $variable eq "T1" && do {
+            # Take current time, and add the value on it.
+            # Nowhere near the actual value, but it's better than nothing!
+            my $leaseTime = time() + int($value);
+            $currentLease->{RENEW} = $leaseTime;
+            last SWITCH;
+        };
+        # T2=6300
+        $variable eq "T2" && do {
+            # Take current time, and add the value on it.
+            # Nowhere near the actual value, but it's better than nothing!
+            my $leaseTime = time() + int($value);
+            $currentLease->{REBIND} = $leaseTime;
+            last SWITCH;
+        };
+        # LIFETIME=7200
+        $variable eq "LIFETIME" && do {
+            # Take current time, and add the value on it.
+            # Nowhere near the actual value, but it's better than nothing!
+            my $leaseTime = time() + int($value);
+            $currentLease->{OPTION}{'dhcp-lease-time'} = int($value);
+            $currentLease->{EXPIRE} = $leaseTime;
             last SWITCH;
         };
     }

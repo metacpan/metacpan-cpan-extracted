@@ -14,19 +14,19 @@
 # TODO: ExtUtils::Manifest - Submit bug report(?) regarding regexps starting with \b used as defaults when MANIFEST.SKIP is missing in ExtUtils::Manifest (suggest below alternatives using "(?:^|/)" as an improvement)
 
 # Avoid PACKAGE DISTRIBUTION FILES
-# :: ${dist_<X>} used; ok since these are BUILD generated files and 'clean'ed up (simply 'build clean' prior to running tools [such as 'cpansign'] using the default ExtUtils::Manifest code)
-##^${dist_path}/${dist_name}-${dist_version}\.tar\.gz$
-##^${dist_path}/${dist_name}-${dist_version}-PPM\.tar\.gz$
-##^${dist_path}/${dist_name}-${dist_version}\.tgz$
-##^${dist_path}/${dist_name}\.ppd$
-##^${dist_path}/${dist_name}-${dist_version}-[^/]*\.par$
-##^${dist_path}/${dist_name}-${dist_version}/
-^${dist_name}-${dist_version}\.tar\.gz$
-^${dist_name}-${dist_version}-PPM\.tar\.gz$
-^${dist_name}-${dist_version}\.tgz$
-^${dist_name}\.ppd$
-^${dist_name}-${dist_version}-[^/]*\.par$
-^${dist_name}-${dist_version}/
+# :: ($dist_<X>) used; ok since these are BUILD generated files and 'clean'ed up (simply 'build clean' prior to running tools [such as 'cpansign'] using the default ExtUtils::Manifest code)
+##^($dist_path)/($dist_name)-($dist_version)\.tar\.gz$
+##^($dist_path)/($dist_name)-($dist_version)-PPM\.tar\.gz$
+##^($dist_path)/($dist_name)-($dist_version)\.tgz$
+##^($dist_path)/($dist_name)\.ppd$
+##^($dist_path)/($dist_name)-($dist_version)-[^/]*\.par$
+##^($dist_path)/($dist_name)-($dist_version)/
+^($dist_name)-($dist_version)\.tar\.gz$
+^($dist_name)-($dist_version)-PPM\.tar\.gz$
+^($dist_name)-($dist_version).tgz$
+^($dist_name)\.ppd$
+^($dist_name)-($dist_version)-[^/]*\.par$
+^($dist_name)-($dist_version)/
 
 # # :: Avoid VERSION
 # ^VERSION$

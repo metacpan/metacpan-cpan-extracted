@@ -5,39 +5,9 @@ use warnings;
 use Config;
 use File::Glob qw( bsd_glob );
 use ExtUtils::MakeMaker ();
-use IPC::Cmd qw( can_run );
+use IPC::Cmd ();
 use lib 'inc';
 use My::ShareConfig;
-
-sub _pkg_config_exe
-{
-  foreach my $cmd ($ENV{PKG_CONFIG}, qw( pkgconf pkg-config ))
-  {
-    next unless defined $cmd;
-    return $cmd if can_run($cmd);
-  }
-  return;
-}
-
-our $VERBOSE = !!$ENV{V};
-
-sub _pkg_config
-{
-  my(@args) = @_;
-  my $cmd = _pkg_config_exe;
-  if(defined $cmd)
-  {
-    my @cmd = ($cmd, @args);
-    print "+@cmd\n" if $VERBOSE;
-    system @cmd;
-    return $? == 0;
-  }
-  else
-  {
-    print "no pkg-config.\n";
-    return;
-  }
-}
 
 sub myWriteMakefile
 {
@@ -58,9 +28,19 @@ sub myWriteMakefile
   }
   else
   {
-    if(_pkg_config('--exists', 'libffi'))
+    require Alien::FFI::pkgconfig    if $^O ne 'MSWin32';
+    require Alien::FFI::PkgConfigPP  if $^O eq 'MSWin32';
+    if($^O eq 'MSWin32' && Alien::FFI::PkgConfigPP->exists)
     {
-      print "using system libffi via @{[ _pkg_config_exe ]}\n";
+      print "using system libffia via PkgConfigPP\n";
+      $share_config->set(alien => { class => 'Alien::FFI::PkgConfigPP', mode => 'system' });
+      require Alien::Base::Wrapper;
+      Alien::Base::Wrapper->import( 'Alien::FFI::PkgConfigPP', 'Alien::psapi', '!export' );
+      %alien = Alien::Base::Wrapper->mm_args;
+    }
+    elsif($^O ne 'MSWin32' && Alien::FFI::pkgconfig->exists)
+    {
+      print "using system libffi via @{[ Alien::FFI::pkgconfig->pkg_config_exe ]}\n";
       $share_config->set(alien => { class => 'Alien::FFI::pkgconfig', mode => 'system' });
       require Alien::Base::Wrapper;
       Alien::Base::Wrapper->import( 'Alien::FFI::pkgconfig', 'Alien::psapi', '!export' );
@@ -255,8 +235,7 @@ sub postamble {
     "\t$noecho\$(FULLPERL) inc/mm-clean.pl\n" .
     "\t$noecho\$(RM_RF) _mm ffi-probe-*\n\n";
 
-  # TODO: remove this conditional at a later date
-  if($^O =~ /bsd$/)
+  if(1)
   {
     # Workaround for the tireless testers out there
     # who want to make -jX a thing.  For some reason.

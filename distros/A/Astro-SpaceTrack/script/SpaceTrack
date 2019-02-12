@@ -15,7 +15,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.125';
+our $VERSION = '0.126';
 
 use Astro::SpaceTrack qw{shell};
 use Getopt::Long 2.39;

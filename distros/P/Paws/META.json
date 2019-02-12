@@ -4,7 +4,7 @@
       "Jose Luis Martinez <jlmartinez@capside.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
@@ -26,17 +26,6 @@
             "Data::Printer" : "0",
             "Devel::Cover" : "0",
             "Devel::CoverReport" : "0",
-            "Dist::Zilla" : "0",
-            "Dist::Zilla::Plugin::Git::Check" : "0",
-            "Dist::Zilla::Plugin::Git::GatherDir" : "0",
-            "Dist::Zilla::Plugin::Git::Push" : "0",
-            "Dist::Zilla::Plugin::Git::Tag" : "0",
-            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
-            "Dist::Zilla::Plugin::RunExtraTests" : "0",
-            "Dist::Zilla::Plugin::Test::Compile" : "0",
-            "Dist::Zilla::Plugin::UploadToCPAN" : "0",
-            "Dist::Zilla::Plugin::VersionFromMainModule" : "0",
-            "Dist::Zilla::PluginBundle::Git" : "0",
             "EV" : "0",
             "Furl" : "0",
             "Future::Mojo" : "0.003",
@@ -59,13 +48,13 @@
             "ARGV::Struct" : "0",
             "Config::INI" : "0",
             "Data::Compare" : "0",
+            "DataStruct::Flat" : "0",
             "DateTime" : "0",
             "DateTime::Format::ISO8601" : "0",
             "Digest::SHA" : "0",
             "File::HomeDir" : "0",
             "Getopt::Long" : "0",
             "HTTP::Tiny" : "0",
-            "Hash::Flatten" : "0",
             "IO::Socket::SSL" : "0",
             "JSON::MaybeXS" : "0",
             "Module::Find" : "0",
@@ -112,7 +101,8 @@
          "web" : "https://github.com/pplu/aws-sdk-perl"
       }
    },
-   "version" : "0.38",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
+   "version" : "0.39",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

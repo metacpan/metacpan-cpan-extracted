@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.132;
+our $VERSION = 1.134;
 
 use JSON ();
 use Quiq::Debug;
@@ -234,7 +234,7 @@ sub asString {
 
 =head1 VERSION
 
-1.132
+1.134
 
 =head1 AUTHOR
 

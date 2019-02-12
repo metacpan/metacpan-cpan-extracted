@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.132;
+our $VERSION = 1.134;
 
 use Quiq::Fibu::Buchung;
 
@@ -339,6 +339,46 @@ sub toBuchungen {
                 vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
                 betrag => '-1465,50',
                 text => 'Nebenkosten Nachzahlung',
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /21.12.18 VISA CARD/) {
+        push @arr,
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-0,99',
+                text => 'Samsung Cloud Service (2018-09-26)',
+                beleg => 0,
+            ),
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-6,32',
+                text => 'github.com (2018-11-27)',
+                beleg => 1,
+            ),
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,77',
+                text => 'Amazon Server (2018-12-04)',
+                beleg => 1,
+            ),
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                betrag => '-7,68',
+                text => 'Privatentnahme',
+                beleg => 0,
+            ),
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                betrag => '-21,95',
+                text => 'Privatentnahme',
+                beleg => 0,
+            ),
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                betrag => '-100,00',
+                text => 'Spende Gemeinnützige Wikimedia',
+                beleg => 0,
             ),
         ;
     }
@@ -785,6 +825,14 @@ sub toBuchungen {
             ),
         ;
     }
+    elsif ($self->buchungshinweis =~ /VOLLERSTATTUNG TAXI.*HUK-COBURG/) {
+        push @arr,
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldzugänge / Einlage von Privat',
+                text => 'Gutschrift KFZ-Versicherung',
+            ),
+        ;
+    }
     elsif ($self->buchungshinweis =~
             /DE94ZZZ00000561653305-6681488-1906758 AMZN/) {
         push @arr,
@@ -799,6 +847,14 @@ sub toBuchungen {
                 text => 'Ladegerät',
                 betrag => '-21,98',
                 beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /305-9887306-3881955 Amazon/) {
+        push @arr,
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                text => 'Privat',
             ),
         ;
     }
@@ -1273,7 +1329,7 @@ sub saldoZahl {
 
 =head1 VERSION
 
-1.132
+1.134
 
 =head1 AUTHOR
 

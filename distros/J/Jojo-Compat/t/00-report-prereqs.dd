@@ -1,0 +1,49 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.28'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build' => '0.28'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Encode' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Importer::Zim' => '0',
+                                      'Module::Spec::V2' => '0',
+                                      'Mojo::Base' => '0',
+                                      'Mojo::Util' => '0',
+                                      'Mojolicious' => '7.55',
+                                      'Role::Tiny' => '2.000006',
+                                      'constant' => '0',
+                                      'experimental' => '0',
+                                      'feature' => '0',
+                                      'perl' => '5.018',
+                                      'strict' => '0',
+                                      'utf8' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96'
+                                 }
+                 }
+     };
+  $x;
+ }

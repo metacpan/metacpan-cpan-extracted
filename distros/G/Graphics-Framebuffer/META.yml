@@ -4,7 +4,7 @@ author:
   - 'Richard Kelsch <rich@rk-internet.com>'
 build_requires:
   List::Util: '1.20'
-  Test::Most: '0.30'
+  Test::More: '1.00'
 configure_requires:
   ExtUtils::MakeMaker: '4.52'
   Inline::MakeMaker: '0.45'
@@ -29,5 +29,5 @@ requires:
   Math::Gradient: '0.03'
   Math::Trig: '1.10'
   perl: '5.008'
-version: '6.18'
+version: '6.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

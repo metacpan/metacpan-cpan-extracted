@@ -10,9 +10,9 @@ MODULE = Locked::Storage		PACKAGE = Locked::Storage
 PROTOTYPES: ENABLE
 
 Locked::Storage
-new(package, nSize)
+new(package, nSize = 0)
 	char *package
-	int   nSize
+	int   nSize;
 	CODE:
 	RETVAL = new(nSize);
 	OUTPUT:
@@ -40,7 +40,33 @@ int
 lockall(pAddressRegion)
 	Locked::Storage pAddressRegion
 
-void
+int
 unlockall(pAddressRegion)
+	Locked::Storage pAddressRegion
+
+int
+is_locked(pAddressRegion)
+	Locked::Storage pAddressRegion
+
+int
+process_locked(pAddressRegion)
+	Locked::Storage pAddressRegion
+
+int
+initialize(pAddressRegion)
+	Locked::Storage pAddressRegion
+
+int
+set_pages(pAddressRegion, pages)
+	Locked::Storage pAddressRegion
+	int	 pages
+
+int
+set_size(pAddressRegion, bytes)
+	Locked::Storage pAddressRegion
+	int	 bytes
+
+int
+pagesize(pAddressRegion)
 	Locked::Storage pAddressRegion
 

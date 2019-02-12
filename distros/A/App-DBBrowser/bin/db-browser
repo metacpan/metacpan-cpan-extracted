@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.057';
+our $VERSION = '2.060';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.057
+Version 2.060
 
 =cut
 
@@ -227,9 +227,6 @@ This entry is available only if enabled in L</Subqueries>.
 
 Join tables.
 
-In the I<foreign-key> menu one can choose a different comparison operator by selecting the prompt line (I<Choose FOREIGN
-KEY column:>).
-
 =head3 Union
 
 Combine the result from multiple SELECT statements.
@@ -331,7 +328,7 @@ Like I<Copy and Paste> with the difference that the data is read from a chosen f
 
 =item Settings
 
-Selecting I<Settings> allows one to set the options described in the option group L</Input> for the current
+Selecting I<Settings> allows one to set the options described in the option group L</Get Data> for the current
 database.
 
 =back
@@ -816,7 +813,7 @@ to the default value (dot).
 
 Enable/disable C<File::Find> warnings when searching for C<SQLite> databases.
 
-=head2 Input
+=head2 Get Data
 
 =head3 Parse Tool
 

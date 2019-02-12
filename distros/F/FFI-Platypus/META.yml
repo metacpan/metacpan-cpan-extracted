@@ -8,7 +8,9 @@ build_requires:
   Test::More: '0.98'
   perl: '5.008001'
 configure_requires:
+  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '7.12'
+  ExtUtils::ParseXS: '3.30'
   IPC::Cmd: '0'
   perl: '5.008001'
 dynamic_config: 1
@@ -35,7 +37,7 @@ resources:
   bugtracker: https://github.com/Perl5-FFI/FFI-Platypus/issues
   homepage: https://metacpan.org/pod/FFI::Platypus
   repository: git://github.com/Perl5-FFI/FFI-Platypus.git
-version: '0.80'
+version: '0.82'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'
@@ -48,6 +50,6 @@ x_contributors:
   - 'Shlomi Fish (shlomif)'
   - 'Damyan Ivanov'
   - 'Ilya Pavlov (Ilya33)'
-x_generated_by_perl: v5.29.4
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

@@ -30,7 +30,8 @@
         Queue => [ 'General' ],
         LookupType => 'RT::Queue-RT::Ticket',
         ConditionedByCF => 3,
-        ConditionedBy => 'Passed',
+        ConditionedBy => 'Failed',
+        ConditionedByOp => "isn't",
     },
     {
         Name => 'Conditioned with multiple values',

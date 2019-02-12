@@ -51,8 +51,7 @@ foreach my $data (
     my $str = q[
         use re '/aa';
         my $greeting = 'hello world';
-
-        my $greeting =~ s/hello/goodmorning/;
+        $greeting =~ s/hello/goodmorning/;
     ];
 
     my @violations = $critic->critique( \$str );
@@ -81,8 +80,7 @@ $critic = Perl::Critic->new(
 {
     my $str = q[
         my $greeting = 'hello world';
-
-        my $greeting =~ s/hello/goodmorning/aa;
+        $greeting =~ s/hello/goodmorning/aa;
     ];
 
     my @violations = $critic->critique( \$str );
@@ -108,8 +106,7 @@ $critic = Perl::Critic->new(
     my $str = q[
         use re '/aa';
         my $greeting = 'hello world';
-
-        my $greeting =~ s/hello/goodmorning/;
+        $greeting =~ s/hello/goodmorning/;
     ];
 
     my @violations = $critic->critique( \$str );
@@ -138,8 +135,7 @@ $critic = Perl::Critic->new(
 {
     my $str = q[
         my $greeting = 'hello world';
-
-        my $greeting =~ s/hello/goodmorning/aa;
+        $greeting =~ s/hello/goodmorning/aa;
     ];
 
     my @violations = $critic->critique( \$str );
@@ -165,8 +161,7 @@ $critic = Perl::Critic->new(
     my $str = q[
         use re '/aa';
         my $greeting = 'hello world';
-
-        my $greeting =~ s/hello/goodmorning/;
+        $greeting =~ s/hello/goodmorning/;
     ];
 
     my @violations = $critic->critique( \$str );

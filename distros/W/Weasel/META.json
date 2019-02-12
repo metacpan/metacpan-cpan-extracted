@@ -34,6 +34,7 @@
             "Weasel::Driver::Selenium2" : "0"
          },
          "requires" : {
+            "HTML::Selector::XPath" : "0",
             "List::Util" : "0",
             "Module::Runtime" : "0",
             "Moose" : "0",
@@ -50,16 +51,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ehuelsmann/weasel/issues"
+         "web" : "https://github.com/perl-weasel/weasel/issues"
       },
       "homepage" : "https://weasel.pm/",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/ehuelsmann/weasel.git",
-         "web" : "https://github.com/ehuelsmann/weasel"
+         "url" : "https://github.com/perl-weasel/weasel.git",
+         "web" : "https://github.com/perl-weasel/weasel"
       }
    },
-   "version" : "0.15",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

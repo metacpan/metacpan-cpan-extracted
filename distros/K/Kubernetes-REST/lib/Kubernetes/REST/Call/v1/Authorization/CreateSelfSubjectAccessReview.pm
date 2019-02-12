@@ -11,7 +11,11 @@ package Kubernetes::REST::Call::v1::Authorization::CreateSelfSubjectAccessReview
   
   has pretty => (is => 'ro', isa => Str);
   
-
+  sub _body_params { [
+  
+    { name => 'body' },
+  
+  ] }
   sub _url_params { [
   
   ] }

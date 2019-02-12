@@ -1,0 +1,14 @@
+Revision history for Getargs-Mixed
+
+1.04        2019-02-11
+        Added OO interface (new()) and -undef_ok option.
+
+1.03        2003-09-04
+        Bugfixes and additional tests.
+
+1.02        2003-09-03
+        Semicolon can come at the beginning of an argument name.
+
+1.01        2003-09-03
+        Initial version, released on an unsuspecting world.
+

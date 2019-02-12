@@ -1,0 +1,14 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+README.md
+lib/Convert/Base85.pm
+t/00-load.t
+t/01-encode.t
+t/interface.t
+t/pod-coverage.t
+t/pod.t
+META.json
+META.yml
+LICENSE

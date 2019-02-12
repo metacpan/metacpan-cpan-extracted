@@ -4,51 +4,77 @@ PerlX::Let - Syntactic sugar for lexical constants
 
 # VERSION
 
-version v0.0.1
+version v0.2.1
 
 # SYNOPSIS
 
 ```perl
 use PerlX::Let;
 
-let $val = "key" {
+let $x = 1,
+    $y = "string" {
 
-  if ( $a->($val} > $b->{$val} ) {
-
-    something( $val );
-
-  }
+    if ( ($a->($y} - $x) > ($b->{$y} + $x) )
+    {
+      something( $y, $x );
+    }
 
 }
 ```
 
 # DESCRIPTION
 
-The code
-
-```
-let $var = "thing" { ... }
-```
-
-is shorthand for
+This module allows you to define lexical constants using a new `let`
+keyword, for example, code such as
 
 ```perl
-{
-   use Const::Fast;
-   const $var => "thing";
-
-   ...
+if (defined $arg{username}) {
+  $row->update( { username => $arg{username} );
 }
 ```
 
+is liable to typos. You could simplify it with
+
+```perl
+let $key = "username" {
+
+  if (defined $arg{$key}) {
+    $row->update( { $key => $arg{$key} );
+  }
+
+}
+```
+
+This is roughly equivalent to using
+
+```perl
+use Const::Fast;
+
+{
+ const $key => "username";
+
+  if (defined $arg{$key}) {
+    $row->update( { $key => $arg{$key} );
+  }
+
+}
+```
+
+However, if the value does not contain a sigil, and the variable is a
+scalar, or you are using Perl v5.28 or later, this uses state
+variables so that the value is only set once.
+
 # KNOWN ISSUES
 
-This is an experimental version.
-
-The parsing of assignments is rudimentaly, and may fail when assigning
+The parsing of assignments is rudimentary, and may fail when assigning
 to another variable or the result of a function.
 
+Because this modifies the source code during compilation, the line
+numebrs may be changed.
+
 # SEE ALSO
+
+[Const::Fast](https://metacpan.org/pod/Const::Fast)
 
 [Keyword::Simple](https://metacpan.org/pod/Keyword::Simple)
 

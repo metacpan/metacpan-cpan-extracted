@@ -36,5 +36,5 @@ resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Mail-Message.git
-version: '3.007'
+version: '3.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

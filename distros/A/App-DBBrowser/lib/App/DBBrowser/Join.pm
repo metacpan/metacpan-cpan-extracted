@@ -8,6 +8,7 @@ use 5.008003;
 use List::MoreUtils qw( any );
 
 use Term::Choose     qw( choose );
+use Term::Form       qw();
 use Term::TablePrint qw( print_table );
 
 use App::DBBrowser::Auxil;
@@ -46,8 +47,6 @@ sub join_tables {
     MASTER: while ( 1 ) {
         $join = {};
         $join->{stmt} = "SELECT * FROM";
-        $join->{primary_keys} = [];
-        $join->{foreign_keys} = [];
         $join->{used_tables}  = [];
         $join->{aliases}      = [];
         $ax->print_sql( $join );
@@ -125,7 +124,7 @@ sub join_tables {
             $join_type =~ s/^-\s//;
             push @bu, [ $join->{stmt}, $join->{default_alias}, [ @{$join->{aliases}} ], [ @{$join->{used_tables}} ] ];
             $join->{stmt} .= " " . $join_type;
-            my $ok = $sf->__add_slave_and_condition( $join, $tables, $join_type, $info );
+            my $ok = $sf->__add_slave_with_join_condition( $join, $tables, $join_type, $info );
             if ( ! $ok ) {
                 ( $join->{stmt}, $join->{default_alias}, $join->{aliases}, $join->{used_tables} ) = @{pop @bu};
             }
@@ -142,9 +141,6 @@ sub join_tables {
         for my $alias ( @{$aliases_by_tables->{$table}} ) {
             for my $col ( @{$sf->{d}{col_names}{$table}} ) {
                 my $col_qt = $ax->quote_col_qualified( [ undef, $alias, $col ] );
-                #if ( any { $_ eq $col_qt } @{$join->{foreign_keys}} ) {
-                #    next;
-                #}
                 if ( any { $_ eq $col_qt } @$qt_columns ) {
                     next;
                 }
@@ -157,7 +153,7 @@ sub join_tables {
 }
 
 
-sub __add_slave_and_condition {
+sub __add_slave_with_join_condition {
     my ( $sf, $join, $tables, $join_type, $info ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
@@ -261,15 +257,12 @@ sub __add_join_condition {
         $avail_fk_cols{ $slave_alias . '.' . $col } = $ax->quote_col_qualified( [ undef, $slave_alias, $col ] );
     }
     $join->{stmt} .= " ON";
+    my $bu_stmt = $join->{stmt};
     my $AND = '';
-    my @bu_primary_key;
-    my @bu_foreign_key;
+    my @bu;
 
     JOIN_PREDICATE: while ( 1 ) {
-        my @pre = ( undef );
-        if ( $AND && @{$join->{primary_keys}} == @{$join->{foreign_keys}} ) {
-            push @pre, $sf->{i}{_confirm};
-        }
+        my @pre = ( undef, $AND ? $sf->{i}{_confirm} : () );
         my $fk_pre = '- ';
 
         PRIMARY_KEY: while ( 1 ) {
@@ -283,8 +276,8 @@ sub __add_join_condition {
                 { prompt => 'Choose PRIMARY KEY column:', undef => $sf->{i}{_back} }
             );
             if ( ! defined $pk_col ) {
-                if ( @bu_foreign_key ) {
-                    ( $join->{stmt}, $join->{primary_keys}, $join->{foreign_keys}, $AND ) = @{pop @bu_foreign_key};
+                if ( @bu ) {
+                    ( $join->{stmt}, $AND ) = @{pop @bu};
                     last PRIMARY_KEY;
                 }
                 return;
@@ -293,14 +286,23 @@ sub __add_join_condition {
                 if ( ! $AND ) {
                     return;
                 }
+                ( my $condition = $join->{stmt} ) =~ s/^\Q$bu_stmt\E\s//;
+                $join->{stmt} = $bu_stmt;
+                $ax->print_sql( $join );
+                my $tr = Term::Form->new();
+                # Readline
+                $condition = $tr->readline( 'Edit: ', { default => $condition, show_context => 1 } );
+                if ( ! defined $condition ) {
+                    return;
+                }
+                $join->{stmt} = $bu_stmt . " " . $condition;
                 return 1;
             }
             elsif ( any { $fk_pre . $_ eq $pk_col } keys %avail_fk_cols ) {
                 next PRIMARY_KEY;
             }
             $pk_col =~ s/^-\s//;
-            push @bu_primary_key, [ $join->{stmt}, [ @{$join->{primary_keys}} ], [ @{$join->{foreign_keys}} ], $AND ];
-            push @{$join->{primary_keys}}, $avail_pk_cols{$pk_col};
+            push @bu, [ $join->{stmt}, $AND ];
             $join->{stmt} .= $AND;
             $join->{stmt} .= " " . $avail_pk_cols{$pk_col} . " " . '=';
             last PRIMARY_KEY;
@@ -308,32 +310,17 @@ sub __add_join_condition {
 
         FOREIGN_KEY: while ( 1 ) {
             $ax->print_sql( $join );
-            my $hidden = 'Choose FOREIGN KEY column:';
             # Choose
             my $fk_col = $stmt_v->choose(
-                [ $hidden, undef, map( "- $_", sort keys %avail_fk_cols ) ],
-                { prompt => '', undef => $sf->{i}{_back}, default => 1 } ##
+                [ undef, map( "- $_", sort keys %avail_fk_cols ) ],
+                { prompt => 'Choose FOREIGN KEY column:', undef => $sf->{i}{_back} }
             );
             if ( ! defined $fk_col ) {
-                ( $join->{stmt}, $join->{primary_keys}, $join->{foreign_keys}, $AND ) = @{pop @bu_primary_key};
+                ( $join->{stmt}, $AND ) = @{pop @bu};
                 next JOIN_PREDICATE;
             }
-            elsif ( $fk_col eq $hidden ) {
-                my @comp_operators = map { " $_ " } qw|!= < > <= >= <> =|;
-                # Choose
-                my $choice = choose(
-                    [ undef, @comp_operators ],
-                    { %{$sf->{i}{lyt_stmt_h}}, prompt => 'Choose operator:' }
-                );
-                if ( defined $choice ) {
-                    $choice =~ s/\s//g;
-                    $join->{stmt} =~ s/=\z/$choice/;
-                }
-                next FOREIGN_KEY;
-            }
             $fk_col =~ s/^-\s//;
-            push @bu_foreign_key, [ $join->{stmt}, [ @{$join->{primary_keys}} ], [ @{$join->{foreign_keys}} ], $AND ];
-            push @{$join->{foreign_keys}}, $avail_fk_cols{$fk_col};
+            push @bu, [ $join->{stmt}, $AND ];
             $join->{stmt} .= " " . $avail_fk_cols{$fk_col};
             $AND = " AND";
             next JOIN_PREDICATE;

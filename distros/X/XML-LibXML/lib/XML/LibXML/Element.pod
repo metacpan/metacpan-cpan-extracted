@@ -10,30 +10,30 @@ XML::LibXML::Element - XML::LibXML Class for Element Nodes
   # Only methods specific to Element nodes are listed here,
   # see the XML::LibXML::Node manpage for other methods
 
-  $node = XML::LibXML::Element-E<gt>new( $name );
-  $node-E<gt>setAttribute( $aname, $avalue );
-  $node-E<gt>setAttributeNS( $nsURI, $aname, $avalue );
-  $avalue = $node-E<gt>getAttribute( $aname );
-  $avalue = $node-E<gt>getAttributeNS( $nsURI, $aname );
-  $attrnode = $node-E<gt>getAttributeNode( $aname );
-  $attrnode = $node-E<gt>getAttributeNodeNS( $namespaceURI, $aname );
-  $node-E<gt>removeAttribute( $aname );
-  $node-E<gt>removeAttributeNS( $nsURI, $aname );
-  $boolean = $node-E<gt>hasAttribute( $aname );
-  $boolean = $node-E<gt>hasAttributeNS( $nsURI, $aname );
-  @nodes = $node-E<gt>getChildrenByTagName($tagname);
-  @nodes = $node-E<gt>getChildrenByTagNameNS($nsURI,$tagname);
-  @nodes = $node-E<gt>getChildrenByLocalName($localname);
-  @nodes = $node-E<gt>getElementsByTagName($tagname);
-  @nodes = $node-E<gt>getElementsByTagNameNS($nsURI,$localname);
-  @nodes = $node-E<gt>getElementsByLocalName($localname);
-  $node-E<gt>appendWellBalancedChunk( $chunk );
-  $node-E<gt>appendText( $PCDATA );
-  $node-E<gt>appendTextNode( $PCDATA );
-  $node-E<gt>appendTextChild( $childname , $PCDATA );
-  $node-E<gt>setNamespace( $nsURI , $nsPrefix, $activate );
-  $node-E<gt>setNamespaceDeclURI( $nsPrefix, $newURI );
-  $node-E<gt>setNamespaceDeclPrefix( $oldPrefix, $newPrefix );
+  $node = XML::LibXML::Element->new( $name );
+  $node->setAttribute( $aname, $avalue );
+  $node->setAttributeNS( $nsURI, $aname, $avalue );
+  $avalue = $node->getAttribute( $aname );
+  $avalue = $node->getAttributeNS( $nsURI, $aname );
+  $attrnode = $node->getAttributeNode( $aname );
+  $attrnode = $node->getAttributeNodeNS( $namespaceURI, $aname );
+  $node->removeAttribute( $aname );
+  $node->removeAttributeNS( $nsURI, $aname );
+  $boolean = $node->hasAttribute( $aname );
+  $boolean = $node->hasAttributeNS( $nsURI, $aname );
+  @nodes = $node->getChildrenByTagName($tagname);
+  @nodes = $node->getChildrenByTagNameNS($nsURI,$tagname);
+  @nodes = $node->getChildrenByLocalName($localname);
+  @nodes = $node->getElementsByTagName($tagname);
+  @nodes = $node->getElementsByTagNameNS($nsURI,$localname);
+  @nodes = $node->getElementsByLocalName($localname);
+  $node->appendWellBalancedChunk( $chunk );
+  $node->appendText( $PCDATA );
+  $node->appendTextNode( $PCDATA );
+  $node->appendTextChild( $childname , $PCDATA );
+  $node->setNamespace( $nsURI , $nsPrefix, $activate );
+  $node->setNamespaceDeclURI( $nsPrefix, $newURI );
+  $node->setNamespaceDeclPrefix( $oldPrefix, $newPrefix );
 
 =head1 METHODS
 
@@ -45,21 +45,21 @@ Many functions listed here are extensively documented in the DOM Level 3 specifi
 
 =item new
 
-  $node = XML::LibXML::Element-E<gt>new( $name );
+  $node = XML::LibXML::Element->new( $name );
 
 This function creates a new node unbound to any DOM.
 
 
 =item setAttribute
 
-  $node-E<gt>setAttribute( $aname, $avalue );
+  $node->setAttribute( $aname, $avalue );
 
 This method sets or replaces the node's attribute C<<<<<< $aname >>>>>> to the value C<<<<<< $avalue >>>>>>
 
 
 =item setAttributeNS
 
-  $node-E<gt>setAttributeNS( $nsURI, $aname, $avalue );
+  $node->setAttributeNS( $nsURI, $aname, $avalue );
 
 Namespace-aware version of C<<<<<< setAttribute >>>>>>, where C<<<<<< $nsURI >>>>>> is a namespace URI, C<<<<<< $aname >>>>>> is a qualified name, and C<<<<<< $avalue >>>>>> is the value. The namespace URI may be null (empty or undefined) in order to
 create an attribute which has no namespace.
@@ -87,28 +87,28 @@ but is computed from a pointer to a namespace declaration attribute.
 
 =item getAttribute
 
-  $avalue = $node-E<gt>getAttribute( $aname );
+  $avalue = $node->getAttribute( $aname );
 
 If C<<<<<< $node >>>>>> has an attribute with the name C<<<<<< $aname >>>>>>, the value of this attribute will get returned.
 
 
 =item getAttributeNS
 
-  $avalue = $node-E<gt>getAttributeNS( $nsURI, $aname );
+  $avalue = $node->getAttributeNS( $nsURI, $aname );
 
 Retrieves an attribute value by local name and namespace URI.
 
 
 =item getAttributeNode
 
-  $attrnode = $node-E<gt>getAttributeNode( $aname );
+  $attrnode = $node->getAttributeNode( $aname );
 
 Retrieve an attribute node by name. If no attribute with a given name exists, C<<<<<< undef >>>>>> is returned.
 
 
 =item getAttributeNodeNS
 
-  $attrnode = $node-E<gt>getAttributeNodeNS( $namespaceURI, $aname );
+  $attrnode = $node->getAttributeNodeNS( $namespaceURI, $aname );
 
 Retrieves an attribute node by local name and namespace URI. If no attribute
 with a given localname and namespace exists, C<<<<<< undef >>>>>> is returned.
@@ -116,21 +116,21 @@ with a given localname and namespace exists, C<<<<<< undef >>>>>> is returned.
 
 =item removeAttribute
 
-  $node-E<gt>removeAttribute( $aname );
+  $node->removeAttribute( $aname );
 
 The method removes the attribute C<<<<<< $aname >>>>>> from the node's attribute list, if the attribute can be found.
 
 
 =item removeAttributeNS
 
-  $node-E<gt>removeAttributeNS( $nsURI, $aname );
+  $node->removeAttributeNS( $nsURI, $aname );
 
 Namespace version of C<<<<<< removeAttribute >>>>>>
 
 
 =item hasAttribute
 
-  $boolean = $node-E<gt>hasAttribute( $aname );
+  $boolean = $node->hasAttribute( $aname );
 
 This function tests if the named attribute is set for the node. If the
 attribute is specified, TRUE (1) will be returned, otherwise the return value
@@ -139,14 +139,14 @@ is FALSE (0).
 
 =item hasAttributeNS
 
-  $boolean = $node-E<gt>hasAttributeNS( $nsURI, $aname );
+  $boolean = $node->hasAttributeNS( $nsURI, $aname );
 
 namespace version of C<<<<<< hasAttribute >>>>>>
 
 
 =item getChildrenByTagName
 
-  @nodes = $node-E<gt>getChildrenByTagName($tagname);
+  @nodes = $node->getChildrenByTagName($tagname);
 
 The function gives direct access to all child elements of the current node with
 a given tagname, where tagname is a qualified name, that is, in case of
@@ -160,7 +160,7 @@ found.
 
 =item getChildrenByTagNameNS
 
-  @nodes = $node-E<gt>getChildrenByTagNameNS($nsURI,$tagname);
+  @nodes = $node->getChildrenByTagNameNS($nsURI,$tagname);
 
 Namespace version of C<<<<<< getChildrenByTagName >>>>>>. A special nsURI '*' matches any namespace URI, in which case the function
 behaves just like C<<<<<< getChildrenByLocalName >>>>>>.
@@ -171,7 +171,7 @@ found.
 
 =item getChildrenByLocalName
 
-  @nodes = $node-E<gt>getChildrenByLocalName($localname);
+  @nodes = $node->getChildrenByLocalName($localname);
 
 The function gives direct access to all child elements of the current node with
 a given local name. It makes things a lot easier if one needs to handle big
@@ -183,7 +183,7 @@ found.
 
 =item getElementsByTagName
 
-  @nodes = $node-E<gt>getElementsByTagName($tagname);
+  @nodes = $node->getElementsByTagName($tagname);
 
 This function is part of the spec. It fetches all descendants of a node with a
 given tagname, where C<<<<<< tagname >>>>>> is a qualified name, that is, in case of namespace usage it may consist of a
@@ -194,7 +194,7 @@ In SCALAR context this function returns an L<<<<<< XML::LibXML::NodeList >>>>>> 
 
 =item getElementsByTagNameNS
 
-  @nodes = $node-E<gt>getElementsByTagNameNS($nsURI,$localname);
+  @nodes = $node->getElementsByTagNameNS($nsURI,$localname);
 
 Namespace version of C<<<<<< getElementsByTagName >>>>>> as found in the DOM spec. A special C<<<<<< localname >>>>>> '*' can be used to match any local name and C<<<<<< nsURI >>>>>> '*' can be used to match any namespace URI.
 
@@ -203,7 +203,7 @@ In SCALAR context this function returns an L<<<<<< XML::LibXML::NodeList >>>>>> 
 
 =item getElementsByLocalName
 
-  @nodes = $node-E<gt>getElementsByLocalName($localname);
+  @nodes = $node->getElementsByLocalName($localname);
 
 This function is not found in the DOM specification. It is a mix of
 getElementsByTagName and getElementsByTagNameNS. It will fetch all tags
@@ -215,7 +215,7 @@ In SCALAR context this function returns an L<<<<<< XML::LibXML::NodeList >>>>>> 
 
 =item appendWellBalancedChunk
 
-  $node-E<gt>appendWellBalancedChunk( $chunk );
+  $node->appendWellBalancedChunk( $chunk );
 
 Sometimes it is necessary to append a string coded XML Tree to a node. I<<<<<< appendWellBalancedChunk >>>>>> will do the trick for you. But this is only done if the String is C<<<<<< well-balanced >>>>>>.
 
@@ -231,28 +231,28 @@ This form is more explicit and makes it easier to control the flow of a script.
 
 =item appendText
 
-  $node-E<gt>appendText( $PCDATA );
+  $node->appendText( $PCDATA );
 
 alias for appendTextNode().
 
 
 =item appendTextNode
 
-  $node-E<gt>appendTextNode( $PCDATA );
+  $node->appendTextNode( $PCDATA );
 
 This wrapper function lets you add a string directly to an element node.
 
 
 =item appendTextChild
 
-  $node-E<gt>appendTextChild( $childname , $PCDATA );
+  $node->appendTextChild( $childname , $PCDATA );
 
 Somewhat similar with C<<<<<< appendTextNode >>>>>>: It lets you set an Element, that contains only a C<<<<<< text node >>>>>> directly by specifying the name and the text content.
 
 
 =item setNamespace
 
-  $node-E<gt>setNamespace( $nsURI , $nsPrefix, $activate );
+  $node->setNamespace( $nsURI , $nsPrefix, $activate );
 
 setNamespace() allows one to apply a namespace to an element. The function
 takes three parameters: 1. the namespace URI, which is required and the two
@@ -308,7 +308,7 @@ with the same prefix but different namespace URI.
 
 =item setNamespaceDeclURI
 
-  $node-E<gt>setNamespaceDeclURI( $nsPrefix, $newURI );
+  $node->setNamespaceDeclURI( $nsPrefix, $newURI );
 
 EXPERIMENTAL IN 1.61 !
 
@@ -332,7 +332,7 @@ This function is NOT part of any DOM API.
 
 =item setNamespaceDeclPrefix
 
-  $node-E<gt>setNamespaceDeclPrefix( $oldPrefix, $newPrefix );
+  $node->setNamespaceDeclPrefix( $oldPrefix, $newPrefix );
 
 EXPERIMENTAL IN 1.61 !
 
@@ -382,7 +382,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0133
+2.0134
 
 =head1 COPYRIGHT
 

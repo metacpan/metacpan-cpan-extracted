@@ -34,6 +34,7 @@ sub import {
     $class->export_to_level(1);
 
     require RT::Extension::ConditionalCustomFields;
+    RT->Config->Set('DevelMode', 1);
 }
 
 1;

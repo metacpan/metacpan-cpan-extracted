@@ -235,9 +235,6 @@ sub config_insert {
                 ];
                 my $prompt = '"Text::CSV"';
                 $sf->__group_readline( $section, $items, $prompt );
-                if ( $sf->{o}{$section}{sep_char} =~ /\\t/ ) {
-                    $sf->{o}{$section}{sep_char}=~ s/\\t/\t/g;
-                }
             }
             elsif ( $opt eq '_options_csv' ) {
                 my $prompt = '"Text::CSV"';
@@ -281,7 +278,7 @@ sub __menus {
             { name => 'config_menu',     text => "- Menu"   },
             { name => 'config_sql',      text => "- SQL",   },
             { name => 'config_output',   text => "- Output" },
-            { name => 'config_insert',   text => "- Input" },
+            { name => 'config_insert',   text => "- Get Data" },
         ],
         config_database => [
             { name => 'plugins',      text => "- DB Plugins", section => 'G' },

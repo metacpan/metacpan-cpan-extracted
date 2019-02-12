@@ -1,6 +1,6 @@
 package Map::Tube::NYC::Line::BMTNassauStreet;
 
-$Map::Tube::NYC::Line::BMTNassauStreet::VERSION   = '0.62';
+$Map::Tube::NYC::Line::BMTNassauStreet::VERSION   = '0.63';
 $Map::Tube::NYC::Line::BMTNassauStreet::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::NYC::Line::BMTNassauStreet - NYC Subway Map: BMT Nassau Street Line.
 
 =head1 VERSION
 
-Version 0.62
+Version 0.63
 
 =head1 DESCRIPTION
 

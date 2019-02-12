@@ -5,14 +5,14 @@
 
 type Distribution {
   name: String!
-  # A list of prerequisites
+  "A list of prerequisites"
   prerequisites: [Prerequisite]
   version: String!
 }
 
 input DistributionInput {
   name: String!
-  # A list of prerequisites
+  "A list of prerequisites"
   prerequisites: [PrerequisiteInput]
   version: String!
 }
@@ -41,7 +41,7 @@ input EnvironmentToolchainInput {
   value: String
 }
 
-# The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.
+"The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem."
 enum Grade {
   fail
   na
@@ -81,7 +81,7 @@ input LanguageVariablesInput {
 }
 
 type Mutation {
-  # Submit a new report to CPAN Testers
+  "Submit a new report to CPAN Testers"
   v3_report_post(report: NewReportInput!): AcceptedReports
 }
 
@@ -93,7 +93,7 @@ input NewReportInput {
   result: ResultInput!
 }
 
-# Language data for Perl 5 reports
+"Language data for Perl 5 reports"
 type Perl_5 implements Language {
   archname: String!
   build: String
@@ -103,7 +103,7 @@ type Perl_5 implements Language {
   version: String!
 }
 
-# Language data for Perl 6 reports
+"Language data for Perl 6 reports"
 type Perl_6 implements Language {
   archname: String!
   backend: Perl_6Backend
@@ -134,43 +134,43 @@ input PrerequisiteInput {
 }
 
 type Query {
-  # Get summary test report info about all CPAN releases
+  "Get summary test report info about all CPAN releases"
   v3_release_all: [Release]
-  # Get summary test report info for releases by an author
+  "Get summary test report info for releases by an author"
   v3_release_author(author: String!, since: DateTime): [Release]
-  # Get summary test report info for releases of a distribution
+  "Get summary test report info for releases of a distribution"
   v3_release_dist(dist: String!, since: DateTime): [Release]
-  # Fetch report data from CPAN Testers
+  "Fetch report data from CPAN Testers"
   v3_report_get(id: String!): Report
-  # Get test report summary info for a specific version of a distribution
+  "Get test report summary info for a specific version of a distribution"
   v3_summary(dist: String!, version: String!): [ReportSummary]
-  # Get all uploads to CPAN
+  "Get all uploads to CPAN"
   v3_upload_all(since: DateTime): [Upload]
-  # Get uploads for an author
+  "Get uploads for an author"
   v3_upload_author(author: String!, since: DateTime): [Upload]
-  # Get uploads for a dist
+  "Get uploads for a dist"
   v3_upload_dist(dist: String!, since: DateTime): [Upload]
 }
 
-# A summary of test reports for a single CPAN release
+"A summary of test reports for a single CPAN release"
 type Release {
-  # The CPAN ID of the author who released this version of this distribution
+  "The CPAN ID of the author who released this version of this distribution"
   author: String
-  # The distribution name
+  "The distribution name"
   dist: String
-  # The number of test failures for this release
+  "The number of test failures for this release"
   fail: Int
-  # The number of NA results for this release, which means the release does not apply to the tester\'s machine due to OS, Perl version, or other conditions
+  "The number of NA results for this release, which means the release does not apply to the tester\'s machine due to OS, Perl version, or other conditions"
   na: Int
-  # The number of test passes for this release
+  "The number of test passes for this release"
   pass: Int
-  # The number of unknown reports for this release
+  "The number of unknown reports for this release"
   unknown: Int
-  # The distribution release version
+  "The distribution release version"
   version: String
 }
 
-# CPAN Testers report
+"CPAN Testers report"
 type Report {
   comments: String
   created: String
@@ -181,27 +181,27 @@ type Report {
   result: Result!
 }
 
-# Flattened summary data from the test report data structure
+"Flattened summary data from the test report data structure"
 type ReportSummary {
-  # The date/time of the report in ISO8601 format
+  "The date/time of the report in ISO8601 format"
   date: String
-  # The name of the distribution tested
+  "The name of the distribution tested"
   dist: String
-  # The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.
+  "The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem."
   grade: Grade
-  # The GUID of the full report this data came from
+  "The GUID of the full report this data came from"
   guid: String
-  # The name of the operating system, like \'linux\', \'MSWin32\', \'darwin\'
+  "The name of the operating system, like \'linux\', \'MSWin32\', \'darwin\'"
   osname: String
-  # The version of the operating system, like \'4.8.0-2-amd64\'
+  "The version of the operating system, like \'4.8.0-2-amd64\'"
   osvers: String
-  # The Perl version that ran the tests, like \'5.24.0\'
+  "The Perl version that ran the tests, like \'5.24.0\'"
   perl: String
-  # The Perl platform that ran the tests, like \'x86_64-linux\'
+  "The Perl platform that ran the tests, like \'x86_64-linux\'"
   platform: String
-  # The name/email of the reporter who submitted this report
+  "The name/email of the reporter who submitted this report"
   reporter: String
-  # The version of the distribution tested
+  "The version of the distribution tested"
   version: String
 }
 
@@ -218,9 +218,9 @@ input ReporterInput {
 type Result {
   duration: Int
   failures: Int
-  # The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.
+  "The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem."
   grade: Grade!
-  # At least one of the properties must be set
+  "At least one of the properties must be set"
   output: TestOutput!
   skipped: Int
   tests: Int
@@ -231,9 +231,9 @@ type Result {
 input ResultInput {
   duration: Int
   failures: Int
-  # The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.
+  "The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem."
   grade: Grade!
-  # At least one of the properties must be set
+  "At least one of the properties must be set"
   output: TestOutputInput!
   skipped: Int
   tests: Int
@@ -283,7 +283,7 @@ input SystemVariablesInput {
   value: String
 }
 
-# At least one of the properties must be set
+"At least one of the properties must be set"
 type TestOutput {
   build: String
   configure: String
@@ -292,7 +292,7 @@ type TestOutput {
   uncategorized: String
 }
 
-# At least one of the properties must be set
+"At least one of the properties must be set"
 input TestOutputInput {
   build: String
   configure: String
@@ -301,17 +301,17 @@ input TestOutputInput {
   uncategorized: String
 }
 
-# A release to CPAN
+"A release to CPAN"
 type Upload {
-  # The CPAN ID of the author who released this version of this distribution
+  "The CPAN ID of the author who released this version of this distribution"
   author: String
-  # The distribution name
+  "The distribution name"
   dist: String
-  # The filename on PAUSE, without the author directory
+  "The filename on PAUSE, without the author directory"
   filename: String
-  # The date/time the file was released to CPAN, in UTC
+  "The date/time the file was released to CPAN, in UTC"
   released: DateTime
-  # The distribution release version
+  "The distribution release version"
   version: String
 }
 '

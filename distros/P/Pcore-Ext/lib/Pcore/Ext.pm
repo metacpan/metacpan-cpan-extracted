@@ -1,4 +1,4 @@
-package Pcore::Ext v0.19.10;
+package Pcore::Ext v0.19.12;
 
 use Pcore -dist, -class;
 use Pcore::Util::Scalar qw[is_ref];
@@ -24,7 +24,7 @@ has locales   => ( init_arg => undef );
 has api_ver   => 'v1';
 has viewport  => ( init_arg => undef );
 has ext_type  => 'modern';
-has ext_ver   => 'v6.6.0';
+has ext_ver   => 'v6.7.0';
 has ext_theme => 'material';
 
 our $FRAMEWORK;
@@ -144,7 +144,7 @@ sub _scan_app_tree ($self) {
 # TODO
 sub _get_framework ($self) {
     my $ext_type = 'modern';    # $APP->{ $class->{app_name} }->{ext_type};
-    my $ext_ver  = 'v6.6.0';    # $APP->{ $class->{app_name} }->{ext_ver};
+    my $ext_ver  = 'v6.7.0';    # $APP->{ $class->{app_name} }->{ext_ver};
 
     # load extjs framework config, if not loaded
     if ( !exists $FRAMEWORK->{$ext_type}->{$ext_ver} ) {

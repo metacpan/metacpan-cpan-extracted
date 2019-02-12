@@ -3,11 +3,45 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+# check OS
 BEGIN{
 	unless ( $^O =~ /MSWin32|cygwin/i ){
 		die "OS $^O unsupported!"; 
 	}
 }
+# check robocopy.exe
+BEGIN{
+	require File::Spec;
+	my $robocopy;
+	# exe in ENV has precedence
+	if ( $ENV{PERL_ROBOCOPY_EXE} ){
+		print "ENV var PERL_ROBOCOPY_EXE set with value: [$ENV{PERL_ROBOCOPY_EXE}]\n";
+		$robocopy = $ENV{PERL_ROBOCOPY_EXE};
+	}
+	# ..or we check in PATH
+	# gently 'inspired' by File::Which
+	# https://metacpan.org/source/PLICEASE/File-Which-1.23/lib/File/Which.pm
+	else{
+		my @paths = split( ';', $ENV{PATH} );
+		s/"//g for @paths;
+		@paths = grep length, @paths;
+		foreach my $dir ( @paths ){
+			my $candidate = File::Spec->catfile( $dir, 'robocopy.exe' );
+			if ( -e -s $candidate ){
+				$robocopy = $candidate;
+				last;
+			}
+		}	
+	}
+	unless ( -e -s $robocopy ){
+			die "given executable [$robocopy] is not here or is empty\n";
+	}
+	my $ret = system "$robocopy /? >nul 2>&1";
+	die "[$robocopy /? >nul 2>&1] did not returned the expected value" unless 16 == ($ret>>8);
+	# all went well..
+	print "[$robocopy] seems to be valid\n"
+}
+
 
 WriteMakefile(
     NAME             => 'Win32::Backup::Robocopy',

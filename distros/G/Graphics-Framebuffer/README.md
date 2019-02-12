@@ -23,12 +23,12 @@ To make your system ready for this module, then please install the following:
 ### DEBIAN BASED SYSTEMS (Ubuntu, Mint, Raspian, etc):
 
 `sudo apt update`
-`sudo apt install build-essential linux-headers libimager-perl libinline-c-perl libmath-gradient-perl libmath-bezier-perl libfile-map-perl libtest-most-perl libsys-cpu-perl fonts-wine`
+`sudo apt install build-essential linux-headers libimager-perl libinline-c-perl libmath-gradient-perl libmath-bezier-perl libfile-map-perl libtest-more-perl libsys-cpu-perl fonts-wine`
 
 ### REDHAT BASED SYSTEMS (Fedora, CentOS, etc):
 
 `sudo yum update`
-`sudo yum upgrade kernel-headers build-essential perl-math-gradient perl-math-bezier perl-file-map perl-imager perl-inline-c perl-sys-cpu`
+`sudo yum upgrade kernel-headers build-essential perl-math-gradient perl-math-bezier perl-file-map perl-imager perl-inline-c perl-sys-cpu perl-test-more`
 
 ## Continuing...
 

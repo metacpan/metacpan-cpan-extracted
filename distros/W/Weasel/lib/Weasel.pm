@@ -5,7 +5,7 @@ Weasel - Perl's php/Mink-inspired abstracted web-driver framework
 
 =head1 VERSION
 
-0.15
+0.18
 
 =head1 SYNOPSIS
 
@@ -104,7 +104,7 @@ methods.
 
 =head1 DEPENDENCIES
 
-This module wraps L<Selenium::Remote::Driver>, version 2.
+
 
 =cut
 
@@ -116,7 +116,7 @@ use warnings;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.15';
+our $VERSION = '0.18';
 
 # From https://w3c.github.io/webdriver/webdriver-spec.html#keyboard-actions
 my %key_codes = (

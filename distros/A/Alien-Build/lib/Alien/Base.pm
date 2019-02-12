@@ -9,7 +9,7 @@ use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 sub import {
@@ -335,15 +335,25 @@ sub dynamic_libs {
     }
 
     my $name = $class->config('ffi_name');
-    unless(defined $name) {
+    unless(defined $name)
+    {
       $name = $class->config('name');
       # strip leading lib from things like libarchive or libffi
       $name =~ s/^lib//;
       # strip trailing version numbers
       $name =~ s/-[0-9\.]+$//;
     }
+
+    my @libpath;
+    foreach my $flag ($class->split_flags($class->libs))
+    {
+      if($flag =~ /^-L(.*)$/)
+      {
+        push @libpath, $1;
+      }
+    }
     
-    return FFI::CheckLib::find_lib(lib => $name);
+    return FFI::CheckLib::find_lib(lib => $name, libpath => \@libpath);
   
   } else {
   
@@ -515,7 +525,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 

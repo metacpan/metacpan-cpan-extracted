@@ -2,7 +2,16 @@ use strict;
 use warnings;
 
 package SpiceParser;
-use parent 'Text::Parser';
+use Moose;
+extends 'Text::Parser';
+
+use Exception::Class (
+    'SpiceParser::Exception',
+    'SpiceParser::Exception::ReadOnlyAttribute' => {
+        isa   => 'SpiceParser::Exception',
+        alias => 'throw_no_change_attribute',
+    }
+);
 
 use constant { SPICE_LINE_CONTD => qr/^[+]\s*/, };
 
@@ -33,9 +42,19 @@ sub join_last_line {
     return $last . $line;
 }
 
-sub new {
-    my $pkg = shift;
-    $pkg->SUPER::new( auto_chomp => 1, multiline_type => 'join_last' );
+sub BUILDARGS {
+    my $class = shift;
+    return { multiline_type => 'join_last', auto_chomp => 1 };
+}
+
+before multiline_type => \&_dont_allow_overwrite;
+before auto_chomp     => \&_dont_allow_overwrite;
+before auto_trim      => \&_dont_allow_overwrite;
+
+sub _dont_allow_overwrite {
+    my $self = shift;
+    throw_no_change_attribute error => '' if @_;
+    super();
 }
 
 sub trim {
@@ -77,13 +96,15 @@ is( $sp->auto_chomp,     1,           'Auto-chomp is turned on' );
 throws_ok {
     $sp->multiline_type('join_next');
 }
-'Moose::Exception::CannotAssignValueToReadOnlyAccessor',
+'SpiceParser::Exception::ReadOnlyAttribute',
     'Exception thrown if you try to change the multiline_type';
+is( $sp->multiline_type, 'join_last', 'Retains old value' );
 throws_ok {
     $sp->auto_chomp(0);
 }
-'Moose::Exception::CannotAssignValueToReadOnlyAccessor',
+'SpiceParser::Exception::ReadOnlyAttribute',
     'Exception thrown if you try to change auto_chomp';
+ok( $sp->auto_chomp, 'Retains true value' );
 
 lives_ok { $sp->read('t/example-2.sp'); } 'Works fine';
 is( $sp->has_aborted,             1, 'Has aborted' );

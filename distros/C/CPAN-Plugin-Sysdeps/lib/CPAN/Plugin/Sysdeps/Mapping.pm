@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 # shortcuts
 #  os and distros
@@ -510,7 +510,7 @@ sub mapping {
 
      [cpanmod => 'Compress::LZMA::Simple',
       [os_freebsd,
-       [package => 'lzmalib']],
+       [package => 'lzmalib']], # warning: installing this package would cause subsequent failures in the Compress::Raw::Lzma test suite!
      ],
       
      [cpanmod => 'Compress::Raw::Lzma',
@@ -1508,10 +1508,14 @@ sub mapping {
      ],
 
      [cpanmod => 'HTML::Parser',
+      [os_freebsd,
+       [package => []]],
       [like_debian,
        [package => 'libc6-dev']],
       [like_fedora,
        [package => 'glibc-headers']],
+      [os_darwin,
+       [package => []]],
      ],
 
      [cpanmod => 'HTTP::Webdav',
@@ -1530,6 +1534,8 @@ sub mapping {
        [before_debian_stretch,
 	[package => []]], # not available?
        [package => 'libtidy-dev']],
+      [like_fedora,
+       [package => 'libtidy-devel']], # but compilation fails on centos6, some test failures on centos7, fedora28 currently OK
       [os_darwin,
        [package => 'tidy-html5']], # but does not work (-L and -I needs to be adjusted, Symbol not found: _tidyBufFree)
      ],
@@ -1688,6 +1694,28 @@ sub mapping {
        [package => [qw(freetype giflib libpng jpeg libtiff)]]],
      ],
 
+     [cpanmod => 'Imager::File::HEIF',
+      [os_freebsd,
+       [osvers => qr{^[456789]\.},
+	[package => []]],
+       [package => 'libheif']], # but does not seem to work with freebsd 10, only with 11 and later
+      [like_debian,
+       [before_ubuntu_bionic,
+	[package => []]],
+       [package => 'libheif-dev']],
+     ],
+
+     [cpanmod => 'Imager::File::JPEG',
+      [os_freebsd,
+       [package => [freebsd_jpeg]]],
+      [like_debian,
+       [package => [qw(libjpeg-dev)]]],
+      [like_fedora,
+       [package => [qw(libjpeg-turbo-devel)]]],
+      [os_darwin,
+       [package => [qw(jpeg)]]],
+     ],
+
      [cpanmod => 'Imager::File::WEBP',
       [os_freebsd,
        [package => 'webp']], # but tests fail with "undefined symbol: WebPFree" on older freebsd (9)
@@ -1695,6 +1723,8 @@ sub mapping {
        [package => 'libwebp-dev']], # but tests fail with "undefined symbol: WebPFree" on jessie+xenial
       [like_fedora,
        [package => 'libwebp-devel']], # but test or compilation failures with centos6+7; fedora28 works
+      [os_darwin,
+       [package => 'webp']],
      ],
 
      [cpanmod => 'Imager::Font::T1',
@@ -1708,6 +1738,9 @@ sub mapping {
       # not available anymore since jessie, also not in xenial
       [like_fedora,
        [package => 't1lib-devel']],
+      [os_darwin,
+       #[package => 't1lib']], # but tests fail
+       [package => []]], # ... and even worse: if t1lib is installed, then the Imager 1.008 test suite fails (https://rt.cpan.org/Ticket/Display.html?id=128145). So don't install it at all.
      ],
 
      # modules just needing java and nothing else:
@@ -1845,11 +1878,18 @@ sub mapping {
        [package => 'jq']],
      ],
 
+     # XXX check whether Kafka::Librd needs an external librdkafka
+     # at all, or if works with just the Alien package
      [cpanmod => 'Kafka::Librd',
       [os_freebsd,
        [package => 'librdkafka']],
       [like_debian,
-       [package => 'librdkafka-dev']]],
+       [package => 'librdkafka-dev']],
+      [like_fedora,
+       [package => 'librdkafka-devel']],
+      [os_darwin,
+       [package => 'librdkafka']],
+     ],
 
      [cpanmod => 'Kernel::Keyring',
       # linux-only
@@ -2670,11 +2710,13 @@ sub mapping {
       [like_debian,
        [package => ['libsnmp-dev', 'snmp-mibs-downloader']]]],
 
-     [cpanmod => 'Sort::Naturally::ICU',
+     [cpanmod => ['Sort::Naturally::ICU', 'Unicode::ICU::Collator'],
       [os_freebsd,
-       [package => 'icu']], # but build fails
+       [package => 'icu']], # but Sort::Naturally::ICU build fails
       [like_debian,
        [package => 'libicu-dev']],
+      [like_fedora, # Sort::Naturally::ICU builds on centos7 and fedora28, missing further packages on centos6
+       [package => 'libicu-devel']],
      ],
 
      [cpanmod => 'Speech::Recognizer::SPX',
@@ -2802,6 +2844,8 @@ sub mapping {
 	linuxdistroversion => qr{^6\.},
 	package => []], # N/A for centos6
        [package => 'libvterm-devel']],
+      [os_darwin,
+       [package => 'libvterm']],
      ],
 
      [cpanmod => 'Text::AI::CRM114',
@@ -3027,11 +3071,14 @@ sub mapping {
       [os_openbsd,
 	# doesn't work
        [package => 'curl']],
-      # XXX freebsd?
+      [os_freebsd,
+       [package => 'curl']],
       [like_debian,
        [package => 'libcurl4-openssl-dev | libcurl4-gnutls-dev | libcurl4-nss-dev']],
       [like_fedora,
        [package => 'libcurl-devel']],
+      [os_darwin,
+       [package => []]], # libcurl is in the base system
      ],
 
      [cpanmod => 'WWW::Mechanize::PhantomJS',
@@ -3069,6 +3116,8 @@ sub mapping {
        [package => 'libxml2-dev']],
       [like_fedora,
        [package => 'libxml2-devel']],
+      [os_darwin,
+       [package => []]], # libxml2.dylib is part of the base system
      ],
 
      [cpanmod => 'XML::LibXSLT',
@@ -3081,7 +3130,10 @@ sub mapping {
       [like_debian,
        [package => ['libxslt1-dev', 'libgdbm-dev']]],
       [like_fedora,
-       [package => 'libxslt-devel']]],
+       [package => 'libxslt-devel']],
+      [os_darwin,
+       [package => []]], # libxslt.dylib is part of the base system
+     ],
 
      [cpanmod => 'XML::Parser',
       [os_freebsd,

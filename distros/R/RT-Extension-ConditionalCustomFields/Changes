@@ -1,5 +1,116 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+1.00 2019-02-12
+ - Add tests with condition on empty value
+ - Add BoolanCustomField as eligible condition CF
+ - Update number of unitary tests
+
+1.00 2019-02-11
+ - Update Changes for version 0.99
+
+0.99 2019-02-11
+ - Add ConditionalOp in ConditionedBy attribute
+ - Add javascript function condition_is_met
+ - Add setting of ConditionedBy operation and CF with anytype
+ - Add ConditionedBy operation in Ajax return
+ - Update show/edit to handle any ConditionedBy CF type
+ - Upgrade version
+ - Configure DevelMode for tests
+ - Adapt tests for Select ConditionedBy CF and 'is' operation
+ - Default ConditionedBy operation to 'is' (backward compatibility for ConditionedBy attribute)
+ - Use jQuery.ajax with async=false instead of jQuery.getJSON (avoid unsync with phantomjs)
+ - Fix deleting attribute
+ - Fix default ConditionedBy operation to 'is'
+ - Update admin_cfs tests
+ - Fix storing attribute when only operation is changed
+ - Update admin_cfs test: test storing every operation for ConditionFreeformSingle CF
+ - Update admin_cfs test: test order with ConditionFreeformSingle as numbers
+ - Update admin_cfs test: test storing every operation for ConditionFreeformMultiple CF
+ - Make search insensitive for "matches"/"doesn't match" condition
+ - Update admin_cfs test: test every operation for ConditionTextSingle and ConditionalWikitextSingle CFs
+ - Update admin_cfs test: test every operation for ConditionImageSingle and ConditionalImageMultiple CFs
+ - Update admin_cfs test: test every operation for ConditionBinarySingle and ConditionalBinaryMultiple CFs
+ - Update admin_cfs test: test every operation for ConditionComboboxSingle CF
+ - Update admin_cfs test: test every operation for ConditionAutocompleteSingle ans ConditionalAutocompleteMultiple CFs
+ - Fix distinctive features between Date and DateTime CF
+ - Fix conversion from Current User Timezone to UTC only for DateTime, not Date
+ - Fix javascript variable 'res' undefined in scope where it was used
+ - Update admin_cfs test: test every operation for ConditionDateSingle CF
+ - Update admin_cfs test: test for ConditionDateTimeSingle with timezone shift
+ - Normalize IpAddresses to sort them as strings
+ - Update admin_cfs test: test for ConditionIPAddressSingle
+ - Update admin_cfs test: test for ConditionIPAddressMultiple
+ - Exclude IPAddressRange CFs from available Conditional CFs
+ - Use RT::ObjectCustomFieldValue->ParseIP to canonicalize IPAdresses
+ - Increase LWP timeout to please Selenium::Remote::Driver
+ - Fix Binary/Image/textarea CF conditionned by
+ - Add tests for Binary/Image/textarea CF conditionned by
+ - Rename edit tests for select/is
+ - Fix tests for adm Conbobox and Autocomplete
+ - Rename display tests for select/is
+ - Add tests for ticket display with Select condition and all operators
+ - Move sorting values for 'between' operator to SetConditionedBy
+ - Provide naturalSort as an alternative to Intl.Collator.compare to please phantomJS
+ - Add tests for ticket display with Freeform condition and all operators
+ - Make naturalSort case insensitive, as Intl.Collator.compare
+ - Add tests for ticket display with Text condition and all operators
+ - Add tests for ticket display with Wikitext condition and all operators
+ - Add tests for ticket display with Image condition and all operators
+ - Fix matches/doesn't match js processing (String.search returns -1 if not found)
+ - Add tests for ticket display with Binary condition and all operators
+ - Add tests for ticket display with Combobox condition and all operators
+ - Add tests for ticket display with Autocomplete condition and all operators
+ - Fix display of date without time for Date CF
+ - Add tests for ticket display with Date condition and all operators
+ - Fix user timezone for condition when checking whether condition is met for DateTime CF
+ - Add tests for ticket display with DateTime condition and all operators
+ - Fix sorting values for 'between' operator and IPAddress CFs
+ - Add tests for ticket display with IPAddress condition and all operators
+ - Fix assigning whole array for each elements
+ - Move normalizing IpAddresses and DateTime to SetConditionedBy
+ - Fix wrong variables names after factorization
+ - Fix timezone for tests on datetime CF
+ - Remove condition on IPAddressRange since this type is excluded
+ - Rename variables to have more explicit names
+ - Fix timezone for tests on admin datetime CFs
+ - Fix CondionedBy to return DateTime CFs in local timezone
+ - Add tests for IPv6 IPAddress CFs
+ - Add javascript rewriting of RT::ObjectCustomFieldValue::ParseIP()
+ - Use javascript ParseIP instead of converting IP to number
+ - Add tests for javascript rewriting of RT::ObjectCustomFieldValue::ParseIP()
+ - Replace js String.search(regex) by RegExp.test(string)
+ - Add tests for ticket modify with Select condition and all operators
+ - Add tests for ticket modify with Freeform condition and all operators
+ - Fix jQuery selector for Text CF
+ - Add tests for ticket modify with Text condition and all operators
+ - Factorize js function get_selector()
+ - Add tests for ticket modify with Wikitext condition and all operators
+ - Factorize js get_cf_current_form_values()
+ - Add tests for ticket modify with Image condition and all operators
+ - Try to upload image with phantomJS/ghostdriver/Selenium
+ - Do not use Selenium upload_file when phantomJS set file input locally
+ - Add tests for dynamically editing 'chosen' select CF
+ - Sync MANIFEST
+ - Fix trim text value for existing current values of Image/Binary CF
+ - Add tests for ticket modify with Binary condition and all operators
+ - Use symbolic links for image tested
+ - Add tests for ticket modify with Combobox condition and all operators
+ - Add tests for ticket modify with Autocomplete condition and all operators
+ - Add tests for ticket modify with Date condition and all operators
+ - Add tests for ticket modify with DateTime condition and all operators
+ - Add tests for ticket modify with IPAddress condition and all operators
+ - Add isn't operator for Date and Datetime CFs
+ - Add tests for isn't operator for Date and Datetime CFs
+ - Backward compatibility for ConditionedBy attribute (without operator defined, default to 'is')
+ - Add tests for backward compatibility for ConditionedBy attribute (without operator defined, default to 'is')
+ - Add tests for editing all types of conditioned by CFs
+ - Add tests for operation in initialdata
+ - Update pod
+
+0.16 2019-02-09
+ - Fix check visibility of 'chosen' widget for Select CF
+ - Add tests for 'chosen' select CF
+
 0.15 2019-01-24
  - Fix textarea CF conditionned byFix textarea CF conditionned by
  - Add tests for textarea CF conditionned by

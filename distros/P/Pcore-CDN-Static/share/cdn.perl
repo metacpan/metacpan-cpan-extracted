@@ -51,7 +51,7 @@
 
     # froala, https://www.froala.com/wysiwyg-editor
     froala2 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v2.9.1 );
+        my $ver = version->parse( $args->{ver} // v2.9.2 );
 
         if (wantarray) {
             my @res;
@@ -89,7 +89,7 @@
 
     # amCharts4
     amcharts4 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.1.3 );
+        my $ver = version->parse( $args->{ver} // v4.1.5 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4';
 
@@ -130,8 +130,7 @@
         if (wantarray) {
             my @res;
 
-            push @res, $cdn->get_script_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/pdf.min.js"        : $cdn->("/static/pdfjs/$ver/pdf.min.js") );
-            push @res, $cdn->get_script_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/pdf.worker.min.js" : $cdn->("/static/pdfjs/$ver/pdf.worker.min.js") );
+            push @res, $cdn->get_script_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/pdf.min.js" : $cdn->("/static/pdfjs/$ver/pdf.min.js") );
 
             return @res;
         }
@@ -142,7 +141,7 @@
 
     # ExtJS
     extjs6 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v6.6.0 );
+        my $ver = version->parse( $args->{ver} // v6.7.0 );
 
         if (wantarray) {
             my @res;
@@ -180,7 +179,7 @@
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (38)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (37)                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -11,11 +11,11 @@ BackupPC::Backups::Info - Restrieves info on BackupPC backups.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.1';
 
 
 =head1 SYNOPSIS
@@ -330,7 +330,7 @@ sub get_raw{
 		$self->warn;
 	};
 
-	my $data;
+	my $data='';
 	while ( my $line=$fh->getline ){
 		$data=$data.$line;
 	}

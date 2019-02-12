@@ -1355,3 +1355,19 @@ Revision history for Graphics-Framebuffer
 
       Holy smokes!  The META files weren't updating.  No wonder some people
       were having prerequisite issues.
+
+6.19  Feb 09, 2019
+
+      Consolidated and improved some internal code.
+
+      Fixed up the examples scripts.
+
+      Added the new mode method shortcuts.
+
+      This release is mostly an optimizing and clean up release.
+
+      Downgraded the testing requirements a bit.
+
+6.20  Feb 10, 2019
+
+      Fixed a code typo and updated the module's POD.

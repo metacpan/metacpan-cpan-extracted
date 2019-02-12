@@ -53,6 +53,7 @@
             "JSON" : "0",
             "Moo" : "0",
             "REST::Client" : "0",
+            "Role::Cache::LRU" : "0",
             "Role::REST::Client" : "0",
             "Sub::Quote" : "0",
             "Types::Common::String" : "0",
@@ -91,7 +92,7 @@
          "web" : "https://github.com/kianmeng/webservice-geoipify"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "Kian Meng Ang <kianmeng@users.noreply.github.com>"
    ],

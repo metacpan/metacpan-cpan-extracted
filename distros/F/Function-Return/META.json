@@ -1,7 +1,7 @@
 {
    "abstract" : "add return type for a function",
    "author" : [
-      "Kenta, Kobayashi <kentafly88@gmail.com>"
+      "kfly8 <kfly@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.2",
@@ -62,7 +62,7 @@
    "provides" : {
       "Function::Return" : {
          "file" : "lib/Function/Return.pm",
-         "version" : "0.03"
+         "version" : "0.031"
       },
       "Function::Return::Info" : {
          "file" : "lib/Function/Return/Info.pm"
@@ -79,9 +79,10 @@
          "web" : "https://github.com/kfly8/p5-Function-Return"
       }
    },
-   "version" : "0.03",
+   "version" : "0.031",
    "x_authority" : "cpan:KFLY",
    "x_contributors" : [
+      "Kenta Kobayashi <kentafly88@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.97001",

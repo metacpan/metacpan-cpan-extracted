@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.132;
+our $VERSION = 1.134;
 
 use Quiq::Sdoc::Line;
 use Quiq::Sdoc::Link;
@@ -621,7 +621,7 @@ sub dump {
 
 =head1 VERSION
 
-1.132
+1.134
 
 =head1 AUTHOR
 

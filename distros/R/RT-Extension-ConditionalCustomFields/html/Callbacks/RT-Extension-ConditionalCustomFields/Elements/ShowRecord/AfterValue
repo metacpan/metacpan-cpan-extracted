@@ -1,7 +1,7 @@
-% if ($attribute =~ /^CustomField.\{([^}]+)\}/) {
+% if ($attribute =~ /^CustomField\.\{([^}]+)\}/) {
 %   my $cf = $Object->LoadCustomFieldByIdentifier($1);
 %   if ($cf && $cf->id) {
-<& /Elements/ShowConditionalCustomFields, CustomField => $cf, ParentSelector => 'class' &>
+<& /Elements/ShowConditionalCustomFields, CustomField => $cf, Object => $Object, ParentSelector => 'class' &>
 %   }
 % }
 <%ARGS>

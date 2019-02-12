@@ -50,7 +50,7 @@
    "provides" : {
       "Types::Mojo" : {
          "file" : "lib/Types/Mojo.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "http://github.com/reneeb/Types-Mojo"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

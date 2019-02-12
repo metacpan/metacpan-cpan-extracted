@@ -208,7 +208,10 @@ defined $pn or $pn = 'undef';
 is($pn, 'undef', 'partnr of top is undef');
 is($message->body->part(0)->partNumber, '1', 'partNumber 1');
 is($message->body->part(1)->partNumber, '2', 'partNumber 2');
-is($message->body->part(0)->body->dispositionFilename('non-existent'), 'non-existent/part.html');
+
+my $disp = $message->body->part(0)->body->dispositionFilename('non-existent');
+$disp =~ s!\\!/!g;  # support windows
+is($disp, 'non-existent/part.html');
 
 my $m1 = Mail::Message->buildFromBody($body, From => 'me', To => 'you',
    Date => 'now', 'Message-Id' => '<simple>');

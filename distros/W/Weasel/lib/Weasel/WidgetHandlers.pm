@@ -37,7 +37,7 @@ Weasel::WidgetHandlers - Mapping elements to widget handlers
 
 =head1 DEPENDENCIES
 
-This module wraps L<Selenium::Remote::Driver>, version 2.
+
 
 =cut
 

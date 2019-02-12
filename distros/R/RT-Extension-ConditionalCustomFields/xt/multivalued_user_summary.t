@@ -32,6 +32,7 @@ $user->AddCustomFieldValue(Field => $cf_conditioned_by_child->id , Value => 'See
 
 my ($base, $m) = RT::Extension::ConditionalCustomFields::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
+$mjs->driver->ua->timeout(540);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 $mjs->get($m->rt_base_url . 'User/Summary.html?id=' . $user->id);
@@ -40,7 +41,7 @@ ok($user_cf_conditioned_by->is_displayed, 'Show ConditionalCF when no condition 
 my $user_cf_conditioned_by_child = $mjs->selector('.record-field.CustomField__'. $cf_conditioned_by_child->Name . '_', single => 1);
 ok($user_cf_conditioned_by_child->is_displayed, 'Show Child when no condition is set');
 
-$cf_conditioned_by->SetConditionedBy($cf_condition->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
+$cf_conditioned_by->SetConditionedBy($cf_condition->id, 'is', [$cf_values->[0]->Name, $cf_values->[2]->Name]);
 $mjs->get($m->rt_base_url . 'User/Summary.html?id=' . $user->id);
 $user_cf_conditioned_by = $mjs->selector('.record-field.CustomField__'. $cf_conditioned_by->Name . '_', single => 1);
 ok($user_cf_conditioned_by->is_displayed, 'Show ConditionalCF when first condition val is met');

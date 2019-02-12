@@ -49,6 +49,7 @@
             "SQL::Type::Guess" : "0",
             "Scalar::Util" : "0",
             "Spreadsheet::Read" : "0",
+            "String::Unescape" : "0",
             "Term::Choose" : "1.644",
             "Term::Choose::Constants" : "1.644",
             "Term::Choose::LineFold" : "1.644",
@@ -72,6 +73,6 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.057",
+   "version" : "2.060",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

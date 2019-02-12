@@ -30,8 +30,8 @@ lib/Pcore/Ext/Overrides/modern.pm
 share/data/ext/locale/de.perl
 share/data/ext/locale/ru.perl
 share/data/ext/material-themes.json
-share/data/ext/v6.6.0/classic.json
-share/data/ext/v6.6.0/modern.json
+share/data/ext/v6.7.0/classic.json
+share/data/ext/v6.7.0/modern.json
 share/dist-id.yaml
 share/dist.yaml
 share/l10n/l10n.pot

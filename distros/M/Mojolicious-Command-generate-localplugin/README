@@ -1,0 +1,73 @@
+NAME
+
+    Mojolicious::Command::Author::generate::localplugin - Plugin generator
+    command
+
+VERSION
+
+    version 0.05
+
+SYNOPSIS
+
+      Usage: APPLICATION generate localplugin [OPTIONS] [NAME]
+    
+        mojo generate localplugin
+        mojo generate localplugin TestPlugin
+    
+      Options:
+        -h, --help   Show this summary of available options
+
+DESCRIPTION
+
+    Mojolicious::Command::Author::generate::localplugin generates directory
+    structures for fully functional Mojolicious plugins.
+
+    See "COMMANDS" in Mojolicious::Commands for a list of commands that are
+    available by default.
+
+ATTRIBUTES
+
+    Mojolicious::Command::Author::generate::localplugin inherits all
+    attributes from Mojolicious::Command and implements the following new
+    ones.
+
+ description
+
+      my $description = $plugin->description;
+      $plugin         = $plugin->description('Foo');
+
+    Short description of this command, used for the command list.
+
+ usage
+
+      my $usage = $plugin->usage;
+      $plugin   = $plugin->usage('Foo');
+
+    Usage information for this command, used for the help screen.
+
+METHODS
+
+    Mojolicious::Command::Author::generate::plugin inherits all methods
+    from Mojolicious::Command and implements the following new ones.
+
+ run
+
+      $plugin->run(@ARGV);
+
+    Run this command.
+
+SEE ALSO
+
+    Mojolicious, Mojolicious::Guides, http://mojolicious.org.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2018 by Renee Baecker.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

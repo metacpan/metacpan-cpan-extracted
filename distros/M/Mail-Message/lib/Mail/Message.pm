@@ -1,4 +1,4 @@
-# Copyrights 2001-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2019 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Message;
 use vars '$VERSION';
-$VERSION = '3.007';
+$VERSION = '3.008';
 
 use base 'Mail::Reporter';
 
@@ -24,7 +24,7 @@ use Mail::Message::Body::Multipart ();
 use Mail::Message::Body::Nested ();
 
 use Carp;
-use Scalar::Util   'weaken';
+use Scalar::Util   qw(weaken blessed);
 
 BEGIN {
     unless($ENV{HARNESS_ACTIVE}) {   # no tests during upgrade
@@ -501,11 +501,17 @@ my $email_simple_converter;
 sub coerce($@)
 {   my ($class, $message) = @_;
 
-    ref $message
+    blessed $message
         or die "coercion starts with some object";
 
-    return bless $message, $class
-        if $message->isa(__PACKAGE__);
+	return $message
+		if ref $message eq $class;
+
+    if($message->isa(__PACKAGE__)) {
+        $message->head->modified(1);
+        $message->body->modified(1);
+        return bless $message, $class;
+	}
 
     if($message->isa('MIME::Entity'))
     {   unless($mime_entity_converter)
@@ -626,11 +632,11 @@ sub readBody($$;$$)
         {   $bodytype = $nbody  }
 
         $body = $bodytype->new
-        ( message => $self
-        , checked => $self->{MM_trusted}
-        , charset => 'us-ascii'
-        , $self->logSettings
-        );
+          ( message => $self
+          , checked => $self->{MM_trusted}
+          , charset => 'us-ascii'
+          , $self->logSettings
+          );
 
         $body->contentInfoFrom($head);
     }

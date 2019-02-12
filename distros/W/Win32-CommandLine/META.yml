@@ -73,13 +73,14 @@ no_index:
 provides:
   Win32::CommandLine:
     file: lib/Win32/CommandLine.pm
-    version: '0.958'
+    version: '0.960'
 recommends:
   Win32: '0'
   Win32::Security::SID: '0'
   Win32::TieRegistry: '0'
 requires:
   Carp::Assert: '0'
+  File::Globstar: '0'
   File::Which: '0'
   Pod::Usage: '1.30'
   perl: v5.8.8
@@ -89,6 +90,6 @@ resources:
   homepage: https://github.com/rivy/perl.Win32-CommandLine
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/rivy/perl.Win32-CommandLine.git
-version: '0.958'
+version: '0.960'
 x_authority: cpan:RIVY
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

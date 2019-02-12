@@ -1,0 +1,33 @@
+---
+abstract: 'Role to test PSGI-based JSON API using L<Test::Class::Moose>.'
+author:
+  - 'Ilya Chesnokov L<chesnokov@cpan.org>.'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Test::TCM::Role::API
+name: Test-TCM-Role-API
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTTP::Message: 0
+  JSON: 0
+  Moose: 0
+  Test::Deep: 0
+  Test::Differences: 0
+  Test::More: 0
+  perl: 5.20.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ichesnokov/p5-test-tcm-role-api
+version: 0.01

@@ -22,9 +22,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Cpanel::JSON::XS" : "4.08",
             "HTTP::Tiny" : "0",
-            "JSON" : "2.94",
-            "JSON::XS" : "3.04",
             "Pod::Perldoc" : "3.21",
             "URI" : "0"
          }
@@ -41,14 +40,11 @@
    "provides" : {
       "Geo::Coder::OpenCage" : {
          "file" : "lib/Geo/Coder/OpenCage.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/OpenCageData/perl-Geo-Coder-OpenCage/issues"
-      },
       "homepage" : "https://github.com/OpenCageData/perl-Geo-Coder-OpenCage",
       "repository" : {
          "type" : "git",
@@ -56,8 +52,8 @@
          "web" : "https://github.com/OpenCageData/perl-Geo-Coder-OpenCage"
       }
    },
-   "version" : "0.16",
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
+   "version" : "0.18",
+   "x_generated_by_perl" : "v5.26.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

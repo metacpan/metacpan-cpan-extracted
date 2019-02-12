@@ -38,29 +38,29 @@ type MultipleCommentsResponse {
 }
 
 type Mutation {
-  # Create an article
+  "Create an article"
   CreateArticle(article: NewArticleRequestInput!): SingleArticleResponse
-  # Create a comment for an article
+  "Create a comment for an article"
   CreateArticleComment(comment: NewCommentRequestInput!, slug: String!): SingleCommentResponse
-  # Favorite an article
+  "Favorite an article"
   CreateArticleFavorite(slug: String!): SingleArticleResponse
-  # Register a new user
+  "Register a new user"
   CreateUser(body: NewUserRequestInput!): UserResponse
-  # Delete an article
+  "Delete an article"
   DeleteArticle(slug: String!): String
-  # Delete a comment for an article
+  "Delete a comment for an article"
   DeleteArticleComment(id: Int!, slug: String!): String
-  # Unfavorite an article
+  "Unfavorite an article"
   DeleteArticleFavorite(slug: String!): SingleArticleResponse
-  # Follow a user
+  "Follow a user"
   FollowUserByUsername(username: String!): ProfileResponse
-  # Existing user login
+  "Existing user login"
   Login(body: LoginUserRequestInput!): UserResponse
-  # Unfollow a user
+  "Unfollow a user"
   UnfollowUserByUsername(username: String!): ProfileResponse
-  # Update an article
+  "Update an article"
   UpdateArticle(article: UpdateArticleRequestInput!, slug: String!): SingleArticleResponse
-  # Update current user
+  "Update current user"
   UpdateCurrentUser(body: UpdateUserRequestInput!): UserResponse
 }
 
@@ -105,19 +105,19 @@ type ProfileResponse {
 }
 
 type Query {
-  # Get an article
+  "Get an article"
   GetArticle(slug: String!): SingleArticleResponse
-  # Get comments for an article
+  "Get comments for an article"
   GetArticleComments(slug: String!): MultipleCommentsResponse
-  # Get recent articles globally
+  "Get recent articles globally"
   GetArticles(author: String, favorited: String, limit: Int, offset: Int, tag: String): MultipleArticlesResponse
-  # Get recent articles from users you follow
+  "Get recent articles from users you follow"
   GetArticlesFeed(limit: Int, offset: Int): MultipleArticlesResponse
-  # Get current user
+  "Get current user"
   GetCurrentUser: UserResponse
-  # Get a profile
+  "Get a profile"
   GetProfileByUsername(username: String!): ProfileResponse
-  # Get tags
+  "Get tags"
   get__tags: TagsResponse
 }
 

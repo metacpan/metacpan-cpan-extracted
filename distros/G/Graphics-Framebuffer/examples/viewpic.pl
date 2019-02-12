@@ -27,9 +27,9 @@ GetOptions(
 );
 
 our $f = Graphics::Framebuffer->new(
-    'SPLASH'        => 0,
-    'SHOW_ERRORS'   => 0,
-    'RESET'         => 1 - $noclear,
+    'SPLASH'      => 0,
+    'SHOW_ERRORS' => 0,
+    'RESET'       => 1 - $noclear,
 );
 
 my $info = $f->screen_dimensions();
@@ -52,20 +52,20 @@ my $image = $f->load_image(\%p);
 if (ref($image) eq 'ARRAY') {
     my $s = time + $delay;
     while (time < $s) {
-        $f->play_animation($image,1);
+        $f->play_animation($image, 1);
     }
 } else {
     if ($alpha < 255) {
         my $size = length($image->{'image'}) / $f->{'BYTES'};
-        $image->{'image'} &= pack('C4',255,255,255,0) x $size;
-        $image->{'image'} |= pack('C4',0,0,0,$alpha) x $size;
+        $image->{'image'} &= pack('C4', 255, 255, 255, 0) x $size;
+        $image->{'image'} |= pack('C4', 0, 0, 0, $alpha) x $size;
         $f->alpha_mode();
     } else {
         $f->normal_mode();
     }
     $f->blit_write($image);
     sleep $delay if ($delay);
-}
+} ## end else [ if (ref($image) eq 'ARRAY')]
 
 =head1 NAME
 

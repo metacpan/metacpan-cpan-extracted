@@ -1,6 +1,4 @@
 ---
-sudo: false     # use the container-based Travis infrastructure
-
 language: perl
 
 perl:
@@ -17,10 +15,9 @@ perl:
   # - "5.14"
   - "5.12"
   - "5.10"
+#   - "5.8.9"
+#   - "5.8.8"
   - "5.8"
-  - "5.6"
-  - "5.8.9"
-  - "5.8.8"
 
 env:
   global:
@@ -34,10 +31,9 @@ matrix:
   allow_failures:
     - perl: "blead"
     - perl: "dev"
-    - perl: "5.8"       ## allow perl v5.8 failures; (v5.8.x can be problematic for many projects)
-    - perl: "5.6"       ## allow perl v5.6 failures; (v5.6.x can be problematic for many projects)
     - perl: "5.8.9"     ## allow specific perl v5.8.9 failures; (v5.8.9 can be problematic for many projects)
     - perl: "5.8.8"     ## allow specific perl v5.8.8 failures; (v5.8.8 can be problematic for many projects)
+    - perl: "5.8"       ## allow perl v5.8 failures; (v5.8.x can be problematic for many projects)
     - perl: "stable"
       env: AUTHOR_TESTING=1 RELEASE_TESTING=1 TEST_SIGNATURE=1
 

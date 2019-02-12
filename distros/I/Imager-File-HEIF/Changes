@@ -1,0 +1,19 @@
+Imager-File-HEIF 0.002 11 Feb 2019
+======================
+
+Improve library probing to:
+
+ - reject too old libraries
+
+ - reject libraries without h.265 encoding (libx265) and decoding
+   (libde265)
+
+Imager-File-HEIF 0.001 10 Feb 2019
+======================
+
+Initial release.
+
+Supports reading and writing HEIF/HEIC images.
+
+You can specify the compression level or use lossless compression,
+though the RGB => YCbCr conversion makes that lossy too.

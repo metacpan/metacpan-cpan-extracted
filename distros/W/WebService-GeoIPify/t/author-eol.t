@@ -22,7 +22,6 @@ my @files = (
     't/01_instantiation.t',
     't/02_lookup.t',
     't/03_check.t',
-    't/04_cache.t',
     't/author-eol.t',
     't/author-minimum-version.t',
     't/author-pod-coverage.t',

@@ -7,14 +7,14 @@ use Exporter 'import';
 use ExtUtils::MakeMaker;
 use XS::Install::Payload;
 
-our $VERSION = '1.0.7';
+our $VERSION = '1.0.11';
 my $THIS_MODULE = 'XS::Install';
 
-our @EXPORT_OK = qw/write_makefile makemaker_args/;
+our @EXPORT_OK = qw/write_makefile makemaker_args not_available/;
 our @EXPORT;
 
 if ($0 =~ /Makefile.PL$/) {
-    @EXPORT = qw/write_makefile makemaker_args/;
+    @EXPORT = qw/write_makefile makemaker_args not_available/;
     _require_makemaker();
 }
 
@@ -121,6 +121,9 @@ sub makemaker_args {
         $cppv = 11 if $cppv < 11;
         _string_merge($params{CCFLAGS}, "-std=c++$cppv");
         
+        # prevent C++ from compile errors on perls <= 5.18, as perl had buggy <perl.h> prior to 5.20
+        _string_merge($params{CCFLAGS}, "-Wno-reserved-user-defined-literal -Wno-literal-suffix -Wno-unknown-warning-option") if $^V < v5.20;
+         
         _check_sjlj();
     }
     
@@ -756,17 +759,25 @@ sub _module_info_write {
     chmod $restore_mode, $file if $restore_mode; # restore old perms if we changed it
 }
 
+sub not_available {
+    my $msg = shift;
+    die "OS unsupported: $msg\n";
+}
+
 sub _check_sjlj {
-    return unless $^O eq 'MSWin32' && $Config{myuname} =~ /strawberry/;
+    return unless $^O eq 'MSWin32';
     my $out = `c++ -v 2>&1`;
-    if ($out =~ /--enable-sjlj-exceptions/) {
-        die "***************************************************************\n".
+    if ($out and $out =~ /--enable-sjlj-exceptions/) {
+        not_available(
+            "SJLJ compiler detected\n".
+            "***************************************************************\n".
             "You are using c++ compiler with SJLJ exceptions enabled.\n".
             "It makes it impossible to use C++ exceptions and perl together.\n".
             "You need to use compiler with DWARF2 or SEH exceptions configured.\n".
             "If you are using Strawberry Perl, install Strawberry 5.26 or higher\n".
             "where they use mingw with SEH exceptions.\n".
-            "***************************************************************\n";
+            "***************************************************************"
+        );
     }
 }
 

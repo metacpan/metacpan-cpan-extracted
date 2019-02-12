@@ -1,0 +1,45 @@
+<select name="<% $Name %>">
+% while (my $value = shift @values) {
+%   my $label = shift @labels;
+    <option value="<% $value %>"<% $Default eq $value ? ' selected="selected"' : '' %>><% $label %></option>
+% }
+</select>
+
+<%INIT>
+my @values = (
+    'matches',
+    "doesn't match",
+    'is',
+    "isn't",
+    'less than',
+    'greater than',
+    'between'
+);
+my @labels = (
+    loc('matches'),
+    loc("doesn't match"),
+    loc('is'),
+    loc("isn't"),
+    loc('less than'),
+    loc('greater than'),
+    loc('between')
+);
+if ($CustomField && $CustomField->Type) {
+    if ($CustomField->IsSelectionType) {
+        @values = ('is', "isn't");
+        @labels = (loc('is'), loc("isn't"));
+    } elsif ($CustomField->Type =~ /^Date(Time)?$/) {
+        @values = ('less than', 'is', "isn't", 'greater than', 'between');
+        @labels = (loc('before'), loc('on'), loc('not on'), loc('after'), loc('between'));
+    } elsif ($CustomField->Type eq 'IPAddress') {
+        @values = ('is', "isn't", 'less than', 'greater than', 'between');
+        @labels = (loc('is'), loc("isn't"), loc('less than'), loc('greater than'), loc('between'));
+    }
+}
+</%INIT>
+
+<%ARGS>
+$CustomField
+$Name => 'ConditionalOp'
+$Default => ''
+</%ARGS>

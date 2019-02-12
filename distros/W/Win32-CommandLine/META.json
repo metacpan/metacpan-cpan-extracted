@@ -84,6 +84,7 @@
          },
          "requires" : {
             "Carp::Assert" : "0",
+            "File::Globstar" : "0",
             "File::Which" : "0",
             "Pod::Usage" : "1.30",
             "perl" : "v5.8.8",
@@ -132,7 +133,7 @@
    "provides" : {
       "Win32::CommandLine" : {
          "file" : "lib/Win32/CommandLine.pm",
-         "version" : "0.958"
+         "version" : "0.960"
       }
    },
    "release_status" : "stable",
@@ -150,7 +151,7 @@
          "web" : "https://github.com/rivy/perl.Win32-CommandLine"
       }
    },
-   "version" : "0.958",
+   "version" : "0.960",
    "x_authority" : "cpan:RIVY",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

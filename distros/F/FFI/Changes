@@ -1,4 +1,11 @@
-Revision history for Perl extension FFI.
+Revision history for FFI
+
+1.14      2019-02-10 11:46:43 -0500
+  - New FFI::Platypus / libffi based implementation
+    (battle tested as Alt-FFI-Libffi)
+  - Numerous documentation updates and fixes
+  - Add `o` type, equivalent to FFI::Platypus
+    `opaque`.
 
 1.12  Thu May 31, 2018
   - Documentation
@@ -72,9 +79,3 @@ Revision history for Perl extension FFI.
 
 0.01  Fri Sep 24 13:06:36 1999
   - original version; created by h2xs 1.19
-
-
-
-
-
-

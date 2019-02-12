@@ -29,14 +29,15 @@
       "runtime" : {
          "requires" : {
             "Mojolicious" : "8.0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "5.008"
          }
       }
    },
    "provides" : {
       "Mojolicious::Command::Author::generate::localplugin" : {
          "file" : "lib/Mojolicious/Command/Author/generate/localplugin.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -51,7 +52,7 @@
          "web" : "http://github.com/reneeb/Mojolicious-Command-generate-localplugin"
       }
    },
-   "version" : "0.02",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

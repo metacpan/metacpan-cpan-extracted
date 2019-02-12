@@ -3,7 +3,7 @@ use warnings;
 package Dist::Zilla::Plugin::Run::Role::Runner;
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 use Moose::Role;
 use namespace::autoclean;
@@ -248,9 +248,10 @@ sub build_formatter {
 
         # build dir or mint dir
         d => sub {
+            require Path::Tiny;
             # stringify build directory
             my $dir = $params->{dir} || $self->zilla->built_in;
-            return "$dir" if $dir;
+            return Path::Tiny::path($dir)->canonpath if $dir;
             $self->log('attempting to use %d in before_build');
             '';
         },

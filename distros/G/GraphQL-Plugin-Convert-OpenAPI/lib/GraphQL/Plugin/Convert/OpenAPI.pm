@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use GraphQL::Schema;
 use GraphQL::Debug qw(_debug);
-use JSON::Validator::OpenAPI;
+use JSON::Validator::OpenAPI::Mojolicious;
 use OpenAPI::Client;
 
-our $VERSION = "0.17";
+our $VERSION = "0.19";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %TYPEMAP = (
@@ -491,7 +491,7 @@ sub _walk_type {
 sub to_graphql {
   my ($class, $spec, $app) = @_;
   my %appargs = (app => $app) if $app;
-  my $openapi_schema = JSON::Validator::OpenAPI->new(
+  my $openapi_schema = JSON::Validator::OpenAPI::Mojolicious->new(
     %appargs
   )->schema($spec)->schema;
   DEBUG and _debug('OpenAPI.schema', $openapi_schema);
@@ -572,7 +572,7 @@ GraphQL::Plugin::Convert::OpenAPI - convert OpenAPI schema to GraphQL schema
 =head1 DESCRIPTION
 
 This module implements the L<GraphQL::Plugin::Convert> API to convert
-a L<JSON::Validator::OpenAPI> specification to L<GraphQL::Schema> etc.
+a L<JSON::Validator::OpenAPI::Mojolicious> specification to L<GraphQL::Schema> etc.
 
 It uses, from the given API spec:
 

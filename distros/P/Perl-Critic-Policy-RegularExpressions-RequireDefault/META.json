@@ -62,7 +62,7 @@
    "provides" : {
       "Perl::Critic::Policy::RegularExpressions::RequireDefault" : {
          "file" : "lib/Perl/Critic/Policy/RegularExpressions/RequireDefault.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "https://github.com/jonasbn/perl-critic-policy-regularexpressions-requiredefault"
       }
    },
-   "version" : "2.00",
+   "version" : "2.01",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }

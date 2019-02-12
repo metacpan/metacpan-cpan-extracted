@@ -4,7 +4,7 @@
       "Kieren Diment <zarquon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
          "web" : "https://github.com/singingfish/p5-array-circular"
       }
    },
-   "version" : "0.002",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+   "version" : "0.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

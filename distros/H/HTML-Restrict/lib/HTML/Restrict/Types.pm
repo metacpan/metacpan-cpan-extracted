@@ -1,5 +1,5 @@
 package HTML::Restrict::Types;
-our $VERSION = 'v2.4.1';
+our $VERSION = 'v2.5.0';
 use strict;
 use warnings;
 
@@ -30,7 +30,7 @@ HTML::Restrict::Types - Type library for HTML::Restrict
 
 =head1 VERSION
 
-version v2.4.1
+version v2.5.0
 
 =head1 AUTHOR
 

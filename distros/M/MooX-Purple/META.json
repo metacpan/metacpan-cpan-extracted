@@ -1,5 +1,5 @@
 {
-   "abstract" : "purple",
+   "abstract" : "MooX::Purple",
    "author" : [
       "lnation <thisusedtobeanemail@gmail.com>"
    ],
@@ -41,6 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

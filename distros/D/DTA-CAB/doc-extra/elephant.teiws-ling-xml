@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI>
+  <text>
+    <!-- running headers are ignored by the tokenizer -->
+    <fw>Running header</fw>
+    <p>
+      <s xml:id="s1">
+        <w xml:id="w1" lemma="eine" pos="ART" norm="Ein">EJn</w>
+        <w xml:id="w2" lemma="zahm" pos="ADJA" norm="zahmer">zamer</w>
+        <w xml:id="w3" lemma="Elefant" pos="NN" norm="Elefant">Elephant</w>
+        <w xml:id="w4" lemma="gelten" pos="VVFIN" norm="gilt">gillt</w>
+        <w xml:id="w5" lemma="ungefähr" pos="ADJD" norm="ungefähr">ohngefähr</w>
+        <w xml:id="w6" lemma="zweihundert" pos="CARD" norm="zweihundert">zweyhundert</w>
+        <w xml:id="w7" lemma="Taler" pos="NN" norm="Taler">Thaler</w>
+      </s>
+    </p>
+    <!-- paragraph boundaries imply sentence boundaries, even without punctuation -->
+    <p>
+      <s xml:id="s2">
+        <w xml:id="w8" lemma="ceterum" pos="FM.la" norm="Ceterum">Ceterum</w>
+        <w xml:id="w9" lemma="censeo" pos="FM.la" norm="censeo">censeo</w>
+        <w xml:id="wa" lemma="carthaginem" pos="FM.la" norm="Carthaginem">Carthaginem</w>
+        <w xml:id="wb" lemma="esse" pos="FM.la" norm="esse">esse</w>
+        <w xml:id="wc" lemma="delendam" pos="FM.la" norm="delendam">delendam</w>
+      </s>
+    </p>
+  </text>
+</TEI>

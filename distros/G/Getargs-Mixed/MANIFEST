@@ -1,12 +1,25 @@
+Changes
+lib/Getargs/Mixed.pm
 Makefile.PL
 MANIFEST
-Mixed.pm
+MANIFEST.SKIP
 README
 t/errors.t
+t/errors_oo.t
 t/extra.t
+t/extra_oo.t
 t/method.t
+t/method_oo.t
 t/oddoptional.t
+t/oddoptional_oo.t
 t/optional.t
+t/optional_oo.t
 t/semifirst.t
+t/semifirst_oo.t
 t/sub.t
+t/sub_oo.t
 t/submethod.t
+t/submethod_oo.t
+t/undef_ok_oo.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

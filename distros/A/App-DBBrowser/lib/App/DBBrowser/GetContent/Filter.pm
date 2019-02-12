@@ -41,6 +41,7 @@ sub input_filter {
     my $various          = '&&';
     my $reset            = 'Reset';
     $sf->{empty_to_null} = $default_e2n;
+    $sf->{i}{idx_added_cols} = [];
     my $old_idx = 0;
 
     FILTER: while ( 1 ) {
@@ -104,7 +105,7 @@ sub input_filter {
             VARIOUS: while ( 1 ) {
                 $ax->print_sql( $sql );
                 my @pre = ( undef );
-                my $choices = [ @pre, $cols_to_rows, $split_table, $merge_rows, $split_col, $replace ];
+                my $choices = [ @pre, $cols_to_rows, $split_table, $merge_rows, $split_col, $replace, $reset ];
                  $ENV{TC_RESET_AUTO_UP} = 0;
                 # Choose
                 my $idx_v = $stmt_h->choose(
@@ -126,7 +127,12 @@ sub input_filter {
                 }
                 delete $ENV{TC_RESET_AUTO_UP};
                 my $filter = $choices->[$idx_v];
-                if ( $filter eq $cols_to_rows ) {
+                if ( $filter eq $reset ) {
+                    $sql->{insert_into_args} = [ map { [ @$_ ] } @$backup ];
+                    $sf->{empty_to_null} = $default_e2n;
+                    next VARIOUS;
+                }
+                elsif ( $filter eq $cols_to_rows ) {
                     $sf->__transpose_rows_to_cols( $sql );
                 }
                 elsif ( $filter eq $merge_rows ) {
@@ -343,11 +349,12 @@ sub __choose_range {
 sub __add_column {
     my ( $sf, $sql ) = @_;
     my $aoa = $sql->{insert_into_args};
-    my $end = $#{$aoa->[0]};
+    my $new_last_idx = $#{$aoa->[0]} + 1;
     for my $row ( @$aoa ) {
-        $#$row = $end + 1;
+        $#$row = $new_last_idx;
     }
-    $aoa->[0][$end + 1] = 'col' . ( $end + 2 );
+    $aoa->[0][$new_last_idx] = 'col' . ( $new_last_idx + 1 );
+    push @{$sf->{i}{idx_added_cols}}, $new_last_idx;
     $sql->{insert_into_args} = $aoa;
     return;
 }
@@ -501,53 +508,92 @@ sub __split_column {
 sub __search_and_replace {
     my ( $sf, $sql, $waiting ) = @_;
 
-    my @choices = (  '  s///', '  s///g', '  s///i', '  s///gi' );
-    my @pre = ( undef );
-    # Choose
-    my $type = choose (
-        [ @pre, @choices ],
-        { %{$sf->{i}{lyt_stmt_v}}, prompt => 'Choose:', index => 1 }
-    );
-    if ( ! $type ) {
-        return;
-    }
-    ( my $info = $choices[$type-@pre] ) =~ s/\s+//;
-    my $trl = Term::Form->new();
-    # Readline
-    my $pattern = $trl->readline( 'Pattern: ', { info => $info } );
-    if ( ! defined $pattern ) {
-        return;
-    }
-    $info =~ s/^(s\/)/$1$pattern/;
-    # Readline
-    my $replacement_str = $trl->readline( 'Replacement string: ', { info => $info } );
-    if ( ! defined $replacement_str ) {
-        return;
-    }
-    $info =~ s/(\/[gi]{0,2})\z/$replacement_str$1/;
-    my $aoa = $sql->{insert_into_args};
-    # Choose
-    my $col_idx = choose_a_subset(
-        $aoa->[0],
-        { back => '<<', confirm => $sf->{i}{ok}, index => 1, layout => 0, info => $info, sofar_sep => ',',
-          name => 'Affected Columns: ', clear_screen => 0, mouse => $sf->{o}{table}{mouse} } #
-    );
-    if ( ! defined $col_idx || ! @$col_idx ) {
-        return;
-    }
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $ax->print_sql( $sql, $waiting );
+    SEARCH_REPLACE: while ( 1 ) {
+        my $mods = [ 'g', 'i', 'e', 'e' ];
+        my $chosen_mods = [];
+        my @bu;
 
-    for my $row ( @$aoa ) { # modifies $aoa
-        for my $i ( @$col_idx ) {
-            if ( ! defined $row->[$i] ) { next; }
-            elsif ( $type == 1 ) { $row->[$i] =~ s/$pattern/$replacement_str/;   }
-            elsif ( $type == 2 ) { $row->[$i] =~ s/$pattern/$replacement_str/g;  }
-            elsif ( $type == 3 ) { $row->[$i] =~ s/$pattern/$replacement_str/i;  }
-            elsif ( $type == 4 ) { $row->[$i] =~ s/$pattern/$replacement_str/gi; }
+        MOD: while ( 1 ) {
+            my $info = 's///' . join( '',  sort { $b cmp $a } @$chosen_mods ) . ";\n";
+            my @pre = ( undef, $sf->{i}{ok} );
+            # Choose
+            my @idx = choose(
+                [ @pre, map { "[$_]" } @$mods ],
+                { %{$sf->{i}{lyt_stmt_h}}, meta_items => [ 0 .. $#pre ], index => 1,
+                include_highlighted => 2, prompt => 'Modifieres: ', info => $info }
+            );
+            my $last;
+            if ( ! $idx[0] ) {
+                if ( @bu ) {
+                    ( $mods, $chosen_mods ) = @{pop @bu};
+                    next MOD;
+                }
+                return;
+            }
+            elsif ( $idx[0] eq $#pre ) {
+                $last = shift @idx;
+            }
+            push @bu, [ [ @$mods ], [ @$chosen_mods ] ];
+            for my $i ( reverse @idx ) {
+                $i -= @pre;
+                push @$chosen_mods, splice @$mods, $i, 1;
+            }
+            if ( defined $last ) {
+                last MOD;
+            }
         }
+        my $insensitive = ( grep( $_ eq 'i', @$chosen_mods ) )[0] || '';
+        my $globally    = ( grep( $_ eq 'g', @$chosen_mods ) )[0] || '';
+        my @e_s = grep { $_ eq 'e' } @$chosen_mods;
+        my $mods_str = join '', $insensitive, $globally, @e_s;
+        my $info = sprintf "s/%s/%s/%s;\n", '', '', $mods_str;
+        my $trl = Term::Form->new();
+        # Readline
+        my $pattern = $trl->readline( 'Pattern: ', { info => $info } );
+        if ( ! defined $pattern ) {
+            next SEARCH_REPLACE;
+        }
+        $info = sprintf "s/%s/%s/%s;\n", $pattern, '', $mods_str;
+        # Readline
+        my $replacement = $trl->readline( 'Replacement: ', { info => $info } );
+        if ( ! defined $replacement ) {
+            next SEARCH_REPLACE;
+        }
+        $info = sprintf "s/%s/%s/%s;\n", $pattern, $replacement, $mods_str;
+        my $aoa = $sql->{insert_into_args};
+        # Choose
+        my $col_idx = choose_a_subset(
+            $aoa->[0],
+            { back => '<<', confirm => $sf->{i}{ok}, index => 1, layout => 0, info => $info,
+            name => 'Columns: ', clear_screen => 0, mouse => $sf->{o}{table}{mouse} }
+        );
+        if ( ! defined $col_idx || ! @$col_idx ) {
+            next SEARCH_REPLACE;
+        }
+        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        $ax->print_sql( $sql, $waiting );
+        my $regex = $insensitive ? qr/(?${insensitive}:${pattern})/ : qr/${pattern}/;
+        my $replacement_code = sub { return $replacement };
+        for ( @e_s ) { # execute (e) substitution
+            my $recurse = $replacement_code;
+            $replacement_code = sub { return eval $recurse->() };
+        }
+        for my $row ( @$aoa ) { # modifies $aoa
+            for my $i ( @$col_idx ) {
+                if ( ! defined $row->[$i] ) {
+                    next;
+                }
+                elsif ( $globally ) {
+                    $row->[$i] =~ s/$regex/$replacement_code->()/ge;
+                }
+                else {
+                    $row->[$i] =~ s/$regex/$replacement_code->()/e;
+                }
+            }
+        }
+        $sql->{insert_into_args} = $aoa;
+        return;
     }
-    $sql->{insert_into_args} = $aoa;
 }
 
 

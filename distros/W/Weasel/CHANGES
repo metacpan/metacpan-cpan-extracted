@@ -1,3 +1,16 @@
+** 0.18 / 2019-02-11
+   - Revert use of CSS locators for find and find_all; leaving the
+     XPath compiler dependency in place for use with FindExpanders later
+
+** 0.17 / 2019-02-11
+   - Use Weasel::Widgets::HTML::Input as a wrapper for TEXTAREAs
+   - Support CSS locators for Weasel::Element->find and ->find_all
+     (by adding dependency on HTML::Selector::XPath)
+
+** 0.16 / 2019-02-10
+   - Allow passing constructor arguments to widgets being constructed
+     as a result from a 'find' or 'find_all' action
+
 ** 0.15 / 2018-09-16
    - Explicitly declare dependency on namespace::autoclean
 

@@ -45,3 +45,6 @@ Revision history for Perl module Devel::Git::MultiBisect
       identifying places where different build-time errors occurred in the
       Perl 5 core distribution.  Considerable refactoring (e.g.,
       Devel::Git::Multisect::Init) to avoid repeated code.
+
+0.12 Mon Feb 11 19:00:29 EST 2019
+    - Minor documentation and metadata changes only.

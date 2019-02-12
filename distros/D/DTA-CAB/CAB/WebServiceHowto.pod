@@ -1,0 +1,1326 @@
+=encoding utf8
+
+=pod
+
+=head1 NAME
+
+DTA::CAB::WebServiceHowto - User documentation for DTA::CAB web-service
+
+=cut
+
+##========================================================================
+## DESCRIPTION
+=pod
+
+=head1 DESCRIPTION
+
+This document describes the use of the L<DTA::CAB|http://odo.dwds.de/~jurish/software/dta-cab/> web-service accessible
+at L<http://www.deutschestextarchiv.de/cab/>.
+The CAB web-service provides
+error-tolerant linguistic analysis for historical German text,
+including normalization of historical orthographic variants
+to "canonical" modern forms using the method described in
+L<Jurish (2012)|http://./#jurish2012>.
+
+Due to legal restrictions on some of the underlying resources,
+not all available analysis layers can be returned
+by the publically accessible "demo" web-service, but it is hoped that the available
+layers (linguistically salient TEI-XML serialization,
+sentence- and word-level tokenization,
+orthographic normalization,
+part-of-speech tags, and (normalized) lemmata) should suffice for most purposes.
+
+=cut
+
+##========================================================================
+## Interface Elements
+=pod
+
+=head2 Interface Elements
+
+Upon accessing the top-level web-service URL ( L<http://www.deutschestextarchiv.de/cab/> )
+in a web browser, the user is presented with a graphical interface in which CAB queries can
+be constructed and submitted to the underlying server.  This section describes the various
+elements of that interface.
+
+=begin html
+
+<a href="cab-screenshot-annotated.png"><img style="display:block;margin-left:auto;margin-right:auto;max-width:50%;" src="cab-screenshot-annotated.png"/></a>
+
+=end html
+
+=over 4
+
+=item Query Form
+
+At the top of the web-service interface is a query form on a gray background including input fields for the CAB
+query parameters ("Query", "Analyzer", "Format", etc.).
+Each query form input element should display a tooltip briefly describing its function if you hover your mouse
+pointer over it in a browser.
+See L<DTA::CAB::HttpProtocol/query Requests> for more details on supported query request parameters.
+
+=item Status Line
+
+Immediately beneath the L<query form|/Query Form> is a status display line ("URL line") on a white background with no border,
+which contains a link to the raw response data for the current query, if any.  In the case of
+singleton (1-word) queries, the status line also contains
+a simple heuristic "traffic-light" indicator of the query word's morphological security status, where
+green indicates a "safe" known modern form, red indicates an unknown (assumedly historical) form,
+and yellow indicates a known modern form which is judged unsafe for identity canonicalization (typically
+a proper name).
+
+=item Response Data
+
+Immediately below the L<URL line|/Status Line> is the response data area ("data area") on a white background with a gray border, which
+displays the results for the current query, if any.
+
+=item Link Buttons
+
+Below the L<data area|/Response Data> are a number of static link buttons for
+the file upload ("File Upload") or the live user-input interface ("Live Query"),
+the list of analyzers supported by the underlying CAB instance ("Analyzers"),
+the list of I/O formats supported by the underlying CAB instance ("Formats"),
+administrative data for the CAB server instance ("Status"),
+and the CAB documentation ("Documentation").
+
+=item Footer
+
+Below the L<link button area|/Link Buttons> is a short footer on a gray background containing
+administrative information about the underlying CAB server.
+
+=back
+
+=cut
+
+##========================================================================
+## Basic Usage
+=pod
+
+=head2 Basic Usage
+
+This section briefly describes the basic usage offered by the DTA::CAB
+web-service by reference to some simple examples.
+
+=cut
+
+##========================================================================
+## Basic Usage: Simple Query
+=pod
+
+=head3 A Simple Query
+
+Most CAB parameters in the query form are initialized with sensible default values, with the exception
+of the "Query" parameter itself, which should contain the text string to be analyzed.
+Say we wish to analyze the text string "C<Elephanten>":
+simply entering this string (or copy & paste it) into the text input box associated with the "Query" parameter,
+and then pressing the <i>Enter</i> key or clicking the "submit" button will cause the query to be
+submitted to the underlying CAB server and the response data to be displayed in the L<data area|/Response Data>:
+L<http://www.deutschestextarchiv.de/cab/?q=Elephanten>
+
+The results are displayed by default in CAB's native "L<Text|/Text>" format,
+in which the first line contains the input surface form (C<Elephanten>), and the remaining lines are the CAB
+attributes for the query word,
+where each attribute line is indicated by an initial TAB character, a plus ("+") sign,
+and the attribute label enclosed in square brackets ("[...]"), followed by the attribute value.
+Useful attributes include "moot/word" (canonical modern form), "moot/tag" (part-of-speech tag), and
+"moot/lemma" (modern lemma).
+
+The example query for instance should produce a response such as:
+
+ Elephanten
+ 	+[moot/word] Elefanten
+ 	+[moot/tag] NN
+ 	+[moot/lemma] Elefant
+
+... indicating that the query was correctly normalized to the canonical modern form "Elefanten",
+tagged as a common noun ("NN"), and assigned the correct canonical lemma "Elefant".
+
+=cut
+
+##========================================================================
+## Basic Usage: Sentence Query
+=pod
+
+=head3 A Sentence Query
+
+Suppose we wish to take advantage of context information while normalizing
+a whole sentence of historical text, as described in
+L<Jurish (2012), Chapter 4|http://./#jurish2012>.
+Simply enter the entire text of the sentence to be analyzed in the "Query"
+input, and ensure that the checkbox for the "tokenize" flag is checked,
+and submit the query, e.g.
+
+ EJn zamer Elephant gillt ohngefähr zweyhundert Thaler.
+
+The output now contains multiple tokens (words), where the analysis for
+each token begins with a line containing only its surface form (no leading whitespace).
+Token attribute lines (introduced by a leading TAB character) refer to the token
+most recently introduced.
+The output for the example query can be directly accessed
+L<here|http://www.deutschestextarchiv.de/cab/?q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.>,
+and should look something like the following:
+
+ EJn
+ 	+[moot/word] Ein
+ 	+[moot/tag] ART
+ 	+[moot/lemma] eine
+ zamer
+ 	+[moot/word] zahmer
+ 	+[moot/tag] ADJA
+ 	+[moot/lemma] zahm
+ Elephant
+ 	+[moot/word] Elefant
+ 	+[moot/tag] NN
+ 	+[moot/lemma] Elefant
+ gillt
+ 	+[moot/word] gilt
+ 	+[moot/tag] VVFIN
+ 	+[moot/lemma] gelten
+ ohngefähr
+ 	+[moot/word] ungefähr
+ 	+[moot/tag] ADJD
+ 	+[moot/lemma] ungefähr
+ zweyhundert
+ 	+[moot/word] zweihundert
+ 	+[moot/tag] CARD
+ 	+[moot/lemma] zweihundert
+ Thaler
+ 	+[moot/word] Taler
+ 	+[moot/tag] NN
+ 	+[moot/lemma] Taler
+ .
+ 	+[moot/word] .
+ 	+[moot/tag] $.
+ 	+[moot/lemma] .
+
+=cut
+
+##========================================================================
+## Basic Usage: Multi-Sentence Query
+=pod
+
+=head3 A Multi-Sentence Query
+
+The CAB web service can analyze multiple sentences as well, for example:
+
+ EJn zamer Elephant gillt ohngefähr zweyhundert Thaler.
+ Ceterum censeo Carthaginem esse delendam.
+
+The corresponding output can be viewed L<here|http://www.deutschestextarchiv.de/cab?q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>, which should look something like:
+
+ %% $s:lang=de
+ EJn
+ 	+[moot/word] Ein
+ 	+[moot/tag] ART
+ 	+[moot/lemma] eine
+ ...
+ .
+ 	+[moot/word] .
+ 	+[moot/tag] $.
+ 	+[moot/lemma] .
+ 
+ %% $s:lang=la
+ Ceterum
+ 	+[moot/word] Ceterum
+ 	+[moot/tag] FM.la
+ 	+[moot/lemma] ceterum
+ censeo
+ 	+[moot/word] censeo
+ 	+[moot/tag] FM.la
+ 	+[moot/lemma] censeo
+ Carthaginem
+ 	+[moot/word] Carthaginem
+ 	+[moot/tag] FM.la
+ 	+[moot/lemma] carthaginem
+ esse
+ 	+[moot/word] esse
+ 	+[moot/tag] FM.la
+ 	+[moot/lemma] esse
+ delendam
+ 	+[moot/word] delendam
+ 	+[moot/tag] FM.la
+ 	+[moot/lemma] delendam
+ .
+ 	+[moot/word] .
+ 	+[moot/tag] $.
+ 	+[moot/lemma] .
+
+
+Here, blank lines indicate sentence boundaries, and comments (non-tokens) are lines
+introduced by two percent signs ("%%").  The special comments immediately preceding each sentence
+of the form "C<%% $s:lang=>I<LANG>" indicate the result of CAB's language-guessing module
+L<DTA::CAB::Analyzer::LangId::Simple|DTA::CAB::Analyzer::LangId::Simple>.
+The blank line between the final "." of the first sentence and the first word of the second
+sentence indicates that the sentence boundary was correctly detected,
+and the "C<%% $s.lang=>I<LANG>" comments indicate that the source language of both
+sentences was correctly guessed ("de" indicating German in the former case, and "la" indicating
+Latin in the latter).  Due to the language-guesser's assignment for the second sentence,
+all words in that sentence are tagged as foreign material ("FM"), with the suffix ".la" indicating
+the language-guesser's output.  Otherwise, no analysis (normalization or lemmatization) is performed
+for sentences recognized as non-German.
+
+=cut
+
+##========================================================================
+## Basic Usage: Document Query
+=pod
+
+=head3 A File Query
+
+In addition to the default "live" query interface, the CAB web-service interface
+also offers users the opportunity to upload an entire document file to be analyzed
+and allowing the analysis results to be saved to the user's local machine.
+The CAB file interface is accessible via the "File Upload"
+button in the L<link area|/Link Buttons>, which resolves to L<http://www.deutschestextarchiv.de/cab/file|http://www.deutschestextarchiv.de/cab/file>
+Suppose we have a simple plain-text file L<F<elephant.raw>|http://./elephant.raw> containing the document to be analyzed:
+
+ EJn zamer Elephant gillt ohngefähr zweyhundert Thaler.
+ Ceterum censeo Carthaginem esse delendam.
+
+First, save the input file L<F<elephant.raw>|http://./elephant.raw> to your local computer.
+Then, in the CAB L<file input form|http://www.deutschestextarchiv.de/cab/file>,
+click on on the "Choose File" button and select F<elephant.raw> from wherever you saved it.
+Clicking on the "submit" button will cause the contents of the selected file to be sent
+to the CAB server, analyzed, and prompt you for a location to which the analysis results
+should be saved (by default F<elephant.raw.txt>).
+Assuming the default options were active, you should have a result file
+resembling
+L<this|http://www.deutschestextarchiv.de/cab/query?q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>,
+identical to the results displayed in the L<data area|/Response Data> for
+L<the multi-sentence query example|/A Multi-Sentence Query>.
+
+=head4 Caveats
+
+Due to bandwidth limitations, the CAB server currently only accepts input files of size B<E<lt>= 1 MB>.
+If you need analyze a large amount of data, you will first need to split your input files into
+chunks of no more than 1 MB each, sending each chunk to the server individually.  In this case,
+please refrain from "hammering" the CAB server with an uninterrupted stream of requests: wait at least
+3-5 seconds between requests to avoid blocking the server for other users.  Alternatively,
+if you need to analyze a large corpus, you can L<contact the I<Deutsches Textarchiv>|http://deutschestextarchiv.de/doku/impressum#kontakt>.
+
+=cut
+
+
+##========================================================================
+## Analysis Chains
+=pod
+
+=head2 Analysis Chains
+
+The CAB server supports a number of different analysis modes, corresponding to
+different sorts of input data and/or different user tasks.  The various analysis
+modes are implemented in terms of different analysis chains (a.k.a. "analyzers" or just "chains")
+supported by the underlying analysis dispatcher class, L<DTA::CAB::Chain::DTA|DTA::CAB::Chain::DTA>.
+The analysis mode to be used for a particular CAB request is specified by the
+"analyzer" or "a" parameter, which is initially set to use the "default" analysis chain
+(which is itself just an alias for the "norm" chain).
+
+This section briefly describes some alternative analysis chains and situations in which
+they might be useful.
+For a full list of available analysis chains, see the list returned by the
+"L<Analyzers|http://www.deutschestextarchiv.de/cab/analyzers>" button in the L<link area|/Link Buttons>,
+and see L<DTA::CAB::Chain::DTA|DTA::CAB::Chain::DTA>
+for a list of the available atomic analyzers and aliases for complex analysis chains.
+For details on individual atomic analyzers, see the appropriate L<DTA::CAB::Analyzer|DTA::CAB::Analyzer>
+subclass documentation.
+
+=cut
+
+##========================================================================
+## Analysis Chains: Type-wise
+=pod
+
+=head3 Type-wise Analysis
+
+As noted L<above|/"A Sentence Query">, the default "norm" analysis chain uses
+sentential context to improve the precision of the normalization process
+as described in
+L<Jurish (2012), Chapter 4|http://./#jurish2012>.
+This behavior is not always desirable, however.  In particular, if your data
+is not arranged into linguistically meaningful sentence-like units -- e.g.
+a simple flat list of surface types -- then no real context information is available,
+and the "sentential" context CAB would use would more likely hinder the normalization
+than help it.  For such cases, the "norm1" analysis chain can be employed instead
+of the default "norm" chain.  The "norm1" chain uses only unigram-based probabilities
+during normalization, so is less likely to be "confused" by non-sentence-like inputs.
+
+Consider for example the input:
+
+ Fliegende Fliegen Fliegen Fliegenden Fliegen Nach.
+
+passing this list to the "norm1" chain inhibits context-dependent processing
+and results in L<the following|http://www.deutschestextarchiv.de/cab?a=norm1&q=Fliegende+Fliegen+Fliegen+Fliegenden+Fliegen+nach.>
+
+ Fliegende
+	+[moot/word] Fliegende
+	+[moot/tag] ADJA
+	+[moot/lemma] fliegend
+ Fliegen
+	+[moot/word] Fliegen
+	+[moot/tag] NN
+	+[moot/lemma] Fliege
+ Fliegen
+	+[moot/word] Fliegen
+	+[moot/tag] NN
+	+[moot/lemma] Fliege
+ Fliegenden
+	+[moot/word] Fliegenden
+	+[moot/tag] NN
+	+[moot/lemma] Fliegende
+ Fliegen
+	+[moot/word] Fliegen
+	+[moot/tag] NN
+	+[moot/lemma] Fliege
+ nach
+	+[moot/word] nach
+	+[moot/tag] APPR
+	+[moot/lemma] nach
+ .
+	+[moot/word] .
+	+[moot/tag] $.
+	+[moot/lemma] .
+
+contrast this to L<the output of the default "norm" chain|http://www.deutschestextarchiv.de/cab?a=norm&q=Fliegende+Fliegen+Fliegen+Fliegenden+Fliegen+nach.>
+
+ Fliegende
+	+[moot/word] Fliegende
+	+[moot/tag] ADJA
+	+[moot/lemma] fliegend
+ Fliegen
+	+[moot/word] Fliegen
+	+[moot/tag] NN
+	+[moot/lemma] Fliege
+ Fliegen
+	+[moot/word] Fliegen
+	+[moot/tag] VVFIN
+	+[moot/lemma] fliegen
+ Fliegenden
+ 	+[moot/word] Fliegenden
+	+[moot/tag] ADJA
+	+[moot/lemma] fliegend
+ Fliegen
+	+[moot/word] Fliegen
+	+[moot/tag] NN
+	+[moot/lemma] Fliege
+ nach
+	+[moot/word] Nach
+	+[moot/tag] PTKVZ
+	+[moot/lemma] nach
+ .
+	+[moot/word] .
+	+[moot/tag] $.
+	+[moot/lemma] .
+
+In the above example, all instances of the surface form "Fliegen" are analyzed as common nouns (NN) with lemma "Fliege"
+by the unigram-based analyzer "norm1".  If sentential context is considered, the second instance of "Fliegen" is correctly
+analyzed as a finite verb form (VVFIN) of the lemma "fliegen".  Similarly, the unigram-based analyzer mis-tags "Fliegenden"
+as a noun rather than an attributive adjective (NN vs. ADJA) and assigns a corresponding (incorrect) lemma "Fliegende".
+The final particle "nach" is mis-tagged as a preposition (APPR vs. PTKVZ) by the unigram-based model, but this has
+no effect on the lemma assigned.
+Although use of the "norm1" analyzer does not alter any canonical modern forms in this example,
+such cases are possible.
+
+=cut
+
+##========================================================================
+## Analysis Chains: Expansion
+=pod
+
+=head3 Term Expansion
+
+It is sometimes useful to have a list of all known orthographic variants of a given input form, e.g.
+for runtime queries of a database which indexes only surface forms.  For such tasks, the analysis
+chain "expand" can be used.  To
+see all the variants of the surface form "Elephant" in the
+L<I<Deutsches Textarchiv>|http://www.deutschestextarchiv.de> corpus for example, one could query
+L<http://deutschestextarchiv.de/cab?a=expand&q=Elephant&tokenize=0>,
+and expect a response something like:
+
+ Elephant
+ 	+[moot/word] Elefant
+ 	+[moot/tag] NN
+ 	+[moot/lemma] Elefant
+ 	+[eqpho] Elephant <0>
+ 	+[eqpho] Elefant <14>
+ 	+[eqpho] elephant <17>
+ 	+[eqpho] elevant <17>
+ 	+[eqpho] Elephand <18>
+ 	+[eqpho] Elevant <18>
+ 	+[eqpho] elefant <18>
+ 	+[eqpho] Elephandt <19>
+ 	+[eqpho] Elephanth <19>
+ 	+[eqrw] Elefant <0>
+ 	+[eqrw] Elephant <0>
+ 	+[eqrw] Elephandt <8.44527626037598>
+ 	+[eqrw] elefant <8.44683265686035>
+ 	+[eqrw] Elephanth <8.70806312561035>
+ 	+[eqrw] elephant <9.01417255401611>
+ 	+[eqrw] Elephand <18.6624526977539>
+ 	+[eqrw] Eliphant <18.7045001983643>
+ 	+[eqrw] Elephants <21.1982593536377>
+ 	+[eqrw] elevant <21.3945064544678>
+ 	+[eqrw] Elphant <23.2134704589844>
+ 	+[eqrw] Elesant <27.7278366088867>
+ 	+[eqrw] Elephanta <30.2710800170898>
+ 	+[eqlemma] Elefannten <0>
+ 	+[eqlemma] Elefant <0>
+ 	+[eqlemma] Elefanten <0>
+ 	+[eqlemma] Elefantin <0>
+ 	+[eqlemma] Elefantine <0>
+ 	+[eqlemma] Elephandten <0>
+ 	+[eqlemma] Elephant <0>
+ 	+[eqlemma] Elephanten <0>
+ 	+[eqlemma] Elesant <0>
+ 	+[eqlemma] elefant <0>
+ 	+[eqlemma] elephanten <0>
+
+Here, the "eqpho" attribute contains all surface forms recognized as phonetic variants of the query term,
+"eqrw" contains those surface forms recognized as variants by the heuristic rewrite cascade,
+and "eqlemma" contains the surface forms most likely to be mapped to the same modern lemma as the query term.
+This online expansion strategy
+is used by the L<DTA Query Lizard|http://kaskade.dwds.de/dstar/dta/lizard?q=Elephant>,
+and was also used by an earlier version of the L<DTA corpus index|http://kaskade.dwds.de/dstar/dta/>
+as described in
+L<Jurish et al. (2014)|http://./#jtw2014>,
+but has since been replaced there by an online lemmatization query using the "lemma" expander,
+in conjunction with a direct query of the underlying corpus $Lemma index.
+
+The request includes the C<tokenize=0> option,
+which informs the CAB server that the query does not need to be tokenized, effectively forcing use of the
+L<C<qd> parameter|DTA::CAB::HttpProtocol/Query Parameters> to the low-level service.  This is generally
+a good idea when using single-token queries or pre-tokenized documents, since it speeds up processing.
+
+=cut
+
+##========================================================================
+## Analysis Chains: Date-optimized
+=pod
+
+=head3 Date-optimized Analysis
+
+As of DTA::CAB v1.78, the L<DTA Dispatcher|DTA::CAB::Chain::DTA>
+includes specialized L<rewrite models|DTA::CAB::Chain::DTA/rw>
+(C<rw.1600-1700>, C<rw.1700-1800>, C<rw.1800-1900>),
+and provides a number of L<high-level convenience chains|DTA::CAB::Chain::DTA/setupChains>
+(C<norm.1600-1700>, C<norm1.1600-1700>, etc.) using these models
+instead of the default "generic" rewrite cascade (C<rw>)
+to provide canonicalization hypotheses for unknown words.
+The weights for the specialized rewrite models
+were trained on a modest number of manually assigned canonicalization pairs
+from the period in question
+extracted from the L<CabErrorDb|http://kaskade.dwds.de/caberr/>
+error database (4,000-8,000 pair types per model), and may provide a slight
+improvement in canonicalization accuracy with respect to the generic model,
+provided that you specify the appropriate analysis chain ("Analyzer") in your request.
+Compare for example the outputs of the various chains for the input forms
+I<avf>, I<Auffichten>, and I<Büberchens>:
+
+=over 4
+
+=item *
+
+L<generic|http://www.deutschestextarchiv.de/demo/cab/?a=default1&q=avf%20Auffichten%20B%C3%BCberchens>
+
+=item *
+
+L<1600-1700|http://www.deutschestextarchiv.de/demo/cab/?a=default1.1600-1700&q=avf%20Auffichten%20B%C3%BCberchens>
+
+=item *
+
+L<1700-1800|http://www.deutschestextarchiv.de/demo/cab/?a=default1.1700-1800&q=avf%20Auffichten%20B%C3%BCberchens>
+
+=item *
+
+L<1800-1900|http://www.deutschestextarchiv.de/demo/cab/?a=default1.1800-1900&q=avf%20Auffichten%20B%C3%BCberchens>
+
+=back
+
+=cut
+
+
+##========================================================================
+## Analysis Chains: Format Conversion
+=pod
+
+=head3 Format Conversion
+
+The CAB server can be used to convert between various
+supported L<IO Formats|/I-O Formats>.  In this mode,
+no analysis is performed on the input data
+(with the exception of tokenization for raw untokenized input),
+but the input document is parsed and re-formatted according to
+the selected output format.  The analysis chain "null" can be
+selected for such tasks.  To tokenize a simple text
+string for instance, you can select the "null" analyzer and the
+"text" format, and expect output such as
+L<this|http://www.deutschestextarchiv.de/cab?a=null&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>.
+
+This mode of operation is mostly useful in conjunction with
+L<file upload queries|/A File Query> to convert analyzed files.
+If you only need to tokenize raw text files, consider using
+the more efficient L<WASTE tokenizer web-service|http://www.dwds.de/waste/>
+directly,
+or the L<WebLicht|http://weblicht.sfs.uni-tuebingen.de/weblichtwiki/> tool-chainer,
+which offers a number of different tokenizer components.
+
+=cut
+
+
+##========================================================================
+## Formats
+=pod
+
+=head2 I/O Formats
+
+The CAB web-service supports a number of different input- and output-formats for
+document data.  This section presents a brief outline of some of the more
+popular formats.  See L<DTA::CAB::Format/SUBCLASSES> for a list of currently
+implemented format subclasses, and see
+the "L<Formats|http://www.deutschestextarchiv.de/cab/formats>" link
+in the CAB web-service interface L<link area|/Link Buttons> for a list of format aliases supported
+by the server.  Formatted input documents are passed to the low-level service
+using the L<C<qd> query parameter|DTA::CAB::HttpProtocol/Query Parameters>,
+the use of which is controlled by the C<tokenize> option in the L<Query Form|/Query Form>
+section of the graphical interface.
+
+
+=cut
+
+##========================================================================
+## Formats: Text-based
+=pod
+
+=head3 Text-based Formats
+
+CAB supports various text-based formats for human consumption and/or further processing.
+While typically not as flexible or efficient as the "pure" data-oriented formats
+described L<below|/Data-oriented formats>, CAB's native text-based formats offer
+a reasonable compromise between human- and machine-readability.
+All text-based CAB formats expect and return data encoded in L<UTF-8|https://en.wikipedia.org/wiki/UTF-8>,
+B<without> a L<Byte-order mark|https://en.wikipedia.org/wiki/Byte_order_mark>.
+
+=cut
+
+
+##========================================================================
+## Formats: Text-based: Text
+=pod
+
+=over 4
+
+=item L<Text|DTA::CAB::Format::Text>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=text&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Simple human-readable text format as described under "L<Basic Usage|/Basic Usage>", above.
+Blank lines indicate sentence boundaries,
+comments are lines beginning with "%%",
+a line with no leading whitespace contains the surface text of a new token (word),
+and subsequent token-lines are attribute values beginning with a TAB character
+and a plus sign ("+"), followed by the attribute label enclosed in square brackets
+"[...]" and the attribute value as a text-string.
+
+Primarily useful for direct inspection and debugging.
+
+=cut
+
+##========================================================================
+## Formats: Text-based: CSV
+=pod
+
+=item L<CSV|DTA::CAB::Format::CSV>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=csv&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Simple fixed-width "vertical" text format containing only selected
+attribute values.
+Each line is either a
+comment introduced by "%%", an empty line indicating a sentence boundary,
+or a TAB-separated token line.  Token lines are of the form
+
+ SURFACE_TEXT   XLIT_TEXT   CANON_TEXT    POS_TAG    LEMMA	?DETAILS
+
+where I<SURFACE_TEXT> is the surface form of the token,
+I<XLIT_TEXT> is the result of a simple deterministic transliteration
+using L<unicruft|http://odo.dwds.de/~jurish/software/unicruft/>,
+I<CANON_TEXT> is the automatically determined canonical modern form
+for the token, I<POS_TAG> is the part-of-speech tag assigned
+by the L<moot|http://kaskade.dwds.de/~jurish/projects/moot/> tagger,
+I<LEMMA> is the modern lemma form determined for I<CANON_TEXT> and I<POS_TAG>
+by the L<TAGH morphological analyzer|http://www.tagh.de/>,
+and I<DETAILS> if present are additional details.
+
+This is the most compact of the text-based formats supported by CAB,
+but lacks flexibility.
+
+=cut
+
+
+##========================================================================
+## Formats: Text-based: TT
+=pod
+
+=item L<TT|DTA::CAB::Format::TT>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=tt&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Simple machine-readable "vertical" text format similar to that used by
+L<Corpus WorkBench|http://cwb.sourceforge.net/>.  Each line is either a
+comment introduced by "%%", an empty line indicating a sentence boundary,
+or a TAB-separated token line.  Token lines' initial column is the token
+surface text, and subsequent columns are
+are the token's attribute values, where each attribute value column
+begins with the attribute label enclosed in square brackets
+"[...]" and is followed by the attribute value as a text string.
+
+Useful for further quick and dirty script-based processing.
+
+=cut
+
+##========================================================================
+## Formats: Text-based: TJ
+=pod
+
+=item L<TJ|DTA::CAB::Format::TJ>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=tj&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Simple machine-readable "vertical" text format based on the L<TT|/TT>
+format but using L<JSON|http://json.org/> to encode sentence- and token-level attributes
+rather than an explicit attribute labelling scheme.
+Each line is either a
+comment introduced by "%%", an empty line indicating a sentence boundary,
+a document attribute line,
+a sentence attribute line,
+or a TAB-separated token line.
+Document-attribute lines are comments of the form
+"C<%%$TJ:DOC=>I<JSON>", where I<JSON> is a JSON object representing
+auxilliary document attributes.
+Sentence-attribute lines are analogousd comments of the form
+"C<%%$TJ:SENT=>I<JSON>".
+Token lines consist of the the token surface text,
+followed by a TAB character,
+followed by a JSON object representing the internal token structure.
+
+Useful for further script-based processing.
+
+=back
+
+=cut
+
+
+##========================================================================
+## Formats: XML-based
+=pod
+
+=head3 XML-based Formats
+
+The CAB web-service supports a number of XML-based formats for data exchange.
+XML data formats are in general less efficient to parse and/or generate
+than L<text-based|/Text-based Formats> or L<data-oriented|/Data-oriented Formats> formats,
+but they do retain some degree of human-readability and the easy availability
+of XML processing software packages such as L<libxml|http://www.xmlsoft.org/>
+or L<XMLStarlet|http://xmlstar.sourceforge.net/>
+makes such formats a reasonable candidate for archiving and cross-platform data sharing.
+
+=cut
+
+##========================================================================
+## Formats: XML-based: XmlTokWrap
+=pod
+
+=over 4
+
+=item L<XmlTokWrap|DTA::CAB::Format::XmlTokWrap>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=twxml&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Simple serial XML-based format as used by the L<DTA::TokWrap|http://odo.dwds.de/~jurish/software/dta-tokwrap/>
+module.  Supports arbitrary token attribute substructure, but fairly slow.
+
+=cut
+
+##========================================================================
+## Formats: XML-based: XmlTokWrapFast
+=pod
+
+=item L<XmlTokWrapFast|DTA::CAB::Format::XmlTokWrapFast>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=ftwxml&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Simple serial XML-based format as used by the L<DTA::TokWrap|http://odo.dwds.de/~jurish/software/dta-tokwrap/>
+module.  Faster than the L<XmlTokWrap|/XmlTokWrap> formatter, but doesn't support all attributes.
+
+=cut
+
+##========================================================================
+## Formats: XML-based: XmlTokWrapLing
+=pod
+
+=item L<XmlLing|DTA::CAB::Format::XmlLing>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=ltwxml&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Flat XML-based format similar to L</XmlTokWrapFast> but using only TEI L<att.linguistic|http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.linguistic.html>
+attributes to represent token information.  Faster than the L<XmlTokWrap|/XmlTokWrap> formatter, but doesn't support all attributes.
+
+=cut
+
+
+##========================================================================
+## Formats: XML-based: TEI
+=pod
+
+=item L<TEI|DTA::CAB::Format::TEI>
+
+[L<example input|http://./elephant.tei-xml>,
+L<example output|http://www.deutschestextarchiv.de/cab/query?fmt=tei&raw=1&qd=%3C%3Fxml+version%3D%221.0%22+encoding%3D%22UTF-8%22%3F%3E%0A%3CTEI%3E%0A+%3Ctext%3E%0A+++%3C%21--+running+headers+are+ignored+by+the+tokenizer+--%3E%0A+++%3Cfw%3ERunning+header%3C%2Ffw%3E%0A+++%3Cp%3EEJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler%3C%2Fp%3E%0A+++%3C%21--+paragraph+boundaries+imply+sentence+boundaries%2C+even+without+punctuation+--%3E%0A+++%3Cp%3ECeterum+censeo+Carthaginem+esse+delendam%2E%3C%2Fp%3E%0A+%3C%2Ftext%3E%0A%3C%2FTEI%3E%0A>]
+
+Parses raw un-tokenized TEI-like input (with or without //c elements) using
+L<DTA::TokWrap|http://odo.dwds.de/~jurish/software/dta-tokwrap/> to reserialize and tokenize the
+source text, and splices analysis results into the resulting XML document
+using the L<XmlTokWrap|/XmlTokWrap> format.
+Any C<E<lt>sE<gt>> or C<E<lt>sE<gt>> elements in the input will be ignored and the input will be (re-)tokenized.
+Output data is itself parseable by by the L<TEIws|/TEIws> formatter.
+
+B<Be warned> that output sentence- and token-nodes (E<lt>sE<gt> and E<lt>wE<gt> elements, respectively)
+may be I<fragmented> in the final output file.  A "fragmented" node
+in this sense is a logical unit (sentence or token) realized in the output TEI-XML file as multiple
+elements.  Fragmented nodes are encoded using the TEI "linking" attributes
+L<@prev|http://www.tei-c.org/release/doc/tei-p5-doc/de/html/ref-att.global.linking.html#tei_att.prev>
+and
+L<@next|http://www.tei-c.org/release/doc/tei-p5-doc/de/html/ref-att.global.linking.html#tei_att.next>,
+and only the first element of a fragmented node should contain the CAB attribute substructure for
+that node.
+
+Input to this class need not strictly conform to the L<TEI Guidelines|http://www.tei-c.org/>;
+in fact, the only structural requirement is that at least one C<E<lt>textE<gt>> element be present --
+any input outside of the scope of a C<E<lt>textE<gt>> element is ignored.  Input files must however
+be encoded in L<UTF-8|https://en.wikipedia.org/wiki/UTF-8>.  In particular, XML documents
+conforming to the L<DTABf Guidelines|http://www.deutschestextarchiv.de/doku/basisformat>
+should be handled gracefully.
+
+Primarily useful for analyzing native TEI-like XML corpus data without losing
+structural information encoded in the source XML itself.
+
+=cut
+
+##========================================================================
+## Formats: XML-based: TEI-fast
+=pod
+
+=item L<TEI-fast|DTA::CAB::Format::TEI>
+
+[L<example input|http://./elephant.tei-xml>,
+L<example output|http://www.deutschestextarchiv.de/cab/query?fmt=tei-fast&raw=1&qd=%3C%3Fxml+version%3D%221.0%22+encoding%3D%22UTF-8%22%3F%3E%0A%3CTEI%3E%0A+%3Ctext%3E%0A+++%3C%21--+running+headers+are+ignored+by+the+tokenizer+--%3E%0A+++%3Cfw%3ERunning+header%3C%2Ffw%3E%0A+++%3Cp%3EEJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler%2C%3C%2Fp%3E%0A+++%3C%21--+paragraph+boundaries+imply+sentence+boundaries%2C+even+without+punctuation+--%3E%0A+++%3Cp%3ECeterum+censeo+Carthaginem+esse+delendam%2E%3C%2Fp%3E%0A+%3C%2Ftext%3E%0A%3C%2FTEI%3E%0A>]
+
+Wrapper for the L</TEI> parser/formatter class using L</XmlTokWrapFast> to format the low-level token data
+See L</TEI> and L</XmlTokWrapFast> for caveats.
+
+=cut
+
+##========================================================================
+## Formats: XML-based: TEI+ling
+=pod
+
+=item L<TEI-ling|DTA::CAB::Format::TEI>
+
+[L<example input|http://./elephant.tei-xml>,
+L<example output|http://www.deutschestextarchiv.de/cab/query?fmt=tei-ling&raw=1&qd=%3C%3Fxml+version%3D%221.0%22+encoding%3D%22UTF-8%22%3F%3E%0A%3CTEI%3E%0A+%3Ctext%3E%0A+++%3C%21--+running+headers+are+ignored+by+the+tokenizer+--%3E%0A+++%3Cfw%3ERunning+header%3C%2Ffw%3E%0A+++%3Cp%3EEJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler%2C%3C%2Fp%3E%0A+++%3C%21--+paragraph+boundaries+imply+sentence+boundaries%2C+even+without+punctuation+--%3E%0A+++%3Cp%3ECeterum+censeo+Carthaginem+esse+delendam%2E%3C%2Fp%3E%0A+%3C%2Ftext%3E%0A%3C%2FTEI%3E%0A>]
+
+Wrapper for the L</TEI> parser/formatter class using L</XmlLing> to format the low-level token data
+using only TEI L<att.linguistic|http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.linguistic.html>
+attributes. See L</TEI> and L</XmlLing> for caveats.
+
+=cut
+
+##========================================================================
+## Formats: XML-based: TEIws
+=pod
+
+=item L<TEIws|DTA::CAB::Format::TEIws>
+
+[L<example input|http://./elephant.teiws-xml>,
+L<example output|http://www.deutschestextarchiv.de/cab/query?fmt=teiws&raw=1&qd=%3C%3Fxml+version%3D%221.0%22+encoding%3D%22UTF-8%22%3F%3E%0A%3CTEI%3E%0A++%3Ctext%3E%0A++++%3C%21--+untokenized+material+is+ignored+--%3E%0A++++%3Cfw%3ERunning+header+%28untokenized%29%3C%2Ffw%3E%0A++++%3Cp%3E%0A++++++%3C%21--+every+sentence+%2F%2Fs+and+token+%2F%2Fw+must+have+an+%40id+or+%40xml%3Aid+attribute+--%3E%0A++++++%3Cs+id%3D%22s1%22%3E%0A++++++++%3Cw+id%3D%22w1%22%3EEJn%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w2%22%3Ezamer%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w3%22%3EElephant%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w4%22%3Egillt%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w5%22%3Eohngef%C3%A4hr%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w6%22%3Ezweyhundert%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w7%22%3EThaler%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w8%22%3E.%3C%2Fw%3E%0A++++++%3C%2Fs%3E%0A++++++%3Cs+id%3D%22s2%22%3E%0A++++++++%3Cw+id%3D%22w9%22%3ECeterum%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w10%22%3Ecenseo%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w11%22%3ECarthaginem%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w12%22%3Eesse%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w13%22%3Edelendam%3C%2Fw%3E%0A++++++++%3Cw+id%3D%22w14%22%3E.%3C%2Fw%3E%0A++++++%3C%2Fs%3E%0A++++%3C%2Fp%3E%0A++%3C%2Ftext%3E%0A%3C%2FTEI%3E%0A>]
+
+High-level parser/formatter class for pre-tokenized (and possibly fragmented) TEI-like XML
+as output by the L<TEI|/TEI> formatter.
+Input files should be encoded in L<UTF-8|https://en.wikipedia.org/wiki/UTF-8>,
+and every input sentence C<//s> and token C<//w> must have an C<@id> or C<@xml:id> attribute.
+
+Potentially useful for analyzing pre-tokenized TEI-like XML data,
+but primarily used for converting to other, script-friendlier formats
+such as L<CSV|/CSV>.
+
+=cut
+
+##========================================================================
+## Formats: XML-based: TEIws+ling
+=pod
+
+=item L<TEIws-ling|DTA::CAB::Format::TEIws>
+
+[L<example|http://./elephant.teiws-ling-xml>]
+
+Wrapper for the L</TEIws> parser/formatter class using L</XmlLing> to format the low-level token data
+using only TEI L<att.linguistic|http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.linguistic.html>
+attributes, which are also parsed from the input document if present. See L</TEIws> and L</XmlLing> for caveats.
+
+=cut
+
+
+##========================================================================
+## Formats: XML-based: TCF
+=pod
+
+=item L<TCF|DTA::CAB::Format::TCF>
+
+[L<example input (untokenized)|http://./elephant.raw.tcf>,
+L<example input (pre-tokenized)|http://./elephant.tok.tcf>,
+L<example output|http://www.deutschestextarchiv.de/cab?fmt=tcf&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Monolithic stand-off XML format used by CLARIN-D, in particlar by the
+L<WebLicht|http://weblicht.sfs.uni-tuebingen.de/weblichtwiki/> tool-chainer.
+See L<the TCF format documentation|http://weblicht.sfs.uni-tuebingen.de/weblichtwiki/index.php/The_TCF_Format>
+for details on the TCF format.
+CAB currently handles only the C<text>, C<tokens>, C<sentences>, C<POStags>, C<lemmas>, and C<orthography>
+TCF layers.
+
+=cut
+
+##========================================================================
+## Formats: XML-based: XML-RPC
+=pod
+
+=item L<XML-RPC|DTA::CAB::Format::XmlRpc>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=xmlrpc&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Flexible but obscenely inefficient format used for data transfer
+by the L<XML-RPC Protocol|https://en.wikipedia.org/wiki/XML-RPC>.
+Avoid it if you can.
+
+=back
+
+=cut
+
+##========================================================================
+## Formats: Data-oriented
+=pod
+
+=head3 Data-oriented Formats
+
+The following formats provide direct dumps of the
+underlying L<DTA::CAB::Document|DTA::CAB/Data Model> used internally by CAB itself.
+They are efficient to parse and to produce, but may not be suitable for direct
+human consumption.
+
+=cut
+
+##========================================================================
+## Formats: Data-oriented: JSON
+=pod
+
+=over 4
+
+=item L<JSON|DTA::CAB::Format::JSON>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=json&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Direct L<JSON|http://json.org/> dump of the underlying
+L<DTA::CAB::Document|DTA::CAB/Data Model> structure
+using the Perl L<JSON::XS|https://metacpan.org/release/JSON-XS> module.
+Very fast and flexible, suitable for further automated processing.
+
+=cut
+
+##========================================================================
+## Formats: Data-oriented: YAML
+=pod
+
+=item L<YAML|DTA::CAB::Format::YAML>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=yaml&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Direct dump of the underlying
+L<DTA::CAB::Document|DTA::CAB/Data Model> structure
+as L<YAML|https://en.wikipedia.org/wiki/YAML> markup.
+Fast, flexible, and supports shared substructures, unlike the L<JSON|/JSON> formatter.
+
+=cut
+
+##========================================================================
+## Formats: Data-oriented: Perl
+=pod
+
+=item L<Perl|DTA::CAB::Format::Perl>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=perl&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Direct dump of the underlying
+L<DTA::CAB::Document|DTA::CAB/Data Model> structure
+using the Perl L<Data::Dumper|https://metacpan.org/release/Data-Dumper> module.
+Mainly useful for further automated processing with Perl
+while retaining some degree of human readability.
+
+=cut
+
+##========================================================================
+## Formats: Data-oriented: Storable
+=pod
+
+=item L<Storable|DTA::CAB::Format::Storable>
+
+[L<example|http://www.deutschestextarchiv.de/cab/query?fmt=bin&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+Direct binary dump of the underlying
+L<DTA::CAB::Document|DTA::CAB/Data Model> structure
+using the Perl L<Storable|https://metacpan.org/release/Storable> module.
+This is currently the fastest I/O class for both in- and output,
+mainly useful for further automated processing with Perl.
+
+=back
+
+=cut
+
+##========================================================================
+## Advanced Usage
+=pod
+
+=head2 Advanced Usage
+
+The CAB web-service is a request-oriented service:
+it accepts a user request as a set of I<parameter>=I<value> pairs
+and returns the analyzed data as a L<DTA::CAB::Document|DTA::CAB::Document> object
+encoded according to the L<output format|/I-O Formats> specified by the C<ofmt> parameter.
+Parameters are passed to the DiaCollo web-service
+L<RESTfully|https://en.wikipedia.org/wiki/Representational_state_transfer>
+via the L<URL query string|http://en.wikipedia.org/wiki/Query_string>
+or L<HTTP POST request|http://en.wikipedia.org/wiki/POST_(HTTP)#Use_for_submitting_web_forms>
+as for a standard L<web form|http://en.wikipedia.org/wiki/Form_(HTML)>.
+The URL for the low-level request including all user parameters
+is displayed in the web front-end in the L<status line|/Status Line>.
+See L<DTA::CAB::HttpProtocol/query Requests> for more details on the
+RESTful CAB request protocol and a list of supported parameters.
+
+Since CAB requests are really nothing more than standard HTTP form requests,
+a large variety of existing software packages can be used to generate and dispatch CAB
+requests, e.g
+L<LWP::UserAgent|https://metacpan.org/pod/LWP::UserAgent>,
+L<curl|http://curl.haxx.se/>,
+or L<wget|https://www.gnu.org/software/wget/>.
+When automating CAB requsts,
+please respect the L<caveats|/Caveats> mentioned above in the L<file query example|/A File Query>.
+
+=cut
+
+##========================================================================
+## Advanced Usage: curl
+=pod
+
+=head3 Querying CAB with curl
+
+To analyze a L<TEI-like|/TEI> XML file F<FILE.tei.xml> using L<curl|http://curl.haxx.se/>
+and save the analysis results to a "spliced" TEI file F<FILE.teiws.xml>,
+the following command-line ought to suffice:
+
+ curl -X POST -sSF "qd=@FILE.tei.xml" -o "FILE.teiws.xml" "http://www.deutschestextarchiv.de/demo/cab/query?fmt=tei"
+
+Alternative L<IO formats|/I-O Formats> and L<request parameters|DTA::CAB::HttpProtocol/query-Requests>
+can be accommodated by inserting them into the L<URL query string|http://en.wikipedia.org/wiki/Query_string>
+passed to L<C<curl>|http://curl.haxx.se/docs/manpage.html>.
+You can also make use of the
+inline POSTDATA mechanism (a.k.a. "xpost") described in L<the DTA::CAB::HttpProtocol manpage|DTA::CAB::HttpProtocol/query-Requests>
+in order to save yourself and the CAB server the effort of encoding/decoding the document data.
+In this case, you need to specify an appropriate "C<Content-Type>" header, e.g:
+
+ curl -X POST -sSH "Content-Type: text/tei+xml; charset=utf8" --data-binary "@FILE.tei.xml" -o "FILE.teiws.xml" "http://www.deutschestextarchiv.de/demo/cab/query?fmt=tei"
+
+You might be interested in the L<cab-curl-post.sh|http://./cab-curl-post.sh> and/or L<cab-curl-xpost.sh|http://./cab-curl-xpost.sh>
+wrapper scripts, which encapsulate some of the common curl command-line options.
+The preceding 2 example C<curl> calls should be equivalent to:
+
+ bash cab-curl-post.sh  "?fmt=tei" "FILE.xml" -o "FILE.teiws.xml"
+ bash cab-curl-xpost.sh "?fmt=tei" "FILE.xml" -o "FILE.teiws.xml"
+
+Note that when accessing the CAB web-service API directly via HTTP in this fashion,
+auto-detection of L<input file format|/I-O Formats> is not supported,
+so you must specify at least the L<"fmt"|DTA::CAB::HttpProtocol/fmt-fmt1> parameter
+in the URL query string if your files are not in the global default format
+(usually L<TT|/TT>).
+
+=cut
+
+##========================================================================
+## Advanced Usage: TEI
+=pod
+
+=head3 Post-processing TEI XML
+
+The following L<XSL|https://en.wikipedia.org/wiki/XSL> scripts are provided for post-processing the
+L<"spliced" TEI-like output format|/TEI>.
+
+=over 4
+
+=item L<spliced2ling.xsl|http://./spliced2ling.xsl>
+
+Removes native CAB-markup from TEI-like XML files, encoding the remaining token analysis information using
+the TEI L<C<att.linguistic>|http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.linguistic.html>
+inventory.  All tokens remain encoded as C<E<lt>wE<gt>> elements (rather than C<E<lt>pcE<gt>> elements),
+and only the C<att.linguistic> attributes C<@lemma>, C<@pos>, and C<@join> are inserted, so that e.g.
+
+ <w id="w2" t="EJn"><moot word="Ein" lemma="ein" tag="ART"/>EJn</w>
+ <w id="w3" t="Elephant"><moot word="Elefant" lemma="Elefant" tag="NN"/>Elephant</w><w>!</w>
+
+becomes:
+
+ <w id="w2" lemma="ein" pos="ART" norm="Ein">Ein</w>
+ <w id="w3" join="right" lemma="Elefant" pos="NN" norm="Elefant">Elephant</w>
+ <w join="left">!</w>
+
+Note that the C<@join> attribute will be correctly generated only if the relevant C<w> elements are truly immediately adjacent
+in the input file: any intervening newlines or other whitespace will prohibit insertion of a C<@join> attribute.
+
+=item L<spliced2norm.xsl|http://./spliced2norm.xsl>
+
+Removes C<//s> and C<//w> elements, replacing the surface text of each token
+with its CAB-normalized form, so that e.g.
+
+ <w id="w3" t="Elephant"><moot word="Elefant" lemma="Elefant" tag="NN"/><xlit isLatin1="1" latin1Text="Elephant" isLatinExt="1"/>Elephant</w>
+
+becomes simply the text node
+
+ Elefant
+
+=item L<spliced2orig+reg.xsl|http://./spliced2orig+reg.xsl>
+
+Removes C<//s> and C<//w> elements, replacing non-identity normalizations
+with a C<choice> element containing a daughter C<orig> with the original surface form
+and a C<reg[@resp="#cab"]> daughter containing the CAB-normalized form, so that e.g.
+
+ <w id="w3" t="Elephant"><moot word="Elefant" lemma="Elefant" tag="NN"/><xlit isLatin1="1" latin1Text="Elephant" isLatinExt="1"/>Elephant</w>
+
+becomes
+
+ <choice><orig>Elephant</orig><reg resp="#cab">Elefant</reg></choice>
+
+=item L<spliced2cab.xsl|http://./spliced2cab.xsl>
+
+Resolves fragmented nodes and converts a "spliced" TEI-like XML file into
+a serial format as output by the L<XmlTokWrap|/XmlTokWrap> formatter class.
+
+=item L<spliced2clean.xsl|http://./spliced2clean.xsl>
+
+Removes some extraneous CAB-markup from TEI-like XML files.
+Probably not really useful for files returned by the CAB web-service.
+
+=item L<spliced2cleaner.xsl|http://./spliced2cleaner.xsl>
+
+Removes most CAB-markup from TEI-like XML files, so that e.g.
+
+ <w id="w3" t="Elephant"><moot word="Elefant" lemma="Elefant" tag="NN"/><xlit isLatin1="1" latin1Text="Elephant" isLatinExt="1"/>Elephant</w>
+
+becomes
+
+ <w id="w3" t="Elephant"><moot word="Elefant" lemma="Elefant" tag="NN"/>Elephant</w>
+
+=item L<spliced2clean+cabns.xsl|http://./spliced2clean+cabns.xsl>
+
+Removes most CAB-markup from TEI-like XML files and assigns CAB-internal
+attributes to the L<XML namespace|https://en.wikipedia.org/wiki/XML_namespace> "cab" (C<http://deutschestextarchiv.de/ns/cab/1.0>),
+so that e.g.
+
+ <w id="w3" t="Elephant"><moot word="Elefant" lemma="Elefant" tag="NN"/><xlit isLatin1="1" latin1Text="Elephant" isLatinExt="1"/>Elephant</w>
+
+becomes
+
+ <w xml:id="w3" cab:t="Elephant" cab:word="Elefant" cab:tag="NN" cab:lemma="Elefant">Elephant</w>
+
+=back
+
+=cut
+
+##========================================================================
+## Advanced Usage: TCF
+=pod
+
+=head3 Post-processing TCF XML
+
+=over 4
+
+=item L<tcf-orthswap.xsl|http://./tcf-orthswap.xsl>
+
+Swaps the text content of 1:1-corresponding C<//tokens/token> and C<//orthography/correction[@operation="replace"]> elements,
+so that e.g.
+
+ <tokens>
+   <token ID="w1">Ein</token>
+   <token ID="w2">Elephant</token>
+ </tokens>
+ ...
+ <orthography>
+   <correction tokenIDs="w2" operation="replace">Elefant</correction>
+ </orthography>
+
+becomes
+
+ <tokens>
+   <token ID="w1">Ein</token>
+   <token ID="w2">Elefant</token>
+ </tokens>
+ ...
+ <orthography>
+   <correction tokenIDs="w2" operation="replace">Elephant</correction>
+ </orthography>
+
+Potentially useful for preparing CAB-annotated TCF data for submission to other text-sensitive TCF processors
+which themselves do not respect the C<//orthography> layer.
+
+=cut
+
+
+##========================================================================
+## REFERENCES
+=pod
+
+=head1 REFERENCES
+
+The author would appreciate CAB users citing its use in any related publications.
+As a general CAB-related reference,
+and for analysis and canonicalizaion of historical text to modern forms in particular, you can cite:
+
+=begin html
+
+<div class="bib">
+
+=end html
+
+L<Jurish, B.|name:jurish2012> I<Finite-state Canonicalization Techniques for Historical German.>
+PhD thesis, Universität Potsdam, 2012 (defended 2011).
+URN urn:nbn:de:kobv:517-opus-55789,
+[L<epub|http://opus.kobv.de/ubp/volltexte/2012/5578/>,
+L<PDF|http://kaskade.dwds.de/~jurish/pubs/jurish2012diss.pdf>,
+L<BibTeX|http://kaskade.dwds.de/~jurish/pubs/jurish2012diss.bib>]
+
+=begin html
+
+</div>
+
+=end html
+
+For the concrete architecture of the CAB system as used by the
+L<I<Deutsches Textarchiv> (DTA)|http://www.deutschestextarchiv.de>
+project, you can cite:
+
+=begin html
+
+<div class="bib">
+
+=end html
+
+L<Jurish, B.|name:jurish2013> "Canonicalizing the Deutsches Textarchiv." In
+L<Proceedings of I<Perspektiven einer corpusbasierten historischen Linguistik und Philologie>|https://edoc.bbaw.de/solrsearch/index/search/searchtype/collection/id/16386>
+(Berlin, Germany, 12th-13th December 2011), volume 4 of
+L<Thesaurus Linguae Aegyptiae|http://aaew.bbaw.de/tla/>,
+Berlin-Brandenburgische Akademie der Wissenschaften, 2013.
+[L<epub|http://nbn-resolving.de/urn/resolver.pl?urn:nbn:de:kobv:b4-opus-24433>,
+L<PDF|http://edoc.bbaw.de/volltexte/2013/2443/pdf/Jurish.pdf>,
+L<BibTeX|http://kaskade.dwds.de/~jurish/pubs/jurish2013canonicalizing.bib>]
+
+=begin html
+
+</div>
+
+=end html
+
+For online term expansion with the "L<expand|/Term Expansion>" analysis chain,
+you can cite:
+
+=begin html
+
+<div class="bib">
+
+=end html
+
+L<Jurish, B., C. Thomas, & F. Wiegand.|name:jtw2014> "Querying the Deutsches Textarchiv."
+In U. Kruschwitz, F. Hopfgartner, & C. Gurrin (editors),
+Proceedings of the Workshop I<L<MindTheGap 2014: Beyond Single-Shot Text Queries: Bridging the Gap(s) between Research Communities|http://ceur-ws.org/Vol-1131/>>
+Berlin, Germany, 4th March, 2014, pages 25-30, 2014.
+[L<PDF|http://ceur-ws.org/Vol-1131/mindthegap14_7.pdf>,
+L<BibTeX|http://kaskade.dwds.de/~jurish/pubs/jtw2014querying.bib>]
+
+=begin html
+
+</div>
+
+=end html
+
+=cut
+
+##========================================================================
+## SEE ALSO
+=pod
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+The L<CAB software page|http://odo.dwds.de/~jurish/software/dta-cab/>
+is the top-level repository for CAB documentation, news, etc.
+
+=item *
+
+The L<DTA::CAB|DTA::CAB> manual page contains a basic introduction
+to the the CAB architecture.
+
+=item *
+
+The L<DTA::CAB::Format|DTA::CAB::Format> manual page describes the
+abstract CAB I/O Format API, and includes a list of supported
+L<format classes|DTA::CAB::Format/SUBCLASSES>.
+
+=item *
+
+The L<DTA::CAB::HttpProtocol|DTA::CAB::HttpProtocol> manual page describes
+the conventions used by the CAB web-service API.
+
+=item *
+
+The L<DTA 'Base Format' Guidelines (DTABf)|http://www.deutschestextarchiv.de/doku/basisformat>
+describes the subset of the L<TEI|http://www.tei-c.org/> encoding guidelines which can reasonably be
+expected to be handled gracefully by the CAB L<TEI|/TEI> and/or L<TEIws|/TEIws> formatters.
+
+=item *
+
+L<Jurish (2012)|http://./#jurish2012>
+describes the abstract method used by CAB for canonicalizaion of historical text to modern forms.
+
+=item *
+
+L<Jurish (2013)|http://./#jurish2013>
+describes the concrete architecture of the CAB system as used by the
+L<I<Deutsches Textarchiv>|http://www.deutschestextarchiv.de> project.
+
+=item *
+
+L<Jurish et al. (2014)|http://./#jtw2014>
+describes the use of CAB's online L<term expansion chain|/Term Expansion>
+for runtime evaluation of database queries.
+
+=back
+
+=cut
+
+##======================================================================
+## Footer
+##======================================================================
+
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>L<jurish@bbaw.de|mailto:jurish@bbaw.de>E<gt>
+
+=cut

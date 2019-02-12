@@ -15,9 +15,6 @@ WriteMakefile(
   },
   TEST_REQUIRES => {
     'Test::More' => '0.98',
-    'JSON::Validator' => '2.01', # fqn bundle fix
-    'GraphQL' => '0.26', # promises
-    'OpenAPI::Client' => '0.17', # "call_p" interface
     'YAML::XS' => '0.68', # local.t needs, <0.68 breaks
     'Mojolicious::Plugin::GraphQL' => '0.11', # Promise->all class method
     'Mojolicious::Plugin::OpenAPI' => '1.25', # register returns plugin
@@ -25,7 +22,8 @@ WriteMakefile(
   },
   PREREQ_PM => {
     'JSON::Validator' => '2.01', # fqn bundle fix
-    'GraphQL' => '0.26', # promises
+    'JSON::Validator::OpenAPI::Mojolicious' => '0',
+    'GraphQL' => '0.32', # new comment format
     'OpenAPI::Client' => '0.17', # "call_p" interface
   },
   clean => { FILES => 'GraphQL-Plugin-Convert-OpenAPI-*' },
@@ -60,7 +58,7 @@ sub MY::postamble {
   <<EOF;
 pure_all :: README.md
 
-README.md : lib/GraphQL/Plugin/Convert/OpenAPI.pm
+README.md : \$(VERSION_FROM)
 \tpod2markdown \$< >\$\@
 EOF
 }

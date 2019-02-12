@@ -17,7 +17,7 @@ Weasel::FindExpanders::HTML - Weasel FindExpanders HTML
 
 =head1 DEPENDENCIES
 
-This module wraps L<Selenium::Remote::Driver>, version 2.
+
 
 =cut
 

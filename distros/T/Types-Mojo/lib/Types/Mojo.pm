@@ -9,19 +9,20 @@ use warnings;
 
 use Type::Library
    -base,
-   -declare => qw( MojoCollection MojoFile MojoFileList );
+   -declare => qw( MojoCollection MojoFile MojoFileList MojoUserAgent MojoURL );
 
 use Type::Utils -all;
 use Types::Standard -types;
 
 use Mojo::File;
 use Mojo::Collection;
+use Mojo::URL;
 use Scalar::Util qw(blessed);
 use List::Util qw(first);
 
 Type::Utils::extends(qw/Types::Standard/);
 
-our $VERSION = '0.02';
+our $VERSION = 0.04;
 
 my $meta = __PACKAGE__->meta;
 
@@ -56,6 +57,8 @@ coerce MojoCollection,
     from ArrayRef, via { Mojo::Collection->new( @{$_} ) }
 ;
 
+class_type MojoUserAgent, { class => 'Mojo::UserAgent' };
+
 class_type MojoFile, { class => 'Mojo::File' };
 
 coerce MojoFile,
@@ -82,6 +85,38 @@ coerce MojoFileList,
         }
 ;
 
+$meta->add_type(
+    name => 'MojoURL',
+    parent => InstanceOf['Mojo::URL'],
+    constraint_generator => sub {
+        return $meta->get_type('MojoURL') if !@_;
+
+        my $type  = $_[0];
+        my ($scheme, $secure) = $type =~ m{(.*?)(s\?)?\z};
+
+        return sub {
+            return if !blessed $_ and $_->isa('Mojo::URL');
+
+            return 1 if $_->scheme eq $scheme;
+            return 1 if $secure && $_->scheme eq $scheme . 's';
+
+            return;
+        };
+    },
+    coercion_generator => sub {
+        my ($parent, $child, $param) = @_;
+        return $parent->coercion;
+    },
+);
+
+coerce MojoURL,
+    from Str, via { Mojo::URL->new( $_ ) }
+;
+
+coerce MojoCollection,
+    from ArrayRef, via { Mojo::Collection->new( @{$_} ) }
+;
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -98,7 +133,7 @@ Types::Mojo - Types related to Mojo
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -141,6 +176,17 @@ An object of L<Mojo::File>
 =head2 MojoFileList
 
 A C<MojoCollection> of C<MojoFile>s.
+
+=head2 MojoURL[`a]
+
+An object of L<Mojo::URL>. Can be parameterized with a scheme.
+
+    has http_url => ( is => 'rw', isa => MojoURL["https?"] ); # s? means plain or secure -> http or https
+    has ftp_url  => ( is => 'rw', isa => MojoURL["ftp"] );
+
+=head2 MojoUserAgent
+
+An object of L<Mojo::UserAgent>
 
 =head1 COERCIONS
 
@@ -294,6 +340,37 @@ In the script
     for my $file ( @{ $obj->files->to_array } ) {
         say $file->basename;
     }
+
+=back
+
+=head2 To MojoURL
+
+=over 4
+
+=item * String to MojoURL
+
+In a class
+
+    package Test;
+    
+    use Moo;
+    use Types::Mojo qw(MojoFile);
+    
+    has 'file' => ( is => 'ro', isa => MojoURL, coerce => 1 );
+    
+    1;
+
+In the script
+
+    use Test;
+
+    use v5.22;
+
+    my $obj = Test->new(
+        url => 'http://perl-services.de',
+    );
+    
+    say $obj->url->host;
 
 =back
 

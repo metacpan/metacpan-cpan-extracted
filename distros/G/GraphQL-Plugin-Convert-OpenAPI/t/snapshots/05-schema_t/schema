@@ -289,33 +289,33 @@ type MultibranchPipeline {
 }
 
 type Mutation {
-  # Delete queue item from an organization pipeline queue
+  "Delete queue item from an organization pipeline queue"
   deletePipelineQueueItem(organization: String!, pipeline: String!, queue: String!): String
-  # Create a new job using job configuration, or copied from an existing job
+  "Create a new job using job configuration, or copied from an existing job"
   postCreateItem(Content_Type: String, Jenkins_Crumb: String, body: String, from: String, mode: String, name: String!): String
-  # Create a new view using view configuration
+  "Create a new view using view configuration"
   postCreateView(Content_Type: String, Jenkins_Crumb: String, body: String, name: String!): String
-  # Build a job
+  "Build a job"
   postJobBuild(Jenkins_Crumb: String, json: String!, name: String!, token: String): String
-  # Update job configuration
+  "Update job configuration"
   postJobConfig(Jenkins_Crumb: String, body: String!, name: String!): String
-  # Delete a job
+  "Delete a job"
   postJobDelete(Jenkins_Crumb: String, name: String!): String
-  # Disable a job
+  "Disable a job"
   postJobDisable(Jenkins_Crumb: String, name: String!): String
-  # Enable a job
+  "Enable a job"
   postJobEnable(Jenkins_Crumb: String, name: String!): String
-  # Stop a job
+  "Stop a job"
   postJobLastBuildStop(Jenkins_Crumb: String, name: String!): String
-  # Replay an organization pipeline run
+  "Replay an organization pipeline run"
   postPipelineRun(organization: String!, pipeline: String!, run: String!): QueueItemImpl
-  # Start a build for an organization pipeline
+  "Start a build for an organization pipeline"
   postPipelineRuns(organization: String!, pipeline: String!): QueueItemImpl
-  # Update view configuration
+  "Update view configuration"
   postViewConfig(Jenkins_Crumb: String, body: String!, name: String!): String
-  # Favorite/unfavorite a pipeline
+  "Favorite/unfavorite a pipeline"
   putPipelineFavorite(body: putPipelineFavorite_bodyInput!, organization: String!, pipeline: String!): FavoriteImpl
-  # Stop a build of an organization pipeline
+  "Stop a build of an organization pipeline"
   putPipelineRun(blocking: String, organization: String!, pipeline: String!, run: String!, timeOutInSecs: Int): PipelineRun
 }
 
@@ -506,93 +506,93 @@ type PipelinelatestRunartifacts {
 }
 
 type Query {
-  # Retrieve authenticated user details for an organization
+  "Retrieve authenticated user details for an organization"
   getAuthenticatedUser(organization: String!): User
-  # Get a list of class names supported by a given class
+  "Get a list of class names supported by a given class"
   getClasses(class: String!): String
-  # Retrieve computer details
+  "Retrieve computer details"
   getComputer(depth: Int!): ComputerSet
-  # Retrieve CSRF protection token
+  "Retrieve CSRF protection token"
   getCrumb: DefaultCrumbIssuer
-  # Retrieve Jenkins details
+  "Retrieve Jenkins details"
   getJenkins: Hudson
-  # Retrieve job details
+  "Retrieve job details"
   getJob(name: String!): FreeStyleProject
-  # Retrieve job configuration
+  "Retrieve job configuration"
   getJobConfig(name: String!): String
-  # Retrieve job\'s last build details
+  "Retrieve job\'s last build details"
   getJobLastBuild(name: String!): FreeStyleBuild
-  # Retrieve job\'s build progressive text output
+  "Retrieve job\'s build progressive text output"
   getJobProgressiveText(name: String!, number: String!, start: String!): String
-  # Retrieve JSON Web Key
+  "Retrieve JSON Web Key"
   getJsonWebKey(key: Int!): String
-  # Retrieve JSON Web Token
+  "Retrieve JSON Web Token"
   getJsonWebToken(expiryTimeInMins: Int, maxExpiryTimeInMins: Int): String
-  # Retrieve organization details
+  "Retrieve organization details"
   getOrganisation(organization: String!): Organisation
-  # Retrieve all organizations details
+  "Retrieve all organizations details"
   getOrganisations: [Organisation]
-  # Retrieve pipeline details for an organization
+  "Retrieve pipeline details for an organization"
   getPipeline(organization: String!, pipeline: String!): Pipeline
-  # Retrieve all activities details for an organization pipeline
+  "Retrieve all activities details for an organization pipeline"
   getPipelineActivities(organization: String!, pipeline: String!): [PipelineActivity]
-  # Retrieve branch details for an organization pipeline
+  "Retrieve branch details for an organization pipeline"
   getPipelineBranch(branch: String!, organization: String!, pipeline: String!): BranchImpl
-  # Retrieve branch run details for an organization pipeline
+  "Retrieve branch run details for an organization pipeline"
   getPipelineBranchRun(branch: String!, organization: String!, pipeline: String!, run: String!): PipelineRun
-  # Retrieve all branches details for an organization pipeline
+  "Retrieve all branches details for an organization pipeline"
   getPipelineBranches(organization: String!, pipeline: String!): MultibranchPipeline
-  # Retrieve pipeline folder for an organization
+  "Retrieve pipeline folder for an organization"
   getPipelineFolder(folder: String!, organization: String!): PipelineFolderImpl
-  # Retrieve pipeline details for an organization folder
+  "Retrieve pipeline details for an organization folder"
   getPipelineFolderPipeline(folder: String!, organization: String!, pipeline: String!): PipelineImpl
-  # Retrieve queue details for an organization pipeline
+  "Retrieve queue details for an organization pipeline"
   getPipelineQueue(organization: String!, pipeline: String!): [QueueItemImpl]
-  # Retrieve run details for an organization pipeline
+  "Retrieve run details for an organization pipeline"
   getPipelineRun(organization: String!, pipeline: String!, run: String!): PipelineRun
-  # Get log for a pipeline run
+  "Get log for a pipeline run"
   getPipelineRunLog(download: Boolean, organization: String!, pipeline: String!, run: String!, start: Int): String
-  # Retrieve run node details for an organization pipeline
+  "Retrieve run node details for an organization pipeline"
   getPipelineRunNode(node: String!, organization: String!, pipeline: String!, run: String!): PipelineRunNode
-  # Retrieve run node details for an organization pipeline
+  "Retrieve run node details for an organization pipeline"
   getPipelineRunNodeStep(node: String!, organization: String!, pipeline: String!, run: String!, step: String!): PipelineStepImpl
-  # Get log for a pipeline run node step
+  "Get log for a pipeline run node step"
   getPipelineRunNodeStepLog(node: String!, organization: String!, pipeline: String!, run: String!, step: String!): String
-  # Retrieve run node steps details for an organization pipeline
+  "Retrieve run node steps details for an organization pipeline"
   getPipelineRunNodeSteps(node: String!, organization: String!, pipeline: String!, run: String!): [PipelineStepImpl]
-  # Retrieve run nodes details for an organization pipeline
+  "Retrieve run nodes details for an organization pipeline"
   getPipelineRunNodes(organization: String!, pipeline: String!, run: String!): [PipelineRunNode]
-  # Retrieve all runs details for an organization pipeline
+  "Retrieve all runs details for an organization pipeline"
   getPipelineRuns(organization: String!, pipeline: String!): [PipelineRun]
-  # Retrieve all pipelines details for an organization
+  "Retrieve all pipelines details for an organization"
   getPipelines(organization: String!): [Pipeline]
-  # Retrieve queue details
+  "Retrieve queue details"
   getQueue: Queue
-  # Retrieve queued item details
+  "Retrieve queued item details"
   getQueueItem(number: String!): Queue
-  # Retrieve SCM details for an organization
+  "Retrieve SCM details for an organization"
   getSCM(organization: String!, scm: String!): GithubScm
-  # Retrieve SCM organization repositories details for an organization
+  "Retrieve SCM organization repositories details for an organization"
   getSCMOrganisationRepositories(credentialId: String, organization: String!, pageNumber: Int, pageSize: Int, scm: String!, scmOrganisation: String!): [GithubOrganization]
-  # Retrieve SCM organization repository details for an organization
+  "Retrieve SCM organization repository details for an organization"
   getSCMOrganisationRepository(credentialId: String, organization: String!, repository: String!, scm: String!, scmOrganisation: String!): [GithubOrganization]
-  # Retrieve SCM organizations details for an organization
+  "Retrieve SCM organizations details for an organization"
   getSCMOrganisations(credentialId: String, organization: String!, scm: String!): [GithubOrganization]
-  # Retrieve user details for an organization
+  "Retrieve user details for an organization"
   getUser(organization: String!, user: String!): User
-  # Retrieve user favorites details for an organization
+  "Retrieve user favorites details for an organization"
   getUserFavorites(user: String!): [FavoriteImpl]
-  # Retrieve users details for an organization
+  "Retrieve users details for an organization"
   getUsers(organization: String!): User
-  # Retrieve view details
+  "Retrieve view details"
   getView(name: String!): ListView
-  # Retrieve view configuration
+  "Retrieve view configuration"
   getViewConfig(name: String!): String
-  # Retrieve Jenkins headers
+  "Retrieve Jenkins headers"
   headJenkins: String
-  # Search for any resource details
+  "Search for any resource details"
   search(q: String!): String
-  # Get classes details
+  "Get classes details"
   searchClasses(q: String!): String
 }
 

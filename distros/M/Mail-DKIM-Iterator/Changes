@@ -1,3 +1,5 @@
+1.002 - 2019/02/10
+- add Date to headers which should be signed by default
 1.002 - 2018/11/15
 - small fix authentication_results
 - fix if sub filter is used after dkim signatures are already read (like

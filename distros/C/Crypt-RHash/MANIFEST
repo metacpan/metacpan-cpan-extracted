@@ -21,8 +21,10 @@ librhash/ed2k.c
 librhash/ed2k.h
 librhash/edonr.c
 librhash/edonr.h
-librhash/gost.c
-librhash/gost.h
+librhash/gost12.c
+librhash/gost12.h
+librhash/gost94.c
+librhash/gost94.h
 librhash/has160.c
 librhash/has160.h
 librhash/hex.c

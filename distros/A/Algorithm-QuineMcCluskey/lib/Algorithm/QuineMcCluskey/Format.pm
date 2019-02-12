@@ -9,7 +9,7 @@ package Algorithm::QuineMcCluskey::Format;
 
 use strict;
 use warnings;
-use 5.010001;
+use 5.016001;
 
 use Algorithm::QuineMcCluskey::Util qw(matchcount);
 use List::MoreUtils qw(uniq firstidx);
@@ -19,12 +19,12 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(arrayarray hasharray chart);
 
-our $VERSION = 0.19;
+our $VERSION = 1.00;
 
 =head1 DESCRIPTION
 
-This module provides formatting utilities designed for (but not limited to) use in
-Algorithm::QuineMcCluskey.
+This module provides formatting utilities designed for (but not limited
+to) use in Algorithm::QuineMcCluskey.
 
 =cut
 
@@ -109,6 +109,7 @@ sub chart
 }
 
 =head3 setbit_cmp()
+
 =head3 unsetbit_cmp()
 
 Comparison function for sort() that orders the rows in the chart() 

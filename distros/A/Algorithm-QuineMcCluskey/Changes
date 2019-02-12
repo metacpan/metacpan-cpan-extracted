@@ -1,5 +1,42 @@
 Revision history for Algorithm-QuineMcCluskey
 
+
+1.00
+     2019-02-10
+	- Moved the formatting functions to_boolean() and
+	  to_boolean_term() over to Logic::Minimizer. Tie::Cycle is no
+	  longer used, and gets removed from the build requirement in
+	  Build.PL.
+	- README is now README.md.
+	- With Logic::Minimizer finally released yesterday, it's time to
+	  send this off to CPAN.
+     2018-10-06
+	- Removed the terms parameter from find_essentials(),
+	  covered_least(), and row_dominance(), which we already
+	  had in other structures. This shortened the loops and reduced
+	  the number of loop structures needed. Another speed-up.
+     2018-09-29
+	- Replace columns(), a function that rotated the primes
+	  hash using grep and any(), with new function transpose(),
+	  which does the same thing using hash keys, and which NYTProf
+	  says is faster.
+     2018-08-30
+	- Examining remels() more closely, it became obvious that
+	  it was using maskedmatch() as an block argument to indexes()
+	  for every single term against every single element three
+	  loops deep. Since maskedmatch() has a set-up cost, this
+	  seems wasteful. Created a new function maskedmatchindexes(),
+	  which sets up the masks before going through the list once.
+	- Which means we no longer are using the indexes() function
+	  from List::MoreUtils, which is now removed.
+     2018-08-29
+	- We now use Logic::Minimizer as a base class.
+	- Consequently, removed attributes and methods that are
+	  now in Logic::Minimizer, and are provided automatically.
+	- Use L::M's catch_errors() for attribute validation.
+	- Update Build.PL with Logic::Minimizer requirement.
+	- And updated the version number everywhere.
+
 0.19
     2019-07-31
 	- There was more processing than needed in least_covered() to do
@@ -21,7 +58,9 @@ Revision history for Algorithm-QuineMcCluskey
 	  function that is called once with a list.
 	- Moved the next-level-implicant check of version 0.18 outward
 	  two loops (some duplicates still popped up as two different
-	  terms could bit flip to the same implicant).
+	  terms could bit flip to the same implicant). Moved the push
+	  operation of those implicants outward too, using the keys
+	  of the hash used in checking for them.
 	- Created width=>6 tests in new files 28-solve.t and 29-solve.t.
 0.18
     2018-07-10
@@ -303,7 +342,7 @@ Revision history for Algorithm-QuineMcCluskey
 	  the documentation and in the test files.
      2014-08-20
 	- No more default arguments (in the form of $self->get_primes())
-	  for row_dom(), col_dom(), and purge_essentials(). Always
+	  for row_dom(), col_dom(), and purge_essentials()). Always
 	  pass in the argument -- it's less confusing that way.
 	- Trim Util.pm of tobits() -- it's embedded in BUILD now.
      2014-08-19

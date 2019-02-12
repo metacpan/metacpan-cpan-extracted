@@ -13,6 +13,7 @@ use File::Spec::Functions qw( catfile );
 use List::MoreUtils   qw( all any first_index uniq );
 use Encode::Locale    qw();
 #use Spreadsheet::Read qw( ReadData rows ); # required
+#use String::Unescape  qw( unescape );      # required
 #use Text::CSV         qw();                # required
 
 use Term::Choose            qw( choose );
@@ -389,7 +390,9 @@ sub __parse_file {
         seek $fh, 0, 0;
         my $rows_of_cols = [];
         require Text::CSV;
-        my $csv = Text::CSV->new( { map { $_ => $sf->{o}{csv}{$_} } keys %{$sf->{o}{csv}} } ) or die Text::CSV->error_diag();
+        require String::Unescape;
+        my $options = { map { $_ => String::Unescape::unescape( $sf->{o}{csv}{$_} ) } keys %{$sf->{o}{csv}} };
+        my $csv = Text::CSV->new( $options ) or die Text::CSV->error_diag();
         $csv->callbacks( error => sub {
             my ( $code, $str, $pos, $rec, $fld ) = @_;
             if ( $code == 2012 ) { # ignore this error

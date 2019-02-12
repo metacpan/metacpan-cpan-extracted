@@ -6,16 +6,25 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Mojolicious-Plugin-MoreHTMLHelpers
+provides:
+  Mojolicious::Plugin::MoreHTMLHelpers:
+    file: lib/Mojolicious/Plugin/MoreHTMLHelpers.pm
+    version: '0.02'
 requires:
   Mojolicious: '4.50'
+  perl: '5.016'
 resources:
   bugtracker: http://github.com/reneeb/Mojolicious-Plugin-MoreHTMLHelpers/issues
   homepage: http://github.com/reneeb/Mojolicious-Plugin-MoreHTMLHelpers
   repository: http://github.com/reneeb/Mojolicious-Plugin-MoreHTMLHelpers.git
-version: '0.01'
+version: '0.02'
+x_contributors:
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

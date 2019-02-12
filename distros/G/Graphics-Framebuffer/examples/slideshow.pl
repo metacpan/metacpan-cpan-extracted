@@ -31,24 +31,24 @@ GetOptions(
     'dev=i'        => \$dev,
     'noaccel'      => \$noaccel,
 );
-my @paths      = @ARGV;
+my @paths = @ARGV;
 
-unless (scalar(@paths) && ! $help) {
+unless (scalar(@paths) && !$help) {
     $help = 2;
 }
 
 if ($help) {
-    pod2usage('-exitstatus' => 1,'-verbose' => $help);
+    pod2usage('-exitstatus' => 1, '-verbose' => $help);
 }
 
 my $splash = ($nosplash) ? 0 : 2;
 
 our $FB = Graphics::Framebuffer->new(
-    'SHOW_ERRORS'   => $errors,
-    'RESET'         => 1,
-    'SPLASH'        => $splash,
-    'ACCELERATED'   => ! $noaccel,
-    'FB_DEVICE'     => "/dev/fb$dev",
+    'SHOW_ERRORS' => $errors,
+    'RESET'       => 1,
+    'SPLASH'      => $splash,
+    'ACCELERATED' => !$noaccel,
+    'FB_DEVICE'   => "/dev/fb$dev",
 );
 
 if ($errors) {
@@ -62,11 +62,10 @@ DELAY           = $delay
 NOSPLASH        = $nosplash
 DEVICE          = /dev/fb$dev
 ACCELERATION    = $FB->{'ACCELERATED'}
-PATH(s)         = }, join('; ',@paths),"\n";
+PATH(s)         = }, join('; ', @paths), "\n";
 
     sleep 1;
-}
-
+} ## end if ($errors)
 
 system('clear');
 $FB->cls('OFF');
@@ -84,33 +83,33 @@ sub gather {
     my @pics;
     foreach my $path (@paths) {
         chop($path) if ($path =~ /\/$/);
-        $FB->rbox({'x' => 0, 'y' => 0, 'width' => $FB->{'XRES'}, 'height' => 32, 'filled' => 1, 'gradient' => {'direction' => 'vertical', 'colors' => {'red' => [0,0], 'green' => [0,0], 'blue' => [64,128]}}});
+        $FB->rbox({ 'x' => 0, 'y' => 0, 'width' => $FB->{'XRES'}, 'height' => 32, 'filled' => 1, 'gradient' => { 'direction' => 'vertical', 'colors' => { 'red' => [0, 0], 'green' => [0, 0], 'blue' => [64, 128] } } });
         print_it("Scanning - $path");
         opendir(my $DIR, "$path") || die "Problem reading $path directory";
         chomp(my @dir = readdir($DIR));
         closedir($DIR);
 
-        return if (! $showall && grep(/^\.nomedia$/, @dir));
+        return if (!$showall && grep(/^\.nomedia$/, @dir));
         foreach my $file (@dir) {
             next if ($file =~ /^\.+/);
             if (-d "$path/$file") {
                 my $r = gather("$path/$file");
                 if (defined($r)) {
-                    @pics = (@pics,@{$r});
+                    @pics = (@pics, @{$r});
                 }
             } elsif (-f "$path/$file" && $file =~ /\.(jpg|jpeg|gif|tiff|bmp|png)$/i) {
                 push(@pics, "$path/$file");
             }
-        }
-    }
-    return(\@pics);
-}
+        } ## end foreach my $file (@dir)
+    } ## end foreach my $path (@paths)
+    return (\@pics);
+} ## end sub gather
 
 sub show {
-    my $ps  = shift;
-    my @pics = shuffle(@{$ps});
-    my $p = scalar(@pics);
-    my $idx = 0;
+    my $ps    = shift;
+    my @pics  = shuffle(@{$ps});
+    my $p     = scalar(@pics);
+    my $idx   = 0;
     my $halfw = int($FB->{'XRES'} / 2);
     my $halfh = int($FB->{'YRES'} / 2);
 
@@ -144,8 +143,8 @@ sub show {
             if (ref($image) eq 'ARRAY') {
                 my $s = time + ($delay * 2);
                 while (time <= $s) {
-                    $FB->play_animation($image,1);
-                } ## end while (time <= $s)
+                    $FB->play_animation($image, 1);
+                }
             } else {
                 $FB->cls();
                 if ($fullscreen) {
@@ -166,11 +165,12 @@ sub show {
                     $FB->blit_write($image);
                 }
                 sleep $delay;
-            }
+            } ## end else [ if (ref($image) eq 'ARRAY')]
         } ## end if (defined($image))
         $idx++;
-#        $idx = 0 if ($idx >= $p);
-    } ## end while ($RUNNING)
+
+        #        $idx = 0 if ($idx >= $p);
+    } ## end while ($idx < $p)
 } ## end sub show
 
 sub print_it {

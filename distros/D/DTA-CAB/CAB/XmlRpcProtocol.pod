@@ -1,0 +1,456 @@
+=pod
+
+=head1 NAME
+
+DTA::CAB::XmlRpcProtocol - XML-RPC protocol for use with DTA::CAB::Server::XmlRpc
+
+=cut
+
+##========================================================================
+## SYNOPSIS
+=pod
+
+=head1 SYNOPSIS
+
+ ##-- system methods provided by RPC::XML
+ STRING = system.identity()
+ STRUCT = system.status()
+ ARRAY  = system.listMethods()
+ ARRAY  = system.methodSignature( METHOD_NAME )
+ STRING = system.methodHelp     ( METHOD_NAME )
+
+ ##-- local methods provided by DTA::CAB::Server::XmlRpc
+ ARRAY  = dta.cab.listAnalyzers()
+ STRUCT = dta.cab.default.analyzeToken    ( TOKEN    , OPTIONS? )
+ STRUCT = dta.cab.default.analyzeSentence ( SENTENCE , OPTIONS? )
+ STRUCT = dta.cab.default.analyzeDocument ( DOCUMENT , OPTIONS? )
+ BASE64 = dta.cab.default.analyzeData     ( DATA     , OPTIONS? )
+
+=cut
+
+##========================================================================
+## DESCRIPTION
+=pod
+
+=head1 DESCRIPTION
+
+This manual page describes the XML-RPC conventions used by the
+L<DTA::CAB::Server::XmlRpc|DTA::CAB::Server::XmlRpc> class.
+See L</SYSTEM METHODS> for a brief description of some methods
+provided by the underlying RPC::XML::Server module, and see
+L</CAB METHODS> for details on the methods provided by
+the L<DTA::CAB::Server::XmlRpc|DTA::CAB::Server::XmlRpc> module
+itself.
+
+All data passed to and from the server are assumed to be encoded in UTF-8
+(although the L</ANALYZER.analyzeData> procedure is cabable of handling
+arbitrary encodings by use of the XML-RPC C<base64> type).
+
+=cut
+
+##========================================================================
+=pod
+
+=head1 SYSTEM METHODS
+
+These methods are provided by the underlying RPC::XML::Server module.
+See L<RPC::XML::Server(3pm)|RPC::XML::Server> for details.
+
+=head2 system.identity
+
+ STRING = system.identity()
+
+Returns a string identifying the running server.
+
+=head2 system.status
+
+ STRUCT = system.status()
+
+Returns a struct representing running server status.
+
+=head2 system.listMethods
+
+ ARRAY  = system.listMethods();
+
+Returns an array of available method names (strings).
+
+=head2 system.methodSignature
+
+ ARRAY  = system.methodSignature( METHOD_NAME );
+
+Returns an array of available call signatures for the method METHOD_NAME (a string).
+Each signature in the returned array is itself an array of XML-RPC type names
+("struct", "string", "int", etc.).  The first element of each signature-array
+is the return type for the method, the remaining elements are argument types.
+
+=head2 system.methodHelp
+
+ STRING = system.methodHelp( METHOD_NAME );
+
+Returns a help string for the method METHOD_NAME (a string).
+
+=cut
+
+##========================================================================
+=pod
+
+=head1 CAB METHODS
+
+L<DTA::CAB::Server::XmlRpc|DTA::CAB::Server::XmlRpc> methods all carry
+an optional prefix characteristic for the server (see {procNamePrefix} in
+L<DTA::CAB::Server::XmlRpc::new()|DTA::CAB::Server::XmlRpc/new>);
+by default this prefix is "dta.cab.".
+If your server is configured to use a different prefix, replace the "dta.cab." prefix
+in the examples below with that used by your server.
+
+Except for the server-global L</listAnalyzers>() method,
+each registered method is associated with an underlying L<DTA::CAB::Analyzer|DTA::CAB::Analyzer>
+object, identified by a name which is unique to that analyzer
+within the scope of the running server (see L</listAnalyzers> for a way
+to figure out which analyzers your server recognizes).
+By default, analysis method names are carry as an additional prefix
+the name of the associated analyzer, so generic method names
+are of the form I<(ServerPrefix)(AnalyzerName).(MethodName)>.
+By convention, each server should register an analyzer (alias) under the
+name "default", which performs some default analysis of incoming data, so
+common calls look like C<dta.cab.default.I<MethodName>(I<MethodArguments>)>
+
+=head2 listAnalyzers
+
+ ARRAY = dta.cab.listAnalyzers()
+
+Returns an array of all analyzer names (strings) recognized by the running server.
+
+
+=head2 ANALYZER.analyzeToken
+
+ STRUCT = dta.cab.default.analyzeToken ( TOKEN, OPTIONS? )
+ STRUCT = dta.cab.ANALYZER.analyzeToken( TOKEN, OPTIONS? )
+
+Analyze a single token TOKEN with the analyzer ANALYZER.
+OPTIONS is an optional struct containing runtime analysis options
+to be passed to
+the closure which implements
+the underlying perl analyzer's
+L<analyzeToken()|DTA::CAB::Analyzer/analyzeToken>
+method.
+
+TOKEN may be of one of the following types:
+
+=over 4
+
+=item string
+
+A simple string is interpreted as raw token text.
+
+=item struct
+
+A struct may contain the field "text", whose value
+should be a string containing the raw token text.
+Other fields may be filled as well; these may be read
+and/or overwritten depending on the underlying analyzer
+and options.  See below for more optional fields.
+
+=back
+
+Returns a struct which may have one or more of the following
+fields, depending on the underlying analyzer and options:
+
+=over 4
+
+=item token.text
+
+Raw token text (string)
+
+=item token.xlit
+
+Transliteration (latin-1 approximation) analysis results,
+a struct with the following fields:
+
+=over 4
+
+=item token.xlit.latin1Text
+
+(string) heuristic latin-1 approximation of input token text
+
+=item token.xlit.isLatin1
+
+(boolean) whether input token text is losslessly encodable in
+the latin-1 (ISO-8859-1) character set.
+If this is true, the token's L<xlit.latin1Text|/token.xlit.latin1Text> field should
+be identical to its L<text|/token.text> field.
+
+=item token.xlit.isLatinExt
+
+(boolean) whether input token text is losslessly encodable
+in the Unicode "latin-extended" character set.
+
+=back
+
+=item token.morph
+
+Morphological analyses, an array of structs,
+each element of which represents a single analysis,
+and has fields:
+
+=over 4
+
+=item token.morph[i].w
+
+Analysis weight (float)
+
+=item token.morph[i].hi
+
+Analysis output string
+
+=back
+
+=item token.msafe
+
+int (boolean) representing heuristic analysis of whether
+morphological analyses are considered "safe" (proper names
+e.g. are not considered "safe" in this sense).
+
+=item token.lts
+
+Letter-to-sound transduction results as an array
+of structs.  See L</token.morph> for the element format.
+
+
+=item token.eqpho
+
+Array of analysis structs a la L</token.morph>
+representing the set of phonetically equivalent indexed word types.
+Note that the notion of "phonetic equivalence" implicit in this analysis
+may or may not be consistent with actual identity of phonetic strings
+as returned in the L</token.lts> field.
+
+=item token.eqphox
+
+Array of strings representing the k-best phonetically equivalent word types known to
+the underlying (intensional) lexicon.  Differs from L</token.eqpho> in the set from
+which the phonetic equivalents are drawn.
+
+=item token.rw
+
+Array of analysis structs a la L</token.morph>, where weights
+and analyses are determined by a (canonicalizing) rewrite cascade.
+Each analysis struct may additionally have "lts" and/or "morph"
+fields of its own, representing the respective analyses of the
+rewrite I<target>.
+
+=item token.eqrw
+
+Array of analysis structs a la L</token.morph> representing the indexed word types
+which are "rewrite-equivalent"
+to the current token; i.e. which were rewritten to the same string as the
+current token.
+
+=item token.eqlemma
+
+Array of analysis structs a la L</token.morph> representing the indexed word types
+which are lemma-equivalent to the current token; i.e. which were assigned the same
+lemma as the current token during the most recent indexing run.
+See L</token.moot.lemma>.
+
+=item token.dmoot
+
+Canonicalization-disambiguator output, a struct containing sub-fields:
+
+=over 4
+
+=item token.dmoot.tag
+
+(required): string representing the optimal canonicalization of the token
+as returned by the HMM disambiguator.
+
+=item token.dmoot.morph
+
+(optional): morphological analyses for L</token.dmoot.tag>, in the same
+format as L</token.morph>.
+
+=item token.dmoot.analyses
+
+(optional): disambiguator input analyses, an array of structs representing the
+canonicalization candidates passed to the disambiguator.  Each element is a struct
+of the form
+
+=over 4
+
+=item token.dmoot.analyses[i].tag
+
+Canonicalization candidate for this analysis (string).
+
+=item token.dmoot.analyses[i].details
+
+Details for this canonicalizaion candidate (string).
+
+=item token.dmoot.analyses[i].cost
+
+Heuristic cost of this canonicalization candidate (float).
+
+=back
+
+=back
+
+
+=item token.moot
+
+Part-of-speech tagging output for this token,
+structured as for L</token.dmoot>, except that
+C<.tag> fields represent part-of-speech tags and
+C<.analyses> represents tagger-relevant morphological analyses for the token.
+The C<token.moot> may also have additional fields:
+
+=over 4
+
+=item token.moot.word
+
+String: the literal text of the token as it was passed to the part-of-speech tagger.
+Usually identical to L</token.dmoot.tag>.
+
+=item token.moot.lemma
+
+String: lemma of the token as guessed from canonicalization and tagger output.
+
+=back
+
+=back
+
+
+=head2 ANALYZER.analyzeSentence
+
+ STRUCT = dta.cab.default.analyzeSentence ( SENTENCE, OPTIONS? )
+ STRUCT = dta.cab.ANALYZER.analyzeSentence( SENTENCE, OPTIONS? )
+
+Analyze a sentence SENTENCE with the analyzer ANALYZER.
+OPTIONS is an optional struct containing runtime analysis options to be passed to
+the closure which implements
+the underlying perl analyzer's
+L<analyzeSentence()|DTA::CAB::Analyzer/analyzeSentence>
+method.
+
+SENTENCE may be of one of the following types:
+
+=over 4
+
+=item array
+
+A sentence array is interpreted as a list of sentence tokens,
+which may occur in any of the forms accepted by
+L</ANALYZER.analyzeToken>.
+
+=item struct
+
+A sentence struct should have the field 'tokens', an array
+containing a list of sentence tokens as above.
+
+=back
+
+Returns a sentence struct in the form just described.
+Currently, no DTA::CAB analyzers add any additional fields to the sentence struct.
+
+=head2 ANALYZER.analyzeDocument
+
+ STRUCT = dta.cab.default.analyzeDocument ( DOCUMENT, OPTIONS? )
+ STRUCT = dta.cab.ANALYZER.analyzeDocument( DOCUMENT, OPTIONS? )
+
+Analyze a whole document DOCUMENT with the analyzer ANALYZER.
+OPTIONS is an optional struct containing runtime analysis options to be passed to
+the closure which implements
+the underlying perl analyzer's
+L<analyzeDocument()|DTA::CAB::Analyzer/analyzeDocument>
+method.
+
+DOCUMENT may be of one of the following types:
+
+=over 4
+
+=item array
+
+A document array is interpreted as a list of document sentences,
+which may occur in any of the forms accepted by
+L</ANALYZER.analyzeSentence>.
+
+=item struct
+
+A document struct should have the field 'body', an array
+containing a list of document sentences as above.
+
+=back
+
+Returns a document struct in the form just described.
+Currently, no DTA::CAB analyzers add any additional fields to the document struct.
+
+
+=head2 ANALYZER.analyzeData
+
+ BASE64 = dta.cab.default.analyzeData ( DATA, OPTIONS? )
+ BASE64 = dta.cab.ANALYZER.analyzeData( DATA, OPTIONS? )
+
+Analyze a raw data string as a document, with server-side
+parsing and formatting.  Perhaps surprisingly, this is the
+fastest method of data exchange with the L<DTA::CAB::Server::XmlRpc|DTA::CAB::Server::XmlRpc>
+server, due to the horrendous overhead associated with the parsing
+and generation of complex XML-RPC data structures required
+by the L</ANALYZER.analyzeDocument>() procedure.
+
+DATA should be a base64 binary string representing the document
+to be analyzed in some format parseable by the DTA::CAB modules
+(e.g. some sub-class of L<DTA::CAB::Format|DTA::CAB::Format>),
+and
+OPTIONS is an optional struct containing runtime analysis options to be passed to
+the closure which implements
+the underlying perl analyzer's
+L<analyzeData()|DTA::CAB::Analyzer/analyzeData>
+and/or
+L<analyzeDocument()|DTA::CAB::Analyzer/analyzeDocument>
+method.
+
+In particular, OPTIONS may contain the (nested) fields:
+
+=over 4
+
+=item OPTIONS-E<gt>reader-E<gt>class
+
+(string) class-name or suffix of the L<DTA::CAB::Format|DTA::CAB::Format>
+subclass to use for parsing input.
+The default reader class is
+L<DTA::CAB::Format::TT|DTA::CAB::Format::TT>
+(unless you changed L<$DTA::CAB::Format::CLASS_DEFAULT|DTA::CAB::Format/$CLASS_DEFAULT>),
+which expects
+one word per line TAB-separated data with conventional prefixes
+identifying token analysis fields.
+
+=item OPTIONS-E<gt>writer-E<gt>class
+
+(string) class-name or suffix of the L<DTA::CAB::Format|DTA::CAB::Format>
+subclass to use for formatting output.
+The default writer class is the whatever reader class is being used.
+
+=back
+
+Returns a formatted binary string representing the analyzed document.
+
+=cut
+
+
+##======================================================================
+## Footer
+##======================================================================
+
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009-2019 by Bryan Jurish
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
