@@ -29,9 +29,9 @@ sub union_tables {
     my $tables = [ @{$sf->{d}{user_tables}}, @{$sf->{d}{sys_tables}} ];
     ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->column_names_and_types( $tables );
     my $union = {
-        used_tables => [],
-        used_cols   => [],
-        saved_cols  => [],
+        used_tables    => [],
+        subselect_data => [],
+        saved_cols     => [],
     };
     my $unique_char = 'A';
     my @bu;
@@ -63,7 +63,7 @@ sub union_tables {
         );
         if ( ! defined $idx_tbl || ! defined $choices->[$idx_tbl] ) {
             if ( @bu ) {
-                ( $union->{used_tables}, $union->{used_cols}, $union->{saved_cols} ) = @{pop @bu};
+                ( $union->{used_tables}, $union->{subselect_data}, $union->{saved_cols} ) = @{pop @bu};
                 next UNION_TABLE;
             }
             return;
@@ -71,7 +71,7 @@ sub union_tables {
         my $union_table = $choices->[$idx_tbl];
         my $qt_union_table;
         if ( $union_table eq $enough_tables ) {
-            if ( ! @{$union->{used_tables}} ) {
+            if ( ! @{$union->{subselect_data}} ) {
                 return;
             }
             last UNION_TABLE;
@@ -102,12 +102,12 @@ sub union_tables {
             $union_table =~ s/\Q$used\E\z//;
             $qt_union_table = $ax->quote_table( $sf->{d}{tables_info}{$union_table} );
         }
-        push @bu, [ [ @{$union->{used_tables}} ], [ @{$union->{used_cols}} ], [ @{$union->{saved_cols}} ] ];
+        push @bu, [ [ @{$union->{used_tables}} ], [ @{$union->{subselect_data}} ], [ @{$union->{saved_cols}} ] ];
         push @{$union->{used_tables}}, $union_table;
         $ax->print_sql( $union );
         my $ok = $sf->__union_table_columns( $union, $union_table, $qt_union_table );
         if ( ! $ok ) {
-            ( $union->{used_tables}, $union->{used_cols}, $union->{saved_cols} ) = @{pop @bu};
+            ( $union->{used_tables}, $union->{subselect_data}, $union->{saved_cols} ) = @{pop @bu};
             next UNION_TABLE;
         }
     }
@@ -117,7 +117,7 @@ sub union_tables {
     my $alias = $ax->alias( 'union', '', "TABLES_UNION" );
     $qt_table .= " AS " . $ax->quote_col_qualified( [ $alias ] );
     # column names in the result-set of a UNION are taken from the first query.
-    my $qt_columns = $union->{used_cols}[0][1];
+    my $qt_columns = $union->{subselect_data}[0][1];
     return $qt_table, $qt_columns;
 }
 
@@ -126,7 +126,7 @@ sub __union_table_columns {
     my ( $sf, $union, $union_table, $qt_union_table ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my ( $privious_cols, $void ) = ( q['^'], q[' '] );
-    my $next_idx = @{$union->{used_cols}};
+    my $next_idx = @{$union->{subselect_data}};
     my $table_cols = [];
     my @bu_cols;
 
@@ -142,17 +142,17 @@ sub __union_table_columns {
         if ( ! defined $chosen[0] ) {
             if ( @bu_cols ) {
                 $table_cols = pop @bu_cols;
-                $union->{used_cols}[$next_idx] = [ $qt_union_table, $ax->quote_simple_many( $table_cols ) ];
+                $union->{subselect_data}[$next_idx] = [ $qt_union_table, $ax->quote_simple_many( $table_cols ) ];
                 next;
             }
-            $#{$union->{used_cols}} = $next_idx - 1;
+            $#{$union->{subselect_data}} = $next_idx - 1;
             return;
         }
         if ( $chosen[0] eq $void ) {
             next;
         }
         elsif ( $chosen[0] eq $privious_cols ) {
-            push @{$union->{used_cols}}, [ $qt_union_table, $ax->quote_simple_many( $union->{saved_cols} ) ];
+            push @{$union->{subselect_data}}, [ $qt_union_table, $ax->quote_simple_many( $union->{saved_cols} ) ];
             return 1;
         }
         elsif ( $chosen[0] eq $sf->{i}{ok} ) {
@@ -161,14 +161,14 @@ sub __union_table_columns {
             if ( ! @$table_cols ) {
                 $table_cols = [ @{$sf->{d}{col_names}{$union_table}} ];
             }
-            $union->{used_cols}[$next_idx] = [ $qt_union_table, $ax->quote_simple_many( $table_cols ) ];
+            $union->{subselect_data}[$next_idx] = [ $qt_union_table, $ax->quote_simple_many( $table_cols ) ];
             $union->{saved_cols} = $table_cols;
             return 1;
         }
         else {
             push @bu_cols, $table_cols;
             push @$table_cols, @chosen;
-            $union->{used_cols}[$next_idx] = [ $qt_union_table, $ax->quote_simple_many( $table_cols ) ];
+            $union->{subselect_data}[$next_idx] = [ $qt_union_table, $ax->quote_simple_many( $table_cols ) ];
         }
     }
 }
@@ -180,7 +180,7 @@ sub __union_all_tables {
     my $choices  = [ undef, map( "- $_", @{$sf->{d}{user_tables}} ) ];
 
     while ( 1 ) {
-        $union->{used_cols} = [ map { [ $_, [ '?' ] ] } @{$sf->{d}{user_tables}} ];
+        $union->{subselect_data} = [ map { [ $_, [ '?' ] ] } @{$sf->{d}{user_tables}} ];
         $ax->print_sql( $union );
         # Choose
         my $idx_tbl = choose(
@@ -188,7 +188,7 @@ sub __union_all_tables {
             { %{$sf->{i}{lyt_stmt_v}}, prompt => 'One UNION table for cols:', index => 1 }
         );
         if ( ! defined $idx_tbl || ! defined $choices->[$idx_tbl] ) {
-            $union->{used_cols} = [];
+            $union->{subselect_data} = [];
             return;
         }
         ( my $union_table = $choices->[$idx_tbl] ) =~ s/^-\s//;
@@ -198,10 +198,10 @@ sub __union_all_tables {
             last;
         }
     }
-    my $qt_used_cols = $union->{used_cols}[-1][1];
-    $union->{used_cols} = [];
+    my $qt_used_cols = $union->{subselect_data}[-1][1];
+    $union->{subselect_data} = [];
     for my $union_table ( @{$sf->{d}{user_tables}} ) {
-        push @{$union->{used_cols}}, [ $ax->quote_table( $sf->{d}{tables_info}{$union_table} ), $qt_used_cols ];
+        push @{$union->{subselect_data}}, [ $ax->quote_table( $sf->{d}{tables_info}{$union_table} ), $qt_used_cols ];
     }
     $ax->print_sql( $union );
     return 1;

@@ -14,6 +14,11 @@ use Types::Dist qw(DistFQ);
 my $badger = App::CPANCoverBadge->new;
 my $check  = DistFQ();
 
+my $config = app->home->child('cpan_cover_badge.conf');
+if ( -e $config->to_string ) {
+    plugin 'Config';
+}
+
 get '/*dist' => sub {
     my ($c) = @_;
 
@@ -41,7 +46,7 @@ cpan_cover_badge
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

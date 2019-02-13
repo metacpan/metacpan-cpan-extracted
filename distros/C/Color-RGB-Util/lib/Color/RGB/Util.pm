@@ -1,7 +1,7 @@
 package Color::RGB::Util;
 
-our $DATE = '2018-10-05'; # DATE
-our $VERSION = '0.593'; # VERSION
+our $DATE = '2019-02-13'; # DATE
+our $VERSION = '0.595'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,6 +15,10 @@ our @EXPORT_OK = qw(
                        mix_2_rgb_colors
                        mix_rgb_colors
                        rand_rgb_color
+                       assign_rgb_color
+                       assign_rgb_light_color
+                       assign_rgb_dark_color
+                       map_rgb_color
                        reverse_rgb_color
                        rgb2grayscale
                        rgb2sepia
@@ -88,6 +92,31 @@ sub rand_rgb_color {
                    $g1 + rand()*($g2-$g1+1),
                    $b1 + rand()*($b2-$b1+1),
                );
+}
+
+sub assign_rgb_color {
+    require Digest::SHA;
+
+    my ($str) = @_;
+
+    my $sha1 = Digest::SHA::sha1_hex($str);
+    substr($sha1, 0, 2) .
+    substr($sha1, 18, 2) .
+    substr($sha1, 38, 2);
+}
+
+sub assign_rgb_light_color {
+    my $str = shift;
+
+    my $rgb = assign_rgb_color($str);
+    rgb_is_light($rgb) ? $rgb : mix_2_rgb_colors($rgb, 'ffffff');
+}
+
+sub assign_rgb_dark_color {
+    my $str = shift;
+
+    my $rgb = assign_rgb_color($str);
+    rgb_is_dark($rgb) ? $rgb : mix_2_rgb_colors($rgb, '000000');
 }
 
 sub rgb2grayscale {
@@ -223,7 +252,7 @@ Color::RGB::Util - Utilities related to RGB colors
 
 =head1 VERSION
 
-This document describes version 0.593 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2018-10-05.
+This document describes version 0.595 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2019-02-13.
 
 =head1 SYNOPSIS
 
@@ -231,6 +260,9 @@ This document describes version 0.593 of Color::RGB::Util (from Perl distributio
      mix_2_rgb_colors
      mix_rgb_colors
      rand_rgb_color
+     assign_rgb_color
+     assign_rgb_light_color
+     assign_rgb_dark_color
      rgb2grayscale
      rgb2sepia
      reverse_rgb_color
@@ -251,6 +283,8 @@ This document describes version 0.593 of Color::RGB::Util (from Perl distributio
 
  say rand_rgb_color();
  say rand_rgb_color('000000', '333333');         # limit range
+
+ say assign_rgb_color("foo");                    # 0b5d33
 
  say rgb2grayscale('0033CC');                    # => 555555
 
@@ -310,6 +344,26 @@ Usage:
 
 Generate a random RGB color. You can specify the limit. Otherwise, they default
 to the full range (000000 to ffffff).
+
+=head2 assign_rgb_color
+
+Usage:
+
+ my $rgb = assign_rgb_color($str);
+
+Map a string to an RGB color. This is done by producing SHA-1 digest (160bit, 20
+bytes) of the string, then taking the first, 10th, and last byte to become the
+RGB color.
+
+=head2 assign_rgb_light_color
+
+Like L</assign_rgb_color> except that it will make sure the assigned color is
+light.
+
+=head2 assign_rgb_dark_color
+
+Like L</assign_rgb_color> except that it will make sure the assigned color is
+dark.
 
 =head2 rgb2grayscale
 
@@ -435,7 +489,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

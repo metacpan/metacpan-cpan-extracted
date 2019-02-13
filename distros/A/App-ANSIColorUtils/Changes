@@ -1,3 +1,20 @@
+0.004   2019-02-13 (PERLANCAR)
+
+	- show-assigned-rgb-colors: Add option --tone.
+
+
+0.003   2019-02-13 (PERLANCAR)
+
+	- Add utility: show-assigned-rgb-colors.
+
+
+0.002   2019-02-13 (PERLANCAR)
+
+	- Add utility: show-ansi-color-table.
+
+	- [ux] Simplify CLIs (no need to read config & env).
+
+
 0.001   2017-12-03 (PERLANCAR)
 
         - First release.

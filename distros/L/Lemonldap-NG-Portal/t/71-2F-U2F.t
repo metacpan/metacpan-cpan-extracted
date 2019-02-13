@@ -12,8 +12,7 @@ SKIP: {
     }
     use_ok('Lemonldap::NG::Common::FormEncode');
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel            => 'error',
                 u2fSelfRegistration => 1,
@@ -108,8 +107,7 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $r->is_success, ' Good challenge value' )
       or diag( $r->error_message );
 
-    my $registrationData = JSON::to_json(
-        {
+    my $registrationData = JSON::to_json( {
             clientData       => $r->client_data,
             errorCode        => 0,
             registrationData => $r->registration_data,
@@ -164,8 +162,7 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         $data->{registeredKeys}->[0]->{keyHandle} );
     ok( $r->is_success, ' Good challenge value' )
       or diag( $r->error_message );
-    my $sign = JSON::to_json(
-        {
+    my $sign = JSON::to_json( {
             errorCode     => 0,
             signatureData => $r->signature_data,
             clientData    => $r->client_data,

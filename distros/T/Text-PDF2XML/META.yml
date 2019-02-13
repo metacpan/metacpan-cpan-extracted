@@ -19,8 +19,6 @@ no_index:
     - inc
     - share
     - t
-recommends:
-  Lingua::Identify::Blacklists: '0.04'
 requires:
   Encode: 0
   Encode::Locale: 0
@@ -30,8 +28,9 @@ requires:
   IO::File: 0
   IPC::Open3: 0
   LWP::UserAgent: 0
+  Lingua::Identify::CLD: 0
   XML::Parser: 0
   XML::Writer: 0
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: 0.3.2
+version: 0.3.3

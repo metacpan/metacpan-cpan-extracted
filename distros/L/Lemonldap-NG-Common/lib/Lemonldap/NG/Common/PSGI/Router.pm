@@ -4,7 +4,7 @@ use Mouse;
 use Lemonldap::NG::Common::PSGI;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '1.9.1';
+our $VERSION = '2.0.0';
 
 extends 'Lemonldap::NG::Common::PSGI';
 
@@ -19,53 +19,77 @@ has 'defaultRoute' => ( is => 'rw', default => 'index.html' );
 # Routes initialization
 
 sub addRoute {
-    my ( $self, $word, $dest, $methods ) = (@_);
+    my ( $self, $word, $dest, $methods, $transform ) = (@_);
     $methods ||= [qw(GET POST PUT DELETE)];
     foreach my $method (@$methods) {
-        $self->genRoute( $self->routes->{$method}, $word, $dest );
+        $self->logger->debug("Add $method route:");
+        $self->genRoute( $self->routes->{$method}, $word, $dest, $transform );
     }
     return $self;
 }
 
 sub genRoute {
-    my ( $self, $routes, $word, $dest ) = @_;
+    my ( $self, $routes, $word, $dest, $transform ) = @_;
+    unless ( ref $routes eq 'HASH' ) {
+        $self->logger->error(
+            'Conflict detected between 2 extensions, aborting 1 route');
+        return;
+    }
     if ( ref $word eq 'ARRAY' ) {
         foreach my $w (@$word) {
-            $self->genRoute( $routes, $w, $dest );
+            $self->genRoute( $routes, $w, $dest, $transform );
         }
     }
     else {
+        $dest //= $word;
         if ( $word =~ /^:(.*)$/ ) {
             $routes->{'#'} = $1;
             die "Target required for $word" unless ($dest);
             $word = ':';
         }
+        elsif ( $word =~ m#/# ) {
+            $word =~ s#^(.*?)/##;
+            return $self->genRoute( $routes->{$1}, $word, $dest, $transform );
+        }
         else {
             $dest ||= $word;
+        }
+        if ( $dest =~ /^(.+)\.html$/ ) {
+            my $tpl = $1 or die;
+            $self->logger->debug("route $dest will use $tpl");
+            $routes->{$word} = sub { $self->sendHtml( $_[1], $tpl ) };
+            return;
+        }
+        if ( $transform and ( not ref($dest) or ref($dest) eq 'CODE' ) ) {
+            $dest = $transform->($dest);
+        }
+        if ( my $t = ref $dest ) {
+            if ( $t eq 'HASH' ) {
+                $routes->{$word} ||= {};
+                foreach my $w ( keys %$dest ) {
+                    $self->genRoute( $routes->{$word}, $w, $dest->{$w},
+                        $transform );
+                }
+                return;
+            }
+            elsif ( $t eq 'ARRAY' ) {
+                $routes->{$word} ||= {};
+                foreach my $w ( @{$dest} ) {
+                    $self->genRoute( $routes->{$word}, $w, $transform );
+                }
+                return;
+            }
+        }
+        if ( $routes->{$word} ) {
+            eval { $self->logger->warn(qq'Route "$word" redefined'); };
         }
         if ( my $t = ref $dest ) {
             if ( $t eq 'CODE' ) {
                 $routes->{$word} = $dest;
             }
-            elsif ( $t eq 'HASH' ) {
-                $routes->{$word} ||= {};
-                foreach my $w ( keys %$dest ) {
-                    $self->genRoute( $routes->{$word}, $w, $dest->{$w} );
-                }
-            }
-            elsif ( $t eq 'ARRAY' ) {
-                $routes->{$word} ||= {};
-                foreach my $w ( @{$dest} ) {
-                    $self->genRoute( $routes->{$word}, $w );
-                }
-            }
             else {
                 die "Type $t unauthorizated in routes";
             }
-        }
-        elsif ( $dest =~ /^(.+)\.html$/ ) {
-            my $tpl = $1 or die;
-            $routes->{$word} = sub { $self->sendHtml( $_[1], $tpl ) };
         }
         elsif ( $self->can($dest) ) {
             $routes->{$word} = sub { shift; $self->$dest(@_) };
@@ -73,7 +97,7 @@ sub genRoute {
         else {
             die "$dest() isn't a method";
         }
-        $self->lmLog( "route $word added", 'debug' );
+        $self->logger->debug("route $word added");
     }
 }
 
@@ -93,8 +117,6 @@ sub handlerAbort {
 sub handler {
     my ( $self, $req ) = @_;
 
-    #print STDERR Dumper($self->routes);use Data::Dumper;
-
     # Reinitialize configuration message
     $Lemonldap::NG::Common::Conf::msg = '';
 
@@ -104,23 +126,19 @@ sub handler {
     }
 
     # Only words are taken in path
-    my @path = grep { $_ =~ /^[\.\w]+/ } split /\//, $req->path();
-    $self->lmLog( "Start routing " . ( $path[0] // 'default route' ), 'debug' );
+    my $last = 0;
+    my @path = grep {
+        $last = 1 if ( $_ =~ /[^\.\w]/ );
+        ( $last or /^$/ ? 0 : 1 );
+    } split /\//, $req->path();
+    $self->logger->debug( "Start routing " . ( $path[0] // 'default route' ) );
 
-    unless (@path) {
-        push @path, $self->defaultRoute;
-
-        # TODO: E-Tag, Expires,...
-        #
-        ## NB: this is not HTTP compliant: host and protocol are required !
-        #my $url = '/' . $self->defaultRoute;
-        #return [
-        #    302,
-        #    [ 'Content-Type' => 'text/plain', 'Location' => $url ],
-        #    ['Document has moved here: $url']
-        #];
+    if ( !@path and $self->defaultRoute ) {
+        @path = ( $self->defaultRoute );
     }
-    return $self->followPath( $req, $self->routes->{ $req->method }, \@path );
+    my $res =
+      $self->followPath( $req, $self->routes->{ $req->method }, \@path );
+    return $res ? $res : $self->sendError( $req, 'Bad request', 400 );
 }
 
 sub followPath {
@@ -130,11 +148,13 @@ sub followPath {
         if ( ref( $routes->{$w} ) eq 'CODE' ) {
             return $routes->{$w}->( $self, $req, @$path );
         }
-        return $self->followPath( $req, $routes->{$w}, $path );
+        my $res = $self->followPath( $req, $routes->{$w}, $path );
+        return $res if ($res);
+        unshift @$path, $w;
     }
-    elsif ( $routes->{':'} ) {
+    if ( $routes->{':'} ) {
         my $v = shift @$path;
-        $req->params->{ $routes->{'#'} } = $v;
+        $req->set_param( $routes->{'#'}, $v );
         if ( ref( $routes->{':'} ) eq 'CODE' ) {
             return $routes->{':'}->( $self, $req, @$path );
         }
@@ -144,8 +164,7 @@ sub followPath {
         return $self->$sub( $req, @$path );
     }
     else {
-        $self->lmLog( 'Bad request received (' . $req->path . ')', 'error' );
-        return $self->sendError( $req, 'Bad request', 400 );
+        return undef;
     }
 }
 
@@ -297,7 +316,7 @@ Examples:
 
   $self->addRoute( books => { ':bookId' => 'book' }, ['GET'] );
 
-booId parameter will be stored in $req->params('bookId');
+bookId parameter will be stored in $req->params('bookId');
 
 =item to manage http://.../books/127/pages/5 with page(), use:
 
@@ -336,13 +355,7 @@ L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>,
 
 =over
 
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=item François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
 
 =back
 
@@ -358,13 +371,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =head1 COPYRIGHT AND LICENSE
 
-=over
-
-=item Copyright (C) 2015-2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2015-2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
+See COPYING file for details.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

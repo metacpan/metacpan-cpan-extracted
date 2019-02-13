@@ -8,8 +8,7 @@ require 't/test-lib.pm';
 use_ok('Lemonldap::NG::Common::FormEncode');
 count(1);
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                  => 'error',
             ext2fActivation           => 1,
@@ -33,7 +32,7 @@ ok(
         IO::String->new('user=dwho&password=ohwd'),
         length => 23
     ),
-    'Auth query'
+    '1st Bad Auth query'
 );
 count(1);
 expectReject($res);
@@ -45,12 +44,24 @@ ok(
         IO::String->new('user=dwho&password=ohwd'),
         length => 23
     ),
-    'Auth query'
+    '2nd Bad Auth query'
 );
 count(1);
 expectReject($res);
 
-## Third failed connection -> rejected
+## Third failed connection
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=ohwd'),
+        length => 23
+    ),
+    '3rd Bad Auth query'
+);
+count(1);
+expectReject($res);
+
+## Forth failed connection -> rejected
 ok(
     $res = $client->_post(
         '/',
@@ -58,7 +69,7 @@ ok(
         length => 23,
         accept => 'text/html',
     ),
-    'Auth query'
+    '4th Bad Auth query -> Rejected'
 );
 count(1);
 ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/, 'Protection enabled' );
@@ -84,7 +95,7 @@ my ( $host, $url, $query ) =
 
 ok(
     $res->[2]->[0] =~
-qr%<input name="code" value="" class="form-control" id="extcode" trplaceholder="code">%,
+qr%<input name="code" value="" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);
@@ -124,7 +135,7 @@ count(1);
 
 ok(
     $res->[2]->[0] =~
-qr%<input name="code" value="" class="form-control" id="extcode" trplaceholder="code">%,
+qr%<input name="code" value="" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);
@@ -147,7 +158,7 @@ ok( $res->[2]->[0] =~ /trspan="lastLogins"/, 'History found' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 my @c = ( $res->[2]->[0] =~ /<td>127.0.0.1/gs );
-ok( @c == 4, 'Four entries found' )
+ok( @c == 5, 'Five entries found' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 

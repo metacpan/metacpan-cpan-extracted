@@ -22,7 +22,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
   'Lemonldap::NG::Portal::Lib::SMTP';
@@ -220,7 +220,7 @@ sub _register {
     $req->user( $req->data->{registerInfo}->{mail} );
     if ( $self->p->_userDB->getUser( $req, useMail => 1 ) == PE_OK ) {
         $self->userLogger->error(
-"Register: refuse mail $req->{mail} because already exists in UserDB"
+"Register: refuse mail $req->{data}->{registerInfo}->{mail} because already exists in UserDB"
         );
         return PE_REGISTERALREADYEXISTS;
     }
@@ -233,8 +233,7 @@ sub _register {
     unless ( $req->data->{register_token} or $register_session ) {
 
         # Create mail token
-        $register_session = $self->mailott->createToken(
-            {
+        $register_session = $self->mailott->createToken( {
                 mail      => $req->data->{registerInfo}->{mail},
                 firstname => $req->data->{registerInfo}->{firstname},
                 lastname  => $req->data->{registerInfo}->{lastname},
@@ -400,7 +399,7 @@ sub _register {
 sub display {
     my ( $self, $req ) = @_;
     my %templateParams = (
-        SKIN_PATH       => '/static',
+        SKIN_PATH       => $self->conf->{staticPrefix},
         SKIN            => $self->p->getSkin($req),
         SKIN_BG         => $self->conf->{portalSkinBackground},
         MAIN_LOGO       => $self->conf->{portalMainLogo},
@@ -430,11 +429,9 @@ sub display {
     );
 
     # Display form the first time
-    if (
-        (
+    if ( (
                $req->error == PE_REGISTERFORMEMPTY
             or $req->error == PE_REGISTERFIRSTACCESS
-            or $req->error == PE_REGISTERALREADYEXISTS
             or $req->error == PE_CAPTCHAERROR
             or $req->error == PE_CAPTCHAEMPTY
             or $req->error == PE_NOTOKEN
@@ -460,6 +457,17 @@ sub display {
     }
     if ( $req->token ) {
         $templateParams{TOKEN} = $req->token;
+    }
+
+    if ( $req->error == PE_REGISTERALREADYEXISTS ) {
+        %templateParams = (
+            %templateParams,
+            DISPLAY_FORM            => 0,
+            DISPLAY_RESEND_FORM     => 0,
+            DISPLAY_CONFIRMMAILSENT => 0,
+            DISPLAY_MAILSENT        => 0,
+            DISPLAY_PASSWORD_FORM   => 0,
+        );
     }
 
     # Display mail confirmation resent form
@@ -513,6 +521,7 @@ sub display {
             DISPLAY_PASSWORD_FORM   => 1,
         );
     }
+
     return ( 'register', \%templateParams );
 }
 

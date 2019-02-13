@@ -5,6 +5,18 @@ objectClass: dcObject
 dc: example
 o: Example
 
+dn: ou=dsa,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: dsa
+
+dn: cn=lemonldapng,ou=dsa,dc=example,dc=com
+objectClass: top
+objectClass: organizationalRole
+objectClass: simpleSecurityObject
+cn: lemonldapng
+userPassword: lemonldapng
+
 dn: ou=users,dc=example,dc=com
 objectClass: top
 objectClass: organizationalUnit
@@ -33,4 +45,86 @@ cn:: 0KDRg9GB0YHQutC40Lk=
 sn:: 0KDRg9GB0YHQutC40Lk=
 mail: russian@badwolf.org
 userPassword: russian
+
+dn: uid=reset,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: reset
+cn: reset
+sn: reset
+mail: reset@badwolf.org
+userPassword: reset
+pwdPolicySubentry: cn=passwordreset,ou=ppolicies,dc=example,dc=com
+pwdReset: TRUE
+
+dn: uid=expire,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: expire
+cn: expire
+sn: expire
+mail: expire@badwolf.org
+userPassword: expire
+pwdPolicySubentry: cn=passwordexpire,ou=ppolicies,dc=example,dc=com
+pwdChangedTime: 20190101000000Z
+
+dn: uid=lock,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: lock
+cn: lock
+sn: lock
+mail: lock@badwolf.org
+userPassword: lock
+pwdPolicySubentry: cn=passwordlock,ou=ppolicies,dc=example,dc=com
+pwdAccountLockedTime: 20190101000000Z
+pwdFailureTime: 20181231000000.000000Z
+
+dn: uid=short,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: short
+cn: short
+sn: short
+mail: short@badwolf.org
+userPassword: passwordnottooshort
+pwdPolicySubentry: cn=passwordshort,ou=ppolicies,dc=example,dc=com
+
+dn: ou=ppolicies,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: ppolicies
+
+dn: cn=passwordreset,ou=ppolicies,dc=example,dc=com
+objectClass: device
+objectClass: pwdPolicy
+cn: passwordreset
+pwdAttribute: userPassword
+pwdAllowUserChange: TRUE
+pwdCheckQuality: 0
+pwdMustChange: TRUE
+
+dn: cn=passwordexpire,ou=ppolicies,dc=example,dc=com
+objectClass: device
+objectClass: pwdPolicy
+cn: passwordexpire
+pwdAttribute: userPassword
+pwdAllowUserChange: TRUE
+pwdCheckQuality: 0
+pwdMaxAge: 5
+
+dn: cn=passwordlock,ou=ppolicies,dc=example,dc=com
+objectClass: device
+objectClass: pwdPolicy
+cn: passwordlock
+pwdAttribute: userPassword
+pwdAllowUserChange: TRUE
+pwdCheckQuality: 0
+pwdLockout: TRUE
+pwdMaxFailure: 1
+
+dn: cn=passwordshort,ou=ppolicies,dc=example,dc=com
+objectClass: device
+objectClass: pwdPolicy
+cn: passwordshort
+pwdAttribute: userPassword
+pwdAllowUserChange: TRUE
+pwdCheckQuality: 2
+pwdMinLength: 6
 

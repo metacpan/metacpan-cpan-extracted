@@ -14,7 +14,7 @@ use MIME::Base64;
 use Digest::MD5 qw(md5);
 use bytes;
 
-our $VERSION = '1.9.1';
+our $VERSION = '2.0.0';
 
 our $msg;
 
@@ -50,8 +50,8 @@ sub _getCipher {
 
 ## @method string encrypt(string data)
 # Encrypt $data and return it in Base64 format
-# @param data datas to encrypt
-# @return encrypted datas in Base64 format
+# @param data data to encrypt
+# @return encrypted data in Base64 format
 sub encrypt {
     my ( $self, $data ) = @_;
 
@@ -73,8 +73,8 @@ sub encrypt {
 
 ## @method string decrypt(string data)
 # Decrypt $data and return it
-# @param data datas to decrypt in Base64 format
-# @return decrypted datas
+# @param data data to decrypt in Base64 format
+# @return decrypted data
 sub decrypt {
     my ( $self, $data ) = @_;
     $data =~ s/%2B/\+/ig;
@@ -100,9 +100,9 @@ sub decrypt {
 # Encrypt $data and return it in hexadecimal format
 # Data must be hexadecimal and its length must be a multiple of 32
 # the encrypted data have same length as the original data
-# @param data datas to encrypt
+# @param data data to encrypt
 # @param key optional secondary key
-# @return encrypted datas in hexadecimal data
+# @return encrypted data in hexadecimal data
 sub encryptHex {
     my ( $self, $data, $key ) = @_;
     return _cryptHex( $self, $data, $key, "encrypt" );
@@ -112,9 +112,9 @@ sub encryptHex {
 # Decrypt $data and return it in hexadecimal format
 # Data must be hexadecimal and its length must be a multiple of 32
 # the decrypted data have same length as the encrypted data
-# @param data datas to decrypt
+# @param data data to decrypt
 # @param key optional secondary key
-# @return decrypted datas in hexadecimal data
+# @return decrypted data in hexadecimal data
 sub decryptHex {
     my ( $self, $data, $key ) = @_;
     return _cryptHex( $self, $data, $key, "decrypt" );
@@ -122,10 +122,10 @@ sub decryptHex {
 
 ## @method private string _cryptHex (string data, string key, string sub)
 # Auxiliary method to share code between encrypt and decrypt
-# @param data datas to decrypt
+# @param data data to decrypt
 # @param key secondary key
 # @param sub may be "encrypt" or "decrypt"
-# @return decrypted datas in hexadecimal data
+# @return decrypted data in hexadecimal data
 sub _cryptHex {
     my ( $self, $data, $key, $sub ) = @_;
     unless ( $data =~ /^([0-9a-fA-F]{2})*$/ ) {

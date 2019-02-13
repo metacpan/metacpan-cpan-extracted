@@ -64,8 +64,7 @@ count(2);
 
 foreach my $query (@hkeys) {
     my $href = &client->jsonResponse( "/confs/1/$query", '' );
-    ok(
-        (
+    ok( (
             ( ref $href eq 'ARRAY' )
               or (  ( ref $href eq 'HASH' )
                 and ( $href->{error} =~ /setDefault$/ ) )

@@ -5,7 +5,7 @@ use GD::SecurityImage use_magick => 1;
 use Mouse;
 use MIME::Base64;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.1';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -88,7 +88,7 @@ sub validateCaptcha {
         $self->logger->warn("Captcha token $token isn't valid");
         return 0;
     }
-    unless ( $s->{captcha} == $value ) {
+    unless ( $s->{captcha} eq $value ) {
         $self->logger->notice('Bad captcha response');
         return 0;
     }

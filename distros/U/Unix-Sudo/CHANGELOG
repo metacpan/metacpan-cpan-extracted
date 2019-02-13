@@ -1,5 +1,7 @@
 Date          Version    Notes
 
+2019-02-12    4          Catch errors more robustly (but still not perfectly)
+
 2019-02-11    2          Fix build problems
 
 2019-02-10    1          First release

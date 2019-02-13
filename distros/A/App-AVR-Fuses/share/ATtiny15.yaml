@@ -1,0 +1,52 @@
+---
+fusemap:
+  BODEN:
+    mask: 64
+    name: BODEN
+    reg: l
+  BODLEVEL:
+    mask: 128
+    name: BODLEVEL
+    reg: l
+    values:
+      - caption: Brown-out detection at VCC=2.7 V
+        name: 2V7
+        value: 128
+      - caption: Brown-out detection at VCC=4.0 V
+        name: 4V0
+        value: 0
+  CKSEL:
+    mask: 3
+    name: CKSEL
+    reg: l
+    values:
+      - caption: Very quickly rising power
+        name: VQUICKPWR
+        value: 3
+      - caption: Quickly rising power
+        name: QUICKPWR
+        value: 2
+      - caption: Slowly rising power
+        name: SLOWPWR
+        value: 1
+      - caption: Slowly rising power
+        name: SLOWPWR
+        value: 0
+  RSTDISBL:
+    mask: 16
+    name: RSTDISBL
+    reg: l
+  SPIEN:
+    mask: 32
+    name: SPIEN
+    reg: l
+fuses:
+  - BODLEVEL
+  - BODEN
+  - SPIEN
+  - RSTDISBL
+  - CKSEL
+reginfos:
+  - default: 92
+    mask: 243
+    name: l

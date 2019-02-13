@@ -25,6 +25,7 @@ my @notManagedAttributes = (
 
     # Brute force attack protection parameters
     'bruteForceProtectionMaxAge', 'bruteForceProtectionTempo',
+    'bruteForceProtectionMaxFailed',
 
     # Metadatas (added by manager itself)
     'cfgAuthor', 'cfgAuthorIP', 'cfgNum', 'cfgDate', 'cfgLog', 'cfgVersion',
@@ -149,8 +150,7 @@ sub scanTree {
             ok( $name =~ /^\w+$/, "Name is a string" );
 
             # Nodes must have leafs or subnodes
-            ok(
-                (
+            ok( (
                          exists( $leaf->{nodes} )
                       or exists( $leaf->{nodes_cond} )
                       or exists( $leaf->{group} )

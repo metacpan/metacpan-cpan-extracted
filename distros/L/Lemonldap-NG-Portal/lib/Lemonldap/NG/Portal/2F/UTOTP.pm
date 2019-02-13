@@ -29,8 +29,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 sub init {
     my ($self) = @_;
-    if (
-        (
+    if ( (
                $self->conf->{totp2fSelfRegistration}
             or $self->conf->{u2fSelfRegistration}
         )
@@ -97,8 +96,7 @@ sub run {
             $self->ott->updateToken( $token, __ch => $data->{challenge} );
 
             # Serialize data
-            $data = to_json(
-                {
+            $data = to_json( {
                     challenge      => $data->{challenge},
                     appId          => $data->{appId},
                     registeredKeys => \@rk,

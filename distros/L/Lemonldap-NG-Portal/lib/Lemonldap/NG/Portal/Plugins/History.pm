@@ -21,8 +21,7 @@ sub run {
     my ( $self, $req ) = @_;
     if ( $req->param('checkLogins') ) {
         $self->logger->debug('History asked');
-        $req->info(
-            (
+        $req->info( (
                 $req->sessionInfo->{_loginHistory}->{successLogin}
                 ? $self->p->mkSessionArray(
                     $req->sessionInfo->{_loginHistory}->{successLogin},

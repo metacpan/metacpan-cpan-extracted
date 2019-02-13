@@ -1,0 +1,37 @@
+---
+abstract: 'Basic interface to Microsoft SharePoint REST API'
+author:
+  - 'Roman Parparov <rparparov@vmware.com>'
+build_requires:
+  Test::More: '0'
+  Test::Output: '0.16'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SharePoint-Basic
+provides:
+  Net::SharePoint::Basic:
+    file: lib/Net/SharePoint/Basic.pm
+    version: '0.1'
+requires:
+  Carp: '1.38'
+  Data::Dumper: '2.161'
+  Data::UUID: '1.203'
+  Exporter: '5.63'
+  File::Basename: '2.77'
+  File::Path: '2.08'
+  Getopt::Long: '2.38'
+  IO::Scalar: '2.110'
+  JSON::XS: '3.04'
+  LWP::UserAgent: '5.835'
+  POSIX: '1.17'
+  Storable: '2.20'
+  URI::Escape: '3.31'
+  experimental: '0.016'
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

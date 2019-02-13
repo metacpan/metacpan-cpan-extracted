@@ -13,7 +13,7 @@ use File::Copy ();
 use ExtUtils::MakeMaker 7.12;
 
 # ABSTRACT: FFI::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '0.82'; # VERSION
+our $VERSION = '0.83'; # VERSION
 
 
 sub new
@@ -180,24 +180,24 @@ sub mm_postamble
 {
   my($self) = @_;
   
-  my $postamble = '';
+  my $postamble = ".PHONY: fbx_build ffi fbx_test ffi-test fbc_clean ffi-clean\n\n";
 
   # make fbx_realclean ; make clean
   $postamble .= "realclean :: fbx_clean\n" .
                 "\n" .
-                "fbx_clean:\n" .
+                "fbx_clean ffi-clean:\n" .
                 "\t\$(FULLPERL) -MFFI::Build::MM=cmd -e fbx_clean\n\n";
   
   # make fbx_build; make
   $postamble .= "pure_all :: fbx_build\n" .
                 "\n" .
-                "fbx_build:\n" .
+                "fbx_build ffi:\n" .
                 "\t\$(FULLPERL) -MFFI::Build::MM=cmd -e fbx_build\n\n";
 
   # make fbx_test; make test
   $postamble .= "subdirs-test_dynamic subdirs-test_static subdirs-test :: fbx_test\n" .
                 "\n" .
-                "fbx_test:\n" .
+                "fbx_test ffi-test:\n" .
                 "\t\$(FULLPERL) -MFFI::Build::MM=cmd -e fbx_test\n\n";
   
   $postamble;
@@ -284,7 +284,7 @@ FFI::Build::MM - FFI::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 
@@ -353,15 +353,15 @@ how to invoke it properly.  It adds the following Make targets:
 
 =over 4
 
-=item fbx_build
+=item fbx_build / ffi
 
 build the main runtime library in C<./ffi>.
 
-=item fbx_test
+=item fbx_test / ffi-test
 
 Build the test library in C<./t/ffi>.
 
-=item fbx_clean
+=item fbx_clean / ffi-clean
 
 Clean any runtime or test libraries already built.
 

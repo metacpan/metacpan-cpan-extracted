@@ -6,10 +6,26 @@
 
 package Lemonldap::NG::Common::Session;
 
-our $VERSION = '1.9.1';
+our $VERSION = '2.0.0';
 
-use Mouse;
 use Lemonldap::NG::Common::Apache::Session;
+
+# Workaround for another ModPerl/Mouse issue...
+BEGIN {
+    require Mouse;
+    no warnings;
+    my $v =
+      $Mouse::VERSION
+      ? sprintf( "%d.%03d%03d", ( $Mouse::VERSION =~ /(\d+)/g ) )
+      : 0;
+    if ( $v < 2.005001 and $Lemonldap::NG::Handler::Apache2::Main::VERSION ) {
+        require Moose;
+        Moose->import();
+    }
+    else {
+        Mouse->import();
+    }
+}
 
 has 'id' => (
     is  => 'rw',
@@ -64,8 +80,10 @@ has 'error' => (
     isa => 'Str|Undef',
 );
 
+has info => ( is => 'rw' );
+
 sub BUILD {
-    my $self = shift;
+    my ($self) = @_;
 
     # Load Apache::Session module
     unless ( $self->storageModule->can('populate') ) {
@@ -107,6 +125,18 @@ sub BUILD {
         $data->{_session_kind} = $self->kind;
     }
 
+    if ( $self->{info} ) {
+        foreach ( keys %{ $self->{info} } ) {
+            if ( defined $self->{info}->{$_} ) {
+                $data->{$_} = $self->{info}->{$_};
+            }
+            else {
+                delete $data->{$_};
+            }
+        }
+        delete $self->{info};
+    }
+
     # Load session data into object
     if ($data) {
         $self->_save_data($data);
@@ -118,15 +148,14 @@ sub BUILD {
 }
 
 sub _tie_session {
-    my $self = shift;
-    my $options = shift || {};
+    my $self = $_[0];
+    my $options = $_[1] || {};
 
     my %h;
 
     eval {
-        # SOAP session module must be directly tied
-        if ( $self->storageModule =~
-            /Lemonldap::NG::Common::Apache::Session::SOAP/ )
+        # SOAP/REST session module must be directly tied
+        if ( $self->storageModule =~ /^Lemonldap::NG::Common::Apache::Session/ )
         {
             tie %h, $self->storageModule, $self->id,
               { %{ $self->options }, %$options };
@@ -155,9 +184,7 @@ sub _save_data {
 }
 
 sub update {
-    my $self       = shift;
-    my $infos      = shift;
-    my $tieOptions = shift;
+    my ( $self, $infos, $tieOptions ) = @_;
 
     unless ( ref $infos eq "HASH" ) {
         $self->error("You need to provide a HASHREF");
@@ -187,8 +214,7 @@ sub update {
 }
 
 sub remove {
-    my $self       = shift;
-    my $tieOptions = shift;
+    my ( $self, $tieOptions ) = @_;
 
     my $data = $self->_tie_session($tieOptions);
 

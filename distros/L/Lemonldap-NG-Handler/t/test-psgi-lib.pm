@@ -105,8 +105,7 @@ sub _get {
     my ( $self, $path, $query, $host, $cookie, %custom ) = @_;
     $query //= '';
     $host ||= 'test1.example.com';
-    return $self->app->(
-        {
+    return $self->app->( {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => 'lmAuth',
             'SERVER_NAME'          => '127.0.0.1',

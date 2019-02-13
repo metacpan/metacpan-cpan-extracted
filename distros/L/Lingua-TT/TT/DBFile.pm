@@ -5,6 +5,7 @@
 
 
 package Lingua::TT::DBFile;
+use 5.010; ##-- for // operator
 use Lingua::TT::Persistent;
 use DB_File;
 use Fcntl;

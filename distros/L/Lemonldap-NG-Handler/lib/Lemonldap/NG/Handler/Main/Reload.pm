@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -72,6 +72,7 @@ sub checkConf {
                     $class->logger->error( "Underlying object can't load conf ("
                           . ref($obj)
                           . "->$sub)" );
+                    return 0;
                 }
             }
         }
@@ -177,8 +178,7 @@ sub configReload {
 sub jailInit {
     my ( $class, $conf ) = @_;
 
-    $class->tsv->{jail} = Lemonldap::NG::Handler::Main::Jail->new(
-        {
+    $class->tsv->{jail} = Lemonldap::NG::Handler::Main::Jail->new( {
             useSafeJail     => $conf->{useSafeJail},
             customFunctions => $conf->{customFunctions},
         }
@@ -192,8 +192,7 @@ sub jailInit {
 sub defaultValuesInit {
     my ( $class, $conf ) = @_;
 
-    $class->tsv->{$_} = $conf->{$_} foreach (
-        qw(
+    $class->tsv->{$_} = $conf->{$_} foreach ( qw(
         cookieExpiration        cookieName         customFunctions httpOnly
         securedCookie           timeout            timeoutActivity
         timeoutActivityInterval useRedirectOnError useRedirectOnForbidden
@@ -204,7 +203,6 @@ sub defaultValuesInit {
     $class->tsv->{cipher} = Lemonldap::NG::Common::Crypto->new( $conf->{key} );
 
     foreach my $opt (qw(https port maintenance)) {
-        next unless defined $conf->{$opt};
 
         # Record default value in key '_'
         $class->tsv->{$opt} = { _ => $conf->{$opt} };
@@ -213,9 +211,10 @@ sub defaultValuesInit {
         if ( $conf->{vhostOptions} ) {
             my $name = 'vhost' . ucfirst($opt);
             foreach my $vhost ( keys %{ $conf->{vhostOptions} } ) {
+                $conf->{vhostOptions}->{$vhost} ||= {};
                 my $val = $conf->{vhostOptions}->{$vhost}->{$name};
 
-                # Keep default value if $val is negative
+                # Keep global value if $val is negative
                 if ( defined $val and $val >= 0 ) {
                     $class->logger->debug(
                         "Options $opt for vhost $vhost: $val");

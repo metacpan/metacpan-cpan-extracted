@@ -2,7 +2,7 @@ package Catmandu::Store::File::BagIt::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.234';
+our $VERSION = '0.235';
 
 use Moo;
 use Carp;
@@ -19,17 +19,23 @@ with 'Catmandu::Bag';
 with 'Catmandu::FileBag';
 with 'Catmandu::Droppable';
 
-has _path => (is => 'lazy');
+has _path  => (is => 'lazy');
+has _bagit => (is => 'lazy');
 
 sub _build__path {
     my $self = shift;
     $self->store->path_string($self->name);
 }
 
+sub _build__bagit {
+    my $self = shift;
+    Catmandu::BagIt->read($self->_path);
+}
+
 sub generator {
     my ($self) = @_;
     my $path  = $self->_path;
-    my $bagit = Catmandu::BagIt->read($path);
+    my $bagit = $self->_bagit;
 
     sub {
         state $children = [$bagit->list_files];
@@ -48,20 +54,19 @@ sub generator {
 
 sub exists {
     my ($self, $id) = @_;
-    my $path = $self->_path;
+    my $path  = $self->_path;
+    my $bagit = $self->_bagit;
 
     my $packed_key = $self->pack_key($id);
-
-    my $bagit = Catmandu::BagIt->read($path);
 
     $bagit->get_checksum($packed_key) ? 1 : 0;
 }
 
 sub get {
     my ($self, $id) = @_;
-    my $path = $self->_path;
 
-    my $bagit = Catmandu::BagIt->read($path);
+    my $path  = $self->_path;
+    my $bagit = $self->_bagit;
 
     my $packed_key = $self->pack_key($id);
 
@@ -122,14 +127,15 @@ sub get {
 
 sub add {
     my ($self, $data) = @_;
-    my $path = $self->_path;
+    my $path  = $self->_path;
+    my $bagit = $self->_bagit;
 
     my $update = 1;
-    my $bagit  = Catmandu::BagIt->read($path);
 
     unless ($bagit) {
         $update = 0;
         $bagit  = Catmandu::BagIt->new;
+        $self->{_bagit} = $bagit;
     }
 
     my $id = $data->{_id};
@@ -160,9 +166,8 @@ sub add {
 
 sub delete {
     my ($self, $id) = @_;
-    my $path = $self->_path;
-
-    my $bagit = Catmandu::BagIt->read($path);
+    my $path  = $self->_path;
+    my $bagit = $self->_bagit;
 
     my $packed_key = $self->pack_key($id);
 

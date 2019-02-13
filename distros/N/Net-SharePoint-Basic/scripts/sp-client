@@ -1,0 +1,245 @@
+#!/usr/bin/perl
+
+# Copyright 2018-2019 VMware, Inc.
+# SPDX-License-Identifier: Artistic-1.0-Perl
+
+=head1 NAME
+
+sp-client - a sample Microsoft SharePoint client implementing C<Net::SharePoint::Basic>
+
+=cut
+
+=head1 SYNOPSIS
+
+sp-client - a sample Microsoft SharePoint client implementing C<Net::SharePoint::Basic>
+
+This client is capable of executing all of the module's commands (upload, download, list, makedir and delete), while also providing examples of how you can validate the necessary arguments and deal with the response codes.
+
+Usage information (available with the -h|--help switch):
+
+ $ ./sp-client --help
+ Client stub for a SharePoint portal
+ Copyright (C) 2018-2019 VMware Inc.
+ Usage: ./sp-client -h|--help | -V|--version | [-v|--verbose | -d|--debug] [ -f|--config-file CONFIG_FILE ] [ -t|--token-file FILE ] [ -l|--log-file FILE ] [ --retries RETRIES ] [ --max-log-size SIZE] [ --chunk-size SIZE ] CMD SHAREPOINTPATH {LOCALPATH|SHAREPOINT-TARGET}
+ Options:
+	-h|--help                 print this message and exit
+	-V|--version              print version of the package and exit
+	-v|--verbose              produce verbose output to STDERR
+	-d|--debug                produce debug output to STDERR
+	-f|--config-file CONFIG   use CONFIG file instead of
+	                          /etc/sharepoint.conf
+	-t|--token-file  FILE     use token file FILE instead of
+	                          /var/run/sharepoint.token
+	   --retries     RETRIES  set the number of retries to RETRIES
+	                          instead of 3
+	   --max-log-size SIZE    set the max log history size to SIZE
+	                          instead of 500000
+	   --chunk-size   SIZE    set the upload chunk size to SIZE
+	                          instead of 200000000
+ Arguments:
+	CMD                       command, one of
+	                          copy, delete, download, list, makedir, upload, move
+	SHAREPOINTPATH            remote path to operate upon
+	LOCALPATH                 {for download and upload}
+	                          files to upload into sharepoint or
+	                           path to store the download 
+	                          OR
+	SHAREPOINT-TARGET         {for copy and move}
+	                          destination for moved or copied object
+Note: use delete for both files and folders
+
+
+=cut
+
+use strict;
+use warnings FATAL => 'all';
+use v5.10.1;
+use experimental qw(smartmatch);
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+use JSON::XS;
+
+use Net::SharePoint::Basic;
+
+our $ERROR_USAGE = 1;
+our $ERROR;
+our $sp;
+
+our @IMPLEMENTED_METHODS = sort grep { $_ ne 'payload' && $_ ne 'chunk' } keys %Net::SharePoint::Basic::PATTERNS;
+
+sub usage (;$) {
+
+	my $status = shift || 0;
+	my $sharepoint_commands = join(', ', sort @IMPLEMENTED_METHODS);
+
+	print "\n\nError: $ERROR\n\n" if $ERROR;
+	print join("\n", <<ENDUSAGE =~ /^\t\t(.*)$/gm), "\n";
+		Client stub for a SharePoint portal
+		Copyright (C) 2018-2019 VMware Inc.
+		Usage: $0 -h|--help | -V|--version | [-v|--verbose | -d|--debug] [ -f|--config-file CONFIG_FILE ] [ -t|--token-file FILE ] [ -l|--log-file FILE ] [ --retries RETRIES ] [ --max-log-size SIZE] [ --chunk-size SIZE ] CMD SHAREPOINTPATH {LOCALPATH|SHAREPOINT-TARGET}
+		Options:
+			-h|--help                 print this message and exit
+			-V|--version              print version of the package and exit
+			-v|--verbose              produce verbose output to STDERR
+			-d|--debug                produce debug output to STDERR
+			-f|--config-file CONFIG   use CONFIG file instead of
+			                          $DEFAULT_SHAREPOINT_CONFIG_FILE
+			-t|--token-file  FILE     use token file FILE instead of
+			                          $DEFAULT_SHAREPOINT_TOKEN_FILE
+			   --retries     RETRIES  set the number of retries to RETRIES
+			                          instead of $DEFAULT_RETRIES
+			   --max-log-size SIZE    set the max log history size to SIZE
+			                          instead of $MAX_LOG_SIZE
+			   --chunk-size   SIZE    set the upload chunk size to SIZE
+			                          instead of $DEFAULT_CHUNK_SIZE
+		Arguments:
+			CMD                       command, one of
+			                          $sharepoint_commands
+			SHAREPOINTPATH            remote path to operate upon
+			LOCALPATH                 {for upload or download}
+			                          files to upload into sharepoint or
+			                           path to store the download
+			                          OR
+			SHAREPOINT-TARGET         {for copy and move}
+		                                  destination for moved or copied object
+
+		Note: use delete for both files and folders
+ENDUSAGE
+	exit $status;
+}
+
+our $opts = {};
+
+GetOptions(
+	"h|help"          => sub { usage();   },
+	"V|version"       => sub { Net::SharePoint::Basic::version(); },
+	"v|verbose"       => sub { $ENV{NET_SHAREPOINT_VERBOSE} = 1 },
+	"d|debug"         => sub { $ENV{NET_SHAREPOINT_DEBUG}   = 1 },
+	"f|config-file=s" => \$opts->{config_file},
+	"t|token-file=s"  => \$opts->{token_file},
+	"l|log-file=s"    => \$opts->{log_file},
+	"retries=i"       => \$opts->{retries},
+	"max-log-size=i"  => \$opts->{max_log_size},
+	"chunk-size=i"    => \$opts->{chunk_size},
+) || usage(1);
+
+=head1 SUBROUTINES/METHODS
+
+=head2 validate_args ()
+
+Validates the arguments to the client. Uses @ARGV as parameters. Checks if the command is recognized, and whether the list, delete and makedir commands receive one argument, and upload/download receive two. Returns the lowercased valid command for future use.
+
+=cut
+
+sub validate_args () {
+
+	my $cmd = shift @ARGV;
+	$cmd = lc $cmd;
+	unless ($cmd) {
+		$ERROR = "Missing command\n";
+		usage($ERROR_USAGE);
+	}
+	$cmd = lc $cmd;
+	unless (grep { $_ eq $cmd } @IMPLEMENTED_METHODS) {
+		$ERROR = "Invalid command $cmd\n";
+		usage($ERROR_USAGE);
+	}
+	if (@ARGV > 2) {
+		$ERROR = "Too many arguments for command $cmd\n";
+		usage($ERROR_USAGE);
+	}
+	if ($cmd eq 'download' || $cmd eq 'upload' || $cmd eq 'move' || $cmd eq 'copy') {
+		if (@ARGV < 2) {
+			$ERROR =
+				"You must supply sharepoint PATH and FILES for download or upload\n";
+			usage($ERROR_USAGE);
+		}
+	}
+	else {
+		if (! @ARGV) {
+			$ERROR =
+				"You must supply sharepoint PATH you want to operate upon\n";
+			usage($ERROR_USAGE);
+		}
+		elsif (@ARGV == 2) {
+			$ERROR =
+				"The local path arg is only applicable for upload and download\n";
+			usage($ERROR_USAGE);
+		}
+	}
+	$cmd;
+}
+
+=head2 print_list_reports ($)
+
+Provides an example on how to process the data returned by the list() method of Net::SharePoint::Basic . The items are listed in alphabetical order. The folders have '/' attached to their name, and their item count is used as 'size'.
+
+Prints "No contents detected" if the folder is empty.
+
+=cut
+
+sub print_list_reports ($) {
+
+	my $reports = shift;
+
+	printf "%-30s %8s %20s\n\n", qw(Name Size Date);
+	for my $report (sort {$a->{Name} cmp $b->{Name} } @{$reports}) {
+		$report->{Length} ||= $report->{ItemCount};
+		$report->{Name}    .= '/' if defined $report->{ItemCount};
+        printf "%-30s %8d %20s\n",
+			@{$report}{qw(Name Length TimeLastModified)};
+	}
+	print "No contents detected\n" unless @{$reports};
+}
+
+=head2 process_result ($$)
+
+Processes the results of the executed command. In most cases the last message stored in the log ($object->{log} is being used, as $object->{log}[-1][2]. For listed items see C<print_list_report>. When deletion is requested for a non-existent item, a warning is emitted.
+
+=cut
+
+sub process_result ($$) {
+
+	my $cmd    = shift;
+	my $result = shift;
+
+	if ($cmd eq 'list') {
+		print_list_reports($result);
+	}
+	elsif ($cmd eq 'delete') {
+		my $json = decode_json($result->{_content});
+		if ($json->{d}{Recycle} eq "00000000-0000-0000-0000-000000000000") {
+			print STDERR "\n\nWARNING: Item does not exist\n\n";
+		}
+		else {
+			print STDERR $sp->{log}[-1][2], "\n";
+		}
+	}
+	else {
+		if ($sp->{log}[-1][1] eq 'info') {
+			print STDERR $sp->{log}[-1][2], "\n";
+		}
+		else {
+			print STDERR "\n\nERROR: $sp->{log}[-1][2]\n\n";
+		}
+	}
+}
+
+my $cmd = validate_args();
+$sp = Net::SharePoint::Basic->new($opts);
+$opts->{type} = 'file' if $cmd eq 'upload';
+my $result = $sp->$cmd($opts, @ARGV);
+process_result($cmd, $result);
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2018-2019 VMware.com
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See file LICENSE.txt for more information.
+
+=cut

@@ -20,6 +20,15 @@ my @source_names =
 ;
 
 foreach my $source_name (sort @source_names) {
+    my %copy_opts = (
+        chunk_size => $CHUNK_SIZE,
+    );
+
+    # Avoid warnings for multi-column PKs by adding the first column ourselves
+    if ($source_name =~ /\wTo[A-Z]/) {
+        $copy_opts{id_name} = ($blank_schema->source($source_name)->primary_columns)[0];
+    }
+
     onlineddl_test 'No-op', $source_name, sub {
         my $cd_schema  = shift;
         my $rsrc       = $cd_schema->source($source_name);
@@ -30,9 +39,7 @@ foreach my $source_name (sort @source_names) {
             rsrc => $rsrc,
             # purposely not adding any coderef_hooks
 
-            copy_opts => {
-                chunk_size => $CHUNK_SIZE,
-            },
+            copy_opts => \%copy_opts,
         );
 
         is $online_ddl->table_name,     $table_name,          'Figured out table_name';
@@ -92,10 +99,7 @@ foreach my $source_name (sort @source_names) {
                     $oddl->dbh_runner_do("ALTER TABLE $qname ADD COLUMN $qcol VARCHAR(100) NULL");
                 },
             },
-
-            copy_opts => {
-                chunk_size => $CHUNK_SIZE,
-            },
+            copy_opts => \%copy_opts,
         );
 
         try_ok { $online_ddl->execute } 'Execute works';

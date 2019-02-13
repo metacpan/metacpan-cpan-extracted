@@ -11,7 +11,7 @@ use Const::Fast ();
 use Keyword::Simple;
 use Text::Balanced ();
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.2';
 
 
 sub import {
@@ -47,7 +47,7 @@ sub _rewrite_let {
             # We can't use Const::Fast on state variables, so we use
             # this workaround.
 
-            $let .= "use feature 'state'; state $name = $val; unless (state \$set = 0) { Const::Fast::_make_readonly(\\$name); \$set = 1; };";
+            $let .= "use feature 'state'; state $name = $val; unless (state \$__perlx_let_state_is_set = 0) { Const::Fast::_make_readonly(\\$name); \$__perlx_let_state_is_set = 1; };";
 
         }
         else {
@@ -87,7 +87,7 @@ PerlX::Let - Syntactic sugar for lexical constants
 
 =head1 VERSION
 
-version v0.2.1
+version v0.2.2
 
 =head1 SYNOPSIS
 
@@ -138,6 +138,13 @@ This is roughly equivalent to using
 However, if the value does not contain a sigil, and the variable is a
 scalar, or you are using Perl v5.28 or later, this uses state
 variables so that the value is only set once.
+
+If the code block is omitted, then this can be used to declare a
+state constant in the current scope, e.g.
+
+  let $x = "foo";
+
+  say $x;
 
 =head1 KNOWN ISSUES
 

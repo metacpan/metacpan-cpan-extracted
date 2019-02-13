@@ -10,6 +10,7 @@ use Types::Standard -types;
 sub single :Return(Str) { }
 sub multi :Return(Str, Int) { }
 sub empty :Return() { }
+sub no { }
 
 fun with_fp_fun(Str $a) :Return(Num) { }
 method with_fp_method(Str $b) :Return(Num) { }
@@ -30,6 +31,11 @@ subtest 'empty' => sub {
     my $info = Function::Return::info \&empty;
     isa_ok $info, 'Function::Return::Info';
     is_deeply $info->types, [];
+};
+
+subtest 'no' => sub {
+    my $info = Function::Return::info \&no;
+    is $info, undef;
 };
 
 subtest 'with_fp_fun' => sub {

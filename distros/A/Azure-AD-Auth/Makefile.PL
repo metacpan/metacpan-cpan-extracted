@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Azure-AD-Auth",
   "LICENSE" => "apache",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Azure::AD::Auth",
   "PREREQ_PM" => {
     "HTTP::Tiny" => 0,
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }

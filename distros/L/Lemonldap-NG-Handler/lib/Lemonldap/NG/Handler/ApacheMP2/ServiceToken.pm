@@ -1,6 +1,6 @@
 # LLNG wrapper class to enable ServiceToken handler with Apache-2/ModPerl-2
 #
-# See http://lemonldap-ng.org/documentation/latest/handlerarch
+# See https://lemonldap-ng.org/documentation/latest/handlerarch
 package Lemonldap::NG::Handler::ApacheMP2::ServiceToken;
 
 use strict;

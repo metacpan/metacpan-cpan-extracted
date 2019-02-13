@@ -17,7 +17,7 @@ use feature 'state';
 extends 'Lemonldap::NG::Common::Conf::AccessLib',
   'Lemonldap::NG::Common::Session::REST';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -103,7 +103,7 @@ sub sessions {
 
     # Case 2: list of sessions
 
-    my $whatToTrace = Lemonldap::NG::Handler::PSGI::Main->tsv->{whatToTrace};
+    my $whatToTrace = Lemonldap::NG::Handler::Main->tsv->{whatToTrace};
 
     # 2.1 Get fields to require
     my @fields = ( '_httpSessionType', $self->{ipField}, $whatToTrace );
@@ -236,8 +236,7 @@ sub sessions {
                 value    => $uid,
                 count    => scalar( @{ $r->{$uid} } ),
                 sessions => [
-                    map {
-                        {
+                    map { {
                             session => $_->{_sessionId},
                             date    => $_->{_utime}
                         }

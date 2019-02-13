@@ -22,8 +22,7 @@ sub cTrees {
             'locationRules',
             'exportedHeaders',
             'post',
-            {
-                title => 'vhostOptions',
+            {   title => 'vhostOptions',
                 help  => 'configvhost.html#options',
                 form  => 'simpleInputContainer',
                 nodes => [
@@ -36,8 +35,41 @@ sub cTrees {
         samlIDPMetaDataNode => [
             'samlIDPMetaDataXML',
             'samlIDPMetaDataExportedAttributes',
-            {
-                title => 'samlIDPMetaDataOptions',
+
+            {   title => "samlIDPMetaDataOptionsSession",
+                form  => 'simpleInputContainer',
+                nodes => [
+                    "samlIDPMetaDataOptionsAdaptSessionUtime",
+                    "samlIDPMetaDataOptionsForceUTF8",
+                    "samlIDPMetaDataOptionsStoreSAMLToken",
+                    "samlIDPMetaDataOptionsUserAttribute"
+                ]
+            },
+            {   title => "samlIDPMetaDataOptionsSignature",
+                form  => 'simpleInputContainer',
+                nodes => [
+                    "samlIDPMetaDataOptionsSignSSOMessage",
+                    "samlIDPMetaDataOptionsCheckSSOMessageSignature",
+                    "samlIDPMetaDataOptionsSignSLOMessage",
+                    "samlIDPMetaDataOptionsCheckSLOMessageSignature"
+                ]
+            },
+            {   title => "samlIDPMetaDataOptionsBinding",
+                form  => 'simpleInputContainer',
+                nodes => [
+                    "samlIDPMetaDataOptionsSSOBinding",
+                    "samlIDPMetaDataOptionsSLOBinding"
+                ]
+            },
+            {   title => "samlIDPMetaDataOptionsSecurity",
+                form  => 'simpleInputContainer',
+                nodes => [
+                    "samlIDPMetaDataOptionsEncryptionMode",
+                    "samlIDPMetaDataOptionsCheckTime",
+                    "samlIDPMetaDataOptionsCheckAudience"
+                ]
+            },
+            {   title => 'samlIDPMetaDataOptions',
                 help  => 'authsaml.html#options',
                 form  => 'simpleInputContainer',
                 nodes => [
@@ -51,53 +83,21 @@ sub cTrees {
                     'samlIDPMetaDataOptionsRelayStateURL',
                 ],
             },
-            {
-                title => "samlIDPMetaDataOptionsSession",
+            {   title => "samlIDPMetaDataOptionsDisplay",
                 form  => 'simpleInputContainer',
                 nodes => [
-                    "samlIDPMetaDataOptionsAdaptSessionUtime",
-                    "samlIDPMetaDataOptionsForceUTF8",
-                    "samlIDPMetaDataOptionsStoreSAMLToken",
-                    "samlIDPMetaDataOptionsUserAttribute"
-                ]
-            },
-            {
-                title => "samlIDPMetaDataOptionsSignature",
-                form  => 'simpleInputContainer',
-                nodes => [
-                    "samlIDPMetaDataOptionsSignSSOMessage",
-                    "samlIDPMetaDataOptionsCheckSSOMessageSignature",
-                    "samlIDPMetaDataOptionsSignSLOMessage",
-                    "samlIDPMetaDataOptionsCheckSLOMessageSignature"
-                ]
-            },
-            {
-                title => "samlIDPMetaDataOptionsBinding",
-                form  => 'simpleInputContainer',
-                nodes => [
-                    "samlIDPMetaDataOptionsSSOBinding",
-                    "samlIDPMetaDataOptionsSLOBinding"
-                ]
-            },
-            {
-                title => "samlIDPMetaDataOptionsSecurity",
-                form  => 'simpleInputContainer',
-                nodes => [
-                    "samlIDPMetaDataOptionsEncryptionMode",
-                    "samlIDPMetaDataOptionsCheckTime",
-                    "samlIDPMetaDataOptionsCheckAudience"
+                    "samlIDPMetaDataOptionsDisplayName",
+                    "samlIDPMetaDataOptionsIcon"
                 ]
             }
         ],
         samlSPMetaDataNode => [
             "samlSPMetaDataXML",
             "samlSPMetaDataExportedAttributes",
-            {
-                title => "samlSPMetaDataOptions",
+            {   title => "samlSPMetaDataOptions",
                 help  => 'idpsaml.html#options',
                 nodes => [
-                    {
-                        title => "samlSPMetaDataOptionsAuthnResponse",
+                    {   title => "samlSPMetaDataOptionsAuthnResponse",
                         form  => 'simpleInputContainer',
                         nodes => [
                             "samlSPMetaDataOptionsNameIDFormat",
@@ -108,8 +108,7 @@ sub cTrees {
                             "samlSPMetaDataOptionsForceUTF8"
                         ]
                     },
-                    {
-                        title => "samlSPMetaDataOptionsSignature",
+                    {   title => "samlSPMetaDataOptionsSignature",
                         form  => 'simpleInputContainer',
                         nodes => [
                             "samlSPMetaDataOptionsSignSSOMessage",
@@ -118,8 +117,7 @@ sub cTrees {
                             "samlSPMetaDataOptionsCheckSLOMessageSignature"
                         ]
                     },
-                    {
-                        title => "samlSPMetaDataOptionsSecurity",
+                    {   title => "samlSPMetaDataOptionsSecurity",
                         form  => 'simpleInputContainer',
                         nodes => [
                             "samlSPMetaDataOptionsEncryptionMode",
@@ -134,11 +132,9 @@ sub cTrees {
             'oidcOPMetaDataJSON',
             'oidcOPMetaDataJWKS',
             'oidcOPMetaDataExportedVars',
-            {
-                title => 'oidcOPMetaDataOptions',
+            {   title => 'oidcOPMetaDataOptions',
                 nodes => [
-                    {
-                        title => 'oidcOPMetaDataOptionsConfiguration',
+                    {   title => 'oidcOPMetaDataOptionsConfiguration',
                         form  => 'simpleInputContainer',
                         nodes => [
                             'oidcOPMetaDataOptionsConfigurationURI',
@@ -148,8 +144,7 @@ sub cTrees {
                             'oidcOPMetaDataOptionsStoreIDToken'
                         ]
                     },
-                    {
-                        title => 'oidcOPMetaDataOptionsProtocol',
+                    {   title => 'oidcOPMetaDataOptionsProtocol',
                         form  => 'simpleInputContainer',
                         nodes => [
                             'oidcOPMetaDataOptionsScope',
@@ -164,37 +159,27 @@ sub cTrees {
                             'oidcOPMetaDataOptionsUseNonce'
                         ]
                     },
-                    {
-                        title => 'oidcOPMetaDataOptionsDisplayParams',
-                        form  => 'simpleInputContainer',
-                        nodes => [
-                            'oidcOPMetaDataOptionsDisplayName',
-                            'oidcOPMetaDataOptionsIcon'
-                        ]
-                    },
+                ]
+            },
+            {   title => 'oidcOPMetaDataOptionsDisplayParams',
+                form  => 'simpleInputContainer',
+                nodes => [
+                    'oidcOPMetaDataOptionsDisplayName',
+                    'oidcOPMetaDataOptionsIcon'
                 ]
             },
         ],
         oidcRPMetaDataNode => [
             'oidcRPMetaDataExportedVars',
-            {
-                title => 'oidcRPMetaDataOptions',
+            'oidcRPMetaDataOptionsExtraClaims',
+            {   title => 'oidcRPMetaDataOptions',
                 nodes => [
-                    {
-                        title => 'oidcRPMetaDataOptionsAuthentication',
+                    {   title => 'oidcRPMetaDataOptionsAuthentication',
                         form  => 'simpleInputContainer',
                         nodes => [
                             'oidcRPMetaDataOptionsClientID',
                             'oidcRPMetaDataOptionsClientSecret'
                         ]
-                    },
-                    {
-                        title => 'oidcRPMetaDataOptionsDisplay',
-                        form  => 'simpleInputContainer',
-                        nodes => [
-                            'oidcRPMetaDataOptionsDisplayName',
-                            'oidcRPMetaDataOptionsIcon'
-                        ],
                     },
                     'oidcRPMetaDataOptionsUserIDAttr',
                     'oidcRPMetaDataOptionsIDTokenSignAlg',
@@ -202,8 +187,7 @@ sub cTrees {
                     'oidcRPMetaDataOptionsAccessTokenExpiration',
                     'oidcRPMetaDataOptionsRedirectUris',
                     'oidcRPMetaDataOptionsBypassConsent',
-                    {
-                        title => 'logout',
+                    {   title => 'logout',
                         form  => 'simpleInputContainer',
                         nodes => [
                             'oidcRPMetaDataOptionsPostLogoutRedirectUris',
@@ -215,26 +199,35 @@ sub cTrees {
                     'oidcRPMetaDataOptionsRule',
                 ]
             },
-            'oidcRPMetaDataOptionsExtraClaims',
+            {   title => 'oidcRPMetaDataOptionsDisplay',
+                form  => 'simpleInputContainer',
+                nodes => [
+                    'oidcRPMetaDataOptionsDisplayName',
+                    'oidcRPMetaDataOptionsIcon'
+                ],
+            },
         ],
         casSrvMetaDataNode => [
-            {
-                title => 'casSrvMetaDataOptions',
+            'casSrvMetaDataExportedVars',
+            'casSrvMetaDataOptionsProxiedServices',
+            {   title => 'casSrvMetaDataOptions',
                 form  => 'simpleInputContainer',
                 nodes => [
                     'casSrvMetaDataOptionsUrl',
                     'casSrvMetaDataOptionsRenew',
                     'casSrvMetaDataOptionsGateway',
+                ]
+            },
+            {   title => 'casSrvMetaDataOptionsDisplay',
+                form  => 'simpleInputContainer',
+                nodes => [
                     'casSrvMetaDataOptionsDisplayName',
                     'casSrvMetaDataOptionsIcon',
                 ]
             },
-            'casSrvMetaDataExportedVars',
-            'casSrvMetaDataOptionsProxiedServices',
         ],
         casAppMetaDataNode => [
-            {
-                title => 'casAppMetaDataOptions',
+            {   title => 'casAppMetaDataOptions',
                 form  => 'simpleInputContainer',
                 nodes => [
                     'casAppMetaDataOptionsService',

@@ -269,8 +269,7 @@ $defaultAttr}
     foreach ( @simpleHashKeys, @doubleHashKeys, sort keys %cnodesRe ) {
         $ra->add($_);
     }
-    foreach (
-        qw(
+    foreach ( qw(
         exportedHeaders locationRules post vhostOptions
         samlIDPMetaDataXML samlIDPMetaDataExportedAttributes
         samlIDPMetaDataOptions samlSPMetaDataXML
@@ -462,8 +461,7 @@ sub scanTree {
                     $jleaf->{"_$n"} = [];
                     $self->scanTree( $leaf->{$n}, $jleaf->{"_$n"}, $prefix,
                         "$path.$nodeName\[$ord\]" );
-                    if (
-                        (
+                    if ( (
                                 $leaf->{title} eq 'authParams'
                             and $n eq 'nodes_cond'
                         )

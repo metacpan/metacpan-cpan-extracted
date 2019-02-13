@@ -1,5 +1,5 @@
 {
-   "abstract" : "add return type for a function",
+   "abstract" : "specify a function return type",
    "author" : [
       "kfly8 <kfly@cpan.org>"
    ],
@@ -62,7 +62,7 @@
    "provides" : {
       "Function::Return" : {
          "file" : "lib/Function/Return.pm",
-         "version" : "0.031"
+         "version" : "0.041"
       },
       "Function::Return::Info" : {
          "file" : "lib/Function/Return/Info.pm"
@@ -79,7 +79,7 @@
          "web" : "https://github.com/kfly8/p5-Function-Return"
       }
    },
-   "version" : "0.031",
+   "version" : "0.041",
    "x_authority" : "cpan:KFLY",
    "x_contributors" : [
       "Kenta Kobayashi <kentafly88@gmail.com>",

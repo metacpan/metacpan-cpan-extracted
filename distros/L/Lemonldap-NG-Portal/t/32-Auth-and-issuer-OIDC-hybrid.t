@@ -101,7 +101,59 @@ ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
 count(1);
 expectOK($res);
 
-# Try to authenticate to IdP
+# Try to authenticate with an unauthorized user to IdP
+$query = "user=french&password=french&$query&nonce=qwerty";
+ok(
+    $res = $op->_post(
+        $url,
+        IO::String->new($query),
+        accept => 'text/html',
+        length => length($query),
+    ),
+    "Post authentication,        endpoint $url"
+);
+count(1);
+ok( $res->[2]->[0] =~ /trmsg="90"/, 'Reject reason is 90' )
+    or print STDERR Dumper( $res->[2]->[0] );
+count(1);
+
+# Initialization
+ok( $op = op(), 'OP portal' );
+
+ok( $res = $op->_get('/oauth2/jwks'), 'Get JWKS,     endpoint /oauth2/jwks' );
+expectOK($res);
+$jwks = $res->[2]->[0];
+
+ok(
+    $res = $op->_get('/.well-known/openid-configuration'),
+    'Get metadata, endpoint /.well-known/openid-configuration'
+);
+expectOK($res);
+$metadata = $res->[2]->[0];
+count(3);
+
+switch ('rp');
+&Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
+ok( $rp = rp( $jwks, $metadata ), 'RP portal' );
+count(1);
+
+# Query RP for auth
+ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth SP request' );
+count(1);
+( $url, $query ) =
+  expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
+
+# Rewrite response_type to use implicit
+$query =~ s/response_type=code/response_type=code%20id_token%20token/;
+
+# Push request to OP
+switch ('op');
+ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
+    "Push request to OP,         endpoint $url" );
+count(1);
+expectOK($res);
+
+# Try to authenticate with an authorized user to IdP
 $query = "user=dwho&password=dwho&$query&nonce=qwerty";
 ok(
     $res = $op->_post(
@@ -169,8 +221,7 @@ sub switch {
 }
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
@@ -178,6 +229,7 @@ sub op {
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => "1",
+                issuerDBOpenIDConnectRule       => '$uid eq "dwho"',
                 oidcRPMetaDataExportedVars      => {
                     rp => {
                         email       => "mail",
@@ -264,8 +316,7 @@ GQIDAQAB
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',

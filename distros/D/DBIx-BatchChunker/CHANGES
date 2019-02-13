@@ -1,0 +1,33 @@
+DBIx-BatchChunker
+=================
+
+Created:         2018-01-20
+Home page:       <https://metacpan.org/release/DBIx-BatchChunker>
+Bug tracker:     <https://github.com/GrantStreetGroup/DBIx-BatchChunker/issues>
+Maintainer:      Grant Street Group <developers@grantstreet.com>
+
+0.93        2018-12-27
+
+    - Change target_time default from 15 to 5 seconds
+    - Make sure this CHANGES file doesn't get skipped in the MANIFEST
+    - Add some test/develop requirements
+    - Fix a DIV/0 error that cropped up in CPAN Matrix tests
+
+0.92        2018-06-20
+
+    - Add support for DBIx::Connector::Retry for DBI retry protection.  This deprecated
+      the sth/*_sth attributes, in favor of stmt/*_stmt attributes.
+    - Add dbic_retry_opts for retry protection on the DBIC side
+    - Add dbic_storage to allow DBI retry protection for DBIC users who want to run raw
+      SQL
+    - Change target_time default from 0 to 15 seconds
+    - Allow DIY Processing to still use features like chunk resizing
+
+0.91        2018-02-16
+
+    - Some unit test fixes based on CPAN Matrix tests
+    - Fix Perl 5.8 failures and bring minimum Perl version to 5.8.1
+
+0.90        2018-01-20
+
+    - Initial release

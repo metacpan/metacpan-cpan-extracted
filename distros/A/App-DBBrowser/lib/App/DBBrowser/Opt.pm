@@ -278,7 +278,7 @@ sub __menus {
             { name => 'config_menu',     text => "- Menu"   },
             { name => 'config_sql',      text => "- SQL",   },
             { name => 'config_output',   text => "- Output" },
-            { name => 'config_insert',   text => "- Get Data" },
+            { name => 'config_insert',   text => "- Get Data" }, #
         ],
         config_database => [
             { name => 'plugins',      text => "- DB Plugins", section => 'G' },
@@ -287,7 +287,7 @@ sub __menus {
         config_menu => [
             { name => '_menu_memory',  text => "- Menu Memory", section => 'G'     },
             { name => '_table_expand', text => "- Table",       section => 'table' },
-            { name => '_info_expand',  text => "- Info",        section => 'G'     },
+            { name => '_info_expand',  text => "- Info",        section => 'G'     }, #
             { name => 'mouse',         text => "- Mouse Mode",  section => 'table' },
         ],
         config_sql => [
@@ -297,10 +297,10 @@ sub __menus {
             { name => '_alias',                 text => "- Alias",          section => 'alias' },
             { name => '_extended_cols',         text => "- Extentions",     section => 'extend' },
             { name => '_sql_identifiers',       text => "- Identifiers",    section => 'G' },
-            { name => '_write_access',          text => "- Write access",   section => 'G' },
             { name => 'parentheses',            text => "- Parentheses",    section => 'G' },
-            { name => 'autoincrement_col_name', text => "- Auto increment", section => 'create' },
-            { name => 'data_type_guessing',     text => "- Data types",     section => 'create' },
+            { name => '_write_access',          text => "- Write access",   section => 'G' },       #
+            { name => 'autoincrement_col_name', text => "- Auto increment", section => 'create' },  #
+            { name => 'data_type_guessing',     text => "- Data types",     section => 'create' },  #
         ],
         config_output => [
             { name => 'min_col_width',      text => "- Colwidth",          section => 'table' },
@@ -516,7 +516,7 @@ sub set_options {
                     [ 'group_by', "- Extend GROUB BY", [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
                     [ 'having',   "- Extend HAVING",   [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
                     [ 'order_by', "- Extend ORDER BY", [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
-                    [ 'set',      "- Extend SET",      [ 'None', 'Func', 'SQ', '=N', 'Func/SQ/=N' ] ],
+                    [ 'set',      "- Extend SET",      [ 'None', 'Func', 'SQ', '=N', 'Func/SQ/=N' ] ], #
                     [ 'table',    "- Extend Table",    [ 'None',         'SQ'                     ] ],
                     [ 'join',     "- Extend Join",     [ 'None',         'SQ'                     ] ],
                     [ 'union',    "- Extend Union",    [ 'None',         'SQ'                     ] ],

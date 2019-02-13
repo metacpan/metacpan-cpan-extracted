@@ -8,8 +8,7 @@ require 't/test-lib.pm';
 my $res;
 my $tmp;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel      => 'error',
             customPlugins => 't::pdata',

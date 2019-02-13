@@ -1,5 +1,8 @@
 Revision history for perl distribution Devel-MojoProf
 
+0.03 2019-02-11T14:02:37+0100
+ - Add missing dependency Class::Method::Modifiers
+
 0.02 2019-01-29T16:28:55+0900
  - Changed "reporter" into an object
  - Devel::MojoProf::Reporter can write a CSV file

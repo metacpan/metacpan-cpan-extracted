@@ -1,7 +1,7 @@
-#!perl -T
+#!/usr/bin/env perl
 
 use Data::Tabulate;
-use Test::More tests => 3;
+use Test::More;
 
 my @array = (1..20);
 my $obj   = Data::Tabulate->new();
@@ -17,6 +17,11 @@ my @check = (
                [16..18],
                [19..20,undef]
             );
-is_deeply(\@table,\@check);
-is($obj->cols,3);
-is($obj->rows,7);
+is_deeply \@table, \@check;
+is $obj->cols, 3;
+is $obj->rows, 7;
+
+$obj->min_columns(7);
+is $obj->max_columns, 7;
+
+done_testing();

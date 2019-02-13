@@ -36,7 +36,7 @@
           <div class="input-group-prepend">
             <span class="input-group-text"><i class="fa fa-eye"></i> </span>
           </div>
-          <input type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" trplaceholder="captcha" required />
+          <input type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" trplaceholder="captcha" required autocomplete="off" />
         </div>
       </TMPL_IF>
       <TMPL_IF NAME="TOKEN">
@@ -79,6 +79,17 @@
         <span trspan="resentConfirm">Do you want the confirmation mail to be resent?</span>
       </p>
 
+      <TMPL_IF NAME=CAPTCHA_SRC>
+        <div class="form-group">
+          <img src="<TMPL_VAR NAME=CAPTCHA_SRC>" class="img-thumbnail" />
+        </div>
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="fa fa-eye"></i> </span>
+          </div>
+          <input type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" trplaceholder="captcha" required autocomplete="off"/>
+        </div>
+      </TMPL_IF>
 
       <div class="input-group mb-3">
         <div class="input-group-prepend">

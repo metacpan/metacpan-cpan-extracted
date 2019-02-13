@@ -17,7 +17,10 @@
           <th><span trspan="type">Type</span></th>
           <th><span trspan="name">Name</span></th>
           <th><span trspan="date">Date</span></th>
-          <th><span trspan="action">Action</span></th>
+          <th>
+            <TMPL_IF NAME="ACTION">
+              <span trspan="action">Action</span></th>
+            </TMPL_IF>
         </tr>
       </thead>
       <tbody>
@@ -27,11 +30,13 @@
             <td class="align-middle"><TMPL_VAR NAME="name"></td>
             <td class="data-epoch"><TMPL_VAR NAME="epoch"></td>
             <td>
-              <span device='<TMPL_VAR NAME="type">' epoch='<TMPL_VAR NAME="epoch">' class="btn btn-danger" role="button">
-                <span class="fa fa-minus-circle"></span>
-                <span trspan="unregister">Unregister</span>
-	      </span>
-	    </td>
+              <TMPL_IF NAME="delAllowed">
+                <span device='<TMPL_VAR NAME="type">' epoch='<TMPL_VAR NAME="epoch">' class="btn btn-danger" role="button">
+                  <span class="fa fa-minus-circle"></span>
+                  <span trspan="unregister">Unregister</span>
+  	            </span>
+              </TMPL_IF>
+	          </td>
           </tr>
         </TMPL_LOOP>
       </tbody>

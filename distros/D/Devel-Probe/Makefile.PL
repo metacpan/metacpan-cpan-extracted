@@ -9,16 +9,19 @@ WriteMakefile(
     MIN_PERL_VERSION => 5.018000,
     PREREQ_PM      => {
         'XSLoader'     => 0,
+        'Carp'         => 0,
+        'Storable'     => 0,
     },
     TEST_REQUIRES  => {
         'Test::More'   => 0,
-        'Test::Output' => 0,
+        'Devel::Leak'  => 0,
     },
     AUTHOR         => [
         'Gonzalo Diethelm (gonzus@cpan.org)',
     ],
     INC            => '-I.',
     OBJECT         => '$(O_FILES)',
+    CCFLAGS        => ' -std=c89',
     META_MERGE     => {
         'meta-spec' => { version => 2 },
         resources   => {
@@ -50,5 +53,6 @@ sub cflags {
     foreach (@cflags) {
         $_ = "CCFLAGS = $self->{CCFLAGS}" if /^CCFLAGS/;
     }
+
     return $self->{CFLAGS} = join("\n", @cflags) . "\n";
 }

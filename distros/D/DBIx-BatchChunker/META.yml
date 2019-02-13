@@ -4,19 +4,20 @@ author:
   - 'Grant Street Group <developers@grantstreet.com>'
 build_requires:
   Class::Load: '0'
+  DBD::SQLite: '1.29'
   DBIx::Class: '0'
   DBIx::Connector::Retry: '0'
   ExtUtils::MakeMaker: '0'
   Path::Class: '0'
   Scalar::Util: '0'
-  Test2::Bundle::More: '0'
+  Test2::Bundle::More: '0.000060'
   Test2::Tools::Compare: '0'
   Test2::Tools::Exception: '0'
   Test2::Tools::Explain: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -44,6 +45,6 @@ resources:
   bugtracker: https://github.com/GrantStreetGroup/DBIx-BatchChunker/issues
   homepage: https://github.com/GrantStreetGroup/DBIx-BatchChunker
   repository: https://github.com/GrantStreetGroup/DBIx-BatchChunker.git
-version: '0.92'
+version: '0.93'
 x_authority: cpan:GSG
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

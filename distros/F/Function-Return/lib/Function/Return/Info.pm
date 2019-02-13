@@ -33,6 +33,10 @@ Function::Return::Info - Information about return values
 
 Function::Return::info returns objects of this class to describe return values of functions.  The following methods are available:
 
+=head2 new
+
+Constructor of Function::Return::Info. This is usually called at Function::Return::info.
+
 =head2 $info->types
 
 Returns a list of type

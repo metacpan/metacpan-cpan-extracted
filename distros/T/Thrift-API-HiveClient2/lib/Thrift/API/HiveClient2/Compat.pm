@@ -1,5 +1,5 @@
 package Thrift::API::HiveClient2::Compat;
-$Thrift::API::HiveClient2::Compat::VERSION = '0.023';
+$Thrift::API::HiveClient2::Compat::VERSION = '0.024';
 {
   $Thrift::API::HiveClient2::Compat::DIST = 'Thrift-API-HiveClient2';
 }
@@ -48,7 +48,7 @@ Thrift::API::HiveClient2::Compat
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 AUTHOR
 

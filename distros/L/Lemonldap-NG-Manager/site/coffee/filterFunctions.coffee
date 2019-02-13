@@ -20,11 +20,11 @@ filterFunctions =
 			# Little function to select good node
 			p = (s) ->
 				tmp = s.toLowerCase()
-				if tmp == 'ad'
-					tmp = 'ldap'
-				else if tmp == 'openidconnect'
+				if tmp == 'openidconnect'
 					tmp = 'oidc'
 				nToShow.push tmp + 'Params'
+				if tmp == 'ad'
+					nToShow.push 'ldapParams'
 
 			# Show all normal nodes
 			for n in node.nodes

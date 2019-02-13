@@ -77,11 +77,11 @@ sub get_stmt {
     elsif ( $stmt_type eq 'Union' ) {
         @tmp = $used_for eq 'print' ? "SELECT * FROM (" :"(";
         my $count = 0;
-        for my $ref ( @{$sql->{used_cols}} ) {
+        for my $ref ( @{$sql->{subselect_data}} ) {
             ++$count;
             my $str = $in x 2 . "SELECT " . join( ', ', @{$ref->[1]} );
             $str .= " FROM " . $ref->[0];
-            if ( $count < @{$sql->{used_cols}} ) {
+            if ( $count < @{$sql->{subselect_data}} ) {
                 $str .= " UNION ALL ";
             }
             push @tmp, $str;

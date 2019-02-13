@@ -2,15 +2,14 @@ package Lemonldap::NG::Common::Cli;
 
 use strict;
 use Mouse;
-use Data::Dumper;
 use Lemonldap::NG::Common::Conf;
+
+our $VERSION = '2.0.0';
 
 has confAccess => (
     is      => 'rw',
     builder => sub {
-        my $res = Lemonldap::NG::Common::Conf->new(
-            {
-                (
+        my $res = Lemonldap::NG::Common::Conf->new( { (
                     ref $_[0] && $_[0]->{iniFile}
                     ? ( confFile => $_[0]->{iniFile} )
                     : ()
@@ -37,14 +36,15 @@ Num      : $conf->{cfgNum}
 Author   : $conf->{cfgAuthor}
 Author IP: $conf->{cfgAuthorIP}
 Date     : } . localtime( $conf->{cfgDate} ) . qq{
+Version  : $conf->{cfgVersion}
 Log      : $conf->{cfgLog}
 };
 }
 
 sub updateCache {
     my $self = shift;
-    die "Must not be launched as root" unless ($>);
     my $conf = $self->confAccess->getConf( { noCache => 2 } );
+    die "Must not be launched as root" unless ($>);
     print STDERR
       qq{Cache updated to configuration $conf->{cfgNum} for user $>\n};
 }

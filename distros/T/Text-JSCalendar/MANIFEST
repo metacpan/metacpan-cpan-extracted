@@ -1,0 +1,11 @@
+README
+MANIFEST
+Changes
+t/00-load.t
+lib/Text/JSCalendar.pm
+lib/Text/JSCalendar/TimeZones.pm
+Makefile.PL
+utils/GenerateTimeZoneModule.pl
+utils/GenerateTimeZonePopulations.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

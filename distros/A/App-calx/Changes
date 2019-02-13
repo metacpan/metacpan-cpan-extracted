@@ -1,0 +1,24 @@
+0.004   2019-02-13 (PERLANCAR)
+
+	- [ux] Show tags.
+
+	- [bugfix] Trap exception from get_entries() (i.e. when dates from
+	  year later than latest supported year is requested).
+
+
+0.003   2019-02-13 (PERLANCAR)
+
+	- Add option -a (get dates from all installed Calendar::Dates::*
+	  modules).
+
+	- [ux] Show calendar date module name for each entry.
+
+
+0.002   2019-02-13 (PERLANCAR)
+
+	- Show each calendar with a different color.
+
+
+0.001   2019-02-13 (PERLANCAR)
+
+        - First release.

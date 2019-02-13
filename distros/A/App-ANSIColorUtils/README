@@ -2,8 +2,8 @@ NAME
     App::ANSIColorUtils - Utilities related to ANSI color
 
 VERSION
-    This document describes version 0.001 of App::ANSIColorUtils (from Perl
-    distribution App-ANSIColorUtils), released on 2017-12-03.
+    This document describes version 0.004 of App::ANSIColorUtils (from Perl
+    distribution App-ANSIColorUtils), released on 2019-02-13.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -32,6 +32,64 @@ DESCRIPTION
 
     *   rgb-to-ansi256-fg-code
 
+    *   show-ansi-color-table
+
+    *   show-assigned-rgb-colors
+
+FUNCTIONS
+  show_ansi_color_table
+    Usage:
+
+     show_ansi_color_table(%args) -> [status, msg, payload, meta]
+
+    Show a table of ANSI codes & colors.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   width => *str* (default: 8)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  show_assigned_rgb_colors
+    Usage:
+
+     show_assigned_rgb_colors(%args) -> [status, msg, payload, meta]
+
+    Take arguments, pass them through assign_rgb_color(), show the results.
+
+    "assign_rgb_color()" from Color::RGB::Util takes a string, produce SHA1
+    digest from it, then take 24bit from the digest as the assigned color.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   strings* => *array[str]*
+
+    *   tone => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-ANSIColorUtils>.
@@ -52,7 +110,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,7 @@ package Unix::Sudo;
 use strict;
 use warnings;
 
-our $VERSION = '2';
+our $VERSION = '4';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -61,10 +61,10 @@ return it on STDOUT and use L<Capture::Tiny> to retrieve it.
 
 =head1 ERRORS
 
-A return value of 255 is special and is used to indicate that the code couldn't
-be compiled for some reason. When this happens the child process will spit an
-error message to STDERR, and the parent will die and attempt to tell you where
-you passed dodgy code to Unix::Sudo.
+A return value of 255 is special and is used to indicate that the code either
+died, couldn't be compiled, or did something else blatantly illegal. When this happens the child
+process will spit an error message to STDERR, and the parent will die and
+attempt to tell you where you passed dodgy code to Unix::Sudo.
 
 See L<CAVEATS> for some hints on circumstances when this might happen.
 
@@ -116,6 +116,11 @@ C<overload> to make reading its value have side-effects will not have those
 side-effects respected in the parent process.  In general, you should use this
 to "promote" as little of your code as possible to run as root, and I<only>
 your code so that you can be as aware as possible of the preceding.
+
+Any global variables in the Unix::Sudo namespace and any environment variables
+beginning with UNIX_SUDO_ are reserved.
+
+Calling C<sudo()> from within C<sudo()> is not supported.
 
 =head1 DEBUGGING
 
@@ -191,7 +196,7 @@ This module is also free-as-in-mason software.
 
 sub sudo(&) {
     my $context = peek_my(1);
-    my $code = '';
+    my $code = "use warnings;use strict;\n";
 
     my $deparse = B::Deparse->new();
 
@@ -237,12 +242,17 @@ sub sudo(&) {
         "sudo", "-p", "Unix::Sudo needs your password: ",
         Probe::Perl->find_perl_interpreter(),
         (map { "-I$_" } grep { -d } @INC),
-        "-T", "-e", "exit do { $code }"
+        "-T", "-e", qq{
+            exit(do {
+                \$Unix::Sudo::RV = eval { $code };
+                \$\@ ? 255 : \$Unix::Sudo::RV
+            })
+        }
     ) >> 8;
 
     if($rv == 255) {
         die(sprintf(
-            "Your code didn't compile when passed to Unix::Sudo::sudo at %s line %s\n",
+            "Your code died or didn't compile when passed to Unix::Sudo::sudo at %s line %s\n",
             (caller(1))[1, 2]
         ));
     } else {

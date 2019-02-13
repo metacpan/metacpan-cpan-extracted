@@ -20,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SLO_ERROR
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 # PROPERTIES
 
@@ -286,6 +286,15 @@ sub loadIDPs {
         }
         $self->logger->debug("Set encryption mode $encryption_mode on IDP $_");
 
+        # Set display options
+        $self->idpList->{$entityID}->{displayName} =
+          $self->conf->{samlIDPMetaDataOptions}->{$_}
+          ->{samlIDPMetaDataOptionsDisplayName};
+        $self->idpList->{$entityID}->{icon} =
+          $self->conf->{samlIDPMetaDataOptions}->{$_}
+          ->{samlIDPMetaDataOptionsIcon};
+
+        # Set rule
         my $cond = $self->conf->{samlIDPMetaDataOptions}->{$_}
           ->{samlIDPMetaDataOptionsResolutionRule};
         if ( length $cond ) {
@@ -2806,8 +2815,7 @@ sub checkDestination {
 sub getSamlSession {
     my ( $self, $id, $info ) = @_;
 
-    my $samlSession = Lemonldap::NG::Common::Session->new(
-        {
+    my $samlSession = Lemonldap::NG::Common::Session->new( {
             storageModule        => $self->aModule,
             storageModuleOptions => $self->amOpts,
             cacheModule          => $self->conf->{localSessionStorage},

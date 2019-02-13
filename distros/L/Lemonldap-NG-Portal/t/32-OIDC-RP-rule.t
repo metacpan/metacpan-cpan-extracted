@@ -129,15 +129,15 @@ sub switch {
 }
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
                 portal                          => 'http://auth.op.com',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
-                issuerDBOpenIDConnectActivation => "1",
+                issuerDBOpenIDConnectActivation => 1,
+                issuerDBOpenIDConnectRule       => '$uid eq "french"',
                 oidcRPMetaDataExportedVars      => {
                     rp => {
                         email       => "mail",
@@ -225,8 +225,7 @@ GQIDAQAB
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',

@@ -18,7 +18,6 @@ use Term::TablePrint   qw( print_table );
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
 use App::DBBrowser::GetContent;
-use App::DBBrowser::Opt;
 use App::DBBrowser::Table::WriteAccess;
 
 
@@ -39,7 +38,7 @@ sub delete_table {
     $ax->reset_sql( $sql );
     my $prompt = $sf->{d}{db_string} . "\n" . 'Drop table';
     # Choose
-    my $table = choose( #
+    my $table = choose(
         [ undef, map { "- $_" } sort @{$sf->{d}{user_tables}} ],
         { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, undef => '  <=' }
     );
@@ -48,13 +47,20 @@ sub delete_table {
     }
     $table =~ s/\-\s//;
     $sql->{table} = $ax->quote_table( $sf->{d}{tables_info}{$table} );
+    my $drop_ok = $sf->__drop_table( $sql );
+    return $drop_ok;
+}
+
+
+sub __drop_table {
+    my ( $sf, $sql ) = @_;
     $sf->{i}{stmt_types} = [ 'Drop_table' ];
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $ax->print_sql( $sql );
-    $prompt = 'Choose:';
     # Choose
-    my $ok = choose( #
+    my $ok = choose(
         [ undef, $sf->{i}{_confirm} . ' Stmt'],
-        { %{$sf->{i}{lyt_stmt_v}}, prompt => $prompt }
+        { %{$sf->{i}{lyt_stmt_v}}, prompt => 'Choose:' }
     );
     if ( ! $ok ) {
         return;
@@ -72,10 +78,10 @@ sub delete_table {
         { %{$sf->{o}{table}}, grid => 2, prompt => $prompt_pt, max_rows => 0,
         keep_header => 1, table_expand => $sf->{o}{G}{info_expand} }
     );
-    $prompt = sprintf 'DROP TABLE %s  (%s %s)', $sql->{table}, insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
+    my $prompt = sprintf 'DROP TABLE %s  (%s %s)', $sql->{table}, insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
     $prompt .= "\n\nCONFIRM:";
     # Choose
-    my $choice = choose( #
+    my $choice = choose(
         [ undef, 'YES' ],
         { %{$sf->{i}{lyt_m}}, prompt => $prompt, undef => 'NO', clear_screen => 1 }
     );
@@ -95,11 +101,10 @@ sub create_new_table {
     my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sql = {};
     $ax->reset_sql( $sql );
-    my @cu_keys = ( qw/create_table_plain create_table_form_file create_table_form_copy settings/ );
+    my @cu_keys = ( qw/create_table_plain create_table_form_file create_table_form_copy/ );
     my %cu = ( create_table_plain      => '- Plain',
                create_table_form_copy  => '- Copy & Paste',
                create_table_form_file  => '- From File',
-               settings                => '  Settings'
     );
     my $old_idx = 0;
 
@@ -129,11 +134,6 @@ sub create_new_table {
             $old_idx = $idx;
         }
         delete $ENV{TC_RESET_AUTO_UP};
-        if ( $custom eq $cu{settings} ) {
-            my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
-            $opt->config_insert();
-            next MENU;
-        }
         push @{$sf->{i}{stmt_types}}, 'Insert';
         my $ok_input;
         if ( $custom eq $cu{create_table_plain} ) {
@@ -167,7 +167,10 @@ sub create_new_table {
         if ( @{$sql->{insert_into_args}} ) {
             my $ok_insert = $sf->__insert_data( $sql );
             if ( ! $ok_insert ) {
-                return;
+                my $drop_ok = $sf->__drop_table( $sql );
+                if ( ! $drop_ok ) {
+                    return;
+                }
             }
         }
         return 1;
@@ -184,7 +187,7 @@ sub __create_table {
         [ undef, 'YES' ],
         { %{$sf->{i}{lyt_m}}, prompt => "Create table $sql->{table}?", undef => 'NO', index => 1 }
     );
-    if ( ! defined $create_table_ok || ! $create_table_ok ) {
+    if ( ! $create_table_ok ) {
         return;
     }
     my $stmt = $ax->get_stmt( $sql, 'Create_table', 'prepare' );
@@ -202,7 +205,9 @@ sub __insert_data {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sf->{i}{stmt_types} = [ 'Insert' ];
     my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} . " LIMIT 0" );
-    $sth->execute() if $sf->{d}{driver} ne 'SQLite';
+    if ( $sf->{d}{driver} ne 'SQLite' ) {
+        $sth->execute();
+    }
     my @columns = @{$sth->{NAME}};
     if ( length $sf->{col_auto} ) {
         shift @columns;
@@ -223,15 +228,15 @@ sub __set_table_name {
 
     while ( 1 ) {
         $ax->print_sql( $sql );
-        my $trs = Term::Form->new( 'tn' );
+        my $trs = Term::Form->new();
         my $info;
         my $default;
         if ( defined $sf->{d}{file_name} ) {
             my $file = basename delete $sf->{d}{file_name};
-            $info = sprintf "\nFile: '%s'", $file;
+            $info = sprintf "File: '%s'", $file;
             ( $default = $file ) =~ s/\.[^.]{1,4}\z//;
         }
-        if ( exists $sf->{d}{sheet_name} && defined $sf->{d}{sheet_name} && length $sf->{d}{sheet_name} ) {
+        if ( defined $sf->{d}{sheet_name} && length $sf->{d}{sheet_name} ) {
             $default .= '_' . delete $sf->{d}{sheet_name};
         }
         if ( defined $default ) {
@@ -421,7 +426,7 @@ sub __data_types {
     my $trs = Term::Form->new( 'cols' );
     $ax->print_sql( $sql );
     # Fill_form
-    my $col_name_and_type = $trs->fill_form( # look
+    my $col_name_and_type = $trs->fill_form(
         $fields,
         { prompt => 'Data types:', auto_up => 2, read_only => $read_only,
           confirm => '  CONFIRM', back => '  BACK   ' }

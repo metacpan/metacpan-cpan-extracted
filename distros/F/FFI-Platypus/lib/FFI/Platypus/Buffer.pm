@@ -5,9 +5,10 @@ use warnings;
 use base qw( Exporter );
 
 our @EXPORT = qw( scalar_to_buffer buffer_to_scalar );
+our @EXPORT_OK = qw ( scalar_to_pointer );
 
 # ABSTRACT: Convert scalars to C buffers
-our $VERSION = '0.82'; # VERSION
+our $VERSION = '0.83'; # VERSION
 
 
 use constant _incantation => 
@@ -19,6 +20,12 @@ use constant _incantation =>
 sub scalar_to_buffer ($)
 {
   (unpack(_incantation, pack 'P', $_[0]), do { use bytes; length $_[0] });
+}
+
+
+sub scalar_to_pointer ($)
+{
+  unpack(_incantation, pack 'P', $_[0]);
 }
 
       
@@ -41,7 +48,7 @@ FFI::Platypus::Buffer - Convert scalars to C buffers
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 
@@ -109,6 +116,15 @@ copying the buffer instead.  For example:
  # later when you know that the c code is no longer using the pointer
  # Since you allocated the copy, you are responsible for free'ing it.
  free($ptr_copy);
+
+=head2 scalar_to_pointer
+
+ my $pointer = scalar_to_pointer $scalar;
+
+Get the pointer to the scalar.  (Similar to C<scalar_to_buffer> above, but
+the size of the scalar is not computed or returned).
+
+Not exported by default, but may be exported on request.
 
 =head2 buffer_to_scalar
 

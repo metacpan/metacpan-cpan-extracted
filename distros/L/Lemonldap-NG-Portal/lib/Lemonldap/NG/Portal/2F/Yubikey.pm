@@ -51,8 +51,7 @@ sub init {
     }
 
     $self->yubi(
-        Auth::Yubikey_WebClient->new(
-            {
+        Auth::Yubikey_WebClient->new( {
                 id    => $self->conf->{yubikey2fClientID},
                 api   => $self->conf->{yubikey2fSecretKey},
                 nonce => $self->conf->{yubikey2fNonce},

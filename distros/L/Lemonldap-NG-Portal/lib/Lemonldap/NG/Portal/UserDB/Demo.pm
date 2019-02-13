@@ -7,11 +7,11 @@ package Lemonldap::NG::Portal::UserDB::Demo;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_USERNOTFOUND);
+use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_BADCREDENTIALS);
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 # Sample accounts from Doctor Who characters
 our %demoAccounts = (
@@ -60,7 +60,7 @@ sub getUser {
     }
 
     eval { $self->p->_authentication->setSecurity($req) };
-    PE_USERNOTFOUND;
+    PE_BADCREDENTIALS;
 }
 
 ## @apmethod int setSessionInfo()

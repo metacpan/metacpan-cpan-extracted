@@ -4,16 +4,45 @@ use strict;
 use Mouse;
 use URI::Escape;
 use Lemonldap::NG::Common::FormEncode;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_BADURL);
+use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_BADURL PE_GET_SERVICE_NOT_ALLOWED);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer';
+
+has rule => ( is => 'rw', default => sub { {} } );
+
+# INITIALIZATION
+
+sub init {
+    my ($self) = @_;
+
+    # Parse activation rule
+    my $hd = $self->p->HANDLER;
+    $self->logger->debug(
+        "GET rule -> " . $self->conf->{issuerDBGetRule} );
+    my $rule =
+      $hd->buildSub(
+        $hd->substitute( $self->conf->{issuerDBGetRule} ) );
+    unless ($rule) {
+        $self->error( "Bad GET rule -> " . $hd->tsv->{jail}->error );
+        return 0;
+    }
+    $self->{rule} = $rule;
+    return 0 unless ( $self->SUPER::init() );
+    return 1;
+}
 
 # RUNNING METHODS
 
 sub run {
     my ( $self, $req ) = @_;
+
+    # Check activation rule
+    unless ( $self->rule->( $req, $req->sessionInfo ) ) {
+        $self->userLogger->error('GET service not authorized');
+        return PE_GET_SERVICE_NOT_ALLOWED;
+    }
 
     # Session ID
     my $session_id = $req->{sessionInfo}->{_session_id} || $self->{id};

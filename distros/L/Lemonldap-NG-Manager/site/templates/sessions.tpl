@@ -94,7 +94,7 @@
        <th ng-if="node.td!='1' && node.td!='2'">{{translate(node.title)}}</th>
        <td class="data-{{node.epoch}}" ng-if="node.td>='1'">{{node.title}}</td>
        <th ng-if="node.title=='type' || node.title=='rp'">{{translate(node.value)}}</th>
-       <td class="col-md-4 data-{{node.epoch}}" ng-if="node.title!='type' && node.title!='rp'">{{node.value}}</td>
+       <td id="v-{{node.title}}" class="col-md-4 data-{{node.epoch}}" ng-if="node.title!='type' && node.title!='rp'">{{node.value}}</td>
        <th ng-if="node.title=='type' || node.title=='rp'">{{translate(node.epoch)}}</th>
        <td class="col-md-4 data-{{node.epoch}}" ng-if="node.epoch > 1500000000">{{localeDate(node.epoch)}}</td>
        <td class="data-{{node.epoch}}">

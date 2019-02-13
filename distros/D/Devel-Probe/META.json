@@ -32,14 +32,16 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Storable" : "0",
             "XSLoader" : "0",
             "perl" : "5.018"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0",
-            "Test::Output" : "0"
+            "Devel::Leak" : "0",
+            "Test::More" : "0"
          }
       }
    },
@@ -50,6 +52,6 @@
          "web" : "https://github.com/gonzus/Devel-Probe.git"
       }
    },
-   "version" : "0.000004",
+   "version" : "0.000005",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

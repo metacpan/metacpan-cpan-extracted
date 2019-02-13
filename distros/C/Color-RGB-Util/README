@@ -2,14 +2,17 @@ NAME
     Color::RGB::Util - Utilities related to RGB colors
 
 VERSION
-    This document describes version 0.593 of Color::RGB::Util (from Perl
-    distribution Color-RGB-Util), released on 2018-10-05.
+    This document describes version 0.595 of Color::RGB::Util (from Perl
+    distribution Color-RGB-Util), released on 2019-02-13.
 
 SYNOPSIS
      use Color::RGB::Util qw(
          mix_2_rgb_colors
          mix_rgb_colors
          rand_rgb_color
+         assign_rgb_color
+         assign_rgb_light_color
+         assign_rgb_dark_color
          rgb2grayscale
          rgb2sepia
          reverse_rgb_color
@@ -30,6 +33,8 @@ SYNOPSIS
 
      say rand_rgb_color();
      say rand_rgb_color('000000', '333333');         # limit range
+
+     say assign_rgb_color("foo");                    # 0b5d33
 
      say rgb2grayscale('0033CC');                    # => 555555
 
@@ -84,6 +89,23 @@ FUNCTIONS
 
     Generate a random RGB color. You can specify the limit. Otherwise, they
     default to the full range (000000 to ffffff).
+
+  assign_rgb_color
+    Usage:
+
+     my $rgb = assign_rgb_color($str);
+
+    Map a string to an RGB color. This is done by producing SHA-1 digest
+    (160bit, 20 bytes) of the string, then taking the first, 10th, and last
+    byte to become the RGB color.
+
+  assign_rgb_light_color
+    Like "assign_rgb_color" except that it will make sure the assigned color
+    is light.
+
+  assign_rgb_dark_color
+    Like "assign_rgb_color" except that it will make sure the assigned color
+    is dark.
 
   rgb2grayscale
     Usage:
@@ -198,7 +220,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2015, 2014, 2013 by
+    This software is copyright (c) 2019, 2018, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

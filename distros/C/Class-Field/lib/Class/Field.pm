@@ -1,6 +1,6 @@
 use strict; use warnings;
 package Class::Field;
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use base 'Exporter';
 
@@ -55,8 +55,11 @@ sub field {
 
     my $code = sprintf $code{sub_start}, $package, $field;
     if ($args->{-init}) {
-        my $fragment = $args->{-weak} ? $code{weak_init} : $code{init};
-        $code .= sprintf $fragment, $field, $args->{-init}, ($field) x 4;
+        if ($args->{-weak}) {
+            $code .= sprintf $code{weak_init}, $field, $args->{-init}, ($field) x 4;
+        } else {
+            $code .= sprintf $code{init}, $field, $args->{-init}, $field;
+        }
     }
     $code .= sprintf $code{set_default}, $field, $default_string, $field
       if defined $default;

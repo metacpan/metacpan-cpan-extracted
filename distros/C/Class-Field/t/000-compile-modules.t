@@ -9,6 +9,8 @@ sub test {
     use_ok $_;
 }
 
+$ENV{PERL_ZILD_TEST_000_COMPILE_MODULES} = 1;
+
 find {
     wanted => \&test,
     no_chdir => 1,

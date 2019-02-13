@@ -95,13 +95,13 @@ __END__
 
 =encoding utf8
 
-convertConfig - tool used to change Lemonldap::NG configuration database.
+convertConfig - A tool to convert Lemonldap::NG configuration database.
 
 =head1 SYNOPSIS
 
   convertConfig --current=/current/lemonldap-ng.ini --new=/new/lemonldap-ng.ini
 
-  # Convert only latest (loose history)
+  # Convert only the latest config (configuration history is lost)
   convertConfig  --latest --current=... --new=...
 
   # Continue even if an error occurs
@@ -110,8 +110,9 @@ convertConfig - tool used to change Lemonldap::NG configuration database.
 
 =head1 DESCRIPTION
 
-convertConfig is a command line toot that can be used to do initialize a new
-Lemonldap::NG configuration database keeping current configuration and history.
+convertConfig is a command line tool to convert all configurations stored
+in database and initialize a new Lemonldap::NG configuration based on
+current configuration.
 
 =head1 SEE ALSO
 

@@ -1,3 +1,4 @@
+CHANGES
 examples/basic.pl
 lib/DBIx/BatchChunker.pm
 Makefile.PL

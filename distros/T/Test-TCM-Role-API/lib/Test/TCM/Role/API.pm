@@ -60,13 +60,13 @@ use experimental qw(smartmatch signatures);
 
 use Carp qw(croak);
 use HTTP::Request;
-use JSON qw(encode_json);
+use JSON qw(encode_json decode_json);
 use Plack::Test;
 use Test::Deep qw(cmp_deeply);
 use Test::Differences qw(eq_or_diff);
 use Test::More;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 =head1 REQUIRED METHODS
 

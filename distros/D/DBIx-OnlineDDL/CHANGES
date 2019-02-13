@@ -6,6 +6,13 @@ Home page:       <https://metacpan.org/release/DBIx-OnlineDDL>
 Bug tracker:     <https://github.com/GrantStreetGroup/DBIx-OnlineDDL/issues>
 Maintainer:      Grant Street Group <developers@grantstreet.com>
 
+0.91        2018-01-02
+
+    - Include default target_time / sleep for copy_opts
+    - Increase sleep time for retries (incremental)
+    - Include 'WSREP has not yet prepared node for application use' as a retryable error
+    - Bulletproof against various DB errors and DBD failures
+
 0.90        2018-09-27
 
     - Initial release

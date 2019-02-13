@@ -1,7 +1,7 @@
 package DBIx::OnlineDDL::Helper::MySQL;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.90';
+our $VERSION   = '0.91';
 
 use v5.10;
 use Moo;
@@ -23,7 +23,7 @@ DBIx::OnlineDDL::Helper::MySQL - Private OnlineDDL helper for MySQL-specific cod
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 DESCRIPTION
 
@@ -104,10 +104,13 @@ sub is_error_retryable {
 
         # Connections
         (?-x:mysql server has gone away)|
-        (?-x:Lost connection to mysql server)|
+        (?-x:lost connection to mysql server)|
 
         # Queries
-        (?-x:query execution was interrupted)
+        (?-x:query execution was interrupted)|
+
+        # Failovers
+        (?-x:wsrep has not yet prepared node for application use)
     >xi;
 }
 

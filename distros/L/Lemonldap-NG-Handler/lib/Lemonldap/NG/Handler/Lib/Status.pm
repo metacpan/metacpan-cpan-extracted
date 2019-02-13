@@ -9,7 +9,7 @@ use JSON qw(to_json);
 use IO::Select;
 use IO::Socket::INET;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 our $status   = {};
 our $activity = [];
@@ -105,6 +105,7 @@ sub portalTab {
         85 => 'PE_RENEWSESSION',
         86 => 'PE_WAIT',
         87 => 'PE_MUSTAUTHN',
+        88 => 'PE_MUSTHAVEMAIL',
     };
 }
 

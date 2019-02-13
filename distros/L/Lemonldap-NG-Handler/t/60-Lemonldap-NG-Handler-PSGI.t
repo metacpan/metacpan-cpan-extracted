@@ -1,6 +1,7 @@
 use Test::More;
 use JSON;
 use MIME::Base64;
+use Data::Dumper;
 
 require 't/test-psgi-lib.pm';
 

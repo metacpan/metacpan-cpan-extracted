@@ -1,3 +1,13 @@
+0.595   2019-02-13 (PERLANCAR)
+
+	- Add functions: assign_rgb_light_color, assign_rgb_dark_color.
+
+
+0.594   2019-02-13 (PERLANCAR)
+
+	- Add function: assign_rgb_color.
+
+
 0.593   2018-10-05 (PERLANCAR)
 
         - No functional changes.

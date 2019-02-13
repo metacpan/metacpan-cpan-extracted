@@ -1,6 +1,6 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -27,7 +27,15 @@ sub process {
         }
         else {
             $self->logger->debug("Processing $sub");
-            last if ( $err = $self->$sub( $req, %args ) );
+            if ( my $as = $self->aroundSub->{$sub} ) {
+                last if ( $err = $as->( $req, %args ) );
+            }
+            else {
+                last if ( $err = $self->$sub( $req, %args ) );
+            }
+            if ( $self->afterSub->{$sub} ) {
+                unshift @{ $req->steps }, @{ $self->afterSub->{$sub} };
+            }
         }
     }
     $self->logger->debug("Returned error: $err") if ($err);
@@ -294,15 +302,18 @@ sub authenticate {
     }
 
     # Store failed login into history
-    $req->steps(
-        [
+    $req->steps( [
             'setSessionInfo',           'setMacros',
             'setPersistentSessionInfo', 'storeHistory',
             @{ $self->afterData }, sub { PE_BADCREDENTIALS }
         ]
     );
 
-    return PE_OK;
+    # Ignore result, process will end at least with PE_BADCREDENTIALS
+    my $tmp = $self->process($req);
+    $ret = $tmp if ( $tmp == PE_WAIT );
+
+    return $ret;
 }
 
 # Third block: Session data providing

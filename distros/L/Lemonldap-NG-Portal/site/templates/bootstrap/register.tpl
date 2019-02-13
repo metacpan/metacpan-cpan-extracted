@@ -6,10 +6,10 @@
   <div class="message message-<TMPL_VAR NAME="AUTH_ERROR_TYPE"> alert"><span trmsg="<TMPL_VAR NAME="AUTH_ERROR">"></span></div>
   </TMPL_IF>
 
-  <div class="card">
+
 
   <TMPL_IF NAME="DISPLAY_FORM">
-
+  <div class="card">
     <form action="#" method="post" class="login" role="form">
     <div class="form">
 
@@ -48,7 +48,7 @@
       <div class="input-group-prepend">
         <span class="input-group-text"><i class="fa fa-eye"></i> </span>
       </div>
-      <input type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" placeholder="Captcha" required aria-required="true"/>
+      <input type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" placeholder="Captcha" required aria-required="true" autocomplete="off" />
     </div>
     </TMPL_IF>
     <TMPL_IF NAME="TOKEN">
@@ -62,10 +62,11 @@
 
     </div>
     </form>
+  </div>
   </TMPL_IF>
 
   <TMPL_IF NAME="DISPLAY_RESEND_FORM">
-
+  <div class="card">
     <form action="#" method="post" class="login" role="form">
     <div class="form">
 
@@ -111,9 +112,11 @@
 
     </div>
     </form>
+  </div>
   </TMPL_IF>
 
   <TMPL_IF NAME="DISPLAY_CONFIRMMAILSENT">
+  <div class="card">
     <form action="#" method="post" class="login" role="form">
     <div class="form">
       <h3 trspan="mailSent2">A message has been sent to your mail address.</h3>
@@ -123,17 +126,18 @@
       </p>
     </div>
     </form>
+  </div>
   </TMPL_IF>
 
   <TMPL_IF NAME="DISPLAY_MAILSENT">
+  <div class="card">
     <form action="#" method="post" class="login" role="form">
     <div class="form">
       <h3 trspan="accountCreated">Your account has been created, your temporary password has been sent to your mail address.</h3>
     </div>
     </form>
-  </TMPL_IF>
-
   </div>
+  </TMPL_IF>
 
 	<div class="buttons">
 	  <a href="<TMPL_VAR NAME="PORTAL_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="CHOICE_VALUE">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="CHOICE_VALUE"></TMPL_IF><TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>" class="btn btn-primary" role="button">

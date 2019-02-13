@@ -1,0 +1,42 @@
+NAME
+    Calendar::Dates::ID::Holiday - Indonesian holiday calendar
+
+VERSION
+    This document describes version 0.002 of Calendar::Dates::ID::Holiday
+    (from Perl distribution Calendar-Dates-ID-Holiday), released on
+    2019-02-13.
+
+DESCRIPTION
+    This module provides Indonesian holiday calendar using the
+    Calendar::Dates interface.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Calendar-Dates-ID-Holiday>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Calendar-Dates-ID-Holiday>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Dates-ID-Hol
+    iday>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Calendar::Dates
+
+    Calendar::Indonesia::Holiday, the backend
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

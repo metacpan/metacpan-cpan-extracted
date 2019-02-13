@@ -6,7 +6,7 @@ use Encode;
 use JSON;
 use Lemonldap::NG::Common::Conf::Constants;
 
-our $VERSION = '1.9.13';
+our $VERSION = '2.0.0';
 
 BEGIN {
     *Lemonldap::NG::Common::Conf::normalize      = \&normalize;
@@ -131,7 +131,7 @@ sub oldUnserialize {
         if ( $k =~ $hashParameters and $v ||= {} and not ref($v) ) {
             $conf->{$k} = {};
 
-            # Value should be a Data::Dumper, else this is an old format
+            # Value should be a Data::Dumper, else this is an old-old format
             if ( defined($v) and $v !~ /^\$/ ) {
 
                 $Lemonldap::NG::Common::Conf::msg .=

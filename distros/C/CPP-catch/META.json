@@ -25,12 +25,12 @@
       },
       "configure" : {
          "requires" : {
-            "XS::Install" : "v1.0.9"
+            "XS::Install" : "v1.0.12"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.0.9"
+            "XS::Install" : "v1.0.12"
          }
       },
       "test" : {
@@ -42,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.4",
+   "version" : "v1.0.5",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

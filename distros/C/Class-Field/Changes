@@ -1,3 +1,6 @@
+0.24 Tue Feb 12 13:55:49 PST 2019
+ - Apply https://github.com/ingydotnet/class-field-pm/pull/3 @mtmail++
+
 0.23 Thu Aug 21 12:06:13 PDT 2014
  - Typo fix via PR/1. @wollmers++
 
@@ -37,4 +40,3 @@
 
 0.10 Tue Jan 31 00:44:04 PST 2006
  - Maiden voyage
-

@@ -1,0 +1,97 @@
+---
+fusemap:
+  BOOTRST:
+    mask: 1
+    name: BOOTRST
+    reg: h
+  BOOTSZ:
+    mask: 6
+    name: BOOTSZ
+    reg: h
+    values:
+      - caption: Boot Flash size=256 words Boot address=$3F00
+        name: 256W_3F00
+        value: 6
+      - caption: Boot Flash size=512 words Boot address=$3E00
+        name: 512W_3E00
+        value: 4
+      - caption: Boot Flash size=1024 words Boot address=$3C00
+        name: 1024W_3C00
+        value: 2
+      - caption: Boot Flash size=2048 words Boot address=$3800
+        name: 2048W_3800
+        value: 0
+  DUVRDINIT:
+    mask: 16
+    name: DUVRDINIT
+    reg: h
+  DWEN:
+    mask: 8
+    name: DWEN
+    reg: h
+  EESAVE:
+    mask: 64
+    name: EESAVE
+    reg: l
+  OSCSEL:
+    mask: 3
+    name: OSCSEL
+    reg: l
+    values:
+      - caption: Default
+        name: DEFAULT
+        value: 1
+  SPIEN:
+    mask: 32
+    name: SPIEN
+    reg: l
+  SUT:
+    mask: 28
+    name: SUT
+    reg: l
+    values:
+      - caption: Start-up time 14 CK + 4 ms
+        name: 14CK_4MS
+        value: 0
+      - caption: Start-up time 14 CK + 8 ms
+        name: 14CK_8MS
+        value: 4
+      - caption: Start-up time 14 CK + 16 ms
+        name: 14CK_16MS
+        value: 8
+      - caption: Start-up time 14 CK + 32 ms
+        name: 14CK_32MS
+        value: 12
+      - caption: Start-up time 14 CK + 64 ms
+        name: 14CK_64MS
+        value: 16
+      - caption: Start-up time 14 CK + 128 ms
+        name: 14CK_128MS
+        value: 20
+      - caption: Start-up time 14 CK + 256 ms
+        name: 14CK_256MS
+        value: 24
+      - caption: Start-up time 14 CK + 512 ms
+        name: 14CK_512MS
+        value: 28
+  WDTON:
+    mask: 128
+    name: WDTON
+    reg: l
+fuses:
+  - WDTON
+  - EESAVE
+  - SPIEN
+  - SUT
+  - OSCSEL
+  - DUVRDINIT
+  - DWEN
+  - BOOTSZ
+  - BOOTRST
+reginfos:
+  - default: 221
+    mask: 255
+    name: l
+  - default: 233
+    mask: 31
+    name: h

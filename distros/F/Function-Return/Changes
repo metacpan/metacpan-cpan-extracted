@@ -1,5 +1,12 @@
 Revision history for Perl extension Function-Return
 
+0.041 2019-02-11T13:11:00Z
+    - Fix document
+
+0.04 2019-02-11T12:59:23Z
+    - unpublish some functions: `attr_re` and `register_return_info`.
+    - improve test and document
+
 0.031 2019-02-10T12:21:42Z
     - improve test and document
 

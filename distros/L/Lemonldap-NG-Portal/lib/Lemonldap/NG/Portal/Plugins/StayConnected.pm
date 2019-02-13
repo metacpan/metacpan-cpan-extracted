@@ -58,8 +58,7 @@ sub newDevice {
     my ( $self, $req ) = @_;
 
     if ( $req->param('stayconnected') ) {
-        my $token = $self->ott->createToken(
-            {
+        my $token = $self->ott->createToken( {
                 name => $req->sessionInfo->{ $self->conf->{whatToTrace} }
             }
         );

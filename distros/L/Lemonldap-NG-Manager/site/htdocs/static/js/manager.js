@@ -170,7 +170,7 @@ This file contains:
           message: '',
           items: []
         };
-        if (data.message === '__needConfirmation__') {
+        if (data.needConfirm) {
           $scope.confirmNeeded = true;
         }
         if (data.message) {
@@ -179,10 +179,17 @@ This file contains:
         if (data.details) {
           for (m in data.details) {
             if (m !== '__changes__') {
-              $scope.message.items.push({
-                message: m,
-                items: data.details[m]
-              });
+              if (m === '__needConfirmation__') {
+                $scope.message.items.unshift({
+                  message: m,
+                  items: data.details[m]
+                });
+              } else {
+                $scope.message.items.push({
+                  message: m,
+                  items: data.details[m]
+                });
+              }
             }
           }
         }
@@ -357,7 +364,7 @@ This file contains:
           type: 'cmbModule',
           data: {
             type: 'LDAP',
-            "for": 0,
+            "for": '0',
             over: []
           }
         });
@@ -403,7 +410,7 @@ This file contains:
           id: node.id + "/n" + (id++),
           title: 'new',
           type: 'samlAttribute',
-          data: [0, 'New', '', '']
+          data: ['0', 'New', '', '']
         });
       };
       $scope.addVhost = function() {
@@ -816,9 +823,7 @@ This file contains:
               } else {
                 node.data = data.value;
               }
-              if (node.type && node.type.match(/^(bool|trool|boolOrExpr)$/)) {
-                node.data = node.data.toString();
-              } else if (node.type && node.type.match(/^int$/)) {
+              if (node.type && node.type.match(/^int$/)) {
                 node.data = parseInt(node.data, 10);
               } else if (node.type && node.type.match(/^(saml(Service|Assertion)|blackWhiteList)$/) && !(typeof node.data === 'object')) {
                 node.data = node.data.split(';');

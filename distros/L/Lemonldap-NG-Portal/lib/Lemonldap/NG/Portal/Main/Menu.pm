@@ -3,11 +3,10 @@
 package Lemonldap::NG::Portal::Main::Menu;
 
 use strict;
-use utf8;
 use Mouse;
 use Clone 'clone';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -60,6 +59,8 @@ sub params {
     my ( $self, $req ) = @_;
     $self->{conf}->{imgPath} ||= $self->{staticPrefix};
     my %res;
+    my @defaultTabs = (qw/appslist password logout loginHistory oidcConsents/);
+    my @customTabs = split( /,\s*/, $self->{conf}->{customMenuTabs} || '' );
 
     # Tab to display
     # Get the tab URL parameter
@@ -90,9 +91,18 @@ sub params {
 
     # else calculate modules to display
     else {
-        $res{DISPLAY_TAB} = scalar( grep /^(password|logout|loginHistory)$/,
-            $req->param("tab") // '' )
-          || "applist";
+        my $tab = $req->param("tab");
+        if ( defined $tab
+            and grep ( /^$tab$/, ( @defaultTabs, @customTabs ) ) )
+        {
+            $self->logger->debug( "Select menu tab "
+                  . $req->param("tab")
+                  . "from GET parameter" );
+            $res{DISPLAY_TAB} = $req->param("tab");
+        }
+        else {
+            $res{DISPLAY_TAB} = "appslist";
+        }
     }
 
     $res{DISPLAY_MODULES} = $self->displayModules($req);
@@ -177,7 +187,6 @@ sub appslist {
 sub _buildCategoryHash {
     my ( $self, $req, $catid, $cathash, $catlevel ) = @_;
     my $catname = $cathash->{catname} || $catid;
-    utf8::decode($catname);
     my $applications;
     my $categories;
 
@@ -233,8 +242,6 @@ sub _buildApplicationHash {
     my $appuri  = $apphash->{options}->{uri}  || "";
     my $appdesc = $apphash->{options}->{description};
     my $applogo = $apphash->{options}->{logo};
-    utf8::decode($appname);
-    utf8::decode($appdesc) if $appdesc;
 
     # Detect sub applications
     my $subapphash;

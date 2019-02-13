@@ -6,14 +6,14 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 use strict;
 use Regexp::Common qw/URI/;
 
 my $perlExpr = sub {
     my ( $val, $conf ) = @_;
     my $s = '';
-    Safe->new->reval("no warning; $s $val");
+    Safe->new->reval("BEGIN { warnings->unimport; } $s $val");
     my $err = join( '',
         grep { $_ =~ /Undefined subroutine/ ? () : $_ } split( /\n/, $@ ) );
     return $err ? ( 1, "__badExpression__: $err" ) : (1);
@@ -291,8 +291,8 @@ sub attributes {
             flags         => 'hmp',
         },
         https => {
-            default       => 0,
-            type          => 'bool',
+            default       => -1,
+            type          => 'trool',
             documentation => 'Use HTTPS for redirection from portal',
             flags         => 'h',
         },
@@ -304,6 +304,7 @@ sub attributes {
             documentation => 'HTTP method for info page form',
         },
         port => {
+            default       => -1,
             type          => 'int',
             documentation => 'Force port in redirection',
             flags         => 'h',
@@ -611,7 +612,13 @@ sub attributes {
             default => 300,
             type    => 'int',
             documentation =>
-              'Brute force attack protection -> Max age third failed login',
+'Brute force attack protection -> Max age between last and first allowed failed login',
+        },
+        bruteForceProtectionMaxFailed => {
+            default => 3,
+            type    => 'int',
+            documentation =>
+              'Brute force attack protection -> Max allowed failed login',
         },
         grantSessionRules => {
             type          => 'grantContainer',
@@ -704,11 +711,6 @@ sub attributes {
             test          => sub { $_[0] >= 0 },
             default       => 60,
             documentation => 'Update session timeout interval on server side',
-        },
-        trustedProxies => {
-            type          => 'text',
-            default       => '',
-            documentation => 'Trusted proxies',
         },
         userControl => {
             type          => 'pcre',
@@ -1078,47 +1080,7 @@ sub attributes {
             documentation => 'Hide old password in portal',
         },
 
-        # Mails
-        mailBody =>
-          { type => 'longtext', documentation => 'Custom mail body', },
-        mailCharset => {
-            type          => 'text',
-            default       => 'utf-8',
-            documentation => 'Mail charset',
-        },
-        mailConfirmBody => {
-            type          => 'longtext',
-            documentation => 'Custom confirm mail body',
-        },
-        mailConfirmSubject => {
-            type          => 'text',
-            documentation => 'Mail subject for reset confirmation',
-        },
-        mailFrom => {
-            type          => 'text',
-            default       => 'noreply@example.com',
-            documentation => 'Sender email',
-        },
-        mailReplyTo => { type => 'text', documentation => 'Reply-To address' },
-        mailSessionKey => {
-            type          => 'text',
-            default       => 'mail',
-            documentation => 'Session parameter where mail is stored',
-        },
-        mailSubject => {
-            type          => 'text',
-            documentation => 'Mail subject for new password email',
-        },
-        mailTimeout => {
-            type          => 'int',
-            default       => 0,
-            documentation => 'Mail session timeout',
-        },
-        mailUrl => {
-            type          => 'url',
-            default       => 'http://auth.example.com/resetpwd',
-            documentation => 'URL of password reset page',
-        },
+        # SMTP server
         SMTPServer => {
             type    => 'text',
             default => '',
@@ -1150,6 +1112,54 @@ sub attributes {
         SMTPAuthPass => {
             type          => 'password',
             documentation => 'Password to use to send mails',
+        },
+
+        # Mails
+        mailCharset => {
+            type          => 'text',
+            default       => 'utf-8',
+            documentation => 'Mail charset',
+        },
+        mailFrom => {
+            type          => 'text',
+            default       => 'noreply@example.com',
+            documentation => 'Sender email',
+        },
+        mailSessionKey => {
+            type          => 'text',
+            default       => 'mail',
+            documentation => 'Session parameter where mail is stored',
+        },
+        mailReplyTo => { type => 'text', documentation => 'Reply-To address' },
+        mailTimeout => {
+            type          => 'int',
+            default       => 0,
+            documentation => 'Mail password reset session timeout',
+        },
+
+        # Password reset
+        mailBody => {
+            type          => 'longtext',
+            documentation => 'Custom password reset mail body',
+        },
+
+        mailConfirmBody => {
+            type          => 'longtext',
+            documentation => 'Custom confirm password reset mail body',
+        },
+        mailConfirmSubject => {
+            type          => 'text',
+            documentation => 'Mail subject for reset confirmation',
+        },
+        mailSubject => {
+            type          => 'text',
+            documentation => 'Mail subject for new password email',
+        },
+
+        mailUrl => {
+            type          => 'url',
+            default       => 'http://auth.example.com/resetpwd',
+            documentation => 'URL of password reset page',
         },
 
         # Registration
@@ -1287,6 +1297,39 @@ sub attributes {
             type => 'int',
             documentation =>
 'Authentication level for users authentified by password+(U2F or TOTP)'
+        },
+
+        # Mail second factor
+        mail2fActivation => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'Mail second factor activation',
+        },
+        mail2fSubject => {
+            type          => 'text',
+            documentation => 'Mail subject for second factor authentication',
+        },
+        mail2fBody => {
+            type          => 'longtext',
+            documentation => 'Mail body for second factor authentication',
+        },
+        mail2fCodeRegex => {
+            type          => 'pcre',
+            default       => '\d{6}',
+            documentation => 'Regular expression to create a mail OTP code',
+        },
+        mail2fTimeout => {
+            type          => 'int',
+            documentation => 'Second factor code timeout',
+        },
+        mail2fAuthnLevel => {
+            type => 'int',
+            documentation =>
+'Authentication level for users authenticated by Mail second factor'
+        },
+        mail2fLogo => {
+            type          => 'text',
+            documentation => 'Custom logo for Mail 2F',
         },
 
         # External second factor
@@ -1498,7 +1541,7 @@ sub attributes {
                           : ( 0, '__badUrl__' );
                     }
                     $s =~ s/\b(accept|deny|unprotect|skip)\b/1/g;
-                    Safe->new->reval("no warnings;$s");
+                    Safe->new->reval("BEGIN { warnings->unimport; } $s");
                     my $err = join( '',
                         grep { $_ =~ /Undefined subroutine/ ? () : $_ }
                           split( /\n/, $@ ) );
@@ -1523,7 +1566,7 @@ sub attributes {
                 test       => sub {
                     my ( $val, $conf ) = @_;
                     my $s = $val;
-                    Safe->new->reval("no warnings;$s");
+                    Safe->new->reval("BEGIN { warnings->unimport; } $s");
                     my $err = join( '',
                         grep { $_ =~ /Undefined subroutine/ ? () : $_ }
                           split( /\n/, $@ ) );
@@ -1698,7 +1741,7 @@ sub attributes {
         casAppMetaDataNodes => {
             type     => 'casAppMetaDataNodeContainer',
             template => 'casAppMetaDataNode',
-            help     => 'idpcas.html',
+            help     => 'idpcas.html#configuring_cas_applications',
         },
 
         # OpenID Issuer
@@ -2014,7 +2057,7 @@ sub attributes {
                     unless ( $v->{$idpId}->{samlIDPMetaDataXML} =~
                         /entityID="(.+?)"/si )
                     {
-                        push @msg, "$idpId SAML metadata has ne EntityID";
+                        push @msg, "$idpId SAML metadata has no EntityID";
                         $res = 0;
                         next;
                     }
@@ -2155,6 +2198,8 @@ sub attributes {
             default => 0,
         },
         samlIDPMetaDataOptionsUserAttribute => { type => 'text', },
+        samlIDPMetaDataOptionsDisplayName   => { type => 'text', },
+        samlIDPMetaDataOptionsIcon          => { type => 'text', },
 
         # SP keys
         samlSPMetaDataExportedAttributes => {
@@ -2297,7 +2342,7 @@ sub attributes {
                 { k => 'AD',          v => 'Active Directory' },
                 { k => 'DBI',         v => 'Database (DBI)' },
                 { k => 'Facebook',    v => 'Facebook' },
-                { k => 'Google',      v => 'Google' },
+                { k => 'GPG',         v => 'GPG' },
                 { k => 'Kerberos',    v => 'Kerberos' },
                 { k => 'LDAP',        v => 'LDAP' },
                 { k => 'LinkedIn',    v => 'LinkedIn' },
@@ -2353,7 +2398,7 @@ sub attributes {
             documentation => 'Password module',
         },
 
-        # Seconf Factor Engine
+        # Second Factor Engine
         sfEngine => {
             type          => 'text',
             default       => '::2F::Engines::Default',
@@ -2367,7 +2412,7 @@ sub attributes {
         },
         available2F => {
             type          => 'text',
-            default       => 'UTOTP,TOTP,U2F,REST,Ext2F,Yubikey',
+            default       => 'UTOTP,TOTP,U2F,REST,Mail2F,Ext2F,Yubikey',
             documentation => 'Available second factor modules',
         },
         available2FSelfRegistration => {
@@ -2512,6 +2557,11 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'text',
             documentation => 'LDAP filter for auth search'
         },
+        ldapGroupDecodeSearchedValue => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Decode value before searching it in LDAP groups',
+        },
         ldapGroupRecursive => {
             default       => 0,
             type          => 'bool',
@@ -2640,6 +2690,13 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'text',
             default       => 'login',
             documentation => 'PAM service',
+        },
+
+        # GPG
+        gpgDb => {
+            type          => 'text',
+            default       => '',
+            documentation => 'GPG keys database',
         },
 
         # Radius
@@ -2882,8 +2939,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             keyTest    => qr/^(\d*)?[a-zA-Z0-9_]+$/,
             keyMsgFail => '__badChoiceKey__',
             test       => sub { 1 },
-            select     => [
-                [
+            select     => [ [
                     { k => 'Apache', v => 'Apache' },
                     { k => 'AD',     v => 'Active Directory' },
                     {
@@ -2893,7 +2949,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                     { k => 'DBI',           v => 'Database (DBI)' },
                     { k => 'Demo',          v => 'Demo' },
                     { k => 'Facebook',      v => 'Facebook' },
-                    { k => 'Google',        v => 'Google' },
+                    { k => 'GPG',           v => 'GPG' },
                     { k => 'Kerberos',      v => 'Kerberos' },
                     { k => 'LDAP',          v => 'LDAP' },
                     { k => 'LinkedIn',      v => 'LinkedIn' },
@@ -2921,7 +2977,6 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                     { k => 'DBI',           v => 'Database (DBI)' },
                     { k => 'Demo',          v => 'Demo' },
                     { k => 'Facebook',      v => 'Facebook' },
-                    { k => 'Google',        v => 'Google' },
                     { k => 'LDAP',          v => 'LDAP' },
                     { k => 'Null',          v => 'None' },
                     { k => 'OpenID',        v => 'OpenID' },
@@ -2962,7 +3017,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                 { k => 'AD',       v => 'Active Directory' },
                 { k => 'DBI',      v => 'Database (DBI)' },
                 { k => 'Facebook', v => 'Facebook' },
-                { k => 'Google',   v => 'Google' },
+                { k => 'GPG',      v => 'GPG' },
                 { k => 'Kerberos', v => 'Kerberos' },
                 { k => 'LDAP',     v => 'LDAP' },
                 { k => 'PAM',      v => 'PAM' },

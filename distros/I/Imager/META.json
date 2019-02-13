@@ -67,6 +67,6 @@
          "web" : "http://git.imager.perl.org/imager.git"
       }
    },
-   "version" : "1.009",
+   "version" : "1.010",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,5 +1,12 @@
 Revision history for PerlX-Let:
 
+v0.2.2    2019-02-11 13:46:03+00:00 Europe/London
+  [Bug Fixes]
+  - Renamed internal variable to avoid potential scope conflicts.
+
+  [Documentation]
+  - Add note that the code block can be omitted.
+
 v0.2.1    2019-02-10 14:35:13+00:00 Europe/London
   [Bug Fixes]
   - Removed newlines from source rewriting so that line numbers are not

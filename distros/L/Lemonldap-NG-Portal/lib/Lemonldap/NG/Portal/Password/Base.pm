@@ -28,7 +28,7 @@ sub forAuthUser { '_modifyPassword' }
 # RUNNING METHODS
 
 sub _modifyPassword {
-    my ( $self, $req ) = @_;
+    my ( $self, $req, $requireOldPwd ) = @_;
 
     # Exit if no password change requested
     return PE_OK
@@ -39,7 +39,7 @@ sub _modifyPassword {
       unless ( $req->data->{newpassword} eq $req->param('confirmpassword') );
 
     # Check if portal require old password
-    if ( $self->conf->{portalRequireOldPassword} ) {
+    if ( $self->conf->{portalRequireOldPassword} or $requireOldPwd ) {
 
         # TODO: verify oldpassword
         unless ( $req->data->{oldpassword} = $req->param('oldpassword') ) {

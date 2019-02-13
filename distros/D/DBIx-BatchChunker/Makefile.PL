@@ -68,13 +68,14 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES => {
         # Start from "scan-perl-prereqs --pretty t"
 
-        'Test2::Bundle::More'     => 0,
+        'Test2::Bundle::More'     => '0.000060',  # has try_ok
         'Test2::Tools::Compare'   => 0,
         'Test2::Tools::Exception' => 0,
         'Test2::Tools::Explain'   => 0,
         'Scalar::Util'            => 0,
 
         'Class::Load' => 0,
+        'DBD::SQLite' => '1.29',
         'DBIx::Class' => 0,
         'DBIx::Connector::Retry' => 0,
         'Path::Class' => 0,
@@ -84,7 +85,7 @@ my %WriteMakefileArgs = (
 # Don't index examples/*
 $WriteMakefileArgs{META_MERGE}{no_index} = { directory => [qw< examples >] };
 
-# Other prereqs not in *_REQUIRES
+# Other prereqs not in *_REQUIRES (https://metacpan.org/pod/CPAN::Meta::Spec#Prereq-Spec)
 $WriteMakefileArgs{META_MERGE}{prereqs} = {
     runtime => {
         suggests => {
@@ -93,6 +94,21 @@ $WriteMakefileArgs{META_MERGE}{prereqs} = {
 
             # This is only "required" if DBI processing is used
             'DBIx::Connector::Retry' => 0,
+        },
+    },
+    develop => {
+        requires => {
+            'perl'                          => '5.10.1',
+            'Module::Metadata'              => '1.00',      # sane minimum baseline
+            'Perl::PrereqScanner'           => '1.023',     # sane minimum baseline
+            'Pod::Markdown::Github'         => 0,
+            'Pod::Readme'                   => 'v1.1.2',    # sane minimum baseline
+            'Test2::Suite'                  => '0.000060',  # has try_ok
+            'Test::CPAN::Changes'           => 0,
+            'Test::Pod'                     => '1.51',      # sane minimum baseline
+            'Test::Pod::Coverage'           => '1.10',      # sane minimum baseline
+            'Test::Strict'                  => 0,
+            'Test::Version'                 => '2.00',      # sane minimum baseline
         },
     },
 };

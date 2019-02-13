@@ -1,7 +1,7 @@
 package DBIx::OnlineDDL;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.90';
+our $VERSION   = '0.91';
 
 use v5.10;
 use Moo;
@@ -13,7 +13,7 @@ use Class::Load;
 use DBI::Const::GetInfoType;
 use DBIx::BatchChunker 0.92;  # with stmt attrs
 use Eval::Reversible;
-use List::Util        1.33 (qw( uniq any all ));  # has any/all/etc.
+use List::Util        1.44 (qw( uniq any all ));  # 1.44 has uniq
 use Sub::Util               qw( subname set_subname );
 use Term::ProgressBar 2.14;   # with silent option
 
@@ -29,7 +29,7 @@ DBIx::OnlineDDL - Run DDL on online databases safely
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -385,6 +385,32 @@ specify at least these options:
 Specifying L<DBIx::BatchChunker/coderef> is not recommended, since Active DBI Processing
 mode will be used.
 
+These options will be included into the hashref, unless specifically overridden by key
+name:
+
+    id_name      => $first_pk_column,  # will warn if the PK is multi-column
+    target_time  => 1,
+    sleep        => 0.5,
+
+    # If using DBIC
+    dbic_storage => $rsrc->storage,
+    rsc          => $id_rsc,
+    dbic_retry_opts => {
+        max_attempts  => 20,
+        # best not to change this, unless you know what you're doing
+        retry_handler => $onlineddl_retry_handler,
+    },
+
+    # If using DBI
+    dbi_connector => $oddl->dbi_connector,
+    min_stmt      => $min_sql,
+    max_stmt      => $max_sql,
+
+    # For both
+    count_stmt    => $count_sql,
+    stmt          => $insert_select_sql,
+    progress_name => $copying_msg,
+
 =cut
 
 has copy_opts => (
@@ -413,6 +439,12 @@ sub _fill_copy_opts {
 
     my $orig_table_name_quote = $dbh->quote_identifier($orig_table_name);
     my $new_table_name_quote  = $dbh->quote_identifier($new_table_name);
+
+    # Sane defaults for timing
+    $copy_opts->{target_time} //= 1;
+    # Copies create lots of rapid I/O, binlog generation, etc. on the primary.
+    # Some sleep time gives other servers a chance to catch up:
+    $copy_opts->{sleep}       //= 0.5;
 
     # Figure out what the id_name is going to be
     my $id_name = $copy_opts->{id_name} //= $self->dbh_runner(run => set_subname '_pk_finder', sub {
@@ -811,7 +843,11 @@ L</dbh_runner_do>.
 
 sub dbh {
     my $self = shift;
-    return $self->rsrc ? $self->rsrc->storage->dbh : $self->dbi_connector->dbh;
+
+    # Even acquiring a $dbh could die (eg: 'USE $db' or other pre-connect commands), so
+    # also try to wrap this in our retry handler.
+    my $dbh = $self->dbh_runner( run => sub { $_[0] } );
+    return $dbh;
 }
 
 =head3 dbh_runner
@@ -841,18 +877,28 @@ sub _retry_handler {
     my $is_retryable = $self->_helper->is_error_retryable($error);
 
     if ($is_retryable) {
+        my ($failed, $max) = ($runner->failed_attempt_count, $runner->max_attempts);
         my $progress = $vars->{progress_bar};
 
         # Warn about the last error
         $progress->message("Encountered a recoverable error: $error") if $progress;
 
-        # Pause for a second first, to discourage any future locks
-        sleep 1;
+        # Pause for an incremental amount of seconds first, to discourage any future locks
+        sleep $failed;
+
+        # If retries are escalating, try forcing a disconnect
+        if ($failed >= $max / 2) {
+            # Finally have some differences between the two classes...
+            if ($runner->isa('DBIx::Class::Storage::BlockRunner')) {
+                eval { $runner->storage->disconnect };
+            }
+            else {
+                eval { $runner->disconnect };
+            }
+        }
 
         $progress->message( sprintf(
-            "Attempt %u of %u",
-            $runner->failed_attempt_count,
-            $runner->max_attempts,
+            "Attempt %u of %u", $failed, $max
         ) ) if $progress;
     }
 
@@ -891,9 +937,34 @@ sub dbh_runner {
             $c->($dbh);  # also pass it in, because that's what DBIx::Connector does
         };
 
-        unless (defined $wantarray) {           $block_runner->run($wrapper, $self, $coderef) }
-        elsif          ($wantarray) { @res    = $block_runner->run($wrapper, $self, $coderef) }
-        else                        { $res[0] = $block_runner->run($wrapper, $self, $coderef) }
+        # BlockRunner can still die post-failure, if $storage->ensure_connected (which calls ping
+        # and tries to reconnect) dies.  If that's the case, use our retry handler to check the new
+        # error message, and throw it back into BlockRunner.
+        my $br_method = 'run';
+        while ($block_runner->failed_attempt_count < $block_runner->max_attempts) {
+            eval {
+                unless (defined $wantarray) {           $block_runner->$br_method($wrapper, $self, $coderef) }
+                elsif          ($wantarray) { @res    = $block_runner->$br_method($wrapper, $self, $coderef) }
+                else                        { $res[0] = $block_runner->$br_method($wrapper, $self, $coderef) }
+            };
+
+            # 'run' resets failed_attempt_count, so subsequent attempts must use
+            # '_run', which does not
+            $br_method = '_run';
+
+            if (my $err = $@) {
+                # Time to really die
+                die $err if $err =~ /Reached max_attempts amount of / || $block_runner->failed_attempt_count >= $block_runner->max_attempts;
+
+                # See if the retry handler likes it
+                push @{ $block_runner->exception_stack }, $err;
+                $block_runner->_set_failed_attempt_count( $block_runner->failed_attempt_count + 1 );
+                die $err unless $self->_retry_handler($block_runner);
+            }
+            else {
+                last;
+            }
+        }
     }
     else {
         my $conn = $self->dbi_connector;
@@ -1039,10 +1110,13 @@ sub create_triggers {
         my %potential_unique_ids = (
             PRIMARY => [ $dbh->primary_key($catalog, $schema, $orig_table_name) ],
         );
-        my $unique_stats = $dbh->can('statistics_info') ?
-            $dbh->statistics_info( $catalog, $schema, $orig_table_name, 1, 1 )->fetchall_arrayref({}) :
-            []
-        ;
+
+        my $unique_stats = [];
+        if ($dbh->can('statistics_info')) {
+            # Sometimes, this still dies, even with the 'can' check (eg: older DBD::mysql drivers)
+            $unique_stats = eval { $dbh->statistics_info( $catalog, $schema, $orig_table_name, 1, 1 )->fetchall_arrayref({}) };
+            $unique_stats = [] if $@;
+        }
 
         foreach my $index_name (uniq map { $_->{INDEX_NAME} } @$unique_stats) {
             my @unique_cols =

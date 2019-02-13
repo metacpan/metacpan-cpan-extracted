@@ -8,13 +8,13 @@
 
 <form action="/totp2fcheck" method="post" class="password" role="form">
   <div class="form">
-    <input type="hidden" id="token" name="token" value="<TMPL_VAR NAME="TOKEN">">
-    <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">">
+    <input type="hidden" id="token" name="token" value="<TMPL_VAR NAME="TOKEN">" />
+    <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">" />
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text"><i class="fa fa-lock"></i> </span>
       </div>
-      <input name="code" value="" class="form-control" id="extcode" trplaceholder="code">
+      <input name="code" value="" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />
     </div>
   </div>
   <div class="buttons mb-3">

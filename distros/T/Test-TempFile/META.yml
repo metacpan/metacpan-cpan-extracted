@@ -19,11 +19,11 @@ no_index:
     - inc
 requires:
   JSON::MaybeXS: '0'
-  Path::Tiny: '0'
+  Path::Tiny: '0.090'
   Test2::API: '0'
   Test::Builder::Module: '0'
-  Test::Exception: '0'
+  Test::Exception: '0.42'
   Test::More: '0.96'
   YAML::Tiny: '0'
-version: '0.90'
+version: '0.92'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

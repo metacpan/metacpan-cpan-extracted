@@ -16,6 +16,7 @@ WriteMakefile(
             'Glib'                  => 0,
             'HTTP::Message'         => 0,
             'Image::Magick'         => 0,
+            'IPC::Run'              => 0,
             'Lasso'                 => '2.3.0',
             'LWP::UserAgent'        => 0,
             'LWP::Protocol::https'  => 0,
@@ -58,7 +59,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Clone'                  => 0,
-        'Lemonldap::NG::Handler' => '2.0.0',
+        'Lemonldap::NG::Handler' => '2.0.2',
         'Regexp::Assemble'       => 0,
     },
     (

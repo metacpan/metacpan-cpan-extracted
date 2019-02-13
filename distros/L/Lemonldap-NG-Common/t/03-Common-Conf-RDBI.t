@@ -27,8 +27,7 @@ SKIP: {
     my $skipSQLite = 0;
 
     ok(
-        $h = new Lemonldap::NG::Common::Conf(
-            {
+        $h = new Lemonldap::NG::Common::Conf( {
                 type        => 'RDBI',
                 dbiChain    => "DBI:SQLite:dbname=t/lmConf.sql",
                 dbiUser     => '',

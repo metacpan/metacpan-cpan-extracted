@@ -15,8 +15,7 @@ $count += 2;
 
 foreach my $attr ( keys %$attrs ) {
     next if ( $attr =~ /^virtualHosts|.*MetaDataNodes|applicationList$/ );
-    ok(
-        (
+    ok( (
                  ref( $attrs->{$attr}->{test} )
               or ref( $types->{ $attrs->{$attr}->{type} }->{test} )
         ),
@@ -24,8 +23,7 @@ foreach my $attr ( keys %$attrs ) {
     );
     $count++;
     if ( $attr =~ qr/^$simpleHashKeys$/o ) {
-        ok(
-            (
+        ok( (
                      ref $attrs->{$attr}->{keyTest}
                   or ref $types->{ $attrs->{$attr}->{type} }->{keyTest}
             ),

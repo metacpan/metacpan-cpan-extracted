@@ -9,15 +9,17 @@ BEGIN {
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                  => 'error',
-            authentication            => 'Demo',
-            userDB                    => 'Same',
-            loginHistoryEnabled       => 1,
-            bruteForceProtection      => 1,
-            bruteForceProtectionTempo => 5,
+            logLevel                      => 'error',
+            authentication                => 'Demo',
+            userDB                        => 'Same',
+            loginHistoryEnabled           => 1,
+            bruteForceProtection          => 1,
+            bruteForceProtectionTempo     => 5,
+            bruteForceProtectionMaxFailed => 4,
+            failedLoginNumber             => 6,
+            successLoginNumber            => 4,
         }
     }
 );
@@ -30,7 +32,7 @@ ok(
         length => 23,
         accept => 'text/html',
     ),
-    'Auth query'
+    '1st Auth query'
 );
 count(1);
 my $id1 = expectCookie($res);
@@ -46,7 +48,55 @@ ok(
         length => 23,
         accept => 'text/html',
     ),
-    'Auth query'
+    '2nd Auth query'
+);
+count(1);
+$id1 = expectCookie($res);
+expectRedirection( $res, 'http://auth.example.com/' );
+
+$client->logout($id1);
+
+## Third successful connection
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=dwho'),
+        length => 23,
+        accept => 'text/html',
+    ),
+    '3rd Auth query'
+);
+count(1);
+$id1 = expectCookie($res);
+expectRedirection( $res, 'http://auth.example.com/' );
+
+$client->logout($id1);
+
+## Forth successful connection
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=dwho'),
+        length => 23,
+        accept => 'text/html',
+    ),
+    '4th Auth query'
+);
+count(1);
+$id1 = expectCookie($res);
+expectRedirection( $res, 'http://auth.example.com/' );
+
+$client->logout($id1);
+
+## Fifth successful connection
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=dwho'),
+        length => 23,
+        accept => 'text/html',
+    ),
+    '5th Auth query'
 );
 count(1);
 $id1 = expectCookie($res);
@@ -61,7 +111,7 @@ ok(
         IO::String->new('user=dwho&password=ohwd'),
         length => 23
     ),
-    'Auth query'
+    '1st Bad Auth query'
 );
 count(1);
 expectReject($res);
@@ -73,12 +123,36 @@ ok(
         IO::String->new('user=dwho&password=ohwd'),
         length => 23
     ),
-    'Auth query'
+    '2nd Bad Auth query'
 );
 count(1);
 expectReject($res);
 
-## Third failed connection -> rejected
+## Third failed connection
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=ohwd'),
+        length => 23
+    ),
+    '3rd Bad Auth query'
+);
+count(1);
+expectReject($res);
+
+## Forth failed connection
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=ohwd'),
+        length => 23
+    ),
+    '4th Bad Auth query'
+);
+count(1);
+expectReject($res);
+
+## Fifth failed connection -> rejected
 ok(
     $res = $client->_post(
         '/',
@@ -86,15 +160,16 @@ ok(
         length => 23,
         accept => 'text/html',
     ),
-    'Auth query'
+    '5th Bad Auth query'
 );
 count(1);
 
-ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/, 'Protection enabled' );
+ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
+    'Rejected -> Protection enabled' );
 count(1);
 sleep 1;
 
-## Fourth failed connection -> Rejected
+## Sixth failed connection -> Rejected
 ok(
     $res = $client->_post(
         '/',
@@ -102,15 +177,16 @@ ok(
         length => 23,
         accept => 'text/html',
     ),
-    'Auth query'
+    '6th Bad Auth query'
 );
 count(1);
 
-ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/, 'Protection enabled' );
+ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
+    'Rejected -> Protection enabled' );
 count(1);
 sleep 2;
 
-## Third successful connection -> Rejected
+## Sixth successful connection -> Rejected
 ok(
     $res = $client->_post(
         '/',
@@ -118,15 +194,16 @@ ok(
         length => 23,
         accept => 'text/html',
     ),
-    'Auth query'
+    '6th Auth query'
 );
 count(1);
 
-ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/, 'Protection enabled' );
+ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
+    'Rejected -> Protection enabled' );
 count(1);
 sleep 3;
 
-## Fourth successful connection -> Accepted
+## Seventh successful connection -> Accepted
 ok(
     $res = $client->_post(
         '/',
@@ -134,7 +211,7 @@ ok(
         length => 37,
         accept => 'text/html',
     ),
-    'Auth query'
+    '7th Auth query'
 );
 count(1);
 $id1 = expectCookie($res);
@@ -145,9 +222,9 @@ ok( $res->[2]->[0] =~ /trspan="lastLogins"/, 'History found' )
 my @c  = ( $res->[2]->[0] =~ /<td>127.0.0.1/gs );
 my @cf = ( $res->[2]->[0] =~ /PE5<\/td>/gs );
 
-# History with 5 entries
-ok( @c == 7,  ' -> Seven entries found' );
-ok( @cf == 4, "  -> Four 'failedLogin' entries found" );
+# History with 10 entries
+ok( @c == 10, ' -> Ten entries found' );
+ok( @cf == 6, "  -> Six 'failedLogin' entries found" );
 count(3);
 
 $client->logout($id1);

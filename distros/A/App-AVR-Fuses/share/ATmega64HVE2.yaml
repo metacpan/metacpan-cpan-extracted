@@ -1,0 +1,86 @@
+---
+fusemap:
+  BODEN:
+    mask: 16
+    name: BODEN
+    reg: l
+  BOOTRST:
+    mask: 1
+    name: BOOTRST
+    reg: h
+  BOOTSZ:
+    mask: 6
+    name: BOOTSZ
+    reg: h
+    values:
+      - caption: Boot Flash size=512 words Boot address=$7E00
+        name: 512W_7E00
+        value: 6
+      - caption: Boot Flash size=1024 words Boot address=$7C00
+        name: 1024W_7C00
+        value: 4
+      - caption: Boot Flash size=2048 words Boot address=$7800
+        name: 2048W_7800
+        value: 2
+      - caption: Boot Flash size=4096 words Boot address=$7000
+        name: 4096W_7000
+        value: 0
+  CKDIV8:
+    mask: 8
+    name: CKDIV8
+    reg: l
+  DWEN:
+    mask: 8
+    name: DWEN
+    reg: h
+  EESAVE:
+    mask: 64
+    name: EESAVE
+    reg: l
+  OSCSEL0:
+    mask: 1
+    name: OSCSEL0
+    reg: l
+  SPIEN:
+    mask: 32
+    name: SPIEN
+    reg: l
+  SUT:
+    mask: 6
+    name: SUT
+    reg: l
+    values:
+      - caption: Start-up time 14 CK + 0 ms
+        name: 14CK_0MS
+        value: 0
+      - caption: Start-up time 14 CK + 16 ms
+        name: 14CK_16MS
+        value: 2
+      - caption: Start-up time 14 CK + 32 ms
+        name: 14CK_32MS
+        value: 4
+      - caption: Start-up time 14 CK + 64 ms
+        name: 14CK_64MS
+        value: 6
+  WDTON:
+    mask: 128
+    name: WDTON
+    reg: l
+fuses:
+  - WDTON
+  - EESAVE
+  - SPIEN
+  - BODEN
+  - CKDIV8
+  - SUT
+  - OSCSEL0
+  - DWEN
+  - BOOTSZ
+  - BOOTRST
+reginfos:
+  - default: 215
+    mask: 255
+    name: l
+  - default: 249
+    mask: 15
+    name: h

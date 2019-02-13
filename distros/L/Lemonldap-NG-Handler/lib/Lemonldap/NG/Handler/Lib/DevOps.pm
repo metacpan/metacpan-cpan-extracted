@@ -37,8 +37,7 @@ sub loadVhostConfig {
     my $json;
     if ( $class->tsv->{useSafeJail} ) {
         my $rUrl = $req->{env}->{RULES_URL}
-          || (
-            (
+          || ( (
                 $class->localConfig->{loopBackUrl}
                 || "http://127.0.0.1:" . $req->{env}->{SERVER_PORT}
             )

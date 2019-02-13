@@ -2,16 +2,15 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Output;
 
 use Devel::Probe;
 
 my @triggered;
 my $trigger_file = 't/007-trigger.t'; # this file
 my %trigger_lines = (
-    default   => [qw/ 23 /], # probe 1
-    once      => [qw/ 24 /], # probe 2
-    permanent => [qw/ 25 /], # probe 3
+    default   => [qw/ 22 /], # probe 1
+    Devel::Probe::ONCE      ,=> [qw/ 23 /], # probe 2
+    Devel::Probe::PERMANENT ,=> [qw/ 24 /], # probe 3
 );
 
 exit main();
@@ -29,7 +28,7 @@ sub run {
     my @expected;
     if ($run != 0 && $run != 4) {
         foreach my $type (keys %trigger_lines) {
-            if (($run == 1) || ($run > 1 && $type eq 'permanent')) {
+            if (($run == 1) || ($run > 1 && $type eq Devel::Probe::PERMANENT)) {
                 push @expected, map { [ $trigger_file, $_ ] } @{ $trigger_lines{$type} };
             }
         }
@@ -62,18 +61,10 @@ sub config {
             { action => 'disable' },
             { action => 'clear' },
             @defines,
-            { action => 'dump' },
             { action => 'enable' },
         ],
     );
-    my $stderr = stderr_from {
-        Devel::Probe::config(\%config);
-    };
-    foreach my $type (keys %trigger_lines) {
-        foreach my $line (@{ $trigger_lines{$type} }) {
-            like($stderr, qr/dump line \[$line\]/, "probe dump contains line $line, type $type");
-        }
-    }
+    Devel::Probe::config(\%config);
 }
 
 sub clear {

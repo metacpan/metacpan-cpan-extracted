@@ -1640,10 +1640,6 @@
   },
   {
     "_nodes": [{
-      "default": "",
-      "id": "trustedProxies",
-      "title": "trustedProxies"
-    }, {
       "default": "uid",
       "id": "whatToTrace",
       "title": "whatToTrace"
@@ -2249,13 +2245,14 @@
     },
     {
       "_nodes": [{
-        "default": 0,
         "id": "https",
+        "default": -1,
         "title": "https",
-        "type": "bool"
+        "type": "trool"
       },
       {
         "id": "port",
+        "default": -1,
         "title": "port",
         "type": "int"
       },

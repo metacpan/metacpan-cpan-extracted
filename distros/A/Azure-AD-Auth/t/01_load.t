@@ -54,8 +54,9 @@ use_ok('Azure::AD::Password');
   my $auth = Azure::AD::Password->new(
     resource_id => 'random',
     client_id => 'cid1',
+    tenant_id => 'ten1',
     username => 'user',
-    password => 'pass', 
+    password => 'pass',
   );
   like($auth->token_endpoint, qr|^https://login.microsoftonline.com|, 'Got default endpoint');
 }
@@ -64,8 +65,9 @@ use_ok('Azure::AD::Password');
   my $auth = Azure::AD::Password->new(
     resource_id => 'random',
     client_id => 'cid1',
+    tenant_id => 'ten1',
     username => 'user',
-    password => 'pass', 
+    password => 'pass',
     ad_url => 'https://login.microsoftonline.us',
   );
   like($auth->token_endpoint, qr|^https://login.microsoftonline.us|, 'Got custom US endpoint');

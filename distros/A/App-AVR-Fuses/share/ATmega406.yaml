@@ -1,0 +1,77 @@
+---
+fusemap:
+  BOOTRST:
+    mask: 8
+    name: BOOTRST
+    reg: l
+  BOOTSZ:
+    mask: 48
+    name: BOOTSZ
+    reg: l
+    values:
+      - caption: Boot Flash size=256 words Boot address=$4F00
+        name: 256W_4F00
+        value: 48
+      - caption: Boot Flash size=512 words Boot address=$4E00
+        name: 512W_4E00
+        value: 32
+      - caption: Boot Flash size=1024 words Boot address=$4C00
+        name: 1024W_4C00
+        value: 16
+      - caption: Boot Flash size=2048 words Boot address=$4800
+        name: 2048W_4800
+        value: 0
+  EESAVE:
+    mask: 64
+    name: EESAVE
+    reg: l
+  JTAGEN:
+    mask: 1
+    name: JTAGEN
+    reg: h
+  OCDEN:
+    mask: 2
+    name: OCDEN
+    reg: h
+  SUT_CKSEL:
+    mask: 7
+    name: SUT_CKSEL
+    reg: l
+    values:
+      - caption: 'Start-up time: 14 CK + 0 ms'
+        name: 14CK_0MS
+        value: 0
+      - caption: 'Start-up time: 14 CK + 3.9 ms'
+        name: 14CK_3MS9
+        value: 2
+      - caption: 'Start-up time: 14 CK + 62.5 ms'
+        name: 14CK_62MS5
+        value: 4
+      - caption: 'Start-up time: 14 CK + 0 ms'
+        name: 14CK_0MS
+        value: 1
+      - caption: 'Start-up time: 14 CK + 3.9 ms'
+        name: 14CK_3MS9
+        value: 3
+      - caption: 'Start-up time: 14 CK + 62.5 ms'
+        name: 14CK_62MS5
+        value: 5
+  WDTON:
+    mask: 128
+    name: WDTON
+    reg: l
+fuses:
+  - OCDEN
+  - JTAGEN
+  - WDTON
+  - EESAVE
+  - BOOTSZ
+  - BOOTRST
+  - SUT_CKSEL
+reginfos:
+  - default: 254
+    mask: 3
+    name: h
+  - default: 205
+    mask: 255
+    name: l

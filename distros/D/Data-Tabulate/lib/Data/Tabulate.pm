@@ -6,7 +6,7 @@ use Carp;
 
 # ABSTRACT: Table generation!
 
-our $VERSION = '0.07';
+our $VERSION = 0.08;
 
 
 sub new {
@@ -25,30 +25,41 @@ sub new {
 sub render {
     my ($self,$module,$atts) = @_;
     
-    unless(defined $atts and ref($atts) eq 'HASH' and
-           exists $atts->{data} and ref($atts->{data}) eq 'ARRAY'){
+    if ( ! (defined $atts and ref($atts) eq 'HASH' and
+           exists $atts->{data} and ref($atts->{data}) eq 'ARRAY') ) {
         croak "no data given";
     }
-    
+
+    if ( !$module ) {
+        croak "no renderer module given";
+    }
+
     my @data = @{$atts->{data}};
     my $tmp  = $module;
     $module  = 'Data::Tabulate::Plugin::'.$module;
     
     $self->_load_module($module);
     
-    @data          = $self->_data() unless @data;
     my @table      = $self->tabulate(@data);
     my $plugin_obj = $module->new();
     
     for my $method(@{$self->{method_calls}->{$tmp}}){
-        if($plugin_obj->can($method->[0])){
+        if(!$plugin_obj->can($method->[0])){
+            croak 'renderer does not know ' . $method->[0];
+        }
+        else {
             no strict 'refs';
             my $method_name = $method->[0];
             my @params      = @{$method->[1]}; 
             $plugin_obj->$method_name(@params);
         }
-    }
     
+    }
+
+    if ( !$plugin_obj->can('output') ) {
+        croak "renderer $module does not have an output method";
+    }
+
     return $plugin_obj->output(@table);
 }
 
@@ -129,7 +140,7 @@ sub max_columns{
     $self->{max_cols} = $value if defined $value and $value =~ /^[1-9]\d*$/;
     
     my $caller = (caller(1))[3];
-    unless( ($caller and $caller =~ /min_columns/) or not defined $self->min_columns){
+    if ( !( ($caller and $caller =~ /min_columns/) or not defined $self->min_columns) ) {
         $self->min_columns($self->{max_cols}) if $self->{max_cols} < $self->min_columns;
     }
     
@@ -143,7 +154,7 @@ sub min_columns{
     $self->{min_cols} = $value if defined $value and $value =~ /^[1-9]\d*$/;
     
     my $caller = (caller(1))[3];
-    unless( $caller and $caller =~ /max_columns/){
+    if ( !( $caller and $caller =~ /max_columns/) ){
         $self->max_columns($self->{min_cols}) if $self->{min_cols} > $self->max_columns;
     }
     
@@ -174,12 +185,6 @@ sub _load_module {
     croak "could not load $module" if $@; 
 }
 
-sub _data{
-    my ($self,@data) = @_;
-    $self->{data} = [@data] if @data;
-    return @{$self->{data}};
-}
-
 1; # End of Data::Tabulate
 
 __END__
@@ -194,7 +199,7 @@ Data::Tabulate - Table generation!
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

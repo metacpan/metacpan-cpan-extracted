@@ -53,6 +53,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Unix-Sudo"
       }
    },
-   "version" : "2",
+   "version" : "4",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

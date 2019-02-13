@@ -17,6 +17,14 @@ sub init {
           and $self->Lemonldap::NG::Portal::Lib::DBI::init );
 }
 
+has authnLevel => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{dbiAuthnLevel};
+    }
+);
+
 # RUNNING METHODS
 
 sub authenticate {

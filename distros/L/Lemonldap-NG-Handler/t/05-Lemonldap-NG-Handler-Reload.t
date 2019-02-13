@@ -15,7 +15,7 @@ BEGIN {
 
 #########################
 
-# Insert your test code below, the Test::More module is use()ed here so read
+# Insert your test code below, the Test::More module is used here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
 my $globalinit;
@@ -30,8 +30,7 @@ eval { Lemonldap::NG::Handler::Main->logLevelInit('error') };
 ok( !$@, 'logLevelInit' );
 
 ok(
-    Lemonldap::NG::Handler::Main->jailInit(
-        {
+    Lemonldap::NG::Handler::Main->jailInit( {
             https        => 0,
             port         => 0,
             maintenance  => 0,
@@ -51,8 +50,7 @@ ok(
 );
 
 ok(
-    Lemonldap::NG::Handler::Main->defaultValuesInit(
-        {
+    Lemonldap::NG::Handler::Main->defaultValuesInit( {
             https        => 0,
             port         => 0,
             maintenance  => 0,
@@ -72,8 +70,7 @@ ok(
 );
 
 ok(
-    Lemonldap::NG::Handler::Main->locationRulesInit(
-        {
+    Lemonldap::NG::Handler::Main->locationRulesInit( {
             'locationRules' => {
                 'www1' => {
                     'default' => 'accept',

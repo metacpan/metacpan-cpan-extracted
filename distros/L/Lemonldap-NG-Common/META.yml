@@ -6,7 +6,6 @@ build_requires:
   IO::String: '0'
   Net::LDAP: '0'
   Test::Pod: '1'
-  XML::Simple: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -22,28 +21,32 @@ no_index:
     - inc
 recommends:
   Apache::Session::Browseable: '0'
-  HTML::Template: '0'
-  HTTP::Message: '0'
-  JSON: '0'
+  Convert::Base32: '0'
+  Cookie::Baker::XS: '0'
+  Crypt::URandom: '0'
+  DBI: '0'
+  LWP::Protocol::https: '0'
   Net::LDAP: '0'
-  XML::LibXML: '0'
-  XML::Simple: '0'
+  SOAP::Lite: '0'
 requires:
   Apache::Session: '0'
-  CGI: '3.08'
   Cache::Cache: '0'
   Config::IniFiles: '0'
   Crypt::OpenSSL::Bignum: '0'
   Crypt::OpenSSL::RSA: '0'
   Crypt::OpenSSL::X509: '0'
   Crypt::Rijndael: '0'
-  DBI: '0'
   Digest::SHA: '0'
-  File::Basename: '0'
+  HTML::Template: '0'
   JSON: '0'
   Mouse: '0'
-  Net::CIDR::Lite: '0'
-  SOAP::Lite: '0'
-  Storable: '0'
-version: v1.9.18
+  Plack: '0'
+  Test::Pod: '1'
+  URI: '0'
+resources:
+  MailingList: mailto:lemonldap-ng-dev@ow2.org
+  X_twitter: https://twitter.com/lemonldapng
+  homepage: http://lemonldap-ng.org/
+  license: http://opensource.org/licenses/GPL-2.0
+version: v2.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

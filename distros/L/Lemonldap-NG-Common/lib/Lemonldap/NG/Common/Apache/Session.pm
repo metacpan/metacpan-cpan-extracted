@@ -15,7 +15,7 @@ use Lemonldap::NG::Common::Apache::Session::Serialize::JSON;
 use Lemonldap::NG::Common::Apache::Session::Store;
 use Lemonldap::NG::Common::Apache::Session::Lock;
 
-our $VERSION = '1.9.5';
+our $VERSION = '2.0.0';
 
 sub _load {
     my ( $backend, $func ) = @_;
@@ -36,7 +36,7 @@ sub populate {
         $self = $self->$backend(@_);
     }
     if ( $backend =~
-/^Apache::Session::(?:(?:Postgre|Redi)s|(?:Oracl|Sybas)e|(?:My|No)SQL|F(?:ile|lex)|Cassandra|LDAP)/
+/^Apache::Session::(?:(?:Postgre|Redi)s|S(?:QLite3|ybase)|(?:My|No)SQL|F(?:ile|lex)|Cassandra|Oracle|LDAP)/
         and !$self->{args}->{useStorable} )
     {
         $self->{serialize} =
@@ -81,6 +81,10 @@ sub setId {
 
 sub searchOn {
     my ( $class, $args, $selectField, $value, @fields ) = splice @_;
+    unless ( $args->{backend} ) {
+        die "SearchOn called without backend. " . join( ', ', caller(0) );
+    }
+
     return $args->{backend}->searchOn( $args, $selectField, $value, @fields )
       if ( _load( $args->{backend}, 'searchOn' ) );
     my %res = ();
@@ -89,7 +93,9 @@ sub searchOn {
         sub {
             my $entry = shift;
             my $id    = shift;
-            return undef unless ( $entry->{$selectField} eq $value );
+            return undef
+              unless ( $entry->{$selectField}
+                and $entry->{$selectField} eq $value );
             if (@fields) {
                 $res{$id}->{$_} = $entry->{$_} foreach (@fields);
             }
@@ -168,8 +174,11 @@ sub get_key_from_all_sessions {
         $args->{unserialize} =
           \&Lemonldap::NG::Common::Apache::Session::Serialize::JSON::_unserialize;
     }
+
+    # For now, Apache::Session::MariaDB doesn't exists.
+    # Apache::Session::Browseable::MariaDB has its own get_key_from_all_sessions
     if ( $backend =~
-/^Apache::Session::(MySQL|MySQL::NoLock|Postgres|Oracle|Sybase|Informix)$/
+/^Apache::Session::(SQLite\d?|MySQL|MySQL::NoLock|Postgres|Oracle|Sybase|Informix)$/
       )
     {
         return $class->_dbiGKFAS( $1, @_ );

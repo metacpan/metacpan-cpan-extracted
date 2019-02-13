@@ -1,0 +1,40 @@
+---
+fusemap:
+  BODLEVEL:
+    mask: 112
+    name: BODLEVEL
+    reg: b
+    values:
+      - caption: 'Brown-out detection disabled; [BODLEVEL=111]'
+        name: DISABLED
+        value: 112
+      - caption: Brown-out detection at VCC=1.8 V
+        name: 1V8
+        value: 96
+      - caption: Brown-out detection at VCC=2.7 V
+        name: 2V7
+        value: 80
+      - caption: Brown-out detection at VCC=4.3 V
+        name: 4V3
+        value: 64
+  CKOUT:
+    mask: 4
+    name: CKOUT
+    reg: b
+  RSTDISBL:
+    mask: 1
+    name: RSTDISBL
+    reg: b
+  WDTON:
+    mask: 2
+    name: WDTON
+    reg: b
+fuses:
+  - BODLEVEL
+  - CKOUT
+  - WDTON
+  - RSTDISBL
+reginfos:
+  - default: 255
+    mask: 119
+    name: b

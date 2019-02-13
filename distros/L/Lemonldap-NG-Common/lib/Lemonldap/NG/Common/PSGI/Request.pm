@@ -1,135 +1,95 @@
 package Lemonldap::NG::Common::PSGI::Request;
 
 use strict;
+use 5.14.0;
 use Mouse;
 use JSON;
+use Plack::Request;
 use URI::Escape;
 
-our $VERSION = '1.9.13';
+our $VERSION = '2.0.1';
+
+our @ISA = ('Plack::Request');
 
 #       http          ://  server   / path      ? query      # fragment
 # m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
 
-has HTTP_ACCEPT          => ( is => 'ro', reader => 'accept' );
-has HTTP_ACCEPT_ENCODING => ( is => 'ro', reader => 'encodings' );
-has HTTP_ACCEPT_LANGUAGE => ( is => 'ro', reader => 'languages' );
-has HTTP_AUTHORIZATION   => ( is => 'ro', reader => 'authorization' );
-has HTTP_COOKIE          => ( is => 'ro', reader => 'cookies' );
-has HTTP_HOST            => ( is => 'ro', reader => 'hostname' );
-has REMOTE_ADDR => ( is => 'ro', isa => 'Str', reader => 'remote_ip' );
-has REMOTE_PORT    => ( is => 'ro', isa => 'Int', reader => 'port' );
-has REQUEST_METHOD => ( is => 'ro', isa => 'Str', reader => 'method' );
-has SCRIPT_NAME    => ( is => 'ro', isa => 'Str', reader => 'scriptname' );
-has SERVER_PORT    => ( is => 'ro', isa => 'Int', reader => 'get_server_port' );
-has X_ORIGINAL_URI => ( is => 'ro', isa => 'Str' );
-has PATH_INFO => (
-    is      => 'ro',
-    reader  => 'path',
-    lazy    => 1,
-    default => '',
-    trigger => sub {
-        my $tmp = $_[0]->{SCRIPT_NAME};
-        $_[0]->{PATH_INFO} =~ s|//+|/|g;
-        $_[0]->{PATH_INFO} =~ s|^$tmp|/|;
-    },
-);
-has REQUEST_URI => (
-    is      => 'ro',
-    reader  => 'uri',
-    lazy    => 1,
-    default => '/',
-    trigger => sub {
-        my $uri = $_[0]->{X_ORIGINAL_URI} || $_[0]->{REQUEST_URI};
-        $_[0]->{unparsed_uri} = $uri;
-        $_[0]->{REQUEST_URI}  = uri_unescape($uri);
-        $_[0]->{REQUEST_URI} =~ s|//+|/|g;
-    },
-);
-has unparsed_uri => ( is => 'rw', isa => 'Str' );
-
-has 'psgi.errors' => ( is => 'rw', reader => 'stderr' );
-
-# Authentication
-
-has REMOTE_USER => (
-    is      => 'ro',
-    reader  => 'user',
-    trigger => sub {
-        $_[0]->{userData} = { $Lemonldap::NG::Handler::Main::tsv->{whatTotrace}
-              || _whatToTrace => $_[0]->{REMOTE_USER}, };
-    },
-);
-has userData => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
-
-# Query parameters
-has _params => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
-has QUERY_STRING => (
-    is      => 'ro',
-    reader  => 'query',
-    trigger => sub {
-        my $self = shift;
-        $self->{QUERY_STRING} = uri_unescape( $self->{QUERY_STRING} );
-        my @tmp =
-          $self->{QUERY_STRING}
-          ? split /&/, $self->{QUERY_STRING}
-          : ();
-        foreach my $s (@tmp) {
-            if   ( $s =~ /^(.+?)=(.+)$/ ) { $self->{_params}->{$1} = $2; }
-            else                          { $self->{_params}->{$s} = 1; }
-        }
-    },
-);
-
-sub params {
-    my ( $self, $key, $value ) = @_;
-    return $self->_params unless ($key);
-    $self->_params->{$key} = $value if ( defined $value );
-    return $self->_params->{$key};
+sub BUILD {
+    my ( $self, $env ) = @_;
+    foreach ( keys %$env ) {
+        $self->{$_} ||= $env->{$_} if (/^(?:HTTP|SSL)_/);
+    }
 }
 
-# POST management
-#
-# When CONTENT_LENGTH is set, store body in memory in `body` key
-has 'psgix.input.buffered' => ( is => 'ro', reader => '_psgixBuffered', );
-has 'psgi.input'           => ( is => 'ro', reader => '_psgiInput', );
-has body                   => ( is => 'rw', isa    => 'Str', default => '' );
-has CONTENT_TYPE => ( is => 'ro', isa => 'Str', reader => 'contentType', );
-has CONTENT_LENGTH => (
-    is      => 'ro',
-    reader  => 'contentLength',
-    lazy    => 1,
-    default => 0,
-    trigger => sub {
-        my $self = shift;
-        if ( $self->method eq 'GET' ) { $self->{body} = undef; }
-        elsif ( $self->method =~ /^(?:POST|PUT)$/ ) {
-            $self->{body} = '';
-            if ( $self->_psgixBuffered ) {
-                my $length = $self->{CONTENT_LENGTH};
-                while ( $length > 0 ) {
-                    my $buffer;
-                    $self->_psgiInput->read( $buffer,
-                        ( $length < 8192 ) ? $length : 8192 );
-                    $length -= length($buffer);
-                    $self->{body} .= $buffer;
-                }
-            }
-            else {
-                $self->_psgiInput->read( $self->{body},
-                    $self->{CONTENT_LENGTH}, 0 );
-            }
-            utf8::upgrade( $self->{body} );
-        }
-    }
-);
-has error => ( is => 'rw', isa => 'Str', default => '' );
+sub new {
+    my $self = Plack::Request::new(@_);
+    $self->env->{REQUEST_URI} = $self->env->{X_ORIGINAL_URI}
+      if ( $self->env->{X_ORIGINAL_URI} );
+    $self->env->{PATH_INFO} =~ s|//+|/|g;
 
-has respHeaders => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
+    if ( my $tmp = $self->script_name ) {
+        $self->env->{PATH_INFO} =~ s|^$tmp|/|;
+    }
+    $self->env->{PATH_INFO} ||= '/';
+    $self->{uri} = uri_unescape( $self->env->{REQUEST_URI} );
+    $self->{uri} =~ s|^//+|/|g;
+    $self->{data}        = {};
+    $self->{error}       = 0;
+    $self->{respHeaders} = [];
+    return bless( $self, $_[0] );
+}
+
+sub data { $_[0]->{data} }
+
+sub uri { $_[0]->{uri} }
+
+sub userData {
+    my ( $self, $v ) = @_;
+    return $self->{userData} = $v if ($v);
+    return $self->{userData} || { _whatToTrace => $self->{user}, };
+}
+
+sub respHeaders {
+    my ( $self, $respHeaders ) = @_;
+    $self->{respHeaders} = $respHeaders if ($respHeaders);
+    return $self->{respHeaders};
+}
+
+sub accept        { $_[0]->env->{HTTP_ACCEPT} }
+sub encodings     { $_[0]->env->{HTTP_ACCEPT_ENCODING} }
+sub languages     { $_[0]->env->{HTTP_ACCEPT_LANGUAGE} }
+sub authorization { $_[0]->env->{HTTP_AUTHORIZATION} }
+sub hostname      { $_[0]->env->{HTTP_HOST} }
+sub referer       { $_[0]->env->{REFERER} }
+sub query_string  { $_[0]->env->{QUERY_STRING} }
+
+sub error {
+    my ( $self, $err ) = @_;
+    $self->{error} = $err if ($err);
+    return $self->{error};
+}
+
+*params = \&Plack::Request::param;
+
+sub set_param {
+    my ( $self, $k, $v ) = @_;
+    $self->param;
+    $self->env->{'plack.request.merged'}->{$k} =
+      $self->env->{'plack.request.query'}->{$k} = $v;
+}
+
+sub wantJSON {
+    return 1
+      if ( defined $_[0]->accept
+        and $_[0]->accept =~ m#(?:application|text)/json# );
+    return 0;
+}
 
 # JSON parser
 sub jsonBodyToObj {
     my $self = shift;
-    unless ( $self->contentType =~ /application\/json/ ) {
+    return $self->{json_body} if ( $self->{json_body} );
+    unless ( $self->content_type =~ /application\/json/ ) {
         $self->error('Data is not JSON');
         return undef;
     }
@@ -137,13 +97,12 @@ sub jsonBodyToObj {
         $self->error('No data');
         return undef;
     }
-    return $self->body if ( ref( $self->body ) );
-    my $j = eval { from_json( $self->body, { allow_nonref => 1 } ) };
+    my $j = eval { from_json( $self->content, { allow_nonref => 1 } ) };
     if ($@) {
         $self->error("$@$!");
         return undef;
     }
-    return $self->{body} = $j;
+    return $self->{json_body} = $j;
 }
 
 1;
@@ -177,130 +136,97 @@ PSGIs
 =head1 DESCRIPTION
 
 This package provides HTTP request objects used by Lemonldap::NG PSGIs. It
-contains common accessors to work with request
+contains common accessors to work with request. Note that it inherits from
+L<Plack::Request>.
 
 =head1 METHODS
 
-=head2 Accessors
+All methods of L<Plack::Request> are available.
+Lemonldap::NG::Common::PSGI::Request adds the following methods:
 
-=head3 accept
+=head2 accept
 
 'Accept' header content.
 
-=head3 encodings
+=head2 encodings
 
 'Accept-Encoding' header content.
 
-=head3 languages
+=head2 error
 
-'Accept-Language header content.
+Used to store error value (usually a L<Lemonldap::NG::Portal::Main::Constants>
+constant).
 
-=head3 cookies
-
-'Cookie' header content.
-
-=head3 hostname
-
-'Host' header content.
-
-=head3 remote_ip
-
-Client IP address.
-
-=head3 port
-
-Client TCP port.
-
-=head3 method
-
-HTTP method asked by client (GET/POST/PUT/DELETE).
-
-=head3 scriptname
-
-SCRIPT_NAME environment variable provided by HTTP server.
-
-=head3 get_server_port
-
-Server port.
-
-=head3 path
-
-PATH_INFO content which has been subtracted `scriptname`. So it's the relative
-path_info for REST calls.
-
-=head3 uri
-
-REQUEST_URI environment variable.
-
-=head3 unparsed_uri
-
-Same as `uri` but without decoding.
-
-=head3 user
-
-REMOTE_USER environment variable. It contains username when a server authentication
-is done.
-
-=head3 userData
-
-Hash reference to be used by Lemonldap::NG::Handler::PSGI. If a server authentication
-is done, it contains:
-
-  { _whatToTrace => `user()` }
-
-=head3 params
-
-GET parameters.
-
-=head3 body
-
-Content of POST requests
-
-=head3 error
-
-Set if an error occurs
-
-=head3 contentType
-
-Content type of posted datas.
-
-=head3 contentLength
-
-Length of posted datas.
-
-=head2 Private accessors
-
-=head3 _psgixBuffered
-
-PSGI psgix.input.buffered variable.
-
-=head3 _psgiInput
-
-PSGI psgix.input variable.
-
-=head2 Methods
-
-=head3 jsonBodyToObj()
+=head2 jsonBodyToObj
 
 Get the content of a JSON POST request as Perl object.
 
+=head2 languages
+
+'Accept-Language header content.
+
+=head2 hostname
+
+'Host' header content.
+
+=head2 read-body
+
+Since body() methods returns an L<IO::Handle> object, this method reads and
+return the request content as string.
+
+=head2 respHeaders
+
+Accessor to 'respHeaders' property. It is used to store headers that have to
+be pushed in response (see L<Lemonldap::NG::Common::PSGI>).
+
+Be careful, it contains an array reference, not a hash one because headers
+can be multi-valued.
+
+Example:
+
+  # Set headers
+  $req->respHeaders( "Location" => "http://x.y.z/", Etag => "XYZ", );
+  # Add header
+  $req->respHeaders->{"X-Key"} = "Value"; 
+
+=head2 set_param( $key, $value )
+
+L<Plack::Request> param() method is read-only. This method can be used to
+modify a GET parameter value
+
+=head2 uri
+
+REQUEST_URI environment variable decoded.
+
+=head2 user
+
+REMOTE_USER environment variable. It contains username when a server
+authentication is done.
+
+=head2 userData
+
+Hash reference to the session information (if app inherits from
+L<Lemonldap::NG::Handler::PSGI> or any other handler PSGI package). If no
+session information is available, it contains:
+
+  { _whatToTrace => <REMOTE-USER value> }
+
+=head2 wantJSON
+
+Return true if current request ask JSON content (verify that "Accept" header
+contains "application/json" or "text/json").
+
 =head1 SEE ALSO
 
-L<http://lemonldap-ng.org/>, L<Lemonldap::NG::Portal>, L<Lemonldap::NG::Handler>,
-L<Plack>, L<PSGI>, L<Lemonldap::NG::Common::PSGI>,
-L<Lemonldap::NG::Common::PSGI::Router>, L<HTML::Template>, 
+L<http://lemonldap-ng.org/>, L<Lemonldap::NG::Common::PSGI>,
+L<Lemonldap::NG::Hander::PSGI>, L<Plack::Request>,
+L<Lemonldap::NG::Portal::Main::Constants>, 
 
 =head1 AUTHORS
 
 =over
 
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=item François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
 
 =back
 
@@ -316,13 +242,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =head1 COPYRIGHT AND LICENSE
 
-=over
-
-=item Copyright (C) 2015-2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2015-2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
+See COPYING file for details.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

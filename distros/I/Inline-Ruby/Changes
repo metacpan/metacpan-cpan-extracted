@@ -1,5 +1,10 @@
 Revision history for Perl extension Inline-Ruby.
 
+0.11    2019-02-13
+    - Fix for https://rt.cpan.org/Ticket/Display.html?id=128484
+        - Cannot inherit from StringIO
+        - Thanks to @quarkbuddha .
+
 0.10    2018-11-12
     - Fix build on Ubuntu and FreeBSD .
         - https://rt.cpan.org/Public/Bug/Display.html?id=127628

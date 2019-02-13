@@ -1,0 +1,104 @@
+Net-SharePoint-Basic
+
+DESCRIPTION
+
+Net::SharePoint::Basic - Basic interface to Microsoft SharePoint REST API.
+
+This module provides a basic interface for managing the Shared Folders
+catalog in the Microsoft SharePoint site via its REST API. In the
+current version only the following actions are supported: 
+
+ * generating a connection token
+ * upload file or string
+ * download file content and save it
+ * list contents of folder
+ * create new folder
+ * delete file or folder
+
+More actions are expected to be added in the future as well as we plan
+to increase the versatility of the arguments accepted by this module
+and the sample implementation of a client, 'sp-client', that comes
+with it. 
+
+The interface is object oriented. A few constants are exported.
+
+The full testing (and naturally the full usage) of the module requires
+a working SharePoint site configuration. The structure of the
+configuration file will be described in this manual as well. The
+sample configuration file provided in this distribution will not work
+against SharePoint and plays the role of a placeholder only. 
+
+    use Net::SharePoint::Basic;
+
+    my $sp = Net::SharePoint::Basic->new({config_file => 'sharepoint.conf'});
+    # creates Shared Documents/test
+    my $response = $sp->makedir({retries => 1}, '/test');
+    # uploads a string as Shared Documents/test/teststring
+    $sp->upload({}, '/test/teststring', 'abcd');
+    # uploads a file 'testfile' into Shared Documents/test/
+    $sp->upload({type => 'file'}, '/test/', 'testfile');
+    # downloads contents of a file
+    $sp->download({}, '/test/teststring');
+    # downloads contents and saves it to a file
+    $sp->download({save_file => 'testfile'}, '/test/teststring');
+    # lists contents of a folder
+    $sp->list({}, '/test');
+    # deletes the folder
+    $sp->delete({}, '/test');
+
+This module was developed based on the MSDN SharePoint REST API at
+https://msdn.microsoft.com/en-us/library/office/jj860569.aspx . 
+
+
+INSTALLATION
+
+For testing your own SharePoint configuration you need to provide the
+path to the file containing it in the environment variable
+NET_SHAREPOINT_CONFIG. For more information on the configuration file
+please read the section 'CONFIGURATION FILE' in the POD of
+Net::SharePoint::Basic . The file provided is a placeholder and will
+not work against your setup. It will be ignored for most of the API
+testing stages. 
+
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::SharePoint::Basic
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-SharePoint-Basic
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-SharePoint-Basic
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-SharePoint-Basic
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-SharePoint-Basic/
+
+    GitHub Repository
+        https://github.com/vmware/perl-net-sharepoint-basic
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2018-2019 VMware Inc. All rights reserved. 
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See LICENSE.txt for more information.
+

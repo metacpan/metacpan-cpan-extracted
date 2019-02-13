@@ -152,8 +152,7 @@ sub handler {
         # olStyleUrl can be set to 1 to use & instead of ;
         $urldc .= (
             $cdc_idp
-            ? (
-                (
+            ? ( (
                     $urldc =~ /\?/
                     ? ( $self->{oldStyleUrl} ? '&' : ';' )
                     : '?'

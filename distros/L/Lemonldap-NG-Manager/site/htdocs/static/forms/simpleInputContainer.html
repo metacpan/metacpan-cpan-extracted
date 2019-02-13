@@ -28,11 +28,11 @@
         <td ng-if="n.type=='bool'">
           <div class="input-group-solid" role="radiogroup">
             <label class="radio-inline">
-              <input id="bopeOn/{{n.title}}" type="radio" value="1" ng-model="n.data" role="radio" aria-labelledby="lbopeOn{{n.title}}"/>
+              <input id="bopeOn/{{n.title}}" type="radio" ng-value="1" ng-model="n.data" role="radio" aria-labelledby="lbopeOn{{n.title}}"/>
               <span id="lbopeOn{{n.title}}" for="bopeOn/{{n.title}}" trspan="on"></span>
             </label>
             <label class="radio-inline">
-              <input id="bopeOff/{{n.title}}" type="radio" value="0" ng-model="n.data" ng-checked="n.data!==1&&n.data!=='1'" role="radio" aria-labelledby="lbopeOff{{n.title}}"/>
+              <input id="bopeOff/{{n.title}}" type="radio" ng-value="0" ng-model="n.data" ng-checked="n.data!==1&&n.data!=='1'" role="radio" aria-labelledby="lbopeOff{{n.title}}"/>
               <span id="lbopeOff{{n.title}}" for="bopeOff/{{n.title}}" trspan="off"></span>
             </label>
           </div>
@@ -41,15 +41,15 @@
         <td ng-if="n.type=='trool'">
           <div class="input-group-solid" role="radiogroup">
             <label class="radio-inline">
-              <input id="trOn/{{n.title}}" type="radio" value="1" ng-model="n.data" role="radio" aria-labelledby="ltrOn{{n.title}}">
+              <input id="trOn/{{n.title}}" type="radio" ng-value="1" ng-model="n.data" role="radio" aria-labelledby="ltrOn{{n.title}}">
               <span id="ltrOn{{n.title}}" for="trOn/{{n.title}}" trspan="on"></span>
             </label>
             <label class="radio-inline">
-              <input id="trOff/{{n.title}}" type="radio" value="0" ng-model="n.data" role="radio" aria-labelledby="ltrOff{{n.title}}">
+              <input id="trOff/{{n.title}}" type="radio" ng-value="0" ng-model="n.data" role="radio" aria-labelledby="ltrOff{{n.title}}">
               <span id="ltrOff{{n.title}}" for="trOff/{{n.title}}" trspan="off"></span>
             </label>
             <label class="radio-inline">
-              <input id="trDefault/{{n.title}}" type="radio" value="-1" ng-model="n.data" ng-checked="n.data!==1&&n.data!=='1'&&n.data!==0&&n.data!=='0'" role="radio" aria-labelledby="ltrDefault{{n.title}}">
+              <input id="trDefault/{{n.title}}" type="radio" ng-value="-1" ng-model="n.data" ng-checked="n.data!==1&&n.data!=='1'&&n.data!==0&&n.data!=='0'" role="radio" aria-labelledby="ltrDefault{{n.title}}">
               <span id="ltrDefault{{n.title}}" for="trDefault/{{n.title}}" trspan="default"></span>
             </label>
           </div>
@@ -58,15 +58,15 @@
         <td ng-if="n.type=='boolOrExpr'">
           <div class="input-group-solid" role="radiogroup">
             <label class="radio-inline">
-              <input id="boeOn/{{n.title}}" type="radio" value="1" ng-model="n.data" role="radio" aria-labelledby="lboeOn{{n.title}}">
+              <input id="boeOn/{{n.title}}" type="radio" ng-value="1" ng-model="n.data" role="radio" aria-labelledby="lboeOn{{n.title}}">
               <span id="lboeOn{{n.title}}" for="boeOn/{{n.title}}" trspan="on"></span>
             </label>
             <label class="radio-inline">
-              <input id="boeOff/{{n.title}}" type="radio" value="0" ng-model="n.data" role="radio" aria-labelledby="lboeOff{{n.title}}">
+              <input id="boeOff/{{n.title}}" type="radio" ng-value="0" ng-model="n.data" role="radio" aria-labelledby="lboeOff{{n.title}}">
               <span id="lboeOff{{n.title}}" for="boeOff/{{n.title}}" trspan="off"></span>
             </label>
             <label class="radio-inline">
-              <input id="boeExpr/{{n.title}}" type="radio" value="-1" ng-click="n.data=''" ng-checked="n.data!==0&&n.data!=='0'&&n.data!==1&&n.data!=='1'" role="radio" aria-labelledby="lboeExpr{{n.title}}">
+              <input id="boeExpr/{{n.title}}" type="radio" ng-value="-1" ng-click="n.data=''" ng-checked="n.data!==0&&n.data!=='0'&&n.data!==1&&n.data!=='1'" role="radio" aria-labelledby="lboeExpr{{n.title}}">
               <span id="lboeExpr{{n.title}}" for="boeExpr/{{n.title}}" trspan="specialRule"></span>
             </label>
           </div>

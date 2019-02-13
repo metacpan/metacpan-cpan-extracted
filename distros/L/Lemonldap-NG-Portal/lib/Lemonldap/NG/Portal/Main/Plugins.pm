@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -13,7 +13,7 @@ use Mouse;
 #
 # Developers: 2FA must be loaded before Notifications
 our @pList = (
-    portalDisplayResetPassword => '::Plugins::MailReset',
+    portalDisplayResetPassword => '::Plugins::MailPasswordReset',
     portalStatus               => '::Plugins::Status',
     cda                        => '::Plugins::CDA',
     notification               => '::Plugins::Notifications',

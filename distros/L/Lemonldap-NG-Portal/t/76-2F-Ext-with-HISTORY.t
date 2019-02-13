@@ -8,8 +8,7 @@ my $maintests = 10;
 
 use_ok('Lemonldap::NG::Common::FormEncode');
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel             => 'error',
             rest2fActivation     => 1,
@@ -47,22 +46,21 @@ ok(
 my ( $host, $url, $query ) =
   expectForm( $res, undef, '/2fchoice', 'token', 'checkLogins' );
 
-
 ok(
     $res->[2]->[0] =~
-qq%<img src="/static/bootstrap/u2f.png" alt="rest2F" title="rest2F" />%,
+      qq%<img src="/static/bootstrap/u2f.png" alt="rest2F" title="rest2F" />%,
     'Found u2f.png'
 ) or print STDERR Dumper( $res->[2]->[0] );
 
 ok(
     $res->[2]->[0] =~
-qq%<img src="/static/bootstrap/yubikey.png" alt="ext2F" title="ext2F" />%,
+      qq%<img src="/static/bootstrap/yubikey.png" alt="ext2F" title="ext2F" />%,
     'Found yubikey.png'
 ) or print STDERR Dumper( $res->[2]->[0] );
 
 ok(
     $res->[2]->[0] =~
-qq%<img src="/static/bootstrap/totp.png" alt="totp2F" title="totp2F" />%,
+      qq%<img src="/static/bootstrap/totp.png" alt="totp2F" title="totp2F" />%,
     'Found totp.png'
 ) or print STDERR Dumper( $res->[2]->[0] );
 
@@ -82,7 +80,7 @@ ok(
 
 ok(
     $res->[2]->[0] =~
-qr%<input name="code" value="" class="form-control" id="extcode" trplaceholder="code">%,
+qr%<input name="code" value="" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
 

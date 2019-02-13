@@ -76,3 +76,15 @@ end
 def some_iter(a)
   yield a
 end
+
+require 'stringio'
+
+# Inherit from StringIO to test fix for https://rt.cpan.org/Ticket/Display.html?id=128484
+class Test128484 < StringIO
+  def a_method()
+      # The code from the script attached to the bug report didn't
+      # include this method and didn't reproduce the error when I put
+      # it here. I'm not sure why, but adding this method caused the
+      # bug to be provoked in this test script.
+  end
+end

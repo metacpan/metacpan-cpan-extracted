@@ -15,7 +15,10 @@ displayError = (j, status, err) ->
 	if res and res.error
 		res = res.error.replace /.* /, ''
 		console.log 'Returned error', res
-		setMsg res, 'warning'
+		if res.match /module/
+			setMsg 'notAuthorized', 'warning'
+		else
+			setMsg res, 'warning'
 
 # Delete function (launched by "delete" button)
 delete2F = (device, epoch) ->

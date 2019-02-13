@@ -1,0 +1,35 @@
+Ceci est un certificat de révocation pour la clef OpenPGP :
+
+pub   rsa3072 2018-12-04 [SC] [expire : 2020-12-03]
+      9482CEFB055809CBAFE6D71AAB2D5542891D1677
+uid          LL::NG <llng@lemonldap-ng.org>
+
+A revocation certificate is a kind of "kill switch" to publicly
+declare that a key shall not anymore be used.  It is not possible
+to retract such a revocation certificate once it has been published.
+
+Use it to revoke this key in case of a compromise or loss of
+the secret key.  However, if the secret key is still accessible,
+it is better to generate a new revocation certificate and give
+a reason for the revocation.  For details see the description of
+of the gpg command "--generate-revocation" in the GnuPG manual.
+
+To avoid an accidental use of this file, a colon has been inserted
+before the 5 dashes below.  Remove this colon with a text editor
+before importing and publishing this revocation certificate.
+
+:-----BEGIN PGP PUBLIC KEY BLOCK-----
+Comment: This is a revocation certificate
+
+iQG2BCABCgAgFiEElILO+wVYCcuv5tcaqy1VQokdFncFAlwG+U8CHQAACgkQqy1V
+QokdFndF6Qv+Pk5xMIXm43dXghosAJZQTI1VvCDDmfhvSedoU+bweANKvnnugLnA
+EGSaHFTY6/vn1928VZBtNJkumVnsT2QeL6nhZcf2QZdWs+1yc3LcRy5lvjgLfxXV
+hLiDjUGUcENiMPkpmAf/p+4giC7nvYpUPnekQVsx6OYmf5ZfagMGBFa2gN/o2a42
+lW4xNlM6213p9s6hlftR6acCQ1nu+aJMMpHeyVz2RC5FZM48CTgZDKoybpS6La7l
+NzFOPvq/RQ3awtOehF51GGs0cxVZQ8GjUamZjdhZI3cV1YsG2huKVERdgUywQf4d
+nic+nAqb4wQSDcuzH0Hqt7ieXG/y8wMRtzB3lYaqTwWTJ1QSs/ygehEWuWIiRJsd
+RCQFkcIO5m0I4nxOJD8EA/71BnxeX6UwL/nqf4QvyBX+lAHZoWEo+rR1qwDLuUW+
+iAx8lgHc0VbqX5XTl6xjvf/IDzK7WkjPpuI1018SjhYppj6Htkq/Ua3rwBXJ0bJx
+3Sh+AbLnIK0w
+=LO4h
+-----END PGP PUBLIC KEY BLOCK-----

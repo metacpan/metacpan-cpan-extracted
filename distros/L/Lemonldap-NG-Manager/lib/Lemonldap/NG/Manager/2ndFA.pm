@@ -16,7 +16,7 @@ use feature 'state';
 extends 'Lemonldap::NG::Common::Conf::AccessLib',
   'Lemonldap::NG::Common::Session::REST';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -42,26 +42,10 @@ sub addRoutes {
         ['DELETE']
       );
 
-    ## ADD 2FA DEVICE
-    #->addRoute(
-    #sfa => { ':sessionType' => { ':sessionId' => 'add2FA' } },
-    #['PUT']
-    #)
-
-    ## VERIFY 2FA DEVICE
-    #->addRoute(
-    #sfa => { ':sessionType' => { ':sessionId' => 'verify2FA' } },
-    #['POST']
-    #);
-
     $self->setTypes($conf);
-
-    #$self->{ipField}              ||= 'ipAddr';
     $self->{multiValuesSeparator} ||= '; ';
     $self->{hiddenAttributes} //= "_password";
-    $self->{TOTPCheck} = '1';
-    $self->{U2FCheck}  = '1';
-    $self->{UBKCheck}  = '1';
+    $self->{TOTPCheck} = $self->{U2FCheck} = $self->{UBKCheck} = '1';
 }
 
 ###################
@@ -91,26 +75,6 @@ sub del2F {
     }
 }
 
-#sub add2FA {
-
-#my ( $self, $req, $session, $skey ) = @_;
-
-#eval 'use Crypt::U2F::Server::Simple';
-#if ($@) {
-#$self->error("Can't load U2F library: $@");
-#return 0;
-#}
-
-#return $self->addU2FKey( $req, $session, $skey );
-#}
-
-#sub verify2FA {
-
-#my ( $self, $req, $session, $skey ) = @_;
-
-#return $self->addU2FKey( $req, $session, $skey );
-#}
-
 ########################
 # III. DISPLAY METHODS #
 ########################
@@ -120,7 +84,6 @@ sub sfa {
 
     # Case 1: only one session is required
     if ($session) {
-
         return $self->session( $req, $session, $skey );
     }
 
@@ -243,14 +206,6 @@ sub sfa {
             $self->logger->debug(
                 "Removing sessions unless a $_ device is registered");
         }
-
-        #else {
-        #    (
-        #        return $self->sendError(
-        #            $req, "Bad or Missing " . $_ . "Check parameter", 400
-        #        )
-        #    );
-        #}
     }
 
     my $total = ( keys %$res );

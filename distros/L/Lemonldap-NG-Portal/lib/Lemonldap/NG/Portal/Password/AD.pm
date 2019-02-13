@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants
 extends 'Lemonldap::NG::Portal::Lib::LDAP',
   'Lemonldap::NG::Portal::Password::Base';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 sub init {
     my ($self) = @_;
@@ -36,8 +36,6 @@ sub modifyPassword {
         1 );
 
     unless ( $code == PE_PASSWORD_OK ) {
-        $self->ldap->unbind;
-        $self->{flags}->{ldapActive} = 0;
         return $code;
     }
 
@@ -53,8 +51,6 @@ sub modifyPassword {
         unless ( $result->code == 0 ) {
             $self->logger->error(
                 "LDAP modify pwdLastSet error: " . $result->code );
-            $self->ldap->unbind;
-            $self->{flags}->{ldapActive} = 0;
             return PE_LDAPERROR;
         }
 

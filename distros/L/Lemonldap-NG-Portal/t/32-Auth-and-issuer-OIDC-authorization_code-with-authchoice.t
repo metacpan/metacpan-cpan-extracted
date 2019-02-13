@@ -112,7 +112,7 @@ SKIP: {
     my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
     # Try to authenticate to OP
-    $query =~ s/user=&?//;
+    $query =~ s/(?:password|user)=&?//g;
     $query = "user=dwho&password=dwho&$query";
     ok(
         $res = $op->_post(
@@ -254,8 +254,7 @@ sub switch {
 }
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel          => $debug,
                 domain            => 'idp.com',
@@ -363,8 +362,7 @@ GQIDAQAB
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',

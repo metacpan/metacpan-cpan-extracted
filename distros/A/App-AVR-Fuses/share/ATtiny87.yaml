@@ -1,0 +1,221 @@
+---
+fusemap:
+  BODLEVEL:
+    mask: 7
+    name: BODLEVEL
+    reg: h
+    values:
+      - caption: Brown-out detection at VCC=4.3 V
+        name: 4V3
+        value: 4
+      - caption: Brown-out detection at VCC=2.7 V
+        name: 2V7
+        value: 5
+      - caption: Brown-out detection at VCC=1.8 V
+        name: 1V8
+        value: 6
+      - caption: Brown-out detection at VCC=2.3 V
+        name: 2V3
+        value: 3
+      - caption: Brown-out detection at VCC=2.2 V
+        name: 2V2
+        value: 2
+      - caption: Brown-out detection at VCC=1.9 V
+        name: 1V9
+        value: 1
+      - caption: Brown-out detection at VCC=2.0 V
+        name: 2V0
+        value: 0
+      - caption: Brown-out detection disabled
+        name: DISABLED
+        value: 7
+  CKDIV8:
+    mask: 128
+    name: CKDIV8
+    reg: l
+  CKOUT:
+    mask: 64
+    name: CKOUT
+    reg: l
+  DWEN:
+    mask: 64
+    name: DWEN
+    reg: h
+  EESAVE:
+    mask: 8
+    name: EESAVE
+    reg: h
+  RSTDISBL:
+    mask: 128
+    name: RSTDISBL
+    reg: h
+  SELFPRGEN:
+    mask: 1
+    name: SELFPRGEN
+    reg: e
+  SPIEN:
+    mask: 32
+    name: SPIEN
+    reg: h
+  SUT_CKSEL:
+    mask: 63
+    name: SUT_CKSEL
+    reg: l
+    values:
+      - caption: 'Ext. Clock; Start-up time PWRDWN/RESET: 6 CK/14 CK + 0 ms'
+        name: EXTCLK_6CK_14CK_0MS
+        value: 0
+      - caption: 'Ext. Clock; Start-up time PWRDWN/RESET: 6 CK/14 CK + 4 ms'
+        name: EXTCLK_6CK_14CK_4MS
+        value: 16
+      - caption: 'Ext. Clock; Start-up time PWRDWN/RESET: 6 CK/14 CK + 64 ms'
+        name: EXTCLK_6CK_14CK_64MS
+        value: 32
+      - caption: 'Int. RC Osc. 8 MHz; Start-up time PWRDWN/RESET: 6 CK/14 CK + 0 ms'
+        name: INTRCOSC_8MHZ_6CK_14CK_0MS
+        value: 2
+      - caption: 'Int. RC Osc. 8 MHz; Start-up time PWRDWN/RESET: 6 CK/14 CK + 4 ms'
+        name: INTRCOSC_8MHZ_6CK_14CK_4MS
+        value: 18
+      - caption: 'Int. RC Osc. 8 MHz; Start-up time PWRDWN/RESET: 6 CK/14 CK + 64 ms'
+        name: INTRCOSC_8MHZ_6CK_14CK_64MS
+        value: 34
+      - caption: 'WD. Osc. 128 kHz; Start-up time PWRDWN/RESET: 6 CK/14 CK + 0 ms'
+        name: WDOSC_128KHZ_6CK_14CK_0MS
+        value: 3
+      - caption: 'WD. Osc. 128 kHz; Start-up time PWRDWN/RESET: 6 CK/14 CK + 4 ms'
+        name: WDOSC_128KHZ_6CK_14CK_4MS
+        value: 19
+      - caption: 'WD. Osc. 128 kHz; Start-up time PWRDWN/RESET: 6 CK/14 CK + 64 ms'
+        name: WDOSC_128KHZ_6CK_14CK_64MS
+        value: 35
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time PWRDWN/RESET: 1024 CK 4 ms'
+        name: EXTLOFXTAL_1KCK_4MS
+        value: 4
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time PWRDWN/RESET: 1024 CK + 64 ms'
+        name: EXTLOFXTAL_1KCK_64MS
+        value: 20
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time PWRDWN/RESET: 32768 CK + 64 ms'
+        name: EXTLOFXTAL_32KCK_64MS
+        value: 36
+      - caption: 'Ext. Ceramic Res. 0.4-0.9 MHz; Start-up time PWRDWN/RESET: 258 CK/14 CK + 4.1 ms'
+        name: EXTCRES_0MHZ4_0MHZ9_258CK_14CK_4MS1
+        value: 8
+      - caption: 'Ext. Ceramic Res. 0.4-0.9 MHz; Start-up time PWRDWN/RESET: 258 CK/14 CK + 65 ms'
+        name: EXTCRES_0MHZ4_0MHZ9_258CK_14CK_65MS
+        value: 24
+      - caption: 'Ext. Ceramic Res. 0.4-0.9 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 0 ms'
+        name: EXTCRES_0MHZ4_0MHZ9_1KCK_14CK_0MS
+        value: 40
+      - caption: 'Ext. Ceramic Res. 0.4-0.9 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 4.1 ms'
+        name: EXTCRES_0MHZ4_0MHZ9_1KCK_14CK_4MS1
+        value: 56
+      - caption: 'Ext. Ceramic Res. 0.4-0.9 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 65 ms'
+        name: EXTCRES_0MHZ4_0MHZ9_1KCK_14CK_65MS
+        value: 9
+      - caption: 'Ext. Crystal Osc. 0.4-0.9 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 0 ms'
+        name: EXTXOSC_0MHZ4_0MHZ9_16KCK_14CK_0MS
+        value: 25
+      - caption: 'Ext. Crystal Osc. 0.4-0.9 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 4.1 ms'
+        name: EXTXOSC_0MHZ4_0MHZ9_16KCK_14CK_4MS1
+        value: 41
+      - caption: 'Ext. Crystal Osc. 0.4-0.9 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 65 ms'
+        name: EXTXOSC_0MHZ4_0MHZ9_16KCK_14CK_65MS
+        value: 57
+      - caption: 'Ext. Ceramic Res. 0.9-3.0 MHz; Start-up time PWRDWN/RESET: 258 CK/14 CK + 4.1 ms'
+        name: EXTCRES_0MHZ9_3MHZ_258CK_14CK_4MS1
+        value: 10
+      - caption: 'Ext. Ceramic Res. 0.9-3.0 MHz; Start-up time PWRDWN/RESET: 258 CK/14 CK + 65 ms'
+        name: EXTCRES_0MHZ9_3MHZ_258CK_14CK_65MS
+        value: 26
+      - caption: 'Ext. Ceramic Res. 0.9-3.0 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 0 ms'
+        name: EXTCRES_0MHZ9_3MHZ_1KCK_14CK_0MS
+        value: 42
+      - caption: 'Ext. Ceramic Res. 0.9-3.0 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 4.1 ms'
+        name: EXTCRES_0MHZ9_3MHZ_1KCK_14CK_4MS1
+        value: 58
+      - caption: 'Ext. Ceramic Res. 0.9-3.0 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 65 ms'
+        name: EXTCRES_0MHZ9_3MHZ_1KCK_14CK_65MS
+        value: 11
+      - caption: 'Ext. Crystal Osc. 0.9-3.0 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 0 ms'
+        name: EXTXOSC_0MHZ9_3MHZ_16KCK_14CK_0MS
+        value: 27
+      - caption: 'Ext. Crystal Osc. 0.9-3.0 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 4.1 ms'
+        name: EXTXOSC_0MHZ9_3MHZ_16KCK_14CK_4MS1
+        value: 43
+      - caption: 'Ext. Crystal Osc. 0.9-3.0 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 65 ms'
+        name: EXTXOSC_0MHZ9_3MHZ_16KCK_14CK_65MS
+        value: 59
+      - caption: 'Ext. Ceramic Res. 3.0-8.0 MHz; Start-up time PWRDWN/RESET: 258 CK/14 CK + 4.1 ms'
+        name: EXTCRES_3MHZ_8MHZ_258CK_14CK_4MS1
+        value: 12
+      - caption: 'Ext. Ceramic Res. 3.0-8.0 MHz; Start-up time PWRDWN/RESET: 258 CK/14 CK + 65 ms'
+        name: EXTCRES_3MHZ_8MHZ_258CK_14CK_65MS
+        value: 28
+      - caption: 'Ext. Ceramic Res. 3.0-8.0 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 0 ms'
+        name: EXTCRES_3MHZ_8MHZ_1KCK_14CK_0MS
+        value: 44
+      - caption: 'Ext. Ceramic Res. 3.0-8.0 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 4.1 ms'
+        name: EXTCRES_3MHZ_8MHZ_1KCK_14CK_4MS1
+        value: 60
+      - caption: 'Ext. Ceramic Res. 3.0-8.0 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 65 ms'
+        name: EXTCRES_3MHZ_8MHZ_1KCK_14CK_65MS
+        value: 13
+      - caption: 'Ext. Crystal Osc. 3.0-8.0 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 0 ms'
+        name: EXTXOSC_3MHZ_8MHZ_16KCK_14CK_0MS
+        value: 29
+      - caption: 'Ext. Crystal Osc. 3.0-8.0 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 4.1 ms'
+        name: EXTXOSC_3MHZ_8MHZ_16KCK_14CK_4MS1
+        value: 45
+      - caption: 'Ext. Crystal Osc. 3.0-8.0 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 65 ms'
+        name: EXTXOSC_3MHZ_8MHZ_16KCK_14CK_65MS
+        value: 61
+      - caption: 'Ext. Ceramic Res. 8.0-16.0 MHz; Start-up time PWRDWN/RESET: 258 CK/14 CK + 4.1 ms'
+        name: EXTCRES_8MHZ_16MHZ_258CK_14CK_4MS1
+        value: 14
+      - caption: 'Ext. Ceramic Res. 8.0-16.0 MHz; Start-up time PWRDWN/RESET: 258 CK/14 CK + 65 ms'
+        name: EXTCRES_8MHZ_16MHZ_258CK_14CK_65MS
+        value: 30
+      - caption: 'Ext. Ceramic Res. 8.0-16.0 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 0 ms'
+        name: EXTCRES_8MHZ_16MHZ_1KCK_14CK_0MS
+        value: 46
+      - caption: 'Ext. Ceramic Res. 8.0-16.0 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 4.1 ms'
+        name: EXTCRES_8MHZ_16MHZ_1KCK_14CK_4MS1
+        value: 62
+      - caption: 'Ext. Ceramic Res. 8.0-16.0 MHz; Start-up time PWRDWN/RESET: 1024 CK /14 CK + 65 ms'
+        name: EXTCRES_8MHZ_16MHZ_1KCK_14CK_65MS
+        value: 15
+      - caption: 'Ext. Crystal Osc. 8.0-16.0 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 0 ms'
+        name: EXTXOSC_8MHZ_16MHZ_16KCK_14CK_0MS
+        value: 31
+      - caption: 'Ext. Crystal Osc. 8.0-16.0 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 4.1 ms'
+        name: EXTXOSC_8MHZ_16MHZ_16KCK_14CK_4MS1
+        value: 47
+      - caption: 'Ext. Crystal Osc. 8.0-16.0 MHz; Start-up time PWRDWN/RESET: 16384 CK/14 CK + 65 ms'
+        name: EXTXOSC_8MHZ_16MHZ_16KCK_14CK_65MS
+        value: 63
+  WDTON:
+    mask: 16
+    name: WDTON
+    reg: h
+fuses:
+  - SELFPRGEN
+  - RSTDISBL
+  - DWEN
+  - SPIEN
+  - WDTON
+  - EESAVE
+  - BODLEVEL
+  - CKDIV8
+  - CKOUT
+  - SUT_CKSEL
+reginfos:
+  - default: 255
+    mask: 1
+    name: e
+  - default: 223
+    mask: 255
+    name: h
+  - default: 98
+    mask: 255
+    name: l

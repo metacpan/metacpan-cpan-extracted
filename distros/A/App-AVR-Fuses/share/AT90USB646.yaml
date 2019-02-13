@@ -1,0 +1,262 @@
+---
+fusemap:
+  BODLEVEL:
+    mask: 7
+    name: BODLEVEL
+    reg: e
+    values:
+      - caption: 'Brown-out detection disabled; [BODLEVEL=111]'
+        name: DISABLED
+        value: 7
+      - caption: Brown-out detection at VCC=2.0 V
+        name: 2V0
+        value: 6
+      - caption: Brown-out detection at VCC=2.2 V
+        name: 2V2
+        value: 5
+      - caption: Brown-out detection at VCC=2.4 V
+        name: 2V4
+        value: 4
+      - caption: Brown-out detection at VCC=2.6 V
+        name: 2V6
+        value: 3
+      - caption: Brown-out detection at VCC=3.4 V
+        name: 3V4
+        value: 2
+      - caption: Brown-out detection at VCC=3.5 V
+        name: 3V5
+        value: 1
+      - caption: Brown-out detection at VCC=4.3 V
+        name: 4V3
+        value: 0
+  BOOTRST:
+    mask: 1
+    name: BOOTRST
+    reg: h
+  BOOTSZ:
+    mask: 6
+    name: BOOTSZ
+    reg: h
+    values:
+      - caption: Boot Flash size=512 words start address=$7F00
+        name: 512W_7F00
+        value: 6
+      - caption: Boot Flash size=1024 words start address=$7E00
+        name: 1024W_7E00
+        value: 4
+      - caption: Boot Flash size=2408 words start address=$7C00
+        name: 2408W_7C00
+        value: 2
+      - caption: Boot Flash size=4096 words start address=$7800
+        name: 4096W_7800
+        value: 0
+  CKDIV8:
+    mask: 128
+    name: CKDIV8
+    reg: l
+  CKOUT:
+    mask: 64
+    name: CKOUT
+    reg: l
+  EESAVE:
+    mask: 8
+    name: EESAVE
+    reg: h
+  HWBE:
+    mask: 8
+    name: HWBE
+    reg: e
+  JTAGEN:
+    mask: 64
+    name: JTAGEN
+    reg: h
+  OCDEN:
+    mask: 128
+    name: OCDEN
+    reg: h
+  SPIEN:
+    mask: 32
+    name: SPIEN
+    reg: h
+  SUT_CKSEL:
+    mask: 63
+    name: SUT_CKSEL
+    reg: l
+    values:
+      - caption: 'Ext. Clock; Start-up time: 6 CK + 0 ms'
+        name: EXTCLK_6CK_0MS
+        value: 0
+      - caption: 'Ext. Clock; Start-up time: 6 CK + 4.1 ms'
+        name: EXTCLK_6CK_4MS1
+        value: 16
+      - caption: 'Ext. Clock; Start-up time: 6 CK + 65 ms'
+        name: EXTCLK_6CK_65MS
+        value: 32
+      - caption: 'Int. RC Osc.; Start-up time: 6 CK + 0 ms'
+        name: INTRCOSC_6CK_0MS
+        value: 2
+      - caption: 'Int. RC Osc.; Start-up time: 6 CK + 4.1 ms'
+        name: INTRCOSC_6CK_4MS1
+        value: 18
+      - caption: 'Int. RC Osc.; Start-up time: 6 CK + 65 ms'
+        name: INTRCOSC_6CK_65MS
+        value: 34
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 32K CK + 0 ms; Int. Cap.'
+        name: EXTLOFXTAL_32KCK_0MS_INTCAP
+        value: 7
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 32K CK + 4.1 ms; Int. Cap.'
+        name: EXTLOFXTAL_32KCK_4MS1_INTCAP
+        value: 23
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 32K CK + 65 ms; Int. Cap.'
+        name: EXTLOFXTAL_32KCK_65MS_INTCAP
+        value: 39
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 1K CK + 0 ms; Int. Cap.'
+        name: EXTLOFXTAL_1KCK_0MS_INTCAP
+        value: 6
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 1K CK + 4.1 ms; Int. Cap.'
+        name: EXTLOFXTAL_1KCK_4MS1_INTCAP
+        value: 22
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 1K CK + 65 ms; Int. Cap.'
+        name: EXTLOFXTAL_1KCK_65MS_INTCAP
+        value: 38
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 32K CK + 0 ms'
+        name: EXTLOFXTAL_32KCK_0MS
+        value: 5
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 32K CK + 4.1 ms'
+        name: EXTLOFXTAL_32KCK_4MS1
+        value: 21
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 32K CK + 65 ms'
+        name: EXTLOFXTAL_32KCK_65MS
+        value: 37
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 1K CK + 0 ms'
+        name: EXTLOFXTAL_1KCK_0MS
+        value: 4
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 1K CK + 4.1 ms'
+        name: EXTLOFXTAL_1KCK_4MS1
+        value: 20
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 1K CK + 65 ms'
+        name: EXTLOFXTAL_1KCK_65MS
+        value: 36
+      - caption: 'Ext. Crystal Osc. 0.4-0.9 MHz; Start-up time: 258 CK + 4.1 ms'
+        name: EXTXOSC_0MHZ4_0MHZ9_258CK_4MS1
+        value: 8
+      - caption: 'Ext. Crystal Osc. 0.4-0.9 MHz; Start-up time: 258 CK + 65 ms'
+        name: EXTXOSC_0MHZ4_0MHZ9_258CK_65MS
+        value: 24
+      - caption: 'Ext. Crystal Osc. 0.4-0.9 MHz; Start-up time: 1K CK + 0 ms'
+        name: EXTXOSC_0MHZ4_0MHZ9_1KCK_0MS
+        value: 40
+      - caption: 'Ext. Crystal Osc. 0.4-0.9 MHz; Start-up time: 1K CK + 4.1 ms'
+        name: EXTXOSC_0MHZ4_0MHZ9_1KCK_4MS1
+        value: 56
+      - caption: 'Ext. Crystal Osc. 0.4-0.9 MHz; Start-up time: 1K CK + 65 ms'
+        name: EXTXOSC_0MHZ4_0MHZ9_1KCK_65MS
+        value: 9
+      - caption: 'Ext. Crystal Osc. 0.4-0.9 MHz; Start-up time: 16K CK + 0 ms'
+        name: EXTXOSC_0MHZ4_0MHZ9_16KCK_0MS
+        value: 25
+      - caption: 'Ext. Crystal Osc. 0.4-0.9 MHz; Start-up time: 16K CK + 4.1 ms'
+        name: EXTXOSC_0MHZ4_0MHZ9_16KCK_4MS1
+        value: 41
+      - caption: 'Ext. Crystal Osc. 0.4-0.9 MHz; Start-up time: 16K CK + 65 ms'
+        name: EXTXOSC_0MHZ4_0MHZ9_16KCK_65MS
+        value: 57
+      - caption: 'Ext. Crystal Osc. 0.9-3.0 MHz; Start-up time: 258 CK + 4.1 ms'
+        name: EXTXOSC_0MHZ9_3MHZ_258CK_4MS1
+        value: 10
+      - caption: 'Ext. Crystal Osc. 0.9-3.0 MHz; Start-up time: 258 CK + 65 ms'
+        name: EXTXOSC_0MHZ9_3MHZ_258CK_65MS
+        value: 26
+      - caption: 'Ext. Crystal Osc. 0.9-3.0 MHz; Start-up time: 1K CK + 0 ms'
+        name: EXTXOSC_0MHZ9_3MHZ_1KCK_0MS
+        value: 42
+      - caption: 'Ext. Crystal Osc. 0.9-3.0 MHz; Start-up time: 1K CK + 4.1 ms'
+        name: EXTXOSC_0MHZ9_3MHZ_1KCK_4MS1
+        value: 58
+      - caption: 'Ext. Crystal Osc. 0.9-3.0 MHz; Start-up time: 1K CK + 65 ms'
+        name: EXTXOSC_0MHZ9_3MHZ_1KCK_65MS
+        value: 11
+      - caption: 'Ext. Crystal Osc. 0.9-3.0 MHz; Start-up time: 16K CK + 0 ms'
+        name: EXTXOSC_0MHZ9_3MHZ_16KCK_0MS
+        value: 27
+      - caption: 'Ext. Crystal Osc. 0.9-3.0 MHz; Start-up time: 16K CK + 4.1 ms'
+        name: EXTXOSC_0MHZ9_3MHZ_16KCK_4MS1
+        value: 43
+      - caption: 'Ext. Crystal Osc. 0.9-3.0 MHz; Start-up time: 16K CK + 65 ms'
+        name: EXTXOSC_0MHZ9_3MHZ_16KCK_65MS
+        value: 59
+      - caption: 'Ext. Crystal Osc. 3.0-8.0 MHz; Start-up time: 258 CK + 4.1 ms'
+        name: EXTXOSC_3MHZ_8MHZ_258CK_4MS1
+        value: 12
+      - caption: 'Ext. Crystal Osc. 3.0-8.0 MHz; Start-up time: 258 CK + 65 ms'
+        name: EXTXOSC_3MHZ_8MHZ_258CK_65MS
+        value: 28
+      - caption: 'Ext. Crystal Osc. 3.0-8.0 MHz; Start-up time: 1K CK + 0 ms'
+        name: EXTXOSC_3MHZ_8MHZ_1KCK_0MS
+        value: 44
+      - caption: 'Ext. Crystal Osc. 3.0-8.0 MHz; Start-up time: 1K CK + 4.1 ms'
+        name: EXTXOSC_3MHZ_8MHZ_1KCK_4MS1
+        value: 60
+      - caption: 'Ext. Crystal Osc. 3.0-8.0 MHz; Start-up time: 1K CK + 65 ms'
+        name: EXTXOSC_3MHZ_8MHZ_1KCK_65MS
+        value: 13
+      - caption: 'Ext. Crystal Osc. 3.0-8.0 MHz; Start-up time: 16K CK + 0 ms'
+        name: EXTXOSC_3MHZ_8MHZ_16KCK_0MS
+        value: 29
+      - caption: 'Ext. Crystal Osc. 3.0-8.0 MHz; Start-up time: 16K CK + 4.1 ms'
+        name: EXTXOSC_3MHZ_8MHZ_16KCK_4MS1
+        value: 45
+      - caption: 'Ext. Crystal Osc. 3.0-8.0 MHz; Start-up time: 16K CK + 65 ms'
+        name: EXTXOSC_3MHZ_8MHZ_16KCK_65MS
+        value: 61
+      - caption: 'Ext. Crystal Osc. 8.0-    MHz; Start-up time: 258 CK + 4.1 ms'
+        name: EXTXOSC_8MHZ_XX_258CK_4MS1
+        value: 14
+      - caption: 'Ext. Crystal Osc. 8.0-    MHz; Start-up time: 258 CK + 65 ms'
+        name: EXTXOSC_8MHZ_XX_258CK_65MS
+        value: 30
+      - caption: 'Ext. Crystal Osc. 8.0-    MHz; Start-up time: 1K CK + 0 ms'
+        name: EXTXOSC_8MHZ_XX_1KCK_0MS
+        value: 46
+      - caption: 'Ext. Crystal Osc. 8.0-    MHz; Start-up time: 1K CK + 4.1 ms'
+        name: EXTXOSC_8MHZ_XX_1KCK_4MS1
+        value: 62
+      - caption: 'Ext. Crystal Osc. 8.0-    MHz; Start-up time: 1K CK + 65 ms'
+        name: EXTXOSC_8MHZ_XX_1KCK_65MS
+        value: 15
+      - caption: 'Ext. Crystal Osc. 8.0-    MHz; Start-up time: 16K CK + 0 ms'
+        name: EXTXOSC_8MHZ_XX_16KCK_0MS
+        value: 31
+      - caption: 'Ext. Crystal Osc. 8.0-    MHz; Start-up time: 16K CK + 4.1 ms'
+        name: EXTXOSC_8MHZ_XX_16KCK_4MS1
+        value: 47
+      - caption: 'Ext. Crystal Osc. 8.0-    MHz; Start-up time: 16K CK + 65 ms'
+        name: EXTXOSC_8MHZ_XX_16KCK_65MS
+        value: 63
+  WDTON:
+    mask: 16
+    name: WDTON
+    reg: h
+fuses:
+  - BODLEVEL
+  - HWBE
+  - OCDEN
+  - JTAGEN
+  - SPIEN
+  - WDTON
+  - EESAVE
+  - BOOTSZ
+  - BOOTRST
+  - CKDIV8
+  - CKOUT
+  - SUT_CKSEL
+reginfos:
+  - default: 243
+    mask: 15
+    name: e
+  - default: 155
+    mask: 255
+    name: h
+  - default: 94
+    mask: 255
+    name: l

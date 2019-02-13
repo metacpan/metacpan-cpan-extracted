@@ -9,7 +9,7 @@ use Time::HiRes qw(gettimeofday tv_interval);
 
 use constant CALLER => $ENV{DEVEL_MOJOPROF_CALLER} // 1;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # Required for "perl -d:MojoProf ..."
 DB->can('DB') or *DB::DB = sub { };

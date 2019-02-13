@@ -51,3 +51,6 @@ eval { unlink $confFiles->[1]; rmdir 't/sessions'; };
 
 done_testing( count() );
 
+# Remove sessions directory
+`rm -rf t/sessions`;
+

@@ -1,0 +1,12 @@
+NAME
+
+    App::AVR::Fuses - support module for avr-fuses
+
+DESCRIPTION
+
+    This module contains the support code for the avr-fuses command.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

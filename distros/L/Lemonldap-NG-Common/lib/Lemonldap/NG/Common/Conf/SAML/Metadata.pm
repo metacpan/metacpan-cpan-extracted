@@ -6,116 +6,29 @@
 package Lemonldap::NG::Common::Conf::SAML::Metadata;
 
 use strict;
-use utf8;
-use warnings;
+use Mouse;
 use Crypt::OpenSSL::RSA;
 use Crypt::OpenSSL::X509;
-use Data::Dumper;
 use HTML::Template;
 use MIME::Base64;
-use XML::Simple;
 use Safe;
 use Encode;
 
-our $VERSION = '1.9.1';
+our $VERSION = '2.0.0';
 
-## @cmethod Lemonldap::NG::Common::Conf::SAML::Metadata new(hashRef args)
-# Class constructor.
-# @param args hash reference
-# @return Lemonldap::NG::Common::Conf::SAML::Metadata object
-sub new {
-    my $class = shift;
-    my $self = bless {}, $class;
-    if ( ref( $_[0] ) ) {
-        %$self = %{ $_[0] };
-    }
-    elsif ( (@_) && $#_ % 2 == 1 ) {
-        %$self = @_;
-    }
-    return $self;
-}
-
-## @method public boolean initiliazeFromConf(string s)
-# Initialize this object from configuration string.
-# @param $s Configuration string.
-# @return boolean
-sub initializeFromConf {
-    my $self   = shift;
-    my $string = shift;
-
-    $string =~ s/&#39;/'/g;
-    my $data = eval $string;
-
-    return $self->initializeFromConfHash($data);
-}
-
-## @method public boolean initiliazeFromConfHash(hash h)
-# Initialize this object from configuration hash element.
-# @param $h Configuration hash element.
-# @return boolean
-sub initializeFromConfHash {
-    my $self = shift;
-    my $hash = shift;
-
-    return 0 unless $hash;
-
-    foreach my $k ( keys %$hash ) {
-        $self->{$k} = $hash->{$k};
-    }
-
-    return 1;
-}
-
-## @method public boolean initializeFromFile(string file)
-# Initialize this object from XML file.
-# @param $file Filename
-# @return boolean
-sub initializeFromFile {
-    my $self = shift;
-    my $file = shift;
-    my $xml  = $self->_loadFile($file);
-    if ( !$xml ) {
-        return 0;
-    }
-    return $self->initializeFromXML($xml);
-}
-
-## @method public boolean initializeFromXML(string string)
-# Initialize this object from configuration XML string.
-# @param $string Configuration XML string.
-# @return boolean
-sub initializeFromXML {
-    my $self   = shift;
-    my $string = shift;
-
-    # Remove spaces
-    $string =~ s/[\n\r\s]+/ /g;
-    $string =~ s/> </></g;
-
-    # New XML::Simple object
-    my $xs = XML::Simple->new( ForceContent => 1, ForceArray => 1 );
-    my $data = $xs->XMLin($string);
-
-    # Store data in Metadata object
-    if ($data) {
-        foreach my $k ( keys %{$data} ) {
-            $self->{$k} = $data->{$k};
-        }
-        return 1;
-    }
-    return 0;
-
-}
+my $dataStart = tell(DATA);
 
 ## @method public string serviceToXML
 # Return all SAML parameters in well formated XML format, corresponding to
 # SAML 2 description.
 # @return string
 sub serviceToXML {
-    my ( $self, $file, $conf ) = @_;
+    my ( $self, $conf ) = @_;
 
+    seek DATA, $dataStart, 0;
+    my $s = join '', <DATA>;
     my $template = HTML::Template->new(
-        filename          => "$file",
+        scalarref         => \$s,
         die_on_bad_params => 0,
         cache             => 0,
     );
@@ -215,7 +128,6 @@ sub serviceToXML {
       samlIDPSSODescriptorSingleSignOnServiceHTTPRedirect
       samlIDPSSODescriptorSingleSignOnServiceHTTPPost
       samlIDPSSODescriptorSingleSignOnServiceHTTPArtifact
-      samlIDPSSODescriptorSingleSignOnServiceSOAP
       samlIDPSSODescriptorSingleLogoutServiceHTTPRedirect
       samlIDPSSODescriptorSingleLogoutServiceHTTPPost
       samlIDPSSODescriptorSingleLogoutServiceSOAP
@@ -251,157 +163,6 @@ sub serviceToXML {
     return $template->output;
 }
 
-## @method public string toXML
-# Return this object in XML format.
-# @return string
-sub toXML {
-    my $self = shift;
-
-    # Use XML::Simple to Dump Perl Hash in XML format
-    my $xs = XML::Simple->new( RootName => "md:EntityDescriptor" );
-
-    # Force xmlns:md key
-    $self->{"xmlns:md"} = "urn:oasis:names:tc:SAML:2.0:metadata"
-      unless defined $self->{"xmlns:md"};
-
-    # Serialize XML
-    my $xml = $xs->XMLout($self);
-
-    # Force UTF-8 encoding
-    my $xml_utf8 = encode( "utf8", $xml );
-
-    # XML schema requires Exponent after Modulus in KeyInfo
-    $xml_utf8 =~
-s#<Exponent>(.+)</Exponent>\s*<Modulus>(.+)</Modulus>#<Modulus>$2</Modulus>\n<Exponent>$1</Exponent>#mg;
-
-    return $xml_utf8;
-}
-
-## @method public string toConf ()
-# Return this object in configuration string format.
-# @return string
-sub toConf {
-    my $self   = shift;
-    my $fields = $self->toHash();
-    local $Data::Dumper::Indent  = 0;
-    local $Data::Dumper::Varname = "data";
-    my $data = Dumper($fields);
-    $data =~ s/^\s*(.*?)\s*$/$1/;
-    $data =~ s/'/&#39;/g;
-    $data =~ s/^\$data[0-9]*\s*=\s*(\{?\s*.+\s*\}?)/$1/g;
-    return $data;
-}
-
-## @method public string toHash ()
-# Return this object in configuration hash format.
-# @return hashref
-sub toHash {
-    my $self   = shift;
-    my $fields = ();
-    foreach ( keys %$self ) {
-        $fields->{$_} = $self->{$_};
-    }
-    return $fields;
-}
-
-## @method public hashref toStruct ()
-# Return this object to be display into the Manager.
-# NOT USED FOR THE MOMENT.
-# @return hashref
-sub toStruct {
-    my $self   = shift;
-    my $struct = ();
-    foreach ( keys %$self ) {
-        $struct->{$_} = $self->{$_};
-    }
-    return $self->_toStruct( '', $struct );
-}
-
-## @method private hashref _toStruct (string path, hashref node)
-# Return a preformated structure to be stored into Manager structure.
-# NOT USED FOR THE MOMENT.
-# @param $path The path of the node.
-# @param $node The current node into the hashref tree.
-# @return hashref A structure to be inserted into Manager structure.
-sub _toStruct {
-    my $self = shift;
-    my $path = shift;
-    my $node = shift;
-    if ( ref $node ) {
-        my $struct = {
-            _nodes => [],
-            _help  => 'default'
-        };
-        my @nodes = ();
-        my $tmpnode;
-        if ( ref $node eq 'ARRAY' ) {
-
-            # More than one value for the same key
-            # Build a hash with indices
-            my $i = 0;
-            foreach (@$node) {
-                $tmpnode->{$i} = $node->[$i];
-            }
-        }
-        else {
-            $tmpnode = $node;
-        }
-        foreach ( keys %$tmpnode ) {
-
-            if ( $_ =~ /^xmlns/ ) {
-                next;
-            }
-            my $key = $path . ' ' . $_;
-            $key =~ s/^ +//g;
-            my $data;
-
-            $data = $self->_toStruct( $key, $tmpnode->{$_} );
-            if ($data) {
-                $struct->{$key} = $data;
-                push @nodes, 'n:' . $key;
-            }
-            else {
-                $struct->{$key} = 'text:/' . $_;
-                push @nodes, $key;
-            }
-        }
-        $struct->{_nodes} = \@nodes;
-        return $struct;
-    }
-    return 0;
-}
-
-## @method public static boolean load(array files)
-# Return an array of Metadata object.
-# @param @files Array of filenames
-# @return array of Metadata objects
-sub load {
-    my @files     = @_;
-    my @metadatas = ();
-    foreach (@files) {
-        my $metadata = new Lemonldap::NG::Common::Conf::SAML::Metadata();
-        if ( $metadata->initializeFromFile($_) ) {
-            push @metadatas, $metadata;
-        }
-    }
-    return @metadatas;
-}
-
-## @method private hashref _loadFile(string file)
-# Load XML file as a XML string.
-# @param $file Filename
-# @return string
-sub _loadFile {
-    my $self = shift;
-    my $file = shift;
-    local $/ = undef;
-    open FILE, $file
-      or die "Couldn't open file: $!";
-    my $string = <FILE>;
-    close FILE;
-    return $string;
-}
-
 #@method string getValue(string key, hashref conf)
 # Get the value for a metadata configuration key
 # Replace #PORTAL# macro
@@ -427,4 +188,151 @@ sub getValue {
 }
 
 1;
+__DATA__
+<?xml version="1.0"?>
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    entityID="<TMPL_VAR NAME="samlEntityID">">
+
+  <IDPSSODescriptor
+      WantAuthnRequestsSigned="<TMPL_VAR NAME="samlIDPSSODescriptorWantAuthnRequestsSigned">"
+      protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <TMPL_VAR NAME="samlServicePublicKeySig">
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <KeyDescriptor use="encryption">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <TMPL_VAR NAME="samlServicePublicKeyEnc">
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService
+      isDefault="<TMPL_VAR NAME="samlIDPSSODescriptorArtifactResolutionServiceArtifactDefault">"
+      index="<TMPL_VAR NAME="samlIDPSSODescriptorArtifactResolutionServiceArtifactIndex">"
+      Binding="<TMPL_VAR NAME="samlIDPSSODescriptorArtifactResolutionServiceArtifactBinding">"
+      Location="<TMPL_VAR NAME="samlIDPSSODescriptorArtifactResolutionServiceArtifactLocation">" />
+    <SingleLogoutService
+      Binding="<TMPL_VAR NAME="samlIDPSSODescriptorSingleLogoutServiceSOAPBinding">"
+      Location="<TMPL_VAR NAME="samlIDPSSODescriptorSingleLogoutServiceSOAPLocation">" />
+    <SingleLogoutService
+      Binding="<TMPL_VAR NAME="samlIDPSSODescriptorSingleLogoutServiceHTTPRedirectBinding">"
+      Location="<TMPL_VAR NAME="samlIDPSSODescriptorSingleLogoutServiceHTTPRedirectLocation">"
+      <TMPL_IF NAME="samlIDPSSODescriptorSingleLogoutServiceHTTPRedirectResponseLocation">
+      ResponseLocation="<TMPL_VAR NAME="samlIDPSSODescriptorSingleLogoutServiceHTTPRedirectResponseLocation">"
+      </TMPL_IF>/>
+    <SingleLogoutService
+      Binding="<TMPL_VAR NAME="samlIDPSSODescriptorSingleLogoutServiceHTTPPostBinding">"
+      Location="<TMPL_VAR NAME="samlIDPSSODescriptorSingleLogoutServiceHTTPPostLocation">"
+      <TMPL_IF NAME="samlIDPSSODescriptorSingleLogoutServiceHTTPPostResponseLocation">
+      ResponseLocation="<TMPL_VAR NAME="samlIDPSSODescriptorSingleLogoutServiceHTTPPostResponseLocation">"
+      </TMPL_IF>/>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <SingleSignOnService
+      Binding="<TMPL_VAR NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPRedirectBinding">"
+      Location="<TMPL_VAR NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPRedirectLocation">"
+      <TMPL_IF NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPRedirectResponseLocation">
+      ResponseLocation="<TMPL_VAR NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPRedirectResponseLocation">"
+      </TMPL_IF>/>
+    <SingleSignOnService
+      Binding="<TMPL_VAR NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPPostBinding">"
+      Location="<TMPL_VAR NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPPostLocation">"
+      <TMPL_IF NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPPostResponseLocation">
+      ResponseLocation="<TMPL_VAR NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPPostResponseLocation">"
+      </TMPL_IF>/>
+    <SingleSignOnService
+      Binding="<TMPL_VAR NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPArtifactBinding">"
+      Location="<TMPL_VAR NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPArtifactLocation">"
+      <TMPL_IF NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPArtifactResponseLocation">
+      ResponseLocation="<TMPL_VAR NAME="samlIDPSSODescriptorSingleSignOnServiceHTTPArtifactResponseLocation">"
+      </TMPL_IF>/>
+  </IDPSSODescriptor>
+
+  <SPSSODescriptor
+      AuthnRequestsSigned="<TMPL_VAR NAME="samlSPSSODescriptorAuthnRequestsSigned">"
+      WantAssertionsSigned="<TMPL_VAR NAME="samlSPSSODescriptorWantAssertionsSigned">"
+      protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <TMPL_VAR NAME="samlServicePublicKeySig">
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <KeyDescriptor use="encryption">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <TMPL_VAR NAME="samlServicePublicKeyEnc">
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService
+      isDefault="<TMPL_VAR NAME="samlSPSSODescriptorArtifactResolutionServiceArtifactDefault">"
+      index="<TMPL_VAR NAME="samlSPSSODescriptorArtifactResolutionServiceArtifactIndex">"
+      Binding="<TMPL_VAR NAME="samlSPSSODescriptorArtifactResolutionServiceArtifactBinding">"
+      Location="<TMPL_VAR NAME="samlSPSSODescriptorArtifactResolutionServiceArtifactLocation">" />
+    <SingleLogoutService
+      Binding="<TMPL_VAR NAME="samlSPSSODescriptorSingleLogoutServiceSOAPBinding">"
+      Location="<TMPL_VAR NAME="samlSPSSODescriptorSingleLogoutServiceSOAPLocation">" />
+    <SingleLogoutService
+      Binding="<TMPL_VAR NAME="samlSPSSODescriptorSingleLogoutServiceHTTPRedirectBinding">"
+      Location="<TMPL_VAR NAME="samlSPSSODescriptorSingleLogoutServiceHTTPRedirectLocation">"
+      <TMPL_IF NAME="samlSPSSODescriptorSingleLogoutServiceHTTPRedirectResponseLocation">
+      ResponseLocation="<TMPL_VAR NAME="samlSPSSODescriptorSingleLogoutServiceHTTPRedirectResponseLocation">"
+      </TMPL_IF>/>
+    <SingleLogoutService
+      Binding="<TMPL_VAR NAME="samlSPSSODescriptorSingleLogoutServiceHTTPPostBinding">"
+      Location="<TMPL_VAR NAME="samlSPSSODescriptorSingleLogoutServiceHTTPPostLocation">"
+      <TMPL_IF NAME="samlSPSSODescriptorSingleLogoutServiceHTTPPostResponseLocation">
+      ResponseLocation="<TMPL_VAR NAME="samlSPSSODescriptorSingleLogoutServiceHTTPPostResponseLocation">"
+      </TMPL_IF>/>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <AssertionConsumerService
+      isDefault="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPArtifactDefault">"
+      index="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPArtifactIndex">"
+      Binding="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPArtifactBinding">"
+      Location="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPArtifactLocation">" />
+    <AssertionConsumerService
+      isDefault="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPPostDefault">"
+      index="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPPostIndex">"
+      Binding="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPPostBinding">"
+      Location="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPPostLocation">" />
+  </SPSSODescriptor>
+
+  <AttributeAuthorityDescriptor
+    protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <TMPL_VAR NAME="samlServicePublicKeySig">
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <KeyDescriptor use="encryption">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <TMPL_VAR NAME="samlServicePublicKeyEnc">
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AttributeService
+      Binding="<TMPL_VAR NAME="samlAttributeAuthorityDescriptorAttributeServiceSOAPBinding">"
+      Location="<TMPL_VAR NAME="samlAttributeAuthorityDescriptorAttributeServiceSOAPLocation">"/>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+  </AttributeAuthorityDescriptor>
+  
+  <Organization>
+    <OrganizationName xml:lang="en"><TMPL_VAR NAME="samlOrganizationName"></OrganizationName>
+    <OrganizationDisplayName xml:lang="en"><TMPL_VAR NAME="samlOrganizationDisplayName"></OrganizationDisplayName>
+    <OrganizationURL xml:lang="en"><TMPL_VAR NAME="samlOrganizationURL"></OrganizationURL>
+  </Organization>
+</EntityDescriptor>
 

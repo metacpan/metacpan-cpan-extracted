@@ -33,7 +33,7 @@
               <li ng-include="'languages.html'"/>
               <li role="separator" class="divider"></li>
               <li class="dropdown-header"><span ng-bind="translate('version')"></span></li>
-              <li><a name="version"><TMPL_VAR NAME="VERSION"></a></li>
+              <li><a href="https://lemonldap-ng.org/team" name="version"><TMPL_VAR NAME="VERSION"></a></li>
             </ul>
           </li>
         </ul>

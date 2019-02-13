@@ -11,6 +11,7 @@ include: file://__SCHEMA_DIR__/core.ldif
 include: file://__SCHEMA_DIR__/cosine.ldif
 include: file://__SCHEMA_DIR__/nis.ldif
 include: file://__SCHEMA_DIR__/inetorgperson.ldif
+include: file://__SCHEMA_DIR__/ppolicy.ldif
 
 dn: olcDatabase=frontend,cn=config
 objectClass: olcDatabaseConfig
@@ -26,14 +27,27 @@ objectClass: olcModuleList
 cn: module
 olcModulePath: /usr/lib/ldap
 olcModuleLoad: back_mdb
+olcModuleLoad: back_monitor
+olcModuleLoad: ppolicy
 
-dn: olcDatabase=mdb,cn=config
+dn: olcDatabase={1}mdb,cn=config
 objectClass: olcDatabaseConfig
 objectClass: olcMdbConfig
-olcDatabase: mdb
+olcDatabase: {1}mdb
 olcSuffix: dc=example,dc=com
 olcDbDirectory: t/testslapd/data
 olcRootDN: cn=admin,dc=example,dc=com
 olcRootPW: admin
 olcAccess: to * by * write
 
+dn: olcOverlay={0}ppolicy,olcDatabase={1}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcPPolicyConfig
+olcOverlay: {0}ppolicy
+olcPPolicyHashCleartext: TRUE
+olcPPolicyUseLockout: TRUE
+olcPPolicyForwardUpdates: FALSE
+
+dn: olcDatabase={2}monitor,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {2}monitor

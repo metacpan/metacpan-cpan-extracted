@@ -2,10 +2,16 @@ package Lemonldap::NG::Portal::Auth::LDAP;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants
-  qw(PE_OK PE_LDAPCONNECTFAILED PE_PP_CHANGE_AFTER_RESET PE_PP_PASSWORD_EXPIRED);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_DONE
+  PE_ERROR
+  PE_LDAPCONNECTFAILED
+  PE_PP_CHANGE_AFTER_RESET
+  PE_PP_PASSWORD_EXPIRED
+);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 # Inheritance: UserDB::LDAP provides all needed ldap functions
 extends
@@ -16,6 +22,14 @@ sub init {
     return (  $self->Lemonldap::NG::Portal::Auth::_WebForm::init
           and $self->Lemonldap::NG::Portal::Lib::LDAP::init );
 }
+
+has authnLevel => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{ldapAuthnLevel};
+    }
+);
 
 # RUNNING METHODS
 
@@ -33,17 +47,32 @@ sub authenticate {
         }
     }
 
+    unless ( $req->data->{password} ) {
+        $self->p->{user} = $req->userData->{_dn} = $req->data->{dn};
+        unless($self->p->{_passwordDB}) {
+            $self->logger->error('No password database configured, aborting');
+            return PE_ERROR;
+        }
+        my $res = $self->p->{_passwordDB}->_modifyPassword( $req, 1 );
+
+        # Security: never create session here
+        return $res || PE_DONE;
+    }
     my $res =
       $self->userBind( $req, $req->data->{dn},
         password => $req->data->{password} );
 
     # Remember password if password reset needed
-    $req->data->{oldpassword} = $self->{password}
-      if (
+    if (
         $res == PE_PP_CHANGE_AFTER_RESET
         or (    $res == PE_PP_PASSWORD_EXPIRED
             and $self->conf->{ldapAllowResetExpiredPassword} )
-      );
+      )
+    {
+        $req->data->{oldpassword} = $self->{password};
+        $req->data->{noerror}     = 1;
+        $self->setSecurity($req);
+    }
 
     return $res;
 

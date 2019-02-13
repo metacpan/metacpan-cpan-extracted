@@ -11,13 +11,17 @@
     </TMPL_IF>
     <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
 
+    <TMPL_IF NAME="TOKEN">
+      <input type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
+    </TMPL_IF>
+
     <TMPL_IF NAME="LOGIN">
     <div class="input-group mb-3">
       <input name="user" type="hidden" value="<TMPL_VAR NAME=LOGIN>" />
       <div class="input-group-prepend">
         <span class="input-group-text"><i class="fa fa-user"></i></span>
       </div>
-      <p class="form-control-static"><TMPL_VAR NAME=LOGIN></p>
+      <input id="staticUser" type="text" readonly class="form-control" value="<TMPL_VAR NAME=LOGIN>" />
     </div>
     </TMPL_IF>
 
@@ -30,7 +34,7 @@
           <div class="input-group-prepend">
             <span class="input-group-text"><i class="fa fa-lock"></i></span>
           </div>
-          <input id="oldpassword" name="oldpassword" type="password" value="<TMPL_VAR NAME=OLDPASSWORD>" class="form-control" trplaceholder="currentPwd" required/ aria-required="true">
+          <input id="oldpassword" name="oldpassword" type="password" value="<TMPL_VAR NAME=OLDPASSWORD>" class="form-control" trplaceholder="currentPwd" required aria-required="true">
         </div>
       </TMPL_IF>
 

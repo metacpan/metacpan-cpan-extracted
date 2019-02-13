@@ -5,15 +5,15 @@
   <div class="panel-body">
     <div class="input-group-solid" role="radiogroup">
       <label class="radio-inline">
-        <input id="bopeOn" type="radio" value="1" name="bope" ng-model="currentNode.data" aria-labelledby="onl" role="radio"/>
+        <input id="bopeOn" type="radio" ng-value="1" name="bope" ng-model="currentNode.data" aria-labelledby="onl" role="radio"/>
         <label id="onl" for="bopeOn" trspan="on"></label>
       </label>
       <label class="radio-inline">
-        <input id="bopeOff" type="radio" value="0" name="bope" ng-model="currentNode.data" aria-labelledby="offl" role="radio"/>
+        <input id="bopeOff" type="radio" ng-value="0" name="bope" ng-model="currentNode.data" aria-labelledby="offl" role="radio"/>
         <label id="offl" for="bopeOff" trspan="off"></label>
       </label>
       <label class="radio-inline">
-        <input id="bopeExpr" type="radio" value="-1" name="bope" ng-click="currentNode.data=''" ng-checked="currentNode.data!==0&&currentNode.data!=='0'&&currentNode.data!==1&&currentNode.data!=='1'" aria-labelledby="rulel" role="radio"/>
+        <input id="bopeExpr" type="radio" ng-value="-1" name="bope" ng-click="currentNode.data=''" ng-checked="currentNode.data!==0&&currentNode.data!=='0'&&currentNode.data!=1&&currentNode.data!=='1'" aria-labelledby="rulel" role="radio"/>
         <label id="rulel" for="bopeExpr" trspan="specialRule"></label>
       </label>
     </div>

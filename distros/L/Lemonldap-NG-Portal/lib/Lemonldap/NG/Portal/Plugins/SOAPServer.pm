@@ -222,8 +222,7 @@ sub getCookies {
 
     # Launch process
     else {
-        $req->steps(
-            [
+        $req->steps( [
                 qw(getUser authenticate setAuthSessionInfo),
                 @{ $self->p->betweenAuthAndData },
                 $self->p->sessionData,
@@ -290,8 +289,7 @@ sub getAttributes {
           SOAP::Data->name(
             attributes => _buildSoapHash(
                 $session->data,
-                (
-                    (
+                ( (
                               $session->{_session_kind}
                           and $session->{_session_kind} eq 'SSO'
                     )

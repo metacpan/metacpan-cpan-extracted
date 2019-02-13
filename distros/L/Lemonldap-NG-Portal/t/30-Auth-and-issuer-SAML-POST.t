@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 16;
+my $maintests = 21;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -73,7 +73,51 @@ SKIP: {
     expectOK($res);
     my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
-    # Try to authenticate to IdP
+    # Try to authenticate with an unauthorized user to IdP
+    $s = "user=dwho&password=dwho&$s";
+    ok(
+        $res = $issuer->_post(
+            $url,
+            IO::String->new($s),
+            accept => 'text/html',
+            cookie => $pdata,
+            length => length($s),
+        ),
+        'Post authentication'
+    );
+    ok( $res->[2]->[0] =~ /trmsg="89"/, 'Reject reason is 89' )
+        or print STDERR Dumper( $res->[2]->[0] );
+    # Simple SP access
+    ok(
+        $res = $sp->_get(
+            '/', accept => 'text/html',
+        ),
+        'Unauth SP request'
+    );
+    expectOK($res);
+    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
+      or explain(
+        $res->[1],
+'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
+      );
+    ( $host, $url, $s ) =
+      expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
+        'SAMLRequest' );
+
+    # Push SAML request to IdP
+    ok(
+        $res = $issuer->_post(
+            $url,
+            IO::String->new($s),
+            accept => 'text/html',
+            length => length($s)
+        ),
+        'Post SAML request to IdP'
+    );
+    expectOK($res);
+    $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+
+    # Try to authenticate with an authorized user to IdP
     $s = "user=french&password=french&$s";
     ok(
         $res = $issuer->_post(
@@ -197,8 +241,7 @@ sub switch {
 }
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -206,6 +249,7 @@ sub issuer {
                 authentication         => 'Demo',
                 userDB                 => 'Same',
                 issuerDBSAMLActivation => 1,
+                issuerDBSAMLRule       => '$uid eq "french"',
                 samlSPMetaDataOptions  => {
                     'sp.com' => {
                         samlSPMetaDataOptionsEncryptionMode           => 'none',
@@ -314,8 +358,7 @@ ywIDAQAB
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

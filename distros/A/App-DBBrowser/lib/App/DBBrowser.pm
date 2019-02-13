@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.060';
+our $VERSION = '2.061';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -600,28 +600,21 @@ sub __create_drop_or_attach {
         if ( $choice eq $create_table || $choice eq $drop_table ) {
             require App::DBBrowser::CreateTable;
             my $ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $changed;
             if ( $choice eq $create_table ) {
-                if ( ! eval { $changed = $ct->create_new_table(); 1 } ) {
+                if ( ! eval { $ct->create_new_table(); 1 } ) {
                     $ax->print_error_message( $@, 'Create Table' );
-                    next HIDDEN;
                 }
             }
             elsif ( $choice eq $drop_table ) {
-                if ( ! eval { $changed = $ct->delete_table(); 1 } ) {
+                if ( ! eval { $ct->delete_table(); 1 } ) {
                     $ax->print_error_message( $@, 'Drop Table' );
-                    next HIDDEN;
                 }
             }
-            if ( ! $changed ) {
-                next HIDDEN;
-            }
-            else {
-                $sf->{old_idx_hidden} = $old_idx;
-                $sf->{redo_schema} = $sf->{d}{schema};
-                $sf->{redo_table} = $table;
-                return;
-            }
+            $sf->{old_idx_hidden} = $old_idx;
+            $sf->{redo_db}     = $sf->{d}{db};
+            $sf->{redo_schema} = $sf->{d}{schema};
+            $sf->{redo_table} = $table;
+            return;
         }
         elsif ( $choice eq $attach_databases || $choice eq $detach_databases ) {
             require App::DBBrowser::AttachDB;
@@ -698,7 +691,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.060
+Version 2.061
 
 =head1 DESCRIPTION
 

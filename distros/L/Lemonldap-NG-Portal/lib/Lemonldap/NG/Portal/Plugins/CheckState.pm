@@ -47,8 +47,7 @@ sub check {
         # Not launched methods:
         #  - "extractFormInfo" due to "token"
         #  - "buildCookie" useless here
-        $req->steps(
-            [
+        $req->steps( [
                 'getUser',
                 'authenticate',
                 @{ $self->p->betweenAuthAndData },

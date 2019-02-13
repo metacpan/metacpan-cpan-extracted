@@ -2,7 +2,10 @@ use Test::More;
 use strict;
 use IO::String;
 
-require 't/test-lib.pm';
+BEGIN {
+    require 't/test-lib.pm';
+    eval "use GSSAPI";
+}
 
 my $res;
 my $maintests = 2;
@@ -13,8 +16,7 @@ SKIP: {
     if ($@) {
         skip 'GSSAPI not found', $maintests;
     }
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel       => 'error',
                 useSafeJail    => 1,

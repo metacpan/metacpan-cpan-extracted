@@ -24,11 +24,32 @@ ok( $res->[0] == 200, "Result code is 200" );
 ok( $resBody = from_json( $res->[2]->[0] ), "Result body contains JSON text" );
 ok( $resBody->{result} == 1, "JSON response contains \"result:1\"" )
   or print STDERR Dumper($resBody);
-ok( -f $confFiles->[1], 'File is created' );
+ok(
+    @{ $resBody->{details}->{__warnings__} } == 2,
+    'JSON response contains 2 warnings'
+) or print STDERR Dumper($resBody);
 
+foreach my $i ( 0 .. 1 ) {
+    ok(
+        $resBody->{details}->{__warnings__}->[$i]->{message} =~
+          /\b(unprotected|cross-domain-authentication)\b/,
+        "Warning with 'unprotect', 'CDA' or 'retries' found"
+    ) or print STDERR Dumper($resBody);
+}
+
+ok(
+    @{ $resBody->{details}->{__changes__} } == 20,
+    'JSON response contains 24 changes'
+) or print STDERR Dumper($resBody);
+
+#print STDERR Dumper($resBody);
+
+ok( -f $confFiles->[1], 'File is created' );
+count(4);
 my @changes = @{&changes};
 my @cmsg    = @{ $resBody->{details}->{__changes__} };
 my $bug;
+
 while ( my $c = shift @{ $resBody->{details}->{__changes__} } ) {
     my $cmp1 = @changes;
     my $cmp2 = @cmsg;
@@ -78,12 +99,15 @@ ok( @c2 == 14, '14 keys changed or created in conf 2' )
 count(5);
 
 unlink $confFiles->[1];
-eval { rmdir 't/sessions'; };
+
+#eval { rmdir 't/sessions'; };
 done_testing( count() );
 
+# Remove sessions directory
+`rm -rf t/sessions`;
+
 sub changes {
-    return [
-        {
+    return [ {
             'key' => 'portal',
             'new' => 'http://auth2.example.com/',
             'old' => 'http://auth.example.com/'

@@ -10,26 +10,24 @@ BEGIN { use_ok('Lemonldap::NG::Common::Conf') }
 
 #########################
 
-# Insert your test code below, the Test::More module is use()ed here so read
+# Insert your test code below, the Test::More module is used here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
 my $h;
 my $inifile     = "lemonldap-ng.ini";
 my $confsection = "configuration";
 
-ok(
-    (
+ok( (
         Lemonldap::NG::Common::Conf->new( type => 'bad' ) == 0
           and $Lemonldap::NG::Common::Conf::msg =~
-          /Error: Unknown package Lemonldap::NG::Common::Conf::bad\.$/
+          /Error: Unknown package Lemonldap::NG::Common::Conf::Backends::bad\.$/
     ),
     'Bad module'
-);
+) or print STDERR "Msg: $Lemonldap::NG::Common::Conf::msg\n";
 
 $h = bless {}, 'Lemonldap::NG::Common::Conf';
 
-ok(
-    (
+ok( (
         %$h = ( %$h, %{ $h->getLocalConf( $confsection, $inifile, 0 ) } )
           and exists $h->{localStorage}
     ),

@@ -2,9 +2,11 @@ package Devel::Probe;
 use strict;
 use warnings;
 
+use Storable qw(dclone);
 use XSLoader;
+use Carp qw(croak);
 
-our $VERSION = '0.000004';
+our $VERSION = '0.000005';
 XSLoader::load( 'Devel::Probe', $VERSION );
 
 sub import {
@@ -12,13 +14,11 @@ sub import {
     Devel::Probe::install();
 }
 
-my @probe_type_names = (
-    'none',
-    'once',
-    'permanent',
-);
-my %probe_type_name_to_type = map { $probe_type_names[$_] => $_ }
-                              (0..scalar(@probe_type_names)-1);
+use constant {
+    NONE => 0,
+    ONCE => 1,
+    PERMANENT => 2,
+};
 
 sub config {
     my ($config) = @_;
@@ -35,10 +35,6 @@ sub config {
             Devel::Probe::disable();
             next;
         }
-        if ($action->{action} eq 'dump') {
-            Devel::Probe::dump();
-            next;
-        }
         if ($action->{action} eq 'clear') {
             Devel::Probe::clear();
             next;
@@ -47,14 +43,28 @@ sub config {
             my $file = $action->{file};
             next unless $file;
 
-            my $type_name = $action->{type} // 'once';
-            my $type = $probe_type_name_to_type{$type_name} // 1;
+            my $type = $action->{type} // ONCE;
+            my $args = $action->{args};
             foreach my $line (@{ $action->{lines} // [] }) {
-                Devel::Probe::add_probe($file, $line, $type);
+                add_probe($file, $line, $type, $args);
             }
             next;
         }
     }
+}
+
+sub add_probe {
+    my ($file, $line, $type, $args) = @_;
+    if ($type ne ONCE && $type ne PERMANENT) {
+        croak sprintf("'%s' is not a valid probe type: try Devel::Probe::ONCE|PERMANENT", $type);
+    }
+
+    my $probes = Devel::Probe::_internal_probe_state();
+    $probes->{$file}->{$line} = [$type, defined $args ? $args : ()];
+}
+
+sub dump {
+    return dclone(Devel::Probe::_internal_probe_state());
 }
 
 1;
@@ -70,7 +80,7 @@ Devel::Probe - Quick & dirty code probes for Perl
 
 =head1 VERSION
 
-Version 0.000004
+Version 0.000005
 
 =head1 SYNOPSIS
 
@@ -91,32 +101,51 @@ Version 0.000004
 Use this module to allow the possibility of creating probes for some lines in
 your code.
 
-The probing code is installed when you import the module, and it is disabled.
+The probing code is installed when you import the module, but it is disabled.
 In these conditions, the probe code is light enough that it should cause no
-impact at all in your CPU usage.
+impact at all in your CPU usage; an impact might be noticed when you enable the
+module and configure some probes, particularly depending on the frequency with
+which those probes will be triggered, and how heavy the trigger callback turns
+out to be.
 
-You can call C<trigger(\&coderef)> to specify a piece of Perl code that will be
-called for every probe that triggers.
+=head1 FUNCTIONS
 
-You can call C<config(\%config)> to specify a configuration for the module,
-including what lines in your code will cause probes to be triggered.  This call
-will always disable the module as a first action, so you always need to
-explicitly enable it again, either from the configuration itself or in a
-further call to C<enable()>.
+=over 4
 
-You can call C<add_probe(file, line, type)> to manually add a probe; this is
-what gets called from C<config()>.
+=item * C<trigger(\&coderef)>
 
-You can call C<enable()> / C<disable()> to dynamically activate and deactivate
-probing.  You can check this status by calling C<is_enabled()>.
+Specify a piece of Perl code that will be called for every probe that triggers.
 
-You can call C<install()> / C<remove()> to install or remove the probe handling
-code.  You can check this status by calling C<is_installed()>.  When you import
-the module, C<install()> is called automatically for you.
+=item * C<config(\%config)>
 
-You can call C<clear()> to remove all probes.
+Specify a configuration for the module, including what lines in your code will
+cause probes to be triggered.  This call will always disable the module as a
+first action, so you always need to explicitly enable it again, either from the
+configuration itself or in a further call to C<enable()>.
 
-You can call C<dump()> to print all probes to stderr.
+=item * C<add_probe(file, line, type)>
+
+Manually add a probe.  This is what gets called from C<config()> when adding
+probes; please see the CONFIGURATION example for more information.
+
+=item * C<enable()> / C<disable()>  / C<is_enabled()>
+
+Dynamically activate and deactivate probing, and check this status.
+
+=item * C<install()> / C<remove()> / C<is_installed()>
+
+Install or remove the probe handling code, and check this status.  When you
+import the module, C<install()> is called automatically for you.
+
+=item * C<clear()>
+
+Remove all probes.
+
+=item * C<dump()>
+
+Print all probes to stderr.
+
+=back
 
 =head1 CONFIGURATION
 
@@ -159,7 +188,8 @@ are:
 =over 4
 
 =item * C<once>: the probe will trigger once and then will be destroyed right
-after that.
+after that.  This default makes it more difficult to overwhelm your system with
+too much probing, unless you explicitly request a different type of probe.
 
 =item * C<permanent>: the probe will trigger every time that line of code is
 executed.
@@ -170,9 +200,13 @@ executed.
 
 =head1 EXAMPLE
 
-This will invoke the C<trigger> callback the first time line 21 executes, and
-take advantage of C<PadWalker> to dump the local variables.
+This will invoke the callback defined with the call to C<trigger()>, the first
+time line 21 executes, taking advantage of C<PadWalker> to dump the local
+variables.  After that first execution, that particular probe will not be
+triggered anymore.  For line 22, every time that line is executed the probe
+will be triggered.
 
+    # line 1 of s.pl
     use Data::Dumper qw(Dumper);
     use PadWalker qw(peek_my);
     use Devel::Probe;
@@ -184,29 +218,32 @@ take advantage of C<PadWalker> to dump the local variables.
 
     my %config = (
         actions => [
-            { action => 'define', # type is 'once' by default
-              file => 'probe my_cool_script.pl', lines => [ 13 ] },
+            { action => 'define', file => 's.pl', lines => [ 21 ] },
+            { action => 'define', file => 's.pl', type = 'permanent', lines => [ 22 ] },
         ],
     );
     Devel::Probe::config(\%config);
     Devel::Probe::enable();
     my $count;
     while (1) {
-        $count++;
-        my $something_inside_the_loop = $count * 2; # line 21
+        $count++;                                   # line 21
+        my $something_inside_the_loop = $count * 2; # line 22
         sleep 5;
     }
     Devel::Probe::disable();
 
 =head1 SUGGESTIONS
 
+For files found directly by the Perl interpreter, the file name in the probe
+definition will usually be a relative path name; for files that are found
+through the PERL5LIB environment variable, the file name in the probe
+definition will usually be a full path name.
+
 One typical use case would be to have a signal handler associated with a
 specific signal, which when triggered would disable the module, read the
 configuration from a given place, reconfigure the module accordingly and then
-enable it.
-
-Another use case could be a similar kind of control using remote endpoints to
-deal with reconfiguring, disabling and enabling the module.
+enable it.  Similarly, this kind of control can be implemented using remote
+endpoints to deal with reconfiguring, disabling and enabling the module.
 
 =head1 TODO
 

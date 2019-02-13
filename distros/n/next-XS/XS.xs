@@ -266,8 +266,8 @@ void method (SV* proto, ...) {
 }
 
 BOOT {
-    cv = newXS_deffile("super::AUTOLOAD", super_AUTOLOAD);
+    cv = newXS("super::AUTOLOAD", super_AUTOLOAD, __FILE__);
     XSANY.any_i32 = 0;
-    cv = newXS_deffile("super::maybe::AUTOLOAD", super_AUTOLOAD);
+    cv = newXS("super::maybe::AUTOLOAD", super_AUTOLOAD, __FILE__);
     XSANY.any_i32 = 1;
 }

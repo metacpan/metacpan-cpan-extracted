@@ -8,16 +8,17 @@ package Lemonldap::NG::Common::Safelib;
 use strict;
 use Encode;
 use MIME::Base64;
+use Lemonldap::NG::Common::IPv6;
 
 #use AutoLoader qw(AUTOLOAD);
 
-our $VERSION = '1.9.1';
+our $VERSION = '2.0.0';
 
 # Set here all the names of functions that must be available in Safe objects.
 # Not that only functions, not methods, can be written here
 our $functions =
   [
-    qw(&checkLogonHours &date &checkDate &basic &unicode2iso &iso2unicode &groupMatch)
+    qw(&checkLogonHours &date &checkDate &basic &unicode2iso &iso2unicode &groupMatch &isInNet6)
   ];
 
 ## @function boolean checkLogonHours(string logon_hours, string syntax, string time_correction, boolean default_access)
@@ -179,71 +180,11 @@ sub groupMatch {
     return $match;
 }
 
+sub isInNet6 {
+    my ( $ip, $net ) = @_;
+    $net =~ s#/(\d+)##;
+    my $bits = $1;
+    return net6( $ip, $bits ) eq net6( $net, $bits ) ? 1 : 0;
+}
+
 1;
-__END__
-
-=head1 NAME
-
-=encoding utf8
-
-Lemonldap::NG::Common::Safelib - Contains functions that are automatically
-imported in Lemonldap::NG Safe objects to be used in expressions like rules,
-macros,...
-
-=head1 SYNOPSIS
-
-Private module not documented.
-
-=head1 DESCRIPTION
-
-Private module not documented.
-
-=head1 SEE ALSO
-
-L<Lemonldap::NG::Manager>, L<Lemonldap::NG::Portal>, L<Lemonldap::NG::Handler>
-
-=head1 AUTHOR
-
-=over
-
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=back
-
-=head1 BUG REPORT
-
-Use OW2 system to report bug or ask for features:
-L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
-
-=head1 DOWNLOAD
-
-Lemonldap::NG is available at
-L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
-
-=head1 COPYRIGHT AND LICENSE
-
-=over
-
-=item Copyright (C) 2009-2010 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2009-2016 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
-
-This library is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see L<http://www.gnu.org/licenses/>.
-
-=cut
-

@@ -1,6 +1,6 @@
 # LLNG platform class for auto-protected PSGI
 #
-# See http://lemonldap-ng.org/documentation/latest/handlerarch
+# See https://lemonldap-ng.org/documentation/latest/handlerarch
 package Lemonldap::NG::Handler::PSGI;
 
 use 5.10.0;

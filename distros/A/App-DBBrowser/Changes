@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.061    2019-02-12
+        - Get data from file: update file search.
+        - Create table: option to drop the table if the insert failed.
+        - Code refactoring.
+
 2.060    2019-02-10
         - Use String::Unescape to unescape options for Text::CSV.
         - Bugfix subqueries: replaced '&&' with '||'.

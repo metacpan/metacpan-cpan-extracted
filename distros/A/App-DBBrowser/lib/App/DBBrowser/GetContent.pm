@@ -7,22 +7,20 @@ use 5.008003;
 
 use Cwd                   qw( realpath );
 use Encode                qw( encode decode );
-use File::Basename        qw( dirname basename );
+use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile );
 
-use List::MoreUtils   qw( all any first_index uniq );
-use Encode::Locale    qw();
-#use Spreadsheet::Read qw( ReadData rows ); # required
-#use String::Unescape  qw( unescape );      # required
-#use Text::CSV         qw();                # required
+use List::MoreUtils qw( all uniq );
+use Encode::Locale  qw();
 
 use Term::Choose            qw( choose );
 use Term::Choose::Constants qw( :screen );
-use Term::Choose::Util      qw( choose_a_file choose_a_subset choose_a_number insert_sep );
+use Term::Choose::Util      qw( choose_a_dir choose_a_number );
 use Term::Form              qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::GetContent::Filter;
+use App::DBBrowser::GetContent::ParseFile;
 use App::DBBrowser::Opt;
 
 use open ':encoding(locale)';
@@ -34,9 +32,9 @@ sub new {
         i => $info,
         o => $options,
         d => $data,
-        tmp_copy_paste => catfile( $info->{app_dir}, 'Copy_and_Paste_tmp_file.csv' ),
-        input_files    => catfile( $info->{app_dir}, 'file_history.json' )
+        data_dirs => catfile( $info->{app_dir}, 'file_history.json' )
     };
+    $sf->{i}{tmp_copy_paste} = catfile $info->{app_dir}, 'Copy_and_Paste_tmp_file.csv';
     bless $sf, $class;
 }
 
@@ -157,13 +155,67 @@ sub from_col_by_col {
 }
 
 
+sub __parse_settings_copy_paste {
+    my ( $sf, $i ) = @_;
+    my @tmp_str;
+    if ( $i == 0 ) {
+        @tmp_str = ( '  [Text::CSV]' );
+        push @tmp_str, '  field_sep  = ' . $sf->{o}{csv}{sep_char};
+        push @tmp_str, '  record_sep = ' . $sf->{o}{csv}{eol} if $sf->{o}{csv}{eol};
+    }
+    elsif ( $i == 1 ) {
+        @tmp_str = ( '  [split]' );
+        push @tmp_str, '  field_sep     = ' . $sf->{o}{split}{field_sep};
+        push @tmp_str, '  field_l_trim  = ' . $sf->{o}{split}{field_l_trim} if $sf->{o}{split}{field_l_trim};
+        push @tmp_str, '  field_r_trim  = ' . $sf->{o}{split}{field_r_trim} if $sf->{o}{split}{field_r_trim};
+        push @tmp_str, '  record_sep    = ' . $sf->{o}{split}{record_sep};
+        push @tmp_str, '  record_l_trim = ' . $sf->{o}{split}{record_l_trim} if $sf->{o}{split}{record_l_trim};
+        push @tmp_str, '  record_r_trim = ' . $sf->{o}{split}{record_r_trim} if $sf->{o}{split}{record_r_trim};
+    }
+    elsif ( $i == 2 ) {
+        @tmp_str = (
+            '  [Spreadsheet::Read]'
+        );
+    }
+    return join "\n", @tmp_str;
+}
+
 sub from_copy_and_paste {
     my ( $sf, $sql ) = @_;
     my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $pf = App::DBBrowser::GetContent::ParseFile->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $parse_mode_idx = $sf->{o}{insert}{copy_parse_mode};
+
+    SETTINGS: while ( 1 ) {
+        my @tmp_info = (
+            'Settings:',
+            $sf->__parse_settings_copy_paste( $parse_mode_idx ),
+            ' '
+        );
+        my ( $confirm, $change ) = ( '  Confirm', '  Change' );
+        # Choose
+        my $choice = choose(
+            [ undef, $confirm, $change ],
+            { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose: ', info => join( "\n", @tmp_info ), undef => '  <<' }
+        );
+        if ( ! defined $choice ) {
+            return;
+        }
+        elsif ( $choice eq $change ) {
+            my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
+            $opt->config_insert();
+            $parse_mode_idx = $sf->{o}{insert}{copy_parse_mode};
+            next SETTINGS;
+        }
+        else {
+            last SETTINGS;
+        }
+    }
     $ax->print_sql( $sql );
-    my $prompt = sprintf "Multi row  %s:\n", $sf->__parse_setting( 'copy_and_paste' );
-    print $prompt;
-    my $file_ec = $sf->{tmp_copy_paste};
+    print "Multi row:\n";
+    my $parse_mode = $sf->{o}{insert}{copy_parse_mode};
+    my $file_ec = $sf->{i}{tmp_copy_paste};
     local $SIG{INT} = sub { unlink $file_ec; exit };
     if ( ! eval {
         open my $fh_in, '>', $file_ec or die $!;
@@ -175,7 +227,13 @@ sub from_copy_and_paste {
         die "No input!" if ! -s $file_ec;
         open my $fh, '<', $file_ec or die $!;
         $sql->{insert_into_args} = [];
-        my $ok = $sf->__parse_file( $sql, $file_ec, $fh, $sf->{o}{insert}{copy_parse_mode} );
+        my $ok;
+        if ( $parse_mode_idx == 0 ) {
+            $ok = $pf->__parse_file_Text_CSV( $sql, $fh );
+        }
+        elsif ( $parse_mode_idx == 1 ) {
+            $ok = $pf->__parse_file_split( $sql, $fh );
+        }
         close $fh;
         unlink $file_ec or die $!;
         die "Error __parse_file!" if ! $ok;
@@ -186,299 +244,220 @@ sub from_copy_and_paste {
         return;
     }
     return if ! @{$sql->{insert_into_args}};
-    my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ok = $cf->input_filter( $sql, 1 );
     return if ! $ok;
     return 1;
 }
 
 
-sub from_file {
-    my ( $sf, $sql ) = @_;
-
-    FILE: while ( 1 ) {
-        my $file_ec = $sf->__file_name();
-        my $fh;
-        if ( ! defined $file_ec ) {
-            return;
-        }
-        if ( $sf->{o}{insert}{file_parse_mode} < 2 && -T $file_ec ) {
-            open $fh, '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')', $file_ec or die $!;
-            my $parse_mode = $sf->{o}{insert}{file_parse_mode};
-            my $ok = $sf->__parse_file( $sql, $file_ec, $fh, $parse_mode );
-            if ( ! $ok ) {
-                next FILE;
-            }
-            if ( ! @{$sql->{insert_into_args}} ) {
-                choose( [ 'empty file!' ], { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' } );
-                close $fh;
-                next FILE;
-            }
-            my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            $ok = $cf->input_filter( $sql, 0 );
-            if ( ! $ok ) {
-                next FILE;
-            }
-            $sf->{d}{file_name} = decode( 'locale_fs', $file_ec );
-            return 1;
-        }
-        else {
-            my $parse_mode = 2;
-            my ( $sheet_count, $sheet_idx );
-            SHEET: while ( 1 ) {
-                $sql->{insert_into_args} = [];
-                $sheet_count = $sf->__parse_file( $sql, $file_ec, $fh, $parse_mode );
-                if ( ! $sheet_count ) {
-                    next FILE;
-                }
-                if ( ! @{$sql->{insert_into_args}} ) { #
-                    next SHEET if $sheet_count >= 2;
-                    next FILE;
-                }
-                my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                my $ok = $cf->input_filter( $sql, 0 );
-                if ( ! $ok ) {
-                    next SHEET if $sheet_count >= 2;
-                    next FILE;
-                }
-                $sf->{d}{file_name} = decode( 'locale_fs', $file_ec );
-                return 1;
-            }
-        }
-    }
-}
-
-
-sub __file_name {
-    my ( $sf ) = @_;
-    if ( ! $sf->{o}{insert}{max_files} ) {
-        return $sf->__new_file_search();
-    }
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $old_idx = 0;
-
-    FILE: while ( 1 ) {
-        my $h_ref = $ax->read_json( $sf->{input_files} );
-        my @dirs = sort @{$h_ref->{dirs}||[]};
-        my @files = sort @{$h_ref->{files}||[]};
-        my $prompt = sprintf "Choose a file  %s:", $sf->__parse_setting( 'file' );
-        my @pre = ( undef, '  NEW search' );
-        $ENV{TC_RESET_AUTO_UP} = 0;
-        # Choose
-        my $idx = choose(
-            [ @pre, map( '- ' . $_, @dirs ), map( '  ' . basename( $_ ), @files ) ],
-            { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, undef => '  <=', index => 1, default => $old_idx }
-        );
-        if ( ! $idx ) {
-            return;
-        }
-        if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx = 0;
-                next DATABASE;
-            }
-            else {
-                $old_idx = $idx;
-            }
-        }
-        delete $ENV{TC_RESET_AUTO_UP};
-        my $file_ec;
-        if ( $idx == $#pre ) {
-            $file_ec = $sf->__new_file_search();
-        }
-        elsif ( $idx < @pre + @dirs ) {
-            my $dir_ec = realpath encode 'locale_fs', $dirs[$idx-@pre];
-            $file_ec = $sf->__file_form_history_dir( $dir_ec );
-        }
-        else {
-            $file_ec = realpath encode 'locale_fs', $files[$idx-(@pre+@dirs)];
-        }
-        if ( ! defined $file_ec || ! length $file_ec ) {
-            next FILE;
-        }
-        $sf->__add_to_history( $file_ec );
-        return $file_ec;
-    }
-}
-
-sub __new_file_search {
-    my ( $sf ) = @_;
-    my $prompt = sprintf "%s", $sf->__parse_setting( 'file' );
-    my $dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
-    # Choose_a_file
-    my $file = choose_a_file( { dir => $dir, mouse => $sf->{o}{table}{mouse}, clear_screen => 1 } );
-    if ( ! defined $file || ! length $file ) {
-        return;
-    }
-    my $file_ec = encode( 'locale_fs', $file );
-    my $dir_ec  = dirname $file_ec;
-    $sf->{i}{tmp_files_dir} = $dir_ec;
-    return $file_ec;
-}
-
-sub __file_form_history_dir {
-    my ( $sf, $dir_ec ) = @_;
-    opendir my $dir_h, $dir_ec or die "$dir_ec: $!";
-
-    my @files_ec;
-    while ( my $file_ec = readdir( $dir_h ) ) {
-        next if $file_ec =~ m/^\./;
-        $file_ec = catfile $dir_ec, $file_ec;
-        next if ! -f $file_ec;
-        push @files_ec, $file_ec;
-    }
-    close $dir_h;
-    @files_ec = sort @files_ec;
-    my @choices = map { '  ' . decode( 'locale_fs', basename $_ ) } @files_ec;
-    my @pre = ( undef );
-    # Choose
-    my $idx = choose(
-        [ @pre, @choices ],
-        { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose:', undef => '  <=', index => 1,
-          info => decode( 'locale_fs', $dir_ec ) }
-    );
-    if ( ! $idx ) {
-        return;
-    }
-    my $file_ec = $files_ec[$idx-@pre];
-    return $file_ec;
-}
-
-sub __add_to_history {
-    my ( $sf, $file_ec ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $h_ref = $ax->read_json( $sf->{input_files} );
-    my %tmp = ( 'files' => $file_ec, 'dirs' => dirname $file_ec );
-    for my $key ( keys %tmp ) {
-        my $files_ec = [ map { realpath encode( 'locale_fs', $_ ) } @{$h_ref->{$key}||[]} ];
-        unshift @$files_ec, $tmp{$key};
-        @$files_ec = uniq @$files_ec;
-        if ( @$files_ec > $sf->{o}{insert}{max_files} ) {
-            $#{$files_ec} = $sf->{o}{insert}{max_files} - 1;
-        }
-        $h_ref->{$key} = [ map { decode( 'locale_fs', $_ ) } @$files_ec ];
-    }
-    $ax->write_json( $sf->{input_files}, $h_ref );
-}
-
-
-sub __parse_setting {
-    my ( $sf, $type ) = @_;
-    my $i = $sf->{o}{insert}{$type eq 'file' ? 'file_parse_mode' : 'copy_parse_mode'};
-    my $parse_mode = ( 'Text::CSV', 'split', 'Spreadsheet::Read' )[$i]; #
-    my $sep;
+sub __parse_settings_file {
+    my ( $sf, $i ) = @_;
+    my ( $parse_mode, $field_sep, $record_sep );
     if ( $i == 0 ) {
-        $sep = $sf->{o}{csv}{sep_char};
+        $parse_mode = 'Text::CSV';
+        $field_sep = $sf->{o}{csv}{sep_char};
     }
     elsif ( $i == 1 ) {
-        $sep = $sf->{o}{split}{field_sep};
+        $parse_mode = 'split';
+        $field_sep  = $sf->{o}{split}{field_sep};
+        $record_sep = $sf->{o}{split}{record_sep};
+    }
+    elsif ( $i == 2 ) {
+        $parse_mode = 'Spreadsheet::Read';
     }
     my $str = "($parse_mode";
-    $str .= " - sep[$sep]" if defined $sep;
+    $str .= " - sep[$field_sep]" if defined $field_sep;
     $str .= ")";
     return $str;
 }
 
 
-sub __parse_file {
-    my ( $sf, $sql, $file_ec, $fh, $parse_mode ) = @_;
-    local $SIG{INT} = sub { unlink $sf->{tmp_copy_paste}; exit };
-    my $waiting = 'Parsing file ... ';
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $ax->print_sql( $sql, $waiting );
-    if ( $parse_mode == 0 ) {
-        seek $fh, 0, 0;
-        my $rows_of_cols = [];
-        require Text::CSV;
-        require String::Unescape;
-        my $options = { map { $_ => String::Unescape::unescape( $sf->{o}{csv}{$_} ) } keys %{$sf->{o}{csv}} };
-        my $csv = Text::CSV->new( $options ) or die Text::CSV->error_diag();
-        $csv->callbacks( error => sub {
-            my ( $code, $str, $pos, $rec, $fld ) = @_;
-            if ( $code == 2012 ) { # ignore this error
-                Text::CSV->SetDiag (0);
+sub from_file {
+    my ( $sf, $sql ) = @_;
+    my $pf = App::DBBrowser::GetContent::ParseFile->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
+
+    DIR: while ( 1 ) {
+        my $dir_ec = $sf->__directory();
+        if ( ! defined $dir_ec ) {
+            return;
+        }
+        opendir my $dir_h, $dir_ec or die "$dir_ec: $!";
+        my @files_ec;
+        while ( my $file_ec = readdir( $dir_h ) ) {
+            next if $file_ec =~ m/^\./;
+            $file_ec = catfile $dir_ec, $file_ec;
+            next if ! -f $file_ec;
+            push @files_ec, $file_ec;
+        }
+        close $dir_h;
+        @files_ec = sort @files_ec;
+        my @files = map { '  ' . decode( 'locale_fs', basename $_ ) } @files_ec;
+        my $parse_mode_idx = $sf->{o}{insert}{file_parse_mode};
+        my $old_idx = 1;
+
+        FILE: while ( 1 ) {
+            my $hidden = 'Choose File ' . $sf->__parse_settings_file( $parse_mode_idx );
+            my @pre = ( $hidden, undef );
+            my $choices = [ @pre, @files ];
+            $ENV{TC_RESET_AUTO_UP} = 0;
+            # Choose
+            my $idx = choose(
+                $choices,
+                { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, undef => '  <=', default => $old_idx }
+            );
+            if ( ! defined $idx || ! defined $choices->[$idx] ) {
+                next DIR;
+            }
+            if ( $sf->{o}{G}{menu_memory} ) {
+                if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                    $old_idx = 1;
+                    next FILE;
+                }
+                else {
+                    $old_idx = $idx;
+                }
+            }
+            delete $ENV{TC_RESET_AUTO_UP};
+            if ( $choices->[$idx] eq $hidden ) {
+                my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
+                $opt->config_insert();
+                $parse_mode_idx = $sf->{o}{insert}{file_parse_mode};
+                next FILE;
+            }
+            my $file_ec = $files_ec[$idx-@pre];
+            my $fh;
+            if ( $sf->{o}{insert}{file_parse_mode} < 2 && -T $file_ec ) {
+                open $fh, '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')', $file_ec or die $!;
+                my $ok;
+                if ( $parse_mode_idx == 0 ) {
+                    $ok = $pf->__parse_file_Text_CSV( $sql, $fh );
+                }
+                elsif ( $parse_mode_idx == 1 ) {
+                    $ok = $pf->__parse_file_split( $sql, $fh );
+                }
+                if ( ! $ok ) {
+                    next FILE;
+                }
+                if ( ! @{$sql->{insert_into_args}} ) {
+                    choose( [ 'empty file!' ], { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' } );
+                    close $fh;
+                    next FILE;
+                }
+                $ok = $cf->input_filter( $sql, 0 );
+                if ( ! $ok ) {
+                    next FILE;
+                }
+                $sf->{d}{file_name} = decode( 'locale_fs', $file_ec );
+                return 1;
             }
             else {
-                my $error_inpunt = $csv->error_input();
-                my $message =  "Text::CSV:\n";
-                $message .= "Input: $error_inpunt" if defined $error_inpunt;
-                $message .= "$code $str - pos:$pos rec:$rec fld:$fld";
-                die $message; ###
+                my ( $sheet_count, $sheet_idx );
+                $sf->{i}{old_sheet_idx} = 0;
+
+                SHEET: while ( 1 ) {
+                    $sql->{insert_into_args} = [];
+                    $sheet_count = $pf->__parse_file_Spreadsheet_Read( $sql, $file_ec );
+                    if ( ! $sheet_count ) {
+                        next FILE;
+                    }
+                    if ( ! @{$sql->{insert_into_args}} ) { #
+                        next SHEET if $sheet_count >= 2;
+                        next FILE;
+                    }
+                    my $ok = $cf->input_filter( $sql, 0 );
+                    if ( ! $ok ) {
+                        next SHEET if $sheet_count >= 2;
+                        next FILE;
+                    }
+                    $sf->{d}{file_name} = decode( 'locale_fs', $file_ec );
+                    return 1;
+                }
             }
-        } );
-        while ( my $cols = $csv->getline( $fh ) ) {
-            push @$rows_of_cols, $cols;
         }
-        $sql->{insert_into_args} = $rows_of_cols;
-        $ax->print_sql( $sql, $waiting );
-        return 1;
-    }
-    elsif ( $parse_mode == 1 ) {
-        my $rows_of_cols = [];
-        local $/;
-        seek $fh, 0, 0;
-        my $record_lead  = $sf->{o}{split}{record_l_trim};
-        my $record_trail = $sf->{o}{split}{record_r_trim};
-        my $field_lead  = $sf->{o}{split}{field_l_trim};
-        my $field_trail = $sf->{o}{split}{field_r_trim};
-        for my $row ( split /$sf->{o}{split}{record_sep}/, <$fh> ) {
-            $row =~ s/^$record_lead//   if length $record_lead;
-            $row =~ s/$record_trail\z// if length $record_trail;
-            push @$rows_of_cols, [
-                map {
-                    s/^$field_lead//   if length $field_lead;
-                    s/$field_trail\z// if length $field_trail;
-                    $_
-                } split /$sf->{o}{split}{field_sep}/, $row, -1 ]; # negative LIMIT (-1) to preserve trailing empty fields
-        }
-        $sql->{insert_into_args} = $rows_of_cols;
-        $ax->print_sql( $sql, $waiting );
-        return 1;
-    }
-    else {
-        require Spreadsheet::Read;
-        $ax->print_sql( $sql, $waiting );
-        my $cm = Term::Choose->new( $sf->{i}{lyt_m} );
-        my $book = Spreadsheet::Read::ReadData( $file_ec, cells => 0, attr => 0, rc => 1, strip => 0 );
-        if ( ! defined $book ) {
-            $cm->choose( [ 'Press ENTER' ], { prompt => 'No Book in ' . decode( 'locale_fs', $file_ec ) .'!' } );
-            return;
-        }
-        my $sheet_count = @$book - 1; # first sheet in $book contains meta info
-        if ( $sheet_count == 0 ) {
-            $cm->choose( [ 'Press ENTER' ], { prompt => 'No Sheets in ' . decode( 'locale_fs', $file_ec ) . '!' } );
-            return;
-        }
-        my $sheet_idx;
-        if ( $sheet_count == 1 ) {
-            $sheet_idx = 1;
-        }
-        else {
-            my @sheets = map { '- ' . ( length $book->[$_]{label} ? $book->[$_]{label} : 'sheet_' . $_ ) } 1 .. $#$book;
-            my @pre = ( undef );
-            my $choices = [ @pre, @sheets ];
-            # Choose
-            $sheet_idx = choose( # m
-                $choices,
-                { %{$sf->{i}{lyt_stmt_v}}, index => 1, prompt => 'Choose a sheet' }
-            );
-            if ( ! defined $sheet_idx || ! defined $choices->[$sheet_idx] ) {
-                return;
-            }
-            $sheet_idx = $sheet_idx - @pre + 1;
-        }
-        if ( $book->[$sheet_idx]{maxrow} == 0 ) {
-            my $sheet = length $book->[$sheet_idx]{label} ? $book->[$sheet_idx]{label} : 'sheet_' . $_;
-            $cm->choose( [ 'Press ENTER' ], { prompt => $sheet . ': empty sheet!' } );
-            return $sheet_count;
-        }
-        $sql->{insert_into_args} = [ Spreadsheet::Read::rows( $book->[$sheet_idx] ) ];
-        if ( ! -T $file_ec && length $book->[$sheet_idx]{label} ){
-            $sf->{d}{sheet_name} = $book->[$sheet_idx]{label};
-        }
-        return $sheet_count;
     }
 }
+
+
+sub __directory {
+    my ( $sf ) = @_;
+    if ( ! $sf->{o}{insert}{max_files} ) {
+        return $sf->__new_dir_search();
+    }
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    $sf->{i}{old_dir_idx} ||= 0;
+
+    DIR: while ( 1 ) {
+        my $h_ref = $ax->read_json( $sf->{data_dirs} );
+        my @dirs = sort @{$h_ref->{dirs}||[]};
+        my $prompt = sprintf "Choose a dir:";
+        my @pre = ( undef, '  NEW search' );
+        $ENV{TC_RESET_AUTO_UP} = 0;
+        # Choose
+        my $idx = choose(
+            [ @pre, map( '- ' . $_, @dirs ) ],
+            { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, undef => '  <=', index => 1, default => $sf->{i}{old_dir_idx} }
+        );
+        if ( ! $idx ) {
+            return;
+        }
+        if ( $sf->{o}{G}{menu_memory} ) {
+            if ( $sf->{i}{old_dir_idx} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $sf->{i}{old_dir_idx} = 0;
+                next DIR;
+            }
+            else {
+                $sf->{i}{old_dir_idx} = $idx;
+            }
+        }
+        delete $ENV{TC_RESET_AUTO_UP};
+        my $dir_ec;
+        if ( $idx == $#pre ) {
+            $dir_ec = $sf->__new_dir_search();
+            # Choose
+            if ( ! defined $dir_ec || ! length $dir_ec ) {
+                next DIR;
+            }
+        }
+        else {
+            $dir_ec = realpath encode 'locale_fs', $dirs[$idx-@pre];
+        }
+        $sf->__add_to_history( $dir_ec );
+        return $dir_ec;
+    }
+}
+
+
+sub __new_dir_search {
+    my ( $sf ) = @_;
+    my $default_dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
+    # Choose
+    my $dir_ec = choose_a_dir( { dir => $default_dir, mouse => $sf->{o}{table}{mouse}, clear_screen => 1, decoded => 0 } );
+    if ( $dir_ec ) {
+        $sf->{i}{tmp_files_dir} = decode 'locale_fs', $dir_ec;
+    }
+    return $dir_ec;
+}
+
+
+sub __add_to_history {
+    my ( $sf, $dir_ec ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $h_ref = $ax->read_json( $sf->{data_dirs} ); ###
+    my $dirs_ec = [ map { realpath encode( 'locale_fs', $_ ) } @{$h_ref->{dirs}||[]} ];
+    unshift @$dirs_ec, $dir_ec;
+    @$dirs_ec = uniq @$dirs_ec;
+    if ( @$dirs_ec > $sf->{o}{insert}{max_files} ) {
+        $#{$dirs_ec} = $sf->{o}{insert}{max_files} - 1;
+    }
+    $h_ref->{dirs} = [ map { decode( 'locale_fs', $_ ) } @$dirs_ec ];
+    $ax->write_json( $sf->{data_dirs}, $h_ref ); ###
+}
+
+
+
+
+
 
 
 

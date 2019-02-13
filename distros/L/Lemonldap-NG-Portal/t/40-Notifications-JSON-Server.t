@@ -16,8 +16,7 @@ my $json = '{
 "text": "This is a test text"
 }';
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                   => 'error',
             useSafeJail                => 1,

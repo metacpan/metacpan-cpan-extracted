@@ -31,6 +31,7 @@ recommends:
   GD::SecurityImage: '0'
   Glib: '0'
   HTTP::Message: '0'
+  IPC::Run: '0'
   Image::Magick: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
@@ -47,12 +48,12 @@ recommends:
   Web::ID: '0'
 requires:
   Clone: '0'
-  Lemonldap::NG::Handler: v2.0.0
+  Lemonldap::NG::Handler: v2.0.2
   Regexp::Assemble: '0'
 resources:
   MailingList: mailto:lemonldap-ng-dev@ow2.org
   X_twitter: https://twitter.com/lemonldapng
   homepage: http://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.0
+version: v2.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

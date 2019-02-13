@@ -3,19 +3,50 @@ NAME
     Acme::CPANModules
 
 VERSION
-    This document describes version 0.002 of App::CPANModulesUtils (from
-    Perl distribution App-CPANModulesUtils), released on 2019-01-11.
+    This document describes version 0.003 of App::CPANModulesUtils (from
+    Perl distribution App-CPANModulesUtils), released on 2019-02-13.
 
 SYNOPSIS
 DESCRIPTION
     This distribution includes the following command-line utilities related
     to Acme::CPANModules:
 
+    *   acme-cpanmodules-for
+
     *   draw-feature-matrix-from-acme-cpanmodules-module
 
     *   gen-acme-cpanmodules-module-from-acme-cpanlists-list
 
 FUNCTIONS
+  acme_cpanmodules_for
+    Usage:
+
+     acme_cpanmodules_for(%args) -> [status, msg, payload, meta]
+
+    List Acme::CPANModules distributions that mention specified modules.
+
+    This utility consults lcpan (local indexed CPAN mirror) to check if
+    there are Acme::CPANModules distributions that mention specified
+    modules. This is done by checking the presence of a dependency with the
+    relationship "x_mentions".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   modules* => *array[perl::modname]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   gen_acme_cpanmodules_module_from_acme_cpanlists_list
     Usage:
 

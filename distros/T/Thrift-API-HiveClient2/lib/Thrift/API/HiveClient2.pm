@@ -1,5 +1,5 @@
 package Thrift::API::HiveClient2;
-$Thrift::API::HiveClient2::VERSION = '0.023';
+$Thrift::API::HiveClient2::VERSION = '0.024';
 {
   $Thrift::API::HiveClient2::DIST = 'Thrift-API-HiveClient2';
 }
@@ -229,6 +229,7 @@ has _session_handle => (
     },
     lazy    => 1,
     builder => '_build_session_handle',
+    predicate => '_has_session_handle',
 );
 
 sub _build_session_handle {
@@ -488,7 +489,7 @@ sub DEMOLISH {
 
     $self->_cleanup_previous_operation;
 
-    if ( $self->_session_handle ) {
+    if ( $self->_has_session_handle ) {
         $self->_client->CloseSession(
             Thrift::API::HiveClient2::TCloseSessionReq->new(
                 { sessionHandle => $self->_session_handle, }
@@ -531,7 +532,7 @@ Thrift::API::HiveClient2 - Perl to HiveServer2 Thrift API wrapper
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =for Pod::Coverage BUILD DEMOLISH
 

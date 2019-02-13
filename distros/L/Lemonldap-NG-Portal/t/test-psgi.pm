@@ -34,8 +34,7 @@ my $app = $m->run;
 
 sub mirror {
     my (%args) = @_;
-    return $app->(
-        {
+    return $app->( {
             'HTTP_ACCEPT' => $args{accept}
               || 'application/json, text/plain, */*',
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',

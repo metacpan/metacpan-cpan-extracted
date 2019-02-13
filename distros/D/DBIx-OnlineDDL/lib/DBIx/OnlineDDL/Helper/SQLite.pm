@@ -1,7 +1,7 @@
 package DBIx::OnlineDDL::Helper::SQLite;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.90';
+our $VERSION   = '0.91';
 
 use v5.10;
 use Moo;
@@ -23,7 +23,7 @@ DBIx::OnlineDDL::Helper::SQLite - Private OnlineDDL helper for SQLite-specific c
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 DESCRIPTION
 
@@ -73,7 +73,7 @@ sub post_connection_stmts {
     my $self = shift;
 
     my $db_timeouts = $self->db_timeouts;
-    return (
+    my @stmts = (
         # See FK comment in MySQL module.  FKs in SQLite are a per-connection enabled
         # feature, so this is always a "session" command.
         'PRAGMA foreign_keys = OFF',
@@ -81,6 +81,19 @@ sub post_connection_stmts {
         # DB timeouts
         'PRAGMA busy_timeout = '.int($db_timeouts->{lock_file} * 1_000),  # busy_timeout uses ms
     );
+
+    # SQLite version 3.25.0 fixes table renames to also rename references to the table,
+    # ie: child FKs.  Since SQLite doesn't yet have an DDL statement for renaming the FKs
+    # back to the old name, setting this PRAGMA variable is the only option.
+    #
+    # Also, while this change was introduced in 3.25.0, it seems to only manifest itself
+    # when the driver reports version 3.26.0, possibly due to how their production
+    # releases work.
+    no warnings 'numeric';
+    my $db_ver = $self->dbh->get_info( $GetInfoType{SQL_DBMS_VER} ) || 0;
+    push @stmts, 'PRAGMA legacy_alter_table = ON' if $db_ver+0 >= 3.26;
+
+    return @stmts;
 }
 
 sub is_error_retryable {

@@ -6,7 +6,7 @@ use strict;
 use Mouse;
 use HTML::Template;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -174,6 +174,43 @@ process
 
 B<Note>: methods inserted so must return a PE_* constant. See
 Lemonldap::NG::Portal::Main::Constants.
+
+=head4 Advanced entry points
+
+These entry points are not stored in C<$req-E<gt>step> but launched on the fly:
+
+=over
+
+=item C<afterSub>: hash ref that give methods to call after given main method
+is called. Example:
+
+  use constant afterSub => {
+      getUser => 'mysub',
+  }
+  sub mysub {
+      my ( $self ,$req ) = @_;
+      # Do something
+      return PE_OK;
+  }
+
+=item C<aroundSub>: hash ref that give methods to call instead of given main
+method. Example:
+
+  use constant aroundSub => {
+      getUser => 'mysub',
+  };
+  sub mysub {
+      my ( $self, $sub, $req ) = @_;
+      # Do something before
+      my $ret = $sub->($req);
+      # Do something after
+      return $ret;
+  }
+
+Do not launch "getUser" but use the given C<$sub>. This permits multiple
+plugins to use "aroundSub" in the same time.
+
+=back
 
 =head1 SEE ALSO
 

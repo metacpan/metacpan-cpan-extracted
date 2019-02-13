@@ -76,7 +76,7 @@ attributetype ( SSOOID:1.6
 # SSO user
 objectClass ( SSOOID:2.1
 	NAME 'ssoUser'
-	DESC 'SSO extended informations for a user'
+	DESC 'SSO extended information for a user'
 	SUP top
 	AUXILIARY
 	MAY ( ssoName $ ssoRoles $ ssoLogonHours $ 

@@ -4,6 +4,7 @@
 "click2Register":"Cliquez ici pour confirmer l'enregistrement de votre compte",
 "click2Reset":"Cliquez ici pour réinitialiser votre mot de passe",
 "hello":"Bonjour",
+"mail2fSubject":"[LemonLDAP::NG] Votre code de connexion",
 "mailConfirmSubject": "[LemonLDAP::NG] Confirmation de réinitialisation de mot de passe",
 "mailSubject": "[LemonLDAP::NG] Votre nouveau mot-de-passe",
 "newPwdIs":"Votre nouveau mot de passe est",
@@ -12,5 +13,6 @@
 "registerConfirmSubject": "[LemonLDAP::NG] Confirmation d'enregistrement de compte",
 "registerDoneSubject": "[LemonLDAP::NG] Votre nouveau compte",
 "requestIssuedFromIP":"La demande provient de l'IP",
+"yourLoginCodeIs":"Votre code de connexion est",
 "yourLoginIs":"Votre identifiant est"
 }

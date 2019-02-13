@@ -8,6 +8,7 @@ inc/LWP/Protocol/PSGI.pm
 lib/Lemonldap/NG/Portal.pm
 lib/Lemonldap/NG/Portal/2F/Engines/Default.pm
 lib/Lemonldap/NG/Portal/2F/Ext2F.pm
+lib/Lemonldap/NG/Portal/2F/Mail2F.pm
 lib/Lemonldap/NG/Portal/2F/Register/TOTP.pm
 lib/Lemonldap/NG/Portal/2F/Register/U2F.pm
 lib/Lemonldap/NG/Portal/2F/Register/Yubikey.pm
@@ -27,6 +28,7 @@ lib/Lemonldap/NG/Portal/Auth/Custom.pm
 lib/Lemonldap/NG/Portal/Auth/DBI.pm
 lib/Lemonldap/NG/Portal/Auth/Demo.pm
 lib/Lemonldap/NG/Portal/Auth/Facebook.pm
+lib/Lemonldap/NG/Portal/Auth/GPG.pm
 lib/Lemonldap/NG/Portal/Auth/Kerberos.pm
 lib/Lemonldap/NG/Portal/Auth/LDAP.pm
 lib/Lemonldap/NG/Portal/Auth/LinkedIn.pm
@@ -101,7 +103,7 @@ lib/Lemonldap/NG/Portal/Plugins/CheckState.pm
 lib/Lemonldap/NG/Portal/Plugins/ForceAuthn.pm
 lib/Lemonldap/NG/Portal/Plugins/GrantSession.pm
 lib/Lemonldap/NG/Portal/Plugins/History.pm
-lib/Lemonldap/NG/Portal/Plugins/MailReset.pm
+lib/Lemonldap/NG/Portal/Plugins/MailPasswordReset.pm
 lib/Lemonldap/NG/Portal/Plugins/Notifications.pm
 lib/Lemonldap/NG/Portal/Plugins/PublicPages.pm
 lib/Lemonldap/NG/Portal/Plugins/Register.pm
@@ -145,11 +147,13 @@ site/coffee/confirm.coffee
 site/coffee/idpchoice.coffee
 site/coffee/info.coffee
 site/coffee/kerberos.coffee
+site/coffee/kerberosChoice.coffee
 site/coffee/oidcchecksession.coffee
 site/coffee/portal.coffee
 site/coffee/redirect.coffee
 site/coffee/registerbrowser.coffee
 site/coffee/ssl.coffee
+site/coffee/sslChoice.coffee
 site/coffee/totpregistration.coffee
 site/coffee/u2fcheck.coffee
 site/coffee/u2fregistration.coffee
@@ -263,6 +267,8 @@ site/htdocs/static/common/js/info.js
 site/htdocs/static/common/js/info.min.js
 site/htdocs/static/common/js/kerberos.js
 site/htdocs/static/common/js/kerberos.min.js
+site/htdocs/static/common/js/kerberosChoice.js
+site/htdocs/static/common/js/kerberosChoice.min.js
 site/htdocs/static/common/js/oidcchecksession.js
 site/htdocs/static/common/js/oidcchecksession.min.js
 site/htdocs/static/common/js/portal.js
@@ -273,6 +279,8 @@ site/htdocs/static/common/js/registerbrowser.js
 site/htdocs/static/common/js/registerbrowser.min.js
 site/htdocs/static/common/js/ssl.js
 site/htdocs/static/common/js/ssl.min.js
+site/htdocs/static/common/js/sslChoice.js
+site/htdocs/static/common/js/sslChoice.min.js
 site/htdocs/static/common/js/totpregistration.js
 site/htdocs/static/common/js/totpregistration.min.js
 site/htdocs/static/common/js/u2f-api.js
@@ -299,7 +307,7 @@ site/htdocs/static/common/nl.png
 site/htdocs/static/common/pt.png
 site/htdocs/static/common/ro.png
 site/htdocs/static/common/vi.png
-site/htdocs/static/common/zh_CN.png
+site/htdocs/static/common/zh.png
 site/htdocs/static/languages/ar.json
 site/htdocs/static/languages/de.json
 site/htdocs/static/languages/en.json
@@ -310,7 +318,7 @@ site/htdocs/static/languages/nl.json
 site/htdocs/static/languages/pt.json
 site/htdocs/static/languages/ro.json
 site/htdocs/static/languages/vi.json
-site/htdocs/static/languages/zh_CN.json
+site/htdocs/static/languages/zh.json
 site/templates/bootstrap/2fchoice.tpl
 site/templates/bootstrap/2fregisters.tpl
 site/templates/bootstrap/casBack2Url.tpl
@@ -324,6 +332,7 @@ site/templates/bootstrap/customLoginHeader.tpl
 site/templates/bootstrap/error.tpl
 site/templates/bootstrap/ext2fcheck.tpl
 site/templates/bootstrap/footer.tpl
+site/templates/bootstrap/gpgform.tpl
 site/templates/bootstrap/header.tpl
 site/templates/bootstrap/idpchoice.tpl
 site/templates/bootstrap/info.tpl
@@ -353,6 +362,7 @@ site/templates/bootstrap/samlSpSoapLogout.tpl
 site/templates/bootstrap/sessionArray.tpl
 site/templates/bootstrap/simpleInfo.tpl
 site/templates/bootstrap/sslform.tpl
+site/templates/bootstrap/sslformChoice.tpl
 site/templates/bootstrap/standardform.tpl
 site/templates/bootstrap/totp2fcheck.tpl
 site/templates/bootstrap/totp2fregister.tpl
@@ -371,6 +381,7 @@ site/templates/common/mail/fr.json
 site/templates/common/mail/it.json
 site/templates/common/mail/vi.json
 site/templates/common/mail/zh_CN.json
+site/templates/common/mail_2fcode.tpl
 site/templates/common/mail_confirm.tpl
 site/templates/common/mail_footer.tpl
 site/templates/common/mail_header.tpl
@@ -383,6 +394,7 @@ site/templates/common/oidc_checksession.tpl
 site/templates/common/redirect.tpl
 site/templates/common/registerBrowser.tpl
 site/templates/common/script.tpl
+site/templates/localeTranslations.txt
 t/01-AuthDemo.t
 t/01-pdata.t
 t/02-Password-Demo.t
@@ -392,6 +404,7 @@ t/20-Auth-and-password-DBI-dynamic-hash.t
 t/20-Auth-and-password-DBI.t
 t/20-Auth-DBI-utf8.t
 t/21-Auth-and-password-LDAP.t
+t/21-Auth-LDAP-Policy.t
 t/21-Auth-LDAP-utf8.t
 t/22-Auth-and-password-AD.t
 t/23-Auth-and-password-REST.t
@@ -402,6 +415,7 @@ t/26-AuthRemote.t
 t/27-AuthProxy.t
 t/28-AuthChoice-and-password.t
 t/28-AuthChoice-with-rules.t
+t/29-AuthGPG.t
 t/29-AuthSSL.t
 t/30-Auth-and-issuer-SAML-Artifact-with-SOAP-SLO-IdP-initiated.t
 t/30-Auth-and-issuer-SAML-Artifact-with-SOAP-SLO.t
@@ -461,12 +475,12 @@ t/42-Register-Demo-with-captcha.t
 t/42-Register-Demo-with-token.t
 t/42-Register-Demo.t
 t/42-Register-LDAP.t
-t/43-MailReset-Choice.t
-t/43-MailReset-DBI.t
-t/43-MailReset-LDAP.t
-t/43-MailReset-with-captcha.t
-t/43-MailReset-with-token.t
-t/43-MailReset.t
+t/43-MailPasswordReset-Choice.t
+t/43-MailPasswordReset-DBI.t
+t/43-MailPasswordReset-LDAP.t
+t/43-MailPasswordReset-with-captcha.t
+t/43-MailPasswordReset-with-token.t
+t/43-MailPasswordReset.t
 t/50-IssuerGet.t
 t/60-Status.t
 t/61-BruteForceProtection.t
@@ -497,8 +511,16 @@ t/75-2F-Registers.t
 t/76-2F-Ext-with-BruteForce.t
 t/76-2F-Ext-with-GrantSession.t
 t/76-2F-Ext-with-HISTORY.t
+t/77-2F-Mail.t
 t/90-Translations.t
 t/99-pod.t
+t/gpghome/key.asc
+t/gpghome/openpgp-revocs.d/9482CEFB055809CBAFE6D71AAB2D5542891D1677.rev
+t/gpghome/private-keys-v1.d/A076B0E7DB141A919271EE8B581CDFA8DA42F333.key
+t/gpghome/private-keys-v1.d/B7219440BCCD85200121CFB89F94C8D98C0397B3.key
+t/gpghome/pubring.kbx
+t/gpghome/trustdb.gpg
+t/lib/Lemonldap/NG/Portal/Auth/LDAPPolicy.pm
 t/lmConf-1.json
 t/pdata.pm
 t/README.md

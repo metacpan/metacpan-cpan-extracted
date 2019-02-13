@@ -3,7 +3,7 @@ package Function::Return;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.031";
+our $VERSION = "0.041";
 
 use attributes ();
 use Sub::Util ();
@@ -39,7 +39,7 @@ sub _MODIFY_CODE_ATTRIBUTES {
     my ($pkg, $sub, @attrs) = @_;
 
     for my $attr (@attrs) {
-        next unless $attr =~ attr_re();
+        next unless $attr =~ _attr_re();
         my $types = $1;
         my $evaled = eval("package $pkg; [$types]");
         $types = $evaled unless $@;
@@ -50,11 +50,11 @@ sub _MODIFY_CODE_ATTRIBUTES {
             types => $types,
         }
     }
-    $ATTR{$sub} = [ grep { !attr_re() } @attrs ];
+    $ATTR{$sub} = [ grep { !_attr_re() } @attrs ];
     return;
 }
 
-sub attr_re {
+sub _attr_re {
     return qr!
         ^
         $IMPORT{name}
@@ -157,7 +157,7 @@ sub info {
     )
 }
 
-sub register_return_info {
+sub _register_return_info {
     my ($func, $types) = @_;
     my $key = Scalar::Util::refaddr $func or return undef;
 
@@ -173,7 +173,7 @@ sub CHECK {
         my ($pkg, $sub, $types)  = @$decl{qw(pkg sub types)};
 
         if (no_check) {
-            register_return_info($sub, $types);
+            _register_return_info($sub, $types);
             next;
         }
 
@@ -191,7 +191,7 @@ sub CHECK {
             no warnings qw(misc);
             attributes::->import($pkg, $wrapped, @attr) if @attr;
         }
-        register_return_info($wrapped, $types);
+        _register_return_info($wrapped, $types);
 
         no strict qw(refs);
         no warnings qw(redefine);
@@ -206,7 +206,7 @@ __END__
 
 =head1 NAME
 
-Function::Return - add return type for a function
+Function::Return - specify a function return type
 
 =head1 SYNOPSIS
 
@@ -232,6 +232,10 @@ Function::Return - add return type for a function
 
 Function::Return allows you to specify a return type for your functions.
 
+=head2 SUPPORT
+
+This module supports all perl versions starting from v5.14.
+
 =head2 IMPORT OPTIONS
 
 =head3 name
@@ -251,9 +255,22 @@ you can switch off type check:
     sub foo :Return(Int) { 3.14 }
     foo(); # NO ERROR!
 
-=head2 INTROSPECTION
+=head2 METHODS
 
-The function Function::Return::info lets you introspect return values like L<Function::Parameters::Info>:
+=head3 Function::Return::info($coderef)
+
+The function C<Function::Return::info> lets you introspect return values like L<Function::Parameters::Info>:
+
+    use Function::Return;
+
+    sub baz() :Return(Str) { 'hello' }
+
+    my $rinfo = Function::Return::info \&baz;
+
+    $rinfo->types; # [Str]
+    $rinfo->isa('Function::Return::Info');
+
+In addition, it can be used with L<Function::Parameters>:
 
     use Function::Parameters;
     use Function::Return;
@@ -263,26 +280,47 @@ The function Function::Return::info lets you introspect return values like L<Fun
     my $pinfo = Function::Parameters::info \&baz;
     my $rinfo = Function::Return::info \&baz;
 
-    $rinfo->types; # [Str]
+This makes it possible to know both type information of function arguments and return value at compile time, making it easier to use for testing etc.
 
-=head1 SUPPORT
+=head3 Function::Return->wrap_sub($coderef)
 
-This module supports all perl versions starting from v5.14.
+This interface is for power-user. Rather than using the C<< :Return >> attribute, it's possible to wrap a coderef like this:
+
+    my $wrapped = Function::Return->wrap_sub($orig, [Str]);
+    $wrapped->();
 
 =head1 NOTE
 
-=head2 COMPARE Return::Type
+=head2 enforce LIST to simplify
 
-It is NOT possible to specify different type constraints for scalar and list context.
+C<Function::Return> makes the original function is called in list context whether the wrapped function is called in list, scalar, void context:
 
-Check type constraint for void context.
+    sub foo :Return(Str) { wantarray ? 'LIST!!' : 'NON!!' }
+    my $a = foo(); # => LIST!!
 
-Function::Return::info and Function::Parameters::info can be used together.
+The specified type checks against the value the original function was called in the list context.
+
+C<wantarray> is convenient, but it sometimes causes confusion. So, in this module, we prioritized that the expected type of function return value becomes easy to understand.
+
+=head2 requirements of type constraint
+
+The requirements of type constraint of C<Function::Return> is the same as for C<Function::Parameters>. Specific requirements are as follows:
+
+> The only requirement is that the returned value (here referred to as $tc, for "type constraint") is an object that provides $tc->check($value) and $tc->get_message($value) methods. check is called to determine whether a particular value is valid; it should return a true or false value. get_message is called on values that fail the check test; it should return a string that describes the error.
+
+=head2 compare Return::Type
+
+Both C<Return::Type> and C<Function::Return> perform type checking on the return value of the function, but there are some differences.
+
+1. C<Function::Return> is not possible to specify different type constraints for scalar and list context.
+
+2. C<Function::Return> check type constraint for void context.
+
+3. C<Function::Return::info> and C<Function::Parameters::info> can be used together.
 
 =head1 SEE ALSO
 
-L<Function::Parameters>
-L<Return::Type>
+L<Function::Parameters>, L<Return::Type>
 
 =head1 LICENSE
 

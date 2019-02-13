@@ -1,0 +1,105 @@
+---
+fusemap:
+  BODLEVEL:
+    mask: 6
+    name: BODLEVEL
+    reg: h
+    values:
+      - caption: Brown-out detection at VCC=4.3 V
+        name: 4V3
+        value: 0
+      - caption: Brown-out detection at VCC=2.7 V
+        name: 2V7
+        value: 2
+      - caption: Brown-out detection at VCC=1.8 V
+        name: 1V8
+        value: 4
+      - caption: Brown-out detection disabled
+        name: DISABLED
+        value: 6
+  CKDIV8:
+    mask: 16
+    name: CKDIV8
+    reg: l
+  DWEN:
+    mask: 8
+    name: DWEN
+    reg: h
+  EESAVE:
+    mask: 64
+    name: EESAVE
+    reg: l
+  RSTDISBL:
+    mask: 1
+    name: RSTDISBL
+    reg: h
+  SELFPRGEN:
+    mask: 16
+    name: SELFPRGEN
+    reg: h
+  SPIEN:
+    mask: 128
+    name: SPIEN
+    reg: l
+  SUT_CKSEL:
+    mask: 15
+    name: SUT_CKSEL
+    reg: l
+    values:
+      - caption: 'Ext. Clock; Start-up time: 14 CK + 0 ms'
+        name: EXTCLK_14CK_0MS
+        value: 0
+      - caption: 'Ext. Clock; Start-up time: 14 CK + 4 ms'
+        name: EXTCLK_14CK_4MS
+        value: 4
+      - caption: 'Ext. Clock; Start-up time: 14 CK + 64 ms'
+        name: EXTCLK_14CK_64MS
+        value: 8
+      - caption: 'Int. RC Osc. 4.8 MHz; Start-up time: 14 CK + 0 ms'
+        name: INTRCOSC_4MHZ8_14CK_0MS
+        value: 1
+      - caption: 'Int. RC Osc. 4.8 MHz; Start-up time: 14 CK + 4 ms'
+        name: INTRCOSC_4MHZ8_14CK_4MS
+        value: 5
+      - caption: 'Int. RC Osc. 4.8 MHz; Start-up time: 14 CK + 64 ms'
+        name: INTRCOSC_4MHZ8_14CK_64MS
+        value: 9
+      - caption: 'Int. RC Osc. 9.6 MHz; Start-up time: 14 CK + 0 ms'
+        name: INTRCOSC_9MHZ6_14CK_0MS
+        value: 2
+      - caption: 'Int. RC Osc. 9.6 MHz; Start-up time: 14 CK + 4 ms'
+        name: INTRCOSC_9MHZ6_14CK_4MS
+        value: 6
+      - caption: 'Int. RC Osc. 9.6 MHz; Start-up time: 14 CK + 64 ms'
+        name: INTRCOSC_9MHZ6_14CK_64MS
+        value: 10
+      - caption: 'Int. RC Osc. 128 kHz; Start-up time: 14 CK + 0 ms'
+        name: INTRCOSC_128KHZ_14CK_0MS
+        value: 3
+      - caption: 'Int. RC Osc. 128 kHz; Start-up time: 14 CK + 4 ms'
+        name: INTRCOSC_128KHZ_14CK_4MS
+        value: 7
+      - caption: 'Int. RC Osc. 128 kHz; Start-up time: 14 CK + 64 ms'
+        name: INTRCOSC_128KHZ_14CK_64MS
+        value: 11
+  WDTON:
+    mask: 32
+    name: WDTON
+    reg: l
+fuses:
+  - SELFPRGEN
+  - DWEN
+  - BODLEVEL
+  - RSTDISBL
+  - SPIEN
+  - EESAVE
+  - WDTON
+  - CKDIV8
+  - SUT_CKSEL
+reginfos:
+  - default: 255
+    mask: 31
+    name: h
+  - default: 106
+    mask: 255
+    name: l

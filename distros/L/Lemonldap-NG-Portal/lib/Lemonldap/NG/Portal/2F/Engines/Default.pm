@@ -20,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -166,11 +166,10 @@ sub run {
             $req->pdata->{sfRegToken} =
               $self->ott->createToken( $req->sessionInfo );
             $self->logger->debug("Just one 2F is enabled");
-            $self->logger->debug(" -> Redirect to /2fregisters/");
-            $req->response(
-                [
+            $self->logger->debug(" -> Redirect to 2fregisters/");
+            $req->response( [
                     302,
-                    [ Location => $self->conf->{portal} . '/2fregisters/' ], []
+                    [ Location => $self->conf->{portal} . '2fregisters/' ], []
                 ]
             );
             return PE_SENDRESPONSE;
@@ -271,11 +270,7 @@ sub _redirect {
     my $arg = $req->env->{QUERY_STRING};
     $self->logger->debug('Call sfEngine _redirect method');
     return [
-        302,
-        [
-            Location => $self->conf->{portal} . ( $arg ? "?$arg" : '' )
-        ],
-        []
+        302, [ Location => $self->conf->{portal} . ( $arg ? "?$arg" : '' ) ], []
     ];
 }
 
@@ -324,17 +319,40 @@ sub _displayRegister {
             [] ];
     }
 
+    # Retrieve user all second factors
     my $_2fDevices =
       $req->userData->{_2fDevices}
-      ? eval { from_json( $req->userData->{_2fDevices},
-            { allow_nonref => 1 } ); }
+      ? eval {
+        from_json( $req->userData->{_2fDevices}, { allow_nonref => 1 } ); }
       : undef;
-
     unless ($_2fDevices) {
         $self->logger->debug("No 2F Device found");
         $_2fDevices = [];
     }
 
+    # Parse second factors to display delete button if allowed
+    my $action = '';
+    foreach
+      my $type ( split /,\s*/, $self->conf->{available2FSelfRegistration} )
+
+    {
+        foreach (@$_2fDevices) {
+            $_->{type} =~ s/^UBK$/Yubikey/;
+            if ( $_->{type} eq $type ) {
+                my $t = lc($type);
+                $t =~ s/2f$//i;
+
+                $_->{delAllowed} =
+                     $self->conf->{ $t . '2fActivation' }
+                  && $self->conf->{ $t . '2fUserCanRemoveKey' }
+                  && $self->conf->{ $t . '2fSelfRegistration' };
+            }
+            $action ||= $_->{delAllowed};
+            $_->{type} =~ s/^Yubikey$/UBK/;
+        }
+    }
+
+    # Display template
     return $self->p->sendHtml(
         $req,
         '2fregisters',
@@ -343,6 +361,7 @@ sub _displayRegister {
             SKIN         => $self->conf->{portalSkin},
             MODULES      => \@am,
             SFDEVICES    => $_2fDevices,
+            ACTION       => $action,
             REG_REQUIRED => $req->data->{sfRegRequired},
         }
     );

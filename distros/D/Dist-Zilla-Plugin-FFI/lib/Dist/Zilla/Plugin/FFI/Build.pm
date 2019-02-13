@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FFI::Build 1.02 {
+package Dist::Zilla::Plugin::FFI::Build 1.03 {
 
   use 5.014;
   use Moose;
@@ -7,11 +7,13 @@ package Dist::Zilla::Plugin::FFI::Build 1.02 {
 
   # TODO: also add build and test prereqs for aliens
   # TODO: release as separate CPAN dist
-  with 'Dist::Zilla::Role::FileMunger';
-  with 'Dist::Zilla::Role::MetaProvider';
+  with 'Dist::Zilla::Role::FileMunger',
+       'Dist::Zilla::Role::MetaProvider',
+       'Dist::Zilla::Role::PrereqSource',
+  ;
 
 my $mm_code_prereqs = <<'EOF1';
-use FFI::Build::MM;
+use FFI::Build::MM 0.83;
 my $fbmm = FFI::Build::MM->new;
 %WriteMakefileArgs = $fbmm->mm_args(%WriteMakefileArgs);
 EOF1
@@ -54,6 +56,16 @@ EOF2
     $file->content($content);
   }
 
+  sub register_prereqs {
+    my ($self) = @_;
+    $self->zilla->register_prereqs( +{
+        phase => 'configure',
+        type  => 'requires',
+      },
+      'FFI::Build::MM' => '0.83',
+    );
+  }
+
   sub metadata
   {
     my($self) = @_;
@@ -78,7 +90,7 @@ Dist::Zilla::Plugin::FFI::Build
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 

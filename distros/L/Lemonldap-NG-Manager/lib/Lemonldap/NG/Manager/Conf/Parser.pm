@@ -20,12 +20,13 @@ package Lemonldap::NG::Manager::Conf::Parser;
 
 use strict;
 use utf8;
+use Crypt::URandom;
 use Mouse;
 use JSON 'to_json';
 use Lemonldap::NG::Common::Conf::ReConstants;
 use Lemonldap::NG::Manager::Attributes;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Common::Conf::Compact';
 
@@ -55,10 +56,10 @@ has message => (
         hdebug( "Message becomes " . $_[0]->{message} );
     }
 );
+has needConfirmation =>
+  ( is => 'rw', isa => 'ArrayRef', default => sub { return [] } );
 
 # Booleans
-has needConfirm =>
-  ( is => 'rw', isa => 'ArrayRef', default => sub { return [] } );
 has confChanged => (
     is      => 'rw',
     isa     => 'Bool',
@@ -125,13 +126,14 @@ sub scanTree {
     # metadata and set a value to the key if empty
     $self->newConf->{cfgNum} = $self->req->params('cfgNum');
     $self->newConf->{cfgAuthor} =
-      $self->req->userData->{ $Lemonldap::NG::Handler::Main::tsv->{whatToTrace}
+      $self->req->userData->{ Lemonldap::NG::Handler::Main->tsv->{whatToTrace}
           || '_whatToTrace' } // "anonymous";
     $self->newConf->{cfgAuthorIP} = $self->req->address;
     $self->newConf->{cfgDate}     = time;
     $self->newConf->{cfgVersion}  = $VERSION;
-    $self->newConf->{key} ||=
-      join( '', map { chr( int( rand(94) ) + 33 ) } ( 1 .. 16 ) );
+    $self->newConf->{key} ||= join( '',
+        map { chr( int( ord( Crypt::URandom::urandom(1) ) * 94 / 256 ) + 33 ) }
+          ( 1 .. 16 ) );
 
     return 1;
 }
@@ -306,7 +308,8 @@ sub _scanNodes {
             # SAML
             elsif ( $base =~ /^saml(?:S|ID)PMetaDataNodes$/ ) {
                 hdebug('SAML');
-                if ( defined $leaf->{data} and ref( $leaf->{data} ) eq 'ARRAY' )
+                if ( defined $leaf->{data}
+                    and ref( $leaf->{data} ) eq 'ARRAY' )
                 {
                     hdebug("  SAML data is an array, serializing");
                     $leaf->{data} = join ';', @{ $leaf->{data} };
@@ -532,6 +535,11 @@ sub _scanNodes {
                         : {}
                     }
                   );
+
+                @listCatRef = sort @listCatRef;
+                @listCatNew = sort @listCatNew;
+                hdebug( '# @listCatRef : ' . \@listCatRef );
+                hdebug( '# @listCatNew : ' . \@listCatNew );
                 for ( my $i = 0 ; $i < @listCatNew ; $i++ ) {
                     if ( not( defined $listCatRef[$i] )
                         or $listCatRef[$i] ne $listCatNew[$i] )
@@ -585,8 +593,7 @@ sub _scanNodes {
                 $knownCat->{__id}++;
                 my $s = $knownCat->{$app} = sprintf '%04d-cat',
                   $knownCat->{__id};
-                $cn->{$s} =
-                  { catname => $leaf->{title}, type => 'category' };
+                $cn->{$s} = { catname => $leaf->{title}, type => 'category' };
                 unless ($cmp->{$app}
                     and $cmp->{$app}->{catname} eq $cn->{$s}->{catname} )
                 {
@@ -1063,8 +1070,7 @@ sub _unitTest {
                 my $msg    = $attr->{msgFail} // $type->{msgFail};
                 $res = 0
                   unless (
-                    $self->_execTest(
-                        {
+                    $self->_execTest( {
                             keyTest    => $attr->{keyTest} // $type->{keyTest},
                             keyMsgFail => $attr->{keyMsgFail}
                               // $type->{keyMsgFail},
@@ -1165,7 +1171,7 @@ sub _globalTest {
         eval {
             ( $res, $msg ) = $sub->();
             if ( $res == -1 ) {
-                push @{ $self->needConfirm }, { message => $msg };
+                push @{ $self->needConfirmation }, { message => $msg };
             }
             elsif ($res) {
                 if ($msg) {

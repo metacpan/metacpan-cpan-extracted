@@ -20,8 +20,7 @@ ok( $res->[0] == 200, "Result code is 200" );
 ok( $resBody = from_json( $res->[2]->[0] ), "Result body contains JSON text" );
 ok( $resBody->{result} == 0, "JSON response contains \"result:0\"" )
   or print STDERR Dumper($res);
-ok(
-    (
+ok( (
         $resBody->{details}->{__errors__}
           and @{ $resBody->{details}->{__errors__} } == 1
     ),

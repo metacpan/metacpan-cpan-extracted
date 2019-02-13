@@ -1,3 +1,9 @@
+* v0.3.3
+
+- added timeout parameter for requests to the ApacheTika server
+- fallback to local java app if the ApacheTika server request fails or is incomplete
+- catch parser failure and return undef instead of breaking
+- removed Blacklist language identifier and use CLD instead
 
 * v0.3.2
 

@@ -10,7 +10,7 @@ BEGIN {
     require 't/test-lib.pm';
 }
 
-my $maintests = 9;
+my $maintests = 14;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -71,7 +71,7 @@ SKIP: {
         ' Ask for OpenID identity' );
 
     $query .=
-      '&openid_identifier=http%3A%2F%2Fauth.idp.com%2Fopenidserver%2Fdwho';
+      '&openid_identifier=http%3A%2F%2Fauth.idp.com%2Fopenidserver%2Ffrench';
 
     ok(
         $res = $sp->_post(
@@ -93,9 +93,57 @@ SKIP: {
     my ($tmp);
     my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
     ( $host, $tmp, $query ) = expectForm( $res, '#', undef );
+    $query .= '&user=french&password=french';
+
+    # Try to authenticate with an unauthorized user
+    ok(
+        $res = $issuer->_post(
+            $uri, IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+            cookie => $pdata,
+        ),
+        'Try to authenticate'
+    );
+    ok( $res->[2]->[0] =~ /trmsg="91"/, 'Reject reason is 91' )
+        or print STDERR Dumper( $res->[2]->[0] );
+    count(1);
+
+    # Simple SP access
+    ok(
+        $res = $sp->_get(
+            '/', accept => 'text/html',
+        ),
+        'Unauth SP request'
+    );
+    ( $host, $url, $query ) = expectForm( $res, '#', undef );
+    ok( $res->[2]->[0] =~ /name="openid_identifier"/,
+        ' Ask for OpenID identity' );
+
+    $query .=
+      '&openid_identifier=http%3A%2F%2Fauth.idp.com%2Fopenidserver%2Fdwho';
+
+    ok(
+        $res = $sp->_post(
+            '/', IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'Post OpenID identity'
+    );
+    ( $uri, $query ) = expectRedirection( $res,
+        qr#http://auth.idp.com(/openidserver/?)\?(openid.*)$# );
+
+    # Follow redirection do IdP
+    switch ('issuer');
+    ok( $res = $issuer->_get( $uri, query => $query, accept => 'text/html' ),
+        'Follow redirection to IdP' );
+    expectOK($res);
+    $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+    ( $host, $tmp, $query ) = expectForm( $res, '#', undef );
     $query .= '&user=dwho&password=dwho';
 
-    # Try to authenticate
+    # Try to authenticate with an authorized user
     ok(
         $res = $issuer->_post(
             $uri, IO::String->new($query),
@@ -142,8 +190,7 @@ sub switch {
 }
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => $debug,
                 templatesDir             => 'site/htdocs/static',
@@ -152,14 +199,14 @@ sub issuer {
                 authentication           => 'Demo',
                 userDB                   => 'Same',
                 issuerDBOpenIDActivation => 1,
+                issuerDBOpenIDRule       => '$uid eq "dwho"',
             }
         }
     );
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel       => $debug,
                 domain         => 'sp.com',

@@ -9,7 +9,7 @@ BEGIN {
     };
 }
 
-my $maintests = 14;
+my $maintests = 26;
 my ( $res, $user, $pwd, $host, $url, $query );
 my $mailSend = 0;
 
@@ -20,8 +20,7 @@ SKIP: {
         skip 'Missing dependencies', $maintests;
     }
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => 'error',
                 useSafeJail              => 1,
@@ -33,8 +32,63 @@ SKIP: {
         }
     );
 
+    # Try to register with an alredy existing mail address
+    # ------------------------
+    ok(
+        $res = $client->_get( '/register', accept => 'text/html' ),
+        'Unauth request',
+    );
+    ( $host, $url, $query ) =
+      expectForm( $res, '#', undef, 'firstname', 'lastname', 'mail' );
+    ok(
+        $query =~
+s/^.*token=([^&]+).*$/token=$1&firstname=who&lastname=doctor&mail=dwho%40badwolf.org/,
+        'Token found'
+    );
+    my $token;
+    ok( $token = $1, ' Token value is defined' );
+    ok( $res->[2]->[0] =~ m#<img src="data:image/png;base64#,
+        ' Captcha image inserted' )
+      or print STDERR Dumper( $res->[2]->[0] );
+
+    # Try to get captcha value
+    my ( $ts, $captcha );
+    ok( $ts = getCache()->get($token), ' Found token session' );
+    $ts = eval { JSON::from_json($ts) };
+    ok( $captcha = $ts->{captcha}, ' Found captcha value' );
+    ok(
+        $res->[2]->[0] =~ m%<img src="/static/common/logos/logo_llng_old.png"%,
+        'Found custom Main Logo'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+
+    $query .= "&captcha=$captcha";
+
+    ok(
+        $res = $client->_post(
+            '/register',
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html'
+        ),
+        'Ask to create account'
+    );
+
+    ok( $res->[2]->[0] =~ q%<span trmsg="80"></span>%,
+        'Rejected -> Mail already exists' );
+    ok(
+        $res->[2]->[0] !~
+          m%<form action="#" method="post" class="login" role="form">%,
+        'No form found'
+    );
+
     # Test normal first access
     # ------------------------
+    ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+    ok(
+        $res->[2]->[0] =~
+m%<a class="btn btn-secondary" href="http://auth.example.com/register\?skin=bootstrap">%,
+        'Found Register link & submit button'
+    ) or print STDERR Dumper( $res->[2]->[0] );
     ok(
         $res = $client->_get( '/register', accept => 'text/html' ),
         'Unauth request',
@@ -61,7 +115,6 @@ s/^.*token=([^&]+).*$/token=$1&firstname=foo&lastname=bar&mail=foobar%40badwolf.
         $res->[2]->[0] =~ m%<img src="/static/common/logos/logo_llng_old.png"%,
         'Found custom Main Logo'
     ) or print STDERR Dumper( $res->[2]->[0] );
-
     $query .= "&captcha=$captcha";
 
     ok(

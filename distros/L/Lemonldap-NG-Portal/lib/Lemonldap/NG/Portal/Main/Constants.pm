@@ -3,7 +3,7 @@ package Lemonldap::NG::Portal::Main::Constants;
 use strict;
 use Exporter 'import';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 use constant HANDLER => 'Lemonldap::NG::Handler::PSGI::Main';
 use constant {
@@ -93,6 +93,12 @@ use constant {
     PE_RENEWSESSION                     => 85,
     PE_WAIT                             => 86,
     PE_MUSTAUTHN                        => 87,
+    PE_MUSTHAVEMAIL                     => 88,
+    PE_SAML_SERVICE_NOT_ALLOWED         => 89,
+    PE_OIDC_SERVICE_NOT_ALLOWED         => 90,
+    PE_OID_SERVICE_NOT_ALLOWED          => 91,
+    PE_GET_SERVICE_NOT_ALLOWED          => 92,
+
 };
 
 # EXPORTER PARAMETERS
@@ -119,6 +125,8 @@ our @EXPORT_OK = qw( PE_SENDRESPONSE PE_INFO PE_REDIRECT PE_DONE PE_OK
   PE_CAPTCHAERROR PE_CAPTCHAEMPTY PE_REGISTERFIRSTACCESS PE_REGISTERFORMEMPTY
   PE_REGISTERALREADYEXISTS PE_NOTOKEN PE_TOKENEXPIRED HANDLER PE_U2FFAILED
   PE_UNAUTHORIZEDPARTNER PE_RENEWSESSION PE_IDPCHOICE PE_WAIT PE_MUSTAUTHN
+  PE_MUSTHAVEMAIL PE_SAML_SERVICE_NOT_ALLOWED PE_OIDC_SERVICE_NOT_ALLOWED
+  PE_OID_SERVICE_NOT_ALLOWED PE_GET_SERVICE_NOT_ALLOWED
 );
 our %EXPORT_TAGS = ( 'all' => [ @EXPORT_OK, 'import' ], );
 

@@ -24,7 +24,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Portal::Main::Auth', 'Lemonldap::NG::Portal::Lib::SAML';
 
@@ -775,8 +775,7 @@ sub extractFormInfo {
 
                 $self->logger->debug("SOAP response $slo_body");
 
-                $req->response(
-                    [
+                $req->response( [
                         200,
                         [
                             'Content-Type'   => 'application/xml',
@@ -785,8 +784,7 @@ sub extractFormInfo {
                         [$slo_body]
                     ]
                 );
-                $req->steps(
-                    [
+                $req->steps( [
                         @{ $self->p->beforeLogout },
                         sub {
                             my ($req) = @_;
@@ -845,8 +843,7 @@ sub extractFormInfo {
             return PE_SAML_ART_ERROR;
         }
 
-        $req->response(
-            [
+        $req->response( [
                 200,
                 [
                     'Content-Type'   => 'application/xml',
@@ -938,12 +935,30 @@ sub extractFormInfo {
         return $urlcheck unless ( $urlcheck == PE_OK );
 
         # IDP list
-        my @list = ();
+        my @list       = ();
+        my $portalPath = $self->conf->{portal};
+
         foreach ( keys %{ $self->idpList } ) {
+            my $idpName = $self->{idpList}->{$_}->{name};
+            $idpName = $self->{idpList}->{$_}->{displayName}
+              if $self->{idpList}->{$_}->{displayName};
+            my $icon    = $self->{idpList}->{$_}->{icon};
+            my $img_src = '';
+
+            if ($icon) {
+                $img_src =
+                  ( $icon =~ m#^https?://# )
+                  ? $icon
+                  : $portalPath . $self->p->staticPrefix . "/common/" . $icon;
+            }
+            $self->logger->debug( "IDP "
+                  . $self->{idpList}->{$_}->{name}
+                  . " -> DisplayName : $idpName with Icon : $img_src" );
             push @list,
               {
                 val  => $_,
-                name => $self->idpList->{$_}->{name}
+                name => $idpName,
+                icon => $img_src,
               };
         }
         $req->data->{list}            = \@list;

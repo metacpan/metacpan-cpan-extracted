@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.012';
+  $VERSION = '0.014';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     get_colorscheme
@@ -704,7 +704,6 @@ my %colorschemes = (
     13 => 'f7714b',
     14 => 'd3dae6',
     15 => 'e9ebee',
-    16 => 'f6f7f9',
     2 => 'dddfe2',
     3 => 'c0c0c0',
     4 => 'bec2c9',
@@ -723,7 +722,6 @@ my %colorschemes = (
     13 => '00af89',
     14 => '1900ab',
     15 => '005946',
-    16 => 'd11d13',
     2 => '73100a',
     3 => '19d11d',
     4 => 'e9322d',
@@ -732,6 +730,24 @@ my %colorschemes = (
     7 => '134e7b',
     8 => '347bff',
     9 => 'cad2d3',
+  },
+  c64 => {
+    0 => '000000',
+    1 => '880000',
+    10 => 'aaff66',
+    11 => 'dd8855',
+    12 => '0088ff',
+    13 => '777777',
+    14 => 'bbbbbb',
+    15 => '664400',
+    2 => '00cc55',
+    3 => 'eeee77',
+    4 => '0000aa',
+    5 => 'cc44cc',
+    6 => 'aaffee',
+    7 => '333333',
+    8 => 'ffffff',
+    9 => 'ff7777',
   },
 );
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FFI 1.02 {
+package Dist::Zilla::Plugin::FFI 1.03 {
 
   use strict;
   use warnings;
@@ -23,7 +23,7 @@ Dist::Zilla::Plugin::FFI - FFI related Dist::Zilla plugins
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 

@@ -37,7 +37,8 @@ sub init {
     my @list = ();
 
     my $portalPath = $self->conf->{portal};
-    $portalPath =~ s#^https?://[^/]+/?#/#;
+
+    #$portalPath =~ s#^https?://[^/]+/?#/#;
 
     foreach (@tab) {
         my $name = $self->conf->{oidcOPMetaDataOptions}->{$_}

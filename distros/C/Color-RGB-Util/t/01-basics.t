@@ -10,6 +10,9 @@ use Color::RGB::Util qw(
                            mix_2_rgb_colors
                            mix_rgb_colors
                            rand_rgb_color
+                           assign_rgb_color
+                           assign_rgb_light_color
+                           assign_rgb_dark_color
                            rgb2grayscale
                            rgb2sepia
                            reverse_rgb_color
@@ -41,6 +44,29 @@ subtest mix_rgb_colors => sub {
 
 subtest rand_rgb_color => sub {
     ok "currently not tested";
+};
+
+subtest assign_rgb_color => sub {
+    is(assign_rgb_color(""), "da5509");
+    is(assign_rgb_color("foo"), "0b5d33");
+};
+
+subtest assign_rgb_color => sub {
+    is(assign_rgb_color(""),    "da5509");
+    is(assign_rgb_color("foo"), "0b5d33");
+    is(assign_rgb_color("baz"), "bb40a2");
+};
+
+subtest assign_rgb_light_color => sub {
+    is(assign_rgb_light_color(""),    "ecaa84");
+    is(assign_rgb_light_color("foo"), "85ae99");
+    is(assign_rgb_light_color("baz"), "bb40a2");
+};
+
+subtest assign_rgb_dark_color => sub {
+    is(assign_rgb_dark_color(""),    "da5509");
+    is(assign_rgb_dark_color("foo"), "0b5d33");
+    is(assign_rgb_dark_color("baz"), "5d2051");
 };
 
 subtest rgb2grayscale => sub {

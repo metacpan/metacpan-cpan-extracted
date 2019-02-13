@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -341,8 +341,12 @@ sub hideCookie {
     my ( $class, $req ) = @_;
     $class->logger->debug("removing cookie");
     my $cookie = $req->env->{HTTP_COOKIE};
-    my $cn     = $class->tsv->{cookieName};
-    $cookie =~ s/$cn(http)?=[^,;]*[,;\s]*//og;
+    $class->logger->debug("Cookies -> $cookie");
+    my $cn = $class->tsv->{cookieName};
+    $class->logger->debug("CookieName -> $cn");
+    $cookie =~ s/\b$cn(http)?=[^,;]*[,;\s]*//og;
+    $class->logger->debug("newCookies -> $cookie");
+
     if ($cookie) {
         $class->set_header_in( $req, 'Cookie' => $cookie );
     }
@@ -398,12 +402,8 @@ sub fetchId {
     my ( $class, $req ) = @_;
     my $t                 = $req->{env}->{HTTP_COOKIE} or return 0;
     my $vhost             = $class->resolveAlias($req);
-    my $lookForHttpCookie = (
-        $class->tsv->{securedCookie} =~ /^(2|3)$/
-          and !( defined( $class->tsv->{https}->{$vhost} ) )
-        ? $class->tsv->{https}->{$vhost}
-        : $class->tsv->{https}->{_}
-    );
+    my $lookForHttpCookie = ( $class->tsv->{securedCookie} =~ /^(2|3)$/
+          and not $class->_isHttps( $req, $vhost ) );
     my $cn = $class->tsv->{cookieName};
     my $value =
       $lookForHttpCookie
@@ -437,8 +437,8 @@ sub retrieveSession {
     #     (15 seconds)
     if (    defined $class->data->{_session_id}
         and $id eq $class->data->{_session_id}
-        and ( $now - $class->dataUpdate < $class->tsv->{handlerInternalCache} )
-      )
+        and
+        ( $now - $class->dataUpdate < $class->tsv->{handlerInternalCache} ) )
     {
         $class->logger->debug("Get session $id from Handler internal cache");
         return $class->data;
@@ -446,8 +446,7 @@ sub retrieveSession {
 
     # 2. Get the session from cache or backend
     my $session = $req->data->{session} = (
-        Lemonldap::NG::Common::Session->new(
-            {
+        Lemonldap::NG::Common::Session->new( {
                 storageModule        => $class->tsv->{sessionStorageModule},
                 storageModuleOptions => $class->tsv->{sessionStorageOptions},
                 cacheModule          => $class->tsv->{sessionCacheModule},
@@ -533,23 +532,67 @@ sub retrieveSession {
     }
 }
 
+## @cmethod private int _getPort(string s)
+# Returns the port on which this vhost is accessed
+# @param $s VHost name
+# @return PORT
+
+sub _getPort {
+
+    my ( $class, $req, $vhost ) = @_;
+
+    if ( defined $class->tsv->{port}->{$vhost}
+        and ( $class->tsv->{port}->{$vhost} > 0 ) )
+    {
+        return $class->tsv->{port}->{$vhost};
+    }
+    else {
+        if ( defined $class->tsv->{port}->{_}
+            and ( $class->tsv->{port}->{_} > 0 ) )
+        {
+            return $class->tsv->{port}->{_};
+        }
+        else {
+            return $req->{env}->{SERVER_PORT};
+        }
+    }
+}
+## @cmethod private boot _isHttps(string s)
+# Returns whether this VHost should he accessed
+# via HTTPS
+# @param $s VHost name
+# @return RUE if the vhost should be accessed over HTTPS
+sub _isHttps {
+
+    my ( $class, $req, $vhost ) = @_;
+
+    if ( defined $class->tsv->{https}->{$vhost}
+        and ( $class->tsv->{https}->{$vhost} > -1 ) )
+    {
+        return $class->tsv->{https}->{$vhost};
+    }
+    else {
+        if ( defined $class->tsv->{https}->{_}
+            and ( $class->tsv->{https}->{_} > -1 ) )
+        {
+            return $class->tsv->{https}->{_};
+        }
+        else {
+            return ( ( uc( $req->{env}->{HTTPS} ) || "OFF" ) eq "ON" );
+        }
+    }
+}
+
 ## @cmethod private string _buildUrl(string s)
 # Transform /<s> into http(s?)://<host>:<port>/s
 # @param $s path
 # @return URL
 sub _buildUrl {
     my ( $class, $req, $s ) = @_;
-    my $realvhost = $req->{env}->{HTTP_HOST};
-    my $vhost     = $class->resolveAlias($req);
-    my $_https    = (
-        defined( $class->tsv->{https}->{$vhost} )
-        ? $class->tsv->{https}->{$vhost}
-        : $class->tsv->{https}->{_}
-    );
-    my $portString =
-         $class->tsv->{port}->{$vhost}
-      || $class->tsv->{port}->{_}
-      || $req->{env}->{SERVER_PORT};
+    my $realvhost  = $req->{env}->{HTTP_HOST};
+    my $vhost      = $class->resolveAlias($req);
+    my $_https     = $class->_isHttps( $req, $vhost );
+    my $portString = $class->_getPort( $req, $vhost );
     $portString = (
              ( $realvhost =~ /:\d+/ )
           or ( $_https  && $portString == 443 )

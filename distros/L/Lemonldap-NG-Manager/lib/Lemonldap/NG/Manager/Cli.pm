@@ -1,11 +1,12 @@
 package Lemonldap::NG::Manager::Cli;
 
 use strict;
+use Crypt::URandom;
 use Mouse;
 use Data::Dumper;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 $Data::Dumper::Useperl = 1;
 
 extends('Lemonldap::NG::Manager::Cli::Lib');
@@ -233,8 +234,7 @@ sub _setKey {
 sub _save {
     my ( $self, $new ) = @_;
     require Lemonldap::NG::Manager::Conf::Parser;
-    my $parser = Lemonldap::NG::Manager::Conf::Parser->new(
-        {
+    my $parser = Lemonldap::NG::Manager::Conf::Parser->new( {
             newConf => $new,
             refConf => $self->mgr->currentConf,
             req     => $self->req
@@ -248,6 +248,16 @@ sub _save {
         $saveParams->{cfgNum}      = $self->cfgNum;
         $saveParams->{cfgNumFixed} = 1;
     }
+    $new->{cfgAuthor} = 'lmConfigEditor: ' . `whoami`;
+    chomp $new->{cfgAuthor};
+    $new->{cfgAuthorIP} = '';
+    $new->{cfgDate}     = time;
+    $new->{cfgVersion}  = $VERSION;
+    $new->{cfgLog}      = '';
+    $new->{key} ||= join( '',
+        map { chr( int( ord( Crypt::URandom::urandom(1) ) * 94 / 256 ) + 33 ) }
+          ( 1 .. 16 ) );
+
     my $s = $self->mgr->confAcc->saveConf( $new, %$saveParams );
     if ( $s > 0 ) {
         print STDERR "Saved under number $s\n";

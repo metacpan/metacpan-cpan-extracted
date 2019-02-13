@@ -19,6 +19,7 @@ for my $file (
     'lib/App/DBBrowser/DB/SQLite.pm',
     'lib/App/DBBrowser/GetContent.pm',
     'lib/App/DBBrowser/GetContent/Filter.pm',
+    'lib/App/DBBrowser/GetContent/ParseFile.pm',
     'lib/App/DBBrowser/Join.pm',
     'lib/App/DBBrowser/Opt.pm',
     'lib/App/DBBrowser/OptDB.pm',

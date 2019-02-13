@@ -1004,10 +1004,6 @@
     "title": "issuerParams"
   }, {
     "_nodes": [{
-      "default": "",
-      "id": "trustedProxies",
-      "title": "trustedProxies"
-    }, {
       "default": "uid",
       "id": "whatToTrace",
       "title": "whatToTrace"
@@ -1417,11 +1413,12 @@
       "type": "simpleInputContainer"
     }, {
       "_nodes": [{
-        "default": 0,
+        "default": -1,
         "id": "https",
         "title": "https",
-        "type": "bool"
+        "type": "trool"
       }, {
+        "default": -1,
         "id": "port",
         "title": "port",
         "type": "int"

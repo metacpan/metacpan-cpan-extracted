@@ -243,8 +243,7 @@ sub run {
 
         # Secret is stored in a token: we choose to not accept secret returned
         # by Ajax request to avoid some attacks
-        my $token = $self->ott->createToken(
-            {
+        my $token = $self->ott->createToken( {
                 _totp2fSecret => $secret,
             }
         );

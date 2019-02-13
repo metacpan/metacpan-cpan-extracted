@@ -18,7 +18,7 @@
     <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
 
     <div class="card border-info">
-      <div class="card-header text-white bg-info">
+      <div class="card-header text-white bg-info text-center">
         <h3 class="card-title">
           <span trspan="selectIdP">Select your Identity Provider</span>
         </h3>

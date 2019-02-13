@@ -9,7 +9,7 @@ BEGIN {
     };
 }
 
-my $maintests = 10;
+my $maintests = 12;
 my ( $res, $user, $pwd );
 
 SKIP: {
@@ -18,8 +18,7 @@ SKIP: {
         skip 'Missing dependencies', $maintests;
     }
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => 'error',
                 useSafeJail              => 1,
@@ -33,6 +32,12 @@ SKIP: {
 
     # Test normal first access
     # ------------------------
+    ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+    ok(
+        $res->[2]->[0] =~
+m%<a class="btn btn-secondary" href="http://auth.example.com/register\?skin=bootstrap">%,
+        'Found Register link & submit button'
+    ) or print STDERR Dumper( $res->[2]->[0] );
     ok(
         $res = $client->_get( '/register', accept => 'text/html' ),
         'Unauth request',

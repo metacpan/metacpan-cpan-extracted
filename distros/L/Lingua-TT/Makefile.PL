@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use strict;
 
 ##----------------------------------------------------------------------
 ## Hacks
@@ -16,6 +17,8 @@ WriteMakefile
    ABSTRACT	=> 'TnT-style I/O utilities',
    VERSION_FROM	=> 'TT.pm',
 
+   LICENSE          => 'perl_5',
+   MIN_PERL_VERSION => '5.010', ##-- v5.10.0, for // operator
    PREREQ_PM    => {
 		    #'Gfsm'=>0.0207,
 		    'Encode'=>0,

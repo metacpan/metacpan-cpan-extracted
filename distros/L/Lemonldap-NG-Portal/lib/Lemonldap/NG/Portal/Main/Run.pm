@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -38,7 +38,7 @@ sub handler {
     my ( $self, $req ) = @_;
 
     bless $req, 'Lemonldap::NG::Portal::Main::Request';
-    $req->init();
+    $req->init( $self->conf );
     my $sp = 0;
 
     # Restore pdata
@@ -150,8 +150,7 @@ sub refresh {
     foreach ( keys %data ) {
         delete $data{$_} unless ( /^_/ or /^(?:startTime)$/ );
     }
-    $req->steps(
-        [
+    $req->steps( [
             'getUser',
             @{ $self->betweenAuthAndData },
             'setAuthSessionInfo',
@@ -327,8 +326,7 @@ sub getApacheSession {
         $self->logger->debug("Try to get a new $args{kind} session");
     }
 
-    my $as = Lemonldap::NG::Common::Session->new(
-        {
+    my $as = Lemonldap::NG::Common::Session->new( {
             storageModule        => $self->conf->{globalStorage},
             storageModuleOptions => $self->conf->{globalStorageOptions},
             cacheModule          => $self->conf->{localSessionStorage},
@@ -395,8 +393,7 @@ sub getPersistentSession {
 
     $info->{_session_uid} = $uid;
 
-    my $ps = Lemonldap::NG::Common::Session->new(
-        {
+    my $ps = Lemonldap::NG::Common::Session->new( {
             storageModule        => $self->conf->{persistentStorage},
             storageModuleOptions => $self->conf->{persistentStorageOptions},
             id                   => $pid,
@@ -607,7 +604,7 @@ sub autoPost {
 
 # Add element into $self->{portalHiddenFormValues}, those values could be
 # used to hide values into HTML form.
-# @param fieldname The field name which will contain the correponding value
+# @param fieldname The field name which will contain the corresponding value
 # @param value The associated value
 # @param prefix Prefix of the field key
 # @param base64 Encode value in base64
@@ -729,6 +726,9 @@ sub _dump {
 
 sub sendHtml {
     my ( $self, $req, $template, %args ) = @_;
+    $args{params}->{TROVER} = $self->trOver;
+    $args{templateDir} =
+      $self->conf->{templateDir} . '/' . $self->getSkin($req);
     my $res = $self->SUPER::sendHtml( $req, $template, %args );
     push @{ $res->[1] },
       'X-XSS-Protection'       => '1; mode=block',
@@ -792,13 +792,16 @@ sub sendHtml {
 
 sub sendCss {
     my ( $self, $req ) = @_;
-    my $s =
-        'html,body{background:url("'
-      . $self->staticPrefix
-      . '/common/backgrounds/'
-      . $self->conf->{portalSkinBackground}
-      . '") no-repeat center fixed;'
-      . 'background-size:cover;}';
+    my $s = '/* LL::NG Portal CSS */';
+    if ( $self->conf->{portalSkinBackground} ) {
+        $s .=
+            'html,body{background:url("'
+          . $self->staticPrefix
+          . '/common/backgrounds/'
+          . $self->conf->{portalSkinBackground}
+          . '") no-repeat center fixed;'
+          . 'background-size:cover;}';
+    }
     return [
         200,
         [
@@ -818,6 +821,8 @@ sub lmError {
     $self->controlUrl($req);
 
     my %templateParams = (
+        MAIN_LOGO  => $self->conf->{portalMainLogo},
+        LANGS      => $self->conf->{showLanguages},
         LOGOUT_URL => $self->conf->{portal} . "?logout=1",
         URL        => $req->{urldc},
     );
@@ -840,16 +845,30 @@ sub rebuildCookies {
 }
 
 sub tplParams {
-    my $portalPath = $_[0]->conf->{portal};
+    my ( $self, $req ) = @_;
+    my %templateParams;
+
+    my $portalPath = $self->conf->{portal};
     $portalPath =~ s#^https?://[^/]+/?#/#;
     $portalPath =~ s#[^/]+\.fcgi$##;
+
+    for my $session_key ( keys %{ $req->{sessionInfo} } ) {
+        $templateParams{ "session_" . $session_key } =
+          $req->{sessionInfo}->{$session_key};
+    }
+
+    for my $env_key ( keys %{ $req->env } ) {
+        $templateParams{ "env_" . $env_key } = $req->env->{$env_key};
+    }
+
     return (
-        SKIN       => $_[0]->getSkin( $_[1] ),
-        PORTAL_URL => $_[0]->conf->{portal},
+        SKIN       => $self->getSkin($req),
+        PORTAL_URL => $self->conf->{portal},
         SKIN_PATH  => $portalPath . "skins",
-        ANTIFRAME  => $_[0]->conf->{portalAntiFrame},
-        SKIN_BG    => $_[0]->conf->{portalSkinBackground},
-        ( $_[0]->customParameters ? ( %{ $_[0]->customParameters } ) : () ),
+        ANTIFRAME  => $self->conf->{portalAntiFrame},
+        SKIN_BG    => $self->conf->{portalSkinBackground},
+        ( $self->customParameters ? ( %{ $self->customParameters } ) : () ),
+        %templateParams
     );
 }
 

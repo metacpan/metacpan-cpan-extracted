@@ -200,8 +200,7 @@ sub switch {
 }
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -319,8 +318,7 @@ ywIDAQAB
 
 sub sp {
     my $xml = samlIDPMetaDataXML( 'idp', 'HTTP-POST' );
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

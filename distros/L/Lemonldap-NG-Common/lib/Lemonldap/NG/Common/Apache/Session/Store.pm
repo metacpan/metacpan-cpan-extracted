@@ -1,7 +1,7 @@
 
 package Lemonldap::NG::Common::Apache::Session::Store;
 
-our $VERSION = '1.9.1';
+our $VERSION = '2.0.0';
 
 sub new {
     my $class = shift;
@@ -28,7 +28,9 @@ sub update {
 
     #TODO: remove cache on all LL::NG instances if updateCache == 1
 
-    unless ( $session->{args}->{updateCache} == -1 ) {
+    unless ( defined( $session->{args}->{updateCache} )
+        and $session->{args}->{updateCache} == -1 )
+    {
 
         # Update session in cache
         my $id = $session->{data}->{_session_id};
@@ -36,7 +38,9 @@ sub update {
         $self->cache->set( $id, $session->{serialized} );
     }
 
-    unless ( $session->{args}->{updateCache} == 2 ) {
+    unless ( defined( $session->{args}->{updateCache} )
+        and $session->{args}->{updateCache} == 2 )
+    {
 
         # Update session in backend
         return $self->module->update($session);
@@ -71,14 +75,18 @@ sub remove {
 
     #TODO: remove cache on all LL::NG instances if updateCache == 1
 
-    unless ( $session->{args}->{updateCache} == -1 ) {
+    unless ($session->{args}->{updateCache}
+        and $session->{args}->{updateCache} == -1 )
+    {
 
         # Remove session from cache
         my $id = $session->{data}->{_session_id};
         $self->cache->remove($id) if ( $self->cache->get($id) );
     }
 
-    unless ( $session->{args}->{updateCache} == 2 ) {
+    unless ($session->{args}->{updateCache}
+        and $session->{args}->{updateCache} == 2 )
+    {
 
         # Remove session from backend
         return $self->module->remove($session);

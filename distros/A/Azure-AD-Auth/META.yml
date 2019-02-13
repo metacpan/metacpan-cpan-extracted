@@ -20,9 +20,10 @@ requires:
   Moo: '0'
   Throwable::Error: '0'
   Types::Standard: '0'
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/pplu/azure-ad-auth/issues
   repository: https://github.com/pplu/azure-ad-auth.git
-version: '0.02'
+version: '0.03'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

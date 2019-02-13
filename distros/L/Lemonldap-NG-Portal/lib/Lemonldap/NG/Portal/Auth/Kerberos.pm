@@ -12,11 +12,17 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
-has keytab => ( is => 'rw' );
+has keytab         => ( is => 'rw' );
+has AjaxInitScript => ( is => 'rw', default => '' );
+has Name           => ( is => 'ro', default => 'Kerberos' );
+has InitCmd => (
+    is      => 'ro',
+    default => q@$self->p->setHiddenFormValue( $req, kerberos => 0, '', 0 )@
+);
 
 # INITIALIZATION
 
@@ -28,6 +34,10 @@ sub init {
         return 0;
     }
     $self->keytab("FILE:$file");
+    $self->AjaxInitScript( '<script type="text/javascript" src="'
+          . $self->p->staticPrefix
+          . '/common/js/kerberosChoice.js"></script>' )
+      if $self->conf->{krbByJs};
     return 1;
 }
 
@@ -50,8 +60,7 @@ sub extractFormInfo {
 
             # Case 1.1: Ajax request
             if ( $req->wantJSON ) {
-                $req->response(
-                    [
+                $req->response( [
                         401,
                         [
                             'WWW-Authenticate' => 'Negotiate',
@@ -93,12 +102,18 @@ sub extractFormInfo {
 
         # Case 3: Display kerberos auth page (with javascript)
         else {
-            $self->logger->debug('Send Kerberos javascript');
-            $req->data->{customScript} .=
-                '<script type="text/javascript" src="'
-              . $self->p->staticPrefix
-              . '/common/js/kerberos.js"></script>';
-            $self->p->setHiddenFormValue( $req, kerberos => 0, '', 0 );
+            $self->logger->debug( 'Append ' . $self->Name . ' init/script' );
+
+            # Call kerberos.js if Kerberos is the only Auth module
+            # kerberosChoice.js is used by Choice
+            $self->{AjaxInitScript} =~ s/kerberosChoice/kerberos/;
+            $req->data->{customScript} .= $self->{AjaxInitScript};
+            $self->logger->debug(
+                "Send init/script -> " . $req->data->{customScript} );
+
+            #$self->p->setHiddenFormValue( $req, kerberos => 0, '', 0 );
+            eval( $self->InitCmd );
+            die 'Unable to launch init commmand ' . $self->{InitCmd} if ($@);
             return PE_FIRSTACCESS;
         }
     }

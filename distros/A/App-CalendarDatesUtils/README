@@ -1,0 +1,95 @@
+NAME
+    App::CalendarDatesUtils - Utilities related to Calendar::Dates
+
+VERSION
+    This document describes version 0.001 of App::CalendarDatesUtils (from
+    Perl distribution App-CalendarDatesUtils), released on 2019-02-13.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   list-calendar-dates
+
+    *   list-calendar-dates-modules
+
+FUNCTIONS
+  list_calendar_dates
+    Usage:
+
+     list_calendar_dates(%args) -> [status, msg, payload, meta]
+
+    List dates from a Calendar::Dates::* module.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   day => *int*
+
+    *   detail => *bool*
+
+    *   module* => *perl::modname*
+
+    *   month => *int*
+
+    *   year => *int*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_calendar_dates_modules
+    Usage:
+
+     list_calendar_dates_modules() -> [status, msg, payload, meta]
+
+    List Calendar::Dates::* modules, without the prefix.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CalendarDatesUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-CalendarDatesUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CalendarDatesUtil
+    s>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

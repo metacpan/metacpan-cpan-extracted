@@ -12,7 +12,7 @@ use Unicode::String qw(utf8);
 use Scalar::Util 'weaken';
 use utf8;
 
-our $VERSION  = '2.0.0';
+our $VERSION  = '2.0.2';
 our $ppLoaded = 0;
 
 BEGIN {
@@ -190,7 +190,7 @@ sub userBind {
         my $pp_error = $resp->pp_error;
         if ( defined $pp_error ) {
             $self->{portal}->userLogger->error(
-                "Password policy error $pp_error for $self->{portal}->{user}");
+                "Password policy error $pp_error for " . $req->user );
             return [
                 PE_PP_PASSWORD_EXPIRED,
                 PE_PP_ACCOUNT_LOCKED,

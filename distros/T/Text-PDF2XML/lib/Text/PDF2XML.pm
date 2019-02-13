@@ -36,6 +36,7 @@ Using pdf2xml as a library is possible via the pdf2xml function:
     dehyphenate             => 0,               # switch off de-hyphenation
     character_merging       => 0,               # skip char merging
     paragraph_merging       => 0,               # skip paragraph merging
+    request_timeout         => 180,             # server request timeout (Tika)
     verbose                 => 1                # verbose output
     );
 
@@ -95,11 +96,13 @@ use Encode::Locale;
 use Encode qw/decode_utf8/;
 use File::Temp qw /tempfile/;
 use FindBin qw/$Bin/;
+use Lingua::Identify::CLD;
 use IO::File;
 use IPC::Open3;
 use LWP::UserAgent;
 use XML::Parser;
 use XML::Writer;
+
 
 
 use Exporter 'import';
@@ -129,12 +132,13 @@ unless (-e $SHARED_HOME.'/lib/tika-app-1.18.jar'){
 
 our $TIKA_URL        = 'http://localhost:9998';
 our $USE_TIKA_SERVER = 1;
+our $REQUEST_TIMEOUT = 180;
 our $CONVERTER       = 'tika';
 
 our $JAVA            = 'java';
 our $JAVA_HEAP_SIZE  = '1g';
 our $TIKAJAR         = $SHARED_HOME.'/lib/tika-app-1.18.jar';
-our $PDF2TEXT        = `which pdftotext`;chomp($PDF2TEXT);
+our $PDF2TEXT        = undef;
 
 our $LOWERCASE       = 1;
 our $SPLIT_CHAR      = 0;
@@ -152,11 +156,14 @@ our $VOCAB_FROM_TIKA = 0;
 our $VERBOSE         = 0;
 
 
+## the compact language identifier from Google Chrome
+my $CLD = new Lingua::Identify::CLD;
+
 
 ## check availability of the Apache Tika Server
 my $_UserAgent;
 if ($USE_TIKA_SERVER){
-    $_UserAgent    = LWP::UserAgent->new();
+    $_UserAgent    = LWP::UserAgent->new( timeout => $REQUEST_TIMEOUT );
     my $_request   = HTTP::Request->new('HEAD' => $TIKA_URL);
     my $_response  = $_UserAgent->request($_request);
     if ($_response->is_error) {
@@ -181,13 +188,6 @@ our %voc          = ();
 our %lm           = ();
 our $LONGEST_WORD = undef;
 
-
-# we require recent versions of pdftotext developed by 
-# The Poppler Developers - http://poppler.freedesktop.org
-if (-e $PDF2TEXT){
-    my $developer = `$PDF2TEXT --help 2>&1 | grep -i 'poppler'`;
-    $PDF2TEXT    = undef unless ($developer=~/poppler/i);
-}
 
 my %LIGATURES = (
     "\x{0132}" => 'IJ',
@@ -239,6 +239,12 @@ sub pdf2xml{
 
     $VERBOSE         = $options{verbose} if ($options{verbose});
 
+    ## set request timeout if necessary
+    $_UserAgent->timeout($options{request_timeout}) if ($options{request_timeout});
+
+    ## set path to pdftotext
+    &_initialize_pdf2text();
+
     ## reset vocabulary
     unless ($KEEP_VOCABULARY){
 	%voc = ();
@@ -284,46 +290,63 @@ sub pdf2xml{
 				   DATA_INDENT => 1 );
     $XMLWRITER->xmlDecl("UTF-8");
 
-
-    my $parser = new XML::Parser( Handlers => { 
-	# Default => sub{ print $_[1] },
-	Char    => sub{ $_[0]->{STRING} .= $_[1] },
-	Start   => \&_xml_start,
-	End     => \&_xml_end } );
-
+    ## NEW: create parser in eval block to catch failures 
+    ##
+    # my $parser = new XML::Parser( Handlers => { 
+    # 	Char    => sub{ $_[0]->{STRING} .= $_[1] },
+    # 	Start   => \&_xml_start,
+    # 	End     => \&_xml_end } );
 
     # use pdfxtk or Apache Tika (default)
 
     if ($CONVERTER=~/pdfxtk/i){
-	my $out_file = &_run_pdfxtk($pdf_file);
-	open OUT,"<$out_file" || die "cannot read from pdfxtkoutput ($out_file)\n";
-	binmode(OUT,":encoding(UTF-8)");
-	# binmode(OUT,":encoding(locale)");
-	$SPLIT_CHAR_IF_NECESSARY = 1;
-	my $handler = $parser->parse_start;
-	while (<OUT>){
-	    $handler->parse_more($_);
-	}
-	close OUT;
+	eval {
+	    my $out_file = &_run_pdfxtk($pdf_file);
+	    open OUT,"<$out_file" || die "cannot read from pdfxtkoutput ($out_file)\n";
+	    binmode(OUT,":encoding(UTF-8)");
+	    # binmode(OUT,":encoding(locale)");
+	    $SPLIT_CHAR_IF_NECESSARY = 1;
+	    my $parser = &new_xml_parser();
+	    my $handler = $parser->parse_start;
+	    while (<OUT>){
+		$handler->parse_more($_);
+	    }
+	    close OUT;
+	};
+	warn $@ && return undef if $@;
     }
     else{
+	my $ParsedContent = undef;
 	if ($USE_TIKA_SERVER){
 	    my $RawContent = _read_raw_file($pdf_file);
-	    my $ParsedContent = _request( 'put', $TIKA_URL, 'tika', 
-					  { 'Accept' => 'text/xml' }, 
-					  $RawContent );
-	    $parser->parse($ParsedContent);
+	    $ParsedContent = _request( 'put', $TIKA_URL, 'tika', 
+				       { 'Accept' => 'text/xml' }, 
+				       $RawContent );
+	}
+	## only parse if there is content and it ends with '</html>'
+	if ($ParsedContent && $ParsedContent=~/<\/html>\s$/s){
+	    eval {
+		my $parser = &new_xml_parser();
+		$parser->parse($ParsedContent);
+	    };
+	    warn $@ && return undef if $@;
 	}
 	else {
-	    local $ENV{LC_ALL} = 'en_US.UTF-8';
-	    my $pid = open3(undef, \*OUT, \*ERR, $JAVA,'-Xmx'.$JAVA_HEAP_SIZE,
-			    '-jar',$TIKAJAR,'-x',$pdf_file);
-	    $parser->parse(*OUT);
-	    # close(OUT);
-	    # waitpid( $pid, 0 );
+	    eval {
+		local $ENV{LC_ALL} = 'en_US.UTF-8';
+		my $pid = open3(undef, \*OUT, \*ERR, $JAVA,'-Xmx'.$JAVA_HEAP_SIZE,
+				'-jar',$TIKAJAR,'-x',$pdf_file);
+		my $parser = &new_xml_parser();
+		$parser->parse(*OUT);
+		# close(OUT);
+		# waitpid( $pid, 0 );
+	    };
+	    warn $@ && return undef if $@;
 	}
     }
-    return $result;
+
+    ## success! return $result or 1
+    return $result ? $result : 1;
 }
 
 
@@ -331,7 +354,12 @@ sub pdf2xml{
 ##########################
 
 
-
+sub new_xml_parser{
+    return new XML::Parser( Handlers => { 
+	Char    => sub{ $_[0]->{STRING} .= $_[1] },
+	Start   => \&_xml_start,
+	End     => \&_xml_end } );
+}
 
 
 sub read_vocabulary{
@@ -378,6 +406,20 @@ sub make_lm{
     $LONGEST_WORD = &_longest_word();
 }
 
+
+
+sub _initialize_pdf2text{
+    unless ($PDF2TEXT){
+	$PDF2TEXT = `which pdftotext`;chomp($PDF2TEXT);
+    }
+
+    # we require recent versions of pdftotext developed by 
+    # The Poppler Developers - http://poppler.freedesktop.org
+    if (-e $PDF2TEXT){
+	my $developer = `$PDF2TEXT --help 2>&1 | grep -i 'poppler'`;
+	$PDF2TEXT    = undef unless ($developer=~/poppler/i);
+    }
+}
 
 
 # convert pdf's using pdfxtk
@@ -485,7 +527,10 @@ sub _xml_end{
 	$text=~s/\s\s+/ /gs;
 	my $lang = undef;
 	if (@words && ($DETECT_LANG || $KEEP_LANG) ){
-	    $lang = Lingua::Identify::Blacklists::identify( lc( $text ));
+	    ## NEW: remove blacklist classifier and use plain CLD instead
+	    # $lang = Lingua::Identify::Blacklists::identify( lc( $text ));
+	    my @detected = $CLD->identify( lc( $text ) );
+	    $lang = $detected[1];
 	    # print STDERR "language detected: ",$lang,"\n";
 	    if ($KEEP_LANG && ($lang ne $KEEP_LANG)){
 		$_[0]->{STRING} = '';
@@ -613,12 +658,14 @@ sub _vocab_from_tika{
         my $ParsedContent = _request( 'put', $TIKA_URL, 'tika', 
 				      { 'Accept' => 'text/plain' }, 
 				      $RawContent );
-	my @lines = split(/\n/,$ParsedContent);
-	my $hyphenated = undef;
-	foreach (@lines){
-	    $hyphenated = _string2voc($_,$hyphenated);
+	if ($ParsedContent){
+	    my @lines = split(/\n/,$ParsedContent);
+	    my $hyphenated = undef;
+	    foreach (@lines){
+		$hyphenated = _string2voc($_,$hyphenated);
+	    }
+	    return 1;
 	}
-	return 1;
     }
 
     local $ENV{LC_ALL} = 'en_US.UTF-8';
@@ -679,7 +726,11 @@ sub _request {
 	%$headers,
 	Content => $bodyBytes
         );
-    return decode_utf8($response->decoded_content(charset => 'none'));
+    if ($response->is_success) {
+	return decode_utf8($response->decoded_content(charset => 'none'));
+    }
+    print STDERR $response->status_line, "\n";
+    return undef;
 }
 
 

@@ -1,6 +1,6 @@
 # LLNG wrapper class to enable DevOps handler with FastCGI handler
 #
-# See http://lemonldap-ng.org/documentation/latest/handlerarch
+# See https://lemonldap-ng.org/documentation/latest/handlerarch
 package Lemonldap::NG::Handler::Server::DevOps;
 
 use strict;

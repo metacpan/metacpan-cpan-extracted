@@ -1,0 +1,106 @@
+NAME
+    App::calx - Display a calendar
+
+VERSION
+    This document describes version 0.004 of App::calx (from Perl
+    distribution App-calx), released on 2019-02-13.
+
+SYNOPSIS
+     # See calx script provided in this distribution
+
+DESCRIPTION
+    This module provides the calx which, like the Unix utility cal, displays
+    calendar on the command-line. The difference is, calx can also show and
+    highlight dates from one or more Calendar::Dates modules.
+
+FUNCTIONS
+  gen_calendar
+    Usage:
+
+     gen_calendar(%args) -> [status, msg, payload, meta]
+
+    Generate one or more monthly calendars in 3-column format.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   highlight_today => *bool* (default: 1)
+
+    *   month => *int*
+
+        The first month.
+
+        Not required if months=12 (generate whole year from month 1 to 12).
+
+    *   months => *int* (default: 1)
+
+    *   time_zone => *str*
+
+    *   year* => *int*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  gen_monthly_calendar
+    Usage:
+
+     gen_monthly_calendar(%args) -> any
+
+    Generate a single month calendar.
+
+    Return [\@lines, \@hol]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   caldates_modules => *array[perl::modname]*
+
+    *   highlight_today => *bool* (default: 1)
+
+    *   month* => *int*
+
+    *   show_next_month_days => *bool* (default: 1)
+
+    *   show_prev_month_days => *bool* (default: 1)
+
+    *   show_year_in_title => *bool* (default: 1)
+
+    *   time_zone => *str*
+
+    *   year* => *int*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-calx>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-calx>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-calx>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

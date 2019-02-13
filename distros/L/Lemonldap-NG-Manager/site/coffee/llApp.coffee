@@ -35,14 +35,19 @@ llapp.provider '$translator', ->
 		if navigator.languages
 			nlangs = navigator.languages
 		for nl in nlangs
+			console.log 'Navigator lang', nl
 			for al in window.availableLanguages
-				if al == nl
+				console.log ' Available lang', al
+				re = new RegExp('^'+al+'-?')
+				if nl.match re
+					console.log '  Matching lang =', al
 					langs.push al
 				else if al.substring(0, 1) == nl.substring(0, 1)
 					langs2.push al
 		res.lang = if langs[0] then langs[0] else if langs2[0] then langs2[0] else 'en'
 	else
 		res.lang = 'en'
+	console.log 'Selected lang ->', res.lang
 
 	# Internal properties
 	res.deferredTr = []
@@ -134,7 +139,7 @@ llapp.directive 'script', ['$htmlParams', ($htmlParams) ->
 	restrict: 'E'
 	terminal: true
 	compile: (element, attr) ->
-		if t = attr.type.match /text\/(menu|parameters)/
+		if attr.type and t = attr.type.match /text\/(menu|parameters)/
 			try
 				return $htmlParams.set t[1], JSON.parse(element[0].text)
 			catch e

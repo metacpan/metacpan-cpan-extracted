@@ -59,8 +59,7 @@ sub getCDAInfos {
     my $infos = {};
 
     # Get the session
-    my $cdaSession = Lemonldap::NG::Common::Session->new(
-        {
+    my $cdaSession = Lemonldap::NG::Common::Session->new( {
             storageModule        => $class->tsv->{sessionStorageModule},
             storageModuleOptions => $class->tsv->{sessionStorageOptions},
             cacheModule          => $class->tsv->{sessionCacheModule},

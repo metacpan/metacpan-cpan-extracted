@@ -2,6 +2,10 @@
 ##
 ## Change log for perl distribution Lingua::TT
 
+v0.12 Wed, 13 Feb 2019 08:46:52 +0100 moocow
+	* Makefile.PL administrivia
+	* use 5.010 (for // operator)
+
 v0.11 2019-02-12  moocow
 	* unified versions to v0.11
 	* generated Changes (this file) from SVN log

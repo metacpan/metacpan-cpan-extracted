@@ -1,6 +1,7 @@
 #define IMAGER_NO_CONTEXT
 #include "imager.h"
 #include "imageri.h"
+#include <assert.h>
 
 /*
 =head1 NAME
@@ -436,6 +437,8 @@ with the side of a filled area.
 i_fill_t *
 i_new_fill_hatch(const i_color *fg, const i_color *bg, int combine, int hatch, 
             const unsigned char *cust_hatch, i_img_dim dx, i_img_dim dy) {
+  assert(fg);
+  assert(bg);
   return i_new_hatch_low(fg, bg, NULL, NULL, combine, hatch, cust_hatch, 
                          dx, dy);
 }
@@ -464,6 +467,8 @@ with the side of a filled area.
 i_fill_t *
 i_new_fill_hatchf(const i_fcolor *fg, const i_fcolor *bg, int combine, int hatch, 
 		  const unsigned char *cust_hatch, i_img_dim dx, i_img_dim dy) {
+  assert(fg);
+  assert(bg);
   return i_new_hatch_low(NULL, NULL, fg, bg, combine, hatch, cust_hatch, 
                          dx, dy);
 }
@@ -642,25 +647,23 @@ i_new_hatch_low(const i_color *fg, const i_color *bg,
   i_fill_hatch_t *fill = mymalloc(sizeof(i_fill_hatch_t)); /* checked 14jul05 tonyc */
 
   *fill = hatch_fill_proto;
-  /* Some Sun C didn't like the condition expressions that were here.
-     See https://rt.cpan.org/Ticket/Display.html?id=21944
-   */
-  if (fg)
+  if (fg && bg) {
     fill->fg = *fg;
-  else
-    fill->fg = fcolor_to_color(ffg);
-  if (bg)
     fill->bg = *bg;
-  else
-    fill->bg = fcolor_to_color(fbg);
-  if (ffg) 
-    fill->ffg = *ffg;
-  else
     fill->ffg = color_to_fcolor(fg);
-  if (fbg)
-    fill->fbg = *fbg;
-  else
     fill->fbg = color_to_fcolor(bg);
+  }
+  else if (ffg && fbg) {
+    fill->fg = fcolor_to_color(ffg);
+    fill->bg = fcolor_to_color(fbg);
+    fill->ffg = *ffg;
+    fill->fbg = *fbg;
+  }
+  else {
+    assert(0);
+    /* NOTREACHED */
+  }
+  
   if (combine) {
     i_get_combine(combine, &fill->base.combine, &fill->base.combinef);
   }

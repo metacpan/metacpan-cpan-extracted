@@ -109,8 +109,7 @@ sub setNotifAccess {
     unless (
         eval {
             $self->notifAccess(
-                $type->new(
-                    {
+                $type->new( {
                         %{ $self->{notificationStorageOptions} },
                         p    => $self,
                         conf => $self

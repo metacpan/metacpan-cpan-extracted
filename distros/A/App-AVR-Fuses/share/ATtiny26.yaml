@@ -1,0 +1,239 @@
+---
+fusemap:
+  BODEN:
+    mask: 1
+    name: BODEN
+    reg: h
+  BODLEVEL:
+    mask: 2
+    name: BODLEVEL
+    reg: h
+    values:
+      - caption: Brown-out detection at VCC=4.0 V
+        name: 4V0
+        value: 0
+      - caption: Brown-out detection at VCC=2.7 V
+        name: 2V7
+        value: 2
+  CKOPT:
+    mask: 64
+    name: CKOPT
+    reg: l
+  EESAVE:
+    mask: 4
+    name: EESAVE
+    reg: h
+  PLLCK_SUT_CKSEL:
+    mask: 191
+    name: PLLCK_SUT_CKSEL
+    reg: l
+    values:
+      - caption: 'PLL Clock; Start-up time: 1K CK + 0 ms'
+        name: PLLCLK_1KCK_0MS
+        value: 1
+      - caption: 'PLL Clock; Start-up time: 1K CK + 4 ms'
+        name: PLLCLK_1KCK_4MS
+        value: 17
+      - caption: 'PLL Clock; Start-up time: 1K CK + 64 ms'
+        name: PLLCLK_1KCK_64MS
+        value: 33
+      - caption: 'PLL Clock; Start-up time: 16K CK + 64 ms'
+        name: PLLCLK_16KCK_64MS
+        value: 49
+      - caption: 'Ext. Clock; Start-up time: 6 CK + 0 ms'
+        name: EXTCLK_6CK_0MS
+        value: 131072
+      - caption: 'Ext. Clock; Start-up time: 6 CK + 4 ms'
+        name: EXTCLK_6CK_4MS
+        value: 131088
+      - caption: 'Ext. Clock; Start-up time: 6 CK + 64 ms'
+        name: EXTCLK_6CK_64MS
+        value: 131104
+      - caption: 'Int. RC Osc. 1 MHz; Start-up time: 6 CK + 0 ms'
+        name: INTRCOSC_1MHZ_6CK_0MS
+        value: 131073
+      - caption: 'Int. RC Osc. 1 MHz; Start-up time: 6 CK + 4 ms'
+        name: INTRCOSC_1MHZ_6CK_4MS
+        value: 131089
+      - caption: 'Int. RC Osc. 1 MHz; Start-up time: 6 CK + 64 ms'
+        name: INTRCOSC_1MHZ_6CK_64MS
+        value: 131105
+      - caption: 'Int. RC Osc. 2 MHz; Start-up time: 6 CK + 0 ms'
+        name: INTRCOSC_2MHZ_6CK_0MS
+        value: 131074
+      - caption: 'Int. RC Osc. 2 MHz; Start-up time: 6 CK + 4 ms'
+        name: INTRCOSC_2MHZ_6CK_4MS
+        value: 131090
+      - caption: 'Int. RC Osc. 2 MHz; Start-up time: 6 CK + 64 ms'
+        name: INTRCOSC_2MHZ_6CK_64MS
+        value: 131106
+      - caption: 'Int. RC Osc. 4 MHz; Start-up time: 6 CK + 0 ms'
+        name: INTRCOSC_4MHZ_6CK_0MS
+        value: 131075
+      - caption: 'Int. RC Osc. 4 MHz; Start-up time: 6 CK + 4 ms'
+        name: INTRCOSC_4MHZ_6CK_4MS
+        value: 131091
+      - caption: 'Int. RC Osc. 4 MHz; Start-up time: 6 CK + 64 ms'
+        name: INTRCOSC_4MHZ_6CK_64MS
+        value: 131107
+      - caption: 'Int. RC Osc. 8 MHz; Start-up time: 6 CK + 0 ms'
+        name: INTRCOSC_8MHZ_6CK_0MS
+        value: 131076
+      - caption: 'Int. RC Osc. 8 MHz; Start-up time: 6 CK + 4 ms'
+        name: INTRCOSC_8MHZ_6CK_4MS
+        value: 131092
+      - caption: 'Int. RC Osc. 8 MHz; Start-up time: 6 CK + 64 ms'
+        name: INTRCOSC_8MHZ_6CK_64MS
+        value: 131108
+      - caption: 'Ext. RC Osc.         -  0.9 MHz; Start-up time: 18 CK + 0 ms'
+        name: EXTRCOSC_XX_0MHZ9_18CK_0MS
+        value: 131077
+      - caption: 'Ext. RC Osc.         -  0.9 MHz; Start-up time: 18 CK + 4 ms'
+        name: EXTRCOSC_XX_0MHZ9_18CK_4MS
+        value: 131093
+      - caption: 'Ext. RC Osc.         -  0.9 MHz; Start-up time: 18 CK + 64 ms'
+        name: EXTRCOSC_XX_0MHZ9_18CK_64MS
+        value: 131109
+      - caption: 'Ext. RC Osc.         -  0.9 MHz; Start-up time: 6 CK + 4 ms'
+        name: EXTRCOSC_XX_0MHZ9_6CK_4MS
+        value: 131125
+      - caption: 'Ext. RC Osc. 0.9 MHz -  3.0 MHz; Start-up time: 18 CK + 0 ms'
+        name: EXTRCOSC_0MHZ9_3MHZ_18CK_0MS
+        value: 131078
+      - caption: 'Ext. RC Osc. 0.9 MHz -  3.0 MHz; Start-up time: 18 CK + 4 ms'
+        name: EXTRCOSC_0MHZ9_3MHZ_18CK_4MS
+        value: 131094
+      - caption: 'Ext. RC Osc. 0.9 MHz -  3.0 MHz; Start-up time: 18 CK + 64 ms'
+        name: EXTRCOSC_0MHZ9_3MHZ_18CK_64MS
+        value: 131110
+      - caption: 'Ext. RC Osc. 0.9 MHz -  3.0 MHz; Start-up time: 6 CK + 4 ms'
+        name: EXTRCOSC_0MHZ9_3MHZ_6CK_4MS
+        value: 131126
+      - caption: 'Ext. RC Osc. 3.0 MHz -  8.0 MHz; Start-up time: 18 CK + 0 ms'
+        name: EXTRCOSC_3MHZ_8MHZ_18CK_0MS
+        value: 131079
+      - caption: 'Ext. RC Osc. 3.0 MHz -  8.0 MHz; Start-up time: 18 CK + 4 ms'
+        name: EXTRCOSC_3MHZ_8MHZ_18CK_4MS
+        value: 131095
+      - caption: 'Ext. RC Osc. 3.0 MHz -  8.0 MHz; Start-up time: 18 CK + 64 ms'
+        name: EXTRCOSC_3MHZ_8MHZ_18CK_64MS
+        value: 131111
+      - caption: 'Ext. RC Osc. 3.0 MHz -  8.0 MHz; Start-up time: 6 CK + 4 ms'
+        name: EXTRCOSC_3MHZ_8MHZ_6CK_4MS
+        value: 131127
+      - caption: 'Ext. RC Osc. 8.0 MHz - 12.0 MHz; Start-up time: 18 CK + 0 ms'
+        name: EXTRCOSC_8MHZ_12MHZ_18CK_0MS
+        value: 131080
+      - caption: 'Ext. RC Osc. 8.0 MHz - 12.0 MHz; Start-up time: 18 CK + 4 ms'
+        name: EXTRCOSC_8MHZ_12MHZ_18CK_4MS
+        value: 131096
+      - caption: 'Ext. RC Osc. 8.0 MHz - 12.0 MHz; Start-up time: 18 CK + 64 ms'
+        name: EXTRCOSC_8MHZ_12MHZ_18CK_64MS
+        value: 131112
+      - caption: 'Ext. RC Osc. 8.0 MHz - 12.0 MHz; Start-up time: 6 CK + 4 ms'
+        name: EXTRCOSC_8MHZ_12MHZ_6CK_4MS
+        value: 131128
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 1K CK + 4 ms'
+        name: EXTLOFXTAL_1KCK_4MS
+        value: 131081
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 1K CK + 64 ms'
+        name: EXTLOFXTAL_1KCK_64MS
+        value: 131097
+      - caption: 'Ext. Low-Freq. Crystal; Start-up time: 32K CK + 64 ms'
+        name: EXTLOFXTAL_32KCK_64MS
+        value: 131113
+      - caption: 'Ext. Crystal/Resonator Low Freq.; Start-up time: 258 CK + 4 ms'
+        name: EXTLOFXTALRES_258CK_4MS
+        value: 131082
+      - caption: 'Ext. Crystal/Resonator Low Freq.; Start-up time: 258 CK + 64 ms'
+        name: EXTLOFXTALRES_258CK_64MS
+        value: 131098
+      - caption: 'Ext. Crystal/Resonator Low Freq.; Start-up time: 1K CK + 0 ms'
+        name: EXTLOFXTALRES_1KCK_0MS
+        value: 131114
+      - caption: 'Ext. Crystal/Resonator Low Freq.; Start-up time: 1K CK + 4 ms'
+        name: EXTLOFXTALRES_1KCK_4MS
+        value: 131130
+      - caption: 'Ext. Crystal/Resonator Low Freq.; Start-up time: 1K CK + 64 ms'
+        name: EXTLOFXTALRES_1KCK_64MS
+        value: 131083
+      - caption: 'Ext. Crystal/Resonator Low Freq.; Start-up time: 16K CK + 0 ms'
+        name: EXTLOFXTALRES_16KCK_0MS
+        value: 131099
+      - caption: 'Ext. Crystal/Resonator Low Freq.; Start-up time: 16K CK + 4 ms'
+        name: EXTLOFXTALRES_16KCK_4MS
+        value: 131115
+      - caption: 'Ext. Crystal/Resonator Low Freq.; Start-up time: 16K CK + 64 ms'
+        name: EXTLOFXTALRES_16KCK_64MS
+        value: 131131
+      - caption: 'Ext. Crystal/Resonator Medium Freq.; Start-up time: 258 CK + 4 ms'
+        name: EXTMEDFXTALRES_258CK_4MS
+        value: 131084
+      - caption: 'Ext. Crystal/Resonator Medium Freq.; Start-up time: 258 CK + 64 ms'
+        name: EXTMEDFXTALRES_258CK_64MS
+        value: 131100
+      - caption: 'Ext. Crystal/Resonator Medium Freq.; Start-up time: 1K CK + 0 ms'
+        name: EXTMEDFXTALRES_1KCK_0MS
+        value: 131116
+      - caption: 'Ext. Crystal/Resonator Medium Freq.; Start-up time: 1K CK + 4 ms'
+        name: EXTMEDFXTALRES_1KCK_4MS
+        value: 131132
+      - caption: 'Ext. Crystal/Resonator Medium Freq.; Start-up time: 1K CK + 64 ms'
+        name: EXTMEDFXTALRES_1KCK_64MS
+        value: 131085
+      - caption: 'Ext. Crystal/Resonator Medium Freq.; Start-up time: 16K CK + 0 ms'
+        name: EXTMEDFXTALRES_16KCK_0MS
+        value: 131101
+      - caption: 'Ext. Crystal/Resonator Medium Freq.; Start-up time: 16K CK + 4 ms'
+        name: EXTMEDFXTALRES_16KCK_4MS
+        value: 131117
+      - caption: 'Ext. Crystal/Resonator Medium Freq.; Start-up time: 16K CK + 64 ms'
+        name: EXTMEDFXTALRES_16KCK_64MS
+        value: 131133
+      - caption: 'Ext. Crystal/Resonator High Freq.; Start-up time: 258 CK + 4 ms'
+        name: EXTHIFXTALRES_258CK_4MS
+        value: 131086
+      - caption: 'Ext. Crystal/Resonator High Freq.; Start-up time: 258 CK + 64 ms'
+        name: EXTHIFXTALRES_258CK_64MS
+        value: 131102
+      - caption: 'Ext. Crystal/Resonator High Freq.; Start-up time: 1K CK + 0 ms'
+        name: EXTHIFXTALRES_1KCK_0MS
+        value: 131118
+      - caption: 'Ext. Crystal/Resonator High Freq.; Start-up time: 1K CK + 4 ms'
+        name: EXTHIFXTALRES_1KCK_4MS
+        value: 131134
+      - caption: 'Ext. Crystal/Resonator High Freq.; Start-up time: 1K CK + 64 ms'
+        name: EXTHIFXTALRES_1KCK_64MS
+        value: 131087
+      - caption: 'Ext. Crystal/Resonator High Freq.; Start-up time: 16K CK + 0 ms'
+        name: EXTHIFXTALRES_16KCK_0MS
+        value: 131103
+      - caption: 'Ext. Crystal/Resonator High Freq.; Start-up time: 16K CK + 4 ms'
+        name: EXTHIFXTALRES_16KCK_4MS
+        value: 131119
+      - caption: 'Ext. Crystal/Resonator High Freq.; Start-up time: 16K CK + 64 ms'
+        name: EXTHIFXTALRES_16KCK_64MS
+        value: 131135
+  RSTDISBL:
+    mask: 16
+    name: RSTDISBL
+    reg: h
+  SPIEN:
+    mask: 8
+    name: SPIEN
+    reg: h
+fuses:
+  - RSTDISBL
+  - SPIEN
+  - EESAVE
+  - BODLEVEL
+  - BODEN
+  - CKOPT
+  - PLLCK_SUT_CKSEL
+reginfos:
+  - default: 247
+    mask: 31
+    name: h
+  - default: 225
+    mask: 255
+    name: l

@@ -1,11 +1,11 @@
 # Main FastCGI handler adapter for LLNG handler
 #
-# See http://lemonldap-ng.org/documentation/latest/handlerarch
+# See https://lemonldap-ng.org/documentation/latest/handlerarch
 package Lemonldap::NG::Handler::Server::Main;
 
 use strict;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 use base 'Lemonldap::NG::Handler::PSGI::Main';
 
@@ -27,10 +27,11 @@ sub set_header_in {
 
 sub unset_header_in {
     my ( $class, $req, $header ) = @_;
-    $req->{respHeaders} = [ grep { $_ ne $header } @{ $req->{respHeaders} } ];
+    $req->{respHeaders} = [ grep { $_ ne $header and $_ ne cgiName($header) }
+          @{ $req->{respHeaders} } ];
+    delete $req->{env}->{ cgiName($header) };
     $header =~ s/-/_/g;
     delete $req->{env}->{$header};
-    delete $req->{env}->{"HTTP_$header"};
 }
 
 # Inheritence is broken in this case with Debian >= jessie

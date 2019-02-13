@@ -6,7 +6,11 @@ lib/Devel/Probe.pm
 t/000-use.t
 t/004-status-installed.t
 t/005-status-enabled.t
+t/006-dump.t
 t/007-trigger.t
+t/008-trigger-after-reinstall.t
+t/009-memleak.t
+t/010-probe-with-args.t
 
 Changes
 LICENSE

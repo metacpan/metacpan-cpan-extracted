@@ -90,15 +90,64 @@ count(1);
 expectOK($res);
 my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
-# Try to authenticate to IdP
+# Try to authenticate with an unauthorized user to IdP
 my $body = $res->[2]->[0];
 $body =~ s/^.*?<form.*?>//s;
 $body =~ s#</form>.*$##s;
 my %fields =
   ( $body =~ /<input type="hidden".+?name="(.+?)".+?value="(.*?)"/sg );
-$fields{user} = $fields{password} = 'french';
+$fields{user} = $fields{password} = 'dwho';
 use URI::Escape;
 my $s = join( '&', map { "$_=" . uri_escape( $fields{$_} ) } keys %fields );
+ok(
+    $res = $issuer->_post(
+        '/cas/login',
+        IO::String->new($s),
+        cookie => $pdata,
+        accept => 'text/html',
+        length => length($s),
+    ),
+    'Post authentication'
+);
+count(1);
+ok( $res->[2]->[0] =~ /trmsg="68"/, 'Reject reason is 68' )
+    or print STDERR Dumper( $res->[2]->[0] );
+count(1);
+
+# Simple SP access
+ok(
+    $res = $sp->_get(
+        '/', accept => 'text/html',
+    ),
+    'Unauth SP request'
+);
+count(1);
+expectRedirection( $res,
+    'http://auth.idp.com/cas/login?service=http%3A%2F%2Fauth.sp.com%2F' );
+
+# Query IdP
+switch ('issuer');
+ok(
+    $res = $issuer->_get(
+        '/cas/login',
+        query  => 'service=http://auth.sp.com/',
+        accept => 'text/html'
+    ),
+    'Query CAS server'
+);
+count(1);
+expectOK($res);
+$pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+
+# Try to authenticate with an authorized to IdP
+$body = $res->[2]->[0];
+$body =~ s/^.*?<form.*?>//s;
+$body =~ s#</form>.*$##s;
+%fields =
+  ( $body =~ /<input type="hidden".+?name="(.+?)".+?value="(.*?)"/sg );
+$fields{user} = $fields{password} = 'french';
+use URI::Escape;
+$s = join( '&', map { "$_=" . uri_escape( $fields{$_} ) } keys %fields );
 ok(
     $res = $issuer->_post(
         '/cas/login',
@@ -207,8 +256,7 @@ sub switch {
 }
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 templatesDir               => 'site/htdocs/static',
@@ -217,6 +265,7 @@ sub issuer {
                 authentication             => 'Demo',
                 userDB                     => 'Same',
                 issuerDBCASActivation      => 1,
+                issuerDBCASRule            => '$uid eq "french"',
                 casAttr                    => 'uid',
                 casAccessControlPolicy     => 'error',
                 multiValuesSeparator       => ';',
@@ -241,8 +290,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel              => $debug,
                 domain                => 'sp.com',

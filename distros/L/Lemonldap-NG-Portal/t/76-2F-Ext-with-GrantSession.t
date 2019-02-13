@@ -8,8 +8,7 @@ require 't/test-lib.pm';
 use_ok('Lemonldap::NG::Common::FormEncode');
 count(1);
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel             => 'error',
             ext2fActivation      => 1,
@@ -42,7 +41,7 @@ my ( $host, $url, $query ) =
 
 ok(
     $res->[2]->[0] =~
-qr%<input name="code" value="" class="form-control" id="extcode" trplaceholder="code">%,
+qr%<input name="code" value="" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);

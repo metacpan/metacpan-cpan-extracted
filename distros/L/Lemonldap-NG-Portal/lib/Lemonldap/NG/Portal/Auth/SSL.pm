@@ -9,13 +9,21 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
 # INITIALIZATION
 
+has AjaxInitScript => ( is => 'rw', default => '' );
+has Name           => ( is => 'ro', default => 'SSL' );
+
 sub init {
+    my ($self) = @_;
+    $self->AjaxInitScript( '<script type="application/init">{"sslHost":"'
+          . $self->conf->{sslHost}
+          . '"}</script>' )
+      if $self->conf->{sslByAjax};
     return 1;
 }
 
@@ -39,14 +47,19 @@ sub extractFormInfo {
         return PE_BADCERTIFICATE;
     }
     elsif ( $self->conf->{sslByAjax} and not $req->param('nossl') ) {
-        $self->logger->debug('Send SSL javascript');
-        $req->data->{customScript} .=
-            '<script type="application/init">{"sslHost":"'
-          . $self->conf->{sslHost}
-          . '"}</script>';
+        $self->logger->debug( 'Append ' . $self->{Name} . ' init/script' );
+        $req->data->{customScript} .= $self->{AjaxInitScript};
+        $self->logger->debug(
+            "Send init/script -> " . $req->data->{customScript} );
         return PE_FIRSTACCESS;
     }
     else {
+        if ( $self->conf->{sslByAjax} ) {
+            $self->logger->debug( 'Append ' . $self->{Name} . ' init/script' );
+            $req->data->{customScript} .= $self->{AjaxInitScript};
+            $self->logger->debug(
+                "Send init/script -> " . $req->data->{customScript} );
+        }
         $self->userLogger->warn('No certificate found');
         return PE_CERTIFICATEREQUIRED;
     }
@@ -65,6 +78,10 @@ sub setAuthSessionInfo {
 sub getDisplayType {
     my ($self) = @_;
     return ( $self->{conf}->{sslByAjax} ? "sslform" : "logo" );
+}
+
+sub authLogout {
+    PE_OK;
 }
 
 1;

@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::CAS';
@@ -23,10 +23,23 @@ extends 'Lemonldap::NG::Portal::Main::Issuer',
 use constant beforeAuth  => 'storeEnvAndCheckGateway';
 use constant sessionKind => 'ICAS';
 
+has rule => ( is => 'rw', default => sub { {} } );
+
 sub init {
     my ($self) = @_;
 
-    # Launch parents initialization subroutines, then launch IdP en SP lists
+    # Parse activation rule
+    my $hd = $self->p->HANDLER;
+    $self->logger->debug( "CAS rule -> " . $self->conf->{issuerDBCASRule} );
+    my $rule =
+      $hd->buildSub( $hd->substitute( $self->conf->{issuerDBCASRule} ) );
+    unless ($rule) {
+        $self->error( "Bad CAS rule -> " . $hd->tsv->{jail}->error );
+        return 0;
+    }
+    $self->{rule} = $rule;
+
+    # Launch parents initialization subroutines, then launch IdP and SP lists
     my $res = $self->Lemonldap::NG::Portal::Main::Issuer::init();
     return 0 unless ( $self->loadApp );
     $self->addUnauthRoute(
@@ -78,6 +91,12 @@ sub storeEnvAndCheckGateway {
 sub run {
     my ( $self, $req, $target ) = @_;
 
+    # Check activation rule
+    unless ( $self->rule->( $req, $req->sessionInfo ) ) {
+        $self->userLogger->error('CAS service not authorized');
+        return PE_CAS_SERVICE_NOT_ALLOWED;
+    }
+
     # CAS URL
     my $cas_login              = 'login';
     my $cas_logout             = 'logout';
@@ -105,8 +124,8 @@ sub run {
         # GET parameters
         my $service = $self->p->getHiddenFormValue( $req, 'service' )
           || $req->param('service');
-        my $renew =
-          $self->p->getHiddenFormValue( $req, 'renew' ) || $req->param('renew');
+        my $renew = $self->p->getHiddenFormValue( $req, 'renew' )
+          || $req->param('renew');
         my $gateway = $self->p->getHiddenFormValue( $req, 'gateway' )
           || $req->param('gateway');
         my $casServiceTicket;
@@ -296,7 +315,8 @@ sub run {
     }
 
     # 4. SERVICE VALIDATE [CAS 2.0]
-    if ( $target eq $cas_serviceValidate || $target eq $cas_p3_serviceValidate )
+    if (   $target eq $cas_serviceValidate
+        || $target eq $cas_p3_serviceValidate )
     {
 
         $self->logger->debug(
@@ -438,8 +458,7 @@ sub validate {
     }
 
     # Get username
-    my $username =
-      $localSession->data->{ $self->conf->{casAttr}
+    my $username = $localSession->data->{ $self->conf->{casAttr}
           || $self->conf->{whatToTrace} };
 
     $self->logger->debug("Get username $username");
@@ -709,8 +728,7 @@ sub _validate2 {
     }
 
     # Get username
-    my $username =
-      $localSession->data->{ $self->conf->{casAttr}
+    my $username = $localSession->data->{ $self->conf->{casAttr}
           || $self->conf->{whatToTrace} };
 
     $self->logger->debug("Get username $username");

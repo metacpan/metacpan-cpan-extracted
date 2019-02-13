@@ -5,7 +5,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
   'Lemonldap::NG::Portal::Lib::U2F';
@@ -186,8 +186,7 @@ sub run {
         }
 
         # Serialize data
-        $data = to_json(
-            {
+        $data = to_json( {
                 challenge      => $data->{challenge},
                 appId          => $data->{appId},
                 registeredKeys => \@rk
@@ -298,9 +297,6 @@ sub run {
             [ 'Content-Type' => 'application/json', 'Content-Length' => 12, ],
             ['{"result":1}']
         ];
-        my $err = Crypt::U2F::Server::Simple::lastError();
-        $self->userLogger->warn("U2F Unregistration failed: $err");
-        return $self->p->sendError( $req, $err, 200 );
     }
     else {
         $self->logger->error("Unknown U2F action -> $action");
@@ -316,7 +312,6 @@ sub loadUser {
     # Read existing 2FDevices
     $self->logger->debug("Looking for 2F Devices ...");
     my ( $kh, $uk, $_2fDevices );
-
     my @u2fs = ();
 
     if ( $req->userData->{_2fDevices} ) {

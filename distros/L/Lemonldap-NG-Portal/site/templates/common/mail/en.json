@@ -4,6 +4,7 @@
 "click2Register":"Click here to confirm your account registration",
 "click2Reset":"Click here to reset your password",
 "hello":"Hello",
+"mail2fSubject":"[LemonLDAP::NG] Your login code",
 "mailConfirmSubject": "[LemonLDAP::NG] Password reset confirmation",
 "mailSubject": "[LemonLDAP::NG] Your new password",
 "newPwdIs":"Your new password is",
@@ -12,5 +13,6 @@
 "registerConfirmSubject": "[LemonLDAP::NG] Account register confirmation",
 "registerDoneSubject": "[LemonLDAP::NG] Your new account",
 "requestIssuedFromIP":"The request was issued from IP",
+"yourLoginCodeIs":"Your login code is",
 "yourLoginIs":"Your login is"
 }

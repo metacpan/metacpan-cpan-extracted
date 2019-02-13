@@ -12,19 +12,20 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SLO_ERROR
   PE_SAML_SSO_ERROR
   PE_SAML_UNKNOWN_ENTITY
+  PE_SAML_SERVICE_NOT_ALLOWED
   PE_UNAUTHORIZEDPARTNER
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::SAML';
 
-has ssoUrlRe => ( is => 'rw' );
-
+has rule           => ( is => 'rw', default => sub { {} } );
+has ssoUrlRe       => ( is => 'rw' );
 has ssoUrlArtifact => ( is => 'rw' );
+has ssoGetUrl      => ( is => 'rw' );
 
-has ssoGetUrl => ( is => 'rw' );
 use constant sessionKind => 'ISAML';
 use constant lsDump      => '_lassoSessionDumpI';
 use constant liDump      => '_lassoIdentityDumpI';
@@ -38,6 +39,17 @@ use constant beforeAuth => 'storeEnv';
 
 sub init {
     my ($self) = @_;
+
+    # Parse activation rule
+    my $hd = $self->p->HANDLER;
+    $self->logger->debug( "SAML rule -> " . $self->conf->{issuerDBSAMLRule} );
+    my $rule =
+      $hd->buildSub( $hd->substitute( $self->conf->{issuerDBSAMLRule} ) );
+    unless ($rule) {
+        $self->error( "Bad SAML rule -> " . $hd->tsv->{jail}->error );
+        return 0;
+    }
+    $self->{rule} = $rule;
 
     # Prepare SSO URL catching
     my $saml_sso_get_url = $self->ssoGetUrl(
@@ -180,6 +192,12 @@ sub run {
     my $protocolProfile;
     my $artifact_method;
     my $authn_context;
+
+    # Check activation rule
+    unless ( $self->rule->( $req, $req->sessionInfo ) ) {
+        $self->userLogger->error('SAML service not authorized');
+        return PE_SAML_SERVICE_NOT_ALLOWED;
+    }
 
     # Session ID
     my $session_id = $req->{sessionInfo}->{_session_id} || $req->{id};
@@ -895,8 +913,7 @@ sub run {
             }
 
             # HTTP-POST
-            if (
-                (
+            if ( (
                        !$artifact
                     and $protocolProfile eq
                     Lasso::Constants::LOGIN_PROTOCOL_PROFILE_BRWS_POST

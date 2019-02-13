@@ -48,7 +48,7 @@
    "provides" : {
       "App::CPANCoverBadge" : {
          "file" : "lib/App/CPANCoverBadge.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -63,7 +63,7 @@
          "web" : "http://github.com/reneeb/App-CPANCoverBadge"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

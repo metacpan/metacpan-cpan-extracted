@@ -1,25 +1,39 @@
-#!perl -T
+#!/usr/bin/env perl
 
 use Data::Tabulate;
 use Test::More;
 
-eval "use Data::Tabulate::Plugin::HTMLTable 0.201";
-plan skip_all => "Data::Tabulate::Plugin::HTMLTable is not installed" if $@;
+use File::Basename;
+use lib dirname(__FILE__);
 
-plan tests => 1;
 my @array     = (1..10);
 my $tabulator = Data::Tabulate->new();
-my $html      = $tabulator->render('HTMLTable',{data => [@array]});
+my $dump      = $tabulator->render('Test',{data => [@array]});
 
-my $check     = q~
-<table>
-<tbody>
-<tr><td>1</td><td>2</td><td>3</td></tr>
-<tr><td>4</td><td>5</td><td>6</td></tr>
-<tr><td>7</td><td>8</td><td>9</td></tr>
-<tr><td>10</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-</tbody>
-</table>
+my $check     = q~$VAR1 = [
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ],
+          [
+            10,
+            undef,
+            undef
+          ]
+        ];
 ~;
 
-is($html,$check);
+is($dump,$check);
+
+done_testing();

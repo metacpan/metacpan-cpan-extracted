@@ -1,0 +1,173 @@
+---
+fusemap:
+  BODACT:
+    mask: 48
+    name: BODACT
+    reg: e
+    values:
+      - caption: Sampled
+        name: BOD_SAMPLED
+        value: 16
+      - caption: Enabled
+        name: BOD_ENABLED
+        value: 32
+      - caption: Disabled
+        name: BOD_DISABLED
+        value: 48
+  BODLEVEL:
+    mask: 7
+    name: BODLEVEL
+    reg: h
+    values:
+      - caption: Brown-out detection disabled
+        name: DISABLED
+        value: 7
+      - caption: Brown-out detection at VCC=4.3 V
+        name: 4V3
+        value: 4
+      - caption: Brown-out detection at VCC=2.7 V
+        name: 2V7
+        value: 5
+      - caption: Brown-out detection at VCC=1.8 V
+        name: 1V8
+        value: 6
+  BODPD:
+    mask: 192
+    name: BODPD
+    reg: e
+    values:
+      - caption: Sampled
+        name: BOD_SAMPLED
+        value: 64
+      - caption: Enabled
+        name: BOD_ENABLED
+        value: 128
+      - caption: Disabled
+        name: BOD_DISABLED
+        value: 192
+  BOOTRST:
+    mask: 1
+    name: BOOTRST
+    reg: e
+  BOOTSZ:
+    mask: 6
+    name: BOOTSZ
+    reg: e
+    values:
+      - caption: Boot Flash size=128 words Boot address=$0F80
+        name: 128W_0F80
+        value: 6
+      - caption: Boot Flash size=256 words Boot address=$0F00
+        name: 256W_0F00
+        value: 4
+      - caption: Boot Flash size=512 words Boot address=$0E00
+        name: 512W_0E00
+        value: 2
+      - caption: Boot Flash size=1024 words Boot address=$0C00
+        name: 1024W_0C00
+        value: 0
+  CKDIV8:
+    mask: 128
+    name: CKDIV8
+    reg: l
+  CKOUT:
+    mask: 64
+    name: CKOUT
+    reg: l
+  DWEN:
+    mask: 64
+    name: DWEN
+    reg: h
+  EESAVE:
+    mask: 8
+    name: EESAVE
+    reg: h
+  RSTDISBL:
+    mask: 128
+    name: RSTDISBL
+    reg: h
+  SPIEN:
+    mask: 32
+    name: SPIEN
+    reg: h
+  SUT_CKSEL:
+    mask: 51
+    name: SUT_CKSEL
+    reg: l
+    values:
+      - caption: 'Ext. Clock; Start-up time PWRDWN/RESET: 6 + 14 CK + 0 ms'
+        name: EXTCLK_6CK_14CK_0MS
+        value: 0
+      - caption: 'Ext. Clock; Start-up time PWRDWN/RESET: 6 + 14 CK + 0 ms'
+        name: EXTCLK_6CK_14CK_0MS
+        value: 1
+      - caption: 'Ext. Clock; Start-up time PWRDWN/RESET: 6 + 14 CK + 4.1 ms'
+        name: EXTCLK_6CK_14CK_4MS1
+        value: 131072
+      - caption: 'Ext. Clock; Start-up time PWRDWN/RESET: 6 + 14 CK + 4.1 ms'
+        name: EXTCLK_6CK_14CK_4MS1
+        value: 131073
+      - caption: 'Ext. Clock; Start-up time PWRDWN/RESET: 6 + 14 CK + 65 ms'
+        name: EXTCLK_6CK_14CK_65MS
+        value: 262144
+      - caption: 'Ext. Clock; Start-up time PWRDWN/RESET: 6 + 14 CK + 65 ms'
+        name: EXTCLK_6CK_14CK_65MS
+        value: 393216
+      - caption: 'Ext. Clock; Start-up time PWRDWN/RESET: 6 + 14 CK + 65 ms'
+        name: EXTCLK_6CK_14CK_65MS
+        value: 262145
+      - caption: 'Ext. Clock; Start-up time PWRDWN/RESET: 6 + 14 CK + 65 ms'
+        name: EXTCLK_6CK_14CK_65MS
+        value: 393217
+      - caption: 'Int. RC Osc. 8 MHz; Start-up time PWRDWN/RESET: 6 + 14 CK + 0 ms'
+        name: INTRCOSC_8MHZ_6CK_14CK_0MS
+        value: 2
+      - caption: 'Int. RC Osc. 8 MHz; Start-up time PWRDWN/RESET: 6 + 14 CK + 4.1 ms'
+        name: INTRCOSC_8MHZ_6CK_14CK_4MS1
+        value: 131074
+      - caption: 'Int. RC Osc. 8 MHz; Start-up time PWRDWN/RESET: 6 + 14 CK + 65 ms'
+        name: INTRCOSC_8MHZ_6CK_14CK_65MS
+        value: 262146
+      - caption: 'Int. RC Osc. 8 MHz; Start-up time PWRDWN/RESET: 6 + 14 CK + 65 ms'
+        name: INTRCOSC_8MHZ_6CK_14CK_65MS
+        value: 393218
+      - caption: 'Int. ULP Osc. 32kHz; Start-up time PWRDWN/RESET: 6 + 14 CK + 0 ms'
+        name: INTULPOSC_32KHZ_6CK_14CK_0MS
+        value: 3
+      - caption: 'Int. ULP Osc. 32kHz; Start-up time PWRDWN/RESET: 6 + 14 CK + 4.1 ms'
+        name: INTULPOSC_32KHZ_6CK_14CK_4MS1
+        value: 131075
+      - caption: 'Int. ULP Osc. 32kHz; Start-up time PWRDWN/RESET: 6 + 14 CK + 65 ms'
+        name: INTULPOSC_32KHZ_6CK_14CK_65MS
+        value: 262147
+      - caption: 'Int. ULP Osc. 32kHz; Start-up time PWRDWN/RESET: 6 + 14 CK + 65 ms'
+        name: INTULPOSC_32KHZ_6CK_14CK_65MS
+        value: 393219
+  WDTON:
+    mask: 16
+    name: WDTON
+    reg: h
+fuses:
+  - BOOTSZ
+  - BOOTRST
+  - BODPD
+  - BODACT
+  - RSTDISBL
+  - DWEN
+  - SPIEN
+  - WDTON
+  - EESAVE
+  - BODLEVEL
+  - CKDIV8
+  - CKOUT
+  - SUT_CKSEL
+reginfos:
+  - default: 255
+    mask: 247
+    name: e
+  - default: 223
+    mask: 255
+    name: h
+  - default: 110
+    mask: 243
+    name: l

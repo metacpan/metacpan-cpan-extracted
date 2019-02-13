@@ -1,0 +1,60 @@
+{
+   "abstract" : "Basic interface to Microsoft SharePoint REST API",
+   "author" : [
+      "Roman Parparov <rparparov@vmware.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-SharePoint-Basic",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.38",
+            "Data::Dumper" : "2.161",
+            "Data::UUID" : "1.203",
+            "Exporter" : "5.63",
+            "File::Basename" : "2.77",
+            "File::Path" : "2.08",
+            "Getopt::Long" : "2.38",
+            "IO::Scalar" : "2.110",
+            "JSON::XS" : "3.04",
+            "LWP::UserAgent" : "5.835",
+            "POSIX" : "1.17",
+            "Storable" : "2.20",
+            "URI::Escape" : "3.31",
+            "experimental" : "0.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Output" : "0.16"
+         }
+      }
+   },
+   "provides" : {
+      "Net::SharePoint::Basic" : {
+         "file" : "lib/Net/SharePoint/Basic.pm",
+         "version" : "0.1"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

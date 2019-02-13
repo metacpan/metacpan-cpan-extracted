@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.060';
+our $VERSION = '2.061';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.060
+Version 2.061
 
 =cut
 
@@ -326,10 +326,7 @@ data. In the I<Settings> one can configure how the data is parsed.
 
 Like I<Copy and Paste> with the difference that the data is read from a chosen file.
 
-=item Settings
-
-Selecting I<Settings> allows one to set the options described in the option group L</Get Data> for the current
-database.
+Selecting the prompt line of the I<Files> menu allows one to set the options described in the option group L</Get Data>.
 
 =back
 
@@ -944,7 +941,7 @@ How to decode text files.
 
 =head3 File History
 
-Set how many input file names and searched directories should be saved. A value of C<0> disables the history.
+Set how many searched directories should be saved. A value of C<0> disables the history.
 
 =head1 CONFIGURATION FILES
 

@@ -66,8 +66,7 @@ LWP::Protocol::PSGI->register(
     }
 );
 
-$client = LLNG::Manager::Test->new(
-    {
+$client = LLNG::Manager::Test->new( {
         ini => {
             logLevel          => $debug,
             useSafeJail       => 1,
@@ -113,8 +112,7 @@ my ( $cli, $app );
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
 switch ('app');
 ok(
-    $app = Lemonldap::NG::Handler::Server->run(
-        {
+    $app = Lemonldap::NG::Handler::Server->run( {
             %{ $client->ini },
             globalStorage => 'Lemonldap::NG::Common::Apache::Session::REST',
             globalStorageOptions =>
@@ -126,8 +124,7 @@ ok(
 );
 
 ok(
-    $res = $app->(
-        {
+    $res = $app->( {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',
@@ -153,8 +150,7 @@ expectRedirection( $res, 'http://test.example.org/' );
 my $cid = expectCookie($res);
 
 ok(
-    $res = $app->(
-        {
+    $res = $app->( {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',

@@ -1,9 +1,9 @@
 package Lemonldap::NG::Handler;
 
-print STDERR
-"Use the appropriate handler. For Apache, use Lemonldap::NG::Handler::ApacheMP2";
+# Use the appropriate handler
+# For Apache, use Lemonldap::NG::Handler::ApacheMP2
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 1;
 

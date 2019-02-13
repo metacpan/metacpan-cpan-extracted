@@ -1,3 +1,8 @@
+0.003   2019-02-13 (PERLANCAR)
+
+	- Add utility: acme-cpanmodules-for.
+
+
 0.002   2019-01-11 (PERLANCAR)
 
 	- Add utility: draw-feature-matrix-from-acme-cpanmodules-module.

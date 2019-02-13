@@ -2,8 +2,9 @@ package Lemonldap::NG::Manager::Conf::Tests;
 
 use utf8;
 use Lemonldap::NG::Common::Regexp;
+use Lemonldap::NG::Handler::Main;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -198,8 +199,7 @@ sub tests {
         # Try to use Apache::Session module
         testApacheSession => sub {
             my ( $id, %h );
-            my $gc =
-              $Lemonldap::NG::Handler::PSGI::Main::tsv->{sessionStorageModule};
+            my $gc = Lemonldap::NG::Handler::Main->tsv->{sessionStorageModule};
             return 1
               if ( ( $gc and $gc eq $conf->{globalStorage} )
                 or $conf->{globalStorage} =~
@@ -238,7 +238,7 @@ sub tests {
 
         # Warn if cookie name has changed
         cookieNameChanged => sub {
-            my $cn = $Lemonldap::NG::Handler::PSGI::API::tsv->{cookieName};
+            my $cn = Lemonldap::NG::Handler::Main->tsv->{cookieName};
             return (
                 1,
                 (
@@ -254,7 +254,8 @@ sub tests {
         cookieTTL => sub {
             return 1 unless ( defined $conf->{cookieExpiration} );
             return ( 0, "Cookie TTL must be higher than one minute" )
-              unless ( $conf->{cookieExpiration} > 60 );
+              unless ( $conf->{cookieExpiration} == 0
+                || $conf->{cookieExpiration} > 60 );
             return ( 1, "Cookie TTL should be higher or equal than one hour" )
               unless ( $conf->{cookieExpiration} >= 3600
                 || $conf->{cookieExpiration} == 0 );
@@ -264,9 +265,9 @@ sub tests {
         },
 
         # Warn if session timeout is lower than 10 minutes
-        timeoutActivity => sub {
+        sessionTimeout => sub {
             return 1 unless ( defined $conf->{timeout} );
-            return ( 1, "Session timeout should be higher than ten minutes" )
+            return ( -1, "Session timeout should be higher than ten minutes" )
               unless ( $conf->{timeout} > 600
                 || $conf->{timeout} == 0 );
 
@@ -275,7 +276,7 @@ sub tests {
         },
 
         # Error if session Activity Timeout is equal or lower than one minute
-        timeoutActivity => sub {
+        sessionTimeoutActivity => sub {
             return 1 unless ( defined $conf->{timeoutActivity} );
             return ( 0,
 "Session activity timeout must be higher or equal than one minute"
@@ -325,7 +326,11 @@ sub tests {
               if ($@);
 
             # Create SMTP object
-            my $smtp = Net::SMTP->new( $conf->{SMTPServer}, Timeout => 5 );
+            my $smtp = Net::SMTP->new(
+                $conf->{SMTPServer},
+                Timeout => 5,
+                ( $conf->{SMTPPort} ? ( Port => $conf->{SMTPPort} ) : () ),
+            );
             return ( 1,
                 "SMTP connection to " . $conf->{SMTPServer} . " failed" )
               unless ($smtp);
@@ -424,6 +429,18 @@ sub tests {
             return 1;
         },
 
+        # Check Combination parameters
+        combinationParameters => sub {
+            return 1 unless ( $conf->{authentication} eq "Combination" );
+            return ( 0, "Combination rule must be defined" )
+              unless ( $conf->{combination} );
+            return ( 0, 'userDB must be set to "Same" to enable Combination' )
+              unless ( $conf->{userDB} eq "Same" );
+
+            # Return
+            return 1;
+        },
+
         # Warn if 2F dependencies seem missing
         sfaDependencies => sub {
 
@@ -483,8 +500,7 @@ sub tests {
             return 1 unless ( defined $conf->{totp2fDigits} );
             return (
                 1,
-                (
-                    (
+                ( (
                              $conf->{totp2fDigits} == 6
                           or $conf->{totp2fDigits} == 8
                     )
@@ -600,6 +616,20 @@ sub tests {
             # Return
             return 1;
         },
+
+        # Warn if Mailrest plugin is enabled without Token or Captcha
+        checkMailResetSecurity => sub {
+            return 1 unless ( $conf->{portalDisplayResetPassword} );
+            return ( -1,
+'"passwordMailReset" plugin is enabled without CSRF Token neither Captcha required !!!'
+              )
+              unless ( $conf->{requireToken}
+                or $conf->{captcha_mail_enabled} );
+
+            # Return
+            return 1;
+        },
+
     };
 }
 

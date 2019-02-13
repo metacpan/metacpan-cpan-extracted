@@ -7,7 +7,7 @@
  <meta http-equiv="cache-control" content="no-cache" />
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- //if:usedebianlibs
- <link rel="stylesheet" type="text/css" href="/javascript/bootstrap/css/bootstrap.min.css" />
+ <link rel="stylesheet" type="text/css" href="/javascript/bootstrap4/css/bootstrap.min.css" />
  <link rel="stylesheet" type="text/css" href="/javascript/font-awesome/css/font-awesome.min.css" />
  <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX"><TMPL_VAR NAME="SKIN">/css/styles.min.css" />
 //elsif:useexternallibs
@@ -40,7 +40,7 @@
 <!-- //if:usedebianlibs
   <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX"><TMPL_VAR NAME="SKIN">/js/skin.min.js"></script>
   <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/portal.min.js"></script>
-  <script type="text/javascript" src="/javascript/bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/javascript/bootstrap4/js/bootstrap.min.js"></script>
  //elsif:jsminified
   <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX"><TMPL_VAR NAME="SKIN">/js/skin.min.js"></script>
   <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/portal.min.js"></script>

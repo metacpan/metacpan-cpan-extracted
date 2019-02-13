@@ -12,18 +12,22 @@ use utf8;
 no strict 'refs';
 use Lemonldap::NG::Common::Conf::Constants;    #inherits
 
+# Import compacter
+use Lemonldap::NG::Common::Conf::Compact;
+*compactConf = \&Lemonldap::NG::Common::Conf::Compact::compactConf;
+
 # TODO: don't import this big file, use a proxy
 use Lemonldap::NG::Common::Conf::DefaultValues;    #inherits
 use Lemonldap::NG::Common::Crypto
   ;    #link protected cipher Object "cypher" in configuration hash
 use Config::IniFiles;
 
-#inherits Lemonldap::NG::Common::Conf::File
-#inherits Lemonldap::NG::Common::Conf::DBI
-#inherits Lemonldap::NG::Common::Conf::SOAP
-#inherits Lemonldap::NG::Common::Conf::LDAP
+#inherits Lemonldap::NG::Common::Conf::Backends::File
+#inherits Lemonldap::NG::Common::Conf::Backends::DBI
+#inherits Lemonldap::NG::Common::Conf::Backends::SOAP
+#inherits Lemonldap::NG::Common::Conf::Backends::LDAP
 
-our $VERSION = '1.9.1';
+our $VERSION = '2.0.0';
 our $msg     = '';
 our $iniObj;
 
@@ -41,9 +45,9 @@ BEGIN {
 # - Nothing: default configuration file is tested,
 # - { confFile => "/path/to/storage.conf" },
 # - { Type => "File", dirName => "/path/to/conf/dir/" },
-# - { Type => "DBI", dbiChain => "DBI:mysql:database=lemonldap-ng;host=1.2.3.4",
+# - { Type => "DBI", dbiChain => "DBI:MariaDB:database=lemonldap-ng;host=1.2.3.4",
 # dbiUser => "user", dbiPassword => "password" },
-# - { Type => "SOAP", proxy => "https://auth.example.com/index.pl/config" },
+# - { Type => "SOAP", proxy => "https://auth.example.com/config" },
 # - { Type => "LDAP", ldapServer => "ldap://localhost", ldapConfBranch => "ou=conf,ou=applications,dc=example,dc=com",
 #  ldapBindDN => "cn=manager,dc=example,dc=com", ldapBindPassword => "secret"},
 #
@@ -79,7 +83,7 @@ sub new {
         unless ( $self->{type} =~ /^[\w:]+$/ ) {
             $msg .= "Error: configStorage: type is not well formed.\n";
         }
-        $self->{type} = "Lemonldap::NG::Common::Conf::$self->{type}"
+        $self->{type} = "Lemonldap::NG::Common::Conf::Backends::$self->{type}"
           unless $self->{type} =~ /^Lemonldap::/;
         eval "require $self->{type}";
         if ($@) {
@@ -93,7 +97,7 @@ sub new {
     if ( $self->{localStorage} and not defined( $self->{refLocalStorage} ) ) {
         eval "use $self->{localStorage};";
         if ($@) {
-            $msg .= "Unable to load $self->{localStorage}: $@.\n";
+            $msg .= "Error: Unable to load $self->{localStorage}: $@.\n";
         }
 
         # TODO: defer that until $> > 0 (to avoid creating local cache with
@@ -128,12 +132,18 @@ sub saveConf {
     my $tmp = $self->store($conf);
 
     unless ( $tmp > 0 ) {
-        $msg .= "Configuration $conf->{cfgNum} not stored.\n";
+        $msg .= "Error: Configuration $conf->{cfgNum} not stored.\n";
         $self->unlock();
         return ( $tmp ? $tmp : UNKNOWN_ERROR );
     }
 
     $msg .= "Configuration $conf->{cfgNum} stored.\n";
+    if ( $self->{refLocalStorage} ) {
+        $self->setDefault($conf);
+        $self->compactConf($conf);
+        $self->setLocalConf($conf);
+    }
+
     return ( $self->unlock() ? $tmp : UNKNOWN_ERROR );
 }
 
@@ -147,15 +157,15 @@ sub saveConf {
 # @return Lemonldap::NG configuration
 sub getConf {
     my ( $self, $args ) = @_;
+    my $res;
 
     # Use only cache to get conf if $args->{local} is set
     if (    $>
         and $args->{local}
         and ref( $self->{refLocalStorage} )
-        and my $res = $self->{refLocalStorage}->get('conf') )
+        and $res = $self->{refLocalStorage}->get('conf') )
     {
         $msg .= "Get configuration from cache without verification.\n";
-        return $res;
     }
 
     # Check cfgNum in conf backend
@@ -163,17 +173,20 @@ sub getConf {
     else {
         $args->{cfgNum} ||= $self->lastCfg;
         unless ( $args->{cfgNum} ) {
-            $msg .= "No configuration available in backend.\n";
+            $msg .= "Error: No configuration available in backend.\n";
         }
         my $r;
         unless ( ref( $self->{refLocalStorage} ) ) {
             $msg .= "Get remote configuration (localStorage unavailable).\n";
             $r = $self->getDBConf($args);
+            return undef unless ( $r->{cfgNum} );
+            $self->setDefault( $r, $args->{localPrm} );
+            $self->compactConf($r);
         }
         else {
             eval { $r = $self->{refLocalStorage}->get('conf') }
               if ( $> and not $args->{noCache} );
-            $msg = "Warn: $@" if ($@);
+            $msg .= "Warn: $@" if ($@);
             if (    ref($r)
                 and $r->{cfgNum}
                 and $args->{cfgNum}
@@ -184,63 +197,73 @@ sub getConf {
                 $args->{noCache} = 1;
             }
             else {
-                $r = $self->getDBConf($args);
-                return undef unless ( $r->{cfgNum} );
-
-                # TODO: default values may not be set here
-                unless ( $args->{raw} ) {
-
-                    # Adapt some values before storing in local cache
-                    # Get default values
-                    my $defaultValues =
-                      Lemonldap::NG::Common::Conf::DefaultValues
-                      ->defaultValues();
-
-                    foreach my $k ( keys %$defaultValues ) {
-                        $r->{$k} //= $defaultValues->{$k};
-                    }
+                my $r2 = $self->getDBConf($args);
+                unless ( $r2->{cfgNum} ) {
+                    $r = $self->{refLocalStorage}->get('conf') unless ($r);
+                    $msg .=
+                      $r
+                      ? "Error: Using previous cached configuration\n"
+                      : "Error: No configuration found in local cache\n";
+                    return undef unless ($r);
+                }
+                else {
+                    $r = $r2;
                 }
 
-                # Convert old option useXForwardedForIP into trustedProxies
-                if ( defined $r->{useXForwardedForIP}
-                    and $r->{useXForwardedForIP} == 1 )
-                {
-                    $r->{trustedProxies} = '*';
-                    delete $r->{useXForwardedForIP};
-                }
-
-                # Force Choice backend
-                if ( $r->{authentication} eq "Choice" ) {
-                    $r->{userDB}     = "Choice";
-                    $r->{passwordDB} = "Choice";
-                }
-
-            # Some parameters expect key name (example), not variable ($example)
-                if ( defined $r->{whatToTrace} ) {
-                    $r->{whatToTrace} =~ s/^\$//;
-                }
+                $self->setDefault( $r, $args->{localPrm} );
+                $self->compactConf($r);
 
                 # Store modified configuration in cache
                 $self->setLocalConf($r)
                   if ( $self->{refLocalStorage}
                     and not( $args->{noCache} == 1 or $args->{raw} ) );
-
-            }
-        }
-
-        # Create cipher object
-        unless ( $args->{raw} ) {
-            eval {
-                $r->{cipher} = Lemonldap::NG::Common::Crypto->new( $r->{key} );
-            };
-            if ($@) {
-                $msg .= "Bad key: $@. \n";
             }
         }
 
         # Return configuration hash
-        return $r;
+        $res = $r;
     }
+
+    # Create cipher object
+    unless ( $args->{raw} ) {
+
+        eval {
+            $res->{cipher} = Lemonldap::NG::Common::Crypto->new( $res->{key} );
+        };
+        if ($@) {
+            $msg .= "Bad key: $@. \n";
+        }
+    }
+
+    return $res;
+}
+
+# Set default values
+sub setDefault {
+    my ( $self, $conf, $localPrm ) = @_;
+    if ( defined $localPrm ) {
+        $self->{localPrm} = $localPrm;
+    }
+    else {
+        $localPrm = $self->{localPrm};
+    }
+    my $defaultValues =
+      Lemonldap::NG::Common::Conf::DefaultValues->defaultValues();
+    if ( $localPrm and %$localPrm ) {
+        foreach my $k ( keys %$localPrm ) {
+            $conf->{$k} = $localPrm->{$k};
+        }
+    }
+    foreach my $k ( keys %$defaultValues ) {
+        $conf->{$k} //= $defaultValues->{$k};
+    }
+
+    # Some parameters expect key name (example), not variable ($example)
+    if ( defined $conf->{whatToTrace} ) {
+        $conf->{whatToTrace} =~ s/^\$//;
+    }
+
+    return $conf;
 }
 
 ## @method hashRef getLocalConf(string section, string file, int loaddefault)
@@ -302,7 +325,13 @@ sub getLocalConf {
     if ($loaddefault) {
         foreach ( $cfg->Parameters(DEFAULTSECTION) ) {
             $r->{$_} = $cfg->val( DEFAULTSECTION, $_ );
-            if ( $r->{$_} =~ /^[{\[].*[}\]]$/ || $r->{$_} =~ /^sub\s*{.*}$/ ) {
+            if ( $_ eq "require" ) {
+                eval { require $r->{$_} };
+                $msg .= "Error: $@" if ($@);
+            }
+            if (   $r->{$_} =~ /^[{\[].*[}\]]$/
+                || $r->{$_} =~ /^sub\s*{.*}$/ )
+            {
                 eval "\$r->{$_} = $r->{$_}";
                 if ($@) {
                     $msg .= "Warning: error in file $file: $@.\n";
@@ -321,6 +350,9 @@ sub getLocalConf {
     # Load section parameters
     foreach ( $cfg->Parameters($section) ) {
         $r->{$_} = $cfg->val( $section, $_ );
+
+        # Remove spaces before and after value (#1488)
+        $r->{$_} =~ s/^\s*(.+?)\s*/$1/;
         if ( $r->{$_} =~ /^[{\[].*[}\]]$/ || $r->{$_} =~ /^sub\s*{.*}$/ ) {
             eval "\$r->{$_} = $r->{$_}";
             if ($@) {
@@ -362,10 +394,6 @@ sub getDBConf {
     my $conf = $self->load( $args->{cfgNum} );
     $msg .= "Get configuration $conf->{cfgNum}.\n"
       if ( defined $conf->{cfgNum} );
-    $self->setLocalConf($conf)
-      if (  ref($conf)
-        and $self->{refLocalStorage}
-        and not( $args->{noCache} ) );
     return $conf;
 }
 
@@ -459,6 +487,8 @@ Web-SSO configuration.
 =head1 SYNOPSIS
 
   use Lemonldap::NG::Common::Conf;
+  # Lemonldap::NG::Common::Conf reads loacl configuration from lemonldap-ng.ini.
+  # Parameters can be overridden in a hash:
   my $confAccess = new Lemonldap::NG::Common::Conf(
               {
                   type=>'File',
@@ -475,68 +505,38 @@ Web-SSO configuration.
                   },
               },
     ) or die "Unable to build Lemonldap::NG::Common::Conf, see Apache logs";
+  # Next, get global configuration. Note that local parameters override global
+  # ones
   my $config = $confAccess->getConf();
 
 =head1 DESCRIPTION
 
-Lemonldap::NG::Common::Conf provides a simple interface to access to
-Lemonldap::NG Web-SSO configuration. It is used by L<Lemonldap::NG::Handler>,
-L<Lemonldap::NG::Portal> and L<Lemonldap::NG::Manager>.
+Lemonldap::NG::Common::Conf is used by all Lemonldap::NG packages to access to
+local/global configuration.
 
 =head2 SUBROUTINES
 
 =over
 
-=item * B<new> (constructor): it takes different arguments depending on the
-chosen type. Examples:
+=item * B<new> (constructor)
+
+It can takes any Lemonldap::NG parameter to override configuration. The
+'confFile' parameter can be used to override lemonldap-ng.ini path.
+Examples:
 
 =over
 
-=item * B<File>:
+=item * B<Set another lemonldap-ng.ini file>
   $confAccess = new Lemonldap::NG::Common::Conf(
-                {
-                type    => 'File',
-                dirName => '/var/lib/lemonldap-ng/',
-                });
-
-=item * B<DBI>:
+                  { confFile => '/opt/lemonldap-ng.ini' } );
+=item * B<Override global storage>:
   $confAccess = new Lemonldap::NG::Common::Conf(
-                {
-                type        => 'DBI',
-                dbiChain    => 'DBI:mysql:database=lemonldap-ng;host=1.2.3.4',
-                dbiUser     => 'lemonldap'
-                dbiPassword => 'pass'
-                dbiTable    => 'lmConfig',
-                });
-
-=item * B<SOAP>:
-  $confAccess = new Lemonldap::NG::Common::Conf(
-                {
-                type         => 'SOAP',
-                proxy        => 'http://auth.example.com/index.pl/config',
-                proxyOptions => {
-                                timeout => 5,
-                                },
-                });
-
-SOAP configuration access is a sort of proxy: the portal is configured to use
-the real session storage type (DBI or File for example). See HTML documentation
-for more.
-
-=item * B<LDAP>:
-  $confAccess = new Lemonldap::NG::Common::Conf(
-                {
-                type             => 'LDAP',
-                ldapServer       => 'ldap://localhost',
-                ldapConfBranch   => 'ou=conf,ou=applications,dc=example,dc=com',
-                ldapBindDN       => 'cn=manager,dc=example,dc=com",
-                ldapBindPassword => 'secret'
-                });
+                  {
+                    type    => 'File',
+                    dirName => '/var/lib/lemonldap-ng/conf',
+                   });
 
 =back
-
-WARNING: You have to use the same storage type on all Lemonldap::NG parts in
-the same server.
 
 =item * B<getConf>: returns a hash reference to the configuration. it takes
 a hash reference as first argument containing 2 optional parameters:
@@ -558,20 +558,13 @@ getConf returns all (C<select * from lmConfig>).
 
 =head1 SEE ALSO
 
-L<Lemonldap::NG::Handler>, L<Lemonldap::NG::Portal>,
 L<http://lemonldap-ng.org/>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 =over
 
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=item François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Sandro Cazzaniga, E<lt>cazzaniga.sandro@gmail.comE<gt>
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
 
 =back
 
@@ -587,17 +580,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =head1 COPYRIGHT AND LICENSE
 
-=over
-
-=item Copyright (C) 2008-2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2012 by Sandro Cazzaniga, E<lt>cazzaniga.sandro@gmail.comE<gt>
-
-=item Copyright (C) 2012 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Copyright (C) 2009-2016 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
+See COPYING file for details.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

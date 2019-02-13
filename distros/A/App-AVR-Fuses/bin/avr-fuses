@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::AVR::Fuses;
+
+exit App::AVR::Fuses->run( @ARGV );
+
+=head1 NAME
+
+F<avr-fuses> - a commandline fuse value calculator for F<AVR> microcontrollers
+
+=head1 SYNOPSIS
+
+   $ avr-fuses --part m328
+   -U efuse:w:0xFF:m -U hfuse:w:0xD9:m -U lfuse:w:0x62:m
+
+   $ avr-fuses --part m328 CKDIV8=1
+   -U efuse:w:0xFF:m -U hfuse:w:0xD9:m -U lfuse:w:0xE2:m
+
+=head1 DESCRIPTION
+
+This program interprets the contents of definition files ("ATDF files")
+provided by Microchip (formerly Atmel) that describe the configuration fuses
+of AVR microcontrollers.
+
+Individual fuses may be named on the commandline, each giving a value in the
+form C<NAME=VALUE>. These will be applied on top of the default values for the
+chosen part.
+
+The program ends by printing new values for the fuse configuration registers,
+in a form suitable to paste directly into an F<avrdude> commandline. This may
+be useful in a shell fragment, such as
+
+   $ avrdude -c avrisp -p m328 $(avr-fuses -p m328 CKDIV8=1)
+
+=head1 OPTIONS
+
+=head2 -h, --help
+
+Displays a summary of the commandline and options
+
+=head2 -v, --verbose
+
+Describe the meaning of each individual named fuse while parsing it
+
+=head2 -p, --part NAME
+
+Gives the part name of the chosen microcontroller. Parts may be specified
+in the following ways:
+
+   ATmega328PB
+   atmega328pb
+   m328pb
+
+   ATtiny84A
+   attiny84a
+   t84a
+
+Specfically, these are the same forms as recognised by F<avr-gcc>'s C<-mmcu>
+option and F<avrdude>'s C<-p> option, for convenience in Makefiles and build
+scripts.
+
+=head2 -f, --fuse FUSE=VALUE
+
+Supplies a value from one of the fuse configuration registers. This is useful
+combined with the C<--verbose> option to decode values read from an AVR chip.
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>

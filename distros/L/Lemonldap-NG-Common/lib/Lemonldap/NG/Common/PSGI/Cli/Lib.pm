@@ -4,7 +4,7 @@ use JSON;
 use Mouse;
 use Lemonldap::NG::Common::PSGI;
 
-our $VERSION = '1.9.13';
+our $VERSION = '2.0.0';
 
 has iniFile => ( is => 'ro', isa => 'Str' );
 
@@ -13,8 +13,7 @@ has app => ( is => 'ro', isa => 'CodeRef' );
 sub _get {
     my ( $self, $path, $query ) = @_;
     $query //= '';
-    return $self->app->(
-        {
+    return $self->app->( {
             'HTTP_ACCEPT'          => 'application/json, text/plain, */*',
             'SCRIPT_NAME'          => '',
             'HTTP_ACCEPT_ENCODING' => 'gzip, deflate',
@@ -39,8 +38,7 @@ sub _post {
     my ( $self, $path, $query, $body, $type, $len ) = @_;
     die "$body must be a IO::Handle"
       unless ( ref($body) and $body->can('read') );
-    return $self->app->(
-        {
+    return $self->app->( {
             'HTTP_ACCEPT'          => 'application/json, text/plain, */*',
             'SCRIPT_NAME'          => '',
             'HTTP_ACCEPT_ENCODING' => 'gzip, deflate',
@@ -69,8 +67,7 @@ sub _put {
     my ( $self, $path, $query, $body, $type, $len ) = @_;
     die "$body must be a IO::Handle"
       unless ( ref($body) and $body->can('read') );
-    return $self->app->(
-        {
+    return $self->app->( {
             'HTTP_ACCEPT'          => 'application/json, text/plain, */*',
             'SCRIPT_NAME'          => '',
             'HTTP_ACCEPT_ENCODING' => 'gzip, deflate',
@@ -97,8 +94,7 @@ sub _put {
 
 sub _del {
     my ( $self, $path, $query ) = @_;
-    return $self->app->(
-        {
+    return $self->app->( {
             'HTTP_ACCEPT'          => 'application/json, text/plain, */*',
             'SCRIPT_NAME'          => '',
             'HTTP_ACCEPT_ENCODING' => 'gzip, deflate',
@@ -122,9 +118,10 @@ sub _del {
 sub jsonResponse {
     my ( $self, $path, $query ) = @_;
     my $res = $self->_get( $path, $query )
-      or die "Manager lib has refused my get, aborting";
+      or die "PSGI lib has refused my get, aborting";
     unless ( $res->[0] == 200 ) {
         require Data::Dumper;
+        $Data::Dumper::Useperl = 1;
         print STDERR "Result dump :\n" . Data::Dumper::Dumper($res);
         die "Manager lib does not return a 200 code, aborting";
     }
@@ -136,9 +133,10 @@ sub jsonResponse {
 sub jsonPostResponse {
     my ( $self, $path, $query, $body, $type, $len ) = @_;
     my $res = $self->_post( $path, $query, $body, $type, $len )
-      or die "Manager lib has refused my post, aborting";
+      or die "PSGI lib has refused my post, aborting";
     unless ( $res->[0] == 200 ) {
         require Data::Dumper;
+        $Data::Dumper::Useperl = 1;
         print STDERR "Result dump :\n" . Data::Dumper::Dumper($res);
         die "Manager lib does not return a 200 code, aborting";
     }
@@ -150,9 +148,10 @@ sub jsonPostResponse {
 sub jsonPutResponse {
     my ( $self, $path, $query, $body, $type, $len ) = @_;
     my $res = $self->_put( $path, $query, $body, $type, $len )
-      or die "Manager lib has refused my put, aborting";
+      or die "PSGI lib has refused my put, aborting";
     unless ( $res->[0] == 200 ) {
         require Data::Dumper;
+        $Data::Dumper::Useperl = 1;
         print STDERR "Result dump :\n" . Data::Dumper::Dumper($res);
         die "Manager lib does not return a 200 code, aborting";
     }

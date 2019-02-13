@@ -66,10 +66,11 @@ subtest 'can get a filehandle for the tempfile' => sub {
     is( path($t->path)->slurp_utf8, "d\n", 'defaults to write handle' );
 
     $fh = $t->filehandle('<');
-    throws_ok {
+    {
         no warnings;
-        print {$fh} "sausages\n" or die $!;
-    } qr/Bad file descriptor/, 'filehandle has correct mode';
+        my $ret = print {$fh} "sausages\n";
+        ok( !$ret, 'filehandle is read-only' );
+    }
     my $line = <$fh>;
     is( $line, "d\n", 'read handle works' );
 

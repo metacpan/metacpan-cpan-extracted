@@ -24,7 +24,11 @@ LemonLDAP::NG 2F registration script
     if (res && res.error) {
       res = res.error.replace(/.* /, '');
       console.log('Returned error', res);
-      return setMsg(res, 'warning');
+      if (res.match(/module/)) {
+        return setMsg('notAuthorized', 'warning');
+      } else {
+        return setMsg(res, 'warning');
+      }
     }
   };
 

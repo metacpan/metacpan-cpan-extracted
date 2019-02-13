@@ -5,12 +5,12 @@ use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
   PE_OK
-  PE_USERNOTFOUND
+  PE_BADCREDENTIALS
 );
 
 extends 'Lemonldap::NG::Common::Module', 'Lemonldap::NG::Portal::Lib::REST';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 # INITIALIZATION
 
@@ -31,8 +31,7 @@ sub getUser {
     my ( $self, $req, %args ) = @_;
     my $res;
     $res = eval {
-        $self->restCall(
-            (
+        $self->restCall( (
                   $args{useMail}
                 ? $self->conf->{restMailDBUrl} || $self->conf->{restUserDBUrl}
                 : $self->conf->{restUserDBUrl}
@@ -46,7 +45,7 @@ sub getUser {
     }
     unless ( $res->{result} ) {
         $self->userLogger->warn( 'User ' . $req->user . ' not found' );
-        return PE_USERNOTFOUND;
+        return PE_BADCREDENTIALS;
     }
     $req->data->{restUserDBInfo} = $res->{info} || {};
     return PE_OK;

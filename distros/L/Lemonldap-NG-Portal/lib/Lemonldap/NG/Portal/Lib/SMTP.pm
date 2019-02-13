@@ -15,7 +15,7 @@ use Email::Sender::Transport::SMTP qw();
 use MIME::Base64;
 use Encode;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 our $transport;
 
@@ -86,17 +86,27 @@ sub translate {
     my ( $self, $req ) = @_;
 
     # Get language using llnglanguage cookie
-    my $lang = $req->cookies->{llnglanguage} || 'en';
-    my $json = $self->conf->{templateDir} . "/common/mail/$lang.json";
+    my $lang_code = $req->cookies->{llnglanguage} || 'en';
+    my $json = $self->conf->{templateDir} . "/common/mail/$lang_code.json";
     $json = $self->conf->{templateDir} . '/common/mail/en.json'
       unless ( -f $json );
     open F, $json
       or die 'Installation error: '
       . $!
-      . " ($self->{conf}->{templateDir}/$lang.json or $self->{conf}->{templateDir}/common/mail/en.json)";
+      . " ($self->{conf}->{templateDir}/$lang_code.json or $self->{conf}->{templateDir}/common/mail/en.json)";
     $json = join '', <F>;
     close F;
-    $lang = from_json( $json, { allow_nonref => 1 } );
+    my $lang     = from_json( $json,            { allow_nonref => 1 } );
+    my $langOver = from_json( $self->p->trOver, { allow_nonref => 1 } );
+
+    if ($langOver) {
+        for my $k ( keys %{ $langOver->{all} || {} } ) {
+            $lang->{$k} = $langOver->{$lang_code}->{$k};
+        }
+        for my $k ( keys %{ $langOver->{$lang_code} || {} } ) {
+            $lang->{$k} = $langOver->{$lang_code}->{$k};
+        }
+    }
     return sub {
         ($_) = @_;
         $$_ =~ s/\s+trspan="(\w+?)"(.*?)>.*?</"$2>".($lang->{$1}||$1).'<'/gse;
@@ -189,12 +199,9 @@ sub send_mail {
                 Subject    => $subject,
                 Type       => 'TEXT',
                 Data       => $body,
+                Type       => 'text/plain',
+                Charset    => $self->charset,
             );
-
-            # Manage content type and charset
-            $message->attr( "content-type"         => "text/plain" );
-            $message->attr( "content-type.charset" => $self->charset );
-
         }
 
         # Send the mail

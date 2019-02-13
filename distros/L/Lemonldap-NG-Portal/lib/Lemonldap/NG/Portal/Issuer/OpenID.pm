@@ -13,9 +13,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OPENID_EMPTY
   PE_REDIRECT
   PE_SENDRESPONSE
+  PE_OID_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer';
 
@@ -49,10 +50,26 @@ has spList => (
 
 has openidPortal => ( is => 'rw' );
 
+has rule => ( is => 'rw', default => sub { {} } );
+
 # INITIALIZATION
 
 sub init {
     my ($self) = @_;
+
+    # Parse activation rule
+    my $hd = $self->p->HANDLER;
+    $self->logger->debug(
+        "OpenID rule -> " . $self->conf->{issuerDBOpenIDRule} );
+    my $rule =
+      $hd->buildSub(
+        $hd->substitute( $self->conf->{issuerDBOpenIDRule} ) );
+    unless ($rule) {
+        $self->error( "Bad OpenID rule -> " . $hd->tsv->{jail}->error );
+        return 0;
+    }
+    $self->{rule} = $rule;
+
     eval { require Lemonldap::NG::Portal::Lib::OpenID::Server };
     if ($@) {
         $self->error("Unable to load Net::OpenID::Server: $@");
@@ -90,8 +107,14 @@ sub _redirect {
 
 sub run {
     my ( $self, $req ) = @_;
-    my $mode = $req->param('openid.mode');
 
+    # Check activation rule
+    unless ( $self->rule->( $req, $req->sessionInfo ) ) {
+        $self->userLogger->error('OpenID service not authorized');
+        return PE_OID_SERVICE_NOT_ALLOWED;
+    }
+
+    my $mode = $req->param('openid.mode');
     unless ($mode) {
         $self->logger->debug('OpenID SP test');
         return PE_OPENID_EMPTY;

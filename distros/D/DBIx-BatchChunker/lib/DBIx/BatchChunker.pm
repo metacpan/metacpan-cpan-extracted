@@ -1,7 +1,7 @@
 package DBIx::BatchChunker;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.92';
+our $VERSION   = '0.93';
 
 use Moo;
 
@@ -30,7 +30,7 @@ DBIx::BatchChunker - Run large database changes safely
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ version 0.92
 
     my %params = (
         chunk_size  => 5000,
-        target_time => 15,
+        target_time => 5,
 
         rs      => $account_rs,
         id_name => 'account_id',
@@ -511,7 +511,7 @@ has coderef => (
 The amount of rows to be processed in each loop.
 
 Default is 1000 rows.  This figure should be sized to keep per-chunk processing time
-at around 15 seconds.  If this is too large, rows may lock for too long.  If it's too
+at around 5 seconds.  If this is too large, rows may lock for too long.  If it's too
 small, processing may be unnecessarily slow.
 
 =cut
@@ -534,8 +534,8 @@ size is grossly inaccurate to the workload, you could end up with several chunks
 beginning causing long-lasting locks before the runtime targeting reduces them down to a
 reasonable size.
 
-Default is 15 seconds.  Set this to zero to turn off runtime targeting.  (This was
-previously defaulted to off prior to v0.92.)
+Default is 5 seconds.  Set this to zero to turn off runtime targeting.  (This was
+previously defaulted to off prior to v0.92, and set to 15 in v0.92.)
 
 =cut
 
@@ -543,7 +543,7 @@ has target_time => (
     is       => 'ro',
     isa      => PositiveOrZeroNum,
     required => 0,
-    default  => 15,
+    default  => 5,
 );
 
 =head3 sleep
@@ -552,7 +552,7 @@ The number of seconds to sleep after each chunk.  It uses L<Time::HiRes>'s versi
 fractional numbers are allowed.
 
 Default is 0, which is fine for most operations.  But, it is highly recommended to turn
-this on (say, 5 to 10 seconds) for really long one-off DB operations, especially if a lot
+this on (say, 1 to 5 seconds) for really long one-off DB operations, especially if a lot
 of disk I/O is involved.  Without this, there's a chance that the slaves will have a hard
 time keeping up, and/or the master won't have enough processing power to keep up with
 standard load.
@@ -1059,7 +1059,7 @@ sub calculate_ranges {
         process_past_max  => 1,    # use this if processing the whole table
         single_rows       => 1,    # does $coderef get a single $row or the whole $chunk_rs / $stmt
         min_chunk_percent => 0.25, # minimum row count of chunk size percentage; defaults to 0.5 (or 50%)
-        target_time       => 15,   # target runtime for dynamic chunk size scaling; default is off
+        target_time       => 5,    # target runtime for dynamic chunk size scaling; default is 5 seconds
 
         progress_name => 'Updating Accounts',  # easier than creating your own progress_bar
 
@@ -1482,6 +1482,7 @@ sub _runtime_checker {
     my ($self) = @_;
     my $ls = $self->_loop_state;
     return unless $self->target_time;
+    return unless $ls->{chunk_size} && $ls->{prev_runtime};  # prevent DIV/0
 
     my $timings = $ls->{last_timings};
 

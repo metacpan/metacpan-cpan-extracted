@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /Acme/CPANModulesUtil/FeatureMatrix/draw_feature_matrix
 # and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2019-01-11'; # DATE
+our $DATE = '2019-02-13'; # DATE
 our $DIST = 'App-CPANModulesUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ draw-feature-matrix-from-acme-cpanmodules-module - Draw features matrix of modul
 
 =head1 VERSION
 
-This document describes version 0.002 of draw-feature-matrix-from-acme-cpanmodules-module (from Perl distribution App-CPANModulesUtils), released on 2019-01-11.
+This document describes version 0.003 of draw-feature-matrix-from-acme-cpanmodules-module (from Perl distribution App-CPANModulesUtils), released on 2019-02-13.
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@
     <div class="input-group-prepend">
       <span class="input-group-text"><i class="fa fa-chevron-right"></i></span>
     </div>
-    <input name="yubikeyOTP" type="text" class="form-control" trplaceholder="enterYubikey" aria-required="true"/>
+    <input name="yubikeyOTP" type="text" class="form-control" trplaceholder="enterYubikey" aria-required="true" autocomplete="off" />
   </div>
 
   <TMPL_INCLUDE NAME="checklogins.tpl">

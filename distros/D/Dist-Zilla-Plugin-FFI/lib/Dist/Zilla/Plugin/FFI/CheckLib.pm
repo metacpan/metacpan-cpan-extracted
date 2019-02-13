@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FFI::CheckLib 1.02 {
+package Dist::Zilla::Plugin::FFI::CheckLib 1.03 {
 
   use strict;
   use warnings;
@@ -148,7 +148,7 @@ Dist::Zilla::Plugin::FFI::CheckLib - FFI::CheckLib alternative to Dist::Zilla::P
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 

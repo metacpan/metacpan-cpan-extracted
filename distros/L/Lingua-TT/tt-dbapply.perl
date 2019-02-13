@@ -15,7 +15,7 @@ use File::Basename qw(basename);
 ##----------------------------------------------------------------------
 
 our $prog = basename($0);
-our $VERSION  = "0.11";
+our $VERSION  = "0.12";
 
 our $include_empty = 0;
 our %dbf           = (type=>'GUESS', flags=>O_RDWR, dbopts=>{cachesize=>'32M'});

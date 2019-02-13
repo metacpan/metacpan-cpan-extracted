@@ -30,6 +30,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Method::Modifiers" : "2.00",
             "Mojolicious" : "7.66"
          }
       },
@@ -51,6 +52,6 @@
          "web" : "https://github.com/jhthorsen/devel-mojoprof"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -37,7 +37,7 @@
 
         <div id="<TMPL_VAR NAME="key">">
 
-          <form action="<TMPL_VAR NAME="url">" method="post" class="login <TMPL_VAR NAME="module">">
+          <form id="lform<TMPL_VAR NAME="module">" action="<TMPL_VAR NAME="url">" method="post" class="login <TMPL_VAR NAME="module">">
 
             <!-- Hidden fields -->
             <TMPL_VAR NAME="HIDDEN_INPUTS">
@@ -59,7 +59,11 @@
             </TMPL_IF>
 
             <TMPL_IF NAME="sslform">
-              <TMPL_INCLUDE NAME="sslform.tpl">
+              <TMPL_INCLUDE NAME="sslformChoice.tpl">
+            </TMPL_IF>
+
+            <TMPL_IF NAME="gpgform">
+              <TMPL_INCLUDE NAME="gpgform.tpl">
             </TMPL_IF>
 
             <TMPL_IF NAME="logo">
@@ -141,6 +145,23 @@
     <input type="hidden" name="timezone" />
     <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
     <TMPL_INCLUDE NAME="sslform.tpl">
+    </form>
+  </div>
+  </TMPL_IF>
+
+  <TMPL_IF NAME="DISPLAY_GPG_FORM">
+  <div class="card">
+  <TMPL_IF NAME="module">
+    <form id="lform" action="#" method="post" class="login <TMPL_VAR NAME="module">" role="form">
+  <TMPL_ELSE>
+    <form id="lform" action="#" method="post" class="login" role="form">
+  </TMPL_IF>
+    <!-- Hidden fields -->
+    <TMPL_VAR NAME="HIDDEN_INPUTS">
+    <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
+    <input type="hidden" name="timezone" />
+    <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
+    <TMPL_INCLUDE NAME="gpgform.tpl">
     </form>
   </div>
   </TMPL_IF>

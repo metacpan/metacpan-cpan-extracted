@@ -13,3 +13,4 @@ MANIFEST			This list of files
 META.yml
 t/01-load.t
 Test-TCM-Role-API-0.01.tar.gz
+Test-TCM-Role-API-0.02.tar.gz

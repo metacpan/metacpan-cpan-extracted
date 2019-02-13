@@ -1,7 +1,11 @@
 Revision history for Thrift-API-HiveClient2
 
+0.024 2019-02-12 BURAK
+    Include the patch by Alexey Lebedeff
+        "Use predicate to test for session handle presence".
+
 0.023 2018-02-06 BURAK
-	Distro fix for prereqs.
+    Distro fix for prereqs.
 
 0.022 2018-01-30 BURAK
         Verbose type checks.

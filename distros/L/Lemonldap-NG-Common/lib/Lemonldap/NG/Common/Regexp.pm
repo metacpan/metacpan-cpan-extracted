@@ -5,6 +5,8 @@ package Lemonldap::NG::Common::Regexp;
 
 use AutoLoader 'AUTOLOAD';
 
+our $VERSION = '2.0.0';
+
 1;
 
 __END__

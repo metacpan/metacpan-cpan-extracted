@@ -19,7 +19,7 @@ use feature 'state';
 
 extends 'Lemonldap::NG::Common::Conf::RESTServer';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -56,8 +56,11 @@ sub addRoutes {
 
       # New key and conf save
       ->addRoute(
-        confs =>
-          { newRSAKey => 'newRSAKey', raw => 'newRawConf', '*' => 'newConf' },
+        confs => {
+            newRSAKey => 'newRSAKey',
+            raw       => 'newRawConf',
+            '*'       => 'newConf'
+        },
         ['POST']
       )
 
@@ -228,10 +231,16 @@ sub newConf {
 
     # "message" fields: note that words enclosed by "__" (__word__) will be
     # translated
-    $res->{message} = $parser->{message};
-    foreach my $t (qw(errors warnings changes)) {
-        $res->{details}->{ '__' . $t . '__' } = $parser->$t
-          if ( @{ $parser->$t } );
+    $res->{details}->{'__errors__'} = $parser->{errors}
+      if ( @{ $parser->{errors} } );
+    unless ( @{ $parser->{errors} } ) {
+        $res->{details}->{'__needConfirmation__'} = $parser->{needConfirmation}
+          if ( @{ $parser->{needConfirmation} } && !$req->params('force') );
+        $res->{message} = $parser->{message};
+        foreach my $t (qw(warnings changes)) {
+            $res->{details}->{ '__' . $t . '__' } = $parser->$t
+              if ( @{ $parser->$t } );
+        }
     }
     if ( $res->{result} ) {
         if ( $self->{demoMode} ) {
@@ -240,7 +249,9 @@ sub newConf {
         else {
             my %args;
             $args{force} = 1 if ( $req->params('force') );
-            my $s = $self->confAcc->saveConf( $parser->newConf, %args );
+            my $s = CONFIG_WAS_CHANGED;
+            $s = $self->confAcc->saveConf( $parser->newConf, %args )
+              unless ( @{ $parser->{needConfirmation} } && !$args{force} );
             if ( $s > 0 ) {
                 $self->userLogger->notice(
                     'User ' . $self->userId($req) . " has stored conf $s" );
@@ -259,7 +270,8 @@ sub newConf {
                 $res->{result} = 0;
                 if ( $s == CONFIG_WAS_CHANGED ) {
                     $res->{needConfirm} = 1;
-                    $res->{message} .= '__needConfirmation__';
+                    $res->{message} .= '__needConfirmation__'
+                      unless @{ $parser->{needConfirmation} };
                 }
                 else {
                     $res->{message} = $Lemonldap::NG::Common::Conf::msg;
@@ -345,7 +357,8 @@ sub applyConf {
             $r =
               HTTP::Request->new( 'GET', $targetUrl,
                 HTTP::Headers->new( Host => $url->host ) );
-            if ( defined $url->userinfo && $url->userinfo =~ /^([^:]+):(.*)$/ )
+            if ( defined $url->userinfo
+                && $url->userinfo =~ /^([^:]+):(.*)$/ )
             {
                 $r->authorization_basic( $1, $2 );
             }

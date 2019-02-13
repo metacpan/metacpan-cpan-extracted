@@ -1,3 +1,6 @@
+0.03 2019-02-12
+  - Fix error: load decode_json
+
 0.02 2019-02-12
   - Add Plack::Test as a requirement
   - Remove api_login() / api_logout() methods

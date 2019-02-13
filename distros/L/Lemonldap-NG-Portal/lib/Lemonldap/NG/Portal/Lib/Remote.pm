@@ -43,8 +43,7 @@ sub checkRemoteId {
 
         # Trying to recover session from global session storage
 
-        my $remoteSession = Lemonldap::NG::Common::Session->new(
-            {
+        my $remoteSession = Lemonldap::NG::Common::Session->new( {
                 storageModule => $self->conf->{remoteGlobalStorage},
                 storageModuleOptions =>
                   $self->conf->{remoteGlobalStorageOptions},

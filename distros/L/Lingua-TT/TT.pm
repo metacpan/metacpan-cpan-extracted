@@ -5,6 +5,7 @@
 
 
 package Lingua::TT;
+use 5.010; ##-- for // operator
 
 use Lingua::TT::Token;
 use Lingua::TT::Sentence;
@@ -18,7 +19,7 @@ use strict;
 ##==============================================================================
 ## Globals & Constants
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 ##==============================================================================
 ## Constructors etc.

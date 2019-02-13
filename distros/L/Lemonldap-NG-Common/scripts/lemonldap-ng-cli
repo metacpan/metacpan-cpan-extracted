@@ -24,7 +24,7 @@ $action ||= "help";
 
 if ( $action =~ /^(?:[gs]et|(?:add|del)Key)$/ ) {
     eval { require Lemonldap::NG::Manager::Cli; };
-    die 'Manager libraries not available, aborting' if ($@);
+    die "Manager libraries not available, aborting ($@)" if ($@);
     Lemonldap::NG::Manager::Cli->run(@ARGV);
 }
 elsif ( $action =~ /^(?:info|update-cache)$/ ) {
@@ -78,9 +78,9 @@ lemonldap-ng-cli - Command-line manager for Lemonldap::NG web-SSO system.
 
 =head1 DESCRIPTION
 
-lemonldap-ng-cli is a command line client that can be used to do some actions
-on Lemonldap::NG configuration. Commands are detailed in
-L<Lemonldap::NG::Manager::Cli> and L<Lemonldap::NG::Common::CLi>
+lemonldap-ng-cli is a command line interface to interact with Lemonldap::NG
+configuration. Commands are described in L<Lemonldap::NG::Manager::Cli>
+and L<Lemonldap::NG::Common::CLi>
 
 =head1 SEE ALSO
 

@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Conf::Zero;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 sub zeroConf {
     my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir ) = @_;
@@ -66,7 +66,7 @@ sub zeroConf {
                         'uri'         => 'http://lemonldap-ng.org/',
                         'display'     => 'on',
                         'logo'        => 'network.png',
-                        'name'        => 'Offical Website'
+                        'name'        => 'Official Website'
                     },
                     'type' => 'application'
                 },

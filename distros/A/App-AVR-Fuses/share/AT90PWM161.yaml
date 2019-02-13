@@ -1,0 +1,300 @@
+---
+fusemap:
+  BODLEVEL:
+    mask: 7
+    name: BODLEVEL
+    reg: e
+    values:
+      - caption: Brown-out detection disabled
+        name: DISABLED
+        value: 7
+      - caption: Brown-out detection at VCC=1.8 V
+        name: 1V8
+        value: 6
+      - caption: Brown-out detection at VCC=2.7 V
+        name: 2V7
+        value: 5
+      - caption: Brown-out detection at VCC=4.3 V
+        name: 4V3
+        value: 4
+      - caption: Brown-out detection at VCC=2.3 V
+        name: 2V3
+        value: 3
+      - caption: Brown-out detection at VCC=2.2 V
+        name: 2V2
+        value: 2
+      - caption: Brown-out detection at VCC=1.9 V
+        name: 1V9
+        value: 1
+      - caption: Brown-out detection at VCC=2.0 V
+        name: 2V0
+        value: 0
+  BOOTRST:
+    mask: 1
+    name: BOOTRST
+    reg: h
+  BOOTSZ:
+    mask: 6
+    name: BOOTSZ
+    reg: h
+    values:
+      - caption: Boot Flash size=128 words Boot address=$0F80
+        name: 128W_0F80
+        value: 6
+      - caption: Boot Flash size=256 words Boot address=$0F00
+        name: 256W_0F00
+        value: 4
+      - caption: Boot Flash size=512 words Boot address=$0E00
+        name: 512W_0E00
+        value: 2
+      - caption: Boot Flash size=1024 words Boot address=$0C00
+        name: 1024W_0C00
+        value: 0
+  CKDIV8:
+    mask: 128
+    name: CKDIV8
+    reg: l
+  CKOUT:
+    mask: 64
+    name: CKOUT
+    reg: l
+  DWEN:
+    mask: 64
+    name: DWEN
+    reg: h
+  EESAVE:
+    mask: 8
+    name: EESAVE
+    reg: h
+  PSC0RB:
+    mask: 32
+    name: PSC0RB
+    reg: e
+  PSC2RB:
+    mask: 128
+    name: PSC2RB
+    reg: e
+  PSC2RBA:
+    mask: 64
+    name: PSC2RBA
+    reg: e
+  PSCINRB:
+    mask: 8
+    name: PSCINRB
+    reg: e
+  PSCRV:
+    mask: 16
+    name: PSCRV
+    reg: e
+  RSTDISBL:
+    mask: 128
+    name: RSTDISBL
+    reg: h
+  SPIEN:
+    mask: 32
+    name: SPIEN
+    reg: h
+  SUT_CKSEL:
+    mask: 63
+    name: SUT_CKSEL
+    reg: l
+    values:
+      - caption: 'Ext. CK; PLLin: RC8; SUT: 6CK/14CK+0ms; [CKSEL=0000 SUT=00]'
+        name: EXTCLK_PLLIN_RC_8MHZ_6CK_14CK_0MS
+        value: 0
+      - caption: 'Ext. CK; PLLin: RC8 MHz; SUT:6 CK/14CK+4.1 ms; [CKSEL=0000 SUT=01]'
+        name: EXTCLK_PLLIN_RC_8MHZ_6CK_14CK_4MS1
+        value: 16
+      - caption: 'Ext. CK; PLLin: RC8 MHz; SUT:6 CK/14CK+65 ms; [CKSEL=0000 SUT=10]'
+        name: EXTCLK_PLLIN_RC_8MHZ_6CK_14CK_65MS
+        value: 32
+      - caption: 'RC8 MHz; PLLin: RC8; SUT: 6CK/14CK+0ms; [CKSEL=0010 SUT=00]'
+        name: RC_8MHZ_PLLIN_RC_8MHZ_6CK_14CK_0MS
+        value: 2
+      - caption: 'RC8 MHz; PLLin: RC8; SUT: 6CK/14CK+4.1 ms; [CKSEL=0010 SUT=01]'
+        name: RC_8MHZ_PLLIN_RC_8MHZ_6CK_14CK_4MS1
+        value: 18
+      - caption: 'RC8 MHz; PLLin: RC8; SUT: 6CK/14CK+65 ms;  [CKSEL=0010 SUT=10]'
+        name: RC_8MHZ_PLLIN_RC_8MHZ_6CK_14CK_65MS
+        value: 34
+      - caption: 'XOSC.9-3MHz; PLLin: RC8; SUT: 258CK/14CK+4.1 ms; [CKSEL=1000 SUT=00]'
+        name: XOSC_PLLIN_RC_8MHZ_258CK_14CK_4MS1
+        value: 8
+      - caption: 'XOSC.9-3MHz; PLLin: RC8; SUT: 258CK/14CK+65 ms; [CKSEL=1000 SUT=01]'
+        name: XOSC_PLLIN_RC_8MHZ_258CK_14CK_65MS
+        value: 24
+      - caption: 'XOSC.9-3MHz; PLLin: RC8; SUT: 1KCK/14CK+0 ms; [CKSEL=1000 SUT=10]'
+        name: XOSC_PLLIN_RC_8MHZ_1KCK_14CK_0MS
+        value: 40
+      - caption: 'XOSC.9-3MHz; PLLin: RC8; SUT: 1KCK/14CK+4.1 ms; [CKSEL=1000 SUT=11]'
+        name: XOSC_PLLIN_RC_8MHZ_1KCK_14CK_4MS1
+        value: 56
+      - caption: 'XOSC.9-3MHz; PLLin: RC8; SUT: 1KCK/14CK+65 ms; [CKSEL=1001 SUT=00]'
+        name: XOSC_PLLIN_RC_8MHZ_1KCK_14CK_65MS
+        value: 9
+      - caption: 'XOSC.9-3MHz; PLLin: RC8; SUT: 16KCK/14CK+0 ms; [CKSEL=1001 SUT=01]'
+        name: XOSC_PLLIN_RC_8MHZ_16KCK_14CK_0MS
+        value: 25
+      - caption: 'XOSC.9-3MHz; PLLin: RC8; SUT: 16KCK/14CK+4.1 ms; [CKSEL=1001 SUT=10]'
+        name: XOSC_PLLIN_RC_8MHZ_16KCK_14CK_4MS1
+        value: 41
+      - caption: 'XOSC.9-3MHz; PLLin: RC8; SUT: 16KCK/14CK+65 ms;  [CKSEL=1001 SUT=11]'
+        name: XOSC_PLLIN_RC_8MHZ_16KCK_14CK_65MS
+        value: 57
+      - caption: 'XOSC3-8MHz; PLLin: RC8; SUT: 258CK/14CK+4.1 ms; [CKSEL=1010 SUT=00]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_RC_8MHZ_258CK_14CK_4MS1
+        value: 10
+      - caption: 'XOSC3-8MHz; PLLin: RC8; SUT: 258CK/14CK+65 ms; [CKSEL=1010 SUT=01]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_RC_8MHZ_258CK_14CK_65MS
+        value: 26
+      - caption: 'XOSC3-8MHz; PLLin: RC8; SUT: 1KCK/14CK+0 ms; [CKSEL=1010 SUT=10]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_RC_8MHZ_1KCK_14CK_0MS
+        value: 42
+      - caption: 'XOSC3-8MHz; PLLin: RC8; SUT: 1KCK/14CK+4.1 ms; [CKSEL=1010 SUT=11]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_RC_8MHZ_1KCK_14CK_4MS1
+        value: 58
+      - caption: 'XOSC3-8MHz; PLLin: RC8; SUT: 1KCK/14CK+65 ms;  [CKSEL=1011 SUT=00]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_RC_8MHZ_1KCK_14CK_65MS
+        value: 11
+      - caption: 'XOSC3-8MHz; PLLin: RC8; SUT: 16KCK/14CK+0 ms; [CKSEL=1011 SUT=01]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_RC_8MHZ_16KCK_14CK_0MS
+        value: 27
+      - caption: 'XOSC3-8MHz; PLLin: RC8; SUT: 16KCK/14CK+4.1 ms; [CKSEL=1011 SUT=10]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_RC_8MHZ_16KCK_14CK_4MS1
+        value: 43
+      - caption: 'XOSC3-8MHz; PLLin: RC8; SUT: 16KCK/14CK+65 ms;  [CKSEL=1011 SUT=11]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_RC_8MHZ_16KCK_14CK_65MS
+        value: 59
+      - caption: 'XOSC3-8MHz; PLLin: XOSC; SUT: 258CK/14CK+4.1 ms; [CKSEL=1100 SUT=00]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_XOSC_258CK_14CK_4MS1
+        value: 12
+      - caption: 'XOSC3-8MHz; PLLin: XOSC; SUT: 258CK/14CK+65 ms;  [CKSEL=1100 SUT=01]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_XOSC_258CK_14CK_65MS
+        value: 28
+      - caption: 'XOSC3-8MHz; PLLin: XOSC; SUT: 1KCK/14CK+0 ms; [CKSEL=1100 SUT=10]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_XOSC_1KCK_14CK_0MS
+        value: 44
+      - caption: 'XOSC3-8MHz; PLLin: XOSC; SUT: 1KCK/14CK+4.1 ms; [CKSEL=1100 SUT=11]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_XOSC_1KCK_14CK_4MS1
+        value: 60
+      - caption: 'XOSC3-8MHz; PLLin: XOSC; SUT: 1KCK/14CK+65 ms;  [CKSEL=1101 SUT=00'
+        name: XOSC_3MHZ_8MHZ_PLLIN_XOSC_1KCK_14CK_65MS
+        value: 13
+      - caption: 'XOSC3-8MHz; PLLin: XOSC; SUT: 16KCK/14CK+0 ms; [CKSEL=1101 SUT=01]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_XOSC_16KCK_14CK_0MS
+        value: 29
+      - caption: 'XOSC3-8MHz; PLLin: XOSC; SUT: 16KCK/14CK+4.1 ms; [CKSEL=1101 SUT=10]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_XOSC_16KCK_14CK_4MS1
+        value: 45
+      - caption: 'XOSC3-8MHz; PLLin: XOSC; SUT: 16KCK/14CK+65 ms;  [CKSEL=1101 SUT=11]'
+        name: XOSC_3MHZ_8MHZ_PLLIN_XOSC_16KCK_14CK_65MS
+        value: 61
+      - caption: 'XOSC8-16MHz; PLLin: RC8; SUT: 258CK/14CK+4.1 ms; [CKSEL=1110 SUT=00]'
+        name: XOSC_8MHZ_16MHZ_PLLIN_RC_8MHZ_258CK_14CK_4MS1
+        value: 14
+      - caption: 'XOSC8-16MHz; PLLin: RC8; SUT: 258CK/14CK+65 ms;  [CKSEL=1110 SUT=01]'
+        name: XOSC_8MHZ_16MHZ_PLLIN_RC_8MHZ_258CK_14CK_65MS
+        value: 30
+      - caption: 'XOSC8-16MHz; PLLin: RC8; SUT: 1KCK/14CK+0 ms; [CKSEL=1110 SUT=10]'
+        name: XOSC_8MHZ_16MHZ_PLLIN_RC_8MHZ_1KCK_14CK_0MS
+        value: 46
+      - caption: 'XOSC8-16MHz; PLLin: RC8; SUT: 1KCK/14CK+4.1 ms; [CKSEL=1110 SUT=11]'
+        name: XOSC_8MHZ_16MHZ_PLLIN_RC_8MHZ_1KCK_14CK_4MS1
+        value: 62
+      - caption: 'XOSC8-16MHz; PLLin: RC8; SUT: 1KCK/14CK+65 ms; [CKSEL=1111 SUT=00]'
+        name: XOSC_8MHZ_16MHZ_PLLIN_RC_8MHZ_1KCK_14CK_65MS
+        value: 15
+      - caption: 'XOSC8-16MHz; PLLin: RC8; SUT: 16KCK/14CK+0 ms; [CKSEL=1111 SUT=01]'
+        name: XOSC_8MHZ_16MHZ_PLLIN_RC_8MHZ_16KCK_14CK_0MS
+        value: 31
+      - caption: 'XOSC8-16MHz; PLLin: RC8; SUT: 16KCK/14CK+4.1 ms; [CKSEL=1111 SUT=10]'
+        name: XOSC_8MHZ_16MHZ_PLLIN_RC_8MHZ_16KCK_14CK_4MS1
+        value: 47
+      - caption: 'XOSC8-16MHz; PLLin: RC8; SUT: 16KCK/14CK+65 ms;  [CKSEL=1111 SUT=11]'
+        name: XOSC_8MHZ_16MHZ_PLLIN_RC_8MHZ_16KCK_14CK_65MS
+        value: 63
+      - caption: 'WD128 KHz; SUT: 1KCK/14CK+0 ms; [CKSEL=0011 SUT=00]'
+        name: WDOSC_128KHZ_1KCK_14CK_0MS
+        value: 3
+      - caption: 'WD128 KHz; SUT: 1KCK/14CK+4.1 ms; [CKSEL=0011 SUT=01]'
+        name: WDOSC_128KHZ_1KCK_14CK_4MS1
+        value: 19
+      - caption: 'WD128 KHz; SUT: 1KCK/14CK+65 ms; [CKSEL=0011 SUT=10]'
+        name: WDOSC_128KHZ_1KCK_14CK_65MS
+        value: 35
+      - caption: 'WD128 KHz; SUT: 16KCK/14CK+0 ms; [CKSEL=0011 SUT=11]'
+        name: WDOSC_128KHZ_16KCK_14CK_0MS
+        value: 51
+      - caption: 'PLL/4; PLLin: RC8; SUT: 1KCK/14CK+0 ms; [CKSEL=0001 SUT=00]'
+        name: PLLCLK_DIV4_PLLIN_RC_8MHZ_1KCK_14CK_0MS
+        value: 1
+      - caption: 'PLL/4; PLLin: RC8; SUT: 1KCK/14CK+4 ms;   [CKSEL=0001 SUT=01]'
+        name: PLLCLK_DIV4_PLLIN_RC_8MHZ_1KCK_14CK_4MS
+        value: 17
+      - caption: 'PLL/4; PLLin: RC8; SUT: 1KCK/14CK+64 ms;   [CKSEL=0001 SUT=10]'
+        name: PLLCLK_DIV4_PLLIN_RC_8MHZ_1KCK_14CK_64MS
+        value: 33
+      - caption: 'PLL/4; PLLin: Ext. CK; SUT: 16KCK/14CK+0 ms; [CKSEL=0101 SUT=00]'
+        name: PLLCLK_DIV4_PLLIN_EXTCLK_16KCK_14CK_0MS
+        value: 5
+      - caption: 'PLL/4; PLLin: Ext. CK; SUT: 16KCK/14CK+4 ms; [CKSEL=0101 SUT=01]'
+        name: PLLCLK_DIV4_PLLIN_EXTCLK_16KCK_14CK_4MS
+        value: 21
+      - caption: 'PLL/4; PLLin: Ext. CK; SUT: 16KCK/14CK+4 ms; [CKSEL=0101 SUT=10]'
+        name: PLLCLK_DIV4_PLLIN_EXTCLK_16KCK_14CK_4MS
+        value: 37
+      - caption: 'PLL/4; PLLin: Ext. CK; SUT: 16KCK/14CK+64 ms; [CKSEL=0101 SUT=11]'
+        name: PLLCLK_DIV4_PLLIN_EXTCLK_16KCK_14CK_64MS
+        value: 53
+      - caption: 'PLL/4; PLLin: XOSC; SUT: 1KCK/14CK+0 ms; [CKSEL=0100 SUT=00]'
+        name: PLLCLK_DIV4_PLLIN_XOSC_1KCK_14CK_0MS
+        value: 4
+      - caption: 'PLL/4; PLLin: XOSC; SUT: 1KCK/14CK+4 ms; [CKSEL=0100 SUT=01]'
+        name: PLLCLK_DIV4_PLLIN_XOSC_1KCK_14CK_4MS
+        value: 20
+      - caption: 'PLL/4; PLLin: XOSC; SUT: 1KCK/14CK+64 ms; [CKSEL=0100 SUT=10]'
+        name: PLLCLK_DIV4_PLLIN_XOSC_1KCK_14CK_64MS
+        value: 36
+      - caption: 'PLL/4; PLLin: XOSC; SUT: 16KCK/14CK+0 ms; [CKSEL=0100 SUT=11]'
+        name: PLLCLK_DIV4_PLLIN_XOSC_16KCK_14CK_0MS
+        value: 52
+      - caption: 'RC 1 MHz; SUT: 1KCK/14CK+0 ms; [CKSEL=0110 SUT=00]'
+        name: RC_1MHZ_1KCK_14CK_0MS
+        value: 6
+      - caption: 'RC 1 MHz; SUT: 1KCK/14CK+4.1 ms; [CKSEL=0110 SUT=01]'
+        name: RC_1MHZ_1KCK_14CK_4MS1
+        value: 22
+      - caption: 'RC 1 MHz; SUT: 1KCK/14CK+65 ms;  [CKSEL=0110 SUT=10]'
+        name: RC_1MHZ_1KCK_14CK_65MS
+        value: 38
+  WDTON:
+    mask: 16
+    name: WDTON
+    reg: h
+fuses:
+  - PSC2RB
+  - PSC2RBA
+  - PSC0RB
+  - PSCRV
+  - PSCINRB
+  - BODLEVEL
+  - RSTDISBL
+  - DWEN
+  - SPIEN
+  - WDTON
+  - EESAVE
+  - BOOTSZ
+  - BOOTRST
+  - CKDIV8
+  - CKOUT
+  - SUT_CKSEL
+reginfos:
+  - default: 253
+    mask: 255
+    name: e
+  - default: 217
+    mask: 255
+    name: h
+  - default: 98
+    mask: 255
+    name: l

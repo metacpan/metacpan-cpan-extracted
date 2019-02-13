@@ -75,7 +75,7 @@
           "description": "Official LemonLDAP::NG Website",
           "display": "on",
           "logo": "network.png",
-          "name": "Offical Website",
+          "name": "Official Website",
           "uri": "http://lemonldap-ng.org/"
         },
         "type": "application"

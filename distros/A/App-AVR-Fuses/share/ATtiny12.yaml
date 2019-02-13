@@ -1,0 +1,88 @@
+---
+fusemap:
+  BODEN:
+    mask: 64
+    name: BODEN
+    reg: l
+  BODLEVEL:
+    mask: 128
+    name: BODLEVEL
+    reg: l
+    values:
+      - caption: Brown-out detection at VCC=1.8 V
+        name: 1V8
+        value: 128
+      - caption: Brown-out detection at VCC=2.7 V
+        name: 2V7
+        value: 0
+  CKSEL:
+    mask: 15
+    name: CKSEL
+    reg: l
+    values:
+      - caption: External Crystal / Ceramic Resonator
+        name: EXTXTALCRES
+        value: 15
+      - caption: External Crystal / Ceramic Resonator
+        name: EXTXTALCRES
+        value: 14
+      - caption: External Crystal / Ceramic Resonator
+        name: EXTXTALCRES
+        value: 13
+      - caption: External Crystal / Ceramic Resonator
+        name: EXTXTALCRES
+        value: 12
+      - caption: External Crystal / Ceramic Resonator
+        name: EXTXTALCRES
+        value: 11
+      - caption: External Crystal / Ceramic Resonator
+        name: EXTXTALCRES
+        value: 10
+      - caption: External Low-Frequency Crystal
+        name: EXTLOFXTAL
+        value: 9
+      - caption: External Low-Frequency Crystal
+        name: EXTLOFXTAL
+        value: 8
+      - caption: External RC Ocsillator
+        name: EXTRCOSC
+        value: 7
+      - caption: External RC Ocsillator
+        name: EXTRCOSC
+        value: 6
+      - caption: External RC Ocsillator
+        name: EXTRCOSC
+        value: 5
+      - caption: Internal RC Ocsillator
+        name: INTRCOSC
+        value: 4
+      - caption: Internal RC Ocsillator
+        name: INTRCOSC
+        value: 3
+      - caption: Internal RC Ocsillator
+        name: INTRCOSC
+        value: 2
+      - caption: External Clock
+        name: EXTCLK
+        value: 1
+      - caption: External Clock
+        name: EXTCLK
+        value: 0
+  RSTDISBL:
+    mask: 16
+    name: RSTDISBL
+    reg: l
+  SPIEN:
+    mask: 32
+    name: SPIEN
+    reg: l
+fuses:
+  - BODLEVEL
+  - BODEN
+  - SPIEN
+  - RSTDISBL
+  - CKSEL
+reginfos:
+  - default: 82
+    mask: 255
+    name: l

@@ -1476,6 +1476,24 @@ sub get__returns_value_not_default_when_value_falsy :Tests {
     );
 }
 
+sub get__returns_value_non_bracketed_zero_key :Tests {
+    my $collection = ["hello", "world"];
+
+    is_deeply(
+        get('0', $collection),
+        "hello",
+    );
+}
+
+sub get__returns_value_when_hash_key_is_number :Tests {
+    my $hash = { 0 => "hello world" };
+
+    is_deeply(
+        get('0', $hash),
+        "hello world",
+    );
+}
+
 sub get__returns_value_with_deep_path_shorthand :Tests {
     my $collection = [
         {
@@ -1524,6 +1542,19 @@ sub get__returns_value_with_key_spaces_and_numbers_and_dashes :Tests {
 
     is_deeply(
         get('[0]{favorite foods-1337}[1]', $collection),
+        "cake"
+    );
+}
+
+sub get__returns_value_with_key_spaces_numbers_dashes_ignoring_uneeded_quotes :Tests {
+    my $collection = [
+        {
+            "favorite foods-1337" => ["cheese", "cake"]
+        }
+    ];
+
+    is_deeply(
+        get('[0]{"favorite foods-1337"}[1]', $collection),
         "cake"
     );
 }

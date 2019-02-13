@@ -3,13 +3,14 @@ package Lemonldap::NG::Common::PSGI;
 use 5.10.0;
 use Mouse;
 use JSON;
-use Lemonldap::NG::Common;
 use Lemonldap::NG::Common::PSGI::Constants;
 use Lemonldap::NG::Common::PSGI::Request;
 
-our $VERSION = '1.9.3';
+our $VERSION = '2.0.2';
 
 our $_json = JSON->new->allow_nonref;
+
+# PROPERTIES
 
 has error        => ( is => 'rw', default => '' );
 has languages    => ( is => 'rw', isa     => 'Str', default => 'en' );
@@ -19,23 +20,41 @@ has staticPrefix => ( is => 'rw', isa     => 'Str' );
 has templateDir  => ( is => 'rw', isa     => 'Str' );
 has links        => ( is => 'rw', isa     => 'ArrayRef' );
 has menuLinks    => ( is => 'rw', isa     => 'ArrayRef' );
-has syslog => (
-    is      => 'rw',
-    isa     => 'Str',
-    trigger => sub {
+has logger     => ( is => 'rw' );
+has userLogger => ( is => 'rw' );
 
-        if ( $_[0]->{syslog} ) {
-            eval {
-                require Sys::Syslog;
-                Sys::Syslog->import(':standard');
-                openlog( 'lemonldap-ng', 'ndelay,pid', $_[0]->{syslog} );
-            };
-            $_[0]
-              ->error("Unable to use syslog with facility $_[0]->{syslog}: $@")
-              if ($@);
+# INITIALIZATION
+
+sub init {
+    my ( $self, $args ) = @_;
+    unless ( ref $args ) {
+        $self->error('init argument must be a hashref');
+        return 0;
+    }
+    foreach my $k ( keys %$args ) {
+        $self->{$k} = $args->{$k} unless ( $k eq 'logger' );
+    }
+    unless ( $self->logger and $self->userLogger ) {
+        my $logger =
+             $args->{logger}
+          || $ENV{LLNG_DEFAULTLOGGER}
+          || 'Lemonldap::NG::Common::Logger::Std';
+        unless ( $self->logger ) {
+            eval "require $logger";
+            die $@ if ($@);
+            $self->logger( $logger->new($self) );
         }
-    },
-);
+        unless ( $self->userLogger ) {
+            $logger = $ENV{LLNG_USERLOGGER} || $args->{userLogger} || $logger;
+            eval "require $logger";
+            die $@ if ($@);
+            $self->userLogger( $logger->new( $self, user => 1 ) );
+        }
+    }
+    return 1;
+}
+
+# RUNNING METHODS
 
 ## @method void lmLog(string mess, string level)
 # Log subroutine. Print on STDERR messages if it exceeds `logLevel` value
@@ -43,16 +62,7 @@ has syslog => (
 # @param $level Level (debug|info|notice|warn|error)
 sub lmLog {
     my ( $self, $msg, $level ) = @_;
-    my $levels = {
-        error  => 4,
-        warn   => 3,
-        notice => 2,
-        info   => 1,
-        debug  => 0
-    };
-    my $l = $levels->{$level} || 1;
-    return if ( ref($self) and $l < $levels->{ $self->{logLevel} } );
-    print STDERR "[$level] " . ( $l ? '' : (caller)[0] . ': ' ) . " $msg\n";
+    return $self->logger->$level($msg);
 }
 
 ##@method void userLog(string mess, string level)
@@ -60,22 +70,16 @@ sub lmLog {
 # @param $mess string to log
 # @param $level level of log message
 sub userLog {
-    my ( $self, $mess, $level ) = @_;
-    if ( $self->{syslog} ) {
-        $level =~ s/^warn$/warning/;
-        syslog( $level || 'notice', $mess );
-    }
-    else {
-        $self->lmLog( $mess, $level );
-    }
+    my ( $self, $msg, $level ) = @_;
+    return $self->userLogger->$level($msg);
 }
 
 ##@method void userInfo(string mess)
 # Log non important user actions. Alias for userLog() with facility "info".
 # @param $mess string to log
 sub userInfo {
-    my ( $self, $mess ) = @_;
-    $self->userLog( $mess, 'info' );
+    my ( $self, $msg ) = @_;
+    return $self->userLogger->info($msg);
 }
 
 ##@method void userNotice(string mess)
@@ -83,24 +87,33 @@ sub userInfo {
 # "notice".
 # @param $mess string to log
 sub userNotice {
-    my ( $self, $mess ) = @_;
-    $self->userLog( $mess, 'notice' );
+    my ( $self, $msg ) = @_;
+    return $self->userLogger->notice($msg);
 }
 
-##@method void userError(string mess)
+##@method void userWarn(string mess)
 # Log user errors like "bad password". Alias for userLog() with facility
 # "warn".
 # @param $mess string to log
+sub userWarn {
+    my ( $self, $msg ) = @_;
+    return $self->userLogger->warn($msg);
+}
+
+##@method void userError(string mess)
+# Log user errors like "try to change password without token". Alias for
+# userLog() with facility "error".
+# @param $mess string to log
 sub userError {
-    my ( $self, $mess ) = @_;
-    $self->userLog( $mess, 'warn' );
+    my ( $self, $msg ) = @_;
+    return $self->userLogger->error($msg);
 }
 
 # Responses methods
 sub sendJSONresponse {
     my ( $self, $req, $j, %args ) = @_;
     $args{code} ||= 200;
-    $args{headers} ||= [];
+    $args{headers} ||= $req->respHeaders || [];
     my $type = 'application/json; charset=utf-8';
     if ( ref $j ) {
         eval { $j = $_json->encode($j); };
@@ -115,16 +128,69 @@ sub sendError {
     $err  ||= $req->error;
     $code ||= 500;
     $self->lmLog( "Error $code: $err", $code > 499 ? 'error' : 'notice' );
-    return (
-          $req->accept =~ /json/
-        ? $self->sendJSONresponse( $req, { error => $err }, code => $code )
-        : [ $code, [ 'Content-Type' => 'text/plain' ], ["Error: $err"] ]
-    );
+
+    # SOAP responses
+    if ( $req->env->{HTTP_SOAPACTION} ) {
+        my $s = '<soapenv:Body>
+ <soapenv:Fault>
+  <Faultcode>soapenv:Client</Faultcode>
+  <Faultstring>' . $err . '.</Faultstring>
+  <Detail>
+   <Key>Fred</Key>
+  </Detail>
+ </soapenv:Fault>
+</soapenv:Body>';
+        return [
+            $code,
+            [
+                'Content-Type' => 'application/xml; charset=utf-8',
+                @{ $req->respHeaders || [] },
+                'Content-Length' => length($s)
+            ],
+            [$s]
+        ];
+    }
+
+    # Handle Ajax responses
+    elsif ( $req->accept =~ /json/ ) {
+        return $self->sendJSONresponse( $req, { error => $err },
+            code => $code );
+    }
+
+    # Default response: HTML
+    else {
+        my $title = (
+              $code >= 500 ? 'Server error'
+            : $code == 403 ? 'Forbidden'
+            : $code == 401 ? 'Authentication required'
+            : $code == 400 ? 'Bad request'
+            :                'Error'
+        );
+        my $s = "<html><head><title>$title</title>
+<style>
+body{background:#000;color:#fff;padding:10px 50px;font-family:sans-serif;}a{text-decoration:none;color:#fff;}h1{text-align:center;}
+</style>
+</head>
+<body>
+<h1>$title</h1>
+<p>$err</p>
+<center><a href=\"http://lemonldap-ng.org\">LemonLDAP::NG</a></center>'
+</body>
+</html>";
+        return [
+            $code,
+            [
+                'Content-Type' => 'text/html; charset=utf-8',
+                @{ $req->respHeaders || [] }, 'Content-Length' => length($s)
+            ],
+            [$s]
+        ];
+    }
 }
 
 sub abort {
     my ( $self, $err ) = @_;
-    $self->lmLog( $err, 'error' );
+    eval { $self->logger->error($err) };
     return sub {
         $self->sendError( Lemonldap::NG::Common::PSGI::Request->new( $_[0] ),
             $err, 500 );
@@ -139,56 +205,56 @@ sub _mustBeDefined {
     die "$name() method must be implemented (probably in $ref)";
 }
 
-sub init {
-    my ( $self, $args ) = @_;
-    unless ( ref $args ) {
-        $self->error('init argument must be a hashref');
-        return 0;
-    }
-    foreach my $k ( keys %$args ) {
-        $self->{$k} = $args->{$k};
-    }
-    return 1;
-}
-
 sub handler { _mustBeDefined(@_) }
 
-sub sendHtml {
-    my ( $self, $req, $template ) = @_;
+sub sendJs {
+    my ( $self, $req ) = @_;
     my $sp = $self->staticPrefix;
     $sp =~ s/\/*$/\//;
-    my $sc = $req->scriptname;
+    my $sc = $req->script_name;
     $sc = '.' unless ($sc);
     $sc =~ s#/*$#/#;
-    if ( defined $req->params('js') ) {
-        my $s =
-            sprintf 'var staticPrefix="%s";'
-          . 'var scriptname="%s";'
-          . 'var availableLanguages="%s".split(/[,;] */);'
-          . 'var portal="%s";', $sp, $sc, $self->languages, $self->portal;
-        $s .= $self->javascript($req) if ( $self->can('javascript') );
-        return [
-            200,
-            [
-                'Content-Type'   => 'application/javascript',
-                'Content-Length' => length($s)
-            ],
-            [$s]
-        ];
-    }
+    my $s =
+        sprintf 'var staticPrefix="%s";'
+      . 'var scriptname="%s";'
+      . 'var availableLanguages="%s".split(/[,;] */);'
+      . 'var portal="%s";', $sp, $sc, $self->languages, $self->portal;
+    $s .= $self->javascript($req) if ( $self->can('javascript') );
+    return [
+        200,
+        [
+            'Content-Type'   => 'application/javascript',
+            'Content-Length' => length($s),
+            'Cache-Control'  => 'public,max-age=2592000',
+        ],
+        [$s]
+    ];
+}
+
+sub sendHtml {
+    my ( $self, $req, $template, %args ) = @_;
+    my $sp = $self->staticPrefix;
+    $sp =~ s/\/*$/\//;
+    my $sc = $req->script_name;
+    $sc = '.' unless ($sc);
+    $sc =~ s#/*$#/#;
+    $args{code} ||= 200;
+    $args{headers} ||= $req->respHeaders || [];
     my $htpl;
-    $template = $self->templateDir . "/$template.tpl";
+    $template = ( $args{templateDir} // $self->templateDir ) . "/$template.tpl";
     return $self->sendError( $req, "Unable to read $template", 500 )
       unless ( -r $template and -f $template );
     eval {
-        $self->lmLog( "Starting HTML generation using $template", 'debug' );
+        $self->logger->debug("Starting HTML generation using $template");
         require HTML::Template;
         $htpl = HTML::Template->new(
             filehandle             => IO::File->new($template),
             path                   => $self->templateDir,
-            die_on_bad_params      => 1,
+            die_on_bad_params      => 0,
             die_on_missing_include => 1,
             cache                  => 0,
+            global_vars            => 1,
+            loop_context_vars      => 1,
         );
 
         # TODO: replace app
@@ -196,25 +262,22 @@ sub sendHtml {
         $htpl->param(
             STATIC_PREFIX => $sp,
             SCRIPTNAME    => $sc,
-            ( $self->can('tplParams') ? ( $self->tplParams ) : () ),
+            ( $self->can('tplParams') ? ( $self->tplParams($req) ) : () ),
+            (
+                $args{params}
+                ? %{ $args{params} }
+                : ()
+            ),
         );
     };
     if ($@) {
         return $self->sendError( $req, "Unable to load template: $@", 500 );
     }
-    $self->lmLog(
-        'For more performance, store the result of this as static file',
-        'debug' );
 
     # Set headers
-    my $hdrs = [ 'Content-Type' => 'text/html' ];
-    unless ( $self->logLevel eq 'debug' ) {
-        push @$hdrs,
-          ETag            => "LMNG-manager-$VERSION",
-          'Cache-Control' => 'private, max-age=2592000';
-    }
-    $self->lmLog( "Sending $template", 'debug' );
-    return [ 200, $hdrs, [ $htpl->output() ] ];
+    my $hdrs = [ 'Content-Type' => 'text/html', @{ $args{headers} } ];
+    $self->logger->debug("Sending $template");
+    return [ $args{code}, $hdrs, [ $htpl->output() ] ];
 }
 
 ###############
@@ -223,6 +286,7 @@ sub sendHtml {
 
 sub run {
     my ( $self, $args ) = @_;
+    $args //= {};
     unless ( ref $self ) {
         $self = $self->new($args);
         return $self->abort( $self->error ) unless ( $self->init($args) );
@@ -259,7 +323,7 @@ Use Lemonldap::NG::Common::PSGI::Router for REST API.
   
     # Store debug level
     $self->logLevel('info');
-    # Can use syslog for user actions
+    # It is possible to use syslog for user actions
     $self->syslog('daemon');
   
     # Return a boolean. If false, then error message has to be stored in
@@ -319,12 +383,13 @@ debug, info, notice, warn, error.
 
 =head3 userLog ($msg, $level)
 
-If $self->syslog is configured, store message with it, else called simply lmLog().
-$self->syslog must be empty or contain syslog facility
+Alias for $self->userLogger->$level($msg). Prefer to use this form (required
+for Auth/Combination)
 
 =head3 userError() userNotice() userInfo()
 
-Alias for userLog(level).
+Alias for userLog(level). Note that you must use $self->userLogger->$level
+instead
 
 =head2 Content sending
 
@@ -422,13 +487,7 @@ L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>,
 
 =over
 
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=item François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
 
 =back
 
@@ -444,13 +503,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =head1 COPYRIGHT AND LICENSE
 
-=over
-
-=item Copyright (C) 2015-2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2015-2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
+See COPYING file for details.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,0 +1,22 @@
+---
+fusemap:
+  CKOUT:
+    mask: 4
+    name: CKOUT
+    reg: b
+  RSTDISBL:
+    mask: 1
+    name: RSTDISBL
+    reg: b
+  WDTON:
+    mask: 2
+    name: WDTON
+    reg: b
+fuses:
+  - CKOUT
+  - WDTON
+  - RSTDISBL
+reginfos:
+  - default: 255
+    mask: 7
+    name: b

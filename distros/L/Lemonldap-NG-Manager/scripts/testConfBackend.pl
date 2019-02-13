@@ -30,8 +30,7 @@ my $currentConf;
 
 # 1
 ok(
-    $currentConf = Lemonldap::NG::Common::Conf->new(
-        {
+    $currentConf = Lemonldap::NG::Common::Conf->new( {
             confFile => 'test/lemonldap-ng.ini',
             noCache  => 1,
         }
@@ -43,8 +42,7 @@ $Lemonldap::NG::Common::Conf::msg = '';
 # 2
 my $new;
 ok(
-    $new = Lemonldap::NG::Common::Conf->new(
-        {
+    $new = Lemonldap::NG::Common::Conf->new( {
             type => $module,
             %$args,
             force       => 1,

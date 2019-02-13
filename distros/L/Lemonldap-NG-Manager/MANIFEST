@@ -162,7 +162,7 @@ site/htdocs/static/languages/en.json
 site/htdocs/static/languages/fr.json
 site/htdocs/static/languages/it.json
 site/htdocs/static/languages/vi.json
-site/htdocs/static/languages/zh_CN.json
+site/htdocs/static/languages/zh.json
 site/htdocs/static/logos/ar.png
 site/htdocs/static/logos/bootstrap.png
 site/htdocs/static/logos/custom.png
@@ -174,7 +174,7 @@ site/htdocs/static/logos/it.png
 site/htdocs/static/logos/llng-icon-32.png
 site/htdocs/static/logos/llng-logo-32.png
 site/htdocs/static/logos/vi.png
-site/htdocs/static/logos/zh_CN.png
+site/htdocs/static/logos/zh.png
 site/htdocs/static/reverseTree.json
 site/htdocs/static/struct.json
 site/templates/2ndfa.tpl
@@ -193,11 +193,13 @@ t/05-rest-api.t
 t/06-rest-api.t
 t/07-utf8.t
 t/10-save-unchanged-conf.t
+t/11-save-changed-conf-with-confirmation.t
 t/12-save-changed-conf.t
 t/14-bad-changes-in-conf.t
 t/15-combination.t
 t/20-test-coverage.t
 t/40-sessions.t
+t/50-notifications-DBI.t
 t/50-notifications.t
 t/60-2ndfa.t
 t/80-attributes.t
@@ -206,8 +208,10 @@ t/99-pod.t
 t/conf/lmConf-1.json
 t/jsonfiles/01-base-tree.json
 t/jsonfiles/02-base-tree-all-nodes-opened.json
+t/jsonfiles/11-modified-with-confirmation.json
 t/jsonfiles/12-modified.json
 t/jsonfiles/14-bad.json
 t/jsonfiles/15-combination.json
+t/lemonldap-ng-dbi.ini
 t/lemonldap-ng.ini
 t/test-lib.pm

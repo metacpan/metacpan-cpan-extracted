@@ -9,7 +9,7 @@ require DynaLoader;
 require Exporter;
 use vars qw(@ISA $VERSION @EXPORT_OK);
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 @ISA = qw(Inline DynaLoader Exporter);
 @EXPORT_OK = qw(rb_eval
 		rb_call_function
@@ -228,7 +228,7 @@ sub build {
     delete @{ $post->{classes} }{@skip_clas, keys(%{$pre->{classes}})};
     delete @{ $post->{functions} }{@skip_func, keys(%{$pre->{functions}})};
     delete @{ $post->{modules} }{
-        keys(%{$pre->{modules}}), keys(%{$post->{classes}})
+        keys(%{$pre->{modules}}), keys(%{$post->{classes}}), grep /:[a-z]/, keys(%{$post->{modules}})
     };
 
     # Filter the results according to the {bindto} and {REGEXP} selections:

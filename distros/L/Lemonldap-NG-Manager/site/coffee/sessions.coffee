@@ -61,7 +61,7 @@ schemes =
 
 overScheme =
 	_whatToTrace: (t,v,level,over) ->
-		if level == 1
+		if level == 1 and v.length > over
 			"#{t}=#{v}*&groupBy=substr(#{t},#{(level+over+1)})"
 		else
 			null

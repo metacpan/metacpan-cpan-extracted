@@ -100,8 +100,7 @@ sub getCasSession {
         );
     }
 
-    my $casSession = Lemonldap::NG::Common::Session->new(
-        {
+    my $casSession = Lemonldap::NG::Common::Session->new( {
             %storage,
             cacheModule        => $self->conf->{localSessionStorage},
             cacheModuleOptions => $self->conf->{localSessionStorageOptions},

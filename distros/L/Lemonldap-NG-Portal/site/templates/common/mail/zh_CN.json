@@ -4,6 +4,7 @@
 "click2Register":"请点击此处已确认您的账户注册",
 "click2Reset":"请点击此处充值您的密码",
 "hello":"您好",
+"mail2fSubject":"[LemonLDAP::NG] Your login code",
 "mailConfirmSubject":"[LemonLDAP::NG] 密码重置确认",
 "mailSubject":"[LemonLDAP::NG] 您的新密码",
 "newPwdIs":"您的新密码是",
@@ -12,5 +13,6 @@
 "registerConfirmSubject":"[LemonLDAP::NG] 账号注册确认",
 "registerDoneSubject":"[LemonLDAP::NG] 您的新账号",
 "requestIssuedFromIP":"此请求来自IP地址",
+"yourLoginCodeIs":"Your login code is",
 "yourLoginIs":"您登陆的账户是"
 }

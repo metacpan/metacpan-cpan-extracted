@@ -19,8 +19,7 @@ SKIP: {
     $dbh->do(
         "INSERT INTO users VALUES ('french','french','Frédéric Accents')");
     $dbh->do("INSERT INTO users VALUES ('russian','russian','Русский')");
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => 'error',
                 useSafeJail              => 1,

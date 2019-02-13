@@ -136,7 +136,7 @@
             "id": "applicationList/0008-cat/0009-app",
             "type": "menuApp"
           }, {
-            "title": "Offical Website",
+            "title": "Official Website",
             "type": "menuApp",
             "id": "applicationList/0008-cat/0010-app",
             "data": {
@@ -1157,11 +1157,6 @@
     "title": "logParams",
     "type": "simpleInputContainer",
     "nodes": [{
-      "default": "",
-      "id": "trustedProxies",
-      "title": "trustedProxies",
-      "data": ""
-    }, {
       "default": "uid",
       "id": "whatToTrace",
       "title": "whatToTrace",
@@ -1611,13 +1606,15 @@
         "default": 0,
         "id": "https",
         "title": "https",
-        "type": "bool",
-        "data": 0
+        "type": "trool",
+        "default": -1,
+        "data": -1
       }, {
         "id": "port",
         "title": "port",
         "type": "int",
-        "data": null
+        "default": -1,
+        "data": -1
       }, {
         "default": 0,
         "id": "useRedirectOnForbidden",

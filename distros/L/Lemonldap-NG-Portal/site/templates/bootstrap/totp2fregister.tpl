@@ -22,7 +22,7 @@
           </div>
           <div class="form-group">
             <label for="code"><span trspan="code">Code</span></label>
-            <input id="code" class="form-control" name="code" type="number" />
+            <input id="code" class="form-control" name="code" type="number" autocomplete="off" />
           </div>
         </div>
       </div>

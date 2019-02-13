@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.2';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -351,7 +351,8 @@ sub display {
         # * Bad URL error
         elsif ($req->{error} == PE_LOGOUT_OK
             or $req->{error} == PE_WAIT
-            or $req->{error} == PE_BADURL )
+            or $req->{error} == PE_BADURL
+            or $req->{error} == PE_BADCREDENTIALS )
         {
             %templateParams = (
                 %templateParams,
@@ -401,6 +402,7 @@ sub display {
                     ? 1
                     : 0,
                     DISPLAY_SSL_FORM  => $displayType =~ /sslform/ ? 1 : 0,
+                    DISPLAY_GPG_FORM  => $displayType =~ /gpgform/ ? 1 : 0,
                     DISPLAY_LOGO_FORM => $displayType eq "logo"    ? 1 : 0,
                     module            => $displayType eq "logo"
                     ? $self->getModule( $req, 'auth' )
@@ -415,18 +417,6 @@ sub display {
 
         }
 
-    }
-
-    # Additional $req param
-    %templateParams = (
-        %templateParams,
-        TROVER => $self->trOver,
-        %{ $req->{customParameters} // {} },
-    );
-
-    for my $session_key ( keys %{ $req->{sessionInfo} } ) {
-        $templateParams{ "session_" . $session_key } =
-          $req->{sessionInfo}->{$session_key};
     }
 
     $self->logger->debug("Skin returned: $skinfile");
@@ -471,7 +461,9 @@ sub buildHiddenForm {
           if $self->checkXSSAttack( $_, $req->{portalHiddenFormValues}->{$_} );
 
         # Build hidden input HTML code
-        $val .= qq{<input type="hidden" name="$_" id="$_" value="}
+        # 'id' is removed to avoid warning with Choice
+        #$val .= qq{<input type="hidden" name="$_" id="$_" value="}
+        $val .= qq{<input type="hidden" name="$_" value="}
           . $req->{portalHiddenFormValues}->{$_} . '" />';
     }
 
@@ -609,8 +601,7 @@ sub mkOidcConsent {
         'oidcConsents',
         params => {
             partners => [
-                map {
-                    {
+                map { {
                         name        => $_,
                         epoch       => $consents->{$_}->{epoch},
                         scope       => $consents->{$_}->{scope},

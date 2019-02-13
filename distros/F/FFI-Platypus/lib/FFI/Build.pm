@@ -12,7 +12,7 @@ use Capture::Tiny ();
 use File::Path ();
 
 # ABSTRACT: Build shared libraries for use with FFI
-our $VERSION = '0.82'; # VERSION
+our $VERSION = '0.83'; # VERSION
 
 
 sub _native_name
@@ -36,10 +36,10 @@ sub new
     alien    => [],
   }, $class;
   
-  my $platform  = $self->{platform}  = $args{platform} || FFI::Build::Platform->default;
-  my $file      = $self->{file}      = $args{file} || FFI::Build::File::Library->new([$args{dir} || '.', $self->_native_name($name)], platform => $self->platform);
+  my $platform  = $self->{platform}  = $args{platform}  || FFI::Build::Platform->default;
+  my $file      = $self->{file}      = $args{file}      || FFI::Build::File::Library->new([$args{dir} || '.', $self->_native_name($name)], platform => $self->platform);
   my $buildname = $self->{buildname} = $args{buildname} || '_build';
-  my $verbose   = $self->{verbose}   = $args{verbose};
+  my $verbose   = $self->{verbose}   = $args{verbose}   || 0;
 
   if(defined $args{cflags})
   {
@@ -137,6 +137,23 @@ sub source
     if(eval { $file_spec->isa('FFI::Build::File::Base') })
     {
       push @{ $self->{source} }, $file_spec;
+      next;
+    }
+    if(ref $file_spec eq 'ARRAY')
+    {
+      my($type, $content, @args) = @$file_spec;
+      my $class = "FFI::Build::File::$type";
+      unless($class->can('new'))
+      {
+        my $pm = "FFI/Build/File/$type.pm";
+        require $pm;
+      }
+      push @{ $self->{source} }, $class->new(
+        $content,
+        build    => $self,
+        platform => $self->platform,
+        @args
+      );
       next;
     }
     my @paths = File::Glob::bsd_glob($file_spec);
@@ -259,7 +276,7 @@ FFI::Build - Build shared libraries for use with FFI
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 
@@ -419,7 +436,7 @@ Returns the verbose flag.
 
 Returns the compiler flags.
 
-=head3 cflags_I
+=head2 cflags_I
 
  my @cflags_I = @{ $build->cflags_I };
 

@@ -11,7 +11,7 @@ use File::Basename qw(basename);
 ## Globals
 ##----------------------------------------------------------------------
 
-our $VERSION  = "0.11";
+our $VERSION  = "0.12";
 our $encoding = undef;
 
 our $iclass = 'Lingua::TT::Persistent';

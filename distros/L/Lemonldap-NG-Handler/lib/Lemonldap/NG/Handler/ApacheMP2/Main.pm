@@ -1,6 +1,6 @@
 # Main ApacheMP2 adapter for LLNG handler
 #
-# See http://lemonldap-ng.org/documentation/latest/handlerarch
+# See https://lemonldap-ng.org/documentation/latest/handlerarch
 package Lemonldap::NG::Handler::ApacheMP2::Main;
 
 use strict;

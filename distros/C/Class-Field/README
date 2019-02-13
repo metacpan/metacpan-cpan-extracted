@@ -1,10 +1,16 @@
 NAME
+
     Class::Field - Class Field Accessor Generator
 
+VERSION
+
+    This document describes Class::Field version 0.24.
+
 SYNOPSIS
+
         package Thing;
         use Class::Field qw'field const';
-
+    
         field 'this';
         field 'list' => [];
         field 'map' => {};
@@ -13,54 +19,61 @@ SYNOPSIS
         const 'answer' => 42;
 
 DESCRIPTION
-    Class::Field exports two subroutines, "field" and "const". These
-    functions are used to declare fields and constants in your class.
+
+    Class::Field exports two subroutines, field and const. These functions
+    are used to declare fields and constants in your class.
 
     Class::Field generates custom code for each accessor that is optimized
     for speed.
 
 FUNCTIONS
-    "field"
-        Defines accessor methods for a field of your class:
 
-            package Example;
-            use base 'Parent';
-            use Class::Field qw'field const';
+    field
 
-            field 'foo';
-            field bar => [];
+      Defines accessor methods for a field of your class:
 
-            sub lalala {
-                my $self = shift;
-                $self->foo(42);
-                push @{$self->{bar}}, $self->foo;
-            }
+          package Example;
+          use base 'Parent';
+          use Class::Field qw'field const';
+      
+          field 'foo';
+          field bar => [];
+      
+          sub lalala {
+              my $self = shift;
+              $self->foo(42);
+              push @{$self->{bar}}, $self->foo;
+          }
 
-        The first parameter passed to "field" is the name of the attribute
-        being defined. Accessors can be given an optional default value.
-        This value will be returned if no value for the field has been set
-        in the object.
+      The first parameter passed to field is the name of the attribute
+      being defined. Accessors can be given an optional default value. This
+      value will be returned if no value for the field has been set in the
+      object.
 
-    "const"
-            const bar => 42;
+    const
 
-        The "const" function is similar to <field> except that it is
-        immutable. It also does not store data in the object. You probably
-        always want to give a "const" a default value, otherwise the
-        generated method will be somewhat useless.
+          const bar => 42;
+
+      The const function is similar to <field> except that it is immutable.
+      It also does not store data in the object. You probably always want
+      to give a const a default value, otherwise the generated method will
+      be somewhat useless.
 
 NOTE
+
     This code was taken directly out the Spiffy module for those people who
     just want this functionality without using the rest of Spiffy.
 
 AUTHOR
-    ingy döt Net <ingy@cpan.org>
 
-COPYRIGHT
-    Copyright 2006-2014. Ingy döt Net.
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2006-2019. Ingy döt Net.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See <http://www.perl.com/perl/misc/Artistic.html>
+    See http://www.perl.com/perl/misc/Artistic.html
 

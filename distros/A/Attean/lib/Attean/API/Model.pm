@@ -7,7 +7,7 @@ Attean::API::Model - RDF Model
 
 =head1 VERSION
 
-This document describes Attean::API::Model version 0.020
+This document describes Attean::API::Model version 0.021
 
 =head1 DESCRIPTION
 
@@ -118,16 +118,34 @@ semantics as C<< get_quads >> with an C<< undef >> graph).
 Returns an L<Attean::API::Iterator> of L<Attean::API::Term> objects of unique
 subjects and objects present in the specified C<< $graph >>.
 
+=item C<< holds($s, $p, $o, $g) >>
+
+=item C<< holds($triple_pattern) >>
+
+=item C<< holds($quad_pattern) >>
+
+Returns true if the triple/quad pattern matches any data in the model, false
+otherwise.
+
+=item C<< algebra_holds($algebra, $graph) >>
+
+=item C<< algebra_holds($algebra, \@graphs) >>
+
+Returns true if the algebra, evaluated with the supplied default graph(s)
+matches any data in the model, false otherwise. This is equivalent to the
+result of an ASK query over the supplied algebra.
+
 =cut
 
 use Attean::API::Binding;
 
-package Attean::API::Model 0.020 {
+package Attean::API::Model 0.021 {
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
 	use URI::Namespace;
 	use Scalar::Util qw(blessed);
 	use List::MoreUtils qw(uniq);
+	use Data::Dumper;
 
 	use Moo::Role;
 	
@@ -149,6 +167,9 @@ package Attean::API::Model 0.020 {
 			}
 		}
 		my $quads		= $self->get_quads(@nodes);
+		unless (blessed($quads)) {
+			return Attean::ListIterator->new(values => [], item_type => 'Attean::API::Result', variables => []);
+		}
 		return $quads->map(sub {
 			my $q			= shift;
 			return unless blessed($q);
@@ -160,6 +181,7 @@ package Attean::API::Model 0.020 {
 	requires 'count_quads';
 	requires 'count_quads_estimate';
 	requires 'get_graphs';
+	requires 'holds';
 	
 	sub get_list {
 		my $self	= shift;
@@ -241,10 +263,46 @@ package Attean::API::Model 0.020 {
 		my %seen;
 		return $union->grep(sub {not($seen{shift->as_string}++)});
 	}
+
+	sub algebra_holds {
+		my $self 	= shift;
+		my $algebra	= shift || die "No algebra available in algebra_holds call";
+		my $default_graphs	= shift || die "No default graphs available in algebra_holds call";
+		$default_graphs	= [$default_graphs] if (blessed($default_graphs));
+		
+		unless (blessed($algebra) and $algebra->does('Attean::API::Algebra')) {
+			die "Unexpected argument to algebra_holds: " . Dumper($algebra);
+		}
+		
+		unless ($algebra->isa('Attean::Algebra::Ask')) {
+			$algebra	= Attean::Algebra::Ask->new(children => [$algebra]);
+		}
+		my $planner	= Attean::IDPQueryPlanner->new();
+		my $plan	= $planner->plan_for_algebra($algebra, $self, $default_graphs);
+		my $iter	= $plan->evaluate($self);
+		my $r		= $iter->next;
+		my $ebv		= eval { $r->ebv };
+		return 0 if ($@);
+		return $ebv;
+	}
+	
+	sub holds {
+		my $self 	= shift;
+		return 0 unless scalar(@_);
+		if (not defined($_[0]) or (blessed($_[0]) and $_[0]->does('Attean::API::TermOrVariable'))) {
+			# firt argument is undef or a term/variable, so we assume this is a call with up to 3 term/variable/undef args
+			return ($self->count_quads_estimate(@_) > 0);
+		} elsif (blessed($_[0]) and $_[0]->does('Attean::API::TripleOrQuadPattern')) {
+			my $t	= shift;
+			return ($self->count_quads_estimate($t->values) > 0);
+		} else {
+			die "Unexpected argument to holds: " . Dumper($_[0]);
+		}
+	}
 }
 
 
-package Attean::API::MutableModel 0.020 {
+package Attean::API::MutableModel 0.021 {
 	use Attean::RDF;
 	use LWP::UserAgent;
 	use Encode qw(encode);
@@ -336,21 +394,21 @@ package Attean::API::MutableModel 0.020 {
 }
 
 
-package Attean::API::ETagCacheableModel 0.020 {
+package Attean::API::ETagCacheableModel 0.021 {
 	use Moo::Role;
 	
 	requires 'etag_value_for_quads';
 }
 
 
-package Attean::API::TimeCacheableModel 0.020 {
+package Attean::API::TimeCacheableModel 0.021 {
 	use Moo::Role;
 	
 	requires 'mtime_for_quads';
 }
 
 
-package Attean::API::BulkUpdatableModel 0.020 {
+package Attean::API::BulkUpdatableModel 0.021 {
 	use Moo::Role;
 	
 	with 'Attean::API::MutableModel';

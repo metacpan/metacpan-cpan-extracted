@@ -137,8 +137,7 @@ count(4);
 
 # Update a key
 ok(
-    $res = $issuer->app->(
-        {
+    $res = $issuer->app->( {
             HTTP_ACCEPT            => 'application/json',
             HTTP_ACCEPT_LANGUAGE   => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             HTTP_HOST              => 'auth.idp.com',
@@ -171,8 +170,7 @@ count(2);
 
 # Del new session
 ok(
-    $res = $issuer->app->(
-        {
+    $res = $issuer->app->( {
             HTTP_ACCEPT          => 'application/json',
             HTTP_ACCEPT_LANGUAGE => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             HTTP_HOST            => 'auth.idp.com',
@@ -236,8 +234,7 @@ sub switch {
 }
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel          => $debug,
                 templatesDir      => 'site/htdocs/static',
@@ -253,8 +250,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel         => $debug,
                 domain           => 'sp.com',

@@ -8,7 +8,7 @@ package Lemonldap::NG::Common::Apache::Session::SOAP;
 use strict;
 use SOAP::Lite;
 
-our $VERSION = '1.9.1';
+our $VERSION = '2.0.0';
 
 #parameter proxy Url of SOAP service
 #parameter proxyOptions SOAP::Lite options
@@ -126,7 +126,7 @@ sub _connect {
     if ( $self->{proxyOptions} ) {
         push @args, %{ $self->{proxyOptions} };
     }
-    $self->{ns} ||= 'urn:Lemonldap/NG/Common/CGI/SOAPService';
+    $self->{ns} ||= 'urn:Lemonldap/NG/Common/PSGI/SOAPService';
     return $self->{service} = SOAP::Lite->ns( $self->{ns} )->proxy(@args);
 }
 
@@ -147,7 +147,7 @@ sub _soapCall {
 
 ## @method hashRef get(string id)
 # @param $id Apache::Session session ID.
-# @return User datas
+# @return User data
 sub get {
     my $self = shift;
     my $id   = shift;
@@ -169,7 +169,7 @@ sub get {
 
 ## @method hashRef newSession()
 # Build a new Apache::Session session.
-# @return User datas (just the session ID)
+# @return User data (just the session ID)
 sub newSession {
     my $self = shift;
     $self->{data} = $self->_soapCall("newSession");
@@ -187,7 +187,7 @@ sub newSession {
 }
 
 ## @method boolean save()
-# Save user datas if modified.
+# Save user data if modified.
 sub save {
     my $self = shift;
     return unless ( $self->{modified} );
@@ -235,8 +235,12 @@ sub get_key_from_all_sessions() {
     }
     die('proxy is required') unless ( $self->{proxy} );
     ( $user, $password ) = ( $args->{User}, $args->{Password} );
+
+    # Get token before query
+    my $token = Lemonldap::NG::Handler::Main->tsv->{cipher}
+      ->decrypt( $self->_soapCall('getCipheredToken') );
     if ( ref($data) eq 'CODE' ) {
-        my $r = $self->_soapCall( "get_key_from_all_sessions", $args );
+        my $r = $self->_soapCall( "get_key_from_all_sessions", $token );
         my $res;
         if ($r) {
             foreach my $k ( keys %$r ) {
@@ -246,7 +250,7 @@ sub get_key_from_all_sessions() {
         }
     }
     else {
-        return $self->_soapCall( "get_key_from_all_sessions", $args, $data );
+        return $self->_soapCall( "get_key_from_all_sessions", $token, $data );
     }
 }
 
@@ -286,7 +290,7 @@ access to Lemonldap::NG Web-SSO sessions via SOAP.
   __PACKAGE__->init ({
          globalStorage => 'Lemonldap::NG::Common::Apache::Session::SOAP',
          globalStorageOptions => {
-                 proxy => 'http://auth.example.com/index.pl/sessions',
+                 proxy => 'http://auth.example.com/sessions',
                  proxyOptions => {
                      timeout => 5,
                  },
@@ -309,7 +313,7 @@ access to Lemonldap::NG Web-SSO sessions via SOAP.
   my $portal = new Lemonldap::NG::Portal::SharedConf (
          globalStorage => 'Lemonldap::NG::Common::Apache::Session::SOAP',
          globalStorageOptions => {
-                 proxy => 'http://auth.example.com/index.pl/sessions',
+                 proxy => 'http://auth.example.com/sessions',
                  proxyOptions => {
                      timeout => 5,
                  },
@@ -338,7 +342,7 @@ Lemonldap::NG Web-SSO configuration. It is used by L<Lemonldap::NG::Handler>,
 L<Lemonldap::NG::Portal> and L<Lemonldap::NG::Manager>.
 
 Lemonldap::NG::Common::Apache::Session::SOAP used with
-L<Lemonldap::NG::Portal> provides the ability to acces to
+L<Lemonldap::NG::Portal> provides the ability to access to
 Lemonldap::NG sessions via SOAP: the portal act as a proxy to access to the
 real Apache::Session module (see HTML documentation for more)
 
@@ -364,7 +368,7 @@ C<>SOAP::Transport::HTTP::Client::get_basic_credentials>:
   __PACKAGE__->init ( {
       globalStorage => 'Lemonldap::NG::Common::Apache::Session::SOAP',
       globalStorageOptions => {
-                proxy => 'http://auth.example.com/index.pl/sessions',
+                proxy => 'http://auth.example.com/sessions',
                 User     => 'http-user',
                 Password => 'pass',
       },
@@ -386,7 +390,7 @@ set environment variables.
   __PACKAGE__->init ( {
       globalStorage => 'Lemonldap::NG::Common::Apache::Session::SOAP',
       globalStorageOptions => {
-                proxy => 'https://auth.example.com/index.pl/sessions',
+                proxy => 'https://auth.example.com/sessions',
       },
   } );
 
@@ -398,15 +402,11 @@ L<Lemonldap::NG::Manager>, L<Lemonldap::NG::Common::Conf::SOAP>,
 L<Lemonldap::NG::Handler>, L<Lemonldap::NG::Portal>,
 L<http://lemonldap-ng.org/>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 =over
 
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=item François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
 
 =back
 
@@ -422,15 +422,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =head1 COPYRIGHT AND LICENSE
 
-=over
-
-=item Copyright (C) 2008-2013 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2012 by François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Copyright (C) 2010-2012 by Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
+See COPYING file for details.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

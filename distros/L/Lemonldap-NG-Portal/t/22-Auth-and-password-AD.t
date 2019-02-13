@@ -10,8 +10,7 @@ my $maintests = 1;
 SKIP: {
     skip 'No AD server given', $maintests unless ( $ENV{ADSERVER} );
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel        => 'error',
                 useSafeJail     => 1,

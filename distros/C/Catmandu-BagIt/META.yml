@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-BagIt/issues
   homepage: https://github.com/LibreCat/Catmandu-BagIt
   repository: https://github.com/LibreCat/Catmandu-BagIt.git
-version: '0.234'
+version: '0.235'
 x_contributors:
   - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'
   - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'

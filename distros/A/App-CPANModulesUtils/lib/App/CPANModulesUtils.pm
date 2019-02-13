@@ -1,7 +1,7 @@
 package App::CPANModulesUtils;
 
-our $DATE = '2019-01-11'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-02-13'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -131,6 +131,41 @@ sub gen_acme_cpanmodules_module_from_acme_cpanlists_list {
     [200];
 }
 
+$SPEC{acme_cpanmodules_for} = {
+    v => 1.1,
+    summary => 'List Acme::CPANModules distributions that mention specified modules',
+    description => <<'_',
+
+This utility consults <prog:lcpan> (local indexed CPAN mirror) to check if there
+are <pm:Acme::CPANModules> distributions that mention specified modules. This is
+done by checking the presence of a dependency with the relationship
+`x_mentions`.
+
+_
+    args => {
+        modules => {
+            schema => ['array*', of=>'perl::modname*'],
+            req => 1,
+            pos => 0,
+            greedy => 1,
+        },
+    },
+
+};
+sub acme_cpanmodules_for {
+    require App::lcpan::Call;
+
+    my %args = @_;
+
+    my $res = App::lcpan::Call::call_lcpan_script(
+        argv => ["rdeps", "--rel", "x_mentions", @{ $args{modules} }],
+    );
+
+    return $res unless $res->[0] == 200;
+
+    return [200, "OK", [grep {/\AAcme-CPANModules/}
+                            map {$_->{dist}} @{ $res->[2] }]];
+}
 
 1;
 # ABSTRACT: Command-line utilities related to Acme::CPANModules
@@ -147,7 +182,7 @@ App::CPANModulesUtils - Command-line utilities related to Acme::CPANModules
 
 =head1 VERSION
 
-This document describes version 0.002 of App::CPANModulesUtils (from Perl distribution App-CPANModulesUtils), released on 2019-01-11.
+This document describes version 0.003 of App::CPANModulesUtils (from Perl distribution App-CPANModulesUtils), released on 2019-02-13.
 
 =head1 SYNOPSIS
 
@@ -158,6 +193,8 @@ L<Acme::CPANModules>:
 
 =over
 
+=item * L<acme-cpanmodules-for>
+
 =item * L<draw-feature-matrix-from-acme-cpanmodules-module>
 
 =item * L<gen-acme-cpanmodules-module-from-acme-cpanlists-list>
@@ -165,6 +202,41 @@ L<Acme::CPANModules>:
 =back
 
 =head1 FUNCTIONS
+
+
+=head2 acme_cpanmodules_for
+
+Usage:
+
+ acme_cpanmodules_for(%args) -> [status, msg, payload, meta]
+
+List Acme::CPANModules distributions that mention specified modules.
+
+This utility consults L<lcpan> (local indexed CPAN mirror) to check if there
+are L<Acme::CPANModules> distributions that mention specified modules. This is
+done by checking the presence of a dependency with the relationship
+C<x_mentions>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<modules>* => I<array[perl::modname]>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
 
 
 =head2 gen_acme_cpanmodules_module_from_acme_cpanlists_list

@@ -7,7 +7,7 @@ use Exporter 'import';
 use ExtUtils::MakeMaker;
 use XS::Install::Payload;
 
-our $VERSION = '1.0.11';
+our $VERSION = '1.0.12';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args not_available/;
@@ -113,18 +113,17 @@ sub makemaker_args {
     }
 
     if (my $use_cpp = $params{CPLUS}) {
-        $params{CC} ||= 'c++';
-        $params{LD} ||= '$(CC)';
         _string_merge($params{XSOPT}, '-C++ -csuffix .cc');
         
         my $cppv = int($use_cpp);
         $cppv = 11 if $cppv < 11;
         _string_merge($params{CCFLAGS}, "-std=c++$cppv");
         
+        $params{CC} = _get_cplusplus($params{CC}, $cppv);
+        $params{LD} ||= '$(CC)';
+        
         # prevent C++ from compile errors on perls <= 5.18, as perl had buggy <perl.h> prior to 5.20
         _string_merge($params{CCFLAGS}, "-Wno-reserved-user-defined-literal -Wno-literal-suffix -Wno-unknown-warning-option") if $^V < v5.20;
-         
-        _check_sjlj();
     }
     
     # inject ParseXS plugins into xsubpp
@@ -764,21 +763,40 @@ sub not_available {
     die "OS unsupported: $msg\n";
 }
 
-sub _check_sjlj {
-    return unless $^O eq 'MSWin32';
-    my $out = `c++ -v 2>&1`;
-    if ($out and $out =~ /--enable-sjlj-exceptions/) {
-        not_available(
-            "SJLJ compiler detected\n".
-            "***************************************************************\n".
-            "You are using c++ compiler with SJLJ exceptions enabled.\n".
-            "It makes it impossible to use C++ exceptions and perl together.\n".
-            "You need to use compiler with DWARF2 or SEH exceptions configured.\n".
-            "If you are using Strawberry Perl, install Strawberry 5.26 or higher\n".
-            "where they use mingw with SEH exceptions.\n".
-            "***************************************************************"
-        );
+sub _get_cplusplus {
+    my ($cpp, $minstd) = @_;
+    $cpp ||= 'c++'; # exists on most platforms/compilers
+    
+    # check compiler existance
+    my $v_out = `$cpp -v 2>&1`;
+    not_available("C++ compiler not available") unless defined $v_out;
+    
+    #check if C++ compiler supports -std=XXX
+    my $tmpfile = '__xs_install_check_cpp.cc';
+    my $outfile = '__xs_install_check_cpp.out';
+    if (open my $fh, '>', $tmpfile) {
+        print $fh "int main () { return 0; }\n";
+        close $fh;
+        unlink $outfile;
+        `$cpp -std=c++$minstd -o $outfile $tmpfile 2>&1`;
+        my $success = -f $outfile;
+        unlink $tmpfile, $outfile;
+        not_available("C++ compiler does not support -std=c++$minstd") unless $success;
     }
+    
+    #check exceptions
+    not_available(
+        "SJLJ compiler detected\n".
+        "***************************************************************\n".
+        "You are using c++ compiler with SJLJ exceptions enabled.\n".
+        "It makes it impossible to use C++ exceptions and perl together.\n".
+        "You need to use compiler with DWARF2 or SEH exceptions configured.\n".
+        "If you are using Strawberry Perl, install Strawberry 5.26 or higher\n".
+        "where they use mingw with SEH exceptions.\n".
+        "***************************************************************"
+    ) if $v_out =~ /--enable-sjlj-exceptions/;
+    
+    return $cpp;
 }
 
 sub _pkg_slash {

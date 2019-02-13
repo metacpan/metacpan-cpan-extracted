@@ -1,0 +1,38 @@
+---
+fusemap:
+  CKSEL:
+    mask: 7
+    name: CKSEL
+    reg: l
+    values:
+      - caption: External Crystal / Ceramic Resonator
+        name: EXTXTALCRES
+        value: 7
+      - caption: External Low-frequency Crystal
+        name: EXTLOFXTAL
+        value: 6
+      - caption: External RC Oscillator
+        name: EXTRCOSC
+        value: 5
+      - caption: Internal RC Oscillator
+        name: INTRCOSC
+        value: 4
+      - caption: External Clock
+        name: EXTCLK
+        value: 0
+  FSTRT:
+    mask: 16
+    name: FSTRT
+    reg: l
+  RSTDISBL:
+    mask: 8
+    name: RSTDISBL
+    reg: l
+fuses:
+  - FSTRT
+  - RSTDISBL
+  - CKSEL
+reginfos:
+  - default: 244
+    mask: 31
+    name: l
