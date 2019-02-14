@@ -12,7 +12,7 @@ use Test::More;
 plan(tests => 3);
 
 my $file = temp_file_path();
-my $data = <<TEXT ;
+my $data = <<TEXT;
 line 1
 more text
 TEXT

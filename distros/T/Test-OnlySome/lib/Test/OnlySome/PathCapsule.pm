@@ -12,7 +12,7 @@ use Cwd qw(cwd);
 
 use constant { true => !!1, false => !!0 };
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001003';
 
 # Docs {{{2
 

@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" : "0",
+            "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
             "Data::Sah::Compiler::perl::TH::int" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
@@ -43,6 +44,7 @@
             "Perinci::CmdLine::Classic" : "1.770",
             "Perinci::Sub::XCompletion::perl_modname" : "0",
             "Sah::Schema::perl::modname" : "0",
+            "Sah::Schema::true" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -68,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-App-CalendarDatesUtils"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

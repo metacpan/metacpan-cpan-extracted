@@ -1,3 +1,18 @@
+0.003    2019-02-14 (PERLANCAR)
+
+         - No functional changes.
+
+         - [dist] Rebuild with updated PWP:Calendar::Dates which also generates
+           Synopsis.
+
+
+0.002    2019-02-14 (PERLANCAR)
+
+         - No functional changes.
+
+         - [dist] Rebuild with DZP:Calendar::Dates and PWP:Calendar::Dates.
+
+
 0.001    2019-02-13 (PERLANCAR)
 
          - First release.

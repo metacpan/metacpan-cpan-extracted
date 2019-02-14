@@ -18,6 +18,7 @@ t/04_fill_with.t
 t/05_min_cols.t
 t/06_render_fail.t
 t/07_do_func.t
+t/08_reuse_tabulated.t
 t/99_check_manifest.t
 t/Data/Tabulate/Plugin/Fail.pm
 t/Data/Tabulate/Plugin/Test.pm

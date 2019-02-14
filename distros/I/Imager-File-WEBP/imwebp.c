@@ -70,6 +70,9 @@ get_image(WebPMux *mux, int n, int *error) {
   VP8StatusCode code;
   i_img *img;
   WebPMuxAnimParams anim;
+#if IMAGER_API_VERSION * 0x100 + IMAGER_API_LEVEL >= 0x50A
+  WebPData exif;
+#endif
 
   *error = 0;
   if ((err = WebPMuxGetFrame(mux, n, &f)) != WEBP_MUX_OK) {
@@ -160,6 +163,14 @@ get_image(WebPMux *mux, int n, int *error) {
     i_tags_set_color(&img->tags, "webp_background", 0, &color.c);
   }
 
+#if IMAGER_API_VERSION * 0x100 + IMAGER_API_LEVEL >= 0x50A
+  if (WebPMuxGetChunk(mux, "EXIF", &exif) == WEBP_MUX_OK) {
+    /* bug in Imager where this parameter was unsigend char *
+       where it should have been const */
+    im_decode_exif(img, (unsigned char *)exif.bytes, exif.size);
+  }
+#endif
+  
   WebPDataClear(&f.bitstream);
 
   i_tags_set(&img->tags, "i_format", "webp", 4);

@@ -100,4 +100,32 @@ SKIP:
 }
 Imager->set_file_limits(reset => 1);
 
+SKIP:
+{
+  $Imager::VERSION >= 1.010
+    or skip "Need a newer Imager for EXIF support", 1;
+  # this exif data was copied from the JPEG exif test image
+  # we don't test them all
+  my %expected_tags =
+    (
+     exif_date_time_original => "2005:11:25 00:00:00",
+     exif_flash => 0,
+     exif_image_description => "Imager Development Notes",
+     exif_make => "Canon",
+     exif_model => "CanoScan LiDE 35",
+     exif_resolution_unit => 2,
+     exif_resolution_unit_name => "inches",
+     exif_user_comment => "        Part of notes from reworking i_arc() and friends.",
+     exif_white_balance => 0,
+     exif_white_balance_name => "Auto white balance",
+    );
+  my $im = Imager->new;
+  ok($im->read(file => "testimg/exif.webp"),
+     "read exif image");
+  for my $key (sort keys %expected_tags) {
+    is($expected_tags{$key}, $im->tags(name => $key),
+       "test value of exif tag $key");
+  }
+}
+
 done_testing();

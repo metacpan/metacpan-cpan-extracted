@@ -61,11 +61,11 @@ sub set
     {
 	if ($] > 5.007)
 	{
-	    open FP, ">:utf8", "$tmp/$key" or ( Carp::cluck "Cannot write-open $tmp/$key" and return );
+	    open FP, ">:utf8", "$tmp/$key" or ( Carp::cluck "Cannot write-open $tmp/$key ($!)" and return );
 	}
 	else
 	{
-	    open FP, ">$tmp/$key" or ( Carp::cluck "Cannot write-open $tmp/$key" and return );
+	    open FP, ">$tmp/$key" or ( Carp::cluck "Cannot write-open $tmp/$key ($!)" and return );
 	}
 	
 	print FP $code;
@@ -158,11 +158,11 @@ sub cached
     {
 	if ($] > 5.007)
 	{
-	    open FP, "<:utf8", "$tmp/$key" or ( Carp::cluck "Cannot read-open $tmp/$key" and return );
+	    open FP, "<:utf8", "$tmp/$key" or ( Carp::cluck "Cannot read-open $tmp/$key ($!)" and return );
 	}
 	else
 	{
-	    open FP, "<$tmp/$key" or ( Carp::cluck "Cannot read-open $tmp/$key" and return );
+	    open FP, "<$tmp/$key" or ( Carp::cluck "Cannot read-open $tmp/$key ($!)" and return );
 	}
 	
 	$res = join '', <FP>;

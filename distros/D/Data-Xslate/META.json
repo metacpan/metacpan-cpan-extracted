@@ -1,0 +1,80 @@
+{
+   "abstract" : "Templatize your data.",
+   "author" : [
+      "Aran Deltac <bluefeet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Xslate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Storable" : "0",
+            "Text::Xslate" : "3",
+            "Tie::Hash" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000071"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Xslate" : {
+         "file" : "lib/Data/Xslate.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/Data-Xslate/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/Data-Xslate",
+      "repository" : {
+         "url" : "git://github.com/bluefeet/Data-Xslate.git",
+         "web" : "https://github.com/bluefeet/Data-Xslate"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Aran Deltac <aran@ziprecruiter.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
+}

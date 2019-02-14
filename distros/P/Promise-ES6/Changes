@@ -1,4 +1,8 @@
 Revision history for Perl module Promise::ES6
 
-0.01 Mon 10 Feb 2019
+0.01 Mon 11 Feb 2019
 - Initial release
+
+0.02 Wed 13 Feb 2019
+- Make tests Windows-compatible. (cf. RT #128491)
+  No production changes.

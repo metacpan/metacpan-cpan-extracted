@@ -42,7 +42,8 @@ local $^W;
 # step 2: Allow step 1 to pass, then write out the newly altered contents to a
 # a file called "foo.$$". This write will fail by simulating a problem with
 # CORE::GLOBAL::syswrite
-{
+SKIP: {
+    skip "Skip these tests because mocking write failures can't happen", 9;
     # go ahead and setup an initial file so that it can be read during the test
     my $file = temp_file_path();
     File::Slurp::write_file($file, '');
@@ -66,7 +67,7 @@ local $^W;
     unlink "$file.$$";
     # cleanup
     unlink $file;
-}
+};
 
 # step 3: Allow steps 1 and 2 to pass, then rename the new file called "foo.$$"
 # to the original "foo". This rename will fail by simulating a problem with

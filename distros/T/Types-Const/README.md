@@ -4,7 +4,7 @@ Types::Const - Types that coerce references to read-only
 
 # VERSION
 
-version v0.3.6
+version v0.3.7
 
 # SYNOPSIS
 
@@ -27,7 +27,7 @@ has bar => (
 This is an _experimental_ type library that provides types that force
 read-only hash and array reference attributes to be deeply read-only.
 
-See the [known issues](#known_issues) below for a discussion of
+See the [known issues](#known-issues) below for a discussion of
 side-effects.
 
 # TYPES
@@ -109,6 +109,10 @@ and may be cloned from [git://github.com/robrwo/Types-Const.git](git://github.co
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
+
+# CONTRIBUTOR
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 

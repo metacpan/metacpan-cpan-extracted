@@ -1,3 +1,6 @@
+0.04 2019-02-14
+  - Add description for data comparison test
+
 0.03 2019-02-12
   - Fix error: load decode_json
 

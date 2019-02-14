@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Firefox::Marionette::Exception::Response);
 
-our $VERSION = '0.67';
+our $VERSION = '0.68';
 
 sub throw {
     my ( $class, $response, $parameters ) = @_;
@@ -27,7 +27,7 @@ Firefox::Marionette::Exception::StaleElement - Represents a 'stale element refer
 
 =head1 VERSION
 
-Version 0.67
+Version 0.68
 
 =head1 SYNOPSIS
 

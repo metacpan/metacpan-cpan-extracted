@@ -19,6 +19,8 @@ my $file  = File::Spec->catfile( $dir, 'MANIFEST.SKIP' );
 my $t_dir = File::Spec->catdir( $dir, 't' );
 my $meta  = 'META.yml';
 
+my $abs_t_file = File::Spec->rel2abs( __FILE__ );
+
 # my ($file,$dirref,$filter,$bool,$files_in_skip,$home) = @_;
 
 my @tests = (
@@ -38,37 +40,87 @@ my @tests = (
         "meta, t/ directory",
     ], 
     [
-        [ __FILE__ ],
+        [ $abs_t_file ],
         0,
         "this file",
     ], 
     [
-        [ __FILE__, [] ],
+        [ $abs_t_file, [] ],
         0,
         "this file, empty dirref",
     ], 
     [
-        [ __FILE__, [ $t_dir ] ],
-        0,
+        [ $abs_t_file, [ $t_dir ] ],
+        1,
         "this file, t/ dir",
     ], 
     [
-        [ __FILE__, [ $t_dir ], [qr/excluded/] ],
-        1,
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/] ],
+        2,
         "this file, t/ dir, filter: 'excluded'",
     ], 
     [
-        [ __FILE__, [ $t_dir ], [qr/excluded/], 'and' ],
-        0,
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and' ],
+        1,
         "this file, t/ dir, filter: 'excluded', bool => 'and'",
     ], 
     [
-        [ __FILE__, [ $t_dir ], [qr/excluded/], 'or' ],
+        [ $abs_t_file, [ $t_dir ], [qr/not_excluded/] ],
         1,
+        "this file, t/ dir, filter: 'not_excluded'",
+    ], 
+    [
+        [ $abs_t_file, [ $t_dir ], [qr/not_excluded/], 'and' ],
+        0,
+        "this file, t/ dir, filter: 'not_excluded', bool => 'and'",
+    ], 
+    [
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and', [] ],
+        1,
+        "this file, t/ dir, filter: 'excluded', bool => 'and', empty files_in_skip",
+    ], 
+    [
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and', [$abs_t_file] ],
+        1,
+        "this file, t/ dir, filter: 'excluded', bool => 'and', skip this file",
+    ], 
+    [
+        [ $abs_t_file . '.bak', [ $t_dir ], [qr/excluded/], 'and', [$abs_t_file . '.bak'] ],
+        1,
+        "<this_file>.bak, t/ dir, filter: 'excluded', bool => 'and', skip backup of this file",
+    ], 
+    [
+        [ '/tmp/test', [ $t_dir ], [qr/excluded/], 'and', [$abs_t_file . '.bak'] ],
+        0,
+        "/tmp/test, t/ dir, filter: 'excluded', bool => 'and', skip backup of this file",
+    ], 
+    [
+        [ '/tmp/test', [ $t_dir ], [qr/excluded/], 'and', ['/test'], '/tmp' ],
+        1,
+        "/tmp/test, t/ dir, filter: 'excluded', bool => 'and', skip /test in /tmp",
+    ], 
+    [
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and', [$abs_t_file . '.bak'] ],
+        1,
+        "this file, t/ dir, filter: 'excluded', bool => 'and', skip backup of this file",
+    ], 
+    [
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and', {} ],
+        0,
+        "this file, t/ dir, filter: 'excluded', bool => 'and', wrong reftype files_in_skip",
+    ], 
+    [
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and' ],
+        1,
+        "this file, t/ dir, filter: 'excluded', bool => 'and'",
+    ], 
+    [
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'or' ],
+        2,
         "this file, t/ dir, filter: 'excluded', bool => 'or'",
     ], 
     [
-        [ __FILE__, [ $t_dir ], [qr/excluded/], 'and', [__FILE__] ],
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and', [$abs_t_file] ],
         1,
         "this file, t/ dir, filter: 'excluded', bool => 'and', excluded",
     ], 

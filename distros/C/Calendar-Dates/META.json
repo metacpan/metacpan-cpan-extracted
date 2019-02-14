@@ -48,7 +48,7 @@
          "web" : "https://github.com/perlancar/perl-Calendar-Dates"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

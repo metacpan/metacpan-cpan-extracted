@@ -2,8 +2,8 @@ NAME
     App::CalendarDatesUtils - Utilities related to Calendar::Dates
 
 VERSION
-    This document describes version 0.001 of App::CalendarDatesUtils (from
-    Perl distribution App-CalendarDatesUtils), released on 2019-02-13.
+    This document describes version 0.002 of App::CalendarDatesUtils (from
+    Perl distribution App-CalendarDatesUtils), released on 2019-02-14.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -18,17 +18,21 @@ FUNCTIONS
 
      list_calendar_dates(%args) -> [status, msg, payload, meta]
 
-    List dates from a Calendar::Dates::* module.
+    List dates from one or more Calendar::Dates::* modules.
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
+    *   all => *true*
+
+        Use all installed Calendar::Dates::* modules.
+
     *   day => *int*
 
     *   detail => *bool*
 
-    *   module* => *perl::modname*
+    *   modules => *array[perl::modname]*
 
     *   month => *int*
 

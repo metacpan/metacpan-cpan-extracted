@@ -1,0 +1,52 @@
+NAME
+    Dist::Zilla::Plugin::Calendar::Dates - Plugin to use when building
+    Calendar::Dates::* distribution
+
+VERSION
+    This document describes version 0.054 of
+    Dist::Zilla::Plugin::Calendar::Dates (from Perl distribution
+    Dist-Zilla-Plugin-Calendar-Dates), released on 2019-02-14.
+
+SYNOPSIS
+    In dist.ini:
+
+     [Calendar::Dates]
+
+DESCRIPTION
+    This plugin is to be used when building "Calendar::Dates::*"
+    distribution. Currently it does the following:
+
+    *   Check that entries are valid
+
+    *   Check that get_min_year() and get_max_year() return sensible values
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Calendar-Dates>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Calendar-Dates>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Cal
+    endar-Dates>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Calendar::Dates
+
+    Pod::Weaver::Plugin::Calendar::Dates
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,5 +1,9 @@
 Revision history for Types-Const:
 
+v0.3.7    2019-02-14 13:09:39+00:00 Europe/London
+  [Documentation]
+  - Fix broken link in POD (Mohammad S Anwar).
+
 v0.3.6    2018-12-06 17:51:23+00:00 Europe/London
   [Bug Fixes]
   - Set minimum version of Storable for Regexp support.

@@ -1,6 +1,11 @@
 Revision history for Data::Tabulate
 ===================================
 
+0.09  2019-02-14 08:16:00
+
+  * added tests
+  * clean up SYNOPSIS (thanks to @manwar)
+
 0.08  2019-02-13 08:19:00
 
   * added tests

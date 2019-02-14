@@ -41,7 +41,6 @@ use vars qw /@tokens @nodeStack/;
 # HTML errors?
 our $HTML_ERRORS = undef;
 
-
 # Encode / Decode info...
 our $DECODE_CHARSET = 'utf8';
 our $ENCODE_CHARSET = 'utf8'; # deprecated
@@ -80,6 +79,8 @@ our $TAINT = undef;
 # don't confess() errors if we access an undefined template variable
 our $ERROR_ON_UNDEF_VAR = 1;
 
+# confess() on include/fill-slot errors
+our $ERROR_ON_INCLUDE_ERROR = undef;
 
 # where are our templates supposed to be?
 our @BASE_DIR = ('.');
@@ -104,7 +105,7 @@ our $CURRENT_INCLUDES = 0;
 
 
 # this is for CPAN
-our $VERSION = '2.24';
+our $VERSION = '2.25';
 
 
 # The CodeGenerator class backend to use.
@@ -344,21 +345,22 @@ sub process
     
     # ok, from there on we need to override any global variable with stuff
     # that might have been specified when constructing the object
-    local $TAINT              = defined $self->{taint}               ? $self->{taint}               : $TAINT;
-    local $ERROR_ON_UNDEF_VAR = defined $self->{error_on_undef_var}  ? $self->{error_on_undef_var}  : $ERROR_ON_UNDEF_VAR;
-    local $DISK_CACHE         = defined $self->{disk_cache}          ? $self->{disk_cache}          : $DISK_CACHE;
-    local $MEMORY_CACHE       = defined $self->{memory_cache}        ? $self->{memory_cache}        : $MEMORY_CACHE;
-    local $CACHE_ONLY         = defined $self->{cache_only}          ? $self->{cache_only}          : $CACHE_ONLY;
-    local $MAX_INCLUDES       = defined $self->{max_includes}        ? $self->{max_includes}        : $MAX_INCLUDES;
-    local $INPUT              = defined $self->{input}               ? $self->{input}               : $INPUT;
-    local $OUTPUT             = defined $self->{output}              ? $self->{output}              : $OUTPUT;
-    local $BASE_DIR           = defined $self->{base_dir} ? do { ref $self->{base_dir} ? undef : $self->{base_dir} } : $BASE_DIR;
-    local @BASE_DIR           = defined $self->{base_dir} ? do { ref $self->{base_dir} ? @{$self->{base_dir}} : () } : @BASE_DIR;
-    local $LANGUAGE           = defined $self->{default_language}    ? $self->{default_language}    : $LANGUAGE;
-    local $DEBUG_DUMP         = defined $self->{debug_dump}          ? $self->{debug_dump}          : $DEBUG_DUMP;
-    local $DECODE_CHARSET     = defined $self->{decode_charset}      ? $self->{decode_charset}      : $DECODE_CHARSET;
-    local $TranslationService = defined $self->{translation_service} ? $self->{translation_service} : $TranslationService;
-    # local $ENCODE_CHARSET     = defined $self->{encode_charset}     ? $self->{encode_charset}     : $ENCODE_CHARSET;
+    local $TAINT                    = defined $self->{taint}                    ? $self->{taint}                  : $TAINT;
+    local $ERROR_ON_UNDEF_VAR       = defined $self->{error_on_undef_var}       ? $self->{error_on_undef_var}     : $ERROR_ON_UNDEF_VAR;
+    local $DISK_CACHE               = defined $self->{disk_cache}               ? $self->{disk_cache}             : $DISK_CACHE;
+    local $MEMORY_CACHE             = defined $self->{memory_cache}             ? $self->{memory_cache}           : $MEMORY_CACHE;
+    local $CACHE_ONLY               = defined $self->{cache_only}               ? $self->{cache_only}             : $CACHE_ONLY;
+    local $MAX_INCLUDES             = defined $self->{max_includes}             ? $self->{max_includes}           : $MAX_INCLUDES;
+    local $INPUT                    = defined $self->{input}                    ? $self->{input}                  : $INPUT;
+    local $OUTPUT                   = defined $self->{output}                   ? $self->{output}                 : $OUTPUT;
+    local $BASE_DIR                 = defined $self->{base_dir} ? do { ref $self->{base_dir} ? undef : $self->{base_dir} } : $BASE_DIR;
+    local @BASE_DIR                 = defined $self->{base_dir} ? do { ref $self->{base_dir} ? @{$self->{base_dir}} : () } : @BASE_DIR;
+    local $LANGUAGE                 = defined $self->{default_language}         ? $self->{default_language}       : $LANGUAGE;
+    local $DEBUG_DUMP               = defined $self->{debug_dump}               ? $self->{debug_dump}             : $DEBUG_DUMP;
+    local $ERROR_ON_INCLUDE_ERROR   = defined $self->{error_on_include_error}   ? $self->{error_on_include_error} : $ERROR_ON_INCLUDE_ERROR;
+    local $DECODE_CHARSET           = defined $self->{decode_charset}           ? $self->{decode_charset}         : $DECODE_CHARSET;
+    local $TranslationService       = defined $self->{translation_service}      ? $self->{translation_service}    : $TranslationService;
+    # local $ENCODE_CHARSET         = defined $self->{encode_charset}     ? $self->{encode_charset}     : $ENCODE_CHARSET;
 
     # prevent infinite includes from happening...
     my $current_includes = $CURRENT_INCLUDES;
@@ -457,7 +459,7 @@ sub _handle_error
 	my $tmpfile = $$ . '.' . time() . '.' . ( join '', map { chr (ord ('a') + int (rand (26))) } 1..10 );
 	my $debug   = "$tmpdir/petal_debug.$tmpfile";
 	
-	open ERROR, ">$debug" || die "Cannot write-open \">$debug\"";
+	open ERROR, ">$debug" || die "Cannot write-open \">$debug\" ($!)";
 	
 	print ERROR "Error: $error\n";
 	ref $error and do {
@@ -588,11 +590,11 @@ sub _file_data_ref
     if ($] > 5.007)
     {
 	my $encoding = Encode::resolve_alias ($DECODE_CHARSET) || 'utf8';
-	open FP, "<:encoding($encoding)", "$file_path" or die "Cannot read-open $file_path";
+	open FP, "<:encoding($encoding)", "$file_path" or die "Cannot read-open $file_path ($!)";
     }
     else
     {
-	open FP, "<$file_path" || die 'Cannot read-open $file_path';
+	open FP, "<$file_path" || die "Cannot read-open $file_path ($!)";
     }
     
     my $res = join '', <FP>;
@@ -946,6 +948,11 @@ If set to C<true>, makes perl taint mode happy.
 
 If set to C<true>, Petal will confess() errors when trying to access undefined
 template variables, otherwise an empty string will be returned.
+
+
+=head2 error_on_include_error => I<true> | I<false> (default: I<false>)
+
+If set to C<true>, Petal will confess() errors when trying render includes.
 
 
 =head2 disk_cache => I<true> | I<false> (default: I<true>)

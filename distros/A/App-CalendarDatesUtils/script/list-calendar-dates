@@ -3,26 +3,27 @@
 # Note: This script is a CLI for Riap function /App/CalendarDatesUtils/list_calendar_dates
 # and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2019-02-13'; # DATE
+our $DATE = '2019-02-14'; # DATE
 our $DIST = 'App-CalendarDatesUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Perinci::CmdLine::Any;
+use Perinci::CmdLine::Classic;
 
-my $cmdline = Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Classic->new(
     url => "/App/CalendarDatesUtils/list_calendar_dates",
     program_name => "list-calendar-dates",
     read_config => 0,
     read_env => 0,
+    use_utf8 => 1,
 );
 
 $cmdline->run;
 
-# ABSTRACT: List dates from a Calendar::Dates::* module
+# ABSTRACT: List dates from one or more Calendar::Dates::* modules
 # PODNAME: list-calendar-dates
 
 __END__
@@ -33,11 +34,11 @@ __END__
 
 =head1 NAME
 
-list-calendar-dates - List dates from a Calendar::Dates::* module
+list-calendar-dates - List dates from one or more Calendar::Dates::* modules
 
 =head1 VERSION
 
-This document describes version 0.001 of list-calendar-dates (from Perl distribution App-CalendarDatesUtils), released on 2019-02-13.
+This document describes version 0.002 of list-calendar-dates (from Perl distribution App-CalendarDatesUtils), released on 2019-02-14.
 
 =head1 SYNOPSIS
 
@@ -53,6 +54,10 @@ C<*> marks required options.
 
 =over
 
+=item B<--all>, B<-a>
+
+Use all installed Calendar::Dates::* modules.
+
 =item B<--day>=I<s>
 
 Valid values:
@@ -61,7 +66,13 @@ Valid values:
 
 =item B<--detail>, B<-l>
 
-=item B<--module>=I<s>*, B<-m>
+=item B<--modules-json>=I<s>, B<-m>
+
+See C<--modules>.
+
+=item B<--modules>=I<s@>
+
+Can be specified multiple times.
 
 =item B<--month>=I<s>
 
@@ -77,6 +88,10 @@ Valid values:
 
 =over
 
+=item B<--format-options>=I<s>
+
+Pass options to formatter.
+
 =item B<--format>=I<s>
 
 Choose output format, e.g. json, text.
@@ -87,7 +102,7 @@ Default value:
 
 =item B<--json>
 
-Set output format to json.
+Equivalent to --format=json-pretty.
 
 =item B<--naked-res>
 

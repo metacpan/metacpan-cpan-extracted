@@ -24,6 +24,7 @@ WriteMakefile1(
     LICENSE      => 'perl',
 
     TEST_REQUIRES => {
+        'autodie' => 0,
         'FindBin'         => 0,
         'Test::Fatal' => 0,
         'Test::More'      => 0,

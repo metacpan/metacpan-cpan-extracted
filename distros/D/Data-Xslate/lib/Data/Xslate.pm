@@ -1,67 +1,18 @@
 package Data::Xslate;
-$Data::Xslate::VERSION = '0.03';
-=head1 NAME
 
-Data::Xslate - Templatize your data.
-
-=head1 SYNOPSIS
-
-    use Data::Xslate;
-    
-    my $xslate = Data::Xslate->new();
-    
-    my $data = $xslate->render(
-        {
-            user => {
-                login => 'john',
-                email => '<: $login :>@example.com',
-                name  => 'John',
-            },
-            email => {
-                to      => '=user.email',
-                subject => 'Hello <: $user.name :>!',
-            },
-            'email.from=' => 'george@example.com',
-        },
-    );
-    
-    # The above produces the following:
-    # $data = {
-    #     user => {
-    #         login => 'john',
-    #         email => 'john@example.com',
-    #         name  => 'John',
-    #     },
-    #     email => {
-    #         to      => 'john@example.com',
-    #         from    => 'george@example.com',
-    #         subject => 'Hello John!',
-    #     },
-    # }
-
-=head1 DESCRIPTION
-
-This module provides a syntax for templatizing data structures.
-
-The most likely use-case is adding some flexibility to configuration
-files.
-
-=cut
+$Data::Xslate::VERSION = '0.05';
 
 use Text::Xslate;
-use Types::Standard -types;
-use Types::Common::String -types;
 use Carp qw( croak );
 use Storable qw( freeze thaw );
 
-use Moo;
-use strictures 2;
-use namespace::clean;
+use strict;
+use warnings;
 
 # A tied-hash class used to expose the data as the Xslate
 # vars when processing the data.
 {
-    package # NO INDEX CPAN!
+    package # NO INDEX
         Data::Xslate::Vars;
 
     use base 'Tie::Hash';
@@ -78,129 +29,44 @@ use namespace::clean;
     }
 }
 
-around BUILDARGS => sub{
-    my $orig = shift;
+sub new {
     my $class = shift;
 
-    my $args = {};
-    my $xslate_args = $class->$orig( @_ );
+    die if @_ % 2 != 0;
+    my $args = { @_ };
 
-    my @expected_args = qw(
-        substitution_tag
-        nested_key_tag
-        key_separator
-    );
-    foreach my $arg (@expected_args) {
-        next if !exists $xslate_args->{$arg};
-        $args->{$arg} = delete $xslate_args->{$arg};
+    my $defaults = {
+        substitution_tag => '=',
+        nested_key_tag   => '=',
+        key_separator    => '.',
+    };
+
+    my $self = bless { %$defaults }, $class;
+    foreach my $key (keys %$defaults) {
+        next if ! exists $args->{$key};
+        $self->{$key} = delete $args->{$key};
     }
-    $args->{_xslate_args} = $xslate_args;
 
-    return $args;
-};
-
-has _xslate_args => (
-    is => 'ro',
-);
-
-has _xslate => (
-    is       => 'lazy',
-    init_arg => undef,
-);
-sub _build__xslate {
-    my ($self) = @_;
-
-    my $args = { %{ $self->_xslate_args() } };
     my $function = delete( $args->{function} ) || {};
     $function->{node} ||= \&_find_node_for_xslate;
-
-    return Text::Xslate->new(
+    $self->{_xslate} = Text::Xslate->new(
         type     => 'text',
         function => $function,
         %$args,
     );
+
+    return $self;
 }
 
-=head1 ARGUMENTS
+# Arguments.
+sub substitution_tag { $_[0]->{substitution_tag} }
+sub nested_key_tag { $_[0]->{nested_key_tag} }
+sub key_separator { $_[0]->{key_separator} }
 
-Any arguments you pass to C<new>, which this class does not directly
-handle, will be used when creating the underlying L<Text::Xslate> object.
-So, any arguments which L<Text::Xslate> supports may be set.  For example:
+# Attributes.
+sub _xslate { $_[0]->{_xslate} }
 
-    my $xslate = Data::Xslate->new(
-        substitution_tag => ']]', # A Data::Xslate argument.
-        verbose          => 2,    # A Text::Xslate option.
-    );
-
-=head2 substitution_tag
-
-The string to look for at the beginning of any string value which
-signifies L</SUBSTITUTION>.  Defaults to C<=>.  This is used in
-data like this:
-
-    { a=>{ b=>2 }, c => '=a.b' }
-
-=cut
-
-has substitution_tag => (
-    is      => 'ro',
-    isa     => NonEmptySimpleStr,
-    default => '=',
-);
-
-=head2 nested_key_tag
-
-The string to look for at the end of any key which signifies
-L</NESTED KEYS>.  Defaults to C<=>.  This is used in data
-like this:
-
-    { a=>{ b=>2 }, 'a.c=' => 3 }
-
-=cut
-
-has nested_key_tag => (
-    is      => 'ro',
-    isa     => NonEmptySimpleStr,
-    default => '=',
-);
-
-=head2 key_separator
-
-The string which will be used between keys.  The default is a dot (C<.>)
-which looks like this:
-
-    { a=>{ b=>2 }, c => '=a.b' }
-
-Whereas, for example, if you changed the C<key_separator> to a forward
-slash it would look like this:
-
-    { a=>{ b=>2 }, c => '=a/b' }
-
-Which actually looks pretty good when you do an absolute, rather than
-relative, key:
-
-    { a=>{ b=>2 }, c => '=/a/b' }
-
-=cut
-
-has key_separator => (
-    is      => 'ro',
-    isa     => NonEmptySimpleStr,
-    default => '.',
-);
-
-=head1 METHODS
-
-=head2 render
-
-    my $data_out = $xslate->render( $data_in );
-
-Processes the data and returns new data.  The passed in data is not
-modified.
-
-=cut
-
-# State variables, only used during local() calls to maintane
+# State variables, only used during local() calls to maintain
 # state in recursive function calls.
 our $XSLATE;
 our $VARS;
@@ -374,7 +240,61 @@ sub _set_node {
 1;
 __END__
 
-=head1 TEMPLATING
+=head1 NAME
+
+Data::Xslate - Templatize your data.
+
+=head1 SYNOPSIS
+
+    use Data::Xslate;
+    
+    my $xslate = Data::Xslate->new();
+    
+    my $output = $xslate->render( $input );
+
+Given this input data structure:
+
+    {
+        color_names => ['red', 'blue', 'orange'],
+        email => {
+            message => 'Do you like the color <: $user.color_name :>?',
+            subject => 'Hello <: $user.name :>!',
+            to      => '=user.email',
+        },
+        'email.from=' => 'george@example.com',
+        user => {
+            color_id => 2,
+            color_name => '<: node("color_names")[$color_id] :>',
+            email => '<: $login :>@example.com',
+            login => 'john',
+            name  => 'John',
+        },
+    }
+
+This data will be output:
+
+    {
+        color_names => ['red', 'blue', 'orange'],
+        email => {
+            from => 'george@example.com',
+            message => 'Do you like the color orange?',
+            subject => 'Hello John!',
+            to => 'john@example.com',
+        },
+        user => {
+            color_id => '2',
+            color_name => 'orange',
+            email => 'john@example.com',
+            login => 'john',
+            name => 'John',
+        },
+    }
+
+=head1 DESCRIPTION
+
+This module provides a syntax for templatizing data structures.
+
+=head2 Templating
 
 The most powerful feature by far is templating, where you can
 use L<Text::Xslate> in your values.
@@ -392,6 +312,7 @@ from other keys:
         prod => 1,
         memcached_host => '<: if $prod { :>memcached.example.com<: } else { :>127.0.0.1<: } :>',
     }
+    # { prod=>1, memcached_host=>'memcached.example.com' }
 
 Values in arrays are also processed for templating:
 
@@ -403,12 +324,25 @@ Values in arrays are also processed for templating:
             'Alice',
         ],
     }
+    # {
+    #     ceo_name => 'Sara',
+    #     employees => [
+    #         'Sara',
+    #         'Fred',
+    #         'Alice',
+    #     ],
+    # }
+
+As well as using array values in a template:
+
+    { foo=>'<: $bar.1 :>', bar=>[4,5,6] }
+    # { foo=>5, bar=>[4,5,6] }
 
 Data structures of any arbitrary depth and complexity are handled
 correctly, and keys from any level can be referred to following
 the L</SCOPE> rules.
 
-=head1 SUBSTITUTION
+=head2 Substitution
 
 Substituion allows you to retrieve a value from one key and use it
 as the value for the current key.  To do this your hash or array
@@ -420,14 +354,14 @@ value must start with the L</substitution_tag> (defaults to C<=>):
     }
     # { foo=>14, bar=>14 }
 
-While the above could just have been written using templating:
+Templating could be used instead of substitution:
 
     {
         foo => 14,
         bar => '<: $foo :>',
     }
 
-But, templating only works with strings.  Substitution becomes vital
+But, templating only works with strings.  Substitutions become vital
 when you want to substitute an array or hash:
 
     {
@@ -438,7 +372,7 @@ when you want to substitute an array or hash:
 
 The keys in substitution follow the L</SCOPE> rules.
 
-=head1 NESTED KEYS
+=head2 Nested Keys
 
 When setting a key value the key can point deeper into the structure by
 separating keys with the L</key_separator> (defaults to a dot, C<.>),
@@ -446,17 +380,14 @@ and ending the key with the L</nested_key_tag> (defaults to C<=>).
 Consider this:
 
     { a=>{ b=>1 }, 'a.b=' => 2 }
-
-Which produces:
-
-    { a=>{ b=>2 } }
+    # { a=>{ b=>2 } }
 
 So, nested keys are a way to set values in other data structures.  This
 feature is very handy when you are merging data structures from different
 sources and one data structure will override a subset of values in the
 other.
 
-=head1 KEY PATHS
+=head2 Key Paths
 
 When referring to other values in L</TEMPLATING>, L</SUBSTITUTION>, or
 L</NESTED KEYS> you are specifying a path made up of keys for this module
@@ -474,7 +405,7 @@ fetched.
 Note that the above examples assume that L</key_separator> is a dot (C<.>),
 the default.
 
-=head1 SCOPE
+=head2 Scope
 
 When using either L</SUBSTITUTION> or L</TEMPLATING> you specify a key to be
 acted on.  This key is found using scope-aware rules where the key is searched for
@@ -515,9 +446,70 @@ But if you wanted to refer to an absolute key you'd have to do this:
 
     <: node(".foo.bar") :>
 
+=head1 ARGUMENTS
+
+Any arguments you pass to C<new>, which this class does not directly
+handle, will be used when creating the underlying L<Text::Xslate> object.
+So, any arguments which L<Text::Xslate> supports may be set.  For example:
+
+    my $xslate = Data::Xslate->new(
+        substitution_tag => ']]', # A Data::Xslate argument.
+        verbose          => 2,    # A Text::Xslate argument.
+    );
+
+=head2 substitution_tag
+
+The string to look for at the beginning of any string value which
+signifies L</SUBSTITUTION>.  Defaults to C<=>.  This is used in
+data like this:
+
+    { a=>{ b=>2 }, c => '=a.b' }
+    # { a=>{ b=>2 }, c => 2 }
+
+=head2 nested_key_tag
+
+The string to look for at the end of any key which signifies
+L</NESTED KEYS>.  Defaults to C<=>.  This is used in data
+like this:
+
+    { a=>{ b=>2 }, 'a.c=' => 3 }
+    # { a=>{ b=>2, c=>3 } }
+
+=head2 key_separator
+
+The string which will be used between keys.  The default is a dot (C<.>)
+which looks like this:
+
+    { a=>{ b=>2 }, c => '=a.b' }
+
+Whereas, for example, if you changed the C<key_separator> to a forward
+slash it would look like this:
+
+    { a=>{ b=>2 }, c => '=a/b' }
+
+Which looks rather good with absolute keys:
+
+    { a=>{ b=>2 }, c => '=/a/b' }
+
+=head1 METHODS
+
+=head2 render
+
+    my $data_out = $xslate->render( $data_in );
+
+Processes the data and returns new data.  The passed in data is not
+modified.
+
+=head1 SUPPORT
+
+Please submit bugs and feature requests to the
+Data-Xslate GitHub issue tracker:
+
+L<https://github.com/bluefeet/Data-Xslate/issues>
+
 =head1 AUTHOR
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+Aran Deltac <bluefeetE<64>gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 

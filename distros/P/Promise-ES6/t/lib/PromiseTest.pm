@@ -2,13 +2,12 @@ package PromiseTest;
 
 use strict;
 use warnings;
-
-use parent qw(Test::Class);
+use autodie;
 
 use Time::HiRes;
 
 sub await {
-    my ($self, $promise) = @_;
+    my ($promise, $checks_ar) = @_;
 
     my %result;
 
@@ -17,7 +16,11 @@ sub await {
         sub { $result{'rejected'} = $_[0] },
     );
 
-    Time::HiRes::sleep(0.01) while !keys %result;
+    while (!keys %result) {
+        Time::HiRes::sleep(0.01);
+
+        $_->() for @$checks_ar;
+    }
 
     return $result{'resolved'} if exists $result{'resolved'};
 

@@ -1,0 +1,57 @@
+NAME
+    Pod::Weaver::Plugin::Calendar::Dates - Plugin to use when building
+    Calendar::Dates::* distribution
+
+VERSION
+    This document describes version 0.002 of
+    Pod::Weaver::Plugin::Calendar::Dates (from Perl distribution
+    Pod-Weaver-Plugin-Calendar-Dates), released on 2019-02-14.
+
+SYNOPSIS
+    In your weaver.ini:
+
+     [-Calendar::Dates]
+
+DESCRIPTION
+    This plugin is used when building Calendar::Dates::* distributions. It
+    currently does the following:
+
+    *   Create "DATES STATISTICS" POD section
+
+    *   Create "DATES SAMPLES" POD section
+
+    *   Mention some modules in See Also section
+
+        e.g. Calendar::Dates (the convention/standard),
+        App::CalendarDatesUtils, etc.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Plugin-Calendar-Dates>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-Calendar-Dates>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Cal
+    endar-Dates>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Calendar::Dates
+
+    Dist::Zilla::Plugin::Calendar::Dates
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

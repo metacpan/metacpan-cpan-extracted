@@ -1,3 +1,12 @@
+0.002   2019-02-14 (PERLANCAR)
+
+	- list-calendar-dates: allow listing from multiple modules, add
+	  --all (-a) to use all installed modules.
+
+	- [ux] list-calendar-dates: Use Perinci::CmdLine::Classic to show
+	  nice tables instead of JSON.
+
+
 0.001   2019-02-13 (PERLANCAR)
 
         - First release.

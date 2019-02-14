@@ -27,7 +27,7 @@ Or (if $flags == 0)
     use XSLoader;
     XSLoader::load($module, $VERSION);
 
-If you don't provide $module it will be detected as caller. If no $VERSION provided, ${module}::VERSION variable will be used.
+If you don't provide $module it will be detected as caller. If no $VERSION provided, ${module}::VERSION variable/sub will be used.
 If $flags is undef or not provided, 0x01 used.
 
 Additionally, checks for binary compability with all XS modules you depend on (binary).

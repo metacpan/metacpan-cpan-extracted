@@ -42,7 +42,7 @@
    "provides" : {
       "Data::Tabulate" : {
          "file" : "lib/Data/Tabulate.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -57,8 +57,9 @@
          "web" : "http://github.com/reneeb/Data-Tabulate"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"
    ],

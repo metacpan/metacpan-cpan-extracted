@@ -5,26 +5,28 @@ use DynaLoader;
 use XS::Install::Payload;
 
 sub load {
-    no strict 'refs';
     shift if $_[0] && $_[0] eq __PACKAGE__;
     my ($module, $version, $flags) = @_;
-    $flags = 0x01 unless defined $flags;
-    $module ||= caller(0);
-    *{"${module}::dl_load_flags"} = sub { $flags } if $flags;
-    $version ||= ${"${module}::VERSION"};
-    if (!$version and my $vsub = $module->can('VERSION')) { $version = $module->VERSION }
     
-    if (my $info = XS::Install::Payload::module_info($module)) {{
+    $module  ||= caller(0);
+    $version ||= XS::Install::Payload::loaded_module_version($module);
+    $flags   //= 0x01;
+    
+    if ($flags) {
+        no strict 'refs';
+        *{"${module}::dl_load_flags"} = sub { $flags };
+    }
+    
+    if (my $info = XS::Install::Payload::binary_module_info($module)) {{
         my $bin_deps = $info->{BIN_DEPS} or last;
         foreach my $dep_module (keys %$bin_deps) {
             next if $dep_module eq 'XS::Install';
             my $path = $dep_module;
             $path =~ s!::!/!g;
-            require $path.".pm" or next;
-            my $dep_version = ${"${dep_module}::VERSION"};
-            if (!$dep_version and my $vsub = $dep_module->can('VERSION')) { $dep_version = $dep_module->VERSION }
+            require $path.".pm" or next; # in what cases it returns false without croaking?
+            my $dep_version = XS::Install::Payload::loaded_module_version($dep_module);
             next if $dep_version eq $bin_deps->{$dep_module};
-            my $dep_info = XS::Install::Payload::module_info($dep_module) || {};
+            my $dep_info = XS::Install::Payload::binary_module_info($dep_module) || {};
             my $bin_dependent = $dep_info->{BIN_DEPENDENT};
             $bin_dependent = [$module] if !$bin_dependent or !@$bin_dependent;
             die << "EOF";
@@ -39,8 +41,12 @@ EOF
     }}
     
     DynaLoader::bootstrap_inherit($module, $version);
-    my $stash = \%{"${module}::"};
-    delete $stash->{dl_load_flags};
+    
+    if ($flags) {
+        no strict 'refs';
+        my $stash = \%{"${module}::"};
+        delete $stash->{dl_load_flags};
+    }
 }
 *bootstrap = *load;
 

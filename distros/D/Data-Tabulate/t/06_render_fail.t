@@ -78,6 +78,7 @@ $obj->min_columns(4);
 {
     my $error = '';
 
+    my $obj   = Data::Tabulate->new();
     $obj->do_func( 'Fail', 'order', 'asc' );
 
     eval {

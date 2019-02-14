@@ -11,7 +11,7 @@ use Data::Dumper;   # for verbose
 
 use Test::OnlySome::PathCapsule;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001003';
 
 use constant DEFAULT_FILENAME => '.onlysome.yml';
 

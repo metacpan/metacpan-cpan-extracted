@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Cwd();
 
-my %module_info;
+my (%module_info, %vcache);
 
 sub data_dir {
     my $module = pop;
@@ -45,16 +45,16 @@ sub typemap_dir {
     return undef;
 }
 
-sub module_info_file {
+sub binary_module_info_file {
     my $data_dir = data_dir(@_) or return undef;
     return "$data_dir/info";
 }
 
-sub module_info {
+sub binary_module_info {
     my $module = shift;
     my $info = $module_info{$module};
     unless ($info) {
-        my $file = module_info_file($module) or return undef;
+        my $file = binary_module_info_file($module) or return undef;
         return undef unless -f $file;
         $info = do($file) or return undef;
         unless (ref($info) eq 'HASH') {
@@ -66,17 +66,12 @@ sub module_info {
     return $info;
 }
 
-sub module_version {
+sub loaded_module_version {
     my $module = shift;
-    my $path = $module;
-    $path =~ s!::!/!g;
-    eval { require $path.".pm"; 1 } or return 0;
     no strict 'refs';
-    my $v = ${$module."::VERSION"};
-    if (!$v and my $vsub = $module->can('VERSION')) {
-        $v = $module->VERSION;
-    }
-    return $v || 0;
+    my $version = ${"${module}::VERSION"};
+    if (!$version and my $vsub = $module->can('VERSION')) { $version = $module->VERSION }
+    return $version || 0;
 }
 
 1;

@@ -42,6 +42,7 @@ cmp_deeply($info, {
     XSOPT       => '-nah',
     BIN_DEPS    => {'XS::Install' => ignore()},
     PASSTHROUGH => ['XS::Install'],
+    LOADABLE    => 1,
 });
 
 done_testing();

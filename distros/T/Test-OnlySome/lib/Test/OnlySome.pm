@@ -15,7 +15,7 @@ use Import::Into;
 use parent 'Exporter';
 our @EXPORT = qw( skip_these skip_next );
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001003';
 
 use constant { true => !!1, false => !!0 };
 
@@ -48,14 +48,16 @@ no one else has reported the problem yet.
 
 =head1 SYNOPSIS
 
-In your test file (e.g., C<t/01.t>):
+Suppose you are testing a C<long_running_function()>.  If it succeeded last
+time, you don't want to take the time to test it again.  In your test file
+(e.g., C<t/01.t>):
 
     use Test::More tests => 2;
     use Test::OnlySome::RerunFailed;    # rerun only failed tests
-    os ok(1, 'passes');     # "os" marks tests that might be skipped
+    os ok(long_running_function());     # "os" marks tests that might be skipped
     os ok(0, 'fails');
 
-At the command line:
+At the command line, supposing the function passes the test:
 
     $ osprove -lv
     ...
@@ -83,9 +85,11 @@ The argument to L</os> can be a statement or block, and it doesn't have to
 be a L<Test::More> test.  You can wrap long-running tests in functions,
 and apply L</os> to those functions.
 
-Please note that L</os> can take a C<test_count> argument.  As discussed
-in more detail below, please use a C<test_count> of 1 for all tests run
-under L<Test::OnlySome::RerunFailed>.
+Please note that L</os> can take a C<test_count> argument, e.g., if there
+are multiple tests in a block.  The whole block will be skipped if and only
+if all the tests in that block are skipped.  Otherwise, the whole block
+will be rerun.  The moral?  Use a C<test_count> of 1 for all tests run under
+L<Test::OnlySome::RerunFailed> and you won't be surprised.
 
 =head1 MARKING TESTS
 
@@ -304,17 +308,18 @@ not in the caller's scope.
 
 =item *
 
-If you use C<< test_count>1 >>, the whole block will be skipped based on
-whether the B<first test> in that block should be skipped.  So, for example,
+If you use C<< test_count>1 >>, the whole block will be skipped only if
+every test in the block is marked to be skipped.  So, for example,
 
     os 2 { ok(1); ok(0); }
 
-will skip the C<ok(0)> if the C<ok(1)> is skipped.
+will still run the C<ok(1)> even if it was marked to be skipped if
+the C<ok(0)> was not marked to be skipped.
 
 =back
 
-I recommend that, when using L<Test::OnlySome::RerunFailed>, you B<not> use
-C<< test_count>1 >>.
+I recommend that, when using L<Test::OnlySome::RerunFailed>, you always use
+C<< test_count == 1 >>.
 
 =cut
 
@@ -394,7 +399,7 @@ sub _gen {
             my \$__first_test_num = \$TEST_NUMBER_OS;
             \$TEST_NUMBER_OS += \$__ntests;
             my \$__skips = $optsVarName$W$L skip $R;
-            my \@__x = (\$__first_test_num .. (\$__first_test_num+\$__ntests-1));
+            my \@__x=(\$__first_test_num .. (\$__first_test_num+\$__ntests-1));
             # print STDERR 'Tests: ', join(', ', \@__x), "\\n";
 
             SKIP: {
@@ -536,9 +541,17 @@ The number of tests in each L</os> call.
 
 =item * C<skip>
 
-A hashref of tests to skip.  Test numbers are keys; any truthy
-value will indicate that the L</os> call beginning with that test number
+A hashref of tests to skip.  That hashref is keyed by test number; any truthy
+value indicates that the L</os> call beginning with that test number
 should be skipped.
+
+B<Note:> The test numbers used by L</os> are B<only> those run under L</os>.
+For example:
+
+    skip_these 2;
+    os ok(1);       # os's test 1
+    ok(0);          # oops - not skipped - no "os"
+    os ok(0);       # this one is skipped - os's test 2
 
 =back
 
@@ -582,6 +595,10 @@ L<https://metacpan.org/release/Test-OnlySome>
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 
 =back
+
+This module is versioned with L<semantic versioning|https://semver.org>,
+but in the backward-compatible Perl format.  So version C<0.001003> is
+semantic version C<0.1.3>.
 
 =cut
 

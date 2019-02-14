@@ -41,14 +41,15 @@
       },
       "test" : {
          "requires" : {
-            "CPAN::Meta::YAML" : "0"
+            "CPAN::Meta::YAML" : "0",
+            "Pod::Coverage::TrustPod" : "0"
          }
       }
    },
    "provides" : {
       "Test::CheckManifest" : {
          "file" : "lib/Test/CheckManifest.pm",
-         "version" : "1.38"
+         "version" : "1.39"
       }
    },
    "release_status" : "stable",
@@ -63,10 +64,11 @@
          "web" : "http://github.com/reneeb/Test-CheckManifest"
       }
    },
-   "version" : "1.38",
+   "version" : "1.39",
    "x_contributors" : [
       "doug <doug@hcsw.org>",
       "LorenzoTa <LorenzoTa@users.noreply.github.com>",
+      "LorenzoTa <lortav72@gmail.com>",
       "Michael Gray <michael@michaelgray.info>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",

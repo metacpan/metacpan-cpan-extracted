@@ -1,3 +1,8 @@
+1.0.14   14.02.2019
+           - perl 5.10 bugfix
+1.0.13   13.02.2019
+           - refactor working with binary versions
+           - fix dmake.exe bug
 1.0.12   12.02.2019
            - now checks if C++ compiler available and supports -std=c++XX and croaks if not, marking as 'NA' on cpantesters
 1.0.11   12.02.2019

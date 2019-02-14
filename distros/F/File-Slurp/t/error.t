@@ -27,14 +27,15 @@ local $^W;
 
 }
 # write_file write error - no syswrite
-{
+SKIP: {
+    skip "Skip these tests because mocking write failures can't happen", 3;
     my $file = temp_file_path();
     my ($res, $warn, $err) = trap_function_override_core('syswrite', \&write_file, $file, '');
     ok(!$warn, 'write_file: write error, no syswrite - no warning!');
     like($err, qr/write/, 'write_file: write error, no syswrite - got exception!');
     ok(!$res, 'write_file: write error, no syswrite - no content!');
     unlink $file;
-}
+};
 # atomic rename error
 SKIP: {
     skip "Atomic rename on Win32 is useless", 3 if $is_win32;
@@ -63,7 +64,8 @@ SKIP: {
     ok(!$res, 'prepend_file: read error - no content!');
 }
 # prepend_file write error
-{
+SKIP: {
+    skip "Skip these tests because mocking write failures can't happen", 3;
     my $file = temp_file_path();
     write_file($file, '');
     my ($res, $warn, $err) = trap_function_override_core('syswrite', \&prepend_file, $file, '');
@@ -72,7 +74,7 @@ SKIP: {
     ok(!$res, 'prepend_file: opendir error - no content!');
     unlink $file;
     unlink "$file.$$";
-}
+};
 # edit_file read error
 {
     my $file = temp_file_path();
@@ -83,7 +85,8 @@ SKIP: {
     unlink $file;
 }
 # edit_file write error
-{
+SKIP: {
+    skip "Skip these tests because mocking write failures can't happen", 3;
     my $file = temp_file_path();
     write_file($file, '');
     my ($res, $warn, $err) = trap_function_override_core('syswrite', \&edit_file, sub {}, $file);
@@ -92,7 +95,7 @@ SKIP: {
     ok(!$res, 'edit_file: write error - no content!');
     unlink $file;
     unlink "$file.$$";
-}
+};
 # edit_file_lines read error
 {
     my $file = temp_file_path();
@@ -103,7 +106,8 @@ SKIP: {
     unlink $file;
 }
 # edit_file write error
-{
+SKIP: {
+    skip "Skip these tests because mocking write failures can't happen", 3;
     my $file = temp_file_path();
     write_file($file, '');
     my ($res, $warn, $err) = trap_function_override_core('syswrite', \&edit_file_lines, sub {}, $file);
@@ -112,4 +116,4 @@ SKIP: {
     ok(!$res, 'edit_file_lines: write error - no content!');
     unlink $file;
     unlink "$file.$$";
-}
+};

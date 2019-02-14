@@ -5,7 +5,7 @@ SPECIFICATION VERSION
     0.1
 
 VERSION
-    This document describes version 0.1.0 of Calendar::Dates (from Perl
+    This document describes version 0.1.1 of Calendar::Dates (from Perl
     distribution Calendar-Dates), released on 2019-02-13.
 
 DESCRIPTION
@@ -162,13 +162,34 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    "Calendar::DatesUtils" namespace for modules that make use of
-    "Calendar::Dates::*" modules, e.g. Calendar::DatesUtils::To::ICal.
+    Related namespaces:
 
-    "Calendar::DatesRoles" namespace.
+    *   "Calendar::DatesUtils"
 
-    App::CalendarDatesUtils which contain utilities like
-    list-calendar-dates, etc.
+        This is namespace for modules that make use of "Calendar::Dates::*"
+        modules, e.g. Calendar::DatesUtils::To::ICal.
+
+    *   "Calendar::DatesRoles"
+
+        For roles related to Calendar::Dates.
+
+    Related modules and applications:
+
+    *   App::CalendarDatesUtils
+
+        which contain utilities like list-calendar-dates, etc.
+
+    *   calx from App::calx
+
+        Uses Calendar::Dates::* to highlight dates.
+
+    Related projects:
+
+    *   Date::Holidays
+
+        A long established project. Shares a similar goal with
+        Calendar::Dates (to provide a common interface for all
+        Date::Holidays::* modules) but focuses on holidays only.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

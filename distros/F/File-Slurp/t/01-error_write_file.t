@@ -90,7 +90,9 @@ plan tests => 108;
 
 # Simulate a bad write
 #  we do this by causing CORE::syswrite to fail by overriding it
-{
+SKIP: {
+    skip "Skip these tests because mocking write failures can't happen", 36;
+
     my $file = temp_file_path(); # good filename, can open
 
     # write_file first
@@ -149,7 +151,7 @@ plan tests => 108;
     ok($err, 'append_file: write error, croak - got exception!');
     ok(!$res, 'append_file: write error, croak - no content!');
     unlink $file, "$file.$$";
-}
+};
 
 # Simulate a bad rename when in atomic mode.
 #  we do this by causing CORE::rename to fail by overriding it

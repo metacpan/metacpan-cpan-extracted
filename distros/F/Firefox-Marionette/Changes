@@ -1,5 +1,8 @@
 Revision history for Firefox-Marionette
 
+0.68  Thu Feb 14 21:08:00 2018
+       Adding support for Firefox 64.  Required sandboxing window.find in scripts
+
 0.67  Sun Oct 28 16:14:00 2018
        Adding support for Firefox 63
 

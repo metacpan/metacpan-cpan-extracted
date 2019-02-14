@@ -66,7 +66,7 @@ use Test::Deep qw(cmp_deeply);
 use Test::Differences qw(eq_or_diff);
 use Test::More;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 =head1 REQUIRED METHODS
 
@@ -229,6 +229,7 @@ sub _process_test_results ( $test, $title, $expected ) {
                 my $ok = cmp_deeply(
                     $json_content,
                     $expected->{json_content},
+                    'Data is as expected'
                 ) or eq_or_diff($json_content, $expected->{json_content});
             }
             else {

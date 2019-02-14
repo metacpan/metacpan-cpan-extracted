@@ -242,6 +242,8 @@ sub _include
     (defined $lang and $lang) ?
         $class->add_code ("my \$res = eval { Petal->new (file => '$path', lang => '$lang')->process (\$new_hash) };") :
 	$class->add_code ("my \$res = eval { Petal->new ('$path')->process (\$new_hash) };");
+
+    $class->add_code ("if (\$@) { confess(\$@); }") if $Petal::ERROR_ON_INCLUDE_ERROR;
     
     $class->add_code ("\$res = \"<!--\\n\$\@\\n-->\" if (defined \$\@ and \$\@);");
     $class->add_code ("\$res;");
@@ -287,6 +289,8 @@ sub _defslot
     (defined $lang and $lang) ?
         $class->add_code ("\$tmp = eval { Petal->new (file => \$path, lang => '$lang')->process (\$new_hash) };") :
 	$class->add_code ("\$tmp = eval { Petal->new (\$path)->process (\$new_hash) };");
+
+    $class->add_code ("if (\$@) { confess(\$@); }") if $Petal::ERROR_ON_INCLUDE_ERROR;
 
     $class->indent_decrement();
     $class->add_code ("};");

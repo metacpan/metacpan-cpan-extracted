@@ -6,7 +6,7 @@ use File::Spec;
 use File::Basename;
 use Test::More;
 
-eval "use Test::CheckManifest tests => 3";
+eval "use Test::CheckManifest tests => 2";
 plan skip_all => "Test::CheckManifest required" if $@;
 
 $Test::CheckManifest::HOME = '/tmp/' . $$ . '/test';
@@ -22,7 +22,7 @@ my $success = ok_manifest({
 }, 'filter OR exclude');
 
 is $error, 'BAILOUT';
-is $success, 1;
+is $success, undef;
 
 
 

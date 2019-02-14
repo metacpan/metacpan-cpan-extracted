@@ -1,6 +1,20 @@
 Revision history File::Slurp
 
-9999.25     2018-10-29
+9999.26     2019-02-13
+    - Reduce the size of handle.t to prevent failures on systems with limits set
+    - Skip all tests in the suite that relied on overriding syswrite to test
+      failure mechanisms as CORE::print cannot be overridden.
+    - Refactor write_file to use print rather than syswrite.
+      - When performing an atomic write, make sure we find a good temporary file
+        so that we don't accidentally overwrite a file that may already exist in
+        the working directory.
+      - Stop re-working the line endings on write_file when on Windows as the use
+        of print now allows layers to provide that functionality.
+    - Add File::Basename, File::Spec, File::Temp, and IO::Handle to the runtime
+      prereqs. These were already testing prereqs and are core.
+    - Perl 5.30 compliance is complete at this point.
+
+9999.25     2018-11-16
     - The previous release contained nothing but a documentation update. That
       updated documentation errantly mentioned pseudo-files. Pseudo-files
       are perfectly fine to use with File::Slurp.

@@ -14,12 +14,14 @@ build_requires:
   Test::Fatal: '0'
   Test::Kit: '2.14'
   Test::More: '0'
+  Try::Tiny: '0.07'
   constant: '0'
   parent: '0'
   rlib: '0'
 configure_requires:
   Config: '0'
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -34,19 +36,19 @@ no_index:
 provides:
   App::Prove::Plugin::Test::OnlySomeP:
     file: lib/App/Prove/Plugin/Test/OnlySomeP.pm
-    version: '0.001000'
+    version: '0.001003'
   App::Prove::Plugin::Test::OnlySomeP::Formatter:
     file: lib/App/Prove/Plugin/Test/OnlySomeP/Formatter.pm
-    version: '0.001000'
+    version: '0.001003'
   Test::OnlySome:
     file: lib/Test/OnlySome.pm
-    version: '0.001000'
+    version: '0.001003'
   Test::OnlySome::PathCapsule:
     file: lib/Test/OnlySome/PathCapsule.pm
-    version: '0.001000'
+    version: '0.001003'
   Test::OnlySome::RerunFailed:
     file: lib/Test/OnlySome/RerunFailed.pm
-    version: '0.001000'
+    version: '0.001003'
 recommends:
   YAML::XS: '0'
 requires:
@@ -62,5 +64,5 @@ requires:
   vars: '0'
 resources:
   repository: https://github.com/cxw42/Test-OnlySome.git
-version: '0.001000'
+version: '0.001003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

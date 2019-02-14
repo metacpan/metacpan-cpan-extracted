@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::CalendarDatesUtils",
   "PREREQ_PM" => {
     "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
+    "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
@@ -30,6 +31,7 @@ my %WriteMakefileArgs = (
     "Perinci::CmdLine::Classic" => "1.770",
     "Perinci::Sub::XCompletion::perl_modname" => 0,
     "Sah::Schema::perl::modname" => 0,
+    "Sah::Schema::true" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -39,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +50,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
+  "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
@@ -60,6 +63,7 @@ my %FallbackPrereqs = (
   "Perinci::CmdLine::Classic" => "1.770",
   "Perinci::Sub::XCompletion::perl_modname" => 0,
   "Sah::Schema::perl::modname" => 0,
+  "Sah::Schema::true" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

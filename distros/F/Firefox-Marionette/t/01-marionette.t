@@ -1216,8 +1216,12 @@ SKIP: {
 		sleep 1;
 	}
 	ok($firefox->uri()->host() eq 'metacpan.org', "\$firefox->uri()->host() is equal to metacpan.org:" . $firefox->uri());
-	ok($firefox->script('return window.find("lucky");'), "metacpan.org contains the phrase 'lucky' in a 'window.find' javascript command");
-	ok($firefox->script('return window.find("lucky");', timeout => 10_000, new => 1), "metacpan.org contains the phrase 'lucky' in a 'window.find' javascript command (using timeout and new (true) as parameters)");
+	my %additional;
+	if ($major_version >= 64) {
+		$additional{sandbox} = 'system';
+	}
+	ok($firefox->script('return window.find("lucky");', %additional), "metacpan.org contains the phrase 'lucky' in a 'window.find' javascript command");
+	ok($firefox->script('return window.find("lucky");', timeout => 10_000, new => 1, %additional), "metacpan.org contains the phrase 'lucky' in a 'window.find' javascript command (using timeout and new (true) as parameters)");
 	my $cookie = Firefox::Marionette::Cookie->new(name => 'BonusCookie', value => 'who really cares about privacy', expiry => time + 500000);
 	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie without a domain");
 	ok($firefox->find_id('search-input')->clear()->find_id('search-input')->type('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");

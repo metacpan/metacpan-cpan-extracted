@@ -7,7 +7,7 @@ use Exporter 'import';
 use ExtUtils::MakeMaker;
 use XS::Install::Payload;
 
-our $VERSION = '1.0.12';
+our $VERSION = '1.0.14';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args not_available/;
@@ -84,7 +84,7 @@ sub makemaker_args {
     
     $params{TYPEMAPS} = [$params{TYPEMAPS}] if $params{TYPEMAPS} and ref($params{TYPEMAPS}) ne 'ARRAY';
     
-    my $module_info = XS::Install::Payload::module_info($params{NAME}) || {};
+    my $module_info = XS::Install::Payload::binary_module_info($params{NAME}) || {};
     $params{MODULE_INFO} = {BIN_DEPENDENT => $module_info->{BIN_DEPENDENT}};
     
     $params{BIN_DEPS} = [$params{BIN_DEPS}] if $params{BIN_DEPS} and ref($params{BIN_DEPS}) ne 'ARRAY';
@@ -124,6 +124,12 @@ sub makemaker_args {
         
         # prevent C++ from compile errors on perls <= 5.18, as perl had buggy <perl.h> prior to 5.20
         _string_merge($params{CCFLAGS}, "-Wno-reserved-user-defined-literal -Wno-literal-suffix -Wno-unknown-warning-option") if $^V < v5.20;
+        
+        if (has_xs(\%params)) {
+            push @$postamble, ".xs.cc:\n".
+                "\t".'$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc'."\n".
+                "\t".'$(MV) $*.xsc $*.cc';
+        }
     }
     
     # inject ParseXS plugins into xsubpp
@@ -153,10 +159,6 @@ sub makemaker_args {
     process_test(\%params, $shared_libs_linking);
     
     delete @params{qw/CPLUS PARSE_XS SRC MODULE_INFO/};
-    
-    push @$postamble, ".xs.cc:\n".
-        "\t".'$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc'."\n".
-        "\t".'$(MV) $*.xsc $*.cc';
     
     # convert array to hash for postamble
     $params{postamble} = {};
@@ -276,9 +278,10 @@ sub get_h_files {
 
 sub process_XSI { # make XS files rebuild if an XSI file changes
     my $params = shift;
+    return unless has_xs($params);
     my @xsi_files = glob($xsi_mask);
     push @xsi_files, _scan_files($xsi_mask, $_) for @{$params->{SRC}};
-    push @{$params->{postamble}}, '$(XS_FILES):: $(FIRST_MAKEFILE) '.join(' ', @xsi_files).'; $(TOUCH) $(XS_FILES)'."\n";
+    push @{$params->{postamble}}, '$(XS_FILES):: $(FIRST_MAKEFILE) '.join(' ', @xsi_files).'; $(TOUCH) $(XS_FILES)'."\n"
 }
 
 sub process_CLIB {
@@ -335,7 +338,7 @@ sub _apply_BIN_DEPS {
     
     return if $seen->{$module}++;
     
-    my $installed_version = XS::Install::Payload::module_version($module)
+    my $installed_version = binary_module_version($module)
         or die "[XS::Install] binary dependency '$module' must be installed to proceed\n";
     $params->{CONFIGURE_REQUIRES}{$module}  ||= $installed_version;
     $params->{PREREQ_PM}{$module}           ||= $installed_version;
@@ -354,7 +357,7 @@ sub _apply_BIN_DEPS {
         last;
     }    
     
-    my $info = XS::Install::Payload::module_info($module)
+    my $info = XS::Install::Payload::binary_module_info($module)
         or die "[XS::Install] this module wants '$module' as a binary dependence, however '$module' doesn't provide any binary interface\n";
     
     if ($info->{INCLUDE}) {
@@ -439,6 +442,8 @@ sub process_BIN_SHARE {
     
     _uniq_list($bin_share->{PASSTHROUGH}) if $bin_share->{PASSTHROUGH};
     
+    $bin_share->{LOADABLE} = has_binary($params);
+    
     # generate info file
     mkdir 'blib';
     my $infopath = 'blib/info';
@@ -463,11 +468,11 @@ sub warn_BIN_DEPENDENT {
     my $params = shift;
     return unless $params->{VERSION_FROM};
     my $module = $params->{NAME};
+    return if $module eq $THIS_MODULE;
     my $list = $params->{MODULE_INFO}{BIN_DEPENDENT} or return;
     return unless @$list;
-    my $installed_version = XS::Install::Payload::module_version($module) or return;
-    my $mm = bless {}, 'MM';
-    my $new_version = $mm->parse_version($params->{VERSION_FROM}) or return;
+    my $installed_version = binary_module_version($module) or return;
+    my $new_version = MM->parse_version($params->{VERSION_FROM}) or return;
     return if $installed_version eq $new_version;
     warn << "EOF";
 ******************************************************************************
@@ -519,25 +524,35 @@ sub process_test {
     delete @$tp{qw/SRC C H XS OBJECT CPLUS/};
 }
 
-sub has_binary {
-    my $params = shift;
-    return 1 if $params->{C} && @{$params->{C}};
-    return 1 if $params->{OBJECT} && @{$params->{OBJECT}};
-    return 1 if $params->{XS} && scalar(keys %{$params->{XS}});
-    return;
+# returns version of binary module which was installed with XS::Install without loading it
+sub binary_module_version {
+    my $module = shift;
+    # user might use his own module for it's Makefile.PL (very rare case but possible, for example this module does it)
+    # to avoid finding it, and find only installed pm, we must se if it has data dir (Module.x) in the same folder
+    # so we will just find the data folder and get the pm from there
+    my $ddir = XS::Install::Payload::data_dir($module) or return 0;
+    my $pm = $ddir;
+    $pm =~ s#\.x$#.pm#;
+    return 0 unless -f $pm;
+    return MM->parse_version($pm) || 0;
 }
+
+sub has_c      { return $_[0]->{C} && scalar(@{$_[0]->{C}}) ? 1 : 0 }
+sub has_object { return $_[0]->{OBJECT} && scalar(@{$_[0]->{OBJECT}}) ? 1 : 0 }
+sub has_xs     { return $_[0]->{XS} && scalar(keys %{$_[0]->{XS}}) ? 1 : 0 }
+sub has_binary { return has_c($_[0]) || has_object($_[0]) || has_xs($_[0]) }
 
 sub cmd_sync_bin_deps {
     my $myself = shift @ARGV;
     my @modules = @ARGV;
     foreach my $module (@modules) {
-        my $info = XS::Install::Payload::module_info($module) or next;
+        my $info = XS::Install::Payload::binary_module_info($module) or next;
         my $dependent = $info->{BIN_DEPENDENT} || [];
         my %tmp = map {$_ => 1} grep {$_ ne $module} @$dependent;
         $tmp{$myself} = 1;
         $info->{BIN_DEPENDENT} = [sort keys %tmp];
         delete $info->{BIN_DEPENDENT} unless @{$info->{BIN_DEPENDENT}};
-        my $file = XS::Install::Payload::module_info_file($module);
+        my $file = XS::Install::Payload::binary_module_info_file($module);
         _module_info_write($file, $info);
     }
 }

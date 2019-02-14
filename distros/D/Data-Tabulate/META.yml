@@ -17,7 +17,7 @@ name: Data-Tabulate
 provides:
   Data::Tabulate:
     file: lib/Data/Tabulate.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Carp: '0'
   perl: '5.010'
@@ -25,8 +25,9 @@ resources:
   bugtracker: http://github.com/reneeb/Data-Tabulate/issues
   homepage: http://github.com/reneeb/Data-Tabulate
   repository: http://github.com/reneeb/Data-Tabulate.git
-version: '0.08'
+version: '0.09'
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

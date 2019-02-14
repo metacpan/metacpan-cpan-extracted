@@ -23,6 +23,7 @@ requires:
   HTTP::Message: 0
   JSON: 0
   Moose: 0
+  Plack::Test: 0
   Test::Deep: 0
   Test::Differences: 0
   Test::More: 0
@@ -30,4 +31,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ichesnokov/p5-test-tcm-role-api
-version: 0.01
+version: 0.04

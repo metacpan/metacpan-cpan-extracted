@@ -1,9 +1,30 @@
 use 5.012;
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
 use Config;
+use ExtUtils::MakeMaker;
+use File::Spec;
 
+my $VERSION_FROM = File::Spec->catfile(qw(lib Test OnlySome.pm));
+my $IS_TRIAL = check_trial();
+
+# Check if this is a TRIAL version {{{1
+sub check_trial {
+    TRIAL: {
+        # Get the VERSION line
+        open my $fd, '<', $VERSION_FROM or last TRIAL;
+        my $linetext;
+        while(<$fd>) {
+            next unless /VERSION/;
+            $linetext = $_;
+            last;
+        }
+        close $fd;
+        return !!($linetext =~ /\bTRIAL\b/);
+    }
+    return 0;
+} #check_trial()
+# }}}1
 # Module metadata {{{1
 my $provides;
 eval {
@@ -30,17 +51,41 @@ sub get_perl_filename {
 
 my $secure_perl_path = get_perl_filename();
 
-# Set up Makefile to generate README.md and uninstall targets {{{1
+# Makefile customization (MY) {{{1
 {   package MY;
 
-    # dist_core: make `dist` a :: target rather than a : target.
+    # dist_core: make `dist` a :: target rather than a : target,
+    # and add -TRIAL if necessary.
     sub dist_core {
         my $self = shift;
         my $text = $self->SUPER::dist_core(@_);
         $text =~ s/^dist\s*:[^:]/dist:: /m;
+
+        # Add -TRIAL if it's a trial release
+        if($IS_TRIAL) {
+            # Note: we don't have to worry about EOL; Appveyor uses gmake even
+            # on Windows, and it only uses \n.
+            print STDERR "TRIAL version\n";
+            my $newtext .=  # Command to rename the tgz
+                "\t$secure_perl_path -MExtUtils::Command -e mv -- " .
+                "\"\$(DISTVNAME).tar\$(SUFFIX)\" " .
+                "\"\$(DISTVNAME)-TRIAL.tar\$(SUFFIX)\"\n";
+
+            # Insert $newtext at the end of the `dist` target
+            $text =~ s{
+                ^(dist\h*:.*\n      # dist header line
+                    (?:\h+\S.*\n)+) # dist body lines.  `.` doesn't match `\n`.
+                                    # NOTE: on Appveyor, the continuation line
+                                    # begins with a space rather than a tab.
+                                    # Therefore, look for \h after \n.
+                                    # Not \s, because that matches a \n!
+            }{$1$newtext}mx;
+        } #endif $IS_TRIAL
+
         return $text;
     } # MY::dist_core
 
+    # Generate README.md; add uninstall target and other test targets
     sub postamble {     # TODO also handle Windows nmake syntax (SET vs. export)
 
         # Note: pod2markdown is marked with a hyphen so that `make` can
@@ -86,11 +131,12 @@ EOT
     } #postamble()
 } #package MY }}}1
 
-WriteMakefile(
+# Main options for EUMM
+my %opts = (
     NAME             => 'Test::OnlySome',
     AUTHOR           => q{Christopher White <cxwembedded@gmail.com>},
-    VERSION_FROM     => 'lib/Test/OnlySome.pm',
-    ABSTRACT_FROM    => 'lib/Test/OnlySome.pm',
+    VERSION_FROM     => $VERSION_FROM,
+    ABSTRACT_FROM    => $VERSION_FROM,
     LICENSE          => 'mit',
     PL_FILES         => {},
     EXE_FILES       => [ 'bin/osprove' ],
@@ -99,6 +145,7 @@ WriteMakefile(
     CONFIGURE_REQUIRES => {
         'Config' => '0',
         'ExtUtils::MakeMaker' => '0',
+        'File::Spec' => '0',
     },
     BUILD_REQUIRES => {
         'Carp' => '0',
@@ -114,7 +161,12 @@ WriteMakefile(
         'Capture::Tiny' => '0',
         'constant' => '0',
         'Exporter::Renaming' => '0',
+        'rlib' => '0',
         'Test::Fatal' => '0',
+            # Test::Fatal requires Try::Tiny, but for some reason cpanm
+            # didn't seem to realize that on Appveyor Ubuntu.  List it here
+            # until sometime when I have a chance to investigate further.
+            'Try::Tiny' => '0.07',
         'Test::Kit' => '2.14',
         'Test2::Tools::Compare' => '0',
     },
@@ -163,8 +215,16 @@ WriteMakefile(
         $provides ? (provides => $provides) : (),
 
     }, #META_MERGE
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    dist  => {
+        DIST_DEFAULT => 'tardist',  # if you change this, change the
+                                    # customization of the dist target above
+        COMPRESS => 'gzip -9f', SUFFIX => 'gz',
+    },
     clean => { FILES => 'Test-OnlySome-*' },
-);
+); # %opts
+
+$opts{META_MERGE}->{release_status} = 'testing' if $IS_TRIAL;
+
+WriteMakefile(%opts);
 
 # vi: set fdm=marker fdl=0: #

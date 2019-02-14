@@ -6,7 +6,7 @@ use Carp;
 
 # ABSTRACT: Table generation!
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 
 sub new {
@@ -24,9 +24,11 @@ sub new {
 
 sub render {
     my ($self,$module,$atts) = @_;
-    
-    if ( ! (defined $atts and ref($atts) eq 'HASH' and
-           exists $atts->{data} and ref($atts->{data}) eq 'ARRAY') ) {
+
+    if ( !$self->{tabulated} and ! (
+        defined $atts and ref($atts) eq 'HASH' and
+        exists $atts->{data} and ref($atts->{data}) eq 'ARRAY'
+    ) ) {
         croak "no data given";
     }
 
@@ -34,13 +36,18 @@ sub render {
         croak "no renderer module given";
     }
 
-    my @data = @{$atts->{data}};
+    my @data = @{$atts->{data} || []};
     my $tmp  = $module;
     $module  = 'Data::Tabulate::Plugin::'.$module;
     
     $self->_load_module($module);
     
-    my @table      = $self->tabulate(@data);
+    my @table = $self->tabulate(@data) if @data;
+
+    if ( !@table ) {
+        @table = @{ $self->{tabulated} || [] };
+    }
+
     my $plugin_obj = $module->new();
     
     for my $method(@{$self->{method_calls}->{$tmp}}){
@@ -66,6 +73,10 @@ sub render {
 
 sub tabulate {
     my ($self,@data) = @_;
+
+    $self->{tabulated} = undef;
+
+    return if !@data;
     
     my $nr   = scalar @data;
     my $cols = int sqrt $nr;
@@ -73,13 +84,13 @@ sub tabulate {
     # the calculated number of columns should not exceed the maximum
     # number of columns that the user has specified
     if($cols > $self->max_columns){
-        $cols    = $self->max_columns;
+        $cols = $self->max_columns;
     }
     
     # the calculated number of columns should be greater the minimum
     # number of columns that the user has specified
     if($cols < $self->min_columns){
-        $cols    = $self->min_columns;
+        $cols = $self->min_columns;
     }
     
     $self->{cols} = $cols;
@@ -110,6 +121,7 @@ sub tabulate {
     }
     
     $self->{rows} = scalar @tmp_data;
+    $self->{tabulated} = \@tmp_data;
                
     return @tmp_data;
 }
@@ -199,7 +211,7 @@ Data::Tabulate - Table generation!
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -207,19 +219,26 @@ C<Data::Tabulate> aims to simplify the generation of tables. Often you don't hav
 tables like in databases (with header and several rows of data), but tables with
 content only (like image galleries or listings displayed as tables).
 
-You can use other modules (e.g. HTML::Table) to produce specific output.
+You can use other modules (e.g. L<HTML::Table>) to produce specific output.
 
 Perhaps a little code snippet.
 
     use Data::Tabulate;
     use Data::Dumper;
-    
-    my @array = qw(1..12);
-    
+
+    my @array = (1..12);
+
     my $foo   = Data::Tabulate->new();
+    my $html1 = $foo->render('HTMLTable', { data => \@array });
+
+    @array = ( 13 .. 24 );
     my @table = $foo->tabulate(@array);
-    
-    my $html  = $foo->render('HTMLTable',@array);
+    my $html2 = $foo->render('HTMLTable');
+
+    print Dumper({
+        'html with raw array data' => $html1,
+        'html with tabulate data'  => $html2,
+    });
 
 =head1 METHODS
 

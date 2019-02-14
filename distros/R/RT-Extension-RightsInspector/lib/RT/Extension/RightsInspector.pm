@@ -16,7 +16,7 @@ use warnings;
 #     record     - generalization of principal and object since rendering
 #                  and whatnot can share code
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 RT->AddStyleSheets("rights-inspector.css");
 RT->AddJavaScript("rights-inspector.js");
@@ -235,19 +235,19 @@ sub InnerRoleQuery {
         SELECT main.id,
                MIN(InnerRecords.id) AS example_record,
                COUNT(InnerRecords.id)-1 AS other_count
-        FROM ACL AS main
-        JOIN Groups AS ParentRoles
+        FROM ACL main
+        JOIN Groups ParentRoles
              ON main.PrincipalId = ParentRoles.id
-        JOIN $inner_table AS InnerRecords
+        JOIN $inner_table InnerRecords
              ON   (ParentRoles.Domain = '$parent_class-Role' AND InnerRecords.$parent_column = ParentRoles.Instance)
                 OR ParentRoles.Domain = 'RT::System-Role'
-        JOIN Groups AS InnerRoles
+        JOIN Groups InnerRoles
              ON  InnerRoles.Instance = InnerRecords.Id
              AND InnerRoles.Name = main.PrincipalType
     ];
     if ($principal_id) {
         push @query, qq[
-            JOIN CachedGroupMembers AS CGM
+            JOIN CachedGroupMembers CGM
                  ON CGM.GroupId = InnerRoles.id
         ];
     }

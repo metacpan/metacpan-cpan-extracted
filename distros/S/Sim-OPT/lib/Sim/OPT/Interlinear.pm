@@ -33,7 +33,7 @@ use Sim::OPT::Parcoord3d;
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
-$VERSION = '0.125';
+$VERSION = '0.127';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -2113,6 +2113,8 @@ Sim::OPT::Interlinear
 
 
 =head1 SYNOPSIS
+
+
   # As a Perl function:
     interlinear( "./configfile.pl", "./sourcefile.csv", "./obtainedmetamodel.csv" );
   # or as a script, from the command line:

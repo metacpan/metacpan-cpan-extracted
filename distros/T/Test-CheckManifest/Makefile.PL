@@ -27,9 +27,10 @@ my %WriteMakefileArgs = (
     "Test::More" => 0
   },
   "TEST_REQUIRES" => {
-    "CPAN::Meta::YAML" => 0
+    "CPAN::Meta::YAML" => 0,
+    "Pod::Coverage::TrustPod" => 0
   },
-  "VERSION" => "1.38",
+  "VERSION" => "1.39",
   "test" => {
     "TESTS" => "t/*.t t/extra/*.t t/xt/*.t"
   }
@@ -43,6 +44,7 @@ my %FallbackPrereqs = (
   "File::Basename" => 0,
   "File::Find" => 0,
   "File::Spec" => 0,
+  "Pod::Coverage::TrustPod" => 0,
   "Scalar::Util" => 0,
   "Test::Builder" => 0,
   "Test::More" => 0

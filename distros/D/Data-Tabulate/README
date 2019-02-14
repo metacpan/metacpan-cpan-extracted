@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.08
+    version 0.09
 
 SYNOPSIS
 
@@ -20,13 +20,20 @@ SYNOPSIS
 
         use Data::Tabulate;
         use Data::Dumper;
-        
-        my @array = qw(1..12);
-        
+    
+        my @array = (1..12);
+    
         my $foo   = Data::Tabulate->new();
+        my $html1 = $foo->render('HTMLTable', { data => \@array });
+    
+        @array = ( 13 .. 24 );
         my @table = $foo->tabulate(@array);
-        
-        my $html  = $foo->render('HTMLTable',@array);
+        my $html2 = $foo->render('HTMLTable');
+    
+        print Dumper({
+            'html with raw array data' => $html1,
+            'html with tabulate data'  => $html2,
+        });
 
 METHODS
 

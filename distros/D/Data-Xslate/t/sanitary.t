@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
-use Test2::Bundle::Extended;
-use strictures 2;
+use Test2::V0;
+use strict;
+use warnings;
 
 use Data::Xslate;
 use Storable qw( freeze thaw );

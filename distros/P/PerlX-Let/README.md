@@ -4,7 +4,7 @@ PerlX::Let - Syntactic sugar for lexical constants
 
 # VERSION
 
-version v0.2.2
+version v0.2.3
 
 # SYNOPSIS
 
@@ -79,7 +79,7 @@ The parsing of assignments is rudimentary, and may fail when assigning
 to another variable or the result of a function.
 
 Because this modifies the source code during compilation, the line
-numebrs may be changed.
+numbers may be changed.
 
 # SEE ALSO
 

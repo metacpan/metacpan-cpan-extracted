@@ -1,3 +1,14 @@
+Imager-File-WEBP 0.004 - 14 Feb 2019
+======================
+
+ - fix some typos in the documentation
+   https://rt.cpan.org/Ticket/Display.html?id=127975
+
+ - fix the abstract generated in META.*
+
+ - add support for reading EXIF metadata into tags when built with
+   Imager 1.010 or later.
+
 Imager-File-WEBP 0.003 - 4 Dec 2018
 ======================
 

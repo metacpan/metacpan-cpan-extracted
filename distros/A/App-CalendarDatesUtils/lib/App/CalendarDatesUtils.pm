@@ -1,7 +1,7 @@
 package App::CalendarDatesUtils;
 
-our $DATE = '2019-02-13'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-02-14'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -25,7 +25,7 @@ sub list_calendar_dates_modules {
 
 $SPEC{list_calendar_dates} = {
     v => 1.1,
-    summary => 'List dates from a Calendar::Dates::* module',
+    summary => 'List dates from one or more Calendar::Dates::* modules',
     args => {
         year => {
             schema => 'int*',
@@ -39,16 +39,25 @@ $SPEC{list_calendar_dates} = {
             schema => ['int*', in=>[1, 31]],
             pos => 2,
         },
-        module => {
-            schema => 'perl::modname*',
-            req => 1,
+        modules => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'modules',
+            schema => ['array*', of=>'perl::modname*'],
             cmdline_aliases => {m=>{}},
             'x.completion' => [perl_modname => {ns_prefix=>'Calendar::Dates'}],
+        },
+        all => {
+            summary => 'Use all installed Calendar::Dates::* modules',
+            schema => 'true*',
+            cmdline_aliases => {a=>{}},
         },
         detail => {
             schema => 'bool*',
             cmdline_aliases => {l=>{}},
         },
+    },
+    args_rels => {
+        req_one => ['modules', 'all'],
     },
 };
 sub list_calendar_dates {
@@ -58,18 +67,34 @@ sub list_calendar_dates {
     my $mon  = $args{month};
     my $day  = $args{day};
 
-    my $mod = $args{module};
-    $mod = "Calendar::Dates::$mod" unless $mod =~ /\ACalendar::Dates::/;
-    (my $mod_pm = "$mod.pm") =~ s!::!/!g;
-    require $mod_pm;
-
-    my $rows = $mod->get_entries($year, $mon, $day);
-
-    unless ($args{detail}) {
-        $rows = [map {$_->{date}} @$rows];
+    my $modules;
+    if ($args{all}) {
+        $modules = list_calendar_dates_modules()->[2];
+    } else {
+        $modules = $args{modules};
     }
 
-    [200, "OK", $rows];
+    my @rows;
+    for my $mod (@$modules) {
+        $mod = "Calendar::Dates::$mod" unless $mod =~ /\ACalendar::Dates::/;
+        (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+        require $mod_pm;
+
+        my $res;
+        eval { $res = $mod->get_entries($year, $mon, $day) };
+        if ($@) {
+            warn "Can't get entries from $mod: $@, skipped";
+            next;
+        }
+
+        push @rows, @$res;
+    }
+
+    unless ($args{detail}) {
+        @rows = map {$_->{date}} @rows;
+    }
+
+    [200, "OK", \@rows];
 }
 
 1;
@@ -87,7 +112,7 @@ App::CalendarDatesUtils - Utilities related to Calendar::Dates
 
 =head1 VERSION
 
-This document describes version 0.001 of App::CalendarDatesUtils (from Perl distribution App-CalendarDatesUtils), released on 2019-02-13.
+This document describes version 0.002 of App::CalendarDatesUtils (from Perl distribution App-CalendarDatesUtils), released on 2019-02-14.
 
 =head1 DESCRIPTION
 
@@ -110,7 +135,7 @@ Usage:
 
  list_calendar_dates(%args) -> [status, msg, payload, meta]
 
-List dates from a Calendar::Dates::* module.
+List dates from one or more Calendar::Dates::* modules.
 
 This function is not exported.
 
@@ -118,11 +143,15 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<all> => I<true>
+
+Use all installed Calendar::Dates::* modules.
+
 =item * B<day> => I<int>
 
 =item * B<detail> => I<bool>
 
-=item * B<module>* => I<perl::modname>
+=item * B<modules> => I<array[perl::modname]>
 
 =item * B<month> => I<int>
 

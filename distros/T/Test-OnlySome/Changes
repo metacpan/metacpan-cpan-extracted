@@ -1,27 +1,32 @@
 Revision history for Test-OnlySome
 
-0.1.0   2018-12-12
+0.001003    2019-02-14
+
+    - More robust installation process
+    - Updated documentation
+
+0.001000    2018-12-12
 
     - Breaking change: in a multi-test block, only skip if all the tests
       in that block are skipped (GH-9).
     - Added tests of osprove(1).
     - Support running tests on Windows (GH-11).
 
-0.0.8   2018-12-04
+0.000008    2018-12-04
 
     - os() can now take the number of tests as a parameter (GH-8).
 
-0.0.7   2018-12-01
+0.000007    2018-12-01
 
     - Added osprove(1) binary to run prove(1) with the Test::OnlyP plugin.
     - Made Test::OnlySome::RerunFailed idempotent.
     - Added "verbose" option to Test::OnlySome and Test::OnlySome::RerunFailed.
 
-0.0.6   2018-11-29
+0.000006    2018-11-29
 
     - Updated documentation.
 
-0.0.5   2018-11-28
+0.000005    2018-11-28
 
     - Package args now use a "skip" keyword ahead of the test numbers
       to skip.
@@ -31,20 +36,18 @@ Revision history for Test-OnlySome
       test results and mark all cleanly-passed tests in a file to be skipped
       by Test::OnlySome.
 
-0.0_3   2018-11-25
-
-0.0_4   2018-11-26
+0.000_004   2018-11-26
 
     - Support package args to specify which tests to skip.
     - Can be used via Import::Into and Test::Kit.
 
-0.0_2   2018-11-24
+0.000_002   2018-11-24
 
     - Require Keyword::Declare 0.001006+ based on cpantesters matrix results.
     - Support implicit configuration using a package-level variable rather than
       an expressly-passed hashref.
 
-0.0_1   2018-11-23
+0.000_001   2018-11-23
 
     - First version, released on an unsuspecting world.
 

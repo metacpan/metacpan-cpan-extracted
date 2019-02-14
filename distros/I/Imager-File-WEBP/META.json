@@ -1,5 +1,5 @@
 {
-   "abstract" : "TIFF image file support for Imager",
+   "abstract" : "WEBP image file support for Imager",
    "author" : [
       "Tony Cook <tonyc@cpan.org>"
    ],
@@ -58,6 +58,6 @@
          "web" : "http://github.com/tonycoz/imager-file-webp.git"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

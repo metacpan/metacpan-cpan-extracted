@@ -3,13 +3,16 @@ package File::Slurp;
 use strict;
 use warnings ;
 
-our $VERSION = '9999.25';
+our $VERSION = '9999.26';
 $VERSION = eval $VERSION;
 
 use Carp ;
 use Exporter qw(import);
 use Fcntl qw( :DEFAULT ) ;
+use File::Basename ();
 use File::Spec;
+use File::Temp qw(tempfile);
+use IO::Handle ();
 use POSIX qw( :fcntl_h ) ;
 use Errno ;
 
@@ -222,192 +225,115 @@ ERR
 	return ;
 }
 
-
 *wf = \&write_file ;
 
 sub write_file {
+	my $file_name = shift;
+	my $opts = (ref $_[0] eq 'HASH') ? shift : {};
+	# options we care about:
+	# append atomic binmode buf_ref err_mode no_clobber perms
 
-	my $file_name = shift ;
-
-# get the optional argument hash ref from @_ or an empty hash ref.
-
-	my $opts = ( ref $_[0] eq 'HASH' ) ? shift : {} ;
-
-	my( $buf_ref, $write_fh, $no_truncate, $orig_file_name, $data_is_ref ) ;
-
-# get the buffer ref - it depends on how the data is passed into write_file
-# after this if/else $buf_ref will have a scalar ref to the data.
-
-	if ( ref $opts->{'buf_ref'} eq 'SCALAR' ) {
-
-# a scalar ref passed in %opts has the data
-# note that the data was passed by ref
-
-		$buf_ref = $opts->{'buf_ref'} ;
-		$data_is_ref = 1 ;
-	}
-	elsif ( ref $_[0] eq 'SCALAR' ) {
-
-# the first value in @_ is the scalar ref to the data
-# note that the data was passed by ref
-
-		$buf_ref = shift ;
-		$data_is_ref = 1 ;
-	}
-	elsif ( ref $_[0] eq 'ARRAY' ) {
-
-# the first value in @_ is the array ref to the data so join it.
-
-		${$buf_ref} = join '', @{$_[0]} ;
-	}
-	else {
-
-# good old @_ has all the data so join it.
-
-		${$buf_ref} = join '', @_ ;
-	}
-
-# deal with ref for a file name
-
-	if ( ref $file_name ) {
-
-		my $ref_result = _check_ref( $file_name ) ;
-
-		if ( ref $ref_result ) {
-
-# we got an error, deal with it
-
-			@_ = ( $opts, $ref_result ) ;
-			goto &_error ;
+	my $fh;
+	my $no_truncate = 0;
+	my $orig_filename;
+	# let's see if we have a stringified object or some sort of handle
+	# or globref before doing anything else
+	if (ref($file_name)) {
+		my $ref_result = _check_ref($file_name, $opts);
+		if (ref($ref_result)) {
+			# some error happened while checking for a ref
+			@_ = ($opts, $ref_result);
+			goto &_error;
 		}
-
-		if ( $ref_result ) {
-
-# we got an overloaded object and the result is the stringified value
-# use it as the file name
-
-			$file_name = $ref_result ;
+		if ($ref_result) {
+			# we have now stringified $file_name from the overloaded obj
+			$file_name = $ref_result;
 		}
 		else {
-
-# we now have a proper handle ref.
-# make sure we don't call truncate on it.
-
-			$write_fh = $file_name ;
-			$no_truncate = 1 ;
+			# we now have a proper handle ref
+			# make sure we don't call truncate on it
+			$fh = $file_name;
+			$no_truncate = 1;
+			# can't do atomic or permissions on a file handle
+			delete $opts->{atomic};
+			delete $opts->{perms};
 		}
 	}
 
-# see if we have a path we need to open
-
-	unless( $write_fh ) {
-
-# spew to regular file.
-
-		if ( $opts->{'atomic'} ) {
-
-# in atomic mode, we spew to a temp file so make one and save the original
-# file name.
-			$orig_file_name = $file_name ;
-			$file_name .= ".$$" ;
+	# open the file for writing if we were given a filename
+	unless ($fh) {
+		$orig_filename = $file_name;
+		my $perms = defined($opts->{perms}) ? $opts->{perms} : 0666;
+		# set the mode for the sysopen
+		my $mode = O_WRONLY | O_CREAT;
+		$mode |= O_APPEND if $opts->{append};
+		$mode |= O_EXCL if $opts->{no_clobber};
+		if ($opts->{atomic}) {
+			# in an atomic write, we must open a new file in the same directory
+			# as the original to account for ACLs. We must also set the new file
+			# to the same permissions as the original unless overridden by the
+			# caller's request to set a specified permission set.
+			my $dir = File::Spec->rel2abs(File::Basename::dirname($file_name));
+			if (!defined($opts->{perms}) && -e $file_name && -f _) {
+				$perms = 07777 & (stat $file_name)[2];
+			}
+			# we must ensure we're using a good temporary filename (doesn't already
+			# exist). This is slower, but safer.
+			(undef, $file_name) = tempfile('tempXXXXX', DIR => $dir, OPEN => 0);
 		}
-
-# set the mode for the sysopen
-
-		my $mode = O_WRONLY | O_CREAT ;
-		$mode |= O_APPEND if $opts->{'append'} ;
-		$mode |= O_EXCL if $opts->{'no_clobber'} ;
-
-		my $perms = $opts->{perms} ;
-		$perms = 0666 unless defined $perms ;
-
-#printf "WR: BINARY %x MODE %x\n", O_BINARY, $mode ;
-
-# open the file and handle any error.
-
-		$write_fh = local( *FH ) ;
-#		$write_fh = gensym ;
-		unless ( sysopen( $write_fh, $file_name, $mode, $perms ) ) {
-
-			@_ = ( $opts, "write_file '$file_name' - sysopen: $!");
-			goto &_error ;
+		$fh = local *FH;
+		unless (sysopen($fh, $file_name, $mode, $perms)) {
+			@_ = ($opts, "write_file '$file_name' - sysopen: $!");
+			goto &_error;
 		}
 	}
-
-	if ( my $binmode = $opts->{'binmode'} ) {
-		binmode( $write_fh, $binmode ) ;
+	# we now have an open file handle as well as data to write to that handle
+	if (my $binmode = $opts->{binmode}) {
+		binmode($fh, $binmode);
 	}
 
-	sysseek( $write_fh, 0, SEEK_END ) if $opts->{'append'} ;
-
-#print 'WR before data ', unpack( 'H*', ${$buf_ref}), "\n" ;
-
-# fix up newline to write cr/lf if this is a windows text file
-
-	if ( $is_win32 && !$opts->{'binmode'} ) {
-
-# copy the write data if it was passed by ref so we don't clobber the
-# caller's data
-		$buf_ref = \do{ my $copy = ${$buf_ref}; } if $data_is_ref ;
-		${$buf_ref} =~ s/\n/\015\012/g ;
+	# get the data to print to the file
+	# get the buffer ref - it depends on how the data is passed in
+	# after this if/else $buf_ref will have a scalar ref to the data
+	my $buf_ref;
+	my $data_is_ref = 0;
+	if (ref($opts->{buf_ref}) eq 'SCALAR') {
+		# a scalar ref passed in %opts has the data
+		# note that the data was passed by ref
+		$buf_ref = $opts->{buf_ref};
+		$data_is_ref = 1;
+	}
+	elsif (ref($_[0]) eq 'SCALAR') {
+		# the first value in @_ is the scalar ref to the data
+		# note that the data was passed by ref
+		$buf_ref = shift;
+		$data_is_ref = 1;
+	}
+	elsif (ref($_[0]) eq 'ARRAY') {
+		# the first value in @_ is the array ref to the data so join it.
+		${$buf_ref} = join '', @{$_[0]};
+	}
+	else {
+		# good old @_ has all the data so join it.
+		${$buf_ref} = join '', @_;
 	}
 
-#print 'after data ', unpack( 'H*', ${$buf_ref}), "\n" ;
+	# seek and print
+	seek($fh, 0, SEEK_END) if $opts->{append};
+	print {$fh} ${$buf_ref};
+	truncate($fh, tell($fh)) unless $no_truncate;
+	close($fh);
 
-# get the size of how much we are writing and init the offset into that buffer
-
-	my $size_left = length( ${$buf_ref} ) ;
-	my $offset = 0 ;
-
-# loop until we have no more data left to write
-
-	do {
-
-# do the write and track how much we just wrote
-
-		my $write_cnt = syswrite( $write_fh, ${$buf_ref},
-				$size_left, $offset ) ;
-
-# since we're using syswrite Perl won't automatically restart the call
-# when interrupted by a signal.
-
-		next if $!{EINTR};
-
-		unless ( defined $write_cnt ) {
-
-			@_ = ( $opts, "write_file '$file_name' - syswrite: $!");
-			goto &_error ;
-		}
-
-# track how much left to write and where to write from in the buffer
-
-		$size_left -= $write_cnt ;
-		$offset += $write_cnt ;
-
-	} while( $size_left > 0 ) ;
-
-# we truncate regular files in case we overwrite a long file with a shorter file
-# so seek to the current position to get it (same as tell()).
-
-	truncate( $write_fh,
-		  sysseek( $write_fh, 0, SEEK_CUR ) ) unless $no_truncate ;
-
-	close( $write_fh ) ;
-
-# handle the atomic mode - move the temp file to the original filename.
-
-	if ( $opts->{'atomic'} && !rename( $file_name, $orig_file_name ) ) {
-
-		@_ = ( $opts, "write_file '$file_name' - rename: $!" ) ;
-		goto &_error ;
+	if ($opts->{atomic} && !rename($file_name, $orig_filename)) {
+		@_ = ($opts, "write_file '$file_name' - rename: $!");
+		goto &_error;
 	}
 
-	return 1 ;
+	return 1;
 }
 
 # this is for backwards compatibility with the previous File::Slurp module.
 # write_file always overwrites an existing file
-
 *overwrite_file = \&write_file ;
 
 # the current write_file has an append mode so we use that. this

@@ -23,14 +23,16 @@ no one else has reported the problem yet.
 
 # SYNOPSIS
 
-In your test file (e.g., `t/01.t`):
+Suppose you are testing a `long_running_function()`.  If it succeeded last
+time, you don't want to take the time to test it again.  In your test file
+(e.g., `t/01.t`):
 
     use Test::More tests => 2;
     use Test::OnlySome::RerunFailed;    # rerun only failed tests
-    os ok(1, 'passes');     # "os" marks tests that might be skipped
+    os ok(long_running_function());     # "os" marks tests that might be skipped
     os ok(0, 'fails');
 
-At the command line:
+At the command line, supposing the function passes the test:
 
     $ osprove -lv
     ...
@@ -58,9 +60,11 @@ The argument to ["os"](#os) can be a statement or block, and it doesn't have to
 be a [Test::More](https://metacpan.org/pod/Test::More) test.  You can wrap long-running tests in functions,
 and apply ["os"](#os) to those functions.
 
-Please note that ["os"](#os) can take a `test_count` argument.  As discussed
-in more detail below, please use a `test_count` of 1 for all tests run
-under [Test::OnlySome::RerunFailed](https://metacpan.org/pod/Test::OnlySome::RerunFailed).
+Please note that ["os"](#os) can take a `test_count` argument, e.g., if there
+are multiple tests in a block.  The whole block will be skipped if and only
+if all the tests in that block are skipped.  Otherwise, the whole block
+will be rerun.  The moral?  Use a `test_count` of 1 for all tests run under
+[Test::OnlySome::RerunFailed](https://metacpan.org/pod/Test::OnlySome::RerunFailed) and you won't be surprised.
 
 # MARKING TESTS
 
@@ -131,15 +135,16 @@ it will be used instead of the number of tests specified in
 
 - The given statement or block will be run in its own lexical scope,
 not in the caller's scope.
-- If you use `test_count>1`, the whole block will be skipped based on
-whether the **first test** in that block should be skipped.  So, for example,
+- If you use `test_count>1`, the whole block will be skipped only if
+every test in the block is marked to be skipped.  So, for example,
 
         os 2 { ok(1); ok(0); }
 
-    will skip the `ok(0)` if the `ok(1)` is skipped.
+    will still run the `ok(1)` even if it was marked to be skipped if
+    the `ok(0)` was not marked to be skipped.
 
-I recommend that, when using [Test::OnlySome::RerunFailed](https://metacpan.org/pod/Test::OnlySome::RerunFailed), you **not** use
-`test_count>1`.
+I recommend that, when using [Test::OnlySome::RerunFailed](https://metacpan.org/pod/Test::OnlySome::RerunFailed), you always use
+`test_count == 1`.
 
 ## unimport
 
@@ -177,6 +182,10 @@ You can also look for information at:
 - RT: CPAN's request tracker
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome)
+
+This module is versioned with [semantic versioning](https://semver.org),
+but in the backward-compatible Perl format.  So version `0.001003` is
+semantic version `0.1.3`.
 
 # LICENSE AND COPYRIGHT
 

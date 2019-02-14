@@ -25,7 +25,7 @@ use Types::TypeTiny ();
 
 use namespace::autoclean 0.28;
 
-our $VERSION = 'v0.3.6';
+our $VERSION = 'v0.3.7';
 
 
 sub VERSION { # for older Perls
@@ -126,7 +126,7 @@ Types::Const - Types that coerce references to read-only
 
 =head1 VERSION
 
-version v0.3.6
+version v0.3.7
 
 =head1 SYNOPSIS
 
@@ -147,7 +147,7 @@ version v0.3.6
 This is an I<experimental> type library that provides types that force
 read-only hash and array reference attributes to be deeply read-only.
 
-See the L<known issues|/KNOWN_ISSUES> below for a discussion of
+See the L<known issues|/"KNOWN ISSUES"> below for a discussion of
 side-effects.
 
 =head1 TYPES
@@ -227,6 +227,12 @@ and may be cloned from L<git://github.com/robrwo/Types-Const.git>
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Mohammad S Anwar
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 

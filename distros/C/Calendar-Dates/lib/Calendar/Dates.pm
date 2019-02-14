@@ -1,7 +1,7 @@
 package Calendar::Dates;
 
 our $DATE = '2019-02-13'; # DATE
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.1.1'; # VERSION
 
 1;
 # ABSTRACT: Modules that contain calendar dates
@@ -22,7 +22,7 @@ Calendar::Dates - Modules that contain calendar dates
 
 =head1 VERSION
 
-This document describes version 0.1.0 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-02-13.
+This document describes version 0.1.1 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-02-13.
 
 =head1 DESCRIPTION
 
@@ -188,13 +188,46 @@ feature.
 
 =head1 SEE ALSO
 
-C<Calendar::DatesUtils> namespace for modules that make use of
-C<Calendar::Dates::*> modules, e.g. L<Calendar::DatesUtils::To::ICal>.
+Related namespaces:
 
-C<Calendar::DatesRoles> namespace.
+=over
 
-L<App::CalendarDatesUtils> which contain utilities like L<list-calendar-dates>,
-etc.
+=item * C<Calendar::DatesUtils>
+
+This is namespace for modules that make use of C<Calendar::Dates::*> modules,
+e.g. L<Calendar::DatesUtils::To::ICal>.
+
+=item * C<Calendar::DatesRoles>
+
+For roles related to Calendar::Dates.
+
+=back
+
+Related modules and applications:
+
+=over
+
+=item * L<App::CalendarDatesUtils>
+
+which contain utilities like L<list-calendar-dates>, etc.
+
+=item * L<calx> from L<App::calx>
+
+Uses Calendar::Dates::* to highlight dates.
+
+=back
+
+Related projects:
+
+=over
+
+=item * L<Date::Holidays>
+
+A long established project. Shares a similar goal with Calendar::Dates (to
+provide a common interface for all Date::Holidays::* modules) but focuses on
+holidays only.
+
+=back
 
 =head1 AUTHOR
 

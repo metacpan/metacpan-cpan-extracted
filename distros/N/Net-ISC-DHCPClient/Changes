@@ -1,5 +1,8 @@
 Revision history for Net-ISC-DHCPClient
 
+0.12    Wed 13 Feb 2019 17:27:00 PM EET
+        Bugfix: Bumped Perl version requirement to 5.14, not 5.140
+
 0.11    Tue 12 Feb 2019 18:27:00 PM EET
         Bumped Perl version requirement to 5.14
 

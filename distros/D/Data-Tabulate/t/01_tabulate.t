@@ -1,10 +1,13 @@
-#!perl -T
+#!/usr/bin/env perl
 
 use Data::Tabulate;
-use Test::More tests => 12;
+use Test::More;
 
 my @array = (1..12);
 my $obj   = Data::Tabulate->new();
+
+is $obj->tabulate(), undef;
+
 my @table = $obj->tabulate(@array);
 
 my @check = (
@@ -36,13 +39,18 @@ is($obj->rows,4);
             [7..9],
             [10,undef,undef],
          );
+
 my @res = $obj->tabulate(@array);
-is_deeply([@res],[@check]);
-is($obj->rows,4);
-is($obj->cols,3);
+
+is_deeply [@res], [@check];
+is $obj->rows, 4;
+is $obj->cols, 3;
 
 @array = (1);
 @check = ([1]);
-is_deeply([$obj->tabulate(@array)],[@check]);
-is($obj->rows,1);
-is($obj->cols,1);
+
+is_deeply [$obj->tabulate(@array)], [@check];
+is $obj->rows, 1;
+is $obj->cols, 1;
+
+done_testing();
