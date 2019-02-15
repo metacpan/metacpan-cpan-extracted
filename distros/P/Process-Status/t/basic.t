@@ -19,6 +19,9 @@ subtest "status_code == 31488" => sub {
   );
 
   is($status->as_string, "exited 123", "->as_string is as expected");
+
+  eval { $status->assert_ok("test") };
+  like($@, qr{^test exited 123}, '->assert_ok throws string error');
 };
 
 subtest "status_code == 395" => sub {
@@ -39,6 +42,9 @@ subtest "status_code == 395" => sub {
     "exited 1, caught SIGSEGV; dumped core",
     "->as_string is as expected",
   );
+
+  eval { $status->assert_ok("test") };
+  like($@, qr{^test exited 1}, '->assert_ok throws string error');
 };
 
 subtest "status_code == -1" => sub {
@@ -60,11 +66,11 @@ subtest "status_code == -1" => sub {
     "->as_struct is as expected",
   );
 
-  is(
-    $status->as_string,
-    qq{did not run; \$? was -1, \$! was "$str" (errno $num)},
-    "->as_string is as expected",
-  );
+  my $expect_err = qq{did not run; \$? was -1, \$! was "$str" (errno $num)};
+  is($status->as_string, $expect_err, "->as_string is as expected");
+
+  eval { $status->assert_ok("test") };
+  like($@, qr{^test \Q$expect_err\E}, '->assert_ok throws string error');
 };
 
 done_testing;

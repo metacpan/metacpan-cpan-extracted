@@ -1,0 +1,58 @@
+{
+    "Parameters": {
+        "CertificateArn1": {
+            "Type": "String"
+        },
+        "CertificateArn2": {
+            "Type": "String"
+        },
+        "LoadBalancerArn": {
+            "Type": "String"
+        },
+        "TargetGroupArn": {
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "ListenerCertificate": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerCertificate",
+            "Properties": {
+                "Certificates": [
+                    {
+                        "CertificateArn": {
+                            "Ref": "CertificateArn1"
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Ref": "Listener"
+                }
+            }
+        },
+        "Listener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Properties": {
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {
+                            "Ref": "TargetGroupArn"
+                        }
+                    }
+                ],
+                "LoadBalancerArn": {
+                    "Ref": "LoadBalancerArn"
+                },
+                "Port": "8000",
+                "Protocol": "HTTPS",
+                "Certificates": [
+                    {
+                        "CertificateArn": {
+                            "Ref": "CertificateArn2"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

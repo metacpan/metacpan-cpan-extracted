@@ -1,3 +1,8 @@
+0.276   2019-02-14 (PERLANCAR)
+
+	- [bugfix] Used wrong variable in loop [RT#128512].
+
+
 0.275   2019-01-06 (PERLANCAR)
 
 	- No functional changes.

@@ -1,8 +1,3 @@
-This software is copyright (c) 2011 by Graham Knop.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 Terms of the Perl programming language system itself
 
 a) the GNU General Public License as published by the Free
@@ -12,7 +7,7 @@ b) the "Artistic License"
 
 --- The GNU General Public License, Version 1, February 1989 ---
 
-This software is Copyright (c) 2011 by Graham Knop.
+This software is Copyright (c) 2019 by haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>.
 
 This is free software, licensed under:
 
@@ -272,7 +267,7 @@ That's all there is to it!
 
 --- The Artistic License 1.0 ---
 
-This software is Copyright (c) 2011 by Graham Knop.
+This software is Copyright (c) 2019 by haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>.
 
 This is free software, licensed under:
 

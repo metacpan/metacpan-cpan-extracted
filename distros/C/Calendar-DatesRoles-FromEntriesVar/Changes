@@ -1,0 +1,11 @@
+0.002    2019-02-14 (PERLANCAR)
+
+         - Rename distribution from Calendar-DatesRoles-FromData to
+           Calendar-DatesRoles-FromEntriesVar. The old name is now used as
+           another role that adds Calendar::Dates interface for modules that has
+           data in __DATA__ section.
+
+
+0.001    2019-02-13 (PERLANCAR)
+
+         - First release.

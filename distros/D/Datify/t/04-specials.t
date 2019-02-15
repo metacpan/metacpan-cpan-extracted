@@ -3,59 +3,75 @@
 use strict;
 use warnings;
 
-use Test::More tests => 79;
+use Test2::V0;
+plan 83;
 
 ok require Datify, 'Required Datify';
 
-no warnings 'qw';
-my $datify = join(' ', qw(
-    -infinite        => "'-inf'",
-    array_ref        => '[$_]',
-    assign           => '$var = $value;',
-    beautify         => undef,
-    body             => '...',
-    code             => 'sub {$_}',
-    dereference      => '$referent->$place',
-    encode           =>   {0 => '\\\\0',  7 => '\\\\a',  9 => '\\\\t',
-                          10 => '\\\\n', 12 => '\\\\f', 13 => '\\\\r',
-                          27 => '\\\\e',
-                          byte => '\\\\x%02x', wide => '\\\\x{%04x}'},
-    false            => "''",
-    format           => "format UNKNOWN =\\n.\\n",
-    hash_ref         => '{$_}',
-    infinite         => "'inf'",
-    io               => '*UNKNOWN{IO}',
-    keyfilter        => undef,
-    keyfilterdefault => 1,
-    keysort          => sub {...},
-    keywords         => ['undef'],
-    list             => '($_)',
-    list_sep         => ', ',
-    longstr          => 1_000,
-    lvalue           => 'substr($lvalue, 0)',
-    name             => '$self',
-    nested           => '$referent$place',
-    nonnumber        => "'nan'",
-    null             => 'undef',
-    num_sep          => '_',
-    object           => 'bless($data, $class_str)',
-    overloads        => ['""', '0+'],
-    pair             => '$key => $value',
-    q1               => 'q',
-    q2               => 'qq',
-    q3               => 'qr',
-    qpairs           => ['()', '<>', '[]', '{}'],
-    qquotes          => ['!', '#', '%', '&', '*', '+', ',', '-', '.', '/',
-                         ':', ';', '=', '?', '^', '|', '~', '$', '@', '`'],
-    quote            => undef,
-    quote1           => "'",
-    quote2           => '"',
-    quote3           => '/',
-    reference        => '\\\\$_',
-    sigils           => '$@',
-    true             => 1,
-    vformat          => 'v%vd'
-));
+my $datify = join(' ', do {
+    no warnings 'qw';
+    qw(
+        -infinite        => "'-inf'",
+        _cache_hit       => 0,
+        array_ref        => '[$_]',
+        assign           => '$var = $value;',
+        beautify         => undef,
+        body             => '...',
+        code             => 'sub {$body}',
+        codename         => '\\\\&$codename',
+        dereference      => '$referent->$place',
+        encode1          =>  {92 => '\\\\\\\\', byte => '\\\\%c'},
+        encode2          =>   {0 => '\\\\0',  7 => '\\\\a',  8 => '\\\\b',
+                               9 => '\\\\t', 10 => '\\\\n', 12 => '\\\\f',
+                              13 => '\\\\r', 27 => '\\\\e', 92 => '\\\\\\\\',
+                              also => '[:cntrl:]',
+                              byte => '\\\\x%02x',
+                              wide => '\\\\x{%04x}'},
+        encode3          =>   {0 => '\\\\0',  7 => '\\\\a',  9 => '\\\\t',
+                              10 => '\\\\n', 12 => '\\\\f', 13 => '\\\\r',
+                              27 => '\\\\e',
+                              also => '[:cntrl:]',
+                              byte => '\\\\x%02x',
+                              wide => '\\\\x{%04x}'},
+        false            => "''",
+        format           => "format UNKNOWN =\\n.\\n",
+        hash_ref         => '{$_}',
+        infinite         => "'inf'",
+        io               => '*$name{IO}',
+        keyfilter        => undef,
+        keyfilterdefault => 1,
+        keysort          => \\&Datify::keysort,
+        keywords         => ['undef'],
+        list             => '($_)',
+        list_sep         => ', ',
+        longstr          => 1_000,
+        lvalue           => 'substr($lvalue, 0)',
+        name             => '$self',
+        nested           => '$referent$place',
+        nonnumber        => "'nan'",
+        null             => 'undef',
+        num_sep          => '_',
+        object           => 'bless($data, $class_str)',
+        overloads        => ['""', '0+'],
+        pair             => '$key => $value',
+        q1               => 'q',
+        q2               => 'qq',
+        q3               => 'qr',
+        qpairs           => ['()', '<>', '[]', '{}'],
+        qquotes          => ['!', '#', '%', '&', '*',
+                             '+', ',', '-', '.', '/',
+                             ':', ';', '=', '?', '^',
+                             '|', '~', '$', '@', '`'],
+        quote            => undef,
+        quote1           => "'",
+        quote2           => '"',
+        quote3           => '/',
+        reference        => '\\\\$_',
+        sigils           => '$@',
+        true             => 1,
+        vformat          => 'v%vd'
+    )
+});
 
 format EMPTY_FORMAT =
 .
@@ -71,18 +87,28 @@ my @specials = (
     '{hash => 1}'     => { hash  => 1 }   => 'hash ref',
     "\\substr('', 0)" => \substr('', 0)   => 'lvalue ref',
     'qr/(?^:\s*)/'    => qr/\s*/          => 'regexp',
-    '\\v99.98.97'     => \v99.98.97       => 'vstring ref',
+    'v99.98.97'       => v99.98.97        => 'vstring',
 
-    q!bless(*STDOUT{IO}, 'IO::File')! => *STDOUT{IO}   => 'IO',
-    "bless({$datify}, 'Datify')"      => Datify->new() => 'object',
+    q!bless(*STDOUT{IO}, 'IO::File')! => *STDOUT{IO} => 'IO',
+
+    "bless({}, 'Datify')"
+        => Datify->new()
+        => 'simple Datify object',
+    "bless({$datify}, 'Datify')"
+        => Datify->new( Datify->get )
+        => 'complete Datify object',
 
     "format UNKNOWN =\n.\n" => *EMPTY_FORMAT{FORMAT} => 'format ref',
 );
-foreach my $stingified (qw( [] {} 'string' 123 456.78 )) {
-    my $thing = eval $stingified;
+foreach my $stringified (qw( [] {} 'string' 123 456.78 )) {
+    my $thing = eval $stringified;
     my $ref   = ref($thing);
-    my $repr  = $stingified;
+    my $repr  = $stringified;
     if ( !$ref ) {
+        $ref
+            = $thing =~ /\./ ? 'Float'
+            : $thing =~ /\d/ ? 'Integer'
+            :                  'String';
         $thing = \do { 1; $thing };
         $repr = '\\' . $repr;
     }

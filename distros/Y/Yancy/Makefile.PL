@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "JSON::Validator" => "3.02",
     "Mojolicious" => "7.79",
-    "Mojolicious::Plugin::OpenAPI" => "2.08",
+    "Mojolicious::Plugin::OpenAPI" => "2.12",
     "Role::Tiny" => "2.000001",
     "Scalar::Util" => 0,
     "Sys::Hostname" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "1.022",
+  "VERSION" => "1.023",
   "test" => {
     "TESTS" => "t/*.t t/backend/*.t t/controller/*.t t/examples/*.t t/plugin/auth/*.t t/plugin/form/*.t"
   }
@@ -64,7 +64,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "JSON::Validator" => "3.02",
   "Mojolicious" => "7.79",
-  "Mojolicious::Plugin::OpenAPI" => "2.08",
+  "Mojolicious::Plugin::OpenAPI" => "2.12",
   "Role::Tiny" => "2.000001",
   "Scalar::Util" => 0,
   "Sys::Hostname" => 0,

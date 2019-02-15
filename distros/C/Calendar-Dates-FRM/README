@@ -2,8 +2,8 @@ NAME
     Calendar::Dates::FRM - FRM exam calendar
 
 VERSION
-    This document describes version 0.003 of Calendar::Dates::FRM (from Perl
-    distribution Calendar-Dates-FRM), released on 2019-02-14.
+    This document describes version 0.005 of Calendar::Dates::FRM (from Perl
+    distribution Calendar-Dates-FRM), released on 2019-02-15.
 
 SYNOPSIS
   Using from Perl

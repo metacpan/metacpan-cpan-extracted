@@ -1,38 +1,65 @@
-use v5.18;
+use v5.14;
 use warnings;
 
-package Datify::Path;
+package Datify::Path v0.19.045;
 # ABSTRACT: Describe structures like filesystem paths.
-our $VERSION = 'v0.18.270'; # VERSION
+# VERSION
 
-use Datify;
-use String::Tools qw(subst);
+use Carp            ();    #qw( carp croak );
+use Datify          ();    #qw( self );
+use Scalar::Util    ();    #qw( blessed refaddr reftype );
+use String::Tools qw( subst );
 
-our %SETTINGS = (
-    list_count     => '[$i/$n]',
-    path_separator => '/',
-    statement      => '$key = $value',
-);
+our %SETTINGS = ();
 
 ### Public methods ###
 
+
+
 sub new {
-    my $self = shift || __PACKAGE__;
-    if ( my $class = ref $self ) {
-        return bless { %$self,    @_, }, $class;
+    my $class = shift || __PACKAGE__;
+
+    my %self = ();
+    if ( defined( my $blessed = Scalar::Util::blessed($class) ) ) {
+        %self  = %$class;    # shallow copy
+        $class = $blessed;
+    }
+    return @_ ? bless( \%self, $class )->set(@_) : bless( \%self, $class );
+}
+
+
+
+sub get {
+    my $self = shift;
+    my $count = scalar(@_);
+
+    if ( defined( Scalar::Util::blessed($self) ) ) {
+        return
+              $count == 0 ? %{ { %SETTINGS, %$self } }
+            : $count == 1 ?
+                exists  $self->{ $_[0] }
+                    ?   $self->{ $_[0] }
+                    : $SETTINGS{ $_[0] }
+            : map { exists $self->{$_} ? $self->{$_} : $SETTINGS{$_} } @_;
     } else {
-        return bless { %SETTINGS, @_, }, $self;
+        return
+              $count == 0 ? %SETTINGS
+            : $count == 1 ? $SETTINGS{ $_[0] }
+            :               @SETTINGS{@_};
     }
 }
 
+
+
 sub set {
     my $self = shift;
+    return $self unless @_;
     my %set  = @_;
 
     my $return;
     my $class;
-    if ( $class = ref $self ) {
-        # Make a copy
+    if ( defined( $class = Scalar::Util::blessed($self) ) ) {
+        # Make a shallow copy
         $self   = bless { %$self }, $class;
         $return = 0;
     } else {
@@ -41,104 +68,269 @@ sub set {
         $return = 1;
     }
 
-    %$self = ( %$self, %set );
+
+
+
+    my $internal = $class->isa( scalar caller );
+    while ( my ( $k, $v ) = each %set ) {
+        Carp::carp( 'Unknown key ', $k )
+            unless $internal
+            || exists $self->{$k}
+            || exists $SETTINGS{$k};
+        $self->{$k} = $v;
+    }
 
     return ( $self, $class )[$return];
 }
 
-sub pathify {
-    my $self = shift; $self = $self->new() unless ref $self;
 
-    my $wantarray = wantarray;
-    return unless defined $wantarray;
-    return $wantarray
-        ?   map $self->_flatten, $self->_pathify(@_)
-        : [ map $self->_flatten, $self->_pathify(@_) ];
+
+sub exists {
+    my $self = shift;
+    return unless my $count = scalar(@_);
+
+    if ( Scalar::Util::blessed($self) ) {
+        return $count == 1
+            ? do {  exists $self->{ $_[0] } || exists $SETTINGS{ $_[0] } }
+            : map { exists $self->{ $_ }    || exists $SETTINGS{ $_ } } @_;
+    } else {
+        return
+            $count == 1 ? exists $SETTINGS{ $_[0] }
+            :       map { exists $SETTINGS{ $_ } } @_;
+    }
+}
+
+
+
+sub pathify {
+    return unless defined( my $wantarray = wantarray );
+    my $self = &Datify::self;
+    local $_ = @_ == 0 ? $_ : @_ == 1 ? shift : \@_;
+
+    my $values = $self->_cache_get($_) // [ $self->_scalar($_) ];
+    if ( $self->isa( scalar caller ) ) {
+        $self->_cache_add( $_ => $values );
+    } else {
+        $values = [ map $self->_flatten, @$values ];
+        $self->_cache_reset();
+    }
+    return $wantarray ? @$values : $values;
 }
 
 ### Private methods ###
 
-sub _pathify {
-    my $self = shift; $self = $self->new() unless ref $self;
-    my $s    = 1 == @_ ? shift : \@_;
-    return undef unless defined $s;
-    my $ref = ref $s;
+__PACKAGE__->set(
+    datify_options => {},
+);
 
-    if      ( 'ARRAY'  eq $ref ) {
-        return $self->_pathify_array($s);
-    } elsif ( 'HASH'   eq $ref ) {
-        return $self->_pathify_hash($s);
-    #} elsif ( 'REF'    eq $ref ) {
-    #   TODO
-    #    return $self->_pathify_ref($s);
-    #} elsif ( 'SCALAR' eq $ref ) {
-    #   TODO
-    #    return $self->_pathify_scalar($s);
-    } elsif ( not $ref ) {
-        return $s;
-    } else {
-        # Hopefully it has stringification overload.
-        return "$s";
-        #die 'Cannot handle ' . $ref;
+sub _datify {
+    my $self = &Datify::self;
+    my $datify = $self->get('_datify');
+    if ( not $datify ) {
+        $datify = Datify->new( %{ $self->get('datify_options') // {} } );
+        $self->set( _datify => $datify );
     }
+    return $datify;
 }
 
-sub _pathify_array {
-    my $self  = shift; $self = $self->new() unless ref $self;
-    my $array = shift;
-
-    my $size = Datify->numify( scalar @$array );
-    return [ subst( $self->{list_count}, i => 0, n => 0 ), undef ]
-        if ( $size eq '0' );
-
-    my $format = subst(
-        $self->{list_count},
-        i => '%' . length($size) . 's',
-        n => $size
-    );
-
-    my @structure;
-    while ( my ( $i, $v ) = each @$array ) {
-        my $key = sprintf( $format, Datify->numify( 1 + $i ) );
-        push @structure, map { [ $key, $_ ] } $self->_pathify($v);
-    }
-    return @structure;
-}
-
-sub _pathify_hash {
-    my $self = shift; $self = $self->new() unless ref $self;
-    my $hash = shift;
-
-    return [ $self->{path_separator}, undef ] if ( 0 == scalar keys %$hash );
-
-    my @structure;
-    foreach my $k ( sort Datify::keysort keys(%$hash) ) {
-        my $key = $self->{path_separator} . Datify->keyify($k);
-        push @structure,
-            map { [ $key, $_ ] } $self->_pathify( $hash->{$k} );
-    }
-    return @structure;
-}
+__PACKAGE__->set(
+    statement      => '$key = $value',
+);
 
 sub _flatten {
-    my $self = shift; $self = $self->new() unless ref $self;
-    my ( $key, $value ) = @{ @_ ? $_[0] : $_ };
+    my $self = &Datify::self;
+    local $_ = shift if @_;
+    my $ref = Scalar::Util::reftype($_);
+    my ( $key, $value ) = $ref && $ref eq 'ARRAY' ? @$_ : ($_);
 
     if ( defined $value ) {
-        if ( ref $value ) {
-            # Assuming it's an ARRAY
-            return $key . $self->_flatten($value);
-        } else {
+        $ref = Scalar::Util::reftype($value);
+        my $statement = $self->get('statement');
+        if ( not $ref ) {
             return subst(
-                $self->{statement},
+                $statement,
                 key   => $key,
-                value => Datify->keyify($value)
+                value => $self->_datify->keyify($value)
             );
+        } elsif ( $ref eq 'ARRAY' ) {
+            return $key . $self->_flatten($value);
+        #} elsif ( $ref eq 'HASH' ) {
+        #    return subst(
+        #        $self->get('object'),
+        #        class => $value->{class},
+        #        key   => $key,
+        #        value => $value->{value}
+        #    );
+        } elsif ( $ref eq 'SCALAR' ) {
+            return subst(
+                $statement,
+                key   => $key,
+                value => $$value
+            );
+        } else {
+            die 'Unsure of how to handle ', $ref;
         }
     } else {
         return $key;
     }
 }
+
+__PACKAGE__->set(
+    list_count     => '[$i/$n]',
+);
+
+sub _array {
+    my $self = &Datify::self;
+    local $_ = shift if @_;
+
+    my $datify     = $self->_datify;
+    my $list_count = $self->get('list_count');
+    my $size       = $datify->numify( scalar @$_ );
+    return [ subst( $list_count, i => 0, n => 0 ), undef ]
+        if ( $size eq '0' );
+
+    my $format = subst(
+        $list_count,
+        i => '%' . length($size) . 's',
+        n => $size
+    );
+
+    my @structure;
+    while ( my ( $i, $v ) = each @$_ ) {
+        my $key = sprintf( $format, $datify->numify( 1 + $i ) );
+        $self->_push_position($key);
+        push @structure, map { [ $key, $_ ] } $self->pathify($v);
+        $self->_pop_position();
+    }
+    return @structure;
+}
+
+__PACKAGE__->set(
+    path_separator => '/',
+);
+
+sub _hash {
+    my $self = &Datify::self;
+    local $_ = shift if @_;
+
+    my $path_separator = $self->get('path_separator');
+    return [ $path_separator, undef ]
+        if ( 0 == scalar keys %$_ );
+
+    my $datify = $self->_datify;
+    my @structure;
+    foreach my $k ( $datify->hashkeys($_) ) {
+        my $key = $path_separator . $datify->keyify($k);
+        $self->_push_position($key);
+        push @structure, map { [ $key, $_ ] } $self->pathify( $_->{$k} );
+        $self->_pop_position();
+    }
+    return @structure;
+}
+
+# TODO:
+#{
+#    foo => bless(
+#        {
+#            alpha   => {},
+#            bravo   => [],
+#            charlie => 123,
+#        },
+#        'Foo::Bar'
+#    )
+#}
+#   /foo/Foo::Bar=alpha/
+#   /foo/Foo::Bar=bravo[0/0]
+#   /foo/Foo::Bar=charlie = 123
+#sub _object {
+#}
+
+sub _scalar {
+    my $self = &Datify::self;
+    local $_ = shift if @_;
+
+    return undef unless defined;
+
+    #if ( defined( my $blessed = Scalar::Util::blessed($_) ) ) {
+    #    return $blessed eq 'Regexp' ? $self->_scalar("$_")
+    #                                : $self->_object($_);
+    #}
+
+    my $ref = Scalar::Util::reftype $_;
+    return
+          not($ref)        ? $_
+        : $ref eq 'ARRAY'  ? $self->_array($_)
+        : $ref eq 'HASH'   ? $self->_hash($_)
+        : $ref eq 'REGEXP' ? $self->_scalarify("$_")
+        : $ref eq 'SCALAR' ? $self->_scalarify($$_)
+        : $ref eq 'REF' && 'REF' ne Scalar::Util::reftype($$_)
+                           ? $self->pathify($$_)
+        :                    die 'Cannot handle ', $ref;
+}
+
+__PACKAGE__->set(
+    _cache_hit => 1,
+    nested     => '$key$subkey',
+);
+
+sub _push_position {
+    my $self     = shift;
+    my $position = shift;
+    push @{ $self->{_position} //= [] }, $position;
+    return $self;
+}
+sub _pop_position {
+    my $self = shift;
+    return pop @{ $self->{_position} };
+}
+sub _position {
+    my $self = shift;
+
+    my $nest = $self->get('nested');
+    my $pos  = List::Util::reduce(
+        sub { subst( $nest, key => $a, subkey => $b ) },
+            @{ $self->{_position} //= [] }
+    );
+    return $pos // '';
+}
+sub _cache_add {
+    my $self  = shift;
+    my $ref   = shift;
+    my $value = shift;
+
+    return $self unless my $refaddr = Scalar::Util::refaddr $ref;
+    my $_cache = $self->{_cache} //= {};
+    my $entry = $_cache->{$refaddr} //= [ [ \$self->_position ] ];
+    push @$entry, $value if @$entry == $self->get('_cache_hit');
+
+    return $self;
+}
+sub _cache_get {
+    my $self = shift;
+    my $item = shift;
+
+    return unless my $refaddr = Scalar::Util::refaddr $item;
+
+    my $_cache = $self->{_cache} //= {};
+    if ( my $entry = $_cache->{$refaddr} ) {
+        my $repr = $self->get('_cache_hit');
+        return $entry->[$repr]
+            // Carp::croak 'Recursive structures not allowed at ',
+                           $self->_position;
+    } else {
+        # Pre-populate the cache, so that we can check for loops
+        $_cache->{$refaddr} = [ [ \$self->_position ] ];
+        return;
+    }
+}
+sub _cache_reset {
+    my $self = shift;
+    %{ $self->{_cache} //= {} } = ();
+    delete $self->{_datify};
+    return $self;
+}
+
+
 
 1;
 
@@ -149,6 +341,44 @@ sub _flatten {
 =head1 NAME
 
 Datify::Path - Describe structures like filesystem paths.
+
+=head1 METHODS
+
+=head2 C<< new( name => value, name => value, ... ) >>
+
+Create a C<Datify::Path> object with the following options.
+
+See L</OPTIONS> for a description of the options and their default values.
+
+=head2 C<get( name, name, ... )>
+
+Get one or more existing values for one or more settings.
+If passed no names, returns all parameters and values.
+
+Can be called as a class method or an object method.
+
+=head2 C<< set( name => value, name => value, ... ) >>
+
+Change the L</OPTIONS> settings.
+When called as a class method, changes default options.
+When called as an object method, changes the settings and returns a
+new object.
+
+See L</OPTIONS> for a description of the options and their default values.
+
+B<NOTE:> When called as a object method, this returns a new instance
+with the values set, so you will need to capture the return if you'd like to
+persist the change:
+
+ $datify = $datify->set( ... );
+
+=head2 exists( name, name, ... )
+
+Determine if values exists for one or more settings.
+
+Can be called as a class method or an object method.
+
+=head2 pathify( ... )
 
 =head1 BUGS
 
@@ -161,7 +391,7 @@ feature.
 
 =head1 VERSION
 
-version v0.18.270
+This document describes version v0.19.045 of this module.
 
 =head1 AUTHOR
 
@@ -169,7 +399,7 @@ Bob Kleemann <bobk@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2018 by Bob Kleemann.
+This software is Copyright (c) 2014-2019 by Bob Kleemann.
 
 This is free software, licensed under:
 

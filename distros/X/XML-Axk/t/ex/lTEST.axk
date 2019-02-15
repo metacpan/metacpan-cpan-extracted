@@ -1,0 +1,10 @@
+#!axk -LTEST
+
+Some random text that isn't valid Perl!
+(*!@&$(*#O!@UJJ(O@()@)(
+
+-L1
+
+say "In L1 at ", __FILE__, ':', __LINE__;
+
+# vi: set ts=4 sts=4 sw=4 et ai ft=perl: #

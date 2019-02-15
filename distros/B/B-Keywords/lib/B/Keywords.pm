@@ -14,7 +14,7 @@ use vars qw( @EXPORT_OK %EXPORT_TAGS );
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use vars '$VERSION';
-$VERSION = '1.19';
+$VERSION = '1.20';
 my $CPERL = $^V =~ /c$/ ? 1 : 0;
 
 use vars '@Scalars';
@@ -189,6 +189,9 @@ use vars '@Functions';
     exists
     exit
     exp ),
+  ($] >= 5.029 && $CPERL ? qw(
+    extern
+  ) : ()),
   ($] >= 5.015008 ? qw(
     fc
   ) : ()), qw(
@@ -611,7 +614,7 @@ for patches and releases.
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2009 Joshua ben Jore, All rights reserved.
-Copyright 2013, 2015, 2017, 2018 Reini Urban, All rights reserved.
+Copyright 2013, 2015, 2017-2019 Reini Urban, All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of either:

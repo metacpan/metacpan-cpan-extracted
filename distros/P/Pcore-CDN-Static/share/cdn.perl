@@ -11,7 +11,7 @@
 
     # FontAwesome
     fa5 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v5.7.1 );
+        my $ver = version->parse( $args->{ver} // v5.7.2 );
 
         state $native_prefix = 'https://use.fontawesome.com/releases';
 
@@ -51,7 +51,7 @@
 
     # froala, https://www.froala.com/wysiwyg-editor
     froala2 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v2.9.2 );
+        my $ver = version->parse( $args->{ver} // v2.9.3 );
 
         if (wantarray) {
             my @res;
@@ -89,7 +89,7 @@
 
     # amCharts4
     amcharts4 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.1.6 );
+        my $ver = version->parse( $args->{ver} // v4.1.8 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4';
 

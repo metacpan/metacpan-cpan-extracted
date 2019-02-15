@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 use utf8;
 
 # Class for $PPR::ERROR objects...
@@ -257,7 +257,7 @@ our $GRAMMAR = qr{
         )*+
     ) # End of rule
 
-    (?<PerlScalarExpr>
+    (?<PerlScalarExpression>
     (?<PerlConditionalExpression>
         (?>(?&PerlBinaryExpression))
         (?:
@@ -1918,7 +1918,7 @@ PPR - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR version 0.000022
+This document describes PPR version 0.000023
 
 
 =head1 SYNOPSIS

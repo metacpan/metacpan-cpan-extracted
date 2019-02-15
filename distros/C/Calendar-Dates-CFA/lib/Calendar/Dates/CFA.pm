@@ -1,7 +1,7 @@
 package Calendar::Dates::CFA;
 
-our $DATE = '2019-02-14'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-02-15'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,39 +9,11 @@ use warnings;
 
 use Role::Tiny::With;
 
-with 'Calendar::DatesRoles::FromData';
-
-our @ENTRIES = (
-    # dec2018exam
-    {date=>'2019-01-23', summary=>'Exam results announcement (Dec 2018, Levels I & II)', tags=>['dec2018exam']},
-
-    # jun2019exam
-    {date=>'2018-10-15', summary=>'First deadline to request disability accommodations', tags=>['jun2019exam']},
-    {date=>'2018-10-17', summary=>'Early registration fee deadline', tags=>['jun2019exam']},
-    {date=>'2019-02-13', summary=>'Standard registration fee deadline', tags=>['jun2019exam']},
-    {date=>'2019-02-18', summary=>'Second deadline to request disability accommodations', tags=>['jun2019exam']},
-    {date=>'2019-03-13', summary=>'Final (late) registration fee deadline', tags=>['jun2019exam']},
-    {date=>'2019-03-18', summary=>'Final deadline to request disability accommodations', tags=>['jun2019exam']},
-    # mid-may 2019, admission tickets available
-    {date=>'2019-06-11', summary=>'Deadline for submission of test center change requests', tags=>['jun2019exam']},
-    {date=>'2019-06-15', summary=>'Exam day: Asia-Pacific (Levels II & III); Americas and EMEA (all levels)', tags=>['jun2019exam']},
-    {date=>'2019-06-16', summary=>'Exam day: Asia-Pacific (Level I only)', tags=>['jun2019exam']},
-    {date=>'2019-06-16', summary=>'Religious alternate exam date (Americas and EMEA, all levels)', tags=>['jun2019exam']},
-    {date=>'2019-06-17', summary=>'Religious alternate exam date (Asia Pacific, all levels)', tags=>['jun2019exam']},
-    # TODO: result announcement
-
-    # dec2019exam
-    {date=>'2019-01-24', summary=>'Exam registration open', tags=>['dec2019exam']},
-    {date=>'2019-03-27', summary=>'Early registration fee deadline', tags=>['dec2019exam']},
-    {date=>'2019-08-14', summary=>'Standard registration fee deadline', tags=>['dec2019exam']},
-    {date=>'2019-09-11', summary=>'Final (late) registration fee deadline', tags=>['dec2019exam']},
-    {date=>'2019-12-07', summary=>'Exam day', tags=>['dec2019exam']},
-);
+with 'Calendar::DatesRoles::DataPreparer::CalendarVar::FromData';
+with 'Calendar::DatesRoles::DataUser::CalendarVar';
 
 1;
 # ABSTRACT: CFA exam calendar
-
-__END__
 
 =pod
 
@@ -53,7 +25,7 @@ Calendar::Dates::CFA - CFA exam calendar
 
 =head1 VERSION
 
-This document describes version 0.003 of Calendar::Dates::CFA (from Perl distribution Calendar-Dates-CFA), released on 2019-02-14.
+This document describes version 0.005 of Calendar::Dates::CFA (from Perl distribution Calendar-Dates-CFA), released on 2019-02-15.
 
 =head1 SYNOPSIS
 
@@ -119,7 +91,7 @@ C<$entries> result:
      date    => "2019-06-15",
      day     => 15,
      month   => 6,
-     summary => "Exam day: Asia-Pacific (Levels II & III); Americas and EMEA (all levels)",
+     summary => "Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels)",
      tags    => ["jun2019exam"],
      year    => 2019,
    },
@@ -229,7 +201,7 @@ Entries for year 2019:
  | 2019-03-13 | 13  | 3     | Final (late) registration fee deadline                                   | jun2019exam | 2019 |
  | 2019-03-18 | 18  | 3     | Final deadline to request disability accommodations                      | jun2019exam | 2019 |
  | 2019-06-11 | 11  | 6     | Deadline for submission of test center change requests                   | jun2019exam | 2019 |
- | 2019-06-15 | 15  | 6     | Exam day: Asia-Pacific (Levels II & III); Americas and EMEA (all levels) | jun2019exam | 2019 |
+ | 2019-06-15 | 15  | 6     | Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels) | jun2019exam | 2019 |
  | 2019-06-16 | 16  | 6     | Exam day: Asia-Pacific (Level I only)                                    | jun2019exam | 2019 |
  | 2019-06-16 | 16  | 6     | Religious alternate exam date (Americas and EMEA, all levels)            | jun2019exam | 2019 |
  | 2019-06-17 | 17  | 6     | Religious alternate exam date (Asia Pacific, all levels)                 | jun2019exam | 2019 |
@@ -280,3 +252,29 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__DATA__
+# dec2018exam
+2019-01-23;Exam results announcement (Dec 2018, Levels I & II);dec2018exam
+
+# jun2019exam
+2018-10-15;First deadline to request disability accommodations;jun2019exam
+2018-10-17;Early registration fee deadline;jun2019exam
+2019-02-13;Standard registration fee deadline;jun2019exam
+2019-02-18;Second deadline to request disability accommodations;jun2019exam
+2019-03-13;Final (late) registration fee deadline;jun2019exam
+2019-03-18;Final deadline to request disability accommodations;jun2019exam
+# mid-may 2019, admission tickets available
+2019-06-11;Deadline for submission of test center change requests;jun2019exam
+2019-06-15;Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels);jun2019exam
+2019-06-16;Exam day: Asia-Pacific (Level I only);jun2019exam
+2019-06-16;Religious alternate exam date (Americas and EMEA, all levels);jun2019exam
+2019-06-17;Religious alternate exam date (Asia Pacific, all levels);jun2019exam
+# TODO: result announcement
+
+# dec2019exam
+2019-01-24;Exam registration open;dec2019exam
+2019-03-27;Early registration fee deadline;dec2019exam
+2019-08-14;Standard registration fee deadline;dec2019exam
+2019-09-11;Final (late) registration fee deadline;dec2019exam
+2019-12-07;Exam day;dec2019exam

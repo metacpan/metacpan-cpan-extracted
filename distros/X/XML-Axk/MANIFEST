@@ -1,0 +1,46 @@
+bin/axk
+Changes
+lib/XML/Axk.pm
+lib/XML/Axk/App.pm
+lib/XML/Axk/Base.pm
+lib/XML/Axk/Core.pm
+lib/XML/Axk/DOM.pm
+lib/XML/Axk/L/L0.pm
+lib/XML/Axk/L/L1.pm
+lib/XML/Axk/L/LTEST.pm
+lib/XML/Axk/Language.pm
+lib/XML/Axk/Matcher/Always.pm
+lib/XML/Axk/Matcher/XPath.pm
+lib/XML/Axk/Object/TinyDefaults.pm
+lib/XML/Axk/Preparse.pm
+lib/XML/Axk/Sandbox.pm
+lib/XML/Axk/SAX/BuildDOM2.pm
+lib/XML/Axk/SAX/Handler.pm
+lib/XML/Axk/SAX/Runner.pm
+lib/XML/Axk/Vars/Array.pm
+lib/XML/Axk/Vars/Scalar.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/01-preparse.t
+t/02-basic-app.t
+t/02-basic-core.t
+t/04-languages.t
+t/06-class-tests.t
+t/ex/02-noL.axk
+t/ex/02.axk
+t/ex/1.axk
+t/ex/ex1.xml
+t/ex/lTEST.axk
+t/ex/nutrition.xml
+t/ex/oneliner
+t/ex/xml1.axk
+t/lib/AxkTest.pm
+t/lib/AxkTest/Helpers.pm
+t/tests/L1.pm
+t/tests/TinyDefaults.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -29,7 +29,7 @@ use Yancy::Util qw( load_backend );
 use Yancy::Backend::Test;
 use JSON::Validator;
 
-our @EXPORT_OK = qw( test_backend init_backend );
+our @EXPORT_OK = qw( test_backend init_backend backend_common );
 
 =sub init_backend
 
@@ -82,7 +82,6 @@ END {
 %Yancy::Backend::Test::SCHEMA = (
     blog => {
         type => 'object',
-        required => [qw( id )],
         properties => {
             id => {
               'x-order' => 1,
@@ -208,7 +207,7 @@ is values the newly-create object will be set to, before being deleted.
 =cut
 
 sub test_backend {
-    my ( $be, $coll_name, $coll_conf, $list, $create, $set_to ) = @_;
+    my ( $be, $coll_name, $coll_conf, $list_key, $list, $create, $create_overlay, $set_to ) = @_;
     my $id_field = $coll_conf->{ 'x-id-field' } || 'id';
     my $tb = Test::Builder->new();
 
@@ -262,13 +261,10 @@ sub test_backend {
             name => 'list with search equals is correct',
             method => 'list',
             do {
-                my $key = $list->[0]{name} ? 'name'
-                        : $list->[0]{username} ? 'username'
-                        : die "Can't find column for search (name, username)";
-                my $value = $list->[0]{ $key };
-                my @expect_list = grep { $_->{ $key } eq $value } @{ $list };
+                my $value = $list->[0]{ $list_key };
+                my @expect_list = grep { $_->{ $list_key } eq $value } @{ $list };
                 (
-                    args => [ $coll_name, { $key => $value } ],
+                    args => [ $coll_name, { $list_key => $value } ],
                     expect => { items => \@expect_list, total => scalar @expect_list },
                 );
             },
@@ -278,14 +274,11 @@ sub test_backend {
             name => 'list with search starts with is correct',
             method => 'list',
             do {
-                my $key = $list->[0]{name} ? 'name'
-                        : $list->[0]{username} ? 'username'
-                        : die "Can't find column for search (name, username)";
-                my $value = substr $list->[0]{ $key }, 0, 4;
-                my @expect_list = grep { $_->{ $key } =~ /^$value/ } @{ $list };
+                my $value = substr $list->[0]{ $list_key }, 0, 4;
+                my @expect_list = grep { $_->{ $list_key } =~ /^$value/ } @{ $list };
                 $value .= '%';
                 (
-                    args => [ $coll_name, { $key => { like => $value } } ],
+                    args => [ $coll_name, { $list_key => { like => $value } } ],
                     expect => { items => \@expect_list, total => scalar @expect_list },
                 );
             },
@@ -295,14 +288,11 @@ sub test_backend {
             name => 'list with search ends with is correct',
             method => 'list',
             do {
-                my $key = $list->[0]{name} ? 'name'
-                        : $list->[0]{username} ? 'username'
-                        : die "Can't find column for search (name, username)";
-                my $value = substr $list->[0]{ $key }, -4;
-                my @expect_list = grep { $_->{ $key } =~ /$value$/ } @{ $list };
+                my $value = substr $list->[0]{ $list_key }, -4;
+                my @expect_list = grep { $_->{ $list_key } =~ /$value$/ } @{ $list };
                 $value = '%' . $value;
                 (
-                    args => [ $coll_name, { $key => { like => $value } } ],
+                    args => [ $coll_name, { $list_key => { like => $value } } ],
                     expect => { items => \@expect_list, total => scalar @expect_list },
                 );
             },
@@ -312,12 +302,9 @@ sub test_backend {
             name => 'list with order by asc is correct',
             method => 'list',
             do {
-                my $key = $list->[0]{name} ? 'name'
-                        : $list->[0]{username} ? 'username'
-                        : die "Can't find column for search (name, username)";
-                my @expect_list = sort { $a->{ $key } cmp $b->{ $key } } @{ $list };
+                my @expect_list = sort { $a->{ $list_key } cmp $b->{ $list_key } } @{ $list };
                 (
-                    args => [ $coll_name, {}, { order_by => { -asc => $key } } ],
+                    args => [ $coll_name, {}, { order_by => { -asc => $list_key } } ],
                     expect => { items => \@expect_list, total => scalar @expect_list },
                 );
             },
@@ -327,12 +314,9 @@ sub test_backend {
             name => 'list with order by name is correct',
             method => 'list',
             do {
-                my $key = $list->[0]{name} ? 'name'
-                        : $list->[0]{username} ? 'username'
-                        : die "Can't find column for search (name, username)";
-                my @expect_list = sort { $b->{ $key } cmp $a->{ $key } } @{ $list };
+                my @expect_list = sort { $b->{ $list_key } cmp $a->{ $list_key } } @{ $list };
                 (
-                    args => [ $coll_name, {}, { order_by => { -desc => $key } } ],
+                    args => [ $coll_name, {}, { order_by => { -desc => $list_key } } ],
                     expect => { items => \@expect_list, total => scalar @expect_list },
                 );
             },
@@ -352,7 +336,7 @@ sub test_backend {
             test => sub {
                 my ( $got_id ) = @_;
                 Test::More::ok( $got_id, 'create() returns ID' );
-                $create->{ $id_field } = $got_id;
+                $create = { %$create, $id_field => $got_id, %$create_overlay };
                 $be->get_p( $coll_name, $got_id )->then( sub {
                     my ( $got ) = @_;
                     Test::More::is_deeply( $got, $create, 'created item correct' )
@@ -436,10 +420,17 @@ sub test_backend {
 
     $run_tests->( sub {
         my ( $cb, $method, $name, @args ) = @_;
-        $tb->subtest( $method . ' (async, promises)' => sub {
+        $tb->subtest( $name . ' (async, promises)' => sub {
             my $async_method = $method . "_p";
             my $promise = $be->$async_method( @args );
-            $promise->then( $cb, sub { Test::More::fail( 'Promise rejected' ) } );
+            $promise->then(
+                $cb,
+                sub {
+                    Test::More::fail(
+                        'Promise rejected: ' . join '', Test::More::explain( \@_ )
+                    )
+                },
+            );
             $promise->wait;
         } );
     } );
@@ -453,24 +444,38 @@ sub test_backend {
                     id => { type => 'integer', 'x-order' => 1 },
                     name => { type => 'string', 'x-order' => 2 },
                     email => { type => [ 'string', 'null' ], 'x-order' => 3 },
+                    age => { type => [ 'integer', 'null' ], 'x-order' => 4 },
+                    contact => { type => [ 'boolean', 'null' ], 'x-order' => 5 },
+                    phone => { type => [ 'string', 'null' ], 'x-order' => 6 },
                 },
             },
             user => {
-                required => [qw( username email )],
-                'x-id-field' => 'username',
+                required => [qw( username email password )],
                 properties => {
-                    username => { type => 'string', 'x-order' => 1 },
-                    email => { type => 'string', 'x-order' => 2 },
+                    id => { type => 'integer', 'x-order' => 1 },
+                    username => { type => 'string', 'x-order' => 2 },
+                    email => { type => 'string', 'x-order' => 3 },
+                    password => { type => 'string', 'x-order' => 4 },
                     access => {
                         type => 'string',
                         enum => [qw( user moderator admin )],
-                        'x-order' => 3,
+                        'x-order' => 5,
                     },
-                    created => {
-                        type => [ 'string', 'null' ],
-                        format => 'date-time',
-                        'x-order' => 4,
+                    age => {
+                        type => [ 'integer', 'null' ],
+                        'x-order' => 6,
                     },
+                },
+            },
+            blog => {
+                properties => {
+                    id => { type => 'integer', 'x-order' => 1 },
+                    user_id => { type => [ 'integer', 'null' ], 'x-order' => 2 },
+                    title => { type => [ 'string', 'null' ], 'x-order' => 3 },
+                    slug => { type => [ 'string', 'null' ], 'x-order' => 4 },
+                    markdown => { type => [ 'string', 'null' ], 'x-order' => 5 },
+                    html => { type => [ 'string', 'null' ], 'x-order' => 6 },
+                    is_published => { type => 'boolean', 'x-order' => 7 },
                 },
             },
             mojo_migrations => {
@@ -487,16 +492,18 @@ sub test_backend {
         # The DBIC backend doesn't ignore modules from read_schema,
         # since people don't create DBIC result classes for things they
         # don't want to interact with...
-        if ( $be->collections->{mojo_migrations}{'x-ignore'} ) {
+        if ( !$got_schema->{mojo_migrations}{'x-ignore'} ) {
             delete $expect_schema->{mojo_migrations}{'x-ignore'};
         }
 
         Test::More::is_deeply(
             $got_schema, $expect_schema, 'schema read from database is correct',
-        );
+        ) or $tb->diag( $tb->explain( $got_schema ) );
 
         $tb->subtest( 'schema validates with JSON::Validator' => sub {
-            my $v = JSON::Validator->new;
+            my $v = JSON::Validator->new(
+                coerce => { booleans => 1, numbers => 1 },
+            );
             $v->formats->{ markdown } = sub { 1 };
             $v->formats->{ tel } = sub { 1 };
             $v->schema( $expect_schema->{ $coll_name } );
@@ -515,6 +522,101 @@ sub test_backend {
 
     });
 
-};
+}
+
+=sub backend_common
+
+    backend_common( $backend, \&insert_item, $collections );
+
+Runs various tests on the given L<Yancy::Backend> instance. The code is
+a backend-specific procedure to create items, probably a closure.
+
+=cut
+
+sub backend_common {
+    my ( $backend, $insert_item, $collections ) = @_;
+    my %person_one = $insert_item->( people =>
+        name => 'person One',
+        email => 'one@example.com',
+        age => undef, contact => undef, phone => undef,
+    );
+    my %person_two = $insert_item->( people =>
+        name => 'person Two',
+        email => 'two@example.com',
+        age => undef, contact => undef, phone => undef,
+    );
+    my %person_three = (
+        name => 'person Three',
+        email => 'three@example.com',
+        age => undef, contact => undef, phone => undef,
+    );
+    Test::More::subtest( 'default id field' => \&test_backend, $backend,
+        people => $collections->{ people }, # Collection
+        'name', # list key
+        [ \%person_one, \%person_two ], # List (already in backend)
+        \%person_three, # Create/Delete test
+        {}, # create overlay
+        { name => 'Set' }, # Set test
+        );
+    my %user_one = $insert_item->( 'user',
+        username => 'one',
+        email => 'one@example.com',
+        access => 'user',
+        password => 'p1',
+        age => undef,
+    );
+    my %user_two = $insert_item->( 'user',
+        username => 'two',
+        email => 'two@example.com',
+        access => 'moderator',
+        password => 'p2',
+        age => undef,
+    );
+    my %user_three = (
+        username => 'three',
+        email => 'three@example.com',
+        access => 'admin',
+        password => 'p3',
+        age => undef,
+    );
+    Test::More::subtest( 'custom id field' => \&test_backend, $backend,
+        user => $collections->{ user }, # Collection
+        'username', # list key
+        [ \%user_one, \%user_two ], # List (already in backend)
+        \%user_three, # Create/Delete test
+        {}, # create overlay
+        { email => 'test@example.com' }, # Set test
+        );
+    my %blog_one = $insert_item->( 'blog',
+        title => 'T 1',
+        user_id => $user_one{id},
+        markdown => '# Super',
+        html => '<h1>Super</h1>',
+        slug => 't-1',
+    );
+    my %blog_two = $insert_item->( 'blog',
+        title => 'T 2',
+        user_id => $user_one{id},
+        markdown => '# Smashing',
+        html => '<h1>Smashing</h1>',
+        slug => 't-2',
+    );
+    $blog_one{is_published} = $blog_two{is_published} = 0;
+    my %blog_three = (
+        title => 'T 3',
+        user_id => $user_two{id},
+        markdown => '# Great',
+        html => '<h1>Great</h1>',
+        slug => 't-3',
+    );
+    Test::More::subtest( 'booleans etc' => \&test_backend, $backend,
+        blog => $collections->{ blog }, # Collection
+        'markdown', # list key
+        [ \%blog_one, \%blog_two ], # List (already in backend)
+        \%blog_three, # Create/Delete test
+        { is_published => 0 }, # create overlay
+        { is_published => 1 }, # Set test
+        );
+}
 
 1;

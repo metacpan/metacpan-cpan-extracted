@@ -2,9 +2,8 @@ use v5.12;
 
 use warnings;
 
-package String::Tools;
+package String::Tools v0.19.045;
 # ABSTRACT: Various tools for manipulating strings.
-our $VERSION = 'v0.18.270'; # VERSION
 
 
 use Exporter 'import';
@@ -16,7 +15,9 @@ our @EXPORT_OK = qw(
     shrink
     stitch
     stitcher
+    stringify
     subst
+    subst_vars
     trim
     trim_lines
 );
@@ -34,30 +35,31 @@ our $THREAD = ' ';
 
 ### Functions ###
 
+sub stringify(_);    # Forward declaration
+
 
 sub define(_) { return $_[0] // !!undef }
 
 
 sub is_blank(_) {
-    local $_ = shift;
-    return 1 unless defined() && length();
-    return /\A$BLANK+\z/;
+    local $_ = &stringify;
+    return not( length() && !/\A$BLANK+\z/ );
 }
 
 
 sub shrink(_) {
-    local $_ = trim(shift);
-    s/$BLANK+/$THREAD/g if defined;
+    local $_ = trim(&stringify);
+    s/$BLANK+/$THREAD/g;
     return $_;
 }
 
 
 sub stitch {
-    local $_;
-    my $str = '';
+    my $str       = '';
     my $was_blank = 1;
 
-    foreach my $s (map define, @_) {
+    local $_;
+    foreach my $s (map stringify, @_) {
         my $is_blank = is_blank($s);
         $str .= $THREAD unless ( $was_blank || $is_blank );
         $str .= $s;
@@ -74,17 +76,33 @@ sub stitcher {
 }
 
 
-sub subst {
-    my $str  = shift;
-    @_ = ( $_ ) if defined($_) && ! @_;
+sub stringify(_) {
+    local ($_) = @_;
 
-    my %subst;
-    if ( 1 == @_ ) {
-        my $ref = ref $_[0];
-        if    ( $ref eq 'HASH' )  { %subst = %{ +shift }     }
-        elsif ( $ref eq 'ARRAY' ) { %subst = @{ +shift }     }
-        else                      { %subst = ( _ => +shift ) }
-    } else { %subst = @_ }
+    return not( defined() ) ? define() : do {
+        my $ref = ref();
+         !$ref                               ?            $_
+        : $ref eq 'ARRAY'                    ?          "@$_"
+        : $ref eq 'HASH'                     ?       "@{[%$_]}"
+        : $ref eq 'REF' && ref($$_) ne 'REF' ? stringify($$_)
+        : $ref eq 'SCALAR'                   ? stringify($$_)
+        :                                                "$_"
+        ;
+    };
+}
+
+
+sub subst {
+    my $str  = stringify( shift );
+    @_ = ( $_ ) if defined($_) && ! @_;
+    my %subst = 1 == @_ ? do {
+            my $ref = ref( $_[0] );
+              not($ref)       ? ( _ => +shift )
+            : $ref eq 'ARRAY' ? @{ +shift }
+            : $ref eq 'HASH'  ? %{ +shift }
+            :                   ( _ => +shift );
+        }
+        : @_;
 
     if (%subst) {
         local $_;
@@ -97,16 +115,25 @@ sub subst {
             )
             . ')\b';
         $str =~ s[\$(?:\{\s*($names)\s*\}|($names))]
-                 [$subst{ $1 // $2 }]g;
+                 [ stringify( $subst{ $1 // $2 } ) ]eg;
     }
 
     return $str;
 }
 
 
+sub subst_vars(_) {
+    local ($_) = &stringify;
+
+    my @vars = /\$(\{\s*$SUBST_VAR\s*\}|$SUBST_VAR\b)/g;
+    my %seen = ();
+    return grep { !$seen{$_}++ }
+        map { trim( $_, qr/\{\s*/, qr/\s*\}/ ) } @vars;
+}
+
+
 sub trim {
-    local $_ = @_ ? shift : $_;
-    return $_ unless defined;
+    local $_ = stringify( @_ ? shift : $_ );
 
     my ( $lead, $rear );
     my $count = scalar @_;
@@ -138,8 +165,7 @@ sub trim {
 
 
 sub trim_lines {
-    local $_ = @_ ? shift : $_;
-    return $_ unless defined;
+    local $_ = stringify( @_ ? shift : $_ );
 
     my ( $lead, $rear );
     my $count = scalar @_;
@@ -189,7 +215,9 @@ String::Tools - Various tools for manipulating strings.
     shrink
     stitch
     stitcher
+    stringify
     subst
+    subst_vars
     trim
     trim_lines
  );
@@ -334,6 +362,31 @@ L</$THREAD>.
  say stitcher( ' ' => $user, qw( home dir is /home/ ), '', $user );
  # "$user home dir is /home/$user"
 
+=head2 C<stringify( $scalar = $_ )>
+
+Return an intelligently stringified version of C<$scalar>.
+Attempts to avoid returning a string that has the reference name
+and a hexadecimal number:
+C<ARRAY(0xdeadbeef)>, C<My::Package=HASH(0xdeadbeef)>.
+
+If C<$scalar> is undefined,
+returns the result from L</define( $scalar = $_ )>.
+If C<$scalar> is not a reference,
+returns $scalar.
+If C<$scalar> is a reference to an C<ARRAY>,
+returns the stringification of that array (via C<"@$scalar">).
+If C<$scalar> is a reference to a C<HASH>,
+returns the stringification of that hash (via C<"@{[%$scalar]}">).
+If C<$scalar> is a reference to a C<REF>,
+and C<$$scalar> is not reference to a C<REF>,
+calls itself as C<stringify($$scalar)>.
+If C<$scalar> is a reference to a C<SCALAR>,
+calls itself as C<stringify($$scalar)>.
+If C<$scalar> is a reference that is not one of the previously mentioned,
+returns the default stringification (via C<"$scalar">).
+
+Since v0.18.277
+
 =head2 C<< subst( $string ; %variables = ( _ => $_ ) ) >>
 
 Take in C<$string>, and do a search and replace of all the variables named in
@@ -356,6 +409,16 @@ The names in C<%variables> to be replaced in C<$string> must follow a pattern.
 The pattern is available in variable L</C<$SUBST_VAR>>.
 
 Returns the string with substitutions made.
+
+=head2 C<subst_vars( $string = $_ )>
+
+Search C<$string> for things that look like variables to be substituted.
+
+Returns the unique list of variable names found, without the leading
+C<$> or surrounding C<{}>.
+
+ my $string = 'Name is $name, age is $age, birthday is ${ birthday }';
+ my @vars = subst_vars($string);    # 'name', 'age', 'birtday'
 
 =head2 C<trim( $string = $_ ; $l = qr/$BLANK+/ ; $r = $l )>
 
@@ -411,11 +474,13 @@ Nothing?
 
 =head1 SEE ALSO
 
-L<perlfunc/join>, Any templating system.
+C<stitch> is similar to L<perlfunc/join>.
+
+C<subst> is similar to any templating system.
 
 =head1 VERSION
 
-version v0.18.270
+This document describes version v0.19.045 of this module.
 
 =head1 AUTHOR
 
@@ -423,7 +488,7 @@ Bob Kleemann <bobk@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2018 by Bob Kleemann.
+This software is Copyright (c) 2014-2019 by Bob Kleemann.
 
 This is free software, licensed under:
 

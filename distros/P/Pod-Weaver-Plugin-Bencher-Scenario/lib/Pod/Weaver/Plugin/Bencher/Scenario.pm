@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::Bencher::Scenario;
 
-our $DATE = '2017-01-04'; # DATE
-our $VERSION = '0.23'; # VERSION
+our $DATE = '2019-02-15'; # DATE
+our $VERSION = '0.240'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -141,8 +141,9 @@ sub _process_scenario_module {
 
     my $tempdir = File::Temp::tempdir(CLEANUP=>1);
 
+    my $raw_scenario = ${"$package\::scenario"};
     my $scenario = Bencher::Backend::parse_scenario(
-        scenario => ${"$package\::scenario"});
+        scenario => $raw_scenario);
 
     my $scenario_name = $package;
     $scenario_name =~ s/\ABencher::Scenario:://;
@@ -418,12 +419,23 @@ sub _process_scenario_module {
         my @pod;
 
         push @pod, "=over\n\n";
+
         for my $ds (@{ $scenario->{datasets} }) {
             push @pod, "=item * $ds->{name}";
             push @pod, " [".join(", ", @{$ds->{tags}})."]" if $ds->{tags};
             push @pod, "\n\n";
             push @pod, "$ds->{summary}\n\n" if $ds->{summary};
         }
+
+        # also mentions datasets not included by default. get it from the raw
+        # scenario as this is trimmed from the parsed scenario (as to why, i
+        # didn't remember).
+        for my $ds (@{ $raw_scenario->{datasets} }) {
+            next unless defined $ds->{include_by_default} && !$ds->{include_by_default};
+            next unless defined $ds->{name};
+            push @pod, "=item * $ds->{name} (not included by default)\n\n";
+        }
+
         push @pod, "=back\n\n";
 
         $self->add_text_to_section(
@@ -573,7 +585,7 @@ Pod::Weaver::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.23 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2017-01-04.
+This document describes version 0.240 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-02-15.
 
 =head1 SYNOPSIS
 
@@ -707,7 +719,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

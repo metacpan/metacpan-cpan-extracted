@@ -1,0 +1,38 @@
+-L1
+
+pre_all { say "pre_all" };
+pre_file { say "pre_file" };
+post_all { say "post_all" };
+post_file { say "post_file" };
+
+perform { die "** This shouldn't have happened" } never;
+
+perform { say "hi  ", $E->getTagName if $E->can("getTagName"); } always, HI;
+perform { say "bye ", $E->getTagName if $E->can("getTagName"); } always, BYE;
+
+perform {
+    say "Hi, attrname world!";
+} xpath('//item[@attrname="world"]'), HI;
+
+perform {
+    my($at, $v);
+    #say ref $E;
+    $at = $E->getAttributeNode("attrname") if $E->can("getAttributeNode");
+    $v = $at->getValue if $at && $at->can("getValue");
+    say "Bye, item: $v" if $v;
+} xpath("//item"), BYE;
+
+perform {
+    my($at, $v);
+    $at = $E->getAttributeNode("moby") if $E->can("getAttributeNode");
+    $v = $at->getValue if $at && $at->can("getValue");
+    say "Ciao, subitem in the $v moby" if $v;
+} xpath("//subitem"), CIAO;
+
+perform {
+    say "Hi, selector-matched subitem!";
+} sel("subitem"), HI;
+
+say "All loaded and ready!";
+
+# vi: set ts=4 sts=4 sw=4 et ai ft=perl: #

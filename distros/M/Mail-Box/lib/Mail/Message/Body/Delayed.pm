@@ -1,4 +1,4 @@
-# Copyrights 2001-2018 by [Mark Overmeer].
+# Copyrights 2001-2019 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Body::Delayed;
 use vars '$VERSION';
-$VERSION = '3.005';
+$VERSION = '3.006';
 
 use base 'Mail::Reporter';
 
@@ -57,27 +57,11 @@ sub modified(;$)
     shift->forceRealize(shift);
 }
 
-#------------------------------------------
 
-
-sub isModified() { 0 }
-
-#------------------------------------------
-
-
+sub isModified()  {0}
 sub isDelayed()   {1}
-
-#------------------------------------------
-
-
 sub isMultipart() {shift->message->head->isMultipart}
-
-#------------------------------------------
-
-
 sub guessSize()   {shift->{MMBD_size}}
-
-#------------------------------------------
 
 
 sub nrLines()
@@ -87,11 +71,9 @@ sub nrLines()
     : $_[0]->forceRealize->nrLines;
 }
 
-#------------------------------------------
-
 sub string_unless_carp()
 {   my $self = shift;
-    return $self->load->string unless (caller)[0] eq 'Carp';
+    return $self->load->string if (caller)[0] ne 'Carp';
 
     (my $class = ref $self) =~ s/^Mail::Message/MM/g;
     "$class object";
@@ -110,16 +92,12 @@ sub read($$;$@)
     $self;
 }
 
-#------------------------------------------
-
 
 sub fileLocation(;@) {
    my $self = shift;
    return @$self{ qw/MMBD_begin MMBD_end/ } unless @_;
    @$self{ qw/MMBD_begin MMBD_end/ } = @_;
 }
-
-#------------------------------------------
 
 
 sub moveLocation($)
@@ -128,8 +106,6 @@ sub moveLocation($)
     $self->{MMBD_end}   -= $dist;
     $self;
 }
-
-#------------------------------------------
 
 
 sub load() {$_[0] = $_[0]->message->loadBody}

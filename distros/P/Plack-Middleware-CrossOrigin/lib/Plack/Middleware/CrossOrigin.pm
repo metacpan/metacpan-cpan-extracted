@@ -1,8 +1,10 @@
+package Plack::Middleware::CrossOrigin;
 use strict;
 use warnings;
-package Plack::Middleware::CrossOrigin;
-$Plack::Middleware::CrossOrigin::VERSION = '0.012';
-# ABSTRACT: Adds headers to allow Cross-Origin Resource Sharing
+
+our $VERSION = '0.013';
+$VERSION =~ tr/_//d;
+
 use 5.008;
 use parent qw(Plack::Middleware);
 
@@ -40,12 +42,25 @@ my @common_headers = qw(
     X-Requested-With
     X-Prototype-Version
 );
+
+# RFC 7231
 my @http_methods = qw(
     GET
     HEAD
     POST
+    PUT
+    DELETE
+    CONNECT
+    OPTIONS
+    TRACE
 );
-my @webdav_methods = (@http_methods, qw(
+
+# RFC 5789
+my @rfc_5789_methods = qw(
+    PATCH
+);
+
+my @webdav_methods = qw(
     CANCELUPLOAD
     CHECKIN
     CHECKOUT
@@ -64,7 +79,9 @@ my @webdav_methods = (@http_methods, qw(
     UNLOCK
     UPDATE
     VERSION-CONTROL
-));
+);
+
+my @all_methods = ( @http_methods, @rfc_5789_methods, @webdav_methods );
 
 sub prepare_app {
     my ($self) = @_;
@@ -72,7 +89,7 @@ sub prepare_app {
     $self->origins([$self->origins || ()])
         unless ref $self->origins;
 
-    $self->methods([$self->methods || @webdav_methods])
+    $self->methods([$self->methods || @all_methods])
         unless ref $self->methods;
 
     $self->headers([$self->headers || @common_headers])
@@ -82,6 +99,16 @@ sub prepare_app {
         unless ref $self->expose_headers;
 
     $self->{origins_h} = { map { $_ => 1 } @{ $self->origins } };
+    ($self->{origins_re}) =
+        map qr/\A(?:$_)\z/,
+        join '|',
+        map +(
+            join '[a-z.-]*',
+            map quotemeta,
+            split /\*/, $_, -1
+        ),
+        @{ $self->origins };
+
     $self->{methods_h} = { map { $_ => 1 } @{ $self->methods } };
     $self->{headers_h} = { map { lc $_ => 1 } @{ $self->headers } };
     $self->{expose_headers_h} = { map { $_ => 1 } @{ $self->expose_headers } };
@@ -111,7 +138,7 @@ sub call {
         $continue_on_failure = 1;
     }
     else {
-        return $self->app->($env);
+        return _with_vary($self->app->($env));
     }
 
     my $request_method  = $env->{HTTP_ACCESS_CONTROL_REQUEST_METHOD};
@@ -131,11 +158,8 @@ sub call {
 
     my @headers;
 
-    if ($allowed_origins_h->{'*'} ) {
-        # allow request to proceed
-    }
-    elsif ( ! $allowed_origins_h->{$origin} ) {
-        return $fail->($env);
+    if (not ($allowed_origins_h->{'*'} || $origin =~ $self->{origins_re} ) ) {
+        return _with_vary($fail->($env));
     }
 
     if ($preflight) {
@@ -177,10 +201,14 @@ sub call {
     return $self->response_cb($res, sub {
         my $res = shift;
 
+        if (! _vary_headers($res->[1])->{origin}) {
+            push @{ $res->[1] }, 'Vary' => 'Origin';
+        }
+
         if ($expose_headers_h->{'*'}) {
             my %headers = @{ $res->[1] };
             delete @headers{@simple_response_headers};
-            $expose_headers = [keys %headers];
+            $expose_headers = [sort keys %headers];
         }
 
         push @headers, 'Access-Control-Expose-Headers' => join ', ', @$expose_headers;
@@ -190,28 +218,41 @@ sub call {
 }
 
 sub _response_forbidden {
-    [403, ['Content-Type' => 'text/plain', 'Content-Length' => 9], ['forbidden']];
+    [403, ['Content-Type' => 'text/plain', 'Content-Length' => 9, 'Vary' => 'Origin'], ['forbidden']];
 }
 
 sub _response_success {
     [200, [ 'Content-Type' => 'text/plain' ], [] ];
 }
 
+sub _with_vary {
+    my ($res) = @_;
+    return Plack::Util::response_cb($res, sub {
+        my $res = shift;
+
+        if (! _vary_headers($res->[1])->{origin}) {
+            push @{ $res->[1] }, 'Vary' => 'Origin';
+        }
+    });
+}
+
+sub _vary_headers {
+    my ($headers) = @_;
+
+    my %vary =
+        map { s/\A\s+//; s/\s+\z//; ( lc, 1) }
+        map +(split /,/),
+        Plack::Util::header_get($headers, 'Vary');
+
+    return \%vary;
+}
+
 1;
-
 __END__
-
-=pod
-
-=encoding UTF-8
 
 =head1 NAME
 
 Plack::Middleware::CrossOrigin - Adds headers to allow Cross-Origin Resource Sharing
-
-=head1 VERSION
-
-version 0.012
 
 =head1 SYNOPSIS
 
@@ -220,7 +261,7 @@ version 0.012
         enable 'CrossOrigin', origins => '*';
         $app;
     };
-    
+
     # Allow GET and POST requests from any location, cache results for 30 days.
     builder {
         enable 'CrossOrigin',
@@ -237,6 +278,9 @@ will also help protect against CSRF attacks in some browsers.
 This module attempts to fully conform to the CORS spec, while
 allowing additional flexibility in the values specified for the of
 the headers.
+
+The module also ensures that the response contains a C<Vary: Origin>
+header to avoid potential issues with caches.
 
 =head1 CORS REQUESTS IN BRIEF
 
@@ -275,11 +319,12 @@ the rest of your Plack application.
 
 A list of allowed origins.  Origins should be formatted as a URL
 scheme and host, with no path information. (C<http://www.example.com>)
-'C<*>' can be specified to allow access from any location.  Must be
-specified for this middleware to have any effect.  This will be
-matched against the C<Origin> request header, and will control the
-C<Access-Control-Allow-Origin> response header.  If the origin does
-not match, the request is aborted.
+'C<*>' can be specified to allow access from any location.  Wildcards
+(C<*>) can also be included in in the host to match any part of a host name
+(e.g. C<https://*.example.com>).  At least one origin must bust be specified
+for this middleware to have any effect.  This will be matched against the
+C<Origin> request header, and will control the C<Access-Control-Allow-Origin>
+response header.  If the origin does not match, the request is aborted.
 
 =item headers
 
@@ -290,43 +335,27 @@ with WebDAV and AJAX frameworks:
 
 =over 4
 
-=item *
+=item * C<Cache-Control>
 
-C<Cache-Control>
+=item * C<Depth>
 
-=item *
+=item * C<If-Modified-Since>
 
-C<Depth>
+=item * C<User-Agent>
 
-=item *
+=item * C<X-File-Name>
 
-C<If-Modified-Since>
+=item * C<X-File-Size>
 
-=item *
+=item * C<X-Prototype-Version>
 
-C<User-Agent>
-
-=item *
-
-C<X-File-Name>
-
-=item *
-
-C<X-File-Size>
-
-=item *
-
-C<X-Prototype-Version>
-
-=item *
-
-C<X-Requested-With>
+=item * C<X-Requested-With>
 
 =back
 
 =item methods
 
-A list of allowed methods.  '*' can be specified to allow any
+A list of allowed methods.  'C<*>' can be specified to allow any
 methods.  Controls the C<Access-Control-Allow-Methods> response
 header.  Defaults to all of the standard HTTP and WebDAV methods.
 
@@ -338,7 +367,7 @@ the web browser will decide how long to use.
 
 =item expose_headers
 
-A list of allowed headers to expose to the client. '*' can be
+A list of allowed headers to expose to the client. 'C<*>' can be
 specified to allow the browser to see all of the response headers.
 Controls the C<Access-Control-Expose-Headers> response header.
 
@@ -412,37 +441,23 @@ Opera and Opera Mobile support CORS since version 12.
 
 =over 4
 
-=item *
+=item * L<W3C Spec for Cross-Origin Resource Sharing|http://www.w3.org/TR/cors/>
 
-L<W3C Spec for Cross-Origin Resource Sharing|http://www.w3.org/TR/cors/>
+=item * L<W3C Spec for Cross-Origin Resource Sharing - Implementation Considerations|http://www.w3.org/TR/cors/#resource-implementation>
 
-=item *
+=item * L<Mozilla Developer Center - HTTP Access Control|https://developer.mozilla.org/En/HTTP_access_control>
 
-L<Mozilla Developer Center - HTTP Access Control|https://developer.mozilla.org/En/HTTP_access_control>
+=item * L<Mozilla Developer Center - Server-Side Access Control|https://developer.mozilla.org/En/Server-Side_Access_Control>
 
-=item *
+=item * L<Cross browser examples of using CORS requests|http://www.nczonline.net/blog/2010/05/25/cross-domain-ajax-with-cross-origin-resource-sharing/>
 
-L<Mozilla Developer Center - Server-Side Access Control|https://developer.mozilla.org/En/Server-Side_Access_Control>
+=item * L<MSDN - XDomainRequest Object|http://msdn.microsoft.com/en-us/library/cc288060%28v=vs.85%29.aspx>
 
-=item *
+=item * L<XDomainRequest - Restrictions, Limitations and Workarounds|http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx>
 
-L<Cross browser examples of using CORS requests|http://www.nczonline.net/blog/2010/05/25/cross-domain-ajax-with-cross-origin-resource-sharing/>
+=item * L<Wikipedia - Cross-Origin Resource Sharing|http://en.wikipedia.org/wiki/Cross-Origin_Resource_Sharing>
 
-=item *
-
-L<MSDN - XDomainRequest Object|http://msdn.microsoft.com/en-us/library/cc288060%28v=vs.85%29.aspx>
-
-=item *
-
-L<XDomainRequest - Restrictions, Limitations and Workarounds|http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx>
-
-=item *
-
-L<Wikipedia - Cross-Origin Resource Sharing|http://en.wikipedia.org/wiki/Cross-Origin_Resource_Sharing>
-
-=item *
-
-L<CORS advocacy|http://enable-cors.org/>
+=item * L<CORS advocacy|http://enable-cors.org/>
 
 =back
 
@@ -450,21 +465,13 @@ L<CORS advocacy|http://enable-cors.org/>
 
 =over 4
 
-=item *
+=item * L<Wikipedia - Cross-site request forgery|http://en.wikipedia.org/wiki/Cross-site_request_forgery>
 
-L<Wikipedia - Cross-site request forgery|http://en.wikipedia.org/wiki/Cross-site_request_forgery>
+=item * L<Stanford Web Security Research - Cross-Site Request Forgery|http://seclab.stanford.edu/websec/csrf/>
 
-=item *
+=item * L<WebKit Bugzilla - Add origin header to POST requests|https://bugs.webkit.org/show_bug.cgi?id=20792>
 
-L<Stanford Web Security Research - Cross-Site Request Forgery|http://seclab.stanford.edu/websec/csrf/>
-
-=item *
-
-L<WebKit Bugzilla - Add origin header to POST requests|https://bugs.webkit.org/show_bug.cgi?id=20792>
-
-=item *
-
-L<Mozilla Bugzilla - Implement Origin header CSRF mitigation|https://bugzilla.mozilla.org/show_bug.cgi?id=446344>
+=item * L<Mozilla Bugzilla - Implement Origin header CSRF mitigation|https://bugzilla.mozilla.org/show_bug.cgi?id=446344>
 
 =back
 
@@ -472,13 +479,9 @@ L<Mozilla Bugzilla - Implement Origin header CSRF mitigation|https://bugzilla.mo
 
 =over 4
 
-=item *
+=item * L<Cross-domain policy file for Flash|http://www.adobe.com/devnet/articles/crossdomain_policy_file_spec.html>
 
-L<Cross-domain policy file for Flash|http://www.adobe.com/devnet/articles/crossdomain_policy_file_spec.html>
-
-=item *
-
-L<Wikipedia - JSONP|http://en.wikipedia.org/wiki/JSONP>
+=item * L<Wikipedia - JSONP|http://en.wikipedia.org/wiki/JSONP>
 
 =back
 
@@ -492,5 +495,23 @@ This software is copyright (c) 2011 by Graham Knop.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 AUTHOR
+
+haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+=head2 CONTRIBUTORS
+
+None so far.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2011 the Plack::Middleware::CrossOrigin L</AUTHOR> and
+L</CONTRIBUTORS> as listed above.
+
+=head1 LICENSE
+
+This library is free software and may be distributed under the same terms
+as perl itself.
 
 =cut

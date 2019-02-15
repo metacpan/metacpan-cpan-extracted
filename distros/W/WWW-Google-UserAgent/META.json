@@ -46,15 +46,15 @@
    "provides" : {
       "WWW::Google::UserAgent" : {
          "file" : "lib/WWW/Google/UserAgent.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       },
       "WWW::Google::UserAgent::DataTypes" : {
          "file" : "lib/WWW/Google/UserAgent/DataTypes.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       },
       "WWW::Google::UserAgent::Exception" : {
          "file" : "lib/WWW/Google/UserAgent/Exception.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -65,6 +65,6 @@
          "web" : "https://github.com/manwar/WWW-Google-UserAgent"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

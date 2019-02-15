@@ -1,0 +1,156 @@
+{
+   "abstract" : "awk-like XML processor",
+   "author" : [
+      "Christopher White <cxwembedded@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Axk",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "strict" : "0",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::RewriteVersion" : "0",
+            "Module::Metadata" : "1.000016"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "Getopt::Long" : "2.50",
+            "HTML::Selector::XPath" : "0",
+            "Hash::Util::FieldHash" : "0",
+            "Import::Into" : "0",
+            "Object::Tiny" : "0",
+            "Pod::Find" : "0",
+            "Pod::Usage" : "0",
+            "Tie::Array" : "0",
+            "Tie::Hash" : "0",
+            "Tie::Scalar" : "0",
+            "XML::DOM" : "0",
+            "XML::DOM::XPath" : "0",
+            "XML::Handler::BuildDOM" : "0",
+            "XML::SAX::ParserFactory" : "0",
+            "perl" : "5.020",
+            "vars" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "File::Spec" : "0",
+            "Module::Loaded" : "0",
+            "Test::Class" : "0",
+            "Test::Class::Load" : "0",
+            "Test::Exception" : "0",
+            "Test::Kit" : "0",
+            "Test::More" : "0.92",
+            "parent" : "0",
+            "rlib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::Axk" : {
+         "file" : "lib/XML/Axk.pm",
+         "version" : "0.001006"
+      },
+      "XML::Axk::App" : {
+         "file" : "lib/XML/Axk/App.pm",
+         "version" : "0.001006"
+      },
+      "XML::Axk::Base" : {
+         "file" : "lib/XML/Axk/Base.pm"
+      },
+      "XML::Axk::Core" : {
+         "file" : "lib/XML/Axk/Core.pm",
+         "version" : "0.001006"
+      },
+      "XML::Axk::DOM" : {
+         "file" : "lib/XML/Axk/DOM.pm"
+      },
+      "XML::Axk::L::L1" : {
+         "file" : "lib/XML/Axk/L/L1.pm"
+      },
+      "XML::Axk::L::LTEST" : {
+         "file" : "lib/XML/Axk/L/LTEST.pm"
+      },
+      "XML::Axk::Language" : {
+         "file" : "lib/XML/Axk/Language.pm"
+      },
+      "XML::Axk::Matcher::Always" : {
+         "file" : "lib/XML/Axk/Matcher/Always.pm"
+      },
+      "XML::Axk::Matcher::XPath" : {
+         "file" : "lib/XML/Axk/Matcher/XPath.pm"
+      },
+      "XML::Axk::Object::TinyDefaults" : {
+         "file" : "lib/XML/Axk/Object/TinyDefaults.pm",
+         "version" : "0.001006"
+      },
+      "XML::Axk::Preparse" : {
+         "file" : "lib/XML/Axk/Preparse.pm"
+      },
+      "XML::Axk::SAX::BuildDOM2" : {
+         "file" : "lib/XML/Axk/SAX/BuildDOM2.pm",
+         "version" : "1.50"
+      },
+      "XML::Axk::SAX::Handler" : {
+         "file" : "lib/XML/Axk/SAX/Handler.pm"
+      },
+      "XML::Axk::SAX::Runner" : {
+         "file" : "lib/XML/Axk/SAX/Runner.pm"
+      },
+      "XML::Axk::Sandbox" : {
+         "file" : "lib/XML/Axk/Sandbox.pm"
+      },
+      "XML::Axk::Vars::Array" : {
+         "file" : "lib/XML/Axk/Vars/Array.pm"
+      },
+      "XML::Axk::Vars::Scalar" : {
+         "file" : "lib/XML/Axk/Vars/Scalar.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/interpreters/axk/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/interpreters/axk.git",
+         "web" : "https://github.com/interpreters/axk"
+      }
+   },
+   "version" : "0.001006",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

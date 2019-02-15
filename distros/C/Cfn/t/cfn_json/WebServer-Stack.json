@@ -1,0 +1,316 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "AWS CloudFormation template to deploy a full LAMP server stack. This template creates an Amazon EC2 instance with an elastic IP, an Amazon RDS database instance, an IAM Role for the EC2 instance to make API requests to S3, EC2 and Cloudformation stack resources. A couple of S3 buckets to store logs and backups with a lifecycle policy of 15 days for backups and 30 days for logs.",
+
+  "Parameters" : {
+    "KeyPair" : {
+      "Description" : "Amazon EC2 Key Pair",
+      "Type" : "AWS::EC2::KeyPair::KeyName"
+    },
+    "InstanceType" : {
+      "Description" : "EC2 instance class",
+      "Type" : "String",
+      "Default" : "t2.micro",
+      "AllowedValues" : ["t2.micro", "m2.small"],
+      "ConstraintDescription" : "Enter t2.micro or m2.small. Default is t2.micro."
+    },
+    "ElasticIP" : {
+      "Description" : "The Elastic IP to use to associate with the instance",
+      "Type" : "String"
+    },
+    "VpcId" : {
+      "Description" : "Amazon default VPC",
+      "Type" : "String",
+      "AllowedPattern" : "^vpc-[a-zA-Z0-9]*",
+      "ConstraintDescription" : "must be a valid VPC identifier."
+    },
+    "DBClass" : {
+      "Description" : "RDS Database instance class",
+      "Type" : "String",
+      "Default" : "db.t2.micro",
+      "AllowedValues" : [ "db.t2.micro", "db.m2.small"],
+      "ConstraintDescription" : "Enter db.t2.micro or db.m2.small. Default is db.t2.micro."
+    },
+    "MultiAZDatabase": {
+      "Default": "false",
+      "Description" : "Create a Multi-AZ MySQL Amazon RDS database instance",
+      "Type": "String",
+      "Default" : "false",
+      "AllowedValues" : [ "true", "false" ],
+      "ConstraintDescription" : "must be either true or false. Default is false"
+    },
+    "DBAllocatedStorage" : {
+      "Default": "5",
+      "Description" : "The size of the database (Gb)",
+      "Type": "Number",
+      "MinValue": "5",
+      "MaxValue": "1024",
+      "ConstraintDescription" : "must be between 5 and 1024Gb."
+    },
+    "DBPort" : {
+      "Default" : "3306",
+      "Description" : "TCP/IP port for the database",
+      "Type" : "Number",
+      "MinValue" : "1150",
+      "MaxValue" : "65535"
+    },
+    "DBUser" : {
+      "NoEcho": "true",
+      "Description" : "The admin account username",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "16",
+      "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription" : "must begin with a letter and contain only alphanumeric characters."
+    },
+    "DBPassword" : {
+      "NoEcho" : "true",
+      "Description" : "The admin account password",
+      "Type" : "String",
+      "MinLength" : "7",
+      "MaxLength" : "41",
+      "AllowedPattern" : "[a-zA-Z0-9]*"
+    }
+  },
+
+  "Resources" : {
+    "WebServerSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable HTTP, HTTPS and SSH access",
+        "VpcId" : {"Ref" : "VpcId"},
+        "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"},
+          {"IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0"},
+          {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : "0.0.0.0/0"}
+        ]
+      }
+    },
+    "DBEC2SecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Frontend Access",
+        "VpcId"            : {"Ref" : "VpcId"},
+        "SecurityGroupIngress" : [{
+          "IpProtocol" : "tcp",
+          "FromPort"   : { "Ref" : "DBPort" },
+          "ToPort"     : { "Ref" : "DBPort" },
+          "CidrIp"     : "172.16.0.0/16"
+        }]
+      }
+    },
+    "WebServerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version" : "2012-10-17",
+          "Statement": [ {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": [ "ec2.amazonaws.com" ]
+             },
+             "Action": [ "sts:AssumeRole" ]
+          } ]
+        },
+        "Path": "/",
+        "Policies": [ 
+          { "PolicyName": "EC2Access",
+            "PolicyDocument": {
+              "Version" : "2012-10-17",
+              "Statement": [ {
+                "Effect": "Allow",
+                "Action": ["ec2:*","autoscaling:*"],
+                "Resource": "*"
+              } ]
+            } 
+          }, 
+          { "PolicyName": "S3Access",
+            "PolicyDocument": {
+              "Version" : "2012-10-17",
+              "Statement": [ {
+                "Effect": "Allow",
+                "Action": "s3:*",
+                "Resource": ["arn:aws:s3:::opentodo-backups","arn:aws:s3:::opentodo-backups/*","arn:aws:s3:::opentodo-logs","arn:aws:s3:::opentodo-logs/*"]
+              } ]
+            }
+          },
+          { "PolicyName": "CfnAccess",
+            "PolicyDocument": {
+              "Version" : "2012-10-17",
+              "Statement": [ {
+                "Effect": "Allow",
+                "Action": ["cloudformation:DescribeStackResource"],
+                "Resource": "*"
+              } ]
+            } 
+          }
+        ]
+      }
+    },
+    "WebServerInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [ {
+        "Ref": "WebServerRole"
+         } ]
+      }
+    },
+    "WebServerEc2Instance" : {
+      "Type" : "AWS::EC2::Instance",
+        "Metadata" : {
+        "AWS::CloudFormation::Init" : {
+          "config" : {
+            "packages" : {
+              "apt" : {
+                "nginx" : [],
+                "php5-fpm" : [],
+                "git" : [],
+                "etckeeper" : [],
+                "fail2ban" : [],
+                "mysql-client" : []
+              },
+              "python" : {
+                "awscli" : []
+              }
+            },
+            "files" : {
+              "/root/.my.cnf" : {
+                "content" : { "Fn::Join" : ["", [
+                  "[client]\n",
+                  "user=", { "Ref" : "DBUser" }, "\n",
+                  "password=", { "Ref" : "DBPassword" }, "\n",
+                  "host=", { "Fn::GetAtt" : [ "DBInstance", "Endpoint.Address" ] }, "\n",
+                  "port=", { "Fn::GetAtt" : [ "DBInstance", "Endpoint.Port" ] }, "\n"
+                ] ] },
+                "mode"  : "000600",
+                "owner" : "root",
+                "group" : "root"
+              },
+              "/etc/bash_completion.d/awscli" : {
+                "content" : { "Fn::Join" : ["", [
+                  "complete -C aws_completer aws\n"
+                ] ] },
+                "mode"  : "000644",
+                "owner" : "root",
+                "group" : "root"
+              }
+            }
+          }
+        }
+      },
+      "Properties" : {
+        "ImageId" : "ami-133cbd64",
+        "InstanceType"   : { "Ref" : "InstanceType" },
+        "SecurityGroupIds" : [ {"Ref" : "WebServerSecurityGroup"} ],
+        "KeyName"        : { "Ref" : "KeyPair" },
+        "IamInstanceProfile" : { "Ref" : "WebServerInstanceProfile" },
+        "SubnetId" : "subnet-7d59d518",
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash\n",
+                "aptitude update\n",
+                "aptitude -y install python-setuptools\n",
+                "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                "# Install the files and packages from the metadata\n",
+                "cfn-init --stack ", { "Ref" : "AWS::StackName" }," --resource WebServerEc2Instance --region ", { "Ref" : "AWS::Region" }, "\n",
+                "# Signal the status from cfn-init\n",
+                "cfn-signal -e $? ","--stack ", { "Ref" : "AWS::StackName" }," --resource WebServerEc2Instance --region ", { "Ref" : "AWS::Region" }, "\n"
+              ]
+            ]
+          }
+        }
+      },
+      "CreationPolicy" : {
+        "ResourceSignal" : {
+          "Timeout" : "PT5M"
+        }
+      }
+    },
+    "EIPAssociation" : {
+      "Type" : "AWS::EC2::EIPAssociation",
+      "Properties" : {
+        "InstanceId" : {"Ref" : "WebServerEc2Instance"},
+        "EIP" : {"Ref" : "ElasticIP"}
+      }
+    },
+    "DBSubnetGroup" : {
+      "Type" : "AWS::RDS::DBSubnetGroup",
+      "Properties" : {
+        "DBSubnetGroupDescription" : "WebServer DB subnet group",
+        "SubnetIds" : [ "subnet-058c0560", "subnet-2072c457" ]
+      }
+    },
+    "DBInstance" : {
+      "Type": "AWS::RDS::DBInstance",
+      "Properties": {
+        "DBInstanceIdentifier" : "WebServerRDS",
+        "Engine"            : "MySQL",
+        "MultiAZ"           : { "Ref": "MultiAZDatabase" },
+        "MasterUsername"    : { "Ref" : "DBUser" },
+        "MasterUserPassword": { "Ref" : "DBPassword" },
+        "DBInstanceClass"   : { "Ref" : "DBClass" },
+        "AllocatedStorage"  : { "Ref" : "DBAllocatedStorage" },
+        "DBSubnetGroupName" : { "Ref" : "DBSubnetGroup" },
+        "Port"              : { "Ref" : "DBPort" },
+        "StorageType" : "gp2",
+        "AutoMinorVersionUpgrade" : "true",
+        "BackupRetentionPeriod" : 5,
+        "PreferredBackupWindow" : "02:30-03:30",
+  "PreferredMaintenanceWindow" : "sun:04:30-sun:05:30",
+        "VPCSecurityGroups": [ { "Fn::GetAtt": [ "DBEC2SecurityGroup", "GroupId" ] } ]
+      }
+    },
+    "S3BackupBucket" : {
+      "Type" : "AWS::S3::Bucket",
+      "DeletionPolicy" : "Retain",
+      "Properties" : {
+        "AccessControl" : "Private",
+        "BucketName" : "opentodo-backups",
+        "LifecycleConfiguration" : {
+          "Rules" : [ {
+            "ExpirationInDays" : 15,
+            "Status" : "Enabled"
+          } ] 
+        }
+      }
+    },
+    "S3LogBucket" : {
+      "Type" : "AWS::S3::Bucket",
+      "DeletionPolicy" : "Retain",
+      "Properties" : {
+        "AccessControl" : "Private",
+        "BucketName" : "opentodo-logs",
+        "LifecycleConfiguration" : {
+          "Rules" : [ {
+            "ExpirationInDays" : 30,
+            "Status" : "Enabled"
+          } ] 
+        }
+      }
+    }
+  },
+  
+  "Outputs" : {
+    "WebsiteURL" : {
+      "Value" : { "Fn::Join" : ["", ["http://", { "Fn::GetAtt" : [ "WebServerEc2Instance", "PublicIp" ]}, "/" ]]},
+      "Description" : "URL of WebServer site"
+    },
+    "RDSInstance" : {
+      "Value" : { "Fn::Join" : [ "", [ { "Fn::GetAtt" : [ "DBInstance", "Endpoint.Address" ] }, ":" , { "Fn::GetAtt" : [ "DBInstance", "Endpoint.Port" ] } ] ] },
+      "Description" : "RDS instance Endpoint"
+    },
+    "S3BackupBucketURL" : {
+      "Value" : { "Fn::Join" : [ "", [ "https://", { "Fn::GetAtt" : [ "S3BackupBucket", "DomainName" ] } ] ] },
+      "Description" : "URL of the S3 bucket to store backups"
+    },
+    "S3LogBucketURL" : {
+      "Value" : { "Fn::Join" : [ "", [ "https://", { "Fn::GetAtt" : [ "S3LogBucket", "DomainName" ] } ] ] },
+      "Description" : "URL of the S3 bucket to store logs"
+    }
+  }
+}

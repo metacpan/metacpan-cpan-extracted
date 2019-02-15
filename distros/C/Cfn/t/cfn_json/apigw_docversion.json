@@ -1,0 +1,111 @@
+{
+    "Parameters": {
+        "apiName": {
+            "Type": "String"
+        },
+        "description": {
+            "Type": "String"
+        },
+        "property": {
+            "Type": "String"
+        },
+        "stageName": {
+            "Type": "String"
+        },
+        "type": {
+            "Type": "String"
+        },
+        "version": {
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "Deployment": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "RestApi"
+                }
+            },
+            "DependsOn": [
+                "Method"
+            ]
+        },
+        "DocumentationPart": {
+            "Type": "AWS::ApiGateway::DocumentationPart",
+            "Properties": {
+                "Location": {
+                    "Type": {
+                        "Ref": "type"
+                    }
+                },
+                "RestApiId": {
+                    "Ref": "RestApi"
+                },
+                "Properties": {
+                    "Ref": "property"
+                }
+            }
+        },
+        "DocumentationVersion": {
+            "Type": "AWS::ApiGateway::DocumentationVersion",
+            "Properties": {
+                "Description": {
+                    "Ref": "description"
+                },
+                "DocumentationVersion": {
+                    "Ref": "version"
+                },
+                "RestApiId": {
+                    "Ref": "RestApi"
+                }
+            },
+            "DependsOn": "DocumentationPart"
+        },
+        "Method": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+                "AuthorizationType": "NONE",
+                "HttpMethod": "POST",
+                "ResourceId": {
+                    "Fn::GetAtt": [
+                        "RestApi",
+                        "RootResourceId"
+                    ]
+                },
+                "RestApiId": {
+                    "Ref": "RestApi"
+                },
+                "Integration": {
+                    "Type": "MOCK"
+                }
+            }
+        },
+        "RestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+                "Name": {
+                    "Ref": "apiName"
+                }
+            }
+        },
+        "Stage": {
+            "Type": "AWS::ApiGateway::Stage",
+            "Properties": {
+                "DeploymentId": {
+                    "Ref": "Deployment"
+                },
+                "DocumentationVersion": {
+                    "Ref": "version"
+                },
+                "RestApiId": {
+                    "Ref": "RestApi"
+                },
+                "StageName": {
+                    "Ref": "stageName"
+                }
+            },
+            "DependsOn": "DocumentationVersion"
+        }
+    }
+}

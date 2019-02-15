@@ -1,11 +1,9 @@
 ChangeLog
-LICENSE
 MANIFEST
 MANIFEST.extra
 META.yml
 Makefile.PL
 README
-README.FAQ
 README.md
 README.todo
 examples/build.pl
@@ -22,7 +20,6 @@ examples/unpack.pl
 lib/Mail/Box-Cookbook.pod
 lib/Mail/Box-Index.pod
 lib/Mail/Box-Overview.pod
-lib/Mail/Box-Shorts.pod
 lib/Mail/Box.pm
 lib/Mail/Box.pod
 lib/Mail/Box/Collection.pm

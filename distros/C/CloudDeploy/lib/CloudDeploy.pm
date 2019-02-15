@@ -1,6 +1,6 @@
 package CloudDeploy;
 
-  our $VERSION = '1.06';
+  our $VERSION = '1.07';
 
 1;
 ### main pod documentation begin ###

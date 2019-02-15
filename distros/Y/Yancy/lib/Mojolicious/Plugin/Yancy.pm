@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.022';
+our $VERSION = '1.023';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -256,12 +256,12 @@ our $VERSION = '1.022';
 #pod
 #pod =head2 yancy.filter.add
 #pod
-#pod     my $filter_sub = sub { my ( $field_name, $field_value, $field_conf ) = @_; ... }
+#pod     my $filter_sub = sub { my ( $field_name, $field_value, $field_conf, @params ) = @_; ... }
 #pod     $c->yancy->filter->add( $name => $filter_sub );
 #pod
 #pod Create a new filter. C<$name> is the name of the filter to give in the
 #pod field's configuration. C<$subref> is a subroutine reference that accepts
-#pod three arguments:
+#pod at least three arguments:
 #pod
 #pod =over
 #pod
@@ -270,6 +270,8 @@ our $VERSION = '1.022';
 #pod =item * $value - The value to filter, either the entire item, or a single field
 #pod
 #pod =item * $conf - The configuration for the collection/field
+#pod
+#pod =item * @params - Other parameters if configured
 #pod
 #pod =back
 #pod
@@ -305,6 +307,34 @@ our $VERSION = '1.022';
 #pod         },
 #pod     }
 #pod
+#pod The same filter, but also configurable with extra parameters:
+#pod
+#pod     my $digest = sub {
+#pod         my ( $field_name, $field_value, $field_conf, @params ) = @_;
+#pod         my $type = ( $params[0] || $field_conf->{ 'x-digest' } )->{ type };
+#pod         Digest->new( $type )->add( $field_value )->b64digest;
+#pod         $field_value . $params[0];
+#pod     };
+#pod     $c->yancy->filter->add( 'digest' => $digest );
+#pod
+#pod The alternative configuration:
+#pod
+#pod     # mysite.conf
+#pod     {
+#pod         collections => {
+#pod             users => {
+#pod                 properties => {
+#pod                     username => { type => 'string' },
+#pod                     password => {
+#pod                         type => 'string',
+#pod                         format => 'password',
+#pod                         'x-filter' => [ [ digest => { type => 'SHA-1' } ] ],
+#pod                     },
+#pod                 },
+#pod             },
+#pod         },
+#pod     }
+#pod
 #pod Collections can also have filters. A collection filter will get the
 #pod entire hash reference as its value. For example, here's a filter that
 #pod updates the C<last_updated> field with the current time:
@@ -331,6 +361,155 @@ our $VERSION = '1.022';
 #pod         },
 #pod     }
 #pod
+#pod You can configure filters on OpenAPI operations' inputs. These will
+#pod probably want to operate on hash-refs as in the collection-level filters
+#pod above. The config passed will be an empty hash. The filter can be applied
+#pod to either or both of the path, or the individual operation, and will be
+#pod executed in that order. E.g.:
+#pod
+#pod     # mysite.conf
+#pod     {
+#pod         openapi => {
+#pod             definitions => {
+#pod                 people => {
+#pod                     properties => {
+#pod                         name => { type => 'string' },
+#pod                         address => { type => 'string' },
+#pod                         last_updated => { type => 'datetime' },
+#pod                     },
+#pod                 },
+#pod             },
+#pod             paths => {
+#pod                 "/people" => {
+#pod                     # could also have x-filter here
+#pod                     "post" => {
+#pod                         'x-filter' => [ 'timestamp' ],
+#pod                         # ...
+#pod                     },
+#pod                 },
+#pod             }
+#pod         },
+#pod     }
+#pod
+#pod You can also configure filters on OpenAPI operations' outputs, this time
+#pod with the key C<x-filter-output>. Again, the config passed will be an empty
+#pod hash. The filter can be applied to either or both of the path, or the
+#pod individual operation, and will be executed in that order. E.g.:
+#pod
+#pod     # mysite.conf
+#pod     {
+#pod         openapi => {
+#pod             paths => {
+#pod                 "/people" => {
+#pod                     'x-filter-output' => [ 'timestamp' ],
+#pod                     # ...
+#pod                 },
+#pod             }
+#pod         },
+#pod     }
+#pod
+#pod =head3 Supplied filters
+#pod
+#pod These filters are always installed.
+#pod
+#pod =head4 yancy.from_helper
+#pod
+#pod The first configured parameter is the name of an installed Mojolicious
+#pod helper. That helper will be called, with any further supplied parameters,
+#pod and the return value will be used as the value of that field /
+#pod item. E.g. with this helper:
+#pod
+#pod     $app->helper( 'current_time' => sub { scalar gmtime } );
+#pod
+#pod This configuration will achieve the same as the above with C<last_updated>:
+#pod
+#pod     # mysite.conf
+#pod     {
+#pod         collections => {
+#pod             people => {
+#pod                 properties => {
+#pod                     name => { type => 'string' },
+#pod                     address => { type => 'string' },
+#pod                     last_updated => {
+#pod                         type => 'datetime',
+#pod                         'x-filter' => [ [ 'yancy.from_helper' => 'current_time' ] ],
+#pod                     },
+#pod                 },
+#pod             },
+#pod         },
+#pod     }
+#pod
+#pod =head4 yancy.overlay_from_helper
+#pod
+#pod Intended to be used for "items" rather than individual fields, as it
+#pod will only work when the "value" parameter is a hash-ref.
+#pod
+#pod The configured parameters are supplied in pairs. The first item in the
+#pod pair is the string key in the hash-ref. The second is either the name of
+#pod a helper, or an array-ref with the first entry as such a helper-name,
+#pod followed by parameters to pass that helper. For each pair, the helper
+#pod will be called, and its return value set as the relevant key's value.
+#pod E.g. with this helper:
+#pod
+#pod     $app->helper( 'current_time' => sub { scalar gmtime } );
+#pod
+#pod This configuration will achieve the same as the above with C<last_updated>:
+#pod
+#pod     # mysite.conf
+#pod     {
+#pod         collections => {
+#pod             people => {
+#pod                 'x-filter' => [
+#pod                     [ 'yancy.overlay_from_helper' => 'last_updated', 'current_time' ]
+#pod                 ],
+#pod                 properties => {
+#pod                     name => { type => 'string' },
+#pod                     address => { type => 'string' },
+#pod                     last_updated => { type => 'datetime' },
+#pod                 },
+#pod             },
+#pod         },
+#pod     }
+#pod
+#pod =head4 yancy.wrap
+#pod
+#pod The configured parameters are a list of strings. For each one, the
+#pod original value will be wrapped in a hash with that string as the key,
+#pod and the previous value as the value. E.g. with this config:
+#pod
+#pod     'x-filter-output' => [
+#pod         [ 'yancy.wrap' => qw(user login) ],
+#pod     ],
+#pod
+#pod The original value of say C<{ user => 'bob', password => 'h12' }>
+#pod will become:
+#pod
+#pod     {
+#pod         login => {
+#pod             user => { user => 'bob', password => 'h12' }
+#pod         }
+#pod     }
+#pod
+#pod The utility of this comes from being able to expressively translate to
+#pod and from a simple database structure to a situation where simple values
+#pod or JSON objects need to be wrapped in objects one or two deep.
+#pod
+#pod =head4 yancy.unwrap
+#pod
+#pod This is the converse of the above. The configured parameters are a
+#pod list of strings. For each one, the original value (a hash-ref) will be
+#pod "unwrapped" by looking in the given hash and extracting the value whose
+#pod key is that string. E.g. with this config:
+#pod
+#pod     'x-filter' => [
+#pod         [ 'yancy.unwrap' => qw(login user) ],
+#pod     ],
+#pod
+#pod This will achieve the reverse of the transformation given in
+#pod L</yancy.wrap> above. Note that obviously the order of arguments is
+#pod inverted, since this operates outside-inward, while C<yancy.wrap>
+#pod operates inside-outward.
+#pod
 #pod =head2 yancy.filter.apply
 #pod
 #pod     my $filtered_data = $c->yancy->filter->apply( $collection, $item_data );
@@ -341,6 +520,11 @@ our $VERSION = '1.022';
 #pod The property-level filters will run before any collection-level filter,
 #pod so that collection-level filters can take advantage of any values set by
 #pod the inner filters.
+#pod
+#pod =head2 yancy.filters
+#pod
+#pod Returns a hash-ref of all configured helpers, mapping the names to
+#pod the code-refs.
 #pod
 #pod =head2 yancy.schema
 #pod
@@ -411,6 +595,7 @@ has _filters => sub { {} };
 
 sub register {
     my ( $self, $app, $config ) = @_;
+    $config = { %$config }; # avoid mutating input
     my $route = $config->{route} // $app->routes->any( '/yancy' );
     $route->to( return_to => $config->{return_to} // '/' );
     $config->{api_controller} //= 'Yancy::API';
@@ -438,11 +623,40 @@ sub register {
     $app->helper( 'yancy.create' => \&_helper_create );
     $app->helper( 'yancy.validate' => \&_helper_validate );
 
+    $self->_helper_filter_add( undef, 'yancy.from_helper' => sub {
+        my ( $field_name, $field_value, $field_conf, @params ) = @_;
+        my $which_helper = shift @params;
+        my $helper = $app->renderer->get_helper( $which_helper );
+        $helper->( @params );
+    } );
+    $self->_helper_filter_add( undef, 'yancy.overlay_from_helper' => sub {
+        my ( $field_name, $field_value, $field_conf, @params ) = @_;
+        my %new_item = %$field_value;
+        while ( my ( $key, $helper ) = splice @params, 0, 2 ) {
+            ( $helper, my @this_params ) = @$helper if ref $helper eq 'ARRAY';
+            my $v = $app->renderer->get_helper( $helper )->( @this_params );
+            $new_item{ $key } = $v;
+        }
+        \%new_item;
+    } );
+    $self->_helper_filter_add( undef, 'yancy.wrap' => sub {
+        my ( $field_name, $field_value, $field_conf, @params ) = @_;
+        $field_value = { $_ => $field_value } for @params;
+        $field_value;
+    } );
+    $self->_helper_filter_add( undef, 'yancy.unwrap' => sub {
+        my ( $field_name, $field_value, $field_conf, @params ) = @_;
+        $field_value = $field_value->{$_} for @params;
+        $field_value;
+    } );
     for my $name ( keys %{ $config->{filters} } ) {
         $self->_helper_filter_add( undef, $name, $config->{filters}{$name} );
     }
     $app->helper( 'yancy.filter.add' => curry( \&_helper_filter_add, $self ) );
     $app->helper( 'yancy.filter.apply' => curry( \&_helper_filter_apply, $self ) );
+    $app->helper( 'yancy.filters' => sub {
+        state $filters = $self->_filters;
+    } );
 
     # Routes
     $route->get( '/' )->name( 'yancy.index' )
@@ -459,6 +673,7 @@ sub register {
     my $spec;
     if ( $config->{openapi} ) {
         $spec = $config->{openapi};
+        $config->{collections} = $spec->{definitions}; # for yancy.backend etc
     }
     else {
         # Merge configuration
@@ -570,6 +785,16 @@ sub _openapi_spec_add_mojo {
             my $mojo = $self->_openapi_spec_infer_mojo( $path, $pathspec, $method, $op_spec );
             $mojo->{controller} = $config->{api_controller};
             $mojo->{collection} = $collection;
+            my @filters = (
+                @{ $pathspec->{ 'x-filter' } || [] },
+                @{ $op_spec->{ 'x-filter' } || [] },
+            );
+            $mojo->{filters} = \@filters if @filters;
+            my @filters_out = (
+                @{ $pathspec->{ 'x-filter-output' } || [] },
+                @{ $op_spec->{ 'x-filter-output' } || [] },
+            );
+            $mojo->{filters_out} = \@filters_out if @filters_out;
             $op_spec->{ 'x-mojo-to' } = $mojo;
         }
     }
@@ -673,7 +898,7 @@ sub _openapi_spec_from_schema {
                         type => ref $props{ $_ }{type} eq 'ARRAY'
                                 ? $props{ $_ }{type}[0] : $props{ $_ }{type},
                         description => "Filter the list by the $_ field. By default, looks for rows containing the value anywhere in the column. Use '*' anywhere in the value to anchor the match.",
-                    } } keys %props,
+                    } } grep !exists( $props{ $_ }{'$ref'} ), keys %props,
                 ],
                 responses => {
                     200 => {
@@ -1006,20 +1231,22 @@ sub _helper_filter_apply {
     for my $key ( keys %{ $coll->{properties} } ) {
         next unless my $prop_filters = $coll->{properties}{ $key }{ 'x-filter' };
         for my $filter ( @{ $prop_filters } ) {
+            ( $filter, my @params ) = @$filter if ref $filter eq 'ARRAY';
             my $sub = $filters->{ $filter };
             die "Unknown filter: $filter (collection: $coll_name, field: $key)"
                 unless $sub;
-            $item->{ $key } = $sub->(
-                $key, $item->{ $key }, $coll->{properties}{ $key }
-            );
+            $item = { %$item, $key => $sub->(
+                $key, $item->{ $key }, $coll->{properties}{ $key }, @params
+            ) };
         }
     }
     if ( my $coll_filters = $coll->{'x-filter'} ) {
         for my $filter ( @{ $coll_filters } ) {
+            ( $filter, my @params ) = @$filter if ref $filter eq 'ARRAY';
             my $sub = $filters->{ $filter };
             die "Unknown filter: $filter (collection: $coll_name)"
                 unless $sub;
-            $item = $sub->( $coll_name, $item, $coll );
+            $item = $sub->( $coll_name, $item, $coll, @params );
         }
     }
     return $item;
@@ -1062,7 +1289,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.022
+version 1.023
 
 =head1 SYNOPSIS
 
@@ -1318,12 +1545,12 @@ See L<JSON::Validator/validate> for more details.
 
 =head2 yancy.filter.add
 
-    my $filter_sub = sub { my ( $field_name, $field_value, $field_conf ) = @_; ... }
+    my $filter_sub = sub { my ( $field_name, $field_value, $field_conf, @params ) = @_; ... }
     $c->yancy->filter->add( $name => $filter_sub );
 
 Create a new filter. C<$name> is the name of the filter to give in the
 field's configuration. C<$subref> is a subroutine reference that accepts
-three arguments:
+at least three arguments:
 
 =over
 
@@ -1332,6 +1559,8 @@ three arguments:
 =item * $value - The value to filter, either the entire item, or a single field
 
 =item * $conf - The configuration for the collection/field
+
+=item * @params - Other parameters if configured
 
 =back
 
@@ -1367,6 +1596,34 @@ And you configure this on a field using C<< x-filter >> and C<< x-digest >>:
         },
     }
 
+The same filter, but also configurable with extra parameters:
+
+    my $digest = sub {
+        my ( $field_name, $field_value, $field_conf, @params ) = @_;
+        my $type = ( $params[0] || $field_conf->{ 'x-digest' } )->{ type };
+        Digest->new( $type )->add( $field_value )->b64digest;
+        $field_value . $params[0];
+    };
+    $c->yancy->filter->add( 'digest' => $digest );
+
+The alternative configuration:
+
+    # mysite.conf
+    {
+        collections => {
+            users => {
+                properties => {
+                    username => { type => 'string' },
+                    password => {
+                        type => 'string',
+                        format => 'password',
+                        'x-filter' => [ [ digest => { type => 'SHA-1' } ] ],
+                    },
+                },
+            },
+        },
+    }
+
 Collections can also have filters. A collection filter will get the
 entire hash reference as its value. For example, here's a filter that
 updates the C<last_updated> field with the current time:
@@ -1393,6 +1650,155 @@ And you configure this on the collection using C<< x-filter >>:
         },
     }
 
+You can configure filters on OpenAPI operations' inputs. These will
+probably want to operate on hash-refs as in the collection-level filters
+above. The config passed will be an empty hash. The filter can be applied
+to either or both of the path, or the individual operation, and will be
+executed in that order. E.g.:
+
+    # mysite.conf
+    {
+        openapi => {
+            definitions => {
+                people => {
+                    properties => {
+                        name => { type => 'string' },
+                        address => { type => 'string' },
+                        last_updated => { type => 'datetime' },
+                    },
+                },
+            },
+            paths => {
+                "/people" => {
+                    # could also have x-filter here
+                    "post" => {
+                        'x-filter' => [ 'timestamp' ],
+                        # ...
+                    },
+                },
+            }
+        },
+    }
+
+You can also configure filters on OpenAPI operations' outputs, this time
+with the key C<x-filter-output>. Again, the config passed will be an empty
+hash. The filter can be applied to either or both of the path, or the
+individual operation, and will be executed in that order. E.g.:
+
+    # mysite.conf
+    {
+        openapi => {
+            paths => {
+                "/people" => {
+                    'x-filter-output' => [ 'timestamp' ],
+                    # ...
+                },
+            }
+        },
+    }
+
+=head3 Supplied filters
+
+These filters are always installed.
+
+=head4 yancy.from_helper
+
+The first configured parameter is the name of an installed Mojolicious
+helper. That helper will be called, with any further supplied parameters,
+and the return value will be used as the value of that field /
+item. E.g. with this helper:
+
+    $app->helper( 'current_time' => sub { scalar gmtime } );
+
+This configuration will achieve the same as the above with C<last_updated>:
+
+    # mysite.conf
+    {
+        collections => {
+            people => {
+                properties => {
+                    name => { type => 'string' },
+                    address => { type => 'string' },
+                    last_updated => {
+                        type => 'datetime',
+                        'x-filter' => [ [ 'yancy.from_helper' => 'current_time' ] ],
+                    },
+                },
+            },
+        },
+    }
+
+=head4 yancy.overlay_from_helper
+
+Intended to be used for "items" rather than individual fields, as it
+will only work when the "value" parameter is a hash-ref.
+
+The configured parameters are supplied in pairs. The first item in the
+pair is the string key in the hash-ref. The second is either the name of
+a helper, or an array-ref with the first entry as such a helper-name,
+followed by parameters to pass that helper. For each pair, the helper
+will be called, and its return value set as the relevant key's value.
+E.g. with this helper:
+
+    $app->helper( 'current_time' => sub { scalar gmtime } );
+
+This configuration will achieve the same as the above with C<last_updated>:
+
+    # mysite.conf
+    {
+        collections => {
+            people => {
+                'x-filter' => [
+                    [ 'yancy.overlay_from_helper' => 'last_updated', 'current_time' ]
+                ],
+                properties => {
+                    name => { type => 'string' },
+                    address => { type => 'string' },
+                    last_updated => { type => 'datetime' },
+                },
+            },
+        },
+    }
+
+=head4 yancy.wrap
+
+The configured parameters are a list of strings. For each one, the
+original value will be wrapped in a hash with that string as the key,
+and the previous value as the value. E.g. with this config:
+
+    'x-filter-output' => [
+        [ 'yancy.wrap' => qw(user login) ],
+    ],
+
+The original value of say C<{ user => 'bob', password => 'h12' }>
+will become:
+
+    {
+        login => {
+            user => { user => 'bob', password => 'h12' }
+        }
+    }
+
+The utility of this comes from being able to expressively translate to
+and from a simple database structure to a situation where simple values
+or JSON objects need to be wrapped in objects one or two deep.
+
+=head4 yancy.unwrap
+
+This is the converse of the above. The configured parameters are a
+list of strings. For each one, the original value (a hash-ref) will be
+"unwrapped" by looking in the given hash and extracting the value whose
+key is that string. E.g. with this config:
+
+    'x-filter' => [
+        [ 'yancy.unwrap' => qw(login user) ],
+    ],
+
+This will achieve the reverse of the transformation given in
+L</yancy.wrap> above. Note that obviously the order of arguments is
+inverted, since this operates outside-inward, while C<yancy.wrap>
+operates inside-outward.
+
 =head2 yancy.filter.apply
 
     my $filtered_data = $c->yancy->filter->apply( $collection, $item_data );
@@ -1403,6 +1809,11 @@ a collection name. Returns the hash of C<$filtered_data>.
 The property-level filters will run before any collection-level filter,
 so that collection-level filters can take advantage of any values set by
 the inner filters.
+
+=head2 yancy.filters
+
+Returns a hash-ref of all configured helpers, mapping the names to
+the code-refs.
 
 =head2 yancy.schema
 

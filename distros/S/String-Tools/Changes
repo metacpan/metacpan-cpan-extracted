@@ -1,12 +1,29 @@
 Revision history for String::Tools.
 
+v0.19.045 2019-02-14
+
+ - Updated the documentation.
+ - Changed stringify() and subst() from a long chain of "if ... elsif ..."
+   to the equivalent trinaries "... ? ... : ... ? ..."
+
+0.18.279  2018-10-06
+
+ - Updated some tests to pass on older Perls.
+
+0.18.277  2018-10-04
+
+ - Added stringify(), to attempt to convert things to a string in a
+   sensible way.
+ - Added subst_vars(), to retrieve the variables in a string.
+ - Updated and added several tests.
+
 v0.18.270 2018-09-27
 
- - Change `define` to a defined value by using the constant `!!undef`
+ - Change define() to a defined value by using the constant !!undef
    (Which causes it work in both the string and numeric contexts correctly).
  - Added/improved several tests.
- - Added the `$SUBST_VAR` variable for the `subst()` function.
- - Added the `trim_lines()` function.
+ - Added the $SUBST_VAR variable for the subst() function.
+ - Added the trim_lines() function.
 
 0.14.163  2014-06-12
 

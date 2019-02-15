@@ -1,3 +1,23 @@
+0.006   2019-02-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Algorithm::Dependency &
+	  Bencher::Scenario::GraphTopologicalSortModules.
+
+
+0.005   2019-02-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] POD formatting so the functions can be linked.
+
+
+0.004   2019-02-14 (PERLANCAR)
+
+	- Make sort order deterministic [GH#1].
+
+
 0.003   2017-07-04 (PERLANCAR)
 
 	- No functional changes.

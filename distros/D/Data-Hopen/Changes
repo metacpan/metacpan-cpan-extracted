@@ -1,0 +1,17 @@
+Revision history for Data-Hopen
+
+0.000009    2019-02-13
+        Renamed from Build::Hopen to Data::Hopen
+
+0.000008    2019-02-09
+        Tweaked File::Glob usage to support Perl 5.14
+
+0.000007    2019-02-08
+        First version that can generate a Makefile
+
+0.000006    2019-02-06
+        Substantially expanded
+
+0.000003    2018-01-02
+        First full trial release
+

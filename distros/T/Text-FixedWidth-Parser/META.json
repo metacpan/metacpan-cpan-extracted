@@ -4,7 +4,7 @@
       "Venkatesan Narayanan"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "perl_5"
    ],
@@ -22,23 +22,18 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "DateTime::Format::Strptime" : "1.68",
             "Math::Expression" : "1.47",
-            "Moose" : "2.1804"
-         }
-      },
-      "test" : {
-         "requires" : {
+            "Moose" : "2.1804",
             "Test::Class" : "0.5",
             "Test::Most" : "0.34"
          }
@@ -52,6 +47,5 @@
          "web" : "https://github.com/VenkatesanNarayanan/Text-FixedWidth-Parser"
       }
    },
-   "version" : "0.4",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.5"
 }

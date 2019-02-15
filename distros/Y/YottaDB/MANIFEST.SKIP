@@ -1,0 +1,13 @@
+tar.gz$
+~$
+\.swp$
+YottaDB\.(?:c|o|bs)$
+blib/
+Makefile.old
+Makefile
+gen-errors.h
+gen-switch.h
+^MYMETA\.
+pm_to_blib
+\.git/
+\.gitignore

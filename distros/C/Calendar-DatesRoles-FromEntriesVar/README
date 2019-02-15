@@ -1,0 +1,47 @@
+NAME
+    Calendar::DatesRoles::FromEntriesVar - Provide Calendar::Dates interface
+    to consumer which has @ENTRIES
+
+VERSION
+    This document describes version 0.002 of
+    Calendar::DatesRoles::FromEntriesVar (from Perl distribution
+    Calendar-DatesRoles-FromEntriesVar), released on 2019-02-14.
+
+DESCRIPTION
+    This role provides Calendar::Dates interface to modules that has
+    @ENTRIES package variable.
+
+METHODS
+  get_min_year
+  get_max_year
+  get_entries
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Calendar-DatesRoles-FromEntriesVar>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Calendar-DatesRoles-FromEntriesVar>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-DatesRoles-F
+    romEntriesVar>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Calendar::Dates
+
+    Calendar::DatesRoles::FromData
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

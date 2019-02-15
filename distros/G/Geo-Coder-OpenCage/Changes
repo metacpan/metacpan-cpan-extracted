@@ -1,8 +1,11 @@
 Revision history for Geo-Coder-OpenCage
 
+0.19    2019-02-15
+        - skip some tests if not online. No code changes.
+        
 0.18    2019-02-12
-        - not sure why but seems CPAN failed to index 0.17 so pushing a new release
-          to see if that solved it. no code changes
+        - not sure why but seems CPAN failed to index 0.17 so pushing a new
+          release to see if that solved it. No code changes.
           
 0.17    2019-02-11
         - more tests, specifically for correctly dealing with 402, 403 response

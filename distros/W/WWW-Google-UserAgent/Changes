@@ -1,5 +1,8 @@
 Revision history for WWW::Google::UserAgent
 
+0.23  Thu Feb 14 15:15:00 2019
+      - Merged PR #1 (more efficient type constraints), thanks @tobyink++.
+
 0.22  Sun Jan 20 04:25:00 2019
       - Used namespace::autoclean instead.
 

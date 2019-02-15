@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Patch
   homepage: https://metacpan.org/release/Module-Patch
   repository: git://github.com/perlancar/perl-Module-Patch.git
-version: '0.275'
+version: '0.276'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -110,7 +110,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

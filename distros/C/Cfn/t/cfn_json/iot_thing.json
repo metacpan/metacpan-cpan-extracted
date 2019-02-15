@@ -1,0 +1,43 @@
+{
+   "AWSTemplateFormatVersion": "2010-09-09",
+   "Resources": {
+      "MyThing": {
+         "Type": "AWS::IoT::Thing",
+         "Properties": {
+            "ThingName": {
+               "Ref": "NameParameter"
+            },
+            "AttributePayload": {
+               "attributes": {
+                  "myAttributeA": {
+                     "Ref": "MyAttributeValueA"
+                  },
+                  "myAttributeB": {
+                     "Ref": "MyAttributeValueB"
+                  },
+                  "myAttributeC": {
+                     "Ref": "MyAttributeValueC"
+                  }
+               }
+            }
+         }
+      }
+   },
+   "Parameters": {
+      "NameParameter": {
+         "Type": "String"
+      },
+      "MyAttributeValueA": {
+         "Type": "String",
+         "Default": "myStringA123"
+      },
+      "MyAttributeValueB": {
+         "Type": "String",
+         "Default": "myStringB123"
+      },
+      "MyAttributeValueC": {
+         "Type": "String",
+         "Default": "myStringC123"
+      }
+   }
+}

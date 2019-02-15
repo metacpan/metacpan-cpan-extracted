@@ -20,13 +20,13 @@ no_index:
 provides:
   WWW::Google::UserAgent:
     file: lib/WWW/Google/UserAgent.pm
-    version: '0.22'
+    version: '0.23'
   WWW::Google::UserAgent::DataTypes:
     file: lib/WWW/Google/UserAgent/DataTypes.pm
-    version: '0.22'
+    version: '0.23'
   WWW::Google::UserAgent::Exception:
     file: lib/WWW/Google/UserAgent/Exception.pm
-    version: '0.22'
+    version: '0.23'
 requires:
   HTTP::Tiny: '0.043'
   IO::Socket::SSL: '1.56'
@@ -38,5 +38,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/WWW-Google-UserAgent.git
-version: '0.22'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

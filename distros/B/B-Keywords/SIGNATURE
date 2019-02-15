@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,27 +12,32 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 9f54ee05615aaf16e452d16c56a176afa9194f91 Changes
-SHA1 0e987cce2b4e94a4d6920e7353f8674a4462528a LICENSE
-SHA1 46ec9231f2152e6fcf554de076272a1fc03e0a72 MANIFEST
-SHA1 bd14190f3bb17ccf70e7111fe67834390e3ccfe0 META.json
-SHA1 08517d33341df96a66ca6690171ad7169a1e3801 META.yml
-SHA1 202c59d7d6a91edfdb197f6959f7e8ac9b463dc0 Makefile.PL
-SHA1 bdbfcd14170d22b0f44a0fc52778bf3a0dda7199 README
-SHA1 8ee601afbd53de5b6a6b0c850201e408208dd240 lib/B/Keywords.pm
-SHA1 26eebf3bf6177dc6fc7f91890c68c05b7a61fbe1 t/10basic.t
-SHA1 d977811d4f33d71a1b515fc6eb96d1bb4184bbd5 t/11keywords.t
-SHA1 e6872ebfbccb57ef102945ddd11d131453024ea3 t/export.t
-SHA1 a68085c94808f024eb2ed76ce73ea439f0ed6d48 t/z_kwalitee.t
-SHA1 993b3cef8c06a70d99829facf76140864eb57240 t/z_meta.t
-SHA1 ade48e2b6098a0a329312543e1451e7e7fb7bc5f t/z_perl_minimum_version.t
-SHA1 db4c7c6e1b7cf2bd96d86fa303fd2225b8bf8613 t/z_pod-coverage.t
-SHA1 c8aa3903d3aba84c19bbd94d677620c758fa07d5 t/z_pod.t
+SHA256 6d434e77fb33a585b598d2b2d25824810bfe2497a7c12a0761b5a3fa73200d4b Changes
+SHA256 6724a85e9820d3b08909b518d4d3d3621cf2fb7f2876360e5b2874efbf8c2ee8 LICENSE
+SHA256 7ebf58443f98897bc4d14d25de111e89838c847102bfafd98cad2ab6de7e7177 MANIFEST
+SHA256 9521b77986f290c079b32eaada1ab1818afde5de79f4cf238245d9172cb708c3 META.json
+SHA256 c05f017c37ab461fcd584b98cc79a87e98193bc4b8e1acb9bd5a0031dc3781f2 META.yml
+SHA256 9a19d5c8de008a8f6dcd8cd8c5aceb9dd554fec349ec3e11026ef6d9a2c558b2 Makefile.PL
+SHA256 cd5fc9aaa4fabef2fc35053cea726f3333de1ae31c4da4157ea8ce7a7d3bc122 README
+SHA256 135f211d978b290a60100c7ffcb946f85be117e32b24e9c01ee1f1c7d4e9c2f2 lib/B/Keywords.pm
+SHA256 e03c8fcbca5ea500346882132d9a4ae57fc8fca37bdf2a8e0576f25408760885 t/10basic.t
+SHA256 e769e2d323d01b7cb67224442cacc7b0bc60bf04492e688af87708d9930a24fa t/11keywords.t
+SHA256 eccb70c617b51d41f8fe54bf1c52e6767f849833cf3c244fb432b3ebfdc2d4bf t/export.t
+SHA256 34c1d133349031b5a5d6cf062b02e8913c23ec49da10bd63a1a52161b690847a t/z_kwalitee.t
+SHA256 fb00e0e0d57de606699706d2a2e486df05d840793d3bcf6e4bb13f1604f19487 t/z_meta.t
+SHA256 956f858cc6c609d57ad5f92b6432a40c9c3d90576c397f90afa4489d12030850 t/z_perl_minimum_version.t
+SHA256 0ba22336dc34b370d0fa7a0d87ed45080d76e87d6a409881f9402277d66a13e4 t/z_pod-coverage.t
+SHA256 298e9a5d4190701d4438f3f68c1e44139cfa36982503ccc44572d04cfe3c317a t/z_pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQRZHhhUcL58V8z0UW2abZJij/3JQgUCW358egAKCRCabZJij/3J
-QnVSAJ9DO0XDCERdUoCWX97y3Cgr8ccbYgCeMbqO3f33Rbw0QiSl7hZkPLNrFFw=
-=cq1R
+iQEzBAEBCgAdFiEEKJWogdNCcPq/6PdHtPYzOeZdZBQFAlxmjvsACgkQtPYzOeZd
+ZBQAoAgAvP/3c5tvr8u7vnk2FW3UjWkC0pzIC8G90gDZsvIuoTCTNI9f05OTC2iG
+uUf4OQy08sjjPC6GsmBu3EVbXFPgPQBQcHM4/yht9eGhn1viGqTSZY8uTq8mk9TD
+dVbE5x/z4p6wBOLrmux+4csrolLUHP6B9y0uFKknbTuBfBMGJXPTitecpwQLoh96
+FsQeU4qRrODBfN4sGKmxFl1mrTyg6tzGH/lY+VqXfpdSeBMWegR93BDSiErbBOsE
+Y8mwkBvzd9+rqrfClQJbifuEKQXr7KbIq1heGaeM0u+gAtFS41RpxzlfMfQjepQq
+mjbGiJyy7ZANqgCcaR25Ynll/BktAQ==
+=9Zh5
 -----END PGP SIGNATURE-----

@@ -1,5 +1,6 @@
 package File::ArchivableFormats;
 use Moose;
+use namespace::autoclean;
 
 # ABSTRACT: Be able to select archivable formats
 
@@ -13,7 +14,7 @@ use Moose::Util::TypeConstraints;
 # Distzilla
 use Archive::Zip qw();
 
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 
 subtype 'PluginRole'
     => as 'Object'
@@ -74,8 +75,7 @@ sub identify_from_fh {
     if (!$info) {
         $info = $self->magic->info_from_handle($fh);
     }
-    return $self->identify_from_mimetype($info->{mime_type})
-
+    return $self->identify_from_mimetype($info->{mime_type});
 }
 
 sub identify_from_path {
@@ -84,9 +84,9 @@ sub identify_from_path {
     my $info = $self->identify_via_libexif($path);
     if (!$info) {
         $info = $self->magic->info_from_filename($path);
-        return $self->identify_from_mimetype($info->{mime_type})
+        return $self->identify_from_mimetype($info->{mime_type});
     }
-    return $self->identify_from_mimetype($info->{mime_type})
+    return $self->identify_from_mimetype($info->{mime_type});
 }
 
 sub parse_extension {
@@ -136,7 +136,7 @@ File::ArchivableFormats - Be able to select archivable formats
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 SYNOPSIS
 
@@ -178,7 +178,7 @@ Returns a data structure like this:
         # DANS is the Prefered format list
         'DANS' => {
             # Types tell  you something about why something is on the
-            # prefered format list
+            # preferred format list
             'types' => [
                 'Plain text (Unicode)',
                 'Plain text (Non-Unicode)',
@@ -189,7 +189,7 @@ Returns a data structure like this:
             # The extensions by which belongs to the mime type/file
             'allowed_extensions' => ['.asc', '.txt'],
             # Boolean which tells you if the file is archivable and
-            # therfore prefered.
+            # therfore preferred.
             'archivable'         => 1
         },
         'mime_type' => 'text/plain'
@@ -207,8 +207,6 @@ Identify based on the mimetype
 
 Identify mimetype via libexif.
 You will need to have L<Archive::Zip> installed for MS Office documents
-
-=head1 FUNCTIONS
 
 =head2 installed_drivers
 

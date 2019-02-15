@@ -1,15 +1,24 @@
 NAME
     Calendar::DatesRoles::FromData - Provide Calendar::Dates interface to
-    consumer which has @ENTRIES
+    consumer which has __DATA__ section
 
 VERSION
-    This document describes version 0.001 of Calendar::DatesRoles::FromData
+    This document describes version 0.002 of Calendar::DatesRoles::FromData
     (from Perl distribution Calendar-DatesRoles-FromData), released on
-    2019-02-13.
+    2019-02-14.
 
 DESCRIPTION
-    This role provides Calendar::Dates interface to modules that has
-    @ENTRIES package variable.
+    This role provides Calendar::Dates interface to modules that puts the
+    entries in __DATA__ section. Entries should be in the following format:
+
+     YYYY-MM-DD;Summary;tag1,tag2
+
+    Blank lines or lines that start with "#" are ignored.
+
+    Examples:
+
+     2019-02-14;Valentine's day
+     2019-06-01;Pancasila day
 
 METHODS
   get_min_year
@@ -33,6 +42,8 @@ BUGS
 
 SEE ALSO
     Calendar::Dates
+
+    Calendar::DatesRoles::FromEntriesVar
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -1,3 +1,11 @@
+0.002   2019-02-14 (PERLANCAR)
+
+	- [Incompatible change] Change implementation to provide
+	  Calendar::Dates interface for module that puts entries in
+	  __DATA__section; old implementation now moved to
+	  Calendar-DatesRoles-FromEntriesVar.
+
+
 0.001    2019-02-12 (PERLANCAR)
 
          - First release.

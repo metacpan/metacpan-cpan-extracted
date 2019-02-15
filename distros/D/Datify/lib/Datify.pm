@@ -1,41 +1,32 @@
 use v5.14;
-
-package Datify;
-# ABSTRACT: Simple stringification of data.
-our $VERSION = 'v0.18.270'; # VERSION
-
-
-use overload ();
 use warnings;
 
-use Carp               ();#qw( croak );
-use List::Util    1.40 ();#qw( reduce sum );
-use Scalar::Util  1.40 ();#qw( blessed looks_like_number refaddr reftype );
-use String::Tools    qw( subst );
-use Sub::Util     1.40 ();#qw( set_subname );
-
-my %SETTINGS;
+package Datify v0.19.045;
+# ABSTRACT: Simple stringification of data.
 
 
-sub add_handler {
-    no strict 'refs';
-    my $pkg  = shift || __PACKAGE__; $pkg = ref $pkg || $pkg;
-    my $name = _nameify(shift);
-    *{$name} = Sub::Util::set_subname $name => shift;
-}
+use mro      ();        #qw( get_linear_isa );
+use overload ();        #qw( Method Overloaded );
 
+use Carp         ();    #qw( carp croak );
+use List::Util   ();    #qw( reduce sum );
+use Scalar::Util ();    #qw( blessed looks_like_number refaddr reftype );
+use String::Tools v0.18.277 ();    #qw( stringify subst );
+use Sub::Util      1.40     ();    #qw( subname );
 
 
 ### Constructor ###
 
 
 sub new {
-    my $self = shift || __PACKAGE__;
-    if ( my $class = ref $self ) {
-        return bless { %$self,    @_ }, $class;
-    } else {
-        return bless { %SETTINGS, @_ }, $self;
+    my $class = shift || __PACKAGE__;
+
+    my %self = ();
+    if ( defined( my $blessed = Scalar::Util::blessed($class) ) ) {
+        %self  = %$class;    # shallow copy
+        $class = $blessed;
     }
+    return @_ ? bless( \%self, $class )->set(@_) : bless( \%self, $class );
 }
 
 
@@ -43,14 +34,17 @@ sub new {
 ### Setter ###
 
 
+my %SETTINGS;
+
 sub set {
     my $self = shift;
+    return $self unless @_;
     my %set  = @_;
 
     my $return;
     my $class;
-    if ( $class = ref $self ) {
-        # Make a copy
+    if ( defined( $class = Scalar::Util::blessed($self) ) ) {
+        # Make a shallow copy
         $self   = bless { %$self }, $class;
         $return = 0;
     } else {
@@ -62,7 +56,14 @@ sub set {
     delete $self->{keyword_set} if ( $set{keywords} );
     delete $self->{"tr$_"} for grep { exists $set{"quote$_"} } ( 1, 2, 3 );
 
-    %$self = ( %$self, %set );
+    my $internal = $class->isa( scalar caller );
+    while ( my ( $k, $v ) = each %set ) {
+        Carp::carp( 'Unknown key ', $k )
+            unless $internal
+            || exists $self->{$k}
+            || exists $SETTINGS{$k};
+        $self->{$k} = $v;
+    }
 
     return ( $self, $class )[$return];
 }
@@ -73,23 +74,63 @@ sub set {
 
 
 sub get {
-    my $self = shift; $self = \%SETTINGS unless ref $self;
-    my $count = scalar @_;
-    if    ( $count == 0 ) { return %$self }
-    elsif ( $count == 1 ) { return $self->{ +shift } }
-    else                  { return @{$self}{@_} }
+    my $self  = shift;
+    my $count = scalar(@_);
+
+    if ( defined( Scalar::Util::blessed($self) ) ) {
+        return
+              $count == 0 ? $self->hashkeyvals( { %SETTINGS, %$self } )
+            : $count == 1 ?
+                exists  $self->{ $_[0] }
+                    ?   $self->{ $_[0] }
+                    : $SETTINGS{ $_[0] }
+            : map { exists $self->{$_} ? $self->{$_} : $SETTINGS{$_} } @_;
+    } else {
+        return
+              $count == 0 ? $self->hashkeyvals( \%SETTINGS )
+            : $count == 1 ? $SETTINGS{ $_[0] }
+            :               @SETTINGS{@_};
+    }
+}
+
+
+sub exists {
+    my $self = shift;
+    return unless my $count = scalar(@_);
+
+    if ( Scalar::Util::blessed($self) ) {
+        return $count == 1
+            ? do {  exists $self->{ $_[0] } || exists $SETTINGS{ $_[0] } }
+            : map { exists $self->{ $_ }    || exists $SETTINGS{ $_ } } @_;
+    } else {
+        return
+            $count == 1 ? exists $SETTINGS{ $_[0] }
+            :       map { exists $SETTINGS{ $_ } } @_;
+    }
+}
+
+
+
+sub add_handler {
+    my $self = &self;
+    my $code = pop;
+    my $pkg  = length( $_[0] ) ? shift : caller;
+
+    if ( my $name = _nameify($pkg) ) {
+        no strict 'refs';
+        *{$name} = $code;
+    }
 }
 
 
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # Var options
     name        => '$self',
     assign      => '$var = $value;',
     list        => '($_)',
+    list_sep    => ', ',
     beautify    => undef,
 );
 
@@ -121,45 +162,44 @@ sub varify {
     if ( defined $_[0] && !ref $_[0] ) {
         ( $sigil, $name )
             = $_[0] =~ /^($sigils)?((?:$package\::)?$varname|$package\::)$/;
-        shift if defined $name && length $name;
+        shift if length $name;
     }
     my $value = 1 == @_ ? shift : \@_;
 
-    if ( defined $name && length $name ) {
+    if ( length $name ) {
         if ( $name =~ /[[:cntrl:]]/ ) {
             $name =~ s/([[:cntrl:]])/'^' . chr(64 + ord($1) % 64)/e;
             $name =~ s/($cntrl_word)(?!\s*\})/\{$1\}/;
         }
     } else {
-        if ( my $ref = ref $value ) {
+        if ( defined( my $ref = Scalar::Util::blessed($value) ) ) {
             $name = _nameify($ref);
         } else {
-            $name = $self->{name};
+            $name = $self->get('name');
         }
     }
-    Carp::croak "Missing name" unless ( defined $name && length $name );
+    Carp::croak "Missing name" unless ( length $name );
 
     unless ($sigil) {
         my $ref = ref $value;
-        if    ( $ref eq 'ARRAY' ) { $sigil = '@'; }
-        elsif ( $ref eq 'HASH' )  { $sigil = '%'; }
-        else                      { $sigil = '$'; }
+        $sigil
+            = $ref eq 'ARRAY' ? '@'
+            : $ref eq 'HASH'  ? '%'
+            :                   '$';
     }
     $name = $sigil . $name;
     $self = $self->set( name => $name );
 
-    if    ( $sigil eq '$' ) { $value = $self->scalarify($value); }
-    elsif ( $sigil eq '@' ) {
-        $value = subst( $self->{list}, $self->listify($value) );
-    }
-    elsif ( $sigil eq '%' ) {
-        $value = subst( $self->{list}, $self->pairify($value) );
-    }
-    else    { $value = $self->scalarify($value); }
+    $value
+        = $sigil eq '$' ?                             $self->scalarify($value)
+        : $sigil eq '@' ? _subst( $self->get('list'), $self->listify($value) )
+        : $sigil eq '%' ? _subst( $self->get('list'), $self->pairify($value) )
+        :                                             $self->scalarify($value)
+        ;
 
-    $value = subst( $self->{assign}, var => $name, value => $value );
-    if ( $self->{beautify} ) {
-        return $self->{beautify}->($value);
+    $value = _subst( $self->get('assign'), var => $name, value => $value );
+    if ( my $beautify = $self->get('beautify') ) {
+        return $beautify->($value);
     } else {
         return $value;
     }
@@ -170,9 +210,7 @@ sub varify {
 ### Scalar: undef ###
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # Undef options
     null => 'undef',
 );
@@ -181,7 +219,7 @@ sub varify {
 sub undefify {
     my $self = &self;
     return $self->scalarify(shift) if @_ and defined($_[0]);
-    return $self->{null};
+    return $self->get('null');
 }
 
 
@@ -189,9 +227,7 @@ sub undefify {
 ### Scalar: boolean ###
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # Boolean options
     true    => 1,
     false   => "''",
@@ -200,9 +236,9 @@ sub undefify {
 
 sub booleanify {
     my $self = &self;
-    local $_ = shift;
+    local $_ = shift if @_;
     return $self->undefify unless defined;
-    return $_ ? $self->{true} : $self->{false};
+    return $_ ? $self->get('true') : $self->get('false');
 }
 
 
@@ -212,20 +248,22 @@ sub booleanify {
 
 sub stringify1 {
     my $self = &self;
-    local $_ = shift;
-    $_ = "$_" if ref;
+    local $_ = shift if @_;
     return $self->undefify unless defined;
-    my ( $open, $close ) = $self->_get_delim( shift // $self->{quote1} );
+    $_ = String::Tools::stringify($_) if ref;
+    my $quote1 = $self->get('quote1');
+    my ( $open, $close ) = $self->_get_delim( shift // $quote1 );
 
-    # single-quote and backslash.
-    s/([$open$close\x5c])/\\$1/g;
+    $self = $self->set( encode => $self->get('encode1') );
+    my $to_encode = $self->_to_encode( $open, $close );
+    s/([$to_encode])/$self->_encode_char($1)/eg;
 
-    if ( $self->{quote1} ne $open ) {
+    if ( $quote1 ne $open ) {
         if ( $open =~ /\w/ ) {
             $open  = ' ' . $open;
             $close = ' ' . $close;
         }
-        $open = $self->{q1} . $open;
+        $open = $self->get('q1') . $open;
     }
 
     return sprintf '%s%s%s', $open, $_, $close;
@@ -238,23 +276,28 @@ sub stringify1 {
 
 sub stringify2 {
     my $self = &self;
-    local $_ = shift;
-    $_ = "$_" if ref;
+    local $_ = shift if @_;
     return $self->undefify unless defined;
-    my ( $open, $close ) = $self->_get_delim( shift // $self->{quote2} );
+    $_ = String::Tools::stringify($_) if ref;
+    my $quote2 = $self->get('quote2');
+    my ( $open, $close ) = $self->_get_delim( shift // $quote2 );
 
-    my $sigils = $self->{sigils} =~ s/(.)/$self->_encode($1)/egsr;
+    my @sigils;
+    if ( my $sigils = $self->get('sigils') ) {
+        push @sigils, split //, $sigils;
+    }
 
     # quote char(s), sigils, and backslash.
-    s/([$open$close$sigils\x5c])/\\$1/g;
-    s/([[:cntrl:]])/$self->_encode($1)/eg;
+    $self = $self->set( encode => $self->get('encode2') );
+    my $to_encode = $self->_to_encode( $open, $close, @sigils );
+    s/([$to_encode])/$self->_encode_char($1)/eg;
 
-    if ( $self->{quote2} ne $open ) {
+    if ( $quote2 ne $open ) {
         if ( $open =~ /\w/ ) {
             $open  = ' ' . $open;
             $close = ' ' . $close;
         }
-        $open = $self->{q2} . $open;
+        $open = $self->get('q2') . $open;
     }
 
     return sprintf '%s%s%s', $open, $_, $close;
@@ -265,9 +308,7 @@ sub stringify2 {
 ### Scalar: string ###
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # String options
     quote   => undef,   # Auto
     quote1  => "'",
@@ -278,18 +319,28 @@ sub stringify2 {
     q2      => 'qq',
     sigils  => '$@',
     longstr => 1_000,
-    encode  => {
-        map( { ord( eval qq!"$_"! ) => $_ } qw( \0 \a \t \n \f \r \e ) ),
+    encode1 => {
+        0x5c => '\\\\',
+
+        byte  => '\\%c',
+    },
+    encode2 => {
+        map( { ord( eval qq!"$_"! ) => $_ } qw( \0 \a \b \t \n \f \r \e ) ),
         #0x00 => '\\0',
         #0x07 => '\\a',
-        ##0x08 => '\\b',   # Does \b mean backspace or word-boundary?
+        #0x08 => '\\b',
         #0x09 => '\\t',
         #0x0a => '\\n',
         #0x0c => '\\f',
         #0x0d => '\\r',
         #0x1b => '\\e',
-        byte => '\\x%02x',
-        wide => '\\x{%04x}',
+        0x5c => '\\\\',
+
+        also  => '[:cntrl:]',
+        byte  => '\\x%02x',
+        #utf   => 8,
+        wide  => '\\x{%04x}',
+        #vwide => '\\x{%06x}',
     },
 
     do {
@@ -309,35 +360,35 @@ sub stringify2 {
 
 sub stringify {
     my $self = &self;
-    local $_ = shift;
+    local $_ = shift if @_;
     return $self->undefify unless defined;
-    $_ = "$_" if ref;
+    $_ = String::Tools::stringify($_) if ref;
     local $@ = undef;
 
-    if ( $self->{quote} ) {
-        return $self->stringify1($_) if $self->{quote1} eq $self->{quote};
-        return $self->stringify2($_) if $self->{quote2} eq $self->{quote};
-        Carp::croak("Bad setting for quote: $self->{quote}");
+    my ( $quote, $quote1, $quote2 ) = $self->get(qw( quote quote1 quote2 ));
+    if ($quote) {
+        return $self->stringify1($_) if $quote1 && $quote1 eq $quote;
+        return $self->stringify2($_) if $quote2 && $quote2 eq $quote;
+        Carp::croak("Bad setting for quote: $quote");
     }
 
-    # Long strings or strings with control characters
-    my $longstr = $self->{longstr};
+    # Long strings or strings with special characters
+    my $longstr = $self->get('longstr');
+    my $encode2 = $self->get('encode2');
+    my $also    = $encode2 && $encode2->{also};
     return $self->stringify2($_)
-        if ( $longstr && $longstr < length() || /[[:cntrl:]]/ );
+        if ( ( $longstr && $longstr < length() ) || ( $also && /[$also]/ ) );
 
-    my $quote1 = $self->{quote1};
-    $self->{tr1} ||= "tr\\$quote1\\$quote1\\";
-    my $single_quotes  = eval $self->{tr1} // die $@;
+    my $tr1 = $self->get('tr1');
+    $self = $self->set( tr1 => $tr1 = "tr\\$quote1\\$quote1\\" )
+        if ( not $tr1 );
+    my $single_quotes = eval $tr1 // die $@;
     return $self->stringify1($_) unless $single_quotes;
 
-    my $quote2 = $self->{quote2};
-    my $sigils = $self->{sigils};
-    #$self->{tr2} ||= "tr\\$quote2\\$quote2\\";
-    #my $double_quotes = eval $self->{tr2} // die $@;
-    #my $sigil_count   = eval "tr\\$sigils\\$sigils\\" // die $@;
-    #return $self->stringify2($_) unless $double_quotes + $sigil_count;
-    $self->{tr2} ||= "tr\\$quote2$sigils\\$quote2$sigils\\";
-    my $double_quotes = eval $self->{tr2} // die $@;
+    my ( $sigils, $tr2 ) = $self->get(qw( sigils tr2 ));
+    $self = $self->set( tr2 => $tr2 = "tr\\$quote2$sigils\\$quote2$sigils\\" )
+        if ( not $tr2 );
+    my $double_quotes = eval $tr2 // die $@;
     return $self->stringify2($_) unless $double_quotes;
 
     return $self->stringify1( $_, $self->_find_q($_) );
@@ -349,9 +400,7 @@ sub stringify {
 # Adapted from Perl FAQ "How can I output my numbers with commas added?"
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # Number options
     infinite  => "'inf'",
     -infinite => "'-inf'",
@@ -362,7 +411,7 @@ sub stringify {
 
 sub is_numeric {
     my $self = &self;
-    local $_ = shift;
+    local $_ = shift if @_;
 
     return undef unless defined;
 
@@ -375,23 +424,24 @@ sub is_numeric {
         }
     }
 
-    # The "defined" and Regexp ensure that we're not
-    # considering inf, nan, and their variants as numeric
-    # (even though looks_like_number does)
+    # The "defined" ensures that we're not considering nan,
+    # and the tests against inf/-inf ensure that those are rejected
+    # (even though looks_like_number considers them valid)
     return Scalar::Util::looks_like_number($_)
         && defined( $_ <=> 0 )
-        && !/^\s*[+-]?(?i:inf(?:inity)?|nan)\s*$/;
+        && $_ !=  'inf'
+        && $_ != '-inf';
 }
 
 
 sub numify {
     my $self = &self;
-    local $_ = shift;
+    local $_ = shift if @_;
 
     return $self->undefify unless defined;
 
     if ( $self->is_numeric($_) ) {
-        return $_ unless my $sep = $self->{num_sep};
+        return $_ unless my $sep = $self->get('num_sep');
 
         # Fractional portion
                 s{^(\s*[-+]?\d*\.\d\d)(\d+)}              [${1}$sep${2}];
@@ -403,12 +453,14 @@ sub numify {
         return $_;
     }
     elsif ( Scalar::Util::looks_like_number($_) ) {
-        if ( not defined( $_ <=> 0 ) ) { return $self->{nonnumber}  }
-        elsif ( $_ ==  'inf' )         { return $self->{infinite}   }
-        elsif ( $_ == -'inf' )         { return $self->{-infinite}  }
+        return
+              $_ ==  'inf'        ? $self->get('infinite')
+            : $_ == '-inf'        ? $self->get('-infinite')
+            : defined( $_ <=> 0 ) ? $_
+            :                       $self->get('nonnumber');
     }
 
-    return $self->{nonnumber};
+    return $self->get('nonnumber');
 }
 
 
@@ -418,55 +470,61 @@ sub numify {
 
 sub scalarify {
     my $self = &self;
-    my $s = shift;
+    local $_ = shift if @_;
 
-    return $self->undefify unless defined $s;
+    my $value = $self->_cache_get($_) // $self->_scalarify($_);
+    $self->isa( scalar caller )
+        ? $self->_cache_add( $_ => $value )
+        : $self->_cache_reset($_);
+    return $value;
+}
 
-    my $ref = ref $s;
-    if ( $ref eq '' ) {
+sub _scalarify {
+    my $self = &self;
+    local $_ = shift if @_;
+
+    return $self->undefify unless defined $_;
+
+    if ( defined( my $blessed = Scalar::Util::blessed($_) ) ) {
+        return
+              $blessed eq 'Regexp' ? $self->regexpify($_)
+            :                        $self->objectify($_);
+    }
+
+    my $ref = Scalar::Util::reftype $_;
+    if ( not $ref ) {
         # Handle GLOB, LVALUE, and VSTRING
-        my $ref2 = ref \$s;
-        if    ( $ref2 eq 'GLOB' )    { return $self->globify($s);    }
-        elsif ( $ref2 eq 'LVALUE' )  { return $self->lvalueify($s);  }
-        elsif ( $ref2 eq 'VSTRING' ) { return $self->vstringify($s); }
-
-        # All other non-ref types.
-        return $self->numify($s)
-            if ( Scalar::Util::looks_like_number($s) );
-        return $self->stringify($s);
+        my $ref2 = ref \$_;
+        return
+              $ref2 eq 'GLOB'    ? $self->globify($_)
+            : $ref2 eq 'LVALUE'  ? $self->lvalueify($_)
+            : $ref2 eq 'VSTRING' ? $self->vstringify($_)
+            : $ref2 eq 'SCALAR'  ? (
+                Scalar::Util::looks_like_number($_)
+                    ? $self->numify($_)
+                    : $self->stringify($_)
+            )
+            : $self->stringify($_);
     }
 
-    if ( my $_cache = $self->_cache($s) ) {
-        return $_cache;
-    }
+    return
+          $ref eq 'ARRAY'  ? $self->arrayify(@$_)
+        : $ref eq 'CODE'   ? $self->codeify($_)
+        : $ref eq 'FORMAT' ? $self->formatify($_)
+        : $ref eq 'HASH'   ? $self->hashify($_)
+        : $ref eq 'IO'     ? $self->ioify($_)
+        : $ref eq 'REF'    ? $self->refify($$_)
+        : $ref eq 'REGEXP' ? $self->regexpify($_)        # ???
+        : do {
+            my $reference = $self->get('reference');
 
-    if    ( $ref eq 'ARRAY' )   { return $self->arrayify($s);  }
-    elsif ( $ref eq 'CODE' )    { return $self->codeify($s);   }
-    elsif ( $ref eq 'FORMAT' )  { return $self->formatify($s); }
-    elsif ( $ref eq 'HASH' )    { return $self->hashify($s);   }
-    elsif ( $ref eq 'IO' )      { return $self->ioify($s);     }
-    elsif ( $ref eq 'REF' )     { return $self->refify($s);    }
-    elsif ( $ref eq 'Regexp' )  { return $self->regexpify($s); }
-
-    elsif ( $ref eq 'GLOB' )    {
-        return subst( $self->{reference}, $self->globify($$s) );
-    }
-    elsif ( $ref eq 'LVALUE' )  {
-        return subst( $self->{reference}, $self->lvalueify($$s) );
-    }
-    elsif ( $ref eq 'SCALAR' )  {
-        return subst( $self->{reference}, $self->scalarify($$s) );
-    }
-    elsif ( $ref eq 'VSTRING' ) {
-        return subst( $self->{reference}, $self->vstringify($$s) );
-    }
-    else {
-        if ( my $code = $self->_find_handler($ref) ) {
-            return $self->$code($s);
-        } else {
-            return $self->objectify($s);
-        }
-    }
+              $ref eq 'GLOB'    ? _subst( $reference, $self->globify($$_) )
+            : $ref eq 'LVALUE'  ? _subst( $reference, $self->lvalueify($$_) )
+            : $ref eq 'SCALAR'  ? _subst( $reference, $self->scalarify($$_) )
+            : $ref eq 'VSTRING' ? _subst( $reference, $self->vstringify($$_) )
+            :                                         $self->objectify($_)
+            ;
+        };
 }
 
 
@@ -474,9 +532,7 @@ sub scalarify {
 ### Scalar: LValue ###
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # LValue options
     lvalue  => 'substr($lvalue, 0)',
 );
@@ -484,7 +540,7 @@ sub scalarify {
 
 sub lvalueify {
     my $self = &self;
-    return subst( $self->{lvalue}, lvalue => $self->stringify(shift) );
+    return _subst( $self->get('lvalue'), lvalue => $self->stringify(shift) );
 }
 
 
@@ -492,9 +548,7 @@ sub lvalueify {
 ### Scalar: VString ###
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # VString options
     vformat => 'v%vd',
     #vformat => 'v%*vd',
@@ -504,10 +558,10 @@ sub lvalueify {
 
 sub vstringify {
     my $self = &self;
-    if ( defined $self->{vsep} ) {
-        return sprintf $self->{vformat}, $self->{vsep}, shift;
+    if ( defined( my $vsep = $self->get('vsep') ) ) {
+        return sprintf $self->get('vformat'), $vsep, shift;
     } else {
-        return sprintf $self->{vformat}, shift;
+        return sprintf $self->get('vformat'), shift;
     }
 }
 
@@ -516,37 +570,54 @@ sub vstringify {
 ### Regexp ###
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # Regexp options
     quote3  => '/',
     #tr3     => q!tr\\/\\/\\!,
     q3      => 'qr',
+
+    encode3 => {
+        map( { ord( eval qq!"$_"! ) => $_ } qw( \0 \a \t \n \f \r \e ) ),
+        #0x00 => '\\0',
+        #0x07 => '\\a',
+        #0x09 => '\\t',
+        #0x0a => '\\n',
+        #0x0c => '\\f',
+        #0x0d => '\\r',
+        #0x1b => '\\e',
+
+        also  => '[:cntrl:]',
+        byte  => '\\x%02x',
+        wide  => '\\x{%04x}',
+        #vwide => '\\x{%06x}',
+    },
 );
 
 
 sub regexpify {
     my $self = &self;
-    local $_ = shift;
+    local $_ = shift if @_;
     local $@ = undef;
 
-    $self->{tr3} ||= "tr\\$self->{quote3}\\$self->{quote3}\\";
-    my $quoter = eval $self->{tr3} // die $@;
+    my ( $quote3, $tr3 ) = $self->get(qw( quote3 tr3 ));
+    $self = $self->set( tr3 => $tr3 = "tr\\$quote3\\$quote3\\" )
+        if ( not $tr3 );
+    my $quoter = eval $tr3 // die $@;
     my ( $open, $close )
         = $self->_get_delim(
-            shift // $quoter ? $self->_find_q($_) : $self->{quote3} );
+            shift // $quoter ? $self->_find_q($_) : $self->get('quote3') );
 
     # Everything but the quotes should be escaped already.
-    s/([$open$close])/\\$1/g;
-    s/([[:cntrl:]])/$self->_encode($1)/eg;
+    $self = $self->set( encode => $self->get('encode3') );
+    my $to_encode = $self->_to_encode( $open, $close );
+    s/([$to_encode])/$self->_encode_char($1)/eg;
 
     if ( $open =~ /\w/ ) {
         $open  = ' ' . $open;
         $close = ' ' . $close;
     }
 
-    $open = $self->{q3} . $open;
+    $open = $self->get('q3') . $open;
 
     return sprintf '%s%s%s', $open, $_, $close;
 }
@@ -558,41 +629,28 @@ sub regexpify {
 
 sub listify {
     my $self = &self;
-    if (1 == @_) {
-        my $ref = Scalar::Util::reftype $_[0];
-        if    ( $ref eq 'HASH' )  { @_ = %{ +shift } }
-        elsif ( $ref eq 'ARRAY' ) {
-            my $array = shift;
-            $self->{_cache}{ +Scalar::Util::refaddr $array }
-                = $self->_name_and_position;
-            @_ = @$array;
-        }
-    }
     my @values;
     for ( my $i = 0; $i < @_; $i++ ) {
         my $value = $_[$i];
-        push @{ $self->{_position} //= [] }, "[$i]";
+        $self = $self->_push_position("[$i]");
         push @values, $self->scalarify($value);
-        pop  @{ $self->{_position} };
+        $self->_pop_position;
     }
-    return join($self->{list_sep}, @values);
+    return join( $self->get('list_sep'), @values );
 }
 
 
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # Array options
     array_ref   => '[$_]',
-    list_sep    => ', ',
 );
 
 
 sub arrayify {
     my $self = &self;
-    return subst( $self->{array_ref}, $self->listify(@_) );
+    return _subst( $self->get('array_ref'), $self->listify(@_) );
 }
 
 
@@ -600,19 +658,33 @@ sub arrayify {
 ### Hash ###
 
 
+sub is_keyword {
+    my $self = &self;
+
+    my $keyword_set = $self->get('keyword_set');
+    if ( not $keyword_set ) {
+        my $keywords = $self->get('keywords') // [];
+        return unless @$keywords;
+        $keyword_set = { map { $_ => 1 } @$keywords };
+        $self->{keyword_set} = $keyword_set;
+    }
+    return exists $keyword_set->{ +shift };
+}
+
+
 sub keyify {
     my $self = &self;
-    local $_ = shift;
+    local $_ = shift if @_;
 
     return $self->undefify unless defined;
     return $_ if ref;
 
-    $self->{keyword_set} = { map { $_ => 1 } @{ $self->{keywords} } }
-        unless $self->{keyword_set};
-
-    if ( Scalar::Util::looks_like_number($_) ) {
+    if ( $self->is_numeric($_) ) {
         return $self->numify($_);
-    } elsif ( /^-?[[:alpha:]_]\w*$/ && ! $self->{keyword_set}{$_} ) {
+    } elsif ( length() < $self->get('longstr')
+        && !$self->is_keyword($_)
+        && /\A-?[[:alpha:]_]\w*\z/ )
+    {
         # If the key would be autoquoted by the fat-comma (=>),
         # then there is no need to quote it.
 
@@ -624,40 +696,32 @@ sub keyify {
 
 
 
-sub keysort($$);
+sub _cmp_;
 BEGIN {
     if ( $^V >= v5.16.0 ) {
-        *keysort = Sub::Util::set_subname(
-            keysort => sub($$) {
-                my $na = Scalar::Util::looks_like_number( $_[0] )
-                    && defined( $_[0] <=> 0 );
-                my $nb = Scalar::Util::looks_like_number( $_[1] )
-                    && defined( $_[1] <=> 0 );
-                if ( $na && $nb ) { return $_[0] <=> $_[1] }
-                elsif ($na) { return -1 }
-                elsif ($nb) { return +1 }
-                else {
-                    return CORE::fc( $_[0] ) cmp CORE::fc( $_[1] )
-                        ||           $_[0]   cmp           $_[1];
-                }
-            }
-        );
+        eval <<'END_CMP';
+sub _cmp_ {
+    return CORE::fc( $_[0] ) cmp CORE::fc( $_[1] )
+        ||           $_[0]   cmp           $_[1];
+}
+END_CMP
     } else {
-        *keysort = Sub::Util::set_subname(
-            keysort => sub($$) {
-                my $na = Scalar::Util::looks_like_number( $_[0] )
-                    && defined( $_[0] <=> 0 );
-                my $nb = Scalar::Util::looks_like_number( $_[1] )
-                    && defined( $_[1] <=> 0 );
-                if ( $na && $nb ) { return $_[0] <=> $_[1] }
-                elsif ($na) { return -1 }
-                elsif ($nb) { return +1 }
-                else        { return $_[0] cmp $_[1] }
-            }
-        );
+        eval <<'END_CMP';
+sub _cmp_ { $_[0] cmp $_[1] }
+END_CMP
     }
 }
 
+sub keysort($$) {
+    my ( $a, $b ) = @_;
+    my $numa = Datify->is_numeric($a);
+    my $numb = Datify->is_numeric($b);
+       $numa && $numb ? $a <=> $b
+    :  $numa          ? -1
+    :           $numb ?        +1
+    :  _cmp_( $a, $b )
+    ;
+}
 
 
 sub hashkeys {
@@ -665,8 +729,8 @@ sub hashkeys {
     my $hash = shift;
 
     my @keys = keys %$hash;
-    if ( my $ref = ref( my $keyfilter = $self->{keyfilter} ) ) {
-        my $keyfilternot     = !$self->{keyfilterdefault};
+    if ( my $ref = ref( my $keyfilter = $self->get('keyfilter') ) ) {
+        my $keyfilternot     = !$self->get('keyfilterdefault');
         my $keyfilterdefault = !$keyfilternot;
         if ( $ref eq 'ARRAY' || $ref eq 'HASH' ) {
             my %keyfilterhash
@@ -687,11 +751,11 @@ sub hashkeys {
             };
         } elsif ( $ref eq 'SCALAR' ) {
             my $keyfiltervalue = $$keyfilter;
-            $self->{keyfilter} = $keyfilter = sub { $keyfiltervalue };
+            $self->{keyfilter} = $keyfilter = sub {$keyfiltervalue};
         }
         @keys = grep { $keyfilter->() } @keys;
     }
-    if ( my $keysort = $self->{keysort} ) {
+    if ( my $keysort = $self->get('keysort') ) {
         @keys = sort $keysort @keys;
     }
     return @keys;
@@ -710,34 +774,27 @@ sub pairify {
     if (1 == @_) {
         my $ref = Scalar::Util::reftype $_[0];
         if    ( $ref eq 'ARRAY' ) { @_ = @{ +shift } }
-        elsif ( $ref eq 'HASH' )  {
-            my $hash = shift;
-            $self->{_cache}{ +Scalar::Util::refaddr $hash }
-                = $self->_name_and_position;
-
-            @_ = $self->hashkeyvals($hash);
-        }
+        elsif ( $ref eq 'HASH' )  { @_ = $self->hashkeyvals(shift) }
     }
     # Use for loop in order to preserve the order of @_,
     # rather than each %{ { @_ } }, which would mix-up the order.
     my @list;
+    my $pair = $self->get('pair');
     for ( my $i = 0; $i < @_ - 1; $i += 2 ) {
         my ( $k, $v ) = @_[ $i, $i + 1 ];
         my $key = $self->keyify($k);
-        push @{ $self->{_position} //= [] }, "{$key}";
+        $self = $self->_push_position("{$key}");
         my $val = $self->scalarify($v);
-        pop  @{ $self->{_position} };
-        push @list, subst( $self->{pair}, key => $key, value => $val );
+        $self->_pop_position;
+        push @list, _subst( $pair, key => $key, value => $val );
     }
-    return join($self->{list_sep}, @list);
+    return join( $self->get('list_sep'), @list );
 }
 
 
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # Hash options
     hash_ref         => '{$_}',
     pair             => '$key => $value',
@@ -751,7 +808,7 @@ sub pairify {
 
 sub hashify  {
     my $self = &self;
-    return subst( $self->{hash_ref}, $self->pairify(@_) );
+    return _subst( $self->get('hash_ref'), $self->pairify(@_) );
 }
 
 
@@ -760,13 +817,14 @@ sub hashify  {
 
 
 sub overloaded {
-    my $self   = shift; $self = $self->new() unless ref $self;
-    my $object = shift;
+    my $self   = &self;
+    my $object = @_ ? shift : $_;
 
-    return unless Scalar::Util::blessed($object)
+    return unless defined( Scalar::Util::blessed($object) )
         && overload::Overloaded($object);
 
-    foreach my $overload ( @{ $self->{overloads} } ) {
+    my $overloads = $self->get('overloads') || [];
+    foreach my $overload (@$overloads) {
         if ( my $method = overload::Method( $object => $overload ) ) {
             return $method;
         }
@@ -777,60 +835,49 @@ sub overloaded {
 
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # Object options
     overloads => [ '""', '0+' ],
     object    => 'bless($data, $class_str)',
-    #object    => '$class($data)',
-    io        => '*UNKNOWN{IO}',
+    #object    => '$class->new($data)',
+    #object    => '$class=$data',
 );
 
 
 sub objectify {
-    my $self   = shift; $self = $self->new() unless ref $self;
-    my $object = shift;
+    my $self   = &self;
+    my $object = @_ ? shift : $_;
 
     return $self->scalarify($object)
-        unless defined( my $class = Scalar::Util::blessed $object );
+        unless defined( my $class = Scalar::Util::blessed($object) );
 
     my $data;
-    if ( my $method = $self->overloaded($object) ) {
+    if (0) {
+    } elsif ( my $code = $self->_find_handler($class) ) {
+        return $self->$code($object);
+    } elsif ( my $method = $self->overloaded($object) ) {
         $data = $self->scalarify( $object->$method() );
-    } elsif ( my $keyvals = $object->can('_attrkeyvals') ) {
-        $data = subst( $self->{hash_ref},
-            $self->pairify( $object->$keyvals() ) );
+    } elsif ( my $attrkeyvals = $object->can('_attrkeyvals') ) {
+        # TODO: Look this up via meta-objects
+        $data = $self->hashify( $object->$attrkeyvals() );
     } else {
         $data = Scalar::Util::reftype $object;
 
-        # Huh?!
-        #if ( $data eq '' ) { return $self->scalarify( $object ) }
-
-        if    ( $data eq 'HASH' )   {
-            # TODO: Look this up via meta-objects and such.
-            if ( my $attrkeys = $object->can('_attrkeys') ) {
-                my @attrs = $object->$attrkeys();
-                $data = subst( $self->{hash_ref},
-                    $self->pairify( map { $_ => $object->{$_} } @attrs ) );
-            } else {
-                                      $data = $self->hashify(  {%$object} )
-            }
-        }
-        elsif ( $data eq 'ARRAY' )  { $data = $self->arrayify( [@$object] ) }
-        elsif ( $data eq 'CODE' )   { $data = $self->codeify(    $object  ) }
-        elsif ( $data eq 'FORMAT' ) { $data = $self->formatify(  $object  ) }
-        elsif ( $data eq 'GLOB' )   { $data = $self->globify(    $object  ) }
-        elsif ( $data eq 'IO' )     { $data = $self->ioify(      $object  ) }
-        elsif ( $data eq 'REF' )    { $data = $self->refify(     $object  ) }
-        elsif ( $data eq 'Regexp' ) { $data = $self->regexpify(  $object  ) }
-        elsif ( $data eq 'SCALAR' ) { $data = $self->refify(    $$object  ) }
-
-        else { $data = "*UNKNOWN{$data}" } # ???
+        $data
+            = $data eq 'ARRAY'  ? $self->arrayify( @$object )
+            : $data eq 'CODE'   ? $self->codeify(   $object )
+            : $data eq 'FORMAT' ? $self->formatify( $object )
+            : $data eq 'GLOB'   ? $self->globify(   $object )
+            : $data eq 'HASH'   ? $self->hashify(   $object )
+            : $data eq 'IO'     ? $self->ioify(     $object )
+            : $data eq 'REF'    ? $self->refify(   $$object )
+            : $data eq 'REGEXP' ? $self->regexpify( $object )
+            : $data eq 'SCALAR' ? $self->refify(   $$object )
+            :                     "*UNKNOWN{$data}";
     }
 
-    return subst(
-        $self->{object},
+    return _subst(
+        $self->get('object'),
         class_str => $self->stringify($class),
         class     => $class,
         data      => $data
@@ -842,13 +889,23 @@ sub objectify {
 ### Objects: IO ###
 
 
+__PACKAGE__->set(
+    # IO options
+    io => '*$name{IO}',
+);
+
+
+
 sub ioify {
     my $self = &self;
-    my $io   = shift;
-    foreach my $ioe (qw(IN OUT ERR)) {
+    my $io   = @_ ? shift : $_;
+
+    my $ioname = 'UNKNOWN';
+    foreach my $ioe (qw( IN OUT ERR )) {
         no strict 'refs';
         if ( *{"main::STD$ioe"}{IO} == $io ) {
-            return "*STD$ioe\{IO}";
+            $ioname = "STD$ioe";
+            last;
         }
     }
     # TODO
@@ -856,10 +913,11 @@ sub ioify {
     #    no strict 'refs';
     #    if ( defined( *{$glob}{IO} ) && *{$glob}{IO} == $io ) {
     #        keys %main::; # We're done, so reset each()
-    #        return "*$name\{IO}";
+    #        $ioname = $name;
+    #        last;
     #    }
     #}
-    return $self->{io};
+    return _subst( $self->get('io'), name => $ioname );
 }
 
 
@@ -867,34 +925,43 @@ sub ioify {
 ### Other ###
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # Code options
-    code    => 'sub {$_}',
-    body    => '...',
+    code     => 'sub {$body}',
+    codename => '\&$codename',
+    body     => '...',
 );
 
 
-sub codeify   {
+sub codeify {
     my $self = &self;
-    if ( ! @_ || 'CODE' eq ref $_[0] ) {
-        return subst $self->{code}, $self->{body};
-    } else {
-        my $code = shift;
-        if ( ! defined $code || ref $code ) {
-            $code = $self->scalarify($code);
+
+    my $template = $self->get('code');
+    my %data     = ( body => $self->get('body') );
+    if ( @_ && defined( $_[0] ) ) {
+        local $_ = shift;
+        if ( my $ref = Scalar::Util::reftype($_) ) {
+            if ( $ref eq 'CODE' ) {
+                if ( ( my $subname = Sub::Util::subname($_) )
+                    !~ /\A(?:\w+\::)*__ANON__\z/ )
+                {
+                    $template = $self->get('codename') // $template;
+                    %data = ( codename => $subname );
+                }
+            } else {
+                %data = ( body => $self->scalarify($_) );
+            }
+        } else {
+            %data = ( body => $_ );
         }
-        return subst $self->{code}, $code;
     }
+    return _subst( $template, %data );
 }
 
 
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # Reference options
     reference   => '\\$_',
     dereference => '$referent->$place',
@@ -904,17 +971,14 @@ sub codeify   {
 
 sub refify    {
     my $self = &self;
-    local $_ = shift;
-    $_ = $$_ if ref;
-    return subst( $self->{reference}, $self->scalarify($_) );
+    local $_ = shift if @_;
+    return _subst( $self->get('reference'), $self->scalarify($_) );
 }
 
 
 
 
-%SETTINGS = (
-    %SETTINGS,
-
+__PACKAGE__->set(
     # Format options
     format  => "format UNKNOWN =\n.\n",
 );
@@ -923,7 +987,7 @@ sub refify    {
 sub formatify {
     my $self = &self;
     #Carp::croak "Unhandled type: ", ref shift;
-    return $self->{format};
+    return $self->get('format');
 }
 
 
@@ -945,16 +1009,29 @@ sub globify   {
 ### they are subject to change or disappear at any time.
 sub self {
     my $self = shift;
-    return ref $self ? $self : $self->new();
+    return defined( Scalar::Util::blessed($self) ) ? $self : $self->new();
 }
 sub _nameify {
-    local $_ = shift;
+    local $_ = shift if @_;
     s/::/_/g;
     return lc() . 'ify';
 }
 sub _find_handler {
-    my $self = shift;
-    return $self->can( _nameify(shift) );
+    my $self  = shift;
+    my $class = shift;
+    my $isa = mro::get_linear_isa($class);
+    foreach my $c (@$isa) {
+        if ( my $code = $self->can( _nameify($c) ) ) {
+            return $code;
+        }
+    }
+    return;
+}
+
+sub _subst {
+    die "Cannot subst on an undefined value"
+        unless defined $_[0];
+    goto &String::Tools::subst;
 }
 
 sub _get_delim {
@@ -963,7 +1040,8 @@ sub _get_delim {
 
     my $close;
     if ( 1 < length $open ) {
-        my %qpairs = map { $_ => 1 } @{ $self->{qpairs} };
+        my $qpairs = $self->get('qpairs') || [];
+        my %qpairs = map { $_ => 1 } @$qpairs;
         if ( $qpairs{$open} ) {
             ( $open, $close ) = split //, $open, 2;
         } else {
@@ -975,32 +1053,152 @@ sub _get_delim {
     return $open, $close;
 }
 
-sub _encode {
+sub _to_encode {
+    my $self   = shift;
+
+    my $encode = $self->get('encode');
+
+    # Ignore the settings for byte, byte2, byte3, byte4, vwide, wide,
+    # and utf
+    my @encode
+        = grep { !(/\A(?:also|byte[234]?|v?wide|utf)\z/) } keys(%$encode);
+
+    my @ranges = ( $encode->{also} // () );
+    foreach my $element (@_) {
+        if ( Scalar::Util::looks_like_number($element) ) {
+            push @encode, $element;
+        } elsif ( length($element) == 1 ) {
+            # An actual character, lets get the ordinal value and use that
+            push @encode, ord($element);
+        } else {
+            # Something longer, it must be a range of chars,
+            # like [:cntrl:], \x00-\x7f, or similar
+            push @ranges, $element;
+        }
+    }
+    @encode = map {
+        # Encode characters in their \xXX or \x{XXXX} notation,
+        # to get the literal values
+        sprintf( $_ <= 255 ? '\\x%02x' : '\\x{%04x}', $_ )
+    } sort {
+        $a <=> $b
+    } @encode;
+
+    return join( '', @encode, @ranges );
+}
+
+sub _encode_ord2utf16 {
+    my $self = shift;
+    my $ord  = shift;
+
+    my $encode = $self->get('encode');
+    my $format = $encode->{wide};
+    my @wides  = ();
+    if (0) {
+    } elsif ( 0x0000 <= $ord && $ord <= 0xffff ) {
+        if ( 0xd800 <= $ord && $ord <= 0xdfff ) {
+            die "Illegal character $ord";
+        }
+
+        @wides = ( $ord );
+    } elsif ( 0x01_0000 <= $ord && $ord <= 0x10_ffff ) {
+        $format = $encode->{vwide} || $format x 2;
+
+        $ord -= 0x01_0000;
+        my $ord2 = 0xdc00 + ( 0x3ff & $ord );
+        $ord >>= 10;
+        my $ord1 = 0xd800 + ( 0x3ff & $ord );
+        @wides = ( $ord1, $ord2 );
+    } else {
+        die "Illegal character $ord";
+    }
+    return sprintf( $format, @wides );
+}
+sub _encode_ord2utf8 {
+    my $self = shift;
+    my $ord  = shift;
+
+    my @bytes  = ();
+    my $format = undef;
+
+    my $encode = $self->get('encode');
+    if (0) {
+    } elsif (      0x00 <= $ord && $ord <=      0x7f ) {
+        # 1 byte represenstation
+        $format = $encode->{byte};
+        @bytes  = ( $ord );
+    } elsif (    0x0080 <= $ord && $ord <=    0x07ff ) {
+        # 2 byte represenstation
+        $format = $encode->{byte2} || $format x 2;
+
+        my $ord2 = 0x80 + ( 0x3f & $ord );
+        $ord >>= 6;
+        my $ord1 = 0xc0 + ( 0x1f & $ord );
+        @bytes = ( $ord1, $ord2 );
+    } elsif (    0x0800 <= $ord && $ord <=    0xffff ) {
+        if (     0xd800 <= $ord && $ord <=    0xdfff ) {
+            die "Illegal character $ord";
+        }
+
+        # 3 byte represenstation
+        $format = $encode->{byte3} || $format x 3;
+
+        my $ord3 = 0x80 + ( 0x3f & $ord );
+        $ord >>= 6;
+        my $ord2 = 0x80 + ( 0x3f & $ord );
+        $ord >>= 6;
+        my $ord1 = 0xe0 + ( 0x0f & $ord );
+        @bytes = ( $ord1, $ord2, $ord3 );
+    } elsif ( 0x01_0000 <= $ord && $ord <= 0x10_ffff ) {
+        # 4 byte represenstation
+        $format = $encode->{byte4} || $format x 4;
+
+        my $ord4 = 0x80 + ( 0x3f & $ord );
+        $ord >>= 6;
+        my $ord3 = 0x80 + ( 0x3f & $ord );
+        $ord >>= 6;
+        my $ord2 = 0x80 + ( 0x3f & $ord );
+        $ord >>= 6;
+        my $ord1 = 0xf0 + ( 0x07 & $ord );
+        @bytes = ( $ord1, $ord2, $ord3, $ord4 );
+    } else {
+        die "Illegal character $ord";
+    }
+    return sprintf( $format, @bytes );
+}
+sub _encode_char {
     my $self = shift;
     my $ord  = ord shift;
 
-    my $encoding;
-    my $encodings = $self->{encode};
-    if ( exists $encodings->{$ord} ) {
-        return $encodings->{$ord};
+    my $encode = $self->get('encode');
+    my $utf    = $encode->{utf} // 0;
+    if ( defined $encode->{$ord} ) {
+        return $encode->{$ord};
+    } elsif ( $utf == 8 ) {
+        return $self->_encode_ord2utf8( $ord );
+    } elsif ( $utf == 16 ) {
+        return $self->_encode_ord2utf16( $ord );
     } elsif ( $ord <= 255 ) {
-        $encoding = $encodings->{byte};
+        return sprintf $encode->{byte}, $ord;
+    } elsif ( $ord <= 65_535 ) {
+        my $encoding = $encode->{wide} // $encode->{byte};
+        return sprintf $encoding, $ord;
     } else {
-        $encoding = $encodings->{wide} // $encodings->{byte};
+        my $encoding = $encode->{vwide} // $encode->{wide} // $encode->{byte};
+        return sprintf $encoding, $ord;
     }
-
-    return sprintf $encoding, $ord;
 }
 
 # Find a good character to use for delimiting q or qq.
 sub _find_q {
     my $self = shift;
-    local $_ = shift;
+    local $_ = shift if @_;
 
     my %counts;
     $counts{$_}++ foreach /([[:punct:]])/g;
     #$counts{$_}++ foreach grep /[[:punct:]]/, split //;
-    foreach my $pair ( @{ $self->{qpairs} } ) {
+    my $qpairs = $self->get('qpairs') || [];
+    foreach my $pair (@$qpairs) {
         $counts{$pair}
             = List::Util::sum 0,
                 grep defined,
@@ -1010,48 +1208,83 @@ sub _find_q {
 
     return List::Util::reduce {
         ( ( $counts{$a} //= 0 ) <= ( $counts{$b} //= 0 ) ) ? $a : $b
-    } @{ $self->{qpairs} }, @{ $self->{qquotes} };
+    } @{ $self->get('qpairs') }, @{ $self->get('qquotes') };
+}
+sub _push_position {
+    my $self     = shift;
+    my $position = shift;
+    push @{ $self->{_position} //= [] }, $position;
+    return $self;
+}
+sub _pop_position {
+    my $self = shift;
+    return pop @{ $self->{_position} };
 }
 sub _name_and_position {
     my $self = shift;
 
-    my $nest = $self->{nested} // $self->{dereference};
+    my $nest = $self->get('nested') // $self->get('dereference');
     my $pos  = List::Util::reduce(
-        sub { subst( $nest, referent => $a, place => $b ) },
+        sub { _subst( $nest, referent => $a, place => $b ) },
             @{ $self->{_position} //= [] }
-    ) // '';
+    );
 
-    my $var = $self->{name};
-    my $sigil = substr $var, 0, 1;
+    my $var = $self->get('name');
+    my $sigil = length $var ? substr $var, 0, 1 : '';
     if ( $sigil eq '@' || $sigil eq '%' ) {
         if ($pos) {
             $var = sprintf '$%s%s', substr($var, 1), $pos;
         } else {
-            $var = subst( $self->{reference}, $var );
+            $var = _subst( $self->get('reference'), $var );
         }
     } elsif ($pos) {
-        $var = subst(
-            $self->{dereference},
+        $var = _subst(
+            $self->get('dereference') // $self->get('nested'),
             referent => $var,
             place    => $pos
         );
     }
-
     return $var;
 }
-sub _cache {
+
+__PACKAGE__->set(
+    # _caching options
+    _cache_hit => 0,
+);
+sub _cache_add {
+    my $self  = shift;
+    my $ref   = shift;
+    my $value = shift;
+
+    return $self unless my $refaddr = Scalar::Util::refaddr $ref;
+    my $_cache = $self->{_cache} //= {};
+    my $entry = $_cache->{$refaddr} //= [ $self->_name_and_position ];
+    push @$entry, $value if @$entry == $self->get('_cache_hit');
+
+    return $self;
+}
+sub _cache_get {
     my $self = shift;
     my $item = shift;
-    return $self->scalarify($item) unless ref $item;
 
-    my $refaddr = Scalar::Util::refaddr $item;
-    if ( my $cache = $self->{_cache}{$refaddr} ) {
-        return $cache;
+    return unless my $refaddr = Scalar::Util::refaddr $item;
+
+    my $_cache = $self->{_cache} //= {};
+    if ( my $entry = $_cache->{$refaddr} ) {
+        my $repr = $self->get('_cache_hit');
+        return $entry->[$repr]
+            // Carp::croak 'Recursive structures not allowed at ',
+                           $self->_name_and_position;
+    } else {
+        # Pre-populate the cache, so that we can check for loops
+        $_cache->{$refaddr} = [ $self->_name_and_position ];
+        return;
     }
-
-    $self->{_cache}{$refaddr} = $self->_name_and_position;
-
-    return;
+}
+sub _cache_reset {
+    my $self = shift;
+    %{ $self->{_cache} //= {} } = ();
+    return $self;
 }
 
 1;
@@ -1077,6 +1310,7 @@ Datify - Simple stringification of data.
 
  # Or
 
+ Datify->set( ... );                # See OPTIONS below
  print Datify->varify( data => [...] ), "\n";
  # "@data = (...);\n"
 
@@ -1093,7 +1327,7 @@ easier to use, and has better formatting and options.
 
 =item I<name>       => B<'$self'>
 
-The neame of the default variable.
+The name of the default variable.
 This is also set as the first parameter to C<varify>.
 
 =item I<assign>     => B<'$var = $value;'>
@@ -1105,6 +1339,10 @@ C<'my $var = $value;'>.
 =item I<list>       => B<'($_)'>
 
 The delimiters for a list.
+
+=item I<list_sep>    => B<', '>
+
+The separator between list elements.
 
 =item I<beautify>   => B<undef>
 
@@ -1204,21 +1442,99 @@ See L</stringify( value )>.
 Change to a false value to indicate no string is long.
 Change to a negative value to indicate every string is long.
 
-=item I<encode>  => B<<
-{
-0 => '\0',
-7 => '\a',
-9 => '\t',
-10 => '\n',
-12 => '\f',
-13 => '\r',
-27 => '\e',
-byte => '\x%02x',
-wide => '\x{%04x}'
-}
->>
+=item I<encode1>  => B<{ ... }>
+
+=over
+
+=item I<92>   => B<'\\\\'>
+
+=item I<byte> => B<'\\%c'>
+
+=back
+
+=item I<encode2>  => B<{ ... }>
+
+=over
+
+=item I<0>    => B<'\0'>
+
+=item I<7>    => B<'\a'>
+
+=item I<8>    => B<'\b'>
+
+=item I<9>    => B<'\t'>
+
+=item I<10>   => B<'\n'>
+
+=item I<12>   => B<'\f'>
+
+=item I<13>   => B<'\r'>
+
+=item I<27>   => B<'\e'>
+
+=item I<92>   => B<'\\\\'>
+
+=item I<also> => B<'[:cntrl:]'>
+
+=item I<byte> => B<'\x%02x'>
+
+=item I<wide> => B<'\x{%04x}'>
+
+=back
 
 How to encode characters that need encoding.
+
+=over
+
+=item I<number> => B<'encoding'>
+
+Encode the character with ordinal C<number> as C<'encoding'>.
+
+=item I<also>   => B<'[:cntrl:]'>
+
+Encode this range of characters, too.
+
+=item I<byte>   => B<'\x%02x'>
+
+Encode characters that do not otherwise have an encoding
+with this C<sprintf> expression.
+
+=item I<byte2>  => B<undef>
+
+Used to encode 2 byte UTF-8 sequences.
+If unset, then 2-byte sequences are encoded by using they C<byte>
+encoding twice.
+
+=item I<byte3>  => B<undef>
+
+Used to encode 3 byte UTF-8 sequences.
+If unset, then 3-byte sequences are encoded by using they C<byte>
+encoding three times.
+
+=item I<byte4>  => B<undef>
+
+Used to encode 4 byte UTF-8 sequences.
+If unset, then 4-byte sequences are encoded by using they C<byte>
+encoding four times.
+
+=item I<utf>    => B<undef>
+
+Use the internal encoding routines to encode characters.
+Set it to C<8> to encode as UTF-8,
+or set it to C<16> to encode as UTF-16.
+
+=item I<vwide>  => B<undef>
+
+Encode very wide characters that do not otherwise have an encoding
+with this C<sprintf> expression.  If unset, then very wide characters
+are encoded with C<wide> twice.
+
+=item I<wide>   => B<'\x{%04x}'>
+
+Encode wide characters that do not otherwise have an encoding
+with this C<sprintf> expression.
+
+=back
 
 =item I<qpairs>  => B<< [ qw\ () <> [] {} \ ] >>
 
@@ -1283,6 +1599,35 @@ C<< vformat => 'v%*vd', vsep => '.' >>.
 
 =item I<q3>      => B<'qr'>
 
+=item I<encode3>  => B<{ ... }>
+
+=over
+
+=item I<0>    => B<'\0'>
+
+=item I<7>    => B<'\a'>
+
+=item I<9>    => B<'\t'>
+
+=item I<10>   => B<'\n'>
+
+=item I<12>   => B<'\f'>
+
+=item I<13>   => B<'\r'>
+
+=item I<27>   => B<'\e'>
+
+=item I<also> => B<'[:cntrl:]'>
+
+=item I<byte> => B<'\x%02x'>
+
+=item I<wide> => B<'\x{%04x}'>
+
+=back
+
+How to encode characters that need encoding.
+See L<< /I<encode2>  => B<{ ... }> >>
+
 =back
 
 =head2 Arrayify options
@@ -1292,10 +1637,6 @@ C<< vformat => 'v%*vd', vsep => '.' >>.
 =item I<array_ref>   => B<'[$_]'>
 
 The representation of an array reference.
-
-=item I<list_sep>    => B<', '>
-
-The representation of the separator between list elements.
 
 =back
 
@@ -1340,7 +1681,7 @@ C<HASH> or C<ARRAY>, should it pass through or not?
 
 How to sort the keys in a hash.  This has a performance hit,
 but it makes the output much more readable.  See the description of
-L</keysort>.
+L</keysort($$)>.
 
 =item I<keywords>         => B<[qw(undef)]>
 
@@ -1362,7 +1703,13 @@ See L<overload> for more information on overloading.
 The representation of an object.  Other possibilities include
 C<'$class($data)'> or C<< '$class->new($data)' >>.
 
-=item I<io>         => B<'*UNKNOWN{IO}'>
+=back
+
+=head2 IOify options
+
+=over
+
+=item I<io> => B<'*$name{IO}'>
 
 The representation of unknown IO objects.
 
@@ -1372,13 +1719,17 @@ The representation of unknown IO objects.
 
 =over
 
-=item I<code>    => B<'sub {$_}'>
+=item I<code>     => B<'sub {$_}'>
 
 The representation of a code reference.  This module does not currently
 support decompiling code to make a complete representation, but if passed
 a representation, can wrap it in this.
 
-=item I<body>    => B<'...'>
+=item I<codename> => B<'\&$_'>
+
+The representation of a code reference by name.
+
+=item I<body>     => B<'...'>
 
 The representation of the body to a code reference.
 This module does not currently support decompiling code to make a
@@ -1417,20 +1768,6 @@ showing the acutal representation.
 
 =head1 METHODS
 
-=head2 C<< add_handler( 'Class::Name' => \&code_ref ) >>
-
-Add a handler to handle an object of type C<'Class::Name'>.  C<\&code_ref>
-should take two parameters, a reference to Datify, and the object to be
-Datify'ed.  It should return a representation of the object.
-
- # Set URI's to stringify as "URI->new('http://example.com')"
- # instead of "bless(\'http://example.com', 'URI')"
- Datify->add_handler( 'URI' => sub {
-     my ( $datify, $uri ) = @_;
-     my $s = $datify->stringify("$uri");
-     return "URI->new($s)";
- } );
-
 =head2 C<< new( name => value, name => value, ... ) >>
 
 Create a C<Datify> object with the following options.
@@ -1458,6 +1795,31 @@ Get one or more existing values for one or more settings.
 If passed no names, returns all parameters and values.
 
 Can be called as a class method or an object method.
+
+=head2 exists( name, name, ... )
+
+Determine if values exists for one or more settings.
+
+Can be called as a class method or an object method.
+
+=head2 C<< add_handler( $class => \&code_ref ) >>
+
+Add a handler to handle an object of type C<$class>.
+C<\&code_ref> should take two parameters,
+a reference to Datify,
+and the object to be Datify'ed.
+It should return a representation of the object.
+
+If C<$class> is unspecified, assumes that it's handling
+for the package where C<add_handler> is called from.
+
+ # Set URI's to stringify as "URI->new('http://example.com')"
+ # instead of "bless(\'http://example.com', 'URI')"
+ Datify->add_handler( 'URI' => sub {
+     my ( $datify, $uri ) = @_;
+     my $s = $datify->stringify("$uri");
+     return "URI->new($s)";
+ } );
 
 =head2 C<< varify( name => value, value, ... ) >>
 
@@ -1502,7 +1864,8 @@ Returns the string that should be used for an undef value.
 =head2 C<booleanify( value )>
 
 Returns the string that represents the C<true> or C<false> interpretation
-of value.
+of C<value>.
+Will return the value for C<undefify> if C<value> is not defined.
 
 =head2 C<stringify1( value I<, delimiters> )>
 
@@ -1548,7 +1911,7 @@ and C<nonnumber> value for all not-a-numbers.
 
  Datify->numify('inf');              # 'inf'
  Datify->numify( 'inf' / 'inf' );    # 'nan'
- Datify->numify(undef);              # undef
+ Datify->numify(undef);              # 'undef'
  Datify->numify('apple');            # 'nan'
 
 =head2 C<scalarify( value )>
@@ -1584,6 +1947,11 @@ Returns value(s) as an array.
 
  Datify->arrayify( 1, 2, 3 );    # '[1, 2, 3]'
 
+=head2 C<is_keyword( word )>
+
+Checks if C<word> has been set in the
+L<< /I<keywords>         => B<[qw(undef)]> >> list.
+
 =head2 C<keyify( value )>
 
 Returns value as a key.  If value does not need to be quoted, it will not be.
@@ -1614,7 +1982,18 @@ has overloaded.  If nothing is overloaded, then return nothing.
 
 =head2 C<objectify( value )>
 
-Returns value as an object.
+Returns value as an object.  Tries several different ways to find the best
+representation of the object.
+
+If a handler has been defined for the object with
+L</C<< add_handler( $class => \&code_ref ) >>>, then use that.
+If the object has overloaded any of
+L<< /I<overloads>  => B<[ '""', '0+' ]> >>, then use that to represent
+the C<$data> portion of the object.
+If the object has an C<_attrkeyvals> method,
+then that will be used to gather the elements of the object.
+If the object has none of those things, then the object is inspected
+and handled appropriately.
 
  Datify->objectify($object);    # "bless({}, 'Object')"
 
@@ -1625,15 +2004,20 @@ STDIN, STDOUT, or STDERR.  Otherwise, returns the C<io> setting.
 
 =head2 C<codeify( value )>
 
-Returns a subroutine definition that is not likely to encode value.
+Returns a representation of a reference to a subroutine.
+If C<value> is not a reference,
+then uses that as the body of the anonymous subroutine.
+If C<value> is a C<CODE> reference, does some introspection on it,
+and expresses as a reference to the named subroutine,
+or to a generic anonymous function.
+If C<value> is another type of reference,
+then expressed as an anonymous function returning that.
+Otherwise, returns a generic anonymous function.
 
- Datify->codeify( \&subroutine );    # 'sub {...}'
-
-However,
-if C<value> is a string, then wrap that string with C<code>,
-or
-if C<value> is a reference to something other than C<CODE>,
-represent that reference by wrapping it with C<code>.
+ Datify->codeify( 'return $_' );               # 'sub { return $_ }'
+ Datify->codeify( \&MyModule::subroutine );    # '\&MyModule::subroutine'
+ Datify->codeify( sub {"!"} );                 # 'sub { ... }'
+ Datify->codeify( [1, 2, 3] );                 # 'sub { [1, 2, 3] }'
 
 =head2 C<refify( value )>
 
@@ -1650,7 +2034,7 @@ For normal values, remove the leading C<main::>.
 
 =head1 FUNCTIONS
 
-=head2 C<keysort>
+=head2 C<keysort($$)>
 
 Not a method, but a sorting routine that sorts numbers (using C<< <=> >>)
 before strings (using C<cmp>).
@@ -1680,7 +2064,7 @@ L<Data::Dumper>
 
 =head1 VERSION
 
-version v0.18.270
+This document describes version v0.19.045 of this module.
 
 =head1 AUTHOR
 
@@ -1688,7 +2072,7 @@ Bob Kleemann <bobk@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2018 by Bob Kleemann.
+This software is Copyright (c) 2014-2019 by Bob Kleemann.
 
 This is free software, licensed under:
 

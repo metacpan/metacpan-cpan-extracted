@@ -1,5 +1,11 @@
 Revision history for File::ArchivableFormats
 
+1.5       2019-02-15 07:29:24Z
+
+    * Maintainer only changes:
+        Fix grammar: prefered to preferred
+    * Add preferred_extension to tell which extension is preferred
+
 1.4       2017-10-27 14:13:11Z
 
     * Fix author tests

@@ -1,5 +1,16 @@
 Revision history for perl distribution Mojolicious-Plugin-OpenAPI
 
+2.12 2019-02-14T20:12:16+0100
+ - Fix HEAD requests #105
+ - Fix using /servers/0/url as basePath for OpenAPI v3 #110
+   Note: This could be breaking change
+ - Fix getting basePath when using under #107
+ - Add support for "nullable" in OpenAPI 3.0 #106
+ - Improved handling of Accept header in OpenAPI v3 #104
+   Can now handle wildcards, such as application/* and */*, even though not
+   defined in the specification.
+ - Bump JSON::Validator to 3.06
+
 2.11 2019-01-26T11:37:15+0900
  - Fix allowing regular requests with "openapi_cors_allowed_origins" #103
 

@@ -2,8 +2,8 @@ NAME
     Calendar::Dates::CFA - CFA exam calendar
 
 VERSION
-    This document describes version 0.003 of Calendar::Dates::CFA (from Perl
-    distribution Calendar-Dates-CFA), released on 2019-02-14.
+    This document describes version 0.005 of Calendar::Dates::CFA (from Perl
+    distribution Calendar-Dates-CFA), released on 2019-02-15.
 
 SYNOPSIS
   Using from Perl
@@ -67,7 +67,7 @@ SYNOPSIS
          date    => "2019-06-15",
          day     => 15,
          month   => 6,
-         summary => "Exam day: Asia-Pacific (Levels II & III); Americas and EMEA (all levels)",
+         summary => "Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels)",
          tags    => ["jun2019exam"],
          year    => 2019,
        },
@@ -174,7 +174,7 @@ DATES SAMPLES
      | 2019-03-13 | 13  | 3     | Final (late) registration fee deadline                                   | jun2019exam | 2019 |
      | 2019-03-18 | 18  | 3     | Final deadline to request disability accommodations                      | jun2019exam | 2019 |
      | 2019-06-11 | 11  | 6     | Deadline for submission of test center change requests                   | jun2019exam | 2019 |
-     | 2019-06-15 | 15  | 6     | Exam day: Asia-Pacific (Levels II & III); Americas and EMEA (all levels) | jun2019exam | 2019 |
+     | 2019-06-15 | 15  | 6     | Exam day: Asia-Pacific (Levels II & III), Americas and EMEA (all levels) | jun2019exam | 2019 |
      | 2019-06-16 | 16  | 6     | Exam day: Asia-Pacific (Level I only)                                    | jun2019exam | 2019 |
      | 2019-06-16 | 16  | 6     | Religious alternate exam date (Americas and EMEA, all levels)            | jun2019exam | 2019 |
      | 2019-06-17 | 17  | 6     | Religious alternate exam date (Asia Pacific, all levels)                 | jun2019exam | 2019 |

@@ -1,0 +1,22 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "DAX parameter group",
+  "Resources": {
+    "daxParamGroup": {
+      "Type": "AWS::DAX::ParameterGroup",
+      "Properties": {
+        "ParameterGroupName": "MyDAXParameterGroup",
+        "Description": "Description for my DAX parameter group",
+        "ParameterNameValues": {
+          "query-ttl-millis": "75000",
+          "record-ttl-millis": "88000"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ParameterGroup": {
+      "Value": "daxParamGroup"
+    }
+  }
+}

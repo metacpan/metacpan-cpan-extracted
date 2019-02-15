@@ -20,6 +20,13 @@ package CCfn {
   );
   has debug => (is => 'ro', default => sub { return $ENV{ CLOUDDEPLOY_DEBUG } ? 1 : 0 });
 
+  # Helper to safely add things to stash
+  sub add_to_stash {
+    my ($self, $name, $value) = @_;
+    die "An element is already in the stash with name $name" if (exists $self->stash->{$name});
+    $self->stash->{ $name } = $value;
+  }
+
   # Small helper to map a Moose class (parameters have a type) to a CloudFormation type
   sub _moose_to_cfn_class {
     return {  
@@ -46,8 +53,12 @@ package CCfn {
         $self->addOutput($name, $self->$name);
       } elsif ($att->does('CCfnX::Meta::Attribute::Trait::Condition')){
         $self->addCondition($name, $self->$name);
+      } elsif ($att->does('CCfnX::Meta::Attribute::Trait::Mapping')){
+        $self->addMapping($name, $self->$name);
       } elsif ($att->does('CCfnX::Meta::Attribute::Trait::Metadata')){
-        $self->Metadata->{ $name } = Cfn::Value->new(Value => $self->$name);
+        $self->addMetadata($name, $self->$name);
+      } elsif ($att->does('CCfnX::Meta::Attribute::Trait::Transform')){
+        $self->addTransform($name, $self->$name);
       }
     }
 
@@ -64,7 +75,7 @@ package CCfn {
 
   sub get_stackversion_from_metadata {
     my $self = shift;
-    $self->Metadata->{ StackVersion };
+    $self->Metadata('StackVersion');
   }
 
   before as_hashref => sub {
@@ -75,16 +86,16 @@ package CCfn {
   };
 
   around addOutput => sub { 
-    my ($orig, $self, $name, $output) = @_;
+    my ($orig, $self, $name, $output, @rest) = @_;
     my $new_name = $name;
     $new_name =~ s/\W//g;
-    if (defined $self->Outputs->{ $new_name }) {
+    if (defined $self->Output($new_name)) {
       die "The output name clashed with an existing output name. Be aware that outputs are stripped of all non-alphanumeric chars before being declared";
     }
     if ($new_name ne $name) {
       $self->output_mappings->{ $new_name } = $name;
     }
-    $self->$orig($new_name, $output);
+    $self->$orig($new_name, $output, @rest);
   };
 
   use Data::Graph::Util qw//;
@@ -141,6 +152,16 @@ package CCfnX::Meta::Attribute::Trait::Condition {
 package CCfnX::Meta::Attribute::Trait::Output {
   use Moose::Role;
   Moose::Util::meta_attribute_alias('Output');
+}
+
+package CCfnX::Meta::Attribute::Trait::Mapping {
+  use Moose::Role;
+  Moose::Util::meta_attribute_alias('Mapping');
+}
+
+package CCfnX::Meta::Attribute::Trait::Transform {
+  use Moose::Role;
+  Moose::Util::meta_attribute_alias('Transform');
 }
 
 package CCfnX::Meta::Attribute::Trait::PostOutput {

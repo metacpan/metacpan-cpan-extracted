@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.022';
+our $VERSION = '1.023';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -107,9 +107,12 @@ use Role::Tiny qw( with );
 with 'Yancy::Backend::Role::Sync';
 use Scalar::Util qw( looks_like_number blessed );
 use Mojo::Loader qw( load_class );
+require Yancy::Backend::Role::Relational;
 
 has collections => ;
 has dbic =>;
+
+*_normalize = \&Yancy::Backend::Role::Relational::normalize;
 
 sub new {
     my ( $class, $backend, $collections ) = @_;
@@ -150,7 +153,7 @@ sub _find {
 
 sub create {
     my ( $self, $coll, $params ) = @_;
-    $self->_normalize( $coll, $params );
+    $params = $self->_normalize( $coll, $params );
     my $created = $self->dbic->resultset( $coll )->create( $params );
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
     return $created->$id_field;
@@ -159,7 +162,8 @@ sub create {
 sub get {
     my ( $self, $coll, $id ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
-    return $self->_rs( $coll )->find( { $id_field => $id } );
+    my $ret = $self->_rs( $coll )->find( { $id_field => $id } );
+    return $self->_normalize( $coll, $ret );
 }
 
 sub list {
@@ -177,12 +181,15 @@ sub list {
         $rs_opt{ offset } = $opt->{offset};
     }
     my $rs = $self->_rs( $coll, $params, \%rs_opt );
-    return { items => [ $rs->all ], total => $self->_rs( $coll, $params )->count };
+    return {
+        items => [ map $self->_normalize( $coll, $_ ), $rs->all ],
+        total => $self->_rs( $coll, $params )->count,
+    };
 }
 
 sub set {
     my ( $self, $coll, $id, $params ) = @_;
-    $self->_normalize( $coll, $params );
+    $params = $self->_normalize( $coll, $params );
     if ( my $row = $self->_find( $coll, $id ) ) {
         $row->set_columns( $params );
         if ( $row->is_changed ) {
@@ -202,20 +209,6 @@ sub delete {
         return 1;
     }
     return 0;
-}
-
-sub _normalize {
-    my ( $self, $coll, $data ) = @_;
-    my $schema = $self->collections->{ $coll }{ properties };
-    for my $key ( keys %$data ) {
-        my $type = $schema->{ $key }{ type };
-        # Boolean: true (1, "true"), false (0, "false")
-        if ( _is_type( $type, 'boolean' ) ) {
-            $data->{ $key }
-                = $data->{ $key } && $data->{ $key } !~ /^false$/i
-                ? 1 : 0;
-        }
-    }
 }
 
 sub _is_type {
@@ -245,7 +238,7 @@ sub read_schema {
                 $self->_map_type( $c ),
                 'x-order' => $i + 1,
             };
-            if ( !$c->{is_nullable} && !$is_auto && !$c->{default_value} ) {
+            if ( !$c->{is_nullable} && !$is_auto && !defined $c->{default_value} ) {
                 push @{ $schema{ $table }{ required } }, $column;
             }
         }
@@ -318,7 +311,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.022
+version 1.023
 
 =head1 SYNOPSIS
 

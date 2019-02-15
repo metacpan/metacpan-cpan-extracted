@@ -1,3 +1,4 @@
+requires 'Cfn';
 requires 'Moose';
 requires 'Module::Runtime';
 requires 'MongoDB';
@@ -11,9 +12,10 @@ requires 'String::Diff';
 requires 'Term::ANSIColor';
 requires 'Data::Printer';
 requires 'Text::ASCIITable';
+requires 'Regexp::Common';
+requires 'Hash::Merge';
 # attributes dependency
 requires 'Paws';
-requires 'MooseX::SlurpyConstructor';
 requires 'Template';
 
 on test => sub {

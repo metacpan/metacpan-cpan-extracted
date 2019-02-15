@@ -1,6 +1,6 @@
 package WWW::Google::UserAgent::DataTypes;
 
-$WWW::Google::UserAgent::DataTypes::VERSION   = '0.22';
+$WWW::Google::UserAgent::DataTypes::VERSION   = '0.23';
 $WWW::Google::UserAgent::DataTypes::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::UserAgent::DataTypes - Commonly used data types for Google API.
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
@@ -172,26 +172,26 @@ my $SEARCH_TYPE   = { 'image' => 1 };
 my $SEARCH_FILTER = { 'e' => 1, 'i' => 1 };
 my $SAFETY_LEVEL  = { 'off' => 1, 'medium' => 1, 'high' => 1 };
 
-declare "ColorType"    , as Str, where { (!defined($_) || (exists($COLOR_TYPE->{lc($_)})))          };
-declare "DominantColor", as Str, where { (!defined($_) || (exists($DOMINANT_COLOR->{lc($_)})))      };
-declare "ImageSize"    , as Str, where { (!defined($_) || (exists($IMAGE_SIZE->{lc($_)})))          };
-declare "ImageType"    , as Str, where { (!defined($_) || (exists($IMAGE_TYPE->{lc($_)})))          };
-declare "Rights"       , as Str, where { (!defined($_) || (exists($RIGHTS->{lc($_)})))              };
-declare "SearchType"   , as Str, where { (!defined($_) || (exists($SEARCH_TYPE->{lc($_)})))         };
-declare "SearchFilter" , as Str, where { (!defined($_) || (exists($SEARCH_FILTER->{lc($_)})))       };
-declare "SafetyLevel"  , as Str, where { (!defined($_) || (exists($SAFETY_LEVEL->{lc($_)})))        };
-declare "InterfaceLang", as Str, where { (!defined($_) || (exists($INTERFACE_LANGUAGE->{lc($_)})))  };
-declare "CountryCode"  , as Str, where { (!defined($_) || (exists($COUNTRY_CODE->{lc($_)})))        };
-declare "LanguageC"    , as Str, where { (!defined($_) || (exists($LANGUAGE_COLLECTION->{lc($_)}))) };
-declare "CountryC"     , as Str, where { (!defined($_) || (exists($COUNTRY_COLLECTION->{lc($_)})))  };
-declare "Language"     , as Str, where { (!defined($_) || (exists($LANGUAGES->{lc($_)})))           };
-declare "Locale"       , as Str, where { (!defined($_) || (exists($LOCALES->{lc($_)})))             };
-declare "Strategy"     , as Str, where { (!defined($_) || ($_ =~ m(^\bdesktop\b|\bmobile\b$)i))     };
-declare "FileType"     , as Str, where { (!defined($_) || ($_ =~ m(^\bjson\b|\bxml\b$)i))           };
-declare "TrueFalse"    , as Str, where { (!defined($_) || ($_ =~ m(^\btrue\b|\bfalse\b$)i))         };
-declare "Unit"         , as Str, where { (!defined($_) || ($_ =~ m(^\bmetric\b|\bimperial\b$)i))    };
-declare "Avoid"        , as Str, where { (!defined($_) || ($_ =~ m(^\btolls\b|\bhighways\b$)i))     };
-declare "Mode"         , as Str, where { (!defined($_) || ($_ =~ m(^\bdriving\b|\bwalking\b|\bbicycling\b$)i)) };
+declare "ColorType"    , as Str, where { exists($COLOR_TYPE->{lc($_)})          };
+declare "DominantColor", as Str, where { exists($DOMINANT_COLOR->{lc($_)})      };
+declare "ImageSize"    , as Str, where { exists($IMAGE_SIZE->{lc($_)})          };
+declare "ImageType"    , as Str, where { exists($IMAGE_TYPE->{lc($_)})          };
+declare "Rights"       , as Str, where { exists($RIGHTS->{lc($_)})              };
+declare "SearchType"   , as Str, where { exists($SEARCH_TYPE->{lc($_)})         };
+declare "SearchFilter" , as Str, where { exists($SEARCH_FILTER->{lc($_)})       };
+declare "SafetyLevel"  , as Str, where { exists($SAFETY_LEVEL->{lc($_)})        };
+declare "InterfaceLang", as Str, where { exists($INTERFACE_LANGUAGE->{lc($_)})  };
+declare "CountryCode"  , as Str, where { exists($COUNTRY_CODE->{lc($_)})        };
+declare "LanguageC"    , as Str, where { exists($LANGUAGE_COLLECTION->{lc($_)}) };
+declare "CountryC"     , as Str, where { exists($COUNTRY_COLLECTION->{lc($_)})  };
+declare "Language"     , as Str, where { exists($LANGUAGES->{lc($_)})           };
+declare "Locale"       , as Str, where { exists($LOCALES->{lc($_)})             };
+declare "Strategy"     , as StrMatch[qr(^\bdesktop\b|\bmobile\b$)i];
+declare "FileType"     , as StrMatch[qr(^\bjson\b|\bxml\b$)i];
+declare "TrueFalse"    , as StrMatch[qr(^\btrue\b|\bfalse\b$)i];
+declare "Unit"         , as StrMatch[qr(^\bmetric\b|\bimperial\b$)i];
+declare "Avoid"        , as StrMatch[qr(^\btolls\b|\bhighways\b$)i];
+declare "Mode"         , as StrMatch[qr(^\bdriving\b|\bwalking\b|\bbicycling\b$)i];
 
 =head1 DESCRIPTION
 

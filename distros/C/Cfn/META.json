@@ -1,0 +1,67 @@
+{
+   "abstract" : "An object model for CloudFormation documents",
+   "author" : [
+      "Jose Luis Martinez <jlmartinez@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Cfn",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "JSON::MaybeXS" : "0",
+            "MooseX::DataModel" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Sort::Topological" : "0",
+            "Template" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "Module::Runtime" : "0",
+            "Moose" : "0",
+            "MooseX::SlurpyConstructor" : "0",
+            "MooseX::StrictConstructor" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Printer" : "0",
+            "File::Slurp" : "0",
+            "FindBin" : "0",
+            "IO::Dir" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pplu/cfn-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pplu/cfn-perl.git",
+         "web" : "https://github.com/pplu/cfn-perl"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+}
+

@@ -4,15 +4,16 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 use Acme::CPANAuthors::Register (
-  ABERGMAN => 'Artur Bergman',
-  CLAESJAC => 'Claes Jakobsson',
-  ERWAN    => 'Erwan Lemonnier',
-  OLOF     => 'Olof Johansson',
-  WOLDRICH => 'Magnus Woldrich',
-  ZIBRI    => 'Olof Johansson',
+  ABERGMAN  => 'Artur Bergman',
+  CLAESJAC  => 'Claes Jakobsson',
+  ERWAN     => 'Erwan Lemonnier',
+  HOBBESTIG => 'Natal Ngétal',
+  OLOF      => 'Olof Johansson',
+  WOLDRICH  => 'Magnus Woldrich',
+  OLOF      => 'Olof Johansson',
 );
 
 1;
@@ -20,6 +21,8 @@ use Acme::CPANAuthors::Register (
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -69,7 +72,7 @@ L<Acme::CPANAuthors> - Main class to manipulate this one
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  magnus@trapd00r.se
+  m@japh.se
   http://japh.se
   http://github.com/trapd00r
 
@@ -79,7 +82,7 @@ None required yet.
 
 =head1 COPYRIGHT
 
-Copyright 2011 the B<Acme::CPANAuthors::Swedish> L</AUTHOR> and L</CONTRIBUTORS>
-as listed above.
+Copyright 2011, 2019- the B<Acme::CPANAuthors::Swedish> L</AUTHOR> and
+L</CONTRIBUTORS> as listed above.
 
 =cut

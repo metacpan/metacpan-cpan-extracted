@@ -25,7 +25,7 @@ package TestClass {
 
   before build => sub {
     my $self = shift;
-    $self->addMetadata('Instance', MyMetadata => 'MyValue');
+    $self->addResourceMetadata('Instance', MyMetadata => 'MyValue');
   };
 }
 

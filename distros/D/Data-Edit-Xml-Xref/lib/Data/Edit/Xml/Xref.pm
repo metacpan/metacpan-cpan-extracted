@@ -3,13 +3,11 @@
 # Cross reference Dita XML, match topics and ameliorate missing references.
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
 #-------------------------------------------------------------------------------
-# It is easier to criticize than to fix.
-# Use nex confluence to  check size of reloaded files in analyze
-# Details of reports in documentation
 # podDocumentation
+# It is easier to criticize than to fix.
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 20190204;
+our $VERSION = 20190214;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -26,6 +24,7 @@ sub improvementLength {80}                                                      
 sub xref(%)                                                                     # Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible attributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
  {my (%attributes) = @_;                                                        # Attributes
   my $xref = genHash(__PACKAGE__,                                               # Attributes used by the Xref cross referencer.
+    addNavTitles=>undef,                                                        # If true, add navtitle to topicrefs to show the title of the target
     attributeCount=>{},                                                         # {file}{attribute} == count of the different xml attributes found in the xml files.
     author=>{},                                                                 # {file} = author of this file.
     badBookMaps=>{},                                                            # Bad book maps.
@@ -33,6 +32,7 @@ sub xref(%)                                                                     
     badConRefsList=>{},                                                         # Bad conrefs - by file.
     badGuidHrefs=>{},                                                           # Bad conrefs - all.
     badImageRefs=>{},                                                           # Consolidated images missing.
+    badNavTitles=>{},                                                           # Details of nav titles that were not resolved
     badTables=>[],                                                              # Array of tables that need fixing.
     badTopicRefs=>{},                                                           # [file, href]   Invalid href attributes found on topicref tags.
     badXml1=>{},                                                                # [Files] with a bad xml encoding header on the first line.
@@ -50,16 +50,20 @@ sub xref(%)                                                                     
     fixBadRefs=>undef,                                                          #I Try to fix bad references in L<these files|/fixRefs> where possible by either changing a guid to a file name assuming the right file is present or failing that by moving the failing reference to the "xtrf" attribute.
     fixRefs=>{},                                                                # {file}{ref} where the href or conref target is not present.
     fixedRefs=>[],                                                              # [] hrefs and conrefs from L<fixRefs|/fixRefs which have been ameliorated where possible by either changing a guid to a file name assuming the right file is present or failing that by moving the failing reference to the "xtrf" attribute.
+    flattenFolder=>undef,                                                       #I Files are optionally renamed to the Gearhart standard and placed in this folder.
+    flattenFiles=>{},                                                           # {old full file name} = file renamed to Gearhart standard
     goodBookMaps=>{},                                                           # Good book maps.
     goodConRefs=>{},                                                            # Good con refs - by file.
     goodConRefsList=>{},                                                        # Good con refs - all.
     goodGuidHrefs=>{},                                                          # {file}{href}{location}++ where a href that starts with GUID- has been correctly resolved.
     goodImageRefs=>{},                                                          # Consolidated images found.
+    goodNavTitles=>{},                                                          # Details of nav titles that were resolved
     goodTopicRefs=>{},                                                          # Good topic refs.
     goodXRefs=>{},                                                              # Good xrefs - by file.
     goodXRefsList=>{},                                                          # Good xrefs - all.
     guidHrefs=>{},                                                              # {file}{href} = location where href starts with GUID- and is thus probably a guid.
     guidToFile=>{},                                                             # {topic id which is a guid} = file defining topic id.
+    hrefUrlEncoding=>{},                                                        # Hrefs that need url encoding because they contain white space
     ids=>{},                                                                    # {file}{id}     Id definitions across all files.
     images=>{},                                                                 # {file}{href}   Count of image references in each file.
     improvements=>{},                                                           # Suggested improvements - a list of improvements that might be made.
@@ -73,7 +77,7 @@ sub xref(%)                                                                     
     noHref=>{},                                                                 # Tags that should have an href but do not have one.
     notReferenced=>{},                                                          # Files in input area that are not referenced by a conref, image, topicref or xref tag and are not a bookmap.
     olBody=>{},                                                                 # The number of ol under body by file
-    parseFailed=>{},                                                            # [file] files that failed to parse.
+    parseFailed=>{},                                                            # {file} files that failed to parse.
     reports=>q(reports),                                                        #I Reports folder: the cross referencer will write reports to files in this folder.
     results=>[],                                                                # Summary of results table.
     sourceFile=>undef,                                                          # The source file from which this structure was generated.
@@ -137,23 +141,31 @@ sub xref(%)                                                                     
                 q(reportTopicReuse),
                 q(reportMd5Sum),
                 q(reportOlBody),
+                q(reportHrefUrlEncoding),
                );
+
+  if ($xref->flattenFolder)                                                     # Fix file names to the gearhart standard
+   {push @phases, q(fixFilesGB)
+   }
 
   if ($xref->matchTopics)                                                       # Topic matching reports
    {push @phases, q(reportSimilarTopicsByTitle),
                   q(reportSimilarTopicsByVocabulary);
    }
 
-  for my $phase(@phases)                                                        # Perform analysis phases
+  if ($xref->addNavTitles)                                                      # Add nav titles to bookmaps if requested
+   {push @phases, q(addNavTitlesToMaps);
+   }
+
+  if ($xref->fixBadRefs)                                                        # Fix files if requested if requested
+   {push @phases, q(fixFiles);
+   }
+
+  for my $phase(@phases)                                                        # Perform phases
    {lll "Phase: $phase" if $xref->debugTimes;
     $xref->$phase;
    }
-
-  if ($xref->fixBadRefs)                                                        # Fix files if requested
-   {lll "Phase: fixFiles" if $xref->debugTimes;
-    $xref->fixFiles;
-    lll "Phase: fixFiles end" if $xref->debugTimes;
-   }
+  lll "Phase: end" if $xref->debugTimes;
 
   formattedTablesReport
    (title=>q(Reports available),
@@ -190,6 +202,7 @@ END
 #   $save->(2, "improvements",      q(improvements));
     $save->(1, "missingImageFiles", q(missing image references));
     $save->(1, "missingTopicIds",   q(missing topic ids));
+    $save->(1, "hrefUrlEncoding",   q(href url encoding), q(href url encoding));
     $save->(2, "noHref",            q(hrefs missing), q(href missing));
     $save->(1, "notReferenced",     q(files not referenced), q(file not referenced));
     $save->(1, "parseFailed",       q(files failed to parse), q(file failed to parse));
@@ -234,7 +247,7 @@ sub countLevels($$)                                                             
   $n
  }
 
-sub relativeFilePath($$)                                                             #P Format file name for easy use on windows
+sub relativeFilePath($$)                                                        #P Format file name for easy use on windows
  {my ($xref, $file) = @_;                                                       # Xref, file
 
   if (my $w = $xref->relativePath)
@@ -378,7 +391,7 @@ sub analyzeOneFile($)                                                           
          [q(More than 3 bold in p), $t, &$loc];
        }
      }
-    elsif ($tag eq q(title))                                                    # Title
+    elsif ($tag eq q(title) and $o->parent == $x)                               # Title
      {my $t = &$content;
       $xref->title->{$iFile} = $t;                                              # Topic Id
       if (my $p = $o->parent)
@@ -438,6 +451,12 @@ sub analyzeOneFile($)                                                           
        {$error->(qq(Column padding required));
        }
      }
+
+    if (my $h = $o->href)                                                       # Check href for url encoding needed
+     {if ($h =~ m(\s)s)
+       {$xref->hrefUrlEncoding->{$iFile}{$o->lineLocation} = $h;
+       }
+     }
    });
 
   push @{$xref->improvements->{$iFile}}, @improvements if @improvements;        # Save improvements
@@ -461,14 +480,15 @@ sub analyzeOneFile($)                                                           
 
     $xref->validationErrors->{$iFile}++ if $s =~ m(<!--compressedErrors:)s;     # File has validation errors
    }
+
   $xref
  } # analyzeOneFile
 
-sub reportGuidsToFiles($)                                                         #P Map and report guids to files
+sub reportGuidsToFiles($)                                                       #P Map and report guids to files
  {my ($xref) = @_;                                                              # Xref results
   my @r;
   for   my $file(sort keys %{$xref->topicIds})                                  # Each input file which will be absolute
-   {if (my $topicId = $xref->topicIds->{$file})                                 # Topic Id for file - we report missing topicIs in: reportDuplicateTopicIds
+   {if (my $topicId = $xref->topicIds->{$file})                                 # Topic Id for file - we report missing topicIds in: reportDuplicateTopicIds
      {next unless $topicId =~ m(\AGUID-)is;
       $xref->guidToFile->{$topicId} = $file;                                    # Guid Topic Id to file
       push @r, [$topicId, $file];
@@ -592,18 +612,106 @@ END
     file=>(my $f = fpe($xref->reports, qw(lists referencesFixed txt))));
  }
 
+sub fixOneFileGB($$)                                                            #P Fix one file to the Gearhart-Brenan standard
+ {my ($xref, $file) = @_;                                                       # Xref results, file to fix
+  my @r;                                                                        # Hrefs changed
+
+  my $x = Data::Edit::Xml::new($file);                                          # Parse xml - should parse OK else otherwise how did we find out that this file needed to be fixed
+
+  $x->by(sub                                                                    # Each node
+   {my ($o) = @_;
+    if (my $h = $o->href)                                                       # Href encountered
+     {my ($localFile, $rest) = split /#/, $h, 2;                                # Split reference
+      my $fullFile = absFromAbsPlusRel($file, $localFile);                      # Full name of referenced file
+      if (my $target = $xref->flattenFiles->{$fullFile})                        # Target file name
+       {my $h = $o->href = $target.($rest ? qq(#$rest) : qq());                 # Reassemble href
+       }
+      else
+       {push @r, [$h, $file];
+       }
+     }
+   });
+
+  if (1)                                                                        # Replace xml in source file
+   {my ($l, $L) = split m/\n/, readFile($file);
+    my $o = fpf($xref->flattenFolder, $xref->flattenFiles->{$file});            # Target file to write to
+    my $t = -p $x;
+    if ($l =~ m(\A<\?xml))                                                      # Check headers - should be improved
+     {owf($o, qq($l\n$L\n$t));
+     }
+    else
+     {owf($o, $t);
+     }
+   }
+
+  \@r                                                                           # Return report of items fixed
+ }
+
+sub fixFilesGB($)                                                               #P Rename files to the Gearhart-Brenan standard
+ {my ($xref) = @_;                                                              # Xref results
+  my @files  = grep {!$xref->parseFailed->{$_}} sort @{$xref->inputFiles};      # Fix files that parsed if requested
+  my @square = squareArray(@files);                                             # Divide the task
+
+  my %reduceMd5;                                                                # Reduce MD5 to minimum needed
+  for my $file(@files)                                                          # Target file for each input file
+   {my $target = sub
+     {my $t = $xref->title->{$file} // q();                                     # Title
+         $t =~ s([^a-zA-Z0-9]+) (_)gs;                                          # Title reduced to basics
+      my $m = $xref->md5Sum->{$file} // q();
+      my $s = substr($xref->baseTag->{$file}//q(u), 0, 1);                      # First letter of tag
+      join q(_), $s, $t, $m;                                                    # The Gearhart standard
+     }->();
+
+    $xref->flattenFiles->{$file} = fpe($target, fe $file);                      # Record correspondence between existing file and standardized file name
+   }
+
+  my $ps = newProcessStarter($xref->maximumNumberOfProcesses);                  # Process starter
+     $ps->processingTitle   = q(Xref Gearhart);
+     $ps->totalToBeStarted  = scalar @square;
+     $ps->processingLogFile = fpe($xref->reports, qw(log flatten txt));
+
+  my @r;                                                                        # Fixes made
+  for my $row(@square)                                                          # Each row of input files
+   {$ps->start(sub
+     {my @r;                                                                    # Results
+      for my $col(@$row)                                                        # Each column in the row
+       {push @r, $xref->fixOneFileGB($col);                                     # Analyze one input file
+       }
+      [@r]                                                                      # Return results as a reference
+     });
+   }
+
+  for my $r(deSquareArray($ps->finish))                                         # Consolidate results
+   {push @r, @$r;
+   }
+
+  formatFileNames($xref, \@r,  3);                                              # Format file names for easy use on unix and windows
+
+  formatTable($xref->fixedRefs = \@r, <<END,                                    # Report results
+Href           The href being fixed
+Source         The source file containing the href
+END
+    summarize=>1,
+    title=>qq(Hrefs that can not be renamed to the Gearhart standard),
+    head=><<END,
+Xref failed to fix NNNN hrefs to the Gearhart standard
+END
+    file=>(my $f = fpe($xref->reports, qw(bad flatten txt))));
+ }
+
 sub analyze($)                                                                  #P Analyze the input files
  {my ($xref) = @_;                                                              # Cross referencer
   my @in = @{$xref->inputFiles};                                                # Input files
   my @square = squareArray(@in);                                                # Divide the task
+  my $square = @square;
 
-  my $ps = newProcessStarter($xref->maximumNumberOfProcesses);                  # Process starter
-     $ps->processingTitle   = q(Xref);
-     $ps->totalToBeStarted  = scalar @square;
-     $ps->processingLogFile = fpe($xref->reports, qw(log xref analyze txt));
+  my $p = newProcessStarter($xref->maximumNumberOfProcesses);                   # Process starter
+     $p->processingTitle   = q(Xref Analyze);
+     $p->totalToBeStarted  = $square;
+     $p->processingLogFile = fpe($xref->reports, qw(log xref analyze txt));
 
   for my $row(@square)                                                          # Each row of input files file
-   {$ps->start(sub
+   {$p->start(sub
      {my @r;                                                                    # Results
       for my $col(@$row)                                                        # Each column in the row
        {push @r, analyzeOneFile($col);                                          # Analyze one input file
@@ -613,19 +721,22 @@ sub analyze($)                                                                  
    }
 # Load results takes 4 minutes while merge takes 10 seconds for all fields
   lll "Phase: analyze load results start" if $xref->debugTimes;
-  my @x = deSquareArray($ps->finish);                                           # mmmm Merge results from each file analyzed
+  my @x = deSquareArray($p->finish);                                            # Load results
   lll "Phase: analyze load results end"   if $xref->debugTimes;
 
-  for my $field(                                                                # Merge hashes by file names which are unique - ffff
+  lll "Phase: analyze merge fields start" if $xref->debugTimes;
+  my @fields =                                                                  # Fields to be merged
     qw(
 attributeCount
 author
 badXml1
 badXml2
+baseTag
 conRefs
 docType
 fixRefs
 guidHrefs
+hrefUrlEncoding
 ids
 images
 improvements
@@ -642,16 +753,36 @@ vocabulary
 xrefBadFormat
 xrefBadScope
 xRefs
-         ))
-   {for my $x(@x)                                                               # mmmm Merge results from each file analyzed
-     {if (my $xf = $x->{$field})
-      #for my $f(sort keys %$xf)
-      # {$xref->{$field}{$f} = $xf->{$f};
-      # }
-       {$xref->{$field} = {%{$xref->{$field}}, %$xf};
+ );
+
+  my $fields = @fields;
+  my $q = newProcessStarter($xref->maximumNumberOfProcesses);                   # Process starter
+     $q->processingTitle   = q(Xref Analyze Merge);
+     $q->totalToBeStarted  = $fields;
+     $q->processingLogFile = fpe($xref->reports, qw(log xref analyzeMerge txt));
+
+  for my $field(@fields)                                                        # Merge hashes by file names which are unique - ffff
+   {$q->start(sub
+     {lll "Phase: analyze merge field $field start" if $xref->debugTimes;
+      my $target = $xref->{$field} //= {};                                      # Field to be merged
+      for my $x(@x)                                                             # mmmm Merge results from each file analyzed
+       {if (my $xf = $x->{$field})
+         {for my $f(keys %$xf)                                                  # Each file analyzed
+           {$target->{$f} = $xf->{$f}                                           # Merge
+           }
+         }
        }
-     }
+      lll "Phase: analyze merge field $field end" if $xref->debugTimes;
+      [$field, $xref]                                                           # Return results as a reference
+     });
    }
+
+  my @merge = $q->finish;                                                       # Load results
+  for my $m(@merge)
+   {my ($f, $x) = @$m;
+    $xref->{$f} = $x->{$f};
+   }
+
   for my $field(                                                                # Merge arrays
     qw(badTables))
    {for my $x(@x)                                                               # mmmm Merge results from each file analyzed
@@ -709,7 +840,7 @@ sub reportDuplicateTopicIds($)                                                  
        }
      }
     else
-     {push @miss, [$file];                                                        # Missing topic id
+     {push @miss, [$file];                                                      # Missing topic id
      }
    }
 
@@ -1033,7 +1164,7 @@ sub reportTopicRefs($)                                                          
 
   my %topicIdsToFile;                                                           # All the topic ids encountered - we have already reported the duplicates so now we can assume that there are no duplicates
   for my $file(sort keys %{$xref->topicIds})                                    # Each input file
-   {if (my $topicId = $xref->topicIds->{$file})                                 # Topic Id for file - we report missing topicIs in: reportDuplicateTopicIds
+   {if (my $topicId = $xref->topicIds->{$file})                                 # Topic Id for file - we report missing topicIds in: reportDuplicateTopicIds
      {$topicIdsToFile{$topicId} = $file;                                        # Topic Id to file
      }
    }
@@ -1170,7 +1301,7 @@ END
     file=>(my $f = fpe($xref->reports, qw(bad parseFailed txt))));
  }
 
-sub reportXml1($)                                                            #P Report bad xml on line 1
+sub reportXml1($)                                                               #P Report bad xml on line 1
  {my ($xref) = @_;                                                              # Cross referencer
 
 
@@ -1182,7 +1313,7 @@ END
     file=>(my $f = fpe($xref->reports, qw(bad xmlLine1 txt))));
  }
 
-sub reportXml2($)                                                            #P Report bad xml on line 2
+sub reportXml2($)                                                               #P Report bad xml on line 2
  {my ($xref) = @_;                                                              # Cross referencer
 
   formatTable([sort keys %{$xref->badXml2}], <<END,
@@ -1714,6 +1845,154 @@ END
     summarize=>1);
  }
 
+sub reportHrefUrlEncoding($)                                                    #P href needs url encoding
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my @b;
+  for my $f  (sort keys %{$xref->hrefUrlEncoding})
+   {for my $l(sort keys %{$xref->hrefUrlEncoding->{$f}})
+     {push @b,           [$xref->hrefUrlEncoding->{$f}{$l}, $l, $f];
+     }
+   }
+
+  formatTable([@b], <<END,
+Href             Href that needs url encoding
+Line_location    Line location
+File_Name        The file containing the href that needs url encoding
+END
+    title=>qq(Hrefs that need url encoding),
+    head=><<END,
+Xref found NNNN locations where an href needs to be url encoded on DDDD.
+END
+    file=>(fpe($xref->reports, qw(bad hrefUrlEncoding txt))),
+    summarize=>1);
+ }
+
+sub addNavTitlesToOneMap($$)                                                    #P Fix navtitles in one map
+ {my ($xref, $file) = @_;                                                       # Xref results, file to fix
+  my $changes = 0;                                                              # Number of successful changes
+  my @r;                                                                        # Count of tags changed
+
+  my $x = Data::Edit::Xml::new($file);                                          # Parse xml - should parse OK else otherwise how did we find out that this file needed to be fixed
+  $x->by(sub                                                                    # Each node
+   {my ($o) = @_;
+    if ($o->at(qr(\A(appendix|chapter|topicref)\Z)is))                          # Nodes that take nv titles
+     {if (my $h = $o->href)                                                     # href to target
+       {if ($h =~ m(\AGUID-)is)                                                 # Target by guid
+         {if (my $target = $xref->guidToFile->{$h})                             # Absolute target name
+           {if (my $title = $xref->title->{$target})                            # Nav title
+             {$o->set(navtitle=>$title);                                        # Set nav title
+              push @r, [q(set by guid), $h, $title, $target, $file];            # Record set
+              ++$changes;
+             }
+            else                                                                # No such target file
+             {push @r, [q(No title for guid target), -A $o, $target, $file];
+             }
+           }
+          else                                                                  # No mapping from guid to target file
+           {push @r, [q(No file for guid), -A $o, $target, $file];
+           }
+         }
+        else                                                                    # Target by file name
+         {my $target = absFromAbsPlusRel($file, $h);                            # Absolute target name
+          if (my $title = $xref->title->{$target})                              # Nav title
+           {$o->set(navtitle=>$title);                                          # Set nav title
+            push @r, [q(set), $h, $title, $target, $file];                      # Record set
+            ++$changes;
+           }
+          else
+           {push @r, [q(No title for target), -A $o, $target, $file];
+           }
+         }
+       }
+      else
+       {push @r, [q(No href), -A $o, q(), $file];
+       }
+     }
+   });
+
+  if ($changes)                                                                 # Replace xml in source file if we changed anything successfully
+   {my ($l, $L) = split m/\n/, readFile($file);
+    my $t = -p $x;
+    if ($l =~ m(\A<\?xml))                                                      # Check headers - should be improved
+     {owf($file, qq($l\n$L\n$t));
+     }
+   }
+
+  \@r                                                                           # Return report of actions taken
+ }
+
+sub addNavTitlesToMaps($)                                                       #P Add nav titles to files containing maps.
+ {my ($xref) = @_;                                                              # Xref results
+  my @r;                                                                        # Additions made
+  my @files =
+    sort
+    grep  {$xref->baseTag->{$_} =~ m(map\Z)s}                                   # Files containing maps
+    keys %{$xref->baseTag};                                                     # Files with any base tags
+
+  if (@files)                                                                   # Add nav titles to files
+   {my @square = squareArray(@files);                                           # Divide the task
+
+    my $ps = newProcessStarter($xref->maximumNumberOfProcesses);                # Process starter
+       $ps->processingTitle   = q(Xref navtitles);
+       $ps->totalToBeStarted  = scalar @square;
+       $ps->processingLogFile = fpe($xref->reports, qw(log xref navtitles txt));
+
+    for my $row(@square)                                                        # Each row of input files file
+     {$ps->start(sub
+       {my @r;                                                                  # Results
+        for my $col(@$row)                                                      # Each column in the row
+         {push @r, $xref->addNavTitlesToOneMap($col);                           # Process one input file
+         }
+        [@r]                                                                    # Return results as a reference
+       });
+     }
+
+    for my $r(deSquareArray($ps->finish))                                       # Consolidate results
+     {push @r, @$r;
+     }
+   }
+
+  my @bad;
+  my @good;
+  for my $r(@r)
+   {if ($$r[0] =~ m(\ANo)s)
+     {push @bad, $r;
+     }
+    else
+     {shift @$r;
+      push @good, $r;
+     }
+   }
+
+  formatTable($xref->badNavTitles = \@bad, <<END,                               # Report bad results
+Reason         The reason why a nav title was not added
+Statement      The source xml statement requesting a navtitle
+Title          The title of the the navtitle attribute
+Target_File    The target of the href
+Source_File    The source file being editted
+END
+    summarize=>1,
+    title=>qq(Failing Nav titles),
+    head=><<END,
+Xref was unable to add NNNN navtitles as requested by the addNavTitles attribute on DDDD
+END
+    file=>(my $f = fpe($xref->reports, qw(bad navTitles txt))));
+
+  formatTable($xref->goodNavTitles = \@good, <<END,                             # Report good results
+Statement      The source xml statement requesting a navtitle
+Title          The title of the the navtitle attribute
+Target_File    The target of the href
+Source_File    The source file being editted
+END
+    summarize=>1,
+    title=>qq(Succeding Nav titles),
+    head=><<END,
+Xref was able to add NNNN navtitles as requested by the addNavTitles parameter on DDDD
+END
+    file=>(fpe($xref->reports, qw(good navTitles txt))));
+ }
+
 sub createSampleInputFiles($)                                                   #P Create sample input files for testing. The attribute B<inputFolder> supplies the name of the folder in which to create the sample files.
  {my ($N) = @_;                                                                 # Number of sample files
   my $in = q(in);
@@ -1816,6 +2095,7 @@ END
 <concept id="table">
   <title>Tables</title>
   <conbody>
+    <image href="new pass.png"/>
     <table>
       <tgroup cols="1">
         <thead>
@@ -1906,7 +2186,7 @@ Data::Edit::Xml::Xref - Cross reference Dita XML, match topics and ameliorate mi
 
 =head1 Synopsis
 
-Check the references in a larghe corpus of Dita XML documents held in folder
+Check the references in a large corpus of Dita XML documents held in folder
 L<inputFolder|/inputFolder> running processes in parallel where ever possible
 to take advantage of multi-cpu computers:
 
@@ -1916,6 +2196,7 @@ to take advantage of multi-cpu computers:
                maximumNumberOfProcesses => 512,
                relativePath             => q(out),
                fixBadRefs               => 1,
+               flattenFolder            => q(out2),
                matchTopics              => 0.9,
               );
 
@@ -2002,16 +2283,33 @@ which contains a list of all the reports generated:
 37     6  Unreferenced files                                              reports/bad/notReferenced.txt
 38    11  Unresolved GUID hrefs                                           reports/bad/guidHrefs.txt
 
-File names in reports can be made relative to a specified directory named on the
+File names in reports can be made relative to a specified directory named on
+the:
 
   relativePath => q(out)
 
 attribute.
 
+=head2 Add navigation titles to topic references
+
+Xref will create or update the navigation titles B<navtitles> of topic refs
+B<appendix|chapter|topicref> in maps if requested by both file name and GUID
+reference:
+
+  addNavTitle => 1
+
+Reports of successful updates will be written to:
+
+  reports/good/navTitles.txt
+
+Reports of unsuccessful updates will be written to:
+
+  reports/bad/navTitles.txt
+
 =head2 Fix bad references
 
 It is often desirable to ameliorate unresolved Dita href attributes so that
-incomplete content can be loaded into a content management system.  The
+incomplete content can be loaded into a content management system.  The:
 
   fixBadRefs => 1
 
@@ -2023,7 +2321,47 @@ attribute be renamed to:
 
  xtrf
 
-if the href attribute specification cannt be resolved in the current corpus.
+if the B<href> attribute specification cannot be resolved in the current corpus.
+
+This feature designed by L<mailto:mom@cpan.org>.
+
+=head2 File flattening
+
+It is often desirable to flatten the topic files so that they can coexist in a
+single folder of a content management system without colliding with each other.
+
+The presence of the input attribute:
+
+ flatFolder
+
+causes topic files to be flattened into the named folder.
+
+Xref uses the well known Gearhart-Brenan Dita Topic File Naming System where
+the file name for a topic consists of the following items separated by
+underscores:
+
+=over
+
+=item The first letter of the root tag of the topic.
+
+=item The title of the topic with all runs of characters not in the ranges:
+
+  a-z, A-Z, 0-9
+
+reduced to a single underscore.
+
+=item The MD5 sum in hexadecimal of the content of the topic.
+
+=over
+
+This has the effect of sorting files by their root tags and titles while
+guaranteeing a unique name for the topic that depends only on its content.
+
+If the content of two such files is identical then they will have an identical
+file name because the generation of the file name depends only on the content
+of the topic. If two topic files have the same name under this naming system
+then they have identical content and only one file is needed to hold the topic
+in a content management system.
 
 =head2 Topic Matching
 
@@ -2089,7 +2427,7 @@ together:
 Cross reference Dita XML, match topics and ameliorate missing references.
 
 
-Version 20190131.
+Version 20190204.
 
 
 The following sections describe the methods in each functional area of this
@@ -2126,7 +2464,11 @@ Attributes used by the Xref cross referencer.
 =head3 Input fields
 
 
+B<debugTimes> - Write timing information if true
+
 B<fixBadRefs> - Try to fix bad references in L<these files|/fixRefs> where possible by either changing a guid to a file name assuming the right file is present or failing that by moving the failing reference to the "xtrf" attribute.
+
+B<flattenFolder> - Files are optionally renamed to the Gearhart standard and placed in this folder.
 
 B<inputFolder> - A folder containing the dita and ditamap files to be cross referenced.
 
@@ -2145,6 +2487,8 @@ B<summary> - Print the summary line.
 =head3 Output fields
 
 
+B<addNavTitles> - If true, add navtitle to topicrefs to show the title of the target
+
 B<attributeCount> - {file}{attribute} == count of the different xml attributes found in the xml files.
 
 B<author> - {file} = author of this file.
@@ -2159,6 +2503,8 @@ B<badGuidHrefs> - Bad conrefs - all.
 
 B<badImageRefs> - Consolidated images missing.
 
+B<badNavTitles> - Details of nav titles that were not resolved
+
 B<badTables> - Array of tables that need fixing.
 
 B<badTopicRefs> - [file, href]   Invalid href attributes found on topicref tags.
@@ -2170,6 +2516,8 @@ B<badXRefsList> - Bad Xrefs - all
 B<badXml1> - [Files] with a bad xml encoding header on the first line.
 
 B<badXml2> - [Files] with a bad xml doc type on the second line.
+
+B<baseTag> - Base Tag for each file
 
 B<conRefs> - {file}{href}   Count of conref definitions in each file.
 
@@ -2185,6 +2533,8 @@ B<fixRefs> - {file}{ref} where the href or conref target is not present.
 
 B<fixedRefs> - [] hrefs and conrefs from L<fixRefs|/fixRefs which have been ameliorated where possible by either changing a guid to a file name assuming the right file is present or failing that by moving the failing reference to the "xtrf" attribute.
 
+B<flattenFiles> - {old full file name} = file renamed to Gearhart standard
+
 B<goodBookMaps> - Good book maps.
 
 B<goodConRefs> - Good con refs - by file.
@@ -2195,6 +2545,8 @@ B<goodGuidHrefs> - {file}{href}{location}++ where a href that starts with GUID- 
 
 B<goodImageRefs> - Consolidated images found.
 
+B<goodNavTitles> - Details of nav titles that were resolved
+
 B<goodTopicRefs> - Good topic refs.
 
 B<goodXRefs> - Good xrefs - by file.
@@ -2204,6 +2556,8 @@ B<goodXRefsList> - Good xrefs - all.
 B<guidHrefs> - {file}{href} = location where href starts with GUID- and is thus probably a guid.
 
 B<guidToFile> - {topic id which is a guid} = file defining topic id.
+
+B<hrefUrlEncoding> - Hrefs that need url encoding because they contain white space
 
 B<ids> - {file}{id}     Id definitions across all files.
 
@@ -2225,7 +2579,9 @@ B<noHref> - Tags that should have an href but do not have one.
 
 B<notReferenced> - Files in input area that are not referenced by a conref, image, topicref or xref tag and are not a bookmap.
 
-B<parseFailed> - [file] files that failed to parse.
+B<olBody> - The number of ol under body by file
+
+B<parseFailed> - {file} files that failed to parse.
 
 B<results> - Summary of results table.
 
@@ -2277,13 +2633,6 @@ Improvement length
 
 
 =head1 Private Methods
-
-=head2 lll(@)
-
-Write a message
-
-     Parameter  Description
-  1  @m         Message text
 
 =head2 countLevels($$)
 
@@ -2350,6 +2699,21 @@ Fix one file by moving unresolved references to the xtrf attribute
 =head2 fixFiles($)
 
 Fix files by moving unresolved references to the xtrf attribute
+
+     Parameter  Description
+  1  $xref      Xref results
+
+=head2 fixOneFileGB($$)
+
+Fix one file to the Gearhart-Brenan standard
+
+     Parameter  Description
+  1  $xref      Xref results
+  2  $file      File to fix
+
+=head2 fixFilesGB($)
+
+Rename files to the Gearhart-Brenan standard
 
      Parameter  Description
   1  $xref      Xref results
@@ -2566,6 +2930,35 @@ Good files have short names which uniquely represent their content and thus can 
      Parameter  Description
   1  $xref      Cross referencer
 
+=head2 reportOlBody($)
+
+ol under body - indicative of a task
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportHrefUrlEncoding($)
+
+href needs url encoding
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 addNavTitlesToOneMap($$)
+
+Fix navtitles in one map
+
+     Parameter  Description
+  1  $xref      Xref results
+  2  $file      File to fix
+
+=head2 addNavTitlesToMaps($)
+
+Add nav titles to files containing maps.
+
+     Parameter  Description
+  1  $xref      Xref results
+
 =head2 createSampleInputFiles($)
 
 Create sample input files for testing. The attribute B<inputFolder> supplies the name of the folder in which to create the sample files.
@@ -2577,89 +2970,99 @@ Create sample input files for testing. The attribute B<inputFolder> supplies the
 =head1 Index
 
 
-1 L<analyze|/analyze> - Analyze the input files
+1 L<addNavTitlesToMaps|/addNavTitlesToMaps> - Add nav titles to files containing maps.
 
-2 L<analyzeOneFile|/analyzeOneFile> - Analyze one input file
+2 L<addNavTitlesToOneMap|/addNavTitlesToOneMap> - Fix navtitles in one map
 
-3 L<checkBookMap|/checkBookMap> - Check whether a bookmap is valid or not
+3 L<analyze|/analyze> - Analyze the input files
 
-4 L<countLevels|/countLevels> - Count has elements to the specified number of levels
+4 L<analyzeOneFile|/analyzeOneFile> - Analyze one input file
 
-5 L<createSampleInputFiles|/createSampleInputFiles> - Create sample input files for testing.
+5 L<checkBookMap|/checkBookMap> - Check whether a bookmap is valid or not
 
-6 L<fixFiles|/fixFiles> - Fix files by moving unresolved references to the xtrf attribute
+6 L<countLevels|/countLevels> - Count has elements to the specified number of levels
 
-7 L<fixOneFile|/fixOneFile> - Fix one file by moving unresolved references to the xtrf attribute
+7 L<createSampleInputFiles|/createSampleInputFiles> - Create sample input files for testing.
 
-8 L<formatFileNames|/formatFileNames> - Format file names for easy use on unix and windows
+8 L<fixFiles|/fixFiles> - Fix files by moving unresolved references to the xtrf attribute
 
-9 L<lll|/lll> - Write a message
+9 L<fixFilesGB|/fixFilesGB> - Rename files to the Gearhart-Brenan standard
 
-10 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
+10 L<fixOneFile|/fixOneFile> - Fix one file by moving unresolved references to the xtrf attribute
 
-11 L<relativeFilePath|/relativeFilePath> - Format file name for easy use on windows
+11 L<fixOneFileGB|/fixOneFileGB> - Fix one file to the Gearhart-Brenan standard
 
-12 L<reportAttributeCount|/reportAttributeCount> - Report attribute counts
+12 L<formatFileNames|/formatFileNames> - Format file names for easy use on unix and windows
 
-13 L<reportBookMaps|/reportBookMaps> - Report on whether each bookmap is good or bad
+13 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
 
-14 L<reportConrefs|/reportConrefs> - Report bad conrefs refs
+14 L<relativeFilePath|/relativeFilePath> - Format file name for easy use on windows
 
-15 L<reportDocTypeCount|/reportDocTypeCount> - Report doc type count
+15 L<reportAttributeCount|/reportAttributeCount> - Report attribute counts
 
-16 L<reportDuplicateIds|/reportDuplicateIds> - Report duplicate ids
+16 L<reportBookMaps|/reportBookMaps> - Report on whether each bookmap is good or bad
 
-17 L<reportDuplicateTopicIds|/reportDuplicateTopicIds> - Report duplicate topic ids
+17 L<reportConrefs|/reportConrefs> - Report bad conrefs refs
 
-18 L<reportExternalXrefs|/reportExternalXrefs> - Report external xrefs missing other attributes
+18 L<reportDocTypeCount|/reportDocTypeCount> - Report doc type count
 
-19 L<reportFileExtensionCount|/reportFileExtensionCount> - Report file extension counts
+19 L<reportDuplicateIds|/reportDuplicateIds> - Report duplicate ids
 
-20 L<reportFileTypes|/reportFileTypes> - Report file type counts - takes too long in series
+20 L<reportDuplicateTopicIds|/reportDuplicateTopicIds> - Report duplicate topic ids
 
-21 L<reportGuidHrefs|/reportGuidHrefs> - Report on guid hrefs
+21 L<reportExternalXrefs|/reportExternalXrefs> - Report external xrefs missing other attributes
 
-22 L<reportGuidsToFiles|/reportGuidsToFiles> - Map and report guids to files
+22 L<reportFileExtensionCount|/reportFileExtensionCount> - Report file extension counts
 
-23 L<reportImages|/reportImages> - Reports on images and references to images
+23 L<reportFileTypes|/reportFileTypes> - Report file type counts - takes too long in series
 
-24 L<reportMd5Sum|/reportMd5Sum> - Good files have short names which uniquely represent their content and thus can be used instead of their md5sum to generate unique names
+24 L<reportGuidHrefs|/reportGuidHrefs> - Report on guid hrefs
 
-25 L<reportNoHrefs|/reportNoHrefs> - Report locations where an href was expected but not found
+25 L<reportGuidsToFiles|/reportGuidsToFiles> - Map and report guids to files
 
-26 L<reportNotReferenced|/reportNotReferenced> - Report files not referenced by any of conref, image, topicref, xref and are not bookmaps.
+26 L<reportHrefUrlEncoding|/reportHrefUrlEncoding> - href needs url encoding
 
-27 L<reportParseFailed|/reportParseFailed> - Report failed parses
+27 L<reportImages|/reportImages> - Reports on images and references to images
 
-28 L<reportPossibleImprovements|/reportPossibleImprovements> - Report improvements possible
+28 L<reportMd5Sum|/reportMd5Sum> - Good files have short names which uniquely represent their content and thus can be used instead of their md5sum to generate unique names
 
-29 L<reportRefs|/reportRefs> - Report bad references found in xrefs or conrefs as they have the same structure
+29 L<reportNoHrefs|/reportNoHrefs> - Report locations where an href was expected but not found
 
-30 L<reportSimilarTopicsByTitle|/reportSimilarTopicsByTitle> - Report topics likely to be similar on the basis of their titles as expressed in the non Guid part of their file names
+30 L<reportNotReferenced|/reportNotReferenced> - Report files not referenced by any of conref, image, topicref, xref and are not bookmaps.
 
-31 L<reportSimilarTopicsByVocabulary|/reportSimilarTopicsByVocabulary> - Report topics likely to be similar on the basis of their vocabulary
+31 L<reportOlBody|/reportOlBody> - ol under body - indicative of a task
 
-32 L<reportTables|/reportTables> - Report on tables that have problems
+32 L<reportParseFailed|/reportParseFailed> - Report failed parses
 
-33 L<reportTagCount|/reportTagCount> - Report tag counts
+33 L<reportPossibleImprovements|/reportPossibleImprovements> - Report improvements possible
 
-34 L<reportTopicDetails|/reportTopicDetails> - Things that occur once in each file
+34 L<reportRefs|/reportRefs> - Report bad references found in xrefs or conrefs as they have the same structure
 
-35 L<reportTopicRefs|/reportTopicRefs> - Report bad topic refs
+35 L<reportSimilarTopicsByTitle|/reportSimilarTopicsByTitle> - Report topics likely to be similar on the basis of their titles as expressed in the non Guid part of their file names
 
-36 L<reportTopicReuse|/reportTopicReuse> - Count how frequently each topic is reused
+36 L<reportSimilarTopicsByVocabulary|/reportSimilarTopicsByVocabulary> - Report topics likely to be similar on the basis of their vocabulary
 
-37 L<reportValidationErrors|/reportValidationErrors> - Report the files known to have validation errors
+37 L<reportTables|/reportTables> - Report on tables that have problems
 
-38 L<reportXml1|/reportXml1> - Report bad xml on line 1
+38 L<reportTagCount|/reportTagCount> - Report tag counts
 
-39 L<reportXml2|/reportXml2> - Report bad xml on line 2
+39 L<reportTopicDetails|/reportTopicDetails> - Things that occur once in each file
 
-40 L<reportXrefs|/reportXrefs> - Report bad xrefs
+40 L<reportTopicRefs|/reportTopicRefs> - Report bad topic refs
 
-41 L<unixFile|/unixFile> - Format file name for easy use on unix
+41 L<reportTopicReuse|/reportTopicReuse> - Count how frequently each topic is reused
 
-42 L<xref|/xref> - Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder.
+42 L<reportValidationErrors|/reportValidationErrors> - Report the files known to have validation errors
+
+43 L<reportXml1|/reportXml1> - Report bad xml on line 1
+
+44 L<reportXml2|/reportXml2> - Report bad xml on line 2
+
+45 L<reportXrefs|/reportXrefs> - Report bad xrefs
+
+46 L<unixFile|/unixFile> - Format file name for easy use on unix
+
+47 L<xref|/xref> - Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder.
 
 =head1 Installation
 
@@ -2705,7 +3108,7 @@ test unless caller;
 __DATA__
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>1;
+use Test::More tests=>3;
 
 my $windows = $^O =~ m(MSWin32)is;
 my $mac     = $^O =~ m(darwin)is;
@@ -2718,27 +3121,64 @@ if (!$windows) {
 if (1) {
   my $N = 8;                                                                    #Txref
 
-  clearFolder(q(reports), 42);
+  clearFolder($_, 420) for qw(in out reports);
   createSampleInputFiles($N);
 
   my $x = xref(inputFolder              => q(in),
                fixBadRefs               => 1,
                maximumNumberOfProcesses => 2,
                matchTopics              => 0.9,
+               flattenFolder            => q(out),
                relativePath             => q(in));
 
   ok nws($x->statusLine) eq nws(<<END);
-Xref: 108 references fixed, 50 bad xrefs, 16 missing image files, 16 missing image references, 13 bad first lines, 13 bad second lines, 9 bad conrefs, 9 duplicate topic ids, 9 files with bad conrefs, 9 files with bad xrefs, 8 duplicate ids, 6 bad topicrefs, 6 files not referenced, 4 invalid guid hrefs, 2 bad book maps, 2 bad tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing
+Xref: 109 references fixed, 50 bad xrefs, 17 missing image files, 17 missing image references, 13 bad first lines, 13 bad second lines, 9 bad conrefs, 9 duplicate topic ids, 9 files with bad conrefs, 9 files with bad xrefs, 8 duplicate ids, 6 bad topicrefs, 6 files not referenced, 4 invalid guid hrefs, 2 bad book maps, 2 bad tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing, 1 href url encoding
 END
 
   say STDERR $x->statusTable;
-# say STDERR "AAAA ", dump($x->notReferenced);
  }
 
  }
 else
  {ok 1 for 1..1;
  }
+
+
+if (1)                                                                          # Add nav titles
+ {my $N = 8;
+
+  clearFolder($_, 420) for qw(in out reports);
+  createSampleInputFiles($N);
+
+  my $x = xref(inputFolder              => q(in),
+               addNavTitles             => 1);
+
+  is_deeply [map {[@$_[0..1]]} @{$x->badNavTitles }],
+ [["No title for target", "topicref href=\"../map/r.txt\""],
+  ["No title for target", "topicref href=\"9999.dita\""],
+  ["No title for target", "topicref href=\"bbb.txt\""],
+  ["No file for guid", "topicref href=\"guid-888\""],
+  ["No file for guid", "topicref href=\"guid-999\""],
+  ["No title for target", "chapter href=\"yyyy.dita\""],
+  ["No title for target", "topicref href=\"../map/r.txt\""],
+  ["No title for target", "topicref href=\"9999.dita\""],
+  ["No title for target", "topicref href=\"bbb.txt\""],
+  ["No file for guid", "topicref href=\"guid-888\""],
+  ["No file for guid", "topicref href=\"guid-999\""],
+  ["No title for target", "chapter href=\"zzzz.dita\""],
+ ];
+
+  is_deeply [map {[@$_[0..1]]} @{$x->goodNavTitles}],
+ [["../act1.dita", "All Timing Codes Begin Here"],
+  ["../act2.dita", "Jumping Through Hops"],
+  ["guid-000", "All Timing Codes Begin Here"],
+  ["../act1.dita", "All Timing Codes Begin Here"],
+  ["../act2.dita", "Jumping Through Hops"],
+  ["guid-000", "All Timing Codes Begin Here"],
+ ];
+
+ }
+
 
 1
 

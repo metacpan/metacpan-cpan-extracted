@@ -1,3 +1,11 @@
+1.042   2019-02-15 (PERLANCAR)
+
+	- [ux] Allow specifying scenario module with Bencher::Scenario::
+	  prefix.
+
+	- Stringify arg_XXX result column.
+
+
 1.041   2018-04-03 (PERLANCAR)
 
 	- Implement import_args & import_args_array.

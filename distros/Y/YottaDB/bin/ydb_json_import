@@ -1,0 +1,145 @@
+#! /usr/bin/perl
+
+=head1 NAME
+
+ydb_json_import - import JSON-Files into YottaDB.
+
+=head1 SYNOPSIS
+
+   ydb_json_import [-v] [-k] [-t] file.json ^global [ subs1 [ subs2 ... ]]
+
+F<ydb_json_import> imports JSON-Files into YottaDB.
+
+F<ydb_json_import> parses the specified JSON-file completely before
+storing it to the database so only well-formed JSON-files get
+stored. In JSON-files the empty string is a valid key - you need
+to enable NULL_SUBSCRIPTS to handle such files or you may get
+
+  YottaDB returned error code: -150373498 YDB_ERR_NULSUBSC at /usr/local/bin/ydb_json_import line 72.
+
+errors.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -v
+
+Be verbose
+
+=item -k
+
+Kill the global reference before inserting
+
+=item -t
+
+Perform import within a transaction. This may fail with YDB_ERR_TRANS2BIG on huge data-sets. -
++carefully increasing the C<GLOBAL_BUFFER_COUNT> may help.
+
+=back
+
+=head1 EXIT STATUS
+
+On success F<ydb_json_import> returns 0 and non-zero otherwise.
+
+=head1 AUTHOR
+
+Copyright (c) 2018 Stefan Traby <stefan@hello-penguin.com>
+
+=cut
+
+use JSON;
+use YottaDB ":all";
+use Getopt::Std;
+
+sub usage() {
+        print <<EOM;
+
+usage: $0 [-v] [-k] [-t] file.json ^global [ subs1 [ subs2 [ ...]]]
+
+	   -v     verbose
+	   -k     kill before inserting
+	   -t     run within a transaction
+	   -h     this help
+
+EOM
+        exit 1;
+}
+
+our %opts;
+my @stk;
+
+sub _set ($) {
+        y_set @stk, $_[0];
+}
+
+sub json_recurse ($) {
+        my $ref = shift;
+        if (ref $ref eq 'ARRAY') {
+                for (my $i = 0; $i < @$ref; $i++) {
+                        my $a = $ref->[$i];
+                        if (defined $a) {
+                                push @stk, $i;
+                                unless (ref $a) {
+                                        _set $a;
+                                } else {
+                                        json_recurse ($a);
+                                }
+                                pop @stk;
+                        }
+                }
+        } elsif (ref $ref eq 'HASH') {
+                while (my ($k, $v) = each %$ref) {
+                        push @stk, $k;
+                        unless (ref $v) {
+                                _set $v;
+                        } else {
+                                json_recurse ($v);
+                        }
+                        pop @stk;
+                }
+        } elsif (ref($ref) =~ m/^JSON::.*::Boolean$/) {
+                _set $$ref;
+        } else {
+                die "invalid/not a ref: ref=" . ref($ref);
+        }
+}
+
+getopts ('vtkh', \%opts);
+
+usage() if $opts{h};
+
+my $f = shift @ARGV;
+open my $fh, "<", $f or do {warn "$0 open: '$f': $!"; usage;};
+
+unless ($ARGV[0] =~ /^\^/) {
+        warn "expected global name, '^' missing.";
+        usage;
+}
+
+push @stk, @ARGV;
+
+print "load\n" if $opts{v};
+my $data = do {local $/; <$fh>};
+
+close $fh;
+
+print "decode_json\n" if $opts{v};
+my $json = decode_json $data;
+
+sub run () {
+        if ($opts{k}) {
+                print "killing\n" if $opts{v};
+                y_kill_tree (@stk);
+        }
+        print "import\n" if $opts{v};
+        json_recurse $json;
+        y_ok;
+}
+if ($opts{t}) {
+        y_trans (\&run, "BATCH");
+} else {
+        run;
+}
+
+exit 0;

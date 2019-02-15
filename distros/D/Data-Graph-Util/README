@@ -1,59 +1,111 @@
-SYNOPSIS
+NAME
+    Data::Graph::Util - Utilities related to graph data structure
 
+VERSION
+    This document describes version 0.006 of Data::Graph::Util (from Perl
+    distribution Data-Graph-Util), released on 2019-02-15.
+
+SYNOPSIS
      use Data::Graph::Util qw(toposort is_cyclic is_acyclic);
-    
+
+     # return nodes that satisfy the following graph: a must come before b, b must
+     # come before c & d, and d must come before c.
+
      my @sorted = toposort(
          { a=>["b"], b=>["c", "d"], d=>["c"] },
      ); # => ("a", "b", "d", "c")
-    
-     # sort specified nodes (nodes not mentioned in the graph will be put at the
-     # end), duplicates not removed
+
+     # sort specified nodes (2nd argument) using the graph. nodes not mentioned in
+     # the graph will be put at the end. duplicates are not removed.
+
      my @sorted = toposort(
          { a=>["b"], b=>["c", "d"], d=>["c"] },
          ["e", "a", "b", "a"]
      ); # => ("a", "a", "b", "e")
-    
+
+     # check if a graph is cyclic
+
      say is_cyclic ({a=>["b"]}); # => 0
      say is_acyclic({a=>["b"]}); # => 1
-    
+
+     # check if a graph is acyclic (not cyclic)
+
      say is_cyclic ({a=>["b"], b=>["c"], c=>["a"]}); # => 1
      say is_acyclic({a=>["b"], b=>["c"], c=>["a"]}); # => 0
 
 DESCRIPTION
-
     Early release. More functions will be added later.
 
-FUNCTIONS
+    Keywords: topological ordering, dependency sorting, dependency ordering.
 
+FUNCTIONS
     None are exported by default, but they are exportable.
 
- toposort(\%graph[ , \@nodes ]) => sorted list
+  toposort
+    Usage:
+
+     toposort(\%graph[ , \@nodes ]) => sorted list
 
     Perform a topological sort on graph (currently using the Kahn
     algorithm). Will return the nodes of the graph sorted topologically.
     Will die if graph cannot be sorted, e.g. when graph is cyclic.
 
-    If \@nodes is specified, will instead return @nodes sorted according to
-    the topological order. Duplicates are allowed and not removed. Nodes
+    If "\@nodes" is specified, will instead return @nodes sorted according
+    to the topological order. Duplicates are allowed and not removed. Nodes
     not mentioned in graph are also allowed and will be put at the end.
 
- is_cyclic(\%graph) => bool
+  is_cyclic
+    Usage:
+
+     is_cyclic(\%graph) => bool
 
     Return true if graph contains at least one cycle. Currently implemented
-    by attempting a topological sort on the graph. If it can't be
-    performed, this means the graph contains cycle(s).
+    by attempting a topological sort on the graph. If it can't be performed,
+    this means the graph contains cycle(s).
 
- is_acyclic(\%graph) => bool
+  is_acyclic
+    Usage:
+
+     is_acyclic(\%graph) => bool
 
     Return true if graph is acyclic, i.e. contains no cycles. The opposite
-    of is_cyclic().
+    of "is_cyclic".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Graph-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Graph-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Graph-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    <https://en.wikipedia.org/wiki/Graph_(abstract_data_type)>
 
-    https://en.wikipedia.org/wiki/Graph_(abstract_data_type)
+    <https://en.wikipedia.org/wiki/Topological_sorting#Kahn.27s_algorithm>
 
-    https://en.wikipedia.org/wiki/Topological_sorting#Kahn.27s_algorithm
+    Algorithm::Dependency can also do topological sorting, but it is more
+    finicky with input: graph cannot be epmty and all nodes need to be
+    specified.
 
-    Sort::Topological can also sort a DAG, but cannot handle cyclical
-    graph.
+    Sort::Topological can also sort a DAG, but cannot handle cyclical graph.
+    It also performs poorly and eats too much RAM on larger graphs.
+
+    See Bencher::Scenario::GraphTopologicalSortModules for benchmarks.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

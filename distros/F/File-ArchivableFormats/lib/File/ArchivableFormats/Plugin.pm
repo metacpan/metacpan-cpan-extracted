@@ -1,17 +1,18 @@
 package File::ArchivableFormats::Plugin;
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 use Moose::Role;
+use namespace::autoclean;
 
 # ABSTRACT: Role which implements logic for all plugins
 
-requires '_build_prefered_formats';
+requires '_build_preferred_formats';
 
-has prefered_formats => (
+has preferred_formats => (
     is        => 'ro',
     isa       => 'HashRef',
     traits    => ['Hash'],
     lazy      => 1,
-    builder   => '_build_prefered_formats',
+    builder   => '_build_preferred_formats',
     handles   => {
         is_archivable => 'defined',
         get_info      => 'get',
@@ -54,13 +55,13 @@ File::ArchivableFormats::Plugin - Role which implements logic for all plugins
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 ATTRIBUTES
 
-=head2 prefered_formats
+=head2 preferred_formats
 
-The list of prefered formats. Implements F <is_archivable> and F <get_info>
+The list of preferred formats. Implements F <is_archivable> and F <get_info>
 
 =head2 name
 
@@ -68,10 +69,10 @@ The (short) name of the plugin
 
 =head1 METHODS
 
-=head2 _build_prefered_formats
+=head2 _build_preferred_formats
 
 Consumers of this role must implement this function to build the
-C<prefered_formats> attribute.
+C<preferred_formats> attribute.
 
 =head2 allowed_extensions
 
@@ -83,7 +84,7 @@ Tells you if an extension is allowed, Returns an HashRef with data.
         ],
         allowed_extensions => [
             # Tells you which extensions are allowed for the mimetype in
-            # the prefered formats list
+            # the preferred formats list
         ],
     }
 

@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use Carp;
 use Time::Seconds;
@@ -18,37 +18,45 @@ has cutoff => ( is => 'rw', isa => 'Int', default => 0 );
 has payday => ( is => 'rw', isa => 'Int', default => 0 );
 has late    => ( is => 'rw', isa => 'Int', default => 1 );
 
-before 'cutoff' => sub {
+around 'cutoff' => sub {
+    my $orig = shift;
     my $self = shift;
+    return $self->$orig() unless @_;
+
     my $value = shift;
-    return super() unless defined $value;
     croak "unvalid cutoff was set: $value" if $value < 0 or 28 < $value;
     my $day = $value? $value: 31;
-    croak "cuttoff must be before payday" if $day >= $self->payday and $self->late == 0;
-    return super();
+     croak "cuttoff must be before payday"
+    if $day >= $self->payday and $self->late == 0;
+    return $self->$orig($value);
 };
 
-before 'payday' => sub {
+around 'payday' => sub {
+    my $orig = shift;
     my $self = shift;
+    return $self->$orig() unless @_;
+        
     my $value = shift;
-    return super() unless defined $value;
     croak "unvalid payday was set: $value" if $value < 0 or 28 < $value;
     my $day = $value? $value: 31;
-    croak "payday must be after cuttoff" if $day <= $self->cutoff and $self->late == 0;
-    return super();
+     croak "payday must be after cuttoff"
+    if $day <= $self->cutoff and $self->late == 0;
+    return $self->$orig($value);
 };
 
-before 'late' => sub {
+around 'late' => sub {
+    my $orig = shift;
     my $self = shift;
+    return $self->$orig() unless @_;
     my $value = shift;
-    return super() unless defined $value;
     croak "unvalid lateness was set: $value" if $value < 0 or 2 < $value;
-    my( $cutoff, $payday ) = ($self->cutoff, $self->payday);
-    croak "payday is before cuttoff in same month" if $value == 0 and $payday <= $cutoff;
-    return super();
+     croak "payday is before cuttoff in same month"
+    if $value == 0 and $self->payday <= $self->cutoff;
+    return $self->$orig($value);
 };
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 sub _isWeekend {
     my $self = shift;

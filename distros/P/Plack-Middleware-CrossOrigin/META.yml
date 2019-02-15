@@ -1,7 +1,7 @@
 ---
 abstract: 'Adds headers to allow Cross-Origin Resource Sharing'
 author:
-  - 'Graham Knop <haarg@haarg.org>'
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
 build_requires:
   Plack::App::File: '0'
   Plack::Builder: '0'
@@ -9,24 +9,27 @@ build_requires:
   Plack::Test: '0'
   Socket: '0'
   Test::More: '0.88'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.021, CPAN::Meta::Converter version 2.142690'
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Plack-Middleware-CrossOrigin
+no_index:
+  directory:
+    - t
+    - xt
 requires:
   Plack::Middleware: '0'
   Plack::Util: '0'
   Plack::Util::Accessor: '0'
   parent: '0'
   perl: '5.008'
-  strict: '0'
-  warnings: '0'
 resources:
-  bugtracker: http://github.com/haarg/Plack-Middleware-CrossOrigin/issues
-  repository: git://github.com/haarg/Plack-Middleware-CrossOrigin.git
-version: '0.012'
+  bugtracker: https://github.com/haarg/Plack-Middleware-CrossOrigin/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/haarg/Plack-Middleware-CrossOrigin.git
+version: '0.013'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

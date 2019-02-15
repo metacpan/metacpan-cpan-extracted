@@ -1,0 +1,24 @@
+say "hello from foo!";
+-L1
+#BEGIN { no strict 'refs'; say Dumper(\%{"axk_script_0::"}); };
+
+pre_all {
+    say "pre_all";
+};
+pre_file { say "pre_file from: ", shift; };
+post_file { say "post_file"; };
+post_all { say "post_all"; };
+
+my $x=42;
+
+perform {
+    say "Always";
+} always;
+
+perform {
+    say "xpather";
+} xpath("//quux");
+
+#on 42, sub { die("oops from foo"); };
+#on { die("oops from foo"); } 42;
+# vi: set ts=4 sts=4 sw=4 et ai ft=perl: #

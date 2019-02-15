@@ -11,7 +11,7 @@ Yancy::Help::Config - How to configure Yancy
 
 =head1 VERSION
 
-version 1.022
+version 1.023
 
 =head1 SYNOPSIS
 
@@ -151,7 +151,7 @@ Instead of (or in addition to) defining collections yourself, you can
 tell Yancy to read your database to try to determine your collection
 configuration. See L<read_schema|/read_schema> for more information.
 
-=head2 Generated Forms
+=head2 Types
 
 Yancy generates input elements based on the C<type>, and C<format> of
 the object's properties.
@@ -183,11 +183,16 @@ that shows a live preview of the rendered HTML. The Markdown can be
 saved as HTML in another field by adding C<< x-html-field => $field_name >>
 to that field.
 
+=item * C<< enum => [...], type => "..." >> - A C<< <select> >> element.
+This can be of any type.
+
 =back
 
 JSON schemas allow specifying multiple types for a field using an array.
 If a field has multiple types, the generated form will use the first
 type to decide what kind of field to display.
+
+=head2 Field Configuration
 
 Other schema attributes will be translated as necessary to the HTML
 input fields:
@@ -199,9 +204,6 @@ input fields:
 =item * C<description> will be placed near the input field to explain it
 
 =item * C<readOnly> will set the input field as read-only
-
-=item * C<enum> specifies an array of possible values for the property,
-which will be shown in a drop-down C<< <select> >> element.
 
 =item * C<pattern> for string fields, a string that can be used as a regex, like C<< pattern => '^foo-\d+$' >>.
 
@@ -373,6 +375,10 @@ L<Mojolicious::Plugin::Yancy>. See
 L<Mojolicious::Plugin::Yancy/yancy.filter.add> for how to create
 a filter in your app.
 
+Instead of a filter name, you can provide an array. The first member
+will be the name, and any further members will be passed to the filter
+code-ref as parameters after the mandatory three.
+
 =item x-view-url
 
 A URL to view the collection in the application. Will be shown as a button
@@ -426,6 +432,10 @@ Filters are added by plugins or during configuration of
 L<Mojolicious::Plugin::Yancy>. See
 L<Mojolicious::Plugin::Yancy/yancy.filter.add> for how to create a filter
 in your app.
+
+Instead of a filter name, you can provide an array. The first member
+will be the name, and any further members will be passed to the filter
+code-ref as parameters after the mandatory three.
 
 =back
 

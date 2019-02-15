@@ -1,0 +1,60 @@
+{
+    "Parameters": {
+        "apiName": {
+            "Type": "String"
+        },
+        "description": {
+            "Type": "String"
+        },
+        "version": {
+            "Type": "String"
+        },
+        "type": {
+            "Type": "String"
+        },
+        "property": {
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "RestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+                "Name": {
+                    "Ref": "apiName"
+                }
+            }
+        },
+        "DocumentationPart": {
+            "Type": "AWS::ApiGateway::DocumentationPart",
+            "Properties": {
+                "Location": {
+                    "Type": {
+                        "Ref": "type"
+                    }
+                },
+                "RestApiId": {
+                    "Ref": "RestApi"
+                },
+                "Properties": {
+                    "Ref": "property"
+                }
+            }
+        },
+        "DocumentationVersion": {
+            "Type": "AWS::ApiGateway::DocumentationVersion",
+            "Properties": {
+                "Description": {
+                    "Ref": "description"
+                },
+                "DocumentationVersion": {
+                    "Ref": "version"
+                },
+                "RestApiId": {
+                    "Ref": "RestApi"
+                }
+            },
+            "DependsOn": "DocumentationPart"
+        }
+    }
+}

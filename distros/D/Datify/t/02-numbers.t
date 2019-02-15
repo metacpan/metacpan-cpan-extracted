@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 96;
+use Test2::V0;
+plan 96;
 
 ok require Datify, 'Required Datify';
 

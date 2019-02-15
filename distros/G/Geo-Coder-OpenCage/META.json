@@ -30,6 +30,7 @@
       },
       "test" : {
          "requires" : {
+            "Net::Ping" : "2.71",
             "Test::Exception" : "0.32",
             "Test::More" : "0.92",
             "Test::Pod" : "1.51",
@@ -40,7 +41,7 @@
    "provides" : {
       "Geo::Coder::OpenCage" : {
          "file" : "lib/Geo/Coder/OpenCage.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -52,7 +53,7 @@
          "web" : "https://github.com/OpenCageData/perl-Geo-Coder-OpenCage"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_generated_by_perl" : "v5.26.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }

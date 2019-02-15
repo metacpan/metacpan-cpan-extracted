@@ -1,7 +1,7 @@
 package Module::Patch;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.275'; # VERSION
+our $DATE = '2019-02-14'; # DATE
+our $VERSION = '0.276'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -33,7 +33,7 @@ sub import {
         for my $exp (@_) {
             die "$exp is not exported by ".__PACKAGE__
                 unless grep { $_ eq $exp } @EXPORT_OK;
-            *{"$caller\::$exp"} = \&{$_};
+            *{"$caller\::$exp"} = \&{$exp};
         }
     } else {
         # we are subclassed, patch caller with patch_data()
@@ -286,7 +286,7 @@ Module::Patch - Patch package with a set of patches
 
 =head1 VERSION
 
-This document describes version 0.275 of Module::Patch (from Perl distribution Module-Patch), released on 2019-01-06.
+This document describes version 0.276 of Module::Patch (from Perl distribution Module-Patch), released on 2019-02-14.
 
 =head1 SYNOPSIS
 

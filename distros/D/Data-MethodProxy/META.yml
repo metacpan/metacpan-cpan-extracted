@@ -1,0 +1,44 @@
+---
+abstract: 'Inject dynamic data into static data.'
+author:
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test2::V0: '0.000071'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-MethodProxy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Config::MethodProxy:
+    file: lib/Config/MethodProxy.pm
+    version: '0.03'
+  Data::MethodProxy:
+    file: lib/Data/MethodProxy.pm
+    version: '0.03'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Module::Runtime: '0.014'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/bluefeet/Data-MethodProxy/issues
+  homepage: https://github.com/bluefeet/Data-MethodProxy
+  repository: git://github.com/bluefeet/Data-MethodProxy.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

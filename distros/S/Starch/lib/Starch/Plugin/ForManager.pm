@@ -1,5 +1,7 @@
 package Starch::Plugin::ForManager;
-$Starch::Plugin::ForManager::VERSION = '0.09';
+
+$Starch::Plugin::ForManager::VERSION = '0.10';
+
 =head1 NAME
 
 Starch::Plugin::ForManager - Base role for Starch plugins.

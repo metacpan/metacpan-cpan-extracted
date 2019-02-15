@@ -4,7 +4,7 @@ package CCfnX::UserData {
 
   extends 'Cfn::Value';
 
-  has '+Value' => (required => 0);
+  has Value => (isa => 'Cfn::Value', coerce => 1, is => 'rw', required => 0);
   has text => (is => 'ro', required => 1, isa => 'Str|ArrayRef');
 
   sub parse_line {

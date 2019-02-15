@@ -1,6 +1,12 @@
 History for Mojolicious::Plugin::BootstrapAlerts
 ================================================
 
+0.07  2019-02-15 09:29:00
+
+      * Fix bug: when auto_inject was active the notifications weren't added
+      * Add tests
+      * clean up code
+
 0.06  2013-12-13
 
       * fix documentation: In two places the plugin was named 'Bootstrap' instead of 'BootstrapAlerts'. (thanks to ravenhall, see issue #1)

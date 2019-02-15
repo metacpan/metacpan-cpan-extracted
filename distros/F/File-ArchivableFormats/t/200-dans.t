@@ -19,6 +19,7 @@ isa_ok($af, "File::ArchivableFormats");
     my %expect = (
         DANS => {
             archivable => 1,
+            preferred_extension => '.txt',
             allowed_extensions => [ '.asc', '.txt' ],
             types => [
                 'Plain text (Unicode)',
@@ -68,10 +69,14 @@ isa_ok($af, "File::ArchivableFormats");
     foreach (qw(Xential.docx Xential-2.docx)) {
         my $filename = catfile(qw(t data), $_);
         my $status = $af->identify_from_path($filename);
-        is($status->{DANS}{archivable}, 1, "File::Temp handling goes well: $filename");
-        is($status->{mime_type}, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', "$filename is a docx file");
+        is($status->{DANS}{archivable},
+            1, "File::Temp handling goes well: $filename");
+        is(
+            $status->{mime_type},
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            "$filename is a docx file"
+        );
     }
-
-
 }
+
 done_testing;

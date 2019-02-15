@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '1.022';
+our $VERSION = '1.023';
 # ABSTRACT: A simple auth module for a site
 
 #pod =encoding utf8
@@ -342,8 +342,28 @@ sub register {
     $app->helper( 'yancy.auth.check' => sub {
         my ( $c, $username, $pass ) = @_;
         my $user = $c->yancy->auth->get_user( $username );
+        if ( !$user ) {
+            $c->app->log->error(
+                sprintf 'Auth failed: User "%s" does not exist.', $username,
+            );
+            return;
+        }
+        if ( !$user->{ $password_field } ) {
+            $c->app->log->error(
+                sprintf 'Auth failed: User "%s" password field "%s" is empty.',
+                $username, $password_field,
+            );
+            return;
+        }
         my $check_pass = $digest->add( $pass )->b64digest;
-        return $user->{ $password_field } eq $check_pass;
+        if ( $user->{ $password_field } ne $check_pass ) {
+            $c->app->log->error(
+                sprintf 'Auth failed: User "%s" password is incorrect (field "%s").',
+                $username, $password_field,
+            );
+            return;
+        }
+        return 1;
     } );
     $app->helper( 'yancy.auth.clear' => sub {
         my ( $c ) = @_;
@@ -395,7 +415,7 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 1.022
+version 1.023
 
 =head1 SYNOPSIS
 

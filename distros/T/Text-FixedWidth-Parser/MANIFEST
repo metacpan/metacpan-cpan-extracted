@@ -1,11 +1,12 @@
-MANIFEST
-Makefile.PL
-README.md
 Changes
 lib/Text/FixedWidth/Parser.pm
-t/Test/Text/FixedWidth/Parser.pm
+Makefile.PL
+MANIFEST
+README.md
 t/run.t
+t/Test/Text/FixedWidth/Parser.pm
 t/test_file.txt
 t/test_file2.txt
+Text-FixedWidth-Parser-0.3.tar.gz
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -2,8 +2,8 @@ NAME
     Module::Patch - Patch package with a set of patches
 
 VERSION
-    This document describes version 0.275 of Module::Patch (from Perl
-    distribution Module-Patch), released on 2019-01-06.
+    This document describes version 0.276 of Module::Patch (from Perl
+    distribution Module-Patch), released on 2019-02-14.
 
 SYNOPSIS
     In this example, we're patching HTTP::Tiny to add automatic retrying.

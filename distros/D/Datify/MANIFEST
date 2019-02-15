@@ -2,10 +2,10 @@
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
-dist.ini
 lib/Datify.pm
 lib/Datify/Path.pm
 t/01-basic.t
@@ -13,4 +13,4 @@ t/02-numbers.t
 t/03-strings.t
 t/04-specials.t
 t/Path/01-basic.t
-weaver.ini
+t/author-pod-syntax.t

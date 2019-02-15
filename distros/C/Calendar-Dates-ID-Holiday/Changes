@@ -1,3 +1,26 @@
+0.007   2019-02-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- [refactor] Refactoring of roles.
+
+
+0.006   2019-02-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to renamed role
+	  Calendar::DatesRoles::From{Data,EntriesVar}.
+
+
+0.005    2019-02-14 (PERLANCAR)
+
+         - No functional changes.
+
+         - [dist] Rebuild with updated PWP:Calendar::Dates which fixes samples
+           rendering.
+
+
 0.004    2019-02-14 (PERLANCAR)
 
          - No functional changes.

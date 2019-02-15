@@ -2,9 +2,9 @@ NAME
     Calendar::Dates::ID::Holiday - Indonesian holiday calendar
 
 VERSION
-    This document describes version 0.004 of Calendar::Dates::ID::Holiday
+    This document describes version 0.007 of Calendar::Dates::ID::Holiday
     (from Perl distribution Calendar-Dates-ID-Holiday), released on
-    2019-02-14.
+    2019-02-15.
 
 SYNOPSIS
   Using from Perl

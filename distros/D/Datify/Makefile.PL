@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.018000;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,22 +14,23 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Datify",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.018000",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Datify",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "List::Util" => "1.40",
-    "Scalar::Util" => "1.40",
-    "String::Tools" => 0,
+    "List::Util" => 0,
+    "Scalar::Util" => 0,
+    "String::Tools" => "0.18.277",
     "Sub::Util" => "1.40",
+    "mro" => 0,
     "overload" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "Test2::V0" => 0
   },
-  "VERSION" => "v0.18.270",
+  "VERSION" => "v0.19.045",
   "test" => {
     "TESTS" => "t/*.t t/Path/*.t"
   }
@@ -38,11 +39,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "List::Util" => "1.40",
-  "Scalar::Util" => "1.40",
-  "String::Tools" => 0,
+  "List::Util" => 0,
+  "Scalar::Util" => 0,
+  "String::Tools" => "0.18.277",
   "Sub::Util" => "1.40",
-  "Test::More" => 0,
+  "Test2::V0" => 0,
+  "mro" => 0,
   "overload" => 0,
   "strict" => 0,
   "warnings" => 0

@@ -10,7 +10,7 @@ use File::Temp ();
 use Capture::Tiny ();
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '0.83'; # VERSION
+our $VERSION = '0.84'; # VERSION
 
 
 sub new
@@ -326,6 +326,10 @@ sub flag_library_output
   {
     return ("-OUT:$file");
   }
+  elsif($self->osname eq 'darwin')
+  {
+    return ('-install_name' => "\@rpath/$file", -o => $file);
+  }
   else
   {
     return ('-o' => $file);
@@ -389,7 +393,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 

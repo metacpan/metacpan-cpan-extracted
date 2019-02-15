@@ -9,12 +9,12 @@ use parent 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub register {
     my ($self, $app, $config) = @_;
 
-    my $dismissable = !( $config && exists $config->{dismissable} && $config->{dismissable} == 0 );
+    my $dismissable = !(exists $config->{dismissable} and $config->{dismissable} == 0 );
 
     $app->helper( notify => sub {
         my $c = shift;
@@ -22,13 +22,16 @@ sub register {
     } );
 
     $app->helper( notifications => sub {
-        my $c                    = shift;
-        my $notifications_config = shift;
+        my $c = shift;
 
         my $output = '';
 
         for my $notification ( @{ $c->stash('__NOTIFICATIONS__') || [] } ) {
             my ($type, $message, $config) = @{ $notification };
+
+            if ( 'HASH' ne ref $config ) {
+                $config = {};
+            }
 
             my ($dismissable_class, $dismissable_button) = ("","");
             if ( $config->{dismissable} || (!exists $config->{dismissable} && $dismissable) ) {
@@ -56,7 +59,8 @@ sub register {
         return Mojo::ByteStream->new( $output );
     } );
 
-    if ( $config && $config->{auto_inject} && ($config->{before} || $config->{after}) ) {
+    my $selector = $config->{before} || $config->{after};
+    if ( $config->{auto_inject} && $selector ) {
         $app->hook( after_render => sub {
             my ($c, $content, $format) = @_;
 
@@ -66,9 +70,8 @@ sub register {
 
             return if !$notifications;
 
-            my $dom           = Mojo::DOM->new( ${$content} );
-            my $selector      = $config->{before} || $config->{after};
-            my $element       = $dom->at( $selector );
+            my $dom     = Mojo::DOM->new( ${$content} );
+            my $element = $dom->find( $selector )->first;
 
             if ( !$element ) {
                 $c->app->log->debug( 'no matching element found (' . $selector . ')' );
@@ -90,13 +93,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Mojolicious::Plugin::BootstrapAlerts - Bootstrap alerts for your web app
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

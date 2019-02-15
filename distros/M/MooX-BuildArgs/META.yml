@@ -1,27 +1,57 @@
 ---
 abstract: 'Save instantiation arguments for later use.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  Test2::Suite: '0'
+  Test2::V0: '0.000071'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MooX-BuildArgs
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooX::BuildArgs:
+    file: lib/MooX/BuildArgs.pm
+    version: '0.06'
+  MooX::BuildArgsHooks:
+    file: lib/MooX/BuildArgsHooks.pm
+    version: '0.06'
+  MooX::MethodProxyArgs:
+    file: lib/MooX/MethodProxyArgs.pm
+    version: '0.06'
+  MooX::Rebuild:
+    file: lib/MooX/Rebuild.pm
+    version: '0.06'
+  MooX::SingleArg:
+    file: lib/MooX/SingleArg.pm
+    version: '0.06'
 requires:
   Carp: '0'
-  Config::MethodProxy: '0.02'
+  Data::MethodProxy: '0.03'
   Moo: '2'
   Scalar::Util: '0'
   namespace::clean: '0.24'
   strictures: '2'
 resources:
   bugtracker: https://github.com/bluefeet/MooX-BuildArgs/issues
+  homepage: https://github.com/bluefeet/MooX-BuildArgs
   repository: git://github.com/bluefeet/MooX-BuildArgs.git
-version: '0.04'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.06'
+x_contributors:
+  - 'Peter Pentchev <roam@ringlet.net>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

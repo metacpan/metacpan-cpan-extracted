@@ -1,0 +1,69 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Create a DAX cluster",
+  "Resources": {
+    "daxCluster": {
+      "Type": "AWS::DAX::Cluster",
+      "Properties": {
+        "ClusterName": "MyDAXCluster",
+        "NodeType": "dax.r3.large",
+        "ReplicationFactor": 1,
+        "IAMRoleARN": "arn:aws:iam::111122223333:role/DaxAccess",
+        "Description": "DAX cluster created with CloudFormation",
+        "SubnetGroupName": "MySubnetGroup"
+      }
+    },
+    "subnetGroupClu": {
+      "Type": "AWS::DAX::SubnetGroup",
+      "Properties": {
+        "SubnetGroupName": "MySubnetGroup",
+        "Description": "Subnet group for DAX cluster",
+        "SubnetIds": [
+          "subnet1",
+          "subnet2"
+        ]
+      }
+    },
+    "subnet1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": "daxVpc",
+        "CidrBlock": "172.13.17.0/24",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        }
+      }
+    },
+    "subnet2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": "daxVpc",
+        "CidrBlock": "172.13.18.0/24",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        }
+      }
+    },
+    "daxVpc": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "172.13.0.0/16"
+      }
+    }
+  },
+  "Outputs": {
+    "Cluster": {
+      "Value": "daxCluster"
+    }
+  }
+}

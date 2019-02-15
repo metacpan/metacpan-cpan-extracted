@@ -1,7 +1,7 @@
 package Calendar::Dates;
 
-our $DATE = '2019-02-13'; # DATE
-our $VERSION = '0.1.1'; # VERSION
+our $DATE = '2019-02-15'; # DATE
+our $VERSION = '0.1.3'; # VERSION
 
 1;
 # ABSTRACT: Modules that contain calendar dates
@@ -22,7 +22,7 @@ Calendar::Dates - Modules that contain calendar dates
 
 =head1 VERSION
 
-This document describes version 0.1.1 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-02-13.
+This document describes version 0.1.3 of Calendar::Dates (from Perl distribution Calendar-Dates), released on 2019-02-15.
 
 =head1 DESCRIPTION
 
@@ -143,13 +143,15 @@ Integer. Day of month number (1-31).
 
 =item * summary
 
-From DefHash specification. Should be in English. To specify summary in other
-language, use "summary.alt.lang.<LL>" keys.
+From DefHash specification. Can be in English or another language, but providing
+English version is recommended. To specify summary in other language, use
+"summary.alt.lang.<LL>" keys.
 
 =item * description
 
-From DefHash specification. Should be in English. To specify description in
-other language, use "description.alt.lang.<LL>" keys.
+From DefHash specification. Can be in English or another language, but providing
+English version is recommended. To specify description in other language, use
+"description.alt.lang.<LL>" keys.
 
 =item * tags
 

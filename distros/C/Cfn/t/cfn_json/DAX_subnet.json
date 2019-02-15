@@ -1,0 +1,58 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Create a DAX subnet group",
+  "Resources": {
+    "MyDAXSubnetGroup": {
+      "Type": "AWS::DAX::SubnetGroup",
+      "Properties": {
+        "SubnetGroupName": "my-dax-subnet-group",
+        "Description": "Description of my DAX subnet group",
+        "SubnetIds": [
+          "subnet1",
+          "subnet2"
+        ]
+      }
+    },
+    "subnet1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": "daxVPC",
+        "CidrBlock": "172.13.17.0/24",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        }
+      }
+    },
+    "subnet2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": "daxVPC",
+        "CidrBlock": "172.13.18.0/24",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        }
+      }
+    },
+    "daxVpc": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "172.13.0.0/16"
+      }
+    }
+  },
+  "Outputs": {
+    "ParameterGroup": {
+      "Value": "MyDAXSubnetGroup"
+    }
+  }
+}

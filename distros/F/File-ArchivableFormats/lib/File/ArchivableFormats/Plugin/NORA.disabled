@@ -7,10 +7,10 @@ with 'File::ArchivableFormats::Plugin';
 
 has '+name' => (default => 'NORA');
 
-sub _build_prefered_formats {
+sub _build_preferred_formats {
     my $self = shift;
 
-    my %prefered = (
+    my %preferred = (
         'audio/x-aac' => {
             allowed_extensions => ['.aac'],
             types              => ['Audio (AAC)']
@@ -243,7 +243,7 @@ sub _build_prefered_formats {
             types              => ['Lossless AVI']
         },
     );
-    return \%prefered;
+    return \%preferred;
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -1,0 +1,49 @@
+=head1 NAME
+
+Data::Hopen::G - Namespace for graph-related items in hopen
+
+=head1 SYNOPSIS
+
+Almost everything graph-related in hopen lives under C<Data::Hopen::G>.  This
+includes nodes, edges, and graphs (specifically, directed acyclic graphs,
+DAGs).
+
+Classes are (all under C<Data::Hopen::G>):
+
+    Entity - something in the graph
+        Runnable - something that has a run() method and need/want namesets
+                    (TODO should this be a Role::Tiny role?)
+            Link - connection between Nodes
+            Node - abstract graph node
+                Op - abstract operation
+                    Goal - a node that just gives a name to a set of operations
+                    PassthroughOp - no-op concrete operation
+                    DAG - the graph
+
+Specific use cases of the graph are not under C<...::G>, such as
+tools used in the hopen build system (L<App::hopen>).
+
+=head1 ELEMENTS
+
+=head2 C<Data::Hopen::G::Op>
+
+An operation.  Operations can, e.g., transform their inputs or invoke a
+generator routine (L<Data::Hopen::Gen>) based on their inputs.  Operations
+can output values representing the generator action they took, or that will
+later be used by the generator or downstream nodes.
+
+=head2 C<Data::Hopen::G::Link>
+
+A connection between operations.  Edges should, generally speaking, B<not>
+invoke generator routines.  Instead, they should transform their inputs to
+outputs, possibly with reference to the environment or (if necessary) the
+B<identity> (but not details) of the generator in use.
+
+=head2 C<Data::Hopen::G::DAG>
+
+A graph of operations and edges.  Every relationship between operations and
+edges is expressed in a DAG.  A DAG has zero or more goals
+(L<Data::Hopen::G::Goal>) that represent named activities expressed
+in the DAG.
+
+=cut

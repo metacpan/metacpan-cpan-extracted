@@ -1,5 +1,7 @@
 package Starch::Store::Memory;
-$Starch::Store::Memory::VERSION = '0.09';
+
+$Starch::Store::Memory::VERSION = '0.10';
+
 =head1 NAME
 
 Starch::Store::Memory - In-memory Starch store.

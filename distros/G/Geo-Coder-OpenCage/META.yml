@@ -3,6 +3,7 @@ abstract: 'Geocode coordinates and addresses with the OpenCage Geocoder'
 author:
   - 'edf <edf@opencagedata.com>'
 build_requires:
+  Net::Ping: '2.71'
   Test::Exception: '0.32'
   Test::More: '0.92'
   Test::Pod: '1.51'
@@ -19,7 +20,7 @@ name: Geo-Coder-OpenCage
 provides:
   Geo::Coder::OpenCage:
     file: lib/Geo/Coder/OpenCage.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   Carp: '0'
   Cpanel::JSON::XS: '4.08'
@@ -29,6 +30,6 @@ requires:
 resources:
   homepage: https://github.com/OpenCageData/perl-Geo-Coder-OpenCage
   repository: https://github.com/OpenCageData/perl-Geo-Coder-OpenCage.git
-version: '0.18'
+version: '0.19'
 x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

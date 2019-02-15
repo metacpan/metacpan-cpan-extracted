@@ -1,5 +1,7 @@
 package MooX::MethodProxyArgs;
-$MooX::MethodProxyArgs::VERSION = '0.04';
+
+$MooX::MethodProxyArgs::VERSION = '0.06';
+
 =head1 NAME
 
 MooX::MethodProxyArgs - Invoke code to populate static arguments.
@@ -29,12 +31,12 @@ MooX::MethodProxyArgs - Invoke code to populate static arguments.
 This module munges the class's input arguments by replacing any
 method proxy values found with the result of calling the methods.
 
-This is done using L<Config::MethodProxy>.  See that module for more
+This is done using L<Data::MethodProxy>.  See that module for more
 information on how method proxies work.
 
 =cut
 
-use Config::MethodProxy;
+use Data::MethodProxy;
 
 use Moo::Role;
 use strictures 2;
@@ -42,11 +44,13 @@ use namespace::clean;
 
 with 'MooX::BuildArgsHooks';
 
+my $mproxy = Data::MethodProxy->new();
+
 around TRANSFORM_BUILDARGS => sub{
     my ($orig, $class, $args) = @_;
 
     return $class->$orig(
-        apply_method_proxies( $args ),
+        $mproxy->render( $args ),
     );
 };
 

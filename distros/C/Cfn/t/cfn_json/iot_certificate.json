@@ -1,0 +1,24 @@
+{
+   "AWSTemplateFormatVersion": "2010-09-09",
+   "Resources": {
+      "MyCertificate": {
+         "Type": "AWS::IoT::Certificate",
+         "Properties": {
+            "CertificateSigningRequest": {
+               "Ref": "CSRParameter"
+            },
+            "Status": {
+               "Ref": "StatusParameter"
+            }
+         }
+      }
+   },
+   "Parameters": {
+      "CSRParameter": {
+         "Type": "String"
+      },
+      "StatusParameter": {
+         "Type": "String"
+      }
+   }
+}

@@ -196,3 +196,8 @@ Revision history for PPR
 
     * Optimized several tests to remove unnecessary (?&PerlOWS) calls
       (thanks, Adriano)
+
+
+0.000023  Fri Feb 15 09:20:25 2019
+
+    * Fixed (?&PerlScalarExpression)

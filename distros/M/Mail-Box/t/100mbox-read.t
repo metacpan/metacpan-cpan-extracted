@@ -63,6 +63,10 @@ ok($parsed,                            'all messages parsed');
 
 my $blank = $crlf_platform ? 2 : 1;
 
+#XXX Mail::Message fileLocation changed, in the hope to keep DKIM signatures valid over storage
+#    in an MBOX folder.  This may not be the right or a sufficient patch.
+$blank = 0;
+
 my ($end, $msgnr) = (-$blank, 0);
 foreach $message ($folder->messages)
 {   my ($msgbegin, $msgend)   = $message->fileLocation;

@@ -1,8 +1,71 @@
 Revision history for Datify.
 
+v0.19.045 2019-02-14
+
+ - Datify:
+   - Lots of changes to the internals:
+     - Changed how add_handler() and _find_handler() work,
+       by subtracting some magic, or adding it, respectively.
+     - Changed calls to ref() to Scalar::Util::blessed()
+       or Scalar::Util::reftype(), as appropriate.
+     - Update new(), get(), and set() to operate on local parameters 
+       before global ones.
+     - Converted several "if ... elsif ... else ..." blocks to
+       the equivalent trinary "? ... : ... ? : ..." statements.
+     - Methods should now localize $_, or operate on the global $_ if no
+       parameters are passed in.
+     - Improved the caching.
+     - Improved how codeify() works, by referring to a named subroutine,
+       if that can be determined.
+   - numify() returns the string for undef, if that's what is passed in,
+     rather than the undef value.
+   - listify() no longer makes assumptions if passed a single ARRAY or HASH.
+   - Added is_keyword() method.
+   - Added more tests.
+   - Updated the documentation.
+   - Updated tests from Test::More to Test2::V0.
+   - And Many more changes...
+ - Datify::Path:
+   - Lots of changes to the internals:
+     - Changed calls to ref() to Scalar::Util::blessed()
+       or Scalar::Util::reftype(), as appropriate.
+     - Update new(), get(), and set() to operate on local parameters 
+       before global ones.
+     - Converted several "if ... elsif ... else ..." blocks to
+       the equivalent trinary "? ... : ... ? : ..." statements.
+     - Methods should now localize $_, or operate on the global $_ if no
+       parameters are passed in.
+     - Improved the caching.
+   - Detect and die on recursive structures.
+   - Added more tests.
+   - Updated tests from Test::More to Test2::V0.
+   - And Many more changes...
+
+0.18.348  2018-12-14
+
+ - Handle Perl 5.14 correctly (5.14 does not have fc()).
+
+0.18.347  2018-12-13
+
+ - Changed comaprisons in is_numeric() to not use regular expressions,
+   and be accurate for various representations of nan, inf, and -inf.
+ - Improved handling of characters, so that UTF-8 and UTF-16 can be supported.
+ - It turns out that Scalar::Util::reftype() reports back 'REGEXP',
+   not 'Regexp'.
+   - RANT: That's not documented anywhere that I can find.
+ - Reduced requirement for Datify::Path from Perl v5.18 to v.5.14.
+
+0.18.279  2018-10-06
+
+ - Changed _encode() to accommodate UTF-8 and UTF-16 encoding.
+
+0.18.277  2018-10-04
+
+ - Added META.json
+
 v0.18.270 2018-09-27
 
- - Changed keyify to format numbers with numify, rather than as strings.
+ - Changed keyify() to format numbers with numify(), rather than as strings.
  - Added Datify::Path, for outputting data like filesystem paths.
  - Changed Datify encode to use "byte" and "wide" rather than 255 and 65_535.
  - Added functionality to filter hash entries and object attributes.

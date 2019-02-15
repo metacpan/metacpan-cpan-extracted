@@ -11,19 +11,27 @@ build_requires:
   MIME::Types: '0'
   Test::Deep: '0'
   Test::More: '0'
-  perl: '5.006'
-  strict: '0'
-  warnings: '0'
+  perl: '5.008'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: File-ArchivableFormats
+provides:
+  File::ArchivableFormats:
+    file: lib/File/ArchivableFormats.pm
+    version: '1.5'
+  File::ArchivableFormats::Plugin:
+    file: lib/File/ArchivableFormats/Plugin.pm
+    version: '1.5'
+  File::ArchivableFormats::Plugin::DANS:
+    file: lib/File/ArchivableFormats/Plugin/DANS.pm
+    version: '1.5'
 requires:
   Archive::Zip: '0'
   File::Basename: '0'
@@ -34,8 +42,12 @@ requires:
   Moose: '0'
   Moose::Role: '0'
   Moose::Util::TypeConstraints: '0'
-  perl: '5.006'
+  namespace::autoclean: '0'
+  perl: '5.008'
 resources:
   repository: git://gitlab.com/waterkip/File-ArchivableFormats.git
-version: '1.4'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '1.5'
+x_contributors:
+  - 'Wesley Schwengle <wesley@schwengle.net>'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

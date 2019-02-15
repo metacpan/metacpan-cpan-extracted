@@ -21,9 +21,9 @@ sub get_mt {
 
 sub test_driver {
     my $driver   = shift;
-    my $prefered = $driver->prefered_formats;
+    my $preferred = $driver->preferred_formats;
 
-    foreach (sort keys %$prefered) {
+    foreach (sort keys %$preferred) {
         if ($_ =~ /^\./) {
             my $ext = $_;
             like($ext, $qr_ext, "Valid extension: '$ext'");

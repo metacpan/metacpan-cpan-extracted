@@ -1,0 +1,7 @@
+#!/usr/bin/perl -w
+# Copyright (c) 2018 cxw42.  All rights reserved.  Artistic 2.
+# To run this manually from the source tree, do
+#     perl -Ilib bin/axk
+use XML::Axk::App;
+exit(XML::Axk::App::Main(\@ARGV));
+# vi: set ts=4 sts=4 sw=4 et ai ft=perl: #

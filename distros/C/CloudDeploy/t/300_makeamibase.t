@@ -21,9 +21,36 @@ package TestClass {
   resource X => 'AWS::IAM::User', {};
 }
 
-my $obj = TestClass->new;
+{
+  my $obj = TestClass->new;
+  ok($obj->Resource('Instance'), 'Instance object is defined just after create');
+  ok($obj->Resource('CfnPolicy'), 'CfnPolicy is defined just after create');
+}
 
-ok($obj->Resource('Instance'), 'Instance object is defined just after create');
-ok($obj->Resource('CfnPolicy'), 'CfnPolicy is defined just after create');
+use CCfnX::MakeAMIBaseVPC;
+
+package TestClassVPC {
+  use Moose;
+  extends 'CCfnX::MakeAMIBaseVPC';
+  use CCfnX::MakeAMIBaseVPCArgs;
+  has params => (is => 'ro', isa => 'CCfnX::MakeAMIBaseVPCArgs', default => sub { CCfnX::MakeAMIBaseVPCArgs->new(
+    instance_type => 'x1.xlarge',
+    region => 'eu-west-1',
+    account => 'devel-capside',
+    name => 'NAME',
+    ami  => 'xxxx',
+    template => [ 'template-xx' ],
+  ); } );
+
+  use CCfnX::Shortcuts;
+
+  resource X => 'AWS::IAM::User', {};
+}
+
+{
+  my $obj = TestClassVPC->new;
+  ok($obj->Resource('Instance'), 'Instance object is defined just after create');
+  ok($obj->Resource('CfnPolicy'), 'CfnPolicy is defined just after create');
+}
 
 done_testing;

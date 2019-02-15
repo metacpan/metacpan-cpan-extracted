@@ -57,6 +57,8 @@ lib/Yancy/Backend.pod
 lib/Yancy/Backend/Dbic.pm
 lib/Yancy/Backend/Mysql.pm
 lib/Yancy/Backend/Pg.pm
+lib/Yancy/Backend/Role/MojoAsync.pm
+lib/Yancy/Backend/Role/Relational.pm
 lib/Yancy/Backend/Role/Sync.pm
 lib/Yancy/Backend/Sqlite.pm
 lib/Yancy/Controller/Yancy.pm
@@ -87,10 +89,6 @@ t/examples/todo-app.t
 t/filter.t
 t/helpers.t
 t/lib/Digest/Broken.pm
-t/lib/Local/BackendTestSchema.pm
-t/lib/Local/BackendTestSchema/Result/mojo_migrations.pm
-t/lib/Local/BackendTestSchema/Result/people.pm
-t/lib/Local/BackendTestSchema/Result/user.pm
 t/lib/Local/Controller/Extend/Yancy.pm
 t/lib/Local/Schema.pm
 t/lib/Local/Schema/Result/blog.pm

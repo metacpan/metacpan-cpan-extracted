@@ -1,5 +1,7 @@
 package MooX::BuildArgsHooks;
-$MooX::BuildArgsHooks::VERSION = '0.04';
+
+$MooX::BuildArgsHooks::VERSION = '0.06';
+
 =head1 NAME
 
 MooX::BuildArgsHooks - Structured BUILDARGS.
@@ -78,8 +80,8 @@ use strictures 2;
 use namespace::clean;
 
 BEGIN {
-    package MooX::BuildArgsHooks::Test;
-$MooX::BuildArgsHooks::Test::VERSION = '0.04';
+    package # NO INDEX
+        MooX::BuildArgsHooks::Test;
     use Moo;
     around BUILDARGS => sub{
         my $orig = shift;

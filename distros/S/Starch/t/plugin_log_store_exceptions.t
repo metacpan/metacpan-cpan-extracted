@@ -2,7 +2,6 @@
 use strictures 2;
 
 use Test2::V0;
-use Test::Fatal;
 use Test::Starch;
 use Log::Any::Test;
 use Log::Any qw($log);

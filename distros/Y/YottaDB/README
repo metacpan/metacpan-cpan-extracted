@@ -1,0 +1,144 @@
+NAME
+    YottaDB - Perl extension for accessing YottaDB
+
+SYNOPSIS
+      use YottaDB ":all";
+
+      y_set "^var", 1;      # s ^var=1
+      y_set "var", 2, 3;    # s var(2)=3
+
+      print y_get "var", 2; # w var(2)
+
+      y_lock_incr (3.14, "a", 1) or die "timeout";
+
+      y_trans (sub {
+                    ok (1 == y_get '$TLEVEL');
+                    y_trans (sub {
+                                    ok (2 == y_get '$TLEVEL');
+                                    y_ok;
+                             },
+                             "BATCH"
+                    );
+                    ok (1 == y_get '$TLEVEL');
+                    y_ok;
+                   },
+                   "BATCH"
+      );
+
+DESCRIPTION
+    This module gives you access to the YottaDB database engine using
+    YottaDB's simple API.
+
+    To reduce the risk of database damage, "make test" will not run tests
+    that access the database, use "make test TEST_DB=1" to run all tests.
+
+    DO NOT USE THIS MODULE ON PRODUCTION SYSTEMS.
+
+FUNCTONS
+    $data = y_data $var [, @subs]
+        The y_data function returns in $data:
+
+                 0  - no value and no subtree
+                 1  - has a value but no subtree
+                10  - no value but a subtree
+                11  - a value and a subtree exists
+
+    y_killall ()
+        The y_killall function kills all local variables.
+
+    y_kill_excl [$var0 [,$var1 [,...]]]
+        The y_kill_excl function deletes all local variables except the
+        specified one(s). y_kill_excl without arguments is the same as
+        y_killall.
+
+    y_kill_node $var [, @subs]
+        Deletes a node but not a subtree.
+
+    y_kill_tree $var [, @subs]
+        Deletes a node and all subtrees.
+
+    y_set $var, [@subs,] $value
+        Sets the variable to $value
+
+    $value = y_get $var [, @subs]
+        Sets $value to the value of $var [, @subs]. Returns undef if not
+        defined.
+
+    $value = y_get_croak $var [, @subs]
+        Sets $value to the value of $var [, @subs]. Croaks if it is not
+        defined.
+
+    $value = y_next $var [, @subs]
+        Returns the next subscript or undef if there is none. Here a sample
+        "order-loop":
+
+                my $x = "";
+                while () {
+                    $x = y_next "^global","subscript", $x;
+                    last unless defined $x;
+                    # ... do something with $x ...
+                }
+
+    $value = y_previous $var [, @subs]
+        Returns the previous subscript or undef if there is none.
+
+    (@subs) = y_node_next $var [, @subs]
+        Returns the next node or the empty list if there is none.
+
+    (@subs) = y_node_previous $var [, @subs]
+        Returns the previous node or the empty list if there is none.
+
+    $incval = y_incr $var [, @subs], $increment
+        Increments $var [, @subs] by $increment and returns the result in
+        $incval.
+
+    $string = y_zwr2str $zwr_encoded_string
+        Decodes the $zwr_encoded_string to $string.
+
+    $zwrstring = y_str2zwr $string
+        Encodes $string in zwr-format.
+
+    $status = y_lock $timeout [, \@glob1 [, \@glob2 [,...]]]
+        Release all locks held. If globals are specified lock all and return
+        1 if succeed or 0 if it's not possible to lock all references within
+        $timeout, return 1 if it fails. Example:
+
+                y_lock 0, ["^temp", 1, "two"],
+                          ["^temp", 3] or die "can't lock";
+
+    $status = y_lock_incr $timeout, $var [, @subs]
+        Try to gain lock on $var [, @subs] for $timeout seconds if not held.
+        Increment lock counter otherwise. $timeout may be 0.0001 for
+        example. Returns 1 on timeout 0 otherwise.
+
+    y_lock_decr $var [, @subs]
+        Decrement lock count on $var [, @subs] and release the lock if it
+        goes 0.
+
+    $status = y_trans (\&code, $tansid [, lvar0 [, lvar1 ...]])
+        Run a transaction. :)
+
+SEE ALSO
+    This module depends on POSIX::AtFork for fork handling and on JSON for
+    "ydb_json_import". Install it on Debian:
+
+            # apt-get install libposix-atfork-perl
+            # apt-get install libjson-perl
+
+    or via CPAN:
+
+            # cpan POSIX::AtFork
+            # cpan JSON
+
+    <https://yottadb.com>
+
+AUTHOR
+    Stefan Traby <stefan@hello-penguin.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2018, 2019 by Stefan Traby
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.26.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

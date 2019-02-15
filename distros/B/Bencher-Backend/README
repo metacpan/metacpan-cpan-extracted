@@ -2,14 +2,14 @@ NAME
     Bencher::Backend - Backend for Bencher
 
 VERSION
-    This document describes version 1.041 of Bencher::Backend (from Perl
-    distribution Bencher-Backend), released on 2018-04-03.
+    This document describes version 1.042 of Bencher::Backend (from Perl
+    distribution Bencher-Backend), released on 2019-02-15.
 
 FUNCTIONS
   bencher
     Usage:
 
-     bencher(%args) -> [status, msg, result, meta]
+     bencher(%args) -> [status, msg, payload, meta]
 
     A benchmark framework.
 
@@ -470,7 +470,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -479,7 +479,7 @@ FUNCTIONS
   chart_result
     Usage:
 
-     chart_result(%args) -> [status, msg, result, meta]
+     chart_result(%args) -> [status, msg, payload, meta]
 
     Generate chart from the result.
 
@@ -511,7 +511,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -520,7 +520,7 @@ FUNCTIONS
   format_result
     Usage:
 
-     format_result($envres, $formatters, $options) -> [status, msg, result, meta]
+     format_result($envres, $formatters, $options) -> [status, msg, payload, meta]
 
     Format bencher result.
 
@@ -543,7 +543,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -552,7 +552,7 @@ FUNCTIONS
   parse_scenario
     Usage:
 
-     parse_scenario(%args) -> [status, msg, result, meta]
+     parse_scenario(%args) -> [status, msg, payload, meta]
 
     Parse scenario (fill in default values, etc).
 
@@ -569,7 +569,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -643,7 +643,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

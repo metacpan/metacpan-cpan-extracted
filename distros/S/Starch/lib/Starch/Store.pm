@@ -1,5 +1,7 @@
 package Starch::Store;
-$Starch::Store::VERSION = '0.09';
+
+$Starch::Store::VERSION = '0.10';
+
 =head1 NAME
 
 Starch::Store - Base role for Starch stores.

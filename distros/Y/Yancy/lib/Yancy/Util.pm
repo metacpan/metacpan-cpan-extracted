@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.022';
+our $VERSION = '1.023';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -128,7 +128,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.022
+version 1.023
 
 =head1 SYNOPSIS
 

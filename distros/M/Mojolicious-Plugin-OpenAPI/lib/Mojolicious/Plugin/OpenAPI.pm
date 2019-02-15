@@ -7,7 +7,7 @@ use Mojo::JSON;
 use Mojo::Util;
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 my $X_RE = qr{^x-};
 
 has route     => sub {undef};
@@ -17,7 +17,8 @@ has _renderer => sub {
   return sub {
     my $c = shift;
     return $_[0]->slurp if UNIVERSAL::isa($_[0], 'Mojo::Asset');
-    $c->res->headers->content_type('application/json;charset=UTF-8');
+    $c->res->headers->content_type('application/json;charset=UTF-8')
+      unless $c->res->headers->content_type;
     return Mojo::JSON::encode_json($_[0]);
   };
 };
@@ -48,7 +49,7 @@ sub register {
   die "[OpenAPI] default_response is no longer supported in config" if $config->{default_response};
 
   $self->{default_response_codes} = $config->{default_response_codes} || [400, 401, 404, 500, 501];
-  $self->{default_response_name} = $config->{default_response_name} || 'DefaultResponse';
+  $self->{default_response_name}  = $config->{default_response_name}  || 'DefaultResponse';
   $self->{log_level} = $ENV{MOJO_OPENAPI_LOG_LEVEL} || $config->{log_level} || 'warn';
   $self->_renderer($config->{renderer}) if $config->{renderer};
   $self->_build_route($app, $config);
@@ -90,7 +91,7 @@ sub _add_routes {
       next if $http_method =~ $X_RE or $http_method eq 'parameters';
       my $op_spec = $self->validator->get([paths => $openapi_path => $http_method]);
       my $name = $op_spec->{'x-mojo-name'} || $op_spec->{operationId};
-      my $to = $op_spec->{'x-mojo-to'};
+      my $to   = $op_spec->{'x-mojo-to'};
       my $r;
 
       $self->{parameters_for}{$openapi_path}{$http_method}
@@ -117,7 +118,8 @@ sub _add_routes {
       $self->_add_default_response($op_spec, $_) for @{$self->{default_response_codes}};
 
       $r->to(ref $to eq 'ARRAY' ? @$to : $to) if $to;
-      $r->to({'openapi.path' => $openapi_path});
+      $r->to({'openapi.method' => $http_method});
+      $r->to({'openapi.path'   => $openapi_path});
       warn "[OpenAPI] Add route $http_method @{[$r->to_string]} (@{[$r->name // '']})\n" if DEBUG;
 
       push @routes, $r;
@@ -142,7 +144,7 @@ sub _before_render {
   my $status = $args->{status} || $c->stash('status') || '200';
   if ($handler eq 'openapi' and ($status eq '404' or $status eq '500')) {
     $args->{handler} = 'openapi';
-    $args->{status} = ($status eq '404' and $c->stash('openapi.path')) ? 501 : $status;
+    $args->{status}  = ($status eq '404' and $c->stash('openapi.path')) ? 501 : $status;
     $c->stash(
       status  => $args->{status},
       openapi => {
@@ -155,8 +157,12 @@ sub _before_render {
 
 sub _build_route {
   my ($self, $app, $config) = @_;
-  my $base_path = $self->validator->get('/basePath') || '/';
   my $route = $config->{route};
+
+  my $base_path
+    = $self->validator->version eq '3'
+    ? Mojo::URL->new($self->validator->get('/servers/0/url') || '/')->path->to_string
+    : $self->validator->get('/basePath') || '/';
 
   $route = $route->any($base_path) if $route and !$route->pattern->unparsed;
   $route = $app->routes->any($base_path) unless $route;
@@ -196,15 +202,16 @@ sub _helper_get_spec {
   my $path = shift // 'for_current';
   my $self = _self($c);
 
+  # Get spec by valid JSON pointer
   return $self->validator->get($path) if ref $path or $path =~ m!^/! or !length $path;
 
-  my $jp;
-  for my $s (reverse @{$c->match->stack}) {
-    $jp ||= [paths => $s->{'openapi.path'}];
-  }
+  # Find spec by current request
+  my ($stash) = grep { $_->{'openapi.path'} } reverse @{$c->match->stack};
+  return undef unless $stash;
 
-  push @$jp, lc $c->req->method if $jp and $path ne 'for_path';    # Internal for now
-  return $jp ? $self->validator->get($jp) : undef;
+  my $jp = [paths => $stash->{'openapi.path'}];
+  push @$jp, $stash->{'openapi.method'} if $path ne 'for_path';    # Internal for now
+  return $self->validator->get($jp);
 }
 
 sub _helper_reply {
@@ -220,7 +227,7 @@ sub _helper_reply {
     my $h = $c->res->headers;
     if (!$h->content_type and $output->isa('Mojo::Asset::File')) {
       my $types = $c->app->types;
-      my $type = $output->path =~ /\.(\w+)$/ ? $types->type($1) : undef;
+      my $type  = $output->path =~ /\.(\w+)$/ ? $types->type($1) : undef;
       $h->content_type($type || $types->type('bin'));
     }
     return $c->reply->asset($output);
@@ -245,7 +252,8 @@ sub _helper_validate {
 
   if (@errors) {
     $self->_log($c, '<<<', \@errors);
-    $c->render(data => $self->_renderer->($c, {errors => \@errors, status => 400}), status => 400)
+    $c->stash(status => 400)
+      ->render(data => $self->_renderer->($c, {errors => \@errors, status => 400}))
       if $args->{auto_render} // 1;
   }
 
@@ -596,7 +604,7 @@ specification is written in perl, instead of JSON or YAML.
 
 =head3 version_from_class
 
-Can be used to overriden C</info/version> in the API specification, from the
+Can be used to overridden C</info/version> in the API specification, from the
 return value from the C<VERSION()> method in C<version_from_class>.
 
 This will only have an effect if "version" is "0".

@@ -401,6 +401,7 @@ ap.it;ap.it
 ap.leg.br;ap.leg.br
 aparecida.br;aparecida.br
 apartments;apartments
+api.stdlib.com;api.stdlib.com
 apigee.io;apigee.io
 app;app
 app.lmpm.com;app.lmpm.com
@@ -408,6 +409,7 @@ app.os.fedoraproject.org;app.os.fedoraproject.org
 app.os.stg.fedoraproject.org;app.os.stg.fedoraproject.org
 appchizi.com;appchizi.com
 apple;apple
+applicationcloud.io;applicationcloud.io
 applinzi.com;applinzi.com
 apps.fbsbx.com;apps.fbsbx.com
 apps.lair.io;apps.lair.io
@@ -987,6 +989,7 @@ brønnøysund.no;xn--brnnysund-m8ac.no
 bs;bs
 bs.it;bs.it
 bsb.br;bsb.br
+bss.design;bss.design
 bt;bt
 bt.it;bt.it
 bu.no;bu.no
@@ -1368,6 +1371,7 @@ co.ao;co.ao
 co.at;co.at
 co.bb;co.bb
 co.bi;co.bi
+co.business;co.business
 co.bw;co.bw
 co.ca;co.ca
 co.ci;co.ci
@@ -1377,6 +1381,9 @@ co.com;co.com
 co.cr;co.cr
 co.cz;co.cz
 co.dk;co.dk
+co.education;co.education
+co.events;co.events
+co.financial;co.financial
 co.gg;co.gg
 co.gl;co.gl
 co.gy;co.gy
@@ -1401,18 +1408,21 @@ co.mu;co.mu
 co.mw;co.mw
 co.mz;co.mz
 co.na;co.na
+co.network;co.network
 co.ni;co.ni
 co.nl;co.nl
 co.no;co.no
 co.nz;co.nz
 co.om;co.om
 co.pl;co.pl
+co.place;co.place
 co.pn;co.pn
 co.pw;co.pw
 co.rs;co.rs
 co.rw;co.rw
 co.st;co.st
 co.sz;co.sz
+co.technology;co.technology
 co.th;co.th
 co.tj;co.tj
 co.tm;co.tm
@@ -2280,6 +2290,7 @@ farmstead.museum;farmstead.museum
 farsund.no;farsund.no
 fashion;fashion
 fast;fast
+fastly-terrarium.com;fastly-terrarium.com
 fastly.net;fastly.net
 fastlylb.net;fastlylb.net
 fastpanel.direct;fastpanel.direct
@@ -2323,6 +2334,12 @@ fie.ee;fie.ee
 field.museum;field.museum
 figueres.museum;figueres.museum
 filatelia.museum;filatelia.museum
+filegear-au.me;filegear-au.me
+filegear-de.me;filegear-de.me
+filegear-gb.me;filegear-gb.me
+filegear-ie.me;filegear-ie.me
+filegear-jp.me;filegear-jp.me
+filegear-sg.me;filegear-sg.me
 filegear.me;filegear.me
 film;film
 film.hu;film.hu
@@ -6827,6 +6844,7 @@ sc.tz;sc.tz
 sc.ug;sc.ug
 sc.us;sc.us
 sca;sca
+scapp.io;scapp.io
 scb;scb
 sch.ae;sch.ae
 sch.id;sch.id
@@ -7279,6 +7297,7 @@ stavanger.no;stavanger.no
 stavern.no;stavern.no
 stc;stc
 stcgroup;stcgroup
+stdlib.com;stdlib.com
 steam.museum;steam.museum
 steiermark.museum;steiermark.museum
 steigen.no;steigen.no

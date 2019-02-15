@@ -1,14 +1,122 @@
+NAME
 
+    Mojolicious::Plugin::BootstrapAlerts - Bootstrap alerts for your web
+    app
 
-This archive contains the distribution Mojolicious-Plugin-BootstrapAlerts,
-version 0.06:
+VERSION
 
-  Bootstrap alerts for your web app
+    version 0.07
 
-This software is Copyright (c) 2013 by Renee Baecker.
+SYNOPSIS
 
-This is free software, licensed under:
+    In your startup:
 
-  The Artistic License 2.0 (GPL Compatible)
+        sub startup {
+            my $self = shift;
+      
+            # do some Mojolicious stuff
+            $self->plugin( 'BootstrapAlerts' );
+    
+            # more Mojolicious stuff
+        }
 
+    In your controller:
+
+        $self->notify( 'success', 'message' );
+        $self->notify( 'danger', [qw/item1 item2/] );
+
+    In your template:
+
+        <%= notifications() %>
+
+HELPERS
+
+    This plugin adds two helper methods to your web application:
+
+ notify
+
+    Add a new notification. The first parameter is the notification type,
+    one of these
+
+      * success
+
+      * info
+
+      * warning
+
+      * danger (alias: error)
+
+    The second parameter is the notification message. If it is a plain
+    string, that's the message. If the parameter is an array reference an
+    unordered list will be created.
+
+    A third parameter is optional. That is a hashreference to configure the
+    notification:
+
+        # this notification is not dismissable
+        $self->notify( 'success', 'message', { dismissable => 0 } );
+    
+        # this notification has an ordered list
+        $self->notify( 'danger', [qw/item1 item2/], { ordered_list => 1 } );
+
+ notifications
+
+    Creates the HTML for the notifications. The notifications call in the
+    SYNOPSIS will create
+
+        <div class="alert alert-success alert-dismissable">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          message
+        </div>
+        <div class="alert alert-danger alert-dismissable">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <ul>
+              <li>item1</li>
+              <li>item2</li>
+          </ul>
+        </div>
+
+METHODS
+
+ register
+
+    Called when registering the plugin. On creation, the plugin accepts a
+    hashref to configure the plugin.
+
+        # load plugin, alerts are dismissable by default
+        $self->plugin( 'BootstrapAlerts' );
+
+  Configuration
+
+        $self->plugin( 'BootstrapAlerts' => {
+            dismissable => 0,          # notifications aren't dismissable by default anymore
+            auto_inject => 1,          # inject notifications into your HTML output, no need for "notifications()" anymore
+            after       => $selector,  # CSS selector to find the element after that the notifications should be injected
+            before      => $selector,  # CSS selector to find the element before that the notifications should be injected
+        });
+
+NOTES
+
+    You have to include the Bootstrap CSS and JavaScript yourself!
+
+    This plugin uses the stash key __NOTIFICATIONS__, so you should avoid
+    using this stash key for your own purposes.
+
+ Known Issues
+
+    Mojo::DOM html_unescapes HTML entities when the HTML is parsed. So the
+    injection might fail if you have a HTML entity in the element
+    before/after that the notifications are injected.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2013 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

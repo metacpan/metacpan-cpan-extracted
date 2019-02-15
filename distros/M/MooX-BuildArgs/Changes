@@ -1,4 +1,14 @@
-Revision history for Perl extension MooX::BuildArgs.
+Revision history for Perl extension MooX-BuildArgs.
+
+0.06 2019-02-14T18:50:14Z
+
+ - Fix a couple PAUSE indexing issues!
+
+0.05 2019-02-14T18:03:13Z
+
+ - Use Data::MethodProxy instead of Config::MethodProxy.
+ - Use Test2::V0 instead of Test2::Bundle::Extended.
+ - Migrate build tooling from Dist::Zilla to Minilla.
 
 0.04 2016-11-26
 

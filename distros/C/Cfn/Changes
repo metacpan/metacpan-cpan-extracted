@@ -1,0 +1,5 @@
+0.01 2019-02-15
+  - First release of this module as a separate entity from CloudDeploy.
+    This module is the result of isolating the code in the CloudDeploy distribution,
+    with the addition of internal updates that we had not released yet.
+  - Implements the resource in CloudFormation spec 2.20.0 (published as of 2019-02-15)

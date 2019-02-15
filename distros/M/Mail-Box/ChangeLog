@@ -1,7 +1,15 @@
 
 ===== ChangeLog of distribution Mail-Box version 3.*
 
-verison 3.005: Sun Mar  4 21:48:38 CET 2018
+version 3.006: Fri 15 Feb 09:01:51 CET 2019
+
+	Fixes:
+	- MailDir warns about repeat count, since last release added 'use
+	  warnings' to the file.  [Keita Jamadam] github issue #2
+	- mbox parsing failed on changing handling of blank lines by Mail::Message
+	  rt.cpan.org#128513 [Gregor Herrmann] + [cpantesters]
+
+version 3.005: Sun Mar  4 21:48:38 CET 2018
 
 	Changes:
 	- code trusted on "perl -w", but now added many "use warnings".

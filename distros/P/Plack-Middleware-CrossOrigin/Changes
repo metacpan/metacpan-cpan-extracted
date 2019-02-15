@@ -1,49 +1,53 @@
 Revision history for Plack-Middleware-CrossOrigin
 
+0.013 - 2019-02-14
+  - Allow using wildcards inside origins to match partial host names
+  - Convert packaging from Dist::Zilla to Distar
+  - Always add a "Vary: Origin" header to avoid issues with caches
+
 0.012     Dec 07 2014
- - Include real change log entry for 0.011
+  - Include real change log entry for 0.011
 
 0.011     Dec 07 2014
- - Use single comma separated headers rather than multiple headers for better
-   compatibility with IE
+  - Use single comma separated headers rather than multiple headers for better
+    compatibility with IE
 
 0.010     Aug 15 2014
- - updated to match spec, with only one origin
- - specify minimum perl version
+  - updated to match spec, with only one origin
+  - specify minimum perl version
 
 0.009     Feb 20 2013
- - Suppress warnings when checking for buggy WebKit browsers. (Dave Rolsky)
+  - Suppress warnings when checking for buggy WebKit browsers. (Dave Rolsky)
 
 0.008     Jan 29 2013
- - Updated browser support documentation.
+  - Updated browser support documentation.
 
 0.007     Sep 12 2011
- - Add continue_on_failure to allow requests to be processed as if the module was not used.
- - Note required version of Test::More
- - Fix POD formatting
+  - Add continue_on_failure to allow requests to be processed as if the module was not used.
+  - Note required version of Test::More
+  - Fix POD formatting
 
 0.006     Jun 16 2011
- - Only apply WebKit workaround to older versions
- - additional documentation and references, including notes on CSRF
-     protection
- - Added a psgi script to help test browser behavior
+  - Only apply WebKit workaround to older versions
+  - additional documentation and references, including notes on CSRF
+    protection
+  - Added a psgi script to help test browser behavior
 
 0.005     Mar 16 2011
- - Add a workaround for WebKit browsers with preflighted GET requests.
+  - Add a workaround for WebKit browsers with preflighted GET requests.
 
 0.004     Feb 08 2011
- - Allow setting expose_headers to * to allow all headers.
- - Fix cross origin OPTIONS requests.
- - Include all default HTTP and WebDAV methods by default.
- - Include common WebDAV and web framework headers as allowed headers by
-     default.
+  - Allow setting expose_headers to * to allow all headers.
+  - Fix cross origin OPTIONS requests.
+  - Include all default HTTP and WebDAV methods by default.
+  - Include common WebDAV and web framework headers as allowed headers by
+    default.
 
 0.003     Sep 22 2010
- - Fixed handling of expose_headers
+  - Fixed handling of expose_headers
 
 0.002     Sep 21 2010
- - Fixed handling of allowed headers
+  - Fixed handling of allowed headers
 
 0.001     Sep 19 2010
- - Initial release
-
+  - Initial release

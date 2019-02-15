@@ -1,7 +1,7 @@
 package Bencher::Backend;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '1.041'; # VERSION
+our $DATE = '2019-02-15'; # DATE
+our $VERSION = '1.042'; # VERSION
 
 use 5.010001;
 use strict;
@@ -392,7 +392,9 @@ sub _get_scenario {
         $scenario = do $pargs->{scenario_file};
         die "Can't load scenario file '$pargs->{scenario_file}': $@" if $@;
     } elsif (defined $pargs->{scenario_module}) {
-        my $m = "Bencher::Scenario::$pargs->{scenario_module}"; $m =~ s!/!::!g;
+        my $m = $pargs->{scenario_module};
+        $m = "Bencher::Scenario::$m" unless $m =~ /\ABencher::Scenario::/;
+        $m =~ s!/!::!g;
         my $mp = $m; $mp =~ s!::!/!g; $mp .= ".pm";
         {
             local @INC = @INC;
@@ -1275,7 +1277,7 @@ sub _gen_items {
             }
             if ($ds->{args}) {
                 for my $k (keys %$h_args) {
-                    $item->{"arg_$k"} = $h_args->{$k};
+                    $item->{"arg_$k"} = "$h_args->{$k}";
                 }
             }
 
@@ -3860,7 +3862,7 @@ sub bencher {
                 $envres->[3]{'func.scenario_file_sha1sum'} = $digests->{sha1};
                 $envres->[3]{'func.scenario_file_sha256sum'} = $digests->{sha256};
             } elsif (my $mod = $args{scenario_module}) {
-                $mod = "Bencher::Scenario::$mod";
+                $mod = "Bencher::Scenario::$mod" unless $mod =~ /\ABencher::Scenario::/;
                 no strict 'refs';
                 $envres->[3]{'func.scenario_module'} = $mod;
                 (my $mod_pm = "$mod.pm") =~ s!::!/!g;
@@ -4181,7 +4183,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.041 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2018-04-03.
+This document describes version 1.042 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2019-02-15.
 
 =head1 FUNCTIONS
 
@@ -4190,7 +4192,7 @@ This document describes version 1.041 of Bencher::Backend (from Perl distributio
 
 Usage:
 
- bencher(%args) -> [status, msg, result, meta]
+ bencher(%args) -> [status, msg, payload, meta]
 
 A benchmark framework.
 
@@ -4637,7 +4639,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4648,7 +4650,7 @@ Return value:  (any)
 
 Usage:
 
- chart_result(%args) -> [status, msg, result, meta]
+ chart_result(%args) -> [status, msg, payload, meta]
 
 Generate chart from the result.
 
@@ -4683,7 +4685,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4694,7 +4696,7 @@ Return value:  (any)
 
 Usage:
 
- format_result($envres, $formatters, $options) -> [status, msg, result, meta]
+ format_result($envres, $formatters, $options) -> [status, msg, payload, meta]
 
 Format bencher result.
 
@@ -4721,7 +4723,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4732,7 +4734,7 @@ Return value:  (any)
 
 Usage:
 
- parse_scenario(%args) -> [status, msg, result, meta]
+ parse_scenario(%args) -> [status, msg, payload, meta]
 
 Parse scenario (fill in default values, etc).
 
@@ -4753,7 +4755,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4838,7 +4840,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

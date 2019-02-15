@@ -1,0 +1,4 @@
+# 02-noL.axk: used by 02-basic*.t
+#L1
+print '1337'
+# vi: set ts=4 sts=4 sw=4 et ai ft=perl fdm=marker fdl=1: #
