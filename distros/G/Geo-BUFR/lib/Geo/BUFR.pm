@@ -1,6 +1,6 @@
 package Geo::BUFR;
 
-# Copyright (C) 2010-2016 MET Norway
+# Copyright (C) 2010-2019 MET Norway
 #
 # This module is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
@@ -85,6 +85,7 @@ require 5.006;
 use strict;
 use warnings;
 use Carp;
+use Cwd qw(getcwd);
 use FileHandle;
 use File::Spec::Functions qw(catfile);
 use Scalar::Util qw(looks_like_number);
@@ -93,7 +94,7 @@ use Time::Local qw(timegm);
 
 require DynaLoader;
 our @ISA = qw(DynaLoader);
-our $VERSION = '1.36';
+our $VERSION = '1.37';
 
 # This loads BUFR.so, the compiled version of BUFR.xs, which
 # contains bitstream2dec, bitstream2ascii, dec2bitstream,
@@ -124,7 +125,7 @@ our $Spew = 0; # To avoid the overhead of subroutine calls to _spew
 our $Nodata = 0; # If set to true will prevent decoding of section 4
 our $Noqc = 0; # If set to true will prevent decoding (or encoding) of
                # any descriptors after 222000 is met
-our $Reuse_current_ahl = 0; 
+our $Reuse_current_ahl = 0;
                # If set to true will cause cet_current_ahl() to return
                # last AHL extracted and not undef if currently
                # processed BUFR message has no (immediately preceding)
@@ -139,6 +140,7 @@ our $Show_all_operators = 0; # = 0: show just the most informative C operators i
 
 our %BUFR_table;
 # Keys: PATH      -> full path to the chosen directory of BUFR tables
+#       FORMAT    -> supported formats are BUFRDC and ECCODES
 #       B$version -> hash containing the B table $BUFR_table/B$version
 #                    key: element descriptor (6 digits)
 #                    value: a \0 separated string containing the B table fields
@@ -151,6 +153,7 @@ our %BUFR_table;
 #                    key: sequence descriptor
 #                    value: a space separated string containing the element
 #                    descriptors (6 digits) the sequence descriptor expands to
+$BUFR_table{FORMAT} = 'BUFRDC'; # Default. Might in the future be changed to ECCODES
 
 our %Descriptors_already_expanded;
 # Keys: Text string "$table_version $unexpanded_descriptors"
@@ -355,13 +358,14 @@ sub set_bufr_edition {
     _croak "BUFR edition number must be an integer, is '$bufr_edition'"
         unless $bufr_edition =~ /^\d+$/;
     _croak "Not an allowed value for BUFR edition number: $bufr_edition"
-        unless $bufr_edition > 1 and $bufr_edition < 5;
+        unless $bufr_edition >= 0 and $bufr_edition < 5;
+        # BUFR edition 0 is in fact in use in ECMWF MARS archive
     $self->{BUFR_EDITION} = $bufr_edition;
     return 1;
 }
 sub get_bufr_edition {
     my $self = shift;
-    return defined $self->{BUFR_EDITION} ? $self->{BUFR_EDITION}: undef;
+    return defined $self->{BUFR_EDITION} ? $self->{BUFR_EDITION} : undef;
 }
 sub set_master_table {
     my ($self, $master_table) = @_;
@@ -766,6 +770,24 @@ sub bad_bufrlength {
     return defined $self->{BAD_LENGTH} ? $self->{BAD_LENGTH} : undef;
 }
 
+sub set_tableformat {
+    my $self = shift;
+
+    my $format = shift;
+    _croak "Table format not provided. Possible values are BUFRDC and ECCODES"
+        unless defined $format;
+    _croak "Supported table formats are BUFRDC and ECCODES"
+        unless uc($format) eq 'BUFRDC' || uc($format) eq 'ECCODES';
+    $BUFR_table{FORMAT} = uc($format);
+    Geo::BUFR->_spew(2, "BUFR table format set to %s", $BUFR_table{FORMAT});
+    return 1;
+}
+
+sub get_tableformat {
+    my $self = shift;
+    return exists $BUFR_table{FORMAT} ? $BUFR_table{FORMAT} : '';
+}
+
 ##  Set the path for BUFR table files
 ##  Usage: Geo::BUFR->set_tablepath(directory_list)
 ##         where directory_list is a list of colon-separated strings.
@@ -789,15 +811,32 @@ sub get_tablepath {
 }
 
 ## Return table version from table if provided, or else from section 1
-## information in BUFR message. Returns undef if impossible to
-## determine table version.
+## information in BUFR message. For BUFRDC, this is a stripped down
+## version of table name. For ECCODES, this is last path of table
+## location (e.g. '0/wmo/29'), and a stringified list of two such
+## paths (master and local) if local tables are used
+## (e.g. '0/wmo/29,0/local/8/78/236'). Returns undef/empty list if
+## impossible to determine table version.
 sub get_table_version {
     my $self = shift;
     my $table = shift;
 
     if ($table) {
-        (my $version = $table) =~ s/^(?:[BCD]?)(.*?)(?:\.TXT)?$/$1/;
-        return $version;
+        if ($BUFR_table{FORMAT} eq 'BUFRDC') {
+            # First check if this actually is an attempt to load an ECCODES table
+            if ($table =~ /wmo/ || $table =~ /local/) {
+                _croak("$table cannot be a BUFRDC table. "
+                       . "Did you forget to set tableformat to ECCODES?");
+            }
+            (my $version = $table) =~ s/^(?:[BCD]?)(.*?)(?:\.TXT)?$/$1/;
+            return $version;
+        } elsif ($BUFR_table{FORMAT} eq 'ECCODES')  {
+            # Mainly meant to catch attempts to load a BUFRDC table
+            # with tableformat mistakingly set to ECCODES
+            _croak("$table cannot be an ecCodes table")
+                unless ($table =~ /wmo/ || $table =~ /local/);
+            return $table;
+        }
     }
 
     # No table provided. Decide version from section 1 information.
@@ -808,7 +847,7 @@ sub get_table_version {
     }
 
     # If master table version, use centre 0 and subcentre 0 (in ECMWF
-    # libbufr this is the convention from version 320 onwards)
+    # BUFRDC this is the convention from version 320 onwards)
     my $centre = $self->{CENTRE};
     my $subcentre = $self->{SUBCENTRE};
     my $local_table_version = $self->{LOCAL_TABLE_VERSION};
@@ -818,14 +857,24 @@ sub get_table_version {
         $local_table_version = 0;
     }
 
-    # Use ECMWF table naming convention (used in version >= 000270 of libbufr)
-    return sprintf "%03d%05d%05d%03d%03d",
-        $self->{MASTER_TABLE}, $subcentre, $centre,
-            $self->{MASTER_TABLE_VERSION}, $local_table_version;
+    my $master_table = $self->{MASTER_TABLE};
+    my $master_table_version = $self->{MASTER_TABLE_VERSION};
+    if ($BUFR_table{FORMAT} eq 'BUFRDC') {
+        # naming convention used in BUFRDC version >= 000270
+        return sprintf "%03d%05d%05d%03d%03d",
+               $master_table,$subcentre,$centre,$master_table_version,$local_table_version;
+    } elsif ($BUFR_table{FORMAT} eq 'ECCODES')  {
+        if ($local_table_version == 0) {
+            return catfile($master_table,'wmo',$master_table_version);
+        } else {
+            return catfile($master_table,'wmo',$master_table_version) . ',' .
+                   catfile($master_table,'local',$local_table_version,$centre,$subcentre);
+        }
+    }
 }
 
 # Search through $BUFR_table{PATH} to find first path for which $fname
-# exists, or if no such path exists, first path for which the
+# exists, or (for BUFRDC) if no such path exists, first path for which the
 # corresponding master file exists, in which case
 # $self->{LOCAL_TABLES_NOT_FOUND} is set to the local table initially
 # searched for (this variable should be undefined as soon as the
@@ -847,25 +896,38 @@ sub _locate_table {
         }
     }
 
-    # Path couldn't be found for $fname. Then try again for master table
-    my $master_table;
-    ($master_table,$path) = _locate_master_table($fname);
-    if ($path) {
-        $self->{LOCAL_TABLES_NOT_FOUND} = $fname;
-        return ($path,$master_table);
-    } else {
-        return;
+    if ($BUFR_table{FORMAT} eq 'BUFRDC') {
+        # Path couldn't be found for $fname. Then try again for master table
+        my $master_table;
+        ($master_table,$path) = $self->_locate_master_table($fname);
+        if ($path) {
+            $self->{LOCAL_TABLES_NOT_FOUND} = $fname;
+            return ($path,$master_table);
+        }
     }
+
+    # No table found
+    return;
 }
 
 # Return master table and path corresponding to local table $fname, or
 # empty list if $fname actually is a master table or if no path for the
 # master table could be found.
 sub _locate_master_table {
-    my $fname = shift;
+    my ($self,$fname) = @_;
 
-    my $master_table = substr($fname,0,4) . '00000' . '00000'
-        . substr($fname,14,3) . '000.TXT';
+    my $master_table;
+    if ($BUFR_table{FORMAT} eq 'BUFRDC') {
+        _croak("$fname is not a valid name for BUFRDC tables")
+            if length($fname) < 20;
+        $master_table = substr($fname,0,4) . '00000' . '00000'
+            . substr($fname,14,3) . '000.TXT';
+    } elsif ($BUFR_table{FORMAT} eq 'ECCODES')  {
+        foreach my $metadata (qw(MASTER_TABLE MASTER_TABLE_VERSION)) {
+            return if ! defined $self->{$metadata};
+        }
+        $master_table = catfile($self->{MASTER_TABLE},'wmo',$self->{MASTER_TABLE_VERSION});
+    }
     return if ($master_table eq $fname); # Already tried
 
     my $path;
@@ -882,7 +944,7 @@ sub _locate_master_table {
 ## Read in a B table file into a hash, e.g.
 ##  $B_table{'001001'} = "WMO BLOCK NUMBER\0NUMERIC\0  0\0           0\0  7"
 ## where the B table values for 001001 are \0 (NUL) separated
-sub _read_B_table {
+sub _read_B_table_bufrdc {
     my ($self,$version) = @_;
 
     my $fname = "B$version.TXT";
@@ -923,7 +985,174 @@ sub _read_B_table {
     return \%B_table;
 }
 
-## Read the flag and code tables, which in ECMWF libbufr tables are
+sub _read_B_table_eccodes {
+    my ($self,$version) = @_;
+
+    my ($path,$tname) = $self->_locate_table(catfile($version,'element.table'));
+
+    if (! $path) {
+        if ($version =~ /wmo/) {
+            _croak "Couldn't find BUFR table " . catfile($version,'element.table')
+                . " in $BUFR_table{PATH}. Wrong tablepath?";
+        } else {
+            # This might actually not be an error, since local table
+            # might be provided for D only. But if later a local
+            # element descriptor is requested, we should complain
+            $self->{LOCAL_TABLES_NOT_FOUND} = $version;
+            return;
+        }
+    }
+    my $tablefile = catfile($path,$tname);
+
+    open(my $TABLE, '<', $tablefile)
+        or _croak "Couldn't open BUFR table B $tablefile: $!";
+    $self->_spew(1, "Reading table %s", $tablefile);
+
+    my %B_table;
+    while (<$TABLE>) {
+        # Skip comments (expexted to be in first line only)
+        next if /^#/;
+
+        # $rest is crex_unit|crex_scale|crex_width
+        my ($code,$abbreviation,$type,$name,$unit,$scale,$reference,$width,$rest)
+            = split /[|]/;
+        next unless defined $width; # shouldn't happen
+        $unit = 'CCITTIA5' if $unit eq 'CCITT IA5';
+        $B_table{$code} = join "\0", $name, $unit, $scale, $reference, $width;
+    }
+    close $TABLE;
+
+    $BUFR_table{"B$version"} = \%B_table;
+    return \%B_table;
+}
+
+## Reads a D table file into a hash, e.g.
+##  $D_table->{307080} = '301090 302031 ...'
+## There are two different types of lines in D*.TXT, e.g.
+##  307080 13 301090 BUFR template for synoptic reports
+##            302031
+## We choose to ignore the number of lines in expansion (here 13)
+## because this number is sometimes in error. Instead we consider a
+## line starting with 5 spaces to be of the second type above, else of
+## the first type
+sub _read_D_table_bufrdc {
+    my ($self,$version) = @_;
+
+    my $fname = "D$version.TXT";
+    my ($path,$tname) = $self->_locate_table($fname)
+        or _croak "Couldn't find BUFR table $fname in $BUFR_table{PATH}."
+            . "Wrong tablepath?";
+
+    # If we are forced to try master table because local table
+    # couldn't be found, check if this might already have been loaded
+    if ($tname ne $fname) {
+        my $master_version = substr($tname,1,-4);
+        return $BUFR_table{"D$master_version"} if exists $BUFR_table{"D$master_version"};
+    }
+
+    my $tablefile = catfile($path,$tname);
+    open(my $TABLE, '<', $tablefile)
+        or _croak "Couldn't open BUFR table D $tablefile: $!";
+    my $txt = "Reading table $tablefile";
+    $txt .= " (since local table " . $self->{LOCAL_TABLES_NOT_FOUND}
+    . " couldn't be found)" if $self->{LOCAL_TABLES_NOT_FOUND};
+    $self->_spew(1, "%s", $txt);
+
+    my (%D_table, $alias);
+    while (my $line = <$TABLE>) {
+        $line =~ s/\s+$//;
+        next if $line =~ /^\s*$/; # Blank line
+
+        if (substr($line,0,5) eq ' ' x 5) {
+            $line =~ s/^\s+//;
+            $D_table{$alias} .= " $line";
+        } else {
+            $line =~ s/^\s+//;
+            # In table version 17 a descriptor with more than 100
+            # entries occurs, causing no space between alias and
+            # number of entries (so split /\s+/ doesn't work)
+            my ($ali, $skip, $desc) = unpack('A6A4A6', $line);
+            $alias = $ali;
+            $D_table{$alias} = $desc;
+        }
+    }
+    close $TABLE; # or _croak "Closing $tablefile failed: $!";
+
+    $BUFR_table{"D$version"} = \%D_table;
+    return \%D_table;
+}
+
+sub _read_D_table_eccodes {
+    my ($self,$version) = @_;
+
+    my ($path,$tname) = $self->_locate_table(catfile($version,'sequence.def'));
+
+    if (! $path) {
+        if ($version =~ /wmo/) {
+            _croak "Couldn't find BUFR table " . catfile($version,'sequence.def')
+                . " in $BUFR_table{PATH}. Wrong tablepath?";
+        } else {
+            # This might actually not be an error, since local table
+            # might be provided for B only. But if later a local
+            # sequence descriptor is requested, we should complain
+            $self->{LOCAL_TABLES_NOT_FOUND} = $version;
+        }
+        return;
+    }
+    my $tablefile = catfile($path,$tname);
+
+    open(my $TABLE, '<', $tablefile)
+        or _croak "Couldn't open BUFR table B $tablefile: $!";
+    $self->_spew(1, "Reading table %s", $tablefile);
+
+## sequence.def is expected to contain lines like
+#"301196" = [  301011, 301013, 301021 ]
+## which should be converted to
+# 301196  3 301011
+#           301013
+#           301021
+## Must also handle descriptors spanning more than one line, like
+#"301046" = [  001007, 001012, 002048, 021119, 025060, 202124, 002026, 002027, 202000, 005040
+#               ]
+## and
+#"301058" = [  301011, 301012, 201152, 202135, 004006, 202000, 201000, 301021, 020111, 020112,
+#               020113, 020114, 020115, 020116, 020117, 020118, 020119, 025035, 020121, 020122,
+#               020123, 020124, 025175, 020023, 025063, 202136, 201136, 002121, 201000, 202000,
+#               025061, 002184, 002189, 025036, 101000, 031002, 301059 ]
+    my %D_table;
+    my $txt;
+    while (<$TABLE>) {
+        if (substr($_,0,1) eq '"') {
+            # New sequence descriptor, parse and store the previous
+            _parse_sequence(\%D_table,$txt) if $txt;
+            chomp;
+            $txt = $_;
+        } else {
+            chomp;
+            $txt .= $_;
+        }
+    }
+    _parse_sequence(\%D_table,$txt) if $txt;
+
+    close $TABLE; # or _croak "Closing $tablefile failed: $!";
+
+    $BUFR_table{"D$version"} = \%D_table;
+    return \%D_table;
+}
+
+sub _parse_sequence {
+    my ($Dtable, $txt) = @_;
+
+    my ($seq, $rest) = ($txt =~ /^"(\d{6})" = \[(.*)\]/);
+    my @list = split(/,/, $rest);
+    foreach (@list) {
+        s/^ +//;
+        s/ +$//;
+    }
+    $Dtable->{$seq} = join(' ', @list);
+}
+
+## Read the flag and code tables, which in ECMWF BUFRDC tables are
 ## put in tables C$version.TXT (not to be confused with BUFR C tables,
 ## which contain the operator descriptors). Note that even though
 ## number of code values and number of lines are included in the
@@ -934,6 +1163,18 @@ sub _read_B_table {
 sub _read_C_table {
     my ($self,$version) = @_;
 
+    # For ECCODES loading 2 different codetables directories might be necessary
+    if ($BUFR_table{FORMAT} eq 'ECCODES') {
+        if ($version =~ /,/) {
+            my ($master, $local) = (split /,/, $version);
+            $self->_read_C_table_eccodes($master);
+            return $self->_read_C_table_eccodes($local);
+        } else {
+            return $self->_read_C_table_eccodes($version);
+        }
+    }
+
+    # Rest of code is for BUFRDC
     my $fname = "C$version.TXT";
     my ($path,$tname) = $self->_locate_table($fname);
     return undef unless $path;
@@ -985,61 +1226,73 @@ sub _read_C_table {
     return \%C_table;
 }
 
-## Reads a D table file into a hash, e.g.
-##  $D_table->{307080} = '301090 302031 ...'
-## There are two different types of lines in D*.TXT, e.g.
-##  307080 13 301090 BUFR template for synoptic reports
-##            302031
-## We choose to ignore the number of lines in expansion (here 13)
-## because this number is sometimes in error. Instead we consider a
-## line starting with 5 spaces to be of the second type above, else of
-## the first type
-sub _read_D_table {
+sub _read_C_table_eccodes {
     my ($self,$version) = @_;
 
-    my $fname = "D$version.TXT";
-    my ($path,$tname) = $self->_locate_table($fname)
-        or _croak "Couldn't find BUFR table $fname in $BUFR_table{PATH}."
-            . "Wrong tablepath?";
+    my ($path,$tname) = $self->_locate_table(catfile($version,'codetables'));
 
-    # If we are forced to try master table because local table
-    # couldn't be found, check if this might already have been loaded
-    if ($tname ne $fname) {
-        my $master_version = substr($tname,1,-4);
-        return $BUFR_table{"D$master_version"} if exists $BUFR_table{"D$master_version"};
-    }
-
-    my $tablefile = catfile($path,$tname);
-    open(my $TABLE, '<', $tablefile)
-        or _croak "Couldn't open BUFR table D $tablefile: $!";
-    my $txt = "Reading table $tablefile";
-    $txt .= " (since local table " . $self->{LOCAL_TABLES_NOT_FOUND}
-    . " couldn't be found)" if $self->{LOCAL_TABLES_NOT_FOUND};
-    $self->_spew(1, "%s", $txt);
-
-    my (%D_table, $alias);
-    while (my $line = <$TABLE>) {
-        $line =~ s/\s+$//;
-        next if $line =~ /^\s*$/; # Blank line
-
-        if (substr($line,0,5) eq ' ' x 5) {
-            $line =~ s/^\s+//;
-            $D_table{$alias} .= " $line";
+    if (! $path) {
+        if ($version =~ /wmo/) {
+            _croak "Couldn't find BUFR table " . catfile($version,'element.table')
+                . " in $BUFR_table{PATH}. Wrong tablepath?"
+                if (! $path && $version =~ /wmo/);
         } else {
-            $line =~ s/^\s+//;
-            # In table version 17 a descriptor with more than 100
-            # entries occurs, causing no space between alias and
-            # number of entries (so split /\s+/ doesn't work)
-            my ($ali, $skip, $desc) = unpack('A6A4A6', $line);
-            $alias = $ali;
-            $D_table{$alias} = $desc;
+            # This might actually not be an error, if none of the
+            # local descriptors are of type code or flag table. So
+            # prefer to keep silent in this case.
+            return;
         }
     }
-    close $TABLE; # or _croak "Closing $tablefile failed: $!";
 
-    $BUFR_table{"D$version"} = \%D_table;
-    return \%D_table;
+    my $tabledir = catfile($path,$tname);
+    my $cwd = getcwd();
+    chdir $tabledir || croak "Couldn't chdir to $tabledir: $!";
+
+    my @table_files = map { $_->[1] }
+                      sort { $a->[0] <=> $b->[0] }
+                      map { [_get_tableid_eccodes($_), $_] }
+                      glob("*.table");
+    $self->_spew(1, "Reading tables in %s", $tabledir) if @table_files;
+
+    my %C_table;
+    foreach my $table_file (@table_files) {
+        my ($table) = ($table_file =~ /(\d+)\.table$/);
+        die "Unexpected name of table file: $table_file" unless $table;
+        $table =  sprintf "%06d", $table;
+
+        open my $IN, '<', $table_file
+            or croak "Couldn't open $table_file: $!";
+        while (<$IN>) {
+            chomp;
+            my ($num, $val, $txt) = split(/ /, $_, 3);
+            _complain("Unexpected: first 2 fields in $table_file in $tabledir are unequal: $num $val")
+                if ($Strict_checking and $num ne $val);
+
+            # Fix a common problem in ecCodes codetables with long
+            # lines, hopefully not changing valid use of '"' in local
+            # tables (e.g. 8/78/0/codetables/8198.table:  ""Nebenamtliche"" measurement
+            $txt =~ s/(?<!")" +//;
+##          $txt =~ s/" +//;
+
+            $C_table{$table}{$val} = $txt . "\n";
+        }
+
+        _complain("$table_file in $tabledir is empty!")
+            if ($Strict_checking and not $C_table{$table});
+        close $IN;
+    }
+    chdir $cwd;
+
+    $BUFR_table{"C$version"} = \%C_table;
+    return \%C_table;
 }
+
+sub _get_tableid_eccodes {
+    my $table_file = shift;
+    my ($id) = ($table_file =~ /(\d+)\.table$/);
+    return $id;
+}
+
 
 sub load_BDtables {
     my $self = shift;
@@ -1048,11 +1301,30 @@ sub load_BDtables {
     my $version = $self->{TABLE_VERSION} = $self->get_table_version($table)
         or _croak "Not enough info to decide which tables to load";
 
-    $self->{B_TABLE} = $BUFR_table{"B$version"} || $self->_read_B_table($version);
-    $self->{D_TABLE} = $BUFR_table{"D$version"} || $self->_read_D_table($version);
+    if ($BUFR_table{FORMAT} eq 'BUFRDC') {
+        $self->{B_TABLE} = $BUFR_table{"B$version"} || $self->_read_B_table_bufrdc($version);
+        $self->{D_TABLE} = $BUFR_table{"D$version"} || $self->_read_D_table_bufrdc($version);
+    } elsif ($BUFR_table{FORMAT} eq 'ECCODES') {
+        if ($version =~ /,/) {
+            my ($master, $local) = (split /,/, $version);
+            $self->{B_TABLE} = $BUFR_table{"B$master"} || $self->_read_B_table_eccodes($master);
+            $self->{D_TABLE} = $BUFR_table{"D$master"} || $self->_read_D_table_eccodes($master);
+
+            # Append local table to the master table (should work even if empty)
+            my $local_Btable = (exists($BUFR_table{"B$local"})) ? $BUFR_table{"B$local"}
+            : $self->_read_B_table_eccodes($local);
+            @{$self->{B_TABLE}}{ keys %$local_Btable } = values %$local_Btable;
+            my $local_Dtable = (exists($BUFR_table{"D$local"})) ? $BUFR_table{"D$local"}
+            : $self->_read_D_table_eccodes($local);
+            @{$self->{D_TABLE}}{ keys %$local_Dtable } = values %$local_Dtable;;
+
+        } else {
+            $self->{B_TABLE} = $BUFR_table{"B$version"} || $self->_read_B_table_eccodes($version);
+            $self->{D_TABLE} = $BUFR_table{"D$version"} || $self->_read_D_table_eccodes($version);
+        }
+    }
     return $version;
 }
-
 
 sub load_Ctable {
     my $self = shift;
@@ -1063,15 +1335,41 @@ sub load_Ctable {
     _croak "Not enough info to decide which C table to load"
         if not $version and not $default_table;
 
-    $self->{C_TABLE} = $BUFR_table{"C$version"} || $self->_read_C_table($version);
+    if ($BUFR_table{FORMAT} eq 'BUFRDC') {
+        $self->{C_TABLE} = $BUFR_table{"C$version"} || $self->_read_C_table($version);
+    } elsif ($BUFR_table{FORMAT} eq 'ECCODES') {
+        if ($version =~ /,/) {
+            my ($master, $local) = (split /,/, $version);
+            $self->{C_TABLE} = $BUFR_table{"$master"} || $self->_read_C_table($master);
+
+            # Append local table to the master table (should work even if empty)
+            my $local_Ctable = (exists($BUFR_table{"C$local"})) ? $BUFR_table{"C$local"}
+                : $self->_read_C_table_eccodes($local);
+            @{$self->{C_TABLE}}{ keys %$local_Ctable } = values %$local_Ctable;
+
+        } else {
+            $self->{C_TABLE} = $BUFR_table{"C$version"} || $self->_read_C_table_eccodes($version);
+        }
+    }
+
     if ($default_table and not $self->{C_TABLE}) {
         # Was not able to load $table. Try $default_table instead.
         $version = $self->get_table_version($default_table);
         _croak "Not enough info to decide which C table to load"
             if not $version;
-        $self->{C_TABLE} = $BUFR_table{"C$version"} || $self->_read_C_table($version);
+        if ($BUFR_table{FORMAT} eq 'BUFRDC') {
+            $self->{C_TABLE} = $BUFR_table{"C$version"} || $self->_read_C_table($version);
+        } else {
+            $self->{C_TABLE} = $BUFR_table{"C$version"} || $self->_read_C_table_eccodes($version);
+        }
     }
-    _croak "Unable to load C table (C$version.TXT)" if not $self->{C_TABLE};
+    if (not $self->{C_TABLE}) {
+        if ($BUFR_table{FORMAT} eq 'BUFRDC') {
+            _croak "Unable to load C table (C$version.TXT)";
+        } else {
+            _croak "Unable to load codetables for $version";
+        }
+    }
 
     return $version;
 }
@@ -1167,7 +1465,7 @@ sub _read_message {
     } elsif (! $Reuse_current_ahl) {
         $self->{CURRENT_AHL} = undef;
     } elsif (defined $self->{CURRENT_AHL}) {
-	$self->{REUSED_CURRENT_AHL} = 1;
+        $self->{REUSED_CURRENT_AHL} = 1;
     }
 
     # Remember start position of BUFR message in case we need to
@@ -1212,7 +1510,7 @@ sub _read_message {
             # section 0 is all that is wrong), but obviously we cannot
             # trust the stated length of BUFR message, so reset
             # position of filehandle to just after section 0
-	    $self->{BAD_LENGTH} = 1;
+            $self->{BAD_LENGTH} = 1;
             $msgisOK = 0;
             seek $filehandle, $pos+8, 0;
             $self->_spew(2, "Danger: file %s not big enough to contain the stated"
@@ -1221,14 +1519,14 @@ sub _read_message {
         } else {
             $pos = tell($filehandle);
             if (substr($msg, -4) ne '7777') {
-		$self->{BAD_LENGTH} = 1;
-		$self->_spew(2, "Danger: BUFR length in sec 0 can't be correct, "
-			     . "last 4 bytes are not '7777'");
-	    }
+                $self->{BAD_LENGTH} = 1;
+                $self->_spew(2, "Danger: BUFR length in sec 0 can't be correct, "
+                             . "last 4 bytes are not '7777'");
+            }
         }
     } else {
         if (length($in_buffer) < $pos+$length) {
-	    $self->{BAD_LENGTH} = 1;
+            $self->{BAD_LENGTH} = 1;
             $msgisOK = 0;
             $self->_spew(2, "Danger: buffer not big enough "
                          . "to contain the stated length of BUFR message");
@@ -1238,10 +1536,10 @@ sub _read_message {
             $msg = substr $in_buffer, $pos+8, $length-8;
             $pos += $length;
             if (substr($msg, -4) ne '7777') {
-		$self->{BAD_LENGTH} = 1;
-		$self->_spew(2, "Danger: BUFR length in sec 0 can't be correct, "
-			     . "last 4 bytes are not '7777'");
-	    }
+                $self->{BAD_LENGTH} = 1;
+                $self->_spew(2, "Danger: BUFR length in sec 0 can't be correct, "
+                             . "last 4 bytes are not '7777'");
+            }
         }
     }
     if ($Spew) {
@@ -1262,7 +1560,7 @@ sub _read_message {
 my $ahl_regex = qr{[A-Z]{4}\d\d [A-Z]{4} \d{6}(?: (?:(?:RR|CC|AA|PA)[A-Z])| COR| RTD)?};
 # BBB=Pxx (segmentation) was allowed until 2007, but at least one
 # centre still uses PAA as of 2014.  COR and RTD shouldn't be
-# allowed (from ?), but are still used 
+# allowed (from ?), but are still used
 
 ## Advance to first occurrence of 'BUFR', or to the possibly preceding
 ## GTS ahl if this is requested in $at. Returns the new position and
@@ -1308,14 +1606,14 @@ sub _find_next_BUFR {
         if ($new_pos < 0) {
             $self->{EOF} = 1;
         } else {
-	    if (substr($in_buffer,$pos,$new_pos-$pos) =~ /(${ahl_regex})((?:\r\r)?\n+)$/) {
-		$ahl = $1;
+            if (substr($in_buffer,$pos,$new_pos-$pos) =~ /(${ahl_regex})((?:\r\r)?\n+)$/) {
+                $ahl = $1;
                 $self->_spew(2,"GTS ahl found: %s",$ahl) if $Spew;
                 if ($at eq 'at_ahl') {
-		    $new_pos -= length($1) + length($2);
-		}
-	    }
-	}
+                    $new_pos -= length($1) + length($2);
+                }
+            }
+        }
     }
 
     if ($self->{EOF}) {
@@ -1336,31 +1634,31 @@ sub _find_next_BUFR {
 ## Returns the BUFR message in raw (binary) form, '' if errors encountered
 sub get_bufr_message {
     my $self = shift;
- 
+
     if ($self->{BAD_LENGTH} || $self->{ERROR_IN_MESSAGE}) {
-	$self->_spew(2, "Skipping erroneous BUFR message");
-	return '';
+        $self->_spew(2, "Skipping erroneous BUFR message");
+        return '';
     }
     if (!$self->{FILEHANDLE} && !$self->{IN_BUFFER}) {
-	$self->_spew(2, "No file or input buffer associated with this object");
-	return '';
+        $self->_spew(2, "No file or input buffer associated with this object");
+        return '';
     }
     if (!exists $self->{START_POS} || !$self->{BUFR_LENGTH}) {
-	$self->_spew(2, "No bufr message to return");
-	return '';
+        $self->_spew(2, "No bufr message to return");
+        return '';
     }
 
     my $msg;
     if (exists $self->{FILEHANDLE}) {
-	my $fh = $self->{FILEHANDLE};
-	my $old_pos = tell($fh);
-	seek($fh, $self->{START_POS}, 0);
-	read($fh, $msg, $self->{BUFR_LENGTH});
-	seek($fh, $old_pos, 0);
-	$self->_spew(2, "BUFR message extracted from file");
+        my $fh = $self->{FILEHANDLE};
+        my $old_pos = tell($fh);
+        seek($fh, $self->{START_POS}, 0);
+        read($fh, $msg, $self->{BUFR_LENGTH});
+        seek($fh, $old_pos, 0);
+        $self->_spew(2, "BUFR message extracted from file");
     } elsif (exists $self->{IN_BUFFER}) {
-	$msg = substr $self->{IN_BUFFER}, $self->{START_POS}, $self->{BUFR_LENGTH};
-	$self->_spew(2, "BUFR message extracted");
+        $msg = substr $self->{IN_BUFFER}, $self->{START_POS}, $self->{BUFR_LENGTH};
+        $self->_spew(2, "BUFR message extracted");
     }
 
     return $msg;
@@ -1676,7 +1974,9 @@ sub _check_descriptors {
             $skip_next = 1;
         } elsif ( (substr($id,0,1) eq '0' && ! exists $B_table->{$id})
             || (substr($id,0,1) eq '3' && ! exists $D_table->{$id}) ) {
-            my $version = substr($self->{LOCAL_TABLES_NOT_FOUND},1,-4);
+            my $version = ($BUFR_table{FORMAT} eq 'BUFRDC')
+                ? substr($self->{LOCAL_TABLES_NOT_FOUND},1,-4)
+                : $self->{LOCAL_TABLES_NOT_FOUND};
             undef $BUFR_table{"B$version"};
             undef $BUFR_table{"D$version"};
             $self->{ERROR_IN_MESSAGE} = 1;
@@ -1759,7 +2059,7 @@ sub next_observation {
         if ($Nodata || $self->{IS_FILTERED}) {
             # Make a simple check that section 4 and 5 are complete
             if ($self->{BAD_LENGTH}) {
-		# We could have set $self->{ERROR_IN_MESSAGE} here and
+                # We could have set $self->{ERROR_IN_MESSAGE} here and
                 # let next_observation() take care of the rewinding.
                 # But we don't want error messages to be displayed if
                 # e.g. message is to be filtered
@@ -1767,7 +2067,7 @@ sub next_observation {
                 seek($self->{FILEHANDLE}, $self->{POS}, 0) if $self->{FILEHANDLE};
                 $self->_spew(2, "Possibly truncated message found (last 4 bytes"
                              . " are not '7777'), so rewinding to position %d",
-			     $self->{POS}) if $Spew;
+                             $self->{POS}) if $Spew;
             }
             # This will ensure next call to next_observation to read next message
             $self->{CURRENT_SUBSET} = $self->{NUM_SUBSETS};
@@ -1985,7 +2285,7 @@ sub dumpsection4 {
         my ($name, $unit, $bits) = (split /\0/, $B_table->{$id})[0,1,4];
         # Code or flag table number equals $id, so no need to display this in [unit]
         my $short_unit = $unit;
-        my $unit_start = substr($unit, 0, 4);
+        my $unit_start = uc(substr($unit, 0, 4));
         if ($unit_start eq 'CODE') {
             $short_unit = 'CODE TABLE';
         } elsif ($unit_start eq 'FLAG') {
@@ -2161,7 +2461,7 @@ sub dumpsection4_with_bitmaps {
         }
         # Code or flag table number equals $id, so no need to display this in [unit]
         my $short_unit = $unit;
-        my $unit_start = substr($unit, 0, 4);
+        my $unit_start = uc(substr($unit, 0, 4));
         if ($unit_start eq 'CODE') {
             $short_unit = 'CODE TABLE';
         } elsif ($unit_start eq 'FLAG') {
@@ -2202,7 +2502,10 @@ sub _get_code_table_txt {
     my ($id,$value,$unit,$B_table,$C_table,$num_spaces,$check_illegal) = @_;
 
     my $txt = '';
-    if ($unit =~ m/^CODE[ ]?TABLE/) {
+    # Need case insensitive matching, since local tables from at least
+    # DWD use 'Code table', not 'CODE TABLE', in the ECMWF ecCodes
+    # distribution
+    if ($unit =~ m/^CODE[ ]?TABLE/i) {
         my $code_table = sprintf "%06d", $id;
         return "Code table $code_table does not exist!\n"
             if ! exists $C_table->{$code_table};
@@ -2212,7 +2515,7 @@ sub _get_code_table_txt {
                 $txt .= sprintf "%s   %s\n", ' ' x ($num_spaces), lc $_;
             }
         }
-    } elsif ($unit =~ m/^FLAG[ ]?TABLE/) {
+    } elsif ($unit =~ m/^FLAG[ ]?TABLE/i) {
         my $flag_table = sprintf "%06d", $id;
         return "Flag table $flag_table does not exist!\n"
             if ! exists $C_table->{$flag_table};
@@ -2363,10 +2666,37 @@ sub resolve_descriptor {
         . " '@allowed_hows', is: '$how'"
             unless grep { $how eq $_ } @allowed_hows;
 
-    my $B_table = $self->{B_TABLE}
-        or _croak "No B table is loaded - did you forget to call load_BDtables?";
-    my $D_table = $self->{D_TABLE}
-        or _croak "No D table is loaded - did you forget to call load_BDtables?";
+    if (! $self->{B_TABLE}) {
+        if ($BUFR_table{FORMAT} eq 'ECCODES' && $self->{LOCAL_TABLES_NOT_FOUND}) {
+            _croak "Local table " . $self->{LOCAL_TABLES_NOT_FOUND} . " couldn't be found,"
+                . " or you might need to load WMO master table also?";
+        } else {
+            _croak "No B table is loaded - did you forget to call load_BDtables?";
+        }
+    }
+    my $B_table = $self->{B_TABLE};
+
+    # Some local tables are provided only for element descriptors, and
+    # we might in fact not need the sequence descriptors for resolving
+    my $D_table;
+    my $need_Dtable = 0;
+    foreach my $id (@desc) {
+        if (substr($id,0,1) eq '3') {
+            $need_Dtable = 1;
+        }
+    }
+    if ($need_Dtable && ! $self->{D_TABLE}) {
+        if ($BUFR_table{FORMAT} eq 'ECCODES' && $self->{LOCAL_TABLES_NOT_FOUND}) {
+            _croak "Local table " . $self->{LOCAL_TABLES_NOT_FOUND} . " couldn't be found,"
+                . " or you might need to load WMO master table also?";
+        } else {
+            _croak "No D table is loaded - did you forget to call load_BDtables?";
+        }
+    } else {
+        # Could consider omitting this if $need_Dtable = 0 ...
+        $D_table = $self->{D_TABLE};
+    }
+
     my $txt = '';
 
     if ($how eq 'simply' or $how eq 'partially') {
@@ -2472,7 +2802,7 @@ sub resolve_flagvalue {
 }
 
 ## Return the contents of code table $code_table, or empty string if
-## code table is not in found
+## code table is not found
 sub dump_codetable {
     my $self = shift;
     my ($code_table,$table,$default_table) = @_;
@@ -2704,7 +3034,7 @@ sub _decode_bitstream {
             # If operator 204$y 'Add associated field is in effect',
             # each data value is preceded by $y bits which should be
             # decoded separately. We choose to provide a descriptor
-            # 999999 in this case (like the ECMWF libbufr software)
+            # 999999 in this case (like the ECMWF BUFRDC software)
             if ($self->{ADD_ASSOCIATED_FIELD} and $id ne '031021') {
                 # First extract associated field
                 my $width = $self->{ADD_ASSOCIATED_FIELD};
@@ -2765,7 +3095,7 @@ sub _decode_bitstream {
                 } elsif ($unit eq 'CCITTIA5' && defined $self->{CHANGE_CCITTIA5_WIDTH}) {
                     $width = $self->{CHANGE_CCITTIA5_WIDTH}
                 }
-                # To prevent autovivification (see perlodc -f exists) we
+                # To prevent autovivification (see perldoc -f exists) we
                 # need this laborious test for defined
                 $refval = $self->{NEW_REFVAL_OF}{$id}{$isub} if defined $self->{NEW_REFVAL_OF}{$id}
                     && defined $self->{NEW_REFVAL_OF}{$id}{$isub};
@@ -3071,7 +3401,7 @@ sub _decompress_bitstream {
         # If operator 204$y 'Add associated field is in effect',
         # each data value is preceded by $y bits which should be
         # decoded separately. We choose to provide a descriptor
-        # 999999 in this case (like the ECMWF libbufr software)
+        # 999999 in this case (like the ECMWF BUFRDC software)
         if ($self->{ADD_ASSOCIATED_FIELD} and $id ne '031021') {
             # First extract associated field
             push @desc_exp, 999999;
@@ -4109,7 +4439,7 @@ sub _encode_bitstream {
             # If operator 204$y 'Add associated field' is in effect,
             # each data value is preceded by $y bits which should be
             # encoded separately. We choose to provide a descriptor
-            # 999999 in this case (like the ECMWF libbufr software)
+            # 999999 in this case (like the ECMWF BUFRDC software)
             if ($self->{ADD_ASSOCIATED_FIELD} and $id ne '031021') {
                 # First encode associated field
                 _croak "Descriptor no $idesc is $desc_ref->[$idesc], expected 999999"
@@ -4784,7 +5114,7 @@ sub _encode_compressed_bitstream {
         # If operator 204$y 'Add associated field' is in effect,
         # each data value is preceded by $y bits which should be
         # encoded separately. We choose to provide a descriptor
-        # 999999 in this case (like the ECMWF libbufr software)
+        # 999999 in this case (like the ECMWF BUFRDC software)
         if ($self->{ADD_ASSOCIATED_FIELD} and $id ne '031021') {
             # First encode associated field
             _croak "Descriptor no $idesc is $desc_ref->[$idesc], expected 999999"
@@ -5464,6 +5794,7 @@ Geo::BUFR - Perl extension for handling of WMO BUFR files.
 
   use Geo::BUFR;
 
+  Geo::BUFR->set_tableformat('BUFRDC'); # ECCODES is also possible
   Geo::BUFR->set_tablepath('path to BUFR tables');
 
   my $bufr = Geo::BUFR->new();
@@ -5491,10 +5822,11 @@ and for displaying information in BUFR B and D tables and in BUFR flag
 and code tables.
 
 Installing this module also installs some programs: C<bufrread.pl>,
-C<bufrresolve.pl>, C<bufrencode.pl>, C<bufr_reencode.pl> and
-C<bufralter.pl>. See L<https://wiki.met.no/bufr.pm/start> for examples
-of use. For the majority of potential users of Geo::BUFR I would
-expect these programs to be all that you will need Geo::BUFR for.
+C<bufrresolve.pl>, C<bufrextract.pl>, C<bufrencode.pl>,
+C<bufr_reencode.pl> and C<bufralter.pl>. See
+L<https://wiki.met.no/bufr.pm/start> for examples of use. For the
+majority of potential users of Geo::BUFR I would expect these programs
+to be all that you will need Geo::BUFR for.
 
 Note that being Perl, this module cannot compete in speed with for
 example the (free) ECMWF BUFRDC Fortran library. Still, some effort
@@ -5555,32 +5887,42 @@ Load B and D tables:
 
   $bufr->load_BDtables($table);
 
-$table is optional, and should be (base)name of a file containing a
-BUFR table B or D, using the ECMWF libbufr naming convention,
-i.e. [BD]'table_version'.TXT. If no argument is provided,
+$table is optional, and should for BUFRDC be (base)name of a file
+containing a BUFR table B or D, using the ECMWF BUFRDC naming
+convention, i.e. [BD]'table_version'.TXT. For ECCODES, use last part
+of path, e.g. on UNIX-like systems '0/wmo/18' for master tables and
+'0/local/8/78/236' for local tables, or both if that is needed,
+e.g. '0/wmo/18,0/local/8/78/236'. If no argument is provided,
 C<load_BDtables()> will use BUFR section 1 information in the $bufr
-object to decide which tables to load. Previously loaded tables are
-kept in memory, and C<load_BDtables> will return immediately if the
-tables already have been loaded. Will die (croak) if tables cannot be
-found, but not if these are local tables (Local table version number >
-0) and the corresponding master tables exist (Local table version
-number = 0), which then will be loaded instead. Returns table version
-for the tables loaded (see C<get_table_version>).
+object to decide which tables to load (which for ECCODES might be up
+to 4 table files, both local and master tables). Previously loaded
+tables are kept in memory, and C<load_BDtables> will return
+immediately if the tables already have been loaded. Will die (croak)
+if tables cannot be found, but (in the no argument version) not if
+these are local tables (Local table version number > 0) and the
+corresponding master tables exist (Local table version number = 0),
+which then will be loaded instead. Returns table version for the
+tables loaded (see C<get_table_version>).
 
 Load C table:
 
   $bufr->load_Ctable($table,$default_table);
 
 Both $table and $default_table are optional. This will load the flag
-and code tables (if not already loaded), which in ECMWF libbufr are
-put in tables C'table_version'.TXT (not to be confused with WMO BUFR
-table C, which contain the operator descriptors). $default_table will
-be used if $table is not found. If no arguments are provided,
+and code tables (if not already loaded), which in ECMWF BUFRDC are put
+in tables C'table_version'.TXT (not to be confused with WMO BUFR table
+C, which contains the operator descriptors). $default_table will be
+used if $table is not found. For $table and $default_table in ECCODES,
+use (just like for C<load_BDtables>) last part of path, e.g. on
+UNIX-like systems '0/wmo/18' for master tables and '0/local/8/78/236'
+for local tables, or both if that is needed,
+e.g. '0/wmo/18,0/local/8/78/236'. Will for ECCODES then load all
+tables in the codetables subdirectory. If no arguments are provided,
 C<load_Ctable()> will use BUFR section 1 information in the $bufr
-object to decide which table to load. Will die (croak) if table cannot
-be found, but not if this is a local table and the corresponding
-master table exists, which then will be loaded instead. Returns table
-version for the table loaded.
+object to decide which table(s) to load. Will die (croak) if table
+cannot be found, but not if this is a local table and the
+corresponding master table exists, which then will be loaded
+instead. Returns table version for the table loaded.
 
 Get next observation (next subset in current BUFR message or first subset
 in next message):
@@ -5764,6 +6106,11 @@ calling dumpsection4:
 C<set_show_all_operators(1)> cannot be combined with C<dumpsections>
 with bitmap option set (which is the default).
 
+Set or get tableformat:
+
+  Geo::BUFR->set_tableformat($tableformat);
+  $tableformat = Geo::BUFR->get_tableformat();
+
 Set or get tablepath:
 
   Geo::BUFR->set_tablepath($tablepath);
@@ -5773,10 +6120,15 @@ Get table version:
 
   $table_version = $bufr->get_table_version($table);
 
-$table is optional. If for example $table =
-'B0000000000088013001.TXT', will return '0000000000088013001'. In the
-more interesting case where $table is not provided, will return table
-version from BUFR section 1 information in the $bufr object.
+$table is optional. Return table version from $table if provided, or
+else from section 1 information in the currently processed BUFR
+message. For BUFRDC, this is a stripped down version of table name. If
+for example $table = 'B0000000000088013001.TXT', will return
+'0000000000088013001'. For ECCODES, this is last path of table
+location (e.g. '0/wmo/29'), and a stringified list of two such paths
+(master and local) if local tables are used
+(e.g. '0/wmo/29,0/local/8/78/236'). Returns undef if impossible to
+determine table version.
 
 Get number of subsets:
 
@@ -5996,15 +6348,17 @@ Resolve flag table value (for printing):
 
 Last 2 arguments are optional. $default_B_table will be used if
 $B_table is not found, $num_leading_spaces defaults to 0.
-Example:
+Examples:
 
-  print $bufr->resolve_flagvalue(4,8006,'B0000000000098013001.TXT')
+  print $bufr->resolve_flagvalue(4,8006,'B0000000000098013001.TXT') # BUFRDC
+  print $bufr->resolve_flagvalue(4,8006,'0/wmo/13')       # ECCODES, master table
+  print $bufr->resolve_flagvalue(4,8193,'0/local/1/98/0') # ECCODES, local table
 
 Print the contents of BUFR code (or flag) table:
 
   print $bufr->dump_codetable($code_table,$table,$default_table);
 
-where $table is (base)name of the C...TXT file containing the code
+where in BUFRDC $table is (base)name of the C...TXT file containing the code
 tables, optionally followed by a default table which will be used if
 $table is not found.
 
@@ -6079,7 +6433,7 @@ Some words about the procedure used for decoding and encoding data in
 section 4 might shed some light on this choice of design.
 
 When decoding section 4 for a subset, first of all the BUFR
-descriptors provided in section 3 are expanded as far as is possible
+descriptors provided in section 3 are expanded as far as possible
 without looking at the actual bitstream, i.e. by eliminating
 nondelayed replication descriptors (F=1) and by using BUFR table D to
 expand sequence descriptors (F=3). Then, for each of the thus expanded
@@ -6124,11 +6478,22 @@ as leading and trailing white space.
 =head1 BUFR TABLE FILES
 
 The BUFR table files should follow the format and naming conventions
-used by ECMWF BUFRDC software (download from
-https://software.ecmwf.int/wiki/display/BUFR/BUFRDC+Home, unpack,
-build library and you will find table files in the bufrtables
-directory). Other table file formats exist and might on request be
-supported in future versions of Geo::BUFR.
+used by one of these two ECMWF software packages: either BUFRDC
+(download from https://confluence.ecmwf.int/display/BUFR/Releases), or
+ecCodes (download from https://confluence.ecmwf.int/display/ECC/Releases).
+
+The utility programs in Geo::BUFR will look for table files by default
+in the standard installation directories, which in Unix-like systems
+will be /usr/local/lib/bufrtables for BUFRDC and
+/usr/local/share/eccodes/definitions/bufr/tables for eCcodes. You can
+change that behaviour by either providing the environment variable
+BUFR_TABLES, or setting path explicitly by using the
+C<--tablepath>. Note that while BUFR_TABLES is a well known concept in
+BUFRDC software, the closest you get in eCcodes is probably
+ECCODES_DEFINITION_PATH (see
+e.g. https://confluence.ecmwf.int/display/ECC/BUFR%3A+Local+configuration),
+for which BUFR_TABLES should (or could) be set to
+ECCODES_DEFINITION_PATH/bufr/tables (again in Unix-like systems).
 
 =head1 STRICT CHECKING
 
@@ -6266,7 +6631,7 @@ L<https://wiki.met.no/bufr.pm/start>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2016 MET Norway
+Copyright (C) 2010-2019 MET Norway
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

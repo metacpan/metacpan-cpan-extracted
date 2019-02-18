@@ -44,49 +44,62 @@ has repo_id        => ( required => 1 );    # Str
 
 sub BUILDARGS ( $self, $args ) {
     if ( $args->{uri} ) {
-        if ( $args->{uri} =~ m[(bitbucket[.]org|github[.]com)[/:]([[:alnum:]-]+)/([[:alnum:]_-]+)([.]git)?]sm ) {
-            my $has_git_suffix = $4;
+        my $uri = P->uri( $args->{uri} );
 
-            $args->{repo_namespace} = $2;
-            $args->{repo_name}      = $3;
-            $args->{repo_id}        = "$2/$3";
+        if ( $uri->{scheme} ) {
+            if ( $args->{uri} =~ m[(bitbucket[.]org|github[.]com)[/:]([[:alnum:]-]+)/([[:alnum:]_-]+)([.]git)?]sm ) {
+                my $has_git_suffix = $4;
 
-            if ( $1 eq 'github.com' ) {
-                $args->{hosting}  = $SCM_HOSTING_GITHUB;
-                $args->{scm_type} = $SCM_TYPE_GIT;
-            }
-            else {
-                $args->{hosting} = $SCM_HOSTING_BITBUCKET;
+                $args->{repo_namespace} = $2;
+                $args->{repo_name}      = $3;
+                $args->{repo_id}        = "$2/$3";
 
-                if ( !$args->{scm_type} ) {
-                    if ($has_git_suffix) {
-                        $args->{scm_type} = $SCM_TYPE_GIT;
-                    }
+                if ( $1 eq 'github.com' ) {
+                    $args->{hosting}  = $SCM_HOSTING_GITHUB;
+                    $args->{scm_type} = $SCM_TYPE_GIT;
+                }
+                else {
+                    $args->{hosting} = $SCM_HOSTING_BITBUCKET;
 
-                    # git_ssh://, git://, git@
-                    elsif ( substr( $args->{uri}, 0, 3 ) eq 'git' ) {
-                        $args->{scm_type} = $SCM_TYPE_GIT;
-                    }
-
-                    # ssh://
-                    elsif ( substr( $args->{uri}, 0, 6 ) eq 'ssh://' ) {
-                        $args->{scm_type} = $SCM_TYPE_HG;
-                    }
-                    else {
-                        if ( $args->{local_scm_type} && $args->{local_scm_type} eq $SCM_TYPE_GIT ) {
+                    if ( !$args->{scm_type} ) {
+                        if ($has_git_suffix) {
                             $args->{scm_type} = $SCM_TYPE_GIT;
                         }
-                        else {
 
-                            # NOTE uri is ambiguous, better is to use .git suffix for git repositories
+                        # git_ssh://, git://, git@
+                        elsif ( substr( $args->{uri}, 0, 3 ) eq 'git' ) {
+                            $args->{scm_type} = $SCM_TYPE_GIT;
+                        }
+
+                        # ssh://
+                        elsif ( substr( $args->{uri}, 0, 6 ) eq 'ssh://' ) {
                             $args->{scm_type} = $SCM_TYPE_HG;
+                        }
+                        else {
+                            if ( $args->{local_scm_type} && $args->{local_scm_type} eq $SCM_TYPE_GIT ) {
+                                $args->{scm_type} = $SCM_TYPE_GIT;
+                            }
+                            else {
+
+                                # NOTE uri is ambiguous, better is to use .git suffix for git repositories
+                                $args->{scm_type} = $SCM_TYPE_HG;
+                            }
                         }
                     }
                 }
             }
+            else {
+                die 'SCM upstream URL is invalid or is not supported';
+            }
         }
         else {
-            die 'SCM upstream URL is invalid';
+
+            # uri is file://
+            $args->{hosting}  //= undef;
+            $args->{scm_type} //= $args->{local_scm_type};
+            $args->{repo_namespace} = undef;
+            $args->{repo_name}      = undef;
+            $args->{repo_id}        = undef;
         }
     }
     else {
@@ -266,11 +279,11 @@ sub get_hosting_api ( $self, $args = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 47                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
+## |    3 | 50                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 76                   | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 65, 79               | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 106, 159             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 119, 172             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -8,16 +8,18 @@ use Pcore::Util::Scalar qw[is_plain_arrayref];
 has ext_app   => ( required => 1 );     # name of the linked application, required
 has ext_title => 'ExtJS Application';
 
-has _bootstrap => ();
+has _index => ();
 
 # TODO api_url
 sub BUILD ( $self, $args ) {
-    my $ns = ref( $self->{app} ) . '::Ext::' . $self->{ext_app};
+    return if index( $self->{ext_app}, '::' ) != -1 && !$self->{app}->{devel};
+
+    my $ns = index( $self->{ext_app}, '::' ) == -1 ? ref( $self->{app} ) . '::Ext::' . $self->{ext_app} : $self->{ext_app};
 
     my $app = $self->{app}->{ext}->{ $self->{ext_app} } = Pcore::Ext->new(
         namespace => $ns,
-        app       => $self->{app},      # maybe Pcore::App instance
-        cdn       => undef,             # maybe Pcore::CDN instance
+        app       => $self->{app},      # maybe InstanceOf['Pcore::App']
+        cdn       => undef,             # maybe InstanceOf['Pcore::CDN']
         prefixes  => {
             pcore => undef,
             dist  => undef,
@@ -38,6 +40,8 @@ sub BUILD ( $self, $args ) {
 sub _get_app ($self) { return $self->{app}->{ext}->{ $self->{ext_app} } }
 
 around run => sub ( $orig, $self, $req ) {
+    return $req->return_xxx(404) if !$self->_get_app;
+
     if ( defined $req->{path} ) {
         if ( $req->{path} eq 'app.js' ) {
             $self->_return_app($req);
@@ -53,16 +57,16 @@ around run => sub ( $orig, $self, $req ) {
         }
     }
     else {
-        $self->_return_bootstrap($req);
+        $self->_return_index($req);
     }
 
     return;
 };
 
-sub _return_bootstrap ( $self, $req ) {
+sub _return_index ( $self, $req ) {
     my $app = $self->_get_app;
 
-    if ( !$self->{_bootstrap} ) {
+    if ( !$self->{_index} ) {
         push my $resources->@*, $app->get_resources( $self->{app}->{devel} )->@*;
 
         my $cdn = $self->{app}->{cdn};
@@ -74,7 +78,7 @@ sub _return_bootstrap ( $self, $req ) {
         push $resources->@*, $cdn->get_script_tag( $self->get_abs_path('app.js') );
 
         # generate HTML tmpl
-        $self->{_bootstrap} = \P->text->encode_utf8(
+        $self->{_index} = \P->text->encode_utf8(
             P->tmpl->render(
                 'ext/index.html',
                 {   INDEX => {    #
@@ -86,7 +90,7 @@ sub _return_bootstrap ( $self, $req ) {
         );
     }
 
-    $req->( 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{_bootstrap} )->finish;
+    $req->( 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{_index} )->finish;
 
     return;
 }

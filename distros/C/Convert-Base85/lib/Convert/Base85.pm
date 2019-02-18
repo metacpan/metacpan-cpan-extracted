@@ -20,7 +20,7 @@ use Math::Int128 qw(
 #
 #use Smart::Comments q(#####);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Exporter qw(import);
 
@@ -263,15 +263,9 @@ sub decode
 
 *base85_decode = \&decode;
 
-
-1;
-
-__END__
-
-
 =head1 SEE ALSO
 
-=head4 The Base85 Character Set
+=head2 The Base85 Character Set
 
 The Base85 character set is described by Robert Elz in his RFC1924 of
 April 1st 1996,
@@ -290,10 +284,6 @@ The character set is:
     '`', '|', and '~'.
 
 and allows for the possibility of using the string in a MIME container.
-
-=cut
-
-=head1 SEE ALSO
 
 =head2 Ascii85
 
@@ -345,17 +335,22 @@ I will be notified, and then you'll automatically be notified of progress on you
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+This module is on Github at L<https://github.com/jgamble/Convert-Base85>.
 
-    perldoc Convert::Base85
+You can also look for information on L<MetaCPAN|https://metacpan.org/release/Convert-Base85>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2018 John M. Gamble.
+Copyright (c) 2019 John M. Gamble.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See L<http://dev.perl.org/licenses/> for more information.
+
+
+1;
+
+__END__
 

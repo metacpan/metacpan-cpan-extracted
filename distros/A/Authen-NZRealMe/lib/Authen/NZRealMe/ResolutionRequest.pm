@@ -1,8 +1,5 @@
 package Authen::NZRealMe::ResolutionRequest;
-{
-  $Authen::NZRealMe::ResolutionRequest::VERSION = '1.16';
-}
-
+$Authen::NZRealMe::ResolutionRequest::VERSION = '1.18';
 use warnings;
 use strict;
 
@@ -10,10 +7,12 @@ require XML::Generator;
 
 use MIME::Base64 qw(decode_base64);
 
+use Authen::NZRealMe::CommonURIs qw(URI NS_PAIR);
 
-my $ns_soap_env = [ 'SOAP-ENV' => 'http://schemas.xmlsoap.org/soap/envelope/' ];
-my $ns_saml     = [ 'saml'     => 'urn:oasis:names:tc:SAML:2.0:assertion'     ];
-my $ns_samlp    = [ 'samlp'    => 'urn:oasis:names:tc:SAML:2.0:protocol'      ];
+
+my $ns_soap_env = [ NS_PAIR('soap11') ];
+my $ns_saml     = [ NS_PAIR('saml') ];
+my $ns_samlp    = [ NS_PAIR('samlp') ];
 
 
 sub new {
@@ -143,7 +142,7 @@ See L<Authen::NZRealMe> for documentation index.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2014 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2010-2019 Enrolment Services, New Zealand Electoral Commission
 
 Written by Grant McLean E<lt>grant@catalyst.net.nzE<gt>
 

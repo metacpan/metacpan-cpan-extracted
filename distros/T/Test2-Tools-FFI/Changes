@@ -1,0 +1,20 @@
+Revision history for Test2-Tools-FFI
+
+0.05      2019-02-18 11:24:43 -0500
+  - Fix downstream install bug on Windows (gh#1)
+
+0.04      2019-02-16 09:34:53 -0500
+  - First CPAN release
+  - Remove lib->test and lib->runtime as they are redundent
+  - Add `notef` and `diagf` to libt2t (simple)
+  - libt2t (simple) calls will abort if it hasn't been initalized
+  - add deinit function to deinitalize.
+
+0.03      2019-02-14 15:51:50 -0500
+  - Mac OS X specific linker fixes
+
+0.02      2019-02-12 21:44:25 -0500
+  - Add `ok` to libt2t (simple)
+
+0.01      2019-02-12 21:39:10 -0500
+  - initial version

@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-# Sreview, a web-based video review and transcoding system
+# SReview, a web-based video review and transcoding system
 # Copyright (c) 2016-2018, Wouter Verhelst <w@uter.be>
 #
-# Sreview is free software: you can redistribute it and/or modify it
+# SReview is free software: you can redistribute it and/or modify it
 # under the terms of the GNU Affero General Public License as published
 # by the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
@@ -26,7 +26,7 @@ my $config = SReview::Config::Common::setup;
 
 my $dbh = DBI->connect($config->get('dbistring'), '', '') or die "Cannot connect to database!";
 
-open SCHEDULE, "curl -s https://fosdem.org/2018/schedule/xml|";
+open SCHEDULE, "curl -s https://fosdem.org/2019/schedule/xml|";
 
 my $schedule = "";
 

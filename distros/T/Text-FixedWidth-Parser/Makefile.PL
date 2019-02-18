@@ -14,6 +14,7 @@ my %wm = (
 	PREREQ_PM    => {
 		'Moose'            => 2.1804,
 		'Math::Expression' => 1.47,
+		'DateTime::Format::Strptime' => 1.76,
 		'Test::Most'       => 0.34,
 		'Test::Class'      => 0.50,
 	},

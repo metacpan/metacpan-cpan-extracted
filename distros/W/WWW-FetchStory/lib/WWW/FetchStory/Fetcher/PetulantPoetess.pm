@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::PetulantPoetess;
-$WWW::FetchStory::Fetcher::PetulantPoetess::VERSION = '0.2002';
+$WWW::FetchStory::Fetcher::PetulantPoetess::VERSION = '0.2004';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher::PetulantPoetess - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2002
+version 0.2004
 
 =head1 DESCRIPTION
 

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -38,52 +38,6 @@ SYNOPSIS
 SUBROUTINES
 
  check
-
-AUTHOR
-
-    Renee Baecker, <module at renee-baecker.de>
-
-BUGS
-
-    Please report any bugs or feature requests to
-    bug-data-validate-withyaml-plugin-NoSpam at rt.cpan.org, or through the
-    web interface at
-    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Validate-WithYAML-Plugin-NoSpam.
-    I will be notified, and then you'll automatically be notified of
-    progress on your bug as I make changes.
-
-SUPPORT
-
-    You can find documentation for this module with the perldoc command.
-
-        perldoc Data::Validate::WithYAML::Plugin::NoSpam
-
-    You can also look for information at:
-
-      * AnnoCPAN: Annotated CPAN documentation
-
-      http://annocpan.org/dist/Data::Validate::WithYAML::Plugin::NoSpam
-
-      * CPAN Ratings
-
-      http://cpanratings.perl.org/d/Data::Validate::WithYAML::Plugin::NoSpam
-
-      * RT: CPAN's request tracker
-
-      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data::Validate::WithYAML::Plugin::NoSpam
-
-      * Search CPAN
-
-      http://search.cpan.org/dist/Data::Validate::WithYAML::Plugin::NoSpam
-
-ACKNOWLEDGEMENTS
-
-COPYRIGHT & LICENSE
-
-    Copyright 2007 Renee Baecker, all rights reserved.
-
-    This program is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
 
 AUTHOR
 

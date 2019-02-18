@@ -21,7 +21,6 @@ requires:
   Term::ExtendedColor::Xresources: '0'
   perl: '5.006'
 resources:
-  bugtracker: https://github.com/trapd00r/Term-ExtendedColor-Xresources-Colorscheme/issues
-  repository: https://github.com/trapd00r/Term-ExtendedColor-Xresources-Colorscheme
-version: '0.014'
+  repository: https://github.com/trapd00r/Term-ExtendedColor-Xresources-Colorscheme.git
+version: '0.018'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,86 @@
+{
+   "abstract" : "Save constructor arguments that were not consumed.",
+   "author" : [
+      "Aran Clary Deltac <bluefeet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-ExtraArgs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "1.23"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000094"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::ExtraArgs" : {
+         "file" : "lib/MooseX/ExtraArgs.pm",
+         "version" : "0.02"
+      },
+      "MooseX::ExtraArgs::Meta::Object" : {
+         "file" : "lib/MooseX/ExtraArgs/Meta/Object.pm",
+         "version" : "0.02"
+      },
+      "MooseX::ExtraArgs::Meta::ToClass" : {
+         "file" : "lib/MooseX/ExtraArgs/Meta/ToClass.pm",
+         "version" : "0.02"
+      },
+      "MooseX::ExtraArgs::Meta::ToRole" : {
+         "file" : "lib/MooseX/ExtraArgs/Meta/ToRole.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/MooseX-ExtraArgs/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/MooseX-ExtraArgs",
+      "repository" : {
+         "url" : "git://github.com/bluefeet/MooseX-ExtraArgs.git",
+         "web" : "https://github.com/bluefeet/MooseX-ExtraArgs"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
+}

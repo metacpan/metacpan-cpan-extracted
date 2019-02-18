@@ -1,12 +1,8 @@
-#!/usr/bin/perl -w
-use strict;
-use warnings;
+#!/usr/bin/env perl
+use strictures 2;
+use Test2::V0;
 
-use Test::More;
-
-BEGIN {
-    use_ok('Geo::Coordinates::GMap');
-}
+use Geo::Coordinates::GMap;
 
 {
     my ($x, $y) = coord_to_gmap_tile( 86, 177, 1 );

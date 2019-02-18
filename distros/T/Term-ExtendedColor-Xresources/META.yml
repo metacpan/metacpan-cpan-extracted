@@ -22,7 +22,6 @@ requires:
   Test::More: '0'
   perl: '5.006'
 resources:
-  bugtracker: https://github.com/trapd00r/Term-ExtendedColor-Xresources/issues
-  repository: https://github.com/trapd00r/Term-ExtendedColor-Xresources
-version: '0.080'
+  repository: https://github.com/trapd00r/Term-ExtendedColor-Xresources.git
+version: '0.084'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

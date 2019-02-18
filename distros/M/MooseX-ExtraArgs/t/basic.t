@@ -2,9 +2,9 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-BEGIN { use_ok('MooseX::ExtraArgs') }
+use MooseX::ExtraArgs;
 
 {
     package MyClass;
@@ -18,7 +18,7 @@ BEGIN { use_ok('MooseX::ExtraArgs') }
 {
     my $obj = MyClass->new();
 
-    is_deeply(
+    is(
         $obj->extra_args(),
         {},
         'extra_args is empty with no arguments passed',
@@ -28,7 +28,7 @@ BEGIN { use_ok('MooseX::ExtraArgs') }
 {
     my $obj = MyClass->new( foo=>32 );
 
-    is_deeply(
+    is(
         $obj->extra_args(),
         {},
         'extra_args is empty with when only known arguments are passed',
@@ -38,7 +38,7 @@ BEGIN { use_ok('MooseX::ExtraArgs') }
 {
     my $obj = MyClass->new( foo=>32, bar=>23 );
 
-    is_deeply(
+    is(
         $obj->extra_args(),
         { bar => 23 },
         'extra_args contains an unknown argument',
@@ -62,7 +62,7 @@ BEGIN { use_ok('MooseX::ExtraArgs') }
 
 {
     my $obj = MyClass2->new( foo=>55, bar=>'baz' );
-    is_deeply(
+    is(
         $obj->extra_args(),
         { bar=>'baz' },
         'works with roles too',

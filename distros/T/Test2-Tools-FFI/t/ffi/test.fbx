@@ -1,0 +1,17 @@
+use strict;
+use warnings;
+
+our $DIR;
+
+{
+  cflags => "-Ishare/include",
+  # TODO: shoudln't need to hard code these paths
+  libs => [
+    "-Wl,-rpath,share/lib", 
+    "-Lshare/lib", 
+    "-Wl,-rpath,blib/lib/auto/share/dist/Test2-Tools-FFI/lib",
+    "-Lblib/lib/auto/share/dist/Test2-Tools-FFI/lib", 
+    "-lt2t",
+  ],
+  source => [ "$DIR/*.c", "$DIR/*.cxx" ],
+}

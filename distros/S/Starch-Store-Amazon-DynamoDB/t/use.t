@@ -1,8 +1,10 @@
 #!/usr/bin/env perl
 use strictures 2;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Starch::Store::Amazon::DynamoDB' );
+use Starch::Store::Amazon::DynamoDB;
+
+ok('use');
 
 done_testing();

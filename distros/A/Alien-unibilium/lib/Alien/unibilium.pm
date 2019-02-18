@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2019 -- leonerd@leonerd.org.uk
 
 package Alien::unibilium;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use POSIX qw( WEXITSTATUS );
 
@@ -35,7 +35,8 @@ provides a simple access to its configuration. If not, the process of
 installing it will install a locally-bundled copy of the library into perl's
 arch-specific library directory.
 
-This module bundles F<unibilium> version v1.1.4.
+This module bundles a patched version of F<unibilium> version v2.0.0,
+containing the pending upstream pull-request #39.
 
 =head1 METHODS
 

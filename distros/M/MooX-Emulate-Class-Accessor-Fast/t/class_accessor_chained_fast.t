@@ -1,12 +1,12 @@
 #!/usr/bin/env perl
-use strictures 1;
+use strictures 2;
+use Test2::V0;
 
-use Test::More;
 use MooX::Adopt::Class::Accessor::Fast;
 
 {
   package MyClass::Accessor::Chained::Fast;
-  use strictures 1;
+  use strictures 2;
   use base 'Class::Accessor::Fast';
 }
 

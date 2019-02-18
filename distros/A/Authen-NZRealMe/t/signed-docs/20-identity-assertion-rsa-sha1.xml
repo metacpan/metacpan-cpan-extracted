@@ -1,0 +1,59 @@
+<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"><soap-env:Body><samlp:ArtifactResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="s207fec6cd451cbc7073b01d8dd907edaf7c2040ba" InResponseTo="d2fc1de338a84b2cb5a6ff7786bc63f6e" Version="2.0" IssueInstant="2014-05-29T20:54:08Z" Destination="https://samltest.taka.wgtn.cat-it.co.nz/saml2/acs"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://test.fakeme.govt.nz/fakemetest/fakemeidp</saml:Issuer><samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+<samlp:StatusCode xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" Value="urn:oasis:names:tc:SAML:2.0:status:Success">
+</samlp:StatusCode>
+</samlp:Status><samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="s25561e95ea40a6fa337adfcbfb61343385a0a3f57" InResponseTo="fb015601b411971db9e258f12f4b1c107" Version="2.0" IssueInstant="2014-05-29T20:50:52Z" Destination="https://samltest.taka.wgtn.cat-it.co.nz/saml2/acs"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://test.fakeme.govt.nz/fakemetest/fakemeidp</saml:Issuer><samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+<samlp:StatusCode xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" Value="urn:oasis:names:tc:SAML:2.0:status:Success">
+</samlp:StatusCode>
+</samlp:Status><saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="s232bee9e49e5da3050735c11aa1e412f5a298cd28" IssueInstant="2014-05-29T20:50:52Z" Version="2.0">
+<saml:Issuer>https://test.fakeme.govt.nz/fakemetest/fakemeidp</saml:Issuer><dsig:Signature xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+        <dsig:SignedInfo>
+            <dsig:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            <dsig:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+            <dsig:Reference URI="#s232bee9e49e5da3050735c11aa1e412f5a298cd28">
+                <dsig:Transforms>
+                    <dsig:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                    <dsig:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                </dsig:Transforms>
+                <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                <dsig:DigestValue>xReppELzBkxVTck/G0Ps6gDOGxA=</dsig:DigestValue>
+            </dsig:Reference>
+        </dsig:SignedInfo>
+    <dsig:SignatureValue>NboUAPyKAAusmp8pG1RY+U2qqWRkPRxFK/q6kitMNEifYmxapCssYPHQtHBf8xS5E1txpvMfSW/R
+VxYw7RnR53sXj4/hUl48h/bIT867cnAzrHzXivpkhGmIYUgHm5RIY0UFYZLEWrDrTkpLgDwNThLl
+BQdYZa3zOH/PcXmZKelbc1twAY60NrZ3Wd61RCigrY5CKS1FldCkdikgq/1dnp40P/gWZFQn+L9B
+TMd7k5Lvpq/9X6EUoQm//pflWXiKPq6K9h6Fv8EyW2FVbUnFVJ5g0bKGUPcMk8sk9PMQu6S0NCfW
+k3YGo67HtDxsr4UE4tLI/FYg6zVDi3kG4KLxEg==
+</dsig:SignatureValue>
+<dsig:KeyInfo>
+<dsig:X509Data>
+<dsig:X509Certificate>
+MIIDLzCCAhegAwIBAgIJAJys5okjA3N3MA0GCSqGSIb3DQEBBQUAMC4xLDAqBgNV
+BAMMI3Rlc3Quc2lnbmluZy5hY2NvdW50LmZha2VtZS5nb3Z0Lm56MB4XDTE0MDUz
+MDAwNTkwMFoXDTE0MDYyOTAwNTkwMFowLjEsMCoGA1UEAwwjdGVzdC5zaWduaW5n
+LmFjY291bnQuZmFrZW1lLmdvdnQubnowggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw
+ggEKAoIBAQDNQWtXKquqhfJt/X8C8Gyg9+2LrhcCvQdyXnTVAITItV1kTk+l2tze
+QNo7yU0Z9i692Gn+UBobPoRwmHgCXu6ZyKxH1qOBqwnqyhhezYSQNm8ReBaSPlP1
+yYswDvY+/N9MBAcZvCt8BSNz4Tsv+gP7WrHOx5U0zrSkVcEGhaCcLFsdo3R2SMFP
+xvVpRmIqRPKzyANZqyoMtoRnIhxyuppaO1fSKvy1TG0SK7dLDVWIn2NPMZMpvZsG
+9JorBAeit5nO/eE8GSxe/i8lvjIuZS/Rc57+71RmeemFz+MbIGZ4tU+YqY0SupXz
+24E0dIsMzSl3rXEU/VD9L4etaxz0pz4ZAgMBAAGjUDBOMB0GA1UdDgQWBBQfsK+Y
+Bi2/Vk+Fvyc22UEvhx1QQTAfBgNVHSMEGDAWgBQfsK+YBi2/Vk+Fvyc22UEvhx1Q
+QTAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4IBAQBXgE/zv3lWxf7e3nGc
+Xpl6JBPv2cB7nwDjeoDxRwx2oThuRoFLtrFmjonrUZIMUWapUBGA+/WjMlq9GuB2
+a1UUx4izOPX9QDHzPTewuDO4tiyI+vTXrXno+8CW7wOi9OwOVaiY8X677nPhJUIP
+LBcBdweYxC7nLdhNLKEXMyRXlg/mD5ACDQAAiUbs/yx3Br4K3YQyM7oZOCAfJR4+
+whCR4OTRYNM1bH7LQNM88N6EPyRnkP3mJpu0HH2wNFOc1hfF2hq9Icwu3VhsQLnm
+nv8TV6OwdEoqMNCPozBegc27rf6AixerOnOJk1hMVLq4GM3Dy0O1qPC3tniFbzUv
+gCNF
+</dsig:X509Certificate>
+</dsig:X509Data>
+</dsig:KeyInfo>
+</dsig:Signature><saml:Subject>
+<saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient" NameQualifier="https://test.fakeme.govt.nz/fakemetest/fakemeidp">fb015601b411971db9e258f12f4b1c107</saml:NameID><saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+<saml:SubjectConfirmationData InResponseTo="fb015601b411971db9e258f12f4b1c107" NotOnOrAfter="2014-05-29T21:00:52Z" Recipient="https://samltest.taka.wgtn.cat-it.co.nz/saml2/acs"/></saml:SubjectConfirmation>
+</saml:Subject><saml:Conditions NotBefore="2014-05-29T20:40:52Z" NotOnOrAfter="2014-05-29T21:00:52Z">
+<saml:AudienceRestriction>
+<saml:Audience>https://www.example.govt.nz/app/sample-identity</saml:Audience>
+</saml:AudienceRestriction>
+</saml:Conditions>
+<saml:AuthnStatement AuthnInstant="2014-05-29T20:48:08Z" SessionIndex="s2c4b3c5e2c06fcd517b9124ae6198a7a0cb352401"><saml:AuthnContext><saml:AuthnContextClassRef>urn:nzl:govt:ict:stds:authn:deployment:GLS:SAML:2.0:ac:classes:ModStrength</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement><saml:AttributeStatement><saml:Attribute Name="urn:nzl:govt:ict:stds:authn:safeb64:attribute:igovt:IVS:Assertion:Identity" NameFormat="urn:oasis:name:tc:SAML:2.0:attrname-format:uri"><saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI_PjxuczE6UGFydHkgeG1sbnM6bnMxPSJ1cm46b2FzaXM6bmFtZXM6dGM6Y2lxOnhwaWw6MyIgeG1sbnM6bnMyPSJ1cm46b2FzaXM6bmFtZXM6dGM6Y2lxOmN0OjMiIHhtbG5zOm5zMz0idXJuOm9hc2lzOm5hbWVzOnRjOmNpcTp4bmw6MyIgeG1sbnM6bnM0PSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpuczU9InVybjpvYXNpczpuYW1lczp0YzpjaXE6eGFsOjMiPjxuczE6UGFydHlOYW1lPjxuczM6UGVyc29uTmFtZSBuczI6RGF0YVF1YWxpdHlUeXBlPSJWYWxpZCI-PG5zMzpOYW1lRWxlbWVudCBuczM6RWxlbWVudFR5cGU9IkZpcnN0TmFtZSI-SWduYXRpdXM8L25zMzpOYW1lRWxlbWVudD48bnMzOk5hbWVFbGVtZW50IG5zMzpFbGVtZW50VHlwZT0iTWlkZGxlTmFtZSI-UXVhbnRpZmljbzwvbnMzOk5hbWVFbGVtZW50PjxuczM6TmFtZUVsZW1lbnQgbnMzOkVsZW1lbnRUeXBlPSJMYXN0TmFtZSI-V2FsbGFwaG9jdGVyPC9uczM6TmFtZUVsZW1lbnQ-PC9uczM6UGVyc29uTmFtZT48L25zMTpQYXJ0eU5hbWU-PG5zMTpQZXJzb25JbmZvIG5zMTpHZW5kZXI9Ik0iLz48bnMxOkJpcnRoSW5mbyBuczI6RGF0YVF1YWxpdHlUeXBlPSJWYWxpZCI-PG5zMTpCaXJ0aEluZm9FbGVtZW50IG5zMTpUeXBlPSJCaXJ0aFllYXIiPjE5ODg8L25zMTpCaXJ0aEluZm9FbGVtZW50PjxuczE6QmlydGhJbmZvRWxlbWVudCBuczE6VHlwZT0iQmlydGhNb250aCI-MDc8L25zMTpCaXJ0aEluZm9FbGVtZW50PjxuczE6QmlydGhJbmZvRWxlbWVudCBuczE6VHlwZT0iQmlydGhEYXkiPjA2PC9uczE6QmlydGhJbmZvRWxlbWVudD48bnMxOkJpcnRoUGxhY2VEZXRhaWxzIG5zMjpEYXRhUXVhbGl0eVR5cGU9IlZhbGlkIj48bnM1OkNvdW50cnk-PG5zNTpOYW1lRWxlbWVudCBuczU6TmFtZVR5cGU9Ik5hbWUiPk5ldyBaZWFsYW5kPC9uczU6TmFtZUVsZW1lbnQ-PC9uczU6Q291bnRyeT48bnM1OkxvY2FsaXR5PjxuczU6TmFtZUVsZW1lbnQgbnM1Ok5hbWVUeXBlPSJOYW1lIj5QYWhpYXR1YTwvbnM1Ok5hbWVFbGVtZW50PjwvbnM1OkxvY2FsaXR5PjwvbnMxOkJpcnRoUGxhY2VEZXRhaWxzPjwvbnMxOkJpcnRoSW5mbz48L25zMTpQYXJ0eT4=</saml:AttributeValue></saml:Attribute><saml:Attribute Name="urn:nzl:govt:ict:stds:authn:attribute:igovt:IVS:FIT" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified"><saml:AttributeValue><saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" NameQualifier="https://identity.dev.i.govt.nz:443/ivs/ivs-idp">GIGANAIRE</saml:NameID></saml:AttributeValue></saml:Attribute><saml:Attribute Name="urn:nzl:govt:ict:stds:authn:safeb64:attribute:NZPost:AVS:Assertion:Address" NameFormat="urn:oasis:name:tc:SAML:2.0:attrname-format:uri"><saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI_PjxwOlBhcnR5IHhtbG5zOnA9InVybjpvYXNpczpuYW1lczp0YzpjaXE6eHBpbDozIiB4bWxuczphPSJ1cm46b2FzaXM6bmFtZXM6dGM6Y2lxOnhhbDozIj48YTpBZGRyZXNzZXM-PGE6QWRkcmVzcyBUeXBlPSJOWlN0YW5kYXJkIiBVc2FnZT0iUmVzaWRlbnRpYWwiIERhdGFRdWFsaXR5VHlwZT0iVmFsaWQiIFZhbGlkRnJvbT0iMTMvMTEvMjAxMiIgeG1sbnM6YT0idXJuOm9hc2lzOm5hbWVzOnRjOmNpcTp4YWw6MyIgPjxhOkxvY2FsaXR5PjxhOk5hbWVFbGVtZW50IE5hbWVUeXBlPSJOWlRvd25DaXR5Ij5IdXR0IENpdHk8L2E6TmFtZUVsZW1lbnQ-PGE6TmFtZUVsZW1lbnQgTmFtZVR5cGU9Ik5aU3VidXJiIj5QZXRvbmU8L2E6TmFtZUVsZW1lbnQ-PC9hOkxvY2FsaXR5PjxhOlRob3JvdWdoZmFyZT48YTpOYW1lRWxlbWVudCBOYW1lVHlwZT0iTlpOdW1iZXJTdHJlZXQiPlF1ZWVuIFN0cmVldDwvYTpOYW1lRWxlbWVudD48L2E6VGhvcm91Z2hmYXJlPjxhOlByZW1pc2VzPjxhOk5hbWVFbGVtZW50IE5hbWVUeXBlPSJOWlVuaXQiPjIwODwvYTpOYW1lRWxlbWVudD48L2E6UHJlbWlzZXM-PGE6UG9zdENvZGU-PGE6SWRlbnRpZmllciBUeXBlPSJOWlBvc3RDb2RlIj4xMjM0PC9hOklkZW50aWZpZXI-PC9hOlBvc3RDb2RlPjwvYTpBZGRyZXNzPjwvYTpBZGRyZXNzZXM-PC9wOlBhcnR5Pg==</saml:AttributeValue></saml:Attribute><saml:Attribute Name="urn:nzl:govt:ict:stds:authn:safeb64:attribute:opaque_token" NameFormat="urn:oasis:name:tc:SAML:2.0:attrname-format:uri"><saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">PGZha2VUb2tlbj5pZGVudGl0eS0xPC9mYWtlVG9rZW4+Cg==</saml:AttributeValue></saml:Attribute></saml:AttributeStatement></saml:Assertion></samlp:Response></samlp:ArtifactResponse></soap-env:Body></soap-env:Envelope>

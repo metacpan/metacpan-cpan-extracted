@@ -90,14 +90,14 @@ foreach my $plugin ('Dist::Zilla::Plugin::MakeMaker::Fallback', 'Dist::Zilla::Pl
     )
 }
 
-my @plugin_classes = map { find_meta($_)->name } @{$tzil->plugins};
+my @plugin_classes = map find_meta($_)->name, @{$tzil->plugins};
 is(
-    scalar(grep { $_ eq 'Dist::Zilla::Plugin::UploadToCPAN' } @plugin_classes),
+    scalar(grep $_ eq 'Dist::Zilla::Plugin::UploadToCPAN', @plugin_classes),
     1,
     'UploadToCPAN is in the plugin list',
 );
 is(
-    scalar(grep { $_ eq 'Dist::Zilla::Plugin::FakeRelease' } @plugin_classes),
+    scalar(grep $_ eq 'Dist::Zilla::Plugin::FakeRelease', @plugin_classes),
     0,
     'FakeRelease is not in the plugin list',
 );
@@ -151,7 +151,7 @@ cmp_deeply(
 );
 
 is(
-    (grep { /someone tried to munge .* after we read from it. Making modifications again.../ } @{ $tzil->log_messages }),
+    (grep /someone tried to munge .* after we read from it. Making modifications again.../, @{ $tzil->log_messages }),
     0,
     'no files were re-munged needlessly',
 );
@@ -178,7 +178,7 @@ is(
             },
             x_Dist_Zilla => superhashof({
                 plugins => supersetof(
-                    ( map {
+                    ( map
                         +{
                             class => 'Dist::Zilla::Plugin::' . $_,
                             # TestRunner added default_jobs and started adding to dump_config in 5.014
@@ -189,8 +189,8 @@ is(
                                 : ()),
                             name => '@Author::ETHER/' . $_,
                             version => "Dist::Zilla::Plugin::$_"->VERSION,
-                        }
-                    } qw(MakeMaker::Fallback ModuleBuildTiny::Fallback RunExtraTests) ),
+                        },
+                        qw(MakeMaker::Fallback ModuleBuildTiny::Fallback RunExtraTests) ),
                     subhashof({
                         class => 'Dist::Zilla::Plugin::Run::AfterRelease',
                         # this may or may not be included, depending on the plugin version
@@ -270,7 +270,7 @@ cmp_deeply(
 );
 
 subtest "a -remove'd plugin should not be loaded" => sub {
-    foreach my $plugin (map { Dist::Zilla::Util->expand_config_package_name($_) } @REMOVED_PLUGINS) {
+    foreach my $plugin (map Dist::Zilla::Util->expand_config_package_name($_), @REMOVED_PLUGINS) {
         is(
             $INC{ module_notional_filename($plugin) },
             undef,

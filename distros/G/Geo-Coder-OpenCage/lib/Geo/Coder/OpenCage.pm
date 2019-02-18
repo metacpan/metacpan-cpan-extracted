@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.19';
+$Geo::Coder::OpenCage::VERSION = '0.20';
 use strict;
 use warnings;
 
@@ -8,7 +8,7 @@ use Carp;
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use HTTP::Tiny;
-use Cpanel::JSON::XS;
+use JSON::MaybeXS;
 use URI;
 
 sub new {
@@ -22,7 +22,7 @@ sub new {
     my $self = {
         api_key => $params{api_key},
         ua      => HTTP::Tiny->new(agent => "Geo::Coder::OpenCage"),
-        json    => Cpanel::JSON::XS->new()->utf8(1),
+        json    => JSON::MaybeXS->new( utf8 => 1 ),
         url     => URI->new('https://api.opencagedata.com/geocode/v1/json/'),
     };
     return bless $self, $class;
@@ -124,7 +124,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

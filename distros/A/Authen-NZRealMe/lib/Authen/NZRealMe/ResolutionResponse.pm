@@ -1,16 +1,16 @@
 package Authen::NZRealMe::ResolutionResponse;
-{
-  $Authen::NZRealMe::ResolutionResponse::VERSION = '1.16';
-}
-
+$Authen::NZRealMe::ResolutionResponse::VERSION = '1.18';
 use warnings;
 use strict;
+use Carp      qw(croak);
 
-my $urn_success   = 'urn:oasis:names:tc:SAML:2.0:status:Success';
-my $urn_cancel    = 'urn:oasis:names:tc:SAML:2.0:status:AuthnFailed';
-my $urn_timeout_1 = 'urn:nzl:govt:ict:stds:authn:deployment:GLS:SAML:2.0:status:Timeout';
-my $urn_timeout_2 = 'urn:nzl:govt:ict:stds:authn:deployment:RealMe:SAML:2.0:status:Timeout';
-my $urn_not_reg   = 'urn:oasis:names:tc:SAML:2.0:status:UnknownPrincipal';
+use Authen::NZRealMe::CommonURIs qw(URI);
+
+
+my $urn_success = URI('saml_success');
+my $urn_cancel  = URI('saml_auth_fail');
+my $urn_timeout = URI('rm_timeout');
+my $urn_not_reg = URI('saml_unkpncpl');
 
 
 sub new {
@@ -28,8 +28,7 @@ sub status_urn        { return shift->{status_urn};               }
 sub status_message    { return shift->{status_message} || '';     }
 sub is_success        { return shift->status_urn eq $urn_success; }
 sub is_error          { return shift->status_urn ne $urn_success; }
-sub is_timeout        { return $_[0]->status_urn eq $urn_timeout_1
-                            || $_[0]->status_urn eq $urn_timeout_2; }
+sub is_timeout        { return shift->status_urn eq $urn_timeout; }
 sub is_cancel         { return shift->status_urn eq $urn_cancel;  }
 sub is_not_registered { return shift->status_urn eq $urn_not_reg; }
 sub flt               { return shift->{flt};                      }
@@ -52,7 +51,7 @@ sub address_rural_delivery { return shift->{address_postcode};    }
 
 sub set_status_urn {
     my $self = shift;
-    $self->{status_urn} = shift or die "No value provided to set_status_urn";
+    $self->{status_urn} = shift or croak "No value provided to set_status_urn";
 }
 
 sub set_status_message {
@@ -68,13 +67,13 @@ sub set_logon_strength {
 
 sub set_flt {
     my $self = shift;
-    $self->{flt} = shift or die "No value provided to set_flt";
+    $self->{flt} = shift or croak "No value provided to set_flt";
 }
 
 sub set_date_of_birth {
     my($self, $dob) = @_;
 
-    die "Invalid Date of Birth: '$dob'" unless $dob =~ /\A\d\d\d\d-\d\d-\d\d\z/;
+    croak "Invalid Date of Birth: '$dob'" unless $dob =~ /\A\d\d\d\d-\d\d-\d\d\z/;
     $self->{date_of_birth} = $dob;
 }
 
@@ -403,7 +402,7 @@ See L<Authen::NZRealMe> for documentation index.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2014 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2010-2019 Enrolment Services, New Zealand Electoral Commission
 
 Written by Grant McLean E<lt>grant@catalyst.net.nzE<gt>
 

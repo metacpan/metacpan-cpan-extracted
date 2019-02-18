@@ -4,6 +4,7 @@ use SReview::Config;
 
 use strict;
 use warnings;
+use feature 'state';
 
 sub get_default_cfile {
 	my $dir = $ENV{SREVIEW_WDIR};
@@ -22,13 +23,16 @@ sub setup {
 	if(!defined($cfile)) {
 		$cfile = get_default_cfile();
 	}
-	my $config = SReview::Config->new($cfile);
+	state $config;
 
+	return $config if(defined $config);
+
+	$config = SReview::Config->new($cfile);
 	# common values
 	$config->define('dbistring', 'The DBI connection string used to connect to the database', 'dbi:Pg:dbname=sreview');
 
 	# Values for sreview-web
-	$config->define('event', 'The default event to handle in the webinterface. Ignored by all other parts of sreview.');
+	$config->define('event', 'The event to handle by this instance of SReview.');
 	$config->define('secret', 'A random secret key, used to encrypt the cookies.', '_INSECURE_DEFAULT_REPLACE_ME_');
 	$config->define("vid_prefix", "The URL prefix to be used for video data files", "");
 	$config->define("anonreviews", "Set to truthy if anonymous reviews should be allowed, or to falsy if not", 0);
@@ -50,7 +54,7 @@ sub setup {
 
 	# Values for detection script
 	$config->define('inputglob', 'A filename pattern (glob) that tells SReview where to find new files', '/srv/sreview/incoming/*/*/*');
-	$config->define('parse_re', 'A regular expression to parse a filename into year, month, day, hour, minute, second, and room', '.*\/(?<room>[^\/]+)\/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})\/(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})');
+	$config->define('parse_re', 'A regular expression to parse a filename into year, month, day, hour, minute, second, room, and stream', '.*\/(?<room>[^\/]+)(?<stream>(-[^\/-]+)?)\/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})\/(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})');
 	$config->define('url_re', 'If set, used with parse_re in an s///g command to produce an input URL', undef);
 
 	# Values for dispatch script
@@ -60,22 +64,32 @@ sub setup {
 		transcoding => 'sreview-transcode <%== $talkid %> > <%== $output_dir %>/trans.<%== $talkid %>.out 2> <%== $output_dir%>/trans.<%== $talkid %>.err',
 		uploading => 'sreview-skip <%== $talkid %>',
 		notification => 'sreview-skip <%== $talkid %>',
+		announcing => 'sreview-skip <%== $talkid %>',
 	});
 	$config->define('query_limit', 'A maximum number of jobs that should be submitted in a single loop in sreview-dispatch. 0 means no limit.', 1);
 
 	# Values for notification script
-	$config->define('notify_actions', 'An array of things to do when notifying. Can contain one or more of: email, command.', []);
-	$config->define('email_template', 'A filename of a Mojo::Template template to process, returning the email body. Required if notify_actions includes email.', undef);
-	$config->define('email_from', 'The data for the From: header in the email. Required if notify_actions includes email.', undef);
-	$config->define('email_subject', 'The data for the Subject: header in the email. Required if notify_actions includes email.', undef);
+	$config->define('notify_actions', 'An array of things to do when notifying the readyness of a preview video. Can contain one or more of: email, command.', []);
+	$config->define('announce_actions', 'An array of things to do when announcing the completion of a transcode. Can contain one or more of: email, command.', []);
+	$config->define('email_template', 'A filename of a Mojo::Template template to process, returning the email body used in notifications or announcements. Can be overridden by announce_email_template or notify_email_template.', undef);
+	$config->define('notify_email_template', 'A filename of a Mojo::Template template to process, returning the email body used in notifications. Required, but defaults to the value of email_template', undef);
+	$config->define('announce_email_template', 'A filename of a Mojo::Template template to process, returning the email body used in announcements. Required, but defaults to the value of email_template', undef);
+	$config->define('email_from', 'The data for the From: header in any email. Required if notify_actions or announce_actions includes email.', undef);
+	$config->define('notify_email_subject', 'The data for the Subject: header in the email. Required if notify_actions includes email.', undef);
+	$config->define('announce_email_subject', 'The data for the Subject: header in the email. Required if announc_actions includes email.', undef);
 	$config->define('urlbase', 'The URL on which SReview runs. Note that this is used by sreview-notify to generate URLs, not by sreview-web.', '');
-	$config->define('notify_commands', 'An array of commands to run. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $title %>', 'is', 'available', 'at', '<%== $url %>']]);
+	$config->define('notify_commands', 'An array of commands to run to perform notifications. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $title %>', 'is', 'available', 'at', '<%== $url %>']]);
+	$config->define('announce_commands', 'An array of commands to run to perform announcements. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $title %>', 'is', 'available', 'at', '<%== $url %>']]);
 
 	# Values for upload script
 	$config->define('upload_actions', 'An array of commands to run on each file to be uploaded. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $file %>', 'ready for upload']]);
+	$config->define('cleanup', 'Whether to remove files after they have been published. Possible values: "all" (removes all files), "previews" (removes the output of sreview-cut, but not that of sreview-transcode), and "output" (removes the output of sreview-transcode, but not the output of sreview-cut). Other values will not remove files', 'none');
 
 	# for sreview-keys
 	$config->define('authkeyfile', 'The authorized_keys file that sreview-keys should manage. If set to undef, the default authorized_keys file will be used.');
+
+	# for extending profiles
+	$config->define('extra_profiles', 'Any extra custom profiles you want to use. This hash should have two keys: the "parent" should be a name of a profile to subclass from, and the "settings" should contain a hash reference with attributes for the new profile to set', {});
 
 	return $config;
 }

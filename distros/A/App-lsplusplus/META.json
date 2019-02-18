@@ -44,13 +44,13 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/trapd00r/ls--/issues"
-      },
       "repository" : {
-         "url" : "https://github.com/trapd00r/ls--"
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/ls--.git",
+         "web" : "https://github.com/trapd00r/ls--",
+         "x_bugtracker" : "https://github.com/trapd00r/ls--/issues"
       }
    },
-   "version" : "0.52",
+   "version" : "0.56",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

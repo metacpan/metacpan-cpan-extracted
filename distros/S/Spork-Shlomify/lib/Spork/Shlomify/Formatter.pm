@@ -1,5 +1,5 @@
 package Spork::Shlomify::Formatter;
-$Spork::Shlomify::Formatter::VERSION = '0.0204';
+$Spork::Shlomify::Formatter::VERSION = '0.0400';
 use strict;
 use warnings;
 
@@ -23,11 +23,11 @@ Spork::Shlomif::Formatter - the formatting class for Spork::Shlomify
 
 =head1 VERSION
 
-version 0.0204
+version 0.0400
 
 =head1 VERSION
 
-version 0.0204
+version 0.0400
 
 =head1 AUTHOR
 
@@ -47,7 +47,7 @@ Shlomi Fish
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2019 by Shlomi Fish.
 
 This is free software, licensed under:
 

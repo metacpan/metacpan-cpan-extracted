@@ -24,7 +24,7 @@ my $tempdir = no_git_tempdir();
 
 my @network_plugins = Dist::Zilla::PluginBundle::Author::ETHER->_network_plugins;
 my %network_plugins;
-@network_plugins{ map { Dist::Zilla::Util->expand_config_package_name($_) } @network_plugins } = () x @network_plugins;
+@network_plugins{ map Dist::Zilla::Util->expand_config_package_name($_), @network_plugins } = () x @network_plugins;
 
 my @tests = (
     {
@@ -72,10 +72,10 @@ subtest $_->{test_name} => sub
         );
     };
 
-    my @plugin_classes = map { find_meta($_)->name } @{$tzil->plugins};
+    my @plugin_classes = map find_meta($_)->name, @{$tzil->plugins};
 
     cmp_deeply(
-        [ grep { exists $network_plugins{$_} } @plugin_classes ],
+        [ grep exists $network_plugins{$_}, @plugin_classes ],
         [],
         'no network-using plugins were actually added',
     );
@@ -96,8 +96,8 @@ subtest $_->{test_name} => sub
     );
 
     my $ok = cmp_deeply(
-        [ map { colorstrip($_) } @warnings ],
-        superbagof(map { re(qr/^\[\@Author::ETHER\] $_/) } @expected_log_messages),
+        [ map colorstrip($_), @warnings ],
+        superbagof(map re(qr/^\[\@Author::ETHER\] $_/), @expected_log_messages),
         'we warn when in airplane mode, and performing a fake release',
     ) or diag explain @warnings;
 
@@ -105,7 +105,7 @@ subtest $_->{test_name} => sub
     push @expected_log_messages,
         '.git is missing and META.json is present -- this looks like a CPAN download rather than a git repository. You should probably run perl Build.PL; ./Build instead of using dzil commands!';
 
-    @warnings = grep { my $warning = $_; not grep { $warning =~ /$_/ } @expected_log_messages } @warnings;
+    @warnings = grep { my $warning = $_; not grep $warning =~ /$_/, @expected_log_messages } @warnings;
     warn @warnings if @warnings and $ok;
 }
 foreach @tests;

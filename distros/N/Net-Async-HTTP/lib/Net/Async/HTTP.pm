@@ -10,7 +10,7 @@ use warnings;
 use 5.010;  # //
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 our $DEFAULT_UA = "Perl + " . __PACKAGE__ . "/$VERSION";
 our $DEFAULT_MAXREDIR = 3;

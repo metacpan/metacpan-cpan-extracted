@@ -1,27 +1,45 @@
 ---
 abstract: 'Make your attributes chainable.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
-  Test::More: '0'
-  Test::Simple: '0.94'
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MooX-ChainedAttributes
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooX::ChainedAttributes:
+    file: lib/MooX/ChainedAttributes.pm
+    version: '0.07'
+  MooX::ChainedAttributes::Role::GenerateAccessor:
+    file: lib/MooX/ChainedAttributes/Role/GenerateAccessor.pm
+    version: '0.07'
 requires:
   Moo: '1.004005'
-  strictures: '1.004004'
+  strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/MooX-ChainedAttributes/issues
   homepage: https://github.com/bluefeet/MooX-ChainedAttributes
-  repository: https://github.com/bluefeet/MooX-ChainedAttributes.git
-version: '0.06'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  repository: git://github.com/bluefeet/MooX-ChainedAttributes.git
+version: '0.07'
+x_contributors:
+  - 'Aran Deltac <aran@ziprecruiter.com>'
+  - 'Graham Knop <haarg@haarg.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

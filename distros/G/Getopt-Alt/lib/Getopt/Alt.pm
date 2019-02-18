@@ -28,7 +28,7 @@ Moose::Exporter->setup_import_methods(
     as_is => [qw/get_options/],
 );
 
-our $VERSION = version->new('0.5.0');
+our $VERSION = version->new('0.5.1');
 our $EXIT    = 1;
 
 has options => (
@@ -123,7 +123,7 @@ has conf_prefix => (
 );
 has conf_section => (
     is      => 'rw',
-    isa     => 'HashRef[Str]',
+    isa     => 'Str',
     predicate => 'has_conf_section',
 );
 
@@ -301,11 +301,11 @@ sub process {
                 unshift @args, '-' . $arg_data;
             }
             if ($self->has_conf_section
-                && $self->conf_section->{param}
-                && $self->conf_section->{param} == $opt_name
+                && $self->conf_section
+                && $self->conf_section == $opt_name
                 && @args_orig
             ) {
-                $self->opt( $class->new(%{ $self->default }, %{ $self->config->{$self->conf_section->{param}}{$value} } ) );
+                $self->opt( $class->new(%{ $self->default }, %{ $self->config->{$self->conf_section}{$value} } ) );
                 # restart the process
                 @args = @args_orig;
                 @args_orig = ();
@@ -556,7 +556,7 @@ Getopt::Alt - Command line option passing with with lots of features
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt version 0.5.0.
+This documentation refers to Getopt::Alt version 0.5.1.
 
 =head1 SYNOPSIS
 
@@ -861,7 +861,7 @@ file to get auto-completion.
     }
     complete -F _eg eg
 
-B<Note>: This is different from version 0.5.0 and earlier
+B<Note>: This is different from version 0.5.1 and earlier
 
 =head1 DIAGNOSTICS
 

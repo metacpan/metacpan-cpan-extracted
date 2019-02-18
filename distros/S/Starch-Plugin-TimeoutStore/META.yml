@@ -1,27 +1,43 @@
 ---
 abstract: 'Throw an exception if store access surpass a timeout.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  Test::Fatal: '0'
-  Test::Simple: '0.96'
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Starch-Plugin-TimeoutStore
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Starch::Plugin::TimeoutStore:
+    file: lib/Starch/Plugin/TimeoutStore.pm
+    version: '0.07'
 requires:
-  Moo: '2'
-  Starch: '0.06'
-  Sys::SigAction: '0.2'
+  Moo: '2.000000'
+  Starch: '0.10'
+  Sys::SigAction: '0.20'
   Type::Tiny: '1.000005'
   namespace::clean: '0.24'
-  strictures: '2'
+  strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/Starch-Plugin-TimeoutStore/issues
+  homepage: https://github.com/bluefeet/Starch-Plugin-TimeoutStore
   repository: git://github.com/bluefeet/Starch-Plugin-TimeoutStore.git
-version: '0.06'
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

@@ -3,30 +3,27 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile1(
-    META_MERGE => {
-        resources => {
-				repository => 'https://github.com/trapd00r/Daemon-Mplayer',
-        bugtracker => 'https://github.com/trapd00r/Daemon-Mplayer/issues',
-        },
-    },
-    #BUILD_REQUIRES => {
-    #},
-
-    NAME                => 'Daemon::Mplayer',
-    AUTHOR              => q{Magnus Woldrich <trapd00r@trapd00r.se>},
-    ABSTRACT           => 'Daemonize mplayer',
-    VERSION_FROM        => 'lib/Daemon/Mplayer.pm',
-    'LICENSE'           => 'perl',
-    PL_FILES            => {},
-    EXE_FILES =>           [
-    ],
-    PREREQ_PM => {
-      'Test::More'      => 0,
-    },
-    MAN1PODS            => {
+  META_MERGE => {
+      q(meta-spec) => { version => 2 },
+      resources => {
+          repository => {
+            type       => 'git',
+            url        => 'https://github.com/trapd00r/Daemon-Mplayer.git',
+            web        => 'https://github.com/trapd00r/Daemon-Mplayer',
+            bugtracker => 'https://github.com/trapd00r/Daemon-Mplayer/issues',
       },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Daemon-Mplayer-*' },
+    },
+  },
+
+  NAME                => 'Daemon::Mplayer',
+  AUTHOR              => q{Magnus Woldrich <m@japh.se>},
+  ABSTRACT            => 'Run mplayer as a daemonized process',
+  VERSION_FROM        => 'lib/Daemon/Mplayer.pm',
+  MIN_PERL_VERSION    => 5.010,
+  'LICENSE'           => 'perl',
+  PL_FILES            => {},
+  dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+  clean               => { FILES => 'Daemon-Mplayer-*' },
 );
 
 sub WriteMakefile1 {

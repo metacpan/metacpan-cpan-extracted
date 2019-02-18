@@ -6,17 +6,17 @@ use Config;
 
 my $perl = $Config{perlpath};
 
-my $output = `$perl ./bufrencode.pl --data t/307080.data --metadata t/metadata.txt_ed4 -t t/bt`;
+my $output = `$perl ./bufrencode.pl --data t/307080.data --metadata t/metadata.txt_ed4 --tablepath t/bt`;
 my $expected = read_binary_file('t/encoded_ed4') ;
 is($output, $expected, 'testing bufrencode.pl on 2 synop bufr edition 4');
 
-`$perl ./bufrencode.pl --data t/307080.data --metadata t/metadata.txt_ed3 --outfile t/outenc1 -t t/bt`;
+`$perl ./bufrencode.pl --data t/307080.data --metadata t/metadata.txt_ed3 --outfile t/outenc1 --tablepath t/bt`;
 $output = read_binary_file('t/outenc1');
 unlink 't/outenc1';
 $expected = read_binary_file('t/encoded_ed3') ;
 is($output, $expected, 'testing bufrencode.pl -o on 2 synop bufr edition 3');
 
-$output = `$perl ./bufrencode.pl --data t/substituted_data --metadata t/substituted_metadata -t t/bt`;
+$output = `$perl ./bufrencode.pl --data t/substituted_data --metadata t/substituted_metadata --tablepath t/bt`;
 $expected = read_binary_file('t/substituted.bufr') ;
 is($output, $expected, 'testing bufrencode.pl on message with unnumbered descriptors');
 

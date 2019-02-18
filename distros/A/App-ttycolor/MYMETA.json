@@ -44,13 +44,13 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/trapd00r/ttycolor/issues"
-      },
       "repository" : {
-         "url" : "https://github.com/trapd00r/ttycolor"
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/ttycolor.git",
+         "web" : "https://github.com/trapd00r/ttycolor",
+         "x_bugtracker" : "https://github.com/trapd00r/ttycolor/issues"
       }
    },
-   "version" : "0.15",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -2,11 +2,11 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Data::Serializer;
 
-BEGIN { use_ok('MooseX::Types::Data::Serializer') }
+use MooseX::Types::Data::Serializer;
 
 {
     package MyClass;
@@ -32,10 +32,10 @@ my $o = MyClass->new(
     mr => Data::Serializer::Raw->new( serializer=>'Storable' ),
 );
 
-isa_ok( $o->s(), 'Data::Serializer', '$o->s()' );
-isa_ok( $o->r(), 'Data::Serializer::Raw', '$o->r()' );
-isa_ok( $o->ms(), 'Data::Serializer', '$o->ms()' );
-isa_ok( $o->mr(), 'Data::Serializer::Raw', '$o->mr()' );
+isa_ok( $o->s(), ['Data::Serializer'], '$o->s()' );
+isa_ok( $o->r(), ['Data::Serializer::Raw'], '$o->r()' );
+isa_ok( $o->ms(), ['Data::Serializer'], '$o->ms()' );
+isa_ok( $o->mr(), ['Data::Serializer::Raw'], '$o->mr()' );
 
 ok( $o->is_s( $o->s() ), 'is_Serializer' );
 ok( $o->is_r( $o->r() ), 'is_RawSerializer' );

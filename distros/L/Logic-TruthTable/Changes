@@ -1,5 +1,22 @@
 Revision history for Boolean-TruthTable
 
+1.01
+     2019 February 18
+	- So many typos.
+	- For example, a space crept into the brace/bracket pair that
+	  creates the markdown link, or would have created it if it
+	  weren't for the space. This was in the README.md file.
+	  Logic Friday and its site vanished from the web sometime in
+	  February 2018 (fortunately the Wayback Machine preserved it,
+	  so I can keep linking to it and referring to it). Convert81.pm
+	  still had the Base81 name internally, and Util.pm was still
+	  linking to it under that name. And the copyright date was
+	  at 2017 instead of 2019.
+	- Complaints from CPAN testers that don't have
+	  Algorithm::QuineMcCluskey installed. Technically it's not
+	  required, but the tests won't run unless some sort of
+	  minimizer is installed, so we may as well add it to the
+	  requirements list.
 1.00
      2019 February 11
 	- First version, released on an unsuspecting world.

@@ -1,3 +1,15 @@
+v0.79.2 2019-02-18T11:03:19Z
+ - scm upstream fix for file upstream
+
+v0.79.1 2019-02-18T10:59:23Z
+ - scm upstream fix for file upstream
+
+v0.79.0 2019-02-18T10:34:12Z
+ - phonegap template
+ - undef scm phase for git
+ - .ignore templates updated
+ - cdn resource tag improved
+
 v0.78.13 2019-02-15T15:33:20Z
  - resources updated
 

@@ -17,9 +17,9 @@ To install this module type the following:
 This will install the module in the standard locations. You will most
 probably require root privileges to install in standard system
 directories. To install in a non-standard directory like /home/cpan,
-specify a prefix during the 'perl Makefile.PL' stage:
+specify the directory during the 'perl Makefile.PL' stage:
 
-   perl Makefile.PL PREFIX=/home/cpan
+   perl Makefile.PL INSTALL_BASE=/home/cpan
 
 After installing, in order for Perl to find the module when executing
 programs, you are adviced to modify the environment variable $PERL5LIB,
@@ -31,7 +31,7 @@ e.g.
 
 You will need a C compiler which supports variable length arrays. This
 is standard on Unix-like systems. On Windows I recommend using
-Strawberry Perl, in which case you should type 'dmake' instead of
+Strawberry Perl, in which case you should type 'gmake' instead of
 'make' when installing.
 
 DEPENDENCIES
@@ -39,7 +39,7 @@ DEPENDENCIES
 This module requires these other modules, all of which are expected to
 be part of a standard Perl distribution:
 
-Carp, Config, DynaLoader, FileHandle, File::Spec::Functions,
+Carp, Config, Cwd, DynaLoader, FileHandle, File::Spec::Functions,
 Getopt::Long, Pod::Usage, Scalar::Util, Storable, Test::More,
 Time::Local
 
@@ -53,8 +53,9 @@ and in BUFR flag and code tables. The core routines for encoding and
 decoding bitstreams are implemented in C.
 
 This module also installs some example programs: bufrread.pl,
-bufrresolve.pl, bufrencode.pl, bufr_reencode.pl and bufralter.pl. See
-https://wiki.met.no/bufr.pm/start for examples of use.
+bufrresolve.pl, bufrextract.pl, bufrencode.pl, bufr_reencode.pl and
+bufralter.pl. See https://wiki.met.no/bufr.pm/start for examples of
+use.
 
 
 COPYRIGHT AND LICENCE
@@ -62,5 +63,5 @@ COPYRIGHT AND LICENCE
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-Copyright (C) 2010 met.no
+Copyright (C) 2010-2019 MET Norway
 

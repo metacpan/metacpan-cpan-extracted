@@ -1,0 +1,77 @@
+{
+   "abstract" : "Clone of PHP's date and time functions.",
+   "author" : [
+      "Aran Clary Deltac <bluefeet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PHP-DateTime",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Time::DaysInMonth" : "99.1117",
+            "Time::HiRes" : "1.9721",
+            "Time::Local" : "1.2000",
+            "Time::Timezone" : "2006.0814"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000094"
+         }
+      }
+   },
+   "provides" : {
+      "PHP::DateTime" : {
+         "file" : "lib/PHP/DateTime.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/PHP-DateTime/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/PHP-DateTime",
+      "repository" : {
+         "url" : "git://github.com/bluefeet/PHP-DateTime.git",
+         "web" : "https://github.com/bluefeet/PHP-DateTime"
+      }
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
+}

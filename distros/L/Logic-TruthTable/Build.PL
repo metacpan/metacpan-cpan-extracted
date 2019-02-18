@@ -8,7 +8,7 @@ my $builder = Module::Build->new(
 
 	dist_author => q{John M. Gamble <jgamble@cpan.org>},
 	dist_abstract => q(Create a Boolean Truth Table),
-	dist_version => '1.00',
+	dist_version => '1.01',
 	release_status => 'stable',
 
 	provides => {
@@ -23,11 +23,16 @@ my $builder = Module::Build->new(
 		},
 	},
 
+	#
+	# It doesn't actually require Algorithm::QuineMcCluskey,
+	# but the tests won't run without it.
+	#
 	requires => {
 		perl => '5.16.1',
 		Moose => '2.16',
 		Carp => 0,
 		JSON => '2.61',
+		'Algorithm::QuineMcCluskey' => 1.00,
 		'Convert::Base81' => '1.00',
 		'Logic::Minimizer' => '1.00',
 		'Module::Runtime' => '0.014',

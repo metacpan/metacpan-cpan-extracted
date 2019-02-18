@@ -1,0 +1,50 @@
+NAME
+    Acme::CPANModules::ConvertingFromRegex - Convert a regular expression to
+    various stuffs
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::ConvertingFromRegex (from Perl distribution
+    Acme-CPANModules-ConvertingFromRegex), released on 2019-02-17.
+
+DESCRIPTION
+    Convert a regular expression to various stuffs.
+
+INCLUDED MODULES
+    *   PPIx::Regexp - To a PPI object
+
+    *   Regexp::Stringify - To Perl string representation
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-ConvertingFromRegex>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-ConvertingFromRegex>
+    .
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Conv
+    ertingFromRegex>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules::ConvertingToRegex
+
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

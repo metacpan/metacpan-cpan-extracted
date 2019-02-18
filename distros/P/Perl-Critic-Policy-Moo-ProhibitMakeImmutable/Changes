@@ -1,4 +1,9 @@
-Revision history for Perl extension Perl::Critic::Policy::Moo::ProhibitMakeImmutable.
+Revision history for Perl extension Perl-Critic-Policy-Moo-ProhibitMakeImmutable.
+
+0.04 2019-02-18T06:06:46Z
+
+ - Migrate all the tests from Test::More to Test2::V0.
+ - Migrate build tooling from Dist::Zilla to Minilla.
 
 0.03 2018-07-20
 

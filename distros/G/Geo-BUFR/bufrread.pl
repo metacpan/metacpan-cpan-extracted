@@ -1,6 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-# (C) Copyright 2010-2016 MET Norway
+# (C) Copyright 2010-2019 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,14 +20,21 @@
 # pod included at end of file
 
 use strict;
+use warnings;
 use Getopt::Long;
 use Pod::Usage qw(pod2usage);
 use Geo::BUFR;
 
+# This is actually default in BUFR.pm, but provided here to make it
+# easier for users to change to 'ECCODES' if preferred
+use constant DEFAULT_TABLE_FORMAT => 'BUFRDC';
+
 # Will be used if neither --tablepath nor $ENV{BUFR_TABLES} is set
-use constant DEFAULT_TABLE_PATH => '/usr/local/lib/bufrtables';
-# Ought to be your most up-to-date C table
-use constant DEFAULT_CTABLE => 'C0000000000000023000';
+use constant DEFAULT_TABLE_PATH_BUFRDC => '/usr/local/lib/bufrtables';
+use constant DEFAULT_TABLE_PATH_ECCODES => '/usr/local/share/eccodes/definitions/bufr/tables';
+# Ought to be your most up-to-date code table(s)
+use constant DEFAULT_CTABLE_BUFRDC => 'C0000000000000029000';
+use constant DEFAULT_CTABLE_ECCODES => '0/wmo/29';
 
 # Parse command line options
 my %option = ();
@@ -47,6 +54,7 @@ GetOptions(
            'outfile=s',    # Print to file instead of STDOUT
            'param=s',      # Decode parameters with descriptors in <descriptor file> only
            'strict_checking=i', # Enable/disable strict checking of BUFR format
+           'tableformat=s',  # Set BUFR table format
            'tablepath=s',  # Set BUFR table path
            'verbose=i',    # Set verbose level to n, 0<=n<=6 (default 0)
            'width=i',      # Set width of values field (default is 15 characters)
@@ -71,6 +79,10 @@ Geo::BUFR->set_strict_checking($option{strict_checking}) if defined $option{stri
 
 Geo::BUFR->set_show_all_operators($option{all_operators}) if defined $option{all_operators};
 
+# Set BUFR table format
+my $tableformat = (defined $option{tableformat}) ? uc $option{tableformat} : DEFAULT_TABLE_FORMAT;
+Geo::BUFR->set_tableformat($tableformat);
+
 # Set BUFR table path
 if ($option{tablepath}) {
     # Command line option --tablepath overrides all
@@ -79,8 +91,12 @@ if ($option{tablepath}) {
     # If no --tablepath option, use the BUFR_TABLES environment variable
     Geo::BUFR->set_tablepath($ENV{BUFR_TABLES});
 } else {
-    # If all else fails, use the libbufr bufrtables
-    Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH);
+    # If all else fails, use the default tablepath in BUFRDC/ECCODES
+    if ($tableformat eq 'BUFRDC') {
+        Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH_BUFRDC);
+    } elsif ($tableformat eq 'ECCODES')  {
+        Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH_ECCODES);
+    }
 }
 
 my $ahl_regexp;
@@ -160,7 +176,7 @@ sub decode {
         };
         if ($@) {
             $current_ahl = $bufr->get_current_ahl() || '';
-            next READLOOP if $option{ahl} && $current_ahl !~ $ahl_regexp; 
+            next READLOOP if $option{ahl} && $current_ahl !~ $ahl_regexp;
 
             warn $@;
             # Try to extract message number and ahl of the bulletin
@@ -184,7 +200,12 @@ sub decode {
             # this C table file does not exist, loads DEFAULT_CTABLE
             # instead.
             my $table_version = $bufr->get_table_version();
-            $bufr->load_Ctable("C$table_version", DEFAULT_CTABLE);
+            my $tableformat = Geo::BUFR->get_tableformat();
+            if ($tableformat eq 'BUFRDC') {
+                $bufr->load_Ctable("C$table_version", DEFAULT_CTABLE_BUFRDC);
+            } elsif ($tableformat eq 'ECCODES')  {
+                $bufr->load_Ctable("$table_version", DEFAULT_CTABLE_ECCODES);
+            }
         }
 
         my $current_subset_number = $bufr->get_current_subset_number();
@@ -458,6 +479,7 @@ sub filter_observation {
       [--outfile <filename>]
       [--param <descriptor file>]
       [--strict_checking n]
+      [--tableformat <BUFRDC|ECCODES>]
       [--tablepath <path to BUFR tables>]
       [--verbose n]
       [--width n]
@@ -500,6 +522,7 @@ examples of use.
                            BUFR format
                        n=2 Croak if (recoverable) error in BUFR format.
                            Nothing more in this message/subset will be decoded.
+   --tableformat   Currently supported are BUFRDC and ECCODES (default is BUFRDC)
    --tablepath <path to BUFR tables>
                    Set path to BUFR tables (overrides ENV{BUFR_TABLES})
    --verbose n     Set verbose level to n, 0<=n<=6 (default 0). n=1 will
@@ -512,7 +535,9 @@ Options may be abbreviated, e.g. C<--h> or C<-h> for C<--help>.
 To avoid having to use the C<--tablepath> option, you are adviced to
 set the environment variable BUFR_TABLES to the directory where your
 BUFR tables are located (unless the default path provided by
-bufrread.pl works for you).
+bufrread.pl works for you). For tableformat ECCODES, se
+L<http://search.cpan.org/dist/Geo-BUFR/lib/Geo/BUFR.pm#BUFR-TABLE-FILES>
+for more info on how to set C<--tablepath> (or BUFR_TABLES).
 
 For option C<--ahl> the <ahl_regexp> should be a Perl regular
 expression. E.g. C<--ahl "ISS... ENMI"> will decode only BUFR SHIP
@@ -571,6 +596,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2016 MET Norway
+Copyright (C) 2010-2019 MET Norway
 
 =cut

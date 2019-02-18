@@ -11,7 +11,7 @@ my $cmnd = "$perl ./bufralter.pl t/1xBUFRSYNOP-ed4.bufr"
     . " --subcentre 9 --update_number -1 --category 9 --subcategory 8"
     . " --master_table_version=11 --local_table_version 0 --year 9"
     . " --month 8 --day 7 --hour 6 --minute 5"
-    . " --outfile t/outalt1 -t t/bt";
+    . " --outfile t/outalt1 --tablepath t/bt";
 
 `$cmnd`;
 my $output = read_binary_file('t/outalt1');
@@ -24,7 +24,7 @@ $cmnd = "$perl ./bufralter.pl t/3xBUFRSYNOP-com.bufr"
     . " --subcentre 9 --update_number 99 --category 9 --subcategory 8"
     . " --master_table_version=11 --local_table_version 0 --year 9"
     . " --month 8 --day 7 --hour 6 --minute 5 --observed 0 --compress 0"
-    . " --outfile t/outalt2 -t t/bt";
+    . " --outfile t/outalt2 --tablepath t/bt";
 `$cmnd`;
 $output = read_binary_file('t/outalt2');
 unlink 't/outalt2';

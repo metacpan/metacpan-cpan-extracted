@@ -1,5 +1,5 @@
 package Task::QuadPres;
-$Task::QuadPres::VERSION = '0.0.1';
+$Task::QuadPres::VERSION = '0.0.2';
 use strict;
 use warnings;
 
@@ -15,7 +15,7 @@ Task::QuadPres - install the CPAN dependencies of Quad-Pres.
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 DESCRIPTION
 
@@ -45,9 +45,9 @@ L<http://www.shlomifish.org/quad-pres/>
 
 =head3 L<HTML::Links::Localize>
 
-=head3 L<HTML::Lint>
-
 =head3 L<HTML::Widgets::NavMenu::EscapeHtml>
+
+=head3 L<HTML::T5>
 
 =head3 L<IO::All>
 
@@ -65,7 +65,7 @@ L<http://www.shlomifish.org/quad-pres/>
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 AUTHOR
 

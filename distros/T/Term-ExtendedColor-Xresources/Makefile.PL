@@ -3,35 +3,38 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile1(
-    META_MERGE => {
-        resources => {
-            repository => q{https://github.com/trapd00r/Term-ExtendedColor-Xresources},
-            bugtracker => q{https://github.com/trapd00r/Term-ExtendedColor-Xresources/issues},
-        },
+  META_MERGE => {
+    q(meta-spec) => { version => 2 },
+    resources => {
+      repository => {
+        type       => 'git',
+        url        => 'https://github.com/trapd00r/Term-ExtendedColor-Xresources.git',
+        web        => 'https://github.com/trapd00r/Term-ExtendedColor-Xresources',
+        bugtracker => 'https://github.com/trapd00r/Term-ExtendedColor-Xresources/issues',
+      },
     },
-    #BUILD_REQUIRES => {
-    #},
+  },
 
-    NAME              => q{Term::ExtendedColor::Xresources},
-    AUTHOR            => q{Magnus Woldrich <m@japh.se>},
-    ABSTRACT          => q{Get, set and modify X resources},
-    VERSION_FROM      => q{./lib/Term/ExtendedColor/Xresources.pm},
-    LICENSE           => q{perl},
-    MIN_PERL_VERSION  => 5.0060,
-    EXE_FILES         => [
-    glob('bin/*'),
-    ],
-    PREREQ_PM => {
-      q{Term::ReadKey}       => 0,
-      q{Test::More}          => 0,
-    },
-    MAN1PODS            => {
-      q{./bin/set_single_color} => q{blib/man1/set_single_color.1},
-    },
+  NAME              => q{Term::ExtendedColor::Xresources},
+  AUTHOR            => q{Magnus Woldrich <m@japh.se>},
+  ABSTRACT          => q{Get, set and modify X resources},
+  VERSION_FROM      => q{./lib/Term/ExtendedColor/Xresources.pm},
+  LICENSE           => q{perl},
+  MIN_PERL_VERSION  => 5.0060,
+  EXE_FILES         => [
+  glob('bin/*'),
+  ],
+  PREREQ_PM => {
+    q{Term::ReadKey}       => 0,
+    q{Test::More}          => 0,
+  },
+  MAN1PODS            => {
+    q{./bin/set_single_color} => q{blib/man1/set_single_color.1},
+  },
 
-    MAN3PODS            => { },
-    dist                => { COMPRESS => q{gzip -9f}, SUFFIX => q{gz}, },
-    clean               => { FILES    => q{Term-ExtendedColor-Xresources-*} },
+  MAN3PODS            => { },
+  dist                => { COMPRESS => q{gzip -9f}, SUFFIX => q{gz}, },
+  clean               => { FILES    => q{Term-ExtendedColor-Xresources-*} },
 );
 
 sub WriteMakefile1 {
@@ -65,5 +68,3 @@ sub WriteMakefile1 {
 
     WriteMakefile(%params);
 }
-
-

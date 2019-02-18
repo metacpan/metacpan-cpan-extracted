@@ -1,5 +1,7 @@
 package Catalyst::Plugin::Starch::Cookie;
-$Catalyst::Plugin::Starch::Cookie::VERSION = '0.03';
+
+$Catalyst::Plugin::Starch::Cookie::VERSION = '0.04';
+
 =head1 NAME
 
 Catalyst::Plugin::Starch::Cookie - Track starch state in a cookie.
@@ -41,7 +43,7 @@ supported at this time:
 
 =item *
 
-The C<make_session_cookie>, C<update_session_cookie>, C<calc_expiry>,
+The C<make_session_cookie>, C<calc_expiry>,
 C<calculate_session_cookie_expires>, C<cookie_is_rejecting>,
 C<delete_session_id>, C<extend_session_id>,
 C<get_session_id>, and C<set_session_id> methods are not currently
@@ -59,7 +61,7 @@ if called.
 #    get_session_id set_session_id
 
 foreach my $method (qw(
-    make_session_cookie update_session_cookie calc_expiry
+    make_session_cookie calc_expiry
     calculate_session_cookie_expires cookie_is_rejecting
 )) {
     fresh $method => sub{
@@ -85,6 +87,21 @@ sub get_session_cookie {
     return $cookie;
 }
 
+=head2 update_session_cookie
+
+This is called automatically by the C<finalize_headers> step in Catalyst.  This method
+is provided if you want to override the behavior.
+
+=cut
+
+sub update_session_cookie {
+    my ($c) = @_;
+    return if !$c->_has_sessionid();
+    my $cookie_name = $c->starch->cookie_name();
+    $c->res->cookies->{ $cookie_name } = $c->starch_state->cookie_args();
+    return;
+}
+
 after prepare_cookies => sub{
     my ($c) = @_;
 
@@ -100,9 +117,7 @@ after prepare_cookies => sub{
 
 before finalize_headers => sub{
     my ($c) = @_;
-    return if !$c->_has_sessionid();
-    my $cookie_name = $c->starch->cookie_name();
-    $c->res->cookies->{ $cookie_name } = $c->starch_state->cookie_args();
+    $c->update_session_cookie();
     return;
 };
 

@@ -1,26 +1,49 @@
 ---
 abstract: 'Save the original constructor arguments for later use.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
   Test2::V0: '0.000094'
-  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MooseX-BuildArgs
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooseX::BuildArgs:
+    file: lib/MooseX/BuildArgs.pm
+    version: '0.07'
+  MooseX::BuildArgs::Meta::Object:
+    file: lib/MooseX/BuildArgs/Meta/Object.pm
+    version: '0.07'
+  MooseX::BuildArgs::Meta::ToClass:
+    file: lib/MooseX/BuildArgs/Meta/ToClass.pm
+    version: '0.07'
+  MooseX::BuildArgs::Meta::ToRole:
+    file: lib/MooseX/BuildArgs/Meta/ToRole.pm
+    version: '0.07'
 requires:
   Moose: '1.23'
 resources:
   bugtracker: https://github.com/bluefeet/MooseX-BuildArgs/issues
   homepage: https://github.com/bluefeet/MooseX-BuildArgs
-  repository: https://github.com/bluefeet/MooseX-BuildArgs.git
-version: '0.06'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  repository: git://github.com/bluefeet/MooseX-BuildArgs.git
+version: '0.07'
+x_contributors:
+  - 'Aran Deltac <aran@ziprecruiter.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

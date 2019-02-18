@@ -1,22 +1,47 @@
 ---
 abstract: 'Save constructor arguments that were not consumed.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  Test::Simple: 0.94
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MooseX-ExtraArgs
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooseX::ExtraArgs:
+    file: lib/MooseX/ExtraArgs.pm
+    version: '0.02'
+  MooseX::ExtraArgs::Meta::Object:
+    file: lib/MooseX/ExtraArgs/Meta/Object.pm
+    version: '0.02'
+  MooseX::ExtraArgs::Meta::ToClass:
+    file: lib/MooseX/ExtraArgs/Meta/ToClass.pm
+    version: '0.02'
+  MooseX::ExtraArgs::Meta::ToRole:
+    file: lib/MooseX/ExtraArgs/Meta/ToRole.pm
+    version: '0.02'
 requires:
-  Moose: 1.23
+  Moose: '1.23'
 resources:
   bugtracker: https://github.com/bluefeet/MooseX-ExtraArgs/issues
   homepage: https://github.com/bluefeet/MooseX-ExtraArgs
-  repository: https://github.com/bluefeet/MooseX-ExtraArgs.git
-version: 0.01
+  repository: git://github.com/bluefeet/MooseX-ExtraArgs.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

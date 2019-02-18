@@ -1,5 +1,7 @@
 package MooX::PluginKit;
-$MooX::PluginKit::VERSION = '0.03';
+
+$MooX::PluginKit::VERSION = '0.04';
+
 # I don't do anything.
 
 1;

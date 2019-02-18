@@ -1,4 +1,7 @@
 Revision history for perl module Text::FixedWidth::Parser
+0.6 
+	* Added missing dependency module
+
 0.5 
 	* Fixing test cases
 

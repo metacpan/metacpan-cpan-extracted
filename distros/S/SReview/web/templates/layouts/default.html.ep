@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
     <script src="/jquery/jquery.min.js"></script>
     <script src="/bootstrap/js/bootstrap.min.js"></script>
+    % if (my $sheets = stash 'stylesheets') {
+    %   foreach my $stylesheet(@$sheets) {
+    %= stylesheet $stylesheet
+    %   }
+    % }
     % if (my $extra = stash 'scripts_extra') {
     %    foreach my $script(@$extra) {
     <script src='<%== $script %>'></script>
@@ -21,7 +26,7 @@
   </head>
   <body>
   <div class="container"><%= content %>
-  <p>SReview <%= $c->version %>. Code is <a href='https://github.com/yoe/sreview'>available</a> under the <a href='http://www.gnu.org/licenses/agpl-3.0.html'>GNU AGPLv3</a>. Patches welcome :-)</p>
+  <p id="version">SReview <%= $c->version %>. Code is <a href='https://github.com/yoe/sreview'>available</a> under the <a href='http://www.gnu.org/licenses/agpl-3.0.html'>GNU AGPLv3</a>. Patches welcome :-)</p>
   </div>
   </body>
 </html>

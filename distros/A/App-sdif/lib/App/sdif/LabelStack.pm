@@ -1,8 +1,11 @@
 package App::sdif::LabelStack;
 
+use v5.14;
 use strict;
 use warnings;
 use Carp;
+
+use Data::Dumper;
 
 sub new {
     my $class = shift;
@@ -14,9 +17,7 @@ sub new {
 	ATTR   => {},
     }, $class;
 
-    if (@_) {
-	$obj->option(@_);
-    }
+    $obj->option(@_) if @_;
 
     if (my $initial_label = $obj->option('START')) {
 	$obj->newlabel($initial_label);
@@ -56,11 +57,26 @@ sub count {
 sub newlabel {
     my $obj = shift;
     my $label = shift;
-    if ($obj->{COUNTS}->{$label}++ and $obj->option('UNIQUE')) {
+    if (my $order = $obj->option('ORDER')) {
+	for my $l (@$order) {
+	    last if $l eq $label;
+	    $obj->exists($l) or $obj->_createlabel($l);
+	}
+    }
+    $obj->_createlabel($label);
+    $obj;
+}
+
+sub _createlabel {
+    my $obj = shift;
+    my $label = shift;
+    if ($obj->option('UNIQUE') and $obj->{COUNTS}->{$label}) {
 	croak "Duplicated label: $label\n";
     }
+    $obj->{COUNTS}->{$label}++;
     push @{$obj->{LABELS}}, $label;
     push @{$obj->{LISTS}}, [];
+    $obj;
 }
 
 sub append {
@@ -116,18 +132,28 @@ sub blockpair {
 
 sub match {
     my $obj = shift;
-    my $label = shift;
-    my $pattern = ref $label eq 'Regexp' ? $label : qr/^\Q$label\E$/;
+    my $cond = shift;
     my @labels = $obj->labels;
-
-    map  { $obj->{LISTS}[$_] }
-    grep { $labels[$_] =~ /$pattern/ }
-    0 .. $#labels;
+    my @index = do {
+	if (ref($cond) eq 'CODE') {
+	    grep {
+		local $_ = $labels[$_];
+		$cond->();
+	    }
+	    0 .. $#labels;
+	} elsif (ref $cond eq 'Regexp') {
+	    grep { $labels[$_] =~ $cond } 0 .. $#labels;
+	} else {
+	    grep { $labels[$_] eq $cond } 0 .. $#labels;
+	}
+    };
+    @{$obj->{LISTS}}[ @index ];
 }
 
 sub collect {
     my $obj = shift;
-    map { @$_ } $obj->match(@_);
+    my @list = map { @$_ } $obj->match(@_);
+    wantarray ? @list : join '', @list;
 }
 
 sub push {

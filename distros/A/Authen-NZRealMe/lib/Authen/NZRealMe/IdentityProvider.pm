@@ -1,8 +1,5 @@
 package Authen::NZRealMe::IdentityProvider;
-{
-  $Authen::NZRealMe::IdentityProvider::VERSION = '1.16';
-}
-
+$Authen::NZRealMe::IdentityProvider::VERSION = '1.18';
 use strict;
 use warnings;
 
@@ -12,14 +9,15 @@ require XML::LibXML::XPathContext;
 use MIME::Base64 qw(encode_base64);
 use Digest::SHA  qw(sha1_base64);
 
+use Authen::NZRealMe::CommonURIs qw(URI NS_PAIR);
+
 
 my %metadata_cache;
 
 
-my $ns_md = [ md => 'urn:oasis:names:tc:SAML:2.0:metadata' ];
-my $ns_ds = [ ds => 'http://www.w3.org/2000/09/xmldsig#'   ];
+my $ns_ds         = [ NS_PAIR('ds') ];
 
-my $soap_binding = 'urn:oasis:names:tc:SAML:2.0:bindings:SOAP';
+my $soap_binding  = URI('saml_b_soap');
 
 
 sub new {
@@ -63,8 +61,9 @@ sub artifact_resolution_location {
 sub verify_signature {
     my($self, $xml) = @_;
 
+    my $verifier;
     eval {
-        my $verifier = Authen::NZRealMe->class_for('xml_signer')->new(
+        $verifier = Authen::NZRealMe->class_for('xml_signer')->new(
             pub_cert_text => $self->signing_cert_pem_data(),
         );
         $verifier->verify($xml);
@@ -72,7 +71,7 @@ sub verify_signature {
     if($@) {
         die "Failed to verify signature on assertion from IdP:\n  $@\n$xml";
     }
-    return 1;
+    return $verifier;
 }
 
 
@@ -97,7 +96,7 @@ sub _read_metadata_from_file {
     my $doc    = $parser->parse_file( $metadata_file );
     my $xc     = XML::LibXML::XPathContext->new( $doc->documentElement() );
 
-    $xc->registerNs( @$ns_md );
+    $xc->registerNs( md => URI('samlmd') );
     $xc->registerNs( @$ns_ds );
 
     my %params;
@@ -240,7 +239,7 @@ See L<Authen::NZRealMe> for documentation index.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2014 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2010-2019 Enrolment Services, New Zealand Electoral Commission
 
 Written by Grant McLean E<lt>grant@catalyst.net.nzE<gt>
 

@@ -5,7 +5,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.064';
+  $VERSION = '0.068';
   @ISA     = qw(Exporter);
 
   @EXPORT_OK = qw(

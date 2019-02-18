@@ -5,7 +5,7 @@
 
 package Alien::libtermkey;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use POSIX qw( WEXITSTATUS );
 

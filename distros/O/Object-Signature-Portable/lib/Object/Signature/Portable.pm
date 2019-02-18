@@ -1,5 +1,7 @@
 package Object::Signature::Portable;
 
+# ABSTRACT: generate portable fingerprints of objects
+
 use v5.10;
 
 use strict;
@@ -10,33 +12,62 @@ use Crypt::Digest;
 use Exporter::Lite;
 use JSON::MaybeXS;
 
-use version 0.77; our $VERSION = version->declare('v0.1.6');
+our $VERSION = 'v0.2.0';
 
 our @EXPORT    = qw/ signature /;
 our @EXPORT_OK = @EXPORT;
+
+
+sub signature {
+    my %args;
+
+    if ( scalar(@_) <= 1 ) {
+        $args{data} = $_[0];
+    } else {
+        %args = @_;
+    }
+
+    $args{digest} //= 'MD5';
+
+    $args{format} //= 'hexdigest';
+    unless ( $args{format} =~ m/^(?:hex|b64u?)digest$/ ) {
+        croak sprintf( 'Invalid digest format: %s', $args{format} );
+    }
+
+    $args{serializer} //= sub {
+        return JSON->new->canonical(1)->allow_nonref(1)->utf8(1)->pretty(0)
+            ->indent(0)->space_before(0)->space_after(0)->allow_blessed(1)
+            ->convert_blessed(1)->encode( $_[0] );
+    };
+
+    my $digest = Crypt::Digest->new( $args{digest} );
+    $digest->add( &{ $args{serializer} }( $args{data} ) );
+
+    if ( my $method = $digest->can( $args{format} ) ) {
+        my $prefix = $args{prefix} ? ( $args{digest} . ':' ) : '';
+        return $prefix . $digest->$method;
+    } else {
+        croak sprintf( 'Unexpected error with digest format: %s',
+            $args{format} );
+    }
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Object::Signature::Portable - generate portable fingerprints of objects
 
-=begin readme
+=head1 VERSION
 
-=head1 REQUIREMENTS
-
-This module requires Perl v5.10 or newer, and the following non-core
-modules:
-
-=over
-
-=item L<Crypt::Digest>
-
-=item L<Exporter::Lite>
-
-=item L<JSON::MaybeXS>
-
-=back
-
-=end readme
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -158,42 +189,6 @@ However, see L</LIMITATIONS> below.
 
 =back
 
-=cut
-
-sub signature {
-    my %args;
-
-    if ( scalar(@_) <= 1 ) {
-        $args{data} = $_[0];
-    } else {
-        %args = @_;
-    }
-
-    $args{digest} //= 'MD5';
-
-    $args{format} //= 'hexdigest';
-    unless ( $args{format} =~ m/^(?:hex|b64u?)digest$/ ) {
-        croak sprintf( 'Invalid digest format: %s', $args{format} );
-    }
-
-    $args{serializer} //= sub {
-        return JSON->new->canonical(1)->allow_nonref(1)->utf8(1)->pretty(0)
-            ->indent(0)->space_before(0)->space_after(0)->allow_blessed(1)
-            ->convert_blessed(1)->encode( $_[0] );
-    };
-
-    my $digest = Crypt::Digest->new( $args{digest} );
-    $digest->add( &{ $args{serializer} }( $args{data} ) );
-
-    if ( my $method = $digest->can( $args{format} ) ) {
-        my $prefix = $args{prefix} ? ( $args{digest} . ':' ) : '';
-        return $prefix . $digest->$method;
-    } else {
-        croak sprintf( 'Unexpected error with digest format: %s',
-            $args{format} );
-    }
-}
-
 =head1 LIMITATIONS
 
 =head2 Signatures for Arbitrary Objects
@@ -298,59 +293,35 @@ signatures.
 
 =back
 
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/Object-Signature-Portable>
+and may be cloned from L<git://github.com/robrwo/Object-Signature-Portable.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/robrwo/Object-Signature-Portable/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
-Robert Rothenberg C<< <rrwo@cpan.org> >> (on behalf of Foxtons, Ltd.)
+Robert Rothenberg <rrwo@cpan.org>
 
 =head2 Acknowledgements
 
 Thanks to various people at YAPC::EU 2014 for suggestions about
 L<Sereal::Encoder>.
 
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2014 Robert Rothenberg.
+This software is Copyright (c) 2013-2014, 2019 by Robert Rothenberg.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+This is free software, licensed under:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
-
-=for readme stop
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=for readme continue
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-1;

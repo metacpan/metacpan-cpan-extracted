@@ -3,30 +3,26 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile1(
-    META_MERGE => {
-        resources => {
-				repository => 'https://github.com/trapd00r/Term-ExtendedColor-TTY',
+  META_MERGE => {
+    q(meta-spec) => { version => 2 },
+    resources => {
+      repository => {
+        type       => 'git',
+        url        => 'https://github.com/trapd00r/Term-ExtendedColor-TTY.git',
+        web        => 'https://github.com/trapd00r/Term-ExtendedColor-TTY',
         bugtracker => 'https://github.com/trapd00r/Term-ExtendedColor-TTY/issues',
-        },
-    },
-    #BUILD_REQUIRES => {
-    #},
-
-    NAME                => 'Term::ExtendedColor::TTY',
-    AUTHOR              => 'Magnus Woldrich <m@japh.se>',
-    ABSTRACT           =>  'Set colors in the Linux VC/TTY',
-    VERSION_FROM        => 'lib/Term/ExtendedColor/TTY.pm',
-    'LICENSE'           => 'perl',
-    PL_FILES            => {},
-    EXE_FILES =>           [
-    ],
-    PREREQ_PM => {
-      'Test::More'      => 0,
-    },
-    MAN1PODS            => {
       },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Term-ExtendedColor-TTY-*' },
+    },
+  },
+
+  NAME             => 'Term::ExtendedColor::TTY',
+  AUTHOR           => 'Magnus Woldrich <m@japh.se>',
+  ABSTRACT         => 'Set colors in the Linux VC/TTY',
+  VERSION_FROM     => 'lib/Term/ExtendedColor/TTY.pm',
+  MIN_PERL_VERSION => 5.010,
+  LICENSE          => 'perl',
+  dist             => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+  clean            => { FILES => 'Term-ExtendedColor-TTY-*' },
 );
 
 sub WriteMakefile1 {

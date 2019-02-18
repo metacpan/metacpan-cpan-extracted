@@ -99,19 +99,19 @@ my @bundle_plugins = qw(
 
 # individual member plugins of bundle should not have been added to runtime-requires
 all_plugins_in_prereqs($tzil,
-    exempt => [ map { Dist::Zilla::Util->expand_config_package_name($_) } @bundle_plugins ],
+    exempt => [ map Dist::Zilla::Util->expand_config_package_name($_), @bundle_plugins ],
     additional => [ 'Dist::Zilla::PluginBundle::Filter' ],
 );
 
 cmp_deeply(
     $tzil->plugins,
     superbagof(
-        map {
+        map
             methods(
                 [ isa => Dist::Zilla::Util->expand_config_package_name($_) ] => bool(1),
                 plugin_name => '@Author::ETHER/@Filter/' . $_,
-            )
-        } @bundle_plugins,
+            ),
+            @bundle_plugins,
     ),
     'plugins from @Basic were added to the distribution, with the proper moniker',
 );
@@ -131,7 +131,7 @@ cmp_deeply(
             $PREREQ_PHASE_DEFAULT=> superhashof({
                     $PREREQ_RELATIONSHIP_DEFAULT => all(
                     superhashof({ 'Dist::Zilla::PluginBundle::Filter' => '4.000' }),
-                    notexists(map { Dist::Zilla::Util->expand_config_package_name($_) } @bundle_plugins),
+                    notexists(map Dist::Zilla::Util->expand_config_package_name($_), @bundle_plugins),
                 ),
             }),
         }),

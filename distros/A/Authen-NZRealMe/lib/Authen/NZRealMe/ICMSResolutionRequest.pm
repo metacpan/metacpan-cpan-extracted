@@ -1,28 +1,34 @@
 package Authen::NZRealMe::ICMSResolutionRequest;
-{
-  $Authen::NZRealMe::ICMSResolutionRequest::VERSION = '1.16';
-}
-
+$Authen::NZRealMe::ICMSResolutionRequest::VERSION = '1.18';
 use warnings;
 use strict;
 
 require XML::Generator;
+require XML::LibXML;
+require XML::LibXML::XPathContext;
 require Data::UUID;
 
 use POSIX        qw(strftime);
 use Digest::MD5  qw(md5_hex);
+use MIME::Base64 qw(encode_base64);
+
+use Authen::NZRealMe::CommonURIs qw(URI NS_PAIR);
 
 
-my $ns_soap     = [ soap  => "http://www.w3.org/2003/05/soap-envelope" ];
-my $ns_wsse     = [ wsse  => "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" ];
-my $ns_wsu      = [ wsu   => "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" ];
-my $ns_wst      = [ wst   => "http://docs.oasis-open.org/ws-sx/ws-trust/200512" ];
-my $ns_wsa      = [ wsa   => "http://www.w3.org/2005/08/addressing" ];
-my $ns_icms     = [ iCMS  => "urn:nzl:govt:ict:stds:authn:deployment:igovt:gls:iCMS:1_0" ];
+my $ns_soap       = [ 'soap' => URI('soap12') ];
+my $ns_wsse       = [ NS_PAIR('wsse') ];
+my $ns_wsu        = [ NS_PAIR('wsu') ];
+my $ns_wst        = [ NS_PAIR('wst') ];
+my $ns_wsa        = [ NS_PAIR('wsa') ];
+my $ns_icms       = [ NS_PAIR('icms') ];
+my $ns_ds         = [ 'dsig' => URI('ds') ];
+my @all_ns = (
+    $ns_soap, $ns_wsse, $ns_wsu, $ns_wst, $ns_wsa, $ns_icms
+);
 
-my $request_type_urn = 'http://docs.oasis-open.org/ws-sx/ws-trust/200512/Validate';
-my $token_type_urn   = 'http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0';
-my $addressing_urn   = 'http://www.w3.org/2005/08/addressing/anonymous';
+my $wst_validate  = URI('wst_validate');
+my $wss_saml2     = URI('wss_saml2');
+my $wsa_anon      = URI('wsa_anon');
 
 
 sub new {
@@ -32,7 +38,7 @@ sub new {
 
     my $self = bless {
         icms_token   => $icms_token,
-        signer       => $sp->_signer('wsu:Id'),
+        signer       => $sp->_signer(),
         method_data  => $sp->_icms_method_data( 'Validate' ),
     }, $class;
 
@@ -67,30 +73,38 @@ sub _generate_flt_resolve_doc {
     # The following list of parts will be signed in the request, any with a
     # 'namespaces' array will have those namespaces treated as InclusiveNamespaces
     # as detailed in http://www.w3.org/TR/2002/REC-xml-exc-c14n-20020718/#sec-Specification
-    my $signed_parts = {
-        Action    =>  {
+    my @signed_parts = (
+        {
+            name        => 'Action',
             id          => $sp->generate_saml_id('wsa:Action'),
             namespaces  => ['soap'],
         },
-        MessageID =>  {
+        {
+            name        => 'MessageID',
             id          => $sp->generate_saml_id('wsa:MessageID'),
             namespaces  => ['soap'],
         },
-        To        =>  {
+        {
+            name        => 'To',
             id          => $sp->generate_saml_id('wsa:To'),
             namespaces  => ['soap'],
         },
-        ReplyTo   =>  {
+        {
+            name        => 'ReplyTo',
             id          => $sp->generate_saml_id('wsa:ReplyTo'),
             namespaces  => ['soap'],
         },
-        Timestamp =>  {
+        {
+            name        => 'Timestamp',
             id          => $sp->generate_saml_id('wsa:Timestamp'),
         },
-        Body      =>  {
+        {
+            name        => 'Body',
             id          => $sp->generate_saml_id('soap:Body'),
         },
-    };
+    );
+
+    my %part_id = map { $_->{name} => $_->{id} } @signed_parts;
 
     my $uuid_gen = new Data::UUID;
     $self->{request_id}   = 'urn:uuid:'.$uuid_gen->create_str();
@@ -104,41 +118,85 @@ sub _generate_flt_resolve_doc {
 
     my $soap_request = $x->Envelope($ns_soap,
         $x->Header($ns_soap,
-            $x->Action( [@$ns_wsa, @$ns_wsu], {'wsu:Id' => $signed_parts->{Action}->{id}}, $method_data->{operation}),
-            $x->MessageID( [@$ns_wsa, @$ns_wsu], {'wsu:Id' => $signed_parts->{MessageID}->{id}}, $self->request_id),
-            $x->To( [@$ns_wsa, @$ns_wsu], {'wsu:Id' => $signed_parts->{To}->{id}}, $method_data->{url}),
-            $x->ReplyTo( [@$ns_wsa, @$ns_wsu], {'wsu:Id' => $signed_parts->{ReplyTo}->{id}},
-                $x->Address( $ns_wsa, $addressing_urn ),
+            $x->Action( [@$ns_wsa, @$ns_wsu], {'wsu:Id' => $part_id{Action}}, $method_data->{operation}),
+            $x->MessageID( [@$ns_wsa, @$ns_wsu], {'wsu:Id' => $part_id{MessageID}}, $self->request_id),
+            $x->To( [@$ns_wsa, @$ns_wsu], {'wsu:Id' => $part_id{To}}, $method_data->{url}),
+            $x->ReplyTo( [@$ns_wsa, @$ns_wsu], {'wsu:Id' => $part_id{ReplyTo}},
+                $x->Address( $ns_wsa, $wsa_anon ),
             ),
             $x->Security( [@$ns_wsse, @$ns_wsu], {'soap:mustUnderstand' => 'true'},  # Populated by signing method
-                $x->Timestamp( $ns_wsu, {'wsu:Id' => $signed_parts->{Timestamp}->{id}},
+                $x->Timestamp( $ns_wsu, {'wsu:Id' => $part_id{Timestamp}},
                     $x->Created ( $ns_wsu, strftime "%FT%TZ", gmtime() ),
                     $x->Expires ( $ns_wsu, strftime "%FT%TZ", gmtime( time() + 300) ),
                 ),
             )
         ),
-        $x->Body($ns_soap, {'wsu:Id' => $signed_parts->{Body}->{id}},
+        $x->Body($ns_soap, {'wsu:Id' => $part_id{Body}},
             $x->RequestSecurityToken($ns_wst,
-                $x->RequestType( $ns_wst, $request_type_urn ),
-                $x->TokenType( $ns_wst, $token_type_urn ),
+                $x->RequestType( $ns_wst, $wst_validate ),
+                $x->TokenType( $ns_wst, $wss_saml2 ),
                 $x->ValidateTarget( $ns_wst, \$self->icms_token ),
                 $x->AllowCreateFLT( $ns_icms),
             ),
         ),
     ) . "";
-    my @signed_part_ids = values %$signed_parts;
-    $soap_request = $self->_sign_xml( $soap_request, \@signed_part_ids );
+
+    my @refs = map {
+        my $ref = { ref_id => $_->{id} };
+        $ref->{namespaces} = $_->{namespaces} if $_->{namespaces};
+        $ref;
+    } @signed_parts;
+    $soap_request = $self->_sign_xml( $soap_request, \@refs );
 
     $self->{request_data} = $soap_request;
-    return $soap_request
+    return $soap_request;
 }
 
 sub _sign_xml {
-    my($self, $xml, $target_ids) = @_;
+    my($self, $xml, $refs) = @_;
 
+    # Just ask the signer to return the signature block
     my $signer = $self->_signer;
-    return $signer->sign_multiple_targets($xml, $target_ids);
+    my $sig_xml = $signer->sign(
+        $xml,
+        undef,    # refs in options
+        return_signature_xml    => 1,
+        references              => $refs,
+        reference_transforms    => [ 'ec14n' ],
+        reference_digest_method => 'sha256',
+        namespaces              => [ @$ns_soap ],
+    );
+
+    my $parser = XML::LibXML->new();
+    my $doc    = $parser->parse_string($xml);
+    my $xc     = XML::LibXML::XPathContext->new($doc->documentElement);
+    $xc->registerNs( @$_ ) foreach @all_ns;
+
+    my $sig_frag = $parser->parse_string($sig_xml)->documentElement();
+    $sig_frag->{Id} = 'SIG-4';  # Add Id attr for backwards compatibility
+
+    # Generate a cert fingerprint and append to the signature block
+    my $x509 = Crypt::OpenSSL::X509->new_from_string($signer->pub_cert_text);
+    my $fingerprint = $x509->fingerprint_sha1() =~ s/://gr;
+    my $fingerprint_sha1 = encode_base64(pack("H*", $fingerprint), '');
+
+    my $x = XML::Generator->new();
+    my $keyinfo_block = $x->KeyInfo( $ns_ds, { Id => "KI-${fingerprint}1" },
+        $x->SecurityTokenReference( $ns_wsse, { Id => "STR-${fingerprint}2" },
+            $x->KeyIdentifier( $ns_wsse, { EncodingType => URI('wss_b64'), ValueType => URI('wss_sha1') },
+                $fingerprint_sha1,
+            ),
+        ),
+    ).'';
+    my $x509_frag = $parser->parse_string($keyinfo_block)->documentElement();
+    $sig_frag->appendChild($x509_frag);
+
+    # Insert signature block as last element in soap:Header/wsse:Security section
+    my($sec_node) = $xc->findnodes("/soap:Envelope/soap:Header/wsse:Security");
+    $sec_node->appendChild($sig_frag);
+    return $doc->toString(0);
 }
+
 
 1;
 
@@ -198,7 +256,7 @@ See L<Authen::NZRealMe> for documentation index.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2014 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2010-2019 Enrolment Services, New Zealand Electoral Commission
 
 Written by Haydn Newport E<lt>haydn@catalyst.net.nzE<gt>
 

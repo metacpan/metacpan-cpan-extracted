@@ -1,5 +1,7 @@
 package MooseX::BuildArgs::Meta::Object;
-$MooseX::BuildArgs::Meta::Object::VERSION = '0.06';
+
+$MooseX::BuildArgs::Meta::Object::VERSION = '0.07';
+
 use Moose::Role;
 
 has build_args => (

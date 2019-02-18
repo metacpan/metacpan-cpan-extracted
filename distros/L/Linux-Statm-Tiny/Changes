@@ -1,5 +1,14 @@
 Revision history for Linux-Statm-Tiny
 
+0.0601    2019-02-17 18:29:31+00:00 Europe/London
+  [Documentation]
+  - Fixed typo in POD markup (manwar).
+
+  - Bumped copyright year.
+
+  [Toolchain]
+  - Updated MANIFEST.SKIP.
+
 0.0600    2018-10-27 23:37:11+01:00 Europe/London
   [Bug Fixes]
   - Fix pid detection in forks (aidy)

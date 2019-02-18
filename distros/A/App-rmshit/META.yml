@@ -1,0 +1,29 @@
+---
+abstract: 'Keep a directory structure clean at all times'
+author:
+  - 'Magnus Woldrich <m@japh.se>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-rmshit
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  App::rmshit:
+    file: bin/rmshit
+requires:
+  Linux::Inotify2: '0'
+  perl: '5.01'
+resources:
+  repository: https://github.com/trapd00r/rmshit.git
+version: v0.6.4
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

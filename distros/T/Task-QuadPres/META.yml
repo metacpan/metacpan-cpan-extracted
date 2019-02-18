@@ -21,7 +21,7 @@ name: Task-QuadPres
 provides:
   Task::QuadPres:
     file: lib/Task/QuadPres.pm
-    version: v0.0.1
+    version: v0.0.2
 requires:
   CGI: '0'
   Class::XSAccessor: '0'
@@ -32,7 +32,7 @@ requires:
   File::Find::Object::Rule: '0'
   Getopt::Long: '0'
   HTML::Links::Localize: '0'
-  HTML::Lint: '0'
+  HTML::T5: '0'
   HTML::Widgets::NavMenu::EscapeHtml: '0'
   IO::All: '0'
   MIME::Types: '0'
@@ -47,10 +47,10 @@ resources:
   bugtracker: https://github.com/shlomif/quad-pres/issues
   homepage: http://metacpan.org/release/Task-QuadPres
   repository: https://github.com/shlomif/quad-pres.git
-version: 0.0.1
+version: 0.0.2
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.028001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -296,5 +296,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

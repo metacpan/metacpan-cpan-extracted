@@ -1,24 +1,41 @@
 ---
 abstract: "Clone of PHP's date and time functions."
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  Test::Simple: 0.96
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: 6.31
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110440'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PHP-DateTime
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  PHP::DateTime:
+    file: lib/PHP/DateTime.pm
+    version: '0.07'
 requires:
-  Time::DaysInMonth: 99.1117
-  Time::HiRes: 1.9721
-  Time::Local: 1.2000
-  Time::Timezone: 2006.0814
+  Time::DaysInMonth: '99.1117'
+  Time::HiRes: '1.9721'
+  Time::Local: '1.2000'
+  Time::Timezone: '2006.0814'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=PHP-DateTime
+  bugtracker: https://github.com/bluefeet/PHP-DateTime/issues
+  homepage: https://github.com/bluefeet/PHP-DateTime
   repository: git://github.com/bluefeet/PHP-DateTime.git
-version: 0.06
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

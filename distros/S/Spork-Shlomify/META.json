@@ -26,24 +26,23 @@
       },
       "develop" : {
          "requires" : {
-            "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::EOL" : "0",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08",
             "Test::TrailingSpace" : "0.0203"
          }
       },
       "runtime" : {
          "requires" : {
+            "CGI" : "0",
             "Cwd" : "0",
             "Spoon" : "0.22",
             "Spork" : "0",
             "Spork::Config" : "0",
             "Spork::Formatter" : "0",
-            "Spork::Slides" : "0",
+            "mixin" : "0",
             "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
@@ -61,19 +60,23 @@
    "provides" : {
       "Spork::Shlomify" : {
          "file" : "lib/Spork/Shlomify.pm",
-         "version" : "0.0204"
+         "version" : "0.0400"
       },
       "Spork::Shlomify::Config" : {
          "file" : "lib/Spork/Shlomify/Config.pm",
-         "version" : "0.0204"
+         "version" : "0.0400"
       },
       "Spork::Shlomify::Formatter" : {
          "file" : "lib/Spork/Shlomify/Formatter.pm",
-         "version" : "0.0204"
+         "version" : "0.0400"
       },
       "Spork::Shlomify::Slides" : {
          "file" : "lib/Spork/Shlomify/Slides.pm",
-         "version" : "0.0204"
+         "version" : "0.0400"
+      },
+      "Spork::Shlomify::Slides::FromSpork" : {
+         "file" : "lib/Spork/Shlomify/Slides/FromSpork.pm",
+         "version" : "0.0400"
       }
    },
    "release_status" : "stable",
@@ -88,10 +91,10 @@
          "web" : "https://github.com/shlomif/Spork-Shlomify"
       }
    },
-   "version" : "0.0204",
+   "version" : "0.0400",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026002"
+         "version" : "5.028001"
       },
       "plugins" : [
          {
@@ -241,11 +244,6 @@
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "@Filter/PkgVersion",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
-            "name" : "@Filter/PodCoverageTests",
             "version" : "6.012"
          },
          {
@@ -517,7 +515,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

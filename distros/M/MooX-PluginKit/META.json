@@ -1,0 +1,108 @@
+{
+   "abstract" : "A comprehensive plugin system.",
+   "author" : [
+      "Aran Clary Deltac <bluefeet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-PluginKit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Module::Runtime" : "0.014",
+            "Moo" : "2.000000",
+            "Scalar::Util" : "0",
+            "Type::Tiny" : "1.000005",
+            "namespace::clean" : "0.24",
+            "strictures" : "2.000000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000094"
+         }
+      }
+   },
+   "provides" : {
+      "MooX::PluginKit" : {
+         "file" : "lib/MooX/PluginKit.pm",
+         "version" : "0.04"
+      },
+      "MooX::PluginKit::Consumer" : {
+         "file" : "lib/MooX/PluginKit/Consumer.pm",
+         "version" : "0.04"
+      },
+      "MooX::PluginKit::ConsumerBase" : {
+         "file" : "lib/MooX/PluginKit/ConsumerBase.pm",
+         "version" : "0.04"
+      },
+      "MooX::PluginKit::ConsumerRole" : {
+         "file" : "lib/MooX/PluginKit/ConsumerRole.pm",
+         "version" : "0.04"
+      },
+      "MooX::PluginKit::Core" : {
+         "file" : "lib/MooX/PluginKit/Core.pm",
+         "version" : "0.04"
+      },
+      "MooX::PluginKit::Factory" : {
+         "file" : "lib/MooX/PluginKit/Factory.pm",
+         "version" : "0.04"
+      },
+      "MooX::PluginKit::Plugin" : {
+         "file" : "lib/MooX/PluginKit/Plugin.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/MooX-PluginKit/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/MooX-PluginKit",
+      "repository" : {
+         "url" : "git://github.com/bluefeet/MooX-PluginKit.git",
+         "web" : "https://github.com/bluefeet/MooX-PluginKit"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "Aran Deltac <aran@ziprecruiter.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
+}

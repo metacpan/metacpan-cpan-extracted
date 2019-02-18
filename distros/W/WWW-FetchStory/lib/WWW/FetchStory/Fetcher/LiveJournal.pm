@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::LiveJournal;
-$WWW::FetchStory::Fetcher::LiveJournal::VERSION = '0.2002';
+$WWW::FetchStory::Fetcher::LiveJournal::VERSION = '0.2004';
 use strict;
 use warnings;
 use HTML::Entities;
@@ -9,7 +9,7 @@ WWW::FetchStory::Fetcher::LiveJournal - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2002
+version 0.2004
 
 =head1 DESCRIPTION
 
@@ -259,9 +259,18 @@ sub extract_story {
     }
     else
     {
-	print STDERR "story not found\n";
-        print STDERR "\n==============\n${content}\n===========\n" if ($self->{debug});
-	return $self->tidy_chars($content);
+        if ($self->{debug})
+        {
+            open(my $fh, ">", "FS$$.html");
+            print $fh $content;
+            close $fh;
+            die "STORY not found. Content is in FS$$.html"
+        }
+        else
+        {
+            print STDERR "story not found\n";
+            return $self->tidy_chars($content);
+        }
     }
 
     my $out = <<EOT;

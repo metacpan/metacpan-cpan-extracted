@@ -32,19 +32,19 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0"
+            "perl" : "5.01"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/trapd00r/Term-ExtendedColor-TTY/issues"
-      },
       "repository" : {
-         "url" : "https://github.com/trapd00r/Term-ExtendedColor-TTY"
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/Term-ExtendedColor-TTY.git",
+         "web" : "https://github.com/trapd00r/Term-ExtendedColor-TTY",
+         "x_bugtracker" : "https://github.com/trapd00r/Term-ExtendedColor-TTY/issues"
       }
    },
-   "version" : "0.030",
+   "version" : "0.034",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

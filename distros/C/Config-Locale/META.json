@@ -1,0 +1,85 @@
+{
+   "abstract" : "Load and merge locale-specific configuration files.",
+   "author" : [
+      "Aran Clary Deltac <bluefeet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Locale",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Loops" : "1.031",
+            "Carp" : "0",
+            "Config::Any" : "0.04",
+            "Hash::Merge" : "0.12",
+            "Moo" : "2.000000",
+            "Path::Tiny" : "0.091",
+            "Type::Tiny" : "1.004000",
+            "namespace::clean" : "0.24",
+            "strictures" : "2.000000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000094"
+         }
+      }
+   },
+   "provides" : {
+      "Config::Locale" : {
+         "file" : "lib/Config/Locale.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/Config-Locale/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/Config-Locale",
+      "repository" : {
+         "url" : "git://github.com/bluefeet/Config-Locale.git",
+         "web" : "https://github.com/bluefeet/Config-Locale"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "Aran Deltac <aran@ziprecruiter.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
+}

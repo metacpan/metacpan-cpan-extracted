@@ -1,5 +1,9 @@
 Revision history for Statistics-Running
 
+0.13	2019-02-16
+	Added sum(), abs_sum() subs.
+	Added mean() to pod.
+
 0.12	2018-12-20
 	Fixed histogram-recalculate bugs
 

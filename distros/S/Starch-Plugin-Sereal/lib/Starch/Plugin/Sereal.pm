@@ -1,5 +1,7 @@
 package Starch::Plugin::Sereal;
-$Starch::Plugin::Sereal::VERSION = '0.02';
+
+$Starch::Plugin::Sereal::VERSION = '0.03';
+
 =head1 NAME
 
 Starch::Plugin::Sereal - Use Sereal for cloning and diffing Starch data structures.

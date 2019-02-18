@@ -1,6 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-# (C) Copyright 2010-2016 MET Norway
+# (C) Copyright 2010-2019 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,12 +20,18 @@
 # pod included at end of file
 
 use strict;
+use warnings;
 use Getopt::Long;
 use Pod::Usage qw(pod2usage);
 use Geo::BUFR;
 
+# This is actually default in BUFR.pm, but provided here to make it
+# easier for users to change to 'ECCODES' if preferred
+use constant DEFAULT_TABLE_FORMAT => 'BUFRDC';
+
 # Will be used if neither --tablepath nor $ENV{BUFR_TABLES} is set
-use constant DEFAULT_TABLE_PATH => '/usr/local/lib/bufrtables';
+use constant DEFAULT_TABLE_PATH_BUFRDC => '/usr/local/lib/bufrtables';
+use constant DEFAULT_TABLE_PATH_ECCODES => '/usr/local/share/eccodes/definitions/bufr/tables';
 
 # Parse command line options
 our %option = ();
@@ -53,6 +59,7 @@ GetOptions(
            'strict_checking=i',
            'subcategory=i',
            'subcentre=i',
+           'tableformat=s',
            'tablepath=s',
            'update_number=i',
            'verbose=i',
@@ -80,6 +87,10 @@ Geo::BUFR->set_strict_checking($strict_checking);
 # Set verbosity level
 Geo::BUFR->set_verbose($option{verbose}) if $option{verbose};
 
+# Set BUFR table format
+my $tableformat = (defined $option{tableformat}) ? uc $option{tableformat} : DEFAULT_TABLE_FORMAT;
+Geo::BUFR->set_tableformat($tableformat);
+
 # Set BUFR table path
 if ($option{tablepath}) {
     # Command line option --tablepath overrides all
@@ -88,8 +99,12 @@ if ($option{tablepath}) {
     # If no --tablepath option, use the BUFR_TABLES environment variable
     Geo::BUFR->set_tablepath($ENV{BUFR_TABLES});
 } else {
-    # If all else fails, use the libbufr bufrtables
-    Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH);
+    # If all else fails, use the default tablepath in BUFRDC/ECCODES
+    if ($tableformat eq 'BUFRDC') {
+        Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH_BUFRDC);
+    } elsif ($tableformat eq 'ECCODES')  {
+        Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH_ECCODES);
+    }
 }
 
 # Where to print the altered BUFR message(s)
@@ -355,6 +370,7 @@ sub set_bufr_edition {
       [--remove_qc]
       [--outfile <file>]
       [--strict_checking n]
+      [--tableformat <BUFRDC|ECCODES>]
       [--tablepath <path to BUFR tables>]
       [--verbose n]
       [--help]
@@ -370,7 +386,6 @@ Execute without arguments for Usage, with option C<--help> for some
 additional info.
 
 =head1 OPTIONS
-
 
    --data <descriptor=value[+]> Set (first) data value in section 4 for
                     descriptor. A trailing '+' means that the value
@@ -418,6 +433,7 @@ additional info.
                          n=2 Croak if (recoverable) error in BUFR format.
                              Nothing more in this message will be
                              decoded/encoded.
+   --tableformat    Currently supported are BUFRDC and ECCODES (default is BUFRDC)
    --tablepath <path to BUFR tables>
                     Set path to BUFR tables (overrides $ENV{BUFR_TABLES})
    --verbose n      Set verbose level to n, 0<=n<=6 (default 0). Verbose
@@ -431,7 +447,9 @@ Options may be abbreviated, e.g. C<--he> or C<-he> for C<--help>.
 To avoid having to use the C<--tablepath> option, you are adviced to
 set the environment variable BUFR_TABLES to the directory where your
 BUFR tables are located (unless the default path provided by
-bufralter.pl works for you).
+bufralter.pl works for you). For tableformat ECCODES, se
+L<http://search.cpan.org/dist/Geo-BUFR/lib/Geo/BUFR.pm#BUFR-TABLE-FILES>
+for more info on how to set C<--tablepath> (or BUFR_TABLES).
 
 =head1 AUTHOR
 
@@ -439,6 +457,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2016 MET Norway
+Copyright (C) 2010-2019 MET Norway
 
 =cut

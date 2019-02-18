@@ -1,0 +1,56 @@
+{
+   "abstract" : "Keep a directory structure clean at all times",
+   "author" : [
+      "Magnus Woldrich <m@japh.se>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-rmshit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Linux::Inotify2" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "App::rmshit" : {
+         "file" : "bin/rmshit"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/rmshit.git",
+         "web" : "https://github.com/trapd00r/rmshit",
+         "x_bugtracker" : "https://github.com/trapd00r/rmshit/issues"
+      }
+   },
+   "version" : "v0.6.4",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

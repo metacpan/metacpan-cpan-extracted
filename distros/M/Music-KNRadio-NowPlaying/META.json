@@ -41,13 +41,13 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/trapd00r/makedist/issues"
-      },
       "repository" : {
-         "url" : "https://github.com/trapd00r/Music-KNRadio-NowPlaying"
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/Music-KNRadio-NowPlaying.git",
+         "web" : "https://github.com/trapd00r/Music-KNRadio-NowPlaying",
+         "x_bugtracker" : "https://github.com/trapd00r/Music-KNRadio-NowPlaying/issues"
       }
    },
-   "version" : "0.008",
+   "version" : "0.012",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

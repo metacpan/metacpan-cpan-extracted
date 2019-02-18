@@ -2,6 +2,7 @@ Build.PL
 Changes
 eg/auto-complete.pl
 eg/auto-complete.sh
+eg/config.pl
 eg/simple.pl
 eg/sub-command-modules.pl
 eg/sub-command.pl
@@ -26,6 +27,7 @@ t/argv-invalid.t
 t/argv-valid.t
 t/auto_complete.t
 t/boilerplate.t
+t/configuration.t
 t/critic.t
 t/get_options.t
 t/getopt-alt.t

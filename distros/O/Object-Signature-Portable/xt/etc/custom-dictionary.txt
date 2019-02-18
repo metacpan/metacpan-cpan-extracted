@@ -1,0 +1,10 @@
+CPAN
+cryptographic
+customized
+customizing
+hexidecimal
+normalized
+serialization
+serialize
+serialized
+serializer

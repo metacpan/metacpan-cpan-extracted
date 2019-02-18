@@ -21,7 +21,9 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -36,13 +38,13 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/trapd00r/File-Media-Sort/issues"
-      },
       "repository" : {
-         "url" : "https://github.com/trapd00r/File-Media-Sort"
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/File-Media-Sort.git",
+         "web" : "https://github.com/trapd00r/File-Media-Sort",
+         "x_bugtracker" : "https://github.com/trapd00r/File-Media-Sort/issues"
       }
    },
-   "version" : "0.064",
+   "version" : "0.068",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -9,7 +9,7 @@ use Fcntl qw/ O_RDONLY /;
 use POSIX qw/ ceil /;
 use Types::Standard qw/ ArrayRef Int /;
 
-our $VERSION = '0.0600';
+our $VERSION = '0.0601';
 
 # ABSTRACT: simple access to Linux /proc/../statm
 
@@ -137,7 +137,7 @@ Linux::Statm::Tiny - simple access to Linux /proc/../statm
 
 =head1 VERSION
 
-version 0.0600
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -218,7 +218,7 @@ if the L</size> is 1.04 MB, then C<size_mb> will return "2".
 
 =head1 METHODS
 
-head2 C<refresh>
+=head2 C<refresh>
 
 The values do not change dynamically. If you need to refresh the
 values, then you you must either create a new instance of the object,
@@ -250,7 +250,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adrian Lai Karen Etheridge
+=for stopwords Adrian Lai Karen Etheridge Mohammad S Anwar
 
 =over 4
 
@@ -262,11 +262,15 @@ Adrian Lai <aidy@cpan.org>
 
 Karen Etheridge <ether@cpan.org>
 
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2018 by Thermeon Worldwide, PLC.
+This software is copyright (c) 2015-2019 by Thermeon Worldwide, PLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

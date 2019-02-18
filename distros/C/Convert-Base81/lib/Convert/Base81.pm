@@ -10,7 +10,7 @@ use Math::Int128 qw(uint128 uint128_to_number
 
 #use Smart::Comments q(###);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Exporter qw(import);
 
@@ -559,11 +559,11 @@ perform that duty.
 Transform a Base81 string back into a string (or array) using
 only three characters.
 
-    $data = b3_unpack81("012", "d`+qxW?q");
+    $data = b3_unpack81("012", "d$+qxW?q");
 
 or
 
-    @array = b3_unpack81("012", "d`+qxW?q");
+    @array = b3_unpack81("012", "d$+qxW?q");
 
 =cut
 
@@ -600,11 +600,11 @@ only nine characters.
 
     $nine_chars = join "", ('0' .. '8'');
 
-    $data = b27_unpack81($nine_chars, "d`+qxW?q");
+    $data = b27_unpack81($nine_chars, "d$+qxW?q");
 
 or
 
-    @array = b27_unpack81($nine_chars, "d`+qxW?q");
+    @array = b27_unpack81($nine_chars, "d$+qxW?q");
 
 =cut
 
@@ -641,11 +641,11 @@ only twenty seven characters.
 
     $twenty7_chars = join("", ('a' .. 'z', '&'));
 
-    $data = b27_unpack81($twenty7_chars, "d`+qxW?q");
+    $data = b27_unpack81($twenty7_chars, "d$+qxW?q");
 
 or
 
-    @array = b27_unpack81($twenty7_chars, "d`+qxW?q");
+    @array = b27_unpack81($twenty7_chars, "d$+qxW?q");
 
 =cut
 
@@ -697,14 +697,9 @@ sub b27_unpack81
 	return wantarray? @clist: join "", @clist;
 }
 
-1;
-
-__END__
-
-
 =head1 SEE ALSO
 
-=head4 The Base81 Character Set
+=head2 The Base81 Character Set
 
 The Base81 character set is adapted from the Base85 character set
 described by Robert Elz in his RFC1924 of April 1st 1996,
@@ -728,15 +723,13 @@ and allows the encoded data to be used without issue in JSON or XML.
 
 =cut
 
-=head1 SEE ALSO
-
 =head2 Ascii85
 
 Base81 is a subset of Base85, which is similar in concept to
 L<Ascii85|http://en.wikipedia.org/wiki/Ascii85>, a format developed for
 the btoa program, and later adopted with changes by Adobe for
 Postscript's ASCII85Encode filter. There are, of course, modules on CPAN
-that provide this format.
+that provide these formats.
 
 =over 3
 
@@ -759,7 +752,7 @@ L<Convert::Z85>
 L<Base64|https://en.wikipedia.org/wiki/Base64> encoding is an eight-bit to six-bit
 encoding scheme that, depending on the characters used for encoding, has been used
 for uuencode and MIME transfer, among many other formats. There are, of course,
-modules on CPAN that provide this format.
+modules on CPAN that provide these formats.
 
 =over 3
 
@@ -785,17 +778,22 @@ I will be notified, and then you'll automatically be notified of progress on you
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+This module is on Github at L<https://github.com/jgamble/Convert-Base81>.
 
-    perldoc Convert::Base81
+You can also look for information on L<MetaCPAN|https://metacpan.org/release/Convert-Base81>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2018 John M. Gamble.
+Copyright (c) 2019 John M. Gamble.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See L<http://dev.perl.org/licenses/> for more information.
+
+
+1;
+
+__END__
 

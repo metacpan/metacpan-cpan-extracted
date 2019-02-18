@@ -2,7 +2,7 @@ package Module::LocalLoad;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.172';
+$VERSION = '0.176';
 
 use Carp();
 use File::Copy();
@@ -81,8 +81,10 @@ Module::LocalLoad - create and use a local lib/ for globally installed modules
 
 =head1 SYNOPSIS
 
+  use Module::LocalLoad;
+
   my $module = 'Term::ANSIColor';
-  load($module) and printf("%s v%s loaded\n", $module $module->VERSION);
+  load($module) and printf("%s v%s loaded\n", $module, $module->VERSION);
 
 =head1 DESCRIPTION
 
@@ -160,7 +162,7 @@ Where the temporary lib should be set up.
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  magnus@trapd00r.se
+  m@japh.se
   http://japh.se
 
 =head1 CONTRIBUTORS

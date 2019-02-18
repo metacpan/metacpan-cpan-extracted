@@ -75,19 +75,6 @@ sub _icms_response_file {
 }
 
 
-sub _extract_flt {
-    my($self, $xml, %args) = @_;
-    # Work around fact that sigs on test-data/icms-response.xml are borked
-
-    my $xc = $self->_xpath_context_dom($xml,
-        [ soap  => "http://www.w3.org/2003/05/soap-envelope" ],
-        [ wst   => "http://docs.oasis-open.org/ws-sx/ws-trust/200512/" ],
-        [ saml  => 'urn:oasis:names:tc:SAML:2.0:assertion' ],
-    );
-    return $xc->findvalue(q{/soap:Envelope/soap:Body/wst:RequestSecurityTokenResponse/wst:RequestedSecurityToken/saml:Assertion/saml:Subject/saml:NameID});
-}
-
-
 sub wind_back_clock {
     my $self = shift;
     $self->{_stopped_clock_time_} = shift;

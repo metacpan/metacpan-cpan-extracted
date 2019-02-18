@@ -6,7 +6,7 @@ use warnings;
 
 use Data::Dumper;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # overload these operators to have special meaning when
 # operand(s) are Statistics::Running:
@@ -38,6 +38,8 @@ sub     new {
 		'M2' => 0.0,
 		'M3' => 0.0,
 		'M4' => 0.0,
+		'ABS-SUM' => 0.0,
+		'SUM' => 0.0,
 		'MIN' => 0.0,
 		'MAX' => 0.0,
 		'N' => 0, # number of data items inserted
@@ -68,8 +70,6 @@ sub     new {
 	$self->clear();
 	return $self
 }
-# return the mean of the data entered so far
-sub     mean { return $_[0]->{'M1'} }
 # returns the histogram bins (can be empty) in our internal format
 sub     histogram { return $_[0]->{'histo'} }
 # if no params, it returns our bins as a hash
@@ -205,6 +205,8 @@ sub     add {
 			if( $x < $self->{'MIN'} ){ $self->{'MIN'} = $x }
 			if( $x > $self->{'MAX'} ){ $self->{'MAX'} = $x }
 		}
+		$self->{'SUM'} += $x; # add x to the total SUM
+		$self->{'ABS-SUM'} += abs($x); # add abs(x) to the total SUM
 		$self->{'N'} += 1; # increment sample size push in
 		my $n0 = $self->{'N'};
 
@@ -259,9 +261,17 @@ sub     clear {
 	$self->{'M2'} = 0.0;
 	$self->{'M3'} = 0.0;
 	$self->{'M4'} = 0.0;
+	$self->{'MIN'} = 0.0;
+	$self->{'MAX'} = 0.0;
+	$self->{'ABS-SUM'} = 0.0;
+	$self->{'SUM'} = 0.0;
 	$self->{'N'} = 0;
 	$self->histogram_reset();
 }
+# return the mean of the data entered so far
+sub     mean { return $_[0]->{'M1'} }
+sub     sum { return $_[0]->{'SUM'} }
+sub     abs_sum { return $_[0]->{'ABS-SUM'} }
 sub     min { return $_[0]->{'MIN'} }
 sub     max { return $_[0]->{'MAX'} }
 # get number of total elements entered so far
@@ -331,6 +341,11 @@ sub     concatenate {
 			+ 6.0*$delta2 * ($selfN*$selfN*$otherM2 + $otherN*$otherN*$selfM2)/($combN*$combN) +
 				  4.0*$delta*($selfN*$otherM3 - $otherN*$selfM3) / $combN
 	;
+
+	$combined->{'SUM'} = $self->{'SUM'} + $other->{'SUM'};
+	$combined->{'ABS-SUM'} = $self->{'ABS-SUM'} + $other->{'ABS-SUM'};
+	$combined->{'MIN'} = $self->{'MIN'} < $other->{'MIN'} ? $self->{'MIN'} : $other->{'MIN'};
+	$combined->{'MAX'} = $self->{'MAX'} > $other->{'MAX'} ? $self->{'MAX'} : $other->{'MAX'};
 
 	# add the histograms only if structure matches:
 	if( $self->_equals_histograms_structure($other) ){
@@ -408,6 +423,7 @@ sub     stringify {
 	return "N: ".$self->get_N()
 		.", mean: ".$self->mean()
 		.", range: ".$self->min()." to ".$self->max()
+		.", sum: ".$self->sum()
 		.", standard deviation: ".$self->standard_deviation()
 		.", kurtosis: ".$self->kurtosis()
 		.", skewness: ".$self->skewness()
@@ -673,7 +689,7 @@ L<John D. Cook's article and C++ implementation|https://www.johndcook.com/blog/s
 =head1 EXPORT
 
 Nothing, this is an Object Oriented module. Once you instantiate
-an object all your methods are yours.
+an object all its methods are yours.
 
 
 =head1 SUBROUTINES/METHODS
@@ -733,6 +749,21 @@ Our object and returned object are identical at the time of cloning.
 
 Clear our internal state as if no data points have ever been added into us.
 As if we were just created. All state is forgotten and reset to zero, including histogram.
+
+
+=head2 mean
+
+Returns the mean of all the data pushed in us
+
+
+=head2 sum
+
+Returns the sum of all the data pushed in us (algebraic sum, not absolute sum)
+
+
+=head2 abs_sum
+
+Returns the sum of the absolute value of all the data pushed in us (this is not algebraic sum)
 
 
 =head2 min
@@ -978,7 +1009,7 @@ B.P.Welford, John Cook.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Andreas Hadjiprocopis.
+Copyright 2018-2019 Andreas Hadjiprocopis.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

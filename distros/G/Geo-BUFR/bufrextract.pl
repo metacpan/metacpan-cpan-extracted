@@ -1,6 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-# (C) Copyright 2010-2016 MET Norway
+# (C) Copyright 2010-2019 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 # pod included at end of file
 
 use strict;
+use warnings;
 use Getopt::Long;
 use Pod::Usage qw(pod2usage);
 use Geo::BUFR;
@@ -253,6 +254,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2016 MET Norway
+Copyright (C) 2010-2019 MET Norway
 
 =cut

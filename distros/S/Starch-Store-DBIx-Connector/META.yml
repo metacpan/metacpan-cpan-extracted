@@ -1,30 +1,47 @@
 ---
 abstract: 'Starch storage backend using DBIx::Connector.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
   DBD::SQLite: '1.46'
-  JSON: '2'
-  Test::Fatal: '0'
-  Test::Simple: '0.96'
+  JSON: '2.00'
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Starch-Store-DBIx-Connector
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Starch::Store::DBIx::Connector:
+    file: lib/Starch/Store/DBIx/Connector.pm
+    version: '0.03'
 requires:
   DBIx::Connector: '0.53'
-  Moo: '2'
+  Moo: '2.000000'
   Scalar::Util: '0'
-  Starch::Store::DBI: '0.02'
+  Starch: '0.10'
+  Starch::Store::DBI: '0.03'
   Type::Tiny: '1.000005'
   namespace::clean: '0.24'
-  strictures: '2'
+  strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/Starch-Store-DBIx-Connector/issues
+  homepage: https://github.com/bluefeet/Starch-Store-DBIx-Connector
   repository: git://github.com/bluefeet/Starch-Store-DBIx-Connector.git
-version: '0.02'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

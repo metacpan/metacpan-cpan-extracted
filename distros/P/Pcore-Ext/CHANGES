@@ -1,3 +1,15 @@
+v0.20.0 2019-02-18T20:48:15Z
+ - read app config
+ - ext version parse
+ - app ns detection improved
+ - export ext vars as hash
+ - l10n updated
+ - cordova imdex tmpl added
+ - cordova index tmpl added
+ - app controller hook for external app in production mode
+ - sort api methods
+ - resources moved
+
 v0.19.12 2019-02-10T21:58:06Z
  - viewport connection erro form
 

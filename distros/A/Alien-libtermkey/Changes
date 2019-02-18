@@ -1,5 +1,16 @@
 Revision history for Alien-libtermkey
 
+0.20    2019-02-17 01:33:44
+        [CHANGES]
+         * Updates to latest inc/Alien/make/Module/Build.pm
+            + Accept a --use-bundled argument to force use of bundled source
+            + Support alien_requires on other alien modules
+            + Set PKG_CONFIG_PATH so second-level dependencies will work
+            + Neater rewrite of .pc file to not break .packlist
+            + Set LIBDIR during build so generated .la files agree
+         * Use second-level Alien dependency to pull in Alien::unibilium if
+           required
+
 0.19    2017/07/29 12:53:00
         [CHANGES]
          * Don't bother with alien_requires tests if simply wrapping the

@@ -34,7 +34,7 @@
          "requires" : {
             "JSON" : "2.53",
             "Moo" : "2.000000",
-            "WWW::Google::UserAgent" : "0.22",
+            "WWW::Google::UserAgent" : "0.23",
             "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
@@ -43,15 +43,15 @@
    "provides" : {
       "WWW::Google::APIDiscovery" : {
          "file" : "lib/WWW/Google/APIDiscovery.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "WWW::Google::APIDiscovery::API" : {
          "file" : "lib/WWW/Google/APIDiscovery/API.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "WWW::Google::APIDiscovery::API::MetaData" : {
          "file" : "lib/WWW/Google/APIDiscovery/API/MetaData.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/manwar/WWW-Google-APIDiscovery"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

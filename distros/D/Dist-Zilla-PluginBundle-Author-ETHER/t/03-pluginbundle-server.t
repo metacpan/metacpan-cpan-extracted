@@ -49,7 +49,7 @@ my %server_to_resources = (
             web => 'http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=gitmo/DZT-Sample.git;a=summary',
         },
     },
-    ( map {
+    ( map +(
         $_ => {
             %bugtracker,
             # no homepage set
@@ -59,7 +59,7 @@ my %server_to_resources = (
                 web => 'http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=' . $_ . '/DZT-Sample.git;a=summary',
             },
         },
-    } qw(p5sagit catagits)),
+    ), qw(p5sagit catagits)),
 );
 
 subtest "server = $_" => sub {
@@ -101,11 +101,11 @@ subtest "server = $_" => sub {
     {
         my $expected = "server = $server: recommend instead using server = github and GithubMeta.remote = $server with a read-only mirror";
         my $ok = cmp_deeply(
-            [ map { colorstrip($_) } @warnings ],
+            [ map colorstrip($_), @warnings ],
             superbagof(re(qr/^\[\@Author::ETHER\] $expected/)),
             'we warn when using other server settings',
         ) or diag explain @warnings;
-        @warnings = grep { !m/$expected/ } @warnings;
+        @warnings = grep !m/$expected/, @warnings;
         warn @warnings if @warnings and $ok;
     }
 

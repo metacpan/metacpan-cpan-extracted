@@ -1,7 +1,7 @@
 package Class::Colon;
 use strict; use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 =head1 NAME
 
@@ -141,10 +141,11 @@ sub import {
         no strict;
         *{"$fake\::NEW"}     = sub { return bless {}, shift; };
 
-        foreach my $proxy_method qw(
+        my @proxy_method_names = qw(
             read_file  read_handle  objectify delim
             write_file write_handle stringify
-        ) {
+        );
+        foreach my $proxy_method (@proxy_method_names) {
             my $proxy_name   = "$fake"  . "::" . uc $proxy_method;
             my $real_name    = "$class" . "::" .    $proxy_method;
             *{"$proxy_name"} = \&{"$real_name"};

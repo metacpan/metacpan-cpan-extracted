@@ -141,9 +141,9 @@ SKIP: {
 
     my $pluginbundle_meta = decode_json(path('META.json')->slurp_raw);
 
-    my %default_bundle_requirements = map {
-       $_->[1] => $_->[2]{':version'}   # package => payload :version
-    } Pod::Weaver::PluginBundle::Default->mvp_bundle_config;
+    my %default_bundle_requirements = map
+       +($_->[1] => $_->[2]{':version'}),   # package => payload :version
+        Pod::Weaver::PluginBundle::Default->mvp_bundle_config;
 
     foreach my $bundle_plugin_config (Pod::Weaver::PluginBundle::Author::ETHER->mvp_bundle_config)
     {

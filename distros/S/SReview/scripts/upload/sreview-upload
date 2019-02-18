@@ -7,6 +7,7 @@ use DBI;
 use Mojo::Template;
 use SReview::Config::Common;
 use SReview::Video::ProfileFactory;
+use SReview::Talk;
 
 my $config = SReview::Config::Common::setup;
 
@@ -42,9 +43,9 @@ my $raw_file = $dbh->prepare("SELECT filename FROM raw_files JOIN talks ON raw_f
 $raw_file->execute($config->get("event"));
 $raw_file = $raw_file->fetchrow_hashref();
 $raw_file = SReview::Video->new(url => $raw_file->{filename});
-my $talk = $dbh->prepare("SELECT event, room, room_output, starttime::date AS date, to_char(starttime, 'yyyy') AS year, name AS title, subtitle, slug FROM talk_list WHERE id = ?");
-$talk->execute($talkid);
-my $talkdata = $talk->fetchrow_hashref;
+my $talk_st = $dbh->prepare("SELECT event, room, room_output, starttime::date AS date, to_char(starttime, 'yyyy') AS year, name AS title, subtitle, slug FROM talk_list WHERE id = ?");
+$talk_st->execute($talkid);
+my $talkdata = $talk_st->fetchrow_hashref;
 my $outputdir = $config->get('outputdir');
 my $subdirs = $config->get('output_subdirs');
 my $reldir = "";
@@ -53,11 +54,39 @@ foreach my $subdir(@$subdirs) {
 	$reldir = join('/', $reldir, $talkdata->{$subdir});
 }
 
+my $talk = SReview::Talk->new(talkid => $talkid);
+
+my @files = ();
+
+if($config->get('cleanup') eq "all" || $config->get('cleanup') eq 'previews') {
+	push @files, (
+		join('/', $talk->workdir, $talk->slug . ".mkv"),
+		join('/', $talk->workdir, $talk->slug . ".webm"),
+		join('/', $talk->workdir, $talk->slug . ".mp4"),
+		join('/', $talk->workdir, $talk->slug . "-post.mkv"),
+		join('/', $talk->workdir, $talk->slug . "-post.webm"),
+		join('/', $talk->workdir, $talk->slug . "-post.mp4"),
+		join('/', $talk->workdir, $talk->slug . "-post.png"),
+		join('/', $talk->workdir, $talk->slug . "-pre.mkv"),
+		join('/', $talk->workdir, $talk->slug . "-pre.webm"),
+		join('/', $talk->workdir, $talk->slug . "-pre.mp4"),
+		join('/', $talk->workdir, $talk->slug . "-pre.png"),
+	)
+}
+
 foreach my $profile(@{$config->get('output_profiles')}) {
 	my $basename = join('.', $talkdata->{slug}, SReview::Video::ProfileFactory->create($profile, $raw_file)->exten());
 	my $relfile = join('/', $reldir, $basename);
 	my $fullfile = join('/', $outputdir, $relfile);
 	run_command($fullfile, $relfile);
+	if($config->get('cleanup') eq "all" || $config->get('cleanup') eq 'output') {
+		push @files, $fullfile;
+		push @files, $fullfile . "-multipass-0.log";
+	}
+}
+
+if (scalar(@files) > 0) {
+	unlink(@files);
 }
 
 $dbh->prepare("UPDATE talks SET progress='done' WHERE id = ?")->execute($talkid);

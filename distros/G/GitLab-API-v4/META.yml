@@ -1,23 +1,46 @@
 ---
 abstract: 'A complete GitLab API v4 client.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
   Log::Any::Adapter::TAP: '0.003003'
   MIME::Base64: '3.15'
   Test2::V0: '0.000094'
-  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: GitLab-API-v4
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  GitLab::API::v4:
+    file: lib/GitLab/API/v4.pm
+    version: '0.16'
+  GitLab::API::v4::Config:
+    file: lib/GitLab/API/v4/Config.pm
+    version: '0.16'
+  GitLab::API::v4::Constants:
+    file: lib/GitLab/API/v4/Constants.pm
+    version: '0.16'
+  GitLab::API::v4::Paginator:
+    file: lib/GitLab/API/v4/Paginator.pm
+    version: '0.16'
+  GitLab::API::v4::RESTClient:
+    file: lib/GitLab/API/v4/RESTClient.pm
+    version: '0.16'
 requires:
   Carp: '0'
   Const::Fast: '0.014'
@@ -44,6 +67,20 @@ requires:
 resources:
   bugtracker: https://github.com/bluefeet/GitLab-API-v4/issues
   homepage: https://github.com/bluefeet/GitLab-API-v4
-  repository: https://github.com/bluefeet/GitLab-API-v4.git
-version: '0.15'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  repository: git://github.com/bluefeet/GitLab-API-v4.git
+version: '0.16'
+x_contributors:
+  - 'Aran Deltac <aran@ziprecruiter.com>'
+  - 'Dave Webb <github@d5ve.com>'
+  - 'Dotan Dimet <dotan@corky.net>'
+  - 'José Joaquín Atria <jjatria@gmail.com>'
+  - 'Kieren Diment <kieren.diment@staples.com.au>'
+  - 'Luc Didry <luc@framasoft.org>'
+  - 'Marek R. Sotola <Marek.R.Sotola@nasa.gov>'
+  - 'Nigel Gregoire <nigelgregoire@gmail.com>'
+  - 'Simon Ruderich <simon@ruderich.org>'
+  - 'gregor herrmann <gregoa@debian.org>'
+  - 'royce55 <royce@ecs.vuw.ac.nz>'
+  - 'trunov-ms <trunov.ms@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

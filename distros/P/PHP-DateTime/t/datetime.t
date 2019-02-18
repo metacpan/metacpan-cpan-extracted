@@ -1,16 +1,16 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
-
-use Test::More;
+use Test2::V0;
 
 use PHP::DateTime;
 
 ok( checkdate(2,12,2001), 'Check a valid date.' );
 ok( !checkdate(13,14,2002), 'Check an invalid date.' );
 
-TODO: {
-    local $TODO = 'The date() function not fully implimented yet.';
+todo 'The date() function not fully implimented yet.' => sub{
     my $secs = mktime(10,11,12,2,3,2004);
+
     is(
         date('a-A-B-c-d-D-F-g-G-h-H-i-I-J-l-L-m-M-n-O-r-s-S-t-T-U-w-W-y-Y-z-Z',$secs),
         'am-AM-674-c-03-Tue-February-10-10-10-10-11-0-J-Tuesday-1-02-Feb-2--0500-Tue, 3 Feb 2004 10:11:12 -0500-12-rd-29-EST-1075821072-2-6-04-2004-33--18000',

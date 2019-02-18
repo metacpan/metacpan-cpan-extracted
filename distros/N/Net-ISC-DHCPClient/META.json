@@ -32,11 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006"
+            "Time::Local" : "1.28",
+            "perl" : "5.014"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.12",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

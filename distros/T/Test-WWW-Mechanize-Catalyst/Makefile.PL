@@ -1,4 +1,5 @@
 #!perl
+BEGIN { push @INC, '.' unless $INC[-1] eq '.' }
 use inc::Module::Install 0.87;
 
 use strict;

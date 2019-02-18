@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.144-2-g67011e3
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.145-8-g9ce3dfe
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.145';
+our $VERSION = '0.146';
 
 use Moose;
 with
@@ -41,7 +41,7 @@ has installer => (
             if not exists $self->payload->{installer};
 
         # remove 'none' from installer list
-        return [ grep { $_ ne 'none' } @{ $self->payload->{installer} } ];
+        return [ grep $_ ne 'none', @{ $self->payload->{installer} } ];
     },
     traits => ['Array'],
     handles => { installer => 'elements' },
@@ -84,7 +84,7 @@ around copy_files_from_release => sub {
 
 sub commit_files_after_release
 {
-    grep { -e } sort(uniq('README.md', 'README.pod', 'Changes', shift->copy_files_from_release));
+    grep -e, sort(uniq('README.md', 'README.pod', 'Changes', shift->copy_files_from_release));
 }
 
 has changes_version_columns => (
@@ -209,7 +209,7 @@ has _plugin_requirements => (
 );
 
 # files that might be in the repository that should never be gathered
-my @never_gather = grep { -e } qw(
+my @never_gather = grep -e, qw(
     Makefile.PL ppport.h README.md README.pod META.json
     cpanfile TODO CONTRIBUTING LICENCE LICENSE INSTALL
     inc/ExtUtils/MakeMaker/Dist/Zilla/Develop.pm
@@ -256,7 +256,7 @@ sub configure
 
     warn '[@Author::ETHER] ', colored('You are using [ModuleBuild] as an installer, WTF?!', 'bright_red'), "\n"
         if any { $_->isa('Dist::Zilla::Plugin::ModuleBuild') }
-            map { Dist::Zilla::Util->expand_config_package_name($_) } $self->installer;
+            map Dist::Zilla::Util->expand_config_package_name($_), $self->installer;
 
     # this is better than injecting a perl prereq for 5.008, to allow MBT to
     # become more 5.006-compatible in the future without forcing the distribution to be re-released.
@@ -355,7 +355,7 @@ sub configure
             : ()
         } ],
         [ 'Authority'           => { ':version' => '1.009', authority => $self->authority, do_munging => 0 } ],
-        [ 'MetaNoIndex'         => { directory => [ qw(t xt), grep { -d } qw(inc local perl5 fatlib examples share corpus demo) ] } ],
+        [ 'MetaNoIndex'         => { directory => [ qw(t xt), grep -d, qw(inc local perl5 fatlib examples share corpus demo) ] } ],
         [ 'MetaProvides::Package' => { ':version' => '1.15000002', finder => ':InstallModules', meta_noindex => 1, inherit_version => 0, inherit_missing => 0 } ],
         'MetaConfig',
         [ 'Keywords'            => { ':version' => '0.004' } ],
@@ -523,7 +523,7 @@ around add_plugins => sub
              $plugin_package eq Dist::Zilla::Util->expand_config_package_name($_)   # match by package name
              or ($plugin->[1] and not ref $plugin->[1] and $plugin->[1] eq $_)      # match by moniker
         } $self->_removed_plugins
-    } map { ref $_ ? $_ : [ $_ ] } @plugins;
+    } map +(ref $_ ? $_ : [ $_ ]), @plugins;
 
     foreach my $plugin_spec (@plugins)
     {
@@ -537,7 +537,7 @@ around add_plugins => sub
         push @$plugin_spec, {} if not ref $plugin_spec->[-1];
         my $payload = $plugin_spec->[-1];
 
-        foreach my $module (grep { $plugin->isa($_) or $plugin->does($_) } keys %extra_args)
+        foreach my $module (grep +($plugin->isa($_) or $plugin->does($_)), keys %extra_args)
         {
             my %configs = %{ $extra_args{$module} };    # copy, not reference!
 
@@ -578,7 +578,7 @@ around add_bundle => sub
     $payload = {
         %$payload,      # caller bundle's default settings for this bundle, passed to this sub
         # custom configs from the user, which may override defaults
-        (map { $_ => $self->payload->{$_} } grep { /^(.+?)\.(.+?)/ } keys %{ $self->payload }),
+        (map +($_ => $self->payload->{$_}), grep /^(.+?)\.(.+?)/, keys %{ $self->payload }),
     };
 
     # allow the user to say -remove = <plugin added in subbundle>, but also do not override
@@ -597,9 +597,9 @@ sub _pause_config
     my $file = path($ENV{HOME} // 'oops', '.pause');
     return if not -e $file;
 
-    my ($username, $password) = map {
-        my (undef, $val) = split ' ', $_; $val  # awk-style whitespace splitting
-    } $file->lines;
+    my ($username, $password) = map
+        +(split(' ', $_))[1],  # awk-style whitespace splitting
+        $file->lines;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -616,7 +616,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.145
+version 0.146
 
 =head1 SYNOPSIS
 

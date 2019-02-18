@@ -1,15 +1,14 @@
 # SReview
 
-This SReview, a video review system. It takes input files, stores
+This is SReview, a video review system. It takes input files, stores
 their lengths in a database, combines those lengths and their starttime
 with a schedule it has of an event to see which talks are fully
 recorded, and creates a preview. After that, magic happens, and
 eventually a fully transcoded quality video rolls out of the system.
 
-Note that while SReview has been used in production for [FOSDEM
-2017](https://fosdem.org/2017), [FOSDEM 2018](https://fosdem.org/2018) and
-[DebConf 2017](https://debconf17.debconf.org), there is still some missing
-functionality in some areas. Patches welcome! :-)
+Note that while SReview has been used [in
+production](https://yoe.github.io/sreview/production), there is still
+some missing functionality in some areas. Patches welcome! :-)
 
 ## States
 
@@ -28,6 +27,7 @@ aware of. First, there is the main state:
     broken
     needs_work
     lost
+    ignored
 
 Next, there is the job state:
 
@@ -61,6 +61,10 @@ following list explains what each of the main states means:
   fixed eventually.
 - `lost`: Refinement of `broken`. Can be used by an administrator to
   confirm that a recording is broken and cannot be usefully released.
+- `ignored`: Can be used by an administrator to mark recordings for
+  talks that never happened, or that appeared on the schedule but don't
+  include interesting content, or that appeared on the schedule but for
+  which speakers requested that no recordings would be made available.
 
 The job states, then, mean:
 
@@ -70,7 +74,7 @@ The job states, then, mean:
   will be started almost immediately; if not, it may need to wait until
   that's done.
 - `running`: the script is now active and running.
-- `done : the script finished successfully
+- `done`: the script finished successfully
 - `failed`: the script did *not* finish successfully (note: when that
   hapens, it doesn't always go into this state, currently).
 

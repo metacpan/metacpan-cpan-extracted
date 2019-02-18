@@ -2,7 +2,7 @@
 # vim:ft=perl:et:
 use vars qw($VERSION);
 my $APP  = 'rgbterm';
-$VERSION = '0.022';
+$VERSION = '0.026';
 
 use strict;
 use Getopt::Long qw(GetOptions);

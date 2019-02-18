@@ -18,8 +18,11 @@ t/bufrencode.t
 t/bufrextract.t
 t/bufrread.t
 t/bufrresolve.t
+t/eccodes.t
+t/set_filter.t
 t/1xBUFRSYNOP-ed4.bufr
 t/1xBUFRSYNOP-ed4.bufr_altered
+t/1xBUFRSYNOP-ed4.bufr_altered_eccodes
 t/1xBUFRSYNOP-ed4.txt
 t/207003.bufr
 t/207003_compressed.bufr
@@ -74,6 +77,12 @@ t/iupd_bad.bufr
 t/iupd_bad.txt
 t/iupd_bad.warn
 t/join.bufr
+t/local.bufr
+t/local_desc_2201.txt_eccodes
+t/local_desc_301193.txt_eccodes
+t/local_table_8198.txt_eccodes
+t/local.txt_eccodes
+t/local.txt_eccodes_c
 t/long_truncated_temp_synop.bufr
 t/long_truncated_temp_synop.err
 t/long_truncated_temp_synop_temp.bufr
@@ -97,7 +106,6 @@ t/retained.txt
 t/set_filter.bufr
 t/set_filter.err2
 t/set_filter.pl
-t/set_filter.t
 t/set_filter.txt
 t/set_filter.txt2
 t/set_filter.txt3
@@ -120,4 +128,16 @@ t/bt/B0000000000098013001.TXT
 t/bt/C0000000000098013001.TXT
 t/bt/D0000000000000011000.TXT
 t/bt/D0000000000098013001.TXT
+t/et/0/local/8/78/236/sequence.def
+t/et/0/local/8/78/236/codetables/2243.table
+t/et/0/local/8/78/236/codetables/8198.table
+t/et/0/local/8/78/236/codetables/2245.table
+t/et/0/local/8/78/236/element.table
+t/et/0/local/1/98/0/6/element.table
+t/et/0/wmo/13/sequence.def
+t/et/0/wmo/13/codetables/20021.table
+t/et/0/wmo/13/codetables/33005.table
+t/et/0/wmo/13/codetables/8021.table
+t/et/0/wmo/13/element.table
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

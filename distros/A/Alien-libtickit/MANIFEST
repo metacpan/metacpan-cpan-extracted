@@ -1,0 +1,10 @@
+Build.PL
+Changes
+inc/Alien/make/Module/Build.pm
+lib/Alien/libtickit.pm
+libtickit-0.2a.tar.gz
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README

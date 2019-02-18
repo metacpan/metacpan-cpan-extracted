@@ -1,10 +1,10 @@
 Name:           perl-LCFG-Build-Tools
-Version:        0.9.19
+Version:        0.9.20
 Release:        1
 Summary:        LCFG build system tools
 License:        gpl
 Group:          Development/Libraries
-Source0:        LCFG-Build-Tools-0.9.19.tar.gz
+Source0:        LCFG-Build-Tools-0.9.20.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl >= 5.16.0
@@ -85,8 +85,15 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/lcfg-reltool
 
 %changelog
-* Thu Jan 24 2019 SVN: new release
-- Release: 0.9.19
+* Mon Feb 18 2019 SVN: new release
+- Release: 0.9.20
+
+* Mon Feb 18 2019 09:34  squinney@INF.ED.AC.UK
+- Makefile.PL: Fixed missing comma in prereq list of packages, closes:
+  https://rt.cpan.org/Public/Bug/Display.html?id=128543
+
+* Thu Jan 24 2019 10:50  squinney@INF.ED.AC.UK
+- Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release: 0.9.19
 
 * Thu Jan 24 2019 10:39  squinney@INF.ED.AC.UK
 - lcfg.yml, templates/build.cmake.tt: Fixed the pod to man page convertor,

@@ -23,7 +23,6 @@ requires:
   Term::ExtendedColor::Dzen: '0'
   perl: '5.001'
 resources:
-  bugtracker: https://github.com/trapd00r/makedist/issues
-  repository: https://github.com/trapd00r/Music-KNRadio-NowPlaying
-version: '0.008'
+  repository: https://github.com/trapd00r/Music-KNRadio-NowPlaying.git
+version: '0.012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

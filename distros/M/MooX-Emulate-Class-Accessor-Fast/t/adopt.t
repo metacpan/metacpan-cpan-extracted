@@ -1,13 +1,19 @@
-#!perl
-use strict;
-use lib 't/lib';
-use Test::More tests => 14;
+#!/usr/bin/env perl
+use strictures 2;
+use Test2::V0;
 
-#1,2
-require_ok("MooX::Adopt::Class::Accessor::Fast");
-use_ok('TestAdoptCAF');
+use MooX::Adopt::Class::Accessor::Fast;
 
-#3-6
+{
+  package TestAdoptCAF;
+
+  use base 'Class::Accessor::Fast';
+
+  __PACKAGE__->mk_accessors('foo');
+  __PACKAGE__->mk_ro_accessors('bar');
+  __PACKAGE__->mk_wo_accessors('baz');
+}
+
 ok(TestAdoptCAF->can('meta'), 'Adopt seems to work');
 
 ok(!Class::Accessor::Fast->can('_get_moocaf_foo'),
@@ -32,15 +38,15 @@ SKIP: {
   };
   ok( ref($ok), ref($ok) ? "no warnings when instantiating object" : $@);
 }
-#7-9
+
 my $t = TestAdoptCAF->new(foo => 100, bar => 200, groditi => 300);
 is($t->{foo},     100, '$self->{foo} set');
 is($t->{bar},     200, '$self->{bar} set');
 is($t->{groditi}, 300, '$self->{groditi} set');
 
-#10-12
 my $u = TestAdoptCAF->new({foo => 100, bar => 200, groditi => 300});
 is($u->{foo},     100, '$self->{foo} set');
 is($u->{bar},     200, '$self->{bar} set');
 is($u->{groditi}, 300, '$self->{groditi} set');
 
+done_testing;

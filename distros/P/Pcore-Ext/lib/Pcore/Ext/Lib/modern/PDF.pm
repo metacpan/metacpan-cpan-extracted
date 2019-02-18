@@ -124,7 +124,7 @@ JS
 
 sub EXT_panel : Extend('Ext.Panel') {
     return {
-        controller => $type->{controller},
+        controller => $type{controller},
 
         config => {
             src   => undef,

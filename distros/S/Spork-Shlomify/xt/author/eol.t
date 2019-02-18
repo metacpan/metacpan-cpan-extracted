@@ -12,6 +12,7 @@ my @files = (
     'lib/Spork/Shlomify/Config.pm',
     'lib/Spork/Shlomify/Formatter.pm',
     'lib/Spork/Shlomify/Slides.pm',
+    'lib/Spork/Shlomify/Slides/FromSpork.pm',
     't/00-compile.t',
     't/00-load.t'
 );

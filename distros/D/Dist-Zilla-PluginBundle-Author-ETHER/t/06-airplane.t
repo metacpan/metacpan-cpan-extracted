@@ -59,7 +59,7 @@ MODULE
     );
 };
 
-my @plugin_classes = map { find_meta($_)->name } @{$tzil->plugins};
+my @plugin_classes = map find_meta($_)->name, @{$tzil->plugins};
 die 'UploadToCPAN found in plugin list' if any { $_ eq 'Dist::Zilla::Plugin::UploadToCPAN' } @plugin_classes;
 die 'FakeRelease not found in plugin list' if not any { $_ eq 'Dist::Zilla::Plugin::FakeRelease' } @plugin_classes;
 
@@ -69,12 +69,12 @@ my @expected_log_messages = (
 );
 
 my $ok = cmp_deeply(
-    [ map { colorstrip($_) } @warnings ],
-    superbagof(map { re(qr/^\[\@Author::ETHER\] $_/) } @expected_log_messages),
+    [ map colorstrip($_), @warnings ],
+    superbagof(map re(qr/^\[\@Author::ETHER\] $_/), @expected_log_messages),
     'we warn when in airplane mode, and performing a fake release',
 ) or diag explain @warnings;
 
-@warnings = grep { my $warning = $_; not grep { $warning =~ /$_/ } @expected_log_messages } @warnings;
+@warnings = grep { my $warning = $_; not grep $warning =~ /$_/, @expected_log_messages } @warnings;
 warn @warnings if @warnings and $ok;
 
 assert_no_git($tzil);
@@ -97,10 +97,10 @@ all_plugins_in_prereqs($tzil,
 
 my @network_plugins = Dist::Zilla::PluginBundle::Author::ETHER->_network_plugins;
 my %network_plugins;
-@network_plugins{ map { Dist::Zilla::Util->expand_config_package_name($_) } @network_plugins } = () x @network_plugins;
+@network_plugins{ map Dist::Zilla::Util->expand_config_package_name($_), @network_plugins } = () x @network_plugins;
 
 cmp_deeply(
-    [ grep { exists $network_plugins{$_} } @plugin_classes ],
+    [ grep exists $network_plugins{$_}, @plugin_classes ],
     [],
     'no network-using plugins were actually added',
 );

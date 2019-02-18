@@ -26,7 +26,6 @@ requires:
   Pod::Usage: '0'
   perl: '5.001'
 resources:
-  bugtracker: https://github.com/trapd00r/id3shit/issues
-  repository: https://github.com/trapd00r/id3shit
-version: '2.60'
+  repository: https://github.com/trapd00r/id3shit.git
+version: '2.64'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

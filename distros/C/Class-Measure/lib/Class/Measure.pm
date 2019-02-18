@@ -1,5 +1,7 @@
 package Class::Measure;
 
+$Class::Measure::VERSION = '0.06';
+
 =head1 NAME
 
 Class::Measure - Create, compare, and convert units of measurement.
@@ -23,8 +25,6 @@ The methods described here are available in all Class::Measure classes.
 
 use strict;
 use warnings;
-
-our $VERSION = '0.04';
 
 use Carp qw( croak );
 

@@ -20,7 +20,6 @@ no_index:
 requires:
   perl: '5.01'
 resources:
-  bugtracker: https://github.com/trapd00r/Term-ExtendedColor/issues
-  repository: https://github.com/trapd00r/Term-ExtendedColor
-version: '0.239'
+  repository: https://github.com/trapd00r/Term-ExtendedColor.git
+version: '0.242'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,7 @@
-package # Hide from the indexer for now until docs are added later.
-    MooseX::ExtraArgs::Meta::ToRole;
+package MooseX::ExtraArgs::Meta::ToRole;
+
+$MooseX::ExtraArgs::Meta::ToRole::VERSION = '0.02';
+
 use Moose::Role;
 
 around apply => sub{

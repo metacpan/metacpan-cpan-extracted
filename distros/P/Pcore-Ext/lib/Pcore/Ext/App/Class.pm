@@ -90,7 +90,7 @@ sub build ( $self ) {
         return Pcore::Ext::App::Class::Ctx::Class->new( class => $self, name => $class_name );
     };
 
-    local *{"$self->{package}\::class"} = \$class;
+    local *{"$self->{package}\::class"} = $class;
 
     # "type" resolver
     tie my $type->%*, 'Pcore::Ext::App::Class::TiedResolver', sub ($class_name) {
@@ -101,7 +101,7 @@ sub build ( $self ) {
         return Pcore::Ext::App::Class::Ctx::Type->new( class => $self, name => $class_name );
     };
 
-    local *{"$self->{package}\::type"} = \$type;
+    local *{"$self->{package}\::type"} = $type;
 
     # "api" resolver
     tie my $api->%*, 'Pcore::Ext::App::Class::TiedResolver', sub ($method_id) {
@@ -124,7 +124,7 @@ sub build ( $self ) {
         return "EXTDIRECT.$self->{app}->{api_namespace}.$action.$name";
     };
 
-    local *{"$self->{package}\::api"} = \$api;
+    local *{"$self->{package}\::api"} = $api;
 
     # "cdn" resolver
     local ${"$self->{package}\::cdn"} = $self->{app}->{cdn};

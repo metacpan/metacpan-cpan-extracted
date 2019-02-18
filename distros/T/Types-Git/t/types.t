@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
-use strictures 1;
+use strictures 2;
 
-use Test::More;
+use Test2::V0;
 
-BEGIN { use_ok('Types::Git', '-types') }
+use Types::Git -types;
 
 my $git_ref_rule_bad_refs = {
     1 => [qw(

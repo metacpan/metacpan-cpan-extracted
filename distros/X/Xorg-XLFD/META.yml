@@ -1,25 +1,25 @@
---- #YAML:1.0
-name:               Xorg-XLFD
-version:            0.128
-abstract:           X11 logical font description interface
+---
+abstract: 'X11 logical font description interface'
 author:
-    - Magnus Woldrich <trapd00r@trapd00r.se>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Magnus Woldrich <m@japh.se.se>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    perl:  5.0110001
-resources:
-    bugtracker:  https://github.com/trapd00r/Xorg-XLFD/issues
-    repository:  https://github.com/trapd00r/Xorg-XLFD
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Xorg-XLFD
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.0110001'
+resources:
+  repository: https://github.com/trapd00r/Xorg-XLFD.git
+version: '0.134'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

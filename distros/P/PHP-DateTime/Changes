@@ -1,22 +1,32 @@
-Revision history for Perl extension PHP::DateTime.
+Revision history for Perl extension PHP-DateTime.
 
-0.06      2011-03-08
+0.07 2019-02-18T06:07:45Z
+
+ - Migrate all the tests from Test::More to Test2::V0.
+ - Migrate build tooling from Dist::Zilla to Minilla.
+
+0.06 2011-03-08
+
  - Very minor doc and release cleanup.
 
-0.05 : 2009-06-29
+0.05 2009-06-29
+
  - Fix significant bug in mktime.
 
-0.04 : 2008-03-16
+0.04 2008-03-16
+
  - Use Module::Install.
  - Require dependent module in build.
  - Fixed a bug in mktime where it was confusing the month for the month day.
 
 0.03
+
  - More tests.
  - Fixed mktime.
  - Docs are expanded a little.
  - Requires Time::Local.
 
-0.02  Thr Mar 11 12:19 2004
+0.02
+
  - First public version.
 

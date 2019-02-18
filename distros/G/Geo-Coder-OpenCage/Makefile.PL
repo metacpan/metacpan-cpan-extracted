@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Cpanel::JSON::XS" => "4.08",
     "HTTP::Tiny" => 0,
+    "JSON::MaybeXS" => "1.004000",
     "Pod::Perldoc" => "3.21",
     "URI" => 0
   },
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.51",
     "Test::Warn" => 0
   },
-  "VERSION" => "0.19",
+  "VERSION" => "0.20",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +41,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Cpanel::JSON::XS" => "4.08",
   "HTTP::Tiny" => 0,
+  "JSON::MaybeXS" => "1.004000",
   "Net::Ping" => "2.71",
   "Pod::Perldoc" => "3.21",
   "Test::Exception" => "0.32",

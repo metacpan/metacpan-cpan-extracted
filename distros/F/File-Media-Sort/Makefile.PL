@@ -3,33 +3,35 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile1(
-    META_MERGE => {
-        resources => {
-
-        repository      => q{https://github.com/trapd00r/File-Media-Sort},
-        bugtracker      => q{https://github.com/trapd00r/File-Media-Sort/issues},
+  META_MERGE => {
+    q(meta-spec) => { version => 2 },
+      resources => {
+          repository => {
+            type       => 'git',
+            url        => 'https://github.com/trapd00r/File-Media-Sort.git',
+            web        => 'https://github.com/trapd00r/File-Media-Sort',
+            bugtracker => 'https://github.com/trapd00r/File-Media-Sort/issues',
       },
     },
-    BUILD_REQUIRES      => { },
+  },
+  NAME                => q{File::Media::Sort},
+  AUTHOR              => q{Magnus Woldrich <m@japh.se>},
+  ABSTRACT            => q{Sort media files based on their filename pattern},
+  VERSION_FROM        => q{lib/File/Media/Sort.pm},
+  LICENSE             => q{perl},
 
-    NAME                => q{File::Media::Sort},
-    AUTHOR              => q{Magnus Woldrich <m@japh.se>},
-    ABSTRACT            => q{Sort media files based on their filename pattern},
-    VERSION_FROM        => q{lib/File/Media/Sort.pm},
-    LICENSE             => q{perl},
-
-    PL_FILES            => { },
-    EXE_FILES           => [glob('scripts/*') ],
-    PREREQ_PM           => {
-      q{Test::More}     => 0,
-    },
-    MAN1PODS            => { },
-    dist                => {
-      COMPRESS          => 'gzip -9f', SUFFIX => 'gz',
-    },
-    clean               => {
-      FILES              => q{File-Media-Sort-*}
-    },
+  PL_FILES            => { },
+  EXE_FILES           => [glob('scripts/*') ],
+  PREREQ_PM           => {
+    q{Test::More}     => 0,
+  },
+  MAN1PODS            => { },
+  dist                => {
+    COMPRESS          => 'gzip -9f', SUFFIX => 'gz',
+  },
+  clean               => {
+    FILES              => q{File-Media-Sort-*}
+  },
 );
 
 sub WriteMakefile1 {
@@ -66,4 +68,3 @@ sub WriteMakefile1 {
 
     WriteMakefile(%params);
 }
-

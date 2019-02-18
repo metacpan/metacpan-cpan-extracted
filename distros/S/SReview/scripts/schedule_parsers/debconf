@@ -1,9 +1,9 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -CSDA
 
-# Sreview, a web-based video review and transcoding system
+# SReview, a web-based video review and transcoding system
 # Copyright (c) 2016-2017, Wouter Verhelst <w@uter.be>
 #
-# Sreview is free software: you can redistribute it and/or modify it
+# SReview is free software: you can redistribute it and/or modify it
 # under the terms of the GNU Affero General Public License as published
 # by the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
@@ -21,11 +21,13 @@ use XML::SimpleObject;
 use Text::Slugify 'slugify';
 use DBI;
 
-require './config.pl';
+use SReview::Config::Common;
 
-my $dbh = DBI->connect($config->{dbistring}, '', '') or die "Cannot connect to database!";
+my $config = SReview::Config::Common::setup;
 
-open SCHEDULE, "curl --capath /etc/ssl/ca-global -s https://debconf17.debconf.org/schedule/pentabarf.xml|";
+my $dbh = DBI->connect($config->get('dbistring'), '', '') or die "Cannot connect to database!";
+
+open SCHEDULE, "curl --capath /etc/ssl/ca-global -s https://debconf18.debconf.org/schedule/pentabarf.xml|";
 
 my $schedule = "";
 
@@ -62,9 +64,6 @@ my $track_add = $dbh->prepare("INSERT INTO tracks(name) VALUES (?)");
 
 foreach my $day($xml->child('schedule')->children('day')) {
 	foreach my $room($day->children('room')) {
-		next if ($room->attribute('name') eq 'Elsewhere');
-		next if ($room->attribute('name') eq 'Woody');
-		next if ($room->attribute('name') eq 'Potato');
 		do {
 			$dbroom->execute($room->attribute('name')) or die;
 
@@ -77,12 +76,12 @@ foreach my $day($xml->child('schedule')->children('day')) {
 		my $roomid = $row->[0];
 		my $talk_upid;
 		foreach my $talk($room->children('event')) {
+			next if ($talk eq ''); # drop empty rooms
 			$talk_upid = $talk->child('conf_url')->value();
 			next unless defined($talk_upid);
 			my $title = $talk->child('title')->value();
 			next unless defined($title);
 			my $released = $talk->child('released')->value();
-			next unless $released eq 'True';
 			do {
 				$track_ex->execute($talk->child('track')->value()) or die;
 
@@ -94,8 +93,13 @@ foreach my $day($xml->child('schedule')->children('day')) {
 			my $talk_st = $dbh->prepare("SELECT id FROM talks WHERE upstreamid = ? AND event = ?");
 			$talk_st->execute($talk_upid, $eventid) or die;
 			if($talk_st->rows < 1) {
+				next unless $released eq 'True';
 				$talk_st = $dbh->prepare("INSERT INTO talks (room, slug, starttime, endtime, title, subtitle, track, event, upstreamid) VALUES (?, ?, ?::timestamptz, ?::timestamptz + ?::interval, ?, ?, ?, ?, ?)");
 			} else {
+				if($released ne 'True') {
+					$dbh->prepare("UPDATE talks SET state='ignored' WHERE upstreamid = ? AND event = ?")->execute($talk_upid, $eventid);
+					next;
+				}
 				$talk_st = $dbh->prepare("UPDATE talks SET room = ?, slug = ?, starttime = ?::timestamptz, endtime = ?::timestamptz + ?::interval, title = ?, subtitle = ?, track = ? WHERE event = ? AND upstreamid = ?");
 			}
 			my $starttime = $day->attribute('date') . " " . $talk->child('start')->value() . ":00+00";

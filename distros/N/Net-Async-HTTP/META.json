@@ -52,15 +52,15 @@
    "provides" : {
       "Net::Async::HTTP" : {
          "file" : "lib/Net/Async/HTTP.pm",
-         "version" : "0.43"
+         "version" : "0.44"
       },
       "Net::Async::HTTP::Connection" : {
          "file" : "lib/Net/Async/HTTP/Connection.pm",
-         "version" : "0.43"
+         "version" : "0.44"
       },
       "Net::Async::HTTP::StallTimer" : {
          "file" : "lib/Net/Async/HTTP/StallTimer.pm",
-         "version" : "0.43"
+         "version" : "0.44"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.43",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.44",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -20,23 +20,27 @@ name: Spork-Shlomify
 provides:
   Spork::Shlomify:
     file: lib/Spork/Shlomify.pm
-    version: '0.0204'
+    version: '0.0400'
   Spork::Shlomify::Config:
     file: lib/Spork/Shlomify/Config.pm
-    version: '0.0204'
+    version: '0.0400'
   Spork::Shlomify::Formatter:
     file: lib/Spork/Shlomify/Formatter.pm
-    version: '0.0204'
+    version: '0.0400'
   Spork::Shlomify::Slides:
     file: lib/Spork/Shlomify/Slides.pm
-    version: '0.0204'
+    version: '0.0400'
+  Spork::Shlomify::Slides::FromSpork:
+    file: lib/Spork/Shlomify/Slides/FromSpork.pm
+    version: '0.0400'
 requires:
+  CGI: '0'
   Cwd: '0'
   Spoon: '0.22'
   Spork: '0'
   Spork::Config: '0'
   Spork::Formatter: '0'
-  Spork::Slides: '0'
+  mixin: '0'
   perl: '5.008'
   strict: '0'
   warnings: '0'
@@ -44,10 +48,10 @@ resources:
   bugtracker: https://github.com/shlomif/Spork-Shlomify/issues
   homepage: http://metacpan.org/release/Spork-Shlomify
   repository: http://github.com/shlomif/perl-Spork-Shlomify
-version: '0.0204'
+version: '0.0400'
 x_Dist_Zilla:
   perl:
-    version: '5.026002'
+    version: '5.028001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -163,10 +167,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Filter/PkgVersion'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::PodCoverageTests
-      name: '@Filter/PodCoverageTests'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
@@ -375,5 +375,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,51 +1,73 @@
 {
    "abstract" : "Record store timing information to statsd.",
    "author" : [
-      "Aran Deltac <bluefeet@gmail.com>"
+      "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Starch-Plugin-Net-Statsd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
-            "Test::Pod" : "1.41"
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "Moo" : "2",
+            "Moo" : "2.000000",
             "Net::Statsd" : "0.11",
-            "Starch" : "0.01",
+            "Starch" : "0.10",
             "Type::Tiny" : "1.000005",
             "namespace::clean" : "0.24",
-            "strictures" : "2"
+            "strictures" : "2.000000"
          }
       },
       "test" : {
-         "recommends" : {
-            "CPAN::Meta" : "2.120900"
-         },
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "File::Spec" : "0",
-            "Package::Stash" : "0.37",
-            "Test::Fatal" : "0",
-            "Test::More" : "0",
-            "Test::Simple" : "0.96"
+            "Test2::V0" : "0.000094"
          }
+      }
+   },
+   "provides" : {
+      "Starch::Plugin::Net::Statsd" : {
+         "file" : "lib/Starch/Plugin/Net/Statsd.pm",
+         "version" : "0.03"
+      },
+      "Starch::Plugin::Net::Statsd::Manager" : {
+         "file" : "lib/Starch/Plugin/Net/Statsd/Manager.pm",
+         "version" : "0.03"
+      },
+      "Starch::Plugin::Net::Statsd::Store" : {
+         "file" : "lib/Starch/Plugin/Net/Statsd/Store.pm",
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -55,12 +77,11 @@
       },
       "homepage" : "https://github.com/bluefeet/Starch-Plugin-Net-Statsd",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/bluefeet/Starch-Plugin-Net-Statsd.git",
+         "url" : "git://github.com/bluefeet/Starch-Plugin-Net-Statsd.git",
          "web" : "https://github.com/bluefeet/Starch-Plugin-Net-Statsd"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
 }
-

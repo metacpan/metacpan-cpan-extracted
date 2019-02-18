@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::AO3;
-$WWW::FetchStory::Fetcher::AO3::VERSION = '0.2002';
+$WWW::FetchStory::Fetcher::AO3::VERSION = '0.2004';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher::AO3 - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2002
+version 0.2004
 
 =head1 DESCRIPTION
 
@@ -334,6 +334,8 @@ sub parse_characters {
     {
 	$characters = $self->SUPER::parse_characters(%args);
     }
+    # Remove the (Universe) part of the characters
+    $characters =~ s!\s*\([^)]+\)!!g;
     return $characters;
 } # parse_characters
 
@@ -383,6 +385,10 @@ sub parse_universe {
     elsif ($universe =~ m!(Doctor Who)!)
     {
         $universe = $1;
+    }
+    elsif ($universe =~ m!Blake&amp;#39;s 7!)
+    {
+        $universe = 'Blakes 7';
     }
     return $universe;
 } # parse_universe

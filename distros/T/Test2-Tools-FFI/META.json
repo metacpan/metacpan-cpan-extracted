@@ -1,0 +1,83 @@
+{
+   "abstract" : "Tools for testing FFI",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test2-Tools-FFI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "FFI::Build" : "0.84"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.30",
+            "FFI::Build::MM" : "0.84",
+            "File::ShareDir::Install" : "0.06",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::Build" : "0.84",
+            "FFI::CheckLib" : "0.11",
+            "FFI::Platypus" : "0.84",
+            "File::ShareDir::Dist" : "0",
+            "Test2::API" : "1.302015",
+            "Test2::EventFacet::Trace" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Perl5-FFI/Test2-Tools-FFI/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Test2::Tools::FFI",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Perl5-FFI/Test2-Tools-FFI.git",
+         "web" : "https://github.com/Perl5-FFI/Test2-Tools-FFI"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.29.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_use_unsafe_inc" : 0
+}
+

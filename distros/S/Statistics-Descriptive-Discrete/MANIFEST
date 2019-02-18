@@ -1,9 +1,14 @@
 Changes
 Discrete.pm
+examples/sdd_prof.pl
+examples/statistics_discrete_ex.pl
+LICENSE
 Makefile.PL
 MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
 README
-test.pl
-
-examples/statistics_discrete_ex.pl
-
+t/00-load.t
+t/descr.t
+t/discrete.t
+t/lib/Utils.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,130 @@
+
+Message 1  
+
+Section 0:
+    Length of BUFR message:            325
+    BUFR edition:                      4
+
+Section 1:
+    Length of section:                 22
+    BUFR master table:                 0
+    Originating centre:                78
+    Originating subcentre:             236
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           0
+    International data subcategory:    255
+    Local data subcategory:            70
+    Master table version number:       13
+    Local table version number:        8
+    Year:                              2017
+    Month:                             1
+    Day:                               6
+    Hour:                              7
+    Minute:                            0
+    Second:                            0
+
+Section 3:
+    Length of section:                 95
+    Number of data subsets:            2
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       001018 001015 001241 001242 001243 002243 002244 002245 301011 301012 301021 007030 007032 012101 012103 013003 007032 020001 109000 031001 002242 012241 102000 031001 007061 012242 007061 013241 020241 004025 020024 013055 020021 013011 007032 008021 004025 011001 011002 008021 004025 011043 011041 033005
+
+Subset 1
+
+     1  001018             F884  SHORT STATION OR SITE NAME [CCITTIA5]
+     2  001015  Sergener Teiche  STATION OR SITE NAME [CCITTIA5]
+     3  001241               BB  STATE/FEDERAL STATE IDENTIFIER [CCITTIA5]
+     4  001242             A015  HIGHWAY DESIGNATOR [CCITTIA5]
+     5  001243                0  ROUTES KILOMETER OF ROAD [m]
+     6  002243               32  EXTENDED TYPE OF STATION [FLAG TABLE]
+     7  002244          missing  TYPE OF ROAD [CODE TABLE]
+     8  002245                1  TYPE OF CONSTRUCTION [CODE TABLE]
+     9  004001             2017  YEAR [a]
+    10  004002                1  MONTH [mon]
+    11  004003                6  DAY [d]
+    12  004004                7  HOUR [h]
+    13  004005                0  MINUTE [min]
+    14  005001         51.71367  LATITUDE (HIGH ACCURACY) [deg]
+    15  006001         14.47513  LONGITUDE (HIGH ACCURACY) [deg]
+    16  007030             86.0  HEIGHT OF STATION GROUND ABOVE MEAN SEA LEVEL (SEE NOTE 3) [m]
+    17  007032             4.00  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [m]
+    18  012101           263.85  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    19  012103           262.05  DEW-POINT TEMPERATURE [K]
+    20  013003               84  RELATIVE HUMIDITY [%]
+    21  007032          missing  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [m]
+    22  020001          missing  HORIZONTAL VISIBILITY [m]
+    23  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [Numeric]
+    24  002242          missing  POSITION OF ROAD SENSORS [CODE TABLE]
+    25  012241           263.35  ROAD SURFACE TEMPERATURE [K]
+    26  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [Numeric]
+    27  007061          missing  DEPTH BELOW LAND SURFACE [m]
+    28  012242           270.45  ROAD SUB-SURFACE TEMPERATURE [K]
+    29  007061          missing  DEPTH BELOW LAND SURFACE [m]
+    30  013241          missing  WATER FILM THICKNESS [m]
+    31  020241          missing  ROAD SURFACE CONDITION [CODE TABLE]
+    32  004025                0  TIME PERIOD OR DISPLACEMENT [min]
+    33  020024          missing  INTENSITY OF PHENOMENA [CODE TABLE]
+    34  013055          missing  INTENSITY OF PRECIPITATION [kg m-2 s-1]
+    35  020021                0  TYPE OF PRECIPITATION [FLAG TABLE]
+    36  013011          missing  TOTAL PRECIPITATION/TOTAL WATER EQUIVALENT [kg m-2]
+    37  007032             4.00  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [m]
+    38  008021                2  TIME SIGNIFICANCE [CODE TABLE]
+    39  004025                0  TIME PERIOD OR DISPLACEMENT [min]
+    40  011001          missing  WIND DIRECTION [deg]
+    41  011002          missing  WIND SPEED [m/s]
+    42  008021               22  TIME SIGNIFICANCE [CODE TABLE]
+    43  004025          missing  TIME PERIOD OR DISPLACEMENT [min]
+    44  011043          missing  MAXIMUM WIND GUST DIRECTION [deg]
+    45  011041          missing  MAXIMUM WIND GUST SPEED [m/s]
+    46  033005        536870912  QUALITY INFORMATION (AWS DATA) [FLAG TABLE]
+
+Subset 2
+
+     1  001018             F894  SHORT STATION OR SITE NAME [CCITTIA5]
+     2  001015       Bademeusel  STATION OR SITE NAME [CCITTIA5]
+     3  001241               BB  STATE/FEDERAL STATE IDENTIFIER [CCITTIA5]
+     4  001242             A015  HIGHWAY DESIGNATOR [CCITTIA5]
+     5  001243              100  ROUTES KILOMETER OF ROAD [m]
+     6  002243               32  EXTENDED TYPE OF STATION [FLAG TABLE]
+     7  002244          missing  TYPE OF ROAD [CODE TABLE]
+     8  002245                0  TYPE OF CONSTRUCTION [CODE TABLE]
+     9  004001             2017  YEAR [a]
+    10  004002                1  MONTH [mon]
+    11  004003                6  DAY [d]
+    12  004004                7  HOUR [h]
+    13  004005                0  MINUTE [min]
+    14  005001         51.66858  LATITUDE (HIGH ACCURACY) [deg]
+    15  006001         14.72208  LONGITUDE (HIGH ACCURACY) [deg]
+    16  007030            100.0  HEIGHT OF STATION GROUND ABOVE MEAN SEA LEVEL (SEE NOTE 3) [m]
+    17  007032             4.00  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [m]
+    18  012101           261.35  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+    19  012103           257.85  DEW-POINT TEMPERATURE [K]
+    20  013003               67  RELATIVE HUMIDITY [%]
+    21  007032          missing  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [m]
+    22  020001          missing  HORIZONTAL VISIBILITY [m]
+    23  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [Numeric]
+    24  002242          missing  POSITION OF ROAD SENSORS [CODE TABLE]
+    25  012241           263.85  ROAD SURFACE TEMPERATURE [K]
+    26  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [Numeric]
+    27  007061          missing  DEPTH BELOW LAND SURFACE [m]
+    28  012242           272.45  ROAD SUB-SURFACE TEMPERATURE [K]
+    29  007061          missing  DEPTH BELOW LAND SURFACE [m]
+    30  013241          missing  WATER FILM THICKNESS [m]
+    31  020241          missing  ROAD SURFACE CONDITION [CODE TABLE]
+    32  004025                0  TIME PERIOD OR DISPLACEMENT [min]
+    33  020024          missing  INTENSITY OF PHENOMENA [CODE TABLE]
+    34  013055          missing  INTENSITY OF PRECIPITATION [kg m-2 s-1]
+    35  020021                0  TYPE OF PRECIPITATION [FLAG TABLE]
+    36  013011          missing  TOTAL PRECIPITATION/TOTAL WATER EQUIVALENT [kg m-2]
+    37  007032             4.00  HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) [m]
+    38  008021                2  TIME SIGNIFICANCE [CODE TABLE]
+    39  004025                0  TIME PERIOD OR DISPLACEMENT [min]
+    40  011001               79  WIND DIRECTION [deg]
+    41  011002              2.2  WIND SPEED [m/s]
+    42  008021               22  TIME SIGNIFICANCE [CODE TABLE]
+    43  004025          missing  TIME PERIOD OR DISPLACEMENT [min]
+    44  011043               79  MAXIMUM WIND GUST DIRECTION [deg]
+    45  011041              2.2  MAXIMUM WIND GUST SPEED [m/s]
+    46  033005        536870912  QUALITY INFORMATION (AWS DATA) [FLAG TABLE]

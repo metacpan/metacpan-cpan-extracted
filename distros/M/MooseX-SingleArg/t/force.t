@@ -2,10 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
-
-require_ok('MooseX::SingleArg');
+use Test2::V0;
 
 {
     package MyClass;
@@ -24,11 +21,11 @@ require_ok('MooseX::SingleArg');
 
 {
     my $obj = MyClass->new( {one=>1} );
-    is_deeply( $obj->arg1(), {one=>1}, 'able to set a single arg to a hashref' );
+    is( $obj->arg1(), {one=>1}, 'able to set a single arg to a hashref' );
 }
 
 like(
-    exception { MyClass->new( arg1 => {one=>1} ) },
+    dies { MyClass->new( arg1 => {one=>1} ) },
     qr{accepts only one argument },
     'when force is on then passing more than one argument errors',
 );

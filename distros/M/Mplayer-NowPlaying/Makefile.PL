@@ -3,33 +3,31 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile1(
-    META_MERGE => {
-        resources => {
-
-        repository      => q{https://github.com/trapd00r/Mplayer-NowPlaying},
-        bugtracker      => q{https://github.com/trapd00r/Mplayer-NowPlaying/issues},
+  META_MERGE => {
+    q(meta-spec) => { version => 2 },
+      resources => {
+          repository => {
+            type       => 'git',
+            url        => 'https://github.com/trapd00r/Mplayer-NowPlaying.git',
+            web        => 'https://github.com/trapd00r/Mplayer-NowPlaying',
+            bugtracker => 'https://github.com/trapd00r/Mplayer-NowPlaying/issues',
       },
     },
-    BUILD_REQUIRES      => { },
+  },
 
-    NAME                => q{Mplayer-NowPlaying},
-    AUTHOR              => q{Magnus Woldrich <trapd00r@trapd00r.se>},
-    ABSTRACT            => q{Query a running Mplayer process for metadata},
-    VERSION_FROM        => q{lib/Mplayer/NowPlaying.pm},
-    LICENSE             => q{perl},
+  NAME                => q{Mplayer::NowPlaying},
+  AUTHOR              => q{Magnus Woldrich <m@japh.se>},
+  ABSTRACT            => q{Query a running mplayer process for metadata},
+  VERSION_FROM        => q{lib/Mplayer/NowPlaying.pm},
+  LICENSE             => q{perl},
+  MIN_PERL_VERSION    => 5.010,
 
-    PL_FILES            => { },
-    EXE_FILES           => [ ],
-    PREREQ_PM           => {
-      q{Test::More}     => 0,
-    },
-    MAN1PODS            => { },
-    dist                => {
-      COMPRESS          => 'gzip -9f', SUFFIX => 'gz',
-    },
-    clean               => {
-      FILES              => q{Mplayer-NowPlaying-*}
-    },
+  dist                => {
+    COMPRESS          => 'gzip -9f', SUFFIX => 'gz',
+  },
+  clean               => {
+    FILES              => q{Mplayer-NowPlaying-*}
+  },
 );
 
 sub WriteMakefile1 {

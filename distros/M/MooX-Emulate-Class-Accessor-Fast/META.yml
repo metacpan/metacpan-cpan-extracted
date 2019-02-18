@@ -1,27 +1,48 @@
 ---
 abstract: 'Emulate Class::Accessor::Fast behavior using Moo attributes.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  Test::Exception: '0'
-  Test::Simple: '0.94'
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MooX-Emulate-Class-Accessor-Fast
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooX::Adopt::Class::Accessor::Fast:
+    file: lib/MooX/Adopt/Class/Accessor/Fast.pm
+    version: '0.04'
+  MooX::Emulate::Class::Accessor::Fast:
+    file: lib/MooX/Emulate/Class/Accessor/Fast.pm
+    version: '0.04'
 requires:
   Carp: '0'
   Class::Method::Modifiers: '2.05'
-  Moo: '1.004005'
+  Moo: '2.000000'
   Package::Stash: '0.26'
-  strictures: '1.004004'
+  strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/MooX-Emulate-Class-Accessor-Fast/issues
   homepage: https://github.com/bluefeet/MooX-Emulate-Class-Accessor-Fast
-  repository: https://github.com/bluefeet/MooX-Emulate-Class-Accessor-Fast.git
-version: '0.03'
+  repository: git://github.com/bluefeet/MooX-Emulate-Class-Accessor-Fast.git
+version: '0.04'
+x_contributors:
+  - 'Aran Deltac <aran@ziprecruiter.com>'
+  - 'Graham Knop <haarg@haarg.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

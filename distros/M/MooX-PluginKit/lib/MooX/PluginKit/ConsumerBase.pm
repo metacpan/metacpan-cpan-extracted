@@ -1,5 +1,7 @@
 package MooX::PluginKit::ConsumerBase;
-$MooX::PluginKit::ConsumerBase::VERSION = '0.03';
+
+$MooX::PluginKit::ConsumerBase::VERSION = '0.04';
+
 =head1 NAME
 
 MooX::PluginKit::ConsumerBase - Parent class for PluginKit consumers.

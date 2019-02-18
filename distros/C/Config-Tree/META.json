@@ -1,0 +1,45 @@
+{
+   "abstract" : "Simple API for accessing configuration data",
+   "author" : [
+      "Matthew King (cpan:CHOHAG) <chohag@jtan.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Tree",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.29",
+            "Scalar::Util" : "0",
+            "Syntax::Keyword::Try" : "0",
+            "strictures" : "2"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

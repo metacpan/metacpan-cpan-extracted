@@ -1,7 +1,6 @@
 package MooseX::SingleArg;
-$MooseX::SingleArg::VERSION = '0.08';
-use Moose ();
-use Moose::Exporter;
+
+$MooseX::SingleArg::VERSION = '0.09';
 
 =head1 NAME
 
@@ -75,6 +74,8 @@ argument when force is on.
 
 =cut
 
+use Moose ();
+use Moose::Exporter;
 use Carp qw( croak );
 
 Moose::Exporter->setup_import_methods(
@@ -113,12 +114,26 @@ __END__
 =head1 SEE ALSO
 
 L<MooseX::OneArgNew> solves the same problem that this module solves.  I considered using OneArgNew
-for my own needs, but found it oddly combersom and confusing.  Maybe that's just me, but I hope that
+for my own needs, but found it oddly cumbersome and confusing.  Maybe that's just me, but I hope that
 this module's design is much simpler to comprehend and more natural to use.
 
 =head1 AUTHOR
 
 Aran Clary Deltac <bluefeet@gmail.com>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Xavier Guimard <x.guimardE<64>free.fr>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwarE<64>yahoo.com>
+
+=back
 
 =head1 LICENSE
 

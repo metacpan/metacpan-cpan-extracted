@@ -1,13 +1,13 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use Test2::V0;
 
-use Test::More;
-use Path::Class qw( file );
+use Path::Tiny;
 
-BEGIN{ use_ok('Config::Locale') }
+use Config::Locale;
 
-my $config_dir = file( $0 )->dir->subdir('nested');
+my $config_dir = path( $0 )->sibling('nested');
 
 my $config = Config::Locale->new(
     directory => $config_dir,
@@ -15,7 +15,7 @@ my $config = Config::Locale->new(
     algorithm => 'NESTED',
 );
 
-is_deeply(
+is(
     $config->combinations(),
     [
         ['all',  'all',  'all'],
@@ -44,7 +44,7 @@ foreach my $case (@test_cases) {
         algorithm       => 'NESTED',
     )->config();
 
-    is_deeply(
+    is(
         $config,
         $expected,
         'config for ' . join('.', @$identity) . ' looks right',

@@ -1,0 +1,86 @@
+#!perl
+
+use strict;
+use warnings;
+#use lib::findbin '../lib'; # dev-only
+use App::whichdll;
+
+# PODNAME: whichdll
+# ABSTRACT: Find dynamic libraries in the appropriate path
+our $VERSION = '0.03'; # VERSION
+
+exit App::whichdll::main('whichdll', @ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+whichdll - Find dynamic libraries in the appropriate path
+
+=head1 VERSION
+
+version 0.03
+
+=head1 SYNOPSIS
+
+ $ whichdll xml2
+ $ whichdll -a xml2  # print all matches
+ $ whichdll -a \*    # print all DLLs
+ $ whichdll -s xml2  # silent mode
+
+=head1 DESCRIPTION
+
+C<whichdll> is a command line interface to L<FFI::CheckLib>.  It can be helpful in determining the location of
+dynamic libraries installed on your system.  Its primary purpose is to be used in debugging issues related to
+L<FFI::CheckLib>, or L<FFI::Platypus>.  The command takes one or more arguments, which are treated as library
+names.  The C<whichdll> script will find the platform specific names in the appropriate places if they can
+be found in the system path.  Thus when you search for C<foo> you will get a result like C<libfoo.so.1.2.3> on
+Linux, C<foo.dll> on Windows, C<libfoo.dylib> or C<foo.bundle> on OS X, C<cygfoo-1.0.dll> on Cygwin, etc., with
+the appropriate full path.
+
+By default duplicates due to duplicate paths or symlinks will be removed.  You can see them using the C<-x>
+option.  For example on Debian:
+
+ $ ./bin/whichdll -a xml2
+ /usr/lib/x86_64-linux-gnu/libxml2.so.2.9.4
+ $ ./bin/whichdll -a -x xml2
+ /usr/lib/x86_64-linux-gnu/libxml2.so.2.9.4
+ /usr/lib/x86_64-linux-gnu/libxml2.so => /usr/lib/x86_64-linux-gnu/libxml2.so.2.9.4
+ /usr/lib/x86_64-linux-gnu/libxml2.so.2 => /usr/lib/x86_64-linux-gnu/libxml2.so.2.9.4
+
+You can use the wildcard C<*> to print all libraries.  This implies the C<-a> option.
+
+=head1 OPTIONS
+
+=head2 -a
+
+Print all matches instead of just the first one.
+
+=head2 -s
+
+No output, just return 0 if any of the DLLs are found, or 1 if none are found.
+
+=head2 -v
+
+Prints version and copyright notice and exits.
+
+=head2 -x
+
+Do not prune duplicates.
+
+=head1 AUTHOR
+
+Graham Ollis <plicease@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,13 +1,21 @@
-Revision history for Perl extension Types::Git.
+Revision history for Perl extension Types-Git.
 
-0.03      2014-11-29
-- Declare List::MoreUtils dependency, thanks @andk.
-  Resolves: https://github.com/bluefeet/Types-Git/issues/1
+0.04 2019-02-18T05:51:45Z
 
-0.02      2014-11-16
-- Add the GitSHA, GitLooseRef, GitBranchRef, GitTagRef, GitObject,
-  and GitRevision types.
+ - Migrate all the tests from Test::More to Test2::V0.
+ - Migrate build tooling from Dist::Zilla to Minilla.
 
-0.01      2014-11-16
+0.03 2014-11-29
+
+ - Declare List::MoreUtils dependency, thanks @andk.
+   Resolves: https://github.com/bluefeet/Types-Git/issues/1
+
+0.02 2014-11-16
+
+ - Add the GitSHA, GitLooseRef, GitBranchRef, GitTagRef, GitObject,
+   and GitRevision types.
+
+0.01 2014-11-16
+
  - First release.
 

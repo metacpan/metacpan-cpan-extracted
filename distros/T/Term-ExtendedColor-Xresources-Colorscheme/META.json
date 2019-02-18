@@ -39,13 +39,13 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/trapd00r/Term-ExtendedColor-Xresources-Colorscheme/issues"
-      },
       "repository" : {
-         "url" : "https://github.com/trapd00r/Term-ExtendedColor-Xresources-Colorscheme"
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/Term-ExtendedColor-Xresources-Colorscheme.git",
+         "web" : "https://github.com/trapd00r/Term-ExtendedColor-Xresources-Colorscheme",
+         "x_bugtracker" : "https://github.com/trapd00r/Term-ExtendedColor-Xresources-Colorscheme/issues"
       }
    },
-   "version" : "0.014",
+   "version" : "0.018",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -4,9 +4,14 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile1(
   META_MERGE => {
-    resources => {
-      repository => q{https://github.com/trapd00r/rgbterm},
-      bugtracker => q{https://github.com/trapd00r/rgbterm/issues},
+      q(meta-spec) => { version => 2 },
+      resources => {
+          repository => {
+            type       => 'git',
+            url        => 'https://github.com/trapd00r/rgbterm.git',
+            web        => 'https://github.com/trapd00r/rgbterm',
+            bugtracker => 'https://github.com/trapd00r/rgbterm/issues',
+      },
     },
   },
 

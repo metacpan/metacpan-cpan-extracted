@@ -1,6 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-# (C) Copyright 2010-2016 MET Norway
+# (C) Copyright 2010-2019 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,12 +20,18 @@
 # pod included at end of file
 
 use strict;
+use warnings;
 use Getopt::Long;
 use Pod::Usage qw(pod2usage);
 use Geo::BUFR;
 
+# This is actually default in BUFR.pm, but provided here to make it
+# easier for users to change to 'ECCODES' if preferred
+use constant DEFAULT_TABLE_FORMAT => 'BUFRDC';
+
 # Will be used if neither --tablepath nor $ENV{BUFR_TABLES} is set
-use constant DEFAULT_TABLE_PATH => '/usr/local/lib/bufrtables';
+use constant DEFAULT_TABLE_PATH_BUFRDC => '/usr/local/lib/bufrtables';
+use constant DEFAULT_TABLE_PATH_ECCODES => '/usr/local/share/eccodes/definitions/bufr/tables';
 
 # Parse command line options
 my %option = ();
@@ -37,6 +43,7 @@ GetOptions(
            'metadata=s',
            'outfile=s',
            'strict_checking=i',
+           'tableformat=s',
            'tablepath=s',
            'verbose=i',
        ) or pod2usage(-verbose => 0);
@@ -58,6 +65,10 @@ Geo::BUFR->set_strict_checking($strict_checking);
 # Set verbosity level
 Geo::BUFR->set_verbose($option{verbose}) if $option{verbose};
 
+# Set BUFR table format
+my $tableformat = (defined $option{tableformat}) ? uc $option{tableformat} : DEFAULT_TABLE_FORMAT;
+Geo::BUFR->set_tableformat($tableformat);
+
 # Set BUFR table path
 if ($option{tablepath}) {
     # Command line option --tablepath overrides all
@@ -66,8 +77,12 @@ if ($option{tablepath}) {
     # If no --tablepath option, use the BUFR_TABLES environment variable
     Geo::BUFR->set_tablepath($ENV{BUFR_TABLES});
 } else {
-    # If all else fails, use the default bufrtables
-    Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH);
+    # If all else fails, use the default tablepath in BUFRDC/ECCODES
+    if ($tableformat eq 'BUFRDC') {
+        Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH_BUFRDC);
+    } elsif ($tableformat eq 'ECCODES')  {
+        Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH_ECCODES);
+    }
 }
 
 my $bufr = Geo::BUFR->new();
@@ -189,6 +204,7 @@ sub readdata {
   bufrencode.pl --data <data file> --metadata <metadata file>
       [--outfile <file to print encoded BUFR message to>]
       [--strict_checking n]
+      [--tableformat <BUFRDC|ECCODES>]
       [--tablepath <path to BUFR tables>]
       [--verbose n]
       [--help]
@@ -205,27 +221,25 @@ examples of use.
 
 =head1 OPTIONS
 
-   --outfile <filename>  Will print the encoded BUFR message to <filename>
-                         instead of STDOUT
-
-   --strict_checking n   n=0 Disable strict checking of BUFR format
-                         n=1 Issue warning if (recoverable) error in
-                             BUFR format
-                         n=2 (default) Croak if (recoverable) error in BUFR format.
-                             Nothing more in this message will be encoded.
-
-   --verbose n           Set verbose level to n, 0<=n<=6 (default 0).
-                         Verbose output is sent to STDOUT, so ought to
-                         be combined with option --outfile
-
+   --help               Display Usage and explain the options. Almost
+                        the same as consulting perldoc bufrencode.pl
+   --outfile <filename> Will print the encoded BUFR message to <filename>
+                        instead of STDOUT
+   --strict_checking n  n=0 Disable strict checking of BUFR format
+                        n=1 Issue warning if (recoverable) error in
+                            BUFR format
+                        n=2 (default) Croak if (recoverable) error in BUFR format.
+                            Nothing more in this message will be encoded.
+   --tableformat        Currently supported are BUFRDC and ECCODES (default is BUFRDC)
    --tablepath <path to BUFR tables>
-                         If used, will set path to BUFR tables. If not set,
-                         will fetch tables from the environment variable
-                         BUFR_TABLES, or if this is not set: will use
-                         DEFAULT_TABLE_PATH hard coded in source code.
-
-   --help                Display Usage and explain the options. Almost
-                         the same as consulting perldoc bufrencode.pl
+                        If used, will set path to BUFR tables. If not
+                        set, will fetch tables from the environment
+                        variable BUFR_TABLES, or if this is not set:
+                        will use DEFAULT_TABLE_PATH_<tableformat>
+                        hard coded in source code.
+   --verbose n          Set verbose level to n, 0<=n<=6 (default 0).
+                        Verbose output is sent to STDOUT, so ought to
+                        be combined with option --outfile
 
 =head2 Required options
 
@@ -304,6 +318,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2016 MET Norway
+Copyright (C) 2010-2019 MET Norway
 
 =cut

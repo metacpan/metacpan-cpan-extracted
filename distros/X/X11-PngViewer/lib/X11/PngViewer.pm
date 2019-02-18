@@ -5,7 +5,7 @@ use warnings;
 
 use base qw(DynaLoader);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 bootstrap X11::PngViewer $VERSION;
 
@@ -24,6 +24,9 @@ Version 0.09
 =head1 SYNOPSIS
  
     use X11::PngViewer();
+    use File::HomeDir();
+    use DirHandle();
+    use File::Spec();
  
     my $viewer = X11::PngViewer->new();
     my $directory = File::HomeDir->my_pictures();

@@ -1,5 +1,7 @@
 package Perl::Critic::Policy::TryTiny::RequireUse;
-$Perl::Critic::Policy::TryTiny::RequireUse::VERSION = '0.03';
+
+$Perl::Critic::Policy::TryTiny::RequireUse::VERSION = '0.04';
+
 use strict;
 use warnings;
 

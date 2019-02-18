@@ -23,7 +23,6 @@ provides:
 requires:
   File::Path: '0'
 resources:
-  bugtracker: https://github.com/trapd00r/clipbored/issues
-  repository: https://github.com/trapd00r/clipbored
-version: v1.2.6
+  repository: https://github.com/trapd00r/clipbored.git
+version: v1.2.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

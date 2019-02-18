@@ -1,0 +1,185 @@
+---
+sections:
+- award_emoji:
+    head: Award Emoji
+    doc_url: https://docs.gitlab.com/ce/api/award_emoji.html
+- branches:
+    head: Branches
+    doc_url: https://docs.gitlab.com/ce/api/branches.html
+- broadcast_messages:
+    head: Broadcast Messages
+    doc_url: https://docs.gitlab.com/ce/api/broadcast_messages.html
+- project_level_variables:
+    head: Project-level Variables
+    doc_url: https://docs.gitlab.com/ce/api/project_level_variables.html
+- group_level_variables:
+    head: Group-level Variables
+    doc_url: https://docs.gitlab.com/ce/api/group_level_variables.html
+- snippets:
+    head: Snippets
+    doc_url: https://docs.gitlab.com/ce/api/snippets.html
+- commits:
+    head: Commits
+    doc_url: https://docs.gitlab.com/ce/api/commits.html
+- custom_attributes:
+    head: Custom Attributes
+    doc_url: https://docs.gitlab.com/ce/api/custom_attributes.html
+- deployments:
+    head: Deployments
+    doc_url: https://docs.gitlab.com/ce/api/deployments.html
+- deploy_keys:
+    head: Deploy Keys
+    doc_url: https://docs.gitlab.com/ce/api/deploy_keys.html
+- environments:
+    head: Environments
+    doc_url: https://docs.gitlab.com/ce/api/environments.html
+- events:
+    head: Events
+    doc_url: https://docs.gitlab.com/ce/api/events.html
+- features:
+    head: Feature flags
+    doc_url: https://docs.gitlab.com/ce/api/features.html
+- gitignores_templates:
+    head: Gitignores
+    doc_url: https://docs.gitlab.com/ce/api/templates/gitignores.html
+- gitlab_ci_ymls_templates:
+    head: GitLab CI YMLs
+    doc_url: https://docs.gitlab.com/ce/api/templates/gitlab_ci_ymls.html
+- groups:
+    head: Groups
+    doc_url: https://docs.gitlab.com/ce/api/groups.html
+- group_access_requests:
+    head: Group access requests
+    doc_url: https://docs.gitlab.com/ce/api/access_requests.html
+- group_badges:
+    head: Group badges
+    doc_url: https://docs.gitlab.com/ce/api/group_badges.html
+- group_members:
+    head: Group members
+    doc_url: https://docs.gitlab.com/ce/api/members.html
+- issues:
+    head: Issues
+    doc_url: https://docs.gitlab.com/ce/api/issues.html
+- boards:
+    head: Issue Boards
+    doc_url: https://docs.gitlab.com/ce/api/boards.html
+- group_boards:
+    head: Group Issue Boards
+    doc_url: https://docs.gitlab.com/ce/api/group_boards.html
+- jobs:
+    head: Jobs
+    doc_url: https://docs.gitlab.com/ce/api/jobs.html
+- keys:
+    head: Keys
+    doc_url: https://docs.gitlab.com/ce/api/keys.html
+- labels:
+    head: Labels
+    doc_url: https://docs.gitlab.com/ce/api/labels.html
+- markdown:
+    head: Markdown
+    doc_url: https://docs.gitlab.com/ce/api/markdown.html
+- merge_requests:
+    head: Merge requests
+    doc_url: https://docs.gitlab.com/ce/api/merge_requests.html
+- milestones:
+    head: Milestones
+    doc_url: https://docs.gitlab.com/ce/api/milestones.html
+- group_milestones:
+    head: Group milestones
+    doc_url: https://docs.gitlab.com/ce/api/group_milestones.html
+- namespaces:
+    head: Namespaces
+    doc_url: https://docs.gitlab.com/ce/api/namespaces.html
+- notes:
+    head: Notes
+    doc_url: https://docs.gitlab.com/ce/api/notes.html
+- discussions:
+    head: Discussions
+    doc_url: https://docs.gitlab.com/ce/api/discussions.html
+- resource_label_events:
+    head: Resource label events
+    doc_url: https://docs.gitlab.com/ce/api/resource_label_events.html
+- notification_settings:
+    head: Notification settings
+    doc_url: https://docs.gitlab.com/ce/api/notification_settings.html
+- licenses_templates:
+    head: Licenses
+    doc_url: https://docs.gitlab.com/ce/api/templates/licenses.html
+- page_domains:
+    head: Pages domains
+    doc_url: https://docs.gitlab.com/ce/api/pages_domains.html
+- pipelines:
+    head: Pipelines
+    doc_url: https://docs.gitlab.com/ce/api/pipelines.html
+- pipeline_triggers:
+    head: Pipeline triggers
+    doc_url: https://docs.gitlab.com/ce/api/pipeline_triggers.html
+- pipeline_schedules:
+    head: Pipeline schedules
+    doc_url: https://docs.gitlab.com/ce/api/pipeline_schedules.html
+- projects:
+    head: Projects
+    doc_url: https://docs.gitlab.com/ce/api/projects.html
+- project_access_requests:
+    head: Project access requests
+    doc_url: https://docs.gitlab.com/ce/api/access_requests.html
+- project_badges:
+    head: Project badges
+    doc_url: https://docs.gitlab.com/ce/api/project_badges.html
+- project_import_export:
+    head: Project import/export
+    doc_url: https://docs.gitlab.com/ce/api/project_import_export.html
+- project_members:
+    head: Project members
+    doc_url: https://docs.gitlab.com/ce/api/members.html
+- project_snippets:
+    head: Project snippets
+    doc_url: https://docs.gitlab.com/ce/api/project_snippets.html
+- protected_branches:
+    head: Protected branches
+    doc_url: https://docs.gitlab.com/ce/api/protected_branches.html
+- protected_tags:
+    head: Protected tags
+    doc_url: https://docs.gitlab.com/ce/api/protected_tags.html
+- repositories:
+    head: Repositories
+    doc_url: https://docs.gitlab.com/ce/api/repositories.html
+- repository_files:
+    head: Repository files
+    doc_url: https://docs.gitlab.com/ce/api/repository_files.html
+- runners:
+    head: Runners
+    doc_url: https://docs.gitlab.com/ce/api/runners.html
+- search:
+    head: Search
+    doc_url: https://docs.gitlab.com/ce/api/search.html
+- services:
+    head: Services
+    doc_url: https://docs.gitlab.com/ce/api/services.html
+- settings:
+    head: Application settings
+    doc_url: https://docs.gitlab.com/ce/api/settings.html
+- sidekiq_metrics:
+    head: Sidekiq Metrics
+    doc_url: https://docs.gitlab.com/ce/api/sidekiq_metrics.html
+- system_hooks:
+    head: System hooks
+    doc_url: https://docs.gitlab.com/ce/api/system_hooks.html
+- tags:
+    head: Tags
+    doc_url: https://docs.gitlab.com/ce/api/tags.html
+- todos:
+    head: Todos
+    doc_url: https://docs.gitlab.com/ce/api/todos.html
+- users:
+    head: Users
+    doc_url: https://docs.gitlab.com/ce/api/users.html
+- lint:
+    head: Validate the .gitlab-ci.yml
+    doc_url: https://docs.gitlab.com/ce/api/lint.html
+- version:
+    head: Version
+    doc_url: https://docs.gitlab.com/ce/api/version.html
+- wikis:
+    head: Wikis
+    doc_url: https://docs.gitlab.com/ce/api/wikis.html

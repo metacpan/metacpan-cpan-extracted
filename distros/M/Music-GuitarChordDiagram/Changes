@@ -1,0 +1,9 @@
+Revision history for Music-GuitarChordDiagram
+
+0.0200 2019-02-17 20:41:18
+    - Added a couple tiny tests.
+    - Made the string notes user definable.
+
+0.0100 2019-02-17 19:56:27
+    - Minted by Dist::Zilla.
+    - Refactored from my github Music/fretboard program.

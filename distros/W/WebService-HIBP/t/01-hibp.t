@@ -23,6 +23,9 @@ SKIP: {
 				} else {
 					chomp $@;
 					diag("Failed data_classes call:$@");
+					diag("Request:\n" . $hibp->last_request()->as_string());
+					diag("Response:\n" . $hibp->last_response()->as_string());
+					skip("Skipping remaining tests", 1);
 				}
 			};
 	}
@@ -45,6 +48,9 @@ SKIP: {
 				} else {
 					chomp $@;
 					diag("Failed account call:$@");
+					diag("Request:\n" . $hibp->last_request()->as_string());
+					diag("Response:\n" . $hibp->last_response()->as_string());
+					skip("Skipping remaining tests", 1);
 				}
 			};
 	}
@@ -81,10 +87,8 @@ SKIP: {
               . $breach->modified_date()
               . "' and is correctly formatted"
         );
-        ok( $breach->logo_type(),
-            "Logo Type of breach is '" . $breach->logo_type() . "'" );
-        ok( defined $breach->is_active(),
-            "Breach is " . ( $breach->is_active() ? 'active' : 'NOT active' ) );
+        ok( $breach->logo_path(),
+            "Logo Path of breach is '" . $breach->logo_path() . "'" );
         ok(
             defined $breach->is_retired(),
             "Breach is " . ( $breach->is_retired() ? 'retired' : 'NOT retired' )
@@ -133,6 +137,9 @@ SKIP: {
 				} else {
 					chomp $@;
 					diag("Failed account with truncate call:$@");
+					diag("Request:\n" . $hibp->last_request()->as_string());
+					diag("Response:\n" . $hibp->last_response()->as_string());
+					skip("Skipping remaining tests", 1);
 				}
 			};
 	}
@@ -151,9 +158,7 @@ SKIP: {
         }
         elsif ( defined $breach->modified_date() ) {
         }
-        elsif ( defined $breach->logo_type() ) {
-        }
-        elsif ( defined $breach->is_active() ) {
+        elsif ( defined $breach->logo_path() ) {
         }
         elsif ( defined $breach->is_retired() ) {
         }
@@ -189,6 +194,9 @@ SKIP: {
 				} else {
 					chomp $@;
 					diag("Failed account with unverified call:$@");
+					diag("Request:\n" . $hibp->last_request()->as_string());
+					diag("Response:\n" . $hibp->last_response()->as_string());
+					skip("Skipping remaining tests", 1);
 				}
 			};
 	}
@@ -213,6 +221,9 @@ SKIP: {
 				} else {
 					chomp $@;
 					diag("Failed account with domain call:$@");
+					diag("Request:\n" . $hibp->last_request()->as_string());
+					diag("Response:\n" . $hibp->last_response()->as_string());
+					skip("Skipping remaining tests", 1);
 				}
 			};
 	}
@@ -256,6 +267,9 @@ SKIP: {
 				} else {
 					chomp $@;
 					diag("Failed breaches call:$@");
+					diag("Request:\n" . $hibp->last_request()->as_string());
+					diag("Response:\n" . $hibp->last_response()->as_string());
+					skip("Skipping remaining tests", 1);
 				}
 			};
 	}
@@ -284,6 +298,9 @@ SKIP: {
 				} else {
 					chomp $@;
 					diag("Failed breaches with domain call:$@");
+					diag("Request:\n" . $hibp->last_request()->as_string());
+					diag("Response:\n" . $hibp->last_response()->as_string());
+					skip("Skipping remaining tests", 1);
 				}
 			};
 	}
@@ -308,6 +325,11 @@ SKIP: {
 				} else {
 					chomp $@;
 					diag("Failed pastes call:$@");
+					diag("Request:\n" . $hibp->last_request()->as_string());
+					diag("Response:\n" . $hibp->last_response()->as_string());
+					if ($@ =~ /401/) {
+						skip("Skipping remaining tests on forbidden", 1);
+					}
 				}
 			};
 	}

@@ -4,7 +4,7 @@ package Pod::Weaver::PluginBundle::Author::ETHER;
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.145';
+our $VERSION = '0.146';
 
 use namespace::autoclean -also => ['_exp'];
 use Pod::Weaver::Config::Assembler;
@@ -110,9 +110,7 @@ sub mvp_bundle_config
 {
     my $self = shift || __PACKAGE__;
 
-    return map {
-        $self->_expand_config($_)
-    } $self->configure;
+    return map $self->_expand_config($_), $self->configure;
 }
 
 my $prefix;
@@ -186,7 +184,7 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.145
+version 0.146
 
 =head1 SYNOPSIS
 

@@ -1,23 +1,39 @@
 ---
 abstract: 'Routines for converting decimal lat/lon to Google Map tiles, and back again.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  Test::Simple: '0.94'
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Geo-Coordinates-GMap
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Geo::Coordinates::GMap:
+    file: lib/Geo/Coordinates/GMap.pm
+    version: '0.08'
 requires:
-  Exporter: '5.57'
-  strictures: '0'
+  Exporter: '0'
+  strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/Geo-Coordinates-GMap/issues
   homepage: https://github.com/bluefeet/Geo-Coordinates-GMap
-  repository: https://github.com/bluefeet/Geo-Coordinates-GMap.git
-version: '0.07'
+  repository: git://github.com/bluefeet/Geo-Coordinates-GMap.git
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

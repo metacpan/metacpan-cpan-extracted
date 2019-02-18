@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Converter;
 # ABSTRACT: Classe de base pour convertir les notices
-$Koha::Contrib::Sudoc::Converter::VERSION = '2.27';
+$Koha::Contrib::Sudoc::Converter::VERSION = '2.28';
 use Moose;
 use utf8;
 use Modern::Perl;
@@ -101,6 +101,9 @@ sub linking {
 
 sub itemize {
     my ($self, $record, $koha_record) = @_;
+
+    # Ne rien faire si c'est demandé pour l'ILN
+    return unless $self->sudoc->c->{biblio}->{itemize};
 
     # Pas d'exemplarisation si on modifie une notice Koha
     return if $koha_record;
@@ -219,7 +222,7 @@ Koha::Contrib::Sudoc::Converter - Classe de base pour convertir les notices
 
 =head1 VERSION
 
-version 2.27
+version 2.28
 
 =head1 DESCRIPTION
 

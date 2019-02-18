@@ -1,6 +1,6 @@
 package Geo::Coordinates::GMap;
-$Geo::Coordinates::GMap::VERSION = '0.07';
-use strictures 1;
+
+$Geo::Coordinates::GMap::VERSION = '0.08';
 
 =head1 NAME
 
@@ -28,6 +28,7 @@ This module makes this process simple and accurate.
 
 =cut
 
+use strictures 2;
 use Math::Trig;
 
 use Exporter qw( import );
@@ -132,8 +133,10 @@ __END__
 
 =over
 
-=item Implement a routine to convert tile coordinates back in to
-lat/lon decimal coordinates.
+=item *
+
+Implement a routine to convert tile coordinates back in to lat/lon decimal
+coordinates.
 
 =back
 

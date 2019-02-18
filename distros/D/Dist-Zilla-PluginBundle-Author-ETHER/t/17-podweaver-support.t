@@ -91,7 +91,7 @@ subtest $_->{test_name} => sub
 {
     my $config = $_->{config};
     my $extra_content = $_->{extra_content} // '';
-    my $expected_pod = all(map { re($_) } @{ $_->{pod} });
+    my $expected_pod = all(map re($_), @{ $_->{pod} });
 
     my $tempdir = no_git_tempdir();
 

@@ -61,12 +61,13 @@
          "web" : "https://github.com/robrwo/Linux-Statm-Tiny"
       }
    },
-   "version" : "0.0600",
+   "version" : "0.0601",
    "x_contributors" : [
       "Adrian Lai <aidy@cpan.org>",
-      "Karen Etheridge <ether@cpan.org>"
+      "Karen Etheridge <ether@cpan.org>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }
 

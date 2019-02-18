@@ -1,0 +1,59 @@
+{
+   "abstract" : "ingest spreadsheets to Perl data structure for faster, repeated processing",
+   "author" : [
+      "Steve Dondley <s@dondley.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Spreadsheet-Read-Ingester",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Signature" : "0",
+            "File::Spec" : "0",
+            "File::UserConfig" : "0",
+            "Spreadsheet::Read" : "0",
+            "Storable" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::File::ShareDir::Dist" : "0",
+            "Test::File::ShareDir::Module" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sdondley/Spreadsheet-Read-Ingester/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sdondley/Spreadsheet-Read-Ingester.git",
+         "web" : "https://github.com/sdondley/Spreadsheet-Read-Ingester"
+      }
+   },
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.24.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+}
+

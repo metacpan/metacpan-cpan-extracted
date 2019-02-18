@@ -1,5 +1,5 @@
 package Spork::Shlomify;
-$Spork::Shlomify::VERSION = '0.0204';
+$Spork::Shlomify::VERSION = '0.0400';
 use warnings;
 use strict;
 
@@ -24,7 +24,7 @@ Spork::Shlomify - An improved Spork.
 
 =head1 VERSION
 
-version 0.0204
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ You can build presentations with it using the shspork executable.
 
 =head1 VERSION
 
-version 0.0204
+version 0.0400
 
 =head1 AUTHOR
 
@@ -66,7 +66,7 @@ Shlomi Fish
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2019 by Shlomi Fish.
 
 This is free software, licensed under:
 

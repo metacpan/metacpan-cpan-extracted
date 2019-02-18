@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+
+our $DIR;
+
+{
+  verbose => 2,
+  alien   => ['Alien::libt2t'],
+  source  => ["$DIR/*.c"],
+}

@@ -1,8 +1,8 @@
-sudo: false
 addons:
   apt:
     packages:
       - aspell
+      - aspell-en
 language: perl
 perl:
   - blead   # builds perl from git
@@ -13,7 +13,7 @@ perl:
     my @all_perl_releases = reverse sort keys %Module::CoreList::released;
     my $latest_stable_perl = first { /^5\.(\d{3})/; defined $1 and $1 % 2 == 0 } @all_perl_releases;
     my ($major_ver) = $latest_stable_perl =~ /^5\.(\d{3})/;
-    join "\n", map { '  - "5.' . $_ . '"' } reverse grep { $_ % 2 == 0 } (8 .. $major_ver);
+    join "\n", map '  - "5.'.$_.'"', reverse grep $_ % 2 == 0, (8 .. $major_ver);
 }}
 env:
   global:

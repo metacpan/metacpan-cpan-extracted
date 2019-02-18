@@ -1,24 +1,25 @@
---- #YAML:1.0
-name:               Parse-Flexget
-version:            0.014
-abstract:           Parse the flexget log format
+---
+abstract: 'Parse the flexget log format'
 author:
-    - Magnus Woldrich <trapd00r@trapd00r.se>
-license:            perl
-distribution_type:  module
+  - 'Magnus Woldrich <m@japh.se>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-    ExtUtils::MakeMaker:  0
-build_requires:  {}
-requires:
-    Test::More:  0
-resources:
-    bugtracker:  https://github.com/trapd00r/Parse-Flexget/issues
-    repository:  https://github.com/trapd00r/Parse-Flexget
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parse-Flexget
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.01'
+resources:
+  repository: https://github.com/trapd00r/Parse-Flexget.git
+version: '0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

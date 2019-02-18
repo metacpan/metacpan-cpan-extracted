@@ -1,9 +1,8 @@
-#!perl
-use strict;
-use Test::More tests => 9;
+#!/usr/bin/env perl
+use strictures 2;
+use Test2::V0;
 
-#1
-require_ok("MooX::Emulate::Class::Accessor::Fast");
+require MooX::Emulate::Class::Accessor::Fast;
 
 {
   package MyClass;
@@ -54,7 +53,6 @@ require_ok("MooX::Emulate::Class::Accessor::Fast");
   use base qw(MyImmutableClass);
 }
 
-# 2-9
 foreach my $class (qw/
                       MyClass 
                       MyImmutableClass 
@@ -69,3 +67,4 @@ foreach my $class (qw/
     is($instance->{foo}, 'bar', $class . " has CAF construction behavior");
 }
 
+done_testing;

@@ -1,13 +1,14 @@
 #!/usr/bin/env perl
-use strictures 1;
+use strictures 2;
 
-use Test::More;
+use Test2::V0;
 use Test::WWW::Mechanize::PSGI;
 
 {
     package MyApp::Controller::Root;
     use Moose;
     use Test::More;
+    use Test::Fatal;
     BEGIN { extends 'Catalyst::Controller' }
     __PACKAGE__->config->{namespace} = '';
     sub noop :Local :Args(0) {
@@ -26,6 +27,57 @@ use Test::WWW::Mechanize::PSGI;
         my ($self, $c, $key) = @_;
         $c->res->body( $c->session->{$key} );
         $c->res->content_type('text/plain');
+    }
+    sub fatal_method :Local :Args(0) {
+        my ($self, $c) = @_;
+        my $ok = eval { $c->check_session_plugin_requirements(); 1 } || 0;
+        $c->res->body( "$ok:$@" );
+        $c->res->content_type('text/plain');
+    }
+    sub tests :Local :Args(0) {
+        my ($self, $c) = @_;
+
+        foreach my $method (qw(
+            cookie_is_rejecting
+            check_session_plugin_requirements
+        )) {
+            like(
+                exception { $c->$method() },
+                qr{method is not implemented},
+                "unimplemented, $method, method threw exception",
+            );
+        }
+
+        cmp_ok(
+            $c->session_expires(), '>', time(),
+            'session_expires is in the future',
+        );
+
+        $c->session( foo => 32 );
+        is( $c->session->{foo}, 32, 'setting list via the session method' );
+
+        $c->session({ bar => 23 });
+        is( $c->session->{bar}, 23, 'setting hash ref via the session method' );
+
+        my $old_id = $c->sessionid();
+        $c->change_session_id();
+        isnt( $c->sessionid(), $old_id, 'session id changed' );
+        is( $c->session->{bar}, 23, 'session appears to have same data after id change' );
+
+        $c->change_session_expires( $c->starch->expires() + 100 );
+        is( $c->starch_state->expires(), $c->starch->expires() + 100, 'changing session expires worked' );
+
+        ok( $c->session_is_valid(), 'session is valid' );
+
+        like(
+            exception { $c->delete_expired_sessions() },
+            qr{does not support expired state reaping},
+            'reaping expired sessions died',
+        );
+
+        $c->delete_session('foobar');
+        ok( $c->starch_state->is_deleted(), 'state was deleted' );
+        is( $c->session_delete_reason(), 'foobar', 'delete reason was stored' );
     }
 }
 
@@ -55,11 +107,12 @@ $mech->get_ok('/noop');
 $mech->get_ok('/session');
 $mech->get_ok('/set/foo/hello');
 $mech->get_ok('/get/foo');
-
 is(
     $mech->response->content(),
     'hello',
     'retrieved value from session successfully',
 );
+
+$mech->get_ok('/tests');
 
 done_testing;

@@ -4,30 +4,33 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile1(
-    META_MERGE => {
-        resources => {
-            repository => 'https://github.com/trapd00r/File-PatternMatch',
+  META_MERGE => {
+      q(meta-spec) => { version => 2 },
+      resources => {
+          repository => {
+            type       => 'git',
+            url        => 'https://github.com/trapd00r/File-PatternMatch.git',
+            web        => 'https://github.com/trapd00r/File-PatternMatch',
             bugtracker => 'https://github.com/trapd00r/File-PatternMatch/issues',
-        },
+      },
     },
-    #BUILD_REQUIRES => {
-    #},
+  },
 
-    NAME                => 'File::PatternMatch',
-    AUTHOR              => q{Magnus Woldrich <m@japh.se>},
-    ABSTRACT_FROM       => 'lib/File/PatternMatch.pm',
-    VERSION_FROM        => 'lib/File/PatternMatch.pm',
-    'LICENSE'           => 'perl',
-    PL_FILES            => {},
-    PREREQ_PM => {
-      'Term::ExtendedColor' => 0.16,
-      'File::LsColor'       => 0,
-    },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'File-PatternMatch-*' },
+  NAME                => 'File::PatternMatch',
+  AUTHOR              => q{Magnus Woldrich <m@japh.se>},
+  ABSTRACT_FROM       => 'lib/File/PatternMatch.pm',
+  VERSION_FROM        => 'lib/File/PatternMatch.pm',
+  MIN_PERL_VERSION    => 5.010,
+  'LICENSE'           => 'perl',
+  PL_FILES            => {},
+  PREREQ_PM => {
+    'Term::ExtendedColor' => 0.16,
+    'File::LsColor'       => 0,
+  },
+  dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+  clean               => { FILES => 'File-PatternMatch-*' },
 );
 
-#Written by Alexandr Ciornii, version 0.23. Added by eumm-upgrade.
 sub WriteMakefile1 {
     my %params=@_;
     my $eumm_version=$ExtUtils::MakeMaker::VERSION;
@@ -57,4 +60,3 @@ sub WriteMakefile1 {
 
     WriteMakefile(%params);
 }
-

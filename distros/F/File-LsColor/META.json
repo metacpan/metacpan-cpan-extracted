@@ -39,13 +39,13 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/trapd00r/File-LsColor/issues"
-      },
       "repository" : {
-         "url" : "https://github.com/trapd00r/File-LsColor"
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/File-LsColor.git",
+         "web" : "https://github.com/trapd00r/File-LsColor",
+         "x_bugtracker" : "https://github.com/trapd00r/File-LsColor/issues"
       }
    },
-   "version" : "0.314",
+   "version" : "0.335",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

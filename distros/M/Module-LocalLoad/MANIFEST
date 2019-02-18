@@ -9,4 +9,5 @@ t/02-pod-coverage.t
 t/03-localload.t
 t/20-synopsis.t
 t/60-pod-coverage.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

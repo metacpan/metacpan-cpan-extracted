@@ -1,36 +1,41 @@
 ---
 abstract: 'generate portable fingerprints of objects'
 author:
-  - 'Robert Rothenberg C<< <rrwo@cpan.org> >> (on behalf of Foxtons, Ltd.)'
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Test::Differences: 0
-  Test::Most: 0
-  Test::Warnings: 0
-  if: 0
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  if: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.10'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - digest
+  - signature
+  - hash
+  - portability
+  - serialization
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Object-Signature-Portable
-no_index:
-  directory:
-    - inc
-    - t
-    - xt
+provides:
+  Object::Signature::Portable:
+    file: lib/Object/Signature/Portable.pm
+    version: v0.2.0
 requires:
-  Crypt::Digest: 0
-  Exporter::Lite: 0
-  JSON::MaybeXS: 0
-  perl: 5.01
-  version: 0.77
+  Crypt::Digest: '0'
+  Exporter::Lite: '0'
+  JSON::MaybeXS: '0'
+  perl: v5.10.0
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: https://github.com/robrwo/Object-Signature-Portable/issues
   repository: git://github.com/robrwo/Object-Signature-Portable.git
-version: 0.001006
+version: v0.2.0
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

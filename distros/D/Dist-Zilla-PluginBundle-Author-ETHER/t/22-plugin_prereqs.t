@@ -57,8 +57,8 @@ all_plugins_in_prereqs($tzil,
     prereq_plugin_type => '',
 );
 
-my @bundle_plugins = uniq map { find_meta($_)->name }
-    grep { $_->plugin_name =~ /^\@Author::ETHER\/[^@]/ } @{$tzil->plugins};
+my @bundle_plugins = uniq map find_meta($_)->name,
+    grep $_->plugin_name =~ /^\@Author::ETHER\/[^@]/, @{$tzil->plugins};
 cmp_deeply(
     $tzil->distmeta->{prereqs}{$PREREQ_PHASE_DEFAULT}{$PREREQ_RELATIONSHIP_DEFAULT} // {},
     notexists(@bundle_plugins),

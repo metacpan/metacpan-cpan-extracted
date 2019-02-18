@@ -8,5 +8,7 @@ t/Test/Text/FixedWidth/Parser.pm
 t/test_file.txt
 t/test_file2.txt
 Text-FixedWidth-Parser-0.3.tar.gz
+Text-FixedWidth-Parser-0.5.tar.gz
+Text-FixedWidth-Parser-0.6.tar.gz
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

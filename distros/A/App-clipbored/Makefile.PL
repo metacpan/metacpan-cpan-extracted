@@ -5,8 +5,10 @@ use ExtUtils::MakeMaker;
 WriteMakefile1(
   META_MERGE => {
     resources => {
-      repository => q{https://github.com/trapd00r/clipbored},
-      bugtracker => q{https://github.com/trapd00r/clipbored/issues},
+      type       => 'git',
+      url        => 'https://github.com/trapd00r/clipbored.git',
+      web        => 'https://github.com/trapd00r/clipbored',
+      bugtracker => 'https://github.com/trapd00r/clipbored/issues',
     },
   },
 
@@ -29,6 +31,17 @@ WriteMakefile1(
       },
     },
   },
+  (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+      'meta-spec' => { version => 2 },
+      resources => {
+          repository => {
+              type => 'git',
+              url  => 'https://github.com/trapd00r/clipbored.git',
+              web  => 'https://github.com/trapd00r/clipbored',
+          },
+      }})
+   : ()
+  ),
   MAN1PODS                     => { },
   dist                         => { COMPRESS => q{gzip -9f},    SUFFIX => q{gz}, },
   clean                        => { FILES    => q{},                  },

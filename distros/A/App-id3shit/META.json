@@ -46,13 +46,12 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/trapd00r/id3shit/issues"
-      },
       "repository" : {
-         "url" : "https://github.com/trapd00r/id3shit"
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/id3shit.git",
+         "web" : "https://github.com/trapd00r/id3shit"
       }
    },
-   "version" : "2.60",
+   "version" : "2.64",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

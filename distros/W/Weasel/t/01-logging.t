@@ -29,6 +29,11 @@ sub find_all {
     return (wantarray) ? @rv : \@rv;
 }
 
+sub screenshot {
+
+    return;
+}
+
 package main;
 
 use Weasel;
@@ -59,6 +64,10 @@ my $session = $weasel->session;
 my @found = $session->page->find_all('span');
 my $found = $session->page->find_all('span');
 
+# `find_all' uses a different calling pattern than `screenshot'
+# and `is_displayed'
+$session->screenshot;
+
 is(scalar(@found), 2, 'Number of tags found equals two');
 is(ref $found, 'ARRAY', 'Scalar context returns ARRAYREF');
 
@@ -78,7 +87,9 @@ is_deeply(\@logs,
            ['post_tag_name', 'found tag with name span'],
            ['post_find_all', 'found 2 elements for span 
  - Weasel::Element (span)
- - Weasel::Element (span)']
+ - Weasel::Element (span)'],
+           ['pre_screenshot', 'screenshot'],
+           ['post_screenshot', 'screenshot'],
           ], 'Compare log output');
 
 done_testing;

@@ -172,6 +172,9 @@ sub scm_id ( $self, $cb = undef ) {
                     $res{release_distance} = 0 if $desc =~ /added tag.+$res{release}/smi;
                 }
 
+                # phase is unknown if remote SCM is git
+                undef $res{phase} if $self->upstream->{scm_type} eq $SCM_TYPE_GIT;
+
                 $res->{data} = \%res;
             }
 

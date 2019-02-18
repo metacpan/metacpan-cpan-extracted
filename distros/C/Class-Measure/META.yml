@@ -1,21 +1,43 @@
 ---
 abstract: 'Create, compare, and convert units of measurement.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@cpan.org>'
 build_requires:
-  Test::Simple: 0.82
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Class-Measure
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Class::Measure:
+    file: lib/Class/Measure.pm
+    version: '0.06'
+  Class::Measure::Length:
+    file: lib/Class/Measure/Length.pm
+    version: '0.06'
 requires:
-  Sub::Exporter: 0.982
+  Sub::Exporter: '0.982'
 resources:
   bugtracker: https://github.com/bluefeet/Class-Measure/issues
+  homepage: https://github.com/bluefeet/Class-Measure
   repository: git://github.com/bluefeet/Class-Measure.git
-version: 0.05
+version: '0.06'
+x_contributors:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

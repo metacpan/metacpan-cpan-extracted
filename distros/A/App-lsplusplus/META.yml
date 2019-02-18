@@ -24,7 +24,6 @@ requires:
   Term::ExtendedColor: '0.16'
   Time::Local: '0.16'
 resources:
-  bugtracker: https://github.com/trapd00r/ls--/issues
-  repository: https://github.com/trapd00r/ls--
-version: '0.52'
+  repository: https://github.com/trapd00r/ls--.git
+version: '0.56'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

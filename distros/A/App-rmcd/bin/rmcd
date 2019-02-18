@@ -1,0 +1,392 @@
+#!/usr/bin/perl
+package App::rmcd;
+
+use strict;
+my  $APP     = 'rmcd';
+our $VERSION = '0.280';
+
+use strict;
+use Cwd                 qw(abs_path getcwd);
+use Carp                qw(croak);
+use Pod::Usage          qw(pod2usage);
+use List::Util          qw(shuffle);
+use File::Copy          qw(copy);
+use Getopt::Long        qw(GetOptions);
+use Daemon::Mplayer     qw(mplayer_play mplayer_stop);
+use Mplayer::NowPlaying qw(now_playing);
+use Term::ExtendedColor qw(:attributes);
+#use Data::Dumper        qw(Dumper);
+#$Data::Dumper::Terse     = 1;
+#$Data::Dumper::Indent    = 1;
+#$Data::Dumper::Useqq     = 1;
+#$Data::Dumper::Deparse   = 1;
+#$Data::Dumper::Quotekeys = 0;
+#$Data::Dumper::Sortkeys  = 1;
+
+my $DEBUG = $ENV{DEBUG};
+
+usage() if(!@ARGV);
+
+my $config         = "$ENV{XDG_CONFIG_HOME}/rmcd/rmcd.conf";
+$config            = '/etc/rmcd.conf' unless(-e $config);
+$config            = './rmcd.conf' if($DEBUG);
+my $fifo           = "$ENV{HOME}/.mplayer/rmcd.fifo";
+my $log            = "$ENV{HOME}/.mplayer/rmcd.log";
+my $pidfile        = '/tmp/rmcd.pid';
+
+my $player         = 'mplayer';
+my @playopt        = ('-cache', 1400,
+                      '-cache-min', 10,
+                      '-identify',
+                      '-idle',
+                      '-input',
+                      "file=$fifo"
+                    );
+my $temp_playlist  = '/tmp/rmcd-playlist';
+my $rmcd_state     = '/tmp/rmcd-state';
+
+fileexist();
+
+# imported from the config
+our($dir_to_copy_to, %channels, $custom_now_playing, $custom_cp, $local_station);
+
+my %allowed_cmds = (
+  next    => 'pt_step 1',
+  prev    => 'pt_step -1',
+  toggle  => 'pause',
+  pause   => 'pause',
+  stop    => 'stop',
+  fs      => 'vo_fullscreen',
+);
+
+#list_channels();
+
+my @opt_play_songs;
+my($opt_shuffle, $opt_repeat) = (0, 1);
+GetOptions(
+  'ch|chanlist'   => \&list_channels,
+  'cp|copy'       => \&cp,
+  'fav'           => \&fav,
+  'kill'          => sub { mplayer_stop( { pidfile => $pidfile } ); },
+  'load:s{1,}'    => \@opt_play_songs,
+  'c|cmd:s{,}'    => \&cmd,
+  'info'          => \&info,
+  'pl|playlist'   => \&show_playlist,
+  'r|shuffle'     => \$opt_shuffle,
+  'repeat'        => sub { $opt_repeat = 1;    },
+  'n|next'        => sub { cmd(undef, 'next')  },
+  'p|prev'        => sub { cmd(undef, 'prev')  },
+  't|toggle'      => sub { cmd(undef, 'pause') },
+  'f|fullscreen'  => sub { cmd(undef, 'fs')    },
+  's|stop'        => sub { cmd(undef, 'stop'); },
+  'cl|clist'      => sub {
+    print "$_\n" for(sort(keys(%allowed_cmds)));
+    print "\nSee 'mplayer -input cmdlist'\n";
+    exit;
+  },
+
+  'debug'         => \$DEBUG,
+  'h|help'        => sub { pod2usage(verbose => 1);  exit },
+  'm|man'         => sub { pod2usage(verbose => 3);  exit },
+  'v|version'     => sub { print "$APP v$VERSION\n"; exit },
+);
+
+if($opt_shuffle and !@opt_play_songs) {
+  print STDERR "You can not shuffle nothingness\n" and exit(-1);
+}
+
+if(@opt_play_songs) {
+  if($opt_shuffle) {
+    @opt_play_songs = shuffle(@opt_play_songs);
+  }
+  load(@opt_play_songs);
+}
+
+
+sub show_playlist {
+  my $current_file = (map { $_->{file} } now_playing($log, 'identify'))[0];
+
+  open(my $fh, '<', $temp_playlist) or die("Can not open $temp_playlist: $!");
+  chomp(my @list = <$fh>);
+  close($fh);
+
+  for(@list) {
+    if($_ eq $current_file) {
+      $_ =~ m{.+/(.+)$};
+      printf("%s\n", $1 ? bold($1) : bold($_));
+    }
+    else {
+      $_ =~ m{.+/(.+)$};
+      printf("%s\n", ($1) ? $1 : $_);
+    }
+  }
+
+  open(my $fh, '<', $rmcd_state) or die("Can not open $rmcd_state: $!");
+  chomp(my $state = <$fh>);
+  close($fh);
+
+  ($opt_shuffle) = $state =~ m/Random: (\d+)/;
+  ($opt_repeat)  = $state =~ m/Repeat: (\d+)/;
+
+  printf("\nRandom: %s Repeat: %s\n",
+    $opt_shuffle ? bold(fg('blue4', 'On')) : 'Off',
+    $opt_repeat  ? bold(fg('blue4', 'On')) : 'Off',
+  );
+
+  return;
+}
+
+sub fileexist {
+  if(!-p $fifo) {
+    require POSIX;
+    print $fifo, "\n\n";
+    POSIX::mkfifo($fifo, 0666) or croak("Cant mkfifo $fifo: $!");
+  }
+  if(-e $config) {
+    require($config);
+    print Dumper \%channels if($DEBUG);
+  }
+  if(!-e $rmcd_state) {
+    open(my $fh, '>', $rmcd_state) or die("Can not open $rmcd_state: $!");
+    close($fh);
+  }
+}
+
+sub load {
+  my @toload = @_;
+
+  my $listing = join("\n", @toload);
+
+  if(!-e $pidfile) { #not started
+    if($toload[0] !~ m;(?:http|mms)://;) {
+      my @fixme = @toload;
+      for(@fixme) {
+        s;.+/(.+);$1;;
+        print "Adding \033[1m$1\033[0m\n";
+      }
+    }
+    # regular files
+
+
+    open(my $plist, '>', $temp_playlist)
+      or die("Can not open $temp_playlist: $!");
+    print $plist $listing;
+    close($plist);
+
+    open(my $state, '>', $rmcd_state) or die("Can not open $rmcd_state: $!");
+    print $state "Random: $opt_shuffle Repeat: $opt_repeat\n";
+    close($state);
+
+    mplayer_play(
+      {
+        pidfile => $pidfile,
+        logfile => $log,
+        path    => $player,
+        args    => [ @playopt, @toload ],
+      }
+    );
+    #exec($player, @playopt, @toload);
+  }
+
+  # rmcd was already running
+
+  exit(0) if(!@toload);
+  my @fixme = @toload;
+  for(@fixme) { # FIXME
+    s;.+/(.+);$1;;
+    print "Adding \033[1m$1\033[0m\n";
+  }
+
+  @toload = map{"'$_'"} @toload;
+
+  open(my $fh, '>', $fifo) or die("Can not open $fifo: $!");
+  print $fh "load @toload\n";
+  print $fh "loop $opt_repeat\n";
+  close($fh);
+
+  open(my $plist, '>', $temp_playlist)
+    or die("Can not open $temp_playlist: $!");
+
+  print $plist $listing;
+  close($plist);
+
+  open(my $state, '>', $rmcd_state) or die("Can not open $rmcd_state: $!");
+  print $state "Random: $opt_shuffle Repeat: $opt_repeat\n";
+  close($state);
+
+  exit(0);
+}
+
+sub cp {
+  if(!$dir_to_copy_to) {
+    print "Please specify destination dir in $config\n";
+    exit(1);
+  }
+  my $file = now_playing('file');
+  if(!$file) {
+    print "There's no file to copy!\n";
+    exit(1);
+  }
+  if($file =~ m;(?:http|mms)://;) {
+    print "You can not copy a stream\n";
+    exit(1);
+  }
+  if(!-e $dir_to_copy_to) {
+    if(mkdir($dir_to_copy_to)) {
+      print "Created directory '$dir_to_copy_to'\n";
+    }
+    else {
+      print "Could not create directory $dir_to_copy_to: $!\n";
+      exit(1);
+    }
+  }
+  if(copy($file, "$dir_to_copy_to/")) {
+    print "'$file' -> '$dir_to_copy_to'\n";
+    exit(0);
+  }
+  else {
+    print "Copy failed: $!\n";
+    exit(1);
+  }
+  exit(0);
+}
+
+
+sub cmd {
+  # Tripplecheck that no other rmcd process are using the fifo!
+  shift; # rid of getopt...
+  my $command = shift;
+  my @args = @_;
+  print "Command?\n" and exit(1) if(!$command);
+  print Dumper "command: $command", "args: \@args\n" if($DEBUG);
+  if(defined($allowed_cmds{$command})) {
+    $command = $allowed_cmds{$command};
+  }
+  else {
+    print "Arbitary command, trying anyway\n";
+  }
+
+  open(my $fh, '>', $fifo) or croak("Cant open $fifo: $!");
+  print $fh "$command", @args, "\n";
+  close($fh);
+}
+
+sub info {
+  my $np = now_playing($log, 'identify');
+
+  if(! -t STDOUT) {
+    printf("mplayer: %s (%s)\n", $np->{file}, $np->{bitrate} / 1000);
+    return;
+  }
+
+  for my $wanted(qw(
+    artist album title
+    genre year bitrate
+    channels chapters
+    format
+    file
+
+  )) {
+    printf("%8s: %s\n", ucfirst($wanted), $np->{$wanted})
+      if exists($np->{$wanted});
+  }
+  return;
+}
+
+sub list_channels {
+  for my $id(sort(keys(%channels))) {
+    printf "%s: %s\n", $id, $channels{$id};
+  }
+}
+
+sub usage {
+  pod2usage(verbose => 1) and exit;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+rmcd - Remotely control a daemonized Mplayer process
+
+=head1 SYNOPSIS
+
+  rmcd [OPTION]... [FILE/URI]
+
+=head1 DESCRIPTION
+
+B<rmcd> is a mplayer daemon/client - it daemonizes itself, playing
+music/movies/radio stations and waiting for input through the named pipe.
+
+You can send commands, load and play new content whenever you like.
+
+You can run rmcd on one computer and remotely control it on another, fully
+transparent. It only cares for the presence of the named pipe.
+
+You can also setup mplayer to stream the content to you, creating a solution
+similar to MPD and their builti-in httpd streaming (except MPD does not support
+video streaming).
+
+rmcd features a built-in, user configurable, web radio management system,
+functionality for copying the current track to your portable mp3 player or
+wherever you prefer, favorizing of tracks and loading of the same, now playing
+information for both local files and streams, along with other nifty stuff.
+
+=head1 OPTIONS
+
+    -l,   --load       play FILE(s)/URI or radio station (see -chanlist)
+    -r,   --shuffle    shuffle the playlist before adding it
+          --repeat     turn repeat ON
+    -pl,  --playlist   show the current playlist
+    -c,   --cmd        send COMMAND to a running process (see shortcuts)
+    -cl,  --clist      show a list of commands that are supported
+    -i,   --info       show now playing information
+
+    -n,   --next       next in playlist
+    -p,   --prev       previous in playlist
+    -t,   --toggle     toggle playback
+    -s,   --stop       stop playback
+    -f,   --fullscreen toggle fullscreen
+
+    -k,   --kill       kill the running process
+
+    -h,   --help       show the help and exit
+    -m,   --man        show the documentation and exit
+    -v,   --version    show version info and exit
+
+=head1 ENVIRONMENT
+
+The configuration file should be placed in $XDG_CONFIG_HOME/rmcd/rmcd.conf
+
+=head1 AUTHOR
+
+  Magnus Woldrich
+  CPAN ID: WOLDRICH
+  m@japh.se
+  http://japh.se
+
+=head1 CONTRIBUTORS
+
+None required yet.
+
+=head1 COPYRIGHT
+
+Copyright 2010, 2011 the B<rmcd> L</AUTHOR> and L</CONTRIBUTORS> as listed
+above.
+
+=head1 LICENSE
+
+This application is free software; you may redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<rmcd.conf(1)>
+
+B<Radio Playing Daemon> L<http://github.com/trapd00r/RPD/>
+
+L<Mplayer::NowPlaying>  L<http://github.com/trapd00r/Mplayer-NowPlaying/>
+
+=cut

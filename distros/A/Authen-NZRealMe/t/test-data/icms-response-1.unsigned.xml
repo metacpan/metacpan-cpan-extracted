@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+  <soap:Header>
+    <Action xmlns="http://www.w3.org/2005/08/addressing" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Id-1387046043">http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/ValidateFinal</Action>
+    <MessageID xmlns="http://www.w3.org/2005/08/addressing" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Id-1020173834">urn:uuid:a77d3236-8731-4161-83f4-f3bce091afe8</MessageID>
+    <To xmlns="http://www.w3.org/2005/08/addressing" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Id-492754038">http://www.w3.org/2005/08/addressing/anonymous</To>
+    <RelatesTo xmlns="http://www.w3.org/2005/08/addressing" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Id-552190390">urn:uuid:37daef25-98ef-48a7-9b2e-5e1f0f49a0dc</RelatesTo>
+    <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" soap:mustUnderstand="true">
+      <wsu:Timestamp wsu:Id="TS-233513">
+        <wsu:Created>2014-05-29T20:54:08.123Z</wsu:Created>
+        <wsu:Expires>2014-05-29T20:59:08.123Z</wsu:Expires>
+      </wsu:Timestamp>
+    </wsse:Security>
+  </soap:Header>
+  <soap:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Id-151184977">
+    <wst:RequestSecurityTokenResponse xmlns:icms="urn:nzl:govt:ict:stds:authn:deployment:igovt:gls:iCMS:1_0" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsse11="http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd" xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:wst14="http://docs.oasis-open.org/ws-sx/ws-trust/200802" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+      <wst:TokenType>http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0</wst:TokenType>
+      <wst:RequestedSecurityToken>
+        <saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xs="http://www.w3.org/2001/XMLSchema" ID="6de78878-82fb-4290-8ca6-a291c7fb1dc8" IssueInstant="2014-06-04T02:17:58.881Z" Version="2.0">
+          <saml2:Issuer>https://www.ite.logon.realme.govt.nz/icms</saml2:Issuer>
+          <saml2:Subject>
+            <saml2:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" NameQualifier="https://www.ite.logon.realme.govt.nz/saml2" SPNameQualifier="https://secure.elections.org.nz/app/enrol">BLAHBLAHBLAH</saml2:NameID>
+            <saml2:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:sender-vouches"/>
+          </saml2:Subject>
+          <saml2:Conditions NotBefore="2014-05-29T20:54:08.000Z" NotOnOrAfter="2014-05-29T21:54:08.123Z">
+            <saml2:AudienceRestriction>
+              <saml2:Audience>https://secure.elections.org.nz/app/enrol</saml2:Audience>
+              <saml2:Audience>https://www.ite.logon.realme.govt.nz/icms#Issue</saml2:Audience>
+            </saml2:AudienceRestriction>
+          </saml2:Conditions>
+          <saml2:AuthnStatement AuthnInstant="2014-05-29T20:54:08.123Z">
+            <saml2:SubjectLocality Address="202.78.240.7" DNSName="172.24.222.25"/>
+            <saml2:AuthnContext>
+              <saml2:AuthnContextClassRef>urn:nzl:govt:ict:stds:authn:deployment:GLS:SAML:2.0:ac:classes:ModStrength</saml2:AuthnContextClassRef>
+            </saml2:AuthnContext>
+          </saml2:AuthnStatement>
+          <saml2:AttributeStatement>
+            <saml2:Attribute FriendlyName="intended-presenter" Name="intended-presenter" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+              <saml2:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">https://secure.elections.org.nz/app/enrol</saml2:AttributeValue>
+            </saml2:Attribute>
+            <saml2:Attribute FriendlyName="permitted-usage" Name="permitted-usage" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+              <saml2:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">urn:nzl:govt:ict:stds:authn:deployment:igovt:gls:iCMS:1_0:SAMLV2.0:Authenticated</saml2:AttributeValue>
+            </saml2:Attribute>
+          </saml2:AttributeStatement>
+        </saml2:Assertion>
+      </wst:RequestedSecurityToken>
+      <wst:status>
+        <wst:Code>http://docs.oasis-open.org/ws-sx/ws-trust/200512/status/valid</wst:Code>
+      </wst:status>
+    </wst:RequestSecurityTokenResponse>
+  </soap:Body>
+</soap:Envelope>

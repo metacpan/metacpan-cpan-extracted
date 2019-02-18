@@ -1,0 +1,20 @@
+Revision history for App-DHCPClientUtils
+
+0.06    Sun 17 Feb 2019 21:35:00 EET
+        Fifth attempt to package scripts to CPAN
+
+0.05    Sun 17 Feb 2019 15:26:00 EET
+        --policy-single-iface implies --policy single if no policy given.
+		Added --output-file
+
+0.04    Sun 17 Feb 2019 15:11:00 EET
+        Third attempt to package scripts to CPAN
+
+0.03    Sat 16 Feb 2019 16:24:00 EET
+        Second attempt to package a binary to CPAN
+
+0.02    Sat 16 Feb 2019 15:05:00 EET
+        Initial attempt to package a binary to CPAN
+
+0.01    Sun 22 Apr 2018 21:39:00 PM CET
+        First version, released on an unsuspecting world.

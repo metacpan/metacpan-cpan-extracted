@@ -28,6 +28,7 @@ $Data::Dumper::Sortkeys = 1;
 use App::sdif;
 my $version = $App::sdif::VERSION;
 
+use App::sdif::Util;
 use App::cdif::Command::Mecab;
 
 sub read_until (&$) {
@@ -72,7 +73,6 @@ my $opt_i;
 my $opt_b;
 my $opt_w;
 my $opt_t;
-my $opt_T;
 
 my $rcs;
 my @rcsopt;
@@ -123,7 +123,6 @@ my @optargs = (
     "b|ignore-space-change" => \$opt_b,
     "w|ignore-all-space" => \$opt_w,
     "t|expand-tabs" => \$opt_t,
-    "T|initial-tab" => \$opt_T,
     "c|context" => sub { push(@diffopts, "-c") },
     "u|unified" => sub { push(@diffopts, "-u") },
     "C=i" => sub { push(@diffopts, "-C" . ($_[1] > 0 ? $_[1] : '')) },
@@ -153,7 +152,6 @@ push @diffopts, map { $_->[1] } grep { $_->[0] } (
     [ $opt_b, "-b" ],
     [ $opt_w, "-w" ],
     [ $opt_t, "-t" ],
-    [ $opt_T, "-T" ],
 );
 
 push @sub_diffopts, map { $_->[1] } grep { $_->[0] } (
@@ -370,100 +368,49 @@ while (<DIFF>) {
 	print @new if $opt_new;
     }
     #
-    # diff -u
+    # diff --combined (generic)
     #
     elsif (m{^
-	   (?<prefix> $graph_prefix_re )
+	   (?<prefix> $graph_prefix_re)
 	   (?<command>
-	     \@\@[ ]-\d+(?:,(?<o>\d+))?[ ]\+\d+(?:,(?<n>\d+))?[ ]\@\@
+	     (?<mark> \@{2,} ) [ ]
+	     (?<lines> (?: [-+]\d+(?:,\d+)? [ ] ){2,} )
+	     \g{mark}
 	     (?s:.*)
 	   )
 	   }x) {
-	my($prefix, $command, $o, $n) = @+{qw(prefix command o n)};
+	my($prefix, $command, $lines) = @+{qw(prefix command lines)};
+	my $column = length $+{mark};
+	my @lines = map {
+	    $_ eq ' ' ? 1 : int $_
+	} $lines =~ /\d+(?|,(\d+)|( ))/g;
+	@lines == $column or do { print; next };
 
-	use App::sdif::Divert;
-	my($divert, %opt);
+	my($divert, %read_opt);
 	if ($prefix) {
-	    $opt{prefix} = $prefix;
-	    $divert = new App::sdif::Divert FINAL => sub {
-		s/^/$prefix/mg;
-	    };
-	};
+	    $read_opt{prefix} = $prefix;
+	    use App::sdif::Divert;
+	    $divert = new App::sdif::Divert
+		FINAL => sub { s/^/$prefix/mg };
+	}
 
 	print_command($command);
-	my @buf = read_diffu(\%opt, *DIFF, $o // 1, $n // 1);
-	my $tab = $opt_T ? "\t" : "";
-	my $mark_re = qr/[\-\+]$tab/;
-	while (my($same, $old, $new) = splice(@buf, 0, 3)) {
-	    $same =~ s/^.$tab//mgo if not $opt_mark;
-	    print $same;
-	    if ($old and $new) {
-		compare(\$old, \$new, $mark_re);
-	    }
-	    if ($opt_color) {
-		$old =~ s{^(\-)($tab.*)}{
-		    ($opt_mark ? color("OMARK", $1) : "") . color("OTEXT", $2)
-		}mgoe if $old;
-		$new =~ s{^(\+)($tab.*)}{
-		    ($opt_mark ? color("NMARK", $1) : "") . color("NTEXT", $2)
-		}mgoe if $new;
-	    } else {
-		if (not $opt_mark) {
-		    $old =~ s/^\-$tab//mgo;
-		    $new =~ s/^\+$tab//mgo;
-		}
-	    }
-	    print $old if $old and $opt_old;
-	    print $new if $new and $opt_new;
-	}
-    }
-    #
-    # diff --combined (only support 3 files)
-    #
-    elsif (/^\@\@\@ -\d+(?:,(\d+))? -\d+(?:,(\d+))? \+\d+(?:,(\d+))? \@\@\@/)  {
 
-	print_command($_);
+	my @buf = read_unified \%read_opt, *DIFF, @lines;
 
-	my @buf = read_diffu3(*DIFF, $1 // 1, $2 // 1, $3 // 1);
-	my @keys = diffu3_keys();
-	my $tab = $opt_T ? "\t" : "";
-	my $mark_re = qr/..$tab/;
-	my %buf;
+	state @mark_re;
+	my $mark_re = $mark_re[$column] //= do {
+	    my $mark = '.' x ($column - 1);
+	    qr/$mark/;
+	};
 
-	while (@buf{@keys} = splice @buf, 0, scalar @keys) {
-
-	    my @r;
-	    $r[0] =     compare(\@buf{q/--/, q/++/}, $mark_re);
-	    $r[1] =     compare(\@buf{q/- /, q/ -/}, $mark_re);
-	    if ($r[1] == 0) {
-		$r[2] = compare(\@buf{q/- /, q/+ /}, $mark_re);
-		$r[3] = compare(\@buf{q/ -/, q/ +/}, $mark_re);
+	for my $buf (@buf) {
+	    my @result = compare_unified($column, $buf, $mark_re);
+	    if (@result == 3) {
+		$opt_new or splice @result, 2, 1;
+		$opt_old or splice @result, 1, 1;
 	    }
-	    if (sum(@r) == 0) {
-		$r[4] = compare(\@buf{q/- /, q/++/}, $mark_re);
-		$r[5] = compare(\@buf{q/ -/, q/++/}, $mark_re) unless $r[4];
-		$r[6] = compare(\@buf{q/--/, q/+ /}, $mark_re);
-		$r[7] = compare(\@buf{q/--/, q/ +/}, $mark_re) unless $r[6];
-	    }
-
-	    if ($opt_color) {
-		map { s/^$mark_re//mg } $buf{q/  /} if not $opt_mark;
-		map {
-		    my($s, $m, $t) = @$_;
-		    $$s =~ s{^(..)($tab.*)}{
-			($opt_mark ? color($m, $1) : '') . color($t, $2)
-		    }mgoe if $$s;
-		}
-		[ \$buf{q/--/}, 'CMARK', 'CTEXT' ],
-		[ \$buf{q/- /}, 'OMARK', 'OTEXT' ],
-		[ \$buf{q/ -/}, 'NMARK', 'NTEXT' ],
-		[ \$buf{q/+ /}, 'MMARK', 'MTEXT' ],
-		[ \$buf{q/ +/}, 'MMARK', 'MTEXT' ],
-		[ \$buf{q/++/}, 'MMARK', 'MTEXT' ];
-	    } else {
-		map { s/^$mark_re//mg } @buf{@keys} if not $opt_mark;
-	    }
-	    print @buf{@keys};
+	    print @result;
 	}
     }
     #
@@ -531,6 +478,73 @@ if ($opt_stat) {
 exit $? >> 8;
 
 ######################################################################
+
+sub compare_unified {
+    my $column = shift;
+    goto &compare_unified_3 if $column == 3;
+    goto &compare_unified_generic;
+}
+
+sub compare_unified_generic {
+    my($buf, $mark_re) = @_;
+    my $c = collect $buf qr/^[\t ]+$/;
+    my $o = collect $buf qr/[-]/;
+    my $n = collect $buf qr/[+]/;
+    compare(\$o, \$n, $mark_re);
+    if ($opt_color) {
+	$c =~ s/^$mark_re//mg if not $opt_mark;
+	map {
+	    my($buf, $m, $t) = @$_;
+	    $$buf =~ s{^($mark_re)(.*)}{
+	    ($opt_mark ? color($m, $1) : '') . color($t, $2)
+	    }mge;
+	} ( [ \$o, 'OMARK', 'OTEXT' ],
+	    [ \$n, 'NMARK', 'NTEXT' ] );
+    } else {
+	map { s/^$mark_re//mg } $c, $o, $n if not $opt_mark;
+    }
+    ($c, $o, $n);
+}
+
+sub compare_unified_3 {
+    my($buf, $mark_re) = @_;
+
+    my @mark = ( "  ", "--", "- ", " -", "+ ", " +", "++" );
+    my %buf = map { $_ => scalar($buf->collect($_)) } @mark;
+
+    my @r;
+    $r[0] =     compare(\@buf{q/--/, q/++/}, $mark_re);
+    $r[1] =     compare(\@buf{q/- /, q/ -/}, $mark_re);
+    if ($r[1] == 0) {
+	$r[2] = compare(\@buf{q/- /, q/+ /}, $mark_re);
+	$r[3] = compare(\@buf{q/ -/, q/ +/}, $mark_re);
+    }
+    if (sum(@r) == 0) {
+	$r[4] = compare(\@buf{q/- /, q/++/}, $mark_re);
+	$r[5] = compare(\@buf{q/ -/, q/++/}, $mark_re) unless $r[4];
+	$r[6] = compare(\@buf{q/--/, q/+ /}, $mark_re);
+	$r[7] = compare(\@buf{q/--/, q/ +/}, $mark_re) unless $r[6];
+    }
+
+    if ($opt_color) {
+	map { s/^$mark_re//mg } $buf{q/  /} if not $opt_mark;
+	map {
+	    my($s, $m, $t) = @$_;
+	    $$s =~ s{^($mark_re)(.*)}{
+	    ($opt_mark ? color($m, $1) : '') . color($t, $2)
+	    }mge if $$s;
+	} ( [ \$buf{q/--/}, 'CMARK', 'CTEXT' ],
+	    [ \$buf{q/- /}, 'OMARK', 'OTEXT' ],
+	    [ \$buf{q/ -/}, 'NMARK', 'NTEXT' ],
+	    [ \$buf{q/+ /}, 'MMARK', 'MTEXT' ],
+	    [ \$buf{q/ +/}, 'MMARK', 'MTEXT' ],
+	    [ \$buf{q/++/}, 'MMARK', 'MTEXT' ] );
+    } else {
+	map { s/^$mark_re//mg } @buf{@mark} if not $opt_mark;
+    }
+
+    @buf{$buf->labels};
+}
 
 sub print_command {
     return unless $opt_command;
@@ -755,65 +769,6 @@ sub read_diffc {
     map { $_ // "" } @buf;
 }
 
-my %slot;
-BEGIN {
-    %slot = ("\n" => 0, " " => 0, "\t" => 0, "-" => 1, "+" => 2);
-}
-sub read_diffu {
-    my $opt = ref $_[0] eq 'HASH' ? shift : {};
-    my $FH = shift;
-    my @l = (0, @_);
-    my $prefix = $opt->{prefix} // '';
-
-    my $i = 0;
-    my @buf;
-    my $slot;
-    while (2 * $l[0] + $l[1] + $l[2] > 0 and $_ = <$FH>) {
-	if ($prefix) {
-	    s/^\Q$prefix// or warn "Unexpected: $_";
-	}
-	# `git diff' produces message like this:
-	# "\ No newline at end of file"
-	/^[^ \t\-\+\n]/ and next;
-	$i++ while ($i % 3) != ($slot = $slot{substr($_, 0, 1)});
-	$l[$slot]--;
-	$buf[$i] .= $_;
-    }
-    map { $_ // "" } @buf;
-}
-
-my @keys3;
-my %slot3;
-my %line3;
-BEGIN {
-    @keys3 = ("  ", "--", "- ", "+ ", " -", " +", "++");
-    @slot3{@keys3} = 0 .. @keys3 - 1;
-    %line3 = ("  " => 3,
-	      "--" => 2, "+ " => 2, " +" => 2,
-	      "++" => 1, "- " => 1, " -" => 1);
-}
-sub diffu3_keys { @keys3 }
-sub read_diffu3 {
-    my $FH = shift;
-    my $line = sum @_;
-
-    my $i = 0;
-    my @buf;
-    while (<$FH>) {
-	# `git diff' produces message like this:
-	# "\ No newline at end of file"
-	/^[ \-\+]{2}/ or next;
-	my $mark = substr $_, 0, 2;
-	if (($i % @keys3) != $slot3{$mark}) {
-	    $i += ($slot3{$mark} - $i % @keys3) % @keys3;
-	}
-	$buf[$i] .= $_;
-	last if ($line -= $line3{$mark}) <= 0;
-    }
-    push @buf, "" while @buf % @keys3;
-    map { $_ // "" } @buf;
-}
-
 sub ul {
     local $_ = join '', @_;
     s/(.)/["", "_\010", "__\010\010"]->[vwidth($1)].$1/ge;
@@ -829,17 +784,6 @@ sub range {
     local $_ = shift;
     my($from, $to) = /,/ ? split(/,/) : ($_, $_);
     wantarray ? ($from, $to) : $to == 0 ? 0 : $to - $from + 1;
-}
-
-##
-## Implement minimum function because Text::Glob is not in standard library
-##
-sub match_glob {
-    local $_ = shift;
-    s/\?/./g;
-    s/\*/.*/g;
-    my $regex = qr/^$_$/;
-    grep { $_ =~ $regex } @_;
 }
 
 sub wc_l {
@@ -883,7 +827,6 @@ Options:
 	-b		ignore space change
 	-w		ignore whitespace
 	-t		expand tabs
-	-T		initial tabs
 	--rcs		use rcsdiff
 	-r<rev>, -q	rcs options
 

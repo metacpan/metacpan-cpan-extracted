@@ -1,23 +1,21 @@
 #!/usr/bin/env perl
 use strictures 2;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 use Test::Starch;
 use Starch;
 use Net::Statsd;
-use Package::Stash;
 
 Test::Starch->new(
     plugins => ['::Net::Statsd'],
 )->test();
 
-my $stash = Package::Stash->new('Net::Statsd');
 my @sends;
-$stash->add_symbol(
-    '&send',
-    sub{ push @sends, [@_] },
-);
+
+{
+    no warnings 'redefine';
+    *Net::Statsd::send = sub{ push @sends, [@_] };
+}
 
 my $starch = Starch->new(
     plugins => ['::Net::Statsd'],
@@ -36,7 +34,7 @@ my $starch = Starch->new(
 my $store = $starch->store();
 
 $store->get('foobar', []);
-is_deeply(
+is(
     \@sends,
     [
         [{ 'starch.outer.get-miss' => '0|ms' }, 1],
@@ -47,7 +45,7 @@ is_deeply(
 @sends = ();
 
 $store->inner->set('foobar', [], {'test'=>1});
-is_deeply(
+is(
     \@sends,
     [
         [{ 'starch.Memory.set' => '0|ms' }, 1],
@@ -57,7 +55,7 @@ is_deeply(
 @sends = ();
 
 $store->get('foobar', []);
-is_deeply(
+is(
     \@sends,
     [
         [{ 'starch.outer.get-miss' => '0|ms' }, 1],
@@ -69,7 +67,7 @@ is_deeply(
 @sends = ();
 
 $store->remove('foobar', []);
-is_deeply(
+is(
     \@sends,
     [
         [{ 'starch.outer.remove' => '0|ms' }, 1],
@@ -101,11 +99,11 @@ $starch = Starch->new(
 $store = $starch->store();
 
 like(
-    exception { $store->set('foobar', [], {test=>1}) },
+    dies { $store->set('foobar', [], {test=>1}) },
     qr{set_fail},
     'set failed',
 );
-is_deeply(
+is(
     \@sends,
     [
         [{ 'blah.fail.set-error' => '0|ms' }, 1],
@@ -115,11 +113,11 @@ is_deeply(
 @sends = ();
 
 like(
-    exception { $store->get('foobar', []) },
+    dies { $store->get('foobar', []) },
     qr{get_fail},
     'get failed',
 );
-is_deeply(
+is(
     \@sends,
     [
         [{ 'blah.fail.get-error' => '0|ms' }, 1],
@@ -129,11 +127,11 @@ is_deeply(
 @sends = ();
 
 like(
-    exception { $store->remove('foobar', []) },
+    dies { $store->remove('foobar', []) },
     qr{remove_fail},
     'remove failed',
 );
-is_deeply(
+is(
     \@sends,
     [
         [{ 'blah.fail.remove-error' => '0|ms' }, 1],

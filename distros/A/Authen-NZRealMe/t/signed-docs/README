@@ -1,0 +1,55 @@
+This folder contains some sample documents with XML digital signatures in
+different formats.  These signatures were generated independently of the
+Authen::NZRealMe module to ensure interoperability.
+
+The 'xmlsec' tool (https://www.aleksey.com/xmlsec/) was used from the
+command-line as follows:
+
+1. Install debian package 'xmlsec1'.
+
+2. Create an unsigned XML document (e.g.: doc.xml).
+
+3. Add a template <Signature /> element like this (vary as required):
+
+   <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+     <SignedInfo>
+       <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+       <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+       <Reference URI="">
+         <Transforms>
+           <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+           <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+         </Transforms>
+         <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+         <DigestValue/>
+       </Reference>
+     </SignedInfo>
+     <SignatureValue/>
+   </Signature>
+
+4. Fill in the URI attribute of the <Reference> element with "#id-value" where
+   "id-value" matches an attribute called (for example) "ID".
+
+5. Sign using a command like this (in this example, the ID attribute was on an
+   <Attribute /> element):
+
+   xmlsec1 --sign --output doc-signed.xml \
+      --privkey-pem t/test-conf/idp-assertion-sign-key.pem \
+      --id-attr:ID Assertion \
+      doc.xml
+
+6. Move the resulting doc-signed.xml into t/signed-docs
+
+The sample command above works with documents that do not use namespaces.  For
+documents which do have namespaces it is necessary to be more specific about the
+namespace of the element with the target attribute:
+
+   xmlsec1 --sign --output doc-signed.xml \
+      --privkey-pem t/test-conf/idp-assertion-sign-key.pem \
+      --id-attr:ID urn:oasis:names:tc:SAML:2.0:assertion:Assertion \
+      doc.xml
+
+The <X509Certificate /> data was added manually because xmlsec1 didn't seem to
+support that.
+
+See also: https://users.dcc.uchile.cl/~pcamacho/tutorial/web/xmlsec/xmlsec.html

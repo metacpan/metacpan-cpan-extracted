@@ -1,33 +1,65 @@
 ---
 abstract: 'A comprehensive plugin system.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
-  Test::More: '0'
-  Test::Simple: '0.96'
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MooX-PluginKit
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooX::PluginKit:
+    file: lib/MooX/PluginKit.pm
+    version: '0.04'
+  MooX::PluginKit::Consumer:
+    file: lib/MooX/PluginKit/Consumer.pm
+    version: '0.04'
+  MooX::PluginKit::ConsumerBase:
+    file: lib/MooX/PluginKit/ConsumerBase.pm
+    version: '0.04'
+  MooX::PluginKit::ConsumerRole:
+    file: lib/MooX/PluginKit/ConsumerRole.pm
+    version: '0.04'
+  MooX::PluginKit::Core:
+    file: lib/MooX/PluginKit/Core.pm
+    version: '0.04'
+  MooX::PluginKit::Factory:
+    file: lib/MooX/PluginKit/Factory.pm
+    version: '0.04'
+  MooX::PluginKit::Plugin:
+    file: lib/MooX/PluginKit/Plugin.pm
+    version: '0.04'
 requires:
   Carp: '0'
   Exporter: '0'
   Module::Runtime: '0.014'
-  Moo: '2'
+  Moo: '2.000000'
   Scalar::Util: '0'
   Type::Tiny: '1.000005'
   namespace::clean: '0.24'
-  strictures: '2'
+  strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/MooX-PluginKit/issues
   homepage: https://github.com/bluefeet/MooX-PluginKit
-  repository: https://github.com/bluefeet/MooX-PluginKit.git
-version: '0.03'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  repository: git://github.com/bluefeet/MooX-PluginKit.git
+version: '0.04'
+x_contributors:
+  - 'Aran Deltac <aran@ziprecruiter.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

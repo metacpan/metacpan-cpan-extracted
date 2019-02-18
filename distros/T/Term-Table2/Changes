@@ -1,0 +1,8 @@
+Revision history for Perl extension Term::Table2.
+
+1.0.0  Sat Feb  9 18:25:18 2019
+	- original version; created by h2xs 1.23 with options
+		-X -n Term::Table2
+
+1.0.1  Sun Feb 17 23:59:46 2019
+	- got rid of camel case in names of all public methods

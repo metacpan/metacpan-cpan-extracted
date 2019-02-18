@@ -74,12 +74,12 @@ is($sig_alg, 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
     "signature algorithm is correct");
 like($sig, qr/^$b64chr{200,}=*$/, 'signature is base64 encoded');
 
-my $cert_path = File::Spec->catfile(test_conf_dir(), 'sp-sign-crt.pem');
+my $cert_path = test_conf_file('sp-sign-crt.pem');
 my $signer = Authen::NZRealMe->class_for('xml_signer')->new(
     pub_cert_file => $cert_path,
 );
-ok($signer->_verify_rsa_signature($plaintext, $sig),
-    'signature verified successfully using public key');
+ok($signer->verify_detached_signature($plaintext, $sig),
+    'signature verified successfully using public key from cert');
 
 my $xml = Authen::NZRealMe::AuthenRequest->_request_from_uri($url);
 ok($xml, 'extracted XML request for analysis');
@@ -136,8 +136,8 @@ $plaintext = "SAMLRequest=$payload&RelayState=$relay&SigAlg=$sig_alg";
 
 $sig =~ s{%([0-9a-f]{2})}{chr(hex($1))}ieg;
 
-ok($signer->_verify_rsa_signature($plaintext, $sig),
-    'signature verified successfully using public key');
+ok($signer->verify_detached_signature($plaintext, $sig),
+    'signature verified successfully using public key from cert');
 
 
 $xml = Authen::NZRealMe::AuthenRequest->_request_from_uri($url);

@@ -1,16 +1,22 @@
 Revision history for Net-ISC-DHCPClient
 
-0.12    Wed 13 Feb 2019 17:27:00 PM EET
+0.14    Sun 17 Feb 2019 15:43:00 EET
+        Added example code into README.md
+
+0.13    Sat 16 Feb 2019 14:36:00 EET
+        Bumped Perl version requirement to 5.14 in Makefile.PL too
+
+0.12    Wed 13 Feb 2019 17:27:00 EET
         Bugfix: Bumped Perl version requirement to 5.14, not 5.140
 
-0.11    Tue 12 Feb 2019 18:27:00 PM EET
+0.11    Tue 12 Feb 2019 18:27:00 EET
         Bumped Perl version requirement to 5.14
 
-0.10    Sun 10 Feb 2019 22:17:00 PM EET
+0.10    Sun 10 Feb 2019 22:17:00 EET
         Added parsing of new Netplan-style DHCP lease files by Networkmanager
 
-0.02    Mon 27 Nov 2017 09:46:24 PM EET
+0.02    Mon 27 Nov 2017 09:46:24 EET
         No code changes. Bumped version for CPAN upload.
 
-0.01    Mon 27 Nov 2017 09:46:24 PM EET
+0.01    Mon 27 Nov 2017 09:46:24 EET
         First version, has functionality to read ISC dhclient leases.

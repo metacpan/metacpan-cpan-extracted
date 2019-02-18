@@ -1,8 +1,8 @@
-### Logic-TruthTable
+# Logic-TruthTable
 
-## version 1.00
+## version 1.01
 
-## 11 February 2019
+## 18 February 2019
 
 ---
 
@@ -29,17 +29,13 @@ perl Build.PL
 After installing, you can find documentation for this module with the
 perldoc or man command, depending upon your system.
 
-```sh
-perldoc Logic::TruthTable
-```
-
 You can also look for information at:
 
 [The module's Github repository](https://github.com/jgamble/Logic-TruthTable)
 
-[RT, CPAN's request tracker (report bugs here)] (http://rt.cpan.org/NoAuth/Bugs.html?Dist=Logic-TruthTable)
+[MetaCPAN](https://metacpan.org/release/Logic-TruthTable)
 
-[MetaCPAN] (https://metacpan.org/release/Logic-TruthTable)
+[RT, CPAN's request tracker (report bugs here)](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Logic-TruthTable)
 
 
 ## COPYRIGHT AND LICENSE

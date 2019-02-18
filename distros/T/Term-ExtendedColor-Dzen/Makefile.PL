@@ -4,9 +4,14 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile1(
   META_MERGE => {
+    q(meta-spec) => { version => 2 },
     resources => {
-      repository => q{https://github.com/trapd00r/Term-ExtendedColor-Dzen},
-      bugtracker => q{https://github.com/trapd00r/Term-ExtendedColor-Dzen/issues},
+      repository => {
+        type       => 'git',
+        url        => 'https://github.com/trapd00r/Term-ExtendedColor-Dzen.git',
+        web        => 'https://github.com/trapd00r/Term-ExtendedColor-Dzen',
+        bugtracker => 'https://github.com/trapd00r/Term-ExtendedColor-Dzen/issues',
+      },
     },
   },
 
@@ -15,7 +20,6 @@ WriteMakefile1(
   ABSTRACT         => q{Color input and add dzen compatible attributes},
   VERSION_FROM     => q{lib/Term/ExtendedColor/Dzen.pm},
   LICENSE          => q{perl},
-#  EXE_FILES        => [ glob('bin/*') ],
   PREREQ_PM        => { },
   MIN_PERL_VERSION => 5.010,
   MAN1PODS         => { },
@@ -54,5 +58,3 @@ sub WriteMakefile1 {
 
   WriteMakefile(%params);
 }
-
-

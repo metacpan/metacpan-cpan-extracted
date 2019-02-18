@@ -10,3 +10,5 @@ t/03ooread.t
 t/04output.t
 t/sample.dat
 t/comma.dat
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

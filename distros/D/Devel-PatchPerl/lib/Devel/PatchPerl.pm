@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '1.52';
+$Devel::PatchPerl::VERSION = '1.54';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -10,6 +10,8 @@ use IO::File;
 use Devel::PatchPerl::Hints qw[hint_file];
 use Module::Pluggable search_path => ['Devel::PatchPerl::Plugin'];
 use vars qw[@ISA @EXPORT_OK];
+
+use constant CERTIFIED => 5.029008; # Anything less than this
 
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(patch_source);
@@ -284,6 +286,10 @@ sub patch_source {
     else {
       die "You didn't provide a perl version and I don't appear to be in a perl source tree\n";
     }
+  }
+  if ( _norm_ver( $vers ) >= CERTIFIED ) {
+      warn "Nothing to do '$vers' is fine\n";
+      exit;
   }
   $source = File::Spec->rel2abs($source);
   {
@@ -7756,7 +7762,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 1.52
+version 1.54
 
 =head1 SYNOPSIS
 
@@ -7822,7 +7828,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Chris Williams and Marcus Holland-Moritz.
+This software is copyright (c) 2019 by Chris Williams and Marcus Holland-Moritz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

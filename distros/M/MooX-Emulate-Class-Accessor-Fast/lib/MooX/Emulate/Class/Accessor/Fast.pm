@@ -1,7 +1,6 @@
 package MooX::Emulate::Class::Accessor::Fast;
-$MooX::Emulate::Class::Accessor::Fast::VERSION = '0.03';
-use Moo::Role;
-use strictures 1;
+
+$MooX::Emulate::Class::Accessor::Fast::VERSION = '0.04';
 
 =head1 NAME
 
@@ -51,6 +50,9 @@ documentation please see L<Class::Accessor::Fast> and L<Class::Accessor>.
 use Package::Stash;
 use Class::Method::Modifiers qw( install_modifier );
 use Carp qw( croak );
+
+use Moo::Role;
+use strictures 2;
 
 sub BUILD { }
 

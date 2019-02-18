@@ -3,7 +3,7 @@ package WebService::HIBP::Breach;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -42,11 +42,6 @@ sub description {
 sub breach_date {
     my ($self) = @_;
     return $self->{BreachDate};
-}
-
-sub is_active {
-    my ($self) = @_;
-    return $self->{IsActive};
 }
 
 sub modified_date {
@@ -99,9 +94,9 @@ sub data_classes {
     }
 }
 
-sub logo_type {
+sub logo_path {
     my ($self) = @_;
-    return $self->{LogoType};
+    return $self->{LogoPath};
 }
 
 1;    # End of WebService::HIBP::Breach
@@ -113,7 +108,7 @@ WebService::HIBP::Breach - An instance of a breach from the Have I Been Pwned we
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =head1 SYNOPSIS
 
@@ -193,11 +188,7 @@ Indicates if the breach has been L<retired|https://haveibeenpwned.com/FAQs#Retir
 
 Indicates if the breach is considered a L<spam list|https://haveibeenpwned.com/FAQs#SpamList>. This flag has no impact on any other attributes but it means that the data has not come as a result of a security compromise.
 
-=head2 is_active
-
-No documentation for this yet.  May be removed without notice.
-
-=head2 logo_type
+=head2 logo_path
 
 No documentation for this yet. May be removed without notice.
 

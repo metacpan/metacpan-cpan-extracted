@@ -18,10 +18,11 @@ no_index:
     - t
     - inc
 requires:
+  DateTime::Format::Strptime: '1.76'
   Math::Expression: '1.47'
   Moose: '2.1804'
   Test::Class: '0.5'
   Test::Most: '0.34'
 resources:
   repository: https://github.com/VenkatesanNarayanan/Text-FixedWidth-Parser.git
-version: '0.5'
+version: '0.6'

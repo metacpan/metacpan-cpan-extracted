@@ -100,9 +100,9 @@ sub get_resource_root ( $self, $name, %args ) {
     return scalar $resource->( $self, $args{native_cdn} // $self->{native_cdn}, \%args );
 }
 
-sub get_script_tag ( $self, $url ) { return qq[<script src="$url" integrity="" crossorigin="anonymous"></script>] }
+sub get_script_tag ( $self, $url ) { return qq[<script src="$url" type="text/javascript" integrity="" crossorigin="anonymous"></script>] }
 
-sub get_css_tag ( $self, $url ) { return qq[<link rel="stylesheet" href="$url" integrity="" crossorigin="anonymous" />] }
+sub get_css_tag ( $self, $url ) { return qq[<link href="$url" type="text/css" rel="stylesheet" integrity="" crossorigin="anonymous" />] }
 
 sub upload ( $self, $path, $data, @args ) {
     my $location_name;

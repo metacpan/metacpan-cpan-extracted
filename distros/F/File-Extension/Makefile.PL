@@ -4,9 +4,14 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile1(
   META_MERGE => {
-    resources => {
-      repository => q{https://github.com/trapd00r/File-Extension},
-      bugtracker => q{https://github.com/trapd00r/File-Extension/issues},
+      q(meta-spec) => { version => 2 },
+      resources => {
+          repository => {
+            type       => 'git',
+            url        => 'https://github.com/trapd00r/File-Extension.git',
+            web        => 'https://github.com/trapd00r/File-Extension',
+            bugtracker => 'https://github.com/trapd00r/File-Extension/issues',
+      },
     },
   },
 
@@ -57,5 +62,3 @@ sub WriteMakefile1 {
 
   WriteMakefile(%params);
 }
-
-

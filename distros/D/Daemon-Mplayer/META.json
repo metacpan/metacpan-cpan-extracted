@@ -1,0 +1,50 @@
+{
+   "abstract" : "Run mplayer as a daemonized process",
+   "author" : [
+      "Magnus Woldrich <m@japh.se>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Daemon-Mplayer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/Daemon-Mplayer.git",
+         "web" : "https://github.com/trapd00r/Daemon-Mplayer",
+         "x_bugtracker" : "https://github.com/trapd00r/Daemon-Mplayer/issues"
+      }
+   },
+   "version" : "0.014",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

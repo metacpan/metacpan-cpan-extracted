@@ -8,7 +8,7 @@ BEGIN {
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
   @ISA = qw(Exporter);
 
-  $VERSION = '0.008';
+  $VERSION = '0.012';
   @EXPORT_OK = qw(knnp);
 }
 

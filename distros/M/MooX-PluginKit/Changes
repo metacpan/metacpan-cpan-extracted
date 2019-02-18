@@ -1,4 +1,9 @@
-Revision history for Perl extension MooX::PluginKit.
+Revision history for Perl extension MooX-PluginKit.
+
+0.04 2019-02-18T06:12:19Z
+
+ - Migrate all the tests from Test::More to Test2::V0.
+ - Migrate build tooling from Dist::Zilla to Minilla.
 
 0.03 2017-01-30
 

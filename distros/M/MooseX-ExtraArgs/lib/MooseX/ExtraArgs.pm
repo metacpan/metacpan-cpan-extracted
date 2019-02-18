@@ -1,9 +1,6 @@
 package MooseX::ExtraArgs;
-{
-  $MooseX::ExtraArgs::VERSION = '0.01';
-}
-use Moose ();
-use Moose::Exporter;
+
+$MooseX::ExtraArgs::VERSION = '0.02';
 
 =head1 NAME
 
@@ -31,6 +28,9 @@ This could be useful for proxy classes that expect extra arguments that will the
 used to pass as arguments to the underlying implementation.
 
 =cut
+
+use Moose ();
+use Moose::Exporter;
 
 Moose::Exporter->setup_import_methods(
     role_metaroles => {

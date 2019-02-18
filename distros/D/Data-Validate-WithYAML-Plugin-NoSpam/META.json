@@ -28,15 +28,23 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Data::Validate::WithYAML" : "0.17",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Perl::Critic" : "0",
-            "perl" : "5.008"
+            "Test::CheckManifest" : "1.38",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Data::Validate::WithYAML::Plugin::NoSpam" : {
          "file" : "lib/Data/Validate/WithYAML/Plugin/NoSpam.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -51,7 +59,7 @@
          "web" : "http://github.com/reneeb/Data-Validate-WithYAML-Plugin-NoSpam"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",

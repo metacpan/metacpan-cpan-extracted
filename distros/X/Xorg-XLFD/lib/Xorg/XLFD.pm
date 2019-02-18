@@ -1,11 +1,12 @@
 package Xorg::XLFD;
+no warnings 'experimental::smartmatch';
 use strict;
 
 BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.128';
+  $VERSION = '0.134';
 
   @ISA = qw(Exporter);
 
@@ -241,7 +242,7 @@ Report bugs on rt.cpan.org or to magnus@trapd00r.se
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  magnus@trapd00r.se
+  m@japh.se
   http://japh.se
 
 =head1 CONTRIBUTORS

@@ -118,8 +118,24 @@ is($@ => '', 'no exceptions!');
 # Dissect the iCMS request first
 
 (undef, $xml) = $sp->test_request_log;
-#diag($xml);
-# TODO: add some assertions about the structure/content of iCMS request
+
+xml_found_node_ok($xml, q{/soap:Envelope});
+
+xml_node_content_is($xml,
+    q{/soap:Envelope/soap:Header/wsa:To},
+    'https://ws.test.logon.fakeme.govt.nz/icms/Validate_v1_1'
+);
+
+xml_node_content_is($xml,
+    q{/soap:Envelope/soap:Header/wsse:Security/ds:Signature/ds:SignedInfo/ds:SignatureMethod/@Algorithm},
+    'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+);
+
+xml_node_content_is($xml,
+    q{/soap:Envelope/soap:Header/wsse:Security/ds:Signature/ds:SignedInfo/ds:Reference[1]/ds:DigestMethod/@Algorithm},
+    'http://www.w3.org/2001/04/xmlenc#sha256'
+);
+
 
 isa_ok($resp => 'Authen::NZRealMe::ResolutionResponse', 'resolution response');
 

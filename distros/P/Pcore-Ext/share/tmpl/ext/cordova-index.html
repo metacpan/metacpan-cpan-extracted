@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'; media-src *; img-src * filesystem: data:">
+
+    <title><: $title :></title>
+
+    <link href="index.css" type="text/css" rel="stylesheet" integrity="" crossorigin="anonymous" />
+    <script src="cordova.js" type="text/javascript" integrity="" crossorigin="anonymous"></script>
+: for $resources -> $resource {
+    <: $resource | raw :>
+: }
+    <script src="overrides.js" type="text/javascript" integrity="" crossorigin="anonymous"></script>
+    <script src="app.js" type="text/javascript" integrity="" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+</body>
+
+</html>

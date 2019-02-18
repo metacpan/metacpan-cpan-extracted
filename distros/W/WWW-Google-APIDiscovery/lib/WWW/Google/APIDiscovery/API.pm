@@ -1,6 +1,6 @@
 package WWW::Google::APIDiscovery::API;
 
-$WWW::Google::APIDiscovery::API::VERSION   = '0.27';
+$WWW::Google::APIDiscovery::API::VERSION   = '0.28';
 $WWW::Google::APIDiscovery::API::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::APIDiscovery::API - Placeholder for supported APIS.
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 

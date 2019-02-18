@@ -51,4 +51,5 @@ t/91rt100066.t
 t/91rt102547.t
 t/99pod.t
 t/privkey.pem
+t/regen-certs.sh
 t/server.pem

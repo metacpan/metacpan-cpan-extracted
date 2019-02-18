@@ -1,0 +1,10 @@
+Revision history for App-whichdll
+
+0.03      2019-02-16 18:11:22 -0500
+  - Prereq fix: bump version of Test::Script
+
+0.02      2019-02-16 09:35:48 -0500
+  - First CPAN Release
+
+0.01      2019-02-15 05:26:52 -0500
+  - initial version

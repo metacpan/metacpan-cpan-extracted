@@ -1,5 +1,7 @@
 package MooX::PluginKit::Consumer;
-$MooX::PluginKit::Consumer::VERSION = '0.03';
+
+$MooX::PluginKit::Consumer::VERSION = '0.04';
+
 =head1 NAME
 
 MooX::PluginKit::Consumer - Declare a class as a consumer of

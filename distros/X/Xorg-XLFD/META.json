@@ -1,0 +1,50 @@
+{
+   "abstract" : "X11 logical font description interface",
+   "author" : [
+      "Magnus Woldrich <m@japh.se.se>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Xorg-XLFD",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.0110001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/Xorg-XLFD.git",
+         "web" : "https://github.com/trapd00r/Xorg-XLFD",
+         "x_bugtracker" : "https://github.com/trapd00r/Xorg-XLFD/issues"
+      }
+   },
+   "version" : "0.134",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

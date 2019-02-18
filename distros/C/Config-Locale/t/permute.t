@@ -1,13 +1,13 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use Test2::V0;
 
-use Test::More;
-use Path::Class qw( file );
+use Path::Tiny;
 
-BEGIN{ use_ok('Config::Locale') }
+use Config::Locale;
 
-my $config_dir = file( $0 )->dir->subdir('permute');
+my $config_dir = path( $0 )->sibling('permute');
 
 my @test_cases = (
     [ [qw( foo )]     => { iam => { foo=>1 } } ],
@@ -24,7 +24,7 @@ foreach my $case (@test_cases) {
         algorithm => 'PERMUTE',
     )->config();
 
-    is_deeply( $config, $expected, join(', ', @$identity) );
+    is( $config, $expected, join(', ', @$identity) );
 }
 
 done_testing;

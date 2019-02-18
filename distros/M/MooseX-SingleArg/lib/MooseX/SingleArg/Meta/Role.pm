@@ -1,5 +1,7 @@
 package MooseX::SingleArg::Meta::Role;
-$MooseX::SingleArg::Meta::Role::VERSION = '0.08';
+
+$MooseX::SingleArg::Meta::Role::VERSION = '0.09';
+
 use Moose::Role;
 
 has single_arg => (

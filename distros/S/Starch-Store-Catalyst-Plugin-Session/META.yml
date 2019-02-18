@@ -1,32 +1,47 @@
 ---
 abstract: 'Starch storage backend using Catalyst::Plugin::Session stores.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
   Catalyst::Plugin::Session::Store::File: '0.18'
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
-  Test2::Bundle::Extended: '0.000051'
-  Test::More: '0'
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Starch-Store-Catalyst-Plugin-Session
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Starch::Store::Catalyst::Plugin::Session:
+    file: lib/Starch/Store/Catalyst/Plugin/Session.pm
+    version: '0.04'
 requires:
-  Catalyst::Plugin::Session: '0.4'
+  Catalyst::Plugin::Session: '0.40'
   Log::Any: '1.03'
-  Moo: '2'
-  Starch: '0.05'
+  Moo: '2.000000'
+  Starch: '0.10'
   Type::Tiny: '1.000005'
   namespace::clean: '0.24'
-  strictures: '2'
+  strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session/issues
   homepage: https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session
-  repository: https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session.git
-version: '0.03'
+  repository: git://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session.git
+version: '0.04'
+x_contributors:
+  - 'Aran Deltac <aran@ziprecruiter.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

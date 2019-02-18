@@ -19,12 +19,11 @@ sub DESTROY {
     my $obj = shift;
     close $obj->{FH};
     select $obj->{STDOUT};
+    $obj->{BUFFER} // return;
     if (my $final = $obj->{FINAL}) {
-	$final->() for $obj->{BUFFER};
+	do { $final->() } for $obj->{BUFFER};
     }
-    if (defined $obj->{BUFFER}) {
-	print decode 'utf8', $obj->{BUFFER};
-    }
+    print decode 'utf8', $obj->{BUFFER};
 }
 
 1;

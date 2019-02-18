@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.014';
+  $VERSION = '0.018';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     get_colorscheme

@@ -1,5 +1,19 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.10.1 2019-02-16T12:15:16Z
+
+    - "state" can not initialize list variable in perl5.18.
+
+4.10.0 2019-02-16T00:59:41Z
+
+    - sdif
+    - - Fix bug in diff3 processing.
+    - - Support "diff -T" input.
+    - - Make --cdif option to take optional command parameter.
+
+    - cdif
+    - - Support unlimited number of combined diff.
+
 4.9.0 2019-01-11T03:16:29Z
 
     - Support git log -p --graph.

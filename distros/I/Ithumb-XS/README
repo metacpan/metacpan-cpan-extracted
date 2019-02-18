@@ -1,7 +1,7 @@
-Ithumb-XS v0.1.3
+Ithumb-XS v0.2.0
 ================
 
-Ithumb::XS is a very small (single function) and simple Perl-XS module
+Ithumb::XS - is a fast, small (one function) and simple Perl-XS module
 for creation a thumbnails, using Imlib2 library.
 
 INSTALLATION
@@ -25,13 +25,31 @@ This module requires these other modules and libraries:
 
 USAGE
 
+## Usage
+
   use Ithumb::XS ();
- 
-  Ithumb::XS::create_thumbnail('src.png', 100, 100, 'output.png');
+
+  Ithumb::XS::create_thumbnail({
+      width     => 800,
+      height    => 600,
+      src_image => 'source_image.jpg',
+      dst_image => 'destination_result_image.jpg'
+  });
+
+OO-interface:
+
+  use Ithumb::XS;
+
+  my $ithumb = Ithumb::XS->new;
+  $ithumb->convert({
+      width     => 800,
+      height    => 600,
+      src_image => 'source_image.jpg',
+      dst_image => 'destination_result_image.jpg'
+  });
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2018 by Peter P. Neuromantic <p.brovchenko@protonmail.com>
+Copyright (C) 2018, 2019 by Peter P. Neuromantic <p.brovchenko@protonmail.com>
 
 For more information see LICENSE file.
-

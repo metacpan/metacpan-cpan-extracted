@@ -1,10 +1,10 @@
 package Spork::Shlomify::Slides;
-$Spork::Shlomify::Slides::VERSION = '0.0204';
+$Spork::Shlomify::Slides::VERSION = '0.0400';
 use strict;
 use warnings;
 use Spork;
 
-use Spork::Slides -Base;
+use Spork::Shlomify::Slides::FromSpork -Base;
 
 sub make_css_file {
     my $output = $self->hub->template->process('slide.css',
@@ -59,11 +59,11 @@ Spork::Shlomif::Slides - the slides generation class for Spork::Shlomify
 
 =head1 VERSION
 
-version 0.0204
+version 0.0400
 
 =head1 VERSION
 
-version 0.0204
+version 0.0400
 
 =head1 FUNCTIONS
 
@@ -97,7 +97,7 @@ Shlomi Fish
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2019 by Shlomi Fish.
 
 This is free software, licensed under:
 

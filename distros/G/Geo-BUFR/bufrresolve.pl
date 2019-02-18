@@ -1,6 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-# (C) Copyright 2010-2016 MET Norway
+# (C) Copyright 2010-2019 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,21 +20,28 @@
 # pod included at end of file
 
 use strict;
+use warnings;
 use Getopt::Long;
 use Pod::Usage qw(pod2usage);
 use Geo::BUFR;
 
+# This is actually default in BUFR.pm, but provided here to make it
+# easier for users to change to 'ECCODES' if preferred
+use constant DEFAULT_TABLE_FORMAT => 'BUFRDC';
+
 # Will be used if neither --tablepath nor $ENV{BUFR_TABLES} is set
-use constant DEFAULT_TABLE_PATH => '/usr/local/lib/bufrtables';
+use constant DEFAULT_TABLE_PATH_BUFRDC => '/usr/local/lib/bufrtables';
+use constant DEFAULT_TABLE_PATH_ECCODES => '/usr/local/share/eccodes/definitions/bufr/tables';
 # Ought to be your most up-to-date B table
-use constant DEFAULT_TABLE => 'B0000000000000023000';
+use constant DEFAULT_TABLE_BUFRDC => 'B0000000000000029000';
+use constant DEFAULT_TABLE_ECCODES => '0/wmo/29';
 
 # Parse command line options
 my %option = ();
 
 GetOptions(
            \%option,
-           'tablepath=s',# Set BUFR table path
+           'bufrtable=s',# Set BUFR tables
            'code=s',     # Print the contents of code table
            'flag=i',     # Resolve the flag value given
            'help',       # Print help information and exit
@@ -43,7 +50,8 @@ GetOptions(
                          # replication
            'simple',     # Like 'partial', but displaying the resulting
                          # descriptors on one line
-           'bufrtable=s',# Set BUFR tables
+           'tableformat=s',  # Set BUFR table format
+           'tablepath=s',# Set BUFR table path
            'verbose=i',  # Display path and tables used
        ) or pod2usage(-verbose => 0);
 
@@ -82,6 +90,10 @@ Geo::BUFR->set_verbose($verbose);
 # bufrresolve.pl to complain in this case
 Geo::BUFR->set_strict_checking(2);
 
+# Set BUFR table format
+my $tableformat = (defined $option{tableformat}) ? uc $option{tableformat} : DEFAULT_TABLE_FORMAT;
+Geo::BUFR->set_tableformat($tableformat);
+
 # Set BUFR table path
 if ($option{tablepath}) {
     # Command line option --tablepath overrides all
@@ -90,12 +102,17 @@ if ($option{tablepath}) {
     # If no --tablepath option, use the BUFR_TABLES environment variable
     Geo::BUFR->set_tablepath($ENV{BUFR_TABLES});
 } else {
-    # If all else fails, use the libbufr bufrtables
-    Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH);
+    # If all else fails, use the default tablepath in BUFRDC/ECCODES
+    if ($tableformat eq 'BUFRDC') {
+        Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH_BUFRDC);
+    } elsif ($tableformat eq 'ECCODES')  {
+        Geo::BUFR->set_tablepath(DEFAULT_TABLE_PATH_ECCODES);
+    }
 }
 
 # BUFR table file to use
-my $table = $option{bufrtable} || DEFAULT_TABLE;
+my $table = $option{bufrtable} ||
+    ($tableformat eq 'BUFRDC' ? DEFAULT_TABLE_BUFRDC : DEFAULT_TABLE_ECCODES);
 
 my $bufr = Geo::BUFR->new();
 
@@ -135,18 +152,21 @@ if (defined $option{code}) {
      [--partial]
      [--simple]
      [--noexpand]
-     [--bufrtable <name of BUFR B table]
+     [--bufrtable <name of BUFR table]
+     [--tableformat <BUFRDC|ECCODES>]
      [--tablepath <path to BUFR tables>]
      [--verbose n]
      [--help]
 
   2) bufrresolve.pl --code <code or flag table>
-     [--bufrtable <name of BUFR B table>]
+     [--bufrtable <name of BUFR table>]
+     [--tableformat <BUFRDC|ECCODES>]
      [--tablepath <path to BUFR tables>]
      [--verbose n]
 
   3) bufrresolve.pl --flag <value> --code <flag table>
-     [--bufrtable <name of BUFR B table]
+     [--bufrtable <name of BUFR table]
+     [--tableformat <BUFRDC|ECCODES>]
      [--tablepath <path to BUFR tables>]
      [--verbose n]
 
@@ -158,14 +178,31 @@ Execute without arguments for Usage, with option C<--help> for some
 additional info. See also L<https://wiki.met.no/bufr.pm/start> for
 examples of use.
 
-It is supposed that the code and flag tables are contained in a file
-with same name as corresponding B table except for having prefix C
-instead of B. The tables used can be chosen by the user with options
-C<--bufrtable> and C<--tablepath>. Default is the hard coded
-DEFAULT_TABLE in directory DEFAULT_TABLE_PATH, but this last one will
-be overriden if the environment variable BUFR_TABLES is set. You
-should consider edit the source code if you are not satisfied with the
-defaults chosen.
+The tables used can be selected by the user with options
+C<--bufrtable>, C<--tablepath> and C<--tableformat>. Default
+tableformat in Geo::BUFR is BUFRDC, while default tablepath in
+bufrresolve.pl will be overridden if the environment variable
+BUFR_TABLES is set. You should consider edit the source code of
+bufrresolve.pl if you are not satisfied with the defaults chosen for
+tablepath and bufrtable (search for 'DEFAULT').
+
+For tableformat ECCODES, see
+L<http://search.cpan.org/dist/Geo-BUFR/lib/Geo/BUFR.pm#BUFR-TABLE-FILES>
+for more info on how to set C<--tablepath>.
+
+For the table name in C<--bufrtable> in BUFRDC, use basename of B
+table, e.g.  B0000000000098013001.TXT. Replacing B with D or C, or
+omitting this prefix altogether, or even omitting the trailing '.TXT'
+(i.e. 0000000000098013001) will also work.
+
+For the table name in C<--bufrtable> in ECCODES, use last significant part
+of table location, e.g. '0/wmo/29' for WMO master tables or
+'0/local/8/78/236' for local tables on Unix-like systems. For looking
+up local sequence descriptors, you might need to provide both a master
+and the local table to get the full expansion, e.g.
+'0/wmo/29,0/local/8/78/236'.
+
+See also L</"CAVEAT"> below for more about the C<--bufrtable> option.
 
 =head1 OPTIONS
 
@@ -173,11 +210,10 @@ defaults chosen.
    --simple     Like --partial, but displaying the resulting
                 descriptors on one line
    --noexpand   Don't expand D descriptors at all
-
    --bufrtable <name of BUFR B or D table>  Set BUFR tables
+   --tableformat Currently supported are BUFRDC and ECCODES (default is BUFRDC)
    --tablepath <path to BUFR tables>  Set BUFR table path
    --verbose n  Display path and tables used if n > 0
-
    --help       Display Usage and explain the options used. Almost
                 the same as consulting perldoc bufrresolve.pl
 
@@ -194,13 +230,27 @@ flag table is <value>.
 
 Options may be abbreviated, e.g. C<--h> or C<-h> for C<--help>
 
+=head1 CAVEAT
+
+The C<--bufrtable> option could be considered mandatory, since there
+is no guarantee that the same BUFR descriptor resolves the same way
+for different BUFR tables. However, as soon as a new BUFR descriptor
+is introduced in a BUFR table, it is extremely rare that the
+descriptor is redefined in later versions. So for convenience,
+bufrresolve.pl uses a default table (adding option C<--verbose 1> will
+tell you which table, unless you use C<--bufrtable> to set the table
+explicitely). If this is the wrong table for your purpose (most common
+case will be if the descriptor was added in a higher version than that
+of the default table), you definitely should use C<--bufrtable> with
+the appropriate table.
+
 =head1 NOTE ON --VERBOSE
 
 n > 1 in C<--verbose n> does not provide any more output than n=1, so
 demanding an argument to C<--verbose> looks funny. But if not, sooner
 or later someone would type C<bufrresolve.pl 307080 --verbose 1> which
 by Perl would be interpreted as if the arguments were C<307080 000001
---verbose>, which probably is not what the user intended.
+--verbose>, which probably is not what you intended.
 
 =head1 AUTHOR
 
@@ -208,6 +258,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2016 MET Norway
+Copyright (C) 2010-2019 MET Norway
 
 =cut

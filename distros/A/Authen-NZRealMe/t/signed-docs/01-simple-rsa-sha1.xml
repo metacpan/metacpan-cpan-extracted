@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<Assertion ID="Ib5e950082ce111e988f41b7fadf9e9a3"><Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+  <SignedInfo>
+    <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+    <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+    <Reference URI="#Ib5e950082ce111e988f41b7fadf9e9a3">
+      <Transforms>
+        <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+        <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+      </Transforms>
+      <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+      <DigestValue>RSRMgt2nJ2aSXvDoyAS/HNqOFz8=</DigestValue>
+    </Reference>
+  </SignedInfo>
+  <SignatureValue>Jza1i9L+WKt8Xi8Yx9eTCZk6voK5AwKuavym2hlNdha/XClNbC+UHj+Yk87mIjWE
+rg9hPOgG7yg09+3gb6SBpxXmrGa4LaQH28hByPSPblgZ3+5VViIliS4IzxbsBXHp
+A4Tb+906JgGWVw4L9cqLchXOhB4TMSSUXRlVKWEXiIXCCTL/r9YsB06GOhs6wENZ
+mZdiBdd9E+BO5VRapvNuGyWkYWSH/EirtY0/g0yFDLYVHPahkBijpbpBCBi/W2mv
+pmW2Z6DJ0Zj2OSm78CvA08ILZhFYfP4I4bGdB9mczABoSUktJfyuaYIQjUYhKi+J
+r0Vkdj7/4n32i5D4+wLxOQ==</SignatureValue>
+</Signature>
+  <AttributeStatement>
+    <Attribute Name="firstName"><AttributeValue>John</AttributeValue></Attribute>
+    <Attribute Name="lastName"><AttributeValue>Smith</AttributeValue></Attribute>
+    <Attribute Name="dateOfBirth"><AttributeValue>1988-08-08</AttributeValue></Attribute>
+  </AttributeStatement>
+</Assertion>

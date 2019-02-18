@@ -84,20 +84,9 @@ sub get_mount_of_tempfile {
   return get_mount_of_filesys(get_filesys_of_tempfile());
 }
 
-sub parse_mount_line {
-    my ($dev, $dir, $opt) = ($_[0] =~ m{^(.+) on (.+) \((.+)\)$});
-    my @opt = split(/, /, $opt);
-    return { dev => $dev, dir => $dir, opt => { map { $_ => 1 } @opt } };
-}
-
 sub tempfile_has_noatime_mount {
-  my ($mount) = parse_mount_line(get_mount_of_tempfile());
-  return $mount->{opt}->{noatime};
-}
-
-sub tempfile_has_hammerfs {
-  my ($mount) = parse_mount_line(get_mount_of_tempfile());
-  return $mount->{opt}->{hammer};
+  my ($mount) = get_mount_of_tempfile();
+  return $mount =~ /\bnoatime\b/;
 }
 
 BEGIN {
@@ -123,7 +112,7 @@ BEGIN {
     }
 }
 
-use Test::More tests => 18;
+use Test::More tests => 22;
 BEGIN { push @INC, '.' }
 use t::Watchdog;
 use File::Temp qw( tempfile );
@@ -146,12 +135,6 @@ if ($^O eq 'cygwin') {
 print "# \$^O = $^O, atime = $atime, mtime = $mtime\n";
 
 my $skip_atime = $^O eq 'netbsd' && tempfile_has_noatime_mount();
-
-if ($^O eq 'dragonfly' && tempfile_is_hammerfs()) {
-    # The HAMMER fs in DragonflyBSD has microsecond timestamps.
-    $atime = 1.111111;
-    $mtime = 2.222222;
-}
 
 if ($skip_atime) {
   printf("# Skipping atime tests because tempfiles seem to be in a filesystem mounted with 'noatime' ($^O)\n'");
@@ -179,6 +162,19 @@ print "#utime \$filename\n";
             is $got_atime, $atime, "atime set correctly";
         }
 	is $got_mtime, $mtime, "mtime set correctly";
+};
+
+print "#utime \$filename round-trip\n";
+{
+	my ($fh, $filename) = tempfile( "Time-HiRes-utime-XXXXXXXXX", UNLINK => 1 );
+        # this fractional part is not exactly representable
+        my $t = 1000000000.12345;
+	is Time::HiRes::utime($t, $t, $filename), 1, "One file changed";
+	my ($got_atime, $got_mtime) = ( Time::HiRes::stat($fh) )[8, 9];
+	is Time::HiRes::utime($got_atime, $got_mtime, $filename), 1, "One file changed";
+	my ($got_atime2, $got_mtime2) = ( Time::HiRes::stat($fh) )[8, 9];
+	is $got_atime, $got_atime2, "atime round trip ok";
+	is $got_mtime, $got_mtime2, "mtime round trip ok";
 };
 
 print "utime \$filename and \$fh\n";

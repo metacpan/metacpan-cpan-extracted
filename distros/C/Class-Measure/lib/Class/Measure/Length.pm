@@ -1,7 +1,6 @@
 package Class::Measure::Length;
-{
-  $Class::Measure::Length::VERSION = '0.05';
-}
+
+$Class::Measure::Length::VERSION = '0.06';
 
 =head1 NAME
 

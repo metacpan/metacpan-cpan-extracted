@@ -1,0 +1,719 @@
+=head1 NAME
+
+Term::Table2 - Provides formatted output of tables supplied as a combination of header and rows.
+
+=head1 VERSION
+
+Version 1.0.1
+(The versioning is conform with L<https://semver.org/>.)
+
+=head1 SYNOPSIS
+
+  use Term::Table2;
+
+  my $table = Term::Table2->new(            # based on array of rows
+    header      => [                        # defaults to output without header
+      'id',
+      'message type',
+      'comment',
+      'version',
+    ],
+    rows        => [                        # each element must contain array of scalars,
+      ['SalcatKIAEST', 315, '', '001'],     # all arrays must have the same length
+      ['SbakerKI2824', 997, '', 'SHP'],
+      ...
+    ],
+    broad_column => [CUT, WRAP, CUT, CUT],  # defaults to wrap for all values in columns
+    broad_header => [CUT, WRAP, CUT, CUT],  # defaults to wrap for all values in headers
+    broad_row    => CUT,                    # defaults to row wrap; supports split to other page, too
+    collapse     => [0, 1, 1, 1],           # defaults to no collapse for all columns
+    column_width => [12, undef, 10, 3],     # defaults to maximum text length within header / values
+    pad          => 2,                      # defaults to 1 for each side
+    page_height  => 100,                    # defaults to 0 (no paging)
+    table_width  => 120,                    # defaults to screen size
+  );
+
+  say while $table->fetch();
+
+  # or
+
+  my $table = Term::Table2->new(            # based on callback for rows
+    rows          => &{$dbObject->fetch()}, # returns reference to array, all arrays must have the same length
+    broad_column  => CUT,                   # considered as the same value for all columns
+    broad_row     => CUT,                   # considered as the same value for all columns
+    column_Width  => 20,                    # considered as the same value for all columns, does not have any default
+    pad           => 2,                     # defaults to 1 for each side
+    page_height   => 100,                   # defaults to 0 (no paging)
+    separate_rows => 1,                     # defaults to 0 (no rows separation)
+    table_width   => 120,                   # defaults to screen size
+  );
+
+  say while $table->fetch();
+
+  # or
+
+  say foreach @{Term::Table2->new(...)->fetch_all()};
+
+This prints a table like this:
+
+  +----------------+-----------+-------+
+  |  id            |  message  |  ver  |
+  |                |  type     |       |
+  +----------------+-----------+-------+
+  |  SalcatKIAEST  |  315      |  001  |
+  |  SbakerKI2824  |  997      |  SHP  |
+  |  ...           |  ...      |  ...  |
+  +----------------+-----------+-------+
+
+or like this:
+
+  +----------------+-----------+-------+
+  |  id            |  message  |  ver  |
+  |                |  type     |       |
+  +----------------+-----------+-------+
+  |  SalcatKIAEST  |  315      |  001  |
+  +----------------+-----------+-------+
+  |  SbakerKI2824  |  997      |  SHP  |
+  +----------------+-----------+-------+
+  |  ...           |  ...      |  ...  |
+  +----------------+-----------+-------+
+
+=head1 DESCRIPTION
+
+Provides a possibility for formatting of tables supplied in form of their row contents and headers.
+Trailing blanks - both in header and row contents - are ignored!
+
+Among other things supports both horizontal and vertical splitting (paging), in other words
+can cope with tables wider and / or higher than the size of page you intend to use.
+Too long table rows and cell contents can be wrapped / truncated depending on options supplied.
+
+Parameters supplied get validated, however the validation scope and its time point
+depend on the kind of row content transmission.
+
+In case of B<rows> supplied as an array reference all parameters are validated during the instantiating of
+B<Term::Table2> object.
+
+In case of a reference to callback function only the types of parameters can be validated
+during the object instantiating, whereas their values can first be checked after the very first row
+will have been delivered by the callback function.
+
+If table contains some wide unicode characters, the represantation will only be correct in case
+the module B<Unicode::GCString> is installed, otherwise this can be twisted but no exception will be raised.
+
+=head2 COMMON METHODS
+
+=head3 new
+
+B<Description>
+
+Constructor preparing a table output on the base of options supplied.
+
+  use Term::Table2;
+  my $table = Term::Table2->new(%options);
+
+B<%options>
+
+=over 2
+
+=item * B<header =E<gt>> I<<array referenceE<gt>>
+
+Considers each element of this array as a header of column with the same index.
+
+If a header exists, if always starts and ends with a separating line consisting of
+hyphens (B<->) and plus characters (B<+>).
+
+Undefined or non-scalar elements cause an exception.
+
+Defaults to output without any header at all.
+
+=item * S<B<rows =E<gt>> I<<reference to array of array referencesE<gt>> or
+B<rows =E<gt>> I<<reference to callback functionE<gt>>>
+
+In case of an array reference considers each element of this array as a single table tow,
+where each sub-element corresponds to a single column value.
+
+In case of a reference to callback function it is expected that
+this function returns an array reference corresponding to one table row.
+
+After the very last row is fetched (e.g. from a database) the callback function has to return B<undef>.
+
+The table content (rows) always ends with the same separating line as described for the header.
+
+Undefined rows in case of an array reference as well as rows not represented by an array reference cause an exception.
+
+Undefined or non-scalar sub-elements (column values) cause an exception.
+
+Defaults to output without table content at all.
+
+=item * S<B<broad_column =E<gt>> I<<array referenceE<gt>> or B<broad_column =E<gt>> I<<scalarE<gt>>>
+
+Considers each element of this array as a flag defining the behaviour in case of too broad cell content.
+In case of scalar its value is applied to all columns.
+
+Whether a cell content (including padding required) is too broad, depends on the width of the corresponding column
+(please refer to B<column_width> below) and on the table width (please refer to B<table_width> below).
+
+If the table width is exceeded, the formatting depends on B<broad_row> described below.
+
+If the table width is not exceeded but the column width is exceeded, the following possibilities are supported:
+
+=over 2
+
+=item B<CUT>
+
+Only the allowed amount of left-most characters will be kept, the rest will be cut off.
+
+=item B<WRAP>
+
+The cell content will be splitted into mutliple chunks in accordance with how many characters are allowed
+(except maybe of the very last chunk that can be shorter).
+As a result each cell in the corresponding table row will occupy multiple lines.
+
+=back
+
+Any value except of B<CUT> and B<WRAP> causes an exception.
+
+Defaults to B<WRAP>.
+
+=item * S<B<broad_header =E<gt>> I<<array referenceE<gt>> or B<broad_header =E<gt>> I<<scalarE<gt>>>
+
+Considers each element of this array as a flag defining the behaviour in case of too broad header cells.
+In case of scalar its value is applied to all columns.
+
+Whether a header cell (including padding required) is too broad, depends on the width of the corresponding column
+(please refer to B<column_width> below) and on the table width (please refer to B<table_width> below).
+
+If the table width is exceeded, the formatting depends on B<broad_row> described below.
+
+If the table width is not exceeded but the column width is exceeded, the following possibilities are supported:
+
+=over 2
+
+=item B<CUT>
+
+Only the allowed amount of left-most characters will be kept, the rest will be cut off.
+
+=item B<WRAP>
+
+The header cell will be splitted into mutliple chunks in accordance with
+how many characters are allowed (except maybe of the very last chunk that can be shorter).
+As a result the table header will occupy multiple lines.
+
+=back
+
+Any value except of B<CUT> and B<WRAP> causes an exception.
+
+Defaults to B<WRAP>.
+
+=item * B<broad_row =E<gt>> I<<scalarE<gt>>
+
+Defines the behaviour in case of too broad row (including padding required).
+
+Whether a row is too broad depends on the table width (please refer to B<table_width> below).
+
+If the table width is exceeded, the following possibilities are supported:
+
+=over 2
+
+=item B<CUT>
+
+Only the allowed amount of left-most characters in each line of each table row will be kept, the rest will be cut off.
+
+=item B<SPLIT>
+
+Each line of each table row will be splitted into mutliple chunks in accordance with
+how many characters are allowed by B<table_width> (except maybe of the very last chunk that can be shorter).
+
+Each next chunk will then be pushed into the result related to the next page so that
+the complete table row will be splitted "horizontally" and occupy multiple pages
+(this can be considered as a table cut through between some columns or even mid-column
+so that it should be afterwards stick together).
+
+This value applied in case of B<rows> referring to a callback function causes an exception.
+
+=item B<WRAP>
+
+Each line of each table row will be splitted into mutliple chunks in accordance with
+how many characters are allowed by B<table_width> (except maybe of the very last chunk that can be shorter).
+
+All these chunks will then be pushed into the same result just after each other so that
+the complete table row will be wrapped and occupy multiple lines.
+
+=back
+
+Defaults to B<WRAP>.
+
+=item * S<B<collapse =E<gt>> I<<array referenceE<gt>> or B<collapse =E<gt>> I<<scalarE<gt>>>
+
+Considers each element of this array as a flag defining the behaviour in case of column containing empty strings only.
+In case of scalar its value is applied to all columns.
+
+If an element is set to true (in terms of Perl) and the corresponding column contains empty strings only,
+this column will not be placed into the result.
+
+Defaults to false for all columns.
+
+This option has no effect in case of B<rows> referring to a callback function.
+
+=item * S<B<column_width =E<gt>> I<<array referenceE<gt>> or B<column_width =E<gt>> I<<scalarE<gt>>>
+
+Considers each element of this array as maximum width of the same-indexed column excluding padding.
+In case of scalar its value is applied to all columns.
+
+The area of allowable values depends on the value of B<rows> as mentioned below:
+
+=over 2
+
+=item - In case of B<rows =E<gt>> I<<reference to array of array referencesE<gt>>
+
+If an element is set to B<0> or exported constant B<ADJUST>,
+the maximum length of values without trailing spaces in the column will be applied.
+
+Any value that is defined but not zero or a positive integer causes an exception.
+
+Defaults to B<ADJUST>.
+
+=item - In case of B<rows =E<gt>> I<<reference to callback functionE<gt>>
+
+All column widths must be pre-defined explicitly, there is no default.
+
+Any value that is defined but not a positive integer causes an exception.
+
+=back
+
+=item * S<B<pad =E<gt>> I<<array referenceE<gt>> or B<pad =E<gt>> I<<scalarE<gt>>>
+
+Number of spaces to be added to each header / column value both on the left and on the right.
+In case of scalar its value is applied to all columns.
+
+If defined but not zero or a positive integer, causes an exception.
+
+Defaults to B<1>.
+
+=item * B<page_height =E<gt>> I<<scalarE<gt>>
+
+Defines if the header must be repeated at the top of each page and how long must be each page.
+
+If set to B<0> or exported constant B<ADJUST>,
+the paging will be deactivated to that the header will appear in the result only once (if any).
+
+If defined but not zero or a positive integer, causes an exception.
+
+If lower than the height of the header + number of row chunks as described for B<broad_row>, causes an exception.
+
+Defaults to the current screen height.
+
+=item * B<separate_rows =E<gt>> I<<scalarE<gt>>
+
+Flag defining if a separating lines must be placed between table rows.
+Any value but false is considered true (in terms of Perl).
+
+The separating line itself consists of hyphens (B<->) placed under each cell and
+plus characters (B<+>) placed between cells and at the table edges.
+
+Defaults to false (no separating line).
+
+=item * B<table_width =E<gt>> I<<scalarE<gt>>
+
+Defines the table width including column separators.
+
+If set to B<0> or exported constant B<ADJUST>,
+there is no limitation so that the table width will depend on the column widths.
+
+If defined but not zero or a positive integer, causes an exception.
+
+If lower than the width of the narrowest possible column i.e. the column containing 1 character,
+its left-side separator and its left-side paddings, causes an exception.
+
+Defaults to the current screen width.
+
+=back
+
+B<Returns>
+
+=over 2
+
+=item
+
+Object reference.
+
+=back
+
+B<Exceptions>
+
+=over 2
+
+=item
+
+Header has less cells than a table row does.
+
+=item
+
+Page height is too low.
+
+=item
+
+Table width is too low.
+
+=back
+
+=head3 fetch
+
+B<Description>
+
+Returns next line from the formatting result delivering B<undef> if all lines are exhausted.
+
+The result depends on the screen size being current during the B<new> execution.
+
+  say while $table->fetch();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Single result line as string.
+
+B<Exceptions>
+
+=over 2
+
+=item
+
+Current row contains a non-scalar cell value (in case of B<rows =E<gt>> I<<reference to callback functionE<gt>> only).
+
+=item
+
+Current row is not an array reference (in case of B<rows =E<gt>> I<<reference to callback functionE<gt>> only).
+
+=item
+
+Wrong number of cells in the current row (in case of B<rows =E<gt>> I<<reference to callback functionE<gt>> only).
+
+=back
+
+=head3 fetch_all
+
+B<Description>
+
+Returns all remaining result lines as a reference to array of strings.
+
+  say foreach @{$table->fetch_all()};
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Array of strings, each of them corresponds to a result line.
+
+B<Exceptions>
+
+See exception description of B<fetch>.
+
+=head2 GETTERS
+
+=head3 header
+
+B<Description>
+
+Provides reference to array containing single column headers.
+
+  my $header = $table->header();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Reference to array of strings, each of them corresponds to a header of the same-index column.
+
+=head3 rows
+
+B<Description>
+
+Provides either reference to array containing all table rows or
+reference to callback function returning a single table row per call.
+
+  my $rows = $table->rows();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+One of the following:
+
+=over 2
+
+=item
+
+Reference to array of array references.
+
+=item
+
+Reference to callback function.
+
+=back
+
+=head3 broad_column
+
+B<Description>
+
+Provides reference to array containing flags defining behaviour in case of too broad column values.
+
+  my $broad_column = $table->broad_column();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Reference to array of flags, each of them corresponds to the same-index column.
+
+=head3 broad_header
+
+B<Description>
+
+Provides reference to array containing flags defining behaviour in case of too broad header values.
+
+  my $broad_header = $table->broad_header();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Reference to array of flags, each of them corresponds to the same-index column.
+
+=head3 broad_row
+
+B<Description>
+
+Provides flag defining behaviour in case of too broad row (wider than the table width).
+
+  my $broad_row = $table->broad_row();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Scalar containing flag value.
+
+=head3 collapse
+
+B<Description>
+
+Provides reference to array containing flags defining behaviour in case of column containing empty strings only.
+
+  my $collapse = $table->collapse();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Reference to array of flags, each of them corresponds to the same-index column.
+
+=head3 column_width
+
+B<Description>
+
+Provides reference to array containing real width of columns really presented in the result
+(under consideration of B<collaps> flags, B<table_width>, and B<broad_row> flag).
+
+  my $column_width = $table->column_width();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Reference to array of column widths.
+
+=head3 current_row
+
+B<Description>
+
+Provides order number of currently processed row (row counter starts with B<1>).
+
+If the very last row has been delivered, contains I<number of rows> + 1 and does not change anymore.
+
+Returns B<0> in case of empty table.
+
+  my $current_row = $table->current_row();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Scalar containing current row number.
+
+=head3 end_of_table
+
+B<Description>
+
+Provides boolean value showing if the end of the table has been reached.
+
+  while ($table->end_of_table()) {
+    ...
+  }
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Boolean flag.
+
+=head3 pad
+
+B<Description>
+
+Provides reference to array containing number of spaces to be added both on the left and on the right
+of each column value.
+
+  my @pad = @{$table->pad()};
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Reference to array containing the size of padding space for each side of every column.
+
+=head3 page_height
+
+B<Description>
+
+Provides number of lines per page.
+
+  my $page_height = $table->page_height();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Scalar containing the page height.
+
+=head3 separate_rows
+
+B<Description>
+
+Provides boolean flag showing if a separating lines must be placed between table rows.
+
+  my $separate_rows = $table->separate_rows();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Scalar containing the flag.
+
+=head3 table_width
+
+B<Description>
+
+Provides maximum number of characters per line.
+
+  my $table_width = $table->table_width();
+
+B<Parameters>
+
+None.
+
+B<Returns>
+
+Scalar containing the table width.
+
+=head2 CONSTANTS
+
+The following constants are exported by request:
+
+=over 2
+
+=item B<ADJUST>
+
+Equates the column width to the length of the longest cell content in this column.
+Contains B<0>.
+
+=item B<CUT>
+
+Activates truncating of row / cell content.
+Contains B<0>.
+
+=item B<SPLIT>
+
+Activates vertical splitting of table by page width.
+Contains B<1>.
+
+=item B<WRAP>
+
+Wraps row / cell content.
+Contains B<2>.
+
+=back
+
+=head1 AUTHOR
+
+Jurij Fajnberg, <fajnbergj at gmail.com>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to bug-term-ansitable at rt.cpan.org,
+or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Term-Table2>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 ACKNOWLEDGEMENTS
+
+=head2 LICENSE AND COPYRIGHT
+
+Copyright 2019 Jurij Fajnberg
+
+This program is free software; you can redistribute it and/or modify it under the terms
+of the the Artistic License (2.0). You may obtain a copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified Versions is governed by this Artistic License.
+By using, modifying or distributing the Package, you accept this license.
+Do not use, modify, or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made by someone other than you,
+you are nevertheless required to ensure that your Modified Version complies with the requirements of this license.
+This license does not grant you the right to use any trademark, service mark, tradename,
+or logo of the Copyright Holder.
+This license includes the non-exclusive, worldwide, free-of-charge patent license to make, have made, use,
+offer to sell, sell, import and otherwise transfer the Package with respect to any patent claims licensable
+by the Copyright Holder that are necessarily infringed by the Package. If you institute patent litigation
+(including a cross-claim or counterclaim) against any party alleging that the Package constitutes direct or
+contributory patent infringement, then this Artistic License to you shall terminate
+on the date that such litigation is filed.
+
+Disclaimer of Warranty:
+
+THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED
+TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

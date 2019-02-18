@@ -1,12 +1,12 @@
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <png.h>
 #include <stdlib.h>
 #include <string.h>
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
 
 typedef struct
 {

@@ -5,7 +5,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION   = q[0.010];
+  $VERSION   = q[0.014];
   @ISA       = q[Exporter];
   @EXPORT_OK = qw(mplayer_play mplayer_stop);
 }
@@ -63,7 +63,7 @@ sub _mplayer_daemonize {
 sub mplayer_stop {
   my $mplayer = shift;
 
-  croak(qq[Not a hashre: '$mplayer']) if ref($mplayer) ne q[HASH];
+  croak(qq[Not a hashref: '$mplayer']) if ref($mplayer) ne q[HASH];
 
   my $pidfile = $mplayer->{pidfile} || q[/tmp/mplayer_daemon.pid];
 
@@ -105,20 +105,18 @@ Daemon::Mplayer - run mplayer daemonized
 
 =head1 SYNOPSIS
 
-  use Daemon::Mplayer;
+  use Daemon::Mplayer qw(mplayer_play mplayer_stop);
 
   mplayer_play(
     {
-      pidfile => $pidfile,
-      logfile => $logfile,
+      pidfile => q{mplayer.pid},
+      logfile => q{mplayer.log},
       path    => '/usr/bin/mplayer',
-      args    => [ @files ],
+      args    => [ qw(file1 file2) ],
     }
   );
 
-  ...
-
-  mplayer_stop($pid);
+  mplayer_stop('mplayer.pid');
 
 =head1 DESCRIPTION
 
@@ -167,7 +165,7 @@ If this succeeds, the pidfile is removed.
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  magnus@trapd00r.se
+  m@japh.se
   http://japh.se
 
 =head1 CONTRIBUTORS
@@ -176,10 +174,11 @@ None required yet.
 
 =head1 COPYRIGHT
 
-Copyright 2011 The B<Daemon::Mplayer>s L</AUTHOR> and L</CONTRIBUTORS> as listed
-above.
+Copyright 2011, 2019- The B<Daemon::Mplayer>s L</AUTHOR> and
+L</CONTRIBUTORS> as listed above.
 
 =head1 LICENSE
+
 This library is free software; you may redistribute it and/or modify it under
 the same terms as Perl itself.
 

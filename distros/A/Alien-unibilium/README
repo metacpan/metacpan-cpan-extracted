@@ -12,7 +12,8 @@ DESCRIPTION
     process of installing it will install a locally-bundled copy of the
     library into perl's arch-specific library directory.
 
-    This module bundles unibilium version v1.1.4.
+    This module bundles a patched version of unibilium version v2.0.0,
+    containing the pending upstream pull-request #39.
 
 METHODS
 

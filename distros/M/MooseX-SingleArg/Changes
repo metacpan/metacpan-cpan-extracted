@@ -1,4 +1,10 @@
-Revision history for Perl extension MooseX::SingleArg.
+Revision history for Perl extension MooseX-SingleArg.
+
+0.09 2019-02-18T06:09:45Z
+
+ - Fix minor typo in Pod.
+ - Fix a test that hadn't been moved to Test2::V0.
+ - Migrate build tooling from Dist::Zilla to Minilla.
 
 0.08 2018-05-16
 

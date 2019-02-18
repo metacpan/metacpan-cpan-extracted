@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Task-QuadPres",
-  "dist_version" => "0.0.1",
+  "dist_version" => "0.0.2",
   "license" => "mit",
   "module_name" => "Task::QuadPres",
   "recursive_test_files" => 1,
@@ -32,7 +32,7 @@ my %module_build_args = (
     "File::Find::Object::Rule" => 0,
     "Getopt::Long" => 0,
     "HTML::Links::Localize" => 0,
-    "HTML::Lint" => 0,
+    "HTML::T5" => 0,
     "HTML::Widgets::NavMenu::EscapeHtml" => 0,
     "IO::All" => 0,
     "MIME::Types" => 0,

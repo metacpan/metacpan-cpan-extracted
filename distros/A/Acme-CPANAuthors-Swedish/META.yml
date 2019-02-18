@@ -20,5 +20,7 @@ no_index:
 requires:
   Acme::CPANAuthors: '0'
   Test::More: '0.47'
-version: '0.06'
+resources:
+  repository: https://github.com/trapd00r/Acme-CPANAuthors-Swedish.git
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

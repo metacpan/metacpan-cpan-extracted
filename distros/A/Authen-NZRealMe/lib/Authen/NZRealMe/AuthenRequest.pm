@@ -1,8 +1,5 @@
 package Authen::NZRealMe::AuthenRequest;
-{
-  $Authen::NZRealMe::AuthenRequest::VERSION = '1.16';
-}
-
+$Authen::NZRealMe::AuthenRequest::VERSION = '1.18';
 use strict;
 use warnings;
 
@@ -13,8 +10,10 @@ use URI::Escape                qw(uri_escape uri_unescape);
 use IO::Uncompress::RawInflate qw(rawinflate $RawInflateError);
 use IO::Compress::RawDeflate   qw(rawdeflate $RawDeflateError);
 
-my $ns_saml  = [ saml  => 'urn:oasis:names:tc:SAML:2.0:assertion' ];
-my $ns_samlp = [ samlp => 'urn:oasis:names:tc:SAML:2.0:protocol'  ];
+use Authen::NZRealMe::CommonURIs qw(NS_PAIR);
+
+my $ns_saml  = [ NS_PAIR('saml') ];
+my $ns_samlp = [ NS_PAIR('samlp') ];
 
 
 sub new {
@@ -333,7 +332,7 @@ See L<Authen::NZRealMe> for documentation index.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2014 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2010-2019 Enrolment Services, New Zealand Electoral Commission
 
 Written by Grant McLean E<lt>grant@catalyst.net.nzE<gt>
 

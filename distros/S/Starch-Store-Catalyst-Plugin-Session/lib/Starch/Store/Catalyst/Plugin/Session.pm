@@ -1,5 +1,7 @@
 package Starch::Store::Catalyst::Plugin::Session;
-$Starch::Store::Catalyst::Plugin::Session::VERSION = '0.03';
+
+$Starch::Store::Catalyst::Plugin::Session::VERSION = '0.04';
+
 =head1 NAME
 
 Starch::Store::Catalyst::Plugin::Session - Starch storage backend using
@@ -10,7 +12,7 @@ Catalyst::Plugin::Session stores.
     my $starch = Starch->new(
         store => {
             class => '::Catalyst::Plugin::Session',
-            store_class => 'Catalyst::Plugin::Session::Store::File',
+            store_class => '::File',
             session_config => {
                 storage => '/tmp/session',
             },
@@ -31,6 +33,7 @@ use Catalyst::Plugin::Session::Store;
 use Moose::Meta::Class qw();
 use Types::Standard -types;
 use Types::Common::String -types;
+use Starch::Util qw( load_prefixed_module );
 
 use Moo;
 use strictures 2;
@@ -80,6 +83,11 @@ after BUILD => sub{
 The full class name for the L<Catalyst::Plugin::Session::Store> you
 wish to use.
 
+If the store class starts with C<::> then it will be considered
+relative to C<Catalyst::Plugin::Session::Store>.  For example, if
+you set this to C<::File> then it will be internally translated to
+C<Catalyst::Plugin::Session::Store::File>.
+
 =cut
 
 has store_class => (
@@ -119,10 +127,15 @@ has store => (
 sub _build_store {
     my ($self) = @_;
 
+    my $store_class = load_prefixed_module(
+        'Catalyst::Plugin::Session::Store',
+        $self->store_class(),
+    );
+
     my $class = Moose::Meta::Class->create_anon_class(
         superclasses => [
             'Starch::FakeCatalystContext',
-            $self->store_class(),
+            $store_class,
         ],
     );
 

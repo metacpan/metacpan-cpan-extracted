@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::HPAdultFanfiction;
-$WWW::FetchStory::Fetcher::HPAdultFanfiction::VERSION = '0.2002';
+$WWW::FetchStory::Fetcher::HPAdultFanfiction::VERSION = '0.2004';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher::HPAdultFanfiction - fetching module for WWW::FetchStor
 
 =head1 VERSION
 
-version 0.2002
+version 0.2004
 
 =head1 DESCRIPTION
 

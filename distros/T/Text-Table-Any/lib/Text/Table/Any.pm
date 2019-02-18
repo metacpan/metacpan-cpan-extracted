@@ -1,7 +1,7 @@
 package Text::Table::Any;
 
-our $DATE = '2019-01-11'; # DATE
-our $VERSION = '0.094'; # VERSION
+our $DATE = '2019-02-17'; # DATE
+our $VERSION = '0.095'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -29,6 +29,7 @@ our @BACKENDS = qw(
                       Text::Table
                       Text::TabularDisplay
                       Text::Table::XLSX
+                      Term::TablePrint
               );
 
 sub _encode {
@@ -71,11 +72,11 @@ sub table {
     } elsif ($backend eq 'Text::Table::CSV') {
         require Text::Table::CSV;
         return Text::Table::CSV::table(
-            rows => $rows, header_row => $header_row);
+            rows => $rows);
     } elsif ($backend eq 'Text::Table::TSV') {
         require Text::Table::TSV;
         return Text::Table::TSV::table(
-            rows => $rows, header_row => $header_row);
+            rows => $rows);
     } elsif ($backend eq 'Text::Table::LTSV') {
         require Text::Table::LTSV;
         return Text::Table::LTSV::table(
@@ -158,6 +159,16 @@ sub table {
         require Text::Table::XLSX;
         return Text::Table::XLSX::table(
             rows => $rows, header_row => $header_row);
+    } elsif ($backend eq 'Term::TablePrint') {
+        require Term::TablePrint;
+        my $rows2;
+        if ($header_row) {
+            $rows2 = $rows;
+        } else {
+            $rows2 = [@$rows];
+            shift @$rows2;
+        }
+        return Term::TablePrint::print_table($rows);
     } else {
         die "Unknown backend '$backend'";
     }
@@ -178,7 +189,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.094 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2019-01-11.
+This document describes version 0.095 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2019-02-17.
 
 =head1 SYNOPSIS
 
@@ -345,6 +356,8 @@ Optional. Pick a backend module. Supported backends:
 =item * Text::TabularDisplay
 
 =item * Text::Table::XLSX
+
+=item * Term::TablePrint
 
 =back
 

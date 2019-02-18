@@ -1,5 +1,24 @@
 Revision history for Authen-NZRealMe
 
+1.18      2019-02-19 12:22:20+13:00 Pacific/Auckland
+
+1.17      2019-02-18 15:14:53+13:00 Pacific/Auckland
+    - Add support for RSA-SHA256 signatures (both signing and verification)
+      in advance of new signatures to be provided by RealMe
+    - Refactor XMLSig module to be more modular and use a single implementation
+      of signing and of verification for both single-reference and multi-
+      reference signatures.
+    - When generating an XML signature the name of the ID attribute used for
+      Reference URIs is now usually left unspecified. The relevant target
+      elements are now located using just the supplied attribute value.
+    - The XMLSig verify() method now accepts an XPath selector argument to
+      specify which signature block to verify (was hard-coded).
+    - After verifying a signature, the caller should now use the new
+      find_verified_element() method to ensure subsequent XPath queries only
+      target verified sections of the original signed document.
+    - Reduce code duplication by adding CommonURIs as the single place where
+      namespace and token URIs are defined.
+
 1.16      2016-05-01 11:51:32 Pacific/Auckland
     - expunge the given/when keywords to avoid 'experimental' warnings
     - revise make-certs command to not use self-signed certs in ITE

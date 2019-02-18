@@ -32,10 +32,6 @@ is($sp->organization_url, 'https://www.example.govt.nz/',
     "SP OrganizationURL loaded from metadata looks good");
 is($sp->contact_company, 'Department of Examples Login Services',
     "SP contact company name loaded from metadata looks good");
-is($sp->contact_first_name, 'Joseph',
-    "SP contact first name loaded from metadata looks good");
-is($sp->contact_surname, 'Bloggs',
-    "SP contact surname loaded from metadata looks good");
 
 # Load IdP metadata for login service
 
@@ -66,11 +62,6 @@ is($sp->organization_url, 'https://www.example.govt.nz/',
     "SP OrganizationURL loaded from metadata looks good");
 is($sp->contact_company, 'Department of Examples Identity Services',
     "SP contact company name loaded from metadata looks good");
-is($sp->contact_first_name, 'James',
-    "SP contact first name loaded from metadata looks good");
-is($sp->contact_surname, 'Briggs',
-    "SP contact surname loaded from metadata looks good");
-
 
 # Load IdP metadata for login service
 

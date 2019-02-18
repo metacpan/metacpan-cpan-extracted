@@ -29,7 +29,7 @@ our @EXPORT_OK = (
 	@{$EXPORT_TAGS{all}},
 );
 
-our $VERSION = 1.00;
+our $VERSION = 1.01;
 
 =head1 DESCRIPTION
 
@@ -306,7 +306,7 @@ sub shift_terms
 
 =head1 SEE ALSO
 
-L<Logic::TruthTable::Base81>
+L<Logic::TruthTable::Convert81>
 
 =head1 AUTHOR
 

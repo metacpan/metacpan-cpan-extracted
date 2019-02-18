@@ -9,7 +9,7 @@ use autodie  qw(:all);
 
 #< init
 
-$VERSION = '0.016';
+$VERSION = '0.026';
 
 sub usage {
   pod2usage(
@@ -22,9 +22,11 @@ sub usage {
 
 use Cwd;
 use Pod::Usage;
-use File::Basename      qw(basename);
-use File::LsColor       qw(ls_color);
-use Term::ExtendedColor qw(fg bg bold);
+use File::Basename        qw(basename);
+use File::Copy::Recursive qw(rcopy);
+use File::Path            qw(rmtree);
+use File::LsColor         qw(ls_color);
+use Term::ExtendedColor   qw(fg bg bold);
 use Getopt::Long;
 use Module::Extract::VERSION;
 use File::Find::Rule;
@@ -53,20 +55,43 @@ config_init() unless $opt_noconfig;
 # actually exists.
 verify_manifest();
 
-# File-LsColor-0.308.tar.gz
-# App-makedist-0.002.tar.gz
-my $tarball = build_filename();
+
+makedist();
 
 
-system('tar', 'czf', $tarball, @files_in_dist);
-if($? == 0) {
-  printf("- Distribution created: %s\n", ls_color($tarball)) if $opt_verbose;
+sub makedist {
+  # App-makedist-0.020.tar.gz
+  my $dist_tar = build_filename();
 
-  # all good, execute code from config if defined
-  # let the config have the value of $tarball as a variable
-  $finished_product = $tarball;
-  if(defined($command_on_success)) {
-    $command_on_success->();
+  # App-makedist-0.020
+  my ($dist_dir) = $dist_tar =~ m/^([a-z0-9.-]+)[.]tar[.]gz$/i;
+
+  mkdir $dist_dir or die "Can't mkdir '$dist_dir': $!\n";
+
+  # copy all files in the MANIFEST to dist dir, i.e App-makedist-0.020
+  for my $file(@files_in_dist) {
+    # make sure to honor the dir structure
+    if($file =~ m{^(.+)/}) {
+      if(-d $1) {
+        rcopy($file, "$dist_dir/$file");
+        next;
+      }
+    }
+    rcopy($file, $dist_dir) or die "Copy failed: '$file' -> '$dist_dir\n";
+  }
+  system('tar', 'czf', $dist_tar, $dist_dir);
+  if($? == 0) {
+    printf("- Distribution created: %s\n", ls_color($dist_tar)) if $opt_verbose;
+
+    # remove the created dist dir
+    rmtree($dist_dir) or die "Can't remove '$dist_dir': $!\n";
+
+    # all good, execute code from config if defined
+    # let the config have the value of $dist_tar as a variable
+    $finished_product = $dist_tar;
+    if(defined($command_on_success)) {
+      $command_on_success->();
+    }
   }
 }
 

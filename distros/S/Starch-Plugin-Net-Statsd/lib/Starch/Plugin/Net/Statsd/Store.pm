@@ -1,5 +1,7 @@
 package Starch::Plugin::Net::Statsd::Store;
-$Starch::Plugin::Net::Statsd::Store::VERSION = '0.02';
+
+$Starch::Plugin::Net::Statsd::Store::VERSION = '0.03';
+
 use Net::Statsd;
 use Types::Common::String -types;
 use Time::HiRes qw( gettimeofday tv_interval );

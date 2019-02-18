@@ -1,5 +1,7 @@
 package MooX::PluginKit::ConsumerRole;
-$MooX::PluginKit::ConsumerRole::VERSION = '0.03';
+
+$MooX::PluginKit::ConsumerRole::VERSION = '0.04';
+
 =head1 NAME
 
 MooX::PluginKit::ConsumerRole - Common functionality for PluginKit consumers.

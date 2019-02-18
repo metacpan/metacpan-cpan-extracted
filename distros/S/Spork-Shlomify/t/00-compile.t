@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Spork/Shlomify.pm',
     'Spork/Shlomify/Config.pm',
     'Spork/Shlomify/Formatter.pm',
-    'Spork/Shlomify/Slides.pm'
+    'Spork/Shlomify/Slides.pm',
+    'Spork/Shlomify/Slides/FromSpork.pm'
 );
 
 my @scripts = (

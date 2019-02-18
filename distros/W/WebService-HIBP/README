@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.06
+    Version 0.08
 
 SYNOPSIS
 
@@ -169,6 +169,18 @@ SUBROUTINES/METHODS
         foreach my $paste ( $hibp->pastes( 'test@example.com' ) ) {
             say $paste->source();
         }
+
+ last_request
+
+    This method returns the request that was sent to the
+    https://haveibeenpwned.com/api/v2/ API. This method is intended to only
+    aid troubleshooting in the event of an error response.
+
+ last_response
+
+    This method returns the response that came from the
+    https://haveibeenpwned.com/api/v2/ API. This method is intended to only
+    aid troubleshooting in the event of an error response.
 
 DIAGNOSTICS
 

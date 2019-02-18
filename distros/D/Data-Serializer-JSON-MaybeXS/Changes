@@ -1,4 +1,9 @@
-Revision history for Perl extension Data::Serializer::JSON::MaybeXS.
+Revision history for Perl extension Data-Serializer-JSON-MaybeXS.
+
+0.02 2019-02-18T06:23:46Z
+
+ - Migrate all the tests from Test::More to Test2::V0.
+ - Migrate build tooling from Dist::Zilla to Minilla.
 
 0.01 2015-07-14
 

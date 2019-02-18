@@ -9,12 +9,15 @@ my $build = Alien::make::Module::Build->new(
    tarball => 'libtermkey-0.20.tar.gz',
    pkgconfig_module => "termkey",
    pkgconfig_version => "0.20",
+   use_bundled => ( scalar grep { $_ eq "--use-bundled" } @ARGV ),
 
    alien_requires => [
       [ any =>
          [ pkgconfig => "unibilium", atleast_version => "0.1.0" ],
-         [ pkgconfig => "ncursesw" ],
-         [ header => "curses.h" ],
+         # libtermkey can also use ncursesw and curses.h, but if none of those
+         # are available anyway we'll want to pull in Alien::unibilium. Best
+         # just to do it now and ignore those anyway
+         [ alien => "Alien::unibilium" => '0.14' ],
       ],
    ],
    build_requires => {
@@ -26,7 +29,6 @@ my $build = Alien::make::Module::Build->new(
       'perl' => '5.010', # //
    },
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

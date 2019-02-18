@@ -1,14 +1,9 @@
 #!/usr/bin/env perl
 use strictures 2;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 use Test::Starch;
 use Starch;
-
-if (!eval('use 5.010_000; 1')) {
-    plan skip_all => 'This test will only function with Perl 5.10 or newer.';
-}
 
 Test::Starch->new(
     plugins => ['::TimeoutStore'],
@@ -44,13 +39,13 @@ my $normal_store = $normal_starch->store();
 
 foreach my $method (qw( set get remove )) {
     is(
-        exception { $normal_store->$method() },
+        dies { $normal_store->$method() },
         undef,
         "no timeout when calling $method",
     );
 
     like(
-        exception { $timeout_store->$method() },
+        dies { $timeout_store->$method() },
         qr{timeout},
         "timeout when calling $method",
     );

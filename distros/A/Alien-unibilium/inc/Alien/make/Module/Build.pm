@@ -2,6 +2,7 @@ package Alien::make::Module::Build;
 
 use strict;
 use warnings;
+use 5.010;  # //
 
 use base qw( Module::Build );
 
@@ -51,12 +52,29 @@ my %more_configure_requires = (
    'Module::Build'  => 0,
 );
 
+# Hunt down any extra pkgconfig directories in @INC if we find them
+# This allows pkg-config in C library's Makefile to find .pc files provided
+# by dependent Alien:: modules
+sub apply_extra_pkgconfig_paths
+{
+   my %added;
+
+   foreach my $inc ( @INC ) {
+      my $dir = "$inc/pkgconfig";
+      next unless -d $dir;
+      $added{$dir}++ and next;
+
+      $ENV{PKG_CONFIG_PATH} = join ":", grep { defined }
+         $dir, $ENV{PKG_CONFIG_PATH};
+   }
+}
+
 sub new
 {
    my $class = shift;
    my %args = @_;
 
-   my $use_bundled = 0;
+   my $use_bundled = !!$args{use_bundled};
 
    $args{get_options}{bundled} = {
       store => \$use_bundled,
@@ -66,10 +84,16 @@ sub new
 
    my $self = $class->SUPER::new( %args );
 
-   foreach my $req ( @{ $self->alien_requires || [] } ) {
-      my $missing = $self->do_requires( @$req );
-      die "OS unsupported - missing $missing\n" if defined $missing;
-   }
+   my $module = $self->pkgconfig_module;
+   my $version = $self->pkgconfig_version;
+
+   $use_bundled = 1 if
+      !$use_bundled and defined $self->do_requires_pkgconfig( $module, atleast_version => $version );
+
+   $self->configure_requires->{$_} ||= $more_configure_requires{$_} for keys %more_configure_requires;
+
+   # Only do this /after/ the do_requires_pkgconfig for toplevel module
+   $self->apply_extra_pkgconfig_paths;
 
    my @reqs = @{ $self->alien_requires || [] };
    while( @reqs ) {
@@ -80,21 +104,18 @@ sub new
       $self->configure_requires->{"ExtUtils::CChecker"} //= 0 if $name eq "header";
    }
 
-   $self->configure_requires->{$_} ||= $more_configure_requires{$_} for keys %more_configure_requires;
-
-   my $module = $self->pkgconfig_module;
-   my $version = $self->pkgconfig_version;
-
-   $use_bundled = 1 if
-      !$use_bundled and system( "pkg-config", $module, "--atleast-version", $version ) != 0;
-
    if( $use_bundled ) {
+      foreach my $req ( @{ $self->alien_requires || [] } ) {
+         my $missing = $self->do_requires( @$req );
+         die "OS unsupported - missing $missing\n" if defined $missing;
+      }
+
       die "OS unsupported - unable to find GNU make\n" unless defined &MAKE;
       die "OS unsupported - unable to find GNU libtool\n" unless defined &LIBTOOL;
       print "Building bundled source\n";
    }
    else {
-      print "Detected $module version >= $version from pkg-config\n";
+      print "Using $module version >= $version from pkg-config\n";
    }
 
    $self->notes( use_bundled => $use_bundled );
@@ -161,6 +182,22 @@ sub do_requires_pkgconfig
 
    print "not found\n";
    return "$module";
+}
+
+sub do_requires_alien
+{
+   my $self = shift;
+   my ( $module, $version ) = @_;
+
+   print "Depending on $module ",
+      ( defined $version ? "version $version" : "any version" ), 
+      "\n";
+
+   $self->build_requires->{$module} = $version;
+
+   # We presume that CPAN can always find any Alien module, so we won't fail
+   # yet. At worst, CPAN will fail to satisfy the build_requires
+   return undef;
 }
 
 sub do_requires_header
@@ -247,6 +284,8 @@ sub ACTION_code
 {
    my $self = shift;
 
+   $self->apply_extra_pkgconfig_paths;
+
    my $blib = File::Spec->catdir( $self->base_dir, "blib" );
 
    my $libdir = File::Spec->catdir( $blib, "arch" );
@@ -263,7 +302,11 @@ sub ACTION_code
    if( $self->notes( 'use_bundled' ) and !-f $buildstamp ) {
       $self->depends_on( 'src' );
 
-      $self->make_in_srcdir( () );
+      my $instlibdir = $self->install_destination( "arch" );
+
+      $self->make_in_srcdir( (),
+         "LIBDIR=$instlibdir",
+      );
 
       $self->make_in_srcdir( "install",
          "LIBDIR=$libdir",
@@ -277,18 +320,14 @@ sub ACTION_code
       # The .pc file that 'make install' has written contains the build-time
       # blib paths in it. We need that rewritten for the real install location,
       # except we're not going to know where that is until ACTION_install.
-      # Instead, lets output a .pc.PL file that we can run at ACTION_install time
-      # to generate it.
+      # We'll rewrite it to @LIBDIR@ now so we can expand the real path later
       my $pcfile = "$libdir/pkgconfig/$pkgconfig_module.pc";
       if( -f $pcfile ) {
          open my $in, "<", $pcfile or die "Cannot open $pcfile for reading - $!";
-         open my $out, ">", "$pcfile.PL" or die "Cannot open $pcfile.PL for writing - $!";
+         open my $out, ">", "$pcfile.new" or die "Cannot open $pcfile.new for writing - $!";
 
          print { $out } join "\n",
-            "#!/usr/bin/env perl",
-            "use File::Basename 'dirname';",
-            '$libdir = dirname(dirname($0));',
-           q{( my $config = <<'EOF' ) =~ s/\@LIBDIR@/$libdir/g;},
+            "# pkg-config rewrite hack written by Alien::make::Module::Build",
             "";
 
          while( <$in> ) {
@@ -296,16 +335,12 @@ sub ACTION_code
             print { $out } $_;
          }
 
-         print { $out } join "\n",
-            "EOF",
-            'print $config;',
-            "";
-
          # Cygwin/Windows doesn't like it when you delete open files
          close $in;
          close $out;
 
          unlink $pcfile;
+         rename "$pcfile.new", $pcfile;
       }
    }
 
@@ -356,6 +391,8 @@ sub ACTION_test
 
    return unless $self->notes( 'use_bundled' );
 
+   $self->apply_extra_pkgconfig_paths;
+
    $self->depends_on( "code" );
 
    $self->make_in_srcdir( "test" );
@@ -364,6 +401,9 @@ sub ACTION_test
 sub ACTION_install
 {
    my $self = shift;
+
+   $self->apply_extra_pkgconfig_paths;
+
    $self->SUPER::ACTION_install;
 
    return unless $self->notes( 'use_bundled' );
@@ -372,21 +412,18 @@ sub ACTION_install
    my $libdir = $self->install_destination( "arch" );
 
    my $pcfile = "$libdir/pkgconfig/$pkgconfig_module.pc";
-   return unless -f "$pcfile.PL";
 
-   open my $out, ">", $pcfile or die "Unable to open $pcfile for writing - $!";
+   print "Relocating $pcfile\n";
 
-   defined( my $kid = fork() ) or die "Unable to fork - $!";
-   if( $kid == 0 ) {
-      close STDOUT;
-      open STDOUT, ">&", $out or die "Unable to reopen $out - $!";
+   $self->cp_file_with_replacement(
+      srcfile => $pcfile,
+      dstfile => "$pcfile.NEW",
+      replace => {
+         LIBDIR => dirname( dirname( $pcfile ) ),
+      },
+   );
 
-      exec $^X, "$pcfile.PL" or
-         die "exec() failed - $!";
-   }
-
-   waitpid $kid, 0;
-   die "Child failed - $?" if $?;
+   rename "$pcfile.NEW", $pcfile;
 }
 
 sub ACTION_clean
@@ -394,6 +431,8 @@ sub ACTION_clean
    my $self = shift;
 
    if( $self->notes( 'use_bundled' ) ) {
+      $self->apply_extra_pkgconfig_paths;
+
       if( -d $self->_srcdir ) {
          $self->make_in_srcdir( "clean" );
       }

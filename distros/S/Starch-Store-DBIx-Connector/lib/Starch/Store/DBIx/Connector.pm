@@ -1,5 +1,7 @@
 package Starch::Store::DBIx::Connector;
-$Starch::Store::DBIx::Connector::VERSION = '0.02';
+
+$Starch::Store::DBIx::Connector::VERSION = '0.03';
+
 =head1 NAME
 
 Starch::Store::DBIx::Connector - Starch storage backend using DBIx::Connector.
@@ -39,14 +41,14 @@ use namespace::clean;
 
 extends 'Starch::Store::DBI';
 
-sub BUILD {
+after BUILD => sub{
   my ($self) = @_;
 
   # Get this loaded as early as possible.
   $self->connector();
 
   return;
-}
+};
 
 =head1 REQUIRED ARGUMENTS
 

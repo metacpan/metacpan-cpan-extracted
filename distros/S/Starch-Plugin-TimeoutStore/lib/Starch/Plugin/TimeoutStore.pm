@@ -1,5 +1,7 @@
 package Starch::Plugin::TimeoutStore;
-$Starch::Plugin::TimeoutStore::VERSION = '0.06';
+
+$Starch::Plugin::TimeoutStore::VERSION = '0.07';
+
 =head1 NAME
 
 Starch::Plugin::TimeoutStore - Throw an exception if store access surpass a timeout.
@@ -67,6 +69,8 @@ foreach my $method (qw( set get remove )) {
     around $method => sub{
         my $orig = shift;
         my $self = shift;
+
+        local $Carp::Internal{ (__PACKAGE__) } = 1;
 
         my $timeout = $self->timeout();
         return $self->$orig( @_ ) if $timeout == 0;

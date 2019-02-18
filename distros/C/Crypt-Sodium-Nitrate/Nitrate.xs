@@ -128,7 +128,7 @@ THX_sodium_decrypt(pTHX_ SV* ciphertext, SV* nonce, SV* key)
     return decrypted_sv;
 }
 
-#define ARITY (SP - (PL_stack_base + TOPMARK))
+#define ARITY ((SP - PL_stack_base) - TOPMARK)
 
 OP*
 S_pp_encrypt(pTHX)
@@ -137,13 +137,13 @@ S_pp_encrypt(pTHX)
     SSize_t arity = ARITY;
     SV *encrypted, *msg, *nonce, *key;
 
+    if ( arity != 3 )
+        croak("encrypt() must be passed a message, a nonce, and a key");
+
     key   = POPs;
     nonce = POPs;
     msg   = POPs;
-
-     if ( arity < 3 ) {
-        croak("encrypt() must be passed a message, a nonce, and a key");
-    }
+    POPMARK;
 
     encrypted = sodium_encrypt(msg, nonce, key);
 
@@ -160,12 +160,13 @@ S_pp_decrypt(pTHX)
     SSize_t arity = ARITY;
     SV *decrypted, *cipher, *nonce, *key;
 
-    if ( arity < 3 )
+    if ( arity != 3 )
         croak("decrypt() must be passed a message, a nonce, and a key");
 
     key    = POPs;
     nonce  = POPs;
     cipher = POPs;
+    POPMARK; // Remove the mark added earlier
 
     decrypted = sodium_decrypt(cipher, nonce, key);
     mXPUSHs(decrypted);
@@ -203,7 +204,9 @@ S_ck_remove_entersub_crypt(pTHX_ OP *entersubop, GV *namegv, SV *encrypt_sv)
     op_free(entersubop);
 
     /* the custom OP that will handle the rest */
-    newop = newUNOP(OP_NULL, 0, firstargop);
+    pushop = newOP(OP_PUSHMARK, 0);
+    OpMORESIB_set(pushop, firstargop);
+    newop = newUNOP(OP_NULL, 0, pushop);
     newop->op_type    = OP_CUSTOM;
     newop->op_ppaddr  = encrypt ? S_pp_encrypt : S_pp_decrypt;
     newop->op_private = 0;

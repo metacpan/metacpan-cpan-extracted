@@ -1,21 +1,31 @@
-Revision history for Perl extension Class::Measure.
+Revision history for Perl extension Class-Measure.
 
-0.05      2012-03-19
+0.06 2019-02-18T06:26:18Z
+
+ - Migrate all the tests from Test::More to Test2::V0.
+ - Migrate build tooling from Dist::Zilla to Minilla.
+
+0.05 2012-03-19
+
  - Use Dist::Zilla for packaging up the distro.
 
 0.04
+
  - Fix tests to declare the number of test first and to not use lib.
  - Remove AUTOLOAD.  Slap me please.
  - Other random cleanups.
 
 0.03
+
  - Added nautical_mile length unit type.
 
 0.02
+
  - Stringifying a measure object now works.
  - Overloads division and multipliation operators.
  - Added META.yml and renamed 00_class.t to 00_measure.t.
 
 0.01  Mon Aug 08 2005
+
  - First version.
 

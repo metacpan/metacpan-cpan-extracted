@@ -1,5 +1,7 @@
 package Starch::Plugin::Net::Statsd;
-$Starch::Plugin::Net::Statsd::VERSION = '0.02';
+
+$Starch::Plugin::Net::Statsd::VERSION = '0.03';
+
 =head1 NAME
 
 Starch::Plugin::Net::Statsd - Record store timing information to statsd.

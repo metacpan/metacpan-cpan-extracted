@@ -1,9 +1,7 @@
 #!/usr/bin/env perl
-use strict;
-use warnings FATAL => 'all';
+use strictures 2;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 {
     package Foo;
@@ -39,13 +37,13 @@ use Test::Fatal;
 }
 
 is(
-    exception{ Foo->can('has')->('foo6', is=>'rw') },
+    dies { Foo->can('has')->('foo6', is=>'rw') },
     undef,
     'remote attribute declaration works',
 );
 
 isnt(
-    exception{ Foo->can('has')->('foo6', is=>'ro') },
+    dies { Foo->can('has')->('foo6', is=>'ro') },
     undef,
     'ro failed',
 );

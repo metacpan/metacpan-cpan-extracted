@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Algorithm::QuineMcCluskey" : "1",
             "Carp" : "0",
             "Convert::Base81" : "1.00",
             "JSON" : "2.61",
@@ -49,15 +50,15 @@
    "provides" : {
       "Logic::TruthTable" : {
          "file" : "lib/Logic/TruthTable.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "Logic::TruthTable::Convert81" : {
          "file" : "lib/Logic/TruthTable/Convert81.pm",
-         "version" : "1"
+         "version" : "1.01"
       },
       "Logic::TruthTable::Util" : {
          "file" : "lib/Logic/TruthTable/Util.pm",
-         "version" : "1"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -69,6 +70,6 @@
          "url" : "git://github.com/jgamble/Logic-TruthTable"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

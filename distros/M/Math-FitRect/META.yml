@@ -1,19 +1,41 @@
 ---
 abstract: 'Resize one rect in to another while preserving aspect ratio.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  Test::Simple: 0.94
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Math-FitRect
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Math::FitRect:
+    file: lib/Math/FitRect.pm
+    version: '0.05'
+requires:
+  Carp: '0'
+  Exporter: '0'
 resources:
   bugtracker: https://github.com/bluefeet/Math-FitRect/issues
+  homepage: https://github.com/bluefeet/Math-FitRect
   repository: git://github.com/bluefeet/Math-FitRect.git
-version: 0.04
+version: '0.05'
+x_contributors:
+  - 'Aran Clary Deltac <bluefeet@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

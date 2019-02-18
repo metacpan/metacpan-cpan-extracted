@@ -1,5 +1,10 @@
 Revision history for Spork-Shlomify
 
+0.0400  2019-02-18
+        - Add lib/Spork/Shlomify/Slides/FromSpork.pm
+            - forked from spork to get rid of "Wide character in print"
+            warnings.
+
 0.0204  2018-05-25
           - Convert to Dist Zilla.
 

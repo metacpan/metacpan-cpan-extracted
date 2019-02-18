@@ -1,0 +1,25 @@
+Revision history for FFI-Platypus-Legacy-Raw
+
+0.05      2019-02-18 11:59:07 -0500
+  - Fix bug where uint was incorrectly mapped to sint64 instead of
+    uint32 it should have been.  (reported as gh#1)
+
+0.04      2019-02-17 10:25:06 -0500
+  - Test fixes
+
+0.03      2019-02-16 18:17:06 -0500
+  - Fix configure prereqs
+
+0.02      2019-02-16 09:34:59 -0500
+  - First CPAN release
+
+0.01      2019-02-14 13:31:29 -0500
+  - Initial release
+  - Initially based on FFI-Raw from its github repository
+    commit 50c6db7d42e63dbb8ea4455022c47eb8f38e96dd
+    which includes a number of additional fixes over the latest
+    CPAN release as of this writing version 0.32.
+  - This is a complete rewrite.
+  - EXTENSION: Add the attach method to FFI::Platypus::Legacy::Raw
+  - EXTENSION: Add the platypus method to FFI::Platypus::Legacy::Raw
+  - EXTENSION: Allow FFI::Platypus types.

@@ -1,4 +1,10 @@
-Revision history for Perl extension Starch::Plugin::TimeoutStore.
+Revision history for Perl extension Starch-Plugin-TimeoutStore.
+
+0.07 2019-02-18T05:59:59Z
+
+ - Make sure we set Carp::Internal during set/get/remove.
+ - Migrate build tooling from Dist::Zilla to Minilla.
+ - Migrate all the tests from Test::More to Test2::V0.
 
 0.06 2015-08-01
 

@@ -1,6 +1,19 @@
 ==================================================
-Changes from 2013-06-24 00:00:00 +0000 to present.
+Changes from 2014-02-19 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.54 at 2019-02-18 11:06:49 +0000
+-----------------------------------------
+
+  Change: 498fcff11abd4e5f06a4e916c2296323c1125ced
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-02-18 11:06:49 +0000
+
+    Updated hints and added certified perl version
+
+    If perl to be patched is greater than or equal to certified perl
+    version than patchperl will exit doing nothing 
 
 -----------------------------------------
 version 1.52 at 2018-06-23 09:12:01 +0000
@@ -321,202 +334,6 @@ version 1.18 at 2014-02-20 20:02:45 +0000
 
     Update included hints to v5.19.9 level 
 
------------------------------------------
-version 1.16 at 2014-01-17 10:59:57 +0000
------------------------------------------
-
-  Change: 8a3d35406361540497404dd1a3825394fd47f8d7
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-01-17 10:59:57 +0000
-
-    Release engineering for 1.16 
-
-  Change: 7e4ab3377588f8f63de4ddc19d1f4cbf966a896c
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2014-01-16 16:55:37 +0000
-
-    Merge pull request #16 from haarg/extra-phony
-
-    add extra phony targets to help case insensitive file systems 
-
-  Change: c1be34c45a96334f90eb97020deb278e25de12cd
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2014-01-16 16:54:50 +0000
-
-    Merge pull request #15 from haarg/db-configure
-
-    Configure should check same Berkeley DB header DB_File uses 
-
-  Change: fd70e1b3b18dd093a25442c0c6fb473d1b06fee6
-  Author: Graham Knop <haarg@haarg.org>
-  Date : 2014-01-16 19:34:54 +0000
-
-    add extra phony targets to help case insensitive file systems 
-
-  Change: da7a9f9303fd2fc4a8668660893b0dc0c2229751
-  Author: Graham Knop <haarg@haarg.org>
-  Date : 2014-01-14 11:54:06 +0000
-
-    Configure should check same Berkeley DB header DB_File uses 
-
------------------------------------------
-version 1.14 at 2013-10-20 15:38:09 +0000
------------------------------------------
-
-  Change: 0b1f81c0ce692a37bc8552cd278e90c0d0a3122c
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-10-20 16:38:09 +0000
-
-    RT#89635 Configure on 5.6 uses sort +N, which isn't supported by
-    modern sort(1)
-
-    The two instances of 'sort -n +1' in Configure on perl 5.6 need to be
-    replaced with the portable equivalent used since perl 5.7.3:
-
-    ($sort -n -k 2 2>/dev/null || $sort -n +1)
-
-    This works on both old and new sorts. 
-
-  Change: 9989391d5011cb1d518db37a32e9b8eeefafcc9a
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2013-09-25 12:19:09 +0000
-
-    Merge pull request #14 from haarg/gconvert-5.6
-
-    better gconvert detection 
-
-  Change: 0003e6aeaf8c055074b75ceea5accb22025ce776
-  Author: Graham Knop <haarg@haarg.org>
-  Date : 2013-09-25 10:30:53 +0000
-
-    better gconvert detection 
-
------------------------------------------
-version 1.12 at 2013-09-15 20:31:14 +0000
------------------------------------------
-
-  Change: 96317bf956f3b5ff36a30c41e293ff134101c6dc
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-09-15 21:31:14 +0000
-
-    Add GNU/Hurd hints file 
-
------------------------------------------
-version 1.10 at 2013-08-22 23:10:22 +0000
------------------------------------------
-
-  Change: 28b9d595ae1f44274a07bb8e845ac7173632b28d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-08-23 00:10:22 +0000
-
-    Only try to change perms if the hints file already exists 
-
------------------------------------------
-version 1.08 at 2013-08-22 22:56:58 +0000
------------------------------------------
-
-  Change: fc01a16685418d3d2d20621c717836b1172982d3
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-08-22 23:56:58 +0000
-
-    Support Bitrig all the way back to at least v5.8.9 
-
------------------------------------------
-version 1.06 at 2013-08-22 21:03:11 +0000
------------------------------------------
-
-  Change: 045c78ad316cddf498ed22c05ce80430d2f51835
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-08-22 22:03:11 +0000
-
-    Fix issues with Bitrig patch and version normalisation 
-
------------------------------------------
-version 1.04 at 2013-08-22 20:48:36 +0000
------------------------------------------
-
-  Change: e53776114d6df0e124f1a60b8c313caa29a37166
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-08-22 21:48:36 +0000
-
-    Remove Test::Compile from dzil configuration 
-
------------------------------------------
-version 1.02 at 2013-08-22 20:12:47 +0000
------------------------------------------
-
-  Change: cdd0d8342146cdcb03638aadb3ccb67cb96f70e1
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-08-22 21:12:47 +0000
-
-    Handle version number comparisons in a saner manner 
-
-  Change: 0120ad2d8b6ec5091ed47771c656e812ff991f37
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-08-22 19:38:13 +0000
-
-    Added support for Bitrig 
-
------------------------------------------
-version 1.00 at 2013-07-25 10:37:01 +0000
------------------------------------------
-
-  Change: 97f7d7261e9156edba84a2e45b5d0b7d9dd9aec8
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-07-25 11:37:01 +0000
-
-    Set PATCH_GET env var to 0 to stop patch doing VCS madness 
-
------------------------------------------
-version 0.98 at 2013-07-25 08:53:30 +0000
------------------------------------------
-
-  Change: 5e3d365324bb2ffa0ff756cb021fc98c2de87e57
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-07-25 09:53:30 +0000
-
-    Bump to version 0.98 
-
-  Change: 0b699704fd0bfe61274270253a758e15157a0e4b
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-07-25 09:51:26 +0000
-
-    Fix issues with patching Configure under Solaris
-
-    https://github.com/gugod/App-perlbrew/issues/355 
-
------------------------------------------
-version 0.96 at 2013-07-08 06:53:34 +0000
------------------------------------------
-
-  Change: a78109ca3e2c9338bf98185c2014ba2be4a04942
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-07-08 07:53:34 +0000
-
-    Fix patch applying for v5.18.0 
-
------------------------------------------
-version 0.94 at 2013-07-07 13:45:00 +0000
------------------------------------------
-
-  Change: c5257739abd2cde575036ba9b105977679a30273
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-07-07 14:45:00 +0000
-
-    Added commit 4149c7198d9b78d861df289cce40dd865cab57e7
-
-    Fixes a regmatch pointer 32-bit wraparound regression in v5.18.0 
-
------------------------------------------
-version 0.92 at 2013-07-07 13:29:48 +0000
------------------------------------------
-
-  Change: 8881838495367f05f599939d4e1eac86106785fa
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-07-07 14:29:48 +0000
-
-    Update Midnight BSD hints for 0.4-RELEASE 
-
 =================================================
-Plus 45 releases after 2013-06-24 00:00:00 +0000.
+Plus 58 releases after 2014-02-19 00:00:00 +0000.
 =================================================

@@ -1,0 +1,49 @@
+{
+   "abstract" : "Provides formatted output of tables supplied as a combination of header and rows. Among other things supports both horizontal and vertical splitting (paging), in other words can cope with tables wider and / or higher than the size of page you intend to use.",
+   "author" : [
+      "Jurij Fajnberg <fajnbergj@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Term-Table2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test2::Mock" : "0",
+            "Test2::V0" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::XSAccessor" : "0",
+            "List::Util" : "0",
+            "Module::Load" : "0",
+            "POSIX" : "0",
+            "Params::Validate" : "0",
+            "Term::ReadKey" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.1"
+}

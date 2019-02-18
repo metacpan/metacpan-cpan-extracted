@@ -74,7 +74,7 @@ Pcore::Ext::Lib::modern::Plugin
 
     # swipe tab plugin
     plugins => {
-        $type->{'/pcore/modern/Plugin/swipe_tab'} => {
+        $type{'/pcore/modern/Plugin/swipe_tab'} => {
             allowOverflow   => \0,
             allowDirections => [ 'left', 'right' ],
         },

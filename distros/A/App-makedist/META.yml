@@ -28,7 +28,6 @@ requires:
   Module::Extract::VERSION: '0'
   Term::ExtendedColor: '0'
 resources:
-  bugtracker: https://github.com/trapd00r/makedist/issues
-  repository: https://github.com/trapd00r/makedist
-version: '0.016'
+  repository: https://github.com/trapd00r/makedist.git
+version: '0.026'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

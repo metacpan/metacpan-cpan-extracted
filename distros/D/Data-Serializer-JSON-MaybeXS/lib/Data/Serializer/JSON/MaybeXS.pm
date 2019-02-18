@@ -1,5 +1,7 @@
 package Data::Serializer::JSON::MaybeXS;
-$Data::Serializer::JSON::MaybeXS::VERSION = '0.01';
+
+$Data::Serializer::JSON::MaybeXS::VERSION = '0.02';
+
 BEGIN { @Data::Serializer::JSON::MaybeXS::ISA = qw(Data::Serializer) }
 
 # This code was pretty much stolen and modified from:

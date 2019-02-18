@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Test::More;
+
+use_ok 'Music::GuitarChordDiagram';
+
+my $obj = Music::GuitarChordDiagram->new( chord => 'xxxxxx' );
+isa_ok $obj, 'Music::GuitarChordDiagram';
+
+is $obj->chord, 'xxxxxx', 'chord';
+is $obj->position, 1, 'position';
+is $obj->string_num, 6, 'string_num';
+is $obj->fret_num, 5, 'fret_num';
+is $obj->size, 30, 'size';
+is $obj->outfile, 'chord-diagram', 'outfile';
+like $obj->font, qr/\.ttf/, 'font';
+is $obj->verbose, 0, 'verbose';
+
+can_ok $obj, 'draw';
+
+done_testing();

@@ -1,8 +1,5 @@
 package Authen::NZRealMe::LogonStrength;
-{
-  $Authen::NZRealMe::LogonStrength::VERSION = '1.16';
-}
-
+$Authen::NZRealMe::LogonStrength::VERSION = '1.18';
 use strict;
 use warnings;
 use Carp;
@@ -152,7 +149,7 @@ See L<Authen::NZRealMe> for documentation index.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2014 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2010-2019 Enrolment Services, New Zealand Electoral Commission
 
 Written by Grant McLean E<lt>grant@catalyst.net.nzE<gt>
 

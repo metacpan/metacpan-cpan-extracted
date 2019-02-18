@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::Colon.
 
+0.04  Fri Feb 15 16:23:34 CST 2019
+        - Updated qw usage to avoid syntax error in modern perl 5.
+
 0.03  Mon Nov 10 12:53:30 CST 2003
         - Added Test::More to the prerequiste list in Makefile.PL.
         - Added a test for direct attribute access like $obj->{first} to

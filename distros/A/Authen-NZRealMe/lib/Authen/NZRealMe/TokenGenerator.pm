@@ -1,8 +1,5 @@
 package Authen::NZRealMe::TokenGenerator;
-{
-  $Authen::NZRealMe::TokenGenerator::VERSION = '1.16';
-}
-
+$Authen::NZRealMe::TokenGenerator::VERSION = '1.18';
 use strict;
 use warnings;
 
@@ -109,7 +106,7 @@ See L<Authen::NZRealMe> for documentation index.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2014-2019 Enrolment Services, New Zealand Electoral Commission
 
 Written by Grant McLean E<lt>grant@catalyst.net.nzE<gt>
 

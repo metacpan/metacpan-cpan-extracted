@@ -1,5 +1,11 @@
 Revision history for Perl module Test::WWW::Mechanize::Catalyst:
 
+0.62 Mon Feb 18 17:30 GMT 2019
+     - The latest 'mst screwed up the last release' release
+
+0.61 Mon Feb 18 14:38 GMT 2019
+     - Add '.' to inc in Makefile.PL
+
 0.60 Fri Dec 26 22:00 GMT 2014
      - Make two test cases compatible with Catalyst 5.90080+ changes
        to encoding (UTF8 because default).

@@ -1,14 +1,14 @@
-package Pcore::Ext v0.19.12;
+package Pcore::Ext v0.20.0;
 
-use Pcore -dist, -class;
+use Pcore -dist, -class, -const;
 use Pcore::Util::Scalar qw[is_ref];
 use Package::Stash::XS qw[];
 use Pcore::Ext::App::Class;
 
 has namespace => ( required => 1 );
 
-has app           => ();       # Pcore::App instance
-has cdn           => ();       # Pcore::CDN instance
+has app           => ();       # maybe InstanceOf['Pcore::App']
+has cdn           => ();       # maybe InstanceOf['Pcore::CDN']
 has api_namespace => ();
 has prefixes      => ();
 has api_url       => '/api';
@@ -21,11 +21,17 @@ has build     => ( init_arg => undef );
 has overrides => ( init_arg => undef );
 has locales   => ( init_arg => undef );
 
-has api_ver   => 'v1';
-has viewport  => ( init_arg => undef );
-has ext_type  => 'modern';
-has ext_ver   => 'v6.7.0';
-has ext_theme => 'material';
+has ext_type    => ( init_arg => undef );
+has ext_ver     => ( init_arg => undef );
+has ext_theme   => ( init_arg => undef );
+has ext_api_ver => ( init_arg => undef );
+has viewport    => ( init_arg => undef );    # viewport class name
+
+const our $EXT_TYPE          => 'modern';    # modern, classic
+const our $EXT_VER           => v6.7.0;
+const our $EXT_THEME_CLASSIC => 'aria';
+const our $EXT_THEME_MODERN  => 'material';
+const our $EXT_API_VER       => 'v1';
 
 our $FRAMEWORK;
 our $MODULES;
@@ -84,9 +90,9 @@ sub _load_module ( $self, $module ) {
         *{"$package\::raw"}  = sub {...};
         *{"$package\::func"} = sub {...};
         *{"$package\::cdn"}  = \undef;
-        *{"$package\::api"}  = \undef;
-        *{"$package\::class"} = \undef;
-        *{"$package\::type"}  = \undef;
+        *{"$package\::api"}  = {};
+        *{"$package\::class"} = {};
+        *{"$package\::type"}  = {};
 
         eval { require $module };
 
@@ -141,17 +147,8 @@ sub _scan_app_tree ($self) {
     return $tree;
 }
 
-# TODO
 sub _get_framework ($self) {
-    my $ext_type = 'modern';    # $APP->{ $class->{app_name} }->{ext_type};
-    my $ext_ver  = 'v6.7.0';    # $APP->{ $class->{app_name} }->{ext_ver};
-
-    # load extjs framework config, if not loaded
-    if ( !exists $FRAMEWORK->{$ext_type}->{$ext_ver} ) {
-        $FRAMEWORK->{$ext_type}->{$ext_ver} = $ENV->{share}->read_cfg("/Pcore-Ext/data/ext/$ext_ver/$ext_type.json");
-    }
-
-    return $FRAMEWORK->{$ext_type}->{$ext_ver};
+    return $FRAMEWORK->{ $self->{ext_type} }->{ $self->{ext_ver} } //= $ENV->{share}->read_cfg("/Pcore-Ext/data/ext/$self->{ext_ver}/$self->{ext_type}.json");
 }
 
 # TODO cleanup
@@ -167,6 +164,12 @@ sub build ($self) {
     my $viewport = $self->{classes}->{ '/' . $self->{namespace} =~ s[::][/]smgr . '/viewport' };
     die q[Viewport class is not defined] if !defined $viewport;
     $self->{viewport} = $viewport->{name};
+
+    # read app config
+    $self->{ext_type}    = ${"$self->{namespace}\::EXT_TYPE"} // $EXT_TYPE;
+    $self->{ext_ver}     = version->parse( ${"$self->{namespace}\::EXT_VER"} // $EXT_VER )->normal;
+    $self->{ext_theme}   = ${"$self->{namespace}\::EXT_THEME"} // ( $self->{ext_type} eq 'classic' ? $EXT_THEME_CLASSIC : $EXT_THEME_MODERN );
+    $self->{ext_api_ver} = ${"$self->{namespace}\::EXT_API_VER"} // $EXT_API_VER;
 
     # get app modules
     my $tree = $self->_scan_app_tree;
@@ -367,6 +370,11 @@ sub _generate ($self) {
 
     $self->{build}->{raw} = $js;
 
+    # sort api methods
+    for my $action ( keys $self->{api}->%* ) {
+        $self->{api}->{$action} = [ sort { $a->{name} cmp $b->{name} } $self->{api}->{$action}->@* ];
+    }
+
     return;
 }
 
@@ -459,7 +467,7 @@ sub _build_app ($self) {
             name: 'APP',
             api: new PCORE({
                 url: '$data->{api_url}',
-                version: '$self->{api_ver}',
+                version: '$self->{ext_api_ver}',
                 listenEvents: null,
                 onConnect: function(api) {},
                 onDisconnect: function(api, status, reason) {},
@@ -608,11 +616,11 @@ sub _prepare_js ( $self, $js, $devel = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 84, 85               | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 90, 91               | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 91                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 97                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 196                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
+## |    3 | 199                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
-use strictures 1;
-
-use Test::More;
+use strictures 2;
+use Test2::V0;
 
 {
   package Vanilla;

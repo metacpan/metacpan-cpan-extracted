@@ -11,11 +11,11 @@ Net::ISC::DHCPClient - ISC dhclient lease reader
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 
 use Net::ISC::DHCPClient::InetLease;
@@ -437,9 +437,8 @@ Jari Turkia, C<< <jatu at hqcodeshop.fi> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-net-isc-dhcpclient at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-ISC-DHCPClient>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to GitHub https://github.com/HQJaTu/Net-ISC-DHCPClient.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 
 

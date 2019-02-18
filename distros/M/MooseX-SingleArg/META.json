@@ -1,27 +1,43 @@
 {
    "abstract" : "No-fuss instantiation of Moose objects using a single argument.",
    "author" : [
-      "Aran Deltac <bluefeet@gmail.com>"
+      "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "MooseX-SingleArg",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
-            "Test::Pod" : "1.41"
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
@@ -30,15 +46,35 @@
          }
       },
       "test" : {
-         "recommends" : {
-            "CPAN::Meta" : "2.120900"
-         },
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "File::Spec" : "0",
-            "Test2::V0" : "0.000094",
-            "Test::More" : "0"
+            "Test2::V0" : "0.000094"
          }
+      }
+   },
+   "provides" : {
+      "MooseX::SingleArg" : {
+         "file" : "lib/MooseX/SingleArg.pm",
+         "version" : "0.09"
+      },
+      "MooseX::SingleArg::Meta::Class" : {
+         "file" : "lib/MooseX/SingleArg/Meta/Class.pm",
+         "version" : "0.09"
+      },
+      "MooseX::SingleArg::Meta::Object" : {
+         "file" : "lib/MooseX/SingleArg/Meta/Object.pm",
+         "version" : "0.09"
+      },
+      "MooseX::SingleArg::Meta::Role" : {
+         "file" : "lib/MooseX/SingleArg/Meta/Role.pm",
+         "version" : "0.09"
+      },
+      "MooseX::SingleArg::Meta::ToClass" : {
+         "file" : "lib/MooseX/SingleArg/Meta/ToClass.pm",
+         "version" : "0.09"
+      },
+      "MooseX::SingleArg::Meta::ToRole" : {
+         "file" : "lib/MooseX/SingleArg/Meta/ToRole.pm",
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -48,12 +84,16 @@
       },
       "homepage" : "https://github.com/bluefeet/MooseX-SingleArg",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/bluefeet/MooseX-SingleArg.git",
+         "url" : "git://github.com/bluefeet/MooseX-SingleArg.git",
          "web" : "https://github.com/bluefeet/MooseX-SingleArg"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "version" : "0.09",
+   "x_contributors" : [
+      "Aran Deltac <aran@ziprecruiter.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Xavier Guimard <x.guimard@free.fr>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
 }
-

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 use strictures 2;
-use Test::More;
+use Test2::V0;
 
 use MooX::PluginKit::Core;
 

@@ -4,14 +4,19 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile1(
   META_MERGE => {
+    q(meta-spec) => { version => 2 },
     resources => {
-      repository => q{https://github.com/trapd00r/Xorg-XLFD},
-      bugtracker => q{https://github.com/trapd00r/Xorg-XLFD/issues},
+      repository => {
+        type       => 'git',
+        url        => 'https://github.com/trapd00r/Xorg-XLFD.git',
+        web        => 'https://github.com/trapd00r/Xorg-XLFD',
+        bugtracker => 'https://github.com/trapd00r/Xorg-XLFD/issues',
+      },
     },
   },
 
   NAME             => q{Xorg::XLFD},
-  AUTHOR           => q{Magnus Woldrich <trapd00r@trapd00r.se>},
+  AUTHOR           => q{Magnus Woldrich <m@japh.se.se>},
   ABSTRACT         => q{X11 logical font description interface},
   VERSION_FROM     => q{lib/Xorg/XLFD.pm},
   LICENSE          => q{perl},

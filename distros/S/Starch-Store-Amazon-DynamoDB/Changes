@@ -1,4 +1,11 @@
-Revision history for Perl extension Starch::Store::Amazon::DynamoDB.
+Revision history for Perl extension Starch-Store-Amazon-DynamoDB.
+
+0.05 2019-02-18T05:58:28Z
+
+ - Remove reaping, the way Amazon::DynamoDB does table scans does not
+   account for provisioned read units and will always go over the limit.
+ - Migrate build tooling from Dist::Zilla to Minilla.
+ - Migrate all the tests from Test::More to Test2::V0.
 
 0.04 2015-07-27
 

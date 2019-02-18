@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 use strictures 2;
-use Test::More;
+use Test2::V0;
 
 subtest class => sub{
     package ClassTest; use Moo;
@@ -21,11 +21,11 @@ subtest class => sub{
     my $consumer = ClassTest->new( plugins=>['::FooPlugin'], foo=>{} );
     my $foo = $consumer->foo();
 
-    is_deeply(
+    is(
         [ $consumer->test() ],
         [qw( ClassTest )],
     );
-    is_deeply(
+    is(
         [ $foo->test() ],
         [qw( ClassTest::FooPlugin ClassTest::Foo )],
     );

@@ -54,7 +54,7 @@ diff ... | sdif
 
 =cut
 
-require 5.014;
+use v5.14;
 use strict;
 use warnings;
 use utf8;
@@ -69,6 +69,8 @@ $Data::Dumper::Terse = 1;
 
 use App::sdif;
 my $version = $App::sdif::VERSION;
+
+use App::sdif::Util;
 
 sub read_until (&$) {
     my($sub, $fh) = @_;
@@ -87,7 +89,7 @@ my $opt_q;
 my $opt_d;
 my $opt_truncate = 0;
 my $opt_onword = 1;
-my $opt_cdif = 1;
+my $opt_cdif = 'cdif';
 my @default_opt_cdifopts = qw(--no-cc --no-mc --no-tc --no-uc);
 my @opt_cdifopts;
 my $opt_env = 1;
@@ -99,7 +101,6 @@ my $opt_digit = 4;
 my $opt_column;
 my $opt_view;
 my $opt_ambiguous = 'narrow';
-my %column_width;
 our $screen_width;
 
 my $opt_color = 'always';
@@ -157,7 +158,8 @@ my @optargs = (
     "u|unified"             => sub { push @opt_diffopts, '-u' },
     "C=i"                   => sub { push @opt_diffopts, '-C' . $_[1] },
     "U=i"                   => sub { push @opt_diffopts, '-U' . $_[1] },
-    "cdif!" => \$opt_cdif,
+    "cdif:s" => \$opt_cdif,
+    "nocdif|no-cdif" => sub { $opt_cdif = undef },
     "cdifopts=s" => \@opt_cdifopts,
     "colortable" => \$opt_colortable,
 
@@ -278,10 +280,12 @@ $screen_width = $opt_W || &terminal_width;
 
 sub column_width {
     my $column = shift;
+    state %column_width;
     $column_width{$screen_width, $column} //= do {
+	use integer;
 	my $w = $screen_width;
 	$w -= $column if $opt_mark;
-	max(1, int($w / $column));
+	max 1, $w / $column;
     };
 }
 
@@ -336,7 +340,7 @@ if ($opt_cdif) {
 	if ($DIFF ne '-') {
 	    open(STDIN, $DIFF) || die "cannot open diff: $!\n";
 	}
-	do { exec join ' ', 'cdif', @opt_cdifopts } ;
+	do { exec join ' ', $opt_cdif, @opt_cdifopts } ;
 	warn "exec failed: $!";
 	print while <>;
 	exit;
@@ -386,7 +390,7 @@ while (<DIFF>) {
 	    @new = read_line(*DIFF, $n);
 	    $readfile and read_line(*NEW, $n);
 	}
-	map { s/^..// } @old, @new;
+	map { s/^[<>] ?// } @old, @new;
 	flush_buffer([], \@old, \@new);
     }
     #
@@ -427,7 +431,7 @@ while (<DIFF>) {
 	($nline) = $right =~ /^(\d+)/;
 
 	my @buf = merge_diffc(\@old, \@new);
-	map { map { s/^..// } @$_ } @buf;
+	map { map { s/^[-+! ] ?// } @$_ } @buf;
 	flush_buffer(@buf);
     }
     #
@@ -458,26 +462,20 @@ while (<DIFF>) {
 	my($o, $n) = ($+{o}//1, $+{n}//1);
 	my($prefix, $command) = @+{qw(prefix command)};
 
-	use App::sdif::Divert;
 	local $screen_width = $screen_width;
-	my($divert, %opt);
+	my($divert, %read_opt);
 	if ($prefix) {
 	    $screen_width -= length $prefix;
-	    $opt{prefix} = $prefix;
-	    $divert = new App::sdif::Divert FINAL => sub {
-		s/^/$prefix/mg;
-	    };
+	    $read_opt{prefix} = $prefix;
+	    use App::sdif::Divert;
+	    $divert = new App::sdif::Divert
+		FINAL => sub { s/^/$prefix/mg };
 	};
 
-	print_command_n(\%opt, $command, $command);
-	my @stack = read_diffu({prefix => $prefix}, *DIFF, $o, $n);
-	my @buf = map {
-	    [ collect $_ qr/^\ $/ ],	# common
-	    [ collect $_ qr/^\-$/ ],	# old
-	    [ collect $_ qr/^\+$/ ],	# new
-	} @stack;
+	print_command_n({ type => 'COMMAND' }, $command, $command);
+	my @buf = read_unified_2 \%read_opt, *DIFF, $o, $n;
 
-	map { map { s/^.// } @$_ } @buf;
+	map { map { s/^[-+ ]// } @$_ } @buf;
 	flush_buffer(@buf);
     }
     #
@@ -497,13 +495,8 @@ while (<DIFF>) {
 	print_command_n({ type => 'COMMAND' }, $_, $_, $_);
 
 	($oline, $nline, $mline) = ($1, $3, $5);
-	my @stack = read_diffu(*DIFF, $2 // 1, $4 // 1, $6 // 1);
-	my @buf = map {
-	    [ collect $_ qr/^  $/ ],		# common
-	    [ collect $_ qr/^(?:--|- |\ \+)/ ],	# old
-	    [ collect $_ qr/^(?:--| -|\+\ )/ ],	# new
-	    [ collect $_ qr/\+/ ]		# merge
-	} @stack;
+	state $read_unified_3 = read_unified_sub(3);
+	my @buf = $read_unified_3->(*DIFF, $2 // 1, $4 // 1, $6 // 1);
 	flush_buffer_3(@buf);
     }
     else {
@@ -526,75 +519,38 @@ exit($exit == 2);
 
 ######################################################################
 
-sub marklines {
-    local $_ = shift;
-    /-/ ? tr/-/-/ : tr/ / / + 1;
-}
-sub read_diffu {
-    my $opt = ref $_[0] eq 'HASH' ? shift : {};
-    my $FH = shift;
-    my $column = @_;
-    my $total = sum @_;
-    my $prefix = $opt->{prefix} // '';
-
-    use App::sdif::LabelStack;
-
-    my $mark_length = $column - 1;
-    my $start_label = ' ' x $mark_length;
-    my @lsopt = (START => $start_label);
-    my @stack = (new App::sdif::LabelStack @lsopt);
-    while (<$FH>) {
-	if ($prefix) {
-	    s/^\Q$prefix// or warn "Unexpected: $_";
-	}
-	# `git diff' produces message like this:
-	# "\ No newline at end of file"
-	/^[ \-\+]{$mark_length}/ or do {
-	    warn "Unexpected line: $_" unless /^\\ /;
-	    next;
-	};
-	my $mark = substr $_, 0, $mark_length;
-	if ($mark ne $stack[-1]->lastlabel and $stack[-1]->exists($mark)) {
-	    push @stack, new App::sdif::LabelStack @lsopt;
-	}
-	$stack[-1]->append($mark, $_);
-	last if ($total -= marklines($mark)) <= 0;
-    }
-    @stack;
-}
-
 sub merge_diffc {
     my @o = @{+shift};
     my @n = @{+shift};
     my @buf;
 
-    die if grep { not /^[ \-\+\!] / } @o, @n;
+    die if grep { not /^[ \-\+\!][\t ]/ } @o, @n;
 
     while (@o or @n) {
 	my @slot = ([], [], []);
 	push @buf, @slot;
 
 	if (@o and @n) {
-	    while (@o and @n and $o[0] =~ /^  / and $n[0] =~ /^  /) {
+	    while (@o and @n and $o[0] =~ /^ [\t ]/ and $n[0] =~ /^ [\t ]/) {
 		push @{$slot[0]}, shift @o;
 		shift @n;
 	    }
 	}
 	elsif (@o) {
-	    push(@{$slot[0]}, shift @o) while @o and $o[0] =~ /^  /;
+	    push(@{$slot[0]}, shift @o) while @o and $o[0] =~ /^ [\t ]/;
 	}
 	elsif (@n) {
-	    push(@{$slot[0]}, shift @n) while @n and $n[0] =~ /^  /;
+	    push(@{$slot[0]}, shift @n) while @n and $n[0] =~ /^ [\t ]/;
 	}
 
-	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ /^\- /;
+	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ /^\-[\t ]/;
 	next if @{$slot[1]};
 
-	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ /^\+ /;
+	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ /^\+[\t ]/;
 	next if @{$slot[2]};
 
-	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ /^! /;
-	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ /^! /;
+	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ /^![\t ]/;
+	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ /^![\t ]/;
     }
 
     @buf;
@@ -661,6 +617,7 @@ sub flush_buffer_3 {
 	my @d = splice @_, 0, 4;
 
 	for my $common (@{shift @d}) {
+	    $common =~ s/^  //;
 	    print_column_23(' ', $common, ' ', $common, ' ', $common);
 	    $oline++;
 	    $nline++;
@@ -671,9 +628,9 @@ sub flush_buffer_3 {
 	    my $old = shift @{$d[0]};
 	    my $new = shift @{$d[1]};
 	    my $mrg = shift @{$d[2]};
-	    my $om = $old ? $old =~ s/^(?|(\S).|\s(.))// && $1 : ' ';
-	    my $nm = $new ? $new =~ s/^(?|(\S).|\s(.))// && $1 : ' ';
-	    my $mm = $mrg ? $mrg =~ s/^(?|(\S).|\s(.))// && $1 : ' ';
+	    my $om = $old ? $old =~ s/^(?|(\-).|\s(\+))// && $1 : ' ';
+	    my $nm = $new ? $new =~ s/^(?|.(\-)|(\+)\s)// && $1 : ' ';
+	    my $mm = $mrg ? $mrg =~ s/^(?|(\+).|.(\+))//  && $1 : ' ';
 
 	    $om = $nm = $mm = ' ' if $opt_view;
 
@@ -877,17 +834,6 @@ sub unesc {
     $_;
 }
 
-##
-## Implement minimum function because Text::Glob is not in standard library
-##
-sub match_glob {
-    local $_ = shift;
-    s/\?/./g;
-    s/\*/.*/g;
-    my $regex = qr/^$_$/;
-    grep { $_ =~ $regex } @_;
-}
-
 sub color_table {
     my $width = shift || 80;
     for my $c (0..5) {
@@ -1059,10 +1005,11 @@ Default false.
 Fold long line at word boundaries.
 Default true.
 
-=item B<-->[B<no>]B<cdif>
+=item B<-->[B<no>]B<cdif>[=I<command>]
 
-Use B<cdif> command instead of normal diff command.
-Default true.
+Use B<cdif> command instead of normal diff command.  Enabled by
+default and use B<--no-cdif> option explicitly to disable it.  This
+option accepts optional parameter as an actual B<cdif> command.
 
 =item B<--cdifopts>=I<option>
 

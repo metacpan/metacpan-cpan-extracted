@@ -1,4 +1,12 @@
-Revision history for Perl extension Catalyst::Plugin::Starch.
+Revision history for Perl extension Catalyst-Plugin-Starch.
+
+0.04 2019-02-18T06:28:05Z
+
+ - Support update_session_cookie.
+ - Depend on latest Starch so that delete_session works in all
+   cases that it works under Catalyst::Plugin::Session.
+ - Migrate build tooling from Dist::Zilla to Minilla.
+ - Migrate all the tests from Test::More to Test2::V0.
 
 0.03 2015-07-20
 

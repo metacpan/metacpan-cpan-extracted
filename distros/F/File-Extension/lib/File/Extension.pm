@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 
 
-our $VERSION = '0.034';
+our $VERSION = '0.038';
 
 # populated in BEGIN block
 my %ext;

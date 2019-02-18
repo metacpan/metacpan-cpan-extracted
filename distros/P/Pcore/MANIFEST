@@ -287,6 +287,13 @@ share/dist-tmpl/tmpl-dist/xt/README.md
 share/dist-tmpl/tmpl-dist/xt/author/README.md
 share/dist-tmpl/tmpl-dist/xt/release/README.md
 share/dist-tmpl/tmpl-dist/xt/smoke/README.md
+share/dist-tmpl/tmpl-phonegap/config.xml
+share/dist-tmpl/tmpl-phonegap/www/css/index.css
+share/dist-tmpl/tmpl-phonegap/www/img/.exists
+share/dist-tmpl/tmpl-phonegap/www/index.html
+share/dist-tmpl/tmpl-phonegap/www/js/app.js
+share/dist-tmpl/tmpl-phonegap/www/js/index.js
+share/dist-tmpl/tmpl-phonegap/www/js/overrides.js
 share/dist.yaml
 share/docker.yaml
 share/include/Pcore/Util/Path.c

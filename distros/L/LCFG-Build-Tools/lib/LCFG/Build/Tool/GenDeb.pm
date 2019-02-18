@@ -5,12 +5,12 @@ use warnings;
 # $Id: GenDeb.pm.in 35296 2019-01-10 10:47:26Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool/CheckMacros.pm.in,v $
 # $Revision: 35296 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_19/lib/LCFG/Build/Tool/GenDeb.pm.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_20/lib/LCFG/Build/Tool/GenDeb.pm.in $
 # $Date: 2019-01-10 10:47:26 +0000 (Thu, 10 Jan 2019) $
 
 use v5.10;
 
-our $VERSION = '0.9.19';
+our $VERSION = '0.9.20';
 
 use File::Copy::Recursive ();
 use File::Spec ();
@@ -179,7 +179,7 @@ __END__
 
 =head1 VERSION
 
-This documentation refers to LCFG::Build::Tool::GenDeb version 0.9.19
+This documentation refers to LCFG::Build::Tool::GenDeb version 0.9.20
 
 =head1 SYNOPSIS
 

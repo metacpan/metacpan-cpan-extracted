@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<!-- REFERENCE: https://cordova.apache.org/docs/en/latest/config_ref/ -->
+<widget id="com.dynamicintl.smtlounge" version="0.4.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+    <name>SMT Lounge</name>
+    <description>
+        This app is for Smart Machine Tool user to share machine specs with our team.
+    </description>
+    <author email="zdm@softvisio.net" href="http://softvisio.net">softvisio.net</author>
+    <content src="index.html" />
+
+    <!-- https://build.phonegap.com/current&#45;support -->
+    <preference name="phonegap-version" value="cli-8.1.1" />
+
+    <!-- android platform version, minimal version 19 is required to make push notifications works -->
+    <preference name="android-minSdkVersion" value="19" />
+    <preference name="android-targetSdkVersion" value="28" />
+
+    <!--
+    Set to true if you don't want the interface to display any feedback when users scroll past the beginning or end of content.
+    On iOS, overscroll gestures cause content to bounce back to its original position.
+    On Android, they produce a more subtle glowing effect along the top or bottom edge of the content.
+    -->
+    <preference name="DisallowOverscroll" value="true" />
+
+    <!-- PLUGINS -->
+    <plugin name="cordova-plugin-device" source="npm" spec="~2" />
+    <plugin name="cordova-plugin-network-information" source="npm" spec="~2" />
+
+    <!-- PUSH NOTIFICATIONS -->
+    <plugin name="phonegap-plugin-push" source="npm" spec="~2" />
+    <platform name="android">
+        <resource-file src="google-services.json" target="app/google-services.json" />
+    </platform>
+
+    <!-- WHITELIST -->
+    <plugin name="cordova-plugin-whitelist" spec="~1" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    <platform name="android">
+        <allow-intent href="market:*" />
+    </platform>
+    <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+    </platform>
+
+    <!-- ASSETS -->
+    <platform name="android">
+        <icon density="ldpi" src="resources/icon/android/drawable-ldpi-icon.png" />
+        <icon density="mdpi" src="resources/icon/android/drawable-mdpi-icon.png" />
+        <icon density="hdpi" src="resources/icon/android/drawable-hdpi-icon.png" />
+        <icon density="xhdpi" src="resources/icon/android/drawable-xhdpi-icon.png" />
+        <icon density="xxhdpi" src="resources/icon/android/drawable-xxhdpi-icon.png" />
+        <icon density="xxxhdpi" src="resources/icon/android/drawable-xxxhdpi-icon.png" />
+    </platform>
+    <platform name="ios">
+        <icon height="57" platform="ios" src="resources/icon/ios/icon.png" width="57" />
+        <icon height="114" platform="ios" src="resources/icon/ios/icon@2x.png" width="114" />
+        <icon height="40" platform="ios" src="resources/icon/ios/icon-40.png" width="40" />
+        <icon height="80" platform="ios" src="resources/icon/ios/icon-40@2x.png" width="80" />
+        <icon height="50" platform="ios" src="resources/icon/ios/icon-50.png" width="50" />
+        <icon height="100" platform="ios" src="resources/icon/ios/icon-50@2x.png" width="100" />
+        <icon height="60" platform="ios" src="resources/icon/ios/icon-60.png" width="60" />
+        <icon height="120" platform="ios" src="resources/icon/ios/icon-60@2x.png" width="120" />
+        <icon height="180" platform="ios" src="resources/icon/ios/icon-60@3x.png" width="180" />
+        <icon height="72" platform="ios" src="resources/icon/ios/icon-72.png" width="72" />
+        <icon height="144" platform="ios" src="resources/icon/ios/icon-72@2x.png" width="144" />
+        <icon height="76" platform="ios" src="resources/icon/ios/icon-76.png" width="76" />
+        <icon height="152" platform="ios" src="resources/icon/ios/icon-76@2x.png" width="152" />
+        <icon height="29" platform="ios" src="resources/icon/ios/icon-small.png" width="29" />
+        <icon height="58" platform="ios" src="resources/icon/ios/icon-small@2x.png" width="58" />
+        <icon height="87" platform="ios" src="resources/icon/ios/icon-small@3x.png" width="87" />
+        <icon height="1024" platform="ios" src="resources/icon/ios/icon-1024.png" width="1024" />
+    </platform>
+</widget>

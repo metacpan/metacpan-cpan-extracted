@@ -1,5 +1,8 @@
 Revision history for Xll-PngViewer
 
+0.02  Fri Feb 15 17:14:00 2019
+	Patches to XS to allow older environments to build
+
 0.01  Thu Feb 14 21:00:00 2019
 	Initial release.
 

@@ -116,7 +116,7 @@ option	--dark-mono \
 	--cdifopts='--dark-mono'
 
 ##
-## for backward compatinbility
+## for backward compatibility
 ##
 option --dark_green --dark-green
 option --dark_cmy   --dark-cmy

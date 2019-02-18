@@ -1,4 +1,8 @@
 Revision history for Perl extension Geo::BUFR.
+1.37 2019-02-16
+- Allow for ecCodes table format (BUFRDC is still default)
+- Allow for BUFR edition 0 and 1
+- Default tables for utility programs changed to master table version 29
 1.36 2016-12-02
 - Fixes in code and test scripts allowing for parallell testing and
   for bufrextract.pl to work on Windows

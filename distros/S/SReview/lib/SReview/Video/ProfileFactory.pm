@@ -68,10 +68,13 @@ C<myprofile> profile in the above example shows how to do so. Any
 property that is known by L<SReview::Video> can be overridden in the
 manner given.
 
-To create a profile that just changes a minor detail of an existing
-profile, extend that profile and change the detail which you want to
-change. To create a new profile from scratch, extend the C<Base> profile
-(see below).
+To create a new profile, one can use the C<extra_profiles> configuration
+setting; however, profiles created in this manner can only hardcode
+values, and cannot vary any parameters based on the input file. To
+create a profile that can do so, when the new profile just changes a
+minor detail of an existing profile, extend that profile and change the
+detail which you want to change. To create a new profile from scratch,
+extend the C<Base> profile (see below).
 
 =head1 PRE-EXISTING PROFILES
 
@@ -228,7 +231,7 @@ use Moose;
 extends 'SReview::Video::Profile::Base';
 
 sub _probe_exten {
-	return 'vp8.webm',
+	return 'vp8.webm';
 }
 
 sub _probe_videocodec {
@@ -289,16 +292,22 @@ sub _probe_exten {
 
 sub _probe_height {
 	my $self = shift;
-	return int($self->reference->video_height / 8);
+	return undef unless defined ($self->reference->video_height);
+	return int($self->reference->video_height / 4);
 }
 
 sub _probe_width {
 	my $self = shift;
-	return int($self->reference->video_width / 8);
+	return undef unless defined ($self->reference->video_width);
+	return int($self->reference->video_width / 4);
 }
 
 sub _probe_videosize {
 	my $self = shift;
+	my $width = $self->video_width;
+	my $height = $self->video_height;
+	return undef unless defined($width) && defined($height);
+	return undef unless $width && $height;
 	return $self->video_width . "x" . $self->video_height;
 }
 
@@ -306,14 +315,30 @@ no Moose;
 
 package SReview::Video::ProfileFactory;
 
+use SReview::Config::Common;
+
 sub create {
 	my $class = shift;
 	my $profile = shift;
 	my $ref = shift;
+	my $config = shift;
+	my $profiles = SReview::Config::Common::setup()->get('extra_profiles');
 
-	eval "require SReview::Video::Profile::$profile;";
+	if(!exists($profiles->{$profile})) {
+		eval "require SReview::Video::Profile::$profile;";
 
-	return "SReview::Video::Profile::$profile"->new(url => '', reference => $ref);
+		return "SReview::Video::Profile::$profile"->new(url => '', reference => $ref);
+	} else {
+		my $parent = $profiles->{$profile}{parent};
+		eval "require SReview::Video::Profile::$parent;";
+		my $rv = "SReview::Video::Profile::$parent"->new(url => '', reference => $ref);
+		foreach my $param(keys %{$profiles->{$profile}{settings}}) {
+			next if($param eq 'parent');
+			$rv->meta->find_attribute_by_name($param)->set_value($rv, $profiles->{$profile}{settings}{$param});
+		}
+		return $rv;
+	}
+	die "Unknown profile $profile requested!";
 }
 
 1;

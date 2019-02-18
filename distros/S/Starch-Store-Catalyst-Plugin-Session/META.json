@@ -1,0 +1,84 @@
+{
+   "abstract" : "Starch storage backend using Catalyst::Plugin::Session stores.",
+   "author" : [
+      "Aran Clary Deltac <bluefeet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Starch-Store-Catalyst-Plugin-Session",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Plugin::Session" : "0.40",
+            "Log::Any" : "1.03",
+            "Moo" : "2.000000",
+            "Starch" : "0.10",
+            "Type::Tiny" : "1.000005",
+            "namespace::clean" : "0.24",
+            "strictures" : "2.000000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst::Plugin::Session::Store::File" : "0.18",
+            "Test2::V0" : "0.000094"
+         }
+      }
+   },
+   "provides" : {
+      "Starch::Store::Catalyst::Plugin::Session" : {
+         "file" : "lib/Starch/Store/Catalyst/Plugin/Session.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session",
+      "repository" : {
+         "url" : "git://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session.git",
+         "web" : "https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "Aran Deltac <aran@ziprecruiter.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
+}

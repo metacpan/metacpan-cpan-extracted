@@ -2,6 +2,7 @@ package AuthenNZRealMeTestHelper;
 
 use strict;
 use warnings;
+use autodie;
 
 use Test::Builder;
 
@@ -15,7 +16,9 @@ use Exporter qw(import);
 
 our @EXPORT = qw(
     test_conf_dir
+    test_conf_file
     test_data_file
+    slurp_file
     xml_found_node_ok
     xml_node_content_is
 );
@@ -24,6 +27,13 @@ my @namespaces = (
     [ nssaml    => 'urn:oasis:names:tc:SAML:2.0:assertion' ],
     [ nssamlp   => 'urn:oasis:names:tc:SAML:2.0:protocol' ],
     [ nssoapenv => 'http://schemas.xmlsoap.org/soap/envelope/' ],
+    [ soap  => "http://www.w3.org/2003/05/soap-envelope" ],
+    [ wsse  => "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" ],
+    [ wsu   => "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" ],
+    [ wst   => "http://docs.oasis-open.org/ws-sx/ws-trust/200512" ],
+    [ wsa   => "http://www.w3.org/2005/08/addressing" ],
+    [ iCMS  => "urn:nzl:govt:ict:stds:authn:deployment:igovt:gls:iCMS:1_0" ],
+    [ ds    => "http://www.w3.org/2000/09/xmldsig#" ],
 );
 
 my $Test = Test::Builder->new();
@@ -32,10 +42,24 @@ sub test_conf_dir {
     return File::Spec->catdir($FindBin::Bin, 'test-conf');
 }
 
+sub test_conf_file {
+    return File::Spec->catdir($FindBin::Bin, 'test-conf', shift);
+}
+
 sub test_data_file {
     return File::Spec->catdir($FindBin::Bin, 'test-data', shift);
 }
 
+sub slurp_file {
+    my($path) = @_;
+
+    my $data = do {
+        local($/) = undef;
+        open my $fh, '<', $path;
+        <$fh>;
+    };
+    return $data;
+}
 
 sub xml_found_node_ok {
     my($xml, $xpath) = @_;
@@ -77,6 +101,10 @@ sub xml_node_content_is {
             $msg = "expected 1 match, found: " . @nodes;
         }
     }
+    else {
+        $msg = "parsing SAML XML failed";
+    }
+
     $Test->ok($ok, $desc);
     $Test->diag($msg) if $msg;
 }

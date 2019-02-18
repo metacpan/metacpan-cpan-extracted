@@ -1,0 +1,8 @@
+lib/Config/Tree.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/fail.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -40,13 +40,13 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/trapd00r/Term-ExtendedColor-Xresources/issues"
-      },
       "repository" : {
-         "url" : "https://github.com/trapd00r/Term-ExtendedColor-Xresources"
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/Term-ExtendedColor-Xresources.git",
+         "web" : "https://github.com/trapd00r/Term-ExtendedColor-Xresources",
+         "x_bugtracker" : "https://github.com/trapd00r/Term-ExtendedColor-Xresources/issues"
       }
    },
-   "version" : "0.080",
+   "version" : "0.084",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

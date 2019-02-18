@@ -1,4 +1,8 @@
-Revision history for Perl extension Starch::Plugin::Sereal.
+Revision history for Perl extension Starch-Plugin-Sereal.
+
+0.03 2019-02-18T06:01:42Z
+
+ - Migrate build tooling from Dist::Zilla to Minilla.
 
 0.02 2015-07-21
 

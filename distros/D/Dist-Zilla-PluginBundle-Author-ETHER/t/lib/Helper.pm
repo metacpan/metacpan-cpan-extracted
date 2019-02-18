@@ -79,7 +79,7 @@ our $PREREQ_RELATIONSHIP_DEFAULT = 'requires';
 sub assert_no_git
 {
     my $tzil = shift;
-    my @git_plugins = grep { find_meta($_)->name =~ /Git(?!(?:hubMeta|Hub::Update))/ } @{$tzil->plugins};
+    my @git_plugins = grep find_meta($_)->name =~ /Git(?!(?:hubMeta|Hub::Update))/, @{$tzil->plugins};
     cmp_deeply(\@git_plugins, [], 'no git-based plugins are running here');
 }
 
@@ -95,8 +95,8 @@ sub all_plugins_in_prereqs
     my ($tzil, %options) = @_;
 
     my $bundle_name = $options{bundle_name} // '@Author::ETHER';    # TODO: default to distribution we are in
-    my %additional = map { $_ => undef } @{ $options{additional} // [] };
-    my %exempt = map { $_ => undef } @{ $options{exempt} // [] };
+    my %additional = map +($_ => undef), @{ $options{additional} // [] };
+    my %exempt = map +($_ => undef), @{ $options{exempt} // [] };
     my $prereq_plugin_phase = $options{prereq_plugin_phase} // $PREREQ_PHASE_DEFAULT;
     my $prereq_plugin_relationship = $options{prereq_plugin_relationship} // $PREREQ_RELATIONSHIP_DEFAULT;
 
@@ -104,8 +104,8 @@ sub all_plugins_in_prereqs
     my $dist_meta = $tzil->distmeta;
 
     subtest "all plugins in use are specified as *required* runtime prerequisites by the plugin bundle, or injected as $prereq_plugin_phase-$prereq_plugin_relationship prerequisites by the distribution (unless option disabled)" => sub {
-        foreach my $plugin (uniq map { find_meta($_)->name }
-            grep { $_->plugin_name =~ /^$bundle_name\/[^@]/ } @{$tzil->plugins})
+        foreach my $plugin (uniq map find_meta($_)->name,
+            grep $_->plugin_name =~ /^$bundle_name\/[^@]/, @{$tzil->plugins})
         {
             note($plugin . ' is explicitly exempted; skipping'), next
                 if exists $exempt{$plugin};

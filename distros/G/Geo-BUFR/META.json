@@ -1,0 +1,53 @@
+{
+   "abstract" : "Perl extension for handling of WMO BUFR files.",
+   "author" : [
+      "P.Sannes <pal.sannes@met.no>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-BUFR",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "Cwd" : "0",
+            "DynaLoader" : "0",
+            "File::Spec::Functions" : "0",
+            "FileHandle" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Test::More" : "0",
+            "Time::Local" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.37"
+}

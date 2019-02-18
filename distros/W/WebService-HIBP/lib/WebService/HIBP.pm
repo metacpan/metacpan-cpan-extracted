@@ -9,7 +9,7 @@ use Digest::SHA();
 use WebService::HIBP::Breach();
 use WebService::HIBP::Paste();
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 sub _LENGTH_OF_PASSWORD_PREFIX { return 5; }
 
@@ -19,15 +19,38 @@ sub new {
     bless $self, $class;
     $self->{url}          = 'https://haveibeenpwned.com/api/v2/';
     $self->{password_url} = 'https://api.pwnedpasswords.com/range/';
-    $self->{ua}           = LWP::UserAgent->new( agent => 'WebService::HIBP ' );
+    $self->{ua}           = LWP::UserAgent->new( agent => 'WebService-HIBP' );
     $self->{ua}->env_proxy();
     return $self;
+}
+
+sub _get {
+    my ( $self, $url ) = @_;
+    my $response = $self->{ua}->get($url);
+    $self->{last_response} = $response;
+    return $response;
+}
+
+sub last_request {
+    my ($self) = @_;
+    if ( defined $self->{last_response} ) {
+        return $self->{last_response}->request();
+    }
+    return;
+}
+
+sub last_response {
+    my ($self) = @_;
+    if ( defined $self->{last_response} ) {
+        return $self->{last_response};
+    }
+    return;
 }
 
 sub data_classes {
     my ($self)   = @_;
     my $url      = $self->{url} . 'dataclasses';
-    my $response = $self->{ua}->get($url);
+    my $response = $self->_get($url);
     if ( $response->is_success() ) {
         my $json = JSON::decode_json( $response->decoded_content() );
         my @classes;
@@ -44,7 +67,7 @@ sub data_classes {
 sub breach {
     my ( $self, $name ) = @_;
     my $url      = $self->{url} . 'breach/' . $name;
-    my $response = $self->{ua}->get($url);
+    my $response = $self->_get($url);
     if ( $response->is_success() ) {
         my $json = JSON::decode_json( $response->decoded_content() );
         return WebService::HIBP::Breach->new( %{$json} );
@@ -58,7 +81,7 @@ sub pastes {
     my ( $self, $account ) = @_;
     my $url =
       $self->{url} . 'pasteaccount/' . URI::Escape::uri_escape($account);
-    my $response = $self->{ua}->get($url);
+    my $response = $self->_get($url);
     if ( $response->is_success() ) {
         my $json = JSON::decode_json( $response->decoded_content() );
         my @pastes;
@@ -78,7 +101,7 @@ sub breaches {
     if ( $parameters{domain} ) {
         $url .= '?domain=' . URI::Escape::uri_escape( $parameters{domain} );
     }
-    my $response = $self->{ua}->get($url);
+    my $response = $self->_get($url);
     if ( $response->is_success() ) {
         my $json = JSON::decode_json( $response->decoded_content() );
         my @breaches;
@@ -110,7 +133,7 @@ sub account {
     if (@filters) {
         $url .= q[?] . join q[&], @filters;
     }
-    my $response = $self->{ua}->get($url);
+    my $response = $self->_get($url);
     if ( $response->is_success() ) {
         my $json = JSON::decode_json( $response->decoded_content() );
         my @breaches;
@@ -129,7 +152,7 @@ sub password {
     my $sha1 = uc Digest::SHA::sha1_hex($password);
     my $url = $self->{password_url} . substr $sha1, 0,
       _LENGTH_OF_PASSWORD_PREFIX();
-    my $response = $self->{ua}->get($url);
+    my $response = $self->_get($url);
     if ( $response->is_success() ) {
         my $remainder = substr $sha1, _LENGTH_OF_PASSWORD_PREFIX();
         foreach my $line ( split /\r\n/smx, $response->decoded_content() ) {
@@ -154,7 +177,7 @@ WebService::HIBP - An interface to the Have I Been Pwned webservice at haveibeen
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =head1 SYNOPSIS
 
@@ -285,6 +308,14 @@ This method takes a single parameter which is the email address to be searched f
     foreach my $paste ( $hibp->pastes( 'test@example.com' ) ) {
         say $paste->source();
     }
+
+=head2 last_request
+
+This method returns the L<request|HTTP::Request> that was sent to the L<https://haveibeenpwned.com/api/v2/> API.  This method is intended to only aid troubleshooting in the event of an error response.
+
+=head2 last_response
+
+This method returns the L<response|HTTP::Response> that came from the L<https://haveibeenpwned.com/api/v2/> API.  This method is intended to only aid troubleshooting in the event of an error response.
 
 =head1 DIAGNOSTICS
 

@@ -1,9 +1,6 @@
 package MooseX::Types::Data::Serializer;
-{
-  $MooseX::Types::Data::Serializer::VERSION = '0.02';
-}
-use strict;
-use warnings;
+
+$MooseX::Types::Data::Serializer::VERSION = '0.03';
 
 =head1 NAME
 
@@ -78,6 +75,9 @@ This is a L<MooseX::Types> type that works just like the Data::Serializer type.
 Just like the Serializer type, but for Data::Serializer::Raw.
 
 =cut
+
+use strict;
+use warnings;
 
 use Moose::Util::TypeConstraints;
 use Data::Serializer;

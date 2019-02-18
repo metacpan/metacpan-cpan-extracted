@@ -1,0 +1,9 @@
+Revision history for Spreadsheet-Read-Ingester
+
+0.002     2019-02-18 16:30:48-05:00 America/New_York
+
+  - Fix test so it only attempts to delete files when cleaning up
+
+0.001     2019-02-18 13:26:23-05:00 America/New_York
+
+  - Initial commit

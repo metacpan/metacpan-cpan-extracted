@@ -8,7 +8,7 @@ use Moose;
 use Math::Expression;
 use DateTime::Format::Strptime;
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 # ========================================================================== #
 

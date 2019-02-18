@@ -1,0 +1,10 @@
+Revision history for Alt-FFI-Raw-Platypus
+
+0.03      2019-02-16 18:21:10 -0500
+  - Fix configure prereqs
+
+0.02      2019-02-16 09:35:12 -0500
+  - First CPAN release
+
+0.01      2019-02-14 14:01:36 -0500
+  - initial version

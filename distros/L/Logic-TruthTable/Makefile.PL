@@ -6,6 +6,7 @@ WriteMakefile
   'NAME' => 'Logic::TruthTable',
   'VERSION_FROM' => 'lib/Logic/TruthTable.pm',
   'PREREQ_PM' => {
+                   'Algorithm::QuineMcCluskey' => '1',
                    'Carp' => 0,
                    'Convert::Base81' => '1.00',
                    'JSON' => '2.61',

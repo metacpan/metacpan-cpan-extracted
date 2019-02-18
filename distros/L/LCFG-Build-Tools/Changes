@@ -1,6 +1,16 @@
-2019-01-24  SVN: new release
+2019-02-18  SVN: new release
 
-	* Release: 0.9.19
+	* Release: 0.9.20
+
+2019-02-18 09:34  squinney@INF.ED.AC.UK
+
+	* Makefile.PL: Fixed missing comma in prereq list of packages,
+	  closes: https://rt.cpan.org/Public/Bug/Display.html?id=128543
+
+2019-01-24 10:50  squinney@INF.ED.AC.UK
+
+	* Changes, debian/changelog, lcfg.yml: LCFG-Build-Tools release:
+	  0.9.19
 
 2019-01-24 10:39  squinney@INF.ED.AC.UK
 

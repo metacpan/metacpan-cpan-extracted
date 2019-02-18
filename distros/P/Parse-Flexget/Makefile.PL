@@ -3,33 +3,33 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile1(
-    META_MERGE => {
-        resources => {
-
-        repository      => q{https://github.com/trapd00r/Parse-Flexget},
-        bugtracker      => q{https://github.com/trapd00r/Parse-Flexget/issues},
+  META_MERGE => {
+    q(meta-spec) => { version => 2 },
+      resources => {
+          repository => {
+            type       => 'git',
+            url        => 'https://github.com/trapd00r/Parse-Flexget.git',
+            web        => 'https://github.com/trapd00r/Parse-Flexget',
+            bugtracker => 'https://github.com/trapd00r/Parse-Flexget/issues',
       },
     },
-    BUILD_REQUIRES      => { },
+  },
 
-    NAME                => q{Parse-Flexget},
-    AUTHOR              => q{Magnus Woldrich <trapd00r@trapd00r.se>},
-    ABSTRACT            => q{Parse the flexget log format},
-    VERSION_FROM        => q{lib/Parse/Flexget.pm},
-    LICENSE             => q{perl},
+  NAME                => q{Parse::Flexget},
+  AUTHOR              => q{Magnus Woldrich <m@japh.se>},
+  ABSTRACT            => q{Parse the flexget log format},
+  VERSION_FROM        => q{lib/Parse/Flexget.pm},
+  LICENSE             => q{perl},
+  MIN_PERL_VERSION    => 5.010,
 
-    PL_FILES            => { },
-    EXE_FILES           => [ ],
-    PREREQ_PM           => {
-      q{Test::More}     => 0,
-    },
-    MAN1PODS            => { },
-    dist                => {
-      COMPRESS          => 'gzip -9f', SUFFIX => 'gz',
-    },
-    clean               => {
-      FILES              => q{Parse-Flexget-*}
-    },
+  PL_FILES            => { },
+  EXE_FILES           => [ ],
+  dist                => {
+    COMPRESS          => 'gzip -9f', SUFFIX => 'gz',
+  },
+  clean               => {
+    FILES              => q{Parse-Flexget-*}
+  },
 );
 
 sub WriteMakefile1 {

@@ -1,5 +1,7 @@
 package Starch::Plugin::Net::Statsd::Manager;
-$Starch::Plugin::Net::Statsd::Manager::VERSION = '0.02';
+
+$Starch::Plugin::Net::Statsd::Manager::VERSION = '0.03';
+
 use Types::Common::String -types;
 use Types::Common::Numeric -types;
 

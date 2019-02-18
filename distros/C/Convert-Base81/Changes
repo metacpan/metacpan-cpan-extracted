@@ -1,5 +1,9 @@
 Revision history for Convert-Base81
 
+1.01
+	2019-02-18
+	- Typo purge. Fix links and incorrect =head numbers.
+
 1.00    2018-10-30
         First version, released on an unsuspecting world.
 

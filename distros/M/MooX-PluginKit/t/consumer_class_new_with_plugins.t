@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 use strictures 2;
-use Test::More;
+use Test2::V0;
 
 {
   package Consumer;
@@ -44,19 +44,19 @@ my $consumer = Consumer->new( plugins=>['::AllPlugin'] );
 my $foo = $consumer->class_new_with_plugins('Consumer::Foo');
 my $bar = $consumer->class_new_with_plugins('Consumer::Bar');
 
-is_deeply(
+is(
   [$consumer->test()],
   ['Consumer::AllPlugin', 'Consumer'],
   'base consumer',
 );
 
-is_deeply(
+is(
   [$foo->test()],
   ['Consumer::FooPlugin', 'Consumer::AllPlugin', 'Consumer::Foo'],
   'sub object 1',
 );
 
-is_deeply(
+is(
   [$bar->test()],
   ['Consumer::BarPlugin', 'Consumer::AllPlugin', 'Consumer::Bar'],
   'sub object 2',

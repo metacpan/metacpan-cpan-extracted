@@ -9,11 +9,11 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
         roles => [],
 
         api => {
-            signin          => undef,    # $api->{'Auth/signin'},
-            signout         => undef,    # $api->{'Auth/signout'},
-            setLocale       => undef,    # $api->{'Auth/set_locale'},
-            changePassword  => undef,    # $api->{'Auth/change_password'},
-            recoverPassword => undef,    # $api->{'Auth/recover_password'},
+            signin          => undef,    # $api{'Auth/signin'},
+            signout         => undef,    # $api{'Auth/signout'},
+            setLocale       => undef,    # $api{'Auth/set_locale'},
+            changePassword  => undef,    # $api{'Auth/change_password'},
+            recoverPassword => undef,    # $api{'Auth/recover_password'},
         },
 
         # MATERIAL THEME
@@ -94,7 +94,7 @@ JS
                     me.unmask();
 
                     var item = me.getView().add({
-                        xtype: "$type->{connection_error}",
+                        xtype: "$type{connection_error}",
                         callback: function () {
                             me.getView().remove(item);
 
@@ -385,7 +385,7 @@ JS
         # ROUTES HANDLERS
         routeChangePassword => func ['values'], <<"JS",
             Ext.Viewport.add({
-                xtype: "$type->{change_password}",
+                xtype: "$type{change_password}",
                 token: values.token,
                 redirectOnClose: ''
             }).show();
@@ -462,7 +462,7 @@ JS
 
 sub EXT_signin : Extend('Ext.Dialog') : Type('widget') {
     return {
-        controller => $type->{signin_controller},
+        controller => $type{signin_controller},
 
         title        => { text => l10n('SIGN IN') },
         defaultFocus => 'textfield[name=username]',
@@ -562,7 +562,7 @@ JS
 
 sub EXT_change_password : Extend('Ext.Dialog') : Type('widget') {
     return {
-        controller => $type->{change_password_controller},
+        controller => $type{change_password_controller},
 
         config => {
             token           => undef,    # change password token

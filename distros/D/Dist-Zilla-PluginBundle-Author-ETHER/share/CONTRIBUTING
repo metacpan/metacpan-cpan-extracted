@@ -111,8 +111,8 @@ https://help.github.com/articles/creating-a-pull-request'
 (-f '.travis.yml' ?
 "\n\n" . 'All pull requests for this distribution will be automatically tested on Linux
 by Travis at: https://travis-ci.com/' . join('/', (split('/', $link))[-2,-1])
-. "\n" . 'All results will be visible in the pull request on GitHub. Follow the
-appropriate links for details when tests fail.'
+. "\n" . 'Results will be visible in the pull request on GitHub. Follow the appropriate
+links for details when tests fail.'
 : '')
 }
 }}

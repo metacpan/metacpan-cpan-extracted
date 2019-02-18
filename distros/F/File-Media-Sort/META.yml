@@ -2,7 +2,8 @@
 abstract: 'Sort media files based on their filename pattern'
 author:
   - 'Magnus Woldrich <m@japh.se>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -19,7 +20,6 @@ no_index:
 requires:
   Test::More: '0'
 resources:
-  bugtracker: https://github.com/trapd00r/File-Media-Sort/issues
-  repository: https://github.com/trapd00r/File-Media-Sort
-version: '0.064'
+  repository: https://github.com/trapd00r/File-Media-Sort.git
+version: '0.068'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

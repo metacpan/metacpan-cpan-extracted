@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-OpenCage
 
+0.19    2019-02-18
+        - use JSON::MaybeXS as using CPanel::JSON::XS directly seems to 
+          to be causing test failures
+
 0.19    2019-02-15
         - skip some tests if not online. No code changes.
         

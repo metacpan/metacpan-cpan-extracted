@@ -48,13 +48,13 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/trapd00r/makedist/issues"
-      },
       "repository" : {
-         "url" : "https://github.com/trapd00r/makedist"
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/makedist.git",
+         "web" : "https://github.com/trapd00r/makedist",
+         "x_bugtracker" : "https://github.com/trapd00r/makedist/issues"
       }
    },
-   "version" : "0.016",
+   "version" : "0.026",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

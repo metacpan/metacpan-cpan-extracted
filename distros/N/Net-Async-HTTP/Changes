@@ -1,5 +1,10 @@
 Revision history for Net-Async-HTTP
 
+0.44    2019-02-17 14:11:57
+        [BUGFIXES]
+         * Regnerate embedded SSL testing certs
+         * No actual code changes
+
 0.43    2018-11-14 22:05:27
         [CHANGES]
          * Use IPTOS_* constants directly from Socket 2.010

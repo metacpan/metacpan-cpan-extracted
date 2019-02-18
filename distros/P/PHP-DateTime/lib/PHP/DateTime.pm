@@ -1,5 +1,7 @@
 package PHP::DateTime;
 
+$PHP::DateTime::VERSION = '0.07';
+
 =head1 NAME
 
 PHP::DateTime - Clone of PHP's date and time functions.
@@ -39,7 +41,7 @@ use Time::Timezone qw();
 use Time::HiRes qw();
 use Time::Local qw();
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 my $days_short   = [qw( Sun Mon Tue Wed Thr Fri Sat )];
 my $days_long    = [qw( Sunday Monday Tuesday Wednesday Thursday Friday Saturday )];

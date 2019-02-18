@@ -21,12 +21,12 @@ name: Convert-Base85
 provides:
   Convert::Base85:
     file: lib/Convert/Base85.pm
-    version: '1.00'
+    version: '1.01'
 requires:
   Math::Int128: '0.22'
   perl: v5.16.1
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/jgamble/Convert-Base85.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

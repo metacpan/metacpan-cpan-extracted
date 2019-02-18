@@ -5,10 +5,10 @@ use warnings;
 # $Id: DevOSXPkg.pm.in 35277 2019-01-09 10:38:18Z squinney@INF.ED.AC.UK $
 # $Source: /var/cvs/dice/LCFG-Build-Tools/lib/LCFG/Build/Tool/DevOSXPkg.pm.in,v $
 # $Revision: 35277 $
-# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_19/lib/LCFG/Build/Tool/DevOSXPkg.pm.in $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_9_20/lib/LCFG/Build/Tool/DevOSXPkg.pm.in $
 # $Date: 2019-01-09 10:38:18 +0000 (Wed, 09 Jan 2019) $
 
-our $VERSION = '0.9.19';
+our $VERSION = '0.9.20';
 
 use LCFG::Build::Utils::OSXPkg;
 
@@ -77,7 +77,7 @@ __END__
 
 =head1 VERSION
 
-    This documentation refers to LCFG::Build::Tool::DevOSXPkg version 0.9.19
+    This documentation refers to LCFG::Build::Tool::DevOSXPkg version 0.9.20
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 use strictures 2;
-use Test::More;
+use Test2::V0;
 
 {
   package ConsumerDefault;
@@ -47,7 +47,7 @@ foreach my $test (@tests) {
 
   my $actual = [ $class->new( plugins=>$plugins )->test() ];
 
-  is_deeply(
+  is(
     $actual, $expected,
     "$class with plugins " . join(', ', @$plugins),
   );

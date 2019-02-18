@@ -129,11 +129,11 @@ Logic::TruthTable - Create and solve sets of boolean equations.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 
 =head1 SYNOPSIS
@@ -228,9 +228,9 @@ A title for the problem you are solving.
 I<Default value: '-'>
 
 Change the representation of the don't-care character. The don't-care
-character is used both in the columnstring, as character in exported
+character is used in the columnstring, as character in exported
 CSV files, and internally as a place holder for eliminated variables
-in the equation. Some of those internals may be examined via other methods.
+in the equation, which may be examined with other methods.
 
 This becomes the I<default> value of the function columns; it may be
 individually overridden in each C<columns> attribute.
@@ -664,6 +664,11 @@ don't-care character, which we can set with the 'dc' option:
 
         close $fh_mwc or warn "Error closing CSV file: $!";
     }
+    else
+    {
+        warn "Error opening CSV file: $!";
+    }
+
 
 The JSON file will store all of the attributes that were in the
 truth table, except for the algorithm, which will have to be
@@ -687,9 +692,6 @@ become the truth table's default character.
 
 The method returns undef if an error is encountered. On
 success it returns the truth table object.
-
-Note that the CSV export cannot write Logic Friday's minimized export
-format, but only the full-sized, not-minimized, files.
 
 =cut
 
@@ -910,9 +912,6 @@ The terms to use when creating the columns. May be either C<minterms>
 =back
 
 The method returns undef if an error is encountered.
-
-Note that C<import_csv()> cannot read Logic Friday's minimized export
-format, only its full, not-minimized files.
 
 =cut
 
@@ -1135,7 +1134,7 @@ John M. Gamble, C<< <jgamble at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-boolean-truthtable at rt.cpan.org>,
+Please report any bugs or feature requests to C<bug-logic-truthtable at rt.cpan.org>,
 or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Logic-TruthTable>. I will
 be notified, and then you'll automatically be notified of progress on your
@@ -1143,32 +1142,9 @@ bug as I make changes.
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+This module is on Github at L<https://github.com/jgamble/Logic-TruthTable>
 
-    perldoc Logic::TruthTable
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Logic-TruthTable>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Logic-TruthTable>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Logic-TruthTable>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Logic-TruthTable/>
-
-=back
-
+You can also look for information on L<MetaCPAN|https://metacpan.org/release/Logic-TruthTable>
 
 =head1 SEE ALSO
 
@@ -1184,18 +1160,25 @@ Discrete Mathematics and its Applications, by Kenneth H. Rosen, 1995
 
 =item
 
-L<Logic Friday|http://sontrak.com/>: "Free software for boolean logic optimization, analysis, and synthesis."
+L<Logic Friday|https://web.archive.org/web/20180204131842/http://sontrak.com/>
+("Free software for boolean logic optimization, analysis, and synthesis.")
+was located on its website until some time after 4 February 2018, at which
+point it shut down. It was enormously useful, and can still be found on
+The Wayback Machine.
+
+It has two forms of its export format, a standard CSV file, and a minimized
+version of the CSV file that unfortunately was not documented. This is
+why only the standard CSV file can be read or written.
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017 John M. Gamble. All rights reserved. This program is
+Copyright (c) 2019 John M. Gamble. All rights reserved. This program is
 free software; you can redistribute it and/or modify it under the same
 terms as Perl itself.
 
 See L<http://dev.perl.org/licenses/> for more information.
-
 
 =cut
 

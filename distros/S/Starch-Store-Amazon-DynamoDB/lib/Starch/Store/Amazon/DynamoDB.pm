@@ -1,5 +1,7 @@
 package Starch::Store::Amazon::DynamoDB;
-$Starch::Store::Amazon::DynamoDB::VERSION = '0.04';
+
+$Starch::Store::Amazon::DynamoDB::VERSION = '0.05';
+
 =head1 NAME
 
 Starch::Store::Amazon::DynamoDB - Starch storage backend using Amazon::DynamoDB.
@@ -253,105 +255,7 @@ has connect_on_create => (
     default => 1,
 );
 
-=head1 ATTRIBUTES
-
-=head1 reap_scan_filter
-
-Returns the data structure used for the C<ScanFilter> argument when
-scanning for states to reap.  This ScanFilter will find all states
-which have an L</expiration_field> less than the current time.
-
-=cut
-
-sub reap_scan_filter {
-    my ($self) = @_;
-
-    return {
-        $self->expiration_field() => {
-            ComparisonOperator => 'LT',
-            AttributeValueList => time(),
-        },
-    };
-}
-
 =head1 METHODS
-
-=head2 reap_expired
-
-This scans the L</table> for all state data which matches the
-L</reap_scan_filter> and deletes the data found.  This could take
-a very long time to run depending on the amount of data.
-Consider setting up a log adapter (see L<Starch/LOGGING>) as this
-method will produce info logs as it runs.
-
-=cut
-
-sub can_reap_expired { 1 }
-
-sub reap_expired {
-    my ($self) = @_;
-
-    my $ddb = $self->ddb();
-    my $table = $self->table();
-    my $key_field = $self->key_field();
-
-    my @keys;
-
-    $self->log->infof(
-        'Scanning DynamoDB for expired states in the %s table.',
-        $table,
-    );
-
-    try {
-        $ddb->scan(
-            sub {
-                my ($record) = @_;
-                push @keys, $record->{ $key_field };
-            },
-            TableName       => $table,
-            AttributesToGet => [ $key_field ],
-            ScanFilter      => $self->reap_scan_filter(),
-        )->get();
-    }
-    catch {
-        $self->_throw_ddb_error( 'scan', $_ )
-    };
-
-    if (!@keys) {
-        $self->log->infof('No expired states found in DynamoDB.');
-        return;
-    }
-
-    $self->log->infof(
-        'Deleting %d expired states in DynamoDB.',
-        @keys + 0,
-    );
-
-    try {
-        $ddb->batch_write_item(
-            RequestItems => {
-                $table => [
-                    map { {
-                        DeleteRequest => {
-                            Key => { $key_field => $_ },
-                        },
-                    } }
-                    @keys
-                ],
-            },
-        )->get();
-    }
-    catch {
-        $self->_throw_ddb_error( 'batch_write_item', $_ )
-    };
-
-    $self->log->infof(
-        'Finished deleting %d expired states from DynamoDB.',
-        @keys + 0,
-    );
-
-    return;
-}
 
 =head2 create_table_args
 

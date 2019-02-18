@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 use strictures 2;
-use Test::More;
+use Test2::V0;
 
 use MooX::PluginKit::Core;
 
@@ -85,7 +85,7 @@ foreach my $class (qw( ConsumerFoo ConsumerBar )) {
   foreach my $test (@tests) {
     my $plugin = shift( @$test );
 
-    is_deeply(
+    is(
       [ build_class_with_plugins( $class, $plugin )->new->test() ],
       $test,
       "$plugin applied to $class includes " . join(', ', @$test),

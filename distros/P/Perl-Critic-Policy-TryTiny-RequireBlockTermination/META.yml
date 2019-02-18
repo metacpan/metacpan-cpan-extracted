@@ -1,26 +1,41 @@
 ---
 abstract: 'Requires that try/catch/finally blocks are properly terminated.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
-  Test::More: '0'
-  Test::Simple: '0.96'
+  Test2::V0: '0.000094'
   Try::Tiny: '0.19'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Perl-Critic-Policy-TryTiny-RequireBlockTermination
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Perl::Critic::Policy::TryTiny::RequireBlockTermination:
+    file: lib/Perl/Critic/Policy/TryTiny/RequireBlockTermination.pm
+    version: '0.02'
 requires:
   Perl::Critic: '1.123'
 resources:
   bugtracker: https://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireBlockTermination/issues
   homepage: https://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireBlockTermination
-  repository: https://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireBlockTermination.git
-version: '0.01'
+  repository: git://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireBlockTermination.git
+version: '0.02'
+x_contributors:
+  - 'Aran Deltac <aran@ziprecruiter.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

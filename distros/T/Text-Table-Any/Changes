@@ -1,3 +1,10 @@
+0.095   2019-02-17 (PERLANCAR)
+
+	- Add backend: Term::TablePrint.
+
+	- Text::Table::CSV & Text::Table::TSV does not observe header_row.
+
+
 0.094   2019-01-11 (PERLANCAR)
 
 	- Add @BACKENDS and backends() to let users get the list of

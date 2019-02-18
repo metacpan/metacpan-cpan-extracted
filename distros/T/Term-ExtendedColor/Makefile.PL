@@ -4,9 +4,14 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile1(
   META_MERGE => {
+    q(meta-spec) => { version => 2 },
     resources => {
-      repository => q{https://github.com/trapd00r/Term-ExtendedColor},
-      bugtracker => q{https://github.com/trapd00r/Term-ExtendedColor/issues},
+      repository => {
+        type       => 'git',
+        url        => 'https://github.com/trapd00r/Term-ExtendedColor.git',
+        web        => 'https://github.com/trapd00r/Term-ExtendedColor',
+        bugtracker => 'https://github.com/trapd00r/Term-ExtendedColor/issues',
+      },
     },
   },
 
@@ -54,5 +59,3 @@ sub WriteMakefile1 {
 
   WriteMakefile(%params);
 }
-
-

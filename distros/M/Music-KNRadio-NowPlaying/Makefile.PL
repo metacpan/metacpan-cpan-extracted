@@ -4,9 +4,14 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile1(
   META_MERGE => {
-    resources => {
-      repository => q{https://github.com/trapd00r/Music-KNRadio-NowPlaying},
-      bugtracker => q{https://github.com/trapd00r/makedist/issues},
+    q(meta-spec) => { version => 2 },
+      resources => {
+          repository => {
+            type       => 'git',
+            url        => 'https://github.com/trapd00r/Music-KNRadio-NowPlaying.git',
+            web        => 'https://github.com/trapd00r/Music-KNRadio-NowPlaying',
+            bugtracker => 'https://github.com/trapd00r/Music-KNRadio-NowPlaying/issues',
+      },
     },
   },
 
@@ -15,6 +20,8 @@ WriteMakefile1(
   ABSTRACT                      => q{Now playing metadata for Karlstad Rock 92.2},
   VERSION_FROM                  => q{lib/Music/KNRadio/NowPlaying.pm},
   LICENSE                       => q{perl},
+  MIN_PERL_VERSION              => 5.010,
+
   EXE_FILES                     => [
     glob("bin/*"),
   ],
@@ -60,5 +67,3 @@ sub WriteMakefile1 {
 
   WriteMakefile(%params);
 }
-
-

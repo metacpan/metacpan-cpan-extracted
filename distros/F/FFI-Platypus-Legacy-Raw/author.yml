@@ -1,0 +1,39 @@
+---
+pod_spelling_system:
+  skip: 0
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  stopwords:
+    - Alessandro
+    - Ctypes
+    - Ghedini
+    - libffi
+    - memptr
+    - str
+    - uchar
+    - uint
+    - ulong
+    - ushort
+    - ALEXBIO
+    - Bakkiaraj
+    - CALID
+    - MLX
+    - Mengu
+    - MidLifeXis
+    - Murugesan
+    - Steinbrunner
+    - Wightman
+    - bakkiaraj
+    - dsteinbrunner
+    - ghedo
+    - xsub
+    - libc
+    - customizations
+
+pod_coverage:
+  skip: 0
+  # format is "Class#method" or "Class", regex allowed
+  # for either Class or method.
+  private:
+    - FFI::Platypus::Legacy::Raw::MemPtr#tostr
+    - FFI::Platypus::Legacy::Raw::Platypus

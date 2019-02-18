@@ -24,7 +24,6 @@ requires:
   Term::ExtendedColor: '0'
   Term::ExtendedColor::Xresources: '0'
 resources:
-  bugtracker: https://github.com/trapd00r/rgbterm/issues
-  repository: https://github.com/trapd00r/rgbterm
-version: '0.022'
+  repository: https://github.com/trapd00r/rgbterm.git
+version: '0.026'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

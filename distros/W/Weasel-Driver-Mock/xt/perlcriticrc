@@ -1,0 +1,64 @@
+# Fail if listed policy modules are not available
+#profile-strictness = fatal
+
+# 1 is the most strict setting, which is the
+# default when only == 1
+severity = 1
+
+verbose = 9
+#verbose =%s %p %f   %l\n
+#verbose =%f %p   %l  (%s)\n
+color =  1
+pager = less
+
+theme     =
+exclude   = 'OTRS::'
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[-CodeLayout::RequireTidyCode]
+
+[ControlStructures::ProhibitPostfixControls]
+allow = for if until while
+
+[-Documentation::PodSpelling]
+
+[-Documentation::RequirePodAtEnd]
+[-Documentation::RequirePodLinksIncludeText]
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | DEPENDENCIES | SUBROUTINES/METHODS | AUTHOR | BUGS AND LIMITATIONS | SOURCE | LICENSE AND COPYRIGHT
+
+[-InputOutput::RequireBriefOpen]
+# Brief open doesn't work for _copy_file()
+
+[Modules::ProhibitEvilModules]
+modules = Carp::Always Data::Printer
+
+[-RegularExpressions::ProhibitEscapedMetacharacters]
+[-RegularExpressions::RequireBracesForMultiline]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[Subroutines::RequireArgUnpacking]
+allow_delegation_to = execute_script
+
+[Variables::ProhibitPunctuationVars]
+string_mode = thorough
+
+#--------------------------------------------------------------
+# I think these are really important, so always load them
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 1
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 1
+
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+
+#--------------------------------------------------------------
+# For all other Policies, I accept the default severity,
+# so no additional configuration is required for them.
+

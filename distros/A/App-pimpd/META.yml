@@ -27,7 +27,6 @@ requires:
   Time::Duration: '0'
   perl: '5.010'
 resources:
-  bugtracker: https://github.com/trapd00r/pimpd2/issues
-  repository: https://github.com/trapd00r/pimpd2
-version: '0.342'
+  repository: https://github.com/trapd00r/pimpd2.git
+version: '0.346'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

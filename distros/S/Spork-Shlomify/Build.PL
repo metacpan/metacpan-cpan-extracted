@@ -18,17 +18,18 @@ my %module_build_args = (
     "Shlomi Fish"
   ],
   "dist_name" => "Spork-Shlomify",
-  "dist_version" => "0.0204",
+  "dist_version" => "0.0400",
   "license" => "mit",
   "module_name" => "Spork::Shlomify",
   "recursive_test_files" => 1,
   "requires" => {
+    "CGI" => 0,
     "Cwd" => 0,
     "Spoon" => "0.22",
     "Spork" => 0,
     "Spork::Config" => 0,
     "Spork::Formatter" => 0,
-    "Spork::Slides" => 0,
+    "mixin" => 0,
     "perl" => "5.008",
     "strict" => 0,
     "warnings" => 0

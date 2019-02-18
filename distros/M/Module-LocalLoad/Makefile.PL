@@ -3,33 +3,32 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile1(
-    META_MERGE => {
-        resources => {
-
-        repository      => q{https://github.com/trapd00r/Module-LocalLoad},
-        bugtracker      => q{https://github.com/trapd00r/Module-LocalLoad/issues},
+  META_MERGE => {
+    q(meta-spec) => { version => 2 },
+      resources => {
+          repository => {
+            type       => 'git',
+            url        => 'https://github.com/trapd00r/Module-LocalLoad.git',
+            web        => 'https://github.com/trapd00r/Module-LocalLoad',
+            bugtracker => 'https://github.com/trapd00r/Module-LocalLoad/issues',
       },
     },
-    BUILD_REQUIRES      => { },
+  },
 
-    NAME                => q{Module-LocalLoad},
-    AUTHOR              => q{Magnus Woldrich <trapd00r@trapd00r.se>},
-    ABSTRACT            => q{Create a local safe haven for global modules},
-    VERSION_FROM        => q{lib/Module/LocalLoad.pm},
-    LICENSE             => q{perl},
+  NAME                => q{Module::LocalLoad},
+  AUTHOR              => q{Magnus Woldrich <m@japh.se>},
+  ABSTRACT            => q{Create a local safe haven for global modules},
+  VERSION_FROM        => q{lib/Module/LocalLoad.pm},
+  LICENSE             => q{perl},
+  MIN_PERL_VERSION    => 5.010,
 
-    PL_FILES            => { },
-    EXE_FILES           => [ ],
-    PREREQ_PM           => {
-      q{Test::More}     => 0,
-    },
-    MAN1PODS            => { },
-    dist                => {
-      COMPRESS          => 'gzip -9f', SUFFIX => 'gz',
-    },
-    clean               => {
-      FILES              => q{Module-LocalLoad-*}
-    },
+  MAN1PODS            => { },
+  dist                => {
+    COMPRESS          => 'gzip -9f', SUFFIX => 'gz',
+  },
+  clean               => {
+    FILES              => q{Module-LocalLoad-*}
+  },
 );
 
 sub WriteMakefile1 {

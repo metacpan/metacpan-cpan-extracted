@@ -4,11 +4,11 @@ package Ithumb::XS;
 
 =head1 NAME
 
-Ithumb::XS - Fast, small and simple image thumbnailazer, based on Imlib2 library.
+Ithumb::XS - image thumbnail creation routines
 
 =head1 DESCRIPTION
 
-Ithumb::XS is a very small (one function) and fast and simple Perl-XS module
+Ithumb::XS is a fast, small (one function) and simple Perl-XS module
 for creation a thumbnails, using Imlib2 library.
 
 =head1 MAINTAINERS
@@ -27,7 +27,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( create_thumbnail );
 
-our $VERSION = 'v0.1.5';
+our $VERSION = 'v0.2.1';
 
 require XSLoader;
 XSLoader::load('Ithumb::XS', $VERSION);
@@ -40,23 +40,56 @@ __END__
 
   use Ithumb::XS ();
 
-  Ithumb::XS::create_thumbnail('src.png', 100, 100, 'output.png');
+  Ithumb::XS::create_thumbnail({
+      width     => 800,
+      height    => 600,
+      src_image => 'source_image.jpg',
+      dst_image => 'destination_result_image.jpg'
+  });
+
+OO-interface:
+
+  use Ithumb::XS;
+
+  my $ithumb = Ithumb::XS->new;
+  $ithumb->convert({
+      width     => 800,
+      height    => 600,
+      src_image => 'source_image.jpg',
+      dst_image => 'destination_result_image.jpg'
+  });
 
 =head1 METHODS
 
-=head2 create_thumbnail($src_image, $width, $height, $dst_image);
+=head2 create_thumbnail($);
 
 Creates a small copy (with cropping) of the image.
 
 =over 12
 
-=item C<$src_image> - path to source image
+=item $_[0]->{width} - destination width
 
-=item C<$width> - destination width
+=item $_[0]->{height} - destination height
 
-=item C<$height> - destination height
+=item $_[0]->{src_image} - path to the source image
 
-=item C<$dst_image> - path to destionation result image
+=item $_[0]->{dst_image} - path to the destionation result image
+  
+=back
+
+=head2 convert($);
+
+Creates a small copy (with cropping) of the image for OO-interface.
+
+=over 12
+
+=item $_[0]->{width} - destination width
+
+=item $_[0]->{height} - destination height
+
+=item $_[0]->{src_image} - path to the source image
+
+=item $_[0]->{dst_image} - path to the destionation result image
   
 =back
 
@@ -64,7 +97,7 @@ Creates a small copy (with cropping) of the image.
 
 BSD 3-Clause License
 
-Copyright (c) 2018, Peter P. Neuromantic <p.brovchenko@protonmail.com>
+Copyright (c) 2018, 2019 Peter P. Neuromantic <p.brovchenko@protonmail.com>
 All rights reserved.
 
 See LICENSE file for more details.

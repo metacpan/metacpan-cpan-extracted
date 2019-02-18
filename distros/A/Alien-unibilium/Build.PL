@@ -6,9 +6,10 @@ use Alien::make::Module::Build;
 
 my $build = Alien::make::Module::Build->new(
    module_name => 'Alien::unibilium',
-   tarball => 'unibilium-1.2.0.tar.gz',
+   tarball => 'unibilium-2.0.0+PR39.tar.gz',
    pkgconfig_module => "unibilium",
-   pkgconfig_version => "1.2.0",
+   pkgconfig_version => "2.0.0",
+   use_bundled => ( scalar grep { $_ eq "--use-bundled" } @ARGV ),
 
    build_requires => {
       'File::Basename' => 0,
@@ -19,7 +20,6 @@ my $build = Alien::make::Module::Build->new(
       'ExtUtils::PkgConfig' => 0,
    },
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

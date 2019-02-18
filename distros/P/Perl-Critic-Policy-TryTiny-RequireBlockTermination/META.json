@@ -1,0 +1,78 @@
+{
+   "abstract" : "Requires that try/catch/finally blocks are properly terminated.",
+   "author" : [
+      "Aran Clary Deltac <bluefeet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Critic-Policy-TryTiny-RequireBlockTermination",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic" : "1.123"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000094",
+            "Try::Tiny" : "0.19"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::TryTiny::RequireBlockTermination" : {
+         "file" : "lib/Perl/Critic/Policy/TryTiny/RequireBlockTermination.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireBlockTermination/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireBlockTermination",
+      "repository" : {
+         "url" : "git://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireBlockTermination.git",
+         "web" : "https://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireBlockTermination"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Aran Deltac <aran@ziprecruiter.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
+}

@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 
-# Sreview, a web-based video review and transcoding system
+# SReview, a web-based video review and transcoding system
 # Copyright (c) 2016-2017, Wouter Verhelst <w@uter.be>
 #
-# Sreview is free software: you can redistribute it and/or modify it
+# SReview is free software: you can redistribute it and/or modify it
 # under the terms of the GNU Affero General Public License as published
 # by the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
@@ -25,6 +25,7 @@ use DBI;
 use File::Path qw/make_path/;
 use File::Temp qw/tempdir/;
 use SReview::Config::Common;
+use SReview::Talk;
 use SReview::Video;
 use SReview::Video::PNGGen;
 use SReview::Video::Concat;
@@ -80,8 +81,6 @@ postroll videos to a production video
 
 =back
 
-=back
-
 =head1 CONFIGURATION
 
 C<sreview-transcode> considers the following configuration values:
@@ -98,25 +97,20 @@ The DBI string used to connect to the database
 
 =cut
 
-my $talkid = $ARGV[0];
-
 my $dbh = DBI->connect($config->get('dbistring'), '', '') or die "Cannot connect to database!";
+my $talkid = $ARGV[0];
 
 $dbh->prepare("UPDATE talks SET progress='running' WHERE id = ?")->execute($talkid);
 
 $dbh->begin_work;
 
-my $talk = $dbh->prepare("SELECT * FROM talks WHERE id = ?");
+my $talk = SReview::Talk->new(talkid => $talkid);
 
-$talk->execute($talkid);
-
-my $row = $talk->fetchrow_hashref();
-my $slug = $row->{slug};
+my $slug = $talk->slug;
 
 my $data = $dbh->prepare("SELECT eventid, event, room, room_output, starttime::date AS date, to_char(starttime, 'yyyy') AS year, speakers, name AS title, subtitle, apologynote FROM talk_list WHERE id = ?");
 $data->execute($talkid);
 my $drow = $data->fetchrow_hashref();
-my $eid = $drow->{eventid};
 
 =item pubdir
 
@@ -124,7 +118,7 @@ The directory in which to find the output of C<sreview-cut>
 
 =cut
 
-my $pubdir = $config->get('pubdir') . "/" . $eid . "/" . $drow->{date} . "/" . substr($drow->{room}, 0, 1);
+my $workdir = $talk->workdir;
 
 =item outputdir
 
@@ -209,7 +203,7 @@ sub process_template($$) {
 	system("inkscape --export-png=$output $outputsvg");
 }
 
-my $preroll = $pubdir . "/$slug-pre.png";
+my $preroll = $workdir . "/$slug-pre.png";
 
 =item preroll_template
 
@@ -224,7 +218,7 @@ if ( ! -f $preroll ) {
 	print "reusing $preroll\n";
 }
 
-my $postroll = $pubdir . "/$slug-post.png";
+my $postroll = $workdir . "/$slug-post.png";
 
 =item postroll_template
 
@@ -251,9 +245,9 @@ if ( ! -f $postroll ) {
 	print "reusing $postroll\n";
 }
 
-my $main_input = SReview::Video->new(url => "$pubdir/$slug.mkv");
+my $main_input = SReview::Video->new(url => "$workdir/$slug.mkv");
 
-my $apology = $pubdir . "/$slug-sorry.png";
+my $apology = $workdir . "/$slug-sorry.png";
 my $sorry;
 
 =item apology_template
@@ -261,6 +255,12 @@ my $sorry;
 The name of an SVG template to be used for the apology slide (shown
 right after the opening credits if an apology was entered). Only
 required if at least one talk has an apology entered.
+
+=item input_profile
+
+A profile that generates videos which can be concatenated with input
+videos without re-transcoding anything. If not specified, uses the input
+video as a "profile".
 
 =cut
 
@@ -281,15 +281,14 @@ if(defined($drow->{apologynote}) && length($drow->{apologynote}) > 0) {
 # concatenate preroll, main video, postroll
 my $pre = SReview::Video->new(url => "$tmpdir/$slug-preroll.mkv", reference => $png_profile, duration => 5);
 SReview::Videopipe->new(inputs => [SReview::Video::PNGGen->new(url => $preroll)], output => $pre, vcopy => 0, acopy => 0)->run();
-my $main = SReview::Video->new(url => "$tmpdir/$slug.mkv");
-SReview::Videopipe->new(inputs => [$main_input], output => $main)->run();
 my $post = SReview::Video->new(url => "$tmpdir/$slug-postroll.mkv", reference => $png_profile, duration => 5);
 SReview::Videopipe->new(inputs => [SReview::Video::PNGGen->new(url => $postroll, duration => 5)], output => $post, vcopy => 0, acopy => 0)->run();
 my $inputs = [ $pre ];
 if( -f "$tmpdir/$slug-sorry.mkv") {
 	push @$inputs, $sorry;
 }
-push @$inputs, ( SReview::Video->new(url => $main->url), $post );
+push @$inputs, ( $main_input, $post );
+
 my $input = SReview::Video::Concat->new(components => $inputs, url => "$tmpdir/concat.txt");
 
 =item output_profiles

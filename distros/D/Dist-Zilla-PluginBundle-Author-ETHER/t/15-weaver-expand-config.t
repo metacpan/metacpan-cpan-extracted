@@ -68,7 +68,7 @@ foreach my $test_data (@test_data)
 # Also test the outcome of my bundle's ->mvp_bundle_config against its original contents.
 cmp_deeply(
     [
-        map { Pod::Weaver::PluginBundle::Author::ETHER->_expand_config($_) }
+        map Pod::Weaver::PluginBundle::Author::ETHER->_expand_config($_),
             '@CorePrep',
             '-SingleEncoding',
             'Name',

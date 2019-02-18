@@ -1,0 +1,35 @@
+Tests:
+
+_hasa and _hash
+  * Simple but also prove that death is done correctly
+_find_raw
+  * Autovivification
+  * Scans lists and hashes correctly
+  * Propagates unexpected death
+_find
+  * Scans all stashes
+  * Proper death includes the property sought
+CONFIG
+  * Applies defaults
+  * Handles lists in scalar/void
+SECRET
+  * not written yet
+exists/true
+  * Recycle CONFIG's default test for existence/truth
+get
+  * Don't bother
+set
+  * Test that %volatile is updated
+append/prepend/replace
+  * Test that @stack is changed
+volatile/stack/default/stash
+  * Correct return values
+import
+  * Check @EXPORT, @ISA and &import
+  * Check that SECRET is the same but CONFIG has a unique coderef
+  * Verify that the re-exported functions modify/access the correct variables
+
+IO:
+
+Figure out a sane and consistent way to load and deserialise files
+with minimal magic or mental load on the user & developer.

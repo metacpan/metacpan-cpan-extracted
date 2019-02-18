@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Data::Serializer::Raw;
 
@@ -13,7 +13,7 @@ my $s = Data::Serializer::Raw->new(
 my $json = $s->serialize( {foo=>32} );
 my $data = $s->deserialize( $json );
 
-is_deeply(
+is(
     $data,
     {foo=>32},
     'serialize then deserialize worked',

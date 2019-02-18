@@ -1,12 +1,12 @@
-use strict;
-use warnings;
-use Test::More tests => 1;
+#!/usr/bin/env perl
+use strictures 2;
+use Test2::V0;
+
 use MooX::Adopt::Class::Accessor::Fast;
 
 {
   package Some::Class;
-  use strict;
-  use warnings;
+  use strictures 2;
   use base qw/Class::Accessor::Fast/;
 
   __PACKAGE__->mk_accessors(qw/ foo /);
@@ -14,4 +14,6 @@ use MooX::Adopt::Class::Accessor::Fast;
 
 my $i = bless {}, 'Some::Class';
 $i->foo(qw/bar baz/);
-is_deeply($i->foo, [qw/ bar baz /]);
+is($i->foo, [qw/ bar baz /]);
+
+done_testing;

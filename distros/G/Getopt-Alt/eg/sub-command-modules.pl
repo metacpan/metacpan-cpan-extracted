@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 use FindBin qw/$Bin/;
 use lib $Bin;
 
-our $VERSION     = version->new('0.5.0');
+our $VERSION     = version->new('0.5.1');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();

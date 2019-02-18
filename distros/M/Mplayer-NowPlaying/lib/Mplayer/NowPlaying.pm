@@ -5,7 +5,7 @@ use strict;
 BEGIN {
   require Exporter;
   use vars qw(@ISA @EXPORT_OK $VERSION);
-  $VERSION   = '0.030';
+  $VERSION   = '0.034';
   @ISA       = 'Exporter';
   @EXPORT_OK = qw(now_playing now_playing_stream);
 }
@@ -294,7 +294,7 @@ like so:
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  magnus@trapd00r.se
+  m@japh.se
   http://japh.se
 
 =head1 CONTRIBUTORS

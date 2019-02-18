@@ -1,5 +1,7 @@
 package Starch::Store::DBI;
-$Starch::Store::DBI::VERSION = '0.02';
+
+$Starch::Store::DBI::VERSION = '0.03';
+
 =head1 NAME
 
 Starch::Store::DBI - Starch storage backend using DBI.

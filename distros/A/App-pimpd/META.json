@@ -45,13 +45,13 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/trapd00r/pimpd2/issues"
-      },
       "repository" : {
-         "url" : "https://github.com/trapd00r/pimpd2"
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/pimpd2.git",
+         "web" : "https://github.com/trapd00r/pimpd2",
+         "x_bugtracker" : "https://github.com/trapd00r/pimpd2/issues"
       }
    },
-   "version" : "0.342",
+   "version" : "0.346",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

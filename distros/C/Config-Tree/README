@@ -1,0 +1,90 @@
+Config::Tree
+============
+
+Simple API to use configuration data, independent of its source.
+
+Config::Any and Config::Simple were already taken.
+
+Config::Tree is a simple module which exports (unconditionally) two
+functions, CONFIG and SECRET. SECRET is simply a wrapper around CONFIG
+which will (when it's written) decode the value obtained in some
+fashion.
+
+Config::Tree can be used as a standalone module accessing a global
+configuration or subclassed to access application-specific
+configuration.
+
+Actual configuration data is stored in 3 global variables in either
+Config::Tree's namespace or that of the module which subclasses
+it. They are:
+
+    %volatile - Updated values in memory only.
+    @stack    - Zero or more loaded or tied hashes.
+    %default  - Default values.
+
+In the general case, an application would use Config::Tree as follows:
+
+    #!/usr/bin/perl
+    use Config::Tree;
+    %Config::Tree::default = ( ... );
+
+    # Loading configuration:
+    my $encoded = read_text("/path/to/config.json");
+    CONFIG->append(decode_json($encoded));
+
+    # Accessing values:
+    my $foo = CONFIG("foo");
+    my $true = CONFIG->true("bar.baz");
+    my $bingable = CONFIG->exists("bar.bing");
+
+Any modules this application uses which also use Config::Tree will
+look for their configuration values in the same place.
+
+Library modules which need their own configuration will use
+Config::Tree as follows:
+
+    package My::Library::Config;
+    use Config::Tree ':reexport'; # Almost the same as use base 'Config::Tree';
+    our %default = (
+        default => "values",
+    );
+
+    package My::Library::Module;
+    use My::Library::Config;
+    my $anything = CONFIG("whatever");
+
+Any code which imports My::Library::Config will use the same API
+exported by Config::Tree to access the %volatile, @stack and %default
+in My::Library::Config.
+
+Config::Tree subclasses may wish to override _find to modify how the
+variables are scanned and how the key is decoded.
+
+A library should normally provide any default values which are
+necessary and leave loading & saving to the application using it.
+
+
+Loading configuration files
+---------------------------
+
+Configuration data is loaded into a hashref, referred to as a stash,
+and inserted into a stack of stashes which are searched
+sequentially. An individual stash can also be a listref but that's
+weird.
+
+There are always 2 stashes hard-coded at the top (%volatile) and
+bottom (%default) of the stack. Configuration data is loaded and
+inserted at the top or bottom of the stack but between %volatile and
+%default (ie. @stack). The contents of these variables can be obtained
+with CONFIG->volatile, CONFIG->default and CONFIG->stack;
+
+@stack is manipulated with the methods append, prepend and replace,
+all of which expect 1 or more stashes as arguments to be pushed or
+unshifted, or to replace entirely the current @stack.
+
+Actually loading and parsing a file (or saving one) is not performed
+by Config::Tree. Data must be pre-processed before passing it to
+append/prepend/replace and serialised before saving it. A future
+version of Config::Tree will include load and save functionality,
+using other modules to perform the actual I/O and not depending on any
+specific one of them.

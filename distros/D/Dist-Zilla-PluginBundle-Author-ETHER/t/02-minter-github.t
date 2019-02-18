@@ -27,7 +27,7 @@ my $tzil = Minter->_new_from_profile(
 );
 
 # we need to stop the git plugins from doing their thing
-foreach my $plugin (grep { ref =~ /Git/ } @{$tzil->plugins})
+foreach my $plugin (grep ref =~ /Git/, @{$tzil->plugins})
 {
     next unless $plugin->can('after_mint');
     my $meta = find_meta($plugin);
@@ -41,6 +41,7 @@ my $mint_dir = path($tzil->tempdir)->child('mint');
 
 my @expected_files = qw(
     .ackrc
+    .gitattributes
     .gitignore
     .mailmap
     .travis.yml
@@ -180,8 +181,8 @@ README
 
 # deliberately calculating this differently from the template -- comes out to 5.26, 5.24, ..., 5.8
 (my $current_ver = $]) =~ s/^5\.0+/5\./;
-my @versions = grep { $current_ver ge $_ } map { '5.' . 2 * $_ } reverse(4..13);
-my $version_matrix = join("\n", map { '  - "' . $_ . '"' } @versions);
+my @versions = grep $current_ver ge $_, map '5.'.2*$_, reverse(4..13);
+my $version_matrix = join("\n", map '  - "'.$_.'"', @versions);
 like(
     path($mint_dir, '.travis.yml')->slurp_utf8,
     qr/$version_matrix/,

@@ -1,5 +1,11 @@
 Revision history for Getopt-Alt
 
+0.5.1   2019-02-16
+        Updating for release of version 0.5.1
+        Added new files to manifest (Ivan Wills)
+        More fixing of the type (Ivan Wills)
+        Fixing the type of conf_section as it is used as a string not a hash (Ivan Wills)
+
 0.5.0   2019-02-03
         Updating for release of version 0.5.0
         Fixing accedentally copied code (Ivan Wills)

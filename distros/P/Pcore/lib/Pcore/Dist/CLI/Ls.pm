@@ -85,7 +85,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
                 }
             }
             else {
-                push @row, q[ - ];
+                push @row, q[ ??? ];
             }
 
             print $tbl->render_row( \@row );

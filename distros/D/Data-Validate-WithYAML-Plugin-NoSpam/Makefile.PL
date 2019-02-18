@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,12 +14,18 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Data-Validate-WithYAML-Plugin-NoSpam",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Data::Validate::WithYAML::Plugin::NoSpam",
   "PREREQ_PM" => {
-    "Perl::Critic" => 0
+    "Carp" => 0,
+    "Data::Validate::WithYAML" => "0.17"
   },
-  "VERSION" => "0.03",
+  "TEST_REQUIRES" => {
+    "Perl::Critic" => 0,
+    "Test::CheckManifest" => "1.38",
+    "Test::More" => 0
+  },
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -27,7 +33,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Perl::Critic" => 0
+  "Carp" => 0,
+  "Data::Validate::WithYAML" => "0.17",
+  "Perl::Critic" => 0,
+  "Test::CheckManifest" => "1.38",
+  "Test::More" => 0
 );
 
 

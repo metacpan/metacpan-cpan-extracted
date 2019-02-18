@@ -20,7 +20,6 @@ no_index:
 requires:
   perl: '5.01'
 resources:
-  bugtracker: https://github.com/trapd00r/Term-ExtendedColor-Dzen/issues
-  repository: https://github.com/trapd00r/Term-ExtendedColor-Dzen
-version: '0.004'
+  repository: https://github.com/trapd00r/Term-ExtendedColor-Dzen.git
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
