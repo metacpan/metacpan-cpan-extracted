@@ -1,5 +1,12 @@
 Revision history for Perl extension Config-Locale.
 
+0.07 2019-02-19T14:14:42Z
+
+ - Support Path::Class objects, incase anyone was doing that.
+ - Hopefully fix a Windows test issue with a missing C:.
+ - Require perl 5.8 per Manilla.
+ - Simplify VERSION declarations.
+
 0.06 2019-02-18T06:25:22Z
 
  - Some documentation updates.

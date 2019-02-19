@@ -49,7 +49,7 @@
    "provides" : {
       "Test::CheckManifest" : {
          "file" : "lib/Test/CheckManifest.pm",
-         "version" : "1.39"
+         "version" : "1.41"
       }
    },
    "release_status" : "stable",
@@ -64,7 +64,7 @@
          "web" : "http://github.com/reneeb/Test-CheckManifest"
       }
    },
-   "version" : "1.39",
+   "version" : "1.41",
    "x_contributors" : [
       "doug <doug@hcsw.org>",
       "LorenzoTa <LorenzoTa@users.noreply.github.com>",

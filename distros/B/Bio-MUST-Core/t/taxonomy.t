@@ -73,17 +73,17 @@ my @valid_ids = (
 
     # viruses
     [ 'HIV-1 M:C_505006@210038491',     # Note the unusual names of viruses
-        'Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Primate lentivirus group; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226',
-        'Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Primate lentivirus group; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C',
-       ('Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Primate lentivirus group; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226') x 3,
+        'Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226',
+        'Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C',
+       ('Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226') x 3,
         q{'HIV-1 M:C U2226'},
         q{'HIV-1 M:C U2226 [210038491]'} ],
 
     # Archaea
     [ 'Methanobrevibacter ruminantium_634498@288561462',
-        'cellular organisms; Archaea; Euryarchaeota; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium; Methanobrevibacter ruminantium M1',
-        'cellular organisms; Archaea; Euryarchaeota; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium',
-       ('cellular organisms; Archaea; Euryarchaeota; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium; Methanobrevibacter ruminantium M1') x 3,
+        'cellular organisms; Archaea; Euryarchaeota; Methanomada group; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium; Methanobrevibacter ruminantium M1',
+        'cellular organisms; Archaea; Euryarchaeota; Methanomada group; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium',
+       ('cellular organisms; Archaea; Euryarchaeota; Methanomada group; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium; Methanobrevibacter ruminantium M1') x 3,
         q{'Methanobrevibacter ruminantium M1'},
         q{'Methanobrevibacter ruminantium M1 [288561462]'} ],
 
@@ -101,11 +101,11 @@ my @valid_ids = (
         q{'Curvibacter putative symbiont of Hydra magnipapillata'},
         q{'Curvibacter putative symbiont of Hydra magnipapillata [260221396]'} ],
     [ 'Desulfotomaculum gibsoniae_767817@357041591',
-        'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Clostridiales; Peptococcaceae; Desulfotomaculum; Desulfotomaculum gibsoniae; Desulfotomaculum gibsoniae DSM 7213',
-        'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Clostridiales; Peptococcaceae; Desulfotomaculum; Desulfotomaculum gibsoniae',
-       ('cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Clostridiales; Peptococcaceae; Desulfotomaculum; Desulfotomaculum gibsoniae; Desulfotomaculum gibsoniae DSM 7213') x 3,
-        q{'Desulfotomaculum gibsoniae DSM 7213'},
-        q{'Desulfotomaculum gibsoniae DSM 7213 [357041591]'} ],
+        'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Clostridiales; Peptococcaceae; Desulfallas; Desulfallas gibsoniae; Desulfallas gibsoniae DSM 7213',
+        'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Clostridiales; Peptococcaceae; Desulfallas; Desulfallas gibsoniae',
+       ('cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Clostridiales; Peptococcaceae; Desulfallas; Desulfallas gibsoniae; Desulfallas gibsoniae DSM 7213') x 3,
+        q{'Desulfallas gibsoniae DSM 7213'},
+        q{'Desulfallas gibsoniae DSM 7213 [357041591]'} ],
 
     # Eukaryota
     [ 'Arabidopsis halleri_81971@184160085',
@@ -166,7 +166,7 @@ my @valid_ids = (
         q{'Ulnaria acus [123456]'} ],
     [ 'Oscillatoriales cyanobacterium_627090@ABCDEF',
         'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; unclassified Cyanobacteria; [Leptolyngbya] sp. JSC-1',
-        '',
+        'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; Oscillatoriophycideae; Oscillatoriales; unclassified Oscillatoriales; unclassified Oscillatoriales (miscellaneous); Oscillatoriales cyanobacterium',
        ('cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; unclassified Cyanobacteria; [Leptolyngbya] sp. JSC-1') x 3,
         q{'[Leptolyngbya] sp. JSC-1'},
         q{'[Leptolyngbya] sp. JSC-1 [ABCDEF]'} ],
@@ -379,7 +379,7 @@ SKIP: {
     my @orgs = (
         'Phytophthora infestans',
         'Nessiteras rhombopteryx',          # unknown name   (should be undef)
-        'Podocoryne carnea',                # misspelling    (should be 1)
+        'Podocoryne minima',                # synonym        (should be 1)
         'Podocoryna carnea',
         'Hydra sp.',                        # non-dupe genus (should be 1)
         'Arabidopsis thaliana',

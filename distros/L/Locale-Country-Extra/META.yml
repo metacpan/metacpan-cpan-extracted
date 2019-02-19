@@ -1,28 +1,32 @@
 ---
 abstract: 'Standard and IDD codes for Country identification, with Multilingual support'
 author:
-  - 'binary.com <perl@binary.com>'
+  - 'binary.com <cpan@binary.com>'
 build_requires:
-  Test::Exception: '0'
-  Test::More: '0'
-  Test::NoWarnings: '0'
-configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.143240'
-license: unknown
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Exception: '0'
+  Test::More: '0.94'
+  Test::NoWarnings: '0'
+  perl: '5.014000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  Locale::Codes: '0'
+  Locale::Country: '3.42'
+  Locale::Country::Multilingual: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Locale-Country-Extra
-no_index:
-  directory:
-    - t
-    - inc
-requires:
-  Locale::Country: '0'
-  Locale::Country::Multilingual: '0'
-  perl: '5.006'
 resources:
-  repository: https://github.com/binary-com/perl-Locale-Country-Extra.git
-version: v1.0.0
+  bugtracker: https://github.com/binary-com/perl-Locale-Country-Extra/issues
+  repository: git://github.com/binary-com/perl-Locale-Country-Extra.git
+version: 1.0.3
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.66'

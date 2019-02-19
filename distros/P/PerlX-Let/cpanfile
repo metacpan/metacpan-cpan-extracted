@@ -1,5 +1,5 @@
 requires "Const::Fast" => "0";
-requires "Keyword::Simple" => "0";
+requires "Keyword::Simple" => "0.04";
 requires "Text::Balanced" => "0";
 requires "perl" => "v5.12.0";
 

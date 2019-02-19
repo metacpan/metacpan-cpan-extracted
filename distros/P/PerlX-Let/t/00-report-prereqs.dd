@@ -25,7 +25,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Const::Fast' => '0',
-                                      'Keyword::Simple' => '0',
+                                      'Keyword::Simple' => '0.04',
                                       'Text::Balanced' => '0',
                                       'perl' => 'v5.12.0'
                                     }

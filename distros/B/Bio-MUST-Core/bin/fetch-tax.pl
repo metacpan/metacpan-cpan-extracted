@@ -66,6 +66,14 @@ my %fetch_from = (
     mustid => sub { map { $tax->get_taxid_from_seq_id($_)   } @_ },
     baseid => sub { map { $tax->get_taxid_from_seq_id($_)   }
                     map { $_ . '@1'                         } @_ },
+            # we build a mustid from the baseid
+    strain => sub { map { $tax->get_taxid_from_seq_id($_)   }
+                    map { SeqId->new_with(
+                            org         => $_,
+                            accession   => 1,
+                            keep_strain => 1,
+                        )                                   } @_ },
+            # we build a mustid from the strain name
     gi     => sub { map { $tax->get_taxid_from_seq_id($_)   }
                     map { $_ =~ $PKEYONLY ? 'gi|' . $_ : $_ } @_ },
             # we let ..._from_seq_id doing the GI number parsing
@@ -78,6 +86,7 @@ for my $infile (@ARGV_infiles) {
 
     ### Processing: $infile
     my $list = IdList->$method($infile);
+    ### Here!
 
     # fetch and clean up list items
     # Note: using apply instead of map for satisfying Perl::Critic
@@ -161,7 +170,7 @@ fetch-tax.pl - Fetch information from the NCBI Taxonomy database
 
 =head1 VERSION
 
-version 0.182420
+version 0.190500
 
 =head1 USAGE
 
@@ -202,6 +211,7 @@ types are available:
 
     - mustid (standard MUST ids, including the '@')
     - baseid (base MUST ids, truncated before the '@')
+    - strain (catalog strains to coerce to NCBI names)
     - name   (NCBI names)
     - taxid  (NCBI taxon ids or GCA/GCF accessions)
     - gi     (NCBI GIs, complete accessions are allowed)
@@ -209,8 +219,10 @@ types are available:
 C<mustid> and C<baseid> items will both be analyzed by the
 L<Bio::MUST::Core::Taxonomy> heuristics, whereas C<name> items will be
 considered in full as NCBI names (which may correspond to higher taxa or
-include very detailed strain information). In contrast, C<taxid> items will
-be directly used to get the corresponding NCBI taxa.
+include very detailed strain information). C<strain> items will be coerced to
+NCBI names using the same heuristics as C<mustid> and C<baseid> items. In
+contrast, C<taxid> items will be directly used to get the corresponding NCBI
+taxa.
 
 As an additional possibility, C<gi> items can be used. These are given either
 as mere GI numbers (e.g., 158280253 or gi|158280253) or as complete NCBI
@@ -222,8 +234,8 @@ Using C<gi> items requires having installed the GI-to-taxid mapper during
 setup of the local mirror of the NCBI Taxonomy database (see
 L<setup-taxdir.pl> for details).
 
-=for Euclid: str.type:       /mustid|baseid|name|taxid|gi/
-    str.type.error: <str> must be one of mustid, baseid, name, taxid or gi (not str)
+=for Euclid: str.type:       /mustid|baseid|strain|name|taxid|gi/
+    str.type.error: <str> must be one of mustid, baseid, strain, name, taxid or gi (not str)
     str.default:    'mustid'
 
 =item --keep-strain

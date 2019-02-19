@@ -3,13 +3,14 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw Guitar Chord Diagrams
 
-our $VERSION = '0.0200';
+our $VERSION = '0.0500';
 
 use Moo;
 use strictures 2;
 use namespace::clean;
 
 use Imager;
+use List::MoreUtils 'first_index';
 use Music::Chord::Namer 'chordname';
 
 
@@ -19,20 +20,20 @@ has chord => (
 
 
 has position => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { die "$_[0] is not a positive integer" unless $_[0] =~ /^[1-9]\d*$/ },
     default => sub { 1 },
 );
 
 
-has string_num => (
+has strings => (
     is      => 'ro',
     isa     => sub { die "$_[0] is not a positive integer" unless $_[0] =~ /^[1-9]\d*$/ },
     default => sub { 6 },
 );
 
 
-has fret_num => (
+has frets => (
     is      => 'ro',
     isa     => sub { die "$_[0] is not a positive integer" unless $_[0] =~ /^[1-9]\d*$/ },
     default => sub { 5 },
@@ -47,7 +48,7 @@ has size => (
 
 
 has outfile => (
-    is      => 'ro',
+    is      => 'rw',
     default => sub { 'chord-diagram' },
 );
 
@@ -58,18 +59,15 @@ has font => (
 );
 
 
-has notes => (
+has tuning => (
     is      => 'ro',
-    default => sub {
-        {
-            1 => [qw/E F  Gb G  Ab A Bb B  C  Db D Eb/],
-            2 => [qw/B C  Db D  Eb E F  Gb G  Ab A Bb/],
-            3 => [qw/G Ab A  Bb B  C Db D  Eb E  F Gb/],
-            4 => [qw/D Eb E  F  Gb G Ab A  Bb B  C Db/],
-            5 => [qw/A Bb B  C  Db D Eb E  F  Gb G Ab/],
-            6 => [qw/E F  Gb G  Ab A Bb B  C  Db D Eb/],
-        }
-    },
+    default => sub { [qw/E B G D A E/] },
+);
+
+
+has fretboard => (
+    is       => 'ro',
+    init_arg => undef,
 );
 
 
@@ -77,6 +75,24 @@ has verbose => (
     is      => 'ro',
     default => sub { 0 },
 );
+
+
+sub BUILD {
+    my ( $self, $args ) = @_;
+
+    my @scale = qw/C Db D Eb E F Gb G Ab A Bb B/;
+    my @index = map { my $t = $_; first_index { $t eq $_ } @scale } @{ $self->tuning };
+    my %notes;
+
+    my $n = 0;
+
+    for my $i ( @index ) {
+        $n++;
+        $notes{$n} = [ map { $scale[ ($i + $_) % @scale ] } 0 .. @scale - 1 ];
+    }
+
+    $self->{fretboard} = \%notes;
+}
 
 
 sub draw {
@@ -91,32 +107,32 @@ sub draw {
 
     # Setup a new image
     my $i = Imager->new(
-        xsize => $SPACE + $self->string_num * $SPACE - $self->string_num,
-        ysize => $SPACE + $self->fret_num * $SPACE - $self->fret_num,
+        xsize => $SPACE + $self->strings * $SPACE - $self->strings,
+        ysize => $SPACE + $self->frets * $SPACE - $self->frets,
     );
     my $font = Imager::Font->new( file => $self->font );
     $i->box( filled => 1, color => $WHITE );
 
     # Draw the vertical string lines
-    for my $string (0 .. $self->string_num - 1) {
+    for my $string (0 .. $self->strings - 1) {
         $i->line(
             color => $BLUE,
             x1    => $SPACE + $string * $SPACE,
             y1    => $SPACE,
             x2    => $SPACE + $string * $SPACE,
-            y2    => $SPACE + ($self->fret_num - 1) * $SPACE,
+            y2    => $SPACE + ($self->frets - 1) * $SPACE,
             aa    => 1,
             endp  => 1
         );
     }
  
     # Draw the horizontal fret lines
-    for my $fret ( 0 .. $self->fret_num - 1 ) {
+    for my $fret ( 0 .. $self->frets - 1 ) {
         $i->line(
             color => $BLUE,
             x1    => $SPACE,
             y1    => $SPACE + $fret * $SPACE,
-            x2    => $SPACE + ($self->string_num - 1) * $SPACE,
+            x2    => $SPACE + ($self->strings - 1) * $SPACE,
             y2    => $SPACE + $fret * $SPACE,
             aa    => 1,
             endp  => 1
@@ -137,7 +153,7 @@ sub draw {
     }
 
     # Draw the note/mute markers
-    my $string = $self->string_num;
+    my $string = $self->strings;
 
     for my $note ( split //, $self->chord ) {
         if ( $note =~ /[xX]/ ) {
@@ -147,14 +163,14 @@ sub draw {
                 font  => $font,
                 text  => 'X',
                 color => $BLACK,
-                x     => $SPACE + ($self->string_num - $string) * $SPACE - $SPACE / 6,
+                x     => $SPACE + ($self->strings - $string) * $SPACE - $SPACE / 6,
                 y     => $SPACE - 2,
                 size  => $SPACE / 2,
                 aa    => 1,
             );
         }
         elsif ( $note =~ /[oO0]/ ) {
-            my $temp = $self->notes->{$string}[0];
+            my $temp = $self->fretboard->{$string}[0];
             push @chord, $temp;
             print "O at 0,$string = $temp\n" if $self->verbose;
 
@@ -162,21 +178,21 @@ sub draw {
                 font  => $font,
                 text  => 'O',
                 color => $BLACK,
-                x     => $SPACE + ($self->string_num - $string) * $SPACE - $SPACE / 6,
+                x     => $SPACE + ($self->strings - $string) * $SPACE - $SPACE / 6,
                 y     => $SPACE - 2,
                 size  => $SPACE / 2,
                 aa    => 1,
             );
         }
         else {
-            my $temp = $self->notes->{$string}[$self->position + $note - 1];
+            my $temp = $self->fretboard->{$string}[$self->position + $note - 1];
             push @chord, $temp;
             print "Dot at $note,$string = $temp\n" if $self->verbose;
 
             $i->circle(
                 color => $BLACK,
                 r     => $SPACE / 5,
-                x     => $SPACE + ($self->string_num - $string) * $SPACE,
+                x     => $SPACE + ($self->strings - $string) * $SPACE,
                 y     => $SPACE + $SPACE / 2 + ($note - 1) * $SPACE,
             );
         }
@@ -191,7 +207,7 @@ sub draw {
         text  => scalar(chordname(@chord)),
         color => $BLACK,
         x     => $SPACE,
-        y     => $SPACE + $self->fret_num * $SPACE - $self->fret_num - $SPACE / 4,
+        y     => $SPACE + $self->frets * $SPACE - $self->frets - $SPACE / 4,
         size  => $SPACE / 2,
         aa    => 1,
     );
@@ -217,30 +233,35 @@ Music::GuitarChordDiagram - Draw Guitar Chord Diagrams
 
 =head1 VERSION
 
-version 0.0200
+version 0.0500
 
 =head1 SYNOPSIS
 
   use Music::GuitarChordDiagram;
 
   my $dia = Music::GuitarChordDiagram->new(
-    chord      => 'x02220',
-    position   => 1,
-    string_num => 6,
-    fret_num   => 5,
-    size       => 30,
-    outfile    => 'chord-diagram',
-    font       => '/path/to/TTF/font.ttf',
-    notes      => { 1 => [qw/D Eb E F .../], 2 => [qw/.../], },
-    verbose    => 1,
+    chord => 'x02220',
+    font  => '/path/to/TTF/font.ttf',
+  );
+
+  $dia = Music::GuitarChordDiagram->new(
+    chord    => '4442',
+    position => 3,
+    strings  => 4,
+    frets    => 6,
+    size     => 25,
+    outfile  => 'ukulele-chord',
+    font     => '/path/to/TTF/font.ttf',
+    tuning   => [qw/A E C G/],
+    verbose  => 1,
   );
 
   $dia->draw();
 
 =head1 DESCRIPTION
 
-A C<Music::GuitarChordDiagram> object draws guitar chord diagrams including neck
-position and chord name annotations.
+A C<Music::GuitarChordDiagram> object draws fretboard chord diagrams including
+neck position and chord name annotations.
 
 =for html <br><img src="https://raw.githubusercontent.com/ology/Music-GuitarChordDiagram/master/chord-diagram.png"><br>
 
@@ -251,39 +272,39 @@ position and chord name annotations.
   $dia->chord('xx0232');
   $chord = $dia->chord;
 
-A guitar chord given in string format, where non-zero digits represent
-frets, C<x> (or C<X>) indicates a muted string and C<0> (or C<o> or C<O>)
-indicates an open string.  The order of the strings is C<654321> from lowest to
-highest.
+A chord given in string format, where non-zero digits represent frets, C<x> (or
+C<X>) indicates a muted string and C<0> (or C<o> or C<O>) indicates an open
+string.  The default order of the strings is C<654321> from lowest to highest.
 
 Examples:
 
-  c: x32010
-  d: xxO232
-  e: 022100
-  f: xx3211
-  g: 210002
-  a: x02220
-  b: xx4442
+  C: x32010
+  D: xx0232
+  E: 022100
+  F: xx3211
+  G: 320003
+  A: x02220
+  B: x24442
  
-  cm: xx5543
-  dm: xx0231
-  em: 022000
-  fm: xx3111
-  gm: xx5333
-  am: x02210
-  bm: xx4432
+  Cm: xx5543
+  Dm: xx0231
+  Em: 022000
+  Fm: xx3111
+  Gm: xx5333
+  Am: x02210
+  Bm: x24432
  
-  c7: x32310
-  d7: xx0212
-  e7: 020100
-  f7: xx1211
-  g7: 320001
-  a7: x02020
-  b7: x21202
+  C7: x32310
+  D7: xx0212
+  E7: 020100
+  F7: xx1211
+  G7: 320001
+  A7: x02020
+  B7: x21202
 
 =head2 position
 
+  $dia->position(3);
   $position = $dia->position;
 
 The neck position of a chord to be diagrammed.  This number is rendered to the
@@ -291,17 +312,17 @@ left of the first fret.
 
 Default: 1
 
-=head2 string_num
+=head2 strings
 
-  $string_num = $dia->string_num;
+  $strings = $dia->strings;
 
 The number of strings.
 
 Default: 6
 
-=head2 fret_num
+=head2 frets
 
-  $fret_num = $dia->fret_num;
+  $frets = $dia->frets;
 
 The number of frets.
 
@@ -317,6 +338,7 @@ Default: 30
 
 =head2 outfile
 
+  $dia->outfile('chord-042');
   $outfile = $dia->outfile;
 
 The image file name minus the (PNG) extension.
@@ -331,20 +353,20 @@ The TTF font to use when rendering the diagram.
 
 Default: /opt/X11/share/fonts/TTF/VeraMono.ttf
 
-=head2 notes
+=head2 tuning
 
-  $notes = $dia->notes;
+  $tuning = $dia->tuning;
 
-A hashref of string keys and note list values to use in computing the chord.
+An arrayref of the string tuning.  The order of the notes is from highest string
+(1st) to lowest (6th).  For accidental notes, use flat (C<b>), not sharp (C<#>).
 
-Default:
+Default: [ E B G D A E ]
 
-  1 => [ E F  Gb G  Ab A Bb B  C  Db D Eb ]
-  2 => [ B C  Db D  Eb E F  Gb G  Ab A Bb ]
-  3 => [ G Ab A  Bb B  C Db D  Eb E  F Gb ]
-  4 => [ D Eb E  F  Gb G Ab A  Bb B  C Db ]
-  5 => [ A Bb B  C  Db D Eb E  F  Gb G Ab ]
-  6 => [ E F  Gb G  Ab A Bb B  C  Db D Eb ]
+=head2 fretboard
+
+  $fretboard = $dia->fretboard;
+
+A hashref of the string notes.  This is a computed attribute.
 
 =head2 verbose
 
@@ -356,13 +378,17 @@ Default: 0
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
   $dia = Music::GuitarChordDiagram->new(%arguments);
 
 Create a new C<Music::GuitarChordDiagram> object.
 
-=head2 draw()
+=head2 BUILD
+
+Construct the B<fretboard> attribute from the B<tuning>.
+
+=head2 draw
 
   $dia->draw;
 
@@ -371,6 +397,8 @@ Render the requested chord diagram as a PNG image.
 =head1 SEE ALSO
 
 L<Imager>
+
+L<List::MoreUtils>
 
 L<Moo>
 

@@ -1,5 +1,8 @@
 Revision history
 
+0.0005      2019-02-19
+    - Put "CONSTRUCTION" before "ATTRIBUTES" and "METHODS".
+
 0.0004      2018-12-24
     - Use Pod::Weaver::Section::Contributors.
 

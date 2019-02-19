@@ -1,5 +1,5 @@
 package Spreadsheet::Read::Ingester ;
-$Spreadsheet::Read::Ingester::VERSION = '0.002';
+$Spreadsheet::Read::Ingester::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -54,7 +54,7 @@ sub cleanup {
 }
 
 1; # Magic true value
-# ABSTRACT: ingest spreadsheets to Perl data structure for faster, repeated processing
+# ABSTRACT: ingest and save csv and spreadsheet data to a perl data structure to avoid reparsing
 
 __END__
 
@@ -62,7 +62,7 @@ __END__
 
 =head1 NAME
 
-Spreadsheet::Read::Ingester - ingest spreadsheets to Perl data structure for faster, repeated processing
+Spreadsheet::Read::Ingester - ingest and save csv and spreadsheet data to a perl data structure to avoid reparsing
 
 =head1 SYNOPSIS
 
@@ -79,26 +79,25 @@ Spreadsheet::Read::Ingester - ingest spreadsheets to Perl data structure for fas
 
 =head1 DESCRIPTION
 
-This module is a simple wrapper for L<Spreadsheet::Read> to make repeated
-ingestion of raw data files faster.
+This module is intended to be a drop-in replacement for <Spreadsheet::Read> and
+is a simple, unobtrusive wrapper for it.
 
-Processing spreadsheet and csv from raw data files can be time consuming,
-especially with large data sets. Sometimes it's necessary to ingest the raw data
-file repeatedly. This module saves time be ingesting and parsing the data once
-using L<Spreadsheet::Read> and then immediately saves the parsed data to
-to the user's home directory with L<Storable>. Files are stored in the directory
-determined by L<File::UserConfig>.
+Parsing spreadsheet and csv data files is time consuming, especially with large
+data sets. If a data file is ingested more than once, much time and processing
+power is wasted reparsing the same data. To avoid reparsing, this module uses
+<Storable> to save a parsed version of the data to disk when a new file is
+ingested. All subsequent ingestions are retrieved from the stored Perl data
+structure. Files are saved in the directory determined by L<File::UserConfig>
+and is a function of the user's OS.
 
-Subsequent ingestions of the original data file L<Spreadsheet::Read::Ingester>
-are retrieved from the stored Perl data structure instead of the raw file.
+The stored data file names are the unique file signatures for the raw data file.
+The signature is used to detect if the original file changed, in which case the
+data is reingested from the raw file and a new parsed file is saved using an
+updated file signature. Parsed data files are kept indefinitely but can be
+deleted with the C<cleanup()> method.
 
-L<Spreadsheet::Read::Ingester> generates a unique file signature for the file so
-that if the original file changed, the data will be reingested from the raw file
-instead and a new parsed file with a new signature will be saved.
-
-To access the data from the stored files and newly ingested files using the
-L<Spreadsheet::Read::Ingester> object, consult the L<Spreadsheet::Read>
-documentation for the methods it provides.
+Consult the L<Spreadsheet::Read> documentation for accessing the data object
+returned by this module.
 
 =head1 METHODS
 
@@ -110,8 +109,9 @@ Takes same arguments as the new constructor in L<Spreadsheet::Read> module.
 Returns an object identical to the object returned by the L<Spreadsheet::Read>
 module along with its corresponding methods.
 
-=head2 cleanup($days)
-=method cleanup()
+=head2 cleanup( $file_age_in_days )
+
+=head2 cleanup()
 
   Spreadsheet::Read::Ingester->cleanup(0);
 

@@ -1,3 +1,9 @@
+0.190500  2019-02-19 15:41:48+01:00 Europe/Brussels
+    - Additions
+      - binaries: added --item-type 'strain' to fetch-tax.pl
+    - Fixes
+      - ColorScheme: fixed incompatibility with recent Graphics::ColorNames
+
 0.182420  2018-08-30 15:45:19+02:00 Europe/Brussels
     - Additions
       - Ali: added class method instant_store

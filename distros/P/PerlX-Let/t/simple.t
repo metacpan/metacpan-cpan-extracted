@@ -54,4 +54,36 @@ foreach my $i (2..3) {
 
 }
 
+subtest 'syntax errors' => sub {
+
+    eval 'let =';
+    like $@, qr/A variable name is required for let/, 'missing variable name';
+
+    eval 'let x';
+    like $@, qr/A variable name is required for let/, 'missing variable name';
+
+    eval 'let $x';
+    like $@, qr/An assignment is required for let/, 'missing assignment';
+
+    eval 'let $x 1';
+    like $@, qr/An assignment is required for let/, 'missing assignment';
+
+    {
+        no warnings;
+
+        eval 'let $x => ';
+        ok $@, 'syntax error';
+
+      TODO: {
+          local $TODO = "This error is identified elsewhere";
+          like $@, qr/A value is required for let/, 'missing value';
+        }
+
+    }
+
+
+};
+
+no PerlX::Let;
+
 done_testing;

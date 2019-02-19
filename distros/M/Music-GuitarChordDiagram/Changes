@@ -1,5 +1,27 @@
 Revision history for Music-GuitarChordDiagram
 
+0.0500 2019-02-19 00:10:47
+    - Made the position and outfile attributes read-write.
+    - Made eg/autumn-leaves-shapes.
+
+0.0401 2019-02-18 22:43:45
+    - Improved documentation.
+
+0.0400 2019-02-18 21:48:25
+    - Renamed the string_num and fret_num attributes to strings and frets, respectively.
+    - Fixed the fretboard attribute assignment.
+
+0.0302 2019-02-18 21:26:34
+    - Improved documentation slightly.
+    - Fixed attribute name in eg/ukulele.
+
+0.0301 2019-02-18 21:10:15
+    - Changed the name of the "notes" attribute to "tuning."
+
+0.0300 2019-02-18 21:01:00
+    - Changed the notes attribute and added the computed fretboard attribute.
+    - Improved documentation.
+
 0.0200 2019-02-17 20:41:18
     - Added a couple tiny tests.
     - Made the string notes user definable.

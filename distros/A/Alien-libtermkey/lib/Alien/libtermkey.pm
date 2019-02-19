@@ -5,7 +5,7 @@
 
 package Alien::libtermkey;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use POSIX qw( WEXITSTATUS );
 
@@ -35,7 +35,7 @@ provides a simple access to its configuration. If not, the process of
 installing it will install a locally-bundled copy of the library into perl's
 arch-specific library directory.
 
-This module bundles F<libtermkey> version 0.20.
+This module bundles F<libtermkey> version 0.21.
 
 =head1 METHODS
 
@@ -75,7 +75,6 @@ sub _get_pkgconfig
    unshift @args, "--$method";
 
    local $ENV{PKG_CONFIG_PATH} = "$libdir/pkgconfig/" if $use_bundled;
-   unshift @args, "--define-variable=libdir=$libdir" if $use_bundled;
 
    open my $eupc, "-|", "pkg-config", @args, $module or
       die "Cannot popen pkg-config - $!";
@@ -85,12 +84,6 @@ sub _get_pkgconfig
 
    return undef if WEXITSTATUS($?);
    return $ret;
-}
-
-sub libs
-{
-   # Append RPATH so that runtime linking actually works
-   return _get_pkgconfig( libs => @_ ) . ( $use_bundled ? " -Wl,-R$libdir" : "" );
 }
 
 =head1 AUTHOR

@@ -1,5 +1,23 @@
 Revision history for PerlX-Let:
 
+v0.2.5    2019-02-19 15:18:37+00:00 Europe/London
+  [Bug Fixes]
+  - Increased minimum version of Keyword::Simple to fix issue with
+    string evals.
+
+  [Documentation]
+  - Fix typo in Changes.
+
+v0.2.4    2019-02-19 11:42:06+00:00 Europe/London
+  [Bug Fixes]
+  - Return error messages for syntax errors.
+
+  [Documentation]
+  - Adjusted alignment of code examples.
+
+  [Tests]
+  - Improved test coverage.
+
 v0.2.3    2019-02-14 11:47:15+00:00 Europe/London
   [Documentation]
   - Fixed typos.

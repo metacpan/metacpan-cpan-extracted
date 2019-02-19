@@ -34,9 +34,11 @@ foreach my $type (qw( default override )) {
                    ? $config->default_stem_path()
                    : $config->override_stem_path();
 
+        $expected = path( $expected )->absolute( $config->directory() );
+
         is(
             $actual . '',
-            path($expected) . '',
+            $expected . '',
             $type . ' stem resolved to ' . $expected,
         );
     }

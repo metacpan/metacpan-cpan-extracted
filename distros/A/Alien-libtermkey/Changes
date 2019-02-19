@@ -1,5 +1,17 @@
 Revision history for Alien-libtermkey
 
+0.21    2019-02-19 15:13:51
+        [CHANGES]
+         * Wrap libtermkey 0.21:
+            + Valgrind cleanness
+            + Various internal bugfixes
+         * Updates to latest inc/Alien/make/Module/Build.pm
+            + Don't bother with -Wl,-rpath hackery because
+              Module::Build::Using::PkgConfig should handle it instead
+            + Defer mangling of paths in .pc file until ACTION_install time,
+              thus allowing never-installed `cpan> test` dependency trees
+              to work
+
 0.20    2019-02-17 01:33:44
         [CHANGES]
          * Updates to latest inc/Alien/make/Module/Build.pm

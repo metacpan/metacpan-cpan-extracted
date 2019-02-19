@@ -135,13 +135,10 @@ enum {
   SPVM_OP_C_ID_OBJECT,
   SPVM_OP_C_ID_WEAKEN,
   SPVM_OP_C_ID_WEAKEN_FIELD,
-  SPVM_OP_C_ID_WEAKEN_ARRAY_ELEMENT,
   SPVM_OP_C_ID_UNWEAKEN,
   SPVM_OP_C_ID_UNWEAKEN_FIELD,
-  SPVM_OP_C_ID_UNWEAKEN_ARRAY_ELEMENT,
   SPVM_OP_C_ID_ISWEAK,
   SPVM_OP_C_ID_ISWEAK_FIELD,
-  SPVM_OP_C_ID_ISWEAK_ARRAY_ELEMENT,
   SPVM_OP_C_ID_SPECIAL_ASSIGN,
   SPVM_OP_C_ID_CONCAT,
   SPVM_OP_C_ID_SET,
@@ -175,6 +172,8 @@ enum {
   SPVM_OP_C_ID_REQUIRE,
   SPVM_OP_C_ID_IF_REQUIRE,
   SPVM_OP_C_ID_CURRENT_PACKAGE,
+  SPVM_OP_C_ID_FREE_TMP,
+  SPVM_OP_C_ID_REFCNT,
 };
 
 extern const char* const SPVM_OP_C_ID_NAMES[];
@@ -265,13 +264,18 @@ struct SPVM_op {
   int8_t is_assigned_to_var;
   int8_t is_passed_to_sub;
   int8_t no_need_check;
+  int8_t free_tmp_vars;
 };
+
+SPVM_OP* SPVM_OP_new_op_assign_bool(SPVM_COMPILER* compiler, SPVM_OP* op_operand, const char* file, int32_t line);
+
+SPVM_OP* SPVM_OP_build_refcnt(SPVM_COMPILER* compiler, SPVM_OP* op_refcnt, SPVM_OP* op_term);
+
+SPVM_OP* SPVM_OP_build_expression_statement(SPVM_COMPILER* compiler, SPVM_OP* op_expression);
 
 SPVM_OP* SPVM_OP_build_if_require_statement(SPVM_COMPILER* compiler, SPVM_OP* op_if_require, SPVM_OP* op_use, SPVM_OP* op_block);
 
 SPVM_OP* SPVM_OP_build_string_length(SPVM_COMPILER* compiler, SPVM_OP* op_string_length, SPVM_OP* op_term);
-
-SPVM_OP* SPVM_OP_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_TYPE* type, const char* file, int32_t line);
 
 SPVM_OP* SPVM_OP_new_op_my(SPVM_COMPILER* compiler, SPVM_MY* my, const char* file, int32_t line);
 
@@ -283,7 +287,7 @@ const char* SPVM_OP_get_var_name(SPVM_COMPILER* compiler, SPVM_OP* op_var);
 
 SPVM_OP* SPVM_OP_build_var(SPVM_COMPILER* compiler, SPVM_OP* op_var_name);
 
-int32_t SPVM_OP_get_var_id(SPVM_COMPILER* compiler, SPVM_OP* op);
+int32_t SPVM_OP_get_mem_id(SPVM_COMPILER* compiler, SPVM_OP* op);
 
 void SPVM_OP_insert_to_most_left_deep_child(SPVM_COMPILER* compiler, SPVM_OP* op_parent, SPVM_OP* op_child);
 
@@ -334,7 +338,9 @@ SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_whil
 SPVM_OP* SPVM_OP_build_if_statement(SPVM_COMPILER* compiler, SPVM_OP* op_if, SPVM_OP* op_term, SPVM_OP* op_block, SPVM_OP* op_else_statement);
 SPVM_OP* SPVM_OP_build_array_length(SPVM_COMPILER* compiler, SPVM_OP* op_array_length, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_malloc_object(SPVM_COMPILER* compiler, SPVM_OP* op_malloc, SPVM_OP* op_type);
+SPVM_OP* SPVM_OP_build_comparison_op(SPVM_COMPILER* compiler, SPVM_OP* op_comparison, SPVM_OP* op_first, SPVM_OP* op_last);
 SPVM_OP* SPVM_OP_build_binary_op(SPVM_COMPILER* compiler, SPVM_OP* op_call_op, SPVM_OP* op_first, SPVM_OP* op_last);
+SPVM_OP* SPVM_OP_build_comparison_op(SPVM_COMPILER* compiler, SPVM_OP* op_call_op, SPVM_OP* op_first, SPVM_OP* op_last);
 SPVM_OP* SPVM_OP_build_basic_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_name);
 SPVM_OP* SPVM_OP_build_array_type(SPVM_COMPILER* compiler, SPVM_OP* op_type, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_ref_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_original);
@@ -355,11 +361,8 @@ SPVM_OP* SPVM_OP_build_unary_op(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM
 SPVM_OP* SPVM_OP_build_array_access(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_OP* op_first, SPVM_OP* op_last);
 SPVM_OP* SPVM_OP_build_weaken_field(SPVM_COMPILER* compiler, SPVM_OP* op_weaken, SPVM_OP* op_field_access);
-SPVM_OP* SPVM_OP_build_weaken_array_element(SPVM_COMPILER* compiler, SPVM_OP* op_weaken, SPVM_OP* op_field_access);
 SPVM_OP* SPVM_OP_build_unweaken_field(SPVM_COMPILER* compiler, SPVM_OP* op_unweaken, SPVM_OP* op_field_access);
-SPVM_OP* SPVM_OP_build_unweaken_array_element(SPVM_COMPILER* compiler, SPVM_OP* op_unweaken, SPVM_OP* op_field_access);
 SPVM_OP* SPVM_OP_build_isweak_field(SPVM_COMPILER* compiler, SPVM_OP* op_isweak, SPVM_OP* op_field_access);
-SPVM_OP* SPVM_OP_build_isweak_array_element(SPVM_COMPILER* compiler, SPVM_OP* op_isweak, SPVM_OP* op_field_access);
 
 void SPVM_OP_resolve_op_convert_type(SPVM_COMPILER* compiler, SPVM_OP* op_convert_type);
 

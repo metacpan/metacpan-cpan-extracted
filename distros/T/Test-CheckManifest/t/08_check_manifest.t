@@ -22,6 +22,14 @@ my $abs_t_file = File::Spec->rel2abs( __FILE__ );
 
 #    my ($existing_files, $manifest_files, $excluded, $msg) = @_;
 
+my $diag = '';
+{
+    no warnings 'redefine';
+    sub Test::Builder::diag {
+        $diag .= $_[1] . "\n";
+    };
+}
+
 my $cnt = 0;
 
 {
@@ -36,12 +44,15 @@ my $cnt = 0;
     );
 
     for my $test ( @tests ) {
+        $diag = '';
+
         my @params   = @{$test};
         my $expected = pop @params;
 
-        my $result = $sub->( @params );
+        my $result = $sub->( @params, 'No Manifest' );
 
         is $result, $expected, "Test $cnt";
+
         $cnt++;
     }
 }
@@ -49,26 +60,56 @@ my $cnt = 0;
 {
     local $Test::CheckManifest::test_bool = 0;
     my @tests = (
-        [ undef, undef, undef, 'test', 1 ],
-        [ ['/t/test'], undef, undef, 'test', '' ],
-        [ ['/t/test'], ['/t/test'], undef, 'test', 1 ],
-        [ ['/t/test'], undef, {'/t/test' => 1}, 'test', 1 ],
-        [ ['/t/test'], ['/test'], {'/t/test' => 1}, 'test', '' ],
-        [ ['/t/test'], ['/t/test', '/t/test'], undef, 'test', '' ],
-        [ ['/t/test','/t/test2'], ['/t/test'], undef, 'test', '' ],
+        [ undef, undef, undef, 'test', '' ],
+        [ ['/t/test'], undef, undef, 'test', 1 ],
+        [ ['/t/test'], ['/t/test'], undef, 'test', '' ],
+        [ ['/t/test'], undef, {'/t/test' => 1}, 'test', '' ],
+        [ ['/t/test'], ['/test'], {'/t/test' => 1}, 'test', 1 ],
+        [ ['/t/test'], ['/t/test', '/t/test'], undef, 'test', 1 ],
+        [ ['/t/test','/t/test2'], ['/t/test'], undef, 'test', 1 ],
     );
 
     for my $test ( @tests ) {
+        $diag = '';
+
         my @params   = @{$test};
         my $expected = pop @params;
 
-        my $result = $sub->( @params );
+        my $result = $sub->( @params, 'No Manifest' );
+
+        is $result, $expected;
         $cnt++;
     }
 }
 
 {
     local $Test::CheckManifest::test_bool = 0;
+    local $Test::CheckManifest::VERBOSE = 0;
+    my @tests = (
+        [ undef, undef, undef, 'test', '' ],
+        [ ['/t/test'], undef, undef, 'test', 1 ],
+        [ ['/t/test'], ['/t/test'], undef, 'test', '' ],
+        [ ['/t/test'], undef, {'/t/test' => 1}, 'test', '' ],
+        [ ['/t/test'], ['/test'], {'/t/test' => 1}, 'test', 1 ],
+        [ ['/t/test'], ['/t/test', '/t/test'], undef, 'test', 1 ],
+        [ ['/t/test','/t/test2'], ['/t/test'], undef, 'test', 1 ],
+    );
+
+    for my $test ( @tests ) {
+        $diag = '';
+
+        my @params   = @{$test};
+        my $expected = pop @params;
+
+        my $result = $sub->( @params, 'No Manifest' );
+
+        is $result, $expected;
+
+        $cnt++;
+    }
+}
+
+{
     local $Test::CheckManifest::VERBOSE = 0;
     my @tests = (
         [ undef, undef, undef, 'test', 1 ],
@@ -81,31 +122,15 @@ my $cnt = 0;
     );
 
     for my $test ( @tests ) {
+        $diag = '';
+
         my @params   = @{$test};
         my $expected = pop @params;
 
-        my $result = $sub->( @params );
-        $cnt++;
-    }
-}
+        my $result = $sub->( @params, 'No Manifest' );
 
-{
-    local $Test::CheckManifest::VERBOSE = 0;
-    my @tests = (
-        [ undef, undef, undef, 'test', 1 ],
-        [ ['/t/test'], undef, undef, 'test', '' ],
-        [ ['/t/test'], ['/t/test'], undef, 'test', 1 ],
-        [ ['/t/test'], undef, {'/t/test' => 1}, 'test', 1 ],
-        [ ['/t/test'], ['/test'], {'/t/test' => 1}, 'test', '' ],
-        [ ['/t/test'], ['/t/test', '/t/test'], undef, 'test', '' ],
-        [ ['/t/test','/t/test2'], ['/t/test'], undef, 'test', '' ],
-    );
+        is $result, $expected;
 
-    for my $test ( @tests ) {
-        my @params   = @{$test};
-        my $expected = pop @params;
-
-        my $result = $sub->( @params );
         $cnt++;
     }
 }

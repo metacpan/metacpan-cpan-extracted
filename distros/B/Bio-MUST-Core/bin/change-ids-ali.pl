@@ -55,7 +55,7 @@ change-ids-ali.pl - Change (abbreviate or restore) ids' org component in ALI fil
 
 =head1 VERSION
 
-version 0.182420
+version 0.190500
 
 =head1 USAGE
 

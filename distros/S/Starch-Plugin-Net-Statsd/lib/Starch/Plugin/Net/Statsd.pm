@@ -1,6 +1,6 @@
 package Starch::Plugin::Net::Statsd;
 
-$Starch::Plugin::Net::Statsd::VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 

@@ -26,25 +26,25 @@ no_index:
 provides:
   MooX::PluginKit:
     file: lib/MooX/PluginKit.pm
-    version: '0.04'
+    version: '0.05'
   MooX::PluginKit::Consumer:
     file: lib/MooX/PluginKit/Consumer.pm
-    version: '0.04'
+    version: '0.05'
   MooX::PluginKit::ConsumerBase:
     file: lib/MooX/PluginKit/ConsumerBase.pm
-    version: '0.04'
+    version: '0.05'
   MooX::PluginKit::ConsumerRole:
     file: lib/MooX/PluginKit/ConsumerRole.pm
-    version: '0.04'
+    version: '0.05'
   MooX::PluginKit::Core:
     file: lib/MooX/PluginKit/Core.pm
-    version: '0.04'
+    version: '0.05'
   MooX::PluginKit::Factory:
     file: lib/MooX/PluginKit/Factory.pm
-    version: '0.04'
+    version: '0.05'
   MooX::PluginKit::Plugin:
     file: lib/MooX/PluginKit/Plugin.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -52,14 +52,16 @@ requires:
   Moo: '2.000000'
   Scalar::Util: '0'
   Type::Tiny: '1.000005'
+  UNIVERSAL::DOES: '0'
   namespace::clean: '0.24'
+  perl: '5.008001'
   strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/MooX-PluginKit/issues
   homepage: https://github.com/bluefeet/MooX-PluginKit
   repository: git://github.com/bluefeet/MooX-PluginKit.git
-version: '0.04'
+version: '0.05'
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

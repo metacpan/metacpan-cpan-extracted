@@ -26,24 +26,25 @@ no_index:
 provides:
   Starch::Plugin::Net::Statsd:
     file: lib/Starch/Plugin/Net/Statsd.pm
-    version: '0.03'
+    version: '0.04'
   Starch::Plugin::Net::Statsd::Manager:
     file: lib/Starch/Plugin/Net/Statsd/Manager.pm
-    version: '0.03'
+    version: '0.04'
   Starch::Plugin::Net::Statsd::Store:
     file: lib/Starch/Plugin/Net/Statsd/Store.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Moo: '2.000000'
   Net::Statsd: '0.11'
   Starch: '0.10'
   Type::Tiny: '1.000005'
   namespace::clean: '0.24'
+  perl: '5.008001'
   strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/Starch-Plugin-Net-Statsd/issues
   homepage: https://github.com/bluefeet/Starch-Plugin-Net-Statsd
   repository: git://github.com/bluefeet/Starch-Plugin-Net-Statsd.git
-version: '0.03'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

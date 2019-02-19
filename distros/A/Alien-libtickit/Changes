@@ -1,6 +1,15 @@
 Revision history for Alien-libtickit
 
-0.02    2010-02-17 13:23:19
+0.03    2019-02-19 15:16:11
+        [CHANGES]
+         * Updates to latest inc/Alien/make/Module/Build.pm
+            + Don't bother with -Wl,-rpath hackery because
+              Module::Build::Using::PkgConfig should handle it instead
+            + Defer mangling of paths in .pc file until ACTION_install time,
+              thus allowing never-installed `cpan> test` dependency trees
+              to work
+
+0.02    2019-02-17 13:23:19
         [CHANGES]
          * Updates to latest inc/Alien/make/Module/Build.pm
             + Don't bother with two-stage rewrite of .pc file; do it in one

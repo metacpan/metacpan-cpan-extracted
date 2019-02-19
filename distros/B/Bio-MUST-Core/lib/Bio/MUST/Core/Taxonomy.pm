@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.182420';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.190500';
 use Moose;
 use namespace::autoclean;
 
@@ -176,32 +176,30 @@ sub _build_ncbi_tax {
 
         # allow most NCBI Taxonomy synonyms classes
         # cut -f4 -d'|' names.dmp | sort | uniq -c
-        # last updated on Oct-1-2017
-        #    1111    acronym
-        #     308    anamorph
-        #  394815    authority
-        #     229    blast name
-        #   14154    common name
-        #   24601    equivalent name
-        #     486    genbank acronym
-        #     109    genbank anamorph
-        #   27907    genbank common name
-        #    2955    genbank synonym
-        #     623    in-part
-        #   34120    includes
-        #    1374    misnomer
-        #   33972    misspelling
-        # 1646768    scientific name
-        #  163954    synonym
-        #     179    teleomorph
-        #  109648    type material
+        # last updated on Feb-19-2019
+        #    1155    acronym
+        #     282    anamorph
+        #  439200    authority
+        #     238    blast name
+        #   14406    common name
+        #   26326    equivalent name
+        #     479    genbank acronym
+        #       1    genbank anamorph
+        #   28750    genbank common name
+        #    1106    genbank synonym
+        #     533    in-part
+        #   44817    includes
+        # 2054028    scientific name
+        #  178204    synonym
+        #     175    teleomorph
+        #  129968    type material
 
         synonyms => [
             'synonym', 'genbank synonym',
             'acronym', 'genbank acronym',
             'anamorph', 'genbank anamorph', 'teleomorph',
             'blast name', 'common name', 'genbank common name',
-            'equivalent name', 'includes', 'misnomer', 'misspelling',
+            'equivalent name', 'includes',
           # 'authority', 'in-part', 'type material',
         ]
     );
@@ -1639,7 +1637,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.182420
+version 0.190500
 
 =head1 SYNOPSIS
 

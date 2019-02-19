@@ -1,0 +1,14 @@
+1.0.2     2019-02-19 09:06:42+00:00 UTC
+
+1.0.2     2019-02-19 08:45:07+00:00 UTC
+	- Add alias names for code_from_country
+	- Update code_from_country to case insenstive
+1.0.2	
+	Switch to dzil
+
+1.0.1	2018-12-02
+	Update duplicated phone code for im
+
+1.0.0	2015-04-16
+	Initial full version released unto the world following approval of
+	CPANTesters everywhere

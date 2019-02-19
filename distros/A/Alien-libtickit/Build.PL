@@ -14,11 +14,11 @@ my $build = Alien::make::Module::Build->new(
    alien_requires => [
       [ any =>
          [ pkgconfig => "unibilium", atleast_version => "1.0.0" ],
-         [ alien => "Alien::unibilium" => '0.14' ],
+         [ alien => "Alien::unibilium" => '0.15' ],
       ],
       [ any =>
          [ pkgconfig => "termkey", atleast_version => "0.20" ],
-         [ alien => "Alien::libtermkey" => "0.20" ],
+         [ alien => "Alien::libtermkey" => "0.21" ],
       ],
    ],
    build_requires => {

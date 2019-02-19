@@ -25,16 +25,16 @@ name: PerlX-Let
 provides:
   PerlX::Let:
     file: lib/PerlX/Let.pm
-    version: v0.2.3
+    version: v0.2.5
 requires:
   Const::Fast: '0'
-  Keyword::Simple: '0'
+  Keyword::Simple: '0.04'
   Text::Balanced: '0'
   perl: v5.12.0
 resources:
   bugtracker: https://github.com/robrwo/PerlX-Let/issues
   repository: git://github.com/robrwo/PerlX-Let.git
-version: v0.2.3
+version: v0.2.5
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

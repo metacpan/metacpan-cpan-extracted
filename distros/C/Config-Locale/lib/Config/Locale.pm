@@ -1,6 +1,6 @@
 package Config::Locale;
 
-$Config::Locale::VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -67,6 +67,14 @@ my $path_type = declare as Str;
 
 coerce $path_type,
   from InstanceOf[ 'Path::Tiny' ],
+  via { '' . $_ };
+
+coerce $path_type,
+  from InstanceOf[ 'Path::Class::File' ],
+  via { '' . $_ };
+
+coerce $path_type,
+  from InstanceOf[ 'Path::Class::Dir' ],
   via { '' . $_ };
 
 =head1 ARGUMENTS

@@ -5,7 +5,7 @@
 
 package Alien::unibilium;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use POSIX qw( WEXITSTATUS );
 
@@ -85,12 +85,6 @@ sub _get_pkgconfig
 
    return undef if WEXITSTATUS($?);
    return $ret;
-}
-
-sub libs
-{
-   # Append RPATH so that runtime linking actually works
-   return _get_pkgconfig( libs => @_ ) . ( $use_bundled ? " -Wl,-R$libdir" : "" );
 }
 
 =head1 SEE ALSO

@@ -35,7 +35,7 @@ my $store = $starch->store();
 
 $store->get('foobar', []);
 is(
-    \@sends,
+    fix_sends( \@sends ),
     [
         [{ 'starch.outer.get-miss' => '0|ms' }, 1],
         [{ 'starch.Memory.get-miss' => '0|ms' }, 1],
@@ -46,7 +46,7 @@ is(
 
 $store->inner->set('foobar', [], {'test'=>1});
 is(
-    \@sends,
+    fix_sends( \@sends ),
     [
         [{ 'starch.Memory.set' => '0|ms' }, 1],
     ],
@@ -56,7 +56,7 @@ is(
 
 $store->get('foobar', []);
 is(
-    \@sends,
+    fix_sends( \@sends ),
     [
         [{ 'starch.outer.get-miss' => '0|ms' }, 1],
         [{ 'starch.Memory.get-hit' => '0|ms' }, 1],
@@ -68,7 +68,7 @@ is(
 
 $store->remove('foobar', []);
 is(
-    \@sends,
+    fix_sends( \@sends ),
     [
         [{ 'starch.outer.remove' => '0|ms' }, 1],
         [{ 'starch.Memory.remove' => '0|ms' }, 1],
@@ -104,7 +104,7 @@ like(
     'set failed',
 );
 is(
-    \@sends,
+    fix_sends( \@sends ),
     [
         [{ 'blah.fail.set-error' => '0|ms' }, 1],
     ],
@@ -118,7 +118,7 @@ like(
     'get failed',
 );
 is(
-    \@sends,
+    fix_sends( \@sends ),
     [
         [{ 'blah.fail.get-error' => '0|ms' }, 1],
     ],
@@ -132,7 +132,7 @@ like(
     'remove failed',
 );
 is(
-    \@sends,
+    fix_sends( \@sends ),
     [
         [{ 'blah.fail.remove-error' => '0|ms' }, 1],
     ],
@@ -141,3 +141,18 @@ is(
 @sends = ();
 
 done_testing();
+
+# Under FreeBSD and some Windows we get > 0ms timings, so
+# normalize the value here.  A little hack.
+sub fix_sends {
+    my ($sends) = @_;
+
+    foreach my $send (@$sends) {
+        my $pack = $send->[0];
+        foreach my $key (keys %$pack) {
+            $pack->{$key} =~ s{^\d+\|ms$}{0|ms};
+        }
+    }
+
+    return $sends;
+}

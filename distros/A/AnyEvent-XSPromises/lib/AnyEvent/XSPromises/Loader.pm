@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use AnyEvent;
 
@@ -42,7 +42,7 @@ BEGIN { $AE_PID= -1; }
 
 sub ___notify_callback {
     if ($$ != $AE_PID) {
-        __reset_pipe();
+        ___reset_pipe();
     } else {
         sysread $PIPE_IN, my $read_buf, 16;
     }

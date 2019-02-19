@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "PerlX::Let",
   "PREREQ_PM" => {
     "Const::Fast" => 0,
-    "Keyword::Simple" => 0,
+    "Keyword::Simple" => "0.04",
     "Text::Balanced" => 0
   },
   "TEST_REQUIRES" => {
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "v0.2.3",
+  "VERSION" => "v0.2.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Const::Fast" => 0,
   "File::Spec" => 0,
-  "Keyword::Simple" => 0,
+  "Keyword::Simple" => "0.04",
   "Module::Metadata" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,

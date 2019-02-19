@@ -24,5 +24,7 @@ GuitarChordDiagram
 Music
 PNG
 TTF
+fretboard
 gene
 lib
+th

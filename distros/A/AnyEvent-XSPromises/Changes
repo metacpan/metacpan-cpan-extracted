@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::XSPromises.
 
+0.004  Tue Feb 19 2019
+    - resolve rare error caused by call to undefined function
+
 0.003  Fri Feb 8 2019
     - add is_in_progress to deferred object
 

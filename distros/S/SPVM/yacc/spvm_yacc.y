@@ -26,7 +26,7 @@
 %token <opval> RETURN WEAKEN CROAK CURRENT_PACKAGE UNWEAKEN '[' '{' '('
 
 %type <opval> grammar
-%type <opval> opt_packages packages package package_block
+%type <opval> opt_packages packages package package_block refcnt
 %type <opval> opt_declarations declarations declaration
 %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
 %type <opval> sub anon_sub opt_args args arg invocant has use require our string_length
@@ -34,13 +34,13 @@
 %type <opval> opt_statements statements statement if_statement else_statement 
 %type <opval> for_statement while_statement switch_statement case_statement default_statement
 %type <opval> block eval_block begin_block if_require_statement
-%type <opval> unary_op binary_op comparison_op num_comparison_op str_comparison_op isa logical_op
+%type <opval> unary_op binary_op num_comparison_op str_comparison_op isa logical_op
 %type <opval> call_sub opt_vaarg
 %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
 %type <opval> deref ref assign inc dec
 %type <opval> new array_init
 %type <opval> my_var var package_var_access
-%type <opval> term opt_expressions expressions expression condition opt_expression
+%type <opval> expression opt_expressions expressions opt_expression
 %type <opval> field_name sub_name
 %type <opval> type basic_type array_type array_type_with_length ref_type  type_or_void
 
@@ -54,7 +54,7 @@
 %left <opval> SHIFT
 %left <opval> '+' '-' '.'
 %left <opval> MULTIPLY DIVIDE REMAINDER
-%right <opval> LOGICAL_NOT BIT_NOT '@' REF DEREF PLUS MINUS CONVERT SCALAR LENGTH ISWEAK
+%right <opval> LOGICAL_NOT BIT_NOT '@' REF DEREF PLUS MINUS CONVERT SCALAR LENGTH ISWEAK REFCNT
 %nonassoc <opval> INC DEC
 %left <opval> ARROW
 
@@ -451,7 +451,7 @@ statement
   | if_require_statement
   | expression ';'
     {
-      $$ = $1;
+      $$ = SPVM_OP_build_expression_statement(compiler, $1);
     }
   | LAST ';'
   | NEXT ';'
@@ -479,13 +479,13 @@ statement
     }
 
 for_statement
-  : FOR '(' opt_expression ';' term ';' opt_expression ')' block
+  : FOR '(' opt_expression ';' expression ';' opt_expression ')' block
     {
       $$ = SPVM_OP_build_for_statement(compiler, $1, $3, $5, $7, $9);
     }
 
 while_statement
-  : WHILE '(' term ')' block
+  : WHILE '(' expression ')' block
     {
       $$ = SPVM_OP_build_while_statement(compiler, $1, $3, $5);
     }
@@ -514,7 +514,7 @@ if_require_statement
     }
 
 if_statement
-  : IF '(' term ')' block else_statement
+  : IF '(' expression ')' block else_statement
     {
       SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
       
@@ -525,7 +525,7 @@ if_statement
       
       $$ = op_block;
     }
-  | UNLESS '(' term ')' block else_statement
+  | UNLESS '(' expression ')' block else_statement
     {
       SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
       
@@ -546,7 +546,7 @@ else_statement
     {
       $$ = $2;
     }
-  | ELSIF '(' term ')' block else_statement
+  | ELSIF '(' expression ')' block else_statement
     {
       $$ = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
     }
@@ -582,10 +582,6 @@ opt_expressions
       }
     }
     
-term
-  : expression
-  | condition
-
 opt_expression
   : /* Empty */
     {
@@ -607,6 +603,7 @@ expression
   | array_init
   | array_length
   | string_length
+  | refcnt
   | my_var
   | binary_op
   | unary_op
@@ -618,12 +615,12 @@ expression
   | '(' expressions ')'
     {
       if ($2->id == SPVM_OP_C_ID_LIST) {
-			  SPVM_OP* op_term = $2->first;
+			  SPVM_OP* op_expression = $2->first;
 	      SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, compiler->cur_file, compiler->cur_line);
-			  while ((op_term = SPVM_OP_sibling(compiler, op_term))) {
-			    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_term);
-  	      SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_term);
-  	      op_term = op_stab;
+			  while ((op_expression = SPVM_OP_sibling(compiler, op_expression))) {
+			    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_expression);
+  	      SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_expression);
+  	      op_expression = op_stab;
 			  }
 			  $$ = op_sequence;
       }
@@ -632,6 +629,17 @@ expression
       }
     }
   | CURRENT_PACKAGE
+  | isweak_field
+  | num_comparison_op
+  | str_comparison_op
+  | isa
+  | logical_op
+
+refcnt
+  : REFCNT expression
+    {
+      $$ = SPVM_OP_build_refcnt(compiler, $1, $2);
+    }
 
 expressions
   : expressions ',' expression
@@ -742,70 +750,56 @@ binary_op
       $$ = SPVM_OP_build_concat(compiler, $2, $1, $3);
     }
 
-condition
-  : comparison_op
-  | logical_op
-  | isweak_field ';'
-  | '(' condition ')'
-    {
-      $$ = $2;
-    }
-
-comparison_op
-  : num_comparison_op
-  | str_comparison_op
-  | isa
-
 num_comparison_op
   : expression NUMEQ expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
   | expression NUMNE expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
   | expression NUMGT expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
   | expression NUMGE expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
   | expression NUMLT expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
   | expression NUMLE expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
 
 str_comparison_op
   : expression STREQ expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
   | expression STRNE expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
   | expression STRGT expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
   | expression STRGE expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
   | expression STRLT expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
   | expression STRLE expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
     
 isa
@@ -815,15 +809,15 @@ isa
     }
 
 logical_op
-  : term LOGICAL_OR term
+  : expression LOGICAL_OR expression
     {
       $$ = SPVM_OP_build_or(compiler, $2, $1, $3);
     }
-  | term LOGICAL_AND term
+  | expression LOGICAL_AND expression
     {
       $$ = SPVM_OP_build_and(compiler, $2, $1, $3);
     }
-  | LOGICAL_NOT term
+  | LOGICAL_NOT expression
     {
       $$ = SPVM_OP_build_not(compiler, $1, $2);
     }
@@ -940,21 +934,24 @@ field_access
     }
 
 weaken_field
-  : WEAKEN field_access
+  : WEAKEN var ARROW '{' field_name '}'
     {
-      $$ = SPVM_OP_build_weaken_field(compiler, $1, $2);
+      SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, $2, $5);
+      $$ = SPVM_OP_build_weaken_field(compiler, $1, op_field_access);
     }
 
 unweaken_field
-  : UNWEAKEN field_access
+  : UNWEAKEN var ARROW '{' field_name '}'
     {
-      $$ = SPVM_OP_build_weaken_field(compiler, $1, $2);
+      SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, $2, $5);
+      $$ = SPVM_OP_build_unweaken_field(compiler, $1, op_field_access);
     }
 
 isweak_field
-  : ISWEAK field_access
+  : ISWEAK var ARROW '{' field_name '}'
     {
-      $$ = SPVM_OP_build_weaken_field(compiler, $1, $2);
+      SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, $2, $5);
+      $$ = SPVM_OP_build_isweak_field(compiler, $1, op_field_access);
     }
 
 array_length

@@ -8,10 +8,10 @@ use strict;
 use warnings;
 
 use Const::Fast ();
-use Keyword::Simple;
+use Keyword::Simple 0.04;
 use Text::Balanced ();
 
-our $VERSION = 'v0.2.3';
+our $VERSION = 'v0.2.5';
 
 
 sub import {
@@ -32,7 +32,8 @@ sub _rewrite_let {
         my ( $name, $val );
 
         ( $name, $$ref ) = Text::Balanced::extract_variable($$ref);
-        $$ref =~ s/^\s*\=>?\s*// or die;
+        die "A variable name is required for let" unless defined $name;
+        $$ref =~ s/^\s*\=>?\s*// or die "An assignment is required for let";
         ( $val, $$ref ) = Text::Balanced::extract_quotelike($$ref);
         ( $val, $$ref ) = Text::Balanced::extract_bracketed( $$ref, '({[' )
           unless defined $val;
@@ -41,6 +42,8 @@ sub _rewrite_let {
             ($val) = $$ref =~ /^(\S+)/;
             $$ref =~ s/^\S+//;
         }
+
+        die "A value is required for let" unless defined $val;
 
         if ($val !~ /[\$\@\%\&]/ && ($] >= 5.028 || substr($name, 0, 1) eq '$')) {
 
@@ -87,7 +90,7 @@ PerlX::Let - Syntactic sugar for lexical constants
 
 =head1 VERSION
 
-version v0.2.3
+version v0.2.5
 
 =head1 SYNOPSIS
 
@@ -127,7 +130,7 @@ This is roughly equivalent to using
   use Const::Fast;
 
   {
-   const $key => "username";
+    const $key => "username";
 
     if (defined $arg{$key}) {
       $row->update( { $key => $arg{$key} );

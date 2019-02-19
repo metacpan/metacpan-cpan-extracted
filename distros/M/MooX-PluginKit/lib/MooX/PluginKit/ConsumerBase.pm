@@ -1,6 +1,6 @@
 package MooX::PluginKit::ConsumerBase;
 
-$MooX::PluginKit::ConsumerBase::VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 

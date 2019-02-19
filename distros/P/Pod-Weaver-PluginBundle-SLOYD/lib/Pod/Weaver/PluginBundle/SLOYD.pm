@@ -5,7 +5,7 @@ package Pod::Weaver::PluginBundle::SLOYD;
 use strict;
 use warnings;
 
-our $VERSION = '0.0004'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 
 use namespace::autoclean;
@@ -31,6 +31,7 @@ sub mvp_bundle_config {
         [ 'SYNOPSIS',         _exp('Generic'), {} ],
         [ 'DESCRIPTION',      _exp('Generic'), {} ],
         [ 'OVERVIEW',         _exp('Generic'), {} ],
+        [ 'CONSTRUCTION',     _exp('Generic'), {} ],
 
         [ 'ATTRIBUTES',    _exp('Collect'), { command => 'attr' } ],
         [ 'CLASS METHODS', _exp('Collect'), { command => 'classmethod' } ],
@@ -76,7 +77,7 @@ Pod::Weaver::PluginBundle::SLOYD - SLOYD's default Pod::Weaver configuration
 
 =head1 VERSION
 
-version 0.0004
+version 0.0005
 
 =head1 OVERVIEW
 
@@ -92,6 +93,7 @@ It is nearly equivalent to the following:
     [Generic / SYNOPSIS]
     [Generic / DESCRIPTION]
     [Generic / OVERVIEW]
+    [Generic / CONSTRUCTION]
     [Collect / ATTRIBUTES]
     command = attr
     [Collect / CLASS METHODS]

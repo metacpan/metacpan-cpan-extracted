@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.335';
+  $VERSION = '0.342';
   @ISA = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -242,7 +242,7 @@ sub ls_color {
 # we can't access.
 # https://github.com/trapd00r/File-LsColor/issues/1
 
-    if(!defined($ext)) { # no extension found
+    if(!defined($ext)) {
        -l $real_file and $ext = 'ln'; # symlink
        -x $real_file and $ext = 'ex'; # executable
        -d $real_file and $ext = 'di'; # beware, dirs have +x
@@ -251,11 +251,21 @@ sub ls_color {
        -b $real_file and $ext = 'bd'; # block device
        -c $real_file and $ext = 'ca'; # character special file
 
-# looks like we can't decide on any attribute based on a stat(), so we use the
-# fallback FILE dircolors key.
-
-       $ext = 'fi' unless defined $ext;
     }
+
+# special case for directories that we can't stat, but we can still safely
+# assume that they are in fact dirs.
+    if( (not defined $ext) and ($file =~ m{/$}) ) {
+      $ext = 'di';
+    }
+
+# looks like we can't decide on any attribute based on a stat(), neither does
+# the input looks like a directory; therefore we use the fallback FILE dircolors
+# key
+    else {
+#      $ext = 'fi';
+    }
+
 # we have an extension. is it defined in the ls_colors hash?
     if(defined($ls_colors->{$ext})) {
       if($ls_colors->{$ext} =~ m/;(\d+;?[1-9]?)$/m) {
@@ -376,7 +386,7 @@ File::LsColor - Colorize input filenames just like ls does
     my $filetype = shift;
     printf "%s can be colored.\n" if can_ls_color($filetype);
 
-# apply terminal color even if we can't use LS_COLORS to do so.
+    # apply terminal color even if we can't use LS_COLORS to do so.
     my $file_with_extension = 'foobar.flac';
     printf "%s looks nice.\n", can_ls_color($file_with_extension)
       ? ls_color($file_with_extension)
@@ -405,7 +415,7 @@ None by default.
 
 Arguments: @files | \@files
 
-Returns:   $files | @files
+Returns:   @files | @files
 
 Returns a list of filenames colored as specified by the environment C<LS_COLORS>
 variable. If the C<LS_COLORS> variable is not set, throws an exception.
@@ -437,6 +447,9 @@ Returns a hash reference where a key is the extension and its value is the
 attributes attached to it.
 
 =head2 can_ls_color()
+
+Arguments: $file
+Returns:   $attributes
 
 Given a valid name, returns the defined attributes associated with it.
 Else, returns undef.

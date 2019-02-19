@@ -1,12 +1,13 @@
 ---
 abstract: 'HTTP Basic authentication plugin for Dancer2 that does what I want.'
 author:
-  - 'Moritz Grosch (LittleFox) <littlefox@fsfe.org>'
-build_requires: {}
+  - 'Mara Sophie Grosch (LittleFox) <littlefox@cpan.org>'
+build_requires:
+  Test::Pod: '1.52'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,5 +15,6 @@ meta-spec:
 name: Dancer2-Plugin-Auth-HTTP-Basic-DWIW
 requires:
   Dancer2: '0.160000'
-version: '0.05'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.06'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

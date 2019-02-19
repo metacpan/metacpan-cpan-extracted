@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Imager" : "0",
+            "List::MoreUtils" : "0",
             "Moo" : "2",
             "Music::Chord::Namer" : "0",
             "namespace::clean" : "0",
@@ -64,7 +65,7 @@
          "web" : "https://github.com/ology/Music-GuitarChordDiagram"
       }
    },
-   "version" : "0.0200",
+   "version" : "0.0500",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -279,7 +280,9 @@
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
                      "PNG",
-                     "TTF"
+                     "TTF",
+                     "fretboard",
+                     "th"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }

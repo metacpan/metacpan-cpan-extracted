@@ -28,7 +28,7 @@ my %files = map { $_ => 1 } @files;
 
 my $data;
 lives_ok {
-  $data = Spreadsheet::Read::Ingester->new( 't/test_files/blank.xlsx' );
+  $data = Spreadsheet::Read::Ingester->new( 't/test_files/test.csv' );
 } 'Can create new object';
 
 opendir (DIR, $configdir);
@@ -52,7 +52,7 @@ my $dummy_data = { hash => 1 };
 store $dummy_data, $file;
 
 lives_ok {
-  $data = Spreadsheet::Read::Ingester->new('t/test_files/blank.xlsx' );
+  $data = Spreadsheet::Read::Ingester->new('t/test_files/test.csv' );
 } 'attempts to get parsed data';
 
 is ($data->{hash}, 1, 'retrieves parsed data');

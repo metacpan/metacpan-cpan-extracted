@@ -1,7 +1,7 @@
 This archive contains the distribution Spreadsheet-Read-Ingester,
-version 0.002:
+version 0.004:
 
-  ingest spreadsheets to Perl data structure for faster, repeated processing
+  ingest and save csv and spreadsheet data to a perl data structure to avoid reparsing
 
 This software is copyright (c) 2019 by Steve Dondley.
 

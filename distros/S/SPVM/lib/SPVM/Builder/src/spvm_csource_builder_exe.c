@@ -49,7 +49,7 @@ void SPVM_CSOURCE_BUILDER_EXE_add_native_headers(SPVM_ENV* env, SPVM_STRING_BUFF
       const char* sub_name = &runtime->string_pool[sub->name_id];
       const char* sub_package_name = &runtime->string_pool[sub_package->name_id];
       
-      SPVM_STRING_BUFFER_add(string_buffer, "int32_t SPVM_NATIVE_");
+      SPVM_STRING_BUFFER_add(string_buffer, "int32_t SPNATIVE__");
       SPVM_STRING_BUFFER_add_package_name(string_buffer, sub_package_name);
       SPVM_STRING_BUFFER_add(string_buffer, "__");
       SPVM_STRING_BUFFER_add(string_buffer, (char*)sub_name);
@@ -68,7 +68,7 @@ void SPVM_CSOURCE_BUILDER_EXE_add_precompile_headers(SPVM_ENV* env, SPVM_STRING_
       const char* sub_name = &runtime->string_pool[sub->name_id];
       const char* sub_package_name = &runtime->string_pool[sub_package->name_id];
       
-      SPVM_STRING_BUFFER_add(string_buffer, "int32_t SPVM_PRECOMPILE_");
+      SPVM_STRING_BUFFER_add(string_buffer, "int32_t SPPRECOMPILE__");
       SPVM_STRING_BUFFER_add_package_name(string_buffer, sub_package_name);
       SPVM_STRING_BUFFER_add(string_buffer, "__");
       SPVM_STRING_BUFFER_add(string_buffer, (char*)sub_name);
@@ -90,7 +90,7 @@ void SPVM_CSOURCE_BUILDER_EXE_add_set_sub_native_addresses(SPVM_ENV* env, SPVM_P
       
       SPVM_STRING_BUFFER_add(string_buffer, "  runtime->sub_cfunc_addresses[");
       SPVM_STRING_BUFFER_add_int(string_buffer, sub->id);
-      SPVM_STRING_BUFFER_add(string_buffer, "] = SPVM_NATIVE_");
+      SPVM_STRING_BUFFER_add(string_buffer, "] = SPNATIVE__");
       SPVM_STRING_BUFFER_add_package_name(string_buffer, sub_package_name);
       SPVM_STRING_BUFFER_add(string_buffer, "__");
       SPVM_STRING_BUFFER_add(string_buffer, (char*)sub_name);
@@ -112,7 +112,7 @@ void SPVM_CSOURCE_BUILDER_EXE_add_set_sub_precompile_addresses(SPVM_ENV* env, SP
       
       SPVM_STRING_BUFFER_add(string_buffer, "  runtime->sub_cfunc_addresses[");
       SPVM_STRING_BUFFER_add_int(string_buffer, sub->id);
-      SPVM_STRING_BUFFER_add(string_buffer, "] = SPVM_PRECOMPILE_");
+      SPVM_STRING_BUFFER_add(string_buffer, "] = SPPRECOMPILE__");
       SPVM_STRING_BUFFER_add_package_name(string_buffer, sub_package_name);
       SPVM_STRING_BUFFER_add(string_buffer, "__");
       SPVM_STRING_BUFFER_add(string_buffer, (char*)sub_name);
@@ -458,8 +458,8 @@ void SPVM_CSOURCE_BUILDER_EXE_build_exe_csource(SPVM_ENV* env, SPVM_STRING_BUFFE
     SPVM_STRING_BUFFER_add(string_buffer, ".type_flag = ");
     SPVM_STRING_BUFFER_add_int(string_buffer, runtime_arg->type_flag);
     SPVM_STRING_BUFFER_add(string_buffer, ", ");
-    SPVM_STRING_BUFFER_add(string_buffer, ".var_id = ");
-    SPVM_STRING_BUFFER_add_int(string_buffer, runtime_arg->var_id);
+    SPVM_STRING_BUFFER_add(string_buffer, ".mem_id = ");
+    SPVM_STRING_BUFFER_add_int(string_buffer, runtime_arg->mem_id);
     SPVM_STRING_BUFFER_add(string_buffer, ", ");
     SPVM_STRING_BUFFER_add(string_buffer, ".runtime_type = ");
     SPVM_STRING_BUFFER_add_int(string_buffer, runtime_arg->runtime_type);

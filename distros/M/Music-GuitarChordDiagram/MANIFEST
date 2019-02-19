@@ -9,6 +9,8 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/autumn-leaves-shapes
+eg/ukulele
 lib/Music/GuitarChordDiagram.pm
 t/00-compile.t
 t/01-methods.t

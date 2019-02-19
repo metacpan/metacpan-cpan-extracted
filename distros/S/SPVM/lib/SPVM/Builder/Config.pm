@@ -14,18 +14,15 @@ sub new {
   return bless $self, $class;
 }
 
-sub set_src_ext {
-  my ($self, $src_ext) = @_;
+sub new_with_make_maker_option {
+  my ($class, $mconfig) = @_;
   
-  $self->{src_ext} = $src_ext;
+  my $config = $class->new;
   
-  return $self;
-}
-
-sub get_src_ext {
-  my ($self) = @_;
-  
-  return $self->{src_ext};
+  # Parse MakeMaker options
+  if (defined(my $ccflags = $mconfig->{CCFLGAS})) {
+    $config->set_ccflags($ccflags);
+  }
 }
 
 sub replace_all_config {

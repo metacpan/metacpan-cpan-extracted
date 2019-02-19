@@ -1,6 +1,6 @@
 package MooX::PluginKit::Core;
 
-$MooX::PluginKit::Core::VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -20,6 +20,9 @@ to be used directly.  This may change.
 use Carp qw( croak );
 use Moo::Role qw();
 use Module::Runtime qw( require_module is_module_name );
+
+require UNIVERSAL::DOES
+    unless defined &UNIVERSAL::DOES;
 
 use strictures 2;
 use namespace::clean;

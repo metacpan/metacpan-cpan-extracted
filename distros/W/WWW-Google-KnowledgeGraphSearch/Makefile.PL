@@ -22,7 +22,7 @@ WriteMakefile(
         'Moo'                    => '2.000000',
         'namespace::autoclean'   => '0.28',
         'URI'                    => '1.65',
-        'WWW::Google::UserAgent' => '0.22',
+        'WWW::Google::UserAgent' => '0.23',
         'Type::Tiny'             => '1.000005',
         'JSON'                   => '2.90',
     },
@@ -31,8 +31,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'WWW::Google::KnowledgeGraphSearch'         => { file => 'lib/WWW/Google/KnowledgeGraphSearch.pm'       , version => '0.06' },
-            'WWW::Google::KnowledgeGraphSearch::Result' => { file => 'lib/WWW/Google/KnowledgeGraphSearch/Result.pm', version => '0.06' },
+            'WWW::Google::KnowledgeGraphSearch'         => { file => 'lib/WWW/Google/KnowledgeGraphSearch.pm'       , version => '0.07' },
+            'WWW::Google::KnowledgeGraphSearch::Result' => { file => 'lib/WWW/Google/KnowledgeGraphSearch/Result.pm', version => '0.07' },
         },
         resources => {
             repository => {

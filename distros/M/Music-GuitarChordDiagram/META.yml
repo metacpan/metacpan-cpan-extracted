@@ -22,6 +22,7 @@ meta-spec:
 name: Music-GuitarChordDiagram
 requires:
   Imager: '0'
+  List::MoreUtils: '0'
   Moo: '2'
   Music::Chord::Namer: '0'
   namespace::clean: '0'
@@ -30,7 +31,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-GuitarChordDiagram
   repository: https://github.com/ology/Music-GuitarChordDiagram
-version: '0.0200'
+version: '0.0500'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -201,6 +202,8 @@ x_Dist_Zilla:
           stopwords:
             - PNG
             - TTF
+            - fretboard
+            - th
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'

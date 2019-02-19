@@ -37,7 +37,7 @@ tax-filter-ali.pl - Apply a taxonomic filter to ALI files
 
 =head1 VERSION
 
-version 0.182420
+version 0.190500
 
 =head1 USAGE
 

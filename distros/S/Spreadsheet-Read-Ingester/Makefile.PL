@@ -13,7 +13,7 @@ install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "ingest spreadsheets to Perl data structure for faster, repeated processing",
+  "ABSTRACT" => "ingest and save csv and spreadsheet data to a perl data structure to avoid reparsing",
   "AUTHOR" => "Steve Dondley <s\@dondley.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Output" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }

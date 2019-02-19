@@ -4,7 +4,7 @@ PerlX::Let - Syntactic sugar for lexical constants
 
 # VERSION
 
-version v0.2.3
+version v0.2.5
 
 # SYNOPSIS
 
@@ -51,7 +51,7 @@ This is roughly equivalent to using
 use Const::Fast;
 
 {
- const $key => "username";
+  const $key => "username";
 
   if (defined $arg{$key}) {
     $row->update( { $key => $arg{$key} );

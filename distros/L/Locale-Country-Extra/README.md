@@ -1,6 +1,8 @@
 
 ### Locale::Country::Extra
-[![Build Status](https://travis-ci.org/binary-com/perl-Locale-Country-Extra.svg?branch=master)](https://travis-ci.org/binary-com/perl-Locale-Country-Extra) [![Coverage Status](https://coveralls.io/repos/binary-com/perl-Locale-Country-Extra/badge.png?branch=master)](https://coveralls.io/r/binary-com/perl-Locale-Country-Extra?branch=master)
+
+[![Build Status](https://travis-ci.org/binary-com/perl-Locale-Country-Extra.svg?branch=master)](https://travis-ci.org/binary-com/perl-Locale-Country-Extra) 
+[![codecov](https://codecov.io/gh/binary-com/perl-Locale-Country-Extra/branch/master/graph/badge.svg)](https://codecov.io/gh/binary-com/perl-Locale-Country-Extra)
 
 Standard and IDD codes for Country identification, with Multilingual support
 
@@ -13,6 +15,29 @@ my $c = $countries->country_from_code('au'); # returns 'Australia'
 my $code = $countries->code_from_country('Indonesia'); # returns 'id'
 my $idd = $countries->idd_from_code('in'); # returns 91
 my $code = $countries->code_from_phone('+44 8882220202'); # returns 'gb'
+```
+
+Extra aliases for country name are supported as below
+ ```
+our %COUNTRY_MAP = (
+    "brunei darussalam"                 => "bn",
+    "cocos islands"                     => "cc",
+    "congo"                             => "cg",
+    "heard island and mcdonald islands" => "hm",
+    "hong kong s.a.r."                  => "hk",
+    "korea"                             => "kr",
+    "macao s.a.r."                      => "mo",
+    "myanmar"                           => "mm",
+    "islamic republic of pakistan"      => "pk",
+    "palestinian authority"             => "ps",
+    "pitcairn"                          => "pn",
+    "saint vincent and the grenadines"  => "vc",
+    "south georgia"                     => "gs",
+    "syrian arab republic"              => "sy",
+    "u.a.e."                            => "ae",
+    "vatican city state"                => "va",
+    "virgin islands"                    => "vg"
+);
 ```
 
 #### INSTALLATION

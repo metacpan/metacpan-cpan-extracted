@@ -17,7 +17,7 @@ name: Test-CheckManifest
 provides:
   Test::CheckManifest:
     file: lib/Test/CheckManifest.pm
-    version: '1.39'
+    version: '1.41'
 requires:
   Carp: '0'
   Cwd: '3.75'
@@ -32,7 +32,7 @@ resources:
   bugtracker: http://github.com/reneeb/Test-CheckManifest/issues
   homepage: http://github.com/reneeb/Test-CheckManifest
   repository: http://github.com/reneeb/Test-CheckManifest.git
-version: '1.39'
+version: '1.41'
 x_contributors:
   - 'doug <doug@hcsw.org>'
   - 'LorenzoTa <LorenzoTa@users.noreply.github.com>'

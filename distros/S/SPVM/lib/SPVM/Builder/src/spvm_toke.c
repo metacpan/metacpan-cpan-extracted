@@ -475,13 +475,15 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           if (*compiler->bufptr == '\r' || *compiler->bufptr == '\n' || *compiler->bufptr == '\0') {
             break;
           }
-          compiler->bufptr++;
+          else {
+            compiler->bufptr++;
+          }
         }
         
         continue;
       
       case '=':
-        // Pod
+        // POD
         if (compiler->bufptr == compiler->cur_src || *(compiler->bufptr - 1) == '\n' || *(compiler->bufptr - 1) == '\r') {
           while (1) {
             compiler->bufptr++;
@@ -1478,7 +1480,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   return ISA;
                 }
                 else if (strcmp(keyword, "isweak") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_ISA);
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_ISWEAK);
                   return ISWEAK;
                 }
                 else if (strcmp(keyword, "int") == 0) {
@@ -1582,7 +1584,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
                 break;
               case 'r' :
-                if (strcmp(keyword, "return") == 0) {
+                if (strcmp(keyword, "refcnt") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_REFCNT);
+                  return REFCNT;
+                }
+                else if (strcmp(keyword, "return") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_RETURN);
                   return RETURN;
                 }

@@ -6,6 +6,13 @@
 --    readability at the suggestion of Peter Rice, EMBL
 --  Later additions by Taxonomy Group staff at NCBI
 --
+--  Version 4.4
+--     Added GTG as start codon for genetic code 3
+--     Added Balanophoraceae plastid genetic code 32
+--
+--  Version 4.3
+--     Change to CTG -> Leu in genetic codes 27, 28, 29, 30
+--
 --  Version 4.2
 --     Added Karyorelict nuclear genetic code 27
 --     Added Condylostoma nuclear genetic code 28
@@ -114,7 +121,7 @@ Genetic-code-table ::= {
   name "SGC2" ,
   id 3 ,
   ncbieaa  "FFLLSSSSYY**CCWWTTTTPPPPHHQQRRRRIIMMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
-  sncbieaa "----------**----------------------MM----------------------------"
+  sncbieaa "----------**----------------------MM---------------M------------"
   -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
   -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
   -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
@@ -319,6 +326,15 @@ Genetic-code-table ::= {
   id 31 ,
   ncbieaa  "FFLLSSSSYYEECCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
   sncbieaa "----------**-----------------------M----------------------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ } ,
+ {
+  name "Balanophoraceae Plastid" ,
+  id 32 ,
+  ncbieaa  "FFLLSSSSYY*WCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "---M------*---*----M------------MMMM---------------M------------"
   -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
   -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
   -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG

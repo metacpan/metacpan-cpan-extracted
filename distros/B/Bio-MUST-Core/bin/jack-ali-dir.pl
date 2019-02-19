@@ -89,7 +89,7 @@ jack-ali-dir.pl - Jackknife a directory of ALI files
 
 =head1 VERSION
 
-version 0.182420
+version 0.190500
 
 =head1 USAGE
 

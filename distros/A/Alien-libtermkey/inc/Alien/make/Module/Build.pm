@@ -316,32 +316,6 @@ sub ACTION_code
       );
 
       open( my $stamp, ">", $buildstamp ) or die "Unable to touch .build-stamp file - $!";
-
-      # The .pc file that 'make install' has written contains the build-time
-      # blib paths in it. We need that rewritten for the real install location,
-      # except we're not going to know where that is until ACTION_install.
-      # We'll rewrite it to @LIBDIR@ now so we can expand the real path later
-      my $pcfile = "$libdir/pkgconfig/$pkgconfig_module.pc";
-      if( -f $pcfile ) {
-         open my $in, "<", $pcfile or die "Cannot open $pcfile for reading - $!";
-         open my $out, ">", "$pcfile.new" or die "Cannot open $pcfile.new for writing - $!";
-
-         print { $out } join "\n",
-            "# pkg-config rewrite hack written by Alien::make::Module::Build",
-            "";
-
-         while( <$in> ) {
-            s{\Q$libdir\E}{\@LIBDIR@}g;
-            print { $out } $_;
-         }
-
-         # Cygwin/Windows doesn't like it when you delete open files
-         close $in;
-         close $out;
-
-         unlink $pcfile;
-         rename "$pcfile.new", $pcfile;
-      }
    }
 
    my @module_file = split m/::/, $self->module_name . ".pm";
@@ -404,26 +378,53 @@ sub ACTION_install
 
    $self->apply_extra_pkgconfig_paths;
 
+   # There's two bugs in just doing this:
+   #   1) symlinks (e.g. libfoo.so => libfoo.so.1) get copied as new files
+   #   2) needlessly considers the .pc file different and copies/relocates it
+   #      every time.
+   # Both of these are still under investigation
    $self->SUPER::ACTION_install;
 
-   return unless $self->notes( 'use_bundled' );
+   # The .pc file that 'ACTION_install' has written contains the build-time
+   # blib paths in it. We need that rewritten for the real install location
+   #
+   # We don't do this at 'ACTION_code' time, because of one awkward cornercase.
+   # When 'cpan> test Foo' is testing an entire tree of dependent modules, it
+   # never installs them, instead adding each of them to the PERL5LIB in turn
+   # so later ones can find them. We needed the path to be "correct" at that
+   # point so that dependent modules can at least find something to link and
+   # test against.
+
+   my $buildlibdir = File::Spec->catdir( $self->base_dir, "blib", "arch" );
+   my $instlibdir  = $self->install_destination( "arch" );
 
    my $pkgconfig_module = $self->pkgconfig_module;
-   my $libdir = $self->install_destination( "arch" );
 
-   my $pcfile = "$libdir/pkgconfig/$pkgconfig_module.pc";
+   my $pcfile = "$instlibdir/pkgconfig/$pkgconfig_module.pc";
+   if( -f $pcfile ) {
+      print "Relocating $pcfile";
 
-   print "Relocating $pcfile\n";
+      open my $in, "<", $pcfile or die "Cannot open $pcfile for reading - $!";
+      open my $out, ">", "$pcfile.new" or die "Cannot open $pcfile.new for writing - $!";
 
-   $self->cp_file_with_replacement(
-      srcfile => $pcfile,
-      dstfile => "$pcfile.NEW",
-      replace => {
-         LIBDIR => dirname( dirname( $pcfile ) ),
-      },
-   );
+      print { $out } join "\n",
+         "# pkg-config paths rewritten by Alien::make::Module::Build",
+         "# buildlibdir=$buildlibdir",
+         "# instlibdir=$instlibdir",
+         "";
 
-   rename "$pcfile.NEW", $pcfile;
+      while( <$in> ) {
+         s{\Q$buildlibdir\E}{$instlibdir}g;
+         print { $out } $_;
+      }
+
+      # Cygwin/Windows doesn't like it when you delete open files
+      close $in;
+      close $out;
+
+      unlink $pcfile;
+      rename "$pcfile.new", $pcfile;
+   }
 }
 
 sub ACTION_clean

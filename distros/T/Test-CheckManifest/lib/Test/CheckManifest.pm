@@ -13,7 +13,7 @@ use Test::Builder;
 use File::Find;
 use Scalar::Util qw(blessed);
 
-our $VERSION = 1.39;
+our $VERSION = 1.41;
 our $VERBOSE = 1;
 our $HOME;
 our $test_bool = 1;
@@ -95,8 +95,8 @@ sub _check_excludes {
 sub _find_home {
     my ($params) = @_;
 
-	my $tmp_path = File::Spec->rel2abs( $0 );
-	my ($home, $volume, $dirs, $file, @dirs);
+    my $tmp_path = File::Spec->rel2abs( $0 );
+    my ($home, $volume, $dirs, $file, @dirs);
 
     if ( $params->{file} ) {
         $tmp_path = $params->{file};
@@ -114,12 +114,28 @@ sub _find_home {
 
         my $tmp_home = Cwd::realpath( File::Spec->catdir( $home, '..' ) );
 
-        last if !$tmp_home || $tmp_home eq $home || $counter++ == 20;
+        last if !$tmp_home || $counter++ == 5;
         $home = $tmp_home;
     }
 
     return $HOME if $HOME;
     return $home;
+}
+
+sub _manifest_files {
+    my ($home, $manifest) = @_;
+
+    my @files = _read_file( $manifest );
+
+    for my $tfile ( @files ) {
+        $tfile = ( split /\s{2,}/, $tfile, 2 )[0];
+
+        next if !-e $home . '/' . $tfile;
+
+        $tfile = File::Spec->rel2abs($home . '/' . $tfile);
+    }
+
+    return @files;
 }
 
 sub ok_manifest {
@@ -134,7 +150,7 @@ sub ok_manifest {
         $test->BAILOUT( 'Cannot find a MANIFEST. Please check!' );
     }
 
-    my @files = _read_file( $manifest );
+    my @files = _manifest_files( $home, $manifest );
     if ( !@files ) {
         $test->diag( "No files in MANIFEST found (is it readable?)" );
         return;
@@ -142,15 +158,8 @@ sub ok_manifest {
     
     my $skip_path  = File::Spec->catfile( $home, 'MANIFEST.SKIP' );
     my @skip_files = _read_file( $skip_path );
+    my @skip_rx    = map{ qr/\Q$_\E/ }@skip_files;
     my $excluded   = _check_excludes( $hashref, $home );
-
-    for my $tfile ( @files ) {
-        $tfile = ( split /\s{2,}/, $tfile, 2 )[0];
-
-        next if !-e $home . '/' . $tfile;
-
-        $tfile = File::Spec->rel2abs($home . '/' . $tfile);
-    }
 
     my (@dir_files, %excluded);
 
@@ -164,7 +173,7 @@ sub ok_manifest {
                 $excluded,
                 $hashref->{filter},
                 $hashref->{bool},
-                \@skip_files,
+                \@skip_rx,
                 $home,
             );
             
@@ -174,14 +183,13 @@ sub ok_manifest {
         }
     },$home);
 
-    my $success = _check_manifest( \@dir_files, \@files, \%excluded, $msg );
-    $test->diag( "MANIFEST: $manifest" ) if !$success;
+    my $success = _check_manifest( \@dir_files, \@files, \%excluded, $msg, $manifest );
 
     return $success;
 }
 
 sub _check_manifest {
-    my ($existing_files, $manifest_files, $excluded, $msg) = @_;
+    my ($existing_files, $manifest_files, $excluded, $msg, $manifest) = @_;
 
     my @existing = @{ $existing_files || [] };
     my @manifest = @{ $manifest_files || [] };
@@ -238,6 +246,8 @@ sub _check_manifest {
     $test->diag($plus) if scalar @files_plus >= 1 and $test_bool == 1 and $VERBOSE;
     $test->diag($dup)  if scalar @dup_files  >= 1 and $test_bool == 1 and $VERBOSE;
 
+    $test->diag( "MANIFEST: $manifest" ) if !$success;
+
     return $success;
 }
 
@@ -286,7 +296,7 @@ sub _not_ok_manifest {
     $test_bool = 1;
 }
 
-sub _is_excluded{
+sub _is_excluded {
     my ($file,$dirref,$filter,$bool,$files_in_skip,$home) = @_;
 
     $home = '' if !defined $home;
@@ -296,12 +306,12 @@ sub _is_excluded{
     if ( $files_in_skip ) {
         (my $local_file = $file) =~ s{\Q$home\E}{};
         for my $rx ( @{$files_in_skip} ) {
-            my $regex = qr/$rx/;
-            return 1 if $local_file =~ $regex;
+            return 1 if $local_file =~ $rx;
         }
     }
-        
-    my @matches = grep{ $file =~ /$_$/ }@excluded_files;
+
+    my $basename = basename $file;
+    my @matches  = grep{ $basename eq $_ }@excluded_files;
 
     return 1 if @matches;
 
@@ -372,7 +382,7 @@ Test::CheckManifest - Check if your Manifest matches your distro
 
 =head1 VERSION
 
-version 1.39
+version 1.41
 
 =head1 SYNOPSIS
 

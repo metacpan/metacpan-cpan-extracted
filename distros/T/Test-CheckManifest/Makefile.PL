@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "CPAN::Meta::YAML" => 0,
     "Pod::Coverage::TrustPod" => 0
   },
-  "VERSION" => "1.39",
+  "VERSION" => "1.41",
   "test" => {
     "TESTS" => "t/*.t t/extra/*.t t/xt/*.t"
   }

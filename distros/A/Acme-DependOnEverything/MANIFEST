@@ -1,0 +1,4 @@
+lib/Acme/DependOnEverything.pm
+MANIFEST
+Makefile.PL
+t/00-load.t
