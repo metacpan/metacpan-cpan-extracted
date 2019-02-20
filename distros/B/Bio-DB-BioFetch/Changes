@@ -1,0 +1,12 @@
+Summary of important user-visible changes for Bio-DB-BioFetch
+-------------------------------------------------------------
+
+1.7.3     2019-02-19 13:14:08-05:00 America/Detroit
+  * First release after split from bioperl-live.
+
+  * The default baseaddress was changed to use the https protocol.
+    The EBI servers were already redirecting it to https anyway.
+
+  * 'refseq' is no longer a valid database for dbfetch requests.  Use
+    'refseqn' (RefSeq nucleotide) or 'refseqp' (RefSeq protein)
+    instead.

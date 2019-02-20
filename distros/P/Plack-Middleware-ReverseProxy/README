@@ -1,27 +1,48 @@
-This is Perl module Plack::Middleware::ReverseProxy.
+NAME
 
-INSTALLATION
+    Plack::Middleware::ReverseProxy - Supports app to run as a reverse
+    proxy backend
 
-Plack::Middleware::ReverseProxy installation is straightforward. If your CPAN shell is set up,
-you should just be able to do
+SYNOPSIS
 
-    % cpan Plack::Middleware::ReverseProxy
+      builder {
+          enable_if { $_[0]->{REMOTE_ADDR} eq '127.0.0.1' } 
+              "Plack::Middleware::ReverseProxy";
+          $app;
+      };
 
-Download it, unpack it, then build it as per the usual:
+DESCRIPTION
 
-    % perl Makefile.PL
-    % make && make test
+    Plack::Middleware::ReverseProxy resets some HTTP headers, which changed
+    by reverse-proxy. You can specify the reverse proxy address and stop
+    fake requests using 'enable_if' directive in your app.psgi.
 
-Then install it:
+LICENSE
 
-    % make install
+    This software is licensed under the same terms as Perl itself.
 
-DOCUMENTATION
+COPYRIGHT
 
-Plack::Middleware::ReverseProxy documentation is available as in POD. So you can do:
+    Copyright 2009-2019 Tatsuhiko Miyagawa
 
-    % perldoc Plack::Middleware::ReverseProxy
+AUTHOR
 
-to read the documentation online with your favorite pager.
+    This module is originally written by Kazuhiro Osawa as
+    HTTP::Engine::Middleware::ReverseProxy for HTTP::Engine.
 
-Noubo Danjou
+    Nobuo Danjou
+
+    Masahiro Nagano
+
+    Tatsuhiko Miyagawa
+
+SEE ALSO
+
+    HTTP::Engine::Middleware::ReverseProxy
+
+    Plack
+
+    Plack::Middleware
+
+    Plack::Middleware::Conditional
+

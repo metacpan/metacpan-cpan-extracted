@@ -1,8 +1,18 @@
 Changes file for Test::Differences
 
+0.65   2019-02-19
+    - Canonical repo is now https://github.com/DrHyde/perl-modules-Test-Differences
+    - Fix discrepancies in copyright notices (thanks to Christian Neukirchen
+      for pointing them out)
+    - Make the tests more consistent (thanks to genio)
+    - Add unicode tests
+    - Fix whitespace issue in tests when using recent Test::More in verbose mode
+      (thanks to ntnyi for debugging)
+    - Get rid of Build.PL, just use Makefile.PL
+
 0.64 Sun November 22, 2015
     - Bump dependency version for Text::Diff to avoid a buggy release
-    - Make tests pass with relocation perl (see
+    - Make tests pass with relocatable perl (see
       https://rt.cpan.org/Ticket/Display.html?id=103133)
 
 0.63 Thu November 20, 2014

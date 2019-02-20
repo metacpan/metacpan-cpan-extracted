@@ -31,7 +31,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-GuitarChordDiagram
   repository: https://github.com/ology/Music-GuitarChordDiagram
-version: '0.0500'
+version: '0.0501'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

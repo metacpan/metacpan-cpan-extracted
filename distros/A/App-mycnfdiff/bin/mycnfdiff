@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+
+package mycnfdiff;
+$mycnfdiff::VERSION = '1.00';
+use Getopt::Long::Descriptive;
+use App::mycnfdiff;
+use Data::Dumper;
+
+my ( $opts, $usage ) = describe_options(
+    $0 . ' %o',
+    [ 'skip|s=s', "comma-separated list of files to skip from parsing" ],
+    [
+        'dir|d=s',
+"specify other directory than current, do not resolve files from subdirectories"
+    ],
+    [
+        'list|l=s',
+        "manually specify source files to parse, in comma separated list format"
+    ],
+    [ 'verbose|v', "print extra stuff" ],
+    [ 'help|h', "print usage message and exit", { shortcircuit => 1 } ],
+);
+
+# TO-DO: diff with compiled defaults  (mysqld --verbose --help)
+
+print( $usage->text ), exit if $opts->help;
+print "$0 run with options : " . Dumper $opts if $opts->verbose;
+
+exit App::mycnfdiff->run($opts);
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mycnfdiff
+
+=head1 VERSION
+
+version 1.00
+
+=head1 AUTHOR
+
+Pavel Serikov <pavelsr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Pavel Serikov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

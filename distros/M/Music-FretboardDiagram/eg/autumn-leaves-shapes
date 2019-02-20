@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# https://raw.githubusercontent.com/ology/Music-FretboardDiagram/master/autumn-leaves.png
+
+use Music::FretboardDiagram;
+
+my $dia = Music::FretboardDiagram->new(
+    chord    => 'x13121',
+    position => 3,
+    outfile  => 'Cm7',
+);
+$dia->draw;
+
+$dia->chord('xx1323');
+$dia->outfile('F7');
+$dia->draw;
+
+$dia->chord('132211');
+$dia->position(6);
+$dia->outfile('Bbmaj7');
+$dia->draw;
+
+$dia->chord('x13231');
+$dia->outfile('Ebmaj7');
+$dia->draw;
+
+$dia->chord('xx1222');
+$dia->position(7);
+$dia->outfile('Ao7_1');
+$dia->draw;
+
+$dia->chord('x1413x');
+$dia->position(5);
+$dia->outfile('D7b13_1');
+$dia->draw;
+
+$dia->chord('xx1312');
+$dia->outfile('Gmin6_1');
+$dia->draw;
+
+$dia->chord('x0101x');
+$dia->position(1);
+$dia->outfile('Ao7_2');
+$dia->draw;
+
+$dia->chord('xx0312');
+$dia->outfile('D7b13_2');
+$dia->draw;
+
+$dia->chord('133131');
+$dia->position(3);
+$dia->outfile('Gmin6_2');
+$dia->draw;
+
+$dia->chord('xx1322');
+$dia->position(5);
+$dia->outfile('Gmin7');
+$dia->draw;
+
+$dia->chord('xx1323');
+$dia->position(4);
+$dia->outfile('Gb7');
+$dia->draw;
+
+$dia->chord('xx1322');
+$dia->position(3);
+$dia->outfile('Fmin7');
+$dia->draw;
+
+$dia->chord('xx1323');
+$dia->position(2);
+$dia->outfile('E7');
+$dia->draw;
+
+$dia->chord('2x221x');
+$dia->position(4);
+$dia->outfile('Ao7_3');
+$dia->draw;

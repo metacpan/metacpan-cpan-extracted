@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,6 +23,7 @@ requires:
   Test::More: '0.88'
   Text::Diff: '1.43'
 resources:
-  bugtracker: https://github.com/Ovid/Test-Differences/issues
-  repository: https://github.com/Ovid/Test-Differences
-version: '0.64'
+  bugtracker: https://github.com/DrHyde/Test-Differences/issues
+  repository: https://github.com/DrHyde/Test-Differences
+version: '0.65'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

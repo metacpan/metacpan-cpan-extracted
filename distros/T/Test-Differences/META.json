@@ -4,13 +4,13 @@
       "David Cantrell <david@cantrell.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Differences",
    "no_index" : {
@@ -42,11 +42,12 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Ovid/Test-Differences/issues"
+         "web" : "https://github.com/DrHyde/Test-Differences/issues"
       },
       "repository" : {
-         "url" : "https://github.com/Ovid/Test-Differences"
+         "url" : "https://github.com/DrHyde/Test-Differences"
       }
    },
-   "version" : "0.64"
+   "version" : "0.65",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

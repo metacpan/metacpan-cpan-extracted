@@ -14,5 +14,6 @@ pod_coverage:
   private:
     - Dist::Zilla::Plugin::AlienBase::Doc
     - Dist::Zilla::Plugin::AlienBase::Wrapper
+    - Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle
     - Dist::Zilla::Plugin::AlienBuild
 

@@ -1,5 +1,5 @@
 package Authen::NZRealMe::ServiceProvider::Builder;
-$Authen::NZRealMe::ServiceProvider::Builder::VERSION = '1.18';
+$Authen::NZRealMe::ServiceProvider::Builder::VERSION = '1.19';
 use warnings;
 use strict;
 use feature "switch";

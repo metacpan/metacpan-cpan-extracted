@@ -5,8 +5,9 @@ use warnings;
 use GraphQL::Schema;
 use GraphQL::Debug qw(_debug);
 use Lingua::EN::Inflect::Number qw(to_S);
+use Carp qw(confess);
 
-our $VERSION = "0.08";
+our $VERSION = "0.10";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %GRAPHQL_TYPE2SQLS = (
@@ -101,11 +102,13 @@ my %TYPEMAP = (
     } @{ $GRAPHQL_TYPE2SQLS{$gql_type} }
   } keys %GRAPHQL_TYPE2SQLS),
   enum => sub {
-    my $info = shift;
+    my ($source, $column, $info) = @_;
     my $extra = $info->{extra};
     return {
       kind => 'enum',
-      name => _dbicsource2pretty($extra->{custom_type_name}),
+      name => _dbicsource2pretty(
+        $extra->{custom_type_name} || "${source}_$column"
+      ),
       values => { map { _trim_name($_) => { value => $_ } } @{ $extra->{list} } },
     }
   },
@@ -114,6 +117,7 @@ my %TYPE2SCALAR = map { ($_ => 1) } qw(ID String Int Float Boolean);
 
 sub _dbicsource2pretty {
   my ($source) = @_;
+  confess "_dbicsource2pretty given undef" if !defined $source;
   $source = eval { $source->source_name } || $source;
   $source =~ s#.*::##;
   $source = to_S $source;
@@ -235,10 +239,12 @@ sub to_graphql {
   my @ast;
   my (
     %name2type, %name2column21, %name2pk21, %name2fk21, %name2rel21,
-    %name2column2rawtype, %seentype,
+    %name2column2rawtype, %seentype, %name2isview,
   );
   for my $source (map $dbic_schema->source($_), $dbic_schema->sources) {
     my $name = _dbicsource2pretty($source);
+    DEBUG and _debug("schema_dbic2graphql($name)", $source);
+    $name2isview{$name} = 1 if $source->can('view_definition');
     my %fields;
     my $columns_info = $source->columns_info;
     $name2pk21{$name} = +{ map { ($_ => 1) } $source->primary_columns };
@@ -250,7 +256,7 @@ sub to_graphql {
       DEBUG and _debug("schema_dbic2graphql($name.col)", $column, $info);
       my $rawtype = $TYPEMAP{ lc $info->{data_type} };
       if ( 'CODE' eq ref $rawtype ) {
-        my $col_spec = $rawtype->($info);
+        my $col_spec = $rawtype->($name, $column, $info);
         push @ast, $col_spec unless $seentype{$col_spec->{name}};
         $rawtype = $col_spec->{name};
         $seentype{$col_spec->{name}} = 1;
@@ -271,6 +277,7 @@ sub to_graphql {
       my $type = _dbicsource2pretty($info->{source});
       $rel =~ s/_id$//; # dumb heuristic
       delete $name2column21{$name}->{$rel}; # so it's not a "column" now
+      delete $name2pk21{$name}{$rel}; # it's not a PK either
       # if it WAS a column, capture its non-null-ness
       my $non_null = ref(($fields{$rel} || {})->{type}) eq 'ARRAY';
       $type = _apply_modifier('non_null', $type) if $non_null;
@@ -290,7 +297,7 @@ sub to_graphql {
   push @ast, map _type2createinput(
     $_, $name2type{$_}->{fields}, \%name2pk21, $name2fk21{$_},
     $name2column21{$_}, \%name2type,
-  ), keys %name2type;
+  ), grep !$name2isview{$_}, keys %name2type;
   push @ast, map _type2searchinput(
     $_, $name2column2rawtype{$_}, \%name2pk21,
     $name2column21{$_}, \%name2type,
@@ -298,7 +305,7 @@ sub to_graphql {
   push @ast, map _type2mutateinput(
     $_, $name2column2rawtype{$_}, $name2type{$_}->{fields}, \%name2pk21,
     $name2column21{$_},
-  ), keys %name2type;
+  ), grep !$name2isview{$_}, keys %name2type;
   push @ast, {
     kind => 'type',
     name => 'Query',
@@ -339,7 +346,7 @@ sub to_graphql {
         };
         (
           # the PKs query
-          $pksearch_name => {
+          keys %{ $name2pk21{$name} } ? ($pksearch_name => {
             type => _apply_modifier('list', $name),
             args => {
               map {
@@ -350,7 +357,7 @@ sub to_graphql {
                 }
               } keys %{ $name2pk21{$name} }
             },
-          },
+          }) : (),
           $input_search_name => {
             description => 'input to search',
             type => _apply_modifier('list', $name),
@@ -465,7 +472,7 @@ sub to_graphql {
             },
           },
         )
-      } keys %name2type
+      } grep !$name2isview{$_}, keys %name2type
     },
   };
   +{

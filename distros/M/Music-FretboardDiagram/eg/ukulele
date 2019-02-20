@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Music::FretboardDiagram;
+ 
+my $dia = Music::FretboardDiagram->new(
+    chord   => '0212',
+    strings => 4,
+    frets   => 6,
+    outfile => $0,
+    verbose => 1,
+    tuning  => [qw/A E C G/],
+);
+ 
+$dia->draw();

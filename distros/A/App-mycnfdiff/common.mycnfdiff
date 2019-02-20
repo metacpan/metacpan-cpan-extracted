@@ -1,0 +1,29 @@
+[mysqld]
+innodb_data_file_path = ibdata1:100M:autoextend
+query_cache_size = 2M
+innodb_autoextend_increment = 32M
+innodb_log_files_in_group = 2
+skip_name_resolve
+innodb_lock_wait_timeout = 150
+read_rnd_buffer_size = 8M
+table_open_cache = 512
+character_set_server = utf8
+tmp_table_size = 20M
+skip-name-resolve
+lower_case_table_names = 1
+read_buffer_size = 1M
+delayed_queue_size = 8
+group_concat_max_len = 32M
+innodb_file_format = BARRACUDA
+sort_buffer_size = 10M
+thread_cache_size = 8
+innodb_log_file_size = 100M
+myisam_sort_buffer_size = 64M
+connect_timeout = 100000
+skip_external_locking
+query_cache_type = 1
+innodb_log_buffer_size = 4M
+skip-external-locking
+innodb_flush_log_at_trx_commit = 0
+key_buffer_size = 128M
+max_allowed_packet = 16M

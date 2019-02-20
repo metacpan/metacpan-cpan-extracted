@@ -30,15 +30,16 @@
          "requires" : {
             "File::Find::Rule" : "0",
             "File::Spec" : "0",
-            "Mojolicious" : "4.0",
+            "Mojolicious" : "8.0",
             "Scalar::Util" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.020001"
          }
       },
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0",
             "File::Basename" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0"
          }
       }
@@ -46,7 +47,7 @@
    "provides" : {
       "MojoX::GlobalEvents" : {
          "file" : "lib/MojoX/GlobalEvents.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -61,8 +62,9 @@
          "web" : "http://github.com/reneeb/MojoX-GlobalEvents"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"
    ],

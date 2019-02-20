@@ -1,5 +1,5 @@
 package Spreadsheet::Read::Ingester ;
-$Spreadsheet::Read::Ingester::VERSION = '0.004';
+$Spreadsheet::Read::Ingester::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use Storable;
 use File::Spec;
 use File::Signature;
 use File::UserConfig;
-use Spreadsheet::Read;
+use Spreadsheet::Read 0.68;
 
 ### Public methods ###
 
@@ -40,7 +40,16 @@ sub new {
 
 sub cleanup {
   my $s = shift;
-  my $age = shift // 30;
+  my $age = shift;
+
+  if (!defined $age) {
+    $age = 30;
+  } elsif ($age eq '0') {
+    $age = -1
+  } elsif ($age !~ /^\d+$/) {
+    warn 'cleanup method accepts only positive integer values or 0';
+    return;
+  }
 
   my $configdir = File::UserConfig->new(dist => 'Spreadsheet-Read-Ingester')->configdir;
 
@@ -49,7 +58,10 @@ sub cleanup {
   closedir (DIR);
   foreach my $file (@files) {
     $file = File::Spec->catfile($configdir, $file);
-    unlink $file if -M $file >= $age;
+    next if (-d $file);
+    if (-M $file >= $age) {
+      unlink $file or die 'Cannot remove file: $file';
+    }
   }
 }
 
@@ -79,13 +91,13 @@ Spreadsheet::Read::Ingester - ingest and save csv and spreadsheet data to a perl
 
 =head1 DESCRIPTION
 
-This module is intended to be a drop-in replacement for <Spreadsheet::Read> and
+This module is intended to be a drop-in replacement for L<Spreadsheet::Read> and
 is a simple, unobtrusive wrapper for it.
 
 Parsing spreadsheet and csv data files is time consuming, especially with large
 data sets. If a data file is ingested more than once, much time and processing
 power is wasted reparsing the same data. To avoid reparsing, this module uses
-<Storable> to save a parsed version of the data to disk when a new file is
+L<Storable> to save a parsed version of the data to disk when a new file is
 ingested. All subsequent ingestions are retrieved from the stored Perl data
 structure. Files are saved in the directory determined by L<File::UserConfig>
 and is a function of the user's OS.

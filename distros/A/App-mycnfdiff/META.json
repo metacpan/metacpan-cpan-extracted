@@ -1,0 +1,62 @@
+{
+   "abstract" : "compare MySQL server configs. ",
+   "author" : [
+      "Pavel Serikov <pavelsr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-mycnfdiff",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::MySQL::Reader" : "0",
+            "Config::MySQL::Writer" : "0",
+            "Const::Fast" : "0",
+            "Cwd" : "0",
+            "Data::Dump" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "File::Slurper" : "0",
+            "Getopt::Long::Descriptive" : "0",
+            "List::Compare" : "0",
+            "List::Util" : "0",
+            "Text::CSV" : "0",
+            "feature" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pavelsr/mycnfdiff/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pavelsr/mycnfdiff.git",
+         "web" : "https://github.com/pavelsr/mycnfdiff"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
+}
+

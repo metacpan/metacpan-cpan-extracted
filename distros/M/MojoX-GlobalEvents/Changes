@@ -1,6 +1,14 @@
 Version history for MojoX::GlobalEvents
 =======================================
 
+0.06 2019-02-20 07:34:00
+
+  * Change initialization and add tests
+
+0.05 2019-02-04 16:00:00
+
+  * Add check that init is called with a namespace (thanks to @manwar)
+
 0.04 2019-02-03 09:25:00
 
   * fix list of prereqs in dist.ini

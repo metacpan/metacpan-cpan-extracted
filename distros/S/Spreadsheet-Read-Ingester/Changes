@@ -1,5 +1,25 @@
 Revision history for Spreadsheet-Read-Ingester
 
+0.008     2019-02-20 08:49:43-05:00 America/New_York
+
+  - Fix link in documentation
+  - Remove share directory from distribution
+
+0.007     2019-02-19 19:54:36-05:00 America/New_York
+
+  - Attempt to allow module to work with older versions of perl
+  - Streamline test logic
+  - Add argument checks to cleanup method
+
+0.006     2019-02-19 14:55:46-05:00 America/New_York
+
+  - Require minimum version for Spreadsheet::Read
+  - Require csv file parser for tests
+
+0.005     2019-02-19 14:20:32-05:00 America/New_York
+
+  - Fix cleanup bug in test
+
 0.004     2019-02-19 07:32:00-05:00 America/New_York
 
   - Documentation improvements

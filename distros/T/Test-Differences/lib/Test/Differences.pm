@@ -6,10 +6,6 @@ package Test::Differences;
 
 Test::Differences - Test strings and data structures and show differences if not ok
 
-=head1 VERSION
-
-0.62
-
 =head1 SYNOPSIS
 
    use Test;    ## Or use Test::More
@@ -322,7 +318,7 @@ if you do this.
 
 =cut
 
-our $VERSION = "0.64"; # or "0.001_001" for a dev release
+our $VERSION = "0.65"; # or "0.001_001" for a dev release
 $VERSION = eval $VERSION;
 
 use Exporter;
@@ -339,6 +335,7 @@ use Exporter;
 );
 
 use strict;
+use warnings;
 
 use Carp;
 use Text::Diff;
@@ -570,10 +567,12 @@ option.
 
 =head1 LICENSE
 
-Copyright 2001-2008 Barrie Slaymaker, All Rights Reserved.
+Copyright Barrie Slaymaker, Curtis "Ovid" Poe, and David Cantrell.
 
-You may use this software under the terms of the GNU public license, any
-version, or the Artistic license.
+All Rights Reserved.
+
+You may use, distribute and modify this software under the terms of the GNU
+public license, any version, or the Artistic license.
 
 =cut
 

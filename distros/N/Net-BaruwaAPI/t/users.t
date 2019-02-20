@@ -13,6 +13,7 @@ my $do = Test::Net::BaruwaAPI->new(api_token => 'xxxxxxxasasswqefdff', api_url =
 isa_ok($do, 'Net::BaruwaAPI');
 
 my $res;
+my $page = 1;
 
 set_expected_response('create_user');
 
@@ -67,6 +68,11 @@ $res = $do->get_users();
 # ok($res, 'the get_users response is defined');
 is(get_last_request_method(), 'GET', 'the request method is correct');
 is(get_last_request_path(), '/api/v1/users', 'the request uri is correct');
+
+$res = $do->get_users($page);
+
+is(get_last_request_method(), 'GET', 'the request method is correct');
+is(get_last_request_path(), "/api/v1/users?page=$page", 'the request uri is correct');
 
 set_expected_response('get_user');
 my $userid = 1;

@@ -5,7 +5,8 @@ use Carp qw(croak);
 use Set::Tiny 0.01;
 use Filesys::Df 0.92;
 use Hash::Util 'lock_keys';
-our $VERSION = '1.3'; # VERSION
+
+our $VERSION = '1.4'; # VERSION
 
 =head1 NAME
 
@@ -92,12 +93,15 @@ in future implementations, but for now you need to create an instance from Linux
 sub new {
     my ( $class, $opts_ref, $has_inode ) = @_;
     my $valids_ref = Linux::Info::DiskUsage->default_fs;
+
     if ( defined($opts_ref) ) {
         croak 'Additional file system names must be given as an array reference'
           unless ( ref($opts_ref) eq 'ARRAY' );
+
         foreach my $type ( @{$opts_ref} ) {
             push( @{$valids_ref}, $type );
         }
+
     }
     my %self = (
         fstypes   => Set::Tiny->new( @{$valids_ref} ),
@@ -121,6 +125,7 @@ sub get {
     my $self          = shift;
     my $mount_entries = $self->_read;
     my %disk_usage;
+
     foreach my $entry ( @{$mount_entries} ) {
         my $ref  = df( $entry->[1] );
         my %info = (
@@ -130,6 +135,7 @@ sub get {
             free       => $ref->{bfree}       || '-',
             usageper   => $ref->{per}         || '-'
         );
+
         if ( $self->{has_inode} ) {
             my @inode_keys = (qw(files ffree favail fused fper));
             if ( exists( $ref->{files} ) ) {
@@ -142,25 +148,24 @@ sub get {
                     $info{$key} = '-';
                 }
             }
-            $disk_usage{ $entry->[0] } = \%info;
         }
+
+        $disk_usage{ $entry->[0] } = \%info;
     }
     return \%disk_usage;
 }
 
 =head2 default_fs
 
-Returns and array reference with the file systems that are mounted and will have their storage
-space checked by default.
+Returns and array reference with the file systems that are mounted and will have
+their storage space checked by default.
 
 This method can be invoke both directly from the class and from instances of it.
 
 =cut
 
 sub default_fs {
-
-    return [qw(devtmpfs tmpfs ext2 ext3 ext4 fuseblk)];
-
+    return [qw(devtmpfs tmpfs ext2 ext3 ext4 fuseblk xfs)];
 }
 
 sub _is_valid {
@@ -180,13 +185,16 @@ sub _read {
     open my $fh, '<', $file
       or croak "Unable to open '$file': $!";
     my @entries;
-    while (<$fh>) {
+
+    while ( local $_ = <$fh> ) {
         chomp;
         my @entry = split;
+
         if ( @entry != 6 ) {
             warn "invalid number of entries in $file line $.";
             next;
         }
+
         $#entry = 3;    # ignore the two dummy values at the end
         s/\\([0-7]{1,3})/chr oct $1/g for @entry;
 
@@ -194,9 +202,9 @@ sub _read {
         push( @entries, [ $entry[0], $entry[1] ] )
           if $self->_is_valid( $entry[2] );
     }
+
     close($file);
     return \@entries;
-
 }
 
 =head1 EXPORTS

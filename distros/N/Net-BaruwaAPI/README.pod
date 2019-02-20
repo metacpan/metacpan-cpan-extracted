@@ -6,9 +6,9 @@
 
 Perl bindings for the Baruwa REST API
 
-=for HTML <a href="https://travis-ci.org/akissa/Net-BaruwaAPI"><img src="https://travis-ci.org/akissa/Net-BaruwaAPI.svg?branch=master" /></a>
+=for HTML <a href="https://travis-ci.org/baruwa-enterprise/Net-BaruwaAPI"><img src="https://travis-ci.org/baruwa-enterprise/Net-BaruwaAPI.svg?branch=master" /></a>
 
-=for HTML <a href="https://codecov.io/gh/akissa/Net-BaruwaAPI"><img src="https://codecov.io/gh/akissa/Net-BaruwaAPI/branch/master/graph/badge.svg" alt="Coverage via Codecov" /></a>
+=for HTML <a href="https://codecov.io/gh/baruwa-enterprise/Net-BaruwaAPI"><img src="https://codecov.io/gh/baruwa-enterprise/Net-BaruwaAPI/branch/master/graph/badge.svg" alt="Coverage via Codecov" /></a>
 
 =for HTML <a href="https://www.mozilla.org/MPL/2.0/"><img src="https://img.shields.io/badge/license-MPLv2-blue.svg?style=flat-square" /></a>
 
@@ -52,7 +52,7 @@ You can also look for information at:
 
 =over 4
 
-=item * Fork it (https://github.com/akissa/Net-BaruwaAPI/fork)
+=item * Fork it (https://github.com/baruwa-enterprise/Net-BaruwaAPI/fork)
 
 =item * Create your feature branch (`git checkout -b my-new-feature`)
 

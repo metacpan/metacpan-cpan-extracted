@@ -1,0 +1,190 @@
+$VAR1 = {
+          'mysqld' => {
+                      'relay-log-index' => {
+                                           't/samples/4.ini' => undef,
+                                           't/samples/2.ini' => '"/media/sf_MySQL/mysql_dbl/relaylog/dbh.index"',
+                                           't/samples/3.ini' => undef,
+                                           't/samples/1.ini' => undef
+                                         },
+                      'log-error' => {
+                                     't/samples/1.ini' => '"/var/foo/mysql/dbh.error.log"',
+                                     't/samples/2.ini' => '"/var/foo/mysql/dbl.error.log"',
+                                     't/samples/3.ini' => '"/var/foo/mysql/dbp.error.log"',
+                                     't/samples/4.ini' => '"/var/foo/mysql/dbt.error.log"'
+                                   },
+                      'socket' => {
+                                  't/samples/4.ini' => '"/var/run/mysqld/mysqld_dbt.sock"',
+                                  't/samples/3.ini' => '"/var/run/mysqld/mysqld_dbp.sock"',
+                                  't/samples/2.ini' => '"/var/run/mysqld/mysqld_dbl.sock"',
+                                  't/samples/1.ini' => '"/var/run/mysqld/mysqld_dbh.sock"'
+                                },
+                      'log-bin' => {
+                                   't/samples/1.ini' => '"/media/sf_MySQL/mysql_dbh/binlog/dbh"',
+                                   't/samples/3.ini' => undef,
+                                   't/samples/2.ini' => undef,
+                                   't/samples/4.ini' => undef
+                                 },
+                      'sync_binlog' => {
+                                       't/samples/1.ini' => '1',
+                                       't/samples/3.ini' => undef,
+                                       't/samples/2.ini' => undef,
+                                       't/samples/4.ini' => undef
+                                     },
+                      'innodb_log_group_home_dir' => {
+                                                     't/samples/3.ini' => '"/media/sf_MySQL/mysql_dbp"',
+                                                     't/samples/2.ini' => '"/media/sf_MySQL/mysql_dbl"',
+                                                     't/samples/4.ini' => '"/media/sf_MySQL/mysql_dbt"',
+                                                     't/samples/1.ini' => '"/media/sf_MySQL/mysql_dbh"'
+                                                   },
+                      'port' => {
+                                't/samples/1.ini' => '3311',
+                                't/samples/2.ini' => '3312',
+                                't/samples/3.ini' => '3313',
+                                't/samples/4.ini' => '3314'
+                              },
+                      'innodb_data_home_dir' => {
+                                                't/samples/2.ini' => '"/media/sf_MySQL/mysql_dbl"',
+                                                't/samples/3.ini' => '"/media/sf_MySQL/mysql_dbp"',
+                                                't/samples/4.ini' => '"/media/sf_MySQL/mysql_dbt"',
+                                                't/samples/1.ini' => '"/media/sf_MySQL/mysql_dbh"'
+                                              },
+                      'log-bin-index' => {
+                                         't/samples/1.ini' => '"/media/sf_MySQL/mysql_dbh/binlog/dbh.index"',
+                                         't/samples/2.ini' => undef,
+                                         't/samples/3.ini' => undef,
+                                         't/samples/4.ini' => undef
+                                       },
+                      'wait_timeout' => {
+                                        't/samples/4.ini' => undef,
+                                        't/samples/3.ini' => undef,
+                                        't/samples/2.ini' => undef,
+                                        't/samples/1.ini' => '28800'
+                                      },
+                      'replicate-do-table' => {
+                                              't/samples/1.ini' => undef,
+                                              't/samples/3.ini' => undef,
+                                              't/samples/2.ini' => 'foo.baz',
+                                              't/samples/4.ini' => undef
+                                            },
+                      'binlog_ignore_db' => {
+                                            't/samples/4.ini' => undef,
+                                            't/samples/3.ini' => undef,
+                                            't/samples/2.ini' => undef,
+                                            't/samples/1.ini' => 'temp'
+                                          },
+                      'tmpdir' => {
+                                  't/samples/1.ini' => '"/tmp/MySQL/mysql_dbh"',
+                                  't/samples/2.ini' => '"/tmp/MySQL/mysql_dbl"',
+                                  't/samples/3.ini' => undef,
+                                  't/samples/4.ini' => '"/tmp/MySQL/mysql_dbt"'
+                                },
+                      'expire_logs_days' => {
+                                            't/samples/4.ini' => undef,
+                                            't/samples/3.ini' => undef,
+                                            't/samples/2.ini' => '2',
+                                            't/samples/1.ini' => '1'
+                                          },
+                      'log_slave_updates' => {
+                                             't/samples/4.ini' => undef,
+                                             't/samples/2.ini' => '1',
+                                             't/samples/3.ini' => undef,
+                                             't/samples/1.ini' => '1'
+                                           },
+                      'binlog_do_db' => {
+                                        't/samples/1.ini' => 'foo',
+                                        't/samples/4.ini' => undef,
+                                        't/samples/2.ini' => 'foo',
+                                        't/samples/3.ini' => undef
+                                      },
+                      'server_id' => {
+                                     't/samples/2.ini' => undef,
+                                     't/samples/3.ini' => undef,
+                                     't/samples/4.ini' => undef,
+                                     't/samples/1.ini' => '1'
+                                   },
+                      'server-id' => {
+                                     't/samples/1.ini' => undef,
+                                     't/samples/4.ini' => undef,
+                                     't/samples/3.ini' => undef,
+                                     't/samples/2.ini' => '2'
+                                   },
+                      'max_connections' => {
+                                           't/samples/2.ini' => '10000',
+                                           't/samples/3.ini' => undef,
+                                           't/samples/4.ini' => undef,
+                                           't/samples/1.ini' => '10000'
+                                         },
+                      'relay-log' => {
+                                     't/samples/4.ini' => undef,
+                                     't/samples/3.ini' => undef,
+                                     't/samples/2.ini' => '"/media/sf_MySQL/mysql_dbl/relaylog/dbh"',
+                                     't/samples/1.ini' => undef
+                                   },
+                      'innodb_force_recovery' => {
+                                                 't/samples/1.ini' => undef,
+                                                 't/samples/2.ini' => undef,
+                                                 't/samples/3.ini' => '6',
+                                                 't/samples/4.ini' => undef
+                                               },
+                      'general_log_file' => {
+                                            't/samples/4.ini' => '"/media/sf_MySQL/mysql_dbt/common.log"',
+                                            't/samples/3.ini' => '"/media/sf_MySQL/mysql_dbp/common.log"',
+                                            't/samples/2.ini' => '"/media/sf_MySQL/mysql_dbl/common.log"',
+                                            't/samples/1.ini' => '"/media/sf_MySQL/mysql_dbh/common.log"'
+                                          },
+                      'datadir' => {
+                                   't/samples/1.ini' => '"/media/sf_MySQL/mysql_dbh"',
+                                   't/samples/4.ini' => '"/media/sf_MySQL/mysql_dbt"',
+                                   't/samples/2.ini' => '"/media/sf_MySQL/mysql_dbl"',
+                                   't/samples/3.ini' => '"/media/sf_MySQL/mysql_dbp"'
+                                 },
+                      'pid-file' => {
+                                    't/samples/1.ini' => '"/var/run/mysqld/mysqld_dbh.pid"',
+                                    't/samples/4.ini' => '"/var/run/mysqld/mysqld_dbt.pid"',
+                                    't/samples/3.ini' => '"/var/run/mysqld/mysqld_dbp.pid"',
+                                    't/samples/2.ini' => '"/var/run/mysqld/mysqld_dbl.pid"'
+                                  },
+                      'max-connections' => {
+                                           't/samples/1.ini' => undef,
+                                           't/samples/3.ini' => '10000',
+                                           't/samples/2.ini' => undef,
+                                           't/samples/4.ini' => '10000'
+                                         },
+                      'binlog_format' => {
+                                         't/samples/1.ini' => 'ROW',
+                                         't/samples/4.ini' => undef,
+                                         't/samples/2.ini' => 'ROW',
+                                         't/samples/3.ini' => undef
+                                       },
+                      'sql-mode' => {
+                                    't/samples/1.ini' => undef,
+                                    't/samples/2.ini' => '"STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"',
+                                    't/samples/3.ini' => '"STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"',
+                                    't/samples/4.ini' => '"STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"'
+                                  },
+                      'relay-log-info-file' => {
+                                               't/samples/1.ini' => undef,
+                                               't/samples/2.ini' => '"/media/sf_MySQL/mysql_dbl/relaylog/relay-log.info"',
+                                               't/samples/3.ini' => undef,
+                                               't/samples/4.ini' => undef
+                                             },
+                      'interactive_timeout' => {
+                                               't/samples/1.ini' => '28800',
+                                               't/samples/4.ini' => undef,
+                                               't/samples/2.ini' => undef,
+                                               't/samples/3.ini' => undef
+                                             },
+                      'sql_mode' => {
+                                    't/samples/1.ini' => '"STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"',
+                                    't/samples/4.ini' => undef,
+                                    't/samples/3.ini' => undef,
+                                    't/samples/2.ini' => undef
+                                  },
+                      'innodb_buffer_pool_size' => {
+                                                   't/samples/4.ini' => '500M',
+                                                   't/samples/2.ini' => '800M',
+                                                   't/samples/3.ini' => '500M',
+                                                   't/samples/1.ini' => '800M'
+                                                 }
+                    }
+        };

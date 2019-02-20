@@ -10,7 +10,7 @@ use Math::Int128 qw(uint128 uint128_to_number
 
 #use Smart::Comments q(###);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Exporter qw(import);
 
@@ -792,6 +792,7 @@ by the Free Software Foundation; or the Artistic License.
 
 See L<http://dev.perl.org/licenses/> for more information.
 
+=cut
 
 1;
 

@@ -18,7 +18,7 @@ use Test::Timer::TimeoutException;
 
 @EXPORT = qw(time_ok time_nok time_atleast time_atmost time_between);
 
-$VERSION = '2.09';
+$VERSION = '2.10';
 
 my $test  = Test::Builder->new;
 my $timeout = 0;
@@ -175,19 +175,18 @@ sub _benchmark {
     }
 
     # setting first benchmark
-    my $t0 = new Benchmark;
+    my $t0 = Benchmark->new();
 
     # defining alarm signal handler
     # the handler takes care of terminating the
     # benchmarking
     local $SIG{ALRM} = sub {
 
-        my $t1 = new Benchmark;
+        my $t_alarm = Benchmark->new();
 
-        my $timestring = timestr( timediff( $t1, $t0 ) );
-        my $time = _timestring2time($timestring);
+        my $alarm_time_string = timediff( $t_alarm, $t0 )->real;
 
-        throw Test::Timer::TimeoutException($time);
+        throw Test::Timer::TimeoutException($alarm_time_string);
     };
 
     # setting alarm
@@ -200,24 +199,12 @@ sub _benchmark {
     alarm( 0 );
 
     # setting second benchmark
-    my $t1 = new Benchmark;
+    my $t1 = Benchmark->new();
 
     # parsing benchmark output
-    my $timestring = timestr( timediff( $t1, $t0 ) );
-    $time = _timestring2time($timestring);
+    my $timestring = timediff( $t1, $t0 )->real;
 
-    return $time;
-}
-
-# helper method to change benchmmark's timestr to an integer
-sub _timestring2time {
-    my $timestring = shift;
-
-    # $timestring:
-    # 2 wallclock secs ( 0.00 usr +  0.00 sys =  0.00 CPU)
-    my ($time) = $timestring =~ m/(\d+) /;
-
-    return $time;
+    return $timestring;
 }
 
 1;
@@ -235,9 +222,41 @@ __END__
 [![Build Status](https://travis-ci.org/jonasbn/perl-test-timer.svg?branch=master)](https://travis-ci.org/jonasbn/perl-test-timer)
 [![Coverage Status](https://coveralls.io/repos/github/jonasbn/perl-test-timer/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/perl-test-timer?branch=master)
 [![License: Artistic-2.0](https://img.shields.io/badge/License-Artistic%202.0-0298c3.svg)](https://opensource.org/licenses/Artistic-2.0)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1391/badge)](https://bestpractices.coreinfrastructure.org/projects/1391)
 
-<!-- MarkdownTOC autoanchor=false -->
+<!-- MarkdownTOC bracket=round levels="1,2,3,4,5" indent="  " -->
 
+- [NAME](#name)
+- [VERSION](#version)
+- [FEATURES](#features)
+- [SYNOPSIS](#synopsis)
+- [DESCRIPTION](#description)
+- [EXPORT](#export)
+- [SUBROUTINES/METHODS](#subroutinesmethods)
+  - [time\_ok](#time_ok)
+  - [time\_nok](#time_nok)
+  - [time\_atmost](#time_atmost)
+  - [time\_atleast](#time_atleast)
+  - [time\_between](#time_between)
+- [PRIVATE FUNCTIONS](#private-functions)
+  - [\_runtest](#_runtest)
+  - [\_benchmark](#_benchmark)
+  - [\_timestring2time](#_timestring2time)
+  - [import](#import)
+- [DIAGNOSTICS](#diagnostics)
+- [CONFIGURATION AND ENVIRONMENT](#configuration-and-environment)
+- [DEPENDENCIES](#dependencies)
+- [INCOMPATIBILITIES](#incompatibilities)
+- [BUGS AND LIMITATIONS](#bugs-and-limitations)
+- [TEST AND QUALITY](#test-and-quality)
+  - [CONTINUOUS INTEGRATION](#continuous-integration)
+- [SEE ALSO](#see-also)
+- [ISSUE REPORTING](#issue-reporting)
+- [SUPPORT](#support)
+- [DEVELOPMENT](#development)
+- [AUTHOR](#author)
+- [ACKNOWLEDGEMENTS](#acknowledgements)
+- [LICENSE AND COPYRIGHT](#license-and-copyright)
 
 <!-- /MarkdownTOC -->
 
@@ -302,8 +321,7 @@ The key features are subroutines to assert or test the following:
 
 =item * that a given piece of code does not exceed a specified time limit
 
-=item * that a given piece of code takes longer than a specified time limit
-and does not exceed another
+=item * that a given piece of code takes longer than a specified time limit and does not exceed another
 
 =back
 
@@ -373,13 +391,13 @@ If the execution of the code exceeds the threshold specified the test fail with 
 
 N will be the actual measured execution time of the specified code
 
-=for HTML <img src='https://jonasbn.github.io/perl-test-timer/assets/images/time_atmost.png' alt='time_atmost visualisation' /></a>
+=for HTML <img src='https://jonasbn.github.io/perl-test-timer/assets/images/time_atmost.png' alt='time_atmost visualization' /></a>
 
-=for markdown ![time_atmost visualisation](https://jonasbn.github.io/perl-test-timer/assets/images/time_atmost.png)
+=for markdown ![time_atmost visualization](https://jonasbn.github.io/perl-test-timer/assets/images/time_atmost.png)
 
 =begin text
 
-Graphical visualisation of the above example.
+Graphical visualization of the above example.
 
     +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
     | Time in seconds: | 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|11|12|13|14|
@@ -399,7 +417,7 @@ Graphical visualisation of the above example.
 The test succeeds if the code takes at least the number of seconds specified by
 the timing threshold.
 
-If the code executes faster, the test fails with the following diagnosic message
+If the code executes faster, the test fails with the following diagnostic message
 
     Test ran 1 seconds and did not exceed specified threshold of 2 seconds
 
@@ -411,13 +429,13 @@ execution to run longer, set the alarm accordingly.
 
 See also L<diagnostics|/DIAGNOSTICS>.
 
-=for HTML <img src='https://jonasbn.github.io/perl-test-timer/assets/images/time_atleast.png' alt='time_atleast visualisation' /></a>
+=for HTML <img src='https://jonasbn.github.io/perl-test-timer/assets/images/time_atleast.png' alt='time_atleast visualization' /></a>
 
-=for markdown ![time_atleast visualisation](https://jonasbn.github.io/perl-test-timer/assets/images/time_atleast.png)
+=for markdown ![time_atleast visualization](https://jonasbn.github.io/perl-test-timer/assets/images/time_atleast.png)
 
 =begin text
 
-Graphical visualisation of the above example.
+Graphical visualization of the above example.
 
     +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
     | Time in seconds: | 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|11|12|13|14|
@@ -439,7 +457,7 @@ interval in order for the test to succeed
     time_between( sub { sleep(2); }, 5, 10,
         'lower threshold of 5 seconds and upper threshold of 10 seconds');
 
-If the code executes faster than the lower threshold or exceeds the upper threshold, the test fails with the following diagnosic message
+If the code executes faster than the lower threshold or exceeds the upper threshold, the test fails with the following diagnostic message
 
     Test ran 2 seconds and did not execute within specified interval 5 - 10 seconds
 
@@ -447,13 +465,13 @@ Or
 
     Test ran 12 seconds and did not execute within specified interval 5 - 10 seconds
 
-=for HTML <img src='https://jonasbn.github.io/perl-test-timer/assets/images/time_between.png' alt='time_between visualisation' /></a>
+=for HTML <img src='https://jonasbn.github.io/perl-test-timer/assets/images/time_between.png' alt='time_between visualization' /></a>
 
-=for markdown ![time_between visualisation](https://jonasbn.github.io/perl-test-timer/assets/images/time_between.png)
+=for markdown ![time_between visualization](https://jonasbn.github.io/perl-test-timer/assets/images/time_between.png)
 
 =begin text
 
-Graphical visualisation of the above example.
+Graphical visualization of the above example.
 
     +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
     | Time in seconds: | 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|11|12|13|14|
@@ -489,8 +507,7 @@ The method takes two parameters:
 
 =item * a code block via a code reference
 
-=item * a threshold (the upper threshold, since this is added to the default
-alarm.
+=item * a threshold (the upper threshold, since this is added to the default alarm
 
 =back
 
@@ -514,28 +531,19 @@ are listed below.
 
 =over
 
-=item * Test did not exceed specified threshold, this message is diagnosis for
-L<time_atleast|/time_atleast> and L<time_nok|/time_nok> tests, which do not exceed their specified
-threshold.
+=item * Test did not exceed specified threshold, this message is diagnosis for L<time_atleast|/time_atleast> and L<time_nok|/time_nok> tests, which do not exceed their specified threshold
 
-=item * Test exceeded specified threshold, this message is a diagnostic for
-L<time_atmost|/time_atmost> and L<time_ok|/time_ok>, if the specified threshold is surpassed.
+=item * Test exceeded specified threshold, this message is a diagnostic for L<time_atmost|/time_atmost> and L<time_ok|/time_ok>, if the specified threshold is surpassed.
 
 This is the key point of the module, either your code is too slow and you should
 address this or your threshold is too low, in which case you can set it a bit
 higher and run the test again.
 
-=item * Test did not execute within specified interval, this is the diagnostic
-from L<time_between|/time_between>, it is the diagnosis if the execution of the code is
-not between the specified lower and upper thresholds.
+=item * Test did not execute within specified interval, this is the diagnostic from L<time_between|/time_between>, it is the diagnosis if the execution of the code is not between the specified lower and upper thresholds
 
-=item * Insufficient parameters, this is the message if a specified test is not
-provided with the sufficient number of parameters, consult this documentation
-and correct accordingly.
+=item * Insufficient parameters, this is the message if a specified test is not provided with the sufficient number of parameters, consult this documentation and correct accordingly
 
-=item * Execution exceeded threshold and timed out, the exception is thrown if
-the execution of tested code exceeds even the alarm, which is default 2 seconds,
-but can be set by the user or is equal to the upperthreshold + 2 seconds.
+=item * Execution exceeded threshold and timed out, the exception is thrown if the execution of tested code exceeds even the alarm, which is default 2 seconds, but can be set by the user or is equal to the upper threshold + 2 seconds
 
 The exception results in a diagnostic for the failing test. This is a failsafe
 to avoid that code runs forever. If you get this diagnose either your code is
@@ -578,7 +586,7 @@ This module holds no known bugs.
 The current implementations only use seconds and resolutions should be higher,
 so the current implementation is limited to seconds as the highest resolution.
 
-On occassion failing tests with CPAN-testers have been observed. This seem to be related to the test-suite
+On occasion failing tests with CPAN-testers have been observed. This seem to be related to the test-suite
 being not taking into account that some smoke-testers do not prioritize resources for the test run and that
 additional processes/jobs are running. The test-suite have been adjusted to accommodate this but these issues
 might reoccur.
@@ -676,7 +684,7 @@ You can also look for information at:
 
 =item * Erik Johansen, suggestion for clearing alarm
 
-=item * Gregor Herrmann, PR #16 fixes to spelling mistakes
+=item * Gregor Herrmann from the Debian Perl Group, PR #16 fixes to spelling mistakes
 
 =item * Nigel Horne, issue #15 suggestion for better assertion in L<time_atleast|/time_atleast>
 
@@ -690,12 +698,9 @@ You can also look for information at:
 
 =item * Bartosz Jakubski, reporting issue #3
 
-=item * Gabor Szabo (GZABO), suggestion for specification of interval thresholds
-even though this was obsoleted by the later introduced time_between
+=item * Gabor Szabo (GZABO), suggestion for specification of interval thresholds even though this was obsoleted by the later introduced time_between
 
-=item * Paul Leonerd Evans (PEVANS), suggestions for time_atleast and time_atmost
-and the handling of $SIG{ALRM}. Also bug report for addressing issue with Debian
-packaging resulting in release 0.10
+=item * Paul Leonerd Evans (PEVANS), suggestions for time_atleast and time_atmost and the handling of $SIG{ALRM}. Also bug report for addressing issue with Debian packaging resulting in release 0.10
 
 =item * brian d foy (BDFOY), for patch to L<_run_test|/_run_test>
 
@@ -711,6 +716,6 @@ License 2.0
 
 Used distributions are under copyright of there respective authors and designated licenses
 
-Image used on L<website|https://jonasbn.github.io/perl-test-timer/> is under copyright by L<Veri Ivanova|https://unsplash.com/@veri_ivanova?photo=p3Pj7jOYvnM>
+Image used on L<website|https://jonasbn.github.io/perl-test-timer/> is under copyright by L<Veri Ivanova|https://unsplash.com/photos/p3Pj7jOYvnM>
 
 =cut

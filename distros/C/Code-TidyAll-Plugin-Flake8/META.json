@@ -43,7 +43,8 @@
          "requires" : {
             "Code::TidyAll::Plugin" : "0",
             "Moo" : "0",
-            "String::ShellQuote" : "0"
+            "String::ShellQuote" : "0",
+            "vars" : "0"
          }
       },
       "test" : {
@@ -61,7 +62,7 @@
    "provides" : {
       "Code::TidyAll::Plugin::Flake8" : {
          "file" : "lib/Code/TidyAll/Plugin/Flake8.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -76,10 +77,10 @@
          "web" : "https://github.com/shlomif/perl-Code-TidyAll-Plugin-Flake8"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.2.0",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026002"
+         "version" : "5.028001"
       },
       "plugins" : [
          {
@@ -489,7 +490,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

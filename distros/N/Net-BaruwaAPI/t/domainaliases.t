@@ -13,6 +13,7 @@ my $do = Test::Net::BaruwaAPI->new(api_token => 'xxxxxxxasasswqefdff', api_url =
 isa_ok($do, 'Net::BaruwaAPI');
 
 my $res;
+my $page = 1;
 
 my $data = {
     name => "example.net",
@@ -31,6 +32,11 @@ $res = $do->get_domainaliases($domainid);
 # ok($res, 'the get_domainaliases response is defined');
 is(get_last_request_method(), 'GET', 'the request method is correct');
 is(get_last_request_path(), "/api/v1/domainaliases/$domainid", 'the request uri is correct');
+
+$res = $do->get_domainaliases($domainid, $page);
+
+is(get_last_request_method(), 'GET', 'the request method is correct');
+is(get_last_request_path(), "/api/v1/domainaliases/$domainid?page=$page", 'the request uri is correct');
 
 set_expected_response('get_domainalias');
 

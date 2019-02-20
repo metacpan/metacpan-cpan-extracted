@@ -3,8 +3,8 @@
 use Test::More tests => 1;
 
 BEGIN {
-    use_ok( 'Convert::Base81' ) || print "Bail out!
+    use_ok( 'Convert::Base85' ) || print "Bail out!
 ";
 }
 
-diag( "Testing Convert::Base81 $Convert::Base81::VERSION, Perl $], $^X" );
+diag( "Testing Convert::Base85 $Convert::Base85::VERSION, Perl $], $^X" );

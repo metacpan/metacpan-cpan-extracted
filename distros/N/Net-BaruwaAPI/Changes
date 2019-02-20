@@ -1,5 +1,8 @@
 Revision history for Net-BaruwaAPI
 
+0.06    20-02-2019
+        Add pagination Support
+
 0.03    11-04-2016
         Support get domain by name
 

@@ -4,7 +4,7 @@
       "Grant McLean <grant@catalyst.net.nz>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -60,8 +60,6 @@
          "web" : "https://github.com/catalyst/Authen-NZRealMe"
       }
    },
-   "version" : "1.18",
-   "x_generated_by_perl" : "v5.18.2",
-   "x_serialization_backend" : "JSON::XS version 2.34"
+   "version" : "1.19"
 }
 

@@ -7,24 +7,35 @@ use warnings;
 
 use File::Find::Rule;
 use File::Spec;
+use Mojo::File;
+use Mojo::Util qw(class_to_path);
 use Scalar::Util qw(blessed);
 
 use base 'Exporter';
 our @EXPORT = qw(on publish);
 
-our $VERSION = 0.04;
+our $VERSION = '0.06';
 
 my %subscriber;
 
 sub init {
     my ($class, $namespace) = @_;
 
+    die 'ERROR: Missing namespace to setup global event.'
+        unless defined $namespace;
+
     my @spaces = split /::/, $namespace;
     my @dirs   = map{ File::Spec->catdir( $_, @spaces ) }@INC; 
     my @files  = File::Find::Rule->file->name( '*.pm' )->in( @dirs );
 
     for my $file ( @files ) {
-        require $file;
+        my @parts = @{ Mojo::File->new( $file )->to_array };
+        my $module = join '::', @parts;
+        $module =~ s{.*?\Q$namespace\E}{$namespace};
+        $module =~ s{\.pm\z}{};
+
+        my $path = class_to_path $module;
+        require $path;
     }
 }
 
@@ -73,7 +84,7 @@ MojoX::GlobalEvents - A module to handle events
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

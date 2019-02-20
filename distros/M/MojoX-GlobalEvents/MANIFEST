@@ -15,3 +15,4 @@ t/author-pod-syntax.t
 t/basic.t
 t/init.t
 t/lib/GlobalEvents/Test/Stderr.pm
+t/lib/GlobalEvents/Test/Stderr/Tee.pm

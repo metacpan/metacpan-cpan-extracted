@@ -1,20 +1,22 @@
+#!perl
+
 use strict;
 use warnings;
 
+use lib 't/lib';
+use Test::Differences::TestUtils::Capture;
+
 use Test::More;
-use Capture::Tiny qw(capture);
 
 END { done_testing(); }
 
-my($stdout, $stderr) = capture { system (
+my $stderr = capture_error { system (
     $^X, (map { "-I$_" } (@INC)),
     't/script/default-headers'
 ) };
-
 is(
     $stderr,
-"
-#   Failed test 'both the same'
+"#   Failed test 'both the same'
 #   at t/script/default-headers line 8.
 # +----+----------------+----------------+
 # | Elt|Got             |Expected        |
@@ -28,15 +30,13 @@ is(
     "got expected error output"
 );
 
-($stdout, $stderr) = capture { system (
+$stderr = capture_error { system (
     $^X, (map { "-I$_" } (@INC)),
     't/script/custom-headers'
 ) };
-
 is(
     $stderr,
-"
-#   Failed test 'both the same'
+"#   Failed test 'both the same'
 #   at t/script/custom-headers line 8.
 # +----+----------------+----------------+
 # | Elt|Lard            |Chips           |
@@ -49,4 +49,3 @@ is(
 ",
     "got expected error output"
 );
-

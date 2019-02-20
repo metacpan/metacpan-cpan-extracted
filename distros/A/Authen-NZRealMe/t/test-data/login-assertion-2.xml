@@ -1,0 +1,36 @@
+<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"><soap-env:Body><samlp:ArtifactResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="s20562d9d04a8f7297cfb33182d6a2ed02b8ea0264" InResponseTo="f7c3b9c84cd67827b31d5a37fd205e5a" Version="2.0" IssueInstant="2015-02-19T17:48:07Z" Destination="https://www.example.govt.nz/app/sample/login-acs"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://test.fakeme.govt.nz/saml2</saml:Issuer><samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+<samlp:StatusCode xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" Value="urn:oasis:names:tc:SAML:2.0:status:Success">
+</samlp:StatusCode>
+</samlp:Status><samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="s283e58e2b048968485a1828bfa314cc4fa130f3d4" InResponseTo="f7c3b9c84cd67827b31d5a37fd205e5a" Version="2.0" IssueInstant="2015-02-19T17:48:06Z" Destination="https://www.example.govt.nz/app/sample/login-acs"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://test.fakeme.govt.nz/saml2</saml:Issuer><samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+<samlp:StatusCode xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" Value="urn:oasis:names:tc:SAML:2.0:status:Success">
+</samlp:StatusCode>
+</samlp:Status><saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="s0ed0e67f384be96ff0c472223b3888f90be041b1b" IssueInstant="2015-02-19T17:48:06Z" Version="2.0">
+<saml:Issuer>https://test.fakeme.govt.nz/saml2</saml:Issuer><dsig:Signature xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+  <dsig:SignedInfo>
+    <dsig:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+    <dsig:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+    <dsig:Reference URI="#s0ed0e67f384be96ff0c472223b3888f90be041b1b">
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+        <dsig:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+      <dsig:DigestValue>b0rkb0rkb0rkb0rkb0rkb0rkb0rk</dsig:DigestValue>
+    </dsig:Reference>
+  </dsig:SignedInfo>
+  <dsig:SignatureValue>
+pu6UB2FLL25P0174JRzc693nkdyXH2Zvq+uEVGPQSXBpCv//oQZ1FOqz5Eynuk9WvvZuXOaWZwCo
+lEXtaLnjOZpfCyXaBIVVCyaz5RPj5vDfAzb+NDso/DftsTge+/Hnelk3Jl+Sbm8Q9ZBXoJEiTo7v
+mL3YSs8g3LSN+XHq67/Zp0s1z4UygZb5G7r5vPEm7gB2WROWCh4Fq0daGP7gNjMwNV8u7Yiwl/Sh
+J9SRTy6XBjEtMhksqE0C7e0m2WTWbbsO01syzb4DMFkBKNSKbGfMeOXbGaCF/xeMfgnR7HajJu7o
+uNV12UUeHcqXBJ0bKZiFm5Y2hcPik61MceaWxw==
+</dsig:SignatureValue>
+</dsig:Signature><saml:Subject>
+<saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" NameQualifier="https://test.fakeme.govt.nz/saml2" SPNameQualifier="https://www.example.govt.nz/app/sample-login">CHC600C1AE5D993A8AE7E382006E9521C07</saml:NameID><saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+<saml:SubjectConfirmationData InResponseTo="f7c3b9c84cd67827b31d5a37fd205e5a" NotOnOrAfter="2015-02-19T17:53:06Z" Recipient="https://www.example.govt.nz/app/sample/login-acs"/></saml:SubjectConfirmation>
+</saml:Subject><saml:Conditions NotBefore="2015-02-19T17:46:06Z" NotOnOrAfter="2015-02-19T17:53:06Z">
+<saml:AudienceRestriction>
+<saml:Audience>https://www.example.govt.nz/app/sample-login</saml:Audience>
+</saml:AudienceRestriction>
+</saml:Conditions>
+<saml:AuthnStatement AuthnInstant="2015-02-19T17:48:06Z" SessionIndex="s2e22274633b868406b3a7c47de6533bd82e392603"><saml:AuthnContext><saml:AuthnContextClassRef>urn:nzl:govt:ict:stds:authn:deployment:GLS:SAML:2.0:ac:classes:LowStrength</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement><saml:AttributeStatement><saml:Attribute FriendlyName="logon_attributes_token" Name="logon_attributes_token" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">Some lengthy details we don't need to care about</saml:AttributeValue></saml:Attribute></saml:AttributeStatement></saml:Assertion></samlp:Response></samlp:ArtifactResponse></soap-env:Body></soap-env:Envelope>

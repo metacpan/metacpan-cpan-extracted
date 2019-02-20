@@ -8,7 +8,7 @@ use Storable qw( dclone );
 use Hash::Merge qw( merge );
 use namespace::clean;
 
-our $VERSION = '0.001011'; # 0.1.11
+our $VERSION = '0.001012'; # 0.1.12
 $VERSION = eval $VERSION;
 
 sub connection {

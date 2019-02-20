@@ -85,7 +85,7 @@ If you are using CPAN, then installation is simple, but if you are installing ma
 
 =back
 
-Please note, that the install step may require root permissions (run it with sudo, "sudo make install").
+Please note, that the install step may require root permissions (run it with sudo, "sudo make install").  "Build.PL" is not used due to lack of support by Inline::C.
 
 If testing fails, it will usually be ok to install it anyway, as it will likely work.  The testing is flakey (thank Perl's test mode for that).
 
@@ -394,7 +394,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.20';
+    our $VERSION   = '6.21';
     our @ISA       = qw(Exporter Graphics::Framebuffer::Splash);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -2970,6 +2970,8 @@ sub _fix_mapping { # File::Map SHOULD make this obsolete
     unless (defined($self->{'FB'})) {
         eval { close($self->{'FB'}); };
         open($self->{'FB'}, '+<', $self->{'FB_DEVICE'});
+        binmode($self->{'FB'});
+        $self->_flush_screen();
     }
     $self->{'MAP_ATTEMPTS'}++;
     # We don't eval, because it worked originally
@@ -3434,11 +3436,10 @@ sub clear_screen {
     my $self   = shift;
     my $cursor = shift || '';
 
-#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
     if ($cursor =~ /off/i) {
-        system('tput civis -- invisible');
+        system('clear && tput civis -- invisible');
     } elsif ($cursor =~ /on/i) {
-        system('tput cnorm -- normal');
+        system('tput cnorm -- normal && reset');
     }
     select(STDOUT);
     $|++;
@@ -3448,7 +3449,6 @@ sub clear_screen {
         $self->blit_write({ 'x' => $self->{'X_CLIP'}, 'y' => $self->{'Y_CLIP'}, 'width' => $w, 'height' => $h, 'image' => $self->{'B_COLOR'} x ($w * $h) }, 0);
     } else {
         substr($self->{'SCREEN'}, 0)                   = $self->{'B_COLOR'} x ($self->{'fscreeninfo'}->{'smem_len'} / $self->{'BYTES'});
-        substr($self->{'SCREEN'}, 0, $self->{'BYTES'}) = $self->{'B_COLOR'};
     }
     $self->_flush_screen();
 }
@@ -3928,6 +3928,8 @@ sub drawto {
 
 sub _flush_screen {
     my $self = shift;
+    select(STDERR);
+    $|++;
     select($self->{'FB'});
     $|++;
 }
@@ -4255,6 +4257,10 @@ sub draw_arc {
                     );
                 }
             }
+            $start_degrees -= 90;
+            $end_degrees   -= 90;
+            $start_degrees += 360 if ($start_degrees < 0);
+            $end_degrees   += 360 if ($end_degrees < 0);
             my %p = (
                 'x'      => $radius,
                 'y'      => $radius,
@@ -6946,9 +6952,9 @@ sub blit_transform {
                 );
                 my $rotated;
                 if (abs($degrees) == 90 || abs($degrees) == 180 || abs($degrees) == 270) {
-                    $rotated = $img->rotate('right' => 360 - $degrees, 'back' => $self->{'BI_COLOR'});
+                    $rotated = $img->rotate('right' => 0 - $degrees, 'back' => $self->{'BI_COLOR'});
                 } else {
-                    $rotated = $img->rotate('degrees' => 360 - $degrees, 'back' => $self->{'BI_COLOR'});
+                    $rotated = $img->rotate('degrees' => 0 - $degrees, 'back' => $self->{'BI_COLOR'});
                 }
                 $width  = $rotated->getwidth();
                 $height = $rotated->getheight();
@@ -7656,7 +7662,7 @@ sub load_image {
     my $bench_total = time;
     my $bench_load  = time;
     my $color_order = $self->{'COLOR_ORDER'};
-    if ($params->{'file'} =~ /\.gif$/i) {
+    if ($params->{'file'} =~ /\.(gif|png)$/i) {
         eval { @Img = Imager->read_multi('file' => $params->{'file'},); };
         warn __LINE__ . " $@\n" if ($@ && $self->{'SHOW_ERRORS'});
     } else {
@@ -7705,10 +7711,14 @@ sub load_image {
             $w = int($img->getwidth());
             $h = int($img->getheight());
             my $channels = $img->getchannels();
+            if ($channels == 1) {
+                $img      = $img->convert('preset' => 'rgb');
+                $channels = $img->getchannels();
+            }
             my $bits     = $img->bits();
 
             # Scale the image, if asked to
-            if ($params->{'file'} =~ /\.gif$/i && !exists($params->{'width'}) && !exists($params->{'height'})) {
+            if ($params->{'file'} =~ /\.(gif|png)$/i && !exists($params->{'width'}) && !exists($params->{'height'})) {
                 ($params->{'width'}, $params->{'height'}) = ($w, $h);
             }
             $params->{'width'}  = min($self->{'XRES'}, int($params->{'width'}  || $w));
@@ -8744,9 +8754,15 @@ Copyright 2003-2019 Richard Kelsch, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under the GNU software license.
 
+=head1 LICENSE
+
+GNU Public License Version 3
+
+A copy of this license is included in the 'LICENSE' file in this distribution.
+
 =head1 VERSION
 
-Version 6.20 (Feb 10, 2019)
+Version 6.21 (Feb 20, 2019)
 
 =head1 THANKS
 

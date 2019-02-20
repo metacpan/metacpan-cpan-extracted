@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Inlineable';
 
-our $VERSION = '1.231';
+our $VERSION = '1.241';
 
 has path   => (fix_arg => 1);
 has at     => (fix_opt => 1);
@@ -47,7 +47,6 @@ Catmandu::Fix::marc_paste - paste a MARC structured field back into the MARC rec
       end
     end
 
-
 =head1 DESCRIPTION
 
 Paste a MARC stucture created by L<Catmandu::Fix::marc_struc> back at the end of
@@ -55,12 +54,16 @@ a MARC record.
 
 =head1 METHODS
 
-=head2 marc_paste(JSON_PATH, [at: MARC+PATH , [equals: REGEX]])
+=head2 marc_paste(JSON_PATH, [at: MARC_PATH , [equals: REGEX]])
 
 Paste a MARC struct PATH back in the MARC record. By default the MARC structure will
 be pasted at the end of the record. Optionally provide an C<at> option to set the
 MARC field after which the structure needs to be pasted. Optionally provide a regex
 that should match the content of the C<at> field.
+
+The C<equals> parameter requires an C<at> parameter. When both are provided, then
+the value of JSON_PATH will only be pasted if the string value of the MARC_PATH
+in C<at> matches the regular expression C<equals>.
 
     # Paste mycopy at the end of the record
     marc_paste(mycopy)
@@ -84,12 +87,12 @@ that should match the content of the C<at> field.
 
 This Fix can be used inline in a Perl script:
 
-    use Catmandu::Fix::marc_struc as => 'marc_struc';
+    use Catmandu::Fix::marc_copy as => 'marc_copy';
     use Catmandu::Fix::marc_paste as => 'marc_paste';
 
     my $data = { record => ['650', ' ', 0, 'a', 'Perl'] };
 
-    $data = marc_struc($data,'650','subject');
+    $data = marc_copy($data,'650','subject');
     $data = marc_paste($data,'subject');
 
 

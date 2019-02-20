@@ -1,32 +1,48 @@
 ---
 abstract: 'Supports app to run as a reverse proxy backend'
 author:
-  - 'This module is originally written by Kazuhiro Osawa as L<HTTP::Engine::Middleware::ReverseProxy> for L<HTTP::Engine>.'
+  - 'Tatsuhiko Miyagawa'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Test::More: 0
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Plack-Middleware-ReverseProxy
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
 requires:
-  Plack: 0.9988
-  Plack::Middleware: 0
-  Plack::Request: 0
-  parent: 0
-  perl: 5.8.1
+  Plack: '0.9988'
+  Plack::Middleware: '0'
+  Plack::Request: '0'
+  parent: '0'
+  perl: '5.008001'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/lopnor/Plack-Middleware-ReverseProxy.git
-version: 0.15
+  bugtracker: https://github.com/lopnor/Plack-Middleware-ReverseProxy/issues
+  homepage: https://github.com/lopnor/Plack-Middleware-ReverseProxy
+  repository: https://github.com/lopnor/Plack-Middleware-ReverseProxy.git
+version: '0.16'
+x_contributors:
+  - 'danjou <danjou@guido.soffritto.org>'
+  - 'Florian Ragwitz <rafl@debian.org>'
+  - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Nobuo Danjou <danjou@mac.com>'
+  - 'Nobuo Danjou <nobuo.danjou@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_generated_by_perl: v5.20.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 0

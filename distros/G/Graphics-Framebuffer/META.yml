@@ -29,5 +29,5 @@ requires:
   Math::Gradient: '0.03'
   Math::Trig: '1.10'
   perl: '5.008'
-version: '6.20'
+version: '6.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

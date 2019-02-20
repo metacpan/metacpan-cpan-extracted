@@ -1,5 +1,5 @@
 This archive contains the distribution Spreadsheet-Read-Ingester,
-version 0.004:
+version 0.008:
 
   ingest and save csv and spreadsheet data to a perl data structure to avoid reparsing
 

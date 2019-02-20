@@ -1,0 +1,23 @@
+==================================================
+Changes from 2018-02-19 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.00 at 2019-02-19 18:13:32 +0000
+-----------------------------------------
+
+  Change: 3802a3fbbe824ff652f10e6b0f00be4b9a57d3d2
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2019-02-19 21:13:18 +0000
+
+    Readme.md 
+
+  Change: 5ac090fc3f8dc94fd77fc1d6765ee3cb47340438
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2019-02-19 21:11:45 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,24 @@
+requires "Carp" => "0";
+requires "Config::MySQL::Reader" => "0";
+requires "Config::MySQL::Writer" => "0";
+requires "Const::Fast" => "0";
+requires "Cwd" => "0";
+requires "Data::Dump" => "0";
+requires "Data::Dumper" => "0";
+requires "Exporter" => "0";
+requires "File::Slurper" => "0";
+requires "Getopt::Long::Descriptive" => "0";
+requires "List::Compare" => "0";
+requires "List::Util" => "0";
+requires "Text::CSV" => "0";
+requires "feature" => "0";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};

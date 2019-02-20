@@ -15,10 +15,10 @@ use HTTP::Request;
 use Carp qw/croak/;
 use LWP::UserAgent;
 use Type::Params qw/compile/;
-use Types::Standard qw(Str InstanceOf Object Int Bool Dict Num ArrayRef);
+use Types::Standard qw(Str InstanceOf Object Int Bool Dict Num ArrayRef Optional);
 use Moo;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our $AUTHORITY = 'cpan:DATOPDOG';
 
 my $api_path = '/api/v1';
@@ -94,9 +94,11 @@ sub _call {
 
 
 sub get_users {
-    state $check = compile(Object);
-    my ($self) = $check->(@_);
-    return $self->_call('GET', "$api_path/users");
+    state $check = compile(Object, Optional[Int]);
+    my ($self, $page) = $check->(@_);
+    my $path = "$api_path/users";
+    $path = "$api_path/users?page=$page" unless @_ == 1;
+    return $self->_call('GET', $path);
 }
 
 sub get_user {
@@ -216,9 +218,11 @@ sub delete_alias {
 }
 
 sub get_domains {
-    state $check = compile(Object);
-    my ($self) = $check->(@_);
-    return $self->_call('GET', "$api_path/domains");
+    state $check = compile(Object, Optional[Int]);
+    my ($self, $page) = $check->(@_);
+    my $path = "$api_path/domains";
+    $path = "$api_path/domains?page=$page" unless @_ == 1;
+    return $self->_call('GET', $path);
 }
 
 sub get_domain {
@@ -300,9 +304,11 @@ sub delete_domain {
 }
 
 sub get_domainaliases {
-    state $check = compile(Object, Int);
-    my ($self, $domainid) = $check->(@_);
-    return $self->_call('GET', "$api_path/domainaliases/$domainid");
+    state $check = compile(Object, Int, Optional[Int]);
+    my ($self, $domainid, $page) = $check->(@_);
+    my $path = "$api_path/domainaliases/$domainid";
+    $path = "$api_path/domainaliases/$domainid?page=$page" unless @_ == 2;
+    return $self->_call('GET', $path);
 }
 
 sub get_domainalias {
@@ -348,9 +354,11 @@ sub delete_domainalias {
 }
 
 sub get_deliveryservers {
-    state $check = compile(Object, Int);
-    my ($self, $domainid) = $check->(@_);
-    return $self->_call('GET', "$api_path/deliveryservers/$domainid");
+    state $check = compile(Object, Int, Optional[Int]);
+    my ($self, $domainid, $page) = $check->(@_);
+    my $path = "$api_path/deliveryservers/$domainid";
+    $path = "$api_path/deliveryservers/$domainid?page=$page" unless @_ == 2;
+    return $self->_call('GET', $path);
 }
 
 sub get_deliveryserver {
@@ -402,9 +410,11 @@ sub delete_deliveryserver {
 }
 
 sub get_user_deliveryservers {
-    state $check = compile(Object, Int);
-    my ($self, $domainid) = $check->(@_);
-    return $self->_call('GET', "$api_path/userdeliveryservers/$domainid");
+    state $check = compile(Object, Int, Optional[Int]);
+    my ($self, $domainid, $page) = $check->(@_);
+    my $path = "$api_path/userdeliveryservers/$domainid";
+    $path = "$api_path/userdeliveryservers/$domainid?page=$page" unless @_ == 2;
+    return $self->_call('GET', $path);
 }
 
 sub get_user_deliveryserver {
@@ -456,9 +466,11 @@ sub delete_user_deliveryserver {
 }
 
 sub get_domain_smarthosts {
-    state $check = compile(Object, Int);
-    my ($self, $domainid) = $check->(@_);
-    return $self->_call('GET', "$api_path/domains/smarthosts/$domainid");
+    state $check = compile(Object, Int, Optional[Int]);
+    my ($self, $domainid, $page) = $check->(@_);
+    my $path = "$api_path/domains/smarthosts/$domainid";
+    $path = "$api_path/domains/smarthosts/$domainid?page=$page" unless @_ == 2;
+    return $self->_call('GET', $path);
 }
 
 sub get_domain_smarthost {
@@ -513,9 +525,11 @@ sub delete_domain_smarthost {
 }
 
 sub get_org_smarthosts {
-    state $check = compile(Object, Int);
-    my ($self, $orgid) = $check->(@_);
-    return $self->_call('GET', "$api_path/organizations/smarthosts/$orgid");
+    state $check = compile(Object, Int, Optional[Int]);
+    my ($self, $orgid, $page) = $check->(@_);
+    my $path = "$api_path/organizations/smarthosts/$orgid";
+    $path = "$api_path/organizations/smarthosts/$orgid?page=$page" unless @_ == 2;
+    return $self->_call('GET', $path);
 }
 
 sub get_org_smarthost {
@@ -570,9 +584,11 @@ sub delete_org_smarthost {
 }
 
 sub get_fallbackservers {
-    state $check = compile(Object, Int);
-    my ($self, $orgid) = $check->(@_);
-    return $self->_call('GET', "$api_path/fallbackservers/$orgid");
+    state $check = compile(Object, Int, Optional[Int]);
+    my ($self, $orgid, $page) = $check->(@_);
+    my $path = "$api_path/fallbackservers/list/$orgid";
+    $path = "$api_path/fallbackservers/list/$orgid?page=$page" unless @_ == 2;
+    return $self->_call('GET', $path);
 }
 
 sub get_fallbackserver {
@@ -624,9 +640,11 @@ sub delete_fallbackserver {
 }
 
 sub get_authservers {
-    state $check = compile(Object, Int);
-    my ($self, $domainid) = $check->(@_);
-    return $self->_call('GET', "$api_path/authservers/$domainid");
+    state $check = compile(Object, Int, Optional[Int]);
+    my ($self, $domainid, $page) = $check->(@_);
+    my $path = "$api_path/authservers/$domainid";
+    $path = "$api_path/authservers/$domainid?page=$page" unless @_ == 2;
+    return $self->_call('GET', $path);
 }
 
 sub get_authserver {
@@ -777,9 +795,11 @@ sub delete_radiussettings {
 }
 
 sub get_organizations {
-    state $check = compile(Object);
-    my ($self) = $check->(@_);
-    return $self->_call('GET', "$api_path/organizations");
+    state $check = compile(Object, Optional[Int]);
+    my ($self, $page) = $check->(@_);
+    my $path = "$api_path/organizations";
+    $path = "$api_path/organizations?page=$page" unless @_ == 1;
+    return $self->_call('GET', $path);
 }
 
 sub get_organization {
@@ -950,7 +970,7 @@ The Baruwa server url
 
 =head2 get_users
 
-    my $data = $api->get_users();
+    my $data = $api->get_users($page);
 
     for ($data->{items}) {
         say $_->{username};
@@ -1566,7 +1586,7 @@ L<http://search.cpan.org/dist/Net-BaruwaAPI/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Andrew Colin Kissa.
+Copyright 2015-2019 Andrew Colin Kissa.
 
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this

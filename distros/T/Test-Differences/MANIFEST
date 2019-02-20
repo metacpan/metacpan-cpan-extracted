@@ -1,4 +1,3 @@
-Build.PL
 Changes
 lib/Test/Differences.pm
 Makefile.PL
@@ -20,5 +19,7 @@ t/column-headers.t
 t/script/custom-headers
 t/script/default-headers
 MANIFEST.SKIP
+t/unicode.t
+t/lib/Test/Differences/TestUtils/Capture.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

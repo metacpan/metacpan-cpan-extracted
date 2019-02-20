@@ -9,7 +9,6 @@ requires "YAML::XS" => "0.41";
 requires "perl" => "5.008009";
 
 on 'test' => sub {
-  requires "Data::Dumper" => "0";
   requires "Scalar::Util" => "0";
   requires "Test::More" => "0";
   requires "Test::Most" => "0.35";

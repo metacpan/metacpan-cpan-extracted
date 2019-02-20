@@ -1,3 +1,6 @@
+0.2.2 - 2019-02-19
+    - add YAML::PP
+
 0.2.1 - 2015-10-29
     - RT #108072 - update MANIFEST.SKIP to exclude MYMETA*
 

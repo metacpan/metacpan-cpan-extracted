@@ -16,3 +16,4 @@ fb_list*
 test*
 *.inl
 *.yml
+src/Framebuffer.pm

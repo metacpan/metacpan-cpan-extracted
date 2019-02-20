@@ -1,6 +1,13 @@
 Revision history for Authen-NZRealMe
 
+1.19      2019-02-20 19:11:05+13:00 Pacific/Auckland
+    - further improvements around the use of find_verified_element()
+    - fix handling of skip_signature_check option
+
 1.18      2019-02-19 12:22:20+13:00 Pacific/Auckland
+    - use find_verified_element() when preparing the ResolutionResponse
+    - fix namespace URI in tests data (URI for wst: has spurious trailing '/')
+    - improve test coverage with less mocking
 
 1.17      2019-02-18 15:14:53+13:00 Pacific/Auckland
     - Add support for RSA-SHA256 signatures (both signing and verification)

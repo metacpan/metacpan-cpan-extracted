@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008_001;
 use parent qw(Plack::Middleware);
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 sub call {
     my $self = shift;
@@ -93,6 +93,10 @@ using 'enable_if' directive in your app.psgi.
 =head1 LICENSE
 
 This software is licensed under the same terms as Perl itself.
+
+=head1 COPYRIGHT
+
+Copyright 2009-2019 Tatsuhiko Miyagawa
 
 =head1 AUTHOR
 

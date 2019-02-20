@@ -62,7 +62,7 @@ for my $c (qw(
 	verify([$m],dns());
     };
     my $err = $@ || ($ok ? '':'unknown error');
-    is( $err,"status status=perm-fail error=header sig mismatch\n",
+    is( $err,"status status=fail error=header sig mismatch\n",
 	"wrong pubkey");
 }
 
@@ -73,7 +73,7 @@ for my $c (qw(
 	verify([$m],dns());
     };
     my $err = $@ || ($ok ? '':'unknown error');
-    is( $err,"status status=soft-fail error=signature e[x]pired\n",
+    is( $err,"status status=policy error=signature e[x]pired\n",
 	"signature expired");
 }
 
@@ -84,7 +84,7 @@ for my $c (qw(
 	verify([$m],dns());
     };
     my $err = $@ || ($ok ? '':'unknown error');
-    is( $err,"status status=temp-fail error=dns lookup failed\n",
+    is( $err,"status status=temperror error=dns lookup failed\n",
 	"DNS lookup failed");
 }
 
@@ -95,7 +95,7 @@ for my $c (qw(
 	verify([$m],dns());
     };
     my $err = $@ || ($ok ? '':'unknown error');
-    is( $err,"status status=perm-fail error=invalid or empty DKIM record\n",
+    is( $err,"status status=permerror error=invalid or empty DKIM record\n",
 	"DKIM key invalid syntax");
 }
 
@@ -132,7 +132,7 @@ sub sign {
     $rv || die "no result after end of mail\n";
 
     @$rv == 1 or die "expected a single result, got ".int(@$rv)."\n";
-    $rv->[0]->status == DKIM_SUCCESS 
+    $rv->[0]->status == DKIM_PASS
 	or die "unexpected status ".( $rv->[0]->status // '<undef>' )."\n";
     my $dkim_sig = $rv->[0]->signature;
     return $dkim_sig . $total_mail;
@@ -159,7 +159,7 @@ sub verify {
     @todo && die "still things to do at end of mail\n";
     $rv || die "no result after end of mail\n";
     @$rv == 1 or die "expected a single result, got ".int(@$rv)."\n";
-    $rv->[0]->status == DKIM_SUCCESS or die 
+    $rv->[0]->status == DKIM_PASS or die
 	"status status=" . ($rv->[0]->status//'<undef>')
 	. " error=" . ($rv->[0]->error//'') . "\n";
     $rv->[0]->warning eq ''

@@ -65,7 +65,7 @@ require Exporter;
 @EXPORT_OK = qw(marc_map);
 %EXPORT_TAGS = (all => [qw(marc_map)]);
 
-our $VERSION = '1.231';
+our $VERSION = '1.241';
 
 sub marc_map {
     my ($data,$marc_path,%opts) = @_;
@@ -74,7 +74,7 @@ sub marc_map {
     $opts{'-split'} = 0         unless exists $opts{'-split'};
     $opts{'-pluck'} = 0         unless exists $opts{'-pluck'};
     $opts{'-nested_arrays'} = 1 unless exists $opts{'-nested_arrays'};
-
+    $opts{'-no-implicit-split'} = 1;
     $opts{'-force_array'} = 1 if (wantarray);
 
     my $vals = Catmandu::MARC->instance->marc_map(

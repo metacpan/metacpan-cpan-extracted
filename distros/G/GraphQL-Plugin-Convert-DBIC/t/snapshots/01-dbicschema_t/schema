@@ -67,19 +67,64 @@ enum CustomType {
 type Mutation {
   createBlog(input: [BlogCreateInput!]!): [Blog]
   createBlogTag(input: [BlogTagCreateInput!]!): [BlogTag]
+  createMysql(input: [MysqlCreateInput!]!): [Mysql]
   createPg(input: [PgCreateInput!]!): [Pg]
   createPhoto(input: [PhotoCreateInput!]!): [Photo]
   createPhotoset(input: [PhotosetCreateInput!]!): [Photoset]
   deleteBlog(input: [BlogMutateInput!]!): [Boolean]
   deleteBlogTag(input: [BlogTagMutateInput!]!): [Boolean]
+  deleteMysql(input: [MysqlMutateInput!]!): [Boolean]
   deletePg(input: [PgMutateInput!]!): [Boolean]
   deletePhoto(input: [PhotoMutateInput!]!): [Boolean]
   deletePhotoset(input: [PhotosetMutateInput!]!): [Boolean]
   updateBlog(input: [BlogMutateInput!]!): [Blog]
   updateBlogTag(input: [BlogTagMutateInput!]!): [BlogTag]
+  updateMysql(input: [MysqlMutateInput!]!): [Mysql]
   updatePg(input: [PgMutateInput!]!): [Pg]
   updatePhoto(input: [PhotoMutateInput!]!): [Photo]
   updatePhotoset(input: [PhotosetMutateInput!]!): [Photoset]
+}
+
+type Mysql {
+  another_enum_column: MysqlAnotherEnumColumn!
+  enum_column: MysqlEnumColumn!
+  id: String!
+  timestamp_with_tz: DateTime
+  timestamp_without_tz: DateTime!
+}
+
+enum MysqlAnotherEnumColumn {
+  bar
+  baz_space
+  foo
+}
+
+input MysqlCreateInput {
+  another_enum_column: MysqlAnotherEnumColumn!
+  enum_column: MysqlEnumColumn!
+  timestamp_with_tz: DateTime
+  timestamp_without_tz: DateTime!
+}
+
+enum MysqlEnumColumn {
+  bar
+  baz_space
+  foo
+}
+
+input MysqlMutateInput {
+  another_enum_column: MysqlAnotherEnumColumn
+  enum_column: MysqlEnumColumn
+  id: String!
+  timestamp_with_tz: DateTime
+  timestamp_without_tz: DateTime
+}
+
+input MysqlSearchInput {
+  another_enum_column: MysqlAnotherEnumColumn
+  enum_column: MysqlEnumColumn
+  timestamp_with_tz: DateTime
+  timestamp_without_tz: DateTime
 }
 
 type Pg {
@@ -279,6 +324,7 @@ input PhotosetSearchInput {
 type Query {
   blog(id: [Int!]!): [Blog]
   blogTag(id: [Int!]!): [BlogTag]
+  mysql(id: [String!]!): [Mysql]
   pg(id: [String!]!): [Pg]
   photo(id: [String!]!): [Photo]
   photoset(id: [String!]!): [Photoset]
@@ -286,6 +332,8 @@ type Query {
   searchBlog(input: BlogSearchInput!): [Blog]
   "input to search"
   searchBlogTag(input: BlogTagSearchInput!): [BlogTag]
+  "input to search"
+  searchMysql(input: MysqlSearchInput!): [Mysql]
   "input to search"
   searchPg(input: PgSearchInput!): [Pg]
   "input to search"

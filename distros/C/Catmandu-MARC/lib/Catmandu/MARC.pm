@@ -15,7 +15,7 @@ memoize('compile_marc_path');
 memoize('parse_marc_spec');
 memoize('_get_index_range');
 
-our $VERSION = '1.231';
+our $VERSION = '1.241';
 
 sub marc_map {
     my $self      = $_[0];
@@ -39,6 +39,11 @@ sub marc_map {
     my $value_set      = $_[3]->{'-value'} // undef;
     my $nested_arrays  = $_[3]->{'-nested_arrays'} // 0;
     my $append         = $_[3]->{'-force_array'} // undef;
+
+    # Do an implicit split for nested_arrays , except when no-implicit-split is set
+    if ($nested_arrays == 1) {
+        $split = 1 unless $_[3]->{'-no-implicit-split'};
+    }
 
     my $vals;
 
@@ -483,7 +488,7 @@ sub marc_spec {
     my $nested_arrays = $_[3]->{'-nested_arrays'} // 0;
     my $append        = $_[3]->{'-force_array'} // 0;
 
-    if($nested_arrays) {
+    if ($nested_arrays) {
         $split = 1
     }
 
@@ -701,10 +706,10 @@ sub marc_spec {
     } # end of field iteration
     return unless ($referred);
 
-    if($append) {
+    if ($append) {
         return [$referred] if $split;
         return $referred;
-    } elsif($split) {
+    } elsif ($split) {
         return [$referred];
     }
 
@@ -848,14 +853,21 @@ sub _get_index_range {
 }
 
 sub marc_xml {
-    my ($self,$data) = @_;
+    my ($self,$data,%opts) = @_;
 
-    my $xml;
-    my $exporter = Catmandu::Exporter::MARC::XML->new(file => \$xml , xml_declaration => 0 , collection => 0);
-    $exporter->add($data);
-    $exporter->commit;
+    if ($opts{reverse}) {
+        my $record = Catmandu->import_from_string($data,'MARC', type=>'XML');
+        return $record->[0]->{record} if $record;
+        return undef;
+    }
+    else {
+        my $xml;
+        my $exporter = Catmandu::Exporter::MARC::XML->new(file => \$xml , xml_declaration => 0 , collection => 0);
+        $exporter->add({record => $data});
+        $exporter->commit;
 
-    $xml;
+        return $xml;
+    }
 }
 
 sub marc_record_to_json {
@@ -979,7 +991,7 @@ sub compile_marc_path {
     my ($field,$field_regex,$ind1,$ind2,
         $subfield,$subfield_regex,$from,$to,$len,$is_regex_field);
 
-    my $MARC_PATH_REGEX = qr/(\S{1,3})(\[([^,])?,?([^,])?\])?([\$_a-z0-9^]+)?(\/([0-9]+)(-([0-9]+))?)?/;
+    my $MARC_PATH_REGEX = qr/(\S{1,3})(\[([^,])?,?([^,])?\])?([\$_a-z0-9^-]+)?(\/([0-9]+)(-([0-9]+))?)?/;
     if ($marc_path =~ $MARC_PATH_REGEX) {
         $field          = $1;
         $ind1           = $3;

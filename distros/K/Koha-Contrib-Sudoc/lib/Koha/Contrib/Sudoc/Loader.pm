@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader;
 # ABSTRACT: Classe de base pour le chargement de notices biblio/autorité
-$Koha::Contrib::Sudoc::Loader::VERSION = '2.28';
+$Koha::Contrib::Sudoc::Loader::VERSION = '2.29';
 use Moose;
 use Modern::Perl;
 use utf8;
@@ -104,7 +104,8 @@ sub handle_record {
 sub run {
     my $self = shift;
 
-    my $dt = DateTime->now;
+    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $dt = DateTime->now( time_zone => $tz );;
     $self->log->debug($dt->dmy . " " . $dt->hms . "\n");
     $self->log->notice("Chargement du fichier " . $self->file . "\n");
     $self->log->notice("** Test **\n") unless $self->doit;
@@ -144,7 +145,7 @@ Koha::Contrib::Sudoc::Loader - Classe de base pour le chargement de notices bibl
 
 =head1 VERSION
 
-version 2.28
+version 2.29
 
 =head1 AUTHOR
 

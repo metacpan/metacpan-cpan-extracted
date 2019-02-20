@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.0701';
+our $VERSION = '0.0801';
 
 use Carp;
 
@@ -60,12 +60,15 @@ sub parse {
     # Get the scale notes
     my @notes = get_scale_notes( $self->scale_note, $self->scale_name );
 
+    # Convert a diminished chord
+    $chord =~ s/dim/o/;
+
     # Get just the note part of the chord name
     ( my $note = $chord ) =~ s/^([A-G][#b]?).*$/$1/;
 
     # Get the roman representation based on the scale position
     my $position = first_index { $_ eq $note } @notes;
-    my ( $roman, $accidental );
+    my $accidental;
     if ( $position == -1 ) {
         if ( length($note) == 1 ) {
             $position = first_index { $_ =~ /$note/ } @notes;
@@ -78,7 +81,7 @@ sub parse {
             $position = first_index { $_ eq $letter } @notes;
         }
     }
-    $roman = $roman[$position];
+    my $roman = $roman[$position];
 
     # Get everything but the note part
     ( my $decorator = $chord ) =~ s/^(?:[A-G][#b]?)(.*)$/$1/;
@@ -94,12 +97,20 @@ sub parse {
     # Add any accidental found in a non-scale note
     $roman = $accidental . $roman if $accidental;
 
-    # Drop the minor and major part of the chord name
-    $decorator =~ s/M//i;
+    if ( $decorator =~ /Maj/ || $decorator =~ /min/ ) {
+        # Move Maj or min over one
+        $decorator =~ s/(Maj|min)/ $1/;
+        $decorator = lc $decorator;
+    }
+    else {
+        # Drop the minor and major part of the chord name
+        $decorator =~ s/M//i;
+    }
 
+    # A remaining note name is a bass decorator
     if ( $decorator =~ /([A-G][#b]?)/ ) {
-        my $letter = $1;
-        $position = first_index { $_ eq $letter } @notes;
+        my $name = $1;
+        $position = first_index { $_ eq $name } @notes;
         if ( $position >= 0 ) {
             $decorator =~ s/[A-G][#b]?/$roman[$position]/;
         }
@@ -128,7 +139,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.0701
+version 0.0801
 
 =head1 SYNOPSIS
 
@@ -140,12 +151,16 @@ version 0.0701
   );
   my $roman = $mtr->parse('Am'); # i (minor)
   $roman = $mtr->parse('Bo');    # iio (diminished)
+  $roman = $mtr->parse('Bdim');  # iio (diminished)
   $roman = $mtr->parse('CM');    # III (major)
   $roman = $mtr->parse('C');     # III (major)
+  $roman = $mtr->parse('CMaj7'); # III maj7 (major seventh)
+  $roman = $mtr->parse('E7');    # V7 (dominant)
   $roman = $mtr->parse('Em7');   # v7 (minor seventh)
+  $roman = $mtr->parse('Emin7'); # v min7 (minor seventh)
   $roman = $mtr->parse('A+');    # I+ (augmented)
   $roman = $mtr->parse('BbM');   # bII (flat-two major)
-  $roman = $mtr->parse('Cm9/G'); # iii9/VII
+  $roman = $mtr->parse('Cm9/G'); # iii9/VII (minor ninth with seven in the bass)
 
   # Also:
   $mtr = Music::ToRoman->new(
@@ -166,14 +181,14 @@ version 0.0701
 C<Music::ToRoman> converts chords to Roman numeral notation.  Also individual
 "chordless" notes may be converted given a diatonic mode B<scale_name>.
 
-For example usage, check out the tests for this distribution and the files
-F<eg/roman> and F<eg/basslines> in L<Music::BachChoralHarmony>.
+For example usage, check out the files F<eg/roman> and F<eg/basslines> in
+L<Music::BachChoralHarmony>.
 
 =head1 ATTRIBUTES
 
 =head2 scale_note
 
-Note on which the scale is based.  This can be one of C, Cb, C#, D, Db, D# ...
+Note on which the scale is based.
 
 Default: C
 
@@ -193,11 +208,11 @@ Default: major
 
 =head2 chords
 
-Are we given chords to B<parse> with major ("M") and minor ("m") designations?
+Are we given chords to B<parse> with major (C<M>) and minor (C<m>) designations?
 
 Default: 1
 
-If this is set to 0, single notes may be used to return the major/minor Roman
+If this is set to 0, single notes can be used to return the major/minor Roman
 numeral for the given diatonic mode B<scale_name>.
 
 =head1 METHODS
@@ -221,11 +236,12 @@ of the given chord.
 This can be overridden by parsing say, C<BM7> (B major seven), thus producing
 C<II7> in the key of A minor.
 
-As expected, if a major/minor chord designation is not provided, "M" major is
-assumed.
+If a major/minor chord designation is not provided, C<M> major is assumed.
 
 If the B<chords> attribute is off and a single note is given, the diatonic mode
 of the B<scale_name> is used to find the correct Roman numeral representation.
+
+A diminished chord may be given as C<dim>, which is then converted to C<o>.
 
 =head1 SEE ALSO
 

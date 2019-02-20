@@ -6,18 +6,11 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
-use File::ShareDir::Install;
-$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
-$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
-install_share dist => "share";
-
-
 my %WriteMakefileArgs = (
   "ABSTRACT" => "ingest and save csv and spreadsheet data to a perl data structure to avoid reparsing",
   "AUTHOR" => "Steve Dondley <s\@dondley.com>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "File::ShareDir::Install" => "0.06"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Spreadsheet-Read-Ingester",
   "LICENSE" => "perl",
@@ -26,19 +19,18 @@ my %WriteMakefileArgs = (
     "File::Signature" => 0,
     "File::Spec" => 0,
     "File::UserConfig" => 0,
-    "Spreadsheet::Read" => 0,
+    "Spreadsheet::Read" => "0.68",
     "Storable" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::File::ShareDir::Dist" => 0,
-    "Test::File::ShareDir::Module" => 0,
+    "Spreadsheet::Read" => "0.68",
     "Test::More" => 0,
     "Test::Most" => 0,
-    "Test::Output" => 0
+    "Text::CSV_PP" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,13 +41,11 @@ my %FallbackPrereqs = (
   "File::Signature" => 0,
   "File::Spec" => 0,
   "File::UserConfig" => 0,
-  "Spreadsheet::Read" => 0,
+  "Spreadsheet::Read" => "0.68",
   "Storable" => 0,
-  "Test::File::ShareDir::Dist" => 0,
-  "Test::File::ShareDir::Module" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
-  "Test::Output" => 0,
+  "Text::CSV_PP" => 0,
   "strict" => 0,
   "warnings" => 0
 );
@@ -71,9 +61,3 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
-
-{
-package
-MY;
-use File::ShareDir::Install qw(postamble);
-}

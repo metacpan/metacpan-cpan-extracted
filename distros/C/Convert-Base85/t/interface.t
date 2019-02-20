@@ -5,28 +5,28 @@ use strict;
 
 use Test::More tests => 19;
 
-require_ok('Convert::Base81');
+require_ok('Convert::Base85');
 
-ok defined &Convert::Base81::encode;
-ok defined &Convert::Base81::decode;
+ok defined &Convert::Base85::encode;
+ok defined &Convert::Base85::decode;
 ok !defined &encode;
 ok !defined &decode;
-ok !defined &base81_encode;
-ok !defined &base81_decode;
+ok !defined &base85_encode;
+ok !defined &base85_decode;
 
-use_ok('Convert::Base81');
-
-ok !defined &encode;
-ok !defined &decode;
-ok !defined &base81_encode;
-ok !defined &base81_decode;
-
-use_ok('Convert::Base81', qw(base81_encode base81_decode));
+use_ok('Convert::Base85');
 
 ok !defined &encode;
 ok !defined &decode;
-ok defined &base81_encode;
-ok defined &base81_decode;
+ok !defined &base85_encode;
+ok !defined &base85_decode;
 
-ok \&base81_encode == \&Convert::Base81::encode;
-ok \&base81_decode == \&Convert::Base81::decode;
+use_ok('Convert::Base85', qw(base85_encode base85_decode));
+
+ok !defined &encode;
+ok !defined &decode;
+ok defined &base85_encode;
+ok defined &base85_decode;
+
+ok \&base85_encode == \&Convert::Base85::encode;
+ok \&base85_decode == \&Convert::Base85::decode;

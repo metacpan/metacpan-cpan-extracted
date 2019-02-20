@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Inlineable';
 
-our $VERSION = '1.231';
+our $VERSION = '1.241';
 
 has marc_path => (fix_arg => 1);
 
@@ -28,7 +28,6 @@ Catmandu::Fix::marc_remove - remove marc (sub)fields
 
     # remove the 245-a subfield
     marc_remove('245a')
-
 
 =head1 DESCRIPTION
 

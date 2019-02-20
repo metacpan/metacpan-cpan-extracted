@@ -39,15 +39,15 @@
    "provides" : {
       "Net::BaruwaAPI" : {
          "file" : "lib/Net/BaruwaAPI.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "https://github.com/akissa/Net-BaruwaAPI"
+         "url" : "https://github.com/baruwa-enterprise/Net-BaruwaAPI"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

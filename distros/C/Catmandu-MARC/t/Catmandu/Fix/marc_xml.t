@@ -82,4 +82,18 @@ note 'marc_xml(record2)';
     ok ! $record->{record} , 'still have a record';
 }
 
+note 'marc_xml(record,reverse:1)';
+{
+    my $fixer = Catmandu::Fix->new(fixes =>
+            [q|marc_xml(record,reverse:1)|]
+    );
+    my $result = $fixer->fix({ record => $mrc });
+
+    ok $result , 'got a result';
+
+    is ref($result->{record}) , 'ARRAY' , 'got an array';
+
+    is $result->{record}->[0]->[0], 'LDR' , 'smells like marc';
+}
+
 done_testing;

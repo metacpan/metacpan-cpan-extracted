@@ -1,5 +1,12 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-DBIC
 
+0.10	Wed 20 Feb 12:25:50 GMT 2019
+ - add MySQL "employees" test db as test
+ - handle views somewhat
+
+0.09	Wed 20 Feb 09:59:28 GMT 2019
+ - handle mysql-style enums too
+
 0.08	Fri  8 Feb 23:24:58 GMT 2019
  - update to new SDL format
 

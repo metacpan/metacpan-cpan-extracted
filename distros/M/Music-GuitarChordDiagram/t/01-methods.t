@@ -15,7 +15,7 @@ is $obj->strings, 6, 'strings';
 is $obj->frets, 5, 'frets';
 is $obj->size, 30, 'size';
 is $obj->outfile, 'chord-diagram', 'outfile';
-like $obj->font, qr/\.ttf/, 'font';
+like $obj->font, qr/\.ttf$/, 'font';
 is_deeply $obj->tuning, [qw/E B G D A E/], 'tuning';
 is keys %{ $obj->fretboard }, 6, 'fretboard';
 is scalar @{ $obj->fretboard->{1} }, 12, 'fretboard';

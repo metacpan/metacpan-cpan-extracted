@@ -13,6 +13,7 @@ my $do = Test::Net::BaruwaAPI->new(api_token => 'xxxxxxxasasswqefdff', api_url =
 isa_ok($do, 'Net::BaruwaAPI');
 
 my $res;
+my $page = 1;
 
 my $data = {
     name => "example.net",
@@ -49,6 +50,11 @@ $res = $do->get_domains();
 # ok($res, 'the get_domains response is defined');
 is(get_last_request_method(), 'GET', 'the request method is correct');
 is(get_last_request_path(), '/api/v1/domains', 'the request uri is correct');
+
+$res = $do->get_domains($page);
+
+is(get_last_request_method(), 'GET', 'the request method is correct');
+is(get_last_request_path(), "/api/v1/domains?page=$page", 'the request uri is correct');
 
 set_expected_response('get_domain');
 

@@ -1,5 +1,18 @@
 Revision history for Catmandu-MARC
 
+1.241  2019-02-20 13:02:08 CET
+  - Fixing missing Test::Exception dependency #95
+  
+1.24  2018-06-21 15:33:11 CEST
+  - Adding support for subfield ranges in marc_map #85
+  - Adding example how to remove non-numeric fields #84
+  - Adding an example how to add subfields to a MARC field #68
+  - nested_arrays:1 should be enough to stop processing subfields/fields #56
+  - Providing an example how to set and remove MARC indicators #36
+  - Adding the reverse:1 option for marc_xml #87
+  - Document "equals" key in marc_copy/marc_cut #89
+  - Adding a deduplication tutorial
+
 1.231  2017-12-16 13:40:53 CET
   - Implementing marc_spec 2.0 in the fixes
 

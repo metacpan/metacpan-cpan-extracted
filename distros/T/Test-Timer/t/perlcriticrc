@@ -238,7 +238,7 @@ severity = 5
 # maximum_violations_per_document    = no_limit
 
 # The Perl::Tidy configuration file to use, if any.
-# perltidyrc =
+perltidyrc = t/perltidyrc
 
 
 # Put a comma at the end of every multi-line list declaration, including the last one.

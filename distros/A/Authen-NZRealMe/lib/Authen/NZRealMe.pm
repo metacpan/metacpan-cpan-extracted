@@ -1,5 +1,5 @@
 package Authen::NZRealMe;
-$Authen::NZRealMe::VERSION = '1.18';
+$Authen::NZRealMe::VERSION = '1.19';
 use warnings;
 use strict;
 
@@ -14,10 +14,9 @@ Provides an API for integrating your application with the New Zealand RealMe
 login service and the RealMe assertion service (for verified identity and
 address details) using SAML 2.0 messaging.
 
-Note: This distribution was renamed from Authen::NZigovt following the
-rebranding of the service from "igovt" to "RealMe".  When migrating systems to
-use the new module, it will be necessary to rename some of the config files to
-the new names listed under L</CONFIGURATION> below.
+Note: If you are looking at this code as an example implementation of SAML2,
+then you can safely ignore any code referring to "iCMS" - it is a (deprecated)
+supplementary API provided by the RealMe IdP, which uses WS-Trust protocols.
 
 The distribution also includes a command-line tool called C<nzrealme> which can
 be used for:

@@ -11,8 +11,6 @@ use constant {
 
 use List::Util qw(min max);
 
-my $VERSION = '1.08';
-
 sub _perl_logo {
     my $self = shift;
     return unless (exists($self->{'FONTS'}->{'DejaVuSerif'}));
@@ -183,8 +181,8 @@ sub splash {
             'x'             => (97 * $hf) + $X,
             'y'             => (202 * $vf) + $Y,
             'radius'        => 52 * $vf,
-            'start_degrees' => 0, # 340,
-            'end_degrees'   => 270,
+            'start_degrees' => 90,
+            'end_degrees'   => 10,
             'granularity'   => 0.05
         }
     );
@@ -244,8 +242,8 @@ sub splash {
             'x'             => (95 * $hf) + $X,
             'y'             => (200 * $vf) + $Y,
             'radius'        => 52 * $vf,
-            'start_degrees' => 0, # 340,
-            'end_degrees'   => 270,
+            'start_degrees' => 90,
+            'end_degrees'   => 10,
             'granularity'   => 0.05
         }
     );

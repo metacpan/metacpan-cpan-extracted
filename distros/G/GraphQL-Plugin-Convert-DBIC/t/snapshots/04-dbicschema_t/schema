@@ -1,0 +1,227 @@
+'type CurrentDeptEmp {
+  dept_no: String!
+  emp_no: Int!
+  from_date: DateTime
+  to_date: DateTime
+}
+
+input CurrentDeptEmpSearchInput {
+  dept_no: String
+  emp_no: Int
+  from_date: DateTime
+  to_date: DateTime
+}
+
+type Department {
+  dept_emps: [DeptEmp]
+  dept_managers: [DeptManager]
+  dept_name: String!
+  dept_no: String!
+}
+
+input DepartmentCreateInput {
+  dept_name: String!
+}
+
+input DepartmentMutateInput {
+  dept_name: String
+  dept_no: String!
+}
+
+input DepartmentSearchInput {
+  dept_name: String
+}
+
+type DeptEmp {
+  dept_no: Department!
+  emp_no: Employee!
+  from_date: DateTime!
+  to_date: DateTime!
+}
+
+input DeptEmpCreateInput {
+  dept_no: DepartmentMutateInput!
+  emp_no: EmployeeMutateInput!
+  from_date: DateTime!
+  to_date: DateTime!
+}
+
+type DeptEmpLatestDate {
+  emp_no: Int!
+  from_date: DateTime
+  to_date: DateTime
+}
+
+input DeptEmpLatestDateSearchInput {
+  emp_no: Int
+  from_date: DateTime
+  to_date: DateTime
+}
+
+input DeptEmpMutateInput {
+  from_date: DateTime
+  to_date: DateTime
+}
+
+input DeptEmpSearchInput {
+  from_date: DateTime
+  to_date: DateTime
+}
+
+type DeptManager {
+  dept_no: Department!
+  emp_no: Employee!
+  from_date: DateTime!
+  to_date: DateTime!
+}
+
+input DeptManagerCreateInput {
+  dept_no: DepartmentMutateInput!
+  emp_no: EmployeeMutateInput!
+  from_date: DateTime!
+  to_date: DateTime!
+}
+
+input DeptManagerMutateInput {
+  from_date: DateTime
+  to_date: DateTime
+}
+
+input DeptManagerSearchInput {
+  from_date: DateTime
+  to_date: DateTime
+}
+
+type Employee {
+  birth_date: DateTime!
+  dept_emps: [DeptEmp]
+  dept_managers: [DeptManager]
+  emp_no: Int!
+  first_name: String!
+  gender: EmployeeGender!
+  hire_date: DateTime!
+  last_name: String!
+  salaries: [Salary]
+  titles: [Title]
+}
+
+input EmployeeCreateInput {
+  birth_date: DateTime!
+  first_name: String!
+  gender: EmployeeGender!
+  hire_date: DateTime!
+  last_name: String!
+}
+
+enum EmployeeGender {
+  F
+  M
+}
+
+input EmployeeMutateInput {
+  birth_date: DateTime
+  emp_no: Int!
+  first_name: String
+  gender: EmployeeGender
+  hire_date: DateTime
+  last_name: String
+}
+
+input EmployeeSearchInput {
+  birth_date: DateTime
+  first_name: String
+  gender: EmployeeGender
+  hire_date: DateTime
+  last_name: String
+}
+
+type Mutation {
+  createDepartment(input: [DepartmentCreateInput!]!): [Department]
+  createDeptEmp(input: [DeptEmpCreateInput!]!): [DeptEmp]
+  createDeptManager(input: [DeptManagerCreateInput!]!): [DeptManager]
+  createEmployee(input: [EmployeeCreateInput!]!): [Employee]
+  createSalary(input: [SalaryCreateInput!]!): [Salary]
+  createTitle(input: [TitleCreateInput!]!): [Title]
+  deleteDepartment(input: [DepartmentMutateInput!]!): [Boolean]
+  deleteDeptEmp(input: [DeptEmpMutateInput!]!): [Boolean]
+  deleteDeptManager(input: [DeptManagerMutateInput!]!): [Boolean]
+  deleteEmployee(input: [EmployeeMutateInput!]!): [Boolean]
+  deleteSalary(input: [SalaryMutateInput!]!): [Boolean]
+  deleteTitle(input: [TitleMutateInput!]!): [Boolean]
+  updateDepartment(input: [DepartmentMutateInput!]!): [Department]
+  updateDeptEmp(input: [DeptEmpMutateInput!]!): [DeptEmp]
+  updateDeptManager(input: [DeptManagerMutateInput!]!): [DeptManager]
+  updateEmployee(input: [EmployeeMutateInput!]!): [Employee]
+  updateSalary(input: [SalaryMutateInput!]!): [Salary]
+  updateTitle(input: [TitleMutateInput!]!): [Title]
+}
+
+type Query {
+  department(dept_no: [String!]!): [Department]
+  employee(emp_no: [Int!]!): [Employee]
+  salary(from_date: [DateTime!]!): [Salary]
+  "input to search"
+  searchCurrentDeptEmp(input: CurrentDeptEmpSearchInput!): [CurrentDeptEmp]
+  "input to search"
+  searchDepartment(input: DepartmentSearchInput!): [Department]
+  "input to search"
+  searchDeptEmp(input: DeptEmpSearchInput!): [DeptEmp]
+  "input to search"
+  searchDeptEmpLatestDate(input: DeptEmpLatestDateSearchInput!): [DeptEmpLatestDate]
+  "input to search"
+  searchDeptManager(input: DeptManagerSearchInput!): [DeptManager]
+  "input to search"
+  searchEmployee(input: EmployeeSearchInput!): [Employee]
+  "input to search"
+  searchSalary(input: SalarySearchInput!): [Salary]
+  "input to search"
+  searchTitle(input: TitleSearchInput!): [Title]
+  title(from_date: [DateTime!]!, title: [String!]!): [Title]
+}
+
+type Salary {
+  emp_no: Employee!
+  from_date: DateTime!
+  salary: Int!
+  to_date: DateTime!
+}
+
+input SalaryCreateInput {
+  emp_no: EmployeeMutateInput!
+  salary: Int!
+  to_date: DateTime!
+}
+
+input SalaryMutateInput {
+  from_date: DateTime!
+  salary: Int
+  to_date: DateTime
+}
+
+input SalarySearchInput {
+  salary: Int
+  to_date: DateTime
+}
+
+type Title {
+  emp_no: Employee!
+  from_date: DateTime!
+  title: String!
+  to_date: DateTime
+}
+
+input TitleCreateInput {
+  emp_no: EmployeeMutateInput!
+  to_date: DateTime
+}
+
+input TitleMutateInput {
+  from_date: DateTime!
+  title: String!
+  to_date: DateTime
+}
+
+input TitleSearchInput {
+  to_date: DateTime
+}
+'

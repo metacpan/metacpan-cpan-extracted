@@ -38,7 +38,7 @@ print "\n",colored(['bright_yellow on_blue'],$name),"\n";
 
 print colored(['bright_yellow'],'Adding C to Module...');
 my $ccode = slurp_file('src/Framebuffer.c');
-my $template = slurp_file('src/Framebuffer.template.pm');
+my $template = slurp_file('src/Framebuffer.pm.template');
 if ($template =~ /^(.*?)\n/s) {
     my ($version, $month, $day, $year) = split(/\s/, $1 );
     $template =~ s/^.*?\n//s;

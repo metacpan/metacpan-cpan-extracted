@@ -1,4 +1,7 @@
 Revision history for Code-TidyAll-Plugin-Flake8
 
+0.2.0       2019-02-19
+    - Use Inline::Python if possible for speeding up by avoiding fork()+exec()
+
 0.0.1       2018-05-08
     - First version, released on an unsuspecting world

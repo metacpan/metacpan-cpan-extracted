@@ -19,7 +19,6 @@ examples/primitives.pl
 examples/slideshow.pl
 examples/template.pl
 examples/threaded_slideshow.pl
-examples/threadstest.pl
 examples/viewpic.pl
 ignore.txt
 KNOWN_ISSUES
@@ -33,6 +32,6 @@ META.yml
 README
 README.md
 src/Framebuffer.c
-src/Framebuffer.template.pm
+src/Framebuffer.pm.template
 t/01-splash.t
 TODO

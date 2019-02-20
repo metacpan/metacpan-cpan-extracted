@@ -1,11 +1,7 @@
-use Test::Most;
-use Test::Output;
+use Test::Most tests => 8;
+use File::Signature;
 use File::Spec;
 use Storable;
-BEGIN {
-  use Test::File::ShareDir::Module { "Spreadsheet::Read::Ingester" => "share/" };
-  use Test::File::ShareDir::Dist { "Spreadsheet-Read-Ingester" => "share/" };
-}
 use Spreadsheet::Read::Ingester;
 
 
@@ -14,42 +10,25 @@ use Spreadsheet::Read::Ingester;
 
 
 
-my $tests = 7; # keep on line 17 for ,i (increment and ,d (decrement)
-plan tests => $tests;
 diag( "Running Spreadsheet::Read::Ingester tests" );
 my $configdir = File::UserConfig->new(dist => 'Spreadsheet-Read-Ingester')->configdir;
 
-opendir (DIR, $configdir);
-my @files = readdir (DIR);
-closedir (DIR);
+my $sig = File::Signature->new('t/test_files/test.csv')->{digest};
+my $new_file = File::Spec->catfile($configdir, $sig);
 
-my $file_count = scalar @files;
-my %files = map { $_ => 1 } @files;
+# make sure file doesn't exist from a previous failed test
+unlink $new_file if -f $new_file;
 
 my $data;
 lives_ok {
   $data = Spreadsheet::Read::Ingester->new( 't/test_files/test.csv' );
 } 'Can create new object';
 
-opendir (DIR, $configdir);
-my @new_files = readdir (DIR);
-closedir (DIR);
+is (1, -f $new_file, 'created parsed file');
 
-is (scalar @new_files, $file_count + 1, 'created parsed file');
-
-# get the name of the new file
-my $file;
-foreach my $f (@new_files) {
-  if (!$files{$f}) {
-    $file = $f;
-    last;
-  }
-}
-
-$file = File::Spec->catfile($configdir, $file);
 my $dummy_data = { hash => 1 };
 
-store $dummy_data, $file;
+store $dummy_data, $new_file;
 
 lives_ok {
   $data = Spreadsheet::Read::Ingester->new('t/test_files/test.csv' );
@@ -61,17 +40,14 @@ lives_ok {
   Spreadsheet::Read::Ingester->cleanup();
 } 'cleans up directory';
 
-is (-e $file, 1, 'parsed file is not deleted');
+warnings_like {
+  Spreadsheet::Read::Ingester->cleanup('blah');
+} qr/accepts only/, 'warns when non-integer passed to cleanup method';
+
+is (-e $new_file, 1, 'parsed file is not deleted');
 
 Spreadsheet::Read::Ingester->cleanup(0);
 
-is (-e $file, undef, 'parsed file is deleted');
+is (-e $new_file, undef, 'parsed file is deleted');
 
-# cleanup dir
-opendir (DIR, $configdir) or die 'Could not open directory.';
-@files = readdir (DIR);
-closedir (DIR);
-foreach my $file (@files) {
-  $file = File::Spec->catfile($configdir, $file);
-  unlink $file if -f $file;
-}
+unlink $new_file if -f $new_file;

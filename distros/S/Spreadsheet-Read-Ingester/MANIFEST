@@ -9,7 +9,6 @@ Makefile.PL
 README
 dist.ini
 lib/Spreadsheet/Read/Ingester.pm
-share/empty
 t/00-use_ok.t
 t/01-basic.t
 t/test_files/test.csv

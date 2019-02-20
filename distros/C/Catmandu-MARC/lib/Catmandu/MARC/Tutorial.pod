@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 Catmandu::MARC::Tutorial - A documentation-only module for new users of Catmandu::MARC
@@ -5,6 +7,31 @@ Catmandu::MARC::Tutorial - A documentation-only module for new users of Catmandu
 =head1 SYNOPSIS
 
   perldoc Catmandu::MARC::Tutorial
+
+=head1 UTF8
+
+=head2 MARC8 and UTF8
+
+The current Catmandu MARC tools are targetted for processing UTF8 encoded files.
+When you have MARC8 encoded data tools like MarcEdit <https://marcedit.reeset.net/>
+or C<yaz-marcdump> <https://software.indexdata.com/yaz/doc/yaz-marcdump.html> can
+be used to create a UTF8 encoded file:
+
+   $ yaz-marcdump -f MARC-8 -t UTF-8 -o marc -l 9=97 marc21.raw > marc21.utf8.raw
+
+
+=head2 Convert a decomposed UTF8 file to a combined UTF8 file and vice versa
+
+For example, the character ä can be represented as
+
+"ä", that is the codepoint U+00E4 (two bytes c3 a4 in UTF-8 encoding), or as
+"ä", that is the two codepoints U+0061 U+0308 (three bytes 61 cc 88 in UTF-8).
+
+The uconf (libicu-dev Linux package) tool can be used to convert these types of
+files:
+
+    $ uconv -x any-nfc < decomposed.txt > combined.txt
+    $ uconv -x any-nfd < combined.txt > decomposed.txt
 
 =head1 READING
 
@@ -414,6 +441,54 @@ language. Using the C<rename> function we search for all the subfields, and repl
 the field matching the regular expression C<1> with C<0>. At the end, we paste
 back the C<tmp> field into the record.
 
+=head2 Setting and remove MARC indicators
+
+In the example below we set every indicator1 of the 500 field to the value "0".
+We will use the L<Catmandu::Fix::Bind::marc_each> bind with a loop variable:
+
+    # For each marc field...
+    do marc_each(var:this)
+       # If the marc field is a 500 field
+       if marc_has(500)
+          # Set the indicator1 to value "0"
+          set_field(this.ind1,0)
+          # Store the result back into the MARC record
+          marc_remove(500)
+          marc_paste(this)
+       end
+     end
+
+Using the same method indicators can also be deleted by setting their value to
+a space " ".
+
+=head2 Adding a new MARC subfield
+
+In the example below we append a new MARC subfield $z to the 500 field with value test.
+We will use the L<Catmandu::Fix::Bind::marc_each> bind with a loop variable:
+
+    # For each marc field...
+    do marc_each(var:this)
+       # If the marc field is a 500 field
+       if marc_has(500)
+          # add a new subfield z
+          add_field(this.subfields.$append.z,Test)
+          # Store the result back into the MARC record
+          marc_remove(500)
+          marc_paste(this)
+       end
+    end
+
+=head2 Remove all non-numeric fields from the MARC record
+
+    # For each marc field...
+    do marc_each(var:this)
+       # If we have a non-numeric fields
+       unless all_match(this.tag,"\d{3}")
+          # Remove this tag
+          marc_remove(***)
+       end
+    end
+
 =head1 WRITING
 
 =head2 Convert a MARC record into a MARC record (do nothing)
@@ -440,7 +515,7 @@ The C<all_match> also allows a regular expressions:
 
     $ catmandu convert MARC to MARC --fix 'marc_map(900a,type); select all_match(type,"[Bb]ook")' < data.mrc > output.mrc
 
-=head2 Select only the rcords with 900a values in a given CSV file
+=head2 Select only the records with 900a values in a given CSV file
 
 Create a CSV file with name,value pairs (need two columns):
 
@@ -466,3 +541,53 @@ MARC tag isn't repeatable this loop not isn't needed. With marc_map we copy
 first the value of a marc subfield to a 'test' field. This test we lookup against
 the CSV file. Then, we select only the records that are found in the CSV file
 (and return the correct value).
+
+=head1 DEDUPLICATION
+
+=head2 Check for duplicate ISBN numbers in a MARC file
+
+In this example we extract from a MARC file all the ISBN numbers from
+the 020 and do a little bit of data cleaning using the L<Catmandu::Identifier>
+project. To install this package, we run this command:
+
+    $ cpanm Catmandu::Identifier
+
+To extract all the ISBN numbers we use this Fix script 'dedup.fix':
+
+    marc_map(020a, identifier.$append)
+    replace_all(identifier.*,"\s+.*","")
+    do list(path:identifier)
+      isbn13(.)
+    end
+    do hashmap(exporter:YAML)
+      copy_field(identifier,key)
+      copy_field(_id,value)
+    end
+
+The first C<marc_map> fix maps every 020 field to an identifier array.
+The C<replace_all> cleans the data a bit and deletes some unwanted text.
+The C<do list> will transform all the ISBN numbers to ISBN13.
+The C<do hashmap> will create an internal mapping table of identifier,_id key
+value pairs. For very identifier, one or more _id can be stored. At the end
+of all MARC processing this mapping table is dumped from memory as a YAML document.
+
+Run this fix as:
+
+    $ catmandu convert MARC to Null --fix dedup.fix < marc.mrc > output.yml
+
+The output YAML file will contain the ISBN to document ID mapping. We
+only need the ISBN numbers with more than one hit. We need a little bit
+of cleanup on this YAML file to reach our final result. Use the following
+'cleanup.fix' script:
+
+    select exists(value.1)
+    join_field(value,",")
+
+This first C<select> fix selects only the records with more than one hit.
+The C<join_field> will turn the array of results into a string. Execute
+this Fix like:
+
+    $ catmandu convert YAML to TSV --fix cleanup.fix < output.yml > result.csv
+
+This will provide a tab delimited file of double isbn numbers in the MARC
+input file.

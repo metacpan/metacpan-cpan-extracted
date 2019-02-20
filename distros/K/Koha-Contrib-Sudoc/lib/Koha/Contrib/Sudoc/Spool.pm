@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Spool;
 # ABSTRACT: Spool des fichiers de notices
-$Koha::Contrib::Sudoc::Spool::VERSION = '2.28';
+$Koha::Contrib::Sudoc::Spool::VERSION = '2.29';
 use Moose;
 use Modern::Perl;
 use File::Copy;
@@ -214,7 +214,7 @@ Koha::Contrib::Sudoc::Spool - Spool des fichiers de notices
 
 =head1 VERSION
 
-version 2.28
+version 2.29
 
 =head1 DESCRIPTION
 

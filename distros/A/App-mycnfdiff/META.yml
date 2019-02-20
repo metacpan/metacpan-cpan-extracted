@@ -1,0 +1,37 @@
+---
+abstract: 'compare MySQL server configs. '
+author:
+  - 'Pavel Serikov <pavelsr@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-mycnfdiff
+requires:
+  Carp: '0'
+  Config::MySQL::Reader: '0'
+  Config::MySQL::Writer: '0'
+  Const::Fast: '0'
+  Cwd: '0'
+  Data::Dump: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Slurper: '0'
+  Getopt::Long::Descriptive: '0'
+  List::Compare: '0'
+  List::Util: '0'
+  Text::CSV: '0'
+  feature: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pavelsr/mycnfdiff/issues
+  repository: git://github.com/pavelsr/mycnfdiff.git
+version: '1.00'
+x_serialization_backend: 'YAML::Tiny version 1.70'

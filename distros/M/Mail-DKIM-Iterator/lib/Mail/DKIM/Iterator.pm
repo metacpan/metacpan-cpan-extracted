@@ -1,7 +1,7 @@
 package Mail::DKIM::Iterator;
 use v5.10.0;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 use strict;
 use warnings;
@@ -18,7 +18,26 @@ my $critical_headers_rx = do {
 my @sign_headers = (@critical_headers, 'to', 'cc', 'date');
 
 use Exporter 'import';
-our @EXPORT =qw(
+our @EXPORT = qw(
+    DKIM_POLICY
+    DKIM_PERMERROR
+    DKIM_NEUTRAL
+    DKIM_TEMPERROR
+    DKIM_FAIL
+    DKIM_PASS
+);
+
+use constant {
+    DKIM_POLICY      => dualvar(-4,'policy'),
+    DKIM_PERMERROR   => dualvar(-3,'permerror'),
+    DKIM_NEUTRAL     => dualvar(-2,'neutral'),
+    DKIM_TEMPERROR   => dualvar(-1,'temperror'),
+    DKIM_FAIL        => dualvar( 0,'fail'),
+    DKIM_PASS        => dualvar( 1,'pass'),
+};
+
+# compability to versions 1.003 and lower
+push @EXPORT, qw(
     DKIM_INVALID_HDR
     DKIM_TEMPFAIL
     DKIM_SOFTFAIL
@@ -27,13 +46,12 @@ our @EXPORT =qw(
 );
 
 use constant {
-    DKIM_INVALID_HDR => dualvar(-3,'invalid-header'),
-    DKIM_SOFTFAIL    => dualvar(-2,'soft-fail'),
-    DKIM_TEMPFAIL    => dualvar(-1,'temp-fail'),
-    DKIM_PERMFAIL    => dualvar( 0,'perm-fail'),
-    DKIM_SUCCESS     => dualvar( 1,'valid'),
+    DKIM_INVALID_HDR => DKIM_PERMERROR,
+    DKIM_TEMPFAIL    => DKIM_TEMPERROR,
+    DKIM_SOFTFAIL    => DKIM_NEUTRAL,
+    DKIM_PERMFAIL    => DKIM_FAIL,
+    DKIM_SUCCESS     => DKIM_PASS,
 };
-
 
 
 # create new object
@@ -157,7 +175,6 @@ sub authentication_results {
     } @{shift->result || []});
 }
 
-
 # Compute result based on current data.
 # This might add more DKIM records to validate signatures.
 sub _compute_result {
@@ -185,8 +202,8 @@ sub _compute_result {
 		my $dkim_sig = sign($sig,$sig->{':key'},$self->{header},\$err);
 		push @rv, $sig->{':result'} =
 		    Mail::DKIM::Iterator::SignRecord->new(
-			$dkim_sig ? ($sig,$dkim_sig,DKIM_SUCCESS)
-			    : ($sig,undef,DKIM_PERMFAIL,$err)
+			$dkim_sig ? ($sig,$dkim_sig,DKIM_PASS)
+			    : ($sig,undef,DKIM_FAIL,$err)
 		    );
 	    }
 	    next;
@@ -198,7 +215,7 @@ sub _compute_result {
 		Mail::DKIM::Iterator::VerifyRecord->new(
 		    $sig,
 		    ($sig->{s}//'UNKNOWN')."_domainkey".($sig->{d}//'UNKNOWN'),
-		    DKIM_INVALID_HDR,
+		    DKIM_PERMERROR,
 		    $sig->{error}
 		);
 	    next;
@@ -208,7 +225,7 @@ sub _compute_result {
 
 	if ($sig->{x} && $sig->{x} < time()) {
 	    push @rv, $sig->{':result'} = Mail::DKIM::Iterator::VerifyRecord
-		->new($sig,$dns, DKIM_SOFTFAIL, "signature e[x]pired");
+		->new($sig,$dns, DKIM_POLICY, "signature e[x]pired");
 	    next;
 	}
 
@@ -236,7 +253,7 @@ sub _compute_result {
 	} elsif (exists $self->{records}{$dns}) {
 	    # cannot get DKIM record
 	    push @rv, $sig->{':result'} = Mail::DKIM::Iterator::VerifyRecord
-		->new($sig,$dns, DKIM_TEMPFAIL, "dns lookup failed");
+		->new($sig,$dns, DKIM_TEMPERROR, "dns lookup failed");
 	} else {
 	    # no DKIM record yet known for $dns - preliminary result
 	    push @rv, Mail::DKIM::Iterator::VerifyRecord->new($sig,$dns);
@@ -279,7 +296,8 @@ sub parse_signature {
     $v->{c} = lc($v->{c}//'simple/simple');
 
     my @h = split(/\s*:\s*/,lc($v->{h}));
-    $$error = "'from' missing from [h]eader fields" if ! grep { $_ eq 'from' } @h;
+    $$error = "'from' missing from [h]eader fields"
+	if ! grep { $_ eq 'from' } @h;
     $v->{'h:list'} = \@h;
 
     if ($for_signing) {
@@ -477,14 +495,14 @@ sub sign {
 
 # Verify a DKIM signature (hash from parse_signature) using a DKIM key (hash
 # from parse_dkimkey). Output is (error_code,error_string) or simply
-# (DKIM_SUCCESS) in case of no error.
+# (DKIM_PASS) in case of no error.
 sub _verify_sig {
     my ($sig,$param) = @_;
-    return (DKIM_PERMFAIL,"none or invalid dkim record") if ! %$param;
-    return (DKIM_TEMPFAIL,$param->{tempfail}) if $param->{tempfail};
-    return (DKIM_PERMFAIL,$param->{permfail}) if $param->{permfail};
+    return (DKIM_PERMERROR,"none or invalid dkim record") if ! %$param;
+    return (DKIM_TEMPERROR,$param->{tempfail}) if $param->{tempfail};
+    return (DKIM_PERMERROR,$param->{permfail}) if $param->{permfail};
 
-    my $FAIL = $param->{t}{y} ? DKIM_SOFTFAIL : DKIM_PERMFAIL;
+    my $FAIL = $param->{t}{y} ? DKIM_NEUTRAL : DKIM_FAIL;
     return ($FAIL,"key revoked") if ! $param->{p};
 
     return ($FAIL,"hash algorithm not allowed")
@@ -518,7 +536,7 @@ sub _verify_sig {
 	# warn "encrypt="._encode64($bencrypt)."\n";
 	return ($FAIL,'header sig mismatch');
     }
-    return (DKIM_SUCCESS, join(' + ', @{$sig->{':warning'} || []}));
+    return (DKIM_PASS, join(' + ', @{$sig->{':warning'} || []}));
 }
 
 # parse the header and extract
@@ -565,7 +583,6 @@ sub _parse_header {
 	return "\x00\x01" . ("\xff" x $pad) . "\x00" . $t;
     }
 }
-
 
 {
 
@@ -691,8 +708,6 @@ sub _parse_header {
 	};
     };
 
-
-
     my %bodyc = (
 	simple  => sub { $bodyc->(0) },
 	relaxed => sub { $bodyc->(1) },
@@ -756,8 +771,6 @@ sub _parse_header {
     }
 }
 
-
-
 {
 
     # parse_taglist($val,\$error)
@@ -797,7 +810,6 @@ sub _parse_header {
 	return \%v;
     }
 }
-
 
 sub _encode64 {
     my $data = shift;
@@ -870,18 +882,17 @@ sub signature { shift->[1] }
 sub status    { shift->[2] }
 sub error     { shift->[3] }
 
-
 1;
 
 __END__
 
-=head1 NAME 
+=head1 NAME
 
-Mail::DKIM::Iterator - Iterative validation of DKIM records or DKIM signing of mails.
+Mail::DKIM::Iterator - Iterative DKIM validation or signing.
 
 =head1 SYNOPSIS
 
-    # ---- Verify all DKIM signature headers found within a mail --------------
+    # ---- Verify all DKIM signature headers found within a mail -----------
 
     my $mailfile = $ARGV[0];
 
@@ -927,8 +938,8 @@ Mail::DKIM::Iterator - Iterative validation of DKIM records or DKIM signing of m
 
     # This final result consists of a VerifyRecord for each DKIM signature
     # in the header, which provides access to the status. Status is one of
-    # of DKIM_SUCCESS, DKIM_PERMFAIL, DKIM_TEMPFAIL, DKIM_SOFTFAIL or
-    # DKIM_INVALID_HDR. In case of error $record->error contains a string
+    # of DKIM_FAIL, DKIM_FAIL, DKIM_PERMERROR, DKIM_TEMPERROR, DKIM_NEUTRAL or
+    # DKIM_POLICY. In case of error $record->error contains a string
     # representation of the error.
 
     for(@$rv) {
@@ -936,10 +947,10 @@ Mail::DKIM::Iterator - Iterative validation of DKIM records or DKIM signing of m
 	my $name = $_->domain;
 	if (!defined $status) {
 	    print STDERR "$mailfile: $name UNKNOWN\n";
-	} elsif ($status == DKIM_SUCCESS) {
+	} elsif ($status == DKIM_PASS) {
 	    # fully validated
 	    print STDERR "$mailfile: $name OK ".$_->warning".\n";
-	} elsif ($status == DKIM_PERMFAIL) {
+	} elsif ($status == DKIM_FAIL) {
 	    # hard error
 	    print STDERR "$mailfile: $name FAIL ".$_->error."\n";
 	} else {
@@ -949,7 +960,7 @@ Mail::DKIM::Iterator - Iterative validation of DKIM records or DKIM signing of m
     }
 
 
-    # ---- Create signature for a mail ----------------------------------------
+    # ---- Create signature for a mail -------------------------------------
 
     my $mailfile = $ARGV[0];
 
@@ -960,7 +971,7 @@ Mail::DKIM::Iterator - Iterative validation of DKIM records or DKIM signing of m
 	a => 'rsa-sha1',
 	d => 'example.com',
 	s => 'foobar',
-	':key' => ... PEM string for private key or Crypt::OpenSSL::RSA object
+	':key' => PEM string for private key or Crypt::OpenSSL::RSA object
     });
 
     open(my $fh,'<',$mailfile) or die $!;
@@ -981,16 +992,13 @@ Mail::DKIM::Iterator - Iterative validation of DKIM records or DKIM signing of m
 	my $name = $_->domain;
 	if (!defined $status) {
 	    print STDERR "$mailfile: $name UNKNOWN\n";
-	} elsif (status != DKIM_SUCCESS) {
+	} elsif (status != DKIM_PASS) {
 	    print STDERR "$mailfile: $name $status - ".$_->error."\n";
 	} else {
 	    # show signature
 	    print $_->signature;
 	}
     }
-
-
-
 
 =head1 DESCRIPTION
 
@@ -1049,7 +1057,6 @@ C<$sig{d}>.
 
 =back
 
-
 =item $dkim->next([ $mailchunk | \%dns ]*) -> ($rv,@todo)
 
 This is used to add new information to the DKIM object.
@@ -1073,11 +1080,11 @@ Both VerifyRecord and SignRecord have the following methods:
 =over 8
 
 =item status - undef if no DKIM result is yet known for the record (preliminary
-result). Otherwise any of DKIM_SUCCESS, DKIM_INVALID_HDR, DKIM_TEMPFAIL,
-DKIM_SOFTFAIL, DKIM_PERMFAIL.
+result). Otherwise any of DKIM_PASS, DKIM_FAIL, DKIM_NEUTRAL, DKIM_TEMPERROR,
+DKIM_POLICY, DKIM_PERMERROR.
 
 =item error - an error description in case the status shows an error, i.e. with
-all status values except undef and DKIM_SUCCESS.
+all status values except undef and DKIM_PASS.
 
 =item sig - the DKIM signature as hash
 
@@ -1091,7 +1098,7 @@ A SignRecord has additionally the following methods:
 
 =over 8
 
-=item signature - the DKIM-Signature value, only if DKIM_SUCCESS
+=item signature - the DKIM-Signature value, only if DKIM_PASS
 
 =back
 
@@ -1099,7 +1106,7 @@ A VerifyRecord has additionally the following methods:
 
 =over 8
 
-=item warning - possible warnings if DKIM_SUCCESS
+=item warning - possible warnings if DKIM_PASS
 
 Currently this is used to provide information if critical header fields in
 the mail are not convered by the signature and thus might have been changed
@@ -1158,21 +1165,20 @@ C<$priv_key> (as PEM string or Crypt::OpenSSL::RSA object) and the header of the
 mail and computes the signature. The result C<$signed_dkim_sig> will be a
 signature string which can be put on top of the mail.
 
-If C<$hdr->{l}> is defined and C<0> then the signature will contain an 'l'
+If C<< $hdr->{l} >> is defined and C<0> then the signature will contain an 'l'
 attribute with the full length of the body.
 
-If C<$hdr->{h_auto}> is true it will determine the necessary minimal
+If C<< $hdr->{h_auto} >> is true it will determine the necessary minimal
 protection needed for the headers, i.e. critical headers will be included in
 the C<h> attribute one more time than they are set to protect against an
 additional definition. To achieve a secure by default behavior
-C<$hdr->{h_auto}> is true by default and need to be explicitly set to false
+C<< $hdr->{h_auto} >> is true by default and need to be explicitly set to false
 to achieve potential insecure behavior.
 
-if C<$hdr->{h}> is set any headers in C<$hdr->{h}> which are not yet
-in the C<h> attribute due to C<$hdr->{h_auto}> will be added also.
+if C<< $hdr->{h} >> is set any headers in C<< $hdr->{h} >> which are not yet
+in the C<h> attribute due to C<< $hdr->{h_auto} >> will be added also.
 
 On errors $error will be set and undef will returned.
-
 
 =back
 
@@ -1195,7 +1201,6 @@ against modification and adding extra fields as described in RFC 6376 section
 8.15. In addition to the critical headers checked when validating a signature it
 will also properly protect C<to> and C<cc> by default.
 
-
 =head1 SEE ALSO
 
 L<Mail::DKIM>
@@ -1208,8 +1213,7 @@ Steffen Ullrich <sullr[at]cpan[dot]org>
 
 =head1 COPYRIGHT
 
-Steffen Ullrich, 2015..2018
+Steffen Ullrich, 2015..2019
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

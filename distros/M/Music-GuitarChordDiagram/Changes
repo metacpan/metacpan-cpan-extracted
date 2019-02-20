@@ -1,5 +1,8 @@
 Revision history for Music-GuitarChordDiagram
 
+0.0501 2019-02-19 13:25:37
+    - Improved documentation.
+
 0.0500 2019-02-19 00:10:47
     - Made the position and outfile attributes read-write.
     - Made eg/autumn-leaves-shapes.

@@ -5,6 +5,7 @@ author:
 build_requires:
   Capture::Tiny: '0'
   File::Basename: '0'
+  Test::Exception: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -18,19 +19,20 @@ name: MojoX-GlobalEvents
 provides:
   MojoX::GlobalEvents:
     file: lib/MojoX/GlobalEvents.pm
-    version: '0.04'
+    version: '0.06'
 requires:
   File::Find::Rule: '0'
   File::Spec: '0'
-  Mojolicious: '4.0'
+  Mojolicious: '8.0'
   Scalar::Util: '0'
-  perl: '5.010001'
+  perl: '5.020001'
 resources:
   bugtracker: http://github.com/reneeb/MojoX-GlobalEvents/issues
   homepage: http://github.com/reneeb/MojoX-GlobalEvents
   repository: http://github.com/reneeb/MojoX-GlobalEvents.git
-version: '0.04'
+version: '0.06'
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

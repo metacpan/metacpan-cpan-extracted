@@ -1,9 +1,16 @@
 Revision history for Convert-Base85
 
+1.02
+     2019-02-19
+	- Lots of 'Base81' mentions where it should be 'Base85' (I
+	  created the two modules at the same time). Yes, I am an idiot.
+	  Found by Slaven Rezic (SREZIC), Mohammad S Anwar (MANWAR), and
+	  Mikhail Che (MCHE).
 1.01
-	2019-02-18
+     2019-02-18
 	- Typo purge. Fix links and incorrect =head numbers.
 
-1.00    2019-02-09
-        First version, released on an unsuspecting world.
+1.00
+     2019-02-09
+	- First version, released on an unsuspecting world.
 

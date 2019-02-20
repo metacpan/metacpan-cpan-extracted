@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBase::Wrapper 0.24 {
+package Dist::Zilla::Plugin::AlienBase::Wrapper 0.25 {
 
   use 5.014;
   use Moose;
@@ -8,8 +8,8 @@ package Dist::Zilla::Plugin::AlienBase::Wrapper 0.24 {
   # VERSION
 
 
-  with 'Dist::Zilla::Role::FileMunger';
-  with 'Dist::Zilla::Role::PrereqSource';
+  with 'Dist::Zilla::Role::FileMunger',
+       'Dist::Zilla::Role::PrereqSource';
 
   has alien => (
     is      => 'ro',
@@ -116,7 +116,7 @@ Dist::Zilla::Plugin::AlienBase::Wrapper - Use aliens in your Makefile.PL or Buil
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 

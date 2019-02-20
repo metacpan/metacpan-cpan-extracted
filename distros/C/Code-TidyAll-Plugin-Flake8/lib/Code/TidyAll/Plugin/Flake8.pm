@@ -1,15 +1,38 @@
 package Code::TidyAll::Plugin::Flake8;
-$Code::TidyAll::Plugin::Flake8::VERSION = '0.0.1';
+$Code::TidyAll::Plugin::Flake8::VERSION = '0.2.0';
 use Moo;
 use String::ShellQuote qw/ shell_quote /;
 
+use vars qw/ $_check /;
+
+BEGIN
+{
+    my $code = <<'EOF';
+from flake8.main import application
+
+def _py_check(fn):
+    app = application.Application()
+    app.run([fn])
+    return ((app.result_count > 0) or app.catastrophic_failure)
+EOF
+    if ( ( eval "use Inline Python => \$code" ) and !$@ )
+    {
+        $_check = sub { return _py_check(shift); };
+    }
+    else
+    {
+        $_check = sub {
+            my $cmd = shell_quote( 'flake8', shift );
+            return scalar `$cmd`;
+        };
+    }
+}
 extends 'Code::TidyAll::Plugin';
 
 sub validate_file
 {
     my ( $self, $fn ) = @_;
-    my $cmd = shell_quote( 'flake8', $fn );
-    if (`$cmd`)
+    if ( $_check->($fn) )
     {
         die 'not valid';
     }
@@ -28,7 +51,7 @@ Code::TidyAll::Plugin::Flake8 - run flake8 using Code::TidyAll
 
 =head1 VERSION
 
-version 0.0.1
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -48,7 +71,7 @@ games.
 
 =head1 VERSION
 
-version 0.0.1
+version 0.2.0
 
 =head1 AUTHOR
 

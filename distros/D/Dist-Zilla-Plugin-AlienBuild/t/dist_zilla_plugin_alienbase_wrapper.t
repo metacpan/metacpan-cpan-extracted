@@ -5,6 +5,7 @@ use Dist::Zilla::Plugin::AlienBase::Wrapper;
 use List::Util qw( first );
 use JSON::MaybeXS qw( decode_json );
 use Alien::Base::Wrapper 1.02;
+use YAML ();
 
 subtest 'eumm' => sub {
 
@@ -27,7 +28,6 @@ subtest 'eumm' => sub {
   subtest 'meta' => sub {
 
     my $meta = decode_json((first { $_->name eq 'META.json' } @{ $tzil->files })->content);
-    use YAML ();
     note YAML::Dump($meta);
 
     is(

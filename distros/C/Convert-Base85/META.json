@@ -40,7 +40,7 @@
    "provides" : {
       "Convert::Base85" : {
          "file" : "lib/Convert/Base85.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "url" : "git://github.com/jgamble/Convert-Base85.git"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

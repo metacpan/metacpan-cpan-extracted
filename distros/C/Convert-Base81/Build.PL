@@ -7,7 +7,7 @@ my $build = Module::Build->new(
 
 	dist_abstract => 'Encoding to and decoding from Base 81 strings',
 	dist_author => ['John M. Gamble <jgamble@cpan.org>'],
-	dist_version => '1.01',
+	dist_version => '1.02',
 	dist_name => 'Convert-Base81',
 
 	requires => {

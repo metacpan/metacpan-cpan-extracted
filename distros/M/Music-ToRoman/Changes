@@ -1,5 +1,13 @@
 Revision history for Music-ToRoman
 
+0.0801 2019-02-19 23:19:37
+    - Improve documentation.
+
+0.0800 2019-02-19 21:23:30
+    - Clean up code and tests.
+    - Allow diminished chords with "dim" in the name.
+    - Allow chord inputs like "AMaj7" and "Bmin7."
+
 0.0701 2018-11-18 15:52:45
     - Restrict the note regex to [A-G] (instead of \w).
     - Improve documentation.

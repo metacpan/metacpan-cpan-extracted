@@ -13,45 +13,33 @@ my $mtr = Music::ToRoman->new(
 );
 isa_ok $mtr, 'Music::ToRoman';
 
-my $roman = $mtr->parse('Am');
-is $roman, 'i', 'i';
-$roman = $mtr->parse('B');
-is $roman, 'II', 'II';
-$roman = $mtr->parse('Bo');
-is $roman, 'iio', 'iio';
-$roman = $mtr->parse('CM');
-is $roman, 'III', 'III';
-$roman = $mtr->parse('Cm9/G');
-is $roman, 'iii9/VII', 'iii9/VII';
-throws_ok { $roman = $mtr->parse('Cm9/Bb') }
-    qr/Can't parse non-scale note in bass/, "can't parse Cm9/Bb";
-$roman = $mtr->parse('Em7');
-is $roman, 'v7', 'v7';
-$roman = $mtr->parse('A+');
-is $roman, 'I+', 'I+';
-$roman = $mtr->parse('BbM');
-is $roman, 'bII', 'bII';
-$roman = $mtr->parse('Bm sus4');
-is $roman, 'ii sus4', 'ii sus4';
+is $mtr->parse('Am'), 'i', 'i';
+is $mtr->parse('B'), 'II', 'II';
+is $mtr->parse('Bo'), 'iio', 'iio';
+is $mtr->parse('Bdim'), 'iio', 'iio';
+is $mtr->parse('CM'), 'III', 'III';
+is $mtr->parse('Cm9/G'), 'iii9/VII', 'iii9/VII';
+throws_ok { $mtr->parse('Cm9/Bb') }
+    qr/non-scale note in bass/, "can't parse Cm9/Bb";
+is $mtr->parse('Em7'), 'v7', 'v7';
+is $mtr->parse('E7'), 'V7', 'V7';
+is $mtr->parse('A+'), 'I+', 'I+';
+is $mtr->parse('BbM'), 'bII', 'bII';
+is $mtr->parse('Bm sus4'), 'ii sus4', 'ii sus4';
+is $mtr->parse('Bmin7'), 'ii min7', 'ii min7';
+is $mtr->parse('AMaj7'), 'I maj7', 'I maj7';
 
 $mtr = Music::ToRoman->new(
     scale_note => 'A',
     scale_name => 'dorian',
     chords     => 0,
 );
-$roman = $mtr->parse('A');
-is $roman, 'i', 'i';
-$roman = $mtr->parse('B');
-is $roman, 'ii', 'ii';
-$roman = $mtr->parse('C');
-is $roman, 'III', 'III';
-$roman = $mtr->parse('D');
-is $roman, 'IV', 'IV';
-$roman = $mtr->parse('E7');
-is $roman, 'v7', 'v7';
-$roman = $mtr->parse('F#');
-is $roman, 'vi', 'vi';
-$roman = $mtr->parse('G');
-is $roman, 'VII', 'VII';
+is $mtr->parse('A'), 'i', 'i';
+is $mtr->parse('B'), 'ii', 'ii';
+is $mtr->parse('C'), 'III', 'III';
+is $mtr->parse('D'), 'IV', 'IV';
+is $mtr->parse('E7'), 'v7', 'v7';
+is $mtr->parse('F#'), 'vi', 'vi';
+is $mtr->parse('G'), 'VII', 'VII';
 
 done_testing();

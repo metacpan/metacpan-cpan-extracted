@@ -5,7 +5,7 @@ use Carp qw(croak);
 use POSIX 1.15;
 use Hash::Util qw(lock_keys);
 use base 'Class::Accessor';
-our $VERSION = '1.3'; # VERSION
+our $VERSION = '1.4'; # VERSION
 
 my @_attribs =
   qw(raw_time hostname domain kernel release version mem swap pcpucount tcpucount interfaces arch proc_arch cpu_flags uptime idletime model);

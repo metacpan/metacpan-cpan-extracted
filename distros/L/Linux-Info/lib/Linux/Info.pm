@@ -6,7 +6,7 @@ use POSIX qw(strftime);
 use UNIVERSAL;
 use Linux::Info::Compilation;
 
-our $VERSION = '1.3'; # VERSION
+our $VERSION = '1.4'; # VERSION
 
 =head1 NAME
 
@@ -51,9 +51,33 @@ Linux::Info will provide additional information not available in L<Sys::Statisti
 general processor information and hopefully apply patches and suggestions not implemented in the
 original project.
 
-L<Sys::Statistics::Linux> is also more forgiving regarding compatibility with older perls interpreters, 
-modules version that it depends on and even older OS. If you find that Linux::Info is not available to your
+L<Sys::Statistics::Linux> is also more forgiving regarding compatibility with older perls interpreters,
+modules version that it depends on and even older OS. If you find that C<Linux::Info> is not available to your
 old system, you should try it.
+
+=head2 What is different from Sys::Statistics::Linux?
+
+Linux::Info has:
+
+=over
+
+=item *
+
+a more modern Perl 5 code;
+
+=item *
+
+doesn't use C<exec> syscall to acquire information;
+
+=item *
+
+provides additional information about the processors;
+
+=item *
+
+higher Kwalitee;
+
+=back
 
 =head1 TECHNICAL NOTE
 
@@ -175,7 +199,7 @@ Example:
 The initial statistics are stored to the temporary file:
 
     #> cat /tmp/pgswstats.yml
-    --- 
+    ---
     pgfault: 397040955
     pgmajfault: 4611
     pgpgin: 21531693

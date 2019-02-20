@@ -43,6 +43,8 @@ To install this module, run the following commands:
 
 NOTE:  _The install step may require sudo (root access)._
 
+       _Build.PL is not supported by Inline::C._
+
 ## FURTHER TEST SCRIPTS
 
 To test the installation properly.  Log into the text console (not X).  Go to the 'examples' directory and run 'primitives.pl'.  It basically calls most of the features of the module.

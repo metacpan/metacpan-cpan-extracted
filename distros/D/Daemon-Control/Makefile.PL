@@ -1,12 +1,10 @@
 use inc::Module::Install;
+BEGIN { push @INC, '.' unless $INC[-1] eq '.' }
 
 # Define metadata
 name           'Daemon-Control';
 all_from       'lib/Daemon/Control.pm';
 license        'perl';
-
-# uses Module::Install::Repository
-auto_set_repository;
 
 resources
     bugtracker => 'http://github.com/symkat/Daemon-Control/issues',

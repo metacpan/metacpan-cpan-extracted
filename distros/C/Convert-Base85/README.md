@@ -1,6 +1,6 @@
 # Convert-Base85
 
-### Version 1.01
+### Version 1.02
 
 This module implements functions to encode binary data
 into Base 85 text.

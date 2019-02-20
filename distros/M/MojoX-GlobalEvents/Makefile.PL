@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.020001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,20 +14,21 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "MojoX-GlobalEvents",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.020001",
   "NAME" => "MojoX::GlobalEvents",
   "PREREQ_PM" => {
     "File::Find::Rule" => 0,
     "File::Spec" => 0,
-    "Mojolicious" => "4.0",
+    "Mojolicious" => "8.0",
     "Scalar::Util" => 0
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
     "File::Basename" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,8 +40,9 @@ my %FallbackPrereqs = (
   "File::Basename" => 0,
   "File::Find::Rule" => 0,
   "File::Spec" => 0,
-  "Mojolicious" => "4.0",
+  "Mojolicious" => "8.0",
   "Scalar::Util" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0
 );
 

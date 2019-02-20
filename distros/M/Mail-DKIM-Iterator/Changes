@@ -1,4 +1,8 @@
-1.002 - 2019/02/10
+1.004 - 2019/02/20
+- rename DKIM_* constants and description according to RFC 7601 2.7.1
+  DKIM_SUCCESS is now DKIM_PASS etc
+  The old constants are still provided for compatibility
+1.003 - 2019/02/10
 - add Date to headers which should be signed by default
 1.002 - 2018/11/15
 - small fix authentication_results

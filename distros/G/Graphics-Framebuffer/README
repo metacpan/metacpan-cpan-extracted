@@ -69,6 +69,8 @@ To install this module, run the following commands:
 
 NOTE:  The install step may require sudo (root access).
 
+       Build.PL is not supported due to lack of support by Inline::C
+
 FURTHER TEST SCRIPTS
 
 To test the installation properly.  Log into the text console (not X).

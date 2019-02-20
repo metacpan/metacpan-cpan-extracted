@@ -18,14 +18,15 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Code-TidyAll-Plugin-Flake8",
-  "dist_version" => "0.0.1",
+  "dist_version" => "0.2.0",
   "license" => "mit",
   "module_name" => "Code::TidyAll::Plugin::Flake8",
   "recursive_test_files" => 1,
   "requires" => {
     "Code::TidyAll::Plugin" => 0,
     "Moo" => 0,
-    "String::ShellQuote" => 0
+    "String::ShellQuote" => 0,
+    "vars" => 0
   },
   "test_requires" => {
     "File::Spec" => 0,

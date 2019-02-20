@@ -23,8 +23,8 @@ WriteMakefile(
   },
   META_ADD => {
     resources => {
-      license => 'http://dev.perl.org/licenses/',
-      repository => 'http://github.com/datamuc/Mojolicious-Plugin-YamlConfig',
+      license => 'https://dev.perl.org/licenses/',
+      repository => 'https://data.rbfh.de/git/mojolicious-plugin-yamlconfig',
     }
   }
 );

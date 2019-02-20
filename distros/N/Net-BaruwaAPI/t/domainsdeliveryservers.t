@@ -13,6 +13,7 @@ my $do = Test::Net::BaruwaAPI->new(api_token => 'xxxxxxxasasswqefdff', api_url =
 isa_ok($do, 'Net::BaruwaAPI');
 
 my $res;
+my $page = 1;
 
 my $data = {
     address => "192.168.1.151",
@@ -33,6 +34,11 @@ $res = $do->get_deliveryservers($domainid);
 # ok($res, 'the get_deliveryservers response is defined');
 is(get_last_request_method(), 'GET', 'the request method is correct');
 is(get_last_request_path(), "/api/v1/deliveryservers/$domainid", 'the request uri is correct');
+
+$res = $do->get_deliveryservers($domainid, $page);
+
+is(get_last_request_method(), 'GET', 'the request method is correct');
+is(get_last_request_path(), "/api/v1/deliveryservers/$domainid?page=$page", 'the request uri is correct');
 
 set_expected_response('get_deliveryserver');
 

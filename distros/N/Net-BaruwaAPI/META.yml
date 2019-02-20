@@ -17,7 +17,7 @@ name: Net-BaruwaAPI
 provides:
   Net::BaruwaAPI:
     file: lib/Net/BaruwaAPI.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   HTTP::Request: '0'
   JSON::MaybeXS: '0'
@@ -26,6 +26,6 @@ requires:
   Moo: '0'
   Types::Standard: '0'
 resources:
-  repository: https://github.com/akissa/Net-BaruwaAPI
-version: '0.05'
+  repository: https://github.com/baruwa-enterprise/Net-BaruwaAPI
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

@@ -1,5 +1,11 @@
 Revision history for Test-Timer
 
+2.10 2019-02-19T16:13:40Z Maintenance release, update not required
+
+- Cleaned the code a bit and eliminated use of regular expression for parsing output from Benchmark
+
+  REF: https://github.com/jonasbn/perl-test-timer/issues/21
+
 2.09 2017-11-24 Maintenance release, update not required
 
 - Attempting to address issues with tests on Windows
@@ -47,12 +53,12 @@ Revision history for Test-Timer
 - Minor improvements to Test::Timer::TimeoutException, some obsoleted code could
   be removed
 
-- Generalizing test asserting, since CPAN testers are sometime contrained on resources,
+- Generalising test asserting, since CPAN testers are sometime constrained on resources,
   making it impossible to predict the actual timeout value
 
   Example: http://www.cpantesters.org/cpan/report/2561e32c-9efa-11e7-bc90-bbe42ddde1fb
 
-- Correction of spelling mistage in PR #16 from Gregor Herrmann
+- Correction of spelling mistake in PR #16 from Gregor Herrmann of the Debian Perl Group
 
 
 2.03 2017-07-01 Maintenance release, update not required
@@ -66,7 +72,7 @@ Revision history for Test-Timer
 
 - Improvements to alarm signal handling and other internal parts
 
-- Addressed issue #15 meaning we thresholds are now included in the assertions
+- Addressed issue #15 meaning thresholds are now included in the assertions
 
 
 2.01 2017-06-12 Bug fix release, update recommended

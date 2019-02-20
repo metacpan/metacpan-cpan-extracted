@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw Guitar Chord Diagrams
 
-our $VERSION = '0.0500';
+our $VERSION = '0.0501';
 
 use Moo;
 use strictures 2;
@@ -233,7 +233,7 @@ Music::GuitarChordDiagram - Draw Guitar Chord Diagrams
 
 =head1 VERSION
 
-version 0.0500
+version 0.0501
 
 =head1 SYNOPSIS
 
@@ -243,6 +243,12 @@ version 0.0500
     chord => 'x02220',
     font  => '/path/to/TTF/font.ttf',
   );
+  $dia->draw;
+
+  $dia->chord('xx0232');
+  $dia->position(5);
+  $dia->outfile('mystery-chord');
+  $dia->draw;
 
   $dia = Music::GuitarChordDiagram->new(
     chord    => '4442',
@@ -255,8 +261,7 @@ version 0.0500
     tuning   => [qw/A E C G/],
     verbose  => 1,
   );
-
-  $dia->draw();
+  $dia->draw;
 
 =head1 DESCRIPTION
 
@@ -396,6 +401,8 @@ Render the requested chord diagram as a PNG image.
 
 =head1 SEE ALSO
 
+The F<eg/> files in this distribution
+
 L<Imager>
 
 L<List::MoreUtils>
@@ -406,9 +413,9 @@ L<Music::Chord::Namer>
 
 Similar modules:
 
-L<Music::Image::Chord>
-
 L<GD::Tab::Guitar>
+
+L<Music::Image::Chord>
 
 =head1 AUTHOR
 

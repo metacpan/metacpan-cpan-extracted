@@ -5,7 +5,7 @@ package Mojolicious::Plugin::YamlConfig;
 
 use base 'Mojolicious::Plugin::JSONConfig';
 
-our $VERSION = '0.2.1';
+our $VERSION = '0.2.2';
 
 sub register {
     my ( $self, $app, $conf ) = @_;
@@ -13,7 +13,7 @@ sub register {
     $conf->{ext} = 'yaml';
     $conf->{class} ||= $ENV{MOJO_YAML} || 'YAML::Tiny';
     $self->{class} = $conf->{class};
-    my @supported = qw(YAML YAML::XS YAML::Tiny YAML::Old);
+    my @supported = qw(YAML YAML::XS YAML::Tiny YAML::Old YAML::PP);
     unless ( grep { $conf->{class} eq $_ } @supported) {
         warn("$conf->{class} is not supported, use at your own risk");
     }
@@ -31,7 +31,7 @@ sub parse {
     # Render
     $content = $self->render($content, $file, $conf, $app);
 
-    my @broken = qw(YAML YAML::Old YAML::Tiny);
+    my @broken = qw(YAML YAML::Old YAML::Tiny YAML::PP);
     unless (grep { $class eq $_ } @broken) {
         # they are broken *sigh*
         $content = Encode::encode('UTF-8', $content);
@@ -87,8 +87,8 @@ and you should be fine. :)
 =head2 LIMITATIONS
 
 L<YAML::Tiny> is the default parser. It doesn't even try to implement the full
-YAML spec. Currently you can use L<YAML::XS>, L<YAML::Old> and L<YAML> via the
-C<class> option to parse the data with a more advanced YAML parser.
+YAML spec. Currently you can use L<YAML::PP>, L<YAML::XS>, L<YAML::Old> and
+L<YAML> via the C<class> option to parse the data with a more advanced YAML parser.
 
 =head2 AUTHOR
 

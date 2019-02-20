@@ -1,0 +1,52 @@
+Revision history for Music-FretboardDiagram
+
+0.0300 2019-02-19 19:11:39
+    - Make double digits in the diagram position not overlap the grid.
+    - Clean up isa syntax.
+    - Add exception tests for bogus attribute values.
+
+0.0201 2019-02-19 17:49:36
+    - Fix changelog to not display double entries.
+
+0.0200 2019-02-19 16:08:27
+    - Allow note position values above the number of scale notes.
+
+0.0100 2019-02-19 15:06:29
+    - Added a link to the Autumn Leaves song chart to the eg program.
+    - Moved repo from Music-GuitarChordDiagram.
+
+######################################################################
+# Music-GuitarChordDiagram changes:
+#
+# 0.0501 2019-02-19 13:25:37
+#     - Improved documentation.
+#
+# 0.0500 2019-02-19 00:10:47
+#     - Made the position and outfile attributes read-write.
+#     - Made eg/autumn-leaves-shapes.
+#
+# 0.0401 2019-02-18 22:43:45
+#     - Improved documentation.
+#
+# 0.0400 2019-02-18 21:48:25
+#     - Renamed the string_num and fret_num attributes to strings and frets, respectively.
+#     - Fixed the fretboard attribute assignment.
+#
+# 0.0302 2019-02-18 21:26:34
+#     - Improved documentation slightly.
+#     - Fixed attribute name in eg/ukulele.
+#
+# 0.0301 2019-02-18 21:10:15
+#     - Changed the name of the "notes" attribute to "tuning."
+#
+# 0.0300 2019-02-18 21:01:00
+#     - Changed the notes attribute and added the computed fretboard attribute.
+#     - Improved documentation.
+#
+# 0.0200 2019-02-17 20:41:18
+#     - Added a couple tiny tests.
+#     - Made the string notes user definable.
+#
+# 0.0100 2019-02-17 19:56:27
+#     - Minted by Dist::Zilla.
+#     - Refactored from my github Music/fretboard program.

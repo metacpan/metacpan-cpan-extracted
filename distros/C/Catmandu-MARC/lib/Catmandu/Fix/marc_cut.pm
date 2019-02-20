@@ -16,7 +16,6 @@ has equals         => (fix_opt => 1);
 sub emit {
     my ($self,$fixer) = @_;
     my $path         = $fixer->split_path($self->path);
-    my $key          = $path->[-1];
     my $marc_obj     = Catmandu::MARC->instance;
 
     # Precompile the marc_path to gain some speed
@@ -81,7 +80,30 @@ mathincg fields from the MARC record
 
 =head2 marc_cut(MARC_PATH, JSON_PATH, [equals: REGEX])
 
-Cut this MARC fields referred by a MARC_PATH to a JSON_PATH.
+Cut this MARC fields referred by a MARC_PATH to a JSON_PATH. hen an
+C<equals> value has been provided, then only the MARC_PATHs with a value
+equal to C<equals> will be cut to JSON_PATH. When the MARC_PATH points
+to a subfield, then the subfield value need to match C<equals>. When the
+MARC_PATH points multiple subfields, then a concatinated string value needs
+to match C<equals>:
+
+    Data:
+    100 $aMy$bField.
+
+    # cut only the 100 fields which have a $a subfield
+    marc_cut(100a,tmp)
+
+    # cut only the 100 fields with have a $a subfield matching 'My'
+    marc_cut(100a,tmp,equals:"My")
+
+    # cut only the 100 fields with have a concatinated string value 'MyField.'
+    # (equals is an regex, the period "." needs to be escaped "\.")
+    marc_cut(100,tmp,equals:"MyField\.")
+
+    # cut only the 100 fields which have a "." at the end
+    marc_cut(100,tmp,equals:"\.$")
+
+More examples:
 
     # Cut all the 300 fields
     marc_cut(300,tmp)
@@ -93,7 +115,7 @@ Cut this MARC fields referred by a MARC_PATH to a JSON_PATH.
     marc_cut(300c,tmp)
 
     # Cut all the 300 fields which have subfield c equal to 'ABC'
-    marc_cut(300c,tmp,equal:"^ABC")
+    marc_cut(300c,tmp,equals:"^ABC")
 
 The JSON_PATH C<tmp> will contain an array with one item per field that was cut.
 Each item is a hash containing the following fields:
@@ -101,7 +123,7 @@ Each item is a hash containing the following fields:
   tmp.*.tag        - The names of the MARC field
   tmp.*.ind1       - The value of the first indicator
   tmp.*.ind2       - The value of the second indicator
-  tmp.*.subfields  - An array of subfield item. Each subfield item is a
+  tmp.*.subfields  - An array of subfield items. Each subfield item is a
                      hash of the subfield code and subfield value
 
 E.g.

@@ -7,7 +7,7 @@ use Catmandu::MARC;
 use Catmandu::Fix::Has;
 use namespace::clean;
 
-our $VERSION = '1.231';
+our $VERSION = '1.241';
 
 has var    => (fix_opt => 1);
 has __marc => (is => 'lazy');
@@ -70,43 +70,24 @@ Catmandu::Fix::Bind::marc_each - a binder that loops over MARC fields
 
     # Delete all the 500 fields
     do marc_each()
-        if marc_match("500",".*")
+        if marc_has("500")
             reject()
-        end
-    end
-
-    # Loop over all the fields with a variable (see marc_copy, marc_cut and marc_paste for the content)
-    do marc_each(var:this)
-        if all_match(this.tag,300)
-          # The '***' is short for the current tag in a marc_each loop
-          marc_map(***a,test)
         end
     end
 
 =head1 DESCRIPTION
 
-The marc_each binder will iterate over each individual MARC field and execute the fixes only
-in context over each individual field.
+The marc_each binder will iterate over each individual MARC field and execute
+the fixes on each individual field.
 
-If a MARC record contains:
+When a MARC record contains:
 
     500  $aTest
     500  $aTest2$eskip
     500  $aTest3
 
-then the fix
-
-    do marc_each()
-        marc_map("500",note.$append)
-    end
-
-will have the same effect as
-
-    marc_map("500",note.$append)
-
-because C<marc_map> by default loops over all repeated MARC fields. But the C<marc_each> bind has the
-advantage to process fields in context. E.g. to only map fields where the $e doesn't contain 'skip'
-you can write:
+then the Fix bellow will copy all 500 fields to note field, except for 500 fields
+with a subfield $e equal to "skip".
 
     do marc_each()
         unless marc_match("500e",skip)
@@ -114,21 +95,49 @@ you can write:
         end
     end
 
-A variable name can be parsed to the marc_each, in which case an automatic marc_copy will be done
-into the variable name. E.g
+The result will be:
 
-    do marc_each()
-       marc_copy(***,this)
-       ...
-    end
+    note: [Test,Test3]
 
-and
+=head1 CONFIGURATION
+
+=head2 var
+
+Optional loop variable which contains a HASH containing MARC field information
+with the following fields:
+
+    tag        - The names of the MARC field
+    ind1       - The value of the first indicator
+    ind2       - The value of the second indicator
+    subfields  - An array of subfield items. Each subfield item is a
+                 hash of the subfield code and subfield value
+
+Given the MARC field:
+
+    500[1, ] $aTest$bRest
+
+the loop variable will contain:
+
+    tag: 500
+    ind1: 1
+    ind2: ' '
+    subfields:
+        - a : Test
+        - b : Rest
+
+The loop variables can be used to have extra control over the processing of the
+MARC fields.
 
     do marc_each(var:this)
-       ...
+      # Set the indicator1 of all MARC 500 field to the value "3"
+      if all_match(this.tag,500)
+        set_field(tag.ind1,3)
+        # Store the result in the MARC file
+        marc_remove(500)
+        marc_paste(this)
+      end
     end
 
-is similar
 
 =head1 SEE ALSO
 

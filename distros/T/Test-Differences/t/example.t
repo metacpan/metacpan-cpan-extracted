@@ -1,4 +1,7 @@
+#!perl
+
 use strict;
+use warnings;
 my $x;
 
 my $demo = $ENV{DEMO};

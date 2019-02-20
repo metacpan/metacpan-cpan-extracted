@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-AlienBuild
 
+0.25      2019-02-19 20:35:58 -0500
+  - Add [AlienBase::Wrapper::Bundle] plugin
+
 0.24      2017-08-24 16:14:03 -0400
   - Add [AlienBase::Wrapper] plugin
 

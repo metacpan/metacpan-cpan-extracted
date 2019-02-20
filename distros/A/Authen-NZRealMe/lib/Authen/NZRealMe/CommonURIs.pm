@@ -1,5 +1,5 @@
 package Authen::NZRealMe::CommonURIs;
-$Authen::NZRealMe::CommonURIs::VERSION = '1.18';
+$Authen::NZRealMe::CommonURIs::VERSION = '1.19';
 use strict;
 use warnings;
 

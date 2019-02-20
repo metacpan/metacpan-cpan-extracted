@@ -1371,3 +1371,21 @@ Revision history for Graphics-Framebuffer
 6.20  Feb 10, 2019
 
       Fixed a code typo and updated the module's POD.
+
+6.21  Feb 20, 2019
+
+      Fixed MakeMaker issues "Kwalitee" brought up.
+
+      Fixed license labeling format in POD.
+
+      Adjusted "_flush_screen" for updating the STDERR buffer as well.
+ 
+      Made some tweaks to the "examples" scripts, especially the
+      "threaded_slideshow.pl" script.
+
+      Fixed greyscale image loading conversion.  No more weird yellow images.
+
+      Fixes to the Imager based rotate routines.
+
+      Fixes to compensate for the incorrect Imager compass coordinates for
+      pies.  Imager was skewing them by 90 degrees for some reason.

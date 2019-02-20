@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Base';
 
-our $VERSION = '1.231';
+our $VERSION = '1.241';
 
 has marc_path      => (fix_arg => 1);
 has path           => (fix_arg => 1);
@@ -109,7 +109,7 @@ Catmandu::Fix::marc_map - copy marc values of one field to a new field
     marc_map('260c','my.has260c', value:found)
 
     # Copy all 100 subfields except the digits to the 'author' field
-    marc_map('100^0123456789','author')
+    marc_map('100^0-9','author')
 
     # Map all the 500 - 599 fields to my.notes
     marc_map('5..','my.motes')

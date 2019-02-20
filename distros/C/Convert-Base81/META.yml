@@ -21,12 +21,12 @@ name: Convert-Base81
 provides:
   Convert::Base81:
     file: lib/Convert/Base81.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   Math::Int128: '0.22'
   perl: v5.16.1
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/jgamble/Convert-Base81.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

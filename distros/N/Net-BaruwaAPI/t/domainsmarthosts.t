@@ -13,6 +13,7 @@ my $do = Test::Net::BaruwaAPI->new(api_token => 'xxxxxxxasasswqefdff', api_url =
 isa_ok($do, 'Net::BaruwaAPI');
 
 my $res;
+my $page = 1;
 
 my $data = {
     address => "192.168.1.151",
@@ -34,6 +35,11 @@ $res = $do->get_domain_smarthosts($domainid);
 # ok($res, 'the get_domain_smarthosts response is defined');
 is(get_last_request_method(), 'GET', 'the request method is correct');
 is(get_last_request_path(), "/api/v1/domains/smarthosts/$domainid", 'the request uri is correct');
+
+$res = $do->get_domain_smarthosts($domainid, $page);
+
+is(get_last_request_method(), 'GET', 'the request method is correct');
+is(get_last_request_path(), "/api/v1/domains/smarthosts/$domainid?page=$page", 'the request uri is correct');
 
 set_expected_response('get_domain_smarthost');
 

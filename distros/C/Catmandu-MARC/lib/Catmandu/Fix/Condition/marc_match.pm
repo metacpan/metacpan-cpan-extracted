@@ -2,7 +2,7 @@ package Catmandu::Fix::Condition::marc_match;
 
 use Moo;
 
-our $VERSION = '1.231';
+our $VERSION = '1.241';
 
 extends 'Catmandu::Fix::Condition::marc_all_match';
 

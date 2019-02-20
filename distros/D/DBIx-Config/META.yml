@@ -4,10 +4,14 @@ author:
   - '=over 4'
 build_requires:
   DBD::SQLite: 0
+  ExtUtils::MakeMaker: 6.36
   Test::MockObject: 1.09
   Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
 distribution_type: module
-generated_by: 'Module::Install version 0.76'
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,4 +28,4 @@ requires:
   perl: 5.005
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.000002
+version: 0.000003

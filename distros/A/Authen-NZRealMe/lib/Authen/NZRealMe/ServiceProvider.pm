@@ -1,5 +1,5 @@
 package Authen::NZRealMe::ServiceProvider;
-$Authen::NZRealMe::ServiceProvider::VERSION = '1.18';
+$Authen::NZRealMe::ServiceProvider::VERSION = '1.19';
 use strict;
 use warnings;
 
@@ -601,6 +601,7 @@ sub _verify_assertion {
     my $subj_xp =
         '//samlp:ArtifactResponse/samlp:Response/saml:Assertion/saml:Subject';
     my($subject) = $verifier->find_verified_element($xc, $subj_xp);
+    my $assertion = $subject->parentNode();
 
 
     # Confirm that subject is valid for our SP
@@ -627,7 +628,7 @@ sub _verify_assertion {
 
     # Look for Conditions on the assertion
 
-    $self->_check_conditions($xc);  # will die on failure
+    $self->_check_conditions($xc, $assertion);  # will die on failure
 
 
     # Make sure it's in the expected format
@@ -642,7 +643,8 @@ sub _verify_assertion {
 
     if($self->type eq 'login') {  # Not needed for assertion IdP
         my $strength = $xc->findvalue(
-            q{//samlp:Response/saml:Assertion/saml:AuthnStatement/saml:AuthnContext/saml:AuthnContextClassRef}
+            q{./saml:AuthnStatement/saml:AuthnContext/saml:AuthnContextClassRef},
+            $assertion
         ) || '';
         $response->set_logon_strength($strength);
         if($args{logon_strength}) {
@@ -654,10 +656,10 @@ sub _verify_assertion {
     # Extract the payload
 
     if($self->type eq 'login') {
-        $self->_extract_login_payload($response, $xc);
+        $self->_extract_login_payload($response, $xc, $subject);
     }
     elsif($self->type eq 'assertion') {
-        $self->_extract_assertion_payload($response, $xc);
+        $self->_extract_assertion_payload($response, $xc, $assertion);
     }
 
     return $response;
@@ -667,17 +669,18 @@ sub _verify_assertion {
 sub _verify_assertion_signature {
     my($self, $idp, $xml) = @_;
 
-    my $skip_type = $self->skip_signature_check;
-    return if $skip_type > 1;
-
     my $verifier;
     eval {
         $verifier = $idp->verify_signature($xml);
     };
     if($@) {
+        my $skip_type = $self->skip_signature_check;
         if($skip_type) {
-            warn "WARNING: Continuing after signature verification failure "
-               . "(skip_signature_check is enabled)\n$@\n";
+            if($skip_type < 2) {
+                warn "WARNING: Continuing after signature verification failure "
+                   . "(skip_signature_check is enabled)\n$@\n";
+            }
+            $verifier = Authen::NZRealMe->class_for('xml_signer')->new();
             $verifier->ignore_bad_signatures();
         }
         else {
@@ -755,11 +758,10 @@ sub _check_subject_confirmation {
 
 
 sub _check_conditions {
-    my($self, $xc) = @_;
+    my($self, $xc, $assertion) = @_;
 
-    my($conditions) = $xc->findnodes(
-        '//samlp:ArtifactResponse/samlp:Response/saml:Assertion/saml:Conditions'
-    ) or return;
+    my($conditions) = $xc->findnodes('./saml:Conditions', $assertion)
+        or return;
 
     my $xml = $conditions->toString();
 
@@ -815,13 +817,12 @@ sub _compare_times {
 
 
 sub _extract_login_payload {
-    my($self, $response, $xc) = @_;
+    my($self, $response, $xc, $subject) = @_;
 
     # Extract the FLT
 
-    my $flt = $xc->findvalue(
-        q{//samlp:Response/saml:Assertion/saml:Subject/saml:NameID}
-    ) or die "Can't find NameID element in response:\n" . $response->xml . "\n";
+    my $flt = $xc->findvalue(q{./saml:NameID}, $subject)
+        or die "Can't find NameID element in response:\n" . $response->xml . "\n";
 
     $flt =~ s{\s+}{}g;
 
@@ -830,14 +831,13 @@ sub _extract_login_payload {
 
 
 sub _extract_assertion_payload {
-    my($self, $response, $xc) = @_;
+    my($self, $response, $xc, $assertion) = @_;
 
     # Extract the asserted attributes
 
-    my $attribute_selector =
-        q{//samlp:Response/saml:Assertion/saml:AttributeStatement/saml:Attribute};
+    my $attribute_selector = q{./saml:AttributeStatement/saml:Attribute};
 
-    foreach my $attr ( $xc->findnodes($attribute_selector) ) {
+    foreach my $attr ( $xc->findnodes($attribute_selector, $assertion) ) {
         my $name  = $xc->findvalue('./@Name', $attr) or next;
         my $value = $xc->findvalue('./saml:AttributeValue', $attr) || '';
         if($name =~ /:safeb64:/) {
