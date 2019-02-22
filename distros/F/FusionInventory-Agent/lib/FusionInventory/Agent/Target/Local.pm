@@ -2,14 +2,15 @@ package FusionInventory::Agent::Target::Local;
 
 use strict;
 use warnings;
-use base 'FusionInventory::Agent::Target';
+
+use parent 'FusionInventory::Agent::Target';
 
 my $count = 0;
 
 sub new {
     my ($class, %params) = @_;
 
-    die "no path parameter" unless $params{path};
+    die "no path parameter for local target\n" unless $params{path};
 
     my $self = $class->SUPER::new(%params);
 
@@ -31,16 +32,27 @@ sub getPath {
     return $self->{path};
 }
 
-sub _getName {
+sub getName {
     my ($self) = @_;
 
     return $self->{path};
 }
 
-sub _getType {
+sub getType {
     my ($self) = @_;
 
     return 'local';
+}
+
+sub plannedTasks {
+    my $self = shift @_;
+
+    # Keep only inventory as local task
+    if (@_) {
+        $self->{tasks} = [ grep { $_ =~ /^Inventory$/i } @_ ];
+    }
+
+    return @{$self->{tasks} || []};
 }
 
 1;
@@ -74,3 +86,17 @@ the output directory path (mandatory)
 =head2 getPath()
 
 Return the local output directory for this target.
+
+=head2 getName()
+
+Return the target name
+
+=head2 getType()
+
+Return the target type
+
+=head2 plannedTasks([@tasks])
+
+Initializes target tasks with supported ones if a list of tasks is provided
+
+Return an array of planned tasks.

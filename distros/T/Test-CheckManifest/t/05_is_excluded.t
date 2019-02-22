@@ -20,6 +20,7 @@ my $t_dir = File::Spec->catdir( $dir, 't' );
 my $meta  = 'META.yml';
 
 my $abs_t_file = File::Spec->rel2abs( __FILE__ );
+my $bak_t_file = $abs_t_file . '.bak';
 
 # my ($file,$dirref,$filter,$bool,$files_in_skip,$home) = @_;
 
@@ -80,17 +81,17 @@ my @tests = (
         "this file, t/ dir, filter: 'excluded', bool => 'and', empty files_in_skip",
     ], 
     [
-        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and', [$abs_t_file] ],
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and', [qr/\Q$abs_t_file\E/] ],
         1,
         "this file, t/ dir, filter: 'excluded', bool => 'and', skip this file",
     ], 
     [
-        [ $abs_t_file . '.bak', [ $t_dir ], [qr/excluded/], 'and', [$abs_t_file . '.bak'] ],
+        [ $abs_t_file . '.bak', [ $t_dir ], [qr/excluded/], 'and', [qr/\Q$bak_t_file\E/] ],
         1,
         "<this_file>.bak, t/ dir, filter: 'excluded', bool => 'and', skip backup of this file",
     ], 
     [
-        [ '/tmp/test', [ $t_dir ], [qr/excluded/], 'and', [$abs_t_file . '.bak'] ],
+        [ '/tmp/test', [ $t_dir ], [qr/excluded/], 'and', [qr/\Q$bak_t_file\E/] ],
         0,
         "/tmp/test, t/ dir, filter: 'excluded', bool => 'and', skip backup of this file",
     ], 
@@ -100,7 +101,7 @@ my @tests = (
         "/tmp/test, t/ dir, filter: 'excluded', bool => 'and', skip /test in /tmp",
     ], 
     [
-        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and', [$abs_t_file . '.bak'] ],
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and', [qr/\Q$bak_t_file\E/] ],
         1,
         "this file, t/ dir, filter: 'excluded', bool => 'and', skip backup of this file",
     ], 
@@ -120,7 +121,7 @@ my @tests = (
         "this file, t/ dir, filter: 'excluded', bool => 'or'",
     ], 
     [
-        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and', [$abs_t_file] ],
+        [ $abs_t_file, [ $t_dir ], [qr/excluded/], 'and', [qr/\Q$abs_t_file\E/] ],
         1,
         "this file, t/ dir, filter: 'excluded', bool => 'and', excluded",
     ], 

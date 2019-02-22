@@ -1,0 +1,75 @@
+=for Pod::Coverage empty
+
+=head1 NAME
+
+Chess::Opening::Book::Move - A move for an opening book entry.
+
+=head1 SYNOPSIS
+
+	$book = Chess::Opening::Book::Polyglot->new('opening.bin');
+	$entry = $book->lookupFEN($fen) or die "position not found";
+	$moves = $entry->moves;
+	foreach (keys %$moves) {
+		my $move = $moves->{$_};
+		$weight = $move;
+	}
+
+=head1 DESCRIPTION
+
+A B<Chess::Opening::Book::Move> is one of the possible moves listed for a
+certain position in a L<Chess::Opening::Book>.
+
+Each move has a "weight" resp. "count" property that specifies the number
+of times that move has been successfully played for a specific position.
+You can compare this information with the weight of other moves for the
+same position in order to estimate the likelihood of success, when picking
+this move.
+
+=head1 METHODS
+
+=over 4
+
+=item B<new KEY, VALUE, ...>
+
+You should normally not use the constructor.  It is called by the
+L<Chess::Opening::Book> that you query.
+
+The constructor accepts the following named arguments:
+
+=over 8
+
+=item B<- move: a text representation of the move>
+
+=item B<- count: the number of times the move was played successfully>
+
+=item B<- learn: for private use, usually 0>
+
+=back
+
+=item B<weight>
+
+The weight of the move.
+
+=item B<count>
+
+An alias for B<weight()>, see above.
+
+=item B<move>
+
+A textual representation of the move.
+
+=item B<learn>
+
+For private use, usually 0.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2019 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+L<Chess::Opening::Book>, L<Chess::Opening::Book::Entry>,
+L<Chess::Opening::Book::Move>, perl(1)

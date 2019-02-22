@@ -2,7 +2,8 @@ package FusionInventory::Agent::Task::Inventory;
 
 use strict;
 use warnings;
-use base 'FusionInventory::Agent::Task';
+
+use parent 'FusionInventory::Agent::Task';
 
 use Config;
 use English qw(-no_match_vars);
@@ -10,9 +11,11 @@ use UNIVERSAL::require;
 
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Inventory;
-use FusionInventory::Agent::XML::Query::Inventory;
 
 use FusionInventory::Agent::Task::Inventory::Version;
+
+# Preload Module base class
+use FusionInventory::Agent::Task::Inventory::Module;
 
 our $VERSION = FusionInventory::Agent::Task::Inventory::Version::VERSION;
 
@@ -20,8 +23,7 @@ sub isEnabled {
     my ($self, $response) = @_;
 
     # always enabled for local target
-    return 1 unless
-        $self->{target}->isa('FusionInventory::Agent::Target::Server');
+    return 1 if $self->{target}->isType('local');
 
     my $content = $response->getContent();
     if (!$content || !$content->{RESPONSE} || $content->{RESPONSE} ne 'SEND') {
@@ -50,9 +52,13 @@ sub run {
 
     my $inventory = FusionInventory::Agent::Inventory->new(
         statedir => $self->{target}->getStorage()->getDirectory(),
+        deviceid => $self->{deviceid},
         logger   => $self->{logger},
         tag      => $self->{config}->{'tag'}
     );
+
+    # Set inventory as remote if running remote inventory like from wmi task
+    $inventory->setRemote($self->getRemote()) if $self->getRemote();
 
     if (not $ENV{PATH}) {
         # set a minimal PATH if none is set (#1129, #1747)
@@ -67,8 +73,20 @@ sub run {
 
     $self->_initModulesList(\%disabled);
     $self->_feedInventory($inventory, \%disabled);
+    return unless $self->_validateInventory($inventory);
+    $self->_submitInventory( %params, inventory => $inventory );
+    return 1;
+}
 
-    if ($self->{target}->isa('FusionInventory::Agent::Target::Local')) {
+# Method to override if inventory needs to be validate
+sub _validateInventory { 1 }
+
+sub _submitInventory {
+    my ($self, %params) = @_;
+
+    my $inventory = $params{inventory};
+
+    if ($self->{target}->isType('local')) {
         my $path   = $self->{target}->getPath();
         my $format = $self->{target}->{format};
         my ($file, $handle);
@@ -81,7 +99,7 @@ sub run {
 
             if (-d $path) {
                 $file =
-                    $path . "/" . $self->{deviceid} .
+                    $path . "/" . $inventory->getDeviceId() .
                     ($format eq 'xml' ? '.ocs' : '.html');
                 last SWITCH;
             }
@@ -112,7 +130,11 @@ sub run {
             close $handle;
         }
 
-    } elsif ($self->{target}->isa('FusionInventory::Agent::Target::Server')) {
+    } elsif ($self->{target}->isType('server')) {
+
+        return $self->{logger}->error("Can't load OCS client API")
+            unless FusionInventory::Agent::HTTP::Client::OCS->require();
+
         my $client = FusionInventory::Agent::HTTP::Client::OCS->new(
             logger       => $self->{logger},
             user         => $params{user},
@@ -124,8 +146,11 @@ sub run {
             no_compress  => $params{no_compress},
         );
 
+        return $self->{logger}->error("Can't load Inventory XML Query API")
+            unless FusionInventory::Agent::XML::Query::Inventory->require();
+
         my $message = FusionInventory::Agent::XML::Query::Inventory->new(
-            deviceid => $self->{deviceid},
+            deviceid => $inventory->getDeviceId(),
             content  => $inventory->getContent()
         );
 
@@ -147,8 +172,12 @@ sub _initModulesList {
     my $logger = $self->{logger};
     my $config = $self->{config};
 
-    my @modules = __PACKAGE__->getModules('');
-    die "no inventory module found" if !@modules;
+    my @modules = $self->getModules('Inventory');
+    die "no inventory module found\n" if !@modules;
+
+    # Select isEnabled function to test
+    my $isEnabledFunction = "isEnabled" ;
+    $isEnabledFunction .= "ForRemote" if $self->getRemote();
 
     # first pass: compute all relevant modules
     foreach my $module (sort @modules) {
@@ -158,7 +187,8 @@ sub _initModulesList {
             join('::', @components[0 .. $#components -1]) : '';
 
         # Just skip Version package as not an inventory package module
-        if ($module =~ /FusionInventory::Agent::Task::Inventory::Version$/) {
+        # Also skip Module as not a real module but the base class for any module
+        if ($module =~ /FusionInventory::Agent::Task::Inventory::(Version|Module)$/) {
             $self->{modules}->{$module}->{enabled} = 0;
             next;
         }
@@ -177,9 +207,16 @@ sub _initModulesList {
             next;
         }
 
+        # Simulate tested function inheritance as we test a module, not a class
+        unless (defined(*{$module."::".$isEnabledFunction})) {
+            no strict 'refs'; ## no critic (ProhibitNoStrict)
+            *{$module."::".$isEnabledFunction} =
+                \&{"FusionInventory::Agent::Task::Inventory::Module::$isEnabledFunction"};
+        }
+
         my $enabled = runFunction(
             module   => $module,
-            function => "isEnabled",
+            function => $isEnabledFunction,
             logger => $logger,
             timeout  => $config->{'backend-collect-timeout'},
             params => {
@@ -204,8 +241,13 @@ sub _initModulesList {
         no strict 'refs'; ## no critic (ProhibitNoStrict)
         $self->{modules}->{$module}->{runAfter} = [
             $parent ? $parent : (),
-            ${$module . '::runAfter'} ? @${$module . '::runAfter'} : ()
+            ${$module . '::runAfter'} ? @${$module . '::runAfter'} : (),
+            ${$module . '::runAfterIfEnabled'} ? @${$module . '::runAfterIfEnabled'} : ()
         ];
+        $self->{modules}->{$module}->{runAfterIfEnabled} = {
+            map { $_ => 1 }
+                ${$module . '::runAfterIfEnabled'} ? @${$module . '::runAfterIfEnabled'} : ()
+        };
     }
 
     # second pass: disable fallback modules
@@ -248,8 +290,15 @@ sub _runModule {
         die "module $other_module, needed before $module, not found"
             if !$self->{modules}->{$other_module};
 
-        die "module $other_module, needed before $module, not enabled"
-            if !$self->{modules}->{$other_module}->{enabled};
+        if (!$self->{modules}->{$other_module}->{enabled}) {
+            if ($self->{modules}->{$module}->{runAfterIfEnabled}->{$other_module}) {
+                # soft dependency: run current module without required one
+                next;
+            } else {
+                # hard dependency: abort current module execution
+                die "module $other_module, needed before $module, not enabled";
+            }
+        }
 
         die "circular dependency between $module and $other_module"
             if $self->{modules}->{$other_module}->{used};
@@ -288,13 +337,6 @@ sub _feedInventory {
 
     foreach my $module (sort @modules) {
         $self->_runModule($module, $inventory, $disabled);
-    }
-
-    if (-d $self->{confdir} . '/softwares') {
-        $self->{logger}->info(
-            "using custom scripts for adding softwares to inventory is " .
-            "deprecated, use --additional-content option instead"
-        );
     }
 
     if ($self->{config}->{'additional-content'} && -f $self->{config}->{'additional-content'}) {
@@ -350,9 +392,9 @@ sub _printInventory {
             );
             print {$params{handle}} $tpp->write({
                 REQUEST => {
-                    CONTENT => $params{inventory}->{content},
-                    DEVICEID => $self->{deviceid},
-                    QUERY => "INVENTORY",
+                    CONTENT  => $params{inventory}->getContent(),
+                    DEVICEID => $params{inventory}->getDeviceId(),
+                    QUERY    => "INVENTORY",
                 }
             });
 
@@ -367,9 +409,9 @@ sub _printInventory {
 
              my $hash = {
                 version  => $FusionInventory::Agent::Version::VERSION,
-                deviceid => $params{inventory}->{deviceid},
-                data     => $params{inventory}->{content},
-                fields   => $params{inventory}->{fields},
+                deviceid => $params{inventory}->getDeviceId(),
+                data     => $params{inventory}->getContent(),
+                fields   => $params{inventory}->getFields()
             };
 
             print {$params{handle}} $template->fill_in(HASH => $hash);

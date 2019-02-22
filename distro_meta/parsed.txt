@@ -53782,3 +53782,13 @@ M/MA/MANWAR/WWW-Google-PageSpeedOnline-0.29.tar.gz
 M/MA/MANWAR/WWW-Google-Places-0.37.tar.gz
 C/CX/CXW/XML-Axk-0.001008.tar.gz
 S/SY/SYBER/XS-Install-1.0.15.tar.gz
+G/GU/GUGOD/Acme-Boolean-0.5.tar.gz
+P/PL/PLICEASE/Alien-unzip-0.02.tar.gz
+I/IV/IVANWILLS/App-Git-Workflow-v1.1.1.tar.gz
+G/GU/GUIDO/Chess-Opening-0.3.tar.gz
+P/PA/PALI/DBD-MariaDB-1.20.tar.gz
+G/GB/GBOUGARD/FusionInventory-Agent-2.4.3.tar.gz
+M/MQ/MQTECH/String-ShortHostname-1.000.tar.gz
+S/SY/SYBER/Test-Catch-1.0.3.tar.gz
+R/RE/RENEEB/Test-CheckManifest-1.42.tar.gz
+S/SY/SYBER/XS-Install-1.1.0.tar.gz

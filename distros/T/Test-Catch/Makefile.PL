@@ -8,6 +8,7 @@ my %params = (
     CPLUS     => 11,
     CCFLAGS   => '-Wall -Wextra',
     test      => {SRC => 't'},
+    OPTIMIZE  => '-O0 -g0', # speedup compilation, tests running performance only slightly affected
 );
 
 write_makefile(%params);

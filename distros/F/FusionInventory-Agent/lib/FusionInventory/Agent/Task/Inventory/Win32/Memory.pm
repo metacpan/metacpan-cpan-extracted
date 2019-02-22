@@ -3,6 +3,9 @@ package FusionInventory::Agent::Task::Inventory::Win32::Memory;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
+use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::Win32;
 
 our $runMeIfTheseChecksFailed =
@@ -77,6 +80,12 @@ sub isEnabled {
     return 1;
 }
 
+sub isEnabledForRemote {
+    my (%params) = @_;
+    return 0 if $params{no_category}->{memory};
+    return 1;
+}
+
 sub doInventory {
     my (%params) = @_;
 
@@ -117,7 +126,7 @@ sub _getMemories {
             DESCRIPTION  => $object->{Description},
             FORMFACTOR   => $formFactorVal[$object->{FormFactor}],
             REMOVABLE    => $object->{Removable} ? 1 : 0,
-            SPEED        => $object->{Speed},
+            SPEED        => getCanonicalSpeed($object->{Speed}),
             TYPE         => $memoryTypeVal[$object->{MemoryType}],
             NUMSLOTS     => $cpt++,
             SERIALNUMBER => $object->{SerialNumber}
@@ -127,7 +136,7 @@ sub _getMemories {
     foreach my $object (getWMIObjects(
         class      => 'Win32_PhysicalMemoryArray',
         properties => [ qw/
-            MemoryDevices SerialNumber PhysicalMemoryCorrection
+            MemoryDevices SerialNumber MemoryErrorCorrection
         / ]
     )) {
 
@@ -136,14 +145,14 @@ sub _getMemories {
             $memory->{SERIALNUMBER} = $object->{SerialNumber};
         }
 
-        if ($object->{PhysicalMemoryCorrection}) {
+        if ($object->{MemoryErrorCorrection}) {
             $memory->{MEMORYCORRECTION} =
-                $memoryErrorProtection[$object->{PhysicalMemoryCorrection}];
+                $memoryErrorProtection[$object->{MemoryErrorCorrection}];
+            if ($memory->{MEMORYCORRECTION} && $object->{MemoryErrorCorrection}>3) {
+                $memory->{DESCRIPTION} .= " (".$memory->{MEMORYCORRECTION}.")";
+            }
         }
 
-        if ($memory->{MEMORYCORRECTION}) {
-            $memory->{DESCRIPTION} .= " (".$memory->{MEMORYCORRECTION}.")";
-        }
     }
 
     return @memories;

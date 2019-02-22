@@ -60,7 +60,6 @@ sub _send {
         if ( $tmpRef && $tmpRef->{faultstring} ) {
             $errorString .= ": " . $tmpRef->{faultstring};
         }
-        print STDERR $errorString . "\n";
         $self->{lastError} = $errorString;
         return;
     }
@@ -77,7 +76,7 @@ sub _parseAnswer {
 
     # We simplify the XML structure
     my $pattern = '.*<\w+Response xmlns="urn:vim25">(.+)</\w+Response>.*$';
-    $answer =~ s/$pattern/$1/sg,;
+    $answer =~ s/$pattern/$1/sg;
     $answer =~ s/ (xsi:|)type="[:\w]+"//sg;
     $answer =~ s/[[:cntrl:]]//g;
     my $tmpRef = $self->{tpp}->parse($answer);

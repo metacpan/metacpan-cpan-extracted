@@ -3,6 +3,8 @@ package FusionInventory::Agent::Task::Inventory::MacOS::CPU;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::MacOS;
 
@@ -53,7 +55,8 @@ sub _getCpus {
     }
     close $handle;
 
-    my $type  = $sysprofile_info->{'Processor Name'} ||
+    my $type  = $sysctl_info->{'machdep.cpu.brand_string'} || 
+                $sysprofile_info->{'Processor Name'} ||
                 $sysprofile_info->{'CPU Type'};
     my $procs = $sysprofile_info->{'Number Of Processors'} ||
                 $sysprofile_info->{'Number Of CPUs'}       ||
@@ -89,7 +92,7 @@ sub _getCpus {
     my $cpu = {
         CORE         => $cores,
         MANUFACTURER => $manufacturer,
-        NAME         => $type,
+        NAME         => trimWhitespace($type),
         THREAD       => $threads,
         FAMILYNUMBER => $family,
         MODEL        => $model,

@@ -1,0 +1,8 @@
+../lib/Chess/Opening/ECO/Entry.pm
+../lib/Chess/Opening/Book.pm
+../lib/Chess/Opening/Book/Polyglot.pm
+../lib/Chess/Opening/Book/Polyglot/Random64.pm
+../lib/Chess/Opening/Book/Move.pm
+../lib/Chess/Opening/Book/Entry.pm
+../lib/Chess/Opening/Book/ECO.pm
+../lib/Chess/Opening/ECO.pm

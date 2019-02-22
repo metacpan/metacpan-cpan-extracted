@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use lib './bin';
+use lib './lib';
 use setup;
 
 use English qw(-no_match_vars);
@@ -24,8 +24,10 @@ GetOptions(
     'first=s',
     'last=s',
     'community=s@',
-    'credential=s@',
+    'credentials=s@',
     'entity=s',
+    'port=s@',
+    'protocol=s@',
     'threads=i',
     'timeout=i',
     'control',
@@ -52,16 +54,10 @@ pod2usage(
     -message => "no last address, aborting\n", -verbose => 0
 ) unless $options->{last};
 
-my $verbosity =
-    $options->{debug} == 0 ? LOG_INFO   :
-    $options->{debug} == 1 ? LOG_DEBUG  :
-    $options->{debug} == 2 ? LOG_DEBUG2 :
-                             LOG_DEBUG2 ;
-
 my $discovery = FusionInventory::Agent::Task::NetDiscovery->new(
     %setup,
     target => FusionInventory::Agent::Task::NetInventory::Target->new(),
-    logger => FusionInventory::Agent::Logger->new(verbosity => $verbosity)
+    logger => FusionInventory::Agent::Logger->new(config => $options)
 );
 
 my $credentials_id = 1;
@@ -71,8 +67,8 @@ if ($options->{community}) {
         push @credentials,
             { ID => $credentials_id++, VERSION => 1, COMMUNITY => $community };
     }
-} elsif ($options->{credential}) {
-    foreach my $specification (@{$options->{credential}}) {
+} elsif ($options->{credentials}) {
+    foreach my $specification (@{$options->{credentials}}) {
         my $credential = { ID => $credentials_id++ };
         foreach my $parameter (split(',', $specification)) {
             my ($key, $value) = split(':', $parameter);
@@ -95,25 +91,27 @@ $discovery->{jobs} = [
         },
         ranges => [
             {
-                ID      => 1,
-                IPSTART => $options->{first},
-                IPEND   => $options->{last},
+                ID       => 1,
+                IPSTART  => $options->{first},
+                IPEND    => $options->{last},
+                PORT     => $options->{port},
+                PROTOCOL => $options->{protocol},
             }
         ],
         credentials => \@credentials
     }
 ];
 if (defined($options->{entity})) {
-    $discovery->{options}->{RANGEIP}->[0]->{ENTITY} = $options->{entity};
+    $discovery->{jobs}->[0]->{ranges}->[0]->{ENTITY} = $options->{entity};
 }
 $discovery->{client} =
     FusionInventory::Agent::Task::NetInventory::Client->new(
         control => $options->{control}
     );
-$discovery->{deviceid} = 'foo';
 
 $discovery->run();
 
+## no critic (ProhibitMultiplePackages)
 package FusionInventory::Agent::Task::NetInventory::Client;
 
 sub new {
@@ -157,21 +155,102 @@ fusioninventory-netdiscovery - Standalone network discovery
 
 =head1 SYNOPSIS
 
-fusioninventory-netdiscovery [options] --first <start> --last <stop>
+fusioninventory-netdiscovery [options] --first <address> --last <address>
 
   Options:
-    --first address IP range first address
-    --last address  IP range last address
-    --credential    SNMP credential (default: version:1,community:public)
-    --entity        GLPI entity
-    --threads nb    number of discovery threads (default: 1)
-    --timeout val   SNMP timeout (default: 1s)
-    --control       output control messages
-    --debug         debug output (execution traces)
-    -h --help       print this message and exit
-    --version       print the task version and exit
+    --first <ADDRESS>      IP range first address
+    --last <ADDRESS>       IP range last address
+    --port <PORT[,PORT2]>  SNMP port (161)
+    --protocol <PROT[,P2]> SNMP protocol/domain (udp/ipv4)
+    --community <STRING>   SNMP community string (public)
+    --credentials <STRING> SNMP credentials (version:1,community:public)
+    --timeout <TIME        SNMP timeout, in seconds (1)
+    --entity <ENTITY>      GLPI entity
+    --threads <COUNT>      number of discovery threads (1)
+    --control              output control messages
+    --debug                debug output
+    -h --help              print this message and exit
+    --version              print the task version and exit
 
 =head1 DESCRIPTION
 
-F<fusioninventory-netdiscovery> allows to run a network discovery task without a
+F<fusioninventory-netdiscovery> can be used to run a network discovery task without a
 GLPI server.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--first> I<ADDRESS>
+
+Set the first IP address of the network range to scan.
+
+=item B<--last> I<ADDRESS>
+
+Set the last IP address of the network range to scan.
+
+=item B<--port> I<PORT[,PORT2]>
+
+List of ports to try, defaults to: 161
+
+Set it to 161,16100 to first try on default port and then on 16100.
+
+=item B<--protocol> I<PROTOCOL[,PROTOCOL2]>
+
+List of protocols to try, defaults to: udp/ipv4
+
+Possible values are: udp/ipv4,udp/ipv6,tcp/ipv4,tcp/ipv6
+
+=item B<--community> I<STRING>
+
+Use given string as SNMP community (assume SNMPv1).
+
+=item B<--credentials> I<STRING>
+
+Use given string as SNMP credentials specification. This specification is a
+comma-separated list of key:value authentication parameters, such as:
+
+=over
+
+=item * version:2c,community:public
+
+=item * version:3,username:admin,authprotocol:sha,authpassword:s3cr3t
+
+=item * etc.
+
+=back
+
+=item B<--timeout> I<TIME>
+
+Set SNMP timeout, in seconds.
+
+=item B<--entity> I<ENTITY>
+
+Set GLPI entity.
+
+=item B<--threads> I<COUNT>
+
+Use given number of inventory threads.
+
+=item B<--control>
+
+Output server-agent control messages, in addition to inventory result itself.
+
+=item B<--debug>
+
+Turn the debug mode on. Multiple usage allowed, for additional verbosity.
+
+=back
+
+=head1 EXAMPLES
+
+Run a discovery against a network range, using SNMP version 1:
+
+    $> fusioninventory-netdiscovery --first 192.168.0.1 --last 192.168.0.254 \
+    --community public
+
+Run a discovery against a network range, using multiple SNMP credentials:
+
+    $> fusioninventory-netdiscovery --first 192.168.0.1 --last 192.168.0.254 \
+    --credentials version:2c,community:public \
+    --credentials version:3,username:admin,authprotocol:sha,authpassword:s3cr3t

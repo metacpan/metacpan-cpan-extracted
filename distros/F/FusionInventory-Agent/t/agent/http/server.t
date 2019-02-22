@@ -6,7 +6,6 @@ use lib 't/lib';
 
 use Config;
 use English qw(-no_match_vars);
-use List::Util qw(first);
 use LWP::UserAgent;
 use Socket;
 use Test::More;
@@ -21,7 +20,7 @@ use FusionInventory::Test::Utils;
 plan tests => 12;
 
 my $logger = FusionInventory::Agent::Logger->new(
-    backends => [ 'Test' ]
+    logger => [ 'Test' ]
 );
 
 my $server;
@@ -48,9 +47,6 @@ if (my $pid = fork()) {
     my $client = LWP::UserAgent->new(timeout => 2);
     exit $client->get('http://127.0.0.1:62354')->is_success();
 }
-
-# find an available port
-my $port = first { test_port($_) } 8080 .. 8090;
 
 lives_ok {
     $server = FusionInventory::Agent::HTTP::Server->new(
@@ -91,7 +87,7 @@ ok (
 );
 
 # find an available port
-$port = first { test_port($_) } 8080 .. 8090;
+my $port = FusionInventory::Agent::Tools::first { test_port($_) } 8080 .. 8180;
 
 lives_ok {
     $server = FusionInventory::Agent::HTTP::Server->new(

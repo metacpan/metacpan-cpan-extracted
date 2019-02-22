@@ -5,7 +5,7 @@ package FusionInventory::Agent::Task::Deploy;
 
 use strict;
 use warnings;
-use base 'FusionInventory::Agent::Task';
+use parent 'FusionInventory::Agent::Task';
 
 use FusionInventory::Agent::HTTP::Client::Fusion;
 use FusionInventory::Agent::Storage;
@@ -21,7 +21,7 @@ our $VERSION = FusionInventory::Agent::Task::Deploy::Version::VERSION;
 sub isEnabled {
     my ($self) = @_;
 
-    if (!$self->{target}->isa('FusionInventory::Agent::Target::Server')) {
+    if (!$self->{target}->isType('server')) {
         $self->{logger}->debug("Deploy task not compatible with local target");
         return;
     }
@@ -87,11 +87,13 @@ sub processRemote {
         return 0;
     }
 
+    my $folder = $self->{target}->getStorage()->getDirectory();
     my $datastore = FusionInventory::Agent::Task::Deploy::Datastore->new(
-        path => $self->{target}{storage}{directory}.'/deploy',
+        config => $self->{config},
+        path   => $folder.'/deploy',
         logger => $logger
     );
-    $datastore->cleanUp();
+    $datastore->cleanUp( force => $datastore->diskIsFull() );
 
     my $jobList = [];
     my $files;
@@ -122,6 +124,7 @@ sub processRemote {
             sha512    => $sha512,
             data      => $answer->{associatedFiles}{$sha512},
             datastore => $datastore,
+            prolog    => $self->{target}->getMaxDelay(),
             logger    => $logger
         );
     }
@@ -174,6 +177,9 @@ sub processRemote {
             msg    => 'all checks are ok'
         );
 
+        # USER INTERACTION
+        next if $job->next_on_usercheck(type => 'before');
+
         $logger->debug2("Downloading for job $job->{uuid}...");
 
         # DOWNLOADING
@@ -195,6 +201,9 @@ sub processRemote {
                     msg    => $file->{name}.' already downloaded'
                 );
 
+                # Reset retention time for all still downloaded parts
+                $file->resetPartFilePaths();
+
                 $workdir->addFile($file);
                 next;
             }
@@ -206,6 +215,9 @@ sub processRemote {
             );
 
             $file->download();
+
+            # Reset retention time for all downloaded parts
+            $file->resetPartFilePaths();
 
             # Are all the fileparts here?
             my $downloadIsOK = $file->filePartsExists();
@@ -235,6 +247,9 @@ sub processRemote {
                     redo FETCHFILE;
                 } else { # Give up...
 
+                    # USER INTERACTION after download failure
+                    $job->next_on_usercheck(type => 'after_download_failure');
+
                     $job->setStatus(
                         file   => $file,
                         status => 'ko',
@@ -252,10 +267,16 @@ sub processRemote {
             msg    => 'success'
         );
 
+        # USER INTERACTION after download
+        next if $job->next_on_usercheck(type => 'after_download');
+
         $logger->debug2("Preparation for job $job->{uuid}...");
 
         $job->currentStep('prepare');
         if (!$workdir->prepare()) {
+            # USER INTERACTION on preparation failure
+            $job->next_on_usercheck(type => 'after_failure');
+
             $job->setStatus(
                 status => 'ko',
                 msg    => 'failed to prepare work dir'
@@ -296,16 +317,37 @@ sub processRemote {
             eval { $ret = $actionProcessor->process($actionName, $params, $logger); };
             $ret->{msg} = [] unless $ret->{msg};
             push @{$ret->{msg}}, $@ if $@;
-            if ( !$ret->{status} ) {
+
+            my $name = $params->{name} || "action #".($actionnum+1);
+
+            # Log msg lines: can be heavy while running a command with high logLineLimit parameter
+            my $logLineLimit = defined($params->{logLineLimit}) ?
+                $params->{logLineLimit} : 10 ;
+
+            # Really report nothing to server if logLineLimit=0 & status is ok
+            $ret->{msg} = [] if (!$logLineLimit && $ret->{status});
+
+            # Add 7 to always output header & retCode analysis lines for cmd command, unless in nolimit (-1)
+            $logLineLimit += 7 unless ($logLineLimit < 0);
+
+            foreach my $line (@{$ret->{msg}}) {
+                next unless ($line);
                 $job->setStatus(
-                    msg       => $ret->{msg},
+                    msg       => "$name: $line",
                     actionnum => $actionnum,
                 );
+                last unless --$logLineLimit;
+            }
+
+            if ( !$ret->{status} ) {
+
+                # USER INTERACTION after action failure
+                $job->next_on_usercheck(type => 'after_failure');
 
                 $job->setStatus(
                     status    => 'ko',
                     actionnum => $actionnum,
-                    msg       => "action #".($actionnum+1)." processing failure"
+                    msg       => "$name, processing failure"
                 );
 
                 next JOB;
@@ -313,13 +355,22 @@ sub processRemote {
             $job->setStatus(
                 status    => 'ok',
                 actionnum => $actionnum,
-                msg       => "action #".($actionnum+1)." processing success"
+                msg       => "$name, processing success"
             );
 
             $actionnum++;
         }
 
+        # USER INTERACTION
+        $job->next_on_usercheck(type => 'after');
+
         $logger->debug2("Finished job $job->{uuid}...");
+
+        # When success and finished, we can still cleanup file in private
+        # cache when retention duration is not set
+        foreach my $file ( @{ $job->{associatedFiles} } ) {
+            $file->cleanup_private();
+        }
 
         $job->currentStep('end');
         $job->setStatus(
@@ -353,8 +404,9 @@ sub run {
         debug        => $self->{debug}
     );
 
+    my $url = $self->{target}->getUrl();
     my $globalRemoteConfig = $self->{client}->send(
-        url  => $self->{target}->{url},
+        url  => $url,
         args => {
             action    => "getConfig",
             machineid => $self->{deviceid},
@@ -363,11 +415,11 @@ sub run {
     );
 
     if (!$globalRemoteConfig->{schedule}) {
-        $self->{logger}->info("No job schedule returned from server at ".$self->{target}->{url});
+        $self->{logger}->info("No job schedule returned from server at $url");
         return;
     }
     if (ref( $globalRemoteConfig->{schedule} ) ne 'ARRAY') {
-        $self->{logger}->info("Malformed schedule from server at ".$self->{target}->{url});
+        $self->{logger}->info("Malformed schedule from server at $url");
         return;
     }
     if ( !@{$globalRemoteConfig->{schedule}} ) {
@@ -388,6 +440,8 @@ sub run {
 
     return 1;
 }
+
+1;
 
 __END__
 

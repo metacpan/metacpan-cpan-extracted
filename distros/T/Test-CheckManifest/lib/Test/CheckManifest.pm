@@ -13,7 +13,7 @@ use Test::Builder;
 use File::Find;
 use Scalar::Util qw(blessed);
 
-our $VERSION = 1.41;
+our $VERSION = '1.42';
 our $VERBOSE = 1;
 our $HOME;
 our $test_bool = 1;
@@ -158,7 +158,7 @@ sub ok_manifest {
     
     my $skip_path  = File::Spec->catfile( $home, 'MANIFEST.SKIP' );
     my @skip_files = _read_file( $skip_path );
-    my @skip_rx    = map{ qr/\Q$_\E/ }@skip_files;
+    my @skip_rx    = map{ qr/$_/ }@skip_files;
     my $excluded   = _check_excludes( $hashref, $home );
 
     my (@dir_files, %excluded);
@@ -167,7 +167,9 @@ sub ok_manifest {
         no_chdir => 1,
         follow   => 0,
         wanted   => sub {
-            my $file         = $File::Find::name;
+            my $file = $File::Find::name;
+            return if !-f $file;
+
             my $is_excluded  = _is_excluded(
                 $file,
                 $excluded,
@@ -177,9 +179,11 @@ sub ok_manifest {
                 $home,
             );
             
-            push @dir_files, File::Spec->rel2abs($file) if -f $file and !$is_excluded;
-            
-            $excluded{$file} = 1 if -f $file and $is_excluded
+            my $abs = File::Spec->rel2abs($file);
+
+            $is_excluded ?
+                ( $excluded{$abs} = 1 ) :
+                ( push @dir_files, $abs );
         }
     },$home);
 
@@ -382,7 +386,7 @@ Test::CheckManifest - Check if your Manifest matches your distro
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -467,6 +471,19 @@ C<MANIFEST.SKIP>. This is a file with filenames that should be excluded:
 
   t/my_very_own.t
   file_to.skip
+
+=head1 REPLACE THIS MODULE
+
+You can replace the test scripts using C<Test::CheckManifest> with this one
+using L<ExtUtils::Manifest>.
+
+    use Test::More tests => 2;
+    use ExtUtils::Manifest;
+    
+    is_deeply [ ExtUtils::Manifest::manicheck() ], [], 'missing';
+    is_deeply [ ExtUtils::Manifest::filecheck() ], [], 'extra';
+
+(L<thanks to @mohawk2|https://github.com/reneeb/Test-CheckManifest/issues/20>).
 
 =head1 ACKNOWLEDGEMENT
 

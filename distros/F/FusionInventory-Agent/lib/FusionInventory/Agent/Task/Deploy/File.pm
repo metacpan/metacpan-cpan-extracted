@@ -18,7 +18,8 @@ sub new {
 
     my $self = {
         p2p                => $params{data}->{p2p},
-        retention_duration => $params{data}->{'p2p-retention-duration'} || 60 * 24 * 3,
+        retention_duration => $params{data}->{'p2p-retention-duration'},
+        prolog_delay       => $params{prolog} || 3600,
         uncompress         => $params{data}->{uncompress},
         mirrors            => $params{data}->{mirrors},
         multiparts         => $params{data}->{multiparts},
@@ -29,9 +30,92 @@ sub new {
         logger             => $params{logger}
     };
 
+    # p2p-retention-duration has a different meaning if not a p2p file
+    if (!$self->{retention_duration}) {
+        if ($self->{p2p}) {
+            # For p2p file, keep downloaded parts 3 days by default
+            $self->{retention_duration} = 60 * 24 * 3;
+        } else {
+            # For not p2p file, we will keep downloaded parts as long as
+            # we need them: 3 times the PROLOG delay to support download
+            # restart in case of network failure
+            $self->{retention_duration} = 0;
+        }
+    }
+
     bless $self, $class;
 
     return $self;
+}
+
+sub normalizedPartFilePath {
+    my ($self, $sha512) = @_;
+
+    return unless $sha512 =~ /^(.)(.)(.{6})/;
+    my $subFilePath = $1.'/'.$2.'/'.$3;
+
+    my $filePath = $self->{datastore}->{path}.'/fileparts/';
+    my $retention_duration;
+    if ($self->{p2p}) {
+        $filePath .= 'shared/';
+        $retention_duration = $self->{retention_duration} * 60;
+    } else {
+        $filePath .= 'private/';
+        $retention_duration = $self->{retention_duration} ?
+            $self->{retention_duration} * 60 : $self->{prolog_delay} * 3;
+    }
+
+    # Compute a directory name that will be used to know if the file must
+    # be purge. We don't want a new directory everytime, so we use a one
+    # minute time frame to follow the retention duration unit
+    my $expiration    = time + $retention_duration + 60;
+    my $retentiontime = $expiration - $expiration % 60 ;
+    $filePath .= $retentiontime . '/' . $subFilePath;
+
+    return $filePath;
+}
+
+sub cleanup_private {
+    my ($self) = @_;
+
+    # Don't cleanup for p2p shared parts
+    return if $self->{p2p};
+
+    # Only cleanup if no retention duration has been set
+    return if $self->{retention_duration};
+
+    # Cleanup all parts
+    foreach my $sha512 (@{$self->{multiparts}}) {
+        my $path = $self->getPartFilePath($sha512);
+        unlink $path if -f $path;
+    }
+
+    # This may leave an empty folder tree, but it will be cleaned by
+    # Maintenance task when convenient
+}
+
+sub resetPartFilePaths {
+    my ($self) = @_;
+
+    # move all Part files to respect retention duration from now
+    my %updates = ();
+
+    foreach my $sha512 (@{$self->{multiparts}}) {
+        my $path = $self->getPartFilePath($sha512);
+        if (-f $path) {
+            my $update = $self->normalizedPartFilePath($sha512);
+            next if $path eq $update;
+            $updates{$path} = $update ;
+        }
+    }
+
+    foreach my $path (keys(%updates)) {
+        File::Path::mkpath(dirname($updates{$path}));
+        rename $path, $updates{$path};
+    }
+
+    # This may leave an empty folder tree, but it will be cleaned by
+    # Maintenance task when convenient
 }
 
 sub getPartFilePath {
@@ -40,9 +124,10 @@ sub getPartFilePath {
     return unless $sha512 =~ /^(.)(.)(.{6})/;
     my $subFilePath = $1.'/'.$2.'/'.$3;
 
-    my @storageDirs =
-        File::Glob::glob($self->{datastore}->{path}.'/fileparts/shared/*'),
-        File::Glob::glob($self->{datastore}->{path}.'/fileparts/private/*');
+    my @storageDirs = (
+        File::Glob::bsd_glob($self->{datastore}->{path}.'/fileparts/shared/*'),
+        File::Glob::bsd_glob($self->{datastore}->{path}.'/fileparts/private/*')
+    );
 
     foreach my $dir (@storageDirs) {
         if (-f $dir.'/'.$subFilePath) {
@@ -50,21 +135,7 @@ sub getPartFilePath {
         }
     }
 
-    my $filePath = $self->{datastore}->{path}.'/fileparts/';
-# filepart not found
-    if ($self->{p2p}) {
-        $filePath .= 'shared/';
-    } else {
-        $filePath .= 'private/';
-    }
-
-# Compute a directory name that will be used to know
-# if the file must be purge. We don't want a new directory
-# everytime, so we use a 10h frame
-    $filePath .= int(time/10000)*10000 + ($self->{retention_duration} * 60);
-    $filePath .= '/'.$subFilePath;
-
-    return $filePath;
+    return $self->normalizedPartFilePath($sha512);
 }
 
 sub download {
@@ -79,10 +150,13 @@ sub download {
             $self->{logger}->debug("can't enable P2P: $EVAL_ERROR")
         } else {
             my $p2p = FusionInventory::Agent::Task::Deploy::P2P->new(
-                logger => $self->{logger}
+                scan_timeout    => 1,
+                datastore       => $self->{datastore},
+                logger          => $self->{logger}
             );
             eval {
                 @peers = $p2p->findPeers(62354);
+                $self->{p2pnet} = $p2p;
             };
             $self->{logger}->debug("failed to enable P2P: $EVAL_ERROR")
                 if $EVAL_ERROR;
@@ -90,6 +164,7 @@ sub download {
     };
 
     my $lastPeer;
+    my $nextPathUpdate = _getNextPathUpdateTime();
     PART: foreach my $sha512 (@{$self->{multiparts}}) {
         my $path = $self->getPartFilePath($sha512);
         if (-f $path) {
@@ -99,7 +174,7 @@ sub download {
 
         # try to download from the same peer as last part, if defined
         if ($lastPeer) {
-            my $success = $self->_download($lastPeer, $sha512, $path);
+            my $success = $self->_downloadPeer($lastPeer, $sha512, $path);
             next PART if $success;
         }
 
@@ -110,14 +185,29 @@ sub download {
                 $lastPeer = $peer;
                 next PART;
             }
+            # Update filepath so retention is kept in the future on long search
+            if ( time - $nextPathUpdate > 0 ) {
+                $path = $self->normalizedPartFilePath($sha512);
+                $nextPathUpdate = _getNextPathUpdateTime();
+            }
         }
 
         # try to download from mirrors
         foreach my $mirror (@{$self->{mirrors}}) {
             my $success = $self->_download($mirror, $sha512, $path);
             next PART if $success;
+            # Update filepath so retention is kept in the future on long search
+            if ( time - $nextPathUpdate > 0 ) {
+                $path = $self->normalizedPartFilePath($sha512);
+                $nextPathUpdate = _getNextPathUpdateTime();
+            }
         }
     }
+}
+
+sub _getNextPathUpdateTime {
+    my $time = time;
+    return $time + 60 - $time % 60;
 }
 
 sub _downloadPeer {
@@ -125,11 +215,11 @@ sub _downloadPeer {
 
     my $source = 'http://'.$peer.':62354/deploy/getFile/';
 
-    return $self->_download($source, $sha512, $path);
+    return $self->_download($source, $sha512, $path, $peer);
 }
 
 sub _download {
-    my ($self, $source, $sha512, $path) = @_;
+    my ($self, $source, $sha512, $path, $peer) = @_;
 
     return unless $sha512 =~ /^(.)(.)/;
     my $sha512dir = $1.'/'.$1.$2.'/';
@@ -138,9 +228,19 @@ sub _download {
     $self->{logger}->debug($url);
 
     my $request = HTTP::Request->new(GET => $url);
-    my $response = $self->{client}->request($request, $path);
+    # We want to try direct download without proxy if peer if defined and then
+    # we also prefer to use really short timeout to disqualify busy peers and
+    # also avoid to block for not responding peers while using P2P
+    my $timeout = $peer ? 1 : 180 ;
+    my $response = $self->{client}->request($request, $path, $peer, $timeout);
 
-    return if $response->code != 200;
+    if ($response->code != 200) {
+        if ($response->code != 404 || $response->status_line() =~ /Nothing found/) {
+            $self->{logger}->debug2("Remote peer $peer is useless, we should forget it out for a while");
+            $self->{p2pnet}->forgetPeer($peer) if $self->{p2pnet};
+        }
+        return;
+    }
     return if ! -f $path;
 
     if ($self->_getSha512ByFile($path) ne $sha512) {

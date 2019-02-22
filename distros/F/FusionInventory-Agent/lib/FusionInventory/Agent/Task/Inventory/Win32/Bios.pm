@@ -3,6 +3,8 @@ package FusionInventory::Agent::Task::Inventory::Win32::Bios;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use English qw(-no_match_vars);
 
 use FusionInventory::Agent::Tools::Win32;
@@ -12,6 +14,10 @@ our $runMeIfTheseChecksFailed =
     ["FusionInventory::Agent::Task::Inventory::Generic::Dmidecode::Bios"];
 
 sub isEnabled {
+    return 1;
+}
+
+sub isEnabledForRemote {
     return 1;
 }
 
@@ -29,14 +35,8 @@ sub doInventory {
     my (%params) = @_;
 
     my $inventory = $params{inventory};
-    my $logger    = $params{logger};
 
-    my $bios = {
-        BDATE => _dateFromIntString(getRegistryValue(
-            path   => "HKEY_LOCAL_MACHINE/Hardware/Description/System/BIOS/BIOSReleaseDate",
-            logger => $logger
-        ))
-    };
+    my $bios = {};
 
     foreach my $object (getWMIObjects(
         class      => 'Win32_Bios',
@@ -51,6 +51,13 @@ sub doInventory {
                                  $object->{BIOSVersion}       ||
                                  $object->{Version};
         $bios->{BDATE}         = _dateFromIntString($object->{ReleaseDate});
+    }
+
+    # Try to set Bios date from registry if not found via wmi
+    unless ($bios->{BDATE}) {
+        $bios->{BDATE} = _dateFromIntString(getRegistryValue(
+            path => "HKEY_LOCAL_MACHINE/Hardware/Description/System/BIOS/BIOSReleaseDate"
+        ));
     }
 
     foreach my $object (getWMIObjects(

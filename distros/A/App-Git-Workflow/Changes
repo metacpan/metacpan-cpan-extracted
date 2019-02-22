@@ -1,5 +1,15 @@
 Revision history for git-workflow-tools
 
+1.1.1   2019-02-22
+        Updating for release of version 1.1.1
+        Updated date (Ivan Wills)
+        Adding new file to manifest (Ivan Wills)
+        Getting basic testing of branch-age (Ivan Wills)
+        Added new dependency DateTime::Format::HTTP (Ivan Wills)
+        Getting ready to write tests (Ivan Wills)
+        Getting branch age working (Ivan Wills)
+        Travis has stopped support for perl 5.8 (Ivan Wills)
+
 1.1.0   2018-09-02
         Updating for release of version 1.1.0
         Updated arguments (and documentation) to match new default operation (Ivan Wills)

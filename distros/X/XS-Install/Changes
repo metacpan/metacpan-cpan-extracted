@@ -1,3 +1,6 @@
+1.1.0    22.02.2019
+           - for development: when possible, rebuild only C files whose headers has changed (H_DEPS param)
+           - a lot of refactorings
 1.0.15   20.02.2019
            - support for test{CCFLAGS}, test{OPTIMIZE}. test{OPTIMIZE} default to -O0 when building c tests (to speedup compile time)
 1.0.14   14.02.2019

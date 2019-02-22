@@ -3,9 +3,9 @@ package FusionInventory::Agent::Task::Inventory::Generic::Arch;
 use strict;
 use warnings;
 
-use FusionInventory::Agent::Tools;
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
 
-my $seen;
+use FusionInventory::Agent::Tools;
 
 sub isEnabled {
     return canRun('arch');

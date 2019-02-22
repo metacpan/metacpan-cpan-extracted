@@ -5,9 +5,10 @@ use Config;
 use Cwd 'abs_path';
 use Exporter 'import';
 use ExtUtils::MakeMaker;
+use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.0.15';
+our $VERSION = '1.1.0';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args not_available/;
@@ -33,8 +34,33 @@ sub write_makefile {
 sub makemaker_args {
     my %params = @_;
     _sync();
+    die "You must define a NAME param" unless $params{NAME};
+    
+    pre_process(\%params);
+    process_FROM(\%params);
+    process_REQUIRES(\%params);    
+    process_BIN_DEPS(\%params);
+    process_PARSE_XS(\%params);
+    process_module_binary(\%params);
+    process_PM(\%params);
+    process_PAYLOAD(\%params);
+    process_CLIB(\%params);
+    process_BIN_SHARE(\%params);
+    attach_BIN_DEPENDENT(\%params);
+    warn_BIN_DEPENDENT(\%params);
+    process_CPLUS(\%params);
+    process_CCFLAGS(\%params);
+    $params{OPTIMIZE} = merge_optimize($Config{optimize}, '-O2', $params{OPTIMIZE});
+    process_test(\%params);
+    post_process(\%params);
 
-    my $postamble = $params{postamble};
+    return %params;
+}
+
+sub pre_process {
+    my $params = shift;
+    
+    my $postamble = $params->{postamble};
     if ($postamble) {
         my $ref = ref $postamble;
         if    (!$ref)           { $postamble = [$postamble] }
@@ -42,130 +68,64 @@ sub makemaker_args {
         elsif ($ref ne 'ARRAY') { die "postamble must be string or array ref" }
     }
     $postamble ||= [];
-    $params{postamble} = $postamble;
-    
-    _string_merge($params{CCFLAGS}, '-o $@');
+    $params->{postamble} = $postamble;
 
-    process_FROM(\%params);
-
-    $params{CONFIGURE_REQUIRES} ||= {};
-    $params{BUILD_REQUIRES} ||= {};
+    $params->{clean} ||= {};
+    $params->{clean}{FILES} ||= '';
     
-    $params{TEST_REQUIRES} ||= {};
-    $params{TEST_REQUIRES}{'Test::Simple'} ||= '0.96';
-    $params{TEST_REQUIRES}{'Test::More'}   ||= 0;
-    $params{TEST_REQUIRES}{'Test::Deep'}   ||= 0;
-    
-    $params{PREREQ_PM} ||= {};
-    
-    unless ($params{NAME} eq $THIS_MODULE) { # skip when building XS::Install itself
-        $params{CONFIGURE_REQUIRES}{$THIS_MODULE} ||= $VERSION;
-        $params{PREREQ_PM         }{$THIS_MODULE} ||= $VERSION;
-    }
-    
-    $params{clean} ||= {};
-    $params{clean}{FILES} ||= '';
-    
-    if (my $bs = $params{BIN_SHARE}) {
-        $bs->{PASSTHROUGH} = [$bs->{PASSTHROUGH}] if $bs->{PASSTHROUGH} and !ref($bs->{PASSTHROUGH});
-    }
-    delete $params{BIN_SHARE} if $params{BIN_SHARE} and !%{$params{BIN_SHARE}};
-    
-    {
-        my $val = $params{SRC};
-        $val = [$val] if $val and ref($val) ne 'ARRAY';
-        $params{SRC} = $val;
-    }
-    {
-        my $val = $params{XS};
-        $val = [$val] if $val and ref($val) ne 'ARRAY' and ref($val) ne 'HASH';
-        $params{XS} = $val;
-    }
-    
-    $params{TYPEMAPS} = [$params{TYPEMAPS}] if $params{TYPEMAPS} and ref($params{TYPEMAPS}) ne 'ARRAY';
-    
-    my $module_info = XS::Install::Payload::binary_module_info($params{NAME}) || {};
-    $params{MODULE_INFO} = {BIN_DEPENDENT => $module_info->{BIN_DEPENDENT}};
-    
-    $params{BIN_DEPS} = [$params{BIN_DEPS}] if $params{BIN_DEPS} and ref($params{BIN_DEPS}) ne 'ARRAY';
-    unless ($params{NAME} eq $THIS_MODULE) {
-    	$params{BIN_DEPS} ||= [];
-    	push @{$params{BIN_DEPS}}, $THIS_MODULE;
-    }
-    
-    $params{PARSE_XS} = [$params{PARSE_XS}] if $params{PARSE_XS} and ref($params{PARSE_XS}) ne 'ARRAY';
-    
-    process_BIN_DEPS(\%params);
-    process_XS(\%params);
-    process_PM(\%params);
-    process_C(\%params);
-    process_OBJECT(\%params);
-    process_H(\%params);
-    process_XSI(\%params);
-    process_CLIB(\%params);
-    process_PAYLOAD(\%params);
-    process_BIN_SHARE(\%params);
-    attach_BIN_DEPENDENT(\%params);
-    warn_BIN_DEPENDENT(\%params);
-
     if (my $comp = ($ENV{COMPILER} || $ENV{CC})) {
-        $params{CC} = $comp;
-    }
-
-    if (my $use_cpp = $params{CPLUS}) {
-        _string_merge($params{XSOPT}, '-C++ -csuffix .cc');
-        
-        my $cppv = int($use_cpp);
-        $cppv = 11 if $cppv < 11;
-        _string_merge($params{CCFLAGS}, "-std=c++$cppv");
-        
-        $params{CC} = _get_cplusplus($params{CC}, $cppv);
-        $params{LD} ||= '$(CC)';
-        
-        # prevent C++ from compile errors on perls <= 5.18, as perl had buggy <perl.h> prior to 5.20
-        _string_merge($params{CCFLAGS}, "-Wno-reserved-user-defined-literal -Wno-literal-suffix -Wno-unknown-warning-option") if $^V < v5.20;
-        
-        if (has_xs(\%params)) {
-            push @$postamble, ".xs.cc:\n".
-                "\t".'$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc'."\n".
-                "\t".'$(MV) $*.xsc $*.cc';
-        }
+        $params->{CC} = $comp;
     }
     
-    # inject ParseXS plugins into xsubpp
-    if (my $list = $params{PARSE_XS}) {
-    	_uniq_list($list);
-        my $inc = join ' ', map { "-M$_" } @$list;
-        push @$postamble, "XSUBPPRUN = \$(PERLRUN) -Ilib $inc \$(XSUBPP)";
+    canonize_array_split($params->{TYPEMAPS});
+    canonize_array_split($params->{PARSE_XS});
+    
+    my $module_info = XS::Install::Payload::binary_module_info($params->{NAME}) || {};
+    $params->{MODULE_INFO} = {
+        BIN_DEPENDENT => $module_info->{BIN_DEPENDENT},
+        SELF_INC      => $params->{INC} || '',
+        ALL_C         => [],
+    };
+
+    if (!defined $params->{H_DEPS} or $params->{H_DEPS}) {
+        my $make = $ENV{MAKE} || $Config{make};
+        $params->{H_DEPS} = ($make eq 'gmake') || ($^O eq 'freebsd' or $^O eq 'linux');
     }
+}
 
-    my $shared_libs_linking;
-    if (my $shared_libs = $params{MODULE_INFO}{SHARED_LIBS} and $^O ne 'darwin') { # MacOSX doesn't allow for linking with bundles :(
-        my %seen;
-        @$shared_libs = grep {!$seen{$_}++} reverse @$shared_libs;
-        $shared_libs_linking = join(' ', @$shared_libs);
+sub process_FROM {
+    my $params = shift;
+    my $module = $params->{NAME} or die "You must define a NAME param";
+    
+    if (my $file = delete $params->{ALL_FROM}) {
+        $params->{VERSION_FROM}  = $file;
+        $params->{ABSTRACT_FROM} = $file;
     }
     
-    $params{LDFROM} ||= '$(OBJECT)';
-    $params{LDFROM} .= ' '.$shared_libs_linking if $shared_libs_linking;
+    my $pm = 'lib/'._pkg_file($module);
+    my $pod = 'lib/'._pkg_slash($module).'.pod';
     
-    $params{OBJECT} = '$(O_FILES)' unless defined $params{OBJECT};
-    
-    $params{CCFLAGS} = "$Config{ccflags} $params{CCFLAGS}" if $params{CCFLAGS};
-    $params{OPTIMIZE} = merge_optimize($Config{optimize}, '-O2', $params{OPTIMIZE});
+    $params->{VERSION_FROM}  ||= $pm;
+    $params->{ABSTRACT_FROM} ||= (-f $pod) ? $pod : $pm;
+}
 
-    delete @params{qw/C H OBJECT XS CCFLAGS LDFROM/} unless has_binary(\%params);
-
-    process_TEST(\%params, $shared_libs_linking);
+sub process_REQUIRES {
+    my $params = shift;
     
-    delete @params{qw/CPLUS PARSE_XS SRC MODULE_INFO/};
+    $params->{CONFIGURE_REQUIRES} ||= {};
+    $params->{BUILD_REQUIRES} ||= {};
     
-    # convert array to hash for postamble
-    $params{postamble} = {};
-    my $i = 0;
-    $params{postamble}{++$i} = $_ for @$postamble;
-     
-    return %params;
+    $params->{TEST_REQUIRES} ||= {};
+    $params->{TEST_REQUIRES}{'Test::Simple'} ||= '0.96';
+    $params->{TEST_REQUIRES}{'Test::More'}   ||= 0;
+    $params->{TEST_REQUIRES}{'Test::Deep'}   ||= 0;
+    
+    $params->{PREREQ_PM} ||= {};
+    
+    unless ($params->{NAME} eq $THIS_MODULE) { # skip when building XS::Install itself
+        $params->{CONFIGURE_REQUIRES}{$THIS_MODULE} ||= $VERSION;
+        $params->{PREREQ_PM         }{$THIS_MODULE} ||= $VERSION;
+    }
 }
 
 sub process_PM {
@@ -189,127 +149,6 @@ sub process_PM {
     }
 }
 
-sub process_FROM {
-    my $params = shift;
-    my $module = $params->{NAME} or die "You must define a NAME param";
-    
-    if (my $file = delete $params->{ALL_FROM}) {
-        $params->{VERSION_FROM}  = $file;
-        $params->{ABSTRACT_FROM} = $file;
-    }
-    
-    my $pm = 'lib/'._pkg_file($module);
-    my $pod = 'lib/'._pkg_slash($module).'.pod';
-    
-    $params->{VERSION_FROM}  ||= $pm;
-    $params->{ABSTRACT_FROM} ||= (-f $pod) ? $pod : $pm;
-}
-
-sub process_XS {
-    my $params = shift;
-    $params->{XS} ||= [_scan_files($xs_mask)];
-    $params->{XS} = get_xs_files($params);
-}
-
-sub get_xs_files {
-    my $params = shift;
-    my (%ret, @list);
-    if ($params->{XS}) {
-        if (ref($params->{XS}) eq 'HASH') {
-            %ret = %{$params->{XS}};
-        } else {
-            push @list, @{_string_split_array($_)} for @{$params->{XS}};
-        }
-    }
-    push @list, _scan_files($xs_mask, $_) for @{$params->{SRC}};
-    my $cext = $params->{CPLUS} ? 'cc' : 'c';
-    foreach my $xsfile (@list) {
-        next if $ret{$xsfile};
-        my $cfile = $xsfile;
-        $cfile =~ s/\.xs$/.$cext/ or next;
-        $ret{$xsfile} = $cfile;
-    }
-    return \%ret;
-}
-
-sub process_C {
-    my $params = shift;
-    $params->{C} ||= [_scan_files($c_mask)];
-    $params->{C} = get_c_files($params);
-}
-
-sub get_c_files {
-    my $params = shift;
-    my $ret = $params->{C} ? _string_split_array($params->{C}) : [];
-    push @$ret, grep { !_includes($ret, $_) } values %{$params->{XS}};
-    push @$ret, grep { !_includes($ret, $_) } _scan_files($c_mask, $_) for @{$params->{SRC}};
-    return $ret;
-}
-
-sub process_OBJECT {
-    my $params = shift;
-    $params->{OBJECT} = get_o_files($params);
-    $params->{clean}{FILES} .= ' $(O_FILES)';
-}
-
-sub get_o_files {
-    my $params = shift;
-    my $ret = _string_split_array($params->{OBJECT});
-    push @$ret, c2obj_file($_) for @{$params->{C}};
-    return $ret;
-}
-
-sub process_H {
-    my $params = shift;
-    $params->{H} ||= [_scan_files($h_mask)];
-    $params->{H} = get_h_files($params);
-}
-
-sub get_h_files {
-    my $params = shift;
-    my $ret = $params->{H} ? _string_split_array($params->{H}) : [];
-    push @$ret, grep { !_includes($ret, $_) } _scan_files($h_mask, $_) for @{$params->{SRC}};
-    return $ret;
-}
-
-sub process_XSI { # make XS files rebuild if an XSI file changes
-    my $params = shift;
-    return unless has_xs($params);
-    my @xsi_files = glob($xsi_mask);
-    push @xsi_files, _scan_files($xsi_mask, $_) for @{$params->{SRC}};
-    push @{$params->{postamble}}, '$(XS_FILES):: $(FIRST_MAKEFILE) '.join(' ', @xsi_files).'; $(TOUCH) $(XS_FILES)'."\n"
-}
-
-sub process_CLIB {
-    my $params = shift;
-    my $clibs = '';
-    my $clib = delete $params->{CLIB} or return;
-    $clib = [$clib] unless ref($clib) eq 'ARRAY';
-    return unless @$clib;
-    
-    foreach my $info (@$clib) {
-        my $build_cmd = $info->{BUILD_CMD};
-        my $clean_cmd = $info->{CLEAN_CMD};
-        
-        unless ($build_cmd) {
-            my $make = '$(MAKE)';
-            $make = 'gmake' if $info->{GMAKE} and $^O eq 'freebsd';
-            $info->{TARGET} ||= '';
-            $info->{FLAGS} ||= '';
-            $build_cmd = "$make $info->{FLAGS} $info->{TARGET}";
-            $clean_cmd = "$make clean";
-        }
-        
-        my $path = $info->{DIR}.'/'.$info->{FILE};
-        $clibs .= "$path ";
-        
-        push @{$params->{postamble}}, "$path : ; cd $info->{DIR} && $build_cmd\n";
-        push @{$params->{postamble}}, "clean :: ; cd $info->{DIR} && $clean_cmd\n" if $clean_cmd;
-        push @{$params->{OBJECT}}, $path;
-    }
-    push @{$params->{postamble}}, "linkext:: $clibs";
-}
-
 sub process_PAYLOAD {
     my $params = shift;
     my $payload = delete $params->{PAYLOAD} or return;
@@ -319,12 +158,15 @@ sub process_PAYLOAD {
 
 sub process_BIN_DEPS {
     my $params = shift;
-    my $bin_deps = delete $params->{BIN_DEPS} or return;
-    my $typemaps = $params->{TYPEMAPS} ||= [];
+    my $bin_deps = delete $params->{BIN_DEPS};
+    canonize_array_split($bin_deps);
+    push @$bin_deps, $THIS_MODULE unless $params->{NAME} eq $THIS_MODULE;
+    
+    my $typemaps = $params->{TYPEMAPS};
     $params->{TYPEMAPS} = [];
     my $seen = {};
     _apply_BIN_DEPS($params, $_, $seen) for @$bin_deps;
-    push @{$params->{TYPEMAPS}}, @{$typemaps};
+    push @{$params->{TYPEMAPS}}, @$typemaps;
 }
 
 sub _apply_BIN_DEPS {
@@ -339,6 +181,7 @@ sub _apply_BIN_DEPS {
     $params->{CONFIGURE_REQUIRES}{$module}  ||= $installed_version;
     $params->{PREREQ_PM}{$module}           ||= $installed_version;
     $params->{MODULE_INFO}{BIN_DEPS}{$module} = $installed_version;
+    push @{$params->{MODULE_INFO}{VISIBLE_BIN_DEPS} ||= []}, $module unless $stop_sharing;
     
     # add so/dll to linker list
     my $shared_list = $params->{MODULE_INFO}{SHARED_LIBS} ||= [];
@@ -399,18 +242,117 @@ sub _apply_BIN_DEPS {
     
     $params->{CPLUS} = $info->{CPLUS} if $info->{CPLUS} and (!$params->{CPLUS} or $params->{CPLUS} < $info->{CPLUS});
     
-    if (my $bin_share = $params->{BIN_SHARE} and !$stop_sharing) {
-        push @{$bin_share->{PASSTHROUGH} ||= []}, $module;
-    }
-    
     if (my $parsexs = $info->{PARSE_XS}) {
     	push @{$params->{PARSE_XS}||=[]}, @$parsexs;
     }
 }
 
+sub process_PARSE_XS { # inject ParseXS plugins into xsubpp
+    my $params = shift;
+    my $list = $params->{PARSE_XS};
+    return unless @$list;
+    _uniq_list($list);
+    my $inc = join ' ', map { "-M$_" } @$list;
+    push @{$params->{postamble}}, "XSUBPPRUN = \$(PERLRUN) -Ilib $inc \$(XSUBPP)";
+}
+
+sub process_module_binary {
+    my $params = shift;
+
+    $params->{XS}  ||= [_scan_files($xs_mask)];
+    $params->{H}   ||= [_scan_files($h_mask)];
+    $params->{C}   ||= [_scan_files($c_mask)];
+    $params->{XSI} ||= [_scan_files($xsi_mask)];
+    
+    process_binary($params);
+    
+    if (has_xs($params)) {
+        # make XS files rebuild if Makefile or XSI file changes
+        push @{$params->{postamble}}, '$(XS_FILES):: $(FIRST_MAKEFILE) '.join(' ', @{$params->{XSI}}).'; $(TOUCH) $(XS_FILES)'."\n";
+    }
+
+    if ($params->{CPLUS}) {
+        _string_merge($params->{XSOPT}, '-C++ -csuffix .cc');
+        
+        push @{$params->{postamble}}, ".xs.cc:\n".
+            "\t".'$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc'."\n".
+            "\t".'$(MV) $*.xsc $*.cc';
+    }
+    
+    $params->{clean}{FILES} .= ' $(O_FILES)';
+    
+    _string_merge($params->{MODULE_INFO}{ALL_C_STR}, '$(C_FILES)');
+    push @{$params->{MODULE_INFO}{ALL_C}}, @{$params->{C}};
+}
+
+sub process_binary {
+    my $params = shift;
+    canonize_array_split($params->{SRC});
+    my $cext = $params->{CPLUS} ? 'cc' : 'c';
+    
+    if (ref($params->{XS}) ne 'HASH') {
+        canonize_array_files($params->{XS});
+        $params->{XS} = { map {$_ => undef} @{$params->{XS}} };
+    }
+    foreach my $xsfile (keys %{$params->{XS}}, map { _scan_files($xs_mask, $_) } @{$params->{SRC}}) {
+        next if $params->{XS}{$xsfile};
+        my $cfile = $xsfile;
+        $cfile =~ s/\.xs$/.$cext/ or next;
+        $params->{XS}{$xsfile} = $cfile;
+    }
+    
+    canonize_array_files($params->{XSI});
+    push @{$params->{XSI}}, _scan_files($xsi_mask, $_) for @{$params->{SRC}};
+    _uniq_list($params->{XSI});
+    
+    canonize_array_files($params->{H});
+    push @{$params->{H}}, _scan_files($h_mask, $_) for @{$params->{SRC}};
+    _uniq_list($params->{H});
+
+    canonize_array_files($params->{C});
+    push @{$params->{C}}, values %{$params->{XS}};
+    push @{$params->{C}}, _scan_files($c_mask, $_) for @{$params->{SRC}};
+    _uniq_list($params->{C});
+    
+    canonize_array_files($params->{OBJECT});
+    push @{$params->{OBJECT}}, c2obj_file($_) for @{$params->{C}};
+    _uniq_list($params->{OBJECT});
+}
+
+sub process_CLIB {
+    my $params = shift;
+    my $clibs = '';
+    my $clib = delete $params->{CLIB} or return;
+    $clib = [$clib] unless ref($clib) eq 'ARRAY';
+    return unless @$clib;
+    
+    foreach my $info (@$clib) {
+        my $build_cmd = $info->{BUILD_CMD};
+        my $clean_cmd = $info->{CLEAN_CMD};
+        
+        unless ($build_cmd) {
+            my $make = '$(MAKE)';
+            $make = 'gmake' if $info->{GMAKE} and $^O eq 'freebsd';
+            $info->{TARGET} ||= '';
+            $info->{FLAGS} ||= '';
+            $build_cmd = "$make $info->{FLAGS} $info->{TARGET}";
+            $clean_cmd = "$make clean";
+        }
+        
+        my $path = $info->{DIR}.'/'.$info->{FILE};
+        $clibs .= "$path ";
+        
+        push @{$params->{postamble}}, "$path : ; cd $info->{DIR} && $build_cmd\n";
+        push @{$params->{postamble}}, "clean :: ; cd $info->{DIR} && $clean_cmd\n" if $clean_cmd;
+        push @{$params->{OBJECT}}, $path;
+    }
+    push @{$params->{postamble}}, "linkext:: $clibs";
+}
+
 sub process_BIN_SHARE {
     my $params = shift;
     my $bin_share = delete $params->{BIN_SHARE} or return;
+    return unless %$bin_share;
     
     my $typemaps = delete($bin_share->{TYPEMAPS}) || {};
     _process_map($typemaps, $map_mask);
@@ -436,18 +378,19 @@ sub process_BIN_SHARE {
     
     return unless %$bin_share;
     
-    _uniq_list($bin_share->{PASSTHROUGH}) if $bin_share->{PASSTHROUGH};
+    if (my $vbd = $params->{MODULE_INFO}{VISIBLE_BIN_DEPS}) {
+        my $pt = 
+        _uniq_list($vbd);
+        $bin_share->{PASSTHROUGH} = $vbd;
+    }
     
     $bin_share->{LOADABLE} = has_binary($params);
     
     # generate info file
     mkdir 'blib';
     my $infopath = 'blib/info';
-    _module_info_write($infopath, $bin_share);
-    
-    my $pm = $params->{PM} ||= {};
-    my $where = has_binary($params) ? '$(INST_ARCHLIB)' : '$(INST_LIB)';
-    $pm->{$infopath} = $where.'/$(FULLEXT).x/info';
+    XS::Install::Util::module_info_write($infopath, $bin_share);
+    _install($params, {$infopath => 'info'}, '');
 }
 
 sub attach_BIN_DEPENDENT {
@@ -456,7 +399,7 @@ sub attach_BIN_DEPENDENT {
     return unless @deps;
     
     push @{$params->{postamble}}, "sync_bin_deps:\n".
-        "\t\$(PERL) -M$THIS_MODULE -e '${THIS_MODULE}::cmd_sync_bin_deps()' $params->{NAME} @deps";
+        "\t\$(PERL) -M${THIS_MODULE}::Util -e '${THIS_MODULE}::Util::cmd_sync_bin_deps()' $params->{NAME} @deps";
     push @{$params->{postamble}}, "install :: sync_bin_deps";
 }
 
@@ -480,23 +423,50 @@ cpanm -f @$list
 EOF
 }
 
-sub process_TEST {
-    my ($params, $shared_libs_linking) = @_;
-    my $tp = $params->{test};
-    return unless $tp and ($tp->{SRC} or $tp->{XS} or $tp->{C});
-    $tp->{SRC} = [$tp->{SRC}] unless ref($tp->{SRC}) eq 'ARRAY';
-    $tp->{CPLUS} //= $params->{CPLUS};
+sub process_CPLUS {
+    my $params = shift;
+    my $use_cpp = $params->{CPLUS} or return;
     
-    $tp->{XS}     = get_xs_files($tp);
-    $tp->{C}      = get_c_files($tp);
-    $tp->{H}      = get_h_files($tp);
-    $tp->{OBJECT} = get_o_files($tp);
-    return unless @{$tp->{OBJECT}};
+    my $cppv = int($use_cpp);
+    $cppv = 11 if $cppv < 11;
+    _string_merge($params->{CCFLAGS}, "-std=c++$cppv");
+        
+    $params->{CC} = _get_cplusplus($params->{CC}, $cppv);
+    $params->{LD} ||= '$(CC)';
+        
+    # prevent C++ from compile errors on perls <= 5.18, as perl had buggy <perl.h> prior to 5.20
+    _string_merge($params->{CCFLAGS}, "-Wno-reserved-user-defined-literal -Wno-literal-suffix -Wno-unknown-warning-option") if $^V < v5.20;
+}
+
+sub process_CCFLAGS {
+    my $params = shift;
+    _string_merge($params->{CCFLAGS}, '-o $@');
+    $params->{CCFLAGS} = "$Config{ccflags} $params->{CCFLAGS}" if $params->{CCFLAGS};
+}
+
+sub process_LD {
+    my $params = shift;
+
+    $params->{LDFROM} ||= '$(OBJECT)';
+    
+    if (my $shared_libs = $params->{MODULE_INFO}{SHARED_LIBS} and $^O ne 'darwin') { # MacOSX doesn't allow for linking with bundles :(
+        my %seen;
+        @$shared_libs = grep {!$seen{$_}++} reverse @$shared_libs;
+        my $str = join(' ', @$shared_libs);
+        $params->{MODULE_INFO}{SHARED_LIBS_LINKING} = $str;
+        $params->{LDFROM} .= ' '.$str if $str;
+    }
+}
+
+sub process_test {
+    my ($params, $shared_libs_linking) = @_;
+    my $tp = $params->{test} or return;
+    
+    $tp->{CPLUS} //= $params->{CPLUS};
+    process_binary($tp);
+    return unless has_binary($tp);
     
     $params->{XS}{$_} = $tp->{XS}{$_} for keys %{$tp->{XS}};
-    
-    my @xsi_files;
-    push @xsi_files, _scan_files($xsi_mask, $_) for @{$tp->{SRC}};
     
     my $ccflags = $params->{CCFLAGS};
     _string_merge($ccflags, $tp->{CCFLAGS});
@@ -505,10 +475,20 @@ sub process_TEST {
     
     $params->{clean}{FILES} .= ' $(TEST_OBJECT)';
     
+    push @{$params->{postamble}}, "# --- XS::Install tests compilation section";
+
     my $cccmd = (bless {C => ['1.c']}, 'MM')->const_cccmd;
     $cccmd =~ s/CCCMD/TEST_CCCMD/;
     $cccmd =~ s/CCFLAGS/TEST_CCFLAGS/g;
     $cccmd =~ s/OPTIMIZE/TEST_OPTIMIZE/g;
+    
+    if (my $inc = $tp->{INC}) {
+        push @{$params->{postamble}}, "TEST_INC = $inc";
+        $cccmd =~ s/(\$\(INC\))/\$(TEST_INC) $1/g;
+        _string_merge($params->{MODULE_INFO}{SELF_INC}, '$(TEST_INC)');
+    }
+    
+    $cccmd .= ' $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE)';
     
     push @{$params->{postamble}},
         "TEST_CCFLAGS = $ccflags",
@@ -520,17 +500,25 @@ sub process_TEST {
         my $o_file = c2obj_file($c_file);
         push @{$params->{postamble}},
             "$o_file : $c_file\n".
-            "\t".'$(TEST_CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) '."$c_file\n"
+            "\t".'$(TEST_CCCMD) '."$c_file\n"
         ;
     }
     
     my $dlpath = 'blib/ctest.$(DLEXT)';
+    my $objdep = $params->{H_DEPS} ? '' : ' $(H_FILES) $(TEST_H_FILES)';
     push @{$params->{postamble}},
         'TEST_OBJECT = '.join(' ', @{$tp->{OBJECT}}),
         'TEST_H_FILES = '.join(' ', @{$tp->{H}}),
-        '$(TEST_OBJECT) : $(FIRST_MAKEFILE) $(H_FILES) $(TEST_H_FILES)',
+        'TEST_C_FILES = '.join(' ', @{$tp->{C}}),
+        '$(TEST_OBJECT) : $(FIRST_MAKEFILE)'.$objdep,
+    ;
+    
+    push @{$params->{postamble}},
         'TEST_XS_FILES = '.join(' ', keys %{$tp->{XS}}),
-        '$(TEST_XS_FILES) :: $(FIRST_MAKEFILE) '.join(' ', @xsi_files).'; $(TOUCH) $(TEST_XS_FILES)',
+        '$(TEST_XS_FILES) :: $(FIRST_MAKEFILE) '.join(' ', @{$tp->{XSI}}).'; $(TOUCH) $(TEST_XS_FILES)',
+    if has_xs($tp);
+        
+    push @{$params->{postamble}},
         "TEST_INST_DYNAMIC = $dlpath",
         'TEST_LDFROM = $(TEST_OBJECT) '.($shared_libs_linking||''),
         '$(TEST_INST_DYNAMIC) : $(TEST_OBJECT) $(INST_DYNAMIC)'."\n".
@@ -541,7 +529,50 @@ sub process_TEST {
         'ctest :: subdirs-test_dynamic',
     ;
     
-    delete @$tp{qw/SRC C H XS OBJECT CPLUS/};
+    _string_merge($params->{MODULE_INFO}{ALL_C_STR}, '$(TEST_C_FILES)');
+    push @{$params->{MODULE_INFO}{ALL_C}}, @{$tp->{C}};
+    
+    delete @$tp{qw/SRC C H XS XSI OBJECT CPLUS CCFLAGS OPTIMIZE/};
+}
+
+sub post_process {
+    my $params = shift;
+    my $postamble = $params->{postamble};
+    my $mi = $params->{MODULE_INFO};
+    
+    if (@{$mi->{ALL_C}} and $params->{H_DEPS}) {
+        my $cmd = "\$(PERL) -M${THIS_MODULE}::Util -e '${THIS_MODULE}::Util::cmd_check_header_dependencies()' \$(OBJ_EXT) $mi->{SELF_INC} $mi->{ALL_C_STR}";
+        # for GNU make
+        push @$postamble, "CHECK_HEADER_DEPS := \$(shell $cmd)";
+        # for BSD make
+        push @$postamble, ".BEGIN : \n".
+            "\t$cmd";
+            
+        delete $params->{H}; # prevent MM from making O_FILES depend on all H_FILES
+    }
+    
+    delete @$params{qw/C H OBJECT XS CCFLAGS LDFROM OPTIMIZE XSOPT/} unless has_binary($params);
+    delete @$params{qw/CPLUS PARSE_XS SRC XSI MODULE_INFO H_DEPS/};
+    
+    # convert array to hash for postamble
+    $params->{postamble} = {};
+    my $i = 0;
+    $params->{postamble}{++$i} = $_ for @$postamble;
+}
+
+sub canonize_array {
+    if    (!$_[0])                { $_[0] = [] }
+    elsif (ref($_[0]) ne 'ARRAY') { $_[0] = [$_[0]] }
+}
+
+sub canonize_array_split {
+    canonize_array($_[0]);
+    @{$_[0]} = map { split ' ' } @{$_[0]};
+}
+
+sub canonize_array_files {
+    canonize_array_split($_[0]);
+    @{$_[0]} = map { glob } @{$_[0]};
 }
 
 # returns version of binary module which was installed with XS::Install without loading it
@@ -561,21 +592,6 @@ sub has_c      { return $_[0]->{C} && scalar(@{$_[0]->{C}}) ? 1 : 0 }
 sub has_object { return $_[0]->{OBJECT} && scalar(@{$_[0]->{OBJECT}}) ? 1 : 0 }
 sub has_xs     { return $_[0]->{XS} && scalar(keys %{$_[0]->{XS}}) ? 1 : 0 }
 sub has_binary { return has_c($_[0]) || has_object($_[0]) || has_xs($_[0]) }
-
-sub cmd_sync_bin_deps {
-    my $myself = shift @ARGV;
-    my @modules = @ARGV;
-    foreach my $module (@modules) {
-        my $info = XS::Install::Payload::binary_module_info($module) or next;
-        my $dependent = $info->{BIN_DEPENDENT} || [];
-        my %tmp = map {$_ => 1} grep {$_ ne $module} @$dependent;
-        $tmp{$myself} = 1;
-        $info->{BIN_DEPENDENT} = [sort keys %tmp];
-        delete $info->{BIN_DEPENDENT} unless @{$info->{BIN_DEPENDENT}};
-        my $file = XS::Install::Payload::binary_module_info_file($module);
-        _module_info_write($file, $info);
-    }
-}
 
 sub merge_optimize {
     my $to = shift;
@@ -600,7 +616,6 @@ sub merge_optimize {
 sub _install {
     my ($params, $map, $path) = @_;
     return unless %$map;
-    my $xs = $params->{XS};
     my $instroot = _instroot($params);
     my $pm = $params->{PM} ||= {};
     while (my ($source, $dest) = each %$map) {
@@ -610,12 +625,7 @@ sub _install {
     }
 }
 
-sub _instroot {
-    my $params = shift;
-    my $xs = $params->{XS};
-    my $instroot = ($xs and %$xs) ? '$(INST_ARCHLIB)' : '$(INST_LIB)';
-    return $instroot;
-}
+sub _instroot { return has_binary($_[0]) ? '$(INST_ARCHLIB)' : '$(INST_LIB)' }
 
 sub _sync {
     no strict 'refs';
@@ -679,22 +689,6 @@ sub _process_map {
             $map->{$file} = $dest_file;
         }
     }
-}
-
-sub _includes {
-    my ($arr, $val) = @_;
-    for (@$arr) { return 1 if $_ eq $val }
-    return;
-}
-
-sub _string_split_array {
-    my $list = shift;
-    my @result;
-    if ($list) {
-        $list = [$list] unless ref($list) eq 'ARRAY';
-        push @result, map { glob } split(' ') for @$list;
-    }
-    return \@result;
 }
 
 sub _uniq_list {
@@ -784,39 +778,11 @@ sub c2obj_file {
     }
 }
 
-
-#    dlsyms  
-    
-    # generate DLL file containing all symbols, like default behaviour on UNIX.
-
-
 sub _require_makemaker {
     unless ($INC{'ExtUtils/MakeMaker.pm'}) {
         require ExtUtils::MakeMaker;
         ExtUtils::MakeMaker->import();
     }
-}
-
-sub _module_info_write {
-    my ($file, $info) = @_;
-    require Data::Dumper;
-    local $Data::Dumper::Terse = 1;
-    local $Data::Dumper::Indent = 0;
-    my $content = Data::Dumper::Dumper($info);
-    my $restore_mode;
-    if (-e $file) { # make sure we have permissions to write, because perl installs files with 444 perms
-        my $mode = (stat $file)[2];
-        unless ($mode & 0200) { # if not, temporary enable write permissions
-            $restore_mode = $mode;
-            $mode |= 0200;
-            chmod $mode, $file;
-        }
-    }
-    open my $fh, '>', $file or die "Cannot open $file for writing: $!, binary data could not be written\n";
-    print $fh $content;
-    close $fh;
-    
-    chmod $restore_mode, $file if $restore_mode; # restore old perms if we changed it
 }
 
 sub not_available {

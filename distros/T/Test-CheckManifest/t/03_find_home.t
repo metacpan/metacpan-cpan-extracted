@@ -5,6 +5,7 @@ use warnings;
 use File::Spec;
 use File::Basename;
 use Test::More;
+use File::Path qw(make_path remove_tree);
 use Test::CheckManifest;
 use Cwd;
 
@@ -26,6 +27,13 @@ is_deeply \@dirs_three, \@dirs_one, 'file ' . $file;
 my @dirs_five = File::Spec->splitdir( $sub->( { dir  => $dir } )  );
 is_deeply \@dirs_five, \@dirs_one, 'dir ' . $dir;
 
-#$sub->( { dir => $vol // '/' } );
+$sub->( { dir => $vol || '/' } );
+$sub->( { dir => '/this/dir/does/not/exist/test/checkmanifest' } );
+
+my $deep_path_one = File::Spec->catdir( $dir, 'deep' );
+my $deep_path_two = File::Spec->catdir( $deep_path_one, qw/path one and another level to search for/ );
+make_path $deep_path_two;
+$sub->( { dir => $deep_path_two } );
+remove_tree $deep_path_one;
 
 done_testing();

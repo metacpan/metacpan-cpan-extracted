@@ -3,6 +3,8 @@ package FusionInventory::Agent::Task::Inventory::Linux::i386::CPU;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::Linux;
 use FusionInventory::Agent::Tools::Generic;
@@ -67,10 +69,10 @@ sub _getCPUs {
             THREAD         => $thread || $dmidecodeInfo->{THREAD}
         };
 
-        $cpu->{ID}     = $dmidecodeInfo->{ID} if $dmidecodeInfo->{ID};
-        $cpu->{SERIAL} = $dmidecodeInfo->{SERIAL} if $dmidecodeInfo->{SERIAL};
-        $cpu->{EXTERNAL_CLOCK} = $dmidecodeInfo->{EXTERNAL_CLOCK} if $dmidecodeInfo->{EXTERNAL_CLOCK};
-        $cpu->{FAMILYNAME} = $dmidecodeInfo->{FAMILYNAME} if $dmidecodeInfo->{FAMILYNAME};
+        # Import some dmidecode value only when available
+        foreach my $key (qw(ID SERIAL EXTERNAL_CLOCK FAMILYNAME CORECOUNT)) {
+            $cpu->{$key} = $dmidecodeInfo->{$key} if $dmidecodeInfo->{$key};
+        }
 
         if ($cpu->{NAME} =~ /([\d\.]+)s*(GHZ)/i) {
             $cpu->{SPEED} = {

@@ -2,16 +2,17 @@ package FusionInventory::Agent::SNMP::Live;
 
 use strict;
 use warnings;
-use base 'FusionInventory::Agent::SNMP';
+use parent 'FusionInventory::Agent::SNMP';
 
 use Encode qw(encode);
 use English qw(-no_match_vars);
 use Net::SNMP;
+use Net::SNMP qw/SNMP_PORT/;
 
 sub new {
     my ($class, %params) = @_;
 
-    die "no hostname parameters" unless $params{hostname};
+    die "no hostname parameters\n" unless $params{hostname};
 
     my $version =
         ! $params{version}       ? 'snmpv1'  :
@@ -20,7 +21,7 @@ sub new {
         $params{version} eq '3'  ? 'snmpv3'  :
                                      undef   ;
 
-    die "invalid SNMP version $params{version}" unless $version;
+    die "invalid SNMP version $params{version} parameter\n" unless $version;
 
     my $self;
 
@@ -29,6 +30,8 @@ sub new {
         -retries  => 0,
         -version  => $version,
         -hostname => $params{hostname},
+        -port     => $params{port}      || SNMP_PORT,
+        -domain   => $params{domain}    || 'udp/ipv4',
     );
     $options{'-timeout'} = $params{timeout} if $params{timeout};
 
@@ -65,6 +68,8 @@ sub new {
         );
         die "no response from host $params{hostname}\n"
             if !$response;
+        die "empty response from host $params{hostname} on System variables request\n"
+            if !$response->{$oid};
         die "no response from host $params{hostname}\n"
             if $response->{$oid} =~ /No response from remote host/;
     }
@@ -100,7 +105,7 @@ sub switch_vlan_context {
         );
     }
 
-    die $error unless $self->{session};
+    die $error."\n" unless $self->{session};
 }
 
 sub reset_original_context {
@@ -170,6 +175,16 @@ sub walk {
     return $values;
 }
 
+sub peer_address {
+    my ($self) = @_;
+
+    # transport() API is not documented in Net::SNMP
+    my $transport = $self->{session}->transport()
+        or return;
+
+    return $transport->peer_address();
+}
+
 1;
 __END__
 
@@ -209,6 +224,24 @@ Can be one of:
 The transport layer timeout
 
 =item hostname (mandatory)
+
+=item port
+
+=item domain
+
+Can be one of:
+
+=over
+
+=item 'udp/ipv4' (default)
+
+=item 'udp/ipv6'
+
+=item 'tcp/ipv4'
+
+=item 'tcp/ipv6'
+
+=back
 
 =item community
 

@@ -3,10 +3,18 @@ package FusionInventory::Agent::Task::Inventory::Win32::Controllers;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools::Generic;
 use FusionInventory::Agent::Tools::Win32;
 
 sub isEnabled {
+    my (%params) = @_;
+    return 0 if $params{no_category}->{controller};
+    return 1;
+}
+
+sub isEnabledForRemote {
     my (%params) = @_;
     return 0 if $params{no_category}->{controller};
     return 1;
@@ -17,6 +25,8 @@ sub doInventory {
 
     my $inventory = $params{inventory};
 
+    my $physical = $inventory->getHardware('VMSYSTEM') eq 'Physical';
+
     foreach my $controller (_getControllers(
         logger  => $params{logger},
         datadir => $params{datadir}
@@ -25,6 +35,12 @@ sub doInventory {
             section => 'CONTROLLERS',
             entry   => $controller
         );
+
+        if ($physical && $controller->{NAME} =~ /QEMU/i) {
+            $inventory->setHardware ({
+                VMSYSTEM => 'QEMU'
+            });
+        }
     }
 }
 

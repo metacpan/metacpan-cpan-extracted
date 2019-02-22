@@ -17,16 +17,26 @@
 /*
  *  Header files we use
  */
-#include <DBIXS.h>  /* installed by the DBI module                        */
+
+/*
+ * On WIN32 windows.h and winsock.h need to be included before mysql.h
+ * Otherwise SOCKET type which is needed for mysql.h is not defined
+ */
+#ifdef _WIN32
+#include <windows.h>
+#include <winsock.h>
+#endif
+
 #include <mysql.h>  /* Comes with MySQL-devel */
 #include <mysqld_error.h>  /* Comes MySQL */
-
 #include <errmsg.h> /* Comes with MySQL-devel */
-#include <stdint.h> /* For uint32_t */
 
 #ifndef MYSQL_VERSION_ID
 #include <mysql_version.h> /* Comes with MySQL-devel */
 #endif
+
+#include <DBIXS.h>  /* installed by the DBI module */
+#include <stdint.h> /* For uint32_t */
 
 #if !defined(MARIADB_BASE_VERSION) && defined(MARIADB_PACKAGE_VERSION)
 #define MARIADB_BASE_VERSION
@@ -325,9 +335,9 @@ PERL_STATIC_INLINE UV SvUV_nomg(pTHX_ SV *sv)
 /*
  * MySQL and MariaDB Embedded are affected by https://jira.mariadb.org/browse/MDEV-16578
  * MariaDB 10.2.2+ prior to 10.2.19 and 10.3.9 and MariaDB Connector/C prior to 3.0.5 are affected by https://jira.mariadb.org/browse/CONC-336
- * MySQL 8.0.4+ is affected too by https://bugs.mysql.com/bug.php?id=93276
+ * MySQL 8.0.4+ prior to 8.0.15 is affected too by https://bugs.mysql.com/bug.php?id=93276
  */
-#if defined(HAVE_EMBEDDED) || (!defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 80004) || (defined(MARIADB_PACKAGE_VERSION) && (!defined(MARIADB_PACKAGE_VERSION_ID) || MARIADB_PACKAGE_VERSION_ID < 30005)) || (defined(MARIADB_VERSION_ID) && ((MARIADB_VERSION_ID >= 100202 && MARIADB_VERSION_ID < 100219) || (MARIADB_VERSION_ID >= 100300 && MARIADB_VERSION_ID < 100309)))
+#if defined(HAVE_EMBEDDED) || (!defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 80004 && MYSQL_VERSION_ID < 80015) || (defined(MARIADB_PACKAGE_VERSION) && (!defined(MARIADB_PACKAGE_VERSION_ID) || MARIADB_PACKAGE_VERSION_ID < 30005)) || (defined(MARIADB_VERSION_ID) && ((MARIADB_VERSION_ID >= 100202 && MARIADB_VERSION_ID < 100219) || (MARIADB_VERSION_ID >= 100300 && MARIADB_VERSION_ID < 100309)))
 #define HAVE_BROKEN_INIT
 #endif
 
@@ -407,6 +417,35 @@ enum av_attribs {
 };                         /*  purposes only                                */
 
 
+/* Double linked list */
+struct mariadb_list_entry {
+    void *data;
+    struct mariadb_list_entry *prev;
+    struct mariadb_list_entry *next;
+};
+#define mariadb_list_add(list, entry, ptr)           \
+  STMT_START {                                       \
+    Newz(0, (entry), 1, struct mariadb_list_entry);  \
+    (entry)->data = (ptr);                           \
+    (entry)->prev = NULL;                            \
+    (entry)->next = (list);                          \
+    if ((list))                                      \
+      (list)->prev = (entry);                        \
+    (list) = (entry);                                \
+  } STMT_END
+#define mariadb_list_remove(list, entry)             \
+  STMT_START {                                       \
+    if ((entry)->prev)                               \
+      (entry)->prev->next = (entry)->next;           \
+    if ((entry)->next)                               \
+      (entry)->next->prev = (entry)->prev;           \
+    if ((list) == (entry))                           \
+      (list) = (entry)->next;                        \
+    Safefree((entry));                               \
+    (entry) = NULL;                                  \
+  } STMT_END
+
+
 /*
  *  This is our part of the driver handle. We receive the handle as
  *  an "SV*", say "drh", and receive a pointer to the structure below
@@ -419,6 +458,9 @@ enum av_attribs {
  */
 struct imp_drh_st {
     dbih_drc_t com;         /* MUST be first element in structure   */
+
+    struct mariadb_list_entry *active_imp_dbhs; /* List of imp_dbh structures with active MYSQL* */
+    struct mariadb_list_entry *taken_pmysqls;   /* List of active MYSQL* from take_imp_data() */
     unsigned long int instances;
     bool non_embedded_started;
 #if !defined(HAVE_EMBEDDED) && defined(HAVE_BROKEN_INIT)
@@ -427,7 +469,6 @@ struct imp_drh_st {
     bool embedded_started;
     SV *embedded_args;
     SV *embedded_groups;
-    AV *taken_pmysqls;      /* List of active MYSQL* structures from take_imp_data() */
 };
 
 
@@ -444,6 +485,7 @@ struct imp_drh_st {
 struct imp_dbh_st {
     dbih_dbc_t com;         /*  MUST be first element in structure   */
 
+    struct mariadb_list_entry *list_entry; /* Entry of imp_drh->active_imp_dbhs list */
     MYSQL *pmysql;
     bool connected;          /* Set to true after DBI->connect finished */
     bool auto_reconnect;
@@ -543,8 +585,7 @@ struct imp_sth_st {
     bool disable_fallback_for_server_prepare;
 
     MYSQL_RES* result;       /* result                                 */
-    int currow;           /* number of current row                  */
-    bool fetch_done;      /* mark that fetch done                   */
+    my_ulonglong currow;  /* number of current row                  */
     my_ulonglong row_num;         /* total number of rows                   */
 
     bool  done_desc;      /* have we described this sth yet ?	    */

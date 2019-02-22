@@ -13,6 +13,7 @@ use List::MoreUtils qw/zip/;
 use Term::ANSIColor qw/colored/;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
+use DateTime::Format::HTTP;
 
 our $VERSION  = 1.0.3;
 our $workflow = App::Git::Workflow->new;
@@ -25,7 +26,7 @@ sub run {
         'remote|r',
         'insensitive|i',
     );
-    my $fmt = join "%09", qw/
+    my $fmt = join "-%09-%09-", qw/
         %(authordate)
         %(authoremail)
         %(authorname)
@@ -56,13 +57,43 @@ sub run {
     }
 
     my @branches = `git branch $arg --format='$fmt'`;
-    use Data::Dumper qw/Dumper/;
+    my $i = 0;
+    my $last = '';
+    my @data;
 
     for my $branch (@branches) {
         chomp $branch;
-        my @cols = split /\t/, $branch;
+        if ($last) {
+            $last .= "\n";
+        }
+        $last .= $branch;
+        my @cols = split /-\t-\t-/, $last;
+        if (@cols < @headings) {
+            next;
+        }
+        $last = '';
         $branch = { zip @headings, @cols };
-        die Dumper $branch;
+        warn 'bad head' if !$branch->{HEAD};
+        next if !$branch->{HEAD};
+
+        my ($date, $tz) = $branch->{authordate} =~ /^(.*)\s+([+-]\d{4})$/;
+        if ($date && $tz) {
+            $branch->{age} = DateTime::Format::HTTP->parse_datetime($date, $tz)->iso8601;
+        }
+        else {
+            $Data::Dumper::Sortkeys = 1;
+            $Data::Dumper::Indent = 1;
+            die Dumper $branch;
+        }
+        push @data, $branch;
+    }
+
+    @data = sort {$a->{age} cmp $b->{age}} @data;
+    if ($option{reverse}) {
+        @data = reverse @data;
+    }
+    for my $branch (@data) {
+        printf "%s\t%s\n", $branch->{age}, $branch->{short};
     }
 }
 

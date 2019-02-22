@@ -3,6 +3,8 @@ package FusionInventory::Agent::Task::Inventory::Linux::Drives;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::Unix;
 
@@ -126,6 +128,57 @@ sub _getFilesystems {
             foreach my $key (keys %$hal_filesystem) {
                 $filesystem->{$key} = $hal_filesystem->{$key}
                     if !$filesystem->{$key};
+            }
+        }
+    }
+
+    my %devicemapper = ();
+    my %cryptsetup = ();
+
+    # complete with encryption status if available
+    if (canRun('dmsetup') && canRun('cryptsetup')) {
+        foreach my $filesystem (@filesystems) {
+            # Find dmsetup uuid if available
+            my $uuid = getFirstMatch(
+                logger  => $logger,
+                command => "dmsetup info $filesystem->{VOLUMN}",
+                pattern => qr/^UUID\s*:\s*(.*)$/
+            );
+            next unless $uuid;
+
+            # Find real devicemapper block name
+            unless ($devicemapper{$uuid}) {
+                foreach my $uuidfile (glob ("/sys/block/*/dm/uuid")) {
+                    next unless getFirstLine(file => $uuidfile) eq $uuid;
+                    ($devicemapper{$uuid}) = $uuidfile =~ m|^(/sys/block/[^/]+)|;
+                    last;
+                }
+            }
+            next unless $devicemapper{$uuid};
+
+            # Lookup for crypto devicemapper slaves
+            foreach my $slavefile (glob ("$devicemapper{$uuid}/slaves/*/dm/name")) {
+                my $name = getFirstLine(file => $slavefile)
+                    or next;
+                # Check cryptsetup status for the found slave
+                unless ($cryptsetup{$name}) {
+                    my $handle = getFileHandle( command => "cryptsetup status $name" )
+                        or next;
+                    while (my $line = <$handle>) {
+                        chomp $line;
+                        next unless ($line =~ /^\s*(.*):\s*(.*)$/);
+                        $cryptsetup{$name}->{uc($1)} = $2;
+                    }
+                    close $handle;
+                }
+                next unless $cryptsetup{$name};
+
+                # Add cryptsetup status to filesystem
+                $filesystem->{ENCRYPT_NAME}   = $cryptsetup{$name}->{TYPE};
+                $filesystem->{ENCRYPT_STATUS} = 'Yes';
+                $filesystem->{ENCRYPT_ALGO}   = $cryptsetup{$name}->{CIPHER};
+
+                last;
             }
         }
     }

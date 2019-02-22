@@ -3,10 +3,13 @@ package FusionInventory::Agent::Task::Inventory::Virtualization::Lxd;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools;
+use FusionInventory::Agent::Tools::Virtualization;
 
 sub isEnabled {
-    return canRun('lxd');
+    return canRun('lxd') && canRun('lxc');
 }
 
 sub doInventory {
@@ -16,7 +19,7 @@ sub doInventory {
     my $logger    = $params{logger};
 
     my @machines = _getVirtualMachines(
-        command => '/usr/bin/lxc list',
+        command => 'lxc list',
         logger  => $logger
     );
 
@@ -46,9 +49,9 @@ sub  _getVirtualMachineState {
     $state->{VMID} = $info{pid};
 
     $state->{STATUS} =
-        $info{status} eq 'Running' ? 'running' :
-        $info{status} eq 'FROZEN'  ? 'paused'  :
-        $info{status} eq 'Stopped' ? 'off'     :
+        $info{status} eq 'Running' ? STATUS_RUNNING :
+        $info{status} eq 'FROZEN'  ? STATUS_PAUSED  :
+        $info{status} eq 'Stopped' ? STATUS_OFF     :
         $info{status};
 
     return $state;
@@ -114,12 +117,17 @@ sub  _getVirtualMachines {
         next unless $name;
 
         my $state = _getVirtualMachineState(
-            command => "/usr/bin/lxc info $name",
+            command => "lxc info $name",
             logger  => $params{logger}
         );
 
         my $config = _getVirtualMachineConfig(
             command => "lxc config show $name",
+            logger  => $params{logger}
+        );
+
+        my $machineid = getFirstLine(
+            command => "lxc file pull $name/etc/machine-id -",
             logger  => $params{logger}
         );
 
@@ -129,6 +137,7 @@ sub  _getVirtualMachines {
             STATUS => $state->{STATUS},
             VCPU   => $config->{VCPU},
             MEMORY => $config->{MEMORY},
+            UUID   => getVirtualUUID($machineid, $name),
         };
     }
     close $handle;

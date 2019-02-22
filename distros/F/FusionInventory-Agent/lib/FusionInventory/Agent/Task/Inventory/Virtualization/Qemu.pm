@@ -4,8 +4,11 @@ package FusionInventory::Agent::Task::Inventory::Virtualization::Qemu;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::Unix;
+use FusionInventory::Agent::Tools::Virtualization;
 
 sub isEnabled {
     # Avoid duplicated entry with libvirt
@@ -30,8 +33,11 @@ sub _parseProcessList {
             $values->{name} = $1 if !$values->{name};
         } elsif ($option =~ m/^name (\S+)/) {
             $values->{name} = $1;
+        } elsif ($option =~ m/^m .*size=(\S+)/) {
+            my ($mem) = split(/,/,$1);
+            $values->{mem} = getCanonicalSize($mem);
         } elsif ($option =~ m/^m (\S+)/) {
-            $values->{mem} = $1;
+            $values->{mem} = getCanonicalSize($1);
         } elsif ($option =~ m/^uuid (\S+)/) {
             $values->{uuid} = $1;
         }
@@ -75,7 +81,7 @@ sub doInventory {
                 UUID      => $values->{uuid},
                 VCPU      => 1,
                 MEMORY    => $values->{mem},
-                STATUS    => "running",
+                STATUS    => STATUS_RUNNING,
                 SUBSYSTEM => $values->{vmtype},
                 VMTYPE    => $values->{vmtype},
                 SERIAL    => $values->{serial},

@@ -3,6 +3,8 @@ package FusionInventory::Agent::Task::Inventory::MacOS::License;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::License;
 
@@ -55,6 +57,7 @@ sub doInventory {
             next unless /^(\S+)\s=\s"(.*)"/;
             $info{$1} = $2;
         }
+        close $handle;
         next unless $info{Serial};
 
         my $date;
@@ -92,6 +95,7 @@ sub _getTransmitLicenses {
             $in = "VERSION";
         }
     }
+    close $handle;
 
     return unless $val{KEY};
 

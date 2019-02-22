@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.41
+    version 1.42
 
 SYNOPSIS
 
@@ -83,6 +83,20 @@ EXCLUDING FILES
 
       t/my_very_own.t
       file_to.skip
+
+REPLACE THIS MODULE
+
+    You can replace the test scripts using Test::CheckManifest with this
+    one using ExtUtils::Manifest.
+
+        use Test::More tests => 2;
+        use ExtUtils::Manifest;
+        
+        is_deeply [ ExtUtils::Manifest::manicheck() ], [], 'missing';
+        is_deeply [ ExtUtils::Manifest::filecheck() ], [], 'extra';
+
+    (thanks to @mohawk2
+    <https://github.com/reneeb/Test-CheckManifest/issues/20>).
 
 ACKNOWLEDGEMENT
 

@@ -10,7 +10,7 @@ use File::Basename;
 use File::Spec;
 
 SKIP: {
-    skip 'Test not needed on Windows', 1 if $^O =~ /Win32/;
+    plan skip_all => 'Test not needed on Windows', 1 if $^O =~ /Win32/;
 
     {
         my $dir = dirname( File::Spec->rel2abs( __FILE__ ) );

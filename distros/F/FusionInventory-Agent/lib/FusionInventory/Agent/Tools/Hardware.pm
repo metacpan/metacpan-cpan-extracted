@@ -2,12 +2,14 @@ package FusionInventory::Agent::Tools::Hardware;
 
 use strict;
 use warnings;
-use base 'Exporter';
+use parent 'Exporter';
 
 use English qw(-no_match_vars);
 
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::Network;
+use FusionInventory::Agent::Tools::SNMP;
+use FusionInventory::Agent::SNMP::Device;
 
 our @EXPORT = qw(
     getDeviceInfo
@@ -28,59 +30,59 @@ my %types = (
 my %sysobjectid;
 
 my %sysdescr_first_word = (
-    '3com'           => { vendor => '3Com',            type => 'NETWORKING' },
-    'alcatel-lucent' => { vendor => 'Alcatel-Lucent',  type => 'NETWORKING' },
-    'allied'         => { vendor => 'Allied',          type => 'NETWORKING' },
-    'alteon'         => { vendor => 'Alteon',          type => 'NETWORKING' },
-    'apc'            => { vendor => 'APC',             type => 'NETWORKING' },
-    'apple'          => { vendor => 'Apple',                                },
-    'avaya'          => { vendor => 'Avaya',           type => 'NETWORKING' },
-    'axis'           => { vendor => 'Axis',            type => 'NETWORKING' },
-    'baystack'       => { vendor => 'Nortel',          type => 'NETWORKING' },
-    'broadband'      => { vendor => 'Broadband',       type => 'NETWORKING' },
-    'brocade'        => { vendor => 'Brocade',         type => 'NETWORKING' },
-    'brother'        => { vendor => 'Brother',         type => 'PRINTER'    },
-    'canon'          => { vendor => 'Canon',           type => 'PRINTER'    },
-    'cisco'          => { vendor => 'Cisco',           type => 'NETWORKING' },
-    'dell'           => { vendor => 'Dell',                                 },
-    'designjet'      => { vendor => 'Hewlett-Packard', type => 'PRINTER'    },
-    'deskjet'        => { vendor => 'Hewlett-Packard', type => 'PRINTER'    },
-    'd-link'         => { vendor => 'D-Link',          type => 'NETWORKING' },
-    'eaton'          => { vendor => 'Eaton',           type => 'NETWORKING' },
-    'emc'            => { vendor => 'EMC',             type => 'STORAGE'    },
-    'enterasys'      => { vendor => 'Enterasys',       type => 'NETWORKING' },
-    'epson'          => { vendor => 'Epson',           type => 'PRINTER'    },
-    'extreme'        => { vendor => 'Extreme',         type => 'NETWORKING' },
-    'extremexos'     => { vendor => 'Extreme',         type => 'NETWORKING' },
-    'force10'        => { vendor => 'Force10',         type => 'NETWORKING' },
-    'foundry'        => { vendor => 'Foundry',         type => 'NETWORKING' },
-    'fuji'           => { vendor => 'Fuji',            type => 'NETWORKING' },
-    'h3c'            => { vendor => 'H3C',             type => 'NETWORKING' },
-    'hp'             => { vendor => 'Hewlett-Packard',                      },
-    'ibm'            => { vendor => 'IBM',             type => 'COMPUTER'   },
-    'juniper'        => { vendor => 'Juniper',         type => 'NETWORKING' },
-    'konica'         => { vendor => 'Konica',          type => 'PRINTER'    },
-    'kyocera'        => { vendor => 'Kyocera',         type => 'PRINTER'    },
-    'lexmark'        => { vendor => 'Lexmark',         type => 'PRINTER'    },
-    'netapp'         => { vendor => 'NetApp',          type => 'STORAGE'    },
-    'netgear'        => { vendor => 'NetGear',         type => 'NETWORKING' },
-    'nortel'         => { vendor => 'Nortel',          type => 'NETWORKING' },
-    'nrg'            => { vendor => 'NRG',             type => 'PRINTER'    },
-    'officejet'      => { vendor => 'Hewlett-Packard', type => 'PRINTER'    },
-    'oki'            => { vendor => 'OKI',             type => 'PRINTER'    },
-    'powerconnect'   => { vendor => 'PowerConnect',    type => 'NETWORKING' },
-    'procurve'       => { vendor => 'Hewlett-Packard', type => 'NETWORKING' },
-    'ricoh'          => { vendor => 'Ricoh',           type => 'PRINTER'    },
-    'sagem'          => { vendor => 'Sagem',           type => 'NETWORKING' },
-    'samsung'        => { vendor => 'Samsung',         type => 'PRINTER'    },
-    'sharp'          => { vendor => 'Sharp',           type => 'PRINTER'    },
-    'toshiba'        => { vendor => 'Toshiba',         type => 'PRINTER'    },
-    'wyse'           => { vendor => 'Wyse',            type => 'COMPUTER'   },
-    'xerox'          => { vendor => 'Xerox',           type => 'PRINTER'    },
-    'xirrus'         => { vendor => 'Xirrus',          type => 'NETWORKING' },
-    'zebranet'       => { vendor => 'Zebranet',        type => 'PRINTER'    },
-    'ztc'            => { vendor => 'ZTC',             type => 'NETWORKING' },
-    'zywall'         => { vendor => 'ZyWall',          type => 'NETWORKING' }
+    '3com'           => { manufacturer => '3Com',            type => 'NETWORKING' },
+    'alcatel-lucent' => { manufacturer => 'Alcatel-Lucent',  type => 'NETWORKING' },
+    'allied'         => { manufacturer => 'Allied',          type => 'NETWORKING' },
+    'alteon'         => { manufacturer => 'Alteon',          type => 'NETWORKING' },
+    'apc'            => { manufacturer => 'APC',             type => 'NETWORKING' },
+    'apple'          => { manufacturer => 'Apple',                                },
+    'avaya'          => { manufacturer => 'Avaya',                                },
+    'axis'           => { manufacturer => 'Axis',            type => 'NETWORKING' },
+    'baystack'       => { manufacturer => 'Nortel',          type => 'NETWORKING' },
+    'broadband'      => { manufacturer => 'Broadband',       type => 'NETWORKING' },
+    'brocade'        => { manufacturer => 'Brocade',         type => 'NETWORKING' },
+    'brother'        => { manufacturer => 'Brother',         type => 'PRINTER'    },
+    'canon'          => { manufacturer => 'Canon',           type => 'PRINTER'    },
+    'cisco'          => { manufacturer => 'Cisco',           type => 'NETWORKING' },
+    'dell'           => { manufacturer => 'Dell',                                 },
+    'designjet'      => { manufacturer => 'Hewlett-Packard', type => 'PRINTER'    },
+    'deskjet'        => { manufacturer => 'Hewlett-Packard', type => 'PRINTER'    },
+    'd-link'         => { manufacturer => 'D-Link',          type => 'NETWORKING' },
+    'eaton'          => { manufacturer => 'Eaton',           type => 'NETWORKING' },
+    'emc'            => { manufacturer => 'EMC',             type => 'STORAGE'    },
+    'enterasys'      => { manufacturer => 'Enterasys',       type => 'NETWORKING' },
+    'epson'          => { manufacturer => 'Epson',           type => 'PRINTER'    },
+    'extreme'        => { manufacturer => 'Extreme',         type => 'NETWORKING' },
+    'extremexos'     => { manufacturer => 'Extreme',         type => 'NETWORKING' },
+    'force10'        => { manufacturer => 'Force10',         type => 'NETWORKING' },
+    'foundry'        => { manufacturer => 'Foundry',         type => 'NETWORKING' },
+    'fuji'           => { manufacturer => 'Fuji',            type => 'NETWORKING' },
+    'h3c'            => { manufacturer => 'H3C',             type => 'NETWORKING' },
+    'hp'             => { manufacturer => 'Hewlett-Packard',                      },
+    'ibm'            => { manufacturer => 'IBM',             type => 'COMPUTER'   },
+    'juniper'        => { manufacturer => 'Juniper',         type => 'NETWORKING' },
+    'konica'         => { manufacturer => 'Konica',          type => 'PRINTER'    },
+    'kyocera'        => { manufacturer => 'Kyocera',         type => 'PRINTER'    },
+    'lexmark'        => { manufacturer => 'Lexmark',         type => 'PRINTER'    },
+    'netapp'         => { manufacturer => 'NetApp',          type => 'STORAGE'    },
+    'netgear'        => { manufacturer => 'NetGear',         type => 'NETWORKING' },
+    'nortel'         => { manufacturer => 'Nortel',          type => 'NETWORKING' },
+    'nrg'            => { manufacturer => 'NRG',             type => 'PRINTER'    },
+    'officejet'      => { manufacturer => 'Hewlett-Packard', type => 'PRINTER'    },
+    'oki'            => { manufacturer => 'OKI',             type => 'PRINTER'    },
+    'powerconnect'   => { manufacturer => 'PowerConnect',    type => 'NETWORKING' },
+    'procurve'       => { manufacturer => 'Hewlett-Packard', type => 'NETWORKING' },
+    'ricoh'          => { manufacturer => 'Ricoh',           type => 'PRINTER'    },
+    'sagem'          => { manufacturer => 'Sagem',           type => 'NETWORKING' },
+    'samsung'        => { manufacturer => 'Samsung',         type => 'PRINTER'    },
+    'sharp'          => { manufacturer => 'Sharp',           type => 'PRINTER'    },
+    'toshiba'        => { manufacturer => 'Toshiba',         type => 'PRINTER'    },
+    'wyse'           => { manufacturer => 'Wyse',            type => 'COMPUTER'   },
+    'xerox'          => { manufacturer => 'Xerox',           type => 'PRINTER'    },
+    'xirrus'         => { manufacturer => 'Xirrus',          type => 'NETWORKING' },
+    'zebranet'       => { manufacturer => 'Zebranet',        type => 'PRINTER'    },
+    'ztc'            => { manufacturer => 'ZTC',             type => 'NETWORKING' },
+    'zywall'         => { manufacturer => 'ZyWall',          type => 'NETWORKING' }
 );
 
 my @sysdescr_rules = (
@@ -95,42 +97,7 @@ my @sysdescr_rules = (
     {
         match  => qr/Linux TS-\d+/,
         type   => 'STORAGE',
-        vendor => 'Qnap'
-    },
-);
-
-# common base variables
-my %base_variables = (
-    CPU          => {
-        oid  => '.1.3.6.1.4.1.9.9.109.1.1.1.1.3.1',
-        type => 'count',
-    },
-    SNMPHOSTNAME => {
-        oid  => '.1.3.6.1.2.1.1.5.0',
-        type => 'string',
-    },
-    LOCATION     => {
-        oid  => '.1.3.6.1.2.1.1.6.0',
-        type => 'string',
-    },
-    CONTACT      => {
-        oid  => '.1.3.6.1.2.1.1.4.0',
-        type => 'string',
-    },
-    UPTIME       => {
-        oid  => '.1.3.6.1.2.1.1.3.0',
-        type => 'string',
-    },
-    MEMORY       => {
-        oid  => [
-            '.1.3.6.1.4.1.9.2.1.8.0',
-            '.1.3.6.1.2.1.25.2.3.1.5.1',
-        ],
-        type => 'memory',
-    },
-    RAM          => {
-        oid  => '.1.3.6.1.4.1.9.3.6.6.0',
-        type => 'memory',
+        manufacturer => 'Qnap'
     },
 );
 
@@ -138,7 +105,7 @@ my %base_variables = (
 my %interface_variables = (
     IFNUMBER         => {
         oid  => '.1.3.6.1.2.1.2.2.1.1',
-        type => 'none'
+        type => 'constant'
     },
     IFDESCR          => {
         oid  => '.1.3.6.1.2.1.2.2.1.2',
@@ -169,7 +136,7 @@ my %interface_variables = (
     },
     IFLASTCHANGE     => {
         oid  => '.1.3.6.1.2.1.2.2.1.9',
-        type => 'none'
+        type => 'string'
     },
     IFINOCTETS       => {
         oid  => '.1.3.6.1.2.1.2.2.1.10',
@@ -233,10 +200,16 @@ my %printer_pagecounters_variables = (
     },
     RECTOVERSO => { },
     SCANNED    => {
-        oid   => '.1.3.6.1.4.1.1347.46.10.1.1.5.3' #Kyocera specific counter ( total scan counter)
+        oid   => [
+            '.1.3.6.1.4.1.1347.46.10.1.1.5.3',    #Kyocera specific counter ( total scan counter)
+            '.1.3.6.1.4.1.1602.1.11.1.3.1.4.501'  #Canon specific counter
+        ]
     },
     PRINTTOTAL => {
-        oid   => '.1.3.6.1.4.1.1347.42.3.1.1.1.1.2' #Kyocera specific counter
+        oid   => [
+            '.1.3.6.1.4.1.1347.42.3.1.1.1.1.2',   #Kyocera specific counter
+            '.1.3.6.1.4.1.1602.1.11.1.3.1.4.301'  #Canon specific counter
+        ]
     },
     PRINTBLACK => {
         oid   => '.1.3.6.1.4.1.1347.42.3.1.2.1.1.1.1' #Kyocera specific counter
@@ -245,27 +218,45 @@ my %printer_pagecounters_variables = (
         oid   => '.1.3.6.1.4.1.1347.42.3.1.2.1.1.1.2' #Kyocera specific counter
     },
     COPYTOTAL  => {
-        oid   => '.1.3.6.1.4.1.1347.42.3.1.1.1.1.2' #Kyocera specific counter
+        oid   => [
+            '.1.3.6.1.4.1.1347.42.3.1.1.1.1.2',   #Kyocera specific counter
+            '.1.3.6.1.4.1.1602.1.11.1.3.1.4.101'  #Canon specific counter
+        ]
     },
     COPYBLACK  => {
-        oid   => '.1.3.6.1.4.1.1347.42.3.1.2.1.1.2.1' #Kyocera specific counter
+        oid   => [
+            '.1.3.6.1.4.1.1347.42.3.1.2.1.1.2.1', #Kyocera specific counter
+            '.1.3.6.1.4.1.1602.1.11.1.3.1.4.113'  #Canon specific counter
+        ]
+    },
+    COPYBLACK_A3  => {
+        oid   => '.1.3.6.1.4.1.1602.1.11.1.3.1.4.112' #Canon specific counter
     },
     COPYCOLOR  => {
-        oid   => '.1.3.6.1.4.1.1347.42.3.1.2.1.1.2.2' #Kyocera specific counter
+        oid   => [
+            '.1.3.6.1.4.1.1347.42.3.1.2.1.1.2.2', #Kyocera specific counter
+            '.1.3.6.1.4.1.1602.1.11.1.3.1.4.123'  #Canon specific counter
+        ]
+    },
+    COPYCOLOR_A3  => {
+        oid   => '.1.3.6.1.4.1.1602.1.11.1.3.1.4.122' #Canon specific counter
     },
     FAXTOTAL   => {
         oid   => '.1.3.6.1.4.1.1347.42.3.1.1.1.1.4'  #Kyocera specific counter
     }
 );
 
-sub getDeviceInfo {
+sub _getDevice {
     my (%params) = @_;
 
     my $snmp    = $params{snmp};
     my $datadir = $params{datadir};
     my $logger  = $params{logger};
 
-    my $device;
+    my $device = FusionInventory::Agent::SNMP::Device->new(
+        snmp   => $snmp,
+        logger => $logger
+    );
 
     # manufacturer, type and model identification attempt, using sysObjectID
     my $sysobjectid = $snmp->get('.1.3.6.1.2.1.1.2.0');
@@ -282,28 +273,43 @@ sub getDeviceInfo {
         $device->{EXTMOD}       = $match->{module} if $match->{module};
     }
 
-    # vendor and type identification attempt, using sysDescr
+    # manufacturer and type identification attempt, using sysDescr,
+    # if one of them is missing
     my $sysdescr = $snmp->get('.1.3.6.1.2.1.1.1.0');
     if ($sysdescr) {
+        $device->{DESCRIPTION} = getCanonicalString($sysdescr);
 
-        # first word
-        my ($first_word) = $sysdescr =~ /(\S+)/;
-        my $result = $sysdescr_first_word{lc($first_word)};
+        if (!exists $device->{MANUFACTURER} || !exists $device->{TYPE}) {
+            # first word
+            my ($first_word) = $sysdescr =~ /(\S+)/;
+            my $result = $sysdescr_first_word{lc($first_word)};
 
-        if ($result) {
-            $device->{VENDOR} = $result->{vendor} if $result->{vendor};
-            $device->{TYPE}   = $result->{type}   if $result->{type};
+            if ($result) {
+                $device->{MANUFACTURER} = $result->{manufacturer} if
+                    $result->{manufacturer} && !exists $device->{MANUFACTURER};
+                $device->{TYPE}   = $result->{type} if
+                    $result->{type}         && !exists $device->{TYPE};
+            }
+
+            # whole sysdescr value
+            foreach my $rule (@sysdescr_rules) {
+                next unless $sysdescr =~ $rule->{match};
+                $device->{MANUFACTURER} = $rule->{manufacturer} if
+                    $rule->{manufacturer} && !exists $device->{MANUFACTURER};
+                $device->{TYPE}   = $rule->{type} if
+                    $rule->{type}         && !exists $device->{TYPE};
+                last;
+            }
         }
-
-        # whole sysdescr value
-        foreach my $rule (@sysdescr_rules) {
-            next unless $sysdescr =~ $rule->{match};
-            $device->{VENDOR} = $rule->{vendor} if $rule->{vendor};
-            $device->{TYPE}   = $rule->{type}   if $rule->{type};
-            last;
-        }
-        $device->{DESCRIPTION} = $sysdescr;
     }
+
+    # load supported mibs regarding sysORID list as this list permits to
+    # identify device supported MIBs. But mib supported can also be tested
+    # regarding sysobjectid in some case, so we pass it as argument
+    $device->loadMibSupport($sysobjectid);
+
+    # Set type from MibSupport
+    $device->setType();
 
     # fallback type identification attempt, using type-specific OID presence
     if (!exists $device->{TYPE}) {
@@ -315,65 +321,42 @@ sub getDeviceInfo {
         }
     }
 
-    # fallback model identification attempt, using type-specific OID value
-    if (!exists $device->{MODEL}) {
-        my $model = exists $device->{TYPE} && $device->{TYPE} eq 'PRINTER' ?
-            $snmp->get('.1.3.6.1.2.1.25.3.2.1.3.1')    :
-            $snmp->get('.1.3.6.1.2.1.47.1.1.1.1.13.1') ;
-        $device->{MODEL} = $model if $model;
+    # Find and set model and manufacturer
+    $device->setModel();
+    $device->setManufacturer();
+
+    # Get some common informations like SNMPHOSTNAME, LOCATION, UPTIME and CONTACT
+    $device->setBaseInfos();
+
+    # Cleanup some strings from whitespaces
+    foreach my $key (qw(MODEL SNMPHOSTNAME LOCATION CONTACT)) {
+        next unless defined $device->{$key};
+        $device->{$key} = trimWhitespace($device->{$key});
+        # Don't keep empty strings
+        delete $device->{$key} if $device->{$key} eq '';
     }
 
-    # fallback manufacturer identification attempt, using type-agnostic OID
-    if (!exists $device->{MANUFACTURER}) {
-        my $manufacturer = $snmp->get('.1.3.6.1.2.1.43.8.2.1.14.1.1');
-        $device->{MANUFACTURER} = $manufacturer if $manufacturer;
-    }
+    # Find and set Mac address
+    $device->setMacAddress();
 
-    # fallback vendor, using manufacturer
-    if (!exists $device->{VENDOR} && exists $device->{MANUFACTURER}) {
-        $device->{VENDOR} = $device->{MANUFACTURER};
-    }
+    # Find device serial number
+    $device->setSerial();
 
-    # remaining informations
-    foreach my $key (keys %base_variables) {
-        my $variable = $base_variables{$key};
+    # Find device firmware
+    $device->setFirmware();
 
-        my $raw_value;
-        if (ref $variable->{oid} eq 'ARRAY') {
-            foreach my $oid (@{$variable->{oid}}) {
-                $raw_value = $snmp->get($oid);
-                last if defined $raw_value;
-            }
-        } else {
-            $raw_value = $snmp->get($variable->{oid});
-        }
-        next unless defined $raw_value;
-
-        my $type = $variable->{type};
-        my $value =
-            $type eq 'memory' ? _getCanonicalMemory($raw_value) :
-            $type eq 'string' ? _getCanonicalString($raw_value) :
-            $type eq 'count'  ? _getCanonicalCount($raw_value)  :
-                                $raw_value;
-
-        $device->{$key} = $value if defined $value;
-    }
-
-    my $mac = _getMacAddress($snmp);
-    $device->{MAC} = $mac if $mac;
-
-    my $serial = _getSerial($snmp, $device->{TYPE});
-    $device->{SERIAL} = $serial if $serial;
-
-    my $firmware = _getFirmware($snmp, $device->{TYPE});
-    $device->{FIRMWARE} = $firmware if $firmware;
-
-    my $results = $snmp->walk('.1.3.6.1.2.1.4.20.1.1');
-    $device->{IPS}->{IP} =  [
-        sort values %{$results}
-    ] if $results;
+    # Find ip
+    $device->setIp();
 
     return $device;
+}
+
+sub getDeviceInfo {
+    my (%params) = @_;
+
+    my $device = _getDevice(%params);
+
+    return $device->getDiscoveryInfo();
 }
 
 sub _getSysObjectIDInfo {
@@ -458,83 +441,6 @@ sub _loadSysObjectIDDatabase {
     close $handle;
 }
 
-sub _getSerial {
-    my ($snmp, $type) = @_;
-
-    # Entity-MIB::entPhysicalSerialNum
-    my $entPhysicalSerialNum = $snmp->get_first('.1.3.6.1.2.1.47.1.1.1.1.11');
-    return _getCanonicalSerialNumber($entPhysicalSerialNum)
-        if $entPhysicalSerialNum;
-
-    # Printer-MIB::prtGeneralSerialNumber
-    my $prtGeneralSerialNumber = $snmp->get_first('.1.3.6.1.2.1.43.5.1.1.17');
-    return _getCanonicalSerialNumber($prtGeneralSerialNumber)
-        if $prtGeneralSerialNumber;
-
-    # vendor specific OIDs
-    my @oids = (
-        '.1.3.6.1.4.1.2636.3.1.3.0',             # Juniper-MIB
-        '.1.3.6.1.4.1.248.14.1.1.9.1.10.1',      # Hirschman MIB
-        '.1.3.6.1.4.1.253.8.53.3.2.1.3.1',       # Xerox-MIB
-        '.1.3.6.1.4.1.367.3.2.1.2.1.4.0',        # Ricoh-MIB
-        '.1.3.6.1.4.1.641.2.1.2.1.6.1',          # Lexmark-MIB
-        '.1.3.6.1.4.1.1602.1.2.1.4.0',           # Canon-MIB
-        '.1.3.6.1.4.1.2435.2.3.9.4.2.1.5.5.1.0', # Brother-MIB
-        '.1.3.6.1.4.1.318.1.1.4.1.5.0',          # MasterSwitch-MIB
-        '.1.3.6.1.4.1.6027.3.8.1.1.5.0',         # F10-C-SERIES-CHASSIS-MIB
-        '.1.3.6.1.4.1.6027.3.10.1.2.2.1.12.1',   # FORCE10-SMI
-    );
-    foreach my $oid (@oids) {
-        my $value = $snmp->get($oid);
-        next unless $value;
-        return _getCanonicalSerialNumber($value);
-    }
-
-    return;
-}
-
-sub _getFirmware {
-    my ($snmp, $type) = @_;
-
-    my $entPhysicalSoftwareRev = $snmp->get_first('.1.3.6.1.2.1.47.1.1.1.1.10');
-    return $entPhysicalSoftwareRev if $entPhysicalSoftwareRev;
-
-    my $entPhysicalFirmwareRev = $snmp->get_first('.1.3.6.1.2.1.47.1.1.1.1.9');
-    return $entPhysicalFirmwareRev if $entPhysicalFirmwareRev;
-
-    my $ios_version = $snmp->get('.1.3.6.1.4.1.9.9.25.1.1.1.2.5');
-    return $ios_version if $ios_version;
-
-    my $firmware = $snmp->get('.1.3.6.1.4.1.248.14.1.1.2.0');
-    return $firmware if $firmware;
-
-    return;
-}
-
-sub _getMacAddress {
-    my ($snmp) = @_;
-
-    # use BRIDGE-MIB::dot1dBaseBridgeAddress if available
-    my $address_oid = ".1.3.6.1.2.1.17.1.1.0";
-    my $address = _getCanonicalMacAddress($snmp->get($address_oid));
-
-    return $address if $address && $address =~ /^$mac_address_pattern$/;
-
-    # fallback on ports addresses (IF-MIB::ifPhysAddress) if unique
-    my $addresses_oid = ".1.3.6.1.2.1.2.2.1.6";
-    my $addresses = $snmp->walk($addresses_oid);
-    my @addresses =
-        uniq
-        grep { $_ ne '00:00:00:00:00:00' }
-        grep { $_ }
-        map  { _getCanonicalMacAddress($_) }
-        values %{$addresses};
-
-    return $addresses[0] if @addresses && @addresses == 1;
-
-    return;
-}
-
 sub getDeviceFullInfo {
     my (%params) = @_;
 
@@ -542,8 +448,10 @@ sub getDeviceFullInfo {
     my $logger = $params{logger};
 
     # first, let's retrieve basic device informations
-    my $info = getDeviceInfo(%params);
-    return unless $info;
+    my $device = _getDevice(%params);
+    return unless $device;
+
+    my $info = $device->getDiscoveryInfo();
 
     # description is defined as DESCRIPTION for discovery
     # and COMMENTS for inventory
@@ -568,7 +476,10 @@ sub getDeviceFullInfo {
     $info->{TYPE} = $params{type} || $info->{TYPE};
 
     # second, use results to build the object
-    my $device = { INFO => $info };
+    $device->{INFO} = $info ;
+
+    # Set other requested infos
+    $device->setInventoryBaseInfos();
 
     _setGenericProperties(
         device => $device,
@@ -591,9 +502,9 @@ sub getDeviceFullInfo {
     ) if $info->{TYPE} && $info->{TYPE} eq 'NETWORKING';
 
     # external processing for the $device
-    if ($device->{INFO}->{EXTMOD}) {
+    if ($device->{EXTMOD}) {
         runFunction(
-            module   => "FusionInventory::Agent::Tools::Hardware::" . $device->{INFO}->{EXTMOD},
+            module   => __PACKAGE__ . "::" . $device->{EXTMOD},
             function => "run",
             logger   => $logger,
             params   => {
@@ -603,10 +514,10 @@ sub getDeviceFullInfo {
             },
             load     => 1
         );
-
-        # no need to send this to the server
-        delete $device->{INFO}->{EXTMOD};
     }
+
+    # Run any detected mib support
+    $device->runMibSupport();
 
     # convert ports hashref to an arrayref, sorted by interface number
     my $ports = $device->{PORTS}->{PORT};
@@ -620,7 +531,7 @@ sub getDeviceFullInfo {
         delete $device->{PORTS};
     }
 
-    return $device;
+    return $device->getInventory();
 }
 
 sub _setGenericProperties {
@@ -654,12 +565,13 @@ sub _setGenericProperties {
         # $prefix.$i = $value, with $i as port id
         while (my ($suffix, $raw_value) = each %{$results}) {
             my $value =
-                $type eq 'mac'      ? _getCanonicalMacAddress($raw_value) :
-                $type eq 'constant' ? _getCanonicalConstant($raw_value)   :
-                $type eq 'string'   ? _getCanonicalString($raw_value)     :
-                $type eq 'count'    ? _getCanonicalCount($raw_value)      :
+                $type eq 'mac'      ? getCanonicalMacAddress($raw_value) :
+                $type eq 'constant' ? getCanonicalConstant($raw_value)   :
+                $type eq 'string'   ? getCanonicalString($raw_value)     :
+                $type eq 'count'    ? getCanonicalCount($raw_value)      :
                                       $raw_value;
-            $ports->{$suffix}->{$key} = $value if defined $value;
+            $ports->{$suffix}->{$key} = $value
+                if defined $value && $value ne '';
         }
     }
 
@@ -682,13 +594,13 @@ sub _setGenericProperties {
         next unless $value;
         # safety checks
         if (! exists $ports->{$value}) {
-            $logger->warning(
+            $logger->debug(
                 "unknown interface $value for IP address $suffix, ignoring"
             ) if $logger;
             next;
         }
         if ($suffix !~ /^$ip_address_pattern$/) {
-            $logger->error("invalid IP address $suffix") if $logger;
+            $logger->debug("invalid IP address $suffix") if $logger;
             next;
         }
         $ports->{$value}->{IP} = $suffix;
@@ -730,7 +642,7 @@ sub _setPrinterProperties {
             $type = $consumable_types{$type_id};
         } else {
             # fallback on description
-            my $description = $descriptions->{$consumable_id};
+            my $description = getCanonicalString($descriptions->{$consumable_id});
             $type =
                 $description =~ /maintenance/i ? 'MAINTENANCEKIT' :
                 $description =~ /fuser/i       ? 'FUSERKIT'       :
@@ -739,21 +651,27 @@ sub _setPrinterProperties {
         }
 
         if (!$type) {
-            $logger->debug("unknown consumable type $type_id") if $logger;
+            $logger->debug("unknown consumable type $type_id: " .
+                (getCanonicalString($descriptions->{$consumable_id}) || "no description")
+            ) if $logger;
             next;
         }
 
         if ($type eq 'TONER' || $type eq 'DRUM' || $type eq 'CARTRIDGE' || $type eq 'DEVELOPER') {
             my $color;
-            if ($color_id) {
-                $color = _getCanonicalString($colors->{$color_id});
+            if ($colors && $color_id) {
+                $color = getCanonicalString($colors->{$color_id});
                 if (!$color) {
-                    $logger->debug("invalid color ID $color_id") if $logger;
+                    $logger->debug("invalid consumable color ID $color_id for : " .
+                        (getCanonicalString($descriptions->{$consumable_id}) || "no description")
+                    ) if $logger;
                     next;
                 }
+                # remove space and following char, XML tag does not accept space
+                $color =~ s/\s.*$//;
             } else {
                 # fallback on description
-                my $description = $descriptions->{$consumable_id};
+                my $description = getCanonicalString($descriptions->{$consumable_id});
                 $color =
                     $description =~ /cyan/i           ? 'cyan'    :
                     $description =~ /magenta/i        ? 'magenta' :
@@ -810,8 +728,8 @@ sub _setPrinterProperties {
             $value = $snmp->get($oid);
         }
         next unless defined $value;
-        if (!_isInteger($value)) {
-            $logger->error("incorrect counter value $value, check $variable->{mapping} mapping") if $logger;
+        if (!isInteger($value)) {
+            $logger->debug("incorrect counter value $value, check $variable->{mapping} mapping") if $logger;
             next;
         }
         $device->{PAGECOUNTERS}->{$key} = $value;
@@ -857,120 +775,20 @@ sub _setNetworkingProperties {
         ports  => $ports,
         logger => $logger
     );
+
+    $device->setComponents();
 }
 
 sub _getPercentValue {
     my ($value1, $value2) = @_;
 
-    return unless defined $value1 && _isInteger($value1);
-    return unless defined $value2 && _isInteger($value2);
+    return unless defined $value1 && isInteger($value1);
+    return unless defined $value2 && isInteger($value2);
     return if $value1 == 0;
 
     return int(
         ( 100 * $value2 ) / $value1
     );
-}
-
-sub _isInteger {
-    $_[0] =~ /^[+-]?\d+$/;
-}
-
-sub _getCanonicalMacAddress {
-    my ($value) = @_;
-
-    return unless $value;
-
-    my $result;
-    my @bytes;
-
-    # packed value, convert from binary to hexadecimal
-    if ($value =~ m/\A [[:ascii:]] \Z/xms) {
-        $value = unpack 'H*', $value;
-    }
-
-    # Check if it's a hex value
-    if ($value =~ /^(?:0x)?([0-9A-F]+)$/i) {
-        @bytes = unpack("(A2)*", $1);
-    } else {
-        @bytes = split(':', $value);
-        # return if bytes are not hex
-        return if grep(!/^[0-9A-F]{1,2}$/i, @bytes);
-    }
-
-    if (scalar(@bytes) == 6) {
-        # it's a MAC
-    } elsif (scalar(@bytes) == 8 &&
-        (($bytes[0] eq '10' && $bytes[1] =~ /^0+/) # WWN 10:00:...
-            || $bytes[0] =~ /^2/)) {               # WWN 2X:XX:...
-    } elsif (scalar(@bytes) < 6) {
-        # make a WWN. prepend "10" and zeroes as necessary
-        while (scalar(@bytes) < 7) { unshift @bytes, '00' }
-        unshift @bytes, '10';
-    } elsif (scalar(@bytes) > 6) {
-        # make a MAC. take 6 bytes from the right
-        @bytes = @bytes[-6 .. -1];
-    }
-
-    $result = join ":", map { sprintf("%02x", hex($_)) } @bytes;
-
-    return if $result eq '00:00:00:00:00:00';
-    return lc($result);
-}
-
-sub _getCanonicalString {
-    my ($value) = @_;
-
-    $value = hex2char($value);
-    return unless $value;
-
-    # truncate after first null-character
-    $value =~ s/\000.*$//;
-
-    # unquote string
-    $value =~ s/^\\?["']//;
-    $value =~ s/\\?["']$//;
-
-    return unless $value;
-
-    return $value;
-}
-
-sub _getCanonicalSerialNumber {
-    my ($value) = @_;
-
-    $value = hex2char($value);
-    return unless $value;
-
-    $value =~ s/[[:^print:]]//g;
-    $value =~ s/^\s+//;
-    $value =~ s/\s+$//;
-    $value =~ s/\.{2,}//g;
-    return unless $value;
-
-    return $value;
-}
-
-sub _getCanonicalMemory {
-    my ($value) = @_;
-
-    if ($value =~ /^(\d+) KBytes$/) {
-        return int($1 / 1024);
-    } else {
-        return int($value / 1024 / 1024);
-    }
-}
-
-sub _getCanonicalConstant {
-    my ($value) = @_;
-
-    return $value if _isInteger($value);
-    return $1 if $value =~ /\((\d+)\)$/;
-}
-
-sub _getCanonicalCount {
-    my ($value) = @_;
-
-    return _isInteger($value) ? $value  : undef;
 }
 
 sub _getElement {
@@ -1087,7 +905,7 @@ sub _addKnownMacAddresses {
     foreach my $port_id (keys %$mac_addresses) {
         # safety check
         if (! exists $ports->{$port_id}) {
-            $logger->error(
+            $logger->debug(
                 "invalid interface ID $port_id while setting known mac " .
                 "addresses, aborting"
             ) if $logger;
@@ -1118,6 +936,7 @@ sub _addKnownMacAddresses {
 
         # add remaining ones
         push @{$port->{CONNECTIONS}->{CONNECTION}->{MAC}}, @adresses;
+        @{$port->{CONNECTIONS}->{CONNECTION}->{MAC}} = uniq(@{$port->{CONNECTIONS}->{CONNECTION}->{MAC}});
     }
 }
 
@@ -1144,7 +963,7 @@ sub _getKnownMacAddresses {
         next unless defined $interface_id;
 
         my @bytes = split(/\./, $suffix);
-        shift @bytes if @bytes > 6;
+        shift @bytes while @bytes > 6;
 
         push @{$results->{$interface_id}},
             sprintf "%02x:%02x:%02x:%02x:%02x:%02x", @bytes;
@@ -1167,9 +986,9 @@ sub _getKnownMacAddressesDeprecatedOids {
         next unless defined $interface_id;
  
         push @{$results->{$interface_id}},
-            _getCanonicalMacAddress($address2mac->{$suffix});
+            getCanonicalMacAddress($address2mac->{$suffix});
     }
-   
+
     return $results;
 }
 
@@ -1184,8 +1003,8 @@ sub _setConnectedDevices {
         foreach my $interface_id (keys %$lldp_info) {
             # safety check
             if (! exists $ports->{$interface_id}) {
-                $logger->warning(
-                    "unknown interface $interface_id in LLDP info, ignoring"
+                $logger->debug(
+                    "LLDP support: unknown interface $interface_id in LLDP info, ignoring"
                 ) if $logger;
                 next;
             }
@@ -1205,8 +1024,8 @@ sub _setConnectedDevices {
         foreach my $interface_id (keys %$cdp_info) {
             # safety check
             if (! exists $ports->{$interface_id}) {
-                $logger->warning(
-                    "unknown interface $interface_id in CDP info, ignoring"
+                $logger->debug(
+                    "CDP support: unknown interface $interface_id in CDP info, ignoring"
                 ) if $logger;
                 next;
             }
@@ -1216,15 +1035,29 @@ sub _setConnectedDevices {
             my $cdp_connection  = $cdp_info->{$interface_id};
 
             if ($lldp_connection) {
-                if ($cdp_connection->{SYSDESCR} eq $lldp_connection->{SYSDESCR}) {
+                my $match = 0;
+
+                # Try different case to find LLDP/CDP connection match
+                if ($lldp_connection->{SYSDESCR} && $cdp_connection->{SYSDESCR} eq $lldp_connection->{SYSDESCR}) {
+                    $match ++;
+                } elsif ($lldp_connection->{SYSNAME} && $cdp_connection->{SYSNAME}) {
+                    my $cdp_test = getCanonicalMacAddress($cdp_connection->{SYSNAME});
+                    if ($cdp_connection->{SYSNAME} eq $lldp_connection->{SYSNAME}) {
+                        $match ++;
+                    } elsif ($lldp_connection->{SYSMAC} && $cdp_test && $lldp_connection->{SYSMAC} eq $cdp_test) {
+                        $match ++;
+                    }
+                }
+
+                if ($match) {
                     # same device, everything OK
                     foreach my $key (qw/IP MODEL/) {
                         $lldp_connection->{$key} = $cdp_connection->{$key};
                     }
                 } else {
                     # undecidable situation
-                    $logger->warning(
-                        "multiple neighbors found by LLDP and CDP for " .
+                    $logger->debug(
+                        "CDP support: multiple neighbors found by LLDP and CDP for " .
                         "interface $interface_id, ignoring"
                     );
                     delete $port->{CONNECTIONS};
@@ -1243,8 +1076,8 @@ sub _setConnectedDevices {
         foreach my $interface_id (keys %$edp_info) {
             # safety check
             if (! exists $ports->{$interface_id}) {
-                $logger->warning(
-                    "unknown interface $interface_id in EDP info, ignoring"
+                $logger->debug(
+                    "EDP support: unknown interface $interface_id in EDP info, ignoring"
                 ) if $logger;
                 next;
             }
@@ -1261,8 +1094,8 @@ sub _setConnectedDevices {
                     }
                 } else {
                     # undecidable situation
-                    $logger->warning(
-                        "multiple neighbors found by LLDP and EDP for " .
+                    $logger->debug(
+                        "EDP support: multiple neighbors found by LLDP and EDP for " .
                         "interface $interface_id, ignoring"
                     );
                     delete $port->{CONNECTIONS};
@@ -1281,8 +1114,10 @@ sub _getLLDPInfo {
     my (%params) = @_;
 
     my $snmp   = $params{snmp};
+    my $logger = $params{logger};
 
     my $results;
+    my $ChassisIdSubType = $snmp->walk('.1.0.8802.1.1.2.1.4.1.1.4');
     my $lldpRemChassisId = $snmp->walk('.1.0.8802.1.1.2.1.4.1.1.5');
     my $lldpRemPortId    = $snmp->walk('.1.0.8802.1.1.2.1.4.1.1.7');
     my $lldpRemPortDesc  = $snmp->walk('.1.0.8802.1.1.2.1.4.1.1.8');
@@ -1298,27 +1133,60 @@ sub _getLLDPInfo {
     # $prefix.x.y.z = $value
     # whereas y is either a port or an interface id
 
+    # See LldpChassisIdSubtype textual convention in lldp.mib RFC
+    # We only report macAddress='4' at the moment
+    my %not_supported_subtype = (
+        '1' => "chassis component",
+        '2' => "interface alias",
+        '3' => "port component",
+        '5' => "network address",
+        '6' => "interface name",
+        '7' => "local"
+    );
+
     while (my ($suffix, $mac) = each %{$lldpRemChassisId}) {
-        my $sysdescr = _getCanonicalString($lldpRemSysDesc->{$suffix});
-        next unless $sysdescr;
+        my $sysdescr = getCanonicalString($lldpRemSysDesc->{$suffix});
+        my $sysname = getCanonicalString($lldpRemSysName->{$suffix});
+        next unless ($sysdescr || $sysname);
 
-        my $connection = {
-            SYSMAC   => lc(alt2canonical($mac)),
-            SYSDESCR => $sysdescr
-        };
-
-        # portId is either a port number or a port mac address,
-        # duplicating chassiId
-        my $portId = $lldpRemPortId->{$suffix};
-        if ($portId !~ /^0x/ or length($portId) != 14) {
-            $connection->{IFNUMBER} = $portId;
+        # Skip unexpected suffix format (seen at least on mikrotik devices)
+        if ($suffix =~ /^\d+$/) {
+            $logger->debug2("LLDP support: skipping unsupported suffix interface $suffix")
+                if ($logger);
+            next;
         }
 
-        my $ifdescr = _getCanonicalString($lldpRemPortDesc->{$suffix});
-        $connection->{IFDESCR} = $ifdescr if $ifdescr;
+        # Skip unsupported LldpChassisIdSubtype
+        my $subtype = $ChassisIdSubType->{$suffix} || "n/a";
+        unless ($subtype eq '4') {
+            if ($logger) {
+                my $info = ($sysname || "no name") . ", " .
+                    (getCanonicalString($mac) || "no chassis id") . ", " .
+                    ($sysdescr || "no description");
+                if ($not_supported_subtype{$subtype}) {
+                    $logger->debug("LLDP support: skipping $not_supported_subtype{$subtype}: $info");
+                } else {
+                    $logger->debug("LLDP support: ChassisId subtype $subtype not supported for <$info>, please report this issue");
+                }
+            }
+            next;
+        }
 
-        my $sysname = _getCanonicalString($lldpRemSysName->{$suffix});
+        my $connection = {
+            SYSMAC => lc(alt2canonical($mac))
+        };
+        $connection->{SYSDESCR} = $sysdescr if $sysdescr;
         $connection->{SYSNAME} = $sysname if $sysname;
+
+        # portId is either a port number or a port mac address,
+        # duplicating chassisId
+        my $portId = $lldpRemPortId->{$suffix};
+        if ($portId !~ /^0x/ or length($portId) != 14) {
+            $connection->{IFNUMBER} = getCanonicalString($portId);
+        }
+
+        my $ifdescr = getCanonicalString($lldpRemPortDesc->{$suffix});
+        $connection->{IFDESCR} = $ifdescr if $ifdescr;
 
         my $id           = _getElement($suffix, -2);
         my $interface_id =
@@ -1352,10 +1220,10 @@ sub _getCDPInfo {
     while (my ($suffix, $ip) = each %{$cdpCacheAddress}) {
         my $interface_id = _getElement($suffix, -2);
         $ip = hex2canonical($ip);
-        next if $ip eq '0.0.0.0';
+        next if (!defined($ip) || $ip eq '0.0.0.0');
 
-        my $sysdescr = _getCanonicalString($cdpCacheVersion->{$suffix});
-        my $model    = _getCanonicalString($cdpCachePlatform->{$suffix});
+        my $sysdescr = getCanonicalString($cdpCacheVersion->{$suffix});
+        my $model    = getCanonicalString($cdpCachePlatform->{$suffix});
         next unless $sysdescr && $model;
 
         my $connection = {
@@ -1369,7 +1237,7 @@ sub _getCDPInfo {
         if ($devicePort =~ /^\d+$/) {
             $connection->{IFNUMBER} = $devicePort;
         } else {
-            $connection->{IFDESCR} = $devicePort;
+            $connection->{IFDESCR} = getCanonicalString($devicePort);
         }
 
         # cdpCacheDeviceId is either remote host name, either remote mac address
@@ -1380,7 +1248,7 @@ sub _getCDPInfo {
                 $connection->{SYSMAC} = lc(alt2canonical($deviceId));
             } else {
                 # otherwise it's an hex-encode hostname
-                $connection->{SYSNAME} = _getCanonicalString($deviceId);
+                $connection->{SYSNAME} = getCanonicalString($deviceId);
             }
         } else {
             $connection->{SYSNAME} = $deviceId;
@@ -1388,14 +1256,14 @@ sub _getCDPInfo {
 
         if ($connection->{SYSNAME} &&
             $connection->{SYSNAME} =~ /^SIP([A-F0-9a-f]*)$/) {
-            $connection->{MAC} = lc(alt2canonical("0x".$1));
+            $connection->{SYSMAC} = lc(alt2canonical("0x".$1));
         }
 
         # warning: multiple neighbors announcement for the same interface
         # usually means a non-CDP aware intermediate equipement
         if ($results->{$interface_id}) {
-            $logger->warning(
-                "multiple neighbors found by CDP for interface $interface_id," .
+            $logger->debug(
+                "CDP support: multiple neighbors found by CDP for interface $interface_id," .
                 " ignoring"
             );
             $blacklist->{$interface_id} = 1;
@@ -1433,7 +1301,7 @@ sub _getEDPInfo {
     # - z1.z2...zz: the vlan name in ASCII
 
     while (my ($suffix, $ip) = each %{$edpNeighborVlanIpAddress}) {
-        next if $ip eq '0.0.0.0';
+        next if (!defined($ip) || $ip eq '0.0.0.0');
 
         my $interface_id = _getElement($suffix, 0);
         my @mac_elements = _getElements($suffix, 3, 8);
@@ -1441,16 +1309,16 @@ sub _getEDPInfo {
 
         my $connection = {
             IP       => $ip,
-            IFDESCR  => $edpNeighborPort->{$short_suffix},
-            SYSNAME  => $edpNeighborName->{$short_suffix},
+            IFDESCR  => getCanonicalString($edpNeighborPort->{$short_suffix}),
+            SYSNAME  => getCanonicalString($edpNeighborName->{$short_suffix}),
             SYSMAC   => sprintf "%02x:%02x:%02x:%02x:%02x:%02x", @mac_elements
         };
 
         # warning: multiple neighbors announcement for the same interface
         # usually means a non-EDP aware intermediate equipement
         if ($results->{$interface_id}) {
-            $logger->warning(
-                "multiple neighbors found by EDP for interface $interface_id," .
+            $logger->debug(
+                "EDP support: multiple neighbors found by EDP for interface $interface_id," .
                 " ignoring"
             );
             $blacklist->{$interface_id} = 1;
@@ -1480,7 +1348,7 @@ sub _setVlans {
     foreach my $port_id (keys %$vlans) {
         # safety check
         if (! exists $ports->{$port_id}) {
-            $logger->error(
+            $logger->debug(
                 "invalid interface ID $port_id while setting vlans, aborting"
             ) if $logger;
             last;
@@ -1506,7 +1374,7 @@ sub _getVlans {
         foreach my $suffix (sort keys %{$vmPortStatus}) {
             my $port_id = _getElement($suffix, -1);
             my $vlan_id = $vmPortStatus->{$suffix};
-            my $name    = $vtpVlanName->{$vlan_id};
+            my $name    = getCanonicalString($vtpVlanName->{$vlan_id});
 
             push @{$results->{$port_id}}, {
                 NUMBER => $vlan_id,
@@ -1515,14 +1383,36 @@ sub _getVlans {
         }
     }
 
-    # For other switches, we use another method
-    my $vlanId = $snmp->walk('.1.0.8802.1.1.2.1.5.32962.1.2.1.1.1');
-    if($vlanId){
-        while (my ($port, $vlan) = each %{$vlanId}) {
-            push @{$results->{$port}}, {
-                NUMBER => $vlan,
-                NAME   => "VLAN " . $vlan
-            };
+    # For other switches, we use another methods
+    # used for Alcatel-Lucent and ExtremNetworks (and perhaps others)
+    my $vlanIdName = $snmp->walk('.1.0.8802.1.1.2.1.5.32962.1.2.3.1.2');
+    my $portLink = $snmp->walk('.1.0.8802.1.1.2.1.3.7.1.3');
+    if($vlanIdName && $portLink){
+        foreach my $suffix (sort keys %{$vlanIdName}) {
+            my ($port, $vlan) = split(/\./, $suffix);
+            if ($portLink->{$port}) {
+                # case generic where $portLink = port number
+                my $portnumber = $portLink->{$port};
+                # case Cisco where $portLink = port name
+                unless ($portLink->{$port} =~ /^[0-9]+$/) {
+                    $portnumber = $port;
+                }
+                push @{$results->{$portnumber}}, {
+                    NUMBER => $vlan,
+                    NAME   => getCanonicalString($vlanIdName->{$suffix})
+                };
+            }
+        }
+    } else {
+        # A last method
+        my $vlanId = $snmp->walk('.1.0.8802.1.1.2.1.5.32962.1.2.1.1.1');
+        if($vlanId){
+            foreach my $port (sort keys %{$vlanId}) {
+                push @{$results->{$port}}, {
+                    NUMBER => $vlanId->{$port},
+                    NAME   => "VLAN " . $vlanId->{$port}
+                };
+            }
         }
     }
 
@@ -1543,7 +1433,7 @@ sub _setTrunkPorts {
     foreach my $port_id (keys %$trunk_ports) {
         # safety check
         if (! exists $ports->{$port_id}) {
-            $logger->error(
+            $logger->debug(
                 "invalid interface ID $port_id while setting trunk flag, " .
                 "aborting"
             ) if $logger;
@@ -1582,7 +1472,9 @@ sub _getTrunkPorts {
         my $port2interface = $snmp->walk('.1.3.6.1.2.1.17.1.4.1.2');
         while (my ($suffix, $value) = each %{$accessMode}) {
             my $port_id = _getElement($suffix, -1);
+            next unless defined($port_id);
             my $interface_id = $port2interface->{$port_id};
+            next unless defined($interface_id);
             $results->{$interface_id} = $value == 2 ? 1 : 0;
         }
         return $results;
@@ -1619,7 +1511,7 @@ sub _setAggregatePorts {
         foreach my $interface_id (keys %$lacp_info) {
             # safety check
             if (!$ports->{$interface_id}) {
-                $logger->warning(
+                $logger->debug(
                     "unknown interface $interface_id in LACP info, ignoring"
                 ) if $logger;
                 next;
@@ -1633,7 +1525,7 @@ sub _setAggregatePorts {
         foreach my $interface_id (keys %$pagp_info) {
             # safety check
             if (!$ports->{$interface_id}) {
-                $logger->error(
+                $logger->debug(
                     "unknown interface $interface_id in PAGP info, ignoring"
                 ) if $logger;
                 next;

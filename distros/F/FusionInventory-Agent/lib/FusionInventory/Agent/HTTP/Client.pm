@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use English qw(-no_match_vars);
+use URI;
 use HTTP::Status;
 use LWP::UserAgent;
 use UNIVERSAL::require;
@@ -54,13 +55,36 @@ sub new {
 }
 
 sub request {
-    my ($self, $request, $file) = @_;
+    my ($self, $request, $file, $no_proxy_host, $timeout) = @_;
 
-    my $logger  = $self->{logger};
+    my $logger = $self->{logger};
+
+    # Save current timeout to restore it before leaving
+    my $current_timeout = $self->{ua}->timeout();
+    $self->{ua}->timeout($timeout)
+        if defined($timeout);
 
     my $url = $request->uri();
     my $scheme = $url->scheme();
     $self->_setSSLOptions() if $scheme eq 'https' && !$self->{ssl_set};
+
+    # Avoid to use proxy if requested
+    if ($no_proxy_host) {
+        $self->{ua}->no_proxy($no_proxy_host);
+    } elsif ($self->{ua}->proxy($scheme)) {
+        # keep proxy trace if one may be used
+        my $proxy_uri = URI->new($self->{ua}->proxy($scheme));
+        if ($proxy_uri->userinfo) {
+            # Obfuscate proxy password if present
+            my ($proxy_user, $proxy_pass) = split(':', $proxy_uri->userinfo);
+            $proxy_uri->userinfo( $proxy_user.":".('X' x length($proxy_pass)) )
+                if ($proxy_pass);
+        }
+        $logger->debug(
+            $log_prefix .
+            "Using '".$proxy_uri->as_string()."' as proxy for $scheme protocol"
+        );
+    }
 
     my $result = HTTP::Response->new( 500 );
     eval {
@@ -113,13 +137,27 @@ sub request {
                     "authentication required, no credentials available"
                 );
             }
-        } else {
+
+        } elsif ($result->code() == 407) {
             $logger->error(
                 $log_prefix .
-                "communication error: " . $result->status_line()
+                "proxy authentication required, wrong or no proxy credentials"
+            );
+
+        } else {
+            # check we request through a proxy
+            my $proxyreq = defined $result->request->{proxy};
+
+            $logger->error(
+                $log_prefix .
+                ($proxyreq ? "proxy" : "communication") .
+                " error: " . $result->status_line()
             );
         }
     }
+
+    # Always restore timeout
+    $self->{ua}->timeout($current_timeout);
 
     return $result;
 }
@@ -145,8 +183,12 @@ sub _setSSLOptions {
             "(workaround: use 'no-ssl-check' configuration parameter)"
             if $EVAL_ERROR;
 
-        if ($self->{logger}{verbosity} > LOG_DEBUG2) {
-            $Net::SSLeay::trace = 2;
+        # Activate SSL Debug if Stderr is in backends
+        my $DEBUG_SSL = 0;
+        $DEBUG_SSL = grep { ref($_) =~/Stderr$/ } @{$self->{logger}{backends}}
+            if (ref($self->{logger}{backends}) eq 'ARRAY');
+        if ( $DEBUG_SSL && $self->{logger}->debug_level() >= 2 ) {
+            $Net::SSLeay::trace = 3;
         }
 
         if ($LWP::VERSION >= 6) {

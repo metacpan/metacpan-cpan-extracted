@@ -2,7 +2,7 @@ package FusionInventory::Test::Utils;
 
 use strict;
 use warnings;
-use base 'Exporter';
+use parent 'Exporter';
 
 use English qw(-no_match_vars);
 use IPC::Run qw(run);
@@ -28,13 +28,13 @@ sub test_port {
     my $paddr = sockaddr_in($port, $iaddr);
     my $proto = getprotobyname('tcp');
     if (socket(my $socket, PF_INET, SOCK_STREAM, $proto)) {
-        if (connect($socket, $paddr)) {
+        if (bind($socket, $paddr)) {
             close $socket;
-            return 0;
+            return 1;
         }
     }
 
-    return 1;
+    return 0;
 }
 
 sub test_localhost {
@@ -48,7 +48,13 @@ sub mockGetWMIObjects {
     return sub {
         my (%params) = @_;
 
-        my $file = "resources/win32/wmi/$test-$params{class}.wmi";
+        my $class = $params{class};
+        if (!$class) {
+            my $query = $params{query};
+            $query = shift @{$query} if ref($query) eq 'ARRAY';
+            ($class) = $query =~ /FROM\s+(\w+)/i ;
+        }
+        my $file = "resources/win32/wmi/$test-$class.wmi";
         return loadWMIDump($file, $params{properties});
     };
 }
@@ -69,6 +75,7 @@ sub loadWMIDump {
     my $object;
     while (my $line = <$handle>) {
         chomp $line;
+        next if $line =~ /^#/;
 
         if ($line =~ /^ (\w+) = (.+) $/x) {
             my $key = $1;
@@ -106,7 +113,9 @@ sub mockGetRegistryKey {
     return sub {
         my (%params) = @_;
 
-        my $last_elt = (split(/\//, $params{path}))[-1];
+        # We can mock getRegistryKey or better _getRegistryKey to cover getRegistryValue
+        my $path = $params{path} || $params{keyName};
+        my $last_elt = (split(/\//, $path))[-1];
         my $file = "resources/win32/registry/$test-$last_elt.reg";
         return loadRegistryDump($file);
     };
@@ -140,7 +149,7 @@ sub loadRegistryDump {
                     my $key_path = $element . '/';
 
                     if (!defined $current_key->{$key_path}) {
-                        my $new_key = {};
+                        my $new_key = bless( {}, "Win32::TieRegistry" );
                         $current_key->{$key_path} = $new_key;
                     }
 
@@ -165,10 +174,18 @@ sub loadRegistryDump {
             next;
         }
 
-        if ($line =~ /^ " ([^"]+) " = " ([^"]+) "/x) {
+        if ($line =~ /^ " ([^"]+) " = " ([^"]*) "/x) {
             my ($key, $value) = ($1, $2);
             $value =~ s{\\\\}{\\}g;
             $current_key->{'/' . $key} = $value;
+            next;
+        }
+
+        # Default key value
+        if ($line =~ /^ \@ = " ([^"]*) "/x) {
+            my $value = $1;
+            $value =~ s{\\\\}{\\}g;
+            $current_key->{'/'} = $value;
             next;
         }
 
@@ -182,6 +199,8 @@ sub loadRegistryDump {
 
     }
     close $handle;
+
+    bless( $root_key, "Win32::TieRegistry" );
 
     return $root_key;
 }
@@ -211,19 +230,22 @@ sub run_executable {
 sub openWin32Registry {
 
     my $Registry;
+    my ($norecursion) = @_;
     Win32::TieRegistry->require();
     Win32::TieRegistry->import(
         Delimiter   => '/',
         TiedRef     => \$Registry
     );
 
-    my $agentKey = 'FusionInventory-Agent';
+    my $agentKey = 'FusionInventory-Agent-unittest';
     my $machKey = $Registry->{'LMachine'};
     my $settings  = $machKey->Open('SOFTWARE/' . $agentKey, { 'Delimiter' => '/' });
     if (! defined($settings)) {
+        die "\nFailed to create HKEY_LOCAL_MACHINE/SOFTWARE/$agentKey key, be sure to run this win32 test with Administrator privileges"
+            if $norecursion;
         $settings = $machKey->Open('SOFTWARE', { 'Delimiter' => '/' });
         $settings->{$agentKey} = {};
-        $settings = openWin32Registry();
+        $settings = openWin32Registry('no-recursion');
     }
 
     return $settings;

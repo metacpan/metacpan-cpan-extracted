@@ -31,9 +31,17 @@ sub new {
     };
     bless $self, $class;
 
+    $self->setTrustedAddresses(%params);
+
+    return $self;
+}
+
+sub setTrustedAddresses {
+    my ($self, %params) = @_;
+
     # compute addresses allowed for push requests
     foreach my $target ($self->{agent}->getTargets()) {
-        next unless $target->isa('FusionInventory::Agent::Target::Server');
+        next unless $target->isType('server');
         my $url  = $target->getUrl();
         my $host = URI->new($url)->host();
         my @addresses = compile($host, $self->{logger});
@@ -45,8 +53,6 @@ sub new {
             $self->{trust}->{$string} = \@addresses if @addresses;
         }
     }
-
-    return $self;
 }
 
 sub _handle {
@@ -139,12 +145,12 @@ sub _handle_root {
 
     my @server_targets =
         map { { name => $_->getUrl(), date => $_->getFormatedNextRunDate() } }
-        grep { $_->isa('FusionInventory::Agent::Target::Server') }
+        grep { $_->isType('server') }
         $self->{agent}->getTargets();
 
     my @local_targets =
         map { { name => $_->getPath(), date => $_->getFormatedNextRunDate() } }
-        grep { $_->isa('FusionInventory::Agent::Target::Local') }
+        grep { $_->isType('local') }
         $self->{agent}->getTargets();
 
     my $hash = {
@@ -183,9 +189,12 @@ sub _handle_deploy {
     }
 
     my $path;
+    my $count = 0;
     LOOP: foreach my $target ($self->{agent}->getTargets()) {
-        foreach (File::Glob::glob($target->{storage}->getDirectory() . "/deploy/fileparts/shared/*")) {
+        foreach (File::Glob::bsd_glob($target->{storage}->getDirectory() . "/deploy/fileparts/shared/*")) {
             next unless -f $_.'/'.$subFilePath;
+
+            $count ++;
 
             my $sha = Digest::SHA->new('512');
             $sha->addfile($_.'/'.$subFilePath, 'b');
@@ -199,7 +208,12 @@ sub _handle_deploy {
         $client->send_file_response($path);
         return 200;
     } else {
-        $client->send_error(404);
+        if ($count) {
+            $client->send_error(404);
+        } else {
+            # Report this agent as nothing to share
+            $client->send_error(404, 'Nothing found');
+        }
         return 404;
     }
 }
@@ -213,11 +227,11 @@ sub _handle_now {
 
     BLOCK: {
         foreach my $target ($self->{agent}->getTargets()) {
-            next unless $target->isa('FusionInventory::Agent::Target::Server');
+            next unless $target->isType('server');
             my $url       = $target->getUrl();
             my $addresses = $self->{trust}->{$url};
             next unless isPartOf($clientIp, $addresses, $logger);
-            $target->setNextRunDate(1);
+            $target->setNextRunDateFromNow();
             $code    = 200;
             $message = "OK";
             $trace   = "rescheduling next contact for target $url right now";
@@ -226,7 +240,7 @@ sub _handle_now {
 
         if ($self->_isTrusted($clientIp)) {
             foreach my $target ($self->{agent}->getTargets()) {
-                $target->setNextRunDate(1);
+                $target->setNextRunDateFromNow();
             }
             $code    = 200;
             $message = "OK";
@@ -297,7 +311,7 @@ sub init {
         LocalAddr => $self->{ip},
         LocalPort => $self->{port},
         Reuse     => 1,
-        Timeout   => 5,
+        Timeout   => 1,
         Blocking  => 0
     );
 
@@ -311,6 +325,41 @@ sub init {
     );
 
     return 1;
+}
+
+sub needToRestart {
+    my ($self, %params) = @_;
+
+    # If no httpd daemon was started, we need to really start it
+    return 1 unless $self->{listener};
+
+    # Restart httpd daemon if ip or port changed
+    return 1 if ($params{ip} && (!$self->{ip} || $params{ip} ne $self->{ip}));
+    return 1 if ($params{port} && (!$self->{port} || $params{port} ne $self->{port}));
+
+    # Logger may have changed, but then resetting logger ref is sufficient
+    $self->{logger} = $params{logger};
+    $self->{logger}->debug2(
+        $log_prefix . "HTTPD service still listening on port $self->{port}"
+    );
+
+    # Be sure to reset computed trusted addresses
+    delete $self->{trust};
+    $self->setTrustedAddresses(%params);
+
+    return 0;
+}
+
+sub stop {
+    my ($self) = @_;
+
+    return unless $self->{listener};
+
+    $self->{listener}->shutdown(2);
+
+    $self->{logger}->debug($log_prefix . "HTTPD service stopped");
+
+    delete $self->{listener};
 }
 
 sub handleRequests {

@@ -1,5 +1,376 @@
 Revision history for FusionInventory agent
 
+2.4.3 Fri, 22 Feb 2019
+
+core:
+* fix some cases where a file handle was not closed
+* win32: fix a handle leak case when agent was running as service
+* Fix #637: Don't depend on GNU install during "make install" to support
+  more Unix systems
+* daemon/service: reload target when the stat file has been updated by
+  another script to use the updated next run timeout
+* For server target, server connection attempts are delayed from 60 seconds,
+  doubled at each new failed attempt, now until reaching max defined by delaytime
+  configuration parameter.
+
+inventory:
+* Bump Inventory task version to 1.6
+* win32 antivirus support update:
+ - nicer product name report for ESET
+ - report expiration date for ESET
+* Fix #582: Add other Acer monitors support
+* Fix #687: Virtuozzo inventory task doesn't include first container
+* Add few minor fix to virtuozzo containers inventory
+* Fix LXC containers support to support recent LXC versions
+* Fix #625: Container UUID is the same than host UUID
+* Fix #624: Skip incomplete battery infos from dmidecode (seen on MacOS)
+* Fix #631: Fix duplicated memory inventory on MacOS
+* linux: fix storage size inventory
+* linux: try to set storage serialnumber from mbr partition id or even
+  PV UUID when not found (hdparm missing or virtual drive)
+* Fix #604: Only inventory Windows Store on recent win32 platforms
+* Fix #596: Openstack container seen as Physical on win32
+* Fix #593: Correct detection of machine type when /var/log/dmesg is too short
+* Fix #583: Add BitDefender antivirus support
+* Updated pci.ids to 2019.02.20 version
+* Updated usb.ids to 2019.01.17 version
+
+netdiscovery/netinventory:
+* Bump NetDiscovery task version to 2.8
+* Bump NetInventory task version to 3.2
+* Add BlueCoat proxy appliance serialnumber support
+* win32: Support arp table check for NetDiscovery task
+* Fix #634: Net::Ping version may not numeric with win32 installer
+* Add Panasas PanFS support
+* Add few HP/Compaq serialnumber cases support
+* Fix #605: try 'ip neighbor show' if 'arp' is not available for netdiscovery
+* Add UPS-MIB support for Riello, S2S & APC
+* Updated sysobject.ids (tagged fia-2.4.3 tag on github repository)
+
+2.4.2 Wed, 03 Oct 2018
+
+core:
+* Linux: fix agent not listening on http port when syslog logger is active
+  and Sys::Sylog module is too old
+
+inventory:
+* Bump Inventory task version to 1.5
+* Fix physical memory error correction detection via WMI under win32
+* Fix #299: Added UWP/APPX/Windows Store software inventory
+* win32 antivirus detection enhanced support:
+  - add support for few antivirus base versions (defender, kaspersky,
+    EST, avira, MSE, McAfee, F-Secure)
+  - try to set license expiration date for F-Secure, kaspersky & avira
+* Fix #442: kaspersky not fully recognized in russia
+* Fix #501: wrong status was reported when windows defender was disabled
+* Enhanced software inventory under Arch Linux
+* Fix #453: under MacOS, skip XML DTD validation for software inventory as
+  parsing may fail if a proxy is enabled
+* Fix #473: fix arch detection under MacOS
+* Fix #475: fix video cards support under MacOS
+* Fix #504: support non-standard ssh port to report local ssh server pubkey
+* Updated pci.ids to 2018.10.02 version
+* Updated usb.ids to 2018.08.15 version
+
+deploy:
+* Bump Deploy task version to 2.7
+* Fix deployment of private packages: their downloaded parts were not
+  fully found when download were too long (closes: #542)
+* Handle retention duration differently for p2p and not p2p files
+* P2p files have a default retention of 3 days by default
+* P2p files have a default retention of 3 times the target prolog delay
+  after download, parts retention is reset to the same delay for all file parts,
+  so the retention duration applies at the time parts has been downloaded
+* P2p file parts are now cleaned up after job success if retention duration
+  is null
+* Fix WinKeyNotEquals audit check to also be true when the registry key is
+  simply missing
+* Add support to "startjob" key for failing deploy audit check to permit
+  to skip remaining checks when a failing condition makes them obsolete.
+
+esx:
+* Bump ESX task version to 2.4
+* Support 2 ServiceTags case to cover chassis & lame board S/N inventory
+* Updated AssetTag support
+* fix wrong cpu core computation when only one package is available
+
+netdiscovery/netinventory:
+* Bump NetDiscovery task version to 2.7
+* Bump NetInventory task version to 3.1
+* Thanks to @QuickNerd357, Brocade devices will now show serial number and
+  firmware informations.
+* Sanitize VLAN names. This fixes an issue with Cisco Small Business Switches.
+* Get rid of unofficial Net::Ping::TimeStamp support to only use official
+  support if available. Net::Ping v2.67 is now mandatory to discover
+  devices thanks to timestamp ping.
+* Fix #481: Add Synology NAS support
+* Fix #480: Add CheckPoint support
+* Fix #488: Update HP Printers support
+* Updated LLDP/CDP connection match checks
+* Updated sysobject.ids (tagged fia-2.4.2 tag on github repository)
+
+collect:
+* Bump Collect task version to 2.5
+* Thanks to David Durieux, add support for dynamic pattern in registry key
+  collect under win32. The dynamic pattern is '**' to glob subkeys like in:
+   HKEY_USERS/**/Software/**/**/CurrentVersion
+
+maintenance:
+* Bump Maintenance task version to 1.1
+* Disable Maintenance task if no maintenance module could be used
+
+test suite:
+* Make snmp walk tests faster
+
+2.4.1 Fri, 29 Jun 2018
+
+core:
+* Update setup & FusionInventory::Agent::Version modules during make install
+* Can set FusionInventory::Agent::Version module VERSION & COMMMENTS during
+  perl Makefile.PL configuration stage
+* Normalized Target class APIs
+* Register planned tasks at target level so target class can filter out
+  unsupported tasks
+* Add Scheduler target support to be used at the same time than Server target
+  but more often to make maintenance other server target storage
+* One scheduler target is created for each configured server target
+* Scheduler target will trigger between one to 2 minutes
+* Get rid of Time::Piece dependency
+
+maintenance:
+* New Maintenance v1.0 task
+* Maintenance task handles quick server target storage cleanup to deploy
+  packages are really removed afetr their expiration time
+* Task only supported by Scheduler target
+
+inventory:
+* Fix BSD Storages support
+* Don't try to run dmidecode inventories if it returns no output
+* Set Bios && Hardware from /sys/class/dmi on recent Linux when dmidecode is missing
+* Add PowerSupplies support
+* Add BSD batteries support
+* Add UUID to LXD containers under Linux
+* Fix #439: Wrong network interface speed under win32
+* Fix #472: On MacOS, add monitors serial number when available
+* Fix #479: No virtual machine memory under Proxmox
+* Fix #485: Fix df output parsing under MacOS
+* Fix #500: Add Acer monitor EDID id match
+* Better SQL Server software inventory under win32
+* Update Xen Server support
+* Fix get-edid command output parsing, thanks to David Durieux
+* Updated pci.ids to 2018.06.29 version
+* Updated usb.ids to 2018.05.04 version
+
+netdiscovery/netinventory:
+* Bump NetDiscovery task version to 2.6
+* Bump NetInventory task version to 3.0
+* fusioninventory-netdiscovery & fusioninventory-netinventory scripts
+  now support '--port' and '--protocol' options for not standard snmp support.
+* Fix RAM & CPU are missing from net inventory
+* Fix MEMORY/RAM OID support
+* Added support for HP Net Peripheral, involving better HP printers inventory
+ * Get Serial number & firmware version
+ * Fix total printed pages counter in many case
+ * Added total color pages counter support
+* Don't assume colors table was read: fixes black toner detection on many HP printers
+* Added Microtik devices support
+* Enhanced Epson printers support, including model name, serial number and firmwares
+* Updated LLDP support
+* NetInventory task protocol upgrade to fix multithreading scheduling according to
+  upgrades done server-side.
+* Fix discovery of devices with only ping responding and without found hostname. In
+  that case, we default the DNSHOSTNAME to the scanned ip.
+* fix entity option in fusioninventory-netdiscovery script
+* Get rid of nmap support for NetDiscovery task
+* Add Zebra printer support
+* Add QuesCom Appliance detection
+* Add Linux Appliance template support
+* Closes: #441,#519
+* Update extmod function calls, thanks to Vadim Pisarev
+* Add custom OID for Canon printer counters
+* Updated sysobject.ids (tagged fia-2.4.1 tag on github repository)
+
+deploy:
+* Bump Deploy task version to 2.6
+* Fix file retention support
+* Add P2P peers caching to reduce peers discovery load in the meantime
+* Reduced timeout for peer discovery and file parts downloading for P2P. This
+  efficiently limits the time passed to discover the local peers and disqualify
+  any busy or not responding peers in a more acceptable delay.
+* For better P2P support, agent ajusts its 404 message to "Nothing found" when it
+  has nothing to share with other agents. So peers won't ask again and again for
+  any file part during 20 minutes by default.
+
+2.4 Fri, 29 Dec 2017
+core:
+* Cleanup confdir use in task so using deprecated etc/softwares folder is no more
+  logged in journal
+* Get rid of confdir setup in setup.pm
+* Added "include" directive support while reading configuration file to make
+  configuration maintenance easy
+* Update syslog name to fullname agent
+* Get rid of List::Util & Proc::PID::File module dependencies
+* Try to load more recent IDS database files if found in well-known places
+* Fixed default daemon pid filename
+* When --pidfile is used, don't permit to manually start daemon even in foreground
+  unless --pidfile parameter is different
+* Makes --pidfile filename optional to compute a default one
+* Check if we need to include libdir while daemonize
+* Class refactoring: Get rid of discouraged 'use base' syntax in favor of lighter
+  'use parent' and as fields pragma is not used (see 'base' man)
+* Logger refactoring: no more an Exporter based class to simplify its usage and
+  as Logger object should be commonly shared everywhere it is used.
+* Fix command run to also time out while an alarm has been set
+* Fix WMI calls to also time out under win32
+* Few code refactoring
+* remove devtom30 from maintainers
+
+inventory:
+* Bump Inventory task version to 1.4
+* Fixed Provider program name in agent context
+* Fixed HyperV VM issue while BIOSGUID is not defined
+* Fix #349: Include last logged user as usual computer user on win32 platform
+* Linux distro: Add support for reading os-release file and removing LSB support
+* Fix Solaris drives df output parsing adding better zfs handling
+* Make backend-collect-timeout working even while waiting on command output
+* Support ASM filesystems on Oracle Grid
+* Introduce getDeviceId() API on Inventory class so it returns task deviceid if set
+  or set a new deviceid (aka agentid or machineid) in case of remote inventory
+* Fix #161: Support retrieving License software via WMI, including Office 2016
+* Fix #364: [win32] Get antivirus version from software installation and get
+  Windows Defender version via WMI
+* Added Windows 10 version support
+* Updated pci.ids to 2017.12.20 version
+* Updated usb.ids to 2017.12.28 version
+
+netdiscovery/netinventory:
+* Bump NetDiscovery & NetInventory task version to 2.5
+* Added section support for MODEMS, SIMCARDS & FIRMWARES
+* Added new detection algorithm based on exposed device supported MIB (sysORID list)
+  and/or sysObjectID
+* Added support for HP iLO cards
+* Added support for Digi devices with enhanced MODEMS, SIMCARDS & FIRMWARES support
+* Updated sysobject.ids with a lot of new devices support
+* Keep first MAC address found while discovering
+* Try first to select MAC address from SNMP session during SNMP device scan
+* Updated sysobject.ids (tagged fia-2.4 tag on github repository)
+
+deploy:
+* Bump Deploy task version to 2.5
+* ddurieux fixed a regression introduced in 2.3.18 preventing to re-use known
+  good peer to download file parts.
+
+esx:
+* Bump ESX task version to 2.3
+* Removed no more needed createFakeDeviceid() API
+
+injector:
+* Support --no-ssl-check option to avoid checking server SSL certificate
+
+wmi-inventory:
+* Added new task and script to permit agent-less inventory on win32 platform based
+  on remote WMI support.
+
+2.3.21 Mon, 31 Jul 2017
+core:
+* Service/daemon refactoring:
+ * Move all daemon method to dedicated FusionInventory::Agent::Daemon package
+ * Win32 service now based on private FusionInventory::Agent::Service inheriting
+   from FusionInventory::Agent::Daemon
+ * support configuration reloading on SIGHUP signal (unix)
+ * support pausing service under win32
+ * support run now on SIGUSR1 signal (unix)
+ * and a lot of daemon/service optimizations and enhancements
+ * daemon process renamed to provider derivated name under unix-like systems with
+   tag if defined. Example: "fusioniventory-agent (prod)"
+* Report http proxy error to help debug communication problems: #324
+* Prevent setup.pm indexing in CPAN as requested by CPAN admins
+* Other fixed issues: #321
+
+inventory:
+* Bump Inventory task version to 1.3
+* Fixed win32 softwares finally missing when 2 'inventory' are set in tasks
+* Fixed bug: last dmidecode block wasn't parsed
+* Updated pci.ids to 2017.07.27 version
+* Updated usb.ids to 2017.07.29 version
+* Updated storage inventory on MacOS supporting Firewire storages: #309 #310
+* Fixes on dmidecode memory inventory: #320
+* Update memory component capacity on virtual systems: #339
+* Fix lenovo system information product name read from dmidecode: fix #311
+* Include TL in AIX OS version: #328
+* Fix Xen vm with space in name not colleted: #176
+
+netdiscovery/netinventory:
+* Bump NetDiscovery & NetInventory task version to 2.3
+* Fix credentials option support
+* Fixed duplicated mac addresses: #315
+* Also accept LLDP notifications on sysName
+* Force MANUFACTURER to match real vendor, VENDOR inventory key removed
+* Better cleanup of canonical strings with invalid characters
+* Support more alternate mac address formats
+* Fix some string field encoding
+* Support Digi devices serial
+* Support ups model oid
+* Fixed Juniper serial retrieval
+* Enhanced Konica printer discovery
+* Enhanced mac address discovery
+* Fixed wrong result on snmp read case: #139
+* Enhanced error messages in netdiscovery task
+* Updated sysobject.ids
+
+deploy:
+* Bump Deploy task version to 2.4
+* Added new audit checks winkey not equals support
+* Support User Interaction under win32 using WTS API (need server-side plugin upgrade)
+
+injector:
+* Support xml file extension: #360
+* Fixed returns exit code 0 even on error: #329
+* Enhanced displayed error messages
+
+2.3.20 Thu, 1 Jun 2017
+core:
+* Fix #224, #254, #268
+* Fix 2.3.19 regression while installing from sources
+* Fix bad initialization while computing inventory checksum involving crash in rare case
+* Include new CONTRIB.md file to reference not mergeable contributions
+* Fix scheduling issue restarting tasks too early
+* Avoid a warning on Socket module version check, issue found on Debian and MacOS
+* Fix: Support SSL debugging at verbosity 2 on Stderr only
+
+inventory:
+* Bump Inventory task version to 1.2
+* Fixed Docker support
+* Added system software category support
+* Added firewall status innventory support
+* Fix last user computation on some unix systems
+* Add CPU CORECOUNT support based on dmidecode output
+* Fix STORAGES support on some platforms
+* MacOS: Refactoring to replace Tie::IxHash dependency with XML::XPath to better
+  parse system profiler output
+* Fix: block device inventory still possible even if fdisk command is missing on linux
+* Fix #289: Add ARM Board support
+* Support UUID for lxc containers
+
+netinventory:
+* Fix #221, #275
+* Command documentation updated
+* a lot more of additional devices in sysobject.ids
+* Fix Juniper new model and firmware detection
+
+deploy:
+* Bump Deploy task version to 2.3
+* Audit checks refactoring and fixes
+* Fix win32 registry key check
+* Added new audit checks like winkey values, needs a server plugin upgrade
+* Enhanced audit checks error reporting
+* Fix and enhanced command action to really report output, may require a server plugin upgrade
+* Fix command action exit code while target command is not found on unix
+
+wakeonlan:
+* Bump WakeOnLan task version to 2.2
+* Fix thanks to Ludovic Pouzenc: send magic packets to all non-loopback non-dumb interfaces
+
 2.3.19 Fri, 17 Feb 2017
 core:
 * Version & provider refactoring to simplify release process

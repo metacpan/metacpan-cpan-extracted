@@ -3,6 +3,8 @@ package FusionInventory::Agent::Task::Inventory::Generic::Timezone;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use English qw(-no_match_vars);
 use UNIVERSAL::require;
 
@@ -10,8 +12,6 @@ use POSIX;
 use Time::Local;
 
 use FusionInventory::Agent::Tools;
-
-my $seen;
 
 sub isEnabled {
 

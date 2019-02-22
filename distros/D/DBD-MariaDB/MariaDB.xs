@@ -63,12 +63,15 @@ BOOT:
   newTypeSub(stash, MYSQL_TYPE_VAR_STRING);
   newTypeSub(stash, MYSQL_TYPE_STRING);
 #undef newTypeSub
-#ifdef HAVE_DEINITIALIZE_SSL
+#if defined(HAVE_DEINITIALIZE_SSL) && defined(HAVE_PROBLEM_WITH_OPENSSL)
   /* Do not deinitialize OpenSSL library after mysql_server_end()
    * See: https://github.com/gooddata/DBD-MariaDB/issues/119 */
   mariadb_deinitialize_ssl = 0;
 #endif
+#ifndef _WIN32
+  /* Calling mysql_thread_init() on WIN32 cause crash */
   mysql_thread_init();
+#endif
 }
 
 MODULE = DBD::MariaDB    PACKAGE = DBD::MariaDB::db
@@ -233,6 +236,8 @@ rows(sth)
             XSRETURN_UNDEF;
         }
     }
+    if (imp_sth->row_num == (my_ulonglong)-1)
+        XSRETURN_IV(-1);
     RETVAL = my_ulonglong2sv(imp_sth->row_num);
   OUTPUT:
     RETVAL
@@ -269,8 +274,6 @@ mariadb_async_result(sth)
 
         if (retval == (my_ulonglong)-1)
             XSRETURN_UNDEF;
-
-        imp_sth->row_num = retval;
 
         if (retval == 0)
             XSRETURN_PV("0E0");

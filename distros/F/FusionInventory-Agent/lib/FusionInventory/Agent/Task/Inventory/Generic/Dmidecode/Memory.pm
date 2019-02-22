@@ -3,8 +3,18 @@ package FusionInventory::Agent::Task::Inventory::Generic::Dmidecode::Memory;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::Generic;
+
+# Run after virtualization to decide if found component is virtual
+our $runAfterIfEnabled = [ qw(
+    FusionInventory::Agent::Task::Inventory::Virtualization::Vmsystem
+    FusionInventory::Agent::Task::Inventory::Win32::OS
+    FusionInventory::Agent::Task::Inventory::Linux::Memory
+    FusionInventory::Agent::Task::Inventory::BSD::Memory
+)];
 
 sub isEnabled {
     my (%params) = @_;
@@ -21,6 +31,26 @@ sub doInventory {
     my $memories = _getMemories(logger => $logger);
 
     return unless $memories;
+
+    # If only one component is defined and we are under a vmsystem, we can update
+    # component capacity to real found size. This permits to support memory size updates.
+    my $vmsystem = $inventory->getHardware('VMSYSTEM');
+    if ($vmsystem && $vmsystem ne 'Physical') {
+        my @components = grep { exists $_->{CAPACITY} } @$memories;
+        if ( @components == 1) {
+            my $real_memory = $inventory->getHardware('MEMORY');
+            my $component = shift @components;
+            if (!$real_memory) {
+                $logger->debug2("Can't verify real memory capacity on this virtual machine");
+            } elsif (!$component->{CAPACITY} || $component->{CAPACITY} != $real_memory) {
+                $logger->debug2($component->{CAPACITY} ?
+                    "Updating virtual component memory capacity to found real capacity: $component->{CAPACITY} => $real_memory"
+                    : "Setting virtual component memory capacity to $real_memory"
+                );
+                $component->{CAPACITY} = $real_memory;
+            }
+        }
+    }
 
     foreach my $memory (@$memories) {
         $inventory->addEntry(
@@ -69,7 +99,7 @@ sub _getMemories {
                 NUMSLOTS         => $slot,
                 DESCRIPTION      => $info->{'Form Factor'},
                 CAPTION          => $info->{'Locator'},
-                SPEED            => $info->{'Speed'},
+                SPEED            => getCanonicalSpeed($info->{'Speed'}),
                 TYPE             => $info->{'Type'},
                 SERIALNUMBER     => $info->{'Serial Number'},
                 MEMORYCORRECTION => $infos->{16}[0]{'Error Correction Type'},

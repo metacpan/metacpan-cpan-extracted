@@ -3,9 +3,15 @@ package FusionInventory::Agent::Task::Inventory::Virtualization::Xen;
 use strict;
 use warnings;
 
-use FusionInventory::Agent::Tools;
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
 
-our $runMeIfTheseChecksFailed = ["FusionInventory::Agent::Task::Inventory::Virtualization::Libvirt"];
+use FusionInventory::Agent::Tools;
+use FusionInventory::Agent::Tools::Virtualization;
+
+our $runMeIfTheseChecksFailed = [
+    "FusionInventory::Agent::Task::Inventory::Virtualization::Libvirt",
+    "FusionInventory::Agent::Task::Inventory::Virtualization::XenCitrixServer"
+];
 
 sub isEnabled {
     return canRun('xm') ||
@@ -60,37 +66,50 @@ sub _getUUID {
 }
 
 sub  _getVirtualMachines {
+    my (%params) = @_;
 
-    my $handle = getFileHandle(@_);
+    my $handle = getFileHandle(%params);
 
     return unless $handle;
 
     # xm status
     my %status_list = (
-        'r' => 'running',
-        'b' => 'blocked',
-        'p' => 'paused',
-        's' => 'shutdown',
-        'c' => 'crashed',
-        'd' => 'dying',
+        'r' => STATUS_RUNNING,
+        'b' => STATUS_BLOCKED,
+        'p' => STATUS_PAUSED,
+        's' => STATUS_SHUTDOWN,
+        'c' => STATUS_CRASHED,
+        'd' => STATUS_DYING
     );
 
     # drop headers
     my $line  = <$handle>;
 
     my @machines;
-    while (my $line = <$handle>) {
+    while ($line = <$handle>) {
         chomp $line;
+        next if $line =~ /^\s*$/;
         my ($name, $vmid, $memory, $vcpu, $status);
         my @fields = split(' ', $line);
         if (@fields == 4) {
-                ($name, $memory, $vcpu) = @fields;
-                $status = 'off';
+            ($name, $memory, $vcpu) = @fields;
+            $status = STATUS_OFF;
         } else {
-                ($name, $vmid, $memory, $vcpu, $status) = @fields;
-                $status =~ s/-//g;
-                $status = $status ? $status_list{$status} : 'off';
-               next if $vmid == 0;
+            if ($line =~ /^(.*\S) \s+ (\d+) \s+ (\d+) \s+ (\d+) \s+ ([a-z-]{5,6}) \s/x) {
+                ($name, $vmid, $memory, $vcpu, $status) = ($1, $2, $3, $4, $5);
+            } else {
+                if ($params{logger}) {
+                    # message in log to easily detect matching errors
+                    my $message = '_getVirtualMachines(): unrecognized output';
+                    $message .= " for command '" . $params{command} . "'";
+                    $message .= ': ' . $line;
+                    $params{logger}->error($message);
+                }
+                next;
+            }
+            $status =~ s/-//g;
+            $status = $status ? $status_list{$status} : STATUS_OFF;
+            next if $vmid == 0;
         }
         next if $name eq 'Domain-0';
 

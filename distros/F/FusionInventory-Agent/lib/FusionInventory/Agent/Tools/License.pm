@@ -2,7 +2,7 @@ package FusionInventory::Agent::Tools::License;
 
 use strict;
 use warnings;
-use base 'Exporter';
+use parent 'Exporter';
 
 use English qw(-no_match_vars);
 
@@ -63,6 +63,7 @@ sub getAdobeLicenses {
             $data{$f[1]}{$f[2]} = $f[3];
         }
     }
+    close $handle;
 
     foreach my $key (keys %data) {
         next unless $data{$key}{SN} || $data{$key}{with};

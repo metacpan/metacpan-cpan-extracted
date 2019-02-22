@@ -6,7 +6,10 @@ package FusionInventory::Agent::Task::Inventory::Virtualization::VmWareDesktop;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools;
+use FusionInventory::Agent::Tools::Virtualization;
 
 sub isEnabled {
     return
@@ -53,7 +56,7 @@ sub _getMachines {
             VCPU      => 1,
             UUID      => $info{'uuid.bios'},
             MEMORY    => $info{'memsize'},
-            STATUS    => "running",
+            STATUS    => STATUS_RUNNING,
             SUBSYSTEM => "VmWare Fusion",
             VMTYPE    => "VmWare",
         };

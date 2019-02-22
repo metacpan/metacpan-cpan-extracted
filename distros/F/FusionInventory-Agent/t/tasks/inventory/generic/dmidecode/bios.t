@@ -184,7 +184,7 @@ my %tests = (
     'rhel-3.9' => {
         bios => {
             MMANUFACTURER => undef,
-            SSN           => '0',
+            SSN           => 0,
             SKUNUMBER     => undef,
             ASSETTAG      => undef,
             BMANUFACTURER => 'innotek GmbH',
@@ -426,6 +426,63 @@ my %tests = (
         hardware => {
             CHASSIS_TYPE  => 'Desktop',
             UUID          => '3445DEE7-45D0-1244-95DD-34FAA067C1BE33E',
+        }
+    },
+    'dell-fx160' => {
+        bios => {
+            BMANUFACTURER => 'Dell Inc.',
+            MSN           => '..CN701638BM00EW.',
+            BDATE         => '01/19/2012',
+            SMODEL        => 'OptiPlex FX160',
+            MMANUFACTURER => 'Dell Inc.',
+            SMANUFACTURER => 'Dell Inc.',
+            SKUNUMBER     => undef,
+            BVERSION      => 'A13',
+            MMODEL        => '0F259F',
+            SSN           => 'C83T54J',
+            ASSETTAG      => undef
+        },
+        hardware => {
+            CHASSIS_TYPE  => 'Desktop',
+            UUID          => '44454C4C-3800-1033-8054-C3C04F35344A'
+        }
+    },
+    'dell-fx170' => {
+        bios => {
+            BMANUFACTURER => 'Phoenix Technologies, LTD',
+            MSN           => undef,
+            BDATE         => '12/13/2011',
+            SMODEL        => 'OptiPlex FX170',
+            MMANUFACTURER => 'Dell Inc.',
+            SMANUFACTURER => 'Dell Inc.',
+            SKUNUMBER     => undef,
+            BVERSION      => '6.00 PG',
+            MMODEL        => undef,
+            SSN           => 'DHN39Q1',
+            ASSETTAG      => undef
+        },
+        hardware => {
+            CHASSIS_TYPE  => 'Desktop',
+            UUID          => '000C7406-053F-1710-8E47-E3AE95ED8CF9'
+        }
+    },
+    'lenovo-thinkpad' => {
+        bios => {
+            BMANUFACTURER => 'LENOVO',
+            MSN           => '1ZJJC21G0N6',
+            BDATE         => '12/01/2011',
+            SMODEL        => 'ThinkPad Edge E320',
+            SMANUFACTURER => 'LENOVO',
+            SKUNUMBER     => 'ThinkPad Edge E320',
+            MMANUFACTURER => 'LENOVO',
+            BVERSION      => '8NET32WW (1.16 )',
+            MMODEL        => '1298A8G',
+            SSN           => 'LR9NKZ7',
+            ASSETTAG      => 'No Asset Information'
+        },
+        hardware => {
+            CHASSIS_TYPE  => 'Notebook',
+            UUID          => '725BA801-507B-11CB-95E6-C66052AAC597'
         }
     }
 );

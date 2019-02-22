@@ -3,10 +3,13 @@ package FusionInventory::Agent::Task::Inventory::Virtualization::VirtualBox;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use English qw(-no_match_vars);
 use User::pwent;
 
 use FusionInventory::Agent::Tools;
+use FusionInventory::Agent::Tools::Virtualization;
 
 sub isEnabled {
     my (%params) = @_;
@@ -76,19 +79,19 @@ sub _parseVBoxManage {
     my (@machines, $machine, $index);
 
     my %status_list = (
-        'powered off'       => 'off',
-        'saved'             => 'off',
-        'teleported'        => 'off',
-        'aborted'           => 'crashed',
-        'stuck'             => 'blocked',
-        'teleporting'       => 'paused',
-        'live snapshotting' => 'running',
-        'starting'          => 'running',
-        'stopping'          => 'dying',
-        'saving'            => 'dying',
-        'restoring'         => 'running',
-        'running'           => 'running',
-        'paused'            => 'paused'
+        'powered off'       => STATUS_OFF,
+        'saved'             => STATUS_OFF,
+        'teleported'        => STATUS_OFF,
+        'aborted'           => STATUS_CRASHED,
+        'stuck'             => STATUS_BLOCKED,
+        'teleporting'       => STATUS_PAUSED,
+        'live snapshotting' => STATUS_RUNNING,
+        'starting'          => STATUS_RUNNING,
+        'stopping'          => STATUS_DYING,
+        'saving'            => STATUS_DYING,
+        'restoring'         => STATUS_RUNNING,
+        'running'           => STATUS_RUNNING,
+        'paused'            => STATUS_PAUSED
     );
     while (my $line = <$handle>) {
         chomp $line;

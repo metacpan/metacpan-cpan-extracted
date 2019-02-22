@@ -2,7 +2,8 @@ package FusionInventory::Agent::Task::Inventory::MacOS::Softwares;
 
 use strict;
 use warnings;
-use Time::Piece;
+
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
 
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::MacOS;
@@ -33,7 +34,6 @@ sub doInventory {
 
 sub _getSoftwaresList {
     my (%params) = @_;
-    my $logger = $params{logger};
 
     my $infos;
     my $datesAlreadyFormatted = 1;
@@ -44,9 +44,9 @@ sub _getSoftwaresList {
     }
     my $localTimeOffset = FusionInventory::Agent::Tools::MacOS::detectLocalTimeOffset();
     $infos = FusionInventory::Agent::Tools::MacOS::getSystemProfilerInfos(
+        %params,
         type            => 'SPApplicationsDataType',
-        localTimeOffset => $localTimeOffset,
-        @_
+        localTimeOffset => $localTimeOffset
     );
 
     my $info = $infos->{Applications};
@@ -62,59 +62,54 @@ sub _getSoftwaresList {
 
         my $formattedDate = $app->{'Last Modified'};
         if (!$datesAlreadyFormatted) {
-            $formattedDate = _formatDate($formattedDate, $logger)
+            $formattedDate = _formatDate($formattedDate);
         }
 
+        my ($category, $userName) = _extractSoftwareSystemCategoryAndUserName($app->{'Location'});
         push @softwares, {
             NAME      => $name,
             VERSION   => $app->{'Version'},
             COMMENTS  => $app->{'Kind'} ? '[' . $app->{'Kind'} . ']' : undef,
             PUBLISHER => $app->{'Get Info String'},
             # extract date's data and format these data
-            INSTALLDATE => $formattedDate
+            INSTALLDATE => $formattedDate,
+            SYSTEM_CATEGORY => $category,
+            USERNAME => $userName
         };
     }
 
     return \@softwares;
 }
 
-sub _formatDate {
-    my ($dateStr, $logger) = @_;
+sub _extractSoftwareSystemCategoryAndUserName {
+    my ($str) = @_;
 
-    my $formattedDate = '';
+    my $category = '';
+    my $userName = '';
+    return ($category, $userName) unless $str;
 
-    my $extractionPatternWithAmOrPm = "%m/%d/%y %l:%M %p";
-    my $extractionPattern = "%m/%d/%y %H:%M";
-    my $extractionPatternUsed = '';
-
-    my $outputFormat = "%d/%m/%Y";
-
-    # trim
-    $dateStr =~ s/^\s+|\s+$//g;
-    # AM or PM detection in end of string
-    if ($dateStr =~ /(?:AM|PM)$/) {
-        $extractionPatternUsed = $extractionPatternWithAmOrPm;
-    } else {
-        $extractionPatternUsed = $extractionPattern;
+    if ($str =~ /^\/Users\/([^\/]+)\/([^\/]+\/[^\/]+)\//
+        || $str =~ /^\/Users\/([^\/]+)\/([^\/]+)\//) {
+        $userName = $1;
+        $category = $2 if $2 !~ /^Downloads|^Desktop/;
+    } elsif ($str =~ /^\/Volumes\/[^\/]+\/([^\/]+\/[^\/]+)\//
+        || $str =~ /^\/Volumes\/[^\/]+\/([^\/]+)\//
+        || $str =~ /^\/([^\/]+\/[^\/]+)\//
+        || $str =~ /^\/([^\/]+)\//) {
+        $category = $1;
     }
 
-    my $func = sub {
-        if (defined $logger) {
-            $logger->error("FusionInventory::Agent::Task::Inventory::MacOS::Softwares::_formatDate() : can't parse string '$dateStr', returns empty string.\n");
-        }
-    };
-    eval {
-        my $extracted = Time::Piece->strptime(
-            $dateStr,
-            $extractionPatternUsed
-        );
-        $formattedDate = $extracted->strftime(
-            $outputFormat
-        );
-    };
-    &$func if $@;
+    return ($category, $userName);
+}
 
-    return $formattedDate;
+sub _formatDate {
+    my ($dateStr) = @_;
+
+    my @date = $dateStr =~ /^\s*(\d{1,2})\/(\d{1,2})\/(\d{2})\s*/;
+    return @date == 3 ?
+        sprintf("%02d/%02d/%d", $date[1], $date[0], 2000+$date[2])
+        :
+        $dateStr;
 }
 
 1;

@@ -2,7 +2,7 @@ package FusionInventory::Agent::Tools;
 
 use strict;
 use warnings;
-use base 'Exporter';
+use parent 'Exporter';
 
 use Encode qw(encode);
 use English qw(-no_match_vars);
@@ -12,7 +12,8 @@ use File::stat;
 use File::Which;
 use Memoize;
 use UNIVERSAL::require;
-use List::Util qw(first);
+
+use FusionInventory::Agent::Tools::Expiration;
 
 # Keep a copy of @ARGV, only for Provider inventory
 BEGIN {
@@ -21,6 +22,7 @@ BEGIN {
 our $ARGV;
 
 our @EXPORT = qw(
+    first
     getDirectoryHandle
     getFileHandle
     getFormatedLocalTime
@@ -31,6 +33,7 @@ our @EXPORT = qw(
     getCanonicalInterfaceSpeed
     getCanonicalSize
     getSanitizedString
+    getUtf8String
     trimWhitespace
     getFirstLine
     getFirstMatch
@@ -51,15 +54,24 @@ our @EXPORT = qw(
     runFunction
     delay
     slurp
-    isParamArrayAndFilled
 );
-
-my $nowhere = $OSNAME eq 'MSWin32' ? 'nul' : '/dev/null';
 
 # this trigger some errors under win32:
 # Anonymous function called in forbidden scalar context
 if ($OSNAME ne 'MSWin32') {
     memoize('canRun');
+}
+
+# Avoid List::Util dependency re-using 'any' sub as template
+sub first (&@) { ## no critic (SubroutinePrototypes)
+    my $f = shift;
+
+    ## no critic (ExplicitReturnUndef)
+
+    foreach ( @_ ) {
+        return $_ if $f->();
+    }
+    return undef;
 }
 
 sub getFormatedLocalTime {
@@ -111,18 +123,18 @@ sub getCanonicalManufacturer {
     if (exists $manufacturers{$manufacturer}) {
         $manufacturer = $manufacturers{$manufacturer};
     } elsif ($manufacturer =~ /(
-        maxtor    |
-        sony      |
-        compaq    |
-        ibm       |
-        toshiba   |
-        fujitsu   |
-        lg        |
-        samsung   |
-        nec       |
-        transcend |
-        matshita  |
-        hitachi   |
+        maxtor     |
+        sony       |
+        compaq     |
+        ibm        |
+        toshiba    |
+        fujitsu    |
+        \blg\b     |
+        samsung    |
+        nec        |
+        transcend  |
+        matshita   |
+        hitachi    |
         pioneer
     )/xi) {
         $manufacturer = ucfirst(lc($1));
@@ -134,6 +146,10 @@ sub getCanonicalManufacturer {
         $manufacturer = "Seagate";
     } elsif ($manufacturer =~ /^(HD|IC|HU|HGST)/) {
         $manufacturer = "Hitachi";
+    } elsif ($manufacturer =~ /^APPLE/i) {
+        $manufacturer = "Apple";
+    } elsif ($manufacturer =~ /^OPTIARC/i) {
+        $manufacturer = "Sony";
     }
 
     return $manufacturer;
@@ -146,16 +162,21 @@ sub getCanonicalSpeed {
 
     return undef unless $speed;
 
+    return $speed if $speed =~ /^([,.\d]+)$/;
+
     return 400 if $speed =~ /^PC3200U/;
 
-    return undef unless $speed =~ /^([,.\d]+) \s? (\S+)$/x;
+    return undef unless $speed =~ /^([,.\d]+) \s? (\S+)/x;
     my $value = $1;
     my $unit = lc($2);
 
+    # Remark: we need to return speed in MHz. Even if MT/s is not accurately
+    # equivalent to MHz, we nned to return the value so server can extract it
     return
-        $unit eq 'ghz' ? $value * 1000 :
-        $unit eq 'mhz' ? $value        :
-                         undef         ;
+        $unit eq 'ghz'  ? $value * 1000 :
+        $unit eq 'mhz'  ? $value        :
+        $unit eq 'mt/s' ? $value        :
+                          undef         ;
 }
 
 sub getCanonicalInterfaceSpeed {
@@ -192,6 +213,7 @@ sub getCanonicalSize {
     return undef unless $size =~ /^([,.\d]+) (\S+)$/x;
     my $value = $1;
     my $unit = lc($2);
+    $value =~ s/,/\./;
 
     return
         $unit eq 'tb'    ? $value * $base * $base        :
@@ -220,13 +242,10 @@ sub compareVersion {
         );
 }
 
-sub getSanitizedString {
+sub getUtf8String {
     my ($string) = @_;
 
     return unless defined $string;
-
-    # clean control caracters
-    $string =~ s/[[:cntrl:]]//g;
 
     # encode to utf-8 if needed
     if (!Encode::is_utf8($string) && $string !~ m/\A(
@@ -243,6 +262,17 @@ sub getSanitizedString {
     };
 
     return $string;
+}
+
+sub getSanitizedString {
+    my ($string) = @_;
+
+    return unless defined $string;
+
+    # clean control caracters
+    $string =~ s/[[:cntrl:]]//g;
+
+    return getUtf8String($string);
 }
 
 sub trimWhitespace {
@@ -269,6 +299,7 @@ sub getDirectoryHandle {
     return $handle;
 }
 
+my $cmdtemplate = $OSNAME eq 'MSWin32' ? "%s 2>nul" : "exec %s 2>/dev/null";
 sub getFileHandle {
     my (%params) = @_;
 
@@ -293,12 +324,16 @@ sub getFileHandle {
             local $ENV{LANG} = 'C';
             # Ignore 'Broken Pipe' warnings on Solaris
             local $SIG{PIPE} = 'IGNORE' if $OSNAME eq 'solaris';
-            if (!open $handle, '-|', $params{command} . " 2>$nowhere") {
+            my $command = sprintf($cmdtemplate, $params{command});
+            my $cmdpid  = open($handle, '-|', $command);
+            if (!$cmdpid) {
                 $params{logger}->error(
                     "Can't run command $params{command}: $ERRNO"
                 ) if $params{logger};
                 return;
             }
+            # Kill command if a timeout was set
+            $SIG{ALRM} = sub { kill 'KILL', $cmdpid ; die "alarm\n"; } if $SIG{ALRM};
             last SWITCH;
         }
         if ($params{string}) {
@@ -320,7 +355,7 @@ sub getFirstLine {
     my $result = <$handle>;
     close $handle;
 
-    chomp $result if $result;
+    chomp $result if defined $result;
     return $result;
 }
 
@@ -336,7 +371,7 @@ sub getLastLine {
     }
     close $handle;
 
-    chomp $result if $result;
+    chomp $result if defined $result;
     return $result;
 }
 
@@ -402,7 +437,7 @@ sub hex2char {
     my ($value) = @_;
 
     ## no critic (ExplicitReturnUndef)
-    return undef unless $value;
+    return undef unless defined $value;
     return $value unless $value =~ /^0x/;
 
     $value =~ s/^0x//; # drop hex prefix
@@ -413,7 +448,7 @@ sub hex2dec {
     my ($value) = @_;
 
     ## no critic (ExplicitReturnUndef)
-    return undef unless $value;
+    return undef unless defined $value;
     return $value unless $value =~ /^0x/;
 
     return oct($value);
@@ -423,7 +458,7 @@ sub dec2hex {
     my ($value) = @_;
 
     ## no critic (ExplicitReturnUndef)
-    return undef unless $value;
+    return undef unless defined $value;
     return $value if $value =~ /^0x/;
 
     return sprintf("0x%x", $value);
@@ -491,8 +526,12 @@ sub runFunction {
     my $result;
     eval {
         local $SIG{ALRM} = sub { die "alarm\n" };
+
         # set a timeout if needed
-        alarm $params{timeout} if $params{timeout};
+        if ($params{timeout}) {
+            alarm $params{timeout};
+            setExpirationTime(timeout => $params{timeout});
+        }
 
         no strict 'refs'; ## no critic (ProhibitNoStrict)
         $result = &{$params{module} . '::' . $params{function}}(
@@ -500,7 +539,10 @@ sub runFunction {
             ref $params{params} eq 'ARRAY' ? @{$params{params}} :
                                                $params{params}
         );
+
+        # Reset timeout
         alarm 0;
+        setExpirationTime();
     };
 
     if ($EVAL_ERROR) {
@@ -533,14 +575,6 @@ sub slurp {
     my $content = <$handler>;
     close $handler;
     return $content;
-}
-
-sub isParamArrayAndFilled {
-    my ($hash, $paramName) = @_;
-    
-    return (defined ($hash->{$paramName}))
-            && UNIVERSAL::isa($hash->{$paramName}, 'ARRAY')
-            && (scalar(@{$hash->{$paramName}}) > 0);
 }
 
 1;
@@ -588,6 +622,10 @@ Returns a normalized size value (in Mb) for given one.
 
 Returns the input stripped from any control character, properly encoded in
 UTF-8.
+
+=head2 getUtf8String($string)
+
+Returns the input properly encoded in UTF-8.
 
 =head2 trimWhitespace($string)
 
@@ -735,6 +773,11 @@ hexadecimal prefix, the unconverted value otherwise. Eg. 65 -> 0x41, 0x41 ->
 
 Returns a true value if any item in LIST meets the criterion given through
 BLOCK.
+
+=head2 first BLOCK LIST
+
+Returns the first value from LIST meeting the criterion given through BLOCK or
+undef.
 
 =head2 all BLOCK LIST
 

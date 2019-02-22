@@ -3,8 +3,12 @@ package FusionInventory::Agent::Task::Inventory::Virtualization::Vmsystem;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
+use UNIVERSAL::require;
+
 use FusionInventory::Agent::Tools;
-use FusionInventory::Agent::Tools::Solaris;
+use FusionInventory::Agent::Tools::Virtualization;
 
 my @vmware_patterns = (
     'Hypervisor detected: VMware',
@@ -83,6 +87,32 @@ sub doInventory {
             pattern => qr/^envID:\s*(\d+)/
         ) || '';
         $inventory->setHardware({ UUID => $hostID . '-' . $guestID });
+
+    } elsif ($type eq 'Docker') {
+        # In docker, dmidecode can be run and so UUID & SSN must be overided
+        my $containerid = getFirstMatch(
+            file    => '/proc/1/cgroup',
+            pattern => qr|/docker/([0-9a-f]{12})|,
+            logger  => $params{logger}
+        );
+
+        $inventory->setHardware({ UUID => $containerid || '' });
+        $inventory->setBios({ SSN  => '' });
+
+    } elsif (($type eq 'lxc' || ($type ne 'Physical' && !$inventory->getHardware('UUID'))) && -e '/etc/machine-id') {
+        # Set UUID from /etc/machine-id & /etc/hostname for container like lxc
+        my $machineid = getFirstLine(
+            file   => '/etc/machine-id',
+            logger => $params{logger}
+        );
+        my $hostname = getFirstLine(
+            file   => '/etc/hostname',
+            logger => $params{logger}
+        );
+
+        if ($machineid && $hostname) {
+            $inventory->setHardware({ UUID => getVirtualUUID($machineid, $hostname) });
+        }
     }
 
     $inventory->setHardware({
@@ -112,14 +142,18 @@ sub _getType {
         return 'VirtualBox'  if $bios->{BVERSION} =~ /VirtualBox/;
     }
 
-    if (-f '/.dockerinit') {
+    # Docker
+
+    if (-f '/.dockerinit' || -f '/.dockerenv') {
         return 'Docker';
     }
 
     # Solaris zones
-    if (canRun('/usr/sbin/zoneadm')) {
-        my $zone = getZone();
-        return 'SolarisZone' if $zone ne 'global';
+    if (FusionInventory::Agent::Tools::Solaris->require()) {
+        if (canRun('/usr/sbin/zoneadm')) {
+            my $zone = FusionInventory::Agent::Tools::Solaris::getZone();
+            return 'SolarisZone' if $zone ne 'global';
+        }
     }
 
     # Xen PV host
@@ -173,9 +207,10 @@ sub _getType {
     return $result if $result;
 
     # dmesg
+    # dmesg can be empty or near empty on some systems (notably on Debian 8)
 
     my $handle;
-    if (-r '/var/log/dmesg') {
+    if (-r '/var/log/dmesg' && -s '/var/log/dmesg' > 40) {
         $handle = getFileHandle(file => '/var/log/dmesg', logger => $logger);
     } elsif (-x '/bin/dmesg') {
         $handle = getFileHandle(command => '/bin/dmesg', logger => $logger);
@@ -198,25 +233,32 @@ sub _getType {
             file => '/proc/scsi/scsi',
             logger => $logger
         );
-        $result = _matchPatterns($handle);
-        close $handle;
-    }
-    return $result if $result;
-
-    if (getFirstMatch(
-        file    => '/proc/1/environ',
-        pattern => qr/container=lxc/
-    )) {
-        return 'lxc';
+        if ($handle) {
+            $result = _matchPatterns($handle);
+            close $handle;
+            return $result if $result;
+        }
     }
 
+    # systemd based container like lxc
+
+    my $init_env = slurp('/proc/1/environ');
+    if ($init_env) {
+        $init_env =~ s/\0/\n/g;
+        my $container_type = getFirstMatch(
+            string  => $init_env,
+            pattern => qr/^container=(\S+)/,
+            logger  => $logger
+        );
+        return $container_type if $container_type;
+    }
     # OpenVZ
     if (-f '/proc/self/status') {
-        my $handle = getFileHandle(
+        my @selfstatus = getAllLines(
             file => '/proc/self/status',
             logger => $logger
         );
-        while (my $line = <$handle>) {
+        foreach my $line (@selfstatus) {
             my ($key, $value) = split(/:/, $line);
             $result = "Virtuozzo" if $key eq 'envID' && $value > 0;
         }

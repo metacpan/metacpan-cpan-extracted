@@ -5,9 +5,6 @@ use warnings;
 use utf8;
 use lib 't/lib';
 
-use constant REG_DWORD => 0x4;
-use constant REG_SZ    => 0x7;
-
 use English qw(-no_match_vars);
 use Test::Deep qw(cmp_deeply);
 use Test::MockModule;
@@ -27,6 +24,10 @@ if (!$Config{usethreads} || $Config{usethreads} ne 'define') {
     plan skip_all => 'thread support required';
 }
 
+# REG_SZ & REG_DWORD provided by even faked Win32::TieRegistry module
+Win32::TieRegistry->require();
+Win32::TieRegistry->import('REG_DWORD', 'REG_SZ');
+
 my %tests = (
     7 => [
         {
@@ -44,6 +45,7 @@ my %tests = (
             SPEED       => 100,
             PNPDEVICEID => 'PCI\VEN_10EC&DEV_8168&SUBSYS_84321043&REV_06\4&87D54EE&0&00E5',
             PCIID       => '10EC:8168:8432:1043',
+            GUID        => '{442CDFAD-10E9-45B6-8CF9-C829034793B0}',
         },
         {
             dns         => '192.168.0.254',
@@ -58,6 +60,7 @@ my %tests = (
             SPEED       => 100,
             PNPDEVICEID => 'PCI\VEN_10EC&DEV_8168&SUBSYS_84321043&REV_06\4&87D54EE&0&00E5',
             PCIID       => '10EC:8168:8432:1043',
+            GUID        => '{442CDFAD-10E9-45B6-8CF9-C829034793B0}',
         },
         {
             dns         => undef,
@@ -68,6 +71,7 @@ my %tests = (
             VIRTUALDEV  => 0,
             PNPDEVICEID => 'BTH\MS_BTHPAN\7&42D85A8&0&2',
             PCIID       => undef,
+            GUID        => '{DDE01862-B0C0-4715-AF6C-51D31172EBF9}',
         },
     ],
     xp => [
@@ -115,6 +119,7 @@ my %tests = (
             MTU         => undef,
             DESCRIPTION => 'Broadcom NetXtreme Gigabit Ethernet - Teefer2 Miniport',
             IPADDRESS   => '10.36.6.30',
+            DNSDomain   => 'sociedad.imaginaria.es',
         },
         {
             dns         => undef,
@@ -166,6 +171,47 @@ my %register = (
         'Environment' => {
             '/TEMP' => '%SystemRoot%\\TEMP',
             '/OS'   => 'Windows_NT',
+        }
+    },
+    'HKEY_USERS/' => {
+        'S-1-5-21-2246875202-1293753324-4206800371-500/' => {
+            'Software/' => {
+                'SimonTatham/' => {
+                    'PuTTY/' => {
+                        '/Version' => '4.1',
+                        'SshHostKeys/' => {
+                            '/rsa2@22:192.168.20.32' => '76f523a6eec4ea6b'
+                        },
+                        '/username' => 'johndoe'
+                    }
+                },
+                'Mozilla/' => {
+                    'Firefox/' => {
+                        '/Version' => '59.0'
+                    }
+                }
+            }
+        },
+        'S-1-5-21-2246875202-1293753324-4206800567-500/' => {
+            '/DisplayName' => 'Janine',
+            'Software/' => {
+                'SimonTatham/' => {
+                    'PuTTY/' => {
+                        '/Version' => '5.2',
+                        '/username' => 'jane',
+                        'SshHostKeys/' => {
+                            '/rsa2@22:192.168.20.54' => 'fdfb3a2eeaa7'
+                        }
+                    }
+                },
+                'Mozilla/' => {
+                    'Firefox/' => {
+                        '/Version' => '62.0',
+                        'Configuration/' => {},
+                        '/Timeout' => '15'
+                    }
+                }
+            }
         }
     }
 );
@@ -230,26 +276,93 @@ my %regval_tests = (
         _expected => {
             'ClientID' => '0x12345678',
             'Version'  => '12.0.72365',
-            'subkey/'   => undef
         }
     },
     'teamviewerid-withtype' => {
         path      => 'HKEY_LOCAL_MACHINE/SOFTWARE/Wow6432Node/TeamViewer/ClientID',
         withtype  => 1,
-        _expected => [ '0x12345678', REG_DWORD ]
+        _expected => [ '0x12345678', REG_DWORD() ]
     },
     'teamviewer-all-withtype' => {
         path      => 'HKEY_LOCAL_MACHINE/SOFTWARE/Wow6432Node/TeamViewer/*',
         withtype  => 1,
         _expected => {
-            'ClientID' => [ '0x12345678', REG_DWORD ],
-            'Version'  => [ '12.0.72365', REG_SZ ],
-            'subkey/'   => []
+            'ClientID' => [ '0x12345678', REG_DWORD() ],
+            'Version'  => [ '12.0.72365', REG_SZ() ],
         }
     },
     'temp-env' => {
         path      => 'HKEY_LOCAL_MACHINE/CurrentControlSet/Control/Session Manager/Environment/TEMP',
         _expected => '%SystemRoot%\\TEMP'
+    },
+    'putty_keys' => {
+        path      => 'HKEY_USERS/**/Software/SimonTatham/PuTTY/SshHostKeys/*',
+        _expected => {
+            'S-1-5-21-2246875202-1293753324-4206800371-500/Software/SimonTatham/PuTTY/SshHostKeys/rsa2@22:192.168.20.32'
+                => '76f523a6eec4ea6b',
+            'S-1-5-21-2246875202-1293753324-4206800567-500/Software/SimonTatham/PuTTY/SshHostKeys/rsa2@22:192.168.20.54'
+                => 'fdfb3a2eeaa7'
+        }
+    },
+    'users_software_versions' => {
+        path      => 'HKEY_USERS/**/Software/Mozilla/Firefox/Version',
+        _expected => {
+            'S-1-5-21-2246875202-1293753324-4206800567-500/Software/Mozilla/Firefox/Version' => '62.0',
+            'S-1-5-21-2246875202-1293753324-4206800371-500/Software/Mozilla/Firefox/Version' => '59.0'
+        }
+    },
+    'users_softwares_versions' => {
+        path      => 'HKEY_USERS/**/Software/**/**/Version',
+        _expected => {
+            'S-1-5-21-2246875202-1293753324-4206800371-500/Software/SimonTatham/PuTTY/Version' => '4.1',
+            'S-1-5-21-2246875202-1293753324-4206800567-500/Software/SimonTatham/PuTTY/Version' => '5.2',
+            'S-1-5-21-2246875202-1293753324-4206800371-500/Software/Mozilla/Firefox/Version' => '59.0',
+            'S-1-5-21-2246875202-1293753324-4206800567-500/Software/Mozilla/Firefox/Version' => '62.0'
+        }
+    },
+    'users_software_values' => {
+        path      => 'HKEY_USERS/**/Software/**/**/*',
+        _expected => {
+            'S-1-5-21-2246875202-1293753324-4206800371-500/Software/SimonTatham/PuTTY/Version' => '4.1',
+            'S-1-5-21-2246875202-1293753324-4206800371-500/Software/SimonTatham/PuTTY/username' => 'johndoe',
+            'S-1-5-21-2246875202-1293753324-4206800567-500/Software/SimonTatham/PuTTY/Version' => '5.2',
+            'S-1-5-21-2246875202-1293753324-4206800567-500/Software/Mozilla/Firefox/Version' => '62.0',
+            'S-1-5-21-2246875202-1293753324-4206800371-500/Software/Mozilla/Firefox/Version' => '59.0',
+            'S-1-5-21-2246875202-1293753324-4206800567-500/Software/SimonTatham/PuTTY/username' => 'jane',
+            'S-1-5-21-2246875202-1293753324-4206800567-500/Software/Mozilla/Firefox/Timeout' => '15'
+        }
+    },
+    'users_software_values' => {
+        path      => 'HKEY_USERS/**/Software/**/Firefox/*',
+        _expected => {
+            'S-1-5-21-2246875202-1293753324-4206800567-500/Software/Mozilla/Firefox/Version' => '62.0',
+            'S-1-5-21-2246875202-1293753324-4206800371-500/Software/Mozilla/Firefox/Version' => '59.0',
+            'S-1-5-21-2246875202-1293753324-4206800567-500/Software/Mozilla/Firefox/Timeout' => '15'
+        }
+    },
+    'users_vars' => {
+        path      => 'HKEY_USERS/**/*',
+        _expected => {
+            'S-1-5-21-2246875202-1293753324-4206800567-500/DisplayName' => 'Janine'
+        }
+    },
+    'users_displayname' => {
+        path      => 'HKEY_USERS/**/DisplayName',
+        _expected => {
+            'S-1-5-21-2246875202-1293753324-4206800567-500/DisplayName' => 'Janine'
+        }
+    },
+    'bad_glob_on_values' => {
+        path      => 'HKEY_USERS/**/Software/**/**/**',
+        _expected => {}
+    },
+    'bad_glob_on_values_2' => {
+        path      => 'HKEY_USERS/S-1-5-21-2246875202-1293753324-4206800371-500/Software/Mozilla/Firefox/**',
+        _expected => undef
+    },
+    'bad_glob_on_values_3' => {
+        path      => 'HKEY_USERS/**/**',
+        _expected => {}
     }
 );
 
@@ -299,6 +412,28 @@ SKIP: {
                 grep { ref($key->{$_}) eq 'HASH' } keys %{$key};
             bless $key, 'Win32::TieRegistry';
             return $key;
+        }
+    );
+
+    $module->mock(
+        '_getRegistryRoot',
+        sub {
+            my (%params) = @_;
+            return unless $params{root};
+            my $root;
+            if (exists($register{$params{root}})) {
+                $root = { %{$register{$params{root}}} };
+            } else {
+                $root = \%register;
+                foreach my $part (split('/',$params{root})) {
+                    return unless $root->{$part.'/'};
+                    $root = { %{$root->{$part.'/'}} }
+                }
+            }
+            # Bless leaf as expected
+            map { bless $root->{$_}, 'Win32::TieRegistry' } grep { m|/$| } keys %{$root};
+            bless $root, 'Win32::TieRegistry';
+            return $root;
         }
     );
 

@@ -50,6 +50,7 @@ README.pod
 t/00-load.t
 t/boilerplate.t
 t/cmd-amend.t
+t/cmd-branch-age.t
 t/cmd-branch-clean.t
 t/cmd-branch-grep.t
 t/cmd-branches.t

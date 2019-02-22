@@ -1,0 +1,7 @@
+Revision history for Alien-unzip
+
+0.02      2019-02-22 14:20:30 -0500
+  - Build fixes for older Perls on Windows
+
+0.01      2019-02-22 11:13:00 -0500
+  - initial version

@@ -1,0 +1,45 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => 'unzip',
+  args    => [ '-v' ],
+  match   => qr/UnZip.*Info-ZIP/,
+  version => qr/UnZip ([0-9\.]+)/,
+);
+
+share {
+
+
+  plugin Download => (
+    #url => 'ftp://ftp.info-zip.org/pub/infozip/src/unzip60.tgz',
+    url => 'https://sourceforge.net/projects/infozip/files/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz',
+  );
+
+  plugin Extract => 'tar.gz';
+
+  if($^O eq 'MSWin32')
+  {
+    meta->before_hook(build => sub {
+      my($build) = @_;
+      my $prefix = $build->install_prop->{prefix};
+      $prefix =~ s{/}{\\}g;
+        meta->interpolator->add_helper(prefix_win => sub { $prefix });
+    });
+
+    plugin 'Build::Make' => 'gmake';
+
+    build [
+      [ '%{make}', -f => 'win32/Makefile.gcc', 'CC_CPU_OPT=', 'NOASM=1' ],
+      [ 'mkdir', '%{prefix_win}\\bin' ],
+      'copy *.exe %{prefix_win}\\bin',
+    ];
+  }
+  else
+  {
+    build [
+      [ '%{make}', -f => 'unix/Makefile', 'generic', 'prefix=%{.install.prefix}' ],
+      [ '%{make}', -f => 'unix/Makefile', 'install', 'prefix=%{.install.prefix}' ],
+    ];
+  }
+
+}

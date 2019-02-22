@@ -33,7 +33,7 @@ my %tests = (
             SERIALNUMBER     => '1A1541FC',
             DESCRIPTION      => 'SODIMM',
             TYPE             => undef,
-            SPEED            => '1067 MHz',
+            SPEED            => '1067',
             CAPACITY         => '2048',
             CAPTION          => 'Bottom - Slot 1',
             MANUFACTURER     => 'Hynix',
@@ -44,7 +44,7 @@ my %tests = (
             SERIALNUMBER     => '1A554239',
             DESCRIPTION      => 'SODIMM',
             TYPE             => undef,
-            SPEED            => '1067 MHz',
+            SPEED            => '1067',
             CAPACITY         => '2048',
             CAPTION          => 'Bottom - Slot 2',
             MANUFACTURER     => 'Hynix',
@@ -58,7 +58,7 @@ my %tests = (
             SERIALNUMBER     => 'SerNum00',
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '1066 MHz',
+            SPEED            => '1066',
             CAPACITY         => '1024',
             CAPTION          => 'DIMM0',
             MANUFACTURER     => undef,
@@ -69,7 +69,7 @@ my %tests = (
             SERIALNUMBER     => 'SerNum01',
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '1066 MHz',
+            SPEED            => '1066',
             CAPACITY         => '1024',
             CAPTION          => 'DIMM1',
             MANUFACTURER     => undef,
@@ -81,7 +81,7 @@ my %tests = (
             SERIALNUMBER     => 'SerNum02',
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '1066 MHz',
+            SPEED            => '1066',
             CAPACITY         => '1024',
             CAPTION          => 'DIMM2',
             MANUFACTURER     => undef,
@@ -93,7 +93,7 @@ my %tests = (
             SERIALNUMBER     => 'SerNum03',
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '1066 MHz',
+            SPEED            => '1066',
             CAPACITY         => '1024',
             CAPTION          => 'DIMM3',
             MANUFACTURER     => undef,
@@ -106,7 +106,7 @@ my %tests = (
             NUMSLOTS         => 1,
             SERIALNUMBER     => '02132010',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '533 MHz (1.9 ns)',
+            SPEED            => '533',
             TYPE             => 'DDR',
             CAPTION          => 'DIMM_A',
             CAPACITY         => '1024',
@@ -117,7 +117,7 @@ my %tests = (
             NUMSLOTS         => 2,
             SERIALNUMBER     => '02132216',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '533 MHz (1.9 ns)',
+            SPEED            => '533',
             TYPE             => 'DDR',
             CAPTION          => 'DIMM_B',
             CAPACITY         => '1024',
@@ -163,7 +163,7 @@ my %tests = (
             NUMSLOTS         => 1,
             SERIALNUMBER     => '50075483',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '400 MHz (2.5 ns)',
+            SPEED            => '400',
             TYPE             => undef,
             CAPTION          => 'DIMM1_A',
             CAPACITY         => '512',
@@ -174,7 +174,7 @@ my %tests = (
             NUMSLOTS         => 2,
             SERIALNUMBER     => '500355A1',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '400 MHz (2.5 ns)',
+            SPEED            => '400',
             TYPE             => undef,
             CAPTION          => 'DIMM1_B',
             CAPACITY         => '512',
@@ -185,7 +185,7 @@ my %tests = (
             NUMSLOTS         => 3,
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
-            SPEED            => '400 MHz (2.5 ns)',
+            SPEED            => '400',
             TYPE             => undef,
             CAPTION          => 'DIMM2_A',
             MANUFACTURER     => undef,
@@ -195,7 +195,7 @@ my %tests = (
             NUMSLOTS         => 4,
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
-            SPEED            => '400 MHz (2.5 ns)',
+            SPEED            => '400',
             TYPE             => undef,
             CAPTION          => 'DIMM2_B',
             MANUFACTURER     => undef,
@@ -206,7 +206,7 @@ my %tests = (
             NUMSLOTS         => 5,
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
-            SPEED            => '400 MHz (2.5 ns)',
+            SPEED            => '400',
             TYPE             => undef,
             CAPTION          => 'DIMM3_A',
             MANUFACTURER     => undef,
@@ -216,7 +216,7 @@ my %tests = (
             NUMSLOTS         => 6,
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
-            SPEED            => '400 MHz (2.5 ns)',
+            SPEED            => '400',
             TYPE             => undef,
             CAPTION          => 'DIMM3_B',
             MANUFACTURER     => undef,
@@ -229,7 +229,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR',
-            SPEED            => '266 MHz',
+            SPEED            => '266',
             CAPACITY         => '512',
             CAPTION          => 'DIMM A',
             MANUFACTURER     => undef,
@@ -241,7 +241,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR',
-            SPEED            => '266 MHz',
+            SPEED            => '266',
             CAPTION          => 'DIMM B',
             MANUFACTURER     => undef,
             MEMORYCORRECTION => 'Multi-bit ECC'
@@ -252,7 +252,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR',
-            SPEED            => '266 MHz',
+            SPEED            => '266',
             CAPTION          => 'DIMM C',
             MANUFACTURER     => undef,
             MEMORYCORRECTION => 'Multi-bit ECC'
@@ -263,7 +263,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR',
-            SPEED            => '266 MHz',
+            SPEED            => '266',
             CAPTION          => 'DIMM D',
             MANUFACTURER     => undef,
             MEMORYCORRECTION => 'Multi-bit ECC'
@@ -275,7 +275,7 @@ my %tests = (
             NUMSLOTS         => 1,
             SERIALNUMBER     => '330DC586',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D11',
             CAPACITY         => '32768',
@@ -286,7 +286,7 @@ my %tests = (
             NUMSLOTS         => 2,
             SERIALNUMBER     => '32A3A4FD',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D10',
             CAPACITY         => '32768',
@@ -307,7 +307,7 @@ my %tests = (
             NUMSLOTS         => 4,
             SERIALNUMBER     => '330DC585',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D8',
             CAPACITY         => '32768',
@@ -318,7 +318,7 @@ my %tests = (
             NUMSLOTS         => 5,
             SERIALNUMBER     => '32A3A500',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D7',
             CAPACITY         => '32768',
@@ -339,7 +339,7 @@ my %tests = (
             NUMSLOTS         => 7,
             SERIALNUMBER     => '330DC584',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D0',
             CAPACITY         => '32768',
@@ -350,7 +350,7 @@ my %tests = (
             NUMSLOTS         => 8,
             SERIALNUMBER     => '32A3A4BD',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D1',
             CAPACITY         => '32768',
@@ -371,7 +371,7 @@ my %tests = (
             NUMSLOTS         => 10,
             SERIALNUMBER     => '330DC588',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D3',
             CAPACITY         => '32768',
@@ -382,7 +382,7 @@ my %tests = (
             NUMSLOTS         => 11,
             SERIALNUMBER     => '32A3A50E',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D4',
             CAPACITY         => '32768',
@@ -403,7 +403,7 @@ my %tests = (
             NUMSLOTS         => 13,
             SERIALNUMBER     => '330DC582',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D11',
             CAPACITY         => '32768',
@@ -414,7 +414,7 @@ my %tests = (
             NUMSLOTS         => 14,
             SERIALNUMBER     => '32A3A4CE',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D10',
             CAPACITY         => '32768',
@@ -435,7 +435,7 @@ my %tests = (
             NUMSLOTS         => 16,
             SERIALNUMBER     => '330DCB4F',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D8',
             CAPACITY         => '32768',
@@ -446,7 +446,7 @@ my %tests = (
             NUMSLOTS         => 17,
             SERIALNUMBER     => '32A3A4FC',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D7',
             CAPACITY         => '32768',
@@ -467,7 +467,7 @@ my %tests = (
             NUMSLOTS         => 19,
             SERIALNUMBER     => '330DC543',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D0',
             CAPACITY         => '32768',
@@ -478,7 +478,7 @@ my %tests = (
             NUMSLOTS         => 20,
             SERIALNUMBER     => '32A3A4CC',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D1',
             CAPACITY         => '32768',
@@ -499,7 +499,7 @@ my %tests = (
             NUMSLOTS         => 22,
             SERIALNUMBER     => '330DC52C',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D3',
             CAPACITY         => '32768',
@@ -510,7 +510,7 @@ my %tests = (
             NUMSLOTS         => 23,
             SERIALNUMBER     => '32A3A50D',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '2133 MHz',
+            SPEED            => '2133',
             TYPE             => 'DDR4',
             CAPTION          => 'D4',
             CAPACITY         => '32768',
@@ -544,7 +544,7 @@ my %tests = (
             NUMSLOTS         => 1,
             SERIALNUMBER     => '460360BB',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '400 MHz (2.5 ns)',
+            SPEED            => '400',
             TYPE             => 'DDR',
             CAPTION          => 'DIMM 1',
             CAPACITY         => '512',
@@ -555,9 +555,20 @@ my %tests = (
             NUMSLOTS         => 2,
             SERIALNUMBER     => '460360E8',
             DESCRIPTION      => 'DIMM',
-            SPEED            => '400 MHz (2.5 ns)',
+            SPEED            => '400',
             TYPE             => 'DDR',
             CAPTION          => 'DIMM 2',
+            CAPACITY         => '512',
+            MANUFACTURER     => undef,
+            MEMORYCORRECTION => 'Single-bit ECC'
+        },
+        {
+            NUMSLOTS         => 3,
+            SERIALNUMBER     => undef,
+            DESCRIPTION      => 'DIMM',
+            SPEED            => '400',
+            TYPE             => 'DDR',
+            CAPTION          => 'DIMM 3',
             CAPACITY         => '512',
             MANUFACTURER     => undef,
             MEMORYCORRECTION => 'Single-bit ECC'
@@ -614,7 +625,7 @@ my %tests = (
             NUMSLOTS         => 1,
             SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             TYPE             => undef,
             CAPTION          => 'DIMM 1A',
             CAPACITY         => '512',
@@ -626,7 +637,7 @@ my %tests = (
             NUMSLOTS         => 2,
             SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             TYPE             => undef,
             CAPTION          => 'DIMM 2B',
             CAPACITY         => '1024',
@@ -637,7 +648,7 @@ my %tests = (
             NUMSLOTS         => 3,
             SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             TYPE             => undef,
             CAPTION          => 'DIMM 3C',
             CAPACITY         => '1024',
@@ -658,7 +669,7 @@ my %tests = (
             NUMSLOTS         => 5,
             SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             TYPE             => undef,
             CAPTION          => 'DIMM 5A',
             CAPACITY         => '512',
@@ -669,7 +680,7 @@ my %tests = (
             NUMSLOTS         => 6,
             SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             TYPE             => undef,
             CAPTION          => 'DIMM 6B',
             CAPACITY         => '1024',
@@ -680,7 +691,7 @@ my %tests = (
             NUMSLOTS         => 7,
             SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             TYPE             => undef,
             CAPTION          => 'DIMM 7C',
             CAPACITY         => '1024',
@@ -704,7 +715,7 @@ my %tests = (
             SERIALNUMBER     => '94D657D7',
             DESCRIPTION      => 'DIMM',
             TYPE             => undef,
-            SPEED            => '1333 MHz (0.8 ns)',
+            SPEED            => '1333',
             CAPACITY         => '2048',
             CAPTION          => 'PROC 1 DIMM 2A',
             MANUFACTURER     => 'Micron',
@@ -726,7 +737,7 @@ my %tests = (
             SERIALNUMBER     => '93D657D7',
             DESCRIPTION      => 'DIMM',
             TYPE             => undef,
-            SPEED            => '1333 MHz (0.8 ns)',
+            SPEED            => '1333',
             CAPACITY         => '2048',
             CAPTION          => 'PROC 1 DIMM 4B',
             MANUFACTURER     => 'Micron',
@@ -829,7 +840,7 @@ my %tests = (
             SERIALNUMBER     => '0x750174F7',
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '533 MHz (1.9 ns)',
+            SPEED            => '533',
             CAPACITY         => '1024',
             CAPTION          => 'J8J1',
             MANUFACTURER     => undef,
@@ -841,7 +852,7 @@ my %tests = (
             SERIALNUMBER     => '0x9DCCE4ED',
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '533 MHz (1.9 ns)',
+            SPEED            => '533',
             CAPACITY         => '2048',
             CAPTION          => 'J8J2',
             MANUFACTURER     => undef,
@@ -853,7 +864,7 @@ my %tests = (
             SERIALNUMBER     => '0x750174FF',
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '533 MHz (1.9 ns)',
+            SPEED            => '533',
             CAPACITY         => '1024',
             CAPTION          => 'J9J1',
             MANUFACTURER     => undef,
@@ -878,7 +889,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             CAPACITY         => '1024',
             CAPTION          => 'ONBOARD DIMM_A1',
             MANUFACTURER     => undef,
@@ -889,7 +900,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             CAPACITY         => '1024',
             CAPTION          => 'ONBOARD DIMM_A2',
             MANUFACTURER     => undef,
@@ -900,7 +911,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             CAPACITY         => '1024',
             CAPTION          => 'ONBOARD DIMM_A3',
             MANUFACTURER     => undef,
@@ -911,7 +922,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             CAPACITY         => '1024',
             CAPTION          => 'ONBOARD DIMM_A4',
             MANUFACTURER     => undef,
@@ -922,7 +933,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             CAPACITY         => '1024',
             CAPTION          => 'ONBOARD DIMM_B1',
             MANUFACTURER     => undef,
@@ -933,7 +944,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             CAPACITY         => '1024',
             CAPTION          => 'ONBOARD DIMM_B2',
             MANUFACTURER     => undef,
@@ -944,7 +955,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             CAPACITY         => '1024',
             CAPTION          => 'ONBOARD DIMM_B3',
             MANUFACTURER     => undef,
@@ -955,7 +966,7 @@ my %tests = (
             SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
-            SPEED            => '667 MHz (1.5 ns)',
+            SPEED            => '667',
             CAPACITY         => '1024',
             CAPTION          => 'ONBOARD DIMM_B4',
             MANUFACTURER     => undef,
@@ -1254,7 +1265,7 @@ my %tests = (
             NUMSLOTS         => 1,
             SERIALNUMBER     => '14FA6621',
             TYPE             => 'DDR2',
-            SPEED            => '800 MHz',
+            SPEED            => '800',
             CAPTION          => 'DIMM_A',
             MEMORYCORRECTION => 'None',
             DESCRIPTION      => 'DIMM',
@@ -1265,7 +1276,7 @@ my %tests = (
             NUMSLOTS         => 2,
             SERIALNUMBER     => 'AEF96621',
             TYPE             => 'DDR2',
-            SPEED            => '800 MHz',
+            SPEED            => '800',
             CAPTION          => 'DIMM_B',
             MEMORYCORRECTION => 'None',
             DESCRIPTION      => 'DIMM',
@@ -1288,7 +1299,7 @@ my %tests = (
             NUMSLOTS         => 2,
             SERIALNUMBER     => '0000000',
             TYPE             => undef,
-            SPEED            => '1600 MHz',
+            SPEED            => '1600',
             CAPTION          => 'DIMM1',
             MEMORYCORRECTION => 'None',
             DESCRIPTION      => 'DIMM',
@@ -1309,12 +1320,74 @@ my %tests = (
             NUMSLOTS         => 4,
             SERIALNUMBER     => '0000000',
             TYPE             => undef,
-            SPEED            => '1600 MHz',
+            SPEED            => '1600',
             CAPTION          => 'DIMM3',
             MEMORYCORRECTION => 'None',
             DESCRIPTION      => 'DIMM',
             MANUFACTURER     => undef,
             CAPACITY         => '2048'
+        }
+    ],
+    'dell-fx160' => [
+        {
+            NUMSLOTS         => 1,
+            SERIALNUMBER     => '3B085E1E',
+            DESCRIPTION      => 'DIMM',
+            TYPE             => 'DDR2',
+            SPEED            => '800',
+            CAPACITY         => '1024',
+            CAPTION          => 'DIMM_1',
+            MANUFACTURER     => 'Nanya',
+            MEMORYCORRECTION => 'None'
+        },{
+            NUMSLOTS         => 2,
+            SERIALNUMBER     => 'SerNum01',
+            DESCRIPTION      => 'Other',
+            TYPE             => undef,
+            SPEED            => undef,
+            CAPTION          => 'DIMM_2',
+            MANUFACTURER     => undef,
+            MEMORYCORRECTION => 'None'
+        }
+    ],
+    'dell-fx170' => [
+        {
+            NUMSLOTS         => 1,
+            SERIALNUMBER     => 'None',
+            DESCRIPTION      => 'DIMM',
+            TYPE             => 'DDR2',
+            SPEED            => undef,
+            CAPACITY         => '2048',
+            CAPTION          => 'A0',
+            MANUFACTURER     => undef,
+            MEMORYCORRECTION => 'None'
+        },{
+            NUMSLOTS         => 2,
+            SERIALNUMBER     => 'None',
+            DESCRIPTION      => 'DIMM',
+            TYPE             => undef,
+            SPEED            => undef,
+            CAPTION          => 'A1',
+            MANUFACTURER     => undef,
+            MEMORYCORRECTION => 'None'
+        },{
+            NUMSLOTS         => 3,
+            SERIALNUMBER     => 'None',
+            DESCRIPTION      => 'DIMM',
+            TYPE             => undef,
+            SPEED            => undef,
+            CAPTION          => 'A2',
+            MANUFACTURER     => undef,
+            MEMORYCORRECTION => 'None'
+        },{
+            NUMSLOTS         => 4,
+            SERIALNUMBER     => 'None',
+            DESCRIPTION      => 'DIMM',
+            TYPE             => undef,
+            SPEED            => undef,
+            CAPTION          => 'A3',
+            MANUFACTURER     => undef,
+            MEMORYCORRECTION => 'None'
         }
     ],
     'windows-hyperV' => [
@@ -1328,7 +1401,6 @@ my %tests = (
             CAPTION          => 'M0',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 2,
@@ -1339,7 +1411,6 @@ my %tests = (
             CAPTION          => 'M1',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 3,
@@ -1350,7 +1421,6 @@ my %tests = (
             CAPTION          => 'M2',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 4,
@@ -1361,7 +1431,6 @@ my %tests = (
             CAPTION          => 'M3',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 5,
@@ -1372,7 +1441,6 @@ my %tests = (
             CAPTION          => 'M4',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 6,
@@ -1383,7 +1451,6 @@ my %tests = (
             CAPTION          => 'M5',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 7,
@@ -1394,7 +1461,6 @@ my %tests = (
             CAPTION          => 'M6',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 8,
@@ -1405,7 +1471,6 @@ my %tests = (
             CAPTION          => 'M7',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 9,
@@ -1416,7 +1481,6 @@ my %tests = (
             CAPTION          => 'M8',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 10,
@@ -1427,7 +1491,6 @@ my %tests = (
             CAPTION          => 'M9',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 11,
@@ -1438,7 +1501,6 @@ my %tests = (
             CAPTION          => 'M10',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 12,
@@ -1449,7 +1511,6 @@ my %tests = (
             CAPTION          => 'M11',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 13,
@@ -1460,7 +1521,6 @@ my %tests = (
             CAPTION          => 'M12',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 14,
@@ -1471,7 +1531,6 @@ my %tests = (
             CAPTION          => 'M13',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 15,
@@ -1482,7 +1541,6 @@ my %tests = (
             CAPTION          => 'M14',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 16,
@@ -1493,7 +1551,6 @@ my %tests = (
             CAPTION          => 'M15',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 17,
@@ -1504,7 +1561,6 @@ my %tests = (
             CAPTION          => 'M16',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 18,
@@ -1515,7 +1571,6 @@ my %tests = (
             CAPTION          => 'M17',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 19,
@@ -1526,7 +1581,6 @@ my %tests = (
             CAPTION          => 'M18',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 20,
@@ -1537,7 +1591,6 @@ my %tests = (
             CAPTION          => 'M19',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 21,
@@ -1548,7 +1601,6 @@ my %tests = (
             CAPTION          => 'M20',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 22,
@@ -1559,7 +1611,6 @@ my %tests = (
             CAPTION          => 'M21',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 23,
@@ -1570,7 +1621,6 @@ my %tests = (
             CAPTION          => 'M22',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 24,
@@ -1581,7 +1631,6 @@ my %tests = (
             CAPTION          => 'M23',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 25,
@@ -1592,7 +1641,6 @@ my %tests = (
             CAPTION          => 'M24',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 26,
@@ -1603,7 +1651,6 @@ my %tests = (
             CAPTION          => 'M25',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 27,
@@ -1614,7 +1661,6 @@ my %tests = (
             CAPTION          => 'M26',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 28,
@@ -1625,7 +1671,6 @@ my %tests = (
             CAPTION          => 'M27',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 29,
@@ -1636,7 +1681,6 @@ my %tests = (
             CAPTION          => 'M28',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 30,
@@ -1647,7 +1691,6 @@ my %tests = (
             CAPTION          => 'M29',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 31,
@@ -1658,7 +1701,6 @@ my %tests = (
             CAPTION          => 'M30',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 32,
@@ -1669,7 +1711,6 @@ my %tests = (
             CAPTION          => 'M31',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 33,
@@ -1680,7 +1721,6 @@ my %tests = (
             CAPTION          => 'M32',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 34,
@@ -1691,7 +1731,6 @@ my %tests = (
             CAPTION          => 'M33',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 35,
@@ -1702,7 +1741,6 @@ my %tests = (
             CAPTION          => 'M34',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 36,
@@ -1713,7 +1751,6 @@ my %tests = (
             CAPTION          => 'M35',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 37,
@@ -1724,7 +1761,6 @@ my %tests = (
             CAPTION          => 'M36',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 38,
@@ -1735,7 +1771,6 @@ my %tests = (
             CAPTION          => 'M37',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 39,
@@ -1746,7 +1781,6 @@ my %tests = (
             CAPTION          => 'M38',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 40,
@@ -1757,7 +1791,6 @@ my %tests = (
             CAPTION          => 'M39',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 41,
@@ -1768,7 +1801,6 @@ my %tests = (
             CAPTION          => 'M40',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 42,
@@ -1779,7 +1811,6 @@ my %tests = (
             CAPTION          => 'M41',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 43,
@@ -1790,7 +1821,6 @@ my %tests = (
             CAPTION          => 'M42',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 44,
@@ -1801,7 +1831,6 @@ my %tests = (
             CAPTION          => 'M43',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 45,
@@ -1812,7 +1841,6 @@ my %tests = (
             CAPTION          => 'M44',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 46,
@@ -1823,7 +1851,6 @@ my %tests = (
             CAPTION          => 'M45',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 47,
@@ -1834,7 +1861,6 @@ my %tests = (
             CAPTION          => 'M46',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 48,
@@ -1845,7 +1871,6 @@ my %tests = (
             CAPTION          => 'M47',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 49,
@@ -1856,7 +1881,6 @@ my %tests = (
             CAPTION          => 'M48',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 50,
@@ -1867,7 +1891,6 @@ my %tests = (
             CAPTION          => 'M49',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 51,
@@ -1878,7 +1901,6 @@ my %tests = (
             CAPTION          => 'M50',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 52,
@@ -1889,7 +1911,6 @@ my %tests = (
             CAPTION          => 'M51',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 53,
@@ -1900,7 +1921,6 @@ my %tests = (
             CAPTION          => 'M52',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 54,
@@ -1911,7 +1931,6 @@ my %tests = (
             CAPTION          => 'M53',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 55,
@@ -1922,7 +1941,6 @@ my %tests = (
             CAPTION          => 'M54',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 56,
@@ -1933,7 +1951,6 @@ my %tests = (
             CAPTION          => 'M55',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 57,
@@ -1944,7 +1961,6 @@ my %tests = (
             CAPTION          => 'M56',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 58,
@@ -1955,7 +1971,6 @@ my %tests = (
             CAPTION          => 'M57',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 59,
@@ -1966,7 +1981,6 @@ my %tests = (
             CAPTION          => 'M58',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 60,
@@ -1977,7 +1991,6 @@ my %tests = (
             CAPTION          => 'M59',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 61,
@@ -1988,7 +2001,6 @@ my %tests = (
             CAPTION          => 'M60',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 62,
@@ -1999,7 +2011,6 @@ my %tests = (
             CAPTION          => 'M61',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 63,
@@ -2010,7 +2021,6 @@ my %tests = (
             CAPTION          => 'M62',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         },
         {
             NUMSLOTS         => 64,
@@ -2021,7 +2031,6 @@ my %tests = (
             CAPTION          => 'M63',
             MANUFACTURER     => 'Microsoft',
             MEMORYCORRECTION => 'None'
-
         }
     ]
 );

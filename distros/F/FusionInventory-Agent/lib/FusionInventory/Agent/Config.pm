@@ -5,12 +5,13 @@ use warnings;
 
 use English qw(-no_match_vars);
 use File::Spec;
+use Cwd qw(abs_path);
 use Getopt::Long;
 use UNIVERSAL::require;
 
 use FusionInventory::Agent::Version;
 
-require FusionInventory::Agent::Tools;
+use FusionInventory::Agent::Tools;
 
 my $default = {
     'additional-content'      => undef,
@@ -47,6 +48,7 @@ my $default = {
     'tasks'                   => undef,
     'timeout'                 => 180,
     'user'                    => undef,
+    'vardir'                  => undef,
     # deprecated options
     'stdout'                  => undef,
 };
@@ -63,35 +65,35 @@ my $confReloadIntervalMinValue = 60;
 sub new {
     my ($class, %params) = @_;
 
-    my $self = {};
+    my $self = {
+        '_confdir' => undef, # SYSCONFDIR replaced here from Makefile
+    };
     bless $self, $class;
     $self->_loadDefaults();
 
-    $self->_loadFromBackend($params{options}->{'conf-file'}, $params{options}->{config}, $params{confdir});
+    $self->_loadFromBackend($params{options}->{'conf-file'}, $params{options}->{config});
 
     $self->_loadUserParams($params{options});
 
-    $self->_checkContent();
+    $self->{vardir} = $params{vardir};
 
-    if (defined($params{options}->{'conf-file'})) {
-        $self->{'conf-file'} = $params{options}->{'conf-file'}
-    }
+    $self->_checkContent();
 
     return $self;
 }
 
 sub reloadFromInputAndBackend {
-    my ($self, $confDir) = @_;
+    my ($self) = @_;
 
     $self->_loadDefaults;
 
-    $self->_loadFromBackend($self->{'conf-file'}, $self->{config}, $confDir);
+    $self->_loadFromBackend($self->{'conf-file'}, $self->{config});
 
     $self->_checkContent();
 }
 
 sub _loadFromBackend {
-    my ($self, $confFile, $config, $confdir) = @_;
+    my ($self, $confFile, $config) = @_;
 
     my $backend =
         $confFile            ? 'file'      :
@@ -108,10 +110,12 @@ sub _loadFromBackend {
         }
 
         if ($backend eq 'file') {
+            # Handle loadedConfs to avoid loops
+            $self->{loadedConfs} = {};
             $self->_loadFromFile({
-                file      => $confFile,
-                directory => $confdir,
+                file => $confFile
             });
+            delete $self->{loadedConfs};
             last SWITCH;
         }
 
@@ -129,6 +133,15 @@ sub _loadDefaults {
     foreach my $key (keys %$default) {
         $self->{$key} = $default->{$key};
     }
+
+    # No need to reset confdir at each call
+    return if $self->{_confdir} && -d $self->{_confdir};
+
+    # Set absolute confdir from default if replaced by Makefile otherwise search
+    # from current path, mostly useful while running from source
+    $self->{_confdir} = abs_path(File::Spec->rel2abs(
+        $self->{_confdir} || first { -d $_ } qw{ ./etc  ../etc }
+    ));
 }
 
 sub _loadFromRegistry {
@@ -166,10 +179,16 @@ sub _loadFromRegistry {
     }
 }
 
+sub confdir {
+    my ($self) = @_;
+
+    return $self->{_confdir};
+}
+
 sub _loadFromFile {
     my ($self, $params) = @_;
     my $file = $params->{file} ?
-        $params->{file} : $params->{directory} . '/agent.cfg';
+        $params->{file} : $self->{_confdir} . '/agent.cfg';
 
     if ($file) {
         die "non-existing file $file" unless -f $file;
@@ -177,6 +196,14 @@ sub _loadFromFile {
     } else {
         die "no configuration file";
     }
+
+    # Don't reload conf if still loaded avoiding loops due to include directive
+    if ($self->{loadedConfs}->{$file}) {
+        warn "$file configuration file still loaded\n"
+            if $self->{logger} && ucfirst($self->{logger}) eq 'Stderr';
+        return;
+    }
+    $self->{loadedConfs}->{$file} = 1;
 
     my $handle;
     if (!open $handle, '<', $file) {
@@ -205,12 +232,52 @@ sub _loadFromFile {
 
             if (exists $default->{$key}) {
                 $self->{$key} = $val;
+            } elsif (lc($key) eq 'include') {
+                $self->_includeDirective($val, $file);
             } else {
                 warn "unknown configuration directive $key";
             }
+        } elsif ($line =~ /^\s*include\s+(.+)$/i) {
+            my $include = $1;
+            if ($include =~ /^(['"])([^\1]*)\1/) {
+                my ($quote, $extract) = ( $1, $2 );
+                $include =~ s/\s*#.+$//;
+                warn "We may have been confused for include quoted path, our extracted path: '$extract'"
+                    if ($include ne "$quote$extract$quote");
+                $include = $extract ;
+            } else {
+                $include =~ s/\s*#.+$//;
+            }
+            $self->_includeDirective($include, $file);
         }
     }
     close $handle;
+}
+
+sub _includeDirective {
+    my ($self, $include, $currentconfig) = @_;
+
+    # Make include path absolute, relatively to current file basedir
+    unless (File::Spec->file_name_is_absolute($include)) {
+        my @path = File::Spec->splitpath($currentconfig);
+        $path[2] = $include;
+        $include = File::Spec->catpath(@path);
+    }
+    # abs_path makes call die under windows if file doen't exist, so we need to eval it
+    eval {
+        $include = abs_path($include);
+    };
+    return unless $include;
+
+    if (-d $include) {
+        foreach my $cfg ( sort glob("$include/*.cfg") ) {
+            # Skip missing or non-readable file
+            next unless -f $cfg && -r $cfg;
+            $self->_loadFromFile({ file => $cfg });
+        }
+    } elsif ( -f $include && -r $include ) {
+        $self->_loadFromFile({ file => $include });
+    }
 }
 
 sub _loadUserParams {
@@ -307,6 +374,8 @@ sub _checkContent {
         File::Spec->rel2abs($self->{'ca-cert-dir'}) if $self->{'ca-cert-dir'};
     $self->{'logfile'} =
         File::Spec->rel2abs($self->{'logfile'}) if $self->{'logfile'};
+    $self->{'vardir'} =
+        File::Spec->rel2abs($self->{'vardir'}) if $self->{'vardir'};
 
     # conf-reload-interval option
     # If value is less than the required minimum, we force it to that
@@ -324,7 +393,70 @@ sub _checkContent {
 sub isParamArrayAndFilled {
     my ($self, $paramName) = @_;
 
-    return FusionInventory::Agent::Tools::isParamArrayAndFilled($self, $paramName);
+    return unless defined($self->{$paramName});
+
+    return unless ref($self->{$paramName}) eq 'ARRAY';
+
+    return scalar(@{$self->{$paramName}}) > 0;
+}
+
+sub logger {
+    my ($self) = @_;
+
+    return {
+        map { $_ => $self->{$_} }
+            qw/debug logger logfacility logfile logfile-maxsize color/
+    };
+}
+
+sub getTargets {
+    my ($self, %params) = @_;
+
+    my @targets = ();
+
+    # create target list
+    if ($self->{local}) {
+        FusionInventory::Agent::Target::Local->require();
+        foreach my $path (@{$self->{local}}) {
+            push @targets,
+                FusionInventory::Agent::Target::Local->new(
+                    logger     => $params{logger},
+                    delaytime  => $self->{delaytime},
+                    basevardir => $params{vardir},
+                    path       => $path,
+                    html       => $self->{html},
+                );
+        }
+    }
+
+    if ($self->{server}) {
+        FusionInventory::Agent::Target::Server->require();
+        FusionInventory::Agent::Target::Scheduler->require();
+        foreach my $url (@{$self->{server}}) {
+            my $server = FusionInventory::Agent::Target::Server->new(
+                logger     => $params{logger},
+                delaytime  => $self->{delaytime},
+                basevardir => $params{vardir},
+                url        => $url,
+                tag        => $self->{tag},
+            );
+
+            # Also setup one Scheduler target for each target, actually
+            # it only used by Maintenance task to cleanup storage from
+            # expired files
+            # Schedule it to run every 2 minutes max by default
+            my $scheduler = FusionInventory::Agent::Target::Scheduler->new(
+                logger      => $params{logger},
+                delaytime   => 60,
+                maxDelay    => 120,
+                basevardir  => $params{vardir},
+                storage     => $server->getStorage(),
+            );
+            push @targets, $server, $scheduler;
+        }
+    }
+
+    return \@targets;
 }
 
 1;
@@ -347,12 +479,12 @@ hash:
 
 =over
 
-=item I<confdir>
-
-the configuration directory.
-
 =item I<options>
 
 additional options override.
 
 =back
+
+=head2 logger()
+
+Get logger only configuration.

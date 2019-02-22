@@ -12,7 +12,7 @@ use XML::TreePP;
 use FusionInventory::Agent::Tools;
 use FusionInventory::Test::Utils;
 
-plan tests => 34;
+plan tests => 36;
 
 my ($content, $out, $err, $rc);
 
@@ -34,9 +34,7 @@ like(
     '--version stdout'
 );
 
-my $regconf = $OSNAME eq 'MSWin32' ? keys(%{FusionInventory::Test::Utils::openWin32Registry()}) : 0;
-
-($out, $err, $rc) = run_executable('fusioninventory-agent', $regconf ? '--config none' : undef);
+($out, $err, $rc) = run_executable('fusioninventory-agent', '--config none');
 ok($rc == 1, 'no target exit status');
 like(
     $err,
@@ -57,8 +55,7 @@ like(
 );
 is($out, '', 'incompatible options stdout');
 
-my $base_options = "--debug --no-task ocsdeploy,wakeonlan,snmpquery,netdiscovery";
-$base_options .= " --config none" if $regconf;
+my $base_options = "--debug --no-task ocsdeploy,wakeonlan,snmpquery,netdiscovery --config none";
 
 # first inventory
 ($out, $err, $rc) = run_executable(
@@ -220,6 +217,25 @@ subtest "--local <file> inventory execution" => sub {
 };
 ok(-f "$dir/foo", '--local <file> result file presence');
 
+# consecutive lazy inventory with fake server target, no inventory and no failure
+($out, $err, $rc) = run_executable(
+    'fusioninventory-agent',
+    "$base_options --lazy --server=http://localhost/plugins/fusioninventory"
+);
+
+subtest "second inventory execution and content" => sub {
+    check_execution_ok($err, $rc);
+};
+
+($out, $err, $rc) = run_executable(
+    'fusioninventory-agent',
+    "$base_options --lazy --server=http://localhost/plugins/fusioninventory"
+);
+
+subtest "second inventory execution and content" => sub {
+    check_execution_ok($err, $rc);
+};
+
 sub check_execution_ok {
     my ($err, $rc) = @_;
 
@@ -235,6 +251,12 @@ sub check_execution_ok {
         $err,
         qr/unexpected error in \S+/,
         'no broken module (execution)'
+    );
+
+    unlike(
+        $err,
+        qr/Use of uninitialized value/,
+        'no failure on uninitialized value'
     );
 }
 

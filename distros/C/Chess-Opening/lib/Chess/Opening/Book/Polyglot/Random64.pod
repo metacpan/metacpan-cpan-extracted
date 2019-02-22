@@ -1,0 +1,23 @@
+=for Pod::Coverage empty
+
+=head1 NAME
+
+Chess::Opening::Book::Polyglot::Random64 - Polyglot random data
+
+=head1 SYNOPSIS
+
+	die "internal to Chess::Opening";
+    
+=head1 DESCRIPTION
+
+This file contains the random data for creating the Zobrist keys that
+L<Chess::Opening::Book::Polyglot> uses.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2019 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+L<Chess::Opening::Book::Polyglot>, perl(1)

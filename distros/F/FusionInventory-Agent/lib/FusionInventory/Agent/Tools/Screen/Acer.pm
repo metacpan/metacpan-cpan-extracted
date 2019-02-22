@@ -3,10 +3,10 @@ package FusionInventory::Agent::Tools::Screen::Acer;
 use strict;
 use warnings;
 
-use base 'FusionInventory::Agent::Tools::Screen';
+use parent 'FusionInventory::Agent::Tools::Screen';
 
 # Well-known eisa_id for which wee need to revert serial and altserial
-my $eisa_id_match = qr/(0018|0020|0024|00A8|0330|0337|0783|7883|ad49|adaf)$/ ;
+my $eisa_id_match = qr/(0018|0020|0024|00a3|00A8|00d2|00f7|032e|0330|0337|0468|0783|7883|ad49|adaf)$/ ;
 
 sub serial {
     my ($self) = @_;

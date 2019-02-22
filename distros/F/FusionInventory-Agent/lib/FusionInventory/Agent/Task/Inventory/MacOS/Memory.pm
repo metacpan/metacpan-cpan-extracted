@@ -3,8 +3,13 @@ package FusionInventory::Agent::Task::Inventory::MacOS::Memory;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::MacOS;
+
+our $runMeIfTheseChecksFailed =
+    ["FusionInventory::Agent::Task::Inventory::Generic::Dmidecode"];
 
 sub isEnabled {
     my (%params) = @_;

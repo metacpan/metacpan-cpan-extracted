@@ -1,6 +1,30 @@
 Revision history for Perl extension Test::CheckManifest.
 ========================================================
 
+1.42    2019-02-22 17:41:00
+
+      * add section in doc that explains how to replace test scripts using Test::CheckManifest
+      * stable release with all the changes from the test releases
+
+1.41_04 2019-02-21 15:12:00
+
+      * fix test failure on Win32 - use "plan skip_all" instead of "skip '...'"
+      * update dist.ini
+
+1.41_03 2019-02-21 09:27:00
+
+      * optimize ok_manifest()
+      * add more tests for find_home()
+
+1.41_02 2019-02-20 13:37:00
+
+      * more debugging stuff
+
+1.41_01 2019-02-20 09:50:00
+
+      * use regexes to silence warnings
+      * add debugging stuff to debug win32 failures
+
 1.41  2019-02-19 10:53:00
 
       * improve tests

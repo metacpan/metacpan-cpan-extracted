@@ -221,12 +221,47 @@ my %edid_tests = (
         ALTSERIAL    => 'LBZ081614233',
         DESCRIPTION  => '5/2010'
     },
+    'lcd.acer-ka240hq' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'Acer KA240HQ',
+        SERIAL       => 'T3SEE0058040f0164206',
+        ALTSERIAL    => 'T3SEE0054206',
+        DESCRIPTION  => '4/2018'
+    },
     'lcd.acer-x193hq' => {
         MANUFACTURER => 'Acer Technologies',
         CAPTION      => 'X193HQ',
         SERIAL       => 'LEK0D0998545',
         ALTSERIAL    => 'LEK0D09994003c0c8545',
         DESCRIPTION  => '40/2009'
+    },
+    'lcd.acer-v246hl' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'Acer V246HL',
+        SERIAL       => 'LXMEE02080905d6c4222',
+        ALTSERIAL    => 'LXMEE0204222',
+        DESCRIPTION  => '9/2018'
+    },
+    'lcd.acer-v193.3' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'V193',
+        SERIAL       => 'LHW0D03093901df58531',
+        ALTSERIAL    => 'LHW0D0308531',
+        DESCRIPTION  => '39/2009'
+    },
+    'lcd.acer-b243h' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'B243H',
+        SERIAL       => 'LH30C0109500722b40D1',
+        ALTSERIAL    => 'LH30C01040D1',
+        DESCRIPTION  => '50/2009'
+    },
+    'lcd.acer-v243h' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'V243H',
+        SERIAL       => 'LFV0C00391105c5a4030',
+        ALTSERIAL    => 'LFV0C0034030',
+        DESCRIPTION  => '11/2009'
     },
     'lcd.b-101750' => {
         MANUFACTURER => 'Rogen Tech Distribution Inc',

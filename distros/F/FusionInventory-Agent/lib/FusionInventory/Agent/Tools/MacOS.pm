@@ -2,7 +2,7 @@ package FusionInventory::Agent::Tools::MacOS;
 
 use strict;
 use warnings;
-use base 'Exporter';
+use parent 'Exporter';
 
 use English qw(-no_match_vars);
 use Memoize;
@@ -10,6 +10,7 @@ use POSIX 'strftime';
 use Time::Local;
 use XML::TreePP;
 use UNIVERSAL::require;
+use Storable 'dclone';
 
 use FusionInventory::Agent::Tools;
 
@@ -24,8 +25,33 @@ memoize('getSystemProfilerInfos');
 use constant {
     KEY_ELEMENT_NAME   => 'key',
     VALUE_ELEMENT_NAME => 'string',
-    DATE_ELEMENT_NAME  => 'date'
+    DATE_ELEMENT_NAME  => 'date',
+    ARRAY_ELEMENT_NAME => 'array'
 };
+
+my $xmlParser;
+
+sub _initXmlParser {
+    my (%params) = @_;
+
+    XML::XPath->require();
+    if ($EVAL_ERROR) {
+        $params{logger}->debug(
+            'XML::XPath unavailable, unable launching _initXmlParser()'
+        ) if $params{logger};
+        return 0;
+    }
+    if ($params{xmlString}) {
+        $xmlParser = XML::XPath->new(xml => $params{xmlString});
+    } elsif ($params{file}) {
+        $xmlParser = XML::XPath->new(filename => $params{file});
+    }
+
+    # Don't validate XML against DTD, parsing may fail if a proxy is active
+    $XML::XPath::ParseParamEnt = 0;
+
+    return $xmlParser;
+}
 
 sub _getSystemProfilerInfosXML {
     my (%params) = @_;
@@ -40,7 +66,21 @@ sub _getSystemProfilerInfosXML {
     #    my $xmlStr = join '', @xml;
     my $info = {};
     if ($params{type} eq 'SPApplicationsDataType') {
-        $info = _extractDataFromXmlString($xmlStr, $params{logger}, $params{localTimeOffset});
+        $info->{Applications} = _extractSoftwaresFromXml(
+            %params,
+            xmlString => $xmlStr
+        );
+    } elsif (
+        $params{type} eq 'SPSerialATADataType'
+        || $params{type} eq 'SPDiscBurningDataType'
+        || $params{type} eq 'SPCardReaderDataType'
+        || $params{type} eq 'SPUSBDataType'
+        || $params{type} eq 'SPFireWireDataType'
+    ) {
+        $info->{storages} = _extractStoragesFromXml(
+            %params,
+            xmlString => $xmlStr
+        );
     } else {
         # not implemented for every data types
     }
@@ -48,117 +88,165 @@ sub _getSystemProfilerInfosXML {
     return $info;
 }
 
-sub _extractDataFromXmlString {
-    my ($xmlStr, $logger, $localTimeOffset) = @_;
+sub _extractSoftwaresFromXml {
+    my (%params) = @_;
 
-    my $xmlHash = _parseXmlStringKeepingOrder($xmlStr, $logger);
+    _initXmlParser(%params);
 
-    my $softwaresXmlHash = _extractInterestingPartOfHash($xmlHash);
+    return unless $xmlParser;
 
-    my $softwareHash;
-    for my $hash (@$softwaresXmlHash) {
-        my $soft = _pairKeyValueFromXml($hash);
-        next unless $soft->{'_name'};
-        $soft = _applySpecialRulesOnApplicationData($soft);
-        my $convertedDate = _convertDateFromApplicationDataXml($soft->{lastModified}, $localTimeOffset);
-        if (defined $convertedDate) {
-            $soft->{lastModified} = $convertedDate;
-        } else {
-            if (defined $logger) {
-                $logger->error("can't parse retrieved dates in 'lastModified' field in XML file");
-            }
-        }
-        my $mappedHash = _mapApplicationDataKeys($soft);
-        $softwareHash = _mergeHashes($softwareHash, $mappedHash);
+    my $softwaresHash = {};
+    my $xPathExpr =  "/plist/array[1]/dict[1]/key[text()='_items']/following-sibling::array[1]/child::dict";
+    my $n = $xmlParser->findnodes($xPathExpr);
+    my @nl = $n->get_nodelist();
+    for my $elem (@nl) {
+        $softwaresHash = _mergeHashes($softwaresHash, _extractSoftwareDataFromXmlNode($elem, $params{logger}, $params{localTimeOffset}));
     }
 
-    return {
-        'Applications' => $softwareHash
-    };
+    return $softwaresHash;
 }
 
-sub _extractInterestingPartOfHash {
-    my ($xmlHash) = @_;
+sub _extractSoftwareDataFromXmlNode {
+    my ($xmlNode, $logger, $localTimeOffset) = @_;
 
-    return _findElementAndReturnParentArray(undef, $xmlHash, 'key', '_name');
+    my $soft = _makeHashFromKeyValuesTextNodes($xmlNode);
+    next unless $soft->{'_name'};
+
+    $soft = _applySpecialRulesOnApplicationData($soft);
+    my $convertedDate = _convertDateFromApplicationDataXml($soft->{lastModified}, $localTimeOffset);
+    if (defined $convertedDate) {
+        $soft->{lastModified} = $convertedDate;
+    } else {
+        if (defined $logger) {
+            $logger->error("can't parse retrieved dates in 'lastModified' field in XML file");
+        }
+    }
+    my $mappedHash = _mapApplicationDataKeys($soft);
+
+    return $mappedHash;
 }
 
-sub _findElementAndReturnParentArray {
-    my ($parentArray, $struct, $elementName, $elementValue) = @_;
+sub _extractStoragesFromXml {
+    my (%params) = @_;
 
-    my $foundArray;
-    if ((ref $struct) eq 'HASH') {
-        if ($parentArray && $struct->{$elementName}) {
-            if (ref($struct->{$elementName}) eq ''
-                && $struct->{$elementName} eq $elementValue) {
-                $foundArray = $parentArray;
+    return unless $params{type};
+
+    _initXmlParser(%params);
+
+    return unless $xmlParser;
+
+    my $storagesHash = {};
+    my $xPathExpr;
+    if ($params{type} eq 'SPSerialATADataType') {
+        $xPathExpr =
+            "/plist/array[1]/dict[1]/key[text()='_items']/following-sibling::array[1]/child::dict"
+                . "/key[text()='_items']/following-sibling::array[1]/child::dict";
+    } elsif ($params{type} eq 'SPDiscBurningDataType'
+        || $params{type} eq 'SPCardReaderDataType'
+        || $params{type} eq 'SPUSBDataType') {
+        $xPathExpr = "//key[text()='_items']/following-sibling::array[1]/child::dict";
+    } elsif ($params{type} eq 'SPFireWireDataType') {
+        $xPathExpr = [
+            "//key[text()='_items']/following-sibling::array[1]"
+                . "/child::dict[key[text()='_name' and following-sibling::string[1][not(contains(.,'bus'))]]]",
+            "./key[text()='units']/following-sibling::array[1]/child::dict",
+            "./key[text()='units']/following-sibling::array[1]/child::dict"
+        ];
+    }
+
+    if (ref($xPathExpr) eq 'ARRAY') {
+        # next function call does not return anything
+        # it directly appends data to the hashref $storagesHash
+        _recursiveParsing({}, $storagesHash, undef, $xPathExpr);
+    } else {
+        my $n = $xmlParser->findnodes($xPathExpr);
+        my @nl = $n->get_nodelist();
+        for my $elem (@nl) {
+            my $storage = _makeHashFromKeyValuesTextNodes($elem);
+            next unless $storage->{_name};
+            $storagesHash->{$storage->{_name}} = $storage;
+        }
+    }
+    return $storagesHash;
+}
+
+# This function is used to parse ugly XML documents
+# It is used to aggregate data from a node and from its descendants
+
+sub _recursiveParsing {
+    my (
+        # data extracted from ancestors
+        $hashFields,
+        # hashref to merge data in
+        $hashElems,
+        # XML context node
+        $elemRoot,
+        # XPath expressions list to be processed
+        $xPathExpr
+    ) = @_;
+
+    # we use here dclone because each recursive call must have its own copy of these structure
+    my $xPathExprClone = dclone $xPathExpr;
+
+    # next XPath expression is eaten up
+    my $expr = shift @$xPathExprClone;
+
+    # XPath expression is processed at context $elemRoot
+    my $n = $xmlParser->findnodes($expr, $elemRoot);
+    my @nl = $n->get_nodelist();
+    if (scalar @nl > 0) {
+        for my $elem (@nl) {
+            # because of XML document specific format, we must do next call to create the hash
+            # in order to have a key-value structure
+            my $newHash = _makeHashFromKeyValuesTextNodes($elem);
+            next unless $newHash->{_name};
+
+            # we use here dclone because each recursive call must have its own copy of these structure
+            my $hashFieldsClone = dclone $hashFields;
+            # hashes are merged, existing values are overwritten (that is expected behaviour)
+            @$hashFieldsClone{keys %$newHash} = values %$newHash;
+            my $extractedElementName = $hashFieldsClone->{_name};
+
+            # if other XPath expressions have to be processed
+            if (scalar @$xPathExprClone) {
+                # recursive call
+                _recursiveParsing($hashFieldsClone, $hashElems, $elem, $xPathExprClone);
             } else {
-                my %hash = map { $_ => 1 } @{$struct->{$elementName}};
-                if ($hash{$elementValue}) {
-                    $foundArray = $parentArray;
-                }
-            }
-        } else {
-            for my $key (keys %$struct) {
-                my $ref = ref $struct->{$key};
-                if ($ref ne '') {
-                    $foundArray = _findElementAndReturnParentArray(undef, $struct->{$key}, $elementName, $elementValue);
-                }
-                last if $foundArray;
+                # no more XPath expression to process
+                # it's time to merge data in main hashref
+                $hashElems->{$extractedElementName} = { } unless $hashElems->{$extractedElementName};
+                @{$hashElems->{$extractedElementName}}{keys %$hashFieldsClone} = values %$hashFieldsClone;
             }
         }
-    } elsif ((ref $struct) eq 'ARRAY') {
-        for my $subStruct (@$struct) {
-            my $ref = ref $subStruct;
-            if ($ref ne '') {
-                $foundArray = _findElementAndReturnParentArray($struct, $subStruct, $elementName, $elementValue);
-                last if $foundArray;
-            }
+    } else {
+        # no more XML nodes found
+        # it's time to merge data in main hashref
+        if ($hashFields->{_name}) {
+            my $extractedElementName = $hashFields->{_name};
+            $hashElems->{$extractedElementName} = { } unless $hashElems->{$extractedElementName};
+            @{$hashElems->{$extractedElementName}}{keys %$hashFields} = values %$hashFields;
         }
     }
-    return $foundArray;
 }
 
-sub _pairKeyValueFromXml {
-    my ($hashFromXml) = @_;
+sub _makeHashFromKeyValuesTextNodes {
+    my ($node) = @_;
 
-    my $names = $$hashFromXml{KEY_ELEMENT_NAME()};
-    my $values = $$hashFromXml{VALUE_ELEMENT_NAME()};
-    my $date = $$hashFromXml{DATE_ELEMENT_NAME()};
+    next unless $xmlParser;
 
-    my $soft = {};
-    my $index = 0;
-    for my $key (@$names) {
-        my $value;
-        if ($key eq 'lastModified') {
-            $value = $date;
-        } else {
-            $value = $values->[$index];
-            $index++;
+    my $hash;
+    my $currentKey;
+    my $n = $xmlParser->findnodes('*', $node);
+    my @nl = $n->get_nodelist();
+    for my $elem (@nl) {
+        if ($elem->getName() eq KEY_ELEMENT_NAME) {
+            $currentKey = Encode::encode_utf8($elem->string_value());
+        } elsif ($currentKey && $elem->getName() ne ARRAY_ELEMENT_NAME) {
+            $hash->{$currentKey} = Encode::encode_utf8($elem->string_value());
+            $currentKey = undef;
         }
-        $soft->{$key} = $value;
     }
-
-    return $soft;
-}
-
-sub _parseXmlStringKeepingOrder {
-    my ($xmlStr, $logger) = @_;
-
-    # this module is required and cannot be imported by default
-    # because it's for Mac OS X only
-    Tie::IxHash->require();
-    if ($EVAL_ERROR) {
-        $logger->debug(
-            'Tie::IxHash unavailable, unable launching _parseXmlStringKeepingOrder to retrieve softwares'
-        ) if $logger;
-        return 0;
-    }
-
-    my $tpp = XML::TreePP->new( use_ixhash => 1 );
-    my $tree = $tpp->parse( $xmlStr );
-
-    return $tree;
+    return $hash;
 }
 
 sub cmpVersionNumbers {
@@ -248,17 +336,6 @@ sub _mergeHashes {
     }
 
     return $hash1;
-}
-
-sub _extractApplicationDataFromXmlStringElement {
-    my ($xmlString) = @_;
-
-    my $hash = {};
-    while ($xmlString =~ /<key>([^<]+)<\/key><(?:string|date)>([^<]+)<\/(?:string|date)>/g) {
-        $hash->{$1} = $2;
-    }
-
-    return $hash;
 }
 
 sub _mapApplicationDataKeys {

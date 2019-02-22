@@ -1,6 +1,6 @@
 package Acme::Boolean;
 # ABSTRACT: There is more then one way to be true.
-$Acme::Boolean::VERSION = '0.4';
+$Acme::Boolean::VERSION = '0.5';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ my @false = map {
 my @ad = map {
     *{$_} = sub($) { shift; };
     $_;
-} qw(so totally very definitely);
+} qw(so totally very definitely really certainly surely unquestionably undoubtedly absolutely);
 
 our @EXPORT = (qw(true false), @ad, @true, @false);
 our @EXPORT_OK = qw(isTrue isFalse isBoolean);
@@ -46,7 +46,7 @@ Acme::Boolean - There is more then one way to be true.
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 SYNOPSIS
 
@@ -103,7 +103,8 @@ Or you can:
 In your lovely sub.
 
 At this moment you can use these adjectives in front of any of those
-true/false vocabularies: so totally very definitely.
+true/false vocabularies: so totally very definitely really certainly
+surely unquestionably undoubtedly absolutely.
 
 =head2 SEE ALSO
 
@@ -115,7 +116,7 @@ Kang-min Liu <gugod@gugod.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Kang-min Liu.
+This software is Copyright (c) 2019 by Kang-min Liu.
 
 This is free software, licensed under:
 

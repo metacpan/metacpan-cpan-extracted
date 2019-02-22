@@ -42,7 +42,8 @@ my %tests = (
             MODEL        => '42',
             SPEED        => '2800',
             THREAD       => '1',
-            CORE         => '4'
+            CORE         => '1',
+            CORECOUNT    => '4'
         }
     ],
     '2003' => [
@@ -55,7 +56,7 @@ my %tests = (
             STEPPING     => '9',
             FAMILYNUMBER => '15',
             MODEL        => '2',
-            SPEED        => '3060',
+            SPEED        => '3065',
             THREAD       => undef,
             CORE         => undef
         },
@@ -68,7 +69,7 @@ my %tests = (
             STEPPING     => '9',
             FAMILYNUMBER => '15',
             MODEL        => '2',
-            SPEED        => '3060',
+            SPEED        => '3065',
             THREAD       => undef,
             CORE         => undef
         }
@@ -83,7 +84,7 @@ my %tests = (
             STEPPING     => '6',
             FAMILYNUMBER => '6',
             MODEL        => '23',
-            SPEED        => '2830',
+            SPEED        => '2833',
             THREAD       => undef,
             CORE         => undef
         },
@@ -96,7 +97,7 @@ my %tests = (
             STEPPING     => '6',
             FAMILYNUMBER => '6',
             MODEL        => '23',
-            SPEED        => '2830',
+            SPEED        => '2833',
             THREAD       => undef,
             CORE         => undef
         }
@@ -111,7 +112,7 @@ my %tests = (
             STEPPING     => '6',
             FAMILYNUMBER => '6',
             MODEL        => '23',
-            SPEED        => '2530',
+            SPEED        => '2534',
             THREAD       => '2',
             CORE         => '2'
         }
@@ -187,7 +188,9 @@ foreach my $test (keys %tests) {
     );
 
 
-    my @cpus = FusionInventory::Agent::Task::Inventory::Win32::CPU::_getCPUs();
+    my @cpus = FusionInventory::Agent::Task::Inventory::Win32::CPU::_getCPUs(
+        inventory => $inventory
+    );
     cmp_deeply(
         \@cpus,
         $tests{$test},

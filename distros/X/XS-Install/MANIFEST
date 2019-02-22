@@ -1,9 +1,11 @@
 Changes
 lib/XS/Install.pm
 lib/XS/Install.pod
+lib/XS/Install/HeaderDeps.pm
 lib/XS/Install/ParseXS.pm
 lib/XS/Install/Payload.pm
 lib/XS/Install/Payload.pod
+lib/XS/Install/Util.pm
 lib/XS/Loader.pm
 lib/XS/Loader.pod
 Makefile.PL

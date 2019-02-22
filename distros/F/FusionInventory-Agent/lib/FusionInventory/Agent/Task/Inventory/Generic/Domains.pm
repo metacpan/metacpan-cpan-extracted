@@ -3,6 +3,8 @@ package FusionInventory::Agent::Task::Inventory::Generic::Domains;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use Sys::Hostname;
 
 use FusionInventory::Agent::Tools;
@@ -47,7 +49,7 @@ sub doInventory {
     if ($pos >= 0) {
         $domain = substr($hostname, $pos + 1);
     } else {
-        $domain = join('/', keys %search_list);
+        $domain = join('/', sort keys %search_list);
     }
 
     $inventory->setHardware({

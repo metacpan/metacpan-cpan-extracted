@@ -3,7 +3,7 @@ package FusionInventory::Agent::Task::NetInventory;
 use strict;
 use warnings;
 use threads;
-use base 'FusionInventory::Agent::Task';
+use parent 'FusionInventory::Agent::Task';
 
 use Encode qw(encode);
 use English qw(-no_match_vars);
@@ -16,6 +16,7 @@ use FusionInventory::Agent::Version;
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::Hardware;
 use FusionInventory::Agent::Tools::Network;
+use FusionInventory::Agent::Tools::Expiration;
 
 use FusionInventory::Agent::Task::NetInventory::Version;
 
@@ -28,7 +29,7 @@ our $VERSION = FusionInventory::Agent::Task::NetInventory::Version::VERSION;
 sub isEnabled {
     my ($self, $response) = @_;
 
-    if (!$self->{target}->isa('FusionInventory::Agent::Target::Server')) {
+    if (!$self->{target}->isType('server')) {
         $self->{logger}->debug("NetInventory task not compatible with local target");
         return;
     }
@@ -93,7 +94,6 @@ sub run {
     ) if !$self->{client};
 
     foreach my $job (@{$self->{jobs}}) {
-        my $pid         = $job->{params}->{PID};
         my $max_threads = $job->{params}->{THREADS_QUERY};
         my $timeout     = $job->{params}->{TIMEOUT};
 
@@ -101,10 +101,13 @@ sub run {
         my $credentials = _getIndexedCredentials($job->{credentials});
 
         # set internal state
-        $self->{pid} = $pid;
+        $self->{pid} = $job->{params}->{PID} || '';
 
-        # send initial message to the server
-        $self->_sendStartMessage();
+        # newer server won't need START message if PID is provided on <DEVICE/>
+        my $skip_start_stop = any { defined($_->{PID}) } @{$job->{devices}};
+
+        # send initial message to server unless it supports newer protocol
+        $self->_sendStartMessage() unless $skip_start_stop;
 
         my ($debug_sent_count, $started_count) = ( 0, 0 );
         my %running_threads = ();
@@ -120,6 +123,12 @@ sub run {
 
         # no need for more threads than devices to scan
         my $threads_count = $max_threads > $size ? $size : $max_threads;
+
+        # Define a job expiration: 15 minutes by device to scan is large enough
+        setExpirationTime(
+            timeout => $size * (!$timeout || $timeout < 900 ?  900 : $timeout)
+        );
+        my $expiration = getExpirationTime();
 
         my $sub = sub {
             my $id = threads->tid();
@@ -145,7 +154,11 @@ sub run {
                             MESSAGE => $EVAL_ERROR
                         }
                     };
-                    $self->{logger}->error($EVAL_ERROR);
+
+                    # Inserted back device PID in result if set by server
+                    $result->{PID} = $device->{PID} if defined($device->{PID});
+
+                    $self->{logger}->error("[thread $id] $EVAL_ERROR");
                 }
 
                 $results->enqueue($result) if $result;
@@ -179,6 +192,17 @@ sub run {
                 $self->_sendResultMessage($result);
             }
 
+            if ($expiration && time > $expiration) {
+                $self->{logger}->warning("Aborting netinventory job as it reached expiration time");
+                # detach all our running worker
+                foreach my $tid (keys(%running_threads)) {
+                    $running_threads{$tid}->detach()
+                        if $running_threads{$tid}->is_running();
+                    delete $running_threads{$tid};
+                }
+                last;
+            }
+
             # wait for a little
             usleep(50000);
 
@@ -202,21 +226,24 @@ sub run {
             }
         }
 
+        # Reset expiration
+        setExpirationTime();
+
         # purge remaining results
         while (my $result = $results->dequeue_nb()) {
             $self->_sendResultMessage($result);
         }
 
-        # send final message to the server before cleaning threads
-        $self->_sendStopMessage();
+        # send final message to the server before cleaning threads unless it supports newer protocol
+        $self->_sendStopMessage() unless $skip_start_stop;
 
         if ($started_count) {
             $self->{logger}->debug("cleaning $started_count worker threads");
             $_->join() foreach threads->list(threads::joinable);
         }
 
-        # send final message to the server
-        $self->_sendStopMessage();
+        # send final message to the server unless it supports newer protocol
+        $self->_sendStopMessage() unless $skip_start_stop;
     }
 }
 
@@ -225,7 +252,7 @@ sub _sendMessage {
 
 
    my $message = FusionInventory::Agent::XML::Query->new(
-       deviceid => $self->{deviceid},
+       deviceid => $self->{deviceid} || 'foo',
        query    => 'SNMPQUERY',
        content  => $content
    );
@@ -264,10 +291,17 @@ sub _sendStopMessage {
 sub _sendResultMessage {
     my ($self, $result) = @_;
 
+    my $pid = $self->{pid};
+    if (exists($result->{PID})) {
+        # Don't keep PID in result but we want to set it as parent PROCESSNUMBER
+        $pid = $result->{PID} if defined($result->{PID});
+        delete $result->{PID};
+    }
+
     $self->_sendMessage({
         DEVICE        => $result,
         MODULEVERSION => $VERSION,
-        PROCESSNUMBER => $self->{pid}
+        PROCESSNUMBER => $pid
     });
 }
 
@@ -278,13 +312,18 @@ sub _queryDevice {
     my $device      = $params{device};
     my $logger      = $self->{logger};
     my $id          = threads->tid();
-    $logger->debug("[thread $id] scanning $device->{ID}");
+    $logger->debug(
+        "[thread $id] scanning $device->{ID}: $device->{IP}" .
+        ( $device->{PORT} ? ' on port ' . $device->{PORT} : '' ) .
+        ( $device->{PROTOCOL} ? ' via ' . $device->{PROTOCOL} : '' )
+    );
 
     my $snmp;
     if ($device->{FILE}) {
         FusionInventory::Agent::SNMP::Mock->require();
         eval {
             $snmp = FusionInventory::Agent::SNMP::Mock->new(
+                ip   => $device->{IP},
                 file => $device->{FILE}
             );
         };
@@ -295,6 +334,8 @@ sub _queryDevice {
             $snmp = FusionInventory::Agent::SNMP::Live->new(
                 version      => $credentials->{VERSION},
                 hostname     => $device->{IP},
+                port         => $device->{PORT},
+                domain       => $device->{PROTOCOL},
                 timeout      => $params{timeout} || 15,
                 community    => $credentials->{COMMUNITY},
                 username     => $credentials->{USERNAME},
@@ -315,6 +356,9 @@ sub _queryDevice {
          logger  => $self->{logger},
          datadir => $self->{datadir}
     );
+
+    # Inserted back device PID in result if set by server
+    $result->{PID} = $device->{PID} if defined($device->{PID});
 
     return $result;
 }

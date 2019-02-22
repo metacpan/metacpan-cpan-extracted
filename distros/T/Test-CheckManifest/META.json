@@ -30,6 +30,7 @@
          "requires" : {
             "Carp" : "0",
             "Cwd" : "3.75",
+            "Data::Dumper" : "0",
             "File::Basename" : "0",
             "File::Find" : "0",
             "File::Spec" : "0",
@@ -42,6 +43,8 @@
       "test" : {
          "requires" : {
             "CPAN::Meta::YAML" : "0",
+            "File::Path" : "0",
+            "IO::File" : "0",
             "Pod::Coverage::TrustPod" : "0"
          }
       }
@@ -49,7 +52,7 @@
    "provides" : {
       "Test::CheckManifest" : {
          "file" : "lib/Test/CheckManifest.pm",
-         "version" : "1.41"
+         "version" : "1.42"
       }
    },
    "release_status" : "stable",
@@ -64,8 +67,9 @@
          "web" : "http://github.com/reneeb/Test-CheckManifest"
       }
    },
-   "version" : "1.41",
+   "version" : "1.42",
    "x_contributors" : [
+      "Dan Book <grinnz@gmail.com>",
       "doug <doug@hcsw.org>",
       "LorenzoTa <LorenzoTa@users.noreply.github.com>",
       "LorenzoTa <lortav72@gmail.com>",

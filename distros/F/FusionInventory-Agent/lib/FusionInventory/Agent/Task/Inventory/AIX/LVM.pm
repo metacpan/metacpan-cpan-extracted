@@ -5,6 +5,8 @@ use FusionInventory::Agent::Tools;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use English qw(-no_match_vars);
 
 sub isEnabled {
@@ -85,7 +87,7 @@ sub _getLogicalVolume {
             $volume->{SEG_COUNT} = $1;
         }
         if ($line =~ /^TYPE:\s+(\S+)/) {
-            $volume->{ATTR} = "Type $1",
+            $volume->{ATTR} = "Type $1";
         }
     }
     close $handle;

@@ -3,7 +3,7 @@ package FusionInventory::Agent::Task::NetDiscovery;
 use strict;
 use warnings;
 use threads;
-use base 'FusionInventory::Agent::Task';
+use parent 'FusionInventory::Agent::Task';
 
 use constant DEVICE_PER_MESSAGE => 4;
 
@@ -13,12 +13,13 @@ use Time::localtime;
 use Time::HiRes qw(usleep);
 use Thread::Queue v2.01;
 use UNIVERSAL::require;
-use XML::TreePP;
 
 use FusionInventory::Agent::Version;
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::Network;
 use FusionInventory::Agent::Tools::Hardware;
+use FusionInventory::Agent::Tools::Expiration;
+use FusionInventory::Agent::Tools::SNMP;
 use FusionInventory::Agent::XML::Query;
 
 use FusionInventory::Agent::Task::NetDiscovery::Version;
@@ -28,7 +29,7 @@ our $VERSION = FusionInventory::Agent::Task::NetDiscovery::Version::VERSION;
 sub isEnabled {
     my ($self, $response) = @_;
 
-    if (!$self->{target}->isa('FusionInventory::Agent::Target::Server')) {
+    if (!$self->{target}->isType('server')) {
         $self->{logger}->debug("NetDiscovery task not compatible with local target");
         return;
     }
@@ -101,19 +102,22 @@ sub run {
     ) if !$self->{client};
 
     # check discovery methods available
-    my $nmap_parameters;
+    my $arp;
 
-    if (canRun('nmap')) {
-       my ($major, $minor) = getFirstMatch(
-           command => 'nmap -V',
-           pattern => qr/Nmap version (\d+)\.(\d+)/
-       );
-       $nmap_parameters = compareVersion($major, $minor, 5, 29) ?
-           "-sP -PP --system-dns --max-retries 1 --max-rtt-timeout 1000ms" :
-           "-sP --system-dns --max-retries 1 --max-rtt-timeout 1000ms"     ;
+    if (canRun('arp')) {
+        $arp = 'arp -a';
+    } elsif (canRun('ip')) {
+        $arp = 'ip neighbor show';
     } else {
         $self->{logger}->info(
-            "Can't run nmap, nmap detection can't be used"
+            "Can't run 'ip neighbor show' or 'arp' command, arp table detection can't be used"
+        );
+    }
+
+    Net::Ping->require();
+    if ($EVAL_ERROR) {
+        $self->{logger}->info(
+            "Can't load Net::Ping, echo ping can't be used"
         );
     }
 
@@ -151,6 +155,8 @@ sub run {
 
         # process each address block
         foreach my $range (@{$job->{ranges}}) {
+            my $ports = $self->_getSNMPPorts($range->{PORT});
+            my $proto = $self->_getSNMPProtocols($range->{PROTOCOL});
             my $block = Net::IP->new(
                 $range->{IPSTART} . '-' . $range->{IPEND}
             );
@@ -171,7 +177,7 @@ sub run {
             my $results   = Thread::Queue->new();
 
             do {
-                $addresses->enqueue($block->ip()),
+                $addresses->enqueue($block->ip());
             } while (++$block);
             my $size = $addresses->pending();
 
@@ -180,6 +186,12 @@ sub run {
 
             # no need for more threads than addresses to scan in this range
             my $threads_count = $max_threads > $size ? $size : $max_threads;
+
+            # Define a realistic block scan expiration : at least one minute by address
+            setExpirationTime(
+                timeout => $size * (!$timeout || $timeout < 60 ? 60 : $timeout)
+            );
+            my $expiration = getExpirationTime();
 
             my $sub = sub {
                 my $id = threads->tid();
@@ -191,8 +203,10 @@ sub run {
                     my $result = $self->_scanAddress(
                         ip               => $address,
                         timeout          => $timeout,
-                        nmap_parameters  => $nmap_parameters,
+                        arp              => $arp,
                         snmp_credentials => $snmp_credentials,
+                        snmp_ports       => $ports,
+                        snmp_domains     => $proto,
                     );
 
                     $results->enqueue($result) if $result;
@@ -228,6 +242,17 @@ sub run {
                     $self->_sendResultMessage($result);
                 }
 
+                if ($expiration && time > $expiration) {
+                    $self->{logger}->warning("Aborting block scan as it reached expiration time");
+                    # detach all our running worker
+                    foreach my $tid (keys(%running_threads)) {
+                        $running_threads{$tid}->detach()
+                            if $running_threads{$tid}->is_running();
+                        delete $running_threads{$tid};
+                    }
+                    last;
+                }
+
                 # wait for a little
                 usleep(50000);
 
@@ -250,6 +275,9 @@ sub run {
                         unless $running_threads_checklist{$tid};
                 }
             }
+
+            # Reset expiration
+            setExpirationTime();
 
             # purge remaning results
             while (my $result = $results->dequeue_nb()) {
@@ -304,7 +332,7 @@ sub _sendMessage {
     my ($self, $content) = @_;
 
     my $message = FusionInventory::Agent::XML::Query->new(
-        deviceid => $self->{deviceid},
+        deviceid => $self->{deviceid} || 'foo',
         query    => 'NETDISCOVERY',
         content  => $content
     );
@@ -323,9 +351,10 @@ sub _scanAddress {
     $logger->debug("[thread $id] scanning $params{ip}:");
 
     my %device = (
-        $params{nmap_parameters} ? $self->_scanAddressByNmap(%params)    : (),
+        $INC{'Net/SNMP.pm'}      ? $self->_scanAddressBySNMP(%params)    : (),
         $INC{'Net/NBName.pm'}    ? $self->_scanAddressByNetbios(%params) : (),
-        $INC{'Net/SNMP.pm'}      ? $self->_scanAddressBySNMP(%params)    : ()
+        $INC{'Net/Ping.pm'}      ? $self->_scanAddressByPing(%params)    : (),
+        $params{arp}             ? $self->_scanAddressByArp(%params)     : (),
     );
 
     # don't report anything without a minimal amount of information
@@ -344,21 +373,75 @@ sub _scanAddress {
     return \%device;
 }
 
-sub _scanAddressByNmap {
+sub _scanAddressByArp {
     my ($self, %params) = @_;
 
-    my $device = _parseNmap(
-        command => "nmap $params{nmap_parameters} $params{ip} -oX -"
+    return unless $params{ip};
+
+    # We want to match the ip including non digit character around
+    my $ip_match = '\b' . $params{ip} . '\D';
+    # We want to match dot on dots
+    $ip_match =~ s/\./\\./g;
+
+    my $output = getFirstMatch(
+        command => $params{arp} . " " . $params{ip},
+        pattern => qr/^(.*$ip_match.*)$/,
+        %params
     );
+
+    my %device = ();
+
+    if ($output && $output =~ /^(\S+) \(\S+\) at (\S+) /) {
+        $device{DNSHOSTNAME} = $1 if $1 ne '?';
+        $device{MAC}         = getCanonicalMacAddress($2);
+    } elsif ($output && $output =~ /^\s+\S+\s+([:a-zA-Z0-9-]+)\s/) {
+        # Under win32, mac address separators are minus signs
+        my $mac_address = $1;
+        $mac_address =~ s/-/:/g;
+        $device{MAC} = getCanonicalMacAddress($mac_address);
+    } elsif ($output && $output =~ /^\S+\s+dev\s+\S+\s+lladdr\s+([:a-zA-Z0-9-]+)\s/) {
+        $device{MAC} = getCanonicalMacAddress($1);
+    }
 
     $self->{logger}->debug(
-        sprintf "[thread %d] - scanning %s with nmap: %s",
+        sprintf "[thread %d] - scanning %s in arp table: %s",
         threads->tid(),
         $params{ip},
-        $device ? 'success' : 'no result'
+        $device{MAC} ? 'success' : 'no result'
     );
 
-    return $device ? %$device : ();
+    return %device;
+}
+
+sub _scanAddressByPing {
+    my ($self, %params) = @_;
+
+    my $type = 'echo';
+    my $np = Net::Ping->new('icmp', 1);
+
+    my %device = ();
+
+    # Avoid an error as Net::Ping::VERSION may contain underscore
+    my ($NetPingVersion) = split('_',$Net::Ping::VERSION);
+
+    if ($np->ping($params{ip})) {
+        $device{DNSHOSTNAME} = $params{ip};
+    } elsif ($NetPingVersion >= 2.67) {
+        $type = 'timestamp';
+        $np->message_type($type);
+        if ($np->ping($params{ip})) {
+            $device{DNSHOSTNAME} = $params{ip};
+        }
+    }
+
+    $self->{logger}->debug(
+        sprintf "[thread %d] - scanning %s with $type ping: %s",
+        threads->tid(),
+        $params{ip},
+        $device{DNSHOSTNAME} ? 'success' : 'no result'
+    );
+
+    return %device;
 }
 
 sub _scanAddressByNetbios {
@@ -402,25 +485,51 @@ sub _scanAddressByNetbios {
 sub _scanAddressBySNMP {
     my ($self, %params) = @_;
 
-    foreach my $credential (@{$params{snmp_credentials}}) {
-        my %device = $self->_scanAddressBySNMPReal(
+    my $tries = [];
+    if ($params{snmp_ports} && @{$params{snmp_ports}}) {
+        foreach my $port (@{$params{snmp_ports}}) {
+            my @cases = map { { port => $port, credential => $_ } } @{$params{snmp_credentials}};
+            push @{$tries}, @cases;
+        }
+    } else {
+        @{$tries} = map { { credential => $_ } } @{$params{snmp_credentials}};
+    }
+    if ($params{snmp_domains} && @{$params{snmp_domains}}) {
+        my @domtries = ();
+        foreach my $domain (@{$params{snmp_domains}}) {
+            foreach my $try (@{$tries}) {
+                $try->{domain} = $domain;
+            }
+            push @domtries, @{$tries};
+        }
+        $tries = \@domtries;
+    }
+
+    foreach my $try (@{$tries}) {
+        my $credential = $try->{credential};
+        my $device = $self->_scanAddressBySNMPReal(
             ip         => $params{ip},
+            port       => $try->{port},
+            domain     => $try->{domain},
             timeout    => $params{timeout},
             credential => $credential
         );
 
         # no result means either no host, no response, or invalid credentials
         $self->{logger}->debug(
-            sprintf "[thread %d] - scanning %s with SNMP, credentials %d: %s",
+            sprintf "[thread %d] - scanning %s%s with SNMP%s, credentials %d: %s",
             threads->tid(),
             $params{ip},
+            $try->{port}   ? ':'.$try->{port}   : '',
+            $try->{domain} ? ' '.$try->{domain} : '',
             $credential->{ID},
-            %device ? 'success' : 'no result'
+            ref $device eq 'HASH' ? 'success' :
+                $device ? "no result, $device" : 'no result'
         );
 
-        if (%device) {
-            $device{AUTHSNMP} = $credential->{ID};
-            return %device;
+        if (ref $device eq 'HASH') {
+            $device->{AUTHSNMP} = $credential->{ID};
+            return %{$device};
         }
     }
 
@@ -435,6 +544,8 @@ sub _scanAddressBySNMPReal {
         $snmp = FusionInventory::Agent::SNMP::Live->new(
             version      => $params{credential}->{VERSION},
             hostname     => $params{ip},
+            port         => $params{port},
+            domain       => $params{domain},
             timeout      => $params{timeout} || 1,
             community    => $params{credential}->{COMMUNITY},
             username     => $params{credential}->{USERNAME},
@@ -444,8 +555,9 @@ sub _scanAddressBySNMPReal {
             privprotocol => $params{credential}->{PRIVPROTOCOL},
         );
     };
-    # an exception here just means no device,  or wrong credentials
-    return if $EVAL_ERROR;
+
+    # an exception here just means no device or wrong credentials
+    return $EVAL_ERROR if $EVAL_ERROR;
 
     my $info = getDeviceInfo(
         snmp    => $snmp,
@@ -454,38 +566,7 @@ sub _scanAddressBySNMPReal {
     );
     return unless $info;
 
-    return %$info;
-}
-
-sub _parseNmap {
-    my (%params) = @_;
-
-    my $handle = getFileHandle(%params);
-    return unless $handle;
-
-    local $INPUT_RECORD_SEPARATOR; # Set input to "slurp" mode
-    my $tpp  = XML::TreePP->new(force_array => '*');
-    my $tree = $tpp->parse(<$handle>);
-    close $handle;
-    return unless $tree;
-
-    my $result;
-
-    foreach my $host (@{$tree->{nmaprun}[0]{host}}) {
-        foreach my $address (@{$host->{address}}) {
-            next unless $address->{'-addrtype'} eq 'mac';
-            $result->{MAC}           = $address->{'-addr'};
-            $result->{NETPORTVENDOR} = $address->{'-vendor'};
-            last;
-        }
-        foreach my $hostname (@{$host->{hostnames}}) {
-            my $name = eval {$hostname->{hostname}[0]{'-name'}};
-            next unless $name;
-            $result->{DNSHOSTNAME} = $name;
-        }
-    }
-
-    return $result;
+    return $info;
 }
 
 sub _sendStartMessage {
@@ -534,6 +615,53 @@ sub _sendResultMessage {
     });
 }
 
+sub _getSNMPPorts {
+    my ($self, $ports) = @_;
+
+    return unless $ports;
+
+    # Given ports can be an array of strings or just a string and each string
+    # can be a comma separated list of ports
+    my @given_ports = map { split(/\s*,\s*/, $_) }
+        ref($ports) eq 'ARRAY' ? @{$ports} : ($ports) ;
+
+    # Be sure to only keep valid and uniq ports
+    my %ports = map { $_ => 1 } grep { $_ && $_ > 0 && $_ < 65536 } @given_ports;
+
+    return [ sort keys %ports ];
+}
+
+sub _getSNMPProtocols {
+    my ($self, $protocols) = @_;
+
+    return unless $protocols;
+
+    # Supported protocols can be used as '-domain' option for Net::SNMP session
+    my @supported_protocols = (
+        'udp/ipv4',
+        'udp/ipv6',
+        'tcp/ipv4',
+        'tcp/ipv6'
+    );
+
+    # Given protocols can be an array of strings or just a string and each string
+    # can be a comma separated list of protocols
+    my @given_protocols = map { split(/\s*,\s*/, $_) }
+        ref($protocols) eq 'ARRAY' ? @{$protocols} : ($protocols) ;
+
+    my @protocols = ();
+    my %protocols = map { lc($_) => 1 } grep { $_ } @given_protocols;
+
+    # Manage to list and filter protocols to use in @supported_protocols order
+    foreach my $proto (@supported_protocols) {
+        if ($protocols{$proto}) {
+            push @protocols, $proto;
+        }
+    }
+
+    return \@protocols;
+}
+
 1;
 
 __END__
@@ -550,7 +678,7 @@ This tasks scans the network to find connected devices, allowing:
 
 =item *
 
-devices discovery within an IP range, through nmap, NetBios or SNMP
+devices discovery within an IP range, through arp, ping, NetBios or SNMP
 
 =item *
 

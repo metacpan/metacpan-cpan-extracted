@@ -7,10 +7,15 @@ use Config;
 use Data::Dumper;
 use Digest::MD5 qw(md5_base64);
 use English qw(-no_match_vars);
+use UNIVERSAL::require;
 use XML::TreePP;
 
+use FusionInventory::Agent::Logger;
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Version;
+
+# Always sort keys in Dumper while computing checksum on HASH
+$Data::Dumper::Sortkeys = 1;
 
 my %fields = (
     BIOS             => [ qw/SMODEL SMANUFACTURER SSN BDATE BVERSION
@@ -30,20 +35,21 @@ my %fields = (
     ACCESSLOG        => [ qw/USERID LOGDATE/ ],
 
     ANTIVIRUS        => [ qw/COMPANY ENABLED GUID NAME UPTODATE VERSION
-                             DATFILECREATION DATFILEVERSION ENGINEVERSION32
-                             ENGINEVERSION64/ ],
+                             EXPIRATION BASE_CREATION BASE_VERSION/ ],
     BATTERIES        => [ qw/CAPACITY CHEMISTRY DATE NAME SERIAL MANUFACTURER
                              VOLTAGE/ ],
     CONTROLLERS      => [ qw/CAPTION DRIVER NAME MANUFACTURER PCICLASS VENDORID
                              PRODUCTID PCISUBSYSTEMID PCISLOT TYPE REV/ ],
     CPUS             => [ qw/CACHE CORE DESCRIPTION MANUFACTURER NAME THREAD
                              SERIAL STEPPING FAMILYNAME FAMILYNUMBER MODEL
-                             SPEED ID EXTERNAL_CLOCK ARCH/ ],
+                             SPEED ID EXTERNAL_CLOCK ARCH CORECOUNT/ ],
     DRIVES           => [ qw/CREATEDATE DESCRIPTION FREE FILESYSTEM LABEL
-                             LETTER SERIAL SYSTEMDRIVE TOTAL TYPE VOLUMN/ ],
+                             LETTER SERIAL SYSTEMDRIVE TOTAL TYPE VOLUMN
+                             ENCRYPT_NAME ENCRYPT_ALGO ENCRYPT_STATUS ENCRYPT_TYPE/ ],
     ENVS             => [ qw/KEY VAL/ ],
     INPUTS           => [ qw/NAME MANUFACTURER CAPTION DESCRIPTION INTERFACE
                              LAYOUT POINTINGTYPE TYPE/ ],
+    FIREWALL         => [ qw/PROFILE STATUS DESCRIPTION IPADDRESS IPADDRESS6/ ],
     LICENSEINFOS     => [ qw/NAME FULLNAME KEY COMPONENTS TRIAL UPDATE OEM
                              ACTIVATION_DATE PRODUCTID/ ],
     LOCAL_GROUPS     => [ qw/ID MEMBER NAME/ ],
@@ -65,6 +71,8 @@ my %fields = (
     PHYSICAL_VOLUMES => [ qw/DEVICE PV_PE_COUNT PV_UUID FORMAT ATTR
                              SIZE FREE PE_SIZE VG_UUID/ ],
     PORTS            => [ qw/CAPTION DESCRIPTION NAME TYPE/ ],
+    POWERSUPPLIES    => [ qw/PARTNUM SERIALNUMBER MANUFACTURER POWER_MAX NAME
+                             HOTREPLACEABLE PLUGGED STATUS LOCATION MODEL/ ],
     PRINTERS         => [ qw/COMMENT DESCRIPTION DRIVER NAME NETWORK PORT
                              RESOLUTION SHARED STATUS ERRSTATUS SERVERNAME
                              SHARENAME PRINTPROCESSOR SERIAL/ ],
@@ -78,11 +86,12 @@ my %fields = (
                             NAME NO_REMOVE RELEASE_TYPE PUBLISHER
                             UNINSTALL_STRING URL_INFO_ABOUT VERSION
                             VERSION_MINOR VERSION_MAJOR GUID ARCH USERNAME
-                            USERID/ ],
+                            USERID SYSTEM_CATEGORY/ ],
     SOUNDS           => [ qw/CAPTION DESCRIPTION MANUFACTURER NAME/ ],
     STORAGES         => [ qw/DESCRIPTION DISKSIZE INTERFACE MANUFACTURER MODEL
                             NAME TYPE SERIAL SERIALNUMBER FIRMWARE SCSI_COID
-                            SCSI_CHID SCSI_UNID SCSI_LUN WWN/ ],
+                            SCSI_CHID SCSI_UNID SCSI_LUN WWN
+                            ENCRYPT_NAME ENCRYPT_ALGO ENCRYPT_STATUS ENCRYPT_TYPE/ ],
     VIDEOS           => [ qw/CHIPSET MEMORY NAME RESOLUTION PCISLOT PCIID/ ],
     USBDEVICES       => [ qw/VENDORID PRODUCTID MANUFACTURER CAPTION SERIAL
                             CLASS SUBCLASS NAME/ ],
@@ -122,11 +131,11 @@ sub new {
     my ($class, %params) = @_;
 
     my $self = {
-        logger         => $params{logger},
+        deviceid       => $params{deviceid},
+        logger         => $params{logger} || FusionInventory::Agent::Logger->new(),
         fields         => \%fields,
         content        => {
             HARDWARE => {
-                ARCHNAME => $Config{archname},
                 VMSYSTEM => "Physical" # Default value
             },
             VERSIONCLIENT => $FusionInventory::Agent::AGENT_STRING ||
@@ -140,6 +149,56 @@ sub new {
         if $params{statedir};
 
     return $self;
+}
+
+sub getRemote {
+    my ($self) = @_;
+
+    return $self->{_remote} || '';
+}
+
+sub setRemote {
+    my ($self, $task) = @_;
+
+    $self->{_remote} = $task || '';
+
+    return $self->{_remote};
+}
+
+sub getDeviceId {
+    my ($self) = @_;
+
+    return $self->{deviceid} if $self->{deviceid};
+
+    # compute an unique agent identifier based on current time and inventory
+    # hostnale or provider name
+    my $hostname = $self->getHardware('NAME');
+    if ($hostname) {
+        my $workgroup = $self->getHardware('WORKGROUP');
+        $hostname .= "." . $workgroup if $workgroup;
+    } else {
+        FusionInventory::Agent::Tools::Hostname->require();
+
+        eval {
+            $hostname = FusionInventory::Agent::Tools::Hostname::getHostname();
+        };
+    }
+
+    # Fake hostname if no default found
+    $hostname = 'device-by-' . lc($FusionInventory::Agent::Version::PROVIDER) . '-agent'
+        unless $hostname;
+
+    my ($year, $month , $day, $hour, $min, $sec) =
+        (localtime (time))[5, 4, 3, 2, 1, 0];
+
+    return $self->{deviceid} = sprintf "%s-%02d-%02d-%02d-%02d-%02d-%02d",
+        $hostname, $year + 1900, $month + 1, $day, $hour, $min, $sec;
+}
+
+sub getFields {
+    my ($self) = @_;
+
+    return $self->{fields};
 }
 
 sub getContent {
@@ -418,7 +477,7 @@ sub computeChecksum {
                 );
             };
             if (ref($self->{last_state_content}) ne 'HASH') {
-                $self->{last_state_file} = {};
+                $self->{last_state_content} = {};
             }
         } else {
             $logger->debug(
@@ -456,7 +515,7 @@ sub saveLastState {
     my $logger = $self->{logger};
 
     if (!defined($self->{last_state_content})) {
-        $self->processChecksum();
+        $self->computeChecksum();
     }
     if ($self->{last_state_file}) {
         eval {
@@ -587,3 +646,15 @@ compatibility.
 
 At the end of the process IF the inventory was saved
 correctly, the last_state is saved.
+
+=head2 getRemote()
+
+Method to get the parent task remote status.
+
+Returns the string set by setRemote() API or an empty string.
+
+=head2 setRemote([$task])
+
+Method to set or reset the parent task remote status.
+
+Without $task parameter, the API resets the parent remote status to an empty string.

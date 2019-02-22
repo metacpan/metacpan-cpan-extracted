@@ -1,0 +1,116 @@
+=for Pod::Coverage empty
+
+=head1 NAME
+
+Chess::Opening - Perl library for handling chess openings
+
+=head1 SYNOPSIS
+
+	die "Chess::Opening is just a documentation wrapper";
+
+=head1 DESCRIPTION
+
+The package F<Chess-Opening> is a collection of modules for dealing with
+chess openings in Perl.
+
+=head2 Opening Books
+
+You can use L<Chess::Opening::Book::Polyglot> for reading (and later writing)
+opening books in polyglot format.
+
+=head2 ECO Data
+
+You can also lookup ECO (Encyclopedia of Chess Openings) data for opening
+positions.  See L<Chess::Opening::Book::ECO> for more information.
+
+You access ECO data in the same way as data from a polyglot opening book, as
+it is internally implemented as a L<Chess::Opening::Book>, the base class
+for all opening books.
+
+=head1 DATA FORMATS
+
+Throughout this library, the following data formats are used:
+
+=head1 Positions
+
+A chess position is represented in
+L<Forsyth-Edwards Notation (FEN)|http://www.chessgames.com/fenhelp.html>.
+This library contains no code for creating FEN strings but whatever
+internal representation of a chess position your code uses, it should be
+simple and straightforward to generate FEN strings.
+
+If you are using L<Chess::Rep> you can create FEN strings as follows:
+
+	$pos = Chess::Rep->new;
+	$pos->go_move('e4');
+	$fen = $pos->get_gen;
+
+Internally, the library also uses Zobrist keys because they are used in
+binary polyglot opening books.  The interface for generating such a Zobrist key
+from a FEN string may be exposed in the future if there is demand for it.
+
+=head1 Moves
+
+All chess moves are represented in I<coordinate notation>.  Coordinate
+notation uses either four (for example "g1f3") or five ("b2b1q") characters.
+The meaning of these characters are:
+
+=over 4
+
+=item - starting file (or column), a character between "a" and "h"
+
+=item - starting rank (or row), a digit between "1" and "8"
+
+=item - destination file (or column), a character between "a" and "h"
+
+=item - destination rank (or row), a digit between "1" and "8"
+
+=item - an optional promotion piece:
+
+=over 4
+
+=item B<q> for a queen
+
+=item B<r> for a rook
+
+=item B<b> for a bishop
+
+=item B<n> for a knight
+
+=back
+
+=back
+
+You can convert a move in coordinate notation into the popular Standard
+Algebraic Notation (SAN) with the help of the module L<Chess::Rep>:
+
+	$fen = '5k2/Q7/5K2/8/8/8/8/8 w - - 0 1';
+	$pos = Chess::Rep->new($fen);
+	$move_info = $pos->go_move('Qa7-f7#');
+	print "SAN: $move_info->{san}\n";
+
+The return value of C<Chess::Rep-E<gt>go_move()> contains more useful fields
+with information about the move.
+
+=head2 Chess Games
+
+Chess games or collections of chess games are normally stored in
+Portable Game Notation (PGN).  The Perl library L<Chess::PGN::Parse> can
+be used for reading such files.
+
+See the script
+L<parse_eco.pl|https://github.com/gflohr/Chess-Opening/blob/master/parse_eco.pl>
+that is part of Chess::Opening for an example that is using the PGN parser.
+
+Chess-Opening itself does not use PGN at all but you will almost inevitably
+need it for code that is using Chess-Opening.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2019 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+L<Chess::Opening::Book>, L<Chess::Opening::Book::Polyglot>,
+L<Chess::Opening::Book::ECO>, L<Chess::Rep>, perl(1)

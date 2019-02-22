@@ -3,10 +3,10 @@ package FusionInventory::Agent::Task::Inventory::MacOS::USB;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::MacOS;
-
-my $seen;
 
 sub isEnabled {
     my (%params) = @_;
@@ -19,6 +19,8 @@ sub doInventory {
 
     my $inventory = $params{inventory};
     my $logger    = $params{logger};
+
+    my $seen;
 
     foreach my $device (_getDevices(logger => $logger)) {
         # avoid duplicates

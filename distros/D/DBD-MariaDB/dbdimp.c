@@ -2291,6 +2291,8 @@ static bool mariadb_dr_connect(
 
           imp_dbh->async_query_in_flight = NULL;
 
+    mariadb_list_add(imp_drh->active_imp_dbhs, imp_dbh->list_entry, imp_dbh);
+
     return TRUE;
 }
 
@@ -2336,8 +2338,7 @@ static bool mariadb_db_my_login(pTHX_ SV* dbh, imp_dbh_t *imp_dbh)
   char* user;
   char* password;
   char* mysql_socket;
-  I32 i;
-  bool found_taken_pmysql;
+  struct mariadb_list_entry *entry;
   D_imp_xxh(dbh);
   D_imp_drh_from_dbh;
 
@@ -2347,34 +2348,29 @@ static bool mariadb_db_my_login(pTHX_ SV* dbh, imp_dbh_t *imp_dbh)
     {
       if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
         PerlIO_printf(DBIc_LOGPIO(imp_xxh), "mariadb_db_my_login skip connect\n");
+
       /* tell our parent we've adopted an active child */
       ++DBIc_ACTIVE_KIDS(DBIc_PARENT_COM(imp_dbh));
-      found_taken_pmysql = FALSE;
-      if (imp_drh->taken_pmysqls)
+
+      for (entry = imp_drh->taken_pmysqls; entry; entry = entry->next)
       {
-        for (i = AvFILL(imp_drh->taken_pmysqls); i >= 0; --i)
+        if ((MYSQL *)entry->data == imp_dbh->pmysql)
         {
-          svp = av_fetch(imp_drh->taken_pmysqls, i, FALSE);
-          if (!svp || !*svp)
-            continue;
-          SvGETMAGIC(*svp);
-          if (!SvIOK(*svp))
-            continue;
-          if (imp_dbh->pmysql == INT2PTR(MYSQL *, SvIVX(*svp)))
-          {
-            found_taken_pmysql = TRUE;
-            av_delete(imp_drh->taken_pmysqls, i, G_DISCARD);
-            break;
-          }
+          /* Remove MYSQL* entry from taken list */
+          mariadb_list_remove(imp_drh->taken_pmysqls, entry);
+
+          /* Add imp_dbh entry into active_imp_dbhs list */
+          mariadb_list_add(imp_drh->active_imp_dbhs, imp_dbh->list_entry, imp_dbh);
+
+          return TRUE;
         }
       }
-      if (!found_taken_pmysql)
-      {
-        imp_dbh->pmysql = NULL;
-        mariadb_dr_do_error(dbh, CR_CONNECTION_ERROR, "Connection error: dbi_imp_data is not valid", "HY000");
-        return FALSE;
-      }
-      return TRUE;
+
+      /* This imp_dbh data belongs to different connection, so destructor should not touch it */
+      imp_dbh->list_entry = NULL;
+      imp_dbh->pmysql = NULL;
+      mariadb_dr_do_error(dbh, CR_CONNECTION_ERROR, "Connection error: dbi_imp_data is not valid", "HY000");
+      return FALSE;
     }
     if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
       PerlIO_printf(DBIc_LOGPIO(imp_xxh),
@@ -2445,12 +2441,15 @@ SV *mariadb_db_take_imp_data(SV *dbh, imp_xxh_t *imp_xxh, void *foo)
   dTHX;
   D_imp_dbh(dbh);
   D_imp_drh_from_dbh;
+  struct mariadb_list_entry *entry;
   PERL_UNUSED_ARG(imp_xxh);
   PERL_UNUSED_ARG(foo);
 
-  if (!imp_drh->taken_pmysqls)
-    imp_drh->taken_pmysqls = newAV();
-  av_push(imp_drh->taken_pmysqls, newSViv(PTR2IV(imp_dbh->pmysql)));
+  /* Add MYSQL* into taken list */
+  mariadb_list_add(imp_drh->taken_pmysqls, entry, imp_dbh->pmysql);
+
+  /* MYSQL* was taken from imp_dbh so remove it also from active_imp_dbhs list */
+  mariadb_list_remove(imp_drh->active_imp_dbhs, imp_dbh->list_entry);
 
   return &PL_sv_no;
 }
@@ -2551,9 +2550,9 @@ IV mariadb_db_do6(SV *dbh, imp_dbh_t *imp_dbh, SV *statement_sv, SV *attribs, I3
   bool disable_fallback_for_server_prepare = FALSE;
   MYSQL_STMT *stmt = NULL;
   MYSQL_BIND *bind = NULL;
-  MYSQL_RES *res;
   STRLEN blen;
   unsigned long int num_params;
+  unsigned int error;
 
   ASYNC_CHECK_RETURN(dbh, -2);
 
@@ -2642,11 +2641,39 @@ IV mariadb_db_do6(SV *dbh, imp_dbh_t *imp_dbh, SV *statement_sv, SV *attribs, I3
     imp_dbh->async_query_in_flight = imp_dbh;
   }
 
-  while (mysql_next_result(imp_dbh->pmysql) == 0)
+  while ((next_result_rc = mysql_next_result(imp_dbh->pmysql)) == 0)
   {
-    res = mysql_use_result(imp_dbh->pmysql);
-    if (res)
-      mysql_free_result(res);
+    result = mysql_store_result(imp_dbh->pmysql);
+    if (!result)
+    {
+      if (mysql_errno(imp_dbh->pmysql))
+      {
+        mariadb_dr_do_error(dbh, mysql_errno(imp_dbh->pmysql), mysql_error(imp_dbh->pmysql), mysql_sqlstate(imp_dbh->pmysql));
+        return -2;
+      }
+      imp_dbh->insertid = mysql_insert_id(imp_dbh->pmysql);
+    }
+    if (result)
+    {
+      mysql_free_result(result);
+      result = NULL;
+    }
+  }
+
+  if (next_result_rc > 0)
+  {
+#if MYSQL_VERSION_ID < 50025
+    /* Cover a protocol design error: error packet does not contain the server status.
+     * Luckily, an error always aborts execution of a statement, so it is safe to turn off the flag. */
+    imp_dbh->pmysql->server_status &= ~SERVER_MORE_RESULTS_EXISTS;
+#endif
+    /* This is error for previous unfetched result ret. So do not report server errors to caller which is expecting new result set. */
+    error = mysql_errno(imp_dbh->pmysql);
+    if (error == CR_COMMANDS_OUT_OF_SYNC || error == CR_OUT_OF_MEMORY || error == CR_SERVER_GONE_ERROR || error == CR_SERVER_LOST || error == CR_UNKNOWN_ERROR)
+    {
+      mariadb_dr_do_error(dbh, mysql_errno(imp_dbh->pmysql), mysql_error(imp_dbh->pmysql), mysql_sqlstate(imp_dbh->pmysql));
+      return -2;
+    }
   }
 
   if (use_server_side_prepare)
@@ -2804,7 +2831,12 @@ IV mariadb_db_do6(SV *dbh, imp_dbh_t *imp_dbh, SV *statement_sv, SV *attribs, I3
     /* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
     while ((next_result_rc = mysql_next_result(imp_dbh->pmysql)) == 0)
     {
-      result = mysql_use_result(imp_dbh->pmysql);
+      result = mysql_store_result(imp_dbh->pmysql);
+      if (mysql_errno(imp_dbh->pmysql))
+      {
+        next_result_rc = 1;
+        break;
+      }
       if (!result) /* Next statement without result set, new insert id */
         imp_dbh->insertid = mysql_insert_id(imp_dbh->pmysql);
       if (result)
@@ -2814,6 +2846,12 @@ IV mariadb_db_do6(SV *dbh, imp_dbh_t *imp_dbh, SV *statement_sv, SV *attribs, I3
 
     if (next_result_rc > 0)
     {
+#if MYSQL_VERSION_ID < 50025
+      /* Cover a protocol design error: error packet does not contain the server status.
+       * Luckily, an error always aborts execution of a statement, so it is safe to turn off the flag. */
+      imp_dbh->pmysql->server_status &= ~SERVER_MORE_RESULTS_EXISTS;
+#endif
+
       if (DBIc_DBISTATE(imp_dbh)->debug >= 2)
         PerlIO_printf(DBIc_LOGPIO(imp_dbh), "\t<- do() ERROR: %s\n", mysql_error(imp_dbh->pmysql));
 
@@ -2912,7 +2950,7 @@ static void mariadb_dr_close_mysql(pTHX_ imp_drh_t *imp_drh, MYSQL *pmysql)
      * These bugs were fixed in MariaDB Connector/C 3.0.5, see: https://jira.mariadb.org/browse/CONC-336
      * But remains in MariaDB Embedded server, see: https://jira.mariadb.org/browse/MDEV-16578
      */
-#ifndef HAVE_BROKEN_INIT
+#if !defined(HAVE_BROKEN_INIT) && (defined(HAVE_DEINITIALIZE_SSL) || !defined(HAVE_PROBLEM_WITH_OPENSSL))
     if (imp_drh->non_embedded_started)
     {
       mysql_server_end();
@@ -2923,6 +2961,9 @@ static void mariadb_dr_close_mysql(pTHX_ imp_drh_t *imp_drh, MYSQL *pmysql)
     {
       mysql_server_end();
       imp_drh->embedded_started = FALSE;
+#if !defined(HAVE_DEINITIALIZE_SSL) && defined(HAVE_PROBLEM_WITH_OPENSSL)
+      warn("DBD::MariaDB disconnect: Client library deinitialized OpenSSL library functions and module Net::SSLeay is now broken");
+#endif
     }
     if (imp_drh->embedded_args)
     {
@@ -2937,23 +2978,8 @@ static void mariadb_dr_close_mysql(pTHX_ imp_drh_t *imp_drh, MYSQL *pmysql)
   }
 }
 
-/*
- ***************************************************************************
- *
- *  Name:    mariadb_db_disconnect
- *
- *  Purpose: Disconnect a database handle from its database
- *
- *  Input:   dbh - database handle being disconnected
- *           imp_dbh - drivers private database handle data
- *
- *  Returns: 1 for success (always)
- *
- **************************************************************************/
-
-int mariadb_db_disconnect(SV* dbh, imp_dbh_t* imp_dbh)
+static void mariadb_db_close_mysql(pTHX_ imp_drh_t *imp_drh, imp_dbh_t *imp_dbh)
 {
-  dTHX;
   AV *av;
   I32 i;
   MAGIC *mg;
@@ -2961,15 +2987,14 @@ int mariadb_db_disconnect(SV* dbh, imp_dbh_t* imp_dbh)
   SV *sv;
   SV *sth;
   imp_sth_t *imp_sth;
-  D_imp_xxh(dbh);
-  D_imp_drh_from_dbh;
 
-  /* We assume that disconnect will always work       */
-  /* since most errors imply already disconnected.    */
+  if (DBIc_TRACE_LEVEL(imp_dbh) >= 2)
+    PerlIO_printf(DBIc_LOGPIO(imp_dbh), "\tmariadb_db_close_mysql: imp_dbh=%p pmysql=%p\n", imp_dbh, imp_dbh->pmysql);
+
   DBIc_ACTIVE_off(imp_dbh);
-  if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
-    PerlIO_printf(DBIc_LOGPIO(imp_xxh), "imp_dbh->pmysql: %p\n",
-		              imp_dbh->pmysql);
+
+  if (imp_dbh->list_entry)
+    mariadb_list_remove(imp_drh->active_imp_dbhs, imp_dbh->list_entry);
 
   if (imp_dbh->pmysql)
   {
@@ -3003,14 +3028,39 @@ int mariadb_db_disconnect(SV* dbh, imp_dbh_t* imp_dbh)
            * CVE 2017-3302 do not do it. So do it manually to prevent crash. */
           if (imp_sth->stmt && imp_sth->stmt->mysql)
           {
-            if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
-              PerlIO_printf(DBIc_LOGPIO(imp_xxh), "Applying CVE 2017-3302 workaround for sth=0x%p\n", imp_sth);
+            if (DBIc_TRACE_LEVEL(imp_dbh) >= 2)
+              PerlIO_printf(DBIc_LOGPIO(imp_dbh), "Applying CVE 2017-3302 workaround for sth=%p\n", imp_sth);
             imp_sth->stmt->mysql = NULL;
           }
         }
       }
     }
   }
+}
+
+/*
+ ***************************************************************************
+ *
+ *  Name:    mariadb_db_disconnect
+ *
+ *  Purpose: Disconnect a database handle from its database
+ *
+ *  Input:   dbh - database handle being disconnected
+ *           imp_dbh - drivers private database handle data
+ *
+ *  Returns: 1 for success (always)
+ *
+ **************************************************************************/
+
+int mariadb_db_disconnect(SV* dbh, imp_dbh_t* imp_dbh)
+{
+  dTHX;
+  D_imp_drh_from_dbh;
+  PERL_UNUSED_ARG(dbh);
+
+  /* We assume that disconnect will always work       */
+  /* since most errors imply already disconnected.    */
+  mariadb_db_close_mysql(aTHX_ imp_drh, imp_dbh);
 
   /* We don't free imp_dbh since a reference still exists    */
   /* The DESTROY method is the only one to 'free' memory.    */
@@ -3033,57 +3083,18 @@ int mariadb_db_disconnect(SV* dbh, imp_dbh_t* imp_dbh)
 
 int mariadb_dr_discon_all (SV *drh, imp_drh_t *imp_drh) {
   dTHX;
-  dSP;
   int ret;
-  SV **svp;
-  AV *av;
-  I32 i;
+  struct mariadb_list_entry *entry;
   PERL_UNUSED_ARG(drh);
 
-  if (imp_drh->taken_pmysqls)
+  while ((entry = imp_drh->taken_pmysqls))
   {
-    for (i = AvFILL(imp_drh->taken_pmysqls); i >= 0; --i)
-    {
-      svp = av_fetch(imp_drh->taken_pmysqls, i, FALSE);
-      if (!svp || !*svp)
-        continue;
-      SvGETMAGIC(*svp);
-      if (!SvIOK(*svp))
-        continue;
-      mariadb_dr_close_mysql(aTHX_ imp_drh, INT2PTR(MYSQL *, SvIVX(*svp)));
-    }
-    av_undef(imp_drh->taken_pmysqls);
-    imp_drh->taken_pmysqls = NULL;
+    mariadb_dr_close_mysql(aTHX_ imp_drh, (MYSQL *)entry->data);
+    mariadb_list_remove(imp_drh->taken_pmysqls, entry);
   }
 
-  svp = hv_fetchs((HV*)DBIc_MY_H(imp_drh), "ChildHandles", FALSE);
-  if (svp && *svp)
-  {
-    SvGETMAGIC(*svp);
-    if (SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVAV)
-    {
-      av = (AV *)SvRV(*svp);
-      for (i = AvFILL(av); i >= 0; --i)
-      {
-        svp = av_fetch(av, i, FALSE);
-        if (!svp || !*svp || !sv_isobject(*svp))
-          continue;
-
-        ENTER;
-        SAVETMPS;
-
-        PUSHMARK(SP);
-        EXTEND(SP, 1);
-        PUSHs(sv_2mortal(newSVsv(*svp)));
-        PUTBACK;
-
-        call_method("disconnect", G_VOID|G_DISCARD|G_EVAL|G_KEEPERR);
-
-        FREETMPS;
-        LEAVE;
-      }
-    }
-  }
+  while (imp_drh->active_imp_dbhs)
+    mariadb_db_close_mysql(aTHX_ imp_drh, (imp_dbh_t *)imp_drh->active_imp_dbhs->data);
 
   ret = 1;
 
@@ -3105,6 +3116,7 @@ int mariadb_dr_discon_all (SV *drh, imp_drh_t *imp_drh) {
 #ifndef HAVE_EMBEDDED
   if (imp_drh->non_embedded_started)
   {
+ #if defined(HAVE_DEINITIALIZE_SSL) || !defined(HAVE_PROBLEM_WITH_OPENSSL)
   #ifndef HAVE_BROKEN_INIT
     warn("DBD::MariaDB disconnect_all: Client library was not properly deinitialized (possible bug in driver)");
     ret = 0;
@@ -3113,6 +3125,7 @@ int mariadb_dr_discon_all (SV *drh, imp_drh_t *imp_drh) {
     imp_drh->non_embedded_started = FALSE;
     imp_drh->non_embedded_finished = TRUE;
   #endif
+ #endif
   }
 #endif
 
@@ -3668,7 +3681,7 @@ AV *mariadb_db_data_sources(SV *dbh, imp_dbh_t *imp_dbh, SV *attr)
   return av;
 }
 
-static int mariadb_st_free_result_sets (SV * sth, imp_sth_t * imp_sth);
+static bool mariadb_st_free_result_sets(SV *sth, imp_sth_t *imp_sth, bool free_last);
 
 /* 
  **************************************************************************
@@ -3730,10 +3743,10 @@ mariadb_st_prepare_sv(
   imp_sth->use_server_side_prepare = imp_dbh->use_server_side_prepare;
   imp_sth->disable_fallback_for_server_prepare = imp_dbh->disable_fallback_for_server_prepare;
 
-  imp_sth->fetch_done = FALSE;
   imp_sth->done_desc = FALSE;
   imp_sth->result = NULL;
   imp_sth->currow = 0;
+  imp_sth->row_num = (my_ulonglong)-1;
 
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
     PerlIO_printf(DBIc_LOGPIO(imp_xxh),
@@ -3800,7 +3813,8 @@ mariadb_st_prepare_sv(
      Clean-up previous result set(s) for sth to prevent
      'Commands out of sync' error 
   */
-  mariadb_st_free_result_sets(sth, imp_sth);
+  if (!mariadb_st_free_result_sets(sth, imp_sth, TRUE))
+    return 0;
 
   if (imp_sth->use_server_side_prepare)
   {
@@ -3943,19 +3957,22 @@ mariadb_st_prepare_sv(
  *
  * Inputs: sth - Statement handle
  *         imp_sth - driver's private statement handle
+ *         free_last - free also the last result set
  *
- * Returns: 1 ok
- *          0 error
+ * Returns: TRUE ok
+ *          FALSE error; mariadb_dr_do_error will be called
  *************************************************************************/
-static int mariadb_st_free_result_sets (SV * sth, imp_sth_t * imp_sth)
+static bool mariadb_st_free_result_sets(SV *sth, imp_sth_t *imp_sth, bool free_last)
 {
   dTHX;
   D_imp_dbh_from_sth;
   D_imp_xxh(sth);
   int next_result_rc= -1;
+  unsigned int error;
 
+  /* No connection, nothing to clean, no error */
   if (!imp_dbh->pmysql)
-    return 0;
+    return TRUE;
 
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
     PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t>- mariadb_st_free_result_sets\n");
@@ -3967,10 +3984,10 @@ static int mariadb_st_free_result_sets (SV * sth, imp_sth_t * imp_sth)
 
     if (next_result_rc == 0)
     {
-      if (!(imp_sth->result = mysql_use_result(imp_dbh->pmysql)))
+      if (!(imp_sth->result = mysql_store_result(imp_dbh->pmysql)))
       {
         /* Check for possible error */
-        if (mysql_field_count(imp_dbh->pmysql))
+        if (mysql_errno(imp_dbh->pmysql))
         {
           if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
           PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t<- mariadb_st_free_result_sets ERROR: %s\n",
@@ -3978,11 +3995,12 @@ static int mariadb_st_free_result_sets (SV * sth, imp_sth_t * imp_sth)
 
           mariadb_dr_do_error(sth, mysql_errno(imp_dbh->pmysql), mysql_error(imp_dbh->pmysql),
                    mysql_sqlstate(imp_dbh->pmysql));
-          return 0;
+          return FALSE;
         }
+        imp_dbh->insertid = imp_sth->insertid = mysql_insert_id(imp_dbh->pmysql);
       }
     }
-    if (imp_sth->result)
+    if (imp_sth->result && (mysql_more_results(imp_dbh->pmysql) || free_last))
     {
       mysql_free_result(imp_sth->result);
       imp_sth->result=NULL;
@@ -3991,18 +4009,29 @@ static int mariadb_st_free_result_sets (SV * sth, imp_sth_t * imp_sth)
 
   if (next_result_rc > 0)
   {
+#if MYSQL_VERSION_ID < 50025
+    /* Cover a protocol design error: error packet does not contain the server status.
+     * Luckily, an error always aborts execution of a statement, so it is safe to turn off the flag. */
+    imp_dbh->pmysql->server_status &= ~SERVER_MORE_RESULTS_EXISTS;
+#endif
+
     if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
       PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t<- mariadb_st_free_result_sets: Error while processing multi-result set: %s\n",
                     mysql_error(imp_dbh->pmysql));
 
-    mariadb_dr_do_error(sth, mysql_errno(imp_dbh->pmysql), mysql_error(imp_dbh->pmysql),
-             mysql_sqlstate(imp_dbh->pmysql));
+    /* This is error for previous unfetched result ret. So do not report server errors to caller which is expecting new result set. */
+    error = mysql_errno(imp_dbh->pmysql);
+    if (error == CR_COMMANDS_OUT_OF_SYNC || error == CR_OUT_OF_MEMORY || error == CR_SERVER_GONE_ERROR || error == CR_SERVER_LOST || error == CR_UNKNOWN_ERROR)
+    {
+      mariadb_dr_do_error(sth, mysql_errno(imp_dbh->pmysql), mysql_error(imp_dbh->pmysql), mysql_sqlstate(imp_dbh->pmysql));
+      return FALSE;
+    }
   }
 
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
     PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t<- mariadb_st_free_result_sets\n");
 
-  return 1;
+  return TRUE;
 }
 
 
@@ -4029,6 +4058,21 @@ bool mariadb_st_more_results(SV* sth, imp_sth_t* imp_sth)
   if (!SvROK(sth) || SvTYPE(SvRV(sth)) != SVt_PVHV)
     croak("Expected hash array");
 
+  if (imp_sth->use_server_side_prepare)
+  {
+    mariadb_dr_do_error(sth, CR_NOT_IMPLEMENTED, "Processing of multiple result set is not possible with server side prepare", "HY000");
+    return FALSE;
+  }
+
+  if (imp_dbh->async_query_in_flight && imp_dbh->async_query_in_flight != imp_sth)
+  {
+    mariadb_dr_do_error(sth, CR_UNKNOWN_ERROR, "Gathering async_query_in_flight results for the wrong handle", "HY000");
+    return FALSE;
+  }
+  imp_dbh->async_query_in_flight = NULL;
+
+  DBIc_ACTIVE_off(imp_sth);
+
   if (!imp_dbh->pmysql && !mariadb_db_reconnect(sth, NULL))
   {
     mariadb_dr_do_error(sth, CR_SERVER_GONE_ERROR, "MySQL server has gone away", "HY000");
@@ -4041,12 +4085,6 @@ bool mariadb_st_more_results(SV* sth, imp_sth_t* imp_sth)
     if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
       PerlIO_printf(DBIc_LOGPIO(imp_xxh),
 		    "\n      <- mariadb_st_more_results no more results\n");
-    return FALSE;
-  }
-
-  if (imp_sth->use_server_side_prepare)
-  {
-    mariadb_dr_do_error(sth, CR_NOT_IMPLEMENTED, "Processing of multiple result set is not possible with server side prepare", "HY000");
     return FALSE;
   }
 
@@ -4068,8 +4106,33 @@ bool mariadb_st_more_results(SV* sth, imp_sth_t* imp_sth)
     imp_sth->result= NULL;
   }
 
-  if (DBIc_ACTIVE(imp_sth))
-    DBIc_ACTIVE_off(imp_sth);
+  imp_sth->done_desc = FALSE;
+  imp_sth->currow = 0;
+  imp_sth->row_num = (my_ulonglong)-1;
+
+  /* clear NUM_OF_FIELDS attribute */
+  DBIc_DBISTATE(imp_sth)->set_attr_k(sth, sv_2mortal(newSVpvs("NUM_OF_FIELDS")), 0, sv_2mortal(newSViv(0)));
+
+  /* delete cached handle attributes */
+  /* XXX should be driven by a list to ease maintenance */
+  (void)hv_deletes((HV*)SvRV(sth), "NAME", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "NULLABLE", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "NUM_OF_FIELDS", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "PRECISION", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "SCALE", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "TYPE", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_insertid", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_is_auto_increment", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_is_blob", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_is_key", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_is_num", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_is_pri_key", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_length", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_max_length", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_table", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_type", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_type_name", G_DISCARD);
+  (void)hv_deletes((HV*)SvRV(sth), "mariadb_warning_count", G_DISCARD);
 
   next_result_return_code= mysql_next_result(imp_dbh->pmysql);
 
@@ -4083,6 +4146,11 @@ bool mariadb_st_more_results(SV* sth, imp_sth_t* imp_sth)
    */
   if (next_result_return_code > 0)
   {
+#if MYSQL_VERSION_ID < 50025
+    /* Cover a protocol design error: error packet does not contain the server status.
+     * Luckily, an error always aborts execution of a statement, so it is safe to turn off the flag. */
+    imp_dbh->pmysql->server_status &= ~SERVER_MORE_RESULTS_EXISTS;
+#endif
     mariadb_dr_do_error(sth, mysql_errno(imp_dbh->pmysql), mysql_error(imp_dbh->pmysql),
              mysql_sqlstate(imp_dbh->pmysql));
 
@@ -4105,52 +4173,32 @@ bool mariadb_st_more_results(SV* sth, imp_sth_t* imp_sth)
       return FALSE;
     }
 
-    imp_sth->row_num= mysql_affected_rows(imp_dbh->pmysql);
-
     if (imp_sth->result == NULL)
     {
+      imp_sth->row_num = mysql_affected_rows(imp_dbh->pmysql);
+
       imp_dbh->insertid = imp_sth->insertid = mysql_insert_id(imp_dbh->pmysql);
-      /* No "real" rowset*/
-      DBIS->set_attr_k(sth, sv_2mortal(newSVpvs("NUM_OF_FIELDS")), 0,
-			               sv_2mortal(newSViv(0)));
-      return TRUE;
+
+      if (mysql_more_results(imp_dbh->pmysql))
+        DBIc_ACTIVE_on(imp_sth);
     }
     else
     {
       /* We have a new rowset */
-      imp_sth->currow=0;
-
-
-      /* delete cached handle attributes */
-      /* XXX should be driven by a list to ease maintenance */
-      (void)hv_deletes((HV*)SvRV(sth), "NAME", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "NULLABLE", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "NUM_OF_FIELDS", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "PRECISION", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "SCALE", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "TYPE", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_insertid", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_is_auto_increment", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_is_blob", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_is_key", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_is_num", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_is_pri_key", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_length", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_max_length", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_table", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_type", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_type_name", G_DISCARD);
-      (void)hv_deletes((HV*)SvRV(sth), "mariadb_warning_count", G_DISCARD);
+      imp_sth->row_num = mysql_num_rows(imp_sth->result);
 
       /* Adjust NUM_OF_FIELDS - which also adjusts the row buffer size */
       DBIc_DBISTATE(imp_sth)->set_attr_k(sth, sv_2mortal(newSVpvs("NUM_OF_FIELDS")), 0,
           sv_2mortal(newSVuv(mysql_num_fields(imp_sth->result)))
       );
 
-      DBIc_ACTIVE_on(imp_sth);
-
-      imp_sth->done_desc = FALSE;
+      if (imp_sth->row_num)
+        DBIc_ACTIVE_on(imp_sth);
     }
+
+    if (imp_sth->is_async && mysql_more_results(imp_dbh->pmysql))
+      imp_dbh->async_query_in_flight = imp_sth;
+
     imp_dbh->pmysql->net.last_errno= 0;
     return TRUE;
   }
@@ -4270,6 +4318,11 @@ static my_ulonglong mariadb_st_internal_execute(
           (!mariadb_db_reconnect(h, NULL) ||
            (mysql_real_query(*svsock, sbuf, slen))))
       {
+#if MYSQL_VERSION_ID < 50025
+        /* Cover a protocol design error: error packet does not contain the server status.
+         * Luckily, an error always aborts execution of a statement, so it is safe to turn off the flag. */
+        (*svsock)->server_status &= ~SERVER_MORE_RESULTS_EXISTS;
+#endif
         rows = -1;
       } else {
           /** Store the result from the Query */
@@ -4538,7 +4591,10 @@ IV mariadb_st_execute_iv(SV* sth, imp_sth_t* imp_sth)
      Clean-up previous result set(s) for sth to prevent
      'Commands out of sync' error 
   */
-  mariadb_st_free_result_sets (sth, imp_sth);
+  if (!mariadb_st_free_result_sets(sth, imp_sth, TRUE))
+    return -2;
+
+  imp_sth->currow = 0;
 
   if (use_server_side_prepare)
   {
@@ -4612,10 +4668,10 @@ IV mariadb_st_execute_iv(SV* sth, imp_sth_t* imp_sth)
       /** Store the result in the current statement handle */
       num_fields = mysql_num_fields(imp_sth->result);
       DBIc_NUM_FIELDS(imp_sth) = (num_fields <= INT_MAX) ? num_fields : INT_MAX;
-      DBIc_ACTIVE_on(imp_sth);
+      if (imp_sth->row_num)
+        DBIc_ACTIVE_on(imp_sth);
       if (!use_server_side_prepare)
         imp_sth->done_desc = FALSE;
-      imp_sth->fetch_done = FALSE;
     }
   }
 
@@ -4658,6 +4714,9 @@ static int mariadb_st_describe(SV* sth, imp_sth_t* imp_sth)
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
     PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t--> mariadb_st_describe\n");
 
+  if (imp_sth->done_desc)
+    return 1;
+
   if (imp_sth->use_server_side_prepare)
   {
     int i;
@@ -4669,9 +4728,6 @@ static int mariadb_st_describe(SV* sth, imp_sth_t* imp_sth)
     if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
       PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t\tmariadb_st_describe() num_fields %d\n",
                     num_fields);
-
-    if (imp_sth->done_desc)
-      return 1;
 
     if (num_fields <= 0 || !imp_sth->result)
     {
@@ -4829,32 +4885,27 @@ mariadb_st_fetch(SV *sth, imp_sth_t* imp_sth)
     PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t-> mariadb_st_fetch\n");
 
   if (!imp_dbh->pmysql)
+  {
+    mariadb_dr_do_error(sth, CR_SERVER_GONE_ERROR, "MySQL server has gone away", "HY000");
     return Nullav;
-
-  if(imp_dbh->async_query_in_flight) {
-      if (mariadb_db_async_result(sth, &imp_sth->result) == (my_ulonglong)-1)
-        return Nullav;
   }
 
-  if (imp_sth->use_server_side_prepare)
+  if (imp_dbh->async_query_in_flight)
   {
-    if (!DBIc_ACTIVE(imp_sth) )
+    if (!DBIc_ACTIVE(imp_sth))
+      return Nullav;
+    if (mariadb_db_async_result(sth, &imp_sth->result) == (my_ulonglong)-1)
+      return Nullav;
+  }
+  else
+  {
+    if (!imp_sth->result)
     {
-      mariadb_dr_do_error(sth, CR_UNKNOWN_ERROR, "no statement executing", "HY000");
+      mariadb_dr_do_error(sth, CR_UNKNOWN_ERROR, "fetch() without execute()", "HY000");
       return Nullav;
     }
-
-    if (imp_sth->fetch_done)
-    {
-      mariadb_dr_do_error(sth, CR_UNKNOWN_ERROR, "fetch() but fetch already done", "HY000");
+    if (!DBIc_ACTIVE(imp_sth))
       return Nullav;
-    }
-
-    if (!imp_sth->done_desc)
-    {
-      if (!mariadb_st_describe(sth, imp_sth))
-        return Nullav;
-    }
   }
 
   ChopBlanks = DBIc_is(imp_sth, DBIcf_ChopBlanks) ? TRUE : FALSE;
@@ -4864,19 +4915,16 @@ mariadb_st_fetch(SV *sth, imp_sth_t* imp_sth)
                   "\t\tmariadb_st_fetch for %p, chopblanks %d\n",
                   sth, ChopBlanks ? 1 : 0);
 
-  if (!imp_sth->result)
-  {
-    mariadb_dr_do_error(sth, CR_UNKNOWN_ERROR, "fetch() without execute()", "HY000");
-    return Nullav;
-  }
-
   /* fix from 2.9008 */
   imp_dbh->pmysql->net.last_errno = 0;
 
   if (imp_sth->use_server_side_prepare)
   {
+    if (!mariadb_st_describe(sth, imp_sth))
+      return Nullav;
+
     if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
-      PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t\tmariadb_st_fetch calling mysql_fetch\n");
+      PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t\tmariadb_st_fetch calling mysql_stmt_fetch\n");
 
     if ((rc= mysql_stmt_fetch(imp_sth->stmt)))
     {
@@ -4890,9 +4938,6 @@ mariadb_st_fetch(SV *sth, imp_sth_t* imp_sth)
 
       if (rc == MYSQL_NO_DATA)
       {
-        /* Update row_num to affected_rows value */
-        imp_sth->row_num= mysql_stmt_affected_rows(imp_sth->stmt);
-        imp_sth->fetch_done = TRUE;
         if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
           PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t\tmariadb_st_fetch no data\n");
       }
@@ -4903,11 +4948,16 @@ mariadb_st_fetch(SV *sth, imp_sth_t* imp_sth)
                  mysql_stmt_sqlstate(imp_sth->stmt));
       }
 
+      DBIc_ACTIVE_off(imp_sth);
+
       return Nullav;
     }
 
 process:
     imp_sth->currow++;
+
+    if (imp_sth->currow >= imp_sth->row_num)
+      DBIc_ACTIVE_off(imp_sth);
 
     av= DBIc_DBISTATE(imp_sth)->get_fbav(imp_sth);
     num_fields=mysql_stmt_field_count(imp_sth->stmt);
@@ -5162,8 +5212,8 @@ process:
                     SVfARG(sv_2mortal(my_ulonglong2sv(mysql_num_rows(imp_sth->result)))));
       PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\tmysql_affected_rows=%" SVf "\n",
                     SVfARG(sv_2mortal(my_ulonglong2sv(mysql_affected_rows(imp_dbh->pmysql)))));
-      PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\tmariadb_st_fetch for %p, currow= %d\n",
-                    sth,imp_sth->currow);
+      PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\tmariadb_st_fetch for %p, currow=%" SVf "\n",
+                    sth, SVfARG(sv_2mortal(my_ulonglong2sv(imp_sth->currow))));
     }
 
     if (!(cols= mysql_fetch_row(imp_sth->result)))
@@ -5176,8 +5226,13 @@ process:
         mariadb_dr_do_error(sth, mysql_errno(imp_dbh->pmysql),
                  mysql_error(imp_dbh->pmysql),
                  mysql_sqlstate(imp_dbh->pmysql));
+      if (!mysql_more_results(imp_dbh->pmysql))
+        DBIc_ACTIVE_off(imp_sth);
       return Nullav;
     }
+
+    if (imp_sth->currow >= imp_sth->row_num && !mysql_more_results(imp_dbh->pmysql))
+      DBIc_ACTIVE_off(imp_sth);
 
     num_fields= mysql_num_fields(imp_sth->result);
     fields= mysql_fetch_fields(imp_sth->result);
@@ -5310,31 +5365,22 @@ int mariadb_st_finish(SV* sth, imp_sth_t* imp_sth) {
   }
 
   if (imp_sth->use_server_side_prepare && imp_sth->stmt)
-  {
-    /*
-      We have to fetch all data from stmt
-      There is may be useful for 2 cases:
-      1. st_finish when we have undef statement
-      2. call st_execute again when we have some unfetched data in stmt
-     */
-    if (DBIc_ACTIVE(imp_sth) && mariadb_st_describe(sth, imp_sth) && !imp_sth->fetch_done)
-      mysql_stmt_free_result(imp_sth->stmt);
-  }
+    mysql_stmt_free_result(imp_sth->stmt);
+
+  /*
+    Clean-up previous result set(s) for sth to prevent
+    'Commands out of sync' error
+  */
+  if (!mariadb_st_free_result_sets(sth, imp_sth, FALSE))
+    return 0;
 
   /*
     Cancel further fetches from this cursor.
     We don't close the cursor till DESTROY.
     The application may re execute it.
   */
-  if (imp_sth && DBIc_ACTIVE(imp_sth))
-  {
-    /*
-      Clean-up previous result set(s) for sth to prevent
-      'Commands out of sync' error
-    */
-    mariadb_st_free_result_sets(sth, imp_sth);
-  }
   DBIc_ACTIVE_off(imp_sth);
+
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
   {
     PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\n<-- mariadb_st_finish\n");
@@ -5365,6 +5411,16 @@ void mariadb_st_destroy(SV *sth, imp_sth_t *imp_sth) {
   imp_sth_fbh_t *fbh;
   int num_params;
   int num_fields;
+
+  if (!PL_dirty)
+  {
+    /* During global destruction, DBI objects are destroyed in random order
+     * and therefore imp_dbh may be already freed. So do not access it. */
+    mariadb_st_finish(sth, imp_sth);
+    mariadb_st_free_result_sets(sth, imp_sth, TRUE);
+  }
+
+  DBIc_ACTIVE_off(imp_sth);
 
   if (imp_sth->statement)
     Safefree(imp_sth->statement);
@@ -5401,8 +5457,6 @@ void mariadb_st_destroy(SV *sth, imp_sth_t *imp_sth) {
     mysql_stmt_close(imp_sth->stmt);
     imp_sth->stmt= NULL;
   }
-
-  /* mariadb_st_finish has already been called by .xs code if needed.	*/
 
   /* Free values allocated by mariadb_st_bind_ph */
   if (imp_sth->params)
@@ -6401,7 +6455,7 @@ my_ulonglong mariadb_db_async_result(SV* h, MYSQL_RES** resp)
   D_imp_xxh(h);
   imp_dbh_t* dbh;
   MYSQL* svsock = NULL;
-  MYSQL_RES* _res;
+  MYSQL_RES* _res = NULL;
   my_ulonglong retval = 0;
   unsigned int num_fields;
   int htype;
@@ -6436,9 +6490,25 @@ my_ulonglong mariadb_db_async_result(SV* h, MYSQL_RES** resp)
   }
   dbh->async_query_in_flight = NULL;
 
+  if (htype == DBIt_ST)
+  {
+    D_imp_sth(h);
+    DBIc_ACTIVE_off(imp_sth);
+  }
+
   svsock= dbh->pmysql;
   if (!svsock)
+  {
+    mariadb_dr_do_error(h, CR_SERVER_GONE_ERROR, "MySQL server has gone away", "HY000");
     return -1;
+  }
+
+  if (*resp)
+  {
+    mysql_free_result(*resp);
+    *resp = NULL;
+  }
+
   if (!mysql_read_query_result(svsock))
   {
     *resp= mysql_store_result(svsock);
@@ -6450,35 +6520,48 @@ my_ulonglong mariadb_db_async_result(SV* h, MYSQL_RES** resp)
     }
     if (!*resp)
       retval= mysql_affected_rows(svsock);
-    else {
+    else
       retval= mysql_num_rows(*resp);
-      if(resp == &_res) {
-        mysql_free_result(*resp);
-        *resp= NULL;
-      }
-    }
+
+    /* Some MySQL client versions return correct value from mysql_insert_id()
+     * function only after non-SELECT operation. So store insert id into dbh
+     * cache and later read it only from cache. */
+    if (!*resp)
+      dbh->insertid = mysql_insert_id(svsock);
+
     if(htype == DBIt_ST) {
       D_imp_sth(h);
       D_imp_dbh_from_sth;
 
-      if (retval != (my_ulonglong)-1) {
+      imp_sth->row_num = retval;
+
         if(! *resp) {
-          /* Some MySQL client versions return correct value from mysql_insert_id()
-           * function only after non-SELECT operation. So store insert id into dbh
-           * cache and later read it only from cache. */
-          imp_dbh->insertid = imp_sth->insertid = mysql_insert_id(svsock);
-          if(! mysql_more_results(svsock))
-            DBIc_ACTIVE_off(imp_sth);
+          imp_sth->insertid = dbh->insertid;
+          if (mysql_more_results(svsock))
+            DBIc_ACTIVE_on(imp_sth);
         } else {
           num_fields = mysql_num_fields(imp_sth->result);
           DBIc_NUM_FIELDS(imp_sth) = (num_fields <= INT_MAX) ? num_fields : INT_MAX;
-          imp_sth->done_desc = FALSE;
-          imp_sth->fetch_done = FALSE;
+          if (imp_sth->row_num)
+            DBIc_ACTIVE_on(imp_sth);
         }
-      }
       imp_sth->warning_count = mysql_warning_count(imp_dbh->pmysql);
     }
+
+    if (*resp && resp == &_res)
+    {
+      mysql_free_result(*resp);
+      *resp = NULL;
+    }
+
+    if (mysql_more_results(svsock))
+      dbh->async_query_in_flight = imp_xxh;
   } else {
+#if MYSQL_VERSION_ID < 50025
+     /* Cover a protocol design error: error packet does not contain the server status.
+      * Luckily, an error always aborts execution of a statement, so it is safe to turn off the flag. */
+     svsock->server_status &= ~SERVER_MORE_RESULTS_EXISTS;
+#endif
      mariadb_dr_do_error(h, mysql_errno(svsock), mysql_error(svsock),
               mysql_sqlstate(svsock));
      return (my_ulonglong)-1;

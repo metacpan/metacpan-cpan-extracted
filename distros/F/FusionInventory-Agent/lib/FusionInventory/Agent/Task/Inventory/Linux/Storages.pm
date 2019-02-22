@@ -3,6 +3,8 @@ package FusionInventory::Agent::Task::Inventory::Linux::Storages;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use English qw(-no_match_vars);
 
 use FusionInventory::Agent::Tools;
@@ -74,23 +76,33 @@ sub _getDevices {
     }
 
     foreach my $device (@devices) {
-        if (!$device->{DESCRIPTION}) {
-            $device->{DESCRIPTION} = _getDescription(
-                $device->{NAME},
-                $device->{MANUFACTURER},
-                $device->{DESCRIPTION},
-                $device->{SERIALNUMBER}
-            );
-        }
+        $device->{DESCRIPTION} = _fixDescription(
+            $device->{NAME},
+            $device->{MANUFACTURER},
+            $device->{DESCRIPTION},
+            $device->{SERIALNUMBER}
+        );
 
-        if (!$device->{MANUFACTURER} or $device->{MANUFACTURER} eq 'ATA') {
+        if (!$device->{MANUFACTURER} || $device->{MANUFACTURER} eq 'ATA') {
             $device->{MANUFACTURER} = getCanonicalManufacturer(
                 $device->{MODEL}
             );
+        } elsif ($device->{MANUFACTURER} && $device->{MANUFACTURER} =~ /^0x(\w+)$/) {
+            my $vendor = getPCIDeviceVendor(id => lc($1));
+            $device->{MANUFACTURER} = $vendor->{name}
+                if $vendor && $vendor->{name};
         }
 
         if (!$device->{DISKSIZE} && $device->{TYPE} !~ /^cd/) {
             $device->{DISKSIZE} = getDeviceCapacity(device => '/dev/' . $device->{NAME});
+        }
+
+        # In some case, serial can't be defined using hdparm (command missing or virtual disk)
+        # Then we can define a serial searching for few specific identifiers
+        if (!$device->{SERIALNUMBER}) {
+            $params{device} = '/dev/' . $device->{NAME};
+            my $sn = _getDiskIdentifier(%params) || _getPVUUID(%params);
+            $device->{SERIALNUMBER} = $sn if $sn;
         }
     }
 
@@ -134,14 +146,14 @@ sub _getDevicesBase {
     return;
 }
 
-sub _getDescription {
+sub _fixDescription {
     my ($name, $manufacturer, $description, $serialnumber) = @_;
 
     # detected as USB by udev
     # TODO maybe we should trust udev detection by default?
     return "USB" if ($description && $description =~ /usb/i);
 
-    if ($name =~ /^s/) { # /dev/sd* are SCSI _OR_ SATA
+    if ($name =~ /^sd/) { # /dev/sd* are SCSI _OR_ SATA
         if (
             ($manufacturer && $manufacturer =~ /ATA/) ||
             ($serialnumber && $serialnumber =~ /ATA/) ||
@@ -151,10 +163,12 @@ sub _getDescription {
         } else {
             return "SCSI";
         }
-    } elsif ($name =~ /^vd/) {
+    } elsif ($name =~ /^vd/  ||
+            ($description && $description =~ /VIRTIO/)
+        ) {
             return "Virtual";
     } else {
-        return "IDE";
+        return $description || "IDE";
     }
 }
 
@@ -172,6 +186,41 @@ sub _correctHdparmAvailable {
     # we need at least version 9.15
     return compareVersion($major, $minor, 9, 15);
 
+}
+
+sub _getDiskIdentifier {
+    my (%params) = @_;
+
+    return unless $params{device} && canRun("fdisk");
+
+    # GNU version requires -p flag
+    my $command = getFirstLine(command => 'fdisk -v') =~ '^GNU' ?
+        "fdisk -p -l $params{device}" :
+        "fdisk -l $params{device}"    ;
+
+    my $identifier = getFirstMatch(
+        command => $command,
+        pattern => qr/^Disk identifier:\s*(?:0x)?(\S+)$/i,
+        logger  => $params{logger},
+    );
+
+    return $identifier;
+}
+
+sub _getPVUUID {
+    my (%params) = @_;
+
+    return unless $params{device} && canRun("lvm");
+
+    my $command = "lvm pvdisplay -C -o pv_uuid --noheadings $params{device}" ;
+
+    my $uuid = getFirstMatch(
+        command => $command,
+        pattern => qr/^\s*(\S+)/,
+        logger  => $params{logger},
+    );
+
+    return $uuid;
 }
 
 1;

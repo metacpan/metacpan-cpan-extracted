@@ -55,7 +55,7 @@ resources:
   homepage: https://github.com/gooddata/DBD-MariaDB
   license: http://dev.perl.org/licenses/
   repository: git://github.com/gooddata/DBD-MariaDB.git
-version: '1.11'
+version: '1.20'
 x_contributors:
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Alexey Molchanov <alexey.molchanov@portaone.com>'

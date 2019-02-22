@@ -13,7 +13,7 @@ use Term::ANSIColor qw/colored/;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 1.1.0;
+our $VERSION  = 1.1.1;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -37,7 +37,7 @@ git-amend - Help amend many commits
 
 =head1 VERSION
 
-This documentation refers to git-amend version 1.1.0
+This documentation refers to git-amend version 1.1.1
 
 =head1 SYNOPSIS
 

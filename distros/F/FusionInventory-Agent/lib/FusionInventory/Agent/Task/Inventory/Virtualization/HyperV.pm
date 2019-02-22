@@ -3,13 +3,22 @@ package FusionInventory::Agent::Task::Inventory::Virtualization::HyperV;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use English qw(-no_match_vars);
 use UNIVERSAL::require;
 
 use FusionInventory::Agent::Tools;
-use FusionInventory::Agent::Tools::Hostname;
+use FusionInventory::Agent::Tools::Virtualization;
+
+# Run after Win32::OS so hostname is still decided and set in inventory
+our $runAfter = ["FusionInventory::Agent::Task::Inventory::Win32::OS"];
 
 sub isEnabled {
+    return $OSNAME eq 'MSWin32';
+}
+
+sub isEnabledForRemote {
     return $OSNAME eq 'MSWin32';
 }
 
@@ -17,9 +26,9 @@ sub doInventory {
     my (%params) = @_;
 
     my $inventory = $params{inventory};
-    my $logger    = $params{inventory};
+    my $hostname  = $inventory->getHardware('NAME');
 
-    foreach my $machine (_getVirtualMachines(logger => $logger)) {
+    foreach my $machine (_getVirtualMachines($hostname)) {
         $inventory->addEntry(
             section => 'VIRTUALMACHINES', entry => $machine
         );
@@ -27,9 +36,9 @@ sub doInventory {
 }
 
 sub _getVirtualMachines {
-    FusionInventory::Agent::Tools::Win32->require();
+    my ($hostname) = @_;
 
-    my $hostname = getHostname(short => 1);
+    FusionInventory::Agent::Tools::Win32->require();
 
     my @machines;
 
@@ -66,7 +75,7 @@ sub _getVirtualMachines {
         properties => [ qw/InstanceID BIOSGUID/ ]
     )) {
         my $id = $object->{InstanceID};
-        next unless $id =~ /^Microsoft:([^\\]+)/;
+        next unless $object->{BIOSGUID} && $id =~ /^Microsoft:([^\\]+)/;
         $biosguid{$1} = $object->{BIOSGUID};
         $biosguid{$1} =~ tr/{}//d;
     }
@@ -78,13 +87,20 @@ sub _getVirtualMachines {
         properties => [ qw/ElementName EnabledState Name/ ]
     )) {
         # skip host
-        next if lc($object->{Name}) eq lc($hostname);
+        next if ($hostname && lc($object->{Name}) eq lc($hostname));
 
         my $status =
-            $object->{EnabledState} == 2     ? 'running'  :
-            $object->{EnabledState} == 3     ? 'shutdown' :
-            $object->{EnabledState} == 32768 ? 'paused'   :
-                                               'unknown'  ;
+            $object->{EnabledState} == 2     ? STATUS_RUNNING  :
+            $object->{EnabledState} == 3     ? STATUS_OFF      :
+            $object->{EnabledState} == 32768 ? STATUS_PAUSED   :
+            $object->{EnabledState} == 32769 ? STATUS_OFF      :
+            $object->{EnabledState} == 32770 ? STATUS_BLOCKED  :
+            $object->{EnabledState} == 32771 ? STATUS_BLOCKED  :
+            $object->{EnabledState} == 32773 ? STATUS_BLOCKED  :
+            $object->{EnabledState} == 32774 ? STATUS_SHUTDOWN :
+            $object->{EnabledState} == 32776 ? STATUS_BLOCKED  :
+            $object->{EnabledState} == 32777 ? STATUS_BLOCKED  :
+                                               STATUS_OFF      ;
         my $machine = {
             SUBSYSTEM => 'MS HyperV',
             VMTYPE    => 'HyperV',

@@ -3,8 +3,9 @@ package FusionInventory::Agent::Task::Inventory::Solaris::Bios;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use Config;
-use List::Util qw(first);
 
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::Solaris;

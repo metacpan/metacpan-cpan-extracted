@@ -16,6 +16,12 @@ require DBI::DBD;
 
 my $TESTDB = "test";
 
+# On WIN32 windows.h and winsock.h need to be included before mysql.h
+# Otherwise SOCKET type which is needed for mysql.h is not defined
+my @mysql_headers;
+push @mysql_headers, 'windows.h', 'winsock.h' if $^O eq 'MSWin32';
+push @mysql_headers, 'mysql.h';
+
 our $opt = { "help" => \&Usage, };
 
 my ($test_host, $test_port, $test_socket);
@@ -68,7 +74,7 @@ my $source = {};
     if ($opt->{'mysql_config'} ne 'skip') {
     $opt->{'mysql_config'} = Win32::GetShortPathName($opt->{'mysql_config'})
         if $^O eq 'MSWin32';
-    if (! defined `$opt->{'mysql_config'} 2>&1`)
+    if (!CanExecute($opt->{'mysql_config'}))
     {
       die <<"MSG";
 
@@ -80,11 +86,11 @@ MSG
   }
   else
   {
-    if (defined `mariadb_config 2>&1`)
+    if (CanExecute("mariadb_config"))
     {
       $opt->{'mysql_config'} = "mariadb_config";
     }
-    elsif (defined `mysql_config 2>&1`)
+    elsif (CanExecute("mysql_config"))
     {
       $opt->{'mysql_config'} = "mysql_config";
     }
@@ -223,7 +229,7 @@ assert_lib(
   LIBS => (join ' ', @libdirs, $main_lib, @libs),
   ccflags => (join ' ', $opt->{cflags}, ($Config{usedl} ? $Config{cccdlflags} : ())),
   ldflags => (join ' ', @libdirs, @ldflags, ($Config{usedl} ? $Config{lddlflags} : ())),
-  header => 'mysql.h',
+  header => \@mysql_headers,
   not_execute => 1,
 );
 
@@ -233,7 +239,7 @@ check_lib(
   LIBS => (join ' ', @libdirs, $main_lib),
   ccflags => $opt->{cflags},
   ldflags => (join ' ', @libdirs, @libs, @ldflags),
-  header => 'mysql.h',
+  header => \@mysql_headers,
   function => "\n#ifndef MYSQL_VERSION_ID\n#include <mysql_version.h>\n#endif\nreturn (MYSQL_VERSION_ID >= 40108) ? 0 : 1;\n",
 ) or die <<"MSG";
 
@@ -248,7 +254,7 @@ my $have_embedded = check_lib(
   LIBS => (join ' ', @libdirs, $main_lib),
   ccflags => $opt->{cflags},
   ldflags => (join ' ', @libdirs, @libs, @ldflags),
-  header => 'mysql.h',
+  header => \@mysql_headers,
   function => 'return mysql_embedded() ? 0 : 1;',
 );
 
@@ -258,7 +264,7 @@ my $have_get_charset_number = check_lib(
   LIBS => (join ' ', @libdirs, $main_lib),
   ccflags => $opt->{cflags},
   ldflags => (join ' ', @libdirs, @libs, @ldflags),
-  header => 'mysql.h',
+  header => \@mysql_headers,
   function => 'unsigned int get_charset_number(const char *cs_name, unsigned int cs_flags); mysql_server_init(-1, 0, 0); get_charset_number("utf8", 32); return 0;',
 );
 
@@ -266,7 +272,7 @@ my $have_get_option = check_lib(
   LIBS => (join ' ', @libdirs, $main_lib),
   ccflags => $opt->{cflags},
   ldflags => (join ' ', @libdirs, @libs, @ldflags),
-  header => 'mysql.h',
+  header => \@mysql_headers,
   function => 'MYSQL mysql; char buf[1024]; mysql_server_init(-1, 0, 0); mysql_init(&mysql); mysql_get_option(&mysql, 0, &buf); return 0;',
 );
 
@@ -274,9 +280,136 @@ my $have_deinitialize_ssl = check_lib(
   LIBS => (join ' ', @libdirs, $main_lib),
   ccflags => $opt->{cflags},
   ldflags => (join ' ', @libdirs, @libs, @ldflags),
-  header => 'mysql.h',
+  header => \@mysql_headers,
   function => 'mariadb_deinitialize_ssl = 0; return 0;',
 );
+
+# Check if mysql_server_end() deinitialize OpenSSL library functions
+# See: https://github.com/gooddata/DBD-MariaDB/issues/119
+my $have_problem_with_openssl = !check_lib(
+  LIBS => (join ' ', @libdirs, $main_lib),
+  ccflags => $opt->{cflags},
+  ldflags => (join ' ', @libdirs, @libs, @ldflags, $Config{perllibs}),
+  header => \@mysql_headers,
+  function => << 'EOF'
+
+#ifndef _WIN32
+  #ifndef _GNU_SOURCE
+    #define _GNU_SOURCE
+  #endif
+  #include <dlfcn.h>
+  #ifndef RTLD_DEFAULT
+    #define RTLD_DEFAULT ((void *)0)
+  #endif
+#endif
+
+int (*OPENSSL_init_ssl_func)(unsigned long long, const void *);
+void (*SSL_load_error_strings_func)(void);
+int (*SSL_library_init_func)(void);
+void *(*SSL_CTX_new_func)(const void *method);
+void (*SSL_CTX_free_func)(void *ctx);
+const void *(*TLS_method_func)(void);
+const void *method1;
+const void *method2;
+void *ctx1;
+void *ctx2;
+
+#ifdef _WIN32
+
+  BOOL (WINAPI *EnumProcessModules_func)(HANDLE, HMODULE *, DWORD, LPDWORD);
+  HMODULE psapi_lib;
+  DWORD size, i;
+  HMODULE *modules;
+
+  modules = NULL;
+  psapi_lib = LoadLibraryA("Psapi.dll");
+  if (psapi_lib) {
+    EnumProcessModules_func = (BOOL (WINAPI *)(HANDLE, HMODULE *, DWORD, LPDWORD))GetProcAddress(psapi_lib, "EnumProcessModules");
+    if (EnumProcessModules_func) {
+      if (EnumProcessModules_func((HANDLE)-1, NULL, 0, &size)) {
+        modules = (HMODULE *)GlobalAlloc(GPTR, size);
+        if (modules && !EnumProcessModules_func((HANDLE)-1, modules, size, &size))
+          modules = NULL;
+      }
+    }
+  }
+
+  #define SYMBOL(var, type, sym) do { \
+      var = (type)GetProcAddress(GetModuleHandle(NULL), sym); \
+      if (!var) { \
+        if (!modules) \
+          return 1; \
+        for (i = 0; i < size/sizeof(*modules); ++i) { \
+          var = (type)GetProcAddress(modules[i], sym); \
+          if (var) \
+            break; \
+        } \
+      } \
+    } while (0)
+
+#else
+
+  #define SYMBOL(var, type, sym) do { var = (type)dlsym(RTLD_DEFAULT, sym); } while (0)
+
+#endif
+
+SYMBOL(OPENSSL_init_ssl_func, int (*)(unsigned long long, const void *), "OPENSSL_init_ssl");
+SYMBOL(SSL_library_init_func, int (*)(void), "SSL_library_init");
+if (!OPENSSL_init_ssl_func && !SSL_library_init_func)
+  return 0;
+SYMBOL(SSL_load_error_strings_func, void (*)(void), "SSL_load_error_strings");
+if (!OPENSSL_init_ssl_func && !SSL_load_error_strings_func)
+  return 0;
+SYMBOL(SSL_CTX_new_func, void *(*)(const void *), "SSL_CTX_new");
+if (!SSL_CTX_new_func)
+  return 0;
+SYMBOL(SSL_CTX_free_func, void (*)(void *), "SSL_CTX_free");
+if (!SSL_CTX_free_func)
+  return 0;
+
+SYMBOL(TLS_method_func, const void *(*)(void), "TLS_method");
+if (!TLS_method_func)
+  SYMBOL(TLS_method_func, const void *(*)(void), "TLSv1_2_method");
+if (!TLS_method_func)
+  SYMBOL(TLS_method_func, const void *(*)(void), "TLSv1_1_method");
+if (!TLS_method_func)
+  SYMBOL(TLS_method_func, const void *(*)(void), "TLSv1_method");
+if (!TLS_method_func)
+  return 0;
+
+if (OPENSSL_init_ssl_func) {
+  OPENSSL_init_ssl_func(0, (void *)0);
+} else {
+  SSL_library_init_func();
+  SSL_load_error_strings_func();
+}
+
+method1 = TLS_method_func();
+if (!method1)
+  return 1;
+ctx1 = SSL_CTX_new_func(method1);
+if (!ctx1)
+  return 1;
+
+mysql_server_init(-1, 0, 0);
+mysql_server_end();
+
+method2 = TLS_method_func();
+if (!method2)
+  return 1;
+ctx2 = SSL_CTX_new_func(method2);
+if (!ctx2)
+  return 1;
+
+SSL_CTX_free_func(ctx1);
+SSL_CTX_free_func(ctx2);
+
+return 0;
+
+EOF
+);
+
+print "Client library deinitialize OpenSSL library functions: " . ($have_problem_with_openssl ? "yes" : "no") . "\n\n";
 
 my $fileName = File::Spec->catfile("t", "MariaDB.mtest");
 (open(FILE, ">$fileName") &&
@@ -307,6 +440,7 @@ $cflags .= " -DHAVE_EMBEDDED" if $have_embedded;
 $cflags .= " -DHAVE_GET_CHARSET_NUMBER" if $have_get_charset_number;
 $cflags .= " -DHAVE_GET_OPTION" if $have_get_option;
 $cflags .= " -DHAVE_DEINITIALIZE_SSL" if $have_deinitialize_ssl;
+$cflags .= " -DHAVE_PROBLEM_WITH_OPENSSL" if $have_problem_with_openssl;
 my %o = ( 'NAME' => 'DBD::MariaDB',
 	  'INC' => $cflags,
 	  'dist'         => { 'SUFFIX'       => ".gz",
@@ -416,7 +550,7 @@ if (eval { ExtUtils::MakeMaker->VERSION(5.43) }) {
       prereqs => {
         test => {
           recommends => {
-            'Net::SSLeay' => 0,
+            'Net::SSLeay' => '1.43',
             'Proc::ProcessTable' => 0,
             'TAP::Harness' => '3.31',
             'CPAN::Meta::YAML' => 0,
@@ -525,13 +659,23 @@ USAGE
 }
 
 
+sub CanExecute {
+  my ($command) = @_;
+  return MM->maybe_command($command) if File::Spec->file_name_is_absolute($command);
+  foreach my $dir (File::Spec->path) {
+    return 1 if MM->maybe_command(File::Spec->catfile($dir, $command));
+  }
+  return 0;
+}
+
+
 my %ParsedCache;
 sub ParseMySQLConfig {
   my ($opt, $param) = @_;
   return $ParsedCache{$param} if exists $ParsedCache{$param};
   return undef unless $opt->{'mysql_config'} and $opt->{'mysql_config'} ne 'skip';
   my $output = `$opt->{'mysql_config'} --$param 2>&1`;
-  if (defined $output and $output !~ /Options:|Usage:|unrecognized option/) {
+  if ($? == 0 and defined $output and $output !~ /Options:|Usage:|unrecognized option/) {
     $output =~ s/\s+$//s;
     $output =~ s/^\s+//s;
     $ParsedCache{$param} = $output;
@@ -611,7 +755,7 @@ sub Configure {
                             LIBS => (join ' ', @libdirs, $main_lib),
                             ldflags => (join ' ', @libdirs, $ldflags, $Config{lddlflags}),
                             ccflags => (join ' ', $opt->{cflags}, $Config{cccdlflags}),
-                            header => 'mysql.h',
+                            header => \@mysql_headers,
                             function => $function,
                             not_execute => 1,
                         ) or next;
@@ -621,7 +765,7 @@ sub Configure {
                         LIBS => (join ' ', @libdirs, $main_lib),
                         ldflags => (join ' ', @libdirs, $ldflags),
                         ccflags => $opt->{cflags},
-                        header => 'mysql.h',
+                        header => \@mysql_headers,
                         function => $function,
                     ) or next;
                     $str .= ' ' . $add_ldflags if defined $add_ldflags;

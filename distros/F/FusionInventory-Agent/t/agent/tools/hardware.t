@@ -8,8 +8,10 @@ use Test::More;
 
 use FusionInventory::Agent::SNMP::Mock;
 use FusionInventory::Agent::Tools::Hardware;
+use FusionInventory::Agent::Tools::SNMP;
 
 my @mac_tests = (
+    [ '\TmGnn'            , '5c:54:6d:47:6e:6e' ],
     [ 'd2:05:a8:6c:26:d5' , 'd2:05:a8:6c:26:d5' ],
     [ 'd2:5:a8:6c:26:d5'  , 'd2:05:a8:6c:26:d5' ],
     [ '0xD205A86C26D5'    , 'd2:05:a8:6c:26:d5' ],
@@ -36,7 +38,7 @@ my @cdp_info_extraction_tests = (
         },
         {
             24 => {
-                MAC      => 'e0:5f:b9:81:a7:a7',
+                SYSMAC   => 'e0:5f:b9:81:a7:a7',
                 SYSDESCR => '7.4.9c',
                 IFDESCR  => 'Port 1',
                 MODEL    => 'Cisco IP Phone SPA508G',
@@ -220,7 +222,7 @@ plan tests =>
 
 foreach my $test (@mac_tests) {
     is(
-        FusionInventory::Agent::Tools::Hardware::_getCanonicalMacAddress($test->[0]),
+        FusionInventory::Agent::Tools::SNMP::getCanonicalMacAddress($test->[0]),
         $test->[1],
         "$test->[0] normalisation"
     );
@@ -262,7 +264,6 @@ cmp_deeply(
         DESCRIPTION  => 'foo',
         TYPE         => 'NETWORKING',
         MANUFACTURER => 'Nortel',
-        VENDOR       => 'Nortel'
     },
     'getDeviceInfo() with sysobjectid'
 );
@@ -272,15 +273,13 @@ my $snmp3 = FusionInventory::Agent::SNMP::Mock->new(
         '.1.3.6.1.2.1.1.2.0'        => [ 'STRING', '.1.3.6.1.4.1.1663.1.1.1.1.24' ],
     }
 );
-my $device4 = getDeviceInfo(snmp => $snmp3, confdir => './share');
+my $device4 = getDeviceInfo(snmp => $snmp3, datadir => './share');
 cmp_deeply(
     $device4,
     {
         TYPE         => 'NETWORKING',
         MANUFACTURER => 'Qlogic',
-        VENDOR       => 'Qlogic',
         MODEL        => 'SANbox 5602 FC Switch',
-        EXTMOD       => 'Qlogic'
     },
     'getDeviceInfo() with sysobjectid and extmod'
 );

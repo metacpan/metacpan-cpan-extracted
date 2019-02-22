@@ -1,0 +1,111 @@
+=for Pod::Coverage empty
+
+=head1 NAME
+
+Chess::Opening::Book - A chess opening book
+
+=head1 SYNOPSIS
+
+	die "Chess::Opening::Book is an abstract base class";
+
+=head1 DESCRIPTION
+
+B<Chess::Opening::Book> is an abstract base class for chess opening books.
+Instantiate one of the sub classes L<Chess::Opening::Book::Polyglot> or
+L<Chess::Opening::Book::ECO> instead.
+
+=head1 PUBLIC INTERFACE
+
+=over 4
+
+=item B<new ARGS>
+
+See the documentation of the sub class you are instantiating for usage
+information.
+
+=item B<lookupFEN FEN>
+
+Looks up a position in Forsyth-Edwards-Notation B<FEN> in the opening book.
+See L<Chess::Opening/Positions> for more information on FEN.
+
+The method returns a L<Chess::Opening::Book::Entry> object if the position was
+found in the book, otherwise false.
+
+Note that the sub class L<Chess::Opening::Book::ECO> returns a
+L<Chess::Opening::ECO::Entry>, a specialization of a
+L<Chess::Opening::Book::Entry>..
+
+=back
+
+=head1 EXAMPLES
+
+The following code implements a visualization of ECO data:
+
+    use strict;
+    
+    use Chess::Opening::Book::ECO;
+    use Chess::Rep;
+    use Storable qw(dclone);
+    
+    my $book = Chess::Opening::Book::ECO->new;
+    my $start = Chess::Rep->new;
+    
+    print_position($book, $start, 0);
+    
+    sub print_position {
+        my ($book, $pos, $plies) = @_;
+
+        my $entry = $book->lookupFEN($pos->get_fen);
+        if (!$entry) {
+            print "\n";
+            return;
+        }
+    
+        my ($eco, $variation) = ($entry->eco, $entry->variation);
+        print "$eco $variation\n";
+    
+        my $moveno = 1 + int($plies / 2);
+        my $prefix = ' ' x (3 * $plies) . "$moveno.";
+        if ($plies & 1) {
+            $prefix .= '..';
+        } else {
+            $prefix .= ' ';
+        }
+    
+        my $moves = $entry->moves;
+        foreach my $move (sort keys %$moves) {
+            my $copy = dclone $pos;
+            my $move_info = $copy->go_move($move);
+            print "$prefix$move_info->{san} ";
+            print_position($book, $copy, $plies + 1);
+        }
+    }
+
+It instantiates a L<Chess::Opening::Book::ECO> for lookup.  You can also
+visualize a L<Chess::Opening::Book::Polyglot> book in a similar manner but
+you have to change the presentation below.
+
+The code then recursively prints the entries with the method
+C<print_position()>.  The Forsyth-Edwards Notation of the current position
+is looked up, and the information found is printed. Neither the methods
+C<eco()> nor C<variation()> are implemented for polyglot opening books. You
+would rather print the weight of the current position for them.
+
+The following lines calculates the indentation level before the code loops
+over the moves leading away from the current position.  For each move found
+the function recurses one level deeper.
+
+You will notice that the script is very slow.  This is because the method
+"go_move()" from L<Chess::Rep> that updates the position with a move is
+slow.  For a faster version you should replace L<Chess::Rep> with something
+that uses bitboards.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2019 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+L<Chess::Opening::Book>, L<Chess::Opening::Book::Polyglot>,
+L<Chess::Opening::Book::ECO>, L<Chess::Rep>, perl(1)

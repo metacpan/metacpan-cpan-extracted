@@ -2,10 +2,11 @@ package FusionInventory::Agent::Tools::Generic;
 
 use strict;
 use warnings;
-use base 'Exporter';
+use parent 'Exporter';
 
 use English qw(-no_match_vars);
 use Memoize;
+use File::stat;
 
 use FusionInventory::Agent::Tools;
 
@@ -79,6 +80,11 @@ sub getDmidecodeInfos {
     }
     close $handle;
 
+    # push last block in list if still defined
+    if ($block) {
+        push(@{$info->{$type}}, $block);
+    }
+
     # do not return anything if dmidecode output is obviously truncated
     return if keys %$info < 2;
 
@@ -107,7 +113,7 @@ sub getCpusFromDmidecode {
         my $cpu = {
             SERIAL       => $info->{'Serial Number'},
             ID           => $info->{ID},
-            CORE         => $info->{'Core Count'} || $info->{'Core Enabled'},
+            CORE         => $info->{'Core Enabled'} || $info->{'Core Count'},
             THREAD       => $info->{'Thread Count'},
             FAMILYNAME   => $info->{'Family'},
             MANUFACTURER => $manufacturer
@@ -151,6 +157,12 @@ sub getCpusFromDmidecode {
             } elsif ($info->{'External Clock'} =~ /^\s*(\d+)\s*Ghz/i) {
                 $cpu->{EXTERNAL_CLOCK} = $1 * 1000;
             }
+        }
+
+        # Add CORECOUNT if we have less enabled cores than total count
+        if ($info->{'Core Enabled'} && $info->{'Core Count'}) {
+            $cpu->{CORECOUNT} = $info->{'Core Count'}
+                unless ($info->{'Core Enabled'} == $info->{'Core Count'});
         }
 
         push @cpus, $cpu;
@@ -276,20 +288,41 @@ sub getEDIDVendor {
     return $EDIDVendors->{$params{id}};
 }
 
+my @datadirs = ($OSNAME ne 'linux') ? () : (
+    "/usr/share/misc",      # debian system well-known path
+    "/usr/share/hwdata",    # hwdata system well-known path including fedora
+);
+
+sub _getIdsFile {
+    my (%params) = @_;
+
+    return "$params{datadir}/$params{idsfile}"
+        unless @datadirs;
+
+    # Try to use the most recent ids file from well-known places
+    my %files = map { $_ => stat($_)->ctime() } grep { -s $_ }
+        map { "$_/$params{idsfile}" } @datadirs, $params{datadir} ;
+
+    # Sort by creation time
+    my @sorted_files = sort { $files{$a} <=> $files{$b} } keys(%files);
+
+    return pop @sorted_files;
+}
+
 sub _loadPCIDatabase {
     my (%params) = @_;
 
-    ($PCIVendors, $PCIClasses) = _loadDatabase(
-        file => "$params{datadir}/pci.ids"
-    );
+    my $file = _getIdsFile( %params, idsfile => "pci.ids" );
+
+    ($PCIVendors, $PCIClasses) = _loadDatabase( file => $file );
 }
 
 sub _loadUSBDatabase {
     my (%params) = @_;
 
-    ($USBVendors, $USBClasses) = _loadDatabase(
-        file => "$params{datadir}/usb.ids"
-    );
+    my $file = _getIdsFile( %params, idsfile => "usb.ids" );
+
+    ($USBVendors, $USBClasses) = _loadDatabase( file => $file );
 }
 
 sub _loadDatabase {
@@ -331,13 +364,16 @@ sub _loadDatabase {
 sub _loadEDIDDatabase {
     my (%params) = @_;
 
-    my $handle = getFileHandle(file => "$params{datadir}/edid.ids");
+    my $file = _getIdsFile( %params, idsfile => "edid.ids" );
+
+    my $handle = getFileHandle( file => $file );
     return unless $handle;
 
     foreach my $line (<$handle>) {
        next unless $line =~ /^([A-Z]{3}) __ (.*)$/;
        $EDIDVendors->{$1} = $2;
    }
+    close $handle;
 
    return;
 }

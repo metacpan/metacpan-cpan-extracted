@@ -3,6 +3,8 @@ package FusionInventory::Agent::Task::Inventory::MacOS::Drives;
 use strict;
 use warnings;
 
+use parent 'FusionInventory::Agent::Task::Inventory::Module';
+
 use FusionInventory::Agent::Tools;
 use FusionInventory::Agent::Tools::Unix;
 
@@ -43,7 +45,7 @@ sub doInventory {
         my $filesystem = $filesystems{$device};
         next unless $filesystem;
 
-        if ($info->{'Total Size'} =~ /^([.\d]+ \s \S+)/x) {
+        if ($info->{'Total Size'} && $info->{'Total Size'} =~ /^([.\d]+ \s \S+)/x) {
             $filesystem->{TOTAL} = getCanonicalSize($1);
         }
         $filesystem->{SERIAL}     = $info->{'Volume UUID'} ||
@@ -51,6 +53,24 @@ sub doInventory {
         $filesystem->{FILESYSTEM} = $info->{'File System'} ||
                                     $info->{'Partition Type'};
         $filesystem->{LABEL}      = $info->{'Volume Name'};
+    }
+
+    # Check FileVault 2 support for root filesystem
+    if (canRun('fdesetup')) {
+        my $status = getFirstLine(command => 'fdesetup status');
+        if ($status && $status =~ /FileVault is On/i) {
+            $logger->debug("FileVault 2 is enabled");
+            my ($rootfs) = grep { $_->{TYPE} eq '/' } values(%filesystems);
+            if ($rootfs) {
+                $rootfs->{ENCRYPT_STATUS} = 'Yes';
+                $rootfs->{ENCRYPT_NAME}   = 'FileVault 2';
+                $rootfs->{ENCRYPT_ALGO}   = 'XTS_AES_128';
+            }
+        } else {
+            $logger->debug("FileVault 2 is disabled");
+        }
+    } else {
+        $logger->debug("FileVault 2 is not supported");
     }
 
     # add filesystems to the inventory

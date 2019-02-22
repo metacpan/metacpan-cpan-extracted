@@ -11,12 +11,13 @@ use FusionInventory::Agent::Storage;
 sub new {
     my ($class, %params) = @_;
 
-    die 'no basevardir parameter' unless $params{basevardir};
+    die "no basevardir parameter for target\n" unless $params{basevardir};
 
     my $self = {
         logger       => $params{logger} ||
                         FusionInventory::Agent::Logger->new(),
         maxDelay     => $params{maxDelay} || 3600,
+        errMaxDelay  => $params{delaytime},
         initialDelay => $params{delaytime},
     };
     bless $self, $class;
@@ -41,7 +42,7 @@ sub _init {
     $self->_loadState();
 
     $self->{nextRunDate} = $self->_computeNextRunDate()
-        if !$self->{nextRunDate};
+        if (!$self->{nextRunDate} || $self->{nextRunDate} < time-$self->getMaxDelay());
 
     $self->_saveState();
 
@@ -61,15 +62,31 @@ sub getStorage {
 sub setNextRunDate {
     my ($self, $nextRunDate) = @_;
 
-    lock($self->{nextRunDate}) if $self->{shared};
     $self->{nextRunDate} = $nextRunDate;
+    $self->_saveState();
+}
+
+sub setNextRunDateFromNow {
+    my ($self, $nextRunDelay) = @_;
+
+    if ($nextRunDelay) {
+        # While using nextRunDelay, we double it on each consecutive call until
+        # delay reach target defined maxDelay. This is only used on network failure.
+        $nextRunDelay = 2 * $self->{_nextrundelay} if ($self->{_nextrundelay});
+        $nextRunDelay = $self->getMaxDelay() if ($nextRunDelay > $self->getMaxDelay());
+        # Also limit toward the initial delaytime as it is also used to
+        # define the maximum delay on network error
+        $nextRunDelay = $self->{errMaxDelay} if ($nextRunDelay > $self->{errMaxDelay});
+        $self->{_nextrundelay} = $nextRunDelay;
+    }
+    $self->{nextRunDate} = time + ($nextRunDelay || 0);
     $self->_saveState();
 }
 
 sub resetNextRunDate {
     my ($self) = @_;
 
-    lock($self->{nextRunDate}) if $self->{shared};
+    $self->{_nextrundelay} = 0;
     $self->{nextRunDate} = $self->_computeNextRunDate();
     $self->_saveState();
 }
@@ -77,7 +94,28 @@ sub resetNextRunDate {
 sub getNextRunDate {
     my ($self) = @_;
 
+    # Check if state file has been updated by a third party, like a script run
+    $self->_loadState() if $self->_needToReloadState();
+
     return $self->{nextRunDate};
+}
+
+sub paused {
+    my ($self) = @_;
+
+    return $self->{_paused} || 0;
+}
+
+sub pause {
+    my ($self) = @_;
+
+    $self->{_paused} = 1;
+}
+
+sub continue {
+    my ($self) = @_;
+
+    delete $self->{_paused};
 }
 
 sub getFormatedNextRunDate {
@@ -98,6 +136,17 @@ sub setMaxDelay {
 
     $self->{maxDelay} = $maxDelay;
     $self->_saveState();
+}
+
+sub isType {
+    my ($self, $testtype) = @_;
+
+    return unless $testtype;
+
+    my $type = $self->getType()
+        or return;
+
+    return "$type" eq "$testtype";
 }
 
 # compute a run date, as current date and a random delay
@@ -138,6 +187,12 @@ sub _saveState {
             nextRunDate => $self->{nextRunDate},
         }
     );
+}
+
+sub _needToReloadState {
+    my ($self) = @_;
+
+    return $self->{storage}->modified(name => 'target');
 }
 
 1;
@@ -186,6 +241,10 @@ Get nextRunDate attribute as a formated string.
 =head2 setNextRunDate($nextRunDate)
 
 Set next execution date.
+
+=head2 setNextRunDateFromNow($nextRunDelay)
+
+Set next execution date from now and after $nextRunDelay seconds (0 by default).
 
 =head2 resetNextRunDate()
 
