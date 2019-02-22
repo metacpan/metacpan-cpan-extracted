@@ -1,4 +1,8 @@
 #!/usr/bin/perl
+#  You may distribute under the terms of either the GNU General Public License
+#  or the Artistic License (the same terms as Perl itself)
+#
+#  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
 
 use strict;
 use warnings;
@@ -6,9 +10,19 @@ use App::sourcepan;
 use Getopt::Long;
 
 my $TYPE;
+my $EXTRACT;
+my $UNVERSIONED;
+my $VC_INIT;
 GetOptions(
-   'module' => sub { $TYPE = "module" },
-   'dist'   => sub { $TYPE = "dist" },
+   'module'        => sub { $TYPE = "module" },
+   'dist'          => sub { $TYPE = "dist" },
+   'extract|x'     => \$EXTRACT,
+   'unversioned|U' => \$UNVERSIONED,
+   'vc-init=s'     => \$VC_INIT,
+
+   # Shortcuts
+   'git'           => sub { $EXTRACT++, $UNVERSIONED++, $VC_INIT = "git" },
+   'bzr'           => sub { $EXTRACT++, $UNVERSIONED++, $VC_INIT = "bzr" },
 ) or exit 1;
 
 # Try to detect dists or modules
@@ -16,4 +30,84 @@ if( !defined $TYPE ) {
    $TYPE = ( grep { m/\S-\S/ } @ARGV ) ? "dist" : "module";
 }
 
-App::sourcepan->run( $TYPE, @ARGV );
+App::sourcepan->run( {
+      type        => $TYPE,
+      extract     => $EXTRACT,
+      unversioned => $UNVERSIONED,
+      vc_init     => $VC_INIT,
+   }, @ARGV );
+
+=head1 NAME
+
+F<sourcepan> - fetch source archives from CPAN
+
+=head1 SYNOPSIS
+
+ $ sourcepan App::sourcepan
+
+ # Extract the source archive
+ $ sourcepan --extract App::sourcepan
+
+ # Initialise a local `git` repo for the extracted source
+ $ sourcepan --git App::sourcepan
+
+=head1 DESCRIPTION
+
+This command fetches the source distribution for the modules or distributions
+named on the commandline, and places each in the current working directory.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --dist
+
+Clarifies that the items named on the commandline are distribution names (i.e.
+base names of archives). Usually not required, as this will be guessed if the
+item name contains a C<-> character.
+
+=item --module
+
+Clarifies that the items named on the commandline are module names (i.e. perl
+packages). Usually not required as this is the default unless a name contains
+the C<-> character, which is not allowed in module names.
+
+=item --extract, -x
+
+Optionally unpack the archive after it is downloaded.
+
+=item --unversioned, -U
+
+Optionally rename the unpacked directory to remove the version suffix.
+
+=item --vc-init SYSTEM
+
+Optionally initialise a version control system inside the unpacked directory.
+Known systems are
+
+=over 4
+
+=item C<bzr>
+
+Bazaar
+
+=item C<git>
+
+Git
+
+=back
+
+=item --bzr
+
+=item --git
+
+Convenience shortcuts to specifying the C<--extract>, C<--unversioned> and
+C<--vc-init> arguments individually.
+
+=back
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

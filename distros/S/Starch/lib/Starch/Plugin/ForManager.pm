@@ -1,6 +1,7 @@
 package Starch::Plugin::ForManager;
-
-$Starch::Plugin::ForManager::VERSION = '0.10';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -31,7 +32,6 @@ See L<Starch::Extending/PLUGINS> for more information.
 =cut
 
 use Moo::Role;
-use strictures 2;
 use namespace::clean;
 
 1;

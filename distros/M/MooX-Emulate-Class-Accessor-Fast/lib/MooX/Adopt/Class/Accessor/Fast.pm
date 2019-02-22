@@ -1,6 +1,5 @@
 package MooX::Adopt::Class::Accessor::Fast;
-
-$MooX::Adopt::Class::Accessor::Fast::VERSION = '0.04';
+our $VERSION = '0.05';
 
 $INC{'Class/Accessor/Fast.pm'} = __FILE__;
 
@@ -8,7 +7,7 @@ package #don't index
     Class::Accessor::Fast;
 
 use Moo;
-use strictures 2;
+use namespace::clean;
 with 'MooX::Emulate::Class::Accessor::Fast';
 
 1;

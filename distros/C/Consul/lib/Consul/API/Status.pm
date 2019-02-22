@@ -1,5 +1,5 @@
 package Consul::API::Status;
-$Consul::API::Status::VERSION = '0.023';
+$Consul::API::Status::VERSION = '0.024';
 use namespace::autoclean;
 
 use Moo::Role;

@@ -1,4 +1,4 @@
-ServiceNow-JSON version 0.01
+ServiceNow-JSON version 0.02
 ============================
 
 Allows for easy use of the ServiceNow JSON REST api from perl.  Supports

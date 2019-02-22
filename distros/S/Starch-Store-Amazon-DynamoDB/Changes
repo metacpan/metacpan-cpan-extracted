@@ -1,5 +1,10 @@
 Revision history for Perl extension Starch-Store-Amazon-DynamoDB.
 
+0.06 2019-02-20T18:48:27Z
+
+ - Require Starch 0.11 so that we get the better croak.
+ - Simplify VERSION declarations.
+
 0.05 2019-02-18T05:58:28Z
 
  - Remove reaping, the way Amazon::DynamoDB does table scans does not

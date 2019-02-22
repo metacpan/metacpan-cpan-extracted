@@ -694,7 +694,7 @@ parse_key(self, str, format)
   char *str
   int format
   PREINIT:
-    char *ret;
+    const char *ret;
     Term__TermKey__Key key;
   CODE:
     RETVAL = newSV(0);
@@ -715,7 +715,7 @@ parse_key_at_pos(self, str, format)
   SV *str
   int format
   PREINIT:
-    char *str_base, *str_start, *str_end;
+    const char *str_base, *str_start, *str_end;
     MAGIC *posmg = NULL;
     Term__TermKey__Key key;
   CODE:

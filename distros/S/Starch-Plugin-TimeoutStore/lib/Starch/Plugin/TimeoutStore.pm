@@ -1,6 +1,7 @@
 package Starch::Plugin::TimeoutStore;
-
-$Starch::Plugin::TimeoutStore::VERSION = '0.07';
+use 5.010001;
+use strictures 2;
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -39,7 +40,6 @@ use Starch::Util qw( croak );
 use Sys::SigAction qw( timeout_call );
 
 use Moo::Role;
-use strictures 2;
 use namespace::clean;
 
 with qw(
@@ -69,8 +69,6 @@ foreach my $method (qw( set get remove )) {
     around $method => sub{
         my $orig = shift;
         my $self = shift;
-
-        local $Carp::Internal{ (__PACKAGE__) } = 1;
 
         my $timeout = $self->timeout();
         return $self->$orig( @_ ) if $timeout == 0;

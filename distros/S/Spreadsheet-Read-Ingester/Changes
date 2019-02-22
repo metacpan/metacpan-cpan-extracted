@@ -1,5 +1,17 @@
 Revision history for Spreadsheet-Read-Ingester
 
+0.010     2019-02-21 13:06:56-05:00 America/New_York
+
+  - Add LIMITATIONS section to documentation
+  - Allow additional files to be added to existing object with "add" method
+  - Implement previously non-working methods (parses, rows, cellrow, cell2cr, etc.) 
+
+0.009     2019-02-20 11:51:53-05:00 America/New_York
+
+  - Protect existing files from getting deleted when test is run
+  - Ensure data returned from stored data files reflects the options passed to constructor
+  - Update documentation
+
 0.008     2019-02-20 08:49:43-05:00 America/New_York
 
   - Fix link in documentation

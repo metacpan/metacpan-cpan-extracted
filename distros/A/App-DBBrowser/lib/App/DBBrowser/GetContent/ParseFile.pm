@@ -51,7 +51,11 @@ sub __parse_file_Text_CSV { # 0
             my $message =  "Text::CSV:\n";
             $message .= "Input: $error_inpunt" if defined $error_inpunt;
             $message .= "$code $str - pos:$pos rec:$rec fld:$fld";
-            die $message; ###
+            choose(
+                [ 'Press ENTER' ],
+                { %{$sf->{i}{lyt_m}}, prompt => $message }
+            );
+            return;
         }
     } );
     while ( my $cols = $csv->getline( $fh ) ) {
@@ -75,8 +79,8 @@ sub __parse_file_split { # 1
     seek $fh, 0, 0;
     my $record_lead  = $sf->{o}{split}{record_l_trim};
     my $record_trail = $sf->{o}{split}{record_r_trim};
-    my $field_lead  = $sf->{o}{split}{field_l_trim};
-    my $field_trail = $sf->{o}{split}{field_r_trim};
+    my $field_lead   = $sf->{o}{split}{field_l_trim};
+    my $field_trail  = $sf->{o}{split}{field_r_trim};
     for my $row ( split /$sf->{o}{split}{record_sep}/, <$fh> ) {
         $row =~ s/^$record_lead//   if length $record_lead;
         $row =~ s/$record_trail\z// if length $record_trail;
@@ -94,19 +98,21 @@ sub __parse_file_split { # 1
 
 
 sub __parse_file_Spreadsheet_Read { # 2
-    my ( $sf, $sql, $file_ec ) = @_;
+    my ( $sf, $sql, $file_ec, $book ) = @_;
     delete $sf->{d}{sheet_name};
     my $waiting = 'Parsing file ... ';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $ax->print_sql( $sql, $waiting );
     require Spreadsheet::Read;
-    my $book = Spreadsheet::Read::ReadData( $file_ec, cells => 0, attr => 0, rc => 1, strip => 0 );
     if ( ! defined $book ) {
-        choose(
-            [ 'Press ENTER' ],
-            { %{$sf->{i}{lyt_m}}, prompt => 'No Book in ' . decode( 'locale_fs', $file_ec ) .'!' }
-        );
-        return;
+        $book = Spreadsheet::Read::ReadData( $file_ec, cells => 0, attr => 0, rc => 1, strip => 0 );
+        if ( ! defined $book ) {
+            choose(
+                [ 'Press ENTER' ],
+                { %{$sf->{i}{lyt_m}}, prompt => 'No Book in ' . decode( 'locale_fs', $file_ec ) .'!' }
+            );
+            return;
+        }
     }
     my $sheet_count = @$book - 1; # first sheet in $book contains meta info
     if ( $sheet_count == 0 ) {
@@ -136,7 +142,7 @@ sub __parse_file_Spreadsheet_Read { # 2
         if ( $sf->{o}{G}{menu_memory} ) {
             if ( $sf->{i}{old_sheet_idx} == $sheet_idx && ! $ENV{TC_RESET_AUTO_UP} ) {
                 $sf->{i}{old_sheet_idx} = 0;
-                return $sheet_count;
+                return $book, $sheet_count;
             }
             else {
                 $sf->{i}{old_sheet_idx} = $sheet_idx;
@@ -151,13 +157,13 @@ sub __parse_file_Spreadsheet_Read { # 2
             [ 'Press ENTER' ],
             { %{$sf->{i}{lyt_m}}, prompt => $sheet . ': empty sheet!' }
         );
-        return $sheet_count;
+        return $book, $sheet_count;
     }
     $sql->{insert_into_args} = [ Spreadsheet::Read::rows( $book->[$sheet_idx] ) ];
     if ( ! -T $file_ec && length $book->[$sheet_idx]{label} ){
         $sf->{d}{sheet_name} = $book->[$sheet_idx]{label};
     }
-    return $sheet_count;
+    return $book, $sheet_count;
 }
 
 

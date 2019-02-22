@@ -1,29 +1,40 @@
 {
-   "abstract" : "fetch source tarballs from CPAN",
+   "abstract" : "fetch source archives from CPAN",
    "author" : [
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4203",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-sourcepan",
    "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "Getopt::Long" : "0"
+            "Getopt::Long" : "0",
+            "IPC::Run" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "App::sourcepan" : {
          "file" : "lib/App/sourcepan.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -32,5 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

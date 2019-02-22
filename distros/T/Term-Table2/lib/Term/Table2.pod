@@ -4,7 +4,7 @@ Term::Table2 - Provides formatted output of tables supplied as a combination of 
 
 =head1 VERSION
 
-Version 1.0.1
+Version 1.0.2
 (The versioning is conform with L<https://semver.org/>.)
 
 =head1 SYNOPSIS

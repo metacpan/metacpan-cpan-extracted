@@ -52,7 +52,7 @@ sudo dzil install
 
 ## For development
 
-You can run the examples with:
+After installing, you can run the examples with:
 
 ```bash
 export PATH="$(pwd)/bin:$PATH"

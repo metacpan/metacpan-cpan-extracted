@@ -1,6 +1,6 @@
 package WWW::Google::Places::DetailResult;
 
-$WWW::Google::Places::DetailResult::VERSION   = '0.36';
+$WWW::Google::Places::DetailResult::VERSION   = '0.37';
 $WWW::Google::Places::DetailResult::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::Places::DetailResult - Placeholder for detail Search Result for WWW
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 

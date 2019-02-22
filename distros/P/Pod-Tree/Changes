@@ -1,5 +1,8 @@
 Revision history for Perl extension Pod::Tree
 
+1.31  2019.02.22 MANWAR
+      - Fixed pod error as reported by CPANTS.
+
 1.30  2019.01.22 MANWAR
       - Merged pull request #9 (fix typo in pod) from @fschlich.
 

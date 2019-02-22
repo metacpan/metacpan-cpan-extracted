@@ -24,7 +24,7 @@ ok(-f $file, 'file exists');
 is(-s $file, length('aa'), 'file correct size');
 my $contents = Net::SharePoint::Basic::read_file($test_file);
 is($contents, 'aa', 'contents read ok');
-
 END {
-	system("rm -rf $test_dir") if $test_dir;
+	unlink $test_file;
+	rmdir $test_dir;
 }

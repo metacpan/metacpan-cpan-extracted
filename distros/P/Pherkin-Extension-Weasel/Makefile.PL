@@ -6,25 +6,37 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Pherkin extension for web-testing",
   "AUTHOR" => "Erik Huelsmann <ehuels\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Pherkin-Extension-Weasel",
   "LICENSE" => "perl",
   "NAME" => "Pherkin::Extension::Weasel",
   "PREREQ_PM" => {
+    "File::Share" => 0,
     "Module::Runtime" => 0,
     "Moose" => 0,
+    "Template" => 0,
     "Test::BDD::Cucumber" => "0.50",
-    "Weasel" => 0
+    "Weasel" => 0,
+    "Weasel::Session" => "0.08"
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "Carp::Always" => 0,
+    "Test::More" => 0,
+    "Weasel::Driver::Mock" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,11 +44,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp::Always" => 0,
+  "File::Share" => 0,
   "Module::Runtime" => 0,
   "Moose" => 0,
+  "Template" => 0,
   "Test::BDD::Cucumber" => "0.50",
   "Test::More" => 0,
-  "Weasel" => 0
+  "Weasel" => 0,
+  "Weasel::Driver::Mock" => 0,
+  "Weasel::Session" => "0.08"
 );
 
 
@@ -50,3 +67,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

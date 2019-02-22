@@ -7,7 +7,6 @@ examples/simple.pl
 lib/Term/TermKey.pm
 lib/Term/TermKey.xs
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml

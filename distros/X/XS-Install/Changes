@@ -1,3 +1,5 @@
+1.0.15   20.02.2019
+           - support for test{CCFLAGS}, test{OPTIMIZE}. test{OPTIMIZE} default to -O0 when building c tests (to speedup compile time)
 1.0.14   14.02.2019
            - perl 5.10 bugfix
 1.0.13   13.02.2019

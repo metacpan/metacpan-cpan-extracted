@@ -6,7 +6,7 @@ use POSIX;
 use List::Util;
 use Data::Dumper qw(Dumper);
 use Exporter qw(import);
-our $VERSION = '0.43';
+our $VERSION = '0.45';
 our @EXPORT_OK = qw(
     incr        reduces   flatten
     drop_right  drop      take_right  take
@@ -685,6 +685,63 @@ concise code.
 
 =head1 SUBROUTINES/METHODS
 
+=head1 Self Partialing: The __ function
+
+Sub::Fp has a "special" function, the C<__> placeholder.
+This function allows for "self partialing", which is similar to auto-currying in many functional languages.
+This works for every single function in the Sub::Fp library, except for C<flow flow_right partial chain>
+
+    # TLDR
+
+    my $person = { name => "Sally" };
+
+    my $get_name = get('{name}', __);  # <---- Function uses placeholder to "self-partial", and return new sub
+
+    print $get_name->($person);        # <---- Invoke function with argument
+
+    # "Sally"
+
+That's it! It also works with multiple placeholders, in different positions,
+with different permutations of supplied arguments.
+
+    my $range = range(__, __);
+
+    print Dumper($range->(1, 10));
+
+    # [1,2,3,4,5,6,7,8,9]
+
+
+    my $range = range(__, __, __);
+
+    print Dumper($range->(1, 4, 0));
+
+    # [1,1,1,1];
+
+
+
+    my $range = range(__, 4, __);
+
+    print Dumper($range->(1, 0));
+
+    # [1,1,1,1];
+
+B<Prior Art>: This is not a new concept by any means (I'm just stealing it),
+and it's existed in functional languages for well over half a century.
+Its a natural application of functional composition.
+To get a better feel for what it looks like in other languages see:
+
+    #1 thread-as macro in Clojure
+
+    #2 Partialing in Lodash, PyToolz etc
+
+    #3 Auto Currying in Haskell, Lodash-Fp, Ramda, Elm
+
+4. The use of C<_> in languages as a placeholder. This library uses
+dobule underscore instead to differentiate it from the native library,
+which already uses a single underscore in some circumstances.
+
+=cut
+
 =head1 EXPORT
 
     incr         reduces   flatten
@@ -706,7 +763,7 @@ Increments the supplied number by 1
 
     incr(1)
 
-    # => 2
+    # 2
 
 =cut
 
@@ -716,7 +773,7 @@ Decrements the supplied number by 1
 
     decr(2)
 
-    # => 1
+    # 1
 
 =cut
 
@@ -752,7 +809,7 @@ arguments into the function it invokes
     apply($sum_all_nums, [100, 200]);
     # same as $sum_all_nums->(100, 200)
 
-    # => 300
+    # 300
 
 =cut
 

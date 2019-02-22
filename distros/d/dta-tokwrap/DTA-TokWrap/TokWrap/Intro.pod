@@ -1,0 +1,297 @@
+=pod
+
+=head1 NAME
+
+DTA::TokWrap::Intro - a gentle introduction to the DTA::TokWrap distribution
+
+=cut
+
+##======================================================================
+=pod
+
+=head1 DESCRIPTION
+
+The DTA::TokWrap perl distribution contains various modules
+for operations associated with the tokenization of DTA "base-format" XML documents.
+The distribution is divided into 1 program and 3 main modules:
+
+=over 4
+
+=item dta-tokwrap.perl
+
+Top-level command-line interface.  Use this if you can.
+See L<dta-tokwrap.perl(1)|dta-tokwrap.perl> for details.
+
+=item Module DTA::TokWrap
+
+Top-level wrappers for persistent data associated with document tokenization.
+Encapsulates all default L<DTA::TokWrap::Processor|/"DTA::TokWrap::Processor">
+sub-processor objects.
+See L<the DTA::TokWrap section|/DTA::TokWrap> for more details.
+
+=item Module DTA::TokWrap::Document
+
+Top-level wrappers for per-document data, including temporary files, indices,
+and in-memory data structures.
+See L<the DTA::TokWrap::Document section|/DTA::TokWrap::Document> for more details.
+
+=item Module DTA::TokWrap::Processor
+
+Abstraction level for processing operations on document data.
+See L<the DTA::TokWrap::Processor section|/DTA::TokWrap::Document> for more details.
+
+=back
+
+These and other included modules are briefly described in the
+L</MODULES> section, below.
+
+=cut
+
+##======================================================================
+=pod
+
+=head1 MODULES
+
+The following sections are intended to give a brief overview of the modules
+included with this distribution.
+
+=cut
+
+##--------------------------------------------------------------
+=pod
+
+=head2 DTA::TokWrap
+
+The DTA::TokWrap module provides top-level object-oriented wrappers
+for (batch) tokenization of DTA "base-format" XML documents.
+DTA::TokWrap objects encapsulate all default
+L<DTA::TokWrap::Processor|/DTA::TokWrap::Processor> objects under a
+single object.  Most document processing should proceed via
+a DTA::TokWrap object.
+
+See L<DTA::TokWrap(3pm)|DTA::TokWrap> for more details.
+
+=cut
+
+##--------------------------------------------------------------
+=pod
+
+=head2 DTA::TokWrap::Document
+
+DTA::TokWrap::Document provides a perl class for representing
+a single DTA base-format XML file and associated indices, temporary files,
+and stand-off files.
+Together with the L<DTA::TokWrap|/DTA::TokWrap> module, this
+class comprises the top-level API of the DTA::TokWrap distribution.
+
+See L<DTA::TokWrap::Document(3pm)|DTA::TokWrap::Document> for more details.
+
+=head3 DTA::TokWrap::Document::Maker
+
+B<***DEPRECATED***>
+
+DTA::TokWrap::Document::Maker provides an experimental
+L<DTA::TokWrap::Document|/DTA::TokWrap::Document>
+subclass which attempts to perform C<make>-like dependency
+tracking on document data keys.
+
+See L<DTA::TokWrap::Document::Maker(3pm)|DTA::TokWrap::Document::Maker> for more details.
+
+=cut
+
+##--------------------------------------------------------------
+=pod
+
+=head2 DTA::TokWrap::Processor
+
+The DTA::TokWrap::Processor package provides an abstract base class
+which subsumes document-processing modules included in the DTA::TokWrap
+distribution.
+
+See L<DTA::TokWrap::Processor(3pm)|DTA::TokWrap::Processor>
+for details on the API.
+
+=head3 DTA::TokWrap::Processor::mkindex
+
+DTA::TokWrap::Processor::mkindex provides an object-oriented
+L<DTA::TokWrap::Processor|/DTA::TokWrap::Processor> wrapper
+around the F<dtatw-mkindex> C program
+for L<DTA::TokWrap::Document|/DTA::TokWrap::Document> objects.
+
+See L<DTA::TokWrap::Processor::mkindex(3pm)|DTA::TokWrap::Processor::mkindex>
+for details.
+
+
+=head3 DTA::TokWrap::Processor::mkbx0
+
+DTA::TokWrap::Processor::mkindex provides an object-oriented
+L<DTA::TokWrap::Processor|/DTA::TokWrap::Processor> wrapper
+for
+hint insertion and serialization sort-key generation
+on a text-free "structure index" (.sx) XML file.
+
+See L<DTA::TokWrap::Processor::mkbx0(3pm)|DTA::TokWrap::Processor::mkbx0>
+for details.
+
+
+=head3 DTA::TokWrap::Processor::mkbx
+
+DTA::TokWrap::Processor::mkbx provides an object-oriented
+L<DTA::TokWrap::Processor|/DTA::TokWrap::Processor> wrapper
+for the creation of in-memory serialized text-block-indices.
+
+See L<DTA::TokWrap::Processor::mkbx(3pm)|DTA::TokWrap::Processor::mkbx>
+for details.
+
+
+=head3 DTA::TokWrap::Processor::tokenize
+
+This class is just an abstract placeholder for a
+low-level tokenizer. By default, it attempts automatically detect
+a supported tokenizer on your system (preferably moot/WASTE).
+Depending on your needs, you may wish to use e.g.
+L<DTA::TokWrap::Processor::tokenize::waste|DTA::TokWrap::Processor::tokenize::waste>
+or
+L<DTA::TokWrap::Processor::tokenize::http|DTA::TokWrap::Processor::tokenize::http>
+directly, or to set the package variable
+L<DTA::TokWrap::Processor::tokenize|$DTA::TokWrap::Processor::tokenize::DEFAULT_SUBCLASS>
+to the default tokenizer subclass name for your system.
+
+DTA::TokWrap::Processor::tokenize provides an object-oriented
+L<DTA::TokWrap::Processor|/DTA::TokWrap::Processor> wrapper
+for the tokenization of serialized text files
+for L<DTA::TokWrap::Document|/DTA::TokWrap::Document> objects.
+
+See L<DTA::TokWrap::Processor::tokenize(3pm)|DTA::TokWrap::Processor::tokenize>
+for details.
+
+
+=head3 DTA::TokWrap::Processor::tokenize::dummy
+
+DTA::TokWrap::Processor::tokenize::dummy provides a package-local
+alternative to the "official" low-level tokenizer class
+L<DTA::TokWrap::Processor::tokenize|DTA::TokWrap::Processor::tokenize>.
+
+See L<DTA::TokWrap::Processor::tokenize::dummy(3pm)|DTA::TokWrap::Processor::tokenize::dummy>
+for details.
+
+=head3 DTA::TokWrap::Processor::tokenize1
+
+DTA::TokWrap::Processor::tokenize1 provides an object-oriented
+L<DTA::TokWrap::Processor|/DTA::TokWrap::Processor> wrapper
+for some required and/or optional post-processing of tokenized files
+used by L<DTA::TokWrap::Document|/DTA::TokWrap::Document> objects.
+
+See L<DTA::TokWrap::Processor::tokenize1(3pm)|DTA::TokWrap::Processor::tokenize1>
+for details.
+
+=head3 DTA::TokWrap::Processor::tok2xml
+
+DTA::TokWrap::Processor::tok2xml provides an object-oriented
+L<DTA::TokWrap::Processor|/DTA::TokWrap::Processor> wrapper
+for converting "raw" CSV-format (.t) low-level tokenizer output
+to a "master" tokenized XML (.t.xml) format,
+for use with L<DTA::TokWrap::Document|/DTA::TokWrap::Document> objects.
+
+See L<DTA::TokWrap::Processor::tok2xml(3pm)|DTA::TokWrap::Processor::tok2xml>
+for details.
+
+
+=head3 DTA::TokWrap::Processor::standoff
+
+B<***OBSOLETE***>
+
+DTA::TokWrap::Processor::standoff provides an object-oriented
+L<DTA::TokWrap::Processor|/DTA::TokWrap::Processor> wrapper
+for generation of various standoff XML formats
+for L<DTA::TokWrap::Document|/DTA::TokWrap::Document> objects.
+
+See L<DTA::TokWrap::Processor::standoff(3pm)|DTA::TokWrap::Processor::standoff>
+for details.
+
+=head3 DTA::TokWrap::Processor::addws
+
+DTA::TokWrap::Processor::standoff provides an object-oriented
+L<DTA::TokWrap::Processor|/DTA::TokWrap::Processor> wrapper
+for splicing tokenization data (word- and sentence-boundaries)
+back into a source TEI-XML file, potentially fragmenting
+words and/or sentences in the process.  Each segment is assigned
+a unique id, and fragmented segments are associated using the TEI
+C<prev> and C<next> attributes.
+
+See L<DTA::TokWrap::Processor::addws(3pm)|DTA::TokWrap::Processor::addws>
+for details.
+
+=head3 DTA::TokWrap::Processor::idsplice
+
+DTA::TokWrap::Processor::standoff provides an object-oriented
+L<DTA::TokWrap::Processor|/DTA::TokWrap::Processor> wrapper
+for splicing stand-off data into a base XML file by matching ids.
+
+See L<DTA::TokWrap::Processor::idsplice(3pm)|DTA::TokWrap::Processor::idsplice>
+for details.
+
+
+=cut
+
+##--------------------------------------------------------------
+=pod
+
+=head2 DTA::TokWrap::Base
+
+DTA::TokWrap::Base provides an abstract base class for all object classes
+in the
+DTA::TokWrap distribution
+
+See L<DTA::TokWrap::Base(3pm)|DTA::TokWrap::Base>
+for details.
+
+=head2 DTA::TokWrap::CxData
+
+DTA::TokWrap::CxData provides utilities for binary I/O on dta-tokwrap *.cx
+files.
+
+See L<DTA::TokWrap::CxData(3pm)|DTA::TokWrap::CxData>
+for details.
+
+=head2 DTA::TokWrap::Logger
+
+DTA::TokWrap::Logger provides an abstract base class for
+object-oriented access to the Log::Log4perl logging facility.
+
+See L<DTA::TokWrap::Logger(3pm)|DTA::TokWrap::Logger>
+for details.
+
+=head2 DTA::TokWrap::Utils
+
+DTA::TokWrap::Utils provides diverse assorted miscellaneous utilities
+which don't fit well anywhere else and which don't on their own justify
+the creation of a new package.
+
+See L<DTA::TokWrap::Logger(3pm)|DTA::TokWrap::Logger>
+for details.
+
+=head2 DTA::TokWrap::Version
+
+Version constants for DTA::TokWrap.
+Intended for (direct) use only by DTA::TokWrap sub-modules.
+
+=cut
+
+
+##======================================================================
+=pod
+
+=head1 SEE ALSO
+
+L<dta-tokwrap.perl(1)|dta-tokwrap.perl>,
+L<DTA::TokWrap(3pm)|DTA::TokWrap>,
+L<DTA::TokWrap::Document(3pm)|DTA::TokWrap::Document>,
+L<DTA::TokWrap::Processor(3pm)|DTA::TokWrap::Processor>,
+...
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=cut

@@ -7,8 +7,8 @@ my $meta = {
   "abstract"         => "RDFa Serializer for RDF::Trine",
   "author"           => ["Kjetil Kjernsmo (KJETILK) <kjetilk\@cpan.org>"],
   "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
-  "keywords"         => [],
+  "generated_by"     => "Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => ["Semantic Web"],
   "license"          => ["perl_5"],
   "meta-spec"        => {
                           url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -28,16 +28,17 @@ my $meta = {
                                          },
                                        },
                           test      => {
-                                         requires => {
-                                           "Module::Load::Conditional" => 0,
-                                           "RDF::RDFa::Parser" => 0,
-                                           "Test::More" => 0.96,
-                                           "Test::RDF" => 0,
-                                         },
+                                         recommends => { "RDF::NS" => 20130802 },
+                                         requires   => {
+                                                         "Module::Load::Conditional" => 0,
+                                                         "RDF::RDFa::Parser" => 0,
+                                                         "Test::More" => 0.96,
+                                                         "Test::RDF" => 0,
+                                                       },
                                        },
                         },
   "provides"         => {
-                          "RDF::Trine::Serializer::RDFa" => { file => "lib/RDF/Trine/Serializer/RDFa.pm", version => "0.100" },
+                          "RDF::Trine::Serializer::RDFa" => { file => "lib/RDF/Trine/Serializer/RDFa.pm", version => 0.101 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -54,7 +55,7 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => "0.100",
+  "version"          => 0.101,
   "x_static_install" => 1,
 };
 

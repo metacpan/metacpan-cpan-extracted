@@ -1,10 +1,11 @@
 package Log::Log4perl::Shortcuts ;
-$Log::Log4perl::Shortcuts::VERSION = '0.023';
+$Log::Log4perl::Shortcuts::VERSION = '0.024';
 use 5.10.0;
 use Carp;
 use Log::Log4perl;
 use Log::Log4perl::Level;
-use File::Spec;
+use Path::Tiny;
+use Module::Data;
 use File::UserConfig;
 use Data::Dumper qw(Dumper);
 
@@ -17,15 +18,15 @@ Exporter::export_ok_tags('all');
 my $package = __PACKAGE__;
 $package =~ s/::/-/g;
 my $config_file;
-my $config_dir = File::Spec->catfile(File::UserConfig->new(dist => $package)->sharedir, 'log_config');
+my $config_dir = path(File::UserConfig->new(dist => $package)->sharedir, 'log_config');
 
-my $default_config_file = File::Spec->catfile($config_dir, 'default.cfg');
+my $default_config_file = path($config_dir, 'default.cfg');
 
-if (!-e $default_config_file) {
+if (!$default_config_file->exists) {
   carp ("Unable to load default Log::Log4perl::Shortcuts configuration file. Aborting");
 } else {
-  Log::Log4perl->init_once(File::Spec->canonpath($default_config_file));
-  $config_file = File::Spec->canonpath($default_config_file);
+  Log::Log4perl->init_once($default_config_file->canonpath);
+  $config_file = $default_config_file->canonpath;
 }
 
 my $log_level = $TRACE;
@@ -47,8 +48,8 @@ sub set_log_config {
   }
 
   # try to get config file from path passed directly in
-  my $cf_path = File::Spec->catfile($new_config);
-  if (-e $cf_path) {
+  my $cf_path = path($new_config);
+  if ($cf_path->exists) {
     return _init_config($cf_path);
   }
 
@@ -61,21 +62,21 @@ sub set_log_config {
   eval {
     my $share_dir = File::UserConfig->new(dist => $module)->sharedir;
     if ($share_dir) {
-      $temp_config_dir = File::Spec->catfile(File::UserConfig->new(dist => $module)->sharedir, 'log_config');
+      $temp_config_dir = path(File::UserConfig->new(dist => $module)->sharedir, 'log_config');
     }
   };
   if ($temp_config_dir) {
-    $cf_path = File::Spec->catfile($temp_config_dir, $new_config);
-    if (-e $cf_path) {
+    $cf_path = path($temp_config_dir, $new_config);
+    if ($cf_path->exists) {
       return _init_config($cf_path);
     }
   }
 
   # Lastly, check the Log::Log4perl::Shortcuts module for config file
   $temp_config_dir = $config_dir;
-  $cf_path = File::Spec->catfile($temp_config_dir, $new_config);
+  $cf_path = path($temp_config_dir, $new_config);
 
-  if (!-e $cf_path) {
+  if (! $cf_path->exists) {
     carp ("Configuration file $new_config does not exist. Configuration file unchanged.");
   } else {
     return _init_config($cf_path);
@@ -84,8 +85,8 @@ sub set_log_config {
 
 sub _init_config {
   my $config = shift;
-  Log::Log4perl->init(File::Spec->canonpath($config));
-  $config_file = File::Spec->canonpath($config);
+  Log::Log4perl->init($config->canonpath);
+  $config_file = $config->canonpath;
   return 'success';
 }
 
@@ -224,7 +225,7 @@ Log::Log4perl::Shortcuts - shortcut functions to make log4perl even easier
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 OVERVIEW
 
@@ -359,13 +360,15 @@ directory found in your home directory.
 
 =item * L<Exporter|Exporter>
 
-=item * L<File::Spec|File::Spec>
-
 =item * L<File::UserConfig|File::UserConfig>
 
 =item * L<Log::Log4perl|Log::Log4perl>
 
 =item * L<Log::Log4perl::Level|Log::Log4perl::Level>
+
+=item * L<Module::Data|Module::Data>
+
+=item * L<Path::Tiny|Path::Tiny>
 
 =back
 

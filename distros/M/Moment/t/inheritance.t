@@ -58,6 +58,10 @@ sub main_in_test {
     is($m_month_end->get_dt(), '2000-01-31 23:59:59', 'get_dt()');
     is($m_month_end->get_d(), '2000-01-31', 'get_d()');
 
+    # now();
+    my $now = My::Moment->now();
+    is(ref($now), 'My::Moment', 'after get_month_end() ref eq My::Moment');
+
     done_testing;
 
 }

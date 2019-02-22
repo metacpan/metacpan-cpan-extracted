@@ -64,21 +64,22 @@ sub add_operator_with_value {
     my $trs = Term::Form->new();
     my $stmt = $clause . '_stmt';
     my $args = $clause . '_args';
-    my $ext_sign;
+    my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
+    my $expand_sign;
     my @operators;
     my @operators_ext;
     if ( $clause eq 'set' ) {
-        $ext_sign = $sf->{i}{extended_signs_set}[ $sf->{o}{extend}{$clause} ];
+        $expand_sign = $sf->{i}{expand_signs_set}[$sign_idx];
         @operators = ( " = " );
         @operators_ext = ( " = " );
     }
     else {
-        $ext_sign = '=' . $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
+        $expand_sign = '=' . $sf->{i}{expand_signs}[$sign_idx];
         @operators = @{$sf->{o}{G}{operators}};
         @operators_ext = ( " = ", " != ", " < ", " > ", " >= ", " <= ", "IN", "NOT IN" );
     }
-    if ( $ext_sign ) {
-        unshift @operators, $ext_sign;
+    if ( $sign_idx ) {
+        unshift @operators, $expand_sign;
     }
     my $ext_col;
 
@@ -97,7 +98,7 @@ sub add_operator_with_value {
             }
         }
         my $bu_stmt = $sql->{$stmt};
-        if ( $op eq $ext_sign ) {
+        if ( $op eq $expand_sign ) {
             if ( @operators_ext == 1 ) {
                 $op = $operators_ext[0];
             }

@@ -16,7 +16,7 @@ use Attean::RDF qw(iri);
 use URI::NamespaceMap;
 use Module::Load::Conditional qw[check_install];
 
-my $rdfns = check_install( module => 'RDF::NS', version => 20130802);
+my $rdfpr = check_install( module => 'RDF::Prefixes');
 
 my $store = Attean->get_store('Memory')->new();
 my $parser = Attean->get_parser('Turtle')->new(base=>'http://example.org/');
@@ -25,7 +25,7 @@ my $iter = $parser->parse_iter_from_bytes('<http://example.org/foo> a <http://ex
 
 
 subtest 'Default generator' => sub {
-  plan skip_all => 'RDF::NS is not installed' unless $rdfns;
+  plan skip_all => 'RDF::Prefixes is not installed' unless $rdfpr;
   ok(my $ser = Attean->get_serializer('RDFa')->new, 'Assignment OK');
   my $string = tests($ser);
   like($string, qr|<meta name="generator" value="RDF::RDFa::Generator::HTML::Head"/>|, 'Head generator is correct');

@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2011-2018 -- leonerd@leonerd.org.uk
  */
 
 
@@ -217,6 +217,8 @@ static SV *pen_get_attr(TickitPen *pen, int attr)
   case TICKIT_PENTYPE_COLOUR:
     return newSViv(tickit_pen_get_colour_attr(pen, attr));
   }
+
+  croak("Unreachable: unknown pen type");
 }
 
 static void pen_set_attr(TickitPen *pen, int attr, SV *val)
@@ -356,9 +358,13 @@ static int term_userevent_fn(TickitTerm *tt, TickitEventFlags flags, void *_info
 
   if(flags & TICKIT_EV_FIRE) {
     SV *info_sv = newSV(0);
-    char *evname;
+    char *evname = NULL;
 
     switch((TickitTermEvent)data->ev) {
+      case TICKIT_TERM_ON_DESTROY:
+        croak("TICKIT_TERM_ON_DESTROY should not be TICKIT_EV_FIRE'd");
+        break;
+
       case TICKIT_TERM_ON_KEY: {
         TickitKeyEventInfo *info = _info, *self;
         Newx(self, 1, TickitKeyEventInfo);
@@ -502,6 +508,8 @@ static int window_destroyed(TickitWindow *win, TickitEventFlags flags, void *inf
   SV *key = newSViv(PTR2UV(win));
   hv_delete_ent(sv_for_window, key, G_DISCARD, 0);
   SvREFCNT_dec(key);
+
+  return 0;
 }
 
 static SV *newSVwin_noinc(TickitWindow *win)
@@ -544,9 +552,13 @@ static int window_userevent_fn(TickitWindow *win, TickitEventFlags flags, void *
 
   if(flags & TICKIT_EV_FIRE) {
     SV *info_sv = newSV(0);
-    char *evname;
+    char *evname = NULL;
 
     switch((TickitWindowEvent)data->ev) {
+      case TICKIT_WINDOW_ON_DESTROY:
+        croak("TICKIT_WINDOW_ON_DESTROY should not be TICKIT_EV_FIRE'd");
+        break;
+
       case TICKIT_WINDOW_ON_EXPOSE: {
         TickitExposeEventInfo *info = _info, *self;
         Newx(self, 1, TickitExposeEventInfo);
@@ -740,6 +752,7 @@ rb(self)
     switch(ix) {
       case 0: RETVAL = newSVrb(info->rb); break;
       case 1: RETVAL = newSVrect(&info->rect); break;
+      default: croak("Unreachable");
     }
   OUTPUT:
     RETVAL
@@ -795,17 +808,10 @@ type(self,newapi=&PL_sv_undef)
   INIT:
     TickitFocusEventInfo *info = INT2PTR(TickitFocusEventInfo *, SvIV((SV*)SvRV(self)));
   CODE:
-    // Deprecated API gave simple 0=out, 1=in
-    if(ix == 0 && !SvTRUE(newapi)) {
-      Perl_ck_warner(aTHX_ packWARN(WARN_DEPRECATED),
-        "Old boolean-returning $info->type API is deprecated");
-      ix = 2;
-    }
-
     switch(ix) {
       case 0: RETVAL = tickit_focusevtype2sv(info->type); break;
       case 1: RETVAL = newSVwin(tickit_window_ref(info->win)); break;
-      case 2: RETVAL = newSViv(info->type == TICKIT_FOCUSEV_IN); break;
+      default: croak("Unreachable");
     }
   OUTPUT:
     RETVAL
@@ -858,6 +864,7 @@ type(self)
       case 0: RETVAL = tickit_keyevtype2sv(info->type); break;
       case 1: RETVAL = newSVpvn_utf8(info->str, strlen(info->str), 1); break;
       case 2: RETVAL = newSViv(info->mod); break;
+      default: croak("Unreachable");
     }
   OUTPUT:
     RETVAL
@@ -921,6 +928,7 @@ type(self)
       case 2: RETVAL = newSViv(info->line); break;
       case 3: RETVAL = newSViv(info->col); break;
       case 4: RETVAL = newSViv(info->mod); break;
+      default: croak("Unreachable");
     }
   OUTPUT:
     RETVAL
@@ -945,6 +953,7 @@ lines(self)
     switch(ix) {
       case 0: RETVAL = newSViv(info->lines); break;
       case 1: RETVAL = newSViv(info->cols);  break;
+      default: croak("Unreachable");
     }
   OUTPUT:
     RETVAL
@@ -956,7 +965,6 @@ _new(package, attrs)
   char *package
   HV   *attrs
   INIT:
-    Tickit__Pen  self;
     TickitPen   *pen;
   CODE:
     pen = tickit_pen_new();
@@ -1341,8 +1349,6 @@ bool
 intersects(self,r)
   Tickit::RectSet self
   Tickit::Rect r
-  INIT:
-    int i;
   CODE:
     RETVAL = tickit_rectset_intersects(self, r);
   OUTPUT:
@@ -1352,8 +1358,6 @@ bool
 contains(self,r)
   Tickit::RectSet self
   Tickit::Rect r
-  INIT:
-    int i;
   CODE:
     RETVAL = tickit_rectset_contains(self, r);
   OUTPUT:
@@ -1501,8 +1505,6 @@ savepen(self)
 void
 restore(self)
   Tickit::RenderBuffer self
-  INIT:
-    TickitRenderBuffer *rb;
   CODE:
     tickit_renderbuffer_restore(self);
 
@@ -1880,10 +1882,23 @@ _new(package,termtype)
   char *package;
   char *termtype;
   INIT:
-    Tickit__Term  self;
     TickitTerm   *tt;
   CODE:
     tt = tickit_term_new_for_termtype(termtype);
+    if(!tt)
+      XSRETURN_UNDEF;
+
+    RETVAL = newSVterm_noinc(tt, package);
+  OUTPUT:
+    RETVAL
+
+SV *
+open_stdio(package)
+  char *package
+  INIT:
+    TickitTerm   *tt;
+  CODE:
+    tt = tickit_term_open_stdio();
     if(!tt)
       XSRETURN_UNDEF;
 
@@ -2359,6 +2374,8 @@ get_methodlog(self)
               value = tickit_pen_get_int_attr(entry->pen, attr); break;
             case TICKIT_PENTYPE_COLOUR:
               value = tickit_pen_get_colour_attr(entry->pen, attr); break;
+            default:
+              croak("Unreachable: unknown pen type");
             }
 
             sv_setiv(*hv_fetch(penattrs, attrname, strlen(attrname), 1), value);
@@ -2634,7 +2651,6 @@ _make_sub(win,top,left,lines,cols,flags)
   INIT:
     TickitRect rect;
     TickitWindow *subwin;
-    Tickit__Window self;
   CODE:
     rect.top   = top;
     rect.left  = left;
@@ -2731,6 +2747,7 @@ root(self)
         RETVAL = self->tickit ? newSVsv(self->tickit) : &PL_sv_undef;
         break;
       }
+      default: croak("Unreachable");
     }
   OUTPUT:
     RETVAL

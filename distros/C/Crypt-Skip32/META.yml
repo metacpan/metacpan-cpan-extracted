@@ -3,27 +3,28 @@ abstract: '32-bit block cipher based on Skipjack'
 author:
   - 'Eric Hammond <eric-cpan-2@thinksome.com>'
 build_requires:
-  Test::More: 0.62
-  Test::NoWarnings: 0.084
+  Test::More: '0.62'
+  Test::NoWarnings: '0.084'
 configure_requires:
-  Module::Build: 0.42
+  Module::Build: '0.42'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4208, CPAN::Meta::Converter version 2.120351'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Crypt-Skip32
 provides:
   Crypt::Skip32:
     file: lib/Crypt/Skip32.pm
-    version: 0.18
+    version: '0.19'
 recommends:
-  Crypt::CBC: 2.22
-  Crypt::Skip32::XS: 0
-  Test::Distribution: 0
+  Crypt::CBC: '2.22'
+  Crypt::Skip32::XS: '0'
+  Test::Distribution: '0'
 requires:
   perl: v5.8.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.18
+version: '0.19'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

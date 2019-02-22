@@ -1,4 +1,4 @@
-6.21 Feb 20, 2019
+6.22 Feb 20, 2019
 package Graphics::Framebuffer;
 
 =head1 NAME
@@ -384,6 +384,7 @@ use Imager;                                                      # This is used 
 use Imager::Matrix2d;
 use Imager::Fill;                                                # For hatch fills
 use Imager::Fountain;                                            #
+use Imager::Font::Wrap;
 use Graphics::Framebuffer::Splash;                               # The splash code is here
 
 Imager->preload; # The Imager documentation says to do this, but doesn't give much of an explanation why.  However, I assume it is to initialize global variables ahead of time.
@@ -3555,6 +3556,7 @@ sub _fill_polygon {
             );
         }
         if (defined($pattern)) {
+            $pattern = $self->_convert_16_24($pattern, RGB) if ($self->{'BITS'} == 16);
             $pimg = Imager->new();
             $pimg->read(
                 'xsize'             => $width,
@@ -5804,6 +5806,160 @@ sub ttf_print {
     return ($params);
 }
 
+=head2 ttf_paragraph
+
+Very similar to an ordinary "print", but uses TTF fonts instead.  It will automatically wrap text like a terminal.
+
+This uses no bounding boxes, and is only needed to be called once.  It uses a very simple wrapping model.
+
+It's "box" is simply the clipping rectangle.  All text will be fit and wrapped within the clipping rectangle.
+
+Text is started at "x" and wrapped to "x".
+
+* This does NOT scroll text.  It merely truncates what doesn't fit.  It returns where in the text string it last printed before truncation.
+
+=over 4
+
+ $fb->ttf_paragraph(
+     {
+         'text'      => 'String to print',
+
+         'x'         => 0,                  # Where to start printing
+         'y'         => 20,                 #
+
+         'size'      => 12,                 # Optional Font size, default is 16
+
+         'color'     => 'FFFF00FF',         # RRGGBBAA
+
+         'justify'   => 'justified'         # Optional justification, default
+                                            # is "left".  Posible values are:
+                                            #  "left", "right", "center", and
+                                            #  "justified"
+
+         'line_spacing' => 5,               # This adjusts the default line
+                                            # spacing by positive or negative
+                                            # amounts.  The default is 0.
+
+         'face'      => 'Ariel',            # Optional, overrides the default
+
+         'font_path' => '/usr/share/fonts', # Optional, else uses the default
+     }
+ );
+
+=back
+
+=cut
+
+sub ttf_paragraph {
+    my $self   = shift;
+    my $params = shift;
+
+    return ($params) unless (defined($params));
+
+    my $TTF_x     = int($params->{'x'})            || 0;
+    my $TTF_y     = int($params->{'y'})            || 0;
+    my $TTF_size  = int($params->{'size'})         || 16;
+    my $text      = $params->{'text'}              || ' ';
+    my $face      = $params->{'face'}              || $self->{'FONT_FACE'};
+    my $justify   = $params->{'justify'}           || 'left';
+    my $linegap   = int($params->{'line_spacing'}) || 0;
+    my $font_path = $params->{'font_path'}         || $self->{'FONT_PATH'};
+    my $P_color   = $params->{'color'} if (exists($params->{'color'}));
+    my $pfont     = "$font_path/$face";
+
+    $TTF_x -= $self->{'X_CLIP'};
+    $TTF_y -= $self->{'Y_CLIP'};
+    $justify = lc($justify);
+    $justify =~ s/justified/fill/;
+    $pfont   =~ s#/+#/#g;    # Get rid of doubled up slashes
+
+    my $color_order = $self->{'COLOR_ORDER'};
+    my $bytes       = $self->{'BYTES'};
+    my $data;
+
+    if (defined($P_color)) {
+        $P_color .= 'FF' if (length($P_color) < 8);                                                                                          # Add opague alpha if it is not defined
+        my ($red, $green, $blue, $alpha) = (substr($P_color, 0, 2), substr($P_color, 2, 2), substr($P_color, 4, 2), substr($P_color, 6, 2));
+        if ($color_order == BGR) {
+            $P_color = $blue . $green . $red . $alpha;
+        } elsif ($color_order == BRG) {
+            $P_color = $blue . $red . $green . $alpha;
+        } elsif ($color_order == RBG) {
+            $P_color = $red . $blue . $green . $alpha;
+        } elsif ($color_order == GRB) {
+            $P_color = $green . $red . $blue . $alpha;
+        } elsif ($color_order == GBR) {
+            $P_color = $green . $blue . $red . $alpha;
+        }
+    } else {
+        $P_color = $self->{'I_COLOR'};
+    }
+
+    my $font = Imager::Font->new(
+        'file'  => $pfont,
+        'color' => $P_color,
+    );
+    unless (defined($font)) {
+        warn __LINE__ . " Can't initialize Imager::Font!\n", Imager->errstr(), "\n" if ($self->{'SHOW_ERRORS'});
+        return (undef);
+    }
+    my $img;
+    my $image;
+    my $draw_mode;
+    my $savepos;
+    eval {
+        $img = Imager->new(
+            'xsize'    => $self->{'W_CLIP'},
+            'ysize'    => $self->{'H_CLIP'},
+            'channels' => max(3, $bytes)
+        );
+        unless ($self->{'DRAW_MODE'}) { # If normal mode, then don't bother
+            if ($self->{'ACCELERATED'}) {
+                $draw_mode           = $self->{'DRAW_MODE'};
+                $self->{'DRAW_MODE'} = MASK_MODE;
+            } else {
+                $image = $self->blit_read({ 'x' => $self->{'X_CLIP'}, 'y' => $self->{'Y_CLIP'}, 'width' => $self->{'W_CLIP'}, 'height' => $self->{'H_CLIP'}});
+                $image->{'image'} = $self->_convert_16_to_24($image->{'image'}, RGB) if ($self->{'BITS'} == 16);
+                $img->read(
+                    'data'              => $image->{'image'},
+                    'type'              => 'raw',
+                    'raw_datachannels'  => max(3, $bytes),
+                    'raw_storechannels' => max(3, $bytes),
+                    'raw_interleave'    => FALSE,
+                    'xsize'             => $self->{'W_CLIP'},
+                    'ysize'             => $self->{'H_CLIP'},
+                );
+            }
+        }
+        Imager::Font::Wrap->wrap_text(
+            'x'       => $TTF_x,
+            'y'       => $TTF_y,
+            'size'    => $TTF_size,
+            'string'  => $text,
+            'font'    => $font,
+            'image'   => $img,
+            'justify' => $justify,
+            'linegap' => $linegap,
+            'savepos' => \$savepos,
+        );
+        $img->write(
+            'type'          => 'raw',
+            'storechannels' => max(3, $bytes),    # Must be at least 24 bit
+            'interleave'    => FALSE,
+            'data'          => \$data
+        );
+    };
+    if ($@) {
+        warn __LINE__ . " ERROR $@\n", Imager->errstr() if ($self->{'SHOW_ERRORS'});
+        return (undef);
+    }
+    $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
+    $self->blit_write({ 'x' => $self->{'X_CLIP'}, 'y' => $self->{'Y_CLIP'}, 'width' => $self->{'W_CLIP'}, 'height' => $self->{'H_CLIP'}, 'image' => $data });
+    $self->{'DRAW_MODE'} = $draw_mode if (defined($draw_mode));
+    return ($savepos);
+}
+
+# Gather in and find all the fonts
 sub _gather_fonts {
     my $self = shift;
     my $path = shift;

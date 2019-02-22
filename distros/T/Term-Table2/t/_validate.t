@@ -11,9 +11,9 @@ use Test2::Mock;
 my $mockThis = Test2::Mock->new(
   class    => $CLASS,
   override => [
-    _copyOptions         => sub       { return {} },
-    _validateForArray    => sub       { return },
-    validate             => sub (\@$) { return },
+    _copy_options       => sub       { return {} },
+    _validate_for_array => sub       { return },
+    validate            => sub (\@$) { return },
   ]
 );
 my $table = bless({}, $CLASS);

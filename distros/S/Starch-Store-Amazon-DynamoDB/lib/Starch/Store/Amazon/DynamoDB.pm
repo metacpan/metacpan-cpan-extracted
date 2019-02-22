@@ -1,6 +1,7 @@
 package Starch::Store::Amazon::DynamoDB;
-
-$Starch::Store::Amazon::DynamoDB::VERSION = '0.05';
+use 5.014000;
+use strictures 2;
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -89,7 +90,6 @@ use Data::Serializer::Raw;
 use Starch::Util qw( croak );
 
 use Moo;
-use strictures 2;
 use namespace::clean;
 
 with qw(
@@ -324,8 +324,6 @@ sub create_table {
 sub _throw_ddb_error {
     my ($self, $method, $error) = @_;
 
-    local $Carp::Internal{ (__PACKAGE__) } = 1;
-
     my $context = "Amazon::DynamoDB::$method";
 
     if (!ref $error) {
@@ -362,8 +360,6 @@ Set L<Starch::Store/remove>.
 
 sub set {
     my ($self, $id, $namespace, $data, $expires) = @_;
-
-    local $Carp::Internal{ (__PACKAGE__) } = 1;
 
     $expires += time() if $expires;
 
@@ -405,8 +401,6 @@ sub set {
 
 sub get {
     my ($self, $id, $namespace) = @_;
-
-    local $Carp::Internal{ (__PACKAGE__) } = 1;
 
     my $key = $self->stringify_key( $id, $namespace );
 
@@ -455,8 +449,6 @@ sub get {
 
 sub remove {
     my ($self, $id, $namespace) = @_;
-
-    local $Carp::Internal{ (__PACKAGE__) } = 1;
 
     my $key = $self->stringify_key( $id, $namespace );
 

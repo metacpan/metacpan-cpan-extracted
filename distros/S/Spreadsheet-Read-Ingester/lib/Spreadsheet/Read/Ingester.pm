@@ -1,5 +1,5 @@
 package Spreadsheet::Read::Ingester ;
-$Spreadsheet::Read::Ingester::VERSION = '0.008';
+$Spreadsheet::Read::Ingester::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -7,11 +7,79 @@ use Storable;
 use File::Spec;
 use File::Signature;
 use File::UserConfig;
-use Spreadsheet::Read 0.68;
+use base qw (Spreadsheet::Read);
 
 ### Public methods ###
 
+# Override constructor
 sub new {
+  my $s = shift;
+  my $data = $s->_fetch_data(@_);
+  return $data;
+}
+
+# wrap functions that require 'Spreadsheet::Read' objects
+my @funcs = qw (parses rows row col2label cr2cell cell2cr cellrow);
+
+foreach my $func (@funcs) {
+  { no strict;
+    *$func = sub {
+      my $s = shift;
+      bless $s, 'Spreadsheet::Read';
+      my $super_func = "SUPER::$func";
+      if (wantarray) {
+        my @result = $s->$super_func(shift);
+        bless $s, 'Spreadsheet::Read::Ingester';
+        return @result;
+      } else {
+        my $result = $s->$super_func(shift);
+        bless $s, 'Spreadsheet::Read::Ingester';
+        return $result;
+      }
+    }
+  }
+}
+
+# Override add function
+sub add {
+  my $book = shift;
+  my $data = $book->_fetch_data(@_);
+  $book && (ref $book eq "ARRAY" ||
+            ref $book eq __PACKAGE__) && $book->[0]{sheets} or return $data;
+
+  my $c1 = $book->[0];
+  my $c2 = $data->[0];
+
+  unless ($c1->{parsers}) {
+      $c1->{parsers}[0]{$_} = $c1->{$_} for qw( type parser version );
+      $book->[$_]{parser} = 0 for 1 .. $c1->{sheets};
+      }
+  my ($pidx) = (grep { my $p = $c1->{parsers}[$_];
+      $p->{type}    eq $c2->{type}   &&
+      $p->{parser}  eq $c2->{parser} &&
+      $p->{version} eq $c2->{version} } 0 .. $#{$c1->{parsers}});
+  unless (defined $pidx) {
+      $pidx = scalar @{$c1->{parsers}};
+      $c1->{parsers}[$pidx]{$_} = $c2->{$_} for qw( type parser version );
+      }
+
+  foreach my $sn (sort { $c2->{sheet}{$a} <=> $c2->{sheet}{$b} } keys %{$c2->{sheet}}) {
+      my $s = $sn;
+      my $v = 2;
+      while (exists $c1->{sheet}{$s}) {
+          $s = $sn."[".$v++."]";
+          }
+      $c1->{sheet}{$s} = $c1->{sheets} + $c2->{sheet}{$sn};
+      $data->[$c2->{sheet}{$sn}]{parser} = $pidx;
+      push @$book, $data->[$c2->{sheet}{$sn}];
+      }
+  $c1->{sheets} += $c2->{sheets};
+
+  return $book;
+}
+
+# Fetch data from stored variable, if available
+sub _fetch_data {
   my $s    = shift;
   my $file = shift;
   my @args = @_;
@@ -19,6 +87,15 @@ sub new {
   my $sig = '';
   eval { $sig  = File::Signature->new($file)->{digest} };
 
+  my %args = @args;
+  my $suffix;
+  foreach my $key (sort keys %args) {
+    $suffix .= $key;
+    $suffix .= $args{$key};
+  }
+  if ($suffix) {
+    $sig .= "-$suffix";
+  }
   my $configdir = File::UserConfig->new(dist => 'Spreadsheet-Read-Ingester')->configdir;
   my $parsed_file = File::Spec->catfile($configdir, $sig);
 
@@ -29,7 +106,7 @@ sub new {
 
   # otherwise reingest from raw file
   if (!$data) {
-    my $data = Spreadsheet::Read->new($file, @_);
+    $data = $s->SUPER::new($file, @_);
     my $error = $data->[0]{error};
     die "Unable to read data from file: $file. Error: $error" if $data->[0]{error};
     store $data, $parsed_file;
@@ -105,8 +182,10 @@ and is a function of the user's OS.
 The stored data file names are the unique file signatures for the raw data file.
 The signature is used to detect if the original file changed, in which case the
 data is reingested from the raw file and a new parsed file is saved using an
-updated file signature. Parsed data files are kept indefinitely but can be
-deleted with the C<cleanup()> method.
+updated file signature. Arguments passed to the constructor are appended to the
+name of the file to ensure different parse options are accounted for. Parsed
+data files are kept indefinitely but can be deleted with the C<cleanup()>
+method.
 
 Consult the L<Spreadsheet::Read> documentation for accessing the data object
 returned by this module.
@@ -141,8 +220,6 @@ files.
 =item * L<File::Spec|File::Spec>
 
 =item * L<File::UserConfig|File::UserConfig>
-
-=item * L<Spreadsheet::Read|Spreadsheet::Read>
 
 =item * L<Storable|Storable>
 
@@ -189,10 +266,28 @@ L<https://github.com/sdondley/Spreadsheet-Read-Ingester>
 
   git clone git://github.com/sdondley/Spreadsheet-Read-Ingester.git
 
-=head1 BUGS AND LIMITATIONS
+=head1 BUGS
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/sdondley/Spreadsheet-Read-Ingester/issues>.
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/sdondley/Spreadsheet-Read-Ingester/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 LIMITATIONS
+
+If a new parser is installed (e.g. L<Text::CSV_XS>) and a previous ingestion
+used a different parser (e.g. L<Text::CSV_PP>), results from the previous parser
+will be returned. Most likely, this will have no practical consequence. But if
+you are concerned, you can avoid the problem by specifying the same parser using
+an environment variable per the L<Spreadsheet::Read> documentation:
+
+  env SPREADSHEET_READ_CSV=Text::CSV_PP ...
+
+Similarly, upgrading to a newer version of a parser can cause the same problem.
+Currently, the only workaround is to delete the stored data files parsed with
+the old older parser version.
 
 =head1 INSTALLATION
 

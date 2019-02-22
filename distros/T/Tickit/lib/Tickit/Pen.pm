@@ -8,7 +8,7 @@ package Tickit::Pen;
 use strict;
 use warnings;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 use Carp;
 
@@ -81,7 +81,7 @@ version.
 
 Applications wishing to use this attribute should be aware that the majority
 of terminal drivers will not be able to support it, and so should make sure to
-set an approriate regular colour index as well. Some terminals using the
+set an appropriate regular colour index as well. Some terminals using the
 F<xterm> driver may make use of it, however, and therefore ignore the index
 version.
 
@@ -357,14 +357,14 @@ use overload '==' => sub { refaddr($_[0]) == refaddr($_[1]) };
 package Tickit::Pen::Immutable;
 use base qw( Tickit::Pen );
 use constant mutable => 0;
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 sub as_immutable { return $_[0] }
 
 package Tickit::Pen::Mutable;
 use base qw( Tickit::Pen );
 use constant mutable => 1;
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 # Adds further methods in XS
 

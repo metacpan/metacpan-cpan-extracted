@@ -19,7 +19,7 @@ subtest 'mm' => sub {
       ),
     },
   });
-  
+
   $tzil->build;
 
   foreach my $file (@{ $tzil->files })
@@ -29,13 +29,13 @@ subtest 'mm' => sub {
   }
 
   my $meta = decode_json((first { $_->name eq 'META.json' } @{ $tzil->files })->content);
-  
+
   is(
     $meta->{dynamic_config},
     T(),
     'dynamic config is set in META.json',
   );
-  
+
   is(
     $meta->{prereqs}->{configure}->{requires},
     hash {
@@ -57,9 +57,9 @@ subtest 'mm' => sub {
     },
     'build prereqs',
   );
-  
+
   my $makefile_pl = (first { $_->name eq 'Makefile.PL' } @{ $tzil->files })->content;
-  
+
   like $makefile_pl, qr{Alien::Build::MM}, 'reference to AB::MM';
 
 };
@@ -80,9 +80,9 @@ subtest 'mb' => sub {
       ),
     },
   });
-  
+
   $tzil->build;
-  
+
   foreach my $file (@{ $tzil->files })
   {
     note "[@{[ $file->name ]}]";
@@ -110,15 +110,15 @@ subtest 'mb' => sub {
     },
     'build prereqs',
   );
-  
+
   my($build_pl) = first { $_->name eq 'Build.PL' } @{ $tzil->files };
-  
+
   like $build_pl->content, qr/Alien::Build::MB/, 'seems to work?';
-  
+
   my($mb_plugin) = first { $_->isa('Dist::Zilla::Plugin::ModuleBuild') } @{ $tzil->plugins };
 
   is( $mb_plugin->mb_class, 'Alien::Build::MB', 'mb_class was set' );
-  
+
 };
 
 
@@ -136,7 +136,7 @@ subtest 'req alien::base' => sub {
       ),
     },
   });
-  
+
   $tzil->build;
 
   my $meta = decode_json((first { $_->name eq 'META.json' } @{ $tzil->files })->content);
@@ -152,7 +152,7 @@ subtest 'req alien::base' => sub {
     },
     'build prereqs',
   );
-  
+
   is(
     $meta->{x_alienfile}->{requires},
     hash {

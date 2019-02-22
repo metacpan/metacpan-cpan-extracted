@@ -6,10 +6,10 @@ use warnings;
 use Carp qw(croak);
 
 if (not $ENV{CRYPT_SKIP32_PP} and eval 'use Crypt::Skip32::XS; 1') {
-  eval q(sub Crypt::Skip32 () { 'Crypt::Skip32::XS' });
+  *new = *Crypt::Skip32::XS::new;
 }
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 eval <<'EOP' if not defined &new;
 
@@ -341,9 +341,21 @@ http://www.anvilon.com
 Original SKIP32 C code written 1999-04-27 by Greg Rose, based on an
 implementation of the Skipjack algorithm written by Panu Rissanen.
 
+=head1 CREDITS
+
+The following have contributed to the Perl version:
+
+    John Laur
+    Joe Edmonds
+    gray
+
+And, of course, this is entirely based on the C version written by:
+
+    Greg Rose
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007-2011 Eric Hammond E<lt>eric-cpan-2@thinksome.comE<gt>
+Copyright (C) 2007-2019 Eric Hammond E<lt>eric-cpan-2@thinksome.comE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

@@ -71,3 +71,5 @@ Revision history for Perl module Gtk2::Ex::DbLinker
       Improved readme file
 0.112 Log::Any used in Datasheet.pm and Form.pm
       Since Log4perl is used in the examples, Log::Any::Adapter and Log::Any::Adapter::Log4perl are required to have these working...
+0.113 Tried to removed $id undef warnings in Forms add_combo when packed
+0.114

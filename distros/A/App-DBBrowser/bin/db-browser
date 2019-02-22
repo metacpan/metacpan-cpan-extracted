@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.061';
+our $VERSION = '2.065';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.061
+Version 2.065
 
 =cut
 
@@ -166,27 +166,27 @@ See also the option group L</Output>.
 
 =head1 MENUS
 
-=head2 Plugin Menu
+=head2 Plugins Menu
 
-Choosing a plugin leads to the I<Database Menu>.
+Choosing a plugin leads to the I<Databases Menu>.
 
 If there is only one plugin, the menu is not shown but the plugin is chosen automatically.
 
-=head2 Database Menu
+=head2 Databases Menu
 
-Choosing a database leads to the I<Schema Menu>.
+Choosing a database leads to the I<Schemas Menu>.
 
 If there is only one database, the menu is not shown but the database is chosen automatically.
 
-=head2 Schema Menu
+=head2 Schemas Menu
 
-Choosing a schema leads to the I<Table Menu>.
+Choosing a schema leads to the I<Tables Menu>.
 
 If there is not more than one schema, this menu is not shown but the schema is chosen automatically.
 
-=head2 Table Menu
+=head2 Tables Menu
 
-The menu entries of the table menu:
+The menu entries of the tables menu:
 
 =head3 Prompt Line
 
@@ -198,9 +198,13 @@ Selecting the prompt line (the database name) opens a menu with these entries:
 
 See L</WRITE ACCESS>
 
+This entry is available only if enabled in L</Extensions>.
+
 =item Drop Table
 
 See L</WRITE ACCESS>
+
+This entry is available only if enabled in L</Extensions>.
 
 =item Attach DB
 
@@ -221,19 +225,25 @@ Choosing a table leads to the I<SQL Menu>.
 
 Choosing this entry allows one to enter a subquery and use it as a table.
 
-This entry is available only if enabled in L</Subqueries>.
+This entry is available only if enabled in L</Extensions>.
 
 =head3 Join
 
 Join tables.
 
+This entry is available only if enabled in L</Extensions>.
+
 =head3 Union
 
 Combine the result from multiple SELECT statements.
 
+This entry is available only if enabled in L</Extensions>.
+
 =head3 Settings
 
 See L</DB Settings>.
+
+This entry is available only if enabled in L</Extensions>.
 
 =head2 SQL Menu
 
@@ -257,6 +267,8 @@ Selecting this prompt line (I<Customize:>) opens a menu with these entries:
 
 See L</WRITE ACCESS>
 
+This entries are available only if enabled in L</Extensions>.
+
 =head3 Print TABLE
 
 Select I<Print TABLE> to show the result of the formed statement on the screen.
@@ -265,7 +277,7 @@ Select I<Print TABLE> to show the result of the formed statement on the screen.
 
 To reset a SQL "sub-statement" (e.g C<WHERE>) re-enter into the respective menu and choose C<-OK->.
 
-See also L</Extensions>, L</Parentheses>, L</Operators>
+See also L</Extensions> and L</Operators>
 
 =head4 SELECT
 
@@ -304,7 +316,7 @@ Reset the SQL statement.
 
 =head2 Create/Drop Table
 
-I<Create/Drop Table> can be reached by selecting the prompt-line in the L</Table Menu> if the respective option is
+I<Create/Drop Table> can be reached by selecting the prompt-line in the L</Tables Menu> if the respective option is
 activated.
 
 =head3 Create Table
@@ -326,7 +338,7 @@ data. In the I<Settings> one can configure how the data is parsed.
 
 Like I<Copy and Paste> with the difference that the data is read from a chosen file.
 
-Selecting the prompt line of the I<Files> menu allows one to set the options described in the option group L</Get Data>.
+Selecting the prompt line of the I<Files> menu allows one to set the options described in L</Insert Data>.
 
 =back
 
@@ -362,7 +374,7 @@ Read the input from am file. Supported file formats: text files and file formats
 =back
 
 If the first column of a table is an auto-increment column, the C<INSERT INTO> statement is build without this first
-column. This feature is available if it is supported by the database plugin.
+column. This feature is available if supported by the database plugin.
 
 =head4 Input filters
 
@@ -401,6 +413,10 @@ With I<Plain> and I<Copy & Paste> this filter is enabled by default.
 =item Reset
 
 Reset the filters to the default values.
+
+=item Reparse
+
+Change the parse settings and reparse the data with the new settings.
 
 =item Cols to Rows
 
@@ -452,13 +468,15 @@ Transpose columns to rows.
     ----|---------
      64 | 9,818.2
 
+In the replacement it can be used the variable C<$c> as a counter. C<$c> is set to C<0> before each C<s///>.
+
 =back
 
 =head3 Update
 
 Update records.
 
-See also L</Extended SET> and L</Extended WHERE>
+See also I<Subqueries> in L</Extensions>
 
 =head3 Delete
 
@@ -476,18 +494,18 @@ Show this documentation.
 
 Shows the version and the path of the running C<db-browser> and the path of the application directory.
 
-=head2 DB
+=head2 DB Settings
 
-=head3 DB Plugins
+=head3 DB plugins
 
 Choose the required database plugins.
 
-=head3 DB Settings
+=head3 DB settings
 
 These driver specific I<DB Settings> are used as the default database settings.
 
-There is also in each L</Table Menu> the entry I<Settings> to make database specific settings. If no database specific
-settings are set, these global (to the database plugin) I<DB Settings> are used.
+There is also in each L</Tables Menu> the entry I<Settings> (if enabled in L</Extensions>) to make database specific
+settings. If no database specific settings are set, these global (to the database plugin) I<DB Settings> are used.
 
 User defined database plugins: it depends on the plugin which items are offered to set in each option and whether the
 selections made by the user are considered.
@@ -518,15 +536,19 @@ Reset database specific parameter to the global I<DB Settings>.
 
 =back
 
-=head2 Menu
+=head2 Behavior
 
 Set the behavior of the interactive menus.
 
-=head3 Menu Memory
+=head3 Menu memory
 
 If enabled: saves the menu position while entering in a sub menu.
 
-=head3 Table
+=head3 Keep header
+
+Show the table header on top of each page.
+
+=head3 Table expand
 
 Expand table rows:
 
@@ -546,7 +568,7 @@ do not expand the first row if the cursor auto-jumped to the first row.
 
 =back
 
-=head3 Info
+=head3 Info expand
 
 Before records are deleted/updated or before a table is dropped the affected records are shown in an info-table.
 
@@ -568,64 +590,81 @@ do not expand the first row if the cursor auto-jumped to the first row.
 
 =back
 
-=head3 Mouse Mode
+=head3 Mouse mode
 
-Set the I<Mouse Mode> (see L<Term::Choose/mouse>).
+Set the I<Mouse mode> (see L<Term::Choose/mouse>).
 
-=head2 SQL
+=head2 Extensions
 
-=head3 Metadata
+Add menu entries to menus:
 
-If I<Metadata> is enabled, system tables/schemas/databases are appended to the respective list.
-
-=head3 Operators
-
-Choose the required operators.
-
-There are two regexp entries: C<REGEXP> matches case sensitive while C<REGEXP_i> matches case insensitive.
-
-With C<MySQL> the sensitive match is achieved by enabling the C<BINARY> operator.
-
-=head3 Max Rows
-
-Sets C<LIMIT> automatically to I<Max Rows>. This can be overwritten by setting a SQL C<LIMIT> statement manually.
-Fetched table rows are kept in memory.
-
-To disable the automatic limit set I<Auto Limit> to C<0>.
-
-=head3 Extensions
-
-Select which menu extensions should be available:
+=head3 Tables menu
 
 =over
 
-=item Extensions SELECT
+=item Add Derived
+
+Derived table - see L</Subqueries>.
+
+=item Add Join
+
+=item Add Union
+
+=item Add DB settings
+
+=back
+
+=head3 Join menu
+
+=over
+
+=item Add Derived
+
+Derived table - see L</Subqueries>.
+
+=back
+
+=head3 Union menu
+
+=over
+
+=item Add Derived
+
+Derived table - see L</Subqueries>.
+
+=item Add Union All
+
+=back
+
+=head3 Substatements
+
+Substatement additions for:
+
+=over
+
+=item SELECT
 
 Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
 
-=item Extensions WHERE
+=item WHERE
 
 Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
 
-=item Extensions HAVING
+=item GROUP BY
 
 Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
 
-=item Extensions SET
+=item HAVING
+
+Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
+
+=item ORDER BY
+
+Values: I<None>, I<Func>, I<SQ> and I<Func/SQ>
+
+=item SET
 
 Values: I<None>, I<Func>, I<SQ>, I<=N> and I<Func/SQ/=N>
-
-=item Extensions Table
-
-Values: I<None> and I<SQ>
-
-=item Extensions Join
-
-Values: I<None> and I<SQ>
-
-=item Extensions Union
-
-Values: I<None> and I<SQ>
 
 =back
 
@@ -633,8 +672,7 @@ If set to I<None>, no menu extensions are available.
 
 If set to I<Func>, C<f()> is shown as additionally menu entry. Selecting C<f()> opens the L</Functions> menu.
 
-If set to I<SQ>, C<SQ> is shown as additionally menu entry. Selecting C<SQ> opens the L</Subqueries> menu. (In the
-table-, join- and union-menus C<Derived> is used instead of C<SQ>.)
+If set to I<SQ>, C<SQ> is shown as additionally menu entry. Selecting C<SQ> opens the L</Subqueries> menu.
 
 If set to I<=N>, C<=N> is shown as additionally menu entry (available only after the C<SET> in an C<UPDATE> statement).
 Selecting C<=N> sets the column to C<NULL>.
@@ -665,7 +703,8 @@ entry has been chosen.
 
 =head4 Subqueries
 
-Selecting a subquery menu entry opens a subquery sub-menu which allows one the enter a subquery (I<Read-Line>).
+Selecting a subquery menu entry (or a derived menu entry) opens a subquery sub-menu which allows one the enter a
+subquery (I<Read-Line>).
 
 If stored or temporarily stored subqueries are available, it is also possible to select one of those subqueries instead
 of entering a subquery.
@@ -675,6 +714,42 @@ A subquery can be saved or removed in the sub-menu which opens by selecting the 
 
 The last subqueries entered in the subquery menu and the last statements printed with I<Print TABLE> are stored
 temporarily.
+
+=head3 Parentheses
+
+Enable parentheses in C<WHERE> and/or C<HAVING> clauses.
+
+=head3 Write access
+
+Enable write access - use with care.
+
+=over
+
+=item Insert records
+
+=item Update records
+
+=item Delete records
+
+=item Create table
+
+=item Drop table
+
+=back
+
+=head2 SQL
+
+=head3 Metadata
+
+If I<Metadata> is enabled, system tables/schemas/databases are appended to the respective list.
+
+=head3 Operators
+
+Choose the required operators.
+
+There are two regexp entries: C<REGEXP> matches case sensitive while C<REGEXP_i> matches case insensitive.
+
+With C<MySQL> the sensitive match is achieved by enabling the C<BINARY> operator.
 
 =head3 Aliases
 
@@ -699,10 +774,6 @@ Derived Tables and subqueries in the SELECT sub-statement.
 
 =back
 
-=head3 Parentheses
-
-Enable parentheses in C<WHERE> and/or C<HAVING> clauses.
-
 =head3 Identifiers
 
 =over
@@ -723,33 +794,22 @@ C<SQLite>:
 
 - if the current database has attached databases, the use of qualified table names is enabled automatically.
 
-=head3 Write access
+=head3 Auto increment
 
-Enable write access - use with care.
-
-=over
-
-=item Insert records
-
-=item Update records
-
-=item Delete records
-
-=item Create table
-
-=item Drop table
-
-=back
+Setting I<Auto increment> to a value which is not the empty string enables the option to set an auto increment column
+when creating a table. The value set here is then used as the default name for the auto increment column.
 
 =head3 Data types
 
 If this option is enabled and a table is created, C<SQL::Type::Guess> is used to detect the data types. These data types
 are then used as default values when the user is asked for the data types.
 
-=head3 Auto increment
+=head3 Max Rows
 
-Setting I<Auto increment> to a value which is not the empty string enables the option to set an auto increment column
-when creating a table. The value set here is then used as the default name for the auto increment column.
+Sets C<LIMIT> automatically to I<Max Rows>. This can be overwritten by setting a SQL C<LIMIT> statement manually.
+Fetched table rows are kept in memory.
+
+To disable the automatic limit set I<Auto Limit> to C<0>.
 
 =head2 Output
 
@@ -776,18 +836,6 @@ Separate the columns from each other and the header from the body with lines.
 Enables the support for color and text formatting escape sequences (SGR) if set to C<Enable>. Before the output it is
 added a reset (C<\e[0m>) at the end of each row.
 
-=head3 Keep Header
-
-Show the table header on top of each page.
-
-=head3 Undef
-
-Set the string that will be shown on the screen instead of an undefined field.
-
-On C<MSWin32> only single-byte character sets are supported when entering the setting I<Undef>, I<user>, I<host> or
-I<port> with the C<db-browser>s readline. But it is possible to edit the entry in configuration files directly after the
-entry was created with this options menu.
-
 =head3 Binary binary
 
 Setting the I<binary_filter> to C<1> means: print "BNRY" instead of arbitrary binary data. If data matches the repexp
@@ -798,7 +846,17 @@ the output.
 
 If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and leading and trailing spaces are removed.
 
-=head3 Decimal separator
+=head3 Set string
+
+=head4 Undef
+
+Set the string that will be shown on the screen instead of an undefined field.
+
+On C<MSWin32> only single-byte character sets are supported when entering the setting I<Undef>, I<user>, I<host> or
+I<port> with the C<db-browser>s readline. But it is possible to edit the entry in configuration files directly after the
+entry was created with this options menu.
+
+=head4 Decimal separator
 
 Set the decimal separator. Numbers with a decimal separator are formatted as number if this option is set to the right
 value.
@@ -810,12 +868,11 @@ to the default value (dot).
 
 Enable/disable C<File::Find> warnings when searching for C<SQLite> databases.
 
-=head2 Get Data
+=head2 Insert Data
 
-=head3 Parse Tool
+=head3 Parse file
 
-Set how to parse text files or the "multi row" input. Files where C<-T $filename> returns true are considered text
-files.
+Set how to parse text files. Files where C<-T $filename> returns true are considered text files.
 
 If a file is not a text file, then it is always used C<Spreadsheet::Read> to parse the file regardless of this setting.
 
@@ -825,7 +882,7 @@ If a file is not a text file, then it is always used C<Spreadsheet::Read> to par
 
 Text::CSV
 
-To decode the files it is used the I<File encoding>.
+To decode the files it is used the L</File encoding>.
 
 Advantages:
 
@@ -848,7 +905,7 @@ split
 Reads to whole input at once and splits the input with the input record separator (IRS) to get the records (rows). Then
 it splits the records with the input field separator (IFS) to get the fields (columns) of each record.
 
-To decode the files it is used the I<File encoding>.
+To decode the files it is used the L</File encoding>.
 
 Advantages:
 
@@ -885,15 +942,13 @@ Auto-detects the separation character for csv-files
 
 =back
 
-=over
+=head3 Parse Copy & Paste
 
-=back
+Set how to parse the "multi row" input.
 
-=head3 Text::CSV config
+Same options as in I<Parse file>.
 
-Set different L<Text::CSV> options.
-
-=head3 'split' config
+=head3 split settings
 
 =over
 
@@ -935,13 +990,47 @@ Expects a regex pattern. If set, removes trailing characters matching regexp fro
 
 =back
 
+=head3 CSV settings-a
+
+Set the Text::CSV options
+
+=over
+
+=item
+
+sep_char
+
+=item
+
+quote_char
+
+=item
+
+escape_char
+
+=item
+
+eol
+
+=back
+
+=head3 CSV settings-b
+
+Set Text::CSV options not mentioned in I<CSV settings-a>:
+
+For the meaning of the different options see L<Text::CSV>.
+
 =head3 File encoding
 
 How to decode text files.
 
-=head3 File History
+=head3 Dir history
 
-Set how many searched directories should be saved. A value of C<0> disables the history.
+Set how many searched directories should be saved.
+
+A value of C<0> disables the history.
+
+If I<Dir history> is set to C<1> and a directory has already been saved, the directory is chosen automatically.
 
 =head1 CONFIGURATION FILES
 

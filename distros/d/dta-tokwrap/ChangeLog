@@ -1,0 +1,1032 @@
+##-*- Mode: ChangeLog; coding: utf-8; -*-
+
+v0.89 Fri, 22 Feb 2019 09:31:13 +0100 moocow
+	* top-level Makefile.PL tweaks
+	  - META.* re-generation fixes
+	  - declare lack of support for win32
+
+v0.88 Thu, 21 Feb 2019 21:18:49 +0100 moocow
+	* re-added missing top-level Makefile.PL (seems to have gotten lost in svn merge)
+	* set $ENV{PERL}=$^X in Makefile.PL before calling ./configure
+	  - should fix bogus failures from non-default perls (e.g. cpantesters ae09febc-353f-11e9-a0cc-de79a423f08d)
+	  - many thanks to Slaven Rezić for spotting the problem
+
+v0.87 Thu, 21 Feb 2019 15:21:05 +0100 moocow
+	* first non-dev cpan release
+
+v0.86 Wed, 20 Feb 2019 08:31:17 +0100 moocow
+	* refactored dta-tokwrap distribution for cpanm- & cpantesters-friendliness
+
+v0.85 Tue, 06 Nov 2018 15:54:02 +0100 moocow
+	* scripts/dtatw-sanitize-header.perl: added length-based trimming for sanitized bibl fields (default: -max-bibl-length=256)
+	* scripts/dtatw-get-ddc-attrs.perl: removed 'left' context-element for 'xc' attribute (mantis #31734)
+
+v0.84 Thu, 13 Sep 2018 14:39:19 +0200 moocow
+	* added dtatw-fast-ddc-attrs.perl: fast minimal attribute extraction (//w/@ws only)
+
+v0.83 Wed, 05 Sep 2018 11:05:56 +0200 moocow
+	* added dtatw-sanitize-header.perl support for user-specified XPaths
+
+v0.82 Fri, 10 Aug 2018 10:07:11 +0200 moocow
+	* added TCF->TEI decoding support for TEI att.linguistic attributes //w/(@lemma|@pos|@norm|@join)
+	  - uses new processor module 'txmlanno': in-place update of *.t.xml
+	  - optional: only used if tcfdecode option 'att.linguistic' is set
+	  - wrapped by new tei-tcf web-service v0.06 form parameter 'lingattrs'
+
+v0.81 Fri, 13 Apr 2018 10:53:17 +0200 moocow
+	* removed diagnostic comments for non-initial chained material in Processor::mkbx0::chain_stylestr()
+	  - fixes mantis bug #26675: comments caused XSL transform to choke in Processor::mkbx0 for xml:ids containing trailing hyphens
+
+v0.80 Tue, 03 Apr 2018 13:57:33 +0200 moocow
+	* allow TCF->TEI decoding even without a TCF 'tokens' layer (expensive no-op)
+	* added TCF<->TEI encoding/decoding example in top-level README
+
+v0.79 Wed, 08 Nov 2017 12:20:54 +0100 moocow
+	* dtatw-sanitize-header.perl for 'rsc' corpus tweaks (//idno fallback XPaths)
+
+v0.78 Wed, 26 Jul 2017 12:57:07 +0200 moocow
+	* dtatw-sanitize-header.perl for 'rem' corpus tweaks (date string sanitation heuristics)
+
+v0.77 Tue, 21 Mar 2017 14:40:32 +0100 moocow
+	* added dtatw-percent-(encode|decode).perl : "%" <-> "$%$" escaping for use with waste tokenizer >= v2.0.15-1
+
+v0.76 Wed, 25 Jan 2017 11:05:49 +0100 moocow
+	* changed dtatw-get-ddc-attrs.perl @rendition parsing (ALL -> ANY); related to mantis bug #18392
+
+v0.75 2016-11-09  moocow
+	* fixed handling of -po=waste=PATH for 'auto' tokenizer class
+
+v0.74 2016-11-01  moocow
+	* updated default tcf textSource type (again)
+
+v0.73 2016-09-23  moocow
+	* added character-offset mode to file-substr.perl (expensive, buffers whole file)
+
+v0.73 2016-06-07  moocow
+	* added tei2spliced target
+	* added tei2spliced target
+	* updated docs
+	* added dta-tokwrap.perl -waste-dir option
+
+v0.72 2016-05-12  moocow
+	* better docs for dtatw-sanitize-header
+	* improved basename guessing in dtatw-sanitize-header.perl for header-less dta files
+
+v0.71 2015-11-12  moocow
+	* dtatw-lb-encode.perl fixes: \R regex was splitting UTF8 characters --> malformed xml
+
+v0.71 2015-08-19  moocow
+	* added fast regex hack dtatw-lb-encode.perl (for dstar build)
+	* added dtatw-ensure-lb.perl : insert <lb/> where tokwrap expects it
+
+v0.69 2015-07-23  moocow
+	* dtatw-sanitize-header.perl: auto-normalize whitespace in fields
+	 - fixes broken DDC return values involving TABs in metadata
+
+v0.68 2015-06-16  moocow
+	* added aux-db support to dtatw-sanitize-header.perl
+
+v0.67 2015-06-15  moocow
+	* dtatw-sanitize-header compat fixes
+	* dtatw-sanitize-header.perl: new canonical XPaths for dtaid, dtadir
+
+v0.66 2015-06-10  moocow
+	* added dtatw-insert-header.perl : header splicing (e.g. for metadata tweaking during dstar con-import)
+
+v0.65 2015-03-11  moocow
+	* re-serialize <metamark> a la <note> and friends
+
+v0.64 2015-03-06  moocow
+	* mkbx0: no whitespace before sb, wb elements (for dta ws attribute)
+
+v0.63 2015-02-18  moocow
+	* added div_TYPE components to 'xc' (ddc 'con' field)
+
+v0.63 2015-02-09  moocow
+	* ignore //del in mkbx0 (fixes mantis bug #721)
+
+v0.62 2015-01-19  moocow
+	* basename fixes dtatw-sanitize-header.perl (was dumping empty basename for -b ./BASENAME calls
+
+v0.62 2015-01-09  moocow
+	* added Algorithm::BinarySearch::Vec dependency (for dtatw-get-ddc-attrs.perl)
+
+v0.62 2015-01-06  moocow
+	* no --backlink in POD2HTMLFLAGS (ubuntu/debian snafu)
+	* fix for goofy text-length explosion on kira (ubuntu server 14.04.1 LTS)
+	  - assuming problem was related to printf format sizes and datatype underflow
+	  - fix uses PRIu32 macro from inttypes.h to print uint32_t safely
+	  - alternate solution uses %u and (uint)ARG , assuming (uint) is at least 32 bits wide
+
+v0.61 2014-12-19  moocow
+	* header title extraction fixes
+
+v0.61 2014-12-17  moocow
+	* tweaks for ubuntu-server 14.04.1 / perl 5.18.2
+	* ignore errors from pod2* utilities
+
+v0.61 2014-12-15  moocow
+	* space-normalization for textClass
+
+v0.61 2014-12-12  moocow
+	* tcfencode/decode : text/tei+xml adjustments
+	* tcfencode.pm : added textSourceType argument for tcfencode object
+
+v0.61 2014-11-28  moocow
+	* added tcftokenize doc
+	* added tcf2tok target: direct tcf tokenization
+	* tcf-encoded tei uses textSource layer, as per tcf spec (git)
+	* addws: xml output was broken
+
+v0.60 2014-11-27  moocow
+	* more decode-related tweaks
+	* tcf decode fixes
+	* tcf decode fixes
+	* tcfdecode
+	* more tcf tweaks
+	* tcf tweaks
+	* improved diff sanity checking in tcfalign
+	* full tcfdecode -> TEI+ws basically working
+
+v0.60 2014-11-21  moocow
+	* tcf decoding work
+	* more ddc-attrs fixes
+	* get-ddc-attrs fix
+
+v0.60 2014-11-20  moocow
+	* added Processor::tei2tcf : simple serialized text-only TEI->TCF encoder
+	* added tcf target to makefile (should combine with twopts=-weak-hints)
+
+v0.59 2014-11-05  moocow
+	* ignore external dtds by default in dtatw-get-ddc-attrs.perl
+
+v0.58 2014-10-24  moocow
+	* added tei2txt target
+	* updated README
+	* added copyright to README.pod
+	* added COPYING files (LGPL)
+	* updated perl copyrights
+	* distcheck fixes
+
+v0.58 2014-10-10  moocow
+	* dtatw-get-ddc-attrs.perl: fixes for token-less files
+	* added spiegel1.xml : causes error from ddc-get-attrs.perl:
+	  'Negative offset to vec in lvalue context at /usr/local/bin/dtatw-get-ddc-attrs.perl line 250'
+
+v0.57 2014-09-30  moocow
+	* trim local namespace prefixes in dtatw-get-header.perl: fix
+	* trim local namespace prefixes in dtatw-get-header.perl
+	* allow local namespace prefixes for dtatw-get-header.perl
+
+v0.57 2014-09-29  moocow
+	* dtatw-mkindex : use //pb/@n for page-break indices if //pb/@facs is unavailable
+	* updated docs
+
+v0.56 2014-09-11  moocow
+	* xml2ddc: disallow non-numeric <pb> and also <pb n=0>, since ddc will choke on them
+
+v0.56 2014-09-09  moocow
+	* dtatw-xml2ddc.perl :wrap <pb/>
+
+v0.56 2014-09-08  moocow
+	* more dstar header-sanitization stuff
+
+v0.56 2014-09-04  moocow
+	* added ENV{TOKWRAP_RCDIR} default
+	* added dta-tokwrap.perl -rcdir option
+	* various -foreign changes
+	* dtatw-sanitize-header.perl: more foreign-source hacks
+	* dtatw-sanitize-header.perl: date-trimming heuristic updated to allow hyphens
+
+v0.55 2014-09-02  moocow
+	* trace message cleanup
+	* added -foreign argument to dtatw-sanitize-header.perl (for d* build)
+
+v0.55 2014-08-20  moocow
+	* fixed double-hyphen in comment bug from dtatw-tok2xml for dwds (zeit?) sources
+	  - double-hyphens now escaped in comments as '-\-'
+
+v0.54 2014-06-06  moocow
+	* mkbx0: add whitespace for '<space>' elements
+
+v0.54 2014-06-05  moocow
+	* README.html re-built (what's the problem?)
+
+v0.54 2014-05-08  moocow
+	* dtatw-sanitize-header.perl : added clauses for //date[@type="creation"]
+
+v0.54 2014-05-05  moocow
+	* added no-break-space (U+00A0) to acceptable post-newline regex in dtatw-t-check.perl
+
+v0.54 2014-04-16  moocow
+	* added -list-targets option to dta-tokwrap.perl
+
+v0.53 2014-03-25  moocow
+	* more BOL-quote regex tweaking
+
+v0.53 2014-03-03  moocow
+	* dtatw-seg2prevnext.perl: applied patch for mantis bug #649 http://odo.dwds.de/mantis/view.php?id=645
+
+v0.53 2014-01-31  moocow
+	* added tokenizeClass workaround to TokWrap and TokWrap::Document
+
+v0.53 2014-01-20  moocow
+	* dtatw-b2xb, Processor::tok2xml.pm fixes for content-free input
+
+v0.52 2014-01-13  moocow
+	* quote-hack fixes in mkbx
+	* tokenize1: split off trailing commas (fixes)
+	* tokenize1: split off trailing commas
+
+v0.52 2014-01-08  moocow
+	* avail code default: -
+	* dtatw-sanitize-header.perl: added 'avail' field and dwds-compatibile 'textClass' source xpath
+
+v0.52 2013-12-18  moocow
+	* ignore bogus '&q;' at BOS -- compensate for transcription errors
+
+v0.51 2013-12-06  moocow
+	* mkbx0 fixes for lost data due to @prev/@next links with leading '#'
+
+v0.50 2013-12-04  moocow
+	* tokenize1.pm: don't use Moot::TokPP by default (for wasteAnnotator built into moot >= v2.0.10-3)
+
+v0.50 2013-12-02  moocow
+	* clean version v0.50 / svn r11301
+	* dtatw-get-ddc-attrs.perl: replaced @cn2packed array with $cn2packed packed vector
+	  - can be pre-allocated with guesstimate of $Ncx_est
+	  - less memory bloating than @cn2packed array
+	  - still better would be to read cx records from the file on demand, but that's quote slow
+	  - large files (e.g. abelinus_theatrum_1635, ~9.7M tei, 19M .cx, ~9.5M cx records)
+	    still cause memory bloat when applying attributes
+
+v0.49 2013-11-29  moocow
+	* help text fix for dta-tokwrap.perl
+	* version cleanup
+	* <p> wrapper cleanup
+	 - dtatw-tok2xml.c : annotate //s/@pn : paragraph counter (really counts SB hints)
+	 - DTA::TokWrap::Processor::tok2xml : sort on paragraph boundaries (indicated by //s/@pn)
+	 - dtatw-pn2p.perl : wrap //s/@pn with <p>..</p>
+	* clean version
+	* dtatw-b2xb.c: debugging
+	 + dtatw-t-check.perl: gentler warnings
+	* added dtatw-sb2p.perl: sentence-break hint to <p> boundary hack
+	 - not quite correct -- this functionaly should really be between tokenize0 and tok2xml, in order to allow paragraph-sensitive re-sorting
+	* added dtatw-sb2p.perl : convert sentence-break hints to <p>-boundaries
+
+v0.48 2013-11-28  moocow
+	* dtatw-get-ddc-attrs.perl: limit number of //pb/@facs warnings for
+	  - dtatw-t-check.perl : avoid 'uninitialized' warnings §
+
+v0.48 2013-11-15  moocow
+	* more doc updates
+	* doc updates
+
+v0.48 2013-11-13  moocow
+	* http tokenizer: use 'dta' model by default
+	* tokenize1: added optional token-analysis with Moot::TokPP
+	* disabled obsolete tokenization auto-fixes
+	  - pass through all comments in tokenizer output, including WB,SB
+
+v0.47 2013-11-12  moocow
+	* doc/programs updates
+	* waste tokenizer module auto-detection fixes
+	* added waste tokenizer class
+	  - set default tokenizer type to waste
+	  - set default http tokenizer target to waste URL
+
+v0.46 2013-10-16  moocow
+	* added 'tei2t' action
+	* updated docs
+
+v0.46 2013-09-04  moocow
+	* scripts/dtatw-sanitize-header.perl : handle nested //idno elements according to new 2013-09-04 dta header schema
+
+v0.46 2013-08-30  moocow
+	* [r10519]
+	* 2013-06-21 moocow
+	* http tokenizer: changed default url host back to kaskade.dwds.de (now -> services2)
+
+v0.46 2013-06-19  moocow
+	* Processor/tokenize/auto.pm : search for and accept e.g. dwds_tomasotath_04x for target class tomasotath_04x
+
+v0.46 2013-06-03  moocow
+	* added -tokenizer-class=CLASS option
+	* tokenize/auto.pm : don't choose tomasotath_05x by default
+	* updated DTA::TokWrap::Processor::tokenize::http to use kaskade's IP (kaskade->services2 switch)
+
+v0.46 2013-05-15  moocow
+	* updated Processor/tokenize/http.pm: use multipart/form-data to avoid implicit LF->CR+LF conversion and corresponding  byte offsets
+	* added min.xml
+
+v0.45 2013-03-20  moocow
+	* add implicit line-breaks before page-breaks (helps with HAB books, e.g.
+	  http://kaskade.dwds.de/dtaq/book/view/30056?hl=nicheer;p=28)
+	* end-of-line quote hack; fix for http://kaskade.dwds.de/dtaq/book/view/20001?p=43;hl=niciren
+
+v0.44 2013-02-26  moocow
+	* added some more pre-numeric abbrevs in Processor::tokenize1
+	* added 'vnd', 'vnnd' to %nojoin_txt2 in Processor::tokenize1
+
+v0.43 2013-02-20  moocow
+	* sb on //trailer (list trailer)
+
+v0.43 2013-02-19  moocow
+	* sb on //list (what happened to all of these?
+	* sb on //head
+	* SB on //item
+
+v0.42 2013-02-05  moocow
+	* added TokWrap/Processor/tomasotath_05x
+
+v0.42 2013-01-14  moocow
+	* trim non-digits from header date
+	* updated to v0.42: don't ignore //ref (at request of CT,FW)
+	* dong add key for //ref
+	* wb on //item
+	* don't ignore //ref
+
+v0.41 2012-11-21  moocow
+	* dtatw-format: add newlines for <pb> elements too
+
+v0.41 2012-11-12  moocow
+	* use editor in place of author for dtatw-sanitize-header.perl
+	* added link xml_header
+
+v0.41 2012-11-08  moocow
+	* dtatw-sanitize-header: text class: @type -> @scheme
+
+v0.41 2012-11-01  moocow
+	* fixed line-initial quote heuristics in Processor::mkbx.pm
+
+v0.41 2012-10-31  moocow
+	* typo fix
+	* updated dtatw-sanitize-header.perl for new header format
+	  - added bibl field 'corpus' (core|aedit|wikisource|...)::(ocr|don|china|...)::...
+	  - removed warnings for missing 'shelfmark', 'repository'
+	* added mp12.xml
+
+v0.41 2012-10-30  moocow
+	* mkbx: quote-at-bol fix for mantis bug #560
+
+v0.40 2012-10-24  moocow
+	* added dtatw-add-xpath.perl
+
+v0.40 2012-10-17  moocow
+	* more relaxed hint-as-token check in dtatw-t-check.perl
+	* various fixes for plato test-set
+	* dtatw-seg2prevnext: tokwrap dep removed
+
+v0.40 2012-10-16  moocow
+	* fix for old version.pm v0.74 on kaskade
+	* printf formats, CFLAGS, etc from kaskade
+	* clean make
+	* binary cx data (from branches/dta-tokwra-0.39-cx-bin)
+
+v0.39 2012-10-15  moocow
+	* fixed mkindex bug (don't use isspace() with unicode codepoints)
+	* removed stale dtatw-mkindex.c+f
+	* removed stale standoff generators
+	* added files mysteriously missing after svn merge
+	* merged in changes from branches/dta-tokwrap-0.38 to trunk
+
+v0.37 2012-10-09  moocow
+	* seg2prevnext: expand_entities=>0
+
+v0.37 2012-10-05  moocow
+	* dtatw-add-c.perl hacks: track space-ness of <c> for dtatw-rm-c.perl consistency
+	  (don't remove whitespace from OCR books with existing //c elements)
+	* turned off OVERLAP debug messages
+
+v0.37 2012-10-04  moocow
+	* fixed overlapping-offsets-from-tokenizer bug in tokenize1 (hack)
+	* more pre-numeric abbrs from kaskade
+	* buffering updates
+	* filehandle hacks for addws.pm
+	  - TODO: check that CAB TEI format still works with this
+	  + added <toka> wrapper element for tokenizer-supplied analyses to dtatw-tok2xml.c
+	  + buffering for dtatw-rm-c.perl, dtatw-nsdefault-(encode|decode).perl
+	  + all because of huge dta input files, e.g. strauss_jesus01_1835
+	* major tokenize1 rewrite: weird performance hits for regexes on large buffers (esp e.g. *_/ABBREV heuristics for strauss_jesus01_1835)
+
+v0.36 2012-10-02  moocow
+	* updated dtatw-get-ddc-attrs.perl: added 'wsep' attribute (bool: true iff word is (whitespace) separated from its predecessor)
+	  - uses tokwrap 'b' field to test immediate adjacency in tokenized txt file
+	* updated dtatw-(add|rm)-c.perl: removed redundant type=ws for whitespace <c>s
+	* dtatw-add-c.perl: more fixes and optimizations
+	* dtatw-add-c.perl fix ($c_rest was not getting encoded)
+	  - mkbx0: be more verbose when initiating a second pass "
+
+v0.36 2012-10-01  moocow
+	* more sanity checks for sanitize_chains
+	* dtatw-get-header.perl update
+	* 2-pass mkbx0::sanitize_chains() -- avoid doubling (and consequent non-wellformedness) on cycles of length=0
+	* fixed dtatw-(add|rm)-c.perl interplay
+	  - added new potential attribute 'type=dtaws' to <c> elements introduced by dtatw-add-c.perl : if present, the element should
+	    be removed entirely for a 1-1 mapping dtatw-add-c.perl | dtatw-rm-c.perl
+	* argh: idsplice absurdly slow (non-linear) using output buffer -- check addws too
+	* idsplice: keep standoff text by default
+	* makefile sync with ddc build
+	* more makefile fixes
+	* makefile updates
+	* new idsplicer working, integrated into tokwrap and Makefile
+	* updated Makefile to use tokwrap for *.wst.xml, *.cwst.xml
+	* started modularization of id-based splicer (dtatw-splice.perl) into TokWrap::Processor::idsplice
+	  - TODO: sensible defaults for related options, tokwrap api-fication
+	* updated emails to jurish@bbaw
+
+v0.36 2012-09-27  moocow
+	* moved <w> and <s> splicing code from independent script dtatw-add-ws.perl to TokWrap::Processor::addws
+	* added new dtatw-nsdefault-(encode|decode).perl
+	  - just hacks default namespaces xmlns=... to XMLNS=...
+	  - contrast with old dtatw-(rm|restore)-namespaces , which hacks __all__ namespaces
+	  - libxml can handle prefixed namespaces alright, but chokes on defaults
+	* added dtatw-restore-namespaces.perl
+
+v0.35 2012-09-25  moocow
+	* minor bugfixes for dtatw-sanitize-header.perl
+
+v0.35 2012-09-21  moocow
+	* added automatic cycle detection to mkbx0::sanitize_chains()
+	* dtatw-add-c.perl: even more newline tweaks
+	* dtatw-add-c.perl: more newline tweaks
+	* dtatw-add-c.perl: retain newlines
+
+v0.35 2012-09-18  moocow
+	* added dtatw-rm-ws.perl: replaces dtatw-rm-w.perl, dtatw-rm-s.perl
+	* added dtatw-format.perl: combines libxml format with linebreak-newline insertion
+
+v0.35 2012-09-17  moocow
+	* tok2xml::txmlsort fix
+
+v0.35 2012-09-14  moocow
+	* DTA::TokWrap::Processor::tok2xml now sorts sentence-wise in source-document order
+	  - sort uses native perl code with sneaky regexes
+	  - scripts/dtatw-txmlsort.xsl does the same thing, but about 10x slower
+	* release cleanup
+	* new dtatw-add-w.perl splices both //w and //s elements into original file
+	  - tweaked handling of //formula elements in dtatw-mkindex, dtatw-tok2xml, dtatw-get-ddc-attrs.perl
+	  - basically, formula handling is (still) a disparate collection of poorly documented crufty conventions: handle with care
+	  - next steps: remove dtatw-add-s.perl, rename, ...
+	* dtatw-add-w.perl: now splicing in both //w and //s
+	  - full support for disparate serial order (.t.xml) and tei document-order (.chr.xml) wrt //w and //s segments
+	  - PROBLEM: formulae aren't getting treated nicely, due to .cx hack
+	  - the trouble here is that only the <formula> open-tag gets its byte offsets+lengths written, not the end-tag
+	  - hence, we can't gobble up the whole formula with a single //w using only the *.cx data: buggrit buggrit millenium etc
+	* fixed dtatw-add-w.perl
+	  - TODO: fix/improve dtatw-add-s.perl too
+	* got dtatw-add-w.perl working again
+	  - uses literal word-segments as reported in .t.xml file ~ (0.1%-0.2%) discontinuous
+	  - uses xml byte-offsets from .t.xml file rather than //c/@id values : 4-5x faster
+	    + removed dangeous id-based cid_is_adjacent() from src/dtatwCommon.h
+	  - replaced with new improved cx_is_adjacent()
+	  - new heuristic requires that source block is associated with each cxRecord: #define CX_WANT_BXP
+	    + dtatw-tok2xml now considers <lb/> elements 'character-like'
+
+v0.34-1 2012-09-12  moocow
+	* fixed dtatw-add-w.perl to use new //w/@xb attribute (safer & faster than old //c/@id method)
+	* added @xb attribute (xml bytes offset+length list) to dtatw-tok2xml (.t.xml) output
+	 - should replace .t.xml //w/@c (//c/@id from input TEI) as source for splicing in standoff annotations
+	   + TODO: improve/fix dtatwCommon.[ch] cid_is_adjacent(): use actual adjacency relation from the *.cx file
+	   + TODO: improve/fix dtatw-tok2xml behavior for line-broken (fragmented) tokens
+	 - currently a token-internal <lb/> seems to cause fragmentation of both //w/@c and //w/@xb lists: figure out why and fix it
+	* removed some extraneous verbose-log newlines
+
+v0.34 2012-09-11  moocow
+	* improved handling of @prev|@next and //seg chains in Processor::mkbx0
+
+v0.33 2012-08-27  moocow
+	* added some warnings to dtatw-get-ddc-attrs.perl
+	* argh
+
+v0.33 2012-08-22  moocow
+	* updated dtatw-t-check.perl to check for mantis bug #548
+	* tokwrap argh
+	* fixed perl carping in dtatw-get-ddc-attributes c_pack()
+	* fixed perl carping in dtatw-get-ddc-attributes c_pack()
+	* improved error reporting
+
+v0.32 2012-08-20  moocow
+	* fixed assertion comparison in dtatw-tok2xml
+
+v0.32 2012-08-16  moocow
+	* fixed mantis bug #547 : <head> was being assigned its own sort key; now only for non-list heads
+
+v0.31 2012-08-08  moocow
+	* fixed mkbx0::sanitize_chains()
+	  - ported fixes from dtatw-sanitize-prevnext.perl
+	  - OaOO: altered dtatw-sanitize-prevnext.perl to call mkbx0::sanitize_chains()
+	* updated dtatw-get-ddc-attrs.perl: use intersection over character-wise @rendition attributes for //w/@xr rather than union
+	  - fixes mantis bug #546
+
+v0.30 2012-07-26  moocow
+	* dtatw-sanitize-prevnext.perl: delete @prev,@next if no corresponding element exists (e.g. for use with DTAQ:
+	  http://kaskade.dwds.de/dtaq/book/view/30044?p=46)
+
+v0.30 2012-07-18  moocow
+	* added more hard-coded dangerous bible abbreviations to tokenize1.pm
+
+v0.29 2012-07-16  moocow
+	* fixed typo in error message
+	* more dtatw-sanitize-header.perl buglets
+	* fixed xpath bug in dtatw-sanitize-header.perl
+
+v0.29 2012-06-29  moocow
+	* fixed sanitize-header
+	* added timestamp
+
+v0.29 2012-06-28  moocow
+	* improved dtatw-sanitize-header.perl
+
+v0.29 2012-06-27  moocow
+	* install dtatw-sanitize-header.perl too
+	* re-commented dtatw-xml2ddc.perl (stale header stuff)
+	  - added new dtatw-sanitize-header.perl: sanitize TEI headers for DDC/DTA indexing
+	  - this is annoying since it has to deal with both old (pre 2012-07) and new (post 2012-07) header formats for now
+	* dtatw-xml2ddc.perl: added ensure_xpath() calls for new-style dta headers (2012-07)
+
+v0.29 2012-06-26  moocow
+	* moved tokenize::auto checks to tokenize() method (instead of init() -- avoid checks for non-tokenization calls)
+	* fixed docs for tokenize[01]
+	* fixed tempfile removal for tokenize[01]
+	* better debug status reporting for tokenizer::auto
+	* use choice/(corr|reg|expan) rather than choice/(sic|orig|abbr)
+	* added new 'auto' tokenizer class (wraps tomastoath, http)
+
+v0.28 2012-06-25  moocow
+	* corrected typo in file-substr.perl help
+	* added item[ref] to hint_sb_xpaths
+
+v0.28 2012-03-28  moocow
+	* more quotes for mkbx
+
+v0.28 2012-03-20  moocow
+	* updated dtatw-add-[sw].perl to use @prev,@next encoding
+	  - @part attribute is still added as well, even though @ref|@n is NOT
+	* updated docsQ
+	* added support for @prev,@next in Tokwrap::Processor::mkbx0
+	* more pre-numeric abbreviations (incl. 'Art')
+
+v0.27 2012-02-21  moocow
+	* added lg to hint_sb_xpaths
+	* removed 'Mark.' pre-numeric abbreviation: still too dodgy
+	* typo
+	* added nabbr_max_distance in DTA::TokWrap::Processor::tokenize1
+
+v0.27 2012-02-15  moocow
+	* added pre-numeric abbreviation post-processing hack in DTA::TokWrap::Processor::tokenize1
+
+v0.26 2012-02-01  moocow
+	* dtatw-get-header.perl fix
+
+v0.26 2012-01-12  moocow
+	* better implementation of dtatw-dtaid: dtatw-ls-ids.perl
+	* back to safer dtatw-dtaid.sh
+	* faster regex-based dtatw-dtaid.sh
+	* updated dtatw-dtaid.sh script
+	* added dtatw-dtaid.sh: create (FILE DTADIR DTAID) map straight from XML files
+	* updated dtatw-get-header.perl
+
+v0.26 2011-09-06  moocow
+	* tomasotath_04x alias fixes
+
+v0.26 2011-09-02  moocow
+	* fixed logic bug in file-substr.perl
+
+v0.26 2011-08-24  moocow
+	* undid file-substr.perl kludge
+	* added -help option to file-substr.perl
+
+v0.26 2011-08-23  moocow
+	* kaskade updates
+	* added choice-element handling for (sic|corr)- and (orig|reg)-pairs
+
+v0.26 2011-08-18  moocow
+	* updated get-ddc-attrs.perl
+
+v0.26 2011-08-17  moocow
+	* fixed t0-errors rules in make/Makefile
+	* added t0-errors rule to Makefile: check tokenizer consistency
+	* updated t-check.perl
+
+v0.26 2011-08-16  moocow
+	* cab_corpus/ build work: fixes and adjustments
+
+v0.26 2011-08-12  moocow
+	* added dtatw-t-check.perl : check consistency of tokenizer output (byte-offset, -length) pairs
+	* updated ax_check_debug.m4 (respect debugging flags in USER_CFLAGS)
+	  + updated dtatw-tok2xml : check for overflow on offset+length when indexing txtb2cx (symtpom: bizarre random-looking segfaults for new tokenizer)
+
+v0.26 2011-08-11  moocow
+	* added Processor/tokenize/tomasotath_(02x|04x); made tomasotath an alias for tomasotath_04x
+	  + tested, seems to work (resources needs new abbrev format)
+	  + bizarre segfaults on kaskade in dtatw-tok2xml
+	* updated tomasotath_02x.pm; added tomasotath_04x.pm : tomastoath 0.4.x
+	* DTA-TokWrap/TokWrap/Processor/tokenize/tomasotath.pm[DEL], DTA-TokWrap/TokWrap/Processor/tokenize/tomasotath_02x.pm[CPY]: +
+	  moved tomasotath.pm to tomasotath_02x.pm (for use with tomasotath v0.2.x)
+
+v0.25 2011-08-05  moocow
+	* xsl update
+	* updated txml2tt.xsl
+	* 2011-08-04 moocow
+	* added offset/length splitting to get-ddc-attrs
+	* added offset/length splitting to get-ddc-attrs
+	* default to keep c,b attributes in dtatw-get-ddc-attrs.perl
+
+v0.25 2011-08-03  moocow
+	* fixed integer-bashing in get-ddc-attrs
+	* added scripts/formulae.xsl: test formula bboxes
+	* formula bbox extraction: may possibilities: easiest (minmax) seems best
+
+v0.25 2011-07-31  moocow
+	* started re-working get-ddc-attrs script
+	  - cache more data from *.c.xml scan (esp. line, auto-generated id)
+	  - maybe extend to also cache c text (urgh): idea -- check for 'word-like' <c>s
+	  - disabled raw word-based fallbacks: should improve these to take more context into account
+	    + esp. since we can now test for document-adjacent <c>s rather than just adjacent words
+	  - had a look at weierstrass_integrale: many whole-line formulae do NOT have a post-formula <lb/> encoded
+	    + also, a lot a formula numbers got encoded as text
+	    + also, lots of whitespace gets encoded as <c>s which screws up the adjaceny heuristics
+	    + idea: take more context into account, drop column-check for single-bbox items (formlae)
+	    + maybe try to grab all formulae by line (unless we're REALLY sure they're inline)
+
+v0.25 2011-07-30  moocow
+	* added formula-recognition and pb/@facs scanning to dtatw-mkindex
+	  + formula text is now inserted directly by dtatw-mkindex
+	  + word-break around formula using mkbx0 insert hint still used (could also ignore it maybe?)
+	  + it's annoying to build in on such a low-level, but this way formulae get unique (pseudo-)ids in the .cx file, which at least
+	    allows us to track them through tokwrap
+	  + grabbed weierstrass_integrale to test: seems to work ok
+	  + still need to beef up the get-ddc-attrs page- and bbox-guessing code for these things
+	    - idea was to use the .cx file directory (with more additions), but that gets pretty hairy with xpaths (structural context)
+
+v0.25 2011-07-28  moocow
+	* ddc/dta build fix
+	* updated '*.errors' targets to use xmlwf (expat), parallelized
+
+v0.25 2011-07-27  moocow
+	* added http tokenizer mode (workaround for broken tokenizer on services)
+
+v0.24 2011-07-22  moocow
+	* updated README
+	* script documentation cleanup
+
+v0.24 2011-07-21  moocow
+	* yet another Makefile update
+	* updated Makefile to include .ddc.t.xml target, generated from .t.xml, .chr.xml via dtatw-get-ddc-attrs.perl
+	* added more docs
+	* added dtatw-get-ddc-attrs.perl
+	* added dtatw-get-ddc-attrs.perl
+
+v0.23 2011-07-19  moocow
+	* updated README
+	* updated dataflow-perl-files.dot: added dtatw-add-c.perl, dtatw-splice.perl, and CAB example
+	* added -guess heuristic to dtatw-add-c.perl
+
+v0.23 2011-07-18  moocow
+	* added dtatw-splice.perl: splice in generic standoff data to base files (e.g. for cab analyses)
+	* bugfixes in txml2uxml script
+	* use compressed //c lists in .t.xml format
+	* removed debug code in dtatw-add-c.perl
+	* even bettern dtatw-add-c.perl check
+	* updated dtatw-add-c.perl: better checking for pre-assigned //c ids
+	  + should now be totally safe to run dtatw-add-c.perl on files with pre-assigned <c>s
+	  - id attributes will be assigned if not already present
+	  - pre-assigned ids will respected
+	  - pre-assigned ids of the form 'cN' are guaranteed not to be clobbered by script
+
+v0.22 2011-07-15  moocow
+	* removed debug message in mkbx
+	* added mkbx0 'hint_replace_xpaths' option: literal xsl snippet for replacing a whole element
+	* used hint_replace_xpaths to replace 'formula' elements with 'FORMEL'
+	* added necessary hacks in mkbx to deal with literal replacement pseudo-blocks (any with a 'text' attribute)
+	* possible problem: literal replacements do NOT get re-inserted into the document with add-w, because they lack any
+	  correspondig //c .... we'll call this a 'feature' for now
+	* added helmholtz example (formulae)
+
+v0.21 2011-06-29  moocow
+	* bugfixes (kaskade)
+	* bugfix for dtatw-add-c.perl: use /\X/ rather than /./ to match single utf8 char
+	  (\X = Match eXtended Unicode "combining character sequence")
+
+v0.21 2011-04-13  moocow
+	* dtatw-rm-c.perl : fix dta-fehlerdb cab view newline handling
+
+v0.21 2010-09-22  moocow
+	* updated to v0.21: new dtatw-txml2uxml
+	* removed dtatw-txml2cspan.perl : added functionality to dtatw-txml2uxml.perl instead
+	* updated dtatw-txml2uxml.perl : added trimming options
+	* updated u.xml rule: generate from .tcs.xml rather than .t.xml
+	* added dtatw-txml2cspan.perl
+
+v0.20 2010-09-01  moocow
+	* smaller test
+	* rolled back empty User.mak from r4066
+
+v0.20 2010-08-30  moocow
+	* fixed <fw> bug in DTA-TokWrap/TokWrap/Processor/mkbx0.pm
+	* updated dtatw-cids2local.perl: don't use //pb/@n
+
+v0.20 2010-08-27  moocow
+	* added newer scripts/* to doc/programs/ build
+	* added dtatw-cids2local.perl
+
+v0.19 2010-08-05  moocow
+	* mkbx0: tokenize <head> contents too
+
+v0.18 2010-08-04  moocow
+	* doc changes
+	* fixed race-condition bug for tokenize (fixtok) of kurz_sonnenwirth_1855.xml
+	* moved tokenizer post-processing hacks to new Processor::tokenize1
+	* added make aliases mktok0, mktok1
+	* master tokenized output file is now .t1 (post-processed)
+	* Makefile changed to reflect updates
+	* added kurz.xml (tokenize / fixtok bug)
+
+v0.17 2010-08-03  moocow
+	* dtatw-rm-c.perl: fix
+	* dtatw-rm-c.perl: also remove ids from <lb/>
+	* bug hunt in Processor::tokenize(): looks related to auto-fix
+
+v0.17 2010-07-30  moocow
+	* tested mkbx0 changes to tokenize EVERYTHING, incl. fw|head|ref
+
+v0.17 2010-05-06  moocow
+	* fixed stylesheet regeneration bug in TokWrap::Processor::mkbx0 (shouldn't have any effect for single-document runs)
+
+v0.17 2010-05-05  moocow
+	* added xpath-tracking (modulo namespaces) to dtatw-mkpx.perl
+	* updated mkbx0.pm: add 'autotune' heuristics to detect OCR over-recognized <p>s
+
+v0.16 2010-05-04  moocow
+	* updated Processor::Tokenize (just formatting, no functional changes)
+
+v0.16 2010-05-03  moocow
+	* updated DTA::TokWrap::Processor::mkbx
+	  - use document-internal text buffer
+	  - added regexes to hack Mantis bug #242: 'kontinuierte quotes @ zeilenanfang --> müll'
+	* px index updates
+	* moved .up.xml rule to .u.xml
+	* Makefile, txml2uxml, mkpx updates: generate .up.xml as .u.xml with pagebreak indices
+	  - use either .wpx or .cpx to find pagebreak indices
+	* added .wpx rule (word-page index)
+	* variable-ized ALL_TARGETS, ALL_XML_TARGETS, etc. in make/Makefile
+	* updated docs, mkpx
+	* added scripts/dtatw-mkpx.perl: create page-break index
+	* added -D DIFF_OPTIONS flag to tt-diff.perl (e.g. -d)
+
+v0.15 2010-04-28  moocow
+	* sentence-break in broken/abbrev override
+	* added broken-token abbreviation hack to Processor::tokenize.pm
+
+v0.14 2010-03-26  moocow
+	* more hacks for tokenize.pm module
+	* added *.t0 to CLEAN_FILES
+	* tokenizer fixes, updated dtatw-txml2uxml.perl script
+	* added hacks to recover from typical tokenizer errors (new files *.t0, new format *.t)
+
+v0.13 2010-03-10  moocow
+	* ignore *.xlit
+
+v0.13 2010-03-06  moocow
+	* set svn:executable for dtatw-txml2uxml.perl'
+	* added u-xml rule to make/
+	* added dtatw-txml2uxml.perl : raw-text extraction and/or unicruft approximation for .t.xml
+
+v0.13 2010-03-03  moocow
+	* updated docs
+	* re-instated default User.mak
+	* updated dtatw-rm-namespaces: excempt built-in xml: namespace from hacks
+
+v0.12 2009-11-11  moocow
+	* added ex6a.xml: test utf-8 truncation bug (in dwds_tomasotath)
+
+v0.12 2009-07-29  moocow
+	* added examples.mak
+
+v0.12 2009-07-27  moocow
+	* fixed missing whitespace-insertion around e.g. <note>...</note>
+
+v0.11 2009-07-22  moocow
+	* updated mkbx0, mkbx for better drama handling (castList, castGroup, speaker, stage, ...)
+	  - added new field 'bx0off' to .bx file: offset of block-start from .bx0 file
+	  - using bx0off as block-sorting sub-key before 'xoff' allows us to shuffle blocks around e.g. in hint stylesheet (see
+	    castGroup treatment for an example) ... without the need to resort to additional global-level sort keys
+	* fixed xmlstarlet dangling syntax in Makefile
+	* make updates
+
+v0.10 2009-06-29  moocow
+	* added 'CORPUS.*.xml.errors' targets: check well-formedness with xmllint
+
+v0.10 2009-06-25  moocow
+	* install rules
+
+v0.10 2009-06-24  moocow
+	* updates for new dwds_tomasotath
+	* updated dtatw-cabtt2xml.perl
+
+v0.09 2009-06-19  moocow
+	* corrected typo in comment
+	* removed *.txt.xml again
+	* added release/ : sources from kirk.bbaw.de:/home/dta/DTA_Produktion/volltext/konvertierung/05_run/
+
+v0.09 2009-06-16  moocow
+	* added some summary rules
+	* added type-wise DTA::CAB analysis to make/ subdir
+	* added dtatw-tt-dictapply.perl, dtatw-cabtt2xml.perl
+
+v0.08 2009-06-11  moocow
+	* dta-cab link-up stuff
+	* added small ex2a.xml (kant, ca. 1k tok)
+
+v0.08 2009-06-05  moocow
+	* added DTA::CAB link to makefile
+	* doc updates
+
+v0.08 2009-05-27  moocow
+	* minor help-message fixes
+	* cleanup
+	* minor doc fixes
+
+v0.08 2009-05-26  moocow
+	* added dahlmann/ test
+
+v0.08 2009-05-25  moocow
+	* install dtatw-rm-[ws].perl
+	* more dtatw-add-s.perl bugfixes
+	* Makefile update: avoid ugly errors when testing inplace
+	* fixed annoying warning bug in dtatw-add-s.perl (pre-existing //w[not(@n)], from OCR software)
+
+v0.07 2009-05-18  moocow
+	* doc fixes
+	* splicing scripts: dtatw-add-[sw].perl
+	  - updated docs, README
+	  - added rules to make/Makefile
+	  - added example file make/xmlsrc/ex1a.xml
+	* removed test-file strerror.c
+
+v0.07 2009-05-15  moocow
+	* more txml2master work
+
+v0.07 2009-05-12  moocow
+	* re-factored indexing code in dtatw-tok2xml.c
+	* removed DTA-TokWrap/TokWrap/Version.pm
+	* improved handling for "overlapping" tokens in dtatw-tok2xml.c
+	  - buffer the whole previous token, check for shared <c>s at token boundaries
+	  - overlap may consist of at most 1 <c> (duh!)
+	  - overlap resolution is first-come-first-serve (first token to claim the <c> gets it)
+	  - if "empty" tokens result (which does happen), they are filtered out
+	    ~ this is ok, since the associated text will have been appended to the first claimer
+	    ~ example:
+	      + XML SOURCE: ... <c xml:id="c42"><g>1/2</c></c> ...
+	      + TOKENIZER OUTPUT: ... 1 16 1 / 17 1 2 18 1 ...
+	      + OLD dtatw-tok2xml OUTPUT (with overlap): ... <w xml:id="w4" b="16 1" t="1" c="c13"/> <w xml:id="w5" b="17 1" t="/" c="c13"/>
+	        <w xml:id="w6" b="18 1" t="2" c="c13"/> ...
+	      + NEW dtatw-tok2xml OUTPUT: ... <w xml:id="w4" b="16 3" t="1/2" c="c13" overlap="R"/> ...
+
+v0.06 2009-05-11  moocow
+	* dtatw-tok2xml
+	  - don't generate overlapping tokens (same <c> in different <w>s)
+	  - standoff files may look a bit odd: empty c refs, incosistent tokenizer-text vs. input-xml text
+	    + what to do about this?
+
+v0.05 2009-05-07  moocow
+	* tokwrap-test.mak update
+	* got dwds_tomasotath 'official' tokenizer pretty much integrated
+	  - added Processor::tokenize options 'abbrevLex', 'mweLex', 'tomata2stderr'
+	  - added dta-tokwrap.perl options '-abbrev-lex', '-mwe-lex'
+	  - default lexica live in (usually) /usr/local/share/dta-resources
+	 * see SVN dev/dta-resources for more details
+
+v0.04 2009-05-06  moocow
+	* added dtatw-files
+	* updated README
+	* added SVNID to perl version-tracking via TokWrap/Version.pm.in
+	* updated .a.xml (token-analysis) format: now more standoff-ish (and smaller)
+	* more svn_id stuff
+	* moved test.t to svn_id: versioning hack
+	* updated keyword-stuff on configure.ac
+	* set svn:keywords property on test.t
+	* added test.t: svn keyword test
+
+v0.03 2009-05-05  moocow
+	* doc updates
+	* minor doc changes (ha)
+	* got make subdirectory installing
+	* moved data/ to make/
+	* added version header-comment to c-util-generated files, also to .bx file
+	* got make stuff working again
+	* moved xml/ to xmlsrc/, to avoid make goofs with 'xml' target
+	* added newline-hints in mkbx0
+	* got make subdirectory working again
+	  - TODO: rule cleanup
+	* updated test, added docs for dtatw-add-c.perl
+	* updated dtatw-add-c.perl: respect pre-existing <c> elements
+
+v0.02 2009-05-04  moocow
+	* removed stale files from data/
+	* moved test/ to data/
+	* added -nohints, -weak-hints, -docopt options to dta-tokwrap.perl
+	* install stuff from scripts/ directory
+	* dataflow dot graph updates, distcheck ok
+	* integrated new C proglet dtatw-tok2xml into DTA::TokWrap::Processor::tok2xml > + TODO: compile & use 'real' dta tokenizer > +
+	  TODO: configurable make-based build system >
+	* got dtatw-t2xml working
+	  - added src/dtatwExpat.[ch] : common files for expat parsers
+	  - configure.ac, m4/ax_check_expat.m4, src/Makefile.am: moved expat linker flags from LIBS to EXPAT_LIBS
+	    + only link those programs to expat which really need it
+
+v0.02 2009-05-03  moocow
+	* got dtatw-t2xml running (needs work: c id output, analysis parsing & formatting)
+	* updated dataflow-perl.dot to reflect v0.02 standoff-generation changes
+	* fixed realloc bug in dtatw-t2xml.c
+	* got src/dtatw-txml2[swa]xml wrapped into DTA::TokWrap::Processor::standoff
+	  + old Processor::standoff module is now Processor::standoff::xsl
+	  + new module is basically backwards-compatible (xsl dumps still work via require hack)
+	  + throughput for pure dta-tokwrap.perl now at ca 1.2 Mbyte/sec (carrot)
+	* added fast standoff generators (C): dtatw-txml2[sa]xml.c
+	  - brings total throughput on carrot up to ca. 6.3 Ktok/sec ~ 1.08 Mbyte/sec
+	* updated dataflow-perl.dot
+	* fixed verbosity typos in dta-tokwrap.perl
+	* fixed doc/DTA-TokWrap build deps
+	* auto-magically make pod,txt,html indices in doc/DTA-TokWrap
+
+v0.01 2009-05-01  moocow
+	* documentation build & install work
+	  - still no handy central index
+	  - could link README to actual pod docs now
+	  - would also be nice to have a 'Parent Directory' link in POD docs
+	  - ... for now it suffices
+	* perl documentation hacks
+
+v0.01 2009-04-30  moocow
+	* documented, documented, documented
+	* added symlink examples -> ../dta-tokwrap-examples
+	* removed examples/ subdirectory (no data in svn)
+
+v0.01 2009-04-28  moocow
+	* documentation
+	* distcheck fixes
+	* more build stuff
+	* more build-related prep-work
+	* removed Makefile (now generated by automake)
+	* renamed dataflow/ subdir to dot/; got autotools build working
+
+v0.0.1 2009-04-27  moocow
+	* added c proglet dtatw-txml2wxml
+	* added 'arc' rule
+	* updated test/Makefile: TODO: remove all but top-level batch-processing targets
+	* removed old/ subdirectory
+	* removed old mkindex-c/ subdirectory
+	* updated Makefile to use new ../DTA-TokWrap/dta-tokwrap.perl syntax
+	* removed extraneous scripts
+	* got non-pseudo-make API working in DTA::TokWrap::Document, dta-tokwrap.perl
+	* moved document pseudo-'make' stuff to DTA::TokWrap::Document::Maker
+
+v0.0.1 2009-04-24  moocow
+	* added scripts/dtatw-txml2tt.xsl
+	* got DTA::TokWrap profiling output working
+
+v0.0.1 2009-04-23  moocow
+	* moved Process -> Processor
+	* moved Processor -> Process
+	* moved Generator -> Processor
+	* re-created lost [A-Z]*.pm files (urgh)
+	* moved generator modules to 'Generator' dir
+
+v0.0.1 2009-04-21  moocow
+	* DTA::TokWrap: got tt->xml and standoff generation working
+	* updated dataflow.dot (added pretty colors)
+	* got DTA::tokenize::dummy working
+	* added, tested DTA::TokWrap::mkbx
+
+v0.0.1 2009-04-17  moocow
+	* removed dtatw-cxb2csv.perl : works (NUL-terminated strings), but too much pain for too little gain
+	* removed dtatw-mkindex-bin : works, but too much pain for too little gain
+
+v0.0.1 2009-04-16  moocow
+	* added kraepelin_arzneimittel_1892.chr.xml
+	* added configure.ac & co
+	* added test/ directory and basic xml formatting rules
+	* began source re-factorization
+	* re-worked raw examples
+	* added doc/dataflow.dot
+	* removed old, slow dta-tokenize-dummy.perl
+	* removed stale dta-tokwrap-standoff.perl: replaced by dta-tokwrap-ttxml2*.xsl
+
+2009-04-14  moocow
+	* renamed to 'mkindex' (again: keep it this time)
+	* renamed: dta-tokwrap-mkindex.c -> dta-tokwrap->textindex.c
+	* changed my mind: *do* write raw text and offsets from 'mkindex' script; we'll need some additional block-shoveling in
+	  serialization, but it's easier to do that on the already extracted data
+	  - file: dta-tokwrap-mkindex.c
+
+2009-03-31  moocow
+	* moved charlist-add-blocks.perl to 'dta-tokwrap-lsblock.perl'
+	* 2 block-indexing implementations:
+	  - charlist2blocks.perl : create a separate small block index
+	  - charlist-add-blocks.perl : add '$BLOCK$' records to index file produced by dta-tokwrap-lschars
+	  - prefer this one: enables a clean pipeline
+	* added some comments & format documentation to output
+	* renamed dta-tokwrap-mkindex.c to dta-tokwrap-lschars.c
+	* list all elements in 'mkindex'

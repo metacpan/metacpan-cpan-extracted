@@ -1,0 +1,350 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Constants">Constants</a></li>
+      <li><a href="#Utils:-external-programs">Utils: external programs</a></li>
+      <li><a href="#Utils:-XML::LibXML">Utils: XML::LibXML</a></li>
+      <li><a href="#Utils:-XML::LibXSLT">Utils: XML::LibXSLT</a></li>
+      <li><a href="#Utils:-I-O:-slurp">Utils: I/O: slurp</a></li>
+      <li><a href="#Utils:-Files">Utils: Files</a></li>
+      <li><a href="#Utils:-Time">Utils: Time</a></li>
+      <li><a href="#Utils:-SI">Utils: SI</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SEE-ALSO1">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DTA::TokWrap::Utils - DTA tokenizer wrappers: generic utilities</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> use DTA::TokWrap::Utils qw(:files :slurp :progs :libxml :libxslt :time :si);
+ 
+ ##========================================================================
+ ## Utils: external programs
+ 
+ $progpath_or_undef = path_prog($progname,%opts);
+ $exitval = runcmd(@cmd);
+ 
+ ##========================================================================
+ ## Utils: XML::LibXML
+ 
+ $parser = libxml_parser(%opts);
+ 
+ ##========================================================================
+ ## Utils: XML::LibXSLT
+ 
+ $xslt = xsl_xslt();
+ $stylesheet = xsl_stylesheet(file=&gt;$xsl_file);
+ 
+ ##========================================================================
+ ## Utils: I/O: slurp
+ 
+ \$txtbuf = slurp_file($filename_or_fh);
+ 
+ ##========================================================================
+ ## Utils: Files
+ 
+ $mtime_in_floating_seconds = file_mtime($filename_or_fh);
+ $bool = file_is_newer($dstFile, \@depFiles, $requireMissingDeps);
+ $bool = file_try_open($filename);
+ $abs_path_to_file = abs_path($file);
+ $bool = str2file($string,$filename_or_fh,\%opts);
+ $bool = ref2file($stringRef,$filename_or_fh,\%opts);
+ 
+ ##========================================================================
+ ## Utils: Time
+ 
+ $stamp = timestamp();
+ 
+ ##========================================================================
+ ## Utils: SI
+ 
+ $si_str = sistr($val, $printfFormatChar, $printfFormatPrecision);</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>DTA::TokWrap::Utils provides diverse assorted miscellaneous utilities which don&#39;t fit well anywhere else and which don&#39;t on their own justify the creation of a new package.</p>
+
+<h2 id="Constants">Constants</h2>
+
+<dl>
+
+<dt id="ISA">@ISA</dt>
+<dd>
+
+<p>DTA::TokWrap::Utils inherits from <a>DTA::TokWrap::Logger</a>.</p>
+
+</dd>
+<dt id="TRACE_RUNCMD">$TRACE_RUNCMD</dt>
+<dd>
+
+<p>Log-level for tracing runcmd() calls. Default=&#39;trace&#39;. See <a>DTA::TokWrap::Logger</a> for details.</p>
+
+<p>Exported under the <code>:progs</code> tag.</p>
+
+</dd>
+</dl>
+
+<h2 id="Utils:-external-programs">Utils: external programs</h2>
+
+<p>The following are exported under the <code>:progs</code> tag:</p>
+
+<dl>
+
+<dt id="path_prog">path_prog</dt>
+<dd>
+
+<pre><code> $progpath_or_undef = DTA::TokWrap::Utils::path_prog($progname,%opts);</code></pre>
+
+<p>Attempt to find an executable program $progname in $ENV{PATH}.</p>
+
+<p>Known %opts:</p>
+
+<pre><code> prepend =&gt; \@paths,  ##-- prepend @paths to Env::Path-&gt;PATH-&gt;List
+ append  =&gt; \@paths,  ##-- append @paths to Env::Path-&gt;PATH-&gt;List
+ warnsub =&gt; \&amp;sub,    ##-- warn subroutine if program not found (undef for no warnings)</code></pre>
+
+</dd>
+<dt id="runcmd">runcmd</dt>
+<dd>
+
+<pre><code> $exitval = DTA::TokWrap::Utils::runcmd(@cmd);</code></pre>
+
+<p>Just a wrapper for system() with optional logging via <a>DTA::TokWrap::Logger</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Utils:-XML::LibXML">Utils: XML::LibXML</h2>
+
+<p>The following are exported by the <code>:libxml</code> tag:</p>
+
+<dl>
+
+<dt id="Variable:-LIBXML_PARSERS">Variable: %LIBXML_PARSERS</dt>
+<dd>
+
+<p>%LIBXML_PARSERS</p>
+
+<p>XML::LibXML parsers, keyed by parser attribute strings (see libxml_parser())</p>
+
+</dd>
+<dt id="libxml_parser">libxml_parser</dt>
+<dd>
+
+<pre><code> $parser = libxml_parser(%opts);</code></pre>
+
+<p>Known %opts (see <a>XML::LibXML(3pm)</a> for details):</p>
+
+<pre><code> line_numbers    =&gt; $bool,  ##-- default: 1
+ load_ext_dtd    =&gt; $bool,  ##-- default: 0
+ validation      =&gt; $bool,  ##-- default: 0
+ keep_blanks     =&gt; $bool,  ##-- default: 1
+ expand_entities =&gt; $bool,  ##-- default: 1
+ recover         =&gt; $bool,  ##-- default: 1</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="Utils:-XML::LibXSLT">Utils: XML::LibXSLT</h2>
+
+<p>The following are exported by the <code>:libxslt</code> tag:</p>
+
+<dl>
+
+<dt id="Variable:-XSLT">Variable: $XSLT</dt>
+<dd>
+
+<p>Package-global shared XML::LibXSLT object (or undef)</p>
+
+</dd>
+<dt id="xsl_xslt">xsl_xslt</dt>
+<dd>
+
+<pre><code> $xslt = DTA::TokWrap::Utils::xsl_xslt();</code></pre>
+
+<p>Returns XML::LibXSLT object ($XSLT).</p>
+
+</dd>
+<dt id="xsl_stylesheet">xsl_stylesheet</dt>
+<dd>
+
+<pre><code> $stylesheet = DTA::TokWrap::Utils::xsl_stylesheet(file=&gt;$xsl_file);
+ $stylesheet = DTA::TokWrap::Utils::xsl_stylesheet(fh=&gt;$xsl_fh)
+ $stylesheet = DTA::TokWrap::Utils::xsl_stylesheet(doc=&gt;$xsl_doc)
+ $stylesheet = DTA::TokWrap::Utils::xsl_stylesheet(string=&gt;$xsl_string)</code></pre>
+
+<p>Compile an XSL stylesheet from specified source.</p>
+
+</dd>
+</dl>
+
+<h2 id="Utils:-I-O:-slurp">Utils: I/O: slurp</h2>
+
+<p>The following are exported by the <code>:slurp</code> tag:</p>
+
+<dl>
+
+<dt id="slurp_file">slurp_file</dt>
+<dd>
+
+<pre><code> \$txtbuf = DTA::TokWrap::Utils::slurp_file($filename_or_fh);
+ \$txtbuf = DTA::TokWrap::Utils::slurp_file($filename_or_fh,\$txtbuf)</code></pre>
+
+<p>Slurp an entire file into a string.</p>
+
+</dd>
+</dl>
+
+<h2 id="Utils:-Files">Utils: Files</h2>
+
+<p>The following are exported by the <code>:files</code> tag:</p>
+
+<dl>
+
+<dt id="file_mtime">file_mtime</dt>
+<dd>
+
+<pre><code> $mtime_in_floating_seconds = file_mtime($filename_or_fh);</code></pre>
+
+<p>Get file modification time. De-references symlinks. Uses Time::HiRes::stat() if available, otherwise perl core function stat().</p>
+
+</dd>
+<dt id="file_is_newer">file_is_newer</dt>
+<dd>
+
+<pre><code> $bool = DTA::TokWrap::Utils::file_is_newer($dstFile, \@depFiles, $requireMissingDeps);</code></pre>
+
+<p>Returns true if $dstFile is newer than all existing @depFiles. If $requireMissingDeps is true, non-existent @depFiles will cause this function to return false.</p>
+
+</dd>
+<dt id="file_try_open">file_try_open</dt>
+<dd>
+
+<pre><code> $bool = file_try_open($filename);</code></pre>
+
+<p>Tries to open() $filename; returns true if successful, otherwise populates $! with the relevant OS error message.</p>
+
+</dd>
+<dt id="abs_path">abs_path</dt>
+<dd>
+
+<pre><code> $abs_path_to_file = abs_path($file);</code></pre>
+
+<p>Get absolute path for a file or directory. De-references symlinks.</p>
+
+<p>Imported from the <code>Cwd</code> module.</p>
+
+</dd>
+<dt id="str2file">str2file</dt>
+<dd>
+
+<pre><code> $bool = str2file($string,$filename_or_fh,\%opts);</code></pre>
+
+<p>Dumps a string $string to a file $filename_or_fh. Opposite of <a>slurp_file</a>().</p>
+
+<p>%opts: see <a>ref2file</a>().</p>
+
+</dd>
+<dt id="ref2file">ref2file</dt>
+<dd>
+
+<pre><code> $bool = ref2file($stringRef,$filename_or_fh,\%opts);</code></pre>
+
+<p>Dumps $$stringRef to $filename_or_fh. Opposite of <a>slurp_file</a>().</p>
+
+<p>%opts:</p>
+
+<pre><code> binmode =&gt; $layer,  ##-- binmode layer (e.g. &#39;:raw&#39;) for $filename_or_fh? (default=none)</code></pre>
+
+</dd>
+</dl>
+
+<p>The following are exported by the <code>:time</code> tag:</p>
+
+<h2 id="Utils:-Time">Utils: Time</h2>
+
+<dl>
+
+<dt id="time">time</dt>
+<dd>
+
+<pre><code> $floating_seconds_since_epoch = PACAKGE::timestamp()</code></pre>
+
+<p>Just a wrapper for <a>Time::HiRes</a>::time().</p>
+
+</dd>
+</dl>
+
+<h2 id="Utils:-SI">Utils: SI</h2>
+
+<p>The following are exported by the <code>:si</code> tag:</p>
+
+<dl>
+
+<dt id="sistr">sistr</dt>
+<dd>
+
+<pre><code> $si_str = sistr($val, $printfFormatChar, $printfFormatPrecision);</code></pre>
+
+<p>Returns an SI string for numeric value $val.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="SEE-ALSO1">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2018 by Bryan Jurish</p>
+
+<p>This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.14.2 or, at your option, any later version of Perl 5 you may have available.</p>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>
+
+

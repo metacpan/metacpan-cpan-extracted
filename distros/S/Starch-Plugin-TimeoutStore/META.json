@@ -43,10 +43,11 @@
       "runtime" : {
          "requires" : {
             "Moo" : "2.000000",
-            "Starch" : "0.10",
+            "Starch" : "0.11",
             "Sys::SigAction" : "0.20",
             "Type::Tiny" : "1.000005",
             "namespace::clean" : "0.24",
+            "perl" : "5.010001",
             "strictures" : "2.000000"
          }
       },
@@ -59,7 +60,7 @@
    "provides" : {
       "Starch::Plugin::TimeoutStore" : {
          "file" : "lib/Starch/Plugin/TimeoutStore.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -73,7 +74,7 @@
          "web" : "https://github.com/bluefeet/Starch-Plugin-TimeoutStore"
       }
    },
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

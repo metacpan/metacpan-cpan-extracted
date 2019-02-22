@@ -1,0 +1,212 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Constants">Constants</a></li>
+      <li><a href="#Constructors-etc">Constructors etc.</a></li>
+      <li><a href="#Methods:-mkbx-bx0doc-txfile-bxdata">Methods: mkbx (bx0doc, txfile) =&gt; bxdata</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SEE-ALSO1">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DTA::TokWrap::Processor::mkbx - DTA tokenizer wrappers: (bx0doc,tx) -&gt; bxdata</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> use DTA::TokWrap::Processor::mkbx;
+ 
+ $mbx = DTA::TokWrap::Processor::mkbx-&gt;new(%opts);
+ $doc_or_undef = $mbx-&gt;mkbx($doc);</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>DTA::TokWrap::Processor::mkbx provides an object-oriented <a>DTA::TokWrap::Processor</a> wrapper for the creation of in-memory serialized text-block-indices.</p>
+
+<p>Most users should use the high-level <a>DTA::TokWrap</a> wrapper class instead of using this module directly.</p>
+
+<h2 id="Constants">Constants</h2>
+
+<dl>
+
+<dt id="ISA">@ISA</dt>
+<dd>
+
+<p>DTA::TokWrap::Processor::mkbx inherits from <a>DTA::TokWrap::Processor</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Constructors-etc">Constructors etc.</h2>
+
+<dl>
+
+<dt id="new">new</dt>
+<dd>
+
+<pre><code> $obj = $CLASS_OR_OBJECT-&gt;new(%args);</code></pre>
+
+<p>Constructor.</p>
+
+<p>%args, %$obj:</p>
+
+<pre><code> ##-- Block-sorting: hints
+ wbStr =&gt; $wbStr,                   ##-- word-break hint text
+ sbStr =&gt; $sbStr,                   ##-- sentence-break hint text
+ sortkey_attr =&gt; $attr,             ##-- sort-key attribute (default=&#39;dta.tw.key&#39;; should jive with mkbx0)
+ 
+ ##-- Block-sorting: low-level data
+ xp    =&gt; $xml_parser,              ##-- XML::Parser object for parsing $doc-&gt;{bx0doc}</code></pre>
+
+</dd>
+<dt id="defaults">defaults</dt>
+<dd>
+
+<pre><code> %defaults = CLASS-&gt;defaults();</code></pre>
+
+<p>Static class-dependent defaults.</p>
+
+</dd>
+<dt id="init">init</dt>
+<dd>
+
+<pre><code> $mbx = $mbx-&gt;init();</code></pre>
+
+<p>Dynamic object-dependent defaults.</p>
+
+</dd>
+<dt id="initXmlParser">initXmlParser</dt>
+<dd>
+
+<pre><code> $xp = $mbx-&gt;initXmlParser();</code></pre>
+
+<p>Create &amp; initialize $mbx-&gt;{xp}, an XML::Parser object used to parse $doc-&gt;{bx0data}.</p>
+
+</dd>
+</dl>
+
+<h2 id="Methods:-mkbx-bx0doc-txfile-bxdata">Methods: mkbx (bx0doc, txfile) =&gt; bxdata</h2>
+
+<dl>
+
+<dt id="mkbx">mkbx</dt>
+<dd>
+
+<pre><code> $doc_or_undef = $CLASS_OR_OBJECT-&gt;mkbx($doc);</code></pre>
+
+<p>Creates the serialized text-block-index $doc-&gt;{bxdata} for the <a>DTA::TokWrap::Document</a> object $doc.</p>
+
+<p>Relevant %$doc keys:</p>
+
+<pre><code> bx0doc  =&gt; $bx0doc,  ##-- (input) preliminary block-index data (XML::LibXML::Document)
+ txfile  =&gt; $txfile,  ##-- (input) raw text index filename
+ bxdata  =&gt; \@blocks, ##-- (output) serialized block index
+ ##
+ mkbx_stamp0 =&gt; $f,   ##-- (output) timestamp of operation begin
+ mkbx_stamp  =&gt; $f,   ##-- (output) timestamp of operation end
+ bxdata_stamp =&gt; $f,  ##-- (output) timestamp of operation end</code></pre>
+
+<p>Block data: @{$doc-&gt;{bxdata}} = @blocks = ($blk0, ..., $blkN); %$blk =</p>
+
+<pre><code> key    =&gt; $sortkey, ##-- (inherited) sort key
+ elt    =&gt; $eltname, ##-- element name which created this block
+ xoff   =&gt; $xoff,    ##-- XML byte offset where this block run begins
+ xlen   =&gt; $xlen,    ##-- XML byte length of this block (0 for hints)
+ toff   =&gt; $toff,    ##-- raw-text (.tx) byte offset where this block run begins
+ tlen   =&gt; $tlen,    ##-- raw-text (.tx) byte length of this block (0 for hints)
+ otext  =&gt; $otext,   ##-- output text (.txt) for this block
+ otoff  =&gt; $otoff,   ##-- output text (.txt) byte offset where this block run begins
+ otlen  =&gt; $otlen,   ##-- output text (.txt) length (bytes)</code></pre>
+
+</dd>
+<dt id="prune_empty_blocks">prune_empty_blocks</dt>
+<dd>
+
+<pre><code> \@blocks = $mbx-&gt;prune_empty_blocks(\@blocks);
+ \@blocks = $mbx-&gt;prune_empty_blocks();</code></pre>
+
+<p>Low-level utility.</p>
+
+<p>Removes empty &#39;c&#39;-type blocks from @blocks (default=$mbx-&gt;{blocks}).</p>
+
+</dd>
+<dt id="sort_blocks">sort_blocks</dt>
+<dd>
+
+<pre><code> \@blocks = $mbx-&gt;sort_blocks(\@blocks);</code></pre>
+
+<p>Low-level utility.</p>
+
+<p>Sorts \@blocks (default=$mbx-&gt;{blocks}) using $mb-&gt;{key2i}.</p>
+
+</dd>
+<dt id="compute_block_text">compute_block_text</dt>
+<dd>
+
+<pre><code> \@blocks = $mbx-&gt;compute_block_text(\@blocks, \$txbuf);
+ \@blocks = $mbx-&gt;compute_block_text(\@blocks);
+ \@blocks = $mbx-&gt;compute_block_text();</code></pre>
+
+<p>Low-level utility.</p>
+
+<p>Sets $blk-&gt;{otoff}, $blk-&gt;{otlen}, $blk-&gt;{otext} for each block $blk in @blocks (default=$mbx-&gt;{blocks}) by extracting raw-text (.tx) substrings from \$txbuf (default=$mbx-&gt;{txbufr}).</p>
+
+<p>\@blocks should already have been sorted before this method is called.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="SEE-ALSO1">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2018 by Bryan Jurish</p>
+
+<p>This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.14.2 or, at your option, any later version of Perl 5 you may have available.</p>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>
+
+

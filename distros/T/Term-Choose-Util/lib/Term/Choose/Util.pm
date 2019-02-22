@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.070';
+our $VERSION = '0.071';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -110,7 +110,7 @@ sub choose_dirs {
 sub _prepare_opt_choose_path {
     my ( $opt ) = @_;
     $opt = {} if ! defined $opt;
-    my $dir = encode( 'locale_fs', $opt->{dir} );
+    my $dir = encode( 'locale_fs', $opt->{dir} ); # documentation ###
     if ( defined $dir && ! -d $dir ) {
         my $prompt = "Could not find the directory \"$dir\". Falling back to the home directory.";
         choose( [ 'Press ENTER to continue' ], { prompt => $prompt, hide_cursor => $opt->{hide_cursor} } );
@@ -299,11 +299,16 @@ sub choose_a_number {
         $digits = 7;
     }
     $opt = {} if ! defined $opt;
+    #####
+    if ( ! defined $opt->{small_first} ) {          # 18.02.2019 # deprecated
+        $opt->{small_first} = $opt->{small_on_top};
+    }
+    #####
     my $info        = defined $opt->{info}         ? $opt->{info}         : '';
     my $prompt      = defined $opt->{prompt}       ? $opt->{prompt}       : '';
     my $name        =         $opt->{name};
     my $clear       = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
-    my $small       = defined $opt->{small_on_top} ? $opt->{small_on_top} : 0;
+    my $small       = defined $opt->{small_first}  ? $opt->{small_first}  : 0;
     my $thsd_sep    = defined $opt->{thsd_sep}     ? $opt->{thsd_sep}     : ',';
     my $mouse       = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
     my $back        = defined $opt->{back}         ? $opt->{back}         : '<<'; #'BACK';
@@ -410,26 +415,31 @@ sub choose_a_number {
 sub choose_a_subset {
     my ( $available, $opt ) = @_;
     $opt = {} if ! defined $opt;
-    my $info          = defined $opt->{info}           ? $opt->{info}           : '';
-    my $name          =         $opt->{name};
-    my $prompt        = defined $opt->{prompt}         ? $opt->{prompt}         : '';
-    my $fmt_chosen    = defined $opt->{fmt_chosen}     ? $opt->{fmt_chosen}     : 0;            #### deprecated
-    my $remove_chosen = defined $opt->{remove_chosen}  ? $opt->{remove_chosen}  : 1;
-    my $mark          =         $opt->{mark};
-    my $index         = defined $opt->{index}          ? $opt->{index}          : 0;
-    my $clear         = defined $opt->{clear_screen}   ? $opt->{clear_screen}   : 0;
-    my $mouse         = defined $opt->{mouse}          ? $opt->{mouse}          : 0;
-    my $layout        = defined $opt->{layout}         ? $opt->{layout}         : 3;
-    my $order         = defined $opt->{order}          ? $opt->{order}          : 1;
-    my $prefix        = defined $opt->{prefix}         ? $opt->{prefix}         : ( $layout == 3 ? '  ' : '' );
-    my $justify       = defined $opt->{justify}        ? $opt->{justify}        : 0;
-    my $confirm       = defined $opt->{confirm}        ? $opt->{confirm}        : ( ' ' x length $prefix ) . '-OK-';
-    my $back          = defined $opt->{back}           ? $opt->{back}           : ( ' ' x length $prefix ) . ' << ';
-    my $hide_cursor   = defined $opt->{hide_cursor}    ? $opt->{hide_cursor}    : 1;
-
-    my $list_begin    = defined $opt->{sofar_begin}     ? $opt->{sofar_begin}     : '';
-    my $list_sep      = defined $opt->{sofar_separator} ? $opt->{sofar_separator} : ', ';
-    my $list_end      = defined $opt->{sofar_end}       ? $opt->{sofar_end}       : '';
+    #####
+    if ( ! defined $opt->{keep_chosen} && defined $opt->{remove_chosen} ) { # 18.02.2019 # deprecated
+        $opt->{keep_chosen} = $opt->{remove_chosen} ? 0 : 1;
+    }
+    #####
+    my $info        = defined $opt->{info}            ? $opt->{info}            : '';
+    my $name        =         $opt->{name};
+    my $prompt      = defined $opt->{prompt}          ? $opt->{prompt}          : '';
+    my $fmt_chosen  = defined $opt->{fmt_chosen}      ? $opt->{fmt_chosen}      : 0;            # 29.01.2109 # deprecated
+    my $keep_chosen = defined $opt->{keep_chosen}     ? $opt->{keep_chosen}     : 0;
+    my $mark        =         $opt->{mark};
+    my $index       = defined $opt->{index}           ? $opt->{index}           : 0;
+    my $clear       = defined $opt->{clear_screen}    ? $opt->{clear_screen}    : 0;
+    my $mouse       = defined $opt->{mouse}           ? $opt->{mouse}           : 0;
+    my $layout      = defined $opt->{layout}          ? $opt->{layout}          : 3;
+    my $order       = defined $opt->{order}           ? $opt->{order}           : 1;
+    my $prefix      = defined $opt->{prefix}          ? $opt->{prefix}          : ( $layout == 3 ? '  ' : '' );
+    my $justify     = defined $opt->{justify}         ? $opt->{justify}         : 0;
+    my $confirm     = defined $opt->{confirm}         ? $opt->{confirm}         : ( ' ' x length $prefix ) . '-OK-';
+    my $back        = defined $opt->{back}            ? $opt->{back}            : ( ' ' x length $prefix ) . ' << ';
+    my $hide_cursor = defined $opt->{hide_cursor}     ? $opt->{hide_cursor}     : 1;
+    my $default_all = defined $opt->{all_by_default}  ? $opt->{all_by_default}  : 1; # documentation
+    my $list_begin  = defined $opt->{sofar_begin}     ? $opt->{sofar_begin}     : '';
+    my $list_sep    = defined $opt->{sofar_separator} ? $opt->{sofar_separator} : ', ';
+    my $list_end    = defined $opt->{sofar_end}       ? $opt->{sofar_end}       : '';
     #--------------------------------------#
     #my $subseq_tab = 4;
     #my $subseq_tab = print_columns( $name || '  ' );
@@ -439,21 +449,34 @@ sub choose_a_subset {
 
     while ( 1 ) {
         my @tmp;
-        if ( defined $opt->{sofar_begin} || defined $opt->{sofar_separator} || defined $opt->{sofar_end} ) {                        ####
+        if ( defined $opt->{sofar_begin} || defined $opt->{sofar_separator} || defined $opt->{sofar_end} ) {                  ####
             my $sofar = $name;
-            $sofar .= $list_begin . join( $list_sep, @{$available}[@$new_idx] ) . $list_end if @{$available}[@$new_idx];
+            #if ( @{$available}[@$new_idx] ) {
+            if ( @$new_idx ) {
+                $sofar .= $list_begin . join( $list_sep, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] ) . $list_end;
+            }
+            elsif ( $opt->{all_by_default} ) {
+                $sofar .= $list_begin . '*' . $list_end;
+            }
             @tmp = ( $sofar );
-        }                                                                                                                           ####    29.01.2109
-        else {                                                                                                                      ####
-            if ( $fmt_chosen == 0 ) {                                                                                               ####    remove lines marked with ####
-                $name = '> ' if ! defined $name;                                                                                    ####
-                push @tmp,  $name . join( $list_sep, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] );                       ####    remove fmt_chosen in the documentation
-            }                                                                                                                       ####
-            else {                                                                                                                  ####
-                push @tmp, $name if defined $name;                                                                                  ####
-                push @tmp, join( "\n", map { ( ' ' x length $prefix ) . ( defined $_ ? $_ : '' ) } @{$available}[@$new_idx] ) if @{$available}[@$new_idx]; ####
-            }                                                                                                                       ####
-        }                                                                                                                           ####
+        }                                                                                                                      ####    29.01.2109
+        else {                                                                                                                 ####
+            my @info_list;                                                                                                     ####
+            if ( @$new_idx ) {                                                                                                 ####
+                @info_list = @{$available}[@$new_idx];                                                                         ####
+            }                                                                                                                  ####
+            elsif ( $opt->{all_by_default} ) {                                                                                 ####
+                @info_list = ( '*' );                                                                                          ####
+            }                                                                                                                  ####
+            if ( $fmt_chosen == 0 ) {                                                                                          ####    remove lines marked with ####
+                $name = '> ' if ! defined $name;                                                                               ####
+                push @tmp,  $name . join( $list_sep, map { defined $_ ? $_ : '' } @info_list );                                ####    remove fmt_chosen in the documentation
+            }                                                                                                                  ####
+            else {                                                                                                             ####
+                push @tmp, $name if defined $name;                                                                             ####
+                push @tmp, join( "\n", map { ( ' ' x length $prefix ) . ( defined $_ ? $_ : '' ) } @info_list ) if @info_list; ####
+            }                                                                                                                  ####
+        }                                                                                                                      ####
         if ( length $prompt ) {
             push @tmp, $prompt;
         }
@@ -482,7 +505,7 @@ sub choose_a_subset {
         my @tmp_idx;
         for my $i ( reverse @idx ) {
             $i -= @pre;
-            if ( $remove_chosen ) {
+            if ( ! $keep_chosen ) {
                 splice( @$curr_avail, $i, 1 );
                 for my $used_i ( sort { $a <=> $b } @$new_idx ) {
                     last if $used_i > $i;
@@ -493,6 +516,9 @@ sub choose_a_subset {
         }
         push @$new_idx, reverse @tmp_idx;
         if ( $ok ) {
+            if ( ! @$new_idx && $opt->{all_by_default} ) {
+                $new_idx = [ 0 .. $#{$available} ];
+            }
             return $index ? $new_idx : [ @{$available}[@$new_idx] ];
         }
     }
@@ -700,7 +726,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.070
+Version 0.071
 
 =cut
 
@@ -917,7 +943,13 @@ Default: "> ";
 
 =item
 
-small_on_top
+small_on_top DEPRECATED
+
+Renamed to I<small_first>.
+
+=item
+
+small_first
 
 Put the small number ranges on top.
 
@@ -970,6 +1002,14 @@ Values: [0],1,2.
 
 =item
 
+keep_chosen
+
+If enabled, the chosen items are not removed from the available choices.
+
+Values: [0],1;
+
+=item
+
 layout
 
 See the option I<layout> in L<Term::Choose>.
@@ -1010,7 +1050,9 @@ The default value is "  " if the I<layout> is 3 else the default is the empty st
 
 =item
 
-remove_chosen
+remove_chosen DEPRECATED
+
+Use I<keep_chosen> instead.
 
 If enabled, the chosen items are remove from the available choices.
 

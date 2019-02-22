@@ -3,12 +3,11 @@ use GQLTest;
 
 my $JSON = JSON::MaybeXS->new->allow_nonref->canonical;
 
-BEGIN {
-  use_ok( 'GraphQL::Schema' ) || print "Bail out!\n";
-  use_ok( 'GraphQL::Execution', qw(execute) ) || print "Bail out!\n";
-  use_ok( 'GraphQL::Type::Scalar', qw($String) ) || print "Bail out!\n";
-  use_ok( 'GraphQL::Type::Object' ) || print "Bail out!\n";
-}
+use GraphQL::Schema;
+use GraphQL::Execution qw(execute);
+use GraphQL::Type::Scalar qw($String $Boolean);
+use GraphQL::Type::Object;
+use GraphQL::Type::Interface;
 
 subtest 'DateTime->now as resolve' => sub {
   require DateTime;
@@ -165,13 +164,15 @@ EOF
 };
 
 subtest 'list in query params' => sub {
+  my $stringlist = GraphQL::Type::List->new(of => $String);
+  is $stringlist->is_valid([ 'string' ]), 1, 'is_valid works';
   my $schema = GraphQL::Schema->new(
     query => GraphQL::Type::Object->new(
       name => 'Query',
       fields => {
         hello => {
           type => $String,
-          args => { arg => { type => GraphQL::Type::List->new(of => $String) } }
+          args => { arg => { type => $stringlist } }
         },
       }
     ),
@@ -234,6 +235,89 @@ subtest 'errors on incorrect query input', sub {
       path => ['fieldWithObjectInput'],
     } ] },
   );
+};
+
+subtest 'test _debug', sub {
+  require GraphQL::Debug;
+  my @diags;
+  {
+    local *Test::More::diag = sub { push @diags, @_ };
+    GraphQL::Debug::_debug('message', +{ key => 1 });
+  }
+  is_deeply \@diags, ['message: ', <<EOF], 'debug output correct' or diag explain \@diags;
+{
+  'key' => 1
+}
+EOF
+};
+
+subtest 'test String.is_valid' => sub {
+  is $String->is_valid('string'), 1, 'is_valid works';
+};
+
+subtest 'test Scalar methods' => sub {
+  my $scalar = GraphQL::Type::Scalar->from_ast({}, { name => 's', description => 'd' });
+  throws_ok { $scalar->serialize->('string') } qr{Fake}, 'fake serialize';
+  throws_ok { $scalar->parse_value->('string') } qr{Fake}, 'fake parse_value';
+  is $scalar->to_doc, qq{"d"\nscalar s\n}, 'to_doc';
+  is $Boolean->serialize->(1), 1, 'Boolean serialize';
+  is $Boolean->parse_value->(1), 1, 'Boolean parse_value';
+};
+
+subtest 'exercise __type root field more'=> sub {
+  my $TestType = GraphQL::Type::Object->new(
+    name => 'TestType',
+    fields => {
+      testField => {
+        type => $String,
+      }
+    }
+  );
+  my $abstract = GraphQL::Type::Interface->new(
+    name => 'i',
+    fields => {
+      testField => {
+        type => $String,
+      }
+    }
+  );
+
+  my $schema = GraphQL::Schema->new(query => $TestType, types => [$abstract]);
+  my $request = <<'EOQ';
+{
+  __type(name: "TestType") {
+    name
+    kind
+    fields {
+      name
+    }
+    interfaces
+  }
+  i: __type(name: "i") {
+    name
+    possibleTypes
+  }
+}
+EOQ
+
+  run_test([$schema, $request], {
+    data => {
+      __type => {
+        fields => [
+          {
+            name => 'testField'
+          },
+        ],
+        interfaces => [],
+        kind => 'OBJECT',
+        name => 'TestType',
+      },
+      i => {
+        name => 'i',
+        possibleTypes => [],
+      }
+    }
+  });
 };
 
 done_testing;

@@ -2,31 +2,32 @@
 abstract: 'Plugin for Module::Build to compile Fortran C<.f> files'
 author:
   - 'Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>'
-build_requires: {}
+build_requires:
+  IPC::Cmd: '0'
+  List::MoreUtils: '0'
+  Path::Class: '0'
+  Test::More: '0.87'
 configure_requires:
-  Module::Build: 0.4005
+  Module::Build: '0.4005'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132510'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Module-Build-Pluggable-Fortran
 provides:
   Module::Build::Pluggable::Fortran:
     file: lib/Module/Build/Pluggable/Fortran.pm
-    version: 0.26
+    version: '0.27'
 requires:
-  ExtUtils::F77: 0
-  Module::Build::Pluggable::Base: 0
-  perl: 5.008
+  ExtUtils::F77: '0'
+  Module::Build::Pluggable::Base: '0'
+  Text::ParseWords: '0'
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/mvgrimes/mb-pluggable-fortran/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/mvgrimes/mb-pluggable-fortran
-version: 0.26
-x_test_requires:
-  IPC::Cmd: 0
-  List::MoreUtils: 0
-  Path::Class: 0
-  Test::More: 0.87
+version: '0.27'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

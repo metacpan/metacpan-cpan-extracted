@@ -3,7 +3,7 @@ NAME
     combination of header and rows.
 
 VERSION
-    Version 1.0.1 (The versioning is conform with <https://semver.org/>.)
+    Version 1.0.2 (The versioning is conform with <https://semver.org/>.)
 
 SYNOPSIS
       use Term::Table2;

@@ -1,0 +1,102 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#OPTIONS-AND-ARGUMENTS">OPTIONS AND ARGUMENTS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>dtatw-cids2local.perl - convert //c/@xml:id attributes to page-local encoding</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> dtatw-cids2local.perl [OPTIONS] [XMLFILE(s)...]
+
+ Options:
+  -help                  # this help message
+  -output FILE           # specify output file (default=&#39;-&#39; (STDOUT))
+  -trace  TRACEFILE      # send trace output to file (default=none)
+  -xmlns , -noxmlns      # do/don&#39;t prepend &#39;xml:&#39; to output id attributes (default=don&#39;t)</code></pre>
+
+<h1 id="OPTIONS-AND-ARGUMENTS">OPTIONS AND ARGUMENTS</h1>
+
+<p>Not yet written.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Converts <code>//c/@xml:id</code> attributes to page-local encoding.</p>
+
+<p>New IDs are computed page-locally, where the page element associated with each <code>//c</code> is given by the XPath <code>preceding::pb[1]</code>, abbreviated hereafter as $pb. The associated $pb supplies a (unique) prefix <code>$pbid</code> to all //c elements on the given page. The prefix is determined according to the following rules:</p>
+
+<ol>
+
+<li><p>If $pb has a @facs attribute, it is used to define $pbid by removing any prefix matching the regex <code>/#?f?0*/</code> and prefixing a &quot;p&quot;, e.g. the following //pb elements all map to $pbid=&quot;p42&quot;:</p>
+
+<pre><code>  &lt;pb facs=&quot;42&quot;/&gt;
+  &lt;pb facs=&quot;#42&quot;/&gt;
+  &lt;pb facs=&quot;#f0042&quot;/&gt;
+  &lt;pb facs=&quot;f00042&quot;/&gt;
+  &lt;pb facs=&quot;000042&quot;/&gt;</code></pre>
+
+</li>
+<li><p>Otherwise, a global counter over all //pb elements is used (whose value is initialized to &quot;0&quot; (zero) before the initial //pb), prefixed by &quot;pz&quot;.</p>
+
+<pre><code>                  &lt;!-- before first page: $pbid=&quot;pz0&quot; --&gt;
+  &lt;pb /&gt;          &lt;!-- first page, no @facs: $pbid=&quot;pz1&quot; --&gt;
+  &lt;pb /&gt;          &lt;!-- second page, no @facs: $pbid=&quot;pz2&quot; --&gt;
+  &lt;pb facs=&quot;42&quot;/&gt; &lt;!-- third page, with @facs: $pbid=&quot;p42&quot; --&gt;
+  &lt;pb /&gt;          &lt;!-- fourth page: $pbid=&quot;pz4&quot; --&gt;</code></pre>
+
+</li>
+</ol>
+
+<p>Finally, //c/@xml:id attributes are computed by a page-local counter <code>$ci</code>, to be of the form <code>${pbid}.c${ci}</code>, e.g.:</p>
+
+<pre><code>  &lt;!-- before first page --&gt;
+  &lt;c xml:id=&quot;pz0.c1&quot;/&gt;
+  &lt;c xml:id=&quot;pz0.c2&quot;/&gt;
+  &lt;!-- ... --&gt;
+
+  &lt;!-- first page, with @facs --&gt;
+  &lt;pb facs=&quot;#f0042&quot;/&gt;
+  &lt;c xml:id=&quot;p42.c1&quot;/&gt;
+  &lt;c xml:id=&quot;p42.c2&quot;/&gt;
+  &lt;!-- ... --&gt;
+
+  &lt;!-- second page, no @facs --&gt;
+  &lt;pb/&gt;
+  &lt;c xml:id=&quot;pz2.c1&quot;/&gt;
+  &lt;c xml:id=&quot;pz2.c2&quot;/&gt;
+  &lt;!-- ... --&gt;</code></pre>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="./dta-tokwrap.perl.html">dta-tokwrap.perl(1)</a>, <a href="./dtatw-add-c.perl.html">dtatw-add-c.perl(1)</a>, <a>dtatw-rm-c.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+
+</body>
+
+</html>
+
+

@@ -4,8 +4,9 @@ package Module::Build::Pluggable::Fortran;
 
 use strict;
 use warnings;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 use parent qw{Module::Build::Pluggable::Base};
+use Text::ParseWords qw(shellwords);
 
 BEGIN {
     eval "use ExtUtils::F77";
@@ -32,7 +33,7 @@ sub HOOK_configure {
     $self->build_requires( 'ExtUtils::F77'      => 0 );
     $self->build_requires( 'ExtUtils::CBuilder' => '0.23' );
 
-    my @runtime = split / /, ExtUtils::F77->runtime;
+    my @runtime = shellwords(ExtUtils::F77->runtime);
     $self->_add_extra_linker_flags( @runtime, @{ $self->_fortran_obj_files } );
 
     $self->builder->add_to_cleanup('f77_underscore');
@@ -120,7 +121,7 @@ Module::Build::Pluggable::Fortran - Plugin for Module::Build to compile Fortran 
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -194,7 +195,7 @@ Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
+This software is copyright (c) 2019 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

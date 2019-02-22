@@ -110,23 +110,24 @@ sub insert_into_args_info_format {
     }
     $begin--;
     $end--;
+    my $list_sep = ', ';
     my $last_i = $#{$sql->{insert_into_args}};
     my $tmp = [];
-    if ( @{$sql->{insert_into_args}} > $max + 2 ) { # 3
+    if ( @{$sql->{insert_into_args}} > $max + 3 ) {
         for my $row ( @{$sql->{insert_into_args}}[ 0 .. $begin ] ) {
-            push @$tmp, $indent . join ', ', map { defined $_ ? $_ : '' } @$row;
+            push @$tmp, $indent . join $list_sep, map { defined $_ ? $_ : '' } @$row;
         }
         push @$tmp, $indent . '...';
-        #push @$tmp, $indent . '...';
+        push @$tmp, $indent . '...';
         for my $row ( @{$sql->{insert_into_args}}[ $last_i - $end .. $last_i ] ) {
-            push @$tmp, $indent . join ', ', map { defined $_ ? $_ : '' } @$row;
+            push @$tmp, $indent . join $list_sep, map { defined $_ ? $_ : '' } @$row;
         }
         my $row_count = scalar( @{$sql->{insert_into_args}} );
         push @$tmp, $indent . '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]';
     }
     else {
         for my $row ( @{$sql->{insert_into_args}} ) {
-            push @$tmp, $indent . join ', ', map { defined $_ ? $_ : '' } @$row;
+            push @$tmp, $indent . join $list_sep, map { defined $_ ? $_ : '' } @$row;
         }
     }
     return $tmp;

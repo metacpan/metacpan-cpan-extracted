@@ -1,23 +1,9 @@
 Build.PL
 Changes
 lib/Module/Build/Pluggable/Fortran.pm
+LICENSE
 MANIFEST			This list of files
-t/01-simple.t
-t/var/_build/auto_features
-t/var/_build/build_params
-t/var/_build/cleanup
-t/var/_build/config_data
-t/var/_build/features
-t/var/_build/lib/MyModuleBuilder.pm
-t/var/_build/magicnum
-t/var/_build/notes
-t/var/_build/prereqs
-t/var/_build/runtime_params
-t/var/Build
-t/var/MANIFEST
-t/var/MYMETA.json
-t/var/MYMETA.yml
-t/var/src/test.f
-README
-META.yml
 META.json
+META.yml
+README
+t/01-simple.t

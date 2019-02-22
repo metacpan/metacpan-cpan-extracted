@@ -21,16 +21,19 @@ my %WriteMakefileArgs = (
     "File::UserConfig" => 0,
     "Spreadsheet::Read" => "0.68",
     "Storable" => 0,
+    "base" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Copy" => 0,
+    "Log::Log4perl::Shortcuts" => 0,
     "Spreadsheet::Read" => "0.68",
     "Test::More" => 0,
     "Test::Most" => 0,
     "Text::CSV_PP" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,14 +41,17 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "File::Copy" => 0,
   "File::Signature" => 0,
   "File::Spec" => 0,
   "File::UserConfig" => 0,
+  "Log::Log4perl::Shortcuts" => 0,
   "Spreadsheet::Read" => "0.68",
   "Storable" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
   "Text::CSV_PP" => 0,
+  "base" => 0,
   "strict" => 0,
   "warnings" => 0
 );

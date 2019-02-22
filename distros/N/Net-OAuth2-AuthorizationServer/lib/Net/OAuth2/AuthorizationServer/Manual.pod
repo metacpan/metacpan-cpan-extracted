@@ -110,7 +110,7 @@ These are the callbacks necessary to use the grant modules in a more realistic
 way, and are required to make the auth code, access token, refresh token, etc
 available across several processes and persistent.
 
-The should be passed to the grant module constructor, each should be a reference
+They should be passed to the grant module constructor, each should be a reference
 to a subroutine:
 
   my $Grant = Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant->new(
@@ -137,7 +137,7 @@ and an array reference of scopes requested by the client.
 
 The callback should return a list with three elements. The first element is 1 if
 access is allowed, 0 if access is not allowed, otherwise undef if the flow was
-interrupted (e.g. calling redirect in a controller). The second element element should
+interrupted (e.g. calling redirect in a controller). The second element should
 be the error message in the case of problems with the confirmation of the scopes. The
 third element should be an array reference of scopes as the user may choose to modify
 the list of requested scopes when confirming them.
@@ -372,7 +372,7 @@ access token and refresh tokens were requested by the Client by the use of an
 existing refresh token, which will be passed as the old refresh token variable.
 In this case you should use the old refresh token to find out the previous
 access token and revoke the previous access and refresh tokens (this is *not* a
-hard requirement according to the OAuth spec, but i would recommend it).
+hard requirement according to the OAuth spec, but I would recommend it).
 
 The callback does not need to return anything.
 
@@ -427,7 +427,7 @@ the verify_access_token callback for verification:
       $client = $client->{client_id};
     }
 
-    # if the client has en existing refresh token we need to revoke it
+    # if the client has an existing refresh token we need to revoke it
     $refresh_tokens->remove({ client_id => $client, user_id => $user_id });
 
     $access_tokens->insert({
@@ -457,7 +457,7 @@ Reference: L<http://tools.ietf.org/html/rfc6749#section-7>
 A callback to verify the access token. The args hash should contain the access
 token, an optional reference to a list of the scopes and if the access_token is
 actually a refresh token. Note that the access token could be the refresh token,
-as this method is also called when the Client uses the refresh token to get a
+as this method is also called when the client uses the refresh token to get a
 new access token (in which case the value of the $is_refresh_token variable will
 be true).
 
@@ -569,7 +569,7 @@ second element should be the error message in the case of bad credentials.
 =head1 PUTTING IT ALL TOGETHER
 
 Having defined the above callbacks, customized to your app/data store/etc, you
-can configuration the grant module. This example is using the for
+can configuration the grant module. This example is using the
 L<Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant>:
 
   my $Grant = Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant->new(

@@ -8,7 +8,7 @@ use Import::Into;
 
 # Pragmas
 use 5.020;
-use feature ":5.18";    # Use expressly so we can re-export it below
+use feature ":5.20";    # Use expressly so we can re-export it below
 use strict;
 use warnings;
 
@@ -49,7 +49,7 @@ sub import {
     XML::Axk::Base->export_to_level(1, @_);
 
     # Re-export pragmas
-    feature->import::into($target, qw(:5.18));
+    feature->import::into($target, qw(:5.20));
     foreach my $pragma (qw(strict warnings)) {
         ${pragma}->import::into($target);
     };

@@ -1,5 +1,21 @@
 Revision history for Win32-Backup-Robocopy
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
 
+v14 
+fixed warning on undefined value for the executable not present
+
+v13
+If no robocopy.exe is available in the system the build of the module will now fails.
+Possibility to specify an alternative executable path via ENV variable PERL_ROBOCOPY_EXE
+check for validity of the above
+check for bugged version of the executable
+
+
+v11
+added checks to robocopy versions
+Win32 dependency in build_requires
+inserted dumping infos if test 02-run.t fails
+
+v7
+first public release
+this release has all features I want to have, tested and documented

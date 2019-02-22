@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#OPTIONS-AND-ARGUMENTS">OPTIONS AND ARGUMENTS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>dtatw-txml2uxml.perl - DTA::TokWrap: convert .t.xml to enrichted .u.xml</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> dtaec-txml2uxml.perl [OPTIONS] [TXMLFILE]
+
+ General Options:
+  -help                  # this help message
+
+ Auxilliary Files Options:
+  -textfile TXTFILE      # .txt file for TXMLFILE://w/@b locations
+  -cpxfile  WPXFILE      # .cpx file for output //w/@pb locations
+  -wpxfile  WPXFILE      # .wpx file for output //w/@pb locations (overrides -cpxfile)
+  -cxfile   CXFILE       # .cx file for output char-spans //w/@cs (default: none (use heuristics))
+
+ Attribute Insertion Options:
+  -pb     , -nopb        # do/don&#39;t parse and output page break indices as //w/@pb (default=only if -wpxfile or -cpxfile is given)
+  -t0     , -not0        # do/don&#39;t output original text from TXTFILE as //w/@t0 (default=do)
+  -cruft  , -nocruft     # do/don&#39;t output unicruft approximations as //w/@u rsp //w/@u0 (default=do)
+  -chars  , -nochars     # do/don&#39;t output inter-token chars as //c (default=don&#39;t)
+  -spans  , -nospans     # do/don&#39;t compute //w/@cs from //w/@c (default=do)
+  -keep-c , -nokeep-c    # do/don&#39;t keep //w/@c if computing //w/@cs (default=don&#39;t)
+  -guess  , -noguess     # do/don&#39;t use heuristics for computing //w/@cs (default only if CXFILE not given)
+
+ Attribute Trimming Options:
+  -trim-t , -notrim-t    # do/don&#39;t trim redundant //w/(@t0,@u,@u0) attributes (default=don&#39;t)
+  -trim-x , -notrim-x    # do/don&#39;t compress //w/@xp using sentence-wide prefixes (default=do)
+  -trim   , -notrim      # set both -trim-t and -trim-x at the same time
+
+ I/O Options:
+  -ent    , -noent       # don&#39;t/do expand entities (default=don&#39;t (-ent))
+  -blanks , -noblanks    # do/don&#39;t keep &quot;ignorable&quot; input blanks (default=don&#39;t (-noblanks))
+  -ws     , -nows        # do/don&#39;t keep token-internal whitespace (default=don&#39;t (-nows))
+  -format , -noformat    # do/don&#39;t pretty-print output? (default=do (-format))
+  -output OUTFILE        # specify output file (default=&#39;-&#39; (STDOUT))</code></pre>
+
+<h1 id="OPTIONS-AND-ARGUMENTS">OPTIONS AND ARGUMENTS</h1>
+
+<p>Not yet written.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Not yet written.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+
+</body>
+
+</html>
+
+

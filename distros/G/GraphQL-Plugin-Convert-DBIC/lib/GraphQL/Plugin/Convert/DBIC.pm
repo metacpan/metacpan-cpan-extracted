@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use GraphQL::Schema;
 use GraphQL::Debug qw(_debug);
-use Lingua::EN::Inflect::Number qw(to_S);
+use Lingua::EN::Inflect::Number qw(to_S to_PL);
 use Carp qw(confess);
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %GRAPHQL_TYPE2SQLS = (
@@ -314,9 +314,20 @@ sub to_graphql {
         my $name = $_;
         my $type = $name2type{$name};
         my $pksearch_name = lcfirst $name;
+        my $pksearch_name_plural = to_PL($pksearch_name);
         my $input_search_name = "search$name";
         # TODO now only one deep, no handle fragments or abstract types
         $root_value{$pksearch_name} = sub {
+          my ($args, $content, $info) = @_;
+          my @subfieldrels = _subfieldrels($name, \%name2rel21, $info->{field_nodes});
+          DEBUG and _debug('DBIC.root_value', @subfieldrels);
+          $dbic_schema_cb->()->resultset($name)->find({
+            $_ => $args->{$_},
+          }, {
+            prefetch => \@subfieldrels,
+          });
+        };
+        $root_value{$pksearch_name_plural} = sub {
           my ($args, $context, $info) = @_;
           my @subfieldrels = _subfieldrels($name, \%name2rel21, $info->{field_nodes});
           DEBUG and _debug('DBIC.root_value', @subfieldrels);
@@ -345,19 +356,33 @@ sub to_graphql {
           ];
         };
         (
-          # the PKs query
-          keys %{ $name2pk21{$name} } ? ($pksearch_name => {
-            type => _apply_modifier('list', $name),
-            args => {
-              map {
-                $_ => {
-                  type => _apply_modifier('non_null', _apply_modifier('list',
-                    _apply_modifier('non_null', $type->{fields}{$_}{type})
-                  ))
-                }
-              } keys %{ $name2pk21{$name} }
+          keys %{ $name2pk21{$name} } ? (
+            # the PK (singular) query
+            $pksearch_name => {
+              type => $name,
+              args => {
+                map {
+                  $_ => {
+                    type =>
+                      _apply_modifier('non_null', $type->{fields}{$_}{type})
+                  }
+                } keys %{ $name2pk21{$name} }
+              },
             },
-          }) : (),
+            # the PKs query
+            $pksearch_name_plural => {
+              type => _apply_modifier('list', $name),
+              args => {
+                map {
+                  $_ => {
+                    type => _apply_modifier('non_null', _apply_modifier('list',
+                      _apply_modifier('non_null', $type->{fields}{$_}{type})
+                    ))
+                  }
+                } keys %{ $name2pk21{$name} }
+              },
+            },
+          ) : (),
           $input_search_name => {
             description => 'input to search',
             type => _apply_modifier('list', $name),

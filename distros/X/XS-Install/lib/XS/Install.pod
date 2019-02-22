@@ -149,6 +149,10 @@ parameters or not, SRCs are always added to them.
 If true, will use c++ to build current extension. Additionally, if > 1, will set -std=c++<CPLUS>
 With this flag set, wraps every XSUB function into try-catch block, catching C++ exceptions and rethrowing it as perl exceptions.
 Additionally, the default extension for XS files output becomes C<.cc> instead of C<.c>
+
+=item OPTIMIZE [-O2]
+
+Default is C<-O2>.
     
 =item postamble
 
@@ -195,12 +199,22 @@ module, which already provides all needed glue. To let C++ test work, there will
 
 	# t/some-file.t
 	XS::Loader::load_tests();
+	Test::Catch::run('[tag]');
 
 	# t/some-file.cc
 	#include <catch.hpp>
 	TEST_CASE("description", "[tag]") {
 		...
 	}
+	
+=item test/CCFLAGS
+
+Concatenated with C<CCFLAGS>, used when compiling test files.
+
+=item test/OPTIMIZE
+
+Concatenated with C<OPTIMIZE>, used when compiling test files. Default to <-O0> to decrease tests compilation time (performance of running
+tests are usually affected by C<-O0> not really much).
 
 =item MIN_PERL_VERSION [5.10.0]
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+use 5.008001;
 use strict;
 use warnings;
 use Test2::V0;
@@ -16,9 +17,6 @@ foreach my $type (qw( default override )) {
         [ 'test1', "/foo/bar/test1" ],
         [ '../test2', '/foo/bar/../test2' ],
         [ '/test3', '/test3' ],
-        [ path('test1'), '/foo/bar/test1' ],
-        [ path('../test2'), '/foo/bar/../test2' ],
-        [ path('/test3'), '/test3' ],
     );
 
     foreach my $test (@test_cases) {
@@ -31,10 +29,10 @@ foreach my $type (qw( default override )) {
         );
 
         my $actual = ($type eq 'default')
-                   ? $config->default_stem_path()
-                   : $config->override_stem_path();
+                   ? $config->_default_stem_path()
+                   : $config->_override_stem_path();
 
-        $expected = path( $expected )->absolute( $config->directory() );
+        $expected = path( $expected )->absolute( $config->_directory_path() );
 
         is(
             $actual . '',

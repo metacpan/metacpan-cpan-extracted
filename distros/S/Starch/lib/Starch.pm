@@ -1,11 +1,11 @@
 package Starch;
-
-$Starch::VERSION = '0.10';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.11';
 
 use Starch::Factory;
 use Moo::Object qw();
 
-use strictures 2;
 use namespace::clean;
 
 sub new {
@@ -264,7 +264,7 @@ Which will call C<get_config> on the C<My::Starch::Config> package and use its
 return value as the arguments for instantiating the Starch object.
 
 Method proxies are provided by L<MooX::MethodProxyArgs> and
-L<Config::MethodProxy>; check those for more details.
+L<Data::MethodProxy>; check those for more details.
 
 =head1 PERFORMANCE
 

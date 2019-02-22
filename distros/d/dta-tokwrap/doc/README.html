@@ -1,0 +1,544 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INSTALLATION">INSTALLATION</a>
+    <ul>
+      <li><a href="#Requirements">Requirements</a>
+        <ul>
+          <li><a href="#C-Libraries">C Libraries</a></li>
+          <li><a href="#Perl-Modules">Perl Modules</a></li>
+          <li><a href="#Development-Tools">Development Tools</a></li>
+        </ul>
+      </li>
+      <li><a href="#Building-from-SVN">Building from SVN</a></li>
+      <li><a href="#Building-from-Source">Building from Source</a></li>
+    </ul>
+  </li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#Input-Format">Input Format</a></li>
+      <li><a href="#Example:-Tokenizing-a-single-XML-file">Example: Tokenizing a single XML file</a></li>
+      <li><a href="#Example:-Tokenizing-multiple-XML-files">Example: Tokenizing multiple XML files</a></li>
+      <li><a href="#Example:-Tracing-execution-progess">Example: Tracing execution progess</a></li>
+      <li><a href="#Example:-From-TEI-to-TCF-and-Back">Example: From TEI to TCF and Back</a></li>
+    </ul>
+  </li>
+  <li><a href="#TOOLS">TOOLS</a>
+    <ul>
+      <li><a href="#Perl-Scripts-Programs">Perl Scripts &amp; Programs</a></li>
+      <li><a href="#GNU-make-build-system-template">GNU make build system template</a></li>
+      <li><a href="#Perl-Modules1">Perl Modules</a></li>
+      <li><a href="#XSL-stylesheets">XSL stylesheets</a></li>
+      <li><a href="#C-Programs">C Programs</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>README for dta-tokwrap - programs, scripts, and perl modules for DTA XML corpus tokenization</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This package contains various utilities for tokenization of DTA &quot;base-format&quot; XML documents. see <a href="#INSTALLATION">&quot;INSTALLATION&quot;</a> for requirements and installation instructions, see <a href="#USAGE">&quot;USAGE&quot;</a> for a brief introduction to the high-level command-line interface, and see <a href="#TOOLS">&quot;TOOLS&quot;</a> for an overview of the individual tools included in this distribution.</p>
+
+<h1 id="INSTALLATION">INSTALLATION</h1>
+
+<h2 id="Requirements">Requirements</h2>
+
+<h3 id="C-Libraries">C Libraries</h3>
+
+<dl>
+
+<dt id="expat">expat</dt>
+<dd>
+
+<p>tested version(s): 1.95.8, 2.0.1</p>
+
+</dd>
+<dt id="libxml2">libxml2</dt>
+<dd>
+
+<p>tested version(s): 2.7.3, 2.7.8</p>
+
+</dd>
+<dt id="libxslt">libxslt</dt>
+<dd>
+
+<p>tested version(s): 1.1.24, 1.1.26</p>
+
+</dd>
+</dl>
+
+<h3 id="Perl-Modules">Perl Modules</h3>
+
+<p>See <i>DTA-TokWrap/README.txt</i> for a full list of required perl modules.</p>
+
+<h3 id="Development-Tools">Development Tools</h3>
+
+<dl>
+
+<dt id="C-compiler">C compiler</dt>
+<dd>
+
+<p>tested version(s): gcc / linux: v4.3.3, 4.4.6</p>
+
+</dd>
+<dt id="GNU-flex-development-only">GNU flex (development only)</dt>
+<dd>
+
+<p>tested version(s): 2.5.33, 2.5.35</p>
+
+<p>Only needed if you plan on making changes to the lexer sources.</p>
+
+</dd>
+<dt id="GNU-autoconf-SVN-only">GNU autoconf (SVN only)</dt>
+<dd>
+
+<p>tested version(s): 2.61, 2.67</p>
+
+<p>Required for building from SVN sources.</p>
+
+</dd>
+<dt id="GNU-automake-SVN-only">GNU automake (SVN only)</dt>
+<dd>
+
+<p>tested version(s): 1.9.6, 1.11.1</p>
+
+<p>Required for building from SVN sources.</p>
+
+</dd>
+</dl>
+
+<h2 id="Building-from-SVN">Building from SVN</h2>
+
+<p>To build this package from SVN sources, you must first run the shell command:</p>
+
+<pre><code> bash$ sh ./autoreconf.sh</code></pre>
+
+<p>from the distribution root directory <b>BEFORE</b> running <i>./configure</i>. Building from SVN sources requires additional development tools to present on the build system. Then, follow the instructions in <a href="#Building-from-Source">&quot;Building from Source&quot;</a>.</p>
+
+<h2 id="Building-from-Source">Building from Source</h2>
+
+<p>To build and install the entire package, issue the following commands to the shell:</p>
+
+<pre><code> bash$ cd dta-tokwrap-0.01   # (or wherever you unpacked this distribution)
+ bash$ sh ./configure        # configure the package
+ bash$ make                  # build the package
+ bash$ make install          # install the package on your system</code></pre>
+
+<p>More details on the top-level installation process can be found in the file <i>INSTALL</i> in the distribution root directory.</p>
+
+<p>More details on building and installing the DTA::TokWrap perl module included in this distribution can be found in the <i>perlmodinstall(1)</i> manpage.</p>
+
+<h1 id="USAGE">USAGE</h1>
+
+<p>The perl program <a href="#dta-tokwrap.perl">dta-tokwrap.perl</a> installed from the <i>DTA-TokWrap/</i> distribution subdirectory provides a flexible high-level command-line interface to the tokenization of DTA XML documents.</p>
+
+<h2 id="Input-Format">Input Format</h2>
+
+<p>The <a href="/../../blib/script/dta-tokwrap.html">dta-tokwrap.perl</a> script takes as its input DTA &quot;base-format&quot; XML files, which are simply (TEI-conformant) UTF-8 encoded XML files with one <code>&lt;c&gt;</code> element per character:</p>
+
+<ul>
+
+<li><p>the document <b>MUST</b> be encoded in UTF-8,</p>
+
+</li>
+<li><p>all text nodes to be tokenized should be descendants of a <code>&lt;text&gt;</code> element, and may optionally be immediate daughters of a <code>&lt;c&gt;</code> element (XPath <code>//text//text()|//text//c/text()</code>). <code>&lt;c&gt;</code> elements may not be nested.</p>
+
+<p>Prior to dta-tokwrap v0.38, <code>&lt;c&gt;</code> elements were required.</p>
+
+</li>
+</ul>
+
+<h2 id="Example:-Tokenizing-a-single-XML-file">Example: Tokenizing a single XML file</h2>
+
+<p>Assume we wish to tokenize a single DTA &quot;base-format&quot; XML file <i>doc1.xml</i>. Issue the following command to the shell:</p>
+
+<pre><code> bash$ dta-tokwrap.perl doc1.xml</code></pre>
+
+<p>... This will create the following output files:</p>
+
+<dl>
+
+<dt id="doc1.t.xml"><i>doc1.t.xml</i></dt>
+<dd>
+
+<p>&quot;Master&quot; tokenizer output file encoding sentence boundaries, token boundaries, and tokenizer-provided token analyses. Source for various stand-off annotation formats. This format can also be passed directly to and from the <a>DTA::CAB(3pm)</a> analysis suite using the <a>DTA::CAB::Format::XmlNative(3pm)</a> formatter class.</p>
+
+</dd>
+</dl>
+
+<h2 id="Example:-Tokenizing-multiple-XML-files">Example: Tokenizing multiple XML files</h2>
+
+<p>Assume we wish to tokenize a corpus of three DTA &quot;base-format&quot; XML files <i>doc1.xml</i>, <i>doc2.xml</i>, and <i>doc3.xml</i>. This is as easy as:</p>
+
+<pre><code> bash$ dta-tokwrap.perl doc1.xml doc2.xml doc3.xml</code></pre>
+
+<p>For each input document specified on the command line, master output files and stand-off annotation files will be created.</p>
+
+<p>See <a href="/../../blib/script/dta-tokwrap.html">&quot;the dta-tokwrap.perl manpage&quot;</a> for more details.</p>
+
+<h2 id="Example:-Tracing-execution-progess">Example: Tracing execution progess</h2>
+
+<p>Assume we wish to tokenize a large corpus of XML input files <i>doc*.xml</i>, and would like to have some feedback on the progress of the tokenization process. Try:</p>
+
+<pre><code> bash$ dta-tokwrap.perl -verbose=1 doc*.xml</code></pre>
+
+<p>or:</p>
+
+<pre><code> bash$ dta-tokwrap.perl -verbose=2 doc*.xml</code></pre>
+
+<p>or even:</p>
+
+<pre><code> bash$ dta-tokwrap.perl -traceAll doc*.xml</code></pre>
+
+<h2 id="Example:-From-TEI-to-TCF-and-Back">Example: From TEI to TCF and Back</h2>
+
+<p>Assume we have a TEI-like document <i>doc.tei.xml</i> which we want to encode as TCF to the file <i>doc.tei.tcf</i>, using only whitespace tokenizer &quot;hints&quot;, but not actually tokenizing the document yet. This can be accomplished by:</p>
+
+<pre><code> $ dta-tokwrap.perl -t=tei2tcf -weak-hints doc1.tei.xml</code></pre>
+
+<p>If the output should instead be written to STDOUT, just call:</p>
+
+<pre><code> $ dta-tokwrap.perl -t=tei2tcf -weak-hints -dO=tcffile=- doc1.tei.xml</code></pre>
+
+<p>Assume that the resulting TCF document has undergone further processing (e.g. via <a href="http://weblicht.sfs.uni-tuebingen.de/weblichtwiki/index.php/Main_Page">WebLicht</a>) to produce an annotated TCF document <code>doc.out.tcf</code>.</p>
+
+<p>selected TCF layers (in particular the <code>tokens</code> and <code>sentences</code> layers) can be spliced back into the TEI document as <i>doc.out.xml</i> by calling:</p>
+
+<pre><code> $ dta-tokwrap.perl -t=tcf2tei doc.out.tcf -dO=tcffile=doc.out.tcf -dO=tcfcwsfile=doc.out.xml</code></pre>
+
+<h1 id="TOOLS">TOOLS</h1>
+
+<p>This section provides a brief overview of the individual tools included in the dta-tokwrap distribution.</p>
+
+<h2 id="Perl-Scripts-Programs">Perl Scripts &amp; Programs</h2>
+
+<p>The perl scripts and programs included with this distribution are installed by default in <i>/usr/local/bin</i> and/or wherever your perl installs scripts by default (e.g. in <code>`perl -MConfig -e &#39;print $Config{installsitescript}&#39;`</code>).</p>
+
+<dl>
+
+<dt id="dta-tokwrap.perl">dta-tokwrap.perl</dt>
+<dd>
+
+<p>Top-level wrapper script for document tokenization using the <a>DTA::TokWrap</a> perl API.</p>
+
+</dd>
+<dt id="dtatw-add-c.perl">dtatw-add-c.perl</dt>
+<dd>
+
+<p>Script to insert <code>&lt;c&gt;</code> elements and/or <code>xml:id</code> attributes for such elements into an XML document which does not yet contain them. Guaranteed not to clobber any existing //c IDs.</p>
+
+<p>//c/@xml:id attributes are generated by a simple document-global counter (&quot;c1&quot;, &quot;c2&quot;, ..., &quot;c65536&quot;).</p>
+
+<p>See <a>&quot;the dtatw-add-c.perl manpage&quot;</a> for more details.</p>
+
+</dd>
+<dt id="dtatw-cids2local.perl">dtatw-cids2local.perl</dt>
+<dd>
+
+<p>Script to convert <code>//c/@xml:id</code> attributes to page-local encoding. Never really used.</p>
+
+<p>See <a>&quot;the dtatw-cids2local.perl manpage&quot;</a> for more details.</p>
+
+</dd>
+<dt id="dtatw-add-ws.perl">dtatw-add-ws.perl</dt>
+<dd>
+
+<p>Script to splice <code>&lt;s&gt;</code> and <code>&lt;w&gt;</code> elements encoded from a standoff (.t.xml or .u.xml) XML file into the <i>original</i> &quot;base-format&quot; (.chr.xml) file, producing a .cws.xml file. A tad too generous with partial word segments, due to strict adjacency and boundary criteria.</p>
+
+<p>In earlier versions of dta-tokwrap, this functionality was split between the scripts <code>dtatw-add-w.perl</code> and <code>dtatw-add-s.perl</code>, which required only an <i>id-compatible</i> base-format (.chr.xml) file as the splice target. As of dta-tokwrap v0.35, the splice target base-format file must be <i>original</i> source file itself, since the current implementation uses byte offsets to perform the splice.</p>
+
+<p>See <a>&quot;the dtatw-add-ws.perl manpage&quot;</a> for more details.</p>
+
+</dd>
+<dt id="dtatw-splice.perl">dtatw-splice.perl</dt>
+<dd>
+
+<p>Script to splice generic standoff attributes and/or content into a base file; useful e.g. for merging flat DTA::CAB standoff analyses into TEI-structured *.cws.xml files.</p>
+
+<p>See <a>&quot;the dtatw-splice.perl manpage&quot;</a> for more details.</p>
+
+</dd>
+<dt id="dtatw-get-ddc-attrs.perl">dtatw-get-ddc-attrs.perl</dt>
+<dd>
+
+<p>Script to insert DDC-relevant attributes extracted from a base file into a *.t.xml file, producing a pre-DDC XML format file (by convention *.ddc.t.xml, a subset of the *.t.xml format).</p>
+
+<p>See <a>&quot;the dtatw-get-ddc-attrs.perl manpage&quot;</a> for more details.</p>
+
+</dd>
+<dt id="dtatw-get-header.perl">dtatw-get-header.perl</dt>
+<dd>
+
+<p>Simple script to extract a single header element from an XML file (e.g. for later inclusion in a DDC XML format file).</p>
+
+<p>See <a>&quot;the dtatw-get-header.perl manpage&quot;</a> for more details.</p>
+
+<p>See <a>&quot;the dtatw-get-header.perl manpage&quot;</a> for more details.</p>
+
+</dd>
+<dt id="dtatw-pn2p.perl">dtatw-pn2p.perl</dt>
+<dd>
+
+<p>Script to conver insert &lt;p&gt;...&lt;/p&gt; wrappers for <code>//s/@pn</code> key attributes in &quot;flat&quot; *.t.xml files.</p>
+
+</dd>
+<dt id="dtatw-xml2ddc.perl">dtatw-xml2ddc.perl</dt>
+<dd>
+
+<p>Script to convert *.ddc.t.xml files and optional headers to DDC-XML format.</p>
+
+<p>See <a>&quot;the dtatw-xml2ddc.perl manpage&quot;</a> for more details.</p>
+
+</dd>
+<dt id="dtatw-t-check.perl">dtatw-t-check.perl</dt>
+<dd>
+
+<p>Simple script to check consistency of tokenizer output (*.t) offset + length fields with input (*.txt) file.</p>
+
+</dd>
+<dt id="dtatw-add-c.perl1">dtatw-add-c.perl</dt>
+<dd>
+
+<p>Script to add <code>&lt;c&gt;</code> elements to an XML document which does not already contain them. Not really useful as of dta-tokwrap v0.38.</p>
+
+</dd>
+<dt id="dtatw-rm-c.perl">dtatw-rm-c.perl</dt>
+<dd>
+
+<p>Script to remove <code>&lt;c&gt;</code> elements from an XML document. Regex hack, fast but not exceedingly robust, use with caution. See also <a href="#dtatw-rm-c.xsl">&quot;dtatw-rm-c.xsl&quot;</a></p>
+
+</dd>
+<dt id="dtatw-rm-w.perl">dtatw-rm-w.perl</dt>
+<dd>
+
+<p>Fast regex hack to remove <code>&lt;w&gt;</code> elements from an XML document</p>
+
+</dd>
+<dt id="dtatw-rm-s.perl">dtatw-rm-s.perl</dt>
+<dd>
+
+<p>Fast regex hack to remove <code>&lt;s&gt;</code> elements from an XML document.</p>
+
+</dd>
+<dt id="dtatw-rm-lb.perl">dtatw-rm-lb.perl</dt>
+<dd>
+
+<p>Script to remove <code>&lt;lb&gt;</code> (line-break) elements from an XML document, replacing them with newlines. Regex hack, fast but not robust, use with caution. See also <a href="#dtatw-rm-lb.xsl">&quot;dtatw-rm-lb.xsl&quot;</a></p>
+
+</dd>
+<dt id="dtatw-lb-encode.perl">dtatw-lb-encode.perl</dt>
+<dd>
+
+<p>Encodes newlines under //text//text() in an XML document as <code>&lt;lb&gt;</code> (line-break) elements using high-level file heuristics only. Regex hack, fast but not robust, use with caution. See also <a href="#dtatw-ensure-lb.perl">&quot;dtatw-ensure-lb.perl&quot;</a>, <a href="#dtatw-add-lb.xsl">&quot;dtatw-add-lb.xsl&quot;</a>, <a href="#dtatw-rm-lb.perl">&quot;dtatw-rm-lb.perl&quot;</a>.</p>
+
+</dd>
+<dt id="dtatw-ensure-lb.perl">dtatw-ensure-lb.perl</dt>
+<dd>
+
+<p>Script to ensure that all //text//text() newlines in an XML document are explicitly encoded with <code>&lt;lb&gt;</code> (line-break) elements, using optional file-, element-, and line-level heuristics. Robust but slow, since it actually parses XML input documents. See also <a href="#dtatw-lb-encode.perl">&quot;dtatw-lb-encode.perl&quot;</a>, <a href="#dtatw-add-lb.xsl">&quot;dtatw-add-lb.xsl&quot;</a>, <a href="#dtatw-rm-lb.perl">&quot;dtatw-rm-lb.perl&quot;</a>.</p>
+
+</dd>
+<dt id="dtatw-tt-dictapply.perl">dtatw-tt-dictapply.perl</dt>
+<dd>
+
+<p>Script to apply a type-&quot;dictionary&quot; in one-word-per-line (.tt) format to a token corpus in one-word-per-line (.tt) format. Especially useful together with standard UNIX utilities such as cut, grep, sort, and uniq.</p>
+
+</dd>
+<dt id="dtatw-cabtt2xml.perl">dtatw-cabtt2xml.perl</dt>
+<dd>
+
+<p>Script to convert DTA::CAB::Format::TT (one-word-per-line with variable analysis fields identified by conventional prefixes) files to expanded .t.xml format used by dta-tokwrap. The expanded format should be identical to that used by the DTA::CAB::Format::Xml class. See also <a>dtatw-txml2tt.xsl</a>.</p>
+
+</dd>
+<dt id="file-substr.perl">file-substr.perl</dt>
+<dd>
+
+<p>Script to extract a portion of a file, specified by byte offset and length. Useful for debugging index files created by other tools.</p>
+
+</dd>
+</dl>
+
+<h2 id="GNU-make-build-system-template">GNU make build system template</h2>
+
+<p>The distribution directory <i>make/</i> contains a &quot;template&quot; for using GNU <i>make</i> to organizing the conversion of large corpora with the dta-tokwrap utilities. This is useful because:</p>
+
+<ul>
+
+<li><p><i>make</i>&#39;s intuitive, easy-to-read syntax provides a wonderful vehicle for user-defined configuration files, obviating the need to remember the names of all 64 (at last count) <code>dta-tokwrap.perl|/dta-tokwrap.perl</code> options,</p>
+
+</li>
+<li><p><i>make</i> is very good at tracking complex dependencies of the sort that exist between the various temporary files generated by the dta-tokwrap utilities,</p>
+
+</li>
+<li><p><i>make</i> jobs can be made &quot;robust&quot; simply by adding a <code>-k</code> (<code>--keep-going</code>) to the command-line, and</p>
+
+</li>
+<li><p>last but certainly not least, <i>make</i> has built-in support for parallelization of complex tasks by means of the <code>-j N</code> (<code>--jobs=N</code>) option, allowing us to take advantage of multiprocessor systems.</p>
+
+</li>
+</ul>
+
+<p>By default, the contents of the distribution <i>make/</i> subdirectory are installed to <i>/usr/local/share/dta-tokwrap/make/</i>. See the comments at the top of <i>make/User.mak</i> for instructions.</p>
+
+<h2 id="Perl-Modules1">Perl Modules</h2>
+
+<dl>
+
+<dt id="DTA::TokWrap"><a>DTA::TokWrap</a></dt>
+<dd>
+
+<p>Top-level tokenization-wrapper module, used by <a href="/../../blib/script/dta-tokwrap.html">dta-tokwrap.perl</a>.</p>
+
+</dd>
+<dt id="DTA::TokWrap::Document"><a>DTA::TokWrap::Document</a></dt>
+<dd>
+
+<p>Object-oriented wrapper for documents to be processed.</p>
+
+</dd>
+<dt id="DTA::TokWrap::Processor"><a>DTA::TokWrap::Processor</a></dt>
+<dd>
+
+<p>Abstract base class for elementary document-processing operations.</p>
+
+</dd>
+</dl>
+
+<p>See the <a>DTA::TokWrap::Intro(3pm)</a> manpage for more details on included modules, APIs, calling conventions, etc.</p>
+
+<h2 id="XSL-stylesheets">XSL stylesheets</h2>
+
+<p>The XSL stylesheets included with this distribution are installed by default in <i>/usr/local/share/dta-tokwrap/stylesheets</i>.</p>
+
+<dl>
+
+<dt id="dtatw-add-lb.xsl">dtatw-add-lb.xsl</dt>
+<dd>
+
+<p>Replaces newlines with <code>&lt;lb/&gt;</code> elements in input document.</p>
+
+</dd>
+<dt id="dtatw-assign-cids.xsl">dtatw-assign-cids.xsl</dt>
+<dd>
+
+<p>Assigns missing <code>//c/@xml:id</code> attributes using the XSL <code>generate-id()</code> function.</p>
+
+</dd>
+<dt id="dtatw-rm-c.xsl">dtatw-rm-c.xsl</dt>
+<dd>
+
+<p>Removes <code>&lt;c&gt;</code> elements from the input document. Slow but robust.</p>
+
+</dd>
+<dt id="dtatw-rm-lb.xsl">dtatw-rm-lb.xsl</dt>
+<dd>
+
+<p>Replaces <code>&lt;lb/&gt;</code> elements with newlines.</p>
+
+</dd>
+<dt id="dtatw-txml2tt.xsl">dtatw-txml2tt.xsl</dt>
+<dd>
+
+<p>Converts &quot;master&quot; tokenized XML output format (<i>*.t.xml</i>) to TAB-separated one-word-per-line format (<i>*.mr.t</i> aka <i>*.t</i> aka <i>*.tt</i> aka &quot;tt&quot; aka &quot;CSV&quot; aka DTA::CAB::Format::TT aka &quot;TnT&quot; aka &quot;TreeTagger&quot; aka &quot;vertical&quot; aka &quot;moot-native&quot; aka ...). See the <i>mootfiles(5)</i> manpage for basic format details, and see the top of the XSL script for some influential transformation parameters.</p>
+
+</dd>
+</dl>
+
+<h2 id="C-Programs">C Programs</h2>
+
+<p>Several C programs are included with the distribution. These are used by the <a href="/../../blib/script/dta-tokwrap.html">dta-tokwrap.perl</a> script to perform various intermediate document processing operations, and should not need to be called by the user directly.</p>
+
+<p><b>Caveat Scriptor</b>: The following programs are meant for internal use by the <code>DTA::TokWrap</code> modules only, and their names, calling conventions, and very presence is subject to change without notice.</p>
+
+<dl>
+
+<dt id="dtatw-mkindex">dtatw-mkindex</dt>
+<dd>
+
+<p>Splits input document <i>doc.xml</i> into a &quot;character index&quot; <i>doc.cx</i> (CSV), a &quot;structural index&quot; <i>doc.sx</i> (XML), and a &quot;text index&quot; <i>doc.tx</i> (UTF-8 text).</p>
+
+</dd>
+<dt id="dtatw-rm-namespaces">dtatw-rm-namespaces</dt>
+<dd>
+
+<p>Removes namespaces from any XML document by renaming &quot;<code>xmlns</code>&quot; attributes to &quot;<code>xmlns_</code>&quot; and &quot;<code>xmlns:*</code>&quot; attributes to &quot;<code>xmlns_*</code>&quot;. Useful because XSL&#39;s namespace handling is annoyingly slow and ugly.</p>
+
+</dd>
+<dt id="dtatw-tokenize-dummy">dtatw-tokenize-dummy</dt>
+<dd>
+
+<p>Dummy <code>flex</code> tokenizer. Useful for testing.</p>
+
+</dd>
+<dt id="dtatw-txml2sxml">dtatw-txml2sxml</dt>
+<dd>
+
+<p>Converts &quot;master&quot; tokenized XML output format (<i>*.t.xml</i>) to sentence-level stand-off XML format (<i>*.s.xml</i>).</p>
+
+</dd>
+<dt id="dtatw-txml2wxml">dtatw-txml2wxml</dt>
+<dd>
+
+<p>Converts &quot;master&quot; tokenized XML output format (<i>*.t.xml</i>) to token-level stand-off XML format (<i>*.w.xml</i>).</p>
+
+</dd>
+<dt id="dtatw-txml2axml">dtatw-txml2axml</dt>
+<dd>
+
+<p>Converts &quot;master&quot; tokenized XML output format (<i>*.t.xml</i>) to token-analysis-level stand-off XML format (<i>*.a.xml</i>).</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>perl(1).</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2018 by Bryan Jurish</p>
+
+<p>This package is free software. Redistribution and modification of C portions of this package are subject to the terms of the version 3 or greater of the GNU Lesser General Public License; see the files COPYING and COPYING.LESSER which came with the distribution for details.</p>
+
+<p>Redistribution and/or modification of the Perl portions of this package are subject to the same terms as Perl itself, either Perl version 5.24.1 or, at your option, any later version of Perl 5 you may have available.</p>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>
+
+

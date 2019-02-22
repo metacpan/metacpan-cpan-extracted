@@ -1,5 +1,11 @@
 Revision history for Perl extension LWP::UserAgent::Cached.
 
+0.07  Fri Feb 22 12:46:12 +07 2019
+      - FIX: extra new line could be added to the content after restoring it from the cache,
+        which could corrupt binary content (#gh4)
+      - WARN: fix above may change cache name for requests without trailing new line (most of POST requests),
+        so such requests may be recached
+
 0.06  Wed Sep 10 02:38:48 NOVT 2014
       - additionally pass $request as third argument to `recache_if' callback
       - documentation improved a little bit

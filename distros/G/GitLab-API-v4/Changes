@@ -1,5 +1,11 @@
 Revision history for Perl extension GitLab-API-v4.
 
+0.17 2019-02-20T22:47:58Z
+
+ - Require perl 5.10.1 as I give up trying to support 5.8 due to other modules
+   requiring 5.10 and strictures/multidimensional issues.
+ - Simplify VERSION declarations.
+
 0.16 2019-02-18T06:21:15Z
 
  - Migrate build tooling from Dist::Zilla to Minilla.

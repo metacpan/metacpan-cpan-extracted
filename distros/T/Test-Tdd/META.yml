@@ -13,17 +13,18 @@ meta-spec:
   version: '1.4'
 name: Test-Tdd
 requires:
-  Class::MOP: '0'
+  Class::Refresh: '0'
   Cwd: '0'
   File::Find: '0'
   Filesys::Notify::Simple: '0'
   Getopt::Long: '0'
   Test::More: '0'
+  perl: '5.008'
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/rogeriochaves/perl-tdd-runner
   repository: https://github.com/rogeriochaves/perl-tdd-runner.git
-version: '0.003'
+version: '0.004'
 x_generated_by_perl: v5.18.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

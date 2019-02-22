@@ -36,11 +36,11 @@ Net::SharePoint::Basic - Basic interface to Microsoft SharePoint REST API
 
 =head1 VERSION
 
-Version 0.1
+Version 0.11
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.11';
 
 our %PATTERNS = (
 	payload => "grant_type=client_credentials&client_id=%1\$s\@%3\$s&client_secret=%2\$s&resource=%4\$s/%5\$s\@%3\$s&scope=%4\$s/%5\$s\@%3\$s",
@@ -107,6 +107,10 @@ The full testing (and naturally the full usage) of the module requires a working
     $sp->list({}, '/test');
     # deletes the folder
     $sp->delete({}, '/test');
+    # moves an object
+    $sp->move({}, '/test-file', '/test-moved-file');
+    # copies an object
+    $sp->copy({}, '/test-moved-file', '/test-file');
 
 This module was developed based on the MSDN SharePoint REST API at https://msdn.microsoft.com/en-us/library/office/jj860569.aspx .
 

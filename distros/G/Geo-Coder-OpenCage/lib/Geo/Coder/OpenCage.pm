@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.20';
+$Geo::Coder::OpenCage::VERSION = '0.21';
 use strict;
 use warnings;
 
@@ -124,7 +124,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

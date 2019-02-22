@@ -32,8 +32,8 @@ sub new {
     if ( $data->{driver} eq 'Pg' ) {
         $sf->{aggregate}[3] = "STRING_AGG(X)";
     }
-    $sf->{i}{extended_signs}     = [ '',  'f()', 'SQ', '%%' ];
-    $sf->{i}{extended_signs_set} = [ '',  'f()', 'SQ', '=N', '%%' ];
+    $sf->{i}{expand_signs}     = [ '',  'f()', 'SQ',       '%%' ];
+    $sf->{i}{expand_signs_set} = [ '',  'f()', 'SQ', '=N', '%%' ];
     bless $sf, $class;
 }
 
@@ -43,8 +43,9 @@ sub select {
     my $clause = 'select';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $choices = [];
-    my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
-    my @pre = ( undef, $sf->{i}{ok}, $ext_sign ? $ext_sign : () );
+    my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
+    my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
+    my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );
     my $type;
     if ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
         $choices = [ @pre, @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
@@ -75,7 +76,7 @@ sub select {
             push @{$sql->{chosen_cols}}, @{$choices}[@idx];
             return 1;
         }
-        elsif ( $choices->[ $idx[0] ] eq $ext_sign ) {
+        elsif ( $choices->[ $idx[0] ] eq $expand_sign ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( ! defined $ext_col ) {
@@ -255,12 +256,13 @@ sub where {
     my $unclosed = 0;
     my $count = 0;
     my @bu;
-    my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
-    my @pre = ( undef, $sf->{i}{ok}, $ext_sign ? $ext_sign : () );
+    my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
+    my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
+    my @pre = ( undef, $sf->{i}{ok}, $sign_idx ? $expand_sign : () );
 
     WHERE: while ( 1 ) {
         my @choices = ( @cols );
-        if ( $sf->{o}{G}{parentheses} == 1 ) {
+        if ( $sf->{o}{enable}{parentheses} ) {
             unshift @choices, $unclosed ? ')' : '(';
         }
         $ax->print_sql( $sql );
@@ -285,7 +287,7 @@ sub where {
             }
             return 1;
         }
-        if ( $quote_col eq $ext_sign ) {
+        if ( $quote_col eq $expand_sign ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( ! defined $ext_col ) {
@@ -339,8 +341,9 @@ sub group_by {
     $sql->{group_by_stmt} = " GROUP BY";
     $sql->{group_by_cols} = [];
     $sql->{chosen_cols} = [];
-    my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
-    my @pre = ( undef, $sf->{i}{ok}, $ext_sign ? $ext_sign : () );
+    my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
+    my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
+    my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );
     my $choices = [ @pre, @{$sql->{cols}} ];
 
     GROUP_BY: while ( 1 ) {
@@ -370,7 +373,7 @@ sub group_by {
             }
             return 1;
         }
-        elsif ( $choices->[ $idx[0] ] eq $ext_sign ) {
+        elsif ( $choices->[ $idx[0] ] eq $expand_sign ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( defined $ext_col ) {
@@ -401,7 +404,7 @@ sub having {
             @{$sf->{aggregate}},
             map( '@' . $_, @{$sql->{aggr_cols}} )
         );
-        if ( $sf->{o}{G}{parentheses} == 1 ) {
+        if ( $sf->{o}{enable}{parentheses} ) {
             unshift @choices, $unclosed ? ')' : '(';
         }
         $ax->print_sql( $sql );
@@ -471,8 +474,9 @@ sub order_by {
     my ( $sf, $stmt_h, $sql ) = @_;
     my $clause = 'order_by';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $ext_sign = $sf->{i}{extended_signs}[ $sf->{o}{extend}{$clause} ];
-    my @pre = ( undef, $sf->{i}{ok}, $ext_sign ? $ext_sign : () );
+    my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
+    my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
+    my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );
     my @cols;
     if ( @{$sql->{aggr_cols}} || @{$sql->{group_by_cols}} ) {
         @cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
@@ -503,7 +507,7 @@ sub order_by {
             }
             return 1;
         }
-        elsif ( $col eq $ext_sign ) {
+        elsif ( $col eq $expand_sign ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( ! defined $ext_col ) {

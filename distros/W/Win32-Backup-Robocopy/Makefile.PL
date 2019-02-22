@@ -33,11 +33,23 @@ BEGIN{
 			}
 		}	
 	}
-	unless ( -e -s $robocopy ){
-			die "given executable [$robocopy] is not here or is empty\n";
+	# check if defined
+	unless ( defined $robocopy ){
+		die "robocopy.exe not found! ".
+				($ENV{PERL_ROBOCOPY_EXE} 	? 
+				'' 							: 
+				' (you can set environment variable PERL_ROBOCOPY_EXE to a custom path) ')
+		;
 	}
+	# check if exist
+	unless ( -e -s $robocopy ){
+			die "given executable [$robocopy] is not here or is empty";
+	}
+	# check it returns a valid result
 	my $ret = system "$robocopy /? >nul 2>&1";
-	die "[$robocopy /? >nul 2>&1] did not returned the expected value" unless 16 == ($ret>>8);
+	unless ( 16 == ($ret>>8) ){
+		die "[$robocopy /? >nul 2>&1] did not returned the expected value";
+	}
 	# all went well..
 	print "[$robocopy] seems to be valid\n"
 }

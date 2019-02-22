@@ -6,8 +6,8 @@ use warnings;
 
 use Exporter 'import';
 our @EXPORT      = qw();
-our %EXPORT_TAGS = ();
-our @EXPORT_OK   = qw(colorize ansi_code csi_code);
+our @EXPORT_OK   = qw(colorize colorize24 ansi_code ansi_pair csi_code);
+our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 our @ISA         = qw(Getopt::EX::LabeledParam);
 
 use Carp;
@@ -18,7 +18,28 @@ use Getopt::EX::LabeledParam;
 use Getopt::EX::Util;
 use Getopt::EX::Func qw(callable);
 
-our $COLOR_RGB24 = 0;
+our $RGB24     = $ENV{GETOPTEX_RGB24};
+our $LINEAR256 = $ENV{GETOPTEX_LINEAR256};
+
+my @nonlinear = do {
+    map { ( $_->[0] ) x $_->[1] } (
+	[ 0, 95 ], #   0 ..  94
+	[ 1, 40 ], #  95 .. 134
+	[ 2, 40 ], # 135 .. 174
+	[ 3, 40 ], # 175 .. 224
+	[ 4, 40 ], # 225 .. 254
+	[ 5,  1 ], # 255
+    );
+};
+
+sub map_256_to_6 {
+    my $i = shift;
+    if ($LINEAR256) {
+	int ( 5 * $i / 255 );
+    } else {
+	$nonlinear[$i];
+    }
+}
 
 sub ansi256_number {
     my $code = shift;
@@ -48,9 +69,7 @@ sub ansi256_number {
 		$grey = undef;
 	    }
 	} else {
-	    $r = int ( 5 * $rx / 255 );
-	    $g = int ( 5 * $gx / 255 );
-	    $b = int ( 5 * $bx / 255 );
+	    ($r, $g, $b) = map { map_256_to_6 $_ } $rx, $gx, $bx;
 	}
     }
     else {
@@ -63,7 +82,7 @@ my %numbers = (
     ';' => undef,	# ; : NOP
     X => undef,		# X : NOP
     N => undef,		# N : None (NOP)
-    E => 'EL',		# E : Erace Line
+    E => 'EL',		# E : Erase Line
     Z => 0,		# Z : Zero (Reset)
     D => 1,		# D : Double-Struck (Bold)
     P => 2,		# P : Pale (Dark)
@@ -86,7 +105,7 @@ my %numbers = (
 
 sub rgb24 {
     my $rgb = shift;
-    if ($COLOR_RGB24) {
+    if ($RGB24) {
 	return (2,
 		map { hex }
 		$rgb =~ /^\#?([\da-f]{2})([\da-f]{2})([\da-f]{2})/i);
@@ -97,7 +116,7 @@ sub rgb24 {
 
 sub rgb12 {
     my $rgb = shift;
-    if ($COLOR_RGB24) {
+    if ($RGB24) {
 	return (2,
 		map { 0x11 * hex }
 		$rgb =~ /^#([\da-f])([\da-f])([\da-f])/i);
@@ -222,6 +241,9 @@ sub csi_code {
 	warn "$name: Unknown ANSI name.\n";
 	return '';
     };
+    if ($name eq 'SGR' and @_ == 1 and $_[0] == 0) {
+	@_ = ();
+    }
     CSI . join(';', @_) . $c;
 }
 
@@ -271,6 +293,11 @@ sub colorize {
     cached_colorize(\%colorcache, @_);
 }
 
+sub colorize24 {
+    local $RGB24 = 1;
+    cached_colorize(\%colorcache, @_);
+}
+
 sub cached_colorize {
     my $cache = shift;
     my @result;
@@ -291,8 +318,7 @@ sub apply_color {
 	return $color->call for $text;
     }
     else {
-	$cache->{$color} //= [ ansi_pair($color) ];
-	my($s, $e) = @{$cache->{$color}};
+	my($s, $e) = @{ $cache->{$color} //= [ ansi_pair($color) ] };
 	$text =~ s/(^|$reset_re)([^\e\r\n]*)/${1}${s}${2}${e}/mg;
 	return $text;
     }
@@ -532,7 +558,7 @@ Samples:
     W/w  L03/L20  #333/#ccc  303030/c6c6c6  <dimgrey>/<lightgrey>
 
 24-bit RGB color sequence is supported but disabled by default.  Set
-C<$COLOR_RGB24> module variable to enable it.
+C<$RGB24> module variable to enable it.
 
 Character "E" is an abbreviation for "{EL}", and it clears the line
 from cursor to the end of the line.  At this time, background color is
@@ -656,8 +682,8 @@ Enclose them by angle bracket to use, like:
     <deeppink>/<lightyellow>
 
 Although these colors are defined in 24bit value, they are mapped to
-6x6x6 216 colors by default.  Set C<$COLOR_RGB24> module variable to
-use 24bit color mode.
+6x6x6 216 colors by default.  Set C<$RGB24> module variable to use
+24bit color mode.
 
 =head1 FUNCTION SPEC
 
@@ -756,7 +782,7 @@ see what happens.
         --cm 555/012,555/102,555/120
 
 
-=head1 METHODS
+=head1 METHOD
 
 =over 4
 
@@ -812,6 +838,43 @@ behaviour.
 =back
 
 
+=head1 FUNCTION
+
+=over 4
+
+=item B<colorize>(I<color_spec>, I<text>)
+
+=item B<colorize24>(I<color_spec>, I<text>)
+
+Return colorized version of given text.
+
+B<colorize> produces 256 or 24bit colors depending on the value of
+C<Getopt::EX::Colormap::RGB24> variable and environment
+C<GETOPTEX_RGB24>.
+
+B<colorize24> always produces 24bit color sequence for 24bit/12bit
+color spec.
+
+=item B<ansi_code>(I<color_spec>)
+
+Produces introducer sequence for given spec.  Reset code can be taken
+by B<ansi_code("Z")>.
+
+=item B<ansi_pair>(I<color_spec>)
+
+Produces introducer and recover sequences for given spec. Recover
+sequence includes I<Erace Line> related control with simple SGR reset
+code.
+
+=item B<csi_code>(I<name>, I<params>)
+
+Produce CSI (Control Sequence Introducer) sequence by name with
+numeric parameters.  I<name> is one of CUU, CUD, CUF, CUB, CNL, CPL,
+CHA, CUP, ED, EL, SU, SD, HVP, SGR, SCP, RCP.
+
+=back
+
+
 =head1 SEE ALSO
 
 L<Getopt::EX>,
@@ -822,3 +885,5 @@ L<https://en.wikipedia.org/wiki/ANSI_escape_code>
 L<Graphics::ColorNames::X>
 
 L<https://en.wikipedia.org/wiki/X11_color_names>
+
+=cut

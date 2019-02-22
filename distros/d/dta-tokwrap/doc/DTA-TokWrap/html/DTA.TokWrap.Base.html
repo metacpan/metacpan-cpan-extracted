@@ -1,0 +1,130 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Constants">Constants</a></li>
+      <li><a href="#Constructors-etc">Constructors etc.</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SEE-ALSO1">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DTA::TokWrap::Base - DTA tokenizer wrappers: base class</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> use DTA::TokWrap::Base;
+ 
+ ##========================================================================
+ ## Constructors etc.
+ 
+ $obj = $CLASS_OR_OBJ-&gt;new(%args);        ##-- inheritable constructor
+ %defaults = $CLASS_OR_OBJ-&gt;defaults();   ##-- set static defaults
+ $obj = $obj-&gt;init();                     ##-- set dynamic defaults</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>DTA::TokWrap::Base provides an abstract base class for all object classes in the DTA::TokWrap distribution</p>
+
+<h2 id="Constants">Constants</h2>
+
+<dl>
+
+<dt id="Variable:-ISA">Variable: @ISA</dt>
+<dd>
+
+<p>DTA::TokWrap::Base inherits from <a>DTA::TokWrap::Logger</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Constructors-etc">Constructors etc.</h2>
+
+<dl>
+
+<dt id="new">new</dt>
+<dd>
+
+<pre><code> $obj = $CLASS_OR_OBJ-&gt;new(%args);</code></pre>
+
+<p>Generic constructor. %args is a hash of subclass-dependent constructor options.</p>
+
+<p>The default implementation calls $CLASS_OR_OBJ-&gt;defaults() before the new object is instiated, and and $obj-&gt;init() afterwords.</p>
+
+</dd>
+<dt id="defaults">defaults</dt>
+<dd>
+
+<pre><code> %defaults = CLASS_OR_OBJ-&gt;defaults();</code></pre>
+
+<p>Subclasses may define a <code>defaults()</code> method to set static (class-dependent) object defaults. The return value %defaults should be an object option hash.</p>
+
+<p>The default implementation just returns an empty hash.</p>
+
+</dd>
+<dt id="init">init</dt>
+<dd>
+
+<pre><code> $obj = $obj-&gt;init();</code></pre>
+
+<p>Subclasses may define an <code>init()</code> method to compute dynamic (object-dependent) object defaults.</p>
+
+<p>The default implementation does nothing.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="SEE-ALSO1">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2018 by Bryan Jurish</p>
+
+<p>This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.14.2 or, at your option, any later version of Perl 5 you may have available.</p>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>
+
+

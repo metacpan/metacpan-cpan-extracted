@@ -184,8 +184,8 @@ sub __create_table {
     $ax->print_sql( $sql );
     # Choose
     my $create_table_ok = choose(
-        [ undef, 'YES' ],
-        { %{$sf->{i}{lyt_m}}, prompt => "Create table $sql->{table}?", undef => 'NO', index => 1 }
+        [ undef, '- YES' ],
+        { %{$sf->{i}{lyt_m}}, prompt => "Create table $sql->{table}?", layout => 3, undef => '- NO', index => 1 }
     );
     if ( ! $create_table_ok ) {
         return;

@@ -7,7 +7,7 @@ use Exporter 'import';
 use ExtUtils::MakeMaker;
 use XS::Install::Payload;
 
-our $VERSION = '1.0.14';
+our $VERSION = '1.0.15';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args not_available/;
@@ -152,11 +152,11 @@ sub makemaker_args {
     $params{OBJECT} = '$(O_FILES)' unless defined $params{OBJECT};
     
     $params{CCFLAGS} = "$Config{ccflags} $params{CCFLAGS}" if $params{CCFLAGS};
-    $params{OPTIMIZE} = "$Config{optimize} -O2 ".($params{OPTIMIZE}||'');
+    $params{OPTIMIZE} = merge_optimize($Config{optimize}, '-O2', $params{OPTIMIZE});
 
     delete @params{qw/C H OBJECT XS CCFLAGS LDFROM/} unless has_binary(\%params);
 
-    process_test(\%params, $shared_libs_linking);
+    process_TEST(\%params, $shared_libs_linking);
     
     delete @params{qw/CPLUS PARSE_XS SRC MODULE_INFO/};
     
@@ -255,11 +255,7 @@ sub process_OBJECT {
 sub get_o_files {
     my $params = shift;
     my $ret = _string_split_array($params->{OBJECT});
-    foreach my $c_file (@{$params->{C}}) {
-        my $o_file = $c_file;
-        $o_file =~ s/\.[^.]+$//;
-        push @$ret, $o_file.'$(OBJ_EXT)';
-    }
+    push @$ret, c2obj_file($_) for @{$params->{C}};
     return $ret;
 }
 
@@ -484,7 +480,7 @@ cpanm -f @$list
 EOF
 }
 
-sub process_test {
+sub process_TEST {
     my ($params, $shared_libs_linking) = @_;
     my $tp = $params->{test};
     return unless $tp and ($tp->{SRC} or $tp->{XS} or $tp->{C});
@@ -502,7 +498,31 @@ sub process_test {
     my @xsi_files;
     push @xsi_files, _scan_files($xsi_mask, $_) for @{$tp->{SRC}};
     
+    my $ccflags = $params->{CCFLAGS};
+    _string_merge($ccflags, $tp->{CCFLAGS});
+    
+    my $optimize = merge_optimize($params->{OPTIMIZE}, "-O0", $tp->{OPTIMIZE});
+    
     $params->{clean}{FILES} .= ' $(TEST_OBJECT)';
+    
+    my $cccmd = (bless {C => ['1.c']}, 'MM')->const_cccmd;
+    $cccmd =~ s/CCCMD/TEST_CCCMD/;
+    $cccmd =~ s/CCFLAGS/TEST_CCFLAGS/g;
+    $cccmd =~ s/OPTIMIZE/TEST_OPTIMIZE/g;
+    
+    push @{$params->{postamble}},
+        "TEST_CCFLAGS = $ccflags",
+        "TEST_OPTIMIZE = $optimize", 
+        $cccmd,
+    ;
+    
+    foreach my $c_file (@{$tp->{C}}) {
+        my $o_file = c2obj_file($c_file);
+        push @{$params->{postamble}},
+            "$o_file : $c_file\n".
+            "\t".'$(TEST_CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) '."$c_file\n"
+        ;
+    }
     
     my $dlpath = 'blib/ctest.$(DLEXT)';
     push @{$params->{postamble}},
@@ -555,6 +575,26 @@ sub cmd_sync_bin_deps {
         my $file = XS::Install::Payload::binary_module_info_file($module);
         _module_info_write($file, $info);
     }
+}
+
+sub merge_optimize {
+    my $to = shift;
+    $to ||= '';
+    my @singleton = (qr/-O[0-9]/, qr/-g[0-9]?/);
+    foreach my $from (@_) {
+        next unless $from;
+        foreach my $tok (split ' ', $from) {
+            foreach my $qr (@singleton) {
+                next unless $tok =~ /^$qr$/;
+                $to =~ s/(^|\s)$qr(\s|$)/ /g;
+            }
+            $to .= " $tok";
+        }
+    }
+    $to =~ s/^\s+//;
+    $to =~ s/\s+$//;
+    $to =~ s/\s{2,}/ /g;
+    return $to;
 }
 
 sub _install {
@@ -667,6 +707,12 @@ sub _string_merge {
     return unless $_[1];
     $_[0] ||= '';
     $_[0] .= $_[0] ? " $_[1]" : $_[1];
+}
+
+sub c2obj_file {
+    my $file = shift;
+    $file =~ s/\.[^.]+$//;
+    return $file.'$(OBJ_EXT)';
 }
 
 {

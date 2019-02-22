@@ -1,5 +1,5 @@
 package Moment;
-$Moment::VERSION = '1.3.1';
+$Moment::VERSION = '1.3.2';
 # ABSTRACT: class that represents the moment in time
 
 use strict;
@@ -16,7 +16,7 @@ sub new {
     my ($class, @params) = @_;
 
     if (@params == 0) {
-        croak "Incorrect usage. new() must get some params: dt, timestamp or year/month/day/hour/minute/secod. Stopped"
+        croak "Incorrect usage. new() must get some params: dt, timestamp, iso_string or year/month/day/hour/minute/second. Stopped"
     }
 
     if (@params % 2 != 0) {
@@ -243,7 +243,7 @@ sub now {
         croak "Incorrect usage. You can't run now() on a variable. Stopped";
     }
 
-    my $self = Moment->new(
+    my $self = $class->new(
         timestamp => time(),
     );
 
@@ -757,7 +757,7 @@ Moment - class that represents the moment in time
 
 =head1 VERSION
 
-version 1.3.1
+version 1.3.2
 
 =head1 SYNOPSIS
 

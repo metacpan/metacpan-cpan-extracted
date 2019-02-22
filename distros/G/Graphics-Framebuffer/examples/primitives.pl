@@ -40,7 +40,6 @@ $noaccel = ($noaccel) ? 1 : 0;    # Only 1 or 0 please
 my $images_path = (-e 'images/RWBY_White.jpg') ? 'images' : 'examples/images';
 
 my $splash = ($nosplash) ? 0 : 2;
-$ENV{'QUIT'} = $ENV{'INT'} = $ENV{'KILL'} = sub { exec('reset'); };
 print "\n\nGathering images...\n";
 $|=1;
 opendir(my $DIR, $images_path);
@@ -51,13 +50,12 @@ our @IMAGES;
 our @SMALL_IMAGES;
 our $STAMP = sprintf('%.1', time);
 
-$ENV{'QUIT'} = $ENV{'INT'} = $ENV{'KILL'} = sub { exec('reset'); };
-
 if (defined($new_x)) {
-    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0);
+    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE);
 } else {
-    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0);
+    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE);
 }
+$SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = sub { exec('reset'); };
 
 my $sinfo = $F->screen_dimensions();
 $F->cls('OFF');
@@ -91,6 +89,7 @@ $F->splash($VERSION) unless ($nosplash);
 my $benchmark;
 
 my $DORKSMILE;
+# if (0) { # This line only used for debugging
 $benchmark->{'Image Load'} = time;
 foreach my $file (@files) {
     next if ($file =~ /^\.+/ || $file =~ /Test|gif/ || -d "$images_path/$file");
@@ -129,7 +128,6 @@ foreach my $file (@files) {
 $benchmark->{'Image Load'} = time - $benchmark->{'Image Load'};
 $F->cls('OFF');
 
-# if (0) { # This line only used for debugging
 color_mapping();
 plotting();
 foreach my $flag (0 .. 1) {
@@ -178,6 +176,7 @@ texture_filled_polygons();
 flood_fill();
 
 truetype_fonts();
+truetype_printing();
 
 # rotate_truetype_fonts();
 
@@ -189,7 +188,7 @@ blitting();
 blit_move();
 rotate();
 
-# flipping();
+ flipping();
 monochrome();
 
 foreach my $m (1 .. 9) {    # We skip divide mode because it's stupid and I should never have added it
@@ -901,7 +900,7 @@ sub polygons {
 sub filled_polygons {
     print_it($F, 'Filled Polygon Test');
     $benchmark->{'Filled Polygons'} = 0;
-    $F->mask_mode() if ($F->{'ACCELERATED'});
+    $F->mask_mode() if ($F->acceleration());
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
@@ -924,7 +923,7 @@ sub filled_polygons {
 sub hatch_filled_polygons {
     print_it($F, 'Hatch Filled Polygon Test');
     $benchmark->{'Hatch Filled Polygons'} = 0;
-    $F->mask_mode() if ($F->{'ACCELERATED'});
+    $F->mask_mode() if ($F->acceleration());
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
@@ -951,7 +950,7 @@ sub gradient_polygons {
     my $direction = shift;
     print_it($F, ucfirst($direction) . ' Gradient Polygon Test');
     $benchmark->{ 'Gradient Polygons ' . ucfirst($direction) } = 0;
-    $F->mask_mode() if ($F->{'ACCELERATED'});
+    $F->mask_mode() if ($F->acceleration());
     my $s = time + $delay;
     while (time < $s) {
         my $count  = int(rand(10)) + 2;
@@ -985,7 +984,7 @@ sub gradient_polygons {
 sub texture_filled_polygons {
     print_it($F, 'Texture Filled Polygon Test');
     $benchmark->{'Texture Filled Polygons'} = 0;
-    $F->mask_mode() if ($F->{'ACCELERATED'});
+    $F->mask_mode() if ($F->acceleration());
 
     my $s = ($F->{'BITS'} == 16) ? time + $delay * 3 : time + $delay * 2;
     while (time < $s) {
@@ -1058,6 +1057,43 @@ sub truetype_fonts {
     } ## end while (time < $g)
 } ## end sub truetype_fonts
 
+sub truetype_printing {
+    print_it($F,'Testing TrueType Font Word Wrapping');
+    $benchmark->{'TrueType Wrapping'} = time;
+    $F->ttf_paragraph(
+        {
+            'x'       => 0,
+            'y'       => 30,
+            'text'    => 'The quick brown fox jumps over the lazy dog.  ' x 150,
+            'justify' => 'justified',
+            'size'    => int($YY/75),
+            'color'   => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
+        }
+    );
+    $benchmark->{'TrueType Wrapping'} = time - $benchmark->{'TrueType Wrapping'};
+    sleep $delay;
+    $F->clip_set(
+        {
+            'x'       => $XX / 4,
+            'y'       => $YY / 3,
+            'xx'      => (3 * ($XX /4)),
+            'yy'      => (2 * ($YY / 3)),
+        }
+    );
+    $F->ttf_paragraph(
+        {
+            'x'       => $XX / 4,
+            'y'       => ($YY / 4) + 30,
+            'text'    => 'The quick brown fox jumps over the lazy dog.  ' x 20,
+            'justify' => 'justified',
+            'size'    => int($YY/75),
+            'color'   => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
+        }
+    );
+    $F->clip_reset();
+    sleep $delay;
+}
+
 sub rotate_truetype_fonts {
     print_it($F, 'Testing TrueType Font Rotation Rendering');
     $benchmark->{'TrueType Fonts Rotated'} = 0;
@@ -1100,6 +1136,8 @@ sub flood_fill {
     $F->clip_reset();
     my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
     $benchmark->{'Flood Fill'} = time;
+    my $saved = $F->acceleration();
+    $F->acceleration(PERL) if ($F->{'BITS'} == 16);
     if ($XX > 255 && !$rpi) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->polygon({ 'coordinates' => [220 * $xm, 190 * $ym, 1520 * $xm, 80 * $xm, 1160 * $xm, $YY, 960 * $xm, 540 * $ym, 760 * $xm, 780 * $ym] });
@@ -1124,9 +1162,9 @@ sub flood_fill {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->fill({ 'x' => 3, 'y' => 3 });
     } ## end else [ if ($XX > 255 && !$rpi)]
-
+    $F->acceleration($saved);
     $benchmark->{'Flood Fill'} = sprintf('%.02f Seconds', (time - $benchmark->{'Flood Fill'}));
-    sleep $delay if ($F->{'ACCELERATED'});
+    sleep $delay if ($F->acceleration());
 } ## end sub flood_fill
 
 sub color_replace {
@@ -1676,6 +1714,13 @@ Richard Kelsch <rich@rk-internet.com>
 
 =head1 COPYRIGHT
 
-Copyright 2003-2018 Richard Kelsch
+Copyright 2003-2019 Richard Kelsch
+All Rights Reserved
+
+=head1 LICENSE
+
+GNU Public License Version 3.0
+
+* See the "LICENSE" file in the distribution for this license.
 
 This program must always be included as part of the Graphics::Framebuffer package.

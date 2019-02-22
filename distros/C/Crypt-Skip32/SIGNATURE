@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,25 +15,18 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 6474ee9741b75bf4e53480ff77b8785a6e3d3a0b Build.PL
-SHA1 ab0b412e3a0c4b0cec3c9e96d5597cecfe90244a Changes
-SHA1 bf1c3ff65a355fb1911126356efff7f6013e71cc LICENSE
+SHA1 bdbf87bf32686924b63da7df64703ea126525678 Changes
+SHA1 50bbe861e990222fadf84b8b1a81d9d4d923b860 LICENSE
 SHA1 a8780eb1e6d3839802ea017aed1f29b9e5e69b9e MANIFEST
-SHA1 7c32af8141846d873d351bcc5e5a21f73a719679 META.json
-SHA1 2bd99b6873bd463ac94b170839163c926285f0c8 META.yml
-SHA1 80d17853e62113b0f36401b32388683474009ec6 Makefile.PL
-SHA1 cdb4e6673163f9bf666984bde53173b2e8bfd9cb README
+SHA1 9228bf2bc0340275872164126ceeb5ea957e078e META.json
+SHA1 6af1b9104407c6ef049589a671380e265ae59382 META.yml
+SHA1 d1a677f349d164d277b856d0fe74e986f85c127d Makefile.PL
+SHA1 33fd16715c070bb94761caac0ddd08afe309a5ee README
 SHA1 88f7f7ad762e1c7bfe336ecf8fa64254ddb9425b examples/crypt-skip32-sample1
-SHA1 05c68b8ea684b1136252ea1e5e51a0633540e606 lib/Crypt/Skip32.pm
+SHA1 8e95f6f7317e26d9dec48558726c6c7211e3cc66 lib/Crypt/Skip32.pm
 SHA1 3882e6de46bd1a7e1443a04b73a457aa5865c9cb t/00distribution.t
 SHA1 df8607252d97a0c2846fbe82e267102ce68df759 t/01basic.t
 SHA1 dc55dc8b33b3aa595c3cfe17d13db7afe418d958 t/02cbc.t
 SHA1 e9c6a5881fc60173fbc8d479c1afd2ce3b43bef1 t/03pod.t
 SHA1 c461940906aaac5d1e9c06e166558d28ebed46bf t/04pod-coverage.t
-SHA1 2e4763a66c0291fcb8c591c592be3f7e130b8789 t/05xs.t
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAlP+fQgACgkQN9qi28wBkF3skwCfQQ+lgtvpFvDHH/BxmVuwIx9k
-RN0AoJiCBJQyDfOePkLvFASlAShE9Hsp
-=0WI5
------END PGP SIGNATURE-----
+SHA1 b9e7d4d52e1b095f29dd1864e8eb846d66c8a5c9 t/05xs.t

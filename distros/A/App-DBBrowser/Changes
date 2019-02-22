@@ -1,6 +1,19 @@
 Revision history for App-DBBrowser
 
 
+2.065    2019-02-22
+        - Update filter 'replace'.
+
+2.064    2019-02-21
+        - Update documentation.
+
+2.063    2019-02-21
+        - Update documentation.
+
+2.062    2019-02-21
+        - Update options.
+        - Update filter search and replace.
+
 2.061    2019-02-12
         - Get data from file: update file search.
         - Create table: option to drop the table if the insert failed.

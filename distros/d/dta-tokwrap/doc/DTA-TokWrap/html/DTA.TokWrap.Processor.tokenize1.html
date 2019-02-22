@@ -1,0 +1,141 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Constants">Constants</a></li>
+      <li><a href="#Constructors-etc">Constructors etc.</a></li>
+      <li><a href="#Methods">Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SEE-ALSO1">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DTA::TokWrap::Processor::tokenize1 - DTA tokenizer wrappers: tokenizer post-processing</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> use DTA::TokWrap::Processor::tokenize1;
+ 
+ $tp = DTA::TokWrap::Processor::tokenize1-&gt;new(%args);
+ $doc_or_undef = $tp-&gt;tokenize1($doc);</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>DTA::TokWrap::Processor::tokenize1 provides an object-oriented <a>DTA::TokWrap::Processor</a> wrapper for post-processing of raw tokenizer output for <a>DTA::TokWrap::Document</a> objects.</p>
+
+<p>Most users should use the high-level <a>DTA::TokWrap</a> wrapper class instead of using this module directly.</p>
+
+<h2 id="Constants">Constants</h2>
+
+<dl>
+
+<dt id="ISA">@ISA</dt>
+<dd>
+
+<p>DTA::TokWrap::Processor::tokenize1 inherits from <a>DTA::TokWrap::Processor</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Constructors-etc">Constructors etc.</h2>
+
+<dl>
+
+<dt id="new">new</dt>
+<dd>
+
+<pre><code> $tp = $CLASS_OR_OBJ-&gt;new(%args);</code></pre>
+
+<p>%args, %$tp:</p>
+
+<pre><code> fixtok =&gt; $bool,  ##-- attempt to fix common tokenizer errors? (default=true)
+ fixold =&gt; $bool,  ##-- attempt to fix unexpected and/or obsolete (tomata2) errors? (default=false)</code></pre>
+
+</dd>
+<dt id="defaults">defaults</dt>
+<dd>
+
+<pre><code> %defaults = CLASS-&gt;defaults();</code></pre>
+
+<p>Static class-dependent defaults.</p>
+
+</dd>
+</dl>
+
+<h2 id="Methods">Methods</h2>
+
+<dl>
+
+<dt id="tokenize1">tokenize1</dt>
+<dd>
+
+<pre><code> $doc_or_undef = $CLASS_OR_OBJECT-&gt;tokenize1($doc);</code></pre>
+
+<p>Runs the low-level tokenizer on the serialized text from the <a>DTA::TokWrap::Document</a> object $doc.</p>
+
+<p>Relevant %$doc keys:</p>
+
+<pre><code>  tokdata0 =&gt; $tokdata0,  ##-- (input)  raw tokenizer output (string)
+  tokdata1 =&gt; $tokdata1,  ##-- (output) post-processed tokenizer output (string)
+  tokenize1_stamp =&gt; $f,  ##-- (output) timestamp of operation end
+  tokdata1_stamp  =&gt; $f,  ##-- (output) timestamp of operation end</code></pre>
+
+<p>may implicitly call $doc-&gt;tokenize() (but shouldn&#39;t).</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="SEE-ALSO1">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2018 by Bryan Jurish</p>
+
+<p>This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.14.2 or, at your option, any later version of Perl 5 you may have available.</p>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>
+
+

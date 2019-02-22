@@ -1,0 +1,90 @@
+/* -*- Mode: C -*- */
+digraph dataflow_perl_files {
+  node [shape=rectangle,style=filled,fillcolor=pink,height=0.25,fontname="Courier"];
+  edge [decorate=0,fontname="Courier"];
+
+  //teifile [label="teifile: *.tei.xml",fillcolor=PowderBlue];
+  //add_c  [label="dtatw-add-c.perl",shape=diamond,fillcolor=orange,fontname="Courier-Bold"];
+  //teifile -> add_c;
+
+  xmlfile [label="xmlfile: *.xml",fillcolor=PowderBlue];
+  //add_c -> xmlfile;
+
+  mkindex [label="mkindex",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  xmlfile -> mkindex;
+
+  sxfile [label="sxfile: *.sx"];
+  txfile [label="txfile: *.tx"];
+  cxfile [label="cxfile: *.cx"];
+  mkindex -> cxfile;
+  mkindex -> sxfile;
+  mkindex -> txfile;
+  {rank=same; cxfile sxfile txfile}
+
+  mkbx0 [label="mkbx0",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  sxfile -> mkbx0;
+ 
+  bx0file [label="bx0file: *.bx0"];
+  mkbx0 -> bx0file;
+
+  mkbx [label="mkbx",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  bx0file -> mkbx;
+  txfile  -> mkbx;
+
+  bxfile [label="bxfile: *.bx"];
+  txtfile [label="txtfile: *.txt"];
+  mkbx -> bxfile;
+  mkbx -> txtfile;
+  {rank=same; bxfile txtfile}
+
+  tokenize [label="tokenize(::dummy)",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold",justify="left"];
+  txtfile -> tokenize;
+
+  tokfile [label="tokfile: *.t"];
+  tokenize -> tokfile;
+  //{rank=same; tokdata tokfile;}
+
+  xtokfile [label="xtokfile: *.t.xml",fillcolor=PowderBlue];
+
+  //-- tok2xml via c prog
+  tok2xml[label="tok2xml",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  bxfile -> tok2xml;
+  cxfile -> tok2xml;
+  tokfile -> tok2xml;
+  tok2xml -> xtokfile;
+
+  /*
+  //-- standoff via C progs (basically obsolete)
+  standoff [label="standoff",shape=diamond,fillcolor=PaleGreen,style=dotted,fontname="Courier-Bold"];
+  xtokfile -> standoff;
+
+  sosfile [label="sosfile: *.s.xml",fillcolor=PowderBlue,style=dotted];
+  sowfile [label="sowfile: *.w.xml",fillcolor=PowderBlue,style=dotted];
+  soafile [label="soafile: *.a.xml",fillcolor=PowderBlue,style=dotted];
+  standoff -> sosfile;
+  standoff -> sowfile;
+  standoff -> soafile;
+  { rank=same; sosfile sowfile soafile; }
+  */
+
+  //-- splice-in: w,s: addws module
+  add_ws  [label="addws",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  xtokfile -> add_ws;
+  xmlfile  -> add_ws;
+  add_ws   -> cwsfile;
+  cwsfile [label="cwsfile: *.cws.xml",fillcolor=PowderBlue];
+
+  //-- splice-in: generic id-based splice (e.g. cab)
+  cab [label="dta-cab",shape=diamond,fillcolor=orange,fontname="Courier-Bold"];
+  xtokfile -> cab;
+
+  cabfile [label="-cabfile: *.cab.xml",fillcolor=yellow];
+  cab -> cabfile;
+
+  idsplice [label="idsplice",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  cabfile -> idsplice;
+  cwsfile -> idsplice;
+
+  cwstfile [label="cwstfile: *.cwst.xml",fillcolor=PowderBlue];
+  idsplice -> cwstfile;
+}

@@ -490,4 +490,15 @@ Keep in mind, a thread takes up memory.  So the more threads you have (and anima
 
 =back
 
+=head1 COPYRIGHT
+
+Copyright 2019 Richard Kelsch
+All Rights Reserved
+
+=head1 LICENSE
+
+GNU Public License Version 3.0
+
+* See the "LICENSE" file in the distribution for this license.
+
 =cut

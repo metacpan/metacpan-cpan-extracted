@@ -6,7 +6,7 @@ use Digest::MD5;
 use HTTP::Response;
 use base 'LWP::UserAgent';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
 	my ($class, %opts) = @_;
@@ -108,7 +108,7 @@ sub simple_request {
 			
 			if (open my $fh, '>:raw', $fpath) {
 				print $fh $request->url, "\n";
-				print $fh $response->as_string;
+				print $fh $response->as_string("\n");
 				close $fh;
 				
 				push @{$self->{last_cached}}, $fpath;
@@ -174,10 +174,10 @@ sub _get_cache_name {
 			$tmp_request->content($self->{cachename_spec}{_body});
 		}
 		
-		return $self->{cache_dir} . '/' . Digest::MD5::md5_hex($tmp_request->as_string);
+		return $self->{cache_dir} . '/' . Digest::MD5::md5_hex($tmp_request->as_string("\n"));
 	}
 	
-	return $self->{cache_dir} . '/' . Digest::MD5::md5_hex($request->as_string);
+	return $self->{cache_dir} . '/' . Digest::MD5::md5_hex($request->as_string("\n"));
 }
 
 sub _parse_cached_response {
@@ -334,7 +334,7 @@ This will not change name of the file with cache.
 =head2 cachename_spec() or cachename_spec($spec)
 
 Gets or sets hash reference to cache naming specification. In fact cache naming for each request based on request content.
-Internally it is md5_hex($request->as_string). But what if some of request headers in your program changed dinamically, e.g.
+Internally it is md5_hex($request->as_string("\n")). But what if some of request headers in your program changed dinamically, e.g.
 User-Agent or Cookie? In such case caching will not work properly for you. We need some way to omit this headers when calculating
 cache name. This option is what you need. Specification hash should contain header name and header value which will be used 
 (instead of values in request) while calculating cache name.

@@ -97,4 +97,15 @@ Wait number of seconds before returning (0=don't wait)
 
 =back
 
+=head1 COPYRIGHT
+
+Copyright 2010 - 2019 Richard Kelsch
+All Rights Reserved
+
+=head1 LICENSE
+
+GNU Public License Version 3.0
+
+* See the "LICENSE" file in this distribution for this license.
+
 =cut

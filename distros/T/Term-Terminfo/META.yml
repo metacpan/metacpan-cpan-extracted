@@ -3,23 +3,24 @@ abstract: 'access the F<terminfo> database'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  ExtUtils::CBuilder: 0
-  Test::More: 0
+  ExtUtils::CBuilder: '0'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::CChecker: 0.02
-  Module::Build: 0
-  Module::Build::Compat: 0
+  ExtUtils::CChecker: '0.02'
+  Module::Build: '0.4004'
+  Module::Build::Using::PkgConfig: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Term-Terminfo
 provides:
   Term::Terminfo:
     file: lib/Term/Terminfo.pm
-    version: 0.08
+    version: '0.09'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.08
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -157,9 +157,12 @@ type Mutation {
 }
 
 type Query {
-  department(dept_no: [String!]!): [Department]
-  employee(emp_no: [Int!]!): [Employee]
-  salary(from_date: [DateTime!]!): [Salary]
+  department(dept_no: String!): Department
+  departments(dept_no: [String!]!): [Department]
+  employee(emp_no: Int!): Employee
+  employees(emp_no: [Int!]!): [Employee]
+  salaries(from_date: [DateTime!]!): [Salary]
+  salary(from_date: DateTime!): Salary
   "input to search"
   searchCurrentDeptEmp(input: CurrentDeptEmpSearchInput!): [CurrentDeptEmp]
   "input to search"
@@ -176,7 +179,8 @@ type Query {
   searchSalary(input: SalarySearchInput!): [Salary]
   "input to search"
   searchTitle(input: TitleSearchInput!): [Title]
-  title(from_date: [DateTime!]!, title: [String!]!): [Title]
+  title(from_date: DateTime!, title: String!): Title
+  titles(from_date: [DateTime!]!, title: [String!]!): [Title]
 }
 
 type Salary {

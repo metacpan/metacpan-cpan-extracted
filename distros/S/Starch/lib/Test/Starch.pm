@@ -1,6 +1,7 @@
 package Test::Starch;
-
-$Test::Starch::VERSION = '0.10';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -49,7 +50,6 @@ use Starch::Manager;
 use Test2::V0;
 
 use Moo;
-use strictures 2;
 use namespace::clean;
 
 around BUILDARGS => sub{

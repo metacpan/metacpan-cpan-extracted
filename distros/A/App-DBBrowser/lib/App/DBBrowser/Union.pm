@@ -41,8 +41,9 @@ sub union_tables {
         my $from_subquery = '  Derived';
         my $all_tables    = '  All Tables';
         my @pre  = ( undef, $enough_tables );
-        my @post = ( $all_tables );
-        unshift @post, $from_subquery if $sf->{o}{extend}{union};
+        my @post;
+        push @post, $from_subquery if $sf->{o}{enable}{u_derived};
+        push @post, $all_tables    if $sf->{o}{enable}{union_all};
         my $used = ' (used)';
         my @tmp_tables;
         for my $table ( @$tables ) {

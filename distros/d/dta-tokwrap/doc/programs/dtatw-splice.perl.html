@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#OPTIONS-AND-ARGUMENTS">OPTIONS AND ARGUMENTS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>dtatw-splice.perl - splice generic standoff data into base XML files</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> dtatw-splice.perl [OPTIONS] BASE_XML_FILE STANDOFF_XML_FILE
+
+ General Options:
+  -help                  # this help message
+  -verbose LEVEL         # set verbosity level (FATAL,ERROR,WARN,INFO,DEBUG,TRACE); default=INFO
+  -quiet                 # be silent
+
+ I/O Options:
+  -blanks , -noblanks    # don&#39;t/do keep &#39;ignorable&#39; whitespace in standoff file (default=ignored)
+  -text   , -notext      # do/don&#39;t splice in standoff text data (default=do)
+  -ignore-attrs LIST     # comma-separated list of standoff attributes to ignore (default=none)
+  -ignore-elts LIST      # comma-separated list of standoff content elements to ignore (default=none)
+  -wrap-content ELT      # element in which to wrap original base file content for spliced items (default=empty:none)
+  -output FILE           # specify output file (default=&#39;-&#39; (STDOUT))</code></pre>
+
+<h1 id="OPTIONS-AND-ARGUMENTS">OPTIONS AND ARGUMENTS</h1>
+
+<p>Not yet written.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Splice generic standoff data into base XML files.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="./dtatw-add-c.perl.html">dtatw-add-c.perl(1)</a>, <a href="./dta-tokwrap.perl.html">dta-tokwrap.perl(1)</a>, <a href="./dtatw-add-ws.perl.html">dtatw-add-ws.perl(1)</a>, <a>dtatw-rm-c.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+
+</body>
+
+</html>
+
+

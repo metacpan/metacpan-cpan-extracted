@@ -1,4 +1,0 @@
-do{ my $x = {
-       'install_base' => '/Users/mgrimes/src/pdl/.local-v5.16'
-     };
-$x; }

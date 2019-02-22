@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
 use Term::TermKey;
 
@@ -18,3 +18,5 @@ ok( $key->type_is_position,  '$key->type_is_position after cursor position repor
 
 is( $key->line, 3, '$key->line after cursor position report' );
 is( $key->col,  5, '$key->col after cursor position report' );
+
+done_testing;

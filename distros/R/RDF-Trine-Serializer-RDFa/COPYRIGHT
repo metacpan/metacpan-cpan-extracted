@@ -6,10 +6,9 @@ Source: https://metacpan.org/release/RDF-Trine-Serializer-RDFa
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
  t/serializer-rdfa.t
-Copyright: Copyright 2018 Kjetil Kjernsmo.
+Copyright: Copyright 2019 Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -20,7 +19,7 @@ License: public-domain
 
 Files: README
  lib/RDF/Trine/Serializer/RDFa.pm
-Copyright: This software is copyright (c) 2017, 2018 by Kjetil Kjernsmo.
+Copyright: This software is copyright (c) 2017, 2018, 2019 by Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
@@ -32,19 +31,23 @@ Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: dist.ini
+Copyright: Copyright 2018 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: t/01basic.t
 Copyright: This software is copyright (c) 2017 by Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  

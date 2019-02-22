@@ -1,5 +1,5 @@
 package Consul::API::Event;
-$Consul::API::Event::VERSION = '0.023';
+$Consul::API::Event::VERSION = '0.024';
 use namespace::autoclean;
 
 use Moo::Role;
@@ -42,7 +42,7 @@ sub list {
 }
 
 package Consul::API::Event::Event;
-$Consul::API::Event::Event::VERSION = '0.023';
+$Consul::API::Event::Event::VERSION = '0.024';
 use Convert::Base64 qw(decode_base64);
 
 use Moo;

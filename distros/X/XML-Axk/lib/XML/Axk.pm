@@ -3,10 +3,9 @@
 package XML::Axk;
 use strict;
 use warnings;
-use Data::Hopen;
-use Data::Hopen::Base;
+use XML::Axk::Base;
 
-our $VERSION = '0.001006';
+our $VERSION = '0.001008';
 
 #use parent 'Exporter';
 #our (@EXPORT, @EXPORT_OK, %EXPORT_TAGS);

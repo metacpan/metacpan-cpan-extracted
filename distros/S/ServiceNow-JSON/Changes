@@ -4,3 +4,6 @@ Revision history for Perl extension ServiceNow::JSON.
 	- original version; created by h2xs 1.23 with options
 		-AX ServiceNow::JSON
 
+0.02  Wed Feb 28 09:21:11 EST 2018 
+    - fixed a concatenation warning that pukes up stderr
+

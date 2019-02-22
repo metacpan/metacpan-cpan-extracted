@@ -1,0 +1,6 @@
+## -*- Mode: CPerl -*-
+use DTA::CAB;
+use DTA::CAB::Analyzer::Unicruft;
+
+##-- return: for DTA::CAB::Persistent::loadPerlFile()
+our $obj = DTA::CAB::Analyzer::Unicruft->new();

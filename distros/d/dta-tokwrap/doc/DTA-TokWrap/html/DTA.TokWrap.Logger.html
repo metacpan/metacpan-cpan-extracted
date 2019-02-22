@@ -1,0 +1,273 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Functions:-Initialization">Functions: Initialization</a></li>
+      <li><a href="#Methods:-get-logger">Methods: get logger</a></li>
+      <li><a href="#Methods:-messages">Methods: messages</a></li>
+      <li><a href="#Methods:-carp-croak-friends">Methods: carp, croak &amp; friends</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SEE-ALSO1">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DTA::TokWrap::Logger - DTA::Tokwrap logging facility using Log::Log4perl</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> use DTA::TokWrap::Logger;
+ 
+ ##========================================================================
+ ## Functions: Initialization
+ 
+ PACKAGE-&gt;logInit();
+ PACKAGE-&gt;ensureLog();
+ $bool = CLASS_OR_OBJECT-&gt;logInitialized();
+ 
+ ##========================================================================
+ ## Methods: get logger
+ 
+ $logger = $class_or_obj-&gt;logger();
+ 
+ ##========================================================================
+ ## Methods: messages
+ 
+ $class_or_obj-&gt;trace (@msg);  ##-- &#39;TRACE&#39;-level message
+ $class_or_obj-&gt;debug (@msg);  ##-- &#39;DEBUG&#39;-level message
+ $class_or_obj-&gt;info  (@msg);  ##-- &#39;INFO&#39;-level message
+ $class_or_obj-&gt;warn  (@msg);  ##-- &#39;WARN&#39;-level message
+ $class_or_obj-&gt;error (@msg);  ##-- &#39;ERROR&#39;-level message
+ $class_or_obj-&gt;fatal (@msg);  ##-- &#39;FATAL&#39;-level message
+ 
+ $class_or_obj-&gt;llog($level, @msg);  ##-- variable-level message (numeric)
+ $class_or_obj-&gt;vlog($how,   @msg);  ##-- variable-level message (symbolic)
+ 
+ ##========================================================================
+ ## Methods: carp, croak &amp; friends
+ 
+ $class_or_obj-&gt;logwarn  (@msg);   ##-- warn w/o stack trace
+ $class_or_obj-&gt;logcarp  (@msg);   ##-- warn w/ 1-level stack trace
+ $class_or_obj-&gt;logcluck (@msg);   ##-- warn w/ full stack trace
+ 
+ $class_or_obj-&gt;logdie    (@msg);  ##-- die w/o stack trace
+ $class_or_obj-&gt;logcroak  (@msg);  ##-- die w/ 1-level stack trace
+ $class_or_obj-&gt;logconfess(@msg);  ##-- die w/ full stack trace</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>DTA::TokWrap::Logger provides an abstract base class for object-oriented access to the Log::Log4perl logging facility.</p>
+
+<h2 id="Functions:-Initialization">Functions: Initialization</h2>
+
+<dl>
+
+<dt id="logInit">logInit</dt>
+<dd>
+
+<pre><code> $PACKAGE-&gt;logInit()             ##-- use default configuration
+ $PACKAGE-&gt;logInit($file)        ##-- read configuration from a file
+ $PACKAGE-&gt;logInit(\$str)        ##-- read configuration from a string
+ $PACKAGE-&gt;logInit($file,$watch) ##-- watch configuration file</code></pre>
+
+<p>Initialize the logging facility.</p>
+
+<p>All log calls in the &#39;DTA::TokWrap&#39; namespace should use a subcategory of &#39;DTA::TokWrap&#39;. This function only needs to be called once; see <a>Log::Log4perl-&gt;initialized()</a> for details.</p>
+
+</dd>
+<dt id="ensureLog">ensureLog</dt>
+<dd>
+
+<pre><code> PACKAGE-&gt;ensureLog()</code></pre>
+
+<p>Ensures that <a>Log::Log4perl</a> has been initialized.</p>
+
+</dd>
+<dt id="logInitialized">logInitialized</dt>
+<dd>
+
+<pre><code> $bool = CLASS_OR_OBJECT-&gt;logInitialized();</code></pre>
+
+<p>Wrapper for <a>Log::Log4perl</a>-&gt;initialized().</p>
+
+</dd>
+</dl>
+
+<h2 id="Methods:-get-logger">Methods: get logger</h2>
+
+<dl>
+
+<dt id="logger">logger</dt>
+<dd>
+
+<pre><code> $logger = $class_or_obj-&gt;logger();
+ $logger = $class_or_obj-&gt;logger($category)</code></pre>
+
+<p>Wrapper for <a>Log::Log4perl</a>::get_logger($category).</p>
+
+<p>$category defaults to ref($class_or_obj)||$class_or_obj</p>
+
+</dd>
+</dl>
+
+<h2 id="Methods:-messages">Methods: messages</h2>
+
+<dl>
+
+<dt id="trace">trace</dt>
+<dd>
+
+</dd>
+<dt id="debug">debug</dt>
+<dd>
+
+</dd>
+<dt id="info">info</dt>
+<dd>
+
+</dd>
+<dt id="warn">warn</dt>
+<dd>
+
+</dd>
+<dt id="error">error</dt>
+<dd>
+
+</dd>
+<dt id="fatal">fatal</dt>
+<dd>
+
+<pre><code> $class_or_obj-&gt;trace (@msg);  ##-- &#39;TRACE&#39;-level message
+ $class_or_obj-&gt;debug (@msg);  ##-- &#39;DEBUG&#39;-level message
+ $class_or_obj-&gt;info  (@msg);  ##-- &#39;INFO&#39;-level message
+ $class_or_obj-&gt;warn  (@msg);  ##-- &#39;WARN&#39;-level message
+ $class_or_obj-&gt;error (@msg);  ##-- &#39;ERROR&#39;-level message
+ $class_or_obj-&gt;fatal (@msg);  ##-- &#39;FATAL&#39;-level message</code></pre>
+
+<p>Log messages at an explicit log-level.</p>
+
+<p>Be sure you have called <a>Log::Log4perl</a>::init() or similar first, e.g. <a href="#logInit">DTA::TokWrap::Logger::logInit()</a>.</p>
+
+</dd>
+<dt id="llog">llog</dt>
+<dd>
+
+<pre><code> $class_or_obj-&gt;llog($level, @msg);</code></pre>
+
+<p>Log message @msg at log-level $level, which should be a (numeric) constant exported by Log::Log4perl::Level.</p>
+
+</dd>
+<dt id="vlog">vlog</dt>
+<dd>
+
+<pre><code> $class_or_obj-&gt;vlog($how, @msg);</code></pre>
+
+<p>Log message @msg at log-level $how, which may be one of the following:</p>
+
+<ul>
+
+<li><p>a CODE reference (e.g. $how=\&amp;logsub) will cause $how-&gt;($class_or_obj,@msg) to be called.</p>
+
+</li>
+<li><p>a method name (e.g. $how=&#39;trace&#39;) will case calls $class_or_obj-&gt;${how}(@msg) to be called.</p>
+
+</li>
+<li><p>anything else (e.g. $how=&#39;none&#39;, $how=undef, ...) will be ignored.</p>
+
+</li>
+</ul>
+
+</dd>
+</dl>
+
+<h2 id="Methods:-carp-croak-friends">Methods: carp, croak &amp; friends</h2>
+
+<dl>
+
+<dt id="logwarn">logwarn</dt>
+<dd>
+
+</dd>
+<dt id="logcarp">logcarp</dt>
+<dd>
+
+</dd>
+<dt id="logcluck">logcluck</dt>
+<dd>
+
+<pre><code> $class_or_obj-&gt;logwarn  (@msg);   ##-- warn w/o stack trace
+ $class_or_obj-&gt;logcarp  (@msg);   ##-- warn w/ 1-level stack trace
+ $class_or_obj-&gt;logcluck (@msg);   ##-- warn w/ full stack trace</code></pre>
+
+</dd>
+<dt id="logdie">logdie</dt>
+<dd>
+
+</dd>
+<dt id="logcroak">logcroak</dt>
+<dd>
+
+</dd>
+<dt id="logconfess">logconfess</dt>
+<dd>
+
+<pre><code> $class_or_obj-&gt;logdie    (@msg);  ##-- die w/o stack trace
+ $class_or_obj-&gt;logcroak  (@msg);  ##-- die w/ 1-level stack trace
+ $class_or_obj-&gt;logconfess(@msg);  ##-- die w/ full stack trace</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="SEE-ALSO1">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2018 by Bryan Jurish</p>
+
+<p>This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.14.2 or, at your option, any later version of Perl 5 you may have available.</p>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>
+
+

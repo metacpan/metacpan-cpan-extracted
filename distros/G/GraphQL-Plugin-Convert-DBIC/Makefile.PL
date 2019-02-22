@@ -18,6 +18,7 @@ WriteMakefile(
     'DBIx::Class::Schema' => 0,
     'DBD::SQLite' => 0,
     'Test::Snapshot' => '0.05',
+    'JSON::MaybeXS' => 0,
   },
   PREREQ_PM => {
     'DBIx::Class::Schema' => 0,
@@ -44,7 +45,6 @@ WriteMakefile(
     prereqs => {
       develop => {
         requires => {
-          'Test::CheckManifest' => '0.9',
           'Test::Pod' => '1.22',
           'Pod::Markdown' => 0,
         },

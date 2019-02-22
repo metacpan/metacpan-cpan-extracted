@@ -7,7 +7,7 @@ my $meta = {
   "abstract"         => "RDFa Serializer for Attean",
   "author"           => ["Kjetil Kjernsmo (KJETILK) <kjetilk\@cpan.org>"],
   "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "generated_by"     => "Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010",
   "keywords"         => [],
   "license"          => ["perl_5"],
   "meta-spec"        => {
@@ -30,16 +30,17 @@ my $meta = {
                                          },
                                        },
                           test      => {
-                                         requires => {
-                                           "Module::Load::Conditional" => 0,
-                                           "Test::Modern"              => 0,
-                                           "Test::More"                => 0.96,
-                                           "URI::NamespaceMap"         => 0,
-                                         },
+                                         recommends => { "RDF::NS" => 20160408 },
+                                         requires   => {
+                                                         "Module::Load::Conditional" => 0,
+                                                         "Test::Modern"              => 0,
+                                                         "Test::More"                => 0.96,
+                                                         "URI::NamespaceMap"         => 0,
+                                                       },
                                        },
                         },
   "provides"         => {
-                          "AtteanX::Serializer::RDFa" => { file => "lib/AtteanX/Serializer/RDFa.pm", version => 0.01 },
+                          "AtteanX::Serializer::RDFa" => { file => "lib/AtteanX/Serializer/RDFa.pm", version => "0.100" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -56,7 +57,7 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => 0.01,
+  "version"          => "0.100",
   "x_static_install" => 1,
 };
 

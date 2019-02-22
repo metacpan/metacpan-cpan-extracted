@@ -1,12 +1,9 @@
 Revision history for Log-Log4perl-Shortcuts
 
-0.023     2019-01-28 19:02:10-05:00 America/New_York
+0.024     2019-02-21 15:59:30-05:00 America/New_York
 
-	- Add Dist::Zilla files to distro
-
-0.022     2019-01-28 15:18:27-05:00 America/New_York
-
-	- Eliminate Path::Tiny dependency
+  - Fix bad test
+  - Add ini files to distribution
 
 0.021     2018-09-15 14:09:10-04:00 America/New_York
 

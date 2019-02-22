@@ -8,7 +8,7 @@ package Tickit::StringPos;
 use strict;
 use warnings;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 # XS code comes from Tickit itself
 require Tickit;
@@ -38,10 +38,11 @@ would increment the bytes counter by 2 and the C<codepoints> counter by 1.
 
 The C<codepoints> member counts individual Unicode codepoints.
 
-The C<graphemes> member counts whole composed grahical clusters of codepoints,
-where combining accents which count as individual codepoints do not count as
-separate graphemes. For example, the codepoint sequence U+0065 U+0301 would
-increment the C<codepoint> counter by 2 and the C<graphemes> counter by 1.
+The C<graphemes> member counts whole composed graphical clusters of
+codepoints, where combining accents which count as individual codepoints do
+not count as separate graphemes. For example, the codepoint sequence U+0065
+U+0301 would increment the C<codepoint> counter by 2 and the C<graphemes>
+counter by 1.
 
 The C<columns> member counts the number of screen columns consumed by the
 graphemes. Most graphemes consume only 1 column, but some are defined in

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 31;
+use Test::More;
 use Test::Refcount;
 
 use Term::TermKey;
@@ -72,3 +72,5 @@ is_refcount( $tk, 2, '$tk has refcount 2 before dropping key' );
 undef $key;
 
 is_oneref( $tk, '$k has refcount 1 before EOF' );
+
+done_testing;

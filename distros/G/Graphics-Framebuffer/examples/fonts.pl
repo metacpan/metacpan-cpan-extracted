@@ -92,4 +92,15 @@ Tells the script to dump a list of the font names to STDOUT.
 
 =back
 
+=head1 COPYRIGHT
+
+Copyright 2003 - 2019 Richard Kelsch
+All Rights Reserved
+
+=head1 LICENSE
+
+GNU Public License Version 3.0
+
+* The "LICENSE" file in the distribution has this license.
+
 =cut

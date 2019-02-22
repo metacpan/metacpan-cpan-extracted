@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2019 -- leonerd@leonerd.org.uk
 
 package Term::Terminfo;
 
@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -21,22 +21,22 @@ C<Term::Terminfo> - access the F<terminfo> database
 
 =head1 SYNOPSIS
 
- use Term::Terminfo;
+   use Term::Terminfo;
 
- my $ti = Term::Terminfo->new;
+   my $ti = Term::Terminfo->new;
 
- printf "This terminal %s do overstrike\n",
-    $ti->getflag('os') ? "can" : "cannot";
+   printf "This terminal %s do overstrike\n",
+      $ti->getflag('os') ? "can" : "cannot";
 
- printf "Tabs on this terminal are initially every %d columns\n",
-    $ti->getnum('it');
+   printf "Tabs on this terminal are initially every %d columns\n",
+      $ti->getnum('it');
 
 
- printf "This terminal %s do overstrike\n",
-    $ti->flag_by_varname('over_strike') ? "can" : "cannot";
+   printf "This terminal %s do overstrike\n",
+      $ti->flag_by_varname('over_strike') ? "can" : "cannot";
 
- printf "Tabs on this terminal are initially every %d columns\n",
-    $ti->num_by_varname('init_tabs');
+   printf "Tabs on this terminal are initially every %d columns\n",
+      $ti->num_by_varname('init_tabs');
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,9 @@ below.
 
 =cut
 
-=head2 $ti = Term::Terminfo->new( $termtype )
+=head2 new
+
+   $ti = Term::Terminfo->new( $termtype )
 
 Constructs a new C<Term::Terminfo> object representing the given termtype. If
 C<$termtype> is not defined, C<$ENV{TERM}> will be used instead. If that
@@ -93,11 +95,17 @@ sub new
 
 =cut
 
-=head2 $bool = $ti->getflag( $capname )
+=head2 getflag
 
-=head2 $num = $ti->getnum( $capname )
+=head2 getnum
 
-=head2 $str = $ti->getstr( $capname )
+=head2 getstr
+
+   $bool = $ti->getflag( $capname )
+
+   $num = $ti->getnum( $capname )
+
+   $str = $ti->getstr( $capname )
 
 Returns the value of the flag, number or string capability of the given
 capname.
@@ -125,11 +133,17 @@ sub getstr
    return $self->{strs_by_capname}{$capname};
 }
 
-=head2 $bool = $ti->flag_by_varname( $varname )
+=head2 flag_by_varname
 
-=head2 $num = $ti->num_by_varname( $varname )
+=head2 num_by_varname
 
-=head2 $str = $ti->str_by_varname( $varname )
+=head2 str_by_varname
+
+   $bool = $ti->flag_by_varname( $varname )
+
+   $num = $ti->num_by_varname( $varname )
+
+   $str = $ti->str_by_varname( $varname )
 
 Returns the value of the flag, number or string capability of the given
 varname.
@@ -157,11 +171,17 @@ sub str_by_varname
    return $self->{strs_by_varname}{$varname};
 }
 
-=head2 @capnames = $ti->flag_capnames
+=head2 flag_capnames
 
-=head2 @capnames = $ti->num_capnames
+=head2 num_capnames
 
-=head2 @capnames = $ti->str_capnames
+=head2 str_capnames
+
+   @capnames = $ti->flag_capnames
+
+   @capnames = $ti->num_capnames
+
+   @capnames = $ti->str_capnames
 
 Return lists of the capnames of the supported flags, numbers, and strings
 
@@ -185,11 +205,17 @@ sub str_capnames
    return sort keys %{ $self->{strs_by_capname} };
 }
 
-=head2 @varnames = $ti->flag_varnames
+=head2 flag_varnames
 
-=head2 @varnames = $ti->num_varnames
+=head2 num_varnames
 
-=head2 @varnames = $ti->str_varnames
+=head2 str_varnames
+
+   @varnames = $ti->flag_varnames
+
+   @varnames = $ti->num_varnames
+
+   @varnames = $ti->str_varnames
 
 Return lists of the varnames of the supported flags, numbers, and strings
 
@@ -230,7 +256,7 @@ I may at some point consider them.
 =item *
 
 C<unibilium> - a terminfo parsing library -
-<https://github.com/mauke/unibilium>
+L<https://github.com/mauke/unibilium>
 
 =back
 

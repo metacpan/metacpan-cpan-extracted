@@ -1,7 +1,7 @@
 package LINE::Bot::API;
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use JSON::XS;
 use URI;
@@ -11,7 +11,9 @@ use LINE::Bot::API::Client;
 use LINE::Bot::API::Event;
 use LINE::Bot::API::Response::Common;
 use LINE::Bot::API::Response::Content;
+use LINE::Bot::API::Response::NumberOfSentMessages;
 use LINE::Bot::API::Response::Profile;
+use LINE::Bot::API::Response::IssueLinkToken;
 
 sub new {
     my($class, %args) = @_;
@@ -26,24 +28,34 @@ sub new {
     }, $class;
 }
 
+sub request {
+    my ($self, $method, $path, @payload) = @_;
+
+    return $self->{client}->$method(
+        $self->{messaging_api_endpoint} .  $path,
+        @payload,
+    );
+}
+
 sub reply_message {
     my($self, $reply_token, $messages) = @_;
 
-    my $res = $self->{client}->post(
-        $self->{messaging_api_endpoint} . 'message/reply',
+    my $res = $self->request(
+        post => 'message/reply',
         +{
             replyToken => $reply_token,
             messages   => $messages,
         }
     );
+
     LINE::Bot::API::Response::Common->new(%{ $res });
 }
 
 sub push_message {
     my($self, $to_id, $messages) = @_;
 
-    my $res = $self->{client}->post(
-        $self->{messaging_api_endpoint} . 'message/push',
+    my $res = $self->request(
+        post => 'message/push',
         +{
             to       => $to_id,
             messages => $messages,
@@ -55,8 +67,8 @@ sub push_message {
 sub multicast {
     my($self, $to_ids, $messages) = @_;
 
-    my $res = $self->{client}->post(
-        $self->{messaging_api_endpoint} . 'message/multicast',
+    my $res = $self->request(
+        post => 'message/multicast',
         +{
             to       => $to_ids,
             messages => $messages,
@@ -67,8 +79,8 @@ sub multicast {
 
 sub get_message_content {
     my($self, $message_id, %options) = @_;
-    my $res = $self->{client}->contents_download(
-        $self->{messaging_api_endpoint} . "message/$message_id/content",
+    my $res = $self->request(
+        'contents_download' => "message/$message_id/content",
         %options
     );
     LINE::Bot::API::Response::Content->new(%{ $res });
@@ -76,20 +88,38 @@ sub get_message_content {
 
 sub get_profile {
     my($self, $user_id) = @_;
-    my $res = $self->{client}->get($self->{messaging_api_endpoint} . "profile/$user_id");
+    my $res = $self->request(get => "profile/$user_id");
     LINE::Bot::API::Response::Profile->new(%{ $res });
 }
 
 sub leave_room {
     my($self, $room_id) = @_;
-    my $res = $self->{client}->post($self->{messaging_api_endpoint} . "room/$room_id/leave", +{});
+    my $res = $self->request(post => "room/$room_id/leave", +{});
     LINE::Bot::API::Response::Common->new(%{ $res });
 }
 
 sub leave_group {
     my($self, $group_id) = @_;
-    my $res = $self->{client}->post($self->{messaging_api_endpoint} . "group/$group_id/leave", +{});
+    my $res = $self->request(post => "group/$group_id/leave", +{});
     LINE::Bot::API::Response::Common->new(%{ $res });
+}
+
+sub get_number_of_sent_reply_messages {
+    my($self, $date) = @_;
+    my $res = $self->request(get => "message/delivery/reply?date=${date}");
+    LINE::Bot::API::Response::NumberOfSentMessages->new(%{ $res });
+}
+
+sub get_number_of_sent_push_messages {
+    my($self, $date) = @_;
+    my $res = $self->request(get => "message/delivery/push?date=${date}", +{});
+    LINE::Bot::API::Response::NumberOfSentMessages->new(%{ $res });
+}
+
+sub get_number_of_sent_multicast_messages {
+    my($self, $date) = @_;
+    my $res = $self->request(get => "message/delivery/multicast?date=${date}", +{});
+    LINE::Bot::API::Response::NumberOfSentMessages->new(%{ $res });
 }
 
 sub validate_signature {
@@ -100,6 +130,12 @@ sub validate_signature {
 sub parse_events_from_json {
     my($self, $json) = @_;
     LINE::Bot::API::Event->parse_events_json($json);
+}
+
+sub issue_link_token {
+    my($self, $user_id) = @_;
+    my $res = $self->request(post => "user/${user_id}/linkToken", +{});
+    LINE::Bot::API::Response::IssueLinkToken->new(%{ $res });
 }
 
 1;
@@ -185,11 +221,10 @@ Send reply messages to a user, room or group.
         }
     }
 
-You can get a C<reply_token> from a L<webhook event object|https://devdocs.line.me/#webhook-event-object>.
+You can get a C<reply_token> from a L<webhook event object|https://developers.line.me/en/reference/messaging-api/#webhook-event-objects>.
 See the documentation for the C<parse_events_from_json($json)> method.
 
-You can also see the online API reference documentation.
-L<https://devdocs.line.me/#reply-message>
+See also the API reference of this method: L<https://developers.line.me/en/reference/messaging-api/#send-reply-message>
 
 =head2 push_message($user_id|$room_id|$group_id, [ $message, ... ])
 
@@ -199,11 +234,10 @@ Send push messages to a user, room or group.
     $messages->add_text( text => 'Example push text' );
     $bot->push_message($user_id, $messages->build);
 
-You can get a C<user_id>, C<room_id> or C<group_id> from a L<webhook event object|https://devdocs.line.me/#webhook-event-object>.
+You can get a C<user_id>, C<room_id> or C<group_id> from a L<webhook event object|https://developers.line.me/en/reference/messaging-api/#webhook-event-objects>
 See the documentation for the C<parse_events_from_json($json)> method.
 
-You can also see the online API reference documentation.
-L<https://devdocs.line.me/#push-message>
+See also the LINE Developers API reference of this method: L<https://developers.line.me/en/reference/messaging-api/#send-push-message>
 
 =head2 multicast([$user_id, ... ], [ $message, ... ])
 
@@ -213,11 +247,10 @@ Send push messages to multiple users.
     $messages->add_text( text => 'Example push text' );
     $bot->multicast([ $user_id ], $messages->build);
 
-You can get a C<user_id> from a L<webhook event object|https://devdocs.line.me/#webhook-event-object>.
+You can get a C<user_id> from a L<webhook event object|https://developers.line.me/en/reference/messaging-api/#webhook-event-objects>.
 See the documentation for the C<parse_events_from_json($json)> method.
 
-You can also see the online API reference documentation.
-L<https://devdocs.line.me/#multicast>
+See also the LINE Developers API reference of this method: L<https://developers.line.me/en/reference/messaging-api/#send-multicast-messages>
 
 =head2 validate_signature($json, $signature)
 
@@ -262,7 +295,7 @@ Bot leaves a room.
 
     $bot->leave_room($room_id);
 
-You can get a C<room_id> by a L<Webhook Event Object|https://devdocs.line.me/#webhook-event-object>.
+You can get a C<room_id> by a L<Webhook Event Object|https://developers.line.me/en/reference/messaging-api/#webhook-event-objects>.
 And see also C<parse_events_from_json($json)> method's document.
 
 =head2 leave_group($group_id)
@@ -271,7 +304,7 @@ Bot leaves a group.
 
     $bot->leave_group($group_id);
 
-You can get a C<group_id> from a L<webhook event object|https://devdocs.line.me/#webhook-event-object>.
+You can get a C<group_id> from a L<webhook event object|https://developers.line.me/en/reference/messaging-api/#webhook-event-objects>.
 See the documentation for the C<parse_events_from_json($json)> method.
 
 =head2 get_message_content($message_id)
@@ -285,11 +318,12 @@ Get the original file which was sent by user.
         ...
     }
 
-You can get a C<message_id> from a L<webhook event object|https://devdocs.line.me/#webhook-event-object>.
+You can get a C<message_id> from a L<webhook event object|https://developers.line.me/en/reference/messaging-api/#webhook-event-objects>.
 See the documentation for the C<parse_events_from_json($json)> method.
 
 You can also see the online API reference documentation.
-L<https://devdocs.line.me/#get-content>
+
+See also the LINE Developers API reference of this method: L<https://developers.line.me/en/reference/messaging-api/#get-content>
 
 =head2 get_profile($user_id)
 
@@ -303,10 +337,54 @@ Get user profile information.
         say $ret->status_message;
     }
 
-See the online API reference documentation.
-L<https://devdocs.line.me/#bot-api-get-profile>
+See also the LINE Developers API reference of this method:  L<https://developers.line.me/en/reference/messaging-api/#get-profile>
+
+=head2 C<< get_number_of_sent_reply_messages($date) >>
+
+Gets the number of messages sent with the C<< /bot/message/reply >> endpoint.
+
+The number of messages retrieved by this operation does not include
+the number of messages sent from LINE@ Manager.
+
+The C<< $date >> parameter is "yyyyMMdd" format.
+
+=head2 C<< get_number_of_sent_push_messages($date) >>
+
+Gets the number of messages sent with the C<< /bot/message/push >> endpoint.
+
+The number of messages retrieved by this operation does not include the number of messages sent from LINE@ Manager.
+
+=over 4
+
+=item date
+
+Date the messages were sent
+
+    Format: yyyyMMdd (Example: 20191231)
+    Timezone: UTC+9
+
+=back
+
+=head2 C<< get_number_of_sent_multicast_messages($date) >>
+
+Gets the number of messages sent with the C<< /bot/message/multicast >> endpoint.
+
+The number of messages retrieved by this operation does not include the number of messages sent from LINE@ Manager.
+
+=over 4
+
+=item date
+
+Date the messages were sent
+
+    Format: yyyyMMdd (Example: 20191231)
+    Timezone: UTC+9
+
+=back
 
 =head2 How to build a send message object
+
+See the LINE Developers API reference about L<Message objects|https://developers.line.me/en/reference/messaging-api/#message-objects>
 
 When the C<LINE::Bot::API::Builder::SendMessage> class is used, it is possible easily to build a send message object.
 That class supports a fluent interface.
@@ -319,9 +397,6 @@ That class supports a fluent interface.
         preview_url => 'http://example.com/image_preview.jpg',
     );
     $bot->reply_message($reply_token, $messages->build);
-
-See the online API reference documentation.
-L<https://devdocs.line.me/#send-message-object>
 
 =head3 Text type
 
@@ -498,6 +573,41 @@ You can use a helper module for the template type.
     )->add_template($carousel->build);
     $bot->reply_message($reply_token, $messages->build);
 
+=head4 Image Carousel type
+
+    my $carousel = LINE::Bot::API::Builder::TemplateMessage->new_image_carousel(
+        alt_text => 'this is a image carousel template',
+    );
+
+    my $column1 = LINE::Bot::API::Builder::TemplateMessage::ImageColumn->new(
+        image_url => 'https://example.com/bot/images/item1.jpg',
+    )->add_postback_action(
+        label => 'postback',
+        data  => 'postback data',
+        text  => 'postback message',
+    );
+    $carousel->add_column($column1->build);
+    
+    my $column2 = LINE::Bot::API::Builder::TemplateMessage::ImageColumn->new(
+        image_url => 'https://example.com/bot/images/item2.jpg',
+    )->add_message_action(
+        label => 'message',
+        text  => 'message',
+    );
+    $carousel->add_column($column2->build);
+    
+    my $column3 = LINE::Bot::API::Builder::TemplateMessage::ImageColumn->new(
+        image_url => 'https://example.com/bot/images/item3.jpg',
+    )->add_uri_action(
+        label => 'uri',
+        uri   => 'http://example.com/',
+    );
+    $carousel->add_column($column3->build);
+
+    my $messages = LINE::Bot::API::Builder::SendMessage->new(
+    )->add_template($carousel->build);
+    $bot->reply_message($reply_token, $messages->build);
+
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2016 LINE Corporation
@@ -509,6 +619,6 @@ https://opensource.org/licenses/Artistic-2.0
 =head1 SEE ALSO
 
 L<LINE::Bot::API::Event>,
-L<https://business.line.me/>, L<https://devdocs.line.me/>
+L<https://business.line.me/>, L<https://developers.line.me/>
 
 =cut

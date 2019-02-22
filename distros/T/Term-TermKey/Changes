@@ -1,5 +1,10 @@
 Revision history for Term-TermKey
 
+0.17    2019-02-20 22:13:39
+        [CHANGES]
+         * Switch build system to Module::Build::Using::PkgConfig
+         * Generally updated module docs, etc...
+
 0.16    CHANGES:
          * Meta-merge a configure-time dependency on Alien::libtermkey, as it
            may be helpful on smoke-test machines.

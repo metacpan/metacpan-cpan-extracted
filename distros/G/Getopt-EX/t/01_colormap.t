@@ -7,9 +7,14 @@ use Getopt::EX::Colormap qw(ansi_code);
 
 sub rgb24(&) {
     my $sub = shift;
-    local $Getopt::EX::Colormap::COLOR_RGB24 = 1;
+    local $Getopt::EX::Colormap::RGB24 = 1;
     $sub->();
 }
+
+
+{
+
+local $Getopt::EX::Colormap::LINEAR256 = 1;
 
 is(ansi_code("R"), "\e[31m", "color name");
 is(ansi_code("W/R"), "\e[37;41m", "background");
@@ -33,6 +38,14 @@ rgb24 {
     is(ansi_code("(1,2,3)"), "\e[38;2;1;2;3m", "rgb 24bit");
 };
 
+}
+
+
+is(ansi_code("ABCDEF"), "\e[38;5;110m", "hex24");
+is(ansi_code("#AABBCC"), "\e[38;5;109m", "hex24 with #");
+is(ansi_code("#ABC"),    "\e[38;5;109m", "hex12");
+is(ansi_code("(171,205,239)"), "\e[38;5;110m", "rgb");
+
 
 is(ansi_code("DK/544"), "\e[1;30;48;5;224m", "256 color");
 is(ansi_code("//DK///544"), "\e[1;30;48;5;224m", "multiple /");
@@ -55,7 +68,7 @@ like(ansi_end("DK/544{EL}"), qr/^\e\[?K/, "{EL} before RESET");
 SKIP: {
     eval {
 	is(ansi_code("<moccasin>"), "\e\[38;5;223m",
-	   "color name (<:moccasin>)");
+	   "color name (<moccasin>)");
     };
     skip $@ =~ s/\)\K.*//r if $@;
 }

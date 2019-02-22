@@ -156,7 +156,7 @@ stream_is( "\e[22m", '$term->chpen( b => undef )' );
 $term->chpen( b => undef );
 stream_is( "", '$term->chpen( b => undef ) again is no-op' );
 
-$term->chpen( u => undef );
+$term->chpen( u => 0 );
 stream_is( "\e[m", '$term->chpen( u => undef )' );
 
 $term->setpen( fg => 1, bg => 5 );

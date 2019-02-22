@@ -1,0 +1,142 @@
+/* -*- Mode: C -*- */
+digraph dataflow_perl_dockeys {
+  node [shape=rectangle,style=filled,fillcolor=white,height=0.25,fontname="Courier"];
+  edge [decorate=0,arrowhead=open,fontname="Courier"];
+
+  xml [label="xmlfile: *.xml",fillcolor=PowderBlue];
+
+  mkindex [label="mkindex",fillcolor=PaleGreen,fontname="Courier-Bold"];
+  xml -> mkindex;
+
+  sxfile [label="sxfile: *.sx",fillcolor=pink];
+  txfile [label="txfile: *.tx",fillcolor=pink];
+  cxfile [label="cxfile: *.cx",fillcolor=pink];
+  mkindex -> cxfile;
+  mkindex -> sxfile;
+  mkindex -> txfile;
+  {rank=same; cxfile sxfile txfile}
+
+  cxdata [label="cxdata",style=dotted];
+  cxfile -> cxdata;
+
+  bx0doc [label="bx0doc",style=dotted];
+  mkbx0 [label="mkbx0",fillcolor=PaleGreen,fontname="Courier-Bold"];
+  sxfile -> mkbx0;
+  mkbx0 -> bx0doc;
+
+  bx0_xsl  [label="hint.xsl\nsort.xsl",fillcolor=grey80];
+  mkbx0 -> bx0_xsl;
+  
+  bx0file [label="bx0file: *.bx0",fillcolor=pink];
+  bx0doc -> bx0file;
+  bx0file -> bx0doc [arrowhead=open,style=dotted];
+
+  bxdata [label="bxdata",style=dotted];
+  mkbx [label="mkbx",fillcolor=PaleGreen,fontname="Courier-Bold"];
+  bx0doc -> mkbx;
+  txfile -> mkbx;
+  mkbx -> bxdata;
+  //{rank=same; bxdata txtfile;}
+  //{rank=same; mkbx bxfile;}
+
+  bxfile [label="bxfile: *.bx",fillcolor=pink];
+  txtfile [label="txtfile: *.txt",fillcolor=pink];
+  bxdata -> bxfile;
+  bxdata -> txtfile;
+  bxfile -> bxdata [arrowhead=open,style=dotted];
+  txtfile -> bxdata [arrowhead=open,style=dotted];
+  //{rank=same; bxfile txtfile}
+
+  tokdata [label="tokdata",style=dotted];
+  tokenize [label="tokenize(::dummy)",fillcolor=PaleGreen,fontname="Courier-Bold",justify="left"];
+  txtfile -> tokenize;
+  tokenize -> tokdata;
+
+  tokfile [label="tokfile: *.t",fillcolor=pink];
+  tokdata -> tokfile;
+  tokfile -> tokdata [arrowhead=open,style=dotted];
+  //{rank=same; tokdata tokfile;}
+
+  xtokdata [label="xtokdata",style=dotted];
+  xtokfile [label="xtokfile: *.t.xml",fillcolor=PowderBlue];
+  xtokdata -> xtokfile;
+  xtokfile -> xtokdata [arrowhead=open,style=dotted];
+
+  xtokdoc  [label="xtokdoc",style=dotted];
+  xtokdata -> xtokdoc [arrowhead=open,style=dotted];
+  //{rank=same; xtokdata xtokfile;}
+
+  //-- old pure-perl tok2xml
+  /*
+  tok2xml [label="tok2xml",fillcolor=PaleGreen,fontname="Courier-Bold"];
+  tokdata -> tok2xml;
+  bxdata  -> tok2xml;
+  cxdata  -> tok2xml;
+  tok2xml -> xtokdata;
+  //{rank=same; cxdata tokdata};
+  */
+
+  //-- tok2xml via c prog
+  tok2xml_c[label="tok2xml",fillcolor=PaleGreen,fontname="Courier-Bold"];
+  //{rank=same; tok2xml tok2xml_c};
+  /*
+  //-- input from files ; output to file
+  bxfile -> tok2xml_c;
+  cxfile -> tok2xml_c;
+  tokfile -> tok2xml_c;
+  tok2xml_c -> xtokfile;
+  */
+  //-- input from files ; output to xtokdata
+  bxfile -> tok2xml_c;
+  cxfile -> tok2xml_c;
+  tokfile -> tok2xml_c;
+  tok2xml_c -> xtokdata; //xtokfile;
+  /* //-- input from files+tokdata ; output to file
+  bxfile -> tok2xml_c;
+  cxfile -> tok2xml_c;
+  tokdata -> tok2xml_c;
+  tok2xml_c -> xtokfile;
+  */
+  
+
+  /*
+  //-- standoff via C progs
+  standoff [label="standoff",fillcolor=PaleGreen,fontname="Courier-Bold"];
+  xtokdata -> standoff;
+
+  sofiles [label="sosfile: *.s.xml\nsowfile: *.w.xml\nsoafile: *.a.xml",fillcolor=PowderBlue];
+  standoff -> sofiles;
+
+  //-- standoff: xsl stylesheets (now obsolete)
+  standoff_xsl [label="t2s.xsl\nt2w.xsl\nt2a.xsl",fillcolor=grey80];
+  standoff -> standoff_xsl;
+  */
+
+  //-- standoff via xsl
+  /*
+  standoff [label="standoff",fillcolor=PaleGreen,fontname="Courier-Bold"];
+  xtokdoc -> standoff;
+
+  t2s_xsl [label="t2s.xsl",fillcolor=grey80];
+  t2w_xsl [label="t2w.xsl",fillcolor=grey80];
+  t2a_xsl [label="t2a.xsl",fillcolor=grey80];
+  standoff -> t2s_xsl;
+  standoff -> t2w_xsl;
+  standoff -> t2a_xsl;
+
+  sowdoc [label="sowdoc"];
+  standoff -> sowdoc;
+  sowfile [label="sowfile: *.w.xml",fillcolor=PowderBlue];
+  sowdoc -> sowfile;
+  
+  sosdoc [label="sosdoc"];
+  standoff -> sosdoc;
+  sosfile [label="sosfile: *.s.xml",fillcolor=PowderBlue];
+  sosdoc -> sosfile;
+
+  soadoc [label="soadoc"];
+  standoff -> soadoc;
+  soafile [label="soafile: *.a.xml",fillcolor=PowderBlue];
+  soadoc -> soafile;
+  */
+}

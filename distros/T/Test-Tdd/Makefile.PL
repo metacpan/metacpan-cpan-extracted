@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
     "bin/provetdd"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Test::Tdd",
   "PREREQ_PM" => {
-    "Class::MOP" => 0,
+    "Class::Refresh" => 0,
     "Cwd" => 0,
     "File::Find" => 0,
     "Filesys::Notify::Simple" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => ""
   }
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Class::MOP" => 0,
+  "Class::Refresh" => 0,
   "Cwd" => 0,
   "File::Find" => 0,
   "Filesys::Notify::Simple" => 0,

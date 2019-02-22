@@ -45,15 +45,17 @@
             "Carp" : "0",
             "Digest::SHA" : "0",
             "Log::Any" : "1.03",
+            "Module::Find" : "0.11",
             "Module::Runtime" : "0.014",
-            "Moo" : "2",
+            "Moo" : "2.000000",
             "MooX::BuildArgs" : "0.02",
             "Scalar::Util" : "0",
             "Storable" : "0",
             "Try::Tiny" : "0.18",
             "Type::Tiny" : "1.000005",
             "namespace::clean" : "0.24",
-            "strictures" : "2"
+            "perl" : "5.008001",
+            "strictures" : "2.000000"
          }
       },
       "test" : {
@@ -65,115 +67,115 @@
    "provides" : {
       "Starch" : {
          "file" : "lib/Starch.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Factory" : {
          "file" : "lib/Starch/Factory.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Manager" : {
          "file" : "lib/Starch/Manager.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::AlwaysLoad" : {
          "file" : "lib/Starch/Plugin/AlwaysLoad.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::Bundle" : {
          "file" : "lib/Starch/Plugin/Bundle.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::CookieArgs" : {
          "file" : "lib/Starch/Plugin/CookieArgs.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::CookieArgs::Manager" : {
          "file" : "lib/Starch/Plugin/CookieArgs/Manager.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::CookieArgs::State" : {
          "file" : "lib/Starch/Plugin/CookieArgs/State.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::DisableStore" : {
          "file" : "lib/Starch/Plugin/DisableStore.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::ForManager" : {
          "file" : "lib/Starch/Plugin/ForManager.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::ForState" : {
          "file" : "lib/Starch/Plugin/ForState.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::ForStore" : {
          "file" : "lib/Starch/Plugin/ForStore.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::LogStoreExceptions" : {
          "file" : "lib/Starch/Plugin/LogStoreExceptions.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::RenewExpiration" : {
          "file" : "lib/Starch/Plugin/RenewExpiration.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::RenewExpiration::Manager" : {
          "file" : "lib/Starch/Plugin/RenewExpiration/Manager.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::RenewExpiration::State" : {
          "file" : "lib/Starch/Plugin/RenewExpiration/State.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::ThrottleStore" : {
          "file" : "lib/Starch/Plugin/ThrottleStore.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::Trace" : {
          "file" : "lib/Starch/Plugin/Trace.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::Trace::Manager" : {
          "file" : "lib/Starch/Plugin/Trace/Manager.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::Trace::State" : {
          "file" : "lib/Starch/Plugin/Trace/State.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Plugin::Trace::Store" : {
          "file" : "lib/Starch/Plugin/Trace/Store.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Role::Log" : {
          "file" : "lib/Starch/Role/Log.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::State" : {
          "file" : "lib/Starch/State.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Store" : {
          "file" : "lib/Starch/Store.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Store::Layered" : {
          "file" : "lib/Starch/Store/Layered.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Store::Memory" : {
          "file" : "lib/Starch/Store/Memory.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Starch::Util" : {
          "file" : "lib/Starch/Util.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Test::Starch" : {
          "file" : "lib/Test/Starch.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -187,13 +189,13 @@
          "web" : "https://github.com/bluefeet/Starch"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>",
       "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>",
       "Ismail Kerim <ismail.kerim@assurant.com>",
       "Jonathan Scott Duff <duff@pobox.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

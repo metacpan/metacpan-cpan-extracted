@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/RDF-Trine-Serializer-RDFa>
 Bug tracker:  <https://github.com/kjetilk/p5-rdf-trine-serializer-rdfa/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.101	2019-02-21	Fix tests
+
+ [ Bug Fixes ]
+ - Used the wrong prefix generator module in tests.
+
 0.100	2018-02-11	Support new RDFa generator
 
  - Added: Add more tests.

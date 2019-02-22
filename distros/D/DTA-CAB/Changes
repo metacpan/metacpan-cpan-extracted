@@ -2,6 +2,9 @@
 ##
 ## Change log for perl distribution DTA::CAB
 
+v1.107 Fri, 22 Feb 2019 09:40:00 +0100 moocow
+	* added DTA::TokWrap and GermaNet::Flat dependencies (used by built-in analyzer classes)
+
 v1.106 2019-02-12  moocow
 	* improved Version.pm (re-)generation: only if this looks like a "proper" checkout
 	* added Changes (this file: extracted from SVN logs & reformatted)

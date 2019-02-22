@@ -1,5 +1,5 @@
 package Consul;
-$Consul::VERSION = '0.023';
+$Consul::VERSION = '0.024';
 # ABSTRACT: Client library for consul
 
 use namespace::autoclean;
@@ -184,8 +184,8 @@ use Moo;
 use Types::Standard qw(Int Bool);
 
 has index        => ( is => 'ro', isa => Int,  init_arg => 'x-consul-index',       required => 1 );
-has last_contact => ( is => 'ro', isa => Int,  init_arg => 'x-consul-lastcontact', required => 1 );
-has known_leader => ( is => 'ro', isa => Bool, init_arg => 'x-consul-knownleader', required => 1, coerce => sub { my $r = { true => 1, false => 0 }->{$_[0]}; defined $r ? $r : $_[0] } );
+has last_contact => ( is => 'ro', isa => Int,  init_arg => 'x-consul-lastcontact' );
+has known_leader => ( is => 'ro', isa => Bool, init_arg => 'x-consul-knownleader', coerce => sub { my $r = { true => 1, false => 0 }->{$_[0]}; defined $r ? $r : $_[0] } );
 
 
 1;
@@ -517,29 +517,27 @@ L<https://github.com/robn/Consul>
 
   git clone https://github.com/robn/Consul.git
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
-
-Robert Norris <rob@eatenbyagrue.org>
-
-=back
-
 =head1 CONTRIBUTORS
 
 =over 4
 
 =item *
 
+Rob N ★ <robn@robn.io>
+
+=item *
+
 Aran Deltac <bluefeet@gmail.com>
+
+=item *
+
+Michael McClimon
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Robert Norris.
+This software is copyright (c) 2015 by Rob N ★.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

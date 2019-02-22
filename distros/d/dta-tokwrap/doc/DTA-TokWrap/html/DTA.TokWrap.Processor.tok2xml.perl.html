@@ -1,0 +1,204 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Constants">Constants</a></li>
+      <li><a href="#Constructors-etc">Constructors etc.</a></li>
+      <li><a href="#Methods:-Document-Processing">Methods: Document Processing</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SEE-ALSO1">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DTA::TokWrap::Processor::tok2xml::perl - DTA tokenizer wrappers: t -&gt; t.xml, pure-perl (slow, obsolete)</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> use DTA::TokWrap::Processor::tok2xml::perl;
+ 
+ $t2x = DTA::TokWrap::Processor::tok2xml::perl-&gt;new(%opts);
+ $doc_or_undef = $t2x-&gt;tok2xml($doc);</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module is deprecated; prefer <a>DTA::TokWrap::Processor::tok2xml</a>.</p>
+
+<p>DTA::TokWrap::Processor::tok2xml::perl provides a pure-perl object-oriented <a>DTA::TokWrap::Processor</a> wrapper for converting &quot;raw&quot; CSV-format (.t) low-level tokenizer output to a &quot;master&quot; tokenized XML (.t.xml) format, for use with <a>DTA::TokWrap::Document</a> objects.</p>
+
+<p>Most users should use the high-level <a>DTA::TokWrap</a> wrapper class instead of using this module directly.</p>
+
+<h2 id="Constants">Constants</h2>
+
+<dl>
+
+<dt id="ISA">@ISA</dt>
+<dd>
+
+<p>DTA::TokWrap::Processor::tok2xml::perl inherits from <a>DTA::TokWrap::Processor</a>, and supports basically the same API as <a>DTA::TokWrap::Processor::tok2xml</a>.</p>
+
+</dd>
+<dt id="NOC">$NOC</dt>
+<dd>
+
+<p>Integer indicating a missing or implicit &#39;c&#39; record; should be equivalent in value to the C code:</p>
+
+<pre><code> unsigned int NOC = ((unsigned int)-1)</code></pre>
+
+<p>for 32-bit &quot;unsigned int&quot;s.</p>
+
+</dd>
+</dl>
+
+<h2 id="Constructors-etc">Constructors etc.</h2>
+
+<dl>
+
+<dt id="new">new</dt>
+<dd>
+
+<pre><code> $t2x = $CLASS_OR_OBJECT-&gt;new(%args);</code></pre>
+
+<p>Constructor.</p>
+
+<p>%args, %$t2x:</p>
+
+<pre><code> ##-- output document structure
+ docElt   =&gt; $elt,  ##-- output document element
+ sElt     =&gt; $elt,  ##-- output sentence element
+ wElt     =&gt; $elt,  ##-- output token element
+ aElt     =&gt; $elt,  ##-- output token-analysis element
+ posAttr  =&gt; $attr, ##-- output byte-position attribute
+ textAttr =&gt; $attr, ##-- output token-text attribute</code></pre>
+
+<p>You probably should <b>NOT</b> change any of the default output document structure options (unless this is the final module in your processing pipeline), since their values have ramifications beyond this module.</p>
+
+</dd>
+<dt id="defaults">defaults</dt>
+<dd>
+
+<pre><code> %defaults = CLASS-&gt;defaults();</code></pre>
+
+<p>Static class-dependent defaults.</p>
+
+</dd>
+</dl>
+
+<h2 id="Methods:-Document-Processing">Methods: Document Processing</h2>
+
+<dl>
+
+<dt id="tok2xml">tok2xml</dt>
+<dd>
+
+<pre><code> $doc_or_undef = $CLASS_OR_OBJECT-&gt;tok2xml($doc);</code></pre>
+
+<p>Converts &quot;raw&quot; CSV-format (.t) low-level tokenizer output to a &quot;master&quot; tokenized XML (.t.xml) format in the <a>DTA::TokWrap::Document</a> object $doc.</p>
+
+<p>Relevant %$doc keys:</p>
+
+<pre><code> bxdata   =&gt; \@bxdata,  ##-- (input) block index data
+ tokdata  =&gt; $tokdata,  ##-- (input) tokenizer output data (string)
+ cxdata   =&gt; \@cxchrs,  ##-- (input) character index data (array of arrays)
+ cxfile   =&gt; $cxfile,   ##-- (input) character index file
+ xtokdata =&gt; $xtokdata, ##-- (output) tokenizer output as XML
+ nchrs    =&gt; $nchrs,    ##-- (output) number of character index records
+ ntoks    =&gt; $ntoks,    ##-- (output) number of tokens parsed
+ ##
+ tok2xml_stamp0 =&gt; $f,  ##-- (output) timestamp of operation begin
+ tok2xml_stamp  =&gt; $f,  ##-- (output) timestamp of operation end
+ xtokdata_stamp =&gt; $f,  ##-- (output) timestamp of operation end</code></pre>
+
+<p>$%t2x keys (temporary, for debugging):</p>
+
+<pre><code> tb2ci   =&gt; $tb2ci,     ##-- (temp) s.t. vec($tb2ci, $txbyte, 32) = $char_index_of_txbyte
+ ntb     =&gt; $ntb,       ##-- (temp) number of text bytes</code></pre>
+
+<p>may implicitly call $doc-&gt;mkbx(), $doc-&gt;loadCxFile(), $doc-&gt;tokenize() (but shouldn&#39;t!)</p>
+
+</dd>
+<dt id="txbyte_to_ci">txbyte_to_ci</dt>
+<dd>
+
+<pre><code> \$tb2ci = $t2x-&gt;txbyte_to_ci(\@cxdata);</code></pre>
+
+<p>Low-level utility method.</p>
+
+<p>Sets %$t2x keys: tb2ci, ntb, nchr</p>
+
+</dd>
+<dt id="txtbyte_to_ci">txtbyte_to_ci</dt>
+<dd>
+
+<pre><code> \$ob2ci = $t2x-&gt;txtbyte_to_ci(\@cxdata,\@bxdata,\$tb2ci);</code></pre>
+
+<p>Low-level utility method</p>
+
+<p>Sets %$t2x keys: ob2ci</p>
+
+</dd>
+<dt id="process_tt_data">process_tt_data</dt>
+<dd>
+
+<pre><code> \$tokxmlr = $t2x-&gt;process_tt_data($doc);</code></pre>
+
+<p>Low-level utility method.</p>
+
+<p>Actually populates $doc-&gt;{xtokdata} by parsing $doc-&gt;{tokdata}, referring to $t2x-&gt;{ob2ci} for character-index lookup.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Processor::tok2xml(3pm)</a>, <a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="SEE-ALSO1">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2018 by Bryan Jurish</p>
+
+<p>This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.14.2 or, at your option, any later version of Perl 5 you may have available.</p>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>
+
+

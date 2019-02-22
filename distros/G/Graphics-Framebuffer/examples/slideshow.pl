@@ -246,4 +246,15 @@ Ignores any ".nomedia" files in subdirectories, and shows the images in them any
 
 =back
 
+=head1 COPYRIGHT
+
+Copyright 2010 - 2019 Richard Kelsch
+All Rights Reserved
+
+=head1 LICENSE
+
+GNU Public License Version 3.0
+
+* See the "LICENSE" file in the distribution for this license.
+
 =cut

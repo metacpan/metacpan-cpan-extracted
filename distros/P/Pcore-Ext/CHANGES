@@ -1,3 +1,6 @@
+v0.20.1 2019-02-21T17:20:29Z
+ - cordova template fixed
+
 v0.20.0 2019-02-18T20:48:15Z
  - read app config
  - ext version parse

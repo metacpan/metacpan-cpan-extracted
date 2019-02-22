@@ -33,7 +33,7 @@ be printed.
 
 =head1 FLAGS
 
-Each flag name starts with a upper-case letters indiciating the subsystem it
+Each flag name starts with a upper-case letters indicating the subsystem it
 relates to, then lower-case letters to indicate the particular kind of event
 or message.
 
@@ -77,7 +77,7 @@ Rectangles of damage queued on the root window for re-expose
 
 =head3 Wh
 
-Heirarchy changes on Windows (creates, deletes, re-orderings)
+Hierarchy changes on Windows (creates, deletes, re-orderings)
 
 =head3 Ws
 

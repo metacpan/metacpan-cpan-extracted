@@ -1,6 +1,6 @@
-#!/usr/bin/env perl
-use strictures 2;
-use Test2::V0;
+use strict;
+use warnings;
+use Test::More;
 
 {
   package SomeClass;

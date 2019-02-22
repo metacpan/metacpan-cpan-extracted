@@ -1,21 +1,26 @@
 ---
-abstract: 'fetch source tarballs from CPAN'
+abstract: 'fetch source archives from CPAN'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
-build_requires: {}
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-sourcepan
 provides:
   App::sourcepan:
     file: lib/App/sourcepan.pm
-    version: 0.02
+    version: '0.04'
 requires:
-  Getopt::Long: 0
+  Getopt::Long: '0'
+  IPC::Run: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.02
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

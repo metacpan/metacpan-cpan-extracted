@@ -31,4 +31,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ichesnokov/p5-test-tcm-role-api
-version: 0.04
+version: 0.05

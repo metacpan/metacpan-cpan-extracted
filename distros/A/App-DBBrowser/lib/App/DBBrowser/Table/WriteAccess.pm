@@ -34,12 +34,12 @@ sub table_write_access {
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @stmt_types;
     if ( ! $sf->{i}{special_table} ) {
-        push @stmt_types, 'Insert' if $sf->{o}{G}{insert_ok};
-        push @stmt_types, 'Update' if $sf->{o}{G}{update_ok};
-        push @stmt_types, 'Delete' if $sf->{o}{G}{delete_ok};
+        push @stmt_types, 'Insert' if $sf->{o}{enable}{insert_into};
+        push @stmt_types, 'Update' if $sf->{o}{enable}{update};
+        push @stmt_types, 'Delete' if $sf->{o}{enable}{delete};
     }
     elsif ( $sf->{i}{special_table} eq 'join' && $sf->{d}{driver} eq 'mysql' ) {
-        push @stmt_types, 'Update' if $sf->{o}{G}{update_ok};
+        push @stmt_types, 'Update' if $sf->{o}{G}{enable}{update};
     }
     if ( ! @stmt_types ) {
         return;

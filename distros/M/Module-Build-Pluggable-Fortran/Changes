@@ -1,5 +1,10 @@
 Changes for Module::Build::Pluggable::Fortran
 
+0.27 - Thu Feb 21 13:56:50 EST 2019
+    Switches to Text::ParseWords instead of naive split for shell
+    quoting. Thanks to @mohawk2 for the PR (GH#1).
+    [Upgrade recommended if running under Windows.]
+
 0.26 - Tue Jan 26 13:49:57 EST 2016
     Fixes bug when adding linker flags; thanks to Luis Mochan for the patch
     Fixes erroneous documentation; thanks to Luis Mochan for the bug report

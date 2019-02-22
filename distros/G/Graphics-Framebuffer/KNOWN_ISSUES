@@ -21,7 +21,3 @@ Nouveau driver.  Other drivers do this quickly, even the Intel driver.  I am
 assuming the other drivers use a DMA routine to transfer the memory address
 framebuffer to the real framebuffer, or map the actual framebuffer to real
 memory, although I suspect most do it via DMA transfers.
-
-I don't yet know why, but "examples/primitives.pl" doesn't end when CTRL-C
-is pressed.  You must either wait for it to end on its own, or go to another
-terminal and typing "killall -15 primitives.pl".

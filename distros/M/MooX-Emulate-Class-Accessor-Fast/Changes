@@ -1,5 +1,13 @@
 Revision history for Perl extension MooX-Emulate-Class-Accessor-Fast.
 
+0.05 2019-02-20T22:49:01Z
+
+ - Revert "Migrate all the tests from Test::More to Test2::V0." as I
+   don't want to deviate that much from MooseX::ECAF.
+ - Remove strictures, add namespace::clean.
+ - Require perl 5.8.1.
+ - Simplify VERSION declarations.
+
 0.04 2019-02-18T06:13:22Z
 
  - Migrate all the tests from Test::More to Test2::V0.

@@ -1,6 +1,7 @@
 package Starch::Plugin::LogStoreExceptions;
-
-$Starch::Plugin::LogStoreExceptions::VERSION = '0.10';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -29,7 +30,6 @@ exceptions produced by other plugins.
 use Try::Tiny;
 
 use Moo::Role;
-use strictures 2;
 use namespace::clean;
 
 with qw(

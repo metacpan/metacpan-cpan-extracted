@@ -17,7 +17,7 @@ Getopt::EX::Numbers->new->parse("1:10:2")->sequence;
 
 =head1 FORMAT
 
-Number format is composed by for elements: C<start>, C<end>, C<step>
+Number format is composed by four elements: C<start>, C<end>, C<step>
 and C<length>.  All elements are optional.
 
     1		1
@@ -171,7 +171,7 @@ sub range {
 	for (my $from = $start; $from <= $end; $from += $step) {
 	    my $to = $from + $length - 1;
 	    $to = List::Util::min($max, $to) if defined $max;
-	    push @l, [$from, $to ];
+	    push @l, [$from, $to];
 	}
     }
 

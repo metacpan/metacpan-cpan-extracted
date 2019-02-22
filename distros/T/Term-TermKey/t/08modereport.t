@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More;
 
 use Term::TermKey;
 
@@ -29,3 +29,5 @@ ok( $key->type_is_modereport,  '$key->type_is_modereport after DEC mode report' 
 is( $key->initial, "?", '$key->initial after DEC mode report' );
 is( $key->mode,      4, '$key->mode after DEC mode report' );
 is( $key->value,     2, '$key->value after DEC mode report' );
+
+done_testing;

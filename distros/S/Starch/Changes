@@ -1,5 +1,12 @@
 Revision history for Perl extension Starch.
 
+0.11 2019-02-20T15:54:38Z
+
+ - Find installed modules with Module::Find in Starch::Util::croak(),
+   making it support non-core Starch:: modules too.
+ - Require perl 5.8.1.
+ - Simplify VERSION declarations.
+
 0.10 2019-02-14T19:40:15Z
 
  - Remove Test::Fatal usage from one test.

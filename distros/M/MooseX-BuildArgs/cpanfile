@@ -1,3 +1,4 @@
+requires 'perl' => '5.008001';
 requires 'Moose' => '1.23';
 
 on test => sub {

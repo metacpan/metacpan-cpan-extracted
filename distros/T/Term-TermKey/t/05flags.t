@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
 use Term::TermKey qw( FLAG_UTF8 FLAG_RAW );
 
@@ -36,3 +36,5 @@ use Term::TermKey qw( FLAG_UTF8 FLAG_RAW );
 
    is( $tk->get_flags & (FLAG_UTF8|FLAG_RAW), FLAG_RAW, 'Autodetected RAW' );
 }
+
+done_testing;

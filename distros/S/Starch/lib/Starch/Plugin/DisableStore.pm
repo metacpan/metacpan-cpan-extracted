@@ -1,6 +1,7 @@
 package Starch::Plugin::DisableStore;
-
-$Starch::Plugin::DisableStore::VERSION = '0.10';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -28,7 +29,6 @@ to the old store, only read.
 use Types::Standard -types;
 
 use Moo::Role;
-use strictures 2;
 use namespace::clean;
 
 with qw(

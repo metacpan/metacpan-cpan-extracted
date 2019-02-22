@@ -67,7 +67,7 @@ sub from_col_by_col {
         $sf->__print_args( $sql );
         # Choose a number
         my $col_count = choose_a_number( 3,
-            { small_on_top => 1, confirm => 'Confirm', mouse => $sf->{o}{table}{mouse},
+            { small_first => 1, confirm => 'Confirm', mouse => $sf->{o}{table}{mouse},
             back => 'Back', name => 'Number of columns: ', clear_screen => 0 }
         );
         if ( ! $col_count ) {
@@ -155,63 +155,26 @@ sub from_col_by_col {
 }
 
 
-sub __parse_settings_copy_paste {
-    my ( $sf, $i ) = @_;
-    my @tmp_str;
-    if ( $i == 0 ) {
-        @tmp_str = ( '  [Text::CSV]' );
-        push @tmp_str, '  field_sep  = ' . $sf->{o}{csv}{sep_char};
-        push @tmp_str, '  record_sep = ' . $sf->{o}{csv}{eol} if $sf->{o}{csv}{eol};
-    }
-    elsif ( $i == 1 ) {
-        @tmp_str = ( '  [split]' );
-        push @tmp_str, '  field_sep     = ' . $sf->{o}{split}{field_sep};
-        push @tmp_str, '  field_l_trim  = ' . $sf->{o}{split}{field_l_trim} if $sf->{o}{split}{field_l_trim};
-        push @tmp_str, '  field_r_trim  = ' . $sf->{o}{split}{field_r_trim} if $sf->{o}{split}{field_r_trim};
-        push @tmp_str, '  record_sep    = ' . $sf->{o}{split}{record_sep};
-        push @tmp_str, '  record_l_trim = ' . $sf->{o}{split}{record_l_trim} if $sf->{o}{split}{record_l_trim};
-        push @tmp_str, '  record_r_trim = ' . $sf->{o}{split}{record_r_trim} if $sf->{o}{split}{record_r_trim};
-    }
-    elsif ( $i == 2 ) {
-        @tmp_str = (
-            '  [Spreadsheet::Read]'
-        );
-    }
-    return join "\n", @tmp_str;
+sub _options_copy_and_paste {
+    my $groups = [
+        { name => 'group_insert', text => '' }
+    ];
+    my $options = [
+        { name => '_parse_copy',   text => "- Parse Tool",     section => 'insert' },
+        { name => '_split_config', text => "- split settings", section => 'split'  },
+        { name => '_csv_char',     text => "- CSV settings-a", section => 'csv'    },
+        { name => '_csv_options',  text => "- CSV settings-b", section => 'csv'    },
+    ];
+    return $groups, $options;
 }
+
 
 sub from_copy_and_paste {
     my ( $sf, $sql ) = @_;
-    my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $pf = App::DBBrowser::GetContent::ParseFile->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $parse_mode_idx = $sf->{o}{insert}{copy_parse_mode};
-
-    SETTINGS: while ( 1 ) {
-        my @tmp_info = (
-            'Settings:',
-            $sf->__parse_settings_copy_paste( $parse_mode_idx ),
-            ' '
-        );
-        my ( $confirm, $change ) = ( '  Confirm', '  Change' );
-        # Choose
-        my $choice = choose(
-            [ undef, $confirm, $change ],
-            { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose: ', info => join( "\n", @tmp_info ), undef => '  <<' }
-        );
-        if ( ! defined $choice ) {
-            return;
-        }
-        elsif ( $choice eq $change ) {
-            my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
-            $opt->config_insert();
-            $parse_mode_idx = $sf->{o}{insert}{copy_parse_mode};
-            next SETTINGS;
-        }
-        else {
-            last SETTINGS;
-        }
-    }
     $ax->print_sql( $sql );
     print "Multi row:\n";
     my $parse_mode = $sf->{o}{insert}{copy_parse_mode};
@@ -224,51 +187,77 @@ sub from_copy_and_paste {
             print $fh_in $row;
         }
         close $fh_in;
-        die "No input!" if ! -s $file_ec;
-        open my $fh, '<', $file_ec or die $!;
-        $sql->{insert_into_args} = [];
-        my $ok;
-        if ( $parse_mode_idx == 0 ) {
-            $ok = $pf->__parse_file_Text_CSV( $sql, $fh );
-        }
-        elsif ( $parse_mode_idx == 1 ) {
-            $ok = $pf->__parse_file_split( $sql, $fh );
-        }
-        close $fh;
-        unlink $file_ec or die $!;
-        die "Error __parse_file!" if ! $ok;
         1 }
     ) {
         $ax->print_error_message( $@, join ', ', @{$sf->{i}{stmt_types}}, 'copy & paste' );
         unlink $file_ec or warn $!;
         return;
     }
-    return if ! @{$sql->{insert_into_args}};
-    my $ok = $cf->input_filter( $sql, 1 );
-    return if ! $ok;
+    if ( ! -s $file_ec ) {
+        $sql->{insert_into_args} = [];
+        return;
+    }
+
+    PARSE: while ( 1 ) {
+        open my $fh, '<', $file_ec or die $!;
+        $sql->{insert_into_args} = [];
+        my $parse_ok;
+        if ( $parse_mode_idx == 0 ) {
+            $parse_ok = $pf->__parse_file_Text_CSV( $sql, $fh );
+        }
+        elsif ( $parse_mode_idx == 1 ) {
+            $parse_ok = $pf->__parse_file_split( $sql, $fh );
+        }
+        close $fh;
+        if ( ! $parse_ok ) {
+            die "Error __parse_file!";
+        };
+        if ( all { @$_ == 0 } @{$sql->{insert_into_args}} ) {
+            $sql->{insert_into_args} = [];
+            return;
+        }
+        my $filter_ok = $cf->input_filter( $sql, 1 );
+        if ( ! $filter_ok ) {
+            return;
+        }
+        elsif ( $filter_ok == -1 ) {
+            my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
+            $sf->{o} = $opt->set_options( _options_copy_and_paste() );
+            $parse_mode_idx = $sf->{o}{insert}{copy_parse_mode};
+            next PARSE;
+        }
+        last PARSE;
+    }
+    unlink $file_ec or die $!;
     return 1;
 }
 
 
 sub __parse_settings_file {
     my ( $sf, $i ) = @_;
-    my ( $parse_mode, $field_sep, $record_sep );
-    if ( $i == 0 ) {
-        $parse_mode = 'Text::CSV';
-        $field_sep = $sf->{o}{csv}{sep_char};
+    if    ( $i == 0 ) { return '(Text::CSV - sep[' . $sf->{o}{csv}{sep_char}    . '])' }
+    elsif ( $i == 1 ) { return '(split - sep['     . $sf->{o}{split}{field_sep} . '])' }
+    elsif ( $i == 2 ) { return '(Spreadsheet::Read)'                                  }
+}
+
+
+sub _options_file {
+    my ( $all ) = @_;
+    my $groups = [
+        { name => 'group_insert', text => '' }
+    ];
+    my $options = [
+        { name => '_parse_file',    text => "- Parse Tool",     section => 'insert' },
+        { name => '_split_config',  text => "- split settings", section => 'split'  },
+        { name => '_csv_char',      text => "- CSV settings-a", section => 'csv'    },
+        { name => '_csv_options',   text => "- CSV settings-b", section => 'csv'    },
+        { name => '_file_encoding', text => "- File Encoding",  section => 'insert' },
+        { name => 'history_dirs',   text => "- Dir History",    section => 'insert' },
+    ];
+    if ( ! $all ) {
+        splice @$options, -2;
     }
-    elsif ( $i == 1 ) {
-        $parse_mode = 'split';
-        $field_sep  = $sf->{o}{split}{field_sep};
-        $record_sep = $sf->{o}{split}{record_sep};
-    }
-    elsif ( $i == 2 ) {
-        $parse_mode = 'Spreadsheet::Read';
-    }
-    my $str = "($parse_mode";
-    $str .= " - sep[$field_sep]" if defined $field_sep;
-    $str .= ")";
-    return $str;
+    return $groups, $options;
 }
 
 
@@ -307,6 +296,7 @@ sub from_file {
                 { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, undef => '  <=', default => $old_idx }
             );
             if ( ! defined $idx || ! defined $choices->[$idx] ) {
+                return if $sf->{o}{insert}{history_dirs} == 1;
                 next DIR;
             }
             if ( $sf->{o}{G}{menu_memory} ) {
@@ -321,57 +311,80 @@ sub from_file {
             delete $ENV{TC_RESET_AUTO_UP};
             if ( $choices->[$idx] eq $hidden ) {
                 my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
-                $opt->config_insert();
+                $opt->set_options( _options_file( 1 ) );
                 $parse_mode_idx = $sf->{o}{insert}{file_parse_mode};
                 next FILE;
             }
             my $file_ec = $files_ec[$idx-@pre];
-            my $fh;
-            if ( $sf->{o}{insert}{file_parse_mode} < 2 && -T $file_ec ) {
-                open $fh, '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')', $file_ec or die $!;
-                my $ok;
-                if ( $parse_mode_idx == 0 ) {
-                    $ok = $pf->__parse_file_Text_CSV( $sql, $fh );
-                }
-                elsif ( $parse_mode_idx == 1 ) {
-                    $ok = $pf->__parse_file_split( $sql, $fh );
-                }
-                if ( ! $ok ) {
-                    next FILE;
-                }
-                if ( ! @{$sql->{insert_into_args}} ) {
-                    choose( [ 'empty file!' ], { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' } );
-                    close $fh;
-                    next FILE;
-                }
-                $ok = $cf->input_filter( $sql, 0 );
-                if ( ! $ok ) {
-                    next FILE;
-                }
-                $sf->{d}{file_name} = decode( 'locale_fs', $file_ec );
-                return 1;
-            }
-            else {
-                my ( $sheet_count, $sheet_idx );
-                $sf->{i}{old_sheet_idx} = 0;
 
-                SHEET: while ( 1 ) {
+            PARSE: while ( 1 ) {
+                if ( $sf->{o}{insert}{file_parse_mode} < 2 && -T $file_ec ) {
                     $sql->{insert_into_args} = [];
-                    $sheet_count = $pf->__parse_file_Spreadsheet_Read( $sql, $file_ec );
-                    if ( ! $sheet_count ) {
+                    open my $fh, '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')', $file_ec or die $!;
+                    my $parse_ok;
+                    if ( $parse_mode_idx == 0 ) {
+                        $parse_ok = $pf->__parse_file_Text_CSV( $sql, $fh );
+                    }
+                    elsif ( $parse_mode_idx == 1 ) {
+                        $parse_ok = $pf->__parse_file_split( $sql, $fh );
+                    }
+                    if ( ! $parse_ok ) {
                         next FILE;
                     }
-                    if ( ! @{$sql->{insert_into_args}} ) { #
-                        next SHEET if $sheet_count >= 2;
+                    if ( ! @{$sql->{insert_into_args}} ) {
+                        choose( [ 'empty file!' ], { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' } );
+                        close $fh;
                         next FILE;
                     }
-                    my $ok = $cf->input_filter( $sql, 0 );
-                    if ( ! $ok ) {
-                        next SHEET if $sheet_count >= 2;
+                    my $filter_ok = $cf->input_filter( $sql, 0 );
+                    if ( ! $filter_ok ) {
                         next FILE;
+                    }
+                    elsif ( $filter_ok == -1 ) {
+                        my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
+                        $sf->{o} = $opt->set_options( _options_file() );
+                        $parse_mode_idx = $sf->{o}{insert}{file_parse_mode};
+                        next PARSE;
                     }
                     $sf->{d}{file_name} = decode( 'locale_fs', $file_ec );
                     return 1;
+                }
+                else {
+                    my $book;
+                    $sf->{i}{old_sheet_idx} = 0;
+
+                    SHEET: while ( 1 ) {
+                        $sql->{insert_into_args} = [];
+                        ( $book, my $sheet_count ) = $pf->__parse_file_Spreadsheet_Read( $sql, $file_ec, $book );
+                        if ( ! $sheet_count ) {
+                            next FILE;
+                        }
+                        if ( ! @{$sql->{insert_into_args}} ) { #
+                            next SHEET if $sheet_count >= 2;
+                            next FILE;
+                        }
+
+                        FILTER: while ( 1 ) {
+                            my $ok = $cf->input_filter( $sql, 0 );
+                            if ( ! $ok ) {
+                                next SHEET if $sheet_count >= 2;
+                                next FILE;
+                            }
+                            elsif ( $ok == -1 ) {
+                                if ( ! -T $file_ec ) {
+                                    choose( [ 'Not a text file: "Spreadsheet::Read" used automatically' ], { %{$sf->{i}{lyt_m}}, prompt => 'Press ENTER' } );
+                                    next FILTER;
+                                }
+                                my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
+                                $sf->{o} = $opt->set_options( _options_file() );
+                                $parse_mode_idx = $sf->{o}{insert}{file_parse_mode};
+                                next PARSE;
+                            }
+                            last FILTER;
+                        }
+                        $sf->{d}{file_name} = decode( 'locale_fs', $file_ec );
+                        return 1;
+                    }
                 }
             }
         }
@@ -381,10 +394,16 @@ sub from_file {
 
 sub __directory {
     my ( $sf ) = @_;
-    if ( ! $sf->{o}{insert}{max_files} ) {
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    if ( ! $sf->{o}{insert}{history_dirs} ) {
         return $sf->__new_dir_search();
     }
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    elsif ( $sf->{o}{insert}{history_dirs} == 1 ) {
+        my $h_ref = $ax->read_json( $sf->{data_dirs} );
+        if ( @{$h_ref->{dirs}||[]} ) {
+            return realpath encode 'locale_fs', $h_ref->{dirs}[0];
+        }
+    }
     $sf->{i}{old_dir_idx} ||= 0;
 
     DIR: while ( 1 ) {
@@ -447,8 +466,8 @@ sub __add_to_history {
     my $dirs_ec = [ map { realpath encode( 'locale_fs', $_ ) } @{$h_ref->{dirs}||[]} ];
     unshift @$dirs_ec, $dir_ec;
     @$dirs_ec = uniq @$dirs_ec;
-    if ( @$dirs_ec > $sf->{o}{insert}{max_files} ) {
-        $#{$dirs_ec} = $sf->{o}{insert}{max_files} - 1;
+    if ( @$dirs_ec > $sf->{o}{insert}{history_dirs} ) {
+        $#{$dirs_ec} = $sf->{o}{insert}{history_dirs} - 1;
     }
     $h_ref->{dirs} = [ map { decode( 'locale_fs', $_ ) } @$dirs_ec ];
     $ax->write_json( $sf->{data_dirs}, $h_ref ); ###

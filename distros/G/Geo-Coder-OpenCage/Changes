@@ -1,6 +1,10 @@
 Revision history for Geo-Coder-OpenCage
 
-0.19    2019-02-18
+0.21    2019-02-22
+        - require IO::Socket::SSL to make https requests, thanks SREZIC
+        - remove 'use feature qw(say)' from a test, also thanks SREZIC
+
+0.20    2019-02-18
         - use JSON::MaybeXS as using CPanel::JSON::XS directly seems to 
           to be causing test failures
 

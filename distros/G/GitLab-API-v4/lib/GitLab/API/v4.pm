@@ -1,6 +1,7 @@
 package GitLab::API::v4;
-
-$GitLab::API::v4::VERSION = '0.16';
+use 5.010001;
+use strictures 2;
+our $VERSION = '0.17';
 
 =encoding utf8
 
@@ -101,7 +102,6 @@ use Carp qw( croak );
 use Log::Any qw( $log );
 
 use Moo;
-use strictures 2;
 use namespace::clean;
 
 sub BUILD {

@@ -1,5 +1,11 @@
 Revision history for Perl extension MooseX-BuildArgs.
 
+0.08 2019-02-20T22:51:06Z
+
+ - Fix a test that wasn't migrated to Test2::V0.
+ - Require perl 5.8.1.
+ - Simplify VERSION declarations.
+
 0.07 2019-02-18T06:11:05Z
 
  - Migrate build tooling from Dist::Zilla to Minilla.

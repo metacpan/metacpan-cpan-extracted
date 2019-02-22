@@ -10,7 +10,7 @@ use_ok('RDF::Trine::Serializer::RDFa');
 
 use Module::Load::Conditional qw[check_install];
 
-my $rdfns = check_install( module => 'RDF::NS', version => 20130802);
+my $rdfpr = check_install( module => 'RDF::Prefixes');
 
 my $testmodel = RDF::Trine::Model->temporary_model;
 my $parser = RDF::Trine::Parser->new( 'turtle' );
@@ -20,7 +20,7 @@ my $testdata = '<http://example.org/foo> a <http://example.org/Bar> ; <http://ex
 $parser->parse_into_model('http://example.org/', $testdata, $testmodel );
 
 subtest 'Default generator' => sub {
-  plan skip_all => 'RDF::NS is not installed' unless $rdfns;
+  plan skip_all => 'RDF::Prefixes is not installed' unless $rdfpr;
   ok(my $s = RDF::Trine::Serializer->new('RDFa'), 'Assignment OK');
   isa_ok($s, 'RDF::Trine::Serializer');
   isa_ok($s, 'RDF::Trine::Serializer::RDFa');

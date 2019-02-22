@@ -73,18 +73,10 @@ is(ref $found, 'ARRAY', 'Scalar context returns ARRAYREF');
 
 is_deeply(\@logs,
           [['pre_find_all', 'pattern: span'],
-           ['pre_tag_name', 'getting tag name'],
-           ['post_tag_name', 'found tag with name span'],
-           ['pre_tag_name', 'getting tag name'],
-           ['post_tag_name', 'found tag with name span'],
            ['post_find_all', 'found 2 elements for span 
  - Weasel::Element (span)
  - Weasel::Element (span)'],
            ['pre_find_all', 'pattern: span'],
-           ['pre_tag_name', 'getting tag name'],
-           ['post_tag_name', 'found tag with name span'],
-           ['pre_tag_name', 'getting tag name'],
-           ['post_tag_name', 'found tag with name span'],
            ['post_find_all', 'found 2 elements for span 
  - Weasel::Element (span)
  - Weasel::Element (span)'],

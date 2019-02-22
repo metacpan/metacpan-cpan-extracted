@@ -3,24 +3,25 @@ abstract: 'LWP::UserAgent with simple caching mechanism'
 author:
   - 'Oleg G <oleg@cpan.org>'
 build_requires:
-  File::Temp: 0
-  Test::Mock::LWP::Dispatch: 0.02
-  Test::More: 0.88
+  File::Temp: '0'
+  Test::Mock::LWP::Dispatch: '0.02'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 6.52
+  ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120351'
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: LWP-UserAgent-Cached
 no_index:
   directory:
     - t
     - inc
 requires:
-  LWP::UserAgent: 0
+  LWP::UserAgent: '0'
 resources:
   repository: https://github.com/olegwtf/p5-LWP-UserAgent-Cached
-version: 0.06
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

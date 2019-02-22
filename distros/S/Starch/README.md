@@ -197,7 +197,7 @@ Which will call `get_config` on the `My::Starch::Config` package and use its
 return value as the arguments for instantiating the Starch object.
 
 Method proxies are provided by [MooX::MethodProxyArgs](https://metacpan.org/pod/MooX::MethodProxyArgs) and
-[Config::MethodProxy](https://metacpan.org/pod/Config::MethodProxy); check those for more details.
+[Data::MethodProxy](https://metacpan.org/pod/Data::MethodProxy); check those for more details.
 
 # PERFORMANCE
 

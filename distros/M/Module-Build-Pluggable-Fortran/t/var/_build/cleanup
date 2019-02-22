@@ -1,6 +1,0 @@
-do{ my $x = {
-       'src/test.o' => 1,
-       'f77_underscore' => 1,
-       'blib' => 1
-     };
-$x; }

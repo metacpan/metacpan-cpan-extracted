@@ -83,7 +83,7 @@ sub __choose_columns {
         return choose_a_subset(
             $cols,
             { layout => 1, name => $function . ': ', sofar_separator => ',',
-              mouse => $sf->{o}{table}{mouse}, remove_chosen => 0 }
+              mouse => $sf->{o}{table}{mouse}, keep_chosen => 1 }
         );
     }
 }
@@ -120,7 +120,7 @@ sub __prepare_col_func {
         my $info = $func . ': ' . $qt_col;
         my $name = "Decimal places: ";
         my $precision = choose_a_number( 2,
-            { info => $info, name => $name, small_on_top => 1, mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
+            { info => $info, name => $name, small_first => 1, mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
         );
         return if ! defined $precision;
         $quote_f = $plui->truncate( $qt_col, $precision );

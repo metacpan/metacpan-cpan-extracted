@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c6ec1b6f19776b83feee7228717e413ff0f799ee MANIFEST
+SHA1 229b87929ab03b62d64200142d7a4727444114a3 META.yml
+SHA1 232d9355064f488642848ad39937762de79eab28 MYMETA.json
+SHA1 8a311a538c8ada1c414a6644b9b371b453112f0a MYMETA.yml
+SHA1 427cab07ce373efee9abb5b331f2e172a97aa96f Makefile.PL
+SHA1 32f79c776392c2efd33e4d0ce061adc371a8a628 README
+SHA1 76992a25527abb26de206c12d84a178eaffb3a67 html/Callbacks/ElapsedBusinessTime/Elements/RT__Ticket/ColumnMap/Once
+SHA1 26a717f5421dcc01790b1eb9ac7462cb2966b7e0 html/Callbacks/ElapsedBusinessTime/Search/Elements/BuildFormatString/Default
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
+SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
+SHA1 85254e101a40b265981d7165d2b8cf0277ebfed2 inc/Module/Install/Include.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
+SHA1 0771221f89b940bd9523987126a5ad8938f2eade inc/Module/Install/RTx.pm
+SHA1 a17d6d01c9da7a5bed6fcef0038727e63d9b932a inc/Module/Install/RTx/Runtime.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
+SHA1 7173d20065379a781d0218b7e747ca7a9b11f7a0 inc/YAML/Tiny.pm
+SHA1 ccad803df45392f372ecd2c1d78df2f8495cd97d lib/RT/Extension/ElapsedBusinessTime.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJcbxKtAAoJEEtT2THk0+hjF4QP/1ZexUG0qgKuypK8HtRIvJrC
+DxS8f45forQVkoG6JT4lEogq6Kc+0vZ+fMO59ZmtlngmmXx9zd4EgHbDfhvvL2gl
+alH2E3GUy/VYsee/tfnPumwX01VpJi/M4UIjiqmL6jw30Q9iKgnKxddiaBpjDpba
+3dnyHpa+6pOSttIxulmJ3P7FZV2MtDDU3SPFvJgw38I5VuibN23q6NuLZmJxHF+p
+xR5cuxBMs7MjoHAxEMFrohRZehW8/+PDf9HE82h6ZxM9J8tbv0Fg8Aqxe2Ja63mw
+rHMP+aV3NjVFeSdChUQ8QVsyVE9jdQmXkG3MLCVpLum9XeiUtqBPjji1zdMlCqIX
+Pcmb66uyRuCJ3S0+CsnywMjVUkzQVERo98fbQx3lS/mt7tGhsVybJq+hsTYMj4na
+5xXJUwUQhOQbtNyMbP1zxlOYHBjGHP2z2PlzflMjWyOxFdNO4bDHkytDQy9C5ZN4
+AkckDIIbgQPSUQm9A4X0nKxeYIcPieUb/k6v0KeFK1xKJQ/aTmTTAYZQAsbVU9/I
+Xc1hjJnBQ50/YtCSrFLVxShoc8u6wQGyJLePQoxAVGRC+0/IuUIo/A+PHKKjpeai
+VvMdjKKOahGAz+prytWjOWDQmZibZ5XS2ozPd8DZhxpMe2w7BU4tifDQkZo/AJqG
+jb07vpwdY6bvitY4dEyP
+=36fj
+-----END PGP SIGNATURE-----

@@ -322,12 +322,18 @@ input PhotosetSearchInput {
 }
 
 type Query {
-  blog(id: [Int!]!): [Blog]
-  blogTag(id: [Int!]!): [BlogTag]
-  mysql(id: [String!]!): [Mysql]
-  pg(id: [String!]!): [Pg]
-  photo(id: [String!]!): [Photo]
-  photoset(id: [String!]!): [Photoset]
+  blog(id: Int!): Blog
+  blogTag(id: Int!): BlogTag
+  blogTags(id: [Int!]!): [BlogTag]
+  blogs(id: [Int!]!): [Blog]
+  mysql(id: String!): Mysql
+  mysqls(id: [String!]!): [Mysql]
+  pg(id: String!): Pg
+  pgs(id: [String!]!): [Pg]
+  photo(id: String!): Photo
+  photos(id: [String!]!): [Photo]
+  photoset(id: String!): Photoset
+  photosets(id: [String!]!): [Photoset]
   "input to search"
   searchBlog(input: BlogSearchInput!): [Blog]
   "input to search"

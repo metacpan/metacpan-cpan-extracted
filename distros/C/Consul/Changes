@@ -1,3 +1,6 @@
+0.024     2019-02-21 08:22:12+11:00 Australia/Melbourne
+- Bugfix: Not all meta fields are required.
+
 0.023     2018-01-21 11:31:20+11:00 Australia/Melbourne
 - Bugfix: Updated several agent endpoints to use PUT instead of GET.
 - Bugfix: Setting a value to 0 in the KV store would store an empty

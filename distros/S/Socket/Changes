@@ -1,5 +1,14 @@
 Revision history for Socket
 
+2.029   2019-02-20 19:19:12
+        [BUGFIXES]
+         * Old MinGW lacks ADDRESS_FAMILY; use USHORT instead (RT128550)
+
+2.028   2019-02-19 23:59:30
+        [CHANGES]
+         * Add PF_LOCAL/AF_LOCAL constants (RT127089)
+         * Provide sockaddr_un on WIN32 (RT128550)
+
 2.027   2018-01-12 16:58:47
         [BUGFIXES]
          * Reimplement croak_sv (securely) for older perls (RT124063)

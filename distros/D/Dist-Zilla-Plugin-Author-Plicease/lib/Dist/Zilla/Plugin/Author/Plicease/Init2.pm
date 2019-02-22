@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.33 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.34 {
   
   use 5.014;
   use Moose;
@@ -354,12 +354,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.33 {
       $content .= "version_plugin = PkgVersion::Block\n" if $self->perl_version >= 5.014;
       
       $content .= "\n";
-      
-      $content .= "[RemovePrereqs]\n"
-               .  "remove = strict\n"
-               .  "remove = warnings\n"
-               .  "remove = base\n"
-               .  "\n";
+
+      $content .= "[Author::Plicease::Core]\n";
       
       $content .= ";[Prereqs]\n"
                .  ";Foo::Bar = 0\n"
@@ -564,7 +560,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.33
+version 2.34
 
 =head1 DESCRIPTION
 

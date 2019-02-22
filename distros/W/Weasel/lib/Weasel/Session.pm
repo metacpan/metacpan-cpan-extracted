@@ -5,7 +5,7 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =head1 VERSION
 
-0.07
+0.08
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ use Module::Runtime qw/ use_module /;;
 use Weasel::FindExpanders qw/ expand_finder_pattern /;
 use Weasel::WidgetHandlers qw| best_match_handler_class |;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 =head1 ATTRIBUTES
@@ -478,6 +478,15 @@ C<$log_hook> for lazy evaluation.
 
 =cut
 
+sub _unlogged {
+    my ($self, $func) = @_;
+
+    local $self->{log_hook} = undef; ## no critic (Variables::ProhibitLocalVars)
+    $func->();
+
+    return;
+}
+
 sub _logged {
     my ($self, $f, $e, $l, $lp) = @_;
     my $hook = $self->log_hook;
@@ -487,15 +496,21 @@ sub _logged {
     $lp //= $l;
     my $pre = (ref $lp eq 'CODE') ? $lp : _appending_wrap($lp);
     my $post = (ref $l eq 'CODE') ? $l : _appending_wrap($l);
-    $hook->("pre_$e", $pre);
+    $self->_unlogged(
+        sub { $hook->("pre_$e", $pre); }
+        );
     if (wantarray) {
         my @rv = $f->();
-        $hook->("post_$e", sub { return $post->(\@rv); });
+        $self->_unlogged(
+            sub { $hook->("post_$e", sub { return $post->(\@rv); }); }
+            );
         return @rv;
     }
     else {
         my $rv = $f->();
-        $hook->("post_$e", sub { return $post->($rv); });
+        $self->_unlogged(
+            sub { $hook->("post_$e", sub { return $post->($rv); }); }
+            );
         return $rv;
     }
 };

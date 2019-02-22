@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.25
+    version 0.26
 
 SYNOPSIS
 

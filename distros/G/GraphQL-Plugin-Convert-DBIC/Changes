@@ -1,5 +1,8 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-DBIC
 
+0.11	Fri 22 Feb 02:45:48 GMT 2019
+ - support singular and plural PK queries (thanks @nohuhu)
+
 0.10	Wed 20 Feb 12:25:50 GMT 2019
  - add MySQL "employees" test db as test
  - handle views somewhat

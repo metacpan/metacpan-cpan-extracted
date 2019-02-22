@@ -57,6 +57,21 @@ ok($ua->cookie_jar->as_string =~ /^(?=.*?lwp=true).*?cached=yes/, 'Cookies from 
 is(scalar($ua->last_cached), 0, '@last_cached length = 0 when get from cache');
 is(scalar($ua->last_used_cache), 2, '@last_used_cache length = 2 when get from cache');
 
+# binary content test
+my $content = "\0\1\2\3\4\5\6";
+$mid = $ua->map('http://mail.com/bin', HTTP::Response->new(200, 'OK', [], $content));
+$ua->get('http://mail.com/bin');
+$ua->unmap($mid);
+is($ua->get('http://mail.com/bin')->decoded_content, $content, "got right binary content");
+
+$content .= "\n";
+$mid = $ua->map('http://mail.com/bin2', HTTP::Response->new(200, 'OK', [], $content));
+$ua->get('http://mail.com/bin2');
+$ua->unmap($mid);
+is($ua->get('http://mail.com/bin2')->decoded_content, $content, "got right binary content with trailing new line");
+
+
+
 # nocache_if test
 $ua->nocache_if(sub {
 	$_[0]->code > 399

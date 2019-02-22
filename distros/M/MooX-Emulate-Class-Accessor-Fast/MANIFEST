@@ -13,6 +13,7 @@ t/adopt.t
 t/class_accessor_chained_fast.t
 t/construction.t
 t/getset.t
+t/lib/TestAdoptCAF.pm
 t/list_assign.t
 t/no_replace_existing_symbols.t
 t/recreated_accessors.t

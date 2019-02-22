@@ -1503,7 +1503,7 @@ package Devel::PPPort;
 use strict;
 use vars qw($VERSION $data);
 
-$VERSION = '3.43';
+$VERSION = '3.44';
 
 sub _init_data
 {
@@ -6125,8 +6125,8 @@ typedef OP* (CPERLscope(*Perl_check_t)) (pTHX_ OP*);
 #  if ( (PERL_BCDVERSION >= 0x5008000) && (PERL_BCDVERSION < 0x5008009) ) || ( (PERL_BCDVERSION >= 0x5009000) && (PERL_BCDVERSION < 0x5010001) )
 #    define D_PPP_FIX_UTF8_ERRSV(errsv, sv)                     \
         STMT_START {                                            \
-            if (sv != ERRSV)                                    \
-                SvFLAGS(ERRSV) = (SvFLAGS(ERRSV) & ~SVf_UTF8) | \
+            if (sv != errsv)                                    \
+                SvFLAGS(errsv) = (SvFLAGS(errsv) & ~SVf_UTF8) | \
                                  (SvFLAGS(sv) & SVf_UTF8);      \
         } STMT_END
 #  else

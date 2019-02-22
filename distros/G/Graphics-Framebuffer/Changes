@@ -1389,3 +1389,17 @@ Revision history for Graphics-Framebuffer
 
       Fixes to compensate for the incorrect Imager compass coordinates for
       pies.  Imager was skewing them by 90 degrees for some reason.
+
+6.22  Feb 20, 2019
+
+      Added new method "ttf_paragraph".  It enables more conventional printing
+      a TrueType display, and even word wraps the text.
+
+      Fixed the cancel issue in the "examples/primitives.pl" script, as well as
+      added the "ttf_paragraph" test to it.
+
+      Updated some documentation.
+
+      Some issues still with 16 bit mode on texture or patterned filled
+      objects.  Temporarily turning off C acceleration for those may minimize
+      some of the issues.

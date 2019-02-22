@@ -35,14 +35,14 @@ my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql(
 subtest 'execute pk + deeper query' => sub {
   my $doc = <<'EOF';
 {
-  blog(id: [1, 2]) {
+  blogs(id: [1, 2]) {
     id
     title
     tags {
       name
     }
   }
-  photo(id: [4730349774, 4730337840]) {
+  photos(id: [4730349774, 4730337840]) {
     id
     description
     photosets {
@@ -59,7 +59,7 @@ EOF
     ],
     {
       data => {
-        blog => [
+        blogs => [
           {
             id => 1,
             tags => [ { name => "personal" }, { name => "test" } ],
@@ -71,7 +71,7 @@ EOF
             title => "Tech",
           }
         ],
-        photo => [
+        photos => [
           {
             description => '',
             id => '4730337840',
@@ -155,7 +155,7 @@ EOF
 subtest 'execute update mutation' => sub {
   my $doc = <<'EOF';
 query q {
-  photo(id: ["4730349774", "4656987762"]) {
+  photos(id: ["4730349774", "4656987762"]) {
     id
     locality
   }
@@ -179,7 +179,7 @@ EOF
     ],
     {
       data => {
-        photo => [
+        photos => [
           { id => '4656987762', locality => 'Chico' },
           { id => '4730349774', locality => 'Fort Lauderdale' },
         ],
@@ -211,14 +211,14 @@ EOF
       $converted->{schema}, $doc, $converted->{root_value},
       (undef) x 2, 'q', $converted->{resolver},
     ],
-    { data => { photo => $expected } },
+    { data => { photos => $expected } },
   );
 };
 
 subtest 'execute delete mutation' => sub {
   my $doc = <<'EOF';
 query q {
-  blogTag(id: [6]) {
+  blogTags(id: [6]) {
     id
     name
   }
@@ -235,7 +235,7 @@ EOF
     ],
     {
       data => {
-        blogTag => [ {
+        blogTags => [ {
           id => 6,
           name => 'something',
         } ],
@@ -256,7 +256,7 @@ EOF
       $converted->{schema}, $doc, $converted->{root_value},
       (undef) x 2, 'q', $converted->{resolver},
     ],
-    { data => { blogTag => [] } },
+    { data => { blogTags => [] } },
   );
 };
 

@@ -1,0 +1,140 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Constants">Constants</a></li>
+      <li><a href="#Constructors-etc">Constructors etc.</a></li>
+      <li><a href="#Methods">Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SEE-ALSO1">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DTA::TokWrap::Processor::tcftokenize - DTA tokenizer wrappers: TCF text layer tokenization</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> use DTA::TokWrap::Processor::tcftokenize;
+ 
+ $ttok = DTA::TokWrap::Processor::tcftokenize-&gt;new(%opts);
+ $doc_or_undef = $ttok-&gt;tcftokenize($doc);</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>DTA::TokWrap::Processor::tcftokenize provides an object-oriented <a>DTA::TokWrap::Processor</a> wrapper for tokenizing the TCF <code>text</code> layer with the selected tokenizer and encoding the result in the TCF <code>tokens</code> and <code>sentences</code> layers.</p>
+
+<h2 id="Constants">Constants</h2>
+
+<dl>
+
+<dt id="ISA">@ISA</dt>
+<dd>
+
+<p>DTA::TokWrap::Processor::tcftokenize inherits from <a>DTA::TokWrap::Processor</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Constructors-etc">Constructors etc.</h2>
+
+<dl>
+
+<dt id="new">new</dt>
+<dd>
+
+<pre><code> $obj = $CLASS_OR_OBJECT-&gt;new(%args);</code></pre>
+
+<p>Constructor.</p>
+
+</dd>
+<dt id="defaults">defaults</dt>
+<dd>
+
+<pre><code> %defaults = $CLASS-&gt;defaults();</code></pre>
+
+<p>Static class-dependent defaults.</p>
+
+</dd>
+</dl>
+
+<h2 id="Methods">Methods</h2>
+
+<dl>
+
+<dt id="tcftokenize">tcftokenize</dt>
+<dd>
+
+<pre><code> $doc_or_undef = $CLASS_OR_OBJECT-&gt;tcftokenize($doc);</code></pre>
+
+<p>Tokenizes the <code>text</code> layer extracted from a TCF document and encodes the result in new TCF <code>tokens</code> and <code>sentences</code> layers.</p>
+
+<p>Relevant %$doc keys:</p>
+
+<pre><code> tcfdoc    =&gt; $tcfdoc,       ##-- (input,output) TCF input document with &lt;text&gt; layer
+ ##
+ txtfile   =&gt; $txtfile,      ##-- (temp,output) text file used for TCF extraction
+ tokdata0  =&gt; $tokdata,      ##-- (temp,output) raw tokenization data
+ tokdata1  =&gt; $tokdata1,     ##-- (temp,output) tweaked tokenization data
+ ##
+ tcftokdoc =&gt; $tcftokdoc,    ##-- (output) output TCF file with &lt;sentences&gt;,&lt;tokens&gt; layers (==$tcfdoc)
+ tcftokenize_stamp0 =&gt; $f,   ##-- (output) timestamp of operation begin
+ tcftokenize_stamp  =&gt; $f,   ##-- (output) timestamp of operation end
+ tcftokdoc_stamp    =&gt; $f,   ##-- (output) timestamp of operation end</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="SEE-ALSO1">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2014-2018 by Bryan Jurish</p>
+
+<p>This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.14.2 or, at your option, any later version of Perl 5 you may have available.</p>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>
+
+

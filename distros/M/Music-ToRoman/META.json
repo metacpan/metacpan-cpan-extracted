@@ -48,7 +48,6 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::Exception" : "0",
             "Test::More" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -67,7 +66,7 @@
          "web" : "https://github.com/ology/Music-ToRoman"
       }
    },
-   "version" : "0.0801",
+   "version" : "0.0901",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

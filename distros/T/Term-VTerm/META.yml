@@ -7,8 +7,8 @@ build_requires:
   Test::More: '0.88'
   Test::Refcount: '0'
 configure_requires:
-  ExtUtils::PkgConfig: '0'
   Module::Build: '0'
+  Module::Build::Using::PkgConfig: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,14 +19,14 @@ name: Term-VTerm
 provides:
   Term::VTerm:
     file: lib/Term/VTerm.pm
-    version: '0.03'
+    version: '0.04'
   Term::VTerm::Screen:
     file: lib/Term/VTerm/Screen.pm
-    version: '0.03'
+    version: '0.04'
   Term::VTerm::State:
     file: lib/Term/VTerm/State.pm
-    version: '0.03'
+    version: '0.04'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

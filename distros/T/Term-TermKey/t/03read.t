@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More;
 use Test::Refcount;
 
 use IO::Handle;
@@ -60,3 +60,5 @@ is_refcount( $rd, 2, '$rd has refcount 2 before dropping $tk' );
 undef $tk;
 
 is_oneref( $rd, '$rd has refcount 1 before EOF' );
+
+done_testing;

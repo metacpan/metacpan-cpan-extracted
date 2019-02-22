@@ -1,5 +1,14 @@
 Revision history for Changes
 
+0.66    2019-02-20 22:20:39
+        [CHANGES]
+         * Switch build system to Module::Build::Using::PkgConfig
+         * Clean up C code in XS file for various gcc warnings
+         * Prepare for new integer type of pen 'u' attribute in tests
+
+        [BUGFIXES]
+         * Spelling fixes (thanks gregor herrmann) (RT125958)
+
 0.65    2018-01-05 15:59:18
         [CHANGES]
          * Updated for libtickit 0.2:

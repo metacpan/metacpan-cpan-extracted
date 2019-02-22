@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 # Load the XS code
 require Tickit;

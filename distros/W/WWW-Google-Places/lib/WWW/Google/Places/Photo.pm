@@ -1,6 +1,6 @@
 package WWW::Google::Places::Photo;
 
-$WWW::Google::Places::Photo::VERSION   = '0.36';
+$WWW::Google::Places::Photo::VERSION   = '0.37';
 $WWW::Google::Places::Photo::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::Places::Photo - Placeholder for 'photo' of WWW::Google::Places::Det
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 

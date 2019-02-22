@@ -3,23 +3,24 @@ abstract: 'Absraction Library for ServiceNow JSON WebServices'
 author:
   - 'Kevin L. Kane <kkane@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: ServiceNow-JSON
 no_index:
   directory:
     - t
     - inc
 requires:
-  JSON: 0.01
-  MIME::Base64: 0.01
-  Moose: 0.01
-  REST::Client: 0.01
-version: 0.01
+  JSON: '0.01'
+  MIME::Base64: '0.01'
+  Moose: '0.01'
+  REST::Client: '0.01'
+version: 0.02
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

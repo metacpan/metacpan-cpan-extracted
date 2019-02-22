@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+use 5.008001;
 use strictures 2;
 
 # If this test fails it may not be due to obvious breakage, but instead

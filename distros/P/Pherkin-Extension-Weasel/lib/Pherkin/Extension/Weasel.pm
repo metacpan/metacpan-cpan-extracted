@@ -5,7 +5,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
 =head1 VERSION
 
-0.03
+0.05
 
 =head1 SYNOPSIS
 
@@ -45,10 +45,13 @@ package Pherkin::Extension::Weasel;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 
+use File::Share ':all';
+use Digest::MD5 qw(md5_hex);
 use Module::Runtime qw(use_module);
+use Template;
 use Test::BDD::Cucumber::Extension;
 
 use Weasel;
@@ -57,6 +60,73 @@ use Weasel::Session;
 use Moose;
 extends 'Test::BDD::Cucumber::Extension';
 
+
+has _log => (is => 'rw', isa => 'Maybe[HashRef]');
+
+has _weasel_log => (is => 'rw', isa => 'Maybe[ArrayRef]');
+
+has feature_template => (is => 'ro', isa => 'Str',
+                         default => 'pherkin-weasel-html-log-default.html');
+
+has logging_dir => (is => 'ro', isa => 'Maybe[Str]');
+
+has templates_dir => (is => 'ro', isa => 'Str',
+                      default => sub {
+                          my $dist = __PACKAGE__;
+                          $dist =~ s/::/-/g;
+                          return dist_dir $dist;
+                      });
+
+
+sub _weasel_log_hook {
+    my $self = shift;
+    my ($event, $log_item, $something) = @_;
+    my $log_text = (ref $log_item eq 'CODE') ? $log_item->() : $log_item;
+
+    my $log = $self->_log;
+    if ($log) {
+        push @{$log->{scenario}->{rows}}, {
+            log => {
+                text => $log_text
+            },
+        };
+    }
+}
+
+sub _flush_log {
+    my $self = shift;
+    my $log = $self->_log;
+    return if ! $log;
+
+    my $f = md5_hex($log->{feature}->{title}) . '.html';
+    $log->{template}->process(
+        $self->feature_template,
+        { %{$log} }, # using the $log object directly destroys it...
+        $f,
+        { binmode => ':utf8' })
+        or die $log->{template}->error();
+
+    return File::Spec->catfile($self->logging_dir, $f);
+}
+
+sub _initialize_logging {
+    my ($self) = @_;
+
+    if ($self->logging_dir) { # the user wants logging...
+        die 'Logging directory: ' . $self->logging_dir . ' does not exist'
+            if ! -d $self->logging_dir;
+
+        $self->_log(
+            {
+                features => [],
+                template => Template->new(
+                    {
+                        INCLUDE_PATH => $self->templates_dir,
+                        OUTPUT_PATH => $self->logging_dir,
+                    }),
+            });
+    }
+}
 
 =head1 Test::BDD::Cucumber::Extension protocol implementation
 
@@ -83,15 +153,54 @@ sub pre_execute {
         my $sess = $ext_config->{$sess_name};
         my $drv = use_module($sess->{driver}->{drv_name});
         $drv = $drv->new(%{$sess->{driver}});
-        my $session = Weasel::Session->new(%$sess, driver => $drv);
+        my $session = Weasel::Session->new(
+            %$sess,
+            driver => $drv,
+            log_hook => sub { $self->_weasel_log_hook(@_) },
+            );
         $sessions{$sess_name} = $session;
     }
     my $weasel = Weasel->new(
         default_session => $self->default_session,
-        sessions => \%sessions);
+        sessions => \%sessions,
+            );
     $self->_weasel($weasel);
+    $self->_initialize_logging;
 }
 
+=item pre_feature
+
+=cut
+
+sub pre_feature {
+    my ($self, $feature, $feature_stash) = @_;
+
+    my $log = $self->_log;
+    if ($log) {
+        my $feature_log = {
+            scenarios => [],
+            title => $feature->name,
+            satisfaction => join("\n",
+                                 map { $_->content }
+                                 @{$feature->satisfaction})
+        };
+        push @{$log->{features}}, $feature_log;
+        $log->{feature} = $feature_log;
+    }
+}
+
+=item post_feature
+
+=cut
+
+sub post_feature {
+    my ($self, $feature, $feature_stash) = @_;
+
+    my $log = $self->_log;
+    if ($log) {
+        $log->{feature} = undef;
+    }
+}
 
 =item pre_scenario
 
@@ -104,6 +213,16 @@ sub pre_scenario {
         $stash->{ext_wsl} = $self->_weasel->session;
         $self->_weasel->session->start;
 
+        my $log = $self->_log;
+        if ($log) {
+            my $scenario_log = {
+                rows => [],
+                title => $scenario->name,
+            };
+            push @{$log->{feature}->{scenarios}}, $scenario_log;
+            $log->{scenario} = $scenario_log;
+        }
+
         $self->_save_screenshot("scenario", "pre");
     }
 }
@@ -114,6 +233,12 @@ sub post_scenario {
 
     return if ! defined $stash->{ext_wsl};
     $self->_save_screenshot("scenario", "post");
+
+    my $log = $self->_log;
+    if ($log) {
+        $log->{scenario} = undef;
+    }
+
     $stash->{ext_wsl}->stop
 }
 
@@ -122,13 +247,26 @@ sub pre_step {
 
     return if ! defined $context->stash->{scenario}->{ext_wsl};
     $self->_save_screenshot("step", "pre");
+    my $log = $self->_log;
+    if ($log) {
+        push @{$log->{scenario}->{rows}}, {
+            step => {
+                text => $context->step->text,
+            },
+        };
+    }
 }
 
 sub post_step {
-    my ($self, $feature, $context) = @_;
+    my ($self, $feature, $context, $failed) = @_;
 
     return if ! defined $context->stash->{scenario}->{ext_wsl};
     $self->_save_screenshot("step", "post");
+    my $log = $self->_log;
+    if ($log) {
+        ${$log->{scenario}->{rows}}[-1]->{step}->{result} =
+            $failed ? 'FAIL' : 'success';
+    }
 }
 
 =back
@@ -207,9 +345,25 @@ sub _save_screenshot {
     return if ! $self->screenshot_event_on("$phase-$event");
 
     my $img_name = "$event-$phase-" . ($img_num++) . '.png';
-    open my $fh, ">", $self->screenshots_dir . '/' . $img_name;
-    $self->_weasel->session->screenshot($fh);
-    close $fh;
+    if (open my $fh, ">", $self->screenshots_dir . '/' . $img_name) {
+        $self->_weasel->session->screenshot($fh);
+        close $fh
+            or warn "Couldn't close screenshot image '$img_name': $!";
+    }
+    else {
+        warn "Couldn't open screenshot image '$img_name': $!";
+    }
+
+    my $log = $self->_log;
+    if ($log) {
+        push @{$log->{scenario}->{rows}}, {
+            screenshot => {
+                location => $img_name,
+                description => "$phase $event: ",
+                classes => [ $event, $phase, "$phase-$event" ],
+            },
+        };
+    }
 }
 
 =back

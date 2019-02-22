@@ -4,8 +4,10 @@
       "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
-   "keywords" : [],
+   "generated_by" : "Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "Semantic Web"
+   ],
    "license" : [
       "perl_5"
    ],
@@ -44,6 +46,9 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "RDF::NS" : "20130802"
+         },
          "requires" : {
             "Module::Load::Conditional" : "0",
             "RDF::RDFa::Parser" : "0",
@@ -55,7 +60,7 @@
    "provides" : {
       "RDF::Trine::Serializer::RDFa" : {
          "file" : "lib/RDF/Trine/Serializer/RDFa.pm",
-         "version" : "0.100"
+         "version" : "0.101"
       }
    },
    "release_status" : "stable",
@@ -75,7 +80,7 @@
       "x_IRC" : "irc://irc.perl.org/#perlrdf",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/project"
    },
-   "version" : "0.100",
+   "version" : "0.101",
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1
 }

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010; # //
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 use Carp;
 
@@ -208,7 +208,7 @@ L<Tickit::Event>.
 
    $id = $win->bind_event( $ev, $flags, $code, $data )
 
-The C<$code> argument may optionally be preceeded by an integer of flag
+The C<$code> argument may optionally be preceded by an integer of flag
 values. This should be zero to apply default semantics, or a bitmask of
 constants. The constants are documented in
 L<Tickit::Term/bind_event (with flags)>.

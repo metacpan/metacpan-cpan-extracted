@@ -1,5 +1,15 @@
 Revision history for App-sourcepan
 
+0.04    2019-02-21 14:12:17
+        [BUGFIXES]
+         * IPC::Run does not work properly on MSWin32 after fork()+chdir();
+           use plain system() instead
+
+0.03    2019-02-21 12:12:07
+        [CHANGES]
+         * Added --extract, --unversioned and --vc-init commandline arguments
+         * Added --git and --bzr shortcuts for them
+
 0.02    2014/01/27 21:34:56
         [CHANGES]
          * Allow specification of module or distribution names on commandline

@@ -1,0 +1,24 @@
+---
+abstract: 'RT-Extension-ElapsedBusinessTime Extension'
+author:
+  - 'Andrew Ruthven, Catalyst Cloud Ltd <puck@catalystcloud.nz>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RT-Extension-ElapsedBusinessTime
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Set::Object: '0'
+  Try::Tiny: '0'
+  perl: '5.008003'
+version: '0.02'

@@ -1,5 +1,9 @@
 Revision history for Term-VTerm
 
+0.04    2019-02-20 22:11:54
+        [CHANGES]
+         * Switch build system to Module::Build::Using::PkgConfig
+
 0.03    2018-12-23 18:59:17
         [CHANGES]
          * Support symbolic keys

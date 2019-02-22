@@ -27,9 +27,9 @@ subtest 'defaults' => sub {
   ok defined $file, 'has inc/Alien/Base/Wrapper.pm';
   if(defined $file)
   {
+    like $file->content, qr/package Alien::Base::Wrapper/;
     note " ### inc/Alien/Base/Wrapper.pm ###";
     note join "\n", splice(@{[split /\n/, $file->content]}, 0, 20), "...";
-    
   }
 
   $file = first { $_->name eq 'Makefile.PL' } @{ $tzil->files };
@@ -59,8 +59,8 @@ subtest 'alt location' => sub {
   ok defined $file, 'has alt/Alien/Base/Wrapper.pm';
   if(defined $file)
   {
+    like $file->content, qr/package Alien::Base::Wrapper/;
     note join "\n", splice(@{[split /\n/, $file->content]}, 0, 20), "...";
-    
   }
 
 };
@@ -102,13 +102,13 @@ subtest 'munger!' => sub {
         [ 'MakeMaker' => {} ],
         [ 'MetaJSON'   => {} ],
         [ 'AlienBase::Wrapper::Bundle' => {
-          system_check => [ 
-                            '| do {', 
-                            '|   # STUFF', 
+          system_check => [
+                            '| do {',
+                            '|   # STUFF',
                             '| }'
                           ],
-          system       => [ 
-                            '| # use libfoo!', 
+          system       => [
+                            '| # use libfoo!',
                             '| $WriteMakefileArgs{LIBS} = [ "-lfoo" ]',
                           ],
           alien        => [ qw( Alien::libfoo Alien::libbar@2.02 ) ],
@@ -129,6 +129,33 @@ subtest 'munger!' => sub {
   note YAML::Dump($meta->{prereqs});
 
   is($meta->{prereqs}->{configure}->{requires}->{'ExtUtils::MakeMaker'}, '6.52');
+};
+
+subtest 'replace' => sub {
+
+  my $tzil = Builder->from_config({ dist_root => 'corpus/Foo-XS2' }, {
+    add_files => {
+      'source/dist.ini' => simple_ini(
+        { name => 'Foo-XS2' },
+        [ 'GatherDir'  => {} ],
+        [ 'MakeMaker' => {} ],
+        [ 'MetaJSON'   => {} ],
+        [ 'AlienBase::Wrapper::Bundle' => {} ],
+      ),
+    },
+  });
+
+  $tzil->build;
+
+  my $file = first { $_->name eq 'inc/Alien/Base/Wrapper.pm' } @{ $tzil->files };
+
+  ok defined $file, 'has inc/Alien/Base/Wrapper.pm';
+  if(defined $file)
+  {
+    like $file->content, qr/package Alien::Base::Wrapper/;
+    note " ### inc/Alien/Base/Wrapper.pm ###";
+    note join "\n", splice(@{[split /\n/, $file->content]}, 0, 20), "...";
+  }
 };
 
 done_testing;

@@ -8,7 +8,6 @@ use Mojolicious::Lite;
 my $host = $ENV{HOST} // '127.0.0.1';
 
 plugin 'OAuth2', {
-  fix_get_token => 1,
   overly_attached_social_network => {
      authorize_url => "https://$host:3000/oauth/authorize?response_type=code",
      token_url     => "https://$host:3000/oauth/access_token",

@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use utf8;
-use feature qw(say);
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use Test::More;
@@ -83,7 +82,6 @@ for my $test (@tests) {
 
     ok $result, '... got a sane response';
 
-    #say Dumper $result->{results}[0];
     my @results = @{ $result->{results} || [] };
     my $num_results = @results;
 

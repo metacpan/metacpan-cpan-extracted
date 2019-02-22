@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle 0.25 {
+package Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle 0.26 {
 
   use 5.014;
   use Moose;
@@ -50,12 +50,24 @@ package Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle 0.25 {
       $self->log_fatal("requires Alien::Base::Wrapper 1.28, but we have @{[ Alien::Base::Wrapper->VERSION ]}");
     }
 
-    my $file = Dist::Zilla::File::InMemory->new({
-      name    => $self->filename,
-      content => Path::Tiny->new($INC{'Alien/Base/Wrapper.pm'})->slurp_utf8,
-    });
+    my $content = Path::Tiny->new($INC{'Alien/Base/Wrapper.pm'})->slurp_utf8;
 
-    $self->add_file($file);
+    my $file;
+
+    $file = List::Util::first { $_->name eq $self->filename } @{ $self->zilla->files };
+
+    if($file)
+    {
+      $file->content($content);
+    }
+    else
+    {
+      $file = Dist::Zilla::File::InMemory->new({
+        name    => $self->filename,
+        content => $content,
+      });
+      $self->add_file($file);
+    }
   }
 
   my $comment_begin  = "# BEGIN code inserted by @{[ __PACKAGE__ ]}\n";
@@ -135,7 +147,7 @@ Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle - Bundle a copy of Alien::Base::
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBase::Doc 0.25 {
+package Dist::Zilla::Plugin::AlienBase::Doc 0.26 {
 
   use 5.014;
   use Moose;
@@ -60,17 +60,17 @@ package Dist::Zilla::Plugin::AlienBase::Doc 0.25 {
     my($orig, $self) = @_;
     ($self->$orig, 'type', 'see_also');
   };
-    
+
   sub render_synopsis
   {
     my($self) = @_;
-  
+
     my $str = "\n=head1 SYNOPSIS";
-  
+
     foreach my $type (@{ $self->type })
     {
       my $template;
-  
+
       if($type eq 'library')
       {
         $template = $self->section_data('__SYNOPSIS_LIBRARY__')
@@ -87,10 +87,10 @@ package Dist::Zilla::Plugin::AlienBase::Doc 0.25 {
       {
         Carp::croak("unknown type: $type");
       }
-    
+
       $template = $$template;
       $template =~ s{\s*$}{};
-    
+
       $str .= "\n\n";
       $str .= $self->fill_in_string($template, {
         class      => $self->class_name,
@@ -99,43 +99,43 @@ package Dist::Zilla::Plugin::AlienBase::Doc 0.25 {
         optversion => $self->min_version ? " @{[ $self->min_version ]}" : '',
       });
     }
-  
+
     $str .= "\n\n=cut\n\n";
-  
+
     $str;
   }
 
   sub render_description
   {
     my($self) = @_;
-  
+
     my $template = $self->section_data('__DESCRIPTION__');
-  
+
     $template = $$template;
     $template =~ s{\s*$}{};
-  
+
     my $str = "\n";
-  
+
     $str .= $self->fill_in_string($template, {
       class      => $self->class_name,
       name       => $self->name,
       version    => $self->min_version,
       optversion => $self->min_version ? " @{[ $self->min_version ]}" : '',
     });
-  
+
     $str .= "\n\n";
-  
+
     $str;
   }
 
   sub render_see_also
   {
     my($self) = @_;
-  
-    my $str = "\n=head1 SEE ALSO\n\n";  
+
+    my $str = "\n=head1 SEE ALSO\n\n";
     $str .= join ', ', map { "L<$_>" } @{ $self->see_also };
     $str .= "\n\n=cut\n\n";
-  
+
     $str;
   }
 
@@ -149,14 +149,14 @@ package Dist::Zilla::Plugin::AlienBase::Doc 0.25 {
   sub munge_file
   {
     my($self, $file) = @_;
-  
+
     my $doc = $self->ppi_document_for_file($file);
-  
+
     return unless defined $doc;
-  
+
     my $comments = $doc->find('PPI::Token::Comment');
     my $modified = 0;
-  
+
     foreach my $comment (@{ $comments || [] })
     {
       if($comment =~ /^\s*##?\s*ALIEN (SYNOPSIS|DESCRIPTION|SEE ALSO)\s*$/)
@@ -177,13 +177,13 @@ package Dist::Zilla::Plugin::AlienBase::Doc 0.25 {
         $modified = 1;
       }
     }
-  
+
     if($modified)
     {
       $self->save_ppi_document_to_file( $doc, $file);
       $self->log_debug([ 'adding ALIEN documentation to %s', $file->name ]);
     }
-  
+
     return;
   }
 
@@ -205,7 +205,7 @@ Dist::Zilla::Plugin::AlienBase::Doc - Generate boilerplate documentation for Ali
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -230,13 +230,13 @@ In your Alien/Foo.pm:
 
 =head1 DESCRIPTION
 
-This plugin generates some boiler plat documentation for your 
-L<Alien::Base> based L<Alien> module.  It will find the special codes 
-C<ALIEN SYNOPSIS>, C<ALIEN DESCRIPTION>, and C<ALIEN SEE ALSO> and 
-replace them with the appropriate boilerplate POD documentation for how 
-to use the module.  The generated synopsis and see also sections are 
-probably good enough as is.  The description is a little more basic, and 
-you may want to write a more detailed description yourself.  It is, at 
+This plugin generates some boiler plat documentation for your
+L<Alien::Base> based L<Alien> module.  It will find the special codes
+C<ALIEN SYNOPSIS>, C<ALIEN DESCRIPTION>, and C<ALIEN SEE ALSO> and
+replace them with the appropriate boilerplate POD documentation for how
+to use the module.  The generated synopsis and see also sections are
+probably good enough as is.  The description is a little more basic, and
+you may want to write a more detailed description yourself.  It is, at
 least, better than nothing though!
 
 =head1 ATTRIBUTES
@@ -348,9 +348,9 @@ In your script or module:
 __[ __DESCRIPTION__ ]__
 =head1 DESCRIPTION
 
-This distribution provides {{ $name }} so that it can be used by other 
-Perl distributions that are on CPAN.  It does this by first trying to 
-detect an existing install of {{ $name }} on your system.  If found it 
+This distribution provides {{ $name }} so that it can be used by other
+Perl distributions that are on CPAN.  It does this by first trying to
+detect an existing install of {{ $name }} on your system.  If found it
 will use that.  If it cannot be found, the source code will be downloaded
 from the internet and it will be installed in a private share location
 for the use of other modules.

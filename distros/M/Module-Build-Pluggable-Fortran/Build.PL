@@ -12,6 +12,7 @@ my $build = Module::Build->new(
         'perl'                           => '5.008',
         'Module::Build::Pluggable::Base' => 0,
         'ExtUtils::F77'                  => 0,
+        'Text::ParseWords'               => 0,
     },
 
     test_requires => {

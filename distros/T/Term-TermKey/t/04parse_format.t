@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More;
 
 use Term::TermKey;
 
@@ -48,3 +48,5 @@ ok( !defined( $key = $tk->parse_key( "NoSuchKey", 0 ) ), '->parse_key "NoSuchKey
    ok( defined( $key = $tk->parse_key_at_pos( $str, FORMAT_LONGMOD ) ), '->parse_key_at_pos defined upgrade' );
    is( pos($str), 7, 'pos($str) after ->parse_key_at_pos upgrade' );
 }
+
+done_testing;

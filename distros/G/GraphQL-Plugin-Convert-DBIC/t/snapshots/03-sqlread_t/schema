@@ -58,8 +58,10 @@ type Mutation {
 }
 
 type Query {
-  author(id: [Int!]!): [Author]
-  module(id: [Int!]!): [Module]
+  author(id: Int!): Author
+  authors(id: [Int!]!): [Author]
+  module(id: Int!): Module
+  modules(id: [Int!]!): [Module]
   "input to search"
   searchAuthor(input: AuthorSearchInput!): [Author]
   "input to search"

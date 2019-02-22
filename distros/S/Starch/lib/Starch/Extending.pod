@@ -116,25 +116,12 @@ they have not broken the core functionality of Starch.
 =head1 THROWING EXCEPTIONS
 
 Exceptions for known issues should be thrown using L<Starch::Util/croak>
-which automatically internalizes all core Starch packages so that the
-error will report the caller in the user's code.  In non-core stores and
-plugins it is important that you localize the package in Carp so that
-the errors point to the user's code as the caller, for example in a
-store you could localize the package in the get, set, and remove methods:
+which automatically internalizes all installed C<Starch::> packages so that
+the error will report the caller in the user's code.
 
-    package My::Store;
-    use Moo;
-    use Carp qw();
-    with 'Starch::Store';
-    sub get {
-        local $Carp::Internal{ (__PACKAGE__) } = 1;
-
-        ...
-    }
-
-This is especially important for plugins where you are often augmenting
-existing methods which may themselves be croak()ing, you don't want your
-plugin's code to be reported at the source of the known error.
+    use Starch::Util qw( croak );
+    ...
+    croak 'foo';
 
 =head1 EXTENDING BUILD
 

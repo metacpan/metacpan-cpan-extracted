@@ -29,7 +29,7 @@ use Class::XSAccessor
         )
   };
 
-sub _overrideLength {                                       # Consider wide Unicode characters if possible i.e.
+sub _override_length {                                      # Consider wide Unicode characters if possible i.e.
   no warnings qw(redefine once);                            # if Unicode::GCString can be used.
   use subs qw(length);
   eval { load('Unicode::GCString') };                       # Otherwise table content can be twisted
@@ -37,7 +37,7 @@ sub _overrideLength {                                       # Consider wide Unic
   return;
 }
 
-BEGIN { _overrideLength() }
+BEGIN { _override_length() }
 
 use constant {                                              # Boolean values
   FALSE => 0,
@@ -87,7 +87,7 @@ use constant {                                              # Valid option combi
       optional     => 1,
     },
     page_height   => {
-      default      => \&_screenHeight,
+      default      => \&_screen_height,
       optional     => 1,
     },
     separate_rows => {
@@ -95,7 +95,7 @@ use constant {                                              # Valid option combi
       optional     => 1,
     },
     table_width   => {
-      default      => \&_screenWidth,
+      default      => \&_screen_width,
       optional     => 1,
     },
   },
@@ -106,15 +106,15 @@ use constant {
     rows         => {
       type        => ARRAYREF,
       callbacks   => {
-        q('rows' element is an array reference)                                    => \&_isEachRowArray,
-        q(all 'rows' elements have same length)                                    => \&_areAllRowsOfEqualLength,
-        q('rows' elements contain defined scalars only)                            => \&_isEachCellScalar,
+        q('rows' element is an array reference)                              => \&_is_each_row_array,
+        q(all 'rows' elements have same length)                              => \&_are_all_rows_of_equal_length,
+        q('rows' elements contain defined scalars only)                      => \&_is_each_cell_scalar,
       },
     },
     broad_row    => {
       type        => SCALAR,
       optional    => 1,
-      callbacks   => { q('broad_row' is either 'CUT', or 'SPLIT', or 'WRAP')       => \&_isCutOrSplitOrWrap },
+      callbacks   => { q('broad_row' is either 'CUT', or 'SPLIT', or 'WRAP') => \&_is_cut_or_split_or_wrap },
     },
     collapse     => {
       type        => ARRAYREF | SCALAR,
@@ -123,7 +123,7 @@ use constant {
     column_width => {
       type        => ARRAYREF | SCALAR,
       optional    => 1,
-      callbacks   => { q('column_width' is undefined or a positive integer)        => \&_isEachColumnWidthUndefOrInt },
+      callbacks   => { q('column_width' is undefined or a positive integer)  => \&_is_each_column_width_undef_or_int },
     },
   },
   OPTIONS_CALLBACK => {
@@ -131,12 +131,12 @@ use constant {
     broad_row   => {
       type        => SCALAR,
       optional    => 1,
-      callbacks   => { q('broad_row' is either 'CUT' or 'WRAP')                    => \&_isCutOrWrap },
+      callbacks   => { q('broad_row' is either 'CUT' or 'WRAP') => \&_is_cut_or_wrap },
     },
     column_width => {
       type        => ARRAYREF | SCALAR,
       optional    => 1,
-      callbacks   => { q('column_width' is a positive integer)                     => \&_isEachColumnWidthInt },
+      callbacks   => { q('column_width' is a positive integer)  => \&_is_each_column_width_int },
     },
   },
   OPTIONS_GENERAL => {
@@ -144,32 +144,32 @@ use constant {
     header        => {
       type         => ARRAYREF,
       optional     => 1,
-      callbacks    => { q('header' element is a scalar)                             => \&_isScalar },
+      callbacks    => { q('header' element is a scalar)                        => \&_is_scalar },
     },
     broad_column  => {
       type         => ARRAYREF | SCALAR,
       optional     => 1,
-      callbacks    => { q('broad_column' is / contains either 'CUT' or 'WRAP' only) => \&_isEachColumnFlagCutOrWrap },
+      callbacks    => { q('broad_column' contains either 'CUT' or 'WRAP' only) => \&_is_each_column_flag_cut_or_wrap },
     },
     broad_header  => {
       type         => ARRAYREF | SCALAR,
       optional     => 1,
-      callbacks    => { q('broad_header' is / contains either 'CUT' or 'WRAP' only) => \&_isEachColumnFlagCutOrWrap },
+      callbacks    => { q('broad_header' contains either 'CUT' or 'WRAP' only) => \&_is_each_column_flag_cut_or_wrap },
     },
     column_width  => {
       type         => ARRAYREF | SCALAR,
       optional     => 1,
-      callbacks    => { q('column_width' is a positive integer)                     => \&_isEachColumnWidthInt },
+      callbacks    => { q('column_width' is a positive integer)                => \&_is_each_column_width_int },
     },
     pad           => {
       type         => ARRAYREF | SCALAR,
       optional     => 1,
-      callbacks    => { q('pad' is undefined or a positive integer)                 => \&_isUndefOrInt },
+      callbacks    => { q('pad' is undefined or a positive integer)            => \&_is_undef_or_int },
     },
     page_height   => {
       type         => SCALAR,
       optional     => 1,
-      callbacks    => { q('page_height' is undefined or a positive integer)         => \&_isUndefOrInt },
+      callbacks    => { q('page_height' is undefined or a positive integer)    => \&_is_undef_or_int },
     },
     separate_rows => {
       type         => SCALAR,
@@ -178,7 +178,7 @@ use constant {
     table_width   => {
       type         => SCALAR,
       optional     => 1,
-      callbacks    => { q('table_width' is undefined or a positive integer)         => \&_isUndefOrInt },
+      callbacks    => { q('table_width' is undefined or a positive integer)    => \&_is_undef_or_int },
     },
   },
 };
@@ -186,19 +186,19 @@ use constant {
 use Exporter qw(import);
 our @EXPORT_OK = qw(ADJUST CUT SPLIT WRAP);
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 sub fetch {                                                 # Provides current line
   my ($self) = @_;
 
-  return if $self->{'end_of_table'} && !@{$self->{':rowLines'}};
+  return if $self->{'end_of_table'} && !@{$self->{':row_lines'}};
 
-  $self->_getNextLines() unless @{$self->{':rowLines'}} && $self->{':lineOnPage'};
-  $self->{':lineOnPage'}++;
-  $self->{':lineOnPage'} = 0 if $self->{':lineOnPage'} == $self->{':linesPerPage'};
+  $self->_get_next_lines() unless @{$self->{':row_lines'}} && $self->{':line_on_page'};
+  $self->{':line_on_page'}++;
+  $self->{':line_on_page'} = 0 if $self->{':line_on_page'} == $self->{':lines_per_page'};
 
-  my $row = shift(@{$self->{':rowLines'}});
-  $self->{':rowBuffer'} = [] unless @{$self->{':rowLines'}};
+  my $row = shift(@{$self->{':row_lines'}});
+  $self->{':row_buffer'} = [] unless @{$self->{':row_lines'}};
 
   return $_ = $row;
 }
@@ -217,36 +217,36 @@ sub new {                                                   # Instantiate table 
 
   my $self = bless(
     {
-      ':endOfChunk'      => FALSE,                          # End of vertical chunk in case of horizontal splitting
-      ':headerLines'     => [],                             # One array element per header line
-      ':lineFormat'      => '|',                            # Row line format
-      ':lineOnPage'      => 0,                              # Line number relative to the current page
-      ':linesPerPage'    => 1,                              # Considers multiple lines per page depending on 'broad_row'
-      ':linesPerRow'     => 1,                              # Considers multiple lines per row depending on 'broad_row'
-      ':numberOfColumns' => undef,                          # Number of columns as supplied via 'rows' array
-      ':rowBuffer'       => [],                             # Current row content
-      ':rowLines'        => [],                             # One array element per row line
-      ':separatingAdded' => FALSE,                          # Separating line is among ':rowLines'
-      ':separatingLine'  => '+',                            # Line separating table / header content
-      ':splitOffset'     => 0,                              # Horizontal offset from the table left side
-      ':totalWidth'      => 0,                              # Table width independently of possible horizontal splitting
-      'current_row'      => 0,                              # Order No. of current row
-      'end_of_table'     => FALSE,                          # End of table in general (end of last chunk)
+      ':end_of_chunk'      => FALSE,                        # End of vertical chunk in case of horizontal splitting
+      ':header_lines'      => [],                           # One array element per header line
+      ':line_format'       => '|',                          # Row line format
+      ':line_on_page'      => 0,                            # Line number relative to the current page
+      ':lines_per_page'    => 1,                            # Considers multiple lines per page depending on 'broad_row'
+      ':lines_per_row'     => 1,                            # Considers multiple lines per row depending on 'broad_row'
+      ':number_of_columns' => undef,                        # Number of columns as supplied via 'rows' array
+      ':row_buffer'        => [],                           # Current row content
+      ':row_lines'         => [],                           # One array element per row line
+      ':separating_added'  => FALSE,                        # Separating line is among ':row_lines'
+      ':separating_line'   => '+',                          # Line separating table / header content
+      ':split_offset'      => 0,                            # Horizontal offset from the table left side
+      ':total_width'       => 0,                            # Table width independently of possible horizontal splitting
+      'current_row'        => 0,                            # Order No. of current row
+      'end_of_table'       => FALSE,                        # End of table in general (end of last chunk)
     },
     $class,
   )->_validate(\@params);
 
-  return ref($self->{'rows'}) eq 'ARRAY' ? $self->_setDefaults()->_init()
-                                         : $self->_copyOptions(OPTIONS_CALLBACK, \@params);
+  return ref($self->{'rows'}) eq 'ARRAY' ? $self->_set_defaults()->_init()
+                                         : $self->_copy_options(OPTIONS_CALLBACK, \@params);
 }
 
-sub _areAllRowsOfEqualLength {
+sub _are_all_rows_of_equal_length {                         # Checks if all rows have the same length as the 1st one
   my ($rows) = @_;
 
   return !grep { @$_ != @{$rows->[0]} } @$rows;
 }
 
-sub _copyOptions {                                          # Takes over values of required options into object
+sub _copy_options {                                          # Takes over values of required options into object
   my ($self, $options, $params) = @_;
 
   my %params = @$params;
@@ -259,34 +259,33 @@ sub _copyOptions {                                          # Takes over values 
   return $self;
 }
 
-sub _cutOrWrapLine {
+sub _cut_or_wrap_line {
   my ($self, $line) = @_;
 
-  $line = substr($line, $self->{':splitOffset'}) if $self->{':splitOffset'};
+  $line = substr($line, $self->{':split_offset'}) if $self->{':split_offset'};
 
-  my $lineTooLong = length($line) > $self->{'table_width'};
+  my $line_too_long = length($line) > $self->{'table_width'};
                                                             # Wrap is required and line is long enough to be wrapped
-  return unpack('(A' . $self->{'table_width'} . ')*', $line) if $self->{'broad_row'} == WRAP && $lineTooLong;
-
-  return substr($line, 0, $self->{'table_width'})           # Wrap is not required and line is too long
-    if $lineTooLong;
+  return unpack('(A' . $self->{'table_width'} . ')*', $line) if $self->{'broad_row'} == WRAP && $line_too_long;
+                                                            # Wrap is not required and line is too long
+  return substr($line, 0, $self->{'table_width'}) if $line_too_long;
 
   return $line;                                             # Line is too short for any change
 }
 
-sub _extractLine {                                          # Extract 1st remaining line from current table row
-  my ($self, $row, $broadFlags) = @_;
+sub _extract_line {                                         # Extract 1st remaining line from current table row
+  my ($self, $row, $broad_flags) = @_;
 
   my @line;
 
-  foreach my $columnNo (0 .. $self->{':numberOfColumns'} - 1) {
-    my $column_width  = $self->{'column_width'}[$columnNo];
-    my $field         = $row->[$columnNo];
+  foreach my $column_no (0 .. $self->{':number_of_columns'} - 1) {
+    my $column_width = $self->{'column_width'}[$column_no];
+    my $field        = $row->[$column_no];
 
-    $row->[$columnNo] = do {
+    $row->[$column_no] = do {
       if (length($field) > $column_width) {
         push(@line, substr($field, 0, $column_width));
-        $broadFlags->[$columnNo] == CUT ? '' : substr($field, $column_width);
+        $broad_flags->[$column_no] == CUT ? '' : substr($field, $column_width);
       }
       else {
         push(@line, $field);
@@ -298,109 +297,106 @@ sub _extractLine {                                          # Extract 1st remain
   return \@line;
 }
 
-sub _extractLines {                                         # Converts table row to array of output cell arrays
-  my ($self, $row, $broadFlags) = @_;
+sub _extract_lines {                                        # Converts table row to array of output cell arrays
+  my ($self, $row, $broad_flags) = @_;
 
   my @row = @$row;
 
   my @lines;
   if (@row) {
-    do {push(@lines, $self->_extractLine(\@row, $broadFlags))} while grep { $_ ne '' } @row;
+    do {push(@lines, $self->_extract_line(\@row, $broad_flags))} while grep { $_ ne '' } @row;
   }
 
   return \@lines;
 }
 
-sub _getNextLines {                                         # Provides next lines from the current row
+sub _get_next_lines {                                       # Provides next lines from the current row
   my ($self) = @_;
 
-  if (!@{$self->{':rowLines'}} && @{$self->_getNextRow()}) {
-    push(@{$self->{':rowLines'}},
-         map { $self->_cutOrWrapLine($_) } @{$self->_prepareRow($self->{':rowBuffer'}, $self->{'broad_column'})});
-    $self->{':separatingAdded'} = FALSE;
+  if (!@{$self->{':row_lines'}} && @{$self->_get_next_row()}) {
+    push(@{$self->{':row_lines'}},
+         map { $self->_cut_or_wrap_line($_) } @{$self->_prepare_row($self->{':row_buffer'}, $self->{'broad_column'})});
+    $self->{':separating_added'} = FALSE;
   }
 
-  my $headerAdded;
-  if ((ref($self->{'rows'}) eq 'ARRAY' && $self->{'current_row'} == 1 || !$self->{':lineOnPage'})
-  &&  !$self->{'end_of_table'}) {
-    unshift(@{$self->{':rowLines'}}, map { $self->_cutOrWrapLine($_) } @{$self->{':headerLines'}});
-    $headerAdded = TRUE;
-  }
+  unshift(@{$self->{':row_lines'}}, map { $self->_cut_or_wrap_line($_) } @{$self->{':header_lines'}})
+    if (ref($self->{'rows'}) eq 'ARRAY' && $self->{'current_row'} == 1 || !$self->{':line_on_page'})
+    && !$self->{'end_of_table'};
 
-  if (($self->{':endOfChunk'}                               # Ends up the table or separates two rows if required
-  ||   $self->{'separate_rows'} && $self->{':lineOnPage'} + @{$self->{':rowLines'}} < $self->{'page_height'} - 1)
-  && !$self->{':separatingAdded'}) {
-    push(@{$self->{':rowLines'}}, $self->_cutOrWrapLine($self->{':separatingLine'}));
-    $self->{':separatingAdded'} = TRUE;
+  if (($self->{':end_of_chunk'}                             # Ends up the table or separates two rows if required
+  ||   $self->{'separate_rows'} && $self->{':line_on_page'} + @{$self->{':row_lines'}} < $self->{'page_height'} - 1)
+  && !$self->{':separating_added'}) {
+    push(@{$self->{':row_lines'}}, $self->_cut_or_wrap_line($self->{':separating_line'}));
+    $self->{':separating_added'} = TRUE;
   }
 
   return;
 }
 
-sub _getNextRow {                                           # Takes over next row
+sub _get_next_row {                                         # Takes over next row
   my ($self) = @_;
 
   if ($self->{'end_of_table'}                               # End of table already reached or being reached just now
-  ||  ref($self->{'rows'}) eq 'ARRAY' && !$self->_getNextRowFromArray()
-  ||  ref($self->{'rows'}) eq 'CODE'  && !$self->_getNextRowFromCallback()) {
-    $self->{':rowBuffer'} = [];
+  ||  ref($self->{'rows'}) eq 'ARRAY' && !$self->_get_next_row_from_array()
+  ||  ref($self->{'rows'}) eq 'CODE'  && !$self->_get_next_row_from_callback()) {
+    $self->{':row_buffer'} = [];
   }
   else {
     $self->{'current_row'}++;
   }
 
-  return $self->{':rowBuffer'};
+  return $self->{':row_buffer'};
 }
 
-sub _getNextRowFromArray {                                  # Takes over next row from array
+sub _get_next_row_from_array {                              # Takes over next row from array
   my ($self) = @_;
 
   my $current_row = $self->{'current_row'};
 
-  $self->{':endOfChunk'} = $current_row == $#{$self->{'rows'}};
+  $self->{':end_of_chunk'} = $current_row == $#{$self->{'rows'}};
 
   if ($current_row > $#{$self->{'rows'}}) {
-    if ($self->{'broad_row'} != SPLIT || $self->{':splitOffset'} + $self->{'table_width'} >= $self->{':totalWidth'}) {
+    if ($self->{'broad_row'} != SPLIT || $self->{':split_offset'} + $self->{'table_width'} >= $self->{':total_width'}) {
       $self->{'end_of_table'} = TRUE;
       return FALSE;
     }
 
-    $self->{'current_row'}   = $current_row = 0;
-    $self->{':splitOffset'} += $self->{'table_width'};
+    $self->{'current_row'}    = $current_row = 0;
+    $self->{':split_offset'} += $self->{'table_width'};
   }
 
-  $self->{':rowBuffer'} = $self->{'rows'}[$current_row];
+  $self->{':row_buffer'}  = $self->{'rows'}[$current_row];
   $self->{'end_of_table'} = FALSE;
 
   return TRUE;
 }
 
-sub _getNextRowFromCallback {                               # Takes over next row delivered by callback function
+sub _get_next_row_from_callback {                           # Takes over next row delivered by callback function
   my ($self) = @_;
 
   my $row = &{$self->{'rows'}};
 
-  unless (defined($self->{':numberOfColumns'})) {
-    $self->{':numberOfColumns'} = ref($row) eq 'ARRAY' ? @$row : 0;
+  unless (defined($self->{':number_of_columns'})) {
+    $self->{':number_of_columns'} = ref($row) eq 'ARRAY' ? @$row : 0;
     die("Row $self->{'current_row'}: not an array reference") if ref($row) ne 'ARRAY';
-    $self->_validateForCallback()->_setDefaults()->_init();
+    $self->_validate_for_callback()->_set_defaults()->_init();
   }
 
   unless (defined($row)) {
-    $self->{':endOfChunk'} = $self->{'end_of_table'} = TRUE;
+    $self->{':end_of_chunk'} = $self->{'end_of_table'} = TRUE;
     return FALSE;
   }
 
-  my $numberOfColumns = $self->{':numberOfColumns'};
+  my $number_of_columns = $self->{':number_of_columns'};
 
   die("Row $self->{'current_row'}: not an array reference") if ref($row) ne 'ARRAY';
-  die("Row $self->{'current_row'}: wrong number of elements (", scalar(@$row), " instead of $numberOfColumns)")
-    if scalar(@$row) != $numberOfColumns;
-  foreach (0 .. $numberOfColumns - 1) {
+  die("Row $self->{'current_row'}: wrong number of elements (", scalar(@$row), " instead of $number_of_columns)")
+    if scalar(@$row) != $number_of_columns;
+  foreach (0 .. $number_of_columns - 1) {
     die("Row $self->{'current_row'}: element No. $_ is ", ref($row->[$_]), ' not a scalar') if ref($row->[$_]);
   }
 
-  $self->{':rowBuffer'} = _stripTrailingBlanks($row);
+  $self->{':row_buffer'} = _strip_trailing_blanks($row);
 
   return TRUE;
 }
@@ -418,27 +414,28 @@ sub _init {                                                 # Set remaining attr
     'left-side column separator, and the lowest left-side padding (', min(@{$self->{'pad'}}), ')'
   ) if $self->{'table_width'} < 1 + 1 + min(@{$self->{'pad'}});
 
-  $self->{'column_width'} = [map { $self->{'column_width'}[$_] == ADJUST ? $self->_maxColumnWidth($_)
+  $self->{'column_width'} = [map { $self->{'column_width'}[$_] == ADJUST ? $self->_max_column_width($_)
                                                                          : $self->{'column_width'}[$_] }
-                            0 .. $#{$self->{'column_width'}}];
+                             0 .. $#{$self->{'column_width'}}];
 
-  $self->_setLineFormat();
-  $self->{':headerLines'} = $self->_prepareRow($self->{'header'}, $self->{'broad_header'});
-  if (@{$self->{':headerLines'}}) {
-    unshift(@{$self->{':headerLines'}}, $self->{':separatingLine'});
-    push   (@{$self->{':headerLines'}}, $self->{':separatingLine'});
+  $self->_set_line_format();
+  $self->{':header_lines'} = $self->_prepare_row($self->{'header'}, $self->{'broad_header'});
+  if (@{$self->{':header_lines'}}) {
+    unshift(@{$self->{':header_lines'}}, $self->{':separating_line'});
+    push   (@{$self->{':header_lines'}}, $self->{':separating_line'});
   }
 
-  $self->{':linesPerRow'}  = $self->{'broad_row'} == WRAP
-                           ? ceil(length($self->{':separatingLine'}) / $self->{'table_width'})
-                           : 1;
-  my $headerHeight         = @{$self->{':headerLines'}} * $self->{':linesPerRow'};
-  $self->{':linesPerPage'} = $headerHeight
-                           + floor(($self->{'page_height'} - $headerHeight) / $self->{':linesPerRow'})
-                           * $self->{':linesPerRow'};
+  $self->{':lines_per_row'}  = $self->{'broad_row'} == WRAP
+                             ? ceil(length($self->{':separating_line'}) / $self->{'table_width'})
+                             : 1;
+  my $header_height          = @{$self->{':header_lines'}} * $self->{':lines_per_row'};
+  $self->{':lines_per_page'} = min(BIG_INT,
+                                   $header_height
+                                 + floor(($self->{'page_height'} - $header_height) / $self->{':lines_per_row'})
+                                 * $self->{':lines_per_row'});
 
-  if (@{$self->{':headerLines'}}) {                         # At least one row or one separating line under the header
-    my $page_height = $headerHeight + $self->{':linesPerRow'};
+  if (@{$self->{':header_lines'}}) {                        # At least one row or one separating line under the header
+    my $page_height = $header_height + $self->{':lines_per_row'};
     die("Page height ($self->{'page_height'}) is lower than the minimum possible page height ($page_height)")
       if $self->{'page_height'} < $page_height;
   }
@@ -448,89 +445,89 @@ sub _init {                                                 # Set remaining attr
   return $self;
 }
 
-sub _isCutOrSplitOrWrap {                                   # Check if each column flag is CUT, or SPLIT, or WRAP
+sub _is_cut_or_split_or_wrap {                              # Check if each column flag is CUT, or SPLIT, or WRAP
   my ($flag) = @_;
 
-  return FALSE unless _isInt($flag);                        # This split-up in 2 "returns" is only necessary due to
+  return FALSE unless _is_int($flag);                       # This split-up in 2 "returns" is only necessary due to
   return $flag == CUT || $flag == SPLIT || $flag == WRAP;   # a weakness of Devel::Cover
 }
 
-sub _isCutOrWrap {                                          # Check if flag is CUT or WRAP
+sub _is_cut_or_wrap {                                       # Check if flag is CUT or WRAP
   my ($flag) = @_;
 
-  return FALSE unless _isInt($flag);                        # This split-up in 2 "returns" is only necessary due to
+  return FALSE unless _is_int($flag);                       # This split-up in 2 "returns" is only necessary due to
   return $flag == CUT || $flag == WRAP;                     # a weakness of Devel::Cover
 }
 
-sub _isEachCellScalar {                                     # Check if each cell in each row is a defined scalar
+sub _is_each_cell_scalar {                                  # Check if each cell in each row is a defined scalar
   my ($rows) = @_;
 
-  return !grep { !_isScalar($_) } @$rows;
+  return !grep { !_is_scalar($_) } @$rows;
 }
 
-sub _isEachColumnFlagCutOrWrap {                            # Check if each column flag is CUT or WRAP
+sub _is_each_column_flag_cut_or_wrap {                      # Check if each column flag is CUT or WRAP
   my ($flag) = @_;
 
-  return ref($flag) ? !grep { !_isCutOrWrap($_) } @$flag : _isCutOrWrap($flag);
+  return ref($flag) ? !grep { !_is_cut_or_wrap($_) } @$flag : _is_cut_or_wrap($flag);
 }
 
-sub _isEachColumnWidthInt {                                 # Check if each column width is positive integer
+sub _is_each_column_width_int {                             # Check if each column width is positive integer
   my ($width) = @_;
 
-  return ref($width) ? !grep { !$_ || !_isInt($_) } @$width : $width && _isInt($width);
+  return ref($width) ? !grep { !$_ || !_is_int($_) } @$width : $width && _is_int($width);
 }
 
-sub _isEachColumnWidthUndefOrInt {                          # Check if each column width is udefined or positive integer
+sub _is_each_column_width_undef_or_int {                    # Check if each column width is udefined or positive integer
   my ($width) = @_;
 
-  return ref($width) ? !grep { !_isUndefOrInt($_) } @$width : _isUndefOrInt($width);
+  return ref($width) ? !grep { !_is_undef_or_int($_) } @$width : _is_undef_or_int($width);
 }
 
-sub _isEachRowArray {                                       # Check if each row is an array
+sub _is_each_row_array {                                    # Check if each row is an array
   my ($rows) = @_;
 
   return !grep { ref ne 'ARRAY' } @$rows;
 }
 
-sub _isInt {                                                # Check if defined value is an integer
+sub _is_int {                                               # Check if defined value is an integer
   my ($value) = @_;
 
   return !ref($value) && $value =~ /^\d+$/;
 }
 
-sub _isScalar {                                             # Check if each cell in a row is a defined scalar
+sub _is_scalar {                                            # Check if each cell in a row is a defined scalar
   my ($value) = @_;
 
   return !grep { !defined || ref } @$value;
 }
 
-sub _isUndefOrInt {                                         # Check if value is defined or an integer
+sub _is_undef_or_int {                                      # Check if value is defined or an integer
   my ($value) = @_;
 
-  return !defined($value) || _isInt($value);
+  return !defined($value) || _is_int($value);
 }
 
-sub _maxColumnWidth {                                       # Estimates maximum length of text in column
-  my ($self, $columnNo) = @_;
+sub _max_column_width {                                     # Estimates maximum length of text in column
+  my ($self, $column_no) = @_;
 
-  my $width = @{$self->{'header'}} ? length($self->{'header'}[$columnNo]) : 0;
+  my $width = @{$self->{'header'}} ? length($self->{'header'}[$column_no]) : 0;
 
-  return max($width, map { length($_->[$columnNo]) } @{$self->{'rows'}});
+  return max($width, map { length($_->[$column_no]) } @{$self->{'rows'}});
 }
 
-sub _prepareRow {                                           # Converts table row to array of output strings
-  my ($self, $row, $broadFlags) = @_;
+sub _prepare_row {                                          # Converts table row to array of output strings
+  my ($self, $row, $broad_flags) = @_;
                                                             # Ignore possible redundant columns in header
-  @$row = @$row[0 .. $self->{':numberOfColumns'} - 1] if $#$row >= $self->{':numberOfColumns'};
+  @$row = @$row[0 .. $self->{':number_of_columns'} - 1] if $#$row >= $self->{':number_of_columns'};
 
-  return [map { sprintf($self->{':lineFormat'}, @$_) } @{$self->_extractLines($row, $broadFlags)}];
+  return [map { sprintf($self->{':line_format'}, @$_) } @{$self->_extract_lines($row, $broad_flags)}];
 }
 
-sub _screenHeight { return (GetTerminalSize())[1] }
+sub _screen_height { return (GetTerminalSize())[1] }
 
-sub _screenWidth  { return (GetTerminalSize())[0] }
+sub _screen_width  { return (GetTerminalSize())[0] }
 
-sub _setDefaults {                                          # Set default attributes if they are omitted
+sub _set_defaults {                                         # Set default attributes if they are omitted
   my ($self) = @_;
 
   for my $option (keys(%{ALL_OPTIONS()})) {
@@ -539,7 +536,7 @@ sub _setDefaults {                                          # Set default attrib
                                                                         : ALL_OPTIONS->{$option}{'default'}[0];
       $self->{$option}       = [] unless ref($self->{$option});
       next if $option eq 'header' || $option eq 'rows';
-      $self->{$option}[$_] //= $default foreach 0 .. $self->{':numberOfColumns'} - 1;
+      $self->{$option}[$_] //= $default foreach 0 .. $self->{':number_of_columns'} - 1;
     }
     else {
       my $default = ALL_OPTIONS->{$option}{'default'};
@@ -550,33 +547,33 @@ sub _setDefaults {                                          # Set default attrib
   return $self;
 }
 
-sub _setLineFormat {
+sub _set_line_format {
   my ($self) = @_;
 
   my $table_width = 1;
 
-  foreach my $columnNo (0 .. $self->{':numberOfColumns'} - 1) {
-    my $column_width = $self->{'column_width'}[$columnNo];
-    if ($self->{'collapse'}[$columnNo] && !$column_width) {
-      $self->{':lineFormat'} .= '%s';
+  foreach my $column_no (0 .. $self->{':number_of_columns'} - 1) {
+    my $column_width = $self->{'column_width'}[$column_no];
+    if ($self->{'collapse'}[$column_no] && !$column_width) {
+      $self->{':line_format'} .= '%s';
     }
     else {
-      my $pad = $self->{'pad'}[$columnNo];
-      $self->{':lineFormat'}     .= ' ' x  $pad . '%-' . $column_width . 's' . ' ' x $pad  . '|';
-      $self->{':separatingLine'} .= '-' x ($pad +        $column_width +             $pad) . '+';
-      $table_width               +=        $pad +        $column_width +             $pad  + 1;
+      my $pad = $self->{'pad'}[$column_no];
+      $self->{':line_format'}     .= ' ' x  $pad . '%-' . $column_width . 's' . ' ' x $pad  . '|';
+      $self->{':separating_line'} .= '-' x ($pad +        $column_width +             $pad) . '+';
+      $table_width                +=        $pad +        $column_width +             $pad  + 1;
     }
 
     last if $self->{'broad_row'} == CUT && $table_width >= $self->{'table_width'};
   }
 
-  $self->{':totalWidth'} = $table_width;
-  $self->{'current_row'} = 0 if $table_width == 1;          # This table has no content
+  $self->{':total_width'} = $table_width;
+  $self->{'current_row'}  = 0 if $table_width == 1;         # This table has no content
 
   return $self;
 }
 
-sub _stripTrailingBlanks {                                  # Strips down trailing blanks from all cell values in row
+sub _strip_trailing_blanks {                                # Strips down trailing blanks from all cell values in row
   my ($row) = @_;
 
   return [map { s/\s+$//r } @$row];
@@ -589,39 +586,39 @@ sub _validate {
 
   my %params      = @$params;
   $self->{'rows'} = $params{'rows'} // [];
-  return ref($params{'rows'}) eq 'ARRAY' ? $self->_validateForArray([%{_copyOptions(undef, OPTIONS_ARRAY, $params)}])
+  return ref($params{'rows'}) eq 'ARRAY' ? $self->_validate_for_array([%{_copy_options(undef, OPTIONS_ARRAY, $params)}])
                                          : $self;
 }
 
-sub _validateForArray {
+sub _validate_for_array {
   my ($self, $params) = @_;
 
-  $self->{'rows'}             = [map { _stripTrailingBlanks($_) } @{$self->{'rows'}}];
-  $self->{':numberOfColumns'} = @{$self->{'rows'}} ? @{$self->{'rows'}[0]} : 0;
+  $self->{'rows'}               = [map { _strip_trailing_blanks($_) } @{$self->{'rows'}}];
+  $self->{':number_of_columns'} = @{$self->{'rows'}} ? @{$self->{'rows'}[0]} : 0;
 
   validate(@$params, OPTIONS_ARRAY);
 
-  return $self->_copyOptions(OPTIONS_ARRAY, $params)->_validateGeneral($params);
+  return $self->_copy_options(OPTIONS_ARRAY, $params)->_validate_general($params);
 }
 
-sub _validateForCallback {
+sub _validate_for_callback {
   my ($self, $params) = @_;
 
   validate(@$params, OPTIONS_CALLBACK);
 
-  return $self->_copyOptions(OPTIONS_CALLBACK, $params)->_validateGeneral($params);
+  return $self->_copy_options(OPTIONS_CALLBACK, $params)->_validate_general($params);
 }
 
-sub _validateGeneral {
+sub _validate_general {
   my ($self, $params) = @_;
 
   validate(@$params, OPTIONS_GENERAL);
 
   my %params = @$params;
   die("The 'header' parameter contains less elements than an element of the 'rows' parameter")
-    if exists($params{'header'}) && exists($params{'rows'}) && @{$params{'header'}} < $self->{':numberOfColumns'};
+    if exists($params{'header'}) && exists($params{'rows'}) && @{$params{'header'}} < $self->{':number_of_columns'};
 
-  return $self->_copyOptions(OPTIONS_GENERAL, $params);
+  return $self->_copy_options(OPTIONS_GENERAL, $params);
 }
 
 1;

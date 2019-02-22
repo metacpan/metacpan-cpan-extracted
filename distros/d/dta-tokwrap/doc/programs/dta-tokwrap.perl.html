@@ -1,0 +1,668 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a>
+    <ul>
+      <li><a href="#General-Options">General Options</a></li>
+      <li><a href="#Make-Emulation-Options">Make Emulation Options</a></li>
+      <li><a href="#Subprocessor-Options">Subprocessor Options:</a></li>
+      <li><a href="#I-O-Options">I/O Options</a></li>
+      <li><a href="#Logging-Options">Logging Options</a></li>
+      <li><a href="#Trace-and-Debugging-Options">Trace and Debugging Options</a></li>
+    </ul>
+  </li>
+  <li><a href="#ARGUMENTS">ARGUMENTS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Modes-of-Operation">Modes of Operation</a>
+        <ul>
+          <li><a href="#make-Mode">-make Mode</a></li>
+          <li><a href="#nomake-Mode">-nomake Mode</a></li>
+        </ul>
+      </li>
+      <li><a href="#Known-Targets">Known Targets</a>
+        <ul>
+          <li><a href="#make-Targets">-make Targets</a></li>
+          <li><a href="#nomake-Targets">-nomake Targets</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>dta-tokwrap.perl - top-level tokenizer wrapper for DTA XML documents</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> dta-tokwrap.perl [OPTIONS] XMLFILE(s)...
+ 
+ General Options:
+  -help                  # show this help message
+  -man                   # show complete manpage
+  -verbose LEVEL         # set verbosity level (0&lt;=level&lt;=7; default=1)
+ 
+ Make Emulation Options:
+  -list-targets          # just list known targets
+  -targets TARGETS       # set build targets (default=&#39;all&#39;)
+  -make , -nomake        # do/don&#39;t emulate make-style dependency tracking (default=don&#39;t)
+  -remake                # force rebuilding of all targets (implies -make)
+  -force-target TARGET   # for -make mode, force rebuilding of TARGET
+  -force                 # alias for -force-target=all
+  -noforce               # overrides all preceeding -force and -force-target flags
+ 
+ Subprocessor Options:
+  -rcdir RCDIR           # resource directory (default=$ENV{TOKWRAP_RCDIR} or /usr/local/share/dta-resources)
+  -inplace , -noinplace  # do/don&#39;t use locally built programs if available (default=do)
+  -sb-xpath XPATH        # add sentence-break hints on XPATH (element) open and close
+  -wb-xpath XPATH        # add word-break hints on XPATH (element) open and close
+  -hints, -nohints       # do/don&#39;t generate &quot;hints&quot; for the tokenizer (default=do)
+  -weak-hints            # use whitespace-only hints rather than defaults ($WB$,$SB$)
+  -strong-hints          # opposite of -weak-hints
+  -abbrev-lex=FILE       # abbreviation lexicon for dwds_tomasotath or waste tokenizer
+  -mwe-lex=FILE          # multiword-expression lexicon for dwds_tomasotath tokenizer
+  -stop-lex=FILE         # stopword lexicon for waste tokenizer
+  -conj-lex=FILE         # conjunction lexicon for waste tokenizer
+  -waste-model=FILE      # HMM file for waste tokenizer
+  -waste-dir=DIR         # waste base directory (defaults for -abbr-lex, -stop-lex, -conj-lex, -waste-model)
+  -procopt OPT=VALUE     # set arbitrary subprocessor options
+ 
+ I/O Options:
+  -outdir OUTDIR         # set output directory (default=.)
+  -tmpdir TMPDIR         # set temporary directory (default=$ENV{DTATW_TMP} or OUTDIR)
+  -keep , -nokeep        # do/don&#39;t keep temporary files (default=don&#39;t)
+  -format , -noformat    # do/don&#39;t pretty-print XML output (default=do)
+  -docopt OPT=VALUE      # set arbitrary document options (e.g. filenames)
+ 
+ Logging Options:
+  -log-config RCFILE     # use Log::Log4perl configuration file RCFILE (default=internal)
+  -log-level LEVEL       # set minimum log level
+  -log-file LOGFILE      # log to file LOGFILE (default=none)
+  -stderr  , -nostderr   # do/don&#39;t log to console (default=do)
+  -profile , -noprofile  # do/don&#39;t log profiling information (default=do)
+  -silent  , -quiet      # alias for -verbose=0 -log-level=FATAL -notrace
+ 
+ Trace and Debugging Options:
+  -dump-xsl PREFIX       # dump generated XSL stylesheets to PREFIX*.xsl and exit
+  -dummy , -nodummy      # don&#39;t/do actually run any subprocessors (default=do)
+  -tokenizer-class CLASS # specify tokenizer subclass (e.g. http, waste, dummy, tomasotath_04x, ...)
+  -dummy-tokenizer       # alias for -tokenizer-class=dummy
+  -http-tokenizer        # alias for -tokenizer-class=http
+  -trace , -notrace      # do/don&#39;t log trace messages (default: depends on -verbose)
+  -traceAll              # enable logging of all possible trace messages
+  -notraceAll            # disable logging of all possible trace messages
+  -traceLevel LEVEL      # set trace logging level (default=&#39;trace&#39;)
+  -traceX, -notraceX     # do/don&#39;t trace &quot;X&quot; (X={Open|Load|Save|Make|...})
+  -traceXLevel LEVEL     # set log level for &quot;X&quot; traces (X={Open|...})</code></pre>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
+<h2 id="General-Options">General Options</h2>
+
+<dl>
+
+<dt id="help">-help</dt>
+<dd>
+
+<p>Display a short help message and exit.</p>
+
+</dd>
+<dt id="man">-man</dt>
+<dd>
+
+<p>Display the complete program manpage and exit.</p>
+
+</dd>
+<dt id="verbose-LEVEL">-verbose LEVEL</dt>
+<dd>
+
+<p>Set verbosity level (0&lt;=level&lt;=7; default=0)</p>
+
+</dd>
+</dl>
+
+<h2 id="Make-Emulation-Options">Make Emulation Options</h2>
+
+<dl>
+
+<dt id="targets-TARGETS">-targets TARGETS</dt>
+<dd>
+
+<p>Set build targets (default=<a href="#all">&quot;all&quot;</a>). Multiple TARGETS may be separated by whitespace, commas, or by passing multiple -targets options. See <a href="#Known-Targets">&quot;Known Targets&quot;</a> for a list of currently defined targets.</p>
+
+</dd>
+<dt id="make--nomake">-make , -nomake</dt>
+<dd>
+
+<p>Do/don&#39;t emulate experimental <i>make</i>-style dependency tracking (default=don&#39;t). Use of <code>-make</code> mode may be faster (because it requires less file I/O).</p>
+
+</dd>
+<dt id="remake">-remake</dt>
+<dd>
+
+<p>Force rebuilding of all targets (implies <a href="#make--nomake">-make</a>).</p>
+
+</dd>
+<dt id="force-target-TARGET">-force-target TARGET</dt>
+<dd>
+
+<p>For <a href="#make--nomake">-make</a> mode, force rebuilding of TARGET.</p>
+
+</dd>
+<dt id="force">-force</dt>
+<dd>
+
+<p>Alias for <a href="#force-target-TARGET">-force-target</a><code>=all</code></p>
+
+</dd>
+<dt id="noforce">-noforce</dt>
+<dd>
+
+<p>Overrides all preceeding <a href="#force">&quot;-force&quot;</a> and <a href="#force-target-TARGET">-force-target</a> flags.</p>
+
+</dd>
+</dl>
+
+<h2 id="Subprocessor-Options">Subprocessor Options:</h2>
+
+<dl>
+
+<dt id="inplace--noinplace">-inplace , -noinplace</dt>
+<dd>
+
+<p>Do/don&#39;t use locally built programs if available (default=do). This is useful if you want to test a development version (<code>-inplace</code>) and an installed system version (<code>-noinplace</code>) of this package on the same machine.</p>
+
+</dd>
+<dt id="sb-xpath-XPATH">-sb-xpath XPATH</dt>
+<dd>
+
+<p>Tells the <code>mkbx0</code> subprocessor to add sentence-break hints on XPATH (which should resolve only to element nodes) open and close. XPATH is included in the generated <i>hint.xsl</i> XSL stylesheet as a <code>match</code> item, so it can include e.g. top-level unions, but no nested unions.</p>
+
+<p>This option may be specified more than once.</p>
+
+</dd>
+<dt id="wb-xpath-XPATH">-wb-xpath XPATH</dt>
+<dd>
+
+<p>Tells the <code>mkbx0</code> subprocessor to add sentence-break hints on XPATH (which should resolve only to element nodes) open and close. Same caveats as for <a href="#sb-xpath-XPATH">&quot;-sb-xpath XPATH&quot;</a></p>
+
+<p>This option may be specified more than once.</p>
+
+</dd>
+<dt id="hints--nohints">-hints , -nohints</dt>
+<dd>
+
+<p>Do/don&#39;t generate explicit sentence- and/or token-break &quot;hints&quot; for the tokenizer in the temporary .txt file (default=do). Explicit hint strings can be set with <code>-procopt wbStr=WORDBREAK_HINT_STRING</code> and/or <code>-procopt sbStr=SENTBREAK_HINT_STRING</code>; see <a href="#procopt-OPT-VALUE">-procopt</a> below for details.</p>
+
+</dd>
+<dt id="weak-hints">-weak-hints</dt>
+<dd>
+
+<p>If generating tokenizer &quot;hints&quot;, use whitespace-only hints rather than defaults &quot;\n$WB$\n&quot;, &quot;\n$SB$\n&quot;. This can be useful if your low-level tokenizer doesn&#39;t understand the explicit hints, but might be predisposed to break tokens and/or sentences on whitespace.</p>
+
+</dd>
+<dt id="strong-hints">-strong-hints</dt>
+<dd>
+
+<p>Opposite of -weak-hints.</p>
+
+</dd>
+<dt id="abbrev-lex-FILE">-abbrev-lex=FILE</dt>
+<dd>
+
+<p>Abbreviation lexicon for <i>dwds_tomasotath</i> tokenizer. Default is (usually) <i>/usr/local/share/dta-resources/dta_abbrevs.lex</i>.</p>
+
+<p>FILE may be specified as the empty string to avoid use of an abbreviation lexicon altogether, although this is likely to weak havoc with <i>dwds_tomasotath</i>&#39;s sentence-boundary recognition.</p>
+
+</dd>
+<dt id="mwe-lex-FILE">-mwe-lex=FILE</dt>
+<dd>
+
+<p>Multiword-expression lexicon for <i>dwds_tomasotath</i> tokenizer. Default is (usually) <i>/usr/local/share/dta-resources/dta_mwe.lex</i>.</p>
+
+<p>FILE may be specified as the empty string to avoid use of a multiword-expression lexicon altogether, although this might cause problems with <i>dwds_tomasotath</i>.</p>
+
+</dd>
+<dt id="procopt-OPT-VALUE">-procopt OPT=VALUE</dt>
+<dd>
+
+<p>Set a literal arbitrary subprocessor option OPT to VALUE. See subprocessor module documentation for available options.</p>
+
+</dd>
+</dl>
+
+<h2 id="I-O-Options">I/O Options</h2>
+
+<dl>
+
+<dt id="outdir-OUTDIR">-outdir OUTDIR</dt>
+<dd>
+
+<p>Set output directory (default=.)</p>
+
+</dd>
+<dt id="tmpdir-TMPDIR">-tmpdir TMPDIR</dt>
+<dd>
+
+<p>Set directory for storing temporary files. Default value is taken from the environment variable <code>$DTATW_TMP</code> if it is set, otherwise the default is the value of OUTDIR (see <a href="#outdir-OUTDIR">-outdir</a>).</p>
+
+</dd>
+<dt id="keep--nokeep">-keep , -nokeep</dt>
+<dd>
+
+<p>Do/don&#39;t keep temporary files, rather than deleting them when they are no longer needed (default=don&#39;t).</p>
+
+</dd>
+<dt id="format--noformat">-format , -noformat</dt>
+<dd>
+
+<p>Do/don&#39;t pretty-print XML output when possible (default=do).</p>
+
+</dd>
+<dt id="docopt-OPT-VALUE">docopt OPT=VALUE</dt>
+<dd>
+
+<p>Set arbitrary DTA::TokWrap::Document options (e.g. filenames). See <a>DTA::TokWrap::Document(3pm)</a> for details.</p>
+
+</dd>
+</dl>
+
+<h2 id="Logging-Options">Logging Options</h2>
+
+<dl>
+
+<dt id="log-config-RCFILE">-log-config RCFILE</dt>
+<dd>
+
+<p>Use Log::Log4perl configuration file <i>RCFILE</i>, rather than the default internal configuration. See <a>Log::Log4perl(3pm)</a> for details on the syntax of <i>RCFILE</i>.</p>
+
+</dd>
+<dt id="log-level-LEVEL">-log-level LEVEL</dt>
+<dd>
+
+<p>Set minimum log level. Only effective if the default (internal) log configuration is being used.</p>
+
+</dd>
+<dt id="log-file-LOGFILE">-log-file LOGFILE</dt>
+<dd>
+
+<p>Send log output to file <i>LOGFILE</i> (default=none). Only effective if the default (internal) log configuration is being used.</p>
+
+</dd>
+<dt id="stderr--nostderr">-stderr , -nostderr</dt>
+<dd>
+
+<p>Do/don&#39;t log to console (default=do). Only effective if the default (internal) log configuration is being used.</p>
+
+</dd>
+<dt id="profile--noprofile">-profile , -noprofile</dt>
+<dd>
+
+<p>Do/don&#39;t log profiling information (default=do).</p>
+
+</dd>
+<dt id="silent--quiet">-silent , -quiet</dt>
+<dd>
+
+<p>Alias for <code>-verbose=0 -log-level=FATAL -notrace</code>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Trace-and-Debugging-Options">Trace and Debugging Options</h2>
+
+<dl>
+
+<dt id="dump-xsl-PREFIX">-dump-xsl PREFIX</dt>
+<dd>
+
+<p>Dumps generated XSL stylesheets to PREFIX*.xsl and exits. Useful for debugging. Causes the following files to be written:</p>
+
+<pre><code> ${PREFIX}mkbx0_hint.xsl    # hint insertion
+ ${PREFIX}mkbx0_sort.xsl    # serialization sort-key generation
+ ${PREFIX}standoff_t2s.xsl  # master XML to sentence standoff
+ ${PREFIX}standoff_t2w.xsl  # master XML to token standoff
+ ${PREFIX}standoff_t2a.xsl  # master XML to analysis standoff</code></pre>
+
+</dd>
+<dt id="dummy--nodummy">-dummy , -nodummy</dt>
+<dd>
+
+<p>Don&#39;t/do actually run any subprocessors (default=do)</p>
+
+</dd>
+<dt id="dummy-tokenizer--nodummy-tokenizer">-dummy-tokenizer , -nodummy-tokenizer</dt>
+<dd>
+
+<p>Do/don&#39;t use locally built dummy tokenizer instead of tomata2.</p>
+
+</dd>
+<dt id="trace--notrace">-trace , -notrace</dt>
+<dd>
+
+<p>Do/don&#39;t log trace messages (default: depends on the current <code>-verbose</code> level; see <a href="#verbose-LEVEL">-verbose</a>).</p>
+
+</dd>
+<dt id="traceAll">-traceAll</dt>
+<dd>
+
+<p>Enable logging of all possible trace messages. <b>Warning</b>: this generates a lot of log output.</p>
+
+</dd>
+<dt id="notraceAll">-notraceAll</dt>
+<dd>
+
+<p>Disable logging of all possible trace messages.</p>
+
+</dd>
+<dt id="traceLevel-LEVEL">-traceLevel LEVEL</dt>
+<dd>
+
+<p>Set log level to use for trace messages (default=&#39;trace&#39;). <code>LEVEL</code> is one of the following: <code>trace, debug, info, warn, error, fatal</code>. Any other value for <code>LEVEL</code> causes trace messages not to be logged.</p>
+
+</dd>
+<dt id="traceX--notraceX">-traceX , -notraceX</dt>
+<dd>
+
+<p>Do/don&#39;t log trace messages for the trace flavor <i>X</i>, where <i>X</i> is one of the following:</p>
+
+<pre><code> Open    # document object open() method
+ Close   # document object close() method
+ Proc    # document processing method calls
+ Load    # load document data file
+ Save    # save document data file
+ Make    # document target (re-)making (including status-check)
+ Gen     # document target (re-)generation
+ Subproc # low-level subprocessor calls
+ Run     # external system command</code></pre>
+
+</dd>
+<dt id="traceXLevel-LEVEL">-traceXLevel LEVEL</dt>
+<dd>
+
+<p>Set log level for <i>X</i>-type traces to LEVEL. <i>X</i> is a trace message flavor as described in <a href="#traceX--notraceX">-traceX</a>, and LEVEL is as described in <a href="#traceLevel-LEVEL">-traceLevel</a>.</p>
+
+</dd>
+</dl>
+
+<h1 id="ARGUMENTS">ARGUMENTS</h1>
+
+<p>All other command-line arguments are assumed to be filenames of DTA &quot;base-format&quot; XML files, which are simply (TEI-conformant) UTF-8 encoded XML files with one (optional as of dta-tokwrap v0.38) <code>&lt;c&gt;</code> element per character:</p>
+
+<ul>
+
+<li><p>the document <b>MUST</b> be encoded in UTF-8,</p>
+
+</li>
+<li><p>all text nodes to be tokenized should be descendants of a <code>&lt;text&gt;</code> element, and may optionally be immediate daughters of a <code>&lt;c&gt;</code> element (XPath <code>//text//text()|//text//c/text()</code>). <code>&lt;c&gt;</code> elements may not be nested.</p>
+
+<p>Prior to dta-tokwrap v0.38, <code>&lt;c&gt;</code> elements were required.</p>
+
+</li>
+</ul>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This program is intended to provide a flexible high-level command-line interface to the tokenization of DTA &quot;base-format&quot; XML documents, generating <i>e.g.</i> sentence-, token-, and analysis-level standoff XML annotations for each input document.</p>
+
+<p>The problem can be run in one of two main modes; see <a href="#Modes-of-Operation">&quot;Modes of Operation&quot;</a> for details on these. In either mode, it can be used either as a standalone batch-processor for one or more input documents, or called by a superordinate build system, <i>e.g.</i> GNU <code>make</code> (see <code>make(1)</code>). Program operation is controlled primarily by the specification of one or more &quot;targets&quot; to build for each input document; see <a href="#Known-Targets">&quot;Known Targets&quot;</a> for details.</p>
+
+<h2 id="Modes-of-Operation">Modes of Operation</h2>
+
+<p>The program can be run in one of two modes of operation, <a href="#make-Mode">&quot;-make Mode&quot;</a> and <a href="#nomake-Mode">&quot;-nomake Mode&quot;</a>.</p>
+
+<h3 id="make-Mode">-make Mode</h3>
+
+<p><b>(DEPRECATED)</b></p>
+
+<p>In this (deprecated) mode, the program attempts to emulate the dependency tracking features of <code>make</code> by (re-)building only those targets which either do not yet exist, or which are older than one or more of their dependencies. Since some dependencies are ephemeral, existing only in RAM during a single program run, this can mean a lot of pain for comparatively little gain.</p>
+
+<p>-make mode is enabled by specifying the <a href="#make--nomake">-make</a> option on the command-line.</p>
+
+<h3 id="nomake-Mode">-nomake Mode</h3>
+
+<p>In this (experimental) mode, no implicit dependency tracking is attempted, and all required data files (input, &quot;temporary&quot;, and/or output) must exist when the requested target is built; otherwise an error results. -nomake mode can be somewhat slower than -make mode, since &quot;temporary&quot; data (which in -make mode are RAM-only ephemera) may need to be bounced off the filesystem.</p>
+
+<p>-nomake mode is the default mode, and may be (re-)enabled (overriding any preceding <code>-make</code> option) by specifying the <a href="#make--nomake">-nomake</a> option on the command-line.</p>
+
+<h2 id="Known-Targets">Known Targets</h2>
+
+<h3 id="make-Targets">-make Targets</h3>
+
+<p>The following targets are known values for the <a href="#targets-TARGETS">-targets</a> option in <a href="#make-Mode">&quot;-make Mode&quot;</a>:</p>
+
+<dl>
+
+<dt id="all">all</dt>
+<dd>
+
+</dd>
+<dt id="not-yet-documented">(not yet documented)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h3 id="nomake-Targets">-nomake Targets</h3>
+
+<p>The following targets are known values for the <a href="#targets-TARGETS">-targets</a> option in <a href="#nomake-Mode">&quot;-nomake Mode&quot;</a>:</p>
+
+<dl>
+
+<dt id="mkindex">mkindex</dt>
+<dd>
+
+<p><b>Alias(es):</b> cx sx tx xx</p>
+
+<p><b>Input(s):</b> FILE.xml</p>
+
+<p><b>Output(s):</b> FILE.cx, FILE.sx, FILE.tx</p>
+
+<p>Creates temporary &quot;character index&quot; <i>FILE.cx</i> (CSV), &quot;structure index&quot; <i>FILE.sx</i> (XML without <code>&lt;c&gt;</code> elements), and &quot;text index&quot; <i>FILE.tx</i> (raw text, unserialized) for each input document <i>FILE.xml</i>.</p>
+
+</dd>
+<dt id="mkbx0">mkbx0</dt>
+<dd>
+
+<p><b>Alias(es):</b> bx0</p>
+
+<p><b>Input(s):</b> FILE.sx</p>
+
+<p><b>Output(s):</b> FILE.bx0</p>
+
+<p>Creates temporary hint- and serialization index <i>FILE.bx0</i> for each input document <i>FILE.xml</i></p>
+
+</dd>
+<dt id="mkbx">mkbx</dt>
+<dd>
+
+<p><b>Alias(es):</b> mktxt bx txt</p>
+
+<p><b>Input(s):</b> FILE.bx0, FILE.tx</p>
+
+<p><b>Output(s):</b> FILE.bx, FILE.txt</p>
+
+<p>Creates temporary serialized block-index file <i>FILE.bx</i> and serialized text file <i>FILE.txt</i> for each input document <i>FILE.xml</i>.</p>
+
+</dd>
+<dt id="mktok0">mktok0</dt>
+<dd>
+
+<p><b>Alias(es):</b> tokenize0 tok0 t0 tt0</p>
+
+<p><b>Input(s):</b> FILE.txt</p>
+
+<p><b>Output(s):</b> FILE.t0</p>
+
+<p>Creates temporary CSV-format raw tokenizer output file <i>FILE.t0</i> for each input document <i>FILE.xml</i></p>
+
+</dd>
+<dt id="mktok1">mktok1</dt>
+<dd>
+
+<p><b>Alias(es):</b> tokenize1 tok1 t1 tt1</p>
+
+<p><b>Input(s):</b> FILE.t0</p>
+
+<p><b>Output(s):</b> FILE.t1</p>
+
+<p>Creates temporary CSV-format post-processed tokenizer output file <i>FILE.t1</i> for each input document <i>FILE.xml</i></p>
+
+</dd>
+<dt id="mktok">mktok</dt>
+<dd>
+
+<p><b>Alias(es):</b> tokenize tok t tt</p>
+
+<p><b>Input(s):</b> FILE.txt</p>
+
+<p><b>Output(s):</b> FILE.t0 FILE.t1</p>
+
+<p>Wrapper for &quot;mktok0 mktok1&quot;.</p>
+
+</dd>
+<dt id="mktxml">mktxml</dt>
+<dd>
+
+<p><b>Alias(es):</b> tok2xml xtok txml ttxml tokxml</p>
+
+<p><b>Input(s):</b> FILE.t, FILE.bx, FILE.cx</p>
+
+<p><b>Output(s):</b> FILE.t.xml</p>
+
+<p>Creates master tokenized XML output file <i>FILE.t.xml</i> for each input document <i>FILE.xml</i></p>
+
+</dd>
+<dt id="addws">addws</dt>
+<dd>
+
+<p><b>Alias(es):</b> mkcws cwsxml cws</p>
+
+<p><b>Input(s):</b> FILE.xml FILE.t.xml</p>
+
+<p><b>Output(s):</b> FILE.cws.xml</p>
+
+<p>Creates &quot;spliced&quot; XML output &quot;Frankenfile&quot; <i>FILE.cws.xml</i> for each input document <i>FILE.xml</i> ; see also <a href="./dtatw-splice.perl.html">dtatw-splice.perl(1)</a>.</p>
+
+</dd>
+<dt id="mksxml">mksxml</dt>
+<dd>
+
+<p><b>Alias(es):</b> mksos sosxml sosfile sxml</p>
+
+<p><b>Input(s):</b> FILE.t.xml</p>
+
+<p><b>Output(s):</b> FILE.s.xml</p>
+
+<p><b>DEPRECATED</b></p>
+
+<p>Creates sentence-level stand-off XML file FILE.s.xml for each input document <i>FILE.xml</i></p>
+
+</dd>
+<dt id="mkwxml">mkwxml</dt>
+<dd>
+
+<p><b>Alias(es):</b> mksow sowxml sowfile wxml</p>
+
+<p><b>Input(s):</b> FILE.t.xml</p>
+
+<p><b>Output(s):</b> FILE.w.xml</p>
+
+<p><b>DEPRECATED</b></p>
+
+<p>Creates token-level stand-off XML file FILE.w.xml for each input document <i>FILE.xml</i></p>
+
+</dd>
+<dt id="mkaxml">mkaxml</dt>
+<dd>
+
+<p><b>Alias(es):</b> mksoa sowaml soafile axml</p>
+
+<p><b>Input(s):</b> FILE.t.xml</p>
+
+<p><b>Output(s):</b> FILE.a.xml</p>
+
+<p><b>DEPRECATED</b></p>
+
+<p>Creates token-analysis-level stand-off XML file FILE.a.xml for each input document <i>FILE.xml</i></p>
+
+</dd>
+<dt id="mkstandoff">mkstandoff</dt>
+<dd>
+
+<p><b>Alias(es):</b> standoff so mkso</p>
+
+<p><b>DEPRECATED</b></p>
+
+<p>Alias for <a>mksxml</a>, <a>mkwxml</a>, <a>mkaxml</a>.</p>
+
+</dd>
+<dt id="all1">all</dt>
+<dd>
+
+<p><b>Alias(es):</b> (none)</p>
+
+<p><b>Input(s):</b> FILE.xml</p>
+
+<p><b>Output(s):</b> FILE.t.xml, FILE.cws.xml</p>
+
+<p>Alias for all targets required to generated the target&#39;s output files (master tokenized file and spliced output) from the input document, run in the proper order.</p>
+
+</dd>
+<dt id="tei2t">tei2t</dt>
+<dd>
+
+<p><b>Aliases:</b> (none)</p>
+
+<p><b>Input(s):</b> FILE.xml</p>
+
+<p><b>Output(s):</b> FILE.t</p>
+
+<p>Alias for all targets required to generated fixed tokenizer output <i>FILE.t</i> from a TEI-XML file <i>FILE.xml</i>, run in the proper order.</p>
+
+</dd>
+<dt id="tei2txml">tei2txml</dt>
+<dd>
+
+<p><b>Aliases:</b> (none)</p>
+
+<p><b>Input(s):</b> FILE.xml</p>
+
+<p><b>Output(s):</b> FILE.t.xml</p>
+
+<p>Alias for all targets required to generated a flat tokeized XML file <i>FILE.t.xml</i> from a TEI-XML file <i>FILE.xml</i>, run in the proper order.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="./dtatw-add-c.perl.html">dtatw-add-c.perl(1)</a>, <a>dtatw-add-w.perl(1)</a>, <a>dtatw-add-s.perl(1)</a>, <a>dtatw-rm-c.perl(1)</a>, <a href="./dtatw-splice.perl.html">dtatw-splice.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+
+</body>
+
+</html>
+
+

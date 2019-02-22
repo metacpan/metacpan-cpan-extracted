@@ -4,39 +4,38 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Term-TermKey",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "ExtUtils::PkgConfig" : "0",
-            "Module::Build" : "0",
-            "Module::Build::Compat" : "0",
-            "Test::More" : "0",
-            "Test::Refcount" : "0"
+            "ExtUtils::CBuilder" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::libtermkey" : "0.13",
-            "Exporter" : "5.57",
-            "ExtUtils::PkgConfig" : "0",
-            "Module::Build" : "0"
+            "Module::Build" : "0.4004",
+            "Module::Build::Using::PkgConfig" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Refcount" : "0"
          }
       }
    },
    "provides" : {
       "Term::TermKey" : {
          "file" : "lib/Term/TermKey.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -45,5 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.16"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

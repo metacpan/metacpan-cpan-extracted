@@ -1,0 +1,149 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Constants">Constants</a></li>
+      <li><a href="#Constructors-etc">Constructors etc.</a></li>
+      <li><a href="#Methods">Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SEE-ALSO1">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DTA::TokWrap::Processor::tokenize - DTA tokenizer wrappers: tokenizer: default (NYI)</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> use DTA::TokWrap::Processor::tokenize;
+ 
+ $tz = DTA::TokWrap::Processor::tokenize-&gt;new(%args);
+ $doc_or_undef = $tz-&gt;tokenize($doc);</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class is really just an abstract API specification. Actual tokenizer classes are e.g. <a>DTA::TokWrap::Processor::tomasotath</a> and <a>DTA::TokWrap::Processor::dummy</a>.</p>
+
+<p>DTA::TokWrap::Processor::tokenize provides an object-oriented <a>DTA::TokWrap::Processor</a> wrapper for the tokenization of serialized text files for <a>DTA::TokWrap::Document</a> objects.</p>
+
+<p>Most users should use the high-level <a>DTA::TokWrap</a> wrapper class instead of using this module directly.</p>
+
+<h2 id="Constants">Constants</h2>
+
+<dl>
+
+<dt id="ISA">@ISA</dt>
+<dd>
+
+<p>DTA::TokWrap::Processor::tokenize inherits from <a>DTA::TokWrap::Processor</a>.</p>
+
+</dd>
+<dt id="DEFAULT_SUBCLASS">$DEFAULT_SUBCLASS</dt>
+<dd>
+
+<p>Default tokenizer subclass to use for DTA::TokWrap::Processor::tokenize-&gt;new(). Default value = &#39;tomasotath&#39;.</p>
+
+</dd>
+</dl>
+
+<h2 id="Constructors-etc">Constructors etc.</h2>
+
+<dl>
+
+<dt id="new">new</dt>
+<dd>
+
+<pre><code> $tz = $CLASS_OR_OBJ-&gt;new(%args);</code></pre>
+
+<p>%args, %$tz: none here; see subclass documentation.</p>
+
+</dd>
+<dt id="defaults">defaults</dt>
+<dd>
+
+<pre><code> %defaults = CLASS-&gt;defaults();</code></pre>
+
+<p>Static class-dependent defaults: none here; see subclass documentation.</p>
+
+</dd>
+</dl>
+
+<h2 id="Methods">Methods</h2>
+
+<dl>
+
+<dt id="tokenize">tokenize</dt>
+<dd>
+
+<pre><code> $doc_or_undef = $CLASS_OR_OBJECT-&gt;tokenize($doc);</code></pre>
+
+<p>Performs actual tokenization of the serialized text from the <a>DTA::TokWrap::Document</a> object $doc.</p>
+
+<p>Relevant %$doc keys:</p>
+
+<pre><code> txtfile =&gt; $txtfile,  ##-- (input) serialized text file (uses $doc-&gt;{bxdata} if $doc-&gt;{txtfile} is not defined)
+ bxdata  =&gt; \@bxdata,  ##-- (input) block data, used to generate $doc-&gt;{txtfile} if not present
+ tokdata0 =&gt; $tokdata0,  ##-- (output) tokenizer output data (string)
+ ##
+ tokenize0_stamp0 =&gt; $f, ##-- (output) timestamp of operation begin
+ tokenize0_stamp  =&gt; $f, ##-- (output) timestamp of operation end
+ tokdata0_stamp =&gt; $f,   ##-- (output) timestamp of operation end</code></pre>
+
+<p>may implicitly call $doc-&gt;mkbx() and/or $doc-&gt;saveTxtFile() (but shouldn&#39;t).</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="SEE-ALSO1">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2018 by Bryan Jurish</p>
+
+<p>This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.14.2 or, at your option, any later version of Perl 5 you may have available.</p>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>
+
+

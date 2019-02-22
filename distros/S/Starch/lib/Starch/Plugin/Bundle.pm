@@ -1,6 +1,7 @@
 package Starch::Plugin::Bundle;
-
-$Starch::Plugin::Bundle::VERSION = '0.10';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -38,7 +39,6 @@ use Types::Common::String -types;
 use Starch::Util qw( load_prefixed_module );
 
 use Moo::Role;
-use strictures 2;
 use namespace::clean;
 
 requires( 'bundled_plugins' );

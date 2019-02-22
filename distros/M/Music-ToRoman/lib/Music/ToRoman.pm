@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.0801';
+our $VERSION = '0.0901';
 
 use Carp;
 
@@ -68,18 +68,10 @@ sub parse {
 
     # Get the roman representation based on the scale position
     my $position = first_index { $_ eq $note } @notes;
+    # If the note is note in the scale find a new position and accidental
     my $accidental;
     if ( $position == -1 ) {
-        if ( length($note) == 1 ) {
-            $position = first_index { $_ =~ /$note/ } @notes;
-            ( $accidental = $notes[$position] ) =~ s/^[A-G](.)$/$1/;
-            $accidental = $accidental eq '#' ? 'b' : '#';
-        }
-        else {
-            my $letter;
-            ( $letter, $accidental ) = $note =~ /^([A-G])(.)$/;
-            $position = first_index { $_ eq $letter } @notes;
-        }
+        ( $position, $accidental ) = _pos_acc( $note, $position, \@notes );
     }
     my $roman = $roman[$position];
 
@@ -97,9 +89,7 @@ sub parse {
     # Add any accidental found in a non-scale note
     $roman = $accidental . $roman if $accidental;
 
-    if ( $decorator =~ /Maj/ || $decorator =~ /min/ ) {
-        # Move Maj or min over one
-        $decorator =~ s/(Maj|min)/ $1/;
+    if ( $decorator =~ /maj/i || $decorator =~ /min/i ) {
         $decorator = lc $decorator;
     }
     else {
@@ -115,7 +105,9 @@ sub parse {
             $decorator =~ s/[A-G][#b]?/$roman[$position]/;
         }
         else {
-            croak "Can't parse non-scale note in bass";
+            ( $position, $accidental ) = _pos_acc( $name, $position, \@notes );
+            my $bass = $accidental . $roman[$position];
+            $decorator =~ s/[A-G][#b]?/$bass/;
         }
     }
 
@@ -123,6 +115,30 @@ sub parse {
     $roman .= $decorator;
 
     return $roman;
+}
+
+sub _pos_acc {
+    my ( $note, $position, $notes ) = @_;
+
+    my $accidental;
+
+    # If the note has no accidental...
+    if ( length($note) == 1 ) {
+        # Find the scale position of the closest note
+        $position = first_index { $_ =~ /$note/ } @$notes;
+        # Get the accidental of the scale note
+        ( $accidental = $notes->[$position] ) =~ s/^[A-G](.)$/$1/;
+        # TODO: Why?
+        $accidental = $accidental eq '#' ? 'b' : '#';
+    }
+    else {
+        # Get the accidental of the given note
+        ( my $letter, $accidental ) = $note =~ /^([A-G])(.)$/;
+        # Get the scale position of the closest note
+        $position = first_index { $_ eq $letter } @$notes;
+    }
+
+    return $position, $accidental;
 }
 
 1;
@@ -139,7 +155,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.0801
+version 0.0901
 
 =head1 SYNOPSIS
 
@@ -149,18 +165,20 @@ version 0.0801
     scale_note => 'A',
     scale_name => 'minor',
   );
-  my $roman = $mtr->parse('Am'); # i (minor)
-  $roman = $mtr->parse('Bo');    # iio (diminished)
-  $roman = $mtr->parse('Bdim');  # iio (diminished)
-  $roman = $mtr->parse('CM');    # III (major)
-  $roman = $mtr->parse('C');     # III (major)
-  $roman = $mtr->parse('CMaj7'); # III maj7 (major seventh)
-  $roman = $mtr->parse('E7');    # V7 (dominant)
-  $roman = $mtr->parse('Em7');   # v7 (minor seventh)
-  $roman = $mtr->parse('Emin7'); # v min7 (minor seventh)
-  $roman = $mtr->parse('A+');    # I+ (augmented)
-  $roman = $mtr->parse('BbM');   # bII (flat-two major)
-  $roman = $mtr->parse('Cm9/G'); # iii9/VII (minor ninth with seven in the bass)
+  my $roman = $mtr->parse('Am');  # i (minor)
+  $roman = $mtr->parse('Bo');     # iio (diminished)
+  $roman = $mtr->parse('Bdim');   # iio (diminished)
+  $roman = $mtr->parse('Bb');     # bII (flat-two major)
+  $roman = $mtr->parse('CM');     # III (major)
+  $roman = $mtr->parse('C');      # III (major)
+  $roman = $mtr->parse('Cm9/G');  # iii9/VII (minor ninth with seven bass)
+  $roman = $mtr->parse('Cm9/Bb'); # iii9/bii (minor ninth with flat-two bass)
+  $roman = $mtr->parse('D sus4'); # IV sus4
+  $roman = $mtr->parse('DMaj7');  # IV maj7 (major seventh)
+  $roman = $mtr->parse('E7');     # V7 (dominant seventh)
+  $roman = $mtr->parse('Em7');    # v7 (minor seventh)
+  $roman = $mtr->parse('Fmin7');  # vi min7 (minor seventh)
+  $roman = $mtr->parse('G+');     # VII+ (augmented)
 
   # Also:
   $mtr = Music::ToRoman->new(
@@ -168,13 +186,18 @@ version 0.0801
     scale_name => 'dorian',
     chords     => 0,
   );
-  $roman = $mtr->parse('A');  # i
-  $roman = $mtr->parse('B');  # ii
-  $roman = $mtr->parse('C');  # III
-  $roman = $mtr->parse('D');  # IV
-  $roman = $mtr->parse('E7'); # v7
-  $roman = $mtr->parse('F#'); # vi
-  $roman = $mtr->parse('G');  # VII
+  $roman = $mtr->parse('A');      # i
+  $roman = $mtr->parse('B');      # ii
+  $roman = $mtr->parse('C');      # III
+  $roman = $mtr->parse('D');      # IV
+  $roman = $mtr->parse('E');      # v
+  $roman = $mtr->parse('F#');     # vi
+  $roman = $mtr->parse('G');      # VII
+  $roman = $mtr->parse('Amin7');  # i min7
+  $roman = $mtr->parse('Bo');     # iio
+  $roman = $mtr->parse('CMaj7');  # III maj7
+  $roman = $mtr->parse('D7');     # IV7
+  $roman = $mtr->parse('Em');     # v
 
 =head1 DESCRIPTION
 
@@ -230,11 +253,11 @@ Create a new C<Music::ToRoman> object.
 Parse a note or chord name into a Roman numeral representation.
 
 For instance, the Roman numeral representation for the C<aeolian> (or minor)
-mode is: i ii III iv v VI VII - where the case indicates the major/minor status
-of the given chord.
+mode is: C<i ii III iv v VI VII> - where the case indicates the major/minor
+status of the given chord.
 
-This can be overridden by parsing say, C<BM7> (B major seven), thus producing
-C<II7> in the key of A minor.
+This can be overridden by parsing say, C<BM7> (B dominant seventh), thus
+producing C<II7> in the key of A minor.
 
 If a major/minor chord designation is not provided, C<M> major is assumed.
 

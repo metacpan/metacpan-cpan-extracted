@@ -1,0 +1,55 @@
+{
+   "abstract" : "Wrapper modules & scripts for DTA XML corpus tokenization",
+   "author" : [
+      "Bryan Jurish <moocow@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DTA-TokWrap",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::BinarySearch::Vec" : "0.05",
+            "Cwd" : "0",
+            "Encode" : "0",
+            "Env::Path" : "0.18",
+            "File::Basename" : "0",
+            "Getopt::Long" : "0",
+            "Log::Log4perl" : "1.2",
+            "Pod::Usage" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "1.9711",
+            "XML::LibXML" : "0",
+            "XML::LibXSLT" : "0",
+            "XML::Parser" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.89",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

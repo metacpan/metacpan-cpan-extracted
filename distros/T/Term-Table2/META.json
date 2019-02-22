@@ -22,8 +22,11 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Clone" : "0",
             "ExtUtils::MakeMaker" : "0",
+            "Module::Load" : "0",
             "Test2::Mock" : "0",
+            "Test2::Require::Module" : "0",
             "Test2::V0" : "0"
          }
       },
@@ -45,5 +48,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.1"
+   "version" : "v1.0.2"
 }

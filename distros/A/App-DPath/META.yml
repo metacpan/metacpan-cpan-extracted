@@ -40,7 +40,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-DPath
   homepage: http://metacpan.org/release/App-DPath
   repository: git://github.com/renormalist/app-dpath.git
-version: '0.10'
+version: '0.11'
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -335,7 +335,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.10
+          tag: v0.11
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

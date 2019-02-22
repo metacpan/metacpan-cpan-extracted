@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2018 -- leonerd@leonerd.org.uk
 
 package Tickit::Term;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 use Carp;
 
@@ -112,6 +112,15 @@ sub new
 
    return $self;
 }
+
+=head2 open_stdio
+
+   $term = Tickit::Term->open_stdio
+
+Convenient shortcut for obtaining a L<Tickit::Term> instance bound to the
+STDIN and STDOUT streams of the process.
+
+=cut
 
 =head1 METHODS
 
@@ -229,7 +238,7 @@ L<Tickit::Event>.
 
    $id = $term->bind_event( $ev, $flags, $code, $data )
 
-The C<$code> argument may optionally be preceeded by an integer of flag
+The C<$code> argument may optionally be preceded by an integer of flag
 values. This should be zero to apply default semantics, or a bitmask of one or
 more of the following constants:
 
@@ -256,11 +265,6 @@ sub bind_event
    my ( $flags, $code, $data ) = ( ref $_[0] ) ? ( 0, @_ ) : @_;
 
    $self->_bind_event( $ev, $flags, $code, $data );
-}
-
-sub bind_event_default
-{
-   croak "\term->bind_event_default is deprecated; use ->bind_event";
 }
 
 =head2 refresh_size

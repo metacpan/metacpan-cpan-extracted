@@ -34,11 +34,13 @@
          "requires" : {
             "CDB_File" : "0",
             "DB_File" : "0",
+            "DTA::TokWrap" : "0",
             "Encode" : "0",
             "File::Basename" : "0",
             "File::Map" : "0",
             "File::Path" : "0",
             "File::Temp" : "0",
+            "GermaNet::Flat" : "0.01",
             "Getopt::Long" : "0",
             "Gfsm" : "0.0216",
             "Gfsm::XL" : "0.03",
@@ -65,6 +67,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.106",
+   "version" : "1.107",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

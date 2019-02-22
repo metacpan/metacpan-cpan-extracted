@@ -4,10 +4,12 @@ sub require_ok ($);
 
 require_ok 'Dist::Zilla::MintingProfile::Author::Plicease';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::Core';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::DevShare';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::Init2';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::MakeMaker';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::NoUnsafeInc';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::Tests';
 require_ok 'Dist::Zilla::Plugin::Author::Plicease::Thanks';

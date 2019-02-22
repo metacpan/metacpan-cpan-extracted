@@ -1,6 +1,8 @@
 package Config::Locale;
-
-our $VERSION = '0.07';
+use 5.008001;
+use strict;
+use warnings;
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -60,7 +62,6 @@ use Types::Common::String -types;
 use Type::Utils -all;
 
 use Moo;
-use strictures 2;
 use namespace::clean;
 
 my $path_type = declare as Str;
@@ -124,7 +125,7 @@ has wildcard => (
 
 =head2 default_stem
 
-A stem to load first, before all other stems.
+A filename stem to load first, before all other stems.
 
 Defaults to C<default>.  A relative path may be specified which will be assumed
 to be relative to L</directory>.  If an absolute path is used then no change
@@ -143,7 +144,7 @@ has default_stem => (
 
 =head2 override_stem
 
-A stem to load last, after all other stems.
+A filename stem to load last, after all other stems.
 
 Defaults to C<override>.  A relative path may be specified which will be assumed
 to be relative to L</directory>.  If an absolute path is used then no change
@@ -162,8 +163,8 @@ has override_stem => (
 
 =head2 require_defaults
 
-If true, then any key that appears in a non-default stem must exist in the
-default stem or an error will be thrown.  Defaults to false.
+If true, then any key that appears in a non-default configuration file must exist
+in the default configuration or an error will be thrown.  Defaults to C<0>.
 
 =cut
 
@@ -258,11 +259,10 @@ L</stem_configs>, and L</override_configs>.
 
 =cut
 
-sub config {
-    my ($self) = @_;
-    $self->{config} ||= $self->_build_config();
-    return $self->{config};
-}
+has config => (
+    is       => 'lazy',
+    init_arg => undef,
+);
 sub _build_config {
     my ($self) = @_;
     return $self->_merge_configs([
@@ -281,11 +281,10 @@ is set.
 
 =cut
 
-sub default_config {
-    my ($self) = @_;
-    $self->{default_config} ||= $self->_build_default_config();
-    return $self->{default_config};
-}
+has default_config => (
+    is       => 'lazy',
+    init_arg => undef,
+);
 sub _build_default_config {
     my ($self) = @_;
     return $self->_merge_configs( $self->default_configs() );
@@ -299,14 +298,13 @@ is the parsed configuration hash for any L</default_stem> configuration.
 
 =cut
 
-sub default_configs {
-    my ($self) = @_;
-    $self->{default_configs} ||= $self->_build_default_configs();
-    return $self->{default_configs};
-}
+has default_configs => (
+    is       => 'lazy',
+    init_arg => undef,
+);
 sub _build_default_configs {
     my ($self) = @_;
-    return $self->_load_configs( [$self->default_stem_path()] );
+    return $self->_load_configs( [$self->_default_stem_path()] );
 }
 
 =head2 stem_configs
@@ -315,11 +313,10 @@ Like L</default_configs>, but for any L</stems> configurations.
 
 =cut
 
-sub stem_configs {
-    my ($self) = @_;
-    $self->{stem_configs} ||= $self->_build_stem_configs();
-    return $self->{stem_configs};
-}
+has stem_configs => (
+    is       => 'lazy',
+    init_arg => undef,
+);
 sub _build_stem_configs {
     my ($self) = @_;
     return $self->_load_configs( $self->stems(), $self->default_config() );
@@ -331,14 +328,13 @@ Like L</default_configs>, but for any L</override_stem> configurations.
 
 =cut
 
-sub override_configs {
-    my ($self) = @_;
-    $self->{override_configs} ||= $self->_build_override_configs();
-    return $self->{override_configs};
-}
+has override_configs => (
+    is       => 'lazy',
+    init_arg => undef,
+);
 sub _build_override_configs {
     my ($self) = @_;
-    return $self->_load_configs( [$self->override_stem_path()], $self->default_config() );
+    return $self->_load_configs( [$self->_override_stem_path()], $self->default_config() );
 }
 
 sub _merge_configs {
@@ -386,15 +382,14 @@ Contains an array of file paths for each value in L</combinations>.
 
 =cut
 
-sub stems {
-    my ($self) = @_;
-    $self->{stems} ||= $self->_build_stems();
-    return $self->{stems};
-}
+has stems => (
+    is       => 'lazy',
+    init_arg => undef,
+);
 sub _build_stems {
     my ($self) = @_;
 
-    my $directory = path( $self->directory() );
+    my $directory = $self->_directory_path();
     my $separator = $self->separator();
     my $prefix    = $self->prefix();
     my $suffix    = $self->suffix();
@@ -404,7 +399,7 @@ sub _build_stems {
     my @stems;
     foreach my $combination (@combinations) {
         my @parts = @$combination;
-        push @stems, '' . $directory->child( $prefix . join($separator, @parts) . $suffix );
+        push @stems, $directory->child( $prefix . join($separator, @parts) . $suffix );
     }
 
     return \@stems;
@@ -417,11 +412,10 @@ identity, per the specified L</algorithm>.
 
 =cut
 
-sub combinations {
-    my ($self) = @_;
-    $self->{combinations} ||= $self->_build_combinations();
-    return $self->{combinations};
-}
+has combinations => (
+    is       => 'lazy',
+    init_arg => undef,
+);
 sub _build_combinations {
     my ($self) = @_;
 
@@ -515,30 +509,31 @@ sub _build_merge_object {
     return Hash::Merge->new( $self->merge_behavior() );
 }
 
-=head2 default_stem_path
-
-=cut
-
-has default_stem_path => (
-  is       => 'lazy',
-  init_arg => undef,
+has _directory_path => (
+    is       => 'lazy',
+    init_arg => undef,
 );
-sub _build_default_stem_path {
-  my ($self) = @_;
-  return '' . path( $self->default_stem() )->absolute( $self->directory );
+sub _build__directory_path {
+    my ($self) = @_;
+    return path( $self->directory() )->absolute();
 }
 
-=head2 override_stem_path
-
-=cut
-
-has override_stem_path => (
+has _default_stem_path => (
   is       => 'lazy',
   init_arg => undef,
 );
-sub _build_override_stem_path {
+sub _build__default_stem_path {
   my ($self) = @_;
-  return '' . path( $self->override_stem() )->absolute( $self->directory );
+  return path( $self->default_stem() )->absolute( $self->_directory_path() );
+}
+
+has _override_stem_path => (
+  is       => 'lazy',
+  init_arg => undef,
+);
+sub _build__override_stem_path {
+  my ($self) = @_;
+  return path( $self->override_stem() )->absolute( $self->_directory_path() );
 }
 
 1;

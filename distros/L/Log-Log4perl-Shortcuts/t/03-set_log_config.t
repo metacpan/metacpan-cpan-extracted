@@ -26,5 +26,5 @@ my $file_abs   = path($config_dir, 'log_config', $file)->canonpath;
 my $default    = path('config', 'log_config', 'default.cfg')->canonpath;
 copy ($default, $file_abs) or die "Copy failed: $!";
 
-ok ( set_log_config($file_abs) == 'success', 'config file changed');
+is ( set_log_config($file_abs), 'success', 'config file changed');
 unlink $file_abs;

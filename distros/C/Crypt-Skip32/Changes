@@ -1,6 +1,9 @@
 Revision history for Perl extension Crypt::Skip32.
 
-0.18  Fri Jan 29 00:40:34 PST 2010 
+0.19  Fri Jan 25 10:11:04 CST 2019
+       - Indirect object syntax works when Crypt::Skip32::XS is installed
+
+0.18  Fri Jan 29 00:40:34 PST 2010
        - Email address update
 
 0.15  Fri Jan 29 00:40:34 PST 2010 

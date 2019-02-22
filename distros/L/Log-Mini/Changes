@@ -1,0 +1,10 @@
+Revision history for Perl extension Log-Mini
+
+0.0.2 2019-02-22T08:01:23Z
+
+    - Undefined warning was fixed
+
+0.0.1 2019-02-21T20:27:25Z
+
+    - original version
+

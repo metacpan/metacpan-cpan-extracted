@@ -1,0 +1,597 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Input-File-Formats">Input File Formats</a>
+        <ul>
+          <li><a href="#xml">*.xml</a></li>
+        </ul>
+      </li>
+      <li><a href="#Temporary-File-Formats">Temporary File Formats</a>
+        <ul>
+          <li><a href="#cx">*.cx</a></li>
+          <li><a href="#sx">*.sx</a></li>
+          <li><a href="#tx">*.tx</a></li>
+          <li><a href="#bx0">*.bx0</a></li>
+          <li><a href="#bx">*.bx</a></li>
+          <li><a href="#txt">*.txt</a></li>
+          <li><a href="#t">*.t</a></li>
+          <li><a href="#cpx">*.cpx</a></li>
+          <li><a href="#wpx">*.wpx</a></li>
+        </ul>
+      </li>
+      <li><a href="#Output-File-Formats">Output File Formats</a>
+        <ul>
+          <li><a href="#t.xml">*.t.xml</a></li>
+          <li><a href="#s.xml">*.s.xml</a></li>
+          <li><a href="#w.xml">*.w.xml</a></li>
+          <li><a href="#a.xml">*.a.xml</a></li>
+          <li><a href="#u.xml">*.u.xml</a></li>
+          <li><a href="#cw.xml">*.cw.xml</a></li>
+          <li><a href="#cws.xml">*.cws.xml</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>dtatw-files.perl - file formats used by dta-tokwrap utilities</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> FILENAME    (STATUS)   DESCRIPTION
+
+ *.xml       (input)    input XML file in DTA &quot;base-format&quot;
+ *.chr.xml   (input)    common convention for input files
+ *.char.xml  (input)    another common convention for input files
+ 
+ *.cx        (temp)     character index (CSV,TAB-separated)
+ *.sx        (temp)     structure index (XML)
+ *.tx        (temp)     text index (UTF-8 text)
+ *.bx0       (temp)     preliminary &quot;block index&quot; (XML)
+ *.bx        (temp)     block index (CSV,TAB-separated)
+ *.txt       (temp)     serialized text (UTF-8 text)
+ *.t         (temp)     tokenizer output (.tt, TAB-separated)
+ *.cpx       (temp)     character+page index (CSV,TAB-separated)
+ *.wpx       (temp)     word+page index (CSV,TAB-separated)
+ 
+ *.t.xml     (output)   master serial XML output (XML)
+ *.s.xml     (output)   sentence-level standoff (XML)
+ *.w.xml     (output)   token-level standoff (XML)
+ *.a.xml     (output)   token-analysis-level standoff (XML)
+ 
+ *.u.xml     (output)   extended serial XML output (XML)
+ *.cw.xml    (output)   base-format + tokens (XML)
+ *.cws.xml   (output)   base-format + tokens + sentences (XML)</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This manual describes the file formats currently used by the dta-tokwrap utilities.</p>
+
+<h2 id="Input-File-Formats">Input File Formats</h2>
+
+<h3 id="xml">*.xml</h3>
+
+<p><b>Alias(es)</b>: *.chr.xml, *.char.xml</p>
+
+<p>Input XML file in DTA &quot;base-format&quot; (UTF8-encoded XML with one <code>c</code> element per character):</p>
+
+<ul>
+
+<li><p>input documents <b>MUST</b> be encoded in UTF-8,</p>
+
+</li>
+<li><p>all text nodes to be tokenized should be descendants of a <code>&lt;c&gt;</code> element which is itself a descendant of a <code>&lt;text&gt;</code> element (XPath <code>//text//c//text()</code>),</p>
+
+</li>
+<li><p>each input document should contain exactly one such <code>&lt;c&gt;</code> element for <i>each logical character</i> which may be passed to the tokenizer,</p>
+
+</li>
+<li><p>no <code>&lt;c&gt;</code> element may be a descendant of another <code>&lt;c&gt;</code> element, and</p>
+
+</li>
+<li><p>each <code>c</code> element should have a valid <code>xml:id</code> attribute.</p>
+
+</li>
+</ul>
+
+<p>Example:</p>
+
+<pre><code> &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+ &lt;TEI xmlns=&quot;http://www.tei-c.org/ns/1.0&quot; xmlns:dta=&quot;http://www.deutsches-textarchiv.de/ns/1.0&quot;&gt;
+   &lt;!-- ... --&gt;
+   &lt;text&gt;
+     &lt;!-- ... --&gt;
+     &lt;c xml:id=&quot;c1&quot;&gt; &lt;/c&gt;
+     &lt;c xml:id=&quot;c2&quot;&gt;U&lt;/c&gt;
+     &lt;c xml:id=&quot;c3&quot;&gt;e&lt;/c&gt;
+     &lt;c xml:id=&quot;c4&quot;&gt;b&lt;/c&gt;
+     &lt;c xml:id=&quot;c5&quot;&gt;e&lt;/c&gt;
+     &lt;c xml:id=&quot;c6&quot;&gt;r&lt;/c&gt;
+     &lt;c xml:id=&quot;c7&quot;&gt; &lt;/c&gt;
+     &lt;c xml:id=&quot;c8&quot;&gt;d&lt;/c&gt;
+     &lt;c xml:id=&quot;c9&quot;&gt;i&lt;/c&gt;
+     &lt;c xml:id=&quot;c10&quot;&gt;e&lt;/c&gt;
+     &lt;c xml:id=&quot;c11&quot;&gt; &lt;/c&gt;
+     &lt;!-- ... --&gt;
+   &lt;/text&gt;
+   &lt;!-- ... --&gt;
+ &lt;/text&gt;</code></pre>
+
+<h2 id="Temporary-File-Formats">Temporary File Formats</h2>
+
+<h3 id="cx">*.cx</h3>
+
+<p>Character index file (TAB-separated text) as created by <i>dtatw-mkindex</i>. Used for translating between byte offsets and <code>xml:id</code>s.</p>
+
+<p>Example:</p>
+
+<pre><code> %% &lt;c&gt;-element index generated by ../src/dtatw-mkindex
+ %% Package: dta-tokwrap version 0.04 / svn+ssh://odo.dwds.de/home/svn/dev/dta-tokwrap/trunk @ 2445:2447
+ %% Command-line: ../src/dtatw-mkindex &#39;xmlsrc/ex1.xml&#39; &#39;ex1.cx&#39; &#39;ex1.sx&#39; &#39;ex1.tx&#39;
+ %%======================================================================
+ %% $ID$        $XML_OFFSET$    $XML_LENGTH$    $TXT_OFFSET$    $TXT_LEN$       $TEXT$
+ c1     276     20      0       1        
+ c2     382     20      1       1       U
+ c3     402     20      2       1       e
+ c4     422     20      3       1       b
+ c5     442     20      4       1       e
+ c6     462     20      5       1       r
+ c7     482     20      6       1        
+ c8     502     20      7       1       d
+ c9     522     20      8       1       i
+ c10    542     21      9       1       e
+ c11    563     21      10      1        </code></pre>
+
+<h3 id="sx">*.sx</h3>
+
+<p>Structure index (XML) as created by <i>dtatw-mkindex</i>. All XPaths <code>//text//c|//text//lb</code> have been removed and replaced by placeholder <code>c</code> elements for each contiguous <i>block</i> of original <code>c</code> and <code>lb</code> elements. The placeholder elements have the form:</p>
+
+<pre><code> &lt;c n=&quot;XOFF XLEN TOFF TLEN&quot;/&gt;</code></pre>
+
+<p>where XOFF,XLEN are byte-offset and -length in the source XML file (*.xml) and TOFF,TLEN are byte-offset and -length in the raw text index file (*.tx).</p>
+
+<pre><code> &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+ &lt;TEI xmlns=&quot;http://www.tei-c.org/ns/1.0&quot; xmlns:dta=&quot;http://www.deutsches-textarchiv.de/ns/1.0&quot;&gt;
+   &lt;!-- ... --&gt;
+   &lt;text&gt;
+      &lt;titlePage&gt;
+        &lt;c n=&quot;338 11 1 0&quot;/&gt;
+        &lt;docTitle&gt;
+          &lt;c n=&quot;349 10 1 0&quot;/&gt;
+          &lt;titlePart type=&quot;main&quot;&gt;
+            &lt;c n=&quot;359 23 1 0&quot;/&gt;
+            &lt;c n=&quot;382 1666 1 82&quot;/&gt;
+          &lt;/titlePart&gt;
+          &lt;c n=&quot;2048 12 83 0&quot;/&gt;
+          &lt;c n=&quot;2060 5 83 1&quot;/&gt;
+        &lt;!-- ... --&gt;
+      &lt;/titlePage&gt;
+   &lt;/text&gt;
+   &lt;!-- ... --&gt;
+ &lt;/text&gt;</code></pre>
+
+<h3 id="tx">*.tx</h3>
+
+<p>Raw, unserialized text index (UTF-8 text) as created by <i>dtatw-mkindex</i>. Results from concatenating all <code>//text//c//text()</code> nodes from the source document, and inserting newlines for <code>//text//lb</code> elements.</p>
+
+<p>Example:</p>
+
+<pre><code>  Ueber die Beeinflussung
+ einfacher psychischer Vorg&auml;nge
+ durch einige Arzneimittel.
+ Experimentelle Untersuchungen
+ von
+ Dr. Emil Kraepelin,
+ Professor der Psychiatrie in Heidelberg.
+ Mit einer Curventafel.
+ Jena,
+ Verlag von Gustav Fischer.
+ 1892.</code></pre>
+
+<h3 id="bx0">*.bx0</h3>
+
+<p>Preliminary &quot;block index&quot; (XML) as created by <a href="./dta-tokwrap.perl.html">&quot;dta-tokwrap.perl -t mkbx0&quot;</a>. Generated from the *.sx file by inserting zero or more &quot;hints&quot; of one of the following forms:</p>
+
+<pre><code> &lt;s/&gt;    &lt;!-- sentence-break hint --&gt;
+ &lt;w/&gt;    &lt;!-- token-break hint    --&gt;
+ &lt;lb/&gt;   &lt;!-- line-break hint     --&gt;</code></pre>
+
+<p>Zero or more output elements may also be assigned a <code>dta.tw.key</code> attribute, which should be some unique key identifying the logical block or <i>segment</i> with which any text descended from that element should be sorted during serialization (this is how we get <code>seg</code> elements to clump together). <code>dta.tw.key</code> attributes are inherited by default.</p>
+
+<p>Also note that namespaces have been forcibly removed from the XML structure.</p>
+
+<p>Example:</p>
+
+<pre><code> &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+ &lt;TEI dta.tw.key=&quot;TEI.id2369102&quot; _xmlns=&quot;http://www.tei-c.org/ns/1.0&quot; xmlns_dta=&quot;http://www.deutsches-textarchiv.de/ns/1.0&quot;&gt;
+   &lt;!-- ... --&gt;
+   &lt;text&gt;
+      &lt;titlePage&gt;
+        &lt;s/&gt;
+        &lt;c n=&quot;338 11 1 0&quot;/&gt;
+        &lt;docTitle&gt;
+          &lt;c n=&quot;349 10 1 0&quot;/&gt;
+          &lt;titlePart type=&quot;main&quot;&gt;
+            &lt;s/&gt;
+            &lt;c n=&quot;359 23 1 0&quot;/&gt;
+            &lt;c n=&quot;382 1666 1 82&quot;/&gt;
+            &lt;s/&gt;
+          &lt;/titlePart&gt;
+          &lt;c n=&quot;2048 12 83 0&quot;/&gt;
+          &lt;c n=&quot;2060 5 83 1&quot;/&gt;
+        &lt;/s&gt;
+      &lt;/titlePage&gt;
+   &lt;/text&gt;
+   &lt;!-- ... --&gt;
+ &lt;/TEI&gt;</code></pre>
+
+<h3 id="bx">*.bx</h3>
+
+<p>Block index (TAB-separated text) as created by <a href="./dta-tokwrap.perl.html">&quot;dta-tokwrap.perl -t mkbx&quot;</a>. Used for translating between serialized-text (.txt) byte offsets and raw-text (.tx) byte offsets, which in turn gets us to <code>c/@xml:id</code>s. Still with me? Good.</p>
+
+<p>Example:</p>
+
+<pre><code> %% XML block list file generated by DTA::TokWrap::Document::saveBxFile() (DTA::TokWrap version 0.04)
+ %% Original source file: ./xmlsrc/ex1.xml
+ %%======================================================================
+ %% $KEY$       $ELT$   $XML_OFFSET$    $XML_LENGTH$    $TX_OFFSET$     $TX_LEN$        $TXT_OFFSET$    $TXT_LEN$
+ __ROOT__       __ROOT__        0       0       0       0       0       0
+ TEI.id2406247  s       176     0       0       0       0       6
+ TEI.id2406247  s       176     0       0       0       6       6
+ TEI.id2406247  s       215     0       0       0       12      6
+ TEI.id2406247  s       227     0       0       0       18      6
+ TEI.id2406247  s       258     0       0       0       24      6
+ TEI.id2406247  c       270     26      0       1       30      1
+ TEI.id2406247  s       270     0       0       0       31      6</code></pre>
+
+<h3 id="txt">*.txt</h3>
+
+<p>Serialized text (UTF-8 text) as created by <a href="./dta-tokwrap.perl.html">&quot;dta-tokwrap.perl -t mktxt&quot;</a>, possibly containing tokenizer &quot;hints&quot;, to be passed to the underlying tokenizer.</p>
+
+<p>The precise form taken by the hints in this file depends on many things, notably the options <code>--strong-hints</code>, <code>--weak-hints</code>, and <code>--no-hints</code> to <a href="./dta-tokwrap.perl.html">dta-tokwrap.perl</a>. You should ensure that your tokenizer is prepared to deal with whatever flavor of hints you are passing it (in particular, don&#39;t use the <code>dwds_tomasotath</code> tokenizer together with the <code>--strong-hints</code> option, unless you want it to return a lot of (<code>$</code>, <code>WB</code>, <code>$</code>) &quot;tokens&quot;.</p>
+
+<p>Example:</p>
+
+<pre><code> $SB$
+ Ueber die Beeinflussung
+ einfacher psychischer Vorg&auml;nge
+ durch einige Arzneimittel.
+ $SB$
+ 
+ $SB$
+ Experimentelle Untersuchungen
+ $SB$</code></pre>
+
+<h3 id="t">*.t</h3>
+
+<p>Tokenizer output (.tt, TAB-separated UTF-8 text). The first non-text field should contain &quot;TXTOFF TXTLEN&quot; pairs, where TXTOFF and TXTLEN are byte-offset and -length in the *.txt file. These data are required for recovery of <code>c</code> element IDs. See <i>mootfiles(5)</i> for details on the file format.</p>
+
+<p>Example:</p>
+
+<pre><code> %% raw tokenizer output generated by ../src/dtatw-tokenize-dummy (dta-tokwrap version 0.04)
+ Ueber  49 5
+ die    55 3
+ Beeinflussung  59 13
+ einfacher      73 9
+ psychischer    83 11
+ Vorg&auml;nge       95 9
+ durch  105 5
+ einige 111 6
+ Arzneimittel   118 12
+ .      130 1   $.</code></pre>
+
+<h3 id="cpx">*.cpx</h3>
+
+<p>Character+pagebreak index (CSV, TAB-separated). Used in generation of *.u.xml files.</p>
+
+<p>Example:</p>
+
+<pre><code> %% &lt;(^c$)&gt;+&lt;pb&gt; index generated by ../scripts/dtatw-mkpx.perl
+ %%======================================================================
+ %%$X_ID        $PB_I   $PB_N   $PB_FACS        $X_XPATH        
+ c1     0       NULL    NULL    /TEI[1]/text[1]/c[1]
+ c2     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/c[1]
+ c3     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/c[2]
+ c4     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/c[3]
+ c5     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/c[4]
+ c6     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/c[5]
+ c7     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/c[6]
+ c8     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/c[7]</code></pre>
+
+<h3 id="wpx">*.wpx</h3>
+
+<p>Token+pagebreak index (CSV, TAB-separated). Used in generation of *.u.xml files. Format is same as *.cpx, but IDs are token-ids.</p>
+
+<p>Example:</p>
+
+<pre><code> %% &lt;(^w$)&gt;+&lt;pb&gt; index generated by ../scripts/dtatw-mkpx.perl
+ %%======================================================================
+ %%$X_ID        $PB_I   $PB_N   $PB_FACS        $X_XPATH        
+ w1     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/w[1]
+ w2     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/w[2]
+ w3     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/w[3]
+ w4     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/w[4]
+ w5     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/w[5]
+ w6     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/w[6]
+ w7     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/w[7]
+ w8     7       NULL    NULL    /TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]/w[8]</code></pre>
+
+<h2 id="Output-File-Formats">Output File Formats</h2>
+
+<h3 id="t.xml">*.t.xml</h3>
+
+<p>Master XML-ified tokenizer output (XML). X-Paths:</p>
+
+<pre><code> /*/s        : sentence
+ /*/s/w      : token: &lt;w @xml:id b=&quot;TXTOFF TXTLEN&quot; t=&quot;TEXT&quot; c=&quot;C_IDS&quot;&gt;...&lt;/w&gt;
+ //w/a       : token analysis: &lt;a&gt;ANALYSIS_TEXT&lt;/a&gt;
+ //w//*      : (additional analysis data, inserted e.g. by DTA::CAB utilities)
+ //w/@xml:id : token id (unique within document, counted in serialized order)
+ //w/@b      : byte-offset and length of token in tokenizer input *.txt
+ //w/@t      : token text as output by tokenizer
+ //w/@c      : space-separated list of //c/@id for token characters</code></pre>
+
+<p>This format can also be passed directly to and from the <a>DTA::CAB(3pm)</a> analysis suite using the <a>DTA::CAB::Format::XmlNative(3pm)</a> formatter class.</p>
+
+<p>Example:</p>
+
+<pre><code> &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+ &lt;sentences xml:base=&quot;ex1.xml&quot;&gt;
+  &lt;s xml:id=&quot;s1&quot;&gt;
+    &lt;w xml:id=&quot;w1&quot; b=&quot;49 5&quot; t=&quot;Ueber&quot; c=&quot;c2 c3 c4 c5 c6&quot;/&gt;
+    &lt;w xml:id=&quot;w2&quot; b=&quot;55 3&quot; t=&quot;die&quot; c=&quot;c8 c9 c10&quot;/&gt;
+    &lt;w xml:id=&quot;w3&quot; b=&quot;59 13&quot; t=&quot;Beeinflussung&quot; c=&quot;c12 c13 c14 c15 c16 c17 c18 c19 c20 c21 c22 c23 c24&quot;/&gt;
+    &lt;w xml:id=&quot;w4&quot; b=&quot;73 9&quot; t=&quot;einfacher&quot; c=&quot;c25 c26 c27 c28 c29 c30 c31 c32 c33&quot;/&gt;
+    &lt;w xml:id=&quot;w5&quot; b=&quot;83 11&quot; t=&quot;psychischer&quot; c=&quot;c35 c36 c37 c38 c39 c40 c41 c42 c43 c44 c45&quot;/&gt;
+    &lt;w xml:id=&quot;w6&quot; b=&quot;95 9&quot; t=&quot;Vorg&auml;nge&quot; c=&quot;c47 c48 c49 c50 c51 c52 c53 c54&quot;/&gt;
+    &lt;w xml:id=&quot;w7&quot; b=&quot;105 5&quot; t=&quot;durch&quot; c=&quot;c55 c56 c57 c58 c59&quot;/&gt;
+    &lt;w xml:id=&quot;w8&quot; b=&quot;111 6&quot; t=&quot;einige&quot; c=&quot;c61 c62 c63 c64 c65 c66&quot;/&gt;
+    &lt;w xml:id=&quot;w9&quot; b=&quot;118 12&quot; t=&quot;Arzneimittel&quot; c=&quot;c68 c69 c70 c71 c72 c73 c74 c75 c76 c77 c78 c79&quot;/&gt;
+    &lt;w xml:id=&quot;w10&quot; b=&quot;130 1&quot; t=&quot;.&quot; c=&quot;c80&quot;&gt;
+      &lt;a&gt;$.&lt;/a&gt;
+    &lt;/w&gt;
+  &lt;/s&gt;
+ &lt;!-- ... --&gt;
+ &lt;/sentences&gt;</code></pre>
+
+<h3 id="s.xml">*.s.xml</h3>
+
+<p>Sentence-level standoff XML. <b>DEPRECATED</b> in favor of *.t.xml, *.u.xml.</p>
+
+<p>Example:</p>
+
+<pre><code> &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+ &lt;sentences xml:base=&quot;ex1.w.xml&quot;&gt;
+  &lt;s xml:id=&quot;s1&quot;&gt;
+    &lt;w ref=&quot;#w1&quot;/&gt;
+    &lt;w ref=&quot;#w2&quot;/&gt;
+    &lt;w ref=&quot;#w3&quot;/&gt;
+    &lt;w ref=&quot;#w4&quot;/&gt;
+    &lt;w ref=&quot;#w5&quot;/&gt;
+    &lt;w ref=&quot;#w6&quot;/&gt;
+    &lt;w ref=&quot;#w7&quot;/&gt;
+    &lt;w ref=&quot;#w8&quot;/&gt;
+    &lt;w ref=&quot;#w9&quot;/&gt;
+    &lt;w ref=&quot;#w10&quot;/&gt;
+  &lt;/s&gt;
+  &lt;!-- ... --&gt;
+ &lt;/sentences&gt;</code></pre>
+
+<h3 id="w.xml">*.w.xml</h3>
+
+<p>Token-level standoff XML. <b>DEPRECATED</b> in favor of *.t.xml, *.u.xml.</p>
+
+<p>Example:</p>
+
+<pre><code> &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+ &lt;tokens xml:base=&quot;ex1.xml&quot;&gt;
+  &lt;w xml:id=&quot;w1&quot; t=&quot;Ueber&quot;&gt;
+    &lt;c ref=&quot;#c2&quot;/&gt;
+    &lt;c ref=&quot;#c3&quot;/&gt;
+    &lt;c ref=&quot;#c4&quot;/&gt;
+    &lt;c ref=&quot;#c5&quot;/&gt;
+    &lt;c ref=&quot;#c6&quot;/&gt;
+  &lt;/w&gt;
+  &lt;w xml:id=&quot;w2&quot; t=&quot;die&quot;&gt;
+    &lt;c ref=&quot;#c8&quot;/&gt;
+    &lt;c ref=&quot;#c9&quot;/&gt;
+    &lt;c ref=&quot;#c10&quot;/&gt;
+  &lt;/w&gt;
+  &lt;w xml:id=&quot;w3&quot; t=&quot;Beeinflussung&quot;&gt;
+    &lt;c ref=&quot;#c12&quot;/&gt;
+    &lt;c ref=&quot;#c13&quot;/&gt;
+    &lt;c ref=&quot;#c14&quot;/&gt;
+    &lt;c ref=&quot;#c15&quot;/&gt;
+    &lt;c ref=&quot;#c16&quot;/&gt;
+    &lt;c ref=&quot;#c17&quot;/&gt;
+    &lt;c ref=&quot;#c18&quot;/&gt;
+    &lt;c ref=&quot;#c19&quot;/&gt;
+    &lt;c ref=&quot;#c20&quot;/&gt;
+    &lt;c ref=&quot;#c21&quot;/&gt;
+    &lt;c ref=&quot;#c22&quot;/&gt;
+    &lt;c ref=&quot;#c23&quot;/&gt;
+    &lt;c ref=&quot;#c24&quot;/&gt;
+  &lt;/w&gt;
+  &lt;!-- ... --&gt;
+ &lt;/tokens&gt;</code></pre>
+
+<h3 id="a.xml">*.a.xml</h3>
+
+<p>Token-analysis-level standoff XML. Currently contains only analyses supplied by the tokenizer. <b>DEPRECATED</b> in favor of *.t.xml, *.u.xml.</p>
+
+<p>Example:</p>
+
+<pre><code> &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+ &lt;analyses xml:base=&quot;ex1.w.xml&quot;&gt;
+
+  &lt;a ref=&quot;#w10&quot;&gt;$.&lt;/a&gt;
+  &lt;a ref=&quot;#w14&quot;&gt;$ABBR&lt;/a&gt;
+  &lt;a ref=&quot;#w17&quot;&gt;$,&lt;/a&gt;
+  &lt;a ref=&quot;#w23&quot;&gt;$.&lt;/a&gt;
+  &lt;a ref=&quot;#w27&quot;&gt;$.&lt;/a&gt;
+  &lt;a ref=&quot;#w29&quot;&gt;$,&lt;/a&gt;
+  &lt;a ref=&quot;#w34&quot;&gt;$.&lt;/a&gt;
+  &lt;a ref=&quot;#w35&quot;&gt;$CARDPUNCT&lt;/a&gt;
+  &lt;!-- ... --&gt;
+ &lt;/analyses&gt;</code></pre>
+
+<h3 id="u.xml">*.u.xml</h3>
+
+<p>Extended serialized XML format, based on *.t.xml with additional XPaths:</p>
+
+<pre><code> //s/@xp   : common source-XML XPath prefix for all sentence tokens
+ //w/@xp   : XPath suffix (of ../@xp) for token
+ //w/@t0   : tokenizer input text (including e.g. newlines) if different from @t
+ //w/@u    : unicruft approximation of @t, if not equal to @t
+ //w/@u0   : unicruft approximation of @t0m if not equal to @u
+ //w/@pb   : index of last //pb before onset of //w
+ //w/@cs   : character spans: &quot;CID+LEN CID+LEN ... CID+LEN&quot;; replaces @c</code></pre>
+
+<p>... and removed XPaths:</p>
+
+<pre><code> //w/@c    : removed in favor of //w/@cs
+ //w/@b    : removed in favor of //w/@cs, //w/@t0</code></pre>
+
+<p>Example:</p>
+
+<pre><code> &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+ &lt;sentences xml:base=&quot;ex1a.xml&quot;&gt;
+  &lt;s xml:id=&quot;s1&quot; xp=&quot;/TEI[1]/text[1]/front[1]/titlePage[1]/docTitle[1]/titlePart[1]&quot;&gt;
+    &lt;w xml:id=&quot;w1&quot; t=&quot;Ueber&quot; pb=&quot;7&quot; xp=&quot;-/c[1]&quot; cs=&quot;c2+5&quot;/&gt;
+    &lt;w xml:id=&quot;w2&quot; t=&quot;die&quot; pb=&quot;7&quot; xp=&quot;-/c[7]&quot; cs=&quot;c8+3&quot;/&gt;
+    &lt;w xml:id=&quot;w3&quot; t=&quot;Beeinflussung&quot; pb=&quot;7&quot; xp=&quot;-/c[11]&quot; cs=&quot;c12+13&quot;/&gt;
+    &lt;w xml:id=&quot;w4&quot; t=&quot;einfacher&quot; pb=&quot;7&quot; xp=&quot;-/c[24]&quot; cs=&quot;c25+9&quot;/&gt;
+    &lt;w xml:id=&quot;w5&quot; t=&quot;psychischer&quot; pb=&quot;7&quot; xp=&quot;-/c[34]&quot; cs=&quot;c35+11&quot;/&gt;
+    &lt;w xml:id=&quot;w6&quot; t=&quot;Vorg&#xFFFD;nge&quot; pb=&quot;7&quot; xp=&quot;-/c[46]&quot; cs=&quot;c47+8&quot;/&gt;
+    &lt;w xml:id=&quot;w7&quot; t=&quot;durch&quot; pb=&quot;7&quot; xp=&quot;-/c[54]&quot; cs=&quot;c55+5&quot;/&gt;
+    &lt;w xml:id=&quot;w8&quot; t=&quot;einige&quot; pb=&quot;7&quot; xp=&quot;-/c[60]&quot; cs=&quot;c61+6&quot;/&gt;
+    &lt;w xml:id=&quot;w9&quot; t=&quot;Arzneimittel&quot; pb=&quot;7&quot; xp=&quot;-/c[67]&quot; cs=&quot;c68+12&quot;/&gt;
+    &lt;w xml:id=&quot;w10&quot; t=&quot;.&quot; pb=&quot;7&quot; xp=&quot;-/c[79]&quot; cs=&quot;c80+1&quot;&gt;
+      &lt;a&gt;$.&lt;/a&gt;
+    &lt;/w&gt;
+  &lt;/s&gt;
+ &lt;/sentences&gt;</code></pre>
+
+<h3 id="cw.xml">*.cw.xml</h3>
+
+<p>Base-format XML file with tokens encoded as <code>w</code> elements, as output by <a>dtatw-add-w.perl</a>.</p>
+
+<p>Example:</p>
+
+<pre><code> &lt;?xml version=&quot;1.0&quot;?&gt;
+ &lt;TEI xmlns=&quot;http://www.tei-c.org/ns/1.0&quot; xmlns:dta=&quot;http://www.deutsches-textarchiv.de/ns/1.0&quot;&gt;
+  &lt;!-- ... --&gt;
+  &lt;text&gt;
+    &lt;!-- ... --&gt;
+          &lt;titlePart type=&quot;main&quot;&gt;
+              &lt;w xml:id=&quot;w1&quot;&gt;
+                &lt;c xml:id=&quot;c2&quot;&gt;U&lt;/c&gt;
+                &lt;c xml:id=&quot;c3&quot;&gt;e&lt;/c&gt;
+                &lt;c xml:id=&quot;c4&quot;&gt;b&lt;/c&gt;
+                &lt;c xml:id=&quot;c5&quot;&gt;e&lt;/c&gt;
+                &lt;c xml:id=&quot;c6&quot;&gt;r&lt;/c&gt;
+              &lt;/w&gt;
+              &lt;c xml:id=&quot;c7&quot;&gt; &lt;/c&gt;
+              &lt;w xml:id=&quot;w2&quot;&gt;
+                &lt;c xml:id=&quot;c8&quot;&gt;d&lt;/c&gt;
+                &lt;c xml:id=&quot;c9&quot;&gt;i&lt;/c&gt;
+                &lt;c xml:id=&quot;c10&quot;&gt;e&lt;/c&gt;
+              &lt;/w&gt;
+              &lt;c xml:id=&quot;c11&quot;&gt; &lt;/c&gt;
+              &lt;!-- ... --&gt;
+              &lt;w xml:id=&quot;w10&quot;&gt;
+                &lt;c xml:id=&quot;c80&quot;&gt;.&lt;/c&gt;
+              &lt;/w&gt;
+          &lt;/titlePart&gt;
+    &lt;!-- ... --&gt;
+  &lt;/text&gt;
+  &lt;!-- ... --&gt;
+ &lt;/TEI&gt;</code></pre>
+
+<h3 id="cws.xml">*.cws.xml</h3>
+
+<p>Base-format XML file with tokens and sentences encoded as <code>w</code> and <code>s</code> elements respectively, as output by <a>dtatw-add-s.perl</a>.</p>
+
+<p>Example:</p>
+
+<pre><code> &lt;?xml version=&quot;1.0&quot;?&gt;
+ &lt;TEI xmlns=&quot;http://www.tei-c.org/ns/1.0&quot; xmlns:dta=&quot;http://www.deutsches-textarchiv.de/ns/1.0&quot;&gt;
+  &lt;!-- ... --&gt;
+  &lt;text&gt;
+    &lt;!-- ... --&gt;
+          &lt;titlePart type=&quot;main&quot;&gt;
+            &lt;s xml:id=&quot;s1&quot;&gt;
+              &lt;w xml:id=&quot;w1&quot;&gt;
+                &lt;c xml:id=&quot;c2&quot;&gt;U&lt;/c&gt;
+                &lt;c xml:id=&quot;c3&quot;&gt;e&lt;/c&gt;
+                &lt;c xml:id=&quot;c4&quot;&gt;b&lt;/c&gt;
+                &lt;c xml:id=&quot;c5&quot;&gt;e&lt;/c&gt;
+                &lt;c xml:id=&quot;c6&quot;&gt;r&lt;/c&gt;
+              &lt;/w&gt;
+              &lt;c xml:id=&quot;c7&quot;&gt; &lt;/c&gt;
+              &lt;w xml:id=&quot;w2&quot;&gt;
+                &lt;c xml:id=&quot;c8&quot;&gt;d&lt;/c&gt;
+                &lt;c xml:id=&quot;c9&quot;&gt;i&lt;/c&gt;
+                &lt;c xml:id=&quot;c10&quot;&gt;e&lt;/c&gt;
+              &lt;/w&gt;
+              &lt;c xml:id=&quot;c11&quot;&gt; &lt;/c&gt;
+              &lt;!-- ... --&gt;
+              &lt;w xml:id=&quot;w10&quot;&gt;
+                &lt;c xml:id=&quot;c80&quot;&gt;.&lt;/c&gt;
+              &lt;/w&gt;
+            &lt;/s&gt;
+          &lt;/titlePart&gt;
+    &lt;!-- ... --&gt;
+  &lt;/text&gt;
+  &lt;!-- ... --&gt;
+ &lt;/TEI&gt;</code></pre>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="./dtatw-add-c.perl.html">dtatw-add-c.perl(1)</a>, <a>dtatw-add-w.perl(1)</a>, <a>dtatw-add-s.perl(1)</a>, <a href="./dta-tokwrap.perl.html">dta-tokwrap.perl(1)</a>, <a href="./dtatw-txml2uxml.perl.html">dtatw-txml2uxml.perl(1)</a>, <a>DTA::TokWrap::Intro(3pm)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="POD-ERRORS">POD ERRORS</h1>
+
+<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
+
+<dl>
+
+<dt id="Around-line-189">Around line 189:</dt>
+<dd>
+
+<p>Non-ASCII character seen before =encoding in &#39;Vorg&auml;nge&#39;. Assuming UTF-8</p>
+
+</dd>
+</dl>
+
+
+</body>
+
+</html>
+
+

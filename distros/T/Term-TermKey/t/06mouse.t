@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More;
 
 use Term::TermKey;
 
@@ -20,3 +20,5 @@ is( $key->mouseev, MOUSE_PRESS, '$key->mouseev after mouse press' );
 is( $key->button,  1,           '$key->button after mouse press' );
 is( $key->line,    3,           '$key->line after mouse press' );
 is( $key->col,     2,           '$key->col after mouse press' );
+
+done_testing;

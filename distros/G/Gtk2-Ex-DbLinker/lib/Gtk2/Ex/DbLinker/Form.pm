@@ -295,7 +295,7 @@ sub add_combo {
 
     #my ($self, $req)=@_;
     my $class = shift;
-        my $id = id $class;
+    #my $id = id $class;
     my %h;
     my $req = ( ref $_[0] eq "HASH" ) ? $_[0] : ( %h = (@_) ) && \%h;
     my $combo = {
@@ -320,7 +320,7 @@ sub add_combo {
         $self = {};
         bless $self, $class;
         $self->_builder( $$req{builder} );
-
+        my $id = id $self;
         #$log{ $id } = Log::Log4perl->get_logger("Gtk2::Ex::DbLinker::Form");
         $log{ $id } = Log::Any->get_logger();
 
@@ -336,7 +336,8 @@ sub add_combo {
     else {
         $self = $class;
     }
-
+    my $id = id $self;
+    $log{ $id } = Log::Any->get_logger();
     $log{ $id }->debug( "cols: " . join( " ", @cols ) );
     # $log{ $id }->debug( sub { Dumper $self->_datawidgets } );
     my $w = $self->_datawidgets( $combo->{id} );
@@ -353,9 +354,10 @@ sub add_combo {
     #the first ( and the next )
 
     my $displayedcol = ( $lastfield > 1 ? 1 : 0 );
+    $log{ $id }->debug("displayed col: " . $displayedcol);
     $w->set_text_column($displayedcol);
     my $model = $w->get_model;
-
+    $log{$id}->debug(" intial model " . ( $model ? " def " : "undef"));
     foreach my $field (@cols) {
 
         #push @list_def, "Glib::String";
@@ -430,13 +432,15 @@ sub add_combo {
     $log{ $id }->debug( "add_combo: " . $i . " rows added" );
 
     if ( $self->_datawidgetsName( $combo->{id} ) eq "GtkComboBoxEntry" ) {
-
-        #if ( ! $self->{combos_set}->{$combo->{id}} ) {
-        #$w->set_text_column( 1 );
-        #$self->{combos_set}->{ $combo->{id} } = TRUE;
-        #}
+        $log{ $id }->debug("setting entryCompletion model is " . ( $model ? " def" : " undef"));
+        # if ( ! $self->{combos_set}->{$combo->{id}} ) {
+        #    $log{ $id }->debug("setting tex_column");
+        # $w->set_text_column( 1 );
+        # $self->{combos_set}->{ $combo->{id} } = TRUE;
+        # }
         my $entrycompletion = Gtk2::EntryCompletion->new;
         $entrycompletion->set_minimum_key_length(1);
+
         $entrycompletion->set_model($model);
         $entrycompletion->set_text_column($displayedcol);
         $w->get_child->set_completion($entrycompletion);

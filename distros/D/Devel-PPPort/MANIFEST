@@ -1,7 +1,5 @@
 apicheck_c.PL
 Changes
-Devel-PPPort-3.43/META.json
-Devel-PPPort-3.43/META.yml
 devel/buildperl.pl
 devel/devtools.pl
 devel/mkapidoc.sh

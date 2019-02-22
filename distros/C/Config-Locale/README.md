@@ -66,7 +66,7 @@ the wildcard string to not be added to the filenames at all.
 
 ## default\_stem
 
-A stem to load first, before all other stems.
+A filename stem to load first, before all other stems.
 
 Defaults to `default`.  A relative path may be specified which will be assumed
 to be relative to ["directory"](#directory).  If an absolute path is used then no change
@@ -76,7 +76,7 @@ Note that ["prefix"](#prefix) and ["suffix"](#suffix) are not applied to this st
 
 ## override\_stem
 
-A stem to load last, after all other stems.
+A filename stem to load last, after all other stems.
 
 Defaults to `override`.  A relative path may be specified which will be assumed
 to be relative to ["directory"](#directory).  If an absolute path is used then no change
@@ -86,8 +86,8 @@ Note that ["prefix"](#prefix) and ["suffix"](#suffix) are not applied to this st
 
 ## require\_defaults
 
-If true, then any key that appears in a non-default stem must exist in the
-default stem or an error will be thrown.  Defaults to false.
+If true, then any key that appears in a non-default configuration file must exist
+in the default configuration or an error will be thrown.  Defaults to `0`.
 
 ## separator
 
@@ -166,10 +166,6 @@ identity, per the specified ["algorithm"](#algorithm).
 
 The [Hash::Merge](https://metacpan.org/pod/Hash::Merge) object that will be used to merge the configuration
 hashes.
-
-## default\_stem\_path
-
-## override\_stem\_path
 
 # AUTHOR
 

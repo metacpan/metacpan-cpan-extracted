@@ -47,11 +47,11 @@
             "Data::Serializer" : "0.60",
             "Moo" : "2.000000",
             "Scalar::Util" : "0",
-            "Starch" : "0.10",
+            "Starch" : "0.11",
             "Try::Tiny" : "0.18",
             "Type::Tiny" : "1.000005",
             "namespace::clean" : "0.24",
-            "perl" : "5.014",
+            "perl" : "5.014000",
             "strictures" : "2.000000"
          }
       },
@@ -65,7 +65,7 @@
    "provides" : {
       "Starch::Store::Amazon::DynamoDB" : {
          "file" : "lib/Starch/Store/Amazon/DynamoDB.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -79,10 +79,10 @@
          "web" : "https://github.com/bluefeet/Starch-Store-Amazon-DynamoDB"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

@@ -10,8 +10,9 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
-keywords: []
+generated_by: 'Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - 'Semantic Web'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +29,7 @@ optional_features: {}
 provides:
   RDF::Trine::Serializer::RDFa:
     file: lib/RDF/Trine/Serializer/RDFa.pm
-    version: '0.100'
+    version: '0.101'
 requires:
   RDF::RDFa::Generator: '0.200'
   RDF::Trine: '0.133'
@@ -41,6 +42,6 @@ resources:
   homepage: https://metacpan.org/release/RDF-Trine-Serializer-RDFa
   license: http://dev.perl.org/licenses/
   repository: git://github.com/kjetilk/p5-rdf-trine-serializer-rdfa.git
-version: '0.100'
+version: '0.101'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

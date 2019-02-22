@@ -1,5 +1,15 @@
 Revision history for Music-ToRoman
 
+0.0901 2019-02-21 11:57:48
+    - Don't insert a space before a maj/min decorator.
+
+0.0900 2019-02-20 20:56:20
+    - Allow parsing of non-scale notes in the bass (ex: "iii9/bii").
+
+0.0802 2019-02-20 20:28:18
+    - Improve documentation.
+    - Add to and reorganize tests.
+
 0.0801 2019-02-19 23:19:37
     - Improve documentation.
 

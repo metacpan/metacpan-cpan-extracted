@@ -12,5 +12,6 @@ lib/Spreadsheet/Read/Ingester.pm
 t/00-use_ok.t
 t/01-basic.t
 t/test_files/test.csv
+t/test_files/test2.csv
 test.tgz
 weaver.ini

@@ -1,3 +1,9 @@
+** 0.05 / 2019-02-21
+   - Add HTML logging of features/scenarios/steps interspersed
+     with screenshots and web page interactions (driver commands)
+
+** 0.04 / 2018-09-21
+   - Check return values from 'syscalls' (open/close/print/etc)
 
 ** 0.03 / 2018-09-13
    - Clear text boxes/inputs before sending new input using the

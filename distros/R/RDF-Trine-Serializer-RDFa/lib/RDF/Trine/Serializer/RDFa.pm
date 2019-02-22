@@ -11,7 +11,7 @@ use RDF::TrineX::Compatibility::Attean;
 our $AUTHORITY = 'cpan:KJETILK';
 our ($VERSION);
 BEGIN {
-  $VERSION = '0.100';
+  $VERSION = '0.101';
   $RDF::Trine::Serializer::serializer_names{ 'rdfa' } = __PACKAGE__;
   $RDF::Trine::Serializer::format_uris{ 'http://www.w3.org/ns/formats/RDFa' } = __PACKAGE__;
   foreach my $type (qw(application/xhtml+xml text/html)) {
@@ -146,7 +146,7 @@ Kjetil Kjernsmo E<lt>kjetilk@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2017, 2018 by Kjetil Kjernsmo.
+This software is copyright (c) 2017, 2018, 2019 by Kjetil Kjernsmo.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

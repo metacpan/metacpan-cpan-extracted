@@ -8,7 +8,7 @@ package Tickit::Event;
 use strict;
 use warnings;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 use Carp;
 
@@ -89,10 +89,6 @@ package
    Tickit::Event::Key;
 our @ISA = qw( Tickit::Event );
 
-use overload '%{}' => sub {
-   Carp::croak "HASH access to Tickit::Event::Key is deprecated";
-};
-
 =head1 Tickit::Event::Key
 
 =head2 type
@@ -112,10 +108,6 @@ An integer bitmask indicating the modifier state.
 package
    Tickit::Event::Mouse;
 our @ISA = qw( Tickit::Event );
-
-use overload '%{}' => sub {
-   Carp::croak "HASH access to Tickit::Event::Mouse is deprecated";
-};
 
 =head1 Tickit::Event::Mouse
 
@@ -143,10 +135,6 @@ An integer bitmask indicating the modifier state.
 package
    Tickit::Event::Resize;
 our @ISA = qw( Tickit::Event );
-
-use overload '%{}' => sub {
-   Carp::croak "HASH access to Tickit::Event::Resize is deprecated";
-};
 
 =head1 Tickit::Event::Resize
 

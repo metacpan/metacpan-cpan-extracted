@@ -807,7 +807,6 @@ bl.it;bl.it
 black;black
 blackbaudcdn.net;blackbaudcdn.net
 blackfriday;blackfriday
-blanco;blanco
 blockbuster;blockbuster
 blog;blog
 blog.bo;blog.bo
@@ -1926,6 +1925,7 @@ dvr;dvr
 dvrcam.info;dvrcam.info
 dvrdns.org;dvrdns.org
 dy.fi;dy.fi
+dyn-berlin.de;dyn-berlin.de
 dyn-ip24.de;dyn-ip24.de
 dyn-o-saur.com;dyn-o-saur.com
 dyn-vpn.de;dyn-vpn.de
@@ -2189,7 +2189,6 @@ entomology.museum;entomology.museum
 environment.museum;environment.museum
 environmentalconservation.museum;environmentalconservation.museum
 epilepsy.museum;epilepsy.museum
-epost;epost
 epson;epson
 equipment;equipment
 equipment.aero;equipment.aero
@@ -3441,7 +3440,16 @@ immobilien;immobilien
 imperia.it;imperia.it
 in;in
 in-addr.arpa;in-addr.arpa
+in-berlin.de;in-berlin.de
+in-brb.de;in-brb.de
+in-butter.de;in-butter.de
+in-dsl.de;in-dsl.de
+in-dsl.net;in-dsl.net
+in-dsl.org;in-dsl.org
 in-the-band.net;in-the-band.net
+in-vpn.de;in-vpn.de
+in-vpn.net;in-vpn.net
+in-vpn.org;in-vpn.org
 in.eu.org;in.eu.org
 in.futurecms.at;in.futurecms.at
 in.na;in.na
@@ -7246,7 +7254,6 @@ spdns.eu;spdns.eu
 spdns.org;spdns.org
 spectrum.myjino.ru;spectrum.myjino.ru
 speedpartner.de;speedpartner.de
-spiegel;spiegel
 spjelkavik.no;spjelkavik.no
 sport;sport
 sport.hu;sport.hu
@@ -8515,7 +8522,6 @@ zgorzelec.pl;zgorzelec.pl
 zhitomir.ua;zhitomir.ua
 zhytomyr.ua;zhytomyr.ua
 zip;zip
-zippo;zippo
 zj.cn;zj.cn
 zlg.br;zlg.br
 zm;zm

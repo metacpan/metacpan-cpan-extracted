@@ -1,9 +1,11 @@
 NAME
+
     Crypt::Skip32 - 32-bit block cipher based on Skipjack
 
 SYNOPSIS
-      use Crypt::Skip32;
 
+      use Crypt::Skip32;
+    
       my $cipher     = new Crypt::Skip32 $key;
       my $ciphertext = $cipher->encrypt($plaintext);
       my $plaintext  = $cipher->decrypt($ciphertext);
@@ -11,6 +13,7 @@ SYNOPSIS
       my $keysize    = $cipher->keysize;
 
 DESCRIPTION
+
     SKIP32 is a 80-bit key, 32-bit block cipher based on Skipjack. The Perl
     code for the algorithm is a direct translation from C to Perl of
     skip32.c by Greg Rose found here:
@@ -18,8 +21,8 @@ DESCRIPTION
       http://www.qualcomm.com.au/PublicationsDocs/skip32.c
 
     This cipher can be handy for scrambling small (32-bit) values when you
-    would like to obscure them while keeping the encrypted output size small
-    (also only 32 bits).
+    would like to obscure them while keeping the encrypted output size
+    small (also only 32 bits).
 
     One example where Crypt::Skip32 has been useful: You have numeric
     database record ids which increment sequentially. You would like to use
@@ -36,43 +39,50 @@ DESCRIPTION
     limit.
 
 FUNCTIONS
-    new
-          my $cipher = new Crypt::Skip32 $key;
 
-        Creates a new Crypt::Skip32 block cipher object, using $key, where
-        $key is a key of "keysize" bytes (10).
+    new
+
+        my $cipher = new Crypt::Skip32 $key;
+
+      Creates a new Crypt::Skip32 block cipher object, using $key, where
+      $key is a key of keysize bytes (10).
 
     encrypt
-          my $ciphertext = $cipher->encrypt($plaintext);
 
-        Encrypt $plaintext and return the $ciphertext. The $plaintext must
-        be of "blocksize" bytes (4).
+        my $ciphertext = $cipher->encrypt($plaintext);
 
-        See the EXAMPLE below for hints on how to take a plain integer,
-        encrypt it, and encode it for use in URLs and other non-binary
-        formats.
+      Encrypt $plaintext and return the $ciphertext. The $plaintext must be
+      of blocksize bytes (4).
+
+      See the EXAMPLE below for hints on how to take a plain integer,
+      encrypt it, and encode it for use in URLs and other non-binary
+      formats.
 
     decrypt
-          my $plaintext = $cipher->decrypt($ciphertext);
 
-        Decrypt $ciphertext and return the $plaintext. The $ciphertext must
-        be of "blocksize" bytes (4).
+        my $plaintext = $cipher->decrypt($ciphertext);
+
+      Decrypt $ciphertext and return the $plaintext. The $ciphertext must
+      be of blocksize bytes (4).
 
     blocksize
-          my $blocksize = $cipher->blocksize;
-          my $blocksize = Crypt::Skip32->blocksize;
 
-        Returns the size (in bytes) of the block cipher. This is always 4
-        bytes (for 32 bits).
+        my $blocksize = $cipher->blocksize;
+        my $blocksize = Crypt::Skip32->blocksize;
+
+      Returns the size (in bytes) of the block cipher. This is always 4
+      bytes (for 32 bits).
 
     keysize
-          my $keysize = $cipher->keysize;
-          my $keysize = Crypt::Skip32->keysize;
 
-        Returns the size (in bytes) of the key. This is always 10 bytes (for
-        80 bits).
+        my $keysize = $cipher->keysize;
+        my $keysize = Crypt::Skip32->keysize;
+
+      Returns the size (in bytes) of the key. This is always 10 bytes (for
+      80 bits).
 
 NOTES
+
     If Crypt::Skip32::XS is installed, this module will use it and the
     constructor will return an object of that type, though the interface is
     identical. You can stick with the pure Perl version by setting the
@@ -82,23 +92,24 @@ NOTES
     module or the XS one, and report it to the corresponding maintainer.
 
 EXAMPLE
+
     This sample code demonstrates how Crypt::Skip32 can be used to encrypt
     unsigned integers and encode them for use in web URLs, form values, and
     other places where short encrypted text might be useful.
 
       use Crypt::Skip32;
-
+    
       # Create a cipher. Change the long hex string to your secret key.
       my $key         = pack("H20", "112233445566778899AA");
       my $cipher      = new Crypt::Skip32 $key; # Always 10 bytes!
-
+    
       # Encrypt an unsigned integer (under 2^32) into an 8-digit hex string.
       my $number      = 3493209676;
       my $plaintext   = pack("N", $number);
       my $ciphertext  = $cipher->encrypt($plaintext); # Always 4 bytes!
       my $cipherhex   = unpack("H8", $ciphertext);
       print "$number encrypted and converted to hex: $cipherhex\n";
-
+    
       # Decrypt an encrypted, hexified unsigned integer.
       my $ciphertext2 = pack("H8", $cipherhex);
       my $plaintext2  = $cipher->decrypt($ciphertext2); # Always 4 bytes!
@@ -111,6 +122,7 @@ EXAMPLE
       6da27100 converted back and decrypted: 3493209676
 
 CAVEATS
+
     This initial alpha Perl implementation of Crypt::Skip32 has not been
     extentively reviewed by cryptographic experts, nor has it been tested
     extensively on many different platforms. It is recommended that this
@@ -120,11 +132,12 @@ CAVEATS
     Reviewers and testers welcomed.
 
     Though this module has been coded to follow a Crypt::CBC usable
-    interface, it is not intended for use in encrypting long chunks of text.
-    For those purposes, it is suggested you use another high quality, proven
-    cipher with a longer block size.
+    interface, it is not intended for use in encrypting long chunks of
+    text. For those purposes, it is suggested you use another high quality,
+    proven cipher with a longer block size.
 
 INSTALLATION
+
     If your Linux distro does not have a prepared package for this module,
     then the preferred method for installation is directly from the CPAN
     using a command like:
@@ -132,6 +145,7 @@ INSTALLATION
         sudo cpan Crypt::Skip32
 
 SOURCE
+
     The source for this module is being maintained on github:
 
         https://github.com/alestic/Crypt-Skip32
@@ -144,6 +158,7 @@ SOURCE
     use.
 
 BUGS
+
     Problems and feature requests can be submitted through the github
     "issues" link:
 
@@ -153,6 +168,7 @@ BUGS
     increase awareness and attention.
 
 SEE ALSO
+
     The original SKIP32 implementation in C by Greg Rose:
     http://www.qualcomm.com.au/PublicationsDocs/skip32.c
 
@@ -162,14 +178,28 @@ SEE ALSO
     Crypt::Skip32::XS
 
 AUTHOR
+
     Perl code maintained by Eric Hammond <eric-cpan-2@thinksome.com>
     http://www.anvilon.com
 
     Original SKIP32 C code written 1999-04-27 by Greg Rose, based on an
     implementation of the Skipjack algorithm written by Panu Rissanen.
 
+CREDITS
+
+    The following have contributed to the Perl version:
+
+        John Laur
+        Joe Edmonds
+        gray
+
+    And, of course, this is entirely based on the C version written by:
+
+        Greg Rose
+
 COPYRIGHT AND LICENSE
-    Copyright (C) 2007-2011 Eric Hammond <eric-cpan-2@thinksome.com>
+
+    Copyright (C) 2007-2019 Eric Hammond <eric-cpan-2@thinksome.com>
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself, either Perl version 5.8.8 or, at
@@ -180,25 +210,26 @@ COPYRIGHT AND LICENSE
     and granted to make a Perl version available on the CPAN.
 
 ORIGINAL C SOURCE
+
      /*
         SKIP32 -- 32 bit block cipher based on SKIPJACK.
         Written by Greg Rose, QUALCOMM Australia, 1999/04/27.
-
+    
         In common: F-table, G-permutation, key schedule.
         Different: 24 round feistel structure.
         Based on:  Unoptimized test implementation of SKIPJACK algorithm
                    Panu Rissanen <bande@lut.fi>
-
+    
         SKIPJACK and KEA Algorithm Specifications
         Version 2.0
         29 May 1998
-
+    
         Not copyright, no rights reserved.
      */
-
+    
      typedef unsigned char   BYTE; /* 8 bits */
      typedef unsigned short  WORD; /* 16 bits */
-
+    
      const BYTE ftable[256] = {
      0xa3,0xd7,0x09,0x83,0xf8,0x48,0xf6,0xf4,0xb3,0x21,0x15,0x78,0x99,0xb1,0xaf,0xf9,
      0xe7,0x2d,0x4d,0x8a,0xce,0x4c,0xca,0x2e,0x52,0x95,0xd9,0x1e,0x4e,0x38,0x44,0x28,
@@ -217,23 +248,23 @@ ORIGINAL C SOURCE
      0x08,0x77,0x11,0xbe,0x92,0x4f,0x24,0xc5,0x32,0x36,0x9d,0xcf,0xf3,0xa6,0xbb,0xac,
      0x5e,0x6c,0xa9,0x13,0x57,0x25,0xb5,0xe3,0xbd,0xa8,0x3a,0x01,0x05,0x59,0x2a,0x46
      };
-
+    
      WORD
      g(BYTE *key, int k, WORD w)
      {
          BYTE g1, g2, g3, g4, g5, g6;
-
+    
          g1 = (w>>8)&0xff;
          g2 = w&0xff;
-
+    
          g3 = ftable[g2 ^ key[(4*k)%10]] ^ g1;
          g4 = ftable[g3 ^ key[(4*k+1)%10]] ^ g2;
          g5 = ftable[g4 ^ key[(4*k+2)%10]] ^ g3;
          g6 = ftable[g5 ^ key[(4*k+3)%10]] ^ g4;
-
+    
          return ((g5<<8) + g6);
      }
-
+    
      void
      skip32(BYTE key[10], BYTE buf[4], int encrypt)
      {
@@ -241,17 +272,17 @@ ORIGINAL C SOURCE
          int         i; /* round counter */
          int         kstep;
          WORD        wl, wr;
-
+    
          /* sort out direction */
          if (encrypt)
              kstep = 1, k = 0;
          else
              kstep = -1, k = 23;
-
+    
          /* pack into words */
          wl = (buf[0] << 8) + buf[1];
          wr = (buf[2] << 8) + buf[3];
-
+    
          /* 24 feistel rounds, doubled up */
          for (i = 0; i < 24/2; ++i) {
              wr ^= g(key, k, wl) ^ k;
@@ -259,12 +290,12 @@ ORIGINAL C SOURCE
              wl ^= g(key, k, wr) ^ k;
              k += kstep;
          }
-
+    
          /* implicitly swap halves while unpacking */
          buf[0] = wr >> 8;   buf[1] = wr & 0xFF;
          buf[2] = wl >> 8;   buf[3] = wl & 0xFF;
      }
-
+    
      #include <stdio.h>
      int main(int ac, char *av[])
      {
@@ -272,7 +303,7 @@ ORIGINAL C SOURCE
          BYTE        key[10] = { 0x00,0x99,0x88,0x77,0x66,0x55,0x44,0x33,0x22,0x11 };
          int         i, encrypt;
          int         bt;
-
+    
          if (ac == 1) {
              skip32(key, in, 1);
              printf("%02x%02x%02x%02x\n", in[0], in[1], in[2], in[3]);

@@ -1,0 +1,5 @@
+^Makefile$
+^examples\b
+
+~$
+\.log$

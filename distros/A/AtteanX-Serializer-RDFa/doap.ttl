@@ -1,46 +1,98 @@
-_:rb0750e8d55e5243218040531e576a60a4r0 <http://ontologi.es/doap-deps#on> "Test::More 0.96"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb0750e8d55e5243218040531e576a60a4r1 <http://ontologi.es/doap-deps#on> "Test::Modern"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb0750e8d55e5243218040531e576a60a4r10 <http://ontologi.es/doap-deps#on> "Dist::Inkt 0.001"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb0750e8d55e5243218040531e576a60a4r2 <http://ontologi.es/doap-deps#on> "Module::Load::Conditional"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb0750e8d55e5243218040531e576a60a4r3 <http://ontologi.es/doap-deps#on> "URI::NamespaceMap"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb0750e8d55e5243218040531e576a60a4r4 <http://ontologi.es/doap-deps#on> "perl 5.010001"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb0750e8d55e5243218040531e576a60a4r5 <http://ontologi.es/doap-deps#on> "Types::Standard"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb0750e8d55e5243218040531e576a60a4r6 <http://ontologi.es/doap-deps#on> "namespace::clean"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb0750e8d55e5243218040531e576a60a4r7 <http://ontologi.es/doap-deps#on> "Attean 0.019"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb0750e8d55e5243218040531e576a60a4r8 <http://ontologi.es/doap-deps#on> "Moo"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb0750e8d55e5243218040531e576a60a4r9 <http://ontologi.es/doap-deps#on> "RDF::RDFa::Generator 0.200"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rbd28422e8fce64b9da3e0d2cc416a6ce4r0 <http://usefulinc.com/ns/doap#browse> <https://github.com/kjetilk/p5-atteanx-serializer-rdfa> ;
-	a <http://usefulinc.com/ns/doap#GitRepository> ;
-	<http://www.w3.org/ns/prov#has_provenance> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-atteanx-serializer-rdfa&serialization=PROV-O#> .
-<http://dev.perl.org/licenses/> <http://purl.org/dc/terms/title> "the same terms as the perl 5 programming language system itself" .
-<http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/project> <http://ontologi.es/doap-deps#develop-recommendation> _:rb0750e8d55e5243218040531e576a60a4r10 ;
-	<http://ontologi.es/doap-deps#runtime-requirement> _:rb0750e8d55e5243218040531e576a60a4r4, _:rb0750e8d55e5243218040531e576a60a4r5, _:rb0750e8d55e5243218040531e576a60a4r6, _:rb0750e8d55e5243218040531e576a60a4r7, _:rb0750e8d55e5243218040531e576a60a4r8, _:rb0750e8d55e5243218040531e576a60a4r9 ;
-	<http://ontologi.es/doap-deps#test-requirement> _:rb0750e8d55e5243218040531e576a60a4r0, _:rb0750e8d55e5243218040531e576a60a4r1, _:rb0750e8d55e5243218040531e576a60a4r2, _:rb0750e8d55e5243218040531e576a60a4r3 ;
-	<http://purl.org/dc/terms/contributor> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://usefulinc.com/ns/doap#bug-database> <https://github.com/kjetilk/p5-atteanx-serializer-rdfa/issues> ;
-	<http://usefulinc.com/ns/doap#created> "2017-12-22"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#developer> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://usefulinc.com/ns/doap#download-page> <https://metacpan.org/release/AtteanX-Serializer-RDFa> ;
-	<http://usefulinc.com/ns/doap#homepage> <https://metacpan.org/release/AtteanX-Serializer-RDFa> ;
-	<http://usefulinc.com/ns/doap#license> <http://dev.perl.org/licenses/> ;
-	<http://usefulinc.com/ns/doap#maintainer> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://usefulinc.com/ns/doap#name> "AtteanX-Serializer-RDFa" ;
-	<http://usefulinc.com/ns/doap#programming-language> "Perl" ;
-	<http://usefulinc.com/ns/doap#release> <http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-01> ;
-	<http://usefulinc.com/ns/doap#repository> _:rbd28422e8fce64b9da3e0d2cc416a6ce4r0 ;
-	<http://usefulinc.com/ns/doap#shortdesc> "RDFa Serializer for Attean" ;
-	<http://usefulinc.com/ns/doap#support-forum> <irc://irc.perl.org/#perlrdf> ;
-	a <http://usefulinc.com/ns/doap#Project> .
-<http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-01> <http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://purl.org/dc/terms/identifier> "AtteanX-Serializer-RDFa-0.01"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2018-02-11"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Serializer-RDFa-0.01.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.01"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Initial release" .
-<http://purl.org/NET/cpan-uri/person/kjetilk> a <http://xmlns.com/foaf/0.1/Person> ;
-	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-atteanx-serializer-rdfa&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me> ;
-	<http://xmlns.com/foaf/0.1/mbox> <mailto:kjetilk@cpan.org> ;
-	<http://xmlns.com/foaf/0.1/name> "Kjetil Kjernsmo" ;
-	<http://xmlns.com/foaf/0.1/nick> "KJETILK" ;
-	<http://xmlns.com/foaf/0.1/page> <https://metacpan.org/author/KJETILK> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix types: <http://rdfs.org/sioc/types#> .
+@prefix wot:   <http://xmlns.com/wot/0.1/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself";
+	rdfs:comment         "the same terms as the Perl 5 programming language system itself"@en.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [
+		doap-deps:on "RDF::RDFa::Generator 0.200"^^doap-deps:CpanId;
+	], [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.019"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "RDF::NS 20160408"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Modern"^^doap-deps:CpanId ], [
+		doap-deps:on "Module::Load::Conditional"^^doap-deps:CpanId;
+	], [ doap-deps:on "URI::NamespaceMap"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/kjetilk/p5-atteanx-serializer-rdfa/issues>;
+	doap:created         "2017-12-22"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:download-page   <https://metacpan.org/release/AtteanX-Serializer-RDFa>;
+	doap:homepage        <https://metacpan.org/release/AtteanX-Serializer-RDFa>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:name            "AtteanX-Serializer-RDFa";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-01>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-100>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/p5-atteanx-serializer-rdfa>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-atteanx-serializer-rdfa&serialization=PROV-O#>;
+	];
+	doap:security-contact <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:shortdesc       "RDFa Serializer for Attean";
+	doap:support-forum   <irc://irc.perl.org/#perlrdf>.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-01>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "AtteanX-Serializer-RDFa-0.01"^^xsd:string;
+	dc:issued            "2018-02-11"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Serializer-RDFa-0.01.tar.gz>;
+	doap:revision        "0.01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-100>
+	a                    doap:Version;
+	rdfs:label           "Fix tests";
+	dc:identifier        "AtteanX-Serializer-RDFa-0.100"^^xsd:string;
+	dc:issued            "2019-02-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Used the wrong prefix generator module in tests."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Serializer-RDFa-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kjetilk>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KJETILK", "KjetilK";
+	foaf:page            <https://metacpan.org/author/KJETILK>;
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-atteanx-serializer-rdfa&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	wot:hasKey           _:B1.
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+	a                    foaf:Person;
+	foaf:homepage        <http://kjetil.kjernsmo.net/>;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KjetilK";
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	wot:hasKey           _:B1.
+
+<irc://irc.perl.org/#perlrdf>
+	a                    types:ChatChannel;
+	dc:title             "The Perl and RDF IRC channel"@en.
+
+_:B1
+	a                    wot:PubKey;
+	wot:fingerprint      "0ECC8BC6D0A2E9B93BA417267FBEE8DF3A9E4AA5".
+

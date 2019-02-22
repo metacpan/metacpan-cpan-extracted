@@ -1,0 +1,49 @@
+---
+abstract: "It's a very simple logger which can log your messages to a file or STDERR."
+author:
+  - 'Denis Fedoseev <denis.fedoseev@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Mini
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Log::Mini:
+    file: lib/Log/Mini.pm
+    version: v0.0.2
+  Log::Mini::LoggerBase:
+    file: lib/Log/Mini/LoggerBase.pm
+  Log::Mini::LoggerFILE:
+    file: lib/Log/Mini/LoggerFILE.pm
+  Log::Mini::LoggerSTDERR:
+    file: lib/Log/Mini/LoggerSTDERR.pm
+requires:
+  Carp: '0'
+  List::Util: '0'
+  Time::Moment: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/alpha6/Log-Mini/issues
+  homepage: https://github.com/alpha6/Log-Mini
+  repository: git://github.com/alpha6/Log-Mini.git
+version: 0.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

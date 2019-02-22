@@ -6,7 +6,7 @@ use Pod::Tree;
 use Pod::Tree::HTML;
 use Pod::Tree::PerlUtil;
 
-our $VERSION = '1.30';
+our $VERSION = '1.31';
 
 use base qw(Pod::Tree::PerlUtil);
 

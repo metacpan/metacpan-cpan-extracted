@@ -19,9 +19,11 @@ t/author-pod-syntax.t
 t/example.yaml10
 t/flatabledata.yaml
 t/release-pod-coverage.t
+t/subs.t
 t/taparchive.t
 t/testdata.cfggeneral
 t/testdata.dumper
+t/testdata.empty
 t/testdata.ini
 t/testdata.json
 t/testdata.tap

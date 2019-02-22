@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More;
 
 use Term::Terminfo;
 
@@ -22,3 +22,5 @@ ok( scalar( grep { $_ eq "auto_right_margin" } $ti->flag_varnames ), '$ti->flag_
 ok( scalar( grep { $_ eq "init_tabs" } $ti->num_varnames ), '$ti->num_varnames has init_tabs' );
 
 ok( scalar( grep { $_ eq "carriage_return" } $ti->str_varnames ), '$ti->str_varnames has carriage_return' );
+
+done_testing;

@@ -17,21 +17,24 @@ name: Net-SharePoint-Basic
 provides:
   Net::SharePoint::Basic:
     file: lib/Net/SharePoint/Basic.pm
-    version: '0.1'
+    version: '0.11'
 requires:
-  Carp: '1.38'
-  Data::Dumper: '2.161'
+  Carp: '1.11'
+  Data::Dumper: '2.124'
   Data::UUID: '1.203'
   Exporter: '5.63'
   File::Basename: '2.77'
   File::Path: '2.08'
   Getopt::Long: '2.38'
   IO::Scalar: '2.110'
-  JSON::XS: '3.04'
+  JSON::XS: '2.27'
   LWP::UserAgent: '5.835'
   POSIX: '1.17'
   Storable: '2.20'
-  URI::Escape: '3.31'
+  URI::Escape: '3.29'
   experimental: '0.016'
-version: '0.1'
+  perl: v5.10.1
+resources:
+  repository: https://github.com/vmware/perl-net-sharepoint-basic
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

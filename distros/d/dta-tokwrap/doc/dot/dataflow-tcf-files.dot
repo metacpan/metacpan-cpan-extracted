@@ -1,0 +1,90 @@
+/* -*- Mode: C -*- */
+digraph dataflow_perl_files {
+  node [shape=rectangle,style=filled,fillcolor=pink,height=0.25,fontname="Courier"];
+  edge [decorate=0,fontname="Courier"];
+
+  //-- tcf stuff
+  tcffile [label="tcffile: *.tcf",fillcolor=PowderBlue];
+
+  tcfdecode [label="tcfdecode",shape=diamond,fillcolor=orange,fontname="Courier-Bold"];
+  tcffile -> tcfdecode;
+
+  tcfwfile [label="tcfwfile: *.tcfw (-bytes)",fillcolor=yellow];
+  tcfdecode -> txtfile;
+  tcfdecode -> xmlfile;
+  tcfdecode -> tcfwfile;
+
+  tcfalign [label="tcfalign",shape=diamond,fillcolor=orange,fontname="Courier-Bold"];
+  tcfwfile -> tcfalign;
+  txtfile -> tcfalign;
+  tcfalign -> tokfile;
+
+  //-- inherited
+  xmlfile [label="xmlfile: *.xml\ntcfxfile: *.tcfx",fillcolor=yellow]; //fillcolor=PowderBlue
+  //add_c -> xmlfile;
+
+  mkindex [label="mkindex",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  xmlfile -> mkindex;
+
+  sxfile [label="sxfile: *.sx"];
+  txfile [label="txfile: *.tx"];
+  cxfile [label="cxfile: *.cx"];
+  mkindex -> cxfile;
+  mkindex -> sxfile;
+  mkindex -> txfile;
+  {rank=same; cxfile sxfile txfile}
+
+  mkbx0 [label="mkbx0",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  sxfile -> mkbx0;
+ 
+  bx0file [label="bx0file: *.bx0"];
+  mkbx0 -> bx0file;
+
+  mkbx [label="mkbx",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  bx0file -> mkbx;
+  txfile  -> mkbx;
+
+  bxfile [label="bxfile: *.bx"];
+  txtfile [label="txtfile: *.txt\ntcftfile: *.tcft",fillcolor=yellow];
+  mkbx -> bxfile;
+  mkbx -> txtfile [style="dashed",color="grey"];
+  {rank=same; bxfile txtfile}
+
+  tokenize [label="tokenize",shape=diamond,fillcolor=grey,fontname="Courier-Bold",justify="left"];
+  txtfile -> tokenize [style="dashed",color="grey"];
+
+  tokfile [label="tokfile: *.t (+bytes)"];
+  tokenize -> tokfile [style="dashed",color="grey"];
+
+  xtokfile [label="xtokfile: *.t.xml"]; //fillcolor=PowderBlue
+
+  //-- tok2xml via c prog
+  tok2xml[label="tok2xml",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  bxfile -> tok2xml;
+  cxfile -> tok2xml;
+  tokfile -> tok2xml;
+  tok2xml -> xtokfile;
+
+  //-- splice-in: w,s: addws module
+  add_ws  [label="addws",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  xtokfile -> add_ws;
+  xmlfile  -> add_ws;
+  add_ws   -> cwsfile;
+  cwsfile [label="cwsfile: *.cws.xml\ntcfcwsfile: *.tcfws.xml",fillcolor=yellow]; //fillcolor=PowderBlue
+
+  //-- splice-in: generic id-based splice (e.g. cab)
+  /*
+  cab [label="dta-cab",shape=diamond,fillcolor=orange,fontname="Courier-Bold"];
+  xtokfile -> cab;
+
+  cabfile [label="-cabfile: *.cab.xml",fillcolor=yellow];
+  cab -> cabfile;
+
+  idsplice [label="idsplice",shape=diamond,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  cabfile -> idsplice;
+  cwsfile -> idsplice;
+
+  cwstfile [label="cwstfile: *.cwst.xml",fillcolor=PowderBlue];
+  idsplice -> cwstfile;
+  */
+}

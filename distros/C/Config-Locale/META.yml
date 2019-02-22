@@ -26,7 +26,7 @@ no_index:
 provides:
   Config::Locale:
     file: lib/Config/Locale.pm
-    version: '0.07'
+    version: '0.09'
 requires:
   Algorithm::Loops: '1.031'
   Carp: '0'
@@ -37,12 +37,11 @@ requires:
   Type::Tiny: '1.004000'
   namespace::clean: '0.24'
   perl: '5.008001'
-  strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/Config-Locale/issues
   homepage: https://github.com/bluefeet/Config-Locale
   repository: git://github.com/bluefeet/Config-Locale.git
-version: '0.07'
+version: '0.09'
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

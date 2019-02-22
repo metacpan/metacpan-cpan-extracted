@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20190120';
+our $VERSION = '5.20190220';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -344,6 +344,7 @@ sub changes_between {
     5.028001 => '2018-11-29',
     5.029006 => '2018-12-18',
     5.029007 => '2019-01-20',
+    5.029008 => '2019-02-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -15431,7 +15432,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'Module::CoreList'      => '5.20180420',
             'Module::CoreList::Utils'=> '5.20180420',
             'POSIX'                 => '1.84',
-            'Time::HiRes'           => '1.9759',
+            'Time::HiRes'           => '1.9760',
             'XS::APItest'           => '0.97',
             'bytes'                 => '1.06',
             'subs'                  => '1.03',
@@ -16093,6 +16094,105 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         },
         removed => {
             'Math::BigInt::CalcEmu' => 1,
+        }
+    },
+    5.029008 => {
+        delta_from => 5.029007,
+        changed => {
+            'B'                     => '1.76',
+            'B::Op_private'         => '5.029008',
+            'Config'                => '5.029008',
+            'Devel::PPPort'         => '3.44',
+            'Encode'                => '3.00',
+            'Encode::Unicode'       => '2.18',
+            'ExtUtils::Miniperl'    => '1.09',
+            'IO'                    => '1.40',
+            'IO::Dir'               => '1.40',
+            'IO::File'              => '1.40',
+            'IO::Handle'            => '1.40',
+            'IO::Pipe'              => '1.40',
+            'IO::Poll'              => '1.40',
+            'IO::Seekable'          => '1.40',
+            'IO::Select'            => '1.40',
+            'IO::Socket'            => '1.40',
+            'IO::Socket::INET'      => '1.40',
+            'IO::Socket::UNIX'      => '1.40',
+            'JSON::PP'              => '4.00',
+            'JSON::PP::Boolean'     => '4.00',
+            'Module::CoreList'      => '5.20190220',
+            'Module::CoreList::Utils'=> '5.20190220',
+            'Module::Load'          => '0.34',
+            'Net::Ping'             => '2.71',
+            'POSIX'                 => '1.87',
+            'Test2'                 => '1.302162',
+            'Test2::API'            => '1.302162',
+            'Test2::API::Breakage'  => '1.302162',
+            'Test2::API::Context'   => '1.302162',
+            'Test2::API::Instance'  => '1.302162',
+            'Test2::API::Stack'     => '1.302162',
+            'Test2::Event'          => '1.302162',
+            'Test2::Event::Bail'    => '1.302162',
+            'Test2::Event::Diag'    => '1.302162',
+            'Test2::Event::Encoding'=> '1.302162',
+            'Test2::Event::Exception'=> '1.302162',
+            'Test2::Event::Fail'    => '1.302162',
+            'Test2::Event::Generic' => '1.302162',
+            'Test2::Event::Note'    => '1.302162',
+            'Test2::Event::Ok'      => '1.302162',
+            'Test2::Event::Pass'    => '1.302162',
+            'Test2::Event::Plan'    => '1.302162',
+            'Test2::Event::Skip'    => '1.302162',
+            'Test2::Event::Subtest' => '1.302162',
+            'Test2::Event::TAP::Version'=> '1.302162',
+            'Test2::Event::V2'      => '1.302162',
+            'Test2::Event::Waiting' => '1.302162',
+            'Test2::EventFacet'     => '1.302162',
+            'Test2::EventFacet::About'=> '1.302162',
+            'Test2::EventFacet::Amnesty'=> '1.302162',
+            'Test2::EventFacet::Assert'=> '1.302162',
+            'Test2::EventFacet::Control'=> '1.302162',
+            'Test2::EventFacet::Error'=> '1.302162',
+            'Test2::EventFacet::Hub'=> '1.302162',
+            'Test2::EventFacet::Info'=> '1.302162',
+            'Test2::EventFacet::Meta'=> '1.302162',
+            'Test2::EventFacet::Parent'=> '1.302162',
+            'Test2::EventFacet::Plan'=> '1.302162',
+            'Test2::EventFacet::Render'=> '1.302162',
+            'Test2::EventFacet::Trace'=> '1.302162',
+            'Test2::Formatter'      => '1.302162',
+            'Test2::Formatter::TAP' => '1.302162',
+            'Test2::Hub'            => '1.302162',
+            'Test2::Hub::Interceptor'=> '1.302162',
+            'Test2::Hub::Interceptor::Terminator'=> '1.302162',
+            'Test2::Hub::Subtest'   => '1.302162',
+            'Test2::IPC'            => '1.302162',
+            'Test2::IPC::Driver'    => '1.302162',
+            'Test2::IPC::Driver::Files'=> '1.302162',
+            'Test2::Tools::Tiny'    => '1.302162',
+            'Test2::Util'           => '1.302162',
+            'Test2::Util::ExternalMeta'=> '1.302162',
+            'Test2::Util::Facets2Legacy'=> '1.302162',
+            'Test2::Util::HashBase' => '1.302162',
+            'Test2::Util::Trace'    => '1.302162',
+            'Test::Builder'         => '1.302162',
+            'Test::Builder::Formatter'=> '1.302162',
+            'Test::Builder::Module' => '1.302162',
+            'Test::Builder::Tester' => '1.302162',
+            'Test::Builder::Tester::Color'=> '1.302162',
+            'Test::Builder::TodoDiag'=> '1.302162',
+            'Test::More'            => '1.302162',
+            'Test::Simple'          => '1.302162',
+            'Test::Tester'          => '1.302162',
+            'Test::Tester::Capture' => '1.302162',
+            'Test::Tester::CaptureRunner'=> '1.302162',
+            'Test::Tester::Delegate'=> '1.302162',
+            'Test::use::ok'         => '1.302162',
+            'XS::APItest'           => '1.00',
+            'deprecate'             => '0.04',
+            'ok'                    => '1.302162',
+            'perlfaq'               => '5.20190126',
+        },
+        removed => {
         }
     },
 );
@@ -17057,6 +17157,13 @@ sub is_core
     },
     5.029007 => {
         delta_from => 5.029006,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029008 => {
+        delta_from => 5.029007,
         changed => {
         },
         removed => {

@@ -1,20 +1,14 @@
 NAME
-    `App::sourcepan' - fetch source tarballs from CPAN
+
+    App::sourcepan - modulino implementation of soucepan
 
 SYNOPSIS
-     $ sourcepan App::sourcepan
 
-     $ sourcepan --module App::sourcepan
+    This module contains the code to implement the sourcepan command.
 
-     $ sourcepan --dist App-sourcepan
-
-     $ sourcepan --dist App-sourcepan-0.01
-
-DESCRIPTION
-    This module provides a command sourcepan, which fetches the source
-    distribution for the modules or distributions named on the commandline,
-    and places each in the current working directory.
+    See sourcepan(1) for usage information.
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

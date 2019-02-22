@@ -2,6 +2,7 @@ Build.PL
 Changes
 ignore.txt
 lib/Net/SharePoint/Basic.pm
+CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 LICENSE.txt
 MANIFEST			This list of files

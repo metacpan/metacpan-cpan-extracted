@@ -97,7 +97,7 @@ sub get_databases {
                 wanted => sub {
                     my $file = $_;
                     return if ! -f $file;
-                    #print "$file\n";
+                    print "$file\n";
                     if ( ! eval {
                         open my $fh, '<:raw', $file or die "$file: $!";
                         defined( read $fh, my $string, 13 ) or die "$file: $!";
@@ -122,7 +122,7 @@ sub get_databases {
                 wanted => sub {
                     my $file = $_;
                     return if ! -f $file;
-                    #print "$file\n";
+                    print "$file\n";
                     eval {
                         open my $fh, '<:raw', $file or die "$file: $!";
                         defined( read $fh, my $string, 13 ) or die "$file: $!";

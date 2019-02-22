@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#OPTIONS-AND-ARGUMENTS">OPTIONS AND ARGUMENTS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>dtatw-get-ddc-attrs.perl - get DDC-relevant attributes from DTA::TokWrap files</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> dtatw-get-ddc-attrs.perl [OPTIONS] T_XML_FILE [SX_FILE=T_XML_FILE:.t.xml=.sx [CX_FILE=SX_FILE:.sx=.cx]]
+
+ General Options:
+  -help                  # this help message
+  -verbose LEVEL         # set verbosity level (0&lt;=LEVEL&lt;=3)
+  -quiet                 # be silent; alias for -verbose=0
+
+ I/O Options:
+  -output FILE           # specify output file (default=&#39;-&#39; (STDOUT))
+  -blanks , -noblanks    # do/don&#39;t keep &#39;ignorable&#39; whitespace in T_XML_FILE file (default=don&#39;t)
+  -dtd    , -nodtd       # do/don&#39;t load external DTDs (default=don&#39;t)
+  -ws     , -nows        # do/don&#39;t keep whitespace in //w/@t (default=don&#39;t)
+  -page   , -nopage      # do/don&#39;t extract //w/@pb (page-break; default=do)
+  -line   , -noline      # do/don&#39;t extract //w/@lb (line-break; default=do)
+  -rend   , -norend      # do/don&#39;t extract //w/@xr (rendition; default=do)
+  -xcon   , -noxcon      # do/don&#39;t extract //w/@xc (xml context; default=do)
+  -xpath  , -noxpath     # do/don&#39;t extract //w/@xp (trimmed xpath; default=do)
+  -xppath , -noxppath    # do/don&#39;t extract //w/@xpp (untrimmed xpath; default=don&#39;t)
+  -bbox   , -nobbox      # do/don&#39;t extract //w/@bb (bbox; default=don&#39;t)
+  -xlit   , -noxlit      # do/don&#39;t extract //w/@u  (unicruft transliteration; default=do)
+  -wsep   , -nowsep      # do/don&#39;t extract //w/@ws (boolean space-separation; default=do)
+  -keep-c , -nokeep-c    # do/don&#39;t keep existing //w/@c and //w/@cs attributes (default=keep)
+  -keep-b , -nokeep-b    # do/don&#39;t keep existing //w/@b attributes (default=keep)
+  -keep-xb, -nokeep-xb   # do/don&#39;t keep existing //w/@xb attributes (default=keep)
+  -formula-text TEXT     # output text for //formula elements (default=&#39;&#39; (no change))</code></pre>
+
+<h1 id="OPTIONS-AND-ARGUMENTS">OPTIONS AND ARGUMENTS</h1>
+
+<p>Not yet written.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Splice DDC-relevant attributes from DTA *.chr.xml files into DTA::TokWrap *.t.xml files.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="./dtatw-add-c.perl.html">dtatw-add-c.perl(1)</a>, <a href="./dta-tokwrap.perl.html">dta-tokwrap.perl(1)</a>, <a>dtatw-add-ws.perl(1)</a>, <a href="./dtatw-splice.perl.html">dtatw-splice.perl(1)</a>, <a>dtatw-rm-c.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+
+</body>
+
+</html>
+
+

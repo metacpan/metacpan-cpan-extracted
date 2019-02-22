@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2019 -- leonerd@leonerd.org.uk
 
 package Term::TermKey;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Exporter 'import';
 
@@ -32,6 +32,17 @@ C<Term::TermKey> - perl wrapper around C<libtermkey>
  print "You pressed: " . $tk->format_key( $key, 0 );
 
 =head1 DESCRIPTION
+
+=over 4
+
+B<Note> that C<libtermkey> itself is deprecated in favour of its eventual
+merge into C<libtickit>. As a result, uses of this module should also be
+considered deprecated. Consider rewriting code to use L<Tickit> instead;
+either by creating a L<Tickit::Term> to receive key input events, or perform a
+more wholescale rewrite into using C<Tickit> generally for all screen
+interaction purposes.
+
+=back
 
 This module provides a light perl wrapper around the C<libtermkey> library.
 This library attempts to provide an abstract way to read keypress events in
@@ -63,7 +74,9 @@ character (U+FFFD) if it is incomplete after this time.
 
 =cut
 
-=head2 $tk = Term::TermKey->new( $fh, $flags )
+=head2 new
+
+   $tk = Term::TermKey->new( $fh, $flags )
 
 Construct a new C<Term::TermKey> object that wraps the given term handle.
 C<$fh> should be either an IO handle reference, an integer referring to a
@@ -71,7 +84,9 @@ plain POSIX file descriptor, of C<undef>. C<$flags> is optional, but if given
 should contain the flags to pass to C<libtermkey>'s constructor. Assumes a
 default of 0 if not supplied. See the C<FLAG_*> constants.
 
-=head2 $tk = Term::TermKey->new_abstract( $termtype, $flags )
+=head2 new_abstract
+
+   $tk = Term::TermKey->new_abstract( $termtype, $flags )
 
 Construct a new abstract C<Term::TermKey> object not associated with a
 filehandle. Input may be fed to it using the C<push_bytes()> method
@@ -87,9 +102,13 @@ should be given in the C<$termtype> string.
 # The following documents the various XS-implemented methods in TermKey.xs in
 # the same order
 
-=head2 $success = $tk->start
+=head2 start
 
-=head2 $sucess = $tk->stop
+=head2 stop
+
+   $success = $tk->start
+
+   $success = $tk->stop
 
 Start or stop IO interactions from the instance. Starting will send the
 terminal initialisation sequence and set up C<termios(5)> settings, stopping
@@ -101,13 +120,19 @@ itself.
 
 Returns false if it fails; C<$!> will contain an error code.
 
-=head2 $started = $tk->is_started
+=head2 is_started
+
+   $started = $tk->is_started
 
 Returns true if the instance has been started, or false if it is stopped.
 
-=head2 $flags = $tk->get_flags
+=head2 get_flags
 
-=head2 $tk->set_flags( $newflags )
+=head2 set_flags
+
+   $flags = $tk->get_flags
+
+   $tk->set_flags( $newflags )
 
 Accessor and mutator for the flags. One of the C<FLAG_UTF8> or C<FLAG_RAW>
 flags will be set, even if neither was present in the constructor, as in this
@@ -116,17 +141,25 @@ or not.
 
 =cut
 
-=head2 $canonflags = $tk->get_canonflags
+=head2 get_canonflags
 
-=head2 $tk->set_canonflags( $newcanonflags )
+=head2 set_canonflags
+
+   $canonflags = $tk->get_canonflags
+
+   $tk->set_canonflags( $newcanonflags )
 
 Accessor and mutator for the canonicalisation flags.
 
 =cut
 
-=head2 $msec = $tk->get_waittime
+=head2 get_waittime
 
-=head2 $tk->set_waittime( $msec )
+=head2 set_waittime
+
+   $msec = $tk->get_waittime
+
+   $tk->set_waittime( $msec )
 
 Accessor and mutator for the maximum wait time in miliseconds. The underlying
 C<libtermkey> library will have specified a default value when the object was
@@ -134,14 +167,20 @@ constructed.
 
 =cut
 
-=head2 $bytes = $tk->get_buffer_remaining
+=head2 get_buffer_remaining
+
+   $bytes = $tk->get_buffer_remaining
 
 Accessor returning the number of bytes of buffer space remaining in the
 buffer; the space in which C<push_bytes> can write.
 
-=head2 $bytes = $tk->get_buffer_size
+=head2 get_buffer_size
 
-=head2 $tk->set_buffer_size( $size )
+=head2 set_buffer_size
+
+   $bytes = $tk->get_buffer_size
+
+   $tk->set_buffer_size( $size )
 
 Accessor and mutator to for the total buffer size to store pending bytes. If
 the underlying C<termkey_set_buffer_size(3)> call fails, the
@@ -149,7 +188,9 @@ C<set_buffer_size> method will throw an exception.
 
 =cut
 
-=head2 $res = $tk->getkey( $key )
+=head2 getkey
+
+   $res = $tk->getkey( $key )
 
 Attempt to retrieve a single keypress event from the buffer, and put it in
 C<$key>. If successful, will return C<RES_KEY> to indicate that the C<$key>
@@ -167,7 +208,9 @@ descriptor. For a normal blocking read, see C<waitkey()>.
 
 =cut
 
-=head2 $res = $tk->getkey_force( $key )
+=head2 getkey_force
+
+   $res = $tk->getkey_force( $key )
 
 Similar to C<getkey()>, but will not return C<RES_AGAIN> if a partial match
 was found. Instead, it will force an interpretation of the bytes, even if this
@@ -181,7 +224,9 @@ descriptor. For a normal blocking read, see C<waitkey()>.
 
 =cut
 
-=head2 $res = $tk->waitkey( $key )
+=head2 waitkey
+
+   $res = $tk->waitkey( $key )
 
 Attempt to retrieve a single keypress event from the buffer, or block until
 one is available. If successful, will return C<RES_KEY> to indicate that the
@@ -194,7 +239,9 @@ initialised to contain a new key structure.
 
 =cut
 
-=head2 $res = $tk->advisereadable
+=head2 advisereadable
+
+   $res = $tk->advisereadable
 
 Inform the underlying library that new input may be available on the
 underlying file descriptor and so it should call C<read()> to obtain it.
@@ -207,7 +254,9 @@ gracefully handles an C<EAGAIN> error from the underlying C<read()> syscall.
 
 =cut
 
-=head2 $len = $tk->push_bytes( $bytes )
+=head2 push_bytes
+
+   $len = $tk->push_bytes( $bytes )
 
 Feed more bytes into the input buffer. This is primarily useful for feeding
 input into filehandle-less instances, constructed by passing C<undef> or C<-1>
@@ -216,14 +265,18 @@ will be available to read as keypresses by the C<getkey> method.
 
 =cut
 
-=head2 $str = $tk->get_keyname( $sym )
+=head2 get_keyname
+
+   $str = $tk->get_keyname( $sym )
 
 Returns the name of a key sym, such as returned by
 C<< Term::TermKey::Key->sym() >>.
 
 =cut
 
-=head2 $sym = $tk->keyname2sym( $keyname )
+=head2 keyname2sym
+
+   $sym = $tk->keyname2sym( $keyname )
 
 Look up the sym for a named key. The result of this method call can be
 compared directly against the value returned by
@@ -233,7 +286,9 @@ initialisation, and the result stored for easier comparisons during runtime.
 
 =cut
 
-=head2 ( $cmd, @args ) = $tk->interpret_unknown_csi( $key )
+=head2 interpret_unknown_csi
+
+   ( $cmd, @args ) = $tk->interpret_unknown_csi( $key )
 
 If C<$key> contains an unknown CSI event then its command and arguments are
 returned in a list. C<$cmd> will be a string of 1 to 3 characters long,
@@ -250,7 +305,9 @@ overwrite that buffer.
 
 =cut
 
-=head2 $str = $tk->format_key( $key, $format )
+=head2 format_key
+
+   $str = $tk->format_key( $key, $format )
 
 Return a string representation of the keypress event in C<$key>, following the
 flags given. See the descriptions of the flags, below, for more detail.
@@ -260,7 +317,9 @@ a hash. See EXAMPLES section for more detail.
 
 =cut
 
-=head2 $key = $tk->parse_key( $str, $format )
+=head2 parse_key
+
+   $key = $tk->parse_key( $str, $format )
 
 Return a keypress event by parsing the string representation in C<$str>,
 following the flags given. This method is an inverse of C<format_key>.
@@ -269,7 +328,9 @@ This may be useful for parsing entries from a configuration file or similar.
 
 =cut
 
-=head2 $key = $tk->parse_key_at_pos( $str, $format )
+=head2 parse_key_at_pos
+
+   $key = $tk->parse_key_at_pos( $str, $format )
 
 Return a keypress event by parsing the string representation in a region of
 C<$str>, following the flags given.
@@ -286,7 +347,9 @@ of a larger string.
 
 =cut
 
-=head2 $cmp = $tk->keycmp( $key1, $key2 )
+=head2 keycmp
+
+   $cmp = $tk->keycmp( $key1, $key2 )
 
 Compares the two given keypress events, returning a number less than, equal
 to, or greater than zero, depending on the ordering. Keys are ordered first by
@@ -311,78 +374,106 @@ will place a new key structure in the C<$key> variable if it is undefined when
 they are called. C<parse_key()> and C<parse_key_at_pos()> will return new
 keys.
 
-=head2 $key->type
+=head2 type
+
+   $key->type
 
 The type of event. One of C<TYPE_UNICODE>, C<TYPE_FUNCTION>, C<TYPE_KEYSYM>,
 C<TYPE_MOUSE>, C<TYPE_POSITION>, C<TYPE_MODEREPORT>, C<TYPE_UNKNOWN_CSI>.
 
-=head2 $key->type_is_unicode
+=head2 type_is_...
 
-=head2 $key->type_is_function
+   $key->type_is_unicode
 
-=head2 $key->type_is_keysym
+   $key->type_is_function
 
-=head2 $key->type_is_mouse
+   $key->type_is_keysym
 
-=head2 $key->type_is_position
+   $key->type_is_mouse
 
-=head2 $key->type_is_modereport
+   $key->type_is_position
 
-=head2 $key->type_is_unknown_csi
+   $key->type_is_modereport
+
+   $key->type_is_unknown_csi
 
 Shortcuts which return a boolean.
 
-=head2 $key->codepoint
+=head2 codepoint
+
+   $key->codepoint
 
 The Unicode codepoint number for C<TYPE_UNICODE>, or 0 otherwise.
 
-=head2 $key->number
+=head2 number
+
+   $key->number
 
 The function key number for C<TYPE_FUNCTION>, or 0 otherwise.
 
-=head2 $key->sym
+=head2 sym
+
+   $key->sym
 
 The key symbol number for C<TYPE_KEYSYM>, or 0 otherwise. This can be passed
 to C<< Term::TermKey->get_keyname() >>, or compared to a result earlier
 obtained from C<< Term::TermKey->keyname2sym() >>.
 
-=head2 $key->modifiers
+=head2 modifiers
+
+   $key->modifiers
 
 The modifier bitmask. Can be compared against the C<KEYMOD_*> constants.
 
-=head2 $key->modifier_shift
+=head2 modifier_...
 
-=head2 $key->modifier_alt
+   $key->modifier_shift
 
-=head2 $key->modifier_ctrl
+   $key->modifier_alt
+
+   $key->modifier_ctrl
 
 Shortcuts which return a boolean if the appropriate modifier is present.
 
-=head2 $key->utf8
+=head2 utf8
+
+   $key->utf8
 
 A string representation of the given Unicode codepoint. If the underlying
 C<termkey> library is in UTF-8 mode then this will be a UTF-8 string. If it is
 in raw mode, then this will be a single raw byte.
 
-=head2 $key->mouseev
+=head2 mouseev
 
-=head2 $key->button
+=head2 button
+
+   $key->mouseev
+
+   $key->button
 
 The details of a mouse event for C<TYPE_MOUSE>, or C<undef> for other types of
 event.
 
-=head2 $key->line
+=head2 line
 
-=head2 $key->col
+=head2 col
+
+   $key->line
+
+   $key->col
 
 The details of a mouse or position event, or C<undef> for other types of
 event.
 
-=head2 $key->termkey
+=head2 termkey
+
+   $key->termkey
 
 Return the underlying C<Term::TermKey> object this key was retrieved from.
 
-=head2 $str = $key->format( $format )
+=head2 format
+
+   $str = $key->format( $format )
 
 Returns a string representation of the keypress event, identically to calling
 C<format_key> on the underlying C<Term::TermKey> object.

@@ -53,7 +53,7 @@ sub join_tables {
         my $info = '  INFO';
         my $from_subquery = '  Derived';
         my @choices = map { "- $_" } @$tables;
-        push @choices, $from_subquery if $sf->{o}{extend}{join};
+        push @choices, $from_subquery if $sf->{o}{enable}{j_derived};
         push @choices, $info;
         my @pre = ( undef );
         # Choose
@@ -168,7 +168,7 @@ sub __add_slave_with_join_condition {
             push @choices, '- ' . $table;
         }
     }
-    push @choices, $from_subquery if $sf->{o}{extend}{join};
+    push @choices, $from_subquery if $sf->{o}{enable}{j_derived};
     push @choices, $info;
     my @pre = ( undef );
     my @bu;

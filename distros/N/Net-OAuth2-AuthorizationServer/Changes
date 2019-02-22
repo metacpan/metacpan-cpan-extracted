@@ -1,5 +1,8 @@
 Revision history for Net-OAuth2-AuthorizationServer
 
+0.20     2019-03-01
+        - Fix example oauth2_client.pl (GH #23)
+
 0.19     2018-12-01
         - Avoid returning from the try/catch block as this never works
           (GH #20, GH #21, thanks to Dylan William Hardison)

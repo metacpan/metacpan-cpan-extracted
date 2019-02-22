@@ -26,24 +26,25 @@ no_index:
 provides:
   MooseX::BuildArgs:
     file: lib/MooseX/BuildArgs.pm
-    version: '0.07'
+    version: '0.08'
   MooseX::BuildArgs::Meta::Object:
     file: lib/MooseX/BuildArgs/Meta/Object.pm
-    version: '0.07'
+    version: '0.08'
   MooseX::BuildArgs::Meta::ToClass:
     file: lib/MooseX/BuildArgs/Meta/ToClass.pm
-    version: '0.07'
+    version: '0.08'
   MooseX::BuildArgs::Meta::ToRole:
     file: lib/MooseX/BuildArgs/Meta/ToRole.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Moose: '1.23'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/bluefeet/MooseX-BuildArgs/issues
   homepage: https://github.com/bluefeet/MooseX-BuildArgs
   repository: git://github.com/bluefeet/MooseX-BuildArgs.git
-version: '0.07'
+version: '0.08'
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

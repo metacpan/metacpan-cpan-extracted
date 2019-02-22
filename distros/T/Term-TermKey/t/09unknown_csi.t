@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More;
 
 use Term::TermKey;
 
@@ -28,3 +28,5 @@ is( $tk->getkey( $key ), RES_KEY, 'getkey yields RES_KEY after unrecognised CSI 
 
 is( $cmd, "? w", '$cmd for unrecognised CSI ? Sp w' );
 is_deeply( \@args, [ 4 ], '@args for unrecognised CSI ? Sp w' );
+
+done_testing;

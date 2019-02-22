@@ -42,7 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Moose" : "1.23"
+            "Moose" : "1.23",
+            "perl" : "5.008001"
          }
       },
       "test" : {
@@ -54,19 +55,19 @@
    "provides" : {
       "MooseX::BuildArgs" : {
          "file" : "lib/MooseX/BuildArgs.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "MooseX::BuildArgs::Meta::Object" : {
          "file" : "lib/MooseX/BuildArgs/Meta/Object.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "MooseX::BuildArgs::Meta::ToClass" : {
          "file" : "lib/MooseX/BuildArgs/Meta/ToClass.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "MooseX::BuildArgs::Meta::ToRole" : {
          "file" : "lib/MooseX/BuildArgs/Meta/ToRole.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -80,10 +81,10 @@
          "web" : "https://github.com/bluefeet/MooseX-BuildArgs"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

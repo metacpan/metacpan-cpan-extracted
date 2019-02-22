@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More;
 
 use Term::Terminfo;
 
@@ -26,3 +26,5 @@ ok( $ti->flag_by_varname( "auto_right_margin" ), '$ti has auto_right_margin' );
 is( $ti->num_by_varname( "init_tabs" ), 8, '$ti has init_tabs at 8' );
 
 is( $ti->str_by_varname( "carriage_return" ), "\cM", '$ti has ^M carriage_return' );
+
+done_testing;

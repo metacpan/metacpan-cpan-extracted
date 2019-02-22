@@ -33,5 +33,5 @@ requires:
   Test::More: '1'
 resources:
   repository: https://sourceforge.net/projects/gtk2-ex-dblinker/
-version: '0.112'
+version: '0.113'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

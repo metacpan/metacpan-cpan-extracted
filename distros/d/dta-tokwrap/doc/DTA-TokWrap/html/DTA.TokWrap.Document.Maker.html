@@ -1,0 +1,267 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="dtatw.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Globals">Globals</a></li>
+      <li><a href="#Constructors-etc">Constructors etc.</a></li>
+      <li><a href="#Methods:-make-Mode:-Dependency-Tracking">Methods: make Mode: Dependency Tracking</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SEE-ALSO1">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DTA::TokWrap::Document::Maker - DTA tokenizer wrappers: document wrapper: make-mode</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> use DTA::TokWrap::Document::Maker;
+ 
+ $doc = DTA::TokWrap::Document::Maker-&gt;new(%opts);
+ $doc-&gt;makeKey($key);
+ 
+ ##-- ... any other DTA::TokWrap::Document method ...</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>DTA::TokWrap::Document::Maker provides an experimental <a>DTA::TokWrap::Document</a> subclass which attempts to perform <code>make</code>-like dependency tracking on document data keys.</p>
+
+<h2 id="Globals">Globals</h2>
+
+<dl>
+
+<dt id="ISA">@ISA</dt>
+<dd>
+
+<p>DTA::TokWrap::Document::Maker inherits from <a>DTA::TokWrap::Document</a>, and should support all DTA::TokWrap::Document methods.</p>
+
+</dd>
+</dl>
+
+<h2 id="Constructors-etc">Constructors etc.</h2>
+
+<dl>
+
+<dt id="new">new</dt>
+<dd>
+
+<pre><code> $doc = $CLASS_OR_OBJECT-&gt;new(%args);</code></pre>
+
+<p>Low-level constructor for make-mode document wrapper object. See <a>DTA::TokWrap::Document::new</a>.</p>
+
+</dd>
+<dt id="defaults">defaults</dt>
+<dd>
+
+<pre><code> %defaults = CLASS-&gt;defaults();</code></pre>
+
+<p>Static class-dependent defaults.</p>
+
+</dd>
+<dt id="init">init</dt>
+<dd>
+
+<pre><code> $doc = $doc-&gt;init();</code></pre>
+
+<p>Dynamic object-dependent defaults.</p>
+
+</dd>
+</dl>
+
+<h2 id="Methods:-make-Mode:-Dependency-Tracking">Methods: make Mode: Dependency Tracking</h2>
+
+<dl>
+
+<dt id="Variable:-KEYGEN">Variable: %KEYGEN</dt>
+<dd>
+
+<p>%KEYGEN = ($dataKey =&gt; $generatorSpec, ...)</p>
+
+<p>See <a>%DTA::TokWrap::Document::KEYGEN</a>.</p>
+
+</dd>
+<dt id="KEYDEPS">%KEYDEPS</dt>
+<dd>
+
+<pre><code> %KEYDEPS = ($dataKey =&gt; \@depsForKey, ...)</code></pre>
+
+<p>Recursive key dependencies.</p>
+
+</dd>
+<dt id="KEYDEPS_0">%KEYDEPS_0</dt>
+<dd>
+
+<pre><code> %KEYDEPS_0 = ($dataKey =&gt; \@immediateDepsForKey, ...)</code></pre>
+
+<p>Immediate key dependencies.</p>
+
+</dd>
+<dt id="KEYDEPS_H">%KEYDEPS_H</dt>
+<dd>
+
+<pre><code> %KEYDEPS_0 = ($dataKey =&gt; {$dep1=&gt;undef,$dep2=&gt;undef,...}, ...)</code></pre>
+
+<p>Recursive dependencies as a hash-of-hashes.</p>
+
+</dd>
+<dt id="keycmp">keycmp</dt>
+<dd>
+
+<pre><code> $cmp = DTA::ToKWrap::Document::Maker::keycmp($a,$b);</code></pre>
+
+<p>Sort comparison function for data keys.</p>
+
+</dd>
+<dt id="uniqKeys">uniqKeys</dt>
+<dd>
+
+<pre><code> @uniqKeys = uniqKeys(@keys);</code></pre>
+
+<p>Returns unique keys from @keys.</p>
+
+</dd>
+<dt id="keyDeps0">keyDeps0</dt>
+<dd>
+
+<pre><code> @deps0 = PACKAGE::keyDeps0(@docKeys);</code></pre>
+
+<p>Returns unique immediate dependencies for @docKeys.</p>
+
+</dd>
+<dt id="keyDeps">keyDeps</dt>
+<dd>
+
+<pre><code> @deps = PACKAGE::keyDeps(@docKeys);</code></pre>
+
+<p>Returns unique recursive dependencies for @docKeys.</p>
+
+</dd>
+<dt id="keyStamp">keyStamp</dt>
+<dd>
+
+<pre><code> $floating_secs_or_undef = $doc-&gt;keyStamp($key);</code></pre>
+
+<p>Returns $doc-&gt;{&quot;${key}_stamp&quot;} if it exists. Otherwise returns file modification time for file keys. Returned value is (floating point) seconds since epoch.</p>
+
+</dd>
+<dt id="keyNewerDeps">keyNewerDeps</dt>
+<dd>
+
+<pre><code> @newerDeps = $doc-&gt;keyNewerDeps($key);
+ @newerDeps = $doc-&gt;keyNewerDeps($key, $missingDepsAreNewer)</code></pre>
+
+<p>Returns list of recursive dependencies for $key which are newer than $key itself. If $missingDepsAreNewer is given and true, missing dependencies are not allowed.</p>
+
+</dd>
+<dt id="keyIsCurrent">keyIsCurrent</dt>
+<dd>
+
+<pre><code> $bool = $doc-&gt;keyIsCurrent($key);
+ $bool = $doc-&gt;keyIsCurrent($key, $requireMissingDeps)</code></pre>
+
+<p>Returns true iff $key is at least as new as all its dependencies.</p>
+
+<p>If $requireMissingDeps is true, missing dependencies are treated as infinitely new (function returns false).</p>
+
+</dd>
+<dt id="genKey">genKey</dt>
+<dd>
+
+<pre><code> $bool = $doc-&gt;genKey($key);
+ $bool = $doc-&gt;genKey($key,\%KEYGEN)</code></pre>
+
+<p>Unconditionally (re-)generate a data key (single step only, ignoring dependencies).</p>
+
+<p>Passes on local \%KEYGEN.</p>
+
+</dd>
+<dt id="makeKey">makeKey</dt>
+<dd>
+
+<pre><code> $bool = $doc-&gt;makeKey($key);
+ $bool = $doc-&gt;makeKey($key,\%queued)</code></pre>
+
+<p>Conditionally (re-)generate a data key, checking dependencies.</p>
+
+</dd>
+<dt id="makeAll">makeAll</dt>
+<dd>
+
+<pre><code> $bool = $doc-&gt;makeAll();</code></pre>
+
+<p>Alias for $doc-&gt;makeKey(&#39;all&#39;).</p>
+
+</dd>
+<dt id="forceStale">forceStale</dt>
+<dd>
+
+<pre><code> undef = $doc-&gt;forceStale(@keys);</code></pre>
+
+<p>Forces all keys @keys to be considered stale by setting $doc-&gt;{&quot;${key}_stamp&quot;}=-$ix, where $ix is the index of $key in the dependency-sorted list.</p>
+
+<p>You can use the $doc-&gt;keyDeps() method to get a list of all dependencies. In particular, using $doc-&gt;keyDeps(&#39;all&#39;) should mark all keys as stale</p>
+
+</dd>
+<dt id="remakeKey">remakeKey</dt>
+<dd>
+
+<pre><code> $keyval_or_undef = $doc-&gt;remakeKey($key);</code></pre>
+
+<p>Unconditionally (re-)generate a data key and all its dependencies.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="SEE-ALSO1">SEE ALSO</h1>
+
+<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="...script.dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Bryan Jurish &lt;moocow@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2018 by Bryan Jurish</p>
+
+<p>This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.14.2 or, at your option, any later version of Perl 5 you may have available.</p>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>
+
+

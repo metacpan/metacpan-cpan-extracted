@@ -4,7 +4,7 @@ use REST::Client;
 use MIME::Base64;
 use JSON;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has 'instance' => (
     is => 'rw',
@@ -111,7 +111,7 @@ sub _build_search_string {
 
         my @terms;
         foreach my $key ( keys %{ $search } ) {
-            push( @terms, "$key=" . $search->{$key} );
+            push( @terms, "$key=" . ( $search->{$key} ? $search->{$key} : "" ) );
         }
 
         $search_str .= join( '^', @terms );

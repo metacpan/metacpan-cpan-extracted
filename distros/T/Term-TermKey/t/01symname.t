@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use Term::TermKey;
 
@@ -17,3 +17,5 @@ my $sym = $tk->keyname2sym( 'Space' );
 ok( defined $sym, "defined keyname2sym('Space')" );
 
 is( $tk->get_keyname( $sym ), 'Space', "get_keyname eq Space" );
+
+done_testing;

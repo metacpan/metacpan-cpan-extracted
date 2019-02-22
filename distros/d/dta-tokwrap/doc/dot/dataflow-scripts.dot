@@ -1,0 +1,76 @@
+/* -*- Mode: C -*- */
+digraph dataflow {
+  node [shape=rectangle,height=0.25,fontname="Courier"];
+  edge [decorate=0,fontname="Courier"];
+
+  xml [label="x.xml"];
+
+  mkindex [label="dtatw-mkindex.c",shape=rectangle,style=filled,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  xml -> mkindex;
+
+  cx [label="x.cx"];
+  sx [label="x.sx"];
+  tx [label="x.tx"];
+  mkindex -> cx;
+  mkindex -> sx;
+  mkindex -> tx;
+  {rank=same; cx sx tx}
+
+  bx0 [label="x.bx0"];
+  mkbx0 [label="xml-rm-namespaces.c\ndtatw-insert-hints.xsl\ndtatw-mark-sortkeys.xsl",shape=rectangle,style=filled,fillcolor=yellow,fontname="Courier-Bold"];
+  sx -> mkbx0;
+  mkbx0 -> bx0;
+
+  bx [label="x.bx"];
+  txt [label="x.txt"];
+  lsblocks [label="dtatw-lsblocks.perl",shape=rectangle,style=filled,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  bx0 -> lsblocks;
+  tx  -> lsblocks;
+  lsblocks -> bx;
+  lsblocks -> txt;
+  {rank=same; bx txt}
+
+  t [label="x.t"];
+  tokenize [label="dtatw-tokenize-dummy.l",shape=rectangle,style=filled,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  txt -> tokenize;
+  tokenize -> t;
+
+  t_xml [label="x.t.xml"];
+  t2xml [label="dtatw-tt2xml.perl",shape=rectangle,style=filled,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  t -> t2xml;
+  bx -> t2xml;
+  cx -> t2xml;
+  t2xml -> t_xml;
+
+  /*
+  w_xml [label="x.w.xml"];
+  txml2wxml [label="dtatw-txml2wxml.xsl",shape=rectangle,style=filled,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  t_xml -> txml2wxml;
+  txml2wxml -> w_xml;
+  //w_xml -> xml [label="xml:base",style=dotted];
+
+  s_xml [label="x.s.xml"];
+  txml2sxml [label="dtatw-txml2sxml.xsl",shape=rectangle,style=filled,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  t_xml -> txml2sxml;
+  txml2sxml -> s_xml;
+  //s_xml -> w_xml [label="xml:base",style=dotted];
+
+  a_xml [label="x.a.xml"];
+  txml2axml [label="dtatw-txml2axml.xsl",shape=rectangle,style=filled,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  t_xml -> txml2axml;
+  txml2axml -> a_xml;
+  //a_xml -> w_xml [label="xml:base",style=dotted];
+  */
+
+  //-- splicing
+  add_ws  [label="dtatw-add-ws.perl",shape=rectangle,style=filled,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  t_xml -> add_ws;
+  xml   -> add_ws;
+  add_ws -> cws_xml;
+  cws_xml [label="x.cws.xml"];
+
+  splice [label="dtatw-splice.perl",shape=rectangle,style=filled,fillcolor=PaleGreen,fontname="Courier-Bold"];
+  cws_xml -> splice;
+  splice -> cwst_xml;
+  cwst_xml [label="x.cwst.xml"];
+}

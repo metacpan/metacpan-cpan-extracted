@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.33 {
+package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.34 {
 
   use 5.014;
   use Path::Tiny qw( path );
@@ -17,6 +17,11 @@ package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.33 {
     is      => 'ro',
     default => 'plicease',
   );
+
+  has appveyor_user => (
+    is      => 'ro',
+    default => 'plicease',
+  );
   
   has appveyor => (
     is  => 'ro',
@@ -29,12 +34,12 @@ package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.33 {
     my $readme = $self->zilla->root->child("README.md");
     if(-r $readme)
     {
-      my $name = $self->zilla->root->absolute->basename;
+      my $name = $self->zilla->name;
       my $user = $self->travis_user;
       
       my $status = '';
       $status .= " [![Build Status](https://secure.travis-ci.org/$user/$name.png)](http://travis-ci.org/$user/$name)" if $self->travis_status;
-      $status .= " [![Build status](https://ci.appveyor.com/api/projects/status/@{[ $self->appveyor ]}/branch/master?svg=true)](https://ci.appveyor.com/project/$user/$name/branch/master)" if $self->appveyor;
+      $status .= " [![Build status](https://ci.appveyor.com/api/projects/status/@{[ $self->appveyor ]}/branch/master?svg=true)](https://ci.appveyor.com/project/@{[ $self->appveyor_user ]}/$name/branch/master)" if $self->appveyor;
       
       my $content = $readme->slurp;
       $content =~ s{# NAME\s+(.*?) - (.*?#)}{# $1$status\n\n$2}s;
@@ -64,7 +69,7 @@ Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup - add a travis status but
 
 =head1 VERSION
 
-version 2.33
+version 2.34
 
 =head1 SYNOPSIS
 

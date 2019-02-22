@@ -3,9 +3,12 @@ abstract: 'Pherkin extension for web-testing'
 author:
   - 'Erik Huelsmann <ehuels@gmail.com>'
 build_requires:
+  Carp::Always: '0'
   Test::More: '0'
+  Weasel::Driver::Mock: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
@@ -14,12 +17,15 @@ meta-spec:
   version: '1.4'
 name: Pherkin-Extension-Weasel
 requires:
+  File::Share: '0'
   Module::Runtime: '0'
   Moose: '0'
+  Template: '0'
   Test::BDD::Cucumber: '0.50'
   Weasel: '0'
+  Weasel::Session: '0.08'
 resources:
   bugtracker: https://github.com/ehuelsmann/pherkin-extension-weasel/issues
   repository: https://github.com/ehuelsmann/pherkin-extension-weasel.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -8,7 +8,7 @@ package Tickit::RenderBuffer;
 use strict;
 use warnings;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 use Carp;
 use Scalar::Util qw( refaddr );
@@ -335,7 +335,7 @@ Successive calls to this method will replace the active pen used, but if there
 is a saved state on the stack it will be merged with the rendering pen of the
 most recent saved state.
 
-This method may be preferrable to passing pens into multiple C<text> or
+This method may be preferable to passing pens into multiple C<text> or
 C<erase> calls as it may be more efficient than merging the same pen on every
 call. If the original pen is still required afterwards, the C<savepen> /
 C<restore> pair may be useful.
@@ -509,7 +509,7 @@ the segment should go to the centre of each cell, or should continue through
 the entire body of the cell and stop at the boundary. By default line segments
 will start and end at the centre of the cells, so that horizontal and vertical
 lines meeting in a cell will form a neat corner. When drawing isolated lines
-such as horizontal or vertical rules, it is preferrable that the line go right
+such as horizontal or vertical rules, it is preferable that the line go right
 through the cells at the start and end. To control this behaviour, the
 C<$caps> bitmask is used. C<CAP_START> and C<CAP_END> state that the line
 should consume the whole of the start or end cell, respectively; C<CAP_BOTH>

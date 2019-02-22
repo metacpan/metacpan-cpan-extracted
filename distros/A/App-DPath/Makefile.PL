@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     "YAML::Syck" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
