@@ -19,8 +19,8 @@ is decompress(compress_mt(\$src, 2)), $src, 'Multi Thread ScalarRef';
 
 decompress("1");
 
-is ZSTD_VERSION_NUMBER, 10307;
-is ZSTD_VERSION_STRING, '1.3.7';
+is ZSTD_VERSION_NUMBER, 10308;
+is ZSTD_VERSION_STRING, '1.3.8';
 is ZSTD_MAX_CLEVEL, 22;
 
 done_testing;

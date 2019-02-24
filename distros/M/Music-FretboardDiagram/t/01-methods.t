@@ -21,6 +21,9 @@ throws_ok {
 throws_ok {
     $obj = Music::FretboardDiagram->new( size => 'foo' )
 } qr/not a positive integer/, 'bogus size dies';
+throws_ok {
+    $obj = Music::FretboardDiagram->new( chord => '54321' )
+} qr/Chord length and string length differ/, 'chord length not equal to strings';
 
 $obj = Music::FretboardDiagram->new( chord => 'xxxxxx' );
 isa_ok $obj, 'Music::FretboardDiagram';

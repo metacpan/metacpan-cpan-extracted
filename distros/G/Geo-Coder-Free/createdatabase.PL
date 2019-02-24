@@ -223,6 +223,17 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20902,
 		}, {
+			'LAT' => 38.993369,
+			'LON' => -77.009501,
+			'NAME' => 'LA CASITA PUPESERIA AND MARKET',
+			'NUMBER' => 8214,
+			'STREET' => 'PINEY BRANCH ROAD',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20910,
+		}, {
 			'NAME' => 'SNIDERS',
 			'LAT' => 39.0088797,
 			'LON' => -77.04162824,
@@ -416,6 +427,17 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'VA',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 22180
+		}, {
+			'LAT' => 38.915635,
+			'LON' => -77.225730,
+			'NAME' => 'THE CAPITAL GRILLE RESTAURANT',
+			'NUMBER' => 1861,
+			'STEET' => 'INTERNATIONAL DR',
+			'CITY' => 'MCLEAN',
+			'COUNTY' => 'FAIRFAX',
+			'STATE' => 'VA',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 22102
 		}
 	], 'other' => [
 		{

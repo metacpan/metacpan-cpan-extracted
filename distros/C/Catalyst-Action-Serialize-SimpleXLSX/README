@@ -1,0 +1,18 @@
+Catalyst::Action::Serialize::SimpleXLSX
+=======================================
+
+This module
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or install using 'cpanm':
+
+  cpanm Catalyst::Action::Serialize::SimpleXLSX
+

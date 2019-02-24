@@ -1,3 +1,6 @@
+# git
+\.git$
+
 # Komodo project file
 \.kpf$
 

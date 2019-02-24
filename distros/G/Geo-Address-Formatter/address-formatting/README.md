@@ -52,19 +52,22 @@ Unlike [physical post (office) mail](http://www.bitboost.com/ref/international-a
 
 Our goal with this repository is a series of (programming) language independent templates. Those templates can then be processed by whatever software you like. 
 
-We've written, use and maintain a working implementation of a processer in Perl, see (CPAN: [Geo::Address::Formatter](https://metacpan.org/release/Geo-Address-Formatter), [github repo](https://github.com/opencagedata/perl-Geo-Address-Formatter)). 
-There is also an open-source [implementation in PHP](https://github.com/predicthq/address-formatter-php).
+There are open-source implementations in
 
-We would love there to be other language implementations. 
-If you do write a processor, please let us know so we can list it here. 
+  * [Javascript](https://github.com/fragaria/address-formatter)
+  * [Perl](https://github.com/opencagedata/perl-Geo-Address-Formatter) - [on CPAN](https://metacpan.org/release/Geo-Address-Formatter)
+  * [PHP](https://github.com/predicthq/address-formatter-php)
+
+We would love there to be other language implementations.
+If you write a processor, please let us know so we can list it here. 
 
 ### Coverage
 
-As of `Sat 25 Mar 2017` coverage is:
+As of `Sun 17 Feb 2019` coverage is:
 
     We are aware of 248 territories
-    We have tests for 250 (100%) territories
-    We have rules for 249 (100%) territories
+    We have tests for 248 (100%) territories
+    We have rules for 248 (100%) territories
     0 (0%) territories have neither rules nor tests
 
 We need more language specific abbreviations, please see `conf/abbreviations`
@@ -124,7 +127,7 @@ We welcome your pull requests. Together we can address the world!
 
 We run the [OpenCage Geocoder](https://opencagedata.com). 
 
-We also run [#geomob](http://geomobldn.org), a meetup of London location based service developers where we do our best to highlight geoinnovation. 
+We also run [#geomob](https://thegeomob.com), a series of regular meetups of location based service creators in London and Barcelona, where we do our best to highlight geoinnovation. 
 
 ### Further reading
 

@@ -1,6 +1,9 @@
 Revision history for WWW-Scraper-ISBN-Booktopia_Driver
 ======================================================
 
+0.23    2019-02-23
+        - patterns and test data updated, due to site changes.
+
 0.22    2015-02-11
         - test data updated, due bad data on site.
 

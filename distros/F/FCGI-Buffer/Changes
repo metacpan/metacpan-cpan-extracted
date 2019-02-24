@@ -1,5 +1,14 @@
 Revision history for FCGI-Buffer
 
+0.13	Sat Feb 23 20:17:41 EST 2019
+	Fix copy and paste error
+
+0.12	Sat Feb 23 13:24:56 EST 2019
+	Get the return status from the CGI::Info object
+	Optimise lists a bit more
+	Optmise <center>
+	Added t/links.t and t/no404s.t
+
 0.11	Wed Oct  4 08:52:44 EDT 2017
 	Work with the latest IO::Compress::Brotli
 	Allow save_to to be disabled after it was enabled

@@ -1,6 +1,9 @@
 Revision history for WWW-Scraper-ISBN-Pearson_Driver
 ====================================================
 
+0.24    2019-02-23
+        - updated test data.
+
 0.23    2015-02-06
         - updated regex for site changes.
 

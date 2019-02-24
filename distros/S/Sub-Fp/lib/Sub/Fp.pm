@@ -6,7 +6,7 @@ use POSIX;
 use List::Util;
 use Data::Dumper qw(Dumper);
 use Exporter qw(import);
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 our @EXPORT_OK = qw(
     incr        reduces   flatten
     drop_right  drop      take_right  take
@@ -730,14 +730,14 @@ and it's existed in functional languages for well over half a century.
 Its a natural application of functional composition.
 To get a better feel for what it looks like in other languages see:
 
-    #1 thread-as macro in Clojure
+1. thread-as macro in Clojure
 
-    #2 Partialing in Lodash, PyToolz etc
+2. Partialing in Lodash, PyToolz etc
 
-    #3 Auto Currying in Haskell, Lodash-Fp, Ramda, Elm
+3. Auto Currying in Haskell, Lodash-Fp, Ramda, Elm
 
 4. The use of C<_> in languages as a placeholder. This library uses
-dobule underscore instead to differentiate it from the native library,
+double underscore instead to differentiate it from the native library,
 which already uses a single underscore in some circumstances.
 
 =cut

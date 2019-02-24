@@ -13,12 +13,15 @@
 # ABSTRACT: Read chess opening books in polyglot format
 
 package Chess::Opening::Book::Polyglot;
-$Chess::Opening::Book::Polyglot::VERSION = '0.3';
+$Chess::Opening::Book::Polyglot::VERSION = '0.5';
 use common::sense;
+
+use 5.12.0;
 
 use base 'Chess::Opening::Book';
 
 use Fcntl qw(:seek);
+use IO::Seekable 1.20;
 
 use Chess::Opening::Book::Polyglot::Random64;
 

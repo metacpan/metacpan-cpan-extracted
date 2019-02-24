@@ -3,7 +3,7 @@ NAME
     combination of header and rows.
 
 VERSION
-    Version 1.0.2 (The versioning is conform with <https://semver.org/>.)
+    Version 1.0.3 (The versioning is conform with <https://semver.org/>.)
 
 SYNOPSIS
       use Term::Table2;
@@ -96,9 +96,14 @@ DESCRIPTION
     can first be checked after the very first row will have been delivered
     by the callback function.
 
-    If table contains some wide unicode characters, the represantation will
-    only be correct in case the module Unicode::GCString is installed,
-    otherwise this can be twisted but no exception will be raised.
+    If table contains some wide unicode characters, the representation will
+    only be correct if the module Unicode::GCString is installed and the
+    Perl has been compiled without the debugging option (i.e. without
+    -DDEBUGGING), otherwise this can be twisted but no exception will be
+    raised. The reason, why the debugging option leads to troubles in form
+    of the error *perl: sv.c:2336: Perl_sv_2iv_flags: Assertion `SvTYPE(sv)
+    != SVt_PVAV && SvTYPE(sv) != SVt_PVHV && SvTYPE(sv) != SVt_PVFM' failed*
+    using this module is still unclear.
 
   COMMON METHODS
    new

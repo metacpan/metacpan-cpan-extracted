@@ -6,14 +6,16 @@ use API::MikroTik::Sentence qw(encode_sentence);
 use Carp ();
 use Mojo::Collection;
 use Mojo::IOLoop;
-use Mojo::Util 'md5_sum';
+use Mojo::Util qw(md5_sum deprecated);
 use Scalar::Util 'weaken';
 
 use constant CONN_TIMEOUT => $ENV{API_MIKROTIK_CONNTIMEOUT};
 use constant DEBUG        => $ENV{API_MIKROTIK_DEBUG} || 0;
 use constant PROMISES     => !!(eval { require Mojo::Promise; 1 });
 
-our $VERSION = '0.24';
+our $VERSION = '0.24.1';
+
+deprecated "This module is deprecated in favour of MikroTik::Client";
 
 has error    => '';
 has host     => '192.168.88.1';
@@ -318,6 +320,8 @@ API::MikroTik - Non-blocking interface to MikroTik API
   Mojo::IOLoop->start();
 
 =head1 DESCRIPTION
+
+B<This module is deprecated in favour of> L<MikroTik::Client>B<.>
 
 Both blocking and non-blocking interface to a MikroTik API service. With queries,
 command subscriptions and Promises/A+ (courtesy of an I/O loop). Based on

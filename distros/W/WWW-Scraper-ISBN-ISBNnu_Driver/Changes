@@ -1,6 +1,9 @@
 Revision history for WWW-Scraper-ISBN-ISBNnu_Driver
 ===================================================
 
+0.25    2019-02-23
+        - updated patterns and test data.
+
 0.24    2014-11-18
         - fixed license fields in META.json to be lists.
         - ping fix for Cygwin (thanks to Alexandr Ciornii).

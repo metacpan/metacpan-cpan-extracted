@@ -2580,7 +2580,7 @@ Example:
 
 The B<sort> method is just like the L</search> method, only different.
 It implements the SORT extension as described in
-F<http://search.ietf.org/internet-drafts/draft-ietf-imapext-sort-10.txt>.
+F<https://tools.ietf.org/html/rfc5256>.
 It would be wise to use the L</has_capability> method to verify that
 the SORT capability is available on your server before trying to use
 the B<sort> method.  If you forget to check and you're connecting to a
@@ -2764,7 +2764,7 @@ that folder.
 
 Example:
 
-  my $thread = $imap->thread($algorithm, $charset, @search_args );
+  my $thread = $imap->thread( $algorithm, $charset, @search_args );
 
 The B<thread> method accepts zero to three arguments.  The first
 argument is the threading algorithm to use, generally either
@@ -2785,7 +2785,7 @@ not support the THREADS extension then the B<thread> method will
 return C<undef>.
 
 The B<threads> method will issue the I<THREAD> command as defined in
-F<http://www.ietf.org/internet-drafts/draft-ietf-imapext-thread-11.txt>.
+F<https://tools.ietf.org/html/rfc5256>.
 It returns an array of threads.  Each element in the array is either a
 message id or a reference to another array of (sub)threads.
 
@@ -4014,13 +4014,13 @@ See L</Prewritemethod> and L</Readmethod> for details.
 =head1 REPORTING BUGS
 
 Please send bug reports to C<bug-Mail-IMAPClient@rt.cpan.org> or
-http://rt.cpan.org/Public/Dist/Display.html?Name=Mail-IMAPClient
+https://rt.cpan.org/Public/Dist/Display.html?Name=Mail-IMAPClient
 
 =head1 COPYRIGHT AND LICENSE
 
   Copyright (C) 1999-2003 The Kernen Group, Inc.
   Copyright (C) 2007-2009 Mark Overmeer
-  Copyright (C) 2010-2017 Phil Pearl (Lobbes)
+  Copyright (C) 2010-2019 Phil Pearl (Lobbes)
   All rights reserved.
 
 This library is free software; you can redistribute it and/or modify

@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.147     2019-02-23 21:42:13Z
+          - amended CONTRIBUTING file to clarify that the Changes file should
+            be edited in a pull request, and all tests should pass.
+          - new 'cpanfile' option, for adding a cpanfile to the distribution
+
 0.146     2019-02-16 20:32:06Z
           - add .gitattributes file to minting profile, to tell github that
             this is perl code, not raku

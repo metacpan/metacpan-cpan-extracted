@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.720'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '0.721'; # VERSION
 
 use 5.010;
 use strict;
@@ -31,7 +31,7 @@ pmdir - Get directory of locally installed Perl module/prefix
 
 =head1 VERSION
 
-This document describes version 0.720 of pmdir (from Perl distribution App-PMUtils), released on 2018-04-03.
+This document describes version 0.721 of pmdir (from Perl distribution App-PMUtils), released on 2019-02-24.
 
 =head1 SYNOPSIS
 
@@ -111,17 +111,15 @@ Default value:
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
-
-Can be specified multiple times.
 
 =item B<--config-profile>=I<s>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -290,7 +288,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

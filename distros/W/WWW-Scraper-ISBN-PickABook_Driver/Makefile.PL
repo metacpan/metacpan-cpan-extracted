@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     AUTHOR              => 'Barbie <barbie@cpan.org>',
-    NAME                => 'WWW-Scraper-ISBN-PickABook_Driver',
+    NAME                => 'WWW::Scraper::ISBN::PickABook_Driver',
     VERSION_FROM        => 'lib/WWW/Scraper/ISBN/PickABook_Driver.pm',
     ABSTRACT            => 'Search driver for the Pick-A-Book online book catalog',
     NO_META             => 1,
@@ -16,7 +16,7 @@ WriteMakefile(
     PREREQ_PM           => {
 
         # prereqs
-		'WWW::Mechanize'				=> '1.60',
+        'WWW::Mechanize'                => '1.60',
         'WWW::Scraper::ISBN'            => '1.00',
         'WWW::Scraper::ISBN::Driver'    => '1.00',
 

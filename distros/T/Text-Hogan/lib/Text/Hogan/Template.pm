@@ -1,5 +1,5 @@
 package Text::Hogan::Template;
-$Text::Hogan::Template::VERSION = '1.07';
+$Text::Hogan::Template::VERSION = '1.09';
 use strict;
 use warnings;
 
@@ -7,29 +7,20 @@ use Scalar::Util qw(looks_like_number);
 use Clone qw(clone);
 
 sub new {
-    my $orig = shift;
-    my ($code_obj, $text, $compiler, $options) = @_;
+    my ($orig, $code_obj, $text, $compiler, $options) = @_;
 
     $code_obj ||= {};
 
-    my $class = ref($orig) || $orig;
-
-    my $self = bless {}, $class;
-
-    $self->{'r'} = $code_obj->{'code'} || (ref($orig) && $orig->{'r'});
-    $self->{'c'} = $compiler;
-    $self->{'options'} = $options || {};
-    $self->{'text'} = $text || "";
-    $self->{'partials'} = $code_obj->{'partials'} || {};
-    $self->{'subs'} = $code_obj->{'subs'} || {};
-
-    $self->{'buf'} = "";
-
-    $self->{'numeric_string_as_string'} = 0; # by default treat numbers as strings
-    if ($options->{'numeric_string_as_string'}){
-        $self->{'numeric_string_as_string'} = 1;
-    }
-    return $self;
+    return bless {
+        r   => $code_obj->{'code'} || (ref($orig) && $orig->{'r'}),
+        c   => $compiler,
+        buf => "",
+        options  => $options || {},
+        text     => $text || "",
+        partials => $code_obj->{'partials'} || {},
+        subs     => $code_obj->{'subs'} || {},
+        numeric_string_as_string => !!$options->{'numeric_string_as_string'},
+    }, ref($orig)||$orig;
 }
 
 sub r {
@@ -42,17 +33,21 @@ sub r {
     return "";
 }
 
+my %mapping = ( 
+    '&' => '&amp;',
+    '<' => '&lt;',
+    '>' => '&gt;',
+    q{'} => '&#39;',
+    '"' => '&quot;',
+);
+
 sub v {
     my ($self, $str) = @_;
-    $str = defined($str) ? $str : "";
+    $str //= "";
 
-    if ($str =~ m{[&<>'"]}) {
-        $str =~ s/&/&amp;/g;
-        $str =~ s/</&lt;/g;
-        $str =~ s/>/&gt;/g;
-        $str =~ s/'/&#39;/g;
-        $str =~ s/"/&quot;/g;
-    }
+    my $re = join '', '[', ( sort keys %mapping ), ']';
+
+    $str =~ s/($re)/$mapping{$1}/ge;
 
     return $str;
 }
@@ -83,23 +78,19 @@ sub ep {
     }
 
     if (!ref($template)) {
-        if (!$self->{'c'}) {
-            die "No compiler available";
-        }
+        die "No compiler available" unless $self->{'c'};
+        
         $template = $self->{'c'}->compile($template, $self->{'options'});
     }
 
-    if (!$template) {
-        return undef;
-    }
+    return undef unless $template;
 
     $self->{'partials'}{$symbol}{'base'} = $template;
 
     if ($partial->{'subs'}) {
         # make sure we consider parent template now
-        if (!$partials->{'stack_text'}) {
-            $partials->{'stack_text'} = {};
-        }
+        $partials->{'stack_text'} ||= {};
+
         for my $key (sort keys %{ $partial->{'subs'} }) {
             if (!$partials->{'stack_text'}{$key}) {
                 $partials->{'stack_text'}{$key} =
@@ -118,10 +109,8 @@ sub ep {
 # tries to find a partial in the current scope and render it
 sub rp {
     my ($self, $symbol, $context, $partials, $indent) = @_;
-    my $partial = $self->ep($symbol, $partials);
-    if (!$partial) {
-        return "";
-    }
+
+    my $partial = $self->ep($symbol, $partials) or return "";
 
     return $partial->ri($context, $partials, $indent);
 }
@@ -135,8 +124,8 @@ sub rs {
         return;
     }
 
-    for (my $i = 0; $i < @$tail; $i++) {
-        push @$context, $tail->[$i];
+    for my $t (@$tail) {
+        push @$context, $t;
         $section->($context, $partials, $self);
         pop @$context;
     }
@@ -146,9 +135,8 @@ sub rs {
 sub s {
     my ($self, $val, $ctx, $partials, $inverted, $start, $end, $tags) = @_;
     my $pass;
-    if ((ref($val) eq 'ARRAY') && !@$val) {
-        return 0;
-    }
+
+    return 0 if (ref($val) eq 'ARRAY') && !@$val;
 
     if (ref($val) eq 'CODE') {
         $val = $self->ms($val, $ctx, $partials, $inverted, $start, $end, $tags);
@@ -178,13 +166,8 @@ sub d {
     # > ".".split(".")
     # [ '', '' ]
     #
-    my @names;
-    if ($key eq '.') {
-        @names = ("", "");
-    }
-    else {
-        @names = split m/[.]/, $key;
-    }
+    my @names = $key eq '.' ? ( '' ) x 2 : split /\./, $key;
+
     my $val = $self->f($names[0], $ctx, $partials, $return_found);
 
     my $cx;
@@ -193,8 +176,8 @@ sub d {
         $val = $ctx->[-1];
     }
     else {
-        for (my $i = 1; $i < @names; $i++) {
-            $found = find_in_scope($names[$i], $val);
+        for my $name (@names[1..$#names] ) {
+            $found = find_in_scope($name, $val);
             if (defined $found) {
                 $cx = $val;
                 $val = $found;
@@ -205,17 +188,15 @@ sub d {
         }
     }
 
-    if ($return_found && !$val) {
-        return 0;
-    }
+    return 0 if $return_found && !$val;
 
     if (!$return_found && ref($val) eq 'CODE') {
         push @$ctx, $cx;
         $val = $self->mv($val, $ctx, $partials);
         pop @$ctx;
     }
-    $val = $self->_check_for_num($val);
-    return $val;
+
+    return $self->_check_for_num($val);
 }
 
 # handle numerical interpolation for decimal numbers "properly"...
@@ -228,38 +209,32 @@ sub _check_for_num {
     my $val = shift;
     return $val if ($self->{'numeric_string_as_string'} == 1);
 
-    if (looks_like_number($val)) {
-	$val = $val + 0;
-    }
+    $val += 0 if looks_like_number($val);
+
     return $val;
 }
 
 # find values with normal names
 sub f {
     my ($self, $key, $ctx, $partials, $return_found) = @_;
-    my $val = 0;
-    my $v = undef;
-    my $found = 0;
+    my ( $val, $found ) = ( 0 );
 
-    for (my $i = @$ctx - 1; $i >= 0; $i--) {
-        $v = $ctx->[$i];
+    for my $v ( reverse @$ctx ) {
         $val = find_in_scope($key, $v);
-        if (defined $val) {
-            $found = 1;
-            last;
-        }
+
+        next unless defined $val;
+
+        $found = 1;
+        last;
     }
 
-    if (!$found) {
-        return $return_found ? 0 : "";
-    }
+    return $return_found ? 0 : "" unless $found;
 
     if (!$return_found && (ref($val) eq 'CODE')) {
         $val = $self->mv($val, $ctx, $partials);
     }
 
-    $val = $self->_check_for_num($val);
-    return $val;
+    return $self->_check_for_num($val);
 }
 
 # higher order templates
@@ -277,9 +252,10 @@ sub ls {
 # compile text
 sub ct {
     my ($self, $text, $cx, $partials) = @_;
-    if ($self->{'options'}{'disable_lambda'}) {
-        die "Lambda features disabled";
-    }
+
+    die "Lambda features disabled"
+        if $self->{'options'}{'disable_lambda'};
+
     return $self->{'c'}->compile($text, $self->{'options'})->render($cx, $partials);
 }
 
@@ -300,20 +276,17 @@ sub fl {
 sub ms {
     my ($self, $func, $ctx, $partials, $inverted, $start, $end, $tags) = @_;
 
-    if ($inverted) {
-        return 1;
-    }
-    else {
-        my $text_source = ($self->{'active_sub'} && $self->{'subs_text'} && $self->{'subs_text'}{$self->{'active_sub'}})
-            ? $self->{'subs_text'}{$self->{'active_sub'}}
-            : $self->{'text'};
+    return 1 if $inverted;
 
-        my $s = substr($text_source,$start,($end-$start));
+    my $text_source = ($self->{'active_sub'} && $self->{'subs_text'} && $self->{'subs_text'}{$self->{'active_sub'}})
+        ? $self->{'subs_text'}{$self->{'active_sub'}}
+        : $self->{'text'};
 
-        $self->ls($func, $ctx->[-1], $ctx, $partials, $s, $tags);
+    my $s = substr($text_source,$start,($end-$start));
 
-        return 0;
-    }
+    $self->ls($func, $ctx->[-1], $ctx, $partials, $s, $tags);
+
+    return 0;
 }
 
 # method replace variable
@@ -327,27 +300,19 @@ sub mv {
 
 sub sub {
     my ($self, $name, $context, $partials, $indent) = @_;
-    my $f = $self->{'subs'}{$name};
-    if ($f) {
-        $self->{'active_sub'} = $name;
-        $f->($context,$partials,$self,$indent);
-        $self->{'active_sub'} = 0;
-    }
+    my $f = $self->{'subs'}{$name} or return;
+
+    $self->{'active_sub'} = $name;
+    $f->($context,$partials,$self,$indent);
+    $self->{'active_sub'} = 0;
 }
 
 ################################################
 
 sub find_in_scope {
     my ($key, $scope) = @_;
-    my $val;
 
-    if ($scope && ref($scope) eq 'HASH') {
-        if (defined $scope->{$key}) {
-            $val = $scope->{$key};
-        }
-    }
-
-    return $val;
+    return eval { $scope->{$key} };
 }
 
 sub create_specialized_partial {
@@ -400,7 +365,7 @@ Text::Hogan::Template - represent and render compiled templates
 
 =head1 VERSION
 
-version 1.07
+version 1.09
 
 =head1 SYNOPSIS
 

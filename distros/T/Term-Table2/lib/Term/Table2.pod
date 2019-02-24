@@ -4,7 +4,7 @@ Term::Table2 - Provides formatted output of tables supplied as a combination of 
 
 =head1 VERSION
 
-Version 1.0.2
+Version 1.0.3
 (The versioning is conform with L<https://semver.org/>.)
 
 =head1 SYNOPSIS
@@ -97,8 +97,12 @@ In case of a reference to callback function only the types of parameters can be 
 during the object instantiating, whereas their values can first be checked after the very first row
 will have been delivered by the callback function.
 
-If table contains some wide unicode characters, the represantation will only be correct in case
-the module B<Unicode::GCString> is installed, otherwise this can be twisted but no exception will be raised.
+If table contains some wide unicode characters, the representation will only be correct if the module
+B<Unicode::GCString> is installed and the Perl has been compiled without the debugging option
+(i.e. without B<-DDEBUGGING>), otherwise this can be twisted but no exception will be raised.
+The reason, why the debugging option leads to troubles in form of the error
+I<perl: sv.c:2336: Perl_sv_2iv_flags: Assertion `SvTYPE(sv) != SVt_PVAV && SvTYPE(sv) != SVt_PVHV && SvTYPE(sv) != SVt_PVFM' failed>
+using this module is still unclear.
 
 =head2 COMMON METHODS
 

@@ -1,0 +1,73 @@
+Foreign-Sort
+============
+
+The syntax  sort NAME LIST  for Perl's builtin  sort  function
+allows you to specify a subroutine name to perform comparison
+of any pair of elements in  LIST . Perl will set the package
+variables  $a  and  $b  and it is expected that your comparison
+function will use  $a  and  $b  to decide how they should
+be ordered.
+
+A limitation of this syntax is that  $a  and  $b  are *package*
+variables in the package of the comparison function, and you
+cannot easily use the syntax to refer to a comparison function
+in a different package from the calling package.
+
+Foreign::Sort  defines the subroutine attribute "Foreign" that
+you can apply to your comparison functions that will allow them
+to accept calls from a different package, overcoming this
+limitation.
+
+
+SYNOPSIS
+
+    package Your::Package;
+    use Foreign::Sort;
+    sub your_compare : Foreign {  $a ... $b }
+
+    package Their::Package;
+    @x = ...;
+    @y = sort Your::Package::your_compare @x;
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Foreign::Sort
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Foreign-Sort
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Foreign-Sort
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Foreign-Sort
+
+    Search CPAN
+        http://search.cpan.org/dist/Foreign-Sort/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2019 Marty O'Brien
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

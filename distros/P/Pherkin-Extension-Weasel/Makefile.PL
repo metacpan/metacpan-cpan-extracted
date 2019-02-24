@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Pherkin-Extension-Weasel",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Pherkin::Extension::Weasel",
   "PREREQ_PM" => {
     "File::Share" => 0,
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Weasel::Driver::Mock" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -25,10 +25,10 @@ my %tests = (
         [ 'is',     'width',        undef                   ],
         [ 'is',     'height',       undef                   ],
         [ 'is',     'weight',       undef                   ],
-        [ 'like',   'image_link',   qr|http://\w+.oreilly.com/images/9780596001735/sm.gif| ],
-        [ 'like',   'thumb_link',   qr|http://\w+.oreilly.com/images/9780596001735/sm.gif| ],
+        [ 'like',   'image_link',   qr|https://\w+.oreilly.com/images/9780596001735/sm.gif| ],
+        [ 'like',   'thumb_link',   qr|https://\w+.oreilly.com/images/9780596001735/sm.gif| ],
         [ 'like',   'description',  qr|Perl Best Practices offers a collection of 256 guidelines| ],
-        [ 'like',   'book_link',    qr|http://shop.oreilly.com/product/\d+\.do| ]
+        [ 'like',   'book_link',    qr|https?://shop.oreilly.com/product/\d+\.do| ]
     ]
 );
 
@@ -41,9 +41,9 @@ my $scraper = WWW::Scraper::ISBN->new();
 isa_ok($scraper,'WWW::Scraper::ISBN');
 
 SKIP: {
-	skip "Can't see a network connection", $tests   if(pingtest($CHECK_DOMAIN));
+    skip "Can't see a network connection", $tests   if(pingtest($CHECK_DOMAIN));
 
-	$scraper->drivers($DRIVER);
+    $scraper->drivers($DRIVER);
 
     my $record;
     for my $isbn (keys %tests) {

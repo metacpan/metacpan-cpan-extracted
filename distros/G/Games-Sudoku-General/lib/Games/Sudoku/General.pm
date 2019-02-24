@@ -172,10 +172,10 @@ generates a topology that looks like this
 
 
 Originally there was a third argument giving the total size of the
-puzzle. Beginning with version 0.005_01 this was deprecated, since it
-appeared to me to be redundant. As of version [% next_version %],
-all uses of this argument will result in a warning. Six months after
-that it will become fatal.
+puzzle. Beginning with version 0.006 this was deprecated, since it
+appeared to me to be redundant. As of version 0.021, all uses of this
+argument resulted in a warning. As of version 0.022, use of the third
+argument will become fatal.
 
 Setting this attribute modifies the following "real" attributes:
 
@@ -577,7 +577,7 @@ use warnings;
 
 use Exporter qw{ import };
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 our @EXPORT_OK = qw{
     SUDOKU_SUCCESS
     SUDOKU_NO_SOLUTION
@@ -2253,8 +2253,8 @@ eod
 
     my %deprecate = (
 	brick_third_argument	=> {
-	    message	=> 'Specifying 3 values for set( brick => ... ) is deprecated',
-	    level	=> 2,
+	    message	=> 'Specifying 3 values for set( brick => ... ) is no longer allowed',
+	    level	=> 3,
 	},
     );
 
@@ -2508,7 +2508,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2006, 2008, 2011-2018 by Thomas R. Wyant, III
+Copyright (C) 2005-2006, 2008, 2011-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

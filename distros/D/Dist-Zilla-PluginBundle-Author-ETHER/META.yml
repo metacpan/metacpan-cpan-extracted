@@ -55,13 +55,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::ETHER:
     file: lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
-    version: '0.146'
+    version: '0.147'
   Dist::Zilla::PluginBundle::Author::ETHER:
     file: lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
-    version: '0.146'
+    version: '0.147'
   Pod::Weaver::PluginBundle::Author::ETHER:
     file: lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
-    version: '0.146'
+    version: '0.147'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -207,10 +207,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER.git
-version: '0.146'
+version: '0.147'
 x_Dist_Zilla:
   perl:
-    version: '5.029007'
+    version: '5.029008'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -688,7 +688,7 @@ x_Dist_Zilla:
           inherit_version: '0'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000034'
           version: '0.006'
       name: '@Author::ETHER/MetaProvides::Package'
       version: '2.004003'
@@ -781,7 +781,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000034'
           version: '0.006'
       name: '@Author::ETHER/CheckSelfDependency'
       version: '0.011'
@@ -819,7 +819,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20190120'
+          Module::CoreList: '5.20190220'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -982,7 +982,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.146
+          tag: v0.147
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -1099,7 +1099,7 @@ x_Dist_Zilla:
             - Moose::Conflicts
           no_forced_deps: 0
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000034'
           version: '0.006'
       name: Test::CheckBreaks
       version: '0.019'
@@ -1172,7 +1172,7 @@ x_contributors:
   - 'Randy Stauner <rwstauner@cpan.org>'
   - 'Roy Ivy III <rivy@cpan.org>'
   - 'Сергей Романов <sromanov@cpan.org>'
-x_generated_by_perl: v5.29.7
+x_generated_by_perl: v5.29.8
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 0
 x_use_unsafe_inc: 0

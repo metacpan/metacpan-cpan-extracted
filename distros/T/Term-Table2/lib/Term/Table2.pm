@@ -31,8 +31,11 @@ use Class::XSAccessor
 
 sub _override_length {                                      # Consider wide Unicode characters if possible i.e.
   no warnings qw(redefine once);                            # if Unicode::GCString can be used.
-  use subs qw(length);
-  eval { load('Unicode::GCString') };                       # Otherwise table content can be twisted
+  use subs qw(length);                                      # Otherwise table content can be twisted
+  eval {
+    load('Unicode::GCString');                              # Try to load Unicode::GCString, then check if Perl was
+    my $dummy = 1 / length(!$^D);                           # compiled without -DDEBUGGING
+  };
   *length = $@ ? sub { return CORE::length($_[0]) } : sub { return Unicode::GCString->new($_[0])->columns() };
   return;
 }
@@ -186,7 +189,7 @@ use constant {
 use Exporter qw(import);
 our @EXPORT_OK = qw(ADJUST CUT SPLIT WRAP);
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 sub fetch {                                                 # Provides current line
   my ($self) = @_;

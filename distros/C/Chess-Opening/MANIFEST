@@ -14,6 +14,7 @@ lib/Chess/Opening.pod
 lib/Chess/Opening/Book.pm
 lib/Chess/Opening/Book.pod
 lib/Chess/Opening/Book/ECO.pm
+lib/Chess/Opening/Book/ECO.pod
 lib/Chess/Opening/Book/Entry.pm
 lib/Chess/Opening/Book/Entry.pod
 lib/Chess/Opening/Book/Move.pm

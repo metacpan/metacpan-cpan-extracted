@@ -1,7 +1,7 @@
 package Bencher::Scenario::Example;
 
-our $DATE = '2019-02-15'; # DATE
-our $VERSION = '1.042'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 our $scenario = {
     participants => [
@@ -29,7 +29,7 @@ Bencher::Scenario::Example - An example scenario
 
 =head1 VERSION
 
-This document describes version 1.042 of Bencher::Scenario::Example (from Perl distribution Bencher-Backend), released on 2019-02-15.
+This document describes version 1.043 of Bencher::Scenario::Example (from Perl distribution Bencher-Backend), released on 2019-02-24.
 
 =head1 SYNOPSIS
 

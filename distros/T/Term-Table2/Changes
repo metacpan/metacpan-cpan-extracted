@@ -6,3 +6,9 @@ Revision history for Perl extension Term::Table2.
 
 1.0.1  Sun Feb 17 23:59:46 2019
 	- got rid of camel case in names of all public methods
+
+1.0.2  Wed Feb 20 22:14:26 2019
+	- got rid of camel case in names of all methods and variables
+
+1.0.3  Sat Feb 23 20:01:41 2019
+	- using and testing of Unicode::GCString prevented if Perl has been compiled with -DDEBUGGING

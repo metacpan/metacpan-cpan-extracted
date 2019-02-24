@@ -147,7 +147,9 @@ like($content, qr!<img src="scenario-pre-\d+\.png"!,
 # simple step; no step data or data table
 
 my $step = Test::BDD::Cucumber::Model::Step->new(
-    text => 'Given step 1',
+    text => 'step 1',
+    verb => 'Given',
+    verb_original => 'Given',
     );
 my $context = Test::BDD::Cucumber::StepContext->new(
     stash => { scenario => $scenario_stash,
@@ -156,6 +158,7 @@ my $context = Test::BDD::Cucumber::StepContext->new(
     scenario => $s,
     step => $step,
     verb => 'Given',
+    verb_original => 'Given',
     harness => Test::BDD::Cucumber::Harness->new(),
     executor => Test::BDD::Cucumber::Executor->new(),
     );
@@ -182,7 +185,8 @@ like($content, qr!<td>found 2 elements for //div!,
 $ext->post_step($f, $context, 1); # failed step
 $content = _flush_and_read_log();
 
-like($content, qr!<td>FAIL</td>!,
+# early versions (at least Pherkin <= 0.56) repoort "<missing>" due to a bug
+like($content, qr!<td>(?:FAIL|&lt;missing&gt;)</td>!,
      q{Step status correctly included in the logs});
 
 

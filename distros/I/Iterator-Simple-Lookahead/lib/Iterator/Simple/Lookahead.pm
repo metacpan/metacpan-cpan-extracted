@@ -19,7 +19,7 @@ use warnings;
 use Carp;
 use Iterator::Simple qw( is_iterator );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 #------------------------------------------------------------------------------
 
@@ -73,13 +73,11 @@ L<Iterator::Simple|Iterator::Simple>.
 =cut
 
 #------------------------------------------------------------------------------
-use base 'Iterator::Simple::Iterator';
-use Class::XSAccessor {
-	accessors 		=> [
+use base 'Iterator::Simple::Iterator', 'Class::Accessor';
+__PACKAGE__->mk_accessors(
 		'_look_ahead',		# list of computed values
 		'_iterators',		# list of iterators
-	],
-};
+);
 
 sub new {
 	my($class, @items) = @_;

@@ -30,4 +30,4 @@ resources:
   IRC: irc://irc.freenode.org/#perl-daemon-control
   bugtracker: http://github.com/symkat/Daemon-Control/issues
   license: http://dev.perl.org/licenses/
-version: 0.001009
+version: 0.001010

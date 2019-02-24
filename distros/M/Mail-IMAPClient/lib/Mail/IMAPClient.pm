@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Mail::IMAPClient;
-our $VERSION = '3.41';
+our $VERSION = '3.42';
 
 use Mail::IMAPClient::MessageSet;
 
@@ -2844,9 +2844,10 @@ sub capability {
 
     # use iterator as we may append to @caps for CAPA=VALUE
     for ( my $i = 0 ; $i < @caps ; $i++ ) {
-        $self->{CAPABILITY}->{ $caps[$i] } ||= [];
+        $self->{CAPABILITY}->{ uc $caps[$i] } ||= [];
         my ( $capa, $cval ) = split( /=/, $caps[$i], 2 );
         if ( defined $cval ) {
+            $capa = uc $capa;
             push( @caps, $capa ) unless exists $self->{CAPABILITY}->{$capa};
             push( @{ $self->{CAPABILITY}->{$capa} }, $cval );
         }
@@ -2863,12 +2864,15 @@ sub has_capability {
     my $aref = [];
 
     # exists in CAPABILITIES? possibly in CAPA=VALUE format?
-    if ( exists $self->{CAPABILITY}{$which} ) {
-        if ( @{ $self->{CAPABILITY}{$which} } ) {
-            $aref = $self->{CAPABILITY}{$which};
-        }
-        else {
-            $aref = [$which];
+    if ( defined $which ) {
+        $which = uc $which;
+        if ( exists $self->{CAPABILITY}{$which} ) {
+            if ( @{ $self->{CAPABILITY}{$which} } ) {
+                $aref = $self->{CAPABILITY}{$which};
+            }
+            else {
+                $aref = [$which];
+            }
         }
     }
 

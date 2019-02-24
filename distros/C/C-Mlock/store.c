@@ -57,28 +57,22 @@ int set_pages(AddressRegion *pAddressRegion, int pages)
 int set_size (AddressRegion *pAddressRegion, int bytes)
 {
     char *t;
-    int r, l;
+    int r, l, s;
+    s = pAddressRegion->sBytes; /* store the original size */
     if (pAddressRegion->pBytes) /* realloc (change size) */
     {
-        /* first determine if we are growing or shrinking */
         if (bytes <= pAddressRegion->nBytes)
-            l = bytes; /* new length is greater */
+            l = bytes; /* new length is shorter */
         else
-            l = pAddressRegion->nBytes; /* new length is shorter */
+            l = pAddressRegion->nBytes; /* new length is greater */
 
         t = (char *) malloc(bytes); /* new area as requested */
         memset(t, 0, bytes); /* clear it */
         r = (!mlock(t, bytes)); /* lock it */
+        if (pAddressRegion->sBytes >= bytes) /* currently stored is greater than the new space */
+		s = bytes - 1; /* set the new size to one less than the size */
         if (pAddressRegion->sBytes) /* don't bother copying if there is nothing stored */
-        {
-            if (pAddressRegion->sBytes < l)
-                l = pAddressRegion->sBytes;
-            else
-                l = pAddressRegion->sBytes - 1;
-      
-            memcpy(t, pAddressRegion->pBytes, (size_t) l); /* copy up to the size stored or the size of the new block which ever is the smaler */
-            *(pAddressRegion->pBytes+bytes) = '\0'; /* terminate if we truncate */
-        }
+            memcpy(t, pAddressRegion->pBytes, (size_t) s);
         memset(pAddressRegion->pBytes, 0, pAddressRegion->nBytes); /* clear the old data */
         if (pAddressRegion->memLocked)
             munlock(pAddressRegion->pBytes, pAddressRegion->nBytes); /* unlock it */
@@ -86,7 +80,7 @@ int set_size (AddressRegion *pAddressRegion, int bytes)
         /* update the stored info with the new memory info */
         pAddressRegion->pBytes = t;
         pAddressRegion->nBytes = bytes;
-        pAddressRegion->sBytes = l;
+        pAddressRegion->sBytes = s;
         pAddressRegion->memLocked = r;
     } else {
         /* nothing stored, so just initialise */

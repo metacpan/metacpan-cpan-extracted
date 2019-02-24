@@ -1,7 +1,7 @@
 package Sah::Schemas::Perl;
 
-our $DATE = '2018-12-09'; # DATE
-our $VERSION = '0.017'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '0.018'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to Perl
@@ -18,7 +18,7 @@ Sah::Schemas::Perl - Sah schemas related to Perl
 
 =head1 VERSION
 
-This document describes version 0.017 of Sah::Schemas::Perl (from Perl distribution Sah-Schemas-Perl), released on 2018-12-09.
+This document describes version 0.018 of Sah::Schemas::Perl (from Perl distribution Sah-Schemas-Perl), released on 2019-02-24.
 
 =head1 HOMEPAGE
 
@@ -48,7 +48,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -25,9 +25,11 @@ t/is_cached.t
 t/js.t
 t/kwalitee.t
 t/last_mod.t
+t/links.t
 t/manifest.t
 t/metrics.t
 t/namespaces.t
+t/no404s.t
 t/nocache.t
 t/noplan.t
 t/output.t

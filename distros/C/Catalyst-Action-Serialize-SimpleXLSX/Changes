@@ -1,0 +1,22 @@
+Revision history for Catalyst-Action-Serialize-SimpleXLSX
+
+0.007  2019-02-22 20:17:23 PDT
+  - Fixed unit tests.  Need to re-emplement column width logic and re-test.
+
+0.006  2019-02-22 13:17:23 PDT
+  - Added minimum Perl at 5.10.1 and removed core pre-requisites. 
+
+0.005  2019-02-22 13:17:22 PDT
+  - Fixed MANIFEST. 
+
+0.004  2019-02-22 13:17:21 PDT
+  - Fixed build. 
+
+0.003  2019-02-22 13:17:20 PDT
+  - Added CONTRIBUTING.
+
+0.002  2019-02-22 13:17:16 PDT
+  - First CPAN release.  Forked from Catalyst-Action-Serialize-SimpleExcel and dropped in Excel::Writer::XLSX.
+
+0.001  2019-02-22 13:16:16 PDT
+  - Initial release.  Probably didn't even have this version number.

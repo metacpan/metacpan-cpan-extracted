@@ -103,8 +103,9 @@ if ($link and $link =~ /github/) {
 "\n" . 'The code for this distribution is hosted at GitHub. The repository is:
 ' . $link . '
 You can submit code changes by forking the repository, pushing your code
-changes to your clone, and then submitting a pull request. Detailed
-instructions for doing that is available here:
+changes to your clone, and then submitting a pull request. Please include a
+suitable end-user-oriented entry in the Changes file describing your change.
+Detailed instructions for doing that is available here:
 
 https://help.github.com/articles/creating-a-pull-request'
 .
@@ -112,7 +113,8 @@ https://help.github.com/articles/creating-a-pull-request'
 "\n\n" . 'All pull requests for this distribution will be automatically tested on Linux
 by Travis at: https://travis-ci.com/' . join('/', (split('/', $link))[-2,-1])
 . "\n" . 'Results will be visible in the pull request on GitHub. Follow the appropriate
-links for details when tests fail.'
+links for details when tests fail. Changes will not be mergeable until all
+tests pass.'
 : '')
 }
 }}

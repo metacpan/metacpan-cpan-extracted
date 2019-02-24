@@ -14,78 +14,78 @@ my $CHECK_DOMAIN    = 'www.google.com';
 
 my %tests = (
     '1558607013' => [
-        [ 'is',     'isbn',         '9781558607019'                 ],
-        [ 'is',     'isbn10',       '1558607013'                    ],
-        [ 'is',     'isbn13',       '9781558607019'                 ],
-        [ 'is',     'ean13',        '9781558607019'                 ],
-        [ 'is',     'title',        'Higher-Order Perl'             ],
-        [ 'is',     'author',       'Mark Jason Dominus'            ],
-        [ 'is',     'publisher',    'Morgan Kaufmann'               ],
-        [ 'is',     'pubdate',      'March 14, 2005'                ],
-        [ 'is',     'binding',      'Paperback'                     ],
-        [ 'is',     'pages',        600                             ],
-        [ 'is',     'width',        190                             ],
-        [ 'is',     'height',       233                             ],
-        [ 'is',     'depth',        35                              ],
-        [ 'is',     'weight',       1179                            ],
-        [ 'is',     'image_link',   'https://covers.openlibrary.org/b/id/784249-L.jpg'    ],
-        [ 'is',     'thumb_link',   'https://covers.openlibrary.org/b/id/784249-S.jpg'    ],
+        [ 'is',     'isbn',         '9781558607019'            ],
+        [ 'is',     'isbn10',       '1558607013'               ],
+        [ 'is',     'isbn13',       '9781558607019'            ],
+        [ 'is',     'ean13',        '9781558607019'            ],
+        [ 'is',     'title',        'Higher-Order Perl'        ],
+        [ 'is',     'author',       'Mark Jason Dominus'       ],
+        [ 'is',     'publisher',    'Morgan Kaufmann'          ],
+        [ 'is',     'pubdate',      'March 14, 2005'           ],
+        [ 'is',     'binding',      'Paperback'                ],
+        [ 'is',     'pages',        600                        ],
+        [ 'is',     'width',        190                        ],
+        [ 'is',     'height',       233                        ],
+        [ 'is',     'depth',        35                         ],
+        [ 'is',     'weight',       1179                       ],
+        [ 'is',     'image_link',   'https://covers.openlibrary.org/b/id/784249-L.jpg' ],
+        [ 'is',     'thumb_link',   'https://covers.openlibrary.org/b/id/784249-S.jpg' ],
         [ 'is',     'book_link',    q|https://openlibrary.org/books/OL8606556M/Higher-Order_Perl| ]
     ],
     '9780571239566' => [
-        [ 'is',     'isbn',         '9780571239566'                 ],
-        [ 'is',     'isbn10',       '0571239560'                    ],
-        [ 'is',     'isbn13',       '9780571239566'                 ],
-        [ 'is',     'ean13',        '9780571239566'                 ],
-        [ 'is',     'title',        'Touching from a Distance'      ],
-        [ 'is',     'author',       'Deborah Curtis'                ],
-        [ 'is',     'publisher',    'Faber and Faber'               ],
-        [ 'is',     'pubdate',      'October 4, 2007'               ],
-        [ 'is',     'binding',      'Paperback'                     ],
-        [ 'is',     'pages',        240                             ],
-        [ 'is',     'width',        127                             ],
-        [ 'is',     'height',       195                             ],
-        [ 'is',     'depth',        20                              ],
-        [ 'is',     'weight',       221                             ],
-        [ 'is',     'image_link',   'https://covers.openlibrary.org/b/id/2521251-L.jpg'    ],
-        [ 'is',     'thumb_link',   'https://covers.openlibrary.org/b/id/2521251-S.jpg'    ],
+        [ 'is',     'isbn',         '9780571239566'            ],
+        [ 'is',     'isbn10',       '0571239560'               ],
+        [ 'is',     'isbn13',       '9780571239566'            ],
+        [ 'is',     'ean13',        '9780571239566'            ],
+        [ 'is',     'title',        'Touching from a Distance' ],
+        [ 'is',     'author',       'Deborah Curtis'           ],
+        [ 'is',     'publisher',    'Faber and Faber'          ],
+        [ 'is',     'pubdate',      'October 4, 2007'          ],
+        [ 'is',     'binding',      'Paperback'                ],
+        [ 'is',     'pages',        240                        ],
+        [ 'is',     'width',        127                        ],
+        [ 'is',     'height',       195                        ],
+        [ 'is',     'depth',        20                         ],
+        [ 'is',     'weight',       221                        ],
+        [ 'is',     'image_link',   'https://covers.openlibrary.org/b/id/2521251-L.jpg' ],
+        [ 'is',     'thumb_link',   'https://covers.openlibrary.org/b/id/2521251-S.jpg' ],
         [ 'is',     'book_link',    q|https://openlibrary.org/books/OL10640818M/Touching_from_a_Distance| ]
     ],
     '9780596001735' => [
-        [ 'is',     'isbn',         '9780596001735'         ],
-        [ 'is',     'isbn10',       '0596001738'            ],
-        [ 'is',     'isbn13',       '9780596001735'         ],
-        [ 'is',     'ean13',        '9780596001735'         ],
-        [ 'is',     'title',        'Perl Best Practices'   ],
-        [ 'is',     'author',       'Damian Conway'         ],
-        [ 'is',     'publisher',    q|O'Reilly Media, Inc.| ],
-        [ 'is',     'pubdate',      'July 12, 2005'         ],
-        [ 'is',     'binding',      undef                   ],
-        [ 'is',     'pages',        542                     ],
-        [ 'is',     'width',        undef                   ],
-        [ 'is',     'height',       undef                   ],
-        [ 'is',     'weight',       undef                   ],
-        [ 'is',     'image_link',   'https://covers.openlibrary.org/b/id/388540-L.jpg'    ],
-        [ 'is',     'thumb_link',   'https://covers.openlibrary.org/b/id/388540-S.jpg'    ],
+        [ 'is',     'isbn',         '9780596001735'            ],
+        [ 'is',     'isbn10',       '0596001738'               ],
+        [ 'is',     'isbn13',       '9780596001735'            ],
+        [ 'is',     'ean13',        '9780596001735'            ],
+        [ 'is',     'title',        'Perl Best Practices'      ],
+        [ 'is',     'author',       'Damian Conway'            ],
+        [ 'is',     'publisher',    q|O'Reilly Media, Inc.|    ],
+        [ 'is',     'pubdate',      'July 12, 2005'            ],
+        [ 'is',     'binding',      undef                      ],
+        [ 'is',     'pages',        542                        ],
+        [ 'is',     'width',        undef                      ],
+        [ 'is',     'height',       undef                      ],
+        [ 'is',     'weight',       undef                      ],
+        [ 'is',     'image_link',   'https://covers.openlibrary.org/b/id/388540-L.jpg' ],
+        [ 'is',     'thumb_link',   'https://covers.openlibrary.org/b/id/388540-S.jpg' ],
         [ 'is',     'book_link',    q|https://openlibrary.org/books/OL7580925M/Perl_Best_Practices| ]
     ],
     '9780804736480' => [    # this should never been tested, as it doesn't exist in OpenLibrary
-        [ 'is',     'isbn',         'failed'    ],
-        [ 'is',     'isbn10',       'failed'    ],
-        [ 'is',     'isbn13',       'failed'    ],
-        [ 'is',     'ean13',        'failed'    ],
-        [ 'is',     'title',        'failed'    ],
-        [ 'is',     'author',       'failed'    ],
-        [ 'is',     'publisher',    'failed'    ],
-        [ 'is',     'pubdate',      'failed'    ],
-        [ 'is',     'binding',      0           ],
-        [ 'is',     'pages',        0           ],
-        [ 'is',     'width',        0           ],
-        [ 'is',     'height',       0           ],
-        [ 'is',     'weight',       0           ],
-        [ 'is',     'image_link',   'failed'    ],
-        [ 'is',     'thumb_link',   'failed'    ],
-        [ 'is',     'book_link',    q|failed|   ]
+        [ 'is',     'isbn',         'failed'  ],
+        [ 'is',     'isbn10',       'failed'  ],
+        [ 'is',     'isbn13',       'failed'  ],
+        [ 'is',     'ean13',        'failed'  ],
+        [ 'is',     'title',        'failed'  ],
+        [ 'is',     'author',       'failed'  ],
+        [ 'is',     'publisher',    'failed'  ],
+        [ 'is',     'pubdate',      'failed'  ],
+        [ 'is',     'binding',      0         ],
+        [ 'is',     'pages',        0         ],
+        [ 'is',     'width',        0         ],
+        [ 'is',     'height',       0         ],
+        [ 'is',     'weight',       0         ],
+        [ 'is',     'image_link',   'failed'  ],
+        [ 'is',     'thumb_link',   'failed'  ],
+        [ 'is',     'book_link',    q|failed| ]
     ],
 );
 
@@ -98,12 +98,12 @@ my $scraper = WWW::Scraper::ISBN->new();
 isa_ok($scraper,'WWW::Scraper::ISBN');
 
 SKIP: {
-	skip "Can't see a network connection", $tests+1   if(pingtest($CHECK_DOMAIN));
+    skip "Can't see a network connection", $tests+1   if(pingtest($CHECK_DOMAIN));
 
-	$scraper->drivers($DRIVER);
+    $scraper->drivers($DRIVER);
 
     # this ISBN doesn't exist
-	my $isbn = "1122334455";
+    my $isbn = "1122334455";
     my $record;
     eval { $record = $scraper->search($isbn); };
     if($@) {
@@ -112,7 +112,7 @@ SKIP: {
     elsif($record->found) {
         ok(0,'Unexpectedly found a non-existent book');
     } else {
-		like($record->error,qr/Invalid ISBN specified|Failed to find that book|website appears to be unavailable/);
+        like($record->error,qr/Invalid ISBN specified|Failed to find that book|website appears to be unavailable/);
     }
 
     for my $isbn (keys %tests) {

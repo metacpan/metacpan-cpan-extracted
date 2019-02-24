@@ -1,6 +1,9 @@
 Revision history for WWW-Scraper-ISBN-BookDepository_Driver
 ===========================================================
 
+0.13    2019-02-23
+        - more updated regex patterns for new website design.
+
 0.12    2015-07-07
         - test data updated.
 

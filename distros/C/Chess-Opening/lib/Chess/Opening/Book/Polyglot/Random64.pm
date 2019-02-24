@@ -13,7 +13,7 @@
 # ABSTRACT: Read chess opening books in polyglot format
 
 package Chess::Opening::Book::Polyglot::Random64;
-$Chess::Opening::Book::Polyglot::Random64::VERSION = '0.3';
+$Chess::Opening::Book::Polyglot::Random64::VERSION = '0.5';
 use common::sense;
 
 use constant DATA => [

@@ -18,36 +18,36 @@ my %tests = (
         [ 'is',     'ean13',        '9780552557801'     ],
         [ 'is',     'title',        'Nation'            ],
         [ 'is',     'author',       'Terry Pratchett'   ],
-        [ 'is',     'publisher',    'Random House Children\'s Publishers UK'   ],
-        [ 'is',     'pubdate',      '24 September 2009' ],
+        [ 'is',     'publisher',    'Random House Children\'s Publishers UK' ],
+        [ 'is',     'pubdate',      '24 Sep 2009'       ],
         [ 'is',     'binding',      'Paperback'         ],
         [ 'is',     'pages',        432                 ],
-        [ 'is',     'width',        114                 ],
-        [ 'is',     'height',       192                 ],
-        [ 'is',     'weight',       240                 ],
-        [ 'like',   'image_link',   qr|/assets/images/book/large/9780/5525/9780552557801.jpg|       ],
-        [ 'like',   'thumb_link',   qr|/assets/images/book/medium/9780/5525/9780552557801.jpg|      ],
-        [ 'like',   'description',  qr|When a giant wave destroys his entire Nation|                ],
-        [ 'is',     'book_link',    'http://www.bookdepository.com/Nation-Terry-Pratchett/9780552557801'   ]
+        [ 'is',     'width',        110                 ],
+        [ 'is',     'height',       178                 ],
+        [ 'is',     'weight',       229                 ],
+        [ 'like',   'image_link',   qr|/assets/images/book/lrg/9780/5525/9780552557801.jpg| ],
+        [ 'like',   'thumb_link',   qr|/assets/images/book/lrg/9780/5525/9780552557801.jpg| ],
+        [ 'like',   'description',  qr|When a giant wave destroys his entire Nation|        ],
+        [ 'is',     'book_link',    'https://www.bookdepository.com/Nation-Terry-Pratchett/9780552557801' ]
     ],
     '9780571239566' => [
         [ 'is',     'isbn',         '9780571239566'         ],
         [ 'is',     'isbn10',       '0571239560'            ],
         [ 'is',     'isbn13',       '9780571239566'         ],
         [ 'is',     'ean13',        '9780571239566'         ],
-        [ 'is',     'title',        'Touching from a Distance'  ],
+        [ 'like',   'title',        qr|Touching from a Distance| ],
         [ 'is',     'author',       'Deborah Curtis'        ],
         [ 'like',   'publisher',    qr|Faber \S+ Faber|i    ],
-        [ 'is',     'pubdate',      '04 October 2007'       ],
+        [ 'is',     'pubdate',      '04 Oct 2007'           ],
         [ 'is',     'binding',      'Paperback'             ],
         [ 'is',     'pages',        240                     ],
-        [ 'is',     'width',        126                     ],
-        [ 'is',     'height',       196                     ],
-        [ 'is',     'weight',       200                     ],
-        [ 'like',   'image_link',   qr|/assets/images/book/large/9780/5712/9780571239566.jpg|   ],
-        [ 'like',   'thumb_link',   qr|/assets/images/book/medium/9780/5712/9780571239566.jpg|  ],
+        [ 'is',     'width',        128                     ],
+        [ 'is',     'height',       198                     ],
+        [ 'is',     'weight',       199                     ],
+        [ 'like',   'image_link',   qr|/assets/images/book/lrg/9780/5712/9780571239566.jpg|     ],
+        [ 'like',   'thumb_link',   qr|/assets/images/book/lrg/9780/5712/9780571239566.jpg|     ],
         [ 'like',   'description',  qr|Ian Curtis left behind a legacy rich in artistic genius| ],
-        [ 'is',     'book_link',    'http://www.bookdepository.com/Touching-from-Distance-Deborah-Curtis/9780571239566' ]
+        [ 'like',   'book_link',    qr|https://www.bookdepository.com/Touching-from-Distance.*/9780571239566| ]
     ],
 );
 
@@ -61,12 +61,12 @@ my $scraper = WWW::Scraper::ISBN->new();
 isa_ok($scraper,'WWW::Scraper::ISBN');
 
 SKIP: {
-	skip "Can't see a network connection", $tests+1   if(pingtest($CHECK_DOMAIN));
+    skip "Can't see a network connection", $tests+1   if(pingtest($CHECK_DOMAIN));
 
-	$scraper->drivers($DRIVER);
+    $scraper->drivers($DRIVER);
 
     # this ISBN doesn't exist
-	my $isbn = "0987654321";
+    my $isbn = "0987654321";
     my $record;
     eval { $record = $scraper->search($isbn); };
     if($record && $record->found) {

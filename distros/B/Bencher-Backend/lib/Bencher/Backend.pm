@@ -1,7 +1,7 @@
 package Bencher::Backend;
 
-our $DATE = '2019-02-15'; # DATE
-our $VERSION = '1.042'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +11,15 @@ use Log::ger;
 use Data::Dmp;
 use List::MoreUtils qw(all);
 use List::Util qw(first);
+
+use Exporter qw(import);
+our @EXPORT_OK = qw(
+                       bencher
+                       format_result
+                       chart_result
+                       split_result
+                       parse_scenario
+               );
 
 our %SPEC;
 
@@ -4183,7 +4192,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.042 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2019-02-15.
+This document describes version 1.043 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2019-02-24.
 
 =head1 FUNCTIONS
 
@@ -4208,7 +4217,7 @@ modules, run benchmark against multiple perls and module versions, and so on.
 Bencher comes as a CLI script as well as Perl module. See the
 L<Bencher::Backend> documentation for more information.
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -4662,7 +4671,7 @@ chartable.
 
 Options to customize the look/style of the chart will be added in the future.
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -4700,7 +4709,7 @@ Usage:
 
 Format bencher result.
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -4738,7 +4747,7 @@ Usage:
 
 Parse scenario (fill in default values, etc).
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -4784,7 +4793,7 @@ a subset of the original result.
 
 Return an array where each element is C<[\%field_values, $split_result]>.
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 

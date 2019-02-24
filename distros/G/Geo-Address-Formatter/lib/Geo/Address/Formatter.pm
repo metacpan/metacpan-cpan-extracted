@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.73';
+$Geo::Address::Formatter::VERSION = '1.74';
 use strict;
 use warnings;
 use feature qw(say);
@@ -673,7 +673,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.73
+version 1.74
 
 =head1 SYNOPSIS
 
@@ -756,7 +756,7 @@ edf <edf@opencagedata.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Opencage Data Limited.
+This software is copyright (c) 2019 by Opencage Data Limited.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

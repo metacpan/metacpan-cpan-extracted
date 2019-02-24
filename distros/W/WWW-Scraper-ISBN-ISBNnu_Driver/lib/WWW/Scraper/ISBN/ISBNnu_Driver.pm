@@ -3,7 +3,7 @@ package WWW::Scraper::ISBN::ISBNnu_Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 #--------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ my $OZ2G  = 0.035274;       # number of ounces (oz) in a gram
 # Public Interface
 
 sub trim {
-	my ($self,$value) = @_;
+    my ($self,$value) = @_;
 
     return ''   unless(defined $value);
 
@@ -50,8 +50,8 @@ sub search {
     $self->found(0);
     $self->book(undef);
 
-    my $post_url = "http://isbn.nu/".$isbn;
-	my $mech = WWW::Mechanize->new();
+    my $post_url = "https://isbn.nu/".$isbn;
+    my $mech = WWW::Mechanize->new();
     $mech->agent_alias( 'Linux Mozilla' );
     $mech->add_header( 'Accept-Encoding' => undef );
 
@@ -66,15 +66,15 @@ sub search {
     return $self->handler("Failed to find that book on the isbn.nu website.")
         if (!$data{title} || $data{title} eq "No Title Found");
 
-    ($data{publisher})  = $html =~ m!<span class="bi_col_title">Publisher</span>\s*<span class="bi_col_value">([^<]+)</span></div>!si;
-    ($data{pubdate})    = $html =~ m!<span class="bi_col_title">Publication date</span>\s*<span class="bi_col_value">([^<]+)</span></div>!;
-    ($data{pages})      = $html =~ m!<span class="bi_col_title">Pages</span>\s*<span class="bi_col_value">([0-9]+)</span></div>!;
-    ($data{edition})    = $html =~ m!<span class="bi_col_title">Edition</span>\s*<span class="bi_col_value">([^<]+)</span></div>!;
-    ($data{volume})     = $html =~ m!<span class="bi_col_title">Volume</span>\s*<span class="bi_col_value">([^<]+)</span></div>!;
-    ($data{binding})    = $html =~ m!<span class="bi_col_title">Binding</span>\s*<span class="bi_col_value">([^<]+)</span></div>!;
-    ($data{isbn13})     = $html =~ m!<span class="bi_col_title">ISBN-13</span>\s*<span class="bi_col_value">([0-9]+)</span></div>!;
-    ($data{isbn10})     = $html =~ m!<span class="bi_col_title">ISBN-10</span>\s*<span class="bi_col_value">([0-9X]+)</span></div>!;
-    ($data{weight})     = $html =~ m!<span class="bi_col_title">Weight</span>\s*<span class="bi_col_value">([0-9\.]+) lbs.</span></div>!;
+    ($data{publisher})  = $html =~ m!<span class="bi_col_title">Publisher</span>\s*<span class="bi_col_value">([^<]+)</span>\s*</div>!si;
+    ($data{pubdate})    = $html =~ m!<span class="bi_col_title">Publication date</span>\s*<span class="bi_col_value">([^<]+)</span>\s*</div>!si;
+    ($data{pages})      = $html =~ m!<span class="bi_col_title">Pages</span>\s*<span class="bi_col_value">([0-9]+)</span>\s*</div>!si;
+    ($data{edition})    = $html =~ m!<span class="bi_col_title">Edition</span>\s*<span class="bi_col_value">([^<]+)</span>\s*</div>!si;
+    ($data{volume})     = $html =~ m!<span class="bi_col_title">Volume</span>\s*<span class="bi_col_value">([^<]+)</span>\s*</div>!si;
+    ($data{binding})    = $html =~ m!<span class="bi_col_title">Binding</span>\s*<span class="bi_col_value">([^<]+)</span>\s*</div>!si;
+    ($data{isbn13})     = $html =~ m!<span class="bi_col_title">ISBN-13</span>\s*<span class="bi_col_value">([0-9]+)</span>\s*</div>!si;
+    ($data{isbn10})     = $html =~ m!<span class="bi_col_title">ISBN-10</span>\s*<span class="bi_col_value">([0-9X]+)</span>\s*</div>!si;
+    ($data{weight})     = $html =~ m!<span class="bi_col_title">Weight</span>\s*<span class="bi_col_value">([0-9\.]+) lbs.</span>\s*</div>!si;
     ($data{author})     = $html =~ m!<div class="d_descriptive">By\s*(.*?)\s*</div>!;
     ($data{description})= $html =~ m!<div class="bi_annotation_text"><div class="bi_anno_text_head">Summary</div>([^<]+)<!;
     ($data{description})= $html =~ m!<div class="bi_wide bi_annotation_text"><a name="amazondesc"></a><b>Amazon.com description:</b> <b>Product Description</b>:([^<]+)<!   unless($data{description});
@@ -85,7 +85,7 @@ sub search {
         $data{weight} = int($data{weight} / $LB2G);
     }
 
-    my @size = $html =~ m!<span class="bi_col_title">Dimensions</span>\s*<span class="bi_col_value">([0-9\.]+) by ([0-9\.]+) by ([0-9\.]+) in.</span></div>!;
+    my @size = $html =~ m!<span class="bi_col_title">Dimensions</span>\s*<span class="bi_col_value">([0-9\.]+) by ([0-9\.]+) by ([0-9\.]+) in.</span>\s*</div>!;
     if(@size) {
         ($data{depth},$data{width},$data{height}) = sort @size;    
         $data{$_} = int($data{$_} / $IN2MM)  for(qw( height width depth ));
@@ -99,7 +99,7 @@ sub search {
     $data{isbn}  = $data{isbn13} || $isbn;
     $data{html}  = $html;
 
-	$self->book(\%data);
+    $self->book(\%data);
 
     $self->found(1);
     return $self->book;
@@ -189,8 +189,8 @@ following fields are returned:
 
 =head1 COPYRIGHT AND LICENSE
 
-  Copyright 2004-2013 by Andy Schamp
-  Copyright 2013-2014 by Barbie
+  Copyright (C) 2004-2013 by Andy Schamp
+  Copyright (C) 2013-2019 by Barbie
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

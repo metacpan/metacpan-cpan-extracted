@@ -28,7 +28,8 @@
             "Template" : "0",
             "Test::BDD::Cucumber" : "0.50",
             "Weasel" : "0",
-            "Weasel::Session" : "0.08"
+            "Weasel::Session" : "0.08",
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -50,7 +51,7 @@
          "web" : "https://github.com/ehuelsmann/pherkin-extension-weasel"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

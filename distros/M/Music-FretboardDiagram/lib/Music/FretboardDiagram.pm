@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw fretboard chord diagrams
 
-our $VERSION = '0.0300';
+our $VERSION = '0.0402';
 
 use Moo;
 use strictures 2;
@@ -53,6 +53,12 @@ has outfile => (
 );
 
 
+has type => (
+    is      => 'ro',
+    default => sub { 'png' },
+);
+
+
 has font => (
     is      => 'ro',
     default => sub { '/opt/X11/share/fonts/TTF/VeraMono.ttf' },
@@ -80,14 +86,22 @@ has verbose => (
 sub BUILD {
     my ( $self, $args ) = @_;
 
+    die 'Chord length and string length differ'
+        if $args->{chord} && length($args->{chord}) != $self->{strings};
+
     my @scale = qw/C Db D Eb E F Gb G Ab A Bb B/;
+
+    # Make a scale position index corresponding with the given tuning
     my @index = map { my $t = $_; first_index { $t eq $_ } @scale } @{ $self->tuning };
+
     my %notes;
 
     my $n = 0;
 
     for my $i ( @index ) {
         $n++;
+
+        # Make a scale note list for each string
         $notes{$n} = [ map { $scale[ ($i + $_) % @scale ] } 0 .. @scale - 1 ];
     }
 
@@ -104,14 +118,21 @@ sub draw {
     my $SPACE = $self->size;
 
     my @chord;
+    my $font;
 
     # Setup a new image
     my $i = Imager->new(
         xsize => $SPACE + $self->strings * $SPACE - $self->strings,
         ysize => $SPACE + $self->frets * $SPACE - $self->frets,
     );
-    my $font = Imager::Font->new( file => $self->font );
     $i->box( filled => 1, color => $WHITE );
+
+    if ( -e $self->font ) {
+        $font = Imager::Font->new( file => $self->font );
+    }
+    else {
+        warn 'WARNING: Font ', $self->font, " not found\n";
+    }
 
     # Draw the vertical string lines
     for my $string (0 .. $self->strings - 1) {
@@ -172,6 +193,7 @@ sub draw {
         elsif ( $note =~ /[oO0]/ ) {
             my $temp = $self->fretboard->{$string}[0];
             push @chord, $temp;
+
             print "O at 0,$string = $temp\n" if $self->verbose;
 
             $i->string(
@@ -187,6 +209,7 @@ sub draw {
         else {
             my $temp = $self->fretboard->{$string}[ ($self->position + $note - 1) % @{ $self->fretboard->{1} } ];
             push @chord, $temp;
+
             print "Dot at $note,$string = $temp\n" if $self->verbose;
 
             $i->circle(
@@ -213,9 +236,8 @@ sub draw {
     );
 
     # Output the image
-    my $type = 'png';
-    my $name = $self->outfile . '.' . $type;
-    $i->write( type => $type, file => $name )
+    my $name = $self->outfile . '.' . $self->type;
+    $i->write( type => $self->type, file => $name )
         or die "Can't save $name: ", $i->errstr;
 }
 
@@ -238,7 +260,7 @@ Music::FretboardDiagram - Draw fretboard chord diagrams
 
 =head1 VERSION
 
-version 0.0300
+version 0.0402
 
 =head1 SYNOPSIS
 
@@ -264,6 +286,7 @@ version 0.0300
     outfile  => 'ukulele-chord',
     font     => '/path/to/TTF/font.ttf',
     tuning   => [qw/A E C G/],
+    type     => 'bmp',
     verbose  => 1,
   );
   $dia->draw;
@@ -282,9 +305,9 @@ neck position and chord name annotations for guitar, ukulele, banjo, etc.
   $dia->chord('xx0232');
   $chord = $dia->chord;
 
-A chord given in string format, where non-zero digits represent frets, C<x> (or
-C<X>) indicates a muted string and C<0> (or C<o> or C<O>) indicates an open
-string.  The default order of the strings is C<654321> from lowest to highest.
+A chord given as a string, where non-zero digits represent frets, C<x> (or C<X>)
+indicates a muted string and C<0> (or C<o> or C<O>) indicates an open string.
+The default order of the strings is C<654321> from lowest to highest.
 
 Examples:
 
@@ -351,9 +374,17 @@ Default: 30
   $dia->outfile('chord-042');
   $outfile = $dia->outfile;
 
-The image file name minus the (PNG) extension.
+The image file name minus the extension.
 
 Default: chord-diagram
+
+=head2 type
+
+  $type = $dia->type;
+
+The image file extension.
+
+Default: png
 
 =head2 font
 
@@ -402,7 +433,7 @@ Construct the B<fretboard> attribute from the B<tuning>.
 
   $dia->draw;
 
-Render the requested chord diagram as a PNG image.
+Render the requested chord diagram as an image file of B<type>.
 
 =head1 SEE ALSO
 

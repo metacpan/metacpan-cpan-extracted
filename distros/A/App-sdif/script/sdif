@@ -823,7 +823,7 @@ sub pwidth {
 
 sub terminal_width {
     my $default = 80;
-    my $cols = `tput cols`;
+    my $cols = `tput cols 2> /dev/tty`;
     chomp $cols;
     $cols > 0 ? int($cols) : $default;
 }

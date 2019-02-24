@@ -1,3 +1,13 @@
+0.101   2019-02-24 (PERLANCAR)
+
+	- Add submodule: perl_modname_or_prefix.
+
+
+0.100   2019-02-23 (PERLANCAR)
+
+	- Add submodule: perl_modprefix.
+
+
 0.09    2017-01-15 (PERLANCAR)
 
 	- Add submodule: perl_distname.

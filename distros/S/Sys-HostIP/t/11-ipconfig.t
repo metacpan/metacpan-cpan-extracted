@@ -10,6 +10,7 @@ use Sys::HostIP;
 use lib '.';
 use t::lib::Utils qw/mock_win32_hostip/;
 
+## no critic qw(Subroutines::RequireFinalReturn)
 sub test_mock_ipconfig {
     my ( $file, $expected_results, $test_name ) = @_;
 

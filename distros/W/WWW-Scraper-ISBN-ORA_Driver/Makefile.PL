@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     AUTHOR              => 'Barbie <barbie@cpan.org>',
-    NAME                => 'WWW-Scraper-ISBN-ORA_Driver',
+    NAME                => 'WWW::Scraper::ISBN::ORA_Driver',
     VERSION_FROM        => 'lib/WWW/Scraper/ISBN/ORA_Driver.pm',
     ABSTRACT            => q|Search driver for the O'Reilly & Associates' online catalog|,
     NO_META             => 1,

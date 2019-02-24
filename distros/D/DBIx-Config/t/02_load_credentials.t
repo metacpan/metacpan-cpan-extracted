@@ -28,6 +28,8 @@ Test::MockObject->fake_module(
                         TRACE_LEVEL => 5,
                     }
                 },
+            },
+            {
                 'some_other_file' => {
                     SOME_DATABASE => {
                         dsn => 'dbi:mysql:dbname=acronym', 

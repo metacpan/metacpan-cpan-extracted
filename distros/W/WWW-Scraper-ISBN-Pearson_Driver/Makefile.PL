@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     AUTHOR              => 'Barbie <barbie@cpan.org>',
-    NAME                => 'WWW-Scraper-ISBN-Pearson_Driver',
+    NAME                => 'WWW::Scraper::ISBN::Pearson_Driver',
     VERSION_FROM        => 'lib/WWW/Scraper/ISBN/Pearson_Driver.pm',
     ABSTRACT            => 'Search driver for the Pearson Education online book catalog',
     NO_META             => 1,

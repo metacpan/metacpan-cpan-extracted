@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.23';
+$VERSION = '0.24';
 
 #--------------------------------------------------------------------------
 
@@ -37,8 +37,8 @@ use WWW::Mechanize;
 ###########################################################################
 # Constants
 
-use constant	SEARCH	=> 'http://www.pearsoned.co.uk/Bookshop/';
-use constant	DETAIL	=> 'http://www.pearsoned.co.uk/Bookshop/detail.asp?item=';
+use constant SEARCH => 'http://www.pearsoned.co.uk/Bookshop/';
+use constant DETAIL => 'http://www.pearsoned.co.uk/Bookshop/detail.asp?item=';
 
 #--------------------------------------------------------------------------
 
@@ -82,33 +82,33 @@ The book_link and image_link refer back to the Pearson Education UK website.
 =cut
 
 sub search {
-	my $self = shift;
-	my $isbn = shift;
-	$self->found(0);
-	$self->book(undef);
+    my $self = shift;
+    my $isbn = shift;
+    $self->found(0);
+    $self->book(undef);
 
-	my $mech = WWW::Mechanize->new();
+    my $mech = WWW::Mechanize->new();
     $mech->agent_alias( 'Linux Mozilla' );
 
-	eval { $mech->get( SEARCH ) };
+    eval { $mech->get( SEARCH ) };
     return $self->handler("Pearson Education website appears to be unavailable.")
-	    if($@ || !$mech->success() || !$mech->content());
+        if($@ || !$mech->success() || !$mech->content());
 
 #print STDERR "\n# content=[\n".$mech->content()."\n]\n";
 
-	$mech->form_id('hipGlobalSearchForm');
-	$mech->set_fields( 'txtSearch' => $isbn );
-	
+    $mech->form_id('hipGlobalSearchForm');
+    $mech->set_fields( 'txtSearch' => $isbn );
+    
     eval { $mech->submit() };
-	return $self->handler("Failed to find that book on Pearson Education website.")
-	    if($@ || !$mech->success() || !$mech->content());
+    return $self->handler("Failed to find that book on Pearson Education website.")
+        if($@ || !$mech->success() || !$mech->content());
 
-	# The Book page
+    # The Book page
     my $html = $mech->content();
 #print STDERR "\n# html=[\n$html\n]\n";
 
-	return $self->handler("Failed to find that book on Pearson Education website.")
-		if($html =~ m!<p>Your search for <b>\d+</b> returned 0 results. Please search again.</p>!si);
+    return $self->handler("Failed to find that book on Pearson Education website.")
+        if($html =~ m!<p>Your search for <b>\d+</b> returned 0 results. Please search again.</p>!si);
 
     my $data;
     ($data->{image})        = $html =~ m!"(http://images.pearsoned-ema.com/jpeg/large/\d+\.jpg)"!i;
@@ -119,18 +119,18 @@ sub search {
      $data->{binding},
      $data->{pages},
      $data->{isbn13})       = $html =~ m!   <div\s*class="biblio">\s*
-                                                        <h1\s*class="larger\s*bold">(.*?)</h1>\s*(?:.*?<br\s*/>\s*)?
-                                                        <h2\s*class="body"><a\s*title[^>]+>(.*?)</a>\s*</h2>\s*
-                                                        ([^,]+),\s*([^,]+)(?:,\s*(\d+)\s+pages)?(?:</a>)?<br\s*/>\s*
-                                                        ISBN(?:13)?:\s*(\d+)\s*<br\s*/>!ix;
+                                            <h1\s*class="larger\s*bold">(.*?)</h1>\s*(?:.*?<br\s*/>\s*)?
+                                            <h2\s*class="body"><a\s*title[^>]+>(.*?)</a>\s*</h2>\s*
+                                            ([^,]+),\s*([^,]+)(?:,\s*(\d+)\s+pages)?(?:</a>)?<br\s*/>\s*
+                                            ISBN(?:13)?:\s*(\d+)\s*<br\s*/>!ix;
     ($data->{description})  = $html =~ m!<div class="desc-text"><p><p>([^<]+)!is;
     ($data->{bookid})       = $html =~ m!recommend.asp\?item=(\d+)!i;
 
 #use Data::Dumper;
 #print STDERR "\n# " . Dumper($data);
 
-	return $self->handler("Could not extract data from Pearson Education result page.")
-		unless(defined $data);
+    return $self->handler("Could not extract data from Pearson Education result page.")
+        unless(defined $data);
 
     # remove HTML tags
     for(qw(author binding)) {
@@ -138,8 +138,8 @@ sub search {
         $data->{$_} =~ s!<[^>]+>!!g;
     }
 
-	# trim top and tail
-	for(keys %$data) { 
+    # trim top and tail
+    for(keys %$data) { 
         next unless(defined $data->{$_});
         $data->{$_} =~ s/^\s+//;
         $data->{$_} =~ s/\s+$//; 
@@ -147,33 +147,33 @@ sub search {
 
     my $uri = $mech->uri(); #DETAIL . $data->{bookid};
 
-	my $bk = {
-		'ean13'		    => $data->{isbn13},
-		'isbn13'		=> $data->{isbn13},
-		'isbn10'		=> $self->convert_to_isbn10( $data->{isbn13} ),
-		'isbn'			=> $data->{isbn13},
-		'author'		=> $data->{author},
-		'title'			=> $data->{title},
-		'book_link'		=> "$uri",
-		'image_link'	=> $data->{image},
-		'thumb_link'	=> $data->{thumb},
-		'description'	=> $data->{description},
-		'pubdate'		=> $data->{pubdate},
-		'publisher'		=> q!Pearson Education!,
-		'binding'	    => $data->{binding},
-		'pages'		    => $data->{pages},
-		'weight'		=> $data->{weight},
-		'width'		    => $data->{width},
-		'height'		=> $data->{height},
-        'html'          => $html
-	};
+    my $bk = {
+        'ean13'       => $data->{isbn13},
+        'isbn13'      => $data->{isbn13},
+        'isbn10'      => $self->convert_to_isbn10( $data->{isbn13} ),
+        'isbn'        => $data->{isbn13},
+        'author'      => $data->{author},
+        'title'       => $data->{title},
+        'book_link'   => "$uri",
+        'image_link'  => $data->{image},
+        'thumb_link'  => $data->{thumb},
+        'description' => $data->{description},
+        'pubdate'     => $data->{pubdate},
+        'publisher'   => q!Pearson Education!,
+        'binding'     => $data->{binding},
+        'pages'       => $data->{pages},
+        'weight'      => $data->{weight},
+        'width'       => $data->{width},
+        'height'      => $data->{height},
+        'html'        => $html
+    };
 
 #use Data::Dumper;
 #print STDERR "\n# book=".Dumper($bk);
 
     $self->book($bk);
-	$self->found(1);
-	return $self->book;
+    $self->found(1);
+    return $self->book;
 }
 
 1;
@@ -211,7 +211,7 @@ be forthcoming, please feel free to (politely) remind me.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2004-2015 Barbie for Miss Barbell Productions
+  Copyright (C) 2004-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

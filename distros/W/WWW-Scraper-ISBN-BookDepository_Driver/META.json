@@ -1,6 +1,6 @@
 {
     "name": "WWW-Scraper-ISBN-BookDepository_Driver",
-    "version": "0.12",
+    "version": "0.13",
     "abstract": "Search driver for The Book Depository online book catalog",
     "author": ["Barbie <barbie@cpan.org>"],
 
@@ -45,7 +45,7 @@
     "provides": {
         "WWW::Scraper::ISBN::BookDepository_Driver": {
             "file": "lib/WWW/Scraper/ISBN/BookDepository_Driver.pm",
-            "version": "0.12"
+            "version": "0.13"
         }
     },
     "no_index": {

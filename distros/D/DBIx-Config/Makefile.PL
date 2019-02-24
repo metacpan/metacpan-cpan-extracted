@@ -1,5 +1,5 @@
-use inc::Module::Install;
 BEGIN { push @INC, '.' unless $INC[-1] eq '.' }
+use inc::Module::Install;
 
 name            'DBIx-Config';
 all_from        'lib/DBIx/Config.pm';

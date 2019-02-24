@@ -19,11 +19,11 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 =head1 VERSION
 
-Version 0.11
+Version 0.13
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -255,7 +255,6 @@ sub DESTROY {
 
 				# Don't always do javascript 'best' since it's confused
 				# by the common <!-- HIDE technique.
-				# See https://github.com/nevesenin/javascript-packer-perl/issues/1#issuecomment-4356790
 				my $options = {
 					remove_comments => 1,
 					remove_newlines => 0,
@@ -304,10 +303,12 @@ sub DESTROY {
 		}
 	}
 
-	$self->{status} = 200;
-
 	if(defined($headers) && ($headers =~ /^Status: (\d+)/m)) {
 		$self->{status} = $1;
+	} elsif(defined($self->{info})) {
+		$self->{status} = $self->{info}->status();
+	} else {
+		$self->{status} = 200;
 	}
 
 	if($self->{'logger'}) {
@@ -437,7 +438,7 @@ sub DESTROY {
 							}
 						}
 						$query = "DELETE FROM fcgi_buffer WHERE key = '$key'";
-						$dbh->prepare($query)->execute();
+						$dbh->do($query);
 						if($self->{logger}) {
 							$self->{logger}->debug($query);
 						}
@@ -846,7 +847,7 @@ sub _optimise_content {
 	$self->{body} =~ s/\<\/tr\>\s\<\/table\>/\<\/tr\>\<\/table\>/gi;
 	$self->{body} =~ s/\<br\s?\/?\>\s?\<p\>/\<p\>/gi;
 	$self->{body} =~ s/\<br\>\s+/\<br\>/gi;
-	$self->{body} =~ s/\s+\<br\>/\<br\>/gi;
+	$self->{body} =~ s/\s+\<br/\<br/gi;
 	$self->{body} =~ s/\<br\s?\/\>\s/\<br \/\>/gi;
 	$self->{body} =~ s/[ \t]+/ /gs;	# Remove duplicate space, don't use \s+ it breaks JavaScript
 	$self->{body} =~ s/\s\<p\>/\<p\>/gi;
@@ -863,8 +864,10 @@ sub _optimise_content {
 	$self->{body} =~ s/<\/li>\s+<li>/<\/li><li>/gis;
 	$self->{body} =~ s/<\/li>\s+<\/ul>/<\/li><\/ul>/gis;
 	$self->{body} =~ s/<ul>\s+<li>/<ul><li>/gis;
+	$self->{body} =~ s/\s+<\/li>/<\/li>/gis;
 	$self->{body} =~ s/\<\/option\>\s+\<option/\<\/option\>\<option/gis;
 	$self->{body} =~ s/<title>\s*(.+?)\s*<\/title>/<title>$1<\/title>/is;
+	$self->{body} =~ s/<\/center>\s+<center>/ /gis;
 }
 
 # Create a key for the cache
@@ -1298,8 +1301,7 @@ sub _set_content_type {
 	foreach my $header (split(/\r?\n/, $headers)) {
 		my ($header_name, $header_value) = split /\:\s*/, $header, 2;
 		if (lc($header_name) eq 'content-type') {
-			my @content_type;
-			@content_type = split /\//, $header_value, 2;
+			my @content_type = split /\//, $header_value, 2;
 			$self->{content_type} = \@content_type;
 			return;
 		}
@@ -1427,18 +1429,16 @@ sub _save_to {
 			$query = "SELECT DISTINCT path, creation FROM fcgi_buffer WHERE uri = ? AND language = ? AND browser_type = ?";
 		}
 		if($self->{logger}) {
-			$self->{logger}->debug("$query: $search_uri");
+			$self->{logger}->debug("$query: $search_uri, ", $self->{lingua}->language(), ', ', $self->{info}->browser_type());
 		}
-		my $sth = $dbh->prepare($query);
-		if(!defined($sth)) {
-			if($self->{logger}) {
-				$self->{logger}->warn("failed to prepare '$query'");
-			}
-		} else {
+		if(defined(my $sth = $dbh->prepare($query))) {
 			$sth->execute($search_uri, $self->{lingua}->language(), $self->{info}->browser_type());
 			if(my $href = $sth->fetchrow_hashref()) {
 				if(my $path = $href->{'path'}) {
 					if(-r $path) {
+						if($self->{logger}) {
+							$self->{logger}->debug("Changing links from $link to $path");
+						}
 						$link =~ s/\?/\\?/g;
 						my $rootdir = $self->{info}->rootdir();
 						$path =~ s/^$rootdir//;
@@ -1456,8 +1456,10 @@ sub _save_to {
 					}
 				}
 			}
+		} elsif($self->{logger}) {
+			$self->{logger}->warn("failed to prepare '$query'");
 		}
-	};
+	}
 	my $expiration = 0;
 	if(defined($creation) && (my $ttl = $self->{save_to}->{ttl})) {
 		$expiration = $creation + $ttl;
@@ -1465,7 +1467,11 @@ sub _save_to {
 	if($changes && (($expiration == 0) || ($expiration >= time))) {
 		if($self->{logger}) {
 			# $self->{logger}->debug("$changes links now point to static pages");
-			$self->{logger}->info("$changes links now point to static pages");
+			if($changes == 1) {
+				$self->{logger}->info('1 link now points to a static page for ', $expiration - time, 's');
+			} else {
+				$self->{logger}->info("$changes links now point to static pages");
+			}
 		}
 		$unzipped_body = $copy;
 		$self->{'body'} = $unzipped_body;
@@ -1544,7 +1550,6 @@ For example:
 
 Can produce buggy JavaScript if you use the <!-- HIDING technique.
 This is a bug in L<JavaScript::Packer>, not FCGI::Buffer.
-See https://github.com/nevesenin/javascript-packer-perl/issues/1#issuecomment-4356790
 
 Mod_deflate can confuse this when compressing output.
 Ensure that deflation is off for .pl files:
@@ -1574,6 +1579,8 @@ or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
+The lint operation only works on HTML4, because of a restriction in L<HTML::Lint>.
+
 =head1 SEE ALSO
 
 CGI::Buffer, HTML::Packer, HTML::Lint
@@ -1592,10 +1599,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=FCGI-Buffer>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/FCGI-Buffer>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/FCGI-Buffer>
@@ -1609,7 +1612,7 @@ L<http://search.cpan.org/dist/FCGI-Buffer/>
 =head1 ACKNOWLEDGEMENTS
 
 The inspiration and code for some of this is cgi_buffer by Mark
-Nottingham: http://www.mnot.net/cgi_buffer.
+Nottingham: L<https://www.mnot.net/blog/2003/04/24/etags>.
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -1622,8 +1625,8 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2017 Nigel Horne,
-and is released under the following licence: GPL
+The rest of the program is Copyright 2015-2019 Nigel Horne,
+and is released under the following licence: GPL2
 
 =cut
 

@@ -27,4 +27,5 @@ TTF
 fretboard
 gene
 lib
+png
 th

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.012000;
 
 use ExtUtils::MakeMaker;
 
@@ -18,10 +18,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Chess-Opening",
   "LICENSE" => "unrestricted",
+  "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Chess::Opening",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Fcntl" => 0,
+    "IO::Seekable" => "1.20",
     "Locale::TextDomain" => 0,
     "base" => 0,
     "common::sense" => 0,
@@ -32,7 +34,7 @@ my %WriteMakefileArgs = (
     "POSIX" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.3",
+  "VERSION" => "0.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +44,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Fcntl" => 0,
+  "IO::Seekable" => "1.20",
   "Locale::TextDomain" => 0,
   "Module::Build" => "0.28",
   "POSIX" => 0,

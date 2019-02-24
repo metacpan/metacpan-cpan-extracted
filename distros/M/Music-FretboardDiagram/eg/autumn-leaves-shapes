@@ -10,6 +10,7 @@ my $dia = Music::FretboardDiagram->new(
     chord    => 'x13121',
     position => 3,
     outfile  => 'Cm7',
+    #font     => '/path/to/your/font.ttf',
 );
 $dia->draw;
 

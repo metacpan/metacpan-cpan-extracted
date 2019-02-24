@@ -5,6 +5,12 @@ Changes from 2.99_01 to 3.16    made by Mark Overmeer
 Changes from 0.09    to 2.99_01 made by David Kernen
 	- Potential compatibility issues from 3.17+ highlighted with '*'
 
+version 3.42: Sun Feb 24 00:43:29 UTC 2019
+	- rt.cpan.org#12859: has_capability() changes in 3.41 broke imap4rev1()
+	  [Gilles Lamiral and Gábor Leszlauer]
+	- updated http:// to https:// URLs for referenced resources
+	- updated copyright for 2019
+
 version 3.41: Thu Feb 21 01:47:42 UTC 2019
 	- rt.cpan.org#128220: unseen(), messages() and related POD cleanup
 	  [Dan Jacobson]

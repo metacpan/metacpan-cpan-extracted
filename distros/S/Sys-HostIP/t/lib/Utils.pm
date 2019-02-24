@@ -12,15 +12,32 @@ use Sys::HostIP qw/ip ips ifconfig interfaces/;
 use Test::More;
 
 @ISA       = qw(Exporter);
-@EXPORT_OK = qw( mock_run_ipconfig mock_win32_hostip base_tests );
+@EXPORT_OK = qw( mock_run_ipconfig mock_win32_hostip mock_linux_hostip base_tests );
 
 sub mock_win32_hostip {
     my $file = shift;
 
     {
+        ## no critic qw(TestingAndDebugging::ProhibitNoWarnings)
         no warnings qw/redefine once/;
         *Sys::HostIP::_run_ipconfig = sub {
             ok( 1, 'Windows was called' );
+            return mock_run_ipconfig($file);
+        };
+    }
+
+    my $hostip = Sys::HostIP->new;
+
+    return $hostip;
+}
+
+sub mock_linux_hostip {
+    my $file = shift;
+
+    {
+        ## no critic qw(TestingAndDebugging::ProhibitNoWarnings)
+        no warnings qw/redefine once/;
+        *Sys::HostIP::_run_ipconfig = sub {
             return mock_run_ipconfig($file);
         };
     }
@@ -41,6 +58,7 @@ sub mock_run_ipconfig {
     return @output;
 }
 
+## no critic qw(Subroutines::RequireFinalReturn)
 sub base_tests {
     my $hostip = shift;
 
@@ -56,7 +74,8 @@ sub base_tests {
     my $sub_ips   = ips();
     my $class_ips = $hostip->ips;
     isa_ok( $class_ips, 'ARRAY', 'scalar context ips() gets arrayref' );
-    ok( 1 == grep( /^$class_ip$/, @{$class_ips} ), 'Found IP in IPs by class' );
+    my $ip_in_ips_list = 1 == grep {/^$class_ip$/x} @{$class_ips};
+    ok( $ip_in_ips_list, 'Found IP in IPs by class' );
     is( scalar @{$class_ips}, scalar @{$sub_ips},
         'Length of class and sub ips() output is equal' );
     is_deeply( [sort @{$class_ips}], [sort @{$sub_ips}],

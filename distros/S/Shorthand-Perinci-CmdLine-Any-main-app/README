@@ -1,0 +1,57 @@
+NAME
+    Shorthand::Perinci::CmdLine::Any::main::app - Load Perinci::CmdLine::Any
+    and run main's app
+
+VERSION
+    This document describes version 0.001 of
+    Shorthand::Perinci::CmdLine::Any::main::app (from Perl distribution
+    Shorthand-Perinci-CmdLine-Any-main-app), released on 2019-02-23.
+
+SYNOPSIS
+     use Shorthand::Perinci::CmdLine::Any::main::app;
+
+DESCRIPTION
+    EXPERIMENTAL.
+
+     use Shorthand::Perinci::CmdLine::Any::main::app;
+
+    is a shorthand for:
+
+     use Perinci::CmdLine::Any;
+     END { Perinci::CmdLine::Any->new(url => '/main/app')->run; }
+
+    You can pass extra arguments to new() via import arguments, e.g.:
+
+     use Shorthand::Perinci::CmdLine::Any::main::app log=>1;
+
+    is a shorthand for:
+
+     use Perinci::CmdLine::Any;
+     END { Perinci::CmdLine::Any->new(url => '/main/app', log=>1)->run; }
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Shorthand-Perinci-CmdLine-Any-main-app>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Shorthand-Perinci-CmdLine-Any-main-ap
+    p>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Shorthand-Perinci-Cmd
+    Line-Any-main-app>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

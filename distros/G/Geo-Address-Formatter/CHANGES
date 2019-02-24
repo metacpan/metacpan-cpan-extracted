@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.74   2019-02-23
+       - use Text::Hogan 1.09
+       - newest address-formatting templates
+
 1.73   2018-12-21
        - use YAML::XS everywhere
        - newest address-formatting templates

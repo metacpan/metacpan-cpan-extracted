@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                   WWW-Scraper-ISBN-PickABook_Driver
-version:                0.07
+version:                0.08
 abstract:               Search driver for the Pick-A-Book online book catalog
 author:
   - Barbie <barbie@cpan.org>
@@ -27,7 +27,7 @@ build_requires:
 provides:
   WWW::Scraper::ISBN::PickABook_Driver:
     file:     lib/WWW/Scraper/ISBN/PickABook_Driver.pm
-    version:  0.07
+    version:  0.08
 no_index:
   directory:
     - t

@@ -3,13 +3,13 @@
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/FCGI-Buffer/badge)](https://dependencyci.com/github/nigelhorne/FCGI-Buffer)
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/FCGI-Buffer/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/FCGI-Buffer?branch=master)
 
-# FCGI::Buffer
+# NAME
 
-Verify, Cache and Optimise FCGI Output
+FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 # VERSION
 
-Version 0.11
+Version 0.13
 
 # SYNOPSIS
 
@@ -221,7 +221,6 @@ For example:
 
 Can produce buggy JavaScript if you use the &lt;!-- HIDING technique.
 This is a bug in [JavaScript::Packer](https://metacpan.org/pod/JavaScript::Packer), not FCGI::Buffer.
-See https://github.com/nevesenin/javascript-packer-perl/issues/1#issuecomment-4356790
 
 Mod\_deflate can confuse this when compressing output.
 Ensure that deflation is off for .pl files:
@@ -251,6 +250,8 @@ or through the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
+The lint operation only works on HTML4, because of a restriction in [HTML::Lint](https://metacpan.org/pod/HTML::Lint).
+
 # SEE ALSO
 
 CGI::Buffer, HTML::Packer, HTML::Lint
@@ -267,10 +268,6 @@ You can also look for information at:
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=FCGI-Buffer](http://rt.cpan.org/NoAuth/Bugs.html?Dist=FCGI-Buffer)
 
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/FCGI-Buffer](http://annocpan.org/dist/FCGI-Buffer)
-
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/FCGI-Buffer](http://cpanratings.perl.org/d/FCGI-Buffer)
@@ -282,7 +279,7 @@ You can also look for information at:
 # ACKNOWLEDGEMENTS
 
 The inspiration and code for some of this is cgi\_buffer by Mark
-Nottingham: http://www.mnot.net/cgi\_buffer.
+Nottingham: [https://www.mnot.net/blog/2003/04/24/etags](https://www.mnot.net/blog/2003/04/24/etags).
 
 # LICENSE AND COPYRIGHT
 
@@ -295,5 +292,5 @@ The licence for cgi\_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2017 Nigel Horne,
-and is released under the following licence: GPL
+The rest of the program is Copyright 2015-2019 Nigel Horne,
+and is released under the following licence: GPL2

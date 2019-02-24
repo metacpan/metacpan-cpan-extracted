@@ -1,5 +1,12 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.10.2 2019-02-24T00:59:14Z
+
+    - Use `tput cols 2> /dev/tty` to get terminal width in sdif.
+
+    When used from watchdiff command, stdout/stderr are redirected to pipe,
+    and can't get terminal width from them.
+
 4.10.1 2019-02-16T12:15:16Z
 
     - "state" can not initialize list variable in perl5.18.

@@ -8,10 +8,10 @@ build_requires:
   Test::More: '1.001008'
   Try::Tiny: '0.22'
   YAML: '1.13'
-  perl: '5.006'
+  perl: v5.10.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: v5.10.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -23,9 +23,9 @@ requires:
   Clone: '0.37'
   Scalar::Util: '1.41'
   Text::Trim: '1.02'
-  perl: '5.006'
+  perl: v5.10.0
 resources:
   bugtracker: https://github.com/kaoru/Text-Hogan/issues
   repository: git://github.com/kaoru/Text-Hogan
-version: '1.07'
+version: '1.09'
 x_serialization_backend: 'YAML::Tiny version 1.69'

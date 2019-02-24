@@ -1,0 +1,24 @@
+MySQL::Compress
+===============
+
+Description
+-----------
+This module provides functions compatible with MySQL COMPRESS() and UNCOMPRESS().
+One reason you may want to use these functions is because MySQL COMPRESS() does not offer the possibilty
+to specify the compression level, whereas the mysql_compress() function in this module does.
+
+Copyright
+---------
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Installation
+------------
+perl Makefile.PL
+make
+make test
+make install
+
+Author
+------
+Craig Manley

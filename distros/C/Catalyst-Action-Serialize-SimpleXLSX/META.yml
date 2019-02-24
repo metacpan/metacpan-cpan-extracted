@@ -1,0 +1,33 @@
+---
+abstract: 'Serialize to Microsoft Excel 2007 .xlsx files '
+author:
+  - 'Mike Baas <mbaas@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  Spreadsheet::XLSX: '0'
+  Template: '0'
+  Test::Deep: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Action-Serialize-SimpleXLSX
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Catalyst::Controller::REST: '0'
+  Catalyst::Exception: '0'
+  Excel::Writer::XLSX: '0'
+  namespace::clean: '0'
+  perl: '5.010001'
+resources:
+  repository: https://github.com/initself/Catalyst-Action-Serialize-SimpleXLSX.git
+version: '0.007'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.30';
+$VERSION = '0.31';
 
 #--------------------------------------------------------------------------
 
@@ -42,10 +42,10 @@ use WWW::Mechanize;
 
 my $DOMAIN = 'http://books.google.com';
 
-use constant	SEARCH	=> '/books?jscmd=viewapi&callback=bookdata&bibkeys=ISBN:';
-use constant	LB2G    => 453.59237;   # number of grams in a pound (lb)
-use constant	OZ2G    => 28.3495231;  # number of grams in an ounce (oz)
-use constant	IN2MM   => 25.4;        # number of inches in a millimetre (mm)
+use constant SEARCH => '/books?jscmd=viewapi&callback=bookdata&bibkeys=ISBN:';
+use constant LB2G   => 453.59237;   # number of grams in a pound (lb)
+use constant OZ2G   => 28.3495231;  # number of grams in an ounce (oz)
+use constant IN2MM  => 25.4;        # number of inches in a millimetre (mm)
 
 my %LANG = (
     'cz' => { Publisher => 'Vydavatel',     Author => 'Autor',          Title => 'Titul',   Length => [ 'Délka', qr/\QD\x{e9}lka\E/, 'D&eacute;lka' ],
@@ -105,29 +105,29 @@ The book_link and image_link refer back to the GoogleBooks website.
 =cut
 
 sub search {
-	my $self = shift;
-	my $isbn = shift;
+    my $self = shift;
+    my $isbn = shift;
     my $data;
-	$self->found(0);
-	$self->book(undef);
+    $self->found(0);
+    $self->book(undef);
 
     # validate and convert into EAN13 format
     my $ean = $self->convert_to_ean13($isbn);
     return $self->handler("Invalid ISBN specified")
         unless($ean);
 
-	my $mech = WWW::Mechanize->new();
+    my $mech = WWW::Mechanize->new();
     $mech->agent_alias( 'Linux Mozilla' );
 
     my $search = ($ENV{GOOGLE_DOMAIN} || $DOMAIN) . SEARCH . $ean;
     eval { $mech->get( $search ) };
     return $self->handler("GoogleBooks website appears to be unavailable.")
-	    if($@ || !$mech->success() || !$mech->content());
+        if($@ || !$mech->success() || !$mech->content());
 
     my $json = $mech->content();
 
     return $self->handler("Failed to find that book on GoogleBooks website.")
-	    if($json eq 'bookdata({});');
+        if($json eq 'bookdata({});');
 
     $json =~ s/^bookdata\(//;
     $json =~ s/\);$//;
@@ -137,27 +137,27 @@ sub search {
 #print STDERR "\n# code=".Dumper($code);
 
     return $self->handler("Failed to find that book on GoogleBooks website.")
-	    unless($code->{'ISBN:'.$ean} || $code->{'ISBN:'.$isbn});
+        unless($code->{'ISBN:'.$ean} || $code->{'ISBN:'.$isbn});
 
     $data->{url}   = $code->{'ISBN:'.$ean }{info_url};
     $data->{url} ||= $code->{'ISBN:'.$isbn}{info_url};
 
     return $self->handler("Failed to find that book on GoogleBooks website.")
-	    unless($data->{url});
+        unless($data->{url});
 
     eval { $mech->get( $data->{url} ) };
     return $self->handler("GoogleBooks website appears to be unavailable.")
-	    if($@ || !$mech->success() || !$mech->content());
+        if($@ || !$mech->success() || !$mech->content());
 
-	# The Book page
+    # The Book page
     #my $html = $mech->content();
     my $html = encode_entities($mech->content(),'^\n\x20-\x25\x27-\x7e');
     $html =~ s/\&amp;#39;/&#39;/sig;
     $html =~ s/\\x\(([a-z\d]+)\)/\&#$1;/sig;
     $html =~ s/&#55;/7/sig;
 
-	return $self->handler("Failed to find that book on GoogleBooks website. [$isbn]")
-		if($html =~ m!Sorry, we couldn't find any matches for!si);
+    return $self->handler("Failed to find that book on GoogleBooks website. [$isbn]")
+        if($html =~ m!Sorry, we couldn't find any matches for!si);
 
 #use Data::Dumper;
 #print STDERR "\n# " . Dumper($data);
@@ -169,10 +169,10 @@ sub search {
     my $lang = 'en';                                                                # English (default)
     $lang = 'de'    if($data->{url} =~ m{^http://[.\w]+\.google\.(de|ch|at)\b});    # German
     $lang = 'iw'    if($data->{url} =~ m{^http://[.\w]+\.google\.co\.il\b});        # Hebrew
-    $lang = $ccTLD  if($LANG{$ccTLD});                                              # we have a ccTLD translation
+    $lang = $ccTLD  if($ccTLD && $LANG{$ccTLD});                                    # we have a ccTLD translation
 
-	return $self->handler("Language '".uc $lang."'not currently supported, patches welcome.")
-		if($lang =~ m!xx!);
+    return $self->handler("Language '".uc $lang."'not currently supported, patches welcome.")
+        if($lang =~ m!xx!);
 
     _match( $html, $data, $lang );
 
@@ -182,8 +182,8 @@ sub search {
         $data->{$_} =~ s!<[^>]+>!!g;
     }
 
-	# trim top and tail
-	for(keys %$data) { next unless(defined $data->{$_});$data->{$_} =~ s/^\s+//;$data->{$_} =~ s/\s+$//; }
+    # trim top and tail
+    for(keys %$data) { next unless(defined $data->{$_});$data->{$_} =~ s/^\s+//;$data->{$_} =~ s/\s+$//; }
 
     # .com (and possibly others) don't always use Google's own CDN
     if($data->{image} =~ m!^/!) {
@@ -195,29 +195,29 @@ sub search {
 
     my $url = $mech->uri();
 
-	my $bk = {
-		'ean13'		    => $data->{isbn13},
-		'isbn13'		=> $data->{isbn13},
-		'isbn10'		=> $data->{isbn10},
-		'isbn'			=> $data->{isbn13},
-		'author'		=> $data->{author},
-		'title'			=> $data->{title},
-		'book_link'		=> "$url",
-		'image_link'	=> $data->{image},
-		'thumb_link'	=> $data->{thumb},
-		'pubdate'		=> $data->{pubdate},
-		'publisher'		=> $data->{publisher},
-		'description'   => $data->{description},
-		'pages'		    => $data->{pages},
-        'html'          => $html
-	};
+    my $bk = {
+        'ean13'       => $data->{isbn13},
+        'isbn13'      => $data->{isbn13},
+        'isbn10'      => $data->{isbn10},
+        'isbn'        => $data->{isbn13},
+        'author'      => $data->{author},
+        'title'       => $data->{title},
+        'book_link'   => "$url",
+        'image_link'  => $data->{image},
+        'thumb_link'  => $data->{thumb},
+        'pubdate'     => $data->{pubdate},
+        'publisher'   => $data->{publisher},
+        'description' => $data->{description},
+        'pages'       => $data->{pages},
+        'html'        => $html
+    };
 
 #use Data::Dumper;
 #print STDERR "\n# book=".Dumper($bk);
 
     $self->book($bk);
-	$self->found(1);
-	return $self->book;
+    $self->found(1);
+    return $self->book;
 }
 
 =head2 Private Methods
@@ -276,13 +276,13 @@ sub _match {
 #print STDERR "\n# " . Dumper($data);
 
     # get other fields
-    ($data->{image})                    = $html =~ m!<div class="bookcover"><img src="([^"]+)"[^>]+id=summary-frontcover[^>]*></div>!i;
-    ($data->{image})                    = $html =~ m!<div class="bookcover"><a[^>]+><img src="([^"]+)"[^>]+id=summary-frontcover[^>]*></a></div>!i  unless($data->{image});
-    ($data->{author})                   = $html =~ m!<td class="metadata_label">(?:<span[^>]*>)?$LANG{$lang}->{Author}(?:</span>)?</td><td class="metadata_value">(.*?)</td>!i;
-    ($data->{author})                   = $html =~ m!<td class="metadata_value"><a class="primary" href=".*?"><span dir=ltr>([^<]+)</span></a></td>!si    unless($data->{author});
-    ($data->{title})                    = $html =~ m!<td class="metadata_label">(?:<span[^>]*>)?$LANG{$lang}->{Title}(?:</span>)?</td><td class="metadata_value">(?:<span[^>]*>)?([^<]+)(?:</span>)?!i;
-    ($data->{title})                    = $html =~ m!<meta name="title" content="([^>]+)"\s*/>! unless($data->{title});
-    ($data->{description})              = $html =~ m!<meta name="description" content="([^>]+)"\s*/>!si;
+    ($data->{image})       = $html =~ m!<div class="bookcover"><img src="([^"]+)"[^>]+id=summary-frontcover[^>]*></div>!i;
+    ($data->{image})       = $html =~ m!<div class="bookcover"><a[^>]+><img src="([^"]+)"[^>]+id=summary-frontcover[^>]*></a></div>!i  unless($data->{image});
+    ($data->{author})      = $html =~ m!<td class="metadata_label">(?:<span[^>]*>)?$LANG{$lang}->{Author}(?:</span>)?</td><td class="metadata_value">(.*?)</td>!i;
+    ($data->{author})      = $html =~ m!<td class="metadata_value"><a class="primary" href=".*?"><span dir=ltr>([^<]+)</span></a></td>!si    unless($data->{author});
+    ($data->{title})       = $html =~ m!<td class="metadata_label">(?:<span[^>]*>)?$LANG{$lang}->{Title}(?:</span>)?</td><td class="metadata_value">(?:<span[^>]*>)?([^<]+)(?:</span>)?!i;
+    ($data->{title})       = $html =~ m!<meta name="title" content="([^>]+)"\s*/>! unless($data->{title});
+    ($data->{description}) = $html =~ m!<meta name="description" content="([^>]+)"\s*/>!si;
 
     $data->{author} =~ s/"//g;
     $data->{thumb} = $data->{image};
@@ -325,7 +325,7 @@ be forthcoming, please feel free to (politely) remind me.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2010-2015 Barbie for Miss Barbell Productions
+  Copyright (C) 2010-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

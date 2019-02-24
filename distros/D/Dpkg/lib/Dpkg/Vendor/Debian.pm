@@ -81,6 +81,8 @@ sub run_hook {
         $self->_add_build_flags(@params);
     } elsif ($hook eq 'builtin-system-build-paths') {
         return qw(/build/);
+    } elsif ($hook eq 'build-tainted-by') {
+        return $self->_build_tainted_by();
     } else {
         return $self->SUPER::run_hook($hook, @params);
     }
@@ -437,6 +439,38 @@ sub _add_build_flags {
             $flags->set_feature($area, $feature, $enabled);
         }
     }
+}
+
+sub _build_tainted_by {
+    my $self = shift;
+    my %tainted;
+
+    foreach my $pathname (qw(/bin /sbin /lib /lib32 /libo32 /libx32 /lib64)) {
+        next unless -l $pathname;
+
+        my $linkname = readlink $pathname;
+        if ($linkname eq "usr$pathname") {
+            $tainted{'merged-usr-via-symlinks'} = 1;
+            last;
+        }
+    }
+
+    require File::Find;
+    my %usr_local_types = (
+        configs => [ qw(etc) ],
+        includes => [ qw(include) ],
+        programs => [ qw(bin sbin) ],
+        libraries => [ qw(lib) ],
+    );
+    foreach my $type (keys %usr_local_types) {
+        File::Find::find({
+            wanted => sub { $tainted{"usr-local-has-$type"} = 1 if -f },
+            no_chdir => 1,
+        }, map { "/usr/local/$_" } @{$usr_local_types{$type}});
+    }
+
+    my @tainted = sort keys %tainted;
+    return @tainted;
 }
 
 =head1 CHANGES

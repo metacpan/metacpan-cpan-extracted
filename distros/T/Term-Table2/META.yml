@@ -30,4 +30,4 @@ requires:
   Params::Validate: '0'
   Term::ReadKey: '0'
   perl: '5.014'
-version: v1.0.2
+version: v1.0.3

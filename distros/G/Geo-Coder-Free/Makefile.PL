@@ -37,7 +37,8 @@ my %urls = (
 	'http://download.geonames.org/export/dump/admin1CodesASCII.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db',
 	'http://download.geonames.org/export/dump/admin2Codes.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db',
 	# 'https://geocode.nigelhorne.com/lib/Geo/Coder/Free/MaxMind/databases/cities.sql' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql',
-	'http://download.maxmind.com/download/worldcities/worldcitiespop.txt.gz' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
+	# 'http://download.maxmind.com/download/worldcities/worldcitiespop.txt.gz' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
+	'https://github.com/apache/commons-csv/blob/master/src/test/resources/perf/worldcitiespop.txt.gz?raw=true' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
 	'http://download.geonames.org/export/dump/allCountries.zip' => 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip',
 );
 
@@ -70,6 +71,22 @@ if(open(my $admin2, '>>', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
 		"GB.ENG.P5\tLondon\tLondon\t2648110\n";
 }
 
+my $test_requires = {
+	'CGI::IDS' => 0,
+	'CGI::Lingua' => 0,
+	'Data::Throttler' => 0,
+	'Test::Most' => 0,
+	'Test::NoWarnings' => 0,
+	'Test::Number::Delta' => 0,
+	'Test::Carp' => 0
+};
+
+if($ENV{'AUTHOR_TESTING'}) {
+	$test_requires->{'IPC::System::Simple'} = 0;
+	$test_requires->{'FCGI::Buffer'} = 0;
+	$test_requires->{'Log::WarnDie'} = 0;
+}
+
 WriteMakefile(
 	NAME		=> 'Geo::Coder::Free',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -94,15 +111,7 @@ WriteMakefile(
 		'LWP::UserAgent::Throttled' => 0,
 		'Try::Tiny' => 0,
 	},
-	TEST_REQUIRES => {
-		'CGI::IDS' => 0,
-		'CGI::Lingua' => 0,
-		'Data::Throttler' => 0,
-		'Test::Most' => 0,
-		'Test::NoWarnings' => 0,
-		'Test::Number::Delta' => 0,
-		'Test::Carp' => 0,
-	},
+	TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'Carp' => 0,
 		'DBI' => 0,

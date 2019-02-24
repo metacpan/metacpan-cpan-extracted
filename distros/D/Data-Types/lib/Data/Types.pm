@@ -4,7 +4,7 @@ use strict;
 require Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 @ISA = qw(Exporter);
 
@@ -164,7 +164,7 @@ applications.
 =head1 EXPORT
 
 No functions are exported by default, though each function may be exported
-explicitly (see L<"Functions">, below, for a list of functions available for
+explicitly (see L</FUNCTIONS> below, for a list of functions available for
 export). The following export tags are supported:
 
 =over 4

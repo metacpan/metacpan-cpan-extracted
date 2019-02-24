@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Text-Hogan,
-version 1.07:
+version 1.09:
 
   Text::Hogan - A mustache templating engine statement-for-statement cloned from hogan.js
 
-This software is copyright (c) 2018 by Alex Balhatchet.
+This software is copyright (c) 2019 by Alex Balhatchet.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

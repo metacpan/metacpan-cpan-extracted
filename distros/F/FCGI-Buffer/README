@@ -1,4 +1,4 @@
-FCGI-Buffer Version 0.11
+FCGI-Buffer Version 0.13
 
 INSTALLATION
 
@@ -21,9 +21,6 @@ You can also look for information at:
     RT, CPAN's request tracker
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=FCGI-Buffer
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/FCGI-Buffer
-
     CPAN Ratings
         http://cpanratings.perl.org/d/FCGI-Buffer
 
@@ -33,6 +30,6 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015-2017 Nigel Horne
+Copyright (C) 2015-2019 Nigel Horne
 
 This program is released under the following licence: GPL2

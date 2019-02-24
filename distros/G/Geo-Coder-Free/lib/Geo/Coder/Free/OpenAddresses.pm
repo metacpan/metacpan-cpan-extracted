@@ -304,7 +304,7 @@ sub geocode {
 					if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($c{'subcountry'})}) {
 						$addr{'state'} = $twoletterstate;
 					}
-				} elsif($c{'country'} =~ /^(Canada|United States|USA|US)$/i) {
+				} elsif($c{'country'} =~ /^(United States|USA|US)$/i) {
 					$addr{'country'} = 'US';
 					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($c{'subcountry'})}) {
 						$addr{'state'} = $twoletterstate;

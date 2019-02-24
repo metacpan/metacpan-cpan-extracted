@@ -1,3 +1,8 @@
+1.043   2019-02-24 (PERLANCAR)
+
+	- Use Exporter to check imported args.
+
+
 1.042   2019-02-15 (PERLANCAR)
 
 	- [ux] Allow specifying scenario module with Bencher::Scenario::

@@ -1,6 +1,9 @@
 Revision history for WWW-Scraper-ISBN-OpenLibrary_Driver
 ========================================================
 
+0.10    2019-02-23
+        - updated patterns and test data, due to website updates.
+
 0.09    2014-11-28
         - fixed license fields in META.json to be lists.
         - ping fix for Cygwin (thanks to Alexandr Ciornii).

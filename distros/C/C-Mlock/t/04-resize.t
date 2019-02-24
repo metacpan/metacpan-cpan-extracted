@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 7;
+plan tests => 11;
 
 BEGIN {
     use C::Mlock;
@@ -23,4 +23,12 @@ BEGIN {
     is( $s, 12, "Set size to smaller than store");
     $rs = $ls->get();
     is( $rs, "Hello World", "Get after truncate (returned: $rs)");
+    $s = $ls->set_size(6);
+    is( $s, 6, "Set size to smaller than store");
+    $rs = $ls->get();
+    is( $rs, "Hello", "Get after truncate 2 (returned: $rs)");
+    $s = $ls->set_size(50);
+    is( $s, 50, "Set size to smaller than store");
+    $rs = $ls->get();
+    is( $rs, "Hello", "Get after enlarge - Should still be 'Hello' after second truncate (returned: $rs)");
 }

@@ -44,3 +44,6 @@ Revision history for Perl extension Locked::Storage.
 1.11  22 Feb 2019
 	- Renamed from Locked::Storage to C::MLock a more
 	  appropriate name.
+
+1.12  23 Feb 2019
+	- Added a couple more tests, and reworked the realloc.

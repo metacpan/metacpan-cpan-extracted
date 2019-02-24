@@ -2,8 +2,8 @@ NAME
     Bencher::Backend - Backend for Bencher
 
 VERSION
-    This document describes version 1.042 of Bencher::Backend (from Perl
-    distribution Bencher-Backend), released on 2019-02-15.
+    This document describes version 1.043 of Bencher::Backend (from Perl
+    distribution Bencher-Backend), released on 2019-02-24.
 
 FUNCTIONS
   bencher
@@ -27,7 +27,7 @@ FUNCTIONS
     script as well as Perl module. See the Bencher::Backend documentation
     for more information.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -492,7 +492,7 @@ FUNCTIONS
     Options to customize the look/style of the chart will be added in the
     future.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -524,7 +524,7 @@ FUNCTIONS
 
     Format bencher result.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -556,7 +556,7 @@ FUNCTIONS
 
     Parse scenario (fill in default values, etc).
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -597,7 +597,7 @@ FUNCTIONS
 
     Return an array where each element is "[\%field_values, $split_result]".
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension Sys::HostIP.
 
+2.110     2019-02-23 17:40:31+02:00 Asia/Jerusalem
+
+    * Implement fallback to `ip` on systems which don't have `ifconfig`.
+      (Adam Balali)
+    * Increase perlcritic compliance.
+
 2.100     2018-01-20 23:17:24+01:00 Europe/Amsterdam
 
     * Work around ip() failures on non-English systems.

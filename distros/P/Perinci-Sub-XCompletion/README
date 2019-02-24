@@ -1,5 +1,12 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::XCompletion - Write completion routines in
+    x.{,element_,index_}completion attributes
 
+VERSION
+    This document describes version 0.101 of Perinci::Sub::XCompletion (from
+    Perl distribution Perinci-Sub-XCompletion), released on 2019-02-24.
+
+SYNOPSIS
     In Rinci metadata:
 
      args => {
@@ -12,18 +19,42 @@ SYNOPSIS
      ...
 
 DESCRIPTION
-
-    This is a module to support an experimental (and temporary?) way to
-    ease writing completion routine. Instead of putting a coderef in
-    completion or element_completion property in argument specification,
-    you put $name or [$name, \%args] in x.completion or
-    x.element_completion or x.index_completion attributes. $name is the
-    name of Perinci::Sub::XCompletion::* submodule to use, and \%args is
+    This is a module to support an experimental (and temporary?) way to ease
+    writing completion routine. Instead of putting a coderef in "completion"
+    or "element_completion" property in argument specification, you put
+    $name or "[$name, \%args]" in "x.completion" or "x.element_completion"
+    or "x.index_completion" attributes. $name is the name of
+    "Perinci::Sub::XCompletion::*" submodule to use, and \%args is
     arguments.
 
     But you can also use a coderef as usual.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-XCompletion>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-XCompletion>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-XCompleti
+    on>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci::Sub::Complete
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

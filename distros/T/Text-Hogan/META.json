@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "v5.10.0"
          }
       },
       "develop" : {
@@ -31,7 +31,7 @@
             "Clone" : "0.37",
             "Scalar::Util" : "1.41",
             "Text::Trim" : "1.02",
-            "perl" : "5.006"
+            "perl" : "v5.10.0"
          }
       },
       "test" : {
@@ -41,7 +41,7 @@
             "Test::More" : "1.001008",
             "Try::Tiny" : "0.22",
             "YAML" : "1.13",
-            "perl" : "5.006"
+            "perl" : "v5.10.0"
          }
       }
    },
@@ -56,7 +56,7 @@
          "web" : "http://github.com/kaoru/Text-Hogan"
       }
    },
-   "version" : "1.07",
+   "version" : "1.09",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0214"
 }
 

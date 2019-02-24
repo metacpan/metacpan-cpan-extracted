@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-Free
 
+0.17	Sat 23 Feb 17:21:41 EST 2019
+	Maxmind download of worldcitiespop.txt has been removed
+
 0.16	Tue Jan  1 17:57:37 EST 2019
 	Import GeoName's allCountries data
 	Remember L:E:AddressParser objects to speed up parsing. RT#127814

@@ -1,6 +1,9 @@
 Revision history for WWW-Scraper-ISBN-ORA_Driver
 ================================================
 
+0.23    2019-02-23
+        - updated pattern matching due to page layout changes.
+
 0.22    2014-11-29
         - fixed license fields in META.json to be lists.
         - ping fix for Cygwin (thanks to Alexandr Ciornii).

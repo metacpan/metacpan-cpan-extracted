@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+CONTRIBUTING
+lib/Catalyst/Action/Serialize/SimpleXLSX.pm
+t/00-load.t
+t/excel.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/REST.pm
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,8 @@
 Revision history for Perl extension Data::Types.
 
+0.17  2019-02-23T12:35:00
+      - Fixed pod error as reported by CPANTS. (MANWAR)
+
 0.16  2018-12-03T17:10:00
       - Added minimum perl version as suggested by CPANTS. (MANWAR)
 

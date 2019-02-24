@@ -1,6 +1,9 @@
-0.1.12
+0.1.13:
+    - Add '.' to @INC so Module::Install continues to work,
+      this time for real.
+0.1.12:
     - Add '.' to @INC so Module::Install continues to work.
-0.1.11
+0.1.11:
     - Using dbh_maker in a hash to connect() will not result
       in connect() passing through your arguments after merging
       into a single hash.
@@ -15,32 +18,29 @@
     - Improved caching layer to prevent stale cache
     - Changed tests to use the correct password attribute
     - Updated Documentation
-
-0.1.10
+0.1.10:
     - Introduce a public config() getter to allow access to the loaded
       Config::Any object.
-
-0.1.9
+0.1.9:
     - Fix perl 5.17 hash randomisation breakage (RT#83309)
-
-0.1.8
+0.1.8:
     - Added class accessor config_files to use Config::Any's
       load_files method and reduce stat() calls for those who
       like that kind of thing.
     - Moved the Config::Any parser to its own private function.
     - DBIX_CONFIG_DIR environment allows run-time injection of
       a directory that contains a dbic.* file.
-0.1.7
+0.1.7:
     - Use File::HomeDir instead of env, thanks @ Christian Walde
     - CHANGELOG -> Changes
     - BSD License -> Perl License
     - README.pod -> Readme.md
     - Contributor Addition (Christian Walde)
-0.1.6
+0.1.6:
     - Once more with feeling.
-0.1.5
+0.1.5:
     - Re-release due to broken MANIFEST.skip and outdated README.pod
-0.1.4 
+0.1.4: 
     - Config::Any added as a requirement
     - Tests now use the included .perl format (No more YAML::XS requirement)
     - Tests changed to support DBIx::Class 0.80123
@@ -49,7 +49,7 @@
         - Added CONTRIBUTOR section
             - Thanks mst and ribasushi for the constant reviews!
     - Pushed to CPAN as a stable release
-0.1.3 
+0.1.3: 
     - connect() now handles passing through valid-looking DBI connect structures.
     - _make_config now checks for $user and $pass to be hashrefs, this adds support
       for structures like ->connect( 'CONFIG', { hostname => 'db.foo.com' } );
@@ -60,7 +60,7 @@
       as the second argument, and the statements referring to load_credentials having
       responsibility to return normal DBI connect structures.
     -  Config::Any is only loaded when it's needed.
-0.1.2
+0.1.2:
     - Makefile.PL depends on DBD::SQLite not DBD::SQLite3
     - _make_config has a less annoying return
     - connection() no longer tries to block ->load_credentials,

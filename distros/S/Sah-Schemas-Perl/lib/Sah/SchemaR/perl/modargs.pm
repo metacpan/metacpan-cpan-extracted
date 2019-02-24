@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::modargs;
 
-our $DATE = '2018-12-09'; # DATE
-our $VERSION = '0.017'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '0.018'; # VERSION
 
 our $rschema = ["str",[{description=>"\nPerl module name with optional arguments which will be used as import arguments,\njust like the `-MMODULE=ARGS` shortcut that `perl` provides. Examples:\n\n    Foo\n    Foo::Bar\n    Foo::Bar=arg1,arg2\n\nSee also: `perl::modname`.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?\\z",summary=>"Perl module name with optional arguments","x.completion"=>"perl_modname"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::modargs - Perl module name with optional arguments
 
 =head1 VERSION
 
-This document describes version 0.017 of Sah::SchemaR::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2018-12-09.
+This document describes version 0.018 of Sah::SchemaR::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2019-02-24.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::pm_filename;
 
-our $DATE = '2018-12-09'; # DATE
-our $VERSION = '0.017'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '0.018'; # VERSION
 
 our $rschema = ["str",[{description=>"\nString containing filename of a Perl module. For convenience, when value is in\nthe form of:\n\n    Foo\n    Foo.pm\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pm\n\nand a matching .pm file is found in `\@INC`, then it will be coerced (converted)\ninto the path of that .pm file, e.g.:\n\n    /home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/Foo/Bar.pm\n\nTo prevent such coercion, you can use prefixing path, e.g.:\n\n    ./Foo::Bar\n    ../Foo/Bar\n    /path/to/Foo/Bar\n\nThis schema comes with convenience completion too.\n\n",summary=>"Filename (.pm file)","x.completion"=>sub{package Sah::Schema::perl::pm_filename;require Complete::File;require Complete::Module;require Complete::Util;my(%args) = @_;my $word = $args{'word'};my @answers;push @answers, Complete::File::complete_file('word', $word);if ($word =~ m[\A\w*((?:::|/)\w+)*\z]) {push @answers, Complete::Module::complete_module('word', $word, 'find_pod', 0);}Complete::Util::combine_answers(@answers)},"x.perl.coerce_rules"=>["str_convert_perl_pm_to_path"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::pm_filename - Filename (.pm file)
 
 =head1 VERSION
 
-This document describes version 0.017 of Sah::SchemaR::perl::pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2018-12-09.
+This document describes version 0.018 of Sah::SchemaR::perl::pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2019-02-24.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

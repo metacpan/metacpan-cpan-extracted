@@ -1,5 +1,11 @@
 Revision history for perl module Text::Hogan
 
+1.09 2019-02-23
+    * Loads of great Perlish refactors from Yanick Champoux <3
+
+1.08 2019-02-23
+    * Use Dist::Zilla::Plugin::Git::Tag for automatic git tags (just for jonassmedegaard :-))
+
 1.07 2018-12-21
     * Variable $key and $Key typo (thanks Yanick Champoux!)
 

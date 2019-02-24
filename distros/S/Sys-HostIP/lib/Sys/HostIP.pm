@@ -1,5 +1,5 @@
 package Sys::HostIP;
-$Sys::HostIP::VERSION = '2.100';
+$Sys::HostIP::VERSION = '2.110';
 # ABSTRACT: Try extra hard to get IP address related info
 
 use strict;
@@ -109,7 +109,7 @@ sub _get_ifconfig_binary {
 
     ## no critic qw(Variables::ProhibitPunctuationVars)
     if ( $^O =~ /(?: linux|openbsd|freebsd|netbsd|solaris|darwin )/xmsi ) {
-        $ifconfig = '/sbin/ifconfig -a';
+        $ifconfig = -f '/sbin/ifconfig' ? '/sbin/ifconfig -a' : '/sbin/ip address';
     } elsif ( $^O eq 'aix' ) {
         $ifconfig = '/usr/sbin/ifconfig -a';
     } elsif ( $^O eq 'irix' ) {
@@ -192,6 +192,17 @@ sub _get_unix_interface_info {
         #           inet addr:127.0.0.1  Mask:255.0.0.0
         #           UP LOOPBACK RUNNING  MTU:3924  Metric:1
         #
+        # In linux, using /sbin/ip it looks like:
+        # [goldenboy:~] adamb $ ip address
+        # 1: lo:   <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default
+        #     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+        #     inet 127.0.0.1/8 scope host lo
+        #        valid_lft forever preferred_lft forever
+        #     inet6 ::1/128 scope host
+        #        valid_lft forever preferred_lft forever
+        # 2: eth0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+        #     link/ether 9c:b6:54:a5:64:60 brd ff:ff:ff:ff:ff:ff
+        #
         # so the regexen involved here have to deal with the following: 1)
         # there's no ':' after an interface's name in linux 2) in linux, it's
         # "inet addr:127.0.0.1" instead of "inet 127.0.0.1" hence the somewhat
@@ -202,15 +213,14 @@ sub _get_unix_interface_info {
         # letters followed (possibly) by an number and a colon, then we've got an
         # interface. if the line starts with a space, then it's the info from the
         # interface that we just found, and we stick the contents into %if_info
-        if ( ( $line =~ /^\s+/ ) && ($interface) ) {
+        if ( ( $line =~ /^\s+/x ) && ($interface) ) {
             $if_info{$interface} .= $line;
         }
 
         # FIXME: refactor this regex
-        elsif ( ($interface)
-            = ( $line =~ /(^\w+(?:\d)?(?:\.\d+)?(?:\:\d+)?)/ ) )
+        elsif ( ($interface) = ( $line =~ /^(?:\d+\:\s){0,1}(\w+(?:\d)?(?:\.\d+)?(?:\:\d+)?)/x ))
         {
-            $line =~ s/\w+\d(\:)?\s+//;
+            $line =~ s/\w+\d(\:)?\s+//x;
             $if_info{$interface} = $line;
         }
     }
@@ -221,7 +231,7 @@ sub _get_unix_interface_info {
         # output. we just want the ip address. perhaps a future version can
         # return even more useful results (netmask, etc).....
         if ( my ($ip)
-            = ( $if_info{$key} =~ /inet (?:addr\:)?(\d+(?:\.\d+){3})/ ) )
+            = ( $if_info{$key} =~ /inet\s(?:addr\:)?(\d+(?:\.\d+){3})/x ) )
         {
             $if_info{$key} = $ip;
         } else {
@@ -413,7 +423,7 @@ Italian, and Finnish locales.
 
 Copyright (C) prior to 2010, Jonathan Schatz <bluelines@divisionbyzero.com>.
 
-Copyright (C) 2010-2017, Sawyer X <xsawyerx@cpan.org>.
+Copyright (C) 2010-2018, Sawyer X <xsawyerx@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

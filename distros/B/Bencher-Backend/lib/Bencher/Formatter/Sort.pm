@@ -1,7 +1,7 @@
 package Bencher::Formatter::Sort;
 
-our $DATE = '2019-02-15'; # DATE
-our $VERSION = '1.042'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 use 5.010001;
 use strict;
@@ -48,7 +48,7 @@ Bencher::Formatter::Sort - Sort rows
 
 =head1 VERSION
 
-This document describes version 1.042 of Bencher::Formatter::Sort (from Perl distribution Bencher-Backend), released on 2019-02-15.
+This document describes version 1.043 of Bencher::Formatter::Sort (from Perl distribution Bencher-Backend), released on 2019-02-24.
 
 =head1 DESCRIPTION
 

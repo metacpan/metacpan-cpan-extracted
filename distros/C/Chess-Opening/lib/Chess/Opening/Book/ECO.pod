@@ -1,0 +1,62 @@
+=for Pod::Coverage empty
+
+=head1 NAME
+
+Chess::Opening::Book::ECO - ECO information
+
+=head1 SYNOPSIS
+
+    $book = Chess::Opening::Book::ECO->new;
+	$entry = $book->lookupFEN($fen) or die "position not found";
+
+	$eco = $entry->eco;
+	print "position has ECO code $eco\n";
+	$variation = $entry->variation;
+	print "opening: $variation\n";
+
+	die "Chess::Opening::Book is an abstract base class";
+
+=head1 DESCRIPTION
+
+The Encyclopedia of Chess Openings ECO is a classification of chess openings.
+Openings are divided into five groups A, B, C, D, E and further classified
+into subgroups numbered 00-99.
+
+The popular chess database program Scid resp. its fork
+L<Scid vs PC|http://scidvspc.sourceforge.net/> extended ECO codes with an
+even finer granularity, see L<http://scidvspc.sourceforge.net/doc/ECO.htm>.
+
+This module offers access to both the classical ECO information and the
+Scid extensions.
+
+=head1 METHODS
+
+=over 4
+
+=item B<new>
+
+The constructor takes no arguments and cannot fail.
+
+=item B<lookupFEN FEN>
+
+See L<Chess::Opening::Book/lookupFEN>!
+
+Note that B<lookupFEN()> returns a L<Chess::Opening::ECO::Entry> that extends
+L<Chess::Opening::Book::Entry> with methods for retrieval of the ECO
+information.
+
+=back
+
+=head1 EXAMPLES
+
+See L<Chess::Opening::Book/EXAMPLES>!
+
+=head1 COPYRIGHT
+
+Copyright (C) 2019 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+L<Chess::Opening::Book>, L<Chess::Opening::Book::Polyglot>,
+L<Chess::Opening::Book::ECO>, L<Chess::Rep>, perl(1)

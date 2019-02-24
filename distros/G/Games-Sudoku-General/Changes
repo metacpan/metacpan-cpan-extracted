@@ -1,3 +1,6 @@
+0.022		2019-02-23	T. R. Wyant
+    Third argument to 'set brick' is now fatal.
+
 0.021		2018-08-24	T. R. Wyant
     Further deprecate third 'set brick' argument. It now warns on every
     use.

@@ -11,7 +11,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 271;
+use Test::Most tests => 282;
 use IO::Uncompress::Brotli;
 use DateTime;
 use Capture::Tiny ':all';
@@ -822,4 +822,48 @@ EOF
 	ok($body =~ /<a href="\/\/www.example.com"/);
 	ok($body !~ /<a href="\/\/www.nigelhorne.com"/);
 
+	#..........................................
+	# Check removal of </center><center>
+
+	sub test21 {
+		my $b = new_ok('FCGI::Buffer');
+
+		$b->set_options({ optimise_content => 1, generate_etag => 0 });
+
+		print "Content-type: text/html; charset=ISO-8859-1\n\n";
+		print << 'EOF';
+<HTML>
+	<HEAD>
+	</HEAD>
+	<BODY>
+		<center>
+			a bit
+			a bit more
+		</center>
+		<center>
+			a third bit
+		</center>
+	</BODY>
+</HTML>
+EOF
+	}
+
+	($stdout, $stderr) = capture { test21() };
+
+	ok($stderr eq '');
+	ok(defined($stdout));
+	ok($stdout !~ /ETag: "([A-Za-z0-F0-f]{32})"/m);
+	ok($stdout !~ /^Status: 304 Not Modified/mi);
+
+	($headers, $body) = split /\r?\n\r?\n/, $stdout, 2;
+
+	ok($headers =~ /^Content-Length:\s+(\d+)/m);
+	$length = $1;
+	ok($headers =~ /MISS/m);
+
+	ok(length($body) != 0);
+	ok(defined($length));
+	ok(length($body) == $length);
+
+	ok($body =~ /a bit more\s+a third bit/);
 }

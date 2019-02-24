@@ -1,3 +1,28 @@
+AR:
+    A: Salta
+    B: Buenos Aires
+    C: Ciudad Autónoma de Buenos Aires
+    D: San Luis
+    E: Entre Ríos
+    F: La Rioja
+    G: Santiago del Estero
+    H: Chaco
+    J: San Juan
+    K: Catamarca
+    L: La Pampa
+    M: Mendoza
+    N: Misiones
+    P: Formosa
+    Q: Neuquén
+    R: Río Negro
+    S: Santa Fe
+    T: Tucumán
+    U: Chubut
+    V: Tierra del Fuego
+    W: Corrientes
+    X: Córdoba
+    Y: Jujuy
+    Z: Santa Cruz
 AU:
     # https://en.wikipedia.org/wiki/States_and_territories_of_Australia
     AAT: Australian Antarctic Territory
@@ -11,6 +36,60 @@ AU:
     TAS: Tasmania
     VIC: Victoria
     WA: Western Australia
+BE:
+    BRU: Bruxelles-Capitale
+    VAN: Antwerpen
+    VBR: Vlaams Brabant
+    VLI: Limburg
+    VOV: Oost-Vlaanderen
+    VWV: West-Vlaanderen
+    WBR: Brabant wallon
+    WHT: Hainaut
+    WLG: Liège
+    WLX: Luxembourg
+    WNA: Namur
+BI:
+    BB: Bubanza
+    BL: Bujumbura Rural
+    BM: Bujumbura Mairie
+    BR: Bururi
+    CA: Cankuzo
+    CI: Cibitoke
+    GI: Gitega
+    KI: Kirundo
+    KR: Karuzi
+    KY: Kayanza
+    MA: Makamba
+    MU: Muramvya
+    MW: Mwaro
+    MY: Muyinga
+    NG: Ngozi
+    RM: Rumonge
+    RT: Rutana
+    RY: Ruyigi
+BJ:
+    AK: Atacora
+    AL: Alibori
+    AQ: Atlantique
+    BO: Borgou
+    CO: Collines
+    DO: Donga
+    KO: Couffo
+    LI: Littoral
+    MO: Mono
+    OU: Ouémé
+    PL: Plateau
+    ZO: Zou
+BO:
+    B: El Beni
+    C: Cochabamba
+    H: Chuquisaca
+    L: La Paz
+    N: Pando
+    O: Oruro
+    P: Potosí
+    S: Santa Cruz
+    T: Tarija
 BR:
     # http://en.wikipedia.org/wiki/States_of_Brazil
     AC: Acre
@@ -40,6 +119,30 @@ BR:
     SP: São Paulo
     SE: Sergipe
     TO: Tocantins
+BW:
+    CE: Central
+    CH: Chobe
+    FR: Francistown
+    GA: Gaborone
+    GH: Ghanzi
+    JW: Jwaneng
+    KG: Kgalagadi
+    KL: Kgatleng
+    KW: Kweneng
+    LO: Lobatse
+    NE: North East
+    NW: North West
+    SE: South East
+    SO: Southern
+    SP: Selibe Phikwe
+    ST: Sowa Town
+BZ:
+    BZ: Belize
+    CY: Cayo
+    CZL: Corozal
+    OW: Orange Walk
+    SC: Stann Creek
+    TOL: Toledo
 CA:
     AB: Alberta
     BC: British Columbia
@@ -54,6 +157,91 @@ CA:
     QC: Quebec
     SK: Saskatchewan
     YT: Yukon
+CH:
+    AG: Aargau
+    AI: Appenzell Innerrhoden
+    AR: Appenzell Ausserrhoden
+    BE: Bern
+    BL: Basel-Landschaft
+    BS: Basel-Stadt
+    FR: Fribourg
+    GE: Genève
+    GL: Glarus
+    GR: Graubünden
+    JU: Jura
+    LU: Luzern
+    NE: Neuchâtel
+    NW: Nidwalden
+    OW: Obwalden
+    SG: Sankt Gallen
+    SH: Schaffhausen
+    SO: Solothurn
+    SZ: Schwyz
+    TG: Thurgau
+    TI: Ticino
+    UR: Uri
+    VD: Vaud
+    VS: Valais
+    ZG: Zug
+    ZH: Zürich
+CL:
+    AI: Aisén del General Carlos Ibañez del Campo
+    AN: Antofagasta
+    AP: Arica y Parinacota
+    AR: La Araucanía
+    AT: Atacama
+    BI: Biobío
+    CO: Coquimbo
+    LI: Libertador General Bernardo O'Higgins
+    LL: Los Lagos
+    LR: Los Ríos
+    MA: Magallanes
+    ML: Maule
+    RM: Región Metropolitana de Santiago
+    TA: Tarapacá
+    VS: Valparaíso
+CO:
+    AMA: Amazonas
+    ANT: Antioquia
+    ARA: Arauca
+    ATL: Atlántico
+    BOL: Bolívar
+    BOY: Boyacá
+    CAL: Caldas
+    CAQ: Caquetá
+    CAS: Casanare
+    CAU: Cauca
+    CES: Cesar
+    CHO: Chocó
+    COR: Córdoba
+    CUN: Cundinamarca
+    DC: Distrito Capital de Bogotá
+    GUA: Guainía
+    GUV: Guaviare
+    HUI: Huila
+    LAG: La Guajira
+    MAG: Magdalena
+    MET: Meta
+    NAR: Nariño
+    NSA: Norte de Santander
+    PUT: Putumayo
+    QUI: Quindío
+    RIS: Risaralda
+    SAN: Santander
+    SAP: San Andrés
+    SUC: Sucre
+    TOL: Tolima
+    VAC: Valle del Cauca
+    VAU: Vaupés
+    VID: Vichada
+CR:
+    A: Alajuela
+    C: Cartago
+    G: Guanacaste
+    H: Heredia
+    L: Limón
+    P: Puntarenas
+    SJ: San José
 DE:
     BB: Brandenburg
     BE: Berlin
@@ -71,6 +259,175 @@ DE:
     SN: Sachsen
     ST: Sachsen-Anhalt
     TH: Thüringen
+EC:
+    A: Azuay
+    B: Bolívar
+    C: Carchi
+    D: Orellana
+    E: Esmeraldas
+    F: Cañar
+    G: Guayas
+    H: Chimborazo
+    I: Imbabura
+    L: Loja
+    M: Manabí
+    N: Napo
+    O: El Oro
+    P: Pichincha
+    R: Los Ríos
+    S: Morona-Santiago
+    SD: Santo Domingo de los Tsáchilas
+    SE: Santa Elena
+    T: Tungurahua
+    U: Sucumbíos
+    W: Galápagos
+    X: Cotopaxi
+    Y: Pastaza
+    Z: Zamora Chinchipe
+ES:
+    AN : Andalucía
+    AR : Aragón
+    AS : Asturias
+    CB : Cantabria
+    CE : Ceuta
+    CL : Castilla y León
+    CM : Castilla-La Mancha
+    CN : Canarias
+    CT : Cataluña
+    EX : Extremadura
+    GA : Galicia
+    IB : Islas Baleares
+    MC : Región de Murcia
+    MD : Comunidad de Madrid
+    ML : Melilla
+    NC : Navarra
+    PV : País Vasco
+    RI : La Rioja
+    VC : Comunidad Valenciana
+GT:
+    AV: Alta Verapaz
+    BV: Baja Verapaz
+    CM: Chimaltenango
+    CQ: Chiquimula
+    ES: Escuintla
+    GU: Guatemala
+    HU: Huehuetenango
+    IZ: Izabal
+    JA: Jalapa
+    JU: Jutiapa
+    PE: Petén
+    PR: El Progreso
+    QC: Quiché
+    QZ: Quetzaltenango
+    RE: Retalhuleu
+    SA: Sacatepéquez
+    SM: San Marcos
+    SO: Sololá
+    SR: Santa Rosa
+    SU: Suchitepéquez
+    TO: Totonicapán
+    ZA: Zacapa
+GY:
+    BA: Barima-Waini
+    CU: Cuyuni-Mazaruni
+    DE: Demerara-Mahaica
+    EB: East Berbice-Corentyne
+    ES: Essequibo Islands-West Demerara
+    MA: Mahaica-Berbice
+    PM: Pomeroon-Supenaam
+    PT: Potaro-Siparuni
+    UD: Upper Demerara-Berbice
+    UT: Upper Takutu-Upper Essequibo
+HN:
+    AT: Atlántida
+    CH: Choluteca
+    CL: Colón
+    CM: Comayagua
+    CP: Copán
+    CR: Cortés
+    EP: El Paraíso
+    FM: Francisco Morazán
+    GD: Gracias a Dios
+    IB: Islas de la Bahía
+    IN: Intibucá
+    LE: Lempira
+    LP: La Paz
+    OC: Ocotepeque
+    OL: Olancho
+    SB: Santa Bárbara
+    VA: Valle
+    YO: Yoro
+HU:
+    BA: Baranya
+    BC: Békéscsaba
+    BE: Békés
+    BK: Bács-Kiskun
+    BU: Budapest
+    BZ: Borsod-Abaúj-Zemplén
+    CS: Csongrád
+    DE: Debrecen
+    DU: Dunaújváros
+    EG: Eger
+    ER: Érd
+    FE: Fejér
+    GS: Győr‐Moson‐Sopron
+    GY: Győr
+    HB: Hajdú-Bihar
+    HE: Heves
+    HV: Hódmezővásárhely
+    JN: Jász-Nagykun-Szolnok
+    KE: Komárom-Esztergom
+    KM: Kecskemét
+    KV: Kaposvár
+    MI: Miskolc
+    NK: Nagykanizsa
+    NO: Nógrád
+    NY: Nyíregyháza
+    PE: Pest
+    PS: Pécs
+    SD: Szeged
+    SF: Székesfehérvár
+    SH: Szombathely
+    SK: Szolnok
+    SN: Sopron
+    SO: Somogy
+    SS: Szekszárd
+    ST: Salgótarján
+    SZ: Szabolcs-Szatmár-Bereg
+    TB: Tatabánya
+    TO: Tolna
+    VA: Vas
+    VE: Veszprém
+    VM: Veszprém
+    ZA: Zala
+    ZE: Zalaegerszeg
+IE:
+    CE: Clare
+    CN: Cavan
+    CO: Cork
+    CW: Carlow
+    D: Dublin
+    DL: Donegal
+    G: Galway
+    KE: Kildare
+    KK: Kilkenny
+    KY: Kerry
+    LD: Longford
+    LH: Louth
+    LK: Limerick
+    LM: Leitrim
+    LS: Laois
+    MH: Meath
+    MN: Monaghan
+    MO: Mayo
+    OY: Offaly
+    RN: Roscommon
+    SO: Sligo
+    TA: Tipperary
+    WD: Waterford
+    WH: Westmeath
+    WW: Wicklow
+    WX: Wexford
 IT:
     ABR: Abruzzo
     BAS: Basilicata
@@ -92,26 +449,180 @@ IT:
     UMB: Umbria
     VAL: Valle d'Aosta
     VEN: Veneto
-ES:
-    AN : Andalucía
-    AR : Aragón
-    AS : Asturias
-    CB : Cantabria
-    CE : Ceuta
-    CL : Castilla y León
-    CM : Castilla-La Mancha
-    CN : Canarias
-    CT : Cataluña
-    EX : Extremadura
-    GA : Galicia
-    IB : Islas Baleares
-    MC : Región de Murcia
-    MD : Comunidad de Madrid
-    ML : Melilla
-    NC : Navarra
-    PV : País Vasco
-    RI : La Rioja
-    VC : Comunidad Valenciana 
+MX:
+    AGU: Aguascalientes
+    BCN: Baja California
+    BCS: Baja California Sur
+    CAM: Campeche
+    CHH: Chihuahua
+    CHP: Chiapas
+    CMX: Ciudad de México
+    COA: Coahuila de Zaragoza
+    COL: Colima
+    DUR: Durango
+    GRO: Guerrero
+    GUA: Guanajuato
+    HID: Hidalgo
+    JAL: Jalisco
+    MEX: México
+    MIC: Michoacán de Ocampo
+    MOR: Morelos
+    NAY: Nayarit
+    NLE: Nuevo León
+    OAX: Oaxaca
+    PUE: Puebla
+    QUE: Querétaro
+    ROO: Quintana Roo
+    SIN: Sinaloa
+    SLP: San Luis Potosí
+    SON: Sonora
+    TAB: Tabasco
+    TAM: Tamaulipas
+    TLA: Tlaxcala
+    VER: Veracruz de Ignacio de la Llave
+    YUC: Yucatán
+    ZAC: Zacatecas
+NI:
+    AN: Atlántico Norte
+    AS: Atlántico Sur
+    BO: Boaco
+    CA: Carazo
+    CI: Chinandega
+    CO: Chontales
+    ES: Estelí
+    GR: Granada
+    JI: Jinotega
+    LE: León
+    MD: Madriz
+    MN: Managua
+    MS: Masaya
+    MT: Matagalpa
+    NS: Nueva Segovia
+    RI: Rivas
+    SJ: Río San Juan
+NL:
+    DR: Drenthe
+    FL: Flevoland
+    FR: Friesland
+    GE: Gelderland
+    GR: Groningen
+    LI: Limburg
+    NB: Noord-Brabant
+    NH: Noord-Holland
+    OV: Overijssel
+    UT: Utrecht
+    ZE: Zeeland
+    ZH: Zuid-Holland
+NZ:
+    AUK: Auckland
+    BOP: Bay of Plenty
+    CAN: Canterbury
+    CIT: Chatham Islands Territory
+    GIS: Gisborne
+    HKB: Hawkes's Bay
+    MBH: Marlborough
+    MWT: Manawatu-Wanganui
+    NSN: Nelson
+    NTL: Northland
+    OTA: Otago
+    STL: Southland
+    TAS: Tasman
+    TKI: Taranaki
+    WGN: Wellington
+    WKO: Waikato
+    WTC: West Coast
+PE:
+    AMA: Amazonas
+    ANC: Ancash
+    APU: Apurímac
+    ARE: Arequipa
+    AYA: Ayacucho
+    CAJ: Cajamarca
+    CAL: El Callao
+    CUS: Cuzco
+    HUC: Huánuco
+    HUV: Huancavelica
+    ICA: Ica
+    JUN: Junín
+    LAL: La Libertad
+    LAM: Lambayeque
+    LIM: Lima
+    LMA: Lima hatun llaqta
+    LOR: Loreto
+    MDD: Madre de Dios
+    MOQ: Moquegua
+    PAS: Pasco
+    PIU: Piura
+    PUN: Puno
+    SAM: San Martín
+    TAC: Tacna
+    TUM: Tumbes
+    UCA: Ucayali
+PL:
+    DS: województwo dolnośląskie
+    KP: województwo kujawsko-pomorskie
+    LB: województwo lubuskie
+    LD: województwo łódzkie
+    LU: województwo lubelskie
+    MA: województwo małopolskie
+    MZ: województwo mazowieckie
+    OP: województwo opolskie
+    PD: województwo podlaskie
+    PK: województwo podkarpackie
+    PM: województwo pomorskie
+    SK: województwo świętokrzyskie
+    SL: województwo śląskie
+    WN: województwo warmińsko-mazurskie
+    WP: województwo wielkopolskie
+    ZP: województwo zachodniopomorskie
+SE:
+    AB: Stockholms län
+    AC: Västerbottens län
+    BD: Norrbottens län
+    C: Uppsala län
+    D: Södermanlands län
+    E: Östergötlands län
+    F: Jönköpings län
+    G: Kronoborgs län
+    H: Kalmar län
+    I: Gotlands län
+    K: Blekinge län
+    M: Skåne län
+    N: Hallands län
+    O: Västra Götalands län
+    S: Värmlands län
+    T: Örebro län
+    U: Västmanlands län
+    W: Dalarnes län
+    X: Gävleborgs län
+    Y: Västernorrlands län
+    Z: Jämtlands län
+SR:
+    BR: Brokopondo
+    CM: Commewijne
+    CR: Coronie
+    MA: Marowijne
+    NI: Nickerie
+    PM: Paramaribo
+    PR: Para
+    SA: Saramacca
+    SI: Sipaliwini
+    WA: Wanica
+SV:
+    AH: Ahuachapán
+    CA: Cabañas
+    CH: Chalatenango
+    CU: Cuscatlán
+    LI: La Libertad
+    MO: Morazán
+    PA: La Paz
+    SA: Santa Ana
+    SM: San Miguel
+    SO: Sonsonate
+    SS: San Salvador
+    SV: San Vicente
+    UN: La Unión
+    US: Usulután
 US:
     # http://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States
     AL: Alabama
@@ -139,7 +650,7 @@ US:
     ME: Maine
     MD: Maryland
     MA: Massachusetts
-    MH: Marsall Islands
+    MH: Marshall Islands
     MI: Michigan
     MN: Minnesota
     MS: Mississippi
@@ -174,3 +685,59 @@ US:
     WV: West Virginia
     WI: Wisconsin
     WY: Wyoming
+UY:
+    AR: Artigas
+    CA: Canelones
+    CL: Cerro Largo
+    CO: Colonia
+    DU: Durazno
+    FD: Florida
+    FS: Flores
+    LA: Lavalleja
+    MA: Maldonado
+    MO: Montevideo
+    PA: Paysandú
+    RN: Río Negro
+    RO: Rocha
+    RV: Rivera
+    SA: Salto
+    SJ: San José
+    SO: Soriano
+    TA: Tacuarembó
+    TT: Treinta y Tres
+VE:
+    A: Distrito Capital
+    B: Anzoátegui
+    C: Apure
+    D: Aragua
+    E: Barinas
+    F: Bolívar
+    G: Carabobo
+    H: Cojedes
+    I: Falcón
+    J: Guárico
+    K: Lara
+    L: Mérida
+    M: Miranda
+    N: Monagas
+    O: Nueva Esparta
+    P: Portuguesa
+    R: Sucre
+    S: Táchira
+    T: Trujillo
+    U: Yaracuy
+    V: Zulia
+    W: Dependencias Federales
+    X: vargas
+    Y: Delta Amacuro
+    Z: Amazonas    
+ZA:
+    EC: Eastern Cape
+    FS: Free State
+    GT: Gauteng
+    LP: Limpopo
+    MP: Mpumalanga
+    NC: Northern Cape
+    NL: Kwazulu-Natal
+    NW: North-West
+    WC: Western Cape

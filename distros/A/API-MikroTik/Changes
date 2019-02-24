@@ -1,3 +1,6 @@
+0.24.1  2019-02-23
+    - This module is deprecated in favour of MikroTik::Client
+
 0.24    2018-02-14
     - Updates to a POD.
     - Reuse socket in a mockup object.

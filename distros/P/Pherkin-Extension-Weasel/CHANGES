@@ -1,3 +1,11 @@
+** 0.06 / 2019-02-22
+   - Actually write the HTML log when steps/scenarios/features
+     complete
+   - Improve default HTML log template
+   - Anticipate change in T::B::C::Extension::post_step()'s
+     '$failed' argument (which turns into '$result' in the
+     hopefully near future)
+
 ** 0.05 / 2019-02-21
    - Add HTML logging of features/scenarios/steps interspersed
      with screenshots and web page interactions (driver commands)

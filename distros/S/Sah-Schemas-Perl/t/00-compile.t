@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
 
 use Test::More;
 
-plan tests => 24 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 30 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/obj/str_perl_version.pm',
@@ -16,10 +16,14 @@ my @module_files = (
     'Data/Sah/Coerce/perl/str/str_convert_perl_pod_to_path.pm',
     'Data/Sah/Coerce/perl/str/str_normalize_perl_distname.pm',
     'Data/Sah/Coerce/perl/str/str_normalize_perl_modname.pm',
+    'Data/Sah/Coerce/perl/str/str_normalize_perl_modname_or_prefix.pm',
+    'Data/Sah/Coerce/perl/str/str_normalize_perl_modprefix.pm',
     'Sah/Schema/perl/distname.pm',
     'Sah/Schema/perl/filename.pm',
     'Sah/Schema/perl/modargs.pm',
     'Sah/Schema/perl/modname.pm',
+    'Sah/Schema/perl/modname_or_prefix.pm',
+    'Sah/Schema/perl/modprefix.pm',
     'Sah/Schema/perl/pm_filename.pm',
     'Sah/Schema/perl/pod_filename.pm',
     'Sah/Schema/perl/pod_or_pm_filename.pm',
@@ -28,6 +32,8 @@ my @module_files = (
     'Sah/SchemaR/perl/filename.pm',
     'Sah/SchemaR/perl/modargs.pm',
     'Sah/SchemaR/perl/modname.pm',
+    'Sah/SchemaR/perl/modname_or_prefix.pm',
+    'Sah/SchemaR/perl/modprefix.pm',
     'Sah/SchemaR/perl/pm_filename.pm',
     'Sah/SchemaR/perl/pod_filename.pm',
     'Sah/SchemaR/perl/pod_or_pm_filename.pm',
@@ -39,9 +45,7 @@ my @module_files = (
 
 # no fake home requested
 
-my @switches = (
-    -d 'blib' ? '-Mblib' : '-Ilib',
-);
+my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
 
 use File::Spec;
 use IPC::Open3;
@@ -55,18 +59,14 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
-            $^X, @switches, '-e', "require q[$lib]"))
-        if $ENV{PERL_COMPILE_TEST_DEBUG};
-
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { +require blib; blib->VERSION('1.01') };
+        and not eval { require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

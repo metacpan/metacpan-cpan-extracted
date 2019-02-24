@@ -51,7 +51,7 @@ my %tests = (
         [ 'is',     'author',       'Deborah Curtis'    ],
         [ 'like',   'publisher',    qr!(Macmillan|Faber \S+ Faber)! ],
         [ 'is',     'pubdate',      '2007'              ],
-        [ 'is',     'pages',        240                 ],
+        [ 'is',     'pages',        212                 ],
         [ 'like',   'image_link',   qr!(books.google.[\w.]+/books/content\?id=\w+|browse.php)!  ],
         [ 'like',   'thumb_link',   qr!(books.google.[\w.]+/books/content\?id=\w+|browse.php)!  ],
         [ 'like',   'description',  qr!Ian Curtis left behind a legacy rich in artistic genius! ],

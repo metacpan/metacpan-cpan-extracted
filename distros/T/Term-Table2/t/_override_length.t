@@ -9,6 +9,8 @@ use Test2::Require::Module 'Unicode::GCString';
 use Test2::V0 -target => 'Term::Table2';
 use Test2::Mock;
 
+skip_all('Unicode::GCString does not work properly if Perl is compiled with -DDEBUGGING') if $^D;
+
 no warnings 'uninitialized';
 my $mockUnicodeGCString = Test2::Mock->new(
   class => 'Unicode::GCString',

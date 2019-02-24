@@ -1,0 +1,28 @@
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: enp0s31f6: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    link/ether 18:db:f2:2b:af:26 brd ff:ff:ff:ff:ff:ff
+3: wlp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether f0:d5:bf:51:ad:15 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.2.107/24 brd 192.168.2.255 scope global wlp2s0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::7caf:9455:eb84:50d9/64 scope link
+       valid_lft forever preferred_lft forever
+9: vboxnet0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    link/ether 0a:00:27:00:00:00 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.23.1/24 brd 192.168.23.255 scope global vboxnet0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::800:27ff:fe00:0/64 scope link
+       valid_lft forever preferred_lft forever
+10: vboxnet1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+    link/ether 0a:00:27:00:00:01 brd ff:ff:ff:ff:ff:ff
+21: tun0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN group default qlen 100
+    link/none
+    inet 10.8.0.2/24 brd 10.8.0.255 scope global tun0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::e057:30b6:8a1b:2fd3/64 scope link flags 800
+       valid_lft forever preferred_lft forever

@@ -1,0 +1,102 @@
+NAME
+    Acme::CPANModulesUtil::Bencher - Generate/extract Bencher scenario from
+    information in an Acme::CPANModules::* list
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModulesUtil::Bencher
+    (from Perl distribution Acme-CPANModulesUtil-Bencher), released on
+    2019-02-24.
+
+FUNCTIONS
+  gen_bencher_scenario
+    Usage:
+
+     gen_bencher_scenario(%args) -> [status, msg, payload, meta]
+
+    Generate/extract Bencher scenario from information in an
+    Acme::CPANModules::* list.
+
+    An Acme::CPANModules::* module can contain benchmark information, for
+    example in Acme::CPANModules::TextTable, each entry has the following
+    property:
+
+     # entries => [
+     #     ...
+     #     {
+     #         module => 'Text::ANSITable',
+     #         ...
+               bench_code => sub {
+                   my ($table) = @_;
+                   my $t = Text::ANSITable->new(
+                       use_utf8 => 0,
+                       use_box_chars => 0,
+                       use_color => 0,
+                       columns => $table->[0],
+                       border_style => 'Default::single_ascii',
+                   );
+                   $t->add_row($table->[$_]) for 1..@$table-1;
+                   $t->draw;
+               },
+
+    The list also contains information about the benchmark datasets:
+
+     bench_datasets => [
+         {name=>'tiny (1x1)'    , argv => [_make_table( 1, 1)],},
+         {name=>'small (3x5)'   , argv => [_make_table( 3, 5)],},
+         {name=>'wide (30x5)'   , argv => [_make_table(30, 5)],},
+         {name=>'long (3x300)'  , argv => [_make_table( 3, 300)],},
+         {name=>'large (30x300)', argv => [_make_table(30, 300)],},
+     ],
+
+    This routine extract those information and return a Bencher scenario
+    structure.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cpanmodule* => *perl::modname*
+
+        Name of Acme::CPANModules::* module, without the prefix.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModulesUtil-Bencher>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModulesUtil-Bencher>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModulesUtil-
+    Bencher>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules
+
+    Bencher
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

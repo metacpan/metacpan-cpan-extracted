@@ -21,9 +21,9 @@ my %tests = (
         [ 'like',   'publisher',    qr|Faber|           ],
         [ 'is',     'pubdate',      'January 18, 2007'  ],
         [ 'is',     'pages',        '256'               ],
-        [ 'is',     'binding',      'Hardcover'          ],
-        [ 'like',   'description',  qr!Learn how the big bang may have been spawned!    ],
-        [ 'like',   'book_link',    qr!http://isbn.nu/057122055X!                       ]
+        [ 'is',     'binding',      'Hardcover'         ],
+        [ 'like',   'description',  qr!Unusual book!    ],
+        [ 'like',   'book_link',    qr!https://isbn.nu/057122055X!          ]
     ],
     '9780571239566' => [
         [ 'is',     'isbn',         '9780571239566'     ],
@@ -41,7 +41,7 @@ my %tests = (
         [ 'is',     'weight',       208                 ],
         [ 'is',     'binding',      'Paperback'         ],
         [ 'like',   'description',  qr!Ian Curtis left behind a legacy rich in artistic genius! ],
-        [ 'like',   'book_link',    qr!http://isbn.nu/9780571239566!                            ]
+        [ 'like',   'book_link',    qr!https://isbn.nu/9780571239566!                           ]
     ],
 );
 

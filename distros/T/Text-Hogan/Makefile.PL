@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Text-Hogan",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Text::Hogan",
   "PREREQ_PM" => {
     "Clone" => "0.37",
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => "0.22",
     "YAML" => "1.13"
   },
-  "VERSION" => "1.07",
+  "VERSION" => "1.09",
   "test" => {
     "TESTS" => "t/*.t"
   }

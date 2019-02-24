@@ -1,6 +1,16 @@
-0.0.3
+0.0.5 2019-02-23 SymKat <symkat@symkat.com>
+    - Added .travis.yml for testing
+    - Fixed hash randomization error in test file (RT: #112888 PR: #4)
+
+0.0.4 2019-02-23 SymKat <symkat@symkat.com>
+    - Add '.' to @INC so Module::Install continues to work,
+      this time for real.
+
+0.0.3 2019-02-19 SymKat <symkat@symkat.com>
     - Add '.' to @INC so Module::Install continues to work.
-0.0.2
+
+0.0.2 2012-09-18 SymKat <symkat@symkat.com>
     - No changes recorded
-0.0.1
+
+0.0.1 2012-08-12 SymKat <symkat@symkat.com>
     - Initial Version

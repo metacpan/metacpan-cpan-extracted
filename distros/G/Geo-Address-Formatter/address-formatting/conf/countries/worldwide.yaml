@@ -772,6 +772,7 @@ GB:
         - ["London, London","London"]
         - ["London, Greater London","London"]
         - ["City of Westminster","London"]
+        - ["City of Nottingham","Nottingham"]
         - [", United Kingdom$","\nUnited Kingdom"]
         - ["London\nEngland\nUnited Kingdom","London\nUnited Kingdom"]
 
@@ -1261,10 +1262,10 @@ MF:
     use_country: FR
     change_country: France     
 
-# Marsall Islands
+# Marshall Islands
 MH:
     use_country: US
-    add_component: state=Marsall Islands
+    add_component: state=Marshall Islands
 
 # Madagascar
 MG:

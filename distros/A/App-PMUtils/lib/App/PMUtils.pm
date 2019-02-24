@@ -1,7 +1,7 @@
 package App::PMUtils;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.720'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '0.721'; # VERSION
 
 use 5.010001;
 
@@ -188,7 +188,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.720 of App::PMUtils (from Perl distribution App-PMUtils), released on 2018-04-03.
+This document describes version 0.721 of App::PMUtils (from Perl distribution App-PMUtils), released on 2019-02-24.
 
 =head1 SYNOPSIS
 
@@ -214,6 +214,8 @@ modules:
 =item * L<pmdoc>
 
 =item * L<pmedit>
+
+=item * L<pmgrep>
 
 =item * L<pmhtml>
 
@@ -258,7 +260,7 @@ The main purpose of these utilities is tab completion.
 
 Usage:
 
- pmdir(%args) -> [status, msg, result, meta]
+ pmdir(%args) -> [status, msg, payload, meta]
 
 Get directory of locally installed Perl module/prefix.
 
@@ -294,7 +296,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -305,7 +307,7 @@ Return value:  (any)
 
 Usage:
 
- pmpath(%args) -> [status, msg, result, meta]
+ pmpath(%args) -> [status, msg, payload, meta]
 
 Get path to locally installed Perl module.
 
@@ -351,7 +353,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -442,7 +444,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -40,7 +40,7 @@ my %tests = (
         [ 'is',     'publisher',    'Pearson Education' ],
         [ 'is',     'pubdate',      'Jul 2001'          ],
         [ 'is',     'binding',      'Paperback'         ],
-        [ 'is',     'pages',        640                 ],
+        [ 'is',     'pages',        632                 ],
         [ 'is',     'width',        undef               ],
         [ 'is',     'height',       undef               ],
         [ 'is',     'weight',       undef               ],

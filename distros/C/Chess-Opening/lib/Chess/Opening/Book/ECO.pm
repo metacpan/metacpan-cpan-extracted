@@ -13,7 +13,7 @@
 # ABSTRACT: Read chess opening books in polyglot format
 
 package Chess::Opening::Book::ECO;
-$Chess::Opening::Book::ECO::VERSION = '0.3';
+$Chess::Opening::Book::ECO::VERSION = '0.5';
 use common::sense;
 
 use Fcntl qw(:seek);

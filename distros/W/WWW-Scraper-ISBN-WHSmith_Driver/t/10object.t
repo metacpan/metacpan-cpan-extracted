@@ -25,29 +25,29 @@ my %tests = (
         [ 'is',     'width',        undef                           ],
         [ 'is',     'height',       undef                           ],
         [ 'like',   'weight',       qr|^\d+$|                       ],
-        [ 'is',     'image_link',   'http://btmedia.whsmith.co.uk/pws/client/images/catalogue/products/9780/55/2557795/xlarge/9780552557795_1.jpg' ],
-        [ 'is',     'thumb_link',   'http://btmedia.whsmith.co.uk/pws/client/images/catalogue/products/9780/55/2557795/small/9780552557795_1.jpg' ],
         [ 'like',   'description',  qr|On the day the world ends|   ],
-        [ 'is',     'book_link',    'http://www.whsmith.co.uk/pws/ProductDetails.ice?ProductID=9780552557795&keywords=9780552557795&redirect=true' ]
+        [ 'is',     'image_link',   'https://btmedia.whsmith.co.uk/pws/client/images/catalogue/products/9780/55/2557795/xlarge/9780552557795_1.jpg' ],
+        [ 'is',     'thumb_link',   'https://btmedia.whsmith.co.uk/pws/client/images/catalogue/products/9780/55/2557795/small/9780552557795_1.jpg'  ],
+        [ 'is',     'book_link',    'https://www.whsmith.co.uk/pws/ProductDetails.ice?ProductID=9780552557795&keywords=9780552557795&redirect=true' ]
     ],
-    '9780847834815' => [
-        [ 'is',     'isbn',         '9780847834815'                 ],
-        [ 'is',     'isbn10',       '0847834816'                    ],
-        [ 'is',     'isbn13',       '9780847834815'                 ],
-        [ 'is',     'ean13',        '9780847834815'                 ],
-        [ 'is',     'title',        'Joy Division'                  ],
-        [ 'is',     'author',       'Kevin Cummins, Bernard Sumner' ],
+    '9780826415493' => [
+        [ 'is',     'isbn',         '9780826415493'                 ],
+        [ 'is',     'isbn10',       '0826415490'                    ],
+        [ 'is',     'isbn13',       '9780826415493'                 ],
+        [ 'is',     'ean13',        '9780826415493'                 ],
+        [ 'is',     'title',        q|Joy Division's Unknown Pleasures (33 1/3)| ],
+        [ 'is',     'author',       'Chris Ott'                     ],
         [ 'is',     'publisher',    undef                           ],
-        [ 'is',     'pubdate',      '01/10/2010'                    ],
-        [ 'is',     'binding',      'Hardback'                      ],
-        [ 'is',     'pages',         208                            ],
+        [ 'is',     'pubdate',      '01/05/2004'                    ],
+        [ 'is',     'binding',      'Paperback'                     ],
+        [ 'is',     'pages',         128                            ],
         [ 'is',     'width',        undef                           ],
         [ 'is',     'height',       undef                           ],
         [ 'like',   'weight',       qr|^\d+$|                       ],
-        [ 'is',     'image_link',   'http://btmedia.whsmith.co.uk/pws/client/images/catalogue/products/9780/84/7834815/xlarge/9780847834815_1.jpg' ],
-        [ 'is',     'thumb_link',   'http://btmedia.whsmith.co.uk/pws/client/images/catalogue/products/9780/84/7834815/small/9780847834815_1.jpg' ],
-        [ 'like',   'description',  qr|The definitive look at one of the most iconic rock bands of all time| ],
-        [ 'is',     'book_link',    'http://www.whsmith.co.uk/pws/ProductDetails.ice?ProductID=9780847834815&keywords=9780847834815&redirect=true' ]
+        [ 'like',   'description',  qr|33 1/3 is a new series of short books| ],
+        [ 'is',     'image_link',   'https://btmedia.whsmith.co.uk/pws/client/images/catalogue/products/9780/82/6415493/xlarge/9780826415493_1.jpg' ],
+        [ 'is',     'thumb_link',   'https://btmedia.whsmith.co.uk/pws/client/images/catalogue/products/9780/82/6415493/small/9780826415493_1.jpg'  ],
+        [ 'is',     'book_link',    'https://www.whsmith.co.uk/pws/ProductDetails.ice?ProductID=9780826415493&keywords=9780826415493&redirect=true' ]
     ],
 );
 
@@ -61,12 +61,12 @@ my $scraper = WWW::Scraper::ISBN->new();
 isa_ok($scraper,'WWW::Scraper::ISBN');
 
 SKIP: {
-	skip "Can't see a network connection", $tests+1   if(pingtest($CHECK_DOMAIN));
+    skip "Can't see a network connection", $tests+1   if(pingtest($CHECK_DOMAIN));
 
-	$scraper->drivers($DRIVER);
+    $scraper->drivers($DRIVER);
 
     # this ISBN doesn't exist
-	my $isbn = "0987654321";
+    my $isbn = "0987654321";
     my $record;
     eval { $record = $scraper->search($isbn); };
     if($@) {
@@ -75,7 +75,7 @@ SKIP: {
     elsif($record->found) {
         ok(0,'Unexpectedly found a non-existent book');
     } else {
-		like($record->error,qr/Invalid ISBN specified|Failed to find that book|website appears to be unavailable/);
+        like($record->error,qr/Invalid ISBN specified|Failed to find that book|website appears to be unavailable/);
     }
 
     for my $isbn (keys %tests) {

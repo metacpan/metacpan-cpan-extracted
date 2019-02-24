@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 #--------------------------------------------------------------------------
 
@@ -37,8 +37,8 @@ use WWW::Mechanize;
 ###########################################################################
 # Constants
 
-use constant	REFERER	=> 'http://www.bookdepository.co.uk/';
-use constant	SEARCH	=> 'http://www.bookdepository.co.uk/search?search=search&searchTerm=';
+use constant    REFERER    => 'http://www.bookdepository.co.uk/';
+use constant    SEARCH    => 'http://www.bookdepository.co.uk/search?search=search&searchTerm=';
 my ($URL1,$URL2) = ('http://www.bookdepository.co.uk/book/','/[^?]+\?b=\-3\&amp;t=\-26\#Bibliographicdata\-26');
 
 #--------------------------------------------------------------------------
@@ -83,10 +83,10 @@ The book_link and image_link refer back to the The Book Depository website.
 =cut
 
 sub search {
-	my $self = shift;
-	my $isbn = shift;
-	$self->found(0);
-	$self->book(undef);
+    my $self = shift;
+    my $isbn = shift;
+    $self->found(0);
+    $self->book(undef);
 
     # validate and convert into EAN13 format
     my $ean = $self->convert_to_ean13($isbn);
@@ -94,7 +94,7 @@ sub search {
         if(!$ean || (length $isbn == 13 && $isbn ne $ean)
                  || (length $isbn == 10 && $isbn ne $self->convert_to_isbn10($ean)));
 
-	my $mech = WWW::Mechanize->new();
+    my $mech = WWW::Mechanize->new();
     $mech->agent_alias( 'Windows IE 6' );
     $mech->add_header( 'Accept-Encoding' => undef );
     $mech->add_header( 'Referer' => REFERER );
@@ -102,13 +102,13 @@ sub search {
 #print STDERR "\n# search=[".SEARCH."$ean]\n";
     eval { $mech->get( SEARCH . $ean ) };
     return $self->handler("The Book Depository website appears to be unavailable.")
-	    if($@ || !$mech->success() || !$mech->content());
+        if($@ || !$mech->success() || !$mech->content());
 
-	# The Book page
+    # The Book page
     my $html = $mech->content();
 
-	return $self->handler("Failed to find that book on The Book Depository website. [$isbn]")
-		if($html =~ m!Sorry, there are no results for!si);
+    return $self->handler("Failed to find that book on The Book Depository website. [$isbn]")
+        if($html =~ m!Sorry, there are no results for!si);
     
     $html =~ s/&amp;/&/g;
 #print STDERR "\n# content2=[\n$html\n]\n";
@@ -116,7 +116,7 @@ sub search {
     my $data;
 
     # first pass wih metadata
-    ($data->{isbn13})       = $html =~ m!<meta itemprop="isbn" content="([^"]+)"!si;
+    #($data->{isbn13})       = $html =~ m!<meta itemprop="isbn" content="([^"]+)"!si;
     ($data->{publisher})    = $html =~ m!<meta itemprop="publisher" content="([^"]+)"!si;
     ($data->{pubdate})      = $html =~ m!<meta itemprop="datePublished" content="([^"]+)"!si;
     ($data->{title})        = $html =~ m!<meta itemprop="name" content="([^"]+)"!si;
@@ -127,20 +127,24 @@ sub search {
     ($data->{pages})        = $html =~ m!<meta itemprop="numberOfPages" content="([^"]+)"!si;
 
     # second pass with page data
-    ($data->{isbn13})       = $html =~ m!<strong>ISBN 13:</strong><span property="dc:identifier">([^<]+)</span>!si              unless($data->{isbn13});
-    ($data->{publisher})    = $html =~ m!<li><strong>Publisher:</strong> <a property=[^>]+>([^<]+)</a></li>!si                  unless($data->{publisher});
-    ($data->{pubdate})      = $html =~ m!<strong>Publication date:</strong>\s*<span property='dc:available'>([^<]+)</span>!si   unless($data->{pubdate});
-    ($data->{pages})        = $html =~ m!<span property='dc:SizeOrDuration'>\s*(\d+) pages</span>!si                            unless($data->{pages});
-    ($data->{image})        = $html =~ m!"(http://\w+.bdcdn.net/assets/images/book/large/\d+/\d+/\d+.jpg)"!si                   unless($data->{image});
+    ($data->{isbn13})       = $html =~ m!<label>ISBN13</label>\s*<span itemprop="isbn">(\d+)</span>!si                          unless($data->{isbn13});
+    ($data->{publisher})    = $html =~ m!<label>Publisher</label>\s*<span[^>]+>\s*<a[^>]+>\s*<span[^>]+>([^<]+)</span>!si       unless($data->{publisher});
+    ($data->{pubdate})      = $html =~ m!<label>Publication date</label>\s*<span itemprop="datePublished">([^<]+)</span>!si     unless($data->{pubdate});
+    ($data->{title})        = $html =~ m!<h1 itemprop="name"[^>]*>([^<]+)</h1>!si                                               unless($data->{title});
+    ($data->{author})       = $html =~ m!<span itemprop="name"[^>]*>([^<]+)</span>!si                                           unless($data->{author});
+    ($data->{pages})        = $html =~ m!<span itemprop="numberOfPages">(\d+) pages\s*</span>!si                                unless($data->{pages});
+    ($data->{image})        = $html =~ m!"(https://\w+.cloudfront.net/assets/images/book/lrg/\d+/\d+/\d+.jpg)"!si               unless($data->{image});
     ($data->{title},$data->{author})    
                             = $html =~ m!<title>(.*):\s+([^:]+)\s+:\s+\d+\s*</title>!                                           unless($data->{title} && $data->{author});
+    ($data->{description})  = $html =~ m!<div class="item-excerpt trunc" itemprop="description" data-height="[^"]+">\s*(.*?)\s*</div>!si
+                                                                                                                                unless($data->{description});
 
     # other page data
-    ($data->{isbn10})       = $html =~ m!<li><strong>ISBN 10:</strong>\s*([^<]+)</li>!si;
-    ($data->{binding})      = $html =~ m!<strong>Format:</strong>\s*<span property="dc:format">([^<]+)!si;
-    ($data->{thumb})        = $html =~ m!"(http://\w+.bdcdn.net/assets/images/book/medium/\d+/\d+/\d+.jpg)"!si;
+    ($data->{isbn10})       = $html =~ m!<label>ISBN10</label>\s*<span>(\d+)</span>!si;
+    ($data->{binding})      = $html =~ m!<label>Format</label>\s*<span>\s*([^\|]+)\|!si;
+    ($data->{thumb})        = $html =~ m!"(https://\w+.cloudfare.net/assets/images/book/medium/\d+/\d+/\d+.jpg)"!si;
     ($data->{width},$data->{height},$data->{depth},$data->{weight})
-                            = $html =~ m!<strong>Dimensions:</strong>\s*(\d+)mm\s*x\s*(\d+)mm\s*x\s*(\d+)mm\s*\|\s*(\d+)g!;
+                            = $html =~ m!<label>Dimensions</label>\s*<span>\s*([\d.]+)\s*x\s*([\d.]+)\s*x\s*([\d.]+)mm\s*\|\s*([\d.]+)g!;
 
     # clean up
     $data->{publisher} =~ s/&#0?39;/'/g     if($data->{publisher});
@@ -155,11 +159,11 @@ sub search {
 #use Data::Dumper;
 #print STDERR "\n# " . Dumper($data);
 
-	return $self->handler("Could not extract data from The Book Depository result page.")
-		unless(defined $data);
+    return $self->handler("Could not extract data from The Book Depository result page.")
+        unless(defined $data);
 
-	# trim top and tail
-	foreach (keys %$data) { 
+    # trim top and tail
+    foreach (keys %$data) { 
         next unless(defined $data->{$_});
         $data->{$_} =~ s!&nbsp;! !g;
         $data->{$_} =~ s/^\s+//;
@@ -169,33 +173,33 @@ sub search {
     my $url = $mech->uri();
     $url =~ s/\?.*//;
 
-	my $bk = {
-		'ean13'		    => $data->{isbn13},
-		'isbn13'		=> $data->{isbn13},
-		'isbn10'		=> $data->{isbn10},
-		'isbn'			=> $data->{isbn13},
-		'author'		=> $data->{author},
-		'title'			=> $data->{title},
-		'book_link'		=> "$url",
-		'image_link'	=> $data->{image},
-		'thumb_link'	=> $data->{thumb},
-		'description'	=> $data->{description},
-		'pubdate'		=> $data->{pubdate},
-		'publisher'		=> $data->{publisher},
-		'binding'	    => $data->{binding},
-		'pages'		    => $data->{pages},
-		'weight'		=> $data->{weight},
-		'width'		    => $data->{width},
-		'height'		=> $data->{height},
-        'html'          => $html
-	};
+    my $bk = {
+        'ean13'       => $data->{isbn13},
+        'isbn13'      => $data->{isbn13},
+        'isbn10'      => $data->{isbn10},
+        'isbn'        => $data->{isbn13},
+        'author'      => $data->{author},
+        'title'       => $data->{title},
+        'book_link'   => "$url",
+        'image_link'  => $data->{image},
+        'thumb_link'  => $data->{thumb},
+        'description' => $data->{description},
+        'pubdate'     => $data->{pubdate},
+        'publisher'   => $data->{publisher},
+        'binding'     => $data->{binding},
+        'pages'       => $data->{pages},
+        'weight'      => $data->{weight},
+        'width'       => $data->{width},
+        'height'      => $data->{height},
+#        'html'        => $html
+    };
 
 #use Data::Dumper;
 #print STDERR "\n# book=".Dumper($bk);
 
     $self->book($bk);
-	$self->found(1);
-	return $self->book;
+    $self->found(1);
+    return $self->book;
 }
 
 1;
@@ -234,7 +238,7 @@ be forthcoming, please feel free to (politely) remind me.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2010-2015 Barbie for Miss Barbell Productions
+  Copyright (C) 2010-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

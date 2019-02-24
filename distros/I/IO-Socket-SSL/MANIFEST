@@ -4,17 +4,19 @@ certs/client-key.enc
 certs/client-key.pem
 certs/create-certs.pl
 certs/proxyca.pem
+certs/server2-cert.pem
+certs/server2-key.pem
 certs/server-cert.der
 certs/server-cert.pem
+certs/server_enc.p12
 certs/server-key.der
 certs/server-key.enc
 certs/server-key.pem
-certs/server-wildcard.pem
 certs/server.p12
-certs/server2-cert.pem
-certs/server2-key.pem
-certs/server_enc.p12
+certs/server-wildcard.pem
+certs/sub-server.pem
 certs/test-ca.pem
+certs/test-subca.pem
 Changes
 docs/debugging.txt
 example/async_https_server.pl
@@ -61,7 +63,9 @@ t/public_suffix_lib_uri.t
 t/public_suffix_ssl.t
 t/readline.t
 t/session_ticket.t
+t/session_cache.t
 t/sessions.t
+t/set_curves.t
 t/signal-readline.t
 t/sni.t
 t/sni_verify.t
@@ -73,5 +77,6 @@ t/testlib.pl
 t/verify_fingerprint.t
 t/verify_hostname.t
 t/verify_hostname_standalone.t
+t/verify_partial_chain.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

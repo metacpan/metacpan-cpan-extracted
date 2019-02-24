@@ -18,7 +18,7 @@ perldoc directly on the module file.
 This module repository is kept in Github, please feel free to submit issues, 
 fork and send pull requests.
 
-	https://github.com/pauloscustodio/Iterator-Simple-Lookahead
+	https://github.com/pauloscustodio/perl-Iterator-Simple-Lookahead
 
 
 Copyright (C) 2013-2015 by Paulo Custodio <pscust@cpan.org>

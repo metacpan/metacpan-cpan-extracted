@@ -1,7 +1,7 @@
 package Sah::Schema::perl::pod_or_pm_filename;
 
-our $DATE = '2018-12-09'; # DATE
-our $VERSION = '0.017'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '0.018'; # VERSION
 
 our $schema = [str => {
     summary => 'Filename (.pod or .pm file)',
@@ -74,7 +74,7 @@ Sah::Schema::perl::pod_or_pm_filename - Filename (.pod or .pm file)
 
 =head1 VERSION
 
-This document describes version 0.017 of Sah::Schema::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2018-12-09.
+This document describes version 0.018 of Sah::Schema::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2019-02-24.
 
 =head1 DESCRIPTION
 
@@ -129,7 +129,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

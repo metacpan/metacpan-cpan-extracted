@@ -1,4 +1,12 @@
 Revision history for Perl extension Chess-Opening
 
+0.5  2019-02-23
+    - fixed case of Chess::Opening::Book::ECO pod
+
+0.4  2019-02-23
+    - specify dependency on IO::Seekable for older Perl versions
+    - documentation for Chess::Opening::Book::ECO
+    - test older Perl versions
+
 0.3  2019-02-22
     - initial public version

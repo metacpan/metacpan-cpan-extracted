@@ -1,3 +1,8 @@
+0.018   2019-02-24 (PERLANCAR)
+
+	- Add schemas: perl::modprefix, perl::modname_or_prefix.
+
+
 0.017   2018-12-09 (PERLANCAR)
 
 	- Argh, previous commit still didn't delete all tests for

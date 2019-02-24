@@ -1,6 +1,6 @@
 {
     "name": "WWW-Scraper-ISBN-WHSmith_Driver",
-    "version": "0.08",
+    "version": "0.09",
     "abstract": "Search driver for the WHSmith online book catalog",
     "author": ["Barbie <barbie@cpan.org>"],
 
@@ -45,7 +45,7 @@
     "provides": {
         "WWW::Scraper::ISBN::WHSmith_Driver": {
             "file": "lib/WWW/Scraper/ISBN/WHSmith_Driver.pm",
-            "version": "0.08"
+            "version": "0.09"
         }
     },
     "no_index": {

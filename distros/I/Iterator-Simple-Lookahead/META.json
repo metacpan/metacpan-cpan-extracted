@@ -4,13 +4,13 @@
       "Paulo Custodio <pscust@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Iterator-Simple-Lookahead",
    "no_index" : {
@@ -32,20 +32,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::XSAccessor" : "1.18",
-            "Iterator::Simple" : "0.06",
+            "Class::Accessor" : "0.51",
+            "Iterator::Simple" : "0.07",
             "Test::More" : "1.001014",
-            "perl" : "5.008"
+            "perl" : "5.008001"
          }
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/pauloscustodio/Iterator-Simple-Lookahead.git",
-         "web" : "https://github.com/pauloscustodio/Iterator-Simple-Lookahead"
-      }
-   },
-   "version" : "0.07"
+   "resources" : {},
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

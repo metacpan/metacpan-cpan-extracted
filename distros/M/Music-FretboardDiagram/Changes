@@ -1,5 +1,18 @@
 Revision history for Music-FretboardDiagram
 
+0.0402 2019-02-22 21:31:22
+    - Clean up code a bit.
+    - Die if the chord length does not equal the number of strings.
+
+0.0400 2019-02-22 20:33:34
+    - Allow any given image file type supported by Imager instead of PNG only.
+
+0.0302 2019-02-22 19:29:18
+    - Rollback!  Do not try to ->draw in the test.
+
+0.0301 2019-02-22 15:10:54
+    - Warn in ->draw if font file is not found.
+
 0.0300 2019-02-19 19:11:39
     - Make double digits in the diagram position not overlap the grid.
     - Clean up isa syntax.

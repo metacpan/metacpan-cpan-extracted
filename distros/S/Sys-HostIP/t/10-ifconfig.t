@@ -6,9 +6,10 @@ use warnings;
 use Test::More;
 use Sys::HostIP;
 
-plan tests => $^O =~ qr/(MSWin32|cygwin)/ ? 5 : 7;
+plan tests => $^O =~ qr/(MSWin32|cygwin)/x ? 5 : 7;
 
 {
+    ## no critic qw(TestingAndDebugging::ProhibitNoWarnings)
     no warnings 'redefine';
 
     *Sys::HostIP::_get_ifconfig_binary = sub {

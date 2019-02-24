@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.22';
+$VERSION = '0.23';
 
 #--------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ use WWW::Mechanize;
 ###########################################################################
 # Constants
 
-use constant	SEARCH	=> 'http://www.booktopia.com.au/search.ep?cID=&submit.x=44&submit.y=7&submit=search&keywords=';
+use constant SEARCH => 'http://www.booktopia.com.au/search.ep?cID=&submit.x=44&submit.y=7&submit=search&keywords=';
 my ($BAU_URL1,$BAU_URL2,$BAU_URL3) = ('http://www.booktopia.com.au','/[^/]+/prod','.html');
 
 #--------------------------------------------------------------------------
@@ -83,10 +83,10 @@ The book_link and image_link refer back to the Booktopia website.
 =cut
 
 sub search {
-	my $self = shift;
-	my $isbn = shift;
-	$self->found(0);
-	$self->book(undef);
+    my $self = shift;
+    my $isbn = shift;
+    $self->found(0);
+    $self->book(undef);
 
     # validate and convert into EAN13 format
     my $ean = $self->convert_to_ean13($isbn);
@@ -104,7 +104,7 @@ sub search {
 
     eval { $mech->get( SEARCH . $isbn ) };
     return $self->handler("Booktopia website appears to be unavailable.")
-	    if($@ || !$mech->success() || !$mech->content());
+        if($@ || !$mech->success() || !$mech->content());
 
     my $pattern = $isbn;
     if(length $isbn == 10) {
@@ -112,29 +112,29 @@ sub search {
         $pattern =~ s/.$/./;
     }
 
-	# The Book page
+    # The Book page
     my $html = $mech->content();
 
-	return $self->handler("Failed to find that book on Booktopia website. [$isbn]")
-		if($html =~ m!Sorry, we couldn't find any matches for!si);
+    return $self->handler("Failed to find that book on Booktopia website. [$isbn]")
+        if($html =~ m!Sorry, we couldn't find any matches for!si);
     
 #print STDERR "\n# html=[\n$html\n]\n";
 
     my $data;
-    ($data->{publisher})                = $html =~ m!<span class="label">\s*Publisher:\s*</span>\s*([^<]+)!si;
+    ($data->{publisher})                = $html =~ m!<b>Publisher:</b>([^<]+)<br>!si;
     ($data->{pubdate})                  = $html =~ m!<span class="label">\s*Published:\s*</span>\s*([^<]+)!si;
 
     $data->{publisher} =~ s!<[^>]+>!!g  if($data->{publisher});
     $data->{pubdate} =~ s!\s+! !g       if($data->{pubdate});
 
-    ($data->{image})                    = $html =~ m!(http://covers.booktopia.com.au/big/\d+/[-\w]+\.jpg)!si;
-    ($data->{thumb})                    = $html =~ m!(http://covers.booktopia.com.au/\d+/\d+/[-\w]+\.jpg)!si;
+    ($data->{image})                    = $html =~ m!(https://www.booktopia.com.au/http_coversbooktopiacomau/big/\d+/[-\w.]+\.jpg)"!si;
+    ($data->{thumb})                    = $html =~ m!(https://www.booktopia.com.au/http_coversbooktopiacomau/\d+/\d+/[-\w.]+\.jpg)"!si;
     ($data->{isbn13})                   = $html =~ m!<b>\s*ISBN:\s*</b>\s*(\d+)!si;
     ($data->{isbn10})                   = $html =~ m!<b>\s*ISBN-10:\s*</b>\s*(\d+)!si;
     ($data->{author})                   = $html =~ m!<div id="contributors">\s*(?:By|Author):\s*(.*?)</div>!si;
     ($data->{title})                    = $html =~ m!<meta property="og:title" content="([^"]+)"!si;
     ($data->{title})                    = $html =~ m!<a href="[^"]+" class="largeLink">([^<]+)</a><br/><br/>!si  unless($data->{title});
-    ($data->{description})              = $html =~ m!<div id="description">(.*?)</div>!si;
+    ($data->{description})              = $html =~ m!<p id="google-preview-information" style="display:none;">\s*<b>[^<]+</b>\s*</p>\s*<p>(.*?)</p>!si;
     ($data->{binding})                  = $html =~ m!<span class="label">\s*Format:\s*</span>\s*([^<]+)!si;
     ($data->{pages})                    = $html =~ m!<b>\s*Number Of Pages:\s*</b>\s*([\d.]+)!si;
     ($data->{weight})                   = $html =~ m!<span class="label">\s*Weight \(kg\):\s*</span>\s*([\d.]+)!si;
@@ -169,40 +169,40 @@ sub search {
 #use Data::Dumper;
 #print STDERR "\n# " . Dumper($data);
 
-	return $self->handler("Could not extract data from Booktopia result page.")
-		unless(defined $data);
+    return $self->handler("Could not extract data from Booktopia result page.")
+        unless(defined $data);
 
-	# trim top and tail
-	foreach (keys %$data) { next unless(defined $data->{$_});$data->{$_} =~ s/^\s+//;$data->{$_} =~ s/\s+$//; }
+    # trim top and tail
+    foreach (keys %$data) { next unless(defined $data->{$_});$data->{$_} =~ s/^\s+//;$data->{$_} =~ s/\s+$//; }
 
-	my $bk = {
-		'ean13'		    => $data->{isbn13},
-		'isbn13'		=> $data->{isbn13},
-		'isbn10'		=> $data->{isbn10},
-		'isbn'			=> $data->{isbn13},
-		'author'		=> $data->{author},
-		'title'			=> $data->{title},
-		'book_link'		=> $mech->uri(),
-		'image_link'	=> $data->{image},
-		'thumb_link'	=> $data->{thumb},
-		'description'	=> $data->{description},
-		'pubdate'		=> $data->{pubdate},
-		'publisher'		=> $data->{publisher},
-		'binding'	    => $data->{binding},
-		'pages'		    => $data->{pages},
-		'weight'		=> $data->{weight},
-		'width'		    => $data->{width},
-		'height'		=> $data->{height},
-		'depth'		    => $data->{depth},
-        'html'          => $html
-	};
+    my $bk = {
+        'ean13'       => $data->{isbn13},
+        'isbn13'      => $data->{isbn13},
+        'isbn10'      => $data->{isbn10},
+        'isbn'        => $data->{isbn13},
+        'author'      => $data->{author},
+        'title'       => $data->{title},
+        'book_link'   => $mech->uri(),
+        'image_link'  => $data->{image},
+        'thumb_link'  => $data->{thumb},
+        'description' => $data->{description},
+        'pubdate'     => $data->{pubdate},
+        'publisher'   => $data->{publisher},
+        'binding'     => $data->{binding},
+        'pages'       => $data->{pages},
+        'weight'      => $data->{weight},
+        'width'       => $data->{width},
+        'height'      => $data->{height},
+        'depth'       => $data->{depth},
+#        'html'        => $html
+    };
 
 #use Data::Dumper;
 #print STDERR "\n# book=".Dumper($bk);
 
     $self->book($bk);
-	$self->found(1);
-	return $self->book;
+    $self->found(1);
+    return $self->book;
 }
 
 1;
@@ -241,7 +241,7 @@ be forthcoming, please feel free to (politely) remind me.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2010-2015 Barbie for Miss Barbell Productions
+  Copyright (C) 2010-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

@@ -1,7 +1,8 @@
 package Text::Hogan::Compiler;
-$Text::Hogan::Compiler::VERSION = '1.07';
+$Text::Hogan::Compiler::VERSION = '1.09';
 use Text::Hogan::Template;
 
+use 5.10.0;
 use strict;
 use warnings;
 
@@ -431,10 +432,7 @@ my %codegen = (
         $context->{'code'} .= sprintf('if($t->s($t->%s("%s",$c,$p,1),$c,$p,0,%s,%s,"%s %s")) { $t->rs($c,$p,sub { my ($c,$p,$t) = @_;',
             choose_method($node->{'n'}),
             esc($node->{'n'}),
-            $node->{'i'},
-            $node->{'end'},
-            $node->{'otag'},
-            $node->{'ctag'}
+            @{$node}{qw/ i end otag ctag /},
         );
         walk($node->{'nodes'}, $context);
         $context->{'code'} .= '}); pop @$c;}';
@@ -495,18 +493,16 @@ sub triple_stache {
     );
 }
 
-sub twrite {
-    my ($s) = @_;
-    return sprintf('$t->b(%s);', $s);
-}
+sub twrite { sprintf '$t->b(%s);', @_ }
 
 sub walk {
     my ($nodelist, $context) = @_;
-    my $func;
-    for (my $i = 0, my $l = scalar(@$nodelist); $i < $l; $i++) {
-        $func = $codegen{$nodelist->[$i]{'tag'}};
-        $func && $func->($nodelist->[$i], $context);
+
+    for my $node (@$nodelist) {
+        my $func = $codegen{$node->{'tag'}} or next;
+        $func->($node, $context);
     }
+
     return $context;
 }
 
@@ -526,9 +522,9 @@ sub cache_key {
 sub compile {
     my ($self, $text, $options) = @_;
     $options ||= {};
-    if (!defined $text) {
-        $text = "";
-    }
+
+    $text //= "";
+
     my $key = cache_key($text, $options);
     my $template = $cache{$key};
 
@@ -559,7 +555,7 @@ Text::Hogan::Compiler - parse templates and output Perl code
 
 =head1 VERSION
 
-version 1.07
+version 1.09
 
 =head1 SYNOPSIS
 
