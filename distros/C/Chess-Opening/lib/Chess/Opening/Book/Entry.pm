@@ -10,21 +10,34 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Opening::Book::Entry;
-$Chess::Opening::Book::Entry::VERSION = '0.5';
+$Chess::Opening::Book::Entry::VERSION = '0.6';
 use common::sense;
 
 use Locale::TextDomain 'com.cantanea.Chess-Opening';
+use Scalar::Util qw(reftype);
 
 use Chess::Opening::Book::Move;
 
 sub new {
-	my ($class, $fen) = @_;
+	my ($class, $fen, %args) = @_;
 
-	bless {
+	my $self = bless {
 		__fen => $fen,
 		__moves => {},
 		__count => 0,
+		__length => -1,
+		__significant => -1,
+		__history => [],
 	}, $class;
+
+	$self->{__length} = $args{length} if exists $args{length};
+	$self->{__significant} = $args{significant} if exists $args{significant};
+	if (exists $args{history} && ref $args{history}
+	    && 'ARRAY' eq $args{history}) {
+		$self->{__history} = $args{history};
+	}
+
+	return $self;
 }
 
 sub addMove {
@@ -54,7 +67,6 @@ sub addMove {
 	return $self;
 }
 
-sub fen { shift->{__fen} }
 sub moves { shift->{__moves} }
 sub counts { shift->{__counts} }
 sub weights { shift->{__counts} }

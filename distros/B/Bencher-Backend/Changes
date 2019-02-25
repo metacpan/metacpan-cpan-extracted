@@ -1,3 +1,9 @@
+1.044   2019-02-24 (PERLANCAR)
+
+	- Support loading scenario from an Acme::CPANModules module (add
+	  --cpanmodules-module option).
+
+
 1.043   2019-02-24 (PERLANCAR)
 
 	- Use Exporter to check imported args.

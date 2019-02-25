@@ -121,7 +121,7 @@ Module::Version::App - Application implementation for Module::Version
 
 =head1 VERSION
 
-version 0.200
+version 0.201
 
 =head1 SYNOPSIS
 

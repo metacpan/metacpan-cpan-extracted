@@ -11,7 +11,7 @@ use File::Temp qw( tempdir );
 use File::chdir;
 
 # ABSTRACT: Plugin for fetching files using curl
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 has curl_command => sub { defined $ENV{CURL} ? which($ENV{CURL}) : which('curl') };
@@ -186,7 +186,7 @@ Alien::Build::Plugin::Fetch::CurlCommand - Plugin for fetching files using curl
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -283,6 +283,8 @@ Duke Leto (LETO)
 Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
+
+Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 

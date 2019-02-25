@@ -21,6 +21,7 @@ requires:
   Fcntl: '0'
   IO::Seekable: '1.20'
   Locale::TextDomain: '0'
+  Scalar::Util: '0'
   base: '0'
   common::sense: '0'
   constant: '0'
@@ -30,6 +31,6 @@ resources:
   bugtracker: https://github.com/gflohr/Chess-Opening/issues
   homepage: http://www.guido-flohr.net/en/projects#chess-opening
   repository: git://github.com/gflohr/Chess-Opening.git
-version: '0.5'
+version: '0.6'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

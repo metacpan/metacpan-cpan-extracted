@@ -18,7 +18,8 @@ do { my $x = {
                                       'ExtUtils::MakeMaker' => '6.56',
                                       'Getopt::Long' => '0',
                                       'local::lib' => '0',
-                                      'parent' => '0'
+                                      'parent' => '0',
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {

@@ -15,9 +15,9 @@ name: Cache-SimpleDir
 provides:
   Cache::SimpleDir:
     file: lib/Cache/SimpleDir.pm
-    version: v2.1.4
+    version: v2.1.5
 requires:
   File::Path::Tiny: '0'
-version: 2.1.4
+version: 2.1.5
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

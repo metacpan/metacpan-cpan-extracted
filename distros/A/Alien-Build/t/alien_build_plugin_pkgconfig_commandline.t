@@ -10,6 +10,7 @@ $ENV{PKG_CONFIG_LIBDIR} = '';
 
 my $bin_name = Alien::Build::Plugin::PkgConfig::CommandLine->new('foo')->bin_name;
 skip_all 'test requires pkgconf or pkg-config' unless $bin_name;
+skip_all 'use PkgConfig::PP on windows' if $^O eq 'MSWin32' && !$ENV{ALIEN_BUILD_PLUGIN_PKGCONFIG_COMMANDLINE_TEST};
 
 ok $bin_name, 'has bin_name';
 note "it be $bin_name";
@@ -41,7 +42,7 @@ subtest 'available' => sub {
       },
     ],
   );
-  
+
   subtest 'no command line' => sub {
 
     %which = ();
@@ -50,13 +51,13 @@ subtest 'available' => sub {
       Alien::Build::Plugin::PkgConfig::CommandLine->available,
       F(),
     );
-  
+
   };
 
   subtest 'pkg-config' => sub {
-  
+
     %which = ( 'pkg-config' => '/usr/bin/pkg-config' );
-  
+
     is(
       Alien::Build::Plugin::PkgConfig::CommandLine->available,
       T(),
@@ -65,9 +66,9 @@ subtest 'available' => sub {
   };
 
   subtest 'pkgconf' => sub {
-  
+
     %which = ( 'pkgconf' => '/usr/bin/pkgconf' );
-  
+
     is(
       Alien::Build::Plugin::PkgConfig::CommandLine->available,
       T(),
@@ -76,15 +77,15 @@ subtest 'available' => sub {
   };
 
   subtest 'PKG_CONFIG' => sub {
-  
+
     local $ENV{PKG_CONFIG} = 'foo-pkg-config';
     %which = ( 'foo-pkg-config' => '/usr/bin/foo-pkg-config' );
-    
+
     is(
       Alien::Build::Plugin::PkgConfig::CommandLine->available,
       T(),
-    );    
-  
+    );
+
   };
 
 };
@@ -95,23 +96,213 @@ subtest 'system not available' => sub {
 
   my($out, $type) = capture_merged { $build->probe };
   note $out;
-  
+
   is( $type, 'share' );
-  
+
 };
 
-subtest 'system available, wrong version' => sub {
+subtest 'version requirements' => sub {
 
-  my($build, $meta, $plugin) = build(
-    pkg_name => 'foo',
-    minimum_version => '1.2.4',
-  );
-  
-  my($out, $type) = capture_merged { $build->probe };
-  note $out;
-  
-  is( $type, 'share' );
+  subtest 'atleast_version or minimum_version' => sub {
 
+    subtest 'old name bad' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        minimum_version => '1.2.4',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'share' );
+    };
+
+    subtest 'old name good (exact)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        minimum_version => '1.2.3',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'system' );
+    };
+
+    subtest 'old name good (much older)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        minimum_version => '1.1.1',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'system' );
+    };
+
+    subtest 'atleast_version bad' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        atleast_version => '1.2.4',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'share' );
+    };
+
+    subtest 'atleast_version good (exact)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        atleast_version => '1.2.3',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'system' );
+    };
+
+    subtest 'atleast_version good (older)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        atleast_version => '1.1.1',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'system' );
+    };
+  };
+
+  subtest 'exact' => sub {
+
+    subtest 'exact version (less)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        exact_version => '1.2.2',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'share' );
+
+    };
+
+    subtest 'exact version (exact)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        exact_version => '1.2.3',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'system' );
+
+    };
+
+    subtest 'exact version (more)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        exact_version => '1.2.4',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'share' );
+
+    };
+
+  };
+
+  subtest 'max_version' => sub {
+
+    subtest 'max version (lot less)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        max_version => '1.0.0',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'share' );
+
+    };
+
+    subtest 'max version (less)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        max_version => '1.2.2',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'share' );
+
+    };
+
+    subtest 'max version (exact)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        max_version => '1.2.3',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'system' );
+
+    };
+
+    subtest 'max version (more)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        max_version => '1.2.4',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'system' );
+
+    };
+
+    subtest 'max version (lots more)' => sub {
+
+      my($build, $meta, $plugin) = build(
+        pkg_name => 'foo',
+        max_version => '3.3.3',
+      );
+
+      my($out, $type) = capture_merged { $build->probe };
+      note $out;
+
+      is( $type, 'system' );
+
+    };
+
+  };
 };
 
 subtest 'system available, okay' => sub {
@@ -120,16 +311,16 @@ subtest 'system available, okay' => sub {
     pkg_name => 'foo',
     minimum_version => '1.2.3',
   );
-  
+
   my($out, $type) = capture_merged { $build->probe };
   note $out;
-  
+
   is( $type, 'system' );
-  
+
   return unless $type eq 'system';
-  
+
   note capture_merged { $build->build; () };
-  
+
   if($^O eq 'MSWin32')
   {
     if($build->runtime_prop->{cflags} =~ m/-I(.*)\/include\/foo/
@@ -141,7 +332,7 @@ subtest 'system available, okay' => sub {
       note "-f $prefix/lib/pkgconfig/foo.pc";
     }
   }
-  
+
   is(
     $build->runtime_prop,
     hash {
@@ -154,7 +345,7 @@ subtest 'system available, okay' => sub {
       etc;
     },
   );
-  
+
   # not supported by pkg-config.
   # may be supported by recent pkgconfig
   # so we do not test it.
@@ -165,20 +356,20 @@ subtest 'system available, okay' => sub {
 subtest 'system multiple' => sub {
 
   subtest 'all found in system' => sub {
-  
+
     my $build = alienfile_ok q{
-  
+
       use alienfile;
       plugin 'PkgConfig::CommandLine' => (
         pkg_name => [ 'xor', 'xor-chillout' ],
       );
-  
+
     };
 
-    alien_install_type_is 'system';  
-    
+    alien_install_type_is 'system';
+
     my $alien = alien_build_ok;
-    
+
     use Alien::Build::Util qw( _dump );
     note _dump($alien->runtime_prop);
 
@@ -211,7 +402,7 @@ subtest 'system multiple' => sub {
         etc;
       },
     );
-    
+
   };
 
 };
@@ -223,11 +414,11 @@ subtest 'system rewrite' => sub {
     use Path::Tiny qw( path );
 
     meta->prop->{destdir} = 1;
-    
+
     plugin 'PkgConfig::CommandLine' => (
       pkg_name => [ 'foo-foo' ],
     );
-    
+
     share {
       download sub { path('file1')->touch };
       extract sub { path('file1')->touch };
@@ -235,13 +426,13 @@ subtest 'system rewrite' => sub {
         my($build) = @_;
         my $stage = path($ENV{DESTDIR});
         my $prefix = path($build->install_prop->{prefix});
-        
+
         {
           my $tmp = $prefix->stringify;
           $tmp =~ s!^([a-z]):!/$1!i if $^O eq 'MSWin32';
           $stage = $stage->child($tmp);
         }
-        
+
         $stage->child('lib/pkgconfig')->mkpath;
         $stage->child('lib/libfoofoo.a')->spew("lib foo-foo as staged\n");
 
@@ -256,7 +447,7 @@ subtest 'system rewrite' => sub {
             exec_prefix=${prefix}
             libdir=${prefix}/lib
             includedir=${prefix}/include
-            
+
             Name: foo-foo
             Description: A testing pkg-config file
             Version: 1.2.3
@@ -264,14 +455,14 @@ subtest 'system rewrite' => sub {
             Cflags: -I${includedir}
           },
         );
-        
+
       };
     };
-    
+
   };
-  
+
   alien_install_type_is 'share';
-  
+
   my $alien = alien_build_ok;
 
   subtest 'test from stage' => sub {
@@ -282,11 +473,11 @@ subtest 'system rewrite' => sub {
     ok(-d $inc, "inc dir exists" );
     note "inc = $inc";
     is($inc->child('foofoo.h')->slurp, "h foo-foo as staged\n", 'libfoofoo.a');
-    
+
     ok(-d $lib, "lib dir exists" );
     note "lib = $lib";
     is($lib->child('libfoofoo.a')->slurp, "lib foo-foo as staged\n", 'libfoofoo.a');
-  
+
   };
 
   alien_build_clean;
@@ -299,11 +490,11 @@ subtest 'system rewrite' => sub {
     ok(-d $inc, "inc dir exists" );
     note "inc = $inc";
     is($inc->child('foofoo.h')->slurp, "h foo-foo as staged\n", 'libfoofoo.a');
-    
+
     ok(-d $lib, "lib dir exists" );
     note "lib = $lib";
     is($lib->child('libfoofoo.a')->slurp, "lib foo-foo as staged\n", 'libfoofoo.a');
-  
+
   };
 
 };
@@ -318,7 +509,7 @@ alien_subtest 'set env' => sub {
     plugin 'PkgConfig::CommandLine' => ( pkg_name => 'totally-bogus-pkg-config-name' );
 
     probe sub { 'share' };
-    
+
     share {
 
       plugin 'Download::Foo';
@@ -328,18 +519,18 @@ alien_subtest 'set env' => sub {
         $build->log("PKG_CONFIG = $ENV{PKG_CONFIG}");
         1;
       };
-      
+
       meta->around_hook(
         gather_share => sub {
           1;
         },
       );
     };
-    
+
   };
-  
+
   alien_build_ok;
-  
+
 };
 
 done_testing;

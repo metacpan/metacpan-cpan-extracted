@@ -42,7 +42,7 @@ use SNMP::Info::Layer2;
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.64';
+$VERSION = '3.65';
 
 %MIBS = (
     %SNMP::Info::Layer2::MIBS,
@@ -189,7 +189,7 @@ Returns 'exinda'.
 =back
 
 =head2 Global Methods imported from SNMP::Info::Layer2
- 
+
 See L<SNMP::Info::Layer2/"GLOBALS"> for details.
 
 =head1 TABLE ENTRIES
@@ -197,14 +197,8 @@ See L<SNMP::Info::Layer2/"GLOBALS"> for details.
 These are methods that return tables of information in the form of a reference
 to a hash.
 
-=head2 Overrides
-
-=over
-
-=back
-
 =head2 Table Methods imported from SNMP::Info::Layer2
- 
+
 See L<SNMP::Info::Layer2/"TABLE METHODS"> for details.
 
 =cut

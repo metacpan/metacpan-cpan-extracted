@@ -13,7 +13,7 @@
 # ABSTRACT: Perl library for accessing chess opening data
 
 package Chess::Opening;
-$Chess::Opening::VERSION = '0.5';
+$Chess::Opening::VERSION = '0.6';
 use Chess::Opening::Book::Polyglot;
 use Chess::Opening::Book::ECO;
 

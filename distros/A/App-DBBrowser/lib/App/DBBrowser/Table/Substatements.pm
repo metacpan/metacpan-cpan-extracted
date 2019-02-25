@@ -53,7 +53,7 @@ sub select {
     else {
         $choices = [ @pre, @{$sql->{cols}} ];
     }
-    $sql->{chosen_cols} = [];
+    $sql->{select_cols} = [];
     $sql->{alias} = { %{$sql->{alias}} };
     my @bu;
 
@@ -65,29 +65,29 @@ sub select {
         );
         if ( ! $idx[0] ) {
             if ( @bu ) {
-                ( $sql->{chosen_cols}, $sql->{alias} ) = @{pop @bu};
+                ( $sql->{select_cols}, $sql->{alias} ) = @{pop @bu};
                 next COLUMNS;
             }
             return;
         }
-        push @bu, [ [ @{$sql->{chosen_cols}} ], { %{$sql->{alias}} } ];
+        push @bu, [ [ @{$sql->{select_cols}} ], { %{$sql->{alias}} } ];
         if ( $choices->[$idx[0]] eq $sf->{i}{ok} ) {
             shift @idx;
-            push @{$sql->{chosen_cols}}, @{$choices}[@idx];
+            push @{$sql->{select_cols}}, @{$choices}[@idx];
             return 1;
         }
         elsif ( $choices->[ $idx[0] ] eq $expand_sign ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( ! defined $ext_col ) {
-                ( $sql->{chosen_cols}, $sql->{alias} ) = @{pop @bu};
+                ( $sql->{select_cols}, $sql->{alias} ) = @{pop @bu};
             }
             else {
-                push @{$sql->{chosen_cols}}, $ext_col;
+                push @{$sql->{select_cols}}, $ext_col;
             }
             next COLUMNS;
         }
-        push @{$sql->{chosen_cols}}, @{$choices}[@idx];
+        push @{$sql->{select_cols}}, @{$choices}[@idx];
     }
 }
 
@@ -123,7 +123,7 @@ sub distinct {
 sub aggregate {
     my ( $sf, $stmt_h, $sql ) = @_;
     $sql->{aggr_cols} = [];
-    $sql->{chosen_cols} = [];
+    $sql->{select_cols} = [];
 
     AGGREGATE: while ( 1 ) {
         my $ret = $sf->__add_aggregate_substmt( $sql );
@@ -340,7 +340,7 @@ sub group_by {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sql->{group_by_stmt} = " GROUP BY";
     $sql->{group_by_cols} = [];
-    $sql->{chosen_cols} = [];
+    $sql->{select_cols} = [];
     my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
     my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
     my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );

@@ -9,7 +9,7 @@ use Alien::Build::Plugin::Extract::CommandLine;
 use Alien::Build::Plugin::Extract::Directory;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 has '+format' => 'tar';
@@ -94,7 +94,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -185,6 +185,8 @@ Duke Leto (LETO)
 Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
+
+Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 

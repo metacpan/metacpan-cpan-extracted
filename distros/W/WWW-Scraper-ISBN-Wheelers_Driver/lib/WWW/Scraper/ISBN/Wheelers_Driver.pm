@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 #--------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ use WWW::Mechanize;
 ###########################################################################
 # Constants
 
-use constant    SEARCH  => 'http://www.wheelers.co.nz/search/results/?query=';
+use constant SEARCH => 'https://www.wheelers.co.nz/search/results/?query=';
 
 #--------------------------------------------------------------------------
 
@@ -102,25 +102,33 @@ sub search {
 #print STDERR "\n# html=[\n$html\n]\n";
 
     my $data;
-    ($data->{image})                    = $html =~ m!href="(.*?/large/\d+/\d+.jpg)!i;
-    ($data->{thumb})                    = $html =~ m!src="(.*?/small/\d+/\d+.jpg)!i;
-    ($data->{author})                   = $html =~ m!<title>\s*.*?by ([^-]+)- ISBN:[^<]+</title><!i;
-    ($data->{title})                    = $html =~ m!<a id="title" name="title"></a>\s*<h1>([^,<]+)</h1>!i;
-    ($data->{publisher})                = $html =~ m!<th>Publisher</th>\s*<td><a[^>]+>([^<]+)</a></td>!i;
-    ($data->{pubdate})                  = $html =~ m!<th>International Publication Date</th>\s*<td>([^<]+)</td>!i;
-    ($data->{isbn13})                   = $html =~ m!<th>ISBN-13</th>\s*<td>(\d+)</td>!i;
-    ($data->{isbn10})                   = $html =~ m!<th>ISBN-10</th>\s*<td>(\d+)</td>!i;
-    ($data->{binding})                  = $html =~ m!<th>Format</th>\s*<td>([^<]+)<!s;
-    ($data->{pages})                    = $html =~ m!<th>Number of Pages</th>\s*<td>([^<]+)</td>!s;
-    ($data->{width},$data->{height})    = $html =~ m!<tr>\s*<th>Dimensions</th>\s*<td>Width:\s*([\d.]+)mm<br />Height:\s*([\d.]+)mm<br />(?:Spine:\s*([\d.]+)mm)?</td>\s*</tr>!s;
-    ($data->{weight})                   = $html =~ m!<tr>\s*<th>Weight</th>\s*<td>(\d+)g</td>\s*</tr>!s;
-    ($data->{description})              = $html =~ m!<h2>Description of this book</h2>\s*<p>([^<]+)</p>!i;
+    ($data->{image})                 = $html =~ m!href="(.*?/large/\d+/\d+.jpg)!i;
+    ($data->{thumb})                 = $html =~ m!src="(.*?/small/\d+/\d+.jpg)!i;
+    ($data->{author})                = $html =~ m!<title>\s*.*?by ([^-]+)- ISBN:[^<]+</title><!i;
+    ($data->{title})                 = $html =~ m!<a id="title" name="title"></a>\s*<h1>([^,<]+)</h1>!i;
+    ($data->{publisher})             = $html =~ m!<th>Publisher</th>\s*<td><a[^>]+>([^<]+)</a></td>!i;
+    ($data->{pubdate})               = $html =~ m!<th>International Publication Date</th>\s*<td>([^<]+)</td>!i;
+    ($data->{isbn13})                = $html =~ m!<th>ISBN-13</th>\s*<td>(\d+)</td>!i;
+    ($data->{isbn10})                = $html =~ m!<th>ISBN-10</th>\s*<td>(\d+)</td>!i;
+    ($data->{binding})               = $html =~ m!<th>Format</th>\s*<td>([^<]+)<!s;
+    ($data->{pages})                 = $html =~ m!<th>Number of Pages</th>\s*<td>([^<]+)</td>!s;
+    ($data->{width},$data->{height}) = $html =~ m!<tr>\s*<th>Dimensions</th>\s*<td>Width:\s*([\d.]+)mm<br />Height:\s*([\d.]+)mm<br />(?:Spine:\s*([\d.]+)mm)?</td>\s*</tr>!s;
+    ($data->{weight})                = $html =~ m!<tr>\s*<th>Weight</th>\s*<td>([\d,]+)g</td>\s*</tr>!s;
+    ($data->{description})           = $html =~ m!<h2>Description of this book</h2>\s*<p>([^<]+)</p>!i;
 
     $data->{binding} =~ s/,.*//;
+    $data->{weight}  =~ s/,//g;
     for(qw(image thumb)) {
         next unless(defined $data->{$_});
-        next if($data->{$_} =~ m!^http://!);
-        $data->{$_} =~ s!^//!http://!;
+        next if($data->{$_} =~ m!^https?://!);
+        $data->{$_} =~ s!^//!https://!;
+    }
+
+    # top 'n' tail trim
+    for(keys %$data) {
+        $data->{$_} =~ s/&#39;/'/g;
+        $data->{$_} =~ s/^\+//;
+        $data->{$_} =~ s/\+$//;
     }
 
     my $base = $mech->uri();
@@ -136,24 +144,24 @@ sub search {
     foreach (keys %$data) { next unless(defined $data->{$_});$data->{$_} =~ s/^\s+//;$data->{$_} =~ s/\s+$//; }
 
     my $bk = {
-        'ean13'         => $data->{isbn13},
-        'isbn13'        => $data->{isbn13},
-        'isbn10'        => $data->{isbn10},
-        'isbn'          => $data->{isbn13},
-        'author'        => $data->{author},
-        'title'         => $data->{title},
-        'book_link'     => $mech->uri(),
-        'image_link'    => $data->{image},
-        'thumb_link'    => $data->{thumb},
-        'description'   => $data->{description},
-        'pubdate'       => $data->{pubdate},
-        'publisher'     => $data->{publisher},
-        'binding'       => $data->{binding},
-        'pages'         => $data->{pages},
-        'weight'        => $data->{weight},
-        'width'         => $data->{width},
-        'height'        => $data->{height},
-        'html'          => $html
+        'ean13'       => $data->{isbn13},
+        'isbn13'      => $data->{isbn13},
+        'isbn10'      => $data->{isbn10},
+        'isbn'        => $data->{isbn13},
+        'author'      => $data->{author},
+        'title'       => $data->{title},
+        'book_link'   => $mech->uri(),
+        'image_link'  => $data->{image},
+        'thumb_link'  => $data->{thumb},
+        'description' => $data->{description},
+        'pubdate'     => $data->{pubdate},
+        'publisher'   => $data->{publisher},
+        'binding'     => $data->{binding},
+        'pages'       => $data->{pages},
+        'weight'      => $data->{weight},
+        'width'       => $data->{width},
+        'height'      => $data->{height},
+        'html'        => $html
     };
 
 #use Data::Dumper;
@@ -199,7 +207,7 @@ be forthcoming, please feel free to (politely) remind me.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2010-2014 Barbie for Miss Barbell Productions
+  Copyright (C) 2010-2019 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

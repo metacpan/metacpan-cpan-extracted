@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Opening::ECO::Entry;
-$Chess::Opening::ECO::Entry::VERSION = '0.5';
+$Chess::Opening::ECO::Entry::VERSION = '0.6';
 use common::sense;
 
 use Locale::TextDomain 'com.cantanea.Chess-Opening';
@@ -20,7 +20,7 @@ use base 'Chess::Opening::Book::Entry';
 sub new {
 	my ($class, $fen, %args) = @_;
 
-	my $self = $class->SUPER::new($fen);
+	my $self = $class->SUPER::new($fen, %args);
 	$self->{__parent} = $args{parent} if exists $args{parent};
 	$self->{__eco} = $args{eco} if exists $args{eco};
 	$self->{__variation} = $args{variation} if exists $args{variation};

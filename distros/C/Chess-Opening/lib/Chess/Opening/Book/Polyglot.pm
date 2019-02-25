@@ -13,7 +13,7 @@
 # ABSTRACT: Read chess opening books in polyglot format
 
 package Chess::Opening::Book::Polyglot;
-$Chess::Opening::Book::Polyglot::VERSION = '0.5';
+$Chess::Opening::Book::Polyglot::VERSION = '0.6';
 use common::sense;
 
 use 5.12.0;

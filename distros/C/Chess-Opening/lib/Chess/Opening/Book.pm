@@ -13,7 +13,7 @@
 # ABSTRACT: Read chess opening books in polyglot format
 
 package Chess::Opening::Book;
-$Chess::Opening::Book::VERSION = '0.5';
+$Chess::Opening::Book::VERSION = '0.6';
 use common::sense;
 
 use Locale::TextDomain 'com.cantanea.Chess-Opening';

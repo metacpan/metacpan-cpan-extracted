@@ -30,7 +30,7 @@ sub new {
 
 sub __parse_file_Text_CSV { # 0
     my ( $sf, $sql, $fh ) = @_;
-    local $SIG{INT} = sub { unlink $sf->{i}{tmp_copy_paste}; exit };
+    local $SIG{INT} = sub { unlink $sf->{i}{f_tmp_copy_paste}; exit };
     delete $sf->{d}{sheet_name};
     my $waiting = 'Parsing file ... ';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -69,7 +69,7 @@ sub __parse_file_Text_CSV { # 0
 
 sub __parse_file_split { # 1
     my ( $sf, $sql, $fh ) = @_;
-    local $SIG{INT} = sub { unlink $sf->{i}{tmp_copy_paste}; exit };
+    local $SIG{INT} = sub { unlink $sf->{i}{f_tmp_copy_paste}; exit };
     delete $sf->{d}{sheet_name};
     my $waiting = 'Parsing file ... ';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );

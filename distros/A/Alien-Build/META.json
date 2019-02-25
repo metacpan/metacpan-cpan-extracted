@@ -99,7 +99,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.52",
+   "version" : "1.55",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -126,10 +126,11 @@
       "Jos\u00e9 Joaqu\u00edn Atria (JJATRIA)",
       "Duke Leto (LETO)",
       "Shoichi Kaji (SKAJI)",
-      "Shawn Laffan (SLAFFAN)"
+      "Shawn Laffan (SLAFFAN)",
+      "Paul Evans (leonerd, PEVANS)"
    ],
-   "x_generated_by_perl" : "v5.29.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09",
    "x_use_unsafe_inc" : 0
 }
 

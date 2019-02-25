@@ -1,3 +1,10 @@
+0.141   2019-02-24 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Data::Sah::Coerce.
+
+
 0.140   2018-06-04 (PERLANCAR)
 
 	- No functional changes.

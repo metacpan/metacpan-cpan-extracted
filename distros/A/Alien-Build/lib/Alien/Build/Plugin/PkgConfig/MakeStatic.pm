@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Path::Tiny ();
 
 # ABSTRACT: Convert .pc files into static
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 has path => undef;
@@ -107,7 +107,7 @@ Alien::Build::Plugin::PkgConfig::MakeStatic - Convert .pc files into static
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -184,6 +184,8 @@ Duke Leto (LETO)
 Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
+
+Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 

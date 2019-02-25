@@ -27,7 +27,7 @@ our @EXPORT = qw(
 );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 my $build;
@@ -567,7 +567,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -830,6 +830,8 @@ Duke Leto (LETO)
 Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
+
+Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -12,11 +12,11 @@ Parse::Netstat::Search - Searches the connection list in the results returned by
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.0.2';
 
 
 =head1 SYNOPSIS
@@ -57,6 +57,7 @@ sub new{
 			  errorExtra=>{
 						   '1'=>'badCIDR',
 						   '2' =>'unknownService',
+						   '3'=>'badResults',
 						   },
 			  cidrs=>[],
 			  protocols=>{},
@@ -211,7 +212,9 @@ sub search{
 	my $res_int=0;
 	while ( defined( $res->[2]->{active_conns}->[$res_int] ) ){
 		# ignore unix sockets
-		if ( $res->[2]->{active_conns}->[$res_int]->{proto} ne 'unix' ){
+		if ( defined( $res->[2]->{active_conns}->[$res_int]->{proto} ) &&
+			 ($res->[2]->{active_conns}->[$res_int]->{proto} ne 'unix')
+			){
 			my $foreign_port=$res->[2]->{active_conns}->[$res_int]->{foreign_port};
 			my $state=$res->[2]->{active_conns}->[$res_int]->{state};
 			my $protocol=$res->[2]->{active_conns}->[$res_int]->{proto};
@@ -220,6 +223,25 @@ sub search{
 			my $foreign_host=$res->[2]->{active_conns}->[$res_int]->{foreign_host};
 			my $sendq=$res->[2]->{active_conns}->[$res_int]->{sendq};
 			my $recvq=$res->[2]->{active_conns}->[$res_int]->{recvq};
+
+			# UDP is stateless and in some cases on listening ports for it Parse::Netstat
+			# does not return any host, so use * for it.
+			if (!defined( $foreign_host )){
+				$foreign_host='*';
+			}
+			if (
+				( $foreign_host eq '*' ) &&
+				( $protocol =~ /^[Uu][Dd][Pp]/ ) &&
+				( ! defined( $state ) )
+				){
+				$state='';
+			}
+			if (
+				( !defined( $state ) ) &&
+				( $protocol =~ /^[Uu][Dd][Pp]/ )
+				){
+				$state='';
+			}
 
 			# checks for making sure a check is meet... defaults to 1
 			my $port_meet=1;
@@ -293,12 +315,13 @@ sub search{
 				){
 				push( @found, {
 							   'foreign_port'=>$foreign_port,
-							   'foriegn_host'=>$foreign_host,
+							   'foreign_host'=>$foreign_host,
 							   'local_port'=>$local_port,
 							   'local_host'=>$local_host,
 							   'sendq'=>$sendq,
 							   'recvq'=>$recvq,
 							   'proto'=>$protocol,
+							   'state'=>$state,
 							   }
 					  );
 			}

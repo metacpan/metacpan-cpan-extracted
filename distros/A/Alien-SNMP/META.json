@@ -1,0 +1,64 @@
+{
+   "abstract" : "Build and install Net-SNMP",
+   "author" : [
+      "Eric A. Miller <emiller AT cpan DOT org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-SNMP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Socket::SSL" : "1.56",
+            "Net::SSLeay" : "1.49"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base" : "0.020",
+            "ExtUtils::CChecker" : "0.10",
+            "File::ShareDir" : "1.03",
+            "Module::Build" : "0.42",
+            "PkgConfig" : "0.14026",
+            "Test2::Suite" : "0.000067",
+            "perl" : "5.010001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.020",
+            "File::ShareDir" : "1.03",
+            "parent" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::CChecker" : "0",
+            "Test::More" : "0.94",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::SNMP" : {
+         "file" : "lib/Alien/SNMP.pm",
+         "version" : "2.000000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ]
+   },
+   "version" : "2.000000",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

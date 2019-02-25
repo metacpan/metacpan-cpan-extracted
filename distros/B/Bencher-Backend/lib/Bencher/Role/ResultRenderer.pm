@@ -1,7 +1,7 @@
 package Bencher::Role::ResultRenderer;
 
 our $DATE = '2019-02-24'; # DATE
-our $VERSION = '1.043'; # VERSION
+our $VERSION = '1.044'; # VERSION
 
 use 5.010;
 use strict;
@@ -26,7 +26,7 @@ Bencher::Role::ResultRenderer - Results renderer role
 
 =head1 VERSION
 
-This document describes version 1.043 of Bencher::Role::ResultRenderer (from Perl distribution Bencher-Backend), released on 2019-02-24.
+This document describes version 1.044 of Bencher::Role::ResultRenderer (from Perl distribution Bencher-Backend), released on 2019-02-24.
 
 =for Pod::Coverage .*
 

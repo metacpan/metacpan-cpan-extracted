@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::Bencher::Scenario;
 
-our $DATE = '2019-02-15'; # DATE
-our $VERSION = '0.240'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '0.242'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -119,7 +119,7 @@ sub __render_run_on {
     );
 }
 
-sub _process_scenario_module {
+sub _process_bencher_scenario_or_acme_cpanmodules_module {
     no strict 'refs';
 
     my ($self, $document, $input, $package) = @_;
@@ -141,23 +141,41 @@ sub _process_scenario_module {
 
     my $tempdir = File::Temp::tempdir(CLEANUP=>1);
 
-    my $raw_scenario = ${"$package\::scenario"};
-    my $scenario = Bencher::Backend::parse_scenario(
-        scenario => $raw_scenario);
-
-    my $scenario_name = $package;
-    $scenario_name =~ s/\ABencher::Scenario:://;
+    my ($raw_scenario, $scenario, $scenario_name, $is_cpanmodules, $cpanmodules_name);
+    if ($package =~ /\ABencher::Scenario::/) {
+        ($scenario_name = $package) =~ s/\ABencher::Scenario:://;
+        $raw_scenario = ${"$package\::scenario"};
+        $scenario = Bencher::Backend::parse_scenario(
+            scenario => ${"$package\::scenario"});
+    } else {
+        # Acme::CPANModules
+        require Acme::CPANModulesUtil::Bencher;
+        $is_cpanmodules = 1;
+        ($cpanmodules_name = $package) =~ s/\AAcme::CPANModules:://;
+        my $res = Acme::CPANModulesUtil::Bencher::gen_bencher_scenario(
+            cpanmodule => $cpanmodules_name);
+        $self->log_fatal(["Can't extract scenario from %s: %s", $package, $res])
+            unless $res->[0] == 200;
+        $raw_scenario = $res->[2];
+        $scenario = Bencher::Backend::parse_scenario(
+            scenario => $res->[2]);
+    }
 
     # add Synopsis section
     {
         my @pod;
         push @pod, "To run benchmark with default option:\n\n",
-            " % bencher -m $scenario_name\n\n";
+            $is_cpanmodules ?
+            " % bencher --cpanmodules-module $cpanmodules_name\n\n" :
+            " % bencher -m $scenario_name\n\n"
+            ;
         my @pmodules = Bencher::Backend::_get_participant_modules($scenario);
         if (@pmodules && !$scenario->{module_startup}) {
             push @pod, "To run module startup overhead benchmark:\n\n",
-                " % bencher --module-startup -m $scenario_name\n\n";
-        }
+                $is_cpanmodules ?
+                " % bencher --module-startup --cpanmodules-module $cpanmodules_name\n\n" :
+                " % bencher --module-startup -m $scenario_name\n\n"
+            }
         push @pod, "For more options (dump scenario, list/include/exclude/add ",
             "participants, list/include/exclude/add datasets, etc), ",
             "see L<bencher> or run C<bencher --help>.\n\n";
@@ -173,6 +191,8 @@ sub _process_scenario_module {
 
     # add Description section
     {
+        last if $is_cpanmodules;
+
         my @pod;
 
         push @pod, $self->_md2pod($scenario->{description})
@@ -218,7 +238,7 @@ sub _process_scenario_module {
                     my $cres = convert_args_to_argv(args => $res->{args}, meta => $meta);
                     $self->log_fatal(["Invalid sample_bench[$i] specification: invalid args: %s - %s", $cres->[0], $cres->[1]])
                         unless $cres->[0] == 200;
-                    my $cmd = "C<< bencher -m $scenario_name ".join(" ", map {shell_quote($_)} @{$cres->[2]})." >>";
+                    my $cmd = "C<< bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." ".join(" ", map {shell_quote($_)} @{$cres->[2]})." >>";
                     if ($res->{title}) {
                         $res->{title} .= " ($cmd)";
                     } else {
@@ -235,7 +255,7 @@ sub _process_scenario_module {
             }
         } else {
             $sample_benches = [
-                {title=>"Benchmark with default options (C<< bencher -m $scenario_name >>)", args=>{}},
+                {title=>"Benchmark with default options (C<< bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." >>)", args=>{}},
             ];
         }
 
@@ -256,10 +276,10 @@ sub _process_scenario_module {
                     }
                 }
             } else {
-                $self->log(["Running benchmark of scenario $scenario_name with args %s", $bench->{args}]);
+                $self->log(["Running benchmark of scenario $package with args %s", $bench->{args}]);
                 $bench_res = Bencher::Backend::bencher(
                     action => 'bench',
-                    scenario_module => $scenario_name,
+                    scenario => $scenario,
                     note => 'Run by '.__PACKAGE__,
                     %{ $bench->{args} },
                 );
@@ -297,17 +317,17 @@ sub _process_scenario_module {
         } # for sample_benches
 
         if ($self->bench_startup && @modules && !$scenario->{module_startup}) {
-            $self->log(["Running module_startup benchmark of scenario $scenario_name"]);
+            $self->log(["Running module_startup benchmark of scenario $package"]);
             my $bench_res2 = Bencher::Backend::bencher(
                 action => 'bench',
                 module_startup => 1,
-                scenario_module => $scenario_name,
+                scenario => $scenario,
                 note => 'Run by '.__PACKAGE__,
             );
             $fres = Bencher::Backend::format_result($bench_res2);
             $fres =~ s/^/ /gm;
             $table_num++;
-            push @pod, "Benchmark module startup overhead (C<< bencher -m $scenario_name --module-startup >>):\n\n #table$table_num#\n", $fres, "\n\n";
+            push @pod, "Benchmark module startup overhead (C<< bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." --module-startup >>):\n\n #table$table_num#\n", $fres, "\n\n";
             push @pod, __html_result($bench_res2, $table_num) if $self->gen_html_tables;
             $self->_gen_chart($tempdir, $input, \@pod, $bench_res2, $table_num);
         }
@@ -368,7 +388,7 @@ sub _process_scenario_module {
         my @pod;
         my $res = Bencher::Backend::bencher(
             action => 'list-participants',
-            scenario_module => $scenario_name,
+            scenario => $scenario,
             detail => 1,
         );
         push @pod, "=over\n\n";
@@ -447,14 +467,22 @@ sub _process_scenario_module {
 
     # create Bencher::ScenarioR::* modules
     {
-        require Data::Dump;
         require Dist::Zilla::File::InMemory;
-        my $rname = $input->{filename}; $rname =~ s!Scenario/!ScenarioR/!;
-        my $rpkg = "Bencher::ScenarioR::$scenario_name";
+        my ($rname, $rpkg, $nsname);
+        if ($is_cpanmodules) {
+            $rname = $input->{filename}; $rname =~ s!CPANModules/!CPANModules_ScenarioR/!;
+            $rpkg = "Acme::CPANModules_ScenarioR::$cpanmodules_name";
+            $nsname = "Acme::CPANModules_ScenarioR::*";
+        } else {
+            $rname = $input->{filename}; $rname =~ s!Scenario/!ScenarioR/!;
+            $rpkg = "Bencher::ScenarioR::$scenario_name";
+            $nsname = "Bencher::ScenarioR::*";
+        }
         my $file = Dist::Zilla::File::InMemory->new(
             name => $rname,
             content => join(
                 "",
+                "## no critic\n",
                 "package $rpkg;\n",
                 "\n",
 
@@ -464,7 +492,7 @@ sub _process_scenario_module {
 
                 "\n",
 
-                "our \$results = ", Data::Dump::dump(\@bench_res), ";\n",
+                "our \$results = ", dmp(\@bench_res), ";\n",
                 "\n",
 
                 "1;\n",
@@ -473,7 +501,7 @@ sub _process_scenario_module {
 
                 "=head1 DESCRIPTION\n\n",
                 "This module is automatically generated by ".__PACKAGE__." during distribution build.\n\n",
-                "A Bencher::ScenarioR::* module contains the raw result of sample benchmark and might be useful for some stuffs later.\n\n",
+                "A $nsname module contains the raw result of sample benchmark and might be useful for some stuffs later.\n\n",
             ),
         );
         my @caller = caller();
@@ -500,7 +528,7 @@ sub _list_my_scenario_modules {
     @res;
 }
 
-sub _process_scenarios_module {
+sub _process_bencher_scenarios_module {
     no strict 'refs';
 
     my ($self, $document, $input, $package) = @_;
@@ -544,17 +572,17 @@ sub weave_section {
     my $filename = $input->{filename};
 
     my $package;
-    if ($filename =~ m!^lib/(Bencher/Scenario/.+)\.pm$!) {
+    if ($filename =~ m!^lib/(?:(Acme/CPANModules/.+)|(Bencher/Scenario/.+))\.pm$!) {
         {
             $package = $1;
             $package =~ s!/!::!g;
             if ($self->include_module && @{ $self->include_module }) {
-                last unless grep {"Bencher::Scenario::$_" eq $package} @{ $self->include_module };
+                last unless grep {$_ eq $package || "Bencher::Scenario::$_" eq $package || "Acme::CPANModules::$_" eq $package} @{ $self->include_module };
             }
             if ($self->exclude_module && @{ $self->exclude_module }) {
-                last if grep {"Bencher::Scenario::$_" eq $package} @{ $self->exclude_module };
+                last if grep {$_ eq $package || "Bencher::Scenario::$_" eq $package || "Acme::CPANModules::$_" eq $package} @{ $self->exclude_module };
             }
-            $self->_process_scenario_module($document, $input, $package);
+            $self->_process_bencher_scenario_or_acme_cpanmodules_module($document, $input, $package);
         }
     }
     if ($filename =~ m!^lib/(Bencher/Scenarios/.+)\.pm$!) {
@@ -565,7 +593,7 @@ sub weave_section {
             last if $mem{$filename}++;
             $package = $1;
             $package =~ s!/!::!g;
-            $self->_process_scenarios_module($document, $input, $package);
+            $self->_process_bencher_scenarios_module($document, $input, $package);
         }
     }
 }
@@ -585,7 +613,7 @@ Pod::Weaver::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.240 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-02-15.
+This document describes version 0.242 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-02-24.
 
 =head1 SYNOPSIS
 
@@ -596,16 +624,19 @@ In your F<weaver.ini>:
 
 =head1 DESCRIPTION
 
-This plugin is to be used when building C<Bencher::Scenario::*> distribution.
-Currently it does the following:
+This plugin is to be used when building C<Bencher::Scenario::*> distribution. It
+can also be used for C<Acme::CPANModules::*> distribution which contain
+benchmarking information. Currently it does the following:
 
-For each C<lib/Bencher/Scenario/*> module files:
+For each C<lib/Bencher/Scenario/*> or C<lib/Acme/CPANModules/*> module files:
 
 =over
 
-=item * Add a Synopsis section (if doesn't already exist) containing a few examples on how to use the scenario
+=item * Add a Synopsis section (if doesn't already exist) containing a few examples on how to benchmark using the scenario
 
 =item * Add a description about Bencher in the Description section
+
+Only for C<lib/Bencher/Scenario/*> module files.
 
 =item * Add a Benchmark Participants section containing list of participants from the scenario
 
@@ -616,7 +647,7 @@ run and shown.
 
 =item * Add a Benchmarked Modules section containing list of benchmarked modules (if any) from the scenario and their versions
 
-=item * Create lib/Bencher/ScenarioR/* module files that contain sample benchmark result data
+=item * Create C<lib/Bencher/ScenarioR/*> or C<lib/Acme/CPANModules_ScenarioR/*> module files that contain sample benchmark result data
 
 These module files contain the raw data, while the Sample Benchmark Results POD
 section of the scenario module contains the formatted result. The raw data might
@@ -628,7 +659,7 @@ alternatives.
 
 =back
 
-For each C<lib/Bencher/Scenario/*> module files:
+For each C<lib/Bencher/Scenarios/*> module files:
 
 =over
 
@@ -712,6 +743,8 @@ feature.
 L<Bencher>
 
 L<Dist::Zilla::Plugin::Bencher::Scenario>
+
+L<Acme::CPANModules>
 
 =head1 AUTHOR
 

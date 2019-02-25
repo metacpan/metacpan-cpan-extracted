@@ -24,7 +24,6 @@ sub new {
 
 sub extended_col {
     my ( $sf, $sql, $clause ) = @_;
-    my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
     my ( $none, $function, $subquery, $all ) = @{$sf->{i}{expand_signs}};
     my $set_to_null = '=N';
     my @values;
@@ -42,12 +41,15 @@ sub extended_col {
     }
     else {
         # Choose
-        $type = $stmt_h->choose( [ undef, @types ], { undef => '<<' } );
+        $type = choose(
+            [ undef, @types ],
+            { %{$sf->{i}{lyt_stmt_h}}, undef => '<<' }
+        );
         if ( ! defined $type ) {
             return;
         }
     }
-    my $ext_col;
+    my ( $ext_col, $alias_type );
     if ( $type eq $subquery ) {
         require App::DBBrowser::Subqueries;
         my $new_sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -56,6 +58,7 @@ sub extended_col {
             return;
         }
         $ext_col = $subq;
+        $alias_type = 'subqueries';
     }
     elsif ( $type eq $function ) {
         require App::DBBrowser::Table::Functions;
@@ -65,13 +68,14 @@ sub extended_col {
             return;
         }
         $ext_col = $func;
+        $alias_type = 'functions';
     }
     elsif ( $type eq $set_to_null ) {
         return "NULL";
     }
     if ( $clause !~ /^(?:set|where|having|group_by|oder_by)\z/i ) {
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $alias = $ax->alias( 'subqueries', $ext_col );
+        my $alias = $ax->alias( $alias_type, $ext_col );
         if ( defined $alias && length $alias ) {
             $sql->{alias}{$ext_col} = $ax->quote_col_qualified( [ $alias ] );
         }

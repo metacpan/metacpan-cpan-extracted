@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1146,7 +1146,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -1195,9 +1195,10 @@ L<Alien::Build> + L<alienfile>.
 
 =back
 
-Note that you will usually not usually create a L<Alien::Build> instance
+Note that you will not usually create a L<Alien::Build> instance
 directly, but rather be using a thin installer layer, such as
-L<Alien::Build::MM> (for use with L<ExtUtils::MakeMaker>).  One of the
+L<Alien::Build::MM> (for use with L<ExtUtils::MakeMaker>) or
+L<Alien::Build::MB> (for use with L<Module::Build>).  One of the
 goals of this project is to remain installer agnostic.
 
 =head1 CONSTRUCTOR
@@ -1907,7 +1908,7 @@ This environment variable will be manipulated during a destdir install.
 =item PKG_CONFIG
 
 This environment variable can be used to override the program name for C<pkg-config>
-for some PkgConfig plugins: L<Alien::Build::Plugin::PkgConfig>.
+when using the command line plugin: L<Alien::Build::Plugin::PkgConfig::CommandLine>.
 
 =item ftp_proxy, all_proxy
 
@@ -2036,6 +2037,8 @@ Duke Leto (LETO)
 Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
+
+Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -32,9 +32,9 @@ sub new {
         i => $info,
         o => $options,
         d => $data,
-        data_dirs => catfile( $info->{app_dir}, 'file_history.json' )
     };
-    $sf->{i}{tmp_copy_paste} = catfile $info->{app_dir}, 'Copy_and_Paste_tmp_file.csv';
+    $sf->{i}{f_tmp_copy_paste} = catfile $sf->{i}{app_dir}, 'tmp_copy_and_paste.csv';
+    $sf->{i}{f_dir_history}    = catfile $sf->{i}{app_dir}, 'dir_history.json';
     bless $sf, $class;
 }
 
@@ -178,7 +178,7 @@ sub from_copy_and_paste {
     $ax->print_sql( $sql );
     print "Multi row:\n";
     my $parse_mode = $sf->{o}{insert}{copy_parse_mode};
-    my $file_ec = $sf->{i}{tmp_copy_paste};
+    my $file_ec = $sf->{i}{f_tmp_copy_paste};
     local $SIG{INT} = sub { unlink $file_ec; exit };
     if ( ! eval {
         open my $fh_in, '>', $file_ec or die $!;
@@ -399,7 +399,7 @@ sub __directory {
         return $sf->__new_dir_search();
     }
     elsif ( $sf->{o}{insert}{history_dirs} == 1 ) {
-        my $h_ref = $ax->read_json( $sf->{data_dirs} );
+        my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} );
         if ( @{$h_ref->{dirs}||[]} ) {
             return realpath encode 'locale_fs', $h_ref->{dirs}[0];
         }
@@ -407,7 +407,7 @@ sub __directory {
     $sf->{i}{old_dir_idx} ||= 0;
 
     DIR: while ( 1 ) {
-        my $h_ref = $ax->read_json( $sf->{data_dirs} );
+        my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} );
         my @dirs = sort @{$h_ref->{dirs}||[]};
         my $prompt = sprintf "Choose a dir:";
         my @pre = ( undef, '  NEW search' );
@@ -462,7 +462,7 @@ sub __new_dir_search {
 sub __add_to_history {
     my ( $sf, $dir_ec ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $h_ref = $ax->read_json( $sf->{data_dirs} ); ###
+    my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} );
     my $dirs_ec = [ map { realpath encode( 'locale_fs', $_ ) } @{$h_ref->{dirs}||[]} ];
     unshift @$dirs_ec, $dir_ec;
     @$dirs_ec = uniq @$dirs_ec;
@@ -470,7 +470,7 @@ sub __add_to_history {
         $#{$dirs_ec} = $sf->{o}{insert}{history_dirs} - 1;
     }
     $h_ref->{dirs} = [ map { decode( 'locale_fs', $_ ) } @$dirs_ec ];
-    $ax->write_json( $sf->{data_dirs}, $h_ref ); ###
+    $ax->write_json( $sf->{i}{f_dir_history}, $h_ref );
 }
 
 

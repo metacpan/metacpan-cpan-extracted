@@ -2,7 +2,7 @@
 use strict;
 
 use Data::Dumper;
-use Test::More tests => 46;
+use Test::More tests => 40;
 use WWW::Scraper::ISBN;
 
 ###########################################################
@@ -11,50 +11,43 @@ my $DRIVER          = 'Wheelers';
 my $CHECK_DOMAIN    = 'www.google.com';
 
 my %tests = (
-    '0099547937' => [
-        [ 'is',     'isbn',         '9780099547938' ],
-        [ 'is',     'isbn10',       '0099547937'    ],
-        [ 'is',     'isbn13',       '9780099547938' ],
-        [ 'is',     'ean13',        '9780099547938' ],
-        [ 'is',     'title',        'Ford County'   ],
-        [ 'is',     'author',       'John Grisham'  ],
-        [ 'is',     'publisher',    'Cornerstone'   ],
-        [ 'is',     'pubdate',      '27 May 2010'   ],
-        [ 'like',   'binding',      qr/Paperback/   ],
-        [ 'is',     'pages',        352             ],
-        [ 'is',     'width',        110             ],
-        [ 'is',     'height',       178             ],
-        [ 'is',     'weight',       190             ],
-        [ 'is',     'image_link',   'http://r.wheelers.co/bk/large/978009/9780099547938.jpg' ],
-        [ 'is',     'thumb_link',   'http://r.wheelers.co/bk/small/978009/9780099547938.jpg' ],
-        [ 'like',   'description',  qr|John Grisham takes you into the heart of America| ],
-        [ 'like',   'book_link',    qr|http://www.wheelers.co.nz/books/9780099547938-| ]
+    '0847834816' => [
+        [ 'is',     'isbn',         '9780847834815'                     ],
+        [ 'is',     'isbn10',       '0847834816'                        ],
+        [ 'is',     'isbn13',       '9780847834815'                     ],
+        [ 'is',     'ean13',        '9780847834815'                     ],
+        [ 'is',     'title',        'Joy Division'                      ],
+        [ 'is',     'author',       'Kevin Cummins'                     ],
+        [ 'like',   'publisher',    qr|Rizzoli International|           ],
+        [ 'is',     'pubdate',      '26 October 2010'                   ],
+        [ 'like',   'binding',      qr/Hardback/                        ],
+        [ 'is',     'pages',        208                                 ],
+        [ 'is',     'width',        241                                 ],
+        [ 'is',     'height',       302                                 ],
+        [ 'is',     'weight',       1397                                ],
+        [ 'is',     'image_link',   'https://r.wheelers.co/bk/large/978084/9780847834815.jpg' ],
+        [ 'is',     'thumb_link',   'https://r.wheelers.co/bk/small/978084/9780847834815.jpg' ],
+        [ 'like',   'description',  qr|Joy Division pioneered a genre of music|               ],
+        [ 'like',   'book_link',    qr|https://www.wheelers.co.nz/books/9780847834815-|       ]
     ],
-    '9780007203055' => [
-        [ 'is',     'isbn',         '9780007203055'             ],
-        [ 'is',     'isbn10',       '0007203055'                ],
-        [ 'is',     'isbn13',       '9780007203055'             ],
-        [ 'is',     'ean13',        '9780007203055'             ],
-        [ 'like',   'author',       qr/Simon Ball/              ],
-        [ 'is',     'title',        q|The Bitter Sea: The Brutal World War II Fight for the Mediterranean|  ],
-        [ 'is',     'publisher',    'HarperCollins'             ],
-        [ 'is',     'pubdate',      '1 April 2010'              ],
-        [ 'is',     'binding',      'Paperback'                 ],
-        [ 'is',     'pages',        416                         ],
-        [ 'is',     'width',        130                         ],
-        [ 'is',     'height',       197                         ],
-        [ 'is',     'weight',       312                         ],
-        [ 'is',     'image_link',   'http://r.wheelers.co/bk/large/978000/9780007203055.jpg'    ],
-        [ 'is',     'thumb_link',   'http://r.wheelers.co/bk/small/978000/9780007203055.jpg'    ],
-        [ 'like',   'description',  qr|A gripping history of the Mediterranean campaigns|   ],
-        [ 'like',   'book_link',    qr|http://www.wheelers.co.nz/books/9780007203055-| ]
-    ],
-
-    '9781408307557' => [
-        [ 'is',     'pages',        48                          ],
-        [ 'is',     'width',        128                         ],
-        [ 'is',     'height',       206                         ],
-        [ 'is',     'weight',       154                         ],
+    '9780826415493' => [
+        [ 'is',     'isbn',         '9780826415493'                     ],
+        [ 'is',     'isbn10',       '0826415490'                        ],
+        [ 'is',     'isbn13',       '9780826415493'                     ],
+        [ 'is',     'ean13',        '9780826415493'                     ],
+        [ 'like',   'author',       qr/Chris Ott/                       ],
+        [ 'is',     'title',        q|Joy Division's Unknown Pleasures| ],
+        [ 'is',     'publisher',    'Bloomsbury Publishing PLC'         ],
+        [ 'is',     'pubdate',      '31 March 2004'                     ],
+        [ 'is',     'binding',      'Paperback'                         ],
+        [ 'is',     'pages',        128                                 ],
+        [ 'is',     'width',        128                                 ],
+        [ 'is',     'height',       178                                 ],
+        [ 'is',     'weight',       136                                 ],
+        [ 'is',     'image_link',   'https://r.wheelers.co/bk/large/978082/9780826415493.jpg' ],
+        [ 'is',     'thumb_link',   'https://r.wheelers.co/bk/small/978082/9780826415493.jpg' ],
+        [ 'like',   'description',  qr|33 1/3 is a new series of short books|                 ],
+        [ 'like',   'book_link',    qr|https://www.wheelers.co.nz/books/9780826415493-|       ]
     ],
 );
 
@@ -68,12 +61,12 @@ my $scraper = WWW::Scraper::ISBN->new();
 isa_ok($scraper,'WWW::Scraper::ISBN');
 
 SKIP: {
-	skip "Can't see a network connection", $tests+1   if(pingtest($CHECK_DOMAIN));
+    skip "Can't see a network connection", $tests+1   if(pingtest($CHECK_DOMAIN));
 
-	$scraper->drivers($DRIVER);
+    $scraper->drivers($DRIVER);
 
     # this ISBN doesn't exist
-	my $isbn = "1234567890";
+    my $isbn = "1234567890";
     my $record;
     eval { $record = $scraper->search($isbn); };
     if($@) {
@@ -82,7 +75,7 @@ SKIP: {
     elsif($record->found) {
         ok(0,'Unexpectedly found a non-existent book');
     } else {
-		like($record->error,qr/Failed to find that book on Wheelers website|website appears to be unavailable/);
+        like($record->error,qr/Failed to find that book on Wheelers website|website appears to be unavailable/);
     }
 
     for my $isbn (keys %tests) {

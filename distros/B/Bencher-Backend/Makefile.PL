@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Bencher::Backend",
   "PREREQ_PM" => {
+    "Acme::CPANModulesUtil::Bencher" => 0,
     "Benchmark::Dumb" => 0,
     "Browser::Open" => 0,
     "Capture::Tiny" => 0,
@@ -66,7 +67,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.043",
+  "VERSION" => "1.044",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,6 +75,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Acme::CPANModulesUtil::Bencher" => 0,
   "Benchmark::Dumb" => 0,
   "Browser::Open" => 0,
   "Capture::Tiny" => 0,

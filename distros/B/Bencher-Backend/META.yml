@@ -19,6 +19,7 @@ name: Bencher-Backend
 recommends:
   App::perlbrew: '0'
 requires:
+  Acme::CPANModulesUtil::Bencher: '0'
   Benchmark::Dumb: '0'
   Browser::Open: '0'
   Capture::Tiny: '0'
@@ -66,7 +67,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Backend
   homepage: https://metacpan.org/release/Bencher-Backend
   repository: git://github.com/perlancar/perl-Bencher-Backend.git
-version: '1.043'
+version: '1.044'
 x_Dist_Zilla:
   perl:
     version: '5.024000'

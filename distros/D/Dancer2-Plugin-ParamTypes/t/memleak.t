@@ -8,7 +8,8 @@ use lib 'lib';
 
 ## no critic qw(Subroutines::ProhibitCallsToUndeclaredSubs)
 
-package MyApp {
+package MyApp;
+
     use Dancer2;
     use Dancer2::Plugin::ParamTypes;
 
@@ -17,7 +18,8 @@ package MyApp {
 
     get '/' => with_types [ [ 'query', 'id', 'Int' ] ] =>
         sub {1};
-}
+
+package main;
 
 my $app    = MyApp->to_app;
 my $runner = Dancer2->runner;

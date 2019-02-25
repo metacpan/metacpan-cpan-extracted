@@ -23,8 +23,8 @@ sub new {
         i => $info,
         o => $options,
         d => $data,
-        subquery_file => catfile( $info->{app_dir}, 'subqueries.json' ),
     };
+    $sf->{i}{f_subqueries} = catfile $info->{app_dir}, 'subqueries.json';
     bless $sf, $class;
 }
 
@@ -68,7 +68,7 @@ sub __tmp_history {
 sub __get_history {
     my ( $sf, $clause ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $h_ref = $ax->read_json( $sf->{subquery_file} );
+    my $h_ref = $ax->read_json( $sf->{i}{f_subqueries} );
     my $saved_history = $h_ref->{ $sf->{d}{driver} }{ $sf->{d}{db} }{ $clause } || [];
     my $tmp_history = $sf->__tmp_history( $clause, $saved_history ) || [];
     my $history = [ @$saved_history, @$tmp_history ];
@@ -76,35 +76,8 @@ sub __get_history {
 }
 
 
-sub __fix_subqueries_file_format { # remove this subroutine
-    my ( $sf ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $h_ref = $ax->read_json( $sf->{subquery_file} );
-    my $changed = 0;
-    for my $driver ( keys %$h_ref ) {
-        for my $db ( keys %{$h_ref->{$driver}} ) {
-            for my $clause ( keys %{$h_ref->{$driver}{$db}} ) {
-                for my $entry ( @{$h_ref->{$driver}{$db}{$clause}} ) {
-                    if ( @$entry == 1 ) {
-                        $entry = [ $entry->[0], $entry->[0] ];
-                        $changed = 1;
-                    }
-                }
-            }
-        }
-    }
-    if ( $changed ) {
-        $ax->write_json( $sf->{subquery_file}, $h_ref );
-    }
-}
-
-
 sub choose_subquery {
     my ( $sf, $sql, $clause ) = @_;
-    ##########
-    # remove this
-    $sf->__fix_subqueries_file_format();
-    ##########
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $history = $sf->__get_history( $clause );
     my $edit_sq_file = 'Choose SQ:';
@@ -134,7 +107,7 @@ sub choose_subquery {
         }
         delete $ENV{TC_RESET_AUTO_UP};
         if ( $choices->[$idx] eq $edit_sq_file ) {
-            if ( $sf->edit_sq_file( $clause ) ) {
+            if ( $sf->__edit_sq_file( $clause ) ) {
                 $history = $sf->__get_history( $clause );
                 $choices = [ @pre, map { '- ' . $_->[1] } @$history ];
             }
@@ -169,7 +142,7 @@ sub choose_subquery {
 }
 
 
-sub edit_sq_file {
+sub __edit_sq_file {
     my ( $sf, $clause ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $driver = $sf->{d}{driver};
@@ -180,7 +153,7 @@ sub edit_sq_file {
 
     while ( 1 ) {
         my $top_lines = [ sprintf( 'Stored Subqueries "%s":', uc $clause ) ];
-        my $h_ref = $ax->read_json( $sf->{subquery_file} );
+        my $h_ref = $ax->read_json( $sf->{i}{f_subqueries} );
         my $saved_history = $h_ref->{$driver}{$db}{$clause} || [];
         my @tmp_info = (
             @$top_lines,
@@ -213,7 +186,7 @@ sub edit_sq_file {
             else {
                 delete $h_ref->{$driver}{$db}{$clause};
             }
-            $ax->write_json( $sf->{subquery_file}, $h_ref );
+            $ax->write_json( $sf->{i}{f_subqueries}, $h_ref );
             $any_change++;
         }
     }

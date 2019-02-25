@@ -727,7 +727,7 @@ sub __write_config_files {
         }
     }
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
-    my $file_name = $sf->{i}{file_settings};
+    my $file_name = $sf->{i}{f_settings};
     $ax->write_json( $file_name, $tmp  );
 }
 
@@ -736,7 +736,7 @@ sub read_config_files {
     my ( $sf ) = @_;
     my $o = $sf->defaults();
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
-    my $file_name = $sf->{i}{file_settings};
+    my $file_name = $sf->{i}{f_settings};
     if ( -f $file_name && -s $file_name ) {
         my $tmp = $ax->read_json( $file_name );
         for my $section ( keys %$tmp ) {

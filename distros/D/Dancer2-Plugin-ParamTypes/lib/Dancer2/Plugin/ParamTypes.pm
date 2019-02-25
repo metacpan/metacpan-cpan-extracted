@@ -1,6 +1,6 @@
 package Dancer2::Plugin::ParamTypes;
 # ABSTRACT: Parameter type checking plugin for Dancer2
-$Dancer2::Plugin::ParamTypes::VERSION = '0.004';
+$Dancer2::Plugin::ParamTypes::VERSION = '0.005';
 use strict;
 use warnings;
 use constant {
@@ -222,7 +222,7 @@ Dancer2::Plugin::ParamTypes - Parameter type checking plugin for Dancer2
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -383,7 +383,7 @@ Sawyer X
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Sawyer X.
+This software is Copyright (c) 2019 by Sawyer X.
 
 This is free software, licensed under:
 

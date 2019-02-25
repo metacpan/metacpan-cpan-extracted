@@ -25,4 +25,4 @@ resources:
   bugtracker: https://github.com/anparker/api-mikrotik/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/anparker/api-mikrotik.git
-version: v0.24.1
+version: v0.242

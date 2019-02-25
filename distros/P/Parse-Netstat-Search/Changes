@@ -1,6 +1,15 @@
 Revision history for Parse-Netstat-Search
 
+0.0.2	2019-02-24/08:30
+		- Previous issue turned out to be specifically. Added
+		  addtional handling for UDP as it is stateless. This
+		  removes '?' from previously. State for for UDP is ''.
+
+0.0.1	2019-02-24/06:30
+		- Handle where FreeBSD does not state LISTEN.
+		- Add a missing error flag.
+		- If state is not defined use '?'.
+
 0.0.0	2019-02-20/06:00
 		-Initial release.
-
 

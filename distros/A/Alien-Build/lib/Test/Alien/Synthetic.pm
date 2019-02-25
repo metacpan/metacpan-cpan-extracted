@@ -5,7 +5,7 @@ use warnings;
 use Test2::API qw( context );
 
 # ABSTRACT: A mock alien object for testing
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 sub _def ($) { my($val) = @_; defined $val ? $val : '' }
@@ -58,14 +58,12 @@ Test::Alien::Synthetic - A mock alien object for testing
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
  use Test2::V0;
  use Test::Alien;
- 
- plan 1;
  
  my $alien = synthetic {
    cflags => '-I/foo/bar/include',
@@ -73,6 +71,8 @@ version 1.52
  };
  
  alien_ok $alien;
+
+ done_testing;
 
 =head1 DESCRIPTION
 
@@ -129,8 +129,6 @@ based L<Alien> distribution.
  use Test::Alien;
  use Alien::Libarchive;
  
- plan 5;
- 
  my $real = Alien::Libarchive->new;
  my $alien = synthetic {
    cflags       => scalar $real->cflags,
@@ -142,7 +140,6 @@ based L<Alien> distribution.
  
  xs_ok do { local $/; <DATA> }, with_subtest {
    my($module) = @_;
-   plan 1;
    my $ptr = $module->archive_read_new;
    like $ptr, qr{^[0-9]+$};
    $module->archive_read_free($ptr);
@@ -156,6 +153,8 @@ based L<Alien> distribution.
    like $ptr, qr{^[0-9]+$};
    $free->($ptr);
  };
+
+ done_testing;
  
  __DATA__
  
@@ -242,6 +241,8 @@ Duke Leto (LETO)
 Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
+
+Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 

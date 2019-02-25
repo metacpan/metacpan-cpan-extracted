@@ -1,6 +1,10 @@
 Revision history for WWW-Scraper-ISBN-Wheelers_Driver
 =====================================================
 
+0.15    2019-02-24
+        - updated pattern matching due to page layout changes.
+        - test data update.
+
 0.14    2014-12-13
         - fixed license fields in META.json to be lists.
         - ping fix for Cygwin (thanks to Alexandr Ciornii).

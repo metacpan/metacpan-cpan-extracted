@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.065';
+our $VERSION = '2.066';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -82,7 +82,7 @@ sub __init {
     mkdir $app_dir or die $! if ! -d $app_dir;
     $sf->{i}{home_dir}      = $home;
     $sf->{i}{app_dir}       = $app_dir;
-    $sf->{i}{file_settings} = catfile $app_dir, 'general_settings.json';
+    $sf->{i}{f_settings} = catfile $app_dir, 'general_settings.json';
     # check all info
 
     if ( ! eval {
@@ -266,10 +266,10 @@ sub run {
                 user_dbs  => $user_dbs,
                 sys_dbs   => $sys_dbs,
             };
-            $sf->{i}{file_attached_db} = catfile $sf->{i}{app_dir}, 'attached_DB.json';
+            $sf->{i}{f_attached_db} = catfile $sf->{i}{app_dir}, 'attached_DB.json';
             $sf->{db_attached} = 0;
-            if ( $driver eq 'SQLite' && -s $sf->{i}{file_attached_db} ) {
-                my $h_ref = $ax->read_json( $sf->{i}{file_attached_db} );
+            if ( $driver eq 'SQLite' && -s $sf->{i}{f_attached_db} ) {
+                my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} );
                 my $attached_db = $h_ref->{$db} || [];
                 if ( @$attached_db ) {
                     for my $ref ( @$attached_db ) {
@@ -693,7 +693,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.065
+Version 2.066
 
 =head1 DESCRIPTION
 

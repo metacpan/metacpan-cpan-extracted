@@ -1,14 +1,39 @@
+NAME
 
+    EPublisher::Source::Plugin::PerltutsCom - Get POD from tutorials
+    published on perltuts.com
 
-This archive contains the distribution EPublisher-Source-Plugin-PerltutsCom,
-version 0.4:
+VERSION
 
-  Get POD from tutorials published on perltuts.com
+    version 0.5
 
-This software is Copyright (c) 2012 by Renee Bäcker.
+SYNOPSIS
 
-This is free software, licensed under:
+      my $source_options = { type => 'PerltutsCom', name => 'Moose' };
+      my $url_source     = EPublisher::Source->new( $source_options );
+      my $pod            = $url_source->load_source;
 
-  The Artistic License 2.0 (GPL Compatible)
+ATTRIBUTES
 
+    ua
+
+METHODS
+
+ load_source
+
+      $url_source->load_source;
+
+    reads the URL
+
+AUTHOR
+
+    Renee Baecker <module@renee-baecker.de>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 by Renee Bäcker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

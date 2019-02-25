@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 our @aliens;
@@ -635,7 +635,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -870,7 +870,6 @@ skipped.  Example:
  xs_ok $xs, with_subtest {
    # skipped if $xs fails for some reason
    my($module) = @_;
-   plan 1;
    is $module->foo, 1;
  };
 
@@ -1012,6 +1011,8 @@ Duke Leto (LETO)
 Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
+
+Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,8 @@
 Revision history for Cache-SimpleDir
 
+2.1.5  2019-02-25 00:25:00+02:00 Europe/Athens
+  - Change the auto definition of the cache path 
+
 2.1.4  2019-02-05 23:30:00+02:00 Europe/Athens
   - callback can be defined either by its name or by code reference
   - bug fixes, documentation changes

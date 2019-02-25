@@ -8,14 +8,15 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     AUTHOR              => 'Barbie <barbie@cpan.org>',
-    NAME                => 'WWW-Scraper-ISBN-Waterstones_Driver',
+    NAME                => 'WWW::Scraper::ISBN::Waterstones_Driver',
     VERSION_FROM        => 'lib/WWW/Scraper/ISBN/Waterstones_Driver.pm',
     ABSTRACT            => 'Search driver for the Waterstones online book catalog',
     NO_META             => 1,
     PREREQ_PM           => {
 
         # prereqs
-		'WWW::Mechanize'				=> '1.60',
+        'JSON::XS'                      => '0',
+        'WWW::Mechanize'                => '1.60',
         'WWW::Scraper::ISBN'            => '1.00',
         'WWW::Scraper::ISBN::Driver'    => '1.00',
 

@@ -3,9 +3,9 @@ NAME
     Bencher::Scenario::* distribution
 
 VERSION
-    This document describes version 0.240 of
+    This document describes version 0.242 of
     Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution
-    Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-02-15.
+    Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-02-24.
 
 SYNOPSIS
     In your weaver.ini:
@@ -15,14 +15,19 @@ SYNOPSIS
 
 DESCRIPTION
     This plugin is to be used when building "Bencher::Scenario::*"
-    distribution. Currently it does the following:
+    distribution. It can also be used for "Acme::CPANModules::*"
+    distribution which contain benchmarking information. Currently it does
+    the following:
 
-    For each "lib/Bencher/Scenario/*" module files:
+    For each "lib/Bencher/Scenario/*" or "lib/Acme/CPANModules/*" module
+    files:
 
     *   Add a Synopsis section (if doesn't already exist) containing a few
-        examples on how to use the scenario
+        examples on how to benchmark using the scenario
 
     *   Add a description about Bencher in the Description section
+
+        Only for "lib/Bencher/Scenario/*" module files.
 
     *   Add a Benchmark Participants section containing list of participants
         from the scenario
@@ -35,7 +40,8 @@ DESCRIPTION
     *   Add a Benchmarked Modules section containing list of benchmarked
         modules (if any) from the scenario and their versions
 
-    *   Create lib/Bencher/ScenarioR/* module files that contain sample
+    *   Create "lib/Bencher/ScenarioR/*" or
+        "lib/Acme/CPANModules_ScenarioR/*" module files that contain sample
         benchmark result data
 
         These module files contain the raw data, while the Sample Benchmark
@@ -47,7 +53,7 @@ DESCRIPTION
         participants on benchmark scenarios). The utility can then suggest
         faster alternatives.
 
-    For each "lib/Bencher/Scenario/*" module files:
+    For each "lib/Bencher/Scenarios/*" module files:
 
     *   Add list of scenario modules at the beginning of Description section
 
@@ -115,6 +121,8 @@ SEE ALSO
     Bencher
 
     Dist::Zilla::Plugin::Bencher::Scenario
+
+    Acme::CPANModules
 
 AUTHOR
     perlancar <perlancar@cpan.org>

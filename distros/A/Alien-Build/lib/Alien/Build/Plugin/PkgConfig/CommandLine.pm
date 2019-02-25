@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using the pkg-config command line interface
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -31,6 +31,15 @@ sub _bin_name {
 };
 
 has bin_name => \&_bin_name;
+
+
+has atleast_version => undef;
+
+
+has exact_version => undef;
+
+
+has max_version => undef;
 
 
 has minimum_version => undef;
@@ -61,7 +70,7 @@ sub available
 sub init
 {
   my($self, $meta) = @_;
-  
+
   my $pkgconf = $self->bin_name;
 
   unless(defined $meta->prop->{env}->{PKG_CONFIG})
@@ -70,25 +79,39 @@ sub init
   }
 
   my($pkg_name, @alt_names) = (ref $self->pkg_name) ? (@{ $self->pkg_name }) : ($self->pkg_name);
-  
+
   my @probe = map { [$pkgconf, '--exists', $_] } ($pkg_name, @alt_names);
-  
+
   if(defined $self->minimum_version)
   {
     push @probe, [ $pkgconf, '--atleast-version=' . $self->minimum_version, $pkg_name ];
+  }
+  elsif(defined $self->atleast_version)
+  {
+    push @probe, [ $pkgconf, '--atleast-version=' . $self->atleast_version, $pkg_name ];
+  }
+
+  if(defined $self->exact_version)
+  {
+    push @probe, [ $pkgconf, '--exact-version=' . $self->exact_version, $pkg_name ];
+  }
+
+  if(defined $self->max_version)
+  {
+    push @probe, [ $pkgconf, '--max-version=' . $self->max_version, $pkg_name ];
   }
 
   unshift @probe, sub {
     my($build) = @_;
     $build->runtime_prop->{legacy}->{name} ||= $pkg_name;
   };
-  
+
   $meta->register_hook(
     probe => \@probe
   );
 
   my @gather = map { [ $pkgconf, '--exists', $_] } ($pkg_name, @alt_names);
-  
+
   foreach my $prop_name (qw( cflags libs version ))
   {
     my $flag = $prop_name eq 'version' ? '--modversion' : "--$prop_name";
@@ -117,7 +140,7 @@ sub init
       }
     }
   }
-  
+
   $meta->register_hook(gather_system => [@gather]);
 
   if($meta->prop->{platform}->{system_type} eq 'windows-mingw')
@@ -139,7 +162,7 @@ sub init
       }
     },
   ) for qw( gather_system gather_share );
-  
+
   $self;
 }
 
@@ -157,7 +180,7 @@ Alien::Build::Plugin::PkgConfig::CommandLine - Probe system and determine librar
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -182,9 +205,21 @@ the best command line tools to accomplish this task.
 The package name.  If this is a list reference then .pc files with all those package
 names must be present.
 
-=head2 minimum_version
+=head2 atleast_version
 
 The minimum required version that is acceptable version as provided by the system.
+
+=head2 exact_version
+
+The exact required version that is acceptable version as provided by the system.
+
+=head2 max_version
+
+The max required version that is acceptable version as provided by the system.
+
+=head2 minimum_version
+
+Alias for C<atleast_version> for backward compatibility.
 
 =head1 METHODS
 
@@ -253,6 +288,8 @@ Duke Leto (LETO)
 Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
+
+Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 

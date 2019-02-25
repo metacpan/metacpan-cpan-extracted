@@ -6,16 +6,16 @@ package EPublisher::Source::Plugin::PerltutsCom;
 use strict;
 use warnings;
 
-use Data::Dumper;
+use Moo;
 use Encode;
 use File::Basename;
-use LWP::Simple;
+use HTTP::Tiny;
 
-use EPublisher::Source::Base;
+use parent qw( EPublisher::Source::Base );
 
-our @ISA = qw( EPublisher::Source::Base );
+has ua => ( is => 'ro', default => sub { HTTP::Tiny->new } );
 
-our $VERSION = 0.4;
+our $VERSION = '0.5';
 
 # implementing the interface to EPublisher::Source::Base
 sub load_source{
@@ -25,33 +25,36 @@ sub load_source{
 
     my $options = $self->_config;
     
-    return '' unless $options->{name};
+    return if !$options->{name};
 
     my $name = $options->{name};
 
     # fetching the requested tutorial from metacpan
     $self->publisher->debug( "103: fetch tutorial $name" );
 
-    my $pod = LWP::Simple::get(
+    return $self->_get_pod( $name );
+}
+
+sub _get_pod {
+    my ($self,$name) = @_;
+
+    my $response = $self->ua->get(
         'http://perltuts.com/tutorials/' . $name . '?format=pod'
     );
 
-    my $regex = qr/<div \s+ id="content" \s+ class="row"> .*? not \s+ found/;
-
-    if ( !$pod || $pod =~ $regex ) { 
+    if ( $response !~ m{\A2} ) {
         $self->publisher->debug(
             "103: tutorial $name does not exist"
         );
+
         return;
     };
+
+    my $pod = $response->{content};
 
     # perltuts.com always provides utf-8 encoded data, so we have
     # to decode it otherwise the target plugins may produce garbage
     eval{ $pod = decode( 'utf-8', $pod ); };
-
-    # remove =encoding line. We try to decode ourselves, and
-    # Pod::Simple tries to decode, too, when it finds a =encoding line
-    $pod =~ s{^=encoding.*?$}{}mg;
 
     my $title    = $name;
     my $info = { pod => $pod, filename => $name, title => $title };
@@ -78,9 +81,11 @@ sub load_source{
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -88,7 +93,7 @@ EPublisher::Source::Plugin::PerltutsCom - Get POD from tutorials published on pe
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 SYNOPSIS
 
@@ -96,7 +101,13 @@ version 0.4
   my $url_source     = EPublisher::Source->new( $source_options );
   my $pod            = $url_source->load_source;
 
-=encoding utf-8
+=head1 ATTRIBUTES
+
+=over 4
+
+=item ua
+
+=back
 
 =head1 METHODS
 
@@ -119,4 +130,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-

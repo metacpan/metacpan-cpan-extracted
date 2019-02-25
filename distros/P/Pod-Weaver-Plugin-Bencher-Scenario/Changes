@@ -1,3 +1,13 @@
+0.242   2019-02-24 (PERLANCAR)
+
+	- Add '## no critic' to generated Scenario_R module file.
+
+
+0.241   2019-02-24 (PERLANCAR)
+
+	- Support getting scenario from Acme::CPANModules::* module.
+
+
 0.240   2019-02-15 (PERLANCAR)
 
 	- Mention datasets not included by default.

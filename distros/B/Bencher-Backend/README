@@ -2,7 +2,7 @@ NAME
     Bencher::Backend - Backend for Bencher
 
 VERSION
-    This document describes version 1.043 of Bencher::Backend (from Perl
+    This document describes version 1.044 of Bencher::Backend (from Perl
     distribution Bencher-Backend), released on 2019-02-24.
 
 FUNCTIONS
@@ -44,6 +44,13 @@ FUNCTIONS
     *   code_startup => *bool*
 
         Benchmark code startup overhead instead of normal benchmark.
+
+    *   cpanmodules_module => *perl::modname*
+
+        Load a scenario from an Acme::CPANModules:: Perl module.
+
+        An Acme::CPANModules module can also contain benchmarking
+        information, e.g. Acme::CPANModules::TextTable.
 
     *   datasets => *array[hash]*
 
@@ -418,7 +425,7 @@ FUNCTIONS
         Perl file will be do()'ed and the last expression should be a hash
         containing the scenario specification.
 
-    *   scenario_module => *str*
+    *   scenario_module => *perl::modname*
 
         Load a scenario from a Bencher::Scenario:: Perl module.
 

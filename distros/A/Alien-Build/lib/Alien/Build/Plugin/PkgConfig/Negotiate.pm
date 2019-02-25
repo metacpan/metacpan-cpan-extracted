@@ -10,12 +10,21 @@ use Alien::Build::Util qw( _perl_config );
 use Carp ();
 
 # ABSTRACT: Package configuration negotiation plugin
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 has '+pkg_name' => sub {
   Carp::croak "pkg_name is a required property";
 };
+
+
+has atleast_version => undef;
+
+
+has exact_version => undef;
+
+
+has max_version => undef;
 
 
 has minimum_version => undef;
@@ -26,24 +35,29 @@ sub pick
   my($class) = @_;
 
   return $ENV{ALIEN_BUILD_PKG_CONFIG} if $ENV{ALIEN_BUILD_PKG_CONFIG};
-  
+
   if(Alien::Build::Plugin::PkgConfig::LibPkgConf->available)
   {
     return 'PkgConfig::LibPkgConf';
   }
-  
+
   if(Alien::Build::Plugin::PkgConfig::CommandLine->available)
   {
     # TODO: determine environment or flags necessary for using pkg-config
     # on solaris 64 bit.
     # Some advice on pkg-config and 64 bit Solaris
     # https://docs.oracle.com/cd/E53394_01/html/E61689/gplhi.html
-    if(! (_perl_config('osname') eq 'solaris' && _perl_config('ptrsize') == 8))
+    my $is_solaris64 = (_perl_config('osname') eq 'solaris' && _perl_config('ptrsize') == 8);
+
+    # PkgConfig.pm is more reliable on windows
+    my $is_windows = _perl_config('osname') eq 'MSWin32';
+
+    if(!$is_solaris64 && !$is_windows)
     {
       return 'PkgConfig::CommandLine';
     }
   }
-  
+
   if(Alien::Build::Plugin::PkgConfig::PP->available)
   {
     return 'PkgConfig::PP';
@@ -65,17 +79,26 @@ sub init
 
   my $plugin = $self->pick;
   Alien::Build->log("Using PkgConfig plugin: $plugin");
-  
+
   if(ref($self->pkg_name) eq 'ARRAY')
   {
     $meta->add_requires('configure', 'Alien::Build::Plugin::PkgConfig::Negotiate' => '0.79');
   }
-  
+
+  if($self->atleast_version || $self->exact_version || $self->max_version)
+  {
+    $meta->add_requires('configure', 'Alien::Build::Plugin::PkgConfig::Negotiate' => '1.53');
+  }
+
   my @args;
   push @args, pkg_name         => $self->pkg_name;
   push @args, register_prereqs => 0;
-  push @args, minimum_version  => $self->minimum_version if defined $self->minimum_version;
-  
+
+  foreach my $method (map { "${_}_version" } qw( minimum atleast exact max ))
+  {
+    push @args, $method => $self->$method if defined $self->$method;
+  }
+
   $meta->apply_plugin($plugin, @args);
 
   $self;
@@ -95,7 +118,7 @@ Alien::Build::Plugin::PkgConfig::Negotiate - Package configuration negotiation p
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -115,9 +138,21 @@ the best C<PkgConfig> plugin depending your platform and environment.
 
 The package name.
 
-=head2 minimum_version
+=head2 atleast_version
 
 The minimum required version that is acceptable version as provided by the system.
+
+=head2 exact_version
+
+The exact required version that is acceptable version as provided by the system.
+
+=head2 max_version
+
+The max required version that is acceptable version as provided by the system.
+
+=head2 minimum_version
+
+Alias for C<atleast_version> for backward compatibility.
 
 =head1 METHODS
 
@@ -197,6 +232,8 @@ Duke Leto (LETO)
 Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
+
+Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 

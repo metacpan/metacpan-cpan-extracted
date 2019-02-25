@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "File::Path::Tiny" => 0
   },
-  "VERSION" => "2.1.4",
+  "VERSION" => "2.1.5",
   "test" => {
     "TESTS" => "t/*.t"
   }

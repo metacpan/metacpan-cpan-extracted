@@ -37,6 +37,7 @@
             "App::perlbrew" : "0"
          },
          "requires" : {
+            "Acme::CPANModulesUtil::Bencher" : "0",
             "Benchmark::Dumb" : "0",
             "Browser::Open" : "0",
             "Capture::Tiny" : "0",
@@ -103,7 +104,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Backend"
       }
    },
-   "version" : "1.043",
+   "version" : "1.044",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"

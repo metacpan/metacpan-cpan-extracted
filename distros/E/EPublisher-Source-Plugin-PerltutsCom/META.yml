@@ -2,24 +2,40 @@
 abstract: 'Get POD from tutorials published on perltuts.com'
 author:
   - 'Renee Baecker <module@renee-baecker.de>'
-build_requires: {}
+build_requires:
+  File::Find: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::Pod: '1.14'
+  Test::Pod::Coverage: '1.08'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: EPublisher-Source-Plugin-PerltutsCom
+provides:
+  EPublisher::Source::Plugin::PerltutsCom:
+    file: lib/EPublisher/Source/Plugin/PerltutsCom.pm
+    version: '0.5'
 requires:
-  EPublisher: 0.6
-  Encode: 0
-  File::Basename: 0
-  File::Find: 0
-  File::Spec: 0
-  LWP::Simple: 0.34
-  Test::More: 0
-  Test::Pod: 1.14
-  Test::Pod::Coverage: 1.08
-version: 0.4
+  EPublisher: '0.6'
+  Encode: '0'
+  File::Basename: '0'
+  HTTP::Tiny: '0'
+  parent: '0'
+  perl: '5.008'
+resources:
+  bugtracker: http://github.com/reneeb/EPublisher-Source-Plugin-PerltutsCom/issues
+  homepage: http://github.com/reneeb/EPublisher-Source-Plugin-PerltutsCom
+  repository: git://github.com/reneeb/EPublisher-Source-Plugin-PerltutsCom.git
+version: '0.5'
+x_contributors:
+  - 'Boris Daeppen <boris_daeppen@bluewin.ch>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

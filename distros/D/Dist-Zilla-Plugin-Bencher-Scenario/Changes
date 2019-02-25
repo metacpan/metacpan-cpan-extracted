@@ -1,3 +1,8 @@
+0.170   2019-02-24 (PERLANCAR)
+
+	- Support getting scenario from Acme::CPANModules::* module.
+
+
 0.16    2017-01-25 (PERLANCAR)
 
         - Add prereq phase=x_benchmarks rel=x_benchmarks to benchmarked modules,

@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Opening::Book::Move;
-$Chess::Opening::Book::Move::VERSION = '0.5';
+$Chess::Opening::Book::Move::VERSION = '0.6';
 use common::sense;
 
 use Locale::TextDomain 'com.cantanea.Chess-Opening';

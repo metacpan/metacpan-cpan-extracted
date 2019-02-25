@@ -1,11 +1,11 @@
 # ABSTRACT: Cache time consuming subroutines, rest api calls
 # George Bouras , george.mpouras@yandex.com
-# Hellas/Athens , 06 Feb 2019
+# Hellas/Athens , 25 Feb 2019
 
 package	Cache::SimpleDir;
 use B;
 use File::Path::Tiny;
-our $VERSION = '2.1.4';
+our $VERSION = '2.1.5';
 our @ISA     = ();
 our $ERROR   = undef;
 
@@ -22,7 +22,7 @@ expire_sec	=> 3600,			# After how many seconds the record will be considered exp
 verbose		=> 'False',			# Verbose if TRUE or 1
 callback	=> '__NEW_RECORD',	# Subroutine name that cache new data
 cache_dir	=> $^O=~/(?i)MSWin/ ? (local $_="$ENV{TEMP}\\cache", s/\\/\//g, $_) : '/tmp/cache',
-__dir 		=> undef,			# The subdirectory under the "cache_dir" of your cached files
+__dir 		=> undef,			
 __record	=> undef,
 __tmp		=> undef};
 
@@ -49,7 +49,7 @@ __tmp		=> undef};
 
 $self->{verbose}	= $self->{verbose}=~/(?i)t|y|1/ ?1:0;
 $self->{cache_dir}	=~s/[\/\\]*$//;
-
+$self->{__dir}		= "$self->{cache_dir}/";	# The cache full path of the class, with the callback and __userclass
 
 
 # Define the "__userclass" Class of the callback
@@ -57,7 +57,8 @@ $self->{cache_dir}	=~s/[\/\\]*$//;
 # You can call it as				$self->{__userclass}->can($self->{callback})->( 1547328808 )
 
 	if ($self->{callback} eq '__NEW_RECORD') {
-	$self->{__userclass} = $class
+	$self->{__userclass} = $class;
+	$self->{__dir} .= $self->{__userclass}
 	}
 	else {
 	$self->{__userclass} = [caller]->[0];
@@ -66,7 +67,7 @@ $self->{cache_dir}	=~s/[\/\\]*$//;
 
 			if ('CODE' eq ref $self->{callback}) {
 			$self->{__callbackname} = B::svref_2object($self->{callback})->GV->NAME;
-			$self->{__dir} = "$self->{cache_dir}/$self->{__userclass}-$self->{__callbackname}"
+			$self->{__dir} .= "$self->{__userclass}-$self->{__callbackname}"
 			}
 			else {
 			$ERROR = "As callback you used a non CODE reference";
@@ -75,7 +76,7 @@ $self->{cache_dir}	=~s/[\/\\]*$//;
 			}
 		}
 		else {
-		$self->{__dir} = "$self->{cache_dir}/$self->{__userclass}-$self->{callback}";
+		$self->{__dir} .= "$self->{__userclass}-$self->{callback}";
 
 			if ('CODE' ne ref $self->{__userclass}->can($self->{callback}))	{	
 			$ERROR = "Function \"$self->{__userclass}::$self->{callback}\" does not exist";
@@ -84,6 +85,9 @@ $self->{cache_dir}	=~s/[\/\\]*$//;
 			}
 		}
 	}
+
+$self->{__dir}=~s/::/-/g;
+
 
 # Create and clear the top cache directory if missing
 
@@ -327,7 +331,7 @@ Cache::SimpleDir - Cache time consuming subroutines, rest api calls
 
 =head1 VERSION
 
-version 2.1.4
+version 2.1.5
 
 =head1 SYNOPSIS
 

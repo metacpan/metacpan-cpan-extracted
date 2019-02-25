@@ -1,3 +1,11 @@
+0.002   2019-02-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Use DZP:Bencher::Scenario and PWP:Bencher::Scenario to
+	  show sample benchmark.
+
+
 0.001   2019-01-11 (PERLANCAR)
 
         - First release, converted from Bencher::Scenario::TextTableModules.

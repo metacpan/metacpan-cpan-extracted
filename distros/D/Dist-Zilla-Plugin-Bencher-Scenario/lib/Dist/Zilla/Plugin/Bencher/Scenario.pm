@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Bencher::Scenario;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.16'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '0.170'; # VERSION
 
 use 5.010001;
 use strict;
@@ -153,12 +153,26 @@ sub munge_files {
     }
 
     for my $file (@{ $self->found_files }) {
-        next unless $file->name =~ m!\Alib/(Bencher/Scenario/.+)\.pm\z!;
-
+        my ($is_cpanmodules, $scenario_name, $cpanmodules_name);
+        my $scenario;
+        next unless $file->name =~ m!\Alib/(?:(Bencher/Scenario/.+)|(Acme/CPANModules/.+))\.pm\z!;
+        $is_cpanmodules = $2 ? 1:0;
+        (my $pkg = $1 || $2) =~ s!/!::!g;
+        if ($is_cpanmodules) {
+            require Acme::CPANModulesUtil::Bencher;
+            ($cpanmodules_name = $pkg) =~ s/\AAcme::CPANModules:://;
+            $self->log("pkg=$pkg");
+            my $res = Acme::CPANModulesUtil::Bencher::gen_bencher_scenario(
+                cpanmodule => $cpanmodules_name,
+            );
+            $self->log_fatal(["Can't get scenario from %s: %s", $pkg, $res]) unless $res->[0] == 200;
+            $scenario = Bencher::Backend::parse_scenario(scenario => $res->[2]);
+        } else {
+            load $pkg;
+            $scenario = Bencher::Backend::parse_scenario(scenario=>${"$pkg\::scenario"});
+        }
         # add prereq to participant modules
-        my $pkg = $1; $pkg =~ s!/!::!g;
-        load $pkg;
-        my $scenario = Bencher::Backend::parse_scenario(scenario=>${"$pkg\::scenario"});
+
         my @modules = Bencher::Backend::_get_participant_modules($scenario);
         my @helper_modules = Bencher::Backend::_get_participant_helper_modules($scenario);
         for my $mod (@modules) {
@@ -239,7 +253,7 @@ Dist::Zilla::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.16 of Dist::Zilla::Plugin::Bencher::Scenario (from Perl distribution Dist-Zilla-Plugin-Bencher-Scenario), released on 2017-01-25.
+This document describes version 0.170 of Dist::Zilla::Plugin::Bencher::Scenario (from Perl distribution Dist-Zilla-Plugin-Bencher-Scenario), released on 2019-02-24.
 
 =head1 SYNOPSIS
 
@@ -249,8 +263,9 @@ In F<dist.ini>:
 
 =head1 DESCRIPTION
 
-This plugin is to be used when building C<Bencher::Scenario::*> distribution.
-It currently dos the following:
+This plugin is to be used when building C<Bencher::Scenario::*> distribution. It
+can also be used for C<Acme::CPANModules::*> distribution that contains
+benchmarking information. It currently dos the following:
 
 =over
 
@@ -296,7 +311,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

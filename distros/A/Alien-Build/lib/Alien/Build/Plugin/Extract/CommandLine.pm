@@ -10,7 +10,7 @@ use File::Temp qw( tempdir );
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 has '+format' => 'tar';
@@ -109,7 +109,7 @@ sub _dcon
     $self->xz_cmd(_which('xz')) unless defined $self->xz_cmd;
     $cmd = $self->xz_cmd unless $self->_tar_can('tar.xz');
   }
-  
+
   if($cmd && $src =~ /\.(gz|bz2|xz|Z)$/)
   {
     $name = $src;
@@ -120,7 +120,7 @@ sub _dcon
     $name = $src;
     $name =~ s/\.(tgz|tbz|txz|taz)$/.tar/;
   }
-  
+
   ($name,$cmd);
 }
 
@@ -128,7 +128,7 @@ sub _dcon
 sub handles
 {
   my($class, $ext) = @_;
-  
+
   my $self = ref $class
   ? $class
   : __PACKAGE__->new;
@@ -138,18 +138,18 @@ sub handles
   $ext = 'tar.bz2' if $ext eq 'tbz';
   $ext = 'tar.xz'  if $ext eq 'txz';
 
-  return 1 if $ext eq 'tar.gz' && $self->_tar_can('tar.gz');
-  return 1 if $ext eq 'tar.Z' && $self->_tar_can('tar.Z');
+  return 1 if $ext eq 'tar.gz'  && $self->_tar_can('tar.gz');
+  return 1 if $ext eq 'tar.Z'   && $self->_tar_can('tar.Z');
   return 1 if $ext eq 'tar.bz2' && $self->_tar_can('tar.bz2');
-  return 1 if $ext eq 'tar.xz' && $self->_tar_can('tar.xz');
-  
+  return 1 if $ext eq 'tar.xz'  && $self->_tar_can('tar.xz');
+
   return if $ext =~ s/\.(gz|Z)$// && (!$self->gzip_cmd);
   return if $ext =~ s/\.bz2$//    && (!$self->bzip2_cmd);
   return if $ext =~ s/\.xz$//     && (!$self->xz_cmd);
-  
-  return 1 if $ext eq 'tar' && $self->tar_cmd;
+
+  return 1 if $ext eq 'tar' && $self->_tar_can('tar');
   return 1 if $ext eq 'zip' && $self->unzip_cmd;
-  
+
   return;
 }
 
@@ -159,13 +159,13 @@ sub available
   my(undef, $ext) = @_;
 
   # this is actually the same as handles
-  __PACKAGE__->handles($ext);  
+  __PACKAGE__->handles($ext);
 }
 
 sub init
 {
   my($self, $meta) = @_;
-  
+
   if($self->format eq 'tar.xz' && !$self->handles('tar.xz'))
   {
     $meta->add_requires('share' => 'Alien::xz' => '0.06');
@@ -178,13 +178,13 @@ sub init
   {
     $meta->add_requires('share' => 'Alien::gzip' => '0.03');
   }
-  
+
   $meta->register_hook(
     extract => sub {
       my($build, $src) = @_;
-      
+
       my($dcon_name, $dcon_cmd) = _dcon($self, $src);
-      
+
       if($dcon_name)
       {
         unless($dcon_cmd)
@@ -210,7 +210,7 @@ sub init
         }
         $src = $dcon_name;
       }
-      
+
       if($src =~ /\.zip$/i)
       {
         $self->_run($build, $self->unzip_cmd, $src);
@@ -235,8 +235,6 @@ sub _tar_can
 
   my $tar = $self->tar_cmd;
 
-  return 1 if $ext eq 'tar';
-  
   unless(%tars)
   {
     my $name = '';
@@ -252,7 +250,7 @@ sub _tar_can
         $tars{$name} .= $_;
       }
     }
-    
+
     foreach my $key (keys %tars)
     {
       $tars{$key} = unpack "u", $tars{$key};
@@ -264,7 +262,7 @@ sub _tar_can
   return 0 unless $tars{$name};
 
   local $CWD = tempdir( CLEANUP => 1 );
-  
+
   my $cleanup = sub {
     my $save = $CWD;
     unlink $name;
@@ -272,23 +270,23 @@ sub _tar_can
     $CWD = '..';
     rmdir $save;
   };
-  
+
   Path::Tiny->new($name)->spew_raw($tars{$name});
 
   my(undef, $exit) = capture_merged {
     system($self->tar_cmd, 'xf', $name);
     $?;
   };
-  
+
   if($exit)
   {
     $cleanup->();
     return 0;
   }
-  
+
   my $content = eval { Path::Tiny->new('xx.txt')->slurp };
   $cleanup->();
-  
+
   return defined $content && $content eq "xx\n";
 }
 
@@ -304,7 +302,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -424,6 +422,8 @@ Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
 
+Paul Evans (leonerd, PEVANS)
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2011-2018 by Graham Ollis.
@@ -456,3 +456,50 @@ MH\B3,T#$F+&21@P:-6+<N`$"1@P9-V+$`%!SHL^?0(,*!5!G#ITP<DR^8<,F
 MS9PS0Q<:#6/&3-2%)V&$/*GQJM>O8,.*'1I0P=BS:-.J7<NVK=NW<./*G4NW
 7KMV[>//JW<NWK]^_@`,+'DRXL.'#0P$`
 
+[ xx.tar ]
+M>'@N='AT````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M`````````````#`P,#8T-"``,#`P-S8U(``P,#`P,C0@`#`P,#`P,#`P,#`S
+M(#$S,3,T,30U,3<W(#`Q,C<Q,0`@,```````````````````````````````
+M````````````````````````````````````````````````````````````
+M``````````````````````````````````````````!U<W1A<@`P,&]L;&ES
+M9P``````````````````````````````````<W1A9F8`````````````````
+M```````````````````P,#`P,#`@`#`P,#`P,"``````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M``````````````````````!X>`H`````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+7````````````````````````````````

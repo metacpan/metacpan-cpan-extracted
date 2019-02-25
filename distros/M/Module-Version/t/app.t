@@ -43,7 +43,6 @@ my $run = sub { $app->run() };
     # check run() without input
     $app->{'modules'} = ['Test::More'];
     my $ver = $Test::More::VERSION;
-    $ver =~ s/0+$//;
     stdout_is( $run, "$ver\n", 'run() ok - regular' );
 }
 
@@ -57,11 +56,11 @@ my $run = sub { $app->run() };
 {
     # check run() with input
     my ( $fh, $filename ) = tempfile();
-    print {$fh} "Module::Version\n";
+    print {$fh} "Test::More\n";
     close $fh or die "Can't close $fh: $!\n";
 
     $app->{'input'} = $filename;
-    stdout_is( $run, "$Module::Version::VERSION\n", 'run() ok - with input' );
+    stdout_is( $run, "$Test::More::VERSION\n", 'run() ok - with input' );
 }
 
 {
@@ -101,11 +100,11 @@ my $run = sub { $app->run() };
 
 {
     # check run() with full
-    $app->{'modules'} = ['Module::Version'];
+    $app->{'modules'} = ['Test::More'];
     $app->{'full'}    = 1;
     stdout_is(
         $run,
-        "Module::Version $Module::Version::VERSION\n",
+        "Test::More $Test::More::VERSION\n",
         'run() ok - full output',
     );
 

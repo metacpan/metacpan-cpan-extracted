@@ -136,32 +136,39 @@ sub insert_into_args_info_format {
 
 sub __select_cols {
     my ( $sf, $sql ) = @_;
-    my @combined_cols;
-    if ( ! keys %{$sql->{alias}} ) {
-        @combined_cols = ( @{$sql->{chosen_cols}} );
-    }
-    else {
-        for ( @{$sql->{chosen_cols}} ) {
-            if ( exists $sql->{alias}{$_} && defined  $sql->{alias}{$_} && length $sql->{alias}{$_} ) {
-                push @combined_cols, $_ . " AS " . $sql->{alias}{$_};
-            }
-            else {
-                push @combined_cols, $_;
-            }
-        }
-    }
-    if ( ! @combined_cols ) {
-        if ( $sf->{i}{special_table} eq 'join' ) {
-             return ' ' . join ', ', @{$sql->{cols}};
-        }
-        elsif ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
-            return ' ' . join ', ', @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}};
+    my @cols;
+    if ( @{$sql->{select_cols}} ) {
+        if ( ! keys %{$sql->{alias}} ) {
+            @cols = @{$sql->{select_cols}};
         }
         else {
-            return " *";
+            for ( @{$sql->{select_cols}} ) {
+                if ( exists $sql->{alias}{$_} && defined  $sql->{alias}{$_} && length $sql->{alias}{$_} ) {
+                    push @cols, $_ . " AS " . $sql->{alias}{$_};
+                }
+                else {
+                    push @cols, $_;
+                }
+            }
         }
     }
-    return ' ' . join ', ', @combined_cols;
+    elsif ( $sf->{i}{special_table} eq 'join' ) {
+        @cols = @{$sql->{cols}};
+    }
+    elsif ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
+        for ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ) {
+            if ( exists $sql->{alias}{$_} && defined  $sql->{alias}{$_} && length $sql->{alias}{$_} ) {
+                push @cols, $_ . " AS " . $sql->{alias}{$_};
+            }
+            else {
+                push @cols, $_;
+            }
+        }
+    }
+    else {
+        @cols = ( "*" );
+    }
+    return ' ' . join ', ', @cols;
 }
 
 
@@ -303,7 +310,7 @@ sub reset_sql {
     map { delete $sql->{$_} } keys %$sql; # not $sql = {} so $sql is still pointing to the outer $sql
     my @string = qw( distinct_stmt set_stmt where_stmt group_by_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
     my @array  = qw( cols group_by_cols aggr_cols
-                     chosen_cols
+                     select_cols
                      set_args where_args having_args
                      insert_into_cols insert_into_args
                      create_table_cols );

@@ -6,8 +6,11 @@ TODO: how to cope with tagged values and standard json decoders
 TODO: investigate magic (Eric Brine)
 TODO: [PATCH] Types::Serialiser: Inline true(), false() and error() functions
 
+4.01 Sun Feb 24 05:03:30 CET 2019
+	- fix some stack corruption caused mostly when calling methods
+          in list context (tewstcase by Wesley Schwengle).
+
 4.0  Fri Nov 16 00:06:54 CET 2018
-	- 4.0 pre-release, do not use other than for testing.
 	- SECURITY IMPLICATION: this release enables allow_nonref by default
           for compatibnility with RFC 7159 and newer. See "old" vs. "new"
           JSON under SECURITY CONSIDERATIONS.

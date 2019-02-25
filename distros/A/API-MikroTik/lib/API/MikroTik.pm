@@ -9,13 +9,13 @@ use Mojo::IOLoop;
 use Mojo::Util qw(md5_sum deprecated);
 use Scalar::Util 'weaken';
 
+deprecated "API::MikroTik is deprecated in favour of MikroTik::Client\n";
+
 use constant CONN_TIMEOUT => $ENV{API_MIKROTIK_CONNTIMEOUT};
 use constant DEBUG        => $ENV{API_MIKROTIK_DEBUG} || 0;
 use constant PROMISES     => !!(eval { require Mojo::Promise; 1 });
 
-our $VERSION = '0.24.1';
-
-deprecated "This module is deprecated in favour of MikroTik::Client";
+our $VERSION = 'v0.242';
 
 has error    => '';
 has host     => '192.168.88.1';

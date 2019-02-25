@@ -1,0 +1,76 @@
+{
+   "abstract" : "Get POD from tutorials published on perltuts.com",
+   "author" : [
+      "Renee Baecker <module@renee-baecker.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EPublisher-Source-Plugin-PerltutsCom",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "EPublisher" : "0.6",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "HTTP::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      }
+   },
+   "provides" : {
+      "EPublisher::Source::Plugin::PerltutsCom" : {
+         "file" : "lib/EPublisher/Source/Plugin/PerltutsCom.pm",
+         "version" : "0.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/EPublisher-Source-Plugin-PerltutsCom/issues"
+      },
+      "homepage" : "http://github.com/reneeb/EPublisher-Source-Plugin-PerltutsCom",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/reneeb/EPublisher-Source-Plugin-PerltutsCom.git",
+         "web" : "http://github.com/reneeb/EPublisher-Source-Plugin-PerltutsCom"
+      }
+   },
+   "version" : "0.5",
+   "x_contributors" : [
+      "Boris Daeppen <boris_daeppen@bluewin.ch>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

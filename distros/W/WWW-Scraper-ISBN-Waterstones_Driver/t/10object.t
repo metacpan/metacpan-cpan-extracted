@@ -19,7 +19,7 @@ my %tests = (
         [ 'is',     'title',        'Higher-Order Perl'             ],
         [ 'is',     'author',       'Mark Jason Dominus'            ],
         [ 'is',     'publisher',    'Elsevier Science & Technology' ],
-        [ 'is',     'pubdate',      '10/12/2004'                    ],
+        [ 'is',     'pubdate',      '31/03/2005'                    ],
         [ 'is',     'binding',      'Paperback'                     ],
         [ 'is',     'pages',        undef                           ],
         [ 'like',   'image_link',   qr|9781558607019\.jpg$|         ],
@@ -54,12 +54,12 @@ my $scraper = WWW::Scraper::ISBN->new();
 isa_ok($scraper,'WWW::Scraper::ISBN');
 
 SKIP: {
-	skip "Can't see a network connection", $tests+2   if(pingtest($CHECK_DOMAIN));
+    skip "Can't see a network connection", $tests+2   if(pingtest($CHECK_DOMAIN));
 
-	$scraper->drivers($DRIVER);
+    $scraper->drivers($DRIVER);
 
     # this ISBN doesn't exist
-	my $isbn = "0987654321";
+    my $isbn = "0987654321";
     my $record;
     eval { $record = $scraper->search($isbn); };
     if($@) {
@@ -67,7 +67,7 @@ SKIP: {
     } elsif($record->found) {
         ok(0,'Unexpectedly found a non-existent book');
     } else {
-		like($record->error,qr/Invalid ISBN specified|Failed to find that book|website appears to be unavailable|Could not extract data/);
+        like($record->error,qr/Invalid ISBN specified|Failed to find that book|website appears to be unavailable|Could not extract data/);
     }
 
     # this ISBN is now out of print
@@ -78,7 +78,7 @@ SKIP: {
     } elsif($record->found) {
         ok(0,'Unexpectedly found a non-existent book');
     } else {
-		like($record->error,qr/Invalid ISBN specified|Failed to find that book|website appears to be unavailable|Could not extract data/);
+        like($record->error,qr/Invalid ISBN specified|Failed to find that book|website appears to be unavailable|Could not extract data/);
     }
 
     for my $isbn (keys %tests) {

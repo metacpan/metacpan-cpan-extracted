@@ -9,7 +9,7 @@ use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 sub import {
@@ -166,6 +166,68 @@ sub version {
       chomp $version;
       $version;
     };
+}
+
+
+sub atleast_version {
+  my $self = shift;
+  my ($wantver) = @_;
+
+  defined(my $version = $self->version) or
+    croak "$self has no defined ->version";
+
+  return $self->version_cmp($version, $wantver) >= 0;
+}
+
+sub exact_version {
+  my $self = shift;
+  my ($wantver) = @_;
+
+  defined(my $version = $self->version) or
+    croak "$self has no defined ->version";
+
+  return $self->version_cmp($version, $wantver) == 0;
+}
+
+sub max_version {
+  my $self = shift;
+  my ($wantver) = @_;
+
+  defined(my $version = $self->version) or
+    croak "$self has no defined ->version";
+
+  return $self->version_cmp($version, $wantver) <= 0;
+}
+
+
+# Sort::Versions isn't quite the same algorithm because it differs in
+# behaviour with leading zeroes.
+#   See also  https://dev.gentoo.org/~mgorny/pkg-config-spec.html#version-comparison
+sub version_cmp {
+  shift;
+  my @x = (shift =~ m/([0-9]+|[a-z]+)/ig);
+  my @y = (shift =~ m/([0-9]+|[a-z]+)/ig);
+
+  while(@x and @y) {
+    my $x = shift @x; my $x_isnum = $x =~ m/[0-9]/;
+    my $y = shift @y; my $y_isnum = $y =~ m/[0-9]/;
+
+    if($x_isnum and $y_isnum) {
+      # Numerical comparison
+      return $x <=> $y if $x != $y;
+    }
+    elsif(!$x_isnum and !$y_isnum) {
+      # Alphabetic comparison
+      return $x cmp $y if $x ne $y;
+    }
+    else {
+      # Of differing types, the numeric one is newer
+      return $x_isnum - $y_isnum;
+    }
+  }
+
+  # Equal so far; the longer is newer
+  return @x <=> @y;
 }
 
 
@@ -525,7 +587,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -712,6 +774,32 @@ if they are different.
 
 Returns the version of the alienized library or tool that was
 determined at install time.
+
+=head2 atleast_version
+
+=head2 exact_version
+
+=head2 max_version
+
+ my $ok = Alien::MyLibrary->atleast_version($wanted_version);
+ my $ok = Alien::MyLibrary->exact_version($wanted_version);
+ my $ok = Alien::MyLibrary->max_version($wanted_version);
+
+Returns true if the version of the alienized library or tool is at least,
+exactly, or at most the version specified, respectively.
+
+=head2 version_cmp
+
+  $cmp = Alien::MyLibrary->version_cmp($x, $y)
+
+Comparison method used by L<atleast_version>, L<exact_version> and
+L<max_version>. May be useful to implement custom comparisons, or for
+subclasses to overload to get different version comparison semantics than the
+default rules, for packages that have some other rules than the F<pkg-config>
+behaviour.
+
+Should return a number less than, equal to, or greater than zero; similar in
+behaviour to the C<< <=> >> and C<cmp> operators.
 
 =head2 install_type
 
@@ -1043,6 +1131,8 @@ Duke Leto (LETO)
 Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
+
+Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 

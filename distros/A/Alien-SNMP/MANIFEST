@@ -1,0 +1,17 @@
+Build.PL
+Changes
+inc/My/AlienPatch.pm
+inc/My/ModuleBuild.pm
+lib/Alien/SNMP.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00_diag.t
+t/00_diag.txt
+t/01_use.t
+t/02_compile.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

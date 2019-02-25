@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.52
+    version 1.55
 
 SYNOPSIS
 
@@ -51,10 +51,11 @@ DESCRIPTION
       This is for the brave souls who want to write plugins that will work
       with Alien::Build + alienfile.
 
-    Note that you will usually not usually create a Alien::Build instance
-    directly, but rather be using a thin installer layer, such as
-    Alien::Build::MM (for use with ExtUtils::MakeMaker). One of the goals
-    of this project is to remain installer agnostic.
+    Note that you will not usually create a Alien::Build instance directly,
+    but rather be using a thin installer layer, such as Alien::Build::MM
+    (for use with ExtUtils::MakeMaker) or Alien::Build::MB (for use with
+    Module::Build). One of the goals of this project is to remain installer
+    agnostic.
 
 CONSTRUCTOR
 
@@ -725,8 +726,8 @@ ENVIRONMENT
     PKG_CONFIG
 
       This environment variable can be used to override the program name
-      for pkg-config for some PkgConfig plugins:
-      Alien::Build::Plugin::PkgConfig.
+      for pkg-config when using the command line plugin:
+      Alien::Build::Plugin::PkgConfig::CommandLine.
 
     ftp_proxy, all_proxy
 
@@ -843,6 +844,8 @@ AUTHOR
     Shoichi Kaji (SKAJI)
 
     Shawn Laffan (SLAFFAN)
+
+    Paul Evans (leonerd, PEVANS)
 
 COPYRIGHT AND LICENSE
 

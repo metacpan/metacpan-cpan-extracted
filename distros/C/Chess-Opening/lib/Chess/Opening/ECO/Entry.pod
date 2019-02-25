@@ -13,7 +13,6 @@ Chess::Opening::ECO::Entry - ECO information for a position.
 	$variation = $entry->variation;
 	$total = $entry->weights;
 	$total = $entry->counts;
-	$fen = $entry->fen;
 	$moves = $entry->moves;
 
 	$entry->addMove(move => 'g1f3', count => 2304);
@@ -66,11 +65,6 @@ the number of moves.
 =item B<counts>
 
 An alias B<weights()>, see above.
-
-=item B<fen>
-
-Returns the chess position in Forsyth-Edwards Notation FEN, see
-L<Chess::Opening/Positions>.
 
 =item B<addMove move =E<gt> MOVE, weight =E<gt> WEIGHT>
 

@@ -1,0 +1,23 @@
+2.000000 - 2019-02-24
+
+  * Merged master
+
+1.000001 - 2017-08-12
+
+  * Merged master
+
+1.000000 - 2017-08-12
+
+  * CPAN release
+
+0.030000 - 2017-04-14
+
+  * Move net-snmp upstream to another repo
+
+0.020000 - 2017-03-06
+
+  * Create Alien::SNMP::MAXTC
+
+0.010000 - 2015-10-16
+
+  * First version, initial release

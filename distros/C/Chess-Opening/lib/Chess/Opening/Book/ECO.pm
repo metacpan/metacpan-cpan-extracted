@@ -13,7 +13,7 @@
 # ABSTRACT: Read chess opening books in polyglot format
 
 package Chess::Opening::Book::ECO;
-$Chess::Opening::Book::ECO::VERSION = '0.5';
+$Chess::Opening::Book::ECO::VERSION = '0.6';
 use common::sense;
 
 use Fcntl qw(:seek);
@@ -35,11 +35,18 @@ sub lookupFEN {
 
 	my $positions = Chess::Opening::ECO->positions;
 
+	# Ignore en passant field, half move count and move number for lookup so
+	# that transpositions work correctly.
+	$fen =~ s/[ \011-\015]+[-a-h1-8]+[ \011-\015]+[0-9]+[ \011-\015]+[0-9]+[ \011-\015]*$//;
+
 	return if !exists $positions->{$fen};
 
 	my $position = $positions->{$fen};
 	my $entry = Chess::Opening::ECO::Entry->new(
 		$fen,
+		length => $position->{length},
+		significant => $position->{significant},
+		history => $position->{history},
 		eco => $position->{eco},
 		variation => $position->{variation});
 

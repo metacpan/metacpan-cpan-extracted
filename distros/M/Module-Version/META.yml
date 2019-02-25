@@ -19,10 +19,10 @@ name: Module-Version
 provides:
   Module::Version:
     file: lib/Module/Version.pm
-    version: '0.200'
+    version: '0.201'
   Module::Version::App:
     file: lib/Module/Version/App.pm
-    version: '0.200'
+    version: '0.201'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -30,8 +30,9 @@ requires:
   Getopt::Long: '0'
   local::lib: '0'
   parent: '0'
+  perl: '5.008'
 resources:
   repository: git://github.com/xsawyerx/module-version.git
-version: '0.200'
+version: '0.201'
 x_authority: cpan:XSAWYERX
 x_serialization_backend: 'YAML::Tiny version 1.73'

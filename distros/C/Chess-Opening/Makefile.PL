@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "Fcntl" => 0,
     "IO::Seekable" => "1.20",
     "Locale::TextDomain" => 0,
+    "Scalar::Util" => 0,
     "base" => 0,
     "common::sense" => 0,
     "constant" => 0,
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "POSIX" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.5",
+  "VERSION" => "0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +49,7 @@ my %FallbackPrereqs = (
   "Locale::TextDomain" => 0,
   "Module::Build" => "0.28",
   "POSIX" => 0,
+  "Scalar::Util" => 0,
   "Test::More" => 0,
   "base" => 0,
   "common::sense" => 0,

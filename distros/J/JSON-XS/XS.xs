@@ -1506,7 +1506,7 @@ decode_hv (dec_t *dec)
   sv = newRV_noinc ((SV *)hv);
 
   // check filter callbacks
-  if (dec->json.flags & F_HOOK)
+  if (expect_false (dec->json.flags & F_HOOK))
     {
       if (dec->json.cb_sk_object && HvKEYS (hv) == 1)
         {
@@ -1558,15 +1558,12 @@ decode_hv (dec_t *dec)
           PUTBACK; count = call_sv (dec->json.cb_object, G_ARRAY); SPAGAIN;
 
           if (count == 1)
-            {
-              sv = newSVsv (POPs);
-              FREETMPS; LEAVE;
-              return sv;
-            }
-          else if (count)
+            sv = newSVsv (POPs);
+          else if (count == 0)
+            SvREFCNT_inc (sv);
+          else
             croak ("filter_json_object callbacks must not return more than one scalar");
 
-          SvREFCNT_inc (sv);
           FREETMPS; LEAVE;
         }
     }
@@ -2211,20 +2208,18 @@ void filter_json_single_key_object (JSON *self, SV *key, SV *cb = &PL_sv_undef)
 
 void encode (JSON *self, SV *scalar)
 	PPCODE:
-        PUTBACK; scalar = encode_json (scalar, self); SPAGAIN;
-        XPUSHs (scalar);
+        PUTBACK; XPUSHs (encode_json (scalar, self));
 
 void decode (JSON *self, SV *jsonstr)
 	PPCODE:
-        PUTBACK; jsonstr = decode_json (jsonstr, self, 0); SPAGAIN;
-        XPUSHs (jsonstr);
+        PUTBACK; XPUSHs (decode_json (jsonstr, self, 0));
 
 void decode_prefix (JSON *self, SV *jsonstr)
 	PPCODE:
 {
 	SV *sv;
         STRLEN offset;
-        PUTBACK; sv = decode_json (jsonstr, self, &offset); SPAGAIN;
+        PUTBACK; sv = decode_json (jsonstr, self, &offset);
         EXTEND (SP, 2);
         PUSHs (sv);
         PUSHs (sv_2mortal (newSVuv (ptr_to_index (jsonstr, SvPV_nolen (jsonstr) + offset))));
@@ -2307,7 +2302,7 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
                     }
                 }
 
-              PUTBACK; sv = decode_json (self->incr_text, self, &offset); SPAGAIN;
+              PUTBACK; sv = decode_json (self->incr_text, self, &offset);
               XPUSHs (sv);
 
               self->incr_pos -= offset;
@@ -2369,8 +2364,7 @@ void encode_json (SV *scalar)
         JSON json;
         json_init (&json);
         json.flags |= F_UTF8;
-        PUTBACK; scalar = encode_json (scalar, &json); SPAGAIN;
-        XPUSHs (scalar);
+        PUTBACK; XPUSHs (encode_json (scalar, &json));
 }
 
 void decode_json (SV *jsonstr)
@@ -2379,7 +2373,6 @@ void decode_json (SV *jsonstr)
         JSON json;
         json_init (&json);
         json.flags |= F_UTF8;
-        PUTBACK; jsonstr = decode_json (jsonstr, &json, 0); SPAGAIN;
-        XPUSHs (jsonstr);
+        PUTBACK; XPUSHs (decode_json (jsonstr, &json, 0));
 }
 

@@ -106,6 +106,10 @@ subtest 'Alien::Build system' => sub {
   is( Alien::libfoo1->libs, '-lfoo', 'libs' );
   is( Alien::libfoo1->libs_static, '-lfoo -lbar -lbaz', 'libs_static' );
   is( Alien::libfoo1->version, '1.2.3', 'version');
+  ok( Alien::libfoo1->atleast_version('1.2'), 'version atleast 1.2' );
+  ok( !Alien::libfoo1->atleast_version('1.3'), 'version not atleast 1.3' );
+  ok( Alien::libfoo1->exact_version('1.2.3'), 'version exactly 1.2.3' );
+  ok( Alien::libfoo1->max_version('1.4'), 'version atmost 1.4' );
   
   subtest 'install type' => sub {
     is( Alien::libfoo1->install_type, 'system' );
@@ -121,6 +125,22 @@ subtest 'Alien::Build system' => sub {
   is( [Alien::libfoo1->bin_dir], [], 'bin_dir' );
   
   is( Alien::libfoo1->runtime_prop->{arbitrary}, 'one', 'runtime_prop' );
+
+  {
+    # no version
+    my $mock = mock 'Alien::libfoo1' => (
+      override => [
+        version => sub { return undef },
+      ],
+    );
+
+    ok( !eval{ Alien::libfoo1->atleast_version('1.2'); 1 } and
+        $@ =~ m/has no defined ->version/, 'no version atleast' );
+    ok( !eval { Alien::libfoo1->exact_version('1.2.3'); 1 } and
+        $@ =~ m/has no defined ->version/, 'no version exactly' );
+    ok( !eval { Alien::libfoo1->max_version('1.4'); 1 } and
+        $@ =~ m/has no defined ->version/, 'no version atmost' );
+  }
 };
 
 subtest 'Alien::Build quazi system dylib' => sub {

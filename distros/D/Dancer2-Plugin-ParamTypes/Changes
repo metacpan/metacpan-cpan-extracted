@@ -1,4 +1,8 @@
 
+0.005     2019-02-24 23:01:26+02:00 Asia/Jerusalem
+
+    * Fix failed reports for usage of "package BLOCK". (Mohammad S Anwar)
+
 0.004     2017-12-17 18:54:32+01:00 Europe/Amsterdam
 
     * Use Ref::Util to speed up.

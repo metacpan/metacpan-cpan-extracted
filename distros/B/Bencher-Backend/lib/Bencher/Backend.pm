@@ -1,7 +1,7 @@
 package Bencher::Backend;
 
 our $DATE = '2019-02-24'; # DATE
-our $VERSION = '1.043'; # VERSION
+our $VERSION = '1.044'; # VERSION
 
 use 5.010001;
 use strict;
@@ -412,6 +412,16 @@ sub _get_scenario {
         }
         no strict 'refs';
         $scenario = ${"$m\::scenario"};
+    } elsif (defined $pargs->{cpanmodules_module}) {
+        require Acme::CPANModulesUtil::Bencher;
+
+        my $mod = "Acme::CPANModules::$pargs->{cpanmodules_module}";
+        my $res = Acme::CPANModulesUtil::Bencher::gen_bencher_scenario(
+            cpanmodule => $pargs->{cpanmodules_module},
+        );
+        die "Can't load scenario from an Acme::CPANModules module '$mod': ".
+            "$res->[0] - $res->[1]" unless $res->[0] == 200;
+        $scenario = $res->[2];
     } elsif (defined $pargs->{scenario}) {
         $scenario = $pargs->{scenario};
     } else {
@@ -1386,6 +1396,28 @@ sub _complete_scenario_module {
     }
 }
 
+sub _complete_cpanmodules_module {
+    my %args = @_;
+    my $word    = $args{word} // '';
+    my $cmdline = $args{cmdline};
+    my $r       = $args{r};
+
+    return undef unless $cmdline;
+
+    # force reading config file
+    $r->{read_config} = 1;
+    my $res = $cmdline->parse_argv($r);
+    my $args = $res->[2];
+
+    require Complete::Module;
+    {
+        local @INC = @INC;
+        unshift @INC, $_ for @{ $args->{include_path} // [] };
+        Complete::Module::complete_module(
+            word=>$args{word}, ns_prefix=>'Acme::CPANModules');
+    }
+}
+
 sub _complete_participant_module {
     my %args = @_;
     my $word    = $args{word} // '';
@@ -2296,7 +2328,7 @@ _
         # XXX sort is only relevant when action=bench and format=text
         # XXX include_perls & exclude_perls are only relevant when multiperl=1
         'choose_one&' => [
-            ['scenario_file', 'scenario_module', 'scenario'],
+            ['scenario_file', 'scenario_module', 'scenario', 'cpanmodules_module'],
             ['module_startup', 'code_startup'],
         ],
     },
@@ -2321,9 +2353,20 @@ variable in the module called `$scenario` which should be a hashref containing
 the scenario specification.
 
 _
-            schema => ['str*', match=>qr!\A\w+((?:::|/)\w+)*\z!],
+            schema => 'perl::modname*',
             cmdline_aliases => {m=>{}},
             completion => sub { _complete_scenario_module(@_) },
+        },
+        cpanmodules_module => {
+            summary => 'Load a scenario from an Acme::CPANModules:: Perl module',
+            description => <<'_',
+
+An <pm:Acme::CPANModules> module can also contain benchmarking information, e.g.
+<pm:Acme::CPANModules::TextTable>.
+
+_
+            schema => 'perl::modname*',
+            completion => sub { _complete_cpanmodules_module(@_) },
         },
         scenario => {
             summary => 'Load a scenario from data structure',
@@ -3871,8 +3914,8 @@ sub bencher {
                 $envres->[3]{'func.scenario_file_sha1sum'} = $digests->{sha1};
                 $envres->[3]{'func.scenario_file_sha256sum'} = $digests->{sha256};
             } elsif (my $mod = $args{scenario_module}) {
-                $mod = "Bencher::Scenario::$mod" unless $mod =~ /\ABencher::Scenario::/;
                 no strict 'refs';
+                $mod = "Bencher::Scenario::$mod" unless $mod =~ /\ABencher::Scenario::/;
                 $envres->[3]{'func.scenario_module'} = $mod;
                 (my $mod_pm = "$mod.pm") =~ s!::!/!g;
                 $INC{$mod_pm} or die "BUG: Can't find '$mod_pm' in \%INC";
@@ -3882,6 +3925,19 @@ sub bencher {
                 $envres->[3]{'func.scenario_module_md5sum'} = $digests->{md5};
                 $envres->[3]{'func.scenario_module_sha1sum'} = $digests->{sha1};
                 $envres->[3]{'func.scenario_module_sha256sum'} = $digests->{sha256};
+                $envres->[3]{'func.module_versions'}{$mod} =
+                    ${"$mod\::VERSION"};
+            } elsif (my $mod0 = $args{cpanmodules_module}) {
+                no strict 'refs';
+                my $mod = "Acme::CPANModules::$mod0";
+                $envres->[3]{'func.cpanmodules_module'} = $mod;
+                (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+                my @st = stat($INC{$mod_pm});
+                $envres->[3]{'func.cpanmodules_module_mtime'} = $st[9];
+                my $digests = _digest($INC{$mod_pm});
+                $envres->[3]{'func.cpanmodules_module_md5sum'} = $digests->{md5};
+                $envres->[3]{'func.cpanmodules_module_sha1sum'} = $digests->{sha1};
+                $envres->[3]{'func.cpanmodules_module_sha256sum'} = $digests->{sha256};
                 $envres->[3]{'func.module_versions'}{$mod} =
                     ${"$mod\::VERSION"};
             }
@@ -4192,7 +4248,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.043 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2019-02-24.
+This document describes version 1.044 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2019-02-24.
 
 =head1 FUNCTIONS
 
@@ -4236,6 +4292,13 @@ Trap output to stdout.
 =item * B<code_startup> => I<bool>
 
 Benchmark code startup overhead instead of normal benchmark.
+
+=item * B<cpanmodules_module> => I<perl::modname>
+
+Load a scenario from an Acme::CPANModules:: Perl module.
+
+An L<Acme::CPANModules> module can also contain benchmarking information, e.g.
+L<Acme::CPANModules::TextTable>.
 
 =item * B<datasets> => I<array[hash]>
 
@@ -4596,7 +4659,7 @@ Load a scenario from a Perl file.
 Perl file will be do()'ed and the last expression should be a hash containing
 the scenario specification.
 
-=item * B<scenario_module> => I<str>
+=item * B<scenario_module> => I<perl::modname>
 
 Load a scenario from a Bencher::Scenario:: Perl module.
 

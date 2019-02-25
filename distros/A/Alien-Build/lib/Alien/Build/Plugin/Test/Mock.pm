@@ -8,7 +8,7 @@ use Path::Tiny ();
 use File::chdir;
 
 # ABSTRACT: Mock plugin for testing
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 has 'probe';
@@ -258,7 +258,7 @@ Alien::Build::Plugin::Test::Mock - Mock plugin for testing
 
 =head1 VERSION
 
-version 1.52
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -426,6 +426,8 @@ Duke Leto (LETO)
 Shoichi Kaji (SKAJI)
 
 Shawn Laffan (SLAFFAN)
+
+Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 

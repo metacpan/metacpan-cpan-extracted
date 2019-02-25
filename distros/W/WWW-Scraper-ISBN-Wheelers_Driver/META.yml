@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                   WWW-Scraper-ISBN-Wheelers_Driver
-version:                0.14
+version:                0.15
 abstract:               Search drivers for the Wheelers' online book catalog
 author:
   - Barbie <barbie@cpan.org>
@@ -27,7 +27,7 @@ build_requires:
 provides:
   WWW::Scraper::ISBN::Wheelers_Driver:
     file:     lib/WWW/Scraper/ISBN/Wheelers_Driver.pm
-    version:  0.14
+    version:  0.15
 
 no_index:
   directory:
